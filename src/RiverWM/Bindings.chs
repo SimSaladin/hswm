@@ -1,33 +1,20 @@
-{-# LANGUAGE RecordWildCards #-}
 module RiverWM.Bindings where
 
-import Control.Monad
-
--- import C2HS
 import Foreign hiding (void)
 import Foreign.C
-import Data.Default
 import GHC.Generics (Generic)
-import Control.Exception
-import Text.Printf
 
+{#import HSWM.Types.XKB #}
 {#import Wayland.Bindings #}
 
 #include "river-window-management-v1-client-protocol.h"
 
-type Data = Ptr ()
+-- * Types
+
+type Data = Ptr () -- TODO
 
 data RiverWindowManagerException = RiverWindowManagerException String deriving (Show)
 instance Exception RiverWindowManagerException
-
-foreign import ccall "&river_window_manager_v1_interface" river_window_manager_v1_interface :: WlInterface
-foreign import ccall "&river_window_v1_interface" river_window_v1_interface :: WlInterface
-foreign import ccall "&river_decoration_v1_interface" river_decoration_v1_interface :: WlInterface
-foreign import ccall "&river_shell_surface_v1_interface" river_shell_surface_v1_interface :: WlInterface
-foreign import ccall "&river_node_v1_interface" river_node_v1_interface :: WlInterface
-foreign import ccall "&river_output_v1_interface" river_output_v1_interface :: WlInterface
-foreign import ccall "&river_seat_v1_interface" river_seat_v1_interface :: WlInterface
-foreign import ccall "&river_pointer_binding_v1_interface" river_pointer_binding_v1_interface :: WlInterface
 
 {#pointer *river_decoration_v1 as RiverDecoration newtype#}
 {#pointer *river_node_v1 as RiverNode newtype#}
@@ -38,9 +25,20 @@ foreign import ccall "&river_pointer_binding_v1_interface" river_pointer_binding
 {#pointer *river_window_manager_v1 as RiverWindowManager newtype#}
 {#pointer *river_window_v1 as RiverWindow newtype#}
 
-instance Eq RiverOutput where RiverOutput a == RiverOutput b = a == b
-instance Eq RiverSeat where RiverSeat a == RiverSeat b = a == b
-instance Eq RiverWindow where RiverWindow a == RiverWindow b = a == b
+deriving instance Show RiverWindow
+deriving instance Show RiverNode
+deriving instance Show RiverSeat
+deriving instance Show RiverPointerBinding
+deriving instance Show RiverOutput
+deriving instance Show RiverWindowManager
+deriving instance Show RiverShellSurface
+
+deriving instance Eq RiverOutput
+deriving instance Eq RiverSeat
+deriving instance Eq RiverWindow
+
+deriving instance Storable RiverSeat
+deriving instance Storable RiverPointerBinding
 
 instance IsWlProxy RiverWindowManager where toWlProxy (RiverWindowManager p) = WlProxy (castPtr p)
 instance IsWlProxy RiverDecoration where toWlProxy (RiverDecoration p) = WlProxy (castPtr p)
@@ -48,6 +46,7 @@ instance IsWlProxy RiverWindow where toWlProxy (RiverWindow p) = WlProxy (castPt
 instance IsWlProxy RiverOutput where toWlProxy (RiverOutput p) = WlProxy (castPtr p)
 instance IsWlProxy RiverSeat where toWlProxy (RiverSeat p) = WlProxy (castPtr p)
 instance IsWlProxy RiverNode where toWlProxy (RiverNode p) = WlProxy (castPtr p)
+instance IsWlProxy RiverPointerBinding where toWlProxy (RiverPointerBinding p) = WlProxy (castPtr p)
 
 instance IsRegistryObject RiverWindowManager where peekRegistryObject p = return $ RiverWindowManager $ castPtr p
 
@@ -55,8 +54,20 @@ instance WlMarshal RiverOutput where wlMarshal (RiverOutput p) = castPtr p
 instance WlMarshal RiverSeat where wlMarshal (RiverSeat p) = castPtr p
 instance WlMarshal RiverWindow where wlMarshal (RiverWindow p) = castPtr p
 instance WlMarshal RiverNode where wlMarshal (RiverNode p) = castPtr p
+instance WlMarshal RiverShellSurface where wlMarshal (RiverShellSurface p) = castPtr p
 
--- * IFACE river_window_manager_v1
+-- * Imported interfaces
+
+foreign import ccall "&river_window_manager_v1_interface"  river_window_manager_v1_interface  :: WlInterface
+foreign import ccall "&river_window_v1_interface"          river_window_v1_interface          :: WlInterface
+foreign import ccall "&river_decoration_v1_interface"      river_decoration_v1_interface      :: WlInterface
+foreign import ccall "&river_shell_surface_v1_interface"   river_shell_surface_v1_interface   :: WlInterface
+foreign import ccall "&river_node_v1_interface"            river_node_v1_interface            :: WlInterface
+foreign import ccall "&river_output_v1_interface"          river_output_v1_interface          :: WlInterface
+foreign import ccall "&river_seat_v1_interface"            river_seat_v1_interface            :: WlInterface
+foreign import ccall "&river_pointer_binding_v1_interface" river_pointer_binding_v1_interface :: WlInterface
+
+-- * river_window_manager_v1
 
 {#enum river_window_manager_v1_error as RiverWindowManagerError {underscoreToCase} #}
 
@@ -73,20 +84,28 @@ river_window_manager_v1_get_user_data wm = wl_proxy_get_user_data wm
 
 wmStop :: RiverWindowManager -> IO ()
 wmStop wm = do
-  river_window_manager_v1_request_ wm {#const RIVER_WINDOW_MANAGER_V1_STOP#} 0
+  ver <- wl_proxy_get_version wm
+  void $ wl_proxy_marshal_flags wm {#const RIVER_WINDOW_MANAGER_V1_STOP#} emptyInterface ver 0
 
 wmDestroy :: RiverWindowManager -> IO ()
 wmDestroy wm = do
-  river_window_manager_v1_request_ wm {#const RIVER_WINDOW_MANAGER_V1_DESTROY#} _WL_MARSHAL_FLAG_DESTROY
+  ver <- wl_proxy_get_version wm
+  void $ wl_proxy_marshal_flags wm {#const RIVER_WINDOW_MANAGER_V1_DESTROY#} emptyInterface ver _WL_MARSHAL_FLAG_DESTROY
+
+wmManageDirty :: RiverWindowManager -> IO ()
+wmManageDirty wm = do
+  ver <- wl_proxy_get_version wm
+  void $ wl_proxy_marshal_flags wm {#const RIVER_WINDOW_MANAGER_V1_MANAGE_DIRTY#} emptyInterface ver 0
+
+wmExitSession :: RiverWindowManager -> IO ()
+wmExitSession wm = do
+  ver <- wl_proxy_get_version wm
+  void $ wl_proxy_marshal_flags wm {#const RIVER_WINDOW_MANAGER_V1_EXIT_SESSION#} emptyInterface ver 0
 
 wmManageFinish :: RiverWindowManager -> IO ()
 wmManageFinish wm = do
   ver <- wl_proxy_get_version wm
   void $ wl_proxy_marshal_flags wm {#const RIVER_WINDOW_MANAGER_V1_MANAGE_FINISH#} emptyInterface ver 0
-
-wmManageDirty :: RiverWindowManager -> IO ()
-wmManageDirty wm = do
-  river_window_manager_v1_request_ wm {#const RIVER_WINDOW_MANAGER_V1_MANAGE_DIRTY#} 0
 
 wmRenderFinish :: RiverWindowManager -> IO ()
 wmRenderFinish wm = do
@@ -99,24 +118,6 @@ wmGetShellSurface wm surface = do
   wl_proxy_marshal_flags__pp wm {#const RIVER_WINDOW_MANAGER_V1_GET_SHELL_SURFACE#} river_shell_surface_v1_interface ver 0 nullPtr surface
     >>= coerceWlProxy "wmGetShellSurface" (return . RiverShellSurface)
 
-wmExitSession :: RiverWindowManager -> IO ()
-wmExitSession wm = river_window_manager_v1_request_ wm {#const RIVER_WINDOW_MANAGER_V1_EXIT_SESSION#} 0
-
-river_window_manager_v1_request_ :: RiverWindowManager -> CUInt -> Flags -> IO ()
-river_window_manager_v1_request_ wm req flags = do
-  ver <- wl_proxy_get_version wm
-  wl_proxy_marshal_flags wm req emptyInterface ver flags >>= coerceWlProxy_ ("river_window_manager_v1_request_:" ++ show req)
-
-type ListenerCb = Ptr () -> RiverWindowManager -> IO ()
-type ListenerWindowCb = Ptr () -> RiverWindowManager -> RiverWindow -> IO ()
-type ListenerOutputCb = Ptr () -> RiverWindowManager -> RiverOutput -> IO ()
-type ListenerSeatCb = Ptr () -> RiverWindowManager -> RiverSeat -> IO ()
-
-foreign import ccall "wrapper" wrapListenerCb :: ListenerCb -> IO (FunPtr ListenerCb)
-foreign import ccall "wrapper" wrapListenerWindowCb :: ListenerWindowCb -> IO (FunPtr ListenerWindowCb)
-foreign import ccall "wrapper" wrapListenerSeatCb :: ListenerSeatCb -> IO (FunPtr ListenerSeatCb)
-foreign import ccall "wrapper" wrapListenerOutputCb :: ListenerOutputCb -> IO (FunPtr ListenerOutputCb)
-
 data WindowManagerEvent
   = WindowManagerUnavailable      { e_data :: Data, e_wm :: RiverWindowManager }
   | WindowManagerFinished         { e_data :: Data, e_wm :: RiverWindowManager }
@@ -127,18 +128,17 @@ data WindowManagerEvent
   | WindowManagerWindow           { e_data :: Data, e_wm :: RiverWindowManager, e_window :: RiverWindow }
   | WindowManagerOutput           { e_data :: Data, e_wm :: RiverWindowManager, e_output :: RiverOutput }
   | WindowManagerSeat             { e_data :: Data, e_wm :: RiverWindowManager, e_seat :: RiverSeat }
+  deriving (Show)
 
-_debugManagerEvent :: WindowManagerEvent -> String
-_debugManagerEvent e = case e of
-  WindowManagerUnavailable      {} -> "WindowManagerUnavailable    "
-  WindowManagerFinished         {} -> "WindowManagerFinished       "
-  WindowManagerManageStart      {} -> "WindowManagerManageStart    "
-  WindowManagerRenderStart      {} -> "WindowManagerRenderStart    "
-  WindowManagerSessionLocked    {} -> "WindowManagerSessionLocked  "
-  WindowManagerSessionUnlocked  {} -> "WindowManagerSessionUnlocked"
-  WindowManagerWindow           {} -> "WindowManagerWindow"
-  WindowManagerOutput           {} -> "WindowManagerOutput"
-  WindowManagerSeat             {} -> "WindowManagerSeat"
+type ListenerCb       = Data -> RiverWindowManager -> IO ()
+type ListenerWindowCb = Data -> RiverWindowManager -> RiverWindow -> IO ()
+type ListenerOutputCb = Data -> RiverWindowManager -> RiverOutput -> IO ()
+type ListenerSeatCb   = Data -> RiverWindowManager -> RiverSeat -> IO ()
+
+foreign import ccall "wrapper" wrapListenerCb       :: ListenerCb -> IO (FunPtr ListenerCb)
+foreign import ccall "wrapper" wrapListenerWindowCb :: ListenerWindowCb -> IO (FunPtr ListenerWindowCb)
+foreign import ccall "wrapper" wrapListenerSeatCb   :: ListenerSeatCb -> IO (FunPtr ListenerSeatCb)
+foreign import ccall "wrapper" wrapListenerOutputCb :: ListenerOutputCb -> IO (FunPtr ListenerOutputCb)
 
 {#pointer *river_window_manager_v1_listener as RiverWindowManagerListener newtype#}
 
@@ -156,27 +156,37 @@ mkWindowManagerListener h = do
     {#set river_window_manager_v1_listener.seat#} p             =<< (wrapListenerSeatCb $ \dt wm a -> h $ WindowManagerSeat dt wm a)
     return p
 
-river_window_manager_v1_add_listener :: RiverWindowManager -> RiverWindowManagerListener -> Ptr () -> IO ()
+river_window_manager_v1_add_listener :: RiverWindowManager -> RiverWindowManagerListener -> Data -> IO ()
 river_window_manager_v1_add_listener wm (RiverWindowManagerListener l) dt = do
   res <- wl_proxy_add_listener wm (castPtr l) dt
   when (res < 0) $ throwIO $ RiverWindowManagerException "river_window_manager_v1_add_listener"
 
--- * IFACE river_window_v1
+-----------------------------------------
+-- * river_window_v1
+-----------------------------------------
 
 type WindowCaps = {#type uint32_t#}
 
 type ClipBox = (Int, Int, Int, Int)
 
 data WindowBorders = WindowBorders
-  { wb_edges, wb_r, wb_g, wb_b, wb_a :: CUInt
-  , wb_width :: Int
+  { wb_edges :: CUInt -- ^ Edges on which to draw borders
+  , wb_width :: Int -- ^ Width of border
+  , wb_r, wb_g, wb_b, wb_a :: CUInt -- ^ RGBA 32-bit
   } deriving (Eq, Ord, Show)
 
-{#enum river_window_v1_error as RiverWindowError {underscoreToCase} #}
-{#enum river_window_v1_decoration_hint as RiverWindowDecorationHint {underscoreToCase} #}
-{#enum river_window_v1_edges as RiverWindowEdges {underscoreToCase} #}
-{#enum river_window_v1_capabilities as RiverWindowCapabilities {underscoreToCase} #}
+{#enum river_window_v1_edges as WindowEdges {underscoreToCase}
+  with prefix = "RIVER_WINDOW_V1_EDGES" add prefix = "EDGE" deriving (Show, Eq) #}
+
+{#enum river_window_v1_decoration_hint as WindowDecorationHint {underscoreToCase}
+  with prefix = "RIVER_WINDOW_V1_DECORATION_HINT" deriving (Show, Eq) #}
+
+{#enum river_window_v1_capabilities as WindowCapabilities {underscoreToCase}
+  with prefix = "RIVER_WINDOW_V1_CAPABILITIES" deriving (Show, Eq) #}
+
 {#pointer *river_window_v1_listener as WindowListener newtype#}
+
+{#enum river_window_v1_error as RiverWindowError {underscoreToCase} #}
 
 invalidWindow :: RiverWindow
 invalidWindow = RiverWindow $ castPtr $ nullPtr
@@ -185,66 +195,47 @@ invalidSeat :: RiverSeat
 invalidSeat = RiverSeat $ castPtr $ nullPtr
 
 data WindowEvent
-  = WindowClosed { we_data :: Data, we_window :: RiverWindow }
-  | WindowDimensionsHint { we_data :: Data, we_window :: RiverWindow, we_min_width, we_min_height, we_max_width, we_max_height :: CInt }
-  | WindowDimensions { we_data :: Data, we_window :: RiverWindow, we_width, we_height :: CInt }
-  | WindowAppId { we_data :: Data, we_window :: RiverWindow, we_app_id :: String }
-  | WindowTitle { we_data :: Data, we_window :: RiverWindow, we_title :: String }
-  | WindowParent { we_data :: Data, we_window :: RiverWindow, we_parent :: RiverWindow }
-  | WindowDecorationHint { we_data :: Data, we_window :: RiverWindow, we_hint :: CUInt }
-  | WindowPointerMoveRequested { we_data :: Data, we_window :: RiverWindow, we_seat :: RiverSeat }
-  | WindowPointerResizeRequested { we_data :: Data, we_window :: RiverWindow, we_seat :: RiverSeat, we_edges :: CUInt }
+  = WindowClosed                  { we_data :: Data, we_window :: RiverWindow }
+  | WindowDimensionsHint          { we_data :: Data, we_window :: RiverWindow, we_min_width, we_min_height, we_max_width, we_max_height :: CInt }
+  | WindowDimensions              { we_data :: Data, we_window :: RiverWindow, we_width, we_height :: CInt }
+  | WindowAppId                   { we_data :: Data, we_window :: RiverWindow, we_app_id :: String }
+  | WindowTitle                   { we_data :: Data, we_window :: RiverWindow, we_title :: String }
+  | WindowParent                  { we_data :: Data, we_window :: RiverWindow, we_parent :: RiverWindow }
+  | WindowDecorationHint          { we_data :: Data, we_window :: RiverWindow, we_hint :: CUInt }
+  | WindowPointerMoveRequested    { we_data :: Data, we_window :: RiverWindow, we_seat :: RiverSeat }
+  | WindowPointerResizeRequested  { we_data :: Data, we_window :: RiverWindow, we_seat :: RiverSeat, we_edges :: CUInt }
   | WindowShowWindowMenuRequested { we_data :: Data, we_window :: RiverWindow, we_x, we_y :: CInt }
-  | WindowMaximizeRequested { we_data :: Data, we_window :: RiverWindow }
-  | WindowUnmaximizeRequested { we_data :: Data, we_window :: RiverWindow }
-  | WindowFullscreenRequested { we_data :: Data, we_window :: RiverWindow, we_output :: RiverOutput }
+  | WindowMaximizeRequested       { we_data :: Data, we_window :: RiverWindow }
+  | WindowUnmaximizeRequested     { we_data :: Data, we_window :: RiverWindow }
+  | WindowFullscreenRequested     { we_data :: Data, we_window :: RiverWindow, we_output :: RiverOutput }
   | WindowExitFullscreenRequested { we_data :: Data, we_window :: RiverWindow }
-  | WindowMinimizeRequested { we_data :: Data, we_window :: RiverWindow }
-  | WindowUnreliablePID { we_data :: Data, we_window :: RiverWindow, we_unreliable_pid :: CInt }
-  | WindowPresentationHint { we_data :: Data, we_window :: RiverWindow, we_hint :: CUInt }
-  | WindowIdentifier { we_data :: Data, we_window :: RiverWindow, we_identifier :: String }
+  | WindowMinimizeRequested       { we_data :: Data, we_window :: RiverWindow }
+  | WindowUnreliablePID           { we_data :: Data, we_window :: RiverWindow, we_unreliable_pid :: CInt }
+  | WindowPresentationHint        { we_data :: Data, we_window :: RiverWindow, we_hint :: CUInt }
+  | WindowIdentifier              { we_data :: Data, we_window :: RiverWindow, we_identifier :: String }
+  deriving (Show)
 
-instance Show WindowEvent where
-  show WindowClosed{}                  = "WindowClosed{}                 "
-  show WindowDimensionsHint{}          = "WindowDimensionsHint{}         "
-  show WindowDimensions{}              = "WindowDimensions{}             "
-  show WindowAppId{}                   = "WindowAppId{}                  "
-  show WindowTitle{}                   = "WindowTitle{}                  "
-  show WindowParent{}                  = "WindowParent{}                 "
-  show WindowDecorationHint{}          = "WindowDecorationHint{}         "
-  show WindowPointerMoveRequested{}    = "WindowPointerMoveRequested{}   "
-  show WindowPointerResizeRequested{}  = "WindowPointerResizeRequested{} "
-  show WindowShowWindowMenuRequested{} = "WindowShowWindowMenuRequested{}"
-  show WindowMaximizeRequested{}       = "WindowMaximizeRequested{}      "
-  show WindowUnmaximizeRequested{}     = "WindowUnmaximizeRequested{}    "
-  show WindowFullscreenRequested{}     = "WindowFullscreenRequested{}    "
-  show WindowExitFullscreenRequested{} = "WindowExitFullscreenRequested{}"
-  show WindowMinimizeRequested{}       = "WindowMinimizeRequested{}      "
-  show WindowUnreliablePID{}           = "WindowUnreliablePID{}          "
-  show WindowPresentationHint{}        = "WindowPresentationHint{}       "
-  show WindowIdentifier{}              = "WindowIdentifier{}             "
-
-foreign import ccall "wrapper" mk_window_handler :: (Data -> RiverWindow -> IO ()) -> IO (FunPtr ((Data -> RiverWindow -> IO ())))
-foreign import ccall "wrapper" mk_window_handler_s :: (Data -> RiverWindow -> CString -> IO ()) -> IO (FunPtr ((Data -> RiverWindow -> CString -> IO ())))
-foreign import ccall "wrapper" mk_window_handler_w :: (Data -> RiverWindow -> RiverWindow -> IO ()) -> IO (FunPtr ((Data -> RiverWindow -> RiverWindow -> IO ())))
-foreign import ccall "wrapper" mk_window_handler_u :: (Data -> RiverWindow -> CUInt -> IO ()) -> IO (FunPtr ((Data -> RiverWindow -> CUInt -> IO ())))
-foreign import ccall "wrapper" mk_window_handler_i :: (Data -> RiverWindow -> CInt -> IO ()) -> IO (FunPtr ((Data -> RiverWindow -> CInt -> IO ())))
-foreign import ccall "wrapper" mk_window_handler_ii :: (Data -> RiverWindow -> CInt -> CInt -> IO ()) -> IO (FunPtr ((Data -> RiverWindow -> CInt -> CInt -> IO ())))
-foreign import ccall "wrapper" mk_window_handler_iiii :: (Data -> RiverWindow -> CInt -> CInt -> CInt -> CInt ->IO ()) -> IO (FunPtr ((Data -> RiverWindow -> CInt -> CInt ->CInt -> CInt -> IO ())))
+foreign import ccall "wrapper" mk_window_handler        :: (Data -> RiverWindow -> IO ()) -> IO (FunPtr ((Data -> RiverWindow -> IO ())))
+foreign import ccall "wrapper" mk_window_handler_s      :: (Data -> RiverWindow -> CString -> IO ()) -> IO (FunPtr ((Data -> RiverWindow -> CString -> IO ())))
+foreign import ccall "wrapper" mk_window_handler_w      :: (Data -> RiverWindow -> RiverWindow -> IO ()) -> IO (FunPtr ((Data -> RiverWindow -> RiverWindow -> IO ())))
+foreign import ccall "wrapper" mk_window_handler_u      :: (Data -> RiverWindow -> CUInt -> IO ()) -> IO (FunPtr ((Data -> RiverWindow -> CUInt -> IO ())))
+foreign import ccall "wrapper" mk_window_handler_i      :: (Data -> RiverWindow -> CInt -> IO ()) -> IO (FunPtr ((Data -> RiverWindow -> CInt -> IO ())))
+foreign import ccall "wrapper" mk_window_handler_ii     :: (Data -> RiverWindow -> CInt -> CInt -> IO ()) -> IO (FunPtr ((Data -> RiverWindow -> CInt -> CInt -> IO ())))
+foreign import ccall "wrapper" mk_window_handler_iiii   :: (Data -> RiverWindow -> CInt -> CInt -> CInt -> CInt ->IO ()) -> IO (FunPtr ((Data -> RiverWindow -> CInt -> CInt ->CInt -> CInt -> IO ())))
 foreign import ccall "wrapper" mk_window_handler_output :: (Data -> RiverWindow -> RiverOutput -> IO ()) -> IO (FunPtr ((Data -> RiverWindow -> RiverOutput -> IO ())))
-foreign import ccall "wrapper" mk_window_handler_seat :: (Data -> RiverWindow -> RiverSeat -> IO ()) -> IO (FunPtr ((Data -> RiverWindow -> RiverSeat -> IO ())))
+foreign import ccall "wrapper" mk_window_handler_seat   :: (Data -> RiverWindow -> RiverSeat -> IO ()) -> IO (FunPtr ((Data -> RiverWindow -> RiverSeat -> IO ())))
 foreign import ccall "wrapper" mk_window_handler_seat_u :: (Data -> RiverWindow -> RiverSeat -> CUInt -> IO ()) -> IO (FunPtr ((Data -> RiverWindow -> RiverSeat -> CUInt -> IO ())))
 
 mkWindowListener :: (WindowEvent -> IO ()) -> IO WindowListener
 mkWindowListener f = do
   p <- WindowListener <$> mallocBytes {#sizeof river_window_v1_listener#}
-  {#set river_window_v1_listener.closed#} p          =<< mk_window_handler (\dt w -> f $ WindowClosed dt w)
-  {#set river_window_v1_listener.dimensions_hint#} p =<< mk_window_handler_iiii (\dt w a b c d -> f $ WindowDimensionsHint dt w a b c d)
-  {#set river_window_v1_listener.dimensions#} p      =<< mk_window_handler_ii (\dt w a b -> f $ WindowDimensions dt w a b)
-  {#set river_window_v1_listener.app_id#} p      =<< mk_window_handler_s (\dt w a -> f . WindowAppId dt w =<< peekCString a)
-  {#set river_window_v1_listener.title#} p      =<< mk_window_handler_s (\dt w a -> f . WindowTitle dt w =<< peekCString a)
-  {#set river_window_v1_listener.parent#} p      =<< mk_window_handler_w (\dt w a -> f $ WindowParent dt w a)
-  {#set river_window_v1_listener.decoration_hint#} p      =<< mk_window_handler_u (\dt w a -> f $ WindowDecorationHint dt w a)
+  {#set river_window_v1_listener.closed#} p                     =<< mk_window_handler (\dt w -> f $ WindowClosed dt w)
+  {#set river_window_v1_listener.dimensions_hint#} p            =<< mk_window_handler_iiii (\dt w a b c d -> f $ WindowDimensionsHint dt w a b c d)
+  {#set river_window_v1_listener.dimensions#} p                 =<< mk_window_handler_ii (\dt w a b -> f $ WindowDimensions dt w a b)
+  {#set river_window_v1_listener.app_id#} p                     =<< mk_window_handler_s (\dt w a -> f . WindowAppId dt w                              =<< peekCString a)
+  {#set river_window_v1_listener.title#} p                      =<< mk_window_handler_s (\dt w a -> f . WindowTitle dt w                              =<< peekCString a)
+  {#set river_window_v1_listener.parent#} p                     =<< mk_window_handler_w (\dt w a -> f $ WindowParent dt w a)
+  {#set river_window_v1_listener.decoration_hint#} p            =<< mk_window_handler_u (\dt w a -> f $ WindowDecorationHint dt w a)
   {#set river_window_v1_listener.pointer_move_requested#} p     =<< mk_window_handler_seat (\dt w a -> f $ WindowPointerMoveRequested dt w a)
   {#set river_window_v1_listener.pointer_resize_requested#} p   =<< mk_window_handler_seat_u (\dt w a b -> f $ WindowPointerResizeRequested dt w a b)
   {#set river_window_v1_listener.show_window_menu_requested#} p =<< mk_window_handler_ii (\dt w a b -> f $ WindowShowWindowMenuRequested dt w a b)
@@ -255,7 +246,7 @@ mkWindowListener f = do
   {#set river_window_v1_listener.minimize_requested#} p         =<< mk_window_handler (\dt w -> f $ WindowMinimizeRequested dt w)
   {#set river_window_v1_listener.unreliable_pid#} p             =<< mk_window_handler_i (\dt w a -> f $ WindowUnreliablePID dt w a)
   {#set river_window_v1_listener.presentation_hint#} p          =<< mk_window_handler_u (\dt w a -> f $ WindowPresentationHint dt w a)
-  {#set river_window_v1_listener.identifier#} p                 =<< mk_window_handler_s (\dt w a -> f . WindowIdentifier dt w =<< peekCString a)
+  {#set river_window_v1_listener.identifier#} p                 =<< mk_window_handler_s (\dt w a -> f . WindowIdentifier dt w                         =<< peekCString a)
   return p
 
 river_window_v1_add_listener :: RiverWindow -> WindowListener -> Ptr () -> IO ()
@@ -322,11 +313,38 @@ river_window_v1_use_ssd w = do
   wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_USE_SSD#} emptyInterface ver 0
     >>= coerceWlProxy_ "river_window_v1_use_ssd"
 
+-- |
+-- This request decorates the window with borders drawn by the compositor
+-- on the specified edges of the window. Borders are drawn above the window
+-- content.
+--
+-- Corners are drawn only between borders on adjacent edges. If e.g. the
+-- left edge has a border and the top edge does not, the border drawn on
+-- the left edge will not extend vertically beyond the top edge of the
+-- window.
+--
+-- Borders are not drawn while the window is fullscreen.
+--
+-- The color is defined by four 32-bit RGBA values. Unless specified in
+-- another protocol extension, the RGBA values use pre-multiplied alpha.
+--
+-- Setting the edges to none or the width to 0 disables the borders.
+-- Setting a negative width is a protocol error.
+--
+-- This request completely overrides all previous set_borders requests.
+-- Only the most recent set_borders request has an effect.
+--
+-- Note that the position/dimensions of a river_window_v1 refer to the
+-- position/dimensions of the window content and are unaffected by the
+-- presence of borders or decoration surfaces.
+--
+-- This request modifies rendering state and may only be made as part of a
+-- render sequence, see the river_window_manager_v1 description.
 river_window_v1_set_borders :: RiverWindow -> WindowBorders -> IO ()
 river_window_v1_set_borders w WindowBorders{..} = do
   ver <- wl_proxy_get_version w
-  wl_proxy_marshal_flags__uiuuuu w {#const RIVER_WINDOW_V1_SET_BORDERS#} emptyInterface ver 0 wb_edges wb_width wb_r wb_g wb_b wb_a
-    >>= coerceWlProxy_ "river_window_v1_set_borders"
+  void $ wl_proxy_marshal_flags__uiuuuu w {#const RIVER_WINDOW_V1_SET_BORDERS#} emptyInterface ver 0 wb_edges wb_width wb_r wb_g wb_b wb_a
+    -- >>= coerceWlProxy_ "river_window_v1_set_borders"
 
 river_window_v1_set_tiled :: RiverWindow -> CUInt -> IO ()
 river_window_v1_set_tiled w edges = do
@@ -431,6 +449,8 @@ river_decoration_v1_get_user_data wm = wl_proxy_get_user_data wm
 
 -- * IFACE river_shell_surface_v1
 
+-- TODO
+
 -- * IFACE river_node_v1
 
 river_node_v1_place_top :: RiverNode -> IO ()
@@ -462,21 +482,15 @@ river_node_v1_set_position nd x y = do
 -- * IFACE river_output_v1
 
 data OutputEvent
-  = OutputHandlerRemoved { _data :: Data, oh'output :: RiverOutput }
-  | OutputHandlerWlOutput { _data :: Data, oh'output :: RiverOutput, wl_output_name :: CUInt }
-  | OutputHandlerPosition { _data :: Data, oh'output :: RiverOutput, x, y :: CInt }
+  = OutputHandlerRemoved    { _data :: Data, oh'output :: RiverOutput }
+  | OutputHandlerWlOutput   { _data :: Data, oh'output :: RiverOutput, wl_output_name :: CUInt }
+  | OutputHandlerPosition   { _data :: Data, oh'output :: RiverOutput, x, y :: CInt }
   | OutputHandlerDimensions { _data :: Data, oh'output :: RiverOutput, width, height :: CInt }
-  deriving (Generic)
+  deriving (Generic, Show)
 
-instance Show OutputEvent where
-  show OutputHandlerRemoved{}    = "Removed"
-  show OutputHandlerDimensions{..} = printf "Dimensions{width=%i,height=%i}" (fromIntegral @_ @Int width) (fromIntegral @_ @Int height)
-  show OutputHandlerPosition{..}   = printf "Position{x=%i,y=%i}" (fromIntegral @_ @Int x) (fromIntegral @_ @Int y)
-  show OutputHandlerWlOutput{..}     = printf "WlOutput{%i}" (fromIntegral @_ @Int wl_output_name)
-
-foreign import ccall "wrapper" mk_output_removed_handler :: (Data -> RiverOutput -> IO ()) -> IO (FunPtr ((Data -> RiverOutput -> IO ())))
-foreign import ccall "wrapper" mk_output_wl_output_handler :: (Data -> RiverOutput -> CUInt -> IO ()) -> IO (FunPtr ((Data -> RiverOutput -> CUInt -> IO ())))
-foreign import ccall "wrapper" mk_output_position_handler :: (Data -> RiverOutput -> CInt -> CInt -> IO ()) -> IO (FunPtr ((Data -> RiverOutput -> CInt -> CInt -> IO ())))
+foreign import ccall "wrapper" mk_output_removed_handler    :: (Data -> RiverOutput -> IO ())                 -> IO (FunPtr ((Data -> RiverOutput -> IO ())))
+foreign import ccall "wrapper" mk_output_wl_output_handler  :: (Data -> RiverOutput -> CUInt -> IO ())        -> IO (FunPtr ((Data -> RiverOutput -> CUInt -> IO ())))
+foreign import ccall "wrapper" mk_output_position_handler   :: (Data -> RiverOutput -> CInt -> CInt -> IO ()) -> IO (FunPtr ((Data -> RiverOutput -> CInt -> CInt -> IO ())))
 foreign import ccall "wrapper" mk_output_dimensions_handler :: (Data -> RiverOutput -> CInt -> CInt -> IO ()) -> IO (FunPtr ((Data -> RiverOutput -> CInt -> CInt -> IO ())))
 
 {#pointer *river_output_v1_listener as RiverOutputListener newtype #}
@@ -531,23 +545,24 @@ data SeatEvent
   | SeatEventOpDelta                 { seat_event_data :: Data, seat_event_seat :: RiverSeat, seat_event_dx, seat_event_dy :: CInt }
   | SeatEventOpRelease               { seat_event_data :: Data, seat_event_seat :: RiverSeat }
   | SeatEventPointerPosition         { seat_event_data :: Data, seat_event_seat :: RiverSeat, seat_event_x, seat_event_y :: CInt }
+  deriving Show
 
-instance Show SeatEvent where
-  show SeatRemoved                      {} = "SeatRemoved"
-  show SeatWlSeat                       {..} = printf "SeatWlSeat{name=%i}" (fromIntegral @_ @Int seat_event_name)
-  show SeatEventPointerEnter            {} = "SeatEventPointerEnter"
-  show SeatEventPointerLeave            {} = "SeatEventPointerLeave"
-  show SeatEventWindowInteraction       {} = "SeatEventWindowInteraction"
-  show SeatEventShellSurfaceInteraction {} = "SeatEventShellSurfaceInteraction"
-  show SeatEventOpDelta                 {..} = "SeatEventOpDelta{dx=" ++ show seat_event_dx ++ ",dy=" ++ show seat_event_dy ++ "}"
-  show SeatEventOpRelease               {} = "SeatEventOpRelease"
-  show SeatEventPointerPosition         {..} = "SeatEventPointerPosition{x=" ++ show seat_event_x ++ ",y=" ++ show seat_event_y ++ "}"
+-- instance Show SeatEvent where
+--   show SeatRemoved                      {   } = "SeatRemoved"
+--   show SeatWlSeat                       {.. } = printf "SeatWlSeat{name=%i}" (fromIntegral @_ @Int seat_event_name)
+--   show SeatEventPointerEnter            {   } = "SeatEventPointerEnter"
+--   show SeatEventPointerLeave            {   } = "SeatEventPointerLeave"
+--   show SeatEventWindowInteraction       {   } = "SeatEventWindowInteraction"
+--   show SeatEventShellSurfaceInteraction {   } = "SeatEventShellSurfaceInteraction"
+--   show SeatEventOpDelta                 {.. } = "SeatEventOpDelta{dx=" ++ show seat_event_dx ++ ",dy=" ++ show seat_event_dy ++ "} "
+--   show SeatEventOpRelease               {   } = "SeatEventOpRelease"
+--   show SeatEventPointerPosition         {.. } = "SeatEventPointerPosition{x=" ++ show seat_event_x ++ ",y=" ++ show seat_event_y ++ "}"
 
-foreign import ccall "wrapper" mk_seat_handler :: (Data -> RiverSeat -> IO ()) -> IO (FunPtr ((Data -> RiverSeat -> IO ())))
+foreign import ccall "wrapper" mk_seat_handler        :: (Data -> RiverSeat -> IO ()) -> IO (FunPtr ((Data -> RiverSeat -> IO ())))
 foreign import ccall "wrapper" mk_seat_handler_window :: (Data -> RiverSeat -> RiverWindow -> IO ()) -> IO (FunPtr ((Data -> RiverSeat -> RiverWindow -> IO ())))
-foreign import ccall "wrapper" mk_seat_handler_u :: (Data -> RiverSeat -> CUInt -> IO ()) -> IO (FunPtr ((Data -> RiverSeat -> CUInt -> IO ())))
-foreign import ccall "wrapper" mk_seat_handler_ss :: (Data -> RiverSeat -> RiverShellSurface -> IO ()) -> IO (FunPtr ((Data -> RiverSeat -> RiverShellSurface -> IO ())))
-foreign import ccall "wrapper" mk_seat_handler_ii :: (Data -> RiverSeat -> CInt -> CInt -> IO ()) -> IO (FunPtr ((Data -> RiverSeat -> CInt -> CInt -> IO ())))
+foreign import ccall "wrapper" mk_seat_handler_u      :: (Data -> RiverSeat -> CUInt -> IO ()) -> IO (FunPtr ((Data -> RiverSeat -> CUInt -> IO ())))
+foreign import ccall "wrapper" mk_seat_handler_ss     :: (Data -> RiverSeat -> RiverShellSurface -> IO ()) -> IO (FunPtr ((Data -> RiverSeat -> RiverShellSurface -> IO ())))
+foreign import ccall "wrapper" mk_seat_handler_ii     :: (Data -> RiverSeat -> CInt -> CInt -> IO ()) -> IO (FunPtr ((Data -> RiverSeat -> CInt -> CInt -> IO ())))
 
 mkSeatListener :: (SeatEvent -> IO ()) -> IO RiverSeatListener
 mkSeatListener f = do
@@ -588,9 +603,63 @@ river_seat_v1_op_start_pointer s = do
   ver <- wl_proxy_get_version s
   void $ wl_proxy_marshal_flags s {#const RIVER_SEAT_V1_OP_START_POINTER#} emptyInterface ver 0
 
--- river_seat_v1_focus_shell_surface
--- river_seat_v1_get_pointer_binding
--- river_seat_v1_get_xcursor_theme
--- river_seat_v1_pointer_warp
+river_seat_v1_pointer_warp :: RiverSeat -> Int -> Int -> IO ()
+river_seat_v1_pointer_warp s x y = do
+  ver <- wl_proxy_get_version s
+  void $ wl_proxy_marshal_flags__ii s {#const RIVER_SEAT_V1_POINTER_WARP#} emptyInterface ver 0 x y
 
--- * IFACE river_pointer_binding_v1
+river_seat_v1_set_xcursor_theme :: RiverSeat -> String -> CUInt -> IO ()
+river_seat_v1_set_xcursor_theme s name size = withCString name $ \c_name -> do
+  ver <- wl_proxy_get_version s
+  void $ wl_proxy_marshal_flags__pu s {#const RIVER_SEAT_V1_SET_XCURSOR_THEME#} emptyInterface ver 0 c_name size
+
+river_seat_v1_get_pointer_binding :: RiverSeat -> Button -> Modifiers -> IO RiverPointerBinding
+river_seat_v1_get_pointer_binding s btn mods = do
+  ver <- wl_proxy_get_version s
+  wl_proxy_marshal_flags__uu s {#const RIVER_SEAT_V1_GET_POINTER_BINDING#} river_pointer_binding_v1_interface ver 0 btn mods
+    >>= coerceWlProxy "river_seat_v1_get_pointer_binding" (return . RiverPointerBinding)
+
+river_seat_v1_focus_shell_surface :: RiverSeat -> RiverShellSurface -> IO ()
+river_seat_v1_focus_shell_surface s ss = do
+  ver <- wl_proxy_get_version s
+  void $ wl_proxy_marshal_flags__p s {#const RIVER_SEAT_V1_FOCUS_SHELL_SURFACE#} emptyInterface ver 0 ss
+
+-- * river_pointer_binding_v1
+
+{#pointer *river_pointer_binding_v1_listener as PointerBindingListener newtype#}
+
+data PointerEvent = PointerPressed Data RiverPointerBinding
+                  | PointerReleased Data RiverPointerBinding
+                  deriving Show
+
+foreign import ccall "wrapper" mk_pointer_binding_listener_cb :: (Data -> RiverPointerBinding -> IO ()) -> IO (FunPtr ((Data -> RiverPointerBinding -> IO ())))
+
+mkPointerBindingListener :: (PointerEvent -> IO ()) -> IO PointerBindingListener
+mkPointerBindingListener f = do
+  p <- PointerBindingListener <$> mallocBytes {#sizeof river_pointer_binding_v1_listener#}
+  {#set river_pointer_binding_v1_listener.pressed#}   p =<< mk_pointer_binding_listener_cb (\dt b -> f $ PointerPressed dt b)
+  {#set river_pointer_binding_v1_listener.released#}  p =<< mk_pointer_binding_listener_cb (\dt b -> f $ PointerReleased dt b)
+  return p
+
+river_pointer_binding_v1_add_listener :: Storable x => RiverPointerBinding -> PointerBindingListener -> x -> IO (Ptr x)
+river_pointer_binding_v1_add_listener target (PointerBindingListener l) val = do
+  dt <- calloc
+  poke dt val
+  res <- wl_proxy_add_listener target (castPtr l) (castPtr dt)
+  when (res < 0) $ throwIO $ RiverWindowManagerException "river_pointer_binding_v1_add_listener"
+  return dt
+
+river_pointer_binding_v1_destroy :: RiverPointerBinding -> IO ()
+river_pointer_binding_v1_destroy x = do
+  ver <- wl_proxy_get_version x
+  void $ wl_proxy_marshal_flags x {#const RIVER_POINTER_BINDING_V1_DESTROY#} emptyInterface ver _WL_MARSHAL_FLAG_DESTROY
+
+river_pointer_binding_v1_enable :: RiverPointerBinding -> IO ()
+river_pointer_binding_v1_enable x = do
+  ver <- wl_proxy_get_version x
+  void $ wl_proxy_marshal_flags x {#const RIVER_POINTER_BINDING_V1_ENABLE#} emptyInterface ver 0
+
+river_pointer_binding_v1_disable :: RiverPointerBinding -> IO ()
+river_pointer_binding_v1_disable x = do
+  ver <- wl_proxy_get_version x
+  void $ wl_proxy_marshal_flags x {#const RIVER_POINTER_BINDING_V1_DISABLE#} emptyInterface ver 0
