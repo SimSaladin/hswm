@@ -1,36 +1,23 @@
-module RiverWM.XKB where
+module River.XKB.Bindings.MiscFFI where
 
--- import C2HS
+-- TODO refactor this module somehow somewhere
+
 import Foreign hiding (void)
 import Foreign.C
+import HSWM.XKB
+import Wayland
+import River.WMP
 
-{#import HSWM.Types.XKB #}
-{#import Wayland.Bindings #}
-{#import RiverWM.Bindings #}
+{#import River.XKB.Bindings.FFI#}
 
 #include "river-xkb-bindings-v1-client-protocol.h"
 
--- * Types
-
-{#pointer *river_xkb_bindings_v1 as RiverXkbBindings newtype#}
-{#pointer *river_xkb_bindings_seat_v1 as XkbBindingsSeat newtype#}
-{#pointer *river_xkb_bindings_seat_v1_listener as XkbBindingsSeatListener newtype#}
-{#pointer *river_xkb_binding_v1 as RiverXkbBinding newtype#}
-{#pointer *river_xkb_binding_v1_listener as XkbBindingListener newtype#}
-
+-- * XXX
 instance IsWlProxy RiverXkbBindings where toWlProxy (RiverXkbBindings p) = WlProxy $ castPtr p
 instance IsWlProxy XkbBindingsSeat where toWlProxy (XkbBindingsSeat p) = WlProxy $ castPtr p
 instance IsWlProxy RiverXkbBinding where toWlProxy (RiverXkbBinding p) = WlProxy $ castPtr p
-
+-- * XXX
 instance IsRegistryObject RiverXkbBindings where peekRegistryObject p = return $ RiverXkbBindings $ castPtr p
-
-deriving instance Storable RiverXkbBinding
-
--- * Interfaces
-
-foreign import ccall "&river_xkb_binding_v1_interface"       river_xkb_binding_v1_interface :: WlInterface
-foreign import ccall "&river_xkb_bindings_v1_interface"      river_xkb_bindings_v1_interface :: WlInterface
-foreign import ccall "&river_xkb_bindings_seat_v1_interface" river_xkb_bindings_seat_v1_interface :: WlInterface
 
 -- * river_xkb_bindings_v1
 
@@ -58,16 +45,12 @@ river_xkb_bindings_v1_get_seat binds seat = do
 -- * river_xkb_binding_v1
 
 data XkbEvent
-  = XkbKeyPressed Data RiverXkbBinding
-  | XkbKeyReleased Data RiverXkbBinding
-  | XkbStopRepeat Data RiverXkbBinding
+  = XkbKeyPressed (Ptr ()) RiverXkbBinding
+  | XkbKeyReleased (Ptr ()) RiverXkbBinding
+  | XkbStopRepeat (Ptr ()) RiverXkbBinding
+  deriving Show
 
-instance Show XkbEvent where
-  show XkbKeyPressed{} = "KeyPressed"
-  show XkbKeyReleased{} = "KeyReleased"
-  show XkbStopRepeat{} = "StopRepeat"
-
-foreign import ccall "wrapper" mk_xkb_listener_cb :: (Data -> RiverXkbBinding -> IO ()) -> IO (FunPtr ((Data -> RiverXkbBinding -> IO ())))
+foreign import ccall "wrapper" mk_xkb_listener_cb :: ((Ptr ()) -> RiverXkbBinding -> IO ()) -> IO (FunPtr (((Ptr ()) -> RiverXkbBinding -> IO ())))
 
 mkXkbBindingListener :: (XkbEvent -> IO ()) -> IO XkbBindingListener
 mkXkbBindingListener f = do
@@ -106,8 +89,7 @@ river_xkb_binding_v1_disable bind = do
 
 -- * river_xkb_bindings_seat_v1
 
-river_xkb_bindings_seat_v1_add_listener :: XkbBindingsSeat -> XkbBindingsSeatListener -> Data -> IO ()
+river_xkb_bindings_seat_v1_add_listener :: XkbBindingsSeat -> XkbBindingsSeatListener -> (Ptr ()) -> IO ()
 river_xkb_bindings_seat_v1_add_listener binds (XkbBindingsSeatListener l) dt = do
   res <- wl_proxy_add_listener binds (castPtr l) dt
   when (res < 0) $ throwIO $ RiverWindowManagerException "river_xkb_bindings_seat_v1_add_listener"
-

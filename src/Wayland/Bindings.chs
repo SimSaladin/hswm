@@ -1,87 +1,46 @@
 {-# LANGUAGE RecordWildCards #-}
-module Wayland.Bindings where
+module Wayland.Bindings
+  ( module Wayland.Bindings
+  , module Wayland.FFI
+  ) where
 
 import Foreign
 import Foreign.C
 
+{#import Wayland.FFI#}
+
 #include <wayland-client-core.h>
 #include <wayland-client-protocol.h>
 
-data WaylandException = WaylandException String deriving (Show)
-instance Exception WaylandException
-
+-- XXX ???
 type Version = {#type uint32_t#}
-type Flags = {#type uint32_t#}
+type Flags   = {#type uint32_t#}
 
+-- XXX IsRegistryObject
 class IsRegistryObject o where
   peekRegistryObject :: Ptr () -> IO o
+instance IsRegistryObject WlSeat where peekRegistryObject p = return $ WlSeat $ castPtr p
 
-class IsOpCode a where
-  toOpCode :: a -> CUInt
+-- XXX WlMarshal
+class WlMarshal a where wlMarshal :: a -> Ptr ()
+instance WlMarshal (Ptr a) where wlMarshal = castPtr
+instance WlMarshal WlSurface where wlMarshal (WlSurface p) = castPtr p
 
-instance IsOpCode CUInt where
-  toOpCode = id
-
-class WlMarshal a where
-  wlMarshal :: a -> Ptr ()
-instance WlMarshal (Ptr a) where
-  wlMarshal = castPtr
-
-
-{#pointer *wl_surface as WlSurface newtype #}
-{#pointer *wl_array as WlArray newtype #}
-
-instance WlMarshal WlSurface where
-  wlMarshal (WlSurface p) = castPtr p
-
-{#pointer *wl_seat as WlSeat newtype #}
-{#pointer *wl_keyboard as WlKeyboard newtype #}
+-- XXX IsWlProxy
+class IsWlProxy a where
+  toWlProxy :: a -> WlProxy
 
 instance IsWlProxy WlSeat where toWlProxy (WlSeat p) = WlProxy $ castPtr p
 instance IsWlProxy WlKeyboard where toWlProxy (WlKeyboard p) = WlProxy $ castPtr p
+instance IsWlProxy WlDisplay where toWlProxy (WlDisplay p) = WlProxy $ castPtr p
+instance IsWlProxy WlRegistry where toWlProxy (WlRegistry p) = WlProxy $ castPtr p
 
-instance IsRegistryObject WlSeat where peekRegistryObject p = return $ WlSeat $ castPtr p
-
--- * wl_display
-
-{#pointer *wl_display as WlDisplay newtype #}
-
-instance IsWlProxy WlDisplay where
-  toWlProxy (WlDisplay p) = WlProxy $ castPtr p
-
--- * wl_registry
-
-{#pointer *wl_registry as WlRegistry newtype #}
-
-instance IsWlProxy WlRegistry where
-  toWlProxy (WlRegistry p) = WlProxy $ castPtr p
-
--- * wl_interace
-
-{#pointer *wl_interface as WlInterface newtype #}
-
-foreign import ccall "&wl_registry_interface" wl_registry_interface :: WlInterface
-foreign import ccall "&wl_seat_interface" wl_seat_interface :: WlInterface
-foreign import ccall "&wl_keyboard_interface" wl_keyboard_interface :: WlInterface
-
+-- XXX
 emptyInterface :: WlInterface
 emptyInterface = WlInterface nullPtr
 
 getInterfaceName :: WlInterface -> IO String
 getInterfaceName p = {#get wl_interface->name#} p >>= peekCString
-
--- * wl_proxy
-
-{#pointer *wl_proxy as WlProxy newtype #}
-
-class IsWlProxy a where
-  toWlProxy :: a -> WlProxy
-
--- * Display
-
-{#fun wl_display_connect {`CString'} -> `WlDisplay' #}
-{#fun wl_display_roundtrip {`WlDisplay'} -> `Int' #}
-{#fun wl_display_dispatch {`WlDisplay'} -> `Int' #}
 
 -- * Constants
 
@@ -205,8 +164,6 @@ wl_seat_get_keyboard seat = do
   wl_proxy_marshal_flags__p seat {#const WL_SEAT_GET_KEYBOARD#} wl_keyboard_interface ver 0 nullPtr
     >>= coerceWlProxy "wl_seat_get_keyboard" (return . WlKeyboard)
 
-
-
 data WlKeyboardEvent a
   = KeyboardKeymap (Ptr a) WlKeyboard CUInt {-fmt-} CInt {-fd-} CUInt {-size-}
   | KeyboardEnter (Ptr a) WlKeyboard CUInt WlSurface WlArray
@@ -214,6 +171,7 @@ data WlKeyboardEvent a
   | KeyboardKey (Ptr a) WlKeyboard CUInt CUInt CUInt CUInt
   | KeyboardModifiers (Ptr a) WlKeyboard CUInt CUInt CUInt CUInt CUInt
   | KeyboardRepeatInfo (Ptr a) WlKeyboard CInt CInt
+  deriving Show
 
 type WlKeyboardListener_keymap a     = Ptr a -> WlKeyboard -> CUInt {-fmt-} -> CInt{-fd-} -> CUInt{-size-} -> IO ()
 type WlKeyboardListener_Enter a      = (Ptr a) -> WlKeyboard -> CUInt -> WlSurface -> WlArray -> IO ()
@@ -228,8 +186,6 @@ foreign import ccall "wrapper" wrap_wl_keyboard_listener_Leave      :: WlKeyboar
 foreign import ccall "wrapper" wrap_wl_keyboard_listener_Key        :: WlKeyboardListener_Key () -> IO (FunPtr (WlKeyboardListener_Key ()))
 foreign import ccall "wrapper" wrap_wl_keyboard_listener_Modifiers  :: WlKeyboardListener_Modifiers () -> IO (FunPtr (WlKeyboardListener_Modifiers ()))
 foreign import ccall "wrapper" wrap_wl_keyboard_listener_RepeatInfo :: WlKeyboardListener_RepeatInfo () -> IO (FunPtr (WlKeyboardListener_RepeatInfo ()))
-
-{#pointer *wl_keyboard_listener as WlKeyboardListener newtype#}
 
 mkKeyboardListener :: (WlKeyboardEvent a -> IO ()) -> IO WlKeyboardListener
 mkKeyboardListener f = do

@@ -1,11 +1,12 @@
-module RiverWM.Bindings where
+module River.WMP.MiscFFI where
 
 import Foreign hiding (void)
 import Foreign.C
 import GHC.Generics (Generic)
 
-{#import HSWM.Types.XKB #}
-{#import Wayland.Bindings #}
+import Wayland
+
+{#import River.WMP.FFI #}
 
 #include "river-window-management-v1-client-protocol.h"
 
@@ -15,30 +16,6 @@ type Data = Ptr () -- TODO
 
 data RiverWindowManagerException = RiverWindowManagerException String deriving (Show)
 instance Exception RiverWindowManagerException
-
-{#pointer *river_decoration_v1 as RiverDecoration newtype#}
-{#pointer *river_node_v1 as RiverNode newtype#}
-{#pointer *river_output_v1 as RiverOutput newtype#}
-{#pointer *river_pointer_binding_v1 as RiverPointerBinding newtype#}
-{#pointer *river_seat_v1 as RiverSeat newtype#}
-{#pointer *river_shell_surface_v1 as RiverShellSurface newtype#}
-{#pointer *river_window_manager_v1 as RiverWindowManager newtype#}
-{#pointer *river_window_v1 as RiverWindow newtype#}
-
-deriving instance Show RiverWindow
-deriving instance Show RiverNode
-deriving instance Show RiverSeat
-deriving instance Show RiverPointerBinding
-deriving instance Show RiverOutput
-deriving instance Show RiverWindowManager
-deriving instance Show RiverShellSurface
-
-deriving instance Eq RiverOutput
-deriving instance Eq RiverSeat
-deriving instance Eq RiverWindow
-
-deriving instance Storable RiverSeat
-deriving instance Storable RiverPointerBinding
 
 instance IsWlProxy RiverWindowManager where toWlProxy (RiverWindowManager p) = WlProxy (castPtr p)
 instance IsWlProxy RiverDecoration where toWlProxy (RiverDecoration p) = WlProxy (castPtr p)
@@ -55,17 +32,6 @@ instance WlMarshal RiverSeat where wlMarshal (RiverSeat p) = castPtr p
 instance WlMarshal RiverWindow where wlMarshal (RiverWindow p) = castPtr p
 instance WlMarshal RiverNode where wlMarshal (RiverNode p) = castPtr p
 instance WlMarshal RiverShellSurface where wlMarshal (RiverShellSurface p) = castPtr p
-
--- * Imported interfaces
-
-foreign import ccall "&river_window_manager_v1_interface"  river_window_manager_v1_interface  :: WlInterface
-foreign import ccall "&river_window_v1_interface"          river_window_v1_interface          :: WlInterface
-foreign import ccall "&river_decoration_v1_interface"      river_decoration_v1_interface      :: WlInterface
-foreign import ccall "&river_shell_surface_v1_interface"   river_shell_surface_v1_interface   :: WlInterface
-foreign import ccall "&river_node_v1_interface"            river_node_v1_interface            :: WlInterface
-foreign import ccall "&river_output_v1_interface"          river_output_v1_interface          :: WlInterface
-foreign import ccall "&river_seat_v1_interface"            river_seat_v1_interface            :: WlInterface
-foreign import ccall "&river_pointer_binding_v1_interface" river_pointer_binding_v1_interface :: WlInterface
 
 -- * river_window_manager_v1
 
@@ -602,7 +568,7 @@ river_seat_v1_set_xcursor_theme s name size = withCString name $ \c_name -> do
   ver <- wl_proxy_get_version s
   void $ wl_proxy_marshal_flags__pu s {#const RIVER_SEAT_V1_SET_XCURSOR_THEME#} emptyInterface ver 0 c_name size
 
-river_seat_v1_get_pointer_binding :: RiverSeat -> Button -> Modifiers -> IO RiverPointerBinding
+river_seat_v1_get_pointer_binding :: RiverSeat -> CUInt {-Button-} -> CUInt {-Modifiers-} -> IO RiverPointerBinding
 river_seat_v1_get_pointer_binding s btn mods = do
   ver <- wl_proxy_get_version s
   wl_proxy_marshal_flags__uu s {#const RIVER_SEAT_V1_GET_POINTER_BINDING#} river_pointer_binding_v1_interface ver 0 btn mods

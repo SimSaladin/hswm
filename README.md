@@ -26,13 +26,25 @@ Figure out the Wl display ID to start programs inside the new session:
 WAYLAND_DISPLAY=wayland-2 kitty
 ```
 
-### Generated sources
+### Generated C sources (`.c`, `.h`)
 
 The Wl protocol bindings (checked into the repo) are generated with
 `wayland-scanner`. They can be regenerated via:
 
 ```bash
 ./genproto.sh
+```
+
+### Compiling with `cabal` (directly)
+
+The Nix shell sets up the Haskell dev environment with dependencies declared in
+the package. You can simply do so:
+
+```bsah
+nix develop
+
+cabal clean
+cabal build
 ```
 
 --------

@@ -1,8 +1,6 @@
 module Main (main) where
 
-import qualified MyLib (someFunc)
+import qualified HSWM.Main as Main
 
 main :: IO ()
-main = do
-  putStrLn "Hello, Haskell!"
-  MyLib.someFunc
+main = Main.testMain

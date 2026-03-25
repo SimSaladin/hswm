@@ -19,16 +19,23 @@ common warnings
 
 library
     import:           warnings
-    exposed-modules: Wayland.Bindings
-                   , RiverWM.Bindings
-                   , RiverWM.XKB
+    exposed-modules: Wayland.FFI
+                   , Wayland.Bindings
                    , Wayland
-                   , Core
-                   , MyLib
+                   , River.WMP.FFI
+                   , River.WMP.MiscFFI
+                   , River.WMP
+                   , River.XKB.Bindings.FFI
+                   , River.XKB.Bindings.MiscFFI
+                   , River.XKB.Bindings
+                   , River
+                   , HSWM.XKB
+                   , HSWM.XKB.FFI
                    , HSWM.Types
-                   , HSWM.Types.XKB
+                   , HSWM.Main
                    , HSWM.Operations
                    , HSWM.Actions
+                   , Core
     other-modules: Prelude
     build-depends:    base ^>=4.20.2.0
                     , data-default

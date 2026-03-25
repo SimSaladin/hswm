@@ -1,11 +1,8 @@
 module HSWM.Actions  where
 
 import HSWM.Types
-import HSWM.Operations
-import Core
 
 import Control.Monad.Fix (fix)
-
 import GHC.Generics
 import System.Posix.IO
 import System.Posix.Types (ProcessID)
@@ -57,9 +54,6 @@ xfork x = io . forkProcess . finally nullStdin $ do
         fd <- openFd "/dev/null" ReadOnly defaultFileFlags
         _ <- dupTo fd stdInput
         closeFd fd
-
-io :: MonadIO m => IO a -> m a
-io = liftIO
 
 -- | Ignore SIGPIPE to avoid termination when a pipe is full, and SIGCHLD to
 -- avoid zombie processes, and clean up any extant zombie processes.

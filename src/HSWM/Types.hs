@@ -1,26 +1,25 @@
 {-# LANGUAGE DerivingVia #-}
 {-# LANGUAGE DefaultSignatures #-}
 
-
 module HSWM.Types (
   module HSWM.Types,
-  module HSWM.Types.XKB
+  module HSWM.XKB
   ) where
 
 import           Data.Bits
 import qualified Data.Map as M
+import qualified Data.TMap as TM
+import           Data.Typeable
 import           Foreign (StablePtr, Ptr, castPtr, nullPtr)
 import           Foreign.C (CUInt)
 import           Foreign.Storable (Storable(..))
 import           Foreign.Storable.Generic (GStorable(..))
 import           GHC.Generics (Generic)
-import           HSWM.Types.XKB
-import           RiverWM.Bindings
-import           RiverWM.XKB
 import           System.Exit (ExitCode(..))
-import           Wayland.Bindings (WlDisplay, WlSeat)
-import qualified Data.TMap as TM
-import Data.Typeable
+
+import           HSWM.XKB
+import           River
+import           Wayland (WlDisplay, WlSeat)
 
 -- | User configuration
 data HSWMConfig = HSWMConfig

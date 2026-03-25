@@ -1,7 +1,7 @@
 module HSWM.Operations where
 
 import           HSWM.Types
-import           RiverWM.Bindings
+import           River
 
 -- | Draw borders on the the window.
 wSetBorders :: RiverWindow -> H ()

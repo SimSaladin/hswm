@@ -3,22 +3,21 @@
 module Core
   ( module Core
   , module Wayland
-  , module RiverWM.Bindings
-  , module RiverWM.XKB
+  , module River
   ) where
+
+import           River
+import           HSWM.Operations
+import           HSWM.Types
+import           Wayland
 
 import           Control.Monad.Fix
 import           Data.Char (toLower)
 import qualified Data.Map as M
 import           Foreign hiding (new, void)
 import           Foreign.C
-import           HSWM.Operations
-import           HSWM.Types
-import           RiverWM.Bindings
-import           RiverWM.XKB
 import           System.Exit
 import           System.IO.Unsafe
-import           Wayland
 import qualified Data.TMap as TM
 
 modMaskMap :: TVar (M.Map String ModMask)
@@ -31,14 +30,13 @@ resolveModMask name = f <$> liftIO (readTVarIO modMaskMap)
 
 createKeyboardListener :: IO WlKeyboardListener
 createKeyboardListener = mkKeyboardListener $ \case
-  KeyboardKeymap dt _kbd fmt fd size -> do
-    log' $ "KEYBOARD: " <> tshow (fmt, fd, size)
+  KeyboardKeymap dt _kbd _fmt fd size -> do
     kmap <- createKeymap fd size
     forM_ xkbRealModifierNames $ \str ->
       xkb_keymap_mod_get_mask kmap str >>= \mask -> do
         debug' $ "keymask: " <> tshow (dt, str, mask)
         when (mask > 0) $ atomically $ modifyTVar modMaskMap $ M.insert (map toLower str) mask
-  _ -> return ()
+  e -> debug' $ "keyboard-event: " <> tshow e
 
 createRegistryListener :: WlDisplay -> WlKeyboardListener
                        -> TVar (M.Map Int WlSeat)
@@ -50,27 +48,23 @@ createRegistryListener display kbd_listener wlSetsTVar = do
     (\_data registry name ifacePtr version -> do
       iface <- peekCString ifacePtr
       case iface of
-        "river_window_manager_v1" -> do
-          wl_registry_bind registry name river_window_manager_v1_interface 4 >>= putMVar varWM
-          log' "river_window_manager_v1 bound"
-        "river_xkb_bindings_v1" -> do
-          wl_registry_bind registry name river_xkb_bindings_v1_interface 1 >>= putMVar varXKB
-          log' "river_xkb_bindings_v1 bound"
+        "river_window_manager_v1" -> do wl_registry_bind registry name river_window_manager_v1_interface 4 >>= putMVar varWM
+                                        log' "river_window_manager_v1 bound"
+        "river_xkb_bindings_v1" -> do wl_registry_bind registry name river_xkb_bindings_v1_interface 1 >>= putMVar varXKB
+                                      log' "river_xkb_bindings_v1 bound"
         "wl_seat" ->
           wl_registry_bind registry name wl_seat_interface version >>= \val@(WlSeat valPtr) -> do
-            debug' $ "reg: wl_seat bound: " <> tshow name
             atomically $ modifyTVar wlSetsTVar (M.insert (fromIntegral name) val)
             kbd <- liftIO $ wl_seat_get_keyboard val
-            debug' $ "reg: wl_seat:" <> tshow name <> ":got keyboard"
+            -- debug' $ "reg: wl_seat:" <> tshow name <> ":got keyboard"
             liftIO $ wl_keyboard_add_listener kbd kbd_listener valPtr
-        _ -> debug' $ "register-global: unhandled iface: " <> toText iface <> " (version: " <> tshow version <> ", name: " <> tshow name <> ")"
+        _ -> return () -- debug' $ "unused iface: " <> toText iface <> " (version: " <> tshow version <> ", name: " <> tshow name <> ")"
     )
     (\_data _reg _name -> return ())
   registry <- wl_display_get_registry display
   wl_registry_add_listener registry regListener nullPtr
 
-  roundtrip <- wl_display_roundtrip display
-  log' $ "Roundtrip: " <> tshow roundtrip
+  _roundtrip <- wl_display_roundtrip display
 
   rwm <- fromJust <$> tryTakeMVar varWM
   xkb <- fromJust <$> tryTakeMVar varXKB

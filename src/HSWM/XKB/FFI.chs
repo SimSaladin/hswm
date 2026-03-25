@@ -1,4 +1,4 @@
-module HSWM.Types.XKB where
+module HSWM.XKB.FFI where
 
 import Foreign
 import Foreign.C
