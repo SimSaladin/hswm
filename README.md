@@ -34,3 +34,11 @@ The Wl protocol bindings (checked into the repo) are generated with
 ```bash
 ./genproto.sh
 ```
+
+--------
+
+- [c2hs
+  reference](https://github.com/haskell/c2hs/wiki/Implementation-of-Haskell-Binding-Modules#call-hooks)
+- [tinyrwm](https://codeberg.org/river/tinyrwm) - Tiny river window manager examples
+- [list of river window
+  managers](https://codeberg.org/river/wiki/src/branch/main/pages/wm-list.md)

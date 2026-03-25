@@ -41,6 +41,10 @@
           };
         };
       };
+      packages = {
+        # Export our overridden river for convenience.
+        inherit (pkgs) river;
+      };
     };
   };
 
