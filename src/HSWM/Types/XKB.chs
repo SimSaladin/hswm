@@ -2,6 +2,7 @@ module HSWM.Types.XKB where
 
 import Foreign
 import Foreign.C
+import System.IO.Unsafe
 
 #include <unistd.h>
 #include <sys/mman.h>
@@ -24,6 +25,22 @@ type Fd = CInt
 {#fun xkb_keymap_mod_get_mask {`XkbKeymap', `String'} -> `ModMask' fromIntegral #}
 {#fun xkb_keymap_mod_get_name {`XkbKeymap', fromIntegral `ModIndex'} -> `String'#}
 {#fun xkb_state_get_keymap {`XkbState'} -> `XkbKeymap' #}
+
+-- enum xkb_keysym_flags {
+--     /** Do not apply any flags. */
+--     XKB_KEYSYM_NO_FLAGS = 0,
+--     /** Find keysym by case-insensitive search. */
+--     XKB_KEYSYM_CASE_INSENSITIVE = (1 << 0)
+-- };
+
+xkb_keysym_from_name :: String -> KeySym
+xkb_keysym_from_name name = unsafePerformIO $ withCString name $ \c_name -> return $!
+  let res = {#call pure xkb_keysym_from_name as _xkb_keysym_from_name#} c_name 1 in
+      if res == 0 then error ("xkb_keysym_from_name: name not found: " ++ name) else res
+{-# NOINLINE xkb_keysym_from_name #-}
+
+-- XKB_EXPORT int
+-- xkb_keysym_get_name(xkb_keysym_t keysym, char *buffer, size_t size);
 
 _XKB_KEY_n :: KeySym
 _XKB_KEY_n = {#const XKB_KEY_n#}

@@ -1,10 +1,15 @@
 {-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE DefaultSignatures #-}
 
-module HSWM.Types where
+
+module HSWM.Types (
+  module HSWM.Types,
+  module HSWM.Types.XKB
+  ) where
 
 import           Data.Bits
 import qualified Data.Map as M
-import           Foreign (Ptr, castPtr, nullPtr)
+import           Foreign (StablePtr, Ptr, castPtr, nullPtr)
 import           Foreign.C (CUInt)
 import           Foreign.Storable (Storable(..))
 import           Foreign.Storable.Generic (GStorable(..))
@@ -14,29 +19,74 @@ import           RiverWM.Bindings
 import           RiverWM.XKB
 import           System.Exit (ExitCode(..))
 import           Wayland.Bindings (WlDisplay, WlSeat)
+import qualified Data.TMap as TM
+import Data.Typeable
 
 -- | User configuration
 data HSWMConfig = HSWMConfig
-  { keyBindings :: [((String, KeySym), Action)]
-  , pointerBindings :: [((String, KeySym), Action)]
-  , defaultModMask :: String
-  , borderWidth :: Int
-  , borderColor :: (CUInt, CUInt, CUInt, CUInt)
-  , borderEdges :: Int
+  { keyBindings     :: [((String, KeySym), SomeAction)]
+  , pointerBindings :: [((String, KeySym), SomeAction)]
+  , defaultModMask  :: String
+  , borderWidth     :: Int
+  , borderColor     :: (CUInt, CUInt, CUInt, CUInt)
+  , borderEdges     :: Int
   } deriving Show
 
+-- | Configuration defaults
 instance Default HSWMConfig where
   def = HSWMConfig
     { borderWidth     = 2
     , borderColor     = (50000, 50000, 50000, 50000)
     , borderEdges     = foldl (.|.) 0 (fromEnum <$> [EdgeLeft, EdgeRight, EdgeTop, EdgeBottom])
-    , keyBindings     = [ (("M", _XKB_KEY_n), ACTION_FOCUS_NEXT)
+    , keyBindings     = [ -- (("M", _XKB_KEY_n), SendMessage ACTION_FOCUS_NEXT)
                         ]
-    , pointerBindings = [ (("M", _BTN_LEFT), ACTION_MOVE)
-                        , (("", _BTN_RIGHT), ACTION_MOVE)
+    , pointerBindings = [ -- (("M", _BTN_LEFT), SendMessage ACTION_MOVE)
+                        -- , (("", _BTN_RIGHT), SendMessage ACTION_MOVE)
                         ]
     , defaultModMask  = "Control"
     }
+
+class IsAction a where
+  runner :: a -> H ()
+
+  -- | Description based on the value (defaults to type info)
+  description :: a -> String
+  description = typeDescription
+
+  -- | Description based on type info
+  typeDescription :: a -> String
+  default typeDescription :: Typeable a => a -> String
+  typeDescription = show . typeOf
+
+
+data SomeAction where
+  SomeAction :: forall a. IsAction a => a -> SomeAction
+
+instance Show SomeAction where
+  show            (SomeAction a) = description a
+
+instance IsAction SomeAction where
+  runner          (SomeAction a) = runner a
+  description     (SomeAction a) = description a
+  typeDescription (SomeAction a) = typeDescription a
+
+toSomeAction :: IsAction a => a -> SomeAction
+toSomeAction = SomeAction
+
+
+
+data SomeMessage where
+  SomeMessage :: Show msg => msg -> SomeMessage
+  SomeMessageAction :: IsAction a => a -> SomeMessage
+
+
+data SendMessage = SendMessage SomeMessage
+
+instance IsAction SendMessage where
+  runner      (SendMessage msg) = dispatchMessage msg
+  description (SendMessage (SomeMessage m)) = "SendMsg: " ++ show m
+  description (SendMessage (SomeMessageAction m)) = "SendActionMsg: " ++ description m
+
 
 data SeatOp = SEAT_OP_NONE
             | SEAT_OP_MOVE
@@ -53,21 +103,20 @@ instance Storable Action where
   peek p = toEnum <$> peek (castPtr p :: Ptr Int)
   poke p x = poke (castPtr p :: Ptr Int) (fromIntegral $ fromEnum x)
 
-
-data XkbBinding = XkbBinding
+data XkbBinding a = XkbBinding
   { xkb_binding :: RiverXkbBinding
-  , river_seat :: RiverSeat
-  , action :: Action
+  , river_seat  :: RiverSeat
+  , action      :: a
   } deriving (Generic)
 
-instance GStorable XkbBinding
-
-data PointerBinding = PointerBinding
-  { pointer_binding :: RiverPointerBinding
-  , river_seat :: RiverSeat
-  , action :: Action
+data PointerBinding a = PointerBinding
+  { pointer_binding    :: RiverPointerBinding
+  , river_seat         :: RiverSeat
+  , action             :: a
   } deriving (Generic)
-instance GStorable PointerBinding
+
+instance GStorable (XkbBinding ())
+instance GStorable (PointerBinding ())
 
 data Seat = Seat
   { river_seat :: RiverSeat
@@ -80,20 +129,20 @@ data Seat = Seat
   , op_start_x, op_start_y, op_dx, op_dy :: Int
   , op_start_width, op_start_height :: Int
   , op_edges :: Int
-  , xkb_bindings :: [Ptr XkbBinding]
-  , pointer_bindings :: [Ptr PointerBinding]
-  , pending_action :: Action
+  , xkb_bindings :: [StablePtr (XkbBinding SomeAction)]
+  , pointer_bindings :: [StablePtr (PointerBinding SomeAction)]
+  , pending_action :: !(Maybe SomeAction)
   }
 
 instance Default Seat where
   def = Seat (RiverSeat nullPtr) True False invalidWindow invalidWindow invalidWindow
-    invalidWindow SEAT_OP_NONE False 0 0 0 0 0 0 0 mempty mempty ACTION_NONE
+    invalidWindow SEAT_OP_NONE False 0 0 0 0 0 0 0 mempty mempty Nothing
 
 data Output = Output
   { river_output :: RiverOutput
   , new :: Bool
   , removed :: Bool
-  }
+  } deriving Show
 
 instance Default Output where
   def = Output (RiverOutput nullPtr) True False
@@ -118,25 +167,28 @@ data Event = EOutput OutputEvent
            | ESeat SeatEvent
 
 data HConf = HConf
-  { display :: WlDisplay
-  , userConfig :: !(HSWMConfig)
-  , handleEventHook :: Event -> H ()
-  , defaultBorders :: WindowBorders
-  , _xkbBindingListener :: XkbBindingListener
+  { display                 :: WlDisplay
+  , userConfig              :: !(HSWMConfig)
+  , handleEventHook         :: Event -> H ()
+  , defaultBorders          :: WindowBorders
+  , _xkbBindingListener     :: XkbBindingListener
   , _pointerBindingListener :: PointerBindingListener
-  , _windowListener :: WindowListener
-  , _seatListener :: RiverSeatListener
-  , _outputListener :: RiverOutputListener
-  , _managerListener :: RiverWindowManagerListener
+  , _windowListener         :: WindowListener
+  , _seatListener           :: RiverSeatListener
+  , _outputListener         :: RiverOutputListener
+  , _managerListener        :: RiverWindowManagerListener
   }
 
 data HState = HState
-  { _seats :: [Seat]
-  , _outputs :: [Output]
-  , _windows :: [Window]
-  , _riverWM :: MVar RiverWindowManager
-  , _xkbBinds :: MVar RiverXkbBindings
-  , _wlSeats :: TVar (M.Map Int WlSeat)
+  { _seats    :: [Seat]
+  , _outputs  :: [Output]
+  , _windows  :: [Window]
+  , _riverWM  :: RiverWindowManager
+  , _xkbBinds :: RiverXkbBindings
+  , wlObjects :: TM.TMap
+  , _wlSeats  :: TVar (M.Map Int WlSeat)
+  , pendingEvents  :: TQueue SomeMessage
+  , pendingActions :: TQueue SomeAction
   }
 
 -- a la xmonad
@@ -162,3 +214,9 @@ catchH job errcase = do
 -- a la xmonad
 userCode :: H a -> H (Maybe a)
 userCode a = catchH (Just <$> a) (return Nothing)
+
+dispatchMessage :: SomeMessage -> H ()
+dispatchMessage msg = gets pendingEvents >>= liftIO . atomically . (`writeTQueue` msg)
+
+dispatchAction :: SomeAction -> H ()
+dispatchAction action = gets pendingActions >>= liftIO . atomically . (`writeTQueue` action)

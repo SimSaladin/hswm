@@ -1,0 +1,27 @@
+> [!IMPORTANT]
+> This project/repo is currently just a playground for the River window manager
+> protocol with Haskell, don't expect to find anything useful here!
+
+# HsWM
+
+**XMonad-inspired window manager for Wayland, powered by the River compositor
+and window manager protocol.**
+
+## Notes
+
+The Nix shell provides more or less all tools needed for testing and
+development (`nix develop`).
+
+River with the binary from this project:
+
+```bash
+river -c path/to/hswm
+```
+
+Inside X11/Wayland the session is contained nested in its own window.
+
+Figure out the Wl display ID to start programs inside the new session:
+
+```bash
+WAYLAND_DISPLAY=wayland-2 kitty
+```

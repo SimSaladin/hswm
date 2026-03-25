@@ -77,13 +77,10 @@ mkXkbBindingListener f = do
   {#set river_xkb_binding_v1_listener.stop_repeat#} p  =<< mk_xkb_listener_cb (\dt x -> f $ XkbStopRepeat dt x)
   return p
 
-river_xkb_binding_v1_add_listener :: Storable x => RiverXkbBinding -> XkbBindingListener -> x -> IO (Ptr x)
-river_xkb_binding_v1_add_listener bind (XkbBindingListener l) val = do
-  dt <- calloc
-  poke dt val
-  res <- wl_proxy_add_listener bind (castPtr l) (castPtr dt)
+river_xkb_binding_v1_add_listener :: RiverXkbBinding -> XkbBindingListener -> Ptr () -> IO ()
+river_xkb_binding_v1_add_listener bind (XkbBindingListener l) dt = do
+  res <- wl_proxy_add_listener bind (castPtr l) dt
   when (res < 0) $ throwIO $ RiverWindowManagerException "river_xkb_binding_v1_add_listener"
-  return dt
 
 river_xkb_binding_v1_destroy :: RiverXkbBinding -> IO ()
 river_xkb_binding_v1_destroy bind = do

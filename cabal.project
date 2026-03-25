@@ -1,5 +1,6 @@
-packages: .
+packages:
+  .
 
+-- https://github.com/haskell/c2hs/issues/300
 package hswm
-  -- https://github.com/haskell/c2hs/issues/300
   c2hs-options: -C -std=gnu18

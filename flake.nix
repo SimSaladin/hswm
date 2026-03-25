@@ -1,5 +1,5 @@
 {
-  description = "A very basic flake";
+  description = "HsWM: XMonad-inspired window manager for Wayland powered by River (compositor/wm protocol)";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
@@ -10,7 +10,7 @@
 
   outputs = inputs@{ self, nixpkgs, flake-utils, ... }:
   inputs.flake-parts.lib.mkFlake { inherit inputs; } {
-    systems = [ "x86_64-linux" ];
+    systems = [ "x86_64-linux" "aarch64-linux" ];
     imports = [
       inputs.haskell-flake.flakeModule
     ];
@@ -19,7 +19,9 @@
         inherit system;
         overlays = [
           (final: _: {
-            river = final.callPackage ./river.nix { };
+            # roll our own for now because the nixpkgs one is rather old and lacks
+            # features (the wm protocol etc.)
+            river = final.callPackage ./river/package.nix { };
           })
         ];
       };

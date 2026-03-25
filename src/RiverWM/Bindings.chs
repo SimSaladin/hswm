@@ -547,17 +547,6 @@ data SeatEvent
   | SeatEventPointerPosition         { seat_event_data :: Data, seat_event_seat :: RiverSeat, seat_event_x, seat_event_y :: CInt }
   deriving Show
 
--- instance Show SeatEvent where
---   show SeatRemoved                      {   } = "SeatRemoved"
---   show SeatWlSeat                       {.. } = printf "SeatWlSeat{name=%i}" (fromIntegral @_ @Int seat_event_name)
---   show SeatEventPointerEnter            {   } = "SeatEventPointerEnter"
---   show SeatEventPointerLeave            {   } = "SeatEventPointerLeave"
---   show SeatEventWindowInteraction       {   } = "SeatEventWindowInteraction"
---   show SeatEventShellSurfaceInteraction {   } = "SeatEventShellSurfaceInteraction"
---   show SeatEventOpDelta                 {.. } = "SeatEventOpDelta{dx=" ++ show seat_event_dx ++ ",dy=" ++ show seat_event_dy ++ "} "
---   show SeatEventOpRelease               {   } = "SeatEventOpRelease"
---   show SeatEventPointerPosition         {.. } = "SeatEventPointerPosition{x=" ++ show seat_event_x ++ ",y=" ++ show seat_event_y ++ "}"
-
 foreign import ccall "wrapper" mk_seat_handler        :: (Data -> RiverSeat -> IO ()) -> IO (FunPtr ((Data -> RiverSeat -> IO ())))
 foreign import ccall "wrapper" mk_seat_handler_window :: (Data -> RiverSeat -> RiverWindow -> IO ()) -> IO (FunPtr ((Data -> RiverSeat -> RiverWindow -> IO ())))
 foreign import ccall "wrapper" mk_seat_handler_u      :: (Data -> RiverSeat -> CUInt -> IO ()) -> IO (FunPtr ((Data -> RiverSeat -> CUInt -> IO ())))
@@ -641,13 +630,10 @@ mkPointerBindingListener f = do
   {#set river_pointer_binding_v1_listener.released#}  p =<< mk_pointer_binding_listener_cb (\dt b -> f $ PointerReleased dt b)
   return p
 
-river_pointer_binding_v1_add_listener :: Storable x => RiverPointerBinding -> PointerBindingListener -> x -> IO (Ptr x)
-river_pointer_binding_v1_add_listener target (PointerBindingListener l) val = do
-  dt <- calloc
-  poke dt val
-  res <- wl_proxy_add_listener target (castPtr l) (castPtr dt)
+river_pointer_binding_v1_add_listener :: RiverPointerBinding -> PointerBindingListener -> Ptr () -> IO ()
+river_pointer_binding_v1_add_listener target (PointerBindingListener l) dt = do
+  res <- wl_proxy_add_listener target (castPtr l) dt
   when (res < 0) $ throwIO $ RiverWindowManagerException "river_pointer_binding_v1_add_listener"
-  return dt
 
 river_pointer_binding_v1_destroy :: RiverPointerBinding -> IO ()
 river_pointer_binding_v1_destroy x = do
