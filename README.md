@@ -25,3 +25,12 @@ Figure out the Wl display ID to start programs inside the new session:
 ```bash
 WAYLAND_DISPLAY=wayland-2 kitty
 ```
+
+### Generated sources
+
+The Wl protocol bindings (checked into the repo) are generated with
+`wayland-scanner`. They can be regenerated via:
+
+```bash
+./genproto.sh
+```
