@@ -3,7 +3,6 @@
 -- Module      : River
 -- Description : Short description
 -- Copyright   : (c) Samuli Thomasson, 2026
--- License     : WTFPL
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@paivola.fi>
 -- Stability   : unstable

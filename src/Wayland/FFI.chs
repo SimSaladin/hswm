@@ -9,6 +9,9 @@ import Foreign.C
 data WaylandException = WaylandException String deriving (Show)
 instance Exception WaylandException
 
+data WaylandDisplayException = WaylandDisplayConnectFailed deriving Show
+instance Exception WaylandDisplayException
+
 {#pointer *wl_surface   as WlSurface   newtype #}
 {#pointer *wl_array     as WlArray     newtype #}
 {#pointer *wl_seat      as WlSeat      newtype #}

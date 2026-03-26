@@ -3,12 +3,9 @@ module Wayland
   , module Wayland.Bindings
   ) where
 
-import Wayland.Bindings
 import Foreign
 import Foreign.C
-
-data WaylandDisplayException = WaylandDisplayConnectFailed deriving Show
-instance Exception WaylandDisplayException
+import Wayland.Bindings
 
 openDisplay :: String -> IO WlDisplay
 openDisplay s = do

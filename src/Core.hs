@@ -10,6 +10,7 @@ import           River
 import           HSWM.Operations
 import           HSWM.Types
 import           Wayland
+import qualified HSWM.StackSet as W
 
 import           Control.Monad.Fix
 import           Data.Char (toLower)
@@ -28,6 +29,11 @@ resolveModMask :: String -> H ModMask
 resolveModMask name = f <$> liftIO (readTVarIO modMaskMap)
   where f = M.findWithDefault 0 (map toLower name)
 
+getOrCreateObject :: (Typeable a, MonadState HState m, MonadIO m) => IO a -> m a
+getOrCreateObject m = gets (TM.lookup . wlObjects) >>= \case
+  Just x -> return x
+  Nothing -> liftIO m >>= \x -> withWlObjects (TM.insert x) >> return x
+
 createKeyboardListener :: IO WlKeyboardListener
 createKeyboardListener = mkKeyboardListener $ \case
   KeyboardKeymap dt _kbd _fmt fd size -> do
@@ -38,80 +44,93 @@ createKeyboardListener = mkKeyboardListener $ \case
         when (mask > 0) $ atomically $ modifyTVar modMaskMap $ M.insert (map toLower str) mask
   e -> debug' $ "keyboard-event: " <> tshow e
 
-createRegistryListener :: WlDisplay -> WlKeyboardListener
-                       -> TVar (M.Map Int WlSeat)
-                       -> IO (WlRegistryListenerPtr, RiverWindowManager, RiverXkbBindings)
-createRegistryListener display kbd_listener wlSetsTVar = do
-  varWM <- newEmptyMVar
-  varXKB <- newEmptyMVar
-  regListener <- mkRegistryListener $ WlRegistryListener
-    (\_data registry name ifacePtr version -> do
-      iface <- peekCString ifacePtr
-      case iface of
-        "river_window_manager_v1" -> do wl_registry_bind registry name river_window_manager_v1_interface 4 >>= putMVar varWM
-                                        log' "river_window_manager_v1 bound"
-        "river_xkb_bindings_v1" -> do wl_registry_bind registry name river_xkb_bindings_v1_interface 1 >>= putMVar varXKB
-                                      log' "river_xkb_bindings_v1 bound"
-        "wl_seat" ->
-          wl_registry_bind registry name wl_seat_interface version >>= \val@(WlSeat valPtr) -> do
-            atomically $ modifyTVar wlSetsTVar (M.insert (fromIntegral name) val)
-            kbd <- liftIO $ wl_seat_get_keyboard val
-            -- debug' $ "reg: wl_seat:" <> tshow name <> ":got keyboard"
-            liftIO $ wl_keyboard_add_listener kbd kbd_listener valPtr
-        _ -> return () -- debug' $ "unused iface: " <> toText iface <> " (version: " <> tshow version <> ", name: " <> tshow name <> ")"
-    )
+createRegistryListener :: (MonadIO m, MonadState HState m) => WlDisplay -> TVar (M.Map Int WlSeat) -> m RiverWindowManager
+createRegistryListener display wlSetsTVar = do
+  kbd_listener <- getOrCreateObject @WlKeyboardListener createKeyboardListener
+  varWM <- liftIO (newEmptyMVar :: IO (MVar RiverWindowManager))
+  varXKB <- liftIO (newEmptyMVar :: IO (MVar RiverXkbBindings))
+
+  let callback registry name _ "river_window_manager_v1" = do
+        wl_registry_bind registry name river_window_manager_v1_interface 4 >>= putMVar varWM
+        log' "river_window_manager_v1 bound"
+
+      callback registry name _ "river_xkb_bindings_v1" = do
+        wl_registry_bind registry name river_xkb_bindings_v1_interface 1 >>= putMVar varXKB
+        log' "river_xkb_bindings_v1 bound"
+
+      callback registry name version "wl_seat" = wl_registry_bind registry name wl_seat_interface version >>= \val@(WlSeat valPtr) -> do
+        atomically $ modifyTVar wlSetsTVar (M.insert (fromIntegral name) val)
+        kbd <- liftIO $ wl_seat_get_keyboard val
+        -- debug' $ "reg: wl_seat:" <> tshow name <> ":got keyboard"
+        liftIO $ wl_keyboard_add_listener kbd kbd_listener valPtr
+
+      callback _ _ _ _ = return () -- debug' $ "unused iface: " <> toText iface <> " (version: " <> tshow version <> ", name: " <> tshow name <> ")"
+
+  regListener <- getOrCreateObject $ mkRegistryListener $ WlRegistryListener
+    (\_data registry name ifacePtr version -> peekCString ifacePtr >>= callback registry name version)
     (\_data _reg _name -> return ())
-  registry <- wl_display_get_registry display
-  wl_registry_add_listener registry regListener nullPtr
 
-  _roundtrip <- wl_display_roundtrip display
+  registry <- liftIO $ wl_display_get_registry display
+  liftIO $ wl_registry_add_listener registry regListener nullPtr
 
-  rwm <- fromJust <$> tryTakeMVar varWM
-  xkb <- fromJust <$> tryTakeMVar varXKB
-  return (regListener, rwm, xkb)
+  _roundtrip <- liftIO $ wl_display_roundtrip display
+
+  rwm <- liftIO $ fromJust <$> tryTakeMVar varWM
+  xkb <- liftIO $ fromJust <$> tryTakeMVar varXKB
+  withWlObjects $ TM.insert rwm . TM.insert xkb
+  return rwm
 
 startHSWM :: WlDisplay -> HSWMConfig -> IO ()
 startHSWM display config = withStdoutLogging $ do
-  kbd_listener <- createKeyboardListener
+  pendingEvents <- newTQueueIO
+  pendingActions <- newTQueueIO
   wlSetsTVar <- newTVarIO mempty
-  (regListener, windowManager, xkbBindings) <- createRegistryListener display kbd_listener wlSetsTVar
+  let initialWinSet = W.new Layout ["1", "2"] [(SD 0 0)]
   let userConfig = config
       handleEventHook _ = return ()
       defaultBorders = let (wb_r, wb_g, wb_b, wb_a) = borderColor config
                            wb_width = borderWidth config
                            wb_edges = fromIntegral $ borderEdges config
                         in WindowBorders { .. }
+  let initialState = HState
+        { windowset = initialWinSet
+        , _seats = mempty
+        , _outputs = mempty
+        , _windows = mempty
+        , _wlSeats = wlSetsTVar
+        , pendingActions = pendingActions
+        , pendingEvents = pendingEvents
+        , wlObjects = TM.empty
+        }
 
-  pendingEvents <- newTQueueIO
-  pendingActions <- newTQueueIO
+  stTMVar <- newTMVarIO initialState
 
-  stTMVar <- newTMVarIO $ HState mempty mempty mempty windowManager xkbBindings
-      (TM.insert xkbBindings $ TM.insert windowManager $ TM.insert regListener $ TM.insert kbd_listener TM.empty)
-       wlSetsTVar pendingEvents pendingActions
+  _ <- mfix $ \conf -> do
 
-  conf <- mfix $ \conf -> do
     let runInH :: H a -> IO a
         runInH a = do
           st <- atomically $ takeTMVar stTMVar
           (r, st') <- runH conf st a
           atomically $ putTMVar stTMVar st'
           return r
-    _xkbBindingListener <- mkXkbBindingListener $ \e -> runInH $ processXkbKeyEvent e
-    _pointerBindingListener <- mkPointerBindingListener $ \e -> runInH $ processPointerEvent e
-    _windowListener <- mkWindowListener $ \e -> runInH $ processWindowEvent e
-    _seatListener <- mkSeatListener $ \e -> runInH $ processSeatEvent e
-    _outputListener <- newOutputListener $ \e -> runInH $ processOutputEvent e
-    _managerListener <- mkWindowManagerListener $ \e -> runInH $ processManagerEvent e
-    runInH $ withWlObjects (TM.insert _xkbBindingListener . TM.insert _pointerBindingListener . TM.insert _windowListener . TM.insert _seatListener . TM.insert _outputListener . TM.insert _managerListener)
-    -- Process pending events
+
+    -- Process pending events in the background
     _ <- forkIO $ forever $ do
       a <- liftIO $ atomically (readTQueue pendingActions)
       debug' $ "[eventq] processing action: " <> toText (description a)
       runInH $ userCode $ runner a
 
-    return HConf { .. }
+    runInH $ do
+      windowManager <- createRegistryListener display wlSetsTVar
+      _ <- getOrCreateObject $ mkXkbBindingListener $ \e -> runInH $ processXkbKeyEvent e
+      _ <- getOrCreateObject $ mkPointerBindingListener $ \e -> runInH $ processPointerEvent e
+      _ <- getOrCreateObject $ mkWindowListener $ \e -> runInH $ processWindowEvent e
+      _ <- getOrCreateObject $ mkSeatListener $ \e -> runInH $ processSeatEvent e
+      _ <- getOrCreateObject $ newOutputListener $ \e -> runInH $ processOutputEvent e
+      managerListener <- getOrCreateObject $ mkWindowManagerListener $ \e -> runInH $ processManagerEvent e
+      liftIO $ river_window_manager_v1_add_listener windowManager managerListener nullPtr
 
-  _ <- river_window_manager_v1_add_listener windowManager conf._managerListener nullPtr
+    return HConf { .. }
 
   forever $ do
     res <- wl_display_dispatch display
@@ -136,8 +155,18 @@ processPendingMessages = do
                 go
     go
 
-withWlObjects :: (TM.TMap -> TM.TMap) -> H ()
-withWlObjects f = modify $ \s -> s { wlObjects = f (wlObjects s) }
+withWlObjects :: MonadState HState m => (TM.TMap -> TM.TMap) -> m ()
+withWlObjects f = modify $ \s -> s { wlObjects = f $! wlObjects s }
+
+getObject :: (Typeable a) => H a
+getObject = gets (TM.lookup . wlObjects) >>= \case
+  Nothing -> error "getObject: no such object"
+  Just x -> return x
+
+withObject :: (Typeable a) => (a -> H b) -> H b
+withObject f = gets (TM.lookup . wlObjects) >>= \case
+  Nothing -> error "withObject: no such object"
+  Just x -> f x
 
 create_seat_bindings :: Seat -> H Seat
 create_seat_bindings s = do
@@ -146,7 +175,10 @@ create_seat_bindings s = do
   xkbBinds     <- asks (keyBindings . userConfig) >>= resolveKeyBinds
   pointerBinds <- asks (pointerBindings . userConfig) >>= resolvePointerBinds
   -- xkb bindings
-  xkbPtrs <- forM xkbBinds $ \((m, k), a) -> xkb_binding_create s m k a
+  xkbPtrs <- forM xkbBinds $ \((m, k), a) -> do
+    binds <- getObject
+    l <- getObject
+    newXKBBinding binds l s.river_seat m k a
   -- pointer bindings
   pointerPtrs <- forM pointerBinds $ \((m, b), a) -> pointer_binding_create s m b a
   return s { xkb_bindings = s.xkb_bindings ++ xkbPtrs
@@ -213,17 +245,17 @@ processManagerEvent e = do
   WindowManagerWindow _ _wm w -> do
     nd <- liftIO $ river_window_v1_get_node w
     let win = def { river_window = w, node = nd }
-    window_listener <- asks _windowListener
+    window_listener <- getObject
     liftIO $ river_window_v1_add_listener w window_listener nullPtr
     modify $ \s -> s { _windows = _windows s ++ [win] }
   WindowManagerOutput _ _ out -> do
     let output = def { river_output = out }
-    output_listener <- asks _outputListener
+    output_listener <- getObject
     liftIO $ river_output_v1_add_listener out output_listener nullPtr
     modify $ \s -> s { _outputs = _outputs s ++ [output] }
   WindowManagerSeat _ _ river_seat -> do
     let seat = def { river_seat = river_seat } :: Seat
-    seat_listener <- asks _seatListener
+    seat_listener <- getObject
     liftIO $ river_seat_v1_add_listener river_seat seat_listener nullPtr
     modify $ \s -> s { _seats = _seats s ++ [seat] }
   _ -> return ()
@@ -233,6 +265,7 @@ processOutputEvent e = do
   log' $ "[event|output] " <> tshow e
   case e of
     OutputHandlerRemoved _ o -> modifyOutput o $ \x -> x { removed = True }
+    OutputHandlerDimensions _ ro width height ->  return ()
     _                        -> return ()
 
 processXkbKeyEvent :: XkbEvent -> H ()
@@ -305,7 +338,7 @@ manageCleanup = do
      liftIO $ river_output_v1_destroy out
      return Nothing
    doRemoveSeat Seat{..} = do
-     forM_ xkb_bindings $ xkb_binding_destroy
+     forM_ xkb_bindings $ destroyXKBBinding
      forM_ pointer_bindings $ pointer_binding_destroy
      liftIO $ river_seat_v1_destroy river_seat
      return Nothing
@@ -435,28 +468,11 @@ seat_action _ (Just action) = do
   log' $ "[seat_action] " <> tshow action
   runner action
 
--- * Key Binds
-
-xkb_binding_create :: Seat -> Modifiers -> KeySym -> SomeAction -> H (StablePtr (XkbBinding SomeAction))
-xkb_binding_create seat mods keysym action = do
-  xkbBinds <- gets _xkbBinds
-  xkb_binding_listener <- asks _xkbBindingListener
-  log' $ "[keys] binding key: " <> tshow (mods, keysym, action)
-  xb <- liftIO $ river_xkb_bindings_v1_get_xkb_binding xkbBinds seat.river_seat keysym mods
-  dtPtr <- liftIO $ newStablePtr $ XkbBinding xb seat.river_seat action
-  liftIO $ river_xkb_binding_v1_add_listener xb xkb_binding_listener (castStablePtrToPtr dtPtr)
-  liftIO $ river_xkb_binding_v1_enable xb
-  return dtPtr
-
-xkb_binding_destroy :: StablePtr (XkbBinding a) -> H ()
-xkb_binding_destroy _ = do
-  log' "xkb_binding_destroy: not yet implemented"
-
 -- * Pointer Binds
 
 pointer_binding_create :: Seat -> Modifiers -> Button -> SomeAction -> H (StablePtr (PointerBinding SomeAction))
 pointer_binding_create seat mods btn action = do
-    pointer_binding_listener <- asks _pointerBindingListener
+    pointer_binding_listener <- getObject @PointerBindingListener
     log' $ "[pointer] binding button: " <> tshow (mods, btn, action)
     pb' <- liftIO $ river_seat_v1_get_pointer_binding seat.river_seat btn mods
     dtPtr <- liftIO $ newStablePtr $ PointerBinding pb' seat.river_seat action
