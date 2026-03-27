@@ -20,7 +20,7 @@ instance IsKeySym KeySym where toKeySym = id
 instance IsKeySym String where
   toKeySym = xkb_keysym_from_name
 
-addKeys :: (IsKeySym k, IsAction a) => [((String, k), a)] -> HSWMConfig -> HSWMConfig
+addKeys :: (IsKeySym k, IsAction a) => [((String, k), a)] -> HSWMConfig l -> HSWMConfig l
 addKeys keys c = c
   { keyBindings = (keyBindings c) ++
     [ ((m, toKeySym k), toSomeAction a) | ((m, k), a) <- keys ]

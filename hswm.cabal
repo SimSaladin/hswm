@@ -12,7 +12,9 @@ build-type:         Simple
 extra-doc-files:    README.md
 --                  CHANGELOG.md
 extra-source-files:
-    cbits/river-window-management-v1-client-protocol.c
+    Makefile
+  , cbits/river-window-management-v1-client-protocol.c
+  , cbits/river-xkb-config-v1-protocol.c
 
 common warnings
     ghc-options: -Wall
@@ -28,7 +30,11 @@ library
                    , River.XKB.Bindings.FFI
                    , River.XKB.Bindings.MiscFFI
                    , River.XKB.Bindings
+		   , River.XKB.Config
+		   , River.XKB.Config.FFI
                    , River
+		   , HSWM
+		   , HSWM.Core
                    , HSWM.XKB
                    , HSWM.XKB.FFI
                    , HSWM.Types
@@ -36,9 +42,11 @@ library
                    , HSWM.Main
                    , HSWM.Operations
                    , HSWM.Actions
+		   , HSWM.Utils
+                   , HSWM.Layout
                    , Core
     other-modules: Prelude
-    build-depends:    base ^>=4.20.2.0
+    build-depends:    base >=4.20.2.0
                     , data-default
 		    , transformers
                     , mtl
@@ -52,7 +60,9 @@ library
     hs-source-dirs:   src
     include-dirs:     cbits
     c-sources:        cbits/river-window-management-v1-protocol.c
+                    , cbits/river-input-management-v1-protocol.c
                     , cbits/river-xkb-bindings-v1-protocol.c
+		    , cbits/river-xkb-config-v1-protocol.c
     pkgconfig-depends: wayland-client, xkbcommon
     extra-libraries:   wayland-client, xkbcommon
 
@@ -71,7 +81,7 @@ library
 executable hswm
     import:           warnings
     main-is:          Main.hs
-    build-depends:    base ^>=4.20.2.0
+    build-depends:    base >=4.20.2.0
                     , hswm
     hs-source-dirs:   app
     pkgconfig-depends: wayland-client

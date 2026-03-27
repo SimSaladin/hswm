@@ -1,6 +1,13 @@
 module Main (main) where
 
-import qualified HSWM.Main as Main
+import HSWM
 
 main :: IO ()
-main = Main.testMain
+main = hswm $ addKeys myKeys def
+  { layoutHook = Tall 1 (3/100) (1/2) ||| Full
+  }
+
+myKeys =
+  [ (("M", "n" :: String), toSomeAction FocusNext)
+  , (("M", "Return"),      toSomeAction $ LaunchProgram "evince" [])
+  ]

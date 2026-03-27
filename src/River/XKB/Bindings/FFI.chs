@@ -27,8 +27,16 @@ deriving instance Storable XkbBindingsSeatListener
 deriving instance Storable RiverXkbBinding
 deriving instance Storable XkbBindingListener
 
+instance IsWlProxy RiverXkbBindings where toWlProxy (RiverXkbBindings p) = WlProxy $ castPtr p
+instance IsWlProxy XkbBindingsSeat where toWlProxy (XkbBindingsSeat p) = WlProxy $ castPtr p
+instance IsWlProxy RiverXkbBinding where toWlProxy (RiverXkbBinding p) = WlProxy $ castPtr p
+
 -- * Interfaces
 
 foreign import ccall "&river_xkb_binding_v1_interface"       river_xkb_binding_v1_interface :: WlInterface
 foreign import ccall "&river_xkb_bindings_v1_interface"      river_xkb_bindings_v1_interface :: WlInterface
 foreign import ccall "&river_xkb_bindings_seat_v1_interface" river_xkb_bindings_seat_v1_interface :: WlInterface
+
+-- * Errors
+
+{#enum river_xkb_bindings_v1_error as RiverXkbBindingsError {} #}

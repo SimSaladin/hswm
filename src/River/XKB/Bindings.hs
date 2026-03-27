@@ -22,7 +22,6 @@ import River.WMP
 import GHC.Generics
 import           Foreign.Storable.Generic (GStorable(..))
 import Foreign
-import           Foreign.Storable (Storable(..))
 
 data XkbBinding a = XkbBinding
   { xkb_binding :: RiverXkbBinding
@@ -42,7 +41,7 @@ newXKBBinding
   -> action
   -> m (StablePtr (XkbBinding action))
 newXKBBinding xkbBinds xkb_binding_listener seat mods keysym action = do
-  log' $ "[keys] binding key: " <> tshow (mods, keysym, action)
+  debug' $ "[keys] binding key: " <> tshow (mods, keysym, action)
   xb <- liftIO $ river_xkb_bindings_v1_get_xkb_binding xkbBinds seat keysym mods
   dtPtr <- liftIO $ newStablePtr $ XkbBinding xb seat action
   liftIO $ river_xkb_binding_v1_add_listener xb xkb_binding_listener (castStablePtrToPtr dtPtr)
@@ -50,5 +49,7 @@ newXKBBinding xkbBinds xkb_binding_listener seat mods keysym action = do
   return dtPtr
 
 destroyXKBBinding :: MonadIO m => StablePtr (XkbBinding a) -> m ()
-destroyXKBBinding _ = do
-  log' "xkb_binding_destroy: not yet implemented"
+destroyXKBBinding sptr = do
+  xb <- liftIO $ deRefStablePtr sptr
+  liftIO $ river_xkb_binding_v1_destroy xb.xkb_binding
+  io $ freeStablePtr sptr

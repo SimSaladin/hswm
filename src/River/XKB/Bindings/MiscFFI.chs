@@ -4,6 +4,7 @@ module River.XKB.Bindings.MiscFFI where
 
 import Foreign hiding (void)
 import Foreign.C
+
 import HSWM.XKB
 import Wayland
 import River.WMP
@@ -12,22 +13,20 @@ import River.WMP
 
 #include "river-xkb-bindings-v1-client-protocol.h"
 
--- * XXX
-instance IsWlProxy RiverXkbBindings where toWlProxy (RiverXkbBindings p) = WlProxy $ castPtr p
-instance IsWlProxy XkbBindingsSeat where toWlProxy (XkbBindingsSeat p) = WlProxy $ castPtr p
-instance IsWlProxy RiverXkbBinding where toWlProxy (RiverXkbBinding p) = WlProxy $ castPtr p
--- * XXX
-instance IsRegistryObject RiverXkbBindings where peekRegistryObject p = return $ RiverXkbBindings $ castPtr p
-
 -- * river_xkb_bindings_v1
 
--- TODO enum river_xkb_bindings_v1_error
+-- ** Destroy
 
-river_xkb_bindings_v1_destroy :: RiverXkbBindings -> IO ()
-river_xkb_bindings_v1_destroy binds = do
-  ver <- wl_proxy_get_version binds
-  void $ wl_proxy_marshal_flags binds {#const RIVER_XKB_BINDINGS_V1_DESTROY#} emptyInterface ver _WL_MARSHAL_FLAG_DESTROY
+river_xkb_bindings_v1_destroy :: MonadIO m => RiverXkbBindings -> m ()
+river_xkb_bindings_v1_destroy binds = wl_proxy_destroy binds {#const RIVER_XKB_BINDINGS_V1_DESTROY#}
 
+-- ** Requests
+
+-- | Define a key binding for the given seat in terms of an xkbcommon keysym
+-- and other configurable properties.
+--
+-- The new key binding is not enabled until initial configuration is
+-- completed and the enable request is made during a manage sequence.
 river_xkb_bindings_v1_get_xkb_binding :: RiverXkbBindings -> RiverSeat -> KeySym -> Modifiers -> IO RiverXkbBinding
 river_xkb_bindings_v1_get_xkb_binding binds seat keysym mods = do
   ver <- wl_proxy_get_version binds
@@ -36,6 +35,10 @@ river_xkb_bindings_v1_get_xkb_binding binds seat keysym mods = do
   when (res == nullPtr) $ throwIO $ RiverWindowManagerException "river_xkb_bindings_v1_get_xkb_bindng"
   return $ RiverXkbBinding $ castPtr res
 
+-- | Create an object to manage seat-specific xkb bindings state.
+--
+-- It is a protocol error to make this request more than once for a given
+-- river_seat_v1 object.
 river_xkb_bindings_v1_get_seat :: RiverXkbBindings -> RiverSeat -> IO XkbBindingsSeat
 river_xkb_bindings_v1_get_seat binds seat = do
   ver <- wl_proxy_get_version binds
@@ -44,13 +47,14 @@ river_xkb_bindings_v1_get_seat binds seat = do
 
 -- * river_xkb_binding_v1
 
-data XkbEvent
-  = XkbKeyPressed (Ptr ()) RiverXkbBinding
-  | XkbKeyReleased (Ptr ()) RiverXkbBinding
-  | XkbStopRepeat (Ptr ()) RiverXkbBinding
-  deriving Show
+-- ** Destroy
 
-foreign import ccall "wrapper" mk_xkb_listener_cb :: ((Ptr ()) -> RiverXkbBinding -> IO ()) -> IO (FunPtr (((Ptr ()) -> RiverXkbBinding -> IO ())))
+river_xkb_binding_v1_destroy :: RiverXkbBinding -> IO ()
+river_xkb_binding_v1_destroy bind = do
+  ver <- wl_proxy_get_version bind
+  void $ wl_proxy_marshal_flags bind {#const RIVER_XKB_BINDING_V1_DESTROY#} emptyInterface ver _WL_MARSHAL_FLAG_DESTROY
+
+-- ** Listener
 
 mkXkbBindingListener :: (XkbEvent -> IO ()) -> IO XkbBindingListener
 mkXkbBindingListener f = do
@@ -65,31 +69,80 @@ river_xkb_binding_v1_add_listener bind (XkbBindingListener l) dt = do
   res <- wl_proxy_add_listener bind (castPtr l) dt
   when (res < 0) $ throwIO $ RiverWindowManagerException "river_xkb_binding_v1_add_listener"
 
-river_xkb_binding_v1_destroy :: RiverXkbBinding -> IO ()
-river_xkb_binding_v1_destroy bind = do
-  ver <- wl_proxy_get_version bind
-  void $ wl_proxy_marshal_flags bind {#const RIVER_XKB_BINDING_V1_DESTROY#} emptyInterface ver _WL_MARSHAL_FLAG_DESTROY
+data XkbEvent
+  = XkbKeyPressed  { userdata :: !(Ptr ()), binding :: !RiverXkbBinding }
+  | XkbKeyReleased { userdata :: !(Ptr ()), binding :: !RiverXkbBinding }
+  | XkbStopRepeat  { userdata :: !(Ptr ()), binding :: !RiverXkbBinding }
+  deriving Show
 
+foreign import ccall "wrapper" mk_xkb_listener_cb :: ListenerCallback (Ptr () -> RiverXkbBinding -> IO ())
+
+-- ** Requests
+
+-- | Specify an xkb layout that should be used to translate key events for
+-- the purpose of triggering this key binding irrespective of the currently
+-- active xkb layout.
+--
+-- The layout argument is a 0-indexed xkbcommon layout number for the
+-- keyboard that generated the key event.
 river_xkb_binding_v1_set_layout_override :: RiverXkbBinding -> CUInt -> IO ()
 river_xkb_binding_v1_set_layout_override bind layout = do
   ver <- wl_proxy_get_version bind
   void $ wl_proxy_marshal_flags__u bind {#const RIVER_XKB_BINDING_V1_SET_LAYOUT_OVERRIDE#} emptyInterface ver 0 layout
 
+-- |
+-- This request should be made after all initial configuration has been
+-- completed and the window manager wishes the key binding to be able to be
+-- triggered.
+--
+-- This request modifies window management state and may only be made as
+-- part of a manage sequence, see the river_window_manager_v1 description.
 river_xkb_binding_v1_enable :: RiverXkbBinding -> IO ()
 river_xkb_binding_v1_enable bind = do
   ver <- wl_proxy_get_version bind
   void $ wl_proxy_marshal_flags bind {#const RIVER_XKB_BINDING_V1_ENABLE#} emptyInterface ver 0
 
+-- |
+-- This request may be used to temporarily disable the key binding. It may
+-- be later re-enabled with the enable request.
+--
+-- This request modifies window management state and may only be made as
+-- part of a manage sequence, see the river_window_manager_v1 description.
 river_xkb_binding_v1_disable :: RiverXkbBinding -> IO ()
 river_xkb_binding_v1_disable bind = do
   ver <- wl_proxy_get_version bind
   void $ wl_proxy_marshal_flags bind {#const RIVER_XKB_BINDING_V1_DISABLE#} emptyInterface ver 0
 
---xkb_binding_create :: RiverXkbBindings -> RiverSeat -> KeySym -> Modifiers -> IO Binding
-
 -- * river_xkb_bindings_seat_v1
+
+-- ** Listener
+
+mkXkbBindingsSeatListener :: (XkbBindingsSeatEvent -> IO ()) -> IO XkbBindingsSeatListener
+mkXkbBindingsSeatListener f = do
+  p <- XkbBindingsSeatListener <$> mallocBytes {#sizeof river_xkb_bindings_seat_v1_listener#}
+  {#set river_xkb_bindings_seat_v1_listener.ate_unbound_key#} p =<< mk_xkb_seat_listener_cb (\dt x -> f $ XkbSeatAteUnboundKey dt x)
+  return p
 
 river_xkb_bindings_seat_v1_add_listener :: XkbBindingsSeat -> XkbBindingsSeatListener -> (Ptr ()) -> IO ()
 river_xkb_bindings_seat_v1_add_listener binds (XkbBindingsSeatListener l) dt = do
   res <- wl_proxy_add_listener binds (castPtr l) dt
   when (res < 0) $ throwIO $ RiverWindowManagerException "river_xkb_bindings_seat_v1_add_listener"
+
+data XkbBindingsSeatEvent = XkbSeatAteUnboundKey { userdata :: !(Ptr ()), bindingsSeat :: !XkbBindingsSeat }
+  deriving Show
+
+foreign import ccall "wrapper" mk_xkb_seat_listener_cb :: ListenerCallback (Ptr () -> XkbBindingsSeat -> IO ())
+
+-- ** Destroy
+
+river_xkb_bindings_seat_v1_destroy :: MonadIO m => XkbBindingsSeat -> m ()
+river_xkb_bindings_seat_v1_destroy = (`wl_proxy_destroy` {#const RIVER_XKB_BINDINGS_SEAT_V1_DESTROY#})
+
+-- ** Requests
+
+river_xkb_bindings_seat_v1_ensure_next_key_eaten :: MonadIO m => XkbBindingsSeat -> m ()
+river_xkb_bindings_seat_v1_ensure_next_key_eaten a = wl_proxy_marshal_flags' (const ()) a {#const RIVER_XKB_BINDINGS_SEAT_V1_ENSURE_NEXT_KEY_EATEN#} emptyInterface 0
+
+river_xkb_bindings_seat_v1_cancel_ensure_next_key_eaten :: MonadIO m => XkbBindingsSeat -> m ()
+river_xkb_bindings_seat_v1_cancel_ensure_next_key_eaten a = wl_proxy_marshal_flags' (const ()) a {#const RIVER_XKB_BINDINGS_SEAT_V1_CANCEL_ENSURE_NEXT_KEY_EATEN#} emptyInterface 0
+

@@ -1,9 +1,8 @@
 ------------------------------------------------------------------------------
 -- |
--- Module      : HSWM.Main
+-- Module      : River.XKB.Config
 -- Description : Short description
 -- Copyright   : (c) Samuli Thomasson, 2026
--- License     : WTFPL
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@paivola.fi>
 -- Stability   : unstable
@@ -12,14 +11,9 @@
 -- Longer description of this module.
 --
 ------------------------------------------------------------------------------
-module HSWM.Main  where
+module River.XKB.Config
+  ( module River.XKB.Config.FFI
+  , module River.XKB.Config
+  ) where
 
-import HSWM.Types
-import HSWM.Actions
-import Core
-
-hswm :: (LayoutClass l RiverWindow, Read (l RiverWindow)) => HSWMConfig l -> IO ()
-hswm conf = do
-  installSignalHandlers
-  display <- openDisplay ""
-  startHSWM display conf
+import           River.XKB.Config.FFI

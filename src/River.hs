@@ -12,9 +12,16 @@
 --
 ------------------------------------------------------------------------------
 module River
-  ( module River.WMP
+  ( module River
+  , module River.WMP
   , module River.XKB.Bindings
+  , module River.XKB.Config
   ) where
 
+import Data.Word (Word32)
 import River.WMP
 import River.XKB.Bindings
+import River.XKB.Config
+
+data RiverColor = RiverColor { red, green, blue, alpha :: !Word32 }
+  deriving (Show, Read, Eq)

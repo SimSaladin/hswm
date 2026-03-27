@@ -12,63 +12,42 @@ import           HSWM.Types
 import           Wayland
 import qualified HSWM.StackSet as W
 
-import           Control.Monad.Fix
-import           Data.Char (toLower)
 import qualified Data.Map as M
+-- import qualified Data.Set as S
+
+import           Data.Char (toLower)
 import           Foreign hiding (new, void)
-import           Foreign.C
 import           System.Exit
-import           System.IO.Unsafe
 import qualified Data.TMap as TM
+import qualified Data.List as L
 
-modMaskMap :: TVar (M.Map String ModMask)
-{-# NOINLINE modMaskMap #-}
-modMaskMap = unsafePerformIO $ newTVarIO M.empty
-
-resolveModMask :: String -> H ModMask
-resolveModMask name = f <$> liftIO (readTVarIO modMaskMap)
-  where f = M.findWithDefault 0 (map toLower name)
-
-getOrCreateObject :: (Typeable a, MonadState HState m, MonadIO m) => IO a -> m a
-getOrCreateObject m = gets (TM.lookup . wlObjects) >>= \case
-  Just x -> return x
-  Nothing -> liftIO m >>= \x -> withWlObjects (TM.insert x) >> return x
-
-createKeyboardListener :: IO WlKeyboardListener
-createKeyboardListener = mkKeyboardListener $ \case
-  KeyboardKeymap dt _kbd _fmt fd size -> do
-    kmap <- createKeymap fd size
-    forM_ xkbRealModifierNames $ \str ->
-      xkb_keymap_mod_get_mask kmap str >>= \mask -> do
-        debug' $ "keymask: " <> tshow (dt, str, mask)
-        when (mask > 0) $ atomically $ modifyTVar modMaskMap $ M.insert (map toLower str) mask
-  e -> debug' $ "keyboard-event: " <> tshow e
-
-createRegistryListener :: (MonadIO m, MonadState HState m) => WlDisplay -> TVar (M.Map Int WlSeat) -> m RiverWindowManager
-createRegistryListener display wlSetsTVar = do
-  kbd_listener <- getOrCreateObject @WlKeyboardListener createKeyboardListener
+createRegistryListener :: (MonadIO m, MonadState HState m) => WlDisplay -> m RiverWindowManager
+createRegistryListener display = do
+  debug' "at create registry listener..."
   varWM <- liftIO (newEmptyMVar :: IO (MVar RiverWindowManager))
   varXKB <- liftIO (newEmptyMVar :: IO (MVar RiverXkbBindings))
-
-  let callback registry name _ "river_window_manager_v1" = do
-        wl_registry_bind registry name river_window_manager_v1_interface 4 >>= putMVar varWM
+  xkbConfigVar <- liftIO newEmptyMVar
+  debug' "initialized mvars"
+  useXkbConfigListener <- withObjectDef (const (return ())) $ \listener -> return (\f -> f listener)
+  log' "got xkbconfiglistener"
+  regListener <- getOrCreateObject $ mkRegistryListener $ \case
+    RegistryGlobal _ registry name "river_window_manager_v1" _ -> do
+        wl_registry_bind registry name river_window_manager_v1_interface 4 >>= putMVar varWM . RiverWindowManager
         log' "river_window_manager_v1 bound"
 
-      callback registry name _ "river_xkb_bindings_v1" = do
-        wl_registry_bind registry name river_xkb_bindings_v1_interface 1 >>= putMVar varXKB
+    RegistryGlobal _ registry name "river_xkb_bindings_v1" _ -> do
+        wl_registry_bind registry name river_xkb_bindings_v1_interface 1 >>= putMVar varXKB . RiverXkbBindings
         log' "river_xkb_bindings_v1 bound"
 
-      callback registry name version "wl_seat" = wl_registry_bind registry name wl_seat_interface version >>= \val@(WlSeat valPtr) -> do
-        atomically $ modifyTVar wlSetsTVar (M.insert (fromIntegral name) val)
-        kbd <- liftIO $ wl_seat_get_keyboard val
-        -- debug' $ "reg: wl_seat:" <> tshow name <> ":got keyboard"
-        liftIO $ wl_keyboard_add_listener kbd kbd_listener valPtr
+    RegistryGlobal _ registry name "river_xkb_config_v1" _ -> do
+        xkbConfig <- RiverXkbConfigV1 <$> wl_registry_bind registry name river_xkb_config_v1_interface 1
+        putMVar xkbConfigVar xkbConfig
+        debug' "about to install xkbconfig listener..."
+        useXkbConfigListener $ \l -> riverXkbConfigV1AddListener xkbConfig l nullPtr
+        debug' "xkbconfig listener installed"
 
-      callback _ _ _ _ = return () -- debug' $ "unused iface: " <> toText iface <> " (version: " <> tshow version <> ", name: " <> tshow name <> ")"
-
-  regListener <- getOrCreateObject $ mkRegistryListener $ WlRegistryListener
-    (\_data registry name ifacePtr version -> peekCString ifacePtr >>= callback registry name version)
-    (\_data _reg _name -> return ())
+    RegistryGlobal _ _ _ iface _ -> log' $ "[globalreg] " <> toText iface
+    _ -> return ()
 
   registry <- liftIO $ wl_display_get_registry display
   liftIO $ wl_registry_add_listener registry regListener nullPtr
@@ -77,60 +56,59 @@ createRegistryListener display wlSetsTVar = do
 
   rwm <- liftIO $ fromJust <$> tryTakeMVar varWM
   xkb <- liftIO $ fromJust <$> tryTakeMVar varXKB
-  withWlObjects $ TM.insert rwm . TM.insert xkb
+  xkbConfig <- liftIO $ fromJust <$> tryTakeMVar xkbConfigVar
+  withWlObjects $ TM.insert xkbConfig . TM.insert rwm . TM.insert xkb
   return rwm
 
-startHSWM :: WlDisplay -> HSWMConfig -> IO ()
+startHSWM :: (LayoutClass l RiverWindow, Read (l RiverWindow)) => WlDisplay -> HSWMConfig l -> IO ()
 startHSWM display config = withStdoutLogging $ do
-  pendingEvents <- newTQueueIO
   pendingActions <- newTQueueIO
-  wlSetsTVar <- newTVarIO mempty
-  let initialWinSet = W.new Layout ["1", "2"] [(SD 0 0)]
-  let userConfig = config
-      handleEventHook _ = return ()
-      defaultBorders = let (wb_r, wb_g, wb_b, wb_a) = borderColor config
-                           wb_width = borderWidth config
-                           wb_edges = fromIntegral $ borderEdges config
-                        in WindowBorders { .. }
+
+  let conf = HConf
+        { config = config { layoutHook = Layout (layoutHook config) }
+        , display = display
+        }
+
+  let initialWinSet = W.new conf.config.layoutHook ["1", "2"] [SD 0 0 0 0]
   let initialState = HState
         { windowset = initialWinSet
+        , windowsetOld = initialWinSet
         , _seats = mempty
         , _outputs = mempty
         , _windows = mempty
-        , _wlSeats = wlSetsTVar
         , pendingActions = pendingActions
-        , pendingEvents = pendingEvents
         , wlObjects = TM.empty
         }
 
   stTMVar <- newTMVarIO initialState
 
-  _ <- mfix $ \conf -> do
-
-    let runInH :: H a -> IO a
-        runInH a = do
-          st <- atomically $ takeTMVar stTMVar
+  let runInH :: H a -> IO a
+      runInH a = bracketOnError
+        (atomically $ takeTMVar stTMVar)
+        (atomically . putTMVar stTMVar)
+        $ \st -> do
           (r, st') <- runH conf st a
           atomically $ putTMVar stTMVar st'
           return r
 
-    -- Process pending events in the background
-    _ <- forkIO $ forever $ do
-      a <- liftIO $ atomically (readTQueue pendingActions)
-      debug' $ "[eventq] processing action: " <> toText (description a)
-      runInH $ userCode $ runner a
+  debug' "At startup..."
+  -- -- Process pending actions in the background
+  -- _ <- forkIO $ forever $ do
+  --   a <- liftIO $ atomically (readTQueue pendingActions)
+  --   debug' $ "[eventq] processing action: " <> toText (actionDescription a)
+  --   runInH $ userCode $ runner a
 
-    runInH $ do
-      windowManager <- createRegistryListener display wlSetsTVar
-      _ <- getOrCreateObject $ mkXkbBindingListener $ \e -> runInH $ processXkbKeyEvent e
-      _ <- getOrCreateObject $ mkPointerBindingListener $ \e -> runInH $ processPointerEvent e
-      _ <- getOrCreateObject $ mkWindowListener $ \e -> runInH $ processWindowEvent e
-      _ <- getOrCreateObject $ mkSeatListener $ \e -> runInH $ processSeatEvent e
-      _ <- getOrCreateObject $ newOutputListener $ \e -> runInH $ processOutputEvent e
-      managerListener <- getOrCreateObject $ mkWindowManagerListener $ \e -> runInH $ processManagerEvent e
-      liftIO $ river_window_manager_v1_add_listener windowManager managerListener nullPtr
-
-    return HConf { .. }
+  runInH $ do
+    _ <- getOrCreateObject $ mkRiverXkbConfigV1Listener $ \e -> runInH $ handleEvent $ XkbConfigEvent e
+    _ <- getOrCreateObject $ mkRiverXkbKeyboardV1Listener $ \e -> runInH $ handleEvent $ XkbKeyboardEvent e
+    windowManager <- createRegistryListener display
+    _ <- getOrCreateObject $ mkXkbBindingListener $ \e -> runInH $ handleEvent $ XkbEvent e
+    _ <- getOrCreateObject $ mkPointerBindingListener $ \e -> runInH $ handleEvent $ PointerEvent e
+    _ <- getOrCreateObject $ mkWindowListener $ \e -> runInH $ handleEvent $ WindowEvent e
+    _ <- getOrCreateObject $ mkSeatListener $ \e -> runInH $ handleEvent $ SeatEvent e
+    _ <- getOrCreateObject $ newOutputListener $ \e -> runInH $ handleEvent $ OutputEvent e
+    managerListener <- getOrCreateObject $ mkWindowManagerListener $ \e -> runInH $ handleEvent $ WindowManagerEvent e
+    liftIO $ river_window_manager_v1_add_listener windowManager managerListener nullPtr
 
   forever $ do
     res <- wl_display_dispatch display
@@ -138,218 +116,103 @@ startHSWM display config = withStdoutLogging $ do
       log' "error: dispatch failed"
       exitFailure
 
-processPendingMessages :: H ()
-processPendingMessages = do
-    tq <- gets pendingEvents
-    let go = do
-            ma <- liftIO . atomically $ tryReadTQueue tq
-            case ma of
-              Nothing -> return ()
-              Just (SomeMessage a) -> do
-                debug' $ "[eventq] processing message: " <> tshow a
-                -- TODO do something with this?
-                go
-              Just (SomeMessageAction a) -> do
-                debug' $ "[eventq] processing message action: " <> toText (description a)
-                _ <- userCode $ runner a
-                go
-    go
+windows :: H ()
+windows = do
+    old <- gets windowsetOld
+    ws <- gets windowset
+    let oldvisible = concatMap (W.integrate' . W.stack . W.workspace) $ W.current old : W.visible old
+        newwindows = W.allWindows ws L.\\ W.allWindows old
 
-withWlObjects :: MonadState HState m => (TM.TMap -> TM.TMap) -> m ()
-withWlObjects f = modify $ \s -> s { wlObjects = f $! wlObjects s }
+    mapM_ setInitialProperties newwindows
 
-getObject :: (Typeable a) => H a
-getObject = gets (TM.lookup . wlObjects) >>= \case
-  Nothing -> error "getObject: no such object"
-  Just x -> return x
+    whenJust (W.peek old) $ \otherw ->
+      setWindowBorder otherw =<< asks (normalBorder . config)
 
-withObject :: (Typeable a) => (a -> H b) -> H b
-withObject f = gets (TM.lookup . wlObjects) >>= \case
-  Nothing -> error "withObject: no such object"
-  Just x -> f x
+    modify (\s -> s { windowsetOld = ws })
 
-create_seat_bindings :: Seat -> H Seat
-create_seat_bindings s = do
-  myMod <- asks (defaultModMask . userConfig) >>= resolveModMask
-  when (myMod /= 0) $ liftIO $ atomically $ modifyTVar modMaskMap $ M.insert "m" myMod
-  xkbBinds     <- asks (keyBindings . userConfig) >>= resolveKeyBinds
-  pointerBinds <- asks (pointerBindings . userConfig) >>= resolvePointerBinds
-  -- xkb bindings
-  xkbPtrs <- forM xkbBinds $ \((m, k), a) -> do
-    binds <- getObject
-    l <- getObject
-    newXKBBinding binds l s.river_seat m k a
-  -- pointer bindings
-  pointerPtrs <- forM pointerBinds $ \((m, b), a) -> pointer_binding_create s m b a
-  return s { xkb_bindings = s.xkb_bindings ++ xkbPtrs
-           , pointer_bindings = s.pointer_bindings ++ pointerPtrs }
-  where
-    resolveKeyBinds = mapM $ \((m, k), a) -> do
-      m' <- resolveModMask m
-      return ((m', k), a)
-    resolvePointerBinds = mapM $ \((m, k), a) -> do
-      m' <- resolveModMask m
-      return ((m', k), a)
+    let tags_oldvisible = map (W.tag . W.workspace) $ W.current old : W.visible old
+        gottenhidden    = filter (flip elem tags_oldvisible . W.tag) $ W.hidden ws
+    mapM_ (sendMessageWithNoRefresh Hide) gottenhidden
 
-window_set_position :: Window -> Int -> Int -> H ()
-window_set_position w x y = liftIO $ river_node_v1_set_position (node w) x y
+    -- for each workspace, layout the currently visible workspaces
+    let allscreens     = W.screens ws
+        summed_visible = scanl (++) [] $ map (W.integrate' . W.stack . W.workspace) allscreens
 
-withSeat :: RiverSeat -> (Seat -> H ()) -> H ()
-withSeat sid f = gets _seats >>= mapM_ (\s -> when (s.river_seat == sid) (f s))
+    rects <- fmap concat $ forM (zip allscreens summed_visible) $ \ (w, vis) -> do
+        let wsp   = W.workspace w
+            this  = W.view n ws
+            n     = W.tag wsp
+            tiled = (W.stack . W.workspace . W.current $ this)
+                    >>= W.filter (`M.notMember` W.floating ws)
+                    >>= W.filter (`notElem` vis)
+            sd = W.screenDetail w
+            viewrect = Rectangle{x=fi sd.x, y=fi sd.y, width=fi sd.width, height=fi sd.height}
 
-withWindow :: RiverWindow -> (Window -> H ()) -> H ()
-withWindow wid f = gets _windows >>= mapM_ (\w -> when (w.river_window == wid) (f w))
+        -- just the tiled windows:
+        -- now tile the windows on this workspace, modified by the gap
+        (rs, ml') <- runLayout wsp { W.stack = tiled } viewrect `catchH`
+                     runLayout wsp { W.stack = tiled, W.layout = Layout Full } viewrect
+        updateLayout n ml'
 
-modifyWindow :: RiverWindow -> (Window -> Window) -> H ()
-modifyWindow w f = modify $ \s -> s { _windows = map g s._windows }
-  where g x | x.river_window == w = f x
-            | otherwise = x
+        let m   = W.floating ws
+            flt = [(fw, scaleRationalRect viewrect r)
+                    | fw <- filter (`M.member` m) (W.index this)
+                    , fw `notElem` vis
+                    , Just r <- [M.lookup fw m]]
+            vs = flt ++ rs
 
-modifyOutput :: RiverOutput -> (Output -> Output) -> H ()
-modifyOutput ro f = modify $ \s -> s { _outputs = map g (_outputs s) }
-  where g x@Output{..} | river_output == ro = f x
-                       | otherwise = x
+        -- return the visible windows for this workspace:
+        return vs
 
-modifySeat :: RiverSeat -> (Seat -> Seat) -> H ()
-modifySeat ro f = modify $ \s -> s { _seats = map g (_seats s) }
-  where g x@Seat{..} | river_seat == ro = f x
-                     | otherwise = x
+    let visible = map fst rects
 
-mapSeats :: (Seat -> H ()) -> H ()
-mapSeats f = gets _seats >>= mapM_ f
+    mapM_ (uncurry tileWindow) rects
 
-mapWindows :: (Window -> H ()) -> H ()
-mapWindows f = gets _windows >>= mapM_ f
+    whenJust (W.peek ws) $ \w ->
+      setWindowBorder w =<< asks (focusedBorder . config)
 
-processManagerEvent :: WindowManagerEvent -> H ()
-processManagerEvent e = do
- case e of
-   WindowManagerManageStart{} -> pure ()
-   WindowManagerRenderStart{} -> pure ()
-   _ -> log' $ "[event|manager] " <> tshow e
- case e of
-  WindowManagerUnavailable{}      -> do log' "error: another window manager already running"
-                                        liftIO exitFailure
-  WindowManagerFinished{}         -> liftIO exitSuccess
-  WindowManagerManageStart _dt wm -> do
-    manageCleanup
-    manageWindows
-    manageSeats
-    processPendingMessages
-    liftIO $ wmManageFinish wm
-  WindowManagerRenderStart _dt wm -> do
-    mapSeats seatRender
-    mapWindows $ \w -> wSetBorders w.river_window
-    processPendingMessages
-    liftIO $ wmRenderFinish wm
-  WindowManagerWindow _ _wm w -> do
-    nd <- liftIO $ river_window_v1_get_node w
-    let win = def { river_window = w, node = nd }
-    window_listener <- getObject
-    liftIO $ river_window_v1_add_listener w window_listener nullPtr
-    modify $ \s -> s { _windows = _windows s ++ [win] }
-  WindowManagerOutput _ _ out -> do
-    let output = def { river_output = out }
-    output_listener <- getObject
-    liftIO $ river_output_v1_add_listener out output_listener nullPtr
-    modify $ \s -> s { _outputs = _outputs s ++ [output] }
-  WindowManagerSeat _ _ river_seat -> do
-    let seat = def { river_seat = river_seat } :: Seat
-    seat_listener <- getObject
-    liftIO $ river_seat_v1_add_listener river_seat seat_listener nullPtr
-    modify $ \s -> s { _seats = _seats s ++ [seat] }
-  _ -> return ()
+    mapM_ reveal visible
+    setTopFocus
 
-processOutputEvent :: OutputEvent -> H ()
-processOutputEvent e = do
-  log' $ "[event|output] " <> tshow e
-  case e of
-    OutputHandlerRemoved _ o -> modifyOutput o $ \x -> x { removed = True }
-    OutputHandlerDimensions _ ro width height ->  return ()
-    _                        -> return ()
+    -- hide every window that was potentially visible before, but is not
+    -- given a position by a layout now.
+    mapM_ hide (L.nub (oldvisible ++ newwindows) L.\\ visible)
 
-processXkbKeyEvent :: XkbEvent -> H ()
-processXkbKeyEvent e = do
-  case e of
-    XkbKeyPressed dt _ -> do
-      xb <- liftIO $ deRefStablePtr (castPtrToStablePtr dt :: StablePtr (XkbBinding SomeAction))
-      log' $ toText $ printf "[event|xkb] keypress ev=%s action=%s" (show e) (show xb.action)
-      dispatchAction xb.action
-      --dispatchAction $ SeatAction xb.river_seat xb.action
-      --modifySeat xb.river_seat $ \s -> s { pending_action = Just xb.action }
-    _ -> log' $ "[event|xkb] " <> tshow e
-
-processPointerEvent :: PointerEvent -> H ()
-processPointerEvent e = do
-  log' $ "[event|pointer] " <> tshow e
-  case e of
-    _ -> return ()
-
-processWindowEvent :: WindowEvent -> H ()
-processWindowEvent e = do
-  log' $ "[event|window] " <> tshow e
-  case e of
-    WindowClosed _ w -> modifyWindow w $ \s -> s { closed = True }
-    WindowDimensions{..} -> modifyWindow we_window $ \s -> s { width = fromIntegral we_width, height = fromIntegral we_height }
-    WindowPointerMoveRequested{..} -> modifyWindow we_window $ \s -> s { pointer_move_requested = we_seat }
-    WindowPointerResizeRequested{..} -> modifyWindow we_window $ \s -> s { pointer_resize_requested = we_seat, pointer_resize_requested_edges = fromIntegral we_edges }
-    _ -> return ()
-  evHook <- asks handleEventHook
-  evHook (EWindow e)
-
-processSeatEvent :: SeatEvent -> H ()
-processSeatEvent e = do
-  log' $ "[event|seat] " <> tshow e
-  case e of
-    SeatRemoved _ seat -> modifySeat seat $ \x -> x { removed = True }
-    SeatEventPointerEnter{..} -> modifySeat seat_event_seat $ \s -> s { hovered = seat_event_window }
-    SeatEventPointerLeave{..} -> modifySeat seat_event_seat $ \s -> s { hovered = invalidWindow }
-    SeatEventWindowInteraction{..} -> modifySeat seat_event_seat $ \s -> s { interacted = seat_event_window }
-    SeatEventOpDelta{..} -> modifySeat seat_event_seat $ \s -> s { op_dx = fromIntegral seat_event_dx, op_dy = fromIntegral seat_event_dy }
-    SeatEventOpRelease{..} -> modifySeat seat_event_seat $ \s -> s { op_release = True }
-    _ -> return ()
+    asks (logHook . config) >>= userCodeDef ()
 
 -- | Destroy closed windows and removed outputs/seats
 manageCleanup :: H ()
 manageCleanup = do
-  gets _outputs >>= \xs -> do
-    xs' <- forM xs $ \out@Output{..} -> if removed then doRemoveOutput river_output else return (Just out)
-    modify $ \s -> s { _outputs = catMaybes xs' }
+  mapSeats $ \seat -> when seat.removed (doRemoveSeat seat)
+  mapWindows $ \w -> when w.closed (doRemoveWindow w)
+
+doRemoveWindow :: Window -> H ()
+doRemoveWindow w@Window{} = do
+  modify $ \st -> st { _windows = L.filter (\x -> (/= w.river_window) x.river_window) (_windows st) }
   gets _seats >>= \xs -> do
-    xs' <- forM xs $ \seat@Seat{..} -> if removed then doRemoveSeat seat else return (Just seat)
-    modify $ \s -> s { _seats = catMaybes xs' }
-  gets _windows >>= \xs -> do
-    xs' <- forM xs $ \w@Window{..} -> if closed then doRemoveWindow w else return (Just w)
-    modify $ \s -> s { _windows = catMaybes xs' }
- where
-   doRemoveWindow w@Window{} = do
-     gets _seats >>= \xs -> do
-       xs' <- forM xs $ \seat' -> do
-         let seat = seat' { focused = if focused seat' == w.river_window then invalidWindow else focused seat' }
-         if (op_window seat == w.river_window)
-            then do
-                liftIO $ river_seat_v1_op_end (seat.river_seat)
-                return $ seat { op_window = invalidWindow, op = SEAT_OP_NONE }
-            else return $ seat
-       modify $ \s -> s { _seats = xs' }
-     liftIO $ river_window_v1_destroy (w.river_window)
-     return Nothing
-   doRemoveOutput out = do
-     liftIO $ river_output_v1_destroy out
-     return Nothing
-   doRemoveSeat Seat{..} = do
-     forM_ xkb_bindings $ destroyXKBBinding
-     forM_ pointer_bindings $ pointer_binding_destroy
-     liftIO $ river_seat_v1_destroy river_seat
-     return Nothing
+   xs' <- forM xs $ \seat' -> do
+     let seat = seat' { focused = if focused seat' == w.river_window then invalidWindow else focused seat' }
+     if op_window seat == w.river_window
+        then do
+            liftIO $ river_seat_v1_op_end seat.river_seat
+            return $ seat { op_window = invalidWindow, op = SEAT_OP_NONE }
+        else return seat
+   modify $ \s -> s { _seats = xs' }
+  liftIO $ river_window_v1_destroy w.river_window
+
+doRemoveSeat :: Seat -> H ()
+doRemoveSeat s@Seat{} = do
+  modify $ \st -> st { _seats = L.filter (\x -> (/= s.river_seat) x.river_seat) (_seats st) }
+  forM_ s.xkb_bindings destroyXKBBinding
+  forM_ s.pointer_bindings destroyPointerBinding
+  liftIO $ river_seat_v1_destroy s.river_seat
 
 manageWindows :: H ()
 manageWindows = do
   newWindows <- gets _windows >>= \xs -> forM xs $ \w -> do
       when w.new $ do
-        window_set_position w  0  0
+        setNodePosition w.node  0  0
         liftIO $ river_window_v1_propose_dimensions w.river_window 0 0
-        wSetBorders w.river_window
       when (w.pointer_move_requested /= invalidSeat) $ do
         seat_pointer_move w.pointer_move_requested w
       when (w.pointer_resize_requested /= invalidSeat) $ do
@@ -357,16 +220,222 @@ manageWindows = do
       return (w :: Window) { new = False, pointer_move_requested = invalidSeat, pointer_resize_requested = invalidSeat  }
   modify $ \s -> s { _windows = newWindows }
 
+
+---------------------------------------------------
+-- event handling
+
+-- | Runs handleEventHook from the configuration and runs the default handler
+-- function if it returned True.
+handleWithHook :: Event -> H ()
+handleWithHook e = do
+  evHook <- asks (handleEventHook . config)
+  whenM (userCodeDef True $ getAll `fmap` evHook e) (handleEvent e)
+
+handleEvent :: Event -> H ()
+handleEvent (WindowManagerEvent e) = do
+  -- debug logging
+  case e of
+    WindowManagerManageStart{} -> pure ()
+    WindowManagerRenderStart{} -> pure ()
+    _ -> log' $ "[event|manager] " <> tshow e
+  case e of
+    WindowManagerOutput _ _ out -> do
+      output_listener <- getObject
+      liftIO $ river_output_v1_add_listener out output_listener nullPtr
+      curOutputs <- gets _outputs
+      let screenId = case [ i | i <- [S 0..], isNothing $ L.find ((i==) . screen) curOutputs ] of
+                       i : _ -> i
+                       _ -> error "impossible"
+      let output = def { river_output = out, screen = screenId }
+      modify $ \s -> s { _outputs = _outputs s ++ [output] }
+      defLayout <- asks (layoutHook . config)
+      modifyWindowSet $ W.insertScreen defLayout screenId (SD 0 0 0 0)
+
+    WindowManagerSeat _ _ river_seat -> do
+      let seat = def { river_seat = river_seat } :: Seat
+      seatListener <- getObject
+      liftIO $ river_seat_v1_add_listener river_seat seatListener nullPtr
+      modify $ \s -> s { _seats = _seats s ++ [seat] }
+
+    WindowManagerWindow _ _wm w -> do
+      nd <- liftIO $ river_window_v1_get_node w
+      let win = def { river_window = w, node = nd }
+      window_listener <- getObject
+      liftIO $ river_window_v1_add_listener w window_listener nullPtr
+      modify $ \s -> s { _windows = _windows s ++ [win] }
+      modifyWindowSet $ W.insertUp w
+
+    -- manage sequence
+    WindowManagerManageStart _dt wm -> do
+      manageCleanup
+      manageWindows
+      manageSeats
+      windows
+      liftIO $ wmManageFinish wm
+
+    WindowManagerRenderStart _dt wm -> do
+      mapSeats seatRender
+      --mapWindows $ \w -> setWindowBorder w.river_window
+      --processPendingMessages
+      liftIO $ wmRenderFinish wm
+
+    WindowManagerUnavailable{} -> do
+      log' "error: another window manager already running"
+      liftIO exitFailure
+
+    WindowManagerFinished _ rwm -> do
+      liftIO $ wmDestroy rwm
+      liftIO exitSuccess
+
+    _ -> return ()
+
+handleEvent (OutputEvent e) = do
+  log' $ "[event|output] " <> tshow e
+  case e of
+    OutputRemoved _ output -> do
+      modify $ \s -> s { _outputs = filter (\x -> x.river_output /= output) s._outputs }
+      withOutput output $ \Output{screen} -> modifyWindowSet $ W.deleteScreen screen
+      liftIO $ river_output_v1_destroy output
+    OutputDimensions _ output width height -> do
+      modifyOutput output $ \x -> x { width = fi width, height = fi height }
+      withOutput output $ \Output{screen} ->
+        modifyWindowSet $ modifyScreen screen $ modifyScreenDetail $ \sd -> sd { height = fi height, width = fi width }
+    OutputPosition _ output x y -> do
+      modifyOutput output $ \a -> a { x = fi x, y = fi y }
+      withOutput output $ \Output{screen} ->
+        modifyWindowSet $ modifyScreen screen $ modifyScreenDetail $ \sd -> sd { x = fi x, y = fi y }
+    _ -> return ()
+  where
+        modifyScreen sid f = W.mapScreen (\s -> if sid == W.screen s then f s else s)
+        modifyScreenDetail f scr = scr { W.screenDetail = f (W.screenDetail scr) }
+
+handleEvent (XkbEvent e) = do
+  case e of
+    XkbKeyPressed dt _ -> do
+      xb <- liftIO $ deRefStablePtr (castPtrToStablePtr dt :: StablePtr (XkbBinding SomeAction))
+      debug' $ toText $ printf "[event|xkb] keypress ev=%s action=%s" (show e) (show xb.action)
+      dispatchAction xb.action
+      --modifySeat xb.river_seat $ \s -> s { pending_action = Just xb.action }
+    _ -> debug' $ "[event|xkb] " <> tshow e
+
+handleEvent (PointerEvent e) = do
+  debug' $ "[event|pointer] " <> tshow e
+  case e of
+    _ -> return ()
+
+handleEvent (WindowEvent e) = do
+  debug' $ "[event|window] " <> tshow e
+  case e of
+    -- The window has been closed by the server, perhaps due to an xdg_toplevel.close request or similar.
+    -- The server will send no further events on this object and ignore any request other than river_window_v1.destroy made after this event is sent. The client should destroy this object with the river_window_v1.destroy request to free up resources.
+    WindowClosed _ w -> do
+      modifyWindow w $ \s -> s { closed = True }
+    WindowDimensions{..} -> do
+      modifyWindow window $ \s -> s { width = fromIntegral we_width, height = fromIntegral we_height }
+    WindowPointerMoveRequested{..} -> do
+      modifyWindow window $ \s -> s { pointer_move_requested = seat }
+    WindowPointerResizeRequested{..} -> do
+      modifyWindow window $ \s -> s { pointer_resize_requested = seat, pointer_resize_requested_edges = fromIntegral we_edges }
+    WindowAppId { window, we_app_id } ->
+      modifyWindow window $ \s -> s { appId = we_app_id }
+    WindowTitle { window, we_title } ->
+      modifyWindow window $ \s -> s { title = we_title }
+    -- Parent { we_parent }
+    -- DecorationHint { we_hint }
+    -- MaximizeRequested
+    -- UnmaximizeRequested
+    -- FullscreenRequested { output }
+    -- ExitFullscreenRequested
+    -- UnreliablePID { we_unreliable_pid }
+    -- PresentationHint { we_hint }
+    -- Identifier { we_identifier }
+    _ -> return ()
+
+handleEvent (SeatEvent e) = do
+  debug' $ "[event|seat] " <> tshow e
+  case e of
+    SeatRemoved _ seat -> do
+      modifySeat seat $ \x -> x { removed = True }
+    SeatEventPointerEnter{..} -> do
+      modifySeat seat $ \s -> s { hovered = window }
+      -- focus follow mouse
+      modifyWindowSet $ W.focusWindow window
+    SeatEventPointerLeave{..} -> do
+      modifySeat seat $ \s -> s { hovered = invalidWindow }
+    SeatEventWindowInteraction{..} -> do
+      modifySeat seat $ \s -> s { interacted = window }
+    SeatEventOpDelta{..} -> do
+      modifySeat seat $ \s -> s { op_dx = fromIntegral dx, op_dy = fromIntegral dy }
+    SeatEventOpRelease{..} -> do
+      modifySeat seat $ \s -> s { op_release = True }
+    _ -> return ()
+
+handleEvent (XkbConfigEvent e) = do
+  debug' $ "[xkbconfig] " <> tshow e
+  case e of
+    XkbConfigXkbKeyboard _ xkbConfig xkbKeyboard -> do
+      l <- getObject @RiverXkbKeyboardV1Listener
+      io $ riverXkbKeyboardV1AddListener xkbKeyboard l nullPtr
+      debug' $ "[xkbconfig] creating and assigning keymap"
+      xkbKeymap <- io $ newXkbKeymapFromNames XkbRuleNames { rules = ""
+                                         , model = "pc104"
+                                         , layout = "dvp-my"
+                                         , variant = "dvp-my"
+                                         , options = "terminate:ctrl_alt_bksp,compose:rctrl-altgr,lv3:ralt_switch,lv3:menu_switch"
+                                         }
+      io $ withXkbKeymapFd xkbKeymap $ \fd -> do
+          kmap <- river_xkb_config_v1_create_keymap xkbConfig (fi fd) 1
+          io $ river_xkb_keyboard_v1_set_keymap xkbKeyboard kmap
+    _ -> pure ()
+
+handleEvent (XkbKeyboardEvent e) = do
+  debug' $ "[xkbkeyboard] " <> tshow e
+
+--------------------------------------------------
+-- seat management
+
+create_seat_bindings :: Seat -> H Seat
+create_seat_bindings s = do
+  myMod        <- asks (defaultModMask . config) >>= pure . resolveModMask 0
+  xkbBinds     <- asks (keyBindings . config) >>= resolveKeyBinds myMod
+  pointerBinds <- asks (pointerBindings . config) >>= resolvePointerBinds myMod
+
+  -- xkb bindings
+  xkbPtrs <- forM xkbBinds $ \((m, k), a) -> do
+    binds <- getObject
+    l <- getObject
+    newXKBBinding binds l s.river_seat m k a
+
+  -- pointer bindings
+  pointer_binding_listener <- getObject @PointerBindingListener
+  pointerPtrs <- forM pointerBinds $ \((m, b), a) -> newPointerBinding pointer_binding_listener s.river_seat m b a
+  return s { xkb_bindings = s.xkb_bindings ++ xkbPtrs
+           , pointer_bindings = s.pointer_bindings ++ pointerPtrs }
+  where
+    resolveModMask d s = case map toLower s of
+                           "m"     -> d
+                           "none"  -> fi $ fromEnum $ RiverSeatV1ModifiersNone
+                           "shift" -> fi $ fromEnum $ RiverSeatV1ModifiersShift
+                           "ctrl"  -> fi $ fromEnum $ RiverSeatV1ModifiersCtrl
+                           "mod1"  -> fi $ fromEnum $ RiverSeatV1ModifiersMod1
+                           "mod3"  -> fi $ fromEnum $ RiverSeatV1ModifiersMod3
+                           "mod4"  -> fi $ fromEnum $ RiverSeatV1ModifiersMod4
+                           "mod5"  -> fi $ fromEnum $ RiverSeatV1ModifiersMod5
+                           _ -> error $ "unrecognized modifier: " ++ s
+    resolveKeyBinds mdef = mapM $ \((m, k), a) -> do
+      let m' = resolveModMask mdef m
+      return ((m', k), a)
+    resolvePointerBinds mdef = mapM $ \((m, k), a) -> do
+      let m' = resolveModMask mdef m
+      return ((m', k), a)
+
+
 manageSeats :: H ()
 manageSeats = do
-    newSeats <- gets _seats >>= \xs -> forM xs $ \s@Seat{..} ->
-        if new then create_seat_bindings (s :: Seat) { new = False }
-               else return s
+    newSeats <- gets _seats >>= \xs -> forM xs $ \s -> if s.new then create_seat_bindings (s :: Seat) { new = False } else return s
     modify $ \s -> s { _seats = newSeats }
-
     gets _seats >>= \xs -> forM_ xs $ \s -> do
-
-      withWindow s.interacted $ \w -> seat_focus s w
+      withWindow s.interacted $ \w -> seatFocus s w
       seat_action s s.pending_action
       --modifySeat s.river_seat $ \s -> s { interacted = invalidWindow, pending_action = ACTION_NONE }
 
@@ -398,42 +467,41 @@ seatRender s = do
     SEAT_OP_NONE -> return ()
     SEAT_OP_MOVE -> do
       withWindow s.op_window $ \w -> do
-        let x = (s.op_start_x + s.op_dx)
-            y = (s.op_start_y + s.op_dy)
-        window_set_position w x y
+        let x = s.op_start_x + s.op_dx
+            y = s.op_start_y + s.op_dy
+        setNodePosition w.node x y
         debug' $ "seatRender: move window " <> tshow (w, x, y)
     SEAT_OP_RESIZE -> withWindow s.op_window $ \w -> do
       let x = s.op_start_x + (if (s.op_edges .&. fromEnum EdgeLeft) /= 0 then s.op_start_width - w.width else 0)
       let y = s.op_start_y + (if (s.op_edges .&. fromEnum EdgeTop) /= 0 then s.op_start_height - w.height else 0)
-      window_set_position w x y
+      setNodePosition w.node x y
       debug' $ "seatRender: resize window " <> tshow (w, x, y)
 
-seat_focus :: Seat -> Window -> H ()
-seat_focus s w = do
+seatFocus :: Seat -> Window -> H ()
+seatFocus s w = do
   toFocus <- if w.river_window == invalidWindow then
-                                          gets _windows >>= \xs -> case xs of
+                                          gets _windows >>= \case
                                                                      x : _ -> return x
                                                                      _     -> return w
                                           else return w
-
-  if toFocus.river_window /= s.focused then
-                                 do
-                                      let w = toFocus.river_window
-                                      when (w /= invalidWindow) $ do
-                                        log' $ "XXXX: seat_focus is FOCUSING CURRENT WINDOW " <> tshow toFocus
-                                        liftIO $ river_seat_v1_focus_window s.river_seat w
-                                        liftIO $ river_node_v1_place_top toFocus.node
-      else
-      do
-        log' $ "XXXX: seat_focus is CLEARING FOCUS " <> tshow toFocus
-        liftIO $ river_seat_v1_clear_focus s.river_seat
-
+  let w = toFocus.river_window
+  when (w /= s.focused) $ setFocus w -- clearFocus
   modifySeat s.river_seat $ \s -> s { focused = toFocus.river_window }
+    where
+      setFocus w = when (w /= invalidWindow) $ do
+        log' $ "XXXX: seatFocus is FOCUSING CURRENT WINDOW " <> tshow w
+        liftIO $ river_seat_v1_focus_window s.river_seat w
+        -- liftIO $ river_node_v1_place_top w.node
+
+seatClearFocus :: Seat -> H ()
+seatClearFocus s = do
+  log' "[seat] clear focus"
+  liftIO $ river_seat_v1_clear_focus s.river_seat
 
 seat_pointer_move :: RiverSeat -> Window -> H ()
 seat_pointer_move sid w = withSeat sid $ \s -> do
   log' $ "[seat_pointer_move] " <> tshow (sid, w)
-  seat_focus s w
+  seatFocus s w
   liftIO $ river_seat_v1_op_start_pointer s.river_seat
   modifySeat s.river_seat $ \s -> s
     { op = SEAT_OP_MOVE
@@ -447,7 +515,7 @@ seat_pointer_move sid w = withSeat sid $ \s -> do
 seat_pointer_resize :: RiverSeat -> Window -> Int -> H ()
 seat_pointer_resize sid w edges = withSeat sid $ \s -> do
   log' $ "[seat_pointer_resize] " <> tshow (sid, w, edges)
-  seat_focus s w
+  seatFocus s w
   liftIO $ river_window_v1_inform_resize_start w.river_window
   liftIO $ river_seat_v1_op_start_pointer s.river_seat
   modifySeat s.river_seat $ \s -> s
@@ -467,19 +535,3 @@ seat_action _ Nothing = return ()
 seat_action _ (Just action) = do
   log' $ "[seat_action] " <> tshow action
   runner action
-
--- * Pointer Binds
-
-pointer_binding_create :: Seat -> Modifiers -> Button -> SomeAction -> H (StablePtr (PointerBinding SomeAction))
-pointer_binding_create seat mods btn action = do
-    pointer_binding_listener <- getObject @PointerBindingListener
-    log' $ "[pointer] binding button: " <> tshow (mods, btn, action)
-    pb' <- liftIO $ river_seat_v1_get_pointer_binding seat.river_seat btn mods
-    dtPtr <- liftIO $ newStablePtr $ PointerBinding pb' seat.river_seat action
-    liftIO $ river_pointer_binding_v1_add_listener pb' pointer_binding_listener (castStablePtrToPtr dtPtr)
-    liftIO $ river_pointer_binding_v1_enable pb'
-    return dtPtr
-
-pointer_binding_destroy :: StablePtr (PointerBinding a) -> H ()
-pointer_binding_destroy _ = do
-  log' "pointer_binding_destroy: not yet implemented"

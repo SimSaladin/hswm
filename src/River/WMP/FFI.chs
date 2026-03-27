@@ -15,6 +15,12 @@ import Wayland.FFI
 {#pointer *river_decoration_v1      as RiverDecoration     newtype #}
 {#pointer *river_shell_surface_v1   as RiverShellSurface   newtype #}
 
+{#pointer *river_window_manager_v1_listener as RiverWindowManagerListener newtype#}
+{#pointer *river_window_v1_listener as WindowListener newtype#}
+{#pointer *river_output_v1_listener as RiverOutputListener newtype #}
+{#pointer *river_seat_v1_listener as RiverSeatListener newtype #}
+{#pointer *river_pointer_binding_v1_listener as PointerBindingListener newtype#}
+
 deriving instance Show RiverWindowManager
 deriving instance Show RiverWindow
 deriving instance Show RiverNode
@@ -42,6 +48,8 @@ deriving instance Storable RiverOutput
 deriving instance Storable RiverDecoration
 deriving instance Storable RiverShellSurface
 
+deriving instance Ord RiverWindow
+
 -- * Imported interfaces
 
 foreign import ccall "&river_window_manager_v1_interface"  river_window_manager_v1_interface  :: WlInterface
@@ -52,3 +60,29 @@ foreign import ccall "&river_node_v1_interface"            river_node_v1_interfa
 foreign import ccall "&river_output_v1_interface"          river_output_v1_interface          :: WlInterface
 foreign import ccall "&river_seat_v1_interface"            river_seat_v1_interface            :: WlInterface
 foreign import ccall "&river_pointer_binding_v1_interface" river_pointer_binding_v1_interface :: WlInterface
+
+-- * Enums
+
+{#enum river_output_v1_presentation_mode as RiverOutputPresentationMode {underscoreToCase} deriving (Show, Eq) #}
+
+{#enum river_seat_v1_modifiers as RiverSeatModifiers {underscoreToCase} deriving (Show, Eq, Ord, Bounded) #}
+
+{#enum river_window_v1_edges as WindowEdges {underscoreToCase}
+  with prefix = "RIVER_WINDOW_V1_EDGES" add prefix = "EDGE" deriving (Show, Eq) #}
+
+{#enum river_window_v1_decoration_hint as WindowDecorationHint {underscoreToCase}
+  with prefix = "RIVER_WINDOW_V1_DECORATION_HINT" deriving (Show, Eq, Ord) #}
+
+{#enum river_window_v1_capabilities as WindowCapabilities {underscoreToCase}
+  with prefix = "RIVER_WINDOW_V1_CAPABILITIES" deriving (Show, Eq) #}
+
+-- * Errors
+
+{#enum river_window_manager_v1_error as RiverWindowManagerError {underscoreToCase} deriving (Show) #}
+{#enum river_window_v1_error as RiverWindowError {underscoreToCase} deriving (Show) #}
+{#enum river_decoration_v1_error as RiverDecorationError {underscoreToCase} deriving (Show) #}
+{#enum river_shell_surface_v1_error as RiverShellSurfaceError {underscoreToCase} deriving (Show) #}
+{#enum river_output_v1_error as RiverOutputError {underscoreToCase} deriving (Show) #}
+
+data RiverWindowManagerException = RiverWindowManagerException String deriving (Show)
+instance Exception RiverWindowManagerException

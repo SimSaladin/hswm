@@ -27,6 +27,8 @@
       };
       haskellProjects.default = {
         projectRoot = ./.;
+        basePackages = pkgs.haskell.packages.ghc912;
+        #basePackages = pkgs.haskell.packages.ghc914;
         devShell = {
           tools = hp: {
             inherit (hp)
