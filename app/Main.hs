@@ -7,6 +7,13 @@ main :: IO ()
 main = hswm $ addKeys myKeys def
   { layoutHook = Tall 1 (3/100) (1/2) ||| Full
   , handleEventHook = debugHook
+  , xkbLayout = Just $
+    XkbRuleNames { rules = ""
+                 , model = "pc104"
+                 , layout = "dvp-my"
+                 , variant = "dvp-my"
+                 , options = "terminate:ctrl_alt_bksp,compose:rctrl-altgr,lv3:ralt_switch,lv3:menu_switch"
+                 }
   }
   where
   myKeys =

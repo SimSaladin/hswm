@@ -31,6 +31,7 @@ instance (l ~ Full) => Default (HSWMConfig l) where
     , handleEventHook = mempty
     , layoutHook      = Full
     , logHook         = mempty
+    , xkbLayout       = Nothing
     }
 
 ---------------------------------------------------------

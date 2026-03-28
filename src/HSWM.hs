@@ -17,6 +17,7 @@ module HSWM
   , module HSWM.Main
   , module HSWM.Actions
   , module HSWM.Utils
+  , module HSWM.XKB
   , module River
   , module Prelude
   , module ReExports
@@ -27,6 +28,7 @@ import HSWM.Core
 import HSWM.Main
 import HSWM.Actions
 import HSWM.Utils
+import HSWM.XKB
 import River
 
 import           Data.Default as ReExports

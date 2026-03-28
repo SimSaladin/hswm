@@ -1,13 +1,14 @@
 module Wayland
   ( module Wayland
-  , module Wayland.Bindings
+  , module Wayland.FFI
   ) where
 
-import Foreign
-import Foreign.C
-import Wayland.Bindings
+import Wayland.FFI
+
+import           Data.IORef
 import qualified Data.List as L
-import Data.IORef
+import           Foreign
+import           Foreign.C
 
 openDisplay :: String -> IO WlDisplay
 openDisplay s = do

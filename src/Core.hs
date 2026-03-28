@@ -7,6 +7,10 @@ module Core
   , module HSWM.Seats
   ) where
 
+import qualified Generated.Wayland.Client as GenWL
+import qualified Generated.Wayland.Client.Global as GenWl
+import qualified Generated.Wayland.Client.Unsafe as UnsafeWL
+
 import           HSWM.Operations
 import qualified HSWM.StackSet as W
 import           HSWM.Types
@@ -20,6 +24,8 @@ import qualified Data.TMap as TM
 import           Foreign hiding (new, void)
 import           System.Exit
 import           Data.IORef
+
+import           Foreign.C.ConstPtr
 
 startHSWM :: (LayoutClass l RiverWindow, Read (l RiverWindow)) => WlDisplay -> HSWMConfig l -> IO ()
 startHSWM display config = withStdoutLogging $ do
@@ -54,10 +60,6 @@ startHSWM display config = withStdoutLogging $ do
   --   debug' $ "[eventq] processing action: " <> toText (actionDescription a)
   --   runInH $ userCode $ runner a
 
-  --varWM <- newEmptyMVar :: IO (MVar RiverWindowManager)
-  --varXKB <- newEmptyMVar :: IO (MVar RiverXkbBindings)
-  --xkbConfigVar <- liftIO newEmptyMVar
-
   runInH $ do
     xkbConfigListener <- getOrCreateObject $ mkRiverXkbConfigV1Listener $ \e -> runInH $ handleWithHook $ XkbConfigEvent e
     _ <- getOrCreateObject $ mkRiverXkbKeyboardV1Listener $ \e -> runInH $ handleWithHook $ XkbKeyboardEvent e
@@ -81,6 +83,13 @@ startHSWM display config = withStdoutLogging $ do
 
     -- Wait for one roundtrip for the registry listener to become aware of all current globals.
     _ <- liftIO $ wl_display_roundtrip display
+
+    wl_compositor <- getOrCreateObject $ requireGlobal conf.globals ("wl_compositor", 4) $ \(WlRegistry r) n v ->
+      io $ alloca $ \ifPtr -> do
+        poke ifPtr GenWl.wl_compositor_interface
+        UnsafeWL.wl_registry_bind (castPtr r) n (ConstPtr ifPtr) (fi v) >>= \p ->
+          return (castPtr p :: Ptr GenWL.Wl_compositor)
+    log' "[INIT] Got wl_compositor"
 
     windowManager <- getOrCreateObject $ requireGlobal conf.globals ("river_window_manager_v1", 4) $ \r n v -> wl_registry_bind r n river_window_manager_v1_interface v <&> RiverWindowManager
     _xkbBindings  <- getOrCreateObject $ requireGlobal conf.globals ("river_xkb_bindings_v1"  , 1) $ \r n v -> wl_registry_bind r n river_xkb_bindings_v1_interface   v <&> RiverXkbBindings
@@ -204,21 +213,9 @@ handleEvent (SeatEvent (SeatEventOpDelta{..})) = do modifySeat seat $ \s -> s { 
 handleEvent (SeatEvent (SeatEventOpRelease{..})) = do modifySeat seat $ \s -> s { op_release = True }
 
 -- Keyboard added
-handleEvent (XkbConfigEvent (XkbConfigXkbKeyboard _ xkbConfig xkbKeyboard)) =
-  withObject @RiverXkbKeyboardV1Listener $ \l -> do
-    io $ riverXkbKeyboardV1AddListener xkbKeyboard l nullPtr
-    debug' "[xkbconfig] creating and assigning keymap"
-    xkbKeymap <- io $ newXkbKeymapFromNames
-      XkbRuleNames
-        { rules = ""
-        , model = "pc104"
-        , layout = "dvp-my"
-        , variant = "dvp-my"
-        , options = "terminate:ctrl_alt_bksp,compose:rctrl-altgr,lv3:ralt_switch,lv3:menu_switch"
-        }
-    io $ withXkbKeymapFd xkbKeymap $ \fd -> do
-        kmap <- riverXkbConfigV1CreateKeymap xkbConfig (fi fd) RiverXkbConfigV1KeymapFormatTextV1
-        io $ riverXkbKeyboardV1SetKeymap xkbKeyboard kmap
+handleEvent (XkbConfigEvent (XkbConfigXkbKeyboard _ xkbConfig xkbKeyboard)) = do
+  withObject @RiverXkbKeyboardV1Listener $ \l -> io $ riverXkbKeyboardV1AddListener xkbKeyboard l nullPtr
+  asks (xkbLayout . config) >>= (`whenJust` setKeyboardLayout xkbConfig xkbKeyboard)
 
 -- keyboard is removed
 handleEvent (XkbKeyboardEvent (KeyboardRemoved _ _kbd)) = return () -- TODO
@@ -231,6 +228,13 @@ handleEvent (PointerEvent _) = return ()
 handleEvent _ = return ()
 
 ----------------------------------------------------------------------------------
+
+setKeyboardLayout :: RiverXkbConfigV1 -> RiverXkbKeyboardV1 -> XkbRuleNames -> H ()
+setKeyboardLayout xkbConfig keyboard layout =
+    io (newXkbKeymapFromNames layout) >>= \km ->
+    io $ withXkbKeymapFd km $ \fd ->
+    riverXkbConfigV1CreateKeymap xkbConfig (fi fd) RiverXkbConfigV1KeymapFormatTextV1
+    >>= io . riverXkbKeyboardV1SetKeymap keyboard
 
 manageWindows :: H ()
 manageWindows = do

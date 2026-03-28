@@ -40,6 +40,7 @@ data HSWMConfig l = HSWMConfig
   , handleEventHook :: !(Event -> H All)
   , layoutHook      :: !(l RiverWindow)
   , logHook         :: !(H ())
+  , xkbLayout       :: !(Maybe XkbRuleNames) -- ^ Keyboard layout set for connected keyboards
   }
 
 -- | The read-only window manager state.

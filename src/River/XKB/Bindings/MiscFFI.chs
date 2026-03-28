@@ -81,9 +81,8 @@ foreign import ccall "wrapper" mk_xkb_listener_cb :: ListenerCallback (Ptr () ->
 -- The layout argument is a 0-indexed xkbcommon layout number for the
 -- keyboard that generated the key event.
 river_xkb_binding_v1_set_layout_override :: RiverXkbBinding -> CUInt -> IO ()
-river_xkb_binding_v1_set_layout_override bind layout = do
-  ver <- wl_proxy_get_version bind
-  void $ wl_proxy_marshal_flags__u bind {#const RIVER_XKB_BINDING_V1_SET_LAYOUT_OVERRIDE#} emptyInterface ver 0 layout
+river_xkb_binding_v1_set_layout_override bind layout = wl_proxy_marshal_array_flags' (const ())
+    bind {#const RIVER_XKB_BINDING_V1_SET_LAYOUT_OVERRIDE#} emptyInterface 0 layout
 
 -- |
 -- This request should be made after all initial configuration has been

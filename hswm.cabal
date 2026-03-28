@@ -37,7 +37,6 @@ library
           Paths_hswm
     exposed-modules:
           Wayland.FFI
-          Wayland.Bindings
           Wayland
           River.XKB.Config.FFI
           River.XKB.Config

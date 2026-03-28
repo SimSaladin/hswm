@@ -10,6 +10,10 @@ import Wayland
 
 #include "river-window-management-v1-client-protocol.h"
 
+-- XXX: just warns in case the result is a nullpointer
+coerceWlProxy_ :: String -> WlProxy -> IO ()
+coerceWlProxy_ desc (WlProxy p) = when (p == nullPtr) $ debug' $ "warning: " <> toText desc <> " returned NULL"
+
 type WindowCaps = {#type uint32_t#}
 
 -- * river_window_manager_v1
@@ -82,10 +86,7 @@ foreign import ccall "wrapper" wrapListenerSeatCb   :: ListenerCallback (Ptr () 
 -- ** Requests
 
 river_window_v1_destroy :: RiverWindow -> IO ()
-river_window_v1_destroy w = do
-  ver <- wl_proxy_get_version w
-  wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_DESTROY#} emptyInterface ver _WL_MARSHAL_FLAG_DESTROY
-    >>= coerceWlProxy_ "river_window_v1_destroy"
+river_window_v1_destroy w = wl_proxy_destroy w {#const RIVER_WINDOW_V1_DESTROY#}
 
 river_window_v1_close :: RiverWindow -> IO ()
 river_window_v1_close w = do
@@ -94,10 +95,8 @@ river_window_v1_close w = do
     >>= coerceWlProxy_ "river_window_v1_close"
 
 river_window_v1_get_node :: RiverWindow -> IO RiverNode
-river_window_v1_get_node w = do
-  ver <- wl_proxy_get_version w
-  wl_proxy_marshal_flags__p w {#const RIVER_WINDOW_V1_GET_NODE#} river_node_v1_interface ver 0 nullPtr
-    >>= coerceWlProxy "river_window_v1_get_node" (return . RiverNode)
+river_window_v1_get_node w = wl_proxy_marshal_array_flags' RiverNode w
+    {#const RIVER_WINDOW_V1_GET_NODE#} river_node_v1_interface 0 nullPtr
 
 river_window_v1_propose_dimensions :: RiverWindow -> Int32 -> Int32 -> IO ()
 river_window_v1_propose_dimensions w width height = wl_proxy_marshal_array_flags' (const ()) w
@@ -184,10 +183,8 @@ riverWindowV1InformResizeEnd w = do
     >>= coerceWlProxy_ "river_window_v1_inform_resize_end"
 
 riverWindowV1SetCapabilities :: RiverWindow -> WindowCaps -> IO ()
-riverWindowV1SetCapabilities w caps = do
-  ver <- wl_proxy_get_version w
-  wl_proxy_marshal_flags__u w {#const RIVER_WINDOW_V1_SET_CAPABILITIES#} emptyInterface ver 0 caps
-    >>= coerceWlProxy_ "river_window_v1_set_capabilities"
+riverWindowV1SetCapabilities w caps = wl_proxy_marshal_array_flags' (const ()) w
+    {#const RIVER_WINDOW_V1_SET_CAPABILITIES#} emptyInterface 0 caps
 
 riverWindowV1InformMaximized :: RiverWindow -> IO ()
 riverWindowV1InformMaximized w = do
