@@ -47,6 +47,7 @@ data HConf = HConf
   , display :: WlDisplay
   }
 
+-- | Mutable stete.
 data HState = HState
   { windowset      :: !WindowSet
   , windowsetOld   :: !WindowSet
@@ -85,6 +86,9 @@ data WorkspaceDetail = WD
 
 instance Default WorkspaceDetail where
   def = WD
+
+-------------------------------------------------------------------------
+-- Layouts
 
 data Layout a = forall l. (LayoutClass l a, Read (l a)) => Layout (l a)
 
@@ -194,6 +198,10 @@ instance Show (Layout a) where show (Layout l) = show l
 data Full a = Full deriving (Show, Read)
 
 instance LayoutClass Full a
+
+
+--------------------------------------------------------------
+-- Layout messages
 
 -- | Based on ideas in /An Extensible Dynamically-Typed Hierarchy of
 -- Exceptions/, Simon Marlow, 2006. Use extensible messages to the
@@ -366,7 +374,7 @@ getOrCreateObject m = gets (TM.lookup . wlObjects) >>= \case
 withWlObjects :: MonadState HState m => (TM.TMap -> TM.TMap) -> m ()
 withWlObjects f = modify $ \s -> s { wlObjects = f $! wlObjects s }
 
-getObject :: (Typeable a) => H a
+getObject :: Typeable a => H a
 getObject = gets (TM.lookup . wlObjects) >>= \case
   Nothing -> error "getObject: no such object"
   Just x -> return x
@@ -384,6 +392,12 @@ withObjectDef od f = gets (TM.lookup . wlObjects) >>= \case
 ---------------------------------------------------------
 -- Actions
 
+toSomeAction :: IsAction a => a -> SomeAction
+toSomeAction = SomeAction
+
+data SomeAction where
+  SomeAction :: forall a. IsAction a => a -> SomeAction
+
 class IsAction a where
   runner :: a -> H ()
 
@@ -396,16 +410,10 @@ class IsAction a where
   default typeDescription :: Typeable a => a -> String
   typeDescription = show . typeOf
 
-data SomeAction where
-  SomeAction :: forall a. IsAction a => a -> SomeAction
-
-instance Show SomeAction where
-  show            (SomeAction a) = actionDescription a
-
 instance IsAction SomeAction where
   runner          (SomeAction a) = runner a
   actionDescription     (SomeAction a) = actionDescription a
   typeDescription (SomeAction a) = typeDescription a
 
-toSomeAction :: IsAction a => a -> SomeAction
-toSomeAction = SomeAction
+instance Show SomeAction where
+  show (SomeAction a) = actionDescription a

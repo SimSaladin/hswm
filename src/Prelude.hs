@@ -11,6 +11,7 @@ import "base"    Data.Maybe as BasePrelude
 import "base"    Data.Monoid as BasePrelude (Endo(..),Any(..))
 import "base"    Data.Semigroup as BasePrelude (All(..))
 import "base"    Text.Printf as BasePrelude
+import "base"    Data.Functor as BasePrelude ((<&>))
 
 import           Control.Concurrent as BasePrelude
 import           Control.Concurrent.STM as BasePrelude
@@ -22,6 +23,7 @@ import           Data.Default as BasePrelude
 import           Data.Typeable as BasePrelude (Typeable)
 import           Data.Text as BasePrelude (Text)
 import qualified Data.Text as T
+import           Foreign as BasePrelude (Int32)
 
 tshow :: Show a => a -> T.Text
 tshow = T.pack . show

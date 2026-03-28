@@ -85,7 +85,6 @@ setWindowBorder w RiverColor {red = wb_r, green = wb_g, blue = wb_b, alpha = wb_
     wb_width <- asks (borderWidth . config)
     wb_edges <- asks (fi . borderEdges . config)
     let borders = WindowBorders{..}
-    debug' $ "[w] draw borders " <> tshow borders <> " " <> tshow w
     liftIO $ riverWindowV1SetBorders w borders
 
 -- | Move and resize @w@ such that it fits inside the given rectangle,

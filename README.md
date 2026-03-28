@@ -54,3 +54,6 @@ cabal build
 - [tinyrwm](https://codeberg.org/river/tinyrwm) - Tiny river window manager examples
 - [list of river window
   managers](https://codeberg.org/river/wiki/src/branch/main/pages/wm-list.md)
+
+- <https://gitlab.freedesktop.org/wlroots/wlr-clients>
+- <https://well-typed.com/blog/2026/02/hs-bindgen-alpha/>

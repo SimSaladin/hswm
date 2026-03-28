@@ -34,6 +34,7 @@ library
 		   , River.XKB.Config.FFI
                    , River
 		   , HSWM
+                   , HSWM.Seats
 		   , HSWM.Core
                    , HSWM.XKB
                    , HSWM.XKB.FFI

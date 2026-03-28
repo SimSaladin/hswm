@@ -43,6 +43,11 @@ xkb_keysym_from_name name = unsafePerformIO $ withCString name $ \c_name -> retu
 
 -- XKB_EXPORT int
 -- xkb_keysym_get_name(xkb_keysym_t keysym, char *buffer, size_t size);
+-- {#fun xkb_keysym_get_name as ^ { `KeySym' , alloca-
+
+xkbKeysymToText :: KeySym -> String
+xkbKeysymToText k = unsafePerformIO $ allocaBytes 64 $ \buf ->
+    let len = {#call pure xkb_keysym_get_name#} k buf 64 in peekCStringLen (buf, fi len)
 
 createKeymap :: Fd -> CUInt -> IO XkbKeymap
 createKeymap fd size = do

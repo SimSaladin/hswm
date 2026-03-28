@@ -16,12 +16,17 @@ module HSWM
   , module HSWM.Layout
   , module HSWM.Main
   , module HSWM.Actions
+  , module River
   , module ReExports
+  , module Prelude
   ) where
 
 import HSWM.Layout
 import HSWM.Core
 import HSWM.Main
 import HSWM.Actions
+import River
 
-import Data.Default as ReExports
+import           Data.Default as ReExports
+import           Data.Semigroup as ReExports (All(..))
+import           Prelude

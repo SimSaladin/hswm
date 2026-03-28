@@ -17,6 +17,8 @@ import Data.Word
 import Numeric (readHex)
 import River
 import Data.Bits
+import HSWM.XKB (ModMask)
+import Data.Char (toLower)
 
 -- | Parse a color in the format 0xRRGGBB or 0xRRGGBBAA and convert it to
 -- 32-bit color values (used by Window.set_borders in rwm).
@@ -37,8 +39,20 @@ parseRgba s
 
 bytesToRiverColor :: Word32 -> RiverColor
 bytesToRiverColor bytes = RiverColor
-  { red   = (bytes .&. 0xFF000000)         -- [3];
+  { red   = bytes .&. 0xFF000000           -- [3];
   , green = (bytes .&. 0x00FF0000) .<<. 8  -- [2];
   , blue  = (bytes .&. 0x0000FF00) .<<. 16 -- [1];
   , alpha = (bytes .&. 0x000000FF) .<<. 24 -- [0];
   }
+
+resolveModMask :: ModMask -> String -> ModMask
+resolveModMask d s = case map toLower s of
+                       "m"     -> d
+                       "none"  -> fi $ fromEnum ModifiersNone
+                       "shift" -> fi $ fromEnum ModifiersShift
+                       "ctrl"  -> fi $ fromEnum ModifiersCtrl
+                       "mod1"  -> fi $ fromEnum ModifiersMod1
+                       "mod3"  -> fi $ fromEnum ModifiersMod3
+                       "mod4"  -> fi $ fromEnum ModifiersMod4
+                       "mod5"  -> fi $ fromEnum ModifiersMod5
+                       _ -> error $ "unrecognized modifier: " ++ s
