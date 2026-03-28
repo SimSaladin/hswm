@@ -28,22 +28,17 @@ river_xkb_bindings_v1_destroy binds = wl_proxy_destroy binds {#const RIVER_XKB_B
 -- The new key binding is not enabled until initial configuration is
 -- completed and the enable request is made during a manage sequence.
 river_xkb_bindings_v1_get_xkb_binding :: RiverXkbBindings -> RiverSeat -> KeySym -> Modifiers -> IO RiverXkbBinding
-river_xkb_bindings_v1_get_xkb_binding binds seat keysym mods = do
-  ver <- wl_proxy_get_version binds
-  WlProxy res <- wl_proxy_marshal_flags__ppuu binds {#const RIVER_XKB_BINDINGS_V1_GET_XKB_BINDING#} river_xkb_binding_v1_interface ver
-    0 seat nullPtr keysym mods
-  when (res == nullPtr) $ throwIO $ RiverWindowManagerException "river_xkb_bindings_v1_get_xkb_bindng"
-  return $ RiverXkbBinding $ castPtr res
+river_xkb_bindings_v1_get_xkb_binding binds (RiverSeat seat) keysym mods = wl_proxy_marshal_array_flags' (RiverXkbBinding . castPtr) binds
+    {#const RIVER_XKB_BINDINGS_V1_GET_XKB_BINDING#} river_xkb_binding_v1_interface 0 (seat, nullPtr, keysym, mods)
+  -- when (res == nullPtr) $ throwIO $ RiverWindowManagerException "river_xkb_bindings_v1_get_xkb_bindng"
 
 -- | Create an object to manage seat-specific xkb bindings state.
 --
 -- It is a protocol error to make this request more than once for a given
 -- river_seat_v1 object.
 river_xkb_bindings_v1_get_seat :: RiverXkbBindings -> RiverSeat -> IO XkbBindingsSeat
-river_xkb_bindings_v1_get_seat binds seat = do
-  ver <- wl_proxy_get_version binds
-  wl_proxy_marshal_flags__pp binds {#const RIVER_XKB_BINDINGS_V1_GET_SEAT#} river_xkb_bindings_seat_v1_interface ver 0 nullPtr seat
-    >>= coerceWlProxy "river_xkb_bindings_v1_get_seat" (return . XkbBindingsSeat)
+river_xkb_bindings_v1_get_seat binds (RiverSeat seat) = wl_proxy_marshal_array_flags' XkbBindingsSeat binds
+    {#const RIVER_XKB_BINDINGS_V1_GET_SEAT#} river_xkb_bindings_seat_v1_interface 0 (nullPtr, seat)
 
 -- * river_xkb_binding_v1
 

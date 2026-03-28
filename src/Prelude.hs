@@ -5,13 +5,12 @@ module Prelude (
   tshow, toText, io, fi, whenJust
   ) where
 
+import "base"    Prelude as BasePrelude hiding (log)
 import "base"    Control.Monad as BasePrelude
 import "base"    Data.Maybe as BasePrelude
-import "base"    Prelude as BasePrelude hiding (log)
+import "base"    Data.Monoid as BasePrelude (Endo(..),Any(..))
+import "base"    Data.Semigroup as BasePrelude (All(..))
 import "base"    Text.Printf as BasePrelude
-import Data.Semigroup as BasePrelude (All(..))
-import Data.Monoid as BasePrelude          (Endo(..),Any(..))
-
 
 import           Control.Concurrent as BasePrelude
 import           Control.Concurrent.STM as BasePrelude

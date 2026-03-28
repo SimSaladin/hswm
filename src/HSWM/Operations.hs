@@ -1,9 +1,75 @@
 module HSWM.Operations where
 
+import           Data.Bits
+import qualified Data.List as L
+import qualified Data.Map as M
+import qualified HSWM.StackSet as W
 import           HSWM.Types
 import           River
-import qualified HSWM.StackSet as W
-import Data.Bits
+
+windows :: H ()
+windows = do
+    old <- gets windowsetOld
+    ws <- gets windowset
+    let oldvisible = concatMap (W.integrate' . W.stack . W.workspace) $ W.current old : W.visible old
+        newwindows = W.allWindows ws L.\\ W.allWindows old
+
+    mapM_ setInitialProperties newwindows
+
+    whenJust (W.peek old) $ \otherw ->
+      setWindowBorder otherw =<< asks (normalBorder . config)
+
+    modify (\s -> s { windowsetOld = ws })
+
+    let tags_oldvisible = map (W.tag . W.workspace) $ W.current old : W.visible old
+        gottenhidden    = filter (flip elem tags_oldvisible . W.tag) $ W.hidden ws
+    mapM_ (sendMessageWithNoRefresh Hide) gottenhidden
+
+    -- for each workspace, layout the currently visible workspaces
+    let allscreens     = W.screens ws
+        summed_visible = scanl (++) [] $ map (W.integrate' . W.stack . W.workspace) allscreens
+
+    rects <- fmap concat $ forM (zip allscreens summed_visible) $ \ (w, vis) -> do
+        let wsp   = W.workspace w
+            this  = W.view n ws
+            n     = W.tag wsp
+            tiled = (W.stack . W.workspace . W.current $ this)
+                    >>= W.filter (`M.notMember` W.floating ws)
+                    >>= W.filter (`notElem` vis)
+            sd = W.screenDetail w
+            viewrect = Rectangle{x=fi sd.x, y=fi sd.y, width=fi sd.width, height=fi sd.height}
+
+        -- just the tiled windows:
+        -- now tile the windows on this workspace, modified by the gap
+        (rs, ml') <- runLayout wsp { W.stack = tiled } viewrect `catchH`
+                     runLayout wsp { W.stack = tiled, W.layout = Layout Full } viewrect
+        updateLayout n ml'
+
+        let m   = W.floating ws
+            flt = [(fw, scaleRationalRect viewrect r)
+                    | fw <- filter (`M.member` m) (W.index this)
+                    , fw `notElem` vis
+                    , Just r <- [M.lookup fw m]]
+            vs = flt ++ rs
+
+        -- return the visible windows for this workspace:
+        return vs
+
+    let visible = map fst rects
+
+    mapM_ (uncurry tileWindow) rects
+
+    whenJust (W.peek ws) $ \w ->
+      setWindowBorder w =<< asks (focusedBorder . config)
+
+    mapM_ reveal visible
+    setTopFocus
+
+    -- hide every window that was potentially visible before, but is not
+    -- given a position by a layout now.
+    mapM_ hide (L.nub (oldvisible ++ newwindows) L.\\ visible)
+
+    asks (logHook . config) >>= userCodeDef ()
 
 -- | Produce the actual rectangle from a screen and a ratio on that screen.
 scaleRationalRect :: Rectangle -> W.RationalRect -> Rectangle
@@ -20,7 +86,7 @@ setWindowBorder w RiverColor {red = wb_r, green = wb_g, blue = wb_b, alpha = wb_
     wb_edges <- asks (fi . borderEdges . config)
     let borders = WindowBorders{..}
     debug' $ "[w] draw borders " <> tshow borders <> " " <> tshow w
-    liftIO $ river_window_v1_set_borders w borders
+    liftIO $ riverWindowV1SetBorders w borders
 
 -- | Move and resize @w@ such that it fits inside the given rectangle,
 -- including its border.
@@ -50,9 +116,9 @@ setFocusH rw = do
 
 setInitialProperties :: RiverWindow -> H ()
 setInitialProperties rw = do
-  io $ river_window_v1_use_ssd rw
-  io $ river_window_v1_set_capabilities rw (fi $ foldl' (.|.) 0 $ map fromEnum [Maximize, Fullscreen])
-  io $ river_window_v1_set_tiled rw (fi $ foldl' (.|.) 0 $ map fromEnum [EdgeTop, EdgeBottom, EdgeLeft, EdgeRight])
+  io $ riverWindowV1UseSsd rw
+  io $ riverWindowV1SetCapabilities rw (fi $ foldl' (.|.) 0 $ map fromEnum [Maximize, Fullscreen])
+  io $ riverWindowV1SetTiled rw (fi $ foldl' (.|.) 0 $ map fromEnum [EdgeTop, EdgeBottom, EdgeLeft, EdgeRight])
   setWindowBorder rw =<< asks (normalBorder . config)
 
 --------------------------------------------------------------
@@ -148,9 +214,9 @@ modifySeat ro f = modify $ \s -> s { _seats = map g (_seats s) }
                    | otherwise = x
 
 modifySeats :: (Seat -> Bool) -> (Seat -> Seat) -> H ()
-modifySeats pred f = modify $ \s -> s { _seats = map g (_seats s) }
-  where g x | pred x    = f x
-            | otherwise = x
+modifySeats choose f = modify $ \s -> s { _seats = map g (_seats s) }
+  where g x | choose x    = f x
+            | otherwise   = x
 
 mapSeats :: (Seat -> H ()) -> H ()
 mapSeats f = gets _seats >>= mapM_ f

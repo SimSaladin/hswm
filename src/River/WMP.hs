@@ -29,7 +29,7 @@ import Foreign
 data Rectangle = Rectangle { x, y, width, height :: !Word32 }
   deriving (Show, Read, Eq)
 
-setNodePosition :: MonadIO m => RiverNode -> Int -> Int -> m ()
+setNodePosition :: MonadIO m => RiverNode -> Int32 -> Int32 -> m ()
 setNodePosition n x y = liftIO $ river_node_v1_set_position n x y
 
 -- * Pointer Binds
@@ -52,7 +52,7 @@ newPointerBinding :: (MonadIO m, Show a)
                   -> m (StablePtr (PointerBinding a))
 newPointerBinding pointerBindingListener seat mods btn action = do
     log' $ "[pointer] binding button: " <> tshow (mods, btn, action)
-    pb' <- liftIO $ river_seat_v1_get_pointer_binding seat btn mods
+    pb' <- liftIO $ river_seat_v1_get_pointer_binding seat (fi btn) (fi mods)
     dtPtr <- liftIO $ newStablePtr $ PointerBinding pb' seat action
     liftIO $ river_pointer_binding_v1_add_listener pb' pointerBindingListener (castStablePtrToPtr dtPtr)
     liftIO $ river_pointer_binding_v1_enable pb'

@@ -52,16 +52,6 @@ instance WlMarshal WlSurface where wlMarshal (WlSurface p) = castPtr p
   `(IsWlProxy p, WlMarshal a1)' => {toWlProxy `p', `CUInt', `WlInterface', fromIntegral `Version', fromIntegral `Flags'
   ,wlMarshal `a1', `CUInt'} -> `WlProxy'#}
 
--- [puu]
-{#fun variadic wl_proxy_marshal_flags[void *, uint32_t, uint32_t] as wl_proxy_marshal_flags__puu
-  `(IsWlProxy p, WlMarshal a)' => {toWlProxy `p', `CUInt', `WlInterface', fromIntegral `Version', fromIntegral `Flags'
-  ,wlMarshal `a', `CUInt', `CUInt'} -> `WlProxy'#}
-
--- [upup]
-{#fun variadic wl_proxy_marshal_flags[uint32_t, void *, uint32_t, void *] as wl_proxy_marshal_flags__upup
-  `(IsWlProxy p, WlMarshal a, WlMarshal a2)' => {toWlProxy `p', `CUInt', `WlInterface', fromIntegral `Version', fromIntegral `Flags'
-  ,`CUInt', wlMarshal `a2', `CUInt', wlMarshal `a'} -> `WlProxy'#}
-
 -- [ppuu]
 {#fun variadic wl_proxy_marshal_flags[void *, void *, uint32_t, uint32_t] as wl_proxy_marshal_flags__ppuu
   `(IsWlProxy p, WlMarshal a, WlMarshal a2)' => {toWlProxy `p', `CUInt', `WlInterface', fromIntegral `Version', fromIntegral `Flags'

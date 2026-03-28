@@ -10,16 +10,16 @@ import Foreign.C
 type Version = {#type uint32_t#}
 type Flags   = {#type uint32_t#}
 
-{#pointer *wl_surface   as WlSurface   newtype #}
-{#pointer *wl_array     as WlArray     newtype #}
-{#pointer *wl_seat      as WlSeat      newtype #}
-{#pointer *wl_keyboard  as WlKeyboard  newtype #}
-{#pointer *wl_display   as WlDisplay   newtype #}
-{#pointer *wl_registry  as WlRegistry  newtype #}
-{#pointer *wl_interface as WlInterface newtype #}
-{#pointer *wl_proxy     as WlProxy     newtype #}
-{#pointer *wl_keyboard_listener as WlKeyboardListener newtype#}
-{#pointer *wl_registry_listener as WlRegistryListener newtype#}
+{#pointer *wl_surface           as WlSurface          newtype #}
+{#pointer *wl_array             as WlArray            newtype #}
+{#pointer *wl_seat              as WlSeat             newtype #}
+{#pointer *wl_keyboard          as WlKeyboard         newtype #}
+{#pointer *wl_display           as WlDisplay          newtype #}
+{#pointer *wl_registry          as WlRegistry         newtype #}
+{#pointer *wl_interface         as WlInterface        newtype #}
+{#pointer *wl_proxy             as WlProxy            newtype #}
+{#pointer *wl_keyboard_listener as WlKeyboardListener newtype #}
+{#pointer *wl_registry_listener as WlRegistryListener newtype #}
 
 deriving instance Show WlSurface
 deriving instance Show WlArray
@@ -104,9 +104,7 @@ foreign import ccall "wrapper" wrap_global_remove :: WlRegistryListenerGlobalRem
 
 mkRegistryListener :: (RegistryEvent -> IO ()) -> IO WlRegistryListener
 mkRegistryListener h = do
-  log' $ "allocating bytes: " <> tshow ({#sizeof wl_registry_listener#})
   p <- WlRegistryListener <$> mallocBytes {#sizeof wl_registry_listener#}
-  log' "allocated"
   {#set wl_registry_listener.global#}        p =<< wrap_global (\a b c d e -> peekCString d >>= \d' -> h $ RegistryGlobal a b c d' e)
   {#set wl_registry_listener.global_remove#} p =<< wrap_global_remove (\a b c -> h $ RegistryGlobalRemove a b c)
   return p
@@ -148,7 +146,9 @@ wl_proxy_marshal_flags' outm p opcode iface flags = io $ do
   return $! outm (castPtr ptr)
 
 -- | Looks up version for the given object.
-wl_proxy_marshal_array_flags' :: (MonadIO m, IsWlProxy p, WlArgs args) => (Ptr a -> a) -> p -> CUInt -> WlInterface -> Flags -> args -> m a
+wl_proxy_marshal_array_flags'
+  :: (MonadIO m, IsWlProxy p, WlArgs args)
+  => (Ptr a -> a) -> p -> CUInt -> WlInterface -> Flags -> args -> m a
 wl_proxy_marshal_array_flags' outm p opcode iface flags args = io $ do
   version <- wl_proxy_get_version p
   WlProxy ptr <- wl_proxy_marshal_array_flags p opcode iface version flags args
@@ -180,8 +180,8 @@ class WlArgs a where
   allocaWlArgs :: a -> (Ptr () -> IO b) -> IO b
 
 instance WlArgs ()      where allocaWlArgs _ f = f nullPtr
-instance WlArgs Int     where allocaWlArgs x f = allocaArray 1 $ \ptr -> poke ptr x >> f (castPtr ptr)
 instance WlArgs Int32   where allocaWlArgs x f = allocaArray 1 $ \ptr -> poke ptr x >> f (castPtr ptr)
+instance WlArgs Word32  where allocaWlArgs x f = allocaArray 1 $ \ptr -> poke ptr x >> f (castPtr ptr)
 instance WlArgs CUInt   where allocaWlArgs x f = allocaArray 1 $ \ptr -> poke ptr x >> f (castPtr ptr)
 instance WlArgs (Ptr a) where allocaWlArgs x f = allocaArray 1 $ \ptr -> poke ptr x >> f (castPtr ptr)
 instance WlArgs String  where allocaWlArgs x f = allocaArray 1 $ \(ptr :: Ptr (Ptr ())) -> withWlArgument x ptr $ f (castPtr ptr)

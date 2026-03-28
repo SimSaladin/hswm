@@ -32,10 +32,10 @@ data HSWMConfig l = HSWMConfig
   { keyBindings     :: [((String, KeySym), SomeAction)]
   , pointerBindings :: [((String, KeySym), SomeAction)]
   , defaultModMask  :: !String
-  , borderWidth     :: !Int
+  , borderWidth     :: !Int32
   , normalBorder    :: !RiverColor
   , focusedBorder   :: !RiverColor
-  , borderEdges     :: !Int
+  , borderEdges     :: !Int32
   , handleEventHook :: !(Event -> H All)
   , layoutHook      :: !(l RiverWindow)
   , logHook         :: !(H ())
@@ -270,9 +270,9 @@ data Seat = Seat
   , op_window                            :: RiverWindow
   , op                                   :: SeatOp
   , op_release                           :: Bool
-  , op_start_x, op_start_y, op_dx, op_dy :: Int
-  , op_start_width, op_start_height      :: Int
-  , op_edges                             :: Int
+  , op_start_x, op_start_y, op_dx, op_dy :: Int32
+  , op_start_width, op_start_height      :: Int32
+  , op_edges                             :: Int32
   , xkb_bindings                         :: [StablePtr (XkbBinding SomeAction)]
   , pointer_bindings                     :: [StablePtr (PointerBinding SomeAction)]
   , pending_action                       :: !(Maybe SomeAction)
@@ -308,7 +308,7 @@ data SeatOp = SEAT_OP_NONE
 
 data Output = Output
   { river_output        :: RiverOutput
-  , width, height, x, y :: !Int
+  , width, height, x, y :: !Int32
   , screen              :: !ScreenId
   , new                 :: Bool
   } deriving Show
@@ -321,10 +321,10 @@ data Window = Window
   , new                            :: Bool
   , node                           :: RiverNode
   , closed                         :: Bool
-  , x, y, width, height            :: Int
+  , x, y, width, height            :: Int32
   , pointer_move_requested         :: RiverSeat
   , pointer_resize_requested       :: RiverSeat
-  , pointer_resize_requested_edges :: Int
+  , pointer_resize_requested_edges :: Int32
   , appId                          :: String
   , title                          :: String
   } deriving Show

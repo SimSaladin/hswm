@@ -10,98 +10,35 @@ import Wayland
 
 #include "river-window-management-v1-client-protocol.h"
 
--- * Types
-
 type WindowCaps = {#type uint32_t#}
-
-type ClipBox = (Int, Int, Int, Int)
-
-data WindowBorders = WindowBorders
-  { wb_edges               :: !Word32 -- ^ Edges on which to draw borders
-  , wb_width               :: !Int    -- ^ Width of border
-  , wb_r, wb_g, wb_b, wb_a :: !Word32 -- ^ RGBA 32-bit
-  } deriving (Eq, Ord, Show)
-
-invalidWindow :: RiverWindow
-invalidWindow = RiverWindow $ castPtr $ nullPtr
-
-invalidSeat :: RiverSeat
-invalidSeat = RiverSeat $ castPtr $ nullPtr
-
-type Data = Ptr () -- TODO
-
-instance IsWlProxy RiverWindowManager where toWlProxy (RiverWindowManager p) = WlProxy (castPtr p)
-instance IsWlProxy RiverDecoration where toWlProxy (RiverDecoration p) = WlProxy (castPtr p)
-instance IsWlProxy RiverWindow where toWlProxy (RiverWindow p) = WlProxy (castPtr p)
-instance IsWlProxy RiverOutput where toWlProxy (RiverOutput p) = WlProxy (castPtr p)
-instance IsWlProxy RiverSeat where toWlProxy (RiverSeat p) = WlProxy (castPtr p)
-instance IsWlProxy RiverNode where toWlProxy (RiverNode p) = WlProxy (castPtr p)
-instance IsWlProxy RiverPointerBinding where toWlProxy (RiverPointerBinding p) = WlProxy (castPtr p)
-
-instance WlMarshal RiverOutput where wlMarshal (RiverOutput p) = castPtr p
-instance WlMarshal RiverSeat where wlMarshal (RiverSeat p) = castPtr p
-instance WlMarshal RiverWindow where wlMarshal (RiverWindow p) = castPtr p
-instance WlMarshal RiverNode where wlMarshal (RiverNode p) = castPtr p
-instance WlMarshal RiverShellSurface where wlMarshal (RiverShellSurface p) = castPtr p
 
 -- * river_window_manager_v1
 
 -- ** Requests
 
-wmStop :: RiverWindowManager -> IO ()
-wmStop wm = do
-  ver <- wl_proxy_get_version wm
-  void $ wl_proxy_marshal_flags wm {#const RIVER_WINDOW_MANAGER_V1_STOP#} emptyInterface ver 0
+riverWindowManagerStop :: RiverWindowManager -> IO ()
+riverWindowManagerStop wm = wl_proxy_marshal_flags' (const ()) wm {#const RIVER_WINDOW_MANAGER_V1_STOP#} emptyInterface 0
 
-wmDestroy :: RiverWindowManager -> IO ()
-wmDestroy wm = do
-  ver <- wl_proxy_get_version wm
-  void $ wl_proxy_marshal_flags wm {#const RIVER_WINDOW_MANAGER_V1_DESTROY#} emptyInterface ver _WL_MARSHAL_FLAG_DESTROY
+riverWindowManagerManageDirty :: RiverWindowManager -> IO ()
+riverWindowManagerManageDirty wm = wl_proxy_marshal_flags' (const ()) wm {#const RIVER_WINDOW_MANAGER_V1_MANAGE_DIRTY#} emptyInterface 0
 
-wmManageDirty :: RiverWindowManager -> IO ()
-wmManageDirty wm = do
-  ver <- wl_proxy_get_version wm
-  void $ wl_proxy_marshal_flags wm {#const RIVER_WINDOW_MANAGER_V1_MANAGE_DIRTY#} emptyInterface ver 0
+riverWindowManagerExitSession :: RiverWindowManager -> IO ()
+riverWindowManagerExitSession wm = wl_proxy_marshal_flags' (const ()) wm {#const RIVER_WINDOW_MANAGER_V1_EXIT_SESSION#} emptyInterface 0
 
-wmExitSession :: RiverWindowManager -> IO ()
-wmExitSession wm = do
-  ver <- wl_proxy_get_version wm
-  void $ wl_proxy_marshal_flags wm {#const RIVER_WINDOW_MANAGER_V1_EXIT_SESSION#} emptyInterface ver 0
+riverWindowManagerManageFinish :: RiverWindowManager -> IO ()
+riverWindowManagerManageFinish wm = wl_proxy_marshal_flags' (const ()) wm {#const RIVER_WINDOW_MANAGER_V1_MANAGE_FINISH#} emptyInterface 0
 
-wmManageFinish :: RiverWindowManager -> IO ()
-wmManageFinish wm = do
-  ver <- wl_proxy_get_version wm
-  void $ wl_proxy_marshal_flags wm {#const RIVER_WINDOW_MANAGER_V1_MANAGE_FINISH#} emptyInterface ver 0
+riverWindowManagerRenderFinish :: RiverWindowManager -> IO ()
+riverWindowManagerRenderFinish wm = wl_proxy_marshal_flags' (const ()) wm {#const RIVER_WINDOW_MANAGER_V1_RENDER_FINISH#} emptyInterface 0
 
-wmRenderFinish :: RiverWindowManager -> IO ()
-wmRenderFinish wm = do
-  ver <- wl_proxy_get_version wm
-  void $ wl_proxy_marshal_flags wm {#const RIVER_WINDOW_MANAGER_V1_RENDER_FINISH#} emptyInterface ver 0
+riverWindowManagerGetShellSurface :: RiverWindowManager -> WlSurface -> IO RiverShellSurface
+riverWindowManagerGetShellSurface wm (WlSurface surface) = wl_proxy_marshal_array_flags' RiverShellSurface wm
+  {#const RIVER_WINDOW_MANAGER_V1_GET_SHELL_SURFACE#} river_shell_surface_v1_interface 0 (nullPtr, surface)
 
-wmGetShellSurface :: RiverWindowManager -> WlSurface -> IO RiverShellSurface
-wmGetShellSurface wm surface = do
-  ver <- wl_proxy_get_version wm
-  wl_proxy_marshal_flags__pp wm {#const RIVER_WINDOW_MANAGER_V1_GET_SHELL_SURFACE#} river_shell_surface_v1_interface ver 0 nullPtr surface
-    >>= coerceWlProxy "wmGetShellSurface" (return . RiverShellSurface)
+riverWindowManagerDestroy :: RiverWindowManager -> IO ()
+riverWindowManagerDestroy wm = wl_proxy_destroy wm {#const RIVER_WINDOW_MANAGER_V1_DESTROY#}
 
 -- ** Listener
-
-data WindowManagerEvent
-  = WindowManagerUnavailable      { userdata :: !(Ptr ()), windowManager :: !RiverWindowManager }
-  | WindowManagerFinished         { userdata :: !(Ptr ()), windowManager :: !RiverWindowManager }
-  | WindowManagerManageStart      { userdata :: !(Ptr ()), windowManager :: !RiverWindowManager }
-  | WindowManagerRenderStart      { userdata :: !(Ptr ()), windowManager :: !RiverWindowManager }
-  | WindowManagerSessionLocked    { userdata :: !(Ptr ()), windowManager :: !RiverWindowManager }
-  | WindowManagerSessionUnlocked  { userdata :: !(Ptr ()), windowManager :: !RiverWindowManager }
-  | WindowManagerWindow           { userdata :: !(Ptr ()), windowManager :: !RiverWindowManager, window :: !RiverWindow }
-  | WindowManagerOutput           { userdata :: !(Ptr ()), windowManager :: !RiverWindowManager, output :: !RiverOutput }
-  | WindowManagerSeat             { userdata :: !(Ptr ()), windowManager :: !RiverWindowManager, seat :: !RiverSeat }
-  deriving (Show)
-
-foreign import ccall "wrapper" wrapListenerCb       :: ListenerCallback (Ptr () -> RiverWindowManager -> IO ())
-foreign import ccall "wrapper" wrapListenerWindowCb :: ListenerCallback (Ptr () -> RiverWindowManager -> RiverWindow -> IO ())
-foreign import ccall "wrapper" wrapListenerOutputCb :: ListenerCallback (Ptr () -> RiverWindowManager -> RiverOutput -> IO ())
-foreign import ccall "wrapper" wrapListenerSeatCb   :: ListenerCallback (Ptr () -> RiverWindowManager -> RiverSeat -> IO ())
 
 mkWindowManagerListener :: (WindowManagerEvent -> IO ()) -> IO RiverWindowManagerListener
 mkWindowManagerListener h = do
@@ -121,6 +58,23 @@ river_window_manager_v1_add_listener :: RiverWindowManager -> RiverWindowManager
 river_window_manager_v1_add_listener wm (RiverWindowManagerListener l) dt = do
   res <- wl_proxy_add_listener wm (castPtr l) dt
   when (res < 0) $ throwIO $ RiverWindowManagerException "river_window_manager_v1_add_listener"
+
+data WindowManagerEvent
+  = WindowManagerUnavailable      { userdata :: !(Ptr ()), windowManager :: !RiverWindowManager }
+  | WindowManagerFinished         { userdata :: !(Ptr ()), windowManager :: !RiverWindowManager }
+  | WindowManagerManageStart      { userdata :: !(Ptr ()), windowManager :: !RiverWindowManager }
+  | WindowManagerRenderStart      { userdata :: !(Ptr ()), windowManager :: !RiverWindowManager }
+  | WindowManagerSessionLocked    { userdata :: !(Ptr ()), windowManager :: !RiverWindowManager }
+  | WindowManagerSessionUnlocked  { userdata :: !(Ptr ()), windowManager :: !RiverWindowManager }
+  | WindowManagerWindow           { userdata :: !(Ptr ()), windowManager :: !RiverWindowManager, window :: !RiverWindow }
+  | WindowManagerOutput           { userdata :: !(Ptr ()), windowManager :: !RiverWindowManager, output :: !RiverOutput }
+  | WindowManagerSeat             { userdata :: !(Ptr ()), windowManager :: !RiverWindowManager, seat :: !RiverSeat }
+  deriving (Show)
+
+foreign import ccall "wrapper" wrapListenerCb       :: ListenerCallback (Ptr () -> RiverWindowManager -> IO ())
+foreign import ccall "wrapper" wrapListenerWindowCb :: ListenerCallback (Ptr () -> RiverWindowManager -> RiverWindow -> IO ())
+foreign import ccall "wrapper" wrapListenerOutputCb :: ListenerCallback (Ptr () -> RiverWindowManager -> RiverOutput -> IO ())
+foreign import ccall "wrapper" wrapListenerSeatCb   :: ListenerCallback (Ptr () -> RiverWindowManager -> RiverSeat -> IO ())
 
 -----------------------------------------
 -- * river_window_v1
@@ -145,11 +99,9 @@ river_window_v1_get_node w = do
   wl_proxy_marshal_flags__p w {#const RIVER_WINDOW_V1_GET_NODE#} river_node_v1_interface ver 0 nullPtr
     >>= coerceWlProxy "river_window_v1_get_node" (return . RiverNode)
 
-river_window_v1_propose_dimensions :: RiverWindow -> Int -> Int -> IO ()
-river_window_v1_propose_dimensions w width height = do
-  ver <- wl_proxy_get_version w
-  void $ wl_proxy_marshal_flags__ii w {#const RIVER_WINDOW_V1_PROPOSE_DIMENSIONS#} emptyInterface ver 0 width height
-    -- >>= coerceWlProxy_ "river_window_v1_propose_dimensions"
+river_window_v1_propose_dimensions :: RiverWindow -> Int32 -> Int32 -> IO ()
+river_window_v1_propose_dimensions w width height = wl_proxy_marshal_array_flags' (const ()) w
+    {#const RIVER_WINDOW_V1_PROPOSE_DIMENSIONS#} emptyInterface 0 (width, height)
 
 river_window_v1_hide :: RiverWindow -> IO ()
 river_window_v1_hide w = do
@@ -163,14 +115,14 @@ river_window_v1_show w = do
   wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_SHOW#} emptyInterface ver 0
     >>= coerceWlProxy_ "river_window_v1_show"
 
-river_window_v1_use_csd :: RiverWindow -> IO ()
-river_window_v1_use_csd w = do
+riverWindowV1UseCsd :: RiverWindow -> IO ()
+riverWindowV1UseCsd w = do
   ver <- wl_proxy_get_version w
   wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_USE_CSD#} emptyInterface ver 0
     >>= coerceWlProxy_ "river_window_v1_use_csd"
 
-river_window_v1_use_ssd :: RiverWindow -> IO ()
-river_window_v1_use_ssd w = do
+riverWindowV1UseSsd :: RiverWindow -> IO ()
+riverWindowV1UseSsd w = do
   ver <- wl_proxy_get_version w
   wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_USE_SSD#} emptyInterface ver 0
     >>= coerceWlProxy_ "river_window_v1_use_ssd"
@@ -202,101 +154,86 @@ river_window_v1_use_ssd w = do
 --
 -- This request modifies rendering state and may only be made as part of a
 -- render sequence, see the river_window_manager_v1 description.
-river_window_v1_set_borders :: RiverWindow -> WindowBorders -> IO ()
-river_window_v1_set_borders w WindowBorders{..} = do
-  ver <- wl_proxy_get_version w
-  void $ wl_proxy_marshal_flags__uiuuuu w {#const RIVER_WINDOW_V1_SET_BORDERS#} emptyInterface ver 0
-    (fi wb_edges) wb_width (fi wb_r) (fi wb_g) (fi wb_b) (fi wb_a)
+riverWindowV1SetBorders :: RiverWindow -> WindowBorders -> IO ()
+riverWindowV1SetBorders w WindowBorders{..} = wl_proxy_marshal_array_flags' (const ()) w
+    {#const RIVER_WINDOW_V1_SET_BORDERS#} emptyInterface 0
+    (wb_edges, wb_width, wb_r, wb_g, wb_b, wb_a)
 
-river_window_v1_set_tiled :: RiverWindow -> CUInt -> IO ()
-river_window_v1_set_tiled w edges = do
-  ver <- wl_proxy_get_version w
-  wl_proxy_marshal_flags__u w {#const RIVER_WINDOW_V1_SET_TILED#} emptyInterface ver 0 edges
-    >>= coerceWlProxy_ "river_window_v1_set_tiled"
+riverWindowV1SetTiled :: RiverWindow -> Word32 -> IO ()
+riverWindowV1SetTiled w edges = wl_proxy_marshal_array_flags' (const ()) w
+    {#const RIVER_WINDOW_V1_SET_TILED#} emptyInterface 0 edges
 
-river_window_v1_get_decoration_above :: RiverWindow -> WlSurface -> IO RiverDecoration
-river_window_v1_get_decoration_above w surface = do
-  ver <- wl_proxy_get_version w
-  wl_proxy_marshal_flags__pp w {#const RIVER_WINDOW_V1_GET_DECORATION_ABOVE#} river_decoration_v1_interface ver 0 nullPtr surface
-    >>= coerceWlProxy "river_window_v1_get_decoration_above" (return . RiverDecoration)
+riverWindowV1GetDecorationAbove :: RiverWindow -> WlSurface -> IO RiverDecoration
+riverWindowV1GetDecorationAbove w (WlSurface surface) = wl_proxy_marshal_array_flags' RiverDecoration w
+    {#const RIVER_WINDOW_V1_GET_DECORATION_ABOVE#} river_decoration_v1_interface 0 (nullPtr, surface)
 
-river_window_v1_get_decoration_below :: RiverWindow -> WlSurface -> IO RiverDecoration
-river_window_v1_get_decoration_below w surface = do
-  ver <- wl_proxy_get_version w
-  wl_proxy_marshal_flags__pp w {#const RIVER_WINDOW_V1_GET_DECORATION_BELOW#} river_decoration_v1_interface ver 0 nullPtr surface
-    >>= coerceWlProxy "river_window_v1_get_decoration_below" (return . RiverDecoration)
+riverWindowV1GetDecorationBelow :: RiverWindow -> WlSurface -> IO RiverDecoration
+riverWindowV1GetDecorationBelow w (WlSurface surface) = wl_proxy_marshal_array_flags' RiverDecoration w
+    {#const RIVER_WINDOW_V1_GET_DECORATION_BELOW#} river_decoration_v1_interface 0 (nullPtr, surface)
 
-river_window_v1_inform_resize_start :: RiverWindow -> IO ()
-river_window_v1_inform_resize_start w = do
+riverWindowV1InformResizeStart :: RiverWindow -> IO ()
+riverWindowV1InformResizeStart w = do
   ver <- wl_proxy_get_version w
   wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_INFORM_RESIZE_START#} emptyInterface ver 0
     >>= coerceWlProxy_ "river_window_v1_inform_resize_start"
 
-river_window_v1_inform_resize_end :: RiverWindow -> IO ()
-river_window_v1_inform_resize_end w = do
+riverWindowV1InformResizeEnd :: RiverWindow -> IO ()
+riverWindowV1InformResizeEnd w = do
   ver <- wl_proxy_get_version w
   wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_INFORM_RESIZE_END#} emptyInterface ver 0
     >>= coerceWlProxy_ "river_window_v1_inform_resize_end"
 
-river_window_v1_set_capabilities :: RiverWindow -> WindowCaps -> IO ()
-river_window_v1_set_capabilities w caps = do
+riverWindowV1SetCapabilities :: RiverWindow -> WindowCaps -> IO ()
+riverWindowV1SetCapabilities w caps = do
   ver <- wl_proxy_get_version w
   wl_proxy_marshal_flags__u w {#const RIVER_WINDOW_V1_SET_CAPABILITIES#} emptyInterface ver 0 caps
     >>= coerceWlProxy_ "river_window_v1_set_capabilities"
 
-river_window_v1_inform_maximized :: RiverWindow -> IO ()
-river_window_v1_inform_maximized w = do
+riverWindowV1InformMaximized :: RiverWindow -> IO ()
+riverWindowV1InformMaximized w = do
   ver <- wl_proxy_get_version w
   wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_INFORM_MAXIMIZED#} emptyInterface ver 0
     >>= coerceWlProxy_ "river_window_v1_inform_maximized"
 
-river_window_v1_inform_unmaximized :: RiverWindow -> IO ()
-river_window_v1_inform_unmaximized w = do
+riverWindowV1InformUnmaximized :: RiverWindow -> IO ()
+riverWindowV1InformUnmaximized w = do
   ver <- wl_proxy_get_version w
   wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_INFORM_UNMAXIMIZED#} emptyInterface ver 0
     >>= coerceWlProxy_ "river_window_v1_inform_unmaximized"
 
-river_window_v1_inform_fullscreen :: RiverWindow -> IO ()
-river_window_v1_inform_fullscreen w = do
+riverWindowV1InformFullscreen :: RiverWindow -> IO ()
+riverWindowV1InformFullscreen w = do
   ver <- wl_proxy_get_version w
   wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_INFORM_FULLSCREEN#} emptyInterface ver 0
     >>= coerceWlProxy_ "river_window_v1_inform_fullscreen"
 
-river_window_v1_inform_not_fullscreen :: RiverWindow -> IO ()
-river_window_v1_inform_not_fullscreen w = do
+riverWindowV1InformNotFullscreen :: RiverWindow -> IO ()
+riverWindowV1InformNotFullscreen w = do
   ver <- wl_proxy_get_version w
   wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_INFORM_NOT_FULLSCREEN#} emptyInterface ver 0
     >>= coerceWlProxy_ "river_window_v1_inform_not_fullscreen"
 
-river_window_v1_fullscreen :: RiverWindow -> RiverOutput -> IO ()
-river_window_v1_fullscreen w output = do
-  ver <- wl_proxy_get_version w
-  wl_proxy_marshal_flags__p w {#const RIVER_WINDOW_V1_FULLSCREEN#} emptyInterface ver 0 output
-    >>= coerceWlProxy_ "river_window_v1_fullscreen"
+riverWindowV1Fullscreen :: RiverWindow -> RiverOutput -> IO ()
+riverWindowV1Fullscreen w (RiverOutput output) = wl_proxy_marshal_array_flags' (const ()) w
+    {#const RIVER_WINDOW_V1_FULLSCREEN#} emptyInterface 0 output
 
-river_window_v1_exit_fullscreen :: RiverWindow -> IO ()
-river_window_v1_exit_fullscreen w = do
+riverWindowV1ExitFullscreen :: RiverWindow -> IO ()
+riverWindowV1ExitFullscreen w = do
   ver <- wl_proxy_get_version w
   wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_EXIT_FULLSCREEN#} emptyInterface ver 0
     >>= coerceWlProxy_ "river_window_v1_exit_fullscreen"
 
-river_window_v1_set_clip_box :: RiverWindow -> ClipBox -> IO ()
-river_window_v1_set_clip_box w (x, y, width, height) = do
-  ver <- wl_proxy_get_version w
-  wl_proxy_marshal_flags__iiii w {#const RIVER_WINDOW_V1_SET_CLIP_BOX#} emptyInterface ver 0 x y width height
-    >>= coerceWlProxy_ "river_window_v1_set_clip_box"
+riverWindowV1SetClipBox :: RiverWindow -> ClipBox -> IO ()
+riverWindowV1SetClipBox w (x, y, width, height) = wl_proxy_marshal_array_flags' (const ()) w
+    {#const RIVER_WINDOW_V1_SET_CLIP_BOX#} emptyInterface 0 (x, y, width, height)
 
-river_window_v1_set_content_clip_box :: RiverWindow -> ClipBox -> IO ()
-river_window_v1_set_content_clip_box w (x, y, width, height) = do
-  ver <- wl_proxy_get_version w
-  wl_proxy_marshal_flags__iiii w {#const RIVER_WINDOW_V1_SET_CONTENT_CLIP_BOX#} emptyInterface ver 0 x y width height
-    >>= coerceWlProxy_ "river_window_v1_set_content_clip_box"
+riverWindowV1SetContentClipBox :: RiverWindow -> ClipBox -> IO ()
+riverWindowV1SetContentClipBox w (x, y, width, height) = wl_proxy_marshal_array_flags' (const ()) w
+    {#const RIVER_WINDOW_V1_SET_CONTENT_CLIP_BOX#} emptyInterface 0 (x, y, width, height)
 
-river_window_v1_set_dimension_bounds :: RiverWindow -> Int -> Int -> IO ()
-river_window_v1_set_dimension_bounds w maxWidth maxHeight = do
-  ver <- wl_proxy_get_version w
-  wl_proxy_marshal_flags__ii w {#const RIVER_WINDOW_V1_SET_DIMENSION_BOUNDS#} emptyInterface ver 0 maxWidth maxHeight
-    >>= coerceWlProxy_ "river_window_v1_set_dimension_bounds"
+riverWindowV1SetDimensionBounds :: RiverWindow -> Int32 -> Int32 -> IO ()
+riverWindowV1SetDimensionBounds w maxWidth maxHeight = wl_proxy_marshal_array_flags' (const ()) w
+    {#const RIVER_WINDOW_V1_SET_DIMENSION_BOUNDS#} emptyInterface 0 (maxWidth, maxHeight)
 
 -- ** Listener
 
@@ -364,46 +301,42 @@ river_window_v1_add_listener w (WindowListener p) dt = do
 
 -- * river_shell_surface_v1
 
--- TODO
+riverShellSurfaceV1Destroy :: MonadIO m => RiverShellSurface -> m ()
+riverShellSurfaceV1Destroy ss = wl_proxy_destroy ss {#const RIVER_SHELL_SURFACE_V1_DESTROY#}
+
+riverShellSurfaceGetNode :: MonadIO m => RiverShellSurface -> m RiverNode
+riverShellSurfaceGetNode ss = wl_proxy_marshal_flags' RiverNode ss
+    {#const RIVER_SHELL_SURFACE_V1_GET_NODE#} emptyInterface 0
+
+riverShellSurfaceSyncNextCommit :: MonadIO m => RiverShellSurface -> m ()
+riverShellSurfaceSyncNextCommit ss = wl_proxy_marshal_flags' (const ()) ss
+    {#const RIVER_SHELL_SURFACE_V1_SYNC_NEXT_COMMIT#} emptyInterface 0
 
 -- * river_node_v1
 
 -- ** Requests
 
 river_node_v1_place_top :: RiverNode -> IO ()
-river_node_v1_place_top nd = do
-  ver <- wl_proxy_get_version nd
-  void $ wl_proxy_marshal_flags nd {#const RIVER_NODE_V1_PLACE_TOP#} emptyInterface ver 0
+river_node_v1_place_top nd = wl_proxy_marshal_flags' (const ()) nd {#const RIVER_NODE_V1_PLACE_TOP#} emptyInterface 0
 
 river_node_v1_place_bottom :: RiverNode -> IO ()
-river_node_v1_place_bottom nd = do
-  ver <- wl_proxy_get_version nd
-  void $ wl_proxy_marshal_flags nd {#const RIVER_NODE_V1_PLACE_BOTTOM#} emptyInterface ver 0
+river_node_v1_place_bottom nd = wl_proxy_marshal_flags' (const ()) nd {#const RIVER_NODE_V1_PLACE_BOTTOM#} emptyInterface 0
 
 river_node_v1_place_above :: RiverNode -> RiverNode -> IO ()
-river_node_v1_place_above nd nd' = do
-  ver <- wl_proxy_get_version nd
-  void $ wl_proxy_marshal_flags__p nd {#const RIVER_NODE_V1_PLACE_ABOVE#} emptyInterface ver 0 nd'
+river_node_v1_place_above nd (RiverNode nd') = wl_proxy_marshal_array_flags' (const ()) nd {#const RIVER_NODE_V1_PLACE_ABOVE#} emptyInterface 0 nd'
 
 river_node_v1_place_below :: RiverNode -> RiverNode -> IO ()
-river_node_v1_place_below nd nd' = do
-  ver <- wl_proxy_get_version nd
-  void $ wl_proxy_marshal_flags__p nd {#const RIVER_NODE_V1_PLACE_BELOW#} emptyInterface ver 0 nd'
+river_node_v1_place_below nd (RiverNode nd') = wl_proxy_marshal_array_flags' (const ()) nd {#const RIVER_NODE_V1_PLACE_BELOW#} emptyInterface 0 nd'
 
-river_node_v1_set_position :: RiverNode -> Int -> Int -> IO ()
-river_node_v1_set_position nd x y = do
-  ver <- wl_proxy_get_version nd
-  void $ wl_proxy_marshal_flags__ii nd {#const RIVER_NODE_V1_SET_POSITION#} emptyInterface ver 0 x y
+river_node_v1_set_position :: RiverNode -> Int32 -> Int32 -> IO ()
+river_node_v1_set_position nd x y = wl_proxy_marshal_array_flags' (const ()) nd {#const RIVER_NODE_V1_SET_POSITION#} emptyInterface 0 (x, y)
 
 -- * river_output_v1
 
 -- ** Destroy
 
 river_output_v1_destroy :: RiverOutput -> IO ()
-river_output_v1_destroy output = do
-  ver <- wl_proxy_get_version output
-  wl_proxy_marshal_flags output {#const RIVER_OUTPUT_V1_DESTROY#} emptyInterface ver _WL_MARSHAL_FLAG_DESTROY
-    >>= coerceWlProxy_ "river_output_v1_destroy"
+river_output_v1_destroy output = wl_proxy_destroy output {#const RIVER_OUTPUT_V1_DESTROY#}
 
 -- ** Listener
 
@@ -448,35 +381,29 @@ river_seat_v1_clear_focus s = do
   void $ wl_proxy_marshal_flags s {#const RIVER_SEAT_V1_CLEAR_FOCUS#} emptyInterface ver 0
 
 river_seat_v1_focus_window :: RiverSeat -> RiverWindow -> IO ()
-river_seat_v1_focus_window s w = do
-  ver <- wl_proxy_get_version s
-  void $ wl_proxy_marshal_flags__p s {#const RIVER_SEAT_V1_FOCUS_WINDOW#} emptyInterface ver 0 w
+river_seat_v1_focus_window s (RiverWindow w) = wl_proxy_marshal_array_flags' (const ()) s
+    {#const RIVER_SEAT_V1_FOCUS_WINDOW#} emptyInterface 0 w
 
 river_seat_v1_op_start_pointer :: RiverSeat -> IO ()
 river_seat_v1_op_start_pointer s = do
   ver <- wl_proxy_get_version s
   void $ wl_proxy_marshal_flags s {#const RIVER_SEAT_V1_OP_START_POINTER#} emptyInterface ver 0
 
-river_seat_v1_pointer_warp :: RiverSeat -> Int -> Int -> IO ()
-river_seat_v1_pointer_warp s x y = do
-  ver <- wl_proxy_get_version s
-  void $ wl_proxy_marshal_flags__ii s {#const RIVER_SEAT_V1_POINTER_WARP#} emptyInterface ver 0 x y
+river_seat_v1_pointer_warp :: RiverSeat -> Int32 -> Int32 -> IO ()
+river_seat_v1_pointer_warp s x y = wl_proxy_marshal_array_flags' (const ()) s
+    {#const RIVER_SEAT_V1_POINTER_WARP#} emptyInterface 0 (x, y)
 
-river_seat_v1_set_xcursor_theme :: RiverSeat -> String -> CUInt -> IO ()
-river_seat_v1_set_xcursor_theme s name size = withCString name $ \c_name -> do
-  ver <- wl_proxy_get_version s
-  void $ wl_proxy_marshal_flags__pu s {#const RIVER_SEAT_V1_SET_XCURSOR_THEME#} emptyInterface ver 0 c_name size
+riverSeatV1SetXcursorTheme :: RiverSeat -> String -> Word32 -> IO ()
+riverSeatV1SetXcursorTheme s name size = wl_proxy_marshal_array_flags' (const ()) s
+    {#const RIVER_SEAT_V1_SET_XCURSOR_THEME#} emptyInterface 0 (name, size)
 
-river_seat_v1_get_pointer_binding :: RiverSeat -> CUInt {-Button-} -> CUInt {-Modifiers-} -> IO RiverPointerBinding
-river_seat_v1_get_pointer_binding s btn mods = do
-  ver <- wl_proxy_get_version s
-  wl_proxy_marshal_flags__uu s {#const RIVER_SEAT_V1_GET_POINTER_BINDING#} river_pointer_binding_v1_interface ver 0 btn mods
-    >>= coerceWlProxy "river_seat_v1_get_pointer_binding" (return . RiverPointerBinding)
+river_seat_v1_get_pointer_binding :: RiverSeat -> Word32 {-Button-} -> Word32 {-Modifiers-} -> IO RiverPointerBinding
+river_seat_v1_get_pointer_binding s btn mods = wl_proxy_marshal_array_flags' RiverPointerBinding s
+    {#const RIVER_SEAT_V1_GET_POINTER_BINDING#} river_pointer_binding_v1_interface 0 (btn, mods)
 
-river_seat_v1_focus_shell_surface :: RiverSeat -> RiverShellSurface -> IO ()
-river_seat_v1_focus_shell_surface s ss = do
-  ver <- wl_proxy_get_version s
-  void $ wl_proxy_marshal_flags__p s {#const RIVER_SEAT_V1_FOCUS_SHELL_SURFACE#} emptyInterface ver 0 ss
+riverSeatV1FocusShellSurface :: RiverSeat -> RiverShellSurface -> IO ()
+riverSeatV1FocusShellSurface s (RiverShellSurface ss) = wl_proxy_marshal_array_flags' (const ()) s
+    {#const RIVER_SEAT_V1_FOCUS_SHELL_SURFACE#} emptyInterface 0 ss
 
 -- ** Destroy
 
@@ -487,7 +414,7 @@ river_seat_v1_destroy s = do
 
 -- ** Listener
 
-river_seat_v1_add_listener :: RiverSeat -> RiverSeatListener -> Data -> IO ()
+river_seat_v1_add_listener :: RiverSeat -> RiverSeatListener -> Ptr () -> IO ()
 river_seat_v1_add_listener seat (RiverSeatListener p) dt = do
   res <- wl_proxy_add_listener seat (castPtr p) dt
   when (res < 0) $ throwIO $ RiverWindowManagerException "river_seat_v1_add_listener"

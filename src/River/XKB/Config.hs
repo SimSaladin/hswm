@@ -13,7 +13,7 @@
 ------------------------------------------------------------------------------
 module River.XKB.Config
   ( module River.XKB.Config.FFI
-  , module River.XKB.Config
+  -- , module River.XKB.Config
   ) where
 
 import           River.XKB.Config.FFI

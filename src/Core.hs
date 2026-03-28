@@ -6,71 +6,25 @@ module Core
   , module River
   ) where
 
-import           River
 import           HSWM.Operations
-import           HSWM.Types
-import           Wayland
 import qualified HSWM.StackSet as W
-
-import qualified Data.Map as M
--- import qualified Data.Set as S
+import           HSWM.Types
+import           River
+import           Wayland
 
 import           Data.Char (toLower)
+import qualified Data.List as L
+import qualified Data.TMap as TM
 import           Foreign hiding (new, void)
 import           System.Exit
-import qualified Data.TMap as TM
-import qualified Data.List as L
-
-createRegistryListener :: (MonadIO m, MonadState HState m) => WlDisplay -> m RiverWindowManager
-createRegistryListener display = do
-  debug' "at create registry listener..."
-  varWM <- liftIO (newEmptyMVar :: IO (MVar RiverWindowManager))
-  varXKB <- liftIO (newEmptyMVar :: IO (MVar RiverXkbBindings))
-  xkbConfigVar <- liftIO newEmptyMVar
-  debug' "initialized mvars"
-  useXkbConfigListener <- withObjectDef (const (return ())) $ \listener -> return (\f -> f listener)
-  log' "got xkbconfiglistener"
-  regListener <- getOrCreateObject $ mkRegistryListener $ \case
-    RegistryGlobal _ registry name "river_window_manager_v1" _ -> do
-        wl_registry_bind registry name river_window_manager_v1_interface 4 >>= putMVar varWM . RiverWindowManager
-        log' "river_window_manager_v1 bound"
-
-    RegistryGlobal _ registry name "river_xkb_bindings_v1" _ -> do
-        wl_registry_bind registry name river_xkb_bindings_v1_interface 1 >>= putMVar varXKB . RiverXkbBindings
-        log' "river_xkb_bindings_v1 bound"
-
-    RegistryGlobal _ registry name "river_xkb_config_v1" _ -> do
-        xkbConfig <- RiverXkbConfigV1 <$> wl_registry_bind registry name river_xkb_config_v1_interface 1
-        putMVar xkbConfigVar xkbConfig
-        debug' "about to install xkbconfig listener..."
-        useXkbConfigListener $ \l -> riverXkbConfigV1AddListener xkbConfig l nullPtr
-        debug' "xkbconfig listener installed"
-
-    RegistryGlobal _ _ _ iface _ -> log' $ "[globalreg] " <> toText iface
-    _ -> return ()
-
-  registry <- liftIO $ wl_display_get_registry display
-  liftIO $ wl_registry_add_listener registry regListener nullPtr
-
-  _roundtrip <- liftIO $ wl_display_roundtrip display
-
-  rwm <- liftIO $ fromJust <$> tryTakeMVar varWM
-  xkb <- liftIO $ fromJust <$> tryTakeMVar varXKB
-  xkbConfig <- liftIO $ fromJust <$> tryTakeMVar xkbConfigVar
-  withWlObjects $ TM.insert xkbConfig . TM.insert rwm . TM.insert xkb
-  return rwm
 
 startHSWM :: (LayoutClass l RiverWindow, Read (l RiverWindow)) => WlDisplay -> HSWMConfig l -> IO ()
 startHSWM display config = withStdoutLogging $ do
   pendingActions <- newTQueueIO
-
   let conf = HConf
         { config = config { layoutHook = Layout (layoutHook config) }
-        , display = display
-        }
-
-  let initialWinSet = W.new conf.config.layoutHook ["1", "2"] [SD 0 0 0 0]
-  let initialState = HState
+        , display = display }
+      initialState = HState
         { windowset = initialWinSet
         , windowsetOld = initialWinSet
         , _seats = mempty
@@ -79,35 +33,65 @@ startHSWM display config = withStdoutLogging $ do
         , pendingActions = pendingActions
         , wlObjects = TM.empty
         }
+      initialWinSet = W.new conf.config.layoutHook ["1", "2"] [SD 0 0 0 0]
 
   stTMVar <- newTMVarIO initialState
 
   let runInH :: H a -> IO a
-      runInH a = bracketOnError
-        (atomically $ takeTMVar stTMVar)
-        (atomically . putTMVar stTMVar)
-        $ \st -> do
+      runInH a = bracketOnError (atomically $ takeTMVar stTMVar) (atomically . putTMVar stTMVar) $ \st -> do
           (r, st') <- runH conf st a
           atomically $ putTMVar stTMVar st'
           return r
 
-  debug' "At startup..."
+  -- XXX
   -- -- Process pending actions in the background
   -- _ <- forkIO $ forever $ do
   --   a <- liftIO $ atomically (readTQueue pendingActions)
   --   debug' $ "[eventq] processing action: " <> toText (actionDescription a)
   --   runInH $ userCode $ runner a
 
+  varWM <- newEmptyMVar :: IO (MVar RiverWindowManager)
+  varXKB <- newEmptyMVar :: IO (MVar RiverXkbBindings)
+  xkbConfigVar <- liftIO newEmptyMVar
+
+  registry <- wl_display_get_registry display
+
   runInH $ do
-    _ <- getOrCreateObject $ mkRiverXkbConfigV1Listener $ \e -> runInH $ handleEvent $ XkbConfigEvent e
+    xkbConfigListener <- getOrCreateObject $ mkRiverXkbConfigV1Listener $ \e -> runInH $ handleEvent $ XkbConfigEvent e
     _ <- getOrCreateObject $ mkRiverXkbKeyboardV1Listener $ \e -> runInH $ handleEvent $ XkbKeyboardEvent e
-    windowManager <- createRegistryListener display
     _ <- getOrCreateObject $ mkXkbBindingListener $ \e -> runInH $ handleEvent $ XkbEvent e
     _ <- getOrCreateObject $ mkPointerBindingListener $ \e -> runInH $ handleEvent $ PointerEvent e
     _ <- getOrCreateObject $ mkWindowListener $ \e -> runInH $ handleEvent $ WindowEvent e
     _ <- getOrCreateObject $ mkSeatListener $ \e -> runInH $ handleEvent $ SeatEvent e
     _ <- getOrCreateObject $ newOutputListener $ \e -> runInH $ handleEvent $ OutputEvent e
     managerListener <- getOrCreateObject $ mkWindowManagerListener $ \e -> runInH $ handleEvent $ WindowManagerEvent e
+    regListener <- getOrCreateObject $ mkRegistryListener $ \case
+
+      RegistryGlobal _ registry name "river_window_manager_v1" _ -> do
+          wl_registry_bind registry name river_window_manager_v1_interface 4 >>= putMVar varWM . RiverWindowManager
+          log' "river_window_manager_v1 bound"
+
+      RegistryGlobal _ registry name "river_xkb_bindings_v1" _ -> do
+          wl_registry_bind registry name river_xkb_bindings_v1_interface 1 >>= putMVar varXKB . RiverXkbBindings
+          log' "river_xkb_bindings_v1 bound"
+
+      RegistryGlobal _ registry name "river_xkb_config_v1" _ -> do
+          xkbConfig <- registryBindRiverXkbConfigV1 registry name 1
+          putMVar xkbConfigVar xkbConfig
+          riverXkbConfigV1AddListener xkbConfig xkbConfigListener nullPtr
+
+      RegistryGlobal _ _ _ iface _ -> log' $ "[globalreg] " <> toText iface
+
+      _ -> return ()
+
+    liftIO $ wl_registry_add_listener registry regListener nullPtr
+    _ <- liftIO $ wl_display_roundtrip display
+
+    windowManager <- liftIO $ fromJust <$> tryTakeMVar varWM
+    xkbBindings <- liftIO $ fromJust <$> tryTakeMVar varXKB
+    xkbConfig <- liftIO $ fromJust <$> tryTakeMVar xkbConfigVar
+    withWlObjects $ TM.insert xkbConfig . TM.insert windowManager . TM.insert xkbBindings
+
     liftIO $ river_window_manager_v1_add_listener windowManager managerListener nullPtr
 
   forever $ do
@@ -115,70 +99,6 @@ startHSWM display config = withStdoutLogging $ do
     when (res < 0) $ do
       log' "error: dispatch failed"
       exitFailure
-
-windows :: H ()
-windows = do
-    old <- gets windowsetOld
-    ws <- gets windowset
-    let oldvisible = concatMap (W.integrate' . W.stack . W.workspace) $ W.current old : W.visible old
-        newwindows = W.allWindows ws L.\\ W.allWindows old
-
-    mapM_ setInitialProperties newwindows
-
-    whenJust (W.peek old) $ \otherw ->
-      setWindowBorder otherw =<< asks (normalBorder . config)
-
-    modify (\s -> s { windowsetOld = ws })
-
-    let tags_oldvisible = map (W.tag . W.workspace) $ W.current old : W.visible old
-        gottenhidden    = filter (flip elem tags_oldvisible . W.tag) $ W.hidden ws
-    mapM_ (sendMessageWithNoRefresh Hide) gottenhidden
-
-    -- for each workspace, layout the currently visible workspaces
-    let allscreens     = W.screens ws
-        summed_visible = scanl (++) [] $ map (W.integrate' . W.stack . W.workspace) allscreens
-
-    rects <- fmap concat $ forM (zip allscreens summed_visible) $ \ (w, vis) -> do
-        let wsp   = W.workspace w
-            this  = W.view n ws
-            n     = W.tag wsp
-            tiled = (W.stack . W.workspace . W.current $ this)
-                    >>= W.filter (`M.notMember` W.floating ws)
-                    >>= W.filter (`notElem` vis)
-            sd = W.screenDetail w
-            viewrect = Rectangle{x=fi sd.x, y=fi sd.y, width=fi sd.width, height=fi sd.height}
-
-        -- just the tiled windows:
-        -- now tile the windows on this workspace, modified by the gap
-        (rs, ml') <- runLayout wsp { W.stack = tiled } viewrect `catchH`
-                     runLayout wsp { W.stack = tiled, W.layout = Layout Full } viewrect
-        updateLayout n ml'
-
-        let m   = W.floating ws
-            flt = [(fw, scaleRationalRect viewrect r)
-                    | fw <- filter (`M.member` m) (W.index this)
-                    , fw `notElem` vis
-                    , Just r <- [M.lookup fw m]]
-            vs = flt ++ rs
-
-        -- return the visible windows for this workspace:
-        return vs
-
-    let visible = map fst rects
-
-    mapM_ (uncurry tileWindow) rects
-
-    whenJust (W.peek ws) $ \w ->
-      setWindowBorder w =<< asks (focusedBorder . config)
-
-    mapM_ reveal visible
-    setTopFocus
-
-    -- hide every window that was potentially visible before, but is not
-    -- given a position by a layout now.
-    mapM_ hide (L.nub (oldvisible ++ newwindows) L.\\ visible)
-
-    asks (logHook . config) >>= userCodeDef ()
 
 -- | Destroy closed windows and removed outputs/seats
 manageCleanup :: H ()
@@ -219,7 +139,6 @@ manageWindows = do
         seat_pointer_resize w.pointer_resize_requested w w.pointer_resize_requested_edges
       return (w :: Window) { new = False, pointer_move_requested = invalidSeat, pointer_resize_requested = invalidSeat  }
   modify $ \s -> s { _windows = newWindows }
-
 
 ---------------------------------------------------
 -- event handling
@@ -271,20 +190,20 @@ handleEvent (WindowManagerEvent e) = do
       manageWindows
       manageSeats
       windows
-      liftIO $ wmManageFinish wm
+      liftIO $ riverWindowManagerManageFinish wm
 
     WindowManagerRenderStart _dt wm -> do
       mapSeats seatRender
       --mapWindows $ \w -> setWindowBorder w.river_window
       --processPendingMessages
-      liftIO $ wmRenderFinish wm
+      liftIO $ riverWindowManagerRenderFinish wm
 
     WindowManagerUnavailable{} -> do
       log' "error: another window manager already running"
       liftIO exitFailure
 
     WindowManagerFinished _ rwm -> do
-      liftIO $ wmDestroy rwm
+      liftIO $ riverWindowManagerDestroy rwm
       liftIO exitSuccess
 
     _ -> return ()
@@ -373,10 +292,10 @@ handleEvent (SeatEvent e) = do
 handleEvent (XkbConfigEvent e) = do
   debug' $ "[xkbconfig] " <> tshow e
   case e of
-    XkbConfigXkbKeyboard _ xkbConfig xkbKeyboard -> do
-      l <- getObject @RiverXkbKeyboardV1Listener
+    -- Keyboard is added
+    XkbConfigXkbKeyboard _ xkbConfig xkbKeyboard -> withObject @RiverXkbKeyboardV1Listener $ \l -> do
       io $ riverXkbKeyboardV1AddListener xkbKeyboard l nullPtr
-      debug' $ "[xkbconfig] creating and assigning keymap"
+      debug' "[xkbconfig] creating and assigning keymap"
       xkbKeymap <- io $ newXkbKeymapFromNames XkbRuleNames { rules = ""
                                          , model = "pc104"
                                          , layout = "dvp-my"
@@ -384,12 +303,17 @@ handleEvent (XkbConfigEvent e) = do
                                          , options = "terminate:ctrl_alt_bksp,compose:rctrl-altgr,lv3:ralt_switch,lv3:menu_switch"
                                          }
       io $ withXkbKeymapFd xkbKeymap $ \fd -> do
-          kmap <- river_xkb_config_v1_create_keymap xkbConfig (fi fd) 1
-          io $ river_xkb_keyboard_v1_set_keymap xkbKeyboard kmap
+          kmap <- riverXkbConfigV1CreateKeymap xkbConfig (fi fd) RiverXkbConfigV1KeymapFormatTextV1
+          io $ riverXkbKeyboardV1SetKeymap xkbKeyboard kmap
+
     _ -> pure ()
 
 handleEvent (XkbKeyboardEvent e) = do
   debug' $ "[xkbkeyboard] " <> tshow e
+  case e of
+    -- keyboard is removed
+    KeyboardRemoved _ _kbd -> return ()
+    _ -> return ()
 
 --------------------------------------------------
 -- seat management
@@ -414,13 +338,13 @@ create_seat_bindings s = do
   where
     resolveModMask d s = case map toLower s of
                            "m"     -> d
-                           "none"  -> fi $ fromEnum $ RiverSeatV1ModifiersNone
-                           "shift" -> fi $ fromEnum $ RiverSeatV1ModifiersShift
-                           "ctrl"  -> fi $ fromEnum $ RiverSeatV1ModifiersCtrl
-                           "mod1"  -> fi $ fromEnum $ RiverSeatV1ModifiersMod1
-                           "mod3"  -> fi $ fromEnum $ RiverSeatV1ModifiersMod3
-                           "mod4"  -> fi $ fromEnum $ RiverSeatV1ModifiersMod4
-                           "mod5"  -> fi $ fromEnum $ RiverSeatV1ModifiersMod5
+                           "none"  -> fi $ fromEnum ModifiersNone
+                           "shift" -> fi $ fromEnum ModifiersShift
+                           "ctrl"  -> fi $ fromEnum ModifiersCtrl
+                           "mod1"  -> fi $ fromEnum ModifiersMod1
+                           "mod3"  -> fi $ fromEnum ModifiersMod3
+                           "mod4"  -> fi $ fromEnum ModifiersMod4
+                           "mod5"  -> fi $ fromEnum ModifiersMod5
                            _ -> error $ "unrecognized modifier: " ++ s
     resolveKeyBinds mdef = mapM $ \((m, k), a) -> do
       let m' = resolveModMask mdef m
@@ -428,7 +352,6 @@ create_seat_bindings s = do
     resolvePointerBinds mdef = mapM $ \((m, k), a) -> do
       let m' = resolveModMask mdef m
       return ((m', k), a)
-
 
 manageSeats :: H ()
 manageSeats = do
@@ -447,7 +370,7 @@ manageSeats = do
             modifySeat s.river_seat $ \s -> s { op = SEAT_OP_NONE, op_window = invalidWindow }
         SEAT_OP_RESIZE -> do
           when s.op_release $ do
-            liftIO $ river_window_v1_inform_resize_end s.op_window
+            liftIO $ riverWindowV1InformResizeEnd s.op_window
             liftIO $ river_seat_v1_op_end s.river_seat
             modifySeat s.river_seat $ \s -> s { op = SEAT_OP_NONE, op_window = invalidWindow }
           withWindow s.op_window $ \w -> do
@@ -472,8 +395,8 @@ seatRender s = do
         setNodePosition w.node x y
         debug' $ "seatRender: move window " <> tshow (w, x, y)
     SEAT_OP_RESIZE -> withWindow s.op_window $ \w -> do
-      let x = s.op_start_x + (if (s.op_edges .&. fromEnum EdgeLeft) /= 0 then s.op_start_width - w.width else 0)
-      let y = s.op_start_y + (if (s.op_edges .&. fromEnum EdgeTop) /= 0 then s.op_start_height - w.height else 0)
+      let x = s.op_start_x + (if (s.op_edges .&. fi (fromEnum EdgeLeft)) /= 0 then s.op_start_width - w.width else 0)
+      let y = s.op_start_y + (if (s.op_edges .&. fi (fromEnum EdgeTop)) /= 0 then s.op_start_height - w.height else 0)
       setNodePosition w.node x y
       debug' $ "seatRender: resize window " <> tshow (w, x, y)
 
@@ -512,11 +435,11 @@ seat_pointer_move sid w = withSeat sid $ \s -> do
     , op_dy= 0
     }
 
-seat_pointer_resize :: RiverSeat -> Window -> Int -> H ()
+seat_pointer_resize :: RiverSeat -> Window -> Int32 -> H ()
 seat_pointer_resize sid w edges = withSeat sid $ \s -> do
   log' $ "[seat_pointer_resize] " <> tshow (sid, w, edges)
   seatFocus s w
-  liftIO $ river_window_v1_inform_resize_start w.river_window
+  liftIO $ riverWindowV1InformResizeStart w.river_window
   liftIO $ river_seat_v1_op_start_pointer s.river_seat
   modifySeat s.river_seat $ \s -> s
     { op = SEAT_OP_RESIZE
