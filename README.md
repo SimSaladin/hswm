@@ -32,7 +32,7 @@ The Wl protocol bindings (checked into the repo) are generated with
 `wayland-scanner`. They can be regenerated via:
 
 ```bash
-./genproto.sh
+make
 ```
 
 ### Compiling with `cabal` (directly)

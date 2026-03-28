@@ -36,6 +36,9 @@
         #basePackages = pkgs.haskell.packages.ghc914;
         devShell = {
           tools = hp: {
+            inherit (hp)
+              hs-bindgen
+              ;
             inherit (pkgs)
               wayland-scanner
               libxkbcommon

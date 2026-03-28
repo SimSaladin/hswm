@@ -1,0 +1,104 @@
+---
+name:               hswm
+version:            0.1.0.0
+synopsis:           Wayland window manager for River
+description:        Wayland window manager for River
+license:            MIT
+license-file:       LICENSE
+author:             Samuli Thomasson
+maintainer:         samuli.thomasson@pm.me
+# copyright:
+build-type:         Simple
+extra-doc-files:    README.md
+#                  CHANGELOG.md
+extra-source-files:
+  - Makefile
+  - cbits/*.c
+
+verbatim:
+  cabal-version: 3.4
+
+_ghc-options: &common-ghc-options
+  -Wall -Wunused-packages
+
+library:
+    source-dirs: src
+    exposed-modules:
+      # Note: c2hs is clunky about the order of exposed modules :(
+      - Wayland.FFI
+      - Wayland.Bindings
+      - Wayland
+      - River.XKB.Config.FFI
+      - River.XKB.Config
+      - River.XKB.Bindings.MiscFFI
+      - River.XKB.Bindings.FFI
+      - River.XKB.Bindings
+      - River.WMP.MiscFFI
+      - River.WMP.FFI
+      - River.WMP
+      - River
+      - HSWM.XKB.FFI
+      - HSWM.XKB
+      - HSWM.Utils
+      - HSWM.Types
+      - HSWM.StackSet
+      - HSWM.Seats
+      - HSWM.Operations
+      - HSWM.Main
+      - HSWM.Layout
+      - HSWM.Core
+      - HSWM.Actions
+      - HSWM
+      - Core
+    other-modules: Prelude
+    generated-other-modules: Paths_hswm
+    dependencies:
+      - &base base >=4.20.2.0
+      - containers
+      - data-default
+      - derive-storable
+      - logging
+      - mtl
+      - pretty-simple
+      - stm
+      - text
+      - transformers
+      - typerep-map
+      - unix
+      # XXX: below for hs-bindgen-cli testing
+      #- c-expr-runtime
+      #- hs-bindgen-runtime
+    pkgconfig-depends:
+      - wayland-client
+      - xkbcommon
+    extra-libraries:
+      - wayland-client
+      - xkbcommon
+    include-dirs: cbits
+    c-sources:
+      - cbits/*-protocol.c
+    build-tools:
+      # Note: may need to "cabal update for this to start working
+      - c2hs:c2hs
+      #- hs-bindgen:hs-bindgen-cli
+    ghc-options: *common-ghc-options
+    language: &default-language
+      GHC2024
+    default-extensions: &default-extensions
+      - RecordWildCards
+      - OverloadedRecordDot
+      - DuplicateRecordFields
+      - OverloadedStrings
+
+executables:
+  hswm:
+    main: Main.hs
+    source-dirs: app
+    dependencies:
+      - *base
+      - hswm
+    pkgconfig-depends: wayland-client
+    extra-libraries: wayland-client
+    language: *default-language
+    default-extensions: *default-extensions
+    ghc-options: *common-ghc-options
