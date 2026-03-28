@@ -1,22 +1,22 @@
-{-# LANGUAGE PatternSynonyms #-}
 {-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE PatternSynonyms       #-}
+{-# LANGUAGE TemplateHaskell       #-}
 
 -- |
 -- Global Wayland interfaces you can bind listeners onto.
 --
 -- See also 'Generated.Wayland.Client.Global'.
+--
 module Wayland.Client.Interface
 
-  -- * Misc. Constants
-  ( U.wL_MAX_MESSAGE_SIZE, C.wL_MARSHAL_FLAG_DESTROY
+  -- * Constants
+  --
+  ( U.wL_MAX_MESSAGE_SIZE
+  , C.wL_MARSHAL_FLAG_DESTROY
 
-  -- * Wayland Interface
-
-  -- ** Const pointers
-  , toConstPtr
-
-  -- TODO
+  -- * Interfaces (global)
+  --
+  -- For binding to the registry, etc.
   , wl_display_interface
   , wl_registry_interface
   , wl_callback_interface
@@ -41,32 +41,34 @@ module Wayland.Client.Interface
   , wl_subsurface_interface
   , wl_fixes_interface
 
-  -- -- ** Plain values
-  -- , G.wl_display_interface
-  -- , G.wl_registry_interface
-  -- , G.wl_callback_interface
-  -- , G.wl_compositor_interface
-  -- , G.wl_shm_pool_interface
-  -- , G.wl_shm_interface
-  -- , G.wl_buffer_interface
-  -- , G.wl_data_offer_interface
-  -- , G.wl_data_source_interface
-  -- , G.wl_data_device_interface
-  -- , G.wl_data_device_manager_interface
-  -- , G.wl_shell_interface
-  -- , G.wl_shell_surface_interface
-  -- , G.wl_surface_interface
-  -- , G.wl_seat_interface
-  -- , G.wl_pointer_interface
-  -- , G.wl_keyboard_interface
-  -- , G.wl_touch_interface
-  -- , G.wl_output_interface
-  -- , G.wl_region_interface
-  -- , G.wl_subcompositor_interface
-  -- , G.wl_subsurface_interface
-  -- , G.wl_fixes_interface
+  -- ** Plain values
 
-  -- * Object types
+  , wl_display_interface'
+  , wl_registry_interface'
+  , wl_callback_interface'
+  , wl_compositor_interface'
+  , wl_shm_pool_interface'
+  , wl_shm_interface'
+  , wl_buffer_interface'
+  , wl_data_offer_interface'
+  , wl_data_source_interface'
+  , wl_data_device_interface'
+  , wl_data_device_manager_interface'
+  , wl_shell_interface'
+  , wl_shell_surface_interface'
+  , wl_surface_interface'
+  , wl_seat_interface'
+  , wl_pointer_interface'
+  , wl_keyboard_interface'
+  , wl_touch_interface'
+  , wl_output_interface'
+  , wl_region_interface'
+  , wl_subcompositor_interface'
+  , wl_subsurface_interface'
+  , wl_fixes_interface'
+
+  -- * Objects
+
   , U.Wl_object
   , U.Wl_message
   , U.Wl_interface
@@ -100,7 +102,8 @@ module Wayland.Client.Interface
   , C.Wl_surface
   , C.Wl_touch
 
-  -- * Event listeners
+  -- ** Event listeners
+
   , C.Wl_display_listener(..)
   , C.Wl_registry_listener(..)
   , C.Wl_callback_listener(..)
@@ -110,10 +113,11 @@ module Wayland.Client.Interface
   , C.Wl_data_source_listener(..)
   , C.Wl_data_device_listener(..)
 
-   -- * What's this?
+   -- | XXX: What's this?
   , U.Wl_dispatcher_func_t(..)
 
   -- * Data Device Manager
+
   , C.Wl_data_device_manager_dnd_action(..)
   , pattern C.WL_DATA_DEVICE_MANAGER_DND_ACTION_NONE
   , pattern C.WL_DATA_DEVICE_MANAGER_DND_ACTION_COPY
@@ -121,6 +125,7 @@ module Wayland.Client.Interface
   , pattern C.WL_DATA_DEVICE_MANAGER_DND_ACTION_ASK
 
   -- * Shell Surfaces
+
   , C.Wl_shell_surface_resize(..)
   , pattern C.WL_SHELL_SURFACE_RESIZE_NONE
   , pattern C.WL_SHELL_SURFACE_RESIZE_TOP
@@ -141,6 +146,7 @@ module Wayland.Client.Interface
   , C.Wl_shell_surface_listener(..)
 
   -- * WL Surface
+
   , C.Wl_surface_error(..)
   , pattern C.WL_SURFACE_ERROR_INVALID_SCALE
   , pattern C.WL_SURFACE_ERROR_INVALID_TRANSFORM
@@ -150,6 +156,7 @@ module Wayland.Client.Interface
   , C.Wl_surface_listener(..)
 
    -- * Wl_Seat
+
   , C.Wl_seat_capability(..)
   , pattern C.WL_SEAT_CAPABILITY_POINTER
   , pattern C.WL_SEAT_CAPABILITY_KEYBOARD
@@ -159,6 +166,7 @@ module Wayland.Client.Interface
   , C.Wl_seat_listener(..)
 
   -- * Pointers
+
   , C.Wl_pointer_error(..)
   , pattern C.WL_POINTER_ERROR_ROLE
   , C.Wl_pointer_button_state(..)
@@ -178,6 +186,7 @@ module Wayland.Client.Interface
   , C.Wl_pointer_listener(..)
 
   -- * Keyboards / Touch
+
   , C.Wl_keyboard_keymap_format(..)
   , pattern C.WL_KEYBOARD_KEYMAP_FORMAT_NO_KEYMAP
   , pattern C.WL_KEYBOARD_KEYMAP_FORMAT_XKB_V1
@@ -189,6 +198,7 @@ module Wayland.Client.Interface
   , C.Wl_touch_listener(..)
 
   -- *  Outputs
+
   , C.Wl_output_subpixel(..)
   , pattern C.WL_OUTPUT_SUBPIXEL_UNKNOWN
   , pattern C.WL_OUTPUT_SUBPIXEL_NONE
@@ -211,20 +221,26 @@ module Wayland.Client.Interface
   , C.Wl_output_listener(..)
 
    -- * Subcompositor
+
   , C.Wl_subcompositor_error(..)
   , pattern C.WL_SUBCOMPOSITOR_ERROR_BAD_SURFACE
   , pattern C.WL_SUBCOMPOSITOR_ERROR_BAD_PARENT
 
   -- * Subsurface
+
   , C.Wl_subsurface_error(..)
   , pattern C.WL_SUBSURFACE_ERROR_BAD_SURFACE
 
   -- * SHM Format
+
+  -- | All "pattern C.WL_SHM_FORMAT_????????"  omitted for brevity.
+  -- They are exported from another module if you need them.
   , C.Wl_shm_format(..)
 
   -- * Errors
 
-  -- * Display Error
+  -- ** Display Error
+
   , C.Wl_display_error(..)
   , pattern C.WL_DISPLAY_ERROR_INVALID_OBJECT
   , pattern C.WL_DISPLAY_ERROR_INVALID_METHOD
@@ -232,6 +248,7 @@ module Wayland.Client.Interface
   , pattern C.WL_DISPLAY_ERROR_IMPLEMENTATION
 
   -- ** Data Offer Error
+
   , C.Wl_data_offer_error(..)
   , pattern C.WL_DATA_OFFER_ERROR_INVALID_FINISH
   , pattern C.WL_DATA_OFFER_ERROR_INVALID_ACTION_MASK
@@ -239,17 +256,20 @@ module Wayland.Client.Interface
   , pattern C.WL_DATA_OFFER_ERROR_INVALID_OFFER
 
   -- ** SHM Error
+
   , C.Wl_shm_error(..)
   , pattern C.WL_SHM_ERROR_INVALID_FORMAT
   , pattern C.WL_SHM_ERROR_INVALID_STRIDE
   , pattern C.WL_SHM_ERROR_INVALID_FD
 
   -- ** Data Source Error
+
   , C.Wl_data_source_error(..)
   , pattern C.WL_DATA_SOURCE_ERROR_INVALID_ACTION_MASK
   , pattern C.WL_DATA_SOURCE_ERROR_INVALID_SOURCE
 
   -- ** Shell error
+
   , C.Wl_shell_error(..)
   , pattern C.WL_SHELL_ERROR_ROLE
 
@@ -259,129 +279,6 @@ module Wayland.Client.Interface
   , pattern C.WL_DATA_DEVICE_ERROR_ROLE
   , pattern C.WL_DATA_DEVICE_ERROR_USED_SOURCE
 
-  -- , pattern C.WL_SHM_FORMAT_ARGB8888
-  -- , pattern C.WL_SHM_FORMAT_XRGB8888
-  -- , pattern C.WL_SHM_FORMAT_C8
-  -- , pattern C.WL_SHM_FORMAT_RGB332
-  -- , pattern C.WL_SHM_FORMAT_BGR233
-  -- , pattern C.WL_SHM_FORMAT_XRGB4444
-  -- , pattern C.WL_SHM_FORMAT_XBGR4444
-  -- , pattern C.WL_SHM_FORMAT_RGBX4444
-  -- , pattern C.WL_SHM_FORMAT_BGRX4444
-  -- , pattern C.WL_SHM_FORMAT_ARGB4444
-  -- , pattern C.WL_SHM_FORMAT_ABGR4444
-  -- , pattern C.WL_SHM_FORMAT_RGBA4444
-  -- , pattern C.WL_SHM_FORMAT_BGRA4444
-  -- , pattern C.WL_SHM_FORMAT_XRGB1555
-  -- , pattern C.WL_SHM_FORMAT_XBGR1555
-  -- , pattern C.WL_SHM_FORMAT_RGBX5551
-  -- , pattern C.WL_SHM_FORMAT_BGRX5551
-  -- , pattern C.WL_SHM_FORMAT_ARGB1555
-  -- , pattern C.WL_SHM_FORMAT_ABGR1555
-  -- , pattern C.WL_SHM_FORMAT_RGBA5551
-  -- , pattern C.WL_SHM_FORMAT_BGRA5551
-  -- , pattern C.WL_SHM_FORMAT_RGB565
-  -- , pattern C.WL_SHM_FORMAT_BGR565
-  -- , pattern C.WL_SHM_FORMAT_RGB888
-  -- , pattern C.WL_SHM_FORMAT_BGR888
-  -- , pattern C.WL_SHM_FORMAT_XBGR8888
-  -- , pattern C.WL_SHM_FORMAT_RGBX8888
-  -- , pattern C.WL_SHM_FORMAT_BGRX8888
-  -- , pattern C.WL_SHM_FORMAT_ABGR8888
-  -- , pattern C.WL_SHM_FORMAT_RGBA8888
-  -- , pattern C.WL_SHM_FORMAT_BGRA8888
-  -- , pattern C.WL_SHM_FORMAT_XRGB2101010
-  -- , pattern C.WL_SHM_FORMAT_XBGR2101010
-  -- , pattern C.WL_SHM_FORMAT_RGBX1010102
-  -- , pattern C.WL_SHM_FORMAT_BGRX1010102
-  -- , pattern C.WL_SHM_FORMAT_ARGB2101010
-  -- , pattern C.WL_SHM_FORMAT_ABGR2101010
-  -- , pattern C.WL_SHM_FORMAT_RGBA1010102
-  -- , pattern C.WL_SHM_FORMAT_BGRA1010102
-  -- , pattern C.WL_SHM_FORMAT_YUYV
-  -- , pattern C.WL_SHM_FORMAT_YVYU
-  -- , pattern C.WL_SHM_FORMAT_UYVY
-  -- , pattern C.WL_SHM_FORMAT_VYUY
-  -- , pattern C.WL_SHM_FORMAT_AYUV
-  -- , pattern C.WL_SHM_FORMAT_NV12
-  -- , pattern C.WL_SHM_FORMAT_NV21
-  -- , pattern C.WL_SHM_FORMAT_NV16
-  -- , pattern C.WL_SHM_FORMAT_NV61
-  -- , pattern C.WL_SHM_FORMAT_YUV410
-  -- , pattern C.WL_SHM_FORMAT_YVU410
-  -- , pattern C.WL_SHM_FORMAT_YUV411
-  -- , pattern C.WL_SHM_FORMAT_YVU411
-  -- , pattern C.WL_SHM_FORMAT_YUV420
-  -- , pattern C.WL_SHM_FORMAT_YVU420
-  -- , pattern C.WL_SHM_FORMAT_YUV422
-  -- , pattern C.WL_SHM_FORMAT_YVU422
-  -- , pattern C.WL_SHM_FORMAT_YUV444
-  -- , pattern C.WL_SHM_FORMAT_YVU444
-  -- , pattern C.WL_SHM_FORMAT_R8
-  -- , pattern C.WL_SHM_FORMAT_R16
-  -- , pattern C.WL_SHM_FORMAT_RG88
-  -- , pattern C.WL_SHM_FORMAT_GR88
-  -- , pattern C.WL_SHM_FORMAT_RG1616
-  -- , pattern C.WL_SHM_FORMAT_GR1616
-  -- , pattern C.WL_SHM_FORMAT_XRGB16161616F
-  -- , pattern C.WL_SHM_FORMAT_XBGR16161616F
-  -- , pattern C.WL_SHM_FORMAT_ARGB16161616F
-  -- , pattern C.WL_SHM_FORMAT_ABGR16161616F
-  -- , pattern C.WL_SHM_FORMAT_XYUV8888
-  -- , pattern C.WL_SHM_FORMAT_VUY888
-  -- , pattern C.WL_SHM_FORMAT_VUY101010
-  -- , pattern C.WL_SHM_FORMAT_Y210
-  -- , pattern C.WL_SHM_FORMAT_Y212
-  -- , pattern C.WL_SHM_FORMAT_Y216
-  -- , pattern C.WL_SHM_FORMAT_Y410
-  -- , pattern C.WL_SHM_FORMAT_Y412
-  -- , pattern C.WL_SHM_FORMAT_Y416
-  -- , pattern C.WL_SHM_FORMAT_XVYU2101010
-  -- , pattern C.WL_SHM_FORMAT_XVYU12_16161616
-  -- , pattern C.WL_SHM_FORMAT_XVYU16161616
-  -- , pattern C.WL_SHM_FORMAT_Y0L0
-  -- , pattern C.WL_SHM_FORMAT_X0L0
-  -- , pattern C.WL_SHM_FORMAT_Y0L2
-  -- , pattern C.WL_SHM_FORMAT_X0L2
-  -- , pattern C.WL_SHM_FORMAT_YUV420_8BIT
-  -- , pattern C.WL_SHM_FORMAT_YUV420_10BIT
-  -- , pattern C.WL_SHM_FORMAT_XRGB8888_A8
-  -- , pattern C.WL_SHM_FORMAT_XBGR8888_A8
-  -- , pattern C.WL_SHM_FORMAT_RGBX8888_A8
-  -- , pattern C.WL_SHM_FORMAT_BGRX8888_A8
-  -- , pattern C.WL_SHM_FORMAT_RGB888_A8
-  -- , pattern C.WL_SHM_FORMAT_BGR888_A8
-  -- , pattern C.WL_SHM_FORMAT_RGB565_A8
-  -- , pattern C.WL_SHM_FORMAT_BGR565_A8
-  -- , pattern C.WL_SHM_FORMAT_NV24
-  -- , pattern C.WL_SHM_FORMAT_NV42
-  -- , pattern C.WL_SHM_FORMAT_P210
-  -- , pattern C.WL_SHM_FORMAT_P010
-  -- , pattern C.WL_SHM_FORMAT_P012
-  -- , pattern C.WL_SHM_FORMAT_P016
-  -- , pattern C.WL_SHM_FORMAT_AXBXGXRX106106106106
-  -- , pattern C.WL_SHM_FORMAT_NV15
-  -- , pattern C.WL_SHM_FORMAT_Q410
-  -- , pattern C.WL_SHM_FORMAT_Q401
-  -- , pattern C.WL_SHM_FORMAT_XRGB16161616
-  -- , pattern C.WL_SHM_FORMAT_XBGR16161616
-  -- , pattern C.WL_SHM_FORMAT_ARGB16161616
-  -- , pattern C.WL_SHM_FORMAT_ABGR16161616
-  -- , pattern C.WL_SHM_FORMAT_C1
-  -- , pattern C.WL_SHM_FORMAT_C2
-  -- , pattern C.WL_SHM_FORMAT_C4
-  -- , pattern C.WL_SHM_FORMAT_D1
-  -- , pattern C.WL_SHM_FORMAT_D2
-  -- , pattern C.WL_SHM_FORMAT_D4
-  -- , pattern C.WL_SHM_FORMAT_D8
-  -- , pattern C.WL_SHM_FORMAT_R1
-  -- , pattern C.WL_SHM_FORMAT_R2
-  -- , pattern C.WL_SHM_FORMAT_R4
-  -- , pattern C.WL_SHM_FORMAT_R10
-  -- , pattern C.WL_SHM_FORMAT_R12
-  -- , pattern C.WL_SHM_FORMAT_AVUY8888
-  -- , pattern C.WL_SHM_FORMAT_XVUY8888
-  -- , pattern C.WL_SHM_FORMAT_P030
   ) where
 
 import qualified Generated.Wayland.Client as C
@@ -389,41 +286,30 @@ import qualified Generated.Wayland.Client.Global as G
 import           Generated.Wayland.Util (Wl_interface)
 import qualified Generated.Wayland.Util as U
 
-import           Foreign
-import           Foreign.C.ConstPtr
 import           Wayland.Client.Internal.TH
-import Language.Haskell.TH
-import System.IO.Unsafe (unsafePerformIO)
-
---import qualified HsBindgen.Runtime.PtrConst as PtrConst
-
--- | The generator hides the ConstPtr values... But we can re-create them here.
-toConstPtr :: Wl_interface -> IO (ConstPtr Wl_interface)
-toConstPtr x = malloc >>= \ptr -> poke ptr x >> pure (ConstPtr ptr)
 
 $(getConstPtrs
-  [ ("wl_display_interface"              , varE 'G.wl_display_interface            )
-  , ("wl_registry_interface"             , varE 'G.wl_registry_interface           )
-  , ("wl_callback_interface"             , varE 'G.wl_callback_interface           )
-  , ("wl_compositor_interface"           , varE 'G.wl_compositor_interface         )
-  , ("wl_shm_pool_interface"             , varE 'G.wl_shm_pool_interface           )
-  , ("wl_shm_interface"                  , varE 'G.wl_shm_interface                )
-  , ("wl_buffer_interface"               , varE 'G.wl_buffer_interface             )
-  , ("wl_data_offer_interface"           , varE 'G.wl_data_offer_interface         )
-  , ("wl_data_source_interface"          , varE 'G.wl_data_source_interface        )
-  , ("wl_data_device_interface"          , varE 'G.wl_data_device_interface        )
-  , ("wl_data_device_manager_interface"  , varE 'G.wl_data_device_manager_interface)
-  , ("wl_shell_interface"                , varE 'G.wl_shell_interface              )
-  , ("wl_shell_surface_interface"        , varE 'G.wl_shell_surface_interface      )
-  , ("wl_surface_interface"              , varE 'G.wl_surface_interface            )
-  , ("wl_seat_interface"                 , varE 'G.wl_seat_interface               )
-  , ("wl_pointer_interface"              , varE 'G.wl_pointer_interface            )
-  , ("wl_keyboard_interface"             , varE 'G.wl_keyboard_interface           )
-  , ("wl_touch_interface"                , varE 'G.wl_touch_interface              )
-  , ("wl_output_interface"               , varE 'G.wl_output_interface             )
-  , ("wl_region_interface"               , varE 'G.wl_region_interface             )
-  , ("wl_subcompositor_interface"        , varE 'G.wl_subcompositor_interface      )
-  , ("wl_subsurface_interface"           , varE 'G.wl_subsurface_interface         )
-  , ("wl_fixes_interface"                , varE 'G.wl_fixes_interface              )
-  ]
- )
+  [ ("wl_display_interface"             , 'G.wl_display_interface            )
+  , ("wl_registry_interface"            , 'G.wl_registry_interface           )
+  , ("wl_callback_interface"            , 'G.wl_callback_interface           )
+  , ("wl_compositor_interface"          , 'G.wl_compositor_interface         )
+  , ("wl_shm_pool_interface"            , 'G.wl_shm_pool_interface           )
+  , ("wl_shm_interface"                 , 'G.wl_shm_interface                )
+  , ("wl_buffer_interface"              , 'G.wl_buffer_interface             )
+  , ("wl_data_offer_interface"          , 'G.wl_data_offer_interface         )
+  , ("wl_data_source_interface"         , 'G.wl_data_source_interface        )
+  , ("wl_data_device_interface"         , 'G.wl_data_device_interface        )
+  , ("wl_data_device_manager_interface" , 'G.wl_data_device_manager_interface)
+  , ("wl_shell_interface"               , 'G.wl_shell_interface              )
+  , ("wl_shell_surface_interface"       , 'G.wl_shell_surface_interface      )
+  , ("wl_surface_interface"             , 'G.wl_surface_interface            )
+  , ("wl_seat_interface"                , 'G.wl_seat_interface               )
+  , ("wl_pointer_interface"             , 'G.wl_pointer_interface            )
+  , ("wl_keyboard_interface"            , 'G.wl_keyboard_interface           )
+  , ("wl_touch_interface"               , 'G.wl_touch_interface              )
+  , ("wl_output_interface"              , 'G.wl_output_interface             )
+  , ("wl_region_interface"              , 'G.wl_region_interface             )
+  , ("wl_subcompositor_interface"       , 'G.wl_subcompositor_interface      )
+  , ("wl_subsurface_interface"          , 'G.wl_subsurface_interface         )
+  , ("wl_fixes_interface"               , 'G.wl_fixes_interface              )
+  ])

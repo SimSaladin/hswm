@@ -1,33 +1,30 @@
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE QuasiQuotes           #-}
+{-# LANGUAGE TemplateHaskellQuotes #-}
 
 module Wayland.Client.Internal.TH where
 
-import Language.Haskell.TH
-import Language.Haskell.TH.Quote
-import Foreign
-import Foreign.C.ConstPtr
+import           Foreign
+import           Foreign.C.ConstPtr
+import           Language.Haskell.TH
+import           System.IO.Unsafe (unsafePerformIO)
 
--- -- | The generator hides the ConstPtr values... But we can re-create them here.
--- toConstPtr :: Wl_interface -> IO (ConstPtr Wl_interface)
--- toConstPtr x = alloca $ \p -> do poke p x
---                                  pure (ConstPtr p)
+-- | The generator hides the ConstPtr values... But we can re-create them here.
+toConstPtr :: Storable a => a -> IO (ConstPtr a)
+toConstPtr x = malloc >>= \ptr -> poke ptr x >> pure (ConstPtr ptr)
 
-getConstPtrs :: [(String, Q Exp)] -> Q [Dec]
+getConstPtrs :: [(String, Name)] -> Q [Dec]
 getConstPtrs defs = concat <$> mapM mk defs
   where
-    -- mk :: (String, a) -> Q [Dec]
-    mk (name, def) = do
-      let n = mkName name
-
-      let tv = mkName "Wl_interface"
-
-      sig <- sigD n $ appT [t| ConstPtr |] (conT tv) -- (reifyType v) ---  Wl_interface |]
-
-      pragma <- pragInlD n NoInline FunLike AllPhases
-
-      let body = appE [| unsafePerformIO . toConstPtr |] def
-
-      val <- valD (varP n) (normalB body) []
-
-      return [sig, pragma, val]
+    mk (name, val) = do
+      let n = mkName name -- const pointer
+          n2 = mkName (name <> "'") -- refers to the interface struct directly
+          curType = reifyType val
+      sequence
+        -- New "foobar :: ConstPtr Wl_interface" with "{-# NOINLINE foobar #-}"
+        [ sigD n $ appT [t| ConstPtr |] curType
+        , pragInlD n NoInline FunLike AllPhases
+        , valD (varP n) (normalB $ appE [| unsafePerformIO . toConstPtr |] (varE val)) []
+        -- Old value renamed
+        , sigD n2 curType
+        , valD (varP n2) (normalB $ varE val) []
+        ]

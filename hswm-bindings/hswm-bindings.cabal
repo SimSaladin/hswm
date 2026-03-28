@@ -61,6 +61,8 @@ library
           Generated.Wayland.Util.FunPtr
           Generated.Wayland.Util.Safe
           Generated.Wayland.Util.Unsafe
+          River.Interfaces
+          Wayland.Client
           Wayland.Client.Interface
           Wayland.Client.Internal.TH
     other-modules:

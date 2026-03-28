@@ -5,7 +5,7 @@ PROTODIR	:= ./protocol
 HEADERDIR := ./cbits
 CDIR	:= ./cbits
 PROTOS	:= river-window-management-v1.xml river-xkb-bindings-v1.xml river-xkb-config-v1.xml \
-		   river-input-management-v1.xml river-layer-shell-v1.xml
+		   river-input-management-v1.xml river-layer-shell-v1.xml river-libinput-config-v1.xml
 
 CLIENT_HEADERS := $(PROTOS:.xml=-client-protocol.h)
 PRIVATE_CODE   := $(PROTOS:.xml=-protocol.c)
@@ -56,11 +56,6 @@ $(bindGenSpecDir)/Generated.Wayland.Client.yaml: FORCE $(bindGenSpecDir)/Generat
 	  --select-except-by-decl-name wl_log_func_t \
 	  --select-except-by-decl-name wl_log_set_handler_client
 
- #   --select-except-by-decl-name wl_proxy_marshal_flags \
- #   --select-except-by-decl-name wl_proxy_marshal \
- #   --select-except-by-decl-name wl_proxy_marshal_constructor \
- #   --select-except-by-decl-name wl_proxy_marshal_constructor_versioned \
-
 $(bindGenSpecDir)/Generated.River.InputManagementV1.yaml: $(HEADERDIR)/river-input-management-v1-client-protocol.h $(bindGenSpecDir)/Generated.Wayland.Client.yaml $(bindGenSpecDir)/Generated.Wayland.Util.yaml FORCE
 	$(HS_BIND_GEN) $(<F) \
 	  --gen-binding-spec $@ \
@@ -94,6 +89,14 @@ $(bindGenSpecDir)/Generated.River.XkbBindingsV1.yaml: $(HEADERDIR)/river-xkb-bin
 	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml
 
 $(bindGenSpecDir)/Generated.River.LayoutShellV1.yaml: $(HEADERDIR)/river-layer-shell-v1-client-protocol.h $(bindGenSpecDir)/Generated.Wayland.Client.yaml $(bindGenSpecDir)/Generated.Wayland.Util.yaml FORCE
+	$(HS_BIND_GEN) $(<F) \
+	  --gen-binding-spec $@ \
+	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \
+	  --module $(patsubst %.yaml,%,$(@F)) \
+	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Client.yaml \
+	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml
+
+$(bindGenSpecDir)/Generated.River.LibinputConfigV1.yaml: $(HEADERDIR)/river-libinput-config-v1-client-protocol.h $(bindGenSpecDir)/Generated.Wayland.Client.yaml $(bindGenSpecDir)/Generated.Wayland.Util.yaml FORCE
 	$(HS_BIND_GEN) $(<F) \
 	  --gen-binding-spec $@ \
 	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \

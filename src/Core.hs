@@ -7,25 +7,19 @@ module Core
   , module HSWM.Seats
   ) where
 
-import qualified Generated.Wayland.Client as GenWL
-import qualified Generated.Wayland.Client.Global as GenWl
-import qualified Generated.Wayland.Client.Unsafe as UnsafeWL
-
 import           HSWM.Operations
 import qualified HSWM.StackSet as W
 import           HSWM.Types
 import           HSWM.Seats
 import           River
 import           Wayland
-import           HSWM.Utils
+import qualified Wayland.Client as WL
 
 import qualified Data.List as L
 import qualified Data.TMap as TM
 import           Foreign hiding (new, void)
 import           System.Exit
 import           Data.IORef
-
-import           Foreign.C.ConstPtr
 
 startHSWM :: (LayoutClass l RiverWindow, Read (l RiverWindow)) => WlDisplay -> HSWMConfig l -> IO ()
 startHSWM display config = withStdoutLogging $ do
@@ -84,11 +78,18 @@ startHSWM display config = withStdoutLogging $ do
     -- Wait for one roundtrip for the registry listener to become aware of all current globals.
     _ <- liftIO $ wl_display_roundtrip display
 
-    wl_compositor <- getOrCreateObject $ requireGlobal conf.globals ("wl_compositor", 4) $ \(WlRegistry r) n v ->
-      io $ alloca $ \ifPtr -> do
-        poke ifPtr GenWl.wl_compositor_interface
-        UnsafeWL.wl_registry_bind (castPtr r) n (ConstPtr ifPtr) (fi v) >>= \p ->
-          return (castPtr p :: Ptr GenWL.Wl_compositor)
+    -- expect wl_compositor
+    _wl_compositor <- getOrCreateObject $ requireGlobal conf.globals ("wl_compositor", 4) $ \(WlRegistry r) n v ->
+      io $ WL.wl_registry_bind (castPtr r) n WL.wl_compositor_interface (fi v) >>= return . castPtr @_ @WL.Wl_compositor
+
+    -- expect wl_shm
+    _wl_shm <- getOrCreateObject $ requireGlobal conf.globals ("wl_shm", 1) $ \(WlRegistry r) n v ->
+      io $ WL.wl_registry_bind (castPtr r) n WL.wl_shm_interface (fi v) >>= return . castPtr @_ @WL.Wl_shm
+
+    -- TODO:
+    -- ("river_libinput_config_v1", 1)
+
+    -- ("river_layer_shell_v1", 1)
 
     windowManager <- getOrCreateObject $ requireGlobal conf.globals ("river_window_manager_v1", 4) $ \r n v -> wl_registry_bind r n river_window_manager_v1_interface v <&> RiverWindowManager
     _xkbBindings  <- getOrCreateObject $ requireGlobal conf.globals ("river_xkb_bindings_v1"  , 1) $ \r n v -> wl_registry_bind r n river_xkb_bindings_v1_interface   v <&> RiverXkbBindings
