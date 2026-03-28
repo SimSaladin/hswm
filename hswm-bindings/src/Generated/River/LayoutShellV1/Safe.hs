@@ -31,46 +31,46 @@ import Generated.River.LayoutShellV1
 
 $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.unlines
   [ "#include <river-layer-shell-v1-client-protocol.h>"
-  , "void hs_bindgen_78878904bbf35fbd ("
+  , "void hs_bindgen_e23900a99824f214 ("
   , "  struct river_layer_shell_v1 *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (river_layer_shell_v1_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_30250d0aecb0f04f ("
+  , "void *hs_bindgen_993c2222ad60ef88 ("
   , "  struct river_layer_shell_v1 *arg1"
   , ")"
   , "{"
   , "  return (river_layer_shell_v1_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_35d0e80747125705 ("
+  , "uint32_t hs_bindgen_c636ed822ca03686 ("
   , "  struct river_layer_shell_v1 *arg1"
   , ")"
   , "{"
   , "  return (river_layer_shell_v1_get_version)(arg1);"
   , "}"
-  , "void hs_bindgen_b0147e40fecd09e8 ("
+  , "void hs_bindgen_171742a2a96b5c94 ("
   , "  struct river_layer_shell_v1 *arg1"
   , ")"
   , "{"
   , "  (river_layer_shell_v1_destroy)(arg1);"
   , "}"
-  , "struct river_layer_shell_output_v1 *hs_bindgen_eea1136fa0e09bbb ("
+  , "struct river_layer_shell_output_v1 *hs_bindgen_f0c8c1a3e5edd7c2 ("
   , "  struct river_layer_shell_v1 *arg1,"
   , "  struct river_output_v1 *arg2"
   , ")"
   , "{"
   , "  return (river_layer_shell_v1_get_output)(arg1, arg2);"
   , "}"
-  , "struct river_layer_shell_seat_v1 *hs_bindgen_f2a67327d0332cb3 ("
+  , "struct river_layer_shell_seat_v1 *hs_bindgen_61218fa55dd20694 ("
   , "  struct river_layer_shell_v1 *arg1,"
   , "  struct river_seat_v1 *arg2"
   , ")"
   , "{"
   , "  return (river_layer_shell_v1_get_seat)(arg1, arg2);"
   , "}"
-  , "signed int hs_bindgen_36ed917ca81d9aa7 ("
+  , "signed int hs_bindgen_ae16df063676961f ("
   , "  struct river_layer_shell_output_v1 *arg1,"
   , "  struct river_layer_shell_output_v1_listener const *arg2,"
   , "  void *arg3"
@@ -78,38 +78,38 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (river_layer_shell_output_v1_add_listener)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_b6fb47d57f8d5c2f ("
+  , "void hs_bindgen_821b7456919066e0 ("
   , "  struct river_layer_shell_output_v1 *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (river_layer_shell_output_v1_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_a293881c16b9cb6b ("
+  , "void *hs_bindgen_2746d0e49d70d796 ("
   , "  struct river_layer_shell_output_v1 *arg1"
   , ")"
   , "{"
   , "  return (river_layer_shell_output_v1_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_ed4c4e219d0fadaa ("
+  , "uint32_t hs_bindgen_667ccea8b6b64af6 ("
   , "  struct river_layer_shell_output_v1 *arg1"
   , ")"
   , "{"
   , "  return (river_layer_shell_output_v1_get_version)(arg1);"
   , "}"
-  , "void hs_bindgen_9e46cbd54e810e38 ("
+  , "void hs_bindgen_ba366e1aa3375bb2 ("
   , "  struct river_layer_shell_output_v1 *arg1"
   , ")"
   , "{"
   , "  (river_layer_shell_output_v1_destroy)(arg1);"
   , "}"
-  , "void hs_bindgen_69d0daaafd1a6349 ("
+  , "void hs_bindgen_48dcc702c23fc260 ("
   , "  struct river_layer_shell_output_v1 *arg1"
   , ")"
   , "{"
   , "  (river_layer_shell_output_v1_set_default)(arg1);"
   , "}"
-  , "signed int hs_bindgen_56fdb642a39dd198 ("
+  , "signed int hs_bindgen_f84fa5ab4aba165b ("
   , "  struct river_layer_shell_seat_v1 *arg1,"
   , "  struct river_layer_shell_seat_v1_listener const *arg2,"
   , "  void *arg3"
@@ -117,26 +117,26 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (river_layer_shell_seat_v1_add_listener)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_42dac0f92250066d ("
+  , "void hs_bindgen_99df98e1501e9b21 ("
   , "  struct river_layer_shell_seat_v1 *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (river_layer_shell_seat_v1_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_bf16c1fd7e8ff9f5 ("
+  , "void *hs_bindgen_180125ba6dcb00d3 ("
   , "  struct river_layer_shell_seat_v1 *arg1"
   , ")"
   , "{"
   , "  return (river_layer_shell_seat_v1_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_20c2c6b09ada5b17 ("
+  , "uint32_t hs_bindgen_45625588c54c67ea ("
   , "  struct river_layer_shell_seat_v1 *arg1"
   , ")"
   , "{"
   , "  return (river_layer_shell_seat_v1_get_version)(arg1);"
   , "}"
-  , "void hs_bindgen_30472c87a8bbd75d ("
+  , "void hs_bindgen_4249b798d7b69cd2 ("
   , "  struct river_layer_shell_seat_v1 *arg1"
   , ")"
   , "{"
@@ -144,19 +144,19 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "}"
   ]))
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_v1_set_user_data@
-foreign import ccall safe "hs_bindgen_78878904bbf35fbd" hs_bindgen_78878904bbf35fbd_base ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_v1_set_user_data@
+foreign import ccall safe "hs_bindgen_e23900a99824f214" hs_bindgen_e23900a99824f214_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_v1_set_user_data@
-hs_bindgen_78878904bbf35fbd ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_v1_set_user_data@
+hs_bindgen_e23900a99824f214 ::
      RIP.Ptr River_layer_shell_v1
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_78878904bbf35fbd =
-  RIP.fromFFIType hs_bindgen_78878904bbf35fbd_base
+hs_bindgen_e23900a99824f214 =
+  RIP.fromFFIType hs_bindgen_e23900a99824f214_base
 
 {-|
 
@@ -175,19 +175,19 @@ river_layer_shell_v1_set_user_data ::
      -- ^ __C declaration:__ @user_data@
   -> IO ()
 river_layer_shell_v1_set_user_data =
-  hs_bindgen_78878904bbf35fbd
+  hs_bindgen_e23900a99824f214
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_v1_get_user_data@
-foreign import ccall safe "hs_bindgen_30250d0aecb0f04f" hs_bindgen_30250d0aecb0f04f_base ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_v1_get_user_data@
+foreign import ccall safe "hs_bindgen_993c2222ad60ef88" hs_bindgen_993c2222ad60ef88_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_v1_get_user_data@
-hs_bindgen_30250d0aecb0f04f ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_v1_get_user_data@
+hs_bindgen_993c2222ad60ef88 ::
      RIP.Ptr River_layer_shell_v1
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_30250d0aecb0f04f =
-  RIP.fromFFIType hs_bindgen_30250d0aecb0f04f_base
+hs_bindgen_993c2222ad60ef88 =
+  RIP.fromFFIType hs_bindgen_993c2222ad60ef88_base
 
 {-|
 
@@ -204,19 +204,19 @@ river_layer_shell_v1_get_user_data ::
      -- ^ __C declaration:__ @river_layer_shell_v1@
   -> IO (RIP.Ptr RIP.Void)
 river_layer_shell_v1_get_user_data =
-  hs_bindgen_30250d0aecb0f04f
+  hs_bindgen_993c2222ad60ef88
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_v1_get_version@
-foreign import ccall safe "hs_bindgen_35d0e80747125705" hs_bindgen_35d0e80747125705_base ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_v1_get_version@
+foreign import ccall safe "hs_bindgen_c636ed822ca03686" hs_bindgen_c636ed822ca03686_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_v1_get_version@
-hs_bindgen_35d0e80747125705 ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_v1_get_version@
+hs_bindgen_c636ed822ca03686 ::
      RIP.Ptr River_layer_shell_v1
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_35d0e80747125705 =
-  RIP.fromFFIType hs_bindgen_35d0e80747125705_base
+hs_bindgen_c636ed822ca03686 =
+  RIP.fromFFIType hs_bindgen_c636ed822ca03686_base
 
 {-| __C declaration:__ @river_layer_shell_v1_get_version@
 
@@ -229,19 +229,19 @@ river_layer_shell_v1_get_version ::
      -- ^ __C declaration:__ @river_layer_shell_v1@
   -> IO HsBindgen.Runtime.LibC.Word32
 river_layer_shell_v1_get_version =
-  hs_bindgen_35d0e80747125705
+  hs_bindgen_c636ed822ca03686
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_v1_destroy@
-foreign import ccall safe "hs_bindgen_b0147e40fecd09e8" hs_bindgen_b0147e40fecd09e8_base ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_v1_destroy@
+foreign import ccall safe "hs_bindgen_171742a2a96b5c94" hs_bindgen_171742a2a96b5c94_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_v1_destroy@
-hs_bindgen_b0147e40fecd09e8 ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_v1_destroy@
+hs_bindgen_171742a2a96b5c94 ::
      RIP.Ptr River_layer_shell_v1
   -> IO ()
-hs_bindgen_b0147e40fecd09e8 =
-  RIP.fromFFIType hs_bindgen_b0147e40fecd09e8_base
+hs_bindgen_171742a2a96b5c94 =
+  RIP.fromFFIType hs_bindgen_171742a2a96b5c94_base
 
 {-|
 
@@ -260,21 +260,21 @@ river_layer_shell_v1_destroy ::
      -- ^ __C declaration:__ @river_layer_shell_v1@
   -> IO ()
 river_layer_shell_v1_destroy =
-  hs_bindgen_b0147e40fecd09e8
+  hs_bindgen_171742a2a96b5c94
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_v1_get_output@
-foreign import ccall safe "hs_bindgen_eea1136fa0e09bbb" hs_bindgen_eea1136fa0e09bbb_base ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_v1_get_output@
+foreign import ccall safe "hs_bindgen_f0c8c1a3e5edd7c2" hs_bindgen_f0c8c1a3e5edd7c2_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_v1_get_output@
-hs_bindgen_eea1136fa0e09bbb ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_v1_get_output@
+hs_bindgen_f0c8c1a3e5edd7c2 ::
      RIP.Ptr River_layer_shell_v1
   -> RIP.Ptr River_output_v1
   -> IO (RIP.Ptr River_layer_shell_output_v1)
-hs_bindgen_eea1136fa0e09bbb =
-  RIP.fromFFIType hs_bindgen_eea1136fa0e09bbb_base
+hs_bindgen_f0c8c1a3e5edd7c2 =
+  RIP.fromFFIType hs_bindgen_f0c8c1a3e5edd7c2_base
 
 {-|
 
@@ -295,21 +295,21 @@ river_layer_shell_v1_get_output ::
      -- ^ __C declaration:__ @output@
   -> IO (RIP.Ptr River_layer_shell_output_v1)
 river_layer_shell_v1_get_output =
-  hs_bindgen_eea1136fa0e09bbb
+  hs_bindgen_f0c8c1a3e5edd7c2
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_v1_get_seat@
-foreign import ccall safe "hs_bindgen_f2a67327d0332cb3" hs_bindgen_f2a67327d0332cb3_base ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_v1_get_seat@
+foreign import ccall safe "hs_bindgen_61218fa55dd20694" hs_bindgen_61218fa55dd20694_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_v1_get_seat@
-hs_bindgen_f2a67327d0332cb3 ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_v1_get_seat@
+hs_bindgen_61218fa55dd20694 ::
      RIP.Ptr River_layer_shell_v1
   -> RIP.Ptr River_seat_v1
   -> IO (RIP.Ptr River_layer_shell_seat_v1)
-hs_bindgen_f2a67327d0332cb3 =
-  RIP.fromFFIType hs_bindgen_f2a67327d0332cb3_base
+hs_bindgen_61218fa55dd20694 =
+  RIP.fromFFIType hs_bindgen_61218fa55dd20694_base
 
 {-|
 
@@ -330,23 +330,23 @@ river_layer_shell_v1_get_seat ::
      -- ^ __C declaration:__ @seat@
   -> IO (RIP.Ptr River_layer_shell_seat_v1)
 river_layer_shell_v1_get_seat =
-  hs_bindgen_f2a67327d0332cb3
+  hs_bindgen_61218fa55dd20694
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_output_v1_add_listener@
-foreign import ccall safe "hs_bindgen_36ed917ca81d9aa7" hs_bindgen_36ed917ca81d9aa7_base ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_output_v1_add_listener@
+foreign import ccall safe "hs_bindgen_ae16df063676961f" hs_bindgen_ae16df063676961f_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_output_v1_add_listener@
-hs_bindgen_36ed917ca81d9aa7 ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_output_v1_add_listener@
+hs_bindgen_ae16df063676961f ::
      RIP.Ptr River_layer_shell_output_v1
   -> PtrConst.PtrConst River_layer_shell_output_v1_listener
   -> RIP.Ptr RIP.Void
   -> IO RIP.CInt
-hs_bindgen_36ed917ca81d9aa7 =
-  RIP.fromFFIType hs_bindgen_36ed917ca81d9aa7_base
+hs_bindgen_ae16df063676961f =
+  RIP.fromFFIType hs_bindgen_ae16df063676961f_base
 
 {-|
 
@@ -367,21 +367,21 @@ river_layer_shell_output_v1_add_listener ::
      -- ^ __C declaration:__ @data@
   -> IO RIP.CInt
 river_layer_shell_output_v1_add_listener =
-  hs_bindgen_36ed917ca81d9aa7
+  hs_bindgen_ae16df063676961f
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_output_v1_set_user_data@
-foreign import ccall safe "hs_bindgen_b6fb47d57f8d5c2f" hs_bindgen_b6fb47d57f8d5c2f_base ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_output_v1_set_user_data@
+foreign import ccall safe "hs_bindgen_821b7456919066e0" hs_bindgen_821b7456919066e0_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_output_v1_set_user_data@
-hs_bindgen_b6fb47d57f8d5c2f ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_output_v1_set_user_data@
+hs_bindgen_821b7456919066e0 ::
      RIP.Ptr River_layer_shell_output_v1
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_b6fb47d57f8d5c2f =
-  RIP.fromFFIType hs_bindgen_b6fb47d57f8d5c2f_base
+hs_bindgen_821b7456919066e0 =
+  RIP.fromFFIType hs_bindgen_821b7456919066e0_base
 
 {-|
 
@@ -400,19 +400,19 @@ river_layer_shell_output_v1_set_user_data ::
      -- ^ __C declaration:__ @user_data@
   -> IO ()
 river_layer_shell_output_v1_set_user_data =
-  hs_bindgen_b6fb47d57f8d5c2f
+  hs_bindgen_821b7456919066e0
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_output_v1_get_user_data@
-foreign import ccall safe "hs_bindgen_a293881c16b9cb6b" hs_bindgen_a293881c16b9cb6b_base ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_output_v1_get_user_data@
+foreign import ccall safe "hs_bindgen_2746d0e49d70d796" hs_bindgen_2746d0e49d70d796_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_output_v1_get_user_data@
-hs_bindgen_a293881c16b9cb6b ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_output_v1_get_user_data@
+hs_bindgen_2746d0e49d70d796 ::
      RIP.Ptr River_layer_shell_output_v1
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_a293881c16b9cb6b =
-  RIP.fromFFIType hs_bindgen_a293881c16b9cb6b_base
+hs_bindgen_2746d0e49d70d796 =
+  RIP.fromFFIType hs_bindgen_2746d0e49d70d796_base
 
 {-|
 
@@ -429,19 +429,19 @@ river_layer_shell_output_v1_get_user_data ::
      -- ^ __C declaration:__ @river_layer_shell_output_v1@
   -> IO (RIP.Ptr RIP.Void)
 river_layer_shell_output_v1_get_user_data =
-  hs_bindgen_a293881c16b9cb6b
+  hs_bindgen_2746d0e49d70d796
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_output_v1_get_version@
-foreign import ccall safe "hs_bindgen_ed4c4e219d0fadaa" hs_bindgen_ed4c4e219d0fadaa_base ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_output_v1_get_version@
+foreign import ccall safe "hs_bindgen_667ccea8b6b64af6" hs_bindgen_667ccea8b6b64af6_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_output_v1_get_version@
-hs_bindgen_ed4c4e219d0fadaa ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_output_v1_get_version@
+hs_bindgen_667ccea8b6b64af6 ::
      RIP.Ptr River_layer_shell_output_v1
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_ed4c4e219d0fadaa =
-  RIP.fromFFIType hs_bindgen_ed4c4e219d0fadaa_base
+hs_bindgen_667ccea8b6b64af6 =
+  RIP.fromFFIType hs_bindgen_667ccea8b6b64af6_base
 
 {-| __C declaration:__ @river_layer_shell_output_v1_get_version@
 
@@ -454,19 +454,19 @@ river_layer_shell_output_v1_get_version ::
      -- ^ __C declaration:__ @river_layer_shell_output_v1@
   -> IO HsBindgen.Runtime.LibC.Word32
 river_layer_shell_output_v1_get_version =
-  hs_bindgen_ed4c4e219d0fadaa
+  hs_bindgen_667ccea8b6b64af6
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_output_v1_destroy@
-foreign import ccall safe "hs_bindgen_9e46cbd54e810e38" hs_bindgen_9e46cbd54e810e38_base ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_output_v1_destroy@
+foreign import ccall safe "hs_bindgen_ba366e1aa3375bb2" hs_bindgen_ba366e1aa3375bb2_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_output_v1_destroy@
-hs_bindgen_9e46cbd54e810e38 ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_output_v1_destroy@
+hs_bindgen_ba366e1aa3375bb2 ::
      RIP.Ptr River_layer_shell_output_v1
   -> IO ()
-hs_bindgen_9e46cbd54e810e38 =
-  RIP.fromFFIType hs_bindgen_9e46cbd54e810e38_base
+hs_bindgen_ba366e1aa3375bb2 =
+  RIP.fromFFIType hs_bindgen_ba366e1aa3375bb2_base
 
 {-|
 
@@ -487,19 +487,19 @@ river_layer_shell_output_v1_destroy ::
      -- ^ __C declaration:__ @river_layer_shell_output_v1@
   -> IO ()
 river_layer_shell_output_v1_destroy =
-  hs_bindgen_9e46cbd54e810e38
+  hs_bindgen_ba366e1aa3375bb2
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_output_v1_set_default@
-foreign import ccall safe "hs_bindgen_69d0daaafd1a6349" hs_bindgen_69d0daaafd1a6349_base ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_output_v1_set_default@
+foreign import ccall safe "hs_bindgen_48dcc702c23fc260" hs_bindgen_48dcc702c23fc260_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_output_v1_set_default@
-hs_bindgen_69d0daaafd1a6349 ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_output_v1_set_default@
+hs_bindgen_48dcc702c23fc260 ::
      RIP.Ptr River_layer_shell_output_v1
   -> IO ()
-hs_bindgen_69d0daaafd1a6349 =
-  RIP.fromFFIType hs_bindgen_69d0daaafd1a6349_base
+hs_bindgen_48dcc702c23fc260 =
+  RIP.fromFFIType hs_bindgen_48dcc702c23fc260_base
 
 {-|
 
@@ -522,23 +522,23 @@ river_layer_shell_output_v1_set_default ::
      -- ^ __C declaration:__ @river_layer_shell_output_v1@
   -> IO ()
 river_layer_shell_output_v1_set_default =
-  hs_bindgen_69d0daaafd1a6349
+  hs_bindgen_48dcc702c23fc260
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_seat_v1_add_listener@
-foreign import ccall safe "hs_bindgen_56fdb642a39dd198" hs_bindgen_56fdb642a39dd198_base ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_seat_v1_add_listener@
+foreign import ccall safe "hs_bindgen_f84fa5ab4aba165b" hs_bindgen_f84fa5ab4aba165b_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_seat_v1_add_listener@
-hs_bindgen_56fdb642a39dd198 ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_seat_v1_add_listener@
+hs_bindgen_f84fa5ab4aba165b ::
      RIP.Ptr River_layer_shell_seat_v1
   -> PtrConst.PtrConst River_layer_shell_seat_v1_listener
   -> RIP.Ptr RIP.Void
   -> IO RIP.CInt
-hs_bindgen_56fdb642a39dd198 =
-  RIP.fromFFIType hs_bindgen_56fdb642a39dd198_base
+hs_bindgen_f84fa5ab4aba165b =
+  RIP.fromFFIType hs_bindgen_f84fa5ab4aba165b_base
 
 {-|
 
@@ -559,21 +559,21 @@ river_layer_shell_seat_v1_add_listener ::
      -- ^ __C declaration:__ @data@
   -> IO RIP.CInt
 river_layer_shell_seat_v1_add_listener =
-  hs_bindgen_56fdb642a39dd198
+  hs_bindgen_f84fa5ab4aba165b
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_seat_v1_set_user_data@
-foreign import ccall safe "hs_bindgen_42dac0f92250066d" hs_bindgen_42dac0f92250066d_base ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_seat_v1_set_user_data@
+foreign import ccall safe "hs_bindgen_99df98e1501e9b21" hs_bindgen_99df98e1501e9b21_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_seat_v1_set_user_data@
-hs_bindgen_42dac0f92250066d ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_seat_v1_set_user_data@
+hs_bindgen_99df98e1501e9b21 ::
      RIP.Ptr River_layer_shell_seat_v1
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_42dac0f92250066d =
-  RIP.fromFFIType hs_bindgen_42dac0f92250066d_base
+hs_bindgen_99df98e1501e9b21 =
+  RIP.fromFFIType hs_bindgen_99df98e1501e9b21_base
 
 {-|
 
@@ -592,19 +592,19 @@ river_layer_shell_seat_v1_set_user_data ::
      -- ^ __C declaration:__ @user_data@
   -> IO ()
 river_layer_shell_seat_v1_set_user_data =
-  hs_bindgen_42dac0f92250066d
+  hs_bindgen_99df98e1501e9b21
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_seat_v1_get_user_data@
-foreign import ccall safe "hs_bindgen_bf16c1fd7e8ff9f5" hs_bindgen_bf16c1fd7e8ff9f5_base ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_seat_v1_get_user_data@
+foreign import ccall safe "hs_bindgen_180125ba6dcb00d3" hs_bindgen_180125ba6dcb00d3_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_seat_v1_get_user_data@
-hs_bindgen_bf16c1fd7e8ff9f5 ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_seat_v1_get_user_data@
+hs_bindgen_180125ba6dcb00d3 ::
      RIP.Ptr River_layer_shell_seat_v1
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_bf16c1fd7e8ff9f5 =
-  RIP.fromFFIType hs_bindgen_bf16c1fd7e8ff9f5_base
+hs_bindgen_180125ba6dcb00d3 =
+  RIP.fromFFIType hs_bindgen_180125ba6dcb00d3_base
 
 {-|
 
@@ -621,19 +621,19 @@ river_layer_shell_seat_v1_get_user_data ::
      -- ^ __C declaration:__ @river_layer_shell_seat_v1@
   -> IO (RIP.Ptr RIP.Void)
 river_layer_shell_seat_v1_get_user_data =
-  hs_bindgen_bf16c1fd7e8ff9f5
+  hs_bindgen_180125ba6dcb00d3
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_seat_v1_get_version@
-foreign import ccall safe "hs_bindgen_20c2c6b09ada5b17" hs_bindgen_20c2c6b09ada5b17_base ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_seat_v1_get_version@
+foreign import ccall safe "hs_bindgen_45625588c54c67ea" hs_bindgen_45625588c54c67ea_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_seat_v1_get_version@
-hs_bindgen_20c2c6b09ada5b17 ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_seat_v1_get_version@
+hs_bindgen_45625588c54c67ea ::
      RIP.Ptr River_layer_shell_seat_v1
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_20c2c6b09ada5b17 =
-  RIP.fromFFIType hs_bindgen_20c2c6b09ada5b17_base
+hs_bindgen_45625588c54c67ea =
+  RIP.fromFFIType hs_bindgen_45625588c54c67ea_base
 
 {-| __C declaration:__ @river_layer_shell_seat_v1_get_version@
 
@@ -646,19 +646,19 @@ river_layer_shell_seat_v1_get_version ::
      -- ^ __C declaration:__ @river_layer_shell_seat_v1@
   -> IO HsBindgen.Runtime.LibC.Word32
 river_layer_shell_seat_v1_get_version =
-  hs_bindgen_20c2c6b09ada5b17
+  hs_bindgen_45625588c54c67ea
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_seat_v1_destroy@
-foreign import ccall safe "hs_bindgen_30472c87a8bbd75d" hs_bindgen_30472c87a8bbd75d_base ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_seat_v1_destroy@
+foreign import ccall safe "hs_bindgen_4249b798d7b69cd2" hs_bindgen_4249b798d7b69cd2_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_river_layershell_Generated.River.LayoutShellV1_Safe_river_layer_shell_seat_v1_destroy@
-hs_bindgen_30472c87a8bbd75d ::
+-- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_Safe_river_layer_shell_seat_v1_destroy@
+hs_bindgen_4249b798d7b69cd2 ::
      RIP.Ptr River_layer_shell_seat_v1
   -> IO ()
-hs_bindgen_30472c87a8bbd75d =
-  RIP.fromFFIType hs_bindgen_30472c87a8bbd75d_base
+hs_bindgen_4249b798d7b69cd2 =
+  RIP.fromFFIType hs_bindgen_4249b798d7b69cd2_base
 
 {-|
 
@@ -679,4 +679,4 @@ river_layer_shell_seat_v1_destroy ::
      -- ^ __C declaration:__ @river_layer_shell_seat_v1@
   -> IO ()
 river_layer_shell_seat_v1_destroy =
-  hs_bindgen_30472c87a8bbd75d
+  hs_bindgen_4249b798d7b69cd2

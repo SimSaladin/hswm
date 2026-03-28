@@ -38,9 +38,9 @@ import Generated.River.XkbConfigV1
 
 $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.unlines
   [ "#include <river-xkb-config-v1-client-protocol.h>"
-  , "/* hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_config_v1_add_listener */"
+  , "/* River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_config_v1_add_listener */"
   , "__attribute__ ((const))"
-  , "signed int (*hs_bindgen_0c674804d1c831f8 (void)) ("
+  , "signed int (*hs_bindgen_bf89e7ee822f14c5 (void)) ("
   , "  struct river_xkb_config_v1 *arg1,"
   , "  struct river_xkb_config_v1_listener const *arg2,"
   , "  void *arg3"
@@ -48,50 +48,50 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return &river_xkb_config_v1_add_listener;"
   , "}"
-  , "/* hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_config_v1_set_user_data */"
+  , "/* River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_config_v1_set_user_data */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_c92292a3176cf916 (void)) ("
+  , "void (*hs_bindgen_7d260c2fb92acda9 (void)) ("
   , "  struct river_xkb_config_v1 *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  return &river_xkb_config_v1_set_user_data;"
   , "}"
-  , "/* hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_config_v1_get_user_data */"
+  , "/* River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_config_v1_get_user_data */"
   , "__attribute__ ((const))"
-  , "void *(*hs_bindgen_88a377658449edfd (void)) ("
+  , "void *(*hs_bindgen_68ccdac259a3789c (void)) ("
   , "  struct river_xkb_config_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_xkb_config_v1_get_user_data;"
   , "}"
-  , "/* hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_config_v1_get_version */"
+  , "/* River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_config_v1_get_version */"
   , "__attribute__ ((const))"
-  , "uint32_t (*hs_bindgen_8cdef2af3769d847 (void)) ("
+  , "uint32_t (*hs_bindgen_a4471fa924db1268 (void)) ("
   , "  struct river_xkb_config_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_xkb_config_v1_get_version;"
   , "}"
-  , "/* hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_config_v1_stop */"
+  , "/* River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_config_v1_stop */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_77f4097121705f05 (void)) ("
+  , "void (*hs_bindgen_fca76dd34ef5601d (void)) ("
   , "  struct river_xkb_config_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_xkb_config_v1_stop;"
   , "}"
-  , "/* hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_config_v1_destroy */"
+  , "/* River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_config_v1_destroy */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_53f1294595fa0de5 (void)) ("
+  , "void (*hs_bindgen_1e0a17d3ebb7e27e (void)) ("
   , "  struct river_xkb_config_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_xkb_config_v1_destroy;"
   , "}"
-  , "/* hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_config_v1_create_keymap */"
+  , "/* River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_config_v1_create_keymap */"
   , "__attribute__ ((const))"
-  , "struct river_xkb_keymap_v1 *(*hs_bindgen_852d7a807cd3dab7 (void)) ("
+  , "struct river_xkb_keymap_v1 *(*hs_bindgen_bee2cbd885166ce9 (void)) ("
   , "  struct river_xkb_config_v1 *arg1,"
   , "  int32_t arg2,"
   , "  uint32_t arg3"
@@ -99,9 +99,9 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return &river_xkb_config_v1_create_keymap;"
   , "}"
-  , "/* hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_add_listener */"
+  , "/* River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_add_listener */"
   , "__attribute__ ((const))"
-  , "signed int (*hs_bindgen_d52d7e39122b1b9e (void)) ("
+  , "signed int (*hs_bindgen_9ecfece37c441a55 (void)) ("
   , "  struct river_xkb_keymap_v1 *arg1,"
   , "  struct river_xkb_keymap_v1_listener const *arg2,"
   , "  void *arg3"
@@ -109,42 +109,42 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return &river_xkb_keymap_v1_add_listener;"
   , "}"
-  , "/* hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_set_user_data */"
+  , "/* River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_set_user_data */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_a1e14ad444f739ae (void)) ("
+  , "void (*hs_bindgen_75aec50c63d2868b (void)) ("
   , "  struct river_xkb_keymap_v1 *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  return &river_xkb_keymap_v1_set_user_data;"
   , "}"
-  , "/* hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_get_user_data */"
+  , "/* River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_get_user_data */"
   , "__attribute__ ((const))"
-  , "void *(*hs_bindgen_d039d34ebac48349 (void)) ("
+  , "void *(*hs_bindgen_48f034c6b992e812 (void)) ("
   , "  struct river_xkb_keymap_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_xkb_keymap_v1_get_user_data;"
   , "}"
-  , "/* hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_get_version */"
+  , "/* River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_get_version */"
   , "__attribute__ ((const))"
-  , "uint32_t (*hs_bindgen_ed4b4ff2aa4b6b9f (void)) ("
+  , "uint32_t (*hs_bindgen_1ddfa8935a4810db (void)) ("
   , "  struct river_xkb_keymap_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_xkb_keymap_v1_get_version;"
   , "}"
-  , "/* hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_destroy */"
+  , "/* River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_destroy */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_40a00d44fbfa7324 (void)) ("
+  , "void (*hs_bindgen_995a602e54c6a8e7 (void)) ("
   , "  struct river_xkb_keymap_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_xkb_keymap_v1_destroy;"
   , "}"
-  , "/* hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_add_listener */"
+  , "/* River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_add_listener */"
   , "__attribute__ ((const))"
-  , "signed int (*hs_bindgen_d731de9a732a6630 (void)) ("
+  , "signed int (*hs_bindgen_6150e1068b5bf406 (void)) ("
   , "  struct river_xkb_keyboard_v1 *arg1,"
   , "  struct river_xkb_keyboard_v1_listener const *arg2,"
   , "  void *arg3"
@@ -152,93 +152,93 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return &river_xkb_keyboard_v1_add_listener;"
   , "}"
-  , "/* hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_set_user_data */"
+  , "/* River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_set_user_data */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_4031592d6d1397c7 (void)) ("
+  , "void (*hs_bindgen_e72765464153eca9 (void)) ("
   , "  struct river_xkb_keyboard_v1 *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  return &river_xkb_keyboard_v1_set_user_data;"
   , "}"
-  , "/* hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_get_user_data */"
+  , "/* River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_get_user_data */"
   , "__attribute__ ((const))"
-  , "void *(*hs_bindgen_95dd1d00bbf831f6 (void)) ("
+  , "void *(*hs_bindgen_19d3bce6737fded4 (void)) ("
   , "  struct river_xkb_keyboard_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_xkb_keyboard_v1_get_user_data;"
   , "}"
-  , "/* hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_get_version */"
+  , "/* River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_get_version */"
   , "__attribute__ ((const))"
-  , "uint32_t (*hs_bindgen_254a58db20c42c1a (void)) ("
+  , "uint32_t (*hs_bindgen_ce32d9c30415af97 (void)) ("
   , "  struct river_xkb_keyboard_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_xkb_keyboard_v1_get_version;"
   , "}"
-  , "/* hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_destroy */"
+  , "/* River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_destroy */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_309356d492b5b877 (void)) ("
+  , "void (*hs_bindgen_03b3d70cd34af2c7 (void)) ("
   , "  struct river_xkb_keyboard_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_xkb_keyboard_v1_destroy;"
   , "}"
-  , "/* hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_set_keymap */"
+  , "/* River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_set_keymap */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_afdfcd4b0ec04cf9 (void)) ("
+  , "void (*hs_bindgen_6809e9e19d0fa66f (void)) ("
   , "  struct river_xkb_keyboard_v1 *arg1,"
   , "  struct river_xkb_keymap_v1 *arg2"
   , ")"
   , "{"
   , "  return &river_xkb_keyboard_v1_set_keymap;"
   , "}"
-  , "/* hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_set_layout_by_index */"
+  , "/* River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_set_layout_by_index */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_0360491883df7b08 (void)) ("
+  , "void (*hs_bindgen_f81943303cf38e79 (void)) ("
   , "  struct river_xkb_keyboard_v1 *arg1,"
   , "  int32_t arg2"
   , ")"
   , "{"
   , "  return &river_xkb_keyboard_v1_set_layout_by_index;"
   , "}"
-  , "/* hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_set_layout_by_name */"
+  , "/* River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_set_layout_by_name */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_63fc013324a09696 (void)) ("
+  , "void (*hs_bindgen_2dcfabd7d189eee8 (void)) ("
   , "  struct river_xkb_keyboard_v1 *arg1,"
   , "  char const *arg2"
   , ")"
   , "{"
   , "  return &river_xkb_keyboard_v1_set_layout_by_name;"
   , "}"
-  , "/* hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_capslock_enable */"
+  , "/* River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_capslock_enable */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_c896905aa1a4772a (void)) ("
+  , "void (*hs_bindgen_f6b5993d41605351 (void)) ("
   , "  struct river_xkb_keyboard_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_xkb_keyboard_v1_capslock_enable;"
   , "}"
-  , "/* hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_capslock_disable */"
+  , "/* River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_capslock_disable */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_3460be042f33a511 (void)) ("
+  , "void (*hs_bindgen_3460cc2b73f95265 (void)) ("
   , "  struct river_xkb_keyboard_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_xkb_keyboard_v1_capslock_disable;"
   , "}"
-  , "/* hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_numlock_enable */"
+  , "/* River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_numlock_enable */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_ccdf7662f05ab3f1 (void)) ("
+  , "void (*hs_bindgen_1d85bac16c82c793 (void)) ("
   , "  struct river_xkb_keyboard_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_xkb_keyboard_v1_numlock_enable;"
   , "}"
-  , "/* hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_numlock_disable */"
+  , "/* River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_numlock_disable */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_259070f5c36619fc (void)) ("
+  , "void (*hs_bindgen_c809ceacc23055fb (void)) ("
   , "  struct river_xkb_keyboard_v1 *arg1"
   , ")"
   , "{"
@@ -246,14 +246,14 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "}"
   ]))
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_config_v1_add_listener@
-foreign import ccall unsafe "hs_bindgen_0c674804d1c831f8" hs_bindgen_0c674804d1c831f8_base ::
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_config_v1_add_listener@
+foreign import ccall unsafe "hs_bindgen_bf89e7ee822f14c5" hs_bindgen_bf89e7ee822f14c5_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_config_v1_add_listener@
-hs_bindgen_0c674804d1c831f8 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_config_v1) -> (PtrConst.PtrConst River_xkb_config_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt))
-hs_bindgen_0c674804d1c831f8 =
-  RIP.fromFFIType hs_bindgen_0c674804d1c831f8_base
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_config_v1_add_listener@
+hs_bindgen_bf89e7ee822f14c5 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_config_v1) -> (PtrConst.PtrConst River_xkb_config_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt))
+hs_bindgen_bf89e7ee822f14c5 =
+  RIP.fromFFIType hs_bindgen_bf89e7ee822f14c5_base
 
 {-# NOINLINE river_xkb_config_v1_add_listener #-}
 {-|
@@ -268,16 +268,16 @@ __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_config_v1_add_listener :: RIP.FunPtr ((RIP.Ptr River_xkb_config_v1) -> (PtrConst.PtrConst River_xkb_config_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt)
 river_xkb_config_v1_add_listener =
-  RIP.unsafePerformIO hs_bindgen_0c674804d1c831f8
+  RIP.unsafePerformIO hs_bindgen_bf89e7ee822f14c5
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_config_v1_set_user_data@
-foreign import ccall unsafe "hs_bindgen_c92292a3176cf916" hs_bindgen_c92292a3176cf916_base ::
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_config_v1_set_user_data@
+foreign import ccall unsafe "hs_bindgen_7d260c2fb92acda9" hs_bindgen_7d260c2fb92acda9_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_config_v1_set_user_data@
-hs_bindgen_c92292a3176cf916 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_config_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
-hs_bindgen_c92292a3176cf916 =
-  RIP.fromFFIType hs_bindgen_c92292a3176cf916_base
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_config_v1_set_user_data@
+hs_bindgen_7d260c2fb92acda9 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_config_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
+hs_bindgen_7d260c2fb92acda9 =
+  RIP.fromFFIType hs_bindgen_7d260c2fb92acda9_base
 
 {-# NOINLINE river_xkb_config_v1_set_user_data #-}
 {-|
@@ -292,16 +292,16 @@ __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_config_v1_set_user_data :: RIP.FunPtr ((RIP.Ptr River_xkb_config_v1) -> (RIP.Ptr RIP.Void) -> IO ())
 river_xkb_config_v1_set_user_data =
-  RIP.unsafePerformIO hs_bindgen_c92292a3176cf916
+  RIP.unsafePerformIO hs_bindgen_7d260c2fb92acda9
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_config_v1_get_user_data@
-foreign import ccall unsafe "hs_bindgen_88a377658449edfd" hs_bindgen_88a377658449edfd_base ::
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_config_v1_get_user_data@
+foreign import ccall unsafe "hs_bindgen_68ccdac259a3789c" hs_bindgen_68ccdac259a3789c_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_config_v1_get_user_data@
-hs_bindgen_88a377658449edfd :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_config_v1) -> IO (RIP.Ptr RIP.Void)))
-hs_bindgen_88a377658449edfd =
-  RIP.fromFFIType hs_bindgen_88a377658449edfd_base
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_config_v1_get_user_data@
+hs_bindgen_68ccdac259a3789c :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_config_v1) -> IO (RIP.Ptr RIP.Void)))
+hs_bindgen_68ccdac259a3789c =
+  RIP.fromFFIType hs_bindgen_68ccdac259a3789c_base
 
 {-# NOINLINE river_xkb_config_v1_get_user_data #-}
 {-|
@@ -316,16 +316,16 @@ __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_config_v1_get_user_data :: RIP.FunPtr ((RIP.Ptr River_xkb_config_v1) -> IO (RIP.Ptr RIP.Void))
 river_xkb_config_v1_get_user_data =
-  RIP.unsafePerformIO hs_bindgen_88a377658449edfd
+  RIP.unsafePerformIO hs_bindgen_68ccdac259a3789c
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_config_v1_get_version@
-foreign import ccall unsafe "hs_bindgen_8cdef2af3769d847" hs_bindgen_8cdef2af3769d847_base ::
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_config_v1_get_version@
+foreign import ccall unsafe "hs_bindgen_a4471fa924db1268" hs_bindgen_a4471fa924db1268_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_config_v1_get_version@
-hs_bindgen_8cdef2af3769d847 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_config_v1) -> IO HsBindgen.Runtime.LibC.Word32))
-hs_bindgen_8cdef2af3769d847 =
-  RIP.fromFFIType hs_bindgen_8cdef2af3769d847_base
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_config_v1_get_version@
+hs_bindgen_a4471fa924db1268 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_config_v1) -> IO HsBindgen.Runtime.LibC.Word32))
+hs_bindgen_a4471fa924db1268 =
+  RIP.fromFFIType hs_bindgen_a4471fa924db1268_base
 
 {-# NOINLINE river_xkb_config_v1_get_version #-}
 {-| __C declaration:__ @river_xkb_config_v1_get_version@
@@ -336,16 +336,16 @@ hs_bindgen_8cdef2af3769d847 =
 -}
 river_xkb_config_v1_get_version :: RIP.FunPtr ((RIP.Ptr River_xkb_config_v1) -> IO HsBindgen.Runtime.LibC.Word32)
 river_xkb_config_v1_get_version =
-  RIP.unsafePerformIO hs_bindgen_8cdef2af3769d847
+  RIP.unsafePerformIO hs_bindgen_a4471fa924db1268
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_config_v1_stop@
-foreign import ccall unsafe "hs_bindgen_77f4097121705f05" hs_bindgen_77f4097121705f05_base ::
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_config_v1_stop@
+foreign import ccall unsafe "hs_bindgen_fca76dd34ef5601d" hs_bindgen_fca76dd34ef5601d_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_config_v1_stop@
-hs_bindgen_77f4097121705f05 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_config_v1) -> IO ()))
-hs_bindgen_77f4097121705f05 =
-  RIP.fromFFIType hs_bindgen_77f4097121705f05_base
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_config_v1_stop@
+hs_bindgen_fca76dd34ef5601d :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_config_v1) -> IO ()))
+hs_bindgen_fca76dd34ef5601d =
+  RIP.fromFFIType hs_bindgen_fca76dd34ef5601d_base
 
 {-# NOINLINE river_xkb_config_v1_stop #-}
 {-|
@@ -364,16 +364,16 @@ __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_config_v1_stop :: RIP.FunPtr ((RIP.Ptr River_xkb_config_v1) -> IO ())
 river_xkb_config_v1_stop =
-  RIP.unsafePerformIO hs_bindgen_77f4097121705f05
+  RIP.unsafePerformIO hs_bindgen_fca76dd34ef5601d
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_config_v1_destroy@
-foreign import ccall unsafe "hs_bindgen_53f1294595fa0de5" hs_bindgen_53f1294595fa0de5_base ::
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_config_v1_destroy@
+foreign import ccall unsafe "hs_bindgen_1e0a17d3ebb7e27e" hs_bindgen_1e0a17d3ebb7e27e_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_config_v1_destroy@
-hs_bindgen_53f1294595fa0de5 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_config_v1) -> IO ()))
-hs_bindgen_53f1294595fa0de5 =
-  RIP.fromFFIType hs_bindgen_53f1294595fa0de5_base
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_config_v1_destroy@
+hs_bindgen_1e0a17d3ebb7e27e :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_config_v1) -> IO ()))
+hs_bindgen_1e0a17d3ebb7e27e =
+  RIP.fromFFIType hs_bindgen_1e0a17d3ebb7e27e_base
 
 {-# NOINLINE river_xkb_config_v1_destroy #-}
 {-|
@@ -394,16 +394,16 @@ __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_config_v1_destroy :: RIP.FunPtr ((RIP.Ptr River_xkb_config_v1) -> IO ())
 river_xkb_config_v1_destroy =
-  RIP.unsafePerformIO hs_bindgen_53f1294595fa0de5
+  RIP.unsafePerformIO hs_bindgen_1e0a17d3ebb7e27e
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_config_v1_create_keymap@
-foreign import ccall unsafe "hs_bindgen_852d7a807cd3dab7" hs_bindgen_852d7a807cd3dab7_base ::
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_config_v1_create_keymap@
+foreign import ccall unsafe "hs_bindgen_bee2cbd885166ce9" hs_bindgen_bee2cbd885166ce9_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_config_v1_create_keymap@
-hs_bindgen_852d7a807cd3dab7 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_config_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> IO (RIP.Ptr River_xkb_keymap_v1)))
-hs_bindgen_852d7a807cd3dab7 =
-  RIP.fromFFIType hs_bindgen_852d7a807cd3dab7_base
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_config_v1_create_keymap@
+hs_bindgen_bee2cbd885166ce9 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_config_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> IO (RIP.Ptr River_xkb_keymap_v1)))
+hs_bindgen_bee2cbd885166ce9 =
+  RIP.fromFFIType hs_bindgen_bee2cbd885166ce9_base
 
 {-# NOINLINE river_xkb_config_v1_create_keymap #-}
 {-|
@@ -420,16 +420,16 @@ __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_config_v1_create_keymap :: RIP.FunPtr ((RIP.Ptr River_xkb_config_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> IO (RIP.Ptr River_xkb_keymap_v1))
 river_xkb_config_v1_create_keymap =
-  RIP.unsafePerformIO hs_bindgen_852d7a807cd3dab7
+  RIP.unsafePerformIO hs_bindgen_bee2cbd885166ce9
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_add_listener@
-foreign import ccall unsafe "hs_bindgen_d52d7e39122b1b9e" hs_bindgen_d52d7e39122b1b9e_base ::
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_add_listener@
+foreign import ccall unsafe "hs_bindgen_9ecfece37c441a55" hs_bindgen_9ecfece37c441a55_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_add_listener@
-hs_bindgen_d52d7e39122b1b9e :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keymap_v1) -> (PtrConst.PtrConst River_xkb_keymap_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt))
-hs_bindgen_d52d7e39122b1b9e =
-  RIP.fromFFIType hs_bindgen_d52d7e39122b1b9e_base
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_add_listener@
+hs_bindgen_9ecfece37c441a55 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keymap_v1) -> (PtrConst.PtrConst River_xkb_keymap_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt))
+hs_bindgen_9ecfece37c441a55 =
+  RIP.fromFFIType hs_bindgen_9ecfece37c441a55_base
 
 {-# NOINLINE river_xkb_keymap_v1_add_listener #-}
 {-|
@@ -444,16 +444,16 @@ __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keymap_v1_add_listener :: RIP.FunPtr ((RIP.Ptr River_xkb_keymap_v1) -> (PtrConst.PtrConst River_xkb_keymap_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt)
 river_xkb_keymap_v1_add_listener =
-  RIP.unsafePerformIO hs_bindgen_d52d7e39122b1b9e
+  RIP.unsafePerformIO hs_bindgen_9ecfece37c441a55
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_set_user_data@
-foreign import ccall unsafe "hs_bindgen_a1e14ad444f739ae" hs_bindgen_a1e14ad444f739ae_base ::
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_set_user_data@
+foreign import ccall unsafe "hs_bindgen_75aec50c63d2868b" hs_bindgen_75aec50c63d2868b_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_set_user_data@
-hs_bindgen_a1e14ad444f739ae :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keymap_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
-hs_bindgen_a1e14ad444f739ae =
-  RIP.fromFFIType hs_bindgen_a1e14ad444f739ae_base
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_set_user_data@
+hs_bindgen_75aec50c63d2868b :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keymap_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
+hs_bindgen_75aec50c63d2868b =
+  RIP.fromFFIType hs_bindgen_75aec50c63d2868b_base
 
 {-# NOINLINE river_xkb_keymap_v1_set_user_data #-}
 {-|
@@ -468,16 +468,16 @@ __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keymap_v1_set_user_data :: RIP.FunPtr ((RIP.Ptr River_xkb_keymap_v1) -> (RIP.Ptr RIP.Void) -> IO ())
 river_xkb_keymap_v1_set_user_data =
-  RIP.unsafePerformIO hs_bindgen_a1e14ad444f739ae
+  RIP.unsafePerformIO hs_bindgen_75aec50c63d2868b
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_get_user_data@
-foreign import ccall unsafe "hs_bindgen_d039d34ebac48349" hs_bindgen_d039d34ebac48349_base ::
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_get_user_data@
+foreign import ccall unsafe "hs_bindgen_48f034c6b992e812" hs_bindgen_48f034c6b992e812_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_get_user_data@
-hs_bindgen_d039d34ebac48349 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keymap_v1) -> IO (RIP.Ptr RIP.Void)))
-hs_bindgen_d039d34ebac48349 =
-  RIP.fromFFIType hs_bindgen_d039d34ebac48349_base
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_get_user_data@
+hs_bindgen_48f034c6b992e812 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keymap_v1) -> IO (RIP.Ptr RIP.Void)))
+hs_bindgen_48f034c6b992e812 =
+  RIP.fromFFIType hs_bindgen_48f034c6b992e812_base
 
 {-# NOINLINE river_xkb_keymap_v1_get_user_data #-}
 {-|
@@ -492,16 +492,16 @@ __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keymap_v1_get_user_data :: RIP.FunPtr ((RIP.Ptr River_xkb_keymap_v1) -> IO (RIP.Ptr RIP.Void))
 river_xkb_keymap_v1_get_user_data =
-  RIP.unsafePerformIO hs_bindgen_d039d34ebac48349
+  RIP.unsafePerformIO hs_bindgen_48f034c6b992e812
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_get_version@
-foreign import ccall unsafe "hs_bindgen_ed4b4ff2aa4b6b9f" hs_bindgen_ed4b4ff2aa4b6b9f_base ::
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_get_version@
+foreign import ccall unsafe "hs_bindgen_1ddfa8935a4810db" hs_bindgen_1ddfa8935a4810db_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_get_version@
-hs_bindgen_ed4b4ff2aa4b6b9f :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keymap_v1) -> IO HsBindgen.Runtime.LibC.Word32))
-hs_bindgen_ed4b4ff2aa4b6b9f =
-  RIP.fromFFIType hs_bindgen_ed4b4ff2aa4b6b9f_base
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_get_version@
+hs_bindgen_1ddfa8935a4810db :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keymap_v1) -> IO HsBindgen.Runtime.LibC.Word32))
+hs_bindgen_1ddfa8935a4810db =
+  RIP.fromFFIType hs_bindgen_1ddfa8935a4810db_base
 
 {-# NOINLINE river_xkb_keymap_v1_get_version #-}
 {-| __C declaration:__ @river_xkb_keymap_v1_get_version@
@@ -512,16 +512,16 @@ hs_bindgen_ed4b4ff2aa4b6b9f =
 -}
 river_xkb_keymap_v1_get_version :: RIP.FunPtr ((RIP.Ptr River_xkb_keymap_v1) -> IO HsBindgen.Runtime.LibC.Word32)
 river_xkb_keymap_v1_get_version =
-  RIP.unsafePerformIO hs_bindgen_ed4b4ff2aa4b6b9f
+  RIP.unsafePerformIO hs_bindgen_1ddfa8935a4810db
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_destroy@
-foreign import ccall unsafe "hs_bindgen_40a00d44fbfa7324" hs_bindgen_40a00d44fbfa7324_base ::
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_destroy@
+foreign import ccall unsafe "hs_bindgen_995a602e54c6a8e7" hs_bindgen_995a602e54c6a8e7_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_destroy@
-hs_bindgen_40a00d44fbfa7324 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keymap_v1) -> IO ()))
-hs_bindgen_40a00d44fbfa7324 =
-  RIP.fromFFIType hs_bindgen_40a00d44fbfa7324_base
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_destroy@
+hs_bindgen_995a602e54c6a8e7 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keymap_v1) -> IO ()))
+hs_bindgen_995a602e54c6a8e7 =
+  RIP.fromFFIType hs_bindgen_995a602e54c6a8e7_base
 
 {-# NOINLINE river_xkb_keymap_v1_destroy #-}
 {-|
@@ -538,16 +538,16 @@ __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keymap_v1_destroy :: RIP.FunPtr ((RIP.Ptr River_xkb_keymap_v1) -> IO ())
 river_xkb_keymap_v1_destroy =
-  RIP.unsafePerformIO hs_bindgen_40a00d44fbfa7324
+  RIP.unsafePerformIO hs_bindgen_995a602e54c6a8e7
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_add_listener@
-foreign import ccall unsafe "hs_bindgen_d731de9a732a6630" hs_bindgen_d731de9a732a6630_base ::
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_add_listener@
+foreign import ccall unsafe "hs_bindgen_6150e1068b5bf406" hs_bindgen_6150e1068b5bf406_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_add_listener@
-hs_bindgen_d731de9a732a6630 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> (PtrConst.PtrConst River_xkb_keyboard_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt))
-hs_bindgen_d731de9a732a6630 =
-  RIP.fromFFIType hs_bindgen_d731de9a732a6630_base
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_add_listener@
+hs_bindgen_6150e1068b5bf406 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> (PtrConst.PtrConst River_xkb_keyboard_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt))
+hs_bindgen_6150e1068b5bf406 =
+  RIP.fromFFIType hs_bindgen_6150e1068b5bf406_base
 
 {-# NOINLINE river_xkb_keyboard_v1_add_listener #-}
 {-|
@@ -562,16 +562,16 @@ __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keyboard_v1_add_listener :: RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> (PtrConst.PtrConst River_xkb_keyboard_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt)
 river_xkb_keyboard_v1_add_listener =
-  RIP.unsafePerformIO hs_bindgen_d731de9a732a6630
+  RIP.unsafePerformIO hs_bindgen_6150e1068b5bf406
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_set_user_data@
-foreign import ccall unsafe "hs_bindgen_4031592d6d1397c7" hs_bindgen_4031592d6d1397c7_base ::
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_set_user_data@
+foreign import ccall unsafe "hs_bindgen_e72765464153eca9" hs_bindgen_e72765464153eca9_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_set_user_data@
-hs_bindgen_4031592d6d1397c7 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
-hs_bindgen_4031592d6d1397c7 =
-  RIP.fromFFIType hs_bindgen_4031592d6d1397c7_base
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_set_user_data@
+hs_bindgen_e72765464153eca9 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
+hs_bindgen_e72765464153eca9 =
+  RIP.fromFFIType hs_bindgen_e72765464153eca9_base
 
 {-# NOINLINE river_xkb_keyboard_v1_set_user_data #-}
 {-|
@@ -586,16 +586,16 @@ __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keyboard_v1_set_user_data :: RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr RIP.Void) -> IO ())
 river_xkb_keyboard_v1_set_user_data =
-  RIP.unsafePerformIO hs_bindgen_4031592d6d1397c7
+  RIP.unsafePerformIO hs_bindgen_e72765464153eca9
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_get_user_data@
-foreign import ccall unsafe "hs_bindgen_95dd1d00bbf831f6" hs_bindgen_95dd1d00bbf831f6_base ::
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_get_user_data@
+foreign import ccall unsafe "hs_bindgen_19d3bce6737fded4" hs_bindgen_19d3bce6737fded4_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_get_user_data@
-hs_bindgen_95dd1d00bbf831f6 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> IO (RIP.Ptr RIP.Void)))
-hs_bindgen_95dd1d00bbf831f6 =
-  RIP.fromFFIType hs_bindgen_95dd1d00bbf831f6_base
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_get_user_data@
+hs_bindgen_19d3bce6737fded4 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> IO (RIP.Ptr RIP.Void)))
+hs_bindgen_19d3bce6737fded4 =
+  RIP.fromFFIType hs_bindgen_19d3bce6737fded4_base
 
 {-# NOINLINE river_xkb_keyboard_v1_get_user_data #-}
 {-|
@@ -610,16 +610,16 @@ __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keyboard_v1_get_user_data :: RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> IO (RIP.Ptr RIP.Void))
 river_xkb_keyboard_v1_get_user_data =
-  RIP.unsafePerformIO hs_bindgen_95dd1d00bbf831f6
+  RIP.unsafePerformIO hs_bindgen_19d3bce6737fded4
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_get_version@
-foreign import ccall unsafe "hs_bindgen_254a58db20c42c1a" hs_bindgen_254a58db20c42c1a_base ::
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_get_version@
+foreign import ccall unsafe "hs_bindgen_ce32d9c30415af97" hs_bindgen_ce32d9c30415af97_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_get_version@
-hs_bindgen_254a58db20c42c1a :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> IO HsBindgen.Runtime.LibC.Word32))
-hs_bindgen_254a58db20c42c1a =
-  RIP.fromFFIType hs_bindgen_254a58db20c42c1a_base
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_get_version@
+hs_bindgen_ce32d9c30415af97 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> IO HsBindgen.Runtime.LibC.Word32))
+hs_bindgen_ce32d9c30415af97 =
+  RIP.fromFFIType hs_bindgen_ce32d9c30415af97_base
 
 {-# NOINLINE river_xkb_keyboard_v1_get_version #-}
 {-| __C declaration:__ @river_xkb_keyboard_v1_get_version@
@@ -630,16 +630,16 @@ hs_bindgen_254a58db20c42c1a =
 -}
 river_xkb_keyboard_v1_get_version :: RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> IO HsBindgen.Runtime.LibC.Word32)
 river_xkb_keyboard_v1_get_version =
-  RIP.unsafePerformIO hs_bindgen_254a58db20c42c1a
+  RIP.unsafePerformIO hs_bindgen_ce32d9c30415af97
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_destroy@
-foreign import ccall unsafe "hs_bindgen_309356d492b5b877" hs_bindgen_309356d492b5b877_base ::
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_destroy@
+foreign import ccall unsafe "hs_bindgen_03b3d70cd34af2c7" hs_bindgen_03b3d70cd34af2c7_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_destroy@
-hs_bindgen_309356d492b5b877 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> IO ()))
-hs_bindgen_309356d492b5b877 =
-  RIP.fromFFIType hs_bindgen_309356d492b5b877_base
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_destroy@
+hs_bindgen_03b3d70cd34af2c7 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> IO ()))
+hs_bindgen_03b3d70cd34af2c7 =
+  RIP.fromFFIType hs_bindgen_03b3d70cd34af2c7_base
 
 {-# NOINLINE river_xkb_keyboard_v1_destroy #-}
 {-|
@@ -656,16 +656,16 @@ __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keyboard_v1_destroy :: RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> IO ())
 river_xkb_keyboard_v1_destroy =
-  RIP.unsafePerformIO hs_bindgen_309356d492b5b877
+  RIP.unsafePerformIO hs_bindgen_03b3d70cd34af2c7
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_set_keymap@
-foreign import ccall unsafe "hs_bindgen_afdfcd4b0ec04cf9" hs_bindgen_afdfcd4b0ec04cf9_base ::
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_set_keymap@
+foreign import ccall unsafe "hs_bindgen_6809e9e19d0fa66f" hs_bindgen_6809e9e19d0fa66f_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_set_keymap@
-hs_bindgen_afdfcd4b0ec04cf9 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr River_xkb_keymap_v1) -> IO ()))
-hs_bindgen_afdfcd4b0ec04cf9 =
-  RIP.fromFFIType hs_bindgen_afdfcd4b0ec04cf9_base
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_set_keymap@
+hs_bindgen_6809e9e19d0fa66f :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr River_xkb_keymap_v1) -> IO ()))
+hs_bindgen_6809e9e19d0fa66f =
+  RIP.fromFFIType hs_bindgen_6809e9e19d0fa66f_base
 
 {-# NOINLINE river_xkb_keyboard_v1_set_keymap #-}
 {-|
@@ -684,16 +684,16 @@ __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keyboard_v1_set_keymap :: RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr River_xkb_keymap_v1) -> IO ())
 river_xkb_keyboard_v1_set_keymap =
-  RIP.unsafePerformIO hs_bindgen_afdfcd4b0ec04cf9
+  RIP.unsafePerformIO hs_bindgen_6809e9e19d0fa66f
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_set_layout_by_index@
-foreign import ccall unsafe "hs_bindgen_0360491883df7b08" hs_bindgen_0360491883df7b08_base ::
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_set_layout_by_index@
+foreign import ccall unsafe "hs_bindgen_f81943303cf38e79" hs_bindgen_f81943303cf38e79_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_set_layout_by_index@
-hs_bindgen_0360491883df7b08 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-hs_bindgen_0360491883df7b08 =
-  RIP.fromFFIType hs_bindgen_0360491883df7b08_base
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_set_layout_by_index@
+hs_bindgen_f81943303cf38e79 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_f81943303cf38e79 =
+  RIP.fromFFIType hs_bindgen_f81943303cf38e79_base
 
 {-# NOINLINE river_xkb_keyboard_v1_set_layout_by_index #-}
 {-|
@@ -710,16 +710,16 @@ __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keyboard_v1_set_layout_by_index :: RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 river_xkb_keyboard_v1_set_layout_by_index =
-  RIP.unsafePerformIO hs_bindgen_0360491883df7b08
+  RIP.unsafePerformIO hs_bindgen_f81943303cf38e79
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_set_layout_by_name@
-foreign import ccall unsafe "hs_bindgen_63fc013324a09696" hs_bindgen_63fc013324a09696_base ::
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_set_layout_by_name@
+foreign import ccall unsafe "hs_bindgen_2dcfabd7d189eee8" hs_bindgen_2dcfabd7d189eee8_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_set_layout_by_name@
-hs_bindgen_63fc013324a09696 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
-hs_bindgen_63fc013324a09696 =
-  RIP.fromFFIType hs_bindgen_63fc013324a09696_base
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_set_layout_by_name@
+hs_bindgen_2dcfabd7d189eee8 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
+hs_bindgen_2dcfabd7d189eee8 =
+  RIP.fromFFIType hs_bindgen_2dcfabd7d189eee8_base
 
 {-# NOINLINE river_xkb_keyboard_v1_set_layout_by_name #-}
 {-|
@@ -736,16 +736,16 @@ __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keyboard_v1_set_layout_by_name :: RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
 river_xkb_keyboard_v1_set_layout_by_name =
-  RIP.unsafePerformIO hs_bindgen_63fc013324a09696
+  RIP.unsafePerformIO hs_bindgen_2dcfabd7d189eee8
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_capslock_enable@
-foreign import ccall unsafe "hs_bindgen_c896905aa1a4772a" hs_bindgen_c896905aa1a4772a_base ::
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_capslock_enable@
+foreign import ccall unsafe "hs_bindgen_f6b5993d41605351" hs_bindgen_f6b5993d41605351_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_capslock_enable@
-hs_bindgen_c896905aa1a4772a :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> IO ()))
-hs_bindgen_c896905aa1a4772a =
-  RIP.fromFFIType hs_bindgen_c896905aa1a4772a_base
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_capslock_enable@
+hs_bindgen_f6b5993d41605351 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> IO ()))
+hs_bindgen_f6b5993d41605351 =
+  RIP.fromFFIType hs_bindgen_f6b5993d41605351_base
 
 {-# NOINLINE river_xkb_keyboard_v1_capslock_enable #-}
 {-|
@@ -762,16 +762,16 @@ __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keyboard_v1_capslock_enable :: RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> IO ())
 river_xkb_keyboard_v1_capslock_enable =
-  RIP.unsafePerformIO hs_bindgen_c896905aa1a4772a
+  RIP.unsafePerformIO hs_bindgen_f6b5993d41605351
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_capslock_disable@
-foreign import ccall unsafe "hs_bindgen_3460be042f33a511" hs_bindgen_3460be042f33a511_base ::
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_capslock_disable@
+foreign import ccall unsafe "hs_bindgen_3460cc2b73f95265" hs_bindgen_3460cc2b73f95265_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_capslock_disable@
-hs_bindgen_3460be042f33a511 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> IO ()))
-hs_bindgen_3460be042f33a511 =
-  RIP.fromFFIType hs_bindgen_3460be042f33a511_base
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_capslock_disable@
+hs_bindgen_3460cc2b73f95265 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> IO ()))
+hs_bindgen_3460cc2b73f95265 =
+  RIP.fromFFIType hs_bindgen_3460cc2b73f95265_base
 
 {-# NOINLINE river_xkb_keyboard_v1_capslock_disable #-}
 {-|
@@ -788,16 +788,16 @@ __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keyboard_v1_capslock_disable :: RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> IO ())
 river_xkb_keyboard_v1_capslock_disable =
-  RIP.unsafePerformIO hs_bindgen_3460be042f33a511
+  RIP.unsafePerformIO hs_bindgen_3460cc2b73f95265
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_numlock_enable@
-foreign import ccall unsafe "hs_bindgen_ccdf7662f05ab3f1" hs_bindgen_ccdf7662f05ab3f1_base ::
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_numlock_enable@
+foreign import ccall unsafe "hs_bindgen_1d85bac16c82c793" hs_bindgen_1d85bac16c82c793_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_numlock_enable@
-hs_bindgen_ccdf7662f05ab3f1 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> IO ()))
-hs_bindgen_ccdf7662f05ab3f1 =
-  RIP.fromFFIType hs_bindgen_ccdf7662f05ab3f1_base
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_numlock_enable@
+hs_bindgen_1d85bac16c82c793 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> IO ()))
+hs_bindgen_1d85bac16c82c793 =
+  RIP.fromFFIType hs_bindgen_1d85bac16c82c793_base
 
 {-# NOINLINE river_xkb_keyboard_v1_numlock_enable #-}
 {-|
@@ -814,16 +814,16 @@ __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keyboard_v1_numlock_enable :: RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> IO ())
 river_xkb_keyboard_v1_numlock_enable =
-  RIP.unsafePerformIO hs_bindgen_ccdf7662f05ab3f1
+  RIP.unsafePerformIO hs_bindgen_1d85bac16c82c793
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_numlock_disable@
-foreign import ccall unsafe "hs_bindgen_259070f5c36619fc" hs_bindgen_259070f5c36619fc_base ::
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_numlock_disable@
+foreign import ccall unsafe "hs_bindgen_c809ceacc23055fb" hs_bindgen_c809ceacc23055fb_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_numlock_disable@
-hs_bindgen_259070f5c36619fc :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> IO ()))
-hs_bindgen_259070f5c36619fc =
-  RIP.fromFFIType hs_bindgen_259070f5c36619fc_base
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_numlock_disable@
+hs_bindgen_c809ceacc23055fb :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> IO ()))
+hs_bindgen_c809ceacc23055fb =
+  RIP.fromFFIType hs_bindgen_c809ceacc23055fb_base
 
 {-# NOINLINE river_xkb_keyboard_v1_numlock_disable #-}
 {-|
@@ -840,4 +840,4 @@ __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keyboard_v1_numlock_disable :: RIP.FunPtr ((RIP.Ptr River_xkb_keyboard_v1) -> IO ())
 river_xkb_keyboard_v1_numlock_disable =
-  RIP.unsafePerformIO hs_bindgen_259070f5c36619fc
+  RIP.unsafePerformIO hs_bindgen_c809ceacc23055fb

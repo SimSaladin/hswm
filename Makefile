@@ -1,7 +1,6 @@
 # File: Makefile
 
 WAYLAND_SCANNER	:= wayland-scanner --include-core-only --strict
-HS_BIND_GEN	:= ./hs-bindgen-test.sh
 PROTODIR	:= ./protocol
 HEADERDIR := ./cbits
 CDIR	:= ./cbits
@@ -15,25 +14,93 @@ PRIVATE_CODE   := $(PROTOS:.xml=-protocol.c)
 
 all: $(PRIVATE_CODE:%=$(CDIR)/%) $(CLIENT_HEADERS:%=$(HEADERDIR)/%) bindgen
 
-bindgen: bindgen-wayland-client bindgen-river-protocols bindgen-pixman-1
-
 $(CLIENT_HEADERS:%=$(HEADERDIR)/%): $(HEADERDIR)/%-client-protocol.h: $(PROTODIR)/%.xml
 	$(WAYLAND_SCANNER) client-header $< $@
 
 $(PRIVATE_CODE:%=$(CDIR)/%): $(CDIR)/%-protocol.c: $(PROTODIR)/%.xml
 	$(WAYLAND_SCANNER) private-code $< $@
 
-bindgen-wayland-client: $(CLIENT_HEADERS:%=$(HEADERDIR)/%)
-	$(HS_BIND_GEN) Wayland.Util             wayland-util.h                     --unique-id hswm.wl.util --select-from-main-header-dirs --select-except-by-decl-name wl_log_func_t
-	$(HS_BIND_GEN) Wayland.Client           wayland-client{,-core,-protocol}.h --unique-id hswm.wl.client
 
-bindgen-river-protocols: $(CLIENT_HEADERS:%=$(HEADERDIR)/%)
-	$(HS_BIND_GEN) River.InputManagementV1  river-input-management-v1-client-protocol.h  --unique-id hswm.river.input-management
-	$(HS_BIND_GEN) River.WindowManagementV1 river-window-management-v1-client-protocol.h --unique-id hswm.river.window-manage
-	$(HS_BIND_GEN) River.XkbConfigV1        river-xkb-config-v1-client-protocol.h        --unique-id hswm.river.xkb-config
-	$(HS_BIND_GEN) River.XkbBindingsV1      river-xkb-bindings-v1-client-protocol.h      --unique-id hswm.river.xkb-bindings
-	$(HS_BIND_GEN) River.LayoutShellV1      river-layer-shell-v1-client-protocol.h       --unique-id hswm.river.layer-shell
+###################
+# hs-bindgen-cli
+###################
+bindGenOutDir	:= hswm-bindings/src
+bindGenSpecDir	:= hswm-bindings/generated
+HS_BIND_GEN	:= hs-bindgen-cli preprocess \
+			   --hs-output-dir $(bindGenOutDir) --create-output-dirs --overwrite-files \
+			   --omit-field-prefixes --enable-program-slicing --clang-option '-std=gnu23' \
+			   -I /nix/store/j8irrc0mpx029dw0rmadsjylg7h31ync-glibc-2.42-51-dev/include \
+			   -I ./cbits
 
-bindgen-pixman-1:
-	$(HS_BIND_GEN) Pixman                   pixman.h           --unique-id hswm.pixman \
-	  $(shell pkg-config --cflags pixman-1) --select-from-main-header-dirs
+.PHONY: bindgen-wayland
+
+bindgen: bindgen-wayland bindgen-river bindgen-pixman-1
+
+bindgen-wayland:	$(bindGenSpecDir)/Generated.Wayland.*.yaml
+bindgen-river:	$(bindGenSpecDir)/Generated.River.*.yaml
+
+$(bindGenSpecDir)/Generated.Wayland.Util.yaml: FORCE
+	$(HS_BIND_GEN) --unique-id hswm_wl_util wayland-util.h \
+	  --gen-binding-spec $@ \
+	  --module $(patsubst %.yaml,%,$(@F)) \
+	  $(shell pkg-config --cflags wayland-client) \
+	  --select-from-main-header-dirs \
+	  --select-except-by-decl-name wl_log_func_t
+
+$(bindGenSpecDir)/Generated.Wayland.Client.yaml: FORCE $(bindGenSpecDir)/Generated.Wayland.Util.yaml
+	$(HS_BIND_GEN) --unique-id hswm_wl_client wayland-client{,-core,-protocol}.h \
+	  --gen-binding-spec $@ \
+	  --module $(patsubst %.yaml,%,$(@F)) \
+	  $(shell pkg-config --cflags wayland-client) \
+	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml \
+	  --select-except-by-decl-name wl_log_func_t \
+	  --select-except-by-decl-name wl_log_set_handler_client
+
+ #   --select-except-by-decl-name wl_proxy_marshal_flags \
+ #   --select-except-by-decl-name wl_proxy_marshal \
+ #   --select-except-by-decl-name wl_proxy_marshal_constructor \
+ #   --select-except-by-decl-name wl_proxy_marshal_constructor_versioned \
+
+$(bindGenSpecDir)/Generated.River.InputManagementV1.yaml: $(HEADERDIR)/river-input-management-v1-client-protocol.h $(bindGenSpecDir)/Generated.Wayland.Client.yaml $(bindGenSpecDir)/Generated.Wayland.Util.yaml FORCE
+	$(HS_BIND_GEN) $(<F) \
+	  --gen-binding-spec $@ \
+	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \
+	  --module $(patsubst %.yaml,%,$(@F)) \
+	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Client.yaml \
+	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml
+
+$(bindGenSpecDir)/Generated.River.WindowManagementV1.yaml: $(HEADERDIR)/river-window-management-v1-client-protocol.h $(bindGenSpecDir)/Generated.Wayland.Client.yaml $(bindGenSpecDir)/Generated.Wayland.Util.yaml FORCE
+	$(HS_BIND_GEN) $(<F) \
+	  --gen-binding-spec $@ \
+	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \
+	  --module $(patsubst %.yaml,%,$(@F)) \
+	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Client.yaml \
+	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml
+
+$(bindGenSpecDir)/Generated.River.XkbConfigV1.yaml: $(HEADERDIR)/river-xkb-config-v1-client-protocol.h $(bindGenSpecDir)/Generated.Wayland.Client.yaml $(bindGenSpecDir)/Generated.Wayland.Util.yaml FORCE
+	$(HS_BIND_GEN) $(<F) \
+	  --gen-binding-spec $@ \
+	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \
+	  --module $(patsubst %.yaml,%,$(@F)) \
+	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Client.yaml \
+	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml
+
+$(bindGenSpecDir)/Generated.River.XkbBindingsV1.yaml: $(HEADERDIR)/river-xkb-bindings-v1-client-protocol.h $(bindGenSpecDir)/Generated.Wayland.Client.yaml $(bindGenSpecDir)/Generated.Wayland.Util.yaml FORCE
+	$(HS_BIND_GEN) $(<F) \
+	  --gen-binding-spec $@ \
+	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \
+	  --module $(patsubst %.yaml,%,$(@F)) \
+	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Client.yaml \
+	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml
+
+$(bindGenSpecDir)/Generated.River.LayoutShellV1.yaml: $(HEADERDIR)/river-layer-shell-v1-client-protocol.h $(bindGenSpecDir)/Generated.Wayland.Client.yaml $(bindGenSpecDir)/Generated.Wayland.Util.yaml FORCE
+	$(HS_BIND_GEN) $(<F) \
+	  --gen-binding-spec $@ \
+	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \
+	  --module $(patsubst %.yaml,%,$(@F)) \
+	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Client.yaml \
+	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml
+
+FORCE:
+
+# $(shell pkg-config --cflags xkbcommon)

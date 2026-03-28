@@ -16,36 +16,36 @@ import qualified HsBindgen.Runtime.PtrConst as PtrConst
 
 $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.unlines
   [ "#include <river-xkb-bindings-v1-client-protocol.h>"
-  , "/* hswm_river_xkbbindings_Generated.River.XkbBindingsV1_get_river_xkb_bindings_v1_interface */"
+  , "/* River_XkbBindingsV1_Generated.River.XkbBindingsV1_get_river_xkb_bindings_v1_interface */"
   , "__attribute__ ((const))"
-  , "struct wl_interface const *hs_bindgen_031adbeed46dcc9d (void)"
+  , "struct wl_interface const *hs_bindgen_9488a30be00c4ca4 (void)"
   , "{"
   , "  return &river_xkb_bindings_v1_interface;"
   , "}"
-  , "/* hswm_river_xkbbindings_Generated.River.XkbBindingsV1_get_river_xkb_binding_v1_interface */"
+  , "/* River_XkbBindingsV1_Generated.River.XkbBindingsV1_get_river_xkb_binding_v1_interface */"
   , "__attribute__ ((const))"
-  , "struct wl_interface const *hs_bindgen_e01973a6eeecbde8 (void)"
+  , "struct wl_interface const *hs_bindgen_17757d1fe2afcfbd (void)"
   , "{"
   , "  return &river_xkb_binding_v1_interface;"
   , "}"
-  , "/* hswm_river_xkbbindings_Generated.River.XkbBindingsV1_get_river_xkb_bindings_seat_v1_interface */"
+  , "/* River_XkbBindingsV1_Generated.River.XkbBindingsV1_get_river_xkb_bindings_seat_v1_interface */"
   , "__attribute__ ((const))"
-  , "struct wl_interface const *hs_bindgen_9dc13de83e71eebd (void)"
+  , "struct wl_interface const *hs_bindgen_18dc8d9eff542448 (void)"
   , "{"
   , "  return &river_xkb_bindings_seat_v1_interface;"
   , "}"
   ]))
 
--- __unique:__ @hswm_river_xkbbindings_Generated.River.XkbBindingsV1_get_river_xkb_bindings_v1_interface@
-foreign import ccall unsafe "hs_bindgen_031adbeed46dcc9d" hs_bindgen_031adbeed46dcc9d_base ::
+-- __unique:__ @River_XkbBindingsV1_Generated.River.XkbBindingsV1_get_river_xkb_bindings_v1_interface@
+foreign import ccall unsafe "hs_bindgen_9488a30be00c4ca4" hs_bindgen_9488a30be00c4ca4_base ::
      IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_river_xkbbindings_Generated.River.XkbBindingsV1_get_river_xkb_bindings_v1_interface@
-hs_bindgen_031adbeed46dcc9d :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
-hs_bindgen_031adbeed46dcc9d =
-  RIP.fromFFIType hs_bindgen_031adbeed46dcc9d_base
+-- __unique:__ @River_XkbBindingsV1_Generated.River.XkbBindingsV1_get_river_xkb_bindings_v1_interface@
+hs_bindgen_9488a30be00c4ca4 :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
+hs_bindgen_9488a30be00c4ca4 =
+  RIP.fromFFIType hs_bindgen_9488a30be00c4ca4_base
 
-{-# NOINLINE hs_bindgen_95d40071274848c5 #-}
+{-# NOINLINE hs_bindgen_ac028fc07da875d7 #-}
 {-|
 
   > page_iface_river_xkb_bindings_v1 river_xkb_bindings_v1
@@ -68,27 +68,27 @@ __defined at:__ @river-xkb-bindings-v1-client-protocol.h 79:34@
 
 __exported by:__ @river-xkb-bindings-v1-client-protocol.h@
 
-__unique:__ @hswm_river_xkbbindings_Generated.River.XkbBindingsV1_river_xkb_bindings_v1_interface@
+__unique:__ @River_XkbBindingsV1_Generated.River.XkbBindingsV1_river_xkb_bindings_v1_interface@
 -}
-hs_bindgen_95d40071274848c5 :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
-hs_bindgen_95d40071274848c5 =
-  RIP.unsafePerformIO hs_bindgen_031adbeed46dcc9d
+hs_bindgen_ac028fc07da875d7 :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+hs_bindgen_ac028fc07da875d7 =
+  RIP.unsafePerformIO hs_bindgen_9488a30be00c4ca4
 
 {-# NOINLINE river_xkb_bindings_v1_interface #-}
 river_xkb_bindings_v1_interface :: Generated.Wayland.Util.Wl_interface
 river_xkb_bindings_v1_interface =
-  RIP.unsafePerformIO (PtrConst.peek hs_bindgen_95d40071274848c5)
+  RIP.unsafePerformIO (PtrConst.peek hs_bindgen_ac028fc07da875d7)
 
--- __unique:__ @hswm_river_xkbbindings_Generated.River.XkbBindingsV1_get_river_xkb_binding_v1_interface@
-foreign import ccall unsafe "hs_bindgen_e01973a6eeecbde8" hs_bindgen_e01973a6eeecbde8_base ::
+-- __unique:__ @River_XkbBindingsV1_Generated.River.XkbBindingsV1_get_river_xkb_binding_v1_interface@
+foreign import ccall unsafe "hs_bindgen_17757d1fe2afcfbd" hs_bindgen_17757d1fe2afcfbd_base ::
      IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_river_xkbbindings_Generated.River.XkbBindingsV1_get_river_xkb_binding_v1_interface@
-hs_bindgen_e01973a6eeecbde8 :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
-hs_bindgen_e01973a6eeecbde8 =
-  RIP.fromFFIType hs_bindgen_e01973a6eeecbde8_base
+-- __unique:__ @River_XkbBindingsV1_Generated.River.XkbBindingsV1_get_river_xkb_binding_v1_interface@
+hs_bindgen_17757d1fe2afcfbd :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
+hs_bindgen_17757d1fe2afcfbd =
+  RIP.fromFFIType hs_bindgen_17757d1fe2afcfbd_base
 
-{-# NOINLINE hs_bindgen_139de0d972933200 #-}
+{-# NOINLINE hs_bindgen_ecd536eec44b6c7d #-}
 {-|
 
   > page_iface_river_xkb_binding_v1 river_xkb_binding_v1
@@ -127,27 +127,27 @@ __defined at:__ @river-xkb-bindings-v1-client-protocol.h 132:34@
 
 __exported by:__ @river-xkb-bindings-v1-client-protocol.h@
 
-__unique:__ @hswm_river_xkbbindings_Generated.River.XkbBindingsV1_river_xkb_binding_v1_interface@
+__unique:__ @River_XkbBindingsV1_Generated.River.XkbBindingsV1_river_xkb_binding_v1_interface@
 -}
-hs_bindgen_139de0d972933200 :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
-hs_bindgen_139de0d972933200 =
-  RIP.unsafePerformIO hs_bindgen_e01973a6eeecbde8
+hs_bindgen_ecd536eec44b6c7d :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+hs_bindgen_ecd536eec44b6c7d =
+  RIP.unsafePerformIO hs_bindgen_17757d1fe2afcfbd
 
 {-# NOINLINE river_xkb_binding_v1_interface #-}
 river_xkb_binding_v1_interface :: Generated.Wayland.Util.Wl_interface
 river_xkb_binding_v1_interface =
-  RIP.unsafePerformIO (PtrConst.peek hs_bindgen_139de0d972933200)
+  RIP.unsafePerformIO (PtrConst.peek hs_bindgen_ecd536eec44b6c7d)
 
--- __unique:__ @hswm_river_xkbbindings_Generated.River.XkbBindingsV1_get_river_xkb_bindings_seat_v1_interface@
-foreign import ccall unsafe "hs_bindgen_9dc13de83e71eebd" hs_bindgen_9dc13de83e71eebd_base ::
+-- __unique:__ @River_XkbBindingsV1_Generated.River.XkbBindingsV1_get_river_xkb_bindings_seat_v1_interface@
+foreign import ccall unsafe "hs_bindgen_18dc8d9eff542448" hs_bindgen_18dc8d9eff542448_base ::
      IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_river_xkbbindings_Generated.River.XkbBindingsV1_get_river_xkb_bindings_seat_v1_interface@
-hs_bindgen_9dc13de83e71eebd :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
-hs_bindgen_9dc13de83e71eebd =
-  RIP.fromFFIType hs_bindgen_9dc13de83e71eebd_base
+-- __unique:__ @River_XkbBindingsV1_Generated.River.XkbBindingsV1_get_river_xkb_bindings_seat_v1_interface@
+hs_bindgen_18dc8d9eff542448 :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
+hs_bindgen_18dc8d9eff542448 =
+  RIP.fromFFIType hs_bindgen_18dc8d9eff542448_base
 
-{-# NOINLINE hs_bindgen_a80c8817e0226ddf #-}
+{-# NOINLINE hs_bindgen_5e969cc39a6d6ceb #-}
 {-|
 
   > page_iface_river_xkb_bindings_seat_v1 river_xkb_bindings_seat_v1
@@ -170,13 +170,13 @@ __defined at:__ @river-xkb-bindings-v1-client-protocol.h 149:34@
 
 __exported by:__ @river-xkb-bindings-v1-client-protocol.h@
 
-__unique:__ @hswm_river_xkbbindings_Generated.River.XkbBindingsV1_river_xkb_bindings_seat_v1_interface@
+__unique:__ @River_XkbBindingsV1_Generated.River.XkbBindingsV1_river_xkb_bindings_seat_v1_interface@
 -}
-hs_bindgen_a80c8817e0226ddf :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
-hs_bindgen_a80c8817e0226ddf =
-  RIP.unsafePerformIO hs_bindgen_9dc13de83e71eebd
+hs_bindgen_5e969cc39a6d6ceb :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+hs_bindgen_5e969cc39a6d6ceb =
+  RIP.unsafePerformIO hs_bindgen_18dc8d9eff542448
 
 {-# NOINLINE river_xkb_bindings_seat_v1_interface #-}
 river_xkb_bindings_seat_v1_interface :: Generated.Wayland.Util.Wl_interface
 river_xkb_bindings_seat_v1_interface =
-  RIP.unsafePerformIO (PtrConst.peek hs_bindgen_a80c8817e0226ddf)
+  RIP.unsafePerformIO (PtrConst.peek hs_bindgen_5e969cc39a6d6ceb)

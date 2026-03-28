@@ -16,36 +16,36 @@ import qualified HsBindgen.Runtime.PtrConst as PtrConst
 
 $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.unlines
   [ "#include <river-xkb-config-v1-client-protocol.h>"
-  , "/* hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_config_v1_interface */"
+  , "/* River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_config_v1_interface */"
   , "__attribute__ ((const))"
-  , "struct wl_interface const *hs_bindgen_1ba03142625428e3 (void)"
+  , "struct wl_interface const *hs_bindgen_e9c4bc407ffe460c (void)"
   , "{"
   , "  return &river_xkb_config_v1_interface;"
   , "}"
-  , "/* hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_interface */"
+  , "/* River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_interface */"
   , "__attribute__ ((const))"
-  , "struct wl_interface const *hs_bindgen_cdc028321fa05913 (void)"
+  , "struct wl_interface const *hs_bindgen_c7adfef1e06566b6 (void)"
   , "{"
   , "  return &river_xkb_keymap_v1_interface;"
   , "}"
-  , "/* hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_interface */"
+  , "/* River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_interface */"
   , "__attribute__ ((const))"
-  , "struct wl_interface const *hs_bindgen_c0b0c84b740ac6ee (void)"
+  , "struct wl_interface const *hs_bindgen_baedbf678c9c3a7b (void)"
   , "{"
   , "  return &river_xkb_keyboard_v1_interface;"
   , "}"
   ]))
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_config_v1_interface@
-foreign import ccall unsafe "hs_bindgen_1ba03142625428e3" hs_bindgen_1ba03142625428e3_base ::
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_config_v1_interface@
+foreign import ccall unsafe "hs_bindgen_e9c4bc407ffe460c" hs_bindgen_e9c4bc407ffe460c_base ::
      IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_config_v1_interface@
-hs_bindgen_1ba03142625428e3 :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
-hs_bindgen_1ba03142625428e3 =
-  RIP.fromFFIType hs_bindgen_1ba03142625428e3_base
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_config_v1_interface@
+hs_bindgen_e9c4bc407ffe460c :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
+hs_bindgen_e9c4bc407ffe460c =
+  RIP.fromFFIType hs_bindgen_e9c4bc407ffe460c_base
 
-{-# NOINLINE hs_bindgen_62a5f9ebf06db302 #-}
+{-# NOINLINE hs_bindgen_78701fbaede2c3d1 #-}
 {-|
 
   > page_iface_river_xkb_config_v1 river_xkb_config_v1
@@ -72,27 +72,27 @@ __defined at:__ @river-xkb-config-v1-client-protocol.h 83:34@
 
 __exported by:__ @river-xkb-config-v1-client-protocol.h@
 
-__unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_river_xkb_config_v1_interface@
+__unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_river_xkb_config_v1_interface@
 -}
-hs_bindgen_62a5f9ebf06db302 :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
-hs_bindgen_62a5f9ebf06db302 =
-  RIP.unsafePerformIO hs_bindgen_1ba03142625428e3
+hs_bindgen_78701fbaede2c3d1 :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+hs_bindgen_78701fbaede2c3d1 =
+  RIP.unsafePerformIO hs_bindgen_e9c4bc407ffe460c
 
 {-# NOINLINE river_xkb_config_v1_interface #-}
 river_xkb_config_v1_interface :: Generated.Wayland.Util.Wl_interface
 river_xkb_config_v1_interface =
-  RIP.unsafePerformIO (PtrConst.peek hs_bindgen_62a5f9ebf06db302)
+  RIP.unsafePerformIO (PtrConst.peek hs_bindgen_78701fbaede2c3d1)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_interface@
-foreign import ccall unsafe "hs_bindgen_cdc028321fa05913" hs_bindgen_cdc028321fa05913_base ::
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_interface@
+foreign import ccall unsafe "hs_bindgen_c7adfef1e06566b6" hs_bindgen_c7adfef1e06566b6_base ::
      IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_interface@
-hs_bindgen_cdc028321fa05913 :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
-hs_bindgen_cdc028321fa05913 =
-  RIP.fromFFIType hs_bindgen_cdc028321fa05913_base
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keymap_v1_interface@
+hs_bindgen_c7adfef1e06566b6 :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
+hs_bindgen_c7adfef1e06566b6 =
+  RIP.fromFFIType hs_bindgen_c7adfef1e06566b6_base
 
-{-# NOINLINE hs_bindgen_0c0c8b537648ccb8 #-}
+{-# NOINLINE hs_bindgen_377a503280ecd8b0 #-}
 {-|
 
   > page_iface_river_xkb_keymap_v1 river_xkb_keymap_v1
@@ -115,27 +115,27 @@ __defined at:__ @river-xkb-config-v1-client-protocol.h 100:34@
 
 __exported by:__ @river-xkb-config-v1-client-protocol.h@
 
-__unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_river_xkb_keymap_v1_interface@
+__unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_river_xkb_keymap_v1_interface@
 -}
-hs_bindgen_0c0c8b537648ccb8 :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
-hs_bindgen_0c0c8b537648ccb8 =
-  RIP.unsafePerformIO hs_bindgen_cdc028321fa05913
+hs_bindgen_377a503280ecd8b0 :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+hs_bindgen_377a503280ecd8b0 =
+  RIP.unsafePerformIO hs_bindgen_c7adfef1e06566b6
 
 {-# NOINLINE river_xkb_keymap_v1_interface #-}
 river_xkb_keymap_v1_interface :: Generated.Wayland.Util.Wl_interface
 river_xkb_keymap_v1_interface =
-  RIP.unsafePerformIO (PtrConst.peek hs_bindgen_0c0c8b537648ccb8)
+  RIP.unsafePerformIO (PtrConst.peek hs_bindgen_377a503280ecd8b0)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_interface@
-foreign import ccall unsafe "hs_bindgen_c0b0c84b740ac6ee" hs_bindgen_c0b0c84b740ac6ee_base ::
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_interface@
+foreign import ccall unsafe "hs_bindgen_baedbf678c9c3a7b" hs_bindgen_baedbf678c9c3a7b_base ::
      IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_interface@
-hs_bindgen_c0b0c84b740ac6ee :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
-hs_bindgen_c0b0c84b740ac6ee =
-  RIP.fromFFIType hs_bindgen_c0b0c84b740ac6ee_base
+-- __unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_get_river_xkb_keyboard_v1_interface@
+hs_bindgen_baedbf678c9c3a7b :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
+hs_bindgen_baedbf678c9c3a7b =
+  RIP.fromFFIType hs_bindgen_baedbf678c9c3a7b_base
 
-{-# NOINLINE hs_bindgen_bba18c7bf2c79f5d #-}
+{-# NOINLINE hs_bindgen_346dec1c2a8f4d03 #-}
 {-|
 
   > page_iface_river_xkb_keyboard_v1 river_xkb_keyboard_v1
@@ -158,13 +158,13 @@ __defined at:__ @river-xkb-config-v1-client-protocol.h 119:34@
 
 __exported by:__ @river-xkb-config-v1-client-protocol.h@
 
-__unique:__ @hswm_river_xkbconfig_Generated.River.XkbConfigV1_river_xkb_keyboard_v1_interface@
+__unique:__ @River_XkbConfigV1_Generated.River.XkbConfigV1_river_xkb_keyboard_v1_interface@
 -}
-hs_bindgen_bba18c7bf2c79f5d :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
-hs_bindgen_bba18c7bf2c79f5d =
-  RIP.unsafePerformIO hs_bindgen_c0b0c84b740ac6ee
+hs_bindgen_346dec1c2a8f4d03 :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+hs_bindgen_346dec1c2a8f4d03 =
+  RIP.unsafePerformIO hs_bindgen_baedbf678c9c3a7b
 
 {-# NOINLINE river_xkb_keyboard_v1_interface #-}
 river_xkb_keyboard_v1_interface :: Generated.Wayland.Util.Wl_interface
 river_xkb_keyboard_v1_interface =
-  RIP.unsafePerformIO (PtrConst.peek hs_bindgen_bba18c7bf2c79f5d)
+  RIP.unsafePerformIO (PtrConst.peek hs_bindgen_346dec1c2a8f4d03)

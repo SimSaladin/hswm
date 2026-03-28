@@ -15,30 +15,30 @@ import qualified HsBindgen.Runtime.PtrConst as PtrConst
 
 $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.unlines
   [ "#include <river-input-management-v1-client-protocol.h>"
-  , "/* hswm_river_inputmanagement_Generated.River.InputManagementV1_get_river_input_manager_v1_interface */"
+  , "/* River_InputManagementV1_Generated.River.InputManagementV1_get_river_input_manager_v1_interface */"
   , "__attribute__ ((const))"
-  , "struct wl_interface const *hs_bindgen_94c9ab936b9cacb1 (void)"
+  , "struct wl_interface const *hs_bindgen_ff3a0fd34a73edd3 (void)"
   , "{"
   , "  return &river_input_manager_v1_interface;"
   , "}"
-  , "/* hswm_river_inputmanagement_Generated.River.InputManagementV1_get_river_input_device_v1_interface */"
+  , "/* River_InputManagementV1_Generated.River.InputManagementV1_get_river_input_device_v1_interface */"
   , "__attribute__ ((const))"
-  , "struct wl_interface const *hs_bindgen_5b117d55f47029f6 (void)"
+  , "struct wl_interface const *hs_bindgen_2a4faf127d549195 (void)"
   , "{"
   , "  return &river_input_device_v1_interface;"
   , "}"
   ]))
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_get_river_input_manager_v1_interface@
-foreign import ccall unsafe "hs_bindgen_94c9ab936b9cacb1" hs_bindgen_94c9ab936b9cacb1_base ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_get_river_input_manager_v1_interface@
+foreign import ccall unsafe "hs_bindgen_ff3a0fd34a73edd3" hs_bindgen_ff3a0fd34a73edd3_base ::
      IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_get_river_input_manager_v1_interface@
-hs_bindgen_94c9ab936b9cacb1 :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
-hs_bindgen_94c9ab936b9cacb1 =
-  RIP.fromFFIType hs_bindgen_94c9ab936b9cacb1_base
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_get_river_input_manager_v1_interface@
+hs_bindgen_ff3a0fd34a73edd3 :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
+hs_bindgen_ff3a0fd34a73edd3 =
+  RIP.fromFFIType hs_bindgen_ff3a0fd34a73edd3_base
 
-{-# NOINLINE hs_bindgen_a4a76a34f5816a36 #-}
+{-# NOINLINE hs_bindgen_9c1fb947283322f4 #-}
 {-|
 
   > page_iface_river_input_manager_v1 river_input_manager_v1
@@ -61,27 +61,27 @@ __defined at:__ @river-input-management-v1-client-protocol.h 74:34@
 
 __exported by:__ @river-input-management-v1-client-protocol.h@
 
-__unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_river_input_manager_v1_interface@
+__unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_river_input_manager_v1_interface@
 -}
-hs_bindgen_a4a76a34f5816a36 :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
-hs_bindgen_a4a76a34f5816a36 =
-  RIP.unsafePerformIO hs_bindgen_94c9ab936b9cacb1
+hs_bindgen_9c1fb947283322f4 :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+hs_bindgen_9c1fb947283322f4 =
+  RIP.unsafePerformIO hs_bindgen_ff3a0fd34a73edd3
 
 {-# NOINLINE river_input_manager_v1_interface #-}
 river_input_manager_v1_interface :: Generated.Wayland.Util.Wl_interface
 river_input_manager_v1_interface =
-  RIP.unsafePerformIO (PtrConst.peek hs_bindgen_a4a76a34f5816a36)
+  RIP.unsafePerformIO (PtrConst.peek hs_bindgen_9c1fb947283322f4)
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_get_river_input_device_v1_interface@
-foreign import ccall unsafe "hs_bindgen_5b117d55f47029f6" hs_bindgen_5b117d55f47029f6_base ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_get_river_input_device_v1_interface@
+foreign import ccall unsafe "hs_bindgen_2a4faf127d549195" hs_bindgen_2a4faf127d549195_base ::
      IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_get_river_input_device_v1_interface@
-hs_bindgen_5b117d55f47029f6 :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
-hs_bindgen_5b117d55f47029f6 =
-  RIP.fromFFIType hs_bindgen_5b117d55f47029f6_base
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_get_river_input_device_v1_interface@
+hs_bindgen_2a4faf127d549195 :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
+hs_bindgen_2a4faf127d549195 =
+  RIP.fromFFIType hs_bindgen_2a4faf127d549195_base
 
-{-# NOINLINE hs_bindgen_f2d89816298f9216 #-}
+{-# NOINLINE hs_bindgen_d8cb7e7c49407b9d #-}
 {-|
 
   > page_iface_river_input_device_v1 river_input_device_v1
@@ -104,13 +104,13 @@ __defined at:__ @river-input-management-v1-client-protocol.h 95:34@
 
 __exported by:__ @river-input-management-v1-client-protocol.h@
 
-__unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_river_input_device_v1_interface@
+__unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_river_input_device_v1_interface@
 -}
-hs_bindgen_f2d89816298f9216 :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
-hs_bindgen_f2d89816298f9216 =
-  RIP.unsafePerformIO hs_bindgen_5b117d55f47029f6
+hs_bindgen_d8cb7e7c49407b9d :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+hs_bindgen_d8cb7e7c49407b9d =
+  RIP.unsafePerformIO hs_bindgen_2a4faf127d549195
 
 {-# NOINLINE river_input_device_v1_interface #-}
 river_input_device_v1_interface :: Generated.Wayland.Util.Wl_interface
 river_input_device_v1_interface =
-  RIP.unsafePerformIO (PtrConst.peek hs_bindgen_f2d89816298f9216)
+  RIP.unsafePerformIO (PtrConst.peek hs_bindgen_d8cb7e7c49407b9d)

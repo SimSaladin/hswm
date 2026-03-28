@@ -33,7 +33,7 @@ import Generated.River.InputManagementV1
 
 $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.unlines
   [ "#include <river-input-management-v1-client-protocol.h>"
-  , "signed int hs_bindgen_d98f87e96263a439 ("
+  , "signed int hs_bindgen_0fc38490afe66c8a ("
   , "  struct river_input_manager_v1 *arg1,"
   , "  struct river_input_manager_v1_listener const *arg2,"
   , "  void *arg3"
@@ -41,52 +41,52 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (river_input_manager_v1_add_listener)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_4ffd343d60728a6f ("
+  , "void hs_bindgen_04a46844ab61dfe3 ("
   , "  struct river_input_manager_v1 *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (river_input_manager_v1_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_ab2f454a0cdee0ae ("
+  , "void *hs_bindgen_f7d95e7a5c98c139 ("
   , "  struct river_input_manager_v1 *arg1"
   , ")"
   , "{"
   , "  return (river_input_manager_v1_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_379ae3c213c9bfd0 ("
+  , "uint32_t hs_bindgen_7d740a641e642bf2 ("
   , "  struct river_input_manager_v1 *arg1"
   , ")"
   , "{"
   , "  return (river_input_manager_v1_get_version)(arg1);"
   , "}"
-  , "void hs_bindgen_13e606993502f0aa ("
+  , "void hs_bindgen_26f5dda305f893ca ("
   , "  struct river_input_manager_v1 *arg1"
   , ")"
   , "{"
   , "  (river_input_manager_v1_stop)(arg1);"
   , "}"
-  , "void hs_bindgen_ccb193d7f2168ccf ("
+  , "void hs_bindgen_1d4eb0b3891ea257 ("
   , "  struct river_input_manager_v1 *arg1"
   , ")"
   , "{"
   , "  (river_input_manager_v1_destroy)(arg1);"
   , "}"
-  , "void hs_bindgen_5bc3565333323e2d ("
+  , "void hs_bindgen_2fec7d06781d2e0b ("
   , "  struct river_input_manager_v1 *arg1,"
   , "  char const *arg2"
   , ")"
   , "{"
   , "  (river_input_manager_v1_create_seat)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_d94b773d7cb746af ("
+  , "void hs_bindgen_628e794231f8c336 ("
   , "  struct river_input_manager_v1 *arg1,"
   , "  char const *arg2"
   , ")"
   , "{"
   , "  (river_input_manager_v1_destroy_seat)(arg1, arg2);"
   , "}"
-  , "signed int hs_bindgen_92292e7f193882c8 ("
+  , "signed int hs_bindgen_51ab7859f4228031 ("
   , "  struct river_input_device_v1 *arg1,"
   , "  struct river_input_device_v1_listener const *arg2,"
   , "  void *arg3"
@@ -94,39 +94,39 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (river_input_device_v1_add_listener)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_e855a387a80f5f2d ("
+  , "void hs_bindgen_1d6a750587d44b0f ("
   , "  struct river_input_device_v1 *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (river_input_device_v1_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_892386f995d0a7f2 ("
+  , "void *hs_bindgen_f15eae8d5f0fd9aa ("
   , "  struct river_input_device_v1 *arg1"
   , ")"
   , "{"
   , "  return (river_input_device_v1_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_6c6e3be09257bfcb ("
+  , "uint32_t hs_bindgen_c41c8dae1ed6c915 ("
   , "  struct river_input_device_v1 *arg1"
   , ")"
   , "{"
   , "  return (river_input_device_v1_get_version)(arg1);"
   , "}"
-  , "void hs_bindgen_c03ba168000098e0 ("
+  , "void hs_bindgen_ae25c8b317dd126d ("
   , "  struct river_input_device_v1 *arg1"
   , ")"
   , "{"
   , "  (river_input_device_v1_destroy)(arg1);"
   , "}"
-  , "void hs_bindgen_bbc71be44ebd011e ("
+  , "void hs_bindgen_68ee246797b3d502 ("
   , "  struct river_input_device_v1 *arg1,"
   , "  char const *arg2"
   , ")"
   , "{"
   , "  (river_input_device_v1_assign_to_seat)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_a0727ca52e94e4de ("
+  , "void hs_bindgen_abbd74b3646acfd3 ("
   , "  struct river_input_device_v1 *arg1,"
   , "  int32_t arg2,"
   , "  int32_t arg3"
@@ -134,21 +134,21 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (river_input_device_v1_set_repeat_info)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_c1adef88372bb157 ("
+  , "void hs_bindgen_83bc1fe212faa762 ("
   , "  struct river_input_device_v1 *arg1,"
   , "  wl_fixed_t arg2"
   , ")"
   , "{"
   , "  (river_input_device_v1_set_scroll_factor)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_276c196f33fc95f7 ("
+  , "void hs_bindgen_afff42da3d023e5e ("
   , "  struct river_input_device_v1 *arg1,"
   , "  struct wl_output *arg2"
   , ")"
   , "{"
   , "  (river_input_device_v1_map_to_output)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_8062d473ce5f3b53 ("
+  , "void hs_bindgen_1571a01ec8a833b3 ("
   , "  struct river_input_device_v1 *arg1,"
   , "  int32_t arg2,"
   , "  int32_t arg3,"
@@ -160,21 +160,21 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "}"
   ]))
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_add_listener@
-foreign import ccall unsafe "hs_bindgen_d98f87e96263a439" hs_bindgen_d98f87e96263a439_base ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_add_listener@
+foreign import ccall unsafe "hs_bindgen_0fc38490afe66c8a" hs_bindgen_0fc38490afe66c8a_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_add_listener@
-hs_bindgen_d98f87e96263a439 ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_add_listener@
+hs_bindgen_0fc38490afe66c8a ::
      RIP.Ptr River_input_manager_v1
   -> PtrConst.PtrConst River_input_manager_v1_listener
   -> RIP.Ptr RIP.Void
   -> IO RIP.CInt
-hs_bindgen_d98f87e96263a439 =
-  RIP.fromFFIType hs_bindgen_d98f87e96263a439_base
+hs_bindgen_0fc38490afe66c8a =
+  RIP.fromFFIType hs_bindgen_0fc38490afe66c8a_base
 
 {-|
 
@@ -195,21 +195,21 @@ river_input_manager_v1_add_listener ::
      -- ^ __C declaration:__ @data@
   -> IO RIP.CInt
 river_input_manager_v1_add_listener =
-  hs_bindgen_d98f87e96263a439
+  hs_bindgen_0fc38490afe66c8a
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_set_user_data@
-foreign import ccall unsafe "hs_bindgen_4ffd343d60728a6f" hs_bindgen_4ffd343d60728a6f_base ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_set_user_data@
+foreign import ccall unsafe "hs_bindgen_04a46844ab61dfe3" hs_bindgen_04a46844ab61dfe3_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_set_user_data@
-hs_bindgen_4ffd343d60728a6f ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_set_user_data@
+hs_bindgen_04a46844ab61dfe3 ::
      RIP.Ptr River_input_manager_v1
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_4ffd343d60728a6f =
-  RIP.fromFFIType hs_bindgen_4ffd343d60728a6f_base
+hs_bindgen_04a46844ab61dfe3 =
+  RIP.fromFFIType hs_bindgen_04a46844ab61dfe3_base
 
 {-|
 
@@ -228,19 +228,19 @@ river_input_manager_v1_set_user_data ::
      -- ^ __C declaration:__ @user_data@
   -> IO ()
 river_input_manager_v1_set_user_data =
-  hs_bindgen_4ffd343d60728a6f
+  hs_bindgen_04a46844ab61dfe3
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_get_user_data@
-foreign import ccall unsafe "hs_bindgen_ab2f454a0cdee0ae" hs_bindgen_ab2f454a0cdee0ae_base ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_get_user_data@
+foreign import ccall unsafe "hs_bindgen_f7d95e7a5c98c139" hs_bindgen_f7d95e7a5c98c139_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_get_user_data@
-hs_bindgen_ab2f454a0cdee0ae ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_get_user_data@
+hs_bindgen_f7d95e7a5c98c139 ::
      RIP.Ptr River_input_manager_v1
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_ab2f454a0cdee0ae =
-  RIP.fromFFIType hs_bindgen_ab2f454a0cdee0ae_base
+hs_bindgen_f7d95e7a5c98c139 =
+  RIP.fromFFIType hs_bindgen_f7d95e7a5c98c139_base
 
 {-|
 
@@ -257,19 +257,19 @@ river_input_manager_v1_get_user_data ::
      -- ^ __C declaration:__ @river_input_manager_v1@
   -> IO (RIP.Ptr RIP.Void)
 river_input_manager_v1_get_user_data =
-  hs_bindgen_ab2f454a0cdee0ae
+  hs_bindgen_f7d95e7a5c98c139
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_get_version@
-foreign import ccall unsafe "hs_bindgen_379ae3c213c9bfd0" hs_bindgen_379ae3c213c9bfd0_base ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_get_version@
+foreign import ccall unsafe "hs_bindgen_7d740a641e642bf2" hs_bindgen_7d740a641e642bf2_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_get_version@
-hs_bindgen_379ae3c213c9bfd0 ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_get_version@
+hs_bindgen_7d740a641e642bf2 ::
      RIP.Ptr River_input_manager_v1
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_379ae3c213c9bfd0 =
-  RIP.fromFFIType hs_bindgen_379ae3c213c9bfd0_base
+hs_bindgen_7d740a641e642bf2 =
+  RIP.fromFFIType hs_bindgen_7d740a641e642bf2_base
 
 {-| __C declaration:__ @river_input_manager_v1_get_version@
 
@@ -282,19 +282,19 @@ river_input_manager_v1_get_version ::
      -- ^ __C declaration:__ @river_input_manager_v1@
   -> IO HsBindgen.Runtime.LibC.Word32
 river_input_manager_v1_get_version =
-  hs_bindgen_379ae3c213c9bfd0
+  hs_bindgen_7d740a641e642bf2
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_stop@
-foreign import ccall unsafe "hs_bindgen_13e606993502f0aa" hs_bindgen_13e606993502f0aa_base ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_stop@
+foreign import ccall unsafe "hs_bindgen_26f5dda305f893ca" hs_bindgen_26f5dda305f893ca_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_stop@
-hs_bindgen_13e606993502f0aa ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_stop@
+hs_bindgen_26f5dda305f893ca ::
      RIP.Ptr River_input_manager_v1
   -> IO ()
-hs_bindgen_13e606993502f0aa =
-  RIP.fromFFIType hs_bindgen_13e606993502f0aa_base
+hs_bindgen_26f5dda305f893ca =
+  RIP.fromFFIType hs_bindgen_26f5dda305f893ca_base
 
 {-|
 
@@ -315,19 +315,19 @@ river_input_manager_v1_stop ::
      -- ^ __C declaration:__ @river_input_manager_v1@
   -> IO ()
 river_input_manager_v1_stop =
-  hs_bindgen_13e606993502f0aa
+  hs_bindgen_26f5dda305f893ca
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_destroy@
-foreign import ccall unsafe "hs_bindgen_ccb193d7f2168ccf" hs_bindgen_ccb193d7f2168ccf_base ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_destroy@
+foreign import ccall unsafe "hs_bindgen_1d4eb0b3891ea257" hs_bindgen_1d4eb0b3891ea257_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_destroy@
-hs_bindgen_ccb193d7f2168ccf ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_destroy@
+hs_bindgen_1d4eb0b3891ea257 ::
      RIP.Ptr River_input_manager_v1
   -> IO ()
-hs_bindgen_ccb193d7f2168ccf =
-  RIP.fromFFIType hs_bindgen_ccb193d7f2168ccf_base
+hs_bindgen_1d4eb0b3891ea257 =
+  RIP.fromFFIType hs_bindgen_1d4eb0b3891ea257_base
 
 {-|
 
@@ -350,21 +350,21 @@ river_input_manager_v1_destroy ::
      -- ^ __C declaration:__ @river_input_manager_v1@
   -> IO ()
 river_input_manager_v1_destroy =
-  hs_bindgen_ccb193d7f2168ccf
+  hs_bindgen_1d4eb0b3891ea257
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_create_seat@
-foreign import ccall unsafe "hs_bindgen_5bc3565333323e2d" hs_bindgen_5bc3565333323e2d_base ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_create_seat@
+foreign import ccall unsafe "hs_bindgen_2fec7d06781d2e0b" hs_bindgen_2fec7d06781d2e0b_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_create_seat@
-hs_bindgen_5bc3565333323e2d ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_create_seat@
+hs_bindgen_2fec7d06781d2e0b ::
      RIP.Ptr River_input_manager_v1
   -> PtrConst.PtrConst RIP.CChar
   -> IO ()
-hs_bindgen_5bc3565333323e2d =
-  RIP.fromFFIType hs_bindgen_5bc3565333323e2d_base
+hs_bindgen_2fec7d06781d2e0b =
+  RIP.fromFFIType hs_bindgen_2fec7d06781d2e0b_base
 
 {-|
 
@@ -387,21 +387,21 @@ river_input_manager_v1_create_seat ::
      -- ^ __C declaration:__ @name@
   -> IO ()
 river_input_manager_v1_create_seat =
-  hs_bindgen_5bc3565333323e2d
+  hs_bindgen_2fec7d06781d2e0b
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_destroy_seat@
-foreign import ccall unsafe "hs_bindgen_d94b773d7cb746af" hs_bindgen_d94b773d7cb746af_base ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_destroy_seat@
+foreign import ccall unsafe "hs_bindgen_628e794231f8c336" hs_bindgen_628e794231f8c336_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_destroy_seat@
-hs_bindgen_d94b773d7cb746af ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_manager_v1_destroy_seat@
+hs_bindgen_628e794231f8c336 ::
      RIP.Ptr River_input_manager_v1
   -> PtrConst.PtrConst RIP.CChar
   -> IO ()
-hs_bindgen_d94b773d7cb746af =
-  RIP.fromFFIType hs_bindgen_d94b773d7cb746af_base
+hs_bindgen_628e794231f8c336 =
+  RIP.fromFFIType hs_bindgen_628e794231f8c336_base
 
 {-|
 
@@ -426,23 +426,23 @@ river_input_manager_v1_destroy_seat ::
      -- ^ __C declaration:__ @name@
   -> IO ()
 river_input_manager_v1_destroy_seat =
-  hs_bindgen_d94b773d7cb746af
+  hs_bindgen_628e794231f8c336
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_add_listener@
-foreign import ccall unsafe "hs_bindgen_92292e7f193882c8" hs_bindgen_92292e7f193882c8_base ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_add_listener@
+foreign import ccall unsafe "hs_bindgen_51ab7859f4228031" hs_bindgen_51ab7859f4228031_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_add_listener@
-hs_bindgen_92292e7f193882c8 ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_add_listener@
+hs_bindgen_51ab7859f4228031 ::
      RIP.Ptr River_input_device_v1
   -> PtrConst.PtrConst River_input_device_v1_listener
   -> RIP.Ptr RIP.Void
   -> IO RIP.CInt
-hs_bindgen_92292e7f193882c8 =
-  RIP.fromFFIType hs_bindgen_92292e7f193882c8_base
+hs_bindgen_51ab7859f4228031 =
+  RIP.fromFFIType hs_bindgen_51ab7859f4228031_base
 
 {-|
 
@@ -463,21 +463,21 @@ river_input_device_v1_add_listener ::
      -- ^ __C declaration:__ @data@
   -> IO RIP.CInt
 river_input_device_v1_add_listener =
-  hs_bindgen_92292e7f193882c8
+  hs_bindgen_51ab7859f4228031
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_set_user_data@
-foreign import ccall unsafe "hs_bindgen_e855a387a80f5f2d" hs_bindgen_e855a387a80f5f2d_base ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_set_user_data@
+foreign import ccall unsafe "hs_bindgen_1d6a750587d44b0f" hs_bindgen_1d6a750587d44b0f_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_set_user_data@
-hs_bindgen_e855a387a80f5f2d ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_set_user_data@
+hs_bindgen_1d6a750587d44b0f ::
      RIP.Ptr River_input_device_v1
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_e855a387a80f5f2d =
-  RIP.fromFFIType hs_bindgen_e855a387a80f5f2d_base
+hs_bindgen_1d6a750587d44b0f =
+  RIP.fromFFIType hs_bindgen_1d6a750587d44b0f_base
 
 {-|
 
@@ -496,19 +496,19 @@ river_input_device_v1_set_user_data ::
      -- ^ __C declaration:__ @user_data@
   -> IO ()
 river_input_device_v1_set_user_data =
-  hs_bindgen_e855a387a80f5f2d
+  hs_bindgen_1d6a750587d44b0f
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_get_user_data@
-foreign import ccall unsafe "hs_bindgen_892386f995d0a7f2" hs_bindgen_892386f995d0a7f2_base ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_get_user_data@
+foreign import ccall unsafe "hs_bindgen_f15eae8d5f0fd9aa" hs_bindgen_f15eae8d5f0fd9aa_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_get_user_data@
-hs_bindgen_892386f995d0a7f2 ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_get_user_data@
+hs_bindgen_f15eae8d5f0fd9aa ::
      RIP.Ptr River_input_device_v1
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_892386f995d0a7f2 =
-  RIP.fromFFIType hs_bindgen_892386f995d0a7f2_base
+hs_bindgen_f15eae8d5f0fd9aa =
+  RIP.fromFFIType hs_bindgen_f15eae8d5f0fd9aa_base
 
 {-|
 
@@ -525,19 +525,19 @@ river_input_device_v1_get_user_data ::
      -- ^ __C declaration:__ @river_input_device_v1@
   -> IO (RIP.Ptr RIP.Void)
 river_input_device_v1_get_user_data =
-  hs_bindgen_892386f995d0a7f2
+  hs_bindgen_f15eae8d5f0fd9aa
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_get_version@
-foreign import ccall unsafe "hs_bindgen_6c6e3be09257bfcb" hs_bindgen_6c6e3be09257bfcb_base ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_get_version@
+foreign import ccall unsafe "hs_bindgen_c41c8dae1ed6c915" hs_bindgen_c41c8dae1ed6c915_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_get_version@
-hs_bindgen_6c6e3be09257bfcb ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_get_version@
+hs_bindgen_c41c8dae1ed6c915 ::
      RIP.Ptr River_input_device_v1
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_6c6e3be09257bfcb =
-  RIP.fromFFIType hs_bindgen_6c6e3be09257bfcb_base
+hs_bindgen_c41c8dae1ed6c915 =
+  RIP.fromFFIType hs_bindgen_c41c8dae1ed6c915_base
 
 {-| __C declaration:__ @river_input_device_v1_get_version@
 
@@ -550,19 +550,19 @@ river_input_device_v1_get_version ::
      -- ^ __C declaration:__ @river_input_device_v1@
   -> IO HsBindgen.Runtime.LibC.Word32
 river_input_device_v1_get_version =
-  hs_bindgen_6c6e3be09257bfcb
+  hs_bindgen_c41c8dae1ed6c915
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_destroy@
-foreign import ccall unsafe "hs_bindgen_c03ba168000098e0" hs_bindgen_c03ba168000098e0_base ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_destroy@
+foreign import ccall unsafe "hs_bindgen_ae25c8b317dd126d" hs_bindgen_ae25c8b317dd126d_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_destroy@
-hs_bindgen_c03ba168000098e0 ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_destroy@
+hs_bindgen_ae25c8b317dd126d ::
      RIP.Ptr River_input_device_v1
   -> IO ()
-hs_bindgen_c03ba168000098e0 =
-  RIP.fromFFIType hs_bindgen_c03ba168000098e0_base
+hs_bindgen_ae25c8b317dd126d =
+  RIP.fromFFIType hs_bindgen_ae25c8b317dd126d_base
 
 {-|
 
@@ -581,21 +581,21 @@ river_input_device_v1_destroy ::
      -- ^ __C declaration:__ @river_input_device_v1@
   -> IO ()
 river_input_device_v1_destroy =
-  hs_bindgen_c03ba168000098e0
+  hs_bindgen_ae25c8b317dd126d
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_assign_to_seat@
-foreign import ccall unsafe "hs_bindgen_bbc71be44ebd011e" hs_bindgen_bbc71be44ebd011e_base ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_assign_to_seat@
+foreign import ccall unsafe "hs_bindgen_68ee246797b3d502" hs_bindgen_68ee246797b3d502_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_assign_to_seat@
-hs_bindgen_bbc71be44ebd011e ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_assign_to_seat@
+hs_bindgen_68ee246797b3d502 ::
      RIP.Ptr River_input_device_v1
   -> PtrConst.PtrConst RIP.CChar
   -> IO ()
-hs_bindgen_bbc71be44ebd011e =
-  RIP.fromFFIType hs_bindgen_bbc71be44ebd011e_base
+hs_bindgen_68ee246797b3d502 =
+  RIP.fromFFIType hs_bindgen_68ee246797b3d502_base
 
 {-|
 
@@ -618,23 +618,23 @@ river_input_device_v1_assign_to_seat ::
      -- ^ __C declaration:__ @name@
   -> IO ()
 river_input_device_v1_assign_to_seat =
-  hs_bindgen_bbc71be44ebd011e
+  hs_bindgen_68ee246797b3d502
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_set_repeat_info@
-foreign import ccall unsafe "hs_bindgen_a0727ca52e94e4de" hs_bindgen_a0727ca52e94e4de_base ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_set_repeat_info@
+foreign import ccall unsafe "hs_bindgen_abbd74b3646acfd3" hs_bindgen_abbd74b3646acfd3_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_set_repeat_info@
-hs_bindgen_a0727ca52e94e4de ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_set_repeat_info@
+hs_bindgen_abbd74b3646acfd3 ::
      RIP.Ptr River_input_device_v1
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Int32
   -> IO ()
-hs_bindgen_a0727ca52e94e4de =
-  RIP.fromFFIType hs_bindgen_a0727ca52e94e4de_base
+hs_bindgen_abbd74b3646acfd3 =
+  RIP.fromFFIType hs_bindgen_abbd74b3646acfd3_base
 
 {-|
 
@@ -659,21 +659,21 @@ river_input_device_v1_set_repeat_info ::
      -- ^ __C declaration:__ @delay@
   -> IO ()
 river_input_device_v1_set_repeat_info =
-  hs_bindgen_a0727ca52e94e4de
+  hs_bindgen_abbd74b3646acfd3
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_set_scroll_factor@
-foreign import ccall unsafe "hs_bindgen_c1adef88372bb157" hs_bindgen_c1adef88372bb157_base ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_set_scroll_factor@
+foreign import ccall unsafe "hs_bindgen_83bc1fe212faa762" hs_bindgen_83bc1fe212faa762_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_set_scroll_factor@
-hs_bindgen_c1adef88372bb157 ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_set_scroll_factor@
+hs_bindgen_83bc1fe212faa762 ::
      RIP.Ptr River_input_device_v1
   -> Generated.Wayland.Util.Wl_fixed_t
   -> IO ()
-hs_bindgen_c1adef88372bb157 =
-  RIP.fromFFIType hs_bindgen_c1adef88372bb157_base
+hs_bindgen_83bc1fe212faa762 =
+  RIP.fromFFIType hs_bindgen_83bc1fe212faa762_base
 
 {-|
 
@@ -698,21 +698,21 @@ river_input_device_v1_set_scroll_factor ::
      -- ^ __C declaration:__ @factor@
   -> IO ()
 river_input_device_v1_set_scroll_factor =
-  hs_bindgen_c1adef88372bb157
+  hs_bindgen_83bc1fe212faa762
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_map_to_output@
-foreign import ccall unsafe "hs_bindgen_276c196f33fc95f7" hs_bindgen_276c196f33fc95f7_base ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_map_to_output@
+foreign import ccall unsafe "hs_bindgen_afff42da3d023e5e" hs_bindgen_afff42da3d023e5e_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_map_to_output@
-hs_bindgen_276c196f33fc95f7 ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_map_to_output@
+hs_bindgen_afff42da3d023e5e ::
      RIP.Ptr River_input_device_v1
   -> RIP.Ptr Wl_output
   -> IO ()
-hs_bindgen_276c196f33fc95f7 =
-  RIP.fromFFIType hs_bindgen_276c196f33fc95f7_base
+hs_bindgen_afff42da3d023e5e =
+  RIP.fromFFIType hs_bindgen_afff42da3d023e5e_base
 
 {-|
 
@@ -737,10 +737,10 @@ river_input_device_v1_map_to_output ::
      -- ^ __C declaration:__ @output@
   -> IO ()
 river_input_device_v1_map_to_output =
-  hs_bindgen_276c196f33fc95f7
+  hs_bindgen_afff42da3d023e5e
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_map_to_rectangle@
-foreign import ccall unsafe "hs_bindgen_8062d473ce5f3b53" hs_bindgen_8062d473ce5f3b53_base ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_map_to_rectangle@
+foreign import ccall unsafe "hs_bindgen_1571a01ec8a833b3" hs_bindgen_1571a01ec8a833b3_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
@@ -748,16 +748,16 @@ foreign import ccall unsafe "hs_bindgen_8062d473ce5f3b53" hs_bindgen_8062d473ce5
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_river_inputmanagement_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_map_to_rectangle@
-hs_bindgen_8062d473ce5f3b53 ::
+-- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_Unsafe_river_input_device_v1_map_to_rectangle@
+hs_bindgen_1571a01ec8a833b3 ::
      RIP.Ptr River_input_device_v1
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Int32
   -> IO ()
-hs_bindgen_8062d473ce5f3b53 =
-  RIP.fromFFIType hs_bindgen_8062d473ce5f3b53_base
+hs_bindgen_1571a01ec8a833b3 =
+  RIP.fromFFIType hs_bindgen_1571a01ec8a833b3_base
 
 {-|
 
@@ -790,4 +790,4 @@ river_input_device_v1_map_to_rectangle ::
      -- ^ __C declaration:__ @height@
   -> IO ()
 river_input_device_v1_map_to_rectangle =
-  hs_bindgen_8062d473ce5f3b53
+  hs_bindgen_1571a01ec8a833b3

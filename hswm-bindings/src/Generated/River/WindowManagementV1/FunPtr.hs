@@ -100,9 +100,9 @@ import Generated.River.WindowManagementV1
 
 $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.unlines
   [ "#include <river-window-management-v1-client-protocol.h>"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_add_listener */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_add_listener */"
   , "__attribute__ ((const))"
-  , "signed int (*hs_bindgen_260b858a9f5cf297 (void)) ("
+  , "signed int (*hs_bindgen_bd105b0334ac4498 (void)) ("
   , "  struct river_window_manager_v1 *arg1,"
   , "  struct river_window_manager_v1_listener const *arg2,"
   , "  void *arg3"
@@ -110,91 +110,91 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return &river_window_manager_v1_add_listener;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_set_user_data */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_set_user_data */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_1f044f4409d05546 (void)) ("
+  , "void (*hs_bindgen_934f963934b86085 (void)) ("
   , "  struct river_window_manager_v1 *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  return &river_window_manager_v1_set_user_data;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_get_user_data */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_get_user_data */"
   , "__attribute__ ((const))"
-  , "void *(*hs_bindgen_355a21107a85a332 (void)) ("
+  , "void *(*hs_bindgen_72177b14923fb83b (void)) ("
   , "  struct river_window_manager_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_window_manager_v1_get_user_data;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_get_version */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_get_version */"
   , "__attribute__ ((const))"
-  , "uint32_t (*hs_bindgen_2475d487147093d4 (void)) ("
+  , "uint32_t (*hs_bindgen_eec2120cc1d0afb3 (void)) ("
   , "  struct river_window_manager_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_window_manager_v1_get_version;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_stop */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_stop */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_9ae8c03fcc22c932 (void)) ("
+  , "void (*hs_bindgen_0cddef1db81a36a1 (void)) ("
   , "  struct river_window_manager_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_window_manager_v1_stop;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_destroy */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_destroy */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_042ed99400638e6f (void)) ("
+  , "void (*hs_bindgen_5718dd140f9379db (void)) ("
   , "  struct river_window_manager_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_window_manager_v1_destroy;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_manage_finish */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_manage_finish */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_8aa54e206c2f8d8f (void)) ("
+  , "void (*hs_bindgen_397cf6178153fea4 (void)) ("
   , "  struct river_window_manager_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_window_manager_v1_manage_finish;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_manage_dirty */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_manage_dirty */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_8a1c64c9e5c6e961 (void)) ("
+  , "void (*hs_bindgen_17006e6a5ecc9d0a (void)) ("
   , "  struct river_window_manager_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_window_manager_v1_manage_dirty;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_render_finish */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_render_finish */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_52ee41b865a6fd39 (void)) ("
+  , "void (*hs_bindgen_42cda47bf713cbb0 (void)) ("
   , "  struct river_window_manager_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_window_manager_v1_render_finish;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_get_shell_surface */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_get_shell_surface */"
   , "__attribute__ ((const))"
-  , "struct river_shell_surface_v1 *(*hs_bindgen_90b770fe18d1786e (void)) ("
+  , "struct river_shell_surface_v1 *(*hs_bindgen_3fde2cad24a83cf6 (void)) ("
   , "  struct river_window_manager_v1 *arg1,"
   , "  struct wl_surface *arg2"
   , ")"
   , "{"
   , "  return &river_window_manager_v1_get_shell_surface;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_exit_session */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_exit_session */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_61be95037a8f4e70 (void)) ("
+  , "void (*hs_bindgen_77294752c12f356f (void)) ("
   , "  struct river_window_manager_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_window_manager_v1_exit_session;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_add_listener */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_add_listener */"
   , "__attribute__ ((const))"
-  , "signed int (*hs_bindgen_92050af93abc0503 (void)) ("
+  , "signed int (*hs_bindgen_a9a7e2e15aaf67ea (void)) ("
   , "  struct river_window_v1 *arg1,"
   , "  struct river_window_v1_listener const *arg2,"
   , "  void *arg3"
@@ -202,58 +202,58 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return &river_window_v1_add_listener;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_set_user_data */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_set_user_data */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_3182bc9478281217 (void)) ("
+  , "void (*hs_bindgen_bab46ea4371933d2 (void)) ("
   , "  struct river_window_v1 *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  return &river_window_v1_set_user_data;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_get_user_data */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_get_user_data */"
   , "__attribute__ ((const))"
-  , "void *(*hs_bindgen_c144635e6c6d075d (void)) ("
+  , "void *(*hs_bindgen_66790122d7f5e3f7 (void)) ("
   , "  struct river_window_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_window_v1_get_user_data;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_get_version */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_get_version */"
   , "__attribute__ ((const))"
-  , "uint32_t (*hs_bindgen_0b6f81a030e05781 (void)) ("
+  , "uint32_t (*hs_bindgen_7175f8488a40ebdb (void)) ("
   , "  struct river_window_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_window_v1_get_version;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_destroy */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_destroy */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_de78324580ea0146 (void)) ("
+  , "void (*hs_bindgen_4ebd03a33113a7ef (void)) ("
   , "  struct river_window_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_window_v1_destroy;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_close */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_close */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_215c3edddc5b3309 (void)) ("
+  , "void (*hs_bindgen_202c4578a49deeb0 (void)) ("
   , "  struct river_window_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_window_v1_close;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_get_node */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_get_node */"
   , "__attribute__ ((const))"
-  , "struct river_node_v1 *(*hs_bindgen_7039f597bf34d0aa (void)) ("
+  , "struct river_node_v1 *(*hs_bindgen_f35cfc9dc3c52328 (void)) ("
   , "  struct river_window_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_window_v1_get_node;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_propose_dimensions */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_propose_dimensions */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_f1ef0c52b287d789 (void)) ("
+  , "void (*hs_bindgen_4c25f0ec48687c1c (void)) ("
   , "  struct river_window_v1 *arg1,"
   , "  int32_t arg2,"
   , "  int32_t arg3"
@@ -261,41 +261,41 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return &river_window_v1_propose_dimensions;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_hide */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_hide */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_53705ab509abb7d0 (void)) ("
+  , "void (*hs_bindgen_0ff0337cc50d3c35 (void)) ("
   , "  struct river_window_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_window_v1_hide;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_show */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_show */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_e0e6ab2e2bb8ec0e (void)) ("
+  , "void (*hs_bindgen_1bbf516eb3a49613 (void)) ("
   , "  struct river_window_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_window_v1_show;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_use_csd */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_use_csd */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_fce1f4d1d669a6d8 (void)) ("
+  , "void (*hs_bindgen_655d924a9a5bdb6d (void)) ("
   , "  struct river_window_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_window_v1_use_csd;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_use_ssd */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_use_ssd */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_710ffd02c8f38152 (void)) ("
+  , "void (*hs_bindgen_45ff2619e1e4eaeb (void)) ("
   , "  struct river_window_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_window_v1_use_ssd;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_set_borders */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_set_borders */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_b74fe1472efa9ef9 (void)) ("
+  , "void (*hs_bindgen_79be2d7dd33e6f70 (void)) ("
   , "  struct river_window_v1 *arg1,"
   , "  uint32_t arg2,"
   , "  int32_t arg3,"
@@ -307,110 +307,110 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return &river_window_v1_set_borders;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_set_tiled */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_set_tiled */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_fdd72f7172b73a1f (void)) ("
+  , "void (*hs_bindgen_6cc5225e41e807c8 (void)) ("
   , "  struct river_window_v1 *arg1,"
   , "  uint32_t arg2"
   , ")"
   , "{"
   , "  return &river_window_v1_set_tiled;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_get_decoration_above */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_get_decoration_above */"
   , "__attribute__ ((const))"
-  , "struct river_decoration_v1 *(*hs_bindgen_20d6e8c7f5d141df (void)) ("
+  , "struct river_decoration_v1 *(*hs_bindgen_c253f0c3baa629d4 (void)) ("
   , "  struct river_window_v1 *arg1,"
   , "  struct wl_surface *arg2"
   , ")"
   , "{"
   , "  return &river_window_v1_get_decoration_above;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_get_decoration_below */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_get_decoration_below */"
   , "__attribute__ ((const))"
-  , "struct river_decoration_v1 *(*hs_bindgen_c55bc7d9f3852438 (void)) ("
+  , "struct river_decoration_v1 *(*hs_bindgen_1cc2f3eb906e6bce (void)) ("
   , "  struct river_window_v1 *arg1,"
   , "  struct wl_surface *arg2"
   , ")"
   , "{"
   , "  return &river_window_v1_get_decoration_below;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_inform_resize_start */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_inform_resize_start */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_763e62f565c1eb56 (void)) ("
+  , "void (*hs_bindgen_80a63cf1316076b7 (void)) ("
   , "  struct river_window_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_window_v1_inform_resize_start;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_inform_resize_end */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_inform_resize_end */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_f423598411bbd214 (void)) ("
+  , "void (*hs_bindgen_33a35fec3dce1c3a (void)) ("
   , "  struct river_window_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_window_v1_inform_resize_end;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_set_capabilities */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_set_capabilities */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_31a4c4d730da7b83 (void)) ("
+  , "void (*hs_bindgen_a99809fd74faf620 (void)) ("
   , "  struct river_window_v1 *arg1,"
   , "  uint32_t arg2"
   , ")"
   , "{"
   , "  return &river_window_v1_set_capabilities;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_inform_maximized */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_inform_maximized */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_f8e6c9c9bd023260 (void)) ("
+  , "void (*hs_bindgen_f9a6f9adca76ed71 (void)) ("
   , "  struct river_window_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_window_v1_inform_maximized;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_inform_unmaximized */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_inform_unmaximized */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_ce67e9ca1cc464e3 (void)) ("
+  , "void (*hs_bindgen_548b52c8d2c8f3b8 (void)) ("
   , "  struct river_window_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_window_v1_inform_unmaximized;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_inform_fullscreen */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_inform_fullscreen */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_11941507dc22ef68 (void)) ("
+  , "void (*hs_bindgen_4b29202051650ebc (void)) ("
   , "  struct river_window_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_window_v1_inform_fullscreen;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_inform_not_fullscreen */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_inform_not_fullscreen */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_9e8ccaf4bbfde3f8 (void)) ("
+  , "void (*hs_bindgen_4e2b9ccf0e333243 (void)) ("
   , "  struct river_window_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_window_v1_inform_not_fullscreen;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_fullscreen */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_fullscreen */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_245cb06882ebeb37 (void)) ("
+  , "void (*hs_bindgen_d6583038c47b2d3c (void)) ("
   , "  struct river_window_v1 *arg1,"
   , "  struct river_output_v1 *arg2"
   , ")"
   , "{"
   , "  return &river_window_v1_fullscreen;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_exit_fullscreen */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_exit_fullscreen */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_885f460e4158a506 (void)) ("
+  , "void (*hs_bindgen_17c96c6e4f248eba (void)) ("
   , "  struct river_window_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_window_v1_exit_fullscreen;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_set_clip_box */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_set_clip_box */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_01a99a063c2ae8fd (void)) ("
+  , "void (*hs_bindgen_c5ec12951e8c0d3d (void)) ("
   , "  struct river_window_v1 *arg1,"
   , "  int32_t arg2,"
   , "  int32_t arg3,"
@@ -420,9 +420,9 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return &river_window_v1_set_clip_box;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_set_content_clip_box */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_set_content_clip_box */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_ac73314ae4ecbfc0 (void)) ("
+  , "void (*hs_bindgen_e6a5b407e60d52f3 (void)) ("
   , "  struct river_window_v1 *arg1,"
   , "  int32_t arg2,"
   , "  int32_t arg3,"
@@ -432,9 +432,9 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return &river_window_v1_set_content_clip_box;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_set_dimension_bounds */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_set_dimension_bounds */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_8574350bdb858517 (void)) ("
+  , "void (*hs_bindgen_8f5d6d73f16d5ffe (void)) ("
   , "  struct river_window_v1 *arg1,"
   , "  int32_t arg2,"
   , "  int32_t arg3"
@@ -442,42 +442,42 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return &river_window_v1_set_dimension_bounds;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_decoration_v1_set_user_data */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_decoration_v1_set_user_data */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_d4a219cdb4d998e0 (void)) ("
+  , "void (*hs_bindgen_8dadbfc697708e99 (void)) ("
   , "  struct river_decoration_v1 *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  return &river_decoration_v1_set_user_data;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_decoration_v1_get_user_data */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_decoration_v1_get_user_data */"
   , "__attribute__ ((const))"
-  , "void *(*hs_bindgen_3cba4dbab6860065 (void)) ("
+  , "void *(*hs_bindgen_8677e1fc75774766 (void)) ("
   , "  struct river_decoration_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_decoration_v1_get_user_data;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_decoration_v1_get_version */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_decoration_v1_get_version */"
   , "__attribute__ ((const))"
-  , "uint32_t (*hs_bindgen_e261771b3f9c3509 (void)) ("
+  , "uint32_t (*hs_bindgen_8ae32a50e736459c (void)) ("
   , "  struct river_decoration_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_decoration_v1_get_version;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_decoration_v1_destroy */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_decoration_v1_destroy */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_1810611f68eb2c61 (void)) ("
+  , "void (*hs_bindgen_9012668ba1231fbc (void)) ("
   , "  struct river_decoration_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_decoration_v1_destroy;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_decoration_v1_set_offset */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_decoration_v1_set_offset */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_a24407cac6cb29d1 (void)) ("
+  , "void (*hs_bindgen_85a1d3b766b97649 (void)) ("
   , "  struct river_decoration_v1 *arg1,"
   , "  int32_t arg2,"
   , "  int32_t arg3"
@@ -485,99 +485,99 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return &river_decoration_v1_set_offset;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_decoration_v1_sync_next_commit */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_decoration_v1_sync_next_commit */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_9e17306666d653e0 (void)) ("
+  , "void (*hs_bindgen_09aef2cabbf2e496 (void)) ("
   , "  struct river_decoration_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_decoration_v1_sync_next_commit;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_shell_surface_v1_set_user_data */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_shell_surface_v1_set_user_data */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_61933ef7a1db28d2 (void)) ("
+  , "void (*hs_bindgen_637340ca2405e9ae (void)) ("
   , "  struct river_shell_surface_v1 *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  return &river_shell_surface_v1_set_user_data;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_shell_surface_v1_get_user_data */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_shell_surface_v1_get_user_data */"
   , "__attribute__ ((const))"
-  , "void *(*hs_bindgen_b002f663f44b911e (void)) ("
+  , "void *(*hs_bindgen_47e0c5f849aa6f3b (void)) ("
   , "  struct river_shell_surface_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_shell_surface_v1_get_user_data;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_shell_surface_v1_get_version */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_shell_surface_v1_get_version */"
   , "__attribute__ ((const))"
-  , "uint32_t (*hs_bindgen_6e692dd59a59c19d (void)) ("
+  , "uint32_t (*hs_bindgen_5bf7062330f9db8f (void)) ("
   , "  struct river_shell_surface_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_shell_surface_v1_get_version;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_shell_surface_v1_destroy */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_shell_surface_v1_destroy */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_4ae20c23c48947ce (void)) ("
+  , "void (*hs_bindgen_4cec8b52de2c9e1f (void)) ("
   , "  struct river_shell_surface_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_shell_surface_v1_destroy;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_shell_surface_v1_get_node */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_shell_surface_v1_get_node */"
   , "__attribute__ ((const))"
-  , "struct river_node_v1 *(*hs_bindgen_278fc05cdcef298b (void)) ("
+  , "struct river_node_v1 *(*hs_bindgen_7983ba591c32bbb5 (void)) ("
   , "  struct river_shell_surface_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_shell_surface_v1_get_node;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_shell_surface_v1_sync_next_commit */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_shell_surface_v1_sync_next_commit */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_afaafe9083308b01 (void)) ("
+  , "void (*hs_bindgen_959ddadb149a9b6f (void)) ("
   , "  struct river_shell_surface_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_shell_surface_v1_sync_next_commit;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_node_v1_set_user_data */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_set_user_data */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_8b4f3149f74893fb (void)) ("
+  , "void (*hs_bindgen_3a1221c3bbf2684e (void)) ("
   , "  struct river_node_v1 *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  return &river_node_v1_set_user_data;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_node_v1_get_user_data */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_get_user_data */"
   , "__attribute__ ((const))"
-  , "void *(*hs_bindgen_ca11d6d1aa9338af (void)) ("
+  , "void *(*hs_bindgen_7b42d0b5100d80c6 (void)) ("
   , "  struct river_node_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_node_v1_get_user_data;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_node_v1_get_version */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_get_version */"
   , "__attribute__ ((const))"
-  , "uint32_t (*hs_bindgen_aebddf4852788668 (void)) ("
+  , "uint32_t (*hs_bindgen_3fea393a8d9daf1a (void)) ("
   , "  struct river_node_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_node_v1_get_version;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_node_v1_destroy */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_destroy */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_00058e19ed494e89 (void)) ("
+  , "void (*hs_bindgen_0f4179852a3ccd36 (void)) ("
   , "  struct river_node_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_node_v1_destroy;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_node_v1_set_position */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_set_position */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_8735927717c46faf (void)) ("
+  , "void (*hs_bindgen_c942f09da52504a3 (void)) ("
   , "  struct river_node_v1 *arg1,"
   , "  int32_t arg2,"
   , "  int32_t arg3"
@@ -585,43 +585,43 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return &river_node_v1_set_position;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_node_v1_place_top */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_place_top */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_92b4918c7c8c8168 (void)) ("
+  , "void (*hs_bindgen_cf225841637ae73a (void)) ("
   , "  struct river_node_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_node_v1_place_top;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_node_v1_place_bottom */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_place_bottom */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_14a096550e0fdbb3 (void)) ("
+  , "void (*hs_bindgen_95a0ac5877f16cae (void)) ("
   , "  struct river_node_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_node_v1_place_bottom;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_node_v1_place_above */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_place_above */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_618142b95fd19e25 (void)) ("
+  , "void (*hs_bindgen_5b1d5fbead8d235f (void)) ("
   , "  struct river_node_v1 *arg1,"
   , "  struct river_node_v1 *arg2"
   , ")"
   , "{"
   , "  return &river_node_v1_place_above;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_node_v1_place_below */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_place_below */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_66aa95649707a23b (void)) ("
+  , "void (*hs_bindgen_f7ec18909a3f4cd1 (void)) ("
   , "  struct river_node_v1 *arg1,"
   , "  struct river_node_v1 *arg2"
   , ")"
   , "{"
   , "  return &river_node_v1_place_below;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_output_v1_add_listener */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_output_v1_add_listener */"
   , "__attribute__ ((const))"
-  , "signed int (*hs_bindgen_71c5f70658564f46 (void)) ("
+  , "signed int (*hs_bindgen_8ce5f1468c302718 (void)) ("
   , "  struct river_output_v1 *arg1,"
   , "  struct river_output_v1_listener const *arg2,"
   , "  void *arg3"
@@ -629,51 +629,51 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return &river_output_v1_add_listener;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_output_v1_set_user_data */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_output_v1_set_user_data */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_08c8089bca2d9ef6 (void)) ("
+  , "void (*hs_bindgen_67d5bb3e3a882763 (void)) ("
   , "  struct river_output_v1 *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  return &river_output_v1_set_user_data;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_output_v1_get_user_data */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_output_v1_get_user_data */"
   , "__attribute__ ((const))"
-  , "void *(*hs_bindgen_67978720df9db53c (void)) ("
+  , "void *(*hs_bindgen_1f80ecb4aeff6715 (void)) ("
   , "  struct river_output_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_output_v1_get_user_data;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_output_v1_get_version */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_output_v1_get_version */"
   , "__attribute__ ((const))"
-  , "uint32_t (*hs_bindgen_884bec6e6f0913ba (void)) ("
+  , "uint32_t (*hs_bindgen_323b8d0dca53fd55 (void)) ("
   , "  struct river_output_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_output_v1_get_version;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_output_v1_destroy */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_output_v1_destroy */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_5141a87f5df77a31 (void)) ("
+  , "void (*hs_bindgen_cbd5d19e2ee6af54 (void)) ("
   , "  struct river_output_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_output_v1_destroy;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_output_v1_set_presentation_mode */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_output_v1_set_presentation_mode */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_7e32b364d8dab9ad (void)) ("
+  , "void (*hs_bindgen_a2dc6af98fb7330a (void)) ("
   , "  struct river_output_v1 *arg1,"
   , "  uint32_t arg2"
   , ")"
   , "{"
   , "  return &river_output_v1_set_presentation_mode;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_add_listener */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_add_listener */"
   , "__attribute__ ((const))"
-  , "signed int (*hs_bindgen_81729c27be6d66fe (void)) ("
+  , "signed int (*hs_bindgen_a93382461e2e21df (void)) ("
   , "  struct river_seat_v1 *arg1,"
   , "  struct river_seat_v1_listener const *arg2,"
   , "  void *arg3"
@@ -681,84 +681,84 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return &river_seat_v1_add_listener;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_set_user_data */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_set_user_data */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_4c3ce402697d4ad3 (void)) ("
+  , "void (*hs_bindgen_36a7a87f14ff59e3 (void)) ("
   , "  struct river_seat_v1 *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  return &river_seat_v1_set_user_data;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_get_user_data */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_get_user_data */"
   , "__attribute__ ((const))"
-  , "void *(*hs_bindgen_ba6e46d9c5222fa2 (void)) ("
+  , "void *(*hs_bindgen_f52a3af2317cdb3f (void)) ("
   , "  struct river_seat_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_seat_v1_get_user_data;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_get_version */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_get_version */"
   , "__attribute__ ((const))"
-  , "uint32_t (*hs_bindgen_f3c02620a20c0334 (void)) ("
+  , "uint32_t (*hs_bindgen_134019eadefab583 (void)) ("
   , "  struct river_seat_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_seat_v1_get_version;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_destroy */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_destroy */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_84bda737d8a5d61d (void)) ("
+  , "void (*hs_bindgen_1c70ada60a57998a (void)) ("
   , "  struct river_seat_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_seat_v1_destroy;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_focus_window */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_focus_window */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_e18c6474aaa6e2d9 (void)) ("
+  , "void (*hs_bindgen_c5e64d924cd67d90 (void)) ("
   , "  struct river_seat_v1 *arg1,"
   , "  struct river_window_v1 *arg2"
   , ")"
   , "{"
   , "  return &river_seat_v1_focus_window;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_focus_shell_surface */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_focus_shell_surface */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_bee3d71ff21fbf10 (void)) ("
+  , "void (*hs_bindgen_e1b6a51de48b9c8b (void)) ("
   , "  struct river_seat_v1 *arg1,"
   , "  struct river_shell_surface_v1 *arg2"
   , ")"
   , "{"
   , "  return &river_seat_v1_focus_shell_surface;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_clear_focus */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_clear_focus */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_4d11a811c0bebdf9 (void)) ("
+  , "void (*hs_bindgen_6bdedc1db9f9d64c (void)) ("
   , "  struct river_seat_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_seat_v1_clear_focus;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_op_start_pointer */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_op_start_pointer */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_4a9aaa027a482629 (void)) ("
+  , "void (*hs_bindgen_8b7ab0fc29f443ef (void)) ("
   , "  struct river_seat_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_seat_v1_op_start_pointer;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_op_end */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_op_end */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_a34dd38ae03c2dab (void)) ("
+  , "void (*hs_bindgen_e20fd7a37b77d031 (void)) ("
   , "  struct river_seat_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_seat_v1_op_end;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_get_pointer_binding */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_get_pointer_binding */"
   , "__attribute__ ((const))"
-  , "struct river_pointer_binding_v1 *(*hs_bindgen_b76ba03a38e05580 (void)) ("
+  , "struct river_pointer_binding_v1 *(*hs_bindgen_74c667c4df9d2989 (void)) ("
   , "  struct river_seat_v1 *arg1,"
   , "  uint32_t arg2,"
   , "  uint32_t arg3"
@@ -766,9 +766,9 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return &river_seat_v1_get_pointer_binding;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_set_xcursor_theme */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_set_xcursor_theme */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_2731fa9dcf0c584e (void)) ("
+  , "void (*hs_bindgen_cc900dda00cc7561 (void)) ("
   , "  struct river_seat_v1 *arg1,"
   , "  char const *arg2,"
   , "  uint32_t arg3"
@@ -776,9 +776,9 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return &river_seat_v1_set_xcursor_theme;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_pointer_warp */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_pointer_warp */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_15768677781d49b7 (void)) ("
+  , "void (*hs_bindgen_dfc63eae30cf6771 (void)) ("
   , "  struct river_seat_v1 *arg1,"
   , "  int32_t arg2,"
   , "  int32_t arg3"
@@ -786,9 +786,9 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return &river_seat_v1_pointer_warp;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_add_listener */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_add_listener */"
   , "__attribute__ ((const))"
-  , "signed int (*hs_bindgen_7bd61c7144b41a68 (void)) ("
+  , "signed int (*hs_bindgen_e247393001849250 (void)) ("
   , "  struct river_pointer_binding_v1 *arg1,"
   , "  struct river_pointer_binding_v1_listener const *arg2,"
   , "  void *arg3"
@@ -796,50 +796,50 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return &river_pointer_binding_v1_add_listener;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_set_user_data */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_set_user_data */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_058cd111dce77ba6 (void)) ("
+  , "void (*hs_bindgen_49c8b53d074824f4 (void)) ("
   , "  struct river_pointer_binding_v1 *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  return &river_pointer_binding_v1_set_user_data;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_get_user_data */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_get_user_data */"
   , "__attribute__ ((const))"
-  , "void *(*hs_bindgen_bc6e5d2841b9f574 (void)) ("
+  , "void *(*hs_bindgen_afd3bcc860d069d0 (void)) ("
   , "  struct river_pointer_binding_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_pointer_binding_v1_get_user_data;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_get_version */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_get_version */"
   , "__attribute__ ((const))"
-  , "uint32_t (*hs_bindgen_561e7879795d3c7e (void)) ("
+  , "uint32_t (*hs_bindgen_7767bae29484f65b (void)) ("
   , "  struct river_pointer_binding_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_pointer_binding_v1_get_version;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_destroy */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_destroy */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_e8046eec37126a29 (void)) ("
+  , "void (*hs_bindgen_65601e3805362557 (void)) ("
   , "  struct river_pointer_binding_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_pointer_binding_v1_destroy;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_enable */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_enable */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_0a23d64ae69bcd64 (void)) ("
+  , "void (*hs_bindgen_c78ddbd52c8c708f (void)) ("
   , "  struct river_pointer_binding_v1 *arg1"
   , ")"
   , "{"
   , "  return &river_pointer_binding_v1_enable;"
   , "}"
-  , "/* hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_disable */"
+  , "/* River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_disable */"
   , "__attribute__ ((const))"
-  , "void (*hs_bindgen_a03b792044c0aeea (void)) ("
+  , "void (*hs_bindgen_6413557eae13ce5a (void)) ("
   , "  struct river_pointer_binding_v1 *arg1"
   , ")"
   , "{"
@@ -847,14 +847,14 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "}"
   ]))
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_add_listener@
-foreign import ccall unsafe "hs_bindgen_260b858a9f5cf297" hs_bindgen_260b858a9f5cf297_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_add_listener@
+foreign import ccall unsafe "hs_bindgen_bd105b0334ac4498" hs_bindgen_bd105b0334ac4498_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_add_listener@
-hs_bindgen_260b858a9f5cf297 :: IO (RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> (PtrConst.PtrConst River_window_manager_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt))
-hs_bindgen_260b858a9f5cf297 =
-  RIP.fromFFIType hs_bindgen_260b858a9f5cf297_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_add_listener@
+hs_bindgen_bd105b0334ac4498 :: IO (RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> (PtrConst.PtrConst River_window_manager_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt))
+hs_bindgen_bd105b0334ac4498 =
+  RIP.fromFFIType hs_bindgen_bd105b0334ac4498_base
 
 {-# NOINLINE river_window_manager_v1_add_listener #-}
 {-|
@@ -869,16 +869,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_manager_v1_add_listener :: RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> (PtrConst.PtrConst River_window_manager_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt)
 river_window_manager_v1_add_listener =
-  RIP.unsafePerformIO hs_bindgen_260b858a9f5cf297
+  RIP.unsafePerformIO hs_bindgen_bd105b0334ac4498
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_set_user_data@
-foreign import ccall unsafe "hs_bindgen_1f044f4409d05546" hs_bindgen_1f044f4409d05546_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_set_user_data@
+foreign import ccall unsafe "hs_bindgen_934f963934b86085" hs_bindgen_934f963934b86085_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_set_user_data@
-hs_bindgen_1f044f4409d05546 :: IO (RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
-hs_bindgen_1f044f4409d05546 =
-  RIP.fromFFIType hs_bindgen_1f044f4409d05546_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_set_user_data@
+hs_bindgen_934f963934b86085 :: IO (RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
+hs_bindgen_934f963934b86085 =
+  RIP.fromFFIType hs_bindgen_934f963934b86085_base
 
 {-# NOINLINE river_window_manager_v1_set_user_data #-}
 {-|
@@ -893,16 +893,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_manager_v1_set_user_data :: RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> (RIP.Ptr RIP.Void) -> IO ())
 river_window_manager_v1_set_user_data =
-  RIP.unsafePerformIO hs_bindgen_1f044f4409d05546
+  RIP.unsafePerformIO hs_bindgen_934f963934b86085
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_get_user_data@
-foreign import ccall unsafe "hs_bindgen_355a21107a85a332" hs_bindgen_355a21107a85a332_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_get_user_data@
+foreign import ccall unsafe "hs_bindgen_72177b14923fb83b" hs_bindgen_72177b14923fb83b_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_get_user_data@
-hs_bindgen_355a21107a85a332 :: IO (RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> IO (RIP.Ptr RIP.Void)))
-hs_bindgen_355a21107a85a332 =
-  RIP.fromFFIType hs_bindgen_355a21107a85a332_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_get_user_data@
+hs_bindgen_72177b14923fb83b :: IO (RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> IO (RIP.Ptr RIP.Void)))
+hs_bindgen_72177b14923fb83b =
+  RIP.fromFFIType hs_bindgen_72177b14923fb83b_base
 
 {-# NOINLINE river_window_manager_v1_get_user_data #-}
 {-|
@@ -917,16 +917,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_manager_v1_get_user_data :: RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> IO (RIP.Ptr RIP.Void))
 river_window_manager_v1_get_user_data =
-  RIP.unsafePerformIO hs_bindgen_355a21107a85a332
+  RIP.unsafePerformIO hs_bindgen_72177b14923fb83b
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_get_version@
-foreign import ccall unsafe "hs_bindgen_2475d487147093d4" hs_bindgen_2475d487147093d4_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_get_version@
+foreign import ccall unsafe "hs_bindgen_eec2120cc1d0afb3" hs_bindgen_eec2120cc1d0afb3_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_get_version@
-hs_bindgen_2475d487147093d4 :: IO (RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> IO HsBindgen.Runtime.LibC.Word32))
-hs_bindgen_2475d487147093d4 =
-  RIP.fromFFIType hs_bindgen_2475d487147093d4_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_get_version@
+hs_bindgen_eec2120cc1d0afb3 :: IO (RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> IO HsBindgen.Runtime.LibC.Word32))
+hs_bindgen_eec2120cc1d0afb3 =
+  RIP.fromFFIType hs_bindgen_eec2120cc1d0afb3_base
 
 {-# NOINLINE river_window_manager_v1_get_version #-}
 {-| __C declaration:__ @river_window_manager_v1_get_version@
@@ -937,16 +937,16 @@ hs_bindgen_2475d487147093d4 =
 -}
 river_window_manager_v1_get_version :: RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> IO HsBindgen.Runtime.LibC.Word32)
 river_window_manager_v1_get_version =
-  RIP.unsafePerformIO hs_bindgen_2475d487147093d4
+  RIP.unsafePerformIO hs_bindgen_eec2120cc1d0afb3
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_stop@
-foreign import ccall unsafe "hs_bindgen_9ae8c03fcc22c932" hs_bindgen_9ae8c03fcc22c932_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_stop@
+foreign import ccall unsafe "hs_bindgen_0cddef1db81a36a1" hs_bindgen_0cddef1db81a36a1_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_stop@
-hs_bindgen_9ae8c03fcc22c932 :: IO (RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> IO ()))
-hs_bindgen_9ae8c03fcc22c932 =
-  RIP.fromFFIType hs_bindgen_9ae8c03fcc22c932_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_stop@
+hs_bindgen_0cddef1db81a36a1 :: IO (RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> IO ()))
+hs_bindgen_0cddef1db81a36a1 =
+  RIP.fromFFIType hs_bindgen_0cddef1db81a36a1_base
 
 {-# NOINLINE river_window_manager_v1_stop #-}
 {-|
@@ -965,16 +965,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_manager_v1_stop :: RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> IO ())
 river_window_manager_v1_stop =
-  RIP.unsafePerformIO hs_bindgen_9ae8c03fcc22c932
+  RIP.unsafePerformIO hs_bindgen_0cddef1db81a36a1
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_destroy@
-foreign import ccall unsafe "hs_bindgen_042ed99400638e6f" hs_bindgen_042ed99400638e6f_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_destroy@
+foreign import ccall unsafe "hs_bindgen_5718dd140f9379db" hs_bindgen_5718dd140f9379db_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_destroy@
-hs_bindgen_042ed99400638e6f :: IO (RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> IO ()))
-hs_bindgen_042ed99400638e6f =
-  RIP.fromFFIType hs_bindgen_042ed99400638e6f_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_destroy@
+hs_bindgen_5718dd140f9379db :: IO (RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> IO ()))
+hs_bindgen_5718dd140f9379db =
+  RIP.fromFFIType hs_bindgen_5718dd140f9379db_base
 
 {-# NOINLINE river_window_manager_v1_destroy #-}
 {-|
@@ -993,16 +993,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_manager_v1_destroy :: RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> IO ())
 river_window_manager_v1_destroy =
-  RIP.unsafePerformIO hs_bindgen_042ed99400638e6f
+  RIP.unsafePerformIO hs_bindgen_5718dd140f9379db
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_manage_finish@
-foreign import ccall unsafe "hs_bindgen_8aa54e206c2f8d8f" hs_bindgen_8aa54e206c2f8d8f_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_manage_finish@
+foreign import ccall unsafe "hs_bindgen_397cf6178153fea4" hs_bindgen_397cf6178153fea4_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_manage_finish@
-hs_bindgen_8aa54e206c2f8d8f :: IO (RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> IO ()))
-hs_bindgen_8aa54e206c2f8d8f =
-  RIP.fromFFIType hs_bindgen_8aa54e206c2f8d8f_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_manage_finish@
+hs_bindgen_397cf6178153fea4 :: IO (RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> IO ()))
+hs_bindgen_397cf6178153fea4 =
+  RIP.fromFFIType hs_bindgen_397cf6178153fea4_base
 
 {-# NOINLINE river_window_manager_v1_manage_finish #-}
 {-|
@@ -1023,16 +1023,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_manager_v1_manage_finish :: RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> IO ())
 river_window_manager_v1_manage_finish =
-  RIP.unsafePerformIO hs_bindgen_8aa54e206c2f8d8f
+  RIP.unsafePerformIO hs_bindgen_397cf6178153fea4
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_manage_dirty@
-foreign import ccall unsafe "hs_bindgen_8a1c64c9e5c6e961" hs_bindgen_8a1c64c9e5c6e961_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_manage_dirty@
+foreign import ccall unsafe "hs_bindgen_17006e6a5ecc9d0a" hs_bindgen_17006e6a5ecc9d0a_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_manage_dirty@
-hs_bindgen_8a1c64c9e5c6e961 :: IO (RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> IO ()))
-hs_bindgen_8a1c64c9e5c6e961 =
-  RIP.fromFFIType hs_bindgen_8a1c64c9e5c6e961_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_manage_dirty@
+hs_bindgen_17006e6a5ecc9d0a :: IO (RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> IO ()))
+hs_bindgen_17006e6a5ecc9d0a =
+  RIP.fromFFIType hs_bindgen_17006e6a5ecc9d0a_base
 
 {-# NOINLINE river_window_manager_v1_manage_dirty #-}
 {-|
@@ -1051,16 +1051,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_manager_v1_manage_dirty :: RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> IO ())
 river_window_manager_v1_manage_dirty =
-  RIP.unsafePerformIO hs_bindgen_8a1c64c9e5c6e961
+  RIP.unsafePerformIO hs_bindgen_17006e6a5ecc9d0a
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_render_finish@
-foreign import ccall unsafe "hs_bindgen_52ee41b865a6fd39" hs_bindgen_52ee41b865a6fd39_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_render_finish@
+foreign import ccall unsafe "hs_bindgen_42cda47bf713cbb0" hs_bindgen_42cda47bf713cbb0_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_render_finish@
-hs_bindgen_52ee41b865a6fd39 :: IO (RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> IO ()))
-hs_bindgen_52ee41b865a6fd39 =
-  RIP.fromFFIType hs_bindgen_52ee41b865a6fd39_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_render_finish@
+hs_bindgen_42cda47bf713cbb0 :: IO (RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> IO ()))
+hs_bindgen_42cda47bf713cbb0 =
+  RIP.fromFFIType hs_bindgen_42cda47bf713cbb0_base
 
 {-# NOINLINE river_window_manager_v1_render_finish #-}
 {-|
@@ -1081,16 +1081,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_manager_v1_render_finish :: RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> IO ())
 river_window_manager_v1_render_finish =
-  RIP.unsafePerformIO hs_bindgen_52ee41b865a6fd39
+  RIP.unsafePerformIO hs_bindgen_42cda47bf713cbb0
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_get_shell_surface@
-foreign import ccall unsafe "hs_bindgen_90b770fe18d1786e" hs_bindgen_90b770fe18d1786e_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_get_shell_surface@
+foreign import ccall unsafe "hs_bindgen_3fde2cad24a83cf6" hs_bindgen_3fde2cad24a83cf6_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_get_shell_surface@
-hs_bindgen_90b770fe18d1786e :: IO (RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> (RIP.Ptr Wl_surface) -> IO (RIP.Ptr River_shell_surface_v1)))
-hs_bindgen_90b770fe18d1786e =
-  RIP.fromFFIType hs_bindgen_90b770fe18d1786e_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_get_shell_surface@
+hs_bindgen_3fde2cad24a83cf6 :: IO (RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> (RIP.Ptr Wl_surface) -> IO (RIP.Ptr River_shell_surface_v1)))
+hs_bindgen_3fde2cad24a83cf6 =
+  RIP.fromFFIType hs_bindgen_3fde2cad24a83cf6_base
 
 {-# NOINLINE river_window_manager_v1_get_shell_surface #-}
 {-|
@@ -1109,16 +1109,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_manager_v1_get_shell_surface :: RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> (RIP.Ptr Wl_surface) -> IO (RIP.Ptr River_shell_surface_v1))
 river_window_manager_v1_get_shell_surface =
-  RIP.unsafePerformIO hs_bindgen_90b770fe18d1786e
+  RIP.unsafePerformIO hs_bindgen_3fde2cad24a83cf6
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_exit_session@
-foreign import ccall unsafe "hs_bindgen_61be95037a8f4e70" hs_bindgen_61be95037a8f4e70_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_exit_session@
+foreign import ccall unsafe "hs_bindgen_77294752c12f356f" hs_bindgen_77294752c12f356f_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_manager_v1_exit_session@
-hs_bindgen_61be95037a8f4e70 :: IO (RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> IO ()))
-hs_bindgen_61be95037a8f4e70 =
-  RIP.fromFFIType hs_bindgen_61be95037a8f4e70_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_exit_session@
+hs_bindgen_77294752c12f356f :: IO (RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> IO ()))
+hs_bindgen_77294752c12f356f =
+  RIP.fromFFIType hs_bindgen_77294752c12f356f_base
 
 {-# NOINLINE river_window_manager_v1_exit_session #-}
 {-|
@@ -1137,16 +1137,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_manager_v1_exit_session :: RIP.FunPtr ((RIP.Ptr River_window_manager_v1) -> IO ())
 river_window_manager_v1_exit_session =
-  RIP.unsafePerformIO hs_bindgen_61be95037a8f4e70
+  RIP.unsafePerformIO hs_bindgen_77294752c12f356f
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_add_listener@
-foreign import ccall unsafe "hs_bindgen_92050af93abc0503" hs_bindgen_92050af93abc0503_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_add_listener@
+foreign import ccall unsafe "hs_bindgen_a9a7e2e15aaf67ea" hs_bindgen_a9a7e2e15aaf67ea_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_add_listener@
-hs_bindgen_92050af93abc0503 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> (PtrConst.PtrConst River_window_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt))
-hs_bindgen_92050af93abc0503 =
-  RIP.fromFFIType hs_bindgen_92050af93abc0503_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_add_listener@
+hs_bindgen_a9a7e2e15aaf67ea :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> (PtrConst.PtrConst River_window_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt))
+hs_bindgen_a9a7e2e15aaf67ea =
+  RIP.fromFFIType hs_bindgen_a9a7e2e15aaf67ea_base
 
 {-# NOINLINE river_window_v1_add_listener #-}
 {-|
@@ -1161,16 +1161,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_add_listener :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> (PtrConst.PtrConst River_window_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt)
 river_window_v1_add_listener =
-  RIP.unsafePerformIO hs_bindgen_92050af93abc0503
+  RIP.unsafePerformIO hs_bindgen_a9a7e2e15aaf67ea
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_set_user_data@
-foreign import ccall unsafe "hs_bindgen_3182bc9478281217" hs_bindgen_3182bc9478281217_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_set_user_data@
+foreign import ccall unsafe "hs_bindgen_bab46ea4371933d2" hs_bindgen_bab46ea4371933d2_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_set_user_data@
-hs_bindgen_3182bc9478281217 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
-hs_bindgen_3182bc9478281217 =
-  RIP.fromFFIType hs_bindgen_3182bc9478281217_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_set_user_data@
+hs_bindgen_bab46ea4371933d2 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
+hs_bindgen_bab46ea4371933d2 =
+  RIP.fromFFIType hs_bindgen_bab46ea4371933d2_base
 
 {-# NOINLINE river_window_v1_set_user_data #-}
 {-|
@@ -1185,16 +1185,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_set_user_data :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> (RIP.Ptr RIP.Void) -> IO ())
 river_window_v1_set_user_data =
-  RIP.unsafePerformIO hs_bindgen_3182bc9478281217
+  RIP.unsafePerformIO hs_bindgen_bab46ea4371933d2
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_get_user_data@
-foreign import ccall unsafe "hs_bindgen_c144635e6c6d075d" hs_bindgen_c144635e6c6d075d_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_get_user_data@
+foreign import ccall unsafe "hs_bindgen_66790122d7f5e3f7" hs_bindgen_66790122d7f5e3f7_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_get_user_data@
-hs_bindgen_c144635e6c6d075d :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO (RIP.Ptr RIP.Void)))
-hs_bindgen_c144635e6c6d075d =
-  RIP.fromFFIType hs_bindgen_c144635e6c6d075d_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_get_user_data@
+hs_bindgen_66790122d7f5e3f7 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO (RIP.Ptr RIP.Void)))
+hs_bindgen_66790122d7f5e3f7 =
+  RIP.fromFFIType hs_bindgen_66790122d7f5e3f7_base
 
 {-# NOINLINE river_window_v1_get_user_data #-}
 {-|
@@ -1209,16 +1209,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_get_user_data :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO (RIP.Ptr RIP.Void))
 river_window_v1_get_user_data =
-  RIP.unsafePerformIO hs_bindgen_c144635e6c6d075d
+  RIP.unsafePerformIO hs_bindgen_66790122d7f5e3f7
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_get_version@
-foreign import ccall unsafe "hs_bindgen_0b6f81a030e05781" hs_bindgen_0b6f81a030e05781_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_get_version@
+foreign import ccall unsafe "hs_bindgen_7175f8488a40ebdb" hs_bindgen_7175f8488a40ebdb_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_get_version@
-hs_bindgen_0b6f81a030e05781 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO HsBindgen.Runtime.LibC.Word32))
-hs_bindgen_0b6f81a030e05781 =
-  RIP.fromFFIType hs_bindgen_0b6f81a030e05781_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_get_version@
+hs_bindgen_7175f8488a40ebdb :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO HsBindgen.Runtime.LibC.Word32))
+hs_bindgen_7175f8488a40ebdb =
+  RIP.fromFFIType hs_bindgen_7175f8488a40ebdb_base
 
 {-# NOINLINE river_window_v1_get_version #-}
 {-| __C declaration:__ @river_window_v1_get_version@
@@ -1229,16 +1229,16 @@ hs_bindgen_0b6f81a030e05781 =
 -}
 river_window_v1_get_version :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO HsBindgen.Runtime.LibC.Word32)
 river_window_v1_get_version =
-  RIP.unsafePerformIO hs_bindgen_0b6f81a030e05781
+  RIP.unsafePerformIO hs_bindgen_7175f8488a40ebdb
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_destroy@
-foreign import ccall unsafe "hs_bindgen_de78324580ea0146" hs_bindgen_de78324580ea0146_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_destroy@
+foreign import ccall unsafe "hs_bindgen_4ebd03a33113a7ef" hs_bindgen_4ebd03a33113a7ef_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_destroy@
-hs_bindgen_de78324580ea0146 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ()))
-hs_bindgen_de78324580ea0146 =
-  RIP.fromFFIType hs_bindgen_de78324580ea0146_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_destroy@
+hs_bindgen_4ebd03a33113a7ef :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ()))
+hs_bindgen_4ebd03a33113a7ef =
+  RIP.fromFFIType hs_bindgen_4ebd03a33113a7ef_base
 
 {-# NOINLINE river_window_v1_destroy #-}
 {-|
@@ -1257,16 +1257,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_destroy :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ())
 river_window_v1_destroy =
-  RIP.unsafePerformIO hs_bindgen_de78324580ea0146
+  RIP.unsafePerformIO hs_bindgen_4ebd03a33113a7ef
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_close@
-foreign import ccall unsafe "hs_bindgen_215c3edddc5b3309" hs_bindgen_215c3edddc5b3309_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_close@
+foreign import ccall unsafe "hs_bindgen_202c4578a49deeb0" hs_bindgen_202c4578a49deeb0_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_close@
-hs_bindgen_215c3edddc5b3309 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ()))
-hs_bindgen_215c3edddc5b3309 =
-  RIP.fromFFIType hs_bindgen_215c3edddc5b3309_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_close@
+hs_bindgen_202c4578a49deeb0 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ()))
+hs_bindgen_202c4578a49deeb0 =
+  RIP.fromFFIType hs_bindgen_202c4578a49deeb0_base
 
 {-# NOINLINE river_window_v1_close #-}
 {-|
@@ -1287,16 +1287,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_close :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ())
 river_window_v1_close =
-  RIP.unsafePerformIO hs_bindgen_215c3edddc5b3309
+  RIP.unsafePerformIO hs_bindgen_202c4578a49deeb0
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_get_node@
-foreign import ccall unsafe "hs_bindgen_7039f597bf34d0aa" hs_bindgen_7039f597bf34d0aa_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_get_node@
+foreign import ccall unsafe "hs_bindgen_f35cfc9dc3c52328" hs_bindgen_f35cfc9dc3c52328_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_get_node@
-hs_bindgen_7039f597bf34d0aa :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO (RIP.Ptr River_node_v1)))
-hs_bindgen_7039f597bf34d0aa =
-  RIP.fromFFIType hs_bindgen_7039f597bf34d0aa_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_get_node@
+hs_bindgen_f35cfc9dc3c52328 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO (RIP.Ptr River_node_v1)))
+hs_bindgen_f35cfc9dc3c52328 =
+  RIP.fromFFIType hs_bindgen_f35cfc9dc3c52328_base
 
 {-# NOINLINE river_window_v1_get_node #-}
 {-|
@@ -1315,16 +1315,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_get_node :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO (RIP.Ptr River_node_v1))
 river_window_v1_get_node =
-  RIP.unsafePerformIO hs_bindgen_7039f597bf34d0aa
+  RIP.unsafePerformIO hs_bindgen_f35cfc9dc3c52328
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_propose_dimensions@
-foreign import ccall unsafe "hs_bindgen_f1ef0c52b287d789" hs_bindgen_f1ef0c52b287d789_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_propose_dimensions@
+foreign import ccall unsafe "hs_bindgen_4c25f0ec48687c1c" hs_bindgen_4c25f0ec48687c1c_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_propose_dimensions@
-hs_bindgen_f1ef0c52b287d789 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-hs_bindgen_f1ef0c52b287d789 =
-  RIP.fromFFIType hs_bindgen_f1ef0c52b287d789_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_propose_dimensions@
+hs_bindgen_4c25f0ec48687c1c :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_4c25f0ec48687c1c =
+  RIP.fromFFIType hs_bindgen_4c25f0ec48687c1c_base
 
 {-# NOINLINE river_window_v1_propose_dimensions #-}
 {-|
@@ -1351,16 +1351,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_propose_dimensions :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 river_window_v1_propose_dimensions =
-  RIP.unsafePerformIO hs_bindgen_f1ef0c52b287d789
+  RIP.unsafePerformIO hs_bindgen_4c25f0ec48687c1c
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_hide@
-foreign import ccall unsafe "hs_bindgen_53705ab509abb7d0" hs_bindgen_53705ab509abb7d0_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_hide@
+foreign import ccall unsafe "hs_bindgen_0ff0337cc50d3c35" hs_bindgen_0ff0337cc50d3c35_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_hide@
-hs_bindgen_53705ab509abb7d0 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ()))
-hs_bindgen_53705ab509abb7d0 =
-  RIP.fromFFIType hs_bindgen_53705ab509abb7d0_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_hide@
+hs_bindgen_0ff0337cc50d3c35 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ()))
+hs_bindgen_0ff0337cc50d3c35 =
+  RIP.fromFFIType hs_bindgen_0ff0337cc50d3c35_base
 
 {-# NOINLINE river_window_v1_hide #-}
 {-|
@@ -1381,16 +1381,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_hide :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ())
 river_window_v1_hide =
-  RIP.unsafePerformIO hs_bindgen_53705ab509abb7d0
+  RIP.unsafePerformIO hs_bindgen_0ff0337cc50d3c35
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_show@
-foreign import ccall unsafe "hs_bindgen_e0e6ab2e2bb8ec0e" hs_bindgen_e0e6ab2e2bb8ec0e_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_show@
+foreign import ccall unsafe "hs_bindgen_1bbf516eb3a49613" hs_bindgen_1bbf516eb3a49613_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_show@
-hs_bindgen_e0e6ab2e2bb8ec0e :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ()))
-hs_bindgen_e0e6ab2e2bb8ec0e =
-  RIP.fromFFIType hs_bindgen_e0e6ab2e2bb8ec0e_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_show@
+hs_bindgen_1bbf516eb3a49613 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ()))
+hs_bindgen_1bbf516eb3a49613 =
+  RIP.fromFFIType hs_bindgen_1bbf516eb3a49613_base
 
 {-# NOINLINE river_window_v1_show #-}
 {-|
@@ -1411,16 +1411,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_show :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ())
 river_window_v1_show =
-  RIP.unsafePerformIO hs_bindgen_e0e6ab2e2bb8ec0e
+  RIP.unsafePerformIO hs_bindgen_1bbf516eb3a49613
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_use_csd@
-foreign import ccall unsafe "hs_bindgen_fce1f4d1d669a6d8" hs_bindgen_fce1f4d1d669a6d8_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_use_csd@
+foreign import ccall unsafe "hs_bindgen_655d924a9a5bdb6d" hs_bindgen_655d924a9a5bdb6d_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_use_csd@
-hs_bindgen_fce1f4d1d669a6d8 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ()))
-hs_bindgen_fce1f4d1d669a6d8 =
-  RIP.fromFFIType hs_bindgen_fce1f4d1d669a6d8_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_use_csd@
+hs_bindgen_655d924a9a5bdb6d :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ()))
+hs_bindgen_655d924a9a5bdb6d =
+  RIP.fromFFIType hs_bindgen_655d924a9a5bdb6d_base
 
 {-# NOINLINE river_window_v1_use_csd #-}
 {-|
@@ -1441,16 +1441,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_use_csd :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ())
 river_window_v1_use_csd =
-  RIP.unsafePerformIO hs_bindgen_fce1f4d1d669a6d8
+  RIP.unsafePerformIO hs_bindgen_655d924a9a5bdb6d
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_use_ssd@
-foreign import ccall unsafe "hs_bindgen_710ffd02c8f38152" hs_bindgen_710ffd02c8f38152_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_use_ssd@
+foreign import ccall unsafe "hs_bindgen_45ff2619e1e4eaeb" hs_bindgen_45ff2619e1e4eaeb_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_use_ssd@
-hs_bindgen_710ffd02c8f38152 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ()))
-hs_bindgen_710ffd02c8f38152 =
-  RIP.fromFFIType hs_bindgen_710ffd02c8f38152_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_use_ssd@
+hs_bindgen_45ff2619e1e4eaeb :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ()))
+hs_bindgen_45ff2619e1e4eaeb =
+  RIP.fromFFIType hs_bindgen_45ff2619e1e4eaeb_base
 
 {-# NOINLINE river_window_v1_use_ssd #-}
 {-|
@@ -1471,16 +1471,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_use_ssd :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ())
 river_window_v1_use_ssd =
-  RIP.unsafePerformIO hs_bindgen_710ffd02c8f38152
+  RIP.unsafePerformIO hs_bindgen_45ff2619e1e4eaeb
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_set_borders@
-foreign import ccall unsafe "hs_bindgen_b74fe1472efa9ef9" hs_bindgen_b74fe1472efa9ef9_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_set_borders@
+foreign import ccall unsafe "hs_bindgen_79be2d7dd33e6f70" hs_bindgen_79be2d7dd33e6f70_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_set_borders@
-hs_bindgen_b74fe1472efa9ef9 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_b74fe1472efa9ef9 =
-  RIP.fromFFIType hs_bindgen_b74fe1472efa9ef9_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_set_borders@
+hs_bindgen_79be2d7dd33e6f70 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_79be2d7dd33e6f70 =
+  RIP.fromFFIType hs_bindgen_79be2d7dd33e6f70_base
 
 {-# NOINLINE river_window_v1_set_borders #-}
 {-|
@@ -1511,16 +1511,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_set_borders :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 river_window_v1_set_borders =
-  RIP.unsafePerformIO hs_bindgen_b74fe1472efa9ef9
+  RIP.unsafePerformIO hs_bindgen_79be2d7dd33e6f70
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_set_tiled@
-foreign import ccall unsafe "hs_bindgen_fdd72f7172b73a1f" hs_bindgen_fdd72f7172b73a1f_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_set_tiled@
+foreign import ccall unsafe "hs_bindgen_6cc5225e41e807c8" hs_bindgen_6cc5225e41e807c8_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_set_tiled@
-hs_bindgen_fdd72f7172b73a1f :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_fdd72f7172b73a1f =
-  RIP.fromFFIType hs_bindgen_fdd72f7172b73a1f_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_set_tiled@
+hs_bindgen_6cc5225e41e807c8 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_6cc5225e41e807c8 =
+  RIP.fromFFIType hs_bindgen_6cc5225e41e807c8_base
 
 {-# NOINLINE river_window_v1_set_tiled #-}
 {-|
@@ -1543,16 +1543,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_set_tiled :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 river_window_v1_set_tiled =
-  RIP.unsafePerformIO hs_bindgen_fdd72f7172b73a1f
+  RIP.unsafePerformIO hs_bindgen_6cc5225e41e807c8
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_get_decoration_above@
-foreign import ccall unsafe "hs_bindgen_20d6e8c7f5d141df" hs_bindgen_20d6e8c7f5d141df_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_get_decoration_above@
+foreign import ccall unsafe "hs_bindgen_c253f0c3baa629d4" hs_bindgen_c253f0c3baa629d4_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_get_decoration_above@
-hs_bindgen_20d6e8c7f5d141df :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> (RIP.Ptr Wl_surface) -> IO (RIP.Ptr River_decoration_v1)))
-hs_bindgen_20d6e8c7f5d141df =
-  RIP.fromFFIType hs_bindgen_20d6e8c7f5d141df_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_get_decoration_above@
+hs_bindgen_c253f0c3baa629d4 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> (RIP.Ptr Wl_surface) -> IO (RIP.Ptr River_decoration_v1)))
+hs_bindgen_c253f0c3baa629d4 =
+  RIP.fromFFIType hs_bindgen_c253f0c3baa629d4_base
 
 {-# NOINLINE river_window_v1_get_decoration_above #-}
 {-|
@@ -1571,16 +1571,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_get_decoration_above :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> (RIP.Ptr Wl_surface) -> IO (RIP.Ptr River_decoration_v1))
 river_window_v1_get_decoration_above =
-  RIP.unsafePerformIO hs_bindgen_20d6e8c7f5d141df
+  RIP.unsafePerformIO hs_bindgen_c253f0c3baa629d4
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_get_decoration_below@
-foreign import ccall unsafe "hs_bindgen_c55bc7d9f3852438" hs_bindgen_c55bc7d9f3852438_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_get_decoration_below@
+foreign import ccall unsafe "hs_bindgen_1cc2f3eb906e6bce" hs_bindgen_1cc2f3eb906e6bce_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_get_decoration_below@
-hs_bindgen_c55bc7d9f3852438 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> (RIP.Ptr Wl_surface) -> IO (RIP.Ptr River_decoration_v1)))
-hs_bindgen_c55bc7d9f3852438 =
-  RIP.fromFFIType hs_bindgen_c55bc7d9f3852438_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_get_decoration_below@
+hs_bindgen_1cc2f3eb906e6bce :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> (RIP.Ptr Wl_surface) -> IO (RIP.Ptr River_decoration_v1)))
+hs_bindgen_1cc2f3eb906e6bce =
+  RIP.fromFFIType hs_bindgen_1cc2f3eb906e6bce_base
 
 {-# NOINLINE river_window_v1_get_decoration_below #-}
 {-|
@@ -1599,16 +1599,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_get_decoration_below :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> (RIP.Ptr Wl_surface) -> IO (RIP.Ptr River_decoration_v1))
 river_window_v1_get_decoration_below =
-  RIP.unsafePerformIO hs_bindgen_c55bc7d9f3852438
+  RIP.unsafePerformIO hs_bindgen_1cc2f3eb906e6bce
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_inform_resize_start@
-foreign import ccall unsafe "hs_bindgen_763e62f565c1eb56" hs_bindgen_763e62f565c1eb56_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_inform_resize_start@
+foreign import ccall unsafe "hs_bindgen_80a63cf1316076b7" hs_bindgen_80a63cf1316076b7_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_inform_resize_start@
-hs_bindgen_763e62f565c1eb56 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ()))
-hs_bindgen_763e62f565c1eb56 =
-  RIP.fromFFIType hs_bindgen_763e62f565c1eb56_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_inform_resize_start@
+hs_bindgen_80a63cf1316076b7 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ()))
+hs_bindgen_80a63cf1316076b7 =
+  RIP.fromFFIType hs_bindgen_80a63cf1316076b7_base
 
 {-# NOINLINE river_window_v1_inform_resize_start #-}
 {-|
@@ -1629,16 +1629,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_inform_resize_start :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ())
 river_window_v1_inform_resize_start =
-  RIP.unsafePerformIO hs_bindgen_763e62f565c1eb56
+  RIP.unsafePerformIO hs_bindgen_80a63cf1316076b7
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_inform_resize_end@
-foreign import ccall unsafe "hs_bindgen_f423598411bbd214" hs_bindgen_f423598411bbd214_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_inform_resize_end@
+foreign import ccall unsafe "hs_bindgen_33a35fec3dce1c3a" hs_bindgen_33a35fec3dce1c3a_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_inform_resize_end@
-hs_bindgen_f423598411bbd214 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ()))
-hs_bindgen_f423598411bbd214 =
-  RIP.fromFFIType hs_bindgen_f423598411bbd214_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_inform_resize_end@
+hs_bindgen_33a35fec3dce1c3a :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ()))
+hs_bindgen_33a35fec3dce1c3a =
+  RIP.fromFFIType hs_bindgen_33a35fec3dce1c3a_base
 
 {-# NOINLINE river_window_v1_inform_resize_end #-}
 {-|
@@ -1657,16 +1657,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_inform_resize_end :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ())
 river_window_v1_inform_resize_end =
-  RIP.unsafePerformIO hs_bindgen_f423598411bbd214
+  RIP.unsafePerformIO hs_bindgen_33a35fec3dce1c3a
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_set_capabilities@
-foreign import ccall unsafe "hs_bindgen_31a4c4d730da7b83" hs_bindgen_31a4c4d730da7b83_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_set_capabilities@
+foreign import ccall unsafe "hs_bindgen_a99809fd74faf620" hs_bindgen_a99809fd74faf620_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_set_capabilities@
-hs_bindgen_31a4c4d730da7b83 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_31a4c4d730da7b83 =
-  RIP.fromFFIType hs_bindgen_31a4c4d730da7b83_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_set_capabilities@
+hs_bindgen_a99809fd74faf620 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_a99809fd74faf620 =
+  RIP.fromFFIType hs_bindgen_a99809fd74faf620_base
 
 {-# NOINLINE river_window_v1_set_capabilities #-}
 {-|
@@ -1689,16 +1689,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_set_capabilities :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 river_window_v1_set_capabilities =
-  RIP.unsafePerformIO hs_bindgen_31a4c4d730da7b83
+  RIP.unsafePerformIO hs_bindgen_a99809fd74faf620
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_inform_maximized@
-foreign import ccall unsafe "hs_bindgen_f8e6c9c9bd023260" hs_bindgen_f8e6c9c9bd023260_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_inform_maximized@
+foreign import ccall unsafe "hs_bindgen_f9a6f9adca76ed71" hs_bindgen_f9a6f9adca76ed71_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_inform_maximized@
-hs_bindgen_f8e6c9c9bd023260 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ()))
-hs_bindgen_f8e6c9c9bd023260 =
-  RIP.fromFFIType hs_bindgen_f8e6c9c9bd023260_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_inform_maximized@
+hs_bindgen_f9a6f9adca76ed71 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ()))
+hs_bindgen_f9a6f9adca76ed71 =
+  RIP.fromFFIType hs_bindgen_f9a6f9adca76ed71_base
 
 {-# NOINLINE river_window_v1_inform_maximized #-}
 {-|
@@ -1719,16 +1719,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_inform_maximized :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ())
 river_window_v1_inform_maximized =
-  RIP.unsafePerformIO hs_bindgen_f8e6c9c9bd023260
+  RIP.unsafePerformIO hs_bindgen_f9a6f9adca76ed71
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_inform_unmaximized@
-foreign import ccall unsafe "hs_bindgen_ce67e9ca1cc464e3" hs_bindgen_ce67e9ca1cc464e3_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_inform_unmaximized@
+foreign import ccall unsafe "hs_bindgen_548b52c8d2c8f3b8" hs_bindgen_548b52c8d2c8f3b8_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_inform_unmaximized@
-hs_bindgen_ce67e9ca1cc464e3 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ()))
-hs_bindgen_ce67e9ca1cc464e3 =
-  RIP.fromFFIType hs_bindgen_ce67e9ca1cc464e3_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_inform_unmaximized@
+hs_bindgen_548b52c8d2c8f3b8 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ()))
+hs_bindgen_548b52c8d2c8f3b8 =
+  RIP.fromFFIType hs_bindgen_548b52c8d2c8f3b8_base
 
 {-# NOINLINE river_window_v1_inform_unmaximized #-}
 {-|
@@ -1747,16 +1747,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_inform_unmaximized :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ())
 river_window_v1_inform_unmaximized =
-  RIP.unsafePerformIO hs_bindgen_ce67e9ca1cc464e3
+  RIP.unsafePerformIO hs_bindgen_548b52c8d2c8f3b8
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_inform_fullscreen@
-foreign import ccall unsafe "hs_bindgen_11941507dc22ef68" hs_bindgen_11941507dc22ef68_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_inform_fullscreen@
+foreign import ccall unsafe "hs_bindgen_4b29202051650ebc" hs_bindgen_4b29202051650ebc_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_inform_fullscreen@
-hs_bindgen_11941507dc22ef68 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ()))
-hs_bindgen_11941507dc22ef68 =
-  RIP.fromFFIType hs_bindgen_11941507dc22ef68_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_inform_fullscreen@
+hs_bindgen_4b29202051650ebc :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ()))
+hs_bindgen_4b29202051650ebc =
+  RIP.fromFFIType hs_bindgen_4b29202051650ebc_base
 
 {-# NOINLINE river_window_v1_inform_fullscreen #-}
 {-|
@@ -1777,16 +1777,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_inform_fullscreen :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ())
 river_window_v1_inform_fullscreen =
-  RIP.unsafePerformIO hs_bindgen_11941507dc22ef68
+  RIP.unsafePerformIO hs_bindgen_4b29202051650ebc
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_inform_not_fullscreen@
-foreign import ccall unsafe "hs_bindgen_9e8ccaf4bbfde3f8" hs_bindgen_9e8ccaf4bbfde3f8_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_inform_not_fullscreen@
+foreign import ccall unsafe "hs_bindgen_4e2b9ccf0e333243" hs_bindgen_4e2b9ccf0e333243_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_inform_not_fullscreen@
-hs_bindgen_9e8ccaf4bbfde3f8 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ()))
-hs_bindgen_9e8ccaf4bbfde3f8 =
-  RIP.fromFFIType hs_bindgen_9e8ccaf4bbfde3f8_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_inform_not_fullscreen@
+hs_bindgen_4e2b9ccf0e333243 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ()))
+hs_bindgen_4e2b9ccf0e333243 =
+  RIP.fromFFIType hs_bindgen_4e2b9ccf0e333243_base
 
 {-# NOINLINE river_window_v1_inform_not_fullscreen #-}
 {-|
@@ -1807,16 +1807,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_inform_not_fullscreen :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ())
 river_window_v1_inform_not_fullscreen =
-  RIP.unsafePerformIO hs_bindgen_9e8ccaf4bbfde3f8
+  RIP.unsafePerformIO hs_bindgen_4e2b9ccf0e333243
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_fullscreen@
-foreign import ccall unsafe "hs_bindgen_245cb06882ebeb37" hs_bindgen_245cb06882ebeb37_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_fullscreen@
+foreign import ccall unsafe "hs_bindgen_d6583038c47b2d3c" hs_bindgen_d6583038c47b2d3c_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_fullscreen@
-hs_bindgen_245cb06882ebeb37 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> (RIP.Ptr River_output_v1) -> IO ()))
-hs_bindgen_245cb06882ebeb37 =
-  RIP.fromFFIType hs_bindgen_245cb06882ebeb37_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_fullscreen@
+hs_bindgen_d6583038c47b2d3c :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> (RIP.Ptr River_output_v1) -> IO ()))
+hs_bindgen_d6583038c47b2d3c =
+  RIP.fromFFIType hs_bindgen_d6583038c47b2d3c_base
 
 {-# NOINLINE river_window_v1_fullscreen #-}
 {-|
@@ -1847,16 +1847,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_fullscreen :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> (RIP.Ptr River_output_v1) -> IO ())
 river_window_v1_fullscreen =
-  RIP.unsafePerformIO hs_bindgen_245cb06882ebeb37
+  RIP.unsafePerformIO hs_bindgen_d6583038c47b2d3c
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_exit_fullscreen@
-foreign import ccall unsafe "hs_bindgen_885f460e4158a506" hs_bindgen_885f460e4158a506_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_exit_fullscreen@
+foreign import ccall unsafe "hs_bindgen_17c96c6e4f248eba" hs_bindgen_17c96c6e4f248eba_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_exit_fullscreen@
-hs_bindgen_885f460e4158a506 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ()))
-hs_bindgen_885f460e4158a506 =
-  RIP.fromFFIType hs_bindgen_885f460e4158a506_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_exit_fullscreen@
+hs_bindgen_17c96c6e4f248eba :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ()))
+hs_bindgen_17c96c6e4f248eba =
+  RIP.fromFFIType hs_bindgen_17c96c6e4f248eba_base
 
 {-# NOINLINE river_window_v1_exit_fullscreen #-}
 {-|
@@ -1881,16 +1881,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_exit_fullscreen :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> IO ())
 river_window_v1_exit_fullscreen =
-  RIP.unsafePerformIO hs_bindgen_885f460e4158a506
+  RIP.unsafePerformIO hs_bindgen_17c96c6e4f248eba
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_set_clip_box@
-foreign import ccall unsafe "hs_bindgen_01a99a063c2ae8fd" hs_bindgen_01a99a063c2ae8fd_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_set_clip_box@
+foreign import ccall unsafe "hs_bindgen_c5ec12951e8c0d3d" hs_bindgen_c5ec12951e8c0d3d_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_set_clip_box@
-hs_bindgen_01a99a063c2ae8fd :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-hs_bindgen_01a99a063c2ae8fd =
-  RIP.fromFFIType hs_bindgen_01a99a063c2ae8fd_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_set_clip_box@
+hs_bindgen_c5ec12951e8c0d3d :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_c5ec12951e8c0d3d =
+  RIP.fromFFIType hs_bindgen_c5ec12951e8c0d3d_base
 
 {-# NOINLINE river_window_v1_set_clip_box #-}
 {-|
@@ -1917,16 +1917,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_set_clip_box :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 river_window_v1_set_clip_box =
-  RIP.unsafePerformIO hs_bindgen_01a99a063c2ae8fd
+  RIP.unsafePerformIO hs_bindgen_c5ec12951e8c0d3d
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_set_content_clip_box@
-foreign import ccall unsafe "hs_bindgen_ac73314ae4ecbfc0" hs_bindgen_ac73314ae4ecbfc0_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_set_content_clip_box@
+foreign import ccall unsafe "hs_bindgen_e6a5b407e60d52f3" hs_bindgen_e6a5b407e60d52f3_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_set_content_clip_box@
-hs_bindgen_ac73314ae4ecbfc0 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-hs_bindgen_ac73314ae4ecbfc0 =
-  RIP.fromFFIType hs_bindgen_ac73314ae4ecbfc0_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_set_content_clip_box@
+hs_bindgen_e6a5b407e60d52f3 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_e6a5b407e60d52f3 =
+  RIP.fromFFIType hs_bindgen_e6a5b407e60d52f3_base
 
 {-# NOINLINE river_window_v1_set_content_clip_box #-}
 {-|
@@ -1955,16 +1955,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_set_content_clip_box :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 river_window_v1_set_content_clip_box =
-  RIP.unsafePerformIO hs_bindgen_ac73314ae4ecbfc0
+  RIP.unsafePerformIO hs_bindgen_e6a5b407e60d52f3
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_set_dimension_bounds@
-foreign import ccall unsafe "hs_bindgen_8574350bdb858517" hs_bindgen_8574350bdb858517_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_set_dimension_bounds@
+foreign import ccall unsafe "hs_bindgen_8f5d6d73f16d5ffe" hs_bindgen_8f5d6d73f16d5ffe_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_window_v1_set_dimension_bounds@
-hs_bindgen_8574350bdb858517 :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-hs_bindgen_8574350bdb858517 =
-  RIP.fromFFIType hs_bindgen_8574350bdb858517_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_set_dimension_bounds@
+hs_bindgen_8f5d6d73f16d5ffe :: IO (RIP.FunPtr ((RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_8f5d6d73f16d5ffe =
+  RIP.fromFFIType hs_bindgen_8f5d6d73f16d5ffe_base
 
 {-# NOINLINE river_window_v1_set_dimension_bounds #-}
 {-|
@@ -1989,16 +1989,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_set_dimension_bounds :: RIP.FunPtr ((RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 river_window_v1_set_dimension_bounds =
-  RIP.unsafePerformIO hs_bindgen_8574350bdb858517
+  RIP.unsafePerformIO hs_bindgen_8f5d6d73f16d5ffe
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_decoration_v1_set_user_data@
-foreign import ccall unsafe "hs_bindgen_d4a219cdb4d998e0" hs_bindgen_d4a219cdb4d998e0_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_decoration_v1_set_user_data@
+foreign import ccall unsafe "hs_bindgen_8dadbfc697708e99" hs_bindgen_8dadbfc697708e99_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_decoration_v1_set_user_data@
-hs_bindgen_d4a219cdb4d998e0 :: IO (RIP.FunPtr ((RIP.Ptr River_decoration_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
-hs_bindgen_d4a219cdb4d998e0 =
-  RIP.fromFFIType hs_bindgen_d4a219cdb4d998e0_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_decoration_v1_set_user_data@
+hs_bindgen_8dadbfc697708e99 :: IO (RIP.FunPtr ((RIP.Ptr River_decoration_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
+hs_bindgen_8dadbfc697708e99 =
+  RIP.fromFFIType hs_bindgen_8dadbfc697708e99_base
 
 {-# NOINLINE river_decoration_v1_set_user_data #-}
 {-|
@@ -2013,16 +2013,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_decoration_v1_set_user_data :: RIP.FunPtr ((RIP.Ptr River_decoration_v1) -> (RIP.Ptr RIP.Void) -> IO ())
 river_decoration_v1_set_user_data =
-  RIP.unsafePerformIO hs_bindgen_d4a219cdb4d998e0
+  RIP.unsafePerformIO hs_bindgen_8dadbfc697708e99
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_decoration_v1_get_user_data@
-foreign import ccall unsafe "hs_bindgen_3cba4dbab6860065" hs_bindgen_3cba4dbab6860065_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_decoration_v1_get_user_data@
+foreign import ccall unsafe "hs_bindgen_8677e1fc75774766" hs_bindgen_8677e1fc75774766_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_decoration_v1_get_user_data@
-hs_bindgen_3cba4dbab6860065 :: IO (RIP.FunPtr ((RIP.Ptr River_decoration_v1) -> IO (RIP.Ptr RIP.Void)))
-hs_bindgen_3cba4dbab6860065 =
-  RIP.fromFFIType hs_bindgen_3cba4dbab6860065_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_decoration_v1_get_user_data@
+hs_bindgen_8677e1fc75774766 :: IO (RIP.FunPtr ((RIP.Ptr River_decoration_v1) -> IO (RIP.Ptr RIP.Void)))
+hs_bindgen_8677e1fc75774766 =
+  RIP.fromFFIType hs_bindgen_8677e1fc75774766_base
 
 {-# NOINLINE river_decoration_v1_get_user_data #-}
 {-|
@@ -2037,16 +2037,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_decoration_v1_get_user_data :: RIP.FunPtr ((RIP.Ptr River_decoration_v1) -> IO (RIP.Ptr RIP.Void))
 river_decoration_v1_get_user_data =
-  RIP.unsafePerformIO hs_bindgen_3cba4dbab6860065
+  RIP.unsafePerformIO hs_bindgen_8677e1fc75774766
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_decoration_v1_get_version@
-foreign import ccall unsafe "hs_bindgen_e261771b3f9c3509" hs_bindgen_e261771b3f9c3509_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_decoration_v1_get_version@
+foreign import ccall unsafe "hs_bindgen_8ae32a50e736459c" hs_bindgen_8ae32a50e736459c_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_decoration_v1_get_version@
-hs_bindgen_e261771b3f9c3509 :: IO (RIP.FunPtr ((RIP.Ptr River_decoration_v1) -> IO HsBindgen.Runtime.LibC.Word32))
-hs_bindgen_e261771b3f9c3509 =
-  RIP.fromFFIType hs_bindgen_e261771b3f9c3509_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_decoration_v1_get_version@
+hs_bindgen_8ae32a50e736459c :: IO (RIP.FunPtr ((RIP.Ptr River_decoration_v1) -> IO HsBindgen.Runtime.LibC.Word32))
+hs_bindgen_8ae32a50e736459c =
+  RIP.fromFFIType hs_bindgen_8ae32a50e736459c_base
 
 {-# NOINLINE river_decoration_v1_get_version #-}
 {-| __C declaration:__ @river_decoration_v1_get_version@
@@ -2057,16 +2057,16 @@ hs_bindgen_e261771b3f9c3509 =
 -}
 river_decoration_v1_get_version :: RIP.FunPtr ((RIP.Ptr River_decoration_v1) -> IO HsBindgen.Runtime.LibC.Word32)
 river_decoration_v1_get_version =
-  RIP.unsafePerformIO hs_bindgen_e261771b3f9c3509
+  RIP.unsafePerformIO hs_bindgen_8ae32a50e736459c
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_decoration_v1_destroy@
-foreign import ccall unsafe "hs_bindgen_1810611f68eb2c61" hs_bindgen_1810611f68eb2c61_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_decoration_v1_destroy@
+foreign import ccall unsafe "hs_bindgen_9012668ba1231fbc" hs_bindgen_9012668ba1231fbc_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_decoration_v1_destroy@
-hs_bindgen_1810611f68eb2c61 :: IO (RIP.FunPtr ((RIP.Ptr River_decoration_v1) -> IO ()))
-hs_bindgen_1810611f68eb2c61 =
-  RIP.fromFFIType hs_bindgen_1810611f68eb2c61_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_decoration_v1_destroy@
+hs_bindgen_9012668ba1231fbc :: IO (RIP.FunPtr ((RIP.Ptr River_decoration_v1) -> IO ()))
+hs_bindgen_9012668ba1231fbc =
+  RIP.fromFFIType hs_bindgen_9012668ba1231fbc_base
 
 {-# NOINLINE river_decoration_v1_destroy #-}
 {-|
@@ -2083,16 +2083,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_decoration_v1_destroy :: RIP.FunPtr ((RIP.Ptr River_decoration_v1) -> IO ())
 river_decoration_v1_destroy =
-  RIP.unsafePerformIO hs_bindgen_1810611f68eb2c61
+  RIP.unsafePerformIO hs_bindgen_9012668ba1231fbc
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_decoration_v1_set_offset@
-foreign import ccall unsafe "hs_bindgen_a24407cac6cb29d1" hs_bindgen_a24407cac6cb29d1_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_decoration_v1_set_offset@
+foreign import ccall unsafe "hs_bindgen_85a1d3b766b97649" hs_bindgen_85a1d3b766b97649_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_decoration_v1_set_offset@
-hs_bindgen_a24407cac6cb29d1 :: IO (RIP.FunPtr ((RIP.Ptr River_decoration_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-hs_bindgen_a24407cac6cb29d1 =
-  RIP.fromFFIType hs_bindgen_a24407cac6cb29d1_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_decoration_v1_set_offset@
+hs_bindgen_85a1d3b766b97649 :: IO (RIP.FunPtr ((RIP.Ptr River_decoration_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_85a1d3b766b97649 =
+  RIP.fromFFIType hs_bindgen_85a1d3b766b97649_base
 
 {-# NOINLINE river_decoration_v1_set_offset #-}
 {-|
@@ -2113,16 +2113,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_decoration_v1_set_offset :: RIP.FunPtr ((RIP.Ptr River_decoration_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 river_decoration_v1_set_offset =
-  RIP.unsafePerformIO hs_bindgen_a24407cac6cb29d1
+  RIP.unsafePerformIO hs_bindgen_85a1d3b766b97649
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_decoration_v1_sync_next_commit@
-foreign import ccall unsafe "hs_bindgen_9e17306666d653e0" hs_bindgen_9e17306666d653e0_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_decoration_v1_sync_next_commit@
+foreign import ccall unsafe "hs_bindgen_09aef2cabbf2e496" hs_bindgen_09aef2cabbf2e496_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_decoration_v1_sync_next_commit@
-hs_bindgen_9e17306666d653e0 :: IO (RIP.FunPtr ((RIP.Ptr River_decoration_v1) -> IO ()))
-hs_bindgen_9e17306666d653e0 =
-  RIP.fromFFIType hs_bindgen_9e17306666d653e0_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_decoration_v1_sync_next_commit@
+hs_bindgen_09aef2cabbf2e496 :: IO (RIP.FunPtr ((RIP.Ptr River_decoration_v1) -> IO ()))
+hs_bindgen_09aef2cabbf2e496 =
+  RIP.fromFFIType hs_bindgen_09aef2cabbf2e496_base
 
 {-# NOINLINE river_decoration_v1_sync_next_commit #-}
 {-|
@@ -2143,16 +2143,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_decoration_v1_sync_next_commit :: RIP.FunPtr ((RIP.Ptr River_decoration_v1) -> IO ())
 river_decoration_v1_sync_next_commit =
-  RIP.unsafePerformIO hs_bindgen_9e17306666d653e0
+  RIP.unsafePerformIO hs_bindgen_09aef2cabbf2e496
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_shell_surface_v1_set_user_data@
-foreign import ccall unsafe "hs_bindgen_61933ef7a1db28d2" hs_bindgen_61933ef7a1db28d2_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_shell_surface_v1_set_user_data@
+foreign import ccall unsafe "hs_bindgen_637340ca2405e9ae" hs_bindgen_637340ca2405e9ae_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_shell_surface_v1_set_user_data@
-hs_bindgen_61933ef7a1db28d2 :: IO (RIP.FunPtr ((RIP.Ptr River_shell_surface_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
-hs_bindgen_61933ef7a1db28d2 =
-  RIP.fromFFIType hs_bindgen_61933ef7a1db28d2_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_shell_surface_v1_set_user_data@
+hs_bindgen_637340ca2405e9ae :: IO (RIP.FunPtr ((RIP.Ptr River_shell_surface_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
+hs_bindgen_637340ca2405e9ae =
+  RIP.fromFFIType hs_bindgen_637340ca2405e9ae_base
 
 {-# NOINLINE river_shell_surface_v1_set_user_data #-}
 {-|
@@ -2167,16 +2167,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_shell_surface_v1_set_user_data :: RIP.FunPtr ((RIP.Ptr River_shell_surface_v1) -> (RIP.Ptr RIP.Void) -> IO ())
 river_shell_surface_v1_set_user_data =
-  RIP.unsafePerformIO hs_bindgen_61933ef7a1db28d2
+  RIP.unsafePerformIO hs_bindgen_637340ca2405e9ae
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_shell_surface_v1_get_user_data@
-foreign import ccall unsafe "hs_bindgen_b002f663f44b911e" hs_bindgen_b002f663f44b911e_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_shell_surface_v1_get_user_data@
+foreign import ccall unsafe "hs_bindgen_47e0c5f849aa6f3b" hs_bindgen_47e0c5f849aa6f3b_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_shell_surface_v1_get_user_data@
-hs_bindgen_b002f663f44b911e :: IO (RIP.FunPtr ((RIP.Ptr River_shell_surface_v1) -> IO (RIP.Ptr RIP.Void)))
-hs_bindgen_b002f663f44b911e =
-  RIP.fromFFIType hs_bindgen_b002f663f44b911e_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_shell_surface_v1_get_user_data@
+hs_bindgen_47e0c5f849aa6f3b :: IO (RIP.FunPtr ((RIP.Ptr River_shell_surface_v1) -> IO (RIP.Ptr RIP.Void)))
+hs_bindgen_47e0c5f849aa6f3b =
+  RIP.fromFFIType hs_bindgen_47e0c5f849aa6f3b_base
 
 {-# NOINLINE river_shell_surface_v1_get_user_data #-}
 {-|
@@ -2191,16 +2191,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_shell_surface_v1_get_user_data :: RIP.FunPtr ((RIP.Ptr River_shell_surface_v1) -> IO (RIP.Ptr RIP.Void))
 river_shell_surface_v1_get_user_data =
-  RIP.unsafePerformIO hs_bindgen_b002f663f44b911e
+  RIP.unsafePerformIO hs_bindgen_47e0c5f849aa6f3b
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_shell_surface_v1_get_version@
-foreign import ccall unsafe "hs_bindgen_6e692dd59a59c19d" hs_bindgen_6e692dd59a59c19d_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_shell_surface_v1_get_version@
+foreign import ccall unsafe "hs_bindgen_5bf7062330f9db8f" hs_bindgen_5bf7062330f9db8f_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_shell_surface_v1_get_version@
-hs_bindgen_6e692dd59a59c19d :: IO (RIP.FunPtr ((RIP.Ptr River_shell_surface_v1) -> IO HsBindgen.Runtime.LibC.Word32))
-hs_bindgen_6e692dd59a59c19d =
-  RIP.fromFFIType hs_bindgen_6e692dd59a59c19d_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_shell_surface_v1_get_version@
+hs_bindgen_5bf7062330f9db8f :: IO (RIP.FunPtr ((RIP.Ptr River_shell_surface_v1) -> IO HsBindgen.Runtime.LibC.Word32))
+hs_bindgen_5bf7062330f9db8f =
+  RIP.fromFFIType hs_bindgen_5bf7062330f9db8f_base
 
 {-# NOINLINE river_shell_surface_v1_get_version #-}
 {-| __C declaration:__ @river_shell_surface_v1_get_version@
@@ -2211,16 +2211,16 @@ hs_bindgen_6e692dd59a59c19d =
 -}
 river_shell_surface_v1_get_version :: RIP.FunPtr ((RIP.Ptr River_shell_surface_v1) -> IO HsBindgen.Runtime.LibC.Word32)
 river_shell_surface_v1_get_version =
-  RIP.unsafePerformIO hs_bindgen_6e692dd59a59c19d
+  RIP.unsafePerformIO hs_bindgen_5bf7062330f9db8f
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_shell_surface_v1_destroy@
-foreign import ccall unsafe "hs_bindgen_4ae20c23c48947ce" hs_bindgen_4ae20c23c48947ce_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_shell_surface_v1_destroy@
+foreign import ccall unsafe "hs_bindgen_4cec8b52de2c9e1f" hs_bindgen_4cec8b52de2c9e1f_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_shell_surface_v1_destroy@
-hs_bindgen_4ae20c23c48947ce :: IO (RIP.FunPtr ((RIP.Ptr River_shell_surface_v1) -> IO ()))
-hs_bindgen_4ae20c23c48947ce =
-  RIP.fromFFIType hs_bindgen_4ae20c23c48947ce_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_shell_surface_v1_destroy@
+hs_bindgen_4cec8b52de2c9e1f :: IO (RIP.FunPtr ((RIP.Ptr River_shell_surface_v1) -> IO ()))
+hs_bindgen_4cec8b52de2c9e1f =
+  RIP.fromFFIType hs_bindgen_4cec8b52de2c9e1f_base
 
 {-# NOINLINE river_shell_surface_v1_destroy #-}
 {-|
@@ -2237,16 +2237,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_shell_surface_v1_destroy :: RIP.FunPtr ((RIP.Ptr River_shell_surface_v1) -> IO ())
 river_shell_surface_v1_destroy =
-  RIP.unsafePerformIO hs_bindgen_4ae20c23c48947ce
+  RIP.unsafePerformIO hs_bindgen_4cec8b52de2c9e1f
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_shell_surface_v1_get_node@
-foreign import ccall unsafe "hs_bindgen_278fc05cdcef298b" hs_bindgen_278fc05cdcef298b_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_shell_surface_v1_get_node@
+foreign import ccall unsafe "hs_bindgen_7983ba591c32bbb5" hs_bindgen_7983ba591c32bbb5_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_shell_surface_v1_get_node@
-hs_bindgen_278fc05cdcef298b :: IO (RIP.FunPtr ((RIP.Ptr River_shell_surface_v1) -> IO (RIP.Ptr River_node_v1)))
-hs_bindgen_278fc05cdcef298b =
-  RIP.fromFFIType hs_bindgen_278fc05cdcef298b_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_shell_surface_v1_get_node@
+hs_bindgen_7983ba591c32bbb5 :: IO (RIP.FunPtr ((RIP.Ptr River_shell_surface_v1) -> IO (RIP.Ptr River_node_v1)))
+hs_bindgen_7983ba591c32bbb5 =
+  RIP.fromFFIType hs_bindgen_7983ba591c32bbb5_base
 
 {-# NOINLINE river_shell_surface_v1_get_node #-}
 {-|
@@ -2265,16 +2265,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_shell_surface_v1_get_node :: RIP.FunPtr ((RIP.Ptr River_shell_surface_v1) -> IO (RIP.Ptr River_node_v1))
 river_shell_surface_v1_get_node =
-  RIP.unsafePerformIO hs_bindgen_278fc05cdcef298b
+  RIP.unsafePerformIO hs_bindgen_7983ba591c32bbb5
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_shell_surface_v1_sync_next_commit@
-foreign import ccall unsafe "hs_bindgen_afaafe9083308b01" hs_bindgen_afaafe9083308b01_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_shell_surface_v1_sync_next_commit@
+foreign import ccall unsafe "hs_bindgen_959ddadb149a9b6f" hs_bindgen_959ddadb149a9b6f_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_shell_surface_v1_sync_next_commit@
-hs_bindgen_afaafe9083308b01 :: IO (RIP.FunPtr ((RIP.Ptr River_shell_surface_v1) -> IO ()))
-hs_bindgen_afaafe9083308b01 =
-  RIP.fromFFIType hs_bindgen_afaafe9083308b01_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_shell_surface_v1_sync_next_commit@
+hs_bindgen_959ddadb149a9b6f :: IO (RIP.FunPtr ((RIP.Ptr River_shell_surface_v1) -> IO ()))
+hs_bindgen_959ddadb149a9b6f =
+  RIP.fromFFIType hs_bindgen_959ddadb149a9b6f_base
 
 {-# NOINLINE river_shell_surface_v1_sync_next_commit #-}
 {-|
@@ -2295,16 +2295,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_shell_surface_v1_sync_next_commit :: RIP.FunPtr ((RIP.Ptr River_shell_surface_v1) -> IO ())
 river_shell_surface_v1_sync_next_commit =
-  RIP.unsafePerformIO hs_bindgen_afaafe9083308b01
+  RIP.unsafePerformIO hs_bindgen_959ddadb149a9b6f
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_node_v1_set_user_data@
-foreign import ccall unsafe "hs_bindgen_8b4f3149f74893fb" hs_bindgen_8b4f3149f74893fb_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_set_user_data@
+foreign import ccall unsafe "hs_bindgen_3a1221c3bbf2684e" hs_bindgen_3a1221c3bbf2684e_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_node_v1_set_user_data@
-hs_bindgen_8b4f3149f74893fb :: IO (RIP.FunPtr ((RIP.Ptr River_node_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
-hs_bindgen_8b4f3149f74893fb =
-  RIP.fromFFIType hs_bindgen_8b4f3149f74893fb_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_set_user_data@
+hs_bindgen_3a1221c3bbf2684e :: IO (RIP.FunPtr ((RIP.Ptr River_node_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
+hs_bindgen_3a1221c3bbf2684e =
+  RIP.fromFFIType hs_bindgen_3a1221c3bbf2684e_base
 
 {-# NOINLINE river_node_v1_set_user_data #-}
 {-|
@@ -2319,16 +2319,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_node_v1_set_user_data :: RIP.FunPtr ((RIP.Ptr River_node_v1) -> (RIP.Ptr RIP.Void) -> IO ())
 river_node_v1_set_user_data =
-  RIP.unsafePerformIO hs_bindgen_8b4f3149f74893fb
+  RIP.unsafePerformIO hs_bindgen_3a1221c3bbf2684e
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_node_v1_get_user_data@
-foreign import ccall unsafe "hs_bindgen_ca11d6d1aa9338af" hs_bindgen_ca11d6d1aa9338af_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_get_user_data@
+foreign import ccall unsafe "hs_bindgen_7b42d0b5100d80c6" hs_bindgen_7b42d0b5100d80c6_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_node_v1_get_user_data@
-hs_bindgen_ca11d6d1aa9338af :: IO (RIP.FunPtr ((RIP.Ptr River_node_v1) -> IO (RIP.Ptr RIP.Void)))
-hs_bindgen_ca11d6d1aa9338af =
-  RIP.fromFFIType hs_bindgen_ca11d6d1aa9338af_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_get_user_data@
+hs_bindgen_7b42d0b5100d80c6 :: IO (RIP.FunPtr ((RIP.Ptr River_node_v1) -> IO (RIP.Ptr RIP.Void)))
+hs_bindgen_7b42d0b5100d80c6 =
+  RIP.fromFFIType hs_bindgen_7b42d0b5100d80c6_base
 
 {-# NOINLINE river_node_v1_get_user_data #-}
 {-|
@@ -2343,16 +2343,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_node_v1_get_user_data :: RIP.FunPtr ((RIP.Ptr River_node_v1) -> IO (RIP.Ptr RIP.Void))
 river_node_v1_get_user_data =
-  RIP.unsafePerformIO hs_bindgen_ca11d6d1aa9338af
+  RIP.unsafePerformIO hs_bindgen_7b42d0b5100d80c6
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_node_v1_get_version@
-foreign import ccall unsafe "hs_bindgen_aebddf4852788668" hs_bindgen_aebddf4852788668_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_get_version@
+foreign import ccall unsafe "hs_bindgen_3fea393a8d9daf1a" hs_bindgen_3fea393a8d9daf1a_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_node_v1_get_version@
-hs_bindgen_aebddf4852788668 :: IO (RIP.FunPtr ((RIP.Ptr River_node_v1) -> IO HsBindgen.Runtime.LibC.Word32))
-hs_bindgen_aebddf4852788668 =
-  RIP.fromFFIType hs_bindgen_aebddf4852788668_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_get_version@
+hs_bindgen_3fea393a8d9daf1a :: IO (RIP.FunPtr ((RIP.Ptr River_node_v1) -> IO HsBindgen.Runtime.LibC.Word32))
+hs_bindgen_3fea393a8d9daf1a =
+  RIP.fromFFIType hs_bindgen_3fea393a8d9daf1a_base
 
 {-# NOINLINE river_node_v1_get_version #-}
 {-| __C declaration:__ @river_node_v1_get_version@
@@ -2363,16 +2363,16 @@ hs_bindgen_aebddf4852788668 =
 -}
 river_node_v1_get_version :: RIP.FunPtr ((RIP.Ptr River_node_v1) -> IO HsBindgen.Runtime.LibC.Word32)
 river_node_v1_get_version =
-  RIP.unsafePerformIO hs_bindgen_aebddf4852788668
+  RIP.unsafePerformIO hs_bindgen_3fea393a8d9daf1a
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_node_v1_destroy@
-foreign import ccall unsafe "hs_bindgen_00058e19ed494e89" hs_bindgen_00058e19ed494e89_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_destroy@
+foreign import ccall unsafe "hs_bindgen_0f4179852a3ccd36" hs_bindgen_0f4179852a3ccd36_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_node_v1_destroy@
-hs_bindgen_00058e19ed494e89 :: IO (RIP.FunPtr ((RIP.Ptr River_node_v1) -> IO ()))
-hs_bindgen_00058e19ed494e89 =
-  RIP.fromFFIType hs_bindgen_00058e19ed494e89_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_destroy@
+hs_bindgen_0f4179852a3ccd36 :: IO (RIP.FunPtr ((RIP.Ptr River_node_v1) -> IO ()))
+hs_bindgen_0f4179852a3ccd36 =
+  RIP.fromFFIType hs_bindgen_0f4179852a3ccd36_base
 
 {-# NOINLINE river_node_v1_destroy #-}
 {-|
@@ -2389,16 +2389,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_node_v1_destroy :: RIP.FunPtr ((RIP.Ptr River_node_v1) -> IO ())
 river_node_v1_destroy =
-  RIP.unsafePerformIO hs_bindgen_00058e19ed494e89
+  RIP.unsafePerformIO hs_bindgen_0f4179852a3ccd36
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_node_v1_set_position@
-foreign import ccall unsafe "hs_bindgen_8735927717c46faf" hs_bindgen_8735927717c46faf_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_set_position@
+foreign import ccall unsafe "hs_bindgen_c942f09da52504a3" hs_bindgen_c942f09da52504a3_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_node_v1_set_position@
-hs_bindgen_8735927717c46faf :: IO (RIP.FunPtr ((RIP.Ptr River_node_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-hs_bindgen_8735927717c46faf =
-  RIP.fromFFIType hs_bindgen_8735927717c46faf_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_set_position@
+hs_bindgen_c942f09da52504a3 :: IO (RIP.FunPtr ((RIP.Ptr River_node_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_c942f09da52504a3 =
+  RIP.fromFFIType hs_bindgen_c942f09da52504a3_base
 
 {-# NOINLINE river_node_v1_set_position #-}
 {-|
@@ -2421,16 +2421,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_node_v1_set_position :: RIP.FunPtr ((RIP.Ptr River_node_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 river_node_v1_set_position =
-  RIP.unsafePerformIO hs_bindgen_8735927717c46faf
+  RIP.unsafePerformIO hs_bindgen_c942f09da52504a3
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_node_v1_place_top@
-foreign import ccall unsafe "hs_bindgen_92b4918c7c8c8168" hs_bindgen_92b4918c7c8c8168_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_place_top@
+foreign import ccall unsafe "hs_bindgen_cf225841637ae73a" hs_bindgen_cf225841637ae73a_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_node_v1_place_top@
-hs_bindgen_92b4918c7c8c8168 :: IO (RIP.FunPtr ((RIP.Ptr River_node_v1) -> IO ()))
-hs_bindgen_92b4918c7c8c8168 =
-  RIP.fromFFIType hs_bindgen_92b4918c7c8c8168_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_place_top@
+hs_bindgen_cf225841637ae73a :: IO (RIP.FunPtr ((RIP.Ptr River_node_v1) -> IO ()))
+hs_bindgen_cf225841637ae73a =
+  RIP.fromFFIType hs_bindgen_cf225841637ae73a_base
 
 {-# NOINLINE river_node_v1_place_top #-}
 {-|
@@ -2449,16 +2449,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_node_v1_place_top :: RIP.FunPtr ((RIP.Ptr River_node_v1) -> IO ())
 river_node_v1_place_top =
-  RIP.unsafePerformIO hs_bindgen_92b4918c7c8c8168
+  RIP.unsafePerformIO hs_bindgen_cf225841637ae73a
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_node_v1_place_bottom@
-foreign import ccall unsafe "hs_bindgen_14a096550e0fdbb3" hs_bindgen_14a096550e0fdbb3_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_place_bottom@
+foreign import ccall unsafe "hs_bindgen_95a0ac5877f16cae" hs_bindgen_95a0ac5877f16cae_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_node_v1_place_bottom@
-hs_bindgen_14a096550e0fdbb3 :: IO (RIP.FunPtr ((RIP.Ptr River_node_v1) -> IO ()))
-hs_bindgen_14a096550e0fdbb3 =
-  RIP.fromFFIType hs_bindgen_14a096550e0fdbb3_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_place_bottom@
+hs_bindgen_95a0ac5877f16cae :: IO (RIP.FunPtr ((RIP.Ptr River_node_v1) -> IO ()))
+hs_bindgen_95a0ac5877f16cae =
+  RIP.fromFFIType hs_bindgen_95a0ac5877f16cae_base
 
 {-# NOINLINE river_node_v1_place_bottom #-}
 {-|
@@ -2477,16 +2477,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_node_v1_place_bottom :: RIP.FunPtr ((RIP.Ptr River_node_v1) -> IO ())
 river_node_v1_place_bottom =
-  RIP.unsafePerformIO hs_bindgen_14a096550e0fdbb3
+  RIP.unsafePerformIO hs_bindgen_95a0ac5877f16cae
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_node_v1_place_above@
-foreign import ccall unsafe "hs_bindgen_618142b95fd19e25" hs_bindgen_618142b95fd19e25_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_place_above@
+foreign import ccall unsafe "hs_bindgen_5b1d5fbead8d235f" hs_bindgen_5b1d5fbead8d235f_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_node_v1_place_above@
-hs_bindgen_618142b95fd19e25 :: IO (RIP.FunPtr ((RIP.Ptr River_node_v1) -> (RIP.Ptr River_node_v1) -> IO ()))
-hs_bindgen_618142b95fd19e25 =
-  RIP.fromFFIType hs_bindgen_618142b95fd19e25_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_place_above@
+hs_bindgen_5b1d5fbead8d235f :: IO (RIP.FunPtr ((RIP.Ptr River_node_v1) -> (RIP.Ptr River_node_v1) -> IO ()))
+hs_bindgen_5b1d5fbead8d235f =
+  RIP.fromFFIType hs_bindgen_5b1d5fbead8d235f_base
 
 {-# NOINLINE river_node_v1_place_above #-}
 {-|
@@ -2507,16 +2507,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_node_v1_place_above :: RIP.FunPtr ((RIP.Ptr River_node_v1) -> (RIP.Ptr River_node_v1) -> IO ())
 river_node_v1_place_above =
-  RIP.unsafePerformIO hs_bindgen_618142b95fd19e25
+  RIP.unsafePerformIO hs_bindgen_5b1d5fbead8d235f
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_node_v1_place_below@
-foreign import ccall unsafe "hs_bindgen_66aa95649707a23b" hs_bindgen_66aa95649707a23b_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_place_below@
+foreign import ccall unsafe "hs_bindgen_f7ec18909a3f4cd1" hs_bindgen_f7ec18909a3f4cd1_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_node_v1_place_below@
-hs_bindgen_66aa95649707a23b :: IO (RIP.FunPtr ((RIP.Ptr River_node_v1) -> (RIP.Ptr River_node_v1) -> IO ()))
-hs_bindgen_66aa95649707a23b =
-  RIP.fromFFIType hs_bindgen_66aa95649707a23b_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_place_below@
+hs_bindgen_f7ec18909a3f4cd1 :: IO (RIP.FunPtr ((RIP.Ptr River_node_v1) -> (RIP.Ptr River_node_v1) -> IO ()))
+hs_bindgen_f7ec18909a3f4cd1 =
+  RIP.fromFFIType hs_bindgen_f7ec18909a3f4cd1_base
 
 {-# NOINLINE river_node_v1_place_below #-}
 {-|
@@ -2537,16 +2537,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_node_v1_place_below :: RIP.FunPtr ((RIP.Ptr River_node_v1) -> (RIP.Ptr River_node_v1) -> IO ())
 river_node_v1_place_below =
-  RIP.unsafePerformIO hs_bindgen_66aa95649707a23b
+  RIP.unsafePerformIO hs_bindgen_f7ec18909a3f4cd1
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_output_v1_add_listener@
-foreign import ccall unsafe "hs_bindgen_71c5f70658564f46" hs_bindgen_71c5f70658564f46_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_output_v1_add_listener@
+foreign import ccall unsafe "hs_bindgen_8ce5f1468c302718" hs_bindgen_8ce5f1468c302718_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_output_v1_add_listener@
-hs_bindgen_71c5f70658564f46 :: IO (RIP.FunPtr ((RIP.Ptr River_output_v1) -> (PtrConst.PtrConst River_output_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt))
-hs_bindgen_71c5f70658564f46 =
-  RIP.fromFFIType hs_bindgen_71c5f70658564f46_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_output_v1_add_listener@
+hs_bindgen_8ce5f1468c302718 :: IO (RIP.FunPtr ((RIP.Ptr River_output_v1) -> (PtrConst.PtrConst River_output_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt))
+hs_bindgen_8ce5f1468c302718 =
+  RIP.fromFFIType hs_bindgen_8ce5f1468c302718_base
 
 {-# NOINLINE river_output_v1_add_listener #-}
 {-|
@@ -2561,16 +2561,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_output_v1_add_listener :: RIP.FunPtr ((RIP.Ptr River_output_v1) -> (PtrConst.PtrConst River_output_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt)
 river_output_v1_add_listener =
-  RIP.unsafePerformIO hs_bindgen_71c5f70658564f46
+  RIP.unsafePerformIO hs_bindgen_8ce5f1468c302718
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_output_v1_set_user_data@
-foreign import ccall unsafe "hs_bindgen_08c8089bca2d9ef6" hs_bindgen_08c8089bca2d9ef6_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_output_v1_set_user_data@
+foreign import ccall unsafe "hs_bindgen_67d5bb3e3a882763" hs_bindgen_67d5bb3e3a882763_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_output_v1_set_user_data@
-hs_bindgen_08c8089bca2d9ef6 :: IO (RIP.FunPtr ((RIP.Ptr River_output_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
-hs_bindgen_08c8089bca2d9ef6 =
-  RIP.fromFFIType hs_bindgen_08c8089bca2d9ef6_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_output_v1_set_user_data@
+hs_bindgen_67d5bb3e3a882763 :: IO (RIP.FunPtr ((RIP.Ptr River_output_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
+hs_bindgen_67d5bb3e3a882763 =
+  RIP.fromFFIType hs_bindgen_67d5bb3e3a882763_base
 
 {-# NOINLINE river_output_v1_set_user_data #-}
 {-|
@@ -2585,16 +2585,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_output_v1_set_user_data :: RIP.FunPtr ((RIP.Ptr River_output_v1) -> (RIP.Ptr RIP.Void) -> IO ())
 river_output_v1_set_user_data =
-  RIP.unsafePerformIO hs_bindgen_08c8089bca2d9ef6
+  RIP.unsafePerformIO hs_bindgen_67d5bb3e3a882763
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_output_v1_get_user_data@
-foreign import ccall unsafe "hs_bindgen_67978720df9db53c" hs_bindgen_67978720df9db53c_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_output_v1_get_user_data@
+foreign import ccall unsafe "hs_bindgen_1f80ecb4aeff6715" hs_bindgen_1f80ecb4aeff6715_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_output_v1_get_user_data@
-hs_bindgen_67978720df9db53c :: IO (RIP.FunPtr ((RIP.Ptr River_output_v1) -> IO (RIP.Ptr RIP.Void)))
-hs_bindgen_67978720df9db53c =
-  RIP.fromFFIType hs_bindgen_67978720df9db53c_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_output_v1_get_user_data@
+hs_bindgen_1f80ecb4aeff6715 :: IO (RIP.FunPtr ((RIP.Ptr River_output_v1) -> IO (RIP.Ptr RIP.Void)))
+hs_bindgen_1f80ecb4aeff6715 =
+  RIP.fromFFIType hs_bindgen_1f80ecb4aeff6715_base
 
 {-# NOINLINE river_output_v1_get_user_data #-}
 {-|
@@ -2609,16 +2609,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_output_v1_get_user_data :: RIP.FunPtr ((RIP.Ptr River_output_v1) -> IO (RIP.Ptr RIP.Void))
 river_output_v1_get_user_data =
-  RIP.unsafePerformIO hs_bindgen_67978720df9db53c
+  RIP.unsafePerformIO hs_bindgen_1f80ecb4aeff6715
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_output_v1_get_version@
-foreign import ccall unsafe "hs_bindgen_884bec6e6f0913ba" hs_bindgen_884bec6e6f0913ba_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_output_v1_get_version@
+foreign import ccall unsafe "hs_bindgen_323b8d0dca53fd55" hs_bindgen_323b8d0dca53fd55_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_output_v1_get_version@
-hs_bindgen_884bec6e6f0913ba :: IO (RIP.FunPtr ((RIP.Ptr River_output_v1) -> IO HsBindgen.Runtime.LibC.Word32))
-hs_bindgen_884bec6e6f0913ba =
-  RIP.fromFFIType hs_bindgen_884bec6e6f0913ba_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_output_v1_get_version@
+hs_bindgen_323b8d0dca53fd55 :: IO (RIP.FunPtr ((RIP.Ptr River_output_v1) -> IO HsBindgen.Runtime.LibC.Word32))
+hs_bindgen_323b8d0dca53fd55 =
+  RIP.fromFFIType hs_bindgen_323b8d0dca53fd55_base
 
 {-# NOINLINE river_output_v1_get_version #-}
 {-| __C declaration:__ @river_output_v1_get_version@
@@ -2629,16 +2629,16 @@ hs_bindgen_884bec6e6f0913ba =
 -}
 river_output_v1_get_version :: RIP.FunPtr ((RIP.Ptr River_output_v1) -> IO HsBindgen.Runtime.LibC.Word32)
 river_output_v1_get_version =
-  RIP.unsafePerformIO hs_bindgen_884bec6e6f0913ba
+  RIP.unsafePerformIO hs_bindgen_323b8d0dca53fd55
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_output_v1_destroy@
-foreign import ccall unsafe "hs_bindgen_5141a87f5df77a31" hs_bindgen_5141a87f5df77a31_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_output_v1_destroy@
+foreign import ccall unsafe "hs_bindgen_cbd5d19e2ee6af54" hs_bindgen_cbd5d19e2ee6af54_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_output_v1_destroy@
-hs_bindgen_5141a87f5df77a31 :: IO (RIP.FunPtr ((RIP.Ptr River_output_v1) -> IO ()))
-hs_bindgen_5141a87f5df77a31 =
-  RIP.fromFFIType hs_bindgen_5141a87f5df77a31_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_output_v1_destroy@
+hs_bindgen_cbd5d19e2ee6af54 :: IO (RIP.FunPtr ((RIP.Ptr River_output_v1) -> IO ()))
+hs_bindgen_cbd5d19e2ee6af54 =
+  RIP.fromFFIType hs_bindgen_cbd5d19e2ee6af54_base
 
 {-# NOINLINE river_output_v1_destroy #-}
 {-|
@@ -2657,16 +2657,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_output_v1_destroy :: RIP.FunPtr ((RIP.Ptr River_output_v1) -> IO ())
 river_output_v1_destroy =
-  RIP.unsafePerformIO hs_bindgen_5141a87f5df77a31
+  RIP.unsafePerformIO hs_bindgen_cbd5d19e2ee6af54
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_output_v1_set_presentation_mode@
-foreign import ccall unsafe "hs_bindgen_7e32b364d8dab9ad" hs_bindgen_7e32b364d8dab9ad_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_output_v1_set_presentation_mode@
+foreign import ccall unsafe "hs_bindgen_a2dc6af98fb7330a" hs_bindgen_a2dc6af98fb7330a_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_output_v1_set_presentation_mode@
-hs_bindgen_7e32b364d8dab9ad :: IO (RIP.FunPtr ((RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_7e32b364d8dab9ad =
-  RIP.fromFFIType hs_bindgen_7e32b364d8dab9ad_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_output_v1_set_presentation_mode@
+hs_bindgen_a2dc6af98fb7330a :: IO (RIP.FunPtr ((RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_a2dc6af98fb7330a =
+  RIP.fromFFIType hs_bindgen_a2dc6af98fb7330a_base
 
 {-# NOINLINE river_output_v1_set_presentation_mode #-}
 {-|
@@ -2685,16 +2685,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_output_v1_set_presentation_mode :: RIP.FunPtr ((RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 river_output_v1_set_presentation_mode =
-  RIP.unsafePerformIO hs_bindgen_7e32b364d8dab9ad
+  RIP.unsafePerformIO hs_bindgen_a2dc6af98fb7330a
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_add_listener@
-foreign import ccall unsafe "hs_bindgen_81729c27be6d66fe" hs_bindgen_81729c27be6d66fe_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_add_listener@
+foreign import ccall unsafe "hs_bindgen_a93382461e2e21df" hs_bindgen_a93382461e2e21df_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_add_listener@
-hs_bindgen_81729c27be6d66fe :: IO (RIP.FunPtr ((RIP.Ptr River_seat_v1) -> (PtrConst.PtrConst River_seat_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt))
-hs_bindgen_81729c27be6d66fe =
-  RIP.fromFFIType hs_bindgen_81729c27be6d66fe_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_add_listener@
+hs_bindgen_a93382461e2e21df :: IO (RIP.FunPtr ((RIP.Ptr River_seat_v1) -> (PtrConst.PtrConst River_seat_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt))
+hs_bindgen_a93382461e2e21df =
+  RIP.fromFFIType hs_bindgen_a93382461e2e21df_base
 
 {-# NOINLINE river_seat_v1_add_listener #-}
 {-|
@@ -2709,16 +2709,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_seat_v1_add_listener :: RIP.FunPtr ((RIP.Ptr River_seat_v1) -> (PtrConst.PtrConst River_seat_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt)
 river_seat_v1_add_listener =
-  RIP.unsafePerformIO hs_bindgen_81729c27be6d66fe
+  RIP.unsafePerformIO hs_bindgen_a93382461e2e21df
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_set_user_data@
-foreign import ccall unsafe "hs_bindgen_4c3ce402697d4ad3" hs_bindgen_4c3ce402697d4ad3_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_set_user_data@
+foreign import ccall unsafe "hs_bindgen_36a7a87f14ff59e3" hs_bindgen_36a7a87f14ff59e3_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_set_user_data@
-hs_bindgen_4c3ce402697d4ad3 :: IO (RIP.FunPtr ((RIP.Ptr River_seat_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
-hs_bindgen_4c3ce402697d4ad3 =
-  RIP.fromFFIType hs_bindgen_4c3ce402697d4ad3_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_set_user_data@
+hs_bindgen_36a7a87f14ff59e3 :: IO (RIP.FunPtr ((RIP.Ptr River_seat_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
+hs_bindgen_36a7a87f14ff59e3 =
+  RIP.fromFFIType hs_bindgen_36a7a87f14ff59e3_base
 
 {-# NOINLINE river_seat_v1_set_user_data #-}
 {-|
@@ -2733,16 +2733,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_seat_v1_set_user_data :: RIP.FunPtr ((RIP.Ptr River_seat_v1) -> (RIP.Ptr RIP.Void) -> IO ())
 river_seat_v1_set_user_data =
-  RIP.unsafePerformIO hs_bindgen_4c3ce402697d4ad3
+  RIP.unsafePerformIO hs_bindgen_36a7a87f14ff59e3
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_get_user_data@
-foreign import ccall unsafe "hs_bindgen_ba6e46d9c5222fa2" hs_bindgen_ba6e46d9c5222fa2_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_get_user_data@
+foreign import ccall unsafe "hs_bindgen_f52a3af2317cdb3f" hs_bindgen_f52a3af2317cdb3f_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_get_user_data@
-hs_bindgen_ba6e46d9c5222fa2 :: IO (RIP.FunPtr ((RIP.Ptr River_seat_v1) -> IO (RIP.Ptr RIP.Void)))
-hs_bindgen_ba6e46d9c5222fa2 =
-  RIP.fromFFIType hs_bindgen_ba6e46d9c5222fa2_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_get_user_data@
+hs_bindgen_f52a3af2317cdb3f :: IO (RIP.FunPtr ((RIP.Ptr River_seat_v1) -> IO (RIP.Ptr RIP.Void)))
+hs_bindgen_f52a3af2317cdb3f =
+  RIP.fromFFIType hs_bindgen_f52a3af2317cdb3f_base
 
 {-# NOINLINE river_seat_v1_get_user_data #-}
 {-|
@@ -2757,16 +2757,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_seat_v1_get_user_data :: RIP.FunPtr ((RIP.Ptr River_seat_v1) -> IO (RIP.Ptr RIP.Void))
 river_seat_v1_get_user_data =
-  RIP.unsafePerformIO hs_bindgen_ba6e46d9c5222fa2
+  RIP.unsafePerformIO hs_bindgen_f52a3af2317cdb3f
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_get_version@
-foreign import ccall unsafe "hs_bindgen_f3c02620a20c0334" hs_bindgen_f3c02620a20c0334_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_get_version@
+foreign import ccall unsafe "hs_bindgen_134019eadefab583" hs_bindgen_134019eadefab583_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_get_version@
-hs_bindgen_f3c02620a20c0334 :: IO (RIP.FunPtr ((RIP.Ptr River_seat_v1) -> IO HsBindgen.Runtime.LibC.Word32))
-hs_bindgen_f3c02620a20c0334 =
-  RIP.fromFFIType hs_bindgen_f3c02620a20c0334_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_get_version@
+hs_bindgen_134019eadefab583 :: IO (RIP.FunPtr ((RIP.Ptr River_seat_v1) -> IO HsBindgen.Runtime.LibC.Word32))
+hs_bindgen_134019eadefab583 =
+  RIP.fromFFIType hs_bindgen_134019eadefab583_base
 
 {-# NOINLINE river_seat_v1_get_version #-}
 {-| __C declaration:__ @river_seat_v1_get_version@
@@ -2777,16 +2777,16 @@ hs_bindgen_f3c02620a20c0334 =
 -}
 river_seat_v1_get_version :: RIP.FunPtr ((RIP.Ptr River_seat_v1) -> IO HsBindgen.Runtime.LibC.Word32)
 river_seat_v1_get_version =
-  RIP.unsafePerformIO hs_bindgen_f3c02620a20c0334
+  RIP.unsafePerformIO hs_bindgen_134019eadefab583
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_destroy@
-foreign import ccall unsafe "hs_bindgen_84bda737d8a5d61d" hs_bindgen_84bda737d8a5d61d_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_destroy@
+foreign import ccall unsafe "hs_bindgen_1c70ada60a57998a" hs_bindgen_1c70ada60a57998a_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_destroy@
-hs_bindgen_84bda737d8a5d61d :: IO (RIP.FunPtr ((RIP.Ptr River_seat_v1) -> IO ()))
-hs_bindgen_84bda737d8a5d61d =
-  RIP.fromFFIType hs_bindgen_84bda737d8a5d61d_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_destroy@
+hs_bindgen_1c70ada60a57998a :: IO (RIP.FunPtr ((RIP.Ptr River_seat_v1) -> IO ()))
+hs_bindgen_1c70ada60a57998a =
+  RIP.fromFFIType hs_bindgen_1c70ada60a57998a_base
 
 {-# NOINLINE river_seat_v1_destroy #-}
 {-|
@@ -2805,16 +2805,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_seat_v1_destroy :: RIP.FunPtr ((RIP.Ptr River_seat_v1) -> IO ())
 river_seat_v1_destroy =
-  RIP.unsafePerformIO hs_bindgen_84bda737d8a5d61d
+  RIP.unsafePerformIO hs_bindgen_1c70ada60a57998a
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_focus_window@
-foreign import ccall unsafe "hs_bindgen_e18c6474aaa6e2d9" hs_bindgen_e18c6474aaa6e2d9_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_focus_window@
+foreign import ccall unsafe "hs_bindgen_c5e64d924cd67d90" hs_bindgen_c5e64d924cd67d90_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_focus_window@
-hs_bindgen_e18c6474aaa6e2d9 :: IO (RIP.FunPtr ((RIP.Ptr River_seat_v1) -> (RIP.Ptr River_window_v1) -> IO ()))
-hs_bindgen_e18c6474aaa6e2d9 =
-  RIP.fromFFIType hs_bindgen_e18c6474aaa6e2d9_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_focus_window@
+hs_bindgen_c5e64d924cd67d90 :: IO (RIP.FunPtr ((RIP.Ptr River_seat_v1) -> (RIP.Ptr River_window_v1) -> IO ()))
+hs_bindgen_c5e64d924cd67d90 =
+  RIP.fromFFIType hs_bindgen_c5e64d924cd67d90_base
 
 {-# NOINLINE river_seat_v1_focus_window #-}
 {-|
@@ -2833,16 +2833,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_seat_v1_focus_window :: RIP.FunPtr ((RIP.Ptr River_seat_v1) -> (RIP.Ptr River_window_v1) -> IO ())
 river_seat_v1_focus_window =
-  RIP.unsafePerformIO hs_bindgen_e18c6474aaa6e2d9
+  RIP.unsafePerformIO hs_bindgen_c5e64d924cd67d90
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_focus_shell_surface@
-foreign import ccall unsafe "hs_bindgen_bee3d71ff21fbf10" hs_bindgen_bee3d71ff21fbf10_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_focus_shell_surface@
+foreign import ccall unsafe "hs_bindgen_e1b6a51de48b9c8b" hs_bindgen_e1b6a51de48b9c8b_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_focus_shell_surface@
-hs_bindgen_bee3d71ff21fbf10 :: IO (RIP.FunPtr ((RIP.Ptr River_seat_v1) -> (RIP.Ptr River_shell_surface_v1) -> IO ()))
-hs_bindgen_bee3d71ff21fbf10 =
-  RIP.fromFFIType hs_bindgen_bee3d71ff21fbf10_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_focus_shell_surface@
+hs_bindgen_e1b6a51de48b9c8b :: IO (RIP.FunPtr ((RIP.Ptr River_seat_v1) -> (RIP.Ptr River_shell_surface_v1) -> IO ()))
+hs_bindgen_e1b6a51de48b9c8b =
+  RIP.fromFFIType hs_bindgen_e1b6a51de48b9c8b_base
 
 {-# NOINLINE river_seat_v1_focus_shell_surface #-}
 {-|
@@ -2861,16 +2861,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_seat_v1_focus_shell_surface :: RIP.FunPtr ((RIP.Ptr River_seat_v1) -> (RIP.Ptr River_shell_surface_v1) -> IO ())
 river_seat_v1_focus_shell_surface =
-  RIP.unsafePerformIO hs_bindgen_bee3d71ff21fbf10
+  RIP.unsafePerformIO hs_bindgen_e1b6a51de48b9c8b
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_clear_focus@
-foreign import ccall unsafe "hs_bindgen_4d11a811c0bebdf9" hs_bindgen_4d11a811c0bebdf9_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_clear_focus@
+foreign import ccall unsafe "hs_bindgen_6bdedc1db9f9d64c" hs_bindgen_6bdedc1db9f9d64c_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_clear_focus@
-hs_bindgen_4d11a811c0bebdf9 :: IO (RIP.FunPtr ((RIP.Ptr River_seat_v1) -> IO ()))
-hs_bindgen_4d11a811c0bebdf9 =
-  RIP.fromFFIType hs_bindgen_4d11a811c0bebdf9_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_clear_focus@
+hs_bindgen_6bdedc1db9f9d64c :: IO (RIP.FunPtr ((RIP.Ptr River_seat_v1) -> IO ()))
+hs_bindgen_6bdedc1db9f9d64c =
+  RIP.fromFFIType hs_bindgen_6bdedc1db9f9d64c_base
 
 {-# NOINLINE river_seat_v1_clear_focus #-}
 {-|
@@ -2889,16 +2889,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_seat_v1_clear_focus :: RIP.FunPtr ((RIP.Ptr River_seat_v1) -> IO ())
 river_seat_v1_clear_focus =
-  RIP.unsafePerformIO hs_bindgen_4d11a811c0bebdf9
+  RIP.unsafePerformIO hs_bindgen_6bdedc1db9f9d64c
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_op_start_pointer@
-foreign import ccall unsafe "hs_bindgen_4a9aaa027a482629" hs_bindgen_4a9aaa027a482629_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_op_start_pointer@
+foreign import ccall unsafe "hs_bindgen_8b7ab0fc29f443ef" hs_bindgen_8b7ab0fc29f443ef_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_op_start_pointer@
-hs_bindgen_4a9aaa027a482629 :: IO (RIP.FunPtr ((RIP.Ptr River_seat_v1) -> IO ()))
-hs_bindgen_4a9aaa027a482629 =
-  RIP.fromFFIType hs_bindgen_4a9aaa027a482629_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_op_start_pointer@
+hs_bindgen_8b7ab0fc29f443ef :: IO (RIP.FunPtr ((RIP.Ptr River_seat_v1) -> IO ()))
+hs_bindgen_8b7ab0fc29f443ef =
+  RIP.fromFFIType hs_bindgen_8b7ab0fc29f443ef_base
 
 {-# NOINLINE river_seat_v1_op_start_pointer #-}
 {-|
@@ -2927,16 +2927,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_seat_v1_op_start_pointer :: RIP.FunPtr ((RIP.Ptr River_seat_v1) -> IO ())
 river_seat_v1_op_start_pointer =
-  RIP.unsafePerformIO hs_bindgen_4a9aaa027a482629
+  RIP.unsafePerformIO hs_bindgen_8b7ab0fc29f443ef
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_op_end@
-foreign import ccall unsafe "hs_bindgen_a34dd38ae03c2dab" hs_bindgen_a34dd38ae03c2dab_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_op_end@
+foreign import ccall unsafe "hs_bindgen_e20fd7a37b77d031" hs_bindgen_e20fd7a37b77d031_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_op_end@
-hs_bindgen_a34dd38ae03c2dab :: IO (RIP.FunPtr ((RIP.Ptr River_seat_v1) -> IO ()))
-hs_bindgen_a34dd38ae03c2dab =
-  RIP.fromFFIType hs_bindgen_a34dd38ae03c2dab_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_op_end@
+hs_bindgen_e20fd7a37b77d031 :: IO (RIP.FunPtr ((RIP.Ptr River_seat_v1) -> IO ()))
+hs_bindgen_e20fd7a37b77d031 =
+  RIP.fromFFIType hs_bindgen_e20fd7a37b77d031_base
 
 {-# NOINLINE river_seat_v1_op_end #-}
 {-|
@@ -2957,16 +2957,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_seat_v1_op_end :: RIP.FunPtr ((RIP.Ptr River_seat_v1) -> IO ())
 river_seat_v1_op_end =
-  RIP.unsafePerformIO hs_bindgen_a34dd38ae03c2dab
+  RIP.unsafePerformIO hs_bindgen_e20fd7a37b77d031
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_get_pointer_binding@
-foreign import ccall unsafe "hs_bindgen_b76ba03a38e05580" hs_bindgen_b76ba03a38e05580_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_get_pointer_binding@
+foreign import ccall unsafe "hs_bindgen_74c667c4df9d2989" hs_bindgen_74c667c4df9d2989_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_get_pointer_binding@
-hs_bindgen_b76ba03a38e05580 :: IO (RIP.FunPtr ((RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO (RIP.Ptr River_pointer_binding_v1)))
-hs_bindgen_b76ba03a38e05580 =
-  RIP.fromFFIType hs_bindgen_b76ba03a38e05580_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_get_pointer_binding@
+hs_bindgen_74c667c4df9d2989 :: IO (RIP.FunPtr ((RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO (RIP.Ptr River_pointer_binding_v1)))
+hs_bindgen_74c667c4df9d2989 =
+  RIP.fromFFIType hs_bindgen_74c667c4df9d2989_base
 
 {-# NOINLINE river_seat_v1_get_pointer_binding #-}
 {-|
@@ -2987,16 +2987,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_seat_v1_get_pointer_binding :: RIP.FunPtr ((RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO (RIP.Ptr River_pointer_binding_v1))
 river_seat_v1_get_pointer_binding =
-  RIP.unsafePerformIO hs_bindgen_b76ba03a38e05580
+  RIP.unsafePerformIO hs_bindgen_74c667c4df9d2989
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_set_xcursor_theme@
-foreign import ccall unsafe "hs_bindgen_2731fa9dcf0c584e" hs_bindgen_2731fa9dcf0c584e_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_set_xcursor_theme@
+foreign import ccall unsafe "hs_bindgen_cc900dda00cc7561" hs_bindgen_cc900dda00cc7561_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_set_xcursor_theme@
-hs_bindgen_2731fa9dcf0c584e :: IO (RIP.FunPtr ((RIP.Ptr River_seat_v1) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_2731fa9dcf0c584e =
-  RIP.fromFFIType hs_bindgen_2731fa9dcf0c584e_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_set_xcursor_theme@
+hs_bindgen_cc900dda00cc7561 :: IO (RIP.FunPtr ((RIP.Ptr River_seat_v1) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_cc900dda00cc7561 =
+  RIP.fromFFIType hs_bindgen_cc900dda00cc7561_base
 
 {-# NOINLINE river_seat_v1_set_xcursor_theme #-}
 {-|
@@ -3015,16 +3015,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_seat_v1_set_xcursor_theme :: RIP.FunPtr ((RIP.Ptr River_seat_v1) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 river_seat_v1_set_xcursor_theme =
-  RIP.unsafePerformIO hs_bindgen_2731fa9dcf0c584e
+  RIP.unsafePerformIO hs_bindgen_cc900dda00cc7561
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_pointer_warp@
-foreign import ccall unsafe "hs_bindgen_15768677781d49b7" hs_bindgen_15768677781d49b7_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_pointer_warp@
+foreign import ccall unsafe "hs_bindgen_dfc63eae30cf6771" hs_bindgen_dfc63eae30cf6771_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_seat_v1_pointer_warp@
-hs_bindgen_15768677781d49b7 :: IO (RIP.FunPtr ((RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-hs_bindgen_15768677781d49b7 =
-  RIP.fromFFIType hs_bindgen_15768677781d49b7_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_pointer_warp@
+hs_bindgen_dfc63eae30cf6771 :: IO (RIP.FunPtr ((RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_dfc63eae30cf6771 =
+  RIP.fromFFIType hs_bindgen_dfc63eae30cf6771_base
 
 {-# NOINLINE river_seat_v1_pointer_warp #-}
 {-|
@@ -3045,16 +3045,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_seat_v1_pointer_warp :: RIP.FunPtr ((RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 river_seat_v1_pointer_warp =
-  RIP.unsafePerformIO hs_bindgen_15768677781d49b7
+  RIP.unsafePerformIO hs_bindgen_dfc63eae30cf6771
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_add_listener@
-foreign import ccall unsafe "hs_bindgen_7bd61c7144b41a68" hs_bindgen_7bd61c7144b41a68_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_add_listener@
+foreign import ccall unsafe "hs_bindgen_e247393001849250" hs_bindgen_e247393001849250_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_add_listener@
-hs_bindgen_7bd61c7144b41a68 :: IO (RIP.FunPtr ((RIP.Ptr River_pointer_binding_v1) -> (PtrConst.PtrConst River_pointer_binding_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt))
-hs_bindgen_7bd61c7144b41a68 =
-  RIP.fromFFIType hs_bindgen_7bd61c7144b41a68_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_add_listener@
+hs_bindgen_e247393001849250 :: IO (RIP.FunPtr ((RIP.Ptr River_pointer_binding_v1) -> (PtrConst.PtrConst River_pointer_binding_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt))
+hs_bindgen_e247393001849250 =
+  RIP.fromFFIType hs_bindgen_e247393001849250_base
 
 {-# NOINLINE river_pointer_binding_v1_add_listener #-}
 {-|
@@ -3069,16 +3069,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_pointer_binding_v1_add_listener :: RIP.FunPtr ((RIP.Ptr River_pointer_binding_v1) -> (PtrConst.PtrConst River_pointer_binding_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt)
 river_pointer_binding_v1_add_listener =
-  RIP.unsafePerformIO hs_bindgen_7bd61c7144b41a68
+  RIP.unsafePerformIO hs_bindgen_e247393001849250
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_set_user_data@
-foreign import ccall unsafe "hs_bindgen_058cd111dce77ba6" hs_bindgen_058cd111dce77ba6_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_set_user_data@
+foreign import ccall unsafe "hs_bindgen_49c8b53d074824f4" hs_bindgen_49c8b53d074824f4_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_set_user_data@
-hs_bindgen_058cd111dce77ba6 :: IO (RIP.FunPtr ((RIP.Ptr River_pointer_binding_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
-hs_bindgen_058cd111dce77ba6 =
-  RIP.fromFFIType hs_bindgen_058cd111dce77ba6_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_set_user_data@
+hs_bindgen_49c8b53d074824f4 :: IO (RIP.FunPtr ((RIP.Ptr River_pointer_binding_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
+hs_bindgen_49c8b53d074824f4 =
+  RIP.fromFFIType hs_bindgen_49c8b53d074824f4_base
 
 {-# NOINLINE river_pointer_binding_v1_set_user_data #-}
 {-|
@@ -3093,16 +3093,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_pointer_binding_v1_set_user_data :: RIP.FunPtr ((RIP.Ptr River_pointer_binding_v1) -> (RIP.Ptr RIP.Void) -> IO ())
 river_pointer_binding_v1_set_user_data =
-  RIP.unsafePerformIO hs_bindgen_058cd111dce77ba6
+  RIP.unsafePerformIO hs_bindgen_49c8b53d074824f4
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_get_user_data@
-foreign import ccall unsafe "hs_bindgen_bc6e5d2841b9f574" hs_bindgen_bc6e5d2841b9f574_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_get_user_data@
+foreign import ccall unsafe "hs_bindgen_afd3bcc860d069d0" hs_bindgen_afd3bcc860d069d0_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_get_user_data@
-hs_bindgen_bc6e5d2841b9f574 :: IO (RIP.FunPtr ((RIP.Ptr River_pointer_binding_v1) -> IO (RIP.Ptr RIP.Void)))
-hs_bindgen_bc6e5d2841b9f574 =
-  RIP.fromFFIType hs_bindgen_bc6e5d2841b9f574_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_get_user_data@
+hs_bindgen_afd3bcc860d069d0 :: IO (RIP.FunPtr ((RIP.Ptr River_pointer_binding_v1) -> IO (RIP.Ptr RIP.Void)))
+hs_bindgen_afd3bcc860d069d0 =
+  RIP.fromFFIType hs_bindgen_afd3bcc860d069d0_base
 
 {-# NOINLINE river_pointer_binding_v1_get_user_data #-}
 {-|
@@ -3117,16 +3117,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_pointer_binding_v1_get_user_data :: RIP.FunPtr ((RIP.Ptr River_pointer_binding_v1) -> IO (RIP.Ptr RIP.Void))
 river_pointer_binding_v1_get_user_data =
-  RIP.unsafePerformIO hs_bindgen_bc6e5d2841b9f574
+  RIP.unsafePerformIO hs_bindgen_afd3bcc860d069d0
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_get_version@
-foreign import ccall unsafe "hs_bindgen_561e7879795d3c7e" hs_bindgen_561e7879795d3c7e_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_get_version@
+foreign import ccall unsafe "hs_bindgen_7767bae29484f65b" hs_bindgen_7767bae29484f65b_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_get_version@
-hs_bindgen_561e7879795d3c7e :: IO (RIP.FunPtr ((RIP.Ptr River_pointer_binding_v1) -> IO HsBindgen.Runtime.LibC.Word32))
-hs_bindgen_561e7879795d3c7e =
-  RIP.fromFFIType hs_bindgen_561e7879795d3c7e_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_get_version@
+hs_bindgen_7767bae29484f65b :: IO (RIP.FunPtr ((RIP.Ptr River_pointer_binding_v1) -> IO HsBindgen.Runtime.LibC.Word32))
+hs_bindgen_7767bae29484f65b =
+  RIP.fromFFIType hs_bindgen_7767bae29484f65b_base
 
 {-# NOINLINE river_pointer_binding_v1_get_version #-}
 {-| __C declaration:__ @river_pointer_binding_v1_get_version@
@@ -3137,16 +3137,16 @@ hs_bindgen_561e7879795d3c7e =
 -}
 river_pointer_binding_v1_get_version :: RIP.FunPtr ((RIP.Ptr River_pointer_binding_v1) -> IO HsBindgen.Runtime.LibC.Word32)
 river_pointer_binding_v1_get_version =
-  RIP.unsafePerformIO hs_bindgen_561e7879795d3c7e
+  RIP.unsafePerformIO hs_bindgen_7767bae29484f65b
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_destroy@
-foreign import ccall unsafe "hs_bindgen_e8046eec37126a29" hs_bindgen_e8046eec37126a29_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_destroy@
+foreign import ccall unsafe "hs_bindgen_65601e3805362557" hs_bindgen_65601e3805362557_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_destroy@
-hs_bindgen_e8046eec37126a29 :: IO (RIP.FunPtr ((RIP.Ptr River_pointer_binding_v1) -> IO ()))
-hs_bindgen_e8046eec37126a29 =
-  RIP.fromFFIType hs_bindgen_e8046eec37126a29_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_destroy@
+hs_bindgen_65601e3805362557 :: IO (RIP.FunPtr ((RIP.Ptr River_pointer_binding_v1) -> IO ()))
+hs_bindgen_65601e3805362557 =
+  RIP.fromFFIType hs_bindgen_65601e3805362557_base
 
 {-# NOINLINE river_pointer_binding_v1_destroy #-}
 {-|
@@ -3163,16 +3163,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_pointer_binding_v1_destroy :: RIP.FunPtr ((RIP.Ptr River_pointer_binding_v1) -> IO ())
 river_pointer_binding_v1_destroy =
-  RIP.unsafePerformIO hs_bindgen_e8046eec37126a29
+  RIP.unsafePerformIO hs_bindgen_65601e3805362557
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_enable@
-foreign import ccall unsafe "hs_bindgen_0a23d64ae69bcd64" hs_bindgen_0a23d64ae69bcd64_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_enable@
+foreign import ccall unsafe "hs_bindgen_c78ddbd52c8c708f" hs_bindgen_c78ddbd52c8c708f_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_enable@
-hs_bindgen_0a23d64ae69bcd64 :: IO (RIP.FunPtr ((RIP.Ptr River_pointer_binding_v1) -> IO ()))
-hs_bindgen_0a23d64ae69bcd64 =
-  RIP.fromFFIType hs_bindgen_0a23d64ae69bcd64_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_enable@
+hs_bindgen_c78ddbd52c8c708f :: IO (RIP.FunPtr ((RIP.Ptr River_pointer_binding_v1) -> IO ()))
+hs_bindgen_c78ddbd52c8c708f =
+  RIP.fromFFIType hs_bindgen_c78ddbd52c8c708f_base
 
 {-# NOINLINE river_pointer_binding_v1_enable #-}
 {-|
@@ -3191,16 +3191,16 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_pointer_binding_v1_enable :: RIP.FunPtr ((RIP.Ptr River_pointer_binding_v1) -> IO ())
 river_pointer_binding_v1_enable =
-  RIP.unsafePerformIO hs_bindgen_0a23d64ae69bcd64
+  RIP.unsafePerformIO hs_bindgen_c78ddbd52c8c708f
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_disable@
-foreign import ccall unsafe "hs_bindgen_a03b792044c0aeea" hs_bindgen_a03b792044c0aeea_base ::
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_disable@
+foreign import ccall unsafe "hs_bindgen_6413557eae13ce5a" hs_bindgen_6413557eae13ce5a_base ::
      IO (RIP.FunPtr RIP.Void)
 
--- __unique:__ @hswm_river_windowmanage_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_disable@
-hs_bindgen_a03b792044c0aeea :: IO (RIP.FunPtr ((RIP.Ptr River_pointer_binding_v1) -> IO ()))
-hs_bindgen_a03b792044c0aeea =
-  RIP.fromFFIType hs_bindgen_a03b792044c0aeea_base
+-- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_disable@
+hs_bindgen_6413557eae13ce5a :: IO (RIP.FunPtr ((RIP.Ptr River_pointer_binding_v1) -> IO ()))
+hs_bindgen_6413557eae13ce5a =
+  RIP.fromFFIType hs_bindgen_6413557eae13ce5a_base
 
 {-# NOINLINE river_pointer_binding_v1_disable #-}
 {-|
@@ -3219,4 +3219,4 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_pointer_binding_v1_disable :: RIP.FunPtr ((RIP.Ptr River_pointer_binding_v1) -> IO ())
 river_pointer_binding_v1_disable =
-  RIP.unsafePerformIO hs_bindgen_a03b792044c0aeea
+  RIP.unsafePerformIO hs_bindgen_6413557eae13ce5a

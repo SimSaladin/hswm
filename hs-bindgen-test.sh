@@ -7,8 +7,6 @@ specsDir=hswm-bindings/generated
 
 mkdir -p "$specsDir" "$outputDir"
 
-cflags+=$(pkg-config --cflags wayland-client xkbcommon)
-
 mod=Generated.$1
 shift
 
@@ -39,4 +37,4 @@ case $mod in
         ;;
 esac
 
-hs-bindgen-cli preprocess $cflags "${bindgenOpts[@]}" "$@"
+hs-bindgen-cli preprocess "${bindgenOpts[@]}" "$@"
