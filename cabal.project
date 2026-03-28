@@ -5,13 +5,13 @@ packages:
 package hswm
   c2hs-options: -C -std=gnu18
 
-source-repository-package
-  type: git
-  location: https://github.com/well-typed/hs-bindgen
-  tag: release-0.1-alpha2
-  subdir: c-expr-dsl c-expr-runtime hs-bindgen hs-bindgen-runtime
-
-source-repository-package
-  type: git
-  location: https://github.com/well-typed/libclang
-  tag: release-0.1-alpha
+-- source-repository-package
+--   type: git
+--   location: https://github.com/well-typed/hs-bindgen
+--   tag: release-0.1-alpha2
+--   subdir: c-expr-dsl c-expr-runtime hs-bindgen hs-bindgen-runtime
+--
+-- source-repository-package
+--   type: git
+--   location: https://github.com/well-typed/libclang
+--   tag: release-0.1-alpha

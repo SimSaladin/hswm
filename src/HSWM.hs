@@ -16,15 +16,17 @@ module HSWM
   , module HSWM.Layout
   , module HSWM.Main
   , module HSWM.Actions
+  , module HSWM.Utils
   , module River
-  , module ReExports
   , module Prelude
+  , module ReExports
   ) where
 
 import HSWM.Layout
 import HSWM.Core
 import HSWM.Main
 import HSWM.Actions
+import HSWM.Utils
 import River
 
 import           Data.Default as ReExports

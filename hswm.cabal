@@ -16,11 +16,18 @@ extra-source-files:
   , cbits/river-window-management-v1-client-protocol.c
   , cbits/river-xkb-config-v1-protocol.c
 
-common warnings
-    ghc-options: -Wall
+common common
+    ghc-options: -Wall -Wunused-packages
+    build-depends: base >=4.20.2.0
+    default-language:  GHC2024
+    default-extensions: RecordWildCards
+                      , OverloadedRecordDot
+                      , DuplicateRecordFields
+                      , OverloadedStrings
 
 library
-    import:           warnings
+    import:          common
+    hs-source-dirs:  src
     exposed-modules: Wayland.FFI
                    , Wayland.Bindings
                    , Wayland
@@ -46,7 +53,7 @@ library
 		   , HSWM.Utils
                    , HSWM.Layout
                    , Core
-    other-modules: Prelude
+    autogen-modules:
     build-depends:    base >=4.20.2.0
                     , data-default
 		    , transformers
@@ -58,7 +65,8 @@ library
                     , containers
                     , typerep-map
                     , unix
-    hs-source-dirs:   src
+		    , pretty-simple
+    other-modules: Prelude
     include-dirs:     cbits
     c-sources:        cbits/river-window-management-v1-protocol.c
                     , cbits/river-input-management-v1-protocol.c
@@ -67,24 +75,20 @@ library
     pkgconfig-depends: wayland-client, xkbcommon
     extra-libraries:   wayland-client, xkbcommon
 
-    default-language: GHC2024
-    default-extensions: RecordWildCards
-                      , OverloadedRecordDot
-                      , DuplicateRecordFields
-                      , OverloadedStrings
-
     -- XXX fix this
     -- build-tool-depends: c2hs:c2hs
+    build-depends:
+      , c-expr-runtime
+      , hs-bindgen
+      , hs-bindgen-runtime
 
     -- Modules included in this library but not exported.
     -- other-modules:
 
 executable hswm
-    import:           warnings
+    import:           common
     main-is:          Main.hs
-    build-depends:    base >=4.20.2.0
-                    , hswm
+    build-depends:    hswm
     hs-source-dirs:   app
     pkgconfig-depends: wayland-client
     extra-libraries:   wayland-client
-    default-language:  GHC2024

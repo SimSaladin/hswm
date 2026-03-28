@@ -6,6 +6,10 @@
     flake-utils.url = "github:numtide/flake-utils";
     flake-parts.url = "github:hercules-ci/flake-parts";
     haskell-flake.url = "github:srid/haskell-flake";
+    hs-bindgen = {
+      url = "github:well-typed/hs-bindgen";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs@{ self, nixpkgs, flake-utils, ... }:
@@ -23,6 +27,7 @@
             # features (the wm protocol etc.)
             river = final.callPackage ./river/package.nix { };
           })
+          inputs.hs-bindgen.overlays.default
         ];
       };
       haskellProjects.default = {

@@ -19,6 +19,8 @@ import River
 import Data.Bits
 import HSWM.XKB (ModMask)
 import Data.Char (toLower)
+import qualified Text.Pretty.Simple as P
+import System.IO
 
 -- | Parse a color in the format 0xRRGGBB or 0xRRGGBBAA and convert it to
 -- 32-bit color values (used by Window.set_borders in rwm).
@@ -56,3 +58,15 @@ resolveModMask d s = case map toLower s of
                        "mod4"  -> fi $ fromEnum ModifiersMod4
                        "mod5"  -> fi $ fromEnum ModifiersMod5
                        _ -> error $ "unrecognized modifier: " ++ s
+
+
+pTrace :: (MonadIO m, Show a) => a -> m ()
+pTrace = P.pHPrintOpt
+  P.CheckColorTty
+  P.defaultOutputOptionsNoColor
+    { P.outputOptionsPageWidth = 380
+    , P.outputOptionsCompact = True
+    , P.outputOptionsCompactParens = True
+    , P.outputOptionsInitialIndent = 4
+    , P.outputOptionsColorOptions = Just P.defaultColorOptionsDarkBg }
+  stderr
