@@ -20,12 +20,13 @@ import qualified Data.TMap as TM
 import           Data.Typeable
 import           Foreign
 import           System.Exit (ExitCode(..))
+import           Data.IORef
 
 import           HSWM.StackSet (Stack, Workspace(..))
 import qualified HSWM.StackSet as W
 import           HSWM.XKB
 import           River
-import           Wayland (WlDisplay)
+import           Wayland
 
 -- | User configuration
 data HSWMConfig l = HSWMConfig
@@ -45,6 +46,8 @@ data HSWMConfig l = HSWMConfig
 data HConf = HConf
   { config  :: !(HSWMConfig Layout)
   , display :: WlDisplay
+    -- | The global objects available through wl_registry.
+  , globals :: !(IORef RegistryCache)
   }
 
 -- | Mutable stete.

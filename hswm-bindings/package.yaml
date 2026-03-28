@@ -1,0 +1,26 @@
+verbatim:
+  cabal-version:      3.4
+name:               hswm-bindings
+version:            0.1.0.0
+license:            MIT
+license-file:       LICENSE
+author:             Samuli Thomasson
+maintainer:         samuli.thomasson@5gsystems.com
+build-type:         Simple
+extra-doc-files:    CHANGELOG.md
+extra-source-files:
+  - ../cbits/*.c
+  - ../cbits/*.h
+
+library:
+  source-dirs: src
+  dependencies:
+    - base >=4.21.0.0
+    - c-expr-runtime
+    - hs-bindgen-runtime
+  language: GHC2024
+  ghc-options: -Wall
+  include-dirs: ../cbits
+  c-sources: ../cbits/*.c
+  pkgconfig-depends: wayland-client
+  extra-libraries: wayland-client

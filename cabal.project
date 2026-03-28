@@ -1,5 +1,6 @@
 packages:
   .
+  hswm-bindings
 
 -- https://github.com/haskell/c2hs/issues/300
 package hswm

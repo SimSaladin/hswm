@@ -75,7 +75,7 @@ wl_seat_get_keyboard seat = do
 
 -- * wl_registry
 
-wl_registry_bind :: WlRegistry -> CUInt -> WlInterface -> Version -> IO (Ptr a)
+wl_registry_bind :: WlRegistry -> Word32 -> WlInterface -> Version -> IO (Ptr a)
 wl_registry_bind reg name iface ver = do
   ifaceName <- {#get wl_interface->name#} iface
   WlProxy res <- wl_proxy_marshal_array_flags reg {#const WL_REGISTRY_BIND#} iface ver 0 (name, ifaceName, ver, nullPtr)
@@ -92,21 +92,18 @@ wl_registry_add_listener reg (WlRegistryListener l) dt = do
   when (res < 0) $ throwIO $ WaylandException $ "wl_registry_add_listener: " ++ show res
 
 data RegistryEvent
-   = RegistryGlobal       !(Ptr ()) !WlRegistry !CUInt !String !CUInt
-   | RegistryGlobalRemove !(Ptr ()) !WlRegistry !CUInt
+   = RegistryGlobal       { userdata :: !(Ptr ()), registry :: !WlRegistry, name :: !Word32, interface :: !String, version :: !Version }
+   | RegistryGlobalRemove { userdata :: !(Ptr ()), registry :: !WlRegistry, name :: !Word32 }
    deriving Show
 
-type WlRegistryListenerGlobal       = Ptr () -> WlRegistry -> CUInt -> CString -> CUInt -> IO ()
-type WlRegistryListenerGlobalRemove = Ptr () -> WlRegistry -> CUInt -> IO ()
-
-foreign import ccall "wrapper" wrap_global :: WlRegistryListenerGlobal -> IO (FunPtr WlRegistryListenerGlobal)
-foreign import ccall "wrapper" wrap_global_remove :: WlRegistryListenerGlobalRemove -> IO (FunPtr WlRegistryListenerGlobalRemove)
+foreign import ccall "wrapper" wrap_global        :: ListenerCallback (Ptr () -> WlRegistry -> CUInt -> CString -> CUInt -> IO ())
+foreign import ccall "wrapper" wrap_global_remove :: ListenerCallback (Ptr () -> WlRegistry -> CUInt -> IO ())
 
 mkRegistryListener :: (RegistryEvent -> IO ()) -> IO WlRegistryListener
 mkRegistryListener h = do
   p <- WlRegistryListener <$> mallocBytes {#sizeof wl_registry_listener#}
-  {#set wl_registry_listener.global#}        p =<< wrap_global (\a b c d e -> peekCString d >>= \d' -> h $ RegistryGlobal a b c d' e)
-  {#set wl_registry_listener.global_remove#} p =<< wrap_global_remove (\a b c -> h $ RegistryGlobalRemove a b c)
+  {#set wl_registry_listener.global#}        p =<< wrap_global        (\a b c d e -> peekCString d >>= \d' -> h $ RegistryGlobal a b (fi c) d' (fi e))
+  {#set wl_registry_listener.global_remove#} p =<< wrap_global_remove (\a b c     -> h $ RegistryGlobalRemove a b (fi c))
   return p
 
 -- * wl_proxy

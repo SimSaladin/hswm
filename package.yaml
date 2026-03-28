@@ -18,9 +18,6 @@ extra-source-files:
 verbatim:
   cabal-version: 3.4
 
-_ghc-options: &common-ghc-options
-  -Wall -Wunused-packages
-
 library:
     source-dirs: src
     exposed-modules:
@@ -30,11 +27,11 @@ library:
       - Wayland
       - River.XKB.Config.FFI
       - River.XKB.Config
-      - River.XKB.Bindings.MiscFFI
       - River.XKB.Bindings.FFI
+      - River.XKB.Bindings.MiscFFI
       - River.XKB.Bindings
-      - River.WMP.MiscFFI
       - River.WMP.FFI
+      - River.WMP.MiscFFI
       - River.WMP
       - River
       - HSWM.XKB.FFI
@@ -65,9 +62,7 @@ library:
       - transformers
       - typerep-map
       - unix
-      # XXX: below for hs-bindgen-cli testing
-      #- c-expr-runtime
-      #- hs-bindgen-runtime
+      - hswm-bindings # Generated C bindings
     pkgconfig-depends:
       - wayland-client
       - xkbcommon
@@ -81,7 +76,8 @@ library:
       # Note: may need to "cabal update for this to start working
       - c2hs:c2hs
       #- hs-bindgen:hs-bindgen-cli
-    ghc-options: *common-ghc-options
+    ghc-options: &common-ghc-options
+      -Wall -Wunused-packages
     language: &default-language
       GHC2024
     default-extensions: &default-extensions
@@ -99,6 +95,6 @@ executables:
       - hswm
     pkgconfig-depends: wayland-client
     extra-libraries: wayland-client
+    ghc-options: *common-ghc-options
     language: *default-language
     default-extensions: *default-extensions
-    ghc-options: *common-ghc-options

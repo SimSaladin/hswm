@@ -1,0 +1,41 @@
+------------------------------------------------------------------------------
+-- |
+-- Module      : HSWM.Keyboards
+-- Description : Short description
+-- Copyright   : (c) Samuli Thomasson, 2026
+--
+-- Maintainer  : Samuli Thomasson <samuli.thomasson@paivola.fi>
+-- Stability   : unstable
+-- Portability : unportable
+--
+-- Longer description of this module.
+--
+------------------------------------------------------------------------------
+module HSWM.Keyboards  where
+
+
+-- kbd_listener <- getOrCreateObject @WlKeyboardListener createKeyboardListener
+--
+-- modMaskMap :: TVar (M.Map String ModMask)
+-- {-# NOINLINE modMaskMap #-}
+-- modMaskMap = unsafePerformIO $ newTVarIO M.empty
+--
+-- resolveModMask :: String -> H ModMask
+-- resolveModMask name = f <$> liftIO (readTVarIO modMaskMap)
+--   where f = M.findWithDefault 0 (map toLower name)
+--
+-- createKeyboardListener :: IO WlKeyboardListener
+-- createKeyboardListener = mkKeyboardListener $ \case
+--   e@(KeyboardKeymap dt _kbd _fmt fd size) -> do
+--     debug' $ "keyboard-event: " <> tshow e
+--     kmap <- createKeymap fd size
+--     forM_ xkbRealModifierNames $ \str ->
+--       xkb_keymap_mod_get_mask kmap str >>= \mask -> do
+--         debug' $ "keymask: " <> tshow (str, mask)
+--         when (mask > 0) $ atomically $ modifyTVar modMaskMap $ M.insert (map toLower str) mask
+--   e -> debug' $ "keyboard-event: " <> tshow e
+--
+-- RegistryGlobal _ registry name "wl_seat" version -> do
+--     wlSeatPtr <- wl_registry_bind registry name wl_seat_interface version
+--     kbd <- wl_seat_get_keyboard (WlSeat wlSeatPtr)
+--     wl_keyboard_add_listener kbd kbd_listener wlSeatPtr

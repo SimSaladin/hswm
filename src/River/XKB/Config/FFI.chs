@@ -86,7 +86,7 @@ foreign import ccall "&river_xkb_config_v1_interface"   river_xkb_config_v1_inte
 foreign import ccall "&river_xkb_keymap_v1_interface"   river_xkb_keymap_v1_interface   :: WlInterface
 foreign import ccall "&river_xkb_keyboard_v1_interface" river_xkb_keyboard_v1_interface :: WlInterface
 
-registryBindRiverXkbConfigV1 :: WlRegistry -> CUInt -> Version -> IO RiverXkbConfigV1
+registryBindRiverXkbConfigV1 :: WlRegistry -> Word32 -> Version -> IO RiverXkbConfigV1
 registryBindRiverXkbConfigV1 registry name version = RiverXkbConfigV1 <$> wl_registry_bind registry name river_xkb_config_v1_interface version
 
 -- foreign import ccall "&river_input_device_v1_interface" river_input_device_v1_interface :: WlInterface

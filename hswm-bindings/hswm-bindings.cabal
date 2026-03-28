@@ -1,0 +1,87 @@
+cabal-version: 3.4
+
+-- This file has been generated from package.yaml by hpack version 0.38.3.
+--
+-- see: https://github.com/sol/hpack
+
+name:               hswm-bindings
+version:            0.1.0.0
+license:            MIT
+license-file:       LICENSE
+author:             Samuli Thomasson
+maintainer:         samuli.thomasson@5gsystems.com
+build-type:         Simple
+extra-source-files:
+      ../cbits/river-input-management-v1-protocol.c
+      ../cbits/river-layer-shell-v1-protocol.c
+      ../cbits/river-window-management-v1-protocol.c
+      ../cbits/river-xkb-bindings-v1-protocol.c
+      ../cbits/river-xkb-config-v1-protocol.c
+      ../cbits/river-input-management-v1-client-protocol.h
+      ../cbits/river-layer-shell-v1-client-protocol.h
+      ../cbits/river-window-management-v1-client-protocol.h
+      ../cbits/river-xkb-bindings-v1-client-protocol.h
+      ../cbits/river-xkb-config-v1-client-protocol.h
+extra-doc-files:
+      CHANGELOG.md
+
+library
+    exposed-modules:
+          Generated.River.InputManagementV1
+          Generated.River.InputManagementV1.FunPtr
+          Generated.River.InputManagementV1.Global
+          Generated.River.InputManagementV1.Safe
+          Generated.River.InputManagementV1.Unsafe
+          Generated.River.LayoutShellV1
+          Generated.River.LayoutShellV1.FunPtr
+          Generated.River.LayoutShellV1.Global
+          Generated.River.LayoutShellV1.Safe
+          Generated.River.LayoutShellV1.Unsafe
+          Generated.River.WindowManagementV1
+          Generated.River.WindowManagementV1.FunPtr
+          Generated.River.WindowManagementV1.Global
+          Generated.River.WindowManagementV1.Safe
+          Generated.River.WindowManagementV1.Unsafe
+          Generated.River.XkbBindingsV1
+          Generated.River.XkbBindingsV1.FunPtr
+          Generated.River.XkbBindingsV1.Global
+          Generated.River.XkbBindingsV1.Safe
+          Generated.River.XkbBindingsV1.Unsafe
+          Generated.River.XkbConfigV1
+          Generated.River.XkbConfigV1.FunPtr
+          Generated.River.XkbConfigV1.Global
+          Generated.River.XkbConfigV1.Safe
+          Generated.River.XkbConfigV1.Unsafe
+          Generated.Wayland.Client
+          Generated.Wayland.Client.FunPtr
+          Generated.Wayland.Client.Global
+          Generated.Wayland.Client.Safe
+          Generated.Wayland.Client.Unsafe
+          Generated.Wayland.Util
+          Generated.Wayland.Util.FunPtr
+          Generated.Wayland.Util.Safe
+          Generated.Wayland.Util.Unsafe
+    other-modules:
+          Paths_hswm_bindings
+    autogen-modules:
+          Paths_hswm_bindings
+    build-depends:
+          base >=4.21.0.0
+        , c-expr-runtime
+        , hs-bindgen-runtime
+    hs-source-dirs:
+          src
+    ghc-options: -Wall
+    include-dirs:
+          ../cbits
+    c-sources:
+          ../cbits/river-input-management-v1-protocol.c
+          ../cbits/river-layer-shell-v1-protocol.c
+          ../cbits/river-window-management-v1-protocol.c
+          ../cbits/river-xkb-bindings-v1-protocol.c
+          ../cbits/river-xkb-config-v1-protocol.c
+    extra-libraries:
+          wayland-client
+    pkgconfig-depends:
+          wayland-client
+    default-language: GHC2024

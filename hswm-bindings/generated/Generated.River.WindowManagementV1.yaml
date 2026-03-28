@@ -1,0 +1,430 @@
+version:
+  hs_bindgen: 0.1.0
+  binding_specification: '1.0'
+hsmodule: Generated.River.WindowManagementV1
+ctypes:
+- headers: river-window-management-v1-client-protocol.h
+  cname: struct river_decoration_v1
+  hsname: River_decoration_v1
+- headers: river-window-management-v1-client-protocol.h
+  cname: struct river_node_v1
+  hsname: River_node_v1
+- headers: river-window-management-v1-client-protocol.h
+  cname: struct river_output_v1
+  hsname: River_output_v1
+- headers: river-window-management-v1-client-protocol.h
+  cname: struct river_pointer_binding_v1
+  hsname: River_pointer_binding_v1
+- headers: river-window-management-v1-client-protocol.h
+  cname: struct river_seat_v1
+  hsname: River_seat_v1
+- headers: river-window-management-v1-client-protocol.h
+  cname: struct river_shell_surface_v1
+  hsname: River_shell_surface_v1
+- headers: river-window-management-v1-client-protocol.h
+  cname: struct river_window_manager_v1
+  hsname: River_window_manager_v1
+- headers: river-window-management-v1-client-protocol.h
+  cname: struct river_window_v1
+  hsname: River_window_v1
+- headers: river-window-management-v1-client-protocol.h
+  cname: struct wl_surface
+  hsname: Wl_surface
+- headers: river-window-management-v1-client-protocol.h
+  cname: enum river_window_manager_v1_error
+  hsname: River_window_manager_v1_error
+- headers: river-window-management-v1-client-protocol.h
+  cname: struct river_window_manager_v1_listener
+  hsname: River_window_manager_v1_listener
+- headers: river-window-management-v1-client-protocol.h
+  cname: enum river_window_v1_error
+  hsname: River_window_v1_error
+- headers: river-window-management-v1-client-protocol.h
+  cname: enum river_window_v1_decoration_hint
+  hsname: River_window_v1_decoration_hint
+- headers: river-window-management-v1-client-protocol.h
+  cname: enum river_window_v1_edges
+  hsname: River_window_v1_edges
+- headers: river-window-management-v1-client-protocol.h
+  cname: enum river_window_v1_capabilities
+  hsname: River_window_v1_capabilities
+- headers: river-window-management-v1-client-protocol.h
+  cname: struct river_window_v1_listener
+  hsname: River_window_v1_listener
+- headers: river-window-management-v1-client-protocol.h
+  cname: enum river_decoration_v1_error
+  hsname: River_decoration_v1_error
+- headers: river-window-management-v1-client-protocol.h
+  cname: enum river_shell_surface_v1_error
+  hsname: River_shell_surface_v1_error
+- headers: river-window-management-v1-client-protocol.h
+  cname: enum river_output_v1_error
+  hsname: River_output_v1_error
+- headers: river-window-management-v1-client-protocol.h
+  cname: enum river_output_v1_presentation_mode
+  hsname: River_output_v1_presentation_mode
+- headers: river-window-management-v1-client-protocol.h
+  cname: struct river_output_v1_listener
+  hsname: River_output_v1_listener
+- headers: river-window-management-v1-client-protocol.h
+  cname: enum river_seat_v1_modifiers
+  hsname: River_seat_v1_modifiers
+- headers: river-window-management-v1-client-protocol.h
+  cname: struct river_seat_v1_listener
+  hsname: River_seat_v1_listener
+- headers: river-window-management-v1-client-protocol.h
+  cname: struct river_pointer_binding_v1_listener
+  hsname: River_pointer_binding_v1_listener
+hstypes:
+- hsname: River_decoration_v1
+  representation: emptydata
+- hsname: River_decoration_v1_error
+  representation:
+    newtype:
+      constructor: River_decoration_v1_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_node_v1
+  representation: emptydata
+- hsname: River_output_v1
+  representation: emptydata
+- hsname: River_output_v1_error
+  representation:
+    newtype:
+      constructor: River_output_v1_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_output_v1_listener
+  representation:
+    record:
+      constructor: River_output_v1_listener
+      fields:
+      - removed
+      - wl_output
+      - position
+      - dimensions
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_output_v1_presentation_mode
+  representation:
+    newtype:
+      constructor: River_output_v1_presentation_mode
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_pointer_binding_v1
+  representation: emptydata
+- hsname: River_pointer_binding_v1_listener
+  representation:
+    record:
+      constructor: River_pointer_binding_v1_listener
+      fields:
+      - pressed
+      - released
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_seat_v1
+  representation: emptydata
+- hsname: River_seat_v1_listener
+  representation:
+    record:
+      constructor: River_seat_v1_listener
+      fields:
+      - removed
+      - wl_seat
+      - pointer_enter
+      - pointer_leave
+      - window_interaction
+      - shell_surface_interaction
+      - op_delta
+      - op_release
+      - pointer_position
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_seat_v1_modifiers
+  representation:
+    newtype:
+      constructor: River_seat_v1_modifiers
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_shell_surface_v1
+  representation: emptydata
+- hsname: River_shell_surface_v1_error
+  representation:
+    newtype:
+      constructor: River_shell_surface_v1_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_window_manager_v1
+  representation: emptydata
+- hsname: River_window_manager_v1_error
+  representation:
+    newtype:
+      constructor: River_window_manager_v1_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_window_manager_v1_listener
+  representation:
+    record:
+      constructor: River_window_manager_v1_listener
+      fields:
+      - unavailable
+      - finished
+      - manage_start
+      - render_start
+      - session_locked
+      - session_unlocked
+      - window
+      - output
+      - seat
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_window_v1
+  representation: emptydata
+- hsname: River_window_v1_capabilities
+  representation:
+    newtype:
+      constructor: River_window_v1_capabilities
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_window_v1_decoration_hint
+  representation:
+    newtype:
+      constructor: River_window_v1_decoration_hint
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_window_v1_edges
+  representation:
+    newtype:
+      constructor: River_window_v1_edges
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_window_v1_error
+  representation:
+    newtype:
+      constructor: River_window_v1_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_window_v1_listener
+  representation:
+    record:
+      constructor: River_window_v1_listener
+      fields:
+      - closed
+      - dimensions_hint
+      - dimensions
+      - app_id
+      - title
+      - parent
+      - decoration_hint
+      - pointer_move_requested
+      - pointer_resize_requested
+      - show_window_menu_requested
+      - maximize_requested
+      - unmaximize_requested
+      - fullscreen_requested
+      - exit_fullscreen_requested
+      - minimize_requested
+      - unreliable_pid
+      - presentation_hint
+      - identifier
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_surface
+  representation: emptydata

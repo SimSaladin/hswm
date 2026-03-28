@@ -1,0 +1,137 @@
+version:
+  hs_bindgen: 0.1.0
+  binding_specification: '1.0'
+hsmodule: Generated.River.InputManagementV1
+ctypes:
+- headers: river-input-management-v1-client-protocol.h
+  cname: struct river_input_device_v1
+  hsname: River_input_device_v1
+- headers: river-input-management-v1-client-protocol.h
+  cname: struct river_input_manager_v1
+  hsname: River_input_manager_v1
+- headers: river-input-management-v1-client-protocol.h
+  cname: struct wl_output
+  hsname: Wl_output
+- headers: river-input-management-v1-client-protocol.h
+  cname: enum river_input_manager_v1_error
+  hsname: River_input_manager_v1_error
+- headers: river-input-management-v1-client-protocol.h
+  cname: struct river_input_manager_v1_listener
+  hsname: River_input_manager_v1_listener
+- headers: river-input-management-v1-client-protocol.h
+  cname: enum river_input_device_v1_error
+  hsname: River_input_device_v1_error
+- headers: river-input-management-v1-client-protocol.h
+  cname: enum river_input_device_v1_type
+  hsname: River_input_device_v1_type
+- headers: river-input-management-v1-client-protocol.h
+  cname: struct river_input_device_v1_listener
+  hsname: River_input_device_v1_listener
+hstypes:
+- hsname: River_input_device_v1
+  representation: emptydata
+- hsname: River_input_device_v1_error
+  representation:
+    newtype:
+      constructor: River_input_device_v1_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_input_device_v1_listener
+  representation:
+    record:
+      constructor: River_input_device_v1_listener
+      fields:
+      - removed
+      - type'
+      - name
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_input_device_v1_type
+  representation:
+    newtype:
+      constructor: River_input_device_v1_type
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_input_manager_v1
+  representation: emptydata
+- hsname: River_input_manager_v1_error
+  representation:
+    newtype:
+      constructor: River_input_manager_v1_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_input_manager_v1_listener
+  representation:
+    record:
+      constructor: River_input_manager_v1_listener
+      fields:
+      - finished
+      - input_device
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_output
+  representation: emptydata

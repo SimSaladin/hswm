@@ -18,6 +18,7 @@ extra-doc-files:
 extra-source-files:
       Makefile
       cbits/river-input-management-v1-protocol.c
+      cbits/river-layer-shell-v1-protocol.c
       cbits/river-window-management-v1-protocol.c
       cbits/river-xkb-bindings-v1-protocol.c
       cbits/river-xkb-config-v1-protocol.c
@@ -40,11 +41,11 @@ library
           Wayland
           River.XKB.Config.FFI
           River.XKB.Config
-          River.XKB.Bindings.MiscFFI
           River.XKB.Bindings.FFI
+          River.XKB.Bindings.MiscFFI
           River.XKB.Bindings
-          River.WMP.MiscFFI
           River.WMP.FFI
+          River.WMP.MiscFFI
           River.WMP
           River
           HSWM.XKB.FFI
@@ -67,6 +68,7 @@ library
         , containers
         , data-default
         , derive-storable
+        , hswm-bindings
         , logging
         , mtl
         , pretty-simple
@@ -86,6 +88,7 @@ library
           cbits
     c-sources:
           cbits/river-input-management-v1-protocol.c
+          cbits/river-layer-shell-v1-protocol.c
           cbits/river-window-management-v1-protocol.c
           cbits/river-xkb-bindings-v1-protocol.c
           cbits/river-xkb-config-v1-protocol.c
