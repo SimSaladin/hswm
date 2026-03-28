@@ -1,4 +1,4 @@
-cabal-version:      3.0
+cabal-version:      3.4
 name:               hswm
 version:            0.1.0.0
 synopsis:           Wayland window manager for River
@@ -12,78 +12,85 @@ build-type:         Simple
 extra-doc-files:    README.md
 --                  CHANGELOG.md
 extra-source-files:
-    Makefile
+  , Makefile
   , cbits/river-window-management-v1-client-protocol.c
   , cbits/river-xkb-config-v1-protocol.c
 
 common common
     ghc-options: -Wall -Wunused-packages
     build-depends: base >=4.20.2.0
-    default-language:  GHC2024
-    default-extensions: RecordWildCards
-                      , OverloadedRecordDot
-                      , DuplicateRecordFields
-                      , OverloadedStrings
+    default-language: GHC2024
+    default-extensions:
+      , RecordWildCards
+      , OverloadedRecordDot
+      , DuplicateRecordFields
+      , OverloadedStrings
 
 library
     import:          common
     hs-source-dirs:  src
-    exposed-modules: Wayland.FFI
-                   , Wayland.Bindings
-                   , Wayland
-                   , River.WMP.FFI
-                   , River.WMP.MiscFFI
-                   , River.WMP
-                   , River.XKB.Bindings.FFI
-                   , River.XKB.Bindings.MiscFFI
-                   , River.XKB.Bindings
-		   , River.XKB.Config
-		   , River.XKB.Config.FFI
-                   , River
-		   , HSWM
-                   , HSWM.Seats
-		   , HSWM.Core
-                   , HSWM.XKB
-                   , HSWM.XKB.FFI
-                   , HSWM.Types
-		   , HSWM.StackSet
-                   , HSWM.Main
-                   , HSWM.Operations
-                   , HSWM.Actions
-		   , HSWM.Utils
-                   , HSWM.Layout
-                   , Core
-    autogen-modules:
-    build-depends:    base >=4.20.2.0
-                    , data-default
-		    , transformers
-                    , mtl
-                    , stm
-                    , logging
-                    , text
-                    , derive-storable
-                    , containers
-                    , typerep-map
-                    , unix
-		    , pretty-simple
     other-modules: Prelude
-    include-dirs:     cbits
-    c-sources:        cbits/river-window-management-v1-protocol.c
-                    , cbits/river-input-management-v1-protocol.c
-                    , cbits/river-xkb-bindings-v1-protocol.c
-		    , cbits/river-xkb-config-v1-protocol.c
-    pkgconfig-depends: wayland-client, xkbcommon
-    extra-libraries:   wayland-client, xkbcommon
-
-    -- XXX fix this
-    -- build-tool-depends: c2hs:c2hs
+    -- Note: c2hs is clunky about the order of exposed modules :(
+    exposed-modules:
+      , Wayland.FFI
+      , Wayland.Bindings
+      , Wayland
+      , River.XKB.Config.FFI
+      , River.XKB.Config
+      , River.XKB.Bindings.MiscFFI
+      , River.XKB.Bindings.FFI
+      , River.XKB.Bindings
+      , River.WMP.MiscFFI
+      , River.WMP.FFI
+      , River.WMP
+      , River
+      , HSWM.XKB.FFI
+      , HSWM.XKB
+      , HSWM.Utils
+      , HSWM.Types
+      , HSWM.StackSet
+      , HSWM.Seats
+      , HSWM.Operations
+      , HSWM.Main
+      , HSWM.Layout
+      , HSWM.Core
+      , HSWM.Actions
+      , HSWM
+      , Core
+      , Paths_hswm
+    autogen-modules: Paths_hswm
     build-depends:
-      , c-expr-runtime
+      , containers
+      , data-default
+      , derive-storable
+      , logging
+      , mtl
+      , pretty-simple
+      , stm
+      , text
+      , transformers
+      , typerep-map
+      , unix
+    pkgconfig-depends:
+      , wayland-client
+      , xkbcommon
+    extra-libraries:
+      , wayland-client
+      , xkbcommon
+    include-dirs: cbits
+    c-sources:
+      , cbits/river-input-management-v1-protocol.c
+      , cbits/river-window-management-v1-protocol.c
+      , cbits/river-xkb-bindings-v1-protocol.c
+      , cbits/river-xkb-config-v1-protocol.c
+    build-tool-depends:
+      -- Note: may need to "cabal update for this to start working
+      , c2hs:c2hs
+    build-depends:
+      -- XXX: below for hs-bindgen-cli testing
+      -- , c-expr-runtime
       , hs-bindgen
-      , hs-bindgen-runtime
-
-    -- Modules included in this library but not exported.
-    -- other-modules:
+      -- , hs-bindgen-runtime
 
 executable hswm
     import:           common

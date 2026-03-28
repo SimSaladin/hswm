@@ -1,8 +1,8 @@
 {-# LANGUAGE PackageImports #-}
 
-module Prelude (
-  module BasePrelude,
-  tshow, toText, io, fi, whenJust
+module Prelude
+  ( module BasePrelude
+  , tshow, toText, io, fi, whenJust
   ) where
 
 import "base"    Prelude as BasePrelude hiding (log)
