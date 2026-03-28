@@ -89,7 +89,6 @@ startHSWM display config = withStdoutLogging $ do
         poke ifPtr GenWl.wl_compositor_interface
         UnsafeWL.wl_registry_bind (castPtr r) n (ConstPtr ifPtr) (fi v) >>= \p ->
           return (castPtr p :: Ptr GenWL.Wl_compositor)
-    log' "[INIT] Got wl_compositor"
 
     windowManager <- getOrCreateObject $ requireGlobal conf.globals ("river_window_manager_v1", 4) $ \r n v -> wl_registry_bind r n river_window_manager_v1_interface v <&> RiverWindowManager
     _xkbBindings  <- getOrCreateObject $ requireGlobal conf.globals ("river_xkb_bindings_v1"  , 1) $ \r n v -> wl_registry_bind r n river_xkb_bindings_v1_interface   v <&> RiverXkbBindings

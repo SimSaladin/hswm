@@ -1,4 +1,7 @@
 ---
+verbatim:
+  cabal-version:    3.4
+
 name:               hswm
 version:            0.1.0.0
 synopsis:           Wayland window manager for River
@@ -15,75 +18,74 @@ extra-source-files:
   - Makefile
   - cbits/*.c
 
-verbatim:
-  cabal-version: 3.4
-
 library:
-    source-dirs: src
-    exposed-modules:
-      # Note: c2hs is clunky about the order of exposed modules :(
-      - Wayland.FFI
-      - Wayland
-      - River.XKB.Config.FFI
-      - River.XKB.Config
-      - River.XKB.Bindings.FFI
-      - River.XKB.Bindings.MiscFFI
-      - River.XKB.Bindings
-      - River.WMP.FFI
-      - River.WMP.MiscFFI
-      - River.WMP
-      - River
-      - HSWM.XKB.FFI
-      - HSWM.XKB
-      - HSWM.Utils
-      - HSWM.Types
-      - HSWM.StackSet
-      - HSWM.Seats
-      - HSWM.Operations
-      - HSWM.Main
-      - HSWM.Layout
-      - HSWM.Core
-      - HSWM.Actions
-      - HSWM
-      - Core
-    other-modules: Prelude
-    generated-other-modules: Paths_hswm
-    dependencies:
-      - &base base >=4.20.2.0
-      - containers
-      - data-default
-      - derive-storable
-      - logging
-      - mtl
-      - pretty-simple
-      - stm
-      - text
-      - transformers
-      - typerep-map
-      - unix
-      - hswm-bindings # Generated C bindings
-    pkgconfig-depends:
-      - wayland-client
-      - xkbcommon
-    extra-libraries:
-      - wayland-client
-      - xkbcommon
-    include-dirs: cbits
-    c-sources:
-      - cbits/*-protocol.c
-    build-tools:
-      # Note: may need to "cabal update for this to start working
-      - c2hs:c2hs
-      #- hs-bindgen:hs-bindgen-cli
-    ghc-options: &common-ghc-options
-      -Wall -Wunused-packages
-    language: &default-language
-      GHC2024
-    default-extensions: &default-extensions
-      - RecordWildCards
-      - OverloadedRecordDot
-      - DuplicateRecordFields
-      - OverloadedStrings
+  source-dirs: src
+  exposed-modules:
+    # Note: c2hs is clunky about the order of exposed modules :(
+    - Wayland.FFI
+    - Wayland
+    - River.XKB.Config.FFI
+    - River.XKB.Config
+    - River.XKB.Bindings.FFI
+    - River.XKB.Bindings.MiscFFI
+    - River.XKB.Bindings
+    - River.WMP.FFI
+    - River.WMP.MiscFFI
+    - River.WMP
+    - River
+    - HSWM.XKB.FFI
+    - HSWM.XKB
+    - HSWM.Utils
+    - HSWM.Types
+    - HSWM.StackSet
+    - HSWM.Seats
+    - HSWM.Operations
+    - HSWM.Main
+    - HSWM.Layout
+    - HSWM.Core
+    - HSWM.Actions
+    - HSWM
+    - Core
+  other-modules: Prelude
+  generated-other-modules: Paths_hswm
+  dependencies:
+    - &base base >=4.20.2.0
+    - containers
+    - data-default
+    - derive-storable
+    - logging
+    - mtl
+    - pretty-simple
+    - stm
+    - text
+    - transformers
+    - typerep-map
+    - unix
+    - hswm-bindings # Generated C bindings
+  pkgconfig-depends:
+    - wayland-client
+    - xkbcommon
+    - pixman-1
+  extra-libraries:
+    - wayland-client
+    - xkbcommon
+    - pixman-1
+  include-dirs: cbits
+  c-sources:
+    - cbits/*-protocol.c
+  build-tools:
+    # Note: may need to "cabal update for this to start working
+    - c2hs:c2hs
+    #- hs-bindgen:hs-bindgen-cli
+  ghc-options: &common-ghc-options
+    -Wall -Wunused-packages
+  language: &default-language
+    GHC2024
+  default-extensions: &default-extensions
+    - RecordWildCards
+    - OverloadedRecordDot
+    - DuplicateRecordFields
+    - OverloadedStrings
 
 executables:
   hswm:

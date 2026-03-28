@@ -80,9 +80,11 @@ library
     pkgconfig-depends:
           wayland-client
         , xkbcommon
+        , pixman-1
     extra-libraries:
           wayland-client
           xkbcommon
+          pixman-1
     include-dirs:
           cbits
     c-sources:

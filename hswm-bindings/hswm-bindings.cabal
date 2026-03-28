@@ -61,6 +61,7 @@ library
           Generated.Wayland.Util.FunPtr
           Generated.Wayland.Util.Safe
           Generated.Wayland.Util.Unsafe
+          Wayland.Client.Interface
     other-modules:
           Paths_hswm_bindings
     autogen-modules:

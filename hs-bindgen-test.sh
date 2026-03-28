@@ -7,10 +7,7 @@ specsDir=hswm-bindings/generated
 
 mkdir -p "$specsDir" "$outputDir"
 
-cflags+=""
 cflags+=$(pkg-config --cflags wayland-client xkbcommon)
-
-echo "pkg-config: cflags: $cflags"
 
 mod=Generated.$1
 shift

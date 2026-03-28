@@ -3,7 +3,7 @@ module Wayland
   , module Wayland.FFI
   ) where
 
-import Wayland.FFI
+import           Wayland.FFI
 
 import           Data.IORef
 import qualified Data.List as L
@@ -21,7 +21,7 @@ openDisplay s = do
 -- Registry tracking
 
 -- | Tracks the global objects that are available through wl_registry.
-data RegistryCache = RegistryCache { objects :: [RegistryItem] } deriving (Show)
+newtype RegistryCache = RegistryCache { objects :: [RegistryItem] } deriving (Show)
 
 instance Semigroup RegistryCache where
   (<>) a b = RegistryCache (a.objects <> b.objects)
@@ -45,12 +45,12 @@ registerGlobal name text version wlr r = r { objects = RegistryItem name text ve
 tryBindGlobal :: MonadIO m => IORef RegistryCache -> (String, Version) -- ^ Interface name and version of the target object
               -> (WlRegistry -> Word32 -> Version -> m a) -- bind
               -> m (Maybe a)
-tryBindGlobal rref (k, v) bind = (L.find (\i -> i.interface == k && v <= i.version) . objects <$> io (readIORef rref)) >>= \case
+tryBindGlobal rref (k, v) bind = io (readIORef rref) >>= \x -> case L.find (\i -> i.interface == k && v <= i.version) (objects x) of
     Just obj -> Just <$> bind obj.registry obj.name v
     Nothing  -> return Nothing
 
 requireGlobal :: MonadIO m => IORef RegistryCache -> (String, Version) -> (WlRegistry -> Word32 -> Version -> m a) -> m a
-requireGlobal rref (k, v) bind = (L.find (\i -> i.interface == k && v <= i.version) . objects <$> io (readIORef rref)) >>= \case
+requireGlobal rref (k, v) bind = io (readIORef rref) >>= \x -> case L.find (\i -> i.interface == k && v <= i.version) $ objects x of
     Just obj -> bind obj.registry obj.name obj.version
     Nothing  -> throw $ NoSuchRegistryObject k v
 

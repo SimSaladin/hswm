@@ -44,6 +44,7 @@
               libxkbcommon
               weston
               river
+              pixman
               ;
           };
         };
