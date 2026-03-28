@@ -1,5 +1,6 @@
 {-# LANGUAGE PatternSynonyms #-}
 {-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 -- |
 -- Global Wayland interfaces you can bind listeners onto.
@@ -16,8 +17,6 @@ module Wayland.Client.Interface
   , toConstPtr
 
   -- TODO
-
-  -- ** Plain values
   , wl_display_interface
   , wl_registry_interface
   , wl_callback_interface
@@ -41,6 +40,31 @@ module Wayland.Client.Interface
   , wl_subcompositor_interface
   , wl_subsurface_interface
   , wl_fixes_interface
+
+  -- -- ** Plain values
+  -- , G.wl_display_interface
+  -- , G.wl_registry_interface
+  -- , G.wl_callback_interface
+  -- , G.wl_compositor_interface
+  -- , G.wl_shm_pool_interface
+  -- , G.wl_shm_interface
+  -- , G.wl_buffer_interface
+  -- , G.wl_data_offer_interface
+  -- , G.wl_data_source_interface
+  -- , G.wl_data_device_interface
+  -- , G.wl_data_device_manager_interface
+  -- , G.wl_shell_interface
+  -- , G.wl_shell_surface_interface
+  -- , G.wl_surface_interface
+  -- , G.wl_seat_interface
+  -- , G.wl_pointer_interface
+  -- , G.wl_keyboard_interface
+  -- , G.wl_touch_interface
+  -- , G.wl_output_interface
+  -- , G.wl_region_interface
+  -- , G.wl_subcompositor_interface
+  -- , G.wl_subsurface_interface
+  -- , G.wl_fixes_interface
 
   -- * Object types
   , U.Wl_object
@@ -361,15 +385,45 @@ module Wayland.Client.Interface
   ) where
 
 import qualified Generated.Wayland.Client as C
-import           Generated.Wayland.Client.Global
-import qualified Generated.Wayland.Util as U
+import qualified Generated.Wayland.Client.Global as G
 import           Generated.Wayland.Util (Wl_interface)
---import qualified HsBindgen.Runtime.PtrConst as PtrConst
+import qualified Generated.Wayland.Util as U
 
-import Foreign
-import Foreign.C.ConstPtr
+import           Foreign
+import           Foreign.C.ConstPtr
+import           Wayland.Client.Internal.TH
+import Language.Haskell.TH
+import System.IO.Unsafe (unsafePerformIO)
+
+--import qualified HsBindgen.Runtime.PtrConst as PtrConst
 
 -- | The generator hides the ConstPtr values... But we can re-create them here.
 toConstPtr :: Wl_interface -> IO (ConstPtr Wl_interface)
-toConstPtr x = alloca $ \p -> do poke p x
-                                 pure (ConstPtr p)
+toConstPtr x = malloc >>= \ptr -> poke ptr x >> pure (ConstPtr ptr)
+
+$(getConstPtrs
+  [ ("wl_display_interface"              , varE 'G.wl_display_interface            )
+  , ("wl_registry_interface"             , varE 'G.wl_registry_interface           )
+  , ("wl_callback_interface"             , varE 'G.wl_callback_interface           )
+  , ("wl_compositor_interface"           , varE 'G.wl_compositor_interface         )
+  , ("wl_shm_pool_interface"             , varE 'G.wl_shm_pool_interface           )
+  , ("wl_shm_interface"                  , varE 'G.wl_shm_interface                )
+  , ("wl_buffer_interface"               , varE 'G.wl_buffer_interface             )
+  , ("wl_data_offer_interface"           , varE 'G.wl_data_offer_interface         )
+  , ("wl_data_source_interface"          , varE 'G.wl_data_source_interface        )
+  , ("wl_data_device_interface"          , varE 'G.wl_data_device_interface        )
+  , ("wl_data_device_manager_interface"  , varE 'G.wl_data_device_manager_interface)
+  , ("wl_shell_interface"                , varE 'G.wl_shell_interface              )
+  , ("wl_shell_surface_interface"        , varE 'G.wl_shell_surface_interface      )
+  , ("wl_surface_interface"              , varE 'G.wl_surface_interface            )
+  , ("wl_seat_interface"                 , varE 'G.wl_seat_interface               )
+  , ("wl_pointer_interface"              , varE 'G.wl_pointer_interface            )
+  , ("wl_keyboard_interface"             , varE 'G.wl_keyboard_interface           )
+  , ("wl_touch_interface"                , varE 'G.wl_touch_interface              )
+  , ("wl_output_interface"               , varE 'G.wl_output_interface             )
+  , ("wl_region_interface"               , varE 'G.wl_region_interface             )
+  , ("wl_subcompositor_interface"        , varE 'G.wl_subcompositor_interface      )
+  , ("wl_subsurface_interface"           , varE 'G.wl_subsurface_interface         )
+  , ("wl_fixes_interface"                , varE 'G.wl_fixes_interface              )
+  ]
+ )

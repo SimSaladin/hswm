@@ -18,9 +18,14 @@ library:
     - base >=4.21.0.0
     - c-expr-runtime
     - hs-bindgen-runtime
+    - template-haskell
   language: GHC2024
-  ghc-options: -Wall
+  ghc-options:
+    -Wall
+    -L/nix/store/indd6wy8j1j62njhdq6m37rkajpvzc3v-wayland-1.24.0/lib
+    -lwayland-client
   include-dirs: ../cbits
-  c-sources: ../cbits/*.c
+  c-sources:
+    - ../cbits/*.c
   pkgconfig-depends: wayland-client
   extra-libraries: wayland-client
