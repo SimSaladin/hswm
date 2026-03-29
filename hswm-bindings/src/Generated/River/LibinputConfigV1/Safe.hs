@@ -49,6 +49,7 @@ module Generated.River.LibinputConfigV1.Safe
     )
   where
 
+import qualified Generated.Wayland.Util
 import qualified HsBindgen.Runtime.Internal.CAPI
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.LibC
@@ -953,7 +954,7 @@ foreign import ccall safe "hs_bindgen_42e414219074a38c" hs_bindgen_42e414219074a
 -- __unique:__ @River_LibinputConfigV1_Generated.River.LibinputConfigV1_Safe_river_libinput_device_v1_set_calibration_matrix@
 hs_bindgen_42e414219074a38c ::
      RIP.Ptr River_libinput_device_v1
-  -> RIP.Ptr Wl_array
+  -> RIP.Ptr Generated.Wayland.Util.WlArray
   -> IO (RIP.Ptr River_libinput_result_v1)
 hs_bindgen_42e414219074a38c =
   RIP.fromFFIType hs_bindgen_42e414219074a38c_base
@@ -973,7 +974,7 @@ __exported by:__ @river-libinput-config-v1-client-protocol.h@
 river_libinput_device_v1_set_calibration_matrix ::
      RIP.Ptr River_libinput_device_v1
      -- ^ __C declaration:__ @river_libinput_device_v1@
-  -> RIP.Ptr Wl_array
+  -> RIP.Ptr Generated.Wayland.Util.WlArray
      -- ^ __C declaration:__ @matrix@
   -> IO (RIP.Ptr River_libinput_result_v1)
 river_libinput_device_v1_set_calibration_matrix =
@@ -1023,7 +1024,7 @@ foreign import ccall safe "hs_bindgen_e34fbcc81054c702" hs_bindgen_e34fbcc81054c
 -- __unique:__ @River_LibinputConfigV1_Generated.River.LibinputConfigV1_Safe_river_libinput_device_v1_set_accel_speed@
 hs_bindgen_e34fbcc81054c702 ::
      RIP.Ptr River_libinput_device_v1
-  -> RIP.Ptr Wl_array
+  -> RIP.Ptr Generated.Wayland.Util.WlArray
   -> IO (RIP.Ptr River_libinput_result_v1)
 hs_bindgen_e34fbcc81054c702 =
   RIP.fromFFIType hs_bindgen_e34fbcc81054c702_base
@@ -1043,7 +1044,7 @@ __exported by:__ @river-libinput-config-v1-client-protocol.h@
 river_libinput_device_v1_set_accel_speed ::
      RIP.Ptr River_libinput_device_v1
      -- ^ __C declaration:__ @river_libinput_device_v1@
-  -> RIP.Ptr Wl_array
+  -> RIP.Ptr Generated.Wayland.Util.WlArray
      -- ^ __C declaration:__ @speed@
   -> IO (RIP.Ptr River_libinput_result_v1)
 river_libinput_device_v1_set_accel_speed =
@@ -1599,8 +1600,8 @@ foreign import ccall safe "hs_bindgen_9c7154190f4cdd44" hs_bindgen_9c7154190f4cd
 hs_bindgen_9c7154190f4cdd44 ::
      RIP.Ptr River_libinput_accel_config_v1
   -> HsBindgen.Runtime.LibC.Word32
-  -> RIP.Ptr Wl_array
-  -> RIP.Ptr Wl_array
+  -> RIP.Ptr Generated.Wayland.Util.WlArray
+  -> RIP.Ptr Generated.Wayland.Util.WlArray
   -> IO (RIP.Ptr River_libinput_result_v1)
 hs_bindgen_9c7154190f4cdd44 =
   RIP.fromFFIType hs_bindgen_9c7154190f4cdd44_base
@@ -1622,9 +1623,9 @@ river_libinput_accel_config_v1_set_points ::
      -- ^ __C declaration:__ @river_libinput_accel_config_v1@
   -> HsBindgen.Runtime.LibC.Word32
      -- ^ __C declaration:__ @type@
-  -> RIP.Ptr Wl_array
+  -> RIP.Ptr Generated.Wayland.Util.WlArray
      -- ^ __C declaration:__ @step@
-  -> RIP.Ptr Wl_array
+  -> RIP.Ptr Generated.Wayland.Util.WlArray
      -- ^ __C declaration:__ @points@
   -> IO (RIP.Ptr River_libinput_result_v1)
 river_libinput_accel_config_v1_set_points =
