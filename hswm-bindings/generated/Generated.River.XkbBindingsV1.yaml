@@ -4,12 +4,6 @@ version:
 hsmodule: Generated.River.XkbBindingsV1
 ctypes:
 - headers: river-xkb-bindings-v1-client-protocol.h
-  cname: struct wl_message
-  hsname: Wl_message
-- headers: river-xkb-bindings-v1-client-protocol.h
-  cname: struct wl_interface
-  hsname: Wl_interface
-- headers: river-xkb-bindings-v1-client-protocol.h
   cname: struct river_seat_v1
   hsname: River_seat_v1
 - headers: river-xkb-bindings-v1-client-protocol.h
@@ -91,45 +85,6 @@ hstypes:
   - Read
   - ReadRaw
   - SequentialCEnum
-  - Show
-  - StaticSize
-  - Storable
-  - WriteRaw
-- hsname: Wl_interface
-  representation:
-    record:
-      constructor: Wl_interface
-      fields:
-      - name
-      - version
-      - method_count
-      - methods
-      - event_count
-      - events
-  instances:
-  - Eq
-  - Generic
-  - HasCField
-  - HasField
-  - ReadRaw
-  - Show
-  - StaticSize
-  - Storable
-  - WriteRaw
-- hsname: Wl_message
-  representation:
-    record:
-      constructor: Wl_message
-      fields:
-      - name
-      - signature
-      - types
-  instances:
-  - Eq
-  - Generic
-  - HasCField
-  - HasField
-  - ReadRaw
   - Show
   - StaticSize
   - Storable
