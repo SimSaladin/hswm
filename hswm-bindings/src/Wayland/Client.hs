@@ -102,7 +102,14 @@ module Wayland.Client
   -- ** @wl_proxy_marshal_*@
   --
   -- __NOTE:__ some (variadic) marshal variants are not here because @hs-bindgen@
-  -- does not do variadic functions.
+  -- does not do variadic functions:
+  --
+  -- @
+  --    struct wl_proxy * wl_proxy_marshal_flags                (struct wl_proxy *proxy, uint32_t opcode, const struct wl_interface *interface, uint32_t version, uint32_t flags, ...);
+  --    void              wl_proxy_marshal                      (struct wl_proxy *p, uint32_t opcode, ...);
+  --    struct wl_proxy * wl_proxy_marshal_constructor          (struct wl_proxy *proxy, uint32_t opcode, const struct wl_interface *interface, ...);
+  --    struct wl_proxy * wl_proxy_marshal_constructor_versioned(struct wl_proxy *proxy, uint32_t opcode, const struct wl_interface *interface, uint32_t version, ...);
+  -- @
 
   ( wl_proxy_marshal_array_flags
   , wl_proxy_marshal_array

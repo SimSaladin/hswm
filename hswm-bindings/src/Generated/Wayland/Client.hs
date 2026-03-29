@@ -20,50 +20,50 @@
 
 module Generated.Wayland.Client
     ( Generated.Wayland.Client.Timespec
-    , Generated.Wayland.Client.Wl_proxy
-    , Generated.Wayland.Client.Wl_display
-    , Generated.Wayland.Client.Wl_event_queue
+    , Generated.Wayland.Client.WlProxy
+    , Generated.Wayland.Client.WlDisplay
+    , Generated.Wayland.Client.WlEventQueue
     , Generated.Wayland.Client.wL_MARSHAL_FLAG_DESTROY
-    , Generated.Wayland.Client.Wl_buffer
-    , Generated.Wayland.Client.Wl_callback
-    , Generated.Wayland.Client.Wl_compositor
-    , Generated.Wayland.Client.Wl_data_device
-    , Generated.Wayland.Client.Wl_data_device_manager
-    , Generated.Wayland.Client.Wl_data_offer
-    , Generated.Wayland.Client.Wl_data_source
-    , Generated.Wayland.Client.Wl_fixes
-    , Generated.Wayland.Client.Wl_keyboard
-    , Generated.Wayland.Client.Wl_output
-    , Generated.Wayland.Client.Wl_pointer
-    , Generated.Wayland.Client.Wl_region
-    , Generated.Wayland.Client.Wl_registry
-    , Generated.Wayland.Client.Wl_seat
-    , Generated.Wayland.Client.Wl_shell
-    , Generated.Wayland.Client.Wl_shell_surface
-    , Generated.Wayland.Client.Wl_shm
-    , Generated.Wayland.Client.Wl_shm_pool
-    , Generated.Wayland.Client.Wl_subcompositor
-    , Generated.Wayland.Client.Wl_subsurface
-    , Generated.Wayland.Client.Wl_surface
-    , Generated.Wayland.Client.Wl_touch
-    , Generated.Wayland.Client.Wl_display_error(..)
+    , Generated.Wayland.Client.WlBuffer
+    , Generated.Wayland.Client.WlCallback
+    , Generated.Wayland.Client.WlCompositor
+    , Generated.Wayland.Client.WlDataDevice
+    , Generated.Wayland.Client.WlDataDeviceManager
+    , Generated.Wayland.Client.WlDataOffer
+    , Generated.Wayland.Client.WlDataSource
+    , Generated.Wayland.Client.WlFixes
+    , Generated.Wayland.Client.WlKeyboard
+    , Generated.Wayland.Client.WlOutput
+    , Generated.Wayland.Client.WlPointer
+    , Generated.Wayland.Client.WlRegion
+    , Generated.Wayland.Client.WlRegistry
+    , Generated.Wayland.Client.WlSeat
+    , Generated.Wayland.Client.WlShell
+    , Generated.Wayland.Client.WlShellSurface
+    , Generated.Wayland.Client.WlShm
+    , Generated.Wayland.Client.WlShmPool
+    , Generated.Wayland.Client.WlSubcompositor
+    , Generated.Wayland.Client.WlSubsurface
+    , Generated.Wayland.Client.WlSurface
+    , Generated.Wayland.Client.WlTouch
+    , Generated.Wayland.Client.WlDisplayError(..)
     , pattern Generated.Wayland.Client.WL_DISPLAY_ERROR_INVALID_OBJECT
     , pattern Generated.Wayland.Client.WL_DISPLAY_ERROR_INVALID_METHOD
     , pattern Generated.Wayland.Client.WL_DISPLAY_ERROR_NO_MEMORY
     , pattern Generated.Wayland.Client.WL_DISPLAY_ERROR_IMPLEMENTATION
-    , Generated.Wayland.Client.Wl_display_listener(..)
+    , Generated.Wayland.Client.WlDisplayListener(..)
     , Generated.Wayland.Client.wL_DISPLAY_SYNC
     , Generated.Wayland.Client.wL_DISPLAY_GET_REGISTRY
     , Generated.Wayland.Client.wL_DISPLAY_ERROR_SINCE_VERSION
     , Generated.Wayland.Client.wL_DISPLAY_DELETE_ID_SINCE_VERSION
     , Generated.Wayland.Client.wL_DISPLAY_SYNC_SINCE_VERSION
     , Generated.Wayland.Client.wL_DISPLAY_GET_REGISTRY_SINCE_VERSION
-    , Generated.Wayland.Client.Wl_registry_listener(..)
+    , Generated.Wayland.Client.WlRegistryListener(..)
     , Generated.Wayland.Client.wL_REGISTRY_BIND
     , Generated.Wayland.Client.wL_REGISTRY_GLOBAL_SINCE_VERSION
     , Generated.Wayland.Client.wL_REGISTRY_GLOBAL_REMOVE_SINCE_VERSION
     , Generated.Wayland.Client.wL_REGISTRY_BIND_SINCE_VERSION
-    , Generated.Wayland.Client.Wl_callback_listener(..)
+    , Generated.Wayland.Client.WlCallbackListener(..)
     , Generated.Wayland.Client.wL_CALLBACK_DONE_SINCE_VERSION
     , Generated.Wayland.Client.wL_COMPOSITOR_CREATE_SURFACE
     , Generated.Wayland.Client.wL_COMPOSITOR_CREATE_REGION
@@ -75,11 +75,11 @@ module Generated.Wayland.Client
     , Generated.Wayland.Client.wL_SHM_POOL_CREATE_BUFFER_SINCE_VERSION
     , Generated.Wayland.Client.wL_SHM_POOL_DESTROY_SINCE_VERSION
     , Generated.Wayland.Client.wL_SHM_POOL_RESIZE_SINCE_VERSION
-    , Generated.Wayland.Client.Wl_shm_error(..)
+    , Generated.Wayland.Client.WlShmError(..)
     , pattern Generated.Wayland.Client.WL_SHM_ERROR_INVALID_FORMAT
     , pattern Generated.Wayland.Client.WL_SHM_ERROR_INVALID_STRIDE
     , pattern Generated.Wayland.Client.WL_SHM_ERROR_INVALID_FD
-    , Generated.Wayland.Client.Wl_shm_format(..)
+    , Generated.Wayland.Client.WlShmFormat(..)
     , pattern Generated.Wayland.Client.WL_SHM_FORMAT_ARGB8888
     , pattern Generated.Wayland.Client.WL_SHM_FORMAT_XRGB8888
     , pattern Generated.Wayland.Client.WL_SHM_FORMAT_C8
@@ -203,22 +203,22 @@ module Generated.Wayland.Client
     , pattern Generated.Wayland.Client.WL_SHM_FORMAT_AVUY8888
     , pattern Generated.Wayland.Client.WL_SHM_FORMAT_XVUY8888
     , pattern Generated.Wayland.Client.WL_SHM_FORMAT_P030
-    , Generated.Wayland.Client.Wl_shm_listener(..)
+    , Generated.Wayland.Client.WlShmListener(..)
     , Generated.Wayland.Client.wL_SHM_CREATE_POOL
     , Generated.Wayland.Client.wL_SHM_RELEASE
     , Generated.Wayland.Client.wL_SHM_FORMAT_SINCE_VERSION
     , Generated.Wayland.Client.wL_SHM_CREATE_POOL_SINCE_VERSION
     , Generated.Wayland.Client.wL_SHM_RELEASE_SINCE_VERSION
-    , Generated.Wayland.Client.Wl_buffer_listener(..)
+    , Generated.Wayland.Client.WlBufferListener(..)
     , Generated.Wayland.Client.wL_BUFFER_DESTROY
     , Generated.Wayland.Client.wL_BUFFER_RELEASE_SINCE_VERSION
     , Generated.Wayland.Client.wL_BUFFER_DESTROY_SINCE_VERSION
-    , Generated.Wayland.Client.Wl_data_offer_error(..)
+    , Generated.Wayland.Client.WlDataOfferError(..)
     , pattern Generated.Wayland.Client.WL_DATA_OFFER_ERROR_INVALID_FINISH
     , pattern Generated.Wayland.Client.WL_DATA_OFFER_ERROR_INVALID_ACTION_MASK
     , pattern Generated.Wayland.Client.WL_DATA_OFFER_ERROR_INVALID_ACTION
     , pattern Generated.Wayland.Client.WL_DATA_OFFER_ERROR_INVALID_OFFER
-    , Generated.Wayland.Client.Wl_data_offer_listener(..)
+    , Generated.Wayland.Client.WlDataOfferListener(..)
     , Generated.Wayland.Client.wL_DATA_OFFER_ACCEPT
     , Generated.Wayland.Client.wL_DATA_OFFER_RECEIVE
     , Generated.Wayland.Client.wL_DATA_OFFER_DESTROY
@@ -232,10 +232,10 @@ module Generated.Wayland.Client
     , Generated.Wayland.Client.wL_DATA_OFFER_DESTROY_SINCE_VERSION
     , Generated.Wayland.Client.wL_DATA_OFFER_FINISH_SINCE_VERSION
     , Generated.Wayland.Client.wL_DATA_OFFER_SET_ACTIONS_SINCE_VERSION
-    , Generated.Wayland.Client.Wl_data_source_error(..)
+    , Generated.Wayland.Client.WlDataSourceError(..)
     , pattern Generated.Wayland.Client.WL_DATA_SOURCE_ERROR_INVALID_ACTION_MASK
     , pattern Generated.Wayland.Client.WL_DATA_SOURCE_ERROR_INVALID_SOURCE
-    , Generated.Wayland.Client.Wl_data_source_listener(..)
+    , Generated.Wayland.Client.WlDataSourceListener(..)
     , Generated.Wayland.Client.wL_DATA_SOURCE_OFFER
     , Generated.Wayland.Client.wL_DATA_SOURCE_DESTROY
     , Generated.Wayland.Client.wL_DATA_SOURCE_SET_ACTIONS
@@ -248,10 +248,10 @@ module Generated.Wayland.Client
     , Generated.Wayland.Client.wL_DATA_SOURCE_OFFER_SINCE_VERSION
     , Generated.Wayland.Client.wL_DATA_SOURCE_DESTROY_SINCE_VERSION
     , Generated.Wayland.Client.wL_DATA_SOURCE_SET_ACTIONS_SINCE_VERSION
-    , Generated.Wayland.Client.Wl_data_device_error(..)
+    , Generated.Wayland.Client.WlDataDeviceError(..)
     , pattern Generated.Wayland.Client.WL_DATA_DEVICE_ERROR_ROLE
     , pattern Generated.Wayland.Client.WL_DATA_DEVICE_ERROR_USED_SOURCE
-    , Generated.Wayland.Client.Wl_data_device_listener(..)
+    , Generated.Wayland.Client.WlDataDeviceListener(..)
     , Generated.Wayland.Client.wL_DATA_DEVICE_START_DRAG
     , Generated.Wayland.Client.wL_DATA_DEVICE_SET_SELECTION
     , Generated.Wayland.Client.wL_DATA_DEVICE_RELEASE
@@ -264,7 +264,7 @@ module Generated.Wayland.Client
     , Generated.Wayland.Client.wL_DATA_DEVICE_START_DRAG_SINCE_VERSION
     , Generated.Wayland.Client.wL_DATA_DEVICE_SET_SELECTION_SINCE_VERSION
     , Generated.Wayland.Client.wL_DATA_DEVICE_RELEASE_SINCE_VERSION
-    , Generated.Wayland.Client.Wl_data_device_manager_dnd_action(..)
+    , Generated.Wayland.Client.WlDataDeviceManagerDndAction(..)
     , pattern Generated.Wayland.Client.WL_DATA_DEVICE_MANAGER_DND_ACTION_NONE
     , pattern Generated.Wayland.Client.WL_DATA_DEVICE_MANAGER_DND_ACTION_COPY
     , pattern Generated.Wayland.Client.WL_DATA_DEVICE_MANAGER_DND_ACTION_MOVE
@@ -273,11 +273,11 @@ module Generated.Wayland.Client
     , Generated.Wayland.Client.wL_DATA_DEVICE_MANAGER_GET_DATA_DEVICE
     , Generated.Wayland.Client.wL_DATA_DEVICE_MANAGER_CREATE_DATA_SOURCE_SINCE_VERSION
     , Generated.Wayland.Client.wL_DATA_DEVICE_MANAGER_GET_DATA_DEVICE_SINCE_VERSION
-    , Generated.Wayland.Client.Wl_shell_error(..)
+    , Generated.Wayland.Client.WlShellError(..)
     , pattern Generated.Wayland.Client.WL_SHELL_ERROR_ROLE
     , Generated.Wayland.Client.wL_SHELL_GET_SHELL_SURFACE
     , Generated.Wayland.Client.wL_SHELL_GET_SHELL_SURFACE_SINCE_VERSION
-    , Generated.Wayland.Client.Wl_shell_surface_resize(..)
+    , Generated.Wayland.Client.WlShellSurfaceResize(..)
     , pattern Generated.Wayland.Client.WL_SHELL_SURFACE_RESIZE_NONE
     , pattern Generated.Wayland.Client.WL_SHELL_SURFACE_RESIZE_TOP
     , pattern Generated.Wayland.Client.WL_SHELL_SURFACE_RESIZE_BOTTOM
@@ -287,14 +287,14 @@ module Generated.Wayland.Client
     , pattern Generated.Wayland.Client.WL_SHELL_SURFACE_RESIZE_RIGHT
     , pattern Generated.Wayland.Client.WL_SHELL_SURFACE_RESIZE_TOP_RIGHT
     , pattern Generated.Wayland.Client.WL_SHELL_SURFACE_RESIZE_BOTTOM_RIGHT
-    , Generated.Wayland.Client.Wl_shell_surface_transient(..)
+    , Generated.Wayland.Client.WlShellSurfaceTransient(..)
     , pattern Generated.Wayland.Client.WL_SHELL_SURFACE_TRANSIENT_INACTIVE
-    , Generated.Wayland.Client.Wl_shell_surface_fullscreen_method(..)
+    , Generated.Wayland.Client.WlShellSurfaceFullscreenMethod(..)
     , pattern Generated.Wayland.Client.WL_SHELL_SURFACE_FULLSCREEN_METHOD_DEFAULT
     , pattern Generated.Wayland.Client.WL_SHELL_SURFACE_FULLSCREEN_METHOD_SCALE
     , pattern Generated.Wayland.Client.WL_SHELL_SURFACE_FULLSCREEN_METHOD_DRIVER
     , pattern Generated.Wayland.Client.WL_SHELL_SURFACE_FULLSCREEN_METHOD_FILL
-    , Generated.Wayland.Client.Wl_shell_surface_listener(..)
+    , Generated.Wayland.Client.WlShellSurfaceListener(..)
     , Generated.Wayland.Client.wL_SHELL_SURFACE_PONG
     , Generated.Wayland.Client.wL_SHELL_SURFACE_MOVE
     , Generated.Wayland.Client.wL_SHELL_SURFACE_RESIZE
@@ -318,13 +318,13 @@ module Generated.Wayland.Client
     , Generated.Wayland.Client.wL_SHELL_SURFACE_SET_MAXIMIZED_SINCE_VERSION
     , Generated.Wayland.Client.wL_SHELL_SURFACE_SET_TITLE_SINCE_VERSION
     , Generated.Wayland.Client.wL_SHELL_SURFACE_SET_CLASS_SINCE_VERSION
-    , Generated.Wayland.Client.Wl_surface_error(..)
+    , Generated.Wayland.Client.WlSurfaceError(..)
     , pattern Generated.Wayland.Client.WL_SURFACE_ERROR_INVALID_SCALE
     , pattern Generated.Wayland.Client.WL_SURFACE_ERROR_INVALID_TRANSFORM
     , pattern Generated.Wayland.Client.WL_SURFACE_ERROR_INVALID_SIZE
     , pattern Generated.Wayland.Client.WL_SURFACE_ERROR_INVALID_OFFSET
     , pattern Generated.Wayland.Client.WL_SURFACE_ERROR_DEFUNCT_ROLE_OBJECT
-    , Generated.Wayland.Client.Wl_surface_listener(..)
+    , Generated.Wayland.Client.WlSurfaceListener(..)
     , Generated.Wayland.Client.wL_SURFACE_DESTROY
     , Generated.Wayland.Client.wL_SURFACE_ATTACH
     , Generated.Wayland.Client.wL_SURFACE_DAMAGE
@@ -351,13 +351,13 @@ module Generated.Wayland.Client
     , Generated.Wayland.Client.wL_SURFACE_SET_BUFFER_SCALE_SINCE_VERSION
     , Generated.Wayland.Client.wL_SURFACE_DAMAGE_BUFFER_SINCE_VERSION
     , Generated.Wayland.Client.wL_SURFACE_OFFSET_SINCE_VERSION
-    , Generated.Wayland.Client.Wl_seat_capability(..)
+    , Generated.Wayland.Client.WlSeatCapability(..)
     , pattern Generated.Wayland.Client.WL_SEAT_CAPABILITY_POINTER
     , pattern Generated.Wayland.Client.WL_SEAT_CAPABILITY_KEYBOARD
     , pattern Generated.Wayland.Client.WL_SEAT_CAPABILITY_TOUCH
-    , Generated.Wayland.Client.Wl_seat_error(..)
+    , Generated.Wayland.Client.WlSeatError(..)
     , pattern Generated.Wayland.Client.WL_SEAT_ERROR_MISSING_CAPABILITY
-    , Generated.Wayland.Client.Wl_seat_listener(..)
+    , Generated.Wayland.Client.WlSeatListener(..)
     , Generated.Wayland.Client.wL_SEAT_GET_POINTER
     , Generated.Wayland.Client.wL_SEAT_GET_KEYBOARD
     , Generated.Wayland.Client.wL_SEAT_GET_TOUCH
@@ -368,24 +368,24 @@ module Generated.Wayland.Client
     , Generated.Wayland.Client.wL_SEAT_GET_KEYBOARD_SINCE_VERSION
     , Generated.Wayland.Client.wL_SEAT_GET_TOUCH_SINCE_VERSION
     , Generated.Wayland.Client.wL_SEAT_RELEASE_SINCE_VERSION
-    , Generated.Wayland.Client.Wl_pointer_error(..)
+    , Generated.Wayland.Client.WlPointerError(..)
     , pattern Generated.Wayland.Client.WL_POINTER_ERROR_ROLE
-    , Generated.Wayland.Client.Wl_pointer_button_state(..)
+    , Generated.Wayland.Client.WlPointerButtonState(..)
     , pattern Generated.Wayland.Client.WL_POINTER_BUTTON_STATE_RELEASED
     , pattern Generated.Wayland.Client.WL_POINTER_BUTTON_STATE_PRESSED
-    , Generated.Wayland.Client.Wl_pointer_axis(..)
+    , Generated.Wayland.Client.WlPointerAxis(..)
     , pattern Generated.Wayland.Client.WL_POINTER_AXIS_VERTICAL_SCROLL
     , pattern Generated.Wayland.Client.WL_POINTER_AXIS_HORIZONTAL_SCROLL
-    , Generated.Wayland.Client.Wl_pointer_axis_source(..)
+    , Generated.Wayland.Client.WlPointerAxisSource(..)
     , pattern Generated.Wayland.Client.WL_POINTER_AXIS_SOURCE_WHEEL
     , pattern Generated.Wayland.Client.WL_POINTER_AXIS_SOURCE_FINGER
     , pattern Generated.Wayland.Client.WL_POINTER_AXIS_SOURCE_CONTINUOUS
     , pattern Generated.Wayland.Client.WL_POINTER_AXIS_SOURCE_WHEEL_TILT
     , Generated.Wayland.Client.wL_POINTER_AXIS_SOURCE_WHEEL_TILT_SINCE_VERSION
-    , Generated.Wayland.Client.Wl_pointer_axis_relative_direction(..)
+    , Generated.Wayland.Client.WlPointerAxisRelativeDirection(..)
     , pattern Generated.Wayland.Client.WL_POINTER_AXIS_RELATIVE_DIRECTION_IDENTICAL
     , pattern Generated.Wayland.Client.WL_POINTER_AXIS_RELATIVE_DIRECTION_INVERTED
-    , Generated.Wayland.Client.Wl_pointer_listener(..)
+    , Generated.Wayland.Client.WlPointerListener(..)
     , Generated.Wayland.Client.wL_POINTER_SET_CURSOR
     , Generated.Wayland.Client.wL_POINTER_RELEASE
     , Generated.Wayland.Client.wL_POINTER_ENTER_SINCE_VERSION
@@ -401,15 +401,15 @@ module Generated.Wayland.Client
     , Generated.Wayland.Client.wL_POINTER_AXIS_RELATIVE_DIRECTION_SINCE_VERSION
     , Generated.Wayland.Client.wL_POINTER_SET_CURSOR_SINCE_VERSION
     , Generated.Wayland.Client.wL_POINTER_RELEASE_SINCE_VERSION
-    , Generated.Wayland.Client.Wl_keyboard_keymap_format(..)
+    , Generated.Wayland.Client.WlKeyboardKeymapFormat(..)
     , pattern Generated.Wayland.Client.WL_KEYBOARD_KEYMAP_FORMAT_NO_KEYMAP
     , pattern Generated.Wayland.Client.WL_KEYBOARD_KEYMAP_FORMAT_XKB_V1
-    , Generated.Wayland.Client.Wl_keyboard_key_state(..)
+    , Generated.Wayland.Client.WlKeyboardKeyState(..)
     , pattern Generated.Wayland.Client.WL_KEYBOARD_KEY_STATE_RELEASED
     , pattern Generated.Wayland.Client.WL_KEYBOARD_KEY_STATE_PRESSED
     , pattern Generated.Wayland.Client.WL_KEYBOARD_KEY_STATE_REPEATED
     , Generated.Wayland.Client.wL_KEYBOARD_KEY_STATE_REPEATED_SINCE_VERSION
-    , Generated.Wayland.Client.Wl_keyboard_listener(..)
+    , Generated.Wayland.Client.WlKeyboardListener(..)
     , Generated.Wayland.Client.wL_KEYBOARD_RELEASE
     , Generated.Wayland.Client.wL_KEYBOARD_KEYMAP_SINCE_VERSION
     , Generated.Wayland.Client.wL_KEYBOARD_ENTER_SINCE_VERSION
@@ -418,7 +418,7 @@ module Generated.Wayland.Client
     , Generated.Wayland.Client.wL_KEYBOARD_MODIFIERS_SINCE_VERSION
     , Generated.Wayland.Client.wL_KEYBOARD_REPEAT_INFO_SINCE_VERSION
     , Generated.Wayland.Client.wL_KEYBOARD_RELEASE_SINCE_VERSION
-    , Generated.Wayland.Client.Wl_touch_listener(..)
+    , Generated.Wayland.Client.WlTouchListener(..)
     , Generated.Wayland.Client.wL_TOUCH_RELEASE
     , Generated.Wayland.Client.wL_TOUCH_DOWN_SINCE_VERSION
     , Generated.Wayland.Client.wL_TOUCH_UP_SINCE_VERSION
@@ -428,14 +428,14 @@ module Generated.Wayland.Client
     , Generated.Wayland.Client.wL_TOUCH_SHAPE_SINCE_VERSION
     , Generated.Wayland.Client.wL_TOUCH_ORIENTATION_SINCE_VERSION
     , Generated.Wayland.Client.wL_TOUCH_RELEASE_SINCE_VERSION
-    , Generated.Wayland.Client.Wl_output_subpixel(..)
+    , Generated.Wayland.Client.WlOutputSubpixel(..)
     , pattern Generated.Wayland.Client.WL_OUTPUT_SUBPIXEL_UNKNOWN
     , pattern Generated.Wayland.Client.WL_OUTPUT_SUBPIXEL_NONE
     , pattern Generated.Wayland.Client.WL_OUTPUT_SUBPIXEL_HORIZONTAL_RGB
     , pattern Generated.Wayland.Client.WL_OUTPUT_SUBPIXEL_HORIZONTAL_BGR
     , pattern Generated.Wayland.Client.WL_OUTPUT_SUBPIXEL_VERTICAL_RGB
     , pattern Generated.Wayland.Client.WL_OUTPUT_SUBPIXEL_VERTICAL_BGR
-    , Generated.Wayland.Client.Wl_output_transform(..)
+    , Generated.Wayland.Client.WlOutputTransform(..)
     , pattern Generated.Wayland.Client.WL_OUTPUT_TRANSFORM_NORMAL
     , pattern Generated.Wayland.Client.WL_OUTPUT_TRANSFORM_90
     , pattern Generated.Wayland.Client.WL_OUTPUT_TRANSFORM_180
@@ -444,10 +444,10 @@ module Generated.Wayland.Client
     , pattern Generated.Wayland.Client.WL_OUTPUT_TRANSFORM_FLIPPED_90
     , pattern Generated.Wayland.Client.WL_OUTPUT_TRANSFORM_FLIPPED_180
     , pattern Generated.Wayland.Client.WL_OUTPUT_TRANSFORM_FLIPPED_270
-    , Generated.Wayland.Client.Wl_output_mode(..)
+    , Generated.Wayland.Client.WlOutputMode(..)
     , pattern Generated.Wayland.Client.WL_OUTPUT_MODE_CURRENT
     , pattern Generated.Wayland.Client.WL_OUTPUT_MODE_PREFERRED
-    , Generated.Wayland.Client.Wl_output_listener(..)
+    , Generated.Wayland.Client.WlOutputListener(..)
     , Generated.Wayland.Client.wL_OUTPUT_RELEASE
     , Generated.Wayland.Client.wL_OUTPUT_GEOMETRY_SINCE_VERSION
     , Generated.Wayland.Client.wL_OUTPUT_MODE_SINCE_VERSION
@@ -462,14 +462,14 @@ module Generated.Wayland.Client
     , Generated.Wayland.Client.wL_REGION_DESTROY_SINCE_VERSION
     , Generated.Wayland.Client.wL_REGION_ADD_SINCE_VERSION
     , Generated.Wayland.Client.wL_REGION_SUBTRACT_SINCE_VERSION
-    , Generated.Wayland.Client.Wl_subcompositor_error(..)
+    , Generated.Wayland.Client.WlSubcompositorError(..)
     , pattern Generated.Wayland.Client.WL_SUBCOMPOSITOR_ERROR_BAD_SURFACE
     , pattern Generated.Wayland.Client.WL_SUBCOMPOSITOR_ERROR_BAD_PARENT
     , Generated.Wayland.Client.wL_SUBCOMPOSITOR_DESTROY
     , Generated.Wayland.Client.wL_SUBCOMPOSITOR_GET_SUBSURFACE
     , Generated.Wayland.Client.wL_SUBCOMPOSITOR_DESTROY_SINCE_VERSION
     , Generated.Wayland.Client.wL_SUBCOMPOSITOR_GET_SUBSURFACE_SINCE_VERSION
-    , Generated.Wayland.Client.Wl_subsurface_error(..)
+    , Generated.Wayland.Client.WlSubsurfaceError(..)
     , pattern Generated.Wayland.Client.WL_SUBSURFACE_ERROR_BAD_SURFACE
     , Generated.Wayland.Client.wL_SUBSURFACE_DESTROY
     , Generated.Wayland.Client.wL_SUBSURFACE_SET_POSITION
@@ -513,7 +513,7 @@ data Timespec
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
 -}
-data Wl_proxy
+data WlProxy
 
 {-| __C declaration:__ @struct wl_display@
 
@@ -521,7 +521,7 @@ data Wl_proxy
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
 -}
-data Wl_display
+data WlDisplay
 
 {-| __C declaration:__ @struct wl_event_queue@
 
@@ -529,7 +529,7 @@ data Wl_display
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
 -}
-data Wl_event_queue
+data WlEventQueue
 
 {-| __C declaration:__ @macro WL_MARSHAL_FLAG_DESTROY@
 
@@ -547,7 +547,7 @@ wL_MARSHAL_FLAG_DESTROY =
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_buffer
+data WlBuffer
 
 {-| __C declaration:__ @struct wl_callback@
 
@@ -555,7 +555,7 @@ data Wl_buffer
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_callback
+data WlCallback
 
 {-| __C declaration:__ @struct wl_compositor@
 
@@ -563,7 +563,7 @@ data Wl_callback
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_compositor
+data WlCompositor
 
 {-| __C declaration:__ @struct wl_data_device@
 
@@ -571,7 +571,7 @@ data Wl_compositor
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_data_device
+data WlDataDevice
 
 {-| __C declaration:__ @struct wl_data_device_manager@
 
@@ -579,7 +579,7 @@ data Wl_data_device
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_data_device_manager
+data WlDataDeviceManager
 
 {-| __C declaration:__ @struct wl_data_offer@
 
@@ -587,7 +587,7 @@ data Wl_data_device_manager
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_data_offer
+data WlDataOffer
 
 {-| __C declaration:__ @struct wl_data_source@
 
@@ -595,7 +595,7 @@ data Wl_data_offer
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_data_source
+data WlDataSource
 
 {-| __C declaration:__ @struct wl_fixes@
 
@@ -603,7 +603,7 @@ data Wl_data_source
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_fixes
+data WlFixes
 
 {-| __C declaration:__ @struct wl_keyboard@
 
@@ -611,7 +611,7 @@ data Wl_fixes
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_keyboard
+data WlKeyboard
 
 {-| __C declaration:__ @struct wl_output@
 
@@ -619,7 +619,7 @@ data Wl_keyboard
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_output
+data WlOutput
 
 {-| __C declaration:__ @struct wl_pointer@
 
@@ -627,7 +627,7 @@ data Wl_output
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_pointer
+data WlPointer
 
 {-| __C declaration:__ @struct wl_region@
 
@@ -635,7 +635,7 @@ data Wl_pointer
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_region
+data WlRegion
 
 {-| __C declaration:__ @struct wl_registry@
 
@@ -643,7 +643,7 @@ data Wl_region
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_registry
+data WlRegistry
 
 {-| __C declaration:__ @struct wl_seat@
 
@@ -651,7 +651,7 @@ data Wl_registry
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_seat
+data WlSeat
 
 {-| __C declaration:__ @struct wl_shell@
 
@@ -659,7 +659,7 @@ data Wl_seat
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_shell
+data WlShell
 
 {-| __C declaration:__ @struct wl_shell_surface@
 
@@ -667,7 +667,7 @@ data Wl_shell
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_shell_surface
+data WlShellSurface
 
 {-| __C declaration:__ @struct wl_shm@
 
@@ -675,7 +675,7 @@ data Wl_shell_surface
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_shm
+data WlShm
 
 {-| __C declaration:__ @struct wl_shm_pool@
 
@@ -683,7 +683,7 @@ data Wl_shm
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_shm_pool
+data WlShmPool
 
 {-| __C declaration:__ @struct wl_subcompositor@
 
@@ -691,7 +691,7 @@ data Wl_shm_pool
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_subcompositor
+data WlSubcompositor
 
 {-| __C declaration:__ @struct wl_subsurface@
 
@@ -699,7 +699,7 @@ data Wl_subcompositor
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_subsurface
+data WlSubsurface
 
 {-| __C declaration:__ @struct wl_surface@
 
@@ -707,7 +707,7 @@ data Wl_subsurface
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_surface
+data WlSurface
 
 {-| __C declaration:__ @struct wl_touch@
 
@@ -715,7 +715,7 @@ data Wl_surface
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_touch
+data WlTouch
 
 {-| __C declaration:__ @enum wl_display_error@
 
@@ -723,43 +723,43 @@ data Wl_touch
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-newtype Wl_display_error = Wl_display_error
+newtype WlDisplayError = WlDisplayError
   { unwrap :: RIP.CUInt
   }
   deriving stock (Eq, RIP.Generic, Ord)
   deriving newtype (RIP.HasFFIType)
 
-instance Marshal.StaticSize Wl_display_error where
+instance Marshal.StaticSize WlDisplayError where
 
   staticSizeOf = \_ -> (4 :: Int)
 
   staticAlignment = \_ -> (4 :: Int)
 
-instance Marshal.ReadRaw Wl_display_error where
+instance Marshal.ReadRaw WlDisplayError where
 
   readRaw =
     \ptr0 ->
-          pure Wl_display_error
+          pure WlDisplayError
       <*> Marshal.readRawByteOff ptr0 (0 :: Int)
 
-instance Marshal.WriteRaw Wl_display_error where
+instance Marshal.WriteRaw WlDisplayError where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_display_error unwrap2 ->
+          WlDisplayError unwrap2 ->
             Marshal.writeRawByteOff ptr0 (0 :: Int) unwrap2
 
-deriving via Marshal.EquivStorable Wl_display_error instance RIP.Storable Wl_display_error
+deriving via Marshal.EquivStorable WlDisplayError instance RIP.Storable WlDisplayError
 
-deriving via RIP.CUInt instance RIP.Prim Wl_display_error
+deriving via RIP.CUInt instance RIP.Prim WlDisplayError
 
-instance CEnum.CEnum Wl_display_error where
+instance CEnum.CEnum WlDisplayError where
 
-  type CEnumZ Wl_display_error = RIP.CUInt
+  type CEnumZ WlDisplayError = RIP.CUInt
 
-  toCEnum = Wl_display_error
+  toCEnum = WlDisplayError
 
   fromCEnum = RIP.getField @"unwrap"
 
@@ -772,26 +772,26 @@ instance CEnum.CEnum Wl_display_error where
                                    ]
 
   showsUndeclared =
-    CEnum.showsWrappedUndeclared "Wl_display_error"
+    CEnum.showsWrappedUndeclared "WlDisplayError"
 
   readPrecUndeclared =
-    CEnum.readPrecWrappedUndeclared "Wl_display_error"
+    CEnum.readPrecWrappedUndeclared "WlDisplayError"
 
   isDeclared = CEnum.seqIsDeclared
 
   mkDeclared = CEnum.seqMkDeclared
 
-instance CEnum.SequentialCEnum Wl_display_error where
+instance CEnum.SequentialCEnum WlDisplayError where
 
   minDeclaredValue = WL_DISPLAY_ERROR_INVALID_OBJECT
 
   maxDeclaredValue = WL_DISPLAY_ERROR_IMPLEMENTATION
 
-instance Show Wl_display_error where
+instance Show WlDisplayError where
 
   showsPrec = CEnum.shows
 
-instance Read Wl_display_error where
+instance Read WlDisplayError where
 
   readPrec = CEnum.readPrec
 
@@ -800,13 +800,13 @@ instance Read Wl_display_error where
   readListPrec = RIP.readListPrecDefault
 
 instance ( ((~) ty) RIP.CUInt
-         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_display_error) (RIP.Ptr ty) where
+         ) => RIP.HasField "unwrap" (RIP.Ptr WlDisplayError) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField Wl_display_error "unwrap" where
+instance HasCField.HasCField WlDisplayError "unwrap" where
 
-  type CFieldType Wl_display_error "unwrap" = RIP.CUInt
+  type CFieldType WlDisplayError "unwrap" = RIP.CUInt
 
   offset# = \_ -> \_ -> 0
 
@@ -816,8 +816,8 @@ instance HasCField.HasCField Wl_display_error "unwrap" where
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_DISPLAY_ERROR_INVALID_OBJECT :: Wl_display_error
-pattern WL_DISPLAY_ERROR_INVALID_OBJECT = Wl_display_error 0
+pattern WL_DISPLAY_ERROR_INVALID_OBJECT :: WlDisplayError
+pattern WL_DISPLAY_ERROR_INVALID_OBJECT = WlDisplayError 0
 
 {-| __C declaration:__ @WL_DISPLAY_ERROR_INVALID_METHOD@
 
@@ -825,8 +825,8 @@ pattern WL_DISPLAY_ERROR_INVALID_OBJECT = Wl_display_error 0
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_DISPLAY_ERROR_INVALID_METHOD :: Wl_display_error
-pattern WL_DISPLAY_ERROR_INVALID_METHOD = Wl_display_error 1
+pattern WL_DISPLAY_ERROR_INVALID_METHOD :: WlDisplayError
+pattern WL_DISPLAY_ERROR_INVALID_METHOD = WlDisplayError 1
 
 {-| __C declaration:__ @WL_DISPLAY_ERROR_NO_MEMORY@
 
@@ -834,8 +834,8 @@ pattern WL_DISPLAY_ERROR_INVALID_METHOD = Wl_display_error 1
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_DISPLAY_ERROR_NO_MEMORY :: Wl_display_error
-pattern WL_DISPLAY_ERROR_NO_MEMORY = Wl_display_error 2
+pattern WL_DISPLAY_ERROR_NO_MEMORY :: WlDisplayError
+pattern WL_DISPLAY_ERROR_NO_MEMORY = WlDisplayError 2
 
 {-| __C declaration:__ @WL_DISPLAY_ERROR_IMPLEMENTATION@
 
@@ -843,8 +843,8 @@ pattern WL_DISPLAY_ERROR_NO_MEMORY = Wl_display_error 2
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_DISPLAY_ERROR_IMPLEMENTATION :: Wl_display_error
-pattern WL_DISPLAY_ERROR_IMPLEMENTATION = Wl_display_error 3
+pattern WL_DISPLAY_ERROR_IMPLEMENTATION :: WlDisplayError
+pattern WL_DISPLAY_ERROR_IMPLEMENTATION = WlDisplayError 3
 
 {-| __C declaration:__ @struct wl_display_listener@
 
@@ -852,15 +852,15 @@ pattern WL_DISPLAY_ERROR_IMPLEMENTATION = Wl_display_error 3
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_display_listener = Wl_display_listener
-  { error :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_display) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+data WlDisplayListener = WlDisplayListener
+  { error :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDisplay) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> IO ())
     {- ^ __C declaration:__ @error@
 
          __defined at:__ @wayland-client-protocol.h 1013:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , delete_id :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_display) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , delete_id :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDisplay) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ __C declaration:__ @delete_id@
 
          __defined at:__ @wayland-client-protocol.h 1028:9@
@@ -870,53 +870,53 @@ data Wl_display_listener = Wl_display_listener
   }
   deriving stock (Eq, RIP.Generic, Show)
 
-instance Marshal.StaticSize Wl_display_listener where
+instance Marshal.StaticSize WlDisplayListener where
 
   staticSizeOf = \_ -> (16 :: Int)
 
   staticAlignment = \_ -> (8 :: Int)
 
-instance Marshal.ReadRaw Wl_display_listener where
+instance Marshal.ReadRaw WlDisplayListener where
 
   readRaw =
     \ptr0 ->
-          pure Wl_display_listener
+          pure WlDisplayListener
       <*> HasCField.readRaw (RIP.Proxy @"error") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"delete_id") ptr0
 
-instance Marshal.WriteRaw Wl_display_listener where
+instance Marshal.WriteRaw WlDisplayListener where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_display_listener error2 delete_id3 ->
+          WlDisplayListener error2 delete_id3 ->
                HasCField.writeRaw (RIP.Proxy @"error") ptr0 error2
             >> HasCField.writeRaw (RIP.Proxy @"delete_id") ptr0 delete_id3
 
-deriving via Marshal.EquivStorable Wl_display_listener instance RIP.Storable Wl_display_listener
+deriving via Marshal.EquivStorable WlDisplayListener instance RIP.Storable WlDisplayListener
 
-instance HasCField.HasCField Wl_display_listener "error" where
+instance HasCField.HasCField WlDisplayListener "error" where
 
-  type CFieldType Wl_display_listener "error" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_display) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  type CFieldType WlDisplayListener "error" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDisplay) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_display) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
-         ) => RIP.HasField "error" (RIP.Ptr Wl_display_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDisplay) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
+         ) => RIP.HasField "error" (RIP.Ptr WlDisplayListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"error")
 
-instance HasCField.HasCField Wl_display_listener "delete_id" where
+instance HasCField.HasCField WlDisplayListener "delete_id" where
 
-  type CFieldType Wl_display_listener "delete_id" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_display) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  type CFieldType WlDisplayListener "delete_id" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDisplay) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_display) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-         ) => RIP.HasField "delete_id" (RIP.Ptr Wl_display_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDisplay) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+         ) => RIP.HasField "delete_id" (RIP.Ptr WlDisplayListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"delete_id")
 
@@ -981,15 +981,15 @@ wL_DISPLAY_GET_REGISTRY_SINCE_VERSION =
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_registry_listener = Wl_registry_listener
-  { global :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_registry) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+data WlRegistryListener = WlRegistryListener
+  { global :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlRegistry) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ __C declaration:__ @global@
 
          __defined at:__ @wayland-client-protocol.h 1152:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , global_remove :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_registry) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , global_remove :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlRegistry) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ __C declaration:__ @global_remove@
 
          __defined at:__ @wayland-client-protocol.h 1172:9@
@@ -999,53 +999,53 @@ data Wl_registry_listener = Wl_registry_listener
   }
   deriving stock (Eq, RIP.Generic, Show)
 
-instance Marshal.StaticSize Wl_registry_listener where
+instance Marshal.StaticSize WlRegistryListener where
 
   staticSizeOf = \_ -> (16 :: Int)
 
   staticAlignment = \_ -> (8 :: Int)
 
-instance Marshal.ReadRaw Wl_registry_listener where
+instance Marshal.ReadRaw WlRegistryListener where
 
   readRaw =
     \ptr0 ->
-          pure Wl_registry_listener
+          pure WlRegistryListener
       <*> HasCField.readRaw (RIP.Proxy @"global") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"global_remove") ptr0
 
-instance Marshal.WriteRaw Wl_registry_listener where
+instance Marshal.WriteRaw WlRegistryListener where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_registry_listener global2 global_remove3 ->
+          WlRegistryListener global2 global_remove3 ->
                HasCField.writeRaw (RIP.Proxy @"global") ptr0 global2
             >> HasCField.writeRaw (RIP.Proxy @"global_remove") ptr0 global_remove3
 
-deriving via Marshal.EquivStorable Wl_registry_listener instance RIP.Storable Wl_registry_listener
+deriving via Marshal.EquivStorable WlRegistryListener instance RIP.Storable WlRegistryListener
 
-instance HasCField.HasCField Wl_registry_listener "global" where
+instance HasCField.HasCField WlRegistryListener "global" where
 
-  type CFieldType Wl_registry_listener "global" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_registry) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  type CFieldType WlRegistryListener "global" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlRegistry) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_registry) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-         ) => RIP.HasField "global" (RIP.Ptr Wl_registry_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlRegistry) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+         ) => RIP.HasField "global" (RIP.Ptr WlRegistryListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"global")
 
-instance HasCField.HasCField Wl_registry_listener "global_remove" where
+instance HasCField.HasCField WlRegistryListener "global_remove" where
 
-  type CFieldType Wl_registry_listener "global_remove" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_registry) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  type CFieldType WlRegistryListener "global_remove" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlRegistry) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_registry) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-         ) => RIP.HasField "global_remove" (RIP.Ptr Wl_registry_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlRegistry) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+         ) => RIP.HasField "global_remove" (RIP.Ptr WlRegistryListener) (RIP.Ptr ty) where
 
   getField =
     HasCField.fromPtr (RIP.Proxy @"global_remove")
@@ -1093,8 +1093,8 @@ wL_REGISTRY_BIND_SINCE_VERSION = (1 :: RIP.CInt)
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_callback_listener = Wl_callback_listener
-  { done :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_callback) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+data WlCallbackListener = WlCallbackListener
+  { done :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlCallback) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ __C declaration:__ @done@
 
          __defined at:__ @wayland-client-protocol.h 1259:9@
@@ -1104,39 +1104,39 @@ data Wl_callback_listener = Wl_callback_listener
   }
   deriving stock (Eq, RIP.Generic, Show)
 
-instance Marshal.StaticSize Wl_callback_listener where
+instance Marshal.StaticSize WlCallbackListener where
 
   staticSizeOf = \_ -> (8 :: Int)
 
   staticAlignment = \_ -> (8 :: Int)
 
-instance Marshal.ReadRaw Wl_callback_listener where
+instance Marshal.ReadRaw WlCallbackListener where
 
   readRaw =
     \ptr0 ->
-          pure Wl_callback_listener
+          pure WlCallbackListener
       <*> HasCField.readRaw (RIP.Proxy @"done") ptr0
 
-instance Marshal.WriteRaw Wl_callback_listener where
+instance Marshal.WriteRaw WlCallbackListener where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_callback_listener done2 ->
+          WlCallbackListener done2 ->
             HasCField.writeRaw (RIP.Proxy @"done") ptr0 done2
 
-deriving via Marshal.EquivStorable Wl_callback_listener instance RIP.Storable Wl_callback_listener
+deriving via Marshal.EquivStorable WlCallbackListener instance RIP.Storable WlCallbackListener
 
-instance HasCField.HasCField Wl_callback_listener "done" where
+instance HasCField.HasCField WlCallbackListener "done" where
 
-  type CFieldType Wl_callback_listener "done" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_callback) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  type CFieldType WlCallbackListener "done" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlCallback) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_callback) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-         ) => RIP.HasField "done" (RIP.Ptr Wl_callback_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlCallback) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+         ) => RIP.HasField "done" (RIP.Ptr WlCallbackListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"done")
 
@@ -1248,43 +1248,43 @@ wL_SHM_POOL_RESIZE_SINCE_VERSION = (1 :: RIP.CInt)
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-newtype Wl_shm_error = Wl_shm_error
+newtype WlShmError = WlShmError
   { unwrap :: RIP.CUInt
   }
   deriving stock (Eq, RIP.Generic, Ord)
   deriving newtype (RIP.HasFFIType)
 
-instance Marshal.StaticSize Wl_shm_error where
+instance Marshal.StaticSize WlShmError where
 
   staticSizeOf = \_ -> (4 :: Int)
 
   staticAlignment = \_ -> (4 :: Int)
 
-instance Marshal.ReadRaw Wl_shm_error where
+instance Marshal.ReadRaw WlShmError where
 
   readRaw =
     \ptr0 ->
-          pure Wl_shm_error
+          pure WlShmError
       <*> Marshal.readRawByteOff ptr0 (0 :: Int)
 
-instance Marshal.WriteRaw Wl_shm_error where
+instance Marshal.WriteRaw WlShmError where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_shm_error unwrap2 ->
+          WlShmError unwrap2 ->
             Marshal.writeRawByteOff ptr0 (0 :: Int) unwrap2
 
-deriving via Marshal.EquivStorable Wl_shm_error instance RIP.Storable Wl_shm_error
+deriving via Marshal.EquivStorable WlShmError instance RIP.Storable WlShmError
 
-deriving via RIP.CUInt instance RIP.Prim Wl_shm_error
+deriving via RIP.CUInt instance RIP.Prim WlShmError
 
-instance CEnum.CEnum Wl_shm_error where
+instance CEnum.CEnum WlShmError where
 
-  type CEnumZ Wl_shm_error = RIP.CUInt
+  type CEnumZ WlShmError = RIP.CUInt
 
-  toCEnum = Wl_shm_error
+  toCEnum = WlShmError
 
   fromCEnum = RIP.getField @"unwrap"
 
@@ -1296,26 +1296,26 @@ instance CEnum.CEnum Wl_shm_error where
                                    ]
 
   showsUndeclared =
-    CEnum.showsWrappedUndeclared "Wl_shm_error"
+    CEnum.showsWrappedUndeclared "WlShmError"
 
   readPrecUndeclared =
-    CEnum.readPrecWrappedUndeclared "Wl_shm_error"
+    CEnum.readPrecWrappedUndeclared "WlShmError"
 
   isDeclared = CEnum.seqIsDeclared
 
   mkDeclared = CEnum.seqMkDeclared
 
-instance CEnum.SequentialCEnum Wl_shm_error where
+instance CEnum.SequentialCEnum WlShmError where
 
   minDeclaredValue = WL_SHM_ERROR_INVALID_FORMAT
 
   maxDeclaredValue = WL_SHM_ERROR_INVALID_FD
 
-instance Show Wl_shm_error where
+instance Show WlShmError where
 
   showsPrec = CEnum.shows
 
-instance Read Wl_shm_error where
+instance Read WlShmError where
 
   readPrec = CEnum.readPrec
 
@@ -1324,13 +1324,13 @@ instance Read Wl_shm_error where
   readListPrec = RIP.readListPrecDefault
 
 instance ( ((~) ty) RIP.CUInt
-         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_shm_error) (RIP.Ptr ty) where
+         ) => RIP.HasField "unwrap" (RIP.Ptr WlShmError) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField Wl_shm_error "unwrap" where
+instance HasCField.HasCField WlShmError "unwrap" where
 
-  type CFieldType Wl_shm_error "unwrap" = RIP.CUInt
+  type CFieldType WlShmError "unwrap" = RIP.CUInt
 
   offset# = \_ -> \_ -> 0
 
@@ -1340,8 +1340,8 @@ instance HasCField.HasCField Wl_shm_error "unwrap" where
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_ERROR_INVALID_FORMAT :: Wl_shm_error
-pattern WL_SHM_ERROR_INVALID_FORMAT = Wl_shm_error 0
+pattern WL_SHM_ERROR_INVALID_FORMAT :: WlShmError
+pattern WL_SHM_ERROR_INVALID_FORMAT = WlShmError 0
 
 {-| __C declaration:__ @WL_SHM_ERROR_INVALID_STRIDE@
 
@@ -1349,8 +1349,8 @@ pattern WL_SHM_ERROR_INVALID_FORMAT = Wl_shm_error 0
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_ERROR_INVALID_STRIDE :: Wl_shm_error
-pattern WL_SHM_ERROR_INVALID_STRIDE = Wl_shm_error 1
+pattern WL_SHM_ERROR_INVALID_STRIDE :: WlShmError
+pattern WL_SHM_ERROR_INVALID_STRIDE = WlShmError 1
 
 {-| __C declaration:__ @WL_SHM_ERROR_INVALID_FD@
 
@@ -1358,8 +1358,8 @@ pattern WL_SHM_ERROR_INVALID_STRIDE = Wl_shm_error 1
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_ERROR_INVALID_FD :: Wl_shm_error
-pattern WL_SHM_ERROR_INVALID_FD = Wl_shm_error 2
+pattern WL_SHM_ERROR_INVALID_FD :: WlShmError
+pattern WL_SHM_ERROR_INVALID_FD = WlShmError 2
 
 {-| __C declaration:__ @enum wl_shm_format@
 
@@ -1367,43 +1367,43 @@ pattern WL_SHM_ERROR_INVALID_FD = Wl_shm_error 2
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-newtype Wl_shm_format = Wl_shm_format
+newtype WlShmFormat = WlShmFormat
   { unwrap :: RIP.CUInt
   }
   deriving stock (Eq, RIP.Generic, Ord)
   deriving newtype (RIP.HasFFIType)
 
-instance Marshal.StaticSize Wl_shm_format where
+instance Marshal.StaticSize WlShmFormat where
 
   staticSizeOf = \_ -> (4 :: Int)
 
   staticAlignment = \_ -> (4 :: Int)
 
-instance Marshal.ReadRaw Wl_shm_format where
+instance Marshal.ReadRaw WlShmFormat where
 
   readRaw =
     \ptr0 ->
-          pure Wl_shm_format
+          pure WlShmFormat
       <*> Marshal.readRawByteOff ptr0 (0 :: Int)
 
-instance Marshal.WriteRaw Wl_shm_format where
+instance Marshal.WriteRaw WlShmFormat where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_shm_format unwrap2 ->
+          WlShmFormat unwrap2 ->
             Marshal.writeRawByteOff ptr0 (0 :: Int) unwrap2
 
-deriving via Marshal.EquivStorable Wl_shm_format instance RIP.Storable Wl_shm_format
+deriving via Marshal.EquivStorable WlShmFormat instance RIP.Storable WlShmFormat
 
-deriving via RIP.CUInt instance RIP.Prim Wl_shm_format
+deriving via RIP.CUInt instance RIP.Prim WlShmFormat
 
-instance CEnum.CEnum Wl_shm_format where
+instance CEnum.CEnum WlShmFormat where
 
-  type CEnumZ Wl_shm_format = RIP.CUInt
+  type CEnumZ WlShmFormat = RIP.CUInt
 
-  toCEnum = Wl_shm_format
+  toCEnum = WlShmFormat
 
   fromCEnum = RIP.getField @"unwrap"
 
@@ -1535,16 +1535,16 @@ instance CEnum.CEnum Wl_shm_format where
                                    ]
 
   showsUndeclared =
-    CEnum.showsWrappedUndeclared "Wl_shm_format"
+    CEnum.showsWrappedUndeclared "WlShmFormat"
 
   readPrecUndeclared =
-    CEnum.readPrecWrappedUndeclared "Wl_shm_format"
+    CEnum.readPrecWrappedUndeclared "WlShmFormat"
 
-instance Show Wl_shm_format where
+instance Show WlShmFormat where
 
   showsPrec = CEnum.shows
 
-instance Read Wl_shm_format where
+instance Read WlShmFormat where
 
   readPrec = CEnum.readPrec
 
@@ -1553,13 +1553,13 @@ instance Read Wl_shm_format where
   readListPrec = RIP.readListPrecDefault
 
 instance ( ((~) ty) RIP.CUInt
-         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_shm_format) (RIP.Ptr ty) where
+         ) => RIP.HasField "unwrap" (RIP.Ptr WlShmFormat) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField Wl_shm_format "unwrap" where
+instance HasCField.HasCField WlShmFormat "unwrap" where
 
-  type CFieldType Wl_shm_format "unwrap" = RIP.CUInt
+  type CFieldType WlShmFormat "unwrap" = RIP.CUInt
 
   offset# = \_ -> \_ -> 0
 
@@ -1569,8 +1569,8 @@ instance HasCField.HasCField Wl_shm_format "unwrap" where
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_ARGB8888 :: Wl_shm_format
-pattern WL_SHM_FORMAT_ARGB8888 = Wl_shm_format 0
+pattern WL_SHM_FORMAT_ARGB8888 :: WlShmFormat
+pattern WL_SHM_FORMAT_ARGB8888 = WlShmFormat 0
 
 {-| __C declaration:__ @WL_SHM_FORMAT_XRGB8888@
 
@@ -1578,8 +1578,8 @@ pattern WL_SHM_FORMAT_ARGB8888 = Wl_shm_format 0
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_XRGB8888 :: Wl_shm_format
-pattern WL_SHM_FORMAT_XRGB8888 = Wl_shm_format 1
+pattern WL_SHM_FORMAT_XRGB8888 :: WlShmFormat
+pattern WL_SHM_FORMAT_XRGB8888 = WlShmFormat 1
 
 {-| __C declaration:__ @WL_SHM_FORMAT_C8@
 
@@ -1587,8 +1587,8 @@ pattern WL_SHM_FORMAT_XRGB8888 = Wl_shm_format 1
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_C8 :: Wl_shm_format
-pattern WL_SHM_FORMAT_C8 = Wl_shm_format 538982467
+pattern WL_SHM_FORMAT_C8 :: WlShmFormat
+pattern WL_SHM_FORMAT_C8 = WlShmFormat 538982467
 
 {-| __C declaration:__ @WL_SHM_FORMAT_RGB332@
 
@@ -1596,8 +1596,8 @@ pattern WL_SHM_FORMAT_C8 = Wl_shm_format 538982467
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_RGB332 :: Wl_shm_format
-pattern WL_SHM_FORMAT_RGB332 = Wl_shm_format 943867730
+pattern WL_SHM_FORMAT_RGB332 :: WlShmFormat
+pattern WL_SHM_FORMAT_RGB332 = WlShmFormat 943867730
 
 {-| __C declaration:__ @WL_SHM_FORMAT_BGR233@
 
@@ -1605,8 +1605,8 @@ pattern WL_SHM_FORMAT_RGB332 = Wl_shm_format 943867730
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_BGR233 :: Wl_shm_format
-pattern WL_SHM_FORMAT_BGR233 = Wl_shm_format 944916290
+pattern WL_SHM_FORMAT_BGR233 :: WlShmFormat
+pattern WL_SHM_FORMAT_BGR233 = WlShmFormat 944916290
 
 {-| __C declaration:__ @WL_SHM_FORMAT_XRGB4444@
 
@@ -1614,8 +1614,8 @@ pattern WL_SHM_FORMAT_BGR233 = Wl_shm_format 944916290
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_XRGB4444 :: Wl_shm_format
-pattern WL_SHM_FORMAT_XRGB4444 = Wl_shm_format 842093144
+pattern WL_SHM_FORMAT_XRGB4444 :: WlShmFormat
+pattern WL_SHM_FORMAT_XRGB4444 = WlShmFormat 842093144
 
 {-| __C declaration:__ @WL_SHM_FORMAT_XBGR4444@
 
@@ -1623,8 +1623,8 @@ pattern WL_SHM_FORMAT_XRGB4444 = Wl_shm_format 842093144
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_XBGR4444 :: Wl_shm_format
-pattern WL_SHM_FORMAT_XBGR4444 = Wl_shm_format 842089048
+pattern WL_SHM_FORMAT_XBGR4444 :: WlShmFormat
+pattern WL_SHM_FORMAT_XBGR4444 = WlShmFormat 842089048
 
 {-| __C declaration:__ @WL_SHM_FORMAT_RGBX4444@
 
@@ -1632,8 +1632,8 @@ pattern WL_SHM_FORMAT_XBGR4444 = Wl_shm_format 842089048
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_RGBX4444 :: Wl_shm_format
-pattern WL_SHM_FORMAT_RGBX4444 = Wl_shm_format 842094674
+pattern WL_SHM_FORMAT_RGBX4444 :: WlShmFormat
+pattern WL_SHM_FORMAT_RGBX4444 = WlShmFormat 842094674
 
 {-| __C declaration:__ @WL_SHM_FORMAT_BGRX4444@
 
@@ -1641,8 +1641,8 @@ pattern WL_SHM_FORMAT_RGBX4444 = Wl_shm_format 842094674
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_BGRX4444 :: Wl_shm_format
-pattern WL_SHM_FORMAT_BGRX4444 = Wl_shm_format 842094658
+pattern WL_SHM_FORMAT_BGRX4444 :: WlShmFormat
+pattern WL_SHM_FORMAT_BGRX4444 = WlShmFormat 842094658
 
 {-| __C declaration:__ @WL_SHM_FORMAT_ARGB4444@
 
@@ -1650,8 +1650,8 @@ pattern WL_SHM_FORMAT_BGRX4444 = Wl_shm_format 842094658
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_ARGB4444 :: Wl_shm_format
-pattern WL_SHM_FORMAT_ARGB4444 = Wl_shm_format 842093121
+pattern WL_SHM_FORMAT_ARGB4444 :: WlShmFormat
+pattern WL_SHM_FORMAT_ARGB4444 = WlShmFormat 842093121
 
 {-| __C declaration:__ @WL_SHM_FORMAT_ABGR4444@
 
@@ -1659,8 +1659,8 @@ pattern WL_SHM_FORMAT_ARGB4444 = Wl_shm_format 842093121
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_ABGR4444 :: Wl_shm_format
-pattern WL_SHM_FORMAT_ABGR4444 = Wl_shm_format 842089025
+pattern WL_SHM_FORMAT_ABGR4444 :: WlShmFormat
+pattern WL_SHM_FORMAT_ABGR4444 = WlShmFormat 842089025
 
 {-| __C declaration:__ @WL_SHM_FORMAT_RGBA4444@
 
@@ -1668,8 +1668,8 @@ pattern WL_SHM_FORMAT_ABGR4444 = Wl_shm_format 842089025
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_RGBA4444 :: Wl_shm_format
-pattern WL_SHM_FORMAT_RGBA4444 = Wl_shm_format 842088786
+pattern WL_SHM_FORMAT_RGBA4444 :: WlShmFormat
+pattern WL_SHM_FORMAT_RGBA4444 = WlShmFormat 842088786
 
 {-| __C declaration:__ @WL_SHM_FORMAT_BGRA4444@
 
@@ -1677,8 +1677,8 @@ pattern WL_SHM_FORMAT_RGBA4444 = Wl_shm_format 842088786
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_BGRA4444 :: Wl_shm_format
-pattern WL_SHM_FORMAT_BGRA4444 = Wl_shm_format 842088770
+pattern WL_SHM_FORMAT_BGRA4444 :: WlShmFormat
+pattern WL_SHM_FORMAT_BGRA4444 = WlShmFormat 842088770
 
 {-| __C declaration:__ @WL_SHM_FORMAT_XRGB1555@
 
@@ -1686,8 +1686,8 @@ pattern WL_SHM_FORMAT_BGRA4444 = Wl_shm_format 842088770
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_XRGB1555 :: Wl_shm_format
-pattern WL_SHM_FORMAT_XRGB1555 = Wl_shm_format 892424792
+pattern WL_SHM_FORMAT_XRGB1555 :: WlShmFormat
+pattern WL_SHM_FORMAT_XRGB1555 = WlShmFormat 892424792
 
 {-| __C declaration:__ @WL_SHM_FORMAT_XBGR1555@
 
@@ -1695,8 +1695,8 @@ pattern WL_SHM_FORMAT_XRGB1555 = Wl_shm_format 892424792
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_XBGR1555 :: Wl_shm_format
-pattern WL_SHM_FORMAT_XBGR1555 = Wl_shm_format 892420696
+pattern WL_SHM_FORMAT_XBGR1555 :: WlShmFormat
+pattern WL_SHM_FORMAT_XBGR1555 = WlShmFormat 892420696
 
 {-| __C declaration:__ @WL_SHM_FORMAT_RGBX5551@
 
@@ -1704,8 +1704,8 @@ pattern WL_SHM_FORMAT_XBGR1555 = Wl_shm_format 892420696
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_RGBX5551 :: Wl_shm_format
-pattern WL_SHM_FORMAT_RGBX5551 = Wl_shm_format 892426322
+pattern WL_SHM_FORMAT_RGBX5551 :: WlShmFormat
+pattern WL_SHM_FORMAT_RGBX5551 = WlShmFormat 892426322
 
 {-| __C declaration:__ @WL_SHM_FORMAT_BGRX5551@
 
@@ -1713,8 +1713,8 @@ pattern WL_SHM_FORMAT_RGBX5551 = Wl_shm_format 892426322
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_BGRX5551 :: Wl_shm_format
-pattern WL_SHM_FORMAT_BGRX5551 = Wl_shm_format 892426306
+pattern WL_SHM_FORMAT_BGRX5551 :: WlShmFormat
+pattern WL_SHM_FORMAT_BGRX5551 = WlShmFormat 892426306
 
 {-| __C declaration:__ @WL_SHM_FORMAT_ARGB1555@
 
@@ -1722,8 +1722,8 @@ pattern WL_SHM_FORMAT_BGRX5551 = Wl_shm_format 892426306
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_ARGB1555 :: Wl_shm_format
-pattern WL_SHM_FORMAT_ARGB1555 = Wl_shm_format 892424769
+pattern WL_SHM_FORMAT_ARGB1555 :: WlShmFormat
+pattern WL_SHM_FORMAT_ARGB1555 = WlShmFormat 892424769
 
 {-| __C declaration:__ @WL_SHM_FORMAT_ABGR1555@
 
@@ -1731,8 +1731,8 @@ pattern WL_SHM_FORMAT_ARGB1555 = Wl_shm_format 892424769
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_ABGR1555 :: Wl_shm_format
-pattern WL_SHM_FORMAT_ABGR1555 = Wl_shm_format 892420673
+pattern WL_SHM_FORMAT_ABGR1555 :: WlShmFormat
+pattern WL_SHM_FORMAT_ABGR1555 = WlShmFormat 892420673
 
 {-| __C declaration:__ @WL_SHM_FORMAT_RGBA5551@
 
@@ -1740,8 +1740,8 @@ pattern WL_SHM_FORMAT_ABGR1555 = Wl_shm_format 892420673
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_RGBA5551 :: Wl_shm_format
-pattern WL_SHM_FORMAT_RGBA5551 = Wl_shm_format 892420434
+pattern WL_SHM_FORMAT_RGBA5551 :: WlShmFormat
+pattern WL_SHM_FORMAT_RGBA5551 = WlShmFormat 892420434
 
 {-| __C declaration:__ @WL_SHM_FORMAT_BGRA5551@
 
@@ -1749,8 +1749,8 @@ pattern WL_SHM_FORMAT_RGBA5551 = Wl_shm_format 892420434
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_BGRA5551 :: Wl_shm_format
-pattern WL_SHM_FORMAT_BGRA5551 = Wl_shm_format 892420418
+pattern WL_SHM_FORMAT_BGRA5551 :: WlShmFormat
+pattern WL_SHM_FORMAT_BGRA5551 = WlShmFormat 892420418
 
 {-| __C declaration:__ @WL_SHM_FORMAT_RGB565@
 
@@ -1758,8 +1758,8 @@ pattern WL_SHM_FORMAT_BGRA5551 = Wl_shm_format 892420418
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_RGB565 :: Wl_shm_format
-pattern WL_SHM_FORMAT_RGB565 = Wl_shm_format 909199186
+pattern WL_SHM_FORMAT_RGB565 :: WlShmFormat
+pattern WL_SHM_FORMAT_RGB565 = WlShmFormat 909199186
 
 {-| __C declaration:__ @WL_SHM_FORMAT_BGR565@
 
@@ -1767,8 +1767,8 @@ pattern WL_SHM_FORMAT_RGB565 = Wl_shm_format 909199186
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_BGR565 :: Wl_shm_format
-pattern WL_SHM_FORMAT_BGR565 = Wl_shm_format 909199170
+pattern WL_SHM_FORMAT_BGR565 :: WlShmFormat
+pattern WL_SHM_FORMAT_BGR565 = WlShmFormat 909199170
 
 {-| __C declaration:__ @WL_SHM_FORMAT_RGB888@
 
@@ -1776,8 +1776,8 @@ pattern WL_SHM_FORMAT_BGR565 = Wl_shm_format 909199170
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_RGB888 :: Wl_shm_format
-pattern WL_SHM_FORMAT_RGB888 = Wl_shm_format 875710290
+pattern WL_SHM_FORMAT_RGB888 :: WlShmFormat
+pattern WL_SHM_FORMAT_RGB888 = WlShmFormat 875710290
 
 {-| __C declaration:__ @WL_SHM_FORMAT_BGR888@
 
@@ -1785,8 +1785,8 @@ pattern WL_SHM_FORMAT_RGB888 = Wl_shm_format 875710290
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_BGR888 :: Wl_shm_format
-pattern WL_SHM_FORMAT_BGR888 = Wl_shm_format 875710274
+pattern WL_SHM_FORMAT_BGR888 :: WlShmFormat
+pattern WL_SHM_FORMAT_BGR888 = WlShmFormat 875710274
 
 {-| __C declaration:__ @WL_SHM_FORMAT_XBGR8888@
 
@@ -1794,8 +1794,8 @@ pattern WL_SHM_FORMAT_BGR888 = Wl_shm_format 875710274
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_XBGR8888 :: Wl_shm_format
-pattern WL_SHM_FORMAT_XBGR8888 = Wl_shm_format 875709016
+pattern WL_SHM_FORMAT_XBGR8888 :: WlShmFormat
+pattern WL_SHM_FORMAT_XBGR8888 = WlShmFormat 875709016
 
 {-| __C declaration:__ @WL_SHM_FORMAT_RGBX8888@
 
@@ -1803,8 +1803,8 @@ pattern WL_SHM_FORMAT_XBGR8888 = Wl_shm_format 875709016
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_RGBX8888 :: Wl_shm_format
-pattern WL_SHM_FORMAT_RGBX8888 = Wl_shm_format 875714642
+pattern WL_SHM_FORMAT_RGBX8888 :: WlShmFormat
+pattern WL_SHM_FORMAT_RGBX8888 = WlShmFormat 875714642
 
 {-| __C declaration:__ @WL_SHM_FORMAT_BGRX8888@
 
@@ -1812,8 +1812,8 @@ pattern WL_SHM_FORMAT_RGBX8888 = Wl_shm_format 875714642
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_BGRX8888 :: Wl_shm_format
-pattern WL_SHM_FORMAT_BGRX8888 = Wl_shm_format 875714626
+pattern WL_SHM_FORMAT_BGRX8888 :: WlShmFormat
+pattern WL_SHM_FORMAT_BGRX8888 = WlShmFormat 875714626
 
 {-| __C declaration:__ @WL_SHM_FORMAT_ABGR8888@
 
@@ -1821,8 +1821,8 @@ pattern WL_SHM_FORMAT_BGRX8888 = Wl_shm_format 875714626
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_ABGR8888 :: Wl_shm_format
-pattern WL_SHM_FORMAT_ABGR8888 = Wl_shm_format 875708993
+pattern WL_SHM_FORMAT_ABGR8888 :: WlShmFormat
+pattern WL_SHM_FORMAT_ABGR8888 = WlShmFormat 875708993
 
 {-| __C declaration:__ @WL_SHM_FORMAT_RGBA8888@
 
@@ -1830,8 +1830,8 @@ pattern WL_SHM_FORMAT_ABGR8888 = Wl_shm_format 875708993
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_RGBA8888 :: Wl_shm_format
-pattern WL_SHM_FORMAT_RGBA8888 = Wl_shm_format 875708754
+pattern WL_SHM_FORMAT_RGBA8888 :: WlShmFormat
+pattern WL_SHM_FORMAT_RGBA8888 = WlShmFormat 875708754
 
 {-| __C declaration:__ @WL_SHM_FORMAT_BGRA8888@
 
@@ -1839,8 +1839,8 @@ pattern WL_SHM_FORMAT_RGBA8888 = Wl_shm_format 875708754
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_BGRA8888 :: Wl_shm_format
-pattern WL_SHM_FORMAT_BGRA8888 = Wl_shm_format 875708738
+pattern WL_SHM_FORMAT_BGRA8888 :: WlShmFormat
+pattern WL_SHM_FORMAT_BGRA8888 = WlShmFormat 875708738
 
 {-| __C declaration:__ @WL_SHM_FORMAT_XRGB2101010@
 
@@ -1848,8 +1848,8 @@ pattern WL_SHM_FORMAT_BGRA8888 = Wl_shm_format 875708738
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_XRGB2101010 :: Wl_shm_format
-pattern WL_SHM_FORMAT_XRGB2101010 = Wl_shm_format 808669784
+pattern WL_SHM_FORMAT_XRGB2101010 :: WlShmFormat
+pattern WL_SHM_FORMAT_XRGB2101010 = WlShmFormat 808669784
 
 {-| __C declaration:__ @WL_SHM_FORMAT_XBGR2101010@
 
@@ -1857,8 +1857,8 @@ pattern WL_SHM_FORMAT_XRGB2101010 = Wl_shm_format 808669784
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_XBGR2101010 :: Wl_shm_format
-pattern WL_SHM_FORMAT_XBGR2101010 = Wl_shm_format 808665688
+pattern WL_SHM_FORMAT_XBGR2101010 :: WlShmFormat
+pattern WL_SHM_FORMAT_XBGR2101010 = WlShmFormat 808665688
 
 {-| __C declaration:__ @WL_SHM_FORMAT_RGBX1010102@
 
@@ -1866,8 +1866,8 @@ pattern WL_SHM_FORMAT_XBGR2101010 = Wl_shm_format 808665688
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_RGBX1010102 :: Wl_shm_format
-pattern WL_SHM_FORMAT_RGBX1010102 = Wl_shm_format 808671314
+pattern WL_SHM_FORMAT_RGBX1010102 :: WlShmFormat
+pattern WL_SHM_FORMAT_RGBX1010102 = WlShmFormat 808671314
 
 {-| __C declaration:__ @WL_SHM_FORMAT_BGRX1010102@
 
@@ -1875,8 +1875,8 @@ pattern WL_SHM_FORMAT_RGBX1010102 = Wl_shm_format 808671314
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_BGRX1010102 :: Wl_shm_format
-pattern WL_SHM_FORMAT_BGRX1010102 = Wl_shm_format 808671298
+pattern WL_SHM_FORMAT_BGRX1010102 :: WlShmFormat
+pattern WL_SHM_FORMAT_BGRX1010102 = WlShmFormat 808671298
 
 {-| __C declaration:__ @WL_SHM_FORMAT_ARGB2101010@
 
@@ -1884,8 +1884,8 @@ pattern WL_SHM_FORMAT_BGRX1010102 = Wl_shm_format 808671298
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_ARGB2101010 :: Wl_shm_format
-pattern WL_SHM_FORMAT_ARGB2101010 = Wl_shm_format 808669761
+pattern WL_SHM_FORMAT_ARGB2101010 :: WlShmFormat
+pattern WL_SHM_FORMAT_ARGB2101010 = WlShmFormat 808669761
 
 {-| __C declaration:__ @WL_SHM_FORMAT_ABGR2101010@
 
@@ -1893,8 +1893,8 @@ pattern WL_SHM_FORMAT_ARGB2101010 = Wl_shm_format 808669761
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_ABGR2101010 :: Wl_shm_format
-pattern WL_SHM_FORMAT_ABGR2101010 = Wl_shm_format 808665665
+pattern WL_SHM_FORMAT_ABGR2101010 :: WlShmFormat
+pattern WL_SHM_FORMAT_ABGR2101010 = WlShmFormat 808665665
 
 {-| __C declaration:__ @WL_SHM_FORMAT_RGBA1010102@
 
@@ -1902,8 +1902,8 @@ pattern WL_SHM_FORMAT_ABGR2101010 = Wl_shm_format 808665665
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_RGBA1010102 :: Wl_shm_format
-pattern WL_SHM_FORMAT_RGBA1010102 = Wl_shm_format 808665426
+pattern WL_SHM_FORMAT_RGBA1010102 :: WlShmFormat
+pattern WL_SHM_FORMAT_RGBA1010102 = WlShmFormat 808665426
 
 {-| __C declaration:__ @WL_SHM_FORMAT_BGRA1010102@
 
@@ -1911,8 +1911,8 @@ pattern WL_SHM_FORMAT_RGBA1010102 = Wl_shm_format 808665426
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_BGRA1010102 :: Wl_shm_format
-pattern WL_SHM_FORMAT_BGRA1010102 = Wl_shm_format 808665410
+pattern WL_SHM_FORMAT_BGRA1010102 :: WlShmFormat
+pattern WL_SHM_FORMAT_BGRA1010102 = WlShmFormat 808665410
 
 {-| __C declaration:__ @WL_SHM_FORMAT_YUYV@
 
@@ -1920,8 +1920,8 @@ pattern WL_SHM_FORMAT_BGRA1010102 = Wl_shm_format 808665410
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_YUYV :: Wl_shm_format
-pattern WL_SHM_FORMAT_YUYV = Wl_shm_format 1448695129
+pattern WL_SHM_FORMAT_YUYV :: WlShmFormat
+pattern WL_SHM_FORMAT_YUYV = WlShmFormat 1448695129
 
 {-| __C declaration:__ @WL_SHM_FORMAT_YVYU@
 
@@ -1929,8 +1929,8 @@ pattern WL_SHM_FORMAT_YUYV = Wl_shm_format 1448695129
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_YVYU :: Wl_shm_format
-pattern WL_SHM_FORMAT_YVYU = Wl_shm_format 1431918169
+pattern WL_SHM_FORMAT_YVYU :: WlShmFormat
+pattern WL_SHM_FORMAT_YVYU = WlShmFormat 1431918169
 
 {-| __C declaration:__ @WL_SHM_FORMAT_UYVY@
 
@@ -1938,8 +1938,8 @@ pattern WL_SHM_FORMAT_YVYU = Wl_shm_format 1431918169
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_UYVY :: Wl_shm_format
-pattern WL_SHM_FORMAT_UYVY = Wl_shm_format 1498831189
+pattern WL_SHM_FORMAT_UYVY :: WlShmFormat
+pattern WL_SHM_FORMAT_UYVY = WlShmFormat 1498831189
 
 {-| __C declaration:__ @WL_SHM_FORMAT_VYUY@
 
@@ -1947,8 +1947,8 @@ pattern WL_SHM_FORMAT_UYVY = Wl_shm_format 1498831189
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_VYUY :: Wl_shm_format
-pattern WL_SHM_FORMAT_VYUY = Wl_shm_format 1498765654
+pattern WL_SHM_FORMAT_VYUY :: WlShmFormat
+pattern WL_SHM_FORMAT_VYUY = WlShmFormat 1498765654
 
 {-| __C declaration:__ @WL_SHM_FORMAT_AYUV@
 
@@ -1956,8 +1956,8 @@ pattern WL_SHM_FORMAT_VYUY = Wl_shm_format 1498765654
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_AYUV :: Wl_shm_format
-pattern WL_SHM_FORMAT_AYUV = Wl_shm_format 1448433985
+pattern WL_SHM_FORMAT_AYUV :: WlShmFormat
+pattern WL_SHM_FORMAT_AYUV = WlShmFormat 1448433985
 
 {-| __C declaration:__ @WL_SHM_FORMAT_NV12@
 
@@ -1965,8 +1965,8 @@ pattern WL_SHM_FORMAT_AYUV = Wl_shm_format 1448433985
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_NV12 :: Wl_shm_format
-pattern WL_SHM_FORMAT_NV12 = Wl_shm_format 842094158
+pattern WL_SHM_FORMAT_NV12 :: WlShmFormat
+pattern WL_SHM_FORMAT_NV12 = WlShmFormat 842094158
 
 {-| __C declaration:__ @WL_SHM_FORMAT_NV21@
 
@@ -1974,8 +1974,8 @@ pattern WL_SHM_FORMAT_NV12 = Wl_shm_format 842094158
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_NV21 :: Wl_shm_format
-pattern WL_SHM_FORMAT_NV21 = Wl_shm_format 825382478
+pattern WL_SHM_FORMAT_NV21 :: WlShmFormat
+pattern WL_SHM_FORMAT_NV21 = WlShmFormat 825382478
 
 {-| __C declaration:__ @WL_SHM_FORMAT_NV16@
 
@@ -1983,8 +1983,8 @@ pattern WL_SHM_FORMAT_NV21 = Wl_shm_format 825382478
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_NV16 :: Wl_shm_format
-pattern WL_SHM_FORMAT_NV16 = Wl_shm_format 909203022
+pattern WL_SHM_FORMAT_NV16 :: WlShmFormat
+pattern WL_SHM_FORMAT_NV16 = WlShmFormat 909203022
 
 {-| __C declaration:__ @WL_SHM_FORMAT_NV61@
 
@@ -1992,8 +1992,8 @@ pattern WL_SHM_FORMAT_NV16 = Wl_shm_format 909203022
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_NV61 :: Wl_shm_format
-pattern WL_SHM_FORMAT_NV61 = Wl_shm_format 825644622
+pattern WL_SHM_FORMAT_NV61 :: WlShmFormat
+pattern WL_SHM_FORMAT_NV61 = WlShmFormat 825644622
 
 {-| __C declaration:__ @WL_SHM_FORMAT_YUV410@
 
@@ -2001,8 +2001,8 @@ pattern WL_SHM_FORMAT_NV61 = Wl_shm_format 825644622
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_YUV410 :: Wl_shm_format
-pattern WL_SHM_FORMAT_YUV410 = Wl_shm_format 961959257
+pattern WL_SHM_FORMAT_YUV410 :: WlShmFormat
+pattern WL_SHM_FORMAT_YUV410 = WlShmFormat 961959257
 
 {-| __C declaration:__ @WL_SHM_FORMAT_YVU410@
 
@@ -2010,8 +2010,8 @@ pattern WL_SHM_FORMAT_YUV410 = Wl_shm_format 961959257
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_YVU410 :: Wl_shm_format
-pattern WL_SHM_FORMAT_YVU410 = Wl_shm_format 961893977
+pattern WL_SHM_FORMAT_YVU410 :: WlShmFormat
+pattern WL_SHM_FORMAT_YVU410 = WlShmFormat 961893977
 
 {-| __C declaration:__ @WL_SHM_FORMAT_YUV411@
 
@@ -2019,8 +2019,8 @@ pattern WL_SHM_FORMAT_YVU410 = Wl_shm_format 961893977
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_YUV411 :: Wl_shm_format
-pattern WL_SHM_FORMAT_YUV411 = Wl_shm_format 825316697
+pattern WL_SHM_FORMAT_YUV411 :: WlShmFormat
+pattern WL_SHM_FORMAT_YUV411 = WlShmFormat 825316697
 
 {-| __C declaration:__ @WL_SHM_FORMAT_YVU411@
 
@@ -2028,8 +2028,8 @@ pattern WL_SHM_FORMAT_YUV411 = Wl_shm_format 825316697
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_YVU411 :: Wl_shm_format
-pattern WL_SHM_FORMAT_YVU411 = Wl_shm_format 825316953
+pattern WL_SHM_FORMAT_YVU411 :: WlShmFormat
+pattern WL_SHM_FORMAT_YVU411 = WlShmFormat 825316953
 
 {-| __C declaration:__ @WL_SHM_FORMAT_YUV420@
 
@@ -2037,8 +2037,8 @@ pattern WL_SHM_FORMAT_YVU411 = Wl_shm_format 825316953
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_YUV420 :: Wl_shm_format
-pattern WL_SHM_FORMAT_YUV420 = Wl_shm_format 842093913
+pattern WL_SHM_FORMAT_YUV420 :: WlShmFormat
+pattern WL_SHM_FORMAT_YUV420 = WlShmFormat 842093913
 
 {-| __C declaration:__ @WL_SHM_FORMAT_YVU420@
 
@@ -2046,8 +2046,8 @@ pattern WL_SHM_FORMAT_YUV420 = Wl_shm_format 842093913
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_YVU420 :: Wl_shm_format
-pattern WL_SHM_FORMAT_YVU420 = Wl_shm_format 842094169
+pattern WL_SHM_FORMAT_YVU420 :: WlShmFormat
+pattern WL_SHM_FORMAT_YVU420 = WlShmFormat 842094169
 
 {-| __C declaration:__ @WL_SHM_FORMAT_YUV422@
 
@@ -2055,8 +2055,8 @@ pattern WL_SHM_FORMAT_YVU420 = Wl_shm_format 842094169
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_YUV422 :: Wl_shm_format
-pattern WL_SHM_FORMAT_YUV422 = Wl_shm_format 909202777
+pattern WL_SHM_FORMAT_YUV422 :: WlShmFormat
+pattern WL_SHM_FORMAT_YUV422 = WlShmFormat 909202777
 
 {-| __C declaration:__ @WL_SHM_FORMAT_YVU422@
 
@@ -2064,8 +2064,8 @@ pattern WL_SHM_FORMAT_YUV422 = Wl_shm_format 909202777
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_YVU422 :: Wl_shm_format
-pattern WL_SHM_FORMAT_YVU422 = Wl_shm_format 909203033
+pattern WL_SHM_FORMAT_YVU422 :: WlShmFormat
+pattern WL_SHM_FORMAT_YVU422 = WlShmFormat 909203033
 
 {-| __C declaration:__ @WL_SHM_FORMAT_YUV444@
 
@@ -2073,8 +2073,8 @@ pattern WL_SHM_FORMAT_YVU422 = Wl_shm_format 909203033
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_YUV444 :: Wl_shm_format
-pattern WL_SHM_FORMAT_YUV444 = Wl_shm_format 875713881
+pattern WL_SHM_FORMAT_YUV444 :: WlShmFormat
+pattern WL_SHM_FORMAT_YUV444 = WlShmFormat 875713881
 
 {-| __C declaration:__ @WL_SHM_FORMAT_YVU444@
 
@@ -2082,8 +2082,8 @@ pattern WL_SHM_FORMAT_YUV444 = Wl_shm_format 875713881
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_YVU444 :: Wl_shm_format
-pattern WL_SHM_FORMAT_YVU444 = Wl_shm_format 875714137
+pattern WL_SHM_FORMAT_YVU444 :: WlShmFormat
+pattern WL_SHM_FORMAT_YVU444 = WlShmFormat 875714137
 
 {-| __C declaration:__ @WL_SHM_FORMAT_R8@
 
@@ -2091,8 +2091,8 @@ pattern WL_SHM_FORMAT_YVU444 = Wl_shm_format 875714137
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_R8 :: Wl_shm_format
-pattern WL_SHM_FORMAT_R8 = Wl_shm_format 538982482
+pattern WL_SHM_FORMAT_R8 :: WlShmFormat
+pattern WL_SHM_FORMAT_R8 = WlShmFormat 538982482
 
 {-| __C declaration:__ @WL_SHM_FORMAT_R16@
 
@@ -2100,8 +2100,8 @@ pattern WL_SHM_FORMAT_R8 = Wl_shm_format 538982482
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_R16 :: Wl_shm_format
-pattern WL_SHM_FORMAT_R16 = Wl_shm_format 540422482
+pattern WL_SHM_FORMAT_R16 :: WlShmFormat
+pattern WL_SHM_FORMAT_R16 = WlShmFormat 540422482
 
 {-| __C declaration:__ @WL_SHM_FORMAT_RG88@
 
@@ -2109,8 +2109,8 @@ pattern WL_SHM_FORMAT_R16 = Wl_shm_format 540422482
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_RG88 :: Wl_shm_format
-pattern WL_SHM_FORMAT_RG88 = Wl_shm_format 943212370
+pattern WL_SHM_FORMAT_RG88 :: WlShmFormat
+pattern WL_SHM_FORMAT_RG88 = WlShmFormat 943212370
 
 {-| __C declaration:__ @WL_SHM_FORMAT_GR88@
 
@@ -2118,8 +2118,8 @@ pattern WL_SHM_FORMAT_RG88 = Wl_shm_format 943212370
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_GR88 :: Wl_shm_format
-pattern WL_SHM_FORMAT_GR88 = Wl_shm_format 943215175
+pattern WL_SHM_FORMAT_GR88 :: WlShmFormat
+pattern WL_SHM_FORMAT_GR88 = WlShmFormat 943215175
 
 {-| __C declaration:__ @WL_SHM_FORMAT_RG1616@
 
@@ -2127,8 +2127,8 @@ pattern WL_SHM_FORMAT_GR88 = Wl_shm_format 943215175
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_RG1616 :: Wl_shm_format
-pattern WL_SHM_FORMAT_RG1616 = Wl_shm_format 842221394
+pattern WL_SHM_FORMAT_RG1616 :: WlShmFormat
+pattern WL_SHM_FORMAT_RG1616 = WlShmFormat 842221394
 
 {-| __C declaration:__ @WL_SHM_FORMAT_GR1616@
 
@@ -2136,8 +2136,8 @@ pattern WL_SHM_FORMAT_RG1616 = Wl_shm_format 842221394
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_GR1616 :: Wl_shm_format
-pattern WL_SHM_FORMAT_GR1616 = Wl_shm_format 842224199
+pattern WL_SHM_FORMAT_GR1616 :: WlShmFormat
+pattern WL_SHM_FORMAT_GR1616 = WlShmFormat 842224199
 
 {-| __C declaration:__ @WL_SHM_FORMAT_XRGB16161616F@
 
@@ -2145,8 +2145,8 @@ pattern WL_SHM_FORMAT_GR1616 = Wl_shm_format 842224199
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_XRGB16161616F :: Wl_shm_format
-pattern WL_SHM_FORMAT_XRGB16161616F = Wl_shm_format 1211388504
+pattern WL_SHM_FORMAT_XRGB16161616F :: WlShmFormat
+pattern WL_SHM_FORMAT_XRGB16161616F = WlShmFormat 1211388504
 
 {-| __C declaration:__ @WL_SHM_FORMAT_XBGR16161616F@
 
@@ -2154,8 +2154,8 @@ pattern WL_SHM_FORMAT_XRGB16161616F = Wl_shm_format 1211388504
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_XBGR16161616F :: Wl_shm_format
-pattern WL_SHM_FORMAT_XBGR16161616F = Wl_shm_format 1211384408
+pattern WL_SHM_FORMAT_XBGR16161616F :: WlShmFormat
+pattern WL_SHM_FORMAT_XBGR16161616F = WlShmFormat 1211384408
 
 {-| __C declaration:__ @WL_SHM_FORMAT_ARGB16161616F@
 
@@ -2163,8 +2163,8 @@ pattern WL_SHM_FORMAT_XBGR16161616F = Wl_shm_format 1211384408
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_ARGB16161616F :: Wl_shm_format
-pattern WL_SHM_FORMAT_ARGB16161616F = Wl_shm_format 1211388481
+pattern WL_SHM_FORMAT_ARGB16161616F :: WlShmFormat
+pattern WL_SHM_FORMAT_ARGB16161616F = WlShmFormat 1211388481
 
 {-| __C declaration:__ @WL_SHM_FORMAT_ABGR16161616F@
 
@@ -2172,8 +2172,8 @@ pattern WL_SHM_FORMAT_ARGB16161616F = Wl_shm_format 1211388481
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_ABGR16161616F :: Wl_shm_format
-pattern WL_SHM_FORMAT_ABGR16161616F = Wl_shm_format 1211384385
+pattern WL_SHM_FORMAT_ABGR16161616F :: WlShmFormat
+pattern WL_SHM_FORMAT_ABGR16161616F = WlShmFormat 1211384385
 
 {-| __C declaration:__ @WL_SHM_FORMAT_XYUV8888@
 
@@ -2181,8 +2181,8 @@ pattern WL_SHM_FORMAT_ABGR16161616F = Wl_shm_format 1211384385
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_XYUV8888 :: Wl_shm_format
-pattern WL_SHM_FORMAT_XYUV8888 = Wl_shm_format 1448434008
+pattern WL_SHM_FORMAT_XYUV8888 :: WlShmFormat
+pattern WL_SHM_FORMAT_XYUV8888 = WlShmFormat 1448434008
 
 {-| __C declaration:__ @WL_SHM_FORMAT_VUY888@
 
@@ -2190,8 +2190,8 @@ pattern WL_SHM_FORMAT_XYUV8888 = Wl_shm_format 1448434008
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_VUY888 :: Wl_shm_format
-pattern WL_SHM_FORMAT_VUY888 = Wl_shm_format 875713878
+pattern WL_SHM_FORMAT_VUY888 :: WlShmFormat
+pattern WL_SHM_FORMAT_VUY888 = WlShmFormat 875713878
 
 {-| __C declaration:__ @WL_SHM_FORMAT_VUY101010@
 
@@ -2199,8 +2199,8 @@ pattern WL_SHM_FORMAT_VUY888 = Wl_shm_format 875713878
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_VUY101010 :: Wl_shm_format
-pattern WL_SHM_FORMAT_VUY101010 = Wl_shm_format 808670550
+pattern WL_SHM_FORMAT_VUY101010 :: WlShmFormat
+pattern WL_SHM_FORMAT_VUY101010 = WlShmFormat 808670550
 
 {-| __C declaration:__ @WL_SHM_FORMAT_Y210@
 
@@ -2208,8 +2208,8 @@ pattern WL_SHM_FORMAT_VUY101010 = Wl_shm_format 808670550
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_Y210 :: Wl_shm_format
-pattern WL_SHM_FORMAT_Y210 = Wl_shm_format 808530521
+pattern WL_SHM_FORMAT_Y210 :: WlShmFormat
+pattern WL_SHM_FORMAT_Y210 = WlShmFormat 808530521
 
 {-| __C declaration:__ @WL_SHM_FORMAT_Y212@
 
@@ -2217,8 +2217,8 @@ pattern WL_SHM_FORMAT_Y210 = Wl_shm_format 808530521
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_Y212 :: Wl_shm_format
-pattern WL_SHM_FORMAT_Y212 = Wl_shm_format 842084953
+pattern WL_SHM_FORMAT_Y212 :: WlShmFormat
+pattern WL_SHM_FORMAT_Y212 = WlShmFormat 842084953
 
 {-| __C declaration:__ @WL_SHM_FORMAT_Y216@
 
@@ -2226,8 +2226,8 @@ pattern WL_SHM_FORMAT_Y212 = Wl_shm_format 842084953
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_Y216 :: Wl_shm_format
-pattern WL_SHM_FORMAT_Y216 = Wl_shm_format 909193817
+pattern WL_SHM_FORMAT_Y216 :: WlShmFormat
+pattern WL_SHM_FORMAT_Y216 = WlShmFormat 909193817
 
 {-| __C declaration:__ @WL_SHM_FORMAT_Y410@
 
@@ -2235,8 +2235,8 @@ pattern WL_SHM_FORMAT_Y216 = Wl_shm_format 909193817
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_Y410 :: Wl_shm_format
-pattern WL_SHM_FORMAT_Y410 = Wl_shm_format 808531033
+pattern WL_SHM_FORMAT_Y410 :: WlShmFormat
+pattern WL_SHM_FORMAT_Y410 = WlShmFormat 808531033
 
 {-| __C declaration:__ @WL_SHM_FORMAT_Y412@
 
@@ -2244,8 +2244,8 @@ pattern WL_SHM_FORMAT_Y410 = Wl_shm_format 808531033
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_Y412 :: Wl_shm_format
-pattern WL_SHM_FORMAT_Y412 = Wl_shm_format 842085465
+pattern WL_SHM_FORMAT_Y412 :: WlShmFormat
+pattern WL_SHM_FORMAT_Y412 = WlShmFormat 842085465
 
 {-| __C declaration:__ @WL_SHM_FORMAT_Y416@
 
@@ -2253,8 +2253,8 @@ pattern WL_SHM_FORMAT_Y412 = Wl_shm_format 842085465
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_Y416 :: Wl_shm_format
-pattern WL_SHM_FORMAT_Y416 = Wl_shm_format 909194329
+pattern WL_SHM_FORMAT_Y416 :: WlShmFormat
+pattern WL_SHM_FORMAT_Y416 = WlShmFormat 909194329
 
 {-| __C declaration:__ @WL_SHM_FORMAT_XVYU2101010@
 
@@ -2262,8 +2262,8 @@ pattern WL_SHM_FORMAT_Y416 = Wl_shm_format 909194329
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_XVYU2101010 :: Wl_shm_format
-pattern WL_SHM_FORMAT_XVYU2101010 = Wl_shm_format 808670808
+pattern WL_SHM_FORMAT_XVYU2101010 :: WlShmFormat
+pattern WL_SHM_FORMAT_XVYU2101010 = WlShmFormat 808670808
 
 {-| __C declaration:__ @WL_SHM_FORMAT_XVYU12_16161616@
 
@@ -2271,8 +2271,8 @@ pattern WL_SHM_FORMAT_XVYU2101010 = Wl_shm_format 808670808
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_XVYU12_16161616 :: Wl_shm_format
-pattern WL_SHM_FORMAT_XVYU12_16161616 = Wl_shm_format 909334104
+pattern WL_SHM_FORMAT_XVYU12_16161616 :: WlShmFormat
+pattern WL_SHM_FORMAT_XVYU12_16161616 = WlShmFormat 909334104
 
 {-| __C declaration:__ @WL_SHM_FORMAT_XVYU16161616@
 
@@ -2280,8 +2280,8 @@ pattern WL_SHM_FORMAT_XVYU12_16161616 = Wl_shm_format 909334104
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_XVYU16161616 :: Wl_shm_format
-pattern WL_SHM_FORMAT_XVYU16161616 = Wl_shm_format 942954072
+pattern WL_SHM_FORMAT_XVYU16161616 :: WlShmFormat
+pattern WL_SHM_FORMAT_XVYU16161616 = WlShmFormat 942954072
 
 {-| __C declaration:__ @WL_SHM_FORMAT_Y0L0@
 
@@ -2289,8 +2289,8 @@ pattern WL_SHM_FORMAT_XVYU16161616 = Wl_shm_format 942954072
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_Y0L0 :: Wl_shm_format
-pattern WL_SHM_FORMAT_Y0L0 = Wl_shm_format 810299481
+pattern WL_SHM_FORMAT_Y0L0 :: WlShmFormat
+pattern WL_SHM_FORMAT_Y0L0 = WlShmFormat 810299481
 
 {-| __C declaration:__ @WL_SHM_FORMAT_X0L0@
 
@@ -2298,8 +2298,8 @@ pattern WL_SHM_FORMAT_Y0L0 = Wl_shm_format 810299481
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_X0L0 :: Wl_shm_format
-pattern WL_SHM_FORMAT_X0L0 = Wl_shm_format 810299480
+pattern WL_SHM_FORMAT_X0L0 :: WlShmFormat
+pattern WL_SHM_FORMAT_X0L0 = WlShmFormat 810299480
 
 {-| __C declaration:__ @WL_SHM_FORMAT_Y0L2@
 
@@ -2307,8 +2307,8 @@ pattern WL_SHM_FORMAT_X0L0 = Wl_shm_format 810299480
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_Y0L2 :: Wl_shm_format
-pattern WL_SHM_FORMAT_Y0L2 = Wl_shm_format 843853913
+pattern WL_SHM_FORMAT_Y0L2 :: WlShmFormat
+pattern WL_SHM_FORMAT_Y0L2 = WlShmFormat 843853913
 
 {-| __C declaration:__ @WL_SHM_FORMAT_X0L2@
 
@@ -2316,8 +2316,8 @@ pattern WL_SHM_FORMAT_Y0L2 = Wl_shm_format 843853913
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_X0L2 :: Wl_shm_format
-pattern WL_SHM_FORMAT_X0L2 = Wl_shm_format 843853912
+pattern WL_SHM_FORMAT_X0L2 :: WlShmFormat
+pattern WL_SHM_FORMAT_X0L2 = WlShmFormat 843853912
 
 {-| __C declaration:__ @WL_SHM_FORMAT_YUV420_8BIT@
 
@@ -2325,8 +2325,8 @@ pattern WL_SHM_FORMAT_X0L2 = Wl_shm_format 843853912
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_YUV420_8BIT :: Wl_shm_format
-pattern WL_SHM_FORMAT_YUV420_8BIT = Wl_shm_format 942691673
+pattern WL_SHM_FORMAT_YUV420_8BIT :: WlShmFormat
+pattern WL_SHM_FORMAT_YUV420_8BIT = WlShmFormat 942691673
 
 {-| __C declaration:__ @WL_SHM_FORMAT_YUV420_10BIT@
 
@@ -2334,8 +2334,8 @@ pattern WL_SHM_FORMAT_YUV420_8BIT = Wl_shm_format 942691673
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_YUV420_10BIT :: Wl_shm_format
-pattern WL_SHM_FORMAT_YUV420_10BIT = Wl_shm_format 808539481
+pattern WL_SHM_FORMAT_YUV420_10BIT :: WlShmFormat
+pattern WL_SHM_FORMAT_YUV420_10BIT = WlShmFormat 808539481
 
 {-| __C declaration:__ @WL_SHM_FORMAT_XRGB8888_A8@
 
@@ -2343,8 +2343,8 @@ pattern WL_SHM_FORMAT_YUV420_10BIT = Wl_shm_format 808539481
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_XRGB8888_A8 :: Wl_shm_format
-pattern WL_SHM_FORMAT_XRGB8888_A8 = Wl_shm_format 943805016
+pattern WL_SHM_FORMAT_XRGB8888_A8 :: WlShmFormat
+pattern WL_SHM_FORMAT_XRGB8888_A8 = WlShmFormat 943805016
 
 {-| __C declaration:__ @WL_SHM_FORMAT_XBGR8888_A8@
 
@@ -2352,8 +2352,8 @@ pattern WL_SHM_FORMAT_XRGB8888_A8 = Wl_shm_format 943805016
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_XBGR8888_A8 :: Wl_shm_format
-pattern WL_SHM_FORMAT_XBGR8888_A8 = Wl_shm_format 943800920
+pattern WL_SHM_FORMAT_XBGR8888_A8 :: WlShmFormat
+pattern WL_SHM_FORMAT_XBGR8888_A8 = WlShmFormat 943800920
 
 {-| __C declaration:__ @WL_SHM_FORMAT_RGBX8888_A8@
 
@@ -2361,8 +2361,8 @@ pattern WL_SHM_FORMAT_XBGR8888_A8 = Wl_shm_format 943800920
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_RGBX8888_A8 :: Wl_shm_format
-pattern WL_SHM_FORMAT_RGBX8888_A8 = Wl_shm_format 943806546
+pattern WL_SHM_FORMAT_RGBX8888_A8 :: WlShmFormat
+pattern WL_SHM_FORMAT_RGBX8888_A8 = WlShmFormat 943806546
 
 {-| __C declaration:__ @WL_SHM_FORMAT_BGRX8888_A8@
 
@@ -2370,8 +2370,8 @@ pattern WL_SHM_FORMAT_RGBX8888_A8 = Wl_shm_format 943806546
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_BGRX8888_A8 :: Wl_shm_format
-pattern WL_SHM_FORMAT_BGRX8888_A8 = Wl_shm_format 943806530
+pattern WL_SHM_FORMAT_BGRX8888_A8 :: WlShmFormat
+pattern WL_SHM_FORMAT_BGRX8888_A8 = WlShmFormat 943806530
 
 {-| __C declaration:__ @WL_SHM_FORMAT_RGB888_A8@
 
@@ -2379,8 +2379,8 @@ pattern WL_SHM_FORMAT_BGRX8888_A8 = Wl_shm_format 943806530
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_RGB888_A8 :: Wl_shm_format
-pattern WL_SHM_FORMAT_RGB888_A8 = Wl_shm_format 943798354
+pattern WL_SHM_FORMAT_RGB888_A8 :: WlShmFormat
+pattern WL_SHM_FORMAT_RGB888_A8 = WlShmFormat 943798354
 
 {-| __C declaration:__ @WL_SHM_FORMAT_BGR888_A8@
 
@@ -2388,8 +2388,8 @@ pattern WL_SHM_FORMAT_RGB888_A8 = Wl_shm_format 943798354
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_BGR888_A8 :: Wl_shm_format
-pattern WL_SHM_FORMAT_BGR888_A8 = Wl_shm_format 943798338
+pattern WL_SHM_FORMAT_BGR888_A8 :: WlShmFormat
+pattern WL_SHM_FORMAT_BGR888_A8 = WlShmFormat 943798338
 
 {-| __C declaration:__ @WL_SHM_FORMAT_RGB565_A8@
 
@@ -2397,8 +2397,8 @@ pattern WL_SHM_FORMAT_BGR888_A8 = Wl_shm_format 943798338
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_RGB565_A8 :: Wl_shm_format
-pattern WL_SHM_FORMAT_RGB565_A8 = Wl_shm_format 943797586
+pattern WL_SHM_FORMAT_RGB565_A8 :: WlShmFormat
+pattern WL_SHM_FORMAT_RGB565_A8 = WlShmFormat 943797586
 
 {-| __C declaration:__ @WL_SHM_FORMAT_BGR565_A8@
 
@@ -2406,8 +2406,8 @@ pattern WL_SHM_FORMAT_RGB565_A8 = Wl_shm_format 943797586
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_BGR565_A8 :: Wl_shm_format
-pattern WL_SHM_FORMAT_BGR565_A8 = Wl_shm_format 943797570
+pattern WL_SHM_FORMAT_BGR565_A8 :: WlShmFormat
+pattern WL_SHM_FORMAT_BGR565_A8 = WlShmFormat 943797570
 
 {-| __C declaration:__ @WL_SHM_FORMAT_NV24@
 
@@ -2415,8 +2415,8 @@ pattern WL_SHM_FORMAT_BGR565_A8 = Wl_shm_format 943797570
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_NV24 :: Wl_shm_format
-pattern WL_SHM_FORMAT_NV24 = Wl_shm_format 875714126
+pattern WL_SHM_FORMAT_NV24 :: WlShmFormat
+pattern WL_SHM_FORMAT_NV24 = WlShmFormat 875714126
 
 {-| __C declaration:__ @WL_SHM_FORMAT_NV42@
 
@@ -2424,8 +2424,8 @@ pattern WL_SHM_FORMAT_NV24 = Wl_shm_format 875714126
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_NV42 :: Wl_shm_format
-pattern WL_SHM_FORMAT_NV42 = Wl_shm_format 842290766
+pattern WL_SHM_FORMAT_NV42 :: WlShmFormat
+pattern WL_SHM_FORMAT_NV42 = WlShmFormat 842290766
 
 {-| __C declaration:__ @WL_SHM_FORMAT_P210@
 
@@ -2433,8 +2433,8 @@ pattern WL_SHM_FORMAT_NV42 = Wl_shm_format 842290766
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_P210 :: Wl_shm_format
-pattern WL_SHM_FORMAT_P210 = Wl_shm_format 808530512
+pattern WL_SHM_FORMAT_P210 :: WlShmFormat
+pattern WL_SHM_FORMAT_P210 = WlShmFormat 808530512
 
 {-| __C declaration:__ @WL_SHM_FORMAT_P010@
 
@@ -2442,8 +2442,8 @@ pattern WL_SHM_FORMAT_P210 = Wl_shm_format 808530512
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_P010 :: Wl_shm_format
-pattern WL_SHM_FORMAT_P010 = Wl_shm_format 808530000
+pattern WL_SHM_FORMAT_P010 :: WlShmFormat
+pattern WL_SHM_FORMAT_P010 = WlShmFormat 808530000
 
 {-| __C declaration:__ @WL_SHM_FORMAT_P012@
 
@@ -2451,8 +2451,8 @@ pattern WL_SHM_FORMAT_P010 = Wl_shm_format 808530000
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_P012 :: Wl_shm_format
-pattern WL_SHM_FORMAT_P012 = Wl_shm_format 842084432
+pattern WL_SHM_FORMAT_P012 :: WlShmFormat
+pattern WL_SHM_FORMAT_P012 = WlShmFormat 842084432
 
 {-| __C declaration:__ @WL_SHM_FORMAT_P016@
 
@@ -2460,8 +2460,8 @@ pattern WL_SHM_FORMAT_P012 = Wl_shm_format 842084432
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_P016 :: Wl_shm_format
-pattern WL_SHM_FORMAT_P016 = Wl_shm_format 909193296
+pattern WL_SHM_FORMAT_P016 :: WlShmFormat
+pattern WL_SHM_FORMAT_P016 = WlShmFormat 909193296
 
 {-| __C declaration:__ @WL_SHM_FORMAT_AXBXGXRX106106106106@
 
@@ -2469,8 +2469,8 @@ pattern WL_SHM_FORMAT_P016 = Wl_shm_format 909193296
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_AXBXGXRX106106106106 :: Wl_shm_format
-pattern WL_SHM_FORMAT_AXBXGXRX106106106106 = Wl_shm_format 808534593
+pattern WL_SHM_FORMAT_AXBXGXRX106106106106 :: WlShmFormat
+pattern WL_SHM_FORMAT_AXBXGXRX106106106106 = WlShmFormat 808534593
 
 {-| __C declaration:__ @WL_SHM_FORMAT_NV15@
 
@@ -2478,8 +2478,8 @@ pattern WL_SHM_FORMAT_AXBXGXRX106106106106 = Wl_shm_format 808534593
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_NV15 :: Wl_shm_format
-pattern WL_SHM_FORMAT_NV15 = Wl_shm_format 892425806
+pattern WL_SHM_FORMAT_NV15 :: WlShmFormat
+pattern WL_SHM_FORMAT_NV15 = WlShmFormat 892425806
 
 {-| __C declaration:__ @WL_SHM_FORMAT_Q410@
 
@@ -2487,8 +2487,8 @@ pattern WL_SHM_FORMAT_NV15 = Wl_shm_format 892425806
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_Q410 :: Wl_shm_format
-pattern WL_SHM_FORMAT_Q410 = Wl_shm_format 808531025
+pattern WL_SHM_FORMAT_Q410 :: WlShmFormat
+pattern WL_SHM_FORMAT_Q410 = WlShmFormat 808531025
 
 {-| __C declaration:__ @WL_SHM_FORMAT_Q401@
 
@@ -2496,8 +2496,8 @@ pattern WL_SHM_FORMAT_Q410 = Wl_shm_format 808531025
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_Q401 :: Wl_shm_format
-pattern WL_SHM_FORMAT_Q401 = Wl_shm_format 825242705
+pattern WL_SHM_FORMAT_Q401 :: WlShmFormat
+pattern WL_SHM_FORMAT_Q401 = WlShmFormat 825242705
 
 {-| __C declaration:__ @WL_SHM_FORMAT_XRGB16161616@
 
@@ -2505,8 +2505,8 @@ pattern WL_SHM_FORMAT_Q401 = Wl_shm_format 825242705
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_XRGB16161616 :: Wl_shm_format
-pattern WL_SHM_FORMAT_XRGB16161616 = Wl_shm_format 942953048
+pattern WL_SHM_FORMAT_XRGB16161616 :: WlShmFormat
+pattern WL_SHM_FORMAT_XRGB16161616 = WlShmFormat 942953048
 
 {-| __C declaration:__ @WL_SHM_FORMAT_XBGR16161616@
 
@@ -2514,8 +2514,8 @@ pattern WL_SHM_FORMAT_XRGB16161616 = Wl_shm_format 942953048
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_XBGR16161616 :: Wl_shm_format
-pattern WL_SHM_FORMAT_XBGR16161616 = Wl_shm_format 942948952
+pattern WL_SHM_FORMAT_XBGR16161616 :: WlShmFormat
+pattern WL_SHM_FORMAT_XBGR16161616 = WlShmFormat 942948952
 
 {-| __C declaration:__ @WL_SHM_FORMAT_ARGB16161616@
 
@@ -2523,8 +2523,8 @@ pattern WL_SHM_FORMAT_XBGR16161616 = Wl_shm_format 942948952
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_ARGB16161616 :: Wl_shm_format
-pattern WL_SHM_FORMAT_ARGB16161616 = Wl_shm_format 942953025
+pattern WL_SHM_FORMAT_ARGB16161616 :: WlShmFormat
+pattern WL_SHM_FORMAT_ARGB16161616 = WlShmFormat 942953025
 
 {-| __C declaration:__ @WL_SHM_FORMAT_ABGR16161616@
 
@@ -2532,8 +2532,8 @@ pattern WL_SHM_FORMAT_ARGB16161616 = Wl_shm_format 942953025
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_ABGR16161616 :: Wl_shm_format
-pattern WL_SHM_FORMAT_ABGR16161616 = Wl_shm_format 942948929
+pattern WL_SHM_FORMAT_ABGR16161616 :: WlShmFormat
+pattern WL_SHM_FORMAT_ABGR16161616 = WlShmFormat 942948929
 
 {-| __C declaration:__ @WL_SHM_FORMAT_C1@
 
@@ -2541,8 +2541,8 @@ pattern WL_SHM_FORMAT_ABGR16161616 = Wl_shm_format 942948929
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_C1 :: Wl_shm_format
-pattern WL_SHM_FORMAT_C1 = Wl_shm_format 538980675
+pattern WL_SHM_FORMAT_C1 :: WlShmFormat
+pattern WL_SHM_FORMAT_C1 = WlShmFormat 538980675
 
 {-| __C declaration:__ @WL_SHM_FORMAT_C2@
 
@@ -2550,8 +2550,8 @@ pattern WL_SHM_FORMAT_C1 = Wl_shm_format 538980675
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_C2 :: Wl_shm_format
-pattern WL_SHM_FORMAT_C2 = Wl_shm_format 538980931
+pattern WL_SHM_FORMAT_C2 :: WlShmFormat
+pattern WL_SHM_FORMAT_C2 = WlShmFormat 538980931
 
 {-| __C declaration:__ @WL_SHM_FORMAT_C4@
 
@@ -2559,8 +2559,8 @@ pattern WL_SHM_FORMAT_C2 = Wl_shm_format 538980931
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_C4 :: Wl_shm_format
-pattern WL_SHM_FORMAT_C4 = Wl_shm_format 538981443
+pattern WL_SHM_FORMAT_C4 :: WlShmFormat
+pattern WL_SHM_FORMAT_C4 = WlShmFormat 538981443
 
 {-| __C declaration:__ @WL_SHM_FORMAT_D1@
 
@@ -2568,8 +2568,8 @@ pattern WL_SHM_FORMAT_C4 = Wl_shm_format 538981443
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_D1 :: Wl_shm_format
-pattern WL_SHM_FORMAT_D1 = Wl_shm_format 538980676
+pattern WL_SHM_FORMAT_D1 :: WlShmFormat
+pattern WL_SHM_FORMAT_D1 = WlShmFormat 538980676
 
 {-| __C declaration:__ @WL_SHM_FORMAT_D2@
 
@@ -2577,8 +2577,8 @@ pattern WL_SHM_FORMAT_D1 = Wl_shm_format 538980676
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_D2 :: Wl_shm_format
-pattern WL_SHM_FORMAT_D2 = Wl_shm_format 538980932
+pattern WL_SHM_FORMAT_D2 :: WlShmFormat
+pattern WL_SHM_FORMAT_D2 = WlShmFormat 538980932
 
 {-| __C declaration:__ @WL_SHM_FORMAT_D4@
 
@@ -2586,8 +2586,8 @@ pattern WL_SHM_FORMAT_D2 = Wl_shm_format 538980932
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_D4 :: Wl_shm_format
-pattern WL_SHM_FORMAT_D4 = Wl_shm_format 538981444
+pattern WL_SHM_FORMAT_D4 :: WlShmFormat
+pattern WL_SHM_FORMAT_D4 = WlShmFormat 538981444
 
 {-| __C declaration:__ @WL_SHM_FORMAT_D8@
 
@@ -2595,8 +2595,8 @@ pattern WL_SHM_FORMAT_D4 = Wl_shm_format 538981444
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_D8 :: Wl_shm_format
-pattern WL_SHM_FORMAT_D8 = Wl_shm_format 538982468
+pattern WL_SHM_FORMAT_D8 :: WlShmFormat
+pattern WL_SHM_FORMAT_D8 = WlShmFormat 538982468
 
 {-| __C declaration:__ @WL_SHM_FORMAT_R1@
 
@@ -2604,8 +2604,8 @@ pattern WL_SHM_FORMAT_D8 = Wl_shm_format 538982468
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_R1 :: Wl_shm_format
-pattern WL_SHM_FORMAT_R1 = Wl_shm_format 538980690
+pattern WL_SHM_FORMAT_R1 :: WlShmFormat
+pattern WL_SHM_FORMAT_R1 = WlShmFormat 538980690
 
 {-| __C declaration:__ @WL_SHM_FORMAT_R2@
 
@@ -2613,8 +2613,8 @@ pattern WL_SHM_FORMAT_R1 = Wl_shm_format 538980690
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_R2 :: Wl_shm_format
-pattern WL_SHM_FORMAT_R2 = Wl_shm_format 538980946
+pattern WL_SHM_FORMAT_R2 :: WlShmFormat
+pattern WL_SHM_FORMAT_R2 = WlShmFormat 538980946
 
 {-| __C declaration:__ @WL_SHM_FORMAT_R4@
 
@@ -2622,8 +2622,8 @@ pattern WL_SHM_FORMAT_R2 = Wl_shm_format 538980946
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_R4 :: Wl_shm_format
-pattern WL_SHM_FORMAT_R4 = Wl_shm_format 538981458
+pattern WL_SHM_FORMAT_R4 :: WlShmFormat
+pattern WL_SHM_FORMAT_R4 = WlShmFormat 538981458
 
 {-| __C declaration:__ @WL_SHM_FORMAT_R10@
 
@@ -2631,8 +2631,8 @@ pattern WL_SHM_FORMAT_R4 = Wl_shm_format 538981458
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_R10 :: Wl_shm_format
-pattern WL_SHM_FORMAT_R10 = Wl_shm_format 540029266
+pattern WL_SHM_FORMAT_R10 :: WlShmFormat
+pattern WL_SHM_FORMAT_R10 = WlShmFormat 540029266
 
 {-| __C declaration:__ @WL_SHM_FORMAT_R12@
 
@@ -2640,8 +2640,8 @@ pattern WL_SHM_FORMAT_R10 = Wl_shm_format 540029266
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_R12 :: Wl_shm_format
-pattern WL_SHM_FORMAT_R12 = Wl_shm_format 540160338
+pattern WL_SHM_FORMAT_R12 :: WlShmFormat
+pattern WL_SHM_FORMAT_R12 = WlShmFormat 540160338
 
 {-| __C declaration:__ @WL_SHM_FORMAT_AVUY8888@
 
@@ -2649,8 +2649,8 @@ pattern WL_SHM_FORMAT_R12 = Wl_shm_format 540160338
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_AVUY8888 :: Wl_shm_format
-pattern WL_SHM_FORMAT_AVUY8888 = Wl_shm_format 1498764865
+pattern WL_SHM_FORMAT_AVUY8888 :: WlShmFormat
+pattern WL_SHM_FORMAT_AVUY8888 = WlShmFormat 1498764865
 
 {-| __C declaration:__ @WL_SHM_FORMAT_XVUY8888@
 
@@ -2658,8 +2658,8 @@ pattern WL_SHM_FORMAT_AVUY8888 = Wl_shm_format 1498764865
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_XVUY8888 :: Wl_shm_format
-pattern WL_SHM_FORMAT_XVUY8888 = Wl_shm_format 1498764888
+pattern WL_SHM_FORMAT_XVUY8888 :: WlShmFormat
+pattern WL_SHM_FORMAT_XVUY8888 = WlShmFormat 1498764888
 
 {-| __C declaration:__ @WL_SHM_FORMAT_P030@
 
@@ -2667,8 +2667,8 @@ pattern WL_SHM_FORMAT_XVUY8888 = Wl_shm_format 1498764888
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHM_FORMAT_P030 :: Wl_shm_format
-pattern WL_SHM_FORMAT_P030 = Wl_shm_format 808661072
+pattern WL_SHM_FORMAT_P030 :: WlShmFormat
+pattern WL_SHM_FORMAT_P030 = WlShmFormat 808661072
 
 {-| __C declaration:__ @struct wl_shm_listener@
 
@@ -2676,8 +2676,8 @@ pattern WL_SHM_FORMAT_P030 = Wl_shm_format 808661072
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_shm_listener = Wl_shm_listener
-  { format :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shm) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+data WlShmListener = WlShmListener
+  { format :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShm) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ __C declaration:__ @format@
 
          __defined at:__ @wayland-client-protocol.h 1996:9@
@@ -2687,39 +2687,39 @@ data Wl_shm_listener = Wl_shm_listener
   }
   deriving stock (Eq, RIP.Generic, Show)
 
-instance Marshal.StaticSize Wl_shm_listener where
+instance Marshal.StaticSize WlShmListener where
 
   staticSizeOf = \_ -> (8 :: Int)
 
   staticAlignment = \_ -> (8 :: Int)
 
-instance Marshal.ReadRaw Wl_shm_listener where
+instance Marshal.ReadRaw WlShmListener where
 
   readRaw =
     \ptr0 ->
-          pure Wl_shm_listener
+          pure WlShmListener
       <*> HasCField.readRaw (RIP.Proxy @"format") ptr0
 
-instance Marshal.WriteRaw Wl_shm_listener where
+instance Marshal.WriteRaw WlShmListener where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_shm_listener format2 ->
+          WlShmListener format2 ->
             HasCField.writeRaw (RIP.Proxy @"format") ptr0 format2
 
-deriving via Marshal.EquivStorable Wl_shm_listener instance RIP.Storable Wl_shm_listener
+deriving via Marshal.EquivStorable WlShmListener instance RIP.Storable WlShmListener
 
-instance HasCField.HasCField Wl_shm_listener "format" where
+instance HasCField.HasCField WlShmListener "format" where
 
-  type CFieldType Wl_shm_listener "format" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shm) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  type CFieldType WlShmListener "format" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShm) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shm) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-         ) => RIP.HasField "format" (RIP.Ptr Wl_shm_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShm) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+         ) => RIP.HasField "format" (RIP.Ptr WlShmListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"format")
 
@@ -2774,8 +2774,8 @@ wL_SHM_RELEASE_SINCE_VERSION = (2 :: RIP.CInt)
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_buffer_listener = Wl_buffer_listener
-  { release :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_buffer) -> IO ())
+data WlBufferListener = WlBufferListener
+  { release :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlBuffer) -> IO ())
     {- ^ __C declaration:__ @release@
 
          __defined at:__ @wayland-client-protocol.h 2114:9@
@@ -2785,39 +2785,39 @@ data Wl_buffer_listener = Wl_buffer_listener
   }
   deriving stock (Eq, RIP.Generic, Show)
 
-instance Marshal.StaticSize Wl_buffer_listener where
+instance Marshal.StaticSize WlBufferListener where
 
   staticSizeOf = \_ -> (8 :: Int)
 
   staticAlignment = \_ -> (8 :: Int)
 
-instance Marshal.ReadRaw Wl_buffer_listener where
+instance Marshal.ReadRaw WlBufferListener where
 
   readRaw =
     \ptr0 ->
-          pure Wl_buffer_listener
+          pure WlBufferListener
       <*> HasCField.readRaw (RIP.Proxy @"release") ptr0
 
-instance Marshal.WriteRaw Wl_buffer_listener where
+instance Marshal.WriteRaw WlBufferListener where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_buffer_listener release2 ->
+          WlBufferListener release2 ->
             HasCField.writeRaw (RIP.Proxy @"release") ptr0 release2
 
-deriving via Marshal.EquivStorable Wl_buffer_listener instance RIP.Storable Wl_buffer_listener
+deriving via Marshal.EquivStorable WlBufferListener instance RIP.Storable WlBufferListener
 
-instance HasCField.HasCField Wl_buffer_listener "release" where
+instance HasCField.HasCField WlBufferListener "release" where
 
-  type CFieldType Wl_buffer_listener "release" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_buffer) -> IO ())
+  type CFieldType WlBufferListener "release" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlBuffer) -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_buffer) -> IO ()))
-         ) => RIP.HasField "release" (RIP.Ptr Wl_buffer_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlBuffer) -> IO ()))
+         ) => RIP.HasField "release" (RIP.Ptr WlBufferListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"release")
 
@@ -2854,43 +2854,43 @@ wL_BUFFER_DESTROY_SINCE_VERSION = (1 :: RIP.CInt)
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-newtype Wl_data_offer_error = Wl_data_offer_error
+newtype WlDataOfferError = WlDataOfferError
   { unwrap :: RIP.CUInt
   }
   deriving stock (Eq, RIP.Generic, Ord)
   deriving newtype (RIP.HasFFIType)
 
-instance Marshal.StaticSize Wl_data_offer_error where
+instance Marshal.StaticSize WlDataOfferError where
 
   staticSizeOf = \_ -> (4 :: Int)
 
   staticAlignment = \_ -> (4 :: Int)
 
-instance Marshal.ReadRaw Wl_data_offer_error where
+instance Marshal.ReadRaw WlDataOfferError where
 
   readRaw =
     \ptr0 ->
-          pure Wl_data_offer_error
+          pure WlDataOfferError
       <*> Marshal.readRawByteOff ptr0 (0 :: Int)
 
-instance Marshal.WriteRaw Wl_data_offer_error where
+instance Marshal.WriteRaw WlDataOfferError where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_data_offer_error unwrap2 ->
+          WlDataOfferError unwrap2 ->
             Marshal.writeRawByteOff ptr0 (0 :: Int) unwrap2
 
-deriving via Marshal.EquivStorable Wl_data_offer_error instance RIP.Storable Wl_data_offer_error
+deriving via Marshal.EquivStorable WlDataOfferError instance RIP.Storable WlDataOfferError
 
-deriving via RIP.CUInt instance RIP.Prim Wl_data_offer_error
+deriving via RIP.CUInt instance RIP.Prim WlDataOfferError
 
-instance CEnum.CEnum Wl_data_offer_error where
+instance CEnum.CEnum WlDataOfferError where
 
-  type CEnumZ Wl_data_offer_error = RIP.CUInt
+  type CEnumZ WlDataOfferError = RIP.CUInt
 
-  toCEnum = Wl_data_offer_error
+  toCEnum = WlDataOfferError
 
   fromCEnum = RIP.getField @"unwrap"
 
@@ -2903,26 +2903,26 @@ instance CEnum.CEnum Wl_data_offer_error where
                                    ]
 
   showsUndeclared =
-    CEnum.showsWrappedUndeclared "Wl_data_offer_error"
+    CEnum.showsWrappedUndeclared "WlDataOfferError"
 
   readPrecUndeclared =
-    CEnum.readPrecWrappedUndeclared "Wl_data_offer_error"
+    CEnum.readPrecWrappedUndeclared "WlDataOfferError"
 
   isDeclared = CEnum.seqIsDeclared
 
   mkDeclared = CEnum.seqMkDeclared
 
-instance CEnum.SequentialCEnum Wl_data_offer_error where
+instance CEnum.SequentialCEnum WlDataOfferError where
 
   minDeclaredValue = WL_DATA_OFFER_ERROR_INVALID_FINISH
 
   maxDeclaredValue = WL_DATA_OFFER_ERROR_INVALID_OFFER
 
-instance Show Wl_data_offer_error where
+instance Show WlDataOfferError where
 
   showsPrec = CEnum.shows
 
-instance Read Wl_data_offer_error where
+instance Read WlDataOfferError where
 
   readPrec = CEnum.readPrec
 
@@ -2931,14 +2931,13 @@ instance Read Wl_data_offer_error where
   readListPrec = RIP.readListPrecDefault
 
 instance ( ((~) ty) RIP.CUInt
-         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_data_offer_error) (RIP.Ptr ty) where
+         ) => RIP.HasField "unwrap" (RIP.Ptr WlDataOfferError) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField Wl_data_offer_error "unwrap" where
+instance HasCField.HasCField WlDataOfferError "unwrap" where
 
-  type CFieldType Wl_data_offer_error "unwrap" =
-    RIP.CUInt
+  type CFieldType WlDataOfferError "unwrap" = RIP.CUInt
 
   offset# = \_ -> \_ -> 0
 
@@ -2948,8 +2947,8 @@ instance HasCField.HasCField Wl_data_offer_error "unwrap" where
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_DATA_OFFER_ERROR_INVALID_FINISH :: Wl_data_offer_error
-pattern WL_DATA_OFFER_ERROR_INVALID_FINISH = Wl_data_offer_error 0
+pattern WL_DATA_OFFER_ERROR_INVALID_FINISH :: WlDataOfferError
+pattern WL_DATA_OFFER_ERROR_INVALID_FINISH = WlDataOfferError 0
 
 {-| __C declaration:__ @WL_DATA_OFFER_ERROR_INVALID_ACTION_MASK@
 
@@ -2957,8 +2956,8 @@ pattern WL_DATA_OFFER_ERROR_INVALID_FINISH = Wl_data_offer_error 0
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_DATA_OFFER_ERROR_INVALID_ACTION_MASK :: Wl_data_offer_error
-pattern WL_DATA_OFFER_ERROR_INVALID_ACTION_MASK = Wl_data_offer_error 1
+pattern WL_DATA_OFFER_ERROR_INVALID_ACTION_MASK :: WlDataOfferError
+pattern WL_DATA_OFFER_ERROR_INVALID_ACTION_MASK = WlDataOfferError 1
 
 {-| __C declaration:__ @WL_DATA_OFFER_ERROR_INVALID_ACTION@
 
@@ -2966,8 +2965,8 @@ pattern WL_DATA_OFFER_ERROR_INVALID_ACTION_MASK = Wl_data_offer_error 1
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_DATA_OFFER_ERROR_INVALID_ACTION :: Wl_data_offer_error
-pattern WL_DATA_OFFER_ERROR_INVALID_ACTION = Wl_data_offer_error 2
+pattern WL_DATA_OFFER_ERROR_INVALID_ACTION :: WlDataOfferError
+pattern WL_DATA_OFFER_ERROR_INVALID_ACTION = WlDataOfferError 2
 
 {-| __C declaration:__ @WL_DATA_OFFER_ERROR_INVALID_OFFER@
 
@@ -2975,8 +2974,8 @@ pattern WL_DATA_OFFER_ERROR_INVALID_ACTION = Wl_data_offer_error 2
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_DATA_OFFER_ERROR_INVALID_OFFER :: Wl_data_offer_error
-pattern WL_DATA_OFFER_ERROR_INVALID_OFFER = Wl_data_offer_error 3
+pattern WL_DATA_OFFER_ERROR_INVALID_OFFER :: WlDataOfferError
+pattern WL_DATA_OFFER_ERROR_INVALID_OFFER = WlDataOfferError 3
 
 {-| __C declaration:__ @struct wl_data_offer_listener@
 
@@ -2984,22 +2983,22 @@ pattern WL_DATA_OFFER_ERROR_INVALID_OFFER = Wl_data_offer_error 3
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_data_offer_listener = Wl_data_offer_listener
-  { offer :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_offer) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+data WlDataOfferListener = WlDataOfferListener
+  { offer :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataOffer) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
     {- ^ __C declaration:__ @offer@
 
          __defined at:__ @wayland-client-protocol.h 2210:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , source_actions :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_offer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , source_actions :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataOffer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ __C declaration:__ @source_actions@
 
          __defined at:__ @wayland-client-protocol.h 2223:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , action :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_offer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , action :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataOffer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ __C declaration:__ @action@
 
          __defined at:__ @wayland-client-protocol.h 2269:9@
@@ -3009,68 +3008,68 @@ data Wl_data_offer_listener = Wl_data_offer_listener
   }
   deriving stock (Eq, RIP.Generic, Show)
 
-instance Marshal.StaticSize Wl_data_offer_listener where
+instance Marshal.StaticSize WlDataOfferListener where
 
   staticSizeOf = \_ -> (24 :: Int)
 
   staticAlignment = \_ -> (8 :: Int)
 
-instance Marshal.ReadRaw Wl_data_offer_listener where
+instance Marshal.ReadRaw WlDataOfferListener where
 
   readRaw =
     \ptr0 ->
-          pure Wl_data_offer_listener
+          pure WlDataOfferListener
       <*> HasCField.readRaw (RIP.Proxy @"offer") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"source_actions") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"action") ptr0
 
-instance Marshal.WriteRaw Wl_data_offer_listener where
+instance Marshal.WriteRaw WlDataOfferListener where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_data_offer_listener offer2 source_actions3 action4 ->
+          WlDataOfferListener offer2 source_actions3 action4 ->
                HasCField.writeRaw (RIP.Proxy @"offer") ptr0 offer2
             >> HasCField.writeRaw (RIP.Proxy @"source_actions") ptr0 source_actions3
             >> HasCField.writeRaw (RIP.Proxy @"action") ptr0 action4
 
-deriving via Marshal.EquivStorable Wl_data_offer_listener instance RIP.Storable Wl_data_offer_listener
+deriving via Marshal.EquivStorable WlDataOfferListener instance RIP.Storable WlDataOfferListener
 
-instance HasCField.HasCField Wl_data_offer_listener "offer" where
+instance HasCField.HasCField WlDataOfferListener "offer" where
 
-  type CFieldType Wl_data_offer_listener "offer" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_offer) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  type CFieldType WlDataOfferListener "offer" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataOffer) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_offer) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
-         ) => RIP.HasField "offer" (RIP.Ptr Wl_data_offer_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataOffer) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
+         ) => RIP.HasField "offer" (RIP.Ptr WlDataOfferListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"offer")
 
-instance HasCField.HasCField Wl_data_offer_listener "source_actions" where
+instance HasCField.HasCField WlDataOfferListener "source_actions" where
 
-  type CFieldType Wl_data_offer_listener "source_actions" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_offer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  type CFieldType WlDataOfferListener "source_actions" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataOffer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_offer) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-         ) => RIP.HasField "source_actions" (RIP.Ptr Wl_data_offer_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataOffer) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+         ) => RIP.HasField "source_actions" (RIP.Ptr WlDataOfferListener) (RIP.Ptr ty) where
 
   getField =
     HasCField.fromPtr (RIP.Proxy @"source_actions")
 
-instance HasCField.HasCField Wl_data_offer_listener "action" where
+instance HasCField.HasCField WlDataOfferListener "action" where
 
-  type CFieldType Wl_data_offer_listener "action" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_offer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  type CFieldType WlDataOfferListener "action" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataOffer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_offer) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-         ) => RIP.HasField "action" (RIP.Ptr Wl_data_offer_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataOffer) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+         ) => RIP.HasField "action" (RIP.Ptr WlDataOfferListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"action")
 
@@ -3199,43 +3198,43 @@ wL_DATA_OFFER_SET_ACTIONS_SINCE_VERSION =
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-newtype Wl_data_source_error = Wl_data_source_error
+newtype WlDataSourceError = WlDataSourceError
   { unwrap :: RIP.CUInt
   }
   deriving stock (Eq, RIP.Generic, Ord)
   deriving newtype (RIP.HasFFIType)
 
-instance Marshal.StaticSize Wl_data_source_error where
+instance Marshal.StaticSize WlDataSourceError where
 
   staticSizeOf = \_ -> (4 :: Int)
 
   staticAlignment = \_ -> (4 :: Int)
 
-instance Marshal.ReadRaw Wl_data_source_error where
+instance Marshal.ReadRaw WlDataSourceError where
 
   readRaw =
     \ptr0 ->
-          pure Wl_data_source_error
+          pure WlDataSourceError
       <*> Marshal.readRawByteOff ptr0 (0 :: Int)
 
-instance Marshal.WriteRaw Wl_data_source_error where
+instance Marshal.WriteRaw WlDataSourceError where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_data_source_error unwrap2 ->
+          WlDataSourceError unwrap2 ->
             Marshal.writeRawByteOff ptr0 (0 :: Int) unwrap2
 
-deriving via Marshal.EquivStorable Wl_data_source_error instance RIP.Storable Wl_data_source_error
+deriving via Marshal.EquivStorable WlDataSourceError instance RIP.Storable WlDataSourceError
 
-deriving via RIP.CUInt instance RIP.Prim Wl_data_source_error
+deriving via RIP.CUInt instance RIP.Prim WlDataSourceError
 
-instance CEnum.CEnum Wl_data_source_error where
+instance CEnum.CEnum WlDataSourceError where
 
-  type CEnumZ Wl_data_source_error = RIP.CUInt
+  type CEnumZ WlDataSourceError = RIP.CUInt
 
-  toCEnum = Wl_data_source_error
+  toCEnum = WlDataSourceError
 
   fromCEnum = RIP.getField @"unwrap"
 
@@ -3246,16 +3245,16 @@ instance CEnum.CEnum Wl_data_source_error where
                                    ]
 
   showsUndeclared =
-    CEnum.showsWrappedUndeclared "Wl_data_source_error"
+    CEnum.showsWrappedUndeclared "WlDataSourceError"
 
   readPrecUndeclared =
-    CEnum.readPrecWrappedUndeclared "Wl_data_source_error"
+    CEnum.readPrecWrappedUndeclared "WlDataSourceError"
 
   isDeclared = CEnum.seqIsDeclared
 
   mkDeclared = CEnum.seqMkDeclared
 
-instance CEnum.SequentialCEnum Wl_data_source_error where
+instance CEnum.SequentialCEnum WlDataSourceError where
 
   minDeclaredValue =
     WL_DATA_SOURCE_ERROR_INVALID_ACTION_MASK
@@ -3263,11 +3262,11 @@ instance CEnum.SequentialCEnum Wl_data_source_error where
   maxDeclaredValue =
     WL_DATA_SOURCE_ERROR_INVALID_SOURCE
 
-instance Show Wl_data_source_error where
+instance Show WlDataSourceError where
 
   showsPrec = CEnum.shows
 
-instance Read Wl_data_source_error where
+instance Read WlDataSourceError where
 
   readPrec = CEnum.readPrec
 
@@ -3276,13 +3275,13 @@ instance Read Wl_data_source_error where
   readListPrec = RIP.readListPrecDefault
 
 instance ( ((~) ty) RIP.CUInt
-         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_data_source_error) (RIP.Ptr ty) where
+         ) => RIP.HasField "unwrap" (RIP.Ptr WlDataSourceError) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField Wl_data_source_error "unwrap" where
+instance HasCField.HasCField WlDataSourceError "unwrap" where
 
-  type CFieldType Wl_data_source_error "unwrap" =
+  type CFieldType WlDataSourceError "unwrap" =
     RIP.CUInt
 
   offset# = \_ -> \_ -> 0
@@ -3293,8 +3292,8 @@ instance HasCField.HasCField Wl_data_source_error "unwrap" where
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_DATA_SOURCE_ERROR_INVALID_ACTION_MASK :: Wl_data_source_error
-pattern WL_DATA_SOURCE_ERROR_INVALID_ACTION_MASK = Wl_data_source_error 0
+pattern WL_DATA_SOURCE_ERROR_INVALID_ACTION_MASK :: WlDataSourceError
+pattern WL_DATA_SOURCE_ERROR_INVALID_ACTION_MASK = WlDataSourceError 0
 
 {-| __C declaration:__ @WL_DATA_SOURCE_ERROR_INVALID_SOURCE@
 
@@ -3302,8 +3301,8 @@ pattern WL_DATA_SOURCE_ERROR_INVALID_ACTION_MASK = Wl_data_source_error 0
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_DATA_SOURCE_ERROR_INVALID_SOURCE :: Wl_data_source_error
-pattern WL_DATA_SOURCE_ERROR_INVALID_SOURCE = Wl_data_source_error 1
+pattern WL_DATA_SOURCE_ERROR_INVALID_SOURCE :: WlDataSourceError
+pattern WL_DATA_SOURCE_ERROR_INVALID_SOURCE = WlDataSourceError 1
 
 {-| __C declaration:__ @struct wl_data_source_listener@
 
@@ -3311,43 +3310,43 @@ pattern WL_DATA_SOURCE_ERROR_INVALID_SOURCE = Wl_data_source_error 1
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_data_source_listener = Wl_data_source_listener
-  { target :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+data WlDataSourceListener = WlDataSourceListener
+  { target :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
     {- ^ __C declaration:__ @target@
 
          __defined at:__ @wayland-client-protocol.h 2503:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , send :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , send :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ __C declaration:__ @send@
 
          __defined at:__ @wayland-client-protocol.h 2515:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , cancelled :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> IO ())
+  , cancelled :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> IO ())
     {- ^ __C declaration:__ @cancelled@
 
          __defined at:__ @wayland-client-protocol.h 2542:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , dnd_drop_performed :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> IO ())
+  , dnd_drop_performed :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> IO ())
     {- ^ __C declaration:__ @dnd_drop_performed@
 
          __defined at:__ @wayland-client-protocol.h 2560:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , dnd_finished :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> IO ())
+  , dnd_finished :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> IO ())
     {- ^ __C declaration:__ @dnd_finished@
 
          __defined at:__ @wayland-client-protocol.h 2573:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , action :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , action :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ __C declaration:__ @action@
 
          __defined at:__ @wayland-client-protocol.h 2608:9@
@@ -3357,17 +3356,17 @@ data Wl_data_source_listener = Wl_data_source_listener
   }
   deriving stock (Eq, RIP.Generic, Show)
 
-instance Marshal.StaticSize Wl_data_source_listener where
+instance Marshal.StaticSize WlDataSourceListener where
 
   staticSizeOf = \_ -> (48 :: Int)
 
   staticAlignment = \_ -> (8 :: Int)
 
-instance Marshal.ReadRaw Wl_data_source_listener where
+instance Marshal.ReadRaw WlDataSourceListener where
 
   readRaw =
     \ptr0 ->
-          pure Wl_data_source_listener
+          pure WlDataSourceListener
       <*> HasCField.readRaw (RIP.Proxy @"target") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"send") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"cancelled") ptr0
@@ -3375,13 +3374,13 @@ instance Marshal.ReadRaw Wl_data_source_listener where
       <*> HasCField.readRaw (RIP.Proxy @"dnd_finished") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"action") ptr0
 
-instance Marshal.WriteRaw Wl_data_source_listener where
+instance Marshal.WriteRaw WlDataSourceListener where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_data_source_listener
+          WlDataSourceListener
             target2
             send3
             cancelled4
@@ -3395,79 +3394,79 @@ instance Marshal.WriteRaw Wl_data_source_listener where
               >> HasCField.writeRaw (RIP.Proxy @"dnd_finished") ptr0 dnd_finished6
               >> HasCField.writeRaw (RIP.Proxy @"action") ptr0 action7
 
-deriving via Marshal.EquivStorable Wl_data_source_listener instance RIP.Storable Wl_data_source_listener
+deriving via Marshal.EquivStorable WlDataSourceListener instance RIP.Storable WlDataSourceListener
 
-instance HasCField.HasCField Wl_data_source_listener "target" where
+instance HasCField.HasCField WlDataSourceListener "target" where
 
-  type CFieldType Wl_data_source_listener "target" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  type CFieldType WlDataSourceListener "target" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
-         ) => RIP.HasField "target" (RIP.Ptr Wl_data_source_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
+         ) => RIP.HasField "target" (RIP.Ptr WlDataSourceListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"target")
 
-instance HasCField.HasCField Wl_data_source_listener "send" where
+instance HasCField.HasCField WlDataSourceListener "send" where
 
-  type CFieldType Wl_data_source_listener "send" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  type CFieldType WlDataSourceListener "send" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-         ) => RIP.HasField "send" (RIP.Ptr Wl_data_source_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+         ) => RIP.HasField "send" (RIP.Ptr WlDataSourceListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"send")
 
-instance HasCField.HasCField Wl_data_source_listener "cancelled" where
+instance HasCField.HasCField WlDataSourceListener "cancelled" where
 
-  type CFieldType Wl_data_source_listener "cancelled" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> IO ())
+  type CFieldType WlDataSourceListener "cancelled" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> IO ())
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> IO ()))
-         ) => RIP.HasField "cancelled" (RIP.Ptr Wl_data_source_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> IO ()))
+         ) => RIP.HasField "cancelled" (RIP.Ptr WlDataSourceListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"cancelled")
 
-instance HasCField.HasCField Wl_data_source_listener "dnd_drop_performed" where
+instance HasCField.HasCField WlDataSourceListener "dnd_drop_performed" where
 
-  type CFieldType Wl_data_source_listener "dnd_drop_performed" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> IO ())
+  type CFieldType WlDataSourceListener "dnd_drop_performed" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> IO ())
 
   offset# = \_ -> \_ -> 24
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> IO ()))
-         ) => RIP.HasField "dnd_drop_performed" (RIP.Ptr Wl_data_source_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> IO ()))
+         ) => RIP.HasField "dnd_drop_performed" (RIP.Ptr WlDataSourceListener) (RIP.Ptr ty) where
 
   getField =
     HasCField.fromPtr (RIP.Proxy @"dnd_drop_performed")
 
-instance HasCField.HasCField Wl_data_source_listener "dnd_finished" where
+instance HasCField.HasCField WlDataSourceListener "dnd_finished" where
 
-  type CFieldType Wl_data_source_listener "dnd_finished" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> IO ())
+  type CFieldType WlDataSourceListener "dnd_finished" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> IO ())
 
   offset# = \_ -> \_ -> 32
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> IO ()))
-         ) => RIP.HasField "dnd_finished" (RIP.Ptr Wl_data_source_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> IO ()))
+         ) => RIP.HasField "dnd_finished" (RIP.Ptr WlDataSourceListener) (RIP.Ptr ty) where
 
   getField =
     HasCField.fromPtr (RIP.Proxy @"dnd_finished")
 
-instance HasCField.HasCField Wl_data_source_listener "action" where
+instance HasCField.HasCField WlDataSourceListener "action" where
 
-  type CFieldType Wl_data_source_listener "action" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  type CFieldType WlDataSourceListener "action" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 40
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-         ) => RIP.HasField "action" (RIP.Ptr Wl_data_source_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+         ) => RIP.HasField "action" (RIP.Ptr WlDataSourceListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"action")
 
@@ -3590,43 +3589,43 @@ wL_DATA_SOURCE_SET_ACTIONS_SINCE_VERSION =
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-newtype Wl_data_device_error = Wl_data_device_error
+newtype WlDataDeviceError = WlDataDeviceError
   { unwrap :: RIP.CUInt
   }
   deriving stock (Eq, RIP.Generic, Ord)
   deriving newtype (RIP.HasFFIType)
 
-instance Marshal.StaticSize Wl_data_device_error where
+instance Marshal.StaticSize WlDataDeviceError where
 
   staticSizeOf = \_ -> (4 :: Int)
 
   staticAlignment = \_ -> (4 :: Int)
 
-instance Marshal.ReadRaw Wl_data_device_error where
+instance Marshal.ReadRaw WlDataDeviceError where
 
   readRaw =
     \ptr0 ->
-          pure Wl_data_device_error
+          pure WlDataDeviceError
       <*> Marshal.readRawByteOff ptr0 (0 :: Int)
 
-instance Marshal.WriteRaw Wl_data_device_error where
+instance Marshal.WriteRaw WlDataDeviceError where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_data_device_error unwrap2 ->
+          WlDataDeviceError unwrap2 ->
             Marshal.writeRawByteOff ptr0 (0 :: Int) unwrap2
 
-deriving via Marshal.EquivStorable Wl_data_device_error instance RIP.Storable Wl_data_device_error
+deriving via Marshal.EquivStorable WlDataDeviceError instance RIP.Storable WlDataDeviceError
 
-deriving via RIP.CUInt instance RIP.Prim Wl_data_device_error
+deriving via RIP.CUInt instance RIP.Prim WlDataDeviceError
 
-instance CEnum.CEnum Wl_data_device_error where
+instance CEnum.CEnum WlDataDeviceError where
 
-  type CEnumZ Wl_data_device_error = RIP.CUInt
+  type CEnumZ WlDataDeviceError = RIP.CUInt
 
-  toCEnum = Wl_data_device_error
+  toCEnum = WlDataDeviceError
 
   fromCEnum = RIP.getField @"unwrap"
 
@@ -3637,26 +3636,26 @@ instance CEnum.CEnum Wl_data_device_error where
                                    ]
 
   showsUndeclared =
-    CEnum.showsWrappedUndeclared "Wl_data_device_error"
+    CEnum.showsWrappedUndeclared "WlDataDeviceError"
 
   readPrecUndeclared =
-    CEnum.readPrecWrappedUndeclared "Wl_data_device_error"
+    CEnum.readPrecWrappedUndeclared "WlDataDeviceError"
 
   isDeclared = CEnum.seqIsDeclared
 
   mkDeclared = CEnum.seqMkDeclared
 
-instance CEnum.SequentialCEnum Wl_data_device_error where
+instance CEnum.SequentialCEnum WlDataDeviceError where
 
   minDeclaredValue = WL_DATA_DEVICE_ERROR_ROLE
 
   maxDeclaredValue = WL_DATA_DEVICE_ERROR_USED_SOURCE
 
-instance Show Wl_data_device_error where
+instance Show WlDataDeviceError where
 
   showsPrec = CEnum.shows
 
-instance Read Wl_data_device_error where
+instance Read WlDataDeviceError where
 
   readPrec = CEnum.readPrec
 
@@ -3665,13 +3664,13 @@ instance Read Wl_data_device_error where
   readListPrec = RIP.readListPrecDefault
 
 instance ( ((~) ty) RIP.CUInt
-         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_data_device_error) (RIP.Ptr ty) where
+         ) => RIP.HasField "unwrap" (RIP.Ptr WlDataDeviceError) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField Wl_data_device_error "unwrap" where
+instance HasCField.HasCField WlDataDeviceError "unwrap" where
 
-  type CFieldType Wl_data_device_error "unwrap" =
+  type CFieldType WlDataDeviceError "unwrap" =
     RIP.CUInt
 
   offset# = \_ -> \_ -> 0
@@ -3682,8 +3681,8 @@ instance HasCField.HasCField Wl_data_device_error "unwrap" where
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_DATA_DEVICE_ERROR_ROLE :: Wl_data_device_error
-pattern WL_DATA_DEVICE_ERROR_ROLE = Wl_data_device_error 0
+pattern WL_DATA_DEVICE_ERROR_ROLE :: WlDataDeviceError
+pattern WL_DATA_DEVICE_ERROR_ROLE = WlDataDeviceError 0
 
 {-| __C declaration:__ @WL_DATA_DEVICE_ERROR_USED_SOURCE@
 
@@ -3691,8 +3690,8 @@ pattern WL_DATA_DEVICE_ERROR_ROLE = Wl_data_device_error 0
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_DATA_DEVICE_ERROR_USED_SOURCE :: Wl_data_device_error
-pattern WL_DATA_DEVICE_ERROR_USED_SOURCE = Wl_data_device_error 1
+pattern WL_DATA_DEVICE_ERROR_USED_SOURCE :: WlDataDeviceError
+pattern WL_DATA_DEVICE_ERROR_USED_SOURCE = WlDataDeviceError 1
 
 {-| __C declaration:__ @struct wl_data_device_listener@
 
@@ -3700,43 +3699,43 @@ pattern WL_DATA_DEVICE_ERROR_USED_SOURCE = Wl_data_device_error 1
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_data_device_listener = Wl_data_device_listener
-  { data_offer :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> (RIP.Ptr Wl_data_offer) -> IO ())
+data WlDataDeviceListener = WlDataDeviceListener
+  { data_offer :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> (RIP.Ptr WlDataOffer) -> IO ())
     {- ^ __C declaration:__ @data_offer@
 
          __defined at:__ @wayland-client-protocol.h 2767:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , enter :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> (RIP.Ptr Wl_data_offer) -> IO ())
+  , enter :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> (RIP.Ptr WlDataOffer) -> IO ())
     {- ^ __C declaration:__ @enter@
 
          __defined at:__ @wayland-client-protocol.h 2783:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , leave :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> IO ())
+  , leave :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> IO ())
     {- ^ __C declaration:__ @leave@
 
          __defined at:__ @wayland-client-protocol.h 2797:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , motion :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  , motion :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
     {- ^ __C declaration:__ @motion@
 
          __defined at:__ @wayland-client-protocol.h 2810:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , drop :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> IO ())
+  , drop :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> IO ())
     {- ^ __C declaration:__ @drop@
 
          __defined at:__ @wayland-client-protocol.h 2832:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , selection :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> (RIP.Ptr Wl_data_offer) -> IO ())
+  , selection :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> (RIP.Ptr WlDataOffer) -> IO ())
     {- ^ __C declaration:__ @selection@
 
          __defined at:__ @wayland-client-protocol.h 2851:9@
@@ -3746,17 +3745,17 @@ data Wl_data_device_listener = Wl_data_device_listener
   }
   deriving stock (Eq, RIP.Generic, Show)
 
-instance Marshal.StaticSize Wl_data_device_listener where
+instance Marshal.StaticSize WlDataDeviceListener where
 
   staticSizeOf = \_ -> (48 :: Int)
 
   staticAlignment = \_ -> (8 :: Int)
 
-instance Marshal.ReadRaw Wl_data_device_listener where
+instance Marshal.ReadRaw WlDataDeviceListener where
 
   readRaw =
     \ptr0 ->
-          pure Wl_data_device_listener
+          pure WlDataDeviceListener
       <*> HasCField.readRaw (RIP.Proxy @"data_offer") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"enter") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"leave") ptr0
@@ -3764,13 +3763,13 @@ instance Marshal.ReadRaw Wl_data_device_listener where
       <*> HasCField.readRaw (RIP.Proxy @"drop") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"selection") ptr0
 
-instance Marshal.WriteRaw Wl_data_device_listener where
+instance Marshal.WriteRaw WlDataDeviceListener where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_data_device_listener data_offer2 enter3 leave4 motion5 drop6 selection7 ->
+          WlDataDeviceListener data_offer2 enter3 leave4 motion5 drop6 selection7 ->
                HasCField.writeRaw (RIP.Proxy @"data_offer") ptr0 data_offer2
             >> HasCField.writeRaw (RIP.Proxy @"enter") ptr0 enter3
             >> HasCField.writeRaw (RIP.Proxy @"leave") ptr0 leave4
@@ -3778,78 +3777,78 @@ instance Marshal.WriteRaw Wl_data_device_listener where
             >> HasCField.writeRaw (RIP.Proxy @"drop") ptr0 drop6
             >> HasCField.writeRaw (RIP.Proxy @"selection") ptr0 selection7
 
-deriving via Marshal.EquivStorable Wl_data_device_listener instance RIP.Storable Wl_data_device_listener
+deriving via Marshal.EquivStorable WlDataDeviceListener instance RIP.Storable WlDataDeviceListener
 
-instance HasCField.HasCField Wl_data_device_listener "data_offer" where
+instance HasCField.HasCField WlDataDeviceListener "data_offer" where
 
-  type CFieldType Wl_data_device_listener "data_offer" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> (RIP.Ptr Wl_data_offer) -> IO ())
+  type CFieldType WlDataDeviceListener "data_offer" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> (RIP.Ptr WlDataOffer) -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> (RIP.Ptr Wl_data_offer) -> IO ()))
-         ) => RIP.HasField "data_offer" (RIP.Ptr Wl_data_device_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> (RIP.Ptr WlDataOffer) -> IO ()))
+         ) => RIP.HasField "data_offer" (RIP.Ptr WlDataDeviceListener) (RIP.Ptr ty) where
 
   getField =
     HasCField.fromPtr (RIP.Proxy @"data_offer")
 
-instance HasCField.HasCField Wl_data_device_listener "enter" where
+instance HasCField.HasCField WlDataDeviceListener "enter" where
 
-  type CFieldType Wl_data_device_listener "enter" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> (RIP.Ptr Wl_data_offer) -> IO ())
+  type CFieldType WlDataDeviceListener "enter" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> (RIP.Ptr WlDataOffer) -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> (RIP.Ptr Wl_data_offer) -> IO ()))
-         ) => RIP.HasField "enter" (RIP.Ptr Wl_data_device_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> (RIP.Ptr WlDataOffer) -> IO ()))
+         ) => RIP.HasField "enter" (RIP.Ptr WlDataDeviceListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"enter")
 
-instance HasCField.HasCField Wl_data_device_listener "leave" where
+instance HasCField.HasCField WlDataDeviceListener "leave" where
 
-  type CFieldType Wl_data_device_listener "leave" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> IO ())
+  type CFieldType WlDataDeviceListener "leave" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> IO ())
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> IO ()))
-         ) => RIP.HasField "leave" (RIP.Ptr Wl_data_device_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> IO ()))
+         ) => RIP.HasField "leave" (RIP.Ptr WlDataDeviceListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"leave")
 
-instance HasCField.HasCField Wl_data_device_listener "motion" where
+instance HasCField.HasCField WlDataDeviceListener "motion" where
 
-  type CFieldType Wl_data_device_listener "motion" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  type CFieldType WlDataDeviceListener "motion" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
 
   offset# = \_ -> \_ -> 24
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
-         ) => RIP.HasField "motion" (RIP.Ptr Wl_data_device_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
+         ) => RIP.HasField "motion" (RIP.Ptr WlDataDeviceListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"motion")
 
-instance HasCField.HasCField Wl_data_device_listener "drop" where
+instance HasCField.HasCField WlDataDeviceListener "drop" where
 
-  type CFieldType Wl_data_device_listener "drop" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> IO ())
+  type CFieldType WlDataDeviceListener "drop" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> IO ())
 
   offset# = \_ -> \_ -> 32
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> IO ()))
-         ) => RIP.HasField "drop" (RIP.Ptr Wl_data_device_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> IO ()))
+         ) => RIP.HasField "drop" (RIP.Ptr WlDataDeviceListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"drop")
 
-instance HasCField.HasCField Wl_data_device_listener "selection" where
+instance HasCField.HasCField WlDataDeviceListener "selection" where
 
-  type CFieldType Wl_data_device_listener "selection" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> (RIP.Ptr Wl_data_offer) -> IO ())
+  type CFieldType WlDataDeviceListener "selection" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> (RIP.Ptr WlDataOffer) -> IO ())
 
   offset# = \_ -> \_ -> 40
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> (RIP.Ptr Wl_data_offer) -> IO ()))
-         ) => RIP.HasField "selection" (RIP.Ptr Wl_data_device_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> (RIP.Ptr WlDataOffer) -> IO ()))
+         ) => RIP.HasField "selection" (RIP.Ptr WlDataDeviceListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"selection")
 
@@ -3972,44 +3971,43 @@ wL_DATA_DEVICE_RELEASE_SINCE_VERSION =
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-newtype Wl_data_device_manager_dnd_action = Wl_data_device_manager_dnd_action
+newtype WlDataDeviceManagerDndAction = WlDataDeviceManagerDndAction
   { unwrap :: RIP.CUInt
   }
   deriving stock (Eq, RIP.Generic, Ord)
   deriving newtype (RIP.HasFFIType)
 
-instance Marshal.StaticSize Wl_data_device_manager_dnd_action where
+instance Marshal.StaticSize WlDataDeviceManagerDndAction where
 
   staticSizeOf = \_ -> (4 :: Int)
 
   staticAlignment = \_ -> (4 :: Int)
 
-instance Marshal.ReadRaw Wl_data_device_manager_dnd_action where
+instance Marshal.ReadRaw WlDataDeviceManagerDndAction where
 
   readRaw =
     \ptr0 ->
-          pure Wl_data_device_manager_dnd_action
+          pure WlDataDeviceManagerDndAction
       <*> Marshal.readRawByteOff ptr0 (0 :: Int)
 
-instance Marshal.WriteRaw Wl_data_device_manager_dnd_action where
+instance Marshal.WriteRaw WlDataDeviceManagerDndAction where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_data_device_manager_dnd_action unwrap2 ->
+          WlDataDeviceManagerDndAction unwrap2 ->
             Marshal.writeRawByteOff ptr0 (0 :: Int) unwrap2
 
-deriving via Marshal.EquivStorable Wl_data_device_manager_dnd_action instance RIP.Storable Wl_data_device_manager_dnd_action
+deriving via Marshal.EquivStorable WlDataDeviceManagerDndAction instance RIP.Storable WlDataDeviceManagerDndAction
 
-deriving via RIP.CUInt instance RIP.Prim Wl_data_device_manager_dnd_action
+deriving via RIP.CUInt instance RIP.Prim WlDataDeviceManagerDndAction
 
-instance CEnum.CEnum Wl_data_device_manager_dnd_action where
+instance CEnum.CEnum WlDataDeviceManagerDndAction where
 
-  type CEnumZ Wl_data_device_manager_dnd_action =
-    RIP.CUInt
+  type CEnumZ WlDataDeviceManagerDndAction = RIP.CUInt
 
-  toCEnum = Wl_data_device_manager_dnd_action
+  toCEnum = WlDataDeviceManagerDndAction
 
   fromCEnum = RIP.getField @"unwrap"
 
@@ -4022,16 +4020,16 @@ instance CEnum.CEnum Wl_data_device_manager_dnd_action where
                                    ]
 
   showsUndeclared =
-    CEnum.showsWrappedUndeclared "Wl_data_device_manager_dnd_action"
+    CEnum.showsWrappedUndeclared "WlDataDeviceManagerDndAction"
 
   readPrecUndeclared =
-    CEnum.readPrecWrappedUndeclared "Wl_data_device_manager_dnd_action"
+    CEnum.readPrecWrappedUndeclared "WlDataDeviceManagerDndAction"
 
-instance Show Wl_data_device_manager_dnd_action where
+instance Show WlDataDeviceManagerDndAction where
 
   showsPrec = CEnum.shows
 
-instance Read Wl_data_device_manager_dnd_action where
+instance Read WlDataDeviceManagerDndAction where
 
   readPrec = CEnum.readPrec
 
@@ -4040,13 +4038,13 @@ instance Read Wl_data_device_manager_dnd_action where
   readListPrec = RIP.readListPrecDefault
 
 instance ( ((~) ty) RIP.CUInt
-         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_data_device_manager_dnd_action) (RIP.Ptr ty) where
+         ) => RIP.HasField "unwrap" (RIP.Ptr WlDataDeviceManagerDndAction) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField Wl_data_device_manager_dnd_action "unwrap" where
+instance HasCField.HasCField WlDataDeviceManagerDndAction "unwrap" where
 
-  type CFieldType Wl_data_device_manager_dnd_action "unwrap" =
+  type CFieldType WlDataDeviceManagerDndAction "unwrap" =
     RIP.CUInt
 
   offset# = \_ -> \_ -> 0
@@ -4057,8 +4055,8 @@ instance HasCField.HasCField Wl_data_device_manager_dnd_action "unwrap" where
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_DATA_DEVICE_MANAGER_DND_ACTION_NONE :: Wl_data_device_manager_dnd_action
-pattern WL_DATA_DEVICE_MANAGER_DND_ACTION_NONE = Wl_data_device_manager_dnd_action 0
+pattern WL_DATA_DEVICE_MANAGER_DND_ACTION_NONE :: WlDataDeviceManagerDndAction
+pattern WL_DATA_DEVICE_MANAGER_DND_ACTION_NONE = WlDataDeviceManagerDndAction 0
 
 {-| __C declaration:__ @WL_DATA_DEVICE_MANAGER_DND_ACTION_COPY@
 
@@ -4066,8 +4064,8 @@ pattern WL_DATA_DEVICE_MANAGER_DND_ACTION_NONE = Wl_data_device_manager_dnd_acti
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_DATA_DEVICE_MANAGER_DND_ACTION_COPY :: Wl_data_device_manager_dnd_action
-pattern WL_DATA_DEVICE_MANAGER_DND_ACTION_COPY = Wl_data_device_manager_dnd_action 1
+pattern WL_DATA_DEVICE_MANAGER_DND_ACTION_COPY :: WlDataDeviceManagerDndAction
+pattern WL_DATA_DEVICE_MANAGER_DND_ACTION_COPY = WlDataDeviceManagerDndAction 1
 
 {-| __C declaration:__ @WL_DATA_DEVICE_MANAGER_DND_ACTION_MOVE@
 
@@ -4075,8 +4073,8 @@ pattern WL_DATA_DEVICE_MANAGER_DND_ACTION_COPY = Wl_data_device_manager_dnd_acti
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_DATA_DEVICE_MANAGER_DND_ACTION_MOVE :: Wl_data_device_manager_dnd_action
-pattern WL_DATA_DEVICE_MANAGER_DND_ACTION_MOVE = Wl_data_device_manager_dnd_action 2
+pattern WL_DATA_DEVICE_MANAGER_DND_ACTION_MOVE :: WlDataDeviceManagerDndAction
+pattern WL_DATA_DEVICE_MANAGER_DND_ACTION_MOVE = WlDataDeviceManagerDndAction 2
 
 {-| __C declaration:__ @WL_DATA_DEVICE_MANAGER_DND_ACTION_ASK@
 
@@ -4084,8 +4082,8 @@ pattern WL_DATA_DEVICE_MANAGER_DND_ACTION_MOVE = Wl_data_device_manager_dnd_acti
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_DATA_DEVICE_MANAGER_DND_ACTION_ASK :: Wl_data_device_manager_dnd_action
-pattern WL_DATA_DEVICE_MANAGER_DND_ACTION_ASK = Wl_data_device_manager_dnd_action 4
+pattern WL_DATA_DEVICE_MANAGER_DND_ACTION_ASK :: WlDataDeviceManagerDndAction
+pattern WL_DATA_DEVICE_MANAGER_DND_ACTION_ASK = WlDataDeviceManagerDndAction 4
 
 {-| __C declaration:__ @macro WL_DATA_DEVICE_MANAGER_CREATE_DATA_SOURCE@
 
@@ -4133,43 +4131,43 @@ wL_DATA_DEVICE_MANAGER_GET_DATA_DEVICE_SINCE_VERSION =
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-newtype Wl_shell_error = Wl_shell_error
+newtype WlShellError = WlShellError
   { unwrap :: RIP.CUInt
   }
   deriving stock (Eq, RIP.Generic, Ord)
   deriving newtype (RIP.HasFFIType)
 
-instance Marshal.StaticSize Wl_shell_error where
+instance Marshal.StaticSize WlShellError where
 
   staticSizeOf = \_ -> (4 :: Int)
 
   staticAlignment = \_ -> (4 :: Int)
 
-instance Marshal.ReadRaw Wl_shell_error where
+instance Marshal.ReadRaw WlShellError where
 
   readRaw =
     \ptr0 ->
-          pure Wl_shell_error
+          pure WlShellError
       <*> Marshal.readRawByteOff ptr0 (0 :: Int)
 
-instance Marshal.WriteRaw Wl_shell_error where
+instance Marshal.WriteRaw WlShellError where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_shell_error unwrap2 ->
+          WlShellError unwrap2 ->
             Marshal.writeRawByteOff ptr0 (0 :: Int) unwrap2
 
-deriving via Marshal.EquivStorable Wl_shell_error instance RIP.Storable Wl_shell_error
+deriving via Marshal.EquivStorable WlShellError instance RIP.Storable WlShellError
 
-deriving via RIP.CUInt instance RIP.Prim Wl_shell_error
+deriving via RIP.CUInt instance RIP.Prim WlShellError
 
-instance CEnum.CEnum Wl_shell_error where
+instance CEnum.CEnum WlShellError where
 
-  type CEnumZ Wl_shell_error = RIP.CUInt
+  type CEnumZ WlShellError = RIP.CUInt
 
-  toCEnum = Wl_shell_error
+  toCEnum = WlShellError
 
   fromCEnum = RIP.getField @"unwrap"
 
@@ -4178,26 +4176,26 @@ instance CEnum.CEnum Wl_shell_error where
       CEnum.declaredValuesFromList [(0, RIP.singleton "WL_SHELL_ERROR_ROLE")]
 
   showsUndeclared =
-    CEnum.showsWrappedUndeclared "Wl_shell_error"
+    CEnum.showsWrappedUndeclared "WlShellError"
 
   readPrecUndeclared =
-    CEnum.readPrecWrappedUndeclared "Wl_shell_error"
+    CEnum.readPrecWrappedUndeclared "WlShellError"
 
   isDeclared = CEnum.seqIsDeclared
 
   mkDeclared = CEnum.seqMkDeclared
 
-instance CEnum.SequentialCEnum Wl_shell_error where
+instance CEnum.SequentialCEnum WlShellError where
 
   minDeclaredValue = WL_SHELL_ERROR_ROLE
 
   maxDeclaredValue = WL_SHELL_ERROR_ROLE
 
-instance Show Wl_shell_error where
+instance Show WlShellError where
 
   showsPrec = CEnum.shows
 
-instance Read Wl_shell_error where
+instance Read WlShellError where
 
   readPrec = CEnum.readPrec
 
@@ -4206,13 +4204,13 @@ instance Read Wl_shell_error where
   readListPrec = RIP.readListPrecDefault
 
 instance ( ((~) ty) RIP.CUInt
-         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_shell_error) (RIP.Ptr ty) where
+         ) => RIP.HasField "unwrap" (RIP.Ptr WlShellError) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField Wl_shell_error "unwrap" where
+instance HasCField.HasCField WlShellError "unwrap" where
 
-  type CFieldType Wl_shell_error "unwrap" = RIP.CUInt
+  type CFieldType WlShellError "unwrap" = RIP.CUInt
 
   offset# = \_ -> \_ -> 0
 
@@ -4222,8 +4220,8 @@ instance HasCField.HasCField Wl_shell_error "unwrap" where
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHELL_ERROR_ROLE :: Wl_shell_error
-pattern WL_SHELL_ERROR_ROLE = Wl_shell_error 0
+pattern WL_SHELL_ERROR_ROLE :: WlShellError
+pattern WL_SHELL_ERROR_ROLE = WlShellError 0
 
 {-| __C declaration:__ @macro WL_SHELL_GET_SHELL_SURFACE@
 
@@ -4250,43 +4248,43 @@ wL_SHELL_GET_SHELL_SURFACE_SINCE_VERSION =
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-newtype Wl_shell_surface_resize = Wl_shell_surface_resize
+newtype WlShellSurfaceResize = WlShellSurfaceResize
   { unwrap :: RIP.CUInt
   }
   deriving stock (Eq, RIP.Generic, Ord)
   deriving newtype (RIP.HasFFIType)
 
-instance Marshal.StaticSize Wl_shell_surface_resize where
+instance Marshal.StaticSize WlShellSurfaceResize where
 
   staticSizeOf = \_ -> (4 :: Int)
 
   staticAlignment = \_ -> (4 :: Int)
 
-instance Marshal.ReadRaw Wl_shell_surface_resize where
+instance Marshal.ReadRaw WlShellSurfaceResize where
 
   readRaw =
     \ptr0 ->
-          pure Wl_shell_surface_resize
+          pure WlShellSurfaceResize
       <*> Marshal.readRawByteOff ptr0 (0 :: Int)
 
-instance Marshal.WriteRaw Wl_shell_surface_resize where
+instance Marshal.WriteRaw WlShellSurfaceResize where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_shell_surface_resize unwrap2 ->
+          WlShellSurfaceResize unwrap2 ->
             Marshal.writeRawByteOff ptr0 (0 :: Int) unwrap2
 
-deriving via Marshal.EquivStorable Wl_shell_surface_resize instance RIP.Storable Wl_shell_surface_resize
+deriving via Marshal.EquivStorable WlShellSurfaceResize instance RIP.Storable WlShellSurfaceResize
 
-deriving via RIP.CUInt instance RIP.Prim Wl_shell_surface_resize
+deriving via RIP.CUInt instance RIP.Prim WlShellSurfaceResize
 
-instance CEnum.CEnum Wl_shell_surface_resize where
+instance CEnum.CEnum WlShellSurfaceResize where
 
-  type CEnumZ Wl_shell_surface_resize = RIP.CUInt
+  type CEnumZ WlShellSurfaceResize = RIP.CUInt
 
-  toCEnum = Wl_shell_surface_resize
+  toCEnum = WlShellSurfaceResize
 
   fromCEnum = RIP.getField @"unwrap"
 
@@ -4304,16 +4302,16 @@ instance CEnum.CEnum Wl_shell_surface_resize where
                                    ]
 
   showsUndeclared =
-    CEnum.showsWrappedUndeclared "Wl_shell_surface_resize"
+    CEnum.showsWrappedUndeclared "WlShellSurfaceResize"
 
   readPrecUndeclared =
-    CEnum.readPrecWrappedUndeclared "Wl_shell_surface_resize"
+    CEnum.readPrecWrappedUndeclared "WlShellSurfaceResize"
 
-instance Show Wl_shell_surface_resize where
+instance Show WlShellSurfaceResize where
 
   showsPrec = CEnum.shows
 
-instance Read Wl_shell_surface_resize where
+instance Read WlShellSurfaceResize where
 
   readPrec = CEnum.readPrec
 
@@ -4322,13 +4320,13 @@ instance Read Wl_shell_surface_resize where
   readListPrec = RIP.readListPrecDefault
 
 instance ( ((~) ty) RIP.CUInt
-         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_shell_surface_resize) (RIP.Ptr ty) where
+         ) => RIP.HasField "unwrap" (RIP.Ptr WlShellSurfaceResize) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField Wl_shell_surface_resize "unwrap" where
+instance HasCField.HasCField WlShellSurfaceResize "unwrap" where
 
-  type CFieldType Wl_shell_surface_resize "unwrap" =
+  type CFieldType WlShellSurfaceResize "unwrap" =
     RIP.CUInt
 
   offset# = \_ -> \_ -> 0
@@ -4339,8 +4337,8 @@ instance HasCField.HasCField Wl_shell_surface_resize "unwrap" where
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHELL_SURFACE_RESIZE_NONE :: Wl_shell_surface_resize
-pattern WL_SHELL_SURFACE_RESIZE_NONE = Wl_shell_surface_resize 0
+pattern WL_SHELL_SURFACE_RESIZE_NONE :: WlShellSurfaceResize
+pattern WL_SHELL_SURFACE_RESIZE_NONE = WlShellSurfaceResize 0
 
 {-| __C declaration:__ @WL_SHELL_SURFACE_RESIZE_TOP@
 
@@ -4348,8 +4346,8 @@ pattern WL_SHELL_SURFACE_RESIZE_NONE = Wl_shell_surface_resize 0
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHELL_SURFACE_RESIZE_TOP :: Wl_shell_surface_resize
-pattern WL_SHELL_SURFACE_RESIZE_TOP = Wl_shell_surface_resize 1
+pattern WL_SHELL_SURFACE_RESIZE_TOP :: WlShellSurfaceResize
+pattern WL_SHELL_SURFACE_RESIZE_TOP = WlShellSurfaceResize 1
 
 {-| __C declaration:__ @WL_SHELL_SURFACE_RESIZE_BOTTOM@
 
@@ -4357,8 +4355,8 @@ pattern WL_SHELL_SURFACE_RESIZE_TOP = Wl_shell_surface_resize 1
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHELL_SURFACE_RESIZE_BOTTOM :: Wl_shell_surface_resize
-pattern WL_SHELL_SURFACE_RESIZE_BOTTOM = Wl_shell_surface_resize 2
+pattern WL_SHELL_SURFACE_RESIZE_BOTTOM :: WlShellSurfaceResize
+pattern WL_SHELL_SURFACE_RESIZE_BOTTOM = WlShellSurfaceResize 2
 
 {-| __C declaration:__ @WL_SHELL_SURFACE_RESIZE_LEFT@
 
@@ -4366,8 +4364,8 @@ pattern WL_SHELL_SURFACE_RESIZE_BOTTOM = Wl_shell_surface_resize 2
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHELL_SURFACE_RESIZE_LEFT :: Wl_shell_surface_resize
-pattern WL_SHELL_SURFACE_RESIZE_LEFT = Wl_shell_surface_resize 4
+pattern WL_SHELL_SURFACE_RESIZE_LEFT :: WlShellSurfaceResize
+pattern WL_SHELL_SURFACE_RESIZE_LEFT = WlShellSurfaceResize 4
 
 {-| __C declaration:__ @WL_SHELL_SURFACE_RESIZE_TOP_LEFT@
 
@@ -4375,8 +4373,8 @@ pattern WL_SHELL_SURFACE_RESIZE_LEFT = Wl_shell_surface_resize 4
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHELL_SURFACE_RESIZE_TOP_LEFT :: Wl_shell_surface_resize
-pattern WL_SHELL_SURFACE_RESIZE_TOP_LEFT = Wl_shell_surface_resize 5
+pattern WL_SHELL_SURFACE_RESIZE_TOP_LEFT :: WlShellSurfaceResize
+pattern WL_SHELL_SURFACE_RESIZE_TOP_LEFT = WlShellSurfaceResize 5
 
 {-| __C declaration:__ @WL_SHELL_SURFACE_RESIZE_BOTTOM_LEFT@
 
@@ -4384,8 +4382,8 @@ pattern WL_SHELL_SURFACE_RESIZE_TOP_LEFT = Wl_shell_surface_resize 5
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHELL_SURFACE_RESIZE_BOTTOM_LEFT :: Wl_shell_surface_resize
-pattern WL_SHELL_SURFACE_RESIZE_BOTTOM_LEFT = Wl_shell_surface_resize 6
+pattern WL_SHELL_SURFACE_RESIZE_BOTTOM_LEFT :: WlShellSurfaceResize
+pattern WL_SHELL_SURFACE_RESIZE_BOTTOM_LEFT = WlShellSurfaceResize 6
 
 {-| __C declaration:__ @WL_SHELL_SURFACE_RESIZE_RIGHT@
 
@@ -4393,8 +4391,8 @@ pattern WL_SHELL_SURFACE_RESIZE_BOTTOM_LEFT = Wl_shell_surface_resize 6
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHELL_SURFACE_RESIZE_RIGHT :: Wl_shell_surface_resize
-pattern WL_SHELL_SURFACE_RESIZE_RIGHT = Wl_shell_surface_resize 8
+pattern WL_SHELL_SURFACE_RESIZE_RIGHT :: WlShellSurfaceResize
+pattern WL_SHELL_SURFACE_RESIZE_RIGHT = WlShellSurfaceResize 8
 
 {-| __C declaration:__ @WL_SHELL_SURFACE_RESIZE_TOP_RIGHT@
 
@@ -4402,8 +4400,8 @@ pattern WL_SHELL_SURFACE_RESIZE_RIGHT = Wl_shell_surface_resize 8
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHELL_SURFACE_RESIZE_TOP_RIGHT :: Wl_shell_surface_resize
-pattern WL_SHELL_SURFACE_RESIZE_TOP_RIGHT = Wl_shell_surface_resize 9
+pattern WL_SHELL_SURFACE_RESIZE_TOP_RIGHT :: WlShellSurfaceResize
+pattern WL_SHELL_SURFACE_RESIZE_TOP_RIGHT = WlShellSurfaceResize 9
 
 {-| __C declaration:__ @WL_SHELL_SURFACE_RESIZE_BOTTOM_RIGHT@
 
@@ -4411,8 +4409,8 @@ pattern WL_SHELL_SURFACE_RESIZE_TOP_RIGHT = Wl_shell_surface_resize 9
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHELL_SURFACE_RESIZE_BOTTOM_RIGHT :: Wl_shell_surface_resize
-pattern WL_SHELL_SURFACE_RESIZE_BOTTOM_RIGHT = Wl_shell_surface_resize 10
+pattern WL_SHELL_SURFACE_RESIZE_BOTTOM_RIGHT :: WlShellSurfaceResize
+pattern WL_SHELL_SURFACE_RESIZE_BOTTOM_RIGHT = WlShellSurfaceResize 10
 
 {-| __C declaration:__ @enum wl_shell_surface_transient@
 
@@ -4420,43 +4418,43 @@ pattern WL_SHELL_SURFACE_RESIZE_BOTTOM_RIGHT = Wl_shell_surface_resize 10
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-newtype Wl_shell_surface_transient = Wl_shell_surface_transient
+newtype WlShellSurfaceTransient = WlShellSurfaceTransient
   { unwrap :: RIP.CUInt
   }
   deriving stock (Eq, RIP.Generic, Ord)
   deriving newtype (RIP.HasFFIType)
 
-instance Marshal.StaticSize Wl_shell_surface_transient where
+instance Marshal.StaticSize WlShellSurfaceTransient where
 
   staticSizeOf = \_ -> (4 :: Int)
 
   staticAlignment = \_ -> (4 :: Int)
 
-instance Marshal.ReadRaw Wl_shell_surface_transient where
+instance Marshal.ReadRaw WlShellSurfaceTransient where
 
   readRaw =
     \ptr0 ->
-          pure Wl_shell_surface_transient
+          pure WlShellSurfaceTransient
       <*> Marshal.readRawByteOff ptr0 (0 :: Int)
 
-instance Marshal.WriteRaw Wl_shell_surface_transient where
+instance Marshal.WriteRaw WlShellSurfaceTransient where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_shell_surface_transient unwrap2 ->
+          WlShellSurfaceTransient unwrap2 ->
             Marshal.writeRawByteOff ptr0 (0 :: Int) unwrap2
 
-deriving via Marshal.EquivStorable Wl_shell_surface_transient instance RIP.Storable Wl_shell_surface_transient
+deriving via Marshal.EquivStorable WlShellSurfaceTransient instance RIP.Storable WlShellSurfaceTransient
 
-deriving via RIP.CUInt instance RIP.Prim Wl_shell_surface_transient
+deriving via RIP.CUInt instance RIP.Prim WlShellSurfaceTransient
 
-instance CEnum.CEnum Wl_shell_surface_transient where
+instance CEnum.CEnum WlShellSurfaceTransient where
 
-  type CEnumZ Wl_shell_surface_transient = RIP.CUInt
+  type CEnumZ WlShellSurfaceTransient = RIP.CUInt
 
-  toCEnum = Wl_shell_surface_transient
+  toCEnum = WlShellSurfaceTransient
 
   fromCEnum = RIP.getField @"unwrap"
 
@@ -4465,16 +4463,16 @@ instance CEnum.CEnum Wl_shell_surface_transient where
       CEnum.declaredValuesFromList [(1, RIP.singleton "WL_SHELL_SURFACE_TRANSIENT_INACTIVE")]
 
   showsUndeclared =
-    CEnum.showsWrappedUndeclared "Wl_shell_surface_transient"
+    CEnum.showsWrappedUndeclared "WlShellSurfaceTransient"
 
   readPrecUndeclared =
-    CEnum.readPrecWrappedUndeclared "Wl_shell_surface_transient"
+    CEnum.readPrecWrappedUndeclared "WlShellSurfaceTransient"
 
   isDeclared = CEnum.seqIsDeclared
 
   mkDeclared = CEnum.seqMkDeclared
 
-instance CEnum.SequentialCEnum Wl_shell_surface_transient where
+instance CEnum.SequentialCEnum WlShellSurfaceTransient where
 
   minDeclaredValue =
     WL_SHELL_SURFACE_TRANSIENT_INACTIVE
@@ -4482,11 +4480,11 @@ instance CEnum.SequentialCEnum Wl_shell_surface_transient where
   maxDeclaredValue =
     WL_SHELL_SURFACE_TRANSIENT_INACTIVE
 
-instance Show Wl_shell_surface_transient where
+instance Show WlShellSurfaceTransient where
 
   showsPrec = CEnum.shows
 
-instance Read Wl_shell_surface_transient where
+instance Read WlShellSurfaceTransient where
 
   readPrec = CEnum.readPrec
 
@@ -4495,13 +4493,13 @@ instance Read Wl_shell_surface_transient where
   readListPrec = RIP.readListPrecDefault
 
 instance ( ((~) ty) RIP.CUInt
-         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_shell_surface_transient) (RIP.Ptr ty) where
+         ) => RIP.HasField "unwrap" (RIP.Ptr WlShellSurfaceTransient) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField Wl_shell_surface_transient "unwrap" where
+instance HasCField.HasCField WlShellSurfaceTransient "unwrap" where
 
-  type CFieldType Wl_shell_surface_transient "unwrap" =
+  type CFieldType WlShellSurfaceTransient "unwrap" =
     RIP.CUInt
 
   offset# = \_ -> \_ -> 0
@@ -4512,8 +4510,8 @@ instance HasCField.HasCField Wl_shell_surface_transient "unwrap" where
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHELL_SURFACE_TRANSIENT_INACTIVE :: Wl_shell_surface_transient
-pattern WL_SHELL_SURFACE_TRANSIENT_INACTIVE = Wl_shell_surface_transient 1
+pattern WL_SHELL_SURFACE_TRANSIENT_INACTIVE :: WlShellSurfaceTransient
+pattern WL_SHELL_SURFACE_TRANSIENT_INACTIVE = WlShellSurfaceTransient 1
 
 {-| __C declaration:__ @enum wl_shell_surface_fullscreen_method@
 
@@ -4521,44 +4519,44 @@ pattern WL_SHELL_SURFACE_TRANSIENT_INACTIVE = Wl_shell_surface_transient 1
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-newtype Wl_shell_surface_fullscreen_method = Wl_shell_surface_fullscreen_method
+newtype WlShellSurfaceFullscreenMethod = WlShellSurfaceFullscreenMethod
   { unwrap :: RIP.CUInt
   }
   deriving stock (Eq, RIP.Generic, Ord)
   deriving newtype (RIP.HasFFIType)
 
-instance Marshal.StaticSize Wl_shell_surface_fullscreen_method where
+instance Marshal.StaticSize WlShellSurfaceFullscreenMethod where
 
   staticSizeOf = \_ -> (4 :: Int)
 
   staticAlignment = \_ -> (4 :: Int)
 
-instance Marshal.ReadRaw Wl_shell_surface_fullscreen_method where
+instance Marshal.ReadRaw WlShellSurfaceFullscreenMethod where
 
   readRaw =
     \ptr0 ->
-          pure Wl_shell_surface_fullscreen_method
+          pure WlShellSurfaceFullscreenMethod
       <*> Marshal.readRawByteOff ptr0 (0 :: Int)
 
-instance Marshal.WriteRaw Wl_shell_surface_fullscreen_method where
+instance Marshal.WriteRaw WlShellSurfaceFullscreenMethod where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_shell_surface_fullscreen_method unwrap2 ->
+          WlShellSurfaceFullscreenMethod unwrap2 ->
             Marshal.writeRawByteOff ptr0 (0 :: Int) unwrap2
 
-deriving via Marshal.EquivStorable Wl_shell_surface_fullscreen_method instance RIP.Storable Wl_shell_surface_fullscreen_method
+deriving via Marshal.EquivStorable WlShellSurfaceFullscreenMethod instance RIP.Storable WlShellSurfaceFullscreenMethod
 
-deriving via RIP.CUInt instance RIP.Prim Wl_shell_surface_fullscreen_method
+deriving via RIP.CUInt instance RIP.Prim WlShellSurfaceFullscreenMethod
 
-instance CEnum.CEnum Wl_shell_surface_fullscreen_method where
+instance CEnum.CEnum WlShellSurfaceFullscreenMethod where
 
-  type CEnumZ Wl_shell_surface_fullscreen_method =
+  type CEnumZ WlShellSurfaceFullscreenMethod =
     RIP.CUInt
 
-  toCEnum = Wl_shell_surface_fullscreen_method
+  toCEnum = WlShellSurfaceFullscreenMethod
 
   fromCEnum = RIP.getField @"unwrap"
 
@@ -4571,16 +4569,16 @@ instance CEnum.CEnum Wl_shell_surface_fullscreen_method where
                                    ]
 
   showsUndeclared =
-    CEnum.showsWrappedUndeclared "Wl_shell_surface_fullscreen_method"
+    CEnum.showsWrappedUndeclared "WlShellSurfaceFullscreenMethod"
 
   readPrecUndeclared =
-    CEnum.readPrecWrappedUndeclared "Wl_shell_surface_fullscreen_method"
+    CEnum.readPrecWrappedUndeclared "WlShellSurfaceFullscreenMethod"
 
   isDeclared = CEnum.seqIsDeclared
 
   mkDeclared = CEnum.seqMkDeclared
 
-instance CEnum.SequentialCEnum Wl_shell_surface_fullscreen_method where
+instance CEnum.SequentialCEnum WlShellSurfaceFullscreenMethod where
 
   minDeclaredValue =
     WL_SHELL_SURFACE_FULLSCREEN_METHOD_DEFAULT
@@ -4588,11 +4586,11 @@ instance CEnum.SequentialCEnum Wl_shell_surface_fullscreen_method where
   maxDeclaredValue =
     WL_SHELL_SURFACE_FULLSCREEN_METHOD_FILL
 
-instance Show Wl_shell_surface_fullscreen_method where
+instance Show WlShellSurfaceFullscreenMethod where
 
   showsPrec = CEnum.shows
 
-instance Read Wl_shell_surface_fullscreen_method where
+instance Read WlShellSurfaceFullscreenMethod where
 
   readPrec = CEnum.readPrec
 
@@ -4601,13 +4599,13 @@ instance Read Wl_shell_surface_fullscreen_method where
   readListPrec = RIP.readListPrecDefault
 
 instance ( ((~) ty) RIP.CUInt
-         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_shell_surface_fullscreen_method) (RIP.Ptr ty) where
+         ) => RIP.HasField "unwrap" (RIP.Ptr WlShellSurfaceFullscreenMethod) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField Wl_shell_surface_fullscreen_method "unwrap" where
+instance HasCField.HasCField WlShellSurfaceFullscreenMethod "unwrap" where
 
-  type CFieldType Wl_shell_surface_fullscreen_method "unwrap" =
+  type CFieldType WlShellSurfaceFullscreenMethod "unwrap" =
     RIP.CUInt
 
   offset# = \_ -> \_ -> 0
@@ -4618,8 +4616,8 @@ instance HasCField.HasCField Wl_shell_surface_fullscreen_method "unwrap" where
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHELL_SURFACE_FULLSCREEN_METHOD_DEFAULT :: Wl_shell_surface_fullscreen_method
-pattern WL_SHELL_SURFACE_FULLSCREEN_METHOD_DEFAULT = Wl_shell_surface_fullscreen_method 0
+pattern WL_SHELL_SURFACE_FULLSCREEN_METHOD_DEFAULT :: WlShellSurfaceFullscreenMethod
+pattern WL_SHELL_SURFACE_FULLSCREEN_METHOD_DEFAULT = WlShellSurfaceFullscreenMethod 0
 
 {-| __C declaration:__ @WL_SHELL_SURFACE_FULLSCREEN_METHOD_SCALE@
 
@@ -4627,8 +4625,8 @@ pattern WL_SHELL_SURFACE_FULLSCREEN_METHOD_DEFAULT = Wl_shell_surface_fullscreen
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHELL_SURFACE_FULLSCREEN_METHOD_SCALE :: Wl_shell_surface_fullscreen_method
-pattern WL_SHELL_SURFACE_FULLSCREEN_METHOD_SCALE = Wl_shell_surface_fullscreen_method 1
+pattern WL_SHELL_SURFACE_FULLSCREEN_METHOD_SCALE :: WlShellSurfaceFullscreenMethod
+pattern WL_SHELL_SURFACE_FULLSCREEN_METHOD_SCALE = WlShellSurfaceFullscreenMethod 1
 
 {-| __C declaration:__ @WL_SHELL_SURFACE_FULLSCREEN_METHOD_DRIVER@
 
@@ -4636,8 +4634,8 @@ pattern WL_SHELL_SURFACE_FULLSCREEN_METHOD_SCALE = Wl_shell_surface_fullscreen_m
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHELL_SURFACE_FULLSCREEN_METHOD_DRIVER :: Wl_shell_surface_fullscreen_method
-pattern WL_SHELL_SURFACE_FULLSCREEN_METHOD_DRIVER = Wl_shell_surface_fullscreen_method 2
+pattern WL_SHELL_SURFACE_FULLSCREEN_METHOD_DRIVER :: WlShellSurfaceFullscreenMethod
+pattern WL_SHELL_SURFACE_FULLSCREEN_METHOD_DRIVER = WlShellSurfaceFullscreenMethod 2
 
 {-| __C declaration:__ @WL_SHELL_SURFACE_FULLSCREEN_METHOD_FILL@
 
@@ -4645,8 +4643,8 @@ pattern WL_SHELL_SURFACE_FULLSCREEN_METHOD_DRIVER = Wl_shell_surface_fullscreen_
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SHELL_SURFACE_FULLSCREEN_METHOD_FILL :: Wl_shell_surface_fullscreen_method
-pattern WL_SHELL_SURFACE_FULLSCREEN_METHOD_FILL = Wl_shell_surface_fullscreen_method 3
+pattern WL_SHELL_SURFACE_FULLSCREEN_METHOD_FILL :: WlShellSurfaceFullscreenMethod
+pattern WL_SHELL_SURFACE_FULLSCREEN_METHOD_FILL = WlShellSurfaceFullscreenMethod 3
 
 {-| __C declaration:__ @struct wl_shell_surface_listener@
 
@@ -4654,22 +4652,22 @@ pattern WL_SHELL_SURFACE_FULLSCREEN_METHOD_FILL = Wl_shell_surface_fullscreen_me
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_shell_surface_listener = Wl_shell_surface_listener
-  { ping :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+data WlShellSurfaceListener = WlShellSurfaceListener
+  { ping :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ __C declaration:__ @ping@
 
          __defined at:__ @wayland-client-protocol.h 3304:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , configure :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , configure :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ __C declaration:__ @configure@
 
          __defined at:__ @wayland-client-protocol.h 3331:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , popup_done :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> IO ())
+  , popup_done :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> IO ())
     {- ^ __C declaration:__ @popup_done@
 
          __defined at:__ @wayland-client-protocol.h 3343:9@
@@ -4679,67 +4677,67 @@ data Wl_shell_surface_listener = Wl_shell_surface_listener
   }
   deriving stock (Eq, RIP.Generic, Show)
 
-instance Marshal.StaticSize Wl_shell_surface_listener where
+instance Marshal.StaticSize WlShellSurfaceListener where
 
   staticSizeOf = \_ -> (24 :: Int)
 
   staticAlignment = \_ -> (8 :: Int)
 
-instance Marshal.ReadRaw Wl_shell_surface_listener where
+instance Marshal.ReadRaw WlShellSurfaceListener where
 
   readRaw =
     \ptr0 ->
-          pure Wl_shell_surface_listener
+          pure WlShellSurfaceListener
       <*> HasCField.readRaw (RIP.Proxy @"ping") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"configure") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"popup_done") ptr0
 
-instance Marshal.WriteRaw Wl_shell_surface_listener where
+instance Marshal.WriteRaw WlShellSurfaceListener where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_shell_surface_listener ping2 configure3 popup_done4 ->
+          WlShellSurfaceListener ping2 configure3 popup_done4 ->
                HasCField.writeRaw (RIP.Proxy @"ping") ptr0 ping2
             >> HasCField.writeRaw (RIP.Proxy @"configure") ptr0 configure3
             >> HasCField.writeRaw (RIP.Proxy @"popup_done") ptr0 popup_done4
 
-deriving via Marshal.EquivStorable Wl_shell_surface_listener instance RIP.Storable Wl_shell_surface_listener
+deriving via Marshal.EquivStorable WlShellSurfaceListener instance RIP.Storable WlShellSurfaceListener
 
-instance HasCField.HasCField Wl_shell_surface_listener "ping" where
+instance HasCField.HasCField WlShellSurfaceListener "ping" where
 
-  type CFieldType Wl_shell_surface_listener "ping" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  type CFieldType WlShellSurfaceListener "ping" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-         ) => RIP.HasField "ping" (RIP.Ptr Wl_shell_surface_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+         ) => RIP.HasField "ping" (RIP.Ptr WlShellSurfaceListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"ping")
 
-instance HasCField.HasCField Wl_shell_surface_listener "configure" where
+instance HasCField.HasCField WlShellSurfaceListener "configure" where
 
-  type CFieldType Wl_shell_surface_listener "configure" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  type CFieldType WlShellSurfaceListener "configure" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-         ) => RIP.HasField "configure" (RIP.Ptr Wl_shell_surface_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+         ) => RIP.HasField "configure" (RIP.Ptr WlShellSurfaceListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"configure")
 
-instance HasCField.HasCField Wl_shell_surface_listener "popup_done" where
+instance HasCField.HasCField WlShellSurfaceListener "popup_done" where
 
-  type CFieldType Wl_shell_surface_listener "popup_done" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> IO ())
+  type CFieldType WlShellSurfaceListener "popup_done" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> IO ())
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> IO ()))
-         ) => RIP.HasField "popup_done" (RIP.Ptr Wl_shell_surface_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> IO ()))
+         ) => RIP.HasField "popup_done" (RIP.Ptr WlShellSurfaceListener) (RIP.Ptr ty) where
 
   getField =
     HasCField.fromPtr (RIP.Proxy @"popup_done")
@@ -4967,43 +4965,43 @@ wL_SHELL_SURFACE_SET_CLASS_SINCE_VERSION =
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-newtype Wl_surface_error = Wl_surface_error
+newtype WlSurfaceError = WlSurfaceError
   { unwrap :: RIP.CUInt
   }
   deriving stock (Eq, RIP.Generic, Ord)
   deriving newtype (RIP.HasFFIType)
 
-instance Marshal.StaticSize Wl_surface_error where
+instance Marshal.StaticSize WlSurfaceError where
 
   staticSizeOf = \_ -> (4 :: Int)
 
   staticAlignment = \_ -> (4 :: Int)
 
-instance Marshal.ReadRaw Wl_surface_error where
+instance Marshal.ReadRaw WlSurfaceError where
 
   readRaw =
     \ptr0 ->
-          pure Wl_surface_error
+          pure WlSurfaceError
       <*> Marshal.readRawByteOff ptr0 (0 :: Int)
 
-instance Marshal.WriteRaw Wl_surface_error where
+instance Marshal.WriteRaw WlSurfaceError where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_surface_error unwrap2 ->
+          WlSurfaceError unwrap2 ->
             Marshal.writeRawByteOff ptr0 (0 :: Int) unwrap2
 
-deriving via Marshal.EquivStorable Wl_surface_error instance RIP.Storable Wl_surface_error
+deriving via Marshal.EquivStorable WlSurfaceError instance RIP.Storable WlSurfaceError
 
-deriving via RIP.CUInt instance RIP.Prim Wl_surface_error
+deriving via RIP.CUInt instance RIP.Prim WlSurfaceError
 
-instance CEnum.CEnum Wl_surface_error where
+instance CEnum.CEnum WlSurfaceError where
 
-  type CEnumZ Wl_surface_error = RIP.CUInt
+  type CEnumZ WlSurfaceError = RIP.CUInt
 
-  toCEnum = Wl_surface_error
+  toCEnum = WlSurfaceError
 
   fromCEnum = RIP.getField @"unwrap"
 
@@ -5017,27 +5015,27 @@ instance CEnum.CEnum Wl_surface_error where
                                    ]
 
   showsUndeclared =
-    CEnum.showsWrappedUndeclared "Wl_surface_error"
+    CEnum.showsWrappedUndeclared "WlSurfaceError"
 
   readPrecUndeclared =
-    CEnum.readPrecWrappedUndeclared "Wl_surface_error"
+    CEnum.readPrecWrappedUndeclared "WlSurfaceError"
 
   isDeclared = CEnum.seqIsDeclared
 
   mkDeclared = CEnum.seqMkDeclared
 
-instance CEnum.SequentialCEnum Wl_surface_error where
+instance CEnum.SequentialCEnum WlSurfaceError where
 
   minDeclaredValue = WL_SURFACE_ERROR_INVALID_SCALE
 
   maxDeclaredValue =
     WL_SURFACE_ERROR_DEFUNCT_ROLE_OBJECT
 
-instance Show Wl_surface_error where
+instance Show WlSurfaceError where
 
   showsPrec = CEnum.shows
 
-instance Read Wl_surface_error where
+instance Read WlSurfaceError where
 
   readPrec = CEnum.readPrec
 
@@ -5046,13 +5044,13 @@ instance Read Wl_surface_error where
   readListPrec = RIP.readListPrecDefault
 
 instance ( ((~) ty) RIP.CUInt
-         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_surface_error) (RIP.Ptr ty) where
+         ) => RIP.HasField "unwrap" (RIP.Ptr WlSurfaceError) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField Wl_surface_error "unwrap" where
+instance HasCField.HasCField WlSurfaceError "unwrap" where
 
-  type CFieldType Wl_surface_error "unwrap" = RIP.CUInt
+  type CFieldType WlSurfaceError "unwrap" = RIP.CUInt
 
   offset# = \_ -> \_ -> 0
 
@@ -5062,8 +5060,8 @@ instance HasCField.HasCField Wl_surface_error "unwrap" where
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SURFACE_ERROR_INVALID_SCALE :: Wl_surface_error
-pattern WL_SURFACE_ERROR_INVALID_SCALE = Wl_surface_error 0
+pattern WL_SURFACE_ERROR_INVALID_SCALE :: WlSurfaceError
+pattern WL_SURFACE_ERROR_INVALID_SCALE = WlSurfaceError 0
 
 {-| __C declaration:__ @WL_SURFACE_ERROR_INVALID_TRANSFORM@
 
@@ -5071,8 +5069,8 @@ pattern WL_SURFACE_ERROR_INVALID_SCALE = Wl_surface_error 0
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SURFACE_ERROR_INVALID_TRANSFORM :: Wl_surface_error
-pattern WL_SURFACE_ERROR_INVALID_TRANSFORM = Wl_surface_error 1
+pattern WL_SURFACE_ERROR_INVALID_TRANSFORM :: WlSurfaceError
+pattern WL_SURFACE_ERROR_INVALID_TRANSFORM = WlSurfaceError 1
 
 {-| __C declaration:__ @WL_SURFACE_ERROR_INVALID_SIZE@
 
@@ -5080,8 +5078,8 @@ pattern WL_SURFACE_ERROR_INVALID_TRANSFORM = Wl_surface_error 1
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SURFACE_ERROR_INVALID_SIZE :: Wl_surface_error
-pattern WL_SURFACE_ERROR_INVALID_SIZE = Wl_surface_error 2
+pattern WL_SURFACE_ERROR_INVALID_SIZE :: WlSurfaceError
+pattern WL_SURFACE_ERROR_INVALID_SIZE = WlSurfaceError 2
 
 {-| __C declaration:__ @WL_SURFACE_ERROR_INVALID_OFFSET@
 
@@ -5089,8 +5087,8 @@ pattern WL_SURFACE_ERROR_INVALID_SIZE = Wl_surface_error 2
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SURFACE_ERROR_INVALID_OFFSET :: Wl_surface_error
-pattern WL_SURFACE_ERROR_INVALID_OFFSET = Wl_surface_error 3
+pattern WL_SURFACE_ERROR_INVALID_OFFSET :: WlSurfaceError
+pattern WL_SURFACE_ERROR_INVALID_OFFSET = WlSurfaceError 3
 
 {-| __C declaration:__ @WL_SURFACE_ERROR_DEFUNCT_ROLE_OBJECT@
 
@@ -5098,8 +5096,8 @@ pattern WL_SURFACE_ERROR_INVALID_OFFSET = Wl_surface_error 3
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SURFACE_ERROR_DEFUNCT_ROLE_OBJECT :: Wl_surface_error
-pattern WL_SURFACE_ERROR_DEFUNCT_ROLE_OBJECT = Wl_surface_error 4
+pattern WL_SURFACE_ERROR_DEFUNCT_ROLE_OBJECT :: WlSurfaceError
+pattern WL_SURFACE_ERROR_DEFUNCT_ROLE_OBJECT = WlSurfaceError 4
 
 {-| __C declaration:__ @struct wl_surface_listener@
 
@@ -5107,29 +5105,29 @@ pattern WL_SURFACE_ERROR_DEFUNCT_ROLE_OBJECT = Wl_surface_error 4
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_surface_listener = Wl_surface_listener
-  { enter :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> (RIP.Ptr Wl_output) -> IO ())
+data WlSurfaceListener = WlSurfaceListener
+  { enter :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> (RIP.Ptr WlOutput) -> IO ())
     {- ^ __C declaration:__ @enter@
 
          __defined at:__ @wayland-client-protocol.h 3713:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , leave :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> (RIP.Ptr Wl_output) -> IO ())
+  , leave :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> (RIP.Ptr WlOutput) -> IO ())
     {- ^ __C declaration:__ @leave@
 
          __defined at:__ @wayland-client-protocol.h 3730:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , preferred_buffer_scale :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , preferred_buffer_scale :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ __C declaration:__ @preferred_buffer_scale@
 
          __defined at:__ @wayland-client-protocol.h 3752:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , preferred_buffer_transform :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , preferred_buffer_transform :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ __C declaration:__ @preferred_buffer_transform@
 
          __defined at:__ @wayland-client-protocol.h 3771:9@
@@ -5139,29 +5137,29 @@ data Wl_surface_listener = Wl_surface_listener
   }
   deriving stock (Eq, RIP.Generic, Show)
 
-instance Marshal.StaticSize Wl_surface_listener where
+instance Marshal.StaticSize WlSurfaceListener where
 
   staticSizeOf = \_ -> (32 :: Int)
 
   staticAlignment = \_ -> (8 :: Int)
 
-instance Marshal.ReadRaw Wl_surface_listener where
+instance Marshal.ReadRaw WlSurfaceListener where
 
   readRaw =
     \ptr0 ->
-          pure Wl_surface_listener
+          pure WlSurfaceListener
       <*> HasCField.readRaw (RIP.Proxy @"enter") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"leave") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"preferred_buffer_scale") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"preferred_buffer_transform") ptr0
 
-instance Marshal.WriteRaw Wl_surface_listener where
+instance Marshal.WriteRaw WlSurfaceListener where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_surface_listener
+          WlSurfaceListener
             enter2
             leave3
             preferred_buffer_scale4
@@ -5171,54 +5169,54 @@ instance Marshal.WriteRaw Wl_surface_listener where
               >> HasCField.writeRaw (RIP.Proxy @"preferred_buffer_scale") ptr0 preferred_buffer_scale4
               >> HasCField.writeRaw (RIP.Proxy @"preferred_buffer_transform") ptr0 preferred_buffer_transform5
 
-deriving via Marshal.EquivStorable Wl_surface_listener instance RIP.Storable Wl_surface_listener
+deriving via Marshal.EquivStorable WlSurfaceListener instance RIP.Storable WlSurfaceListener
 
-instance HasCField.HasCField Wl_surface_listener "enter" where
+instance HasCField.HasCField WlSurfaceListener "enter" where
 
-  type CFieldType Wl_surface_listener "enter" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> (RIP.Ptr Wl_output) -> IO ())
+  type CFieldType WlSurfaceListener "enter" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> (RIP.Ptr WlOutput) -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> (RIP.Ptr Wl_output) -> IO ()))
-         ) => RIP.HasField "enter" (RIP.Ptr Wl_surface_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> (RIP.Ptr WlOutput) -> IO ()))
+         ) => RIP.HasField "enter" (RIP.Ptr WlSurfaceListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"enter")
 
-instance HasCField.HasCField Wl_surface_listener "leave" where
+instance HasCField.HasCField WlSurfaceListener "leave" where
 
-  type CFieldType Wl_surface_listener "leave" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> (RIP.Ptr Wl_output) -> IO ())
+  type CFieldType WlSurfaceListener "leave" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> (RIP.Ptr WlOutput) -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> (RIP.Ptr Wl_output) -> IO ()))
-         ) => RIP.HasField "leave" (RIP.Ptr Wl_surface_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> (RIP.Ptr WlOutput) -> IO ()))
+         ) => RIP.HasField "leave" (RIP.Ptr WlSurfaceListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"leave")
 
-instance HasCField.HasCField Wl_surface_listener "preferred_buffer_scale" where
+instance HasCField.HasCField WlSurfaceListener "preferred_buffer_scale" where
 
-  type CFieldType Wl_surface_listener "preferred_buffer_scale" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  type CFieldType WlSurfaceListener "preferred_buffer_scale" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-         ) => RIP.HasField "preferred_buffer_scale" (RIP.Ptr Wl_surface_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+         ) => RIP.HasField "preferred_buffer_scale" (RIP.Ptr WlSurfaceListener) (RIP.Ptr ty) where
 
   getField =
     HasCField.fromPtr (RIP.Proxy @"preferred_buffer_scale")
 
-instance HasCField.HasCField Wl_surface_listener "preferred_buffer_transform" where
+instance HasCField.HasCField WlSurfaceListener "preferred_buffer_transform" where
 
-  type CFieldType Wl_surface_listener "preferred_buffer_transform" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  type CFieldType WlSurfaceListener "preferred_buffer_transform" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 24
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-         ) => RIP.HasField "preferred_buffer_transform" (RIP.Ptr Wl_surface_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+         ) => RIP.HasField "preferred_buffer_transform" (RIP.Ptr WlSurfaceListener) (RIP.Ptr ty) where
 
   getField =
     HasCField.fromPtr (RIP.Proxy @"preferred_buffer_transform")
@@ -5470,43 +5468,43 @@ wL_SURFACE_OFFSET_SINCE_VERSION = (5 :: RIP.CInt)
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-newtype Wl_seat_capability = Wl_seat_capability
+newtype WlSeatCapability = WlSeatCapability
   { unwrap :: RIP.CUInt
   }
   deriving stock (Eq, RIP.Generic, Ord)
   deriving newtype (RIP.HasFFIType)
 
-instance Marshal.StaticSize Wl_seat_capability where
+instance Marshal.StaticSize WlSeatCapability where
 
   staticSizeOf = \_ -> (4 :: Int)
 
   staticAlignment = \_ -> (4 :: Int)
 
-instance Marshal.ReadRaw Wl_seat_capability where
+instance Marshal.ReadRaw WlSeatCapability where
 
   readRaw =
     \ptr0 ->
-          pure Wl_seat_capability
+          pure WlSeatCapability
       <*> Marshal.readRawByteOff ptr0 (0 :: Int)
 
-instance Marshal.WriteRaw Wl_seat_capability where
+instance Marshal.WriteRaw WlSeatCapability where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_seat_capability unwrap2 ->
+          WlSeatCapability unwrap2 ->
             Marshal.writeRawByteOff ptr0 (0 :: Int) unwrap2
 
-deriving via Marshal.EquivStorable Wl_seat_capability instance RIP.Storable Wl_seat_capability
+deriving via Marshal.EquivStorable WlSeatCapability instance RIP.Storable WlSeatCapability
 
-deriving via RIP.CUInt instance RIP.Prim Wl_seat_capability
+deriving via RIP.CUInt instance RIP.Prim WlSeatCapability
 
-instance CEnum.CEnum Wl_seat_capability where
+instance CEnum.CEnum WlSeatCapability where
 
-  type CEnumZ Wl_seat_capability = RIP.CUInt
+  type CEnumZ WlSeatCapability = RIP.CUInt
 
-  toCEnum = Wl_seat_capability
+  toCEnum = WlSeatCapability
 
   fromCEnum = RIP.getField @"unwrap"
 
@@ -5518,16 +5516,16 @@ instance CEnum.CEnum Wl_seat_capability where
                                    ]
 
   showsUndeclared =
-    CEnum.showsWrappedUndeclared "Wl_seat_capability"
+    CEnum.showsWrappedUndeclared "WlSeatCapability"
 
   readPrecUndeclared =
-    CEnum.readPrecWrappedUndeclared "Wl_seat_capability"
+    CEnum.readPrecWrappedUndeclared "WlSeatCapability"
 
-instance Show Wl_seat_capability where
+instance Show WlSeatCapability where
 
   showsPrec = CEnum.shows
 
-instance Read Wl_seat_capability where
+instance Read WlSeatCapability where
 
   readPrec = CEnum.readPrec
 
@@ -5536,14 +5534,13 @@ instance Read Wl_seat_capability where
   readListPrec = RIP.readListPrecDefault
 
 instance ( ((~) ty) RIP.CUInt
-         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_seat_capability) (RIP.Ptr ty) where
+         ) => RIP.HasField "unwrap" (RIP.Ptr WlSeatCapability) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField Wl_seat_capability "unwrap" where
+instance HasCField.HasCField WlSeatCapability "unwrap" where
 
-  type CFieldType Wl_seat_capability "unwrap" =
-    RIP.CUInt
+  type CFieldType WlSeatCapability "unwrap" = RIP.CUInt
 
   offset# = \_ -> \_ -> 0
 
@@ -5553,8 +5550,8 @@ instance HasCField.HasCField Wl_seat_capability "unwrap" where
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SEAT_CAPABILITY_POINTER :: Wl_seat_capability
-pattern WL_SEAT_CAPABILITY_POINTER = Wl_seat_capability 1
+pattern WL_SEAT_CAPABILITY_POINTER :: WlSeatCapability
+pattern WL_SEAT_CAPABILITY_POINTER = WlSeatCapability 1
 
 {-| __C declaration:__ @WL_SEAT_CAPABILITY_KEYBOARD@
 
@@ -5562,8 +5559,8 @@ pattern WL_SEAT_CAPABILITY_POINTER = Wl_seat_capability 1
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SEAT_CAPABILITY_KEYBOARD :: Wl_seat_capability
-pattern WL_SEAT_CAPABILITY_KEYBOARD = Wl_seat_capability 2
+pattern WL_SEAT_CAPABILITY_KEYBOARD :: WlSeatCapability
+pattern WL_SEAT_CAPABILITY_KEYBOARD = WlSeatCapability 2
 
 {-| __C declaration:__ @WL_SEAT_CAPABILITY_TOUCH@
 
@@ -5571,8 +5568,8 @@ pattern WL_SEAT_CAPABILITY_KEYBOARD = Wl_seat_capability 2
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SEAT_CAPABILITY_TOUCH :: Wl_seat_capability
-pattern WL_SEAT_CAPABILITY_TOUCH = Wl_seat_capability 4
+pattern WL_SEAT_CAPABILITY_TOUCH :: WlSeatCapability
+pattern WL_SEAT_CAPABILITY_TOUCH = WlSeatCapability 4
 
 {-| __C declaration:__ @enum wl_seat_error@
 
@@ -5580,43 +5577,43 @@ pattern WL_SEAT_CAPABILITY_TOUCH = Wl_seat_capability 4
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-newtype Wl_seat_error = Wl_seat_error
+newtype WlSeatError = WlSeatError
   { unwrap :: RIP.CUInt
   }
   deriving stock (Eq, RIP.Generic, Ord)
   deriving newtype (RIP.HasFFIType)
 
-instance Marshal.StaticSize Wl_seat_error where
+instance Marshal.StaticSize WlSeatError where
 
   staticSizeOf = \_ -> (4 :: Int)
 
   staticAlignment = \_ -> (4 :: Int)
 
-instance Marshal.ReadRaw Wl_seat_error where
+instance Marshal.ReadRaw WlSeatError where
 
   readRaw =
     \ptr0 ->
-          pure Wl_seat_error
+          pure WlSeatError
       <*> Marshal.readRawByteOff ptr0 (0 :: Int)
 
-instance Marshal.WriteRaw Wl_seat_error where
+instance Marshal.WriteRaw WlSeatError where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_seat_error unwrap2 ->
+          WlSeatError unwrap2 ->
             Marshal.writeRawByteOff ptr0 (0 :: Int) unwrap2
 
-deriving via Marshal.EquivStorable Wl_seat_error instance RIP.Storable Wl_seat_error
+deriving via Marshal.EquivStorable WlSeatError instance RIP.Storable WlSeatError
 
-deriving via RIP.CUInt instance RIP.Prim Wl_seat_error
+deriving via RIP.CUInt instance RIP.Prim WlSeatError
 
-instance CEnum.CEnum Wl_seat_error where
+instance CEnum.CEnum WlSeatError where
 
-  type CEnumZ Wl_seat_error = RIP.CUInt
+  type CEnumZ WlSeatError = RIP.CUInt
 
-  toCEnum = Wl_seat_error
+  toCEnum = WlSeatError
 
   fromCEnum = RIP.getField @"unwrap"
 
@@ -5625,26 +5622,26 @@ instance CEnum.CEnum Wl_seat_error where
       CEnum.declaredValuesFromList [(0, RIP.singleton "WL_SEAT_ERROR_MISSING_CAPABILITY")]
 
   showsUndeclared =
-    CEnum.showsWrappedUndeclared "Wl_seat_error"
+    CEnum.showsWrappedUndeclared "WlSeatError"
 
   readPrecUndeclared =
-    CEnum.readPrecWrappedUndeclared "Wl_seat_error"
+    CEnum.readPrecWrappedUndeclared "WlSeatError"
 
   isDeclared = CEnum.seqIsDeclared
 
   mkDeclared = CEnum.seqMkDeclared
 
-instance CEnum.SequentialCEnum Wl_seat_error where
+instance CEnum.SequentialCEnum WlSeatError where
 
   minDeclaredValue = WL_SEAT_ERROR_MISSING_CAPABILITY
 
   maxDeclaredValue = WL_SEAT_ERROR_MISSING_CAPABILITY
 
-instance Show Wl_seat_error where
+instance Show WlSeatError where
 
   showsPrec = CEnum.shows
 
-instance Read Wl_seat_error where
+instance Read WlSeatError where
 
   readPrec = CEnum.readPrec
 
@@ -5653,13 +5650,13 @@ instance Read Wl_seat_error where
   readListPrec = RIP.readListPrecDefault
 
 instance ( ((~) ty) RIP.CUInt
-         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_seat_error) (RIP.Ptr ty) where
+         ) => RIP.HasField "unwrap" (RIP.Ptr WlSeatError) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField Wl_seat_error "unwrap" where
+instance HasCField.HasCField WlSeatError "unwrap" where
 
-  type CFieldType Wl_seat_error "unwrap" = RIP.CUInt
+  type CFieldType WlSeatError "unwrap" = RIP.CUInt
 
   offset# = \_ -> \_ -> 0
 
@@ -5669,8 +5666,8 @@ instance HasCField.HasCField Wl_seat_error "unwrap" where
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SEAT_ERROR_MISSING_CAPABILITY :: Wl_seat_error
-pattern WL_SEAT_ERROR_MISSING_CAPABILITY = Wl_seat_error 0
+pattern WL_SEAT_ERROR_MISSING_CAPABILITY :: WlSeatError
+pattern WL_SEAT_ERROR_MISSING_CAPABILITY = WlSeatError 0
 
 {-| __C declaration:__ @struct wl_seat_listener@
 
@@ -5678,15 +5675,15 @@ pattern WL_SEAT_ERROR_MISSING_CAPABILITY = Wl_seat_error 0
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_seat_listener = Wl_seat_listener
-  { capabilities :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_seat) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+data WlSeatListener = WlSeatListener
+  { capabilities :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSeat) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ __C declaration:__ @capabilities@
 
          __defined at:__ @wayland-client-protocol.h 4368:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , name :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_seat) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  , name :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSeat) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
     {- ^ __C declaration:__ @name@
 
          __defined at:__ @wayland-client-protocol.h 4397:9@
@@ -5696,54 +5693,54 @@ data Wl_seat_listener = Wl_seat_listener
   }
   deriving stock (Eq, RIP.Generic, Show)
 
-instance Marshal.StaticSize Wl_seat_listener where
+instance Marshal.StaticSize WlSeatListener where
 
   staticSizeOf = \_ -> (16 :: Int)
 
   staticAlignment = \_ -> (8 :: Int)
 
-instance Marshal.ReadRaw Wl_seat_listener where
+instance Marshal.ReadRaw WlSeatListener where
 
   readRaw =
     \ptr0 ->
-          pure Wl_seat_listener
+          pure WlSeatListener
       <*> HasCField.readRaw (RIP.Proxy @"capabilities") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"name") ptr0
 
-instance Marshal.WriteRaw Wl_seat_listener where
+instance Marshal.WriteRaw WlSeatListener where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_seat_listener capabilities2 name3 ->
+          WlSeatListener capabilities2 name3 ->
                HasCField.writeRaw (RIP.Proxy @"capabilities") ptr0 capabilities2
             >> HasCField.writeRaw (RIP.Proxy @"name") ptr0 name3
 
-deriving via Marshal.EquivStorable Wl_seat_listener instance RIP.Storable Wl_seat_listener
+deriving via Marshal.EquivStorable WlSeatListener instance RIP.Storable WlSeatListener
 
-instance HasCField.HasCField Wl_seat_listener "capabilities" where
+instance HasCField.HasCField WlSeatListener "capabilities" where
 
-  type CFieldType Wl_seat_listener "capabilities" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_seat) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  type CFieldType WlSeatListener "capabilities" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSeat) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_seat) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-         ) => RIP.HasField "capabilities" (RIP.Ptr Wl_seat_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSeat) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+         ) => RIP.HasField "capabilities" (RIP.Ptr WlSeatListener) (RIP.Ptr ty) where
 
   getField =
     HasCField.fromPtr (RIP.Proxy @"capabilities")
 
-instance HasCField.HasCField Wl_seat_listener "name" where
+instance HasCField.HasCField WlSeatListener "name" where
 
-  type CFieldType Wl_seat_listener "name" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_seat) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  type CFieldType WlSeatListener "name" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSeat) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_seat) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
-         ) => RIP.HasField "name" (RIP.Ptr Wl_seat_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSeat) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
+         ) => RIP.HasField "name" (RIP.Ptr WlSeatListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"name")
 
@@ -5843,43 +5840,43 @@ wL_SEAT_RELEASE_SINCE_VERSION = (5 :: RIP.CInt)
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-newtype Wl_pointer_error = Wl_pointer_error
+newtype WlPointerError = WlPointerError
   { unwrap :: RIP.CUInt
   }
   deriving stock (Eq, RIP.Generic, Ord)
   deriving newtype (RIP.HasFFIType)
 
-instance Marshal.StaticSize Wl_pointer_error where
+instance Marshal.StaticSize WlPointerError where
 
   staticSizeOf = \_ -> (4 :: Int)
 
   staticAlignment = \_ -> (4 :: Int)
 
-instance Marshal.ReadRaw Wl_pointer_error where
+instance Marshal.ReadRaw WlPointerError where
 
   readRaw =
     \ptr0 ->
-          pure Wl_pointer_error
+          pure WlPointerError
       <*> Marshal.readRawByteOff ptr0 (0 :: Int)
 
-instance Marshal.WriteRaw Wl_pointer_error where
+instance Marshal.WriteRaw WlPointerError where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_pointer_error unwrap2 ->
+          WlPointerError unwrap2 ->
             Marshal.writeRawByteOff ptr0 (0 :: Int) unwrap2
 
-deriving via Marshal.EquivStorable Wl_pointer_error instance RIP.Storable Wl_pointer_error
+deriving via Marshal.EquivStorable WlPointerError instance RIP.Storable WlPointerError
 
-deriving via RIP.CUInt instance RIP.Prim Wl_pointer_error
+deriving via RIP.CUInt instance RIP.Prim WlPointerError
 
-instance CEnum.CEnum Wl_pointer_error where
+instance CEnum.CEnum WlPointerError where
 
-  type CEnumZ Wl_pointer_error = RIP.CUInt
+  type CEnumZ WlPointerError = RIP.CUInt
 
-  toCEnum = Wl_pointer_error
+  toCEnum = WlPointerError
 
   fromCEnum = RIP.getField @"unwrap"
 
@@ -5888,26 +5885,26 @@ instance CEnum.CEnum Wl_pointer_error where
       CEnum.declaredValuesFromList [(0, RIP.singleton "WL_POINTER_ERROR_ROLE")]
 
   showsUndeclared =
-    CEnum.showsWrappedUndeclared "Wl_pointer_error"
+    CEnum.showsWrappedUndeclared "WlPointerError"
 
   readPrecUndeclared =
-    CEnum.readPrecWrappedUndeclared "Wl_pointer_error"
+    CEnum.readPrecWrappedUndeclared "WlPointerError"
 
   isDeclared = CEnum.seqIsDeclared
 
   mkDeclared = CEnum.seqMkDeclared
 
-instance CEnum.SequentialCEnum Wl_pointer_error where
+instance CEnum.SequentialCEnum WlPointerError where
 
   minDeclaredValue = WL_POINTER_ERROR_ROLE
 
   maxDeclaredValue = WL_POINTER_ERROR_ROLE
 
-instance Show Wl_pointer_error where
+instance Show WlPointerError where
 
   showsPrec = CEnum.shows
 
-instance Read Wl_pointer_error where
+instance Read WlPointerError where
 
   readPrec = CEnum.readPrec
 
@@ -5916,13 +5913,13 @@ instance Read Wl_pointer_error where
   readListPrec = RIP.readListPrecDefault
 
 instance ( ((~) ty) RIP.CUInt
-         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_pointer_error) (RIP.Ptr ty) where
+         ) => RIP.HasField "unwrap" (RIP.Ptr WlPointerError) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField Wl_pointer_error "unwrap" where
+instance HasCField.HasCField WlPointerError "unwrap" where
 
-  type CFieldType Wl_pointer_error "unwrap" = RIP.CUInt
+  type CFieldType WlPointerError "unwrap" = RIP.CUInt
 
   offset# = \_ -> \_ -> 0
 
@@ -5932,8 +5929,8 @@ instance HasCField.HasCField Wl_pointer_error "unwrap" where
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_POINTER_ERROR_ROLE :: Wl_pointer_error
-pattern WL_POINTER_ERROR_ROLE = Wl_pointer_error 0
+pattern WL_POINTER_ERROR_ROLE :: WlPointerError
+pattern WL_POINTER_ERROR_ROLE = WlPointerError 0
 
 {-| __C declaration:__ @enum wl_pointer_button_state@
 
@@ -5941,43 +5938,43 @@ pattern WL_POINTER_ERROR_ROLE = Wl_pointer_error 0
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-newtype Wl_pointer_button_state = Wl_pointer_button_state
+newtype WlPointerButtonState = WlPointerButtonState
   { unwrap :: RIP.CUInt
   }
   deriving stock (Eq, RIP.Generic, Ord)
   deriving newtype (RIP.HasFFIType)
 
-instance Marshal.StaticSize Wl_pointer_button_state where
+instance Marshal.StaticSize WlPointerButtonState where
 
   staticSizeOf = \_ -> (4 :: Int)
 
   staticAlignment = \_ -> (4 :: Int)
 
-instance Marshal.ReadRaw Wl_pointer_button_state where
+instance Marshal.ReadRaw WlPointerButtonState where
 
   readRaw =
     \ptr0 ->
-          pure Wl_pointer_button_state
+          pure WlPointerButtonState
       <*> Marshal.readRawByteOff ptr0 (0 :: Int)
 
-instance Marshal.WriteRaw Wl_pointer_button_state where
+instance Marshal.WriteRaw WlPointerButtonState where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_pointer_button_state unwrap2 ->
+          WlPointerButtonState unwrap2 ->
             Marshal.writeRawByteOff ptr0 (0 :: Int) unwrap2
 
-deriving via Marshal.EquivStorable Wl_pointer_button_state instance RIP.Storable Wl_pointer_button_state
+deriving via Marshal.EquivStorable WlPointerButtonState instance RIP.Storable WlPointerButtonState
 
-deriving via RIP.CUInt instance RIP.Prim Wl_pointer_button_state
+deriving via RIP.CUInt instance RIP.Prim WlPointerButtonState
 
-instance CEnum.CEnum Wl_pointer_button_state where
+instance CEnum.CEnum WlPointerButtonState where
 
-  type CEnumZ Wl_pointer_button_state = RIP.CUInt
+  type CEnumZ WlPointerButtonState = RIP.CUInt
 
-  toCEnum = Wl_pointer_button_state
+  toCEnum = WlPointerButtonState
 
   fromCEnum = RIP.getField @"unwrap"
 
@@ -5988,26 +5985,26 @@ instance CEnum.CEnum Wl_pointer_button_state where
                                    ]
 
   showsUndeclared =
-    CEnum.showsWrappedUndeclared "Wl_pointer_button_state"
+    CEnum.showsWrappedUndeclared "WlPointerButtonState"
 
   readPrecUndeclared =
-    CEnum.readPrecWrappedUndeclared "Wl_pointer_button_state"
+    CEnum.readPrecWrappedUndeclared "WlPointerButtonState"
 
   isDeclared = CEnum.seqIsDeclared
 
   mkDeclared = CEnum.seqMkDeclared
 
-instance CEnum.SequentialCEnum Wl_pointer_button_state where
+instance CEnum.SequentialCEnum WlPointerButtonState where
 
   minDeclaredValue = WL_POINTER_BUTTON_STATE_RELEASED
 
   maxDeclaredValue = WL_POINTER_BUTTON_STATE_PRESSED
 
-instance Show Wl_pointer_button_state where
+instance Show WlPointerButtonState where
 
   showsPrec = CEnum.shows
 
-instance Read Wl_pointer_button_state where
+instance Read WlPointerButtonState where
 
   readPrec = CEnum.readPrec
 
@@ -6016,13 +6013,13 @@ instance Read Wl_pointer_button_state where
   readListPrec = RIP.readListPrecDefault
 
 instance ( ((~) ty) RIP.CUInt
-         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_pointer_button_state) (RIP.Ptr ty) where
+         ) => RIP.HasField "unwrap" (RIP.Ptr WlPointerButtonState) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField Wl_pointer_button_state "unwrap" where
+instance HasCField.HasCField WlPointerButtonState "unwrap" where
 
-  type CFieldType Wl_pointer_button_state "unwrap" =
+  type CFieldType WlPointerButtonState "unwrap" =
     RIP.CUInt
 
   offset# = \_ -> \_ -> 0
@@ -6033,8 +6030,8 @@ instance HasCField.HasCField Wl_pointer_button_state "unwrap" where
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_POINTER_BUTTON_STATE_RELEASED :: Wl_pointer_button_state
-pattern WL_POINTER_BUTTON_STATE_RELEASED = Wl_pointer_button_state 0
+pattern WL_POINTER_BUTTON_STATE_RELEASED :: WlPointerButtonState
+pattern WL_POINTER_BUTTON_STATE_RELEASED = WlPointerButtonState 0
 
 {-| __C declaration:__ @WL_POINTER_BUTTON_STATE_PRESSED@
 
@@ -6042,8 +6039,8 @@ pattern WL_POINTER_BUTTON_STATE_RELEASED = Wl_pointer_button_state 0
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_POINTER_BUTTON_STATE_PRESSED :: Wl_pointer_button_state
-pattern WL_POINTER_BUTTON_STATE_PRESSED = Wl_pointer_button_state 1
+pattern WL_POINTER_BUTTON_STATE_PRESSED :: WlPointerButtonState
+pattern WL_POINTER_BUTTON_STATE_PRESSED = WlPointerButtonState 1
 
 {-| __C declaration:__ @enum wl_pointer_axis@
 
@@ -6051,43 +6048,43 @@ pattern WL_POINTER_BUTTON_STATE_PRESSED = Wl_pointer_button_state 1
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-newtype Wl_pointer_axis = Wl_pointer_axis
+newtype WlPointerAxis = WlPointerAxis
   { unwrap :: RIP.CUInt
   }
   deriving stock (Eq, RIP.Generic, Ord)
   deriving newtype (RIP.HasFFIType)
 
-instance Marshal.StaticSize Wl_pointer_axis where
+instance Marshal.StaticSize WlPointerAxis where
 
   staticSizeOf = \_ -> (4 :: Int)
 
   staticAlignment = \_ -> (4 :: Int)
 
-instance Marshal.ReadRaw Wl_pointer_axis where
+instance Marshal.ReadRaw WlPointerAxis where
 
   readRaw =
     \ptr0 ->
-          pure Wl_pointer_axis
+          pure WlPointerAxis
       <*> Marshal.readRawByteOff ptr0 (0 :: Int)
 
-instance Marshal.WriteRaw Wl_pointer_axis where
+instance Marshal.WriteRaw WlPointerAxis where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_pointer_axis unwrap2 ->
+          WlPointerAxis unwrap2 ->
             Marshal.writeRawByteOff ptr0 (0 :: Int) unwrap2
 
-deriving via Marshal.EquivStorable Wl_pointer_axis instance RIP.Storable Wl_pointer_axis
+deriving via Marshal.EquivStorable WlPointerAxis instance RIP.Storable WlPointerAxis
 
-deriving via RIP.CUInt instance RIP.Prim Wl_pointer_axis
+deriving via RIP.CUInt instance RIP.Prim WlPointerAxis
 
-instance CEnum.CEnum Wl_pointer_axis where
+instance CEnum.CEnum WlPointerAxis where
 
-  type CEnumZ Wl_pointer_axis = RIP.CUInt
+  type CEnumZ WlPointerAxis = RIP.CUInt
 
-  toCEnum = Wl_pointer_axis
+  toCEnum = WlPointerAxis
 
   fromCEnum = RIP.getField @"unwrap"
 
@@ -6098,26 +6095,26 @@ instance CEnum.CEnum Wl_pointer_axis where
                                    ]
 
   showsUndeclared =
-    CEnum.showsWrappedUndeclared "Wl_pointer_axis"
+    CEnum.showsWrappedUndeclared "WlPointerAxis"
 
   readPrecUndeclared =
-    CEnum.readPrecWrappedUndeclared "Wl_pointer_axis"
+    CEnum.readPrecWrappedUndeclared "WlPointerAxis"
 
   isDeclared = CEnum.seqIsDeclared
 
   mkDeclared = CEnum.seqMkDeclared
 
-instance CEnum.SequentialCEnum Wl_pointer_axis where
+instance CEnum.SequentialCEnum WlPointerAxis where
 
   minDeclaredValue = WL_POINTER_AXIS_VERTICAL_SCROLL
 
   maxDeclaredValue = WL_POINTER_AXIS_HORIZONTAL_SCROLL
 
-instance Show Wl_pointer_axis where
+instance Show WlPointerAxis where
 
   showsPrec = CEnum.shows
 
-instance Read Wl_pointer_axis where
+instance Read WlPointerAxis where
 
   readPrec = CEnum.readPrec
 
@@ -6126,13 +6123,13 @@ instance Read Wl_pointer_axis where
   readListPrec = RIP.readListPrecDefault
 
 instance ( ((~) ty) RIP.CUInt
-         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_pointer_axis) (RIP.Ptr ty) where
+         ) => RIP.HasField "unwrap" (RIP.Ptr WlPointerAxis) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField Wl_pointer_axis "unwrap" where
+instance HasCField.HasCField WlPointerAxis "unwrap" where
 
-  type CFieldType Wl_pointer_axis "unwrap" = RIP.CUInt
+  type CFieldType WlPointerAxis "unwrap" = RIP.CUInt
 
   offset# = \_ -> \_ -> 0
 
@@ -6142,8 +6139,8 @@ instance HasCField.HasCField Wl_pointer_axis "unwrap" where
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_POINTER_AXIS_VERTICAL_SCROLL :: Wl_pointer_axis
-pattern WL_POINTER_AXIS_VERTICAL_SCROLL = Wl_pointer_axis 0
+pattern WL_POINTER_AXIS_VERTICAL_SCROLL :: WlPointerAxis
+pattern WL_POINTER_AXIS_VERTICAL_SCROLL = WlPointerAxis 0
 
 {-| __C declaration:__ @WL_POINTER_AXIS_HORIZONTAL_SCROLL@
 
@@ -6151,8 +6148,8 @@ pattern WL_POINTER_AXIS_VERTICAL_SCROLL = Wl_pointer_axis 0
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_POINTER_AXIS_HORIZONTAL_SCROLL :: Wl_pointer_axis
-pattern WL_POINTER_AXIS_HORIZONTAL_SCROLL = Wl_pointer_axis 1
+pattern WL_POINTER_AXIS_HORIZONTAL_SCROLL :: WlPointerAxis
+pattern WL_POINTER_AXIS_HORIZONTAL_SCROLL = WlPointerAxis 1
 
 {-| __C declaration:__ @enum wl_pointer_axis_source@
 
@@ -6160,43 +6157,43 @@ pattern WL_POINTER_AXIS_HORIZONTAL_SCROLL = Wl_pointer_axis 1
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-newtype Wl_pointer_axis_source = Wl_pointer_axis_source
+newtype WlPointerAxisSource = WlPointerAxisSource
   { unwrap :: RIP.CUInt
   }
   deriving stock (Eq, RIP.Generic, Ord)
   deriving newtype (RIP.HasFFIType)
 
-instance Marshal.StaticSize Wl_pointer_axis_source where
+instance Marshal.StaticSize WlPointerAxisSource where
 
   staticSizeOf = \_ -> (4 :: Int)
 
   staticAlignment = \_ -> (4 :: Int)
 
-instance Marshal.ReadRaw Wl_pointer_axis_source where
+instance Marshal.ReadRaw WlPointerAxisSource where
 
   readRaw =
     \ptr0 ->
-          pure Wl_pointer_axis_source
+          pure WlPointerAxisSource
       <*> Marshal.readRawByteOff ptr0 (0 :: Int)
 
-instance Marshal.WriteRaw Wl_pointer_axis_source where
+instance Marshal.WriteRaw WlPointerAxisSource where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_pointer_axis_source unwrap2 ->
+          WlPointerAxisSource unwrap2 ->
             Marshal.writeRawByteOff ptr0 (0 :: Int) unwrap2
 
-deriving via Marshal.EquivStorable Wl_pointer_axis_source instance RIP.Storable Wl_pointer_axis_source
+deriving via Marshal.EquivStorable WlPointerAxisSource instance RIP.Storable WlPointerAxisSource
 
-deriving via RIP.CUInt instance RIP.Prim Wl_pointer_axis_source
+deriving via RIP.CUInt instance RIP.Prim WlPointerAxisSource
 
-instance CEnum.CEnum Wl_pointer_axis_source where
+instance CEnum.CEnum WlPointerAxisSource where
 
-  type CEnumZ Wl_pointer_axis_source = RIP.CUInt
+  type CEnumZ WlPointerAxisSource = RIP.CUInt
 
-  toCEnum = Wl_pointer_axis_source
+  toCEnum = WlPointerAxisSource
 
   fromCEnum = RIP.getField @"unwrap"
 
@@ -6209,26 +6206,26 @@ instance CEnum.CEnum Wl_pointer_axis_source where
                                    ]
 
   showsUndeclared =
-    CEnum.showsWrappedUndeclared "Wl_pointer_axis_source"
+    CEnum.showsWrappedUndeclared "WlPointerAxisSource"
 
   readPrecUndeclared =
-    CEnum.readPrecWrappedUndeclared "Wl_pointer_axis_source"
+    CEnum.readPrecWrappedUndeclared "WlPointerAxisSource"
 
   isDeclared = CEnum.seqIsDeclared
 
   mkDeclared = CEnum.seqMkDeclared
 
-instance CEnum.SequentialCEnum Wl_pointer_axis_source where
+instance CEnum.SequentialCEnum WlPointerAxisSource where
 
   minDeclaredValue = WL_POINTER_AXIS_SOURCE_WHEEL
 
   maxDeclaredValue = WL_POINTER_AXIS_SOURCE_WHEEL_TILT
 
-instance Show Wl_pointer_axis_source where
+instance Show WlPointerAxisSource where
 
   showsPrec = CEnum.shows
 
-instance Read Wl_pointer_axis_source where
+instance Read WlPointerAxisSource where
 
   readPrec = CEnum.readPrec
 
@@ -6237,13 +6234,13 @@ instance Read Wl_pointer_axis_source where
   readListPrec = RIP.readListPrecDefault
 
 instance ( ((~) ty) RIP.CUInt
-         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_pointer_axis_source) (RIP.Ptr ty) where
+         ) => RIP.HasField "unwrap" (RIP.Ptr WlPointerAxisSource) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField Wl_pointer_axis_source "unwrap" where
+instance HasCField.HasCField WlPointerAxisSource "unwrap" where
 
-  type CFieldType Wl_pointer_axis_source "unwrap" =
+  type CFieldType WlPointerAxisSource "unwrap" =
     RIP.CUInt
 
   offset# = \_ -> \_ -> 0
@@ -6254,8 +6251,8 @@ instance HasCField.HasCField Wl_pointer_axis_source "unwrap" where
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_POINTER_AXIS_SOURCE_WHEEL :: Wl_pointer_axis_source
-pattern WL_POINTER_AXIS_SOURCE_WHEEL = Wl_pointer_axis_source 0
+pattern WL_POINTER_AXIS_SOURCE_WHEEL :: WlPointerAxisSource
+pattern WL_POINTER_AXIS_SOURCE_WHEEL = WlPointerAxisSource 0
 
 {-| __C declaration:__ @WL_POINTER_AXIS_SOURCE_FINGER@
 
@@ -6263,8 +6260,8 @@ pattern WL_POINTER_AXIS_SOURCE_WHEEL = Wl_pointer_axis_source 0
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_POINTER_AXIS_SOURCE_FINGER :: Wl_pointer_axis_source
-pattern WL_POINTER_AXIS_SOURCE_FINGER = Wl_pointer_axis_source 1
+pattern WL_POINTER_AXIS_SOURCE_FINGER :: WlPointerAxisSource
+pattern WL_POINTER_AXIS_SOURCE_FINGER = WlPointerAxisSource 1
 
 {-| __C declaration:__ @WL_POINTER_AXIS_SOURCE_CONTINUOUS@
 
@@ -6272,8 +6269,8 @@ pattern WL_POINTER_AXIS_SOURCE_FINGER = Wl_pointer_axis_source 1
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_POINTER_AXIS_SOURCE_CONTINUOUS :: Wl_pointer_axis_source
-pattern WL_POINTER_AXIS_SOURCE_CONTINUOUS = Wl_pointer_axis_source 2
+pattern WL_POINTER_AXIS_SOURCE_CONTINUOUS :: WlPointerAxisSource
+pattern WL_POINTER_AXIS_SOURCE_CONTINUOUS = WlPointerAxisSource 2
 
 {-| __C declaration:__ @WL_POINTER_AXIS_SOURCE_WHEEL_TILT@
 
@@ -6281,8 +6278,8 @@ pattern WL_POINTER_AXIS_SOURCE_CONTINUOUS = Wl_pointer_axis_source 2
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_POINTER_AXIS_SOURCE_WHEEL_TILT :: Wl_pointer_axis_source
-pattern WL_POINTER_AXIS_SOURCE_WHEEL_TILT = Wl_pointer_axis_source 3
+pattern WL_POINTER_AXIS_SOURCE_WHEEL_TILT :: WlPointerAxisSource
+pattern WL_POINTER_AXIS_SOURCE_WHEEL_TILT = WlPointerAxisSource 3
 
 {-| __C declaration:__ @macro WL_POINTER_AXIS_SOURCE_WHEEL_TILT_SINCE_VERSION@
 
@@ -6300,44 +6297,44 @@ wL_POINTER_AXIS_SOURCE_WHEEL_TILT_SINCE_VERSION =
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-newtype Wl_pointer_axis_relative_direction = Wl_pointer_axis_relative_direction
+newtype WlPointerAxisRelativeDirection = WlPointerAxisRelativeDirection
   { unwrap :: RIP.CUInt
   }
   deriving stock (Eq, RIP.Generic, Ord)
   deriving newtype (RIP.HasFFIType)
 
-instance Marshal.StaticSize Wl_pointer_axis_relative_direction where
+instance Marshal.StaticSize WlPointerAxisRelativeDirection where
 
   staticSizeOf = \_ -> (4 :: Int)
 
   staticAlignment = \_ -> (4 :: Int)
 
-instance Marshal.ReadRaw Wl_pointer_axis_relative_direction where
+instance Marshal.ReadRaw WlPointerAxisRelativeDirection where
 
   readRaw =
     \ptr0 ->
-          pure Wl_pointer_axis_relative_direction
+          pure WlPointerAxisRelativeDirection
       <*> Marshal.readRawByteOff ptr0 (0 :: Int)
 
-instance Marshal.WriteRaw Wl_pointer_axis_relative_direction where
+instance Marshal.WriteRaw WlPointerAxisRelativeDirection where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_pointer_axis_relative_direction unwrap2 ->
+          WlPointerAxisRelativeDirection unwrap2 ->
             Marshal.writeRawByteOff ptr0 (0 :: Int) unwrap2
 
-deriving via Marshal.EquivStorable Wl_pointer_axis_relative_direction instance RIP.Storable Wl_pointer_axis_relative_direction
+deriving via Marshal.EquivStorable WlPointerAxisRelativeDirection instance RIP.Storable WlPointerAxisRelativeDirection
 
-deriving via RIP.CUInt instance RIP.Prim Wl_pointer_axis_relative_direction
+deriving via RIP.CUInt instance RIP.Prim WlPointerAxisRelativeDirection
 
-instance CEnum.CEnum Wl_pointer_axis_relative_direction where
+instance CEnum.CEnum WlPointerAxisRelativeDirection where
 
-  type CEnumZ Wl_pointer_axis_relative_direction =
+  type CEnumZ WlPointerAxisRelativeDirection =
     RIP.CUInt
 
-  toCEnum = Wl_pointer_axis_relative_direction
+  toCEnum = WlPointerAxisRelativeDirection
 
   fromCEnum = RIP.getField @"unwrap"
 
@@ -6348,16 +6345,16 @@ instance CEnum.CEnum Wl_pointer_axis_relative_direction where
                                    ]
 
   showsUndeclared =
-    CEnum.showsWrappedUndeclared "Wl_pointer_axis_relative_direction"
+    CEnum.showsWrappedUndeclared "WlPointerAxisRelativeDirection"
 
   readPrecUndeclared =
-    CEnum.readPrecWrappedUndeclared "Wl_pointer_axis_relative_direction"
+    CEnum.readPrecWrappedUndeclared "WlPointerAxisRelativeDirection"
 
   isDeclared = CEnum.seqIsDeclared
 
   mkDeclared = CEnum.seqMkDeclared
 
-instance CEnum.SequentialCEnum Wl_pointer_axis_relative_direction where
+instance CEnum.SequentialCEnum WlPointerAxisRelativeDirection where
 
   minDeclaredValue =
     WL_POINTER_AXIS_RELATIVE_DIRECTION_IDENTICAL
@@ -6365,11 +6362,11 @@ instance CEnum.SequentialCEnum Wl_pointer_axis_relative_direction where
   maxDeclaredValue =
     WL_POINTER_AXIS_RELATIVE_DIRECTION_INVERTED
 
-instance Show Wl_pointer_axis_relative_direction where
+instance Show WlPointerAxisRelativeDirection where
 
   showsPrec = CEnum.shows
 
-instance Read Wl_pointer_axis_relative_direction where
+instance Read WlPointerAxisRelativeDirection where
 
   readPrec = CEnum.readPrec
 
@@ -6378,13 +6375,13 @@ instance Read Wl_pointer_axis_relative_direction where
   readListPrec = RIP.readListPrecDefault
 
 instance ( ((~) ty) RIP.CUInt
-         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_pointer_axis_relative_direction) (RIP.Ptr ty) where
+         ) => RIP.HasField "unwrap" (RIP.Ptr WlPointerAxisRelativeDirection) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField Wl_pointer_axis_relative_direction "unwrap" where
+instance HasCField.HasCField WlPointerAxisRelativeDirection "unwrap" where
 
-  type CFieldType Wl_pointer_axis_relative_direction "unwrap" =
+  type CFieldType WlPointerAxisRelativeDirection "unwrap" =
     RIP.CUInt
 
   offset# = \_ -> \_ -> 0
@@ -6395,8 +6392,8 @@ instance HasCField.HasCField Wl_pointer_axis_relative_direction "unwrap" where
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_POINTER_AXIS_RELATIVE_DIRECTION_IDENTICAL :: Wl_pointer_axis_relative_direction
-pattern WL_POINTER_AXIS_RELATIVE_DIRECTION_IDENTICAL = Wl_pointer_axis_relative_direction 0
+pattern WL_POINTER_AXIS_RELATIVE_DIRECTION_IDENTICAL :: WlPointerAxisRelativeDirection
+pattern WL_POINTER_AXIS_RELATIVE_DIRECTION_IDENTICAL = WlPointerAxisRelativeDirection 0
 
 {-| __C declaration:__ @WL_POINTER_AXIS_RELATIVE_DIRECTION_INVERTED@
 
@@ -6404,8 +6401,8 @@ pattern WL_POINTER_AXIS_RELATIVE_DIRECTION_IDENTICAL = Wl_pointer_axis_relative_
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_POINTER_AXIS_RELATIVE_DIRECTION_INVERTED :: Wl_pointer_axis_relative_direction
-pattern WL_POINTER_AXIS_RELATIVE_DIRECTION_INVERTED = Wl_pointer_axis_relative_direction 1
+pattern WL_POINTER_AXIS_RELATIVE_DIRECTION_INVERTED :: WlPointerAxisRelativeDirection
+pattern WL_POINTER_AXIS_RELATIVE_DIRECTION_INVERTED = WlPointerAxisRelativeDirection 1
 
 {-| __C declaration:__ @struct wl_pointer_listener@
 
@@ -6413,78 +6410,78 @@ pattern WL_POINTER_AXIS_RELATIVE_DIRECTION_INVERTED = Wl_pointer_axis_relative_d
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_pointer_listener = Wl_pointer_listener
-  { enter :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+data WlPointerListener = WlPointerListener
+  { enter :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
     {- ^ __C declaration:__ @enter@
 
          __defined at:__ @wayland-client-protocol.h 4692:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , leave :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> IO ())
+  , leave :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> IO ())
     {- ^ __C declaration:__ @leave@
 
          __defined at:__ @wayland-client-protocol.h 4709:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , motion :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  , motion :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
     {- ^ __C declaration:__ @motion@
 
          __defined at:__ @wayland-client-protocol.h 4723:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , button :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , button :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ __C declaration:__ @button@
 
          __defined at:__ @wayland-client-protocol.h 4749:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , axis :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  , axis :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
     {- ^ __C declaration:__ @axis@
 
          __defined at:__ @wayland-client-protocol.h 4778:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , frame :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> IO ())
+  , frame :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> IO ())
     {- ^ __C declaration:__ @frame@
 
          __defined at:__ @wayland-client-protocol.h 4822:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , axis_source :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , axis_source :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ __C declaration:__ @axis_source@
 
          __defined at:__ @wayland-client-protocol.h 4855:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , axis_stop :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , axis_stop :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ __C declaration:__ @axis_stop@
 
          __defined at:__ @wayland-client-protocol.h 4879:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , axis_discrete :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , axis_discrete :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ __C declaration:__ @axis_discrete@
 
          __defined at:__ @wayland-client-protocol.h 4922:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , axis_value120 :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , axis_value120 :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ __C declaration:__ @axis_value120@
 
          __defined at:__ @wayland-client-protocol.h 4954:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , axis_relative_direction :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , axis_relative_direction :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ __C declaration:__ @axis_relative_direction@
 
          __defined at:__ @wayland-client-protocol.h 5000:9@
@@ -6494,17 +6491,17 @@ data Wl_pointer_listener = Wl_pointer_listener
   }
   deriving stock (Eq, RIP.Generic, Show)
 
-instance Marshal.StaticSize Wl_pointer_listener where
+instance Marshal.StaticSize WlPointerListener where
 
   staticSizeOf = \_ -> (88 :: Int)
 
   staticAlignment = \_ -> (8 :: Int)
 
-instance Marshal.ReadRaw Wl_pointer_listener where
+instance Marshal.ReadRaw WlPointerListener where
 
   readRaw =
     \ptr0 ->
-          pure Wl_pointer_listener
+          pure WlPointerListener
       <*> HasCField.readRaw (RIP.Proxy @"enter") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"leave") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"motion") ptr0
@@ -6517,13 +6514,13 @@ instance Marshal.ReadRaw Wl_pointer_listener where
       <*> HasCField.readRaw (RIP.Proxy @"axis_value120") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"axis_relative_direction") ptr0
 
-instance Marshal.WriteRaw Wl_pointer_listener where
+instance Marshal.WriteRaw WlPointerListener where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_pointer_listener
+          WlPointerListener
             enter2
             leave3
             motion4
@@ -6547,140 +6544,140 @@ instance Marshal.WriteRaw Wl_pointer_listener where
               >> HasCField.writeRaw (RIP.Proxy @"axis_value120") ptr0 axis_value12011
               >> HasCField.writeRaw (RIP.Proxy @"axis_relative_direction") ptr0 axis_relative_direction12
 
-deriving via Marshal.EquivStorable Wl_pointer_listener instance RIP.Storable Wl_pointer_listener
+deriving via Marshal.EquivStorable WlPointerListener instance RIP.Storable WlPointerListener
 
-instance HasCField.HasCField Wl_pointer_listener "enter" where
+instance HasCField.HasCField WlPointerListener "enter" where
 
-  type CFieldType Wl_pointer_listener "enter" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  type CFieldType WlPointerListener "enter" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
-         ) => RIP.HasField "enter" (RIP.Ptr Wl_pointer_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
+         ) => RIP.HasField "enter" (RIP.Ptr WlPointerListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"enter")
 
-instance HasCField.HasCField Wl_pointer_listener "leave" where
+instance HasCField.HasCField WlPointerListener "leave" where
 
-  type CFieldType Wl_pointer_listener "leave" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> IO ())
+  type CFieldType WlPointerListener "leave" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> IO ()))
-         ) => RIP.HasField "leave" (RIP.Ptr Wl_pointer_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> IO ()))
+         ) => RIP.HasField "leave" (RIP.Ptr WlPointerListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"leave")
 
-instance HasCField.HasCField Wl_pointer_listener "motion" where
+instance HasCField.HasCField WlPointerListener "motion" where
 
-  type CFieldType Wl_pointer_listener "motion" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  type CFieldType WlPointerListener "motion" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
-         ) => RIP.HasField "motion" (RIP.Ptr Wl_pointer_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
+         ) => RIP.HasField "motion" (RIP.Ptr WlPointerListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"motion")
 
-instance HasCField.HasCField Wl_pointer_listener "button" where
+instance HasCField.HasCField WlPointerListener "button" where
 
-  type CFieldType Wl_pointer_listener "button" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  type CFieldType WlPointerListener "button" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 24
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-         ) => RIP.HasField "button" (RIP.Ptr Wl_pointer_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+         ) => RIP.HasField "button" (RIP.Ptr WlPointerListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"button")
 
-instance HasCField.HasCField Wl_pointer_listener "axis" where
+instance HasCField.HasCField WlPointerListener "axis" where
 
-  type CFieldType Wl_pointer_listener "axis" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  type CFieldType WlPointerListener "axis" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
 
   offset# = \_ -> \_ -> 32
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
-         ) => RIP.HasField "axis" (RIP.Ptr Wl_pointer_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
+         ) => RIP.HasField "axis" (RIP.Ptr WlPointerListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"axis")
 
-instance HasCField.HasCField Wl_pointer_listener "frame" where
+instance HasCField.HasCField WlPointerListener "frame" where
 
-  type CFieldType Wl_pointer_listener "frame" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> IO ())
+  type CFieldType WlPointerListener "frame" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> IO ())
 
   offset# = \_ -> \_ -> 40
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> IO ()))
-         ) => RIP.HasField "frame" (RIP.Ptr Wl_pointer_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> IO ()))
+         ) => RIP.HasField "frame" (RIP.Ptr WlPointerListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"frame")
 
-instance HasCField.HasCField Wl_pointer_listener "axis_source" where
+instance HasCField.HasCField WlPointerListener "axis_source" where
 
-  type CFieldType Wl_pointer_listener "axis_source" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  type CFieldType WlPointerListener "axis_source" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 48
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-         ) => RIP.HasField "axis_source" (RIP.Ptr Wl_pointer_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+         ) => RIP.HasField "axis_source" (RIP.Ptr WlPointerListener) (RIP.Ptr ty) where
 
   getField =
     HasCField.fromPtr (RIP.Proxy @"axis_source")
 
-instance HasCField.HasCField Wl_pointer_listener "axis_stop" where
+instance HasCField.HasCField WlPointerListener "axis_stop" where
 
-  type CFieldType Wl_pointer_listener "axis_stop" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  type CFieldType WlPointerListener "axis_stop" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 56
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-         ) => RIP.HasField "axis_stop" (RIP.Ptr Wl_pointer_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+         ) => RIP.HasField "axis_stop" (RIP.Ptr WlPointerListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"axis_stop")
 
-instance HasCField.HasCField Wl_pointer_listener "axis_discrete" where
+instance HasCField.HasCField WlPointerListener "axis_discrete" where
 
-  type CFieldType Wl_pointer_listener "axis_discrete" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  type CFieldType WlPointerListener "axis_discrete" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 64
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-         ) => RIP.HasField "axis_discrete" (RIP.Ptr Wl_pointer_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+         ) => RIP.HasField "axis_discrete" (RIP.Ptr WlPointerListener) (RIP.Ptr ty) where
 
   getField =
     HasCField.fromPtr (RIP.Proxy @"axis_discrete")
 
-instance HasCField.HasCField Wl_pointer_listener "axis_value120" where
+instance HasCField.HasCField WlPointerListener "axis_value120" where
 
-  type CFieldType Wl_pointer_listener "axis_value120" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  type CFieldType WlPointerListener "axis_value120" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 72
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-         ) => RIP.HasField "axis_value120" (RIP.Ptr Wl_pointer_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+         ) => RIP.HasField "axis_value120" (RIP.Ptr WlPointerListener) (RIP.Ptr ty) where
 
   getField =
     HasCField.fromPtr (RIP.Proxy @"axis_value120")
 
-instance HasCField.HasCField Wl_pointer_listener "axis_relative_direction" where
+instance HasCField.HasCField WlPointerListener "axis_relative_direction" where
 
-  type CFieldType Wl_pointer_listener "axis_relative_direction" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  type CFieldType WlPointerListener "axis_relative_direction" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 80
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-         ) => RIP.HasField "axis_relative_direction" (RIP.Ptr Wl_pointer_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+         ) => RIP.HasField "axis_relative_direction" (RIP.Ptr WlPointerListener) (RIP.Ptr ty) where
 
   getField =
     HasCField.fromPtr (RIP.Proxy @"axis_relative_direction")
@@ -6830,43 +6827,43 @@ wL_POINTER_RELEASE_SINCE_VERSION = (3 :: RIP.CInt)
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-newtype Wl_keyboard_keymap_format = Wl_keyboard_keymap_format
+newtype WlKeyboardKeymapFormat = WlKeyboardKeymapFormat
   { unwrap :: RIP.CUInt
   }
   deriving stock (Eq, RIP.Generic, Ord)
   deriving newtype (RIP.HasFFIType)
 
-instance Marshal.StaticSize Wl_keyboard_keymap_format where
+instance Marshal.StaticSize WlKeyboardKeymapFormat where
 
   staticSizeOf = \_ -> (4 :: Int)
 
   staticAlignment = \_ -> (4 :: Int)
 
-instance Marshal.ReadRaw Wl_keyboard_keymap_format where
+instance Marshal.ReadRaw WlKeyboardKeymapFormat where
 
   readRaw =
     \ptr0 ->
-          pure Wl_keyboard_keymap_format
+          pure WlKeyboardKeymapFormat
       <*> Marshal.readRawByteOff ptr0 (0 :: Int)
 
-instance Marshal.WriteRaw Wl_keyboard_keymap_format where
+instance Marshal.WriteRaw WlKeyboardKeymapFormat where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_keyboard_keymap_format unwrap2 ->
+          WlKeyboardKeymapFormat unwrap2 ->
             Marshal.writeRawByteOff ptr0 (0 :: Int) unwrap2
 
-deriving via Marshal.EquivStorable Wl_keyboard_keymap_format instance RIP.Storable Wl_keyboard_keymap_format
+deriving via Marshal.EquivStorable WlKeyboardKeymapFormat instance RIP.Storable WlKeyboardKeymapFormat
 
-deriving via RIP.CUInt instance RIP.Prim Wl_keyboard_keymap_format
+deriving via RIP.CUInt instance RIP.Prim WlKeyboardKeymapFormat
 
-instance CEnum.CEnum Wl_keyboard_keymap_format where
+instance CEnum.CEnum WlKeyboardKeymapFormat where
 
-  type CEnumZ Wl_keyboard_keymap_format = RIP.CUInt
+  type CEnumZ WlKeyboardKeymapFormat = RIP.CUInt
 
-  toCEnum = Wl_keyboard_keymap_format
+  toCEnum = WlKeyboardKeymapFormat
 
   fromCEnum = RIP.getField @"unwrap"
 
@@ -6877,27 +6874,27 @@ instance CEnum.CEnum Wl_keyboard_keymap_format where
                                    ]
 
   showsUndeclared =
-    CEnum.showsWrappedUndeclared "Wl_keyboard_keymap_format"
+    CEnum.showsWrappedUndeclared "WlKeyboardKeymapFormat"
 
   readPrecUndeclared =
-    CEnum.readPrecWrappedUndeclared "Wl_keyboard_keymap_format"
+    CEnum.readPrecWrappedUndeclared "WlKeyboardKeymapFormat"
 
   isDeclared = CEnum.seqIsDeclared
 
   mkDeclared = CEnum.seqMkDeclared
 
-instance CEnum.SequentialCEnum Wl_keyboard_keymap_format where
+instance CEnum.SequentialCEnum WlKeyboardKeymapFormat where
 
   minDeclaredValue =
     WL_KEYBOARD_KEYMAP_FORMAT_NO_KEYMAP
 
   maxDeclaredValue = WL_KEYBOARD_KEYMAP_FORMAT_XKB_V1
 
-instance Show Wl_keyboard_keymap_format where
+instance Show WlKeyboardKeymapFormat where
 
   showsPrec = CEnum.shows
 
-instance Read Wl_keyboard_keymap_format where
+instance Read WlKeyboardKeymapFormat where
 
   readPrec = CEnum.readPrec
 
@@ -6906,13 +6903,13 @@ instance Read Wl_keyboard_keymap_format where
   readListPrec = RIP.readListPrecDefault
 
 instance ( ((~) ty) RIP.CUInt
-         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_keyboard_keymap_format) (RIP.Ptr ty) where
+         ) => RIP.HasField "unwrap" (RIP.Ptr WlKeyboardKeymapFormat) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField Wl_keyboard_keymap_format "unwrap" where
+instance HasCField.HasCField WlKeyboardKeymapFormat "unwrap" where
 
-  type CFieldType Wl_keyboard_keymap_format "unwrap" =
+  type CFieldType WlKeyboardKeymapFormat "unwrap" =
     RIP.CUInt
 
   offset# = \_ -> \_ -> 0
@@ -6923,8 +6920,8 @@ instance HasCField.HasCField Wl_keyboard_keymap_format "unwrap" where
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_KEYBOARD_KEYMAP_FORMAT_NO_KEYMAP :: Wl_keyboard_keymap_format
-pattern WL_KEYBOARD_KEYMAP_FORMAT_NO_KEYMAP = Wl_keyboard_keymap_format 0
+pattern WL_KEYBOARD_KEYMAP_FORMAT_NO_KEYMAP :: WlKeyboardKeymapFormat
+pattern WL_KEYBOARD_KEYMAP_FORMAT_NO_KEYMAP = WlKeyboardKeymapFormat 0
 
 {-| __C declaration:__ @WL_KEYBOARD_KEYMAP_FORMAT_XKB_V1@
 
@@ -6932,8 +6929,8 @@ pattern WL_KEYBOARD_KEYMAP_FORMAT_NO_KEYMAP = Wl_keyboard_keymap_format 0
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_KEYBOARD_KEYMAP_FORMAT_XKB_V1 :: Wl_keyboard_keymap_format
-pattern WL_KEYBOARD_KEYMAP_FORMAT_XKB_V1 = Wl_keyboard_keymap_format 1
+pattern WL_KEYBOARD_KEYMAP_FORMAT_XKB_V1 :: WlKeyboardKeymapFormat
+pattern WL_KEYBOARD_KEYMAP_FORMAT_XKB_V1 = WlKeyboardKeymapFormat 1
 
 {-| __C declaration:__ @enum wl_keyboard_key_state@
 
@@ -6941,43 +6938,43 @@ pattern WL_KEYBOARD_KEYMAP_FORMAT_XKB_V1 = Wl_keyboard_keymap_format 1
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-newtype Wl_keyboard_key_state = Wl_keyboard_key_state
+newtype WlKeyboardKeyState = WlKeyboardKeyState
   { unwrap :: RIP.CUInt
   }
   deriving stock (Eq, RIP.Generic, Ord)
   deriving newtype (RIP.HasFFIType)
 
-instance Marshal.StaticSize Wl_keyboard_key_state where
+instance Marshal.StaticSize WlKeyboardKeyState where
 
   staticSizeOf = \_ -> (4 :: Int)
 
   staticAlignment = \_ -> (4 :: Int)
 
-instance Marshal.ReadRaw Wl_keyboard_key_state where
+instance Marshal.ReadRaw WlKeyboardKeyState where
 
   readRaw =
     \ptr0 ->
-          pure Wl_keyboard_key_state
+          pure WlKeyboardKeyState
       <*> Marshal.readRawByteOff ptr0 (0 :: Int)
 
-instance Marshal.WriteRaw Wl_keyboard_key_state where
+instance Marshal.WriteRaw WlKeyboardKeyState where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_keyboard_key_state unwrap2 ->
+          WlKeyboardKeyState unwrap2 ->
             Marshal.writeRawByteOff ptr0 (0 :: Int) unwrap2
 
-deriving via Marshal.EquivStorable Wl_keyboard_key_state instance RIP.Storable Wl_keyboard_key_state
+deriving via Marshal.EquivStorable WlKeyboardKeyState instance RIP.Storable WlKeyboardKeyState
 
-deriving via RIP.CUInt instance RIP.Prim Wl_keyboard_key_state
+deriving via RIP.CUInt instance RIP.Prim WlKeyboardKeyState
 
-instance CEnum.CEnum Wl_keyboard_key_state where
+instance CEnum.CEnum WlKeyboardKeyState where
 
-  type CEnumZ Wl_keyboard_key_state = RIP.CUInt
+  type CEnumZ WlKeyboardKeyState = RIP.CUInt
 
-  toCEnum = Wl_keyboard_key_state
+  toCEnum = WlKeyboardKeyState
 
   fromCEnum = RIP.getField @"unwrap"
 
@@ -6989,26 +6986,26 @@ instance CEnum.CEnum Wl_keyboard_key_state where
                                    ]
 
   showsUndeclared =
-    CEnum.showsWrappedUndeclared "Wl_keyboard_key_state"
+    CEnum.showsWrappedUndeclared "WlKeyboardKeyState"
 
   readPrecUndeclared =
-    CEnum.readPrecWrappedUndeclared "Wl_keyboard_key_state"
+    CEnum.readPrecWrappedUndeclared "WlKeyboardKeyState"
 
   isDeclared = CEnum.seqIsDeclared
 
   mkDeclared = CEnum.seqMkDeclared
 
-instance CEnum.SequentialCEnum Wl_keyboard_key_state where
+instance CEnum.SequentialCEnum WlKeyboardKeyState where
 
   minDeclaredValue = WL_KEYBOARD_KEY_STATE_RELEASED
 
   maxDeclaredValue = WL_KEYBOARD_KEY_STATE_REPEATED
 
-instance Show Wl_keyboard_key_state where
+instance Show WlKeyboardKeyState where
 
   showsPrec = CEnum.shows
 
-instance Read Wl_keyboard_key_state where
+instance Read WlKeyboardKeyState where
 
   readPrec = CEnum.readPrec
 
@@ -7017,13 +7014,13 @@ instance Read Wl_keyboard_key_state where
   readListPrec = RIP.readListPrecDefault
 
 instance ( ((~) ty) RIP.CUInt
-         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_keyboard_key_state) (RIP.Ptr ty) where
+         ) => RIP.HasField "unwrap" (RIP.Ptr WlKeyboardKeyState) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField Wl_keyboard_key_state "unwrap" where
+instance HasCField.HasCField WlKeyboardKeyState "unwrap" where
 
-  type CFieldType Wl_keyboard_key_state "unwrap" =
+  type CFieldType WlKeyboardKeyState "unwrap" =
     RIP.CUInt
 
   offset# = \_ -> \_ -> 0
@@ -7034,8 +7031,8 @@ instance HasCField.HasCField Wl_keyboard_key_state "unwrap" where
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_KEYBOARD_KEY_STATE_RELEASED :: Wl_keyboard_key_state
-pattern WL_KEYBOARD_KEY_STATE_RELEASED = Wl_keyboard_key_state 0
+pattern WL_KEYBOARD_KEY_STATE_RELEASED :: WlKeyboardKeyState
+pattern WL_KEYBOARD_KEY_STATE_RELEASED = WlKeyboardKeyState 0
 
 {-| __C declaration:__ @WL_KEYBOARD_KEY_STATE_PRESSED@
 
@@ -7043,8 +7040,8 @@ pattern WL_KEYBOARD_KEY_STATE_RELEASED = Wl_keyboard_key_state 0
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_KEYBOARD_KEY_STATE_PRESSED :: Wl_keyboard_key_state
-pattern WL_KEYBOARD_KEY_STATE_PRESSED = Wl_keyboard_key_state 1
+pattern WL_KEYBOARD_KEY_STATE_PRESSED :: WlKeyboardKeyState
+pattern WL_KEYBOARD_KEY_STATE_PRESSED = WlKeyboardKeyState 1
 
 {-| __C declaration:__ @WL_KEYBOARD_KEY_STATE_REPEATED@
 
@@ -7052,8 +7049,8 @@ pattern WL_KEYBOARD_KEY_STATE_PRESSED = Wl_keyboard_key_state 1
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_KEYBOARD_KEY_STATE_REPEATED :: Wl_keyboard_key_state
-pattern WL_KEYBOARD_KEY_STATE_REPEATED = Wl_keyboard_key_state 2
+pattern WL_KEYBOARD_KEY_STATE_REPEATED :: WlKeyboardKeyState
+pattern WL_KEYBOARD_KEY_STATE_REPEATED = WlKeyboardKeyState 2
 
 {-| __C declaration:__ @macro WL_KEYBOARD_KEY_STATE_REPEATED_SINCE_VERSION@
 
@@ -7071,43 +7068,43 @@ wL_KEYBOARD_KEY_STATE_REPEATED_SINCE_VERSION =
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_keyboard_listener = Wl_keyboard_listener
-  { keymap :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+data WlKeyboardListener = WlKeyboardListener
+  { keymap :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ __C declaration:__ @keymap@
 
          __defined at:__ @wayland-client-protocol.h 5237:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , enter :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ())
+  , enter :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ())
     {- ^ __C declaration:__ @enter@
 
          __defined at:__ @wayland-client-protocol.h 5263:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , leave :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> IO ())
+  , leave :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> IO ())
     {- ^ __C declaration:__ @leave@
 
          __defined at:__ @wayland-client-protocol.h 5284:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , key :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , key :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ __C declaration:__ @key@
 
          __defined at:__ @wayland-client-protocol.h 5319:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , modifiers :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , modifiers :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ __C declaration:__ @modifiers@
 
          __defined at:__ @wayland-client-protocol.h 5348:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , repeat_info :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , repeat_info :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ __C declaration:__ @repeat_info@
 
          __defined at:__ @wayland-client-protocol.h 5375:9@
@@ -7117,17 +7114,17 @@ data Wl_keyboard_listener = Wl_keyboard_listener
   }
   deriving stock (Eq, RIP.Generic, Show)
 
-instance Marshal.StaticSize Wl_keyboard_listener where
+instance Marshal.StaticSize WlKeyboardListener where
 
   staticSizeOf = \_ -> (48 :: Int)
 
   staticAlignment = \_ -> (8 :: Int)
 
-instance Marshal.ReadRaw Wl_keyboard_listener where
+instance Marshal.ReadRaw WlKeyboardListener where
 
   readRaw =
     \ptr0 ->
-          pure Wl_keyboard_listener
+          pure WlKeyboardListener
       <*> HasCField.readRaw (RIP.Proxy @"keymap") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"enter") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"leave") ptr0
@@ -7135,13 +7132,13 @@ instance Marshal.ReadRaw Wl_keyboard_listener where
       <*> HasCField.readRaw (RIP.Proxy @"modifiers") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"repeat_info") ptr0
 
-instance Marshal.WriteRaw Wl_keyboard_listener where
+instance Marshal.WriteRaw WlKeyboardListener where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_keyboard_listener keymap2 enter3 leave4 key5 modifiers6 repeat_info7 ->
+          WlKeyboardListener keymap2 enter3 leave4 key5 modifiers6 repeat_info7 ->
                HasCField.writeRaw (RIP.Proxy @"keymap") ptr0 keymap2
             >> HasCField.writeRaw (RIP.Proxy @"enter") ptr0 enter3
             >> HasCField.writeRaw (RIP.Proxy @"leave") ptr0 leave4
@@ -7149,77 +7146,77 @@ instance Marshal.WriteRaw Wl_keyboard_listener where
             >> HasCField.writeRaw (RIP.Proxy @"modifiers") ptr0 modifiers6
             >> HasCField.writeRaw (RIP.Proxy @"repeat_info") ptr0 repeat_info7
 
-deriving via Marshal.EquivStorable Wl_keyboard_listener instance RIP.Storable Wl_keyboard_listener
+deriving via Marshal.EquivStorable WlKeyboardListener instance RIP.Storable WlKeyboardListener
 
-instance HasCField.HasCField Wl_keyboard_listener "keymap" where
+instance HasCField.HasCField WlKeyboardListener "keymap" where
 
-  type CFieldType Wl_keyboard_listener "keymap" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  type CFieldType WlKeyboardListener "keymap" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-         ) => RIP.HasField "keymap" (RIP.Ptr Wl_keyboard_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+         ) => RIP.HasField "keymap" (RIP.Ptr WlKeyboardListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"keymap")
 
-instance HasCField.HasCField Wl_keyboard_listener "enter" where
+instance HasCField.HasCField WlKeyboardListener "enter" where
 
-  type CFieldType Wl_keyboard_listener "enter" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ())
+  type CFieldType WlKeyboardListener "enter" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ()))
-         ) => RIP.HasField "enter" (RIP.Ptr Wl_keyboard_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ()))
+         ) => RIP.HasField "enter" (RIP.Ptr WlKeyboardListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"enter")
 
-instance HasCField.HasCField Wl_keyboard_listener "leave" where
+instance HasCField.HasCField WlKeyboardListener "leave" where
 
-  type CFieldType Wl_keyboard_listener "leave" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> IO ())
+  type CFieldType WlKeyboardListener "leave" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> IO ())
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> IO ()))
-         ) => RIP.HasField "leave" (RIP.Ptr Wl_keyboard_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> IO ()))
+         ) => RIP.HasField "leave" (RIP.Ptr WlKeyboardListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"leave")
 
-instance HasCField.HasCField Wl_keyboard_listener "key" where
+instance HasCField.HasCField WlKeyboardListener "key" where
 
-  type CFieldType Wl_keyboard_listener "key" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  type CFieldType WlKeyboardListener "key" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 24
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-         ) => RIP.HasField "key" (RIP.Ptr Wl_keyboard_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+         ) => RIP.HasField "key" (RIP.Ptr WlKeyboardListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"key")
 
-instance HasCField.HasCField Wl_keyboard_listener "modifiers" where
+instance HasCField.HasCField WlKeyboardListener "modifiers" where
 
-  type CFieldType Wl_keyboard_listener "modifiers" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  type CFieldType WlKeyboardListener "modifiers" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 32
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-         ) => RIP.HasField "modifiers" (RIP.Ptr Wl_keyboard_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+         ) => RIP.HasField "modifiers" (RIP.Ptr WlKeyboardListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"modifiers")
 
-instance HasCField.HasCField Wl_keyboard_listener "repeat_info" where
+instance HasCField.HasCField WlKeyboardListener "repeat_info" where
 
-  type CFieldType Wl_keyboard_listener "repeat_info" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  type CFieldType WlKeyboardListener "repeat_info" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 40
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-         ) => RIP.HasField "repeat_info" (RIP.Ptr Wl_keyboard_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+         ) => RIP.HasField "repeat_info" (RIP.Ptr WlKeyboardListener) (RIP.Ptr ty) where
 
   getField =
     HasCField.fromPtr (RIP.Proxy @"repeat_info")
@@ -7303,50 +7300,50 @@ wL_KEYBOARD_RELEASE_SINCE_VERSION = (3 :: RIP.CInt)
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_touch_listener = Wl_touch_listener
-  { down :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+data WlTouchListener = WlTouchListener
+  { down :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
     {- ^ __C declaration:__ @down@
 
          __defined at:__ @wayland-client-protocol.h 5480:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , up :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , up :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ __C declaration:__ @up@
 
          __defined at:__ @wayland-client-protocol.h 5498:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , motion :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  , motion :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
     {- ^ __C declaration:__ @motion@
 
          __defined at:__ @wayland-client-protocol.h 5512:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , frame :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> IO ())
+  , frame :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> IO ())
     {- ^ __C declaration:__ @frame@
 
          __defined at:__ @wayland-client-protocol.h 5530:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , cancel :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> IO ())
+  , cancel :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> IO ())
     {- ^ __C declaration:__ @cancel@
 
          __defined at:__ @wayland-client-protocol.h 5544:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , shape :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  , shape :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
     {- ^ __C declaration:__ @shape@
 
          __defined at:__ @wayland-client-protocol.h 5580:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , orientation :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  , orientation :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
     {- ^ __C declaration:__ @orientation@
 
          __defined at:__ @wayland-client-protocol.h 5615:9@
@@ -7356,17 +7353,17 @@ data Wl_touch_listener = Wl_touch_listener
   }
   deriving stock (Eq, RIP.Generic, Show)
 
-instance Marshal.StaticSize Wl_touch_listener where
+instance Marshal.StaticSize WlTouchListener where
 
   staticSizeOf = \_ -> (56 :: Int)
 
   staticAlignment = \_ -> (8 :: Int)
 
-instance Marshal.ReadRaw Wl_touch_listener where
+instance Marshal.ReadRaw WlTouchListener where
 
   readRaw =
     \ptr0 ->
-          pure Wl_touch_listener
+          pure WlTouchListener
       <*> HasCField.readRaw (RIP.Proxy @"down") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"up") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"motion") ptr0
@@ -7375,13 +7372,13 @@ instance Marshal.ReadRaw Wl_touch_listener where
       <*> HasCField.readRaw (RIP.Proxy @"shape") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"orientation") ptr0
 
-instance Marshal.WriteRaw Wl_touch_listener where
+instance Marshal.WriteRaw WlTouchListener where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_touch_listener down2 up3 motion4 frame5 cancel6 shape7 orientation8 ->
+          WlTouchListener down2 up3 motion4 frame5 cancel6 shape7 orientation8 ->
                HasCField.writeRaw (RIP.Proxy @"down") ptr0 down2
             >> HasCField.writeRaw (RIP.Proxy @"up") ptr0 up3
             >> HasCField.writeRaw (RIP.Proxy @"motion") ptr0 motion4
@@ -7390,89 +7387,89 @@ instance Marshal.WriteRaw Wl_touch_listener where
             >> HasCField.writeRaw (RIP.Proxy @"shape") ptr0 shape7
             >> HasCField.writeRaw (RIP.Proxy @"orientation") ptr0 orientation8
 
-deriving via Marshal.EquivStorable Wl_touch_listener instance RIP.Storable Wl_touch_listener
+deriving via Marshal.EquivStorable WlTouchListener instance RIP.Storable WlTouchListener
 
-instance HasCField.HasCField Wl_touch_listener "down" where
+instance HasCField.HasCField WlTouchListener "down" where
 
-  type CFieldType Wl_touch_listener "down" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  type CFieldType WlTouchListener "down" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
-         ) => RIP.HasField "down" (RIP.Ptr Wl_touch_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
+         ) => RIP.HasField "down" (RIP.Ptr WlTouchListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"down")
 
-instance HasCField.HasCField Wl_touch_listener "up" where
+instance HasCField.HasCField WlTouchListener "up" where
 
-  type CFieldType Wl_touch_listener "up" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  type CFieldType WlTouchListener "up" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-         ) => RIP.HasField "up" (RIP.Ptr Wl_touch_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+         ) => RIP.HasField "up" (RIP.Ptr WlTouchListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"up")
 
-instance HasCField.HasCField Wl_touch_listener "motion" where
+instance HasCField.HasCField WlTouchListener "motion" where
 
-  type CFieldType Wl_touch_listener "motion" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  type CFieldType WlTouchListener "motion" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
-         ) => RIP.HasField "motion" (RIP.Ptr Wl_touch_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
+         ) => RIP.HasField "motion" (RIP.Ptr WlTouchListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"motion")
 
-instance HasCField.HasCField Wl_touch_listener "frame" where
+instance HasCField.HasCField WlTouchListener "frame" where
 
-  type CFieldType Wl_touch_listener "frame" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> IO ())
+  type CFieldType WlTouchListener "frame" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> IO ())
 
   offset# = \_ -> \_ -> 24
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> IO ()))
-         ) => RIP.HasField "frame" (RIP.Ptr Wl_touch_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> IO ()))
+         ) => RIP.HasField "frame" (RIP.Ptr WlTouchListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"frame")
 
-instance HasCField.HasCField Wl_touch_listener "cancel" where
+instance HasCField.HasCField WlTouchListener "cancel" where
 
-  type CFieldType Wl_touch_listener "cancel" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> IO ())
+  type CFieldType WlTouchListener "cancel" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> IO ())
 
   offset# = \_ -> \_ -> 32
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> IO ()))
-         ) => RIP.HasField "cancel" (RIP.Ptr Wl_touch_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> IO ()))
+         ) => RIP.HasField "cancel" (RIP.Ptr WlTouchListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"cancel")
 
-instance HasCField.HasCField Wl_touch_listener "shape" where
+instance HasCField.HasCField WlTouchListener "shape" where
 
-  type CFieldType Wl_touch_listener "shape" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  type CFieldType WlTouchListener "shape" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
 
   offset# = \_ -> \_ -> 40
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
-         ) => RIP.HasField "shape" (RIP.Ptr Wl_touch_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
+         ) => RIP.HasField "shape" (RIP.Ptr WlTouchListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"shape")
 
-instance HasCField.HasCField Wl_touch_listener "orientation" where
+instance HasCField.HasCField WlTouchListener "orientation" where
 
-  type CFieldType Wl_touch_listener "orientation" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  type CFieldType WlTouchListener "orientation" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
 
   offset# = \_ -> \_ -> 48
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
-         ) => RIP.HasField "orientation" (RIP.Ptr Wl_touch_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
+         ) => RIP.HasField "orientation" (RIP.Ptr WlTouchListener) (RIP.Ptr ty) where
 
   getField =
     HasCField.fromPtr (RIP.Proxy @"orientation")
@@ -7564,43 +7561,43 @@ wL_TOUCH_RELEASE_SINCE_VERSION = (3 :: RIP.CInt)
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-newtype Wl_output_subpixel = Wl_output_subpixel
+newtype WlOutputSubpixel = WlOutputSubpixel
   { unwrap :: RIP.CUInt
   }
   deriving stock (Eq, RIP.Generic, Ord)
   deriving newtype (RIP.HasFFIType)
 
-instance Marshal.StaticSize Wl_output_subpixel where
+instance Marshal.StaticSize WlOutputSubpixel where
 
   staticSizeOf = \_ -> (4 :: Int)
 
   staticAlignment = \_ -> (4 :: Int)
 
-instance Marshal.ReadRaw Wl_output_subpixel where
+instance Marshal.ReadRaw WlOutputSubpixel where
 
   readRaw =
     \ptr0 ->
-          pure Wl_output_subpixel
+          pure WlOutputSubpixel
       <*> Marshal.readRawByteOff ptr0 (0 :: Int)
 
-instance Marshal.WriteRaw Wl_output_subpixel where
+instance Marshal.WriteRaw WlOutputSubpixel where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_output_subpixel unwrap2 ->
+          WlOutputSubpixel unwrap2 ->
             Marshal.writeRawByteOff ptr0 (0 :: Int) unwrap2
 
-deriving via Marshal.EquivStorable Wl_output_subpixel instance RIP.Storable Wl_output_subpixel
+deriving via Marshal.EquivStorable WlOutputSubpixel instance RIP.Storable WlOutputSubpixel
 
-deriving via RIP.CUInt instance RIP.Prim Wl_output_subpixel
+deriving via RIP.CUInt instance RIP.Prim WlOutputSubpixel
 
-instance CEnum.CEnum Wl_output_subpixel where
+instance CEnum.CEnum WlOutputSubpixel where
 
-  type CEnumZ Wl_output_subpixel = RIP.CUInt
+  type CEnumZ WlOutputSubpixel = RIP.CUInt
 
-  toCEnum = Wl_output_subpixel
+  toCEnum = WlOutputSubpixel
 
   fromCEnum = RIP.getField @"unwrap"
 
@@ -7615,26 +7612,26 @@ instance CEnum.CEnum Wl_output_subpixel where
                                    ]
 
   showsUndeclared =
-    CEnum.showsWrappedUndeclared "Wl_output_subpixel"
+    CEnum.showsWrappedUndeclared "WlOutputSubpixel"
 
   readPrecUndeclared =
-    CEnum.readPrecWrappedUndeclared "Wl_output_subpixel"
+    CEnum.readPrecWrappedUndeclared "WlOutputSubpixel"
 
   isDeclared = CEnum.seqIsDeclared
 
   mkDeclared = CEnum.seqMkDeclared
 
-instance CEnum.SequentialCEnum Wl_output_subpixel where
+instance CEnum.SequentialCEnum WlOutputSubpixel where
 
   minDeclaredValue = WL_OUTPUT_SUBPIXEL_UNKNOWN
 
   maxDeclaredValue = WL_OUTPUT_SUBPIXEL_VERTICAL_BGR
 
-instance Show Wl_output_subpixel where
+instance Show WlOutputSubpixel where
 
   showsPrec = CEnum.shows
 
-instance Read Wl_output_subpixel where
+instance Read WlOutputSubpixel where
 
   readPrec = CEnum.readPrec
 
@@ -7643,14 +7640,13 @@ instance Read Wl_output_subpixel where
   readListPrec = RIP.readListPrecDefault
 
 instance ( ((~) ty) RIP.CUInt
-         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_output_subpixel) (RIP.Ptr ty) where
+         ) => RIP.HasField "unwrap" (RIP.Ptr WlOutputSubpixel) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField Wl_output_subpixel "unwrap" where
+instance HasCField.HasCField WlOutputSubpixel "unwrap" where
 
-  type CFieldType Wl_output_subpixel "unwrap" =
-    RIP.CUInt
+  type CFieldType WlOutputSubpixel "unwrap" = RIP.CUInt
 
   offset# = \_ -> \_ -> 0
 
@@ -7660,8 +7656,8 @@ instance HasCField.HasCField Wl_output_subpixel "unwrap" where
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_OUTPUT_SUBPIXEL_UNKNOWN :: Wl_output_subpixel
-pattern WL_OUTPUT_SUBPIXEL_UNKNOWN = Wl_output_subpixel 0
+pattern WL_OUTPUT_SUBPIXEL_UNKNOWN :: WlOutputSubpixel
+pattern WL_OUTPUT_SUBPIXEL_UNKNOWN = WlOutputSubpixel 0
 
 {-| __C declaration:__ @WL_OUTPUT_SUBPIXEL_NONE@
 
@@ -7669,8 +7665,8 @@ pattern WL_OUTPUT_SUBPIXEL_UNKNOWN = Wl_output_subpixel 0
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_OUTPUT_SUBPIXEL_NONE :: Wl_output_subpixel
-pattern WL_OUTPUT_SUBPIXEL_NONE = Wl_output_subpixel 1
+pattern WL_OUTPUT_SUBPIXEL_NONE :: WlOutputSubpixel
+pattern WL_OUTPUT_SUBPIXEL_NONE = WlOutputSubpixel 1
 
 {-| __C declaration:__ @WL_OUTPUT_SUBPIXEL_HORIZONTAL_RGB@
 
@@ -7678,8 +7674,8 @@ pattern WL_OUTPUT_SUBPIXEL_NONE = Wl_output_subpixel 1
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_OUTPUT_SUBPIXEL_HORIZONTAL_RGB :: Wl_output_subpixel
-pattern WL_OUTPUT_SUBPIXEL_HORIZONTAL_RGB = Wl_output_subpixel 2
+pattern WL_OUTPUT_SUBPIXEL_HORIZONTAL_RGB :: WlOutputSubpixel
+pattern WL_OUTPUT_SUBPIXEL_HORIZONTAL_RGB = WlOutputSubpixel 2
 
 {-| __C declaration:__ @WL_OUTPUT_SUBPIXEL_HORIZONTAL_BGR@
 
@@ -7687,8 +7683,8 @@ pattern WL_OUTPUT_SUBPIXEL_HORIZONTAL_RGB = Wl_output_subpixel 2
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_OUTPUT_SUBPIXEL_HORIZONTAL_BGR :: Wl_output_subpixel
-pattern WL_OUTPUT_SUBPIXEL_HORIZONTAL_BGR = Wl_output_subpixel 3
+pattern WL_OUTPUT_SUBPIXEL_HORIZONTAL_BGR :: WlOutputSubpixel
+pattern WL_OUTPUT_SUBPIXEL_HORIZONTAL_BGR = WlOutputSubpixel 3
 
 {-| __C declaration:__ @WL_OUTPUT_SUBPIXEL_VERTICAL_RGB@
 
@@ -7696,8 +7692,8 @@ pattern WL_OUTPUT_SUBPIXEL_HORIZONTAL_BGR = Wl_output_subpixel 3
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_OUTPUT_SUBPIXEL_VERTICAL_RGB :: Wl_output_subpixel
-pattern WL_OUTPUT_SUBPIXEL_VERTICAL_RGB = Wl_output_subpixel 4
+pattern WL_OUTPUT_SUBPIXEL_VERTICAL_RGB :: WlOutputSubpixel
+pattern WL_OUTPUT_SUBPIXEL_VERTICAL_RGB = WlOutputSubpixel 4
 
 {-| __C declaration:__ @WL_OUTPUT_SUBPIXEL_VERTICAL_BGR@
 
@@ -7705,8 +7701,8 @@ pattern WL_OUTPUT_SUBPIXEL_VERTICAL_RGB = Wl_output_subpixel 4
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_OUTPUT_SUBPIXEL_VERTICAL_BGR :: Wl_output_subpixel
-pattern WL_OUTPUT_SUBPIXEL_VERTICAL_BGR = Wl_output_subpixel 5
+pattern WL_OUTPUT_SUBPIXEL_VERTICAL_BGR :: WlOutputSubpixel
+pattern WL_OUTPUT_SUBPIXEL_VERTICAL_BGR = WlOutputSubpixel 5
 
 {-| __C declaration:__ @enum wl_output_transform@
 
@@ -7714,43 +7710,43 @@ pattern WL_OUTPUT_SUBPIXEL_VERTICAL_BGR = Wl_output_subpixel 5
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-newtype Wl_output_transform = Wl_output_transform
+newtype WlOutputTransform = WlOutputTransform
   { unwrap :: RIP.CUInt
   }
   deriving stock (Eq, RIP.Generic, Ord)
   deriving newtype (RIP.HasFFIType)
 
-instance Marshal.StaticSize Wl_output_transform where
+instance Marshal.StaticSize WlOutputTransform where
 
   staticSizeOf = \_ -> (4 :: Int)
 
   staticAlignment = \_ -> (4 :: Int)
 
-instance Marshal.ReadRaw Wl_output_transform where
+instance Marshal.ReadRaw WlOutputTransform where
 
   readRaw =
     \ptr0 ->
-          pure Wl_output_transform
+          pure WlOutputTransform
       <*> Marshal.readRawByteOff ptr0 (0 :: Int)
 
-instance Marshal.WriteRaw Wl_output_transform where
+instance Marshal.WriteRaw WlOutputTransform where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_output_transform unwrap2 ->
+          WlOutputTransform unwrap2 ->
             Marshal.writeRawByteOff ptr0 (0 :: Int) unwrap2
 
-deriving via Marshal.EquivStorable Wl_output_transform instance RIP.Storable Wl_output_transform
+deriving via Marshal.EquivStorable WlOutputTransform instance RIP.Storable WlOutputTransform
 
-deriving via RIP.CUInt instance RIP.Prim Wl_output_transform
+deriving via RIP.CUInt instance RIP.Prim WlOutputTransform
 
-instance CEnum.CEnum Wl_output_transform where
+instance CEnum.CEnum WlOutputTransform where
 
-  type CEnumZ Wl_output_transform = RIP.CUInt
+  type CEnumZ WlOutputTransform = RIP.CUInt
 
-  toCEnum = Wl_output_transform
+  toCEnum = WlOutputTransform
 
   fromCEnum = RIP.getField @"unwrap"
 
@@ -7767,26 +7763,26 @@ instance CEnum.CEnum Wl_output_transform where
                                    ]
 
   showsUndeclared =
-    CEnum.showsWrappedUndeclared "Wl_output_transform"
+    CEnum.showsWrappedUndeclared "WlOutputTransform"
 
   readPrecUndeclared =
-    CEnum.readPrecWrappedUndeclared "Wl_output_transform"
+    CEnum.readPrecWrappedUndeclared "WlOutputTransform"
 
   isDeclared = CEnum.seqIsDeclared
 
   mkDeclared = CEnum.seqMkDeclared
 
-instance CEnum.SequentialCEnum Wl_output_transform where
+instance CEnum.SequentialCEnum WlOutputTransform where
 
   minDeclaredValue = WL_OUTPUT_TRANSFORM_NORMAL
 
   maxDeclaredValue = WL_OUTPUT_TRANSFORM_FLIPPED_270
 
-instance Show Wl_output_transform where
+instance Show WlOutputTransform where
 
   showsPrec = CEnum.shows
 
-instance Read Wl_output_transform where
+instance Read WlOutputTransform where
 
   readPrec = CEnum.readPrec
 
@@ -7795,13 +7791,13 @@ instance Read Wl_output_transform where
   readListPrec = RIP.readListPrecDefault
 
 instance ( ((~) ty) RIP.CUInt
-         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_output_transform) (RIP.Ptr ty) where
+         ) => RIP.HasField "unwrap" (RIP.Ptr WlOutputTransform) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField Wl_output_transform "unwrap" where
+instance HasCField.HasCField WlOutputTransform "unwrap" where
 
-  type CFieldType Wl_output_transform "unwrap" =
+  type CFieldType WlOutputTransform "unwrap" =
     RIP.CUInt
 
   offset# = \_ -> \_ -> 0
@@ -7812,8 +7808,8 @@ instance HasCField.HasCField Wl_output_transform "unwrap" where
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_OUTPUT_TRANSFORM_NORMAL :: Wl_output_transform
-pattern WL_OUTPUT_TRANSFORM_NORMAL = Wl_output_transform 0
+pattern WL_OUTPUT_TRANSFORM_NORMAL :: WlOutputTransform
+pattern WL_OUTPUT_TRANSFORM_NORMAL = WlOutputTransform 0
 
 {-| __C declaration:__ @WL_OUTPUT_TRANSFORM_90@
 
@@ -7821,8 +7817,8 @@ pattern WL_OUTPUT_TRANSFORM_NORMAL = Wl_output_transform 0
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_OUTPUT_TRANSFORM_90 :: Wl_output_transform
-pattern WL_OUTPUT_TRANSFORM_90 = Wl_output_transform 1
+pattern WL_OUTPUT_TRANSFORM_90 :: WlOutputTransform
+pattern WL_OUTPUT_TRANSFORM_90 = WlOutputTransform 1
 
 {-| __C declaration:__ @WL_OUTPUT_TRANSFORM_180@
 
@@ -7830,8 +7826,8 @@ pattern WL_OUTPUT_TRANSFORM_90 = Wl_output_transform 1
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_OUTPUT_TRANSFORM_180 :: Wl_output_transform
-pattern WL_OUTPUT_TRANSFORM_180 = Wl_output_transform 2
+pattern WL_OUTPUT_TRANSFORM_180 :: WlOutputTransform
+pattern WL_OUTPUT_TRANSFORM_180 = WlOutputTransform 2
 
 {-| __C declaration:__ @WL_OUTPUT_TRANSFORM_270@
 
@@ -7839,8 +7835,8 @@ pattern WL_OUTPUT_TRANSFORM_180 = Wl_output_transform 2
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_OUTPUT_TRANSFORM_270 :: Wl_output_transform
-pattern WL_OUTPUT_TRANSFORM_270 = Wl_output_transform 3
+pattern WL_OUTPUT_TRANSFORM_270 :: WlOutputTransform
+pattern WL_OUTPUT_TRANSFORM_270 = WlOutputTransform 3
 
 {-| __C declaration:__ @WL_OUTPUT_TRANSFORM_FLIPPED@
 
@@ -7848,8 +7844,8 @@ pattern WL_OUTPUT_TRANSFORM_270 = Wl_output_transform 3
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_OUTPUT_TRANSFORM_FLIPPED :: Wl_output_transform
-pattern WL_OUTPUT_TRANSFORM_FLIPPED = Wl_output_transform 4
+pattern WL_OUTPUT_TRANSFORM_FLIPPED :: WlOutputTransform
+pattern WL_OUTPUT_TRANSFORM_FLIPPED = WlOutputTransform 4
 
 {-| __C declaration:__ @WL_OUTPUT_TRANSFORM_FLIPPED_90@
 
@@ -7857,8 +7853,8 @@ pattern WL_OUTPUT_TRANSFORM_FLIPPED = Wl_output_transform 4
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_OUTPUT_TRANSFORM_FLIPPED_90 :: Wl_output_transform
-pattern WL_OUTPUT_TRANSFORM_FLIPPED_90 = Wl_output_transform 5
+pattern WL_OUTPUT_TRANSFORM_FLIPPED_90 :: WlOutputTransform
+pattern WL_OUTPUT_TRANSFORM_FLIPPED_90 = WlOutputTransform 5
 
 {-| __C declaration:__ @WL_OUTPUT_TRANSFORM_FLIPPED_180@
 
@@ -7866,8 +7862,8 @@ pattern WL_OUTPUT_TRANSFORM_FLIPPED_90 = Wl_output_transform 5
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_OUTPUT_TRANSFORM_FLIPPED_180 :: Wl_output_transform
-pattern WL_OUTPUT_TRANSFORM_FLIPPED_180 = Wl_output_transform 6
+pattern WL_OUTPUT_TRANSFORM_FLIPPED_180 :: WlOutputTransform
+pattern WL_OUTPUT_TRANSFORM_FLIPPED_180 = WlOutputTransform 6
 
 {-| __C declaration:__ @WL_OUTPUT_TRANSFORM_FLIPPED_270@
 
@@ -7875,8 +7871,8 @@ pattern WL_OUTPUT_TRANSFORM_FLIPPED_180 = Wl_output_transform 6
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_OUTPUT_TRANSFORM_FLIPPED_270 :: Wl_output_transform
-pattern WL_OUTPUT_TRANSFORM_FLIPPED_270 = Wl_output_transform 7
+pattern WL_OUTPUT_TRANSFORM_FLIPPED_270 :: WlOutputTransform
+pattern WL_OUTPUT_TRANSFORM_FLIPPED_270 = WlOutputTransform 7
 
 {-| __C declaration:__ @enum wl_output_mode@
 
@@ -7884,43 +7880,43 @@ pattern WL_OUTPUT_TRANSFORM_FLIPPED_270 = Wl_output_transform 7
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-newtype Wl_output_mode = Wl_output_mode
+newtype WlOutputMode = WlOutputMode
   { unwrap :: RIP.CUInt
   }
   deriving stock (Eq, RIP.Generic, Ord)
   deriving newtype (RIP.HasFFIType)
 
-instance Marshal.StaticSize Wl_output_mode where
+instance Marshal.StaticSize WlOutputMode where
 
   staticSizeOf = \_ -> (4 :: Int)
 
   staticAlignment = \_ -> (4 :: Int)
 
-instance Marshal.ReadRaw Wl_output_mode where
+instance Marshal.ReadRaw WlOutputMode where
 
   readRaw =
     \ptr0 ->
-          pure Wl_output_mode
+          pure WlOutputMode
       <*> Marshal.readRawByteOff ptr0 (0 :: Int)
 
-instance Marshal.WriteRaw Wl_output_mode where
+instance Marshal.WriteRaw WlOutputMode where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_output_mode unwrap2 ->
+          WlOutputMode unwrap2 ->
             Marshal.writeRawByteOff ptr0 (0 :: Int) unwrap2
 
-deriving via Marshal.EquivStorable Wl_output_mode instance RIP.Storable Wl_output_mode
+deriving via Marshal.EquivStorable WlOutputMode instance RIP.Storable WlOutputMode
 
-deriving via RIP.CUInt instance RIP.Prim Wl_output_mode
+deriving via RIP.CUInt instance RIP.Prim WlOutputMode
 
-instance CEnum.CEnum Wl_output_mode where
+instance CEnum.CEnum WlOutputMode where
 
-  type CEnumZ Wl_output_mode = RIP.CUInt
+  type CEnumZ WlOutputMode = RIP.CUInt
 
-  toCEnum = Wl_output_mode
+  toCEnum = WlOutputMode
 
   fromCEnum = RIP.getField @"unwrap"
 
@@ -7931,26 +7927,26 @@ instance CEnum.CEnum Wl_output_mode where
                                    ]
 
   showsUndeclared =
-    CEnum.showsWrappedUndeclared "Wl_output_mode"
+    CEnum.showsWrappedUndeclared "WlOutputMode"
 
   readPrecUndeclared =
-    CEnum.readPrecWrappedUndeclared "Wl_output_mode"
+    CEnum.readPrecWrappedUndeclared "WlOutputMode"
 
   isDeclared = CEnum.seqIsDeclared
 
   mkDeclared = CEnum.seqMkDeclared
 
-instance CEnum.SequentialCEnum Wl_output_mode where
+instance CEnum.SequentialCEnum WlOutputMode where
 
   minDeclaredValue = WL_OUTPUT_MODE_CURRENT
 
   maxDeclaredValue = WL_OUTPUT_MODE_PREFERRED
 
-instance Show Wl_output_mode where
+instance Show WlOutputMode where
 
   showsPrec = CEnum.shows
 
-instance Read Wl_output_mode where
+instance Read WlOutputMode where
 
   readPrec = CEnum.readPrec
 
@@ -7959,13 +7955,13 @@ instance Read Wl_output_mode where
   readListPrec = RIP.readListPrecDefault
 
 instance ( ((~) ty) RIP.CUInt
-         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_output_mode) (RIP.Ptr ty) where
+         ) => RIP.HasField "unwrap" (RIP.Ptr WlOutputMode) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField Wl_output_mode "unwrap" where
+instance HasCField.HasCField WlOutputMode "unwrap" where
 
-  type CFieldType Wl_output_mode "unwrap" = RIP.CUInt
+  type CFieldType WlOutputMode "unwrap" = RIP.CUInt
 
   offset# = \_ -> \_ -> 0
 
@@ -7975,8 +7971,8 @@ instance HasCField.HasCField Wl_output_mode "unwrap" where
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_OUTPUT_MODE_CURRENT :: Wl_output_mode
-pattern WL_OUTPUT_MODE_CURRENT = Wl_output_mode 1
+pattern WL_OUTPUT_MODE_CURRENT :: WlOutputMode
+pattern WL_OUTPUT_MODE_CURRENT = WlOutputMode 1
 
 {-| __C declaration:__ @WL_OUTPUT_MODE_PREFERRED@
 
@@ -7984,8 +7980,8 @@ pattern WL_OUTPUT_MODE_CURRENT = Wl_output_mode 1
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_OUTPUT_MODE_PREFERRED :: Wl_output_mode
-pattern WL_OUTPUT_MODE_PREFERRED = Wl_output_mode 2
+pattern WL_OUTPUT_MODE_PREFERRED :: WlOutputMode
+pattern WL_OUTPUT_MODE_PREFERRED = WlOutputMode 2
 
 {-| __C declaration:__ @struct wl_output_listener@
 
@@ -7993,43 +7989,43 @@ pattern WL_OUTPUT_MODE_PREFERRED = Wl_output_mode 2
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-data Wl_output_listener = Wl_output_listener
-  { geometry :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> (PtrConst.PtrConst RIP.CChar) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+data WlOutputListener = WlOutputListener
+  { geometry :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> (PtrConst.PtrConst RIP.CChar) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ __C declaration:__ @geometry@
 
          __defined at:__ @wayland-client-protocol.h 5854:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , mode :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , mode :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ __C declaration:__ @mode@
 
          __defined at:__ @wayland-client-protocol.h 5905:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , done :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> IO ())
+  , done :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> IO ())
     {- ^ __C declaration:__ @done@
 
          __defined at:__ @wayland-client-protocol.h 5921:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , scale :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , scale :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ __C declaration:__ @scale@
 
          __defined at:__ @wayland-client-protocol.h 5946:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , name :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  , name :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
     {- ^ __C declaration:__ @name@
 
          __defined at:__ @wayland-client-protocol.h 5986:9@
 
          __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
     -}
-  , description :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  , description :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
     {- ^ __C declaration:__ @description@
 
          __defined at:__ @wayland-client-protocol.h 6009:9@
@@ -8039,17 +8035,17 @@ data Wl_output_listener = Wl_output_listener
   }
   deriving stock (Eq, RIP.Generic, Show)
 
-instance Marshal.StaticSize Wl_output_listener where
+instance Marshal.StaticSize WlOutputListener where
 
   staticSizeOf = \_ -> (48 :: Int)
 
   staticAlignment = \_ -> (8 :: Int)
 
-instance Marshal.ReadRaw Wl_output_listener where
+instance Marshal.ReadRaw WlOutputListener where
 
   readRaw =
     \ptr0 ->
-          pure Wl_output_listener
+          pure WlOutputListener
       <*> HasCField.readRaw (RIP.Proxy @"geometry") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"mode") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"done") ptr0
@@ -8057,13 +8053,13 @@ instance Marshal.ReadRaw Wl_output_listener where
       <*> HasCField.readRaw (RIP.Proxy @"name") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"description") ptr0
 
-instance Marshal.WriteRaw Wl_output_listener where
+instance Marshal.WriteRaw WlOutputListener where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_output_listener geometry2 mode3 done4 scale5 name6 description7 ->
+          WlOutputListener geometry2 mode3 done4 scale5 name6 description7 ->
                HasCField.writeRaw (RIP.Proxy @"geometry") ptr0 geometry2
             >> HasCField.writeRaw (RIP.Proxy @"mode") ptr0 mode3
             >> HasCField.writeRaw (RIP.Proxy @"done") ptr0 done4
@@ -8071,77 +8067,77 @@ instance Marshal.WriteRaw Wl_output_listener where
             >> HasCField.writeRaw (RIP.Proxy @"name") ptr0 name6
             >> HasCField.writeRaw (RIP.Proxy @"description") ptr0 description7
 
-deriving via Marshal.EquivStorable Wl_output_listener instance RIP.Storable Wl_output_listener
+deriving via Marshal.EquivStorable WlOutputListener instance RIP.Storable WlOutputListener
 
-instance HasCField.HasCField Wl_output_listener "geometry" where
+instance HasCField.HasCField WlOutputListener "geometry" where
 
-  type CFieldType Wl_output_listener "geometry" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> (PtrConst.PtrConst RIP.CChar) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  type CFieldType WlOutputListener "geometry" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> (PtrConst.PtrConst RIP.CChar) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> (PtrConst.PtrConst RIP.CChar) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-         ) => RIP.HasField "geometry" (RIP.Ptr Wl_output_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> (PtrConst.PtrConst RIP.CChar) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+         ) => RIP.HasField "geometry" (RIP.Ptr WlOutputListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"geometry")
 
-instance HasCField.HasCField Wl_output_listener "mode" where
+instance HasCField.HasCField WlOutputListener "mode" where
 
-  type CFieldType Wl_output_listener "mode" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  type CFieldType WlOutputListener "mode" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-         ) => RIP.HasField "mode" (RIP.Ptr Wl_output_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+         ) => RIP.HasField "mode" (RIP.Ptr WlOutputListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"mode")
 
-instance HasCField.HasCField Wl_output_listener "done" where
+instance HasCField.HasCField WlOutputListener "done" where
 
-  type CFieldType Wl_output_listener "done" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> IO ())
+  type CFieldType WlOutputListener "done" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> IO ())
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> IO ()))
-         ) => RIP.HasField "done" (RIP.Ptr Wl_output_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> IO ()))
+         ) => RIP.HasField "done" (RIP.Ptr WlOutputListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"done")
 
-instance HasCField.HasCField Wl_output_listener "scale" where
+instance HasCField.HasCField WlOutputListener "scale" where
 
-  type CFieldType Wl_output_listener "scale" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  type CFieldType WlOutputListener "scale" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 24
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-         ) => RIP.HasField "scale" (RIP.Ptr Wl_output_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+         ) => RIP.HasField "scale" (RIP.Ptr WlOutputListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"scale")
 
-instance HasCField.HasCField Wl_output_listener "name" where
+instance HasCField.HasCField WlOutputListener "name" where
 
-  type CFieldType Wl_output_listener "name" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  type CFieldType WlOutputListener "name" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
 
   offset# = \_ -> \_ -> 32
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
-         ) => RIP.HasField "name" (RIP.Ptr Wl_output_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
+         ) => RIP.HasField "name" (RIP.Ptr WlOutputListener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"name")
 
-instance HasCField.HasCField Wl_output_listener "description" where
+instance HasCField.HasCField WlOutputListener "description" where
 
-  type CFieldType Wl_output_listener "description" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  type CFieldType WlOutputListener "description" =
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
 
   offset# = \_ -> \_ -> 40
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
-         ) => RIP.HasField "description" (RIP.Ptr Wl_output_listener) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
+         ) => RIP.HasField "description" (RIP.Ptr WlOutputListener) (RIP.Ptr ty) where
 
   getField =
     HasCField.fromPtr (RIP.Proxy @"description")
@@ -8278,43 +8274,43 @@ wL_REGION_SUBTRACT_SINCE_VERSION = (1 :: RIP.CInt)
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-newtype Wl_subcompositor_error = Wl_subcompositor_error
+newtype WlSubcompositorError = WlSubcompositorError
   { unwrap :: RIP.CUInt
   }
   deriving stock (Eq, RIP.Generic, Ord)
   deriving newtype (RIP.HasFFIType)
 
-instance Marshal.StaticSize Wl_subcompositor_error where
+instance Marshal.StaticSize WlSubcompositorError where
 
   staticSizeOf = \_ -> (4 :: Int)
 
   staticAlignment = \_ -> (4 :: Int)
 
-instance Marshal.ReadRaw Wl_subcompositor_error where
+instance Marshal.ReadRaw WlSubcompositorError where
 
   readRaw =
     \ptr0 ->
-          pure Wl_subcompositor_error
+          pure WlSubcompositorError
       <*> Marshal.readRawByteOff ptr0 (0 :: Int)
 
-instance Marshal.WriteRaw Wl_subcompositor_error where
+instance Marshal.WriteRaw WlSubcompositorError where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_subcompositor_error unwrap2 ->
+          WlSubcompositorError unwrap2 ->
             Marshal.writeRawByteOff ptr0 (0 :: Int) unwrap2
 
-deriving via Marshal.EquivStorable Wl_subcompositor_error instance RIP.Storable Wl_subcompositor_error
+deriving via Marshal.EquivStorable WlSubcompositorError instance RIP.Storable WlSubcompositorError
 
-deriving via RIP.CUInt instance RIP.Prim Wl_subcompositor_error
+deriving via RIP.CUInt instance RIP.Prim WlSubcompositorError
 
-instance CEnum.CEnum Wl_subcompositor_error where
+instance CEnum.CEnum WlSubcompositorError where
 
-  type CEnumZ Wl_subcompositor_error = RIP.CUInt
+  type CEnumZ WlSubcompositorError = RIP.CUInt
 
-  toCEnum = Wl_subcompositor_error
+  toCEnum = WlSubcompositorError
 
   fromCEnum = RIP.getField @"unwrap"
 
@@ -8325,26 +8321,26 @@ instance CEnum.CEnum Wl_subcompositor_error where
                                    ]
 
   showsUndeclared =
-    CEnum.showsWrappedUndeclared "Wl_subcompositor_error"
+    CEnum.showsWrappedUndeclared "WlSubcompositorError"
 
   readPrecUndeclared =
-    CEnum.readPrecWrappedUndeclared "Wl_subcompositor_error"
+    CEnum.readPrecWrappedUndeclared "WlSubcompositorError"
 
   isDeclared = CEnum.seqIsDeclared
 
   mkDeclared = CEnum.seqMkDeclared
 
-instance CEnum.SequentialCEnum Wl_subcompositor_error where
+instance CEnum.SequentialCEnum WlSubcompositorError where
 
   minDeclaredValue = WL_SUBCOMPOSITOR_ERROR_BAD_SURFACE
 
   maxDeclaredValue = WL_SUBCOMPOSITOR_ERROR_BAD_PARENT
 
-instance Show Wl_subcompositor_error where
+instance Show WlSubcompositorError where
 
   showsPrec = CEnum.shows
 
-instance Read Wl_subcompositor_error where
+instance Read WlSubcompositorError where
 
   readPrec = CEnum.readPrec
 
@@ -8353,13 +8349,13 @@ instance Read Wl_subcompositor_error where
   readListPrec = RIP.readListPrecDefault
 
 instance ( ((~) ty) RIP.CUInt
-         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_subcompositor_error) (RIP.Ptr ty) where
+         ) => RIP.HasField "unwrap" (RIP.Ptr WlSubcompositorError) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField Wl_subcompositor_error "unwrap" where
+instance HasCField.HasCField WlSubcompositorError "unwrap" where
 
-  type CFieldType Wl_subcompositor_error "unwrap" =
+  type CFieldType WlSubcompositorError "unwrap" =
     RIP.CUInt
 
   offset# = \_ -> \_ -> 0
@@ -8370,8 +8366,8 @@ instance HasCField.HasCField Wl_subcompositor_error "unwrap" where
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SUBCOMPOSITOR_ERROR_BAD_SURFACE :: Wl_subcompositor_error
-pattern WL_SUBCOMPOSITOR_ERROR_BAD_SURFACE = Wl_subcompositor_error 0
+pattern WL_SUBCOMPOSITOR_ERROR_BAD_SURFACE :: WlSubcompositorError
+pattern WL_SUBCOMPOSITOR_ERROR_BAD_SURFACE = WlSubcompositorError 0
 
 {-| __C declaration:__ @WL_SUBCOMPOSITOR_ERROR_BAD_PARENT@
 
@@ -8379,8 +8375,8 @@ pattern WL_SUBCOMPOSITOR_ERROR_BAD_SURFACE = Wl_subcompositor_error 0
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SUBCOMPOSITOR_ERROR_BAD_PARENT :: Wl_subcompositor_error
-pattern WL_SUBCOMPOSITOR_ERROR_BAD_PARENT = Wl_subcompositor_error 1
+pattern WL_SUBCOMPOSITOR_ERROR_BAD_PARENT :: WlSubcompositorError
+pattern WL_SUBCOMPOSITOR_ERROR_BAD_PARENT = WlSubcompositorError 1
 
 {-| __C declaration:__ @macro WL_SUBCOMPOSITOR_DESTROY@
 
@@ -8426,43 +8422,43 @@ wL_SUBCOMPOSITOR_GET_SUBSURFACE_SINCE_VERSION =
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-newtype Wl_subsurface_error = Wl_subsurface_error
+newtype WlSubsurfaceError = WlSubsurfaceError
   { unwrap :: RIP.CUInt
   }
   deriving stock (Eq, RIP.Generic, Ord)
   deriving newtype (RIP.HasFFIType)
 
-instance Marshal.StaticSize Wl_subsurface_error where
+instance Marshal.StaticSize WlSubsurfaceError where
 
   staticSizeOf = \_ -> (4 :: Int)
 
   staticAlignment = \_ -> (4 :: Int)
 
-instance Marshal.ReadRaw Wl_subsurface_error where
+instance Marshal.ReadRaw WlSubsurfaceError where
 
   readRaw =
     \ptr0 ->
-          pure Wl_subsurface_error
+          pure WlSubsurfaceError
       <*> Marshal.readRawByteOff ptr0 (0 :: Int)
 
-instance Marshal.WriteRaw Wl_subsurface_error where
+instance Marshal.WriteRaw WlSubsurfaceError where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          Wl_subsurface_error unwrap2 ->
+          WlSubsurfaceError unwrap2 ->
             Marshal.writeRawByteOff ptr0 (0 :: Int) unwrap2
 
-deriving via Marshal.EquivStorable Wl_subsurface_error instance RIP.Storable Wl_subsurface_error
+deriving via Marshal.EquivStorable WlSubsurfaceError instance RIP.Storable WlSubsurfaceError
 
-deriving via RIP.CUInt instance RIP.Prim Wl_subsurface_error
+deriving via RIP.CUInt instance RIP.Prim WlSubsurfaceError
 
-instance CEnum.CEnum Wl_subsurface_error where
+instance CEnum.CEnum WlSubsurfaceError where
 
-  type CEnumZ Wl_subsurface_error = RIP.CUInt
+  type CEnumZ WlSubsurfaceError = RIP.CUInt
 
-  toCEnum = Wl_subsurface_error
+  toCEnum = WlSubsurfaceError
 
   fromCEnum = RIP.getField @"unwrap"
 
@@ -8471,26 +8467,26 @@ instance CEnum.CEnum Wl_subsurface_error where
       CEnum.declaredValuesFromList [(0, RIP.singleton "WL_SUBSURFACE_ERROR_BAD_SURFACE")]
 
   showsUndeclared =
-    CEnum.showsWrappedUndeclared "Wl_subsurface_error"
+    CEnum.showsWrappedUndeclared "WlSubsurfaceError"
 
   readPrecUndeclared =
-    CEnum.readPrecWrappedUndeclared "Wl_subsurface_error"
+    CEnum.readPrecWrappedUndeclared "WlSubsurfaceError"
 
   isDeclared = CEnum.seqIsDeclared
 
   mkDeclared = CEnum.seqMkDeclared
 
-instance CEnum.SequentialCEnum Wl_subsurface_error where
+instance CEnum.SequentialCEnum WlSubsurfaceError where
 
   minDeclaredValue = WL_SUBSURFACE_ERROR_BAD_SURFACE
 
   maxDeclaredValue = WL_SUBSURFACE_ERROR_BAD_SURFACE
 
-instance Show Wl_subsurface_error where
+instance Show WlSubsurfaceError where
 
   showsPrec = CEnum.shows
 
-instance Read Wl_subsurface_error where
+instance Read WlSubsurfaceError where
 
   readPrec = CEnum.readPrec
 
@@ -8499,13 +8495,13 @@ instance Read Wl_subsurface_error where
   readListPrec = RIP.readListPrecDefault
 
 instance ( ((~) ty) RIP.CUInt
-         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_subsurface_error) (RIP.Ptr ty) where
+         ) => RIP.HasField "unwrap" (RIP.Ptr WlSubsurfaceError) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField Wl_subsurface_error "unwrap" where
+instance HasCField.HasCField WlSubsurfaceError "unwrap" where
 
-  type CFieldType Wl_subsurface_error "unwrap" =
+  type CFieldType WlSubsurfaceError "unwrap" =
     RIP.CUInt
 
   offset# = \_ -> \_ -> 0
@@ -8516,8 +8512,8 @@ instance HasCField.HasCField Wl_subsurface_error "unwrap" where
 
     __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
 -}
-pattern WL_SUBSURFACE_ERROR_BAD_SURFACE :: Wl_subsurface_error
-pattern WL_SUBSURFACE_ERROR_BAD_SURFACE = Wl_subsurface_error 0
+pattern WL_SUBSURFACE_ERROR_BAD_SURFACE :: WlSubsurfaceError
+pattern WL_SUBSURFACE_ERROR_BAD_SURFACE = WlSubsurfaceError 0
 
 {-| __C declaration:__ @macro WL_SUBSURFACE_DESTROY@
 
@@ -8669,1634 +8665,1634 @@ wL_FIXES_DESTROY_REGISTRY_SINCE_VERSION :: RIP.CInt
 wL_FIXES_DESTROY_REGISTRY_SINCE_VERSION =
   (1 :: RIP.CInt)
 
-foreign import ccall safe "wrapper" hs_bindgen_1a9426a250e4427e_base ::
+foreign import ccall safe "wrapper" hs_bindgen_fd4f9b2c25c45fff_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_buffer) -> IO ())@
-hs_bindgen_1a9426a250e4427e ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_buffer) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_buffer) -> IO ()))
-hs_bindgen_1a9426a250e4427e =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlBuffer) -> IO ())@
+hs_bindgen_fd4f9b2c25c45fff ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlBuffer) -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlBuffer) -> IO ()))
+hs_bindgen_fd4f9b2c25c45fff =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_1a9426a250e4427e_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_fd4f9b2c25c45fff_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_327af10f7bc13685_base ::
+foreign import ccall safe "dynamic" hs_bindgen_1a2860f5bb3e09bf_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_buffer) -> IO ())@
-hs_bindgen_327af10f7bc13685 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_buffer) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_buffer) -> IO ()
-hs_bindgen_327af10f7bc13685 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlBuffer) -> IO ())@
+hs_bindgen_1a2860f5bb3e09bf ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlBuffer) -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlBuffer) -> IO ()
+hs_bindgen_1a2860f5bb3e09bf =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_327af10f7bc13685_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_1a2860f5bb3e09bf_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_buffer) -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlBuffer) -> IO ()) where
 
-  toFunPtr = hs_bindgen_1a9426a250e4427e
+  toFunPtr = hs_bindgen_fd4f9b2c25c45fff
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_buffer) -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlBuffer) -> IO ()) where
 
-  fromFunPtr = hs_bindgen_327af10f7bc13685
+  fromFunPtr = hs_bindgen_1a2860f5bb3e09bf
 
-foreign import ccall safe "wrapper" hs_bindgen_dda3eda54be7e049_base ::
+foreign import ccall safe "wrapper" hs_bindgen_ca7c531dd18274e6_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_callback) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_dda3eda54be7e049 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_callback) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_callback) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_dda3eda54be7e049 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlCallback) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_ca7c531dd18274e6 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlCallback) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlCallback) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_ca7c531dd18274e6 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_dda3eda54be7e049_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_ca7c531dd18274e6_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_90814fdb4355a9e6_base ::
+foreign import ccall safe "dynamic" hs_bindgen_6c4cd4ccfe1300bf_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_callback) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_90814fdb4355a9e6 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_callback) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_callback) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
-hs_bindgen_90814fdb4355a9e6 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlCallback) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_6c4cd4ccfe1300bf ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlCallback) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlCallback) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
+hs_bindgen_6c4cd4ccfe1300bf =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_90814fdb4355a9e6_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_6c4cd4ccfe1300bf_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_callback) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlCallback) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_dda3eda54be7e049
+  toFunPtr = hs_bindgen_ca7c531dd18274e6
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_callback) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlCallback) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_90814fdb4355a9e6
+  fromFunPtr = hs_bindgen_6c4cd4ccfe1300bf
 
-foreign import ccall safe "wrapper" hs_bindgen_675a3ee6f52da54c_base ::
+foreign import ccall safe "wrapper" hs_bindgen_27eaa0be5c782366_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> IO ())@
-hs_bindgen_675a3ee6f52da54c ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> IO ()))
-hs_bindgen_675a3ee6f52da54c =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> IO ())@
+hs_bindgen_27eaa0be5c782366 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> IO ()))
+hs_bindgen_27eaa0be5c782366 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_675a3ee6f52da54c_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_27eaa0be5c782366_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_905b1463ac138a95_base ::
+foreign import ccall safe "dynamic" hs_bindgen_40e49827c7b27ba9_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> IO ())@
-hs_bindgen_905b1463ac138a95 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> IO ()
-hs_bindgen_905b1463ac138a95 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> IO ())@
+hs_bindgen_40e49827c7b27ba9 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> IO ()
+hs_bindgen_40e49827c7b27ba9 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_905b1463ac138a95_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_40e49827c7b27ba9_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> IO ()) where
 
-  toFunPtr = hs_bindgen_675a3ee6f52da54c
+  toFunPtr = hs_bindgen_27eaa0be5c782366
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> IO ()) where
 
-  fromFunPtr = hs_bindgen_905b1463ac138a95
+  fromFunPtr = hs_bindgen_40e49827c7b27ba9
 
-foreign import ccall safe "wrapper" hs_bindgen_f0e4a93e343f97f1_base ::
+foreign import ccall safe "wrapper" hs_bindgen_7e085f96858bc2a9_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> (RIP.Ptr Wl_data_offer) -> IO ())@
-hs_bindgen_f0e4a93e343f97f1 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> (RIP.Ptr Wl_data_offer) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> (RIP.Ptr Wl_data_offer) -> IO ()))
-hs_bindgen_f0e4a93e343f97f1 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> (RIP.Ptr WlDataOffer) -> IO ())@
+hs_bindgen_7e085f96858bc2a9 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> (RIP.Ptr WlDataOffer) -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> (RIP.Ptr WlDataOffer) -> IO ()))
+hs_bindgen_7e085f96858bc2a9 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_f0e4a93e343f97f1_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_7e085f96858bc2a9_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_3d65b58791b6a05c_base ::
+foreign import ccall safe "dynamic" hs_bindgen_f78c4f8dde82dc77_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> (RIP.Ptr Wl_data_offer) -> IO ())@
-hs_bindgen_3d65b58791b6a05c ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> (RIP.Ptr Wl_data_offer) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> (RIP.Ptr Wl_data_offer) -> IO ()
-hs_bindgen_3d65b58791b6a05c =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> (RIP.Ptr WlDataOffer) -> IO ())@
+hs_bindgen_f78c4f8dde82dc77 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> (RIP.Ptr WlDataOffer) -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> (RIP.Ptr WlDataOffer) -> IO ()
+hs_bindgen_f78c4f8dde82dc77 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_3d65b58791b6a05c_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_f78c4f8dde82dc77_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> (RIP.Ptr Wl_data_offer) -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> (RIP.Ptr WlDataOffer) -> IO ()) where
 
-  toFunPtr = hs_bindgen_f0e4a93e343f97f1
+  toFunPtr = hs_bindgen_7e085f96858bc2a9
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> (RIP.Ptr Wl_data_offer) -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> (RIP.Ptr WlDataOffer) -> IO ()) where
 
-  fromFunPtr = hs_bindgen_3d65b58791b6a05c
+  fromFunPtr = hs_bindgen_f78c4f8dde82dc77
 
-foreign import ccall safe "wrapper" hs_bindgen_53feb2df1944f1d8_base ::
+foreign import ccall safe "wrapper" hs_bindgen_d17586cb2c0d03cf_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> (RIP.Ptr RIP.Void) -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> (RIP.Ptr RIP.Void) -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> (RIP.Ptr Wl_data_offer) -> IO ())@
-hs_bindgen_53feb2df1944f1d8 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> (RIP.Ptr Wl_data_offer) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> (RIP.Ptr Wl_data_offer) -> IO ()))
-hs_bindgen_53feb2df1944f1d8 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> (RIP.Ptr WlDataOffer) -> IO ())@
+hs_bindgen_d17586cb2c0d03cf ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> (RIP.Ptr WlDataOffer) -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> (RIP.Ptr WlDataOffer) -> IO ()))
+hs_bindgen_d17586cb2c0d03cf =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_53feb2df1944f1d8_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_d17586cb2c0d03cf_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_b3149c6e2d34eec8_base ::
+foreign import ccall safe "dynamic" hs_bindgen_3b621b9a9948e8a0_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> (RIP.Ptr RIP.Void) -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> (RIP.Ptr RIP.Void) -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> (RIP.Ptr Wl_data_offer) -> IO ())@
-hs_bindgen_b3149c6e2d34eec8 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> (RIP.Ptr Wl_data_offer) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> (RIP.Ptr Wl_data_offer) -> IO ()
-hs_bindgen_b3149c6e2d34eec8 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> (RIP.Ptr WlDataOffer) -> IO ())@
+hs_bindgen_3b621b9a9948e8a0 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> (RIP.Ptr WlDataOffer) -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> (RIP.Ptr WlDataOffer) -> IO ()
+hs_bindgen_3b621b9a9948e8a0 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_b3149c6e2d34eec8_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_3b621b9a9948e8a0_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> (RIP.Ptr Wl_data_offer) -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> (RIP.Ptr WlDataOffer) -> IO ()) where
 
-  toFunPtr = hs_bindgen_53feb2df1944f1d8
+  toFunPtr = hs_bindgen_d17586cb2c0d03cf
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> (RIP.Ptr Wl_data_offer) -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> (RIP.Ptr WlDataOffer) -> IO ()) where
 
-  fromFunPtr = hs_bindgen_b3149c6e2d34eec8
+  fromFunPtr = hs_bindgen_3b621b9a9948e8a0
 
-foreign import ccall safe "wrapper" hs_bindgen_3e5d503fe9a077f2_base ::
+foreign import ccall safe "wrapper" hs_bindgen_498bf54cfe5fbcc1_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> RIP.Int32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
-hs_bindgen_3e5d503fe9a077f2 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
-hs_bindgen_3e5d503fe9a077f2 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
+hs_bindgen_498bf54cfe5fbcc1 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
+hs_bindgen_498bf54cfe5fbcc1 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_3e5d503fe9a077f2_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_498bf54cfe5fbcc1_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_3bd5168a23b6de4e_base ::
+foreign import ccall safe "dynamic" hs_bindgen_36deaa2842974bfa_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> RIP.Int32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
-hs_bindgen_3bd5168a23b6de4e ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()
-hs_bindgen_3bd5168a23b6de4e =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
+hs_bindgen_36deaa2842974bfa ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()
+hs_bindgen_36deaa2842974bfa =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_3bd5168a23b6de4e_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_36deaa2842974bfa_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
 
-  toFunPtr = hs_bindgen_3e5d503fe9a077f2
+  toFunPtr = hs_bindgen_498bf54cfe5fbcc1
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_device) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataDevice) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
 
-  fromFunPtr = hs_bindgen_3bd5168a23b6de4e
+  fromFunPtr = hs_bindgen_36deaa2842974bfa
 
-foreign import ccall safe "wrapper" hs_bindgen_97fc3aab77e9665a_base ::
+foreign import ccall safe "wrapper" hs_bindgen_fe7e1b5132c6293d_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_offer) -> (PtrConst.PtrConst RIP.CChar) -> IO ())@
-hs_bindgen_97fc3aab77e9665a ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_offer) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_offer) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
-hs_bindgen_97fc3aab77e9665a =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataOffer) -> (PtrConst.PtrConst RIP.CChar) -> IO ())@
+hs_bindgen_fe7e1b5132c6293d ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataOffer) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataOffer) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
+hs_bindgen_fe7e1b5132c6293d =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_97fc3aab77e9665a_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_fe7e1b5132c6293d_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_38725ca7292ff767_base ::
+foreign import ccall safe "dynamic" hs_bindgen_955cf43647826d07_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_offer) -> (PtrConst.PtrConst RIP.CChar) -> IO ())@
-hs_bindgen_38725ca7292ff767 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_offer) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_offer) -> (PtrConst.PtrConst RIP.CChar) -> IO ()
-hs_bindgen_38725ca7292ff767 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataOffer) -> (PtrConst.PtrConst RIP.CChar) -> IO ())@
+hs_bindgen_955cf43647826d07 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataOffer) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataOffer) -> (PtrConst.PtrConst RIP.CChar) -> IO ()
+hs_bindgen_955cf43647826d07 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_38725ca7292ff767_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_955cf43647826d07_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_offer) -> (PtrConst.PtrConst RIP.CChar) -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataOffer) -> (PtrConst.PtrConst RIP.CChar) -> IO ()) where
 
-  toFunPtr = hs_bindgen_97fc3aab77e9665a
+  toFunPtr = hs_bindgen_fe7e1b5132c6293d
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_offer) -> (PtrConst.PtrConst RIP.CChar) -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataOffer) -> (PtrConst.PtrConst RIP.CChar) -> IO ()) where
 
-  fromFunPtr = hs_bindgen_38725ca7292ff767
+  fromFunPtr = hs_bindgen_955cf43647826d07
 
-foreign import ccall safe "wrapper" hs_bindgen_94d54aafef082d04_base ::
+foreign import ccall safe "wrapper" hs_bindgen_38b6de851e2fc2e9_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_offer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_94d54aafef082d04 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_offer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_offer) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_94d54aafef082d04 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataOffer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_38b6de851e2fc2e9 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataOffer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataOffer) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_38b6de851e2fc2e9 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_94d54aafef082d04_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_38b6de851e2fc2e9_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_7b80203bedac4cc7_base ::
+foreign import ccall safe "dynamic" hs_bindgen_e787a2efec186a1e_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_offer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_7b80203bedac4cc7 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_offer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_offer) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
-hs_bindgen_7b80203bedac4cc7 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataOffer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_e787a2efec186a1e ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataOffer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataOffer) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
+hs_bindgen_e787a2efec186a1e =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_7b80203bedac4cc7_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_e787a2efec186a1e_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_offer) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataOffer) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_94d54aafef082d04
+  toFunPtr = hs_bindgen_38b6de851e2fc2e9
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_offer) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataOffer) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_7b80203bedac4cc7
+  fromFunPtr = hs_bindgen_e787a2efec186a1e
 
-foreign import ccall safe "wrapper" hs_bindgen_8870737334824781_base ::
+foreign import ccall safe "wrapper" hs_bindgen_6a8a11276a1d0d31_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> IO ())@
-hs_bindgen_8870737334824781 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> IO ()))
-hs_bindgen_8870737334824781 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> IO ())@
+hs_bindgen_6a8a11276a1d0d31 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> IO ()))
+hs_bindgen_6a8a11276a1d0d31 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_8870737334824781_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_6a8a11276a1d0d31_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_cfe460c3af4ad457_base ::
+foreign import ccall safe "dynamic" hs_bindgen_d699ecb18528a632_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> IO ())@
-hs_bindgen_cfe460c3af4ad457 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> IO ()
-hs_bindgen_cfe460c3af4ad457 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> IO ())@
+hs_bindgen_d699ecb18528a632 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> IO ()
+hs_bindgen_d699ecb18528a632 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_cfe460c3af4ad457_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_d699ecb18528a632_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> IO ()) where
 
-  toFunPtr = hs_bindgen_8870737334824781
+  toFunPtr = hs_bindgen_6a8a11276a1d0d31
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> IO ()) where
 
-  fromFunPtr = hs_bindgen_cfe460c3af4ad457
+  fromFunPtr = hs_bindgen_d699ecb18528a632
 
-foreign import ccall safe "wrapper" hs_bindgen_e316ff471f17f95a_base ::
+foreign import ccall safe "wrapper" hs_bindgen_14999734930c9332_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> (PtrConst.PtrConst RIP.CChar) -> IO ())@
-hs_bindgen_e316ff471f17f95a ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
-hs_bindgen_e316ff471f17f95a =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> (PtrConst.PtrConst RIP.CChar) -> IO ())@
+hs_bindgen_14999734930c9332 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
+hs_bindgen_14999734930c9332 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_e316ff471f17f95a_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_14999734930c9332_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_2ef5de60f5bf8329_base ::
+foreign import ccall safe "dynamic" hs_bindgen_acc767bf3965b40e_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> (PtrConst.PtrConst RIP.CChar) -> IO ())@
-hs_bindgen_2ef5de60f5bf8329 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> (PtrConst.PtrConst RIP.CChar) -> IO ()
-hs_bindgen_2ef5de60f5bf8329 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> (PtrConst.PtrConst RIP.CChar) -> IO ())@
+hs_bindgen_acc767bf3965b40e ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> (PtrConst.PtrConst RIP.CChar) -> IO ()
+hs_bindgen_acc767bf3965b40e =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_2ef5de60f5bf8329_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_acc767bf3965b40e_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> (PtrConst.PtrConst RIP.CChar) -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> (PtrConst.PtrConst RIP.CChar) -> IO ()) where
 
-  toFunPtr = hs_bindgen_e316ff471f17f95a
+  toFunPtr = hs_bindgen_14999734930c9332
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> (PtrConst.PtrConst RIP.CChar) -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> (PtrConst.PtrConst RIP.CChar) -> IO ()) where
 
-  fromFunPtr = hs_bindgen_2ef5de60f5bf8329
+  fromFunPtr = hs_bindgen_acc767bf3965b40e
 
-foreign import ccall safe "wrapper" hs_bindgen_b765a3ccebedc2e5_base ::
+foreign import ccall safe "wrapper" hs_bindgen_03ef29d481d655c9_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_b765a3ccebedc2e5 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-hs_bindgen_b765a3ccebedc2e5 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_03ef29d481d655c9 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_03ef29d481d655c9 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_b765a3ccebedc2e5_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_03ef29d481d655c9_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_58cd5e9bb660e365_base ::
+foreign import ccall safe "dynamic" hs_bindgen_7b07a64016c7cdb7_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_58cd5e9bb660e365 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ()
-hs_bindgen_58cd5e9bb660e365 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_7b07a64016c7cdb7 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ()
+hs_bindgen_7b07a64016c7cdb7 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_58cd5e9bb660e365_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_7b07a64016c7cdb7_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_b765a3ccebedc2e5
+  toFunPtr = hs_bindgen_03ef29d481d655c9
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_58cd5e9bb660e365
+  fromFunPtr = hs_bindgen_7b07a64016c7cdb7
 
-foreign import ccall safe "wrapper" hs_bindgen_c4dad9bcd5299286_base ::
+foreign import ccall safe "wrapper" hs_bindgen_91a4238f14a26924_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_c4dad9bcd5299286 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_c4dad9bcd5299286 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_91a4238f14a26924 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_91a4238f14a26924 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_c4dad9bcd5299286_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_91a4238f14a26924_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_7eba1388d985806d_base ::
+foreign import ccall safe "dynamic" hs_bindgen_3e73441e9fbe9886_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_7eba1388d985806d ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
-hs_bindgen_7eba1388d985806d =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_3e73441e9fbe9886 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
+hs_bindgen_3e73441e9fbe9886 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_7eba1388d985806d_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_3e73441e9fbe9886_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_c4dad9bcd5299286
+  toFunPtr = hs_bindgen_91a4238f14a26924
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_data_source) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDataSource) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_7eba1388d985806d
+  fromFunPtr = hs_bindgen_3e73441e9fbe9886
 
-foreign import ccall safe "wrapper" hs_bindgen_a41509c5c1ca4d7d_base ::
+foreign import ccall safe "wrapper" hs_bindgen_cfbb3a613b016aca_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_display) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> IO ())@
-hs_bindgen_a41509c5c1ca4d7d ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_display) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_display) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
-hs_bindgen_a41509c5c1ca4d7d =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDisplay) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> IO ())@
+hs_bindgen_cfbb3a613b016aca ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDisplay) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDisplay) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
+hs_bindgen_cfbb3a613b016aca =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_a41509c5c1ca4d7d_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_cfbb3a613b016aca_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_c94fdaec0cae0df7_base ::
+foreign import ccall safe "dynamic" hs_bindgen_c172918188eabbff_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_display) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> IO ())@
-hs_bindgen_c94fdaec0cae0df7 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_display) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_display) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> IO ()
-hs_bindgen_c94fdaec0cae0df7 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDisplay) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> IO ())@
+hs_bindgen_c172918188eabbff ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDisplay) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlDisplay) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> IO ()
+hs_bindgen_c172918188eabbff =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_c94fdaec0cae0df7_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_c172918188eabbff_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_display) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDisplay) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> IO ()) where
 
-  toFunPtr = hs_bindgen_a41509c5c1ca4d7d
+  toFunPtr = hs_bindgen_cfbb3a613b016aca
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_display) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDisplay) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> IO ()) where
 
-  fromFunPtr = hs_bindgen_c94fdaec0cae0df7
+  fromFunPtr = hs_bindgen_c172918188eabbff
 
-foreign import ccall safe "wrapper" hs_bindgen_87e518f6c2e20922_base ::
+foreign import ccall safe "wrapper" hs_bindgen_23f71da037291888_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_display) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_87e518f6c2e20922 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_display) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_display) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_87e518f6c2e20922 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDisplay) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_23f71da037291888 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDisplay) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDisplay) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_23f71da037291888 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_87e518f6c2e20922_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_23f71da037291888_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_2610a07a9e2c9073_base ::
+foreign import ccall safe "dynamic" hs_bindgen_9eaa128d8f833e4f_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_display) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_2610a07a9e2c9073 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_display) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_display) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
-hs_bindgen_2610a07a9e2c9073 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDisplay) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_9eaa128d8f833e4f ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDisplay) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlDisplay) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
+hs_bindgen_9eaa128d8f833e4f =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_2610a07a9e2c9073_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_9eaa128d8f833e4f_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_display) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDisplay) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_87e518f6c2e20922
+  toFunPtr = hs_bindgen_23f71da037291888
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_display) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlDisplay) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_2610a07a9e2c9073
+  fromFunPtr = hs_bindgen_9eaa128d8f833e4f
 
-foreign import ccall safe "wrapper" hs_bindgen_f62670ea91a8cccf_base ::
+foreign import ccall safe "wrapper" hs_bindgen_9306d9692a283a51_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_f62670ea91a8cccf ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-hs_bindgen_f62670ea91a8cccf =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_9306d9692a283a51 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_9306d9692a283a51 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_f62670ea91a8cccf_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_9306d9692a283a51_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_ae4017f19437dfbf_base ::
+foreign import ccall safe "dynamic" hs_bindgen_b5b2dbf2efc8f9e8_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_ae4017f19437dfbf ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()
-hs_bindgen_ae4017f19437dfbf =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_b5b2dbf2efc8f9e8 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()
+hs_bindgen_b5b2dbf2efc8f9e8 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_ae4017f19437dfbf_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_b5b2dbf2efc8f9e8_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_f62670ea91a8cccf
+  toFunPtr = hs_bindgen_9306d9692a283a51
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_ae4017f19437dfbf
+  fromFunPtr = hs_bindgen_b5b2dbf2efc8f9e8
 
-foreign import ccall safe "wrapper" hs_bindgen_d37f1fbb24cc3980_base ::
+foreign import ccall safe "wrapper" hs_bindgen_d6c700e4046fdac3_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> IO ())@
-hs_bindgen_d37f1fbb24cc3980 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> IO ()))
-hs_bindgen_d37f1fbb24cc3980 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> IO ())@
+hs_bindgen_d6c700e4046fdac3 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> IO ()))
+hs_bindgen_d6c700e4046fdac3 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_d37f1fbb24cc3980_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_d6c700e4046fdac3_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_dd927156e40d60a0_base ::
+foreign import ccall safe "dynamic" hs_bindgen_bd83b16f9f3a9606_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> IO ())@
-hs_bindgen_dd927156e40d60a0 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> IO ()
-hs_bindgen_dd927156e40d60a0 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> IO ())@
+hs_bindgen_bd83b16f9f3a9606 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> IO ()
+hs_bindgen_bd83b16f9f3a9606 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_dd927156e40d60a0_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_bd83b16f9f3a9606_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> IO ()) where
 
-  toFunPtr = hs_bindgen_d37f1fbb24cc3980
+  toFunPtr = hs_bindgen_d6c700e4046fdac3
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> IO ()) where
 
-  fromFunPtr = hs_bindgen_dd927156e40d60a0
+  fromFunPtr = hs_bindgen_bd83b16f9f3a9606
 
-foreign import ccall safe "wrapper" hs_bindgen_3ad1ea9dc14fb0f9_base ::
+foreign import ccall safe "wrapper" hs_bindgen_97db390415bb37b3_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ())@
-hs_bindgen_3ad1ea9dc14fb0f9 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ()))
-hs_bindgen_3ad1ea9dc14fb0f9 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ())@
+hs_bindgen_97db390415bb37b3 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ()))
+hs_bindgen_97db390415bb37b3 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_3ad1ea9dc14fb0f9_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_97db390415bb37b3_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_75bbdee08665d883_base ::
+foreign import ccall safe "dynamic" hs_bindgen_2973e240d6891843_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ())@
-hs_bindgen_75bbdee08665d883 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ()
-hs_bindgen_75bbdee08665d883 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ())@
+hs_bindgen_2973e240d6891843 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ()
+hs_bindgen_2973e240d6891843 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_75bbdee08665d883_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_2973e240d6891843_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ()) where
 
-  toFunPtr = hs_bindgen_3ad1ea9dc14fb0f9
+  toFunPtr = hs_bindgen_97db390415bb37b3
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ()) where
 
-  fromFunPtr = hs_bindgen_75bbdee08665d883
+  fromFunPtr = hs_bindgen_2973e240d6891843
 
-foreign import ccall safe "wrapper" hs_bindgen_3b88b7c60d9ea6a7_base ::
+foreign import ccall safe "wrapper" hs_bindgen_fee211a57b70e03c_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> RIP.Word32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> RIP.Word32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_3b88b7c60d9ea6a7 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_3b88b7c60d9ea6a7 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_fee211a57b70e03c ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_fee211a57b70e03c =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_3b88b7c60d9ea6a7_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_fee211a57b70e03c_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_ee67bf56d2c81072_base ::
+foreign import ccall safe "dynamic" hs_bindgen_eb7a48cda91d9a93_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> RIP.Word32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> RIP.Word32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_ee67bf56d2c81072 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()
-hs_bindgen_ee67bf56d2c81072 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_eb7a48cda91d9a93 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()
+hs_bindgen_eb7a48cda91d9a93 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_ee67bf56d2c81072_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_eb7a48cda91d9a93_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_3b88b7c60d9ea6a7
+  toFunPtr = hs_bindgen_fee211a57b70e03c
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_ee67bf56d2c81072
+  fromFunPtr = hs_bindgen_eb7a48cda91d9a93
 
-foreign import ccall safe "wrapper" hs_bindgen_2b0012281f94d304_base ::
+foreign import ccall safe "wrapper" hs_bindgen_6c582537fd2482b5_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_2b0012281f94d304 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_2b0012281f94d304 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_6c582537fd2482b5 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_6c582537fd2482b5 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_2b0012281f94d304_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_6c582537fd2482b5_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_57aecc510849c622_base ::
+foreign import ccall safe "dynamic" hs_bindgen_cb859bc68b5942d2_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_57aecc510849c622 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()
-hs_bindgen_57aecc510849c622 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_cb859bc68b5942d2 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()
+hs_bindgen_cb859bc68b5942d2 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_57aecc510849c622_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_cb859bc68b5942d2_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_2b0012281f94d304
+  toFunPtr = hs_bindgen_6c582537fd2482b5
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_57aecc510849c622
+  fromFunPtr = hs_bindgen_cb859bc68b5942d2
 
-foreign import ccall safe "wrapper" hs_bindgen_d363f8a9869a69f9_base ::
+foreign import ccall safe "wrapper" hs_bindgen_53c7bc1f0aa64f2f_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_d363f8a9869a69f9 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_d363f8a9869a69f9 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_53c7bc1f0aa64f2f ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_53c7bc1f0aa64f2f =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_d363f8a9869a69f9_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_53c7bc1f0aa64f2f_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_45e1a568e865553e_base ::
+foreign import ccall safe "dynamic" hs_bindgen_4a521a7b40d40c18_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_45e1a568e865553e ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()
-hs_bindgen_45e1a568e865553e =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_4a521a7b40d40c18 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()
+hs_bindgen_4a521a7b40d40c18 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_45e1a568e865553e_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_4a521a7b40d40c18_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_d363f8a9869a69f9
+  toFunPtr = hs_bindgen_53c7bc1f0aa64f2f
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_keyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlKeyboard) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_45e1a568e865553e
+  fromFunPtr = hs_bindgen_4a521a7b40d40c18
 
-foreign import ccall safe "wrapper" hs_bindgen_d9c8cf8757f61685_base ::
+foreign import ccall safe "wrapper" hs_bindgen_93f05ce75daf80b5_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> IO ())@
-hs_bindgen_d9c8cf8757f61685 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> IO ()))
-hs_bindgen_d9c8cf8757f61685 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> IO ())@
+hs_bindgen_93f05ce75daf80b5 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> IO ()))
+hs_bindgen_93f05ce75daf80b5 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_d9c8cf8757f61685_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_93f05ce75daf80b5_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_9a1b19b86a3a3645_base ::
+foreign import ccall safe "dynamic" hs_bindgen_5b7aacdbcef2365b_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> IO ())@
-hs_bindgen_9a1b19b86a3a3645 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> IO ()
-hs_bindgen_9a1b19b86a3a3645 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> IO ())@
+hs_bindgen_5b7aacdbcef2365b ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> IO ()
+hs_bindgen_5b7aacdbcef2365b =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_9a1b19b86a3a3645_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_5b7aacdbcef2365b_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> IO ()) where
 
-  toFunPtr = hs_bindgen_d9c8cf8757f61685
+  toFunPtr = hs_bindgen_93f05ce75daf80b5
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> IO ()) where
 
-  fromFunPtr = hs_bindgen_9a1b19b86a3a3645
+  fromFunPtr = hs_bindgen_5b7aacdbcef2365b
 
-foreign import ccall safe "wrapper" hs_bindgen_974f39f50eebe464_base ::
+foreign import ccall safe "wrapper" hs_bindgen_831387ce858df594_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> (PtrConst.PtrConst RIP.CChar) -> IO ())@
-hs_bindgen_974f39f50eebe464 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
-hs_bindgen_974f39f50eebe464 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> (PtrConst.PtrConst RIP.CChar) -> IO ())@
+hs_bindgen_831387ce858df594 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
+hs_bindgen_831387ce858df594 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_974f39f50eebe464_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_831387ce858df594_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_eebf31c6b404e6db_base ::
+foreign import ccall safe "dynamic" hs_bindgen_920da43b353750e1_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> (PtrConst.PtrConst RIP.CChar) -> IO ())@
-hs_bindgen_eebf31c6b404e6db ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> (PtrConst.PtrConst RIP.CChar) -> IO ()
-hs_bindgen_eebf31c6b404e6db =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> (PtrConst.PtrConst RIP.CChar) -> IO ())@
+hs_bindgen_920da43b353750e1 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> (PtrConst.PtrConst RIP.CChar) -> IO ()
+hs_bindgen_920da43b353750e1 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_eebf31c6b404e6db_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_920da43b353750e1_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> (PtrConst.PtrConst RIP.CChar) -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> (PtrConst.PtrConst RIP.CChar) -> IO ()) where
 
-  toFunPtr = hs_bindgen_974f39f50eebe464
+  toFunPtr = hs_bindgen_831387ce858df594
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> (PtrConst.PtrConst RIP.CChar) -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> (PtrConst.PtrConst RIP.CChar) -> IO ()) where
 
-  fromFunPtr = hs_bindgen_eebf31c6b404e6db
+  fromFunPtr = hs_bindgen_920da43b353750e1
 
-foreign import ccall safe "wrapper" hs_bindgen_3d10cdbaf363dd36_base ::
+foreign import ccall safe "wrapper" hs_bindgen_f474f76351f8b793_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_3d10cdbaf363dd36 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-hs_bindgen_3d10cdbaf363dd36 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_f474f76351f8b793 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_f474f76351f8b793 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_3d10cdbaf363dd36_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_f474f76351f8b793_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_07bbe396c3c1a822_base ::
+foreign import ccall safe "dynamic" hs_bindgen_73ecfe785297afdc_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_07bbe396c3c1a822 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Int32 -> IO ()
-hs_bindgen_07bbe396c3c1a822 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_73ecfe785297afdc ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Int32 -> IO ()
+hs_bindgen_73ecfe785297afdc =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_07bbe396c3c1a822_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_73ecfe785297afdc_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_3d10cdbaf363dd36
+  toFunPtr = hs_bindgen_f474f76351f8b793
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_07bbe396c3c1a822
+  fromFunPtr = hs_bindgen_73ecfe785297afdc
 
-foreign import ccall safe "wrapper" hs_bindgen_9fd2155155cb148c_base ::
+foreign import ccall safe "wrapper" hs_bindgen_0c458a3a15058bf2_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> (PtrConst.PtrConst RIP.CChar) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_9fd2155155cb148c ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> (PtrConst.PtrConst RIP.CChar) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> (PtrConst.PtrConst RIP.CChar) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-hs_bindgen_9fd2155155cb148c =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> (PtrConst.PtrConst RIP.CChar) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_0c458a3a15058bf2 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> (PtrConst.PtrConst RIP.CChar) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> (PtrConst.PtrConst RIP.CChar) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_0c458a3a15058bf2 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_9fd2155155cb148c_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_0c458a3a15058bf2_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_d5a5a628dc37f28f_base ::
+foreign import ccall safe "dynamic" hs_bindgen_5d6a22d6cb8af5a9_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> (PtrConst.PtrConst RIP.CChar) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_d5a5a628dc37f28f ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> (PtrConst.PtrConst RIP.CChar) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> (PtrConst.PtrConst RIP.CChar) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ()
-hs_bindgen_d5a5a628dc37f28f =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> (PtrConst.PtrConst RIP.CChar) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_5d6a22d6cb8af5a9 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> (PtrConst.PtrConst RIP.CChar) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> (PtrConst.PtrConst RIP.CChar) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ()
+hs_bindgen_5d6a22d6cb8af5a9 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_d5a5a628dc37f28f_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_5d6a22d6cb8af5a9_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> (PtrConst.PtrConst RIP.CChar) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> (PtrConst.PtrConst RIP.CChar) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_9fd2155155cb148c
+  toFunPtr = hs_bindgen_0c458a3a15058bf2
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> (PtrConst.PtrConst RIP.CChar) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> (PtrConst.PtrConst RIP.CChar) -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_d5a5a628dc37f28f
+  fromFunPtr = hs_bindgen_5d6a22d6cb8af5a9
 
-foreign import ccall safe "wrapper" hs_bindgen_c771fa1d01d67529_base ::
+foreign import ccall safe "wrapper" hs_bindgen_00b0d5e25b922e43_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_c771fa1d01d67529 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-hs_bindgen_c771fa1d01d67529 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_00b0d5e25b922e43 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_00b0d5e25b922e43 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_c771fa1d01d67529_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_00b0d5e25b922e43_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_97c97c60e07f601d_base ::
+foreign import ccall safe "dynamic" hs_bindgen_371b99c4c3a5d9c7_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_97c97c60e07f601d ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()
-hs_bindgen_97c97c60e07f601d =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_371b99c4c3a5d9c7 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()
+hs_bindgen_371b99c4c3a5d9c7 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_97c97c60e07f601d_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_371b99c4c3a5d9c7_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_c771fa1d01d67529
+  toFunPtr = hs_bindgen_00b0d5e25b922e43
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_output) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlOutput) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_97c97c60e07f601d
+  fromFunPtr = hs_bindgen_371b99c4c3a5d9c7
 
-foreign import ccall safe "wrapper" hs_bindgen_c1cc26a65dfbb054_base ::
+foreign import ccall safe "wrapper" hs_bindgen_a03ea38f0ba0a66f_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> IO ())@
-hs_bindgen_c1cc26a65dfbb054 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> IO ()))
-hs_bindgen_c1cc26a65dfbb054 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> IO ())@
+hs_bindgen_a03ea38f0ba0a66f ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> IO ()))
+hs_bindgen_a03ea38f0ba0a66f =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_c1cc26a65dfbb054_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_a03ea38f0ba0a66f_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_8140223f7a9cd5a2_base ::
+foreign import ccall safe "dynamic" hs_bindgen_281d50e0df8f5df3_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> IO ())@
-hs_bindgen_8140223f7a9cd5a2 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> IO ()
-hs_bindgen_8140223f7a9cd5a2 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> IO ())@
+hs_bindgen_281d50e0df8f5df3 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> IO ()
+hs_bindgen_281d50e0df8f5df3 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_8140223f7a9cd5a2_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_281d50e0df8f5df3_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> IO ()) where
 
-  toFunPtr = hs_bindgen_c1cc26a65dfbb054
+  toFunPtr = hs_bindgen_a03ea38f0ba0a66f
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> IO ()) where
 
-  fromFunPtr = hs_bindgen_8140223f7a9cd5a2
+  fromFunPtr = hs_bindgen_281d50e0df8f5df3
 
-foreign import ccall safe "wrapper" hs_bindgen_c6c8188b001e0422_base ::
+foreign import ccall safe "wrapper" hs_bindgen_efee672f2c906b1d_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_c6c8188b001e0422 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_c6c8188b001e0422 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_efee672f2c906b1d ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_efee672f2c906b1d =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_c6c8188b001e0422_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_efee672f2c906b1d_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_97a11e08270382c8_base ::
+foreign import ccall safe "dynamic" hs_bindgen_1d52e277b8745126_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_97a11e08270382c8 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
-hs_bindgen_97a11e08270382c8 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_1d52e277b8745126 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
+hs_bindgen_1d52e277b8745126 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_97a11e08270382c8_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_1d52e277b8745126_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_c6c8188b001e0422
+  toFunPtr = hs_bindgen_efee672f2c906b1d
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_97a11e08270382c8
+  fromFunPtr = hs_bindgen_1d52e277b8745126
 
-foreign import ccall safe "wrapper" hs_bindgen_4e0737183779984e_base ::
+foreign import ccall safe "wrapper" hs_bindgen_a56b66a11ff976f8_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> IO ())@
-hs_bindgen_4e0737183779984e ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> IO ()))
-hs_bindgen_4e0737183779984e =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> IO ())@
+hs_bindgen_a56b66a11ff976f8 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> IO ()))
+hs_bindgen_a56b66a11ff976f8 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_4e0737183779984e_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_a56b66a11ff976f8_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_4afdef747ebfea4b_base ::
+foreign import ccall safe "dynamic" hs_bindgen_53c6836eab0bc45e_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> IO ())@
-hs_bindgen_4afdef747ebfea4b ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> IO ()
-hs_bindgen_4afdef747ebfea4b =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> IO ())@
+hs_bindgen_53c6836eab0bc45e ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> IO ()
+hs_bindgen_53c6836eab0bc45e =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_4afdef747ebfea4b_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_53c6836eab0bc45e_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> IO ()) where
 
-  toFunPtr = hs_bindgen_4e0737183779984e
+  toFunPtr = hs_bindgen_a56b66a11ff976f8
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> IO ()) where
 
-  fromFunPtr = hs_bindgen_4afdef747ebfea4b
+  fromFunPtr = hs_bindgen_53c6836eab0bc45e
 
-foreign import ccall safe "wrapper" hs_bindgen_9063f846a4df6bc2_base ::
+foreign import ccall safe "wrapper" hs_bindgen_f1612d776df157ff_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
-hs_bindgen_9063f846a4df6bc2 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
-hs_bindgen_9063f846a4df6bc2 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
+hs_bindgen_f1612d776df157ff ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
+hs_bindgen_f1612d776df157ff =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_9063f846a4df6bc2_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_f1612d776df157ff_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_aeb1e16694ce33c7_base ::
+foreign import ccall safe "dynamic" hs_bindgen_20b041e6e773e4eb_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
-hs_bindgen_aeb1e16694ce33c7 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()
-hs_bindgen_aeb1e16694ce33c7 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
+hs_bindgen_20b041e6e773e4eb ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()
+hs_bindgen_20b041e6e773e4eb =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_aeb1e16694ce33c7_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_20b041e6e773e4eb_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
 
-  toFunPtr = hs_bindgen_9063f846a4df6bc2
+  toFunPtr = hs_bindgen_f1612d776df157ff
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
 
-  fromFunPtr = hs_bindgen_aeb1e16694ce33c7
+  fromFunPtr = hs_bindgen_20b041e6e773e4eb
 
-foreign import ccall safe "wrapper" hs_bindgen_d5e16f6ba13001eb_base ::
+foreign import ccall safe "wrapper" hs_bindgen_4e1d574d965f3a89_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_d5e16f6ba13001eb ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-hs_bindgen_d5e16f6ba13001eb =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_4e1d574d965f3a89 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_4e1d574d965f3a89 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_d5e16f6ba13001eb_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_4e1d574d965f3a89_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_ad4fbff37e007433_base ::
+foreign import ccall safe "dynamic" hs_bindgen_1fff8761282ae1c5_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_ad4fbff37e007433 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()
-hs_bindgen_ad4fbff37e007433 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_1fff8761282ae1c5 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()
+hs_bindgen_1fff8761282ae1c5 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_ad4fbff37e007433_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_1fff8761282ae1c5_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_d5e16f6ba13001eb
+  toFunPtr = hs_bindgen_4e1d574d965f3a89
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_ad4fbff37e007433
+  fromFunPtr = hs_bindgen_1fff8761282ae1c5
 
-foreign import ccall safe "wrapper" hs_bindgen_196a6f41da3a0b67_base ::
+foreign import ccall safe "wrapper" hs_bindgen_32af10156c104806_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_196a6f41da3a0b67 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_196a6f41da3a0b67 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_32af10156c104806 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_32af10156c104806 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_196a6f41da3a0b67_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_32af10156c104806_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_333a812250be469c_base ::
+foreign import ccall safe "dynamic" hs_bindgen_09e8dd9321984438_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_333a812250be469c ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()
-hs_bindgen_333a812250be469c =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_09e8dd9321984438 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()
+hs_bindgen_09e8dd9321984438 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_333a812250be469c_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_09e8dd9321984438_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_196a6f41da3a0b67
+  toFunPtr = hs_bindgen_32af10156c104806
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_333a812250be469c
+  fromFunPtr = hs_bindgen_09e8dd9321984438
 
-foreign import ccall safe "wrapper" hs_bindgen_1aad7e9537785de2_base ::
+foreign import ccall safe "wrapper" hs_bindgen_ea371abd58e25d61_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_1aad7e9537785de2 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_1aad7e9537785de2 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_ea371abd58e25d61 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_ea371abd58e25d61 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_1aad7e9537785de2_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_ea371abd58e25d61_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_ccc14fe572432ee9_base ::
+foreign import ccall safe "dynamic" hs_bindgen_f1f5987e081ceaa4_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_ccc14fe572432ee9 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()
-hs_bindgen_ccc14fe572432ee9 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_f1f5987e081ceaa4 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()
+hs_bindgen_f1f5987e081ceaa4 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_ccc14fe572432ee9_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_f1f5987e081ceaa4_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_1aad7e9537785de2
+  toFunPtr = hs_bindgen_ea371abd58e25d61
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_ccc14fe572432ee9
+  fromFunPtr = hs_bindgen_f1f5987e081ceaa4
 
-foreign import ccall safe "wrapper" hs_bindgen_4349ea93dd6cab18_base ::
+foreign import ccall safe "wrapper" hs_bindgen_d84a742f4ad80bd9_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> RIP.Int32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
-hs_bindgen_4349ea93dd6cab18 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
-hs_bindgen_4349ea93dd6cab18 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
+hs_bindgen_d84a742f4ad80bd9 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
+hs_bindgen_d84a742f4ad80bd9 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_4349ea93dd6cab18_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_d84a742f4ad80bd9_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_98de6d8206ad0b55_base ::
+foreign import ccall safe "dynamic" hs_bindgen_b3beda1586e9ac4a_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> RIP.Int32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
-hs_bindgen_98de6d8206ad0b55 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ()
-hs_bindgen_98de6d8206ad0b55 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
+hs_bindgen_b3beda1586e9ac4a ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ()
+hs_bindgen_b3beda1586e9ac4a =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_98de6d8206ad0b55_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_b3beda1586e9ac4a_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
 
-  toFunPtr = hs_bindgen_4349ea93dd6cab18
+  toFunPtr = hs_bindgen_d84a742f4ad80bd9
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
 
-  fromFunPtr = hs_bindgen_98de6d8206ad0b55
+  fromFunPtr = hs_bindgen_b3beda1586e9ac4a
 
-foreign import ccall safe "wrapper" hs_bindgen_aecf42382626dd1c_base ::
+foreign import ccall safe "wrapper" hs_bindgen_916dda34c0dd0126_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> RIP.Int32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
-hs_bindgen_aecf42382626dd1c ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
-hs_bindgen_aecf42382626dd1c =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
+hs_bindgen_916dda34c0dd0126 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
+hs_bindgen_916dda34c0dd0126 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_aecf42382626dd1c_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_916dda34c0dd0126_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_169b09765345379f_base ::
+foreign import ccall safe "dynamic" hs_bindgen_1b972382c3d47674_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> RIP.Int32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
-hs_bindgen_169b09765345379f ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()
-hs_bindgen_169b09765345379f =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
+hs_bindgen_1b972382c3d47674 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()
+hs_bindgen_1b972382c3d47674 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_169b09765345379f_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_1b972382c3d47674_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
 
-  toFunPtr = hs_bindgen_aecf42382626dd1c
+  toFunPtr = hs_bindgen_916dda34c0dd0126
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_pointer) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlPointer) -> HsBindgen.Runtime.LibC.Word32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
 
-  fromFunPtr = hs_bindgen_169b09765345379f
+  fromFunPtr = hs_bindgen_1b972382c3d47674
 
-foreign import ccall safe "wrapper" hs_bindgen_14a89356092f3ab0_base ::
+foreign import ccall safe "wrapper" hs_bindgen_36c68109ef3a70fe_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_registry) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_14a89356092f3ab0 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_registry) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_registry) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_14a89356092f3ab0 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlRegistry) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_36c68109ef3a70fe ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlRegistry) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlRegistry) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_36c68109ef3a70fe =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_14a89356092f3ab0_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_36c68109ef3a70fe_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_0a3f4533a5e02f94_base ::
+foreign import ccall safe "dynamic" hs_bindgen_93708164a95f3f84_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_registry) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_0a3f4533a5e02f94 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_registry) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_registry) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
-hs_bindgen_0a3f4533a5e02f94 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlRegistry) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_93708164a95f3f84 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlRegistry) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlRegistry) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
+hs_bindgen_93708164a95f3f84 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_0a3f4533a5e02f94_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_93708164a95f3f84_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_registry) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlRegistry) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_14a89356092f3ab0
+  toFunPtr = hs_bindgen_36c68109ef3a70fe
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_registry) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlRegistry) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_0a3f4533a5e02f94
+  fromFunPtr = hs_bindgen_93708164a95f3f84
 
-foreign import ccall safe "wrapper" hs_bindgen_2106d4b671c23695_base ::
+foreign import ccall safe "wrapper" hs_bindgen_70c22fae024dc57b_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_registry) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_2106d4b671c23695 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_registry) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_registry) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_2106d4b671c23695 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlRegistry) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_70c22fae024dc57b ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlRegistry) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlRegistry) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_70c22fae024dc57b =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_2106d4b671c23695_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_70c22fae024dc57b_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_5cfa6557c94fe743_base ::
+foreign import ccall safe "dynamic" hs_bindgen_8307fd3cc110a0f7_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_registry) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_5cfa6557c94fe743 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_registry) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_registry) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
-hs_bindgen_5cfa6557c94fe743 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlRegistry) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_8307fd3cc110a0f7 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlRegistry) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlRegistry) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
+hs_bindgen_8307fd3cc110a0f7 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_5cfa6557c94fe743_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_8307fd3cc110a0f7_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_registry) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlRegistry) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_2106d4b671c23695
+  toFunPtr = hs_bindgen_70c22fae024dc57b
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_registry) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlRegistry) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst RIP.CChar) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_5cfa6557c94fe743
+  fromFunPtr = hs_bindgen_8307fd3cc110a0f7
 
-foreign import ccall safe "wrapper" hs_bindgen_52614345d38540ec_base ::
+foreign import ccall safe "wrapper" hs_bindgen_d21a2c3586551ed3_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_seat) -> (PtrConst.PtrConst RIP.CChar) -> IO ())@
-hs_bindgen_52614345d38540ec ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_seat) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_seat) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
-hs_bindgen_52614345d38540ec =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSeat) -> (PtrConst.PtrConst RIP.CChar) -> IO ())@
+hs_bindgen_d21a2c3586551ed3 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSeat) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSeat) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
+hs_bindgen_d21a2c3586551ed3 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_52614345d38540ec_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_d21a2c3586551ed3_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_3ff0e37b52ebba78_base ::
+foreign import ccall safe "dynamic" hs_bindgen_07f788b9608410cd_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_seat) -> (PtrConst.PtrConst RIP.CChar) -> IO ())@
-hs_bindgen_3ff0e37b52ebba78 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_seat) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_seat) -> (PtrConst.PtrConst RIP.CChar) -> IO ()
-hs_bindgen_3ff0e37b52ebba78 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSeat) -> (PtrConst.PtrConst RIP.CChar) -> IO ())@
+hs_bindgen_07f788b9608410cd ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSeat) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlSeat) -> (PtrConst.PtrConst RIP.CChar) -> IO ()
+hs_bindgen_07f788b9608410cd =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_3ff0e37b52ebba78_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_07f788b9608410cd_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_seat) -> (PtrConst.PtrConst RIP.CChar) -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSeat) -> (PtrConst.PtrConst RIP.CChar) -> IO ()) where
 
-  toFunPtr = hs_bindgen_52614345d38540ec
+  toFunPtr = hs_bindgen_d21a2c3586551ed3
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_seat) -> (PtrConst.PtrConst RIP.CChar) -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSeat) -> (PtrConst.PtrConst RIP.CChar) -> IO ()) where
 
-  fromFunPtr = hs_bindgen_3ff0e37b52ebba78
+  fromFunPtr = hs_bindgen_07f788b9608410cd
 
-foreign import ccall safe "wrapper" hs_bindgen_053215ee8ea05cea_base ::
+foreign import ccall safe "wrapper" hs_bindgen_21c6b349362eae72_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_seat) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_053215ee8ea05cea ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_seat) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_seat) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_053215ee8ea05cea =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSeat) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_21c6b349362eae72 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSeat) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSeat) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_21c6b349362eae72 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_053215ee8ea05cea_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_21c6b349362eae72_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_0cec578fd95ac180_base ::
+foreign import ccall safe "dynamic" hs_bindgen_9a03f5f9f9632558_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_seat) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_0cec578fd95ac180 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_seat) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_seat) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
-hs_bindgen_0cec578fd95ac180 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSeat) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_9a03f5f9f9632558 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSeat) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlSeat) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
+hs_bindgen_9a03f5f9f9632558 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_0cec578fd95ac180_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_9a03f5f9f9632558_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_seat) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSeat) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_053215ee8ea05cea
+  toFunPtr = hs_bindgen_21c6b349362eae72
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_seat) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSeat) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_0cec578fd95ac180
+  fromFunPtr = hs_bindgen_9a03f5f9f9632558
 
-foreign import ccall safe "wrapper" hs_bindgen_f8c2eeafbdee59ce_base ::
+foreign import ccall safe "wrapper" hs_bindgen_72aed376029d6e4c_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> IO ())@
-hs_bindgen_f8c2eeafbdee59ce ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> IO ()))
-hs_bindgen_f8c2eeafbdee59ce =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> IO ())@
+hs_bindgen_72aed376029d6e4c ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> IO ()))
+hs_bindgen_72aed376029d6e4c =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_f8c2eeafbdee59ce_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_72aed376029d6e4c_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_ad2eebfd277bd654_base ::
+foreign import ccall safe "dynamic" hs_bindgen_f1b63c3f9f0a88a5_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> IO ())@
-hs_bindgen_ad2eebfd277bd654 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> IO ()
-hs_bindgen_ad2eebfd277bd654 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> IO ())@
+hs_bindgen_f1b63c3f9f0a88a5 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> IO ()
+hs_bindgen_f1b63c3f9f0a88a5 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_ad2eebfd277bd654_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_f1b63c3f9f0a88a5_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> IO ()) where
 
-  toFunPtr = hs_bindgen_f8c2eeafbdee59ce
+  toFunPtr = hs_bindgen_72aed376029d6e4c
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> IO ()) where
 
-  fromFunPtr = hs_bindgen_ad2eebfd277bd654
+  fromFunPtr = hs_bindgen_f1b63c3f9f0a88a5
 
-foreign import ccall safe "wrapper" hs_bindgen_62d8e104578ef5c2_base ::
+foreign import ccall safe "wrapper" hs_bindgen_651af53b2579c2fe_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_62d8e104578ef5c2 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_62d8e104578ef5c2 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_651af53b2579c2fe ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_651af53b2579c2fe =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_62d8e104578ef5c2_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_651af53b2579c2fe_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_798beeaf5b662305_base ::
+foreign import ccall safe "dynamic" hs_bindgen_39fa58ff1492dd70_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_798beeaf5b662305 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
-hs_bindgen_798beeaf5b662305 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_39fa58ff1492dd70 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
+hs_bindgen_39fa58ff1492dd70 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_798beeaf5b662305_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_39fa58ff1492dd70_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_62d8e104578ef5c2
+  toFunPtr = hs_bindgen_651af53b2579c2fe
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_798beeaf5b662305
+  fromFunPtr = hs_bindgen_39fa58ff1492dd70
 
-foreign import ccall safe "wrapper" hs_bindgen_1acce78366ca51bf_base ::
+foreign import ccall safe "wrapper" hs_bindgen_96fddae07f52eb6a_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> RIP.Int32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_1acce78366ca51bf ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-hs_bindgen_1acce78366ca51bf =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_96fddae07f52eb6a ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_96fddae07f52eb6a =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_1acce78366ca51bf_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_96fddae07f52eb6a_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_5e7cdf748c721f7a_base ::
+foreign import ccall safe "dynamic" hs_bindgen_b197a0a784e23f8c_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> RIP.Int32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_5e7cdf748c721f7a ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()
-hs_bindgen_5e7cdf748c721f7a =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_b197a0a784e23f8c ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()
+hs_bindgen_b197a0a784e23f8c =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_5e7cdf748c721f7a_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_b197a0a784e23f8c_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_1acce78366ca51bf
+  toFunPtr = hs_bindgen_96fddae07f52eb6a
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shell_surface) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShellSurface) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_5e7cdf748c721f7a
+  fromFunPtr = hs_bindgen_b197a0a784e23f8c
 
-foreign import ccall safe "wrapper" hs_bindgen_baef53cff718f868_base ::
+foreign import ccall safe "wrapper" hs_bindgen_7fe75586312780f2_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shm) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_baef53cff718f868 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shm) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shm) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_baef53cff718f868 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShm) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_7fe75586312780f2 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShm) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShm) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_7fe75586312780f2 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_baef53cff718f868_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_7fe75586312780f2_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_9981fba5cde05871_base ::
+foreign import ccall safe "dynamic" hs_bindgen_40c4653a9c30d84b_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shm) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_9981fba5cde05871 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shm) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shm) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
-hs_bindgen_9981fba5cde05871 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShm) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_40c4653a9c30d84b ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShm) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlShm) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
+hs_bindgen_40c4653a9c30d84b =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_9981fba5cde05871_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_40c4653a9c30d84b_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shm) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShm) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_baef53cff718f868
+  toFunPtr = hs_bindgen_7fe75586312780f2
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_shm) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlShm) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_9981fba5cde05871
+  fromFunPtr = hs_bindgen_40c4653a9c30d84b
 
-foreign import ccall safe "wrapper" hs_bindgen_95c3d256c8c4b99d_base ::
+foreign import ccall safe "wrapper" hs_bindgen_f73d5d61704a8a68_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> (RIP.Ptr Wl_output) -> IO ())@
-hs_bindgen_95c3d256c8c4b99d ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> (RIP.Ptr Wl_output) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> (RIP.Ptr Wl_output) -> IO ()))
-hs_bindgen_95c3d256c8c4b99d =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> (RIP.Ptr WlOutput) -> IO ())@
+hs_bindgen_f73d5d61704a8a68 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> (RIP.Ptr WlOutput) -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> (RIP.Ptr WlOutput) -> IO ()))
+hs_bindgen_f73d5d61704a8a68 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_95c3d256c8c4b99d_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_f73d5d61704a8a68_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_e63a003c9d10263d_base ::
+foreign import ccall safe "dynamic" hs_bindgen_ab714becdd726938_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> (RIP.Ptr Wl_output) -> IO ())@
-hs_bindgen_e63a003c9d10263d ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> (RIP.Ptr Wl_output) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> (RIP.Ptr Wl_output) -> IO ()
-hs_bindgen_e63a003c9d10263d =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> (RIP.Ptr WlOutput) -> IO ())@
+hs_bindgen_ab714becdd726938 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> (RIP.Ptr WlOutput) -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> (RIP.Ptr WlOutput) -> IO ()
+hs_bindgen_ab714becdd726938 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_e63a003c9d10263d_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_ab714becdd726938_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> (RIP.Ptr Wl_output) -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> (RIP.Ptr WlOutput) -> IO ()) where
 
-  toFunPtr = hs_bindgen_95c3d256c8c4b99d
+  toFunPtr = hs_bindgen_f73d5d61704a8a68
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> (RIP.Ptr Wl_output) -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> (RIP.Ptr WlOutput) -> IO ()) where
 
-  fromFunPtr = hs_bindgen_e63a003c9d10263d
+  fromFunPtr = hs_bindgen_ab714becdd726938
 
-foreign import ccall safe "wrapper" hs_bindgen_c8fe3beb1e20960d_base ::
+foreign import ccall safe "wrapper" hs_bindgen_a6229da380db6912_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_c8fe3beb1e20960d ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-hs_bindgen_c8fe3beb1e20960d =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_a6229da380db6912 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_a6229da380db6912 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_c8fe3beb1e20960d_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_a6229da380db6912_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_e14b1d2eb8d96f2d_base ::
+foreign import ccall safe "dynamic" hs_bindgen_45124a34d399e440_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_e14b1d2eb8d96f2d ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Int32 -> IO ()
-hs_bindgen_e14b1d2eb8d96f2d =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_45124a34d399e440 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Int32 -> IO ()
+hs_bindgen_45124a34d399e440 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_e14b1d2eb8d96f2d_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_45124a34d399e440_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_c8fe3beb1e20960d
+  toFunPtr = hs_bindgen_a6229da380db6912
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_e14b1d2eb8d96f2d
+  fromFunPtr = hs_bindgen_45124a34d399e440
 
-foreign import ccall safe "wrapper" hs_bindgen_b24dede6a5157007_base ::
+foreign import ccall safe "wrapper" hs_bindgen_1eb16e3862887fb0_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_b24dede6a5157007 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_b24dede6a5157007 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_1eb16e3862887fb0 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_1eb16e3862887fb0 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_b24dede6a5157007_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_1eb16e3862887fb0_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_191ccedb512f7f8b_base ::
+foreign import ccall safe "dynamic" hs_bindgen_70b3707ee1961104_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_191ccedb512f7f8b ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
-hs_bindgen_191ccedb512f7f8b =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_70b3707ee1961104 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
+hs_bindgen_70b3707ee1961104 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_191ccedb512f7f8b_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_70b3707ee1961104_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_b24dede6a5157007
+  toFunPtr = hs_bindgen_1eb16e3862887fb0
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_191ccedb512f7f8b
+  fromFunPtr = hs_bindgen_70b3707ee1961104
 
-foreign import ccall safe "wrapper" hs_bindgen_511490c1ffef17a2_base ::
+foreign import ccall safe "wrapper" hs_bindgen_aa17fb262d5beddf_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> IO ())@
-hs_bindgen_511490c1ffef17a2 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> IO ()))
-hs_bindgen_511490c1ffef17a2 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> IO ())@
+hs_bindgen_aa17fb262d5beddf ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> IO ()))
+hs_bindgen_aa17fb262d5beddf =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_511490c1ffef17a2_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_aa17fb262d5beddf_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_508fc57933605de4_base ::
+foreign import ccall safe "dynamic" hs_bindgen_3d4a4e8a60149a23_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> IO ())@
-hs_bindgen_508fc57933605de4 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> IO ()
-hs_bindgen_508fc57933605de4 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> IO ())@
+hs_bindgen_3d4a4e8a60149a23 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> IO ()
+hs_bindgen_3d4a4e8a60149a23 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_508fc57933605de4_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_3d4a4e8a60149a23_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> IO ()) where
 
-  toFunPtr = hs_bindgen_511490c1ffef17a2
+  toFunPtr = hs_bindgen_aa17fb262d5beddf
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> IO ()) where
 
-  fromFunPtr = hs_bindgen_508fc57933605de4
+  fromFunPtr = hs_bindgen_3d4a4e8a60149a23
 
-foreign import ccall safe "wrapper" hs_bindgen_ac96d51c5fff80f0_base ::
+foreign import ccall safe "wrapper" hs_bindgen_fe36132af109bd41_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
-hs_bindgen_ac96d51c5fff80f0 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
-hs_bindgen_ac96d51c5fff80f0 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
+hs_bindgen_fe36132af109bd41 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
+hs_bindgen_fe36132af109bd41 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_ac96d51c5fff80f0_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_fe36132af109bd41_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_30c39a20f8c25d51_base ::
+foreign import ccall safe "dynamic" hs_bindgen_5f7dc5d159c845a3_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
-hs_bindgen_30c39a20f8c25d51 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ()
-hs_bindgen_30c39a20f8c25d51 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
+hs_bindgen_5f7dc5d159c845a3 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ()
+hs_bindgen_5f7dc5d159c845a3 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_30c39a20f8c25d51_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_5f7dc5d159c845a3_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
 
-  toFunPtr = hs_bindgen_ac96d51c5fff80f0
+  toFunPtr = hs_bindgen_fe36132af109bd41
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
 
-  fromFunPtr = hs_bindgen_30c39a20f8c25d51
+  fromFunPtr = hs_bindgen_5f7dc5d159c845a3
 
-foreign import ccall safe "wrapper" hs_bindgen_dae24cf4e59cdc9d_base ::
+foreign import ccall safe "wrapper" hs_bindgen_6b21144334ab6c1b_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
-hs_bindgen_dae24cf4e59cdc9d ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
-hs_bindgen_dae24cf4e59cdc9d =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
+hs_bindgen_6b21144334ab6c1b ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
+hs_bindgen_6b21144334ab6c1b =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_dae24cf4e59cdc9d_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_6b21144334ab6c1b_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_001211e7ac2d0b16_base ::
+foreign import ccall safe "dynamic" hs_bindgen_0e957b32f55a4709_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
-hs_bindgen_001211e7ac2d0b16 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()
-hs_bindgen_001211e7ac2d0b16 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
+hs_bindgen_0e957b32f55a4709 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()
+hs_bindgen_0e957b32f55a4709 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_001211e7ac2d0b16_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_0e957b32f55a4709_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
 
-  toFunPtr = hs_bindgen_dae24cf4e59cdc9d
+  toFunPtr = hs_bindgen_6b21144334ab6c1b
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
 
-  fromFunPtr = hs_bindgen_001211e7ac2d0b16
+  fromFunPtr = hs_bindgen_0e957b32f55a4709
 
-foreign import ccall safe "wrapper" hs_bindgen_bc58e450ea08f0a8_base ::
+foreign import ccall safe "wrapper" hs_bindgen_8f2f1c66503dc49d_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
-hs_bindgen_bc58e450ea08f0a8 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
-hs_bindgen_bc58e450ea08f0a8 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
+hs_bindgen_8f2f1c66503dc49d ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
+hs_bindgen_8f2f1c66503dc49d =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_bc58e450ea08f0a8_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_8f2f1c66503dc49d_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_991bd2a6502d900e_base ::
+foreign import ccall safe "dynamic" hs_bindgen_04c835693b240ca6_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
-hs_bindgen_991bd2a6502d900e ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()
-hs_bindgen_991bd2a6502d900e =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
+hs_bindgen_04c835693b240ca6 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()
+hs_bindgen_04c835693b240ca6 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_991bd2a6502d900e_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_04c835693b240ca6_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
 
-  toFunPtr = hs_bindgen_bc58e450ea08f0a8
+  toFunPtr = hs_bindgen_8f2f1c66503dc49d
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
 
-  fromFunPtr = hs_bindgen_991bd2a6502d900e
+  fromFunPtr = hs_bindgen_04c835693b240ca6
 
-foreign import ccall safe "wrapper" hs_bindgen_19bac1eb47614612_base ::
+foreign import ccall safe "wrapper" hs_bindgen_e4da9ec8a8de5204_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
-hs_bindgen_19bac1eb47614612 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
-hs_bindgen_19bac1eb47614612 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
+hs_bindgen_e4da9ec8a8de5204 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
+hs_bindgen_e4da9ec8a8de5204 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_19bac1eb47614612_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_e4da9ec8a8de5204_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_1b87dbb385436e2a_base ::
+foreign import ccall safe "dynamic" hs_bindgen_78af8501c47fb90a_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
-hs_bindgen_1b87dbb385436e2a ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()
-hs_bindgen_1b87dbb385436e2a =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
+hs_bindgen_78af8501c47fb90a ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()
+hs_bindgen_78af8501c47fb90a =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_1b87dbb385436e2a_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_78af8501c47fb90a_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
 
-  toFunPtr = hs_bindgen_19bac1eb47614612
+  toFunPtr = hs_bindgen_e4da9ec8a8de5204
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_surface) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr WlSurface) -> HsBindgen.Runtime.LibC.Int32 -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
 
-  fromFunPtr = hs_bindgen_1b87dbb385436e2a
+  fromFunPtr = hs_bindgen_78af8501c47fb90a
 
-foreign import ccall safe "wrapper" hs_bindgen_95c1ade7c46808ac_base ::
+foreign import ccall safe "wrapper" hs_bindgen_0af19484ff54bb70_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> RIP.Int32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_95c1ade7c46808ac ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-hs_bindgen_95c1ade7c46808ac =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_0af19484ff54bb70 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_0af19484ff54bb70 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_95c1ade7c46808ac_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_0af19484ff54bb70_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_fa7ff8ed18c159a2_base ::
+foreign import ccall safe "dynamic" hs_bindgen_dc610487f74abc47_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> RIP.Int32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_fa7ff8ed18c159a2 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()
-hs_bindgen_fa7ff8ed18c159a2 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_dc610487f74abc47 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()
+hs_bindgen_dc610487f74abc47 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_fa7ff8ed18c159a2_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_dc610487f74abc47_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_95c1ade7c46808ac
+  toFunPtr = hs_bindgen_0af19484ff54bb70
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Wl_touch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr WlTouch) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_fa7ff8ed18c159a2
+  fromFunPtr = hs_bindgen_dc610487f74abc47

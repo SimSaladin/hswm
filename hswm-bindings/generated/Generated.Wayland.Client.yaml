@@ -14,343 +14,343 @@ ctypes:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_proxy
-  hsname: Wl_proxy
+  hsname: WlProxy
 - headers:
   - wayland-client-core.h
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_display
-  hsname: Wl_display
+  hsname: WlDisplay
 - headers:
   - wayland-client-core.h
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_event_queue
-  hsname: Wl_event_queue
+  hsname: WlEventQueue
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_buffer
-  hsname: Wl_buffer
+  hsname: WlBuffer
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_callback
-  hsname: Wl_callback
+  hsname: WlCallback
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_compositor
-  hsname: Wl_compositor
+  hsname: WlCompositor
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_data_device
-  hsname: Wl_data_device
+  hsname: WlDataDevice
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_data_device_manager
-  hsname: Wl_data_device_manager
+  hsname: WlDataDeviceManager
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_data_offer
-  hsname: Wl_data_offer
+  hsname: WlDataOffer
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_data_source
-  hsname: Wl_data_source
+  hsname: WlDataSource
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_fixes
-  hsname: Wl_fixes
+  hsname: WlFixes
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_keyboard
-  hsname: Wl_keyboard
+  hsname: WlKeyboard
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_output
-  hsname: Wl_output
+  hsname: WlOutput
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_pointer
-  hsname: Wl_pointer
+  hsname: WlPointer
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_region
-  hsname: Wl_region
+  hsname: WlRegion
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_registry
-  hsname: Wl_registry
+  hsname: WlRegistry
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_seat
-  hsname: Wl_seat
+  hsname: WlSeat
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_shell
-  hsname: Wl_shell
+  hsname: WlShell
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_shell_surface
-  hsname: Wl_shell_surface
+  hsname: WlShellSurface
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_shm
-  hsname: Wl_shm
+  hsname: WlShm
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_shm_pool
-  hsname: Wl_shm_pool
+  hsname: WlShmPool
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_subcompositor
-  hsname: Wl_subcompositor
+  hsname: WlSubcompositor
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_subsurface
-  hsname: Wl_subsurface
+  hsname: WlSubsurface
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_surface
-  hsname: Wl_surface
+  hsname: WlSurface
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_touch
-  hsname: Wl_touch
+  hsname: WlTouch
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: enum wl_display_error
-  hsname: Wl_display_error
+  hsname: WlDisplayError
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_display_listener
-  hsname: Wl_display_listener
+  hsname: WlDisplayListener
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_registry_listener
-  hsname: Wl_registry_listener
+  hsname: WlRegistryListener
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_callback_listener
-  hsname: Wl_callback_listener
+  hsname: WlCallbackListener
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: enum wl_shm_error
-  hsname: Wl_shm_error
+  hsname: WlShmError
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: enum wl_shm_format
-  hsname: Wl_shm_format
+  hsname: WlShmFormat
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_shm_listener
-  hsname: Wl_shm_listener
+  hsname: WlShmListener
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_buffer_listener
-  hsname: Wl_buffer_listener
+  hsname: WlBufferListener
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: enum wl_data_offer_error
-  hsname: Wl_data_offer_error
+  hsname: WlDataOfferError
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_data_offer_listener
-  hsname: Wl_data_offer_listener
+  hsname: WlDataOfferListener
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: enum wl_data_source_error
-  hsname: Wl_data_source_error
+  hsname: WlDataSourceError
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_data_source_listener
-  hsname: Wl_data_source_listener
+  hsname: WlDataSourceListener
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: enum wl_data_device_error
-  hsname: Wl_data_device_error
+  hsname: WlDataDeviceError
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_data_device_listener
-  hsname: Wl_data_device_listener
+  hsname: WlDataDeviceListener
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: enum wl_data_device_manager_dnd_action
-  hsname: Wl_data_device_manager_dnd_action
+  hsname: WlDataDeviceManagerDndAction
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: enum wl_shell_error
-  hsname: Wl_shell_error
+  hsname: WlShellError
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: enum wl_shell_surface_resize
-  hsname: Wl_shell_surface_resize
+  hsname: WlShellSurfaceResize
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: enum wl_shell_surface_transient
-  hsname: Wl_shell_surface_transient
+  hsname: WlShellSurfaceTransient
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: enum wl_shell_surface_fullscreen_method
-  hsname: Wl_shell_surface_fullscreen_method
+  hsname: WlShellSurfaceFullscreenMethod
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_shell_surface_listener
-  hsname: Wl_shell_surface_listener
+  hsname: WlShellSurfaceListener
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: enum wl_surface_error
-  hsname: Wl_surface_error
+  hsname: WlSurfaceError
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_surface_listener
-  hsname: Wl_surface_listener
+  hsname: WlSurfaceListener
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: enum wl_seat_capability
-  hsname: Wl_seat_capability
+  hsname: WlSeatCapability
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: enum wl_seat_error
-  hsname: Wl_seat_error
+  hsname: WlSeatError
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_seat_listener
-  hsname: Wl_seat_listener
+  hsname: WlSeatListener
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: enum wl_pointer_error
-  hsname: Wl_pointer_error
+  hsname: WlPointerError
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: enum wl_pointer_button_state
-  hsname: Wl_pointer_button_state
+  hsname: WlPointerButtonState
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: enum wl_pointer_axis
-  hsname: Wl_pointer_axis
+  hsname: WlPointerAxis
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: enum wl_pointer_axis_source
-  hsname: Wl_pointer_axis_source
+  hsname: WlPointerAxisSource
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: enum wl_pointer_axis_relative_direction
-  hsname: Wl_pointer_axis_relative_direction
+  hsname: WlPointerAxisRelativeDirection
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_pointer_listener
-  hsname: Wl_pointer_listener
+  hsname: WlPointerListener
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: enum wl_keyboard_keymap_format
-  hsname: Wl_keyboard_keymap_format
+  hsname: WlKeyboardKeymapFormat
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: enum wl_keyboard_key_state
-  hsname: Wl_keyboard_key_state
+  hsname: WlKeyboardKeyState
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_keyboard_listener
-  hsname: Wl_keyboard_listener
+  hsname: WlKeyboardListener
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_touch_listener
-  hsname: Wl_touch_listener
+  hsname: WlTouchListener
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: enum wl_output_subpixel
-  hsname: Wl_output_subpixel
+  hsname: WlOutputSubpixel
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: enum wl_output_transform
-  hsname: Wl_output_transform
+  hsname: WlOutputTransform
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: enum wl_output_mode
-  hsname: Wl_output_mode
+  hsname: WlOutputMode
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: struct wl_output_listener
-  hsname: Wl_output_listener
+  hsname: WlOutputListener
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: enum wl_subcompositor_error
-  hsname: Wl_subcompositor_error
+  hsname: WlSubcompositorError
 - headers:
   - wayland-client-protocol.h
   - wayland-client.h
   cname: enum wl_subsurface_error
-  hsname: Wl_subsurface_error
+  hsname: WlSubsurfaceError
 hstypes:
 - hsname: Timespec
   representation: emptydata
-- hsname: Wl_buffer
+- hsname: WlBuffer
   representation: emptydata
-- hsname: Wl_buffer_listener
+- hsname: WlBufferListener
   representation:
     record:
-      constructor: Wl_buffer_listener
+      constructor: WlBufferListener
       fields:
       - release
   instances:
@@ -363,12 +363,12 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_callback
+- hsname: WlCallback
   representation: emptydata
-- hsname: Wl_callback_listener
+- hsname: WlCallbackListener
   representation:
     record:
-      constructor: Wl_callback_listener
+      constructor: WlCallbackListener
       fields:
       - done
   instances:
@@ -381,14 +381,14 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_compositor
+- hsname: WlCompositor
   representation: emptydata
-- hsname: Wl_data_device
+- hsname: WlDataDevice
   representation: emptydata
-- hsname: Wl_data_device_error
+- hsname: WlDataDeviceError
   representation:
     newtype:
-      constructor: Wl_data_device_error
+      constructor: WlDataDeviceError
       fields:
       - unwrap
   instances:
@@ -407,10 +407,10 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_data_device_listener
+- hsname: WlDataDeviceListener
   representation:
     record:
-      constructor: Wl_data_device_listener
+      constructor: WlDataDeviceListener
       fields:
       - data_offer
       - enter
@@ -428,12 +428,12 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_data_device_manager
+- hsname: WlDataDeviceManager
   representation: emptydata
-- hsname: Wl_data_device_manager_dnd_action
+- hsname: WlDataDeviceManagerDndAction
   representation:
     newtype:
-      constructor: Wl_data_device_manager_dnd_action
+      constructor: WlDataDeviceManagerDndAction
       fields:
       - unwrap
   instances:
@@ -451,12 +451,12 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_data_offer
+- hsname: WlDataOffer
   representation: emptydata
-- hsname: Wl_data_offer_error
+- hsname: WlDataOfferError
   representation:
     newtype:
-      constructor: Wl_data_offer_error
+      constructor: WlDataOfferError
       fields:
       - unwrap
   instances:
@@ -475,10 +475,10 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_data_offer_listener
+- hsname: WlDataOfferListener
   representation:
     record:
-      constructor: Wl_data_offer_listener
+      constructor: WlDataOfferListener
       fields:
       - offer
       - source_actions
@@ -493,12 +493,12 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_data_source
+- hsname: WlDataSource
   representation: emptydata
-- hsname: Wl_data_source_error
+- hsname: WlDataSourceError
   representation:
     newtype:
-      constructor: Wl_data_source_error
+      constructor: WlDataSourceError
       fields:
       - unwrap
   instances:
@@ -517,10 +517,10 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_data_source_listener
+- hsname: WlDataSourceListener
   representation:
     record:
-      constructor: Wl_data_source_listener
+      constructor: WlDataSourceListener
       fields:
       - target
       - send
@@ -538,12 +538,12 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_display
+- hsname: WlDisplay
   representation: emptydata
-- hsname: Wl_display_error
+- hsname: WlDisplayError
   representation:
     newtype:
-      constructor: Wl_display_error
+      constructor: WlDisplayError
       fields:
       - unwrap
   instances:
@@ -562,10 +562,10 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_display_listener
+- hsname: WlDisplayListener
   representation:
     record:
-      constructor: Wl_display_listener
+      constructor: WlDisplayListener
       fields:
       - error
       - delete_id
@@ -579,16 +579,16 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_event_queue
+- hsname: WlEventQueue
   representation: emptydata
-- hsname: Wl_fixes
+- hsname: WlFixes
   representation: emptydata
-- hsname: Wl_keyboard
+- hsname: WlKeyboard
   representation: emptydata
-- hsname: Wl_keyboard_key_state
+- hsname: WlKeyboardKeyState
   representation:
     newtype:
-      constructor: Wl_keyboard_key_state
+      constructor: WlKeyboardKeyState
       fields:
       - unwrap
   instances:
@@ -607,10 +607,10 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_keyboard_keymap_format
+- hsname: WlKeyboardKeymapFormat
   representation:
     newtype:
-      constructor: Wl_keyboard_keymap_format
+      constructor: WlKeyboardKeymapFormat
       fields:
       - unwrap
   instances:
@@ -629,10 +629,10 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_keyboard_listener
+- hsname: WlKeyboardListener
   representation:
     record:
-      constructor: Wl_keyboard_listener
+      constructor: WlKeyboardListener
       fields:
       - keymap
       - enter
@@ -650,12 +650,12 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_output
+- hsname: WlOutput
   representation: emptydata
-- hsname: Wl_output_listener
+- hsname: WlOutputListener
   representation:
     record:
-      constructor: Wl_output_listener
+      constructor: WlOutputListener
       fields:
       - geometry
       - mode
@@ -673,10 +673,10 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_output_mode
+- hsname: WlOutputMode
   representation:
     newtype:
-      constructor: Wl_output_mode
+      constructor: WlOutputMode
       fields:
       - unwrap
   instances:
@@ -695,10 +695,10 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_output_subpixel
+- hsname: WlOutputSubpixel
   representation:
     newtype:
-      constructor: Wl_output_subpixel
+      constructor: WlOutputSubpixel
       fields:
       - unwrap
   instances:
@@ -717,10 +717,10 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_output_transform
+- hsname: WlOutputTransform
   representation:
     newtype:
-      constructor: Wl_output_transform
+      constructor: WlOutputTransform
       fields:
       - unwrap
   instances:
@@ -739,12 +739,12 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_pointer
+- hsname: WlPointer
   representation: emptydata
-- hsname: Wl_pointer_axis
+- hsname: WlPointerAxis
   representation:
     newtype:
-      constructor: Wl_pointer_axis
+      constructor: WlPointerAxis
       fields:
       - unwrap
   instances:
@@ -763,10 +763,10 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_pointer_axis_relative_direction
+- hsname: WlPointerAxisRelativeDirection
   representation:
     newtype:
-      constructor: Wl_pointer_axis_relative_direction
+      constructor: WlPointerAxisRelativeDirection
       fields:
       - unwrap
   instances:
@@ -785,10 +785,10 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_pointer_axis_source
+- hsname: WlPointerAxisSource
   representation:
     newtype:
-      constructor: Wl_pointer_axis_source
+      constructor: WlPointerAxisSource
       fields:
       - unwrap
   instances:
@@ -807,10 +807,10 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_pointer_button_state
+- hsname: WlPointerButtonState
   representation:
     newtype:
-      constructor: Wl_pointer_button_state
+      constructor: WlPointerButtonState
       fields:
       - unwrap
   instances:
@@ -829,10 +829,10 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_pointer_error
+- hsname: WlPointerError
   representation:
     newtype:
-      constructor: Wl_pointer_error
+      constructor: WlPointerError
       fields:
       - unwrap
   instances:
@@ -851,10 +851,10 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_pointer_listener
+- hsname: WlPointerListener
   representation:
     record:
-      constructor: Wl_pointer_listener
+      constructor: WlPointerListener
       fields:
       - enter
       - leave
@@ -877,16 +877,16 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_proxy
+- hsname: WlProxy
   representation: emptydata
-- hsname: Wl_region
+- hsname: WlRegion
   representation: emptydata
-- hsname: Wl_registry
+- hsname: WlRegistry
   representation: emptydata
-- hsname: Wl_registry_listener
+- hsname: WlRegistryListener
   representation:
     record:
-      constructor: Wl_registry_listener
+      constructor: WlRegistryListener
       fields:
       - global
       - global_remove
@@ -900,12 +900,12 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_seat
+- hsname: WlSeat
   representation: emptydata
-- hsname: Wl_seat_capability
+- hsname: WlSeatCapability
   representation:
     newtype:
-      constructor: Wl_seat_capability
+      constructor: WlSeatCapability
       fields:
       - unwrap
   instances:
@@ -923,10 +923,10 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_seat_error
+- hsname: WlSeatError
   representation:
     newtype:
-      constructor: Wl_seat_error
+      constructor: WlSeatError
       fields:
       - unwrap
   instances:
@@ -945,10 +945,10 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_seat_listener
+- hsname: WlSeatListener
   representation:
     record:
-      constructor: Wl_seat_listener
+      constructor: WlSeatListener
       fields:
       - capabilities
       - name
@@ -962,12 +962,12 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_shell
+- hsname: WlShell
   representation: emptydata
-- hsname: Wl_shell_error
+- hsname: WlShellError
   representation:
     newtype:
-      constructor: Wl_shell_error
+      constructor: WlShellError
       fields:
       - unwrap
   instances:
@@ -986,12 +986,12 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_shell_surface
+- hsname: WlShellSurface
   representation: emptydata
-- hsname: Wl_shell_surface_fullscreen_method
+- hsname: WlShellSurfaceFullscreenMethod
   representation:
     newtype:
-      constructor: Wl_shell_surface_fullscreen_method
+      constructor: WlShellSurfaceFullscreenMethod
       fields:
       - unwrap
   instances:
@@ -1010,10 +1010,10 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_shell_surface_listener
+- hsname: WlShellSurfaceListener
   representation:
     record:
-      constructor: Wl_shell_surface_listener
+      constructor: WlShellSurfaceListener
       fields:
       - ping
       - configure
@@ -1028,10 +1028,10 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_shell_surface_resize
+- hsname: WlShellSurfaceResize
   representation:
     newtype:
-      constructor: Wl_shell_surface_resize
+      constructor: WlShellSurfaceResize
       fields:
       - unwrap
   instances:
@@ -1049,10 +1049,10 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_shell_surface_transient
+- hsname: WlShellSurfaceTransient
   representation:
     newtype:
-      constructor: Wl_shell_surface_transient
+      constructor: WlShellSurfaceTransient
       fields:
       - unwrap
   instances:
@@ -1071,12 +1071,12 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_shm
+- hsname: WlShm
   representation: emptydata
-- hsname: Wl_shm_error
+- hsname: WlShmError
   representation:
     newtype:
-      constructor: Wl_shm_error
+      constructor: WlShmError
       fields:
       - unwrap
   instances:
@@ -1095,10 +1095,10 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_shm_format
+- hsname: WlShmFormat
   representation:
     newtype:
-      constructor: Wl_shm_format
+      constructor: WlShmFormat
       fields:
       - unwrap
   instances:
@@ -1116,10 +1116,10 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_shm_listener
+- hsname: WlShmListener
   representation:
     record:
-      constructor: Wl_shm_listener
+      constructor: WlShmListener
       fields:
       - format
   instances:
@@ -1132,14 +1132,14 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_shm_pool
+- hsname: WlShmPool
   representation: emptydata
-- hsname: Wl_subcompositor
+- hsname: WlSubcompositor
   representation: emptydata
-- hsname: Wl_subcompositor_error
+- hsname: WlSubcompositorError
   representation:
     newtype:
-      constructor: Wl_subcompositor_error
+      constructor: WlSubcompositorError
       fields:
       - unwrap
   instances:
@@ -1158,12 +1158,12 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_subsurface
+- hsname: WlSubsurface
   representation: emptydata
-- hsname: Wl_subsurface_error
+- hsname: WlSubsurfaceError
   representation:
     newtype:
-      constructor: Wl_subsurface_error
+      constructor: WlSubsurfaceError
       fields:
       - unwrap
   instances:
@@ -1182,12 +1182,12 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_surface
+- hsname: WlSurface
   representation: emptydata
-- hsname: Wl_surface_error
+- hsname: WlSurfaceError
   representation:
     newtype:
-      constructor: Wl_surface_error
+      constructor: WlSurfaceError
       fields:
       - unwrap
   instances:
@@ -1206,10 +1206,10 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_surface_listener
+- hsname: WlSurfaceListener
   representation:
     record:
-      constructor: Wl_surface_listener
+      constructor: WlSurfaceListener
       fields:
       - enter
       - leave
@@ -1225,12 +1225,12 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_touch
+- hsname: WlTouch
   representation: emptydata
-- hsname: Wl_touch_listener
+- hsname: WlTouchListener
   representation:
     record:
-      constructor: Wl_touch_listener
+      constructor: WlTouchListener
       fields:
       - down
       - up
