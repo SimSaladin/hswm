@@ -9,10 +9,10 @@ module Generated.River.LayoutShellV1.Global
     )
   where
 
+import qualified Generated.Wayland.Util
 import qualified HsBindgen.Runtime.Internal.CAPI
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.PtrConst as PtrConst
-import Generated.River.LayoutShellV1
 
 $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.unlines
   [ "#include <river-layer-shell-v1-client-protocol.h>"
@@ -41,7 +41,7 @@ foreign import ccall unsafe "hs_bindgen_c60de1108b4d7b24" hs_bindgen_c60de1108b4
      IO (RIP.Ptr RIP.Void)
 
 -- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_get_river_layer_shell_v1_interface@
-hs_bindgen_c60de1108b4d7b24 :: IO (PtrConst.PtrConst Wl_interface)
+hs_bindgen_c60de1108b4d7b24 :: IO (PtrConst.PtrConst Generated.Wayland.Util.WlInterface)
 hs_bindgen_c60de1108b4d7b24 =
   RIP.fromFFIType hs_bindgen_c60de1108b4d7b24_base
 
@@ -74,12 +74,12 @@ __exported by:__ @river-layer-shell-v1-client-protocol.h@
 
 __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_river_layer_shell_v1_interface@
 -}
-hs_bindgen_7612ef69509f2a50 :: PtrConst.PtrConst Wl_interface
+hs_bindgen_7612ef69509f2a50 :: PtrConst.PtrConst Generated.Wayland.Util.WlInterface
 hs_bindgen_7612ef69509f2a50 =
   RIP.unsafePerformIO hs_bindgen_c60de1108b4d7b24
 
 {-# NOINLINE river_layer_shell_v1_interface #-}
-river_layer_shell_v1_interface :: Wl_interface
+river_layer_shell_v1_interface :: Generated.Wayland.Util.WlInterface
 river_layer_shell_v1_interface =
   RIP.unsafePerformIO (PtrConst.peek hs_bindgen_7612ef69509f2a50)
 
@@ -88,7 +88,7 @@ foreign import ccall unsafe "hs_bindgen_2053b83b349209d9" hs_bindgen_2053b83b349
      IO (RIP.Ptr RIP.Void)
 
 -- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_get_river_layer_shell_output_v1_interface@
-hs_bindgen_2053b83b349209d9 :: IO (PtrConst.PtrConst Wl_interface)
+hs_bindgen_2053b83b349209d9 :: IO (PtrConst.PtrConst Generated.Wayland.Util.WlInterface)
 hs_bindgen_2053b83b349209d9 =
   RIP.fromFFIType hs_bindgen_2053b83b349209d9_base
 
@@ -117,12 +117,12 @@ __exported by:__ @river-layer-shell-v1-client-protocol.h@
 
 __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_river_layer_shell_output_v1_interface@
 -}
-hs_bindgen_5dc15f7c7b8cc13c :: PtrConst.PtrConst Wl_interface
+hs_bindgen_5dc15f7c7b8cc13c :: PtrConst.PtrConst Generated.Wayland.Util.WlInterface
 hs_bindgen_5dc15f7c7b8cc13c =
   RIP.unsafePerformIO hs_bindgen_2053b83b349209d9
 
 {-# NOINLINE river_layer_shell_output_v1_interface #-}
-river_layer_shell_output_v1_interface :: Wl_interface
+river_layer_shell_output_v1_interface :: Generated.Wayland.Util.WlInterface
 river_layer_shell_output_v1_interface =
   RIP.unsafePerformIO (PtrConst.peek hs_bindgen_5dc15f7c7b8cc13c)
 
@@ -131,7 +131,7 @@ foreign import ccall unsafe "hs_bindgen_dbbb0e0b47d4b06d" hs_bindgen_dbbb0e0b47d
      IO (RIP.Ptr RIP.Void)
 
 -- __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_get_river_layer_shell_seat_v1_interface@
-hs_bindgen_dbbb0e0b47d4b06d :: IO (PtrConst.PtrConst Wl_interface)
+hs_bindgen_dbbb0e0b47d4b06d :: IO (PtrConst.PtrConst Generated.Wayland.Util.WlInterface)
 hs_bindgen_dbbb0e0b47d4b06d =
   RIP.fromFFIType hs_bindgen_dbbb0e0b47d4b06d_base
 
@@ -160,11 +160,11 @@ __exported by:__ @river-layer-shell-v1-client-protocol.h@
 
 __unique:__ @River_LayoutShellV1_Generated.River.LayoutShellV1_river_layer_shell_seat_v1_interface@
 -}
-hs_bindgen_57d254de526a9583 :: PtrConst.PtrConst Wl_interface
+hs_bindgen_57d254de526a9583 :: PtrConst.PtrConst Generated.Wayland.Util.WlInterface
 hs_bindgen_57d254de526a9583 =
   RIP.unsafePerformIO hs_bindgen_dbbb0e0b47d4b06d
 
 {-# NOINLINE river_layer_shell_seat_v1_interface #-}
-river_layer_shell_seat_v1_interface :: Wl_interface
+river_layer_shell_seat_v1_interface :: Generated.Wayland.Util.WlInterface
 river_layer_shell_seat_v1_interface =
   RIP.unsafePerformIO (PtrConst.peek hs_bindgen_57d254de526a9583)

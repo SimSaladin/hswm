@@ -4,12 +4,6 @@ version:
 hsmodule: Generated.River.LayoutShellV1
 ctypes:
 - headers: river-layer-shell-v1-client-protocol.h
-  cname: struct wl_message
-  hsname: Wl_message
-- headers: river-layer-shell-v1-client-protocol.h
-  cname: struct wl_interface
-  hsname: Wl_interface
-- headers: river-layer-shell-v1-client-protocol.h
   cname: struct river_layer_shell_output_v1
   hsname: River_layer_shell_output_v1
 - headers: river-layer-shell-v1-client-protocol.h
@@ -100,42 +94,3 @@ hstypes:
   representation: emptydata
 - hsname: River_seat_v1
   representation: emptydata
-- hsname: Wl_interface
-  representation:
-    record:
-      constructor: Wl_interface
-      fields:
-      - name
-      - version
-      - method_count
-      - methods
-      - event_count
-      - events
-  instances:
-  - Eq
-  - Generic
-  - HasCField
-  - HasField
-  - ReadRaw
-  - Show
-  - StaticSize
-  - Storable
-  - WriteRaw
-- hsname: Wl_message
-  representation:
-    record:
-      constructor: Wl_message
-      fields:
-      - name
-      - signature
-      - types
-  instances:
-  - Eq
-  - Generic
-  - HasCField
-  - HasField
-  - ReadRaw
-  - Show
-  - StaticSize
-  - Storable
-  - WriteRaw
