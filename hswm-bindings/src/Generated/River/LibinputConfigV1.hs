@@ -19,7 +19,10 @@
 {-# LANGUAGE UndecidableInstances #-}
 
 module Generated.River.LibinputConfigV1
-    ( Generated.River.LibinputConfigV1.River_input_device_v1
+    ( Generated.River.LibinputConfigV1.Wl_message(..)
+    , Generated.River.LibinputConfigV1.Wl_interface(..)
+    , Generated.River.LibinputConfigV1.Wl_array(..)
+    , Generated.River.LibinputConfigV1.River_input_device_v1
     , Generated.River.LibinputConfigV1.River_libinput_accel_config_v1
     , Generated.River.LibinputConfigV1.River_libinput_config_v1
     , Generated.River.LibinputConfigV1.River_libinput_device_v1
@@ -225,12 +228,359 @@ module Generated.River.LibinputConfigV1
     )
   where
 
-import qualified Generated.Wayland.Util
 import qualified HsBindgen.Runtime.CEnum as CEnum
 import qualified HsBindgen.Runtime.HasCField as HasCField
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.LibC
 import qualified HsBindgen.Runtime.Marshal as Marshal
+import qualified HsBindgen.Runtime.PtrConst as PtrConst
+
+{-| __C declaration:__ @struct wl_message@
+
+    __defined at:__ @wayland-util.h 177:8@
+
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+-}
+data Wl_message = Wl_message
+  { name :: PtrConst.PtrConst RIP.CChar
+    {- ^ __C declaration:__ @name@
+
+         __defined at:__ @wayland-util.h 179:14@
+
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
+    -}
+  , signature :: PtrConst.PtrConst RIP.CChar
+    {- ^ __C declaration:__ @signature@
+
+         __defined at:__ @wayland-util.h 181:14@
+
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
+    -}
+  , types :: RIP.Ptr (PtrConst.PtrConst Wl_interface)
+    {- ^ __C declaration:__ @types@
+
+         __defined at:__ @wayland-util.h 183:30@
+
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
+    -}
+  }
+  deriving stock (Eq, RIP.Generic, Show)
+
+instance Marshal.StaticSize Wl_message where
+
+  staticSizeOf = \_ -> (24 :: Int)
+
+  staticAlignment = \_ -> (8 :: Int)
+
+instance Marshal.ReadRaw Wl_message where
+
+  readRaw =
+    \ptr0 ->
+          pure Wl_message
+      <*> HasCField.readRaw (RIP.Proxy @"name") ptr0
+      <*> HasCField.readRaw (RIP.Proxy @"signature") ptr0
+      <*> HasCField.readRaw (RIP.Proxy @"types") ptr0
+
+instance Marshal.WriteRaw Wl_message where
+
+  writeRaw =
+    \ptr0 ->
+      \s1 ->
+        case s1 of
+          Wl_message name2 signature3 types4 ->
+               HasCField.writeRaw (RIP.Proxy @"name") ptr0 name2
+            >> HasCField.writeRaw (RIP.Proxy @"signature") ptr0 signature3
+            >> HasCField.writeRaw (RIP.Proxy @"types") ptr0 types4
+
+deriving via Marshal.EquivStorable Wl_message instance RIP.Storable Wl_message
+
+instance HasCField.HasCField Wl_message "name" where
+
+  type CFieldType Wl_message "name" =
+    PtrConst.PtrConst RIP.CChar
+
+  offset# = \_ -> \_ -> 0
+
+instance ( ((~) ty) (PtrConst.PtrConst RIP.CChar)
+         ) => RIP.HasField "name" (RIP.Ptr Wl_message) (RIP.Ptr ty) where
+
+  getField = HasCField.fromPtr (RIP.Proxy @"name")
+
+instance HasCField.HasCField Wl_message "signature" where
+
+  type CFieldType Wl_message "signature" =
+    PtrConst.PtrConst RIP.CChar
+
+  offset# = \_ -> \_ -> 8
+
+instance ( ((~) ty) (PtrConst.PtrConst RIP.CChar)
+         ) => RIP.HasField "signature" (RIP.Ptr Wl_message) (RIP.Ptr ty) where
+
+  getField = HasCField.fromPtr (RIP.Proxy @"signature")
+
+instance HasCField.HasCField Wl_message "types" where
+
+  type CFieldType Wl_message "types" =
+    RIP.Ptr (PtrConst.PtrConst Wl_interface)
+
+  offset# = \_ -> \_ -> 16
+
+instance ( ((~) ty) (RIP.Ptr (PtrConst.PtrConst Wl_interface))
+         ) => RIP.HasField "types" (RIP.Ptr Wl_message) (RIP.Ptr ty) where
+
+  getField = HasCField.fromPtr (RIP.Proxy @"types")
+
+{-| __C declaration:__ @struct wl_interface@
+
+    __defined at:__ @wayland-util.h 232:8@
+
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+-}
+data Wl_interface = Wl_interface
+  { name :: PtrConst.PtrConst RIP.CChar
+    {- ^ __C declaration:__ @name@
+
+         __defined at:__ @wayland-util.h 234:14@
+
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
+    -}
+  , version :: RIP.CInt
+    {- ^ __C declaration:__ @version@
+
+         __defined at:__ @wayland-util.h 236:6@
+
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
+    -}
+  , method_count :: RIP.CInt
+    {- ^ __C declaration:__ @method_count@
+
+         __defined at:__ @wayland-util.h 238:6@
+
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
+    -}
+  , methods :: PtrConst.PtrConst Wl_message
+    {- ^ __C declaration:__ @methods@
+
+         __defined at:__ @wayland-util.h 240:27@
+
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
+    -}
+  , event_count :: RIP.CInt
+    {- ^ __C declaration:__ @event_count@
+
+         __defined at:__ @wayland-util.h 242:6@
+
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
+    -}
+  , events :: PtrConst.PtrConst Wl_message
+    {- ^ __C declaration:__ @events@
+
+         __defined at:__ @wayland-util.h 244:27@
+
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
+    -}
+  }
+  deriving stock (Eq, RIP.Generic, Show)
+
+instance Marshal.StaticSize Wl_interface where
+
+  staticSizeOf = \_ -> (40 :: Int)
+
+  staticAlignment = \_ -> (8 :: Int)
+
+instance Marshal.ReadRaw Wl_interface where
+
+  readRaw =
+    \ptr0 ->
+          pure Wl_interface
+      <*> HasCField.readRaw (RIP.Proxy @"name") ptr0
+      <*> HasCField.readRaw (RIP.Proxy @"version") ptr0
+      <*> HasCField.readRaw (RIP.Proxy @"method_count") ptr0
+      <*> HasCField.readRaw (RIP.Proxy @"methods") ptr0
+      <*> HasCField.readRaw (RIP.Proxy @"event_count") ptr0
+      <*> HasCField.readRaw (RIP.Proxy @"events") ptr0
+
+instance Marshal.WriteRaw Wl_interface where
+
+  writeRaw =
+    \ptr0 ->
+      \s1 ->
+        case s1 of
+          Wl_interface name2 version3 method_count4 methods5 event_count6 events7 ->
+               HasCField.writeRaw (RIP.Proxy @"name") ptr0 name2
+            >> HasCField.writeRaw (RIP.Proxy @"version") ptr0 version3
+            >> HasCField.writeRaw (RIP.Proxy @"method_count") ptr0 method_count4
+            >> HasCField.writeRaw (RIP.Proxy @"methods") ptr0 methods5
+            >> HasCField.writeRaw (RIP.Proxy @"event_count") ptr0 event_count6
+            >> HasCField.writeRaw (RIP.Proxy @"events") ptr0 events7
+
+deriving via Marshal.EquivStorable Wl_interface instance RIP.Storable Wl_interface
+
+instance HasCField.HasCField Wl_interface "name" where
+
+  type CFieldType Wl_interface "name" =
+    PtrConst.PtrConst RIP.CChar
+
+  offset# = \_ -> \_ -> 0
+
+instance ( ((~) ty) (PtrConst.PtrConst RIP.CChar)
+         ) => RIP.HasField "name" (RIP.Ptr Wl_interface) (RIP.Ptr ty) where
+
+  getField = HasCField.fromPtr (RIP.Proxy @"name")
+
+instance HasCField.HasCField Wl_interface "version" where
+
+  type CFieldType Wl_interface "version" = RIP.CInt
+
+  offset# = \_ -> \_ -> 8
+
+instance ( ((~) ty) RIP.CInt
+         ) => RIP.HasField "version" (RIP.Ptr Wl_interface) (RIP.Ptr ty) where
+
+  getField = HasCField.fromPtr (RIP.Proxy @"version")
+
+instance HasCField.HasCField Wl_interface "method_count" where
+
+  type CFieldType Wl_interface "method_count" =
+    RIP.CInt
+
+  offset# = \_ -> \_ -> 12
+
+instance ( ((~) ty) RIP.CInt
+         ) => RIP.HasField "method_count" (RIP.Ptr Wl_interface) (RIP.Ptr ty) where
+
+  getField =
+    HasCField.fromPtr (RIP.Proxy @"method_count")
+
+instance HasCField.HasCField Wl_interface "methods" where
+
+  type CFieldType Wl_interface "methods" =
+    PtrConst.PtrConst Wl_message
+
+  offset# = \_ -> \_ -> 16
+
+instance ( ((~) ty) (PtrConst.PtrConst Wl_message)
+         ) => RIP.HasField "methods" (RIP.Ptr Wl_interface) (RIP.Ptr ty) where
+
+  getField = HasCField.fromPtr (RIP.Proxy @"methods")
+
+instance HasCField.HasCField Wl_interface "event_count" where
+
+  type CFieldType Wl_interface "event_count" = RIP.CInt
+
+  offset# = \_ -> \_ -> 24
+
+instance ( ((~) ty) RIP.CInt
+         ) => RIP.HasField "event_count" (RIP.Ptr Wl_interface) (RIP.Ptr ty) where
+
+  getField =
+    HasCField.fromPtr (RIP.Proxy @"event_count")
+
+instance HasCField.HasCField Wl_interface "events" where
+
+  type CFieldType Wl_interface "events" =
+    PtrConst.PtrConst Wl_message
+
+  offset# = \_ -> \_ -> 32
+
+instance ( ((~) ty) (PtrConst.PtrConst Wl_message)
+         ) => RIP.HasField "events" (RIP.Ptr Wl_interface) (RIP.Ptr ty) where
+
+  getField = HasCField.fromPtr (RIP.Proxy @"events")
+
+{-| __C declaration:__ @struct wl_array@
+
+    __defined at:__ @wayland-util.h 535:8@
+
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+-}
+data Wl_array = Wl_array
+  { size :: HsBindgen.Runtime.LibC.CSize
+    {- ^ __C declaration:__ @size@
+
+         __defined at:__ @wayland-util.h 537:9@
+
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
+    -}
+  , alloc :: HsBindgen.Runtime.LibC.CSize
+    {- ^ __C declaration:__ @alloc@
+
+         __defined at:__ @wayland-util.h 539:9@
+
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
+    -}
+  , data' :: RIP.Ptr RIP.Void
+    {- ^ __C declaration:__ @data@
+
+         __defined at:__ @wayland-util.h 541:8@
+
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
+    -}
+  }
+  deriving stock (Eq, RIP.Generic, Show)
+
+instance Marshal.StaticSize Wl_array where
+
+  staticSizeOf = \_ -> (24 :: Int)
+
+  staticAlignment = \_ -> (8 :: Int)
+
+instance Marshal.ReadRaw Wl_array where
+
+  readRaw =
+    \ptr0 ->
+          pure Wl_array
+      <*> HasCField.readRaw (RIP.Proxy @"size") ptr0
+      <*> HasCField.readRaw (RIP.Proxy @"alloc") ptr0
+      <*> HasCField.readRaw (RIP.Proxy @"data'") ptr0
+
+instance Marshal.WriteRaw Wl_array where
+
+  writeRaw =
+    \ptr0 ->
+      \s1 ->
+        case s1 of
+          Wl_array size2 alloc3 data'4 ->
+               HasCField.writeRaw (RIP.Proxy @"size") ptr0 size2
+            >> HasCField.writeRaw (RIP.Proxy @"alloc") ptr0 alloc3
+            >> HasCField.writeRaw (RIP.Proxy @"data'") ptr0 data'4
+
+deriving via Marshal.EquivStorable Wl_array instance RIP.Storable Wl_array
+
+instance HasCField.HasCField Wl_array "size" where
+
+  type CFieldType Wl_array "size" =
+    HsBindgen.Runtime.LibC.CSize
+
+  offset# = \_ -> \_ -> 0
+
+instance ( ((~) ty) HsBindgen.Runtime.LibC.CSize
+         ) => RIP.HasField "size" (RIP.Ptr Wl_array) (RIP.Ptr ty) where
+
+  getField = HasCField.fromPtr (RIP.Proxy @"size")
+
+instance HasCField.HasCField Wl_array "alloc" where
+
+  type CFieldType Wl_array "alloc" =
+    HsBindgen.Runtime.LibC.CSize
+
+  offset# = \_ -> \_ -> 8
+
+instance ( ((~) ty) HsBindgen.Runtime.LibC.CSize
+         ) => RIP.HasField "alloc" (RIP.Ptr Wl_array) (RIP.Ptr ty) where
+
+  getField = HasCField.fromPtr (RIP.Proxy @"alloc")
+
+instance HasCField.HasCField Wl_array "data'" where
+
+  type CFieldType Wl_array "data'" = RIP.Ptr RIP.Void
+
+  offset# = \_ -> \_ -> 16
+
+instance ( ((~) ty) (RIP.Ptr RIP.Void)
+         ) => RIP.HasField "data'" (RIP.Ptr Wl_array) (RIP.Ptr ty) where
+
+  getField = HasCField.fromPtr (RIP.Proxy @"data'")
 
 {-|
 
@@ -3165,7 +3515,7 @@ data River_libinput_device_v1_listener = River_libinput_device_v1_listener
 
     __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , calibration_matrix_default :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ())
+  , calibration_matrix_default :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Wl_array) -> IO ())
     {- ^ default calibration matrix
 
        Default calibration matrix.
@@ -3178,7 +3528,7 @@ data River_libinput_device_v1_listener = River_libinput_device_v1_listener
 
     __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , calibration_matrix_current :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ())
+  , calibration_matrix_current :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Wl_array) -> IO ())
     {- ^ current calibration matrix
 
        Current calibration matrix.
@@ -3224,7 +3574,7 @@ data River_libinput_device_v1_listener = River_libinput_device_v1_listener
 
     __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , accel_speed_default :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ())
+  , accel_speed_default :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Wl_array) -> IO ())
     {- ^ default acceleration speed
 
        Default acceleration speed.
@@ -3237,7 +3587,7 @@ data River_libinput_device_v1_listener = River_libinput_device_v1_listener
 
     __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , accel_speed_current :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ())
+  , accel_speed_current :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Wl_array) -> IO ())
     {- ^ current acceleration speed
 
        Current acceleration speed.
@@ -4018,11 +4368,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "calibration_matrix_default" where
 
   type CFieldType River_libinput_device_v1_listener "calibration_matrix_default" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ())
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Wl_array) -> IO ())
 
   offset# = \_ -> \_ -> 144
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ()))
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Wl_array) -> IO ()))
          ) => RIP.HasField "calibration_matrix_default" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4031,11 +4381,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "calibration_matrix_current" where
 
   type CFieldType River_libinput_device_v1_listener "calibration_matrix_current" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ())
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Wl_array) -> IO ())
 
   offset# = \_ -> \_ -> 152
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ()))
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Wl_array) -> IO ()))
          ) => RIP.HasField "calibration_matrix_current" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4083,11 +4433,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "accel_speed_default" where
 
   type CFieldType River_libinput_device_v1_listener "accel_speed_default" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ())
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Wl_array) -> IO ())
 
   offset# = \_ -> \_ -> 184
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ()))
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Wl_array) -> IO ()))
          ) => RIP.HasField "accel_speed_default" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4096,11 +4446,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "accel_speed_current" where
 
   type CFieldType River_libinput_device_v1_listener "accel_speed_current" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ())
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Wl_array) -> IO ())
 
   offset# = \_ -> \_ -> 192
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ()))
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Wl_array) -> IO ()))
          ) => RIP.HasField "accel_speed_current" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -6020,37 +6370,37 @@ instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1
 
   fromFunPtr = hs_bindgen_0b10719c94e49123
 
-foreign import ccall safe "wrapper" hs_bindgen_5c4040cd71595988_base ::
+foreign import ccall safe "wrapper" hs_bindgen_9f7231773d00fcb6_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ())@
-hs_bindgen_5c4040cd71595988 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ()))
-hs_bindgen_5c4040cd71595988 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Wl_array) -> IO ())@
+hs_bindgen_9f7231773d00fcb6 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Wl_array) -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Wl_array) -> IO ()))
+hs_bindgen_9f7231773d00fcb6 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_5c4040cd71595988_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_9f7231773d00fcb6_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_0a5aaf16714aad31_base ::
+foreign import ccall safe "dynamic" hs_bindgen_eaa3e613987086f7_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ())@
-hs_bindgen_0a5aaf16714aad31 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ()
-hs_bindgen_0a5aaf16714aad31 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Wl_array) -> IO ())@
+hs_bindgen_eaa3e613987086f7 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Wl_array) -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Wl_array) -> IO ()
+hs_bindgen_eaa3e613987086f7 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_0a5aaf16714aad31_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_eaa3e613987086f7_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Wl_array) -> IO ()) where
 
-  toFunPtr = hs_bindgen_5c4040cd71595988
+  toFunPtr = hs_bindgen_9f7231773d00fcb6
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Wl_array) -> IO ()) where
 
-  fromFunPtr = hs_bindgen_0a5aaf16714aad31
+  fromFunPtr = hs_bindgen_eaa3e613987086f7
 
 foreign import ccall safe "wrapper" hs_bindgen_18686de1898fdad6_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ())

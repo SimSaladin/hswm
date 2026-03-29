@@ -49,7 +49,6 @@ module Generated.River.LibinputConfigV1.FunPtr
     )
   where
 
-import qualified Generated.Wayland.Util
 import qualified HsBindgen.Runtime.Internal.CAPI
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.LibC
@@ -894,7 +893,7 @@ foreign import ccall unsafe "hs_bindgen_f4a535fd03f900a1" hs_bindgen_f4a535fd03f
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @River_LibinputConfigV1_Generated.River.LibinputConfigV1_get_river_libinput_device_v1_set_calibration_matrix@
-hs_bindgen_f4a535fd03f900a1 :: IO (RIP.FunPtr ((RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO (RIP.Ptr River_libinput_result_v1)))
+hs_bindgen_f4a535fd03f900a1 :: IO (RIP.FunPtr ((RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Wl_array) -> IO (RIP.Ptr River_libinput_result_v1)))
 hs_bindgen_f4a535fd03f900a1 =
   RIP.fromFFIType hs_bindgen_f4a535fd03f900a1_base
 
@@ -911,7 +910,7 @@ __defined at:__ @river-libinput-config-v1-client-protocol.h 1455:1@
 
 __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
-river_libinput_device_v1_set_calibration_matrix :: RIP.FunPtr ((RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO (RIP.Ptr River_libinput_result_v1))
+river_libinput_device_v1_set_calibration_matrix :: RIP.FunPtr ((RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Wl_array) -> IO (RIP.Ptr River_libinput_result_v1))
 river_libinput_device_v1_set_calibration_matrix =
   RIP.unsafePerformIO hs_bindgen_f4a535fd03f900a1
 
@@ -946,7 +945,7 @@ foreign import ccall unsafe "hs_bindgen_02f5235ca262634a" hs_bindgen_02f5235ca26
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @River_LibinputConfigV1_Generated.River.LibinputConfigV1_get_river_libinput_device_v1_set_accel_speed@
-hs_bindgen_02f5235ca262634a :: IO (RIP.FunPtr ((RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO (RIP.Ptr River_libinput_result_v1)))
+hs_bindgen_02f5235ca262634a :: IO (RIP.FunPtr ((RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Wl_array) -> IO (RIP.Ptr River_libinput_result_v1)))
 hs_bindgen_02f5235ca262634a =
   RIP.fromFFIType hs_bindgen_02f5235ca262634a_base
 
@@ -963,7 +962,7 @@ __defined at:__ @river-libinput-config-v1-client-protocol.h 1489:1@
 
 __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
-river_libinput_device_v1_set_accel_speed :: RIP.FunPtr ((RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO (RIP.Ptr River_libinput_result_v1))
+river_libinput_device_v1_set_accel_speed :: RIP.FunPtr ((RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Wl_array) -> IO (RIP.Ptr River_libinput_result_v1))
 river_libinput_device_v1_set_accel_speed =
   RIP.unsafePerformIO hs_bindgen_02f5235ca262634a
 
@@ -1378,7 +1377,7 @@ foreign import ccall unsafe "hs_bindgen_210a0d5f8a5e4d0c" hs_bindgen_210a0d5f8a5
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @River_LibinputConfigV1_Generated.River.LibinputConfigV1_get_river_libinput_accel_config_v1_set_points@
-hs_bindgen_210a0d5f8a5e4d0c :: IO (RIP.FunPtr ((RIP.Ptr River_libinput_accel_config_v1) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO (RIP.Ptr River_libinput_result_v1)))
+hs_bindgen_210a0d5f8a5e4d0c :: IO (RIP.FunPtr ((RIP.Ptr River_libinput_accel_config_v1) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_array) -> (RIP.Ptr Wl_array) -> IO (RIP.Ptr River_libinput_result_v1)))
 hs_bindgen_210a0d5f8a5e4d0c =
   RIP.fromFFIType hs_bindgen_210a0d5f8a5e4d0c_base
 
@@ -1395,7 +1394,7 @@ __defined at:__ @river-libinput-config-v1-client-protocol.h 1767:1@
 
 __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
-river_libinput_accel_config_v1_set_points :: RIP.FunPtr ((RIP.Ptr River_libinput_accel_config_v1) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> (RIP.Ptr Generated.Wayland.Util.Wl_array) -> IO (RIP.Ptr River_libinput_result_v1))
+river_libinput_accel_config_v1_set_points :: RIP.FunPtr ((RIP.Ptr River_libinput_accel_config_v1) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Wl_array) -> (RIP.Ptr Wl_array) -> IO (RIP.Ptr River_libinput_result_v1))
 river_libinput_accel_config_v1_set_points =
   RIP.unsafePerformIO hs_bindgen_210a0d5f8a5e4d0c
 

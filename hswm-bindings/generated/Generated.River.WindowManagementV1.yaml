@@ -4,6 +4,12 @@ version:
 hsmodule: Generated.River.WindowManagementV1
 ctypes:
 - headers: river-window-management-v1-client-protocol.h
+  cname: struct wl_message
+  hsname: Wl_message
+- headers: river-window-management-v1-client-protocol.h
+  cname: struct wl_interface
+  hsname: Wl_interface
+- headers: river-window-management-v1-client-protocol.h
   cname: struct river_decoration_v1
   hsname: River_decoration_v1
 - headers: river-window-management-v1-client-protocol.h
@@ -416,6 +422,45 @@ hstypes:
       - unreliable_pid
       - presentation_hint
       - identifier
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_interface
+  representation:
+    record:
+      constructor: Wl_interface
+      fields:
+      - name
+      - version
+      - method_count
+      - methods
+      - event_count
+      - events
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_message
+  representation:
+    record:
+      constructor: Wl_message
+      fields:
+      - name
+      - signature
+      - types
   instances:
   - Eq
   - Generic

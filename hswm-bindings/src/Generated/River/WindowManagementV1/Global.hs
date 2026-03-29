@@ -14,10 +14,10 @@ module Generated.River.WindowManagementV1.Global
     )
   where
 
-import qualified Generated.Wayland.Util
 import qualified HsBindgen.Runtime.Internal.CAPI
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.PtrConst as PtrConst
+import Generated.River.WindowManagementV1
 
 $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.unlines
   [ "#include <river-window-management-v1-client-protocol.h>"
@@ -76,7 +76,7 @@ foreign import ccall unsafe "hs_bindgen_b6d7c456c8c13e37" hs_bindgen_b6d7c456c8c
      IO (RIP.Ptr RIP.Void)
 
 -- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_manager_v1_interface@
-hs_bindgen_b6d7c456c8c13e37 :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
+hs_bindgen_b6d7c456c8c13e37 :: IO (PtrConst.PtrConst Wl_interface)
 hs_bindgen_b6d7c456c8c13e37 =
   RIP.fromFFIType hs_bindgen_b6d7c456c8c13e37_base
 
@@ -177,12 +177,12 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 
 __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_river_window_manager_v1_interface@
 -}
-hs_bindgen_8fc8cfe58441010f :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+hs_bindgen_8fc8cfe58441010f :: PtrConst.PtrConst Wl_interface
 hs_bindgen_8fc8cfe58441010f =
   RIP.unsafePerformIO hs_bindgen_b6d7c456c8c13e37
 
 {-# NOINLINE river_window_manager_v1_interface #-}
-river_window_manager_v1_interface :: Generated.Wayland.Util.Wl_interface
+river_window_manager_v1_interface :: Wl_interface
 river_window_manager_v1_interface =
   RIP.unsafePerformIO (PtrConst.peek hs_bindgen_8fc8cfe58441010f)
 
@@ -191,7 +191,7 @@ foreign import ccall unsafe "hs_bindgen_787effb2370ddbc5" hs_bindgen_787effb2370
      IO (RIP.Ptr RIP.Void)
 
 -- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_window_v1_interface@
-hs_bindgen_787effb2370ddbc5 :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
+hs_bindgen_787effb2370ddbc5 :: IO (PtrConst.PtrConst Wl_interface)
 hs_bindgen_787effb2370ddbc5 =
   RIP.fromFFIType hs_bindgen_787effb2370ddbc5_base
 
@@ -224,12 +224,12 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 
 __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_river_window_v1_interface@
 -}
-hs_bindgen_b61d3e198059e3e6 :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+hs_bindgen_b61d3e198059e3e6 :: PtrConst.PtrConst Wl_interface
 hs_bindgen_b61d3e198059e3e6 =
   RIP.unsafePerformIO hs_bindgen_787effb2370ddbc5
 
 {-# NOINLINE river_window_v1_interface #-}
-river_window_v1_interface :: Generated.Wayland.Util.Wl_interface
+river_window_v1_interface :: Wl_interface
 river_window_v1_interface =
   RIP.unsafePerformIO (PtrConst.peek hs_bindgen_b61d3e198059e3e6)
 
@@ -238,7 +238,7 @@ foreign import ccall unsafe "hs_bindgen_018ed14d788ed3b4" hs_bindgen_018ed14d788
      IO (RIP.Ptr RIP.Void)
 
 -- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_decoration_v1_interface@
-hs_bindgen_018ed14d788ed3b4 :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
+hs_bindgen_018ed14d788ed3b4 :: IO (PtrConst.PtrConst Wl_interface)
 hs_bindgen_018ed14d788ed3b4 =
   RIP.fromFFIType hs_bindgen_018ed14d788ed3b4_base
 
@@ -287,12 +287,12 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 
 __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_river_decoration_v1_interface@
 -}
-hs_bindgen_b96d53816c26ffbf :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+hs_bindgen_b96d53816c26ffbf :: PtrConst.PtrConst Wl_interface
 hs_bindgen_b96d53816c26ffbf =
   RIP.unsafePerformIO hs_bindgen_018ed14d788ed3b4
 
 {-# NOINLINE river_decoration_v1_interface #-}
-river_decoration_v1_interface :: Generated.Wayland.Util.Wl_interface
+river_decoration_v1_interface :: Wl_interface
 river_decoration_v1_interface =
   RIP.unsafePerformIO (PtrConst.peek hs_bindgen_b96d53816c26ffbf)
 
@@ -301,7 +301,7 @@ foreign import ccall unsafe "hs_bindgen_f94c66bb801406a5" hs_bindgen_f94c66bb801
      IO (RIP.Ptr RIP.Void)
 
 -- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_shell_surface_v1_interface@
-hs_bindgen_f94c66bb801406a5 :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
+hs_bindgen_f94c66bb801406a5 :: IO (PtrConst.PtrConst Wl_interface)
 hs_bindgen_f94c66bb801406a5 =
   RIP.fromFFIType hs_bindgen_f94c66bb801406a5_base
 
@@ -330,12 +330,12 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 
 __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_river_shell_surface_v1_interface@
 -}
-hs_bindgen_ae90c6f99ffd7e06 :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+hs_bindgen_ae90c6f99ffd7e06 :: PtrConst.PtrConst Wl_interface
 hs_bindgen_ae90c6f99ffd7e06 =
   RIP.unsafePerformIO hs_bindgen_f94c66bb801406a5
 
 {-# NOINLINE river_shell_surface_v1_interface #-}
-river_shell_surface_v1_interface :: Generated.Wayland.Util.Wl_interface
+river_shell_surface_v1_interface :: Wl_interface
 river_shell_surface_v1_interface =
   RIP.unsafePerformIO (PtrConst.peek hs_bindgen_ae90c6f99ffd7e06)
 
@@ -344,7 +344,7 @@ foreign import ccall unsafe "hs_bindgen_f281705af45ce84a" hs_bindgen_f281705af45
      IO (RIP.Ptr RIP.Void)
 
 -- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_node_v1_interface@
-hs_bindgen_f281705af45ce84a :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
+hs_bindgen_f281705af45ce84a :: IO (PtrConst.PtrConst Wl_interface)
 hs_bindgen_f281705af45ce84a =
   RIP.fromFFIType hs_bindgen_f281705af45ce84a_base
 
@@ -377,12 +377,12 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 
 __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_river_node_v1_interface@
 -}
-hs_bindgen_67ae7b3bf139a23d :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+hs_bindgen_67ae7b3bf139a23d :: PtrConst.PtrConst Wl_interface
 hs_bindgen_67ae7b3bf139a23d =
   RIP.unsafePerformIO hs_bindgen_f281705af45ce84a
 
 {-# NOINLINE river_node_v1_interface #-}
-river_node_v1_interface :: Generated.Wayland.Util.Wl_interface
+river_node_v1_interface :: Wl_interface
 river_node_v1_interface =
   RIP.unsafePerformIO (PtrConst.peek hs_bindgen_67ae7b3bf139a23d)
 
@@ -391,7 +391,7 @@ foreign import ccall unsafe "hs_bindgen_4493397455644085" hs_bindgen_44933974556
      IO (RIP.Ptr RIP.Void)
 
 -- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_output_v1_interface@
-hs_bindgen_4493397455644085 :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
+hs_bindgen_4493397455644085 :: IO (PtrConst.PtrConst Wl_interface)
 hs_bindgen_4493397455644085 =
   RIP.fromFFIType hs_bindgen_4493397455644085_base
 
@@ -420,12 +420,12 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 
 __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_river_output_v1_interface@
 -}
-hs_bindgen_d5879885d1e06131 :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+hs_bindgen_d5879885d1e06131 :: PtrConst.PtrConst Wl_interface
 hs_bindgen_d5879885d1e06131 =
   RIP.unsafePerformIO hs_bindgen_4493397455644085
 
 {-# NOINLINE river_output_v1_interface #-}
-river_output_v1_interface :: Generated.Wayland.Util.Wl_interface
+river_output_v1_interface :: Wl_interface
 river_output_v1_interface =
   RIP.unsafePerformIO (PtrConst.peek hs_bindgen_d5879885d1e06131)
 
@@ -434,7 +434,7 @@ foreign import ccall unsafe "hs_bindgen_16a01a61f0e2be20" hs_bindgen_16a01a61f0e
      IO (RIP.Ptr RIP.Void)
 
 -- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_seat_v1_interface@
-hs_bindgen_16a01a61f0e2be20 :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
+hs_bindgen_16a01a61f0e2be20 :: IO (PtrConst.PtrConst Wl_interface)
 hs_bindgen_16a01a61f0e2be20 =
   RIP.fromFFIType hs_bindgen_16a01a61f0e2be20_base
 
@@ -475,12 +475,12 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 
 __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_river_seat_v1_interface@
 -}
-hs_bindgen_5fed1c2ea6e6c5f8 :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+hs_bindgen_5fed1c2ea6e6c5f8 :: PtrConst.PtrConst Wl_interface
 hs_bindgen_5fed1c2ea6e6c5f8 =
   RIP.unsafePerformIO hs_bindgen_16a01a61f0e2be20
 
 {-# NOINLINE river_seat_v1_interface #-}
-river_seat_v1_interface :: Generated.Wayland.Util.Wl_interface
+river_seat_v1_interface :: Wl_interface
 river_seat_v1_interface =
   RIP.unsafePerformIO (PtrConst.peek hs_bindgen_5fed1c2ea6e6c5f8)
 
@@ -489,7 +489,7 @@ foreign import ccall unsafe "hs_bindgen_d0ee47d14d4d6dd0" hs_bindgen_d0ee47d14d4
      IO (RIP.Ptr RIP.Void)
 
 -- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_get_river_pointer_binding_v1_interface@
-hs_bindgen_d0ee47d14d4d6dd0 :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
+hs_bindgen_d0ee47d14d4d6dd0 :: IO (PtrConst.PtrConst Wl_interface)
 hs_bindgen_d0ee47d14d4d6dd0 =
   RIP.fromFFIType hs_bindgen_d0ee47d14d4d6dd0_base
 
@@ -530,11 +530,11 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 
 __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_river_pointer_binding_v1_interface@
 -}
-hs_bindgen_b32b3bb538cc39a0 :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+hs_bindgen_b32b3bb538cc39a0 :: PtrConst.PtrConst Wl_interface
 hs_bindgen_b32b3bb538cc39a0 =
   RIP.unsafePerformIO hs_bindgen_d0ee47d14d4d6dd0
 
 {-# NOINLINE river_pointer_binding_v1_interface #-}
-river_pointer_binding_v1_interface :: Generated.Wayland.Util.Wl_interface
+river_pointer_binding_v1_interface :: Wl_interface
 river_pointer_binding_v1_interface =
   RIP.unsafePerformIO (PtrConst.peek hs_bindgen_b32b3bb538cc39a0)

@@ -54,7 +54,7 @@ $(bindGenSpecDir)/Generated.Wayland.Util.yaml: FORCE
 	  --gen-binding-spec $@ \
 	  --module $(patsubst %.yaml,%,$(@F)) \
 	  $(shell pkg-config --cflags wayland-client) \
-	  --external-binding-spec $(bindingSpecs)/wayland-util.yaml \
+	  --prescriptive-binding-spec $(bindingSpecs)/wayland-util.yaml \
 	  --select-from-main-header-dirs \
 	  --select-except-by-decl-name wl_log_func_t
 
