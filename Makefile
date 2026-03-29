@@ -46,11 +46,15 @@ bindgen-river:	\
 	$(bindGenSpecDir)/Generated.River.LibinputConfigV1.yaml \
 	$(bindGenSpecDir)/Generated.River.LayoutShellV1.yaml
 
+# --external-binding-spec $(bindingSpecs)/wayland-client.yaml --external-binding-spec $(bindingSpecs)/wayland-util.yaml
+
 $(bindGenSpecDir)/Generated.Wayland.Util.yaml: FORCE
-	$(HS_BIND_GEN) --unique-id hswm_wl_util wayland-util.h \
+	$(HS_BIND_GEN) \
+	  --unique-id hswm_wl_util wayland-util.h \
 	  --gen-binding-spec $@ \
 	  --module $(patsubst %.yaml,%,$(@F)) \
 	  $(shell pkg-config --cflags wayland-client) \
+	  --external-binding-spec $(bindingSpecs)/wayland-util.yaml \
 	  --select-from-main-header-dirs \
 	  --select-except-by-decl-name wl_log_func_t
 
@@ -60,13 +64,13 @@ $(bindGenSpecDir)/Generated.Wayland.Client.yaml: FORCE $(bindGenSpecDir)/Generat
 	  --module $(patsubst %.yaml,%,$(@F)) \
 	  $(shell pkg-config --cflags wayland-client) \
 	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml \
-	  --prescriptive-binding-spec $(bindingSpecs)/wayland-client.yaml \
-	  --select-except-by-decl-name \'wl_log_func_t$$\' \
-	  --select-except-by-decl-name \'wl_log_set_handler_client$$\' \
-	  --select-except-by-decl-name \'wl_proxy_marshal_flags$$\' \
-	  --select-except-by-decl-name \'wl_proxy_marshal$$\' \
-	  --select-except-by-decl-name \'wl_proxy_marshal_constructor$$\' \
-	  --select-except-by-decl-name \'wl_proxy_marshal_constructor_versioned$$\'
+	  --external-binding-spec $(bindingSpecs)/wayland-client.yaml \
+	  --select-except-by-decl-name wl_log_func_t \
+	  --select-except-by-decl-name wl_log_set_handler_client \
+	  --select-except-by-decl-name wl_proxy_marshal_flags \
+	  --select-except-by-decl-name wl_proxy_marshal \
+	  --select-except-by-decl-name wl_proxy_marshal_constructor \
+	  --select-except-by-decl-name wl_proxy_marshal_constructor_versioned
 
 $(bindGenSpecDir)/Generated.River.InputManagementV1.yaml: $(HEADERDIR)/river-input-management-v1-client-protocol.h FORCE
 	$(HS_BIND_GEN) $(<F) \
