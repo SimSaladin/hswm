@@ -2,7 +2,7 @@
 ------------------------------------------------------------------------------
 -- |
 -- Module      : River.Interfaces
--- Description : Short description
+-- Description : River WM Interface (Wayland) Bindings
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@paivola.fi>
@@ -30,6 +30,10 @@
 --   * "Generated.River.XkbConfigV1"
 --
 --      * "Generated.River.XkbConfigV1.Global"
+--
+--   * "Generated.River.LibinputConfigV1"
+--
+--      * "Generated.River.LibinputConfigV1.Global"
 
 ------------------------------------------------------------------------------
 module River.Interfaces
@@ -81,6 +85,16 @@ module River.Interfaces
   , river_xkb_config_v1_interface'
   , river_xkb_keymap_v1_interface'
   , river_xkb_keyboard_v1_interface'
+
+  -- * RiverLibinputConfigV1
+  , river_libinput_config_v1_interface
+  , river_libinput_device_v1_interface
+  , river_libinput_accel_config_v1_interface
+  , river_libinput_result_v1_interface
+  , river_libinput_config_v1_interface'
+  , river_libinput_device_v1_interface'
+  , river_libinput_accel_config_v1_interface'
+  , river_libinput_result_v1_interface'
   ) where
 
 import qualified Generated.River.InputManagementV1.Global as G
@@ -88,26 +102,33 @@ import qualified Generated.River.LayoutShellV1.Global as G
 import qualified Generated.River.WindowManagementV1.Global as G
 import qualified Generated.River.XkbBindingsV1.Global as G
 import qualified Generated.River.XkbConfigV1.Global as G
+import qualified Generated.River.LibinputConfigV1.Global as G
 
 import           Wayland.Client.Internal.TH (getConstPtrs)
 
 $(getConstPtrs
-  [ ( "river_layer_shell_v1_interface"        , 'G.river_layer_shell_v1_interface       )
-  , ( "river_layer_shell_output_v1_interface" , 'G.river_layer_shell_output_v1_interface)
-  , ( "river_layer_shell_seat_v1_interface"   , 'G.river_layer_shell_seat_v1_interface  )
-  , ( "river_input_manager_v1_interface"      , 'G.river_input_manager_v1_interface     )
-  , ( "river_input_device_v1_interface"       , 'G.river_input_device_v1_interface      )
-  , ( "river_window_manager_v1_interface"     , 'G.river_window_manager_v1_interface    )
-  , ( "river_window_v1_interface"             , 'G.river_window_v1_interface            )
-  , ( "river_decoration_v1_interface"         , 'G.river_decoration_v1_interface        )
-  , ( "river_shell_surface_v1_interface"      , 'G.river_shell_surface_v1_interface     )
-  , ( "river_node_v1_interface"               , 'G.river_node_v1_interface              )
-  , ( "river_output_v1_interface"             , 'G.river_output_v1_interface            )
-  , ( "river_seat_v1_interface"               , 'G.river_seat_v1_interface              )
-  , ( "river_pointer_binding_v1_interface"    , 'G.river_pointer_binding_v1_interface   )
-  , ( "river_xkb_bindings_v1_interface"       , 'G.river_xkb_bindings_v1_interface      )
-  , ( "river_xkb_binding_v1_interface"        , 'G.river_xkb_binding_v1_interface       )
-  , ( "river_xkb_bindings_seat_v1_interface"  , 'G.river_xkb_bindings_seat_v1_interface )
-  , ( "river_xkb_config_v1_interface"         , 'G.river_xkb_config_v1_interface        )
-  , ( "river_xkb_keymap_v1_interface"         , 'G.river_xkb_keymap_v1_interface        )
-  , ( "river_xkb_keyboard_v1_interface"       , 'G.river_xkb_keyboard_v1_interface      ) ])
+  [ ( "river_layer_shell_v1_interface"            , 'G.river_layer_shell_v1_interface       )
+  , ( "river_layer_shell_output_v1_interface"     , 'G.river_layer_shell_output_v1_interface)
+  , ( "river_layer_shell_seat_v1_interface"       , 'G.river_layer_shell_seat_v1_interface  )
+  , ( "river_input_manager_v1_interface"          , 'G.river_input_manager_v1_interface     )
+  , ( "river_input_device_v1_interface"           , 'G.river_input_device_v1_interface      )
+  , ( "river_window_manager_v1_interface"         , 'G.river_window_manager_v1_interface    )
+  , ( "river_window_v1_interface"                 , 'G.river_window_v1_interface            )
+  , ( "river_decoration_v1_interface"             , 'G.river_decoration_v1_interface        )
+  , ( "river_shell_surface_v1_interface"          , 'G.river_shell_surface_v1_interface     )
+  , ( "river_node_v1_interface"                   , 'G.river_node_v1_interface              )
+  , ( "river_output_v1_interface"                 , 'G.river_output_v1_interface            )
+  , ( "river_seat_v1_interface"                   , 'G.river_seat_v1_interface              )
+  , ( "river_pointer_binding_v1_interface"        , 'G.river_pointer_binding_v1_interface   )
+  , ( "river_xkb_bindings_v1_interface"           , 'G.river_xkb_bindings_v1_interface      )
+  , ( "river_xkb_binding_v1_interface"            , 'G.river_xkb_binding_v1_interface       )
+  , ( "river_xkb_bindings_seat_v1_interface"      , 'G.river_xkb_bindings_seat_v1_interface )
+  , ( "river_xkb_config_v1_interface"             , 'G.river_xkb_config_v1_interface        )
+  , ( "river_xkb_keymap_v1_interface"             , 'G.river_xkb_keymap_v1_interface        )
+  , ( "river_xkb_keyboard_v1_interface"           , 'G.river_xkb_keyboard_v1_interface      )
+  , ( "river_libinput_config_v1_interface"        , 'G.river_libinput_config_v1_interface       )
+  , ( "river_libinput_device_v1_interface"        , 'G.river_libinput_device_v1_interface       )
+  , ( "river_libinput_accel_config_v1_interface"  , 'G.river_libinput_accel_config_v1_interface )
+  , ( "river_libinput_result_v1_interface"        , 'G.river_libinput_result_v1_interface       )
+  ]
+ )

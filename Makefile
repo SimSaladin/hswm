@@ -36,8 +36,14 @@ HS_BIND_GEN	:= hs-bindgen-cli preprocess \
 
 bindgen: bindgen-wayland bindgen-river bindgen-pixman-1
 
-bindgen-wayland:	$(bindGenSpecDir)/Generated.Wayland.*.yaml
-bindgen-river:	$(bindGenSpecDir)/Generated.River.*.yaml
+bindgen-wayland:	$(bindGenSpecDir)/Generated.Wayland.Util.yaml $(bindGenSpecDir)/Generated.Wayland.Client.yaml
+bindgen-river:	\
+	$(bindGenSpecDir)/Generated.River.InputManagementV1.yaml \
+	$(bindGenSpecDir)/Generated.River.WindowManagementV1.yaml \
+	$(bindGenSpecDir)/Generated.River.XkbConfigV1.yaml \
+	$(bindGenSpecDir)/Generated.River.XkbBindingsV1.yaml \
+	$(bindGenSpecDir)/Generated.River.LibinputConfigV1.yaml \
+	$(bindGenSpecDir)/Generated.River.LayoutShellV1.yaml
 
 $(bindGenSpecDir)/Generated.Wayland.Util.yaml: FORCE
 	$(HS_BIND_GEN) --unique-id hswm_wl_util wayland-util.h \

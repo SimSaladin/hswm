@@ -1,0 +1,716 @@
+version:
+  hs_bindgen: 0.1.0
+  binding_specification: '1.0'
+hsmodule: Generated.River.LibinputConfigV1
+ctypes:
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: struct river_input_device_v1
+  hsname: River_input_device_v1
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: struct river_libinput_accel_config_v1
+  hsname: River_libinput_accel_config_v1
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: struct river_libinput_config_v1
+  hsname: River_libinput_config_v1
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: struct river_libinput_device_v1
+  hsname: River_libinput_device_v1
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: struct river_libinput_result_v1
+  hsname: River_libinput_result_v1
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: enum river_libinput_config_v1_error
+  hsname: River_libinput_config_v1_error
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: struct river_libinput_config_v1_listener
+  hsname: River_libinput_config_v1_listener
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: enum river_libinput_device_v1_error
+  hsname: River_libinput_device_v1_error
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: enum river_libinput_device_v1_send_events_modes
+  hsname: River_libinput_device_v1_send_events_modes
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: enum river_libinput_device_v1_tap_state
+  hsname: River_libinput_device_v1_tap_state
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: enum river_libinput_device_v1_tap_button_map
+  hsname: River_libinput_device_v1_tap_button_map
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: enum river_libinput_device_v1_drag_state
+  hsname: River_libinput_device_v1_drag_state
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: enum river_libinput_device_v1_drag_lock_state
+  hsname: River_libinput_device_v1_drag_lock_state
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: enum river_libinput_device_v1_three_finger_drag_state
+  hsname: River_libinput_device_v1_three_finger_drag_state
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: enum river_libinput_device_v1_accel_profile
+  hsname: River_libinput_device_v1_accel_profile
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: enum river_libinput_device_v1_accel_profiles
+  hsname: River_libinput_device_v1_accel_profiles
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: enum river_libinput_device_v1_natural_scroll_state
+  hsname: River_libinput_device_v1_natural_scroll_state
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: enum river_libinput_device_v1_left_handed_state
+  hsname: River_libinput_device_v1_left_handed_state
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: enum river_libinput_device_v1_click_method
+  hsname: River_libinput_device_v1_click_method
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: enum river_libinput_device_v1_click_methods
+  hsname: River_libinput_device_v1_click_methods
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: enum river_libinput_device_v1_clickfinger_button_map
+  hsname: River_libinput_device_v1_clickfinger_button_map
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: enum river_libinput_device_v1_middle_emulation_state
+  hsname: River_libinput_device_v1_middle_emulation_state
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: enum river_libinput_device_v1_scroll_method
+  hsname: River_libinput_device_v1_scroll_method
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: enum river_libinput_device_v1_scroll_methods
+  hsname: River_libinput_device_v1_scroll_methods
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: enum river_libinput_device_v1_scroll_button_lock_state
+  hsname: River_libinput_device_v1_scroll_button_lock_state
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: enum river_libinput_device_v1_dwt_state
+  hsname: River_libinput_device_v1_dwt_state
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: enum river_libinput_device_v1_dwtp_state
+  hsname: River_libinput_device_v1_dwtp_state
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: struct river_libinput_device_v1_listener
+  hsname: River_libinput_device_v1_listener
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: enum river_libinput_accel_config_v1_error
+  hsname: River_libinput_accel_config_v1_error
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: enum river_libinput_accel_config_v1_accel_type
+  hsname: River_libinput_accel_config_v1_accel_type
+- headers: river-libinput-config-v1-client-protocol.h
+  cname: struct river_libinput_result_v1_listener
+  hsname: River_libinput_result_v1_listener
+hstypes:
+- hsname: River_input_device_v1
+  representation: emptydata
+- hsname: River_libinput_accel_config_v1
+  representation: emptydata
+- hsname: River_libinput_accel_config_v1_accel_type
+  representation:
+    newtype:
+      constructor: River_libinput_accel_config_v1_accel_type
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_libinput_accel_config_v1_error
+  representation:
+    newtype:
+      constructor: River_libinput_accel_config_v1_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_libinput_config_v1
+  representation: emptydata
+- hsname: River_libinput_config_v1_error
+  representation:
+    newtype:
+      constructor: River_libinput_config_v1_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_libinput_config_v1_listener
+  representation:
+    record:
+      constructor: River_libinput_config_v1_listener
+      fields:
+      - finished
+      - libinput_device
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_libinput_device_v1
+  representation: emptydata
+- hsname: River_libinput_device_v1_accel_profile
+  representation:
+    newtype:
+      constructor: River_libinput_device_v1_accel_profile
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_libinput_device_v1_accel_profiles
+  representation:
+    newtype:
+      constructor: River_libinput_device_v1_accel_profiles
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_libinput_device_v1_click_method
+  representation:
+    newtype:
+      constructor: River_libinput_device_v1_click_method
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_libinput_device_v1_click_methods
+  representation:
+    newtype:
+      constructor: River_libinput_device_v1_click_methods
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_libinput_device_v1_clickfinger_button_map
+  representation:
+    newtype:
+      constructor: River_libinput_device_v1_clickfinger_button_map
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_libinput_device_v1_drag_lock_state
+  representation:
+    newtype:
+      constructor: River_libinput_device_v1_drag_lock_state
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_libinput_device_v1_drag_state
+  representation:
+    newtype:
+      constructor: River_libinput_device_v1_drag_state
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_libinput_device_v1_dwt_state
+  representation:
+    newtype:
+      constructor: River_libinput_device_v1_dwt_state
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_libinput_device_v1_dwtp_state
+  representation:
+    newtype:
+      constructor: River_libinput_device_v1_dwtp_state
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_libinput_device_v1_error
+  representation:
+    newtype:
+      constructor: River_libinput_device_v1_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_libinput_device_v1_left_handed_state
+  representation:
+    newtype:
+      constructor: River_libinput_device_v1_left_handed_state
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_libinput_device_v1_listener
+  representation:
+    record:
+      constructor: River_libinput_device_v1_listener
+      fields:
+      - removed
+      - input_device
+      - send_events_support
+      - send_events_default
+      - send_events_current
+      - tap_support
+      - tap_default
+      - tap_current
+      - tap_button_map_default
+      - tap_button_map_current
+      - drag_default
+      - drag_current
+      - drag_lock_default
+      - drag_lock_current
+      - three_finger_drag_support
+      - three_finger_drag_default
+      - three_finger_drag_current
+      - calibration_matrix_support
+      - calibration_matrix_default
+      - calibration_matrix_current
+      - accel_profiles_support
+      - accel_profile_default
+      - accel_profile_current
+      - accel_speed_default
+      - accel_speed_current
+      - natural_scroll_support
+      - natural_scroll_default
+      - natural_scroll_current
+      - left_handed_support
+      - left_handed_default
+      - left_handed_current
+      - click_method_support
+      - click_method_default
+      - click_method_current
+      - clickfinger_button_map_default
+      - clickfinger_button_map_current
+      - middle_emulation_support
+      - middle_emulation_default
+      - middle_emulation_current
+      - scroll_method_support
+      - scroll_method_default
+      - scroll_method_current
+      - scroll_button_default
+      - scroll_button_current
+      - scroll_button_lock_default
+      - scroll_button_lock_current
+      - dwt_support
+      - dwt_default
+      - dwt_current
+      - dwtp_support
+      - dwtp_default
+      - dwtp_current
+      - rotation_support
+      - rotation_default
+      - rotation_current
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_libinput_device_v1_middle_emulation_state
+  representation:
+    newtype:
+      constructor: River_libinput_device_v1_middle_emulation_state
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_libinput_device_v1_natural_scroll_state
+  representation:
+    newtype:
+      constructor: River_libinput_device_v1_natural_scroll_state
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_libinput_device_v1_scroll_button_lock_state
+  representation:
+    newtype:
+      constructor: River_libinput_device_v1_scroll_button_lock_state
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_libinput_device_v1_scroll_method
+  representation:
+    newtype:
+      constructor: River_libinput_device_v1_scroll_method
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_libinput_device_v1_scroll_methods
+  representation:
+    newtype:
+      constructor: River_libinput_device_v1_scroll_methods
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_libinput_device_v1_send_events_modes
+  representation:
+    newtype:
+      constructor: River_libinput_device_v1_send_events_modes
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_libinput_device_v1_tap_button_map
+  representation:
+    newtype:
+      constructor: River_libinput_device_v1_tap_button_map
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_libinput_device_v1_tap_state
+  representation:
+    newtype:
+      constructor: River_libinput_device_v1_tap_state
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_libinput_device_v1_three_finger_drag_state
+  representation:
+    newtype:
+      constructor: River_libinput_device_v1_three_finger_drag_state
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_libinput_result_v1
+  representation: emptydata
+- hsname: River_libinput_result_v1_listener
+  representation:
+    record:
+      constructor: River_libinput_result_v1_listener
+      fields:
+      - success
+      - unsupported
+      - invalid
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw

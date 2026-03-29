@@ -14,6 +14,7 @@ import           HSWM.Seats
 import           River
 import           Wayland
 import qualified Wayland.Client as WL
+import qualified River.Interfaces as R
 
 import qualified Data.List as L
 import qualified Data.TMap as TM
@@ -86,10 +87,12 @@ startHSWM display config = withStdoutLogging $ do
     _wl_shm <- getOrCreateObject $ requireGlobal conf.globals ("wl_shm", 1) $ \(WlRegistry r) n v ->
       io $ WL.wl_registry_bind (castPtr r) n WL.wl_shm_interface (fi v) >>= return . castPtr @_ @WL.Wl_shm
 
-    -- TODO:
-    -- ("river_libinput_config_v1", 1)
+    -- river layer shell
+    _r_layerShell <- getOrCreateObject $ requireGlobal conf.globals ("river_layer_shell_v1", 1) $ \(WlRegistry r) n v ->
+      io $ WL.wl_registry_bind (castPtr r) n WL.wl_shm_interface (fi v) >>= return . castPtr @_ @R.RiverLayerShellV1
 
-    -- ("river_layer_shell_v1", 1)
+    _riverLibinputConfig <- getOrCreateObject $ requireGlobal conf.globals ("river_libinput_config_v1", 1) $ \(WlRegistry r) n v ->
+      io $ WL.wl_registry_bind (castPtr r) n WL.wl_shm_interface (fi v) >>= return . castPtr @_ @R.RiverLibinputConfigV1
 
     windowManager <- getOrCreateObject $ requireGlobal conf.globals ("river_window_manager_v1", 4) $ \r n v -> wl_registry_bind r n river_window_manager_v1_interface v <&> RiverWindowManager
     _xkbBindings  <- getOrCreateObject $ requireGlobal conf.globals ("river_xkb_bindings_v1"  , 1) $ \r n v -> wl_registry_bind r n river_xkb_bindings_v1_interface   v <&> RiverXkbBindings
