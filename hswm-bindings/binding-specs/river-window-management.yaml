@@ -1,0 +1,19 @@
+version:
+  hs_bindgen: 0.1.0
+  binding_specification: '1.0'
+hsmodule: Generated.River.RiverWindowManagementV1
+ctypes:
+- cname: struct river_output_v1
+  hsname: River_output_v1
+  headers: &headers
+  - river-layer-shell-v1-client-protocol.h
+  - river-xkb-bindings-v1-client-protocol.h
+- cname: struct river_seat_v1
+  hsname: River_seat_v1
+  headers: *headers
+
+hstypes:
+- hsname: River_output_v1
+  representation: emptydata
+- hsname: River_seat_v1
+  representation: emptydata

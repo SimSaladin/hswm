@@ -1,0 +1,24 @@
+version:
+  hs_bindgen: 0.1.0
+  binding_specification: '1.0'
+hsmodule: Generated.Wayland.Client
+ctypes:
+- headers: &headers
+  - river-window-management-v1-client-protocol.h
+  - river-input-management-v1-client-protocol.h
+  cname: struct wl_output
+  hsname: Wl_output
+- headers: *headers
+  cname: struct wl_seat
+  hsname: Wl_seat
+- headers: *headers
+  cname: struct wl_surface
+  hsname: Wl_surface
+
+hstypes:
+- hsname: Wl_output
+  representation: emptydata
+- hsname: Wl_seat
+  representation: emptydata
+- hsname: Wl_surface
+  representation: emptydata
