@@ -7,7 +7,10 @@ import qualified HSWM.StackSet as W
 import           HSWM.Types
 import           River
 import System.IO
+import qualified System.Posix as Posix
 import System.Posix.Process (executeFile)
+import System.Directory (removeFile)
+import Foreign (IntPtr, ptrToIntPtr, intPtrToPtr)
 
 windows :: H ()
 windows = do
@@ -60,8 +63,7 @@ windows = do
 
     mapM_ (\(a,b,c) -> tileWindow c a b) rects
 
-    whenJust (W.peek ws) $ \w ->
-      setWindowBorder w =<< asks (focusedBorder . config)
+    whenJust (W.peek ws) $ \w -> setWindowBorder w =<< asks (focusedBorder . config)
 
     mapM_ reveal visible
     setTopFocus
@@ -80,7 +82,7 @@ scaleRationalRect (Rectangle sx sy sw sh) (W.RationalRect rx ry rw rh)
 
 --------------------------------------------------------------
 
--- | Draw borders on the the window.
+-- | /render sequence/ Draw borders on the the window.
 setWindowBorder :: RiverWindow -> RiverColor -> H ()
 setWindowBorder w RiverColor {red = wb_r, green = wb_g, blue = wb_b, alpha = wb_a} = withWindow w $ \_ -> do
     wb_width <- asks (borderWidth . config)
@@ -88,43 +90,48 @@ setWindowBorder w RiverColor {red = wb_r, green = wb_g, blue = wb_b, alpha = wb_
     let borders = WindowBorders{..}
     liftIO $ riverWindowV1SetBorders w borders
 
--- | Move and resize @w@ such that it fits inside the given rectangle,
--- including its border.
+-- | TODO Mixed manage / render
+-- Move and resize @w@ such that it fits inside the given rectangle, including its border.
 tileWindow :: Bool -> RiverWindow -> Rectangle -> H ()
 tileWindow placeTop i r = withWindow i $ \w -> do
     bw <- asks (fi . borderWidth . config)
     -- give all windows at least 1x1 pixels
     let least x | x <= bw*2  = 1
                 | otherwise  = x - bw*2
+    -- /manage/
     io $ river_window_v1_propose_dimensions w.river_window (least $ fi r.width) (least $ fi r.height)
+    -- render
     io $ setNodePosition w.node (fi r.x + bw) (fi r.y + bw)
-    when placeTop $ io $  river_node_v1_place_top w.node
+    -- render
+    when placeTop $ io $ river_node_v1_place_top w.node
 
+-- | /render sequence/
 reveal :: RiverWindow -> H ()
-reveal rw = withWindow rw $ \_ -> do
-  debug' $ "window: show " <> tshow rw
-  io $ river_window_v1_show rw
+reveal rw = withWindow rw $ \_ -> io $ river_window_v1_show rw
 
+-- | /render sequence/
 hide :: RiverWindow -> H ()
-hide rw = withWindow rw $ \_ -> do
-  debug' $ "window: hide " <> tshow rw
-  io $ river_window_v1_hide rw
+hide rw = withWindow rw $ \_ -> io $ river_window_v1_hide rw
 
--- | Set the focus to the window on top of the stack, or root
-setTopFocus :: H ()
-setTopFocus = withWindowSet $ maybe (pure ()) setFocusH . W.peek
-
+-- | /manage sequence/ focus a window in every seat.
 setFocusH :: RiverWindow -> H ()
-setFocusH rw = do
-  mapSeats $ \s -> do
-    io $ river_seat_v1_focus_window s.river_seat rw
+setFocusH rw = mapSeats $ \s -> io $ river_seat_v1_focus_window s.river_seat rw
 
+-- | TODO Mixed manage / render
 setInitialProperties :: RiverWindow -> H ()
 setInitialProperties rw = do
+  -- manage sequence
   io $ riverWindowV1UseSsd rw
+  -- manage sequence
   io $ riverWindowV1SetCapabilities rw (fi $ foldl' (.|.) 0 $ map fromEnum [Maximize, Fullscreen])
+  -- manage sequence
   io $ riverWindowV1SetTiled rw (fi $ foldl' (.|.) 0 $ map fromEnum [EdgeTop, EdgeBottom, EdgeLeft, EdgeRight])
+  -- render sequence
   setWindowBorder rw =<< asks (normalBorder . config)
+
+-- | Force new manage sequence.
+manageDirty :: H ()
+manageDirty = withObject (io . riverWindowManagerManageDirty)
 
 --------------------------------------------------------------
 
@@ -177,10 +184,12 @@ updateLayout :: WorkspaceId -> Maybe (Layout RiverWindow) -> H ()
 updateLayout i ml = whenJust ml $ \l ->
     runOnWorkspaces $ \ww -> return $ if W.tag ww == i then ww { W.layout = l} else ww
 
-manageDirty :: H ()
-manageDirty = withObject (io . riverWindowManagerManageDirty)
-
 --------------------------------------------------------------
+-- * WindowSet etc. modifications
+
+-- | Set the focus to the window on top of the stack, or root
+setTopFocus :: H ()
+setTopFocus = withWindowSet $ maybe (pure ()) setFocusH . W.peek
 
 -- | This is basically a map function, running a function in the 'H' monad on
 -- each workspace with the output of that function being the modified workspace.
@@ -255,11 +264,11 @@ modifyWindow w f = modify $ \s -> s { _windows = map g s._windows }
 mapWindows :: (Window -> H ()) -> H ()
 mapWindows f = gets _windows >>= mapM_ f
 
-
 -------------------------------------------------------------------
+-- * Restart with state
 
 data StateData = StateData
-  { sfWins :: W.StackSet  WorkspaceId String RiverWindow WorkspaceDetail ScreenId ScreenDetail
+  { sfWins :: W.StackSet WorkspaceId String (IntPtr, String) WorkspaceDetail ScreenId ScreenDetail
   , sfExt  :: [(String, String)]
   } deriving (Show, Read)
 
@@ -267,13 +276,17 @@ restart :: String -> H ()
 restart prog = do
   broadcastMessage ReleaseResources
   writeStateToFile
-  io $ (executeFile prog True [] Nothing) `catch`
+  io $ executeFile prog True [] Nothing `catch`
     (\(SomeException e) -> hPrint stderr e >> hFlush stderr)
 
 writeStateToFile :: H ()
 writeStateToFile = do
   let path = ".hswm.state"
-      wsData = W.mapLayout show . windowset
+      wsData s = W.mapLayout show $ W.mapWindow winIdent $ windowset s
+        where
+          winIdent w
+            | Just win <- L.find (\x -> x.river_window == w) s._windows = (ptrToIntPtr w, win.identifier)
+            | otherwise = (ptrToIntPtr w, "")
       extState _ = [] -- TODO
   stateData <- gets $ \s -> StateData (wsData s) (extState s)
   catchIO $ writeFile path $ show stateData
@@ -281,3 +294,46 @@ writeStateToFile = do
 
 catchIO :: MonadIO m => IO () -> m ()
 catchIO f = io (f `catch` \(SomeException e) -> hPrint stderr e >> hFlush stderr)
+
+
+-- | Read the state of a previous xmonad instance from a file and
+-- return that state.  The state file is removed after reading it.
+readStateFile :: (LayoutClass l RiverWindow, Read (l RiverWindow)) => HSWMConfig l -> IO (Maybe HState)
+readStateFile xmc = do
+    let path = ".hswm.state"
+
+    -- I'm trying really hard here to make sure we read the entire
+    -- contents of the file before it is removed from the file system.
+    res <- try @SomeException $ do
+        raw <- withFile path ReadMode readStrict
+        return $! maybeRead reads raw
+    try @SomeException $ io (removeFile path)
+
+    case res of
+       Left e -> print e >> return Nothing
+       Right sf' -> return $ do
+          sf <- sf'
+
+          let wins = W.allWindows (sfWins sf)
+          let winset = W.ensureTags layout (workspaces xmc) $
+                W.mapLayout (fromMaybe layout . maybeRead lreads) $
+                  W.mapWindow (intPtrToPtr . fst) (sfWins sf)
+              --extState = M.fromList . map (second Left) $ sfExt sf
+
+          return def
+            { windowset = winset
+            , windowsetOld = winset
+            , recoveredWindows = M.fromList [ (b, intPtrToPtr a) | (a,b) <- wins ]
+            }
+  where
+    layout = Layout (layoutHook xmc)
+    lreads = readsLayout layout
+    maybeRead reads' s = case reads' s of
+                           [(x, "")] -> Just x
+                           _         -> Nothing
+
+    readStrict :: Handle -> IO String
+    readStrict h = hGetContents h >>= \s -> length s `seq` return s
+
+sendRestart :: H ()
+sendRestart = io $ Posix.raiseSignal Posix.sigUSR1

@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveAnyClass #-}
+
 ------------------------------------------------------------------------------
 -- |
 -- Module      : HSWM.StackSet
@@ -20,6 +22,7 @@ import qualified Data.Map as M
 import qualified Data.List as L
 import qualified Data.List.NonEmpty as NE
 import Data.List.NonEmpty (NonEmpty((:|)))
+import GHC.Generics  (Generic)
 
 ------------------------------------------------------------------------
 -- |
@@ -35,6 +38,7 @@ data StackSet i l a wd sid sd =
              , hidden   :: [Workspace i l a wd]         -- ^ workspaces not visible anywhere
              , floating :: M.Map a RationalRect      -- ^ floating windows
              } deriving (Show, Read, Eq)
+             deriving (Generic, Default)
 
 -- | Visible workspaces, and their outputs.
 data Screen i l a wd sid sd = Screen
@@ -42,6 +46,7 @@ data Screen i l a wd sid sd = Screen
   , screen       :: !sid
   , screenDetail :: !sd
   } deriving (Show, Read, Eq)
+             deriving (Generic, Default)
 
 -- |
 -- A workspace is just a tag, a layout, and a stack.
@@ -52,6 +57,7 @@ data Workspace i l a wd = Workspace
   , stack           :: Maybe (Stack a)
   , workspaceDetail :: !wd
   } deriving (Show, Read, Eq)
+             deriving (Generic, Default)
 
 -- |
 -- A stack is a cursor onto a window list.
@@ -75,6 +81,7 @@ data Stack a = Stack { focus  :: !a        -- focused thing in this set
                      , up     :: [a]       -- clowns to the left
                      , down   :: [a] }     -- jokers to the right
     deriving (Show, Read, Eq, Functor)
+             deriving (Generic, Default)
 
 instance Foldable Stack where
     toList = integrate
@@ -345,6 +352,13 @@ mapLayout f (StackSet v vs hs m) = StackSet (fScreen v) (map fScreen vs) (map fW
  where
     fScreen (Screen ws s sd) = Screen (fWorkspace ws) s sd
     fWorkspace (Workspace t l s wd) = Workspace t (f l) s wd
+
+mapWindow :: Ord a' => (a -> a') -> StackSet i l a wd s sd -> StackSet i l a' wd s sd
+mapWindow f (StackSet v vs hs m) = StackSet (fScreen v) (map fScreen vs) (map fWorkspace hs) (fFloating m)
+ where
+    fScreen (Screen ws s sd) = Screen (fWorkspace ws) s sd
+    fWorkspace (Workspace t l s wd) = Workspace t l (fmap (fmap f) s) wd
+    fFloating fls = M.fromList $ [ (f k, x) | (k, x) <- M.toList fls ]
 
 -- | /O(n)/. Is a window in the 'StackSet'?
 member :: Eq a => a -> StackSet i l a wd s sd -> Bool

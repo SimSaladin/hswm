@@ -54,7 +54,9 @@ library
           HSWM.Utils
           HSWM.Types
           HSWM.StackSet
+          HSWM.BufferPool
           HSWM.Seats
+          HSWM.Outputs
           HSWM.Operations
           HSWM.Main
           HSWM.Layout

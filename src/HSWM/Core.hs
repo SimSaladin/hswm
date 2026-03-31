@@ -1,4 +1,5 @@
 {-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DefaultSignatures #-}
 
 ------------------------------------------------------------------------------
@@ -16,20 +17,24 @@
 ------------------------------------------------------------------------------
 module HSWM.Core where
 
+import           HSWM.StackSet (Stack, Workspace(..))
+import qualified HSWM.StackSet as W
+import           HSWM.XKB
+
 import           Data.Monoid (Ap(..))
 import qualified Data.TMap as TM
+import qualified Data.Map as M
 import           Data.Typeable
 import           Foreign
 import           System.Exit (ExitCode(..))
 import           Data.IORef
+import GHC.Generics
 
-import           HSWM.StackSet (Stack, Workspace(..))
-import qualified HSWM.StackSet as W
-import           HSWM.XKB
 import           River
 import           Wayland
 import qualified Wayland.Client as WL
 import qualified River.Safe as R
+
 import qualified Generated.River.LayerShellV1 as R
 
 -- | User configuration
@@ -42,11 +47,19 @@ data HSWMConfig l = HSWMConfig
   , focusedBorder   :: !RiverColor
   , borderEdges     :: !Int32
   , startupHook     :: !(H ())
+  , exitHook        :: !(H ())
   , handleEventHook :: !(Event -> H All)
   , layoutHook      :: !(l RiverWindow)
+  , manageHook      :: !(H ())
+  , renderHook      :: !(H ())
   , logHook         :: !(H ())
   , xkbLayout       :: !(Maybe XkbRuleNames) -- ^ Keyboard layout set for connected keyboards
-  }
+  , workspaces      :: [WorkspaceId]
+  } deriving stock (Generic)
+
+deriving anyclass instance Default (HSWMConfig Layout)
+instance Default (Event -> H All) where def = \_ -> mempty
+instance Default (H ()) where def = return ()
 
 -- | The read-only window manager state.
 data HConf = HConf
@@ -56,15 +69,22 @@ data HConf = HConf
   , globals :: !(IORef RegistryCache)
   }
 
+newtype TypeMap = TypeMap { unTypeMap :: TM.TMap }
+  deriving (Show)
+
+instance Default TypeMap where
+  def = TypeMap TM.empty
+
 -- | Mutable stete.
 data HState = HState
   { windowset      :: !WindowSet
   , windowsetOld   :: !WindowSet
-  , wlObjects      :: !TM.TMap
+  , wlObjects      :: !TypeMap
   , _seats         :: [Seat]
   , _outputs       :: [Output]
   , _windows       :: [Window]
-  }
+  , recoveredWindows :: !(M.Map String RiverWindow)
+  } deriving (Generic, Default)
 
 -- | Mash-up of all River/Wayland generated events
 data Event = WindowManagerEvent !WindowManagerEvent
@@ -73,6 +93,7 @@ data Event = WindowManagerEvent !WindowManagerEvent
            | SeatEvent !SeatEvent
            | PointerEvent !PointerEvent
            | XkbEvent !XkbEvent
+           | XkbSeatEvent !R.RiverXkbBindingsSeatV1Event
            | XkbConfigEvent !RiverXkbConfigV1Event
            | XkbKeyboardEvent !RiverXkbKeyboardV1Event
            | WlOutputEvent !WL.WlOutputEvent
@@ -83,7 +104,7 @@ data Event = WindowManagerEvent !WindowManagerEvent
            | InputManagerEvent !R.RiverInputManagerV1Event
            | InputDeviceEvent !R.RiverInputDeviceV1Event
            | LibinputConfigEvent !R.RiverLibinputConfigV1Event
-           deriving (Show)
+           deriving (Show, Generic)
 
 type WindowSet   = W.StackSet  WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail ScreenId ScreenDetail
 type WindowSpace = W.Workspace WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail
@@ -92,17 +113,18 @@ type WindowSpace = W.Workspace WorkspaceId (Layout RiverWindow) RiverWindow Work
 type WorkspaceId = String
 
 -- | Physical screen indices
-newtype ScreenId = S Int deriving (Eq,Ord,Show,Read,Enum,Num,Integral,Real)
+newtype ScreenId = S Int
+  deriving stock (Eq,Show,Read,Generic)
+  deriving newtype (Ord,Enum,Num,Integral,Real)
+instance Default ScreenId where
+  def = S (-1)
 
 -- | The output dimensions
 data ScreenDetail = SD { x, y, width, height :: !Int }
-  deriving (Eq, Show, Read)
+  deriving (Eq, Show, Read, Generic, Default)
 
 data WorkspaceDetail = WD
-  deriving (Eq, Show, Read)
-
-instance Default WorkspaceDetail where
-  def = WD
+  deriving (Eq, Show, Read, Generic, Default)
 
 -------------------------------------------------------------------------
 -- Layouts
@@ -216,6 +238,8 @@ data Full a = Full deriving (Show, Read)
 
 instance LayoutClass Full a
 
+instance Default (Layout a) where
+  def = Layout $ Full
 
 --------------------------------------------------------------
 -- Layout messages
@@ -247,7 +271,7 @@ instance Message Event
 -- layouts) should consider handling.
 data LayoutMessages = Hide              -- ^ sent when a layout becomes non-visible
                     | ReleaseResources  -- ^ sent when xmonad is exiting or restarting
-    deriving Eq
+    deriving (Eq, Show)
 
 instance Message LayoutMessages
 
@@ -255,7 +279,7 @@ instance Message LayoutMessages
 
 -- a la xmonad
 newtype H a = H (ReaderT HConf (StateT HState IO) a)
-  deriving (Functor, Applicative, Monad, MonadFail, MonadIO, MonadState HState, MonadReader HConf)
+  deriving newtype (Functor, Applicative, Monad, MonadFail, MonadIO, MonadState HState, MonadReader HConf)
   deriving (Semigroup, Monoid) via Ap H a
 
 -- a la xmonad
@@ -287,9 +311,16 @@ userCode a = catchH (Just <$> a) (return Nothing)
 userCodeDef :: a -> H a -> H a
 userCodeDef defValue a = fromMaybe defValue <$> userCode a
 
+data SeatAction = S_NONE
+                | S_SUBMAP_NEXT_KEY SomeAction [StablePtr (XkbBinding SomeAction)]
+                | S_SUBMAP_CANCEL
+                deriving (Generic)
+
+instance Default SeatAction where def = S_NONE
+
 data Seat = Seat
   { river_seat                           :: RiverSeat
-  , new                                  :: Bool
+  , xkb_bindings_seat                    :: R.RiverXkbBindingsSeatV1
   , removed                              :: Bool
   , focused, hovered, interacted         :: RiverWindow
   , op_window                            :: RiverWindow
@@ -300,14 +331,15 @@ data Seat = Seat
   , op_edges                             :: Int32
   , xkb_bindings                         :: [StablePtr (XkbBinding SomeAction)]
   , pointer_bindings                     :: [StablePtr (PointerBinding SomeAction)]
-  , pending_action                       :: !(Maybe SomeAction)
+  , pending_action                       :: !SeatAction
+  , submap_pending :: Maybe (SomeAction, [StablePtr (XkbBinding SomeAction)])
   , river_layer_shell_seat :: Ptr R.River_layer_shell_seat_v1
-  }
+  } deriving (Generic)
 
 instance Default Seat where
   def = Seat
     { river_seat = nullPtr
-    , new = True
+    , xkb_bindings_seat = nullPtr
     , removed = False
     , focused = invalidWindow
     , hovered = invalidWindow
@@ -324,7 +356,8 @@ instance Default Seat where
     , op_edges = 0
     , xkb_bindings = mempty
     , pointer_bindings = mempty
-    , pending_action = Nothing
+    , pending_action = S_NONE
+    , submap_pending = Nothing
     , river_layer_shell_seat = nullPtr
     }
 
@@ -334,16 +367,18 @@ data SeatOp = SEAT_OP_NONE
             | SEAT_OP_RESIZE
 
 data Output = Output
-  { river_output        :: RiverOutput
-  , width, height, x, y :: !Int32
-  , screen              :: !ScreenId
-  , new                 :: Bool
-  , river_layerShellOutput    :: Ptr R.River_layer_shell_output_v1
-  , nonExclusive :: Maybe (Int32, Int32, Int32, Int32) -- x, y, w, h
-  } deriving Show
+  { river_output           :: !RiverOutput
+  , width, height, x, y    :: !Int32
+  , scale                  :: !Int32
+  , screen                 :: !ScreenId
+  , outputName             :: !String
+  , outputDescription      :: !String
+  , river_layerShellOutput :: !(Ptr R.River_layer_shell_output_v1)
+  , nonExclusive           :: Maybe (Int32, Int32, Int32, Int32) -- x, y, w, h
+  } deriving (Show, Generic)
 
 instance Default Output where
-  def = Output nullPtr 0 0 0 0 (S (-1)) True nullPtr Nothing
+  def = Output nullPtr 0 0 0 0 0 (S (-1)) "" "" nullPtr Nothing
 
 data Window = Window
   { river_window                   :: RiverWindow
@@ -357,6 +392,7 @@ data Window = Window
   , appId                          :: String
   , title                          :: String
   , min_height, min_width, max_height, max_width :: Int
+  , identifier :: String
   } deriving Show
 
 instance Default Window where
@@ -378,6 +414,7 @@ instance Default Window where
     , min_width = 0
     , max_height = maxBound
     , max_width = maxBound
+    , identifier = ""
     }
 
 -------------------------------------------------------
@@ -393,39 +430,48 @@ modifyWindowSet f = modify' $ \s -> s { windowset = f (windowset s) }
 -- $wlObjects
 
 getOrCreateObject :: (Typeable a, MonadState HState m, MonadIO m) => IO a -> m a
-getOrCreateObject m = gets (TM.lookup . wlObjects) >>= \case
+getOrCreateObject m = gets (TM.lookup . unTypeMap . wlObjects) >>= \case
   Just x -> return x
-  Nothing -> liftIO m >>= \x -> withWlObjects (TM.insert x) >> return x
+  Nothing -> liftIO m >>= \x -> modifyWlObjects (TM.insert x) >> return x
 
-withWlObjects :: MonadState HState m => (TM.TMap -> TM.TMap) -> m ()
-withWlObjects f = modify $ \s -> s { wlObjects = f $! wlObjects s }
+modifyWlObjects :: MonadState HState m => (TM.TMap -> TM.TMap) -> m ()
+modifyWlObjects f = modify $ \s -> s { wlObjects = TypeMap $ f $! unTypeMap $ wlObjects s }
+
+withObjects :: MonadState HState m => (TM.TMap -> m a) -> m a
+withObjects f = gets (unTypeMap . wlObjects) >>= f
+
+putObject :: Typeable a => a -> H ()
+putObject x = modifyWlObjects $ TM.insert x
 
 getObject :: Typeable a => H a
-getObject = gets (TM.lookup . wlObjects) >>= \case
-  Nothing -> error "getObject: no such object"
+getObject = gets (TM.lookup . unTypeMap . wlObjects) >>= \case
+  (Nothing :: Maybe a) -> error ("getObject: no such object: " ++ show (typeRep (Proxy :: Proxy a)))
   Just x -> return x
 
 withObject :: (Typeable a) => (a -> H b) -> H b
-withObject f = gets (TM.lookup . wlObjects) >>= \case
-  Nothing -> error "withObject: no such object"
+withObject f = gets (TM.lookup . unTypeMap . wlObjects) >>= \case
+  (Nothing :: Maybe a) -> error ("withObject: no such object: " ++ show (typeRep (Proxy :: Proxy a)))
   Just x -> f x
 
 withObjectDef :: (Typeable a, MonadState HState m) => b -> (a -> m b) -> m b
-withObjectDef od f = gets (TM.lookup . wlObjects) >>= \case
+withObjectDef od f = gets (TM.lookup . unTypeMap . wlObjects) >>= \case
   Nothing -> return od
   Just x -> f x
 
 ---------------------------------------------------------
 -- Actions
 
-toSomeAction :: IsAction a => a -> SomeAction
-toSomeAction = SomeAction
-
 data SomeAction where
   SomeAction :: forall a. IsAction a => a -> SomeAction
 
+toSomeAction :: IsAction a => a -> SomeAction
+toSomeAction = SomeAction
+
 class IsAction a where
   runner :: a -> H ()
+
+  actionSubmap :: a -> [((ModMask, KeySym), SomeAction)]
+  actionSubmap _ = []
 
   -- | Description based on the value (defaults to type info)
   actionDescription :: a -> String
@@ -437,9 +483,19 @@ class IsAction a where
   typeDescription = show . typeOf
 
 instance IsAction SomeAction where
-  runner          (SomeAction a) = runner a
-  actionDescription     (SomeAction a) = actionDescription a
-  typeDescription (SomeAction a) = typeDescription a
+  runner             (SomeAction a) = runner a
+  actionSubmap       (SomeAction a) = actionSubmap a
+  actionDescription  (SomeAction a) = actionDescription a
+  typeDescription    (SomeAction a) = typeDescription a
 
 instance Show SomeAction where
   show (SomeAction a) = actionDescription a
+
+data Submap = Submap { submapKeys :: [((ModMask, KeySym), SomeAction)]
+                     , submapDefault :: Maybe SomeAction
+                     } deriving (Show)
+
+instance IsAction Submap where
+  runner Submap{..} = whenJust submapDefault runner
+  actionSubmap Submap{..} = submapKeys
+  --actionDescription Submap{..} = "Submap"

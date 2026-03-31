@@ -7,23 +7,25 @@ import qualified HSWM.Wallpaper
 import qualified HSWM.StackSet as W
 
 main :: IO ()
-main = hswm $ addKeys myKeys def
+main = hswm
+  $ addKeys myKeys
+  $ HSWM.Wallpaper.usingWallpaper HSWM.Wallpaper.Config { filepath = "/home/sim/wallpaper.png" }
+  (def @(HSWMConfig Full))
   { layoutHook = Tall 1 (3/100) (1/2) ||| Full
-  , startupHook = HSWM.Wallpaper.startupHook HSWM.Wallpaper.Config { filepath = "/home/sim/wallpaper.png" }
-  , handleEventHook = debugHook <> HSWM.Wallpaper.handleEventHook
+  , handleEventHook = debugHook
   , xkbLayout = Just $
     XkbRuleNames { rules = ""
                  , model = "pc104"
                  , layout = "dvp-my"
                  , variant = "dvp-my"
-                 , options = "terminate:ctrl_alt_bksp,compose:rctrl-altgr,lv3:ralt_switch,lv3:menu_switch"
-                 }
+                 , options = "terminate:ctrl_alt_bksp,compose:rctrl-altgr,lv3:ralt_switch,lv3:menu_switch" }
   , pointerBindings =
     [ (("M", _BTN_LEFT), namedA "Move" $ return ())
-    , (("M", _BTN_RIGHT), namedA "RIGHT" $ return ())
-    ]
+    , (("M", _BTN_RIGHT), namedA "RIGHT" $ return ()) ]
   }
+
   where
+
   myKeys =
     [ (("M", "n" :: String), windowsA "Focus down" W.focusDown)
     , (("M", "p" :: String), windowsA "Focus up" W.focusUp)
@@ -37,27 +39,29 @@ main = hswm $ addKeys myKeys def
     , (("M", "Period"),      messageA $ IncMasterN 1)
     , (("M", "x"),      messageA Shrink)
     , (("M-S", "x"),      messageA Expand)
+    , (("M-S", "q"),      namedA "Restart" sendRestart)
+    , (("M", "r"), submap Nothing
+            [ ((0, "r"), namedA "Foo" $ log' "Submap: r")
+            ])
     ]
 
 debugHook :: Event -> H All
 debugHook ev
    | WindowManagerEvent WindowManagerManageStart{} <- ev = mempty
    | WindowManagerEvent WindowManagerRenderStart{} <- ev = mempty
-
-   | XkbEvent (XkbKeyPressed dt _) <- ev = do
+   | XkbEvent (XkbKeyPressed dt _)   <- ev = do
       (xb :: XkbBinding SomeAction) <- liftIO $ deRefStablePtr (castPtrToStablePtr dt)
       debug' $ toText $ printf "[EH] KEY PRESS ev=%s action=%s" (show ev) (show xb.action)
       pTrace ev
       mempty
-
-   | WlOutputEvent e <- ev = pTrace e >> mempty
-   | SeatEvent e <- ev = pTrace e >> mempty
-   | OutputEvent e <- ev = pTrace e >> mempty
-   | WindowEvent e <- ev = pTrace e >> mempty
-   | XkbKeyboardEvent e <- ev = pTrace e >> mempty
-   | WindowManagerEvent e <- ev = pTrace e >> mempty
-   | WlShmEvent _ <- ev = mempty
-   | otherwise = pTrace ev >> mempty
+   | WlOutputEvent e                 <- ev = pTrace e >> mempty
+   | SeatEvent e                     <- ev = pTrace e >> mempty
+   | OutputEvent e                   <- ev = pTrace e >> mempty
+   | WindowEvent e                   <- ev = pTrace e >> mempty
+   | XkbKeyboardEvent e              <- ev = pTrace e >> mempty
+   | WindowManagerEvent e            <- ev = pTrace e >> mempty
+   | WlShmEvent _                    <- ev = mempty
+   | otherwise                             = pTrace ev >> mempty
 
 debugAction :: H ()
 debugAction = do

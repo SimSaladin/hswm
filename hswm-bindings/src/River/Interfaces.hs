@@ -128,6 +128,7 @@ mkInterface ''G.River_layer_shell_v1     'G.river_layer_shell_v1_interface
 mkInterface ''G.River_input_manager_v1   'G.river_input_manager_v1_interface
 mkInterface ''G.River_window_manager_v1  'G.river_window_manager_v1_interface
 mkInterface ''G.River_xkb_bindings_v1    'G.river_xkb_bindings_v1_interface
+mkInterface ''G.River_xkb_bindings_seat_v1    'G.river_xkb_bindings_seat_v1_interface
 mkInterface ''G.River_xkb_config_v1      'G.river_xkb_config_v1_interface
 mkInterface ''G.River_libinput_config_v1 'G.river_libinput_config_v1_interface
 
@@ -143,7 +144,6 @@ $(getConstPtrs
   , ( "river_seat_v1_interface"                   , 'G.river_seat_v1_interface              )
   , ( "river_pointer_binding_v1_interface"        , 'G.river_pointer_binding_v1_interface   )
   , ( "river_xkb_binding_v1_interface"            , 'G.river_xkb_binding_v1_interface       )
-  , ( "river_xkb_bindings_seat_v1_interface"      , 'G.river_xkb_bindings_seat_v1_interface )
   , ( "river_xkb_keymap_v1_interface"             , 'G.river_xkb_keymap_v1_interface        )
   , ( "river_xkb_keyboard_v1_interface"           , 'G.river_xkb_keyboard_v1_interface      )
   , ( "river_libinput_device_v1_interface"        , 'G.river_libinput_device_v1_interface       )

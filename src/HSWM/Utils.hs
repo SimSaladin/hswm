@@ -61,8 +61,11 @@ resolveModMask d s = go s
                        "c"     -> fi $ fromEnum ModifiersCtrl
                        "ctrl"  -> fi $ fromEnum ModifiersCtrl
                        "mod1"  -> fi $ fromEnum ModifiersMod1
+                       "alt"   -> fi $ fromEnum ModifiersMod1
                        "mod3"  -> fi $ fromEnum ModifiersMod3
                        "mod4"  -> fi $ fromEnum ModifiersMod4
+                       "super" -> fi $ fromEnum ModifiersMod4
+                       "logo"  -> fi $ fromEnum ModifiersMod4
                        "mod5"  -> fi $ fromEnum ModifiersMod5
                        _ -> error $ "unrecognized modifier: " ++ s
 

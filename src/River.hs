@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveAnyClass #-}
+
 ------------------------------------------------------------------------------
 -- |
 -- Module      : River
@@ -22,6 +24,8 @@ import Data.Word (Word32)
 import River.WMP
 import River.XKB.Bindings
 import River.XKB.Config
+import GHC.Generics
 
 data RiverColor = RiverColor { red, green, blue, alpha :: !Word32 }
-  deriving (Show, Read, Eq)
+  deriving (Show, Read, Eq, Generic)
+  deriving (Default)

@@ -27,7 +27,7 @@ module Generated.River.XkbBindingsV1.Safe
     )
   where
 
-import qualified Generated.River.RiverWindowManagementV1
+import qualified Generated.River.WindowManagementV1
 import qualified HsBindgen.Runtime.Internal.CAPI
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.LibC
@@ -305,7 +305,7 @@ foreign import ccall safe "hs_bindgen_2f46befd1ac93cc6" hs_bindgen_2f46befd1ac93
 -- __unique:__ @River_XkbBindingsV1_Generated.River.XkbBindingsV1_Safe_river_xkb_bindings_v1_get_xkb_binding@
 hs_bindgen_2f46befd1ac93cc6 ::
      RIP.Ptr River_xkb_bindings_v1
-  -> RIP.Ptr Generated.River.RiverWindowManagementV1.River_seat_v1
+  -> RIP.Ptr Generated.River.WindowManagementV1.River_seat_v1
   -> HsBindgen.Runtime.LibC.Word32
   -> HsBindgen.Runtime.LibC.Word32
   -> IO (RIP.Ptr River_xkb_binding_v1)
@@ -329,7 +329,7 @@ __exported by:__ @river-xkb-bindings-v1-client-protocol.h@
 river_xkb_bindings_v1_get_xkb_binding ::
      RIP.Ptr River_xkb_bindings_v1
      -- ^ __C declaration:__ @river_xkb_bindings_v1@
-  -> RIP.Ptr Generated.River.RiverWindowManagementV1.River_seat_v1
+  -> RIP.Ptr Generated.River.WindowManagementV1.River_seat_v1
      -- ^ __C declaration:__ @seat@
   -> HsBindgen.Runtime.LibC.Word32
      -- ^ __C declaration:__ @keysym@
@@ -348,7 +348,7 @@ foreign import ccall safe "hs_bindgen_0cee457cae9868f0" hs_bindgen_0cee457cae986
 -- __unique:__ @River_XkbBindingsV1_Generated.River.XkbBindingsV1_Safe_river_xkb_bindings_v1_get_seat@
 hs_bindgen_0cee457cae9868f0 ::
      RIP.Ptr River_xkb_bindings_v1
-  -> RIP.Ptr Generated.River.RiverWindowManagementV1.River_seat_v1
+  -> RIP.Ptr Generated.River.WindowManagementV1.River_seat_v1
   -> IO (RIP.Ptr River_xkb_bindings_seat_v1)
 hs_bindgen_0cee457cae9868f0 =
   RIP.fromFFIType hs_bindgen_0cee457cae9868f0_base
@@ -370,7 +370,7 @@ __exported by:__ @river-xkb-bindings-v1-client-protocol.h@
 river_xkb_bindings_v1_get_seat ::
      RIP.Ptr River_xkb_bindings_v1
      -- ^ __C declaration:__ @river_xkb_bindings_v1@
-  -> RIP.Ptr Generated.River.RiverWindowManagementV1.River_seat_v1
+  -> RIP.Ptr Generated.River.WindowManagementV1.River_seat_v1
      -- ^ __C declaration:__ @seat@
   -> IO (RIP.Ptr River_xkb_bindings_seat_v1)
 river_xkb_bindings_v1_get_seat =

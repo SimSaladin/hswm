@@ -1,4 +1,5 @@
 module HSWM.XKB (
+  module HSWM.XKB,
   module HSWM.XKB.FFI
   ) where
 

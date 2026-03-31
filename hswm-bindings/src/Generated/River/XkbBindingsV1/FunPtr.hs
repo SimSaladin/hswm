@@ -27,7 +27,7 @@ module Generated.River.XkbBindingsV1.FunPtr
     )
   where
 
-import qualified Generated.River.RiverWindowManagementV1
+import qualified Generated.River.WindowManagementV1
 import qualified HsBindgen.Runtime.Internal.CAPI
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.LibC
@@ -317,7 +317,7 @@ foreign import ccall unsafe "hs_bindgen_886ebfbecd7b1b23" hs_bindgen_886ebfbecd7
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @River_XkbBindingsV1_Generated.River.XkbBindingsV1_get_river_xkb_bindings_v1_get_xkb_binding@
-hs_bindgen_886ebfbecd7b1b23 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_bindings_v1) -> (RIP.Ptr Generated.River.RiverWindowManagementV1.River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO (RIP.Ptr River_xkb_binding_v1)))
+hs_bindgen_886ebfbecd7b1b23 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_bindings_v1) -> (RIP.Ptr Generated.River.WindowManagementV1.River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO (RIP.Ptr River_xkb_binding_v1)))
 hs_bindgen_886ebfbecd7b1b23 =
   RIP.fromFFIType hs_bindgen_886ebfbecd7b1b23_base
 
@@ -336,7 +336,7 @@ __defined at:__ @river-xkb-bindings-v1-client-protocol.h 227:1@
 
 __exported by:__ @river-xkb-bindings-v1-client-protocol.h@
 -}
-river_xkb_bindings_v1_get_xkb_binding :: RIP.FunPtr ((RIP.Ptr River_xkb_bindings_v1) -> (RIP.Ptr Generated.River.RiverWindowManagementV1.River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO (RIP.Ptr River_xkb_binding_v1))
+river_xkb_bindings_v1_get_xkb_binding :: RIP.FunPtr ((RIP.Ptr River_xkb_bindings_v1) -> (RIP.Ptr Generated.River.WindowManagementV1.River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO (RIP.Ptr River_xkb_binding_v1))
 river_xkb_bindings_v1_get_xkb_binding =
   RIP.unsafePerformIO hs_bindgen_886ebfbecd7b1b23
 
@@ -345,7 +345,7 @@ foreign import ccall unsafe "hs_bindgen_b8862522236bff61" hs_bindgen_b8862522236
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @River_XkbBindingsV1_Generated.River.XkbBindingsV1_get_river_xkb_bindings_v1_get_seat@
-hs_bindgen_b8862522236bff61 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_bindings_v1) -> (RIP.Ptr Generated.River.RiverWindowManagementV1.River_seat_v1) -> IO (RIP.Ptr River_xkb_bindings_seat_v1)))
+hs_bindgen_b8862522236bff61 :: IO (RIP.FunPtr ((RIP.Ptr River_xkb_bindings_v1) -> (RIP.Ptr Generated.River.WindowManagementV1.River_seat_v1) -> IO (RIP.Ptr River_xkb_bindings_seat_v1)))
 hs_bindgen_b8862522236bff61 =
   RIP.fromFFIType hs_bindgen_b8862522236bff61_base
 
@@ -364,7 +364,7 @@ __defined at:__ @river-xkb-bindings-v1-client-protocol.h 246:1@
 
 __exported by:__ @river-xkb-bindings-v1-client-protocol.h@
 -}
-river_xkb_bindings_v1_get_seat :: RIP.FunPtr ((RIP.Ptr River_xkb_bindings_v1) -> (RIP.Ptr Generated.River.RiverWindowManagementV1.River_seat_v1) -> IO (RIP.Ptr River_xkb_bindings_seat_v1))
+river_xkb_bindings_v1_get_seat :: RIP.FunPtr ((RIP.Ptr River_xkb_bindings_v1) -> (RIP.Ptr Generated.River.WindowManagementV1.River_seat_v1) -> IO (RIP.Ptr River_xkb_bindings_seat_v1))
 river_xkb_bindings_v1_get_seat =
   RIP.unsafePerformIO hs_bindgen_b8862522236bff61
 

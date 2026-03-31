@@ -137,5 +137,3 @@ $(bindGenSpecDir)/Generated.River.LibinputConfigV1.yaml: $(HEADERDIR)/river-libi
 	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml
 
 FORCE:
-
-# $(shell pkg-config --cflags xkbcommon)

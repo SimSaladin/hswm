@@ -20,6 +20,11 @@ addKeys keys c = c
     [ ((m, toKeySym k), toSomeAction a) | ((m, k), a) <- keys ]
   }
 
+submap :: (IsAction a, IsKeySym k) => Maybe SomeAction -> [((ModMask, k), a)] -> SomeAction
+submap defAct subKeys = SomeAction $ Submap
+  { submapKeys = [ ((m, toKeySym k), toSomeAction a) | ((m, k), a) <- subKeys ]
+  , submapDefault = SomeAction <$> defAct }
+
 data LaunchProgram = LaunchProgram String [String]
   deriving (Show, Generic)
 

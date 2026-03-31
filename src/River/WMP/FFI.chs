@@ -56,11 +56,8 @@ deriving instance Storable RiverPointerBinding
 deriving instance Storable RiverDecoration
 deriving instance Storable RiverShellSurface
 
-deriving instance Ord RiverWindow
-
 instance IsWlProxy RiverWindowManager where toWlProxy (RiverWindowManager p) = WlProxy (castPtr p)
 instance IsWlProxy RiverDecoration where toWlProxy (RiverDecoration p) = WlProxy (castPtr p)
-instance IsWlProxy RiverWindow where toWlProxy (RiverWindow p) = WlProxy (castPtr p)
 instance IsWlProxy RiverNode where toWlProxy (RiverNode p) = WlProxy (castPtr p)
 instance IsWlProxy RiverPointerBinding where toWlProxy (RiverPointerBinding p) = WlProxy (castPtr p)
 instance IsWlProxy RiverShellSurface where toWlProxy (RiverShellSurface p) = WlProxy (castPtr p)
@@ -107,7 +104,7 @@ instance Exception RiverWindowManagerException
 -- * Misc
 
 invalidWindow :: RiverWindow
-invalidWindow = RiverWindow $ castPtr $ nullPtr
+invalidWindow = nullPtr
 
 invalidSeat :: RiverSeat
 invalidSeat = castPtr $ nullPtr

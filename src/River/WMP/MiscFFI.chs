@@ -53,7 +53,7 @@ mkWindowManagerListener h = do
     {#set river_window_manager_v1_listener.render_start#} p     =<< (wrapListenerCb       $ \dt wm -> h $ WindowManagerRenderStart dt wm)
     {#set river_window_manager_v1_listener.session_locked#} p   =<< (wrapListenerCb       $ \dt wm -> h $ WindowManagerSessionLocked dt wm)
     {#set river_window_manager_v1_listener.session_unlocked#} p =<< (wrapListenerCb       $ \dt wm -> h $ WindowManagerSessionUnlocked dt wm)
-    {#set river_window_manager_v1_listener.window#} p           =<< (wrapListenerWindowCb $ \dt wm a -> h $ WindowManagerWindow dt wm a)
+    {#set river_window_manager_v1_listener.window#} p           =<< (wrapListenerWindowCb $ \dt wm a -> h $ WindowManagerWindow dt wm (castPtr a))
     {#set river_window_manager_v1_listener.output#} p           =<< (wrapListenerOutputCb $ \dt wm a -> h $ WindowManagerOutput dt wm (castPtr a))
     {#set river_window_manager_v1_listener.seat#} p             =<< (wrapListenerSeatCb   $ \dt wm a -> h $ WindowManagerSeat dt wm (castPtr a))
     return p
@@ -76,7 +76,7 @@ data WindowManagerEvent
   deriving (Show)
 
 foreign import ccall "wrapper" wrapListenerCb       :: ListenerCallback (Ptr () -> RiverWindowManager -> IO ())
-foreign import ccall "wrapper" wrapListenerWindowCb :: ListenerCallback (Ptr () -> RiverWindowManager -> RiverWindow -> IO ())
+foreign import ccall "wrapper" wrapListenerWindowCb :: ListenerCallback (Ptr () -> RiverWindowManager -> Ptr () -> IO ())
 foreign import ccall "wrapper" wrapListenerOutputCb :: ListenerCallback (Ptr () -> RiverWindowManager -> Ptr () -> IO ())
 foreign import ccall "wrapper" wrapListenerSeatCb   :: ListenerCallback (Ptr () -> RiverWindowManager -> Ptr () -> IO ())
 
@@ -255,38 +255,38 @@ data WindowEvent
   | WindowIdentifier              { userdata :: !(Ptr ()), window :: !RiverWindow, we_identifier :: !String }
   deriving (Show)
 
-foreign import ccall "wrapper" mk_window_handler        :: ListenerCallback (Ptr () -> RiverWindow -> IO ())
-foreign import ccall "wrapper" mk_window_handler_s      :: ListenerCallback (Ptr () -> RiverWindow -> CString -> IO ())
-foreign import ccall "wrapper" mk_window_handler_w      :: ListenerCallback (Ptr () -> RiverWindow -> RiverWindow -> IO ())
-foreign import ccall "wrapper" mk_window_handler_u      :: ListenerCallback (Ptr () -> RiverWindow -> CUInt -> IO ())
-foreign import ccall "wrapper" mk_window_handler_i      :: ListenerCallback (Ptr () -> RiverWindow -> CInt -> IO ())
-foreign import ccall "wrapper" mk_window_handler_ii     :: ListenerCallback (Ptr () -> RiverWindow -> CInt -> CInt -> IO ())
-foreign import ccall "wrapper" mk_window_handler_iiii   :: ListenerCallback (Ptr () -> RiverWindow -> CInt -> CInt -> CInt -> CInt ->IO ())
-foreign import ccall "wrapper" mk_window_handler_output :: ListenerCallback (Ptr () -> RiverWindow -> Ptr () -> IO ())
-foreign import ccall "wrapper" mk_window_handler_seat   :: ListenerCallback (Ptr () -> RiverWindow -> Ptr () -> IO ())
-foreign import ccall "wrapper" mk_window_handler_seat_u :: ListenerCallback (Ptr () -> RiverWindow -> Ptr () -> CUInt -> IO ())
+foreign import ccall "wrapper" mk_window_handler        :: ListenerCallback (Ptr () -> Ptr () -> IO ())
+foreign import ccall "wrapper" mk_window_handler_s      :: ListenerCallback (Ptr () -> Ptr () -> CString -> IO ())
+foreign import ccall "wrapper" mk_window_handler_w      :: ListenerCallback (Ptr () -> Ptr () -> Ptr () -> IO ())
+foreign import ccall "wrapper" mk_window_handler_u      :: ListenerCallback (Ptr () -> Ptr () -> CUInt -> IO ())
+foreign import ccall "wrapper" mk_window_handler_i      :: ListenerCallback (Ptr () -> Ptr () -> CInt -> IO ())
+foreign import ccall "wrapper" mk_window_handler_ii     :: ListenerCallback (Ptr () -> Ptr () -> CInt -> CInt -> IO ())
+foreign import ccall "wrapper" mk_window_handler_iiii   :: ListenerCallback (Ptr () -> Ptr () -> CInt -> CInt -> CInt -> CInt ->IO ())
+foreign import ccall "wrapper" mk_window_handler_output :: ListenerCallback (Ptr () -> Ptr () -> Ptr () -> IO ())
+foreign import ccall "wrapper" mk_window_handler_seat   :: ListenerCallback (Ptr () -> Ptr () -> Ptr () -> IO ())
+foreign import ccall "wrapper" mk_window_handler_seat_u :: ListenerCallback (Ptr () -> Ptr () -> Ptr () -> CUInt -> IO ())
 
 mkWindowListener :: (WindowEvent -> IO ()) -> IO WindowListener
 mkWindowListener f = do
   p <- WindowListener <$> mallocBytes {#sizeof river_window_v1_listener#}
-  {#set river_window_v1_listener.closed#} p                     =<< mk_window_handler (\dt w -> f $ WindowClosed dt w)
-  {#set river_window_v1_listener.dimensions_hint#} p            =<< mk_window_handler_iiii (\dt w a b c d -> f $ WindowDimensionsHint dt w (fi a) (fi b) (fi c) (fi d))
-  {#set river_window_v1_listener.dimensions#} p                 =<< mk_window_handler_ii (\dt w a b -> f $ WindowDimensions dt w (fi a) (fi b))
-  {#set river_window_v1_listener.app_id#} p                     =<< mk_window_handler_s (\dt w a -> f . WindowAppId dt w =<< peekCString a)
-  {#set river_window_v1_listener.title#} p                      =<< mk_window_handler_s (\dt w a -> f . WindowTitle dt w =<< peekCString a)
-  {#set river_window_v1_listener.parent#} p                     =<< mk_window_handler_w (\dt w a -> f $ WindowParent dt w a)
-  {#set river_window_v1_listener.decoration_hint#} p            =<< mk_window_handler_u (\dt w a -> f $ WindowDecorationHint dt w (fi a))
-  {#set river_window_v1_listener.pointer_move_requested#} p     =<< mk_window_handler_seat   (\dt w a   -> f $ WindowPointerMoveRequested   dt w (castPtr a))
-  {#set river_window_v1_listener.pointer_resize_requested#} p   =<< mk_window_handler_seat_u (\dt w a b -> f $ WindowPointerResizeRequested dt w (castPtr a) b) -- XXX CUInt?
-  {#set river_window_v1_listener.show_window_menu_requested#} p =<< mk_window_handler_ii (\dt w a b -> f $ WindowShowWindowMenuRequested dt w (fi a) (fi b))
-  {#set river_window_v1_listener.maximize_requested#} p         =<< mk_window_handler (\dt w -> f $ WindowMaximizeRequested dt w)
-  {#set river_window_v1_listener.unmaximize_requested#} p       =<< mk_window_handler (\dt w -> f $ WindowUnmaximizeRequested dt w)
-  {#set river_window_v1_listener.fullscreen_requested#} p       =<< mk_window_handler_output (\dt w a -> f $ WindowFullscreenRequested dt w (castPtr a))
-  {#set river_window_v1_listener.exit_fullscreen_requested#} p  =<< mk_window_handler (\dt w -> f $ WindowExitFullscreenRequested dt w)
-  {#set river_window_v1_listener.minimize_requested#} p         =<< mk_window_handler (\dt w -> f $ WindowMinimizeRequested dt w)
-  {#set river_window_v1_listener.unreliable_pid#} p             =<< mk_window_handler_i (\dt w a -> f $ WindowUnreliablePID dt w (fi a))
-  {#set river_window_v1_listener.presentation_hint#} p          =<< mk_window_handler_u (\dt w a -> f $ WindowPresentationHint dt w (fi a))
-  {#set river_window_v1_listener.identifier#} p                 =<< mk_window_handler_s (\dt w a -> f . WindowIdentifier dt w =<< peekCString a)
+  {#set river_window_v1_listener.closed#} p                     =<< mk_window_handler (\dt w -> f $ WindowClosed dt (castPtr w))
+  {#set river_window_v1_listener.dimensions_hint#} p            =<< mk_window_handler_iiii (\dt w a b c d -> f $ WindowDimensionsHint dt (castPtr w) (fi a) (fi b) (fi c) (fi d))
+  {#set river_window_v1_listener.dimensions#} p                 =<< mk_window_handler_ii (\dt w a b -> f $ WindowDimensions dt (castPtr w) (fi a) (fi b))
+  {#set river_window_v1_listener.app_id#} p                     =<< mk_window_handler_s (\dt w a -> f . WindowAppId dt (castPtr w) =<< peekCString a)
+  {#set river_window_v1_listener.title#} p                      =<< mk_window_handler_s (\dt w a -> f . WindowTitle dt (castPtr w) =<< peekCString a)
+  {#set river_window_v1_listener.parent#} p                     =<< mk_window_handler_w (\dt w a -> f $ WindowParent dt (castPtr w) (castPtr a))
+  {#set river_window_v1_listener.decoration_hint#} p            =<< mk_window_handler_u (\dt w a -> f $ WindowDecorationHint dt (castPtr w) (fi a))
+  {#set river_window_v1_listener.pointer_move_requested#} p     =<< mk_window_handler_seat   (\dt w a   -> f $ WindowPointerMoveRequested   dt (castPtr w) (castPtr a))
+  {#set river_window_v1_listener.pointer_resize_requested#} p   =<< mk_window_handler_seat_u (\dt w a b -> f $ WindowPointerResizeRequested dt (castPtr w) (castPtr a) b) -- XXX CUInt?
+  {#set river_window_v1_listener.show_window_menu_requested#} p =<< mk_window_handler_ii (\dt w a b -> f $ WindowShowWindowMenuRequested dt (castPtr w) (fi a) (fi b))
+  {#set river_window_v1_listener.maximize_requested#} p         =<< mk_window_handler (\dt w -> f $ WindowMaximizeRequested dt (castPtr w))
+  {#set river_window_v1_listener.unmaximize_requested#} p       =<< mk_window_handler (\dt w -> f $ WindowUnmaximizeRequested dt (castPtr w))
+  {#set river_window_v1_listener.fullscreen_requested#} p       =<< mk_window_handler_output (\dt w a -> f $ WindowFullscreenRequested dt (castPtr w) (castPtr a))
+  {#set river_window_v1_listener.exit_fullscreen_requested#} p  =<< mk_window_handler (\dt w -> f $ WindowExitFullscreenRequested dt (castPtr w))
+  {#set river_window_v1_listener.minimize_requested#} p         =<< mk_window_handler (\dt w -> f $ WindowMinimizeRequested dt (castPtr w))
+  {#set river_window_v1_listener.unreliable_pid#} p             =<< mk_window_handler_i (\dt w a -> f $ WindowUnreliablePID dt (castPtr w) (fi a))
+  {#set river_window_v1_listener.presentation_hint#} p          =<< mk_window_handler_u (\dt w a -> f $ WindowPresentationHint dt (castPtr w) (fi a))
+  {#set river_window_v1_listener.identifier#} p                 =<< mk_window_handler_s (\dt w a -> f . WindowIdentifier dt (castPtr w) =<< peekCString a)
   return p
 
 river_window_v1_add_listener :: RiverWindow -> WindowListener -> Ptr () -> IO ()
@@ -381,7 +381,7 @@ river_seat_v1_clear_focus s = do
   void $ wl_proxy_marshal_flags s {#const RIVER_SEAT_V1_CLEAR_FOCUS#} emptyInterface ver 0
 
 river_seat_v1_focus_window :: RiverSeat -> RiverWindow -> IO ()
-river_seat_v1_focus_window s (RiverWindow w) = wl_proxy_marshal_array_flags' (const ()) s
+river_seat_v1_focus_window s w = wl_proxy_marshal_array_flags' (const ()) s
     {#const RIVER_SEAT_V1_FOCUS_WINDOW#} emptyInterface 0 w
 
 river_seat_v1_op_start_pointer :: RiverSeat -> IO ()
@@ -424,9 +424,9 @@ mkSeatListener f = do
   p <- RiverSeatListener <$> mallocBytes {#sizeof river_seat_v1_listener#}
   {#set river_seat_v1_listener.removed#} p                   =<< mk_seat_handler        (\dt s -> f $ SeatRemoved dt (castPtr s))
   {#set river_seat_v1_listener.wl_seat#} p                   =<< mk_seat_handler_u      (\dt s u -> f $ SeatWlSeat dt (castPtr s) (fi u))
-  {#set river_seat_v1_listener.pointer_enter#} p             =<< mk_seat_handler_window (\dt s w -> f $ SeatEventPointerEnter dt (castPtr s) w)
+  {#set river_seat_v1_listener.pointer_enter#} p             =<< mk_seat_handler_window (\dt s w -> f $ SeatEventPointerEnter dt (castPtr s) (castPtr w))
   {#set river_seat_v1_listener.pointer_leave#} p             =<< mk_seat_handler        (\dt s -> f $ SeatEventPointerLeave dt (castPtr s))
-  {#set river_seat_v1_listener.window_interaction#} p        =<< mk_seat_handler_window (\dt s w -> f $ SeatEventWindowInteraction dt (castPtr s) w)
+  {#set river_seat_v1_listener.window_interaction#} p        =<< mk_seat_handler_window (\dt s w -> f $ SeatEventWindowInteraction dt (castPtr s) (castPtr w))
   {#set river_seat_v1_listener.shell_surface_interaction#} p =<< mk_seat_handler_ss     (\dt s ss -> f $ SeatEventShellSurfaceInteraction dt (castPtr s) ss)
   {#set river_seat_v1_listener.op_delta#} p                  =<< mk_seat_handler_ii     (\dt s x y -> f $ SeatEventOpDelta dt (castPtr s) (fi x) (fi y))
   {#set river_seat_v1_listener.op_release#} p                =<< mk_seat_handler        (\dt s -> f $ SeatEventOpRelease dt (castPtr s))
@@ -446,7 +446,7 @@ data SeatEvent
   deriving Show
 
 foreign import ccall "wrapper" mk_seat_handler        :: ListenerCallback (Ptr () -> Ptr () -> IO ())
-foreign import ccall "wrapper" mk_seat_handler_window :: ListenerCallback (Ptr () -> Ptr () -> RiverWindow -> IO ())
+foreign import ccall "wrapper" mk_seat_handler_window :: ListenerCallback (Ptr () -> Ptr () -> Ptr () -> IO ())
 foreign import ccall "wrapper" mk_seat_handler_u      :: ListenerCallback (Ptr () -> Ptr () -> CUInt -> IO ())
 foreign import ccall "wrapper" mk_seat_handler_ss     :: ListenerCallback (Ptr () -> Ptr () -> RiverShellSurface -> IO ())
 foreign import ccall "wrapper" mk_seat_handler_ii     :: ListenerCallback (Ptr () -> Ptr () -> CInt -> CInt -> IO ())

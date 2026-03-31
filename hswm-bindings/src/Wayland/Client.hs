@@ -152,6 +152,7 @@ module Wayland.Client
   ) where
 
 import           Wayland.Client.Interface      as X hiding ()
+import           Wayland.Client.Internal.Types as X hiding ()
 import           Generated.Wayland.Util.Safe   as X hiding ()
 import           Generated.Wayland.Client.Safe as X hiding ()
 
