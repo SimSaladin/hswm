@@ -23,6 +23,7 @@ module Generated.River.LayerShellV1.Safe
     )
   where
 
+import qualified Generated.River.RiverWindowManagementV1
 import qualified HsBindgen.Runtime.Internal.CAPI
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.LibC
@@ -271,7 +272,7 @@ foreign import ccall safe "hs_bindgen_436a49b077a0a31d" hs_bindgen_436a49b077a0a
 -- __unique:__ @River_LayerShellV1_Generated.River.LayerShellV1_Safe_river_layer_shell_v1_get_output@
 hs_bindgen_436a49b077a0a31d ::
      RIP.Ptr River_layer_shell_v1
-  -> RIP.Ptr River_output_v1
+  -> RIP.Ptr Generated.River.RiverWindowManagementV1.River_output_v1
   -> IO (RIP.Ptr River_layer_shell_output_v1)
 hs_bindgen_436a49b077a0a31d =
   RIP.fromFFIType hs_bindgen_436a49b077a0a31d_base
@@ -291,7 +292,7 @@ __exported by:__ @river-layer-shell-v1-client-protocol.h@
 river_layer_shell_v1_get_output ::
      RIP.Ptr River_layer_shell_v1
      -- ^ __C declaration:__ @river_layer_shell_v1@
-  -> RIP.Ptr River_output_v1
+  -> RIP.Ptr Generated.River.RiverWindowManagementV1.River_output_v1
      -- ^ __C declaration:__ @output@
   -> IO (RIP.Ptr River_layer_shell_output_v1)
 river_layer_shell_v1_get_output =
@@ -306,7 +307,7 @@ foreign import ccall safe "hs_bindgen_d4f8225109f73848" hs_bindgen_d4f8225109f73
 -- __unique:__ @River_LayerShellV1_Generated.River.LayerShellV1_Safe_river_layer_shell_v1_get_seat@
 hs_bindgen_d4f8225109f73848 ::
      RIP.Ptr River_layer_shell_v1
-  -> RIP.Ptr River_seat_v1
+  -> RIP.Ptr Generated.River.RiverWindowManagementV1.River_seat_v1
   -> IO (RIP.Ptr River_layer_shell_seat_v1)
 hs_bindgen_d4f8225109f73848 =
   RIP.fromFFIType hs_bindgen_d4f8225109f73848_base
@@ -326,7 +327,7 @@ __exported by:__ @river-layer-shell-v1-client-protocol.h@
 river_layer_shell_v1_get_seat ::
      RIP.Ptr River_layer_shell_v1
      -- ^ __C declaration:__ @river_layer_shell_v1@
-  -> RIP.Ptr River_seat_v1
+  -> RIP.Ptr Generated.River.RiverWindowManagementV1.River_seat_v1
      -- ^ __C declaration:__ @seat@
   -> IO (RIP.Ptr River_layer_shell_seat_v1)
 river_layer_shell_v1_get_seat =

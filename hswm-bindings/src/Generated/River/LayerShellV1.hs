@@ -22,8 +22,6 @@ module Generated.River.LayerShellV1
     ( Generated.River.LayerShellV1.River_layer_shell_output_v1
     , Generated.River.LayerShellV1.River_layer_shell_seat_v1
     , Generated.River.LayerShellV1.River_layer_shell_v1
-    , Generated.River.LayerShellV1.River_output_v1
-    , Generated.River.LayerShellV1.River_seat_v1
     , Generated.River.LayerShellV1.River_layer_shell_v1_error(..)
     , pattern Generated.River.LayerShellV1.RIVER_LAYER_SHELL_V1_ERROR_OBJECT_ALREADY_CREATED
     , Generated.River.LayerShellV1.rIVER_LAYER_SHELL_V1_DESTROY
@@ -112,22 +110,6 @@ data River_layer_shell_seat_v1
     __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
 data River_layer_shell_v1
-
-{-| __C declaration:__ @struct river_output_v1@
-
-    __defined at:__ @river-layer-shell-v1-client-protocol.h 59:8@
-
-    __exported by:__ @river-layer-shell-v1-client-protocol.h@
--}
-data River_output_v1
-
-{-| __C declaration:__ @struct river_seat_v1@
-
-    __defined at:__ @river-layer-shell-v1-client-protocol.h 60:8@
-
-    __exported by:__ @river-layer-shell-v1-client-protocol.h@
--}
-data River_seat_v1
 
 {-| __C declaration:__ @enum river_layer_shell_v1_error@
 

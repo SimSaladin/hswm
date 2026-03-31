@@ -13,12 +13,6 @@ ctypes:
   cname: struct river_layer_shell_v1
   hsname: River_layer_shell_v1
 - headers: river-layer-shell-v1-client-protocol.h
-  cname: struct river_output_v1
-  hsname: River_output_v1
-- headers: river-layer-shell-v1-client-protocol.h
-  cname: struct river_seat_v1
-  hsname: River_seat_v1
-- headers: river-layer-shell-v1-client-protocol.h
   cname: enum river_layer_shell_v1_error
   hsname: River_layer_shell_v1_error
 - headers: river-layer-shell-v1-client-protocol.h
@@ -90,7 +84,3 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: River_output_v1
-  representation: emptydata
-- hsname: River_seat_v1
-  representation: emptydata
