@@ -19,8 +19,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 
 module Generated.River.XkbBindingsV1
-    ( Generated.River.XkbBindingsV1.River_seat_v1
-    , Generated.River.XkbBindingsV1.River_xkb_binding_v1
+    ( Generated.River.XkbBindingsV1.River_xkb_binding_v1
     , Generated.River.XkbBindingsV1.River_xkb_bindings_seat_v1
     , Generated.River.XkbBindingsV1.River_xkb_bindings_v1
     , Generated.River.XkbBindingsV1.River_xkb_bindings_v1_error(..)
@@ -59,50 +58,6 @@ import qualified HsBindgen.Runtime.CEnum as CEnum
 import qualified HsBindgen.Runtime.HasCField as HasCField
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.Marshal as Marshal
-
-{-|
-
-  > page_river_xkb_bindings_v1 The river_xkb_bindings_v1 protocol
-
-  xkbcommon-based key bindings
-
-  > page_desc_river_xkb_bindings_v1 Description
-
-  This protocol allows the river-window-management-v1 window manager to define key bindings in terms of xkbcommon keysyms and other configurable properties.
-
-  The key words "must", "must not", "required", "shall", "shall not", "should", "should not", "recommended", "may", and "optional" in this document are to be interpreted as described in IETF RFC 2119.
-
-  > page_ifaces_river_xkb_bindings_v1 Interfaces
-
-  -
-
-  > page_iface_river_xkb_bindings_v1 - xkbcommon bindings global interface
-
-  -
-
-  > page_iface_river_xkb_binding_v1 - configure a xkb key binding, receive trigger events
-
-  -
-
-  > page_iface_river_xkb_bindings_seat_v1 - xkb bindings seat
-
-  > page_copyright_river_xkb_bindings_v1 Copyright
-
-  SPDX-FileCopyrightText: © 2025 Isaac Freund SPDX-License-Identifier: MIT
-
-  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-__C declaration:__ @struct river_seat_v1@
-
-__defined at:__ @river-xkb-bindings-v1-client-protocol.h 57:8@
-
-__exported by:__ @river-xkb-bindings-v1-client-protocol.h@
--}
-data River_seat_v1
 
 {-| __C declaration:__ @struct river_xkb_binding_v1@
 

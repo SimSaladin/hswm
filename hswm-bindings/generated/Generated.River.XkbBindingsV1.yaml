@@ -4,9 +4,6 @@ version:
 hsmodule: Generated.River.XkbBindingsV1
 ctypes:
 - headers: river-xkb-bindings-v1-client-protocol.h
-  cname: struct river_seat_v1
-  hsname: River_seat_v1
-- headers: river-xkb-bindings-v1-client-protocol.h
   cname: struct river_xkb_binding_v1
   hsname: River_xkb_binding_v1
 - headers: river-xkb-bindings-v1-client-protocol.h
@@ -25,8 +22,6 @@ ctypes:
   cname: struct river_xkb_bindings_seat_v1_listener
   hsname: River_xkb_bindings_seat_v1_listener
 hstypes:
-- hsname: River_seat_v1
-  representation: emptydata
 - hsname: River_xkb_binding_v1
   representation: emptydata
 - hsname: River_xkb_binding_v1_listener
