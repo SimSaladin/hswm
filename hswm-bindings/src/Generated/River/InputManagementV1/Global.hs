@@ -34,7 +34,7 @@ foreign import ccall unsafe "hs_bindgen_ff3a0fd34a73edd3" hs_bindgen_ff3a0fd34a7
      IO (RIP.Ptr RIP.Void)
 
 -- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_get_river_input_manager_v1_interface@
-hs_bindgen_ff3a0fd34a73edd3 :: IO (PtrConst.PtrConst Generated.Wayland.Util.WlInterface)
+hs_bindgen_ff3a0fd34a73edd3 :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
 hs_bindgen_ff3a0fd34a73edd3 =
   RIP.fromFFIType hs_bindgen_ff3a0fd34a73edd3_base
 
@@ -63,12 +63,12 @@ __exported by:__ @river-input-management-v1-client-protocol.h@
 
 __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_river_input_manager_v1_interface@
 -}
-hs_bindgen_9c1fb947283322f4 :: PtrConst.PtrConst Generated.Wayland.Util.WlInterface
+hs_bindgen_9c1fb947283322f4 :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
 hs_bindgen_9c1fb947283322f4 =
   RIP.unsafePerformIO hs_bindgen_ff3a0fd34a73edd3
 
 {-# NOINLINE river_input_manager_v1_interface #-}
-river_input_manager_v1_interface :: Generated.Wayland.Util.WlInterface
+river_input_manager_v1_interface :: Generated.Wayland.Util.Wl_interface
 river_input_manager_v1_interface =
   RIP.unsafePerformIO (PtrConst.peek hs_bindgen_9c1fb947283322f4)
 
@@ -77,7 +77,7 @@ foreign import ccall unsafe "hs_bindgen_2a4faf127d549195" hs_bindgen_2a4faf127d5
      IO (RIP.Ptr RIP.Void)
 
 -- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_get_river_input_device_v1_interface@
-hs_bindgen_2a4faf127d549195 :: IO (PtrConst.PtrConst Generated.Wayland.Util.WlInterface)
+hs_bindgen_2a4faf127d549195 :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
 hs_bindgen_2a4faf127d549195 =
   RIP.fromFFIType hs_bindgen_2a4faf127d549195_base
 
@@ -106,11 +106,11 @@ __exported by:__ @river-input-management-v1-client-protocol.h@
 
 __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_river_input_device_v1_interface@
 -}
-hs_bindgen_d8cb7e7c49407b9d :: PtrConst.PtrConst Generated.Wayland.Util.WlInterface
+hs_bindgen_d8cb7e7c49407b9d :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
 hs_bindgen_d8cb7e7c49407b9d =
   RIP.unsafePerformIO hs_bindgen_2a4faf127d549195
 
 {-# NOINLINE river_input_device_v1_interface #-}
-river_input_device_v1_interface :: Generated.Wayland.Util.WlInterface
+river_input_device_v1_interface :: Generated.Wayland.Util.Wl_interface
 river_input_device_v1_interface =
   RIP.unsafePerformIO (PtrConst.peek hs_bindgen_d8cb7e7c49407b9d)

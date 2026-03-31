@@ -12,9 +12,9 @@ import           Foreign.C
 
 openDisplay :: String -> IO WlDisplay
 openDisplay s = do
-  display@(WlDisplay p) <- if s == "" then wl_display_connect nullPtr
+  display <- if s == "" then wl_display_connect nullPtr
                         else withCString s wl_display_connect
-  when (p == nullPtr) $ throwIO WaylandDisplayConnectFailed
+  when (display == nullPtr) $ throwIO WaylandDisplayConnectFailed
   return display
 
 ------------------------------------------------------------------

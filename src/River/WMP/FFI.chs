@@ -4,6 +4,11 @@ module River.WMP.FFI where
 import Foreign
 import Wayland.FFI
 
+import qualified River.Safe as R
+import qualified Generated.River.WindowManagementV1 as R
+import qualified Generated.River.LayerShellV1 as R
+-- import qualified Generated.River.WindowManagementV1 as R
+
 #include "river-window-management-v1-client-protocol.h"
 
 data WindowBorders = WindowBorders
@@ -14,12 +19,16 @@ data WindowBorders = WindowBorders
 
 type ClipBox = (Int32, Int32, Int32, Int32)
 
+type RiverOutput = Ptr R.River_output_v1
+type RiverSeat = Ptr R.River_seat_v1
+type RiverWindow = Ptr R.River_window_v1
+
 {#pointer *river_window_manager_v1  as RiverWindowManager  newtype #}
-{#pointer *river_window_v1          as RiverWindow         newtype #}
+-- {#pointer *river_window_v1          as RiverWindow         newtype #}
 {#pointer *river_node_v1            as RiverNode           newtype #}
-{#pointer *river_seat_v1            as RiverSeat           newtype #}
+-- {#pointer *river_seat_v1            as RiverSeat           newtype #}
 {#pointer *river_pointer_binding_v1 as RiverPointerBinding newtype #}
-{#pointer *river_output_v1          as RiverOutput         newtype #}
+-- {#pointer *river_output_v1          as RiverOutput         newtype #}
 {#pointer *river_decoration_v1      as RiverDecoration     newtype #}
 {#pointer *river_shell_surface_v1   as RiverShellSurface   newtype #}
 
@@ -30,29 +39,20 @@ type ClipBox = (Int32, Int32, Int32, Int32)
 {#pointer *river_pointer_binding_v1_listener as PointerBindingListener     newtype#}
 
 deriving instance Show RiverWindowManager
-deriving instance Show RiverWindow
 deriving instance Show RiverNode
-deriving instance Show RiverSeat
 deriving instance Show RiverPointerBinding
-deriving instance Show RiverOutput
 deriving instance Show RiverDecoration
 deriving instance Show RiverShellSurface
 
 deriving instance Eq RiverWindowManager
-deriving instance Eq RiverWindow
 deriving instance Eq RiverNode
-deriving instance Eq RiverSeat
 deriving instance Eq RiverPointerBinding
-deriving instance Eq RiverOutput
 deriving instance Eq RiverDecoration
 deriving instance Eq RiverShellSurface
 
 deriving instance Storable RiverWindowManager
-deriving instance Storable RiverWindow
 deriving instance Storable RiverNode
-deriving instance Storable RiverSeat
 deriving instance Storable RiverPointerBinding
-deriving instance Storable RiverOutput
 deriving instance Storable RiverDecoration
 deriving instance Storable RiverShellSurface
 
@@ -61,8 +61,6 @@ deriving instance Ord RiverWindow
 instance IsWlProxy RiverWindowManager where toWlProxy (RiverWindowManager p) = WlProxy (castPtr p)
 instance IsWlProxy RiverDecoration where toWlProxy (RiverDecoration p) = WlProxy (castPtr p)
 instance IsWlProxy RiverWindow where toWlProxy (RiverWindow p) = WlProxy (castPtr p)
-instance IsWlProxy RiverOutput where toWlProxy (RiverOutput p) = WlProxy (castPtr p)
-instance IsWlProxy RiverSeat where toWlProxy (RiverSeat p) = WlProxy (castPtr p)
 instance IsWlProxy RiverNode where toWlProxy (RiverNode p) = WlProxy (castPtr p)
 instance IsWlProxy RiverPointerBinding where toWlProxy (RiverPointerBinding p) = WlProxy (castPtr p)
 instance IsWlProxy RiverShellSurface where toWlProxy (RiverShellSurface p) = WlProxy (castPtr p)
@@ -112,4 +110,4 @@ invalidWindow :: RiverWindow
 invalidWindow = RiverWindow $ castPtr $ nullPtr
 
 invalidSeat :: RiverSeat
-invalidSeat = RiverSeat $ castPtr $ nullPtr
+invalidSeat = castPtr $ nullPtr

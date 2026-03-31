@@ -38,15 +38,27 @@ HS_BIND_GEN	:= hs-bindgen-cli preprocess \
 bindgen: bindgen-wayland bindgen-river bindgen-pixman-1
 
 bindgen-wayland:	$(bindGenSpecDir)/Generated.Wayland.Util.yaml $(bindGenSpecDir)/Generated.Wayland.Client.yaml
+bindgen-pixman-1:	$(bindGenSpecDir)/Generated.Pixman.yaml
 bindgen-river:	\
 	$(bindGenSpecDir)/Generated.River.InputManagementV1.yaml \
 	$(bindGenSpecDir)/Generated.River.WindowManagementV1.yaml \
 	$(bindGenSpecDir)/Generated.River.XkbConfigV1.yaml \
 	$(bindGenSpecDir)/Generated.River.XkbBindingsV1.yaml \
 	$(bindGenSpecDir)/Generated.River.LibinputConfigV1.yaml \
-	$(bindGenSpecDir)/Generated.River.LayoutShellV1.yaml
+	$(bindGenSpecDir)/Generated.River.LayerShellV1.yaml
 
-# --external-binding-spec $(bindingSpecs)/wayland-client.yaml --external-binding-spec $(bindingSpecs)/wayland-util.yaml
+# --external-binding-spec $(bindingSpecs)/wayland-client.yaml
+# --external-binding-spec $(bindingSpecs)/wayland-util.yaml
+# --prescriptive-binding-spec $(bindingSpecs)/wayland-util.yaml \
+# --external-binding-spec $(bindingSpecs)/wayland-client.yaml \
+
+$(bindGenSpecDir)/Generated.Pixman.yaml: FORCE
+	$(HS_BIND_GEN) \
+	  --unique-id hswm_pixman pixman.h \
+	  --gen-binding-spec $@ \
+	  --module $(patsubst %.yaml,%,$(@F)) \
+	  $(shell pkg-config --cflags pixman-1) \
+	  --select-from-main-header-dirs
 
 $(bindGenSpecDir)/Generated.Wayland.Util.yaml: FORCE
 	$(HS_BIND_GEN) \
@@ -54,7 +66,6 @@ $(bindGenSpecDir)/Generated.Wayland.Util.yaml: FORCE
 	  --gen-binding-spec $@ \
 	  --module $(patsubst %.yaml,%,$(@F)) \
 	  $(shell pkg-config --cflags wayland-client) \
-	  --prescriptive-binding-spec $(bindingSpecs)/wayland-util.yaml \
 	  --select-from-main-header-dirs \
 	  --select-except-by-decl-name wl_log_func_t
 
@@ -64,15 +75,15 @@ $(bindGenSpecDir)/Generated.Wayland.Client.yaml: FORCE $(bindGenSpecDir)/Generat
 	  --module $(patsubst %.yaml,%,$(@F)) \
 	  $(shell pkg-config --cflags wayland-client) \
 	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml \
-	  --external-binding-spec $(bindingSpecs)/wayland-client.yaml \
 	  --select-except-by-decl-name wl_log_func_t \
-	  --select-except-by-decl-name wl_log_set_handler_client \
-	  --select-except-by-decl-name wl_proxy_marshal_flags \
-	  --select-except-by-decl-name wl_proxy_marshal \
-	  --select-except-by-decl-name wl_proxy_marshal_constructor \
-	  --select-except-by-decl-name wl_proxy_marshal_constructor_versioned
+	  --select-except-by-decl-name wl_log_set_handler_client
 
-$(bindGenSpecDir)/Generated.River.InputManagementV1.yaml: $(HEADERDIR)/river-input-management-v1-client-protocol.h FORCE
+# --select-except-by-decl-name wl_proxy_marshal_flags \
+#	  --select-except-by-decl-name wl_proxy_marshal \
+#	  --select-except-by-decl-name wl_proxy_marshal_constructor \
+#	  --select-except-by-decl-name wl_proxy_marshal_constructor_versioned
+
+$(bindGenSpecDir)/Generated.River.WindowManagementV1.yaml: $(HEADERDIR)/river-window-management-v1-client-protocol.h FORCE
 	$(HS_BIND_GEN) $(<F) \
 	  --gen-binding-spec $@ \
 	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \
@@ -80,7 +91,7 @@ $(bindGenSpecDir)/Generated.River.InputManagementV1.yaml: $(HEADERDIR)/river-inp
 	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Client.yaml \
 	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml
 
-$(bindGenSpecDir)/Generated.River.WindowManagementV1.yaml: $(HEADERDIR)/river-window-management-v1-client-protocol.h FORCE
+$(bindGenSpecDir)/Generated.River.InputManagementV1.yaml: $(HEADERDIR)/river-input-management-v1-client-protocol.h FORCE
 	$(HS_BIND_GEN) $(<F) \
 	  --gen-binding-spec $@ \
 	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \
@@ -104,13 +115,14 @@ $(bindGenSpecDir)/Generated.River.XkbBindingsV1.yaml: $(HEADERDIR)/river-xkb-bin
 	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Client.yaml \
 	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml
 
-$(bindGenSpecDir)/Generated.River.LayoutShellV1.yaml: $(HEADERDIR)/river-layer-shell-v1-client-protocol.h FORCE
+$(bindGenSpecDir)/Generated.River.LayerShellV1.yaml: $(HEADERDIR)/river-layer-shell-v1-client-protocol.h FORCE
 	$(HS_BIND_GEN) $(<F) \
 	  --gen-binding-spec $@ \
 	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \
 	  --module $(patsubst %.yaml,%,$(@F)) \
 	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Client.yaml \
-	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml
+	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml \
+	  --external-binding-spec $(bindGenSpecDir)/Generated.River.WindowManagementV1.yaml
 
 $(bindGenSpecDir)/Generated.River.LibinputConfigV1.yaml: $(HEADERDIR)/river-libinput-config-v1-client-protocol.h FORCE
 	$(HS_BIND_GEN) $(<F) \

@@ -9,16 +9,10 @@ import System.Posix.Types (ProcessID)
 import System.Posix.Process (executeFile, forkProcess, getAnyProcessStatus, createSession)
 import System.Posix.Signals
 
-data ChangeFocus = FocusNext deriving (Generic)
-instance IsAction ChangeFocus where
-  runner FocusNext = log' "FocusNext todo"
-
 class IsKeySym a where toKeySym :: a -> KeySym
 
 instance IsKeySym KeySym where toKeySym = id
-
-instance IsKeySym String where
-  toKeySym = xkb_keysym_from_name
+instance IsKeySym String where toKeySym = xkb_keysym_from_name
 
 addKeys :: (IsKeySym k, IsAction a) => [((String, k), a)] -> HSWMConfig l -> HSWMConfig l
 addKeys keys c = c
@@ -27,7 +21,7 @@ addKeys keys c = c
   }
 
 data LaunchProgram = LaunchProgram String [String]
-  deriving (Generic)
+  deriving (Show, Generic)
 
 instance IsAction LaunchProgram where
   runner (LaunchProgram cmd args) = do

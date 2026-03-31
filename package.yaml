@@ -35,6 +35,7 @@ library:
     - River
     - HSWM.XKB.FFI
     - HSWM.XKB
+    - HSWM.Util.Posix
     - HSWM.Utils
     - HSWM.Types
     - HSWM.StackSet
@@ -44,6 +45,7 @@ library:
     - HSWM.Layout
     - HSWM.Core
     - HSWM.Actions
+    - HSWM.Wallpaper
     - HSWM
     - Core
   other-modules: Prelude
@@ -62,6 +64,9 @@ library:
     - typerep-map
     - unix
     - hswm-bindings # Generated C bindings
+    - directory
+    - vector
+    - JuicyPixels
   pkgconfig-depends:
     - wayland-client
     - xkbcommon

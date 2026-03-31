@@ -5,36 +5,36 @@ hsmodule: Generated.Wayland.Util
 ctypes:
 - headers: wayland-util.h
   cname: struct wl_object
-  hsname: WlObject
+  hsname: Wl_object
 - headers: wayland-util.h
   cname: struct wl_message
-  hsname: WlMessage
+  hsname: Wl_message
 - headers: wayland-util.h
   cname: struct wl_interface
-  hsname: WlInterface
+  hsname: Wl_interface
 - headers: wayland-util.h
   cname: struct wl_list
-  hsname: WlList
+  hsname: Wl_list
 - headers: wayland-util.h
   cname: struct wl_array
-  hsname: WlArray
+  hsname: Wl_array
 - headers: wayland-util.h
   cname: wl_fixed_t
   hsname: Wl_fixed_t
 - headers: wayland-util.h
   cname: union wl_argument
-  hsname: WlArgument
+  hsname: Wl_argument
 - headers: wayland-util.h
   cname: wl_dispatcher_func_t
-  hsname: WlDispatcherFuncT
+  hsname: Wl_dispatcher_func_t
 - headers: wayland-util.h
   cname: enum wl_iterator_result
-  hsname: WlIteratorResult
+  hsname: Wl_iterator_result
 hstypes:
-- hsname: WlArgument
+- hsname: Wl_argument
   representation:
     newtype:
-      constructor: WlArgument
+      constructor: Wl_argument
       fields:
       - unwrap
   instances:
@@ -45,10 +45,10 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: WlArray
+- hsname: Wl_array
   representation:
     record:
-      constructor: WlArray
+      constructor: Wl_array
       fields:
       - size
       - alloc
@@ -63,10 +63,10 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: WlDispatcherFuncT
+- hsname: Wl_dispatcher_func_t
   representation:
     newtype:
-      constructor: WlDispatcherFuncT
+      constructor: Wl_dispatcher_func_t
       fields:
       - unwrap
   instances:
@@ -81,86 +81,6 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: WlInterface
-  representation:
-    record:
-      constructor: WlInterface
-      fields:
-      - name
-      - version
-      - method_count
-      - methods
-      - event_count
-      - events
-  instances:
-  - Eq
-  - Generic
-  - HasCField
-  - HasField
-  - ReadRaw
-  - Show
-  - StaticSize
-  - Storable
-  - WriteRaw
-- hsname: WlIteratorResult
-  representation:
-    newtype:
-      constructor: WlIteratorResult
-      fields:
-      - unwrap
-  instances:
-  - CEnum
-  - Eq
-  - Generic
-  - HasCField
-  - HasFFIType
-  - HasField
-  - Ord
-  - Prim
-  - Read
-  - ReadRaw
-  - SequentialCEnum
-  - Show
-  - StaticSize
-  - Storable
-  - WriteRaw
-- hsname: WlList
-  representation:
-    record:
-      constructor: WlList
-      fields:
-      - prev
-      - next
-  instances:
-  - Eq
-  - Generic
-  - HasCField
-  - HasField
-  - ReadRaw
-  - Show
-  - StaticSize
-  - Storable
-  - WriteRaw
-- hsname: WlMessage
-  representation:
-    record:
-      constructor: WlMessage
-      fields:
-      - name
-      - signature
-      - types
-  instances:
-  - Eq
-  - Generic
-  - HasCField
-  - HasField
-  - ReadRaw
-  - Show
-  - StaticSize
-  - Storable
-  - WriteRaw
-- hsname: WlObject
-  representation: emptydata
 - hsname: Wl_fixed_t
   representation:
     newtype:
@@ -190,3 +110,83 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
+- hsname: Wl_interface
+  representation:
+    record:
+      constructor: Wl_interface
+      fields:
+      - name
+      - version
+      - method_count
+      - methods
+      - event_count
+      - events
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_iterator_result
+  representation:
+    newtype:
+      constructor: Wl_iterator_result
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_list
+  representation:
+    record:
+      constructor: Wl_list
+      fields:
+      - prev
+      - next
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_message
+  representation:
+    record:
+      constructor: Wl_message
+      fields:
+      - name
+      - signature
+      - types
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_object
+  representation: emptydata

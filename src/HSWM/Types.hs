@@ -7,7 +7,6 @@ module HSWM.Types (
   ) where
 
 import           Data.Bits
-import           Foreign
 import           GHC.Generics (Generic)
 
 import           HSWM.Core
@@ -28,42 +27,9 @@ instance (l ~ Full) => Default (HSWMConfig l) where
                         -- , (("", _BTN_RIGHT), SendMessage ACTION_MOVE)
                         ]
     , defaultModMask  = "Ctrl"
+    , startupHook     = mempty
     , handleEventHook = mempty
     , layoutHook      = Full
     , logHook         = mempty
     , xkbLayout       = Nothing
     }
-
----------------------------------------------------------
--- wtf
-
-data Action = ACTION_NONE
-            | ACTION_FOCUS_NEXT
-            | ACTION_MOVE
-  deriving (Eq, Show, Enum, Generic)
-
-instance Storable Action where
-  sizeOf _ = sizeOf (0 :: Int)
-  alignment _ = alignment (0 :: Int)
-  peek p = toEnum <$> peek (castPtr p :: Ptr Int)
-  poke p x = poke (castPtr p :: Ptr Int) (fromIntegral $ fromEnum x)
-
----------------------------------------------------------
--- $actionsAndMessages
-
---dispatchMessage :: SomeMessage -> H ()
---dispatchMessage msg = gets pendingEvents >>= liftIO . atomically . (`writeTQueue` msg)
-
-dispatchAction :: SomeAction -> H ()
-dispatchAction action = gets pendingActions >>= liftIO . atomically . (`writeTQueue` action)
-
--- data SomeMessage where
---   SomeMessage :: Show msg => msg -> SomeMessage
---   SomeMessageAction :: IsAction a => a -> SomeMessage
-
--- data SendMessage = SendMessage SomeMessage
---
--- instance IsAction SendMessage where
---   runner      (SendMessage msg) = dispatchMessage msg
---   actionDescription (SendMessage (SomeMessage m)) = "SendMsg: " ++ show m
---   actionDescription (SendMessage (SomeMessageAction m)) = "SendActionMsg: " ++ actionDescription m

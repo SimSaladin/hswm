@@ -139,11 +139,11 @@ seatPointerResize sid w edges = do
 seatClearFocus :: Seat -> H ()
 seatClearFocus s = do
   log' "[seat] clear focus"
-  liftIO $ river_seat_v1_clear_focus s.river_seat
+  io $ river_seat_v1_clear_focus s.river_seat
 
 deleteRemovedSeat :: Seat -> H ()
 deleteRemovedSeat s@Seat{} = do
   modify $ \st -> st { _seats = L.filter (\x -> (/= s.river_seat) x.river_seat) (_seats st) }
   forM_ s.xkb_bindings destroyXKBBinding
   forM_ s.pointer_bindings destroyPointerBinding
-  liftIO $ river_seat_v1_destroy s.river_seat
+  io $ river_seat_v1_destroy s.river_seat

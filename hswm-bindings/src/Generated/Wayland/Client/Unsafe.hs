@@ -4,9 +4,13 @@
 
 module Generated.Wayland.Client.Unsafe
     ( Generated.Wayland.Client.Unsafe.wl_event_queue_destroy
+    , Generated.Wayland.Client.Unsafe.wl_proxy_marshal_array_flags
+    , Generated.Wayland.Client.Unsafe.wl_proxy_marshal_array
     , Generated.Wayland.Client.Unsafe.wl_proxy_create
     , Generated.Wayland.Client.Unsafe.wl_proxy_create_wrapper
     , Generated.Wayland.Client.Unsafe.wl_proxy_wrapper_destroy
+    , Generated.Wayland.Client.Unsafe.wl_proxy_marshal_array_constructor
+    , Generated.Wayland.Client.Unsafe.wl_proxy_marshal_array_constructor_versioned
     , Generated.Wayland.Client.Unsafe.wl_proxy_destroy
     , Generated.Wayland.Client.Unsafe.wl_proxy_add_listener
     , Generated.Wayland.Client.Unsafe.wl_proxy_get_listener
@@ -228,6 +232,25 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (wl_event_queue_destroy)(arg1);"
   , "}"
+  , "struct wl_proxy *hs_bindgen_7f05288a646be2fa ("
+  , "  struct wl_proxy *arg1,"
+  , "  uint32_t arg2,"
+  , "  struct wl_interface const *arg3,"
+  , "  uint32_t arg4,"
+  , "  uint32_t arg5,"
+  , "  union wl_argument *arg6"
+  , ")"
+  , "{"
+  , "  return (wl_proxy_marshal_array_flags)(arg1, arg2, arg3, arg4, arg5, arg6);"
+  , "}"
+  , "void hs_bindgen_9a82baee5015cdfe ("
+  , "  struct wl_proxy *arg1,"
+  , "  uint32_t arg2,"
+  , "  union wl_argument *arg3"
+  , ")"
+  , "{"
+  , "  (wl_proxy_marshal_array)(arg1, arg2, arg3);"
+  , "}"
   , "struct wl_proxy *hs_bindgen_c031af1829d0e38b ("
   , "  struct wl_proxy *arg1,"
   , "  struct wl_interface const *arg2"
@@ -246,6 +269,25 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , ")"
   , "{"
   , "  (wl_proxy_wrapper_destroy)(arg1);"
+  , "}"
+  , "struct wl_proxy *hs_bindgen_bf5683d638da9977 ("
+  , "  struct wl_proxy *arg1,"
+  , "  uint32_t arg2,"
+  , "  union wl_argument *arg3,"
+  , "  struct wl_interface const *arg4"
+  , ")"
+  , "{"
+  , "  return (wl_proxy_marshal_array_constructor)(arg1, arg2, arg3, arg4);"
+  , "}"
+  , "struct wl_proxy *hs_bindgen_f0b31ca80af65d80 ("
+  , "  struct wl_proxy *arg1,"
+  , "  uint32_t arg2,"
+  , "  union wl_argument *arg3,"
+  , "  struct wl_interface const *arg4,"
+  , "  uint32_t arg5"
+  , ")"
+  , "{"
+  , "  return (wl_proxy_marshal_array_constructor_versioned)(arg1, arg2, arg3, arg4, arg5);"
   , "}"
   , "void hs_bindgen_31b039cc9846eb82 ("
   , "  struct wl_proxy *arg1"
@@ -1648,6 +1690,83 @@ wl_event_queue_destroy ::
   -> IO ()
 wl_event_queue_destroy = hs_bindgen_e31c4274050bd669
 
+-- __unique:__ @hswm_wl_client_Generated.Wayland.Client_Unsafe_wl_proxy_marshal_array_flags@
+foreign import ccall unsafe "hs_bindgen_7f05288a646be2fa" hs_bindgen_7f05288a646be2fa_base ::
+     RIP.Ptr RIP.Void
+  -> RIP.Word32
+  -> RIP.Ptr RIP.Void
+  -> RIP.Word32
+  -> RIP.Word32
+  -> RIP.Ptr RIP.Void
+  -> IO (RIP.Ptr RIP.Void)
+
+-- __unique:__ @hswm_wl_client_Generated.Wayland.Client_Unsafe_wl_proxy_marshal_array_flags@
+hs_bindgen_7f05288a646be2fa ::
+     RIP.Ptr Wl_proxy
+  -> HsBindgen.Runtime.LibC.Word32
+  -> PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+  -> HsBindgen.Runtime.LibC.Word32
+  -> HsBindgen.Runtime.LibC.Word32
+  -> RIP.Ptr Generated.Wayland.Util.Wl_argument
+  -> IO (RIP.Ptr Wl_proxy)
+hs_bindgen_7f05288a646be2fa =
+  RIP.fromFFIType hs_bindgen_7f05288a646be2fa_base
+
+{-| __C declaration:__ @wl_proxy_marshal_array_flags@
+
+    __defined at:__ @wayland-client-core.h 139:1@
+
+    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+-}
+wl_proxy_marshal_array_flags ::
+     RIP.Ptr Wl_proxy
+     -- ^ __C declaration:__ @proxy@
+  -> HsBindgen.Runtime.LibC.Word32
+     -- ^ __C declaration:__ @opcode@
+  -> PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+     -- ^ __C declaration:__ @interface@
+  -> HsBindgen.Runtime.LibC.Word32
+     -- ^ __C declaration:__ @version@
+  -> HsBindgen.Runtime.LibC.Word32
+     -- ^ __C declaration:__ @flags@
+  -> RIP.Ptr Generated.Wayland.Util.Wl_argument
+     -- ^ __C declaration:__ @args@
+  -> IO (RIP.Ptr Wl_proxy)
+wl_proxy_marshal_array_flags =
+  hs_bindgen_7f05288a646be2fa
+
+-- __unique:__ @hswm_wl_client_Generated.Wayland.Client_Unsafe_wl_proxy_marshal_array@
+foreign import ccall unsafe "hs_bindgen_9a82baee5015cdfe" hs_bindgen_9a82baee5015cdfe_base ::
+     RIP.Ptr RIP.Void
+  -> RIP.Word32
+  -> RIP.Ptr RIP.Void
+  -> IO ()
+
+-- __unique:__ @hswm_wl_client_Generated.Wayland.Client_Unsafe_wl_proxy_marshal_array@
+hs_bindgen_9a82baee5015cdfe ::
+     RIP.Ptr Wl_proxy
+  -> HsBindgen.Runtime.LibC.Word32
+  -> RIP.Ptr Generated.Wayland.Util.Wl_argument
+  -> IO ()
+hs_bindgen_9a82baee5015cdfe =
+  RIP.fromFFIType hs_bindgen_9a82baee5015cdfe_base
+
+{-| __C declaration:__ @wl_proxy_marshal_array@
+
+    __defined at:__ @wayland-client-core.h 149:1@
+
+    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+-}
+wl_proxy_marshal_array ::
+     RIP.Ptr Wl_proxy
+     -- ^ __C declaration:__ @p@
+  -> HsBindgen.Runtime.LibC.Word32
+     -- ^ __C declaration:__ @opcode@
+  -> RIP.Ptr Generated.Wayland.Util.Wl_argument
+     -- ^ __C declaration:__ @args@
+  -> IO ()
+wl_proxy_marshal_array = hs_bindgen_9a82baee5015cdfe
+
 -- __unique:__ @hswm_wl_client_Generated.Wayland.Client_Unsafe_wl_proxy_create@
 foreign import ccall unsafe "hs_bindgen_c031af1829d0e38b" hs_bindgen_c031af1829d0e38b_base ::
      RIP.Ptr RIP.Void
@@ -1724,6 +1843,84 @@ wl_proxy_wrapper_destroy ::
   -> IO ()
 wl_proxy_wrapper_destroy =
   hs_bindgen_8abb8ac14753be5f
+
+-- __unique:__ @hswm_wl_client_Generated.Wayland.Client_Unsafe_wl_proxy_marshal_array_constructor@
+foreign import ccall unsafe "hs_bindgen_bf5683d638da9977" hs_bindgen_bf5683d638da9977_base ::
+     RIP.Ptr RIP.Void
+  -> RIP.Word32
+  -> RIP.Ptr RIP.Void
+  -> RIP.Ptr RIP.Void
+  -> IO (RIP.Ptr RIP.Void)
+
+-- __unique:__ @hswm_wl_client_Generated.Wayland.Client_Unsafe_wl_proxy_marshal_array_constructor@
+hs_bindgen_bf5683d638da9977 ::
+     RIP.Ptr Wl_proxy
+  -> HsBindgen.Runtime.LibC.Word32
+  -> RIP.Ptr Generated.Wayland.Util.Wl_argument
+  -> PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+  -> IO (RIP.Ptr Wl_proxy)
+hs_bindgen_bf5683d638da9977 =
+  RIP.fromFFIType hs_bindgen_bf5683d638da9977_base
+
+{-| __C declaration:__ @wl_proxy_marshal_array_constructor@
+
+    __defined at:__ @wayland-client-core.h 176:1@
+
+    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+-}
+wl_proxy_marshal_array_constructor ::
+     RIP.Ptr Wl_proxy
+     -- ^ __C declaration:__ @proxy@
+  -> HsBindgen.Runtime.LibC.Word32
+     -- ^ __C declaration:__ @opcode@
+  -> RIP.Ptr Generated.Wayland.Util.Wl_argument
+     -- ^ __C declaration:__ @args@
+  -> PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+     -- ^ __C declaration:__ @interface@
+  -> IO (RIP.Ptr Wl_proxy)
+wl_proxy_marshal_array_constructor =
+  hs_bindgen_bf5683d638da9977
+
+-- __unique:__ @hswm_wl_client_Generated.Wayland.Client_Unsafe_wl_proxy_marshal_array_constructor_versioned@
+foreign import ccall unsafe "hs_bindgen_f0b31ca80af65d80" hs_bindgen_f0b31ca80af65d80_base ::
+     RIP.Ptr RIP.Void
+  -> RIP.Word32
+  -> RIP.Ptr RIP.Void
+  -> RIP.Ptr RIP.Void
+  -> RIP.Word32
+  -> IO (RIP.Ptr RIP.Void)
+
+-- __unique:__ @hswm_wl_client_Generated.Wayland.Client_Unsafe_wl_proxy_marshal_array_constructor_versioned@
+hs_bindgen_f0b31ca80af65d80 ::
+     RIP.Ptr Wl_proxy
+  -> HsBindgen.Runtime.LibC.Word32
+  -> RIP.Ptr Generated.Wayland.Util.Wl_argument
+  -> PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+  -> HsBindgen.Runtime.LibC.Word32
+  -> IO (RIP.Ptr Wl_proxy)
+hs_bindgen_f0b31ca80af65d80 =
+  RIP.fromFFIType hs_bindgen_f0b31ca80af65d80_base
+
+{-| __C declaration:__ @wl_proxy_marshal_array_constructor_versioned@
+
+    __defined at:__ @wayland-client-core.h 181:1@
+
+    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+-}
+wl_proxy_marshal_array_constructor_versioned ::
+     RIP.Ptr Wl_proxy
+     -- ^ __C declaration:__ @proxy@
+  -> HsBindgen.Runtime.LibC.Word32
+     -- ^ __C declaration:__ @opcode@
+  -> RIP.Ptr Generated.Wayland.Util.Wl_argument
+     -- ^ __C declaration:__ @args@
+  -> PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+     -- ^ __C declaration:__ @interface@
+  -> HsBindgen.Runtime.LibC.Word32
+     -- ^ __C declaration:__ @version@
+  -> IO (RIP.Ptr Wl_proxy)
+wl_proxy_marshal_array_constructor_versioned =
+  hs_bindgen_f0b31ca80af65d80
 
 -- __unique:__ @hswm_wl_client_Generated.Wayland.Client_Unsafe_wl_proxy_destroy@
 foreign import ccall unsafe "hs_bindgen_31b039cc9846eb82" hs_bindgen_31b039cc9846eb82_base ::

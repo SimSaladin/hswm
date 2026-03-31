@@ -20,11 +20,19 @@ module River.WMP
 
 import River.WMP.FFI
 import River.WMP.MiscFFI
-import HSWM.XKB (Modifiers, Button)
+import HSWM.XKB
 
+import qualified Data.List as L
 import GHC.Generics
 import           Foreign.Storable.Generic (GStorable(..))
 import Foreign
+
+ppXkbModsKey :: Modifiers -> KeySym -> String
+ppXkbModsKey m ksym =
+  L.intercalate "+" $
+    [ name | (x, name) <- [ (ModifiersCtrl, "C"), (ModifiersShift, "S"), (ModifiersMod1, "M1"), (ModifiersMod3, "M3"), (ModifiersMod4, "M4"), (ModifiersMod5, "M5") ]
+           , fi (fromEnum x) .&. m /= 0 ]
+    ++ [ xkbKeysymToText ksym ]
 
 data Rectangle = Rectangle { x, y, width, height :: !Word32 }
   deriving (Show, Read, Eq)
@@ -51,7 +59,7 @@ newPointerBinding :: (MonadIO m, Show a)
                   -> a
                   -> m (StablePtr (PointerBinding a))
 newPointerBinding pointerBindingListener seat mods btn action = do
-    log' $ "[pointer] binding button: " <> tshow (mods, btn, action)
+    log' $ "[pointer] binding button: " <> toText (ppXkbModsKey mods btn) <> " " <> tshow action
     pb' <- liftIO $ river_seat_v1_get_pointer_binding seat (fi btn) (fi mods)
     dtPtr <- liftIO $ newStablePtr $ PointerBinding pb' seat action
     liftIO $ river_pointer_binding_v1_add_listener pb' pointerBindingListener (castStablePtrToPtr dtPtr)
@@ -59,5 +67,7 @@ newPointerBinding pointerBindingListener seat mods btn action = do
     return dtPtr
 
 destroyPointerBinding :: MonadIO m => StablePtr (PointerBinding a) -> m ()
-destroyPointerBinding _ = do
-  log' "pointer_binding_destroy: not yet implemented"
+destroyPointerBinding sptr = do
+  pb <- liftIO $ deRefStablePtr sptr
+  liftIO $ river_pointer_binding_v1_destroy pb.pointer_binding
+  io $ freeStablePtr sptr

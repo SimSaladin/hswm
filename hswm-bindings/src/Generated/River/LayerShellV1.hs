@@ -18,32 +18,32 @@
 {-# LANGUAGE UnboxedTuples #-}
 {-# LANGUAGE UndecidableInstances #-}
 
-module Generated.River.LayoutShellV1
-    ( Generated.River.LayoutShellV1.River_layer_shell_output_v1
-    , Generated.River.LayoutShellV1.River_layer_shell_seat_v1
-    , Generated.River.LayoutShellV1.River_layer_shell_v1
-    , Generated.River.LayoutShellV1.River_output_v1
-    , Generated.River.LayoutShellV1.River_seat_v1
-    , Generated.River.LayoutShellV1.River_layer_shell_v1_error(..)
-    , pattern Generated.River.LayoutShellV1.RIVER_LAYER_SHELL_V1_ERROR_OBJECT_ALREADY_CREATED
-    , Generated.River.LayoutShellV1.rIVER_LAYER_SHELL_V1_DESTROY
-    , Generated.River.LayoutShellV1.rIVER_LAYER_SHELL_V1_GET_OUTPUT
-    , Generated.River.LayoutShellV1.rIVER_LAYER_SHELL_V1_GET_SEAT
-    , Generated.River.LayoutShellV1.rIVER_LAYER_SHELL_V1_DESTROY_SINCE_VERSION
-    , Generated.River.LayoutShellV1.rIVER_LAYER_SHELL_V1_GET_OUTPUT_SINCE_VERSION
-    , Generated.River.LayoutShellV1.rIVER_LAYER_SHELL_V1_GET_SEAT_SINCE_VERSION
-    , Generated.River.LayoutShellV1.River_layer_shell_output_v1_listener(..)
-    , Generated.River.LayoutShellV1.rIVER_LAYER_SHELL_OUTPUT_V1_DESTROY
-    , Generated.River.LayoutShellV1.rIVER_LAYER_SHELL_OUTPUT_V1_SET_DEFAULT
-    , Generated.River.LayoutShellV1.rIVER_LAYER_SHELL_OUTPUT_V1_NON_EXCLUSIVE_AREA_SINCE_VERSION
-    , Generated.River.LayoutShellV1.rIVER_LAYER_SHELL_OUTPUT_V1_DESTROY_SINCE_VERSION
-    , Generated.River.LayoutShellV1.rIVER_LAYER_SHELL_OUTPUT_V1_SET_DEFAULT_SINCE_VERSION
-    , Generated.River.LayoutShellV1.River_layer_shell_seat_v1_listener(..)
-    , Generated.River.LayoutShellV1.rIVER_LAYER_SHELL_SEAT_V1_DESTROY
-    , Generated.River.LayoutShellV1.rIVER_LAYER_SHELL_SEAT_V1_FOCUS_EXCLUSIVE_SINCE_VERSION
-    , Generated.River.LayoutShellV1.rIVER_LAYER_SHELL_SEAT_V1_FOCUS_NON_EXCLUSIVE_SINCE_VERSION
-    , Generated.River.LayoutShellV1.rIVER_LAYER_SHELL_SEAT_V1_FOCUS_NONE_SINCE_VERSION
-    , Generated.River.LayoutShellV1.rIVER_LAYER_SHELL_SEAT_V1_DESTROY_SINCE_VERSION
+module Generated.River.LayerShellV1
+    ( Generated.River.LayerShellV1.River_layer_shell_output_v1
+    , Generated.River.LayerShellV1.River_layer_shell_seat_v1
+    , Generated.River.LayerShellV1.River_layer_shell_v1
+    , Generated.River.LayerShellV1.River_output_v1
+    , Generated.River.LayerShellV1.River_seat_v1
+    , Generated.River.LayerShellV1.River_layer_shell_v1_error(..)
+    , pattern Generated.River.LayerShellV1.RIVER_LAYER_SHELL_V1_ERROR_OBJECT_ALREADY_CREATED
+    , Generated.River.LayerShellV1.rIVER_LAYER_SHELL_V1_DESTROY
+    , Generated.River.LayerShellV1.rIVER_LAYER_SHELL_V1_GET_OUTPUT
+    , Generated.River.LayerShellV1.rIVER_LAYER_SHELL_V1_GET_SEAT
+    , Generated.River.LayerShellV1.rIVER_LAYER_SHELL_V1_DESTROY_SINCE_VERSION
+    , Generated.River.LayerShellV1.rIVER_LAYER_SHELL_V1_GET_OUTPUT_SINCE_VERSION
+    , Generated.River.LayerShellV1.rIVER_LAYER_SHELL_V1_GET_SEAT_SINCE_VERSION
+    , Generated.River.LayerShellV1.River_layer_shell_output_v1_listener(..)
+    , Generated.River.LayerShellV1.rIVER_LAYER_SHELL_OUTPUT_V1_DESTROY
+    , Generated.River.LayerShellV1.rIVER_LAYER_SHELL_OUTPUT_V1_SET_DEFAULT
+    , Generated.River.LayerShellV1.rIVER_LAYER_SHELL_OUTPUT_V1_NON_EXCLUSIVE_AREA_SINCE_VERSION
+    , Generated.River.LayerShellV1.rIVER_LAYER_SHELL_OUTPUT_V1_DESTROY_SINCE_VERSION
+    , Generated.River.LayerShellV1.rIVER_LAYER_SHELL_OUTPUT_V1_SET_DEFAULT_SINCE_VERSION
+    , Generated.River.LayerShellV1.River_layer_shell_seat_v1_listener(..)
+    , Generated.River.LayerShellV1.rIVER_LAYER_SHELL_SEAT_V1_DESTROY
+    , Generated.River.LayerShellV1.rIVER_LAYER_SHELL_SEAT_V1_FOCUS_EXCLUSIVE_SINCE_VERSION
+    , Generated.River.LayerShellV1.rIVER_LAYER_SHELL_SEAT_V1_FOCUS_NON_EXCLUSIVE_SINCE_VERSION
+    , Generated.River.LayerShellV1.rIVER_LAYER_SHELL_SEAT_V1_FOCUS_NONE_SINCE_VERSION
+    , Generated.River.LayerShellV1.rIVER_LAYER_SHELL_SEAT_V1_DESTROY_SINCE_VERSION
     )
   where
 

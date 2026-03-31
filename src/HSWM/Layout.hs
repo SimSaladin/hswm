@@ -28,9 +28,11 @@ import           River
 
 -- | Change the size of the master pane.
 data Resize = Shrink | Expand
+  deriving Show
 
 -- | Increase the number of clients in the master pane.
 newtype IncMasterN = IncMasterN Int
+  deriving Show
 
 instance Message Resize
 instance Message IncMasterN

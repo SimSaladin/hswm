@@ -1,7 +1,7 @@
 version:
   hs_bindgen: 0.1.0
   binding_specification: '1.0'
-hsmodule: Generated.River.LayoutShellV1
+hsmodule: Generated.River.LayerShellV1
 ctypes:
 - headers: river-layer-shell-v1-client-protocol.h
   cname: struct river_layer_shell_output_v1

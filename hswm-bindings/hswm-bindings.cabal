@@ -29,16 +29,20 @@ extra-doc-files:
 
 library
     exposed-modules:
+          Generated.Pixman
+          Generated.Pixman.FunPtr
+          Generated.Pixman.Safe
+          Generated.Pixman.Unsafe
           Generated.River.InputManagementV1
           Generated.River.InputManagementV1.FunPtr
           Generated.River.InputManagementV1.Global
           Generated.River.InputManagementV1.Safe
           Generated.River.InputManagementV1.Unsafe
-          Generated.River.LayoutShellV1
-          Generated.River.LayoutShellV1.FunPtr
-          Generated.River.LayoutShellV1.Global
-          Generated.River.LayoutShellV1.Safe
-          Generated.River.LayoutShellV1.Unsafe
+          Generated.River.LayerShellV1
+          Generated.River.LayerShellV1.FunPtr
+          Generated.River.LayerShellV1.Global
+          Generated.River.LayerShellV1.Safe
+          Generated.River.LayerShellV1.Unsafe
           Generated.River.LibinputConfigV1
           Generated.River.LibinputConfigV1.FunPtr
           Generated.River.LibinputConfigV1.Global
@@ -69,9 +73,11 @@ library
           Generated.Wayland.Util.Safe
           Generated.Wayland.Util.Unsafe
           River.Interfaces
+          River.Safe
           Wayland.Client
           Wayland.Client.Interface
           Wayland.Client.Internal.TH
+          Wayland.Client.Internal.Types
     other-modules:
           Paths_hswm_bindings
     autogen-modules:

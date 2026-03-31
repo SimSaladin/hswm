@@ -19,6 +19,7 @@ extra-source-files:
       Makefile
       cbits/river-input-management-v1-protocol.c
       cbits/river-layer-shell-v1-protocol.c
+      cbits/river-libinput-config-v1-protocol.c
       cbits/river-window-management-v1-protocol.c
       cbits/river-xkb-bindings-v1-protocol.c
       cbits/river-xkb-config-v1-protocol.c
@@ -49,6 +50,7 @@ library
           River
           HSWM.XKB.FFI
           HSWM.XKB
+          HSWM.Util.Posix
           HSWM.Utils
           HSWM.Types
           HSWM.StackSet
@@ -58,15 +60,18 @@ library
           HSWM.Layout
           HSWM.Core
           HSWM.Actions
+          HSWM.Wallpaper
           HSWM
           Core
     autogen-modules:
           Paths_hswm
     build-depends:
-          base >=4.20.2.0
+          JuicyPixels
+        , base >=4.20.2.0
         , containers
         , data-default
         , derive-storable
+        , directory
         , hswm-bindings
         , logging
         , mtl
@@ -76,6 +81,7 @@ library
         , transformers
         , typerep-map
         , unix
+        , vector
     default-language: GHC2024
     pkgconfig-depends:
           wayland-client
@@ -90,6 +96,7 @@ library
     c-sources:
           cbits/river-input-management-v1-protocol.c
           cbits/river-layer-shell-v1-protocol.c
+          cbits/river-libinput-config-v1-protocol.c
           cbits/river-window-management-v1-protocol.c
           cbits/river-xkb-bindings-v1-protocol.c
           cbits/river-xkb-config-v1-protocol.c

@@ -151,7 +151,7 @@ foreign import ccall unsafe "hs_bindgen_e397184fa5ecec04" hs_bindgen_e397184fa5e
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @hswm_wl_util_Generated.Wayland.Util_get_wl_list_init@
-hs_bindgen_e397184fa5ecec04 :: IO (RIP.FunPtr ((RIP.Ptr WlList) -> IO ()))
+hs_bindgen_e397184fa5ecec04 :: IO (RIP.FunPtr ((RIP.Ptr Wl_list) -> IO ()))
 hs_bindgen_e397184fa5ecec04 =
   RIP.fromFFIType hs_bindgen_e397184fa5ecec04_base
 
@@ -162,7 +162,7 @@ hs_bindgen_e397184fa5ecec04 =
 
     __exported by:__ @wayland-util.h@
 -}
-wl_list_init :: RIP.FunPtr ((RIP.Ptr WlList) -> IO ())
+wl_list_init :: RIP.FunPtr ((RIP.Ptr Wl_list) -> IO ())
 wl_list_init =
   RIP.unsafePerformIO hs_bindgen_e397184fa5ecec04
 
@@ -171,7 +171,7 @@ foreign import ccall unsafe "hs_bindgen_4dac707cfc01c466" hs_bindgen_4dac707cfc0
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @hswm_wl_util_Generated.Wayland.Util_get_wl_list_insert@
-hs_bindgen_4dac707cfc01c466 :: IO (RIP.FunPtr ((RIP.Ptr WlList) -> (RIP.Ptr WlList) -> IO ()))
+hs_bindgen_4dac707cfc01c466 :: IO (RIP.FunPtr ((RIP.Ptr Wl_list) -> (RIP.Ptr Wl_list) -> IO ()))
 hs_bindgen_4dac707cfc01c466 =
   RIP.fromFFIType hs_bindgen_4dac707cfc01c466_base
 
@@ -182,7 +182,7 @@ hs_bindgen_4dac707cfc01c466 =
 
     __exported by:__ @wayland-util.h@
 -}
-wl_list_insert :: RIP.FunPtr ((RIP.Ptr WlList) -> (RIP.Ptr WlList) -> IO ())
+wl_list_insert :: RIP.FunPtr ((RIP.Ptr Wl_list) -> (RIP.Ptr Wl_list) -> IO ())
 wl_list_insert =
   RIP.unsafePerformIO hs_bindgen_4dac707cfc01c466
 
@@ -191,7 +191,7 @@ foreign import ccall unsafe "hs_bindgen_7e7df4fe140b2894" hs_bindgen_7e7df4fe140
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @hswm_wl_util_Generated.Wayland.Util_get_wl_list_remove@
-hs_bindgen_7e7df4fe140b2894 :: IO (RIP.FunPtr ((RIP.Ptr WlList) -> IO ()))
+hs_bindgen_7e7df4fe140b2894 :: IO (RIP.FunPtr ((RIP.Ptr Wl_list) -> IO ()))
 hs_bindgen_7e7df4fe140b2894 =
   RIP.fromFFIType hs_bindgen_7e7df4fe140b2894_base
 
@@ -202,7 +202,7 @@ hs_bindgen_7e7df4fe140b2894 =
 
     __exported by:__ @wayland-util.h@
 -}
-wl_list_remove :: RIP.FunPtr ((RIP.Ptr WlList) -> IO ())
+wl_list_remove :: RIP.FunPtr ((RIP.Ptr Wl_list) -> IO ())
 wl_list_remove =
   RIP.unsafePerformIO hs_bindgen_7e7df4fe140b2894
 
@@ -211,7 +211,7 @@ foreign import ccall unsafe "hs_bindgen_4ff8763da7180276" hs_bindgen_4ff8763da71
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @hswm_wl_util_Generated.Wayland.Util_get_wl_list_length@
-hs_bindgen_4ff8763da7180276 :: IO (RIP.FunPtr ((PtrConst.PtrConst WlList) -> IO RIP.CInt))
+hs_bindgen_4ff8763da7180276 :: IO (RIP.FunPtr ((PtrConst.PtrConst Wl_list) -> IO RIP.CInt))
 hs_bindgen_4ff8763da7180276 =
   RIP.fromFFIType hs_bindgen_4ff8763da7180276_base
 
@@ -222,7 +222,7 @@ hs_bindgen_4ff8763da7180276 =
 
     __exported by:__ @wayland-util.h@
 -}
-wl_list_length :: RIP.FunPtr ((PtrConst.PtrConst WlList) -> IO RIP.CInt)
+wl_list_length :: RIP.FunPtr ((PtrConst.PtrConst Wl_list) -> IO RIP.CInt)
 wl_list_length =
   RIP.unsafePerformIO hs_bindgen_4ff8763da7180276
 
@@ -231,7 +231,7 @@ foreign import ccall unsafe "hs_bindgen_59b044e06f57b41b" hs_bindgen_59b044e06f5
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @hswm_wl_util_Generated.Wayland.Util_get_wl_list_empty@
-hs_bindgen_59b044e06f57b41b :: IO (RIP.FunPtr ((PtrConst.PtrConst WlList) -> IO RIP.CInt))
+hs_bindgen_59b044e06f57b41b :: IO (RIP.FunPtr ((PtrConst.PtrConst Wl_list) -> IO RIP.CInt))
 hs_bindgen_59b044e06f57b41b =
   RIP.fromFFIType hs_bindgen_59b044e06f57b41b_base
 
@@ -242,7 +242,7 @@ hs_bindgen_59b044e06f57b41b =
 
     __exported by:__ @wayland-util.h@
 -}
-wl_list_empty :: RIP.FunPtr ((PtrConst.PtrConst WlList) -> IO RIP.CInt)
+wl_list_empty :: RIP.FunPtr ((PtrConst.PtrConst Wl_list) -> IO RIP.CInt)
 wl_list_empty =
   RIP.unsafePerformIO hs_bindgen_59b044e06f57b41b
 
@@ -251,7 +251,7 @@ foreign import ccall unsafe "hs_bindgen_b364f9938090bee7" hs_bindgen_b364f993809
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @hswm_wl_util_Generated.Wayland.Util_get_wl_list_insert_list@
-hs_bindgen_b364f9938090bee7 :: IO (RIP.FunPtr ((RIP.Ptr WlList) -> (RIP.Ptr WlList) -> IO ()))
+hs_bindgen_b364f9938090bee7 :: IO (RIP.FunPtr ((RIP.Ptr Wl_list) -> (RIP.Ptr Wl_list) -> IO ()))
 hs_bindgen_b364f9938090bee7 =
   RIP.fromFFIType hs_bindgen_b364f9938090bee7_base
 
@@ -262,7 +262,7 @@ hs_bindgen_b364f9938090bee7 =
 
     __exported by:__ @wayland-util.h@
 -}
-wl_list_insert_list :: RIP.FunPtr ((RIP.Ptr WlList) -> (RIP.Ptr WlList) -> IO ())
+wl_list_insert_list :: RIP.FunPtr ((RIP.Ptr Wl_list) -> (RIP.Ptr Wl_list) -> IO ())
 wl_list_insert_list =
   RIP.unsafePerformIO hs_bindgen_b364f9938090bee7
 
@@ -271,7 +271,7 @@ foreign import ccall unsafe "hs_bindgen_bd6e148982e327cb" hs_bindgen_bd6e148982e
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @hswm_wl_util_Generated.Wayland.Util_get_wl_array_init@
-hs_bindgen_bd6e148982e327cb :: IO (RIP.FunPtr ((RIP.Ptr WlArray) -> IO ()))
+hs_bindgen_bd6e148982e327cb :: IO (RIP.FunPtr ((RIP.Ptr Wl_array) -> IO ()))
 hs_bindgen_bd6e148982e327cb =
   RIP.fromFFIType hs_bindgen_bd6e148982e327cb_base
 
@@ -282,7 +282,7 @@ hs_bindgen_bd6e148982e327cb =
 
     __exported by:__ @wayland-util.h@
 -}
-wl_array_init :: RIP.FunPtr ((RIP.Ptr WlArray) -> IO ())
+wl_array_init :: RIP.FunPtr ((RIP.Ptr Wl_array) -> IO ())
 wl_array_init =
   RIP.unsafePerformIO hs_bindgen_bd6e148982e327cb
 
@@ -291,7 +291,7 @@ foreign import ccall unsafe "hs_bindgen_d94897fca8341dd7" hs_bindgen_d94897fca83
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @hswm_wl_util_Generated.Wayland.Util_get_wl_array_release@
-hs_bindgen_d94897fca8341dd7 :: IO (RIP.FunPtr ((RIP.Ptr WlArray) -> IO ()))
+hs_bindgen_d94897fca8341dd7 :: IO (RIP.FunPtr ((RIP.Ptr Wl_array) -> IO ()))
 hs_bindgen_d94897fca8341dd7 =
   RIP.fromFFIType hs_bindgen_d94897fca8341dd7_base
 
@@ -302,7 +302,7 @@ hs_bindgen_d94897fca8341dd7 =
 
     __exported by:__ @wayland-util.h@
 -}
-wl_array_release :: RIP.FunPtr ((RIP.Ptr WlArray) -> IO ())
+wl_array_release :: RIP.FunPtr ((RIP.Ptr Wl_array) -> IO ())
 wl_array_release =
   RIP.unsafePerformIO hs_bindgen_d94897fca8341dd7
 
@@ -311,7 +311,7 @@ foreign import ccall unsafe "hs_bindgen_eb075fc075567153" hs_bindgen_eb075fc0755
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @hswm_wl_util_Generated.Wayland.Util_get_wl_array_add@
-hs_bindgen_eb075fc075567153 :: IO (RIP.FunPtr ((RIP.Ptr WlArray) -> HsBindgen.Runtime.LibC.CSize -> IO (RIP.Ptr RIP.Void)))
+hs_bindgen_eb075fc075567153 :: IO (RIP.FunPtr ((RIP.Ptr Wl_array) -> HsBindgen.Runtime.LibC.CSize -> IO (RIP.Ptr RIP.Void)))
 hs_bindgen_eb075fc075567153 =
   RIP.fromFFIType hs_bindgen_eb075fc075567153_base
 
@@ -322,7 +322,7 @@ hs_bindgen_eb075fc075567153 =
 
     __exported by:__ @wayland-util.h@
 -}
-wl_array_add :: RIP.FunPtr ((RIP.Ptr WlArray) -> HsBindgen.Runtime.LibC.CSize -> IO (RIP.Ptr RIP.Void))
+wl_array_add :: RIP.FunPtr ((RIP.Ptr Wl_array) -> HsBindgen.Runtime.LibC.CSize -> IO (RIP.Ptr RIP.Void))
 wl_array_add =
   RIP.unsafePerformIO hs_bindgen_eb075fc075567153
 
@@ -331,7 +331,7 @@ foreign import ccall unsafe "hs_bindgen_03c299a97b6ba297" hs_bindgen_03c299a97b6
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @hswm_wl_util_Generated.Wayland.Util_get_wl_array_copy@
-hs_bindgen_03c299a97b6ba297 :: IO (RIP.FunPtr ((RIP.Ptr WlArray) -> (RIP.Ptr WlArray) -> IO RIP.CInt))
+hs_bindgen_03c299a97b6ba297 :: IO (RIP.FunPtr ((RIP.Ptr Wl_array) -> (RIP.Ptr Wl_array) -> IO RIP.CInt))
 hs_bindgen_03c299a97b6ba297 =
   RIP.fromFFIType hs_bindgen_03c299a97b6ba297_base
 
@@ -342,7 +342,7 @@ hs_bindgen_03c299a97b6ba297 =
 
     __exported by:__ @wayland-util.h@
 -}
-wl_array_copy :: RIP.FunPtr ((RIP.Ptr WlArray) -> (RIP.Ptr WlArray) -> IO RIP.CInt)
+wl_array_copy :: RIP.FunPtr ((RIP.Ptr Wl_array) -> (RIP.Ptr Wl_array) -> IO RIP.CInt)
 wl_array_copy =
   RIP.unsafePerformIO hs_bindgen_03c299a97b6ba297
 

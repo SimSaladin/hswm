@@ -3,6 +3,8 @@ module Wayland.FFI where
 import Foreign hiding (void)
 import Foreign.C
 
+import qualified Wayland.Client as WL
+
 #include <wayland-client.h>
 
 -- * Types
@@ -10,22 +12,22 @@ import Foreign.C
 type Version = {#type uint32_t#}
 type Flags   = {#type uint32_t#}
 
-{#pointer *wl_surface           as WlSurface          newtype #}
+type WlDisplay = Ptr WL.Wl_display
+type WlSurface = Ptr WL.Wl_surface
+
 {#pointer *wl_array             as WlArray            newtype #}
 {#pointer *wl_seat              as WlSeat             newtype #}
 {#pointer *wl_keyboard          as WlKeyboard         newtype #}
-{#pointer *wl_display           as WlDisplay          newtype #}
 {#pointer *wl_registry          as WlRegistry         newtype #}
 {#pointer *wl_interface         as WlInterface        newtype #}
 {#pointer *wl_proxy             as WlProxy            newtype #}
 {#pointer *wl_keyboard_listener as WlKeyboardListener newtype #}
 {#pointer *wl_registry_listener as WlRegistryListener newtype #}
 
-deriving instance Show WlSurface
+-- deriving instance Show WlSurface
 deriving instance Show WlArray
 deriving instance Show WlSeat
 deriving instance Show WlKeyboard
-deriving instance Show WlDisplay
 deriving instance Show WlRegistry
 deriving instance Show WlInterface
 deriving instance Show WlProxy
@@ -47,9 +49,9 @@ _WL_MARSHAL_FLAG_DESTROY = 1 -- {#const WL_MARSHAL_FLAG_DESTROY#}
 
 -- * wl_display
 
-{#fun wl_display_connect   {`CString'}   -> `WlDisplay' #}
-{#fun wl_display_roundtrip {`WlDisplay'} -> `Int' #}
-{#fun wl_display_dispatch  {`WlDisplay'} -> `Int' #}
+{#fun wl_display_connect   {`CString'}   -> `WlDisplay' castPtr #}
+{#fun wl_display_roundtrip {castPtr `WlDisplay'} -> `Int' #}
+{#fun wl_display_dispatch  {castPtr `WlDisplay'} -> `Int' #}
 
 wl_display_get_registry :: WlDisplay -> IO WlRegistry
 wl_display_get_registry display = do
@@ -158,7 +160,6 @@ class IsWlProxy a where
 instance IsWlProxy (Ptr a) where toWlProxy = WlProxy . castPtr
 instance IsWlProxy WlSeat where toWlProxy (WlSeat p) = WlProxy $ castPtr p
 instance IsWlProxy WlKeyboard where toWlProxy (WlKeyboard p) = WlProxy $ castPtr p
-instance IsWlProxy WlDisplay where toWlProxy (WlDisplay p) = WlProxy $ castPtr p
 instance IsWlProxy WlRegistry where toWlProxy (WlRegistry p) = WlProxy $ castPtr p
 
 -- | see wl_argument
@@ -241,8 +242,8 @@ mkKeyboardListener :: (WlKeyboardEvent a -> IO ()) -> IO WlKeyboardListener
 mkKeyboardListener f = do
     p <- WlKeyboardListener <$> callocBytes {#sizeof wl_keyboard_listener#}
     {#set wl_keyboard_listener.keymap#} p      =<< wrap_wl_keyboard_listener_keymap     (\dt kbd fmt fd size    -> f $ KeyboardKeymap     (castPtr dt) kbd fmt fd size)
-    {#set wl_keyboard_listener.enter#} p       =<< wrap_wl_keyboard_listener_Enter      (\dt kbd u1 p1 p2       -> f $ KeyboardEnter      (castPtr dt) kbd u1 p1 p2)
-    {#set wl_keyboard_listener.leave#} p       =<< wrap_wl_keyboard_listener_Leave      (\dt kbd u1 p1          -> f $ KeyboardLeave      (castPtr dt) kbd u1 p1)
+    {#set wl_keyboard_listener.enter#} p       =<< wrap_wl_keyboard_listener_Enter      (\dt kbd u1 p1 p2       -> f $ KeyboardEnter      (castPtr dt) kbd u1 (castPtr p1) p2)
+    {#set wl_keyboard_listener.leave#} p       =<< wrap_wl_keyboard_listener_Leave      (\dt kbd u1 p1          -> f $ KeyboardLeave      (castPtr dt) kbd u1 (castPtr p1))
     {#set wl_keyboard_listener.key#} p         =<< wrap_wl_keyboard_listener_Key        (\dt kbd u1 u2 u3 u4    -> f $ KeyboardKey        (castPtr dt) kbd u1 u2 u3 u4)
     {#set wl_keyboard_listener.modifiers#} p   =<< wrap_wl_keyboard_listener_Modifiers  (\dt kbd u1 u2 u3 u4 u5 -> f $ KeyboardModifiers  (castPtr dt) kbd u1 u2 u3 u4 u5)
     {#set wl_keyboard_listener.repeat_info#} p =<< wrap_wl_keyboard_listener_RepeatInfo (\dt kbd rate delay     -> f $ KeyboardRepeatInfo (castPtr dt) kbd rate delay)
@@ -258,8 +259,8 @@ data WlKeyboardEvent a
   deriving Show
 
 foreign import ccall "wrapper" wrap_wl_keyboard_listener_keymap     :: ListenerCallback (Ptr () -> WlKeyboard -> CUInt {-fmt-} -> CInt{-fd-} -> CUInt{-size-} -> IO ())
-foreign import ccall "wrapper" wrap_wl_keyboard_listener_Enter      :: ListenerCallback (Ptr () -> WlKeyboard -> CUInt -> WlSurface -> WlArray -> IO ())
-foreign import ccall "wrapper" wrap_wl_keyboard_listener_Leave      :: ListenerCallback (Ptr () -> WlKeyboard -> CUInt -> WlSurface -> IO ())
+foreign import ccall "wrapper" wrap_wl_keyboard_listener_Enter      :: ListenerCallback (Ptr () -> WlKeyboard -> CUInt -> Ptr () -> WlArray -> IO ())
+foreign import ccall "wrapper" wrap_wl_keyboard_listener_Leave      :: ListenerCallback (Ptr () -> WlKeyboard -> CUInt -> Ptr () -> IO ())
 foreign import ccall "wrapper" wrap_wl_keyboard_listener_Key        :: ListenerCallback (Ptr () -> WlKeyboard -> CUInt -> CUInt -> CUInt -> CUInt -> IO ())
 foreign import ccall "wrapper" wrap_wl_keyboard_listener_Modifiers  :: ListenerCallback (Ptr () -> WlKeyboard -> CUInt -> CUInt -> CUInt -> CUInt -> CUInt -> IO ())
 foreign import ccall "wrapper" wrap_wl_keyboard_listener_RepeatInfo :: ListenerCallback (Ptr () -> WlKeyboard -> CInt -> CInt -> IO ())

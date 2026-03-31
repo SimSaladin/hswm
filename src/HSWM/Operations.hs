@@ -6,6 +6,8 @@ import qualified Data.Map as M
 import qualified HSWM.StackSet as W
 import           HSWM.Types
 import           River
+import System.IO
+import System.Posix.Process (executeFile)
 
 windows :: H ()
 windows = do
@@ -46,18 +48,17 @@ windows = do
         updateLayout n ml'
 
         let m   = W.floating ws
-            flt = [(fw, scaleRationalRect viewrect r)
+            flt = [(fw, scaleRationalRect viewrect r, True)
                     | fw <- filter (`M.member` m) (W.index this)
                     , fw `notElem` vis
                     , Just r <- [M.lookup fw m]]
-            vs = flt ++ rs
 
         -- return the visible windows for this workspace:
-        return vs
+        return (flt ++ [ (a, b, False) | (a, b) <- rs])
 
-    let visible = map fst rects
+    let visible = map (\(a,_,_) -> a) rects
 
-    mapM_ (uncurry tileWindow) rects
+    mapM_ (\(a,b,c) -> tileWindow c a b) rects
 
     whenJust (W.peek ws) $ \w ->
       setWindowBorder w =<< asks (focusedBorder . config)
@@ -81,7 +82,7 @@ scaleRationalRect (Rectangle sx sy sw sh) (W.RationalRect rx ry rw rh)
 
 -- | Draw borders on the the window.
 setWindowBorder :: RiverWindow -> RiverColor -> H ()
-setWindowBorder w RiverColor {red = wb_r, green = wb_g, blue = wb_b, alpha = wb_a} = do
+setWindowBorder w RiverColor {red = wb_r, green = wb_g, blue = wb_b, alpha = wb_a} = withWindow w $ \_ -> do
     wb_width <- asks (borderWidth . config)
     wb_edges <- asks (fi . borderEdges . config)
     let borders = WindowBorders{..}
@@ -89,20 +90,25 @@ setWindowBorder w RiverColor {red = wb_r, green = wb_g, blue = wb_b, alpha = wb_
 
 -- | Move and resize @w@ such that it fits inside the given rectangle,
 -- including its border.
-tileWindow :: RiverWindow -> Rectangle -> H ()
-tileWindow i r = withWindow i $ \w -> do
+tileWindow :: Bool -> RiverWindow -> Rectangle -> H ()
+tileWindow placeTop i r = withWindow i $ \w -> do
+    bw <- asks (fi . borderWidth . config)
     -- give all windows at least 1x1 pixels
-    let bw = 1 -- fromIntegral $ wa_border_width wa
-        least x | x <= bw*2  = 1
+    let least x | x <= bw*2  = 1
                 | otherwise  = x - bw*2
     io $ river_window_v1_propose_dimensions w.river_window (least $ fi r.width) (least $ fi r.height)
     io $ setNodePosition w.node (fi r.x + bw) (fi r.y + bw)
+    when placeTop $ io $  river_node_v1_place_top w.node
 
 reveal :: RiverWindow -> H ()
-reveal rw = io $ river_window_v1_show rw
+reveal rw = withWindow rw $ \_ -> do
+  debug' $ "window: show " <> tshow rw
+  io $ river_window_v1_show rw
 
 hide :: RiverWindow -> H ()
-hide rw = io $ river_window_v1_hide rw
+hide rw = withWindow rw $ \_ -> do
+  debug' $ "window: hide " <> tshow rw
+  io $ river_window_v1_hide rw
 
 -- | Set the focus to the window on top of the stack, or root
 setTopFocus :: H ()
@@ -125,29 +131,40 @@ setInitialProperties rw = do
 {-
 -- | Throw a message to the current 'LayoutClass' possibly modifying how we
 -- layout the windows, in which case changes are handled through a refresh.
+-}
 sendMessage :: Message a => a -> H ()
-sendMessage a = windowBracket_ $ do
+sendMessage a = do
     w <- gets $ W.workspace . W.current . windowset
     ml' <- handleMessage (W.layout w) (SomeMessage a) `catchH` return Nothing
-    whenJust ml' $ \l' ->
+    whenJust ml' $ \l' -> do
         modifyWindowSet $ \ws -> ws { W.current = (W.current ws)
                                 { W.workspace = (W.workspace $ W.current ws)
                                   { W.layout = l' }}}
-    return (Any $ isJust ml')
--}
+        manageDirty
+    return ()
 
--- -- | Send a message to all layouts, without refreshing.
--- broadcastMessage :: Message a => a -> H ()
--- broadcastMessage a = withWindowSet $ \ws -> do
---     -- this is O(n²), but we can't really fix this as there's code in
---     -- xmonad-contrib that touches the windowset during handleMessage
---     -- (returning Nothing for changes to not get overwritten), so we
---     -- unfortunately need to do this one by one and persist layout states
---     -- of each workspace separately)
---     let c = W.workspace . W.current $ ws
---         v = map W.workspace . W.visible $ ws
---         h = W.hidden ws
---     mapM_ (sendMessageWithNoRefresh a) (c : v ++ h)
+--  Xmonad impl:
+--sendMessage a = windowBracket_ $ do
+--    w <- gets $ W.workspace . W.current . windowset
+--    ml' <- handleMessage (W.layout w) (SomeMessage a) `catchH` return Nothing
+--    whenJust ml' $ \l' ->
+--        modifyWindowSet $ \ws -> ws { W.current = (W.current ws)
+--                                { W.workspace = (W.workspace $ W.current ws)
+--                                  { W.layout = l' }}}
+--    return (Any $ isJust ml')
+
+-- | Send a message to all layouts, without refreshing.
+broadcastMessage :: Message a => a -> H ()
+broadcastMessage a = withWindowSet $ \ws -> do
+    -- this is O(n²), but we can't really fix this as there's code in
+    -- xmonad-contrib that touches the windowset during handleMessage
+    -- (returning Nothing for changes to not get overwritten), so we
+    -- unfortunately need to do this one by one and persist layout states
+    -- of each workspace separately)
+    let c = W.workspace . W.current $ ws
+        v = map W.workspace . W.visible $ ws
+        h = W.hidden ws
+    mapM_ (sendMessageWithNoRefresh a) (c : v ++ h)
 
 -- | Send a message to a layout, without refreshing.
 sendMessageWithNoRefresh :: Message a => a -> WindowSpace -> H ()
@@ -160,6 +177,8 @@ updateLayout :: WorkspaceId -> Maybe (Layout RiverWindow) -> H ()
 updateLayout i ml = whenJust ml $ \l ->
     runOnWorkspaces $ \ww -> return $ if W.tag ww == i then ww { W.layout = l} else ww
 
+manageDirty :: H ()
+manageDirty = withObject (io . riverWindowManagerManageDirty)
 
 --------------------------------------------------------------
 
@@ -222,6 +241,9 @@ mapSeats f = gets _seats >>= mapM_ f
 
 -- windows
 
+withFocused :: (Window -> H ()) -> H ()
+withFocused f = gets windowset >>= \ws -> whenJust (W.peek ws) (`withWindow` f)
+
 withWindow :: RiverWindow -> (Window -> H ()) -> H ()
 withWindow wid f = gets _windows >>= mapM_ (\w -> when (w.river_window == wid) (f w))
 
@@ -232,3 +254,30 @@ modifyWindow w f = modify $ \s -> s { _windows = map g s._windows }
 
 mapWindows :: (Window -> H ()) -> H ()
 mapWindows f = gets _windows >>= mapM_ f
+
+
+-------------------------------------------------------------------
+
+data StateData = StateData
+  { sfWins :: W.StackSet  WorkspaceId String RiverWindow WorkspaceDetail ScreenId ScreenDetail
+  , sfExt  :: [(String, String)]
+  } deriving (Show, Read)
+
+restart :: String -> H ()
+restart prog = do
+  broadcastMessage ReleaseResources
+  writeStateToFile
+  io $ (executeFile prog True [] Nothing) `catch`
+    (\(SomeException e) -> hPrint stderr e >> hFlush stderr)
+
+writeStateToFile :: H ()
+writeStateToFile = do
+  let path = ".hswm.state"
+      wsData = W.mapLayout show . windowset
+      extState _ = [] -- TODO
+  stateData <- gets $ \s -> StateData (wsData s) (extState s)
+  catchIO $ writeFile path $ show stateData
+
+
+catchIO :: MonadIO m => IO () -> m ()
+catchIO f = io (f `catch` \(SomeException e) -> hPrint stderr e >> hFlush stderr)

@@ -19,33 +19,33 @@
 {-# LANGUAGE UndecidableInstances #-}
 
 module Generated.Wayland.Util
-    ( Generated.Wayland.Util.WlObject
+    ( Generated.Wayland.Util.Wl_object
     , Generated.Wayland.Util.wL_MAX_MESSAGE_SIZE
-    , Generated.Wayland.Util.WlMessage(..)
-    , Generated.Wayland.Util.WlInterface(..)
-    , Generated.Wayland.Util.WlList(..)
-    , Generated.Wayland.Util.WlArray(..)
+    , Generated.Wayland.Util.Wl_message(..)
+    , Generated.Wayland.Util.Wl_interface(..)
+    , Generated.Wayland.Util.Wl_list(..)
+    , Generated.Wayland.Util.Wl_array(..)
     , Generated.Wayland.Util.Wl_fixed_t(..)
-    , Generated.Wayland.Util.WlArgument(..)
-    , Generated.Wayland.Util.get_wlArgument_i
-    , Generated.Wayland.Util.set_wlArgument_i
-    , Generated.Wayland.Util.get_wlArgument_u
-    , Generated.Wayland.Util.set_wlArgument_u
-    , Generated.Wayland.Util.get_wlArgument_f
-    , Generated.Wayland.Util.set_wlArgument_f
-    , Generated.Wayland.Util.get_wlArgument_s
-    , Generated.Wayland.Util.set_wlArgument_s
-    , Generated.Wayland.Util.get_wlArgument_o
-    , Generated.Wayland.Util.set_wlArgument_o
-    , Generated.Wayland.Util.get_wlArgument_n
-    , Generated.Wayland.Util.set_wlArgument_n
-    , Generated.Wayland.Util.get_wlArgument_a
-    , Generated.Wayland.Util.set_wlArgument_a
-    , Generated.Wayland.Util.get_wlArgument_h
-    , Generated.Wayland.Util.set_wlArgument_h
-    , Generated.Wayland.Util.WlDispatcherFuncT_Aux(..)
-    , Generated.Wayland.Util.WlDispatcherFuncT(..)
-    , Generated.Wayland.Util.WlIteratorResult(..)
+    , Generated.Wayland.Util.Wl_argument(..)
+    , Generated.Wayland.Util.get_wl_argument_i
+    , Generated.Wayland.Util.set_wl_argument_i
+    , Generated.Wayland.Util.get_wl_argument_u
+    , Generated.Wayland.Util.set_wl_argument_u
+    , Generated.Wayland.Util.get_wl_argument_f
+    , Generated.Wayland.Util.set_wl_argument_f
+    , Generated.Wayland.Util.get_wl_argument_s
+    , Generated.Wayland.Util.set_wl_argument_s
+    , Generated.Wayland.Util.get_wl_argument_o
+    , Generated.Wayland.Util.set_wl_argument_o
+    , Generated.Wayland.Util.get_wl_argument_n
+    , Generated.Wayland.Util.set_wl_argument_n
+    , Generated.Wayland.Util.get_wl_argument_a
+    , Generated.Wayland.Util.set_wl_argument_a
+    , Generated.Wayland.Util.get_wl_argument_h
+    , Generated.Wayland.Util.set_wl_argument_h
+    , Generated.Wayland.Util.Wl_dispatcher_func_t_Aux(..)
+    , Generated.Wayland.Util.Wl_dispatcher_func_t(..)
+    , Generated.Wayland.Util.Wl_iterator_result(..)
     , pattern Generated.Wayland.Util.WL_ITERATOR_STOP
     , pattern Generated.Wayland.Util.WL_ITERATOR_CONTINUE
     )
@@ -64,7 +64,7 @@ import qualified HsBindgen.Runtime.PtrConst as PtrConst
 
     __exported by:__ @wayland-util.h@
 -}
-data WlObject
+data Wl_object
 
 {-| __C declaration:__ @macro WL_MAX_MESSAGE_SIZE@
 
@@ -81,7 +81,7 @@ wL_MAX_MESSAGE_SIZE = (4096 :: RIP.CInt)
 
     __exported by:__ @wayland-util.h@
 -}
-data WlMessage = WlMessage
+data Wl_message = Wl_message
   { name :: PtrConst.PtrConst RIP.CChar
     {- ^ __C declaration:__ @name@
 
@@ -96,7 +96,7 @@ data WlMessage = WlMessage
 
          __exported by:__ @wayland-util.h@
     -}
-  , types :: RIP.Ptr (PtrConst.PtrConst WlInterface)
+  , types :: RIP.Ptr (PtrConst.PtrConst Wl_interface)
     {- ^ __C declaration:__ @types@
 
          __defined at:__ @wayland-util.h 183:30@
@@ -106,67 +106,67 @@ data WlMessage = WlMessage
   }
   deriving stock (Eq, RIP.Generic, Show)
 
-instance Marshal.StaticSize WlMessage where
+instance Marshal.StaticSize Wl_message where
 
   staticSizeOf = \_ -> (24 :: Int)
 
   staticAlignment = \_ -> (8 :: Int)
 
-instance Marshal.ReadRaw WlMessage where
+instance Marshal.ReadRaw Wl_message where
 
   readRaw =
     \ptr0 ->
-          pure WlMessage
+          pure Wl_message
       <*> HasCField.readRaw (RIP.Proxy @"name") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"signature") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"types") ptr0
 
-instance Marshal.WriteRaw WlMessage where
+instance Marshal.WriteRaw Wl_message where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          WlMessage name2 signature3 types4 ->
+          Wl_message name2 signature3 types4 ->
                HasCField.writeRaw (RIP.Proxy @"name") ptr0 name2
             >> HasCField.writeRaw (RIP.Proxy @"signature") ptr0 signature3
             >> HasCField.writeRaw (RIP.Proxy @"types") ptr0 types4
 
-deriving via Marshal.EquivStorable WlMessage instance RIP.Storable WlMessage
+deriving via Marshal.EquivStorable Wl_message instance RIP.Storable Wl_message
 
-instance HasCField.HasCField WlMessage "name" where
+instance HasCField.HasCField Wl_message "name" where
 
-  type CFieldType WlMessage "name" =
+  type CFieldType Wl_message "name" =
     PtrConst.PtrConst RIP.CChar
 
   offset# = \_ -> \_ -> 0
 
 instance ( ((~) ty) (PtrConst.PtrConst RIP.CChar)
-         ) => RIP.HasField "name" (RIP.Ptr WlMessage) (RIP.Ptr ty) where
+         ) => RIP.HasField "name" (RIP.Ptr Wl_message) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"name")
 
-instance HasCField.HasCField WlMessage "signature" where
+instance HasCField.HasCField Wl_message "signature" where
 
-  type CFieldType WlMessage "signature" =
+  type CFieldType Wl_message "signature" =
     PtrConst.PtrConst RIP.CChar
 
   offset# = \_ -> \_ -> 8
 
 instance ( ((~) ty) (PtrConst.PtrConst RIP.CChar)
-         ) => RIP.HasField "signature" (RIP.Ptr WlMessage) (RIP.Ptr ty) where
+         ) => RIP.HasField "signature" (RIP.Ptr Wl_message) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"signature")
 
-instance HasCField.HasCField WlMessage "types" where
+instance HasCField.HasCField Wl_message "types" where
 
-  type CFieldType WlMessage "types" =
-    RIP.Ptr (PtrConst.PtrConst WlInterface)
+  type CFieldType Wl_message "types" =
+    RIP.Ptr (PtrConst.PtrConst Wl_interface)
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) (RIP.Ptr (PtrConst.PtrConst WlInterface))
-         ) => RIP.HasField "types" (RIP.Ptr WlMessage) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.Ptr (PtrConst.PtrConst Wl_interface))
+         ) => RIP.HasField "types" (RIP.Ptr Wl_message) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"types")
 
@@ -176,7 +176,7 @@ instance ( ((~) ty) (RIP.Ptr (PtrConst.PtrConst WlInterface))
 
     __exported by:__ @wayland-util.h@
 -}
-data WlInterface = WlInterface
+data Wl_interface = Wl_interface
   { name :: PtrConst.PtrConst RIP.CChar
     {- ^ __C declaration:__ @name@
 
@@ -198,7 +198,7 @@ data WlInterface = WlInterface
 
          __exported by:__ @wayland-util.h@
     -}
-  , methods :: PtrConst.PtrConst WlMessage
+  , methods :: PtrConst.PtrConst Wl_message
     {- ^ __C declaration:__ @methods@
 
          __defined at:__ @wayland-util.h 240:27@
@@ -212,7 +212,7 @@ data WlInterface = WlInterface
 
          __exported by:__ @wayland-util.h@
     -}
-  , events :: PtrConst.PtrConst WlMessage
+  , events :: PtrConst.PtrConst Wl_message
     {- ^ __C declaration:__ @events@
 
          __defined at:__ @wayland-util.h 244:27@
@@ -222,17 +222,17 @@ data WlInterface = WlInterface
   }
   deriving stock (Eq, RIP.Generic, Show)
 
-instance Marshal.StaticSize WlInterface where
+instance Marshal.StaticSize Wl_interface where
 
   staticSizeOf = \_ -> (40 :: Int)
 
   staticAlignment = \_ -> (8 :: Int)
 
-instance Marshal.ReadRaw WlInterface where
+instance Marshal.ReadRaw Wl_interface where
 
   readRaw =
     \ptr0 ->
-          pure WlInterface
+          pure Wl_interface
       <*> HasCField.readRaw (RIP.Proxy @"name") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"version") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"method_count") ptr0
@@ -240,13 +240,13 @@ instance Marshal.ReadRaw WlInterface where
       <*> HasCField.readRaw (RIP.Proxy @"event_count") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"events") ptr0
 
-instance Marshal.WriteRaw WlInterface where
+instance Marshal.WriteRaw Wl_interface where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          WlInterface name2 version3 method_count4 methods5 event_count6 events7 ->
+          Wl_interface name2 version3 method_count4 methods5 event_count6 events7 ->
                HasCField.writeRaw (RIP.Proxy @"name") ptr0 name2
             >> HasCField.writeRaw (RIP.Proxy @"version") ptr0 version3
             >> HasCField.writeRaw (RIP.Proxy @"method_count") ptr0 method_count4
@@ -254,76 +254,77 @@ instance Marshal.WriteRaw WlInterface where
             >> HasCField.writeRaw (RIP.Proxy @"event_count") ptr0 event_count6
             >> HasCField.writeRaw (RIP.Proxy @"events") ptr0 events7
 
-deriving via Marshal.EquivStorable WlInterface instance RIP.Storable WlInterface
+deriving via Marshal.EquivStorable Wl_interface instance RIP.Storable Wl_interface
 
-instance HasCField.HasCField WlInterface "name" where
+instance HasCField.HasCField Wl_interface "name" where
 
-  type CFieldType WlInterface "name" =
+  type CFieldType Wl_interface "name" =
     PtrConst.PtrConst RIP.CChar
 
   offset# = \_ -> \_ -> 0
 
 instance ( ((~) ty) (PtrConst.PtrConst RIP.CChar)
-         ) => RIP.HasField "name" (RIP.Ptr WlInterface) (RIP.Ptr ty) where
+         ) => RIP.HasField "name" (RIP.Ptr Wl_interface) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"name")
 
-instance HasCField.HasCField WlInterface "version" where
+instance HasCField.HasCField Wl_interface "version" where
 
-  type CFieldType WlInterface "version" = RIP.CInt
+  type CFieldType Wl_interface "version" = RIP.CInt
 
   offset# = \_ -> \_ -> 8
 
 instance ( ((~) ty) RIP.CInt
-         ) => RIP.HasField "version" (RIP.Ptr WlInterface) (RIP.Ptr ty) where
+         ) => RIP.HasField "version" (RIP.Ptr Wl_interface) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"version")
 
-instance HasCField.HasCField WlInterface "method_count" where
+instance HasCField.HasCField Wl_interface "method_count" where
 
-  type CFieldType WlInterface "method_count" = RIP.CInt
+  type CFieldType Wl_interface "method_count" =
+    RIP.CInt
 
   offset# = \_ -> \_ -> 12
 
 instance ( ((~) ty) RIP.CInt
-         ) => RIP.HasField "method_count" (RIP.Ptr WlInterface) (RIP.Ptr ty) where
+         ) => RIP.HasField "method_count" (RIP.Ptr Wl_interface) (RIP.Ptr ty) where
 
   getField =
     HasCField.fromPtr (RIP.Proxy @"method_count")
 
-instance HasCField.HasCField WlInterface "methods" where
+instance HasCField.HasCField Wl_interface "methods" where
 
-  type CFieldType WlInterface "methods" =
-    PtrConst.PtrConst WlMessage
+  type CFieldType Wl_interface "methods" =
+    PtrConst.PtrConst Wl_message
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) (PtrConst.PtrConst WlMessage)
-         ) => RIP.HasField "methods" (RIP.Ptr WlInterface) (RIP.Ptr ty) where
+instance ( ((~) ty) (PtrConst.PtrConst Wl_message)
+         ) => RIP.HasField "methods" (RIP.Ptr Wl_interface) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"methods")
 
-instance HasCField.HasCField WlInterface "event_count" where
+instance HasCField.HasCField Wl_interface "event_count" where
 
-  type CFieldType WlInterface "event_count" = RIP.CInt
+  type CFieldType Wl_interface "event_count" = RIP.CInt
 
   offset# = \_ -> \_ -> 24
 
 instance ( ((~) ty) RIP.CInt
-         ) => RIP.HasField "event_count" (RIP.Ptr WlInterface) (RIP.Ptr ty) where
+         ) => RIP.HasField "event_count" (RIP.Ptr Wl_interface) (RIP.Ptr ty) where
 
   getField =
     HasCField.fromPtr (RIP.Proxy @"event_count")
 
-instance HasCField.HasCField WlInterface "events" where
+instance HasCField.HasCField Wl_interface "events" where
 
-  type CFieldType WlInterface "events" =
-    PtrConst.PtrConst WlMessage
+  type CFieldType Wl_interface "events" =
+    PtrConst.PtrConst Wl_message
 
   offset# = \_ -> \_ -> 32
 
-instance ( ((~) ty) (PtrConst.PtrConst WlMessage)
-         ) => RIP.HasField "events" (RIP.Ptr WlInterface) (RIP.Ptr ty) where
+instance ( ((~) ty) (PtrConst.PtrConst Wl_message)
+         ) => RIP.HasField "events" (RIP.Ptr Wl_interface) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"events")
 
@@ -333,15 +334,15 @@ instance ( ((~) ty) (PtrConst.PtrConst WlMessage)
 
     __exported by:__ @wayland-util.h@
 -}
-data WlList = WlList
-  { prev :: RIP.Ptr WlList
+data Wl_list = Wl_list
+  { prev :: RIP.Ptr Wl_list
     {- ^ __C declaration:__ @prev@
 
          __defined at:__ @wayland-util.h 306:18@
 
          __exported by:__ @wayland-util.h@
     -}
-  , next :: RIP.Ptr WlList
+  , next :: RIP.Ptr Wl_list
     {- ^ __C declaration:__ @next@
 
          __defined at:__ @wayland-util.h 308:18@
@@ -351,51 +352,51 @@ data WlList = WlList
   }
   deriving stock (Eq, RIP.Generic, Show)
 
-instance Marshal.StaticSize WlList where
+instance Marshal.StaticSize Wl_list where
 
   staticSizeOf = \_ -> (16 :: Int)
 
   staticAlignment = \_ -> (8 :: Int)
 
-instance Marshal.ReadRaw WlList where
+instance Marshal.ReadRaw Wl_list where
 
   readRaw =
     \ptr0 ->
-          pure WlList
+          pure Wl_list
       <*> HasCField.readRaw (RIP.Proxy @"prev") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"next") ptr0
 
-instance Marshal.WriteRaw WlList where
+instance Marshal.WriteRaw Wl_list where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          WlList prev2 next3 ->
+          Wl_list prev2 next3 ->
                HasCField.writeRaw (RIP.Proxy @"prev") ptr0 prev2
             >> HasCField.writeRaw (RIP.Proxy @"next") ptr0 next3
 
-deriving via Marshal.EquivStorable WlList instance RIP.Storable WlList
+deriving via Marshal.EquivStorable Wl_list instance RIP.Storable Wl_list
 
-instance HasCField.HasCField WlList "prev" where
+instance HasCField.HasCField Wl_list "prev" where
 
-  type CFieldType WlList "prev" = RIP.Ptr WlList
+  type CFieldType Wl_list "prev" = RIP.Ptr Wl_list
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.Ptr WlList)
-         ) => RIP.HasField "prev" (RIP.Ptr WlList) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.Ptr Wl_list)
+         ) => RIP.HasField "prev" (RIP.Ptr Wl_list) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"prev")
 
-instance HasCField.HasCField WlList "next" where
+instance HasCField.HasCField Wl_list "next" where
 
-  type CFieldType WlList "next" = RIP.Ptr WlList
+  type CFieldType Wl_list "next" = RIP.Ptr Wl_list
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.Ptr WlList)
-         ) => RIP.HasField "next" (RIP.Ptr WlList) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.Ptr Wl_list)
+         ) => RIP.HasField "next" (RIP.Ptr Wl_list) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"next")
 
@@ -405,7 +406,7 @@ instance ( ((~) ty) (RIP.Ptr WlList)
 
     __exported by:__ @wayland-util.h@
 -}
-data WlArray = WlArray
+data Wl_array = Wl_array
   { size :: HsBindgen.Runtime.LibC.CSize
     {- ^ __C declaration:__ @size@
 
@@ -430,66 +431,66 @@ data WlArray = WlArray
   }
   deriving stock (Eq, RIP.Generic, Show)
 
-instance Marshal.StaticSize WlArray where
+instance Marshal.StaticSize Wl_array where
 
   staticSizeOf = \_ -> (24 :: Int)
 
   staticAlignment = \_ -> (8 :: Int)
 
-instance Marshal.ReadRaw WlArray where
+instance Marshal.ReadRaw Wl_array where
 
   readRaw =
     \ptr0 ->
-          pure WlArray
+          pure Wl_array
       <*> HasCField.readRaw (RIP.Proxy @"size") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"alloc") ptr0
       <*> HasCField.readRaw (RIP.Proxy @"data'") ptr0
 
-instance Marshal.WriteRaw WlArray where
+instance Marshal.WriteRaw Wl_array where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          WlArray size2 alloc3 data'4 ->
+          Wl_array size2 alloc3 data'4 ->
                HasCField.writeRaw (RIP.Proxy @"size") ptr0 size2
             >> HasCField.writeRaw (RIP.Proxy @"alloc") ptr0 alloc3
             >> HasCField.writeRaw (RIP.Proxy @"data'") ptr0 data'4
 
-deriving via Marshal.EquivStorable WlArray instance RIP.Storable WlArray
+deriving via Marshal.EquivStorable Wl_array instance RIP.Storable Wl_array
 
-instance HasCField.HasCField WlArray "size" where
+instance HasCField.HasCField Wl_array "size" where
 
-  type CFieldType WlArray "size" =
+  type CFieldType Wl_array "size" =
     HsBindgen.Runtime.LibC.CSize
 
   offset# = \_ -> \_ -> 0
 
 instance ( ((~) ty) HsBindgen.Runtime.LibC.CSize
-         ) => RIP.HasField "size" (RIP.Ptr WlArray) (RIP.Ptr ty) where
+         ) => RIP.HasField "size" (RIP.Ptr Wl_array) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"size")
 
-instance HasCField.HasCField WlArray "alloc" where
+instance HasCField.HasCField Wl_array "alloc" where
 
-  type CFieldType WlArray "alloc" =
+  type CFieldType Wl_array "alloc" =
     HsBindgen.Runtime.LibC.CSize
 
   offset# = \_ -> \_ -> 8
 
 instance ( ((~) ty) HsBindgen.Runtime.LibC.CSize
-         ) => RIP.HasField "alloc" (RIP.Ptr WlArray) (RIP.Ptr ty) where
+         ) => RIP.HasField "alloc" (RIP.Ptr Wl_array) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"alloc")
 
-instance HasCField.HasCField WlArray "data'" where
+instance HasCField.HasCField Wl_array "data'" where
 
-  type CFieldType WlArray "data'" = RIP.Ptr RIP.Void
+  type CFieldType Wl_array "data'" = RIP.Ptr RIP.Void
 
   offset# = \_ -> \_ -> 16
 
 instance ( ((~) ty) (RIP.Ptr RIP.Void)
-         ) => RIP.HasField "data'" (RIP.Ptr WlArray) (RIP.Ptr ty) where
+         ) => RIP.HasField "data'" (RIP.Ptr Wl_array) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"data'")
 
@@ -539,22 +540,22 @@ instance HasCField.HasCField Wl_fixed_t "unwrap" where
 
     __exported by:__ @wayland-util.h@
 -}
-newtype WlArgument = WlArgument
+newtype Wl_argument = Wl_argument
   { unwrap :: RIP.ByteArray
   }
   deriving stock (RIP.Generic)
 
-deriving via (RIP.SizedByteArray 8) 8 instance Marshal.StaticSize WlArgument
+deriving via (RIP.SizedByteArray 8) 8 instance Marshal.StaticSize Wl_argument
 
-deriving via (RIP.SizedByteArray 8) 8 instance Marshal.ReadRaw WlArgument
+deriving via (RIP.SizedByteArray 8) 8 instance Marshal.ReadRaw Wl_argument
 
-deriving via (RIP.SizedByteArray 8) 8 instance Marshal.WriteRaw WlArgument
+deriving via (RIP.SizedByteArray 8) 8 instance Marshal.WriteRaw Wl_argument
 
-deriving via Marshal.EquivStorable WlArgument instance RIP.Storable WlArgument
+deriving via Marshal.EquivStorable Wl_argument instance RIP.Storable Wl_argument
 
 {-|
 
-  __See:__ 'set_wlArgument_i'
+  __See:__ 'set_wl_argument_i'
 
 __C declaration:__ @i@
 
@@ -562,24 +563,24 @@ __defined at:__ @wayland-util.h 687:10@
 
 __exported by:__ @wayland-util.h@
 -}
-get_wlArgument_i ::
-     WlArgument
+get_wl_argument_i ::
+     Wl_argument
   -> HsBindgen.Runtime.LibC.Int32
-get_wlArgument_i = RIP.getUnionPayload
+get_wl_argument_i = RIP.getUnionPayload
 
 {-|
 
-  __See:__ 'get_wlArgument_i'
+  __See:__ 'get_wl_argument_i'
 
 -}
-set_wlArgument_i ::
+set_wl_argument_i ::
      HsBindgen.Runtime.LibC.Int32
-  -> WlArgument
-set_wlArgument_i = RIP.setUnionPayload
+  -> Wl_argument
+set_wl_argument_i = RIP.setUnionPayload
 
 {-|
 
-  __See:__ 'set_wlArgument_u'
+  __See:__ 'set_wl_argument_u'
 
 __C declaration:__ @u@
 
@@ -587,24 +588,24 @@ __defined at:__ @wayland-util.h 688:11@
 
 __exported by:__ @wayland-util.h@
 -}
-get_wlArgument_u ::
-     WlArgument
+get_wl_argument_u ::
+     Wl_argument
   -> HsBindgen.Runtime.LibC.Word32
-get_wlArgument_u = RIP.getUnionPayload
+get_wl_argument_u = RIP.getUnionPayload
 
 {-|
 
-  __See:__ 'get_wlArgument_u'
+  __See:__ 'get_wl_argument_u'
 
 -}
-set_wlArgument_u ::
+set_wl_argument_u ::
      HsBindgen.Runtime.LibC.Word32
-  -> WlArgument
-set_wlArgument_u = RIP.setUnionPayload
+  -> Wl_argument
+set_wl_argument_u = RIP.setUnionPayload
 
 {-|
 
-  __See:__ 'set_wlArgument_f'
+  __See:__ 'set_wl_argument_f'
 
 __C declaration:__ @f@
 
@@ -612,24 +613,24 @@ __defined at:__ @wayland-util.h 689:13@
 
 __exported by:__ @wayland-util.h@
 -}
-get_wlArgument_f ::
-     WlArgument
+get_wl_argument_f ::
+     Wl_argument
   -> Wl_fixed_t
-get_wlArgument_f = RIP.getUnionPayload
+get_wl_argument_f = RIP.getUnionPayload
 
 {-|
 
-  __See:__ 'get_wlArgument_f'
+  __See:__ 'get_wl_argument_f'
 
 -}
-set_wlArgument_f ::
+set_wl_argument_f ::
      Wl_fixed_t
-  -> WlArgument
-set_wlArgument_f = RIP.setUnionPayload
+  -> Wl_argument
+set_wl_argument_f = RIP.setUnionPayload
 
 {-|
 
-  __See:__ 'set_wlArgument_s'
+  __See:__ 'set_wl_argument_s'
 
 __C declaration:__ @s@
 
@@ -637,24 +638,24 @@ __defined at:__ @wayland-util.h 690:14@
 
 __exported by:__ @wayland-util.h@
 -}
-get_wlArgument_s ::
-     WlArgument
+get_wl_argument_s ::
+     Wl_argument
   -> PtrConst.PtrConst RIP.CChar
-get_wlArgument_s = RIP.getUnionPayload
+get_wl_argument_s = RIP.getUnionPayload
 
 {-|
 
-  __See:__ 'get_wlArgument_s'
+  __See:__ 'get_wl_argument_s'
 
 -}
-set_wlArgument_s ::
+set_wl_argument_s ::
      PtrConst.PtrConst RIP.CChar
-  -> WlArgument
-set_wlArgument_s = RIP.setUnionPayload
+  -> Wl_argument
+set_wl_argument_s = RIP.setUnionPayload
 
 {-|
 
-  __See:__ 'set_wlArgument_o'
+  __See:__ 'set_wl_argument_o'
 
 __C declaration:__ @o@
 
@@ -662,24 +663,24 @@ __defined at:__ @wayland-util.h 691:20@
 
 __exported by:__ @wayland-util.h@
 -}
-get_wlArgument_o ::
-     WlArgument
-  -> RIP.Ptr WlObject
-get_wlArgument_o = RIP.getUnionPayload
+get_wl_argument_o ::
+     Wl_argument
+  -> RIP.Ptr Wl_object
+get_wl_argument_o = RIP.getUnionPayload
 
 {-|
 
-  __See:__ 'get_wlArgument_o'
+  __See:__ 'get_wl_argument_o'
 
 -}
-set_wlArgument_o ::
-     RIP.Ptr WlObject
-  -> WlArgument
-set_wlArgument_o = RIP.setUnionPayload
+set_wl_argument_o ::
+     RIP.Ptr Wl_object
+  -> Wl_argument
+set_wl_argument_o = RIP.setUnionPayload
 
 {-|
 
-  __See:__ 'set_wlArgument_n'
+  __See:__ 'set_wl_argument_n'
 
 __C declaration:__ @n@
 
@@ -687,24 +688,24 @@ __defined at:__ @wayland-util.h 692:11@
 
 __exported by:__ @wayland-util.h@
 -}
-get_wlArgument_n ::
-     WlArgument
+get_wl_argument_n ::
+     Wl_argument
   -> HsBindgen.Runtime.LibC.Word32
-get_wlArgument_n = RIP.getUnionPayload
+get_wl_argument_n = RIP.getUnionPayload
 
 {-|
 
-  __See:__ 'get_wlArgument_n'
+  __See:__ 'get_wl_argument_n'
 
 -}
-set_wlArgument_n ::
+set_wl_argument_n ::
      HsBindgen.Runtime.LibC.Word32
-  -> WlArgument
-set_wlArgument_n = RIP.setUnionPayload
+  -> Wl_argument
+set_wl_argument_n = RIP.setUnionPayload
 
 {-|
 
-  __See:__ 'set_wlArgument_a'
+  __See:__ 'set_wl_argument_a'
 
 __C declaration:__ @a@
 
@@ -712,24 +713,24 @@ __defined at:__ @wayland-util.h 693:19@
 
 __exported by:__ @wayland-util.h@
 -}
-get_wlArgument_a ::
-     WlArgument
-  -> RIP.Ptr WlArray
-get_wlArgument_a = RIP.getUnionPayload
+get_wl_argument_a ::
+     Wl_argument
+  -> RIP.Ptr Wl_array
+get_wl_argument_a = RIP.getUnionPayload
 
 {-|
 
-  __See:__ 'get_wlArgument_a'
+  __See:__ 'get_wl_argument_a'
 
 -}
-set_wlArgument_a ::
-     RIP.Ptr WlArray
-  -> WlArgument
-set_wlArgument_a = RIP.setUnionPayload
+set_wl_argument_a ::
+     RIP.Ptr Wl_array
+  -> Wl_argument
+set_wl_argument_a = RIP.setUnionPayload
 
 {-|
 
-  __See:__ 'set_wlArgument_h'
+  __See:__ 'set_wl_argument_h'
 
 __C declaration:__ @h@
 
@@ -737,115 +738,115 @@ __defined at:__ @wayland-util.h 694:10@
 
 __exported by:__ @wayland-util.h@
 -}
-get_wlArgument_h ::
-     WlArgument
+get_wl_argument_h ::
+     Wl_argument
   -> HsBindgen.Runtime.LibC.Int32
-get_wlArgument_h = RIP.getUnionPayload
+get_wl_argument_h = RIP.getUnionPayload
 
 {-|
 
-  __See:__ 'get_wlArgument_h'
+  __See:__ 'get_wl_argument_h'
 
 -}
-set_wlArgument_h ::
+set_wl_argument_h ::
      HsBindgen.Runtime.LibC.Int32
-  -> WlArgument
-set_wlArgument_h = RIP.setUnionPayload
+  -> Wl_argument
+set_wl_argument_h = RIP.setUnionPayload
 
-instance HasCField.HasCField WlArgument "i" where
+instance HasCField.HasCField Wl_argument "i" where
 
-  type CFieldType WlArgument "i" =
+  type CFieldType Wl_argument "i" =
     HsBindgen.Runtime.LibC.Int32
 
   offset# = \_ -> \_ -> 0
 
 instance ( ((~) ty) HsBindgen.Runtime.LibC.Int32
-         ) => RIP.HasField "i" (RIP.Ptr WlArgument) (RIP.Ptr ty) where
+         ) => RIP.HasField "i" (RIP.Ptr Wl_argument) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"i")
 
-instance HasCField.HasCField WlArgument "u" where
+instance HasCField.HasCField Wl_argument "u" where
 
-  type CFieldType WlArgument "u" =
+  type CFieldType Wl_argument "u" =
     HsBindgen.Runtime.LibC.Word32
 
   offset# = \_ -> \_ -> 0
 
 instance ( ((~) ty) HsBindgen.Runtime.LibC.Word32
-         ) => RIP.HasField "u" (RIP.Ptr WlArgument) (RIP.Ptr ty) where
+         ) => RIP.HasField "u" (RIP.Ptr Wl_argument) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"u")
 
-instance HasCField.HasCField WlArgument "f" where
+instance HasCField.HasCField Wl_argument "f" where
 
-  type CFieldType WlArgument "f" = Wl_fixed_t
+  type CFieldType Wl_argument "f" = Wl_fixed_t
 
   offset# = \_ -> \_ -> 0
 
 instance ( ((~) ty) Wl_fixed_t
-         ) => RIP.HasField "f" (RIP.Ptr WlArgument) (RIP.Ptr ty) where
+         ) => RIP.HasField "f" (RIP.Ptr Wl_argument) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"f")
 
-instance HasCField.HasCField WlArgument "s" where
+instance HasCField.HasCField Wl_argument "s" where
 
-  type CFieldType WlArgument "s" =
+  type CFieldType Wl_argument "s" =
     PtrConst.PtrConst RIP.CChar
 
   offset# = \_ -> \_ -> 0
 
 instance ( ((~) ty) (PtrConst.PtrConst RIP.CChar)
-         ) => RIP.HasField "s" (RIP.Ptr WlArgument) (RIP.Ptr ty) where
+         ) => RIP.HasField "s" (RIP.Ptr Wl_argument) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"s")
 
-instance HasCField.HasCField WlArgument "o" where
+instance HasCField.HasCField Wl_argument "o" where
 
-  type CFieldType WlArgument "o" = RIP.Ptr WlObject
+  type CFieldType Wl_argument "o" = RIP.Ptr Wl_object
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.Ptr WlObject)
-         ) => RIP.HasField "o" (RIP.Ptr WlArgument) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.Ptr Wl_object)
+         ) => RIP.HasField "o" (RIP.Ptr Wl_argument) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"o")
 
-instance HasCField.HasCField WlArgument "n" where
+instance HasCField.HasCField Wl_argument "n" where
 
-  type CFieldType WlArgument "n" =
+  type CFieldType Wl_argument "n" =
     HsBindgen.Runtime.LibC.Word32
 
   offset# = \_ -> \_ -> 0
 
 instance ( ((~) ty) HsBindgen.Runtime.LibC.Word32
-         ) => RIP.HasField "n" (RIP.Ptr WlArgument) (RIP.Ptr ty) where
+         ) => RIP.HasField "n" (RIP.Ptr Wl_argument) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"n")
 
-instance HasCField.HasCField WlArgument "a" where
+instance HasCField.HasCField Wl_argument "a" where
 
-  type CFieldType WlArgument "a" = RIP.Ptr WlArray
+  type CFieldType Wl_argument "a" = RIP.Ptr Wl_array
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.Ptr WlArray)
-         ) => RIP.HasField "a" (RIP.Ptr WlArgument) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.Ptr Wl_array)
+         ) => RIP.HasField "a" (RIP.Ptr Wl_argument) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"a")
 
-instance HasCField.HasCField WlArgument "h" where
+instance HasCField.HasCField Wl_argument "h" where
 
-  type CFieldType WlArgument "h" =
+  type CFieldType Wl_argument "h" =
     HsBindgen.Runtime.LibC.Int32
 
   offset# = \_ -> \_ -> 0
 
 instance ( ((~) ty) HsBindgen.Runtime.LibC.Int32
-         ) => RIP.HasField "h" (RIP.Ptr WlArgument) (RIP.Ptr ty) where
+         ) => RIP.HasField "h" (RIP.Ptr Wl_argument) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"h")
 
-{-| Auxiliary type used by 'WlDispatcherFuncT'
+{-| Auxiliary type used by 'Wl_dispatcher_func_t'
 
 __C declaration:__ @wl_dispatcher_func_t@
 
@@ -853,53 +854,53 @@ __defined at:__ @wayland-util.h 721:15@
 
 __exported by:__ @wayland-util.h@
 -}
-newtype WlDispatcherFuncT_Aux = WlDispatcherFuncT_Aux
-  { unwrap :: (PtrConst.PtrConst RIP.Void) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst WlMessage) -> (RIP.Ptr WlArgument) -> IO RIP.CInt
+newtype Wl_dispatcher_func_t_Aux = Wl_dispatcher_func_t_Aux
+  { unwrap :: (PtrConst.PtrConst RIP.Void) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst Wl_message) -> (RIP.Ptr Wl_argument) -> IO RIP.CInt
   }
   deriving stock (RIP.Generic)
   deriving newtype (RIP.HasFFIType)
 
-foreign import ccall safe "wrapper" hs_bindgen_170c805c4d6f56fe_base ::
+foreign import ccall safe "wrapper" hs_bindgen_9d6bd6644ff7c6e3_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO RIP.Int32)
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO RIP.Int32))
 
--- __unique:__ @toWlDispatcherFuncT_Aux@
-hs_bindgen_170c805c4d6f56fe ::
-     WlDispatcherFuncT_Aux
-  -> IO (RIP.FunPtr WlDispatcherFuncT_Aux)
-hs_bindgen_170c805c4d6f56fe =
+-- __unique:__ @toWl_dispatcher_func_t_Aux@
+hs_bindgen_9d6bd6644ff7c6e3 ::
+     Wl_dispatcher_func_t_Aux
+  -> IO (RIP.FunPtr Wl_dispatcher_func_t_Aux)
+hs_bindgen_9d6bd6644ff7c6e3 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_170c805c4d6f56fe_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_9d6bd6644ff7c6e3_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_5ca3fcbb7186e068_base ::
+foreign import ccall safe "dynamic" hs_bindgen_71d19b7e32a1b09a_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO RIP.Int32)
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO RIP.Int32
 
--- __unique:__ @fromWlDispatcherFuncT_Aux@
-hs_bindgen_5ca3fcbb7186e068 ::
-     RIP.FunPtr WlDispatcherFuncT_Aux
-  -> WlDispatcherFuncT_Aux
-hs_bindgen_5ca3fcbb7186e068 =
+-- __unique:__ @fromWl_dispatcher_func_t_Aux@
+hs_bindgen_71d19b7e32a1b09a ::
+     RIP.FunPtr Wl_dispatcher_func_t_Aux
+  -> Wl_dispatcher_func_t_Aux
+hs_bindgen_71d19b7e32a1b09a =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_5ca3fcbb7186e068_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_71d19b7e32a1b09a_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr WlDispatcherFuncT_Aux where
+instance RIP.ToFunPtr Wl_dispatcher_func_t_Aux where
 
-  toFunPtr = hs_bindgen_170c805c4d6f56fe
+  toFunPtr = hs_bindgen_9d6bd6644ff7c6e3
 
-instance RIP.FromFunPtr WlDispatcherFuncT_Aux where
+instance RIP.FromFunPtr Wl_dispatcher_func_t_Aux where
 
-  fromFunPtr = hs_bindgen_5ca3fcbb7186e068
+  fromFunPtr = hs_bindgen_71d19b7e32a1b09a
 
-instance ( ((~) ty) ((PtrConst.PtrConst RIP.Void) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst WlMessage) -> (RIP.Ptr WlArgument) -> IO RIP.CInt)
-         ) => RIP.HasField "unwrap" (RIP.Ptr WlDispatcherFuncT_Aux) (RIP.Ptr ty) where
+instance ( ((~) ty) ((PtrConst.PtrConst RIP.Void) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst Wl_message) -> (RIP.Ptr Wl_argument) -> IO RIP.CInt)
+         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_dispatcher_func_t_Aux) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField WlDispatcherFuncT_Aux "unwrap" where
+instance HasCField.HasCField Wl_dispatcher_func_t_Aux "unwrap" where
 
-  type CFieldType WlDispatcherFuncT_Aux "unwrap" =
-    (PtrConst.PtrConst RIP.Void) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst WlMessage) -> (RIP.Ptr WlArgument) -> IO RIP.CInt
+  type CFieldType Wl_dispatcher_func_t_Aux "unwrap" =
+    (PtrConst.PtrConst RIP.Void) -> (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> (PtrConst.PtrConst Wl_message) -> (RIP.Ptr Wl_argument) -> IO RIP.CInt
 
   offset# = \_ -> \_ -> 0
 
@@ -909,8 +910,8 @@ instance HasCField.HasCField WlDispatcherFuncT_Aux "unwrap" where
 
     __exported by:__ @wayland-util.h@
 -}
-newtype WlDispatcherFuncT = WlDispatcherFuncT
-  { unwrap :: RIP.FunPtr WlDispatcherFuncT_Aux
+newtype Wl_dispatcher_func_t = Wl_dispatcher_func_t
+  { unwrap :: RIP.FunPtr Wl_dispatcher_func_t_Aux
   }
   deriving stock (Eq, RIP.Generic, Ord, Show)
   deriving newtype
@@ -921,15 +922,15 @@ newtype WlDispatcherFuncT = WlDispatcherFuncT
     , Marshal.WriteRaw
     )
 
-instance ( ((~) ty) (RIP.FunPtr WlDispatcherFuncT_Aux)
-         ) => RIP.HasField "unwrap" (RIP.Ptr WlDispatcherFuncT) (RIP.Ptr ty) where
+instance ( ((~) ty) (RIP.FunPtr Wl_dispatcher_func_t_Aux)
+         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_dispatcher_func_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField WlDispatcherFuncT "unwrap" where
+instance HasCField.HasCField Wl_dispatcher_func_t "unwrap" where
 
-  type CFieldType WlDispatcherFuncT "unwrap" =
-    RIP.FunPtr WlDispatcherFuncT_Aux
+  type CFieldType Wl_dispatcher_func_t "unwrap" =
+    RIP.FunPtr Wl_dispatcher_func_t_Aux
 
   offset# = \_ -> \_ -> 0
 
@@ -939,43 +940,43 @@ instance HasCField.HasCField WlDispatcherFuncT "unwrap" where
 
     __exported by:__ @wayland-util.h@
 -}
-newtype WlIteratorResult = WlIteratorResult
+newtype Wl_iterator_result = Wl_iterator_result
   { unwrap :: RIP.CUInt
   }
   deriving stock (Eq, RIP.Generic, Ord)
   deriving newtype (RIP.HasFFIType)
 
-instance Marshal.StaticSize WlIteratorResult where
+instance Marshal.StaticSize Wl_iterator_result where
 
   staticSizeOf = \_ -> (4 :: Int)
 
   staticAlignment = \_ -> (4 :: Int)
 
-instance Marshal.ReadRaw WlIteratorResult where
+instance Marshal.ReadRaw Wl_iterator_result where
 
   readRaw =
     \ptr0 ->
-          pure WlIteratorResult
+          pure Wl_iterator_result
       <*> Marshal.readRawByteOff ptr0 (0 :: Int)
 
-instance Marshal.WriteRaw WlIteratorResult where
+instance Marshal.WriteRaw Wl_iterator_result where
 
   writeRaw =
     \ptr0 ->
       \s1 ->
         case s1 of
-          WlIteratorResult unwrap2 ->
+          Wl_iterator_result unwrap2 ->
             Marshal.writeRawByteOff ptr0 (0 :: Int) unwrap2
 
-deriving via Marshal.EquivStorable WlIteratorResult instance RIP.Storable WlIteratorResult
+deriving via Marshal.EquivStorable Wl_iterator_result instance RIP.Storable Wl_iterator_result
 
-deriving via RIP.CUInt instance RIP.Prim WlIteratorResult
+deriving via RIP.CUInt instance RIP.Prim Wl_iterator_result
 
-instance CEnum.CEnum WlIteratorResult where
+instance CEnum.CEnum Wl_iterator_result where
 
-  type CEnumZ WlIteratorResult = RIP.CUInt
+  type CEnumZ Wl_iterator_result = RIP.CUInt
 
-  toCEnum = WlIteratorResult
+  toCEnum = Wl_iterator_result
 
   fromCEnum = RIP.getField @"unwrap"
 
@@ -986,26 +987,26 @@ instance CEnum.CEnum WlIteratorResult where
                                    ]
 
   showsUndeclared =
-    CEnum.showsWrappedUndeclared "WlIteratorResult"
+    CEnum.showsWrappedUndeclared "Wl_iterator_result"
 
   readPrecUndeclared =
-    CEnum.readPrecWrappedUndeclared "WlIteratorResult"
+    CEnum.readPrecWrappedUndeclared "Wl_iterator_result"
 
   isDeclared = CEnum.seqIsDeclared
 
   mkDeclared = CEnum.seqMkDeclared
 
-instance CEnum.SequentialCEnum WlIteratorResult where
+instance CEnum.SequentialCEnum Wl_iterator_result where
 
   minDeclaredValue = WL_ITERATOR_STOP
 
   maxDeclaredValue = WL_ITERATOR_CONTINUE
 
-instance Show WlIteratorResult where
+instance Show Wl_iterator_result where
 
   showsPrec = CEnum.shows
 
-instance Read WlIteratorResult where
+instance Read Wl_iterator_result where
 
   readPrec = CEnum.readPrec
 
@@ -1014,13 +1015,14 @@ instance Read WlIteratorResult where
   readListPrec = RIP.readListPrecDefault
 
 instance ( ((~) ty) RIP.CUInt
-         ) => RIP.HasField "unwrap" (RIP.Ptr WlIteratorResult) (RIP.Ptr ty) where
+         ) => RIP.HasField "unwrap" (RIP.Ptr Wl_iterator_result) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
 
-instance HasCField.HasCField WlIteratorResult "unwrap" where
+instance HasCField.HasCField Wl_iterator_result "unwrap" where
 
-  type CFieldType WlIteratorResult "unwrap" = RIP.CUInt
+  type CFieldType Wl_iterator_result "unwrap" =
+    RIP.CUInt
 
   offset# = \_ -> \_ -> 0
 
@@ -1030,8 +1032,8 @@ instance HasCField.HasCField WlIteratorResult "unwrap" where
 
     __exported by:__ @wayland-util.h@
 -}
-pattern WL_ITERATOR_STOP :: WlIteratorResult
-pattern WL_ITERATOR_STOP = WlIteratorResult 0
+pattern WL_ITERATOR_STOP :: Wl_iterator_result
+pattern WL_ITERATOR_STOP = Wl_iterator_result 0
 
 {-| __C declaration:__ @WL_ITERATOR_CONTINUE@
 
@@ -1039,5 +1041,5 @@ pattern WL_ITERATOR_STOP = WlIteratorResult 0
 
     __exported by:__ @wayland-util.h@
 -}
-pattern WL_ITERATOR_CONTINUE :: WlIteratorResult
-pattern WL_ITERATOR_CONTINUE = WlIteratorResult 1
+pattern WL_ITERATOR_CONTINUE :: Wl_iterator_result
+pattern WL_ITERATOR_CONTINUE = Wl_iterator_result 1

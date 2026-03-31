@@ -1,5 +1,6 @@
 {-# LANGUAGE DerivingVia #-}
 {-# LANGUAGE DefaultSignatures #-}
+
 ------------------------------------------------------------------------------
 -- |
 -- Module      : HSWM.Core
@@ -27,6 +28,9 @@ import qualified HSWM.StackSet as W
 import           HSWM.XKB
 import           River
 import           Wayland
+import qualified Wayland.Client as WL
+import qualified River.Safe as R
+import qualified Generated.River.LayerShellV1 as R
 
 -- | User configuration
 data HSWMConfig l = HSWMConfig
@@ -37,6 +41,7 @@ data HSWMConfig l = HSWMConfig
   , normalBorder    :: !RiverColor
   , focusedBorder   :: !RiverColor
   , borderEdges     :: !Int32
+  , startupHook     :: !(H ())
   , handleEventHook :: !(Event -> H All)
   , layoutHook      :: !(l RiverWindow)
   , logHook         :: !(H ())
@@ -46,7 +51,7 @@ data HSWMConfig l = HSWMConfig
 -- | The read-only window manager state.
 data HConf = HConf
   { config  :: !(HSWMConfig Layout)
-  , display :: WlDisplay
+  , display :: !WlDisplay
     -- | The global objects available through wl_registry.
   , globals :: !(IORef RegistryCache)
   }
@@ -59,7 +64,6 @@ data HState = HState
   , _seats         :: [Seat]
   , _outputs       :: [Output]
   , _windows       :: [Window]
-  , pendingActions :: TQueue SomeAction
   }
 
 -- | Mash-up of all River/Wayland generated events
@@ -71,6 +75,14 @@ data Event = WindowManagerEvent !WindowManagerEvent
            | XkbEvent !XkbEvent
            | XkbConfigEvent !RiverXkbConfigV1Event
            | XkbKeyboardEvent !RiverXkbKeyboardV1Event
+           | WlOutputEvent !WL.WlOutputEvent
+           | WlShellSurfaceEvent !WL.WlShellSurfaceEvent
+           | WlShmEvent !WL.WlShmEvent
+           | LayerShellOutputEvent !R.RiverLayerShellOutputV1Event
+           | LayerShellSeatEvent !R.RiverLayerShellSeatV1Event
+           | InputManagerEvent !R.RiverInputManagerV1Event
+           | InputDeviceEvent !R.RiverInputDeviceV1Event
+           | LibinputConfigEvent !R.RiverLibinputConfigV1Event
            deriving (Show)
 
 type WindowSet   = W.StackSet  WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail ScreenId ScreenDetail
@@ -83,7 +95,8 @@ type WorkspaceId = String
 newtype ScreenId = S Int deriving (Eq,Ord,Show,Read,Enum,Num,Integral,Real)
 
 -- | The output dimensions
-data ScreenDetail = SD { x, y, width, height :: !Int } deriving (Eq, Show)
+data ScreenDetail = SD { x, y, width, height :: !Int }
+  deriving (Eq, Show, Read)
 
 data WorkspaceDetail = WD
   deriving (Eq, Show, Read)
@@ -288,11 +301,12 @@ data Seat = Seat
   , xkb_bindings                         :: [StablePtr (XkbBinding SomeAction)]
   , pointer_bindings                     :: [StablePtr (PointerBinding SomeAction)]
   , pending_action                       :: !(Maybe SomeAction)
+  , river_layer_shell_seat :: Ptr R.River_layer_shell_seat_v1
   }
 
 instance Default Seat where
   def = Seat
-    { river_seat = RiverSeat nullPtr
+    { river_seat = nullPtr
     , new = True
     , removed = False
     , focused = invalidWindow
@@ -311,6 +325,7 @@ instance Default Seat where
     , xkb_bindings = mempty
     , pointer_bindings = mempty
     , pending_action = Nothing
+    , river_layer_shell_seat = nullPtr
     }
 
 -- XXX: ????
@@ -323,10 +338,12 @@ data Output = Output
   , width, height, x, y :: !Int32
   , screen              :: !ScreenId
   , new                 :: Bool
+  , river_layerShellOutput    :: Ptr R.River_layer_shell_output_v1
+  , nonExclusive :: Maybe (Int32, Int32, Int32, Int32) -- x, y, w, h
   } deriving Show
 
 instance Default Output where
-  def = Output (RiverOutput nullPtr) 0 0 0 0 (S (-1)) True
+  def = Output nullPtr 0 0 0 0 (S (-1)) True nullPtr Nothing
 
 data Window = Window
   { river_window                   :: RiverWindow
@@ -339,6 +356,7 @@ data Window = Window
   , pointer_resize_requested_edges :: Int32
   , appId                          :: String
   , title                          :: String
+  , min_height, min_width, max_height, max_width :: Int
   } deriving Show
 
 instance Default Window where
@@ -356,6 +374,10 @@ instance Default Window where
     , pointer_resize_requested_edges = 0 -- XXX
     , appId = ""
     , title = ""
+    , min_height = 0
+    , min_width = 0
+    , max_height = maxBound
+    , max_width = maxBound
     }
 
 -------------------------------------------------------

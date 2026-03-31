@@ -54,10 +54,3 @@ destroyXKBBinding sptr = do
   xb <- liftIO $ deRefStablePtr sptr
   liftIO $ river_xkb_binding_v1_destroy xb.xkb_binding
   io $ freeStablePtr sptr
-
-ppXkbModsKey :: Modifiers -> KeySym -> String
-ppXkbModsKey m ksym =
-  L.intercalate "+" $
-    [ name | (x, name) <- [ (ModifiersCtrl, "C"), (ModifiersShift, "S"), (ModifiersMod1, "M1"), (ModifiersMod3, "M3"), (ModifiersMod4, "M4"), (ModifiersMod5, "M5") ]
-           , fi (fromEnum x) .&. m /= 0 ]
-    ++ [ xkbKeysymToText ksym ]

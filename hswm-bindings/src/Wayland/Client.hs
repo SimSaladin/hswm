@@ -1,3 +1,6 @@
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TypeFamilies #-}
+
 ------------------------------------------------------------------------------
 -- |
 -- Module      : Wayland.Client
@@ -145,8 +148,29 @@ module Wayland.Client
 
   -- * Everything else (uncategorized)
   , module X
+  , module Wayland.Client
   ) where
 
 import           Wayland.Client.Interface      as X hiding ()
 import           Generated.Wayland.Util.Safe   as X hiding ()
 import           Generated.Wayland.Client.Safe as X hiding ()
+
+import Wayland.Client.Internal.TH
+
+mkListenerEvents
+  [ ''Wl_display_listener
+  , ''Wl_registry_listener
+  , ''Wl_callback_listener
+  , ''Wl_shm_listener
+  , ''Wl_buffer_listener
+  , ''Wl_data_offer_listener
+  , ''Wl_data_source_listener
+  , ''Wl_data_device_listener
+  , ''Wl_shell_surface_listener
+  , ''Wl_surface_listener
+  , ''Wl_pointer_listener
+  , ''Wl_keyboard_listener
+  , ''Wl_touch_listener
+  , ''Wl_output_listener
+  , ''Wl_seat_listener
+  ]
