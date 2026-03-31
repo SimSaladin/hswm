@@ -10,9 +10,6 @@ ctypes:
   cname: struct river_input_manager_v1
   hsname: River_input_manager_v1
 - headers: river-input-management-v1-client-protocol.h
-  cname: struct wl_output
-  hsname: Wl_output
-- headers: river-input-management-v1-client-protocol.h
   cname: enum river_input_manager_v1_error
   hsname: River_input_manager_v1_error
 - headers: river-input-management-v1-client-protocol.h
@@ -133,5 +130,3 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_output
-  representation: emptydata

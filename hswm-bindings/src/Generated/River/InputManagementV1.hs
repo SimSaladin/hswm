@@ -21,7 +21,6 @@
 module Generated.River.InputManagementV1
     ( Generated.River.InputManagementV1.River_input_device_v1
     , Generated.River.InputManagementV1.River_input_manager_v1
-    , Generated.River.InputManagementV1.Wl_output
     , Generated.River.InputManagementV1.River_input_manager_v1_error(..)
     , pattern Generated.River.InputManagementV1.RIVER_INPUT_MANAGER_V1_ERROR_INVALID_DESTROY
     , Generated.River.InputManagementV1.River_input_manager_v1_listener(..)
@@ -117,14 +116,6 @@ data River_input_device_v1
     __exported by:__ @river-input-management-v1-client-protocol.h@
 -}
 data River_input_manager_v1
-
-{-| __C declaration:__ @struct wl_output@
-
-    __defined at:__ @river-input-management-v1-client-protocol.h 57:8@
-
-    __exported by:__ @river-input-management-v1-client-protocol.h@
--}
-data Wl_output
 
 {-| __C declaration:__ @enum river_input_manager_v1_error@
 

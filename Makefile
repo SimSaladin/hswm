@@ -115,7 +115,8 @@ $(bindGenSpecDir)/Generated.River.XkbBindingsV1.yaml: $(HEADERDIR)/river-xkb-bin
 	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \
 	  --module $(patsubst %.yaml,%,$(@F)) \
 	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Client.yaml \
-	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml
+	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml \
+	  --external-binding-spec $(bindingSpecs)/river-window-management.yaml
 
 $(bindGenSpecDir)/Generated.River.LayerShellV1.yaml: $(HEADERDIR)/river-layer-shell-v1-client-protocol.h FORCE
 	$(HS_BIND_GEN) $(<F) \

@@ -24,6 +24,7 @@ module Generated.River.InputManagementV1.FunPtr
     )
   where
 
+import qualified Generated.Wayland.Client
 import qualified Generated.Wayland.Util
 import qualified HsBindgen.Runtime.Internal.CAPI
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
@@ -613,7 +614,7 @@ foreign import ccall unsafe "hs_bindgen_667a417ed10c55c0" hs_bindgen_667a417ed10
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @River_InputManagementV1_Generated.River.InputManagementV1_get_river_input_device_v1_map_to_output@
-hs_bindgen_667a417ed10c55c0 :: IO (RIP.FunPtr ((RIP.Ptr River_input_device_v1) -> (RIP.Ptr Wl_output) -> IO ()))
+hs_bindgen_667a417ed10c55c0 :: IO (RIP.FunPtr ((RIP.Ptr River_input_device_v1) -> (RIP.Ptr Generated.Wayland.Client.Wl_output) -> IO ()))
 hs_bindgen_667a417ed10c55c0 =
   RIP.fromFFIType hs_bindgen_667a417ed10c55c0_base
 
@@ -634,7 +635,7 @@ __defined at:__ @river-input-management-v1-client-protocol.h 474:1@
 
 __exported by:__ @river-input-management-v1-client-protocol.h@
 -}
-river_input_device_v1_map_to_output :: RIP.FunPtr ((RIP.Ptr River_input_device_v1) -> (RIP.Ptr Wl_output) -> IO ())
+river_input_device_v1_map_to_output :: RIP.FunPtr ((RIP.Ptr River_input_device_v1) -> (RIP.Ptr Generated.Wayland.Client.Wl_output) -> IO ())
 river_input_device_v1_map_to_output =
   RIP.unsafePerformIO hs_bindgen_667a417ed10c55c0
 
