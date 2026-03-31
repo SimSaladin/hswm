@@ -92,6 +92,7 @@ module Generated.River.WindowManagementV1.Unsafe
     )
   where
 
+import qualified Generated.Wayland.Client
 import qualified HsBindgen.Runtime.Internal.CAPI
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.LibC
@@ -977,7 +978,7 @@ foreign import ccall unsafe "hs_bindgen_9dc985c0bba03bd3" hs_bindgen_9dc985c0bba
 -- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_Unsafe_river_window_manager_v1_get_shell_surface@
 hs_bindgen_9dc985c0bba03bd3 ::
      RIP.Ptr River_window_manager_v1
-  -> RIP.Ptr Wl_surface
+  -> RIP.Ptr Generated.Wayland.Client.Wl_surface
   -> IO (RIP.Ptr River_shell_surface_v1)
 hs_bindgen_9dc985c0bba03bd3 =
   RIP.fromFFIType hs_bindgen_9dc985c0bba03bd3_base
@@ -999,7 +1000,7 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 river_window_manager_v1_get_shell_surface ::
      RIP.Ptr River_window_manager_v1
      -- ^ __C declaration:__ @river_window_manager_v1@
-  -> RIP.Ptr Wl_surface
+  -> RIP.Ptr Generated.Wayland.Client.Wl_surface
      -- ^ __C declaration:__ @surface@
   -> IO (RIP.Ptr River_shell_surface_v1)
 river_window_manager_v1_get_shell_surface =
@@ -1565,7 +1566,7 @@ foreign import ccall unsafe "hs_bindgen_a081b383ee02bebe" hs_bindgen_a081b383ee0
 -- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_Unsafe_river_window_v1_get_decoration_above@
 hs_bindgen_a081b383ee02bebe ::
      RIP.Ptr River_window_v1
-  -> RIP.Ptr Wl_surface
+  -> RIP.Ptr Generated.Wayland.Client.Wl_surface
   -> IO (RIP.Ptr River_decoration_v1)
 hs_bindgen_a081b383ee02bebe =
   RIP.fromFFIType hs_bindgen_a081b383ee02bebe_base
@@ -1587,7 +1588,7 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 river_window_v1_get_decoration_above ::
      RIP.Ptr River_window_v1
      -- ^ __C declaration:__ @river_window_v1@
-  -> RIP.Ptr Wl_surface
+  -> RIP.Ptr Generated.Wayland.Client.Wl_surface
      -- ^ __C declaration:__ @surface@
   -> IO (RIP.Ptr River_decoration_v1)
 river_window_v1_get_decoration_above =
@@ -1602,7 +1603,7 @@ foreign import ccall unsafe "hs_bindgen_dab32aa9bfe4c6dd" hs_bindgen_dab32aa9bfe
 -- __unique:__ @River_WindowManagementV1_Generated.River.WindowManagementV1_Unsafe_river_window_v1_get_decoration_below@
 hs_bindgen_dab32aa9bfe4c6dd ::
      RIP.Ptr River_window_v1
-  -> RIP.Ptr Wl_surface
+  -> RIP.Ptr Generated.Wayland.Client.Wl_surface
   -> IO (RIP.Ptr River_decoration_v1)
 hs_bindgen_dab32aa9bfe4c6dd =
   RIP.fromFFIType hs_bindgen_dab32aa9bfe4c6dd_base
@@ -1624,7 +1625,7 @@ __exported by:__ @river-window-management-v1-client-protocol.h@
 river_window_v1_get_decoration_below ::
      RIP.Ptr River_window_v1
      -- ^ __C declaration:__ @river_window_v1@
-  -> RIP.Ptr Wl_surface
+  -> RIP.Ptr Generated.Wayland.Client.Wl_surface
      -- ^ __C declaration:__ @surface@
   -> IO (RIP.Ptr River_decoration_v1)
 river_window_v1_get_decoration_below =

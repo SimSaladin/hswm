@@ -28,9 +28,6 @@ ctypes:
   cname: struct river_window_v1
   hsname: River_window_v1
 - headers: river-window-management-v1-client-protocol.h
-  cname: struct wl_surface
-  hsname: Wl_surface
-- headers: river-window-management-v1-client-protocol.h
   cname: enum river_window_manager_v1_error
   hsname: River_window_manager_v1_error
 - headers: river-window-management-v1-client-protocol.h
@@ -426,5 +423,3 @@ hstypes:
   - StaticSize
   - Storable
   - WriteRaw
-- hsname: Wl_surface
-  representation: emptydata

@@ -27,7 +27,6 @@ module Generated.River.WindowManagementV1
     , Generated.River.WindowManagementV1.River_shell_surface_v1
     , Generated.River.WindowManagementV1.River_window_manager_v1
     , Generated.River.WindowManagementV1.River_window_v1
-    , Generated.River.WindowManagementV1.Wl_surface
     , Generated.River.WindowManagementV1.River_window_manager_v1_error(..)
     , pattern Generated.River.WindowManagementV1.RIVER_WINDOW_MANAGER_V1_ERROR_SEQUENCE_ORDER
     , pattern Generated.River.WindowManagementV1.RIVER_WINDOW_MANAGER_V1_ERROR_ROLE
@@ -362,14 +361,6 @@ data River_window_manager_v1
     __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 data River_window_v1
-
-{-| __C declaration:__ @struct wl_surface@
-
-    __defined at:__ @river-window-management-v1-client-protocol.h 71:8@
-
-    __exported by:__ @river-window-management-v1-client-protocol.h@
--}
-data Wl_surface
 
 {-| __C declaration:__ @enum river_window_manager_v1_error@
 
