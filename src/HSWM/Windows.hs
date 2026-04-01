@@ -21,7 +21,7 @@ import           HSWM.Core
 import           HSWM.Operations
 -- import qualified HSWM.StackSet as W
 import qualified HSWM.StackSet as W
--- import           HSWM.Utils
+import qualified HSWM.Seats as Seats
 
 import           River
 import qualified River.Safe as R
@@ -43,7 +43,7 @@ added w = do
 
 applyManageActions :: Window -> [WindowManageAction] -> H (Maybe Window)
 applyManageActions _ [] = return Nothing
-applyManageActions w0 xs = doAll w0 xs >>= \w' -> return $ Just w' { p_manage_action = [ ] }
+applyManageActions w0 xs0 = doAll w0 xs0 >>= \w' -> return $ Just w' { p_manage_action = [ ] }
   where
     doAll :: Window -> [WindowManageAction] -> H Window
     doAll w [] = pure w
@@ -53,35 +53,33 @@ applyManageActions w0 xs = doAll w0 xs >>= \w' -> return $ Just w' { p_manage_ac
       let rw = w.river_window
       case a of
           WRequestClose -> do
-            io $ R.river_window_v1_close rw
-            pure w
+              io $ R.river_window_v1_close rw
+              pure w
           WFullscreenOnScreen ro -> do
-            io $ R.river_window_v1_fullscreen rw ro
-            pure w { fullscreen = True }
+              io $ R.river_window_v1_fullscreen rw ro
+              io $ R.river_window_v1_inform_fullscreen rw
+              pure w { fullscreen = True }
           WFullscreen -> do
-            sid <- gets $ W.screen . W.current . windowset
-            withScreenOutput sid $ \o -> io $ R.river_window_v1_fullscreen rw o.river_output
-            pure w { fullscreen = True }
+              sid <- gets $ W.screen . W.current . windowset
+              withScreenOutput sid $ \o -> do
+                io $ R.river_window_v1_fullscreen rw o.river_output
+                io $ R.river_window_v1_inform_fullscreen rw
+              pure w { fullscreen = True }
           WExitFullscreen -> do
-            io $ R.river_window_v1_exit_fullscreen rw
-            pure w { fullscreen = False }
+              io $ R.river_window_v1_exit_fullscreen rw
+              io $ R.river_window_v1_inform_not_fullscreen rw
+              pure w { fullscreen = False }
           WToggleFullscreen
-            | w.fullscreen -> do
-                io $ R.river_window_v1_exit_fullscreen rw
-                pure w { fullscreen = False }
-            | otherwise -> do
-                sid <- gets $ W.screen . W.current . windowset
-                withScreenOutput sid $ \o -> io $ R.river_window_v1_fullscreen rw o.river_output
-                pure w { fullscreen = True }
+              | w.fullscreen -> doIt w WExitFullscreen
+              | otherwise    -> doIt w WFullscreen
 
 manage :: H ()
 manage = do
    -- get rid of any closed windows
    -- do initial properties for new windows
   mapWindows $ \w -> do
-    if | w.closed -> doRemoveWindow w
-       | w.new -> setInitialManageProperties w >> modifyWindow w.river_window (\s -> s { new = False })
-       -- | Just m <- w.p_manage_do -> m >> modifyWindow w.river_window (\s -> s { p_manage_do = Nothing })
+    if | w.closed  -> doRemoveWindow w
+       | w.new     -> setInitialManageProperties w >> modifyWindow w.river_window (\s -> s { new = False })
        | otherwise -> applyManageActions w w.p_manage_action >>= (`whenJust` (\w -> modifyWindow w.river_window (const w)))
 
   old <- gets windowsetOld
@@ -131,8 +129,13 @@ manage = do
 
   mapM_ (\(a,b,c) -> tileWindow c a b) rects
 
+  sm <- Seats.getSMgr
+
   whenJust (W.peek ws) $ \w ->
-    manageWindowBorder w =<< asks (focusedBorder . config)
+    if sm.seat_lshell_focus == Seats.FocusNone
+       then manageWindowBorder w =<< asks (focusedBorder . config)
+       else manageWindowBorder w =<< asks (normalBorder . config)
+
 
   mapM_ manageReveal visible
   setTopFocus
@@ -158,8 +161,7 @@ render = do
       { p_render_border = Nothing
       , p_render_pos = Nothing
       , p_render_place = 0
-      , p_set_visible = Nothing
-      }
+      , p_set_visible = Nothing }
 
 -- | /manage/
 setInitialManageProperties :: Window -> H ()
@@ -242,9 +244,13 @@ handleEvent e = case e of
   WindowPointerResizeRequested{..} -> modifyWindow window $ \s -> s
     { pointer_resize_requested = seat, pointer_resize_requested_edges = fromIntegral we_edges }
 
-  WindowMaximizeRequested{window} -> return ()
-  WindowUnmaximizeRequested{window} -> return ()
-  WindowFullscreenRequested{window, output} -> return ()
-  WindowExitFullscreenRequested{window} -> return ()
+  WindowFullscreenRequested{window, output} ->
+    doManage' (if output == nullPtr then WFullscreen else WFullscreenOnScreen output) window
+
+  WindowExitFullscreenRequested{window} ->
+    doManage' WExitFullscreen window
+
+  WindowMaximizeRequested{window =_w} -> return ()
+  WindowUnmaximizeRequested{window =_w} -> return () -- TODO
 
   _ -> return ()

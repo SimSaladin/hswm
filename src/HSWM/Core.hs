@@ -34,6 +34,7 @@ import Foreign.C
 import           River
 import           Wayland
 import qualified Wayland.Client as WL
+import qualified Wayland.Client.Extras as WL
 import qualified River.Safe as R
 
 -- | User configuration
@@ -103,6 +104,8 @@ data Event = WindowManagerEvent !WindowManagerEvent
            | InputManagerEvent !R.RiverInputManagerV1Event
            | InputDeviceEvent !R.RiverInputDeviceV1Event
            | LibinputConfigEvent !R.RiverLibinputConfigV1Event
+           | ForeignTopLevelListV1 !WL.ExtForeignToplevelListV1Event
+           | ForeignTopLevelHandleV1 !WL.ExtForeignToplevelHandleV1Event
            deriving (Show, Generic)
 
 type WindowSet   = W.StackSet  WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail ScreenId ScreenDetail

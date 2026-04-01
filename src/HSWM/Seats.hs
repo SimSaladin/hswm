@@ -18,50 +18,30 @@ module HSWM.Seats where
 import           HSWM.Core
 import           HSWM.Operations
 -- import qualified HSWM.StackSet as W
-import           HSWM.Utils
 import qualified HSWM.StackSet as W
+import           HSWM.Utils
 import           River
 import qualified River.Safe as R
 
 import           Data.Bits
 import qualified Data.List as L
-import Foreign
-import GHC.Generics
+import           Foreign
+import           GHC.Generics
+
+data LayerShellFocus = FocusNone | FocusLayerShell { exclusive :: Bool }
+  deriving (Eq, Show, Generic)
+
+instance Default LayerShellFocus where def = FocusNone
 
 data SeatManager = SeatManager
-  -- { pending_setup  :: M.Map RiverOutput Seat
-  { pending_manage :: [Seat]
-  -- , wl_seats       :: M.Map RiverSeats (Ptr WL.Wl_seat)
+  { pending_manage    :: [Seat]
+  , seat_lshell_focus :: LayerShellFocus
   }
   deriving stock Generic
   deriving anyclass Default
 
----------------------------------------------------------
--- * Events
-
-handleEvent :: SeatEvent -> H ()
-handleEvent e = case e of
-  SeatRemoved _ seat -> do
-    withSeat seat deleteRemovedSeat
-
-  SeatEventPointerEnter{..} -> do
-    modifySeat seat $ \s -> s { hovered = window }
-    modifyWindowSet $ W.focusWindow window -- focus follow mouse
-
-  SeatEventPointerLeave{..} -> do
-    modifySeat seat $ \s -> s { hovered = invalidWindow }
-
-  SeatEventWindowInteraction{..} -> do
-    modifySeat seat $ \s -> s { interacted = window }
-
-  SeatEventOpDelta{..} -> do
-    modifySeat seat $ \s -> s { op_dx = fromIntegral dx, op_dy = fromIntegral dy }
-
-  SeatEventOpRelease{..} -> do
-    modifySeat seat $ \s -> s { op_release = True }
-
-  _ -> return ()
-  -- (SeatWlSeat _ seat name)) = _
+getSMgr :: H SeatManager
+getSMgr = getOrCreateObject (pure def)
 
 -- | New seat added
 added :: RiverSeat -> H ()
@@ -89,8 +69,155 @@ added rseat = do
         , xkb_bindings_seat = bindingsSeat
         }
 
-  om <- getOrCreateObject $ pure def
+  om <- getSMgr
   putObject om { pending_manage = seat : pending_manage om }
+
+---------------------------------------------------------
+-- * Events
+
+handleEvent :: SeatEvent -> H ()
+handleEvent e = do
+  sm <- getSMgr
+  case e of
+    SeatRemoved _ seat -> do
+      withSeat seat deleteRemovedSeat
+
+    SeatEventPointerEnter{..} -> do
+      when (sm.seat_lshell_focus == FocusNone) $ do
+        modifySeat seat $ \s -> s { hovered = window }
+        modifyWindowSet $ W.focusWindow window -- focus follow mouse
+
+    SeatEventPointerLeave{..} -> do
+      modifySeat seat $ \s -> s { hovered = invalidWindow }
+
+    SeatEventWindowInteraction{..} -> do
+      modifySeat seat $ \s -> s { interacted = window }
+
+    SeatEventOpDelta{..} -> do
+      modifySeat seat $ \s -> s { op_dx = fromIntegral dx, op_dy = fromIntegral dy }
+
+    SeatEventOpRelease{..} -> do
+      modifySeat seat $ \s -> s { op_release = True }
+
+    -- (SeatWlSeat _ seat name)) = _
+
+    _ -> return ()
+
+handleLayerShellSeat :: R.RiverLayerShellSeatV1Event -> H ()
+handleLayerShellSeat e = do
+  sm <- getSMgr
+  newFocus <- case e of
+    -- layer shell surface has exclusive focus
+    R.RiverLayerShellSeatV1FocusExclusive    _ _ -> pure $ FocusLayerShell True
+
+    -- layer shell surface wants non-exclusive focus
+    -- A layer shell surface will be given non-exclusive keyboard focus at the end
+    -- of the manage sequence in which this event is sent. The window manager may want
+    -- to update window decorations or similar to indicate that no window is focused.
+    R.RiverLayerShellSeatV1FocusNonExclusive _ _ -> pure $ FocusLayerShell False
+
+    -- no layer shell surface has focus
+    -- No layer shell surface will have keyboard focus at the end
+    -- of the manage sequence in which this event is sent. The window
+    -- manager may want to return focus to whichever window last had focus, for example.
+    R.RiverLayerShellSeatV1FocusNone         _ _ -> pure $ FocusNone
+  putObject sm { seat_lshell_focus = newFocus }
+
+
+---------------------------------------------------------
+-- * Manage
+
+manage :: H ()
+manage = do
+  om <- getObject
+  -- handle new seats
+  newSeats <- forM om.pending_manage createSeatBindings
+  modify $ \s -> s { _seats = _seats s ++ newSeats }
+  putObject om { pending_manage = [] }
+  -- manage existing ones
+  gets _seats >>= mapM_ manage1
+
+manage1 :: Seat -> H ()
+manage1 s = do
+  let doS = modifySeat s.river_seat
+  case s.pending_action of
+
+    S_SUBMAP_NEXT_KEY action subkeys -> do
+      -- make sure next key is devoured
+      io $ ensureNextKeyEaten s
+      -- disable previous keymap keys
+      io $ mapM_ (deRefStablePtr >=> river_xkb_binding_v1_disable . xkb_binding) $ maybe s.xkb_bindings snd s.submap_pending
+      -- activate sub-keymap keys
+      io $ forM_ subkeys $ deRefStablePtr >=> river_xkb_binding_v1_enable . xkb_binding
+      -- store submap state
+      doS $ \s' -> s' { submap_pending = Just (action, subkeys), pending_action = S_NONE }
+
+    S_SUBMAP_CANCEL -> do
+      -- disable sub-keymap keys
+      whenJust s.submap_pending $ \(_, subkeys) -> io $ forM_ subkeys $ deRefStablePtr >=> river_xkb_binding_v1_disable . xkb_binding
+      -- enable main keymap keys
+      io $ forM_ s.xkb_bindings $ deRefStablePtr >=> river_xkb_binding_v1_enable . xkb_binding
+      -- reset state
+      doS $ \s' -> s' { submap_pending = Nothing, pending_action = S_NONE }
+
+    S_NONE -> return ()
+
+  -- withWindow s.interacted $ \w -> seatFocus s w
+
+  -- XXX: ??
+  --seat_action s s.pending_action
+  --modifySeat s.river_seat $ \s -> s { interacted = invalidWindow, pending_action = ACTION_NONE }
+
+  -- TODO
+  -- case s.op of
+  --   SEAT_OP_NONE -> return ()
+  --   SEAT_OP_MOVE -> do
+  --     when s.op_release $ do
+  --       liftIO $ river_seat_v1_op_end s.river_seat
+  --       modifySeat s.river_seat $ \x -> x { op = SEAT_OP_NONE, op_window = invalidWindow }
+  --   SEAT_OP_RESIZE -> do
+  --     when s.op_release $ do
+  --       liftIO $ riverWindowV1InformResizeEnd s.op_window
+  --       liftIO $ river_seat_v1_op_end s.river_seat
+  --       modifySeat s.river_seat $ \x -> x { op = SEAT_OP_NONE, op_window = invalidWindow }
+  --     withWindow s.op_window $ \w -> do
+  --       let width = s.op_start_width
+  --             - (if (s.op_edges .&. fromIntegral (fromEnum EdgeLeft)) /= 0  then s.op_dx else 0)
+  --             + (if (s.op_edges .&. fromIntegral (fromEnum EdgeRight)) /= 0 then s.op_dx else 0)
+  --       let height = s.op_start_height
+  --             - (if (s.op_edges .&. fromIntegral (fromEnum EdgeTop)) /= 0    then s.op_dy else 0)
+  --             + (if (s.op_edges .&. fromIntegral (fromEnum EdgeBottom)) /= 0 then s.op_dy else 0)
+  --       liftIO $ river_window_v1_propose_dimensions w.river_window (max width 1) (max height 1)
+
+  -- when s.op_release $ modifySeat s.river_seat $ \x -> x { op_release = False }
+
+---------------------------------------------------------
+-- * Render
+
+render :: H ()
+render = do
+  mapSeats seatRender
+
+seatRender :: Seat -> H ()
+seatRender s = do
+  case s.op of
+    SEAT_OP_NONE -> return ()
+
+    SEAT_OP_MOVE -> do
+      withWindow s.op_window $ \w -> do
+        let x = s.op_start_x + s.op_dx
+            y = s.op_start_y + s.op_dy
+        setNodePosition w.node x y
+        -- debug' $ "seatRender: move window " <> tshow (w, x, y)
+
+    SEAT_OP_RESIZE -> withWindow s.op_window $ \w -> do
+      let x = s.op_start_x + (if (s.op_edges .&. fi (fromEnum EdgeLeft)) /= 0 then s.op_start_width - w.width else 0)
+      let y = s.op_start_y + (if (s.op_edges .&. fi (fromEnum EdgeTop)) /= 0 then s.op_start_height - w.height else 0)
+      setNodePosition w.node x y
+      -- debug' $ "seatRender: resize window " <> tshow (w, x, y)
+
+----------------------------------------------------------
+-- * Utilities
 
 createSeatBindings :: Seat -> H Seat
 createSeatBindings s = do
@@ -99,7 +226,7 @@ createSeatBindings s = do
   pbListen <- getObject @PointerBindingListener
 
   myMod  <- asks (defaultModMask . config) <&> resolveModMask 0
-  kBinds <- asks (keyBindings . config) -- >>= resolveKeyBinds myMod
+  kBinds <- asks (keyBindings . config)
   pBinds <- asks (pointerBindings . config) >>= resolvePointerBinds myMod
 
   let fKeyBind enable ((m, k), a) = case actionSubmap a of
@@ -114,7 +241,6 @@ createSeatBindings s = do
   return s { xkb_bindings     = s.xkb_bindings ++ kPtrs
            , pointer_bindings = s.pointer_bindings ++ pPtrs }
   where
-    resolveKeyBinds     mdef = mapM $ \((m, k), a) -> return ((resolveModMask mdef m, k), a)
     resolvePointerBinds mdef = mapM $ \((m, k), a) -> return ((resolveModMask mdef m, k), a)
 
 -- |
@@ -159,71 +285,6 @@ execXkbBinding xb = withSeat xb.river_seat $ \s -> do
       debug' "submap binding activated (lvl++)"
       subkeys <- io $ deRefStablePtr xb.subKeymap
       modifySeat xb.river_seat $ \s' -> s' { pending_action = S_SUBMAP_NEXT_KEY xb.action subkeys }
-
----------------------------------------------------------
--- * Manage
-
-manage :: H ()
-manage = do
-  -- handle new seats
-  om <- getObject
-  forM_ om.pending_manage $ \seat -> do
-    seat' <- createSeatBindings seat
-    modify $ \s -> s { _seats = _seats s ++ [seat'] }
-  putObject om { pending_manage = [] }
-  -- manage existing ones
-  gets _seats >>= mapM_ manage1
-
-manage1 :: Seat -> H ()
-manage1 s = do
-  let doS = modifySeat s.river_seat
-  case s.pending_action of
-    S_SUBMAP_NEXT_KEY action subkeys -> do
-      -- make sure next key is devoured
-      io $ ensureNextKeyEaten s
-      -- disable previous keymap keys
-      io $ mapM_ (deRefStablePtr >=> river_xkb_binding_v1_disable . xkb_binding) $ maybe s.xkb_bindings snd s.submap_pending
-      -- activate sub-keymap keys
-      io $ forM_ subkeys $ deRefStablePtr >=> river_xkb_binding_v1_enable . xkb_binding
-      -- store submap state
-      doS $ \s' -> s' { submap_pending = Just (action, subkeys), pending_action = S_NONE }
-    S_SUBMAP_CANCEL -> do
-      -- disable sub-keymap keys
-      whenJust s.submap_pending $ \(_, subkeys) -> io $ forM_ subkeys $ deRefStablePtr >=> river_xkb_binding_v1_disable . xkb_binding
-      -- enable main keymap keys
-      io $ forM_ s.xkb_bindings $ deRefStablePtr >=> river_xkb_binding_v1_enable . xkb_binding
-      -- reset state
-      doS $ \s' -> s' { submap_pending = Nothing, pending_action = S_NONE }
-    S_NONE -> return ()
-
-  -- withWindow s.interacted $ \w -> seatFocus s w
-
-  -- XXX: ??
-  --seat_action s s.pending_action
-  --modifySeat s.river_seat $ \s -> s { interacted = invalidWindow, pending_action = ACTION_NONE }
-
-  -- TODO
-  -- case s.op of
-  --   SEAT_OP_NONE -> return ()
-  --   SEAT_OP_MOVE -> do
-  --     when s.op_release $ do
-  --       liftIO $ river_seat_v1_op_end s.river_seat
-  --       modifySeat s.river_seat $ \x -> x { op = SEAT_OP_NONE, op_window = invalidWindow }
-  --   SEAT_OP_RESIZE -> do
-  --     when s.op_release $ do
-  --       liftIO $ riverWindowV1InformResizeEnd s.op_window
-  --       liftIO $ river_seat_v1_op_end s.river_seat
-  --       modifySeat s.river_seat $ \x -> x { op = SEAT_OP_NONE, op_window = invalidWindow }
-  --     withWindow s.op_window $ \w -> do
-  --       let width = s.op_start_width
-  --             - (if (s.op_edges .&. fromIntegral (fromEnum EdgeLeft)) /= 0  then s.op_dx else 0)
-  --             + (if (s.op_edges .&. fromIntegral (fromEnum EdgeRight)) /= 0 then s.op_dx else 0)
-  --       let height = s.op_start_height
-  --             - (if (s.op_edges .&. fromIntegral (fromEnum EdgeTop)) /= 0    then s.op_dy else 0)
-  --             + (if (s.op_edges .&. fromIntegral (fromEnum EdgeBottom)) /= 0 then s.op_dy else 0)
-  --       liftIO $ river_window_v1_propose_dimensions w.river_window (max width 1) (max height 1)
-
-  -- when s.op_release $ modifySeat s.river_seat $ \x -> x { op_release = False }
 
 seatFocus :: Seat -> Window -> H ()
 seatFocus s w' = do
@@ -276,26 +337,3 @@ seatPointerResize sid w edges = do
     , op_dx = 0
     , op_dy = 0
     }
-
----------------------------------------------------------
--- * Render
-
-render :: H ()
-render = do
-  mapSeats seatRender
-
-seatRender :: Seat -> H ()
-seatRender s = do
-  case s.op of
-    SEAT_OP_NONE -> return ()
-    SEAT_OP_MOVE -> do
-      withWindow s.op_window $ \w -> do
-        let x = s.op_start_x + s.op_dx
-            y = s.op_start_y + s.op_dy
-        setNodePosition w.node x y
-        -- debug' $ "seatRender: move window " <> tshow (w, x, y)
-    SEAT_OP_RESIZE -> withWindow s.op_window $ \w -> do
-      let x = s.op_start_x + (if (s.op_edges .&. fi (fromEnum EdgeLeft)) /= 0 then s.op_start_width - w.width else 0)
-      let y = s.op_start_y + (if (s.op_edges .&. fi (fromEnum EdgeTop)) /= 0 then s.op_start_height - w.height else 0)
-      setNodePosition w.node x y
-      -- debug' $ "seatRender: resize window " <> tshow (w, x, y)

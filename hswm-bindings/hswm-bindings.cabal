@@ -15,12 +15,14 @@ extra-source-files:
       ../cbits/river-input-management-v1-protocol.c
       ../cbits/river-layer-shell-v1-protocol.c
       ../cbits/river-libinput-config-v1-protocol.c
+      ../cbits/river-status-unstable-v1-protocol.c
       ../cbits/river-window-management-v1-protocol.c
       ../cbits/river-xkb-bindings-v1-protocol.c
       ../cbits/river-xkb-config-v1-protocol.c
       ../cbits/river-input-management-v1-client-protocol.h
       ../cbits/river-layer-shell-v1-client-protocol.h
       ../cbits/river-libinput-config-v1-client-protocol.h
+      ../cbits/river-status-unstable-v1-server-protocol.h
       ../cbits/river-window-management-v1-client-protocol.h
       ../cbits/river-xkb-bindings-v1-client-protocol.h
       ../cbits/river-xkb-config-v1-client-protocol.h
@@ -68,6 +70,11 @@ library
           Generated.Wayland.Client.Global
           Generated.Wayland.Client.Safe
           Generated.Wayland.Client.Unsafe
+          Generated.Wayland.Protocol.ForeignTopLevelListV1
+          Generated.Wayland.Protocol.ForeignTopLevelListV1.FunPtr
+          Generated.Wayland.Protocol.ForeignTopLevelListV1.Global
+          Generated.Wayland.Protocol.ForeignTopLevelListV1.Safe
+          Generated.Wayland.Protocol.ForeignTopLevelListV1.Unsafe
           Generated.Wayland.Util
           Generated.Wayland.Util.FunPtr
           Generated.Wayland.Util.Safe
@@ -75,6 +82,7 @@ library
           River.Interfaces
           River.Safe
           Wayland.Client
+          Wayland.Client.Extras
           Wayland.Client.Interface
           Wayland.Client.Internal.TH
           Wayland.Client.Internal.Types
@@ -92,13 +100,16 @@ library
     ghc-options: -Wall -L/nix/store/indd6wy8j1j62njhdq6m37rkajpvzc3v-wayland-1.24.0/lib -lwayland-client
     include-dirs:
           ../cbits
+          ../cbits/wayland-protocols
     c-sources:
           ../cbits/river-input-management-v1-protocol.c
           ../cbits/river-layer-shell-v1-protocol.c
           ../cbits/river-libinput-config-v1-protocol.c
+          ../cbits/river-status-unstable-v1-protocol.c
           ../cbits/river-window-management-v1-protocol.c
           ../cbits/river-xkb-bindings-v1-protocol.c
           ../cbits/river-xkb-config-v1-protocol.c
+          ../cbits/wayland-protocols/ext-foreign-toplevel-list-v1-protocol.c
     extra-libraries:
           wayland-client
     pkgconfig-depends:

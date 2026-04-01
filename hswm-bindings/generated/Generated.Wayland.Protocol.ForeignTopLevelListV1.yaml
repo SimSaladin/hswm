@@ -1,0 +1,59 @@
+version:
+  hs_bindgen: 0.1.0
+  binding_specification: '1.0'
+hsmodule: Generated.Wayland.Protocol.ForeignTopLevelListV1
+ctypes:
+- headers: ext-foreign-toplevel-list-v1-client-protocol.h
+  cname: struct ext_foreign_toplevel_handle_v1
+  hsname: Ext_foreign_toplevel_handle_v1
+- headers: ext-foreign-toplevel-list-v1-client-protocol.h
+  cname: struct ext_foreign_toplevel_list_v1
+  hsname: Ext_foreign_toplevel_list_v1
+- headers: ext-foreign-toplevel-list-v1-client-protocol.h
+  cname: struct ext_foreign_toplevel_list_v1_listener
+  hsname: Ext_foreign_toplevel_list_v1_listener
+- headers: ext-foreign-toplevel-list-v1-client-protocol.h
+  cname: struct ext_foreign_toplevel_handle_v1_listener
+  hsname: Ext_foreign_toplevel_handle_v1_listener
+hstypes:
+- hsname: Ext_foreign_toplevel_handle_v1
+  representation: emptydata
+- hsname: Ext_foreign_toplevel_handle_v1_listener
+  representation:
+    record:
+      constructor: Ext_foreign_toplevel_handle_v1_listener
+      fields:
+      - closed
+      - done
+      - title
+      - app_id
+      - identifier
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Ext_foreign_toplevel_list_v1
+  representation: emptydata
+- hsname: Ext_foreign_toplevel_list_v1_listener
+  representation:
+    record:
+      constructor: Ext_foreign_toplevel_list_v1_listener
+      fields:
+      - toplevel
+      - finished
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw

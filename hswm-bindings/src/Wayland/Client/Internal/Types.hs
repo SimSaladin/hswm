@@ -13,9 +13,12 @@
 -- Longer description of this module.
 --
 ------------------------------------------------------------------------------
-module Wayland.Client.Internal.Types where
+module Wayland.Client.Internal.Types
+  ( module Wayland.Client.Internal.Types
+  , module HsBindgen.Runtime.Prelude
+  ) where
 
-import           HsBindgen.Runtime.Prelude
+import           HsBindgen.Runtime.Prelude (ToFunPtr(..), FromFunPtr(..))
 import Data.Proxy
 
 class ListenerEvent ev where

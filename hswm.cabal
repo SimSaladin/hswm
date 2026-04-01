@@ -20,6 +20,7 @@ extra-source-files:
       cbits/river-input-management-v1-protocol.c
       cbits/river-layer-shell-v1-protocol.c
       cbits/river-libinput-config-v1-protocol.c
+      cbits/river-status-unstable-v1-protocol.c
       cbits/river-window-management-v1-protocol.c
       cbits/river-xkb-bindings-v1-protocol.c
       cbits/river-xkb-config-v1-protocol.c
@@ -87,7 +88,8 @@ library
         , vector
     default-language: GHC2024
     pkgconfig-depends:
-          wayland-client
+          wayland-protocols
+        , wayland-client
         , xkbcommon
         , pixman-1
     extra-libraries:
@@ -100,6 +102,7 @@ library
           cbits/river-input-management-v1-protocol.c
           cbits/river-layer-shell-v1-protocol.c
           cbits/river-libinput-config-v1-protocol.c
+          cbits/river-status-unstable-v1-protocol.c
           cbits/river-window-management-v1-protocol.c
           cbits/river-xkb-bindings-v1-protocol.c
           cbits/river-xkb-config-v1-protocol.c
@@ -115,6 +118,7 @@ executable hswm
     build-depends:
           base >=4.20.2.0
         , hswm
+        , hswm-bindings
     default-language: GHC2024
     hs-source-dirs:
           app

@@ -24,8 +24,11 @@ library:
     -Wall
     -L/nix/store/indd6wy8j1j62njhdq6m37rkajpvzc3v-wayland-1.24.0/lib
     -lwayland-client
-  include-dirs: ../cbits
+  include-dirs:
+    - ../cbits
+    - ../cbits/wayland-protocols
   c-sources:
     - ../cbits/*.c
+    - ../cbits/wayland-protocols/ext-foreign-toplevel-list-v1-protocol.c
   pkgconfig-depends: wayland-client
   extra-libraries: wayland-client

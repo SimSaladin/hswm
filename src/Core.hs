@@ -18,6 +18,7 @@ import           River
 import qualified River.Safe as R
 import           Wayland
 import qualified Wayland.Client as WL
+import qualified Wayland.Client.Extras as WL
 
 import           Data.IORef
 import qualified Data.List as L
@@ -32,6 +33,7 @@ data StopReason = StopReasonNone | StopReasonRestart
 
 startHSWM :: (LayoutClass l RiverWindow, Read (l RiverWindow)) => WlDisplay -> HSWMConfig l -> IO ()
 startHSWM display config = withStdoutLogging $ do
+
   conf <- HConf (config { layoutHook = Layout (layoutHook config) }) display <$> newIORef mempty
 
   initialState <- io (readStateFile config) >>= \case
@@ -65,6 +67,8 @@ startHSWM display config = withStdoutLogging $ do
     inputManagerListener <- getOrCreateObject $ R.mkRiverInputManagerV1Listener $ \e -> runInH $ handleWithHook $ InputManagerEvent e
     shmListener <- getOrCreateObject $ WL.mkWlShmListener $ \e -> runInH $ handleWithHook $ WlShmEvent e
     managerListener <- getOrCreateObject $ mkWindowManagerListener $ \e -> runInH $ handleWithHook $ WindowManagerEvent e
+    _ <- getOrCreateObject $ WL.mkExtForeignToplevelListV1Listener $ \e -> runInH $ handleWithHook $ ForeignTopLevelListV1 e
+    _ <- getOrCreateObject $ WL.mkExtForeignToplevelHandleV1Listener $ \e -> runInH $ handleWithHook $ ForeignTopLevelHandleV1 e
 
     regListener <- getOrCreateObject $ mkRegistryListener $ \case
       RegistryGlobal _ registry name iface version -> do
@@ -108,6 +112,11 @@ startHSWM display config = withStdoutLogging $ do
     xkbConfig     <- getOrCreateObject $ requireGlobal conf.globals ("river_xkb_config_v1"    , 1) registryBindRiverXkbConfigV1
     io $ riverXkbConfigV1AddListener xkbConfig xkbConfigListener nullPtr
     io $ river_window_manager_v1_add_listener windowManager managerListener nullPtr
+
+    foreignListListener <- getObject
+    foreignList <- getOrCreateObject $ requireGlobal conf.globals ("ext_foreign_toplevel_list_v1", 1) $ \(WlRegistry r) n v ->
+      WL.wl_registry_bind (castPtr r) n WL.ext_foreign_toplevel_list_v1_interface (fi v) >>= return . castPtr @_ @WL.Ext_foreign_toplevel_list_v1
+    _ <- io $ WL.ext_foreign_toplevel_list_v1_add_listener foreignList foreignListListener nullPtr
 
     log' "WM: running startup hooks"
     userCodeDef () (startupHook config)
@@ -186,6 +195,7 @@ handleEvent (OutputEvent e)           = Outputs.handle e
 handleEvent (LayerShellOutputEvent e) = Outputs.handleLayerShell e
 handleEvent (WlOutputEvent e)         = Outputs.handleWlOutput e
 handleEvent (SeatEvent e)             = Seats.handleEvent e
+handleEvent (LayerShellSeatEvent e)   = Seats.handleLayerShellSeat e
 handleEvent (WindowEvent e)           = Windows.handleEvent e
 
 -- XKB Keyboard events
@@ -214,6 +224,12 @@ handleEvent (InputManagerEvent (R.RiverInputManagerV1InputDevice _ _ inputDevice
   void $ io $ R.river_input_device_v1_add_listener inputDevice devListener nullPtr
 
 handleEvent (WlShmEvent (WL.WlShmFormat _ _ fmt)) = log' $ toText $ "shm format: " ++ ppShmFormat (WL.Wl_shm_format $ fi fmt)
+
+handleEvent (ForeignTopLevelListV1 (WL.ExtForeignToplevelListV1Toplevel _ _ fh)) = do
+    l <- getObject
+    _ <- io $ WL.ext_foreign_toplevel_handle_v1_add_listener fh l nullPtr
+    return ()
+
 handleEvent _ = return ()
 
 ----------------------------------------------------------------------------------

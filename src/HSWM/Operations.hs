@@ -16,8 +16,11 @@ import           System.Posix.Process (executeFile)
 manageKill :: Window -> H ()
 manageKill = doManage WRequestClose
 
+doManage' :: WindowManageAction -> RiverWindow -> H ()
+doManage' a rw = modifyWindow rw $ \s -> s { p_manage_action = p_manage_action s ++ [a] }
+
 doManage :: WindowManageAction -> Window -> H ()
-doManage a w = modifyWindow w.river_window $ \s -> s { p_manage_action = p_manage_action s ++ [a] }
+doManage a w = doManage' a w.river_window
 
 withScreenOutput :: ScreenId -> (Output -> H ()) -> H ()
 withScreenOutput sid f = mapM_ f . L.find (\o -> o.screen == sid) =<< gets _outputs

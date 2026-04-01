@@ -8,13 +8,26 @@ CLIENT_PROTOS	:= river-window-management-v1.xml river-xkb-bindings-v1.xml river-
 		   river-input-management-v1.xml river-layer-shell-v1.xml river-libinput-config-v1.xml
 SERVER_PROTOS := river-status-unstable-v1.xml
 
+WAYLAND_PROTO_PREFIX	:= $(shell pkg-config wayland-protocols --variable=pkgdatadir)
+WAYLAND_PROTOS		:= $(wildcard $(WAYLAND_PROTO_PREFIX)/*/*/*.xml)
+WaYLAND_CLIENT_HEADERS	:= $(subst $(WAYLAND_PROTO_PREFIX), , $(WAYLAND_PROTOS))
+
 CLIENT_HEADERS := $(CLIENT_PROTOS:.xml=-client-protocol.h)
 SERVER_HEADERS := $(SERVER_PROTOS:.xml=-server-protocol.h)
 PRIVATE_CODE   := $(CLIENT_PROTOS:.xml=-protocol.c) $(SERVER_PROTOS:.xml=-protocol.c)
 
 .PHONY: all bindgen bindgen-wayland-client bindgen-river-protocols bindgen-pixman-1
 
-all: $(PRIVATE_CODE:%=$(CDIR)/%) $(CLIENT_HEADERS:%=$(HEADERDIR)/%) $(SERVER_HEADERS:%=$(HEADERDIR)/%) bindgen
+all: $(PRIVATE_CODE:%=$(CDIR)/%) $(CLIENT_HEADERS:%=$(HEADERDIR)/%) bindgen wayland-protos
+
+wayland-protos: $(HEADERDIR)/wayland-protocols
+
+$(HEADERDIR)/wayland-protocols: $(WAYLAND_PROTOS)
+	mkdir -p $@
+	for name in $^; do \
+	  $(WAYLAND_SCANNER) client-header $$name $@/$$(basename -s .xml $$name)-client-protocol.h; \
+	  $(WAYLAND_SCANNER) private-code  $$name $@/$$(basename -s .xml $$name)-protocol.c; \
+	done
 
 #########
 # rules
@@ -23,12 +36,8 @@ all: $(PRIVATE_CODE:%=$(CDIR)/%) $(CLIENT_HEADERS:%=$(HEADERDIR)/%) $(SERVER_HEA
 $(CLIENT_HEADERS:%=$(HEADERDIR)/%): $(HEADERDIR)/%-client-protocol.h: $(PROTODIR)/%.xml
 	$(WAYLAND_SCANNER) client-header $< $@
 
-$(SERVER_HEADERS:%=$(HEADERDIR)/%): $(HEADERDIR)/%-server-protocol.h: $(PROTODIR)/%.xml
-	$(WAYLAND_SCANNER) server-header $< $@
-
 $(PRIVATE_CODE:%=$(CDIR)/%): $(CDIR)/%-protocol.c: $(PROTODIR)/%.xml
 	$(WAYLAND_SCANNER) private-code $< $@
-
 
 ###################
 # hs-bindgen-cli
@@ -46,8 +55,13 @@ HS_BIND_GEN	:= hs-bindgen-cli preprocess \
 
 bindgen: bindgen-wayland bindgen-river bindgen-pixman-1
 
-bindgen-wayland:	$(bindGenSpecDir)/Generated.Wayland.Util.yaml $(bindGenSpecDir)/Generated.Wayland.Client.yaml
+bindgen-wayland:	\
+	$(bindGenSpecDir)/Generated.Wayland.Util.yaml \
+	$(bindGenSpecDir)/Generated.Wayland.Client.yaml
+#	$(bindGenSpecDir)/Generated.Wayland.Server.yaml
+
 bindgen-pixman-1:	$(bindGenSpecDir)/Generated.Pixman.yaml
+
 bindgen-river:	\
 	$(bindGenSpecDir)/Generated.River.InputManagementV1.yaml \
 	$(bindGenSpecDir)/Generated.River.WindowManagementV1.yaml \
@@ -91,6 +105,13 @@ $(bindGenSpecDir)/Generated.Wayland.Client.yaml: FORCE $(bindGenSpecDir)/Generat
 #	  --select-except-by-decl-name wl_proxy_marshal \
 #	  --select-except-by-decl-name wl_proxy_marshal_constructor \
 #	  --select-except-by-decl-name wl_proxy_marshal_constructor_versioned
+
+#$(bindGenSpecDir)/Generated.Wayland.Server.yaml: FORCE $(bindGenSpecDir)/Generated.Wayland.Util.yaml
+#	$(HS_BIND_GEN) --unique-id hswm_wl_server wayland-server{,-core,-protocol}.h \
+#	  --gen-binding-spec $@ \
+#	  --module $(patsubst %.yaml,%,$(@F)) \
+#	  $(shell pkg-config --cflags wayland-server) \
+#	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml
 
 $(bindGenSpecDir)/Generated.River.WindowManagementV1.yaml: $(HEADERDIR)/river-window-management-v1-client-protocol.h FORCE
 	$(HS_BIND_GEN) $(<F) \
@@ -147,11 +168,20 @@ $(bindGenSpecDir)/Generated.River.LibinputConfigV1.yaml: $(HEADERDIR)/river-libi
 	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml \
 	  --external-binding-spec $(bindingSpecs)/river-input-management.yaml
 
-$(bindGenSpecDir)/Generated.River.Status.Server.yaml: $(HEADERDIR)/river-status-unstable-v1-server-protocol.h FORCE
-	$(HS_BIND_GEN) $(<F) \
+$(bindGenSpecDir)/Generated.Wayland.Protocol.ForeignTopLevelListV1.yaml: $(HEADERDIR)/wayland-protocols/ext-foreign-toplevel-list-v1-client-protocol.h FORCE
+	$(HS_BIND_GEN) $(<F) -I $(HEADERDIR)/wayland-protocols \
 	  --gen-binding-spec $@ \
 	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \
 	  --module $(patsubst %.yaml,%,$(@F)) \
-	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml
+	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml \
+	  --external-binding-spec $(bindingSpecs)/wayland-client.yaml
+
+#$(bindGenSpecDir)/Generated.River.Status.Server.yaml: $(HEADERDIR)/river-status-unstable-v1-server-protocol.h FORCE
+#	$(HS_BIND_GEN) $(<F) \
+#	  --gen-binding-spec $@ \
+#	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \
+#	  --module $(patsubst %.yaml,%,$(@F)) \
+#	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml \
+#	  --external-binding-spec $(bindingSpecs)/wayland-server.yaml
 
 FORCE:

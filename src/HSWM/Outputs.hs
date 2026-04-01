@@ -62,6 +62,9 @@ added out = do
 
     putObject om { pending_setup = M.insert out output $ pending_setup om }
 
+----------------------------------------------------------
+-- * Events
+
 handle :: OutputEvent -> H ()
 handle e = do
   om <- getOrCreateObject $ pure def
@@ -78,7 +81,6 @@ handle e = do
         liftIO $ river_output_v1_destroy output
         -- release wl_output
         forM_ (M.lookup output om.wl_outputs) $ \p -> io $ WL.wl_output_release p
-
     OutputWlOutput _ output name -> do
       -- bind a wl_output listener
       registry <- asks globals
@@ -86,17 +88,10 @@ handle e = do
       wl_output <- requireGlobal registry ("wl_output", 4) $ \(WlRegistry r) _ ver -> io $ WL.wl_registry_bind (castPtr r) name WL.wl_output_interface (fi ver)
       _ <- io $ WL.wl_output_add_listener (castPtr wl_output) wlOutputListener (castPtr output)
       putObject om { wl_outputs = M.insert output (castPtr wl_output) $ wl_outputs om }
-
     OutputDimensions _ output width height ->
       modifyOutput' output $ \x -> (x::Output) { width = fi width, height = fi height }
-
     OutputPosition _ output x y ->
       modifyOutput' output $ \a -> a { x = fi x, y = fi y }
-
-handleLayerShell :: R.RiverLayerShellOutputV1Event -> H ()
-handleLayerShell e = case e of
-  R.RiverLayerShellOutputV1NonExclusiveArea ro _ x y w h ->
-    modifyOutput' (castPtr ro) $ \o -> o { nonExclusive = Just (x, y, w, h) }
 
 handleWlOutput :: WL.WlOutputEvent -> H ()
 handleWlOutput e = case e of
@@ -129,6 +124,14 @@ handleWlOutput e = case e of
         putObject om { pending_setup = M.delete (castPtr o) (pending_setup om)
                      , pending_manage = output : pending_manage om }
 
+handleLayerShell :: R.RiverLayerShellOutputV1Event -> H ()
+handleLayerShell e = case e of
+  R.RiverLayerShellOutputV1NonExclusiveArea ro _ x y w h ->
+    modifyOutput' (castPtr ro) $ \o -> o { nonExclusive = Just (x, y, w, h) }
+
+----------------------------------------------------------
+-- * Manage
+
 manage :: H ()
 manage = do
   om <- getObject
@@ -145,8 +148,14 @@ manage = do
 
   putObject om { pending_manage = mempty }
 
+----------------------------------------------------------
+-- * Render
+
 render :: H ()
 render = return ()
+
+----------------------------------------------------------
+-- * Utilities
 
 nextScreenId :: OutputManager -> H ScreenId
 nextScreenId om = do
