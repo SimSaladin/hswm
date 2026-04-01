@@ -76,6 +76,7 @@ library:
     - wayland-client
     - xkbcommon
     - pixman-1
+    - gtk+-3.0 # XXX not strictly needed /here/
   extra-libraries:
     - wayland-client
     - xkbcommon

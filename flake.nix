@@ -45,6 +45,7 @@
               weston
               river
               pixman
+              gtk3
               ;
           };
         };

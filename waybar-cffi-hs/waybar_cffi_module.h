@@ -1,0 +1,1 @@
+../cbits/waybar_cffi_module.h
