@@ -1,7 +1,4 @@
-{-# LANGUAGE DerivingVia #-}
-{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DefaultSignatures #-}
-
 ------------------------------------------------------------------------------
 -- |
 -- Module      : HSWM.Core
@@ -20,22 +17,22 @@ module HSWM.Core where
 import           HSWM.StackSet (Stack, Workspace(..))
 import qualified HSWM.StackSet as W
 import           HSWM.XKB
-
-import           Data.Monoid (Ap(..))
-import qualified Data.TMap as TM
-import qualified Data.Map as M
-import           Data.Typeable
-import           Foreign
-import           System.Exit (ExitCode(..))
-import           Data.IORef
-import GHC.Generics
-import Foreign.C
+import           HSWM.Utils
 
 import           River
+import qualified River.Safe as R
 import           Wayland
 import qualified Wayland.Client as WL
 import qualified Wayland.Client.Extras as WL
-import qualified River.Safe as R
+
+import           Data.IORef
+import qualified Data.Map as M
+import           Data.Monoid (Ap(..))
+import qualified Data.TMap as TM
+import           Data.Typeable
+import           Foreign
+import           Foreign.C
+import           System.Exit (ExitCode(..))
 
 -- | User configuration
 data HSWMConfig l = HSWMConfig
@@ -58,23 +55,18 @@ data HSWMConfig l = HSWMConfig
   , repeatInfo      :: !(Maybe (Int32, Int32)) -- ^ Keyboard repeat (rate, delay)
   } deriving stock (Generic)
 
-deriving anyclass instance Default (HSWMConfig Layout)
-instance Default (Event -> H All) where def = \_ -> mempty
-instance Default (H ()) where def = return ()
-
 -- | The read-only window manager state.
 data HConf = HConf
   { config  :: !(HSWMConfig Layout)
   , display :: !WlDisplay
     -- | The global objects available through wl_registry.
   , globals :: !(IORef RegistryCache)
-  }
+  } deriving (Generic)
 
 newtype TypeMap = TypeMap { unTypeMap :: TM.TMap }
-  deriving (Show)
+  deriving (Show, Generic)
 
-instance Default TypeMap where
-  def = TypeMap TM.empty
+instance Default TypeMap where def = TypeMap TM.empty
 
 -- | Mutable stete.
 data HState = HState
@@ -119,8 +111,6 @@ type WorkspaceId = String
 newtype ScreenId = S Int
   deriving stock (Eq,Show,Read,Generic)
   deriving newtype (Ord,Enum,Num,Integral,Real)
-instance Default ScreenId where
-  def = S (-1)
 
 -- | The output dimensions
 data ScreenDetail = SD { x, y, width, height :: !Int }
@@ -128,6 +118,14 @@ data ScreenDetail = SD { x, y, width, height :: !Int }
 
 data WorkspaceDetail = WD
   deriving (Eq, Show, Read, Generic, Default)
+
+-------------------------------------------------------------------------
+-- instance Default
+
+deriving anyclass instance Default (HSWMConfig Layout)
+instance                   Default (Event -> H All) where def = \_ -> mempty
+instance                   Default (H ())           where def = return ()
+instance                   Default ScreenId         where def = S (-1)
 
 -------------------------------------------------------------------------
 -- Layouts
@@ -464,9 +462,6 @@ withObjectDef od f = gets (TM.lookup . unTypeMap . wlObjects) >>= \case
 ---------------------------------------------------------
 -- Actions
 
-data SomeAction where
-  SomeAction :: forall a. IsAction a => a -> SomeAction
-
 toSomeAction :: IsAction a => a -> SomeAction
 toSomeAction = SomeAction
 
@@ -485,6 +480,9 @@ class IsAction a where
   default typeDescription :: Typeable a => a -> String
   typeDescription = show . typeOf
 
+data SomeAction where
+  SomeAction :: forall a. IsAction a => a -> SomeAction
+
 instance IsAction SomeAction where
   runner             (SomeAction a) = runner a
   actionSubmap       (SomeAction a) = actionSubmap a
@@ -494,11 +492,38 @@ instance IsAction SomeAction where
 instance Show SomeAction where
   show (SomeAction a) = actionDescription a
 
-data Submap = Submap { submapKeys :: [((ModMask, KeySym), SomeAction)]
-                     , submapDefault :: Maybe SomeAction
-                     } deriving (Show)
+data Submap = Submap
+  { submapKeys    :: [((ModMask, KeySym), SomeAction)]
+  , submapDefault :: Maybe SomeAction
+  } deriving (Show, Generic)
 
 instance IsAction Submap where
   runner Submap{..} = whenJust submapDefault runner
+
   actionSubmap Submap{..} = submapKeys
+
   --actionDescription Submap{..} = "Submap"
+
+----------------------------------------------------------
+-- Default config
+
+-- | Configuration defaults
+instance Default (HSWMConfig Full) where
+  def = (def :: HSWMConfig Layout)
+    { borderWidth     = 2
+    , normalBorder    = parseRgba "0x0000B0"
+    , focusedBorder   = parseRgba "0xFA0050"
+    , borderEdges     = foldl (.|.) 0 (fi . fromEnum <$> [EdgeLeft, EdgeRight, EdgeTop, EdgeBottom])
+    , keyBindings     = [ -- (("M", _XKB_KEY_n), SendMessage ACTION_FOCUS_NEXT)
+                        ]
+    , pointerBindings = [ -- (("M", _BTN_LEFT), SendMessage ACTION_MOVE)
+                        -- , (("", _BTN_RIGHT), SendMessage ACTION_MOVE)
+                        ]
+    , defaultModMask  = "Ctrl"
+    , startupHook     = mempty
+    , handleEventHook = mempty
+    , layoutHook      = Full
+    , logHook         = mempty
+    , xkbLayout       = Nothing
+    , workspaces      = [ "1", "2", "3", "4" ]
+    }

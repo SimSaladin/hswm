@@ -37,7 +37,6 @@ library:
     - HSWM.XKB
     - HSWM.Util.Posix
     - HSWM.Utils
-    - HSWM.Types
     - HSWM.StackSet
     - HSWM.BufferPool
     - HSWM.Seats
@@ -52,8 +51,10 @@ library:
     - HSWM.Config
     - HSWM
     - Core
-  other-modules: Prelude
-  generated-other-modules: Paths_hswm
+  other-modules:
+    - Prelude
+  generated-other-modules:
+    - Paths_hswm
   dependencies:
     - &base base >=4.20.2.0
     - containers
@@ -98,6 +99,7 @@ library:
     - OverloadedRecordDot
     - DuplicateRecordFields
     - OverloadedStrings
+    - DerivingVia
     - DeriveAnyClass
 
 executables:

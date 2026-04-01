@@ -8,8 +8,6 @@
 -- Stability   : unstable
 -- Portability : unportable
 --
--- Longer description of this module.
---
 ------------------------------------------------------------------------------
 module HSWM
   ( module HSWM.Core
@@ -29,7 +27,6 @@ import           HSWM.Core
 import           HSWM.Layout
 import           HSWM.Main
 import           HSWM.Operations
-import           HSWM.StackSet (RationalRect(..))
 import           HSWM.Utils
 import           HSWM.XKB
 import           River

@@ -1,13 +1,14 @@
 module HSWM.Operations where
 
-import           Data.Bits
+import qualified HSWM.StackSet as W
+import           HSWM.Core
+
+import           River
+import qualified River.Safe as R
+
 import qualified Data.List as L
 import qualified Data.Map as M
 import           Foreign (IntPtr, intPtrToPtr, ptrToIntPtr)
-import qualified HSWM.StackSet as W
-import           HSWM.Types
-import           River
-import qualified River.Safe as R
 import           System.Directory (removeFile)
 import           System.IO
 import qualified System.Posix as Posix

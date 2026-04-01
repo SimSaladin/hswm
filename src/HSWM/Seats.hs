@@ -26,7 +26,6 @@ import qualified River.Safe as R
 import           Data.Bits
 import qualified Data.List as L
 import           Foreign
-import           GHC.Generics
 
 data LayerShellFocus = FocusNone | FocusLayerShell { exclusive :: Bool }
   deriving (Eq, Show, Generic)

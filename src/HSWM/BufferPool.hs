@@ -13,17 +13,22 @@
 ------------------------------------------------------------------------------
 module HSWM.BufferPool where
 
+import           Data.Proxy
 import           Foreign
-import           Foreign.C.ConstPtr
 import           System.Posix (Fd)
-import Data.Proxy
 
-import           HSWM.Core
-import           HSWM.Util.Posix
 import qualified Generated.Pixman as P
 import qualified Generated.Pixman.Safe as P
 import qualified Generated.Wayland.Client as WL
+import           HSWM.Core
+import           HSWM.Util.Posix
 import qualified Wayland.Client as WL
+
+data ImageBufferPool = ImageBufferPool
+  { buffers        :: MVar ([ImageBuffer], Int)
+  , wlShm          :: Ptr WL.Wl_shm
+  , bufferListener :: ConstPtr WL.Wl_buffer_listener
+  } deriving (Generic)
 
 data ImageBuffer = ImageBuffer
   { fd            :: !Fd
@@ -34,12 +39,7 @@ data ImageBuffer = ImageBuffer
   , pixmanImage   :: !(Ptr P.Pixman_image_t)
   , busy          :: !(Ptr Bool)
   , pool          :: Ptr WL.Wl_shm_pool
-  }
-
-data ImageBufferPool = ImageBufferPool { buffers :: MVar ([ImageBuffer], Int)
-                                       , wlShm :: Ptr WL.Wl_shm
-                                       , bufferListener :: ConstPtr WL.Wl_buffer_listener
-                                       }
+  } deriving (Generic)
 
 newImageBufferPool :: H ImageBufferPool
 newImageBufferPool = do
@@ -95,7 +95,6 @@ initImageBuffer ImageBufferPool{wlShm = wl_shm, bufferListener = listener} width
 
     -- Set busy = False
     _ <- io $ WL.wl_buffer_add_listener buf listener (castPtr busy)
-
     return ImageBuffer{..}
 
 destroyImageBufferPool :: ImageBufferPool -> IO ()
@@ -103,7 +102,6 @@ destroyImageBufferPool pool = do
     tryReadMVar pool.buffers >>= \case
       Nothing -> pure ()
       Just (xs, _) -> forM_ xs destroyImageBuffer
-
     let p = unConstPtr pool.bufferListener
     WL.freeListener (Proxy :: Proxy WL.WlBufferEvent) =<< peek p
     free p

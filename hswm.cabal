@@ -33,6 +33,7 @@ library
           OverloadedRecordDot
           DuplicateRecordFields
           OverloadedStrings
+          DerivingVia
           DeriveAnyClass
     ghc-options: -Wall -Wunused-packages
     other-modules:
@@ -54,7 +55,6 @@ library
           HSWM.XKB
           HSWM.Util.Posix
           HSWM.Utils
-          HSWM.Types
           HSWM.StackSet
           HSWM.BufferPool
           HSWM.Seats
@@ -94,6 +94,7 @@ library
         , wayland-client
         , xkbcommon
         , pixman-1
+        , gtk+-3.0
     extra-libraries:
           wayland-client
           xkbcommon
@@ -129,6 +130,7 @@ executable hswm
           OverloadedRecordDot
           DuplicateRecordFields
           OverloadedStrings
+          DerivingVia
           DeriveAnyClass
     ghc-options: -Wall -Wunused-packages
     pkgconfig-depends:

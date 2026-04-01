@@ -34,7 +34,7 @@ data RegistryItem = RegistryItem
   , interface :: String -- ^ Interface description
   , version   :: Version -- ^ Interface version
   , registry  :: WlRegistry
-  } deriving (Show)
+  } deriving (Show, Generic)
 
 removeGlobal :: Word32 -> RegistryCache -> RegistryCache
 removeGlobal name_ r = r { objects = L.filter (\o -> name_ /= o.name) r.objects }

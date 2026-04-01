@@ -1,6 +1,3 @@
-module HSWM.XKB (
-  module HSWM.XKB,
-  module HSWM.XKB.FFI
-  ) where
+module HSWM.XKB ( module HSWM.XKB.FFI ) where
 
 import HSWM.XKB.FFI

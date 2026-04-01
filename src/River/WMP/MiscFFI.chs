@@ -2,17 +2,12 @@ module River.WMP.MiscFFI where
 
 import Foreign hiding (void)
 import Foreign.C
-import GHC.Generics (Generic)
 
 import Wayland
 
 {#import River.WMP.FFI #}
 
 #include "river-window-management-v1-client-protocol.h"
-
-coerceWlProxy_ :: String -> WlProxy -> IO ()
-coerceWlProxy_ desc (WlProxy p) = return ()
--- when (p == nullPtr) $ debug' $ "warning: " <> toText desc <> " returned NULL"
 
 type WindowCaps = {#type uint32_t#}
 
@@ -91,8 +86,7 @@ river_window_v1_destroy w = wl_proxy_destroy w {#const RIVER_WINDOW_V1_DESTROY#}
 river_window_v1_close :: RiverWindow -> IO ()
 river_window_v1_close w = do
   ver <- wl_proxy_get_version w
-  wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_CLOSE#} emptyInterface ver 0
-    >>= coerceWlProxy_ "river_window_v1_close"
+  void $ wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_CLOSE#} emptyInterface ver 0
 
 river_window_v1_get_node :: RiverWindow -> IO RiverNode
 river_window_v1_get_node w = wl_proxy_marshal_array_flags' id w
@@ -105,26 +99,22 @@ river_window_v1_propose_dimensions w width height = wl_proxy_marshal_array_flags
 river_window_v1_hide :: RiverWindow -> IO ()
 river_window_v1_hide w = do
   ver <- wl_proxy_get_version w
-  wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_HIDE#} emptyInterface ver 0
-    >>= coerceWlProxy_ "river_window_v1_hide"
+  void $ wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_HIDE#} emptyInterface ver 0
 
 river_window_v1_show :: RiverWindow -> IO ()
 river_window_v1_show w = do
   ver <- wl_proxy_get_version w
-  wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_SHOW#} emptyInterface ver 0
-    >>= coerceWlProxy_ "river_window_v1_show"
+  void $ wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_SHOW#} emptyInterface ver 0
 
 riverWindowV1UseCsd :: RiverWindow -> IO ()
 riverWindowV1UseCsd w = do
   ver <- wl_proxy_get_version w
-  wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_USE_CSD#} emptyInterface ver 0
-    >>= coerceWlProxy_ "river_window_v1_use_csd"
+  void $ wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_USE_CSD#} emptyInterface ver 0
 
 riverWindowV1UseSsd :: RiverWindow -> IO ()
 riverWindowV1UseSsd w = do
   ver <- wl_proxy_get_version w
-  wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_USE_SSD#} emptyInterface ver 0
-    >>= coerceWlProxy_ "river_window_v1_use_ssd"
+  void $ wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_USE_SSD#} emptyInterface ver 0
 
 -- |
 -- This request decorates the window with borders drawn by the compositor
@@ -173,14 +163,12 @@ riverWindowV1GetDecorationBelow w surface = wl_proxy_marshal_array_flags' RiverD
 riverWindowV1InformResizeStart :: RiverWindow -> IO ()
 riverWindowV1InformResizeStart w = do
   ver <- wl_proxy_get_version w
-  wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_INFORM_RESIZE_START#} emptyInterface ver 0
-    >>= coerceWlProxy_ "river_window_v1_inform_resize_start"
+  void $ wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_INFORM_RESIZE_START#} emptyInterface ver 0
 
 riverWindowV1InformResizeEnd :: RiverWindow -> IO ()
 riverWindowV1InformResizeEnd w = do
   ver <- wl_proxy_get_version w
-  wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_INFORM_RESIZE_END#} emptyInterface ver 0
-    >>= coerceWlProxy_ "river_window_v1_inform_resize_end"
+  void $ wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_INFORM_RESIZE_END#} emptyInterface ver 0
 
 riverWindowV1SetCapabilities :: RiverWindow -> WindowCaps -> IO ()
 riverWindowV1SetCapabilities w caps = wl_proxy_marshal_array_flags' (const ()) w
@@ -189,26 +177,22 @@ riverWindowV1SetCapabilities w caps = wl_proxy_marshal_array_flags' (const ()) w
 riverWindowV1InformMaximized :: RiverWindow -> IO ()
 riverWindowV1InformMaximized w = do
   ver <- wl_proxy_get_version w
-  wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_INFORM_MAXIMIZED#} emptyInterface ver 0
-    >>= coerceWlProxy_ "river_window_v1_inform_maximized"
+  void $ wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_INFORM_MAXIMIZED#} emptyInterface ver 0
 
 riverWindowV1InformUnmaximized :: RiverWindow -> IO ()
 riverWindowV1InformUnmaximized w = do
   ver <- wl_proxy_get_version w
-  wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_INFORM_UNMAXIMIZED#} emptyInterface ver 0
-    >>= coerceWlProxy_ "river_window_v1_inform_unmaximized"
+  void $ wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_INFORM_UNMAXIMIZED#} emptyInterface ver 0
 
 riverWindowV1InformFullscreen :: RiverWindow -> IO ()
 riverWindowV1InformFullscreen w = do
   ver <- wl_proxy_get_version w
-  wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_INFORM_FULLSCREEN#} emptyInterface ver 0
-    >>= coerceWlProxy_ "river_window_v1_inform_fullscreen"
+  void $ wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_INFORM_FULLSCREEN#} emptyInterface ver 0
 
 riverWindowV1InformNotFullscreen :: RiverWindow -> IO ()
 riverWindowV1InformNotFullscreen w = do
   ver <- wl_proxy_get_version w
-  wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_INFORM_NOT_FULLSCREEN#} emptyInterface ver 0
-    >>= coerceWlProxy_ "river_window_v1_inform_not_fullscreen"
+  void $ wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_INFORM_NOT_FULLSCREEN#} emptyInterface ver 0
 
 riverWindowV1Fullscreen :: RiverWindow -> RiverOutput -> IO ()
 riverWindowV1Fullscreen w output = wl_proxy_marshal_array_flags' (const ()) w
@@ -217,8 +201,7 @@ riverWindowV1Fullscreen w output = wl_proxy_marshal_array_flags' (const ()) w
 riverWindowV1ExitFullscreen :: RiverWindow -> IO ()
 riverWindowV1ExitFullscreen w = do
   ver <- wl_proxy_get_version w
-  wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_EXIT_FULLSCREEN#} emptyInterface ver 0
-    >>= coerceWlProxy_ "river_window_v1_exit_fullscreen"
+  void $ wl_proxy_marshal_flags w {#const RIVER_WINDOW_V1_EXIT_FULLSCREEN#} emptyInterface ver 0
 
 riverWindowV1SetClipBox :: RiverWindow -> ClipBox -> IO ()
 riverWindowV1SetClipBox w (x, y, width, height) = wl_proxy_marshal_array_flags' (const ()) w

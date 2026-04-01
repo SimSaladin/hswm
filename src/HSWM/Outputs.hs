@@ -1,7 +1,4 @@
-{-# LANGUAGE DeriveAnyClass #-}
 {-# OPTIONS_GHC -Wno-ambiguous-fields #-}
-
-
 ------------------------------------------------------------------------------
 -- |
 -- Module      : HSWM.Outputs
@@ -20,6 +17,7 @@ module HSWM.Outputs where
 import           HSWM.Core
 import           HSWM.Operations
 import qualified HSWM.StackSet as W
+
 import           River
 import qualified River.Safe as R
 import           Wayland
@@ -29,13 +27,11 @@ import qualified Data.List as L
 import qualified Data.Map as M
 import           Foreign
 import           Foreign.C
-import           Foreign.C.ConstPtr
-import           GHC.Generics
 
 data OutputManager = OutputManager
-  { pending_setup :: M.Map RiverOutput Output
+  { pending_setup  :: M.Map RiverOutput Output
   , pending_manage :: [Output]
-  , wl_outputs :: M.Map RiverOutput (Ptr WL.Wl_output)
+  , wl_outputs     :: M.Map RiverOutput (Ptr WL.Wl_output)
   }
   deriving stock Generic
   deriving anyclass Default
@@ -95,17 +91,15 @@ handle e = do
 
 handleWlOutput :: WL.WlOutputEvent -> H ()
 handleWlOutput e = case e of
-    WL.WlOutputGeometry _o _ x y pw ph subpix make_s model_s trans -> do
-      make <- io . peekCString $ unConstPtr make_s
-      model <- io . peekCString $ unConstPtr model_s
-      --log' $ "output geometry: " <> tshow ((x, y), (pw, ph), subpix)
-      --  <> " make: " <> toText make
-      --  <> " model: " <> toText model
-      --  <> " transform: " <> tshow trans
-      return ()
+    -- WL.WlOutputGeometry _o _ x y pw ph subpix make_s model_s trans -> do
+    --   --make <- io . peekCString $ unConstPtr make_s
+    --   --model <- io . peekCString $ unConstPtr model_s
+    --   --log' $ "output geometry: " <> tshow ((x, y), (pw, ph), subpix)
+    --   --  <> " make: " <> toText make
+    --   --  <> " model: " <> toText model
+    --   --  <> " transform: " <> tshow trans
 
-    WL.WlOutputMode _o _ _flags _w _h _refresh ->
-      return ()
+    -- WL.WlOutputMode _o _ _flags _w _h _refresh -> return ()
 
     WL.WlOutputScale o _ i ->
       modifyOutput' (castPtr o) $ \x -> (x::Output) { scale = i }
@@ -123,6 +117,8 @@ handleWlOutput e = case e of
       forM_ (M.lookup (castPtr o) $ pending_setup om) $ \output ->
         putObject om { pending_setup = M.delete (castPtr o) (pending_setup om)
                      , pending_manage = output : pending_manage om }
+
+    _ -> mempty
 
 handleLayerShell :: R.RiverLayerShellOutputV1Event -> H ()
 handleLayerShell e = case e of

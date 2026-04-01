@@ -89,8 +89,6 @@ foreign import ccall "&river_xkb_keyboard_v1_interface" river_xkb_keyboard_v1_in
 registryBindRiverXkbConfigV1 :: WlRegistry -> Word32 -> Version -> IO RiverXkbConfigV1
 registryBindRiverXkbConfigV1 registry name version = RiverXkbConfigV1 <$> wl_registry_bind registry name river_xkb_config_v1_interface version
 
--- foreign import ccall "&river_input_device_v1_interface" river_input_device_v1_interface :: WlInterface
-
 -- * River XKB Config
 
 data RiverXkbConfigV1Event
@@ -198,10 +196,6 @@ mkRiverXkbKeyboardV1Listener h = do
     {#set river_xkb_keyboard_v1_listener.numlock_disabled#}  p =<< (mkKeyboardListenerCB $ \dt x -> h $ KeyboardNumlockDisabled dt x)
     return p
 
--- | Frees callback function wrappers and the listener memory area.
-riverXkbKeyboardV1ListenerDestroy :: RiverXkbKeyboardV1Listener -> IO ()
-riverXkbKeyboardV1ListenerDestroy (RiverXkbKeyboardV1Listener ptr) = peekArray 7 (castPtr ptr) >>= mapM_ freeHaskellFunPtr >> free ptr
-
 data RiverXkbKeyboardV1Event
   = KeyboardRemoved          { userdata :: !(Ptr ()), xkbKeyboard :: !RiverXkbKeyboardV1 }
   | KeyboardInputDevice      { userdata :: !(Ptr ()), xkbKeyboard :: !RiverXkbKeyboardV1, inputDevice :: !RiverInputDeviceV1 }
@@ -238,48 +232,3 @@ riverXkbKeyboardV1SetLayoutByIndex keyboard i = wl_proxy_marshal_array_flags' (c
 riverXkbKeyboardV1SetLayoutByName :: MonadIO m => RiverXkbKeyboardV1 -> String -> m ()
 riverXkbKeyboardV1SetLayoutByName keyboard name = wl_proxy_marshal_array_flags' (const ())
     keyboard {#const RIVER_XKB_KEYBOARD_V1_SET_LAYOUT_BY_NAME#} emptyInterface 0 name
-
-{-
-
-TODO
-
-/**
- * Enable capslock for the keyboard.
- */
-static inline void
-river_xkb_keyboard_v1_capslock_enable(struct river_xkb_keyboard_v1 *river_xkb_keyboard_v1)
-{
-	wl_proxy_marshal_flags((struct wl_proxy *) river_xkb_keyboard_v1,
-			 RIVER_XKB_KEYBOARD_V1_CAPSLOCK_ENABLE, NULL, wl_proxy_get_version((struct wl_proxy *) river_xkb_keyboard_v1), 0);
-}
-
-/**
- * Disable capslock for the keyboard.
- */
-static inline void
-river_xkb_keyboard_v1_capslock_disable(struct river_xkb_keyboard_v1 *river_xkb_keyboard_v1)
-{
-	wl_proxy_marshal_flags((struct wl_proxy *) river_xkb_keyboard_v1,
-			 RIVER_XKB_KEYBOARD_V1_CAPSLOCK_DISABLE, NULL, wl_proxy_get_version((struct wl_proxy *) river_xkb_keyboard_v1), 0);
-}
-
-/**
- * Enable numlock for the keyboard.
- */
-static inline void
-river_xkb_keyboard_v1_numlock_enable(struct river_xkb_keyboard_v1 *river_xkb_keyboard_v1)
-{
-	wl_proxy_marshal_flags((struct wl_proxy *) river_xkb_keyboard_v1,
-			 RIVER_XKB_KEYBOARD_V1_NUMLOCK_ENABLE, NULL, wl_proxy_get_version((struct wl_proxy *) river_xkb_keyboard_v1), 0);
-}
-
-/**
- * Disable numlock for the keyboard.
- */
-static inline void
-river_xkb_keyboard_v1_numlock_disable(struct river_xkb_keyboard_v1 *river_xkb_keyboard_v1)
-{
-	wl_proxy_marshal_flags((struct wl_proxy *) river_xkb_keyboard_v1,
-			 RIVER_XKB_KEYBOARD_V1_NUMLOCK_DISABLE, NULL, wl_proxy_get_version((struct wl_proxy *) river_xkb_keyboard_v1), 0);
-}
--}

@@ -21,7 +21,6 @@ import HSWM.XKB
 import HSWM.Utils
 
 import qualified Data.List as L
-import GHC.Generics
 
 -- * Named
 
@@ -79,8 +78,8 @@ data KeyAction mk a = KeyAction mk a
                     deriving (Show, Generic)
 
 parseSubmaps :: [(String, SomeAction)] -> [ KeyAction (String, KeySym) SomeAction ] -- [((String, KeySym), SomeAction)]
-parseSubmaps ks =
-  let sanitized = [(L.words s, a) | (s, a) <- ks ] :: [([String], SomeAction)]
+parseSubmaps ks0 =
+  let sanitized = [(L.words s, a) | (s, a) <- ks0 ] :: [([String], SomeAction)]
 
       keypaths :: [ ( [(String, KeySym)], SomeAction ) ]
       keypaths = do
@@ -88,9 +87,9 @@ parseSubmaps ks =
         return ( [ (L.intercalate "-" (L.init (breakKeys k)) :: String, toKeySym $ L.last (breakKeys k) :: KeySym) | k <- keyseq ], a)
 
       toADT :: ([(String, KeySym)], SomeAction) -> KeyAction (String, KeySym) SomeAction
-      toADT ([ k ], a) = KeyAction k a
+      toADT ([ k ], a)  = KeyAction k a
       toADT (k : ks, a) = KeySubmap k [toADT (ks, a)]
-      toADT ([], _) = error "toADT"
+      toADT ([], _)     = error "toADT"
 
       chains = map toADT keypaths :: [ KeyAction (String, KeySym) SomeAction ]
 
@@ -108,9 +107,9 @@ parseSubmaps ks =
     breakKeys :: String -> [String]
     breakKeys "" = []
     breakKeys str = case L.span (/= '-') str of
-                      (k,  []) -> [k]
+                      (k,       []) -> [k]
                       (k, '-' : xs) -> [k] ++ breakKeys xs
-                      (k,  k') -> error "breakkeys"
+                      (_,        _) -> error "breakkeys"
 
     key (KeyAction k _) = k
     key (KeySubmap k _) = k

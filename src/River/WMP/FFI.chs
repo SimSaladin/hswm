@@ -22,14 +22,9 @@ type RiverWindow = Ptr R.River_window_v1
 type RiverNode = Ptr R.River_node_v1
 
 {#pointer *river_window_manager_v1  as RiverWindowManager  newtype #}
--- {#pointer *river_window_v1          as RiverWindow         newtype #}
--- {#pointer *river_node_v1            as RiverNode           newtype #}
--- {#pointer *river_seat_v1            as RiverSeat           newtype #}
 {#pointer *river_pointer_binding_v1 as RiverPointerBinding newtype #}
--- {#pointer *river_output_v1          as RiverOutput         newtype #}
 {#pointer *river_decoration_v1      as RiverDecoration     newtype #}
 {#pointer *river_shell_surface_v1   as RiverShellSurface   newtype #}
-
 {#pointer *river_window_manager_v1_listener  as RiverWindowManagerListener newtype#}
 {#pointer *river_window_v1_listener          as WindowListener             newtype#}
 {#pointer *river_output_v1_listener          as RiverOutputListener        newtype#}
@@ -46,10 +41,10 @@ deriving instance Eq RiverPointerBinding
 deriving instance Eq RiverDecoration
 deriving instance Eq RiverShellSurface
 
-deriving instance Storable RiverWindowManager
-deriving instance Storable RiverPointerBinding
-deriving instance Storable RiverDecoration
-deriving instance Storable RiverShellSurface
+deriving via (Ptr a) instance Storable RiverWindowManager
+deriving via (Ptr a) instance Storable RiverPointerBinding
+deriving via (Ptr a) instance Storable RiverDecoration
+deriving via (Ptr a) instance Storable RiverShellSurface
 
 instance IsWlProxy RiverWindowManager where toWlProxy (RiverWindowManager p) = WlProxy (castPtr p)
 instance IsWlProxy RiverDecoration where toWlProxy (RiverDecoration p) = WlProxy (castPtr p)

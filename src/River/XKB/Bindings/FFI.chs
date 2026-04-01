@@ -4,7 +4,6 @@ import Foreign hiding (void)
 import Foreign.C
 
 import qualified River.Safe as R
-import qualified River.Interfaces as R
 import Wayland
 
 #include "river-xkb-bindings-v1-client-protocol.h"
@@ -13,25 +12,21 @@ import Wayland
 
 type RiverXkbBindings = R.RiverXkbBindingsV1
 
---{#pointer *river_xkb_bindings_v1               as RiverXkbBindings        newtype #}
 {#pointer *river_xkb_bindings_seat_v1          as XkbBindingsSeat         newtype #}
 {#pointer *river_xkb_bindings_seat_v1_listener as XkbBindingsSeatListener newtype #}
 {#pointer *river_xkb_binding_v1                as RiverXkbBinding         newtype #}
 {#pointer *river_xkb_binding_v1_listener       as XkbBindingListener      newtype #}
 
---deriving instance Show RiverXkbBindings
 deriving instance Show XkbBindingsSeat
 deriving instance Show XkbBindingsSeatListener
 deriving instance Show RiverXkbBinding
 deriving instance Show XkbBindingListener
 
---deriving instance Storable RiverXkbBindings
-deriving instance Storable XkbBindingsSeat
-deriving instance Storable XkbBindingsSeatListener
-deriving instance Storable RiverXkbBinding
-deriving instance Storable XkbBindingListener
+deriving via (Ptr a) instance Storable XkbBindingsSeat
+deriving via (Ptr a) instance Storable XkbBindingsSeatListener
+deriving via (Ptr a) instance Storable RiverXkbBinding
+deriving via (Ptr a) instance Storable XkbBindingListener
 
---instance IsWlProxy RiverXkbBindings where toWlProxy (RiverXkbBindings p) = WlProxy $ castPtr p
 instance IsWlProxy XkbBindingsSeat where toWlProxy (XkbBindingsSeat p) = WlProxy $ castPtr p
 instance IsWlProxy RiverXkbBinding where toWlProxy (RiverXkbBinding p) = WlProxy $ castPtr p
 

@@ -1,18 +1,19 @@
 {-# OPTIONS_GHC -Wno-ambiguous-fields -Wno-unused-record-wildcards -Wno-name-shadowing #-}
-
 module Core
   ( module Core
   , module Wayland
   , module River
+  , module HSWM.Core
   ) where
 
+import           HSWM.Core
+import qualified HSWM.StackSet as W
 import           HSWM.Operations
 import qualified HSWM.Outputs as Outputs
 import qualified HSWM.Seats as Seats
-import qualified HSWM.StackSet as W
-import           HSWM.Types
 import           HSWM.Utils
 import qualified HSWM.Windows as Windows
+import           HSWM.XKB
 
 import           River
 import qualified River.Safe as R

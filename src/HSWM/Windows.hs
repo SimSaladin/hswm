@@ -80,7 +80,7 @@ manage = do
   mapWindows $ \w -> do
     if | w.closed  -> doRemoveWindow w
        | w.new     -> setInitialManageProperties w >> modifyWindow w.river_window (\s -> s { new = False })
-       | otherwise -> applyManageActions w w.p_manage_action >>= (`whenJust` (\w -> modifyWindow w.river_window (const w)))
+       | otherwise -> applyManageActions w w.p_manage_action >>= (`whenJust` (\w' -> modifyWindow w.river_window (const w')))
 
   old <- gets windowsetOld
   ws <- gets windowset

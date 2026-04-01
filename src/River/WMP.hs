@@ -18,14 +18,13 @@ module River.WMP
   , module River.WMP.MiscFFI
   ) where
 
-import River.WMP.FFI
-import River.WMP.MiscFFI
-import HSWM.XKB
+import           HSWM.XKB
+import           River.WMP.FFI
+import           River.WMP.MiscFFI
 
 import qualified Data.List as L
-import GHC.Generics
+import           Foreign
 import           Foreign.Storable.Generic (GStorable(..))
-import Foreign
 
 ppXkbModsKey :: Modifiers -> KeySym -> String
 ppXkbModsKey m ksym =

@@ -1,5 +1,3 @@
-{-# LANGUAGE DeriveAnyClass #-}
-
 ------------------------------------------------------------------------------
 -- |
 -- Module      : HSWM.StackSet
@@ -15,14 +13,13 @@
 ------------------------------------------------------------------------------
 module HSWM.StackSet where
 
-import Prelude hiding (modify, modify', filter)
-import Control.Applicative.Backwards (Backwards (Backwards, forwards))
-import Data.Foldable (toList)
-import qualified Data.Map as M
+import           Control.Applicative.Backwards (Backwards(Backwards, forwards))
+import           Data.Foldable (toList)
 import qualified Data.List as L
+import           Data.List.NonEmpty (NonEmpty((:|)))
 import qualified Data.List.NonEmpty as NE
-import Data.List.NonEmpty (NonEmpty((:|)))
-import GHC.Generics  (Generic)
+import qualified Data.Map as M
+import           Prelude hiding (filter, modify, modify')
 
 ------------------------------------------------------------------------
 -- |

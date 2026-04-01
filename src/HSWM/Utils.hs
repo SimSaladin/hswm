@@ -13,13 +13,14 @@
 ------------------------------------------------------------------------------
 module HSWM.Utils where
 
+import           HSWM.XKB (ModMask)
+
 import           Control.Monad.Fix (fix)
 import           Data.Bits
 import           Data.Char (toLower)
 import qualified Data.List as L
 import           Data.Word
 import qualified Generated.Wayland.Client as WL
-import           HSWM.XKB (ModMask)
 import           Numeric (readHex)
 import           River
 import           System.IO
