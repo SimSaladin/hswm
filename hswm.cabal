@@ -33,6 +33,7 @@ library
           OverloadedRecordDot
           DuplicateRecordFields
           OverloadedStrings
+          DeriveAnyClass
     ghc-options: -Wall -Wunused-packages
     other-modules:
           Prelude
@@ -61,6 +62,7 @@ library
           HSWM.Outputs
           HSWM.Operations
           HSWM.Main
+          HSWM.Util.Waybar
           HSWM.Layout
           HSWM.Core
           HSWM.Wallpaper
@@ -127,6 +129,7 @@ executable hswm
           OverloadedRecordDot
           DuplicateRecordFields
           OverloadedStrings
+          DeriveAnyClass
     ghc-options: -Wall -Wunused-packages
     pkgconfig-depends:
           wayland-client

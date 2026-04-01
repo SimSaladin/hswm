@@ -2,12 +2,13 @@ module Main (main) where
 
 import           Data.Ratio
 import           Foreign
+import           Foreign.C
+import           Foreign.C.ConstPtr
 import           HSWM
 import qualified HSWM.StackSet as W
 import qualified HSWM.Wallpaper
+import qualified HSWM.Util.Waybar as WB
 import qualified Wayland.Client.Extras as WL
-import Foreign.C
-import Foreign.C.ConstPtr
 
 default ([Char])
 
@@ -17,6 +18,7 @@ main =
   -- $ addKeys myKeys
   $ addKeys (fromADTKeys $ parseSubmaps myKeys')
 
+  $ WB.waybarSB def
   $ HSWM.Wallpaper.usingWallpaper HSWM.Wallpaper.Config { filepath = "/home/sim/wallpaper.png" }
 
   (def @(HSWMConfig Full))

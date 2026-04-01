@@ -45,6 +45,7 @@ library:
     - HSWM.Outputs
     - HSWM.Operations
     - HSWM.Main
+    - HSWM.Util.Waybar
     - HSWM.Layout
     - HSWM.Core
     - HSWM.Wallpaper
@@ -96,6 +97,7 @@ library:
     - OverloadedRecordDot
     - DuplicateRecordFields
     - OverloadedStrings
+    - DeriveAnyClass
 
 executables:
   hswm:

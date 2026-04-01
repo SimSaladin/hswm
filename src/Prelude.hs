@@ -24,6 +24,8 @@ import           Data.Typeable as BasePrelude (Typeable)
 import           Data.Text as BasePrelude (Text)
 import qualified Data.Text as T
 import           Foreign as BasePrelude (Int32)
+import           GHC.Generics as BasePrelude (Generic)
+import           Foreign.C.ConstPtr as BasePrelude
 
 tshow :: Show a => a -> T.Text
 tshow = T.pack . show
