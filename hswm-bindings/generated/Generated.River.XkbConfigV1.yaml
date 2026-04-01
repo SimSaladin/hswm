@@ -4,9 +4,6 @@ version:
 hsmodule: Generated.River.XkbConfigV1
 ctypes:
 - headers: river-xkb-config-v1-client-protocol.h
-  cname: struct river_input_device_v1
-  hsname: River_input_device_v1
-- headers: river-xkb-config-v1-client-protocol.h
   cname: struct river_xkb_config_v1
   hsname: River_xkb_config_v1
 - headers: river-xkb-config-v1-client-protocol.h
@@ -34,8 +31,6 @@ ctypes:
   cname: struct river_xkb_keyboard_v1_listener
   hsname: River_xkb_keyboard_v1_listener
 hstypes:
-- hsname: River_input_device_v1
-  representation: emptydata
 - hsname: River_xkb_config_v1
   representation: emptydata
 - hsname: River_xkb_config_v1_error

@@ -13,16 +13,22 @@
 ------------------------------------------------------------------------------
 module HSWM.Utils where
 
-import Data.Word
-import Numeric (readHex)
-import River
-import Data.Bits
-import HSWM.XKB (ModMask)
-import Data.Char (toLower)
-import qualified Text.Pretty.Simple as P
-import System.IO
-import qualified Generated.Wayland.Client as WL
+import           Control.Monad.Fix (fix)
+import           Data.Bits
+import           Data.Char (toLower)
 import qualified Data.List as L
+import           Data.Word
+import qualified Generated.Wayland.Client as WL
+import           HSWM.XKB (ModMask)
+import           Numeric (readHex)
+import           River
+import           System.IO
+import           System.Posix.IO
+import           System.Posix.Process (createSession, executeFile, forkProcess,
+                                       getAnyProcessStatus)
+import           System.Posix.Signals
+import           System.Posix.Types (ProcessID)
+import qualified Text.Pretty.Simple as P
 
 -- | Parse a color in the format 0xRRGGBB or 0xRRGGBBAA and convert it to
 -- 32-bit color values (used by Window.set_borders in rwm).
@@ -208,3 +214,42 @@ ppShmFormat x = case x of
     WL.WL_SHM_FORMAT_XVUY8888                 -> "XVUY8888"
     WL.WL_SHM_FORMAT_P030                     -> "P030"
     _ -> "UNKNOWN"
+
+spawnProcess :: MonadIO m => String -> [String] -> m ProcessID
+spawnProcess x xs = xfork $ executeFile "/usr/bin/env" False (x : xs) Nothing
+
+spawnShell :: MonadIO m => String -> m ProcessID
+spawnShell x = xfork $ executeFile "/bin/sh" False ["-c", x] Nothing
+
+spawn :: MonadIO m => String -> m ()
+spawn x = void $ spawnShell x
+
+-- | A replacement for 'forkProcess' which resets default signal handlers.
+xfork :: MonadIO m => IO () -> m ProcessID
+xfork x = io . forkProcess . finally nullStdin $ do
+                uninstallSignalHandlers
+                _ <- createSession
+                x
+ where
+    nullStdin = do
+        fd <- openFd "/dev/null" ReadOnly defaultFileFlags
+        _ <- dupTo fd stdInput
+        closeFd fd
+
+-- | Ignore SIGPIPE to avoid termination when a pipe is full, and SIGCHLD to
+-- avoid zombie processes, and clean up any extant zombie processes.
+installSignalHandlers :: MonadIO m => m ()
+installSignalHandlers = io $ do
+    _ <- installHandler openEndedPipe Ignore Nothing
+    _ <- installHandler sigCHLD Ignore Nothing
+    void $ (try :: IO a -> IO (Either SomeException a))
+      $ fix $ \more -> do
+        x <- getAnyProcessStatus False False
+        when (isJust x) more
+    return ()
+
+uninstallSignalHandlers :: MonadIO m => m ()
+uninstallSignalHandlers = io $ do
+    _ <- installHandler openEndedPipe Default Nothing
+    _ <- installHandler sigCHLD Default Nothing
+    return ()

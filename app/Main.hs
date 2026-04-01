@@ -1,48 +1,50 @@
 module Main (main) where
 
-import Data.Ratio
-import HSWM
-import Foreign
-import qualified HSWM.Wallpaper
+import           Data.Ratio
+import           Foreign
+import           HSWM
 import qualified HSWM.StackSet as W
+import qualified HSWM.Wallpaper
+
+default ([Char])
 
 main :: IO ()
-main = hswm
-  $ addKeys myKeys
+main =
+ hswm
+  -- $ addKeys myKeys
+  $ addKeys (fromADTKeys $ parseSubmaps myKeys')
+
   $ HSWM.Wallpaper.usingWallpaper HSWM.Wallpaper.Config { filepath = "/home/sim/wallpaper.png" }
+
   (def @(HSWMConfig Full))
   { layoutHook = Tall 1 (3/100) (1/2) ||| Full
   , handleEventHook = debugHook
-  , xkbLayout = Just $
-    XkbRuleNames { rules = ""
-                 , model = "pc104"
-                 , layout = "dvp-my"
-                 , variant = "dvp-my"
-                 , options = "terminate:ctrl_alt_bksp,compose:rctrl-altgr,lv3:ralt_switch,lv3:menu_switch" }
-  , pointerBindings =
-    [ (("M", _BTN_LEFT), namedA "Move" $ return ())
-    , (("M", _BTN_RIGHT), namedA "RIGHT" $ return ()) ]
-  }
+  , xkbLayout = Just dvpMyLayout
+  , pointerBindings = myPointerBinds
+  } where
 
-  where
+  myKeys' =
+    [ ("M-n",           windowsA "Focus down" W.focusDown)
+    , ("M-p" ,          windowsA "Focus up" W.focusUp)
+    , ("M-r r",         named "RUn cmd" $ launchRofi ["-modes", "run", "-show", "run"])
+    , ("M-b f",         namedA "Fullscreen" $ withFocused $ doManage WToggleFullscreen)
+    , ("M-s",           namedA "Sink focused" $ withFocused $ \w -> modifyWindowSet (W.sink w.river_window))
+    , ("M-f",           namedA "Float focused" $ withFocused $ \w -> modifyWindowSet (W.float w.river_window (W.RationalRect (1%10) (1%10) (1%2) (1%2))))
+    , ("M-Return",      toSomeAction $ LaunchProgram "kitty" [])
+    , ("M-Escape",      namedA "Debug" debugAction)
+    , ("M-Space",       messageA NextLayout)
+    , ("M-Shift-Space", messageA FirstLayout)
+    , ("M-Comma",       messageA $ IncMasterN (-1))
+    , ("M-Period",      messageA $ IncMasterN 1)
+    , ("M-x",           messageA Shrink)
+    , ("M-S-x",         messageA Expand)
+    , ("M-S-c",         namedA "Kill focused window" $ withFocused manageKill)
+    , ("M-S-q",         namedA "Restart" sendRestart)
+    ]
 
-  myKeys =
-    [ (("M", "n" :: String), windowsA "Focus down" W.focusDown)
-    , (("M", "p" :: String), windowsA "Focus up" W.focusUp)
-    , (("M", "s"),           namedA "Sink focused" $ withFocused $ \w -> modifyWindowSet (W.sink w.river_window))
-    , (("M", "f"),           namedA "Float focused" $ withFocused $ \w -> modifyWindowSet (W.float w.river_window (W.RationalRect 0 0 (1%2) (1%2))))
-    , (("M", "Return"),      toSomeAction $ LaunchProgram "kitty" [])
-    , (("M", "Escape"),      namedA "Debug" debugAction)
-    , (("M", "Space"),      messageA NextLayout)
-    , (("M-Shift", "Space"),      messageA FirstLayout)
-    , (("M", "Comma"),      messageA $ IncMasterN (-1))
-    , (("M", "Period"),      messageA $ IncMasterN 1)
-    , (("M", "x"),      messageA Shrink)
-    , (("M-S", "x"),      messageA Expand)
-    , (("M-S", "q"),      namedA "Restart" sendRestart)
-    , (("M", "r"), submap Nothing
-            [ ((0, "r"), namedA "Foo" $ log' "Submap: r")
-            ])
+  myPointerBinds =
+    [ (("M", _BTN_LEFT),  namedA "Move"    $ return ())
+    , (("M", _BTN_RIGHT), namedA "Stretch" $ return ())
     ]
 
 debugHook :: Event -> H All
@@ -54,10 +56,16 @@ debugHook ev
       debug' $ toText $ printf "[EH] KEY PRESS ev=%s action=%s" (show ev) (show xb.action)
       pTrace ev
       mempty
-   | WlOutputEvent e                 <- ev = pTrace e >> mempty
+
+   | SeatEvent SeatEventPointerPosition{}   <- ev = mempty
    | SeatEvent e                     <- ev = pTrace e >> mempty
+
    | OutputEvent e                   <- ev = pTrace e >> mempty
+
+   | WindowEvent WindowDimensions{}  <- ev = mempty
    | WindowEvent e                   <- ev = pTrace e >> mempty
+
+   | WlOutputEvent e                 <- ev = mempty -- pTrace e >> mempty
    | XkbKeyboardEvent e              <- ev = pTrace e >> mempty
    | WindowManagerEvent e            <- ev = pTrace e >> mempty
    | WlShmEvent _                    <- ev = mempty
@@ -65,5 +73,18 @@ debugHook ev
 
 debugAction :: H ()
 debugAction = do
+  gets _outputs >>= pTrace
   ws <- gets windowset
   pTrace ws
+
+dvpMyLayout :: XkbRuleNames
+dvpMyLayout = XkbRuleNames
+  { rules = ""
+  , model = "pc104"
+  , layout = "dvp-my"
+  , variant = "dvp-my"
+  , options = "terminate:ctrl_alt_bksp,compose:rctrl-altgr,lv3:ralt_switch,lv3:menu_switch"
+  }
+
+launchRofi :: [String] -> SomeAction
+launchRofi args = toSomeAction $ LaunchProgram "rofi" (["-dpi", "150"] ++ args)

@@ -64,7 +64,6 @@ ctxMVar = unsafePerformIO $ newMVar $ Ctx False Nothing 0 0 Nothing Nothing
 
 wpStartupHook :: Config -> H ()
 wpStartupHook conf = do
-  debug' "wallpaper: startuphook"
   ctx <- io $ readMVar ctxMVar
   -- create bufferpool if missing
   when (isNothing ctx.bufferPool) $ do
@@ -89,10 +88,8 @@ wpHandleEventHook _ = mempty
 
 render :: H ()
 render = do
-  log' "wallpaper: rendering.."
   ctx <- io $ readMVar ctxMVar
   when (ctx.pending_render && isJust ctx.surfaces && isJust ctx.src_image && isJust ctx.bufferPool) $ do
-    log' "wallpaper: rendering!!!"
     drawImage
     io $ modifyMVar_ ctxMVar $ \x -> pure $ x { pending_render = False }
 
@@ -150,7 +147,6 @@ initOutput = do
   -- create surface etc.
   let w = ctx.render_width
   let h = ctx.render_height
-  debug' $ "wallpaper: initialize " <> tshow (w, h)
 
   compositor <- getObject
   wm <- getObject

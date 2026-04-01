@@ -19,8 +19,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 
 module Generated.River.XkbConfigV1
-    ( Generated.River.XkbConfigV1.River_input_device_v1
-    , Generated.River.XkbConfigV1.River_xkb_config_v1
+    ( Generated.River.XkbConfigV1.River_xkb_config_v1
     , Generated.River.XkbConfigV1.River_xkb_keyboard_v1
     , Generated.River.XkbConfigV1.River_xkb_keymap_v1
     , Generated.River.XkbConfigV1.River_xkb_config_v1_error(..)
@@ -72,56 +71,13 @@ module Generated.River.XkbConfigV1
     )
   where
 
+import qualified Generated.River.InputManagementV1
 import qualified HsBindgen.Runtime.CEnum as CEnum
 import qualified HsBindgen.Runtime.HasCField as HasCField
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.LibC
 import qualified HsBindgen.Runtime.Marshal as Marshal
 import qualified HsBindgen.Runtime.PtrConst as PtrConst
-
-{-|
-
-  > page_river_xkb_config_v1 The river_xkb_config_v1 protocol
-
-  configure xkbcommon keyboards
-
-  > page_desc_river_xkb_config_v1 Description
-
-  This protocol allow a client to set the xkbcommon keymap of individual keyboard input devices. It also allows switching between the layouts of a keymap and toggling capslock/numlock state.
-
-  The key words "must", "must not", "required", "shall", "shall not", "should", "should not", "recommended", "may", and "optional" in this document are to be interpreted as described in IETF RFC 2119.
-
-  > page_ifaces_river_xkb_config_v1 Interfaces
-
-  -
-
-  > page_iface_river_xkb_config_v1 - xkb config global interface
-
-  -
-
-  > page_iface_river_xkb_keymap_v1 - xkbcommon keymap
-
-  -
-
-  > page_iface_river_xkb_keyboard_v1 - xkbcommon keyboard device
-
-  > page_copyright_river_xkb_config_v1 Copyright
-
-  SPDX-FileCopyrightText: © 2026 Isaac Freund SPDX-License-Identifier: MIT
-
-  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-__C declaration:__ @struct river_input_device_v1@
-
-__defined at:__ @river-xkb-config-v1-client-protocol.h 57:8@
-
-__exported by:__ @river-xkb-config-v1-client-protocol.h@
--}
-data River_input_device_v1
 
 {-| __C declaration:__ @struct river_xkb_config_v1@
 
@@ -798,7 +754,7 @@ data River_xkb_keyboard_v1_listener = River_xkb_keyboard_v1_listener
 
     __exported by:__ @river-xkb-config-v1-client-protocol.h@
     -}
-  , input_device :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr River_input_device_v1) -> IO ())
+  , input_device :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr Generated.River.InputManagementV1.River_input_device_v1) -> IO ())
     {- ^ corresponding river input device
 
        The river_input_device_v1 corresponding to this xkb keyboard. This event will always be the first event sent on the river_xkb_keyboard_v1 object, and it will be sent exactly once.
@@ -935,11 +891,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_keyboa
 instance HasCField.HasCField River_xkb_keyboard_v1_listener "input_device" where
 
   type CFieldType River_xkb_keyboard_v1_listener "input_device" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr River_input_device_v1) -> IO ())
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr Generated.River.InputManagementV1.River_input_device_v1) -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr River_input_device_v1) -> IO ()))
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr Generated.River.InputManagementV1.River_input_device_v1) -> IO ()))
          ) => RIP.HasField "input_device" (RIP.Ptr River_xkb_keyboard_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -1333,37 +1289,37 @@ instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_keyboard_v1) -
 
   fromFunPtr = hs_bindgen_a703ad695b8c4fc7
 
-foreign import ccall safe "wrapper" hs_bindgen_f6a71c50ef08d243_base ::
+foreign import ccall safe "wrapper" hs_bindgen_db2bd566a131fa30_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr River_input_device_v1) -> IO ())@
-hs_bindgen_f6a71c50ef08d243 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr River_input_device_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr River_input_device_v1) -> IO ()))
-hs_bindgen_f6a71c50ef08d243 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr Generated.River.InputManagementV1.River_input_device_v1) -> IO ())@
+hs_bindgen_db2bd566a131fa30 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr Generated.River.InputManagementV1.River_input_device_v1) -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr Generated.River.InputManagementV1.River_input_device_v1) -> IO ()))
+hs_bindgen_db2bd566a131fa30 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_f6a71c50ef08d243_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_db2bd566a131fa30_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_1df7fa1cb2586f56_base ::
+foreign import ccall safe "dynamic" hs_bindgen_ba2959b4fd83cf9e_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr River_input_device_v1) -> IO ())@
-hs_bindgen_1df7fa1cb2586f56 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr River_input_device_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr River_input_device_v1) -> IO ()
-hs_bindgen_1df7fa1cb2586f56 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr Generated.River.InputManagementV1.River_input_device_v1) -> IO ())@
+hs_bindgen_ba2959b4fd83cf9e ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr Generated.River.InputManagementV1.River_input_device_v1) -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr Generated.River.InputManagementV1.River_input_device_v1) -> IO ()
+hs_bindgen_ba2959b4fd83cf9e =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_1df7fa1cb2586f56_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_ba2959b4fd83cf9e_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr River_input_device_v1) -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr Generated.River.InputManagementV1.River_input_device_v1) -> IO ()) where
 
-  toFunPtr = hs_bindgen_f6a71c50ef08d243
+  toFunPtr = hs_bindgen_db2bd566a131fa30
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr River_input_device_v1) -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_keyboard_v1) -> (RIP.Ptr Generated.River.InputManagementV1.River_input_device_v1) -> IO ()) where
 
-  fromFunPtr = hs_bindgen_1df7fa1cb2586f56
+  fromFunPtr = hs_bindgen_ba2959b4fd83cf9e
 
 foreign import ccall safe "wrapper" hs_bindgen_d30132c9b6d4f2d2_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> (RIP.Ptr RIP.Void) -> IO ())

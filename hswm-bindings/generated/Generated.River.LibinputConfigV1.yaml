@@ -4,9 +4,6 @@ version:
 hsmodule: Generated.River.LibinputConfigV1
 ctypes:
 - headers: river-libinput-config-v1-client-protocol.h
-  cname: struct river_input_device_v1
-  hsname: River_input_device_v1
-- headers: river-libinput-config-v1-client-protocol.h
   cname: struct river_libinput_accel_config_v1
   hsname: River_libinput_accel_config_v1
 - headers: river-libinput-config-v1-client-protocol.h
@@ -97,8 +94,6 @@ ctypes:
   cname: struct river_libinput_result_v1_listener
   hsname: River_libinput_result_v1_listener
 hstypes:
-- hsname: River_input_device_v1
-  representation: emptydata
 - hsname: River_libinput_accel_config_v1
   representation: emptydata
 - hsname: River_libinput_accel_config_v1_accel_type

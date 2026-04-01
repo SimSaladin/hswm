@@ -10,9 +10,9 @@ import Wayland
 
 #include "river-window-management-v1-client-protocol.h"
 
--- XXX: just warns in case the result is a nullpointer
 coerceWlProxy_ :: String -> WlProxy -> IO ()
-coerceWlProxy_ desc (WlProxy p) = when (p == nullPtr) $ debug' $ "warning: " <> toText desc <> " returned NULL"
+coerceWlProxy_ desc (WlProxy p) = return ()
+-- when (p == nullPtr) $ debug' $ "warning: " <> toText desc <> " returned NULL"
 
 type WindowCaps = {#type uint32_t#}
 
@@ -95,7 +95,7 @@ river_window_v1_close w = do
     >>= coerceWlProxy_ "river_window_v1_close"
 
 river_window_v1_get_node :: RiverWindow -> IO RiverNode
-river_window_v1_get_node w = wl_proxy_marshal_array_flags' RiverNode w
+river_window_v1_get_node w = wl_proxy_marshal_array_flags' id w
     {#const RIVER_WINDOW_V1_GET_NODE#} river_node_v1_interface 0 nullPtr
 
 river_window_v1_propose_dimensions :: RiverWindow -> Int32 -> Int32 -> IO ()
@@ -302,7 +302,7 @@ riverShellSurfaceV1Destroy :: MonadIO m => RiverShellSurface -> m ()
 riverShellSurfaceV1Destroy ss = wl_proxy_destroy ss {#const RIVER_SHELL_SURFACE_V1_DESTROY#}
 
 riverShellSurfaceGetNode :: MonadIO m => RiverShellSurface -> m RiverNode
-riverShellSurfaceGetNode ss = wl_proxy_marshal_flags' RiverNode ss
+riverShellSurfaceGetNode ss = wl_proxy_marshal_flags' id ss
     {#const RIVER_SHELL_SURFACE_V1_GET_NODE#} river_node_v1_interface 0
 
 riverShellSurfaceSyncNextCommit :: MonadIO m => RiverShellSurface -> m ()
@@ -323,10 +323,10 @@ river_node_v1_place_bottom :: RiverNode -> IO ()
 river_node_v1_place_bottom nd = wl_proxy_marshal_flags' (const ()) nd {#const RIVER_NODE_V1_PLACE_BOTTOM#} emptyInterface 0
 
 river_node_v1_place_above :: RiverNode -> RiverNode -> IO ()
-river_node_v1_place_above nd (RiverNode nd') = wl_proxy_marshal_array_flags' (const ()) nd {#const RIVER_NODE_V1_PLACE_ABOVE#} emptyInterface 0 nd'
+river_node_v1_place_above nd nd' = wl_proxy_marshal_array_flags' (const ()) nd {#const RIVER_NODE_V1_PLACE_ABOVE#} emptyInterface 0 nd'
 
 river_node_v1_place_below :: RiverNode -> RiverNode -> IO ()
-river_node_v1_place_below nd (RiverNode nd') = wl_proxy_marshal_array_flags' (const ()) nd {#const RIVER_NODE_V1_PLACE_BELOW#} emptyInterface 0 nd'
+river_node_v1_place_below nd nd' = wl_proxy_marshal_array_flags' (const ()) nd {#const RIVER_NODE_V1_PLACE_BELOW#} emptyInterface 0 nd'
 
 river_node_v1_set_position :: RiverNode -> Int32 -> Int32 -> IO ()
 river_node_v1_set_position nd x y = wl_proxy_marshal_array_flags' (const ()) nd {#const RIVER_NODE_V1_SET_POSITION#} emptyInterface 0 (x, y)

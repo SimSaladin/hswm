@@ -14,9 +14,9 @@
 ------------------------------------------------------------------------------
 module HSWM.Main  where
 
-import HSWM.Types
-import HSWM.Actions
 import Core
+import HSWM.Core
+import HSWM.Utils
 
 hswm :: (LayoutClass l RiverWindow, Read (l RiverWindow)) => HSWMConfig l -> IO ()
 hswm conf = do

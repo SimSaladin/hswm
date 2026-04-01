@@ -7,36 +7,37 @@ module Core
   ) where
 
 import           HSWM.Operations
+import qualified HSWM.Windows as Windows
+import qualified HSWM.Outputs as Outputs
+import qualified HSWM.Seats as Seats
 import qualified HSWM.StackSet as W
 import           HSWM.Types
 import           HSWM.Utils
-import qualified HSWM.Outputs as Outputs
-import qualified HSWM.Seats as Seats
 
 import           River
+import qualified River.Safe as R
 import           Wayland
 import qualified Wayland.Client as WL
-import qualified River.Safe as R
 
+import           Data.IORef
 import qualified Data.List as L
-import qualified Data.Map as M
+-- import qualified Data.Map as M
 import qualified Data.TMap as TM
 import           Foreign hiding (new, void)
 import           System.Exit
 import qualified System.Posix as Posix
-import           Data.IORef
+
+data StopReason = StopReasonNone | StopReasonRestart
+  deriving (Eq, Show)
 
 startHSWM :: (LayoutClass l RiverWindow, Read (l RiverWindow)) => WlDisplay -> HSWMConfig l -> IO ()
 startHSWM display config = withStdoutLogging $ do
-  conf <- HConf (config { layoutHook = Layout (layoutHook config) }) display
-              <$> newIORef mempty
+  conf <- HConf (config { layoutHook = Layout (layoutHook config) }) display <$> newIORef mempty
 
-  mRestored <- io $ readStateFile config
-
-  let initialState
-        | Just s <- mRestored  = s
-        | otherwise = def { windowset = initialWinSet , windowsetOld = initialWinSet }
+  initialState <- io (readStateFile config) >>= \case
+    Nothing -> return def { windowset = initialWinSet , windowsetOld = initialWinSet }
             where initialWinSet = W.new conf.config.layoutHook config.workspaces [SD 0 0 0 0]
+    Just s -> return s
 
   stTMVar <- newTMVarIO initialState
 
@@ -126,18 +127,18 @@ startHSWM display config = withStdoutLogging $ do
     runInH $ restart "hswm"
                                           ) Nothing
 
+  -- main loop
+  -- However, if you have a more sophisticated application, you can build your own event loop in any manner you please,
+  -- and obtain the Wayland display's file descriptor with wl_display_get_fd.
+  --
+  -- Upon POLLIN events, call wl_display_dispatch to process incoming events.
+  --
+  -- To flush outgoing requests, call wl_display_flush.
   forever $ do
-    flush_errno <- WL.wl_display_flush display
-    when (flush_errno < 0) $ do
-      log' "error: flush failed"
-      exitFailure
     res <- wl_display_dispatch display
     when (res < 0) $ do
       log' "error: dispatch failed"
       exitFailure
-
-data StopReason = StopReasonNone | StopReasonRestart
-  deriving (Eq, Show)
 
 ---------------------------------------------------
 -- event handling
@@ -150,29 +151,20 @@ handleWithHook e = do
   whenM (userCodeDef True $ getAll `fmap` evHook e) (handleEvent e)
 
 handleEvent :: Event -> H ()
-handleEvent (WindowManagerEvent e) = do
-  case e of
+handleEvent (WindowManagerEvent e) = case e of
     WindowManagerOutput _ _ out -> Outputs.added out
     WindowManagerSeat _ _ seat -> Seats.added seat
-    WindowManagerWindow _ _ w -> do
-      nd <- liftIO $ river_window_v1_get_node w
-      let win = def { river_window = w, node = nd }
-      window_listener <- getObject
-      liftIO $ river_window_v1_add_listener w window_listener nullPtr
-      modify $ \s -> s { _windows = _windows s ++ [win] }
-      modifyWindowSet $ W.insertUp w
+    WindowManagerWindow _ _ w -> Windows.added w
 
     -- /manage sequence/
     WindowManagerManageStart _ wm -> do
-      Outputs.manage >> Seats.manage
-      manageWindows
-      windows
+      Outputs.manage >> Seats.manage >> Windows.manage
       void . userCode =<< asks (manageHook . config)
       io (riverWindowManagerManageFinish wm)
 
     -- /render sequence/
     WindowManagerRenderStart _ wm -> do
-      Outputs.render >> Seats.render
+      Outputs.render >> Seats.render >> Windows.render
       void . userCode =<< asks (renderHook . config)
       io (riverWindowManagerRenderFinish wm)
 
@@ -180,7 +172,7 @@ handleEvent (WindowManagerEvent e) = do
       log' "error: another window manager already running"
       liftIO exitFailure
 
-    WindowManagerFinished _ _ -> do
+    WindowManagerFinished{} -> do
       withObjectDef StopReasonNone return >>= \case
         StopReasonRestart -> do
           log' "river_window_manage_v1 finished, restarting..."
@@ -194,46 +186,11 @@ handleEvent (OutputEvent e)           = Outputs.handle e
 handleEvent (LayerShellOutputEvent e) = Outputs.handleLayerShell e
 handleEvent (WlOutputEvent e)         = Outputs.handleWlOutput e
 handleEvent (SeatEvent e)             = Seats.handleEvent e
-
-  -- The window has been closed by the server, perhaps due to an xdg_toplevel.close request or similar.
-  -- The server will send no further events on this object and ignore any request other than river_window_v1.destroy made after this event is sent. The client should destroy this object with the river_window_v1.destroy request to free up resources.
-handleEvent (WindowEvent (WindowClosed _ w)) = modifyWindow w $ \s -> s
-  { closed = True }
-handleEvent (WindowEvent (WindowAppId { window, we_app_id })) = modifyWindow window $ \s -> s
-  { appId = we_app_id }
-handleEvent (WindowEvent (WindowTitle { window, we_title })) = modifyWindow window $ \s -> s
-  { title = we_title }
-handleEvent (WindowEvent (WindowIdentifier { window, we_identifier })) = do
-  modifyWindow window $ \s -> s { identifier = we_identifier }
-  let recoverWindow w = do
-            modifyWindowSet $ W.mapWindow (\x -> if x == w then window else x) . W.delete window
-            modify' $ \s -> s { recoveredWindows = M.delete we_identifier s.recoveredWindows }
-  gets (M.lookup we_identifier . recoveredWindows) >>= (`whenJust` recoverWindow)
-handleEvent (WindowEvent (WindowDimensions{window, we_width, we_height})) = modifyWindow window $ \s -> s
-  { width = fromIntegral we_width, height = fromIntegral we_height }
-handleEvent (WindowEvent (WindowDimensionsHint{..})) = modifyWindow window $ \s -> s
-  { min_width = fromIntegral we_min_width
-  , min_height = fromIntegral we_min_height
-  , max_width = fromIntegral we_max_width
-  , max_height = fromIntegral we_max_height
-  }
-handleEvent (WindowEvent (WindowPointerMoveRequested{..}   )) = modifyWindow window $ \s -> s
-  { pointer_move_requested = seat }
-handleEvent (WindowEvent (WindowPointerResizeRequested{..} )) = modifyWindow window $ \s -> s
-  { pointer_resize_requested = seat, pointer_resize_requested_edges = fromIntegral we_edges }
-
--- Parent { we_parent }
--- DecorationHint { we_hint }
--- MaximizeRequested
--- UnmaximizeRequested
--- FullscreenRequested { output }
--- ExitFullscreenRequested
--- UnreliablePID { we_unreliable_pid }
--- PresentationHint { we_hint }
+handleEvent (WindowEvent e)           = Windows.handleEvent e
 
 -- XKB Keyboard events
 handleEvent (XkbEvent (XkbKeyPressed dt _)) = do
-  xb <- liftIO $ deRefStablePtr (castPtrToStablePtr dt :: StablePtr (XkbBinding SomeAction))
+  xb <- io $ deRefStablePtr (castPtrToStablePtr dt :: StablePtr (XkbBinding SomeAction))
   Seats.execXkbBinding xb
 
 -- unhandled submap keys
@@ -242,7 +199,7 @@ handleEvent (XkbSeatEvent (R.RiverXkbBindingsSeatV1AteUnboundKey dt _)) =
 
 -- Pointer events
 handleEvent (PointerEvent (PointerPressed dt _bind)) = do
-  xb <- liftIO $ deRefStablePtr (castPtrToStablePtr dt :: StablePtr (PointerBinding SomeAction))
+  xb <- io $ deRefStablePtr (castPtrToStablePtr dt :: StablePtr (PointerBinding SomeAction))
   userCodeDef () $ runner xb.action
 
 -- INPUT configuration
@@ -250,17 +207,13 @@ handleEvent (PointerEvent (PointerPressed dt _bind)) = do
 handleEvent (XkbConfigEvent (XkbConfigXkbKeyboard _ xkbConfig xkbKeyboard)) = do
   withObject @RiverXkbKeyboardV1Listener $ \l -> io $ riverXkbKeyboardV1AddListener xkbKeyboard l nullPtr
   asks (xkbLayout . config) >>= (`whenJust` setKeyboardLayout xkbConfig xkbKeyboard)
-
 -- keyboard is removed
 handleEvent (XkbKeyboardEvent (KeyboardRemoved _ _kbd)) = return () -- TODO
-
 handleEvent (InputManagerEvent (R.RiverInputManagerV1InputDevice _ _ inputDevice)) = do
   devListener <- getObject
   void $ io $ R.river_input_device_v1_add_listener inputDevice devListener nullPtr
 
--- shm
 handleEvent (WlShmEvent (WL.WlShmFormat _ _ fmt)) = log' $ toText $ "shm format: " ++ ppShmFormat (WL.Wl_shm_format $ fi fmt)
-
 handleEvent _ = return ()
 
 ----------------------------------------------------------------------------------
@@ -272,34 +225,3 @@ setKeyboardLayout xkbConfig keyboard layout =
     riverXkbConfigV1CreateKeymap xkbConfig (fi fd) RiverXkbConfigV1KeymapFormatTextV1
     >>= io . riverXkbKeyboardV1SetKeymap keyboard
 
-manageWindows :: H ()
-manageWindows = do
-     -- XXX ??
-    mapWindows $ \w -> when w.closed (doRemoveWindow w)
-
-    newWindows <- gets _windows >>= \xs -> forM xs $ \w -> do
-        --when (w.pointer_move_requested /= invalidSeat) $ seatPointerMove w.pointer_move_requested w
-        --when (w.pointer_resize_requested /= invalidSeat) $ seatPointerResize w.pointer_resize_requested w w.pointer_resize_requested_edges
-        return (w :: Window) { new = False, pointer_move_requested = invalidSeat, pointer_resize_requested = invalidSeat  }
-
-    modify $ \s -> s { _windows = newWindows }
-
-doRemoveWindow :: Window -> H ()
-doRemoveWindow w@Window{} = do
-  modifyWindowSet $ W.delete w.river_window
-  modify $ \st -> st { _windows = L.filter (\x -> (/= w.river_window) x.river_window) (_windows st) }
-  gets _seats >>= \xs -> do
-   xs' <- forM xs $ \seat' -> do
-     let seat = seat'
-          { focused = if focused seat' == w.river_window then invalidWindow else focused seat'
-          , hovered = if hovered seat' == w.river_window then invalidWindow else hovered seat'
-          , interacted = if interacted seat' == w.river_window then invalidWindow else interacted seat'
-          }
-     if op_window seat == w.river_window
-        then do
-            liftIO $ river_seat_v1_op_end seat.river_seat
-            return $ seat { op_window = invalidWindow, op = SEAT_OP_NONE }
-        else return seat
-   modify $ \s -> s { _seats = xs' }
-  io $ river_node_v1_destroy w.node
-  io $ river_window_v1_destroy w.river_window

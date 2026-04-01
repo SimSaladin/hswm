@@ -19,8 +19,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 
 module Generated.River.LibinputConfigV1
-    ( Generated.River.LibinputConfigV1.River_input_device_v1
-    , Generated.River.LibinputConfigV1.River_libinput_accel_config_v1
+    ( Generated.River.LibinputConfigV1.River_libinput_accel_config_v1
     , Generated.River.LibinputConfigV1.River_libinput_config_v1
     , Generated.River.LibinputConfigV1.River_libinput_device_v1
     , Generated.River.LibinputConfigV1.River_libinput_result_v1
@@ -225,66 +224,13 @@ module Generated.River.LibinputConfigV1
     )
   where
 
+import qualified Generated.River.InputManagementV1
 import qualified Generated.Wayland.Util
 import qualified HsBindgen.Runtime.CEnum as CEnum
 import qualified HsBindgen.Runtime.HasCField as HasCField
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.LibC
 import qualified HsBindgen.Runtime.Marshal as Marshal
-
-{-|
-
-  > page_river_libinput_config_v1 The river_libinput_config_v1 protocol
-
-  configure libinput devices
-
-  > page_desc_river_libinput_config_v1 Description
-
-  This protocol exposes libinput device configuration APIs. The libinput documentation should be referred to for detailed information on libinput's behavior.
-
-  Note that the compositor will not be able to expose libinput devices through this protocol when it does not have access to the hardware, for example when running nested in another Wayland compositor or X11 session.
-
-  This protocol is designed so that (hopefully) any backwards compatible change to libinput's API can be matched with a backwards compatible change to this protocol.
-
-  Note: the libinput API uses floating point types (float and double in C) which are not (yet?) natively supported by the Wayland protocol. However, the Wayland protocol does support sending arbitrary bytes through the array argument type. This protocol uses e.g. type="array" summary="double" to indicate a native-endian IEEE-754 64-bit double value.
-
-  The key words "must", "must not", "required", "shall", "shall not", "should", "should not", "recommended", "may", and "optional" in this document are to be interpreted as described in IETF RFC 2119.
-
-  > page_ifaces_river_libinput_config_v1 Interfaces
-
-  -
-
-  > page_iface_river_libinput_config_v1 - libinput config global interface
-
-  -
-
-  > page_iface_river_libinput_device_v1 - a libinput device
-
-  -
-
-  > page_iface_river_libinput_accel_config_v1 - acceleration config
-
-  -
-
-  > page_iface_river_libinput_result_v1 - config application result
-
-  > page_copyright_river_libinput_config_v1 Copyright
-
-  SPDX-FileCopyrightText: © 2025 Isaac Freund SPDX-License-Identifier: MIT
-
-  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-__C declaration:__ @struct river_input_device_v1@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 72:8@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
--}
-data River_input_device_v1
 
 {-| __C declaration:__ @struct river_libinput_accel_config_v1@
 
@@ -2976,7 +2922,7 @@ data River_libinput_device_v1_listener = River_libinput_device_v1_listener
 
     __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , input_device :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr River_input_device_v1) -> IO ())
+  , input_device :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.River.InputManagementV1.River_input_device_v1) -> IO ())
     {- ^ corresponding river input device
 
        The river_input_device_v1 corresponding to this libinput device. This event will always be the first event sent on the river_libinput_device_v1 object, and it will be sent exactly once.
@@ -3797,11 +3743,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "input_device" where
 
   type CFieldType River_libinput_device_v1_listener "input_device" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr River_input_device_v1) -> IO ())
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.River.InputManagementV1.River_input_device_v1) -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr River_input_device_v1) -> IO ()))
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.River.InputManagementV1.River_input_device_v1) -> IO ()))
          ) => RIP.HasField "input_device" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -5988,37 +5934,37 @@ instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1
 
   fromFunPtr = hs_bindgen_6cf8ab7cabe77448
 
-foreign import ccall safe "wrapper" hs_bindgen_dab2560949d50cf3_base ::
+foreign import ccall safe "wrapper" hs_bindgen_df7aab9a3cb5cddf_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr River_input_device_v1) -> IO ())@
-hs_bindgen_dab2560949d50cf3 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr River_input_device_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr River_input_device_v1) -> IO ()))
-hs_bindgen_dab2560949d50cf3 =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.River.InputManagementV1.River_input_device_v1) -> IO ())@
+hs_bindgen_df7aab9a3cb5cddf ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.River.InputManagementV1.River_input_device_v1) -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.River.InputManagementV1.River_input_device_v1) -> IO ()))
+hs_bindgen_df7aab9a3cb5cddf =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_dab2560949d50cf3_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_df7aab9a3cb5cddf_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_0b10719c94e49123_base ::
+foreign import ccall safe "dynamic" hs_bindgen_1817c75639dea892_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr River_input_device_v1) -> IO ())@
-hs_bindgen_0b10719c94e49123 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr River_input_device_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr River_input_device_v1) -> IO ()
-hs_bindgen_0b10719c94e49123 =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.River.InputManagementV1.River_input_device_v1) -> IO ())@
+hs_bindgen_1817c75639dea892 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.River.InputManagementV1.River_input_device_v1) -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.River.InputManagementV1.River_input_device_v1) -> IO ()
+hs_bindgen_1817c75639dea892 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_0b10719c94e49123_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_1817c75639dea892_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr River_input_device_v1) -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.River.InputManagementV1.River_input_device_v1) -> IO ()) where
 
-  toFunPtr = hs_bindgen_dab2560949d50cf3
+  toFunPtr = hs_bindgen_df7aab9a3cb5cddf
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr River_input_device_v1) -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Generated.River.InputManagementV1.River_input_device_v1) -> IO ()) where
 
-  fromFunPtr = hs_bindgen_0b10719c94e49123
+  fromFunPtr = hs_bindgen_1817c75639dea892
 
 foreign import ccall safe "wrapper" hs_bindgen_5c4040cd71595988_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())

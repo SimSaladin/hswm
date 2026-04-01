@@ -99,7 +99,7 @@ createSeatBindings s = do
   pbListen <- getObject @PointerBindingListener
 
   myMod  <- asks (defaultModMask . config) <&> resolveModMask 0
-  kBinds <- asks (keyBindings . config) >>= resolveKeyBinds myMod
+  kBinds <- asks (keyBindings . config) -- >>= resolveKeyBinds myMod
   pBinds <- asks (pointerBindings . config) >>= resolvePointerBinds myMod
 
   let fKeyBind enable ((m, k), a) = case actionSubmap a of
@@ -182,9 +182,9 @@ manage1 s = do
       -- make sure next key is devoured
       io $ ensureNextKeyEaten s
       -- disable previous keymap keys
-      mapM_ (deRefStablePtr >=> river_xkb_binding_v1_disable . xkb_binding) $ maybe s.xkb_bindings snd s.submap_pending
+      io $ mapM_ (deRefStablePtr >=> river_xkb_binding_v1_disable . xkb_binding) $ maybe s.xkb_bindings snd s.submap_pending
       -- activate sub-keymap keys
-      io $ forM_ subkeys $ deRefStablePtr >>= river_xkb_binding_v1_enable . xkb_binding
+      io $ forM_ subkeys $ deRefStablePtr >=> river_xkb_binding_v1_enable . xkb_binding
       -- store submap state
       doS $ \s' -> s' { submap_pending = Just (action, subkeys), pending_action = S_NONE }
     S_SUBMAP_CANCEL -> do
@@ -235,7 +235,7 @@ seatFocus s w' = do
   modifySeat s.river_seat $ \s' -> s' { focused = toFocus.river_window }
     where
       setFocus w = when (w /= invalidWindow) $ do
-        log' $ "XXXX: seatFocus is FOCUSING CURRENT WINDOW " <> tshow w
+        -- log' $ "XXXX: seatFocus is FOCUSING CURRENT WINDOW " <> tshow w
         liftIO $ river_seat_v1_focus_window s.river_seat w
         -- liftIO $ river_node_v1_place_top w.node
 
@@ -246,7 +246,7 @@ seatClearFocus s = io $ river_seat_v1_clear_focus s.river_seat
 seatPointerMove :: RiverSeat -> Window -> H ()
 seatPointerMove sid w = do
   withSeat sid $ \s -> do
-    log' $ "[seatPointerMove] " <> tshow (sid, w)
+    --log' $ "[seatPointerMove] " <> tshow (sid, w)
     seatFocus s w
     liftIO $ river_seat_v1_op_start_pointer s.river_seat
   modifySeat sid $ \s -> s
@@ -261,7 +261,7 @@ seatPointerMove sid w = do
 seatPointerResize :: RiverSeat -> Window -> Int32 -> H ()
 seatPointerResize sid w edges = do
   withSeat sid $ \s -> do
-    debug' $ "[seatPointerResize] " <> tshow (sid, w, edges)
+    -- debug' $ "[seatPointerResize] " <> tshow (sid, w, edges)
     seatFocus s w
     liftIO $ riverWindowV1InformResizeStart w.river_window
     liftIO $ river_seat_v1_op_start_pointer s.river_seat
@@ -293,9 +293,9 @@ seatRender s = do
         let x = s.op_start_x + s.op_dx
             y = s.op_start_y + s.op_dy
         setNodePosition w.node x y
-        debug' $ "seatRender: move window " <> tshow (w, x, y)
+        -- debug' $ "seatRender: move window " <> tshow (w, x, y)
     SEAT_OP_RESIZE -> withWindow s.op_window $ \w -> do
       let x = s.op_start_x + (if (s.op_edges .&. fi (fromEnum EdgeLeft)) /= 0 then s.op_start_width - w.width else 0)
       let y = s.op_start_y + (if (s.op_edges .&. fi (fromEnum EdgeTop)) /= 0 then s.op_start_height - w.height else 0)
       setNodePosition w.node x y
-      debug' $ "seatRender: resize window " <> tshow (w, x, y)
+      -- debug' $ "seatRender: resize window " <> tshow (w, x, y)

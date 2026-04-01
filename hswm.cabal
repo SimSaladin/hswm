@@ -56,13 +56,14 @@ library
           HSWM.StackSet
           HSWM.BufferPool
           HSWM.Seats
+          HSWM.Windows
           HSWM.Outputs
           HSWM.Operations
           HSWM.Main
           HSWM.Layout
           HSWM.Core
-          HSWM.Actions
           HSWM.Wallpaper
+          HSWM.Config
           HSWM
           Core
     autogen-modules:

@@ -29,17 +29,16 @@ import           Foreign
 import           System.Exit (ExitCode(..))
 import           Data.IORef
 import GHC.Generics
+import Foreign.C
 
 import           River
 import           Wayland
 import qualified Wayland.Client as WL
 import qualified River.Safe as R
 
-import qualified Generated.River.LayerShellV1 as R
-
 -- | User configuration
 data HSWMConfig l = HSWMConfig
-  { keyBindings     :: [((String, KeySym), SomeAction)]
+  { keyBindings     :: [((ModMask, KeySym), SomeAction)]
   , pointerBindings :: [((String, KeySym), SomeAction)]
   , defaultModMask  :: !String
   , borderWidth     :: !Int32
@@ -319,8 +318,16 @@ data SeatAction = S_NONE
 instance Default SeatAction where def = S_NONE
 
 data Seat = Seat
-  { river_seat                           :: RiverSeat
-  , xkb_bindings_seat                    :: R.RiverXkbBindingsSeatV1
+  { river_seat                           :: !RiverSeat
+  , river_layer_shell_seat               :: !(Ptr R.River_layer_shell_seat_v1)
+  , xkb_bindings_seat                    :: !R.RiverXkbBindingsSeatV1
+  --
+  , xkb_bindings                         :: [StablePtr (XkbBinding SomeAction)]
+  , pointer_bindings                     :: [StablePtr (PointerBinding SomeAction)]
+  --
+  , pending_action                       :: !SeatAction
+  , submap_pending                       :: Maybe (SomeAction, [StablePtr (XkbBinding SomeAction)])
+  -- TODO: review below
   , removed                              :: Bool
   , focused, hovered, interacted         :: RiverWindow
   , op_window                            :: RiverWindow
@@ -329,11 +336,6 @@ data Seat = Seat
   , op_start_x, op_start_y, op_dx, op_dy :: Int32
   , op_start_width, op_start_height      :: Int32
   , op_edges                             :: Int32
-  , xkb_bindings                         :: [StablePtr (XkbBinding SomeAction)]
-  , pointer_bindings                     :: [StablePtr (PointerBinding SomeAction)]
-  , pending_action                       :: !SeatAction
-  , submap_pending :: Maybe (SomeAction, [StablePtr (XkbBinding SomeAction)])
-  , river_layer_shell_seat :: Ptr R.River_layer_shell_seat_v1
   } deriving (Generic)
 
 instance Default Seat where
@@ -381,41 +383,38 @@ instance Default Output where
   def = Output nullPtr 0 0 0 0 0 (S (-1)) "" "" nullPtr Nothing
 
 data Window = Window
-  { river_window                   :: RiverWindow
-  , new                            :: Bool
-  , node                           :: RiverNode
-  , closed                         :: Bool
-  , x, y, width, height            :: Int32
-  , pointer_move_requested         :: RiverSeat
-  , pointer_resize_requested       :: RiverSeat
-  , pointer_resize_requested_edges :: Int32
-  , appId                          :: String
-  , title                          :: String
-  , min_height, min_width, max_height, max_width :: Int
-  , identifier :: String
-  } deriving Show
+  { river_window                                 :: !RiverWindow
+  , node                                         :: !RiverNode
+  , x, y, width, height                          :: !Int32
+  , title, appId, identifier                     :: !String
+  , min_height, min_width, max_height, max_width :: !Int -- ^ Dimension hints
+  , parent                                       :: !(Maybe RiverWindow)
+  , unreliablePid                                :: !(Maybe Int)
+  , decorationHint                               :: !(Maybe R.River_window_v1_decoration_hint)
+  , presentationHint                             :: !(Maybe R.River_output_v1_presentation_mode)
+  , new                                          :: Bool
+  , closed                                       :: Bool
+  , fullscreen                                   :: Bool
+  , p_manage_action                              :: [WindowManageAction]
+  , p_render_border                              :: Maybe RiverColor
+  , p_render_pos                                 :: Maybe (Int32, Int32)
+  , p_render_place                               :: CInt
+  , p_set_visible                                :: Maybe Bool
+  -- TODO: review below
+  , pointer_move_requested                       :: RiverSeat
+  , pointer_resize_requested                     :: RiverSeat
+  , pointer_resize_requested_edges               :: Int32
+  }
+  deriving stock (Show, Generic)
+  deriving anyclass (Default)
 
-instance Default Window where
-  def = Window
-    { river_window = invalidWindow
-    , new = True -- XXX
-    , node = RiverNode nullPtr
-    , closed = False -- XXX
-    , x = 0
-    , y = 0
-    , width = 0
-    , height = 0
-    , pointer_move_requested = invalidSeat -- XXX
-    , pointer_resize_requested = invalidSeat -- XXX
-    , pointer_resize_requested_edges = 0 -- XXX
-    , appId = ""
-    , title = ""
-    , min_height = 0
-    , min_width = 0
-    , max_height = maxBound
-    , max_width = maxBound
-    , identifier = ""
-    }
+data WindowManageAction
+  = WFullscreen
+  | WFullscreenOnScreen RiverOutput
+  | WExitFullscreen
+  | WToggleFullscreen
+  | WRequestClose
+  deriving (Eq, Show, Generic)
 
 -------------------------------------------------------
 

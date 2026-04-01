@@ -3,76 +3,24 @@ module HSWM.Operations where
 import           Data.Bits
 import qualified Data.List as L
 import qualified Data.Map as M
+import           Foreign (IntPtr, intPtrToPtr, ptrToIntPtr)
 import qualified HSWM.StackSet as W
 import           HSWM.Types
 import           River
-import System.IO
+import qualified River.Safe as R
+import           System.Directory (removeFile)
+import           System.IO
 import qualified System.Posix as Posix
-import System.Posix.Process (executeFile)
-import System.Directory (removeFile)
-import Foreign (IntPtr, ptrToIntPtr, intPtrToPtr)
+import           System.Posix.Process (executeFile)
 
-windows :: H ()
-windows = do
-    old <- gets windowsetOld
-    ws <- gets windowset
-    let oldvisible = concatMap (W.integrate' . W.stack . W.workspace) $ W.current old : W.visible old
-        newwindows = W.allWindows ws L.\\ W.allWindows old
+manageKill :: Window -> H ()
+manageKill = doManage WRequestClose
 
-    mapM_ setInitialProperties newwindows
+doManage :: WindowManageAction -> Window -> H ()
+doManage a w = modifyWindow w.river_window $ \s -> s { p_manage_action = p_manage_action s ++ [a] }
 
-    whenJust (W.peek old) $ \otherw ->
-      setWindowBorder otherw =<< asks (normalBorder . config)
-
-    modify (\s -> s { windowsetOld = ws })
-
-    let tags_oldvisible = map (W.tag . W.workspace) $ W.current old : W.visible old
-        gottenhidden    = filter (flip elem tags_oldvisible . W.tag) $ W.hidden ws
-    mapM_ (sendMessageWithNoRefresh Hide) gottenhidden
-
-    -- for each workspace, layout the currently visible workspaces
-    let allscreens     = W.screens ws
-        summed_visible = scanl (++) [] $ map (W.integrate' . W.stack . W.workspace) allscreens
-
-    rects <- fmap concat $ forM (zip allscreens summed_visible) $ \ (w, vis) -> do
-        let wsp   = W.workspace w
-            this  = W.view n ws
-            n     = W.tag wsp
-            tiled = (W.stack . W.workspace . W.current $ this)
-                    >>= W.filter (`M.notMember` W.floating ws)
-                    >>= W.filter (`notElem` vis)
-            sd = W.screenDetail w
-            viewrect = Rectangle{x=fi sd.x, y=fi sd.y, width=fi sd.width, height=fi sd.height}
-
-        -- just the tiled windows:
-        -- now tile the windows on this workspace, modified by the gap
-        (rs, ml') <- runLayout wsp { W.stack = tiled } viewrect `catchH`
-                     runLayout wsp { W.stack = tiled, W.layout = Layout Full } viewrect
-        updateLayout n ml'
-
-        let m   = W.floating ws
-            flt = [(fw, scaleRationalRect viewrect r, True)
-                    | fw <- filter (`M.member` m) (W.index this)
-                    , fw `notElem` vis
-                    , Just r <- [M.lookup fw m]]
-
-        -- return the visible windows for this workspace:
-        return (flt ++ [ (a, b, False) | (a, b) <- rs])
-
-    let visible = map (\(a,_,_) -> a) rects
-
-    mapM_ (\(a,b,c) -> tileWindow c a b) rects
-
-    whenJust (W.peek ws) $ \w -> setWindowBorder w =<< asks (focusedBorder . config)
-
-    mapM_ reveal visible
-    setTopFocus
-
-    -- hide every window that was potentially visible before, but is not
-    -- given a position by a layout now.
-    mapM_ hide (L.nub (oldvisible ++ newwindows) L.\\ visible)
-
-    asks (logHook . config) >>= userCodeDef ()
+withScreenOutput :: ScreenId -> (Output -> H ()) -> H ()
+withScreenOutput sid f = mapM_ f . L.find (\o -> o.screen == sid) =<< gets _outputs
 
 -- | Produce the actual rectangle from a screen and a ratio on that screen.
 scaleRationalRect :: Rectangle -> W.RationalRect -> Rectangle
@@ -82,6 +30,9 @@ scaleRationalRect (Rectangle sx sy sw sh) (W.RationalRect rx ry rw rh)
 
 --------------------------------------------------------------
 
+manageWindowBorder :: RiverWindow -> RiverColor -> H ()
+manageWindowBorder rw rc = modifyWindow rw $ \s -> s { p_render_border = Just rc }
+
 -- | /render sequence/ Draw borders on the the window.
 setWindowBorder :: RiverWindow -> RiverColor -> H ()
 setWindowBorder w RiverColor {red = wb_r, green = wb_g, blue = wb_b, alpha = wb_a} = withWindow w $ \_ -> do
@@ -90,7 +41,7 @@ setWindowBorder w RiverColor {red = wb_r, green = wb_g, blue = wb_b, alpha = wb_
     let borders = WindowBorders{..}
     liftIO $ riverWindowV1SetBorders w borders
 
--- | TODO Mixed manage / render
+-- | /manage/
 -- Move and resize @w@ such that it fits inside the given rectangle, including its border.
 tileWindow :: Bool -> RiverWindow -> Rectangle -> H ()
 tileWindow placeTop i r = withWindow i $ \w -> do
@@ -98,12 +49,16 @@ tileWindow placeTop i r = withWindow i $ \w -> do
     -- give all windows at least 1x1 pixels
     let least x | x <= bw*2  = 1
                 | otherwise  = x - bw*2
-    -- /manage/
     io $ river_window_v1_propose_dimensions w.river_window (least $ fi r.width) (least $ fi r.height)
-    -- render
-    io $ setNodePosition w.node (fi r.x + bw) (fi r.y + bw)
-    -- render
-    when placeTop $ io $ river_node_v1_place_top w.node
+    modifyWindow i $ \s -> s
+      -- setNodePosition w.node (fi r.x + bw) (fi r.y + bw)
+      { p_render_pos = Just (fi r.x + bw, fi r.y + bw)
+      , p_render_place = if placeTop then R.rIVER_NODE_V1_PLACE_TOP else 0
+      }
+
+manageReveal, manageHide :: RiverWindow -> H ()
+manageReveal = flip modifyWindow $ \s -> s { p_set_visible = Just True }
+manageHide = flip modifyWindow $ \s -> s { p_set_visible = Just False }
 
 -- | /render sequence/
 reveal :: RiverWindow -> H ()
@@ -116,18 +71,6 @@ hide rw = withWindow rw $ \_ -> io $ river_window_v1_hide rw
 -- | /manage sequence/ focus a window in every seat.
 setFocusH :: RiverWindow -> H ()
 setFocusH rw = mapSeats $ \s -> io $ river_seat_v1_focus_window s.river_seat rw
-
--- | TODO Mixed manage / render
-setInitialProperties :: RiverWindow -> H ()
-setInitialProperties rw = do
-  -- manage sequence
-  io $ riverWindowV1UseSsd rw
-  -- manage sequence
-  io $ riverWindowV1SetCapabilities rw (fi $ foldl' (.|.) 0 $ map fromEnum [Maximize, Fullscreen])
-  -- manage sequence
-  io $ riverWindowV1SetTiled rw (fi $ foldl' (.|.) 0 $ map fromEnum [EdgeTop, EdgeBottom, EdgeLeft, EdgeRight])
-  -- render sequence
-  setWindowBorder rw =<< asks (normalBorder . config)
 
 -- | Force new manage sequence.
 manageDirty :: H ()

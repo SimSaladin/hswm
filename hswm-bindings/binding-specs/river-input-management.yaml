@@ -1,0 +1,14 @@
+version:
+  hs_bindgen: 0.1.0
+  binding_specification: '1.0'
+hsmodule: Generated.River.InputManagementV1
+ctypes:
+- headers:
+  - river-libinput-config-v1-client-protocol.h
+  - river-xkb-config-v1-client-protocol.h
+  - river-input-management-v1-client-protocol.h
+  cname: struct river_input_device_v1
+  hsname: River_input_device_v1
+hstypes:
+- hsname: River_input_device_v1
+  representation: emptydata

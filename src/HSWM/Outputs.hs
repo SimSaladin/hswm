@@ -103,10 +103,10 @@ handleWlOutput e = case e of
     WL.WlOutputGeometry _o _ x y pw ph subpix make_s model_s trans -> do
       make <- io . peekCString $ unConstPtr make_s
       model <- io . peekCString $ unConstPtr model_s
-      log' $ "output geometry: " <> tshow ((x, y), (pw, ph), subpix)
-        <> " make: " <> toText make
-        <> " model: " <> toText model
-        <> " transform: " <> tshow trans
+      --log' $ "output geometry: " <> tshow ((x, y), (pw, ph), subpix)
+      --  <> " make: " <> toText make
+      --  <> " model: " <> toText model
+      --  <> " transform: " <> tshow trans
       return ()
 
     WL.WlOutputMode _o _ _flags _w _h _refresh ->
@@ -117,12 +117,10 @@ handleWlOutput e = case e of
 
     WL.WlOutputName o _ ptr -> do
       name <- io $ peekCString $ unConstPtr ptr
-      log' $ "output: name: " <> toText name
       modifyOutput' (castPtr o) $ \x -> (x::Output) { outputName = name }
 
     WL.WlOutputDescription o _ ptr -> do
       desc <- io $ peekCString $ unConstPtr ptr
-      log' $ "output: description: " <> toText desc
       modifyOutput' (castPtr o) $ \x -> (x::Output) { outputDescription = desc }
 
     WL.WlOutputDone o _ -> do
@@ -143,7 +141,6 @@ manage = do
     defLayout <- asks (layoutHook . config)
     modifyWindowSet $ W.insertScreen defLayout output.screen (getScreenDetail output)
 
-    log' $ "WM: set rivershelloutput default: " <> tshow  output.river_layerShellOutput
     io $ R.river_layer_shell_output_v1_set_default output.river_layerShellOutput
 
   putObject om { pending_manage = mempty }

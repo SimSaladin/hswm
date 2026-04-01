@@ -138,7 +138,7 @@ mkRegistryListener h = do
   } -> `WlProxy' #}
 
 -- | Looks up version for the given object.
-wl_proxy_marshal_flags' :: (MonadIO m, IsWlProxy p) => (Ptr a -> a) -> p -> CUInt -> WlInterface -> Flags -> m a
+wl_proxy_marshal_flags' :: (MonadIO m, IsWlProxy p) => (Ptr a -> b) -> p -> CUInt -> WlInterface -> Flags -> m b
 wl_proxy_marshal_flags' outm p opcode iface flags = io $ do
   version <- wl_proxy_get_version p
   WlProxy ptr <- wl_proxy_marshal_flags p opcode iface version flags
@@ -147,7 +147,7 @@ wl_proxy_marshal_flags' outm p opcode iface flags = io $ do
 -- | Looks up version for the given object.
 wl_proxy_marshal_array_flags'
   :: (MonadIO m, IsWlProxy p, WlArgs args)
-  => (Ptr a -> a) -> p -> CUInt -> WlInterface -> Flags -> args -> m a
+  => (Ptr a -> b) -> p -> CUInt -> WlInterface -> Flags -> args -> m b
 wl_proxy_marshal_array_flags' outm p opcode iface flags args = io $ do
   version <- wl_proxy_get_version p
   WlProxy ptr <- wl_proxy_marshal_array_flags p opcode iface version flags args
@@ -157,8 +157,9 @@ wl_proxy_marshal_array_flags' outm p opcode iface flags args = io $ do
 class IsWlProxy a where
   toWlProxy :: a -> WlProxy
 
-instance IsWlProxy (Ptr a) where toWlProxy = WlProxy . castPtr
-instance IsWlProxy WlSeat where toWlProxy (WlSeat p) = WlProxy $ castPtr p
+instance IsWlProxy (Ptr a)    where toWlProxy = WlProxy . castPtr
+
+instance IsWlProxy WlSeat     where toWlProxy (WlSeat p) = WlProxy $ castPtr p
 instance IsWlProxy WlKeyboard where toWlProxy (WlKeyboard p) = WlProxy $ castPtr p
 instance IsWlProxy WlRegistry where toWlProxy (WlRegistry p) = WlProxy $ castPtr p
 

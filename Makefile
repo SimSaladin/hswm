@@ -107,7 +107,8 @@ $(bindGenSpecDir)/Generated.River.XkbConfigV1.yaml: $(HEADERDIR)/river-xkb-confi
 	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \
 	  --module $(patsubst %.yaml,%,$(@F)) \
 	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Client.yaml \
-	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml
+	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml \
+	  --external-binding-spec $(bindingSpecs)/river-input-management.yaml
 
 $(bindGenSpecDir)/Generated.River.XkbBindingsV1.yaml: $(HEADERDIR)/river-xkb-bindings-v1-client-protocol.h FORCE
 	$(HS_BIND_GEN) $(<F) \
@@ -134,6 +135,7 @@ $(bindGenSpecDir)/Generated.River.LibinputConfigV1.yaml: $(HEADERDIR)/river-libi
 	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \
 	  --module $(patsubst %.yaml,%,$(@F)) \
 	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Client.yaml \
-	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml
+	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml \
+	  --external-binding-spec $(bindingSpecs)/river-input-management.yaml
 
 FORCE:
