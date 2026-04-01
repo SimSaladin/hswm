@@ -4,18 +4,27 @@ WAYLAND_SCANNER	:= wayland-scanner --include-core-only --strict
 PROTODIR	:= ./protocol
 HEADERDIR := ./cbits
 CDIR	:= ./cbits
-PROTOS	:= river-window-management-v1.xml river-xkb-bindings-v1.xml river-xkb-config-v1.xml \
+CLIENT_PROTOS	:= river-window-management-v1.xml river-xkb-bindings-v1.xml river-xkb-config-v1.xml \
 		   river-input-management-v1.xml river-layer-shell-v1.xml river-libinput-config-v1.xml
+SERVER_PROTOS := river-status-unstable-v1.xml
 
-CLIENT_HEADERS := $(PROTOS:.xml=-client-protocol.h)
-PRIVATE_CODE   := $(PROTOS:.xml=-protocol.c)
+CLIENT_HEADERS := $(CLIENT_PROTOS:.xml=-client-protocol.h)
+SERVER_HEADERS := $(SERVER_PROTOS:.xml=-server-protocol.h)
+PRIVATE_CODE   := $(CLIENT_PROTOS:.xml=-protocol.c) $(SERVER_PROTOS:.xml=-protocol.c)
 
 .PHONY: all bindgen bindgen-wayland-client bindgen-river-protocols bindgen-pixman-1
 
-all: $(PRIVATE_CODE:%=$(CDIR)/%) $(CLIENT_HEADERS:%=$(HEADERDIR)/%) bindgen
+all: $(PRIVATE_CODE:%=$(CDIR)/%) $(CLIENT_HEADERS:%=$(HEADERDIR)/%) $(SERVER_HEADERS:%=$(HEADERDIR)/%) bindgen
+
+#########
+# rules
+#########
 
 $(CLIENT_HEADERS:%=$(HEADERDIR)/%): $(HEADERDIR)/%-client-protocol.h: $(PROTODIR)/%.xml
 	$(WAYLAND_SCANNER) client-header $< $@
+
+$(SERVER_HEADERS:%=$(HEADERDIR)/%): $(HEADERDIR)/%-server-protocol.h: $(PROTODIR)/%.xml
+	$(WAYLAND_SCANNER) server-header $< $@
 
 $(PRIVATE_CODE:%=$(CDIR)/%): $(CDIR)/%-protocol.c: $(PROTODIR)/%.xml
 	$(WAYLAND_SCANNER) private-code $< $@
@@ -137,5 +146,12 @@ $(bindGenSpecDir)/Generated.River.LibinputConfigV1.yaml: $(HEADERDIR)/river-libi
 	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Client.yaml \
 	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml \
 	  --external-binding-spec $(bindingSpecs)/river-input-management.yaml
+
+$(bindGenSpecDir)/Generated.River.Status.Server.yaml: $(HEADERDIR)/river-status-unstable-v1-server-protocol.h FORCE
+	$(HS_BIND_GEN) $(<F) \
+	  --gen-binding-spec $@ \
+	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \
+	  --module $(patsubst %.yaml,%,$(@F)) \
+	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml
 
 FORCE:
