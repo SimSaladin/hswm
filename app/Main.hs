@@ -24,6 +24,7 @@ main =
   , handleEventHook = debugHook
   , xkbLayout = Just dvpMyLayout
   , pointerBindings = myPointerBinds
+  , repeatInfo = Just (20, 150)
   } where
 
   myKeys' =

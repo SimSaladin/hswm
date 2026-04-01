@@ -55,6 +55,7 @@ data HSWMConfig l = HSWMConfig
   , logHook         :: !(H ())
   , xkbLayout       :: !(Maybe XkbRuleNames) -- ^ Keyboard layout set for connected keyboards
   , workspaces      :: [WorkspaceId]
+  , repeatInfo      :: !(Maybe (Int32, Int32)) -- ^ Keyboard repeat (rate, delay)
   } deriving stock (Generic)
 
 deriving anyclass instance Default (HSWMConfig Layout)

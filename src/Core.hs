@@ -124,8 +124,8 @@ startHSWM display config = withStdoutLogging $ do
   -- _ <- Posix.installHandler Posix.sigTERM (Posix.CatchInfo $ \_ -> log' "TERM" >> exitFailure) Nothing
   _ <- Posix.installHandler Posix.sigINT (Posix.CatchInfo $ \_ -> log' "INT" >> exitSuccess) Nothing
   _ <- Posix.installHandler Posix.sigQUIT (Posix.CatchInfo $ \_ -> log' "QUIT" >> exitFailure) Nothing
-  _ <- Posix.installHandler Posix.sigUSR1 (Posix.Catch $ do
-    log' "USR1 - restart"
+  _ <- Posix.installHandler Posix.sigUSR2 (Posix.Catch $ do
+    log' "USR2 - reload / restart"
     runInH $ do
       wm <- getObject
       io $ riverWindowManagerStop wm
@@ -217,11 +217,16 @@ handleEvent (PointerEvent (PointerPressed dt _bind)) = do
 handleEvent (XkbConfigEvent (XkbConfigXkbKeyboard _ xkbConfig xkbKeyboard)) = do
   withObject @RiverXkbKeyboardV1Listener $ \l -> io $ riverXkbKeyboardV1AddListener xkbKeyboard l nullPtr
   asks (xkbLayout . config) >>= (`whenJust` setKeyboardLayout xkbConfig xkbKeyboard)
+
 -- keyboard is removed
 handleEvent (XkbKeyboardEvent (KeyboardRemoved _ _kbd)) = return () -- TODO
-handleEvent (InputManagerEvent (R.RiverInputManagerV1InputDevice _ _ inputDevice)) = do
-  devListener <- getObject
-  void $ io $ R.river_input_device_v1_add_listener inputDevice devListener nullPtr
+
+handleEvent (InputManagerEvent (R.RiverInputManagerV1InputDevice _ _ dev)) = do
+  l <- getObject
+  void $ io $ R.river_input_device_v1_add_listener dev l nullPtr
+  asks (repeatInfo . config) >>= io . (`whenJust` uncurry (R.river_input_device_v1_set_repeat_info dev)) --  repeatRate repeatDelay
+
+-- handleEvent (InputDevicEvent (R.RiverInputDeviceV1Type' _ _ inputDevice)) = return ()
 
 handleEvent (WlShmEvent (WL.WlShmFormat _ _ fmt)) = log' $ toText $ "shm format: " ++ ppShmFormat (WL.Wl_shm_format $ fi fmt)
 

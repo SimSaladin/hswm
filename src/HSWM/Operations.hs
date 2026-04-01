@@ -222,8 +222,7 @@ restart :: String -> H ()
 restart prog = do
   broadcastMessage ReleaseResources
   writeStateToFile
-  io $ executeFile prog True [] Nothing `catch`
-    (\(SomeException e) -> hPrint stderr e >> hFlush stderr)
+  catchIO $ executeFile prog True [] Nothing
 
 writeStateToFile :: H ()
 writeStateToFile = do
@@ -253,7 +252,7 @@ readStateFile xmc = do
     res <- try @SomeException $ do
         raw <- withFile path ReadMode readStrict
         return $! maybeRead reads raw
-    try @SomeException $ io (removeFile path)
+    _ <- try @SomeException $ io (removeFile path)
 
     case res of
        Left e -> print e >> return Nothing
@@ -282,4 +281,4 @@ readStateFile xmc = do
     readStrict h = hGetContents h >>= \s -> length s `seq` return s
 
 sendRestart :: H ()
-sendRestart = io $ Posix.raiseSignal Posix.sigUSR1
+sendRestart = io $ Posix.raiseSignal Posix.sigUSR2
