@@ -3,7 +3,7 @@ verbatim:
   cabal-version:    3.4
 
 name:               hswm
-version:            0.1.0.0
+version: &version   0.1.0.0
 synopsis:           Wayland window manager for River
 description:        Wayland window manager for River
 license:            MIT
@@ -17,6 +17,25 @@ extra-doc-files:    README.md
 extra-source-files:
   - Makefile
   - cbits/*.c
+
+internal-libraries:
+  hswm-prelude:
+    source-dirs: hswm-prelude
+    exposed-modules:
+      - HSWM.Prelude
+    other-modules: []
+    dependencies:
+      - name: base
+        version: &base-version '>=4.20.2.0'
+      - text
+      - mtl
+      - logging
+      - data-default
+      - stm
+    language: &default-language GHC2024
+    default-extensions:
+      - NoImplicitPrelude
+      - PackageImports
 
 library:
   source-dirs: src
@@ -51,22 +70,30 @@ library:
     - HSWM.Windows
     - HSWM.XKB
     - HSWM.XKB.FFI
+    - HSWM.Util.IPC
     - HSWM
     - Core # TODO: refactor/rename
-  other-modules:
-    - Prelude
+  other-modules: []
   generated-other-modules:
     - Paths_hswm
   dependencies:
-    - &base base >=4.20.2.0
+    - &hswm-prelude
+      name: hswm:hswm-prelude
+      mixin:
+        - (HSWM.Prelude as Prelude)
+    - &base-noprelude
+      name: base
+      version: *base-version
+      mixin:
+        - hiding (Prelude)
     - containers
     - data-default
     - derive-storable
-    - logging
-    - mtl
+    #- logging
+    #- mtl
     - pretty-simple
-    - stm
-    - text
+    #- stm
+    #- text
     - transformers
     - typerep-map
     - unix
@@ -74,16 +101,22 @@ library:
     - directory
     - vector
     - JuicyPixels
+    - network
+    - bytestring
+    #- aeson
+    - c-expr-runtime
+    - hs-bindgen-runtime
   pkgconfig-depends:
-    - wayland-protocols
-    - wayland-client
     - xkbcommon
-    - pixman-1
-    - gtk+-3.0 # XXX not strictly needed /here/
-  extra-libraries:
-    - wayland-client
-    - xkbcommon
-    - pixman-1
+    #- wayland-protocols
+    #- wayland-client
+    #- pixman-1
+    #- gtk+-3.0 # XXX not strictly needed /here/
+  extra-libraries: []
+    #- wayland-client
+    #- xkbcommon
+    #- pixman-1
+    #- gtk-3 # XXX not strictly needed /here/
   include-dirs:
     - cbits
   c-sources:
@@ -94,8 +127,7 @@ library:
     #- hs-bindgen:hs-bindgen-cli
   ghc-options: &common-ghc-options
     -Wall -Wunused-packages
-  language: &default-language
-    GHC2024
+  language: *default-language
   default-extensions: &default-extensions
     - RecordWildCards
     - OverloadedRecordDot
@@ -109,7 +141,8 @@ executables:
     main: Main.hs
     source-dirs: app
     dependencies:
-      - *base
+      - name: base
+        version: *base-version
       - hswm
       - hswm-bindings
       - containers

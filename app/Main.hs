@@ -9,6 +9,7 @@ import qualified HSWM.Actions.WindowNavigation as WNav
 import qualified HSWM.StackSet as W
 import qualified HSWM.Util.Waybar as WB
 import qualified HSWM.Wallpaper
+import qualified HSWM.Util.IPC as IPC
 
 import qualified Wayland.Client.Extras as WL
 
@@ -59,6 +60,7 @@ main = do
       , repeatInfo      = Just (20, 150)
       , normalBorder    = parseRgba colBase02
       , focusedBorder   = parseRgba colCyan
+      , startupHook     = IPC.serverStartupHook
       }
   where
 

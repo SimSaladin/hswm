@@ -1,7 +1,6 @@
 module River.XKB.Bindings.FFI where
 
 import Foreign hiding (void)
-import Foreign.C
 
 import qualified River.Safe as R
 import Wayland

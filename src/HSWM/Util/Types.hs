@@ -13,7 +13,7 @@
 ------------------------------------------------------------------------------
 module HSWM.Util.Types  where
 
-import HsWM.StackSet as W
+import HSWM.StackSet as W
 
 import Data.Word (Word32)
 

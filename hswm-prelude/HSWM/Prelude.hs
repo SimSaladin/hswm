@@ -1,6 +1,4 @@
-{-# LANGUAGE PackageImports #-}
-
-module Prelude
+module HSWM.Prelude
   ( module BasePrelude
   , tshow, toText, io, fi, whenJust
   ) where

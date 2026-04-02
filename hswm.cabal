@@ -37,7 +37,6 @@ library
           DeriveAnyClass
     ghc-options: -Wall -Wunused-packages
     other-modules:
-          Prelude
           Paths_hswm
     exposed-modules:
           Wayland.FFI
@@ -69,6 +68,7 @@ library
           HSWM.Windows
           HSWM.XKB
           HSWM.XKB.FFI
+          HSWM.Util.IPC
           HSWM
           Core
     autogen-modules:
@@ -76,31 +76,25 @@ library
     build-depends:
           JuicyPixels
         , base >=4.20.2.0
+        , bytestring
+        , c-expr-runtime
         , containers
         , data-default
         , derive-storable
         , directory
+        , hs-bindgen-runtime
         , hswm-bindings
-        , logging
-        , mtl
+        , hswm:hswm-prelude
+        , network
         , pretty-simple
-        , stm
-        , text
         , transformers
         , typerep-map
         , unix
         , vector
+    mixins:
+          base hiding (Prelude)
+        , hswm:hswm-prelude (HSWM.Prelude as Prelude)
     default-language: GHC2024
-    pkgconfig-depends:
-          wayland-protocols
-        , wayland-client
-        , xkbcommon
-        , pixman-1
-        , gtk+-3.0
-    extra-libraries:
-          wayland-client
-          xkbcommon
-          pixman-1
     include-dirs:
           cbits
     c-sources:
@@ -111,8 +105,27 @@ library
           cbits/river-window-management-v1-protocol.c
           cbits/river-xkb-bindings-v1-protocol.c
           cbits/river-xkb-config-v1-protocol.c
+    pkgconfig-depends:
+          xkbcommon
     build-tool-depends:
           c2hs:c2hs
+
+library hswm-prelude
+    exposed-modules:
+          HSWM.Prelude
+    hs-source-dirs:
+          hswm-prelude
+    default-extensions:
+          NoImplicitPrelude
+          PackageImports
+    build-depends:
+          base >=4.20.2.0
+        , data-default
+        , logging
+        , mtl
+        , stm
+        , text
+    default-language: GHC2024
 
 executable hswm
     main-is: Main.hs

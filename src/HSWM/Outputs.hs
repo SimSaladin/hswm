@@ -18,7 +18,6 @@ import           HSWM.Core
 import           HSWM.Operations
 import qualified HSWM.StackSet as W
 
-import           River
 import qualified River.Safe as R
 import           Wayland
 import qualified Wayland.Client as WL
