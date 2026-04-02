@@ -16,10 +16,25 @@ extra-doc-files:    README.md
 #                  CHANGELOG.md
 extra-source-files:
   - Makefile
-  - cbits/*.c
+  - hswm-bindings/include/*.h
+  - hswm-bindings/cbits/*.c
+
+_common/language: &language
+  language: GHC2024
+  default-extensions: &default-extensions
+    - RecordWildCards
+    - OverloadedRecordDot
+    - DuplicateRecordFields
+    - OverloadedStrings
+    - DerivingVia
+    - DeriveAnyClass
+    - PackageImports
+  ghc-options: &common-ghc-options
+    -Wall -Wunused-packages
 
 internal-libraries:
   hswm-prelude:
+    <<: *language
     source-dirs: hswm-prelude
     exposed-modules:
       - HSWM.Prelude
@@ -32,12 +47,9 @@ internal-libraries:
       - logging
       - data-default
       - stm
-    language: &default-language GHC2024
-    default-extensions:
-      - NoImplicitPrelude
-      - PackageImports
 
 library:
+  <<: *language
   source-dirs: src
   exposed-modules:
     # Note: c2hs is clunky about the order of exposed modules :(
@@ -103,9 +115,9 @@ library:
     - JuicyPixels
     - network
     - bytestring
-    #- aeson
-    - c-expr-runtime
-    - hs-bindgen-runtime
+    - aeson
+    - c-expr-runtime # XXX: needded to avoid linker problems?
+    - hs-bindgen-runtime # XXX: needded to avoid linker problems?
   pkgconfig-depends:
     - xkbcommon
     #- wayland-protocols
@@ -118,36 +130,33 @@ library:
     #- pixman-1
     #- gtk-3 # XXX not strictly needed /here/
   include-dirs:
-    - cbits
+    - hswm-bindings/include
   c-sources:
-    - cbits/*-protocol.c
+    - hswm-bindings/cbits/*-protocol.c
   build-tools:
-    # Note: may need to "cabal update for this to start working
-    - c2hs:c2hs
-    #- hs-bindgen:hs-bindgen-cli
-  ghc-options: &common-ghc-options
-    -Wall -Wunused-packages
-  language: *default-language
-  default-extensions: &default-extensions
-    - RecordWildCards
-    - OverloadedRecordDot
-    - DuplicateRecordFields
-    - OverloadedStrings
-    - DerivingVia
-    - DeriveAnyClass
+    - c2hs:c2hs  # Note: may need to "cabal update for this to start working
 
 executables:
   hswm:
+    <<: *language
     main: Main.hs
     source-dirs: app
     dependencies:
-      - name: base
-        version: *base-version
+      - base
       - hswm
       - hswm-bindings
       - containers
-    pkgconfig-depends: wayland-client
-    extra-libraries: wayland-client
-    ghc-options: *common-ghc-options
-    language: *default-language
-    default-extensions: *default-extensions
+    ghc-options:
+      - *common-ghc-options
+      - -threaded
+
+  hswmctl:
+    <<: *language
+    main: Main.hs
+    source-dirs: app-ctl
+    dependencies:
+      - base
+      - hswm
+    ghc-options:
+      - *common-ghc-options
+      - -threaded

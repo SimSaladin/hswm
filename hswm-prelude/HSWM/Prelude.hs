@@ -1,3 +1,5 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module HSWM.Prelude
   ( module BasePrelude
   , tshow, toText, io, fi, whenJust

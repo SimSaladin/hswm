@@ -8,9 +8,12 @@ author:             Samuli Thomasson
 maintainer:         samuli.thomasson@5gsystems.com
 build-type:         Simple
 extra-doc-files:    CHANGELOG.md
+
 extra-source-files:
-  - ../cbits/*.c
-  - ../cbits/*.h
+  - cbits/*.c
+  - include/*.h
+  - binding-specs/*.yaml
+  - generated/*.yaml
 
 library:
   source-dirs: src
@@ -20,17 +23,17 @@ library:
     - hs-bindgen-runtime
     - template-haskell
   include-dirs:
-    - ../cbits
-    - ../cbits/wayland-protocols
+    - include
+    - include/wayland-protocols
   c-sources:
-    - ../cbits/*.c
-    - ../cbits/wayland-protocols/ext-foreign-toplevel-list-v1-protocol.c
+    - cbits/*.c
+    - cbits/wayland-protocols/ext-foreign-toplevel-list-v1-protocol.c
   pkgconfig-depends:
     - wayland-client
     - pixman-1
-  extra-libraries:
-    - wayland-client
-    - pixman-1
+  #extra-libraries:
+  #  - wayland-client
+  #  - pixman-1
   ghc-options:
     - -Wall
     - -Wunused-packages

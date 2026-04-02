@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <HsFFI.h>
+#include "Waybar/CFFI/Plugin_stub.h"
 
 extern void CAT(__stginit_, MODULE)(void);
 
@@ -22,11 +23,14 @@ static HsBool library_init(void)
 
     hs_init(&argc, &argp);
 
+    plugin_runtime_init();
+
    return HS_BOOL_TRUE;
 }
 
 static void library_exit(void) __attribute__((destructor));
 static void library_exit(void)
 {
+    plugin_runtime_destroy();
     hs_exit();
 }

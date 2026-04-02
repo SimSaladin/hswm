@@ -12,21 +12,35 @@ author:             Samuli Thomasson
 maintainer:         samuli.thomasson@5gsystems.com
 build-type:         Simple
 extra-source-files:
-      ../cbits/river-input-management-v1-protocol.c
-      ../cbits/river-layer-shell-v1-protocol.c
-      ../cbits/river-libinput-config-v1-protocol.c
-      ../cbits/river-status-unstable-v1-protocol.c
-      ../cbits/river-window-management-v1-protocol.c
-      ../cbits/river-xkb-bindings-v1-protocol.c
-      ../cbits/river-xkb-config-v1-protocol.c
-      ../cbits/river-input-management-v1-client-protocol.h
-      ../cbits/river-layer-shell-v1-client-protocol.h
-      ../cbits/river-libinput-config-v1-client-protocol.h
-      ../cbits/river-status-unstable-v1-server-protocol.h
-      ../cbits/river-window-management-v1-client-protocol.h
-      ../cbits/river-xkb-bindings-v1-client-protocol.h
-      ../cbits/river-xkb-config-v1-client-protocol.h
-      ../cbits/waybar_cffi_module.h
+      cbits/river-input-management-v1-protocol.c
+      cbits/river-layer-shell-v1-protocol.c
+      cbits/river-libinput-config-v1-protocol.c
+      cbits/river-status-unstable-v1-protocol.c
+      cbits/river-window-management-v1-protocol.c
+      cbits/river-xkb-bindings-v1-protocol.c
+      cbits/river-xkb-config-v1-protocol.c
+      include/river-input-management-v1-client-protocol.h
+      include/river-layer-shell-v1-client-protocol.h
+      include/river-libinput-config-v1-client-protocol.h
+      include/river-status-unstable-v1-server-protocol.h
+      include/river-window-management-v1-client-protocol.h
+      include/river-xkb-bindings-v1-client-protocol.h
+      include/river-xkb-config-v1-client-protocol.h
+      binding-specs/river-input-management.yaml
+      binding-specs/river-window-management.yaml
+      binding-specs/wayland-client.yaml
+      binding-specs/wayland-server.yaml
+      binding-specs/wayland-util.yaml
+      generated/Generated.Pixman.yaml
+      generated/Generated.River.InputManagementV1.yaml
+      generated/Generated.River.LayerShellV1.yaml
+      generated/Generated.River.LibinputConfigV1.yaml
+      generated/Generated.River.WindowManagementV1.yaml
+      generated/Generated.River.XkbBindingsV1.yaml
+      generated/Generated.River.XkbConfigV1.yaml
+      generated/Generated.Wayland.Client.yaml
+      generated/Generated.Wayland.Protocol.ForeignTopLevelListV1.yaml
+      generated/Generated.Wayland.Util.yaml
 extra-doc-files:
       CHANGELOG.md
 
@@ -100,20 +114,17 @@ library
           src
     ghc-options: -Wall -Wunused-packages -fPIC
     include-dirs:
-          ../cbits
-          ../cbits/wayland-protocols
+          include
+          include/wayland-protocols
     c-sources:
-          ../cbits/river-input-management-v1-protocol.c
-          ../cbits/river-layer-shell-v1-protocol.c
-          ../cbits/river-libinput-config-v1-protocol.c
-          ../cbits/river-status-unstable-v1-protocol.c
-          ../cbits/river-window-management-v1-protocol.c
-          ../cbits/river-xkb-bindings-v1-protocol.c
-          ../cbits/river-xkb-config-v1-protocol.c
-          ../cbits/wayland-protocols/ext-foreign-toplevel-list-v1-protocol.c
-    extra-libraries:
-          wayland-client
-          pixman-1
+          cbits/river-input-management-v1-protocol.c
+          cbits/river-layer-shell-v1-protocol.c
+          cbits/river-libinput-config-v1-protocol.c
+          cbits/river-status-unstable-v1-protocol.c
+          cbits/river-window-management-v1-protocol.c
+          cbits/river-xkb-bindings-v1-protocol.c
+          cbits/river-xkb-config-v1-protocol.c
+          cbits/wayland-protocols/ext-foreign-toplevel-list-v1-protocol.c
     pkgconfig-depends:
           wayland-client
         , pixman-1
