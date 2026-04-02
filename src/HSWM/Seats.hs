@@ -20,21 +20,20 @@ import           HSWM.Operations
 -- import qualified HSWM.StackSet as W
 import qualified HSWM.StackSet as W
 import           HSWM.Utils
-import           River
 import qualified River.Safe as R
 
 import           Data.Bits
 import qualified Data.List as L
 import           Foreign
 
-data LayerShellFocus = FocusNone | FocusLayerShell { exclusive :: Bool }
+data LayerShellFocus = FocusNone | FocusLayerShell { exclusive :: !Bool }
   deriving (Eq, Show, Generic)
 
 instance Default LayerShellFocus where def = FocusNone
 
 data SeatManager = SeatManager
   { pending_manage    :: [Seat]
-  , seat_lshell_focus :: LayerShellFocus
+  , seat_lshell_focus :: !LayerShellFocus
   }
   deriving stock Generic
   deriving anyclass Default
@@ -78,25 +77,17 @@ handleEvent :: SeatEvent -> H ()
 handleEvent e = do
   sm <- getSMgr
   case e of
-    SeatRemoved _ seat -> do
-      withSeat seat deleteRemovedSeat
+    SeatRemoved _ seat -> withSeat seat deleteRemovedSeat
 
     SeatEventPointerEnter{..} -> do
       when (sm.seat_lshell_focus == FocusNone) $ do
         modifySeat seat $ \s -> s { hovered = window }
         modifyWindowSet $ W.focusWindow window -- focus follow mouse
 
-    SeatEventPointerLeave{..} -> do
-      modifySeat seat $ \s -> s { hovered = invalidWindow }
-
-    SeatEventWindowInteraction{..} -> do
-      modifySeat seat $ \s -> s { interacted = window }
-
-    SeatEventOpDelta{..} -> do
-      modifySeat seat $ \s -> s { op_dx = fromIntegral dx, op_dy = fromIntegral dy }
-
-    SeatEventOpRelease{..} -> do
-      modifySeat seat $ \s -> s { op_release = True }
+    SeatEventPointerLeave{..}      -> modifySeat seat $ \s -> s { hovered = invalidWindow }
+    SeatEventWindowInteraction{..} -> modifySeat seat $ \s -> s { interacted = window }
+    SeatEventOpDelta{..}           -> modifySeat seat $ \s -> s { op_dx = fromIntegral dx, op_dy = fromIntegral dy }
+    SeatEventOpRelease{..}         -> modifySeat seat $ \s -> s { op_release = True }
 
     -- (SeatWlSeat _ seat name)) = _
 
@@ -286,17 +277,15 @@ execXkbBinding xb = withSeat xb.river_seat $ \s -> do
       modifySeat xb.river_seat $ \s' -> s' { pending_action = S_SUBMAP_NEXT_KEY xb.action subkeys }
 
 seatFocus :: Seat -> Window -> H ()
-seatFocus s w' = do
-  toFocus <- if w'.river_window == invalidWindow
-                then gets _windows >>= \case { x : _ -> return x; _ -> return w'; }
-                else return w'
-  let w = toFocus.river_window
-  when (w /= s.focused) $ setFocus w -- clearFocus
-  modifySeat s.river_seat $ \s' -> s' { focused = toFocus.river_window }
+seatFocus s w = when (w.river_window /= invalidWindow) $ do
+  --toFocus <- if w'.river_window == invalidWindow
+  --              then gets (M.lookupMax . _windows) >>= \case { x : _ -> return x; _ -> return w'; }
+  --              else return w'
+  --let w = toFocus.river_window
+  when (w.river_window /= s.focused) $ setFocus w.river_window -- clearFocus
+  modifySeat s.river_seat $ \s' -> s' { focused = w.river_window }
     where
-      setFocus w = when (w /= invalidWindow) $ do
-        -- log' $ "XXXX: seatFocus is FOCUSING CURRENT WINDOW " <> tshow w
-        liftIO $ river_seat_v1_focus_window s.river_seat w
+      setFocus rw = when (rw /= invalidWindow) $ liftIO $ river_seat_v1_focus_window s.river_seat rw
         -- liftIO $ river_node_v1_place_top w.node
 
 -- | /manage sequence/

@@ -33,24 +33,26 @@ library:
     - River.WMP.MiscFFI
     - River.WMP
     - River
-    - HSWM.XKB.FFI
-    - HSWM.XKB
-    - HSWM.Util.Posix
-    - HSWM.Utils
-    - HSWM.StackSet
+    - HSWM.Actions.WindowNavigation
     - HSWM.BufferPool
-    - HSWM.Seats
-    - HSWM.Windows
-    - HSWM.Outputs
-    - HSWM.Operations
-    - HSWM.Main
-    - HSWM.Util.Waybar
-    - HSWM.Layout
-    - HSWM.Core
-    - HSWM.Wallpaper
     - HSWM.Config
+    - HSWM.Core
+    - HSWM.Layout
+    - HSWM.Main
+    - HSWM.Operations
+    - HSWM.Outputs
+    - HSWM.Seats
+    - HSWM.StackSet
+    - HSWM.Util.Posix
+    - HSWM.Util.Types
+    - HSWM.Util.Waybar
+    - HSWM.Utils
+    - HSWM.Wallpaper
+    - HSWM.Windows
+    - HSWM.XKB
+    - HSWM.XKB.FFI
     - HSWM
-    - Core
+    - Core # TODO: refactor/rename
   other-modules:
     - Prelude
   generated-other-modules:
@@ -110,6 +112,7 @@ executables:
       - *base
       - hswm
       - hswm-bindings
+      - containers
     pkgconfig-depends: wayland-client
     extra-libraries: wayland-client
     ghc-options: *common-ghc-options

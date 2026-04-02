@@ -15,10 +15,10 @@ module HSWM.Config
   ( module HSWM.Config
   ) where
 
-import HSWM.Core
-import HSWM.Operations
-import HSWM.XKB
-import HSWM.Utils
+import           HSWM.Core
+import           HSWM.Operations
+import           HSWM.Utils
+import           HSWM.XKB
 
 import qualified Data.List as L
 
@@ -32,13 +32,13 @@ data NamedAction = NamedAction String SomeAction
 
 instance IsAction NamedAction where
   runner (NamedActionH _ m) = m
-  runner (NamedAction _ a) = runner a
+  runner (NamedAction _ a)  = runner a
 
   actionSubmap (NamedActionH _ _) = []
-  actionSubmap (NamedAction _ a) = actionSubmap a
+  actionSubmap (NamedAction _ a)  = actionSubmap a
 
   actionDescription (NamedActionH nm _) = nm
-  actionDescription (NamedAction nm _) = nm
+  actionDescription (NamedAction nm _)  = nm
 
   --typeDescription _ = ""
 
@@ -52,7 +52,7 @@ windowsA :: String -> (WindowSet -> WindowSet) -> SomeAction
 windowsA desc f = SomeAction $ NamedActionH desc $ modifyWindowSet f
 
 windowsMA :: String -> (WindowSet -> H WindowSet) -> SomeAction
-windowsMA desc f = SomeAction $ NamedActionH desc $ withWindowSet $ \ws -> f ws >>= modifyWindowSet . const
+windowsMA desc f = SomeAction $ NamedActionH desc $ withWindowSet $ f >=> modifyWindowSet . const
 
 -- * Keys/submaps
 
@@ -69,7 +69,7 @@ submap defAct subKeys = SomeAction $ Submap
 
 fromADTKeys :: [ KeyAction (String, KeySym) SomeAction ] -> [((ModMask, KeySym), SomeAction)]
 fromADTKeys = map doKey where
-  doKey (KeyAction k a) = (doMK k, a)
+  doKey (KeyAction k a)  = (doMK k, a)
   doKey (KeySubmap k xs) = (doMK k, submap Nothing (fromADTKeys xs))
   doMK (m, k) = (resolveModMask (resolveModMask 0 "c") m, k)
 
@@ -77,7 +77,7 @@ data KeyAction mk a = KeyAction mk a
                     | KeySubmap mk [KeyAction mk a]
                     deriving (Show, Generic)
 
-parseSubmaps :: [(String, SomeAction)] -> [ KeyAction (String, KeySym) SomeAction ] -- [((String, KeySym), SomeAction)]
+parseSubmaps :: [(String, SomeAction)] -> [ KeyAction (String, KeySym) SomeAction ]
 parseSubmaps ks0 =
   let sanitized = [(L.words s, a) | (s, a) <- ks0 ] :: [([String], SomeAction)]
 
@@ -108,7 +108,7 @@ parseSubmaps ks0 =
     breakKeys "" = []
     breakKeys str = case L.span (/= '-') str of
                       (k,       []) -> [k]
-                      (k, '-' : xs) -> [k] ++ breakKeys xs
+                      (k, '-' : xs) -> k : breakKeys xs
                       (_,        _) -> error "breakkeys"
 
     key (KeyAction k _) = k

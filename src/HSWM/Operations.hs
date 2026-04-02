@@ -3,7 +3,6 @@ module HSWM.Operations where
 import qualified HSWM.StackSet as W
 import           HSWM.Core
 
-import           River
 import qualified River.Safe as R
 
 import qualified Data.List as L
@@ -14,36 +13,14 @@ import           System.IO
 import qualified System.Posix as Posix
 import           System.Posix.Process (executeFile)
 
+-- * Manage tasks that defer to next manage sequence
+
+manageReveal, manageHide :: RiverWindow -> H ()
+manageReveal = flip modifyWindow $ \s -> s { p_set_visible = Just True }
+manageHide = flip modifyWindow $ \s -> s { p_set_visible = Just False }
+
 manageKill :: Window -> H ()
 manageKill = doManage WRequestClose
-
-doManage' :: WindowManageAction -> RiverWindow -> H ()
-doManage' a rw = modifyWindow rw $ \s -> s { p_manage_action = p_manage_action s ++ [a] }
-
-doManage :: WindowManageAction -> Window -> H ()
-doManage a w = doManage' a w.river_window
-
-withScreenOutput :: ScreenId -> (Output -> H ()) -> H ()
-withScreenOutput sid f = mapM_ f . L.find (\o -> o.screen == sid) =<< gets _outputs
-
--- | Produce the actual rectangle from a screen and a ratio on that screen.
-scaleRationalRect :: Rectangle -> W.RationalRect -> Rectangle
-scaleRationalRect (Rectangle sx sy sw sh) (W.RationalRect rx ry rw rh)
- = Rectangle (sx + scale sw rx) (sy + scale sh ry) (scale sw rw) (scale sh rh)
- where scale s r = floor (toRational s * r)
-
---------------------------------------------------------------
-
-manageWindowBorder :: RiverWindow -> RiverColor -> H ()
-manageWindowBorder rw rc = modifyWindow rw $ \s -> s { p_render_border = Just rc }
-
--- | /render sequence/ Draw borders on the the window.
-setWindowBorder :: RiverWindow -> RiverColor -> H ()
-setWindowBorder w RiverColor {red = wb_r, green = wb_g, blue = wb_b, alpha = wb_a} = withWindow w $ \_ -> do
-    wb_width <- asks (borderWidth . config)
-    wb_edges <- asks (fi . borderEdges . config)
-    let borders = WindowBorders{..}
-    liftIO $ riverWindowV1SetBorders w borders
 
 -- | /manage/
 -- Move and resize @w@ such that it fits inside the given rectangle, including its border.
@@ -60,28 +37,18 @@ tileWindow placeTop i r = withWindow i $ \w -> do
       , p_render_place = if placeTop then R.rIVER_NODE_V1_PLACE_TOP else 0
       }
 
-manageReveal, manageHide :: RiverWindow -> H ()
-manageReveal = flip modifyWindow $ \s -> s { p_set_visible = Just True }
-manageHide = flip modifyWindow $ \s -> s { p_set_visible = Just False }
+manageWindowBorder :: RiverWindow -> RiverColor -> H ()
+manageWindowBorder rw rc = modifyWindow rw $ \s -> s { p_render_border = Just rc }
 
--- | /render sequence/
-reveal :: RiverWindow -> H ()
-reveal rw = withWindow rw $ \_ -> io $ river_window_v1_show rw
+doManage' :: WindowManageAction -> RiverWindow -> H ()
+doManage' a rw = modifyWindow rw $ \s -> s { p_manage_action = p_manage_action s ++ [a] }
 
--- | /render sequence/
-hide :: RiverWindow -> H ()
-hide rw = withWindow rw $ \_ -> io $ river_window_v1_hide rw
-
--- | /manage sequence/ focus a window in every seat.
-setFocusH :: RiverWindow -> H ()
-setFocusH rw = mapSeats $ \s -> io $ river_seat_v1_focus_window s.river_seat rw
-
--- | Force new manage sequence.
-manageDirty :: H ()
-manageDirty = withObject (io . riverWindowManagerManageDirty)
+doManage :: WindowManageAction -> Window -> H ()
+doManage a w = doManage' a w.river_window
 
 --------------------------------------------------------------
 
+-- * Operations not tied to manage/render phases
 {-
 -- | Throw a message to the current 'LayoutClass' possibly modifying how we
 -- layout the windows, in which case changes are handled through a refresh.
@@ -130,6 +97,40 @@ sendMessageWithNoRefresh a w =
 updateLayout :: WorkspaceId -> Maybe (Layout RiverWindow) -> H ()
 updateLayout i ml = whenJust ml $ \l ->
     runOnWorkspaces $ \ww -> return $ if W.tag ww == i then ww { W.layout = l} else ww
+
+withScreenOutput :: ScreenId -> (Output -> H ()) -> H ()
+withScreenOutput sid f = mapM_ f . L.find (\o -> o.screen == sid) =<< gets _outputs
+
+-- | Force new manage sequence.
+manageDirty :: H ()
+manageDirty = withObject (io . riverWindowManagerManageDirty)
+
+
+-- * Manage sequence /only/
+
+-- | /manage sequence/ focus a window in every seat.
+setFocusH :: RiverWindow -> H ()
+setFocusH rw = mapSeats $ \s -> io $ river_seat_v1_focus_window s.river_seat rw
+
+--------------------------------------------------------------
+
+-- * Render sequence / defer to render sequence
+
+-- | /render sequence/ Draw borders on the the window.
+setWindowBorder :: RiverWindow -> RiverColor -> H ()
+setWindowBorder w RiverColor {red = wb_r, green = wb_g, blue = wb_b, alpha = wb_a} = withWindow w $ \_ -> do
+    wb_width <- asks (borderWidth . config)
+    wb_edges <- asks (fi . borderEdges . config)
+    let borders = WindowBorders{..}
+    liftIO $ riverWindowV1SetBorders w borders
+
+-- | /render sequence/
+reveal, hide :: RiverWindow -> H ()
+reveal rw = withWindow rw $ \_ -> io $ river_window_v1_show rw
+hide rw = withWindow rw $ \_ -> io $ river_window_v1_hide rw
+
+--------------------------------------------------------------
+
 
 --------------------------------------------------------------
 -- * WindowSet etc. modifications
@@ -200,13 +201,17 @@ mapSeats f = gets _seats >>= mapM_ f
 withFocused :: (Window -> H ()) -> H ()
 withFocused f = gets windowset >>= \ws -> whenJust (W.peek ws) (`withWindow` f)
 
+lookupWindow :: RiverWindow -> H (Maybe Window)
+lookupWindow wid = gets (M.lookup wid . _windows)
+
 withWindow :: RiverWindow -> (Window -> H ()) -> H ()
-withWindow wid f = gets _windows >>= mapM_ (\w -> when (w.river_window == wid) (f w))
+withWindow wid f = gets (M.lookup wid . _windows) >>= (`whenJust` f)
 
 modifyWindow :: RiverWindow -> (Window -> Window) -> H ()
-modifyWindow w f = modify $ \s -> s { _windows = map g s._windows }
-  where g x | x.river_window == w = f x
-            | otherwise = x
+modifyWindow w f = alterWindow w (fmap f)
+
+alterWindow :: RiverWindow -> (Maybe Window -> Maybe Window) -> H ()
+alterWindow w f = modify $ \s -> s { _windows = M.alter f w s._windows }
 
 mapWindows :: (Window -> H ()) -> H ()
 mapWindows f = gets _windows >>= mapM_ f
@@ -237,10 +242,8 @@ writeStateToFile = do
   stateData <- gets $ \s -> StateData (wsData s) (extState s)
   catchIO $ writeFile path $ show stateData
 
-
 catchIO :: MonadIO m => IO () -> m ()
 catchIO f = io (f `catch` \(SomeException e) -> hPrint stderr e >> hFlush stderr)
-
 
 -- | Read the state of a previous xmonad instance from a file and
 -- return that state.  The state file is removed after reading it.

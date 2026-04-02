@@ -12,12 +12,18 @@
 -- Longer description of this module.
 --
 ------------------------------------------------------------------------------
-module HSWM.Core where
+module HSWM.Core
+  ( module HSWM.Core
+  , module HSWM.Util.Types
+  , module River
+  , ModMask, KeySym
+  ) where
 
 import           HSWM.StackSet (Stack, Workspace(..))
 import qualified HSWM.StackSet as W
 import           HSWM.XKB
 import           HSWM.Utils
+import           HSWM.Util.Types
 
 import           River
 import qualified River.Safe as R
@@ -75,7 +81,7 @@ data HState = HState
   , wlObjects      :: !TypeMap
   , _seats         :: [Seat]
   , _outputs       :: [Output]
-  , _windows       :: [Window]
+  , _windows       :: M.Map RiverWindow Window
   , recoveredWindows :: !(M.Map String RiverWindow)
   } deriving (Generic, Default)
 
@@ -123,7 +129,7 @@ data WorkspaceDetail = WD
 -- instance Default
 
 deriving anyclass instance Default (HSWMConfig Layout)
-instance                   Default (Event -> H All) where def = \_ -> mempty
+instance                   Default (Event -> H All) where def _ = mempty
 instance                   Default (H ())           where def = return ()
 instance                   Default ScreenId         where def = S (-1)
 
@@ -240,7 +246,7 @@ data Full a = Full deriving (Show, Read)
 instance LayoutClass Full a
 
 instance Default (Layout a) where
-  def = Layout $ Full
+  def = Layout Full
 
 --------------------------------------------------------------
 -- Layout messages
@@ -514,11 +520,8 @@ instance Default (HSWMConfig Full) where
     , normalBorder    = parseRgba "0x0000B0"
     , focusedBorder   = parseRgba "0xFA0050"
     , borderEdges     = foldl (.|.) 0 (fi . fromEnum <$> [EdgeLeft, EdgeRight, EdgeTop, EdgeBottom])
-    , keyBindings     = [ -- (("M", _XKB_KEY_n), SendMessage ACTION_FOCUS_NEXT)
-                        ]
-    , pointerBindings = [ -- (("M", _BTN_LEFT), SendMessage ACTION_MOVE)
-                        -- , (("", _BTN_RIGHT), SendMessage ACTION_MOVE)
-                        ]
+    , keyBindings     = [ ]
+    , pointerBindings = [ ]
     , defaultModMask  = "Ctrl"
     , startupHook     = mempty
     , handleEventHook = mempty

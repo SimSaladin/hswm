@@ -19,20 +19,19 @@ module HSWM.Layout
   tile
   ) where
 
-import Control.Arrow (second, (***))
-
-import           Prelude hiding (handle)
 import           HSWM.Core
 import qualified HSWM.StackSet as W
-import           River
+
+import           Control.Arrow (second, (***))
+import           Prelude hiding (handle)
 
 -- | Change the size of the master pane.
 data Resize = Shrink | Expand
-  deriving Show
+  deriving (Eq, Show)
 
 -- | Increase the number of clients in the master pane.
 newtype IncMasterN = IncMasterN Int
-  deriving Show
+  deriving (Eq, Show)
 
 instance Message Resize
 instance Message IncMasterN

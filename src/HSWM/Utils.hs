@@ -35,6 +35,7 @@ import qualified Text.Pretty.Simple as P
 -- 32-bit color values (used by Window.set_borders in rwm).
 parseRgba :: String -> RiverColor
 parseRgba s
+  | '#' : s' <- s = parseRgba ('0':'x':s')
   | '0' : 'x' : s' <- s, length s == 8 || length s == 10 =
     bytesToRiverColor $ case readHex @Word32 s' of
                     [(c, "")]
@@ -217,17 +218,17 @@ ppShmFormat x = case x of
     _ -> "UNKNOWN"
 
 spawnProcess :: MonadIO m => String -> [String] -> m ProcessID
-spawnProcess x xs = xfork $ executeFile "/usr/bin/env" False (x : xs) Nothing
+spawnProcess x xs = fork $ executeFile "/usr/bin/env" False (x : xs) Nothing
 
 spawnShell :: MonadIO m => String -> m ProcessID
-spawnShell x = xfork $ executeFile "/bin/sh" False ["-c", x] Nothing
+spawnShell x = fork $ executeFile "/bin/sh" False ["-c", x] Nothing
 
 spawn :: MonadIO m => String -> m ()
 spawn x = void $ spawnShell x
 
 -- | A replacement for 'forkProcess' which resets default signal handlers.
-xfork :: MonadIO m => IO () -> m ProcessID
-xfork x = io . forkProcess . finally nullStdin $ do
+fork :: MonadIO m => IO () -> m ProcessID
+fork x = io . forkProcess . finally nullStdin $ do
                 uninstallSignalHandlers
                 _ <- createSession
                 x
@@ -247,7 +248,6 @@ installSignalHandlers = io $ do
       $ fix $ \more -> do
         x <- getAnyProcessStatus False False
         when (isJust x) more
-    return ()
 
 uninstallSignalHandlers :: MonadIO m => m ()
 uninstallSignalHandlers = io $ do

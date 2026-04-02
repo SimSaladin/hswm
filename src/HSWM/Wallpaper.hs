@@ -11,35 +11,35 @@
 -- Longer description of this module.
 --
 ------------------------------------------------------------------------------
-module HSWM.Wallpaper where
+module HSWM.Wallpaper
+  ( usingWallpaper, Config(..), wpStartupHook, wpExitHook, wpHandleEventHook
+  ) where
+
+import qualified HSWM.BufferPool as BP
+import           HSWM.Core
+
+import qualified Generated.Pixman as P
+import qualified Generated.Pixman.Safe as P
+import qualified Generated.Wayland.Client as WL
+import qualified Wayland.Client as WL
 
 import qualified Codec.Picture as JP
-import qualified Codec.Picture.Metadata as JP
 import qualified Data.Vector.Storable as V
 import           Foreign
 import           System.Directory
 import           System.IO.Unsafe
 
-import           HSWM.Core
-import qualified Generated.Pixman as P
-import qualified Generated.Pixman.Safe as P
-import qualified Generated.Wayland.Client as WL
-import           River
-import qualified Wayland.Client as WL
-import qualified HSWM.BufferPool as BP
-
 
 data Config = Config
   { filepath :: FilePath
-  } deriving (Show, Read)
-
-type Image = (JP.DynamicImage, JP.Metadatas)
+  }
+  deriving (Show, Read)
 
 data Surfaces = Surfaces
-  { node              :: RiverNode
-  , wl_surface        :: (Ptr WL.Wl_surface)
-  , rs_surface        :: RiverShellSurface
-  }
+  { node              :: !RiverNode
+  , wl_surface        :: !(Ptr WL.Wl_surface)
+  , rs_surface        :: !RiverShellSurface
+  } deriving (Eq, Show)
 
 data Ctx = Ctx
   { pending_render    :: !Bool
@@ -48,7 +48,7 @@ data Ctx = Ctx
   , render_height     :: !Int32
   , src_image         :: !(Maybe (JP.Image JP.PixelRGBA8))
   , bufferPool        :: !(Maybe BP.ImageBufferPool)
-  }
+  } deriving (Generic)
 
 usingWallpaper :: Config -> HSWMConfig l -> HSWMConfig l
 usingWallpaper cfg userConf = userConf

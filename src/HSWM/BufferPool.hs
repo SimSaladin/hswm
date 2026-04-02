@@ -13,43 +13,44 @@
 ------------------------------------------------------------------------------
 module HSWM.BufferPool where
 
-import           Data.Proxy
-import           Foreign
-import           System.Posix (Fd)
+import           HSWM.Core
+import           HSWM.Util.Posix
 
 import qualified Generated.Pixman as P
 import qualified Generated.Pixman.Safe as P
 import qualified Generated.Wayland.Client as WL
-import           HSWM.Core
-import           HSWM.Util.Posix
 import qualified Wayland.Client as WL
 
+import           Data.Proxy
+import           Foreign
+import           System.Posix (Fd)
+
 data ImageBufferPool = ImageBufferPool
-  { buffers        :: MVar ([ImageBuffer], Int)
-  , wlShm          :: Ptr WL.Wl_shm
-  , bufferListener :: ConstPtr WL.Wl_buffer_listener
-  } deriving (Generic)
+    { buffers        :: MVar ([ImageBuffer], Int)
+    , wlShm          :: !(Ptr WL.Wl_shm)
+    , bufferListener :: !(ConstPtr WL.Wl_buffer_listener)
+    } deriving (Generic)
 
 data ImageBuffer = ImageBuffer
-  { fd            :: !Fd
-  , ptr           :: !(Ptr ())
-  , width, height :: Int
-  , size          :: !Int
-  , buf           :: !(Ptr WL.Wl_buffer)
-  , pixmanImage   :: !(Ptr P.Pixman_image_t)
-  , busy          :: !(Ptr Bool)
-  , pool          :: Ptr WL.Wl_shm_pool
-  } deriving (Generic)
+    { fd            :: !Fd
+    , ptr           :: !(Ptr ())
+    , width, height :: !Int
+    , size          :: !Int
+    , buf           :: !(Ptr WL.Wl_buffer)
+    , pixmanImage   :: !(Ptr P.Pixman_image_t)
+    , busy          :: !(Ptr Bool)
+    , pool          :: !(Ptr WL.Wl_shm_pool)
+    } deriving (Generic)
 
 newImageBufferPool :: H ImageBufferPool
 newImageBufferPool = do
-  wlShm <- getObject
-  buffers <- io $ newMVar ([], 0)
-  bufferListener <- io $ WL.mkWlBufferListener $ \case
-    WL.WlBufferRelease aUserData _aBuf -> do
-      let p = castPtr aUserData :: Ptr Bool
-      poke p False
-  return ImageBufferPool{..}
+    wlShm <- getObject
+    buffers <- io $ newMVar ([], 0)
+    bufferListener <- io $ WL.mkWlBufferListener $ \case
+      WL.WlBufferRelease aUserData _aBuf -> do
+        let p = castPtr aUserData :: Ptr Bool
+        poke p False
+    return ImageBufferPool{..}
 
 nextBuffer :: ImageBufferPool -> Int -> Int -> IO ImageBuffer
 nextBuffer pool w h = modifyMVar pool.buffers go00
@@ -83,17 +84,13 @@ initImageBuffer ImageBufferPool{wlShm = wl_shm, bufferListener = listener} width
         size = height * stride
         w = width
         h = height
-
     (fd, ptr) <- createShm (fi size)
     pool <- io $ WL.wl_shm_create_pool wl_shm (fi fd) (fi size)
     buf <- io $ WL.wl_shm_pool_create_buffer pool 0 (fi w) (fi h) (fi stride) (fi (WL.WL_SHM_FORMAT_ABGR8888).unwrap)
-
     -- create pixman image
     pixmanImage <- io $ P.pixman_image_create_bits_no_clear P.PIXMAN_a8r8g8b8 (fi w) (fi h) (castPtr ptr) (fi stride)
-
     busy <- Foreign.new True
-
-    -- Set busy = False
+    -- Sets busy = False
     _ <- io $ WL.wl_buffer_add_listener buf listener (castPtr busy)
     return ImageBuffer{..}
 

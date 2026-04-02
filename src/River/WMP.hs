@@ -33,9 +33,6 @@ ppXkbModsKey m ksym =
            , fi (fromEnum x) .&. m /= 0 ]
     ++ [ xkbKeysymToText ksym ]
 
-data Rectangle = Rectangle { x, y, width, height :: !Word32 }
-  deriving (Show, Read, Eq)
-
 setNodePosition :: MonadIO m => RiverNode -> Int32 -> Int32 -> m ()
 setNodePosition n x y = liftIO $ river_node_v1_set_position n x y
 
