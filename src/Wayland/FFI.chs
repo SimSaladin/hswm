@@ -9,104 +9,40 @@ import qualified Wayland.Client as WL
 
 -- * Types
 
-type Version = {#type uint32_t#}
-type Flags   = {#type uint32_t#}
+type WlInterface = ConstPtr WL.Wl_interface
+type Version     = Word32
+type Flags       = {#type uint32_t#}
 
-type WlDisplay = Ptr WL.Wl_display
-type WlSurface = Ptr WL.Wl_surface
+type WlSurface = WL.Surface
+type WlRegistry = WL.Registry
+type WlSeat = WL.Seat
 
 {#pointer *wl_array             as WlArray            newtype #}
-{#pointer *wl_seat              as WlSeat             newtype #}
 {#pointer *wl_keyboard          as WlKeyboard         newtype #}
-{#pointer *wl_registry          as WlRegistry         newtype #}
-{#pointer *wl_interface         as WlInterface        newtype #}
 {#pointer *wl_proxy             as WlProxy            newtype #}
 {#pointer *wl_keyboard_listener as WlKeyboardListener newtype #}
 {#pointer *wl_registry_listener as WlRegistryListener newtype #}
 
--- deriving instance Show WlSurface
 deriving instance Show WlArray
-deriving instance Show WlSeat
 deriving instance Show WlKeyboard
-deriving instance Show WlRegistry
-deriving instance Show WlInterface
 deriving instance Show WlProxy
 deriving instance Show WlKeyboardListener
 
 -- | For writing C wrappers for callback functions.
 type ListenerCallback f = f -> IO (FunPtr f)
 
--- * External interfaces
-
-foreign import ccall "&wl_registry_interface" wl_registry_interface :: WlInterface
-foreign import ccall "&wl_seat_interface"     wl_seat_interface     :: WlInterface
-foreign import ccall "&wl_keyboard_interface" wl_keyboard_interface :: WlInterface
-
 -- * Constants
 
 _WL_MARSHAL_FLAG_DESTROY :: Flags
 _WL_MARSHAL_FLAG_DESTROY = 1 -- {#const WL_MARSHAL_FLAG_DESTROY#}
 
--- * wl_display
-
-{#fun wl_display_connect   {`CString'}   -> `WlDisplay' castPtr #}
-{#fun wl_display_roundtrip {castPtr `WlDisplay'} -> `Int' #}
-{#fun wl_display_dispatch  {castPtr `WlDisplay'} -> `Int' #}
-
-wl_display_get_registry :: WlDisplay -> IO WlRegistry
-wl_display_get_registry display = do
-  ver <- wl_proxy_get_version display
-  WlProxy res <- wl_proxy_marshal_array_flags display {#const WL_DISPLAY_GET_REGISTRY#} wl_registry_interface ver 0 nullPtr
-  return $ WlRegistry $ castPtr res
-
 -- * wl_interface
 
 getInterfaceName :: WlInterface -> IO String
-getInterfaceName p = {#get wl_interface->name#} p >>= peekCString
+getInterfaceName p = {#get wl_interface->name#} (unConstPtr p) >>= peekCString
 
 emptyInterface :: WlInterface
-emptyInterface = WlInterface nullPtr
-
--- * wl_seat
-
-wl_seat_get_keyboard :: WlSeat -> IO WlKeyboard
-wl_seat_get_keyboard seat = do
-  ver <- wl_proxy_get_version seat
-  WlProxy res <- wl_proxy_marshal_array_flags seat {#const WL_SEAT_GET_KEYBOARD#} wl_keyboard_interface ver 0 nullPtr
-  return $ WlKeyboard $ castPtr res
-
--- * wl_registry
-
-wl_registry_bind :: WlRegistry -> Word32 -> WlInterface -> Version -> IO (Ptr a)
-wl_registry_bind reg name iface ver = do
-  ifaceName <- {#get wl_interface->name#} iface
-  WlProxy res <- wl_proxy_marshal_array_flags reg {#const WL_REGISTRY_BIND#} iface ver 0 (name, ifaceName, ver, nullPtr)
-  when (res == nullPtr) $ throwIO $ WaylandException "wl_registry_bind (NULL)"
-  return $! castPtr res
-
-wl_registry_add_listener
-  :: WlRegistry
-  -> WlRegistryListener
-  -> Ptr () -- ^ userdata
-  -> IO ()
-wl_registry_add_listener reg (WlRegistryListener l) dt = do
-  res <- wl_proxy_add_listener reg (castPtr l) dt
-  when (res < 0) $ throwIO $ WaylandException $ "wl_registry_add_listener: " ++ show res
-
-data RegistryEvent
-   = RegistryGlobal       { userdata :: !(Ptr ()), registry :: !WlRegistry, name :: !Word32, interface :: !String, version :: !Version }
-   | RegistryGlobalRemove { userdata :: !(Ptr ()), registry :: !WlRegistry, name :: !Word32 }
-   deriving Show
-
-foreign import ccall "wrapper" wrap_global        :: ListenerCallback (Ptr () -> WlRegistry -> CUInt -> CString -> CUInt -> IO ())
-foreign import ccall "wrapper" wrap_global_remove :: ListenerCallback (Ptr () -> WlRegistry -> CUInt -> IO ())
-
-mkRegistryListener :: (RegistryEvent -> IO ()) -> IO WlRegistryListener
-mkRegistryListener h = do
-  p <- WlRegistryListener <$> mallocBytes {#sizeof wl_registry_listener#}
-  {#set wl_registry_listener.global#}        p =<< wrap_global        (\a b c d e -> peekCString d >>= \d' -> h $ RegistryGlobal a b (fi c) d' (fi e))
-  {#set wl_registry_listener.global_remove#} p =<< wrap_global_remove (\a b c     -> h $ RegistryGlobalRemove a b (fi c))
-  return p
+emptyInterface = ConstPtr nullPtr
 
 -- * wl_proxy
 
@@ -119,10 +55,12 @@ mkRegistryListener h = do
 {#fun wl_proxy_add_listener  `(IsWlProxy p)' =>
   { toWlProxy `p' , id `Ptr (FunPtr (IO ()))' , `Ptr ()' } -> `Int' #}
 
+castUnConstPtr = castPtr . unConstPtr
+
 {#fun wl_proxy_marshal_flags `(IsWlProxy p)' =>
   { toWlProxy    `p'
   ,              `CUInt'
-  ,              `WlInterface'
+  , castUnConstPtr      `WlInterface'
   , fromIntegral `Version'
   , fromIntegral `Flags'
   } -> `WlProxy' #}
@@ -131,7 +69,7 @@ mkRegistryListener h = do
   `(IsWlProxy p1, WlArgs args)' =>
   { toWlProxy     `p1' -- wl_proxy*
   ,               `CUInt' -- ^ opcode
-  ,               `WlInterface'
+  , castUnConstPtr       `WlInterface'
   , fromIntegral  `Version'
   , fromIntegral  `Flags'
   , allocaWlArgs* `args' -- Ptr () , union wl_argument * args)
@@ -159,9 +97,8 @@ class IsWlProxy a where
 
 instance IsWlProxy (Ptr a)    where toWlProxy = WlProxy . castPtr
 
-instance IsWlProxy WlSeat     where toWlProxy (WlSeat p) = WlProxy $ castPtr p
+--instance IsWlProxy WlSeat     where toWlProxy (WlSeat p) = WlProxy $ castPtr p
 instance IsWlProxy WlKeyboard where toWlProxy (WlKeyboard p) = WlProxy $ castPtr p
-instance IsWlProxy WlRegistry where toWlProxy (WlRegistry p) = WlProxy $ castPtr p
 
 -- | see wl_argument
 class WlArgument a where
@@ -172,6 +109,8 @@ instance WlArgument Int32   where withWlArgument x p m = poke (castPtr p) x >> m
 instance WlArgument Word32  where withWlArgument x p m = poke (castPtr p) x >> m
 instance WlArgument (Ptr a) where withWlArgument x p m = poke (castPtr p) x >> m
 instance WlArgument String  where withWlArgument x p m = withCString x $ \px -> poke (castPtr p) px >> m
+
+instance WlArgument WL.Surface where withWlArgument (WL.Surface x) p m = withWlArgument x p m
 
 
 -- | Arguments array marshalling for 'wl_proxy_marshal_array_flags'
@@ -243,8 +182,8 @@ mkKeyboardListener :: (WlKeyboardEvent a -> IO ()) -> IO WlKeyboardListener
 mkKeyboardListener f = do
     p <- WlKeyboardListener <$> callocBytes {#sizeof wl_keyboard_listener#}
     {#set wl_keyboard_listener.keymap#} p      =<< wrap_wl_keyboard_listener_keymap     (\dt kbd fmt fd size    -> f $ KeyboardKeymap     (castPtr dt) kbd fmt fd size)
-    {#set wl_keyboard_listener.enter#} p       =<< wrap_wl_keyboard_listener_Enter      (\dt kbd u1 p1 p2       -> f $ KeyboardEnter      (castPtr dt) kbd u1 (castPtr p1) p2)
-    {#set wl_keyboard_listener.leave#} p       =<< wrap_wl_keyboard_listener_Leave      (\dt kbd u1 p1          -> f $ KeyboardLeave      (castPtr dt) kbd u1 (castPtr p1))
+    {#set wl_keyboard_listener.enter#} p       =<< wrap_wl_keyboard_listener_Enter      (\dt kbd u1 p1 p2       -> f $ KeyboardEnter      (castPtr dt) kbd u1 (WL.Surface $ castPtr p1) p2)
+    {#set wl_keyboard_listener.leave#} p       =<< wrap_wl_keyboard_listener_Leave      (\dt kbd u1 p1          -> f $ KeyboardLeave      (castPtr dt) kbd u1 (WL.Surface $ castPtr p1))
     {#set wl_keyboard_listener.key#} p         =<< wrap_wl_keyboard_listener_Key        (\dt kbd u1 u2 u3 u4    -> f $ KeyboardKey        (castPtr dt) kbd u1 u2 u3 u4)
     {#set wl_keyboard_listener.modifiers#} p   =<< wrap_wl_keyboard_listener_Modifiers  (\dt kbd u1 u2 u3 u4 u5 -> f $ KeyboardModifiers  (castPtr dt) kbd u1 u2 u3 u4 u5)
     {#set wl_keyboard_listener.repeat_info#} p =<< wrap_wl_keyboard_listener_RepeatInfo (\dt kbd rate delay     -> f $ KeyboardRepeatInfo (castPtr dt) kbd rate delay)
@@ -267,9 +206,6 @@ foreign import ccall "wrapper" wrap_wl_keyboard_listener_Modifiers  :: ListenerC
 foreign import ccall "wrapper" wrap_wl_keyboard_listener_RepeatInfo :: ListenerCallback (Ptr () -> WlKeyboard -> CInt -> CInt -> IO ())
 
 -- * Exceptions
-
-data WaylandDisplayException = WaylandDisplayConnectFailed deriving Show
-instance Exception WaylandDisplayException
 
 data WaylandException = WaylandException String deriving (Show)
 instance Exception WaylandException

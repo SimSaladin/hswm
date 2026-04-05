@@ -1,4 +1,4 @@
-cabal-version: 3.4
+cabal-version: 3.12
 
 -- This file has been generated from package.yaml by hpack version 0.38.3.
 --
@@ -45,6 +45,7 @@ library
           PackageImports
     ghc-options: -Wall -Wunused-packages
     other-modules:
+          PackageInfo_hswm
           Paths_hswm
     exposed-modules:
           Wayland.FFI
@@ -71,6 +72,7 @@ library
           HSWM.Util.Posix
           HSWM.Util.Types
           HSWM.Util.Waybar
+          HSWM.Util.Debug
           HSWM.Utils
           HSWM.Wallpaper
           HSWM.Windows
@@ -80,25 +82,26 @@ library
           HSWM
           Core
     autogen-modules:
+          PackageInfo_hswm
           Paths_hswm
     build-depends:
-          JuicyPixels
+          JuicyPixels >=3.3.9 && <3.4
         , aeson
-        , base >=4.20.2.0
-        , bytestring
-        , c-expr-runtime
-        , containers
-        , data-default
+        , base >=4.21.0 && <4.22
+        , bytestring >=0.12.2 && <0.13
+        , containers ==0.7.*
+        , data-default >=0.8.0 && <0.9
         , derive-storable
         , directory
-        , hs-bindgen-runtime
         , hswm-bindings
         , hswm:hswm-prelude
         , network
         , pretty-simple
+        , text
         , transformers
         , typerep-map
         , unix
+        , utf8-string
         , vector
     mixins:
           base hiding (Prelude)
@@ -134,7 +137,7 @@ library hswm-prelude
           PackageImports
     ghc-options: -Wall -Wunused-packages
     build-depends:
-          base >=4.20.2.0
+          base >=4.21.0 && <4.22
         , data-default
         , logging
         , mtl

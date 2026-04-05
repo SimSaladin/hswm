@@ -4,12 +4,15 @@ import qualified HSWM.StackSet as W
 import           HSWM.Core
 
 import qualified River.Safe as R
+import qualified River.Objects as R
 
 import qualified Data.List as L
 import qualified Data.Map as M
 import           Foreign (IntPtr, intPtrToPtr, ptrToIntPtr)
 import           System.Directory (removeFile)
 import           System.IO
+import System.Exit
+import System.Environment
 import qualified System.Posix as Posix
 import           System.Posix.Process (executeFile)
 
@@ -30,7 +33,7 @@ tileWindow placeTop i r = withWindow i $ \w -> do
     -- give all windows at least 1x1 pixels
     let least x | x <= bw*2  = 1
                 | otherwise  = x - bw*2
-    io $ river_window_v1_propose_dimensions w.river_window (least $ fi r.width) (least $ fi r.height)
+    io $ R.riverWindowProposeDimensions w.river_window (least $ fi r.width) (least $ fi r.height)
     modifyWindow i $ \s -> s
       -- setNodePosition w.node (fi r.x + bw) (fi r.y + bw)
       { p_render_pos = Just (fi r.x + bw, fi r.y + bw)
@@ -103,14 +106,14 @@ withScreenOutput sid f = mapM_ f . L.find (\o -> o.screen == sid) =<< gets _outp
 
 -- | Force new manage sequence.
 manageDirty :: H ()
-manageDirty = withObject (io . riverWindowManagerManageDirty)
+manageDirty = withObject (io . R.riverWindowManagerManageDirty)
 
 
 -- * Manage sequence /only/
 
 -- | /manage sequence/ focus a window in every seat.
 setFocusH :: RiverWindow -> H ()
-setFocusH rw = mapSeats $ \s -> io $ river_seat_v1_focus_window s.river_seat rw
+setFocusH rw = mapSeats $ \s -> io $ R.riverSeatFocusWindow s.river_seat rw
 
 --------------------------------------------------------------
 
@@ -122,12 +125,16 @@ setWindowBorder w RiverColor {red = wb_r, green = wb_g, blue = wb_b, alpha = wb_
     wb_width <- asks (borderWidth . config)
     wb_edges <- asks (fi . borderEdges . config)
     let borders = WindowBorders{..}
-    liftIO $ riverWindowV1SetBorders w borders
+    liftIO $ riverWindowSetBorders w borders
+
+riverWindowSetBorders :: RiverWindow -> WindowBorders -> IO ()
+riverWindowSetBorders w WindowBorders{..} =
+  R.riverWindowSetBorders w wb_edges wb_width wb_r wb_g wb_b wb_a
 
 -- | /render sequence/
 reveal, hide :: RiverWindow -> H ()
-reveal rw = withWindow rw $ \_ -> io $ river_window_v1_show rw
-hide rw = withWindow rw $ \_ -> io $ river_window_v1_hide rw
+reveal rw = withWindow rw $ \_ -> io $ R.riverWindowShow rw
+hide rw = withWindow rw $ \_ -> io $ R.riverWindowHide rw
 
 --------------------------------------------------------------
 
@@ -224,11 +231,28 @@ data StateData = StateData
   , sfExt  :: [(String, String)]
   } deriving (Show, Read)
 
+getProgramPath :: IO FilePath
+getProgramPath = lookupEnv "HSWM_EXECUTABLE" >>= \case
+    Just x -> return x
+    Nothing
+      | Just getExe <- executablePath -> do
+          x <- fromMaybe (error "restart: unable to get program path") <$> getExe
+          setEnv "HSWM_EXECUTABLE" x
+          return x
+      | otherwise -> error "restart: unable to resolve program path"
+
 restart :: String -> H ()
 restart prog = do
   broadcastMessage ReleaseResources
+  void . userCode =<< asks (exitHook . config)
   writeStateToFile
-  catchIO $ executeFile prog True [] Nothing
+  io $ do
+    res <- try $ executeFile prog True [] Nothing
+    case res of
+      Left (SomeException e) -> hPrint stderr e >> exitFailure
+      Right{} -> return ()
+
+rwToIntPtr (R.RiverWindow w) = ptrToIntPtr w
 
 writeStateToFile :: H ()
 writeStateToFile = do
@@ -236,8 +260,8 @@ writeStateToFile = do
       wsData s = W.mapLayout show $ W.mapWindow winIdent $ windowset s
         where
           winIdent w
-            | Just win <- L.find (\x -> x.river_window == w) s._windows = (ptrToIntPtr w, win.identifier)
-            | otherwise = (ptrToIntPtr w, "")
+            | Just win <- L.find (\x -> x.river_window == w) s._windows = (rwToIntPtr w, win.identifier)
+            | otherwise = (rwToIntPtr w, "")
       extState _ = [] -- TODO
   stateData <- gets $ \s -> StateData (wsData s) (extState s)
   catchIO $ writeFile path $ show stateData
@@ -266,13 +290,13 @@ readStateFile xmc = do
           let wins = W.allWindows (sfWins sf)
           let winset = W.ensureTags layout (workspaces xmc) $
                 W.mapLayout (fromMaybe layout . maybeRead lreads) $
-                  W.mapWindow (intPtrToPtr . fst) (sfWins sf)
+                  W.mapWindow (R.RiverWindow . intPtrToPtr . fst) (sfWins sf)
               --extState = M.fromList . map (second Left) $ sfExt sf
 
           return def
             { windowset = winset
             , windowsetOld = winset
-            , recoveredWindows = M.fromList [ (b, intPtrToPtr a) | (a,b) <- wins ]
+            , recoveredWindows = M.fromList [ (b, R.RiverWindow $ intPtrToPtr a) | (a,b) <- wins ]
             }
   where
     layout = Layout (layoutHook xmc)

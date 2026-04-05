@@ -95,7 +95,8 @@ $(bindGenSpecDir)/Generated.Wayland.Util.yaml: FORCE
 	  --select-except-by-decl-name wl_log_func_t
 
 $(bindGenSpecDir)/Generated.Wayland.Client.yaml: FORCE $(bindGenSpecDir)/Generated.Wayland.Util.yaml
-	$(HS_BIND_GEN) --unique-id hswm_wl_client wayland-client{,-core,-protocol}.h \
+	$(HS_BIND_GEN) \
+	  --unique-id hswm_wl_client wayland-client{,-core,-protocol}.h \
 	  --gen-binding-spec $@ \
 	  --module $(patsubst %.yaml,%,$(@F)) \
 	  $(shell pkg-config --cflags wayland-client) \
@@ -107,13 +108,6 @@ $(bindGenSpecDir)/Generated.Wayland.Client.yaml: FORCE $(bindGenSpecDir)/Generat
 #	  --select-except-by-decl-name wl_proxy_marshal \
 #	  --select-except-by-decl-name wl_proxy_marshal_constructor \
 #	  --select-except-by-decl-name wl_proxy_marshal_constructor_versioned
-
-#$(bindGenSpecDir)/Generated.Wayland.Server.yaml: FORCE $(bindGenSpecDir)/Generated.Wayland.Util.yaml
-#	$(HS_BIND_GEN) --unique-id hswm_wl_server wayland-server{,-core,-protocol}.h \
-#	  --gen-binding-spec $@ \
-#	  --module $(patsubst %.yaml,%,$(@F)) \
-#	  $(shell pkg-config --cflags wayland-server) \
-#	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml
 
 $(bindGenSpecDir)/Generated.River.WindowManagementV1.yaml: $(HEADERDIR)/river-window-management-v1-client-protocol.h FORCE
 	$(HS_BIND_GEN) $(<F) \
@@ -177,13 +171,5 @@ $(bindGenSpecDir)/Generated.Wayland.Protocol.ForeignTopLevelListV1.yaml: $(HEADE
 	  --module $(patsubst %.yaml,%,$(@F)) \
 	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml \
 	  --external-binding-spec $(bindingSpecs)/wayland-client.yaml
-
-#$(bindGenSpecDir)/Generated.River.Status.Server.yaml: $(HEADERDIR)/river-status-unstable-v1-server-protocol.h FORCE
-#	$(HS_BIND_GEN) $(<F) \
-#	  --gen-binding-spec $@ \
-#	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \
-#	  --module $(patsubst %.yaml,%,$(@F)) \
-#	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml \
-#	  --external-binding-spec $(bindingSpecs)/wayland-server.yaml
 
 FORCE:

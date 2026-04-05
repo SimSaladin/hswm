@@ -18,9 +18,25 @@ module Wayland.Client.Internal.Types
   , module HsBindgen.Runtime.Prelude
   ) where
 
-import           HsBindgen.Runtime.Prelude (ToFunPtr(..), FromFunPtr(..))
+import           HsBindgen.Runtime.Prelude (ToFunPtr(..), FromFunPtr(..), PtrConst)
 import Data.Proxy
+import Data.Kind (Type)
+import Foreign.C
+import Foreign
+import Data.Void
 
 class ListenerEvent ev where
-  type Listener ev :: *
+  type Listener ev :: Type
   freeListener :: Proxy ev -> Listener ev -> IO ()
+
+class IsWlObject object where
+  getVersion :: object -> IO Word32
+  getUserData :: object -> IO (Ptr Void)
+  setUserData :: object -> Ptr Void -> IO ()
+
+class AddListener object where
+  type ObjectListener object :: Type
+  listenerAdd :: object -> PtrConst (ObjectListener object) -> Ptr Void -> IO CInt
+
+class HasDestructor object where
+  objectDestroy :: object -> IO ()

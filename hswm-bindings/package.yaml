@@ -5,7 +5,7 @@ version:            0.1.0.0
 license:            MIT
 license-file:       LICENSE
 author:             Samuli Thomasson
-maintainer:         samuli.thomasson@5gsystems.com
+maintainer:         samuli.thomasson@pm.me
 build-type:         Simple
 extra-doc-files:    CHANGELOG.md
 
@@ -18,10 +18,11 @@ extra-source-files:
 library:
   source-dirs: src
   dependencies:
-    - base >=4.21.0.0
+    - base ^>=4.21.0.0
     - c-expr-runtime
     - hs-bindgen-runtime
     - template-haskell
+    - data-default
   include-dirs:
     - include
     - include/wayland-protocols
@@ -37,5 +38,11 @@ library:
   ghc-options:
     - -Wall
     - -Wunused-packages
+    - -haddock
     - -fPIC
   language: GHC2024
+  default-extensions:
+    - TemplateHaskell
+    - TypeFamilies
+    - OverloadedStrings
+    - DuplicateRecordFields

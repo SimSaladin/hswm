@@ -1,6 +1,3 @@
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeFamilies #-}
-
 ------------------------------------------------------------------------------
 -- |
 -- Module      : Wayland.Client
@@ -100,6 +97,13 @@
 ------------------------------------------------------------------------------
 module Wayland.Client
 
+  ( module Types
+  , module Wayland.Client.Display
+  , module Wayland.Client.Objects
+  , module Wayland.Client.Interface
+  , module Safe
+  ) where
+
   -- * Wl_proxy
   --
   -- ** @wl_proxy_marshal_*@
@@ -114,64 +118,11 @@ module Wayland.Client
   --    struct wl_proxy * wl_proxy_marshal_constructor_versioned(struct wl_proxy *proxy, uint32_t opcode, const struct wl_interface *interface, uint32_t version, ...);
   -- @
 
-  ( wl_proxy_marshal_array_flags
-  , wl_proxy_marshal_array
-  , wl_proxy_marshal_array_constructor
-  , wl_proxy_marshal_array_constructor_versioned
+import Wayland.Client.Display
+import Wayland.Client.Objects
+import Wayland.Client.Internal.Types as Types
 
-  -- * Wl_display
-  , wl_display_connect
-  , wl_display_get_registry
-  , wl_display_dispatch
-  , wl_display_get_error
-  , wl_display_get_protocol_error
-  , wl_display_flush
-  , wl_display_roundtrip
-  , wl_display_add_listener
+import Wayland.Client.Interface
 
-  -- * Wl_registry
-  , wl_registry_add_listener
-  , wl_registry_bind
-
-  -- * Wl_compositor
-  , wl_compositor_create_surface
-  , wl_compositor_create_region
-
-  -- * Wl_shell, shell_surface
-  , wl_shell_get_shell_surface
-
-  -- * Wl_seat
-  , wl_seat_add_listener
-  , wl_output_add_listener
-  , wl_touch_add_listener
-  , wl_keyboard_add_listener
-
-  -- * Everything else (uncategorized)
-  , module X
-  , module Wayland.Client
-  ) where
-
-import           Wayland.Client.Interface      as X hiding ()
-import           Wayland.Client.Internal.Types as X hiding ()
-import           Generated.Wayland.Util.Safe   as X hiding ()
-import           Generated.Wayland.Client.Safe as X hiding ()
-
-import Wayland.Client.Internal.TH
-
-mkListenerEvents
-  [ ''Wl_display_listener
-  , ''Wl_registry_listener
-  , ''Wl_callback_listener
-  , ''Wl_shm_listener
-  , ''Wl_buffer_listener
-  , ''Wl_data_offer_listener
-  , ''Wl_data_source_listener
-  , ''Wl_data_device_listener
-  , ''Wl_shell_surface_listener
-  , ''Wl_surface_listener
-  , ''Wl_pointer_listener
-  , ''Wl_keyboard_listener
-  , ''Wl_touch_listener
-  , ''Wl_output_listener
-  , ''Wl_seat_listener
-  ]
+import Generated.Wayland.Util.Safe   as Safe
+import Generated.Wayland.Client.Safe as Safe

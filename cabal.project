@@ -3,6 +3,9 @@ packages:
   hswm-bindings
   waybar-cffi-hs
 
+jobs: $ncpus
+documentation: True
+
 -- https://github.com/haskell/c2hs/issues/300
-package hswm
-  c2hs-options: -C -std=gnu18
+--package hswm
+--  c2hs-options: -C -std=gnu18

@@ -9,7 +9,7 @@ version:            0.1.0.0
 license:            MIT
 license-file:       LICENSE
 author:             Samuli Thomasson
-maintainer:         samuli.thomasson@5gsystems.com
+maintainer:         samuli.thomasson@pm.me
 build-type:         Simple
 extra-source-files:
       cbits/river-input-management-v1-protocol.c
@@ -94,25 +94,39 @@ library
           Generated.Wayland.Util.FunPtr
           Generated.Wayland.Util.Safe
           Generated.Wayland.Util.Unsafe
-          River.Interfaces
+          River.InputManagement
+          River.LayerShell
+          River.LibinputConfig
+          River.Objects
           River.Safe
+          River.WindowManagement
+          River.XkbBindings
+          River.XkbConfig
           Wayland.Client
+          Wayland.Client.Display
           Wayland.Client.Extras
           Wayland.Client.Interface
           Wayland.Client.Internal.TH
           Wayland.Client.Internal.Types
+          Wayland.Client.Objects
     other-modules:
           Paths_hswm_bindings
     autogen-modules:
           Paths_hswm_bindings
     build-depends:
-          base >=4.21.0.0
+          base >=4.21.0.0 && <4.22
         , c-expr-runtime
+        , data-default
         , hs-bindgen-runtime
         , template-haskell
     hs-source-dirs:
           src
-    ghc-options: -Wall -Wunused-packages -fPIC
+    default-extensions:
+          TemplateHaskell
+          TypeFamilies
+          OverloadedStrings
+          DuplicateRecordFields
+    ghc-options: -Wall -Wunused-packages -haddock -fPIC
     include-dirs:
           include
           include/wayland-protocols

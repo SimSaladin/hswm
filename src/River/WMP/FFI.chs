@@ -1,10 +1,17 @@
 -- river-window-manager-protocol-v1
-module River.WMP.FFI where
+module River.WMP.FFI
+  ( module River.WMP.FFI
+  , R.RiverWindow
+  , R.RiverSeat
+  , R.RiverOutput
+  , R.RiverNode
+  ) where
 
 import Foreign
 import Wayland.FFI
 
 import qualified River.Safe as R
+import qualified River.Objects as R
 
 #include "river-window-management-v1-client-protocol.h"
 
@@ -16,51 +23,51 @@ data WindowBorders = WindowBorders
 
 type ClipBox = (Int32, Int32, Int32, Int32)
 
-type RiverOutput = Ptr R.River_output_v1
-type RiverSeat = Ptr R.River_seat_v1
-type RiverWindow = Ptr R.River_window_v1
-type RiverNode = Ptr R.River_node_v1
+--type RiverOutput = Ptr R.River_output_v1
+--type RiverSeat = Ptr R.River_seat_v1
+--type RiverWindow = Ptr R.River_window_v1
+--type RiverNode = Ptr R.River_node_v1
 
-{#pointer *river_window_manager_v1  as RiverWindowManager  newtype #}
-{#pointer *river_pointer_binding_v1 as RiverPointerBinding newtype #}
-{#pointer *river_decoration_v1      as RiverDecoration     newtype #}
-{#pointer *river_shell_surface_v1   as RiverShellSurface   newtype #}
-{#pointer *river_window_manager_v1_listener  as RiverWindowManagerListener newtype#}
-{#pointer *river_window_v1_listener          as WindowListener             newtype#}
-{#pointer *river_output_v1_listener          as RiverOutputListener        newtype#}
-{#pointer *river_seat_v1_listener            as RiverSeatListener          newtype#}
-{#pointer *river_pointer_binding_v1_listener as PointerBindingListener     newtype#}
+-- {#pointer *river_window_manager_v1  as RiverWindowManager  newtype #}
+-- {#pointer *river_pointer_binding_v1 as RiverPointerBinding newtype #}
+-- {#pointer *river_decoration_v1      as RiverDecoration     newtype #}
+-- {#pointer *river_shell_surface_v1   as RiverShellSurface   newtype #}
+-- {#pointer *river_window_manager_v1_listener  as RiverWindowManagerListener newtype#}
+-- {#pointer *river_window_v1_listener          as WindowListener             newtype#}
+-- {#pointer *river_output_v1_listener          as RiverOutputListener        newtype#}
+-- {#pointer *river_seat_v1_listener            as RiverSeatListener          newtype#}
+-- {#pointer *river_pointer_binding_v1_listener as PointerBindingListener     newtype#}
 
-deriving instance Show RiverWindowManager
-deriving instance Show RiverPointerBinding
-deriving instance Show RiverDecoration
-deriving instance Show RiverShellSurface
+-- deriving instance Show RiverWindowManager
+-- deriving instance Show RiverPointerBinding
+-- deriving instance Show RiverDecoration
+-- deriving instance Show RiverShellSurface
+--
+-- deriving instance Eq RiverWindowManager
+-- deriving instance Eq RiverPointerBinding
+-- deriving instance Eq RiverDecoration
+-- deriving instance Eq RiverShellSurface
+--
+-- deriving via (Ptr a) instance Storable RiverWindowManager
+-- deriving via (Ptr a) instance Storable RiverPointerBinding
+-- deriving via (Ptr a) instance Storable RiverDecoration
+-- deriving via (Ptr a) instance Storable RiverShellSurface
 
-deriving instance Eq RiverWindowManager
-deriving instance Eq RiverPointerBinding
-deriving instance Eq RiverDecoration
-deriving instance Eq RiverShellSurface
-
-deriving via (Ptr a) instance Storable RiverWindowManager
-deriving via (Ptr a) instance Storable RiverPointerBinding
-deriving via (Ptr a) instance Storable RiverDecoration
-deriving via (Ptr a) instance Storable RiverShellSurface
-
-instance IsWlProxy RiverWindowManager where toWlProxy (RiverWindowManager p) = WlProxy (castPtr p)
-instance IsWlProxy RiverDecoration where toWlProxy (RiverDecoration p) = WlProxy (castPtr p)
-instance IsWlProxy RiverPointerBinding where toWlProxy (RiverPointerBinding p) = WlProxy (castPtr p)
-instance IsWlProxy RiverShellSurface where toWlProxy (RiverShellSurface p) = WlProxy (castPtr p)
+-- instance IsWlProxy RiverWindowManager where toWlProxy (RiverWindowManager p) = WlProxy (castPtr p)
+-- instance IsWlProxy RiverDecoration where toWlProxy (RiverDecoration p) = WlProxy (castPtr p)
+-- instance IsWlProxy RiverPointerBinding where toWlProxy (RiverPointerBinding p) = WlProxy (castPtr p)
+-- instance IsWlProxy RiverShellSurface where toWlProxy (RiverShellSurface p) = WlProxy (castPtr p)
 
 -- * Imported interfaces
 
-foreign import ccall "&river_window_manager_v1_interface"  river_window_manager_v1_interface  :: WlInterface
-foreign import ccall "&river_window_v1_interface"          river_window_v1_interface          :: WlInterface
-foreign import ccall "&river_decoration_v1_interface"      river_decoration_v1_interface      :: WlInterface
-foreign import ccall "&river_shell_surface_v1_interface"   river_shell_surface_v1_interface   :: WlInterface
-foreign import ccall "&river_node_v1_interface"            river_node_v1_interface            :: WlInterface
-foreign import ccall "&river_output_v1_interface"          river_output_v1_interface          :: WlInterface
-foreign import ccall "&river_seat_v1_interface"            river_seat_v1_interface            :: WlInterface
-foreign import ccall "&river_pointer_binding_v1_interface" river_pointer_binding_v1_interface :: WlInterface
+-- foreign import ccall "&river_window_manager_v1_interface"  river_window_manager_v1_interface  :: WlInterface
+-- foreign import ccall "&river_window_v1_interface"          river_window_v1_interface          :: WlInterface
+-- foreign import ccall "&river_decoration_v1_interface"      river_decoration_v1_interface      :: WlInterface
+-- foreign import ccall "&river_shell_surface_v1_interface"   river_shell_surface_v1_interface   :: WlInterface
+-- foreign import ccall "&river_node_v1_interface"            river_node_v1_interface            :: WlInterface
+-- foreign import ccall "&river_output_v1_interface"          river_output_v1_interface          :: WlInterface
+-- foreign import ccall "&river_seat_v1_interface"            river_seat_v1_interface            :: WlInterface
+-- foreign import ccall "&river_pointer_binding_v1_interface" river_pointer_binding_v1_interface :: WlInterface
 
 -- * Enums
 
@@ -92,8 +99,8 @@ instance Exception RiverWindowManagerException
 
 -- * Misc
 
-invalidWindow :: RiverWindow
-invalidWindow = nullPtr
+invalidWindow :: R.RiverWindow
+invalidWindow = R.RiverWindow nullPtr
 
-invalidSeat :: RiverSeat
-invalidSeat = castPtr $ nullPtr
+invalidSeat :: R.RiverSeat
+invalidSeat = R.RiverSeat nullPtr

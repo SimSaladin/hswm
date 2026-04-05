@@ -17,6 +17,9 @@ common deps
     , hswm
     , derive-storable
     , gi-gtk3
+    , text
+    , aeson
+    , bytestring
   pkgconfig-depends: gtk+-3.0
 
 common default-language
@@ -30,8 +33,8 @@ common default-language
 common build-settings
   cpp-options: -DWCFFI_VERSION=2
   cc-options: -DWCFFI_VERSION=2
-  ghc-options: -Wall -Wunused-packages -stubdir stub
-  ghc-shared-options: -dynamic -fPIC -flink-rts
+  ghc-options: -Wall -Wunused-packages -stubdir stub -threaded
+  ghc-shared-options: -fPIC -flink-rts
 
 library
   import: deps, default-language, build-settings

@@ -1,4 +1,6 @@
 {-# OPTIONS_GHC -Wno-ambiguous-fields -Wno-unused-record-wildcards -Wno-name-shadowing #-}
+{-# LANGUAGE MultiWayIf #-}
+
 module Core
   ( module Core
   , module Wayland
@@ -7,123 +9,133 @@ module Core
   ) where
 
 import           HSWM.Core
-import qualified HSWM.StackSet as W
 import           HSWM.Operations
 import qualified HSWM.Outputs as Outputs
 import qualified HSWM.Seats as Seats
+import qualified HSWM.StackSet as W
+import           HSWM.Util.Posix
 import           HSWM.Utils
 import qualified HSWM.Windows as Windows
 import           HSWM.XKB
 
 import           River
 import qualified River.Safe as R
+import qualified River.Objects as R
 import           Wayland
 import qualified Wayland.Client as WL
 import qualified Wayland.Client.Extras as WL
 
 import           Data.IORef
-import qualified Data.TMap as TM
 import           Foreign hiding (new, void)
+import           Foreign.C.Error
 import           System.Exit
 import qualified System.Posix as Posix
+import           System.Timeout
 
-data StopReason = StopReasonNone | StopReasonRestart
-  deriving (Eq, Show)
-
-startHSWM :: (LayoutClass l RiverWindow, Read (l RiverWindow)) => WlDisplay -> HSWMConfig l -> IO ()
+startHSWM :: (LayoutClass l RiverWindow, Read (l RiverWindow)) => Display -> HSWMConfig l -> IO ()
 startHSWM display config = withStdoutLogging $ do
-  conf <- HConf (config { layoutHook = Layout (layoutHook config) }) display <$> newIORef mempty
+  conf <- HConf (config { layoutHook = Layout (layoutHook config) }) display
+    <$> newIORef mempty
+    <*> newEmptyTMVarIO
+    <*> newTQueueIO
+
+  let mainEvent = atomically . writeTQueue conf.eventQueue
+
   initialState <- io (readStateFile config) >>= \case
     Nothing -> return def { windowset = initialWinSet , windowsetOld = initialWinSet }
             where initialWinSet = W.new conf.config.layoutHook config.workspaces [SD 0 0 0 0]
     Just s -> return s
-  stTMVar <- newTMVarIO initialState
+
+  atomically $ putTMVar conf._state initialState
+  let stTMVar = conf._state
+
   let runInH :: H a -> IO a
       runInH a = bracketOnError (atomically $ takeTMVar stTMVar) (atomically . putTMVar stTMVar) $ \st -> do
           (r, st') <- runH conf st a
           atomically $ putTMVar stTMVar st'
           return r
-  runInH $ do
-    xkbConfigL <- getOrCreateObject $ mkRiverXkbConfigV1Listener $ \e -> runInH $ handleWithHook $ XkbConfigEvent e
-    _ <- getOrCreateObject $ mkRiverXkbKeyboardV1Listener $ \e -> runInH $ handleWithHook $ XkbKeyboardEvent e
-    _ <- getOrCreateObject $ mkXkbBindingListener $ \e -> runInH $ handleWithHook $ XkbEvent e
-    _ <- getOrCreateObject $ R.mkRiverXkbBindingsSeatV1Listener $ \e -> runInH $ handleWithHook $ XkbSeatEvent e
-    _ <- getOrCreateObject $ mkPointerBindingListener $ \e -> runInH $ handleWithHook $ PointerEvent e
-    _ <- getOrCreateObject $ mkWindowListener $ \e -> runInH $ handleWithHook $ WindowEvent e
-    _ <- getOrCreateObject $ mkSeatListener $ \e -> runInH $ handleWithHook $ SeatEvent e
-    _ <- getOrCreateObject $ newOutputListener $ \e -> runInH $ handleWithHook $ OutputEvent e
-    _ <- getOrCreateObject $ WL.mkWlOutputListener $ \e -> runInH $ handleWithHook $ WlOutputEvent e
-    _ <- getOrCreateObject $ WL.mkWlShellSurfaceListener $ \e -> runInH $ handleWithHook $ WlShellSurfaceEvent e
-    _ <- getOrCreateObject $ R.mkRiverLayerShellOutputV1Listener $ \e -> runInH $ handleWithHook $ LayerShellOutputEvent e -- R.RiverLayerShellOutputV1Listener
-    _ <- getOrCreateObject $ R.mkRiverLayerShellSeatV1Listener $ \e -> runInH $ handleWithHook $ LayerShellSeatEvent e -- R.RiverLayerShellOutputV1Listener
-    _ <- getOrCreateObject $ R.mkRiverInputDeviceV1Listener $ \e -> runInH $ handleWithHook $ InputDeviceEvent e
-    libinputConfigL <- getOrCreateObject $ R.mkRiverLibinputConfigV1Listener $ \e -> runInH $ handleWithHook $ LibinputConfigEvent e
-    inputManagerL <- getOrCreateObject $ R.mkRiverInputManagerV1Listener $ \e -> runInH $ handleWithHook $ InputManagerEvent e
-    shmL <- getOrCreateObject $ WL.mkWlShmListener $ \e -> runInH $ handleWithHook $ WlShmEvent e
-    managerL <- getOrCreateObject $ mkWindowManagerListener $ \e -> runInH $ handleWithHook $ WindowManagerEvent e
-    regL <- getOrCreateObject $ mkRegistryListener $ \case
-      RegistryGlobal _ registry name iface version -> do
-        log' $ "[globalreg] new registry item: " <> toText iface <> " (" <> tshow name <> ")"
-        modifyIORef conf.globals $ registerGlobal name iface version registry
-      RegistryGlobalRemove _udata _registry name -> do
-        log' $ "[globalreg] registry entry removed: " <> tshow name
-        modifyIORef conf.globals (removeGlobal name)
 
-    registry <- io $ wl_display_get_registry display
-    io $ wl_registry_add_listener registry regL nullPtr
+      handleE e = do
+        r <- timeout 5000000 $ runInH $ handleWithHook e
+        case r of
+          Just r -> return r
+          Nothing -> do
+            warn' $ "handling event timed out: " <> tshow e
+
+  runInH $ do
+    xkbConfigL      <- getOrCreateObject $ R.mkRiverXkbConfigListener        $ \e -> handleE $ XkbConfigEvent e
+    _               <- getOrCreateObject $ R.mkRiverXkbKeyboardListener      $ \e -> handleE $ XkbKeyboardEvent e
+    _               <- getOrCreateObject $ R.mkRiverXkbBindingListener              $ \e -> handleE $ XkbEvent e
+    _               <- getOrCreateObject $ R.mkRiverXkbBindingsSeatListener $ \e -> handleE $ XkbSeatEvent e
+    _               <- getOrCreateObject $ R.mkRiverPointerBindingListener          $ \e -> handleE $ PointerEvent e
+    _               <- getOrCreateObject $ R.mkRiverWindowListener                  $ \e -> handleE $ WindowEvent e
+    _               <- getOrCreateObject $ R.mkRiverSeatListener                    $ \e -> handleE $ SeatEvent e
+    _               <- getOrCreateObject $ R.mkRiverOutputListener                 $ \e -> handleE $ OutputEvent e
+    _               <- getOrCreateObject $ WL.mkOutputListener               $ \e -> handleE $ WlOutputEvent e
+    _               <- getOrCreateObject $ WL.mkShellSurfaceListener         $ \e -> handleE $ WlShellSurfaceEvent e
+    _               <- getOrCreateObject $ R.mkRiverLayerShellOutputListener $ \e -> handleE $ LayerShellOutputEvent e -- R.RiverLayerShellOutputListener
+    _               <- getOrCreateObject $ R.mkRiverLayerShellSeatListener $ \e -> handleE $ LayerShellSeatEvent e -- R.RiverLayerShellOutputListener
+    _               <- getOrCreateObject $ R.mkRiverInputDeviceListener    $ \e -> handleE $ InputDeviceEvent e
+    libinputConfigL <- getOrCreateObject $ R.mkRiverLibinputConfigListener $ \e -> handleE $ LibinputConfigEvent e
+    inputManagerL   <- getOrCreateObject $ R.mkRiverInputManagerListener   $ \e -> handleE $ InputManagerEvent e
+    shmL            <- getOrCreateObject $ WL.mkShmListener                  $ \e -> handleE $ WlShmEvent e
+    managerL        <- getOrCreateObject $ R.mkRiverWindowManagerListener           $ \e -> handleE $ WindowManagerEvent e
+    regL            <- getOrCreateObject $ WL.mkRegistryListener             $ handleRegistryListenerE conf.globals
+
+    registry <- io $ displayGetRegistry display
+    _ <- io $ WL.listenerAdd registry regL nullPtr
 
     -- Wait for one roundtrip for the registry listener to become aware of all current globals.
-    _ <- liftIO $ wl_display_roundtrip display
+    _ <- io $ displayRoundtrip display
 
     -- expect wl_compositor
-    _ <- getOrCreateObject $ requireGlobal conf.globals ("wl_compositor", 4) $ \(WlRegistry r) n v ->
-      io $ WL.wl_registry_bind (castPtr r) n WL.wl_compositor_interface (fi v) >>= return . castPtr @_ @WL.Wl_compositor
+    _ <- getOrCreateObject $ requireGlobal conf.globals ("wl_compositor", 4) $ \r n v ->
+      io $ WL.Compositor <$> WL.registryBind r n WL.compositorInterface (fi v)
 
     -- expect wl_shm
-    wl_shm <- getOrCreateObject $ requireGlobal conf.globals ("wl_shm", 1) $ \(WlRegistry r) n v ->
-      io $ WL.wl_registry_bind (castPtr r) n WL.wl_shm_interface (fi v) >>= \p -> return (castPtr p :: Ptr WL.Wl_shm)
-    _ <- io $ WL.wl_shm_add_listener wl_shm shmL nullPtr
+    wl_shm <- getOrCreateObject $ requireGlobal conf.globals ("wl_shm", 1) $ \r n v ->
+      io $ WL.Shm <$> WL.registryBind r n WL.shmInterface (fi v)
+    _ <- io $ WL.listenerAdd wl_shm shmL nullPtr
 
-    inputManager <- getOrCreateObject $ requireGlobal conf.globals ("river_input_manager_v1", 1) $ \(WlRegistry r) n v ->
-      WL.wl_registry_bind (castPtr r) n R.river_input_manager_v1_interface (fi v) >>= \p -> return (castPtr p :: R.RiverInputManagerV1)
-    _ <- io $ R.river_input_manager_v1_add_listener inputManager inputManagerL nullPtr
+    inputManager <- getOrCreateObject $ requireGlobal conf.globals ("river_input_manager_v1", 1) $ \r n v ->
+      WL.registryBind r n R.riverInputManagerInterface (fi v) <&> R.RiverInputManager
+    _ <- io $ R.listenerAdd inputManager inputManagerL nullPtr
 
-    libinputConfig <- getOrCreateObject $ requireGlobal conf.globals ("river_libinput_config_v1", 1) $ \(WlRegistry r) n v ->
-      WL.wl_registry_bind (castPtr r) n R.river_libinput_config_v1_interface (fi v) >>= \p -> return (castPtr p :: R.RiverLibinputConfigV1)
-    _ <- io $ R.river_libinput_config_v1_add_listener libinputConfig libinputConfigL nullPtr
+    libinputConfig <- getOrCreateObject $ requireGlobal conf.globals ("river_libinput_config_v1", 1) $ \r n v ->
+      WL.registryBind r n R.riverLibinputConfigInterface (fi v) <&> R.RiverLibinputConfig
+    _ <- io $ R.listenerAdd libinputConfig libinputConfigL nullPtr
 
-    _ <- getOrCreateObject $ requireGlobal conf.globals ("river_layer_shell_v1", 1) $ \(WlRegistry r) n v ->
-      WL.wl_registry_bind (castPtr r) n R.river_layer_shell_v1_interface (fi v) >>= \p -> return (castPtr p :: R.RiverLayerShellV1)
+    _ <- getOrCreateObject $ requireGlobal conf.globals ("river_layer_shell_v1", 1) $ \r n v ->
+      WL.registryBind r n R.riverLayerShellInterface (fi v) <&> R.RiverLayerShell
 
-    windowManager <- getOrCreateObject $ requireGlobal conf.globals ("river_window_manager_v1", 4) $ \r n v -> wl_registry_bind r n river_window_manager_v1_interface v <&> RiverWindowManager
+    windowManager <- getOrCreateObject $ requireGlobal conf.globals ("river_window_manager_v1", 4) $ \r n v ->
+      WL.registryBind r n R.riverWindowManagerInterface v <&> R.RiverWindowManager
 
-    _ <- getOrCreateObject $ requireGlobal conf.globals ("river_xkb_bindings_v1"  , 1) $ \(WlRegistry r) n v ->
-      WL.wl_registry_bind (castPtr r) n R.river_xkb_bindings_v1_interface (fi v) >>= \p -> return (castPtr p :: R.RiverXkbBindingsV1)
+    _ <- getOrCreateObject $ requireGlobal conf.globals ("river_xkb_bindings_v1"  , 1) $ \r n v ->
+      WL.registryBind r n R.riverXkbBindingsInterface (fi v) <&> R.RiverXkbBindings
 
-    xkbConfig     <- getOrCreateObject $ requireGlobal conf.globals ("river_xkb_config_v1"    , 1) registryBindRiverXkbConfigV1
-    io $ riverXkbConfigV1AddListener xkbConfig xkbConfigL nullPtr
-    io $ river_window_manager_v1_add_listener windowManager managerL nullPtr
+    xkbConfig <- getOrCreateObject $ requireGlobal conf.globals ("river_xkb_config_v1", 1) $ \r n v ->
+      WL.registryBind r n R.riverXkbConfigInterface (fi v) <&> R.RiverXkbConfig
+    io $ R.listenerAdd xkbConfig xkbConfigL nullPtr
+    io $ R.listenerAdd windowManager managerL nullPtr
 
-    foreignListL <- getOrCreateObject $ WL.mkExtForeignToplevelListV1Listener $ \e -> runInH $ handleWithHook $ ForeignTopLevelListV1 e
-    _ <- getOrCreateObject $ WL.mkExtForeignToplevelHandleV1Listener $ \e -> runInH $ handleWithHook $ ForeignTopLevelHandleV1 e
-    foreignList <- getOrCreateObject $ requireGlobal conf.globals ("ext_foreign_toplevel_list_v1", 1) $ \(WlRegistry r) n v ->
-      WL.wl_registry_bind (castPtr r) n WL.ext_foreign_toplevel_list_v1_interface (fi v) >>= return . castPtr @_ @WL.Ext_foreign_toplevel_list_v1
+    foreignListL <- getOrCreateObject $ WL.mkExtForeignToplevelListV1Listener $ \e -> handleE $ ForeignTopLevelListV1 e
+    _            <- getOrCreateObject $ WL.mkExtForeignToplevelHandleV1Listener $ \e -> handleE $ ForeignTopLevelHandleV1 e
+    foreignList  <- getOrCreateObject $ requireGlobal conf.globals ("ext_foreign_toplevel_list_v1", 1) $ \r n v ->
+      WL.registryBind r n WL.ext_foreign_toplevel_list_v1_interface (fi v) >>= return . castPtr @_ @WL.Ext_foreign_toplevel_list_v1
     _ <- io $ WL.ext_foreign_toplevel_list_v1_add_listener foreignList foreignListL nullPtr
 
     log' "WM: running startup hooks"
     userCodeDef () (startupHook config)
 
-  _ <- Posix.installHandler Posix.sigTERM (Posix.CatchInfo $ \_ -> log' "TERM" >> exitFailure) Nothing
-  _ <- Posix.installHandler Posix.sigINT  (Posix.CatchInfo $ \_ -> log' "INT"  >> exitSuccess) Nothing
-  _ <- Posix.installHandler Posix.sigQUIT (Posix.CatchInfo $ \_ -> log' "QUIT" >> exitFailure) Nothing
+  log' "WM: Installing signal handlers..."
+  _ <- Posix.installHandler Posix.sigTERM (Posix.CatchInfo $ \_ -> mainEvent $ MainExit "TERM") Nothing
+  _ <- Posix.installHandler Posix.sigINT  (Posix.CatchInfo $ \_ -> mainEvent $ MainExit "INT") Nothing
+  _ <- Posix.installHandler Posix.sigQUIT (Posix.CatchInfo $ \_ -> mainEvent $ MainExit "QUIT") Nothing
   _ <- Posix.installHandler Posix.sigUSR2 (Posix.Catch $ do
-    log' "USR2 - reload / restart"
-    runInH $ do
-      io . riverWindowManagerStop =<< getObject
-      modifyWlObjects $ TM.insert StopReasonRestart
-      void $ userCode (exitHook config)
-    log' "RESTART"
-    runInH $ restart "hswm"
+        log' "USR2 - reload / restart"
+        prog <- getProgramPath
+        mainEvent $ MainRestart prog
                                           ) Nothing
 
   -- main loop
@@ -133,14 +145,57 @@ startHSWM display config = withStdoutLogging $ do
   -- Upon POLLIN events, call wl_display_dispatch to process incoming events.
   --
   -- To flush outgoing requests, call wl_display_flush.
-  forever $ do
-    res <- wl_display_dispatch display
-    when (res < 0) $ do
-      log' "error: dispatch failed"
-      exitFailure
+
+  waylandFd <- displayGetFd display
+
+  let pollfdWayland = PollFd (Posix.Fd waylandFd) pOLLIN 0
+
+  _ <- forkIO $ withPollFds [pollfdWayland] $ \(fds, fdsLen) -> do
+    let wlPollFd = fds
+        whenRevent fd ev f = do
+          r <- isRevent fd ev
+          when r f
+    forever $ do
+      -- flush outgoing requests
+      -- TODO should catch the IOError errno now
+      r_flush <- displayFlush display
+      errno <- getErrno
+      if | errno == eAGAIN -> setPollEvents wlPollFd (pOLLIN .|. pOLLOUT)
+         | r_flush == -1 -> mainEvent $ MainExit "flush failed"
+         | otherwise -> setPollEvents wlPollFd pOLLIN
+
+      c_poll fds fdsLen PollBlock >>= \case
+        PollError -> mainEvent $ MainExit "main: poll error"
+        PollTimeout -> return ()
+        PollResult n -> do
+          whenRevent wlPollFd pOLLHUP $ mainEvent $ MainExit "disconnected by compositor"
+          whenRevent wlPollFd pOLLIN $ do
+            -- process incoming events
+            res <- displayDispatch display
+            when (res < 0) $ mainEvent $ MainExit "error: dispatch failed"
+
+  let main = do
+        ev <- atomically $ readTQueue conf.eventQueue
+        case ev of
+          MainExit s -> do
+            log' $ "main: exiting: " <> toText s
+            runInH $ userCode config.exitHook
+            exitFailure
+          MainRestart prog -> do
+            log' "[main] restaring"
+            runInH $ restart prog
+  main
 
 ---------------------------------------------------
 -- event handling
+
+handleRegistryListenerE :: IORef RegistryCache -> WL.RegistryEvent -> IO ()
+handleRegistryListenerE ref (WL.RegistryGlobal _ registry name iface version) = do
+    log' $ "[GLOBALS] new registry item: " <> toText iface <> " version=" <> tshow version <> " (" <> tshow name <> ")"
+    modifyIORef ref $ registerGlobal name iface version registry
+handleRegistryListenerE ref (WL.RegistryGlobalRemove _ _ name) = do
+    log' $ "[GLOBALS] registry entry removed: " <> tshow name
+    modifyIORef ref (removeGlobal name)
 
 -- | Runs handleEventHook from the configuration and runs the default handler
 -- function if it returned True.
@@ -151,33 +206,30 @@ handleWithHook e = do
 
 handleEvent :: Event -> H ()
 handleEvent (WindowManagerEvent e) = case e of
-    WindowManagerOutput _ _ out -> Outputs.added out
-    WindowManagerSeat _ _ seat -> Seats.added seat
-    WindowManagerWindow _ _ w -> Windows.added w
+    R.RiverWindowManagerOutput _ _ out -> Outputs.added out
+    R.RiverWindowManagerSeat _ _ seat -> Seats.added seat
+    R.RiverWindowManagerWindow _ _ w -> Windows.added w
 
     -- /manage sequence/
-    WindowManagerManageStart _ wm -> do
+    R.RiverWindowManagerManageStart _ wm -> do
       Outputs.manage >> Seats.manage >> Windows.manage
       void . userCode =<< asks (manageHook . config)
-      io (riverWindowManagerManageFinish wm)
+      io (R.riverWindowManagerManageFinish wm)
 
     -- /render sequence/
-    WindowManagerRenderStart _ wm -> do
+    R.RiverWindowManagerRenderStart _ wm -> do
       Outputs.render >> Seats.render >> Windows.render
       void . userCode =<< asks (renderHook . config)
-      io (riverWindowManagerRenderFinish wm)
+      io (R.riverWindowManagerRenderFinish wm)
 
-    WindowManagerUnavailable{} -> do
+    R.RiverWindowManagerUnavailable{} -> do
       log' "error: another window manager already running"
-      liftIO exitFailure
+      io $ Posix.raiseSignal Posix.sigTERM
 
-    WindowManagerFinished{} -> do
-      withObjectDef StopReasonNone return >>= \case
-        StopReasonRestart -> do
-          log' "river_window_manage_v1 finished, restarting..."
-        StopReasonNone -> do
-          log' "river_window_manage_v1 finished, exiting."
-          io $ Posix.raiseSignal Posix.sigABRT
+    R.RiverWindowManagerFinished _ wm -> do
+      io $ R.objectDestroy wm
+      log' "river_window_manage_v1 finished, exiting."
+      io $ Posix.raiseSignal Posix.sigINT
 
     _ -> return ()
 
@@ -189,36 +241,36 @@ handleEvent (LayerShellSeatEvent e)   = Seats.handleLayerShellSeat e
 handleEvent (WindowEvent e)           = Windows.handleEvent e
 
 -- XKB Keyboard events
-handleEvent (XkbEvent (XkbKeyPressed dt _)) = do
-  xb <- io $ deRefStablePtr (castPtrToStablePtr dt :: StablePtr (XkbBinding SomeAction))
+handleEvent (XkbEvent (R.RiverXkbBindingPressed dt _)) = do
+  xb <- io $ deRefStablePtr (castPtrToStablePtr (castPtr dt) :: StablePtr (XkbBinding SomeAction))
   Seats.execXkbBinding xb
 
 -- unhandled submap keys
-handleEvent (XkbSeatEvent (R.RiverXkbBindingsSeatV1AteUnboundKey dt _)) =
-  modifySeat (castPtr dt) $ \s -> s { pending_action = S_SUBMAP_CANCEL }
+handleEvent (XkbSeatEvent (R.RiverXkbBindingsSeatAteUnboundKey dt _)) =
+  modifySeat (R.RiverSeat $ castPtr dt) $ \s -> s { pending_action = S_SUBMAP_CANCEL }
 
 -- Pointer events
-handleEvent (PointerEvent (PointerPressed dt _bind)) = do
-  xb <- io $ deRefStablePtr (castPtrToStablePtr dt :: StablePtr (PointerBinding SomeAction))
+handleEvent (PointerEvent (R.RiverPointerBindingPressed dt _bind)) = do
+  xb <- io $ deRefStablePtr (castPtrToStablePtr $ castPtr dt :: StablePtr (PointerBinding SomeAction))
   userCodeDef () $ runner xb.action
 
 -- INPUT configuration
 -- Keyboard added
-handleEvent (XkbConfigEvent (XkbConfigXkbKeyboard _ xkbConfig xkbKeyboard)) = do
-  withObject @RiverXkbKeyboardV1Listener $ \l -> io $ riverXkbKeyboardV1AddListener xkbKeyboard l nullPtr
+handleEvent (XkbConfigEvent (R.RiverXkbConfigXkbKeyboard _ xkbConfig xkbKeyboard)) = do
+  withObject @R.RiverXkbKeyboardListener $ \l -> io $ R.listenerAdd xkbKeyboard l nullPtr
   asks (xkbLayout . config) >>= (`whenJust` setKeyboardLayout xkbConfig xkbKeyboard)
 
 -- keyboard is removed
-handleEvent (XkbKeyboardEvent (KeyboardRemoved _ _kbd)) = return () -- TODO
+handleEvent (XkbKeyboardEvent (R.RiverXkbKeyboardRemoved _ _kbd)) = return () -- TODO
 
-handleEvent (InputManagerEvent (R.RiverInputManagerV1InputDevice _ _ dev)) = do
+handleEvent (InputManagerEvent (R.RiverInputManagerInputDevice _ _ dev)) = do
   l <- getObject
-  void $ io $ R.river_input_device_v1_add_listener dev l nullPtr
-  asks (repeatInfo . config) >>= io . (`whenJust` uncurry (R.river_input_device_v1_set_repeat_info dev)) --  repeatRate repeatDelay
+  void $ io $ R.listenerAdd dev l nullPtr
+  asks (repeatInfo . config) >>= io . (`whenJust` uncurry (R.riverInputDeviceSetRepeatInfo dev)) --  repeatRate repeatDelay
 
--- handleEvent (InputDevicEvent (R.RiverInputDeviceV1Type' _ _ inputDevice)) = return ()
+-- handleEvent (InputDevicEvent (R.RiverInputDeviceType' _ _ inputDevice)) = return ()
 
-handleEvent (WlShmEvent (WL.WlShmFormat _ _ fmt)) = log' $ toText $ "shm format: " ++ ppShmFormat (WL.Wl_shm_format $ fi fmt)
+handleEvent (WlShmEvent (WL.ShmFormat _ _ fmt)) = log' $ toText $ "shm format: " ++ ppShmFormat (WL.Wl_shm_format $ fi fmt)
 
 handleEvent (ForeignTopLevelListV1 (WL.ExtForeignToplevelListV1Toplevel _ _ fh)) = do
     l <- getObject
@@ -229,10 +281,9 @@ handleEvent _ = return ()
 
 ----------------------------------------------------------------------------------
 
-setKeyboardLayout :: RiverXkbConfigV1 -> RiverXkbKeyboardV1 -> XkbRuleNames -> H ()
+setKeyboardLayout :: R.RiverXkbConfig -> R.RiverXkbKeyboard -> XkbRuleNames -> H ()
 setKeyboardLayout xkbConfig keyboard layout =
     io (newXkbKeymapFromNames layout) >>= \km ->
     io $ withXkbKeymapFd km $ \fd ->
-    riverXkbConfigV1CreateKeymap xkbConfig (fi fd) RiverXkbConfigV1KeymapFormatTextV1
-    >>= io . riverXkbKeyboardV1SetKeymap keyboard
-
+    R.riverXkbConfigCreateKeymap xkbConfig (fi fd) R.RIVER_XKB_CONFIG_V1_KEYMAP_FORMAT_TEXT_V1 -- RiverXkbConfigKeymapFormatText
+    >>= io . R.riverXkbKeyboardSetKeymap keyboard

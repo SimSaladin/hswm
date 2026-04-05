@@ -26,6 +26,7 @@ import           HSWM.Utils
 import           HSWM.Util.Types
 
 import           River
+import qualified River.Objects as R
 import qualified River.Safe as R
 import           Wayland
 import qualified Wayland.Client as WL
@@ -39,6 +40,7 @@ import           Data.Typeable
 import           Foreign
 import           Foreign.C
 import           System.Exit (ExitCode(..))
+import qualified Data.Aeson as A
 
 -- | User configuration
 data HSWMConfig l = HSWMConfig
@@ -64,10 +66,16 @@ data HSWMConfig l = HSWMConfig
 -- | The read-only window manager state.
 data HConf = HConf
   { config  :: !(HSWMConfig Layout)
-  , display :: !WlDisplay
+  , display :: !Display
     -- | The global objects available through wl_registry.
   , globals :: !(IORef RegistryCache)
+  , _state :: !(TMVar HState)
+  , eventQueue :: !(TQueue MainEvent)
   } deriving (Generic)
+
+data MainEvent = MainRestart FilePath
+               | MainExit String
+               deriving (Eq, Show, Generic)
 
 newtype TypeMap = TypeMap { unTypeMap :: TM.TMap }
   deriving (Show, Generic)
@@ -86,23 +94,23 @@ data HState = HState
   } deriving (Generic, Default)
 
 -- | Mash-up of all River/Wayland generated events
-data Event = WindowManagerEvent !WindowManagerEvent
-           | OutputEvent !OutputEvent
-           | WindowEvent !WindowEvent
-           | SeatEvent !SeatEvent
-           | PointerEvent !PointerEvent
-           | XkbEvent !XkbEvent
-           | XkbSeatEvent !R.RiverXkbBindingsSeatV1Event
-           | XkbConfigEvent !RiverXkbConfigV1Event
-           | XkbKeyboardEvent !RiverXkbKeyboardV1Event
-           | WlOutputEvent !WL.WlOutputEvent
-           | WlShellSurfaceEvent !WL.WlShellSurfaceEvent
-           | WlShmEvent !WL.WlShmEvent
-           | LayerShellOutputEvent !R.RiverLayerShellOutputV1Event
-           | LayerShellSeatEvent !R.RiverLayerShellSeatV1Event
-           | InputManagerEvent !R.RiverInputManagerV1Event
-           | InputDeviceEvent !R.RiverInputDeviceV1Event
-           | LibinputConfigEvent !R.RiverLibinputConfigV1Event
+data Event = WindowManagerEvent !R.RiverWindowManagerEvent
+           | OutputEvent !R.RiverOutputEvent
+           | WindowEvent !R.RiverWindowEvent
+           | SeatEvent !R.RiverSeatEvent
+           | PointerEvent !R.RiverPointerBindingEvent
+           | WlOutputEvent !WL.OutputEvent
+           | WlShellSurfaceEvent !WL.ShellSurfaceEvent
+           | WlShmEvent !WL.ShmEvent
+           | XkbEvent !R.RiverXkbBindingEvent
+           | XkbSeatEvent !R.RiverXkbBindingsSeatEvent
+           | XkbConfigEvent !R.RiverXkbConfigEvent
+           | XkbKeyboardEvent !R.RiverXkbKeyboardEvent
+           | LayerShellOutputEvent !R.RiverLayerShellOutputEvent
+           | LayerShellSeatEvent !R.RiverLayerShellSeatEvent
+           | InputManagerEvent !R.RiverInputManagerEvent
+           | InputDeviceEvent !R.RiverInputDeviceEvent
+           | LibinputConfigEvent !R.RiverLibinputConfigEvent
            | ForeignTopLevelListV1 !WL.ExtForeignToplevelListV1Event
            | ForeignTopLevelHandleV1 !WL.ExtForeignToplevelHandleV1Event
            deriving (Show, Generic)
@@ -116,7 +124,11 @@ type WorkspaceId = String
 -- | Physical screen indices
 newtype ScreenId = S Int
   deriving stock (Eq,Show,Read,Generic)
-  deriving newtype (Ord,Enum,Num,Integral,Real)
+  deriving newtype (Ord,Enum,Num,Integral,Real, A.ToJSON, A.FromJSON)
+
+instance Bounded ScreenId where
+  minBound = S 1
+  maxBound = S maxBound
 
 -- | The output dimensions
 data ScreenDetail = SD { x, y, width, height :: !Int }
@@ -293,6 +305,15 @@ newtype H a = H (ReaderT HConf (StateT HState IO) a)
 runH :: HConf -> HState -> H a -> IO (a, HState)
 runH c st (H a) = runStateT (runReaderT a c) st
 
+withRunInH :: ((H a -> IO a) -> IO b) -> H b
+withRunInH f = do
+  conf <- ask
+  let runInH a = bracketOnError (atomically $ takeTMVar conf._state) (atomically . putTMVar conf._state) $ \st -> do
+        (r, st') <- runH conf st a
+        atomically $ putTMVar conf._state st'
+        return r
+  io $ f runInH
+
 -- a la xmonad
 catchH :: H a -> H a -> H a
 catchH job errcase = do
@@ -327,8 +348,8 @@ instance Default SeatAction where def = S_NONE
 
 data Seat = Seat
   { river_seat                           :: !RiverSeat
-  , river_layer_shell_seat               :: !(Ptr R.River_layer_shell_seat_v1)
-  , xkb_bindings_seat                    :: !R.RiverXkbBindingsSeatV1
+  , river_layer_shell_seat               :: !R.RiverLayerShellSeat
+  , xkb_bindings_seat                    :: !R.RiverXkbBindingsSeat
   --
   , xkb_bindings                         :: [StablePtr (XkbBinding SomeAction)]
   , pointer_bindings                     :: [StablePtr (PointerBinding SomeAction)]
@@ -348,8 +369,8 @@ data Seat = Seat
 
 instance Default Seat where
   def = Seat
-    { river_seat = nullPtr
-    , xkb_bindings_seat = nullPtr
+    { river_seat = def
+    , xkb_bindings_seat = R.RiverXkbBindingsSeat nullPtr
     , removed = False
     , focused = invalidWindow
     , hovered = invalidWindow
@@ -368,7 +389,7 @@ instance Default Seat where
     , pointer_bindings = mempty
     , pending_action = S_NONE
     , submap_pending = Nothing
-    , river_layer_shell_seat = nullPtr
+    , river_layer_shell_seat = R.RiverLayerShellSeat nullPtr
     }
 
 -- XXX: ????
@@ -383,12 +404,12 @@ data Output = Output
   , screen                 :: !ScreenId
   , outputName             :: !String
   , outputDescription      :: !String
-  , river_layerShellOutput :: !(Ptr R.River_layer_shell_output_v1)
+  , river_layerShellOutput :: !R.RiverLayerShellOutput
   , nonExclusive           :: Maybe (Int32, Int32, Int32, Int32) -- x, y, w, h
   } deriving (Show, Generic)
 
 instance Default Output where
-  def = Output nullPtr 0 0 0 0 0 (S (-1)) "" "" nullPtr Nothing
+  def = Output def 0 0 0 0 0 (S (-1)) "" "" (R.RiverLayerShellOutput nullPtr) Nothing
 
 data Window = Window
   { river_window                                 :: !RiverWindow

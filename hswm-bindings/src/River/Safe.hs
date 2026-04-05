@@ -1,6 +1,4 @@
-module River.Safe ( module X) where
-
-import River.Interfaces as X
+module River.Safe (module X) where
 
 import Generated.River.InputManagementV1 as X
 import Generated.River.LayerShellV1 as X

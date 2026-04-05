@@ -18,6 +18,8 @@ import GI.Gtk as Gtk
 import GI.Gtk.Objects.Container as Container
 import Waybar.CFFI.Plugin.Base
 import Waybar.CFFI.Plugin.HSWM qualified as HSWM
+import qualified Data.Aeson as A
+import qualified Data.ByteString as BS
 
 ------------------------------------------------------------------------------
 
@@ -28,7 +30,9 @@ foreign export ccall "plugin_runtime_init" pluginRuntimeInit :: IO ()
 foreign export ccall "plugin_runtime_destroy" pluginRuntimeDestroy :: IO ()
 
 pluginRuntimeInit, pluginRuntimeDestroy :: IO ()
-pluginRuntimeInit = pure ()
+pluginRuntimeInit = do
+  putStrLn "CFFI plugin initialized"
+
 pluginRuntimeDestroy = pure ()
 
 ------------------------------------------------------------------------------
@@ -50,7 +54,9 @@ pluginInit infoPtr cfgEntries cfgEntriesLen = do
   initInfo@InitInfo {wbcffi_module = wbModule} <- peek infoPtr
   configs <- forM [0 .. (fromIntegral cfgEntriesLen - 1)] $ \i -> do
     ConfigEntry pk pv <- peek (plusPtr cfgEntries (i * 2))
-    (,) <$> peekCString pk <*> peekCString pv
+    (k, v) <- (,) <$> peekCString pk <*> BS.packCString pv
+    let Just v' = A.decodeStrict' v :: Maybe A.Value
+    return (k, v')
   wbVersion <- peekCString (waybar_version initInfo)
   rootWidget <- mkGetRootFun (get_root_widget initInfo) (wbcffi_module initInfo) >>= newObject Container.Container
   let queueUpdate = mkQueueUpdate (queue_update initInfo) wbModule
@@ -75,7 +81,9 @@ pluginDeinit p = (deRefStablePtr sp >>= HSWM.instanceDestroy) `E.finally` freeSt
 -- @param instance Module instance data (as returned by `wbcffi_init`)
 -- @param action_name Action name
 pluginUpdate :: Ptr Void -> IO ()
-pluginUpdate p = deRefStablePtr sp >>= HSWM.updateDo
+pluginUpdate p = do
+  putStrLn "[cffip] update"
+  deRefStablePtr sp >>= HSWM.updateDo
   where
     sp = castPtrToStablePtr $ castPtr p
 

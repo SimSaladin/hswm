@@ -27,7 +27,7 @@ import           System.Posix (Fd)
 
 data ImageBufferPool = ImageBufferPool
     { buffers        :: MVar ([ImageBuffer], Int)
-    , wlShm          :: !(Ptr WL.Wl_shm)
+    , wlShm          :: !WL.Shm
     , bufferListener :: !(ConstPtr WL.Wl_buffer_listener)
     } deriving (Generic)
 
@@ -36,18 +36,18 @@ data ImageBuffer = ImageBuffer
     , ptr           :: !(Ptr ())
     , width, height :: !Int
     , size          :: !Int
-    , buf           :: !(Ptr WL.Wl_buffer)
+    , buf           :: !WL.Buffer
     , pixmanImage   :: !(Ptr P.Pixman_image_t)
     , busy          :: !(Ptr Bool)
-    , pool          :: !(Ptr WL.Wl_shm_pool)
+    , pool          :: !WL.ShmPool
     } deriving (Generic)
 
 newImageBufferPool :: H ImageBufferPool
 newImageBufferPool = do
     wlShm <- getObject
     buffers <- io $ newMVar ([], 0)
-    bufferListener <- io $ WL.mkWlBufferListener $ \case
-      WL.WlBufferRelease aUserData _aBuf -> do
+    bufferListener <- io $ WL.mkBufferListener $ \case
+      WL.BufferRelease aUserData _aBuf -> do
         let p = castPtr aUserData :: Ptr Bool
         poke p False
     return ImageBufferPool{..}
@@ -85,13 +85,13 @@ initImageBuffer ImageBufferPool{wlShm = wl_shm, bufferListener = listener} width
         w = width
         h = height
     (fd, ptr) <- createShm (fi size)
-    pool <- io $ WL.wl_shm_create_pool wl_shm (fi fd) (fi size)
-    buf <- io $ WL.wl_shm_pool_create_buffer pool 0 (fi w) (fi h) (fi stride) (fi (WL.WL_SHM_FORMAT_ABGR8888).unwrap)
+    pool <- io $ WL.shmCreatePool wl_shm (fi fd) (fi size)
+    buf <- io $ WL.shmPoolCreateBuffer pool 0 (fi w) (fi h) (fi stride) (fi (WL.WL_SHM_FORMAT_ABGR8888).unwrap)
     -- create pixman image
     pixmanImage <- io $ P.pixman_image_create_bits_no_clear P.PIXMAN_a8r8g8b8 (fi w) (fi h) (castPtr ptr) (fi stride)
     busy <- Foreign.new True
     -- Sets busy = False
-    _ <- io $ WL.wl_buffer_add_listener buf listener (castPtr busy)
+    _ <- io $ {-WL.wl_buffer_add_listener-} WL.listenerAdd buf listener (castPtr busy)
     return ImageBuffer{..}
 
 destroyImageBufferPool :: ImageBufferPool -> IO ()
@@ -100,13 +100,13 @@ destroyImageBufferPool pool = do
       Nothing -> pure ()
       Just (xs, _) -> forM_ xs destroyImageBuffer
     let p = unConstPtr pool.bufferListener
-    WL.freeListener (Proxy :: Proxy WL.WlBufferEvent) =<< peek p
+    WL.freeListener (Proxy :: Proxy WL.BufferEvent) =<< peek p
     free p
 
 destroyImageBuffer :: ImageBuffer -> IO ()
 destroyImageBuffer ibuf = do
-    WL.wl_buffer_destroy ibuf.buf
-    WL.wl_shm_pool_destroy ibuf.pool
+    WL.objectDestroy ibuf.buf
+    WL.objectDestroy ibuf.pool
     _ <- P.pixman_image_unref ibuf.pixmanImage
     munmap ibuf.ptr ibuf.size
     free ibuf.busy

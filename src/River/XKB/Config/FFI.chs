@@ -49,6 +49,7 @@ import Foreign hiding (void)
 import Foreign.C
 
 import Wayland
+import qualified Wayland.Client as WL
 
 #include "river-xkb-config-v1-client-protocol.h"
 
@@ -87,7 +88,8 @@ foreign import ccall "&river_xkb_keymap_v1_interface"   river_xkb_keymap_v1_inte
 foreign import ccall "&river_xkb_keyboard_v1_interface" river_xkb_keyboard_v1_interface :: WlInterface
 
 registryBindRiverXkbConfigV1 :: WlRegistry -> Word32 -> Version -> IO RiverXkbConfigV1
-registryBindRiverXkbConfigV1 registry name version = RiverXkbConfigV1 <$> wl_registry_bind registry name river_xkb_config_v1_interface version
+registryBindRiverXkbConfigV1 registry name version =
+  RiverXkbConfigV1 <$> WL.registryBind registry name river_xkb_config_v1_interface version
 
 -- * River XKB Config
 

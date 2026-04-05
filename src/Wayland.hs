@@ -1,21 +1,15 @@
 module Wayland
   ( module Wayland
   , module Wayland.FFI
+  , module Wayland.Client.Display
   ) where
 
+import           Wayland.Client.Display
 import           Wayland.FFI
 
 import           Data.IORef
 import qualified Data.List as L
 import           Foreign
-import           Foreign.C
-
-openDisplay :: String -> IO WlDisplay
-openDisplay s = do
-  display <- if s == "" then wl_display_connect nullPtr
-                        else withCString s wl_display_connect
-  when (display == nullPtr) $ throwIO WaylandDisplayConnectFailed
-  return display
 
 ------------------------------------------------------------------
 -- Registry tracking

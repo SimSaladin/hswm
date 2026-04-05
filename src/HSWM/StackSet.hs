@@ -110,7 +110,7 @@ new l (wid:wids) (m:ms) | length ms <= length wids
   = StackSet cur visi (map ws unseen) M.empty
   where ws i = Workspace i l Nothing def
         (seen, unseen) = L.splitAt (length ms) wids
-        cur:|visi = Screen (ws wid) 0 m :| [ Screen (ws i) s sd | (i, s, sd) <- zip3 seen [1..] ms ]
+        cur:|visi = Screen (ws wid) 1 m :| [ Screen (ws i) s sd | (i, s, sd) <- zip3 seen [1..] ms ]
                 -- now zip up visibles with their screen id
 new _ _ _ = error "non-positive argument to StackSet.new"
 
@@ -453,12 +453,19 @@ deleteScreen sid s
 
 insertScreen :: (Eq s, i ~ String, Default wd) => l -> s -> sd -> StackSet i l a wd s sd -> StackSet i l a wd s sd
 insertScreen defLayout sid sd s
+    -- change sd of current screen
     | screen (current s) == sid
     = s { current = (current s) { screenDetail = sd } }
 
+    -- change sd of visible screen
+    | Just _ <- L.find (\x -> screen x == sid) (visible s)
+    = s { visible = map (\x -> if screen x == sid then x { screenDetail = sd } else x) (visible s) }
+
+    -- new visible screen showing next hidden workspace
     | a : as <- hidden s
     = s { visible = Screen a sid sd : visible s, hidden = as }
 
+    -- new visible screen, show a new workspace
     | otherwise
     = s { visible = Screen (Workspace  "10" defLayout Nothing def) sid sd : visible s }
 

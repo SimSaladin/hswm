@@ -21,6 +21,7 @@ module River.WMP
 import           HSWM.XKB
 import           River.WMP.FFI
 import           River.WMP.MiscFFI
+import qualified River.Objects as R
 
 import qualified Data.List as L
 import           Foreign
@@ -34,12 +35,12 @@ ppXkbModsKey m ksym =
     ++ [ xkbKeysymToText ksym ]
 
 setNodePosition :: MonadIO m => RiverNode -> Int32 -> Int32 -> m ()
-setNodePosition n x y = liftIO $ river_node_v1_set_position n x y
+setNodePosition n x y = liftIO $ R.riverNodeSetPosition n x y
 
 -- * Pointer Binds
 
 data PointerBinding a = PointerBinding
-  { pointer_binding    :: RiverPointerBinding
+  { pointer_binding    :: R.RiverPointerBinding
   , river_seat         :: RiverSeat
   , action             :: a
   } deriving (Generic)
@@ -48,7 +49,7 @@ instance GStorable (PointerBinding ())
 
 
 newPointerBinding :: (MonadIO m, Show a)
-                  => PointerBindingListener
+                  => R.RiverPointerBindingListener
                   -> RiverSeat
                   -> Modifiers
                   -> Button
@@ -56,14 +57,14 @@ newPointerBinding :: (MonadIO m, Show a)
                   -> m (StablePtr (PointerBinding a))
 newPointerBinding pointerBindingListener seat mods btn action = do
     log' $ "[pointer] binding button: " <> toText (ppXkbModsKey mods btn) <> " " <> tshow action
-    pb' <- liftIO $ river_seat_v1_get_pointer_binding seat (fi btn) (fi mods)
+    pb' <- liftIO $ R.riverSeatGetPointerBinding seat (fi btn) (fi mods)
     dtPtr <- liftIO $ newStablePtr $ PointerBinding pb' seat action
-    liftIO $ river_pointer_binding_v1_add_listener pb' pointerBindingListener (castStablePtrToPtr dtPtr)
-    liftIO $ river_pointer_binding_v1_enable pb'
+    liftIO $ R.listenerAdd pb' pointerBindingListener (castPtr $ castStablePtrToPtr dtPtr)
+    liftIO $ R.riverPointerBindingEnable pb'
     return dtPtr
 
 destroyPointerBinding :: MonadIO m => StablePtr (PointerBinding a) -> m ()
 destroyPointerBinding sptr = do
   pb <- liftIO $ deRefStablePtr sptr
-  liftIO $ river_pointer_binding_v1_destroy pb.pointer_binding
+  liftIO $ R.objectDestroy pb.pointer_binding
   io $ freeStablePtr sptr

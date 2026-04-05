@@ -21,6 +21,7 @@ import           HSWM.Operations
 import qualified HSWM.StackSet as W
 import           HSWM.Utils
 import qualified River.Safe as R
+import qualified River.Objects as R
 
 import           Data.Bits
 import qualified Data.List as L
@@ -41,6 +42,8 @@ data SeatManager = SeatManager
 getSMgr :: H SeatManager
 getSMgr = getOrCreateObject (pure def)
 
+toUserData (R.RiverSeat p) = castPtr p
+
 -- | New seat added
 added :: RiverSeat -> H ()
 added rseat = do
@@ -51,15 +54,15 @@ added rseat = do
   xkbBindingsSeatListener <- getObject
 
   -- add river_seat_listener
-  io $ river_seat_v1_add_listener rseat seatListener nullPtr
+  io $ R.listenerAdd rseat seatListener nullPtr
 
   -- get layer shell seat + add listener
-  layerShellSeat <- io $ R.river_layer_shell_v1_get_seat layerShell (castPtr rseat)
-  _ <- io $ R.river_layer_shell_seat_v1_add_listener layerShellSeat shellSeatListener nullPtr
+  layerShellSeat <- io $ R.riverLayerShellGetSeat layerShell rseat
+  _ <- io $ R.listenerAdd layerShellSeat shellSeatListener nullPtr
 
   -- bind seat bindings
-  bindingsSeat <- io $ R.river_xkb_bindings_v1_get_seat xkbBindings rseat
-  _ <- io $ R.river_xkb_bindings_seat_v1_add_listener bindingsSeat xkbBindingsSeatListener (castPtr rseat)
+  bindingsSeat <- io $ R.riverXkbBindingsGetSeat xkbBindings rseat
+  _ <- io $ R.listenerAdd bindingsSeat xkbBindingsSeatListener (toUserData rseat)
 
   let seat = def
         { river_seat = rseat
@@ -73,44 +76,44 @@ added rseat = do
 ---------------------------------------------------------
 -- * Events
 
-handleEvent :: SeatEvent -> H ()
+handleEvent :: R.RiverSeatEvent -> H ()
 handleEvent e = do
   sm <- getSMgr
   case e of
-    SeatRemoved _ seat -> withSeat seat deleteRemovedSeat
+    R.RiverSeatRemoved _ seat -> withSeat seat deleteRemovedSeat
 
-    SeatEventPointerEnter{..} -> do
+    R.RiverSeatPointerEnter _ seat window -> do
       when (sm.seat_lshell_focus == FocusNone) $ do
         modifySeat seat $ \s -> s { hovered = window }
         modifyWindowSet $ W.focusWindow window -- focus follow mouse
 
-    SeatEventPointerLeave{..}      -> modifySeat seat $ \s -> s { hovered = invalidWindow }
-    SeatEventWindowInteraction{..} -> modifySeat seat $ \s -> s { interacted = window }
-    SeatEventOpDelta{..}           -> modifySeat seat $ \s -> s { op_dx = fromIntegral dx, op_dy = fromIntegral dy }
-    SeatEventOpRelease{..}         -> modifySeat seat $ \s -> s { op_release = True }
+    R.RiverSeatPointerLeave _ seat      -> modifySeat seat $ \s -> s { hovered = invalidWindow }
+    R.RiverSeatWindowInteraction _ seat window -> modifySeat seat $ \s -> s { interacted = window }
+    R.RiverSeatOpDelta _ seat dx dy          -> modifySeat seat $ \s -> s { op_dx = fromIntegral dx, op_dy = fromIntegral dy }
+    R.RiverSeatOpRelease _ seat         -> modifySeat seat $ \s -> s { op_release = True }
 
     -- (SeatWlSeat _ seat name)) = _
 
     _ -> return ()
 
-handleLayerShellSeat :: R.RiverLayerShellSeatV1Event -> H ()
+handleLayerShellSeat :: R.RiverLayerShellSeatEvent -> H ()
 handleLayerShellSeat e = do
   sm <- getSMgr
   newFocus <- case e of
     -- layer shell surface has exclusive focus
-    R.RiverLayerShellSeatV1FocusExclusive    _ _ -> pure $ FocusLayerShell True
+    R.RiverLayerShellSeatFocusExclusive    _ _ -> pure $ FocusLayerShell True
 
     -- layer shell surface wants non-exclusive focus
     -- A layer shell surface will be given non-exclusive keyboard focus at the end
     -- of the manage sequence in which this event is sent. The window manager may want
     -- to update window decorations or similar to indicate that no window is focused.
-    R.RiverLayerShellSeatV1FocusNonExclusive _ _ -> pure $ FocusLayerShell False
+    R.RiverLayerShellSeatFocusNonExclusive _ _ -> pure $ FocusLayerShell False
 
     -- no layer shell surface has focus
     -- No layer shell surface will have keyboard focus at the end
     -- of the manage sequence in which this event is sent. The window
     -- manager may want to return focus to whichever window last had focus, for example.
-    R.RiverLayerShellSeatV1FocusNone         _ _ -> pure $ FocusNone
+    R.RiverLayerShellSeatFocusNone         _ _ -> pure $ FocusNone
   putObject sm { seat_lshell_focus = newFocus }
 
 
@@ -136,17 +139,17 @@ manage1 s = do
       -- make sure next key is devoured
       io $ ensureNextKeyEaten s
       -- disable previous keymap keys
-      io $ mapM_ (deRefStablePtr >=> river_xkb_binding_v1_disable . xkb_binding) $ maybe s.xkb_bindings snd s.submap_pending
+      io $ mapM_ (deRefStablePtr >=> R.riverXkbBindingDisable . xkb_binding) $ maybe s.xkb_bindings snd s.submap_pending
       -- activate sub-keymap keys
-      io $ forM_ subkeys $ deRefStablePtr >=> river_xkb_binding_v1_enable . xkb_binding
+      io $ forM_ subkeys $ deRefStablePtr >=> R.riverXkbBindingEnable . xkb_binding
       -- store submap state
       doS $ \s' -> s' { submap_pending = Just (action, subkeys), pending_action = S_NONE }
 
     S_SUBMAP_CANCEL -> do
       -- disable sub-keymap keys
-      whenJust s.submap_pending $ \(_, subkeys) -> io $ forM_ subkeys $ deRefStablePtr >=> river_xkb_binding_v1_disable . xkb_binding
+      whenJust s.submap_pending $ \(_, subkeys) -> io $ forM_ subkeys $ deRefStablePtr >=> R.riverXkbBindingDisable . xkb_binding
       -- enable main keymap keys
-      io $ forM_ s.xkb_bindings $ deRefStablePtr >=> river_xkb_binding_v1_enable . xkb_binding
+      io $ forM_ s.xkb_bindings $ deRefStablePtr >=> R.riverXkbBindingEnable . xkb_binding
       -- reset state
       doS $ \s' -> s' { submap_pending = Nothing, pending_action = S_NONE }
 
@@ -167,7 +170,7 @@ manage1 s = do
   --       modifySeat s.river_seat $ \x -> x { op = SEAT_OP_NONE, op_window = invalidWindow }
   --   SEAT_OP_RESIZE -> do
   --     when s.op_release $ do
-  --       liftIO $ riverWindowV1InformResizeEnd s.op_window
+  --       liftIO $ riverWindowInformResizeEnd s.op_window
   --       liftIO $ river_seat_v1_op_end s.river_seat
   --       modifySeat s.river_seat $ \x -> x { op = SEAT_OP_NONE, op_window = invalidWindow }
   --     withWindow s.op_window $ \w -> do
@@ -213,7 +216,7 @@ createSeatBindings :: Seat -> H Seat
 createSeatBindings s = do
   kbdListen <- getObject
   binds <- getObject
-  pbListen <- getObject @PointerBindingListener
+  pbListen <- getObject @R.RiverPointerBindingListener
 
   myMod  <- asks (defaultModMask . config) <&> resolveModMask 0
   kBinds <- asks (keyBindings . config)
@@ -245,17 +248,19 @@ createSeatBindings s = do
 --
 -- /manage sequence/
 ensureNextKeyEaten, cancelEnsureNextKeyEaten :: Seat -> IO ()
-ensureNextKeyEaten s = io $ R.river_xkb_bindings_seat_v1_ensure_next_key_eaten s.xkb_bindings_seat
-cancelEnsureNextKeyEaten s = io $ R.river_xkb_bindings_seat_v1_cancel_ensure_next_key_eaten s.xkb_bindings_seat
+ensureNextKeyEaten s = io $ R.riverXkbBindingsSeatEnsureNextKeyEaten s.xkb_bindings_seat
+cancelEnsureNextKeyEaten s = io $ R.riverXkbBindingsSeatCancelEnsureNextKeyEaten s.xkb_bindings_seat
 
 deleteRemovedSeat :: Seat -> H ()
 deleteRemovedSeat s@Seat{} = do
   modify $ \st -> st { _seats = L.filter (\x -> (/= s.river_seat) x.river_seat) (_seats st) }
   forM_ s.xkb_bindings destroyXKBBinding
   forM_ s.pointer_bindings destroyPointerBinding
-  io $ R.river_xkb_bindings_seat_v1_destroy s.xkb_bindings_seat
-  io $ R.river_layer_shell_seat_v1_destroy s.river_layer_shell_seat
-  io $ river_seat_v1_destroy s.river_seat
+  io $ R.objectDestroy s.xkb_bindings_seat
+  io $ R.objectDestroy s.river_layer_shell_seat
+  io $ R.objectDestroy s.river_seat
+
+fromRiverSeat (R.RiverSeat s) = s
 
 execXkbBinding :: XkbBinding SomeAction -> H ()
 execXkbBinding xb = withSeat xb.river_seat $ \s -> do
@@ -285,19 +290,19 @@ seatFocus s w = when (w.river_window /= invalidWindow) $ do
   when (w.river_window /= s.focused) $ setFocus w.river_window -- clearFocus
   modifySeat s.river_seat $ \s' -> s' { focused = w.river_window }
     where
-      setFocus rw = when (rw /= invalidWindow) $ liftIO $ river_seat_v1_focus_window s.river_seat rw
+      setFocus rw = when (rw /= invalidWindow) $ liftIO $ R.riverSeatFocusWindow s.river_seat rw
         -- liftIO $ river_node_v1_place_top w.node
 
 -- | /manage sequence/
 seatClearFocus :: Seat -> H ()
-seatClearFocus s = io $ river_seat_v1_clear_focus s.river_seat
+seatClearFocus s = io $ R.riverSeatClearFocus s.river_seat
 
 seatPointerMove :: RiverSeat -> Window -> H ()
 seatPointerMove sid w = do
   withSeat sid $ \s -> do
     --log' $ "[seatPointerMove] " <> tshow (sid, w)
     seatFocus s w
-    liftIO $ river_seat_v1_op_start_pointer s.river_seat
+    liftIO $ R.riverSeatOpStartPointer s.river_seat
   modifySeat sid $ \s -> s
     { op = SEAT_OP_MOVE
     , op_window = w.river_window
@@ -312,8 +317,8 @@ seatPointerResize sid w edges = do
   withSeat sid $ \s -> do
     -- debug' $ "[seatPointerResize] " <> tshow (sid, w, edges)
     seatFocus s w
-    liftIO $ riverWindowV1InformResizeStart w.river_window
-    liftIO $ river_seat_v1_op_start_pointer s.river_seat
+    liftIO $ R.riverWindowInformResizeStart w.river_window
+    liftIO $ R.riverSeatOpStartPointer s.river_seat
   modifySeat sid $ \s -> s
     { op = SEAT_OP_RESIZE
     , op_window = w.river_window

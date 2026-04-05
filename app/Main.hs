@@ -10,13 +10,9 @@ import qualified HSWM.StackSet as W
 import qualified HSWM.Util.Waybar as WB
 import qualified HSWM.Wallpaper
 import qualified HSWM.Util.IPC as IPC
+import           HSWM.Util.Debug
 
-import qualified Wayland.Client.Extras as WL
-
-import qualified Data.Map as M
 import           Data.Ratio
-import           Foreign
-import           Foreign.C
 
 default ([Char])
 
@@ -54,7 +50,7 @@ main = do
     (def @(HSWMConfig Full))
       { layoutHook      = Tall 1 (3/100) (1/2) ||| Full
       , handleEventHook = debugHook
-      , logHook         = navLogHook
+      , logHook         = navLogHook <> IPC.ipcLogHook
       , xkbLayout       = Just dvpMyLayout
       , pointerBindings = myPointerBinds
       , repeatInfo      = Just (20, 150)
@@ -81,51 +77,16 @@ main = do
     , ("M-r r",         named "RUn cmd" $ launchRofi ["-modes", "run", "-show", "run"])
     , ("M-S-c",         namedA "Kill focused window" $ withFocused manageKill)
     , ("M-S-q",         namedA "Restart" sendRestart)
+    -- , ("M-w", namedA "Switch to screen 1" $ viewScreen 1)
+    , ("M-SemiColon a", namedA "View workspace 1" $ modifyWindowSet $ W.view "1")
+    , ("M-SemiColon b", namedA "View workspace 2" $ modifyWindowSet $ W.view "2")
+    , ("M-SemiColon c", namedA "View workspace 3" $ modifyWindowSet $ W.view "3")
     ]
 
   myPointerBinds =
     [ (("M", _BTN_LEFT),  namedA "Move"    $ return ())
     , (("M", _BTN_RIGHT), namedA "Stretch" $ return ())
     ]
-
-debugHook :: Event -> H All
-debugHook ev
-   | WindowManagerEvent WindowManagerManageStart{} <- ev = mempty
-   | WindowManagerEvent WindowManagerRenderStart{} <- ev = mempty
-   | XkbEvent (XkbKeyPressed dt _)   <- ev = do
-      (xb :: XkbBinding SomeAction) <- liftIO $ deRefStablePtr (castPtrToStablePtr dt)
-      debug' $ toText $ printf "[EH] KEY PRESS ev=%s action=%s" (show ev) (show xb.action)
-      pTrace ev
-      mempty
-
-   | SeatEvent SeatEventPointerPosition{}   <- ev = mempty
-   | SeatEvent e                     <- ev = pTrace e >> mempty
-
-   | OutputEvent e                   <- ev = pTrace e >> mempty
-
-   | WindowEvent WindowDimensions{}  <- ev = mempty
-   | WindowEvent e                   <- ev = pTrace e >> mempty
-
-   | WlOutputEvent _                 <- ev = mempty -- pTrace e >> mempty
-   | XkbKeyboardEvent e              <- ev = pTrace e >> mempty
-   | WindowManagerEvent e            <- ev = pTrace e >> mempty
-   | WlShmEvent _                    <- ev = mempty
-
-   | ForeignTopLevelHandleV1 e <- ev = do
-       io $ case e of
-           WL.ExtForeignToplevelHandleV1Title _ _ cs -> peekCString (unConstPtr cs) >>= \s -> pTrace (e, s)
-           WL.ExtForeignToplevelHandleV1Identifier _ _ cs -> peekCString (unConstPtr cs) >>= \s -> pTrace (e, s)
-           WL.ExtForeignToplevelHandleV1AppId _ _ cs -> peekCString (unConstPtr cs) >>= \s -> pTrace (e, s)
-           _ -> return ()
-       mempty
-
-   | otherwise                             = pTrace ev >> mempty
-
-debugAction :: H ()
-debugAction = do
-  pTrace "[[[ Outputs ]]]" >> gets _outputs >>= mapM_ pTrace
-  pTrace "[[[ Windows ]]]" >> gets _windows >>= mapM_ pTrace . M.elems
-  pTrace "[[[WindowSet]]]" >> gets windowset >>= pTrace
 
 dvpMyLayout :: XkbRuleNames
 dvpMyLayout = XkbRuleNames

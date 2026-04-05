@@ -15,12 +15,13 @@
 ------------------------------------------------------------------------------
 module HSWM.Windows  where
 
-import           HSWM.Core
+import           HSWM.Core hiding (SeatEvent(..), WindowEvent(..), WindowManagerEvent(..))
 import           HSWM.Operations
 import qualified HSWM.StackSet as W
 import qualified HSWM.Seats as Seats
 
 import qualified River.Safe as R
+import qualified River.Objects as R
 
 import qualified Data.Map as M
 import qualified Data.List as L
@@ -30,8 +31,8 @@ added :: RiverWindow -> H ()
 added w = do
   -- setup WL window listener
   window_listener <- getObject
-  liftIO $ river_window_v1_add_listener w window_listener nullPtr
-  nd <- io $ river_window_v1_get_node w
+  liftIO $ R.listenerAdd w window_listener nullPtr
+  nd <- io $ R.riverWindowGetNode w
   let win = def { new = True, river_window = w, node = nd, max_height = maxBound, max_width = maxBound }
   -- insert window to stack and state
   alterWindow w (\_ -> Just win)
@@ -49,21 +50,21 @@ applyManageActions w0 xs0 = doAll w0 xs0 >>= \w' -> return $ Just w' { p_manage_
       let rw = w.river_window
       case a of
           WRequestClose -> do
-              io $ R.river_window_v1_close rw
+              io $ R.riverWindowClose rw
               pure w
           WFullscreenOnScreen ro -> do
-              io $ R.river_window_v1_fullscreen rw ro
-              io $ R.river_window_v1_inform_fullscreen rw
+              io $ R.riverWindowFullscreen rw ro
+              io $ R.riverWindowInformFullscreen rw
               pure w { fullscreen = True }
           WFullscreen -> do
               sid <- gets $ W.screen . W.current . windowset
               withScreenOutput sid $ \o -> do
-                io $ R.river_window_v1_fullscreen rw o.river_output
-                io $ R.river_window_v1_inform_fullscreen rw
+                io $ R.riverWindowFullscreen rw o.river_output
+                io $ R.riverWindowInformFullscreen rw
               pure w { fullscreen = True }
           WExitFullscreen -> do
-              io $ R.river_window_v1_exit_fullscreen rw
-              io $ R.river_window_v1_inform_not_fullscreen rw
+              io $ R.riverWindowExitFullscreen rw
+              io $ R.riverWindowInformNotFullscreen rw
               pure w { fullscreen = False }
           WToggleFullscreen
               | w.fullscreen -> doIt w WExitFullscreen
@@ -148,8 +149,8 @@ render = do
     whenJust w.p_render_pos $ uncurry (setWindowPosition w)
     whenJust w.p_render_border $ setWindowBorder w.river_window
     case w.p_render_place of
-      i | i == R.rIVER_NODE_V1_PLACE_TOP    -> io $ river_node_v1_place_top    w.node
-        | i == R.rIVER_NODE_V1_PLACE_BOTTOM -> io $ river_node_v1_place_bottom w.node
+      i | i == R.rIVER_NODE_V1_PLACE_TOP    -> io $ R.riverNodePlaceTop    w.node
+        | i == R.rIVER_NODE_V1_PLACE_BOTTOM -> io $ R.riverNodePlaceBottom w.node
       _ -> return ()
     whenJust w.p_set_visible $ \viz -> if viz then reveal w.river_window else hide w.river_window
     -- reset pending fields
@@ -167,9 +168,9 @@ setWindowPosition w x y = do
 -- | /manage/
 setInitialManageProperties :: Window -> H ()
 setInitialManageProperties Window{river_window = rw} = do
-  io $ riverWindowV1UseSsd rw
-  io $ riverWindowV1SetCapabilities rw (fi $ foldl' (.|.) 0 $ map fromEnum [Maximize, Fullscreen])
-  io $ riverWindowV1SetTiled rw (fi $ foldl' (.|.) 0 $ map fromEnum [EdgeTop, EdgeBottom, EdgeLeft, EdgeRight])
+  io $ R.riverWindowUseSsd rw
+  io $ R.riverWindowSetCapabilities rw (fi $ foldl' (.|.) 0 $ map fromEnum [Maximize, Fullscreen])
+  io $ R.riverWindowSetTiled rw (fi $ foldl' (.|.) 0 $ map fromEnum [EdgeTop, EdgeBottom, EdgeLeft, EdgeRight])
   bcolor <- asks (normalBorder . config)
   modifyWindow rw $ \s -> s { new = False, p_render_border = Just bcolor }
 
@@ -188,26 +189,26 @@ doRemoveWindow w@Window{} = do
           }
      if op_window seat == w.river_window
         then do
-            liftIO $ river_seat_v1_op_end seat.river_seat
+            liftIO $ R.riverSeatOpEnd seat.river_seat
             return $ seat { op_window = invalidWindow, op = SEAT_OP_NONE }
         else return seat
    modify $ \s -> s { _seats = xs' }
   -- destroy WL references
-  io $ river_node_v1_destroy w.node
-  io $ river_window_v1_destroy w.river_window
+  io $ R.objectDestroy w.node
+  io $ R.objectDestroy w.river_window
 
-handleEvent :: WindowEvent -> H ()
+handleEvent :: R.RiverWindowEvent -> H ()
 handleEvent e = case e of
     -- The window has been closed by the server, perhaps due to an xdg_toplevel.close request or similar.
     -- The server will send no further events on this object and ignore any request other than river_window_v1.destroy made after this event is sent. The client should destroy this object with the river_window_v1.destroy request to free up resources.
-  WindowClosed _ w-> modifyWindow w $ \s -> s { closed = True }
+  R.RiverWindowClosed _ w -> modifyWindow w $ \s -> s { closed = True }
 
   -- properties
-  WindowParent { window, we_parent } -> modifyWindow window $ \s -> s { parent = Just we_parent }
-  WindowAppId { window, we_app_id } -> modifyWindow window $ \s -> s { appId = we_app_id }
-  WindowTitle { window, we_title } -> modifyWindow window $ \s -> s { title = we_title }
-  WindowUnreliablePID{window, we_unreliable_pid} -> modifyWindow window $ \s -> s { unreliablePid = Just we_unreliable_pid }
-  WindowIdentifier { window, we_identifier }-> do
+  R.RiverWindowParent _ window we_parent -> modifyWindow window $ \s -> s { parent = Just we_parent }
+  R.RiverWindowAppId _ window we_app_id -> modifyWindow window $ \s -> s { appId = we_app_id }
+  R.RiverWindowTitle _ window we_title -> modifyWindow window $ \s -> s { title = we_title }
+  R.RiverWindowUnreliablePid _ window we_unreliable_pid -> modifyWindow window $ \s -> s { unreliablePid = Just $ fi we_unreliable_pid }
+  R.RiverWindowIdentifier _ window we_identifier -> do
     modifyWindow window $ \s -> s { identifier = we_identifier }
     let recoverWindow w = do
               modifyWindowSet $ W.mapWindow (\x -> if x == w then window else x) . W.delete window
@@ -215,23 +216,27 @@ handleEvent e = case e of
     gets (M.lookup we_identifier . recoveredWindows) >>= (`whenJust` recoverWindow)
 
   -- updated width + height
-  WindowDimensions{window, we_width, we_height} -> modifyWindow window $ \s -> s { width = fi we_width, height = fi we_height }
+  R.RiverWindowDimensions _ window we_width we_height -> modifyWindow window $ \s -> s { width = fi we_width, height = fi we_height }
 
   -- Hints
-  WindowDecorationHint { window, we_hint } -> modifyWindow window $ \s -> s { decorationHint = Just $ R.River_window_v1_decoration_hint (fi we_hint) }
-  WindowPresentationHint { window, we_hint } -> modifyWindow window $ \s -> s { presentationHint = Just (R.River_output_v1_presentation_mode (fi we_hint)) }
-  WindowDimensionsHint{..}-> modifyWindow window $ \s -> s { min_width = fi we_min_width , min_height = fi we_min_height , max_width = fi we_max_width , max_height = fi we_max_height }
+  R.RiverWindowDecorationHint _ window we_hint -> modifyWindow window $ \s -> s { decorationHint = Just $ R.River_window_v1_decoration_hint (fi we_hint) }
+  R.RiverWindowPresentationHint _ window we_hint -> modifyWindow window $ \s -> s { presentationHint = Just (R.River_output_v1_presentation_mode (fi we_hint)) }
+
+  R.RiverWindowDimensionsHint _ window we_min_width we_min_height we_max_width we_max_height ->
+    modifyWindow window $ \s -> s { min_width = fi we_min_width , min_height = fi we_min_height , max_width = fi we_max_width , max_height = fi we_max_height }
 
   -- fullscreen
-  WindowFullscreenRequested{window, output} -> doManage' (if output == nullPtr then WFullscreen else WFullscreenOnScreen output) window
-  WindowExitFullscreenRequested{window} -> doManage' WExitFullscreen window
+  R.RiverWindowFullscreenRequested _ window output -> doManage' (if output == def then WFullscreen else WFullscreenOnScreen output) window
+  R.RiverWindowExitFullscreenRequested _ window -> doManage' WExitFullscreen window
 
   -- TODO what's this
-  WindowPointerMoveRequested{..}   -> modifyWindow window $ \s -> s { pointer_move_requested = seat }
-  WindowPointerResizeRequested{..} -> modifyWindow window $ \s -> s { pointer_resize_requested = seat, pointer_resize_requested_edges = fromIntegral we_edges }
+  R.RiverWindowPointerMoveRequested _ w seat ->
+    modifyWindow w $ \s -> s { pointer_move_requested = seat }
+  R.RiverWindowPointerResizeRequested _ w seat edges ->
+    modifyWindow w $ \x -> x { pointer_resize_requested = seat, pointer_resize_requested_edges = fromIntegral edges }
 
   -- TODO maximize
-  WindowMaximizeRequested{window =_w} -> return ()
-  WindowUnmaximizeRequested{window =_w} -> return ()
+  R.RiverWindowMaximizeRequested _ _w -> return ()
+  R.RiverWindowUnmaximizeRequested _ _w -> return ()
 
   _ -> return ()

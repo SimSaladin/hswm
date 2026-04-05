@@ -18,19 +18,18 @@ import           HSWM.Core
 import           HSWM.Operations
 import qualified HSWM.StackSet as W
 
-import qualified River.Safe as R
+import qualified River.Objects as R
 import           Wayland
 import qualified Wayland.Client as WL
 
 import qualified Data.List as L
 import qualified Data.Map as M
 import           Foreign
-import           Foreign.C
 
 data OutputManager = OutputManager
   { pending_setup  :: M.Map RiverOutput Output
   , pending_manage :: [Output]
-  , wl_outputs     :: M.Map RiverOutput (Ptr WL.Wl_output)
+  , wl_outputs     :: M.Map RiverOutput WL.Output
   }
   deriving stock Generic
   deriving anyclass Default
@@ -42,10 +41,11 @@ added out = do
 
     -- create layer shell output
     output_listener <- getObject
-    shellOutputListener <- getObject -- @R.RiverLayerShellOutputV1Listener
-    liftIO $ river_output_v1_add_listener out output_listener nullPtr
-    layerShellOutput <- withObject @R.RiverLayerShellV1 $ \shell -> io $ R.river_layer_shell_v1_get_output shell out
-    _ <- io $ R.river_layer_shell_output_v1_add_listener layerShellOutput shellOutputListener (castPtr out)
+    shellOutputListener <- getObject -- @R.RiverLayerShellOutputListener
+    _ <- liftIO $ R.listenerAdd out output_listener nullPtr
+    layerShellOutput <- withObject @R.RiverLayerShell $ \shell ->
+      io $ R.riverLayerShellGetOutput shell out
+    _ <- io $ R.listenerAdd layerShellOutput shellOutputListener (toUserData out)
 
     screenId <- nextScreenId om
 
@@ -60,37 +60,40 @@ added out = do
 ----------------------------------------------------------
 -- * Events
 
-handle :: OutputEvent -> H ()
+handle :: R.RiverOutputEvent -> H ()
 handle e = do
   om <- getOrCreateObject $ pure def
   case e of
-    OutputRemoved _ output -> withOutput output $
+    R.RiverOutputRemoved _ output -> withOutput output $
       \Output{screen, river_layerShellOutput = layerShellOutput } -> do
         -- delete screen from windowset
         modifyWindowSet $ W.deleteScreen screen
         -- delete from list of outputs
         modify $ \s -> s { _outputs = filter (\x -> x.river_output /= output) s._outputs }
         -- destroy layer shell output
-        io $ R.river_layer_shell_output_v1_destroy layerShellOutput
+        io $ R.objectDestroy layerShellOutput
         -- destroy output
-        liftIO $ river_output_v1_destroy output
+        liftIO $ R.objectDestroy output
         -- release wl_output
-        forM_ (M.lookup output om.wl_outputs) $ \p -> io $ WL.wl_output_release p
-    OutputWlOutput _ output name -> do
+        forM_ (M.lookup output om.wl_outputs) $ \p -> io $ WL.outputRelease p
+    R.RiverOutputWlOutput _ output name -> do
       -- bind a wl_output listener
       registry <- asks globals
       wlOutputListener <- getObject
-      wl_output <- requireGlobal registry ("wl_output", 4) $ \(WlRegistry r) _ ver -> io $ WL.wl_registry_bind (castPtr r) name WL.wl_output_interface (fi ver)
-      _ <- io $ WL.wl_output_add_listener (castPtr wl_output) wlOutputListener (castPtr output)
-      putObject om { wl_outputs = M.insert output (castPtr wl_output) $ wl_outputs om }
-    OutputDimensions _ output width height ->
+      wl_output <- requireGlobal registry ("wl_output", 4) $ \r _ ver ->
+        io $ WL.Output <$> WL.registryBind r name WL.outputInterface (fi ver)
+      _ <- io $ WL.listenerAdd wl_output wlOutputListener (toUserData output)
+      putObject om { wl_outputs = M.insert output wl_output $ wl_outputs om }
+    R.RiverOutputDimensions _ output width height ->
       modifyOutput' output $ \x -> (x::Output) { width = fi width, height = fi height }
-    OutputPosition _ output x y ->
+    R.RiverOutputPosition _ output x y ->
       modifyOutput' output $ \a -> a { x = fi x, y = fi y }
 
-handleWlOutput :: WL.WlOutputEvent -> H ()
+toUserData (R.RiverOutput p) = castPtr p
+
+handleWlOutput :: WL.OutputEvent -> H ()
 handleWlOutput e = case e of
-    -- WL.WlOutputGeometry _o _ x y pw ph subpix make_s model_s trans -> do
+    -- WL.OutputGeometry _o _ x y pw ph subpix make_s model_s trans -> do
     --   --make <- io . peekCString $ unConstPtr make_s
     --   --model <- io . peekCString $ unConstPtr model_s
     --   --log' $ "output geometry: " <> tshow ((x, y), (pw, ph), subpix)
@@ -98,31 +101,29 @@ handleWlOutput e = case e of
     --   --  <> " model: " <> toText model
     --   --  <> " transform: " <> tshow trans
 
-    -- WL.WlOutputMode _o _ _flags _w _h _refresh -> return ()
+    -- WL.OutputMode _o _ _flags _w _h _refresh -> return ()
 
-    WL.WlOutputScale o _ i ->
-      modifyOutput' (castPtr o) $ \x -> (x::Output) { scale = i }
+    WL.OutputScale o _ i ->
+      modifyOutput' (R.RiverOutput $ castPtr o) $ \x -> (x::Output) { scale = i }
 
-    WL.WlOutputName o _ ptr -> do
-      name <- io $ peekCString $ unConstPtr ptr
-      modifyOutput' (castPtr o) $ \x -> (x::Output) { outputName = name }
+    WL.OutputName o _ name -> do
+      modifyOutput' (R.RiverOutput $ castPtr o) $ \x -> (x::Output) { outputName = name }
 
-    WL.WlOutputDescription o _ ptr -> do
-      desc <- io $ peekCString $ unConstPtr ptr
-      modifyOutput' (castPtr o) $ \x -> (x::Output) { outputDescription = desc }
+    WL.OutputDescription o _ desc -> do
+      modifyOutput' (R.RiverOutput $ castPtr o) $ \x -> (x::Output) { outputDescription = desc }
 
-    WL.WlOutputDone o _ -> do
+    WL.OutputDone o _ -> do
       om <- getObject
-      forM_ (M.lookup (castPtr o) $ pending_setup om) $ \output ->
-        putObject om { pending_setup = M.delete (castPtr o) (pending_setup om)
+      forM_ (M.lookup (R.RiverOutput $ castPtr o) $ pending_setup om) $ \output ->
+        putObject om { pending_setup = M.delete (R.RiverOutput $ castPtr o) (pending_setup om)
                      , pending_manage = output : pending_manage om }
 
     _ -> mempty
 
-handleLayerShell :: R.RiverLayerShellOutputV1Event -> H ()
+handleLayerShell :: R.RiverLayerShellOutputEvent -> H ()
 handleLayerShell e = case e of
-  R.RiverLayerShellOutputV1NonExclusiveArea ro _ x y w h ->
-    modifyOutput' (castPtr ro) $ \o -> o { nonExclusive = Just (x, y, w, h) }
+  R.RiverLayerShellOutputNonExclusiveArea ro _ x y w h ->
+    modifyOutput' (R.RiverOutput $ castPtr ro) $ \o -> o { nonExclusive = Just (x, y, w, h) }
 
 ----------------------------------------------------------
 -- * Manage
@@ -139,7 +140,7 @@ manage = do
     defLayout <- asks (layoutHook . config)
     modifyWindowSet $ W.insertScreen defLayout output.screen (getScreenDetail output)
 
-    io $ R.river_layer_shell_output_v1_set_default output.river_layerShellOutput
+    io $ R.riverLayerShellOutputSetDefault output.river_layerShellOutput
 
   putObject om { pending_manage = mempty }
 
@@ -155,7 +156,7 @@ render = return ()
 nextScreenId :: OutputManager -> H ScreenId
 nextScreenId om = do
     curOutputs <- gets _outputs
-    case [ i | i <- [S 0..], isNothing $ L.find ((i==) . screen) (curOutputs ++ M.elems om.pending_setup) ] of
+    case [ i | i <- [S 1..], isNothing $ L.find ((i==) . screen) (curOutputs ++ M.elems om.pending_setup) ] of
       i : _ -> return i
       _ -> error "impossible"
 

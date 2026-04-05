@@ -22,6 +22,7 @@ module HSWM.Layout
 import           HSWM.Core
 import qualified HSWM.StackSet as W
 
+import qualified River.Objects as R
 import           Control.Arrow (second, (***))
 import           Prelude hiding (handle)
 
@@ -202,7 +203,7 @@ instance (LayoutClass l a, LayoutClass r a) => LayoutClass (Choose l r) a where
     handleMessage c@(Choose d l r) m | Just ReleaseResources <- fromMessage m =
         join $ liftM2 (choose c d) (handle l ReleaseResources) (handle r ReleaseResources)
 
-    handleMessage c@(Choose d l r) m | Just e@(WindowEvent (WindowClosed{})) <- fromMessage m =
+    handleMessage c@(Choose d l r) m | Just e@(WindowEvent (R.RiverWindowClosed{})) <- fromMessage m =
         join $ liftM2 (choose c d) (handle l e) (handle r e)
 
     handleMessage c@(Choose d l r) m | Just (JumpToLayout desc) <- fromMessage m = do

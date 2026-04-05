@@ -1,5 +1,6 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE PatternSynonyms       #-}
+{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TemplateHaskell       #-}
 
 -- |
@@ -13,59 +14,6 @@ module Wayland.Client.Interface
   --
   ( U.wL_MAX_MESSAGE_SIZE
   , C.wL_MARSHAL_FLAG_DESTROY
-
-  -- * Interfaces (global)
-  --
-  -- For binding to the registry, etc.
-  , wl_display_interface
-  , wl_registry_interface
-  , wl_callback_interface
-  , wl_compositor_interface
-  , wl_shm_pool_interface
-  , wl_shm_interface
-  , wl_buffer_interface
-  , wl_data_offer_interface
-  , wl_data_source_interface
-  , wl_data_device_interface
-  , wl_data_device_manager_interface
-  , wl_shell_interface
-  , wl_shell_surface_interface
-  , wl_surface_interface
-  , wl_seat_interface
-  , wl_pointer_interface
-  , wl_keyboard_interface
-  , wl_touch_interface
-  , wl_output_interface
-  , wl_region_interface
-  , wl_subcompositor_interface
-  , wl_subsurface_interface
-  , wl_fixes_interface
-
-  -- ** Plain values
-
-  , wl_display_interface'
-  , wl_registry_interface'
-  , wl_callback_interface'
-  , wl_compositor_interface'
-  , wl_shm_pool_interface'
-  , wl_shm_interface'
-  , wl_buffer_interface'
-  , wl_data_offer_interface'
-  , wl_data_source_interface'
-  , wl_data_device_interface'
-  , wl_data_device_manager_interface'
-  , wl_shell_interface'
-  , wl_shell_surface_interface'
-  , wl_surface_interface'
-  , wl_seat_interface'
-  , wl_pointer_interface'
-  , wl_keyboard_interface'
-  , wl_touch_interface'
-  , wl_output_interface'
-  , wl_region_interface'
-  , wl_subcompositor_interface'
-  , wl_subsurface_interface'
-  , wl_fixes_interface'
 
   -- * Objects
 
@@ -282,34 +230,4 @@ module Wayland.Client.Interface
   ) where
 
 import qualified Generated.Wayland.Client as C
-import qualified Generated.Wayland.Client.Global as G
-import           Generated.Wayland.Util (Wl_interface)
 import qualified Generated.Wayland.Util as U
-
-import           Wayland.Client.Internal.TH
-
-$(getConstPtrs
-  [ ("wl_display_interface"             , 'G.wl_display_interface            )
-  , ("wl_registry_interface"            , 'G.wl_registry_interface           )
-  , ("wl_callback_interface"            , 'G.wl_callback_interface           )
-  , ("wl_compositor_interface"          , 'G.wl_compositor_interface         )
-  , ("wl_shm_pool_interface"            , 'G.wl_shm_pool_interface           )
-  , ("wl_shm_interface"                 , 'G.wl_shm_interface                )
-  , ("wl_buffer_interface"              , 'G.wl_buffer_interface             )
-  , ("wl_data_offer_interface"          , 'G.wl_data_offer_interface         )
-  , ("wl_data_source_interface"         , 'G.wl_data_source_interface        )
-  , ("wl_data_device_interface"         , 'G.wl_data_device_interface        )
-  , ("wl_data_device_manager_interface" , 'G.wl_data_device_manager_interface)
-  , ("wl_shell_interface"               , 'G.wl_shell_interface              )
-  , ("wl_shell_surface_interface"       , 'G.wl_shell_surface_interface      )
-  , ("wl_surface_interface"             , 'G.wl_surface_interface            )
-  , ("wl_seat_interface"                , 'G.wl_seat_interface               )
-  , ("wl_pointer_interface"             , 'G.wl_pointer_interface            )
-  , ("wl_keyboard_interface"            , 'G.wl_keyboard_interface           )
-  , ("wl_touch_interface"               , 'G.wl_touch_interface              )
-  , ("wl_output_interface"              , 'G.wl_output_interface             )
-  , ("wl_region_interface"              , 'G.wl_region_interface             )
-  , ("wl_subcompositor_interface"       , 'G.wl_subcompositor_interface      )
-  , ("wl_subsurface_interface"          , 'G.wl_subsurface_interface         )
-  , ("wl_fixes_interface"               , 'G.wl_fixes_interface              )
-  ])

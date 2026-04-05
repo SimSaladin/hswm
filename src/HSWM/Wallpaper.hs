@@ -20,8 +20,8 @@ import           HSWM.Core
 
 import qualified Generated.Pixman as P
 import qualified Generated.Pixman.Safe as P
-import qualified Generated.Wayland.Client as WL
 import qualified Wayland.Client as WL
+import qualified River.Objects as R
 
 import qualified Codec.Picture as JP
 import qualified Data.Vector.Storable as V
@@ -37,8 +37,8 @@ data Config = Config
 
 data Surfaces = Surfaces
   { node              :: !RiverNode
-  , wl_surface        :: !(Ptr WL.Wl_surface)
-  , rs_surface        :: !RiverShellSurface
+  , wl_surface        :: !WL.Surface
+  , rs_surface        :: !R.RiverShellSurface
   } deriving (Eq, Show)
 
 data Ctx = Ctx
@@ -77,10 +77,10 @@ wpExitHook :: H ()
 wpExitHook = deinit
 
 wpHandleEventHook :: Event -> H All
-wpHandleEventHook (OutputEvent (OutputDimensions _ _ w h)) = do
+wpHandleEventHook (OutputEvent (R.RiverOutputDimensions _ _ w h)) = do
   io $ modifyMVar_ ctxMVar $ \x -> pure x { pending_render = True, render_width = fi w, render_height = fi h }
   mempty
-wpHandleEventHook (WlOutputEvent WL.WlOutputDone{}) = do
+wpHandleEventHook (WlOutputEvent WL.OutputDone{}) = do
   --deinit
   initOutput
   mempty
@@ -105,10 +105,10 @@ drawImage = do
   Ctx{bufferPool = mPool, surfaces = Just Surfaces{..}, render_width = w, render_height = h, src_image = Just img} <- io $ readMVar ctxMVar
   -- set opaque region
   compositor <- getObject -- @(Ptr WL.Wl_compositor)
-  opaqueRegion <- io $ WL.wl_compositor_create_region compositor
-  io $ WL.wl_region_add opaqueRegion 0 0 w h
-  io $ WL.wl_surface_set_opaque_region wl_surface opaqueRegion
-  io $ WL.wl_region_destroy opaqueRegion
+  opaqueRegion <- io $ WL.compositorCreateRegion compositor
+  io $ WL.regionAdd opaqueRegion 0 0 w h
+  io $ WL.surfaceSetOpaqueRegion wl_surface opaqueRegion
+  io $ WL.objectDestroy opaqueRegion
   case mPool of
     Just bp -> do
       let src_w = JP.imageWidth img
@@ -116,16 +116,16 @@ drawImage = do
           src_stride = src_w * 4
       debug' $ "wallpaper: drawing image w=" <> tshow w <> " h=" <> tshow h
       buf <- io $ BP.nextBuffer bp (fi w) (fi h)
-      io $ river_node_v1_set_position node 0 0
-      io $ river_node_v1_place_bottom node
+      io $ R.riverNodeSetPosition node 0 0
+      io $ R.riverNodePlaceBottom node
       io $ V.unsafeWith (JP.imageData img) $ \bits -> do
         piximg <- P.pixman_image_create_bits P.PIXMAN_a8r8g8b8 (fi src_w) (fi src_h) (castPtr bits) (fi src_stride)
         P.pixman_image_composite32 P.PIXMAN_OP_SRC piximg nullPtr buf.pixmanImage 0 0 0 0 0 0 (fi $ min w $ fi src_w) (fi $ min h $ fi src_h)
         _ <- P.pixman_image_unref piximg
-        riverShellSurfaceSyncNextCommit rs_surface
-        WL.wl_surface_attach wl_surface buf.buf 0 0
-        WL.wl_surface_damage_buffer wl_surface 0 0 (fi w) (fi h)
-        WL.wl_surface_commit wl_surface
+        R.riverShellSurfaceSyncNextCommit rs_surface
+        WL.surfaceAttach wl_surface buf.buf 0 0
+        WL.surfaceDamageBuffer wl_surface 0 0 (fi w) (fi h)
+        WL.surfaceCommit wl_surface
     Nothing -> log' "wallpaper: warning: bufferpool not initialized"
 
 deinit :: H ()
@@ -136,9 +136,9 @@ deinit = do
         case ctx.surfaces of
           Nothing -> return ctx
           Just ss -> do
-            io $ river_node_v1_destroy ss.node
-            io $ riverShellSurfaceV1Destroy ss.rs_surface
-            io $ WL.wl_surface_destroy ss.wl_surface
+            io $ R.objectDestroy ss.node
+            io $ R.objectDestroy ss.rs_surface
+            io $ WL.objectDestroy ss.wl_surface
             return ctx{surfaces = Nothing}
 
 initOutput :: H ()
@@ -152,22 +152,22 @@ initOutput = do
   wm <- getObject
   ss <- case ctx.surfaces of
           Nothing -> do
-            wl_surface <- io $ WL.wl_compositor_create_surface compositor
-            river_shell_surface <- io $ riverWindowManagerGetShellSurface wm wl_surface
-            ss_node <- io $ riverShellSurfaceGetNode river_shell_surface
+            wl_surface <- io $ WL.compositorCreateSurface compositor
+            river_shell_surface <- io $ R.riverWindowManagerGetShellSurface wm wl_surface
+            ss_node <- io $ R.riverShellSurfaceGetNode river_shell_surface
             return $ Surfaces { node = ss_node, wl_surface = wl_surface, rs_surface = river_shell_surface }
           Just ss -> return ss
 
   -- set no input region
-  emptyRegion <- io $ WL.wl_compositor_create_region compositor
-  io $ WL.wl_surface_set_input_region ss.wl_surface emptyRegion
-  io $ WL.wl_region_destroy emptyRegion
+  emptyRegion <- io $ WL.compositorCreateRegion compositor
+  io $ WL.surfaceSetInputRegion ss.wl_surface emptyRegion
+  io $ WL.objectDestroy emptyRegion
 
   -- set opaque region
-  opaqueRegion <- io $ WL.wl_compositor_create_region compositor
-  io $ WL.wl_region_add opaqueRegion 0 0 w h
-  io $ WL.wl_surface_set_opaque_region ss.wl_surface opaqueRegion
-  io $ WL.wl_region_destroy opaqueRegion
+  opaqueRegion <- io $ WL.compositorCreateRegion compositor
+  io $ WL.regionAdd opaqueRegion 0 0 w h
+  io $ WL.surfaceSetOpaqueRegion ss.wl_surface opaqueRegion
+  io $ WL.objectDestroy opaqueRegion
 
   -- update ctx
   io $ modifyMVar_ ctxMVar $ \x -> pure x { pending_render = True, surfaces = Just ss }

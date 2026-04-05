@@ -1,5 +1,4 @@
 {-# LANGUAGE CApiFFI #-}
-{-# LANGUAGE ForeignFunctionInterface #-}
 
 -- |
 -- Module      : Waybar.CFFI.Plugin.Base
@@ -10,7 +9,6 @@
 -- Stability   : unstable
 -- Portability : unportable
 --
--- Longer description of this module.
 module Waybar.CFFI.Plugin.Base
   ( module Waybar.CFFI.Plugin.Base,
     module RXP,
@@ -22,6 +20,7 @@ import Foreign.C as RXP
 import Foreign.Storable.Generic as RXP (GStorable (..))
 import GHC.Generics as RXP (Generic)
 import GI.Gtk.Objects.Container as RXP (Container)
+import qualified Data.Aeson as A
 
 data IConf a = IConf
   { wbModule :: !(Ptr WbcffiModule),
@@ -30,7 +29,7 @@ data IConf a = IConf
     -- | Widget root widget
     rootWidget :: !Container,
     -- | TODO: parse value as JSON
-    configs :: ![(String, String)],
+    configs :: ![(String, A.Value)],
     -- | Queue update to waybar
     queueUpdate :: !(IO ()),
     instanceData :: a
@@ -40,16 +39,16 @@ data IConf a = IConf
 -- | Waybar module information
 data {-# CTYPE "waybar_cffi_module.h" "wbcffi_init_info" #-} InitInfo = InitInfo
   { -- | Private Waybar CFFI module
-    wbcffi_module :: Ptr WbcffiModule,
+    wbcffi_module :: !(Ptr WbcffiModule),
     -- | Waybar version string
-    waybar_version :: CString,
+    waybar_version :: !CString,
     -- | Returns the waybar widget allocated for this module
     -- @param obj Waybar CFFI object pointer
-    get_root_widget :: FunPtr (Ptr WbcffiModule -> IO (Ptr Container)),
+    get_root_widget :: !(FunPtr (Ptr WbcffiModule -> IO (Ptr Container))),
     -- | Queues a request for calling wbcffi_update() on the next GTK main event
     -- loop iteration
     -- @param obj Waybar CFFI object pointer
-    queue_update :: FunPtr (Ptr WbcffiModule -> IO ())
+    queue_update :: !(FunPtr (Ptr WbcffiModule -> IO ()))
   }
   deriving (Generic)
 
@@ -60,9 +59,9 @@ data {-# CTYPE "waybar_cffi_module.h" "wbcffi_module" #-} WbcffiModule deriving 
 -- | Config key-value pair
 data {-# CTYPE "waybar_cffi_module.h" "struct wbcffi_config_entry" #-} ConfigEntry = ConfigEntry
   { -- | Entry key
-    configEntryKey :: CString,
+    configEntryKey :: !CString,
     -- | Entry value. In ver 2 this is json object or json string.
-    configEntryValue :: CString
+    configEntryValue :: !CString
   }
   deriving (Generic)
 

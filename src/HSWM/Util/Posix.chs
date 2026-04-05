@@ -22,6 +22,7 @@ import qualified System.Posix as P
 #include <unistd.h>
 #include <sys/mman.h>
 #include <fcntl.h>
+#include <poll.h>
 
 newMemfd :: String -> IO Fd
 newMemfd name = withCString name $ \c_name ->
@@ -37,3 +38,67 @@ createShm size = do
   ptr <- {#call mmap as _mmap#} nullPtr (fromIntegral size) ({#const PROT_READ#} .|. {#const PROT_WRITE#}) {#const MAP_SHARED#} (fromIntegral fd) 0
   c_fcntl (fi fd) {#const F_ADD_SEALS#} ({#const F_SEAL_GROW#} .|. {#const F_SEAL_SHRINK#} .|. {#const F_SEAL_SEAL#})
   return (fd, ptr)
+
+data PollFd = PollFd
+  { pollfd_fd :: !Fd -- ^ Fd to poll
+  , pollfd_events :: !CShort -- ^ types of events poller cares about
+  , pollfd_revents :: !CShort -- ^ types of events that actually occurred
+  }
+
+-- | There is data to read
+pOLLIN :: CShort
+pOLLIN = {#const POLLIN#}
+
+pOLLOUT :: CShort
+pOLLOUT = {#const POLLOUT#}
+
+-- | Hang up
+pOLLHUP :: CShort
+pOLLHUP = {#const POLLHUP#}
+
+instance Storable PollFd where
+  sizeOf _ = {#sizeof pollfd#}
+  alignment _ = {#alignof pollfd#}
+  peek p = PollFd
+    <$> fmap Fd ({#get pollfd.fd#} p)
+    <*> {#get pollfd.events#} p
+    <*> {#get pollfd.revents#} p
+  poke p (PollFd (Fd fd) events revents) = do
+    {#set pollfd.fd#} p fd
+    {#set pollfd.events#} p events
+    {#set pollfd.revents#} p revents
+
+{#pointer *pollfd as PollFdPtr -> PollFd#}
+
+setPollEvents :: PollFdPtr -> CShort -> IO ()
+setPollEvents p ev = {#set pollfd.events#} p ev
+
+isRevent :: PollFdPtr -> CShort -> IO Bool
+isRevent p ev = do
+  rev <- {#get pollfd.revents#} p
+  return $ rev .&. ev /= 0
+
+data PollResult
+  = PollResult !Int
+  | PollTimeout
+  | PollError
+
+getPollResult :: CInt -> PollResult
+getPollResult 0 = PollTimeout
+getPollResult (-1) = PollError
+getPollResult n = PollResult (fi n)
+
+data PollTimeout = PollBlock | PollWaitMs Int
+
+asPollTimeout :: PollTimeout -> CInt
+asPollTimeout PollBlock = -1
+asPollTimeout (PollWaitMs i) = fi i
+
+{#fun poll as c_poll
+  { `PollFdPtr'
+  , `CULong'
+  , asPollTimeout `PollTimeout'
+  } -> `PollResult' getPollResult#}
+
+withPollFds :: [PollFd] -> ((PollFdPtr, CULong) -> IO a) -> IO a
+withPollFds pollfds f = withArray pollfds $ \p -> f (p, fi $ length pollfds)

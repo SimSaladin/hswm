@@ -37,7 +37,7 @@ waybarStartupHook :: WaybarConfig -> H ()
 waybarStartupHook _ = do
   log' "Starting waybar..."
   st <- getOrCreateObject $ pure (def :: WaybarState)
-  pid <- spawnProcess "waybar" []
+  pid <- spawnProcess "waybar" [ "-l", "debug" ]
   putObject st { wbPID = Just pid }
 
 waybarExitHook :: WaybarConfig -> H ()

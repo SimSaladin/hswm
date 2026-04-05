@@ -23,8 +23,3 @@ import Wayland.Client.Internal.TH
 
 mkInterface ''Ext_foreign_toplevel_list_v1_listener   'G.ext_foreign_toplevel_list_v1_interface
 mkInterface ''Ext_foreign_toplevel_handle_v1_listener 'G.ext_foreign_toplevel_handle_v1_interface
-
-mkListenerEvents
-  [ ''Ext_foreign_toplevel_list_v1_listener
-  , ''Ext_foreign_toplevel_handle_v1_listener
-  ]
