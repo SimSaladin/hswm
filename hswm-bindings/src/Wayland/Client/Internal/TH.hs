@@ -21,6 +21,7 @@ import System.IO.Unsafe (unsafePerformIO)
 import Wayland.Client.Internal.Types
 import Data.Maybe
 import qualified Data.List as L
+import Data.Void
 
 -- * Configuration
 
@@ -107,23 +108,24 @@ riverObj t fns = (wlobj t fns)
   , objTypePrefix = upperFirst $ fromSnailCase $ dropSuffix "_v1" $ nameBase t
   , objHasDestructor = True
   , objEventFieldNamesCommon = [ "userdata", lowerFirst $ fromSnailCase $ dropSuffix "_v1" $ nameBase t ]
-  , objAutoMarshall = Just $ \_ tT -> case tT of
-                                     AppT (ConT pn) (ConT nm)
-                                       | pn == ''Ptr, "Wl_" == take 3 (nameBase nm) ->
-                                         let cN = mkName $ mkConName 3 "" nm
-                                          in return (fromString (nameBase nm)) { fa_type = \_ -> ConT cN, fa_val_in = Just $ \n -> conP cN [varP n], fa_val_out = Just [|$(conE cN)|] }
-                                       | pn == ''Ptr, "River_" == take 6 (nameBase nm) ->
-                                         let cN = mkName $ mkConName 0 "_v1" nm
-                                          in return (fromString (nameBase nm)) { fa_type = \_ -> ConT cN, fa_val_in = Just $ \n -> conP cN [varP n], fa_val_out = Just [|$(conE cN)|] }
+  , objAutoMarshall = Just $ \_ tT ->
+    case tT of
+      AppT (ConT pn) (ConT nm)
+        | pn == ''Ptr, "Wl_" == take 3 (nameBase nm) ->
+          let cN = mkName $ mkConName 3 "" nm
+           in return (fromString (nameBase nm)) { fa_type = \_ -> ConT cN, fa_val_in = Just $ \n -> conP cN [varP n], fa_val_out = Just [|$(conE cN)|] }
+        | pn == ''Ptr, "River_" == take 6 (nameBase nm) ->
+          let cN = mkName $ mkConName 0 "_v1" nm
+           in return (fromString (nameBase nm)) { fa_type = \_ -> ConT cN, fa_val_in = Just $ \n -> conP cN [varP n], fa_val_out = Just [|$(conE cN)|] }
 
-                                     AppT (ConT nIO) (AppT (ConT nPtr) (ConT nm))
-                                       | nIO == ''IO, nPtr == ''Ptr, "Wl_" == take 3 (nameBase nm) ->
-                                         let cN = mkName $ mkConName 3 "" nm
-                                          in return (fromString (nameBase nm)) { fa_type = \_ -> AppT (ConT nIO) (ConT cN), fa_val_out = Just [|return . $(conE cN)|] }
-                                       | nIO == ''IO, nPtr == ''Ptr, "River_" == take 6 (nameBase nm) ->
-                                         let cN = mkName $ mkConName 0 "_v1" nm
-                                          in return (fromString (nameBase nm)) { fa_type = \_ -> AppT (ConT nIO) (ConT cN), fa_val_out = Just [|return . $(conE cN)|] }
-                                     _ -> return $ fromString ""
+      AppT (ConT nIO) (AppT (ConT nPtr) (ConT nm))
+        | nIO == ''IO, nPtr == ''Ptr, "Wl_" == take 3 (nameBase nm) ->
+          let cN = mkName $ mkConName 3 "" nm
+           in return (fromString (nameBase nm)) { fa_type = \_ -> AppT (ConT nIO) (ConT cN), fa_val_out = Just [|return . $(conE cN)|] }
+        | nIO == ''IO, nPtr == ''Ptr, "River_" == take 6 (nameBase nm) ->
+          let cN = mkName $ mkConName 0 "_v1" nm
+           in return (fromString (nameBase nm)) { fa_type = \_ -> AppT (ConT nIO) (ConT cN), fa_val_out = Just [|return . $(conE cN)|] }
+      _ -> return $ fromString ""
   }
 
 mkPtrArg :: String -> Name -> Name -> ObjectFnA
@@ -318,7 +320,7 @@ mkListenerEventNew ObjectCfg {..} listenerTypeName = do
           evName = mkName $ objectName ++ "Event"
       sequence
           -- data FoobarEvent = ...
-        [ dataD (pure []) evName [] Nothing (map (mkEvCon $ mkName objectName) recs)
+        [ dataD (pure []) evName [] Nothing (map mkEvCon recs)
             [derivClause Nothing [conT ''Eq, conT ''Show, conT ''Generic]]
 
         {- mkFoobarListener :: (FoobarEvent -> IO ()) -> IO FoobarListener
@@ -344,22 +346,38 @@ mkListenerEventNew ObjectCfg {..} listenerTypeName = do
             (normalB $ doE [noBindS [|freeHaskellFunPtr $(varE nm)|] | nm <- funNames])
             []
 
-        fieldName eN i _fT
+        fieldName eN i fT
           | Just nm <- objEventFieldNamesCommon L.!? i = return $ mkName nm
           | Just xs <- L.lookup (nameBase eN) objEventFieldNames, Just nm <- xs L.!? (i - length objEventFieldNamesCommon) = return $ mkName nm
-          | otherwise = newName $ "_" ++ nameBase eN ++ "_" ++ show i
+          | otherwise = do
+            oType <- [t|Ptr $(conT objType)|]
+            if fT == oType
+               then return $ mkName $ lowerFirst objTypePrefix
+               else case fT of
+                      ConT nm
+                        | nm `elem` [''Word32,''Int32,''Void] -> return $ mkName $ "_" ++ nameBase nm ++ "_" ++ show i
+                        | otherwise -> return $ mkName $ lowerFirst $ nameBase nm
+                      AppT (ConT nm) (ConT nm')
+                        | nm == ''PtrConst, nm' == ''CChar -> return $ mkName $ "string_" ++ show i
+                        | otherwise -> return $ mkName $ "_" ++ (lowerFirst $ dropPrefix "Wl_" $ nameBase nm')
+                      _ -> return $ mkName $ "_" ++ nameBase eN ++ "_" ++ show i
 
-        mkEvCon :: Name -> (Name, Bang, Type) -> Q Con
-        mkEvCon prefix (evName, _bang, evType) = do
+        mkEvCon :: (Name, Bang, Type) -> Q Con
+        mkEvCon (evName, _bang, evType) = do
+          let prefix = mkName objTypePrefix
           let evConN = mkName $ nameBase prefix ++ upperFirst (fromSnailCase $ nameBase evName)
-          fields <- forM (zip [(0::Int)..] $ getFields evType) $ \(idx, fT) -> do
+          fields' <- forM (zip [(0::Int)..] $ getFields evType) $ \(idx, fT) -> do
             fa <- if | Just doA <- objAutoMarshall -> doA 1 fT
                      -- | Just userA <- of_arguments L.!? idx -> return userA
                      | otherwise -> return $ fromString ""
             fN <- fieldName evName idx (fa_type fa fT)
             return (fT, fa, fN)
-          recC evConN
-            [varBangType fN (bangType (bang noSourceUnpackedness sourceStrict) (pure $ typeTrans $ fa_type fa fT)) | (fT, fa, fN) <- fields]
+          let fields = snd $ foldl (\(used, res) x@(fT,fa,fN) ->
+                if fN `elem` used
+                   then (mkName (nameBase fN ++ "_2") : used, res ++ [(fT,fa,mkName $ nameBase fN ++ "_2")])
+                   else (fN : used, res ++ [x])
+                ) ([],[]) fields'
+          recC evConN [varBangType fN (bangType (bang noSourceUnpackedness sourceStrict) (pure $ typeTrans $ fa_type fa fT)) | (fT, fa, fN) <- fields]
 
         mkListenerFun prefix recs' = do
           handle <- newName "h"

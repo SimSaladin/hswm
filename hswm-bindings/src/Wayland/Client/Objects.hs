@@ -1,3 +1,5 @@
+{-# LANGUAGE DuplicateRecordFields #-}
+
 -- {-# OPTIONS_GHC -ddump-splices -fenable-th-splice-warnings #-}
 
 ------------------------------------------------------------------------------
@@ -37,7 +39,9 @@ mkWlObject $ (wlobj ''U.Wl_array [])
 
 -- * Callback
 mkWlObject $ (wlobj ''C.Wl_callback [])
-  { objHasDestructor = True }
+  { objHasDestructor = True
+  , objEventFieldNames = [("done", ["callback", "callback_data"])]
+  }
 
 -- * Buffer
 mkWlObject $ (wlobj ''C.Wl_buffer [])
@@ -72,7 +76,12 @@ $(mkWlObject $ (wlobj ''C.Wl_registry
       }
     ] }
   ])
-  { objHasDestructor = True })
+  { objHasDestructor = True
+  , objEventFieldNames = [ ("global", ["registry", "name", "iface", "version"])
+                         , ("global_remove", ["registry", "name"])
+                         ]
+  }
+ )
 
 -- * Fixes
 mkWlObject $ (wlobj ''C.Wl_fixes
@@ -104,7 +113,13 @@ mkWlObject $ (wlobj ''C.Wl_surface
   , "set_opaque_region"
     { of_arguments = [ "surface", mkPtrArg "region" ''Region 'Region ] }
   ])
-  { objHasDestructor = True }
+  { objHasDestructor = True
+  , objEventFieldNames = [ ("enter", ["surface", "output"] )
+                         , ("leave", ["surface", "output"] )
+                         , ("preferred_buffer_scale", ["surface"] ) -- XXX
+                         , ("preferred_buffer_transform", ["surface"] )
+                         ]
+  }
 
 -- * Compositor
 mkWlObject $ (wlobj ''C.Wl_compositor
@@ -156,7 +171,9 @@ mkWlObject $ (wlobj ''C.Wl_shm
       , mkIOPtrArg "pool" ''ShmPool 'ShmPool
       ] }
     ])
-  { objHasDestructor = True }
+  { objHasDestructor = True
+  , objEventFieldNames = [ ("format", ["shm", "format"] ) ]
+  }
 
 -- * ShellSurface
 mkWlObject $ (wlobj ''C.Wl_shell_surface
@@ -247,15 +264,6 @@ mkWlObject $ (wlobj ''C.Wl_data_device_manager
   ])
   { objListener = Nothing, objHasDestructor = True }
 
--- * Seat
-mkWlObject $ (wlobj ''C.Wl_seat
-  [ "get_keyboard"
-  , "get_pointer"
-  , "get_touch"
-  , "release"
-  ])
-  { objHasDestructor = True }
-
 -- * Pointer
 mkWlObject $ (wlobj ''C.Wl_pointer
   [ "release"
@@ -274,3 +282,14 @@ mkWlObject $ (wlobj ''C.Wl_touch
   [ "release"
   ])
   { objHasDestructor = True }
+
+-- * Seat
+mkWlObject $ (wlobj ''C.Wl_seat
+  [ "get_keyboard"
+  , "get_pointer"
+  , "get_touch"
+  , "release"
+  ])
+  { objHasDestructor = True
+  , objAutoMarshall = objAutoMarshall (riverObj ''C.Wl_seat [])
+  }

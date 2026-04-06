@@ -1,52 +1,61 @@
 cabal-version: 3.4
-
 -- This file has been generated from package.yaml by hpack version 0.38.3.
 --
 -- see: https://github.com/sol/hpack
-
-name:           waybar-cffi-hs
-version:        0.0.1
-build-type:     Simple
+name: waybar-cffi-hs
+version: 0.0.1
+build-type: Simple
 extra-source-files:
-    cbits/module-init.c
-  , include/waybar_cffi_module.h
+  cbits/module-init.c
+  include/waybar_cffi_module.h
 
 common deps
   build-depends:
-      base >=4.20.2.0
-    , hswm
-    , derive-storable
-    , gi-gtk3
-    , text
-    , aeson
-    , bytestring
+    aeson,
+    base >=4.20.2.0,
+    bytestring,
+    derive-storable,
+    gi-gtk3,
+    hswm,
+    text,
+
   pkgconfig-depends: gtk+-3.0
 
 common default-language
   default-language: GHC2024
   default-extensions:
-      NamedFieldPuns
-      OverloadedLabels
-      OverloadedStrings
-      RecordWildCards
+    NamedFieldPuns
+    OverloadedLabels
+    OverloadedStrings
+    RecordWildCards
 
 common build-settings
   cpp-options: -DWCFFI_VERSION=2
   cc-options: -DWCFFI_VERSION=2
-  ghc-options: -Wall -Wunused-packages -stubdir stub -threaded
-  ghc-shared-options: -fPIC -flink-rts
+  ghc-options:
+    -Wall
+    -Wunused-packages
+    -stubdir
+    stub
+    -threaded
+
+  ghc-shared-options:
+    -fPIC
+    -flink-rts
 
 library
   import: deps, default-language, build-settings
   hs-source-dirs: lib
   exposed-modules:
-      Waybar.CFFI.Plugin
-    , Waybar.CFFI.Plugin.Base
-    , Waybar.CFFI.Plugin.HSWM
+    Waybar.CFFI.Plugin
+    Waybar.CFFI.Plugin.Base
+    Waybar.CFFI.Plugin.HSWM
+
   other-modules:
-      Paths_waybar_cffi_hs
+    Paths_waybar_cffi_hs
+
   autogen-modules:
-      Paths_waybar_cffi_hs
+    Paths_waybar_cffi_hs
 
 foreign-library waybarhaskellplugin
   import: deps, default-language, build-settings
@@ -54,7 +63,8 @@ foreign-library waybarhaskellplugin
   lib-version-info: 1:0:0
   hs-source-dirs: lib
   other-modules:
-      Waybar.CFFI.Plugin
-    , Waybar.CFFI.Plugin.Base
-    , Waybar.CFFI.Plugin.HSWM
+    Waybar.CFFI.Plugin
+    Waybar.CFFI.Plugin.Base
+    Waybar.CFFI.Plugin.HSWM
+
   c-sources: cbits/module-init.c

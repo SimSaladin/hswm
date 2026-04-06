@@ -1,5 +1,6 @@
 {-# LANGUAGE MultiWayIf #-}
 {-# LANGUAGE OverloadedRecordDot #-}
+{-# LANGUAGE RebindableSyntax #-}
 
 -- |
 -- Module      : Waybar.CFFI.Plugin.HSWM
@@ -13,6 +14,8 @@
 -- Longer description of this module.
 module Waybar.CFFI.Plugin.HSWM where
 
+import Prelude
+import Data.String
 import Control.Concurrent
 import Control.Monad
 import GI.Gtk as Gtk
@@ -25,26 +28,30 @@ import Data.Char (isDigit)
 import qualified Data.List as L
 import Data.Maybe
 import Control.Monad.Fix
+import GHC.Records
 
 data ModState = ModState
   { tagWidgets :: [Label]
   , thisOutputName :: !T.Text
   , outputs :: [(T.Text, ScreenId)]
   , workspaces :: !(Maybe ([String], (String, ScreenId, T.Text), [(String, ScreenId, T.Text)]))
+  , curfocus :: Maybe (Word, T.Text)
   }
 
 data MyMod = MyMod
   { -- | GtkBox* container
     topContainer :: !Box,
     workspacesContainer :: !Box,
-    layoutWidget :: !Label,
+    layoutWidget, focusInfoWidget :: !Label,
     stRef :: !(IORef ModState),
     wmThread :: !ThreadId
   }
   deriving (Generic)
 
 connectToWM :: (ProtoMsg -> IO ()) -> IO ()
-connectToWM onMsg = withStderrLogging $ clientRun Nothing onMsg (\_say -> forever $ threadDelay maxBound)
+connectToWM onMsg = withStderrLogging $ do
+  putStrLn "Connecting..."
+  clientRun Nothing onMsg (\_say -> forever $ threadDelay maxBound)
 
 instanceNew :: IConf a -> IO MyMod
 instanceNew iconf@IConf {..} = do
@@ -61,32 +68,34 @@ instanceNew iconf@IConf {..} = do
   workspacesContainer <- boxNew OrientationHorizontal 5
   containerAdd topContainer workspacesContainer
 
-  layoutWidget <- labelNew Nothing
+  layoutWidget <- labelNew (Just "Loading...")
   containerAdd topContainer layoutWidget
 
-  stRef <- newIORef $ ModState [] "" mempty Nothing
+  focusInfoWidget <- labelNew Nothing
+  containerAdd topContainer focusInfoWidget
+
+  stRef <- newIORef $ ModState [] "" mempty Nothing Nothing
 
   mfix $ \myMod -> do
     _ <- forkIO $ updateOutputName iconf myMod
-    wmThread <- forkIO $ do
-      putStrLn "Connecting..."
-      connectToWM (handleMsg iconf myMod)
+    wmThread <- forkIO $ connectToWM (handleMsg iconf myMod)
     return MyMod {..}
 
 handleMsg :: IConf a -> MyMod -> ProtoMsg -> IO ()
-handleMsg _ _ Identify{} = pure ()
-handleMsg _ m OutputInfo{..} = do
-  modifyIORef (stRef m) $ \s -> s { outputs = outputs }
-handleMsg _ m WsInfo{..} = do
+handleMsg _  _ Identify{} = pure ()
+handleMsg _  m OutputInfo{..} = modifyIORef (stRef m) $ \s -> s { outputs }
+handleMsg ic m WsInfo{..} = do
   modifyIORef (stRef m) $ \s -> s { workspaces = Just (wsNames, wsFocused, wsVisible) }
-  updateWorkspaces m
+  queueUpdate ic
+handleMsg ic m FocusedWindow{wId, wTitle} = do
+  modifyIORef (stRef m) $ \s -> s { curfocus = Just (wId, T.pack wTitle) }
+  queueUpdate ic
 handleMsg _ _ msg = putStrLn $ "warn: unhandled incoming message: " <> show msg
 
+-- | Wait for the waybar window to be created, then sniff out the assigned screen name.
 updateOutputName :: IConf a -> MyMod -> IO ()
-updateOutputName _ m = do
-  -- wait for the window to be created
+updateOutputName ic m = do
   threadDelay 1000000
-  -- figure out the output name of this bar instance
   rootPath <- widgetGetPath (topContainer m)
   classes <- widgetPathIterListClasses rootPath 0
   case filter check classes of
@@ -94,7 +103,7 @@ updateOutputName _ m = do
     name : _ -> do
       putStrLn $ "output name detected: " ++ T.unpack name
       modifyIORef (stRef m) $ \s -> s { thisOutputName = name }
-      updateWorkspaces m
+      queueUpdate ic
   where
     check s
       | Just ('-', x) <- T.uncons (T.takeEnd 2 s), Just (n, _) <- T.uncons x = isDigit n
@@ -104,24 +113,21 @@ updateWorkspaces :: MyMod -> IO ()
 updateWorkspaces m = do
   st <- readIORef (stRef m)
   case workspaces st of
-    Nothing -> return ()
+    Nothing -> putStrLn "warn: no workspaces found!"
     Just (tags, (focusedTag, focusedScreen, focusedLayout), visibleTags) -> do
-      let thisScreen = fromMaybe maxBound (L.lookup (thisOutputName st) st.outputs)
 
-      let add tag = do
+      let thisScreen = fromMaybe maxBound (L.lookup (thisOutputName st) st.outputs)
+          add tag = do
             l <- labelNew (Just $ T.pack tag)
             sc <- widgetGetStyleContext l
             styleContextAddClass sc (T.pack "workspace")
             containerAdd (workspacesContainer m) l
+            widgetShow l
             return l
-
-          remove l = do
-            putStrLn "destroying ws label"
-            widgetDestroy l
+          remove = widgetDestroy
 
       -- create new
       newTags <- forM (drop (length (tagWidgets st)) tags) add
-
       -- destroy deleted
       forM_ (drop (length tags) (tagWidgets st)) remove
 
@@ -142,17 +148,24 @@ updateWorkspaces m = do
              styleContextRemoveClass sc (T.pack "visible")
              styleContextRemoveClass sc (T.pack "focused")
 
-      writeIORef (stRef m) st { tagWidgets = tagWidgets' }
+      writeIORef m.stRef st { tagWidgets = tagWidgets' }
+
+updateFocusInfo :: MyMod -> IO ()
+updateFocusInfo MyMod{..} = do
+  st <- readIORef stRef
+  case curfocus st of
+    Just (wId, title) -> labelSetText focusInfoWidget title
+    Nothing -> labelSetText focusInfoWidget ""
 
 instanceDestroy :: IConf MyMod -> IO ()
 instanceDestroy IConf {instanceData = MyMod {..}} = do
-  putStrLn "deinit..."
+  putStrLn "Shutting down.."
   killThread wmThread
   widgetDestroy topContainer
 
 -- | Update the UI
 updateDo :: IConf MyMod -> IO ()
-updateDo IConf{..} = updateWorkspaces instanceData
+updateDo IConf{..} = updateWorkspaces instanceData >> updateFocusInfo instanceData
 
 -- | Handle signal which was propagated by waybar (reload, etc.)
 signalDo :: IConf MyMod -> Int -> IO ()

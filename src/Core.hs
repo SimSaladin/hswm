@@ -66,6 +66,8 @@ startHSWM display config = withStdoutLogging $ do
     shmL            <- getOrCreateObject $ WL.mkShmListener                   $ \e -> handleE $ WlShmEvent e
     _               <- getOrCreateObject $ WL.mkOutputListener                $ \e -> handleE $ WlOutputEvent e
     _               <- getOrCreateObject $ WL.mkShellSurfaceListener          $ \e -> handleE $ WlShellSurfaceEvent e
+    _               <- getOrCreateObject $ WL.mkSeatListener                  $ \e -> handleE $ WlSeatEvent e
+    _               <- getOrCreateObject $ WL.mkKeyboardListener              $ \e -> handleE $ WlKeyboardEvent e
     xkbConfigL      <- getOrCreateObject $ R.mkRiverXkbConfigListener         $ \e -> handleE $ XkbConfigEvent e
     _               <- getOrCreateObject $ R.mkRiverXkbKeyboardListener       $ \e -> handleE $ XkbKeyboardEvent e
     _               <- getOrCreateObject $ R.mkRiverXkbBindingListener        $ \e -> handleE $ XkbEvent e
@@ -78,6 +80,7 @@ startHSWM display config = withStdoutLogging $ do
     _               <- getOrCreateObject $ R.mkRiverLayerShellSeatListener    $ \e -> handleE $ LayerShellSeatEvent e
     _               <- getOrCreateObject $ R.mkRiverInputDeviceListener       $ \e -> handleE $ InputDeviceEvent e
     libinputConfigL <- getOrCreateObject $ R.mkRiverLibinputConfigListener    $ \e -> handleE $ LibinputConfigEvent e
+    libinputDeviceL <- getOrCreateObject $ R.mkRiverLibinputDeviceListener    $ \e -> handleE $ LibinputDeviceEvent e
     inputManagerL   <- getOrCreateObject $ R.mkRiverInputManagerListener      $ \e -> handleE $ InputManagerEvent e
     managerL        <- getOrCreateObject $ R.mkRiverWindowManagerListener     $ \e -> handleE $ WindowManagerEvent e
     foreignListL    <- getOrCreateObject $ WL.mkForeignToplevelListListener   $ \e -> handleE $ ForeignTopLevelListV1 e
@@ -90,24 +93,22 @@ startHSWM display config = withStdoutLogging $ do
     _ <- io $ displayRoundtrip display
 
     -- expect wl_compositor
-    _ <- getOrCreateObject $ requireGlobal conf.globals ("wl_compositor", 4) $ \r n v ->
+    _ <- getOrCreateObject $ requireGlobal conf.globals ("wl_compositor", 6) $ \r n v ->
       WL.Compositor <$> WL.registryBind r n WL.compositorInterface (fi v)
 
     -- expect wl_shm
-    wl_shm <- getOrCreateObject $ requireGlobal conf.globals ("wl_shm", 1) $ \r n v ->
+    wl_shm <- getOrCreateObject $ requireGlobal conf.globals ("wl_shm", 2) $ \r n v ->
       WL.Shm <$> WL.registryBind r n WL.shmInterface (fi v)
 
     io $ WL.listenerAdd wl_shm shmL nullPtr
 
-    inputManager <- getOrCreateObject $ requireGlobal conf.globals ("river_input_manager_v1", 1) $ \r n v ->
-      WL.registryBind r n R.riverInputManagerInterface (fi v) <&> R.RiverInputManager
-
-    io $ R.listenerAdd inputManager inputManagerL nullPtr
-
     libinputConfig <- getOrCreateObject $ requireGlobal conf.globals ("river_libinput_config_v1", 1) $ \r n v ->
       WL.registryBind r n R.riverLibinputConfigInterface (fi v) <&> R.RiverLibinputConfig
-
     io $ R.listenerAdd libinputConfig libinputConfigL nullPtr
+
+    inputManager <- getOrCreateObject $ requireGlobal conf.globals ("river_input_manager_v1", 1) $ \r n v ->
+      WL.registryBind r n R.riverInputManagerInterface (fi v) <&> R.RiverInputManager
+    io $ R.listenerAdd inputManager inputManagerL nullPtr
 
     _ <- getOrCreateObject $ requireGlobal conf.globals ("river_layer_shell_v1", 1) $ \r n v ->
       WL.registryBind r n R.riverLayerShellInterface (fi v) <&> R.RiverLayerShell
@@ -115,7 +116,7 @@ startHSWM display config = withStdoutLogging $ do
     windowManager <- getOrCreateObject $ requireGlobal conf.globals ("river_window_manager_v1", 4) $ \r n v ->
       WL.registryBind r n R.riverWindowManagerInterface v <&> R.RiverWindowManager
 
-    _ <- getOrCreateObject $ requireGlobal conf.globals ("river_xkb_bindings_v1"  , 1) $ \r n v ->
+    _ <- getOrCreateObject $ requireGlobal conf.globals ("river_xkb_bindings_v1", 2) $ \r n v ->
       WL.registryBind r n R.riverXkbBindingsInterface (fi v) <&> R.RiverXkbBindings
 
     xkbConfig <- getOrCreateObject $ requireGlobal conf.globals ("river_xkb_config_v1", 1) $ \r n v ->
@@ -131,6 +132,11 @@ startHSWM display config = withStdoutLogging $ do
 
     log' "WM: running startup hooks"
     userCodeDef () (startupHook config)
+
+    setXCursorTheme
+
+    -- Create an additional seat; useful for testing
+    --io $ R.riverInputManagerCreateSeat inputManager (Just "foobar")
 
   log' "WM: Installing signal handlers..."
   _ <- Posix.installHandler Posix.sigTERM (Posix.Catch $ mainEvent $ MainExit "TERM") Nothing
@@ -183,7 +189,7 @@ startHSWM display config = withStdoutLogging $ do
         case ev of
           MainExit s -> do
             log' $ "main: exiting: " <> toText s
-            runInH $ userCode config.exitHook
+            void $ runInH $ userCode config.exitHook
             exitFailure
           MainRestart prog -> do
             log' "[main] restaring"
@@ -242,21 +248,11 @@ handleEvent (LayerShellOutputEvent e) = Outputs.handleLayerShell e
 handleEvent (WlOutputEvent e)         = Outputs.handleWlOutput e
 handleEvent (SeatEvent e)             = Seats.handleEvent e
 handleEvent (LayerShellSeatEvent e)   = Seats.handleLayerShellSeat e
+handleEvent (WlSeatEvent e)           = Seats.handleWlSeatEvent e
 handleEvent (WindowEvent e)           = Windows.handleEvent e
-
--- XKB Keyboard events
-handleEvent (XkbEvent (R.RiverXkbBindingPressed dt _)) = do
-  xb <- io $ deRefStablePtr (castPtrToStablePtr (castPtr dt) :: StablePtr (XkbBinding SomeAction))
-  Seats.execXkbBinding xb
-
--- unhandled submap keys
-handleEvent (XkbSeatEvent (R.RiverXkbBindingsSeatAteUnboundKey dt _)) =
-  modifySeat (R.RiverSeat $ castPtr dt) $ \s -> s { pending_action = S_SUBMAP_CANCEL }
-
--- Pointer events
-handleEvent (PointerEvent (R.RiverPointerBindingPressed dt _bind)) = do
-  xb <- io $ deRefStablePtr (castPtrToStablePtr $ castPtr dt :: StablePtr (PointerBinding SomeAction))
-  userCodeDef () $ runner xb.action
+handleEvent (XkbEvent e)              = Seats.handleXkbBindingEvent e -- XKB Keyboard events
+handleEvent (XkbSeatEvent e)          = Seats.handleXkbBindingsSeatEvent e -- XKB Keyboard events
+handleEvent (PointerEvent e)          = Seats.handlePointerEvent e -- Pointer events
 
 -- INPUT configuration
 -- Keyboard added
@@ -269,8 +265,9 @@ handleEvent (XkbKeyboardEvent (R.RiverXkbKeyboardRemoved _ _kbd)) = return () --
 
 handleEvent (InputManagerEvent (R.RiverInputManagerInputDevice _ _ dev)) = do
   l <- getObject
-  void $ io $ R.listenerAdd dev l nullPtr
+  io $ R.listenerAdd dev l nullPtr
   asks (repeatInfo . config) >>= io . (`whenJust` uncurry (R.riverInputDeviceSetRepeatInfo dev)) --  repeatRate repeatDelay
+  --io $ R.riverInputDeviceAssignToSeat dev (Just "default")
 
 -- handleEvent (InputDevicEvent (R.RiverInputDeviceType' _ _ inputDevice)) = return ()
 
@@ -278,6 +275,11 @@ handleEvent (ForeignTopLevelListV1 (WL.ForeignToplevelListToplevel _ _ fh)) = do
     l <- getObject
     _ <- io $ WL.listenerAdd fh l nullPtr
     return ()
+
+handleEvent (LibinputConfigEvent (R.RiverLibinputConfigLibinputDevice _ _ dev)) = do
+  l <- getObject
+  io $ WL.listenerAdd dev l nullPtr
+  return ()
 
 handleEvent _ = return ()
 

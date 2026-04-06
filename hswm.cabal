@@ -48,33 +48,39 @@ library
           PackageInfo_hswm
           Paths_hswm
     exposed-modules:
-          Wayland.FFI
-          Wayland
-          River
-          River.WMP
-          River.XKB.Bindings
+          Core
+          HSWM
+          HSWM.Actions.CycleRecentWS
+          HSWM.Actions.CycleWS
+          HSWM.Actions.PhysicalScreens
           HSWM.Actions.WindowNavigation
           HSWM.BufferPool
           HSWM.Config
           HSWM.Core
+          HSWM.Hooks.WorkspaceHistory
+          HSWM.Keyboards
           HSWM.Layout
           HSWM.Main
           HSWM.Operations
           HSWM.Outputs
           HSWM.Seats
           HSWM.StackSet
+          HSWM.Util.Debug
+          HSWM.Util.ExtensibleState
+          HSWM.Util.IPC
           HSWM.Util.Posix
           HSWM.Util.Types
           HSWM.Util.Waybar
-          HSWM.Util.Debug
+          HSWM.Util.WorkspaceCompare
           HSWM.Utils
           HSWM.Wallpaper
           HSWM.Windows
           HSWM.XKB
           HSWM.XKB.FFI
-          HSWM.Util.IPC
-          HSWM
-          Core
+          River
+          River.WMP
+          River.XKB.Bindings
+          Wayland
     autogen-modules:
           PackageInfo_hswm
           Paths_hswm
@@ -85,10 +91,12 @@ library
         , bytestring >=0.12.2 && <0.13
         , containers ==0.7.*
         , data-default >=0.8.0 && <0.9
+        , deepseq
         , derive-storable
         , directory
         , hswm-bindings
         , hswm:hswm-prelude
+        , mtl
         , network
         , pretty-simple
         , text

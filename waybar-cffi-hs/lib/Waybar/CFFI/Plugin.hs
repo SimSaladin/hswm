@@ -82,7 +82,7 @@ pluginDeinit p = (deRefStablePtr sp >>= HSWM.instanceDestroy) `E.finally` freeSt
 -- @param action_name Action name
 pluginUpdate :: Ptr Void -> IO ()
 pluginUpdate p = do
-  putStrLn "[cffip] update"
+  --putStrLn "[cffip] update"
   deRefStablePtr sp >>= HSWM.updateDo
   where
     sp = castPtrToStablePtr $ castPtr p

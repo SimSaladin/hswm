@@ -1,15 +1,17 @@
 module Wayland
   ( module Wayland
-  , module Wayland.FFI
   , module Wayland.Client.Display
   ) where
 
+import           Wayland.Client as WL
 import           Wayland.Client.Display
-import           Wayland.FFI
 
 import           Data.IORef
 import qualified Data.List as L
 import           Foreign
+
+type Version    = Word32
+type WlRegistry = WL.Registry
 
 ------------------------------------------------------------------
 -- Registry tracking

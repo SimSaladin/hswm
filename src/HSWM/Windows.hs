@@ -139,7 +139,6 @@ manage_ = do
        then manageWindowBorder w =<< asks (focusedBorder . config)
        else manageWindowBorder w =<< asks (normalBorder . config)
 
-
   mapM_ manageReveal visible
   setTopFocus
 

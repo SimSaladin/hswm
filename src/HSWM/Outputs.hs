@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -Wno-ambiguous-fields #-}
+
 ------------------------------------------------------------------------------
 -- |
 -- Module      : HSWM.Outputs
@@ -45,7 +46,7 @@ added out = do
     _ <- liftIO $ R.listenerAdd out output_listener nullPtr
     layerShellOutput <- withObject @R.RiverLayerShell $ \shell ->
       io $ R.riverLayerShellGetOutput shell out
-    _ <- io $ R.listenerAdd layerShellOutput shellOutputListener (toUserData out)
+    _ <- io $ R.listenerAdd layerShellOutput shellOutputListener out
 
     screenId <- nextScreenId om
 
@@ -82,14 +83,14 @@ handle e = do
       wlOutputListener <- getObject
       wl_output <- requireGlobal registry ("wl_output", 4) $ \r _ ver ->
         io $ WL.Output <$> WL.registryBind r name WL.outputInterface (fi ver)
-      _ <- io $ WL.listenerAdd wl_output wlOutputListener (toUserData output)
+      _ <- io $ WL.listenerAdd wl_output wlOutputListener output
       putObject om { wl_outputs = M.insert output wl_output $ wl_outputs om }
     R.RiverOutputDimensions _ output width height ->
       modifyOutput' output $ \x -> (x::Output) { width = fi width, height = fi height }
     R.RiverOutputPosition _ output x y ->
       modifyOutput' output $ \a -> a { x = fi x, y = fi y }
 
-toUserData (R.RiverOutput p) = castPtr p
+-- toUserData (R.RiverOutput p) = castPtr p
 
 handleWlOutput :: WL.OutputEvent -> H ()
 handleWlOutput e = case e of

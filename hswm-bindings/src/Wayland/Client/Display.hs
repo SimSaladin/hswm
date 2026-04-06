@@ -7,7 +7,8 @@ import Generated.Wayland.Client.Safe as Safe
 import Wayland.Client.Objects
 import Wayland.Client.Internal.TH
 
-mkWlObject $ wlobj ''Wl_display
+mkWlObject $
+  (wlobj ''Wl_display
   [ "connect"
     { of_nullCheck = True, of_getErrno = True }
   , "connect_to_fd"
@@ -66,7 +67,10 @@ mkWlObject $ wlobj ''Wl_display
   , "set_max_buffer_size"
   , "sync"
     { of_arguments = [ "display", mkIOPtrArg "callback" ''Callback 'Callback ] }
-  ]
+  ])
+    {
+    objEventFieldNames = [("error", ["display", "object_id", "code", "message"]), ("delete_id", ["display", "delete_id"])]
+    }
 
 --
 -- Wl_display_error

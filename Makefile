@@ -7,7 +7,8 @@ HEADERDIR := ./hswm-bindings/include
 CDIR	:= ./hswm-includes/cbits
 
 CLIENT_PROTOS := river-window-management-v1.xml river-xkb-bindings-v1.xml river-xkb-config-v1.xml \
-		   river-input-management-v1.xml river-layer-shell-v1.xml river-libinput-config-v1.xml
+		   river-input-management-v1.xml river-layer-shell-v1.xml river-libinput-config-v1.xml \
+		   input-method-unstable-v2.xml
 SERVER_PROTOS := river-status-unstable-v1.xml
 
 WAYLAND_PROTO_PREFIX	:= $(shell pkg-config wayland-protocols --variable=pkgdatadir)

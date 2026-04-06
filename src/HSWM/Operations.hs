@@ -8,6 +8,7 @@ import Data.Ratio  ((%))
 import qualified River.Safe as R
 import qualified River.Objects as R
 
+import Control.Arrow
 import qualified Data.List as L
 import qualified Data.Map as M
 import           Foreign (IntPtr, intPtrToPtr, ptrToIntPtr)
@@ -50,6 +51,14 @@ doManage' a rw = modifyWindow rw $ \s -> s { p_manage_action = p_manage_action s
 
 doManage :: WindowManageAction -> Window -> H ()
 doManage a w = doManage' a w.river_window
+
+-- XXX  XMonad compat
+windows :: (WindowSet -> WindowSet) -> H ()
+windows = modifyWindowSet
+
+-- | Return workspace visible on screen @sc@, or 'Nothing'.
+screenWorkspace :: ScreenId -> H (Maybe WorkspaceId)
+screenWorkspace sc = withWindowSet $ return . W.lookupWorkspace sc
 
 --------------------------------------------------------------
 
@@ -115,7 +124,11 @@ manageDirty = withObject (io . R.riverWindowManagerManageDirty)
 
 -- | /manage sequence/ focus a window in every seat.
 setFocusH :: RiverWindow -> H ()
-setFocusH rw = mapSeats $ \s -> io $ R.riverSeatFocusWindow s.river_seat rw
+setFocusH rw = mapSeats $ \s -> do
+  io $ R.riverSeatFocusWindow s.river_seat rw
+  withWindow rw $ \w -> do
+    log' "manage: warping pointer!"
+    io $ R.riverSeatPointerWarp s.river_seat (w.x + (w.width `div` 2)) (w.y + (w.height `div` 2))
 
 --------------------------------------------------------------
 
@@ -254,8 +267,6 @@ restart prog = do
       Left (SomeException e) -> hPrint stderr e >> exitFailure
       Right{} -> return ()
 
-rwToIntPtr (R.RiverWindow w) = ptrToIntPtr w
-
 writeStateToFile :: H ()
 writeStateToFile = do
   let path = ".hswm.state"
@@ -264,9 +275,14 @@ writeStateToFile = do
           winIdent w
             | Just win <- L.find (\x -> x.river_window == w) s._windows = (rwToIntPtr w, win.identifier)
             | otherwise = (rwToIntPtr w, "")
-      extState _ = [] -- TODO
+  let maybeShow (t, Right (PersistentExtension ext)) = Just (t, show ext)
+      maybeShow (t, Left str) = Just (t, str)
+      maybeShow _ = Nothing
+      extState = mapMaybe maybeShow . M.toList . extensibleState
   stateData <- gets $ \s -> StateData (wsData s) (extState s)
   catchIO $ writeFile path $ show stateData
+    where
+      rwToIntPtr (R.RiverWindow w) = ptrToIntPtr w
 
 catchIO :: MonadIO m => IO () -> m ()
 catchIO f = io (f `catch` \(SomeException e) -> hPrint stderr e >> hFlush stderr)
@@ -293,12 +309,13 @@ readStateFile xmc = do
           let winset = W.ensureTags layout (workspaces xmc) $
                 W.mapLayout (fromMaybe layout . maybeRead lreads) $
                   W.mapWindow (R.RiverWindow . intPtrToPtr . fst) (sfWins sf)
-              --extState = M.fromList . map (second Left) $ sfExt sf
+              extState = M.fromList . map (second Left) $ sfExt sf
 
           return def
             { windowset = winset
             , windowsetOld = winset
             , recoveredWindows = M.fromList [ (b, R.RiverWindow $ intPtrToPtr a) | (a,b) <- wins ]
+            , extensibleState = extState
             }
   where
     layout = Layout (layoutHook xmc)
@@ -313,11 +330,14 @@ readStateFile xmc = do
 sendRestart :: H ()
 sendRestart = io $ Posix.raiseSignal Posix.sigUSR2
 
+-----------------------------------
 
-
------------------------------------
-
+startSeatOp :: SeatOp -> H ()
 startSeatOp op = modifySeats (const True) $ \seat -> seat { pending_action = S_START_OP op }
+
+seatInputOverride :: String -> H Bool -> [((ModMask, KeySym), H ())] -> H ()
+seatInputOverride seat onempty keys = modifySeats (\s -> s.name == seat) $ \s ->
+  s { pending_action = S_INPUT_OVERRIDE onempty (map (second SomeAction) keys) }
 
 -- | Make a tiled window floating, using its suggested rectangle
 float :: RiverWindow -> H ()
@@ -341,7 +361,7 @@ floatLocation w = go
 
   where go = do
           ws <- gets windowset
-          let bw = fi 2 -- (fromIntegral . wa_border_width) wa
+          let bw = 2 :: Int -- (fromIntegral . wa_border_width) wa
           point_sc <- pointScreen (fi w.x) (fi $ w.y)
 
           -- ignore pointScreen for new windows unless it's the current
@@ -370,9 +390,22 @@ pointScreen :: Position -> Position
 pointScreen x y = withWindowSet $ return . L.find p . W.screens
   where p = pointWithin x y . screenRect . W.screenDetail
 
+screenRect :: ScreenDetail -> Rectangle
 screenRect SD{..} = Rectangle (fi x) (fi y) (fi width) (fi height)
 
 setWindowPosition :: Window -> Int32 -> Int32 -> H ()
 setWindowPosition w x y = do
   setNodePosition w.node x y
-  modifyWindow w.river_window $ \s -> s { x = x, y = y }
+  modifyWindow w.river_window $ \s -> s { x, y }
+
+
+-----------------------------------------------------------------
+-- * Cursor
+
+-- XXX: also set XCURSOR_THEME= ? XCURSOR_PATH= ?
+setXCursorTheme :: H ()
+setXCursorTheme = do
+  let cursorTheme = "Vanilla-DMZ"
+      cursorSize = 24
+  mapSeats $ \seat -> do
+    io $ R.riverSeatSetXcursorTheme seat.river_seat (Just cursorTheme) cursorSize

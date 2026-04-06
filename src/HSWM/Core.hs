@@ -91,29 +91,41 @@ data HState = HState
   , _outputs       :: [Output]
   , _windows       :: M.Map RiverWindow Window
   , recoveredWindows :: !(M.Map String RiverWindow)
+  , extensibleState  :: !(M.Map String (Either String StateExtension))
+  -- ^ stores custom state information.
+  --
+  -- The module "XMonad.Util.ExtensibleState" in xmonad-contrib
+  -- provides additional information and a simple interface for using this.
   } deriving (Generic, Default)
 
 -- | Mash-up of all River/Wayland generated events
-data Event = WindowManagerEvent !R.RiverWindowManagerEvent
-           | OutputEvent !R.RiverOutputEvent
-           | WindowEvent !R.RiverWindowEvent
-           | SeatEvent !R.RiverSeatEvent
-           | PointerEvent !R.RiverPointerBindingEvent
-           | WlOutputEvent !WL.OutputEvent
-           | WlShellSurfaceEvent !WL.ShellSurfaceEvent
-           | WlShmEvent !WL.ShmEvent
-           | XkbEvent !R.RiverXkbBindingEvent
-           | XkbSeatEvent !R.RiverXkbBindingsSeatEvent
-           | XkbConfigEvent !R.RiverXkbConfigEvent
-           | XkbKeyboardEvent !R.RiverXkbKeyboardEvent
-           | LayerShellOutputEvent !R.RiverLayerShellOutputEvent
-           | LayerShellSeatEvent !R.RiverLayerShellSeatEvent
-           | InputManagerEvent !R.RiverInputManagerEvent
-           | InputDeviceEvent !R.RiverInputDeviceEvent
-           | LibinputConfigEvent !R.RiverLibinputConfigEvent
-           | ForeignTopLevelListV1 !WL.ForeignToplevelListEvent
-           | ForeignTopLevelHandleV1 !WL.ForeignToplevelHandleEvent
-           deriving (Show, Generic)
+data Event
+  -- River_*
+  = WindowManagerEvent !R.RiverWindowManagerEvent
+  | OutputEvent !R.RiverOutputEvent
+  | WindowEvent !R.RiverWindowEvent
+  | SeatEvent !R.RiverSeatEvent
+  | PointerEvent !R.RiverPointerBindingEvent
+  | XkbEvent !R.RiverXkbBindingEvent
+  | XkbSeatEvent !R.RiverXkbBindingsSeatEvent
+  | XkbConfigEvent !R.RiverXkbConfigEvent
+  | XkbKeyboardEvent !R.RiverXkbKeyboardEvent
+  | LayerShellOutputEvent !R.RiverLayerShellOutputEvent
+  | LayerShellSeatEvent !R.RiverLayerShellSeatEvent
+  | InputManagerEvent !R.RiverInputManagerEvent
+  | InputDeviceEvent !R.RiverInputDeviceEvent
+  | LibinputConfigEvent !R.RiverLibinputConfigEvent
+  | LibinputDeviceEvent !R.RiverLibinputDeviceEvent
+  -- Wl_*
+  | WlShmEvent !WL.ShmEvent
+  | WlSeatEvent !WL.SeatEvent
+  | WlOutputEvent !WL.OutputEvent
+  | WlShellSurfaceEvent !WL.ShellSurfaceEvent
+  | WlKeyboardEvent !WL.KeyboardEvent
+  -- Ext_*
+  | ForeignTopLevelListV1 !WL.ForeignToplevelListEvent
+  | ForeignTopLevelHandleV1 !WL.ForeignToplevelHandleEvent
+  deriving (Show, Generic)
 
 type WindowSet   = W.StackSet  WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail ScreenId ScreenDetail
 type WindowSpace = W.Workspace WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail
@@ -339,11 +351,17 @@ userCode a = catchH (Just <$> a) (return Nothing)
 userCodeDef :: a -> H a -> H a
 userCodeDef defValue a = fromMaybe defValue <$> userCode a
 
-data SeatAction = S_NONE
-                | S_SUBMAP_NEXT_KEY SomeAction [StablePtr (XkbBinding SomeAction)]
+data SeatAction = S_NONE -- ^ no action / reset
+                | S_START_OP SeatOp -- ^ start pointer drag operation
+                | S_SUBMAP_NEXT_KEY SomeAction (XkbBindingMap SomeAction)
+                  -- ^ interpret next keypress for submap, swallowing an unexpected key
                 | S_SUBMAP_CANCEL
-                | S_START_OP SeatOp
-                deriving (Generic)
+                  -- ^ Cancel submap input, resetting to root bindings.
+                | S_INPUT_OVERRIDE (H Bool) [((ModMask, KeySym), SomeAction)]
+                  -- ^ Temporarily interpret all keyboard input differently.
+                | S_INPUT_OVERRIDE_CANCEL
+                  -- ^ Cancel input override mode
+                deriving (Show, Generic)
 
 instance Default SeatAction where def = S_NONE
 
@@ -351,27 +369,42 @@ data Seat = Seat
   { river_seat                           :: !RiverSeat
   , river_layer_shell_seat               :: !R.RiverLayerShellSeat
   , xkb_bindings_seat                    :: !R.RiverXkbBindingsSeat
+  , name                                 :: !String
+  , caps                                 :: !WL.Wl_seat_capability
   --
-  , xkb_bindings                         :: [StablePtr (XkbBinding SomeAction)]
+  , xkb_bindings                         :: !(XkbBindingMap SomeAction)
   , pointer_bindings                     :: [StablePtr (PointerBinding SomeAction)]
   --
   , pending_action                       :: !SeatAction
-  , submap_pending                       :: Maybe (SomeAction, [StablePtr (XkbBinding SomeAction)])
-  -- TODO: review below
-  , removed                              :: Bool
-  , focused, hovered, interacted         :: RiverWindow
-  , op_window                            :: RiverWindow
+  , submap_pending                       :: Maybe (SomeAction, XkbBindingMap SomeAction)
+  , inputOverride                        :: !(Maybe (H Bool, XkbBindingMap SomeAction))
+  -- Pointer move/resize
   , op                                   :: SeatOp
+  , op_window                            :: RiverWindow
   , op_release                           :: Bool
   , op_start_x, op_start_y, op_dx, op_dy :: Int32
   , op_start_width, op_start_height      :: Int32
   , op_edges                             :: Int32
-  } deriving (Generic)
+  -- TODO: review below
+  , removed                              :: Bool
+  , focused, hovered, interacted         :: RiverWindow
+  } deriving (Show, Generic)
+
+-- XXX
+instance Show (StablePtr a) where
+  show _ = "<SP>"
+instance Show (H ()) where
+  show _ = "H()"
+instance Show (H Bool) where
+  show _ = "H()"
 
 instance Default Seat where
   def = Seat
     { river_seat = def
     , xkb_bindings_seat = R.RiverXkbBindingsSeat nullPtr
+    , inputOverride = Nothing
+    , name = ""
+    , caps = WL.toCEnum 0
     , removed = False
     , focused = invalidWindow
     , hovered = invalidWindow
@@ -397,7 +430,7 @@ instance Default Seat where
 data SeatOp = SEAT_OP_NONE
             | SEAT_OP_MOVE
             | SEAT_OP_RESIZE
-            deriving (Eq)
+            deriving (Eq, Show)
 
 data Output = Output
   { river_output           :: !RiverOutput
@@ -526,6 +559,9 @@ data Submap = Submap
   , submapDefault :: Maybe SomeAction
   } deriving (Show, Generic)
 
+instance IsAction (H ()) where
+  runner = id
+
 instance IsAction Submap where
   runner Submap{..} = whenJust submapDefault runner
 
@@ -553,3 +589,34 @@ instance Default (HSWMConfig Full) where
     , xkbLayout       = Nothing
     , workspaces      = [ "1", "2", "3", "4" ]
     }
+
+-- ---------------------------------------------------------------------
+-- Extensible state/config
+--
+
+-- | Every module must make the data it wants to store
+-- an instance of this class.
+--
+-- Minimal complete definition: initialValue
+class Typeable a => ExtensionClass a where
+    {-# MINIMAL initialValue #-}
+    -- | Defines an initial value for the state extension
+    initialValue :: a
+    -- | Specifies whether the state extension should be
+    -- persistent. Setting this method to 'PersistentExtension'
+    -- will make the stored data survive restarts, but
+    -- requires a to be an instance of Read and Show.
+    --
+    -- It defaults to 'StateExtension', i.e. no persistence.
+    extensionType :: a -> StateExtension
+    extensionType = StateExtension
+
+-- | Existential type to store a state extension.
+data StateExtension =
+    forall a. ExtensionClass a => StateExtension a
+    -- ^ Non-persistent state extension
+  | forall a. (Read a, Show a, ExtensionClass a) => PersistentExtension a
+    -- ^ Persistent extension
+
+-- | Existential type to store a config extension.
+data ConfExtension = forall a. Typeable a => ConfExtension a

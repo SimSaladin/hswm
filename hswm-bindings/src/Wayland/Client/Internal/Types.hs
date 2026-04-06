@@ -1,4 +1,5 @@
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 ------------------------------------------------------------------------------
 -- |
@@ -15,16 +16,17 @@
 ------------------------------------------------------------------------------
 module Wayland.Client.Internal.Types
   ( module Wayland.Client.Internal.Types
-  , module HsBindgen.Runtime.Prelude
+  , module ReExports
   ) where
 
-import           HsBindgen.Runtime.Prelude (ToFunPtr(..), FromFunPtr(..), PtrConst)
-import Data.Proxy
-import Data.Kind (Type)
-import Foreign.C
-import Foreign
-import Data.Void
-import Control.Monad
+import           Control.Monad
+import           Data.Kind (Type)
+import           Data.Proxy
+import           Data.Void
+import           Foreign
+import           Foreign.C
+import           GHC.Records
+import           HsBindgen.Runtime.Prelude as ReExports (FromFunPtr(..), PtrConst, ToFunPtr(..), CEnum(..), CEnumZ(..))
 
 class ListenerEvent ev where
   type Listener ev :: Type
@@ -49,10 +51,20 @@ listenerAdd obj l ud = do
 
 class IsUserData a where
   toUserData :: a -> Ptr Void
+  fromUserData :: Ptr Void -> IO a
 
-instance IsUserData ()
-  where toUserData _ = nullPtr
-instance IsUserData (Ptr a)
-  where toUserData = castPtr
+instance IsUserData () where
+  toUserData _ = nullPtr
+  fromUserData _ = pure ()
+
 instance IsUserData (StablePtr a) where
   toUserData = castPtr . castStablePtrToPtr
+  fromUserData = pure . castPtrToStablePtr . castPtr
+
+instance {-# OVERLAPPABLE #-} (HasField "unwrap" ty (Ptr a), Storable ty) => IsUserData ty where
+  toUserData = castPtr . getField @"unwrap"
+  fromUserData = peek . castPtr
+
+instance {-# OVERLAPPABLE #-} IsUserData (Ptr a) where
+  toUserData = castPtr
+  fromUserData = pure . castPtr

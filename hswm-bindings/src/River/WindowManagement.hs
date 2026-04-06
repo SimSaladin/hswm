@@ -150,8 +150,3 @@ instance Default RiverWindow where def = RiverWindow nullPtr
 instance Default RiverNode where def = RiverNode nullPtr
 instance Default RiverSeat where def = RiverSeat nullPtr
 instance Default RiverOutput where def = RiverOutput nullPtr
-
-instance IsUserData RiverWindow where toUserData = castPtr . getField @"unwrap"
-instance IsUserData RiverNode   where toUserData = castPtr . getField @"unwrap"
-instance IsUserData RiverSeat   where toUserData = castPtr . getField @"unwrap"
-instance IsUserData RiverOutput where toUserData = castPtr . getField @"unwrap"

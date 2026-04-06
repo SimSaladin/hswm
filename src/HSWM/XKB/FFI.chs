@@ -12,25 +12,33 @@ import System.Posix (Fd(..), closeFd, fdWrite)
 #include <xkbcommon/xkbcommon.h>
 #include <linux/input-event-codes.h>
 
-type KeySym = CUInt
-type Button = {#type uint32_t#}
-
+type KeySym    = CUInt
+type Button    = {#type uint32_t#}
 type Modifiers = {#type uint32_t#}
-type ModMask = {#type xkb_mod_index_t#}
-type ModIndex = {#type xkb_mod_index_t#}
+type ModMask   = {#type xkb_mod_index_t#}
+type ModIndex  = {#type xkb_mod_index_t#}
 
-{#pointer *xkb_keymap as XkbKeymap #}
-{#pointer *xkb_state as XkbState #}
+{#pointer *xkb_keymap  as XkbKeymap #}
+{#pointer *xkb_state   as XkbState #}
 {#pointer *xkb_context as XkbContext #}
 
 {#fun xkb_context_new as ^ {`CInt'} -> `XkbContext'#}
 
 {#fun xkb_keymap_new_from_string as ^ {`XkbContext', `CString', `CUInt', `CUInt'} -> `XkbKeymap' #}
-{#fun xkb_keymap_mod_get_mask {`XkbKeymap', `String'} -> `ModMask' fromIntegral #}
-{#fun xkb_keymap_mod_get_name {`XkbKeymap', fromIntegral `ModIndex'} -> `String'#}
-{#fun xkb_keymap_get_as_string as ^ {`XkbKeymap', `CUInt'} -> `String' #}
+{#fun xkb_keymap_mod_get_mask         {`XkbKeymap', `String'} -> `ModMask' fromIntegral #}
+{#fun xkb_keymap_mod_get_name         {`XkbKeymap', fromIntegral `ModIndex'} -> `String'#}
+{#fun xkb_keymap_get_as_string as ^   {`XkbKeymap', `CUInt'} -> `String' #}
 
 {#fun xkb_state_get_keymap {`XkbState'} -> `XkbKeymap' #}
+
+-- | returns A keymap compiled according to the [RMLVO] names, or `NULL` if
+-- the compilation failed.
+{#fun xkb_keymap_new_from_names2
+  {                   `XkbContext'
+  , withXkbRuleNames* `XkbRuleNames' -- @param names   The [RMLVO] names to use.  See xkb_rule_names.
+  ,                   `CUInt' -- xkb_keymap_format
+  ,                   `CUInt' -- xkb_keymap_compile_flags
+  } -> `XkbKeymap' #}
 
 -- enum xkb_keysym_flags:
 --     XKB_KEYSYM_NO_FLAGS         = 0,       /** Do not apply any flags. */
@@ -49,6 +57,8 @@ xkbKeysymToText :: KeySym -> String
 xkbKeysymToText k = unsafePerformIO $ allocaBytes 64 $ \buf ->
     let len = {#call pure xkb_keysym_get_name#} k buf 64 in peekCStringLen (buf, fi len)
 
+-- * Keymap and XkbRules
+
 createKeymap :: Fd -> CUInt -> IO XkbKeymap
 createKeymap fd size = do
   ptr <- {#call mmap as _mmap#} nullPtr (fromIntegral size) {#const PROT_READ#} {#const MAP_PRIVATE#} (fromIntegral fd) 0
@@ -58,6 +68,9 @@ createKeymap fd size = do
   closeFd fd
   return keymap
 
+data XkbRuleNames = XkbRuleNames { rules, model, layout, variant, options :: !String }
+  deriving (Show, Read, Eq)
+
 withXkbKeymapFd :: XkbKeymap -> (Fd -> IO b) -> IO b
 withXkbKeymapFd kmap f = withCString "hswm-xkb-keymap" $ \c_name -> do
   fd <- Fd <$> {#call memfd_create#} c_name (1 {- MFD_CLOEXEC-} .|. 2 {- MFD_ALLOW_SEALING -})
@@ -66,9 +79,6 @@ withXkbKeymapFd kmap f = withCString "hswm-xkb-keymap" $ \c_name -> do
   r <- f fd
   closeFd fd
   return r
-
-data XkbRuleNames = XkbRuleNames { rules, model, layout, variant, options :: !String }
-  deriving (Show, Read, Eq)
 
 newXkbKeymapFromNames :: XkbRuleNames -> IO XkbKeymap
 newXkbKeymapFromNames opts = do
@@ -91,17 +101,11 @@ withXkbRuleNames x m = allocaBytesAligned {#sizeof xkb_rule_names#} {#alignof xk
       {#set xkb_rule_names.options#} p c_options
       m $ castPtr p
 
--- | returns A keymap compiled according to the [RMLVO] names, or `NULL` if
--- the compilation failed.
-{#fun xkb_keymap_new_from_names2
-  {                   `XkbContext'
-  , withXkbRuleNames* `XkbRuleNames' -- @param names   The [RMLVO] names to use.  See xkb_rule_names.
-  ,                   `CUInt' -- xkb_keymap_format
-  ,                   `CUInt' -- xkb_keymap_compile_flags
-  } -> `XkbKeymap' #}
-
 -----------------------------------------------------------------------------
 -- * KeySyms
+
+--_XKB_KEY_n :: KeySym
+--_XKB_KEY_n = {#const XKB_KEY_n#}
 
 -- | real-modifier-names
 _XKB_MOD_NAME_SHIFT, _XKB_MOD_NAME_CAPS, _XKB_MOD_NAME_CTRL, _XKB_MOD_NAME_MOD1, _XKB_MOD_NAME_MOD2, _XKB_MOD_NAME_MOD3, _XKB_MOD_NAME_MOD4, _XKB_MOD_NAME_MOD5 :: String
@@ -131,10 +135,7 @@ xkbRealModifierNames = [_XKB_MOD_NAME_SHIFT, _XKB_MOD_NAME_CAPS, _XKB_MOD_NAME_C
 xkbVirtualModifierNames :: [String]
 xkbVirtualModifierNames = [_XKB_VMOD_NAME_ALT, _XKB_VMOD_NAME_HYPER, _XKB_VMOD_NAME_LEVEL3, _XKB_VMOD_NAME_LEVEL5, _XKB_VMOD_NAME_META, _XKB_VMOD_NAME_NUM, _XKB_VMOD_NAME_SCROLL, _XKB_VMOD_NAME_SUPER]
 
-_XKB_KEY_n :: KeySym
-_XKB_KEY_n = {#const XKB_KEY_n#}
-
--- evdev-codes
+-- * evdev-codes
 
 _BTN_LEFT, _BTN_RIGHT :: Button
 _BTN_LEFT  = {#const BTN_LEFT#}

@@ -1,3 +1,5 @@
+{-# LANGUAGE MultiWayIf #-}
+
 -- |
 -- Module      : HSWM.Util.IPC
 -- Description : Short description
@@ -16,15 +18,17 @@ import qualified Data.ByteString.Char8 as C8
 import Data.IORef
 import Data.Map qualified as M
 import Data.Version (showVersion)
-import HSWM.Core as HSWM
 import Network.Socket
 import Network.Socket.ByteString qualified as NB
 import PackageInfo_hswm qualified as PKG
 import System.Directory
 import Foreign.Ptr
-import qualified HSWM.StackSet as W
 import qualified Data.Text as T
 import qualified River.Objects as R
+
+import HSWM.Core as HSWM
+import qualified HSWM.StackSet as W
+import HSWM.Operations
 
 -- | Workspace identifier type
 type WsId = String
@@ -51,7 +55,7 @@ data ProtoMsg
     WsInfo {wsNames :: [WsId], wsFocused :: (WsId, ScreenId, LayoutDesc), wsVisible :: [(WsId, ScreenId, LayoutDesc)]}
 
   | -- | Inform the client about the details of the currently focused window.
-    FocusedWindow {wId :: Word, wTitle :: String}
+    FocusedWindow {wId :: Word, wTitle, wAppId, wIdentifier :: String, wPid :: Maybe Int}
   | -- | There is nothing currently focused
     FocusedNone
 
@@ -144,7 +148,7 @@ clientRun mSockPath onMsg cb = bracket (socket AF_UNIX Stream defaultProtocol) c
               Right (Ping n) -> sendMsg sock (Pong n)
               Right msg -> do
                 debug' $ "IPC server event (raw): " <> toText (BUTF8.toString resp)
-                debug' $ "IPC server event (decoded): " <> tshow msg
+                --debug' $ "IPC server event (decoded): " <> tshow msg
                 onMsg msg
         worker ""
 
@@ -194,8 +198,10 @@ fullStateUpdate = do
   let wsInfo = WsInfo tags focusedTag visibleTags
 
   -- info about focused window (if any)
-  let focusedInfo
-        | Just fw <- W.peek ws = FocusedWindow (toWindowId fw) "???"
-        | otherwise = FocusedNone
+  focusedInfo <-
+    if | Just fw <- W.peek ws -> lookupWindow fw >>= \case
+              Just w -> return $ FocusedWindow (toWindowId fw) w.title w.appId w.identifier w.unreliablePid
+              Nothing -> return FocusedNone
+       | otherwise -> return FocusedNone
 
   return [outputInfo, wsInfo, focusedInfo]

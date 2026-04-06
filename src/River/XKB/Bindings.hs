@@ -19,16 +19,36 @@ import qualified River.Objects as R
 import           River.WMP
 
 import           Foreign
-import           Foreign.Storable.Generic (GStorable(..))
+--import           Foreign.Storable.Generic (GStorable(..))
+import qualified Data.Map as M
+
+type XBKey = (Modifiers, KeySym)
+
+type XkbBindingMap a = M.Map XBKey (StablePtr (XkbBinding a))
 
 data XkbBinding a = XkbBinding
   { xkb_binding :: R.RiverXkbBinding
   , river_seat  :: R.RiverSeat
   , action      :: a
-  , subKeymap   :: StablePtr [StablePtr (XkbBinding a)]
+  , subKeymap   :: XkbBindingMap a
   } deriving (Generic)
 
-instance GStorable (XkbBinding ())
+-- instance GStorable (XkbBindingMap ())
+-- instance GStorable (XkbBinding ())
+
+createXkbBindings
+  :: (MonadIO m, Show a)
+  => (R.RiverXkbBindings, R.RiverXkbBindingListener, R.RiverSeat)
+  -> (a -> [((ModMask, KeySym), a)]) -- ^ 'actionSubmap' - get subkeys
+  -> [((ModMask, KeySym), a)]
+  -> m (XkbBindingMap a)
+createXkbBindings (a1, a2, a3) getSub keys = sequence top
+  where
+    top = M.fromList [ (k, create1 True k v =<< createSubs (getSub v)) | (k, v) <- keys ]
+
+    createSubs ks = sequence $ M.fromList [ (k, create1 False k v =<< createSubs (getSub v)) | (k, v) <- ks ]
+
+    create1 enable (m, k) = newXKBBinding a1 a2 a3 enable m k
 
 newXKBBinding
   :: (MonadIO m, Show action)
@@ -39,13 +59,13 @@ newXKBBinding
   -> Modifiers
   -> KeySym
   -> action -- ^ Action when pressed
-  -> [StablePtr (XkbBinding action)] -- ^ Submap keys
+  -> XkbBindingMap action -- ^ Submap keys
   -> m (StablePtr (XkbBinding action))
 newXKBBinding xkbBinds xkb_binding_listener seat enable mods keysym action subKM = do
   debug' $ "[keys] binding key: " <> toText (ppXkbModsKey mods keysym) <> " " <> tshow action
   xb <- io $ R.riverXkbBindingsGetXkbBinding xkbBinds seat (fi keysym) (fi mods)
-  subP <- io $ newStablePtr subKM
-  dtPtr <- io $ newStablePtr $ XkbBinding xb seat action subP
+  -- subP <- io $ newStablePtr subKM
+  dtPtr <- io $ newStablePtr $ XkbBinding xb seat action subKM
   _ <- io $ R.listenerAdd xb xkb_binding_listener (castPtr $ castStablePtrToPtr dtPtr)
   when enable $ io $ R.riverXkbBindingEnable xb
   return dtPtr
@@ -54,6 +74,5 @@ destroyXKBBinding :: MonadIO m => StablePtr (XkbBinding a) -> m ()
 destroyXKBBinding sptr = do
   xb <- io (deRefStablePtr sptr)
   io $ R.objectDestroy xb.xkb_binding
-  io (deRefStablePtr xb.subKeymap) >>= mapM_ destroyXKBBinding
-  io $ freeStablePtr xb.subKeymap
+  mapM_ destroyXKBBinding xb.subKeymap
   io $ freeStablePtr sptr
