@@ -3,6 +3,8 @@ module HSWM.Operations where
 import qualified HSWM.StackSet as W
 import           HSWM.Core
 
+import Data.Function (on)
+import Data.Ratio  ((%))
 import qualified River.Safe as R
 import qualified River.Objects as R
 
@@ -310,3 +312,67 @@ readStateFile xmc = do
 
 sendRestart :: H ()
 sendRestart = io $ Posix.raiseSignal Posix.sigUSR2
+
+
+
+-----------------------------------
+
+startSeatOp op = modifySeats (const True) $ \seat -> seat { pending_action = S_START_OP op }
+
+-- | Make a tiled window floating, using its suggested rectangle
+float :: RiverWindow -> H ()
+float rw = withWindow rw $ \w -> do
+    (sc, rr) <- floatLocation w
+    modifyWindowSet $ \ws -> W.float rw rr . fromMaybe ws $ do
+        i  <- W.findTag rw ws
+        guard $ i `elem` map (W.tag . W.workspace) (W.screens ws)
+        f  <- W.peek ws
+        sw <- W.lookupWorkspace sc ws
+        return (W.focusWindow f . W.shiftWin sw rw $ ws)
+
+-- | Given a window, find the screen it is located on, and compute
+-- the geometry of that window WRT that screen.
+floatLocation :: Window -> H (ScreenId, W.RationalRect)
+floatLocation w = go
+      -- -- Fallback solution if `go' fails.  Which it might, since it
+      -- -- calls `getWindowAttributes'.
+      -- sc <- gets $ W.current . windowset
+      -- return (W.screen sc, W.RationalRect 0 0 1 1)
+
+  where go = do
+          ws <- gets windowset
+          let bw = fi 2 -- (fromIntegral . wa_border_width) wa
+          point_sc <- pointScreen (fi w.x) (fi $ w.y)
+
+          -- ignore pointScreen for new windows unless it's the current
+          -- screen, otherwise the float's relative size is computed against
+          -- a different screen and the float ends up with the wrong size
+          let sr_eq = (==) `on` fmap (screenRect . W.screenDetail)
+              sc = fromMaybe (W.current ws) $
+                  if point_sc `sr_eq` Just (W.current ws) then point_sc else Nothing
+              sr = screenRect . W.screenDetail $ sc
+              x = (fi w.x - fi (sr.x)) % fi (sr.width)
+              y = (fi w.y - fi (sr.y)) % fi (sr.height)
+              (width, height) = {- applySizeHintsContents sh -} (fi w.width, fi w.height)
+              rwidth  = fi (width + bw*2) % fi (sr.width)
+              rheight = fi (height + bw*2) % fi (sr.height)
+              -- adjust x/y of unmanaged windows if we ignored or didn't get pointScreen,
+              -- it might be out of bounds otherwise
+              rr = if point_sc `sr_eq` Just sc
+                  then W.RationalRect x y rwidth rheight
+                  else W.RationalRect (0.5 - rwidth/2) (0.5 - rheight/2) rwidth rheight
+
+          return (W.screen sc, rr)
+
+-- | Given a point, determine the screen (if any) that contains it.
+pointScreen :: Position -> Position
+            -> H (Maybe (W.Screen WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail ScreenId ScreenDetail))
+pointScreen x y = withWindowSet $ return . L.find p . W.screens
+  where p = pointWithin x y . screenRect . W.screenDetail
+
+screenRect SD{..} = Rectangle (fi x) (fi y) (fi width) (fi height)
+
+setWindowPosition :: Window -> Int32 -> Int32 -> H ()
+setWindowPosition w x y = do
+  setNodePosition w.node x y
+  modifyWindow w.river_window $ \s -> s { x = x, y = y }

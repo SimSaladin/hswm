@@ -72,11 +72,6 @@ bindgen-river:	\
 	$(bindGenSpecDir)/Generated.River.LibinputConfigV1.yaml \
 	$(bindGenSpecDir)/Generated.River.LayerShellV1.yaml
 
-# --external-binding-spec $(bindingSpecs)/wayland-client.yaml
-# --external-binding-spec $(bindingSpecs)/wayland-util.yaml
-# --prescriptive-binding-spec $(bindingSpecs)/wayland-util.yaml \
-# --external-binding-spec $(bindingSpecs)/wayland-client.yaml \
-
 $(bindGenSpecDir)/Generated.Pixman.yaml: FORCE
 	$(HS_BIND_GEN) \
 	  --unique-id hswm_pixman pixman.h \

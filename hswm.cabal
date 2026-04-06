@@ -50,15 +50,9 @@ library
     exposed-modules:
           Wayland.FFI
           Wayland
-          River.XKB.Config.FFI
-          River.XKB.Config
-          River.XKB.Bindings.FFI
-          River.XKB.Bindings.MiscFFI
-          River.XKB.Bindings
-          River.WMP.FFI
-          River.WMP.MiscFFI
-          River.WMP
           River
+          River.WMP
+          River.XKB.Bindings
           HSWM.Actions.WindowNavigation
           HSWM.BufferPool
           HSWM.Config

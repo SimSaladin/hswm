@@ -230,7 +230,7 @@ mkWlObjectMisc cfg = do
           (pure [])
           (appT (conT ''AddListener) (conT ntName))
           [ tySynInstD $ tySynEqn Nothing (appT (conT ''ObjectListener) (conT ntName)) (conT listenerN),
-            funD 'listenerAdd [mk_clause]
+            funD 'objectListenerAdd [mk_clause]
           ]
         , tySynD (mkName $ objTypePrefix cfg ++ "Listener") [] [t| PtrConst (ObjectListener $(conT ntName)) |]
         ]

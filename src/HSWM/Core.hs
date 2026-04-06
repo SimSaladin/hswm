@@ -111,8 +111,8 @@ data Event = WindowManagerEvent !R.RiverWindowManagerEvent
            | InputManagerEvent !R.RiverInputManagerEvent
            | InputDeviceEvent !R.RiverInputDeviceEvent
            | LibinputConfigEvent !R.RiverLibinputConfigEvent
-           | ForeignTopLevelListV1 !WL.ExtForeignToplevelListV1Event
-           | ForeignTopLevelHandleV1 !WL.ExtForeignToplevelHandleV1Event
+           | ForeignTopLevelListV1 !WL.ForeignToplevelListEvent
+           | ForeignTopLevelHandleV1 !WL.ForeignToplevelHandleEvent
            deriving (Show, Generic)
 
 type WindowSet   = W.StackSet  WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail ScreenId ScreenDetail
@@ -342,6 +342,7 @@ userCodeDef defValue a = fromMaybe defValue <$> userCode a
 data SeatAction = S_NONE
                 | S_SUBMAP_NEXT_KEY SomeAction [StablePtr (XkbBinding SomeAction)]
                 | S_SUBMAP_CANCEL
+                | S_START_OP SeatOp
                 deriving (Generic)
 
 instance Default SeatAction where def = S_NONE
@@ -396,6 +397,7 @@ instance Default Seat where
 data SeatOp = SEAT_OP_NONE
             | SEAT_OP_MOVE
             | SEAT_OP_RESIZE
+            deriving (Eq)
 
 data Output = Output
   { river_output           :: !RiverOutput
@@ -540,7 +542,7 @@ instance Default (HSWMConfig Full) where
     { borderWidth     = 2
     , normalBorder    = parseRgba "0x0000B0"
     , focusedBorder   = parseRgba "0xFA0050"
-    , borderEdges     = foldl (.|.) 0 (fi . fromEnum <$> [EdgeLeft, EdgeRight, EdgeTop, EdgeBottom])
+    , borderEdges     = foldl (.|.) 0 (fi . (.unwrap) <$> [EdgeLeft, EdgeRight, EdgeTop, EdgeBottom])
     , keyBindings     = [ ]
     , pointerBindings = [ ]
     , defaultModMask  = "Ctrl"

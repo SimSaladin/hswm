@@ -1,3 +1,7 @@
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE OverloadedLabels #-}
+
+
 -- |
 -- Module      : River.WindowManagement
 -- Description : Short description
@@ -15,6 +19,8 @@ import Wayland.Client.Internal.TH
 import Wayland.Client.Objects
 import Data.Default
 import Foreign.Ptr
+import Wayland.Client.Internal.Types
+import GHC.Records
 
 mkWlObjectType (riverObj ''River_pointer_binding_v1 [])
 mkWlObjectType (riverObj ''River_window_v1 [])
@@ -144,3 +150,8 @@ instance Default RiverWindow where def = RiverWindow nullPtr
 instance Default RiverNode where def = RiverNode nullPtr
 instance Default RiverSeat where def = RiverSeat nullPtr
 instance Default RiverOutput where def = RiverOutput nullPtr
+
+instance IsUserData RiverWindow where toUserData = castPtr . getField @"unwrap"
+instance IsUserData RiverNode   where toUserData = castPtr . getField @"unwrap"
+instance IsUserData RiverSeat   where toUserData = castPtr . getField @"unwrap"
+instance IsUserData RiverOutput where toUserData = castPtr . getField @"unwrap"

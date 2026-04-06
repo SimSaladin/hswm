@@ -42,8 +42,6 @@ data SeatManager = SeatManager
 getSMgr :: H SeatManager
 getSMgr = getOrCreateObject (pure def)
 
-toUserData (R.RiverSeat p) = castPtr p
-
 -- | New seat added
 added :: RiverSeat -> H ()
 added rseat = do
@@ -62,7 +60,7 @@ added rseat = do
 
   -- bind seat bindings
   bindingsSeat <- io $ R.riverXkbBindingsGetSeat xkbBindings rseat
-  _ <- io $ R.listenerAdd bindingsSeat xkbBindingsSeatListener (toUserData rseat)
+  _ <- io $ R.listenerAdd bindingsSeat xkbBindingsSeatListener rseat
 
   let seat = def
         { river_seat = rseat
@@ -87,10 +85,11 @@ handleEvent e = do
         modifySeat seat $ \s -> s { hovered = window }
         modifyWindowSet $ W.focusWindow window -- focus follow mouse
 
-    R.RiverSeatPointerLeave _ seat      -> modifySeat seat $ \s -> s { hovered = invalidWindow }
+    R.RiverSeatPointerLeave _ seat -> modifySeat seat $ \s -> s { hovered = invalidWindow }
     R.RiverSeatWindowInteraction _ seat window -> modifySeat seat $ \s -> s { interacted = window }
-    R.RiverSeatOpDelta _ seat dx dy          -> modifySeat seat $ \s -> s { op_dx = fromIntegral dx, op_dy = fromIntegral dy }
-    R.RiverSeatOpRelease _ seat         -> modifySeat seat $ \s -> s { op_release = True }
+    R.RiverSeatOpDelta _ seat dx dy -> modifySeat seat $ \s -> s
+      { op_dx = fromIntegral dx, op_dy = fromIntegral dy }
+    R.RiverSeatOpRelease _ seat -> modifySeat seat $ \s -> s { op_release = True }
 
     -- (SeatWlSeat _ seat name)) = _
 
@@ -153,7 +152,27 @@ manage1 s = do
       -- reset state
       doS $ \s' -> s' { submap_pending = Nothing, pending_action = S_NONE }
 
+    S_START_OP SEAT_OP_MOVE -> do
+      mw <- withWindowSet $ return . W.peek
+      case mw of
+        Nothing -> return ()
+        Just w -> do
+          log' "seat: start move op"
+          doS $ \s' -> s' { pending_action = S_NONE }
+          withWindow w $ seatPointerMove s.river_seat
+
+    S_START_OP SEAT_OP_RESIZE -> do
+      mw <- withWindowSet $ return . W.peek
+      case mw of
+        Nothing -> return ()
+        Just w -> do
+          log' "seat: start resize op"
+          doS $ \s' -> s' { pending_action = S_NONE }
+          withWindow w $ \rv -> seatPointerResize s.river_seat rv (2 .|. 8) --  .|. 4 .|. 8)
+
     S_NONE -> return ()
+
+    _ -> return ()
 
   -- withWindow s.interacted $ \w -> seatFocus s w
 
@@ -161,28 +180,31 @@ manage1 s = do
   --seat_action s s.pending_action
   --modifySeat s.river_seat $ \s -> s { interacted = invalidWindow, pending_action = ACTION_NONE }
 
-  -- TODO
-  -- case s.op of
-  --   SEAT_OP_NONE -> return ()
-  --   SEAT_OP_MOVE -> do
-  --     when s.op_release $ do
-  --       liftIO $ river_seat_v1_op_end s.river_seat
-  --       modifySeat s.river_seat $ \x -> x { op = SEAT_OP_NONE, op_window = invalidWindow }
-  --   SEAT_OP_RESIZE -> do
-  --     when s.op_release $ do
-  --       liftIO $ riverWindowInformResizeEnd s.op_window
-  --       liftIO $ river_seat_v1_op_end s.river_seat
-  --       modifySeat s.river_seat $ \x -> x { op = SEAT_OP_NONE, op_window = invalidWindow }
-  --     withWindow s.op_window $ \w -> do
-  --       let width = s.op_start_width
-  --             - (if (s.op_edges .&. fromIntegral (fromEnum EdgeLeft)) /= 0  then s.op_dx else 0)
-  --             + (if (s.op_edges .&. fromIntegral (fromEnum EdgeRight)) /= 0 then s.op_dx else 0)
-  --       let height = s.op_start_height
-  --             - (if (s.op_edges .&. fromIntegral (fromEnum EdgeTop)) /= 0    then s.op_dy else 0)
-  --             + (if (s.op_edges .&. fromIntegral (fromEnum EdgeBottom)) /= 0 then s.op_dy else 0)
-  --       liftIO $ river_window_v1_propose_dimensions w.river_window (max width 1) (max height 1)
+  case s.op of
+    SEAT_OP_NONE -> return ()
 
-  -- when s.op_release $ modifySeat s.river_seat $ \x -> x { op_release = False }
+    SEAT_OP_MOVE -> do
+      when s.op_release $ do
+        io $ R.riverSeatOpEnd s.river_seat
+        float s.op_window
+        modifySeat s.river_seat $ \x -> x { op = SEAT_OP_NONE, op_window = invalidWindow }
+
+    SEAT_OP_RESIZE -> do
+      when s.op_release $ do
+        liftIO $ R.riverWindowInformResizeEnd s.op_window
+        liftIO $ R.riverSeatOpEnd s.river_seat
+        float s.op_window
+        modifySeat s.river_seat $ \x -> x { op = SEAT_OP_NONE, op_window = invalidWindow }
+      withWindow s.op_window $ \w -> do
+        let width = s.op_start_width
+              - (if (s.op_edges .&. fromIntegral ((.unwrap) EdgeLeft)) /= 0  then s.op_dx else 0)
+              + (if (s.op_edges .&. fromIntegral ((.unwrap) EdgeRight)) /= 0 then s.op_dx else 0)
+        let height = s.op_start_height
+              - (if (s.op_edges .&. fromIntegral ((.unwrap) EdgeTop)) /= 0    then s.op_dy else 0)
+              + (if (s.op_edges .&. fromIntegral ((.unwrap) EdgeBottom)) /= 0 then s.op_dy else 0)
+        liftIO $ R.riverWindowProposeDimensions w.river_window (max width 1) (max height 1)
+
+  when s.op_release $ modifySeat s.river_seat $ \x -> x { op_release = False }
 
 ---------------------------------------------------------
 -- * Render
@@ -200,13 +222,12 @@ seatRender s = do
       withWindow s.op_window $ \w -> do
         let x = s.op_start_x + s.op_dx
             y = s.op_start_y + s.op_dy
-        setNodePosition w.node x y
-        -- debug' $ "seatRender: move window " <> tshow (w, x, y)
+        setWindowPosition w x y
 
     SEAT_OP_RESIZE -> withWindow s.op_window $ \w -> do
-      let x = s.op_start_x + (if (s.op_edges .&. fi (fromEnum EdgeLeft)) /= 0 then s.op_start_width - w.width else 0)
-      let y = s.op_start_y + (if (s.op_edges .&. fi (fromEnum EdgeTop)) /= 0 then s.op_start_height - w.height else 0)
-      setNodePosition w.node x y
+      let x = s.op_start_x + (if (s.op_edges .&. fi ((.unwrap) EdgeLeft)) /= 0 then s.op_start_width - w.width else 0)
+      let y = s.op_start_y + (if (s.op_edges .&. fi ((.unwrap) EdgeTop)) /= 0 then s.op_start_height - w.height else 0)
+      setWindowPosition w x y
       -- debug' $ "seatRender: resize window " <> tshow (w, x, y)
 
 ----------------------------------------------------------
@@ -260,38 +281,31 @@ deleteRemovedSeat s@Seat{} = do
   io $ R.objectDestroy s.river_layer_shell_seat
   io $ R.objectDestroy s.river_seat
 
-fromRiverSeat (R.RiverSeat s) = s
-
 execXkbBinding :: XkbBinding SomeAction -> H ()
 execXkbBinding xb = withSeat xb.river_seat $ \s -> do
   case (s.submap_pending, actionSubmap xb.action) of
     (Nothing, []) -> do
-      debug' "submap: no submap run"
+      --debug' "submap: no submap run"
       userCodeDef () $ runner xb.action
     (Nothing, _) -> do
-      debug' "submap binding activated"
+      --debug' "submap binding activated"
       subkeys <- io $ deRefStablePtr xb.subKeymap
       modifySeat xb.river_seat $ \s' -> s' { pending_action = S_SUBMAP_NEXT_KEY xb.action subkeys }
     (Just _, []) -> do
-      debug' "submap: cancel"
+      --debug' "submap: cancel"
       modifySeat xb.river_seat $ \s' -> s' { pending_action = S_SUBMAP_CANCEL }
       userCodeDef () $ runner xb.action
     (Just (_,_), _:_) -> do
-      debug' "submap binding activated (lvl++)"
+      --debug' "submap binding activated (lvl++)"
       subkeys <- io $ deRefStablePtr xb.subKeymap
       modifySeat xb.river_seat $ \s' -> s' { pending_action = S_SUBMAP_NEXT_KEY xb.action subkeys }
 
 seatFocus :: Seat -> Window -> H ()
 seatFocus s w = when (w.river_window /= invalidWindow) $ do
-  --toFocus <- if w'.river_window == invalidWindow
-  --              then gets (M.lookupMax . _windows) >>= \case { x : _ -> return x; _ -> return w'; }
-  --              else return w'
-  --let w = toFocus.river_window
   when (w.river_window /= s.focused) $ setFocus w.river_window -- clearFocus
   modifySeat s.river_seat $ \s' -> s' { focused = w.river_window }
     where
       setFocus rw = when (rw /= invalidWindow) $ liftIO $ R.riverSeatFocusWindow s.river_seat rw
-        -- liftIO $ river_node_v1_place_top w.node
 
 -- | /manage sequence/
 seatClearFocus :: Seat -> H ()
@@ -299,10 +313,10 @@ seatClearFocus s = io $ R.riverSeatClearFocus s.river_seat
 
 seatPointerMove :: RiverSeat -> Window -> H ()
 seatPointerMove sid w = do
-  withSeat sid $ \s -> do
-    --log' $ "[seatPointerMove] " <> tshow (sid, w)
-    seatFocus s w
-    liftIO $ R.riverSeatOpStartPointer s.river_seat
+  log' $ "[seatPointerMove] " <> tshow (sid, w)
+  withSeat sid $ \s -> seatFocus s w
+  io $ R.riverNodePlaceTop w.node
+  io $ R.riverSeatOpStartPointer sid
   modifySeat sid $ \s -> s
     { op = SEAT_OP_MOVE
     , op_window = w.river_window
@@ -315,10 +329,11 @@ seatPointerMove sid w = do
 seatPointerResize :: RiverSeat -> Window -> Int32 -> H ()
 seatPointerResize sid w edges = do
   withSeat sid $ \s -> do
-    -- debug' $ "[seatPointerResize] " <> tshow (sid, w, edges)
+    debug' $ "[seatPointerResize] " <> tshow (sid, w, edges)
     seatFocus s w
-    liftIO $ R.riverWindowInformResizeStart w.river_window
-    liftIO $ R.riverSeatOpStartPointer s.river_seat
+    io $ R.riverNodePlaceTop w.node
+    io $ R.riverWindowInformResizeStart w.river_window
+    io $ R.riverSeatOpStartPointer s.river_seat
   modifySeat sid $ \s -> s
     { op = SEAT_OP_RESIZE
     , op_window = w.river_window

@@ -14,10 +14,10 @@ module HSWM.Util.Debug  where
 
 import HSWM
 import qualified River.Objects as R
+import qualified Wayland.Client as WL
 import qualified Wayland.Client.Extras as WL
 import qualified Data.Map as M
 import           Foreign
-import           Foreign.C
 
 debugHook :: Event -> H All
 debugHook ev
@@ -30,23 +30,23 @@ debugHook ev
       mempty
 
    | SeatEvent R.RiverSeatPointerPosition{}   <- ev = mempty
-   | SeatEvent e                     <- ev = pTrace e >> mempty
+   | SeatEvent e                     <- ev          = pTrace e >> mempty
 
-   | OutputEvent e                   <- ev = pTrace e >> mempty
+   | OutputEvent e                   <- ev          = pTrace e >> mempty
 
-   | WindowEvent R.RiverWindowDimensions{}  <- ev = mempty
-   | WindowEvent e                   <- ev = pTrace e >> mempty
+   | WindowEvent R.RiverWindowDimensions{}  <- ev   = mempty
+   | WindowEvent e                   <- ev          = pTrace e >> mempty
 
-   | WlOutputEvent _                 <- ev = mempty -- pTrace e >> mempty
-   | XkbKeyboardEvent e              <- ev = pTrace e >> mempty
-   | WindowManagerEvent e            <- ev = pTrace e >> mempty
-   | WlShmEvent _                    <- ev = mempty
+   | WlOutputEvent _                 <- ev          = mempty -- pTrace e >> mempty
+   | XkbKeyboardEvent e              <- ev          = pTrace e >> mempty
+   | WindowManagerEvent e            <- ev          = pTrace e >> mempty
+   | WlShmEvent (WL.ShmFormat _ _ fmt) <- ev        = log' (toText $ "shm format: " ++ ppShmFormat (WL.Wl_shm_format $ fi fmt)) >> mempty
 
    | ForeignTopLevelHandleV1 e <- ev = do
        io $ case e of
-           WL.ExtForeignToplevelHandleV1Title _ _ cs -> peekCString (unConstPtr cs) >>= \s -> pTrace (e, s)
-           WL.ExtForeignToplevelHandleV1Identifier _ _ cs -> peekCString (unConstPtr cs) >>= \s -> pTrace (e, s)
-           WL.ExtForeignToplevelHandleV1AppId _ _ cs -> peekCString (unConstPtr cs) >>= \s -> pTrace (e, s)
+           WL.ForeignToplevelHandleTitle _ _ s -> pTrace (e, s)
+           WL.ForeignToplevelHandleIdentifier _ _ s -> pTrace (e, s)
+           WL.ForeignToplevelHandleAppId _ _ s -> pTrace (e, s)
            _ -> return ()
        mempty
 

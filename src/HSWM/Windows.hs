@@ -15,7 +15,7 @@
 ------------------------------------------------------------------------------
 module HSWM.Windows  where
 
-import           HSWM.Core hiding (SeatEvent(..), WindowEvent(..), WindowManagerEvent(..))
+import           HSWM.Core
 import           HSWM.Operations
 import qualified HSWM.StackSet as W
 import qualified HSWM.Seats as Seats
@@ -70,8 +70,14 @@ applyManageActions w0 xs0 = doAll w0 xs0 >>= \w' -> return $ Just w' { p_manage_
               | w.fullscreen -> doIt w WExitFullscreen
               | otherwise    -> doIt w WFullscreen
 
+-- | Do nothing while pointer operation is in progress.
 manage :: H ()
 manage = do
+  ss <- gets _seats
+  unless (any (\s -> s.op /= SEAT_OP_NONE) ss) manage_
+
+manage_ :: H ()
+manage_ = do
    -- get rid of any closed windows
    -- do initial properties for new windows
   mapWindows $ \w -> do
@@ -160,17 +166,12 @@ render = do
       , p_render_place = 0
       , p_set_visible = Nothing }
 
-setWindowPosition :: Window -> Int32 -> Int32 -> H ()
-setWindowPosition w x y = do
-  setNodePosition w.node x y
-  modifyWindow w.river_window $ \s -> s { x = x, y = y }
-
 -- | /manage/
 setInitialManageProperties :: Window -> H ()
 setInitialManageProperties Window{river_window = rw} = do
   io $ R.riverWindowUseSsd rw
-  io $ R.riverWindowSetCapabilities rw (fi $ foldl' (.|.) 0 $ map fromEnum [Maximize, Fullscreen])
-  io $ R.riverWindowSetTiled rw (fi $ foldl' (.|.) 0 $ map fromEnum [EdgeTop, EdgeBottom, EdgeLeft, EdgeRight])
+  io $ R.riverWindowSetCapabilities rw (fi $ foldl' (.|.) 0 $ map (.unwrap) [Maximize, Fullscreen])
+  io $ R.riverWindowSetTiled rw (fi $ foldl' (.|.) 0 $ map (.unwrap) [EdgeTop, EdgeBottom, EdgeLeft, EdgeRight])
   bcolor <- asks (normalBorder . config)
   modifyWindow rw $ \s -> s { new = False, p_render_border = Just bcolor }
 

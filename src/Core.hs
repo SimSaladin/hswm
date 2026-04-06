@@ -14,7 +14,6 @@ import qualified HSWM.Outputs as Outputs
 import qualified HSWM.Seats as Seats
 import qualified HSWM.StackSet as W
 import           HSWM.Util.Posix
-import           HSWM.Utils
 import qualified HSWM.Windows as Windows
 import           HSWM.XKB
 
@@ -63,47 +62,52 @@ startHSWM display config = withStdoutLogging $ do
             warn' $ "handling event timed out: " <> tshow e
 
   runInH $ do
-    xkbConfigL      <- getOrCreateObject $ R.mkRiverXkbConfigListener        $ \e -> handleE $ XkbConfigEvent e
-    _               <- getOrCreateObject $ R.mkRiverXkbKeyboardListener      $ \e -> handleE $ XkbKeyboardEvent e
-    _               <- getOrCreateObject $ R.mkRiverXkbBindingListener              $ \e -> handleE $ XkbEvent e
-    _               <- getOrCreateObject $ R.mkRiverXkbBindingsSeatListener $ \e -> handleE $ XkbSeatEvent e
-    _               <- getOrCreateObject $ R.mkRiverPointerBindingListener          $ \e -> handleE $ PointerEvent e
-    _               <- getOrCreateObject $ R.mkRiverWindowListener                  $ \e -> handleE $ WindowEvent e
-    _               <- getOrCreateObject $ R.mkRiverSeatListener                    $ \e -> handleE $ SeatEvent e
-    _               <- getOrCreateObject $ R.mkRiverOutputListener                 $ \e -> handleE $ OutputEvent e
-    _               <- getOrCreateObject $ WL.mkOutputListener               $ \e -> handleE $ WlOutputEvent e
-    _               <- getOrCreateObject $ WL.mkShellSurfaceListener         $ \e -> handleE $ WlShellSurfaceEvent e
-    _               <- getOrCreateObject $ R.mkRiverLayerShellOutputListener $ \e -> handleE $ LayerShellOutputEvent e -- R.RiverLayerShellOutputListener
-    _               <- getOrCreateObject $ R.mkRiverLayerShellSeatListener $ \e -> handleE $ LayerShellSeatEvent e -- R.RiverLayerShellOutputListener
-    _               <- getOrCreateObject $ R.mkRiverInputDeviceListener    $ \e -> handleE $ InputDeviceEvent e
-    libinputConfigL <- getOrCreateObject $ R.mkRiverLibinputConfigListener $ \e -> handleE $ LibinputConfigEvent e
-    inputManagerL   <- getOrCreateObject $ R.mkRiverInputManagerListener   $ \e -> handleE $ InputManagerEvent e
-    shmL            <- getOrCreateObject $ WL.mkShmListener                  $ \e -> handleE $ WlShmEvent e
-    managerL        <- getOrCreateObject $ R.mkRiverWindowManagerListener           $ \e -> handleE $ WindowManagerEvent e
-    regL            <- getOrCreateObject $ WL.mkRegistryListener             $ handleRegistryListenerE conf.globals
+    regL            <- getOrCreateObject $ WL.mkRegistryListener              $ handleRegistryListenerE conf.globals
+    shmL            <- getOrCreateObject $ WL.mkShmListener                   $ \e -> handleE $ WlShmEvent e
+    _               <- getOrCreateObject $ WL.mkOutputListener                $ \e -> handleE $ WlOutputEvent e
+    _               <- getOrCreateObject $ WL.mkShellSurfaceListener          $ \e -> handleE $ WlShellSurfaceEvent e
+    xkbConfigL      <- getOrCreateObject $ R.mkRiverXkbConfigListener         $ \e -> handleE $ XkbConfigEvent e
+    _               <- getOrCreateObject $ R.mkRiverXkbKeyboardListener       $ \e -> handleE $ XkbKeyboardEvent e
+    _               <- getOrCreateObject $ R.mkRiverXkbBindingListener        $ \e -> handleE $ XkbEvent e
+    _               <- getOrCreateObject $ R.mkRiverXkbBindingsSeatListener   $ \e -> handleE $ XkbSeatEvent e
+    _               <- getOrCreateObject $ R.mkRiverPointerBindingListener    $ \e -> handleE $ PointerEvent e
+    _               <- getOrCreateObject $ R.mkRiverWindowListener            $ \e -> handleE $ WindowEvent e
+    _               <- getOrCreateObject $ R.mkRiverSeatListener              $ \e -> handleE $ SeatEvent e
+    _               <- getOrCreateObject $ R.mkRiverOutputListener            $ \e -> handleE $ OutputEvent e
+    _               <- getOrCreateObject $ R.mkRiverLayerShellOutputListener  $ \e -> handleE $ LayerShellOutputEvent e
+    _               <- getOrCreateObject $ R.mkRiverLayerShellSeatListener    $ \e -> handleE $ LayerShellSeatEvent e
+    _               <- getOrCreateObject $ R.mkRiverInputDeviceListener       $ \e -> handleE $ InputDeviceEvent e
+    libinputConfigL <- getOrCreateObject $ R.mkRiverLibinputConfigListener    $ \e -> handleE $ LibinputConfigEvent e
+    inputManagerL   <- getOrCreateObject $ R.mkRiverInputManagerListener      $ \e -> handleE $ InputManagerEvent e
+    managerL        <- getOrCreateObject $ R.mkRiverWindowManagerListener     $ \e -> handleE $ WindowManagerEvent e
+    foreignListL    <- getOrCreateObject $ WL.mkForeignToplevelListListener   $ \e -> handleE $ ForeignTopLevelListV1 e
+    _               <- getOrCreateObject $ WL.mkForeignToplevelHandleListener $ \e -> handleE $ ForeignTopLevelHandleV1 e
 
     registry <- io $ displayGetRegistry display
-    _ <- io $ WL.listenerAdd registry regL nullPtr
+    io $ WL.listenerAdd registry regL nullPtr
 
     -- Wait for one roundtrip for the registry listener to become aware of all current globals.
     _ <- io $ displayRoundtrip display
 
     -- expect wl_compositor
     _ <- getOrCreateObject $ requireGlobal conf.globals ("wl_compositor", 4) $ \r n v ->
-      io $ WL.Compositor <$> WL.registryBind r n WL.compositorInterface (fi v)
+      WL.Compositor <$> WL.registryBind r n WL.compositorInterface (fi v)
 
     -- expect wl_shm
     wl_shm <- getOrCreateObject $ requireGlobal conf.globals ("wl_shm", 1) $ \r n v ->
-      io $ WL.Shm <$> WL.registryBind r n WL.shmInterface (fi v)
-    _ <- io $ WL.listenerAdd wl_shm shmL nullPtr
+      WL.Shm <$> WL.registryBind r n WL.shmInterface (fi v)
+
+    io $ WL.listenerAdd wl_shm shmL nullPtr
 
     inputManager <- getOrCreateObject $ requireGlobal conf.globals ("river_input_manager_v1", 1) $ \r n v ->
       WL.registryBind r n R.riverInputManagerInterface (fi v) <&> R.RiverInputManager
-    _ <- io $ R.listenerAdd inputManager inputManagerL nullPtr
+
+    io $ R.listenerAdd inputManager inputManagerL nullPtr
 
     libinputConfig <- getOrCreateObject $ requireGlobal conf.globals ("river_libinput_config_v1", 1) $ \r n v ->
       WL.registryBind r n R.riverLibinputConfigInterface (fi v) <&> R.RiverLibinputConfig
-    _ <- io $ R.listenerAdd libinputConfig libinputConfigL nullPtr
+
+    io $ R.listenerAdd libinputConfig libinputConfigL nullPtr
 
     _ <- getOrCreateObject $ requireGlobal conf.globals ("river_layer_shell_v1", 1) $ \r n v ->
       WL.registryBind r n R.riverLayerShellInterface (fi v) <&> R.RiverLayerShell
@@ -116,22 +120,22 @@ startHSWM display config = withStdoutLogging $ do
 
     xkbConfig <- getOrCreateObject $ requireGlobal conf.globals ("river_xkb_config_v1", 1) $ \r n v ->
       WL.registryBind r n R.riverXkbConfigInterface (fi v) <&> R.RiverXkbConfig
+
     io $ R.listenerAdd xkbConfig xkbConfigL nullPtr
     io $ R.listenerAdd windowManager managerL nullPtr
 
-    foreignListL <- getOrCreateObject $ WL.mkExtForeignToplevelListV1Listener $ \e -> handleE $ ForeignTopLevelListV1 e
-    _            <- getOrCreateObject $ WL.mkExtForeignToplevelHandleV1Listener $ \e -> handleE $ ForeignTopLevelHandleV1 e
     foreignList  <- getOrCreateObject $ requireGlobal conf.globals ("ext_foreign_toplevel_list_v1", 1) $ \r n v ->
-      WL.registryBind r n WL.ext_foreign_toplevel_list_v1_interface (fi v) >>= return . castPtr @_ @WL.Ext_foreign_toplevel_list_v1
-    _ <- io $ WL.ext_foreign_toplevel_list_v1_add_listener foreignList foreignListL nullPtr
+      WL.registryBind r n WL.foreignToplevelListInterface (fi v) <&> WL.ForeignToplevelList
+
+    io $ WL.listenerAdd foreignList foreignListL nullPtr
 
     log' "WM: running startup hooks"
     userCodeDef () (startupHook config)
 
   log' "WM: Installing signal handlers..."
-  _ <- Posix.installHandler Posix.sigTERM (Posix.CatchInfo $ \_ -> mainEvent $ MainExit "TERM") Nothing
-  _ <- Posix.installHandler Posix.sigINT  (Posix.CatchInfo $ \_ -> mainEvent $ MainExit "INT") Nothing
-  _ <- Posix.installHandler Posix.sigQUIT (Posix.CatchInfo $ \_ -> mainEvent $ MainExit "QUIT") Nothing
+  _ <- Posix.installHandler Posix.sigTERM (Posix.Catch $ mainEvent $ MainExit "TERM") Nothing
+  _ <- Posix.installHandler Posix.sigINT  (Posix.Catch $ mainEvent $ MainExit "INT") Nothing
+  _ <- Posix.installHandler Posix.sigQUIT (Posix.Catch $ mainEvent $ MainExit "QUIT") Nothing
   _ <- Posix.installHandler Posix.sigUSR2 (Posix.Catch $ do
         log' "USR2 - reload / restart"
         prog <- getProgramPath
@@ -167,7 +171,7 @@ startHSWM display config = withStdoutLogging $ do
       c_poll fds fdsLen PollBlock >>= \case
         PollError -> mainEvent $ MainExit "main: poll error"
         PollTimeout -> return ()
-        PollResult n -> do
+        PollResult _ -> do
           whenRevent wlPollFd pOLLHUP $ mainEvent $ MainExit "disconnected by compositor"
           whenRevent wlPollFd pOLLIN $ do
             -- process incoming events
@@ -270,11 +274,9 @@ handleEvent (InputManagerEvent (R.RiverInputManagerInputDevice _ _ dev)) = do
 
 -- handleEvent (InputDevicEvent (R.RiverInputDeviceType' _ _ inputDevice)) = return ()
 
-handleEvent (WlShmEvent (WL.ShmFormat _ _ fmt)) = log' $ toText $ "shm format: " ++ ppShmFormat (WL.Wl_shm_format $ fi fmt)
-
-handleEvent (ForeignTopLevelListV1 (WL.ExtForeignToplevelListV1Toplevel _ _ fh)) = do
+handleEvent (ForeignTopLevelListV1 (WL.ForeignToplevelListToplevel _ _ fh)) = do
     l <- getObject
-    _ <- io $ WL.ext_foreign_toplevel_handle_v1_add_listener fh l nullPtr
+    _ <- io $ WL.listenerAdd fh l nullPtr
     return ()
 
 handleEvent _ = return ()

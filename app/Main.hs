@@ -84,8 +84,8 @@ main = do
     ]
 
   myPointerBinds =
-    [ (("M", _BTN_LEFT),  namedA "Move"    $ return ())
-    , (("M", _BTN_RIGHT), namedA "Stretch" $ return ())
+    [ (("M", _BTN_LEFT),  namedA "Move"    $ startSeatOp SEAT_OP_MOVE)
+    , (("M", _BTN_RIGHT), namedA "Stretch" $ startSeatOp SEAT_OP_RESIZE)
     ]
 
 dvpMyLayout :: XkbRuleNames

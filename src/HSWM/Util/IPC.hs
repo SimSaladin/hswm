@@ -113,7 +113,7 @@ serverRun stateRef onMsg = do
                   Right (Ping n) -> sendMsg conn (Pong n)
                   Right (msg :: ProtoMsg) -> do
                     debug' $ "IPC client event (raw): " <> toText (BUTF8.toString resp)
-                    debug' $ "IPC client event (decoded): " <> tshow msg
+                    --debug' $ "IPC client event (decoded): " <> tshow msg
                     onMsg conn msg
       worker ""
 

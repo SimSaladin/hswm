@@ -24,6 +24,7 @@ import Data.Kind (Type)
 import Foreign.C
 import Foreign
 import Data.Void
+import Control.Monad
 
 class ListenerEvent ev where
   type Listener ev :: Type
@@ -36,7 +37,22 @@ class IsWlObject object where
 
 class AddListener object where
   type ObjectListener object :: Type
-  listenerAdd :: object -> PtrConst (ObjectListener object) -> Ptr Void -> IO CInt
+  objectListenerAdd :: object -> PtrConst (ObjectListener object) -> Ptr Void -> IO CInt
 
 class HasDestructor object where
   objectDestroy :: object -> IO ()
+
+listenerAdd :: (AddListener a, IsUserData ud) => a -> PtrConst (ObjectListener a) -> ud -> IO ()
+listenerAdd obj l ud = do
+  res <- objectListenerAdd obj l (toUserData ud)
+  when (res < 0) $ error "listenerAdd: returned -1"
+
+class IsUserData a where
+  toUserData :: a -> Ptr Void
+
+instance IsUserData ()
+  where toUserData _ = nullPtr
+instance IsUserData (Ptr a)
+  where toUserData = castPtr
+instance IsUserData (StablePtr a) where
+  toUserData = castPtr . castStablePtrToPtr

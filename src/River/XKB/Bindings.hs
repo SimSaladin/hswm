@@ -11,16 +11,12 @@
 ------------------------------------------------------------------------------
 module River.XKB.Bindings
   ( module River.XKB.Bindings
-  -- , module River.XKB.Bindings.FFI
-  -- , module River.XKB.Bindings.MiscFFI
   ) where
 
 import           HSWM.XKB
 
 import qualified River.Objects as R
 import           River.WMP
---import           River.XKB.Bindings.FFI
---import           River.XKB.Bindings.MiscFFI
 
 import           Foreign
 import           Foreign.Storable.Generic (GStorable(..))
