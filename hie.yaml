@@ -1,0 +1,22 @@
+cradle:
+  cabal:
+    - path: "./src"
+      component: "lib:hswm"
+
+    - path: "./hswm-prelude"
+      component: "hswm:lib:hswm-prelude"
+
+    - path: "./app/Main.hs"
+      component: "hswm:exe:hswm"
+
+    - path: "./app-ctl/Main.hs"
+      component: "hswm:exe:hswmctl"
+
+    - path: "hswm-bindings/src"
+      component: "lib:hswm-bindings"
+
+    - path: "waybar-cffi-hs/lib"
+      component: "lib:waybar-cffi-hs"
+
+    - path: "waybar-cffi-hs/lib"
+      component: "waybar-cffi-hs:lib:waybarhaskellplugin"

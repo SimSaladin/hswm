@@ -31,6 +31,7 @@ import qualified River.Safe as R
 import           Wayland
 import qualified Wayland.Client as WL
 import qualified Wayland.Client.Extras as WL
+import           Wlr
 
 import           Data.IORef
 import qualified Data.Map as M
@@ -125,6 +126,9 @@ data Event
   -- Ext_*
   | ForeignTopLevelListV1 !WL.ForeignToplevelListEvent
   | ForeignTopLevelHandleV1 !WL.ForeignToplevelHandleEvent
+  | ZwpIM2PopupSurfaceE !ZwpInputPopupSurfaceV2Event
+  | ZwpIM2KeyboardGrabE !ZwpInputMethodKeyboardGrabV2Event
+  | ZwpIM2E             !ZwpInputMethodV2Event
   deriving (Show, Generic)
 
 type WindowSet   = W.StackSet  WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail ScreenId ScreenDetail
@@ -369,6 +373,7 @@ data Seat = Seat
   { river_seat                           :: !RiverSeat
   , river_layer_shell_seat               :: !R.RiverLayerShellSeat
   , xkb_bindings_seat                    :: !R.RiverXkbBindingsSeat
+  , wl_seat                              :: !WL.Seat
   , name                                 :: !String
   , caps                                 :: !WL.Wl_seat_capability
   --
@@ -401,6 +406,7 @@ instance Show (H Bool) where
 instance Default Seat where
   def = Seat
     { river_seat = def
+    , wl_seat = WL.Seat nullPtr
     , xkb_bindings_seat = R.RiverXkbBindingsSeat nullPtr
     , inputOverride = Nothing
     , name = ""

@@ -12,6 +12,7 @@ author:             Samuli Thomasson
 maintainer:         samuli.thomasson@pm.me
 build-type:         Simple
 extra-source-files:
+      cbits/input-method-unstable-v2-protocol.c
       cbits/river-input-management-v1-protocol.c
       cbits/river-layer-shell-v1-protocol.c
       cbits/river-libinput-config-v1-protocol.c
@@ -19,6 +20,7 @@ extra-source-files:
       cbits/river-window-management-v1-protocol.c
       cbits/river-xkb-bindings-v1-protocol.c
       cbits/river-xkb-config-v1-protocol.c
+      include/input-method-unstable-v2-client-protocol.h
       include/river-input-management-v1-client-protocol.h
       include/river-layer-shell-v1-client-protocol.h
       include/river-libinput-config-v1-client-protocol.h
@@ -29,8 +31,6 @@ extra-source-files:
       binding-specs/river-input-management.yaml
       binding-specs/river-window-management.yaml
       binding-specs/wayland-client.yaml
-      binding-specs/wayland-server.yaml
-      binding-specs/wayland-util.yaml
       generated/Generated.Pixman.yaml
       generated/Generated.River.InputManagementV1.yaml
       generated/Generated.River.LayerShellV1.yaml
@@ -41,6 +41,7 @@ extra-source-files:
       generated/Generated.Wayland.Client.yaml
       generated/Generated.Wayland.Protocol.ForeignTopLevelListV1.yaml
       generated/Generated.Wayland.Util.yaml
+      generated/Generated.Wlr.InputMethodV2.yaml
 extra-doc-files:
       CHANGELOG.md
 
@@ -94,6 +95,11 @@ library
           Generated.Wayland.Util.FunPtr
           Generated.Wayland.Util.Safe
           Generated.Wayland.Util.Unsafe
+          Generated.Wlr.InputMethodV2
+          Generated.Wlr.InputMethodV2.FunPtr
+          Generated.Wlr.InputMethodV2.Global
+          Generated.Wlr.InputMethodV2.Safe
+          Generated.Wlr.InputMethodV2.Unsafe
           River.InputManagement
           River.LayerShell
           River.LibinputConfig
@@ -109,6 +115,7 @@ library
           Wayland.Client.Internal.TH
           Wayland.Client.Internal.Types
           Wayland.Client.Objects
+          Wlr
     other-modules:
           Paths_hswm_bindings
     autogen-modules:
@@ -131,6 +138,7 @@ library
           include
           include/wayland-protocols
     c-sources:
+          cbits/input-method-unstable-v2-protocol.c
           cbits/river-input-management-v1-protocol.c
           cbits/river-layer-shell-v1-protocol.c
           cbits/river-libinput-config-v1-protocol.c

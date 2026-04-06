@@ -4,7 +4,7 @@ WAYLAND_SCANNER	:= wayland-scanner --include-core-only --strict
 
 PROTODIR	:= ./protocol
 HEADERDIR := ./hswm-bindings/include
-CDIR	:= ./hswm-includes/cbits
+CDIR	:= ./hswm-bindings/cbits
 
 CLIENT_PROTOS := river-window-management-v1.xml river-xkb-bindings-v1.xml river-xkb-config-v1.xml \
 		   river-input-management-v1.xml river-layer-shell-v1.xml river-libinput-config-v1.xml \
@@ -52,7 +52,7 @@ HS_BIND_GEN	:= hs-bindgen-cli preprocess \
 			   --hs-output-dir $(bindGenOutDir) --create-output-dirs --overwrite-files \
 			   --omit-field-prefixes --enable-program-slicing --clang-option '-std=gnu23' \
 			   -I /nix/store/j8irrc0mpx029dw0rmadsjylg7h31ync-glibc-2.42-51-dev/include \
-			   -I ./cbits
+			   -I $(HEADERDIR)
 
 .PHONY: bindgen-wayland
 
@@ -71,7 +71,8 @@ bindgen-river:	\
 	$(bindGenSpecDir)/Generated.River.XkbConfigV1.yaml \
 	$(bindGenSpecDir)/Generated.River.XkbBindingsV1.yaml \
 	$(bindGenSpecDir)/Generated.River.LibinputConfigV1.yaml \
-	$(bindGenSpecDir)/Generated.River.LayerShellV1.yaml
+	$(bindGenSpecDir)/Generated.River.LayerShellV1.yaml \
+	$(bindGenSpecDir)/Generated.Wlr.InputMethodV2.yaml
 
 $(bindGenSpecDir)/Generated.Pixman.yaml: FORCE
 	$(HS_BIND_GEN) \
@@ -162,6 +163,15 @@ $(bindGenSpecDir)/Generated.River.LibinputConfigV1.yaml: $(HEADERDIR)/river-libi
 
 $(bindGenSpecDir)/Generated.Wayland.Protocol.ForeignTopLevelListV1.yaml: $(HEADERDIR)/wayland-protocols/ext-foreign-toplevel-list-v1-client-protocol.h FORCE
 	$(HS_BIND_GEN) $(<F) -I $(HEADERDIR)/wayland-protocols \
+	  --gen-binding-spec $@ \
+	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \
+	  --module $(patsubst %.yaml,%,$(@F)) \
+	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml \
+	  --external-binding-spec $(bindingSpecs)/wayland-client.yaml
+
+# input-method-unstable-v2-client-protocol.h
+$(bindGenSpecDir)/Generated.Wlr.InputMethodV2.yaml: $(HEADERDIR)/input-method-unstable-v2-client-protocol.h FORCE
+	$(HS_BIND_GEN) $(<F) \
 	  --gen-binding-spec $@ \
 	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \
 	  --module $(patsubst %.yaml,%,$(@F)) \

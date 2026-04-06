@@ -16,6 +16,7 @@ import qualified HSWM.StackSet as W
 import           HSWM.Util.Posix
 import qualified HSWM.Windows as Windows
 import           HSWM.XKB
+import HSWM.Utils
 
 import           River
 import qualified River.Safe as R
@@ -23,6 +24,7 @@ import qualified River.Objects as R
 import           Wayland
 import qualified Wayland.Client as WL
 import qualified Wayland.Client.Extras as WL
+import           Wlr
 
 import           Data.IORef
 import           Foreign hiding (new, void)
@@ -86,6 +88,10 @@ startHSWM display config = withStdoutLogging $ do
     foreignListL    <- getOrCreateObject $ WL.mkForeignToplevelListListener   $ \e -> handleE $ ForeignTopLevelListV1 e
     _               <- getOrCreateObject $ WL.mkForeignToplevelHandleListener $ \e -> handleE $ ForeignTopLevelHandleV1 e
 
+    _               <- getOrCreateObject $ mkZwpInputPopupSurfaceV2Listener       $ handleE . ZwpIM2PopupSurfaceE
+    _               <- getOrCreateObject $ mkZwpInputMethodKeyboardGrabV2Listener $ handleE . ZwpIM2KeyboardGrabE
+    _               <- getOrCreateObject $ mkZwpInputMethodV2Listener             $ handleE . ZwpIM2E
+
     registry <- io $ displayGetRegistry display
     io $ WL.listenerAdd registry regL nullPtr
 
@@ -129,6 +135,9 @@ startHSWM display config = withStdoutLogging $ do
       WL.registryBind r n WL.foreignToplevelListInterface (fi v) <&> WL.ForeignToplevelList
 
     io $ WL.listenerAdd foreignList foreignListL nullPtr
+
+    im2manager <- getOrCreateObject $ requireGlobal conf.globals ("zwp_input_method_manager_v2", 1) $ \r n v ->
+      io $ WL.registryBind r n zwpInputMethodManagerV2Interface (fi v)  <&> ZwpInputMethodManagerV2
 
     log' "WM: running startup hooks"
     userCodeDef () (startupHook config)
@@ -291,3 +300,17 @@ setKeyboardLayout xkbConfig keyboard layout =
     io $ withXkbKeymapFd km $ \fd ->
     R.riverXkbConfigCreateKeymap xkbConfig (fi fd) R.RIVER_XKB_CONFIG_V1_KEYMAP_FORMAT_TEXT_V1 -- RiverXkbConfigKeymapFormatText
     >>= io . R.riverXkbKeyboardSetKeymap keyboard
+
+testIM2 :: H ()
+testIM2 = do
+  im2manager <- getObject
+  mapSeats $ \seat -> do
+    im2 <- io $ zwpInputMethodManagerV2GetInputMethod im2manager seat.wl_seat
+    putObject im2
+    l <- getObject
+    io $ WL.listenerAdd im2 l nullPtr
+
+    log' "Grabbing keyboard"
+    kbGrab <- io $ zwpInputMethodV2GrabKeyboard im2
+    kbgL <- getObject
+    io $ WL.listenerAdd kbGrab kbgL nullPtr

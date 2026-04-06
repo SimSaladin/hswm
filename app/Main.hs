@@ -16,6 +16,7 @@ import           HSWM.Util.Debug
 import qualified HSWM.Actions.CycleWS as CycleWS
 import qualified HSWM.Actions.CycleRecentWS as CyclRecentWS
 
+import Core (testIM2)
 import           Data.Ratio
 
 default ([Char])
@@ -85,6 +86,7 @@ main = do
     -- "M-S-<Return>"  FloatNext.floatNext True >> spawnTerm def "" ? "Terminal (floating)"
     -- "M-$"           spawn (sh "physlock -p \"${HOSTNAME} ${DISPLAY}\"") ? "Lock (physlock)"
     -- "M-<Print>"     takeScreenshot
+    , ("M-r t", "Test IM2" =? testIM2)
 
      -- ======== Execute ==========
     , ("M-r r",         "Prompt: run command" =? launchRofi ["-modes", "run", "-show", "run"])

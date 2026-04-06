@@ -44,7 +44,7 @@ data SeatManager = SeatManager
   deriving anyclass Default
 
 modifySeat' :: Ptr Void -> (Seat -> Seat) -> H ()
-modifySeat' ud f = io (WL.fromUserData ud) >>= (`modifySeat` f)
+modifySeat' ud f = modifySeat (R.RiverSeat $ castPtr ud) f
 
 getSMgr :: H SeatManager
 getSMgr = getOrCreateObject (pure def)
@@ -111,8 +111,9 @@ handleEvent e = do
 handleWlSeatEvent :: WL.SeatEvent -> H ()
 handleWlSeatEvent e = do
   case e of
-    WL.SeatName ud _ name ->
-      modifySeat' ud $ \x -> x { name = name }
+    WL.SeatName ud wl_seat name -> do
+      modifySeat' ud $ \x -> x { name = name, wl_seat }
+      mapSeats $ pTrace
     WL.SeatCapabilities ud s caps -> do
       modifySeat' ud $ \x -> x { caps = WL.toCEnum (fi caps) }
       setXCursorTheme
