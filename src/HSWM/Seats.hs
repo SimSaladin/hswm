@@ -113,7 +113,7 @@ handleLayerShellSeat e = do
     -- No layer shell surface will have keyboard focus at the end
     -- of the manage sequence in which this event is sent. The window
     -- manager may want to return focus to whichever window last had focus, for example.
-    R.RiverLayerShellSeatFocusNone         _ _ -> pure $ FocusNone
+    R.RiverLayerShellSeatFocusNone         _ _ -> pure FocusNone
   putObject sm { seat_lshell_focus = newFocus }
 
 
