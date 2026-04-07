@@ -14,6 +14,7 @@ module HSWM.Core
     module HSWM.Types.Events,
     module HSWM.Types.Layouts,
     module HSWM.Types.WM,
+    module HSWM.Types.TypeMap,
     module HSWM.Util.Types,
     module River,
     ModMask,
@@ -24,8 +25,6 @@ where
 import Data.IORef
 import Data.Map qualified as M
 import Data.Monoid (Ap (..))
-import Data.TMap qualified as TM
-import Data.Typeable
 import Foreign
 import Foreign.C
 import HSWM.Util.Types
@@ -34,18 +33,24 @@ import River
 import River.Objects qualified as R
 import River.Safe qualified as R
 import System.Exit (ExitCode (..))
-import Wayland
-import Wayland.Client qualified as WL
+import Wayland (RegistryCache)
+import Wayland.Client qualified as WL hiding (display)
+import Control.Monad.State
 
 import HSWM.Types.WM
 import HSWM.Types.Config
 import HSWM.Types.Layouts
 import HSWM.Types.Events
+import HSWM.Types.TypeMap
+
+-----------------------------------------------------------
+-- Program state (read + write)
 
 -- | The read-only window manager state.
 data HConf = HConf
   { config :: !(HSWMConfig H Layout),
-    display :: !Display,
+    _display :: !WL.Display,
+    _logFunc :: !LogFunc,
     -- | The global objects available through wl_registry.
     globals :: !(IORef RegistryCache),
     _state :: !(TMVar HState),
@@ -72,22 +77,22 @@ data HState = HState
   deriving (Generic, Default)
 
 ---------------------------------------------------------------
-
-newtype TypeMap = TypeMap {unTypeMap :: TM.TMap}
-  deriving (Show, Generic)
-
-instance Default TypeMap where def = TypeMap TM.empty
-
----------------------------------------------------------------
+-- * H Monad
 
 -- a la xmonad
 newtype H a = H (ReaderT HConf (StateT HState IO) a)
-  deriving newtype (Functor, Applicative, Monad, MonadFail, MonadIO, MonadState HState, MonadReader HConf)
+  deriving newtype (Functor, Applicative, Monad, MonadFail, MonadIO, MonadState HState, MonadReader HConf, MonadThrow)
   deriving (Semigroup, Monoid) via Ap H a
 
 instance Default (H ()) where def = return ()
 
 instance IsAction H (H ()) where runner = id
+
+instance HasGlobalTMap HState where
+  globalTMap = lens wlObjects (\s a -> s { wlObjects = a })
+
+instance HasLogFunc HConf where
+  logFuncL = lens _logFunc (\s a -> s { _logFunc = a })
 
 -- a la xmonad
 runH :: HConf -> HState -> H a -> IO (a, HState)
@@ -106,18 +111,16 @@ catchH :: H a -> H a -> H a
 catchH job errcase = do
   st <- get
   c <- ask
-  (a, s') <-
-    liftIO $
-      runH c st job
+  (a, s') <- liftIO $ runH c st job
         `catch` \e -> case fromException e of
-          Just (_ :: ExitCode) -> throw e
-          _ -> log' ("error: " <> tshow e) >> runH c st errcase
+          Just (_ :: ExitCode) -> throwM e
+          _ -> hPutBuilder stderr (getUtf8Builder $ display @Text "error: " <> display (tshow e)) >> runH c st errcase
   put s'
   return a
 
--- | Conditionally run an action, using a monadic event to decide
-whenM :: (Monad m) => m Bool -> m () -> m ()
-whenM a f = a >>= \b -> when b f
+-- -- | Conditionally run an action, using a monadic event to decide
+-- whenM :: (Monad m) => m Bool -> m () -> m ()
+-- whenM a f = a >>= \b -> when b f
 
 -- a la xmonad
 userCode :: H a -> H (Maybe a)
@@ -128,22 +131,10 @@ userCode a = catchH (Just <$> a) (return Nothing)
 userCodeDef :: a -> H a -> H a
 userCodeDef defValue a = fromMaybe defValue <$> userCode a
 
-data SeatAction
-  = -- | no action / reset
-    S_NONE
-  | -- | start pointer drag operation
-    S_START_OP SeatOp
-  | -- | interpret next keypress for submap, swallowing an unexpected key
-    S_SUBMAP_NEXT_KEY (SomeAction H) (XkbBindingMap (SomeAction H))
-  | -- | Cancel submap input, resetting to root bindings.
-    S_SUBMAP_CANCEL
-  | -- | Temporarily interpret all keyboard input differently.
-    S_INPUT_OVERRIDE (H Bool) [((ModMask, KeySym), (SomeAction H))]
-  | -- | Cancel input override mode
-    S_INPUT_OVERRIDE_CANCEL
-  deriving (Show, Generic)
+-----------------------------------------------------------
+-- River & Wayland
 
-instance Default SeatAction where def = S_NONE
+-- * River/WL Seat
 
 data Seat = Seat
   { river_seat :: !RiverSeat,
@@ -172,8 +163,26 @@ data Seat = Seat
   }
   deriving (Show, Generic)
 
+data SeatAction
+  = -- | no action / reset
+    S_NONE
+  | -- | start pointer drag operation
+    S_START_OP SeatOp
+  | -- | interpret next keypress for submap, swallowing an unexpected key
+    S_SUBMAP_NEXT_KEY (SomeAction H) (XkbBindingMap (SomeAction H))
+  | -- | Cancel submap input, resetting to root bindings.
+    S_SUBMAP_CANCEL
+  | -- | Temporarily interpret all keyboard input differently.
+    S_INPUT_OVERRIDE (H Bool) [((ModMask, KeySym), SomeAction H)]
+  | -- | Cancel input override mode
+    S_INPUT_OVERRIDE_CANCEL
+  deriving (Show, Generic)
+
+instance Default SeatAction where def = S_NONE
+
 -- XXX
-instance Show (StablePtr a) where show _ = "<SP>"
+instance Show (StablePtr a) where show :: StablePtr a -> String
+                                  show _ = "<SP>"
 instance Show (H ()) where show _ = "H()"
 instance Show (H Bool) where show _ = "H()"
 
@@ -214,6 +223,8 @@ data SeatOp
   | SEAT_OP_RESIZE
   deriving (Eq, Show)
 
+-- * Wayland/River outputs management
+
 data Output = Output
   { river_output :: !RiverOutput,
     width, height, x, y :: !Int32,
@@ -228,6 +239,8 @@ data Output = Output
 
 instance Default Output where
   def = Output def 0 0 0 0 0 (S (-1)) "" "" (R.RiverLayerShellOutput nullPtr) Nothing
+
+-- * Window management
 
 data Window = Window
   { river_window :: !RiverWindow,
@@ -256,6 +269,8 @@ data Window = Window
   deriving stock (Show, Generic)
   deriving anyclass (Default)
 
+-- * WindowManager main loop
+
 data WindowManageAction
   = WFullscreen
   | WFullscreenOnScreen RiverOutput
@@ -264,46 +279,3 @@ data WindowManageAction
   | WRequestClose
   deriving (Eq, Show, Generic)
 
--------------------------------------------------------
-
--- | Run a monadic action with the current stack set
-withWindowSet :: (WindowSet -> H a) -> H a
-withWindowSet f = gets windowset >>= f
-
-modifyWindowSet :: (WindowSet -> WindowSet) -> H ()
-modifyWindowSet f = modify' $ \s -> s {windowset = f (windowset s)}
-
--------------------------------------------------------
-
-getOrCreateObject :: (Typeable a, MonadState HState m, MonadIO m) => IO a -> m a
-getOrCreateObject m =
-  gets (TM.lookup . unTypeMap . wlObjects) >>= \case
-    Just x -> return x
-    Nothing -> liftIO m >>= \x -> modifyWlObjects (TM.insert x) >> return x
-
-modifyWlObjects :: (MonadState HState m) => (TM.TMap -> TM.TMap) -> m ()
-modifyWlObjects f = modify $ \s -> s {wlObjects = TypeMap $ f $! unTypeMap $ wlObjects s}
-
-withObjects :: (MonadState HState m) => (TM.TMap -> m a) -> m a
-withObjects f = gets (unTypeMap . wlObjects) >>= f
-
-putObject :: (Typeable a) => a -> H ()
-putObject x = modifyWlObjects $ TM.insert x
-
-getObject :: (Typeable a) => H a
-getObject =
-  gets (TM.lookup . unTypeMap . wlObjects) >>= \case
-    (Nothing :: Maybe a) -> error ("getObject: no such object: " ++ show (typeRep (Proxy :: Proxy a)))
-    Just x -> return x
-
-withObject :: (Typeable a) => (a -> H b) -> H b
-withObject f =
-  gets (TM.lookup . unTypeMap . wlObjects) >>= \case
-    (Nothing :: Maybe a) -> error ("withObject: no such object: " ++ show (typeRep (Proxy :: Proxy a)))
-    Just x -> f x
-
-withObjectDef :: (Typeable a, MonadState HState m) => b -> (a -> m b) -> m b
-withObjectDef od f =
-  gets (TM.lookup . unTypeMap . wlObjects) >>= \case
-    Nothing -> return od
-    Just x -> f x

@@ -45,6 +45,4 @@ waybarExitHook _ = do
   withObject $ \WaybarState{wbPID} ->
     io $ case wbPID of
       Nothing -> pure ()
-      Just pid -> do
-        log' "Stopping waybar..."
-        Posix.signalProcessGroup Posix.sigTERM pid
+      Just pid -> Posix.signalProcessGroup Posix.sigTERM pid

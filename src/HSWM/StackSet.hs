@@ -13,13 +13,11 @@
 ------------------------------------------------------------------------------
 module HSWM.StackSet where
 
+import           Prelude hiding (view, filter, modify)
 import           Control.Applicative.Backwards (Backwards(Backwards, forwards))
-import           Data.Foldable (toList)
 import qualified Data.List as L
-import           Data.List.NonEmpty (NonEmpty((:|)))
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map as M
-import           Prelude hiding (filter, modify, modify')
 
 ------------------------------------------------------------------------
 -- |
@@ -110,7 +108,7 @@ new l (wid:wids) (m:ms) | length ms <= length wids
   = StackSet cur visi (map ws unseen) M.empty
   where ws i = Workspace i l Nothing def
         (seen, unseen) = L.splitAt (length ms) wids
-        cur:|visi = Screen (ws wid) 1 m :| [ Screen (ws i) s sd | (i, s, sd) <- zip3 seen [1..] ms ]
+        cur:|visi = Screen (ws wid) 1 m :| [ Screen (ws i) s sd | (i, s, sd) <- L.zip3 seen [1..] ms ]
                 -- now zip up visibles with their screen id
 new _ _ _ = error "non-positive argument to StackSet.new"
 

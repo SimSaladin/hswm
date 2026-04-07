@@ -27,8 +27,6 @@ import           Prelude hiding (state)
 import qualified Data.List as L
 import qualified Data.Map as M
 import qualified Data.Set as S
-import           Data.IORef
-import           Control.Arrow
 
 type Window = RiverWindow -- XXX
 

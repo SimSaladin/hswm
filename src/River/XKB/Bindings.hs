@@ -33,7 +33,7 @@ data XkbBinding a = XkbBinding
   } deriving (Generic)
 
 createXkbBindings
-  :: (MonadIO m, Show a)
+  :: (MonadReader env m, HasLogFunc env, MonadIO m, Show a)
   => (R.RiverXkbBindings, R.RiverXkbBindingListener, R.RiverSeat)
   -> (a -> [((ModMask, KeySym), a)]) -- ^ 'actionSubmap' - get subkeys
   -> [((ModMask, KeySym), a)]
@@ -47,7 +47,7 @@ createXkbBindings (a1, a2, a3) getSub keys = sequence top
     create1 enable (m, k) = newXKBBinding a1 a2 a3 enable m k
 
 newXKBBinding
-  :: (MonadIO m, Show action)
+  :: (MonadReader env m, HasLogFunc env, MonadIO m, Show action)
   => R.RiverXkbBindings
   -> R.RiverXkbBindingListener
   -> R.RiverSeat
@@ -58,7 +58,7 @@ newXKBBinding
   -> XkbBindingMap action -- ^ Submap keys
   -> m (StablePtr (XkbBinding action))
 newXKBBinding xkbBinds xkb_binding_listener seat enable mods keysym action subKM = do
-  debug' $ "[keys] binding key: " <> toText (ppXkbModsKey mods keysym) <> " " <> tshow action
+  debug' $ "[keys] binding key: " <> fromString (ppXkbModsKey mods keysym) <> " " <> fromString (show action)
   xb <- io $ R.riverXkbBindingsGetXkbBinding xkbBinds seat (fi keysym) (fi mods)
   -- subP <- io $ newStablePtr subKM
   dtPtr <- io $ newStablePtr $ XkbBinding xb seat action subKM

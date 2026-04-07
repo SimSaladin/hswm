@@ -38,6 +38,7 @@ import Data.List (elemIndex, sortBy)
 import Data.List.NonEmpty (nonEmpty, NonEmpty((:|)))
 import Data.Function (on)
 
+import Data.List ((!!))
 import HSWM
 import qualified HSWM.StackSet as W
 

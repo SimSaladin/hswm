@@ -24,8 +24,8 @@ import Foreign
 import HSWM.XKB.FFI
 import HSWM.Operations
 import Control.Monad.Fix
-import Data.IORef
 import qualified River.Objects as R
+import Control.Monad.State (StateT, runStateT)
 
 grabWhileDo :: acc -> [ModMask] -> [KeySym] -> (KeySym -> StateT acc H ()) -> H ()
 grabWhileDo start uphold triggers eventHandler = withGrab start $ \acc gk ->
@@ -39,13 +39,21 @@ grabWhileDo start uphold triggers eventHandler = withGrab start $ \acc gk ->
 
 withGrab :: acc -> (acc -> GrabbedKey -> IO (Either (Maybe (H acc)) (H ()))) -> H ()
 withGrab start f = do
+
+  logFunc <- asks (view logFuncL)
+
+  let runWithLog = flip runReaderT logFunc
+
   im2manager <- getObject
   seat : _ <- gets _seats
-  grabIM <- getOrCreateObject $ io $ newGrabIM im2manager seat.wl_seat
-  s : _ <- gets _seats
-  let mainBinds = s.xkb_bindings
+  grabIM <- getOrCreateObject $ runWithLog $ newGrabIM im2manager seat.wl_seat
+
+  let mainBinds = seat.xkb_bindings
+
   hc <- ask
+
   withRunInH $ \(runInH :: forall a. H a -> IO a) -> do
+
       let -- cb :: Int -> GrabbedKey -> IO ()
           cb acc gk = f acc gk >>= \case
             Left Nothing -> pure ()
@@ -59,25 +67,23 @@ withGrab start f = do
               runInManage hc $ do
                 log' "grab: enable main binds"
                 io $ mapM_ (deRefStablePtr >=> R.riverXkbBindingEnable . xkb_binding) mainBinds
-                --modifySeats (const True) $ \x -> x { pending_action = S_SUBMAP_CANCEL }
                 final
               return ()
       writeIORef grabIM.callback (cb start)
       forkIO $ runInManage hc $ do
-        -- disable current keys
         log' "grab: disable main binds"
         io $ mapM_ (deRefStablePtr >=> R.riverXkbBindingDisable . xkb_binding) mainBinds
       grabIM.activate
 
-testIM2 :: H ()
-testIM2 = do
-  mapSeats $ \seat -> do
-    log' "Initializing new GrabIM..."
-    im2manager <- getObject
-    grabIM <- getOrCreateObject $ io $ newGrabIM im2manager seat.wl_seat
-    io $ grabIM.activate
-    log' "Grab DONE"
-    return ()
+--testIM2 :: H ()
+--testIM2 = do
+--  mapSeats $ \seat -> do
+--    log' "Initializing new GrabIM..."
+--    im2manager <- getObject
+--    grabIM <- getOrCreateObject $ newGrabIM im2manager seat.wl_seat
+--    io $ grabIM.activate
+--    log' "Grab DONE"
+--    return ()
 
 data GrabIM = GrabIM
   { seat       :: WL.Seat
@@ -99,22 +105,25 @@ data GrabbedKey = GK { state :: !Word
 
 instance Default GrabbedKey where def = GK 0 0 0
 
-newGrabIM :: ZwpInputMethodManager -> WL.Seat -> IO GrabIM
+newGrabIM :: (MonadIO m, MonadReader env m, HasLogFunc env, MonadUnliftIO m, MonadFix m)
+          => ZwpInputMethodManager -> WL.Seat -> m GrabIM
 newGrabIM manager seat = mfix $ \final -> do
-    active         <- calloc @Bool
-    pending_active <- calloc @Bool
-    xkbContext     <- malloc @XkbContext
-    xkbState       <- newIORef undefined -- @XkbState
-    kbdGrab        <- calloc @ZwpInputMethodKeyboardGrab
 
-    xkbContextNew 0 >>= poke xkbContext
+    active         <- io $ calloc @Bool
+    pending_active <- io $ calloc @Bool
+    xkbContext     <- io $ malloc @XkbContext
+    xkbState       <- io $ newIORef undefined -- @XkbState
+    kbdGrab        <- io $ calloc @ZwpInputMethodKeyboardGrab
+    io $ xkbContextNew 0 >>= poke xkbContext
+
+    runInIO <- askRunInIO
 
     let im_activate _ im = do
           res <- zwpInputMethodGrabKeyboard im
           when (res.unwrap == nullPtr) $ error "Failed to grab"
           WL.listenerAdd res final.grabL nullPtr
           poke kbdGrab res
-          log' "Grab: active"
+          runInIO $ log' "Grab: active"
 
     let im_deactivate _ _ = do
           res <- peek kbdGrab
@@ -123,7 +132,7 @@ newGrabIM manager seat = mfix $ \final -> do
             poke kbdGrab (ZwpInputMethodKeyboardGrab nullPtr)
 
     -- event listeners
-    imL <- mkZwpInputMethodListener $ \e -> case e of
+    imL <- io $ mkZwpInputMethodListener $ \e -> case e of
       ZwpInputMethodActivate _ _ -> do
         pTrace e
         poke pending_active True
@@ -133,49 +142,51 @@ newGrabIM manager seat = mfix $ \final -> do
       ZwpInputMethodSurroundingText _ _ _text _cursor _anchor -> pure () -- ignored
       ZwpInputMethodTextChangeCause _ _ _cause -> pure () -- ignored
       ZwpInputMethodContentType _ _ _hint _purpose -> pure () -- ignored
-      ZwpInputMethodDone ud self -> do
+      ZwpInputMethodDone ud self -> runInIO $ do
         pTrace e
-        prev_active <- peek active
-        next_active <- peek pending_active
+        prev_active <- io $ peek active
+        next_active <- io $ peek pending_active
         when (prev_active /= next_active) $ do
           log' $ "GrabKeyboard: now: " <> (if next_active then "ACTIVE" else "NOT ACTIVE")
-        poke active next_active
-        if next_active && not prev_active then im_activate ud self
-                                          else im_deactivate ud self
-      ZwpInputMethodUnavailable _ud self -> do
+        io $ poke active next_active
+        if next_active && not prev_active then io $ im_activate ud self
+                                          else io $ im_deactivate ud self
+      ZwpInputMethodUnavailable _ud self -> runInIO $ do
         log' "IM: Unavailable!"
-        WL.objectDestroy self
+        io $ WL.objectDestroy self
 
-    grabL <- mkZwpInputMethodKeyboardGrabListener $ \e -> case e of
-      ZwpInputMethodKeyboardGrabKeymap _ _ _fmt fd size -> do
+    grabL <- io $ mkZwpInputMethodKeyboardGrabListener $ \e -> case e of
+      ZwpInputMethodKeyboardGrabKeymap _ _ _fmt fd size -> runInIO $ do
         pTrace e
-        ctxPtr <- peek xkbContext
+        ctxPtr <- io $ peek xkbContext
         --xkb_keymap_unref res
-        res <- createKeymap'' ctxPtr (fi fd) (fi size)
-        st <- xkb_state_new res
+        res <- io $ createKeymap'' ctxPtr (fi fd) (fi size)
+        st <- io $ xkb_state_new res
         writeIORef xkbState st
-      ZwpInputMethodKeyboardGrabModifiers _ _ _ depressed latched locked group -> do
+
+      ZwpInputMethodKeyboardGrabModifiers _ _ _ depressed latched locked group -> runInIO $ do
         pTrace e
         st <- readIORef xkbState
-        xkb_state_update_mask st depressed latched locked 0 0 group
+        io $ xkb_state_update_mask st depressed latched locked 0 0 group
         let gkey = GMod { mods = fi depressed }
-        readIORef final.callback >>= ($ gkey)
-      ZwpInputMethodKeyboardGrabKey _ _ _ _time key st -> do
+        io $ readIORef final.callback >>= ($ gkey)
+
+      ZwpInputMethodKeyboardGrabKey _ _ _ _time key st -> runInIO $ do
         xst <- readIORef xkbState
-        keysym <- xkb_state_key_get_one_sym xst (fi $ key + 8)
+        keysym <- io $ xkb_state_key_get_one_sym xst (fi $ key + 8)
         --let pressed = fi st == WL.fromCEnum WL_KEYBOARD_KEY_STATE_PRESSED
-        readIORef final.callback >>= ($ GK { state = fi st, keysym = fi keysym, keycode = fi key })
+        io $ readIORef final.callback >>= ($ GK { state = fi st, keysym = fi keysym, keycode = fi key })
         --pTrace e
         --log' $ "Key: " <> tshow (keysym, pressed)
 
       ZwpInputMethodKeyboardGrabRepeatInfo _ _ _ _ -> pTrace e -- ignored
 
     -- input method
-    im <- zwpInputMethodManagerGetInputMethod manager seat
-    WL.listenerAdd im imL nullPtr
+    im <- io $ zwpInputMethodManagerGetInputMethod manager seat
+    io $ WL.listenerAdd im imL nullPtr
 
     callback <- newIORef pTrace
     let activate = im_activate nullPtr im
         deactivate = im_deactivate nullPtr im
-    return GrabIM{..}
 
+    return GrabIM{..}

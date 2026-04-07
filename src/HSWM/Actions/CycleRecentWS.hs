@@ -38,8 +38,12 @@ module HSWM.Actions.CycleRecentWS (
 
 --import HSWM.Actions.Repeatable (repeatableSt)
 
-import HSWM hiding (workspaces, screen)
+import Data.Enum (succ, pred)
+import Data.List ((!!), splitAt)
+import Prelude hiding (view)
+import HSWM hiding (workspaces, screen, view)
 import HSWM.StackSet hiding (filter, modify)
+import Control.Monad.State (get)
 
 import Control.Arrow ((&&&))
 import Data.Function (on)

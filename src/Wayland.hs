@@ -6,9 +6,7 @@ module Wayland
 import           Wayland.Client as WL
 import           Wayland.Client.Display
 
-import           Data.IORef
 import qualified Data.List as L
-import           Foreign
 
 type Version    = Word32
 type WlRegistry = WL.Registry
@@ -45,10 +43,10 @@ tryBindGlobal rref (k, v) bind = io (readIORef rref) >>= \x -> case L.find (\i -
     Just obj -> Just <$> bind obj.registry obj.name v
     Nothing  -> return Nothing
 
-requireGlobal :: MonadIO m => IORef RegistryCache -> (String, Version) -> (WlRegistry -> Word32 -> Version -> m a) -> m a
+requireGlobal :: (MonadIO m, MonadThrow m) => IORef RegistryCache -> (String, Version) -> (WlRegistry -> Word32 -> Version -> m a) -> m a
 requireGlobal rref (k, v) bind = io (readIORef rref) >>= \x -> case L.find (\i -> i.interface == k && v <= i.version) $ objects x of
     Just obj -> bind obj.registry obj.name obj.version
-    Nothing  -> throw $ NoSuchRegistryObject k v
+    Nothing  -> throwM $ NoSuchRegistryObject k v
 
 data RegistryException = NoSuchRegistryObject String Version deriving (Show, Eq)
 instance Exception RegistryException

@@ -114,7 +114,7 @@ drawImage = do
       let src_w = JP.imageWidth img
           src_h = JP.imageHeight img
           src_stride = src_w * 4
-      debug' $ "wallpaper: drawing image w=" <> tshow w <> " h=" <> tshow h
+      debug' $ display $ "wallpaper: drawing image w=" <> tshow w <> " h=" <> tshow h
       buf <- io $ BP.nextBuffer bp (fi w) (fi h)
       io $ R.riverNodeSetPosition node 0 0
       io $ R.riverNodePlaceBottom node

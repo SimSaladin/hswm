@@ -38,6 +38,7 @@ import HSWM.Core (H, ExtensionClass(..), StateExtension(..), HState(..))
 
 --import HSWM.Util.PureX
 import qualified Control.Monad.State as State
+import Control.Concurrent (forkIO, killThread)
 
 class MonadState HState m => XLike m where
 

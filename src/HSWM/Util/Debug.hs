@@ -18,6 +18,7 @@ import qualified Wayland.Client as WL
 import qualified Wayland.Client.Extras as WL
 import qualified Data.Map as M
 import           Foreign
+import Text.Printf
 
 debugHook :: Event -> H All
 debugHook ev
@@ -29,7 +30,7 @@ debugHook ev
 
    | XkbEvent (R.RiverXkbBindingPressed dt _)             <- ev = do
       (xb :: XkbBinding (SomeAction H)) <- liftIO $ deRefStablePtr (castPtrToStablePtr $ castPtr dt)
-      debug' $ toText $ printf "[EH] KEY PRESS ev=%s action=%s" (show ev) (show xb.action)
+      debug' $ display $ toText $ printf "[EH] KEY PRESS ev=%s action=%s" (show ev) (show xb.action)
       pTrace ev
       mempty
 
@@ -43,7 +44,7 @@ debugHook ev
 
    -- WL_*
    | WlOutputEvent _                          <- ev = mempty -- pTrace e >> mempty
-   | WlShmEvent (WL.ShmFormat _ _ fmt)        <- ev = log' (toText $ "shm format: " ++ ppShmFormat (WL.Wl_shm_format $ fi fmt)) >> mempty
+   | WlShmEvent (WL.ShmFormat _ _ fmt)        <- ev = log' (display (toText $ "shm format: " ++ ppShmFormat (WL.Wl_shm_format $ fi fmt))) >> mempty
    | WlSeatEvent e                            <- ev = pTrace e >> mempty
 
    -- Ext_*

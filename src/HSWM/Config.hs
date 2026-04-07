@@ -1,3 +1,5 @@
+{-# LANGUAGE UndecidableInstances #-}
+
 ------------------------------------------------------------------------------
 -- |
 -- Module      : HSWM.Config
@@ -127,9 +129,9 @@ parseSubmaps ks0 =
 data LaunchProgram = LaunchProgram String [String]
   deriving (Show, Generic)
 
-instance MonadIO m => IsAction m LaunchProgram where
+instance (MonadIO m, MonadReader env m, HasLogFunc env) => IsAction m LaunchProgram where
   runner (LaunchProgram cmd args) = do
-    log' $ "[launch] " <> toText cmd <> " " <> tshow args
+    log' $ display $ "[launch] " <> toText cmd <> " " <> tshow args
     void $ spawnProcess cmd args
 
 -- * KeySym parsing

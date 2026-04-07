@@ -23,13 +23,13 @@ import qualified HSWM.StackSet as W
 import           HSWM.Utils
 import qualified River.Objects as R
 import qualified River.Safe as R
-import           Wayland
+import           Wayland hiding (display)
 
 import           Data.Bits
 import qualified Data.List as L
+import           Data.Void
 import           Foreign hiding (void)
 import qualified Wayland.Client as WL
-import Data.Void
 
 data LayerShellFocus = FocusNone | FocusLayerShell { exclusive :: !Bool }
   deriving (Eq, Show, Generic)
@@ -119,7 +119,7 @@ handleWlSeatEvent e = do
       setXCursorTheme
 
       when (caps > 0) $ do
-        log' $ "seat: get keyboard: " <> tshow caps
+        log' $ display $ "seat: get keyboard: " <> tshow caps
         wlkeyboard <- io $ WL.seatGetKeyboard s
         log' "keyboard: set listener"
         wlkeyboardL <- getObject
@@ -288,7 +288,7 @@ seatClearFocus s = io $ R.riverSeatClearFocus s.river_seat
 
 seatPointerMove :: RiverSeat -> Window -> H ()
 seatPointerMove sid w = do
-  log' $ "[seatPointerMove] " <> tshow (sid, w)
+  log' $ display $ "[seatPointerMove] " <> tshow (sid, w)
   withSeat sid $ \s -> seatFocus s w
   io $ R.riverNodePlaceTop w.node
   io $ R.riverSeatOpStartPointer sid
@@ -304,7 +304,7 @@ seatPointerMove sid w = do
 seatPointerResize :: RiverSeat -> Window -> Int32 -> H ()
 seatPointerResize sid w edges = do
   withSeat sid $ \s -> do
-    debug' $ "[seatPointerResize] " <> tshow (sid, w, edges)
+    debug' $ display $ "[seatPointerResize] " <> tshow (sid, w, edges)
     seatFocus s w
     io $ R.riverNodePlaceTop w.node
     io $ R.riverWindowInformResizeStart w.river_window

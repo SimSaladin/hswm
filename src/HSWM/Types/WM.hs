@@ -97,8 +97,10 @@ instance MonadIO m => IsAction m (SomeAction m) where
   typeDescription   mp (SomeAction a) = typeDescription mp a
 
 instance (MonadIO m) => Show (SomeAction m) where
-  show some = case some of
+  show x = case x of
                 SomeAction (val :: IsAction m a => a) -> actionDescription (Proxy :: Proxy m) val
+instance (MonadIO m) => Display (SomeAction m) where
+  textDisplay = toText . show
 
 data Submap m = Submap
   { submapKeys :: [((ModMask, KeySym), SomeAction m)],

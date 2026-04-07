@@ -1,9 +1,6 @@
 ---
 verbatim:
   - cabal-version:    3.12
-#  - |
-#    program-default-options
-#      c2hs-options: -C -std=gnu18
 
 name:               hswm
 version: &version   0.1.0.0
@@ -32,6 +29,7 @@ _common/language: &language
     - DerivingVia
     - DeriveAnyClass
     - PackageImports
+    - QuantifiedConstraints
   ghc-options: &common-ghc-options
     -Wall -Wunused-packages
 
@@ -45,6 +43,7 @@ internal-libraries:
     dependencies:
       - name: base
         version: &base-version '>=4.21.0 && < 4.22'
+      - rio
       - text
       - mtl
       - logging
@@ -54,39 +53,13 @@ internal-libraries:
 library:
   <<: *language
   source-dirs: src
-  #exposed-modules:
-  #  # Note: c2hs is clunky about the order of exposed modules :(
-  #  - Wayland
-  #  - River
-  #  - River.WMP
-  #  - River.XKB.Bindings
-  #  - HSWM.Actions.WindowNavigation
-  #  - HSWM.BufferPool
-  #  - HSWM.Config
-  #  - HSWM.Core
-  #  - HSWM.Layout
-  #  - HSWM.Main
-  #  - HSWM.Operations
-  #  - HSWM.Outputs
-  #  - HSWM.Seats
-  #  - HSWM.StackSet
-  #  - HSWM.Util.Posix
-  #  - HSWM.Util.Types
-  #  - HSWM.Util.Waybar
-  #  - HSWM.Util.Debug
-  #  - HSWM.Utils
-  #  - HSWM.Wallpaper
-  #  - HSWM.Windows
-  #  - HSWM.XKB
-  #  - HSWM.XKB.FFI
-  #  - HSWM.Util.IPC
-  #  - HSWM
-  #  - Core # TODO: refactor/rename
+  #exposed-modules: # discovered by hpack
   other-modules: []
   generated-other-modules:
     - PackageInfo_hswm
-    - Paths_hswm
+  #  - Paths_hswm
   dependencies:
+    - rio
     - &base-noprelude
       name: base
       version: *base-version
@@ -100,10 +73,7 @@ library:
     - data-default ^>=0.8.0
     - derive-storable
     - utf8-string
-    #- logging
-    #- mtl
     - pretty-simple
-    #- stm
     - text
     - transformers
     - typerep-map
@@ -115,8 +85,6 @@ library:
     - network
     - bytestring ^>=0.12.2
     - aeson
-   #- c-expr-runtime # XXX: needded to avoid linker problems?
-   #- hs-bindgen-runtime # XXX: needded to avoid linker problems?
     - deepseq
     - mtl
   pkgconfig-depends:
@@ -125,11 +93,6 @@ library:
     #- wayland-client
     #- pixman-1
     #- gtk+-3.0 # XXX not strictly needed /here/
-  extra-libraries: []
-    #- wayland-client
-    #- xkbcommon
-    #- pixman-1
-    #- gtk-3 # XXX not strictly needed /here/
   include-dirs:
     - hswm-bindings/include
   c-sources:

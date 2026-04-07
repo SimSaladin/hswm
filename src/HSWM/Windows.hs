@@ -26,6 +26,7 @@ import qualified River.Objects as R
 import qualified Data.Map as M
 import qualified Data.List as L
 import           Foreign
+import qualified Control.Monad.State as State
 
 added :: RiverWindow -> H ()
 added w = do
@@ -212,7 +213,7 @@ handleEvent e = case e of
     modifyWindow window $ \s -> s { identifier = we_identifier }
     let recoverWindow w = do
               modifyWindowSet $ W.mapWindow (\x -> if x == w then window else x) . W.delete window
-              modify' $ \s -> s { recoveredWindows = M.delete we_identifier s.recoveredWindows }
+              State.modify' $ \s -> s { recoveredWindows = M.delete we_identifier s.recoveredWindows }
     gets (M.lookup we_identifier . recoveredWindows) >>= (`whenJust` recoverWindow)
 
   -- updated width + height

@@ -4,7 +4,6 @@
 module Core
   ( module Core
   , module Wayland
-  , module River
   , module HSWM.Core
   ) where
 
@@ -16,32 +15,36 @@ import qualified HSWM.StackSet as W
 import           HSWM.Util.Posix
 import qualified HSWM.Windows as Windows
 import           HSWM.XKB
-import HSWM.Utils
+import           HSWM.Utils
 
-import           River
+--import qualified River as R
 import qualified River.Safe as R
 import qualified River.Objects as R
-import           Wayland
+import           Wayland (requireGlobal, removeGlobal, registerGlobal, displayGetRegistry, displayFlush, displayDispatch, displayRoundtrip, displayGetFd)
+import qualified Wayland as WL
 import qualified Wayland.Client as WL
 import qualified Wayland.Client.Extras as WL
 import           Wlr
 
-import           Data.IORef
 import           Foreign hiding (new, void)
 import           Foreign.C.Error
-import           System.Exit
 import qualified System.Posix as Posix
-import           System.Timeout
 
-startHSWM :: (m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow)) => Display -> HSWMConfig m l -> IO ()
-startHSWM display config = withStdoutLogging $ do
-  conf <- HConf (config { layoutHook = Layout (layoutHook config) }) display
+startHSWM :: (m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow)) => WL.Display -> HSWMConfig m l -> IO ()
+startHSWM wlDisplay config = do
+ logOpts <- logOptionsHandle stderr True
+ withLogFunc logOpts $ \logFunc -> do
+  let runWithLogging = flip runReaderT logFunc
+
+  conf <- HConf (config { layoutHook = Layout (layoutHook config) }) wlDisplay logFunc
     <$> newIORef mempty
     <*> newEmptyTMVarIO
     <*> newTQueueIO
     <*> newEmptyMVar
 
-  let mainEvent = atomically . writeTQueue conf.eventQueue
+  let
+    mainEvent :: MonadIO m => MainEvent -> m ()
+    mainEvent = atomically . writeTQueue conf.eventQueue
 
   initialState <- io (readStateFile config) >>= \case
     Nothing -> return def { windowset = initialWinSet , windowsetOld = initialWinSet }
@@ -61,11 +64,10 @@ startHSWM display config = withStdoutLogging $ do
         r <- timeout 5000000 $ runInH $ handleWithHook e
         case r of
           Just r -> return r
-          Nothing -> do
-            warn' $ "handling event timed out: " <> tshow e
+          Nothing -> runWithLogging $ warn' $ display $ "handling event timed out: " <> tshow e
 
   runInH $ do
-    regL            <- getOrCreateObject $ WL.mkRegistryListener              $ handleRegistryListenerE conf.globals
+    regL            <- getOrCreateObject $ WL.mkRegistryListener              $ runWithLogging . handleRegistryListenerE conf.globals
     shmL            <- getOrCreateObject $ WL.mkShmListener                   $ \e -> handleE $ WlShmEvent e
     _               <- getOrCreateObject $ WL.mkOutputListener                $ \e -> handleE $ WlOutputEvent e
     _               <- getOrCreateObject $ WL.mkShellSurfaceListener          $ \e -> handleE $ WlShellSurfaceEvent e
@@ -89,11 +91,11 @@ startHSWM display config = withStdoutLogging $ do
     foreignListL    <- getOrCreateObject $ WL.mkForeignToplevelListListener   $ \e -> handleE $ ForeignTopLevelListV1 e
     _               <- getOrCreateObject $ WL.mkForeignToplevelHandleListener $ \e -> handleE $ ForeignTopLevelHandleV1 e
 
-    registry <- io $ displayGetRegistry display
+    registry <- io $ displayGetRegistry wlDisplay
     io $ WL.listenerAdd registry regL nullPtr
 
     -- Wait for one roundtrip for the registry listener to become aware of all current globals.
-    _ <- io $ displayRoundtrip display
+    _ <- io $ displayRoundtrip wlDisplay
 
     -- expect wl_compositor
     _ <- getOrCreateObject $ requireGlobal conf.globals ("wl_compositor", 6) $ \r n v ->
@@ -144,15 +146,17 @@ startHSWM display config = withStdoutLogging $ do
     -- Create an additional seat; useful for testing
     --io $ R.riverInputManagerCreateSeat inputManager (Just "foobar")
 
-  log' "WM: Installing signal handlers..."
-  _ <- Posix.installHandler Posix.sigTERM (Posix.Catch $ mainEvent $ MainExit "TERM") Nothing
-  _ <- Posix.installHandler Posix.sigINT  (Posix.Catch $ mainEvent $ MainExit "INT") Nothing
-  _ <- Posix.installHandler Posix.sigQUIT (Posix.Catch $ mainEvent $ MainExit "QUIT") Nothing
-  _ <- Posix.installHandler Posix.sigUSR2 (Posix.Catch $ do
-        log' "USR2 - reload / restart"
-        prog <- getProgramPath
-        mainEvent $ MainRestart prog
-                                          ) Nothing
+  runWithLogging $ do
+    log' "WM: Installing signal handlers..."
+    _ <- io $ Posix.installHandler Posix.sigTERM (Posix.Catch $ runWithLogging $ mainEvent $ MainExit "TERM") Nothing
+    _ <- io $ Posix.installHandler Posix.sigINT  (Posix.Catch $ runWithLogging $ mainEvent $ MainExit "INT") Nothing
+    _ <- io $ Posix.installHandler Posix.sigQUIT (Posix.Catch $ runWithLogging $ mainEvent $ MainExit "QUIT") Nothing
+    _ <- io $ Posix.installHandler Posix.sigUSR2 (Posix.Catch $ runWithLogging $ do
+          log' "USR2 - reload / restart"
+          prog <- io getProgramPath
+          mainEvent $ MainRestart prog
+                                            ) Nothing
+    return ()
 
   -- main loop
   -- However, if you have a more sophisticated application, you can build your own event loop in any manner you please,
@@ -162,7 +166,7 @@ startHSWM display config = withStdoutLogging $ do
   --
   -- To flush outgoing requests, call wl_display_flush.
 
-  waylandFd <- displayGetFd display
+  waylandFd <- displayGetFd wlDisplay
 
   let pollfdWayland = PollFd (Posix.Fd waylandFd) pOLLIN 0
 
@@ -171,46 +175,46 @@ startHSWM display config = withStdoutLogging $ do
         whenRevent fd ev f = do
           r <- isRevent fd ev
           when r f
-    forever $ do
+    runWithLogging $ forever $ do
       -- flush outgoing requests
       -- TODO should catch the IOError errno now
-      r_flush <- displayFlush display
-      errno <- getErrno
-      if | errno == eAGAIN -> setPollEvents wlPollFd (pOLLIN .|. pOLLOUT)
-         | r_flush == -1 -> mainEvent $ MainExit "flush failed"
-         | otherwise -> setPollEvents wlPollFd pOLLIN
+      r_flush <- io $ displayFlush wlDisplay
+      errno <- io $ getErrno
+      if | errno == eAGAIN -> io $ setPollEvents wlPollFd (pOLLIN .|. pOLLOUT)
+         | r_flush == -1   -> io $ mainEvent $ MainExit "flush failed"
+         | otherwise       -> io $ setPollEvents wlPollFd pOLLIN
 
-      c_poll fds fdsLen PollBlock >>= \case
+      io $ c_poll fds fdsLen PollBlock >>= \r -> runWithLogging $ case r of
         PollError -> mainEvent $ MainExit "main: poll error"
         PollTimeout -> return ()
         PollResult _ -> do
-          whenRevent wlPollFd pOLLHUP $ mainEvent $ MainExit "disconnected by compositor"
-          whenRevent wlPollFd pOLLIN $ do
+          io $ whenRevent wlPollFd pOLLHUP $ mainEvent $ MainExit "disconnected by compositor"
+          io $ whenRevent wlPollFd pOLLIN $ do
             -- process incoming events
-            res <- displayDispatch display
+            res <- io $ displayDispatch wlDisplay
             when (res < 0) $ mainEvent $ MainExit "error: dispatch failed"
 
-  let main = do
+  let main = runWithLogging $ do
         ev <- atomically $ readTQueue conf.eventQueue
         case ev of
           MainExit s -> do
-            log' $ "main: exiting: " <> toText s
-            void $ runInH $ userCode config.exitHook
+            log' $ display $ "main: exiting: " <> toText s
+            void . io . runInH $ userCode config.exitHook
             exitFailure
           MainRestart prog -> do
             log' "[main] restaring"
-            runInH $ restart prog
+            io . runInH $ restart prog
   main
 
 ---------------------------------------------------
 -- event handling
 
-handleRegistryListenerE :: IORef RegistryCache -> WL.RegistryEvent -> IO ()
+handleRegistryListenerE :: (MonadIO m, MonadReader env m, HasLogFunc env) => IORef WL.RegistryCache -> WL.RegistryEvent -> m ()
 handleRegistryListenerE ref (WL.RegistryGlobal _ registry name iface version) = do
-    log' $ "[GLOBALS] new registry item: " <> toText iface <> " version=" <> tshow version <> " (" <> tshow name <> ")"
+    log' $ display $ "[GLOBALS] new registry item: " <> toText iface <> " version=" <> tshow version <> " (" <> tshow name <> ")"
     modifyIORef ref $ registerGlobal name iface version registry
 handleRegistryListenerE ref (WL.RegistryGlobalRemove _ _ name) = do
-    log' $ "[GLOBALS] registry entry removed: " <> tshow name
+    log' $ display $ "[GLOBALS] registry entry removed: " <> tshow name
     modifyIORef ref (removeGlobal name)
 
 -- | Runs handleEventHook from the configuration and runs the default handler

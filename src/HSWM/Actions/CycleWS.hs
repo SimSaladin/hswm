@@ -91,6 +91,7 @@ import qualified HSWM.StackSet as W
 import qualified HSWM.Hooks.WorkspaceHistory as WH
 import HSWM.Util.WorkspaceCompare
 import qualified Data.List as L
+import Data.List ((!!))
 
 -- $usage
 -- You can use this module with the following in your @xmonad.hs@ file:

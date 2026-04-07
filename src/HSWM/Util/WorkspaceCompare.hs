@@ -30,6 +30,7 @@ import HSWM.Actions.PhysicalScreens (ScreenComparator(ScreenComparator), getScre
 
 import Data.Function (on)
 import Data.List (elemIndex, find, sortBy)
+import Data.Maybe (fromJust)
 
 type WorkspaceCompare = WorkspaceId -> WorkspaceId -> Ordering
 type WorkspaceSort = [WindowSpace] -> [WindowSpace]

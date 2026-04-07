@@ -15,16 +15,13 @@ module HSWM.Utils where
 
 import           HSWM.XKB (ModMask)
 
-import           Control.Monad.Fix (fix)
 import           Data.Bits
 import           Data.Char (toLower)
 import qualified Data.List as L
-import           Data.Word
 import qualified Generated.Wayland.Client as WL
 import           Numeric (readHex)
 import           River
 import qualified River.Safe as R
-import           System.IO
 import           System.Posix.IO
 import           System.Posix.Process (createSession, executeFile, forkProcess,
                                        getAnyProcessStatus)

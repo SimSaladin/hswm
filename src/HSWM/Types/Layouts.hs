@@ -15,6 +15,7 @@ import River as HSWM.Types.WM (RiverWindow)
 import HSWM.StackSet as W
 import Data.Typeable
 import HSWM.Types.Events
+import Text.Read (reads)
 
 type WindowSet = W.StackSet WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail ScreenId ScreenDetail
 

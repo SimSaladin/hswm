@@ -90,7 +90,7 @@ data PointerBinding a = PointerBinding
 instance GStorable (PointerBinding ())
 
 
-newPointerBinding :: (MonadIO m, Show a)
+newPointerBinding :: (MonadReader env m, HasLogFunc env, MonadIO m, Show a, Display a)
                   => R.RiverPointerBindingListener
                   -> R.RiverSeat
                   -> Modifiers
@@ -98,7 +98,7 @@ newPointerBinding :: (MonadIO m, Show a)
                   -> a
                   -> m (StablePtr (PointerBinding a))
 newPointerBinding pointerBindingListener seat mods btn action = do
-    log' $ "[pointer] binding button: " <> toText (ppXkbModsKey mods btn) <> " " <> tshow action
+    log' $ "[pointer] binding button: " <> fromString (ppXkbModsKey mods btn) <> " " <> display action
     pb' <- io $ R.riverSeatGetPointerBinding seat (fi btn) (fi mods)
     dtPtr <- io $ newStablePtr $ PointerBinding pb' seat action
     io $ R.listenerAdd pb' pointerBindingListener (castPtr $ castStablePtrToPtr dtPtr)

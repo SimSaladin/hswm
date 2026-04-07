@@ -23,7 +23,6 @@ import           HSWM.Core
 import qualified HSWM.StackSet as W
 
 import qualified River.Objects as R
-import           Control.Arrow (second, (***))
 import           Prelude hiding (handle)
 
 -- | Change the size of the master pane.
