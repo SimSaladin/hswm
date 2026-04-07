@@ -23,6 +23,8 @@ library:
     - hs-bindgen-runtime
     - template-haskell
     - data-default
+    - hashable
+    - deepseq
   include-dirs:
     - include
     - include/wayland-protocols

@@ -13,39 +13,17 @@ import           HSWM.Util.Debug
 import qualified HSWM.Actions.CycleWS as CycleWS
 import qualified HSWM.Actions.CycleRecentWS as CycleRecentWS
 import HSWM.Util.GrabKeyboard
+import qualified HSWM.Util.RofiPrompt as RP
 
 import           Data.Ratio
+import qualified HSWM.Actions.DynamicWorkspaceOrder as DWO
 
-default ([Char])
+rofiPrompt = def
+  { RP._dmenu = True
+  , RP._msg = "Choose thing"
+  }
 
-
--- | Solarized palette
-colBase03, colBase02, colBase01, colBase00, colBase0, colBase1, colBase2, colBase3, colYellow, colOrange, colRed, colMagenta, colViolet, colBlue, colCyan, colGreen :: String
-colBase03  = "0x002b36" -- "#002b36"
-colBase02  = "0x073642" -- "#073642"
-colBase01  = "0x586e75" -- "#586e75"
-colBase00  = "0x657b83" -- "#657b83"
-colBase0   = "0x839496" -- "#839496"
-colBase1   = "0x93a1a1" -- "#93a1a1"
-colBase2   = "0xeee8d5" -- "#eee8d5"
-colBase3   = "0xfdf6e3" -- "#fdf6e3"
-colYellow  = "0xb58900" -- "#b58900"
-colOrange  = "0xcb4b16" -- "#cb4b16"
-colRed     = "0xdc322f" -- "#dc322f"
-colMagenta = "0xd33682" -- "#d33682"
-colViolet  = "0x6c71c4" -- "#6c71c4"
-colBlue    = "0x268bd2" -- "#268bd2"
-colCyan    = "0x2aa198" -- "#2aa198"
-colGreen   = "0x859900" -- "#859900"
-
-class IsKeyAction a where
-  toKeyAction :: String -> a -> SomeAction H
-instance {-# OVERLAPPABLE #-} IsKeyAction (H ()) where toKeyAction = namedA
-instance {-# OVERLAPPABLE #-} IsKeyAction (SomeAction H) where toKeyAction d a = SomeAction $ NamedAction d a
-instance {-# OVERLAPPABLE #-} (Message a, Show a) => IsKeyAction a where toKeyAction d a = SomeAction $ NamedActionH (d ++ show a) (sendMessage a)
-
-(=?) :: IsKeyAction a => String -> a -> SomeAction H
-desc =? action = toKeyAction desc action
+rofiAction = RP.rofiRun rofiPrompt ["foo", "bar", "baz"] >>= (`whenJust` liftIO . putStrLn)
 
 main :: IO ()
 main = do
@@ -83,7 +61,7 @@ main = do
     -- "M-S-<Return>"  FloatNext.floatNext True >> spawnTerm def "" ? "Terminal (floating)"
     -- "M-$"           spawn (sh "physlock -p \"${HOSTNAME} ${DISPLAY}\"") ? "Lock (physlock)"
     -- "M-<Print>"     takeScreenshot
-    , ("M-r t", "Test IM2" =? (void $ userCode testIM2))
+    --, ("M-r t", "Test IM2" =? (void $ userCode testIM2)) -- TESTING
 
      -- ======== Execute ==========
     , ("M-r r",         "Prompt: run command" =? launchRofi ["-modes", "run", "-show", "run"])
@@ -113,10 +91,11 @@ main = do
     -- "M-; "        >>+ tags >++> WorkspaceView
     -- "M-; M-"      >>+ tags >++> WorkspaceCopy
     -- "M-S-; "      >>+ tags >++> WorkspaceShiftTo
-    , ("M-y",        "Cycle recent hidden tags"  =? CycleRecentWS.cycleRecentWS [4, 8] 121 112)
-    --, ("M-S-n",      "Shift current tag (forwards)"   =? swapTo Next CycleWS.anyWS) -- XXX: save workspace order?
-    --, ("M-S-p",      "Shift current tag (backwards)"  =? swapTo Prev CycleWS.anyWS)
+    , ("M-y",        "Cycle recent hidden tags"       =? CycleRecentWS.cycleRecentWS [4, 8] 121 112)
+    , ("M-S-n",      "Shift current tag (forwards)"   =? DWO.swapWith Next CycleWS.anyWS) -- XXX: save workspace order?
+    , ("M-S-p",      "Shift current tag (backwards)"  =? DWO.swapWith Prev CycleWS.anyWS)
     --, ( "M-g r"      WorkspaceSetNamePrompt
+    , ("M-g r",      "Test Rofi prompt" =? (rofiAction :: H ()))
     --, ( "M-g n"      WorkspaceAddPrompt
     --, ( "M-g d"      WorkspaceRemoveFocused
     -- ( "M-g S-n"     wsPromptNew' "New tag for window: " ?+ (\to -> DynWS.addHiddenWorkspace to >> defile (shift to))   ? "Move window to new tag (XP)"
@@ -126,9 +105,9 @@ main = do
     -- ( "M-g s"       GS.goToSelected gsconfig1                          ? "Go to window (GS)"
     -- ( "M-g f"       XP.windowPrompt xpConfigAuto XP.Goto XP.allWindows ? "Go to window (XP)"
 
-    , ("M-SemiColon a", namedA "View workspace 1" $ modifyWindowSet $ W.view "1")
-    , ("M-SemiColon b", namedA "View workspace 2" $ modifyWindowSet $ W.view "2")
-    , ("M-SemiColon c", namedA "View workspace 3" $ modifyWindowSet $ W.view "3")
+    , ("M-SemiColon a", "View workspace 1" =? DWO.withNthWorkspace W.view 0)
+    , ("M-SemiColon b", "View workspace 2" =? DWO.withNthWorkspace W.view 1)
+    , ("M-SemiColon c", "View workspace 3" =? DWO.withNthWorkspace W.view 2)
 
     -- ===== Workspace Groups ====
     -- "M-g M-n" >+ wsPromptNew' "New Workspace group: " ?+ addWSG ? "New WSG"
@@ -268,3 +247,35 @@ dvpMyLayout = XkbRuleNames
 
 launchRofi :: [String] -> SomeAction H
 launchRofi args = SomeAction $ LaunchProgram "rofi" (["-dpi", "150"] ++ args)
+
+-- * Colors
+
+-- | Solarized palette
+colBase03, colBase02, colBase01, colBase00, colBase0, colBase1, colBase2, colBase3, colYellow, colOrange, colRed, colMagenta, colViolet, colBlue, colCyan, colGreen :: String
+colBase03  = "0x002b36" -- "#002b36"
+colBase02  = "0x073642" -- "#073642"
+colBase01  = "0x586e75" -- "#586e75"
+colBase00  = "0x657b83" -- "#657b83"
+colBase0   = "0x839496" -- "#839496"
+colBase1   = "0x93a1a1" -- "#93a1a1"
+colBase2   = "0xeee8d5" -- "#eee8d5"
+colBase3   = "0xfdf6e3" -- "#fdf6e3"
+colYellow  = "0xb58900" -- "#b58900"
+colOrange  = "0xcb4b16" -- "#cb4b16"
+colRed     = "0xdc322f" -- "#dc322f"
+colMagenta = "0xd33682" -- "#d33682"
+colViolet  = "0x6c71c4" -- "#6c71c4"
+colBlue    = "0x268bd2" -- "#268bd2"
+colCyan    = "0x2aa198" -- "#2aa198"
+colGreen   = "0x859900" -- "#859900"
+
+-- * Utilities
+
+class IsKeyAction a where
+  toKeyAction :: String -> a -> SomeAction H
+instance {-# OVERLAPPABLE #-} IsKeyAction (H ()) where toKeyAction = namedA
+instance {-# OVERLAPPABLE #-} IsKeyAction (SomeAction H) where toKeyAction d a = SomeAction $ NamedAction d a
+instance {-# OVERLAPPABLE #-} (Message a, Show a) => IsKeyAction a where toKeyAction d a = SomeAction $ NamedActionH (d ++ show a) (sendMessage a)
+
+(=?) :: IsKeyAction a => String -> a -> SomeAction H
+desc =? action = toKeyAction desc action

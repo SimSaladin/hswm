@@ -180,7 +180,7 @@ startHSWM wlDisplay config = do
       -- flush outgoing requests
       -- TODO should catch the IOError errno now
       r_flush <- io $ displayFlush wlDisplay
-      errno <- io $ getErrno
+      errno <- io getErrno
       if | errno == eAGAIN -> io $ setPollEvents wlPollFd (pOLLIN .|. pOLLOUT)
          | r_flush == -1   -> io $ mainEvent $ MainExit "flush failed"
          | otherwise       -> io $ setPollEvents wlPollFd pOLLIN

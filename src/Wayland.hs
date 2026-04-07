@@ -48,5 +48,5 @@ requireGlobal rref (k, v) bind = io (readIORef rref) >>= \x -> case L.find (\i -
     Just obj -> bind obj.registry obj.name obj.version
     Nothing  -> throwM $ NoSuchRegistryObject k v
 
-data RegistryException = NoSuchRegistryObject String Version deriving (Show, Eq)
-instance Exception RegistryException
+data WlRegistryException = NoSuchRegistryObject String Version deriving (Show, Eq)
+instance Exception WlRegistryException

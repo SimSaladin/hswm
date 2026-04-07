@@ -13,7 +13,7 @@ module HSWM.Types.TypeMap where
 import RIO
 import Data.TMap qualified as TM
 import Data.Typeable
-import Prelude
+import Prelude (Default(def), MonadState, gets, modify)
 
 newtype TypeMap = TypeMap {unTypeMap :: TM.TMap}
   deriving (Show, Generic)
@@ -24,7 +24,7 @@ class HasGlobalTMap env where
   globalTMap :: Lens' env TypeMap
 
 instance HasGlobalTMap TypeMap where
-  globalTMap = lens id (\s _ -> s)
+  globalTMap = lens id (const)
 
 type MonadStateGlobal s m = (HasGlobalTMap s, MonadState s m)
 

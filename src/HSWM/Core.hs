@@ -25,7 +25,7 @@ where
 import Data.IORef
 import Data.Map qualified as M
 import Data.Monoid (Ap (..))
-import Foreign
+import Foreign hiding (void)
 import Foreign.C
 import HSWM.Util.Types
 import HSWM.XKB
@@ -44,8 +44,7 @@ import HSWM.Types.Layouts
 import HSWM.Types.Events
 import HSWM.Types.TypeMap
 
------------------------------------------------------------
--- Program state (read + write)
+-- * Program state (read + write)
 
 -- | The read-only window manager state.
 data HConf = HConf
@@ -77,7 +76,6 @@ data HState = HState
   }
   deriving (Generic, Default)
 
----------------------------------------------------------------
 -- * H Monad
 
 -- a la xmonad
@@ -99,7 +97,7 @@ instance MonadUnliftIO H where
   withRunInIO :: ((forall a. H a -> IO a) -> IO b) -> H b
   withRunInIO f = do
     conf <- ask
-    io $! f (\a -> bracketOnError (atomically $ takeTMVar conf._state) (atomically . putTMVar conf._state) (runner conf a))
+    io $! f (bracketOnError (atomically $ takeTMVar conf._state) (atomically . putTMVar conf._state) . runner conf)
       where
     runner c a st = do
       (r, st') <- runH c st a
@@ -109,7 +107,6 @@ instance MonadUnliftIO H where
 instance MonadFix H where
   mfix :: (a -> H a) -> H a
   mfix f = H (mfix g) where g a = let H a' = f a in a'
-
 
 -- a la xmonad
 runH :: HConf -> HState -> H a -> IO (a, HState)
@@ -135,10 +132,6 @@ catchH job errcase = do
   put s'
   return a
 
--- -- | Conditionally run an action, using a monadic event to decide
--- whenM :: (Monad m) => m Bool -> m () -> m ()
--- whenM a f = a >>= \b -> when b f
-
 -- a la xmonad
 userCode :: H a -> H (Maybe a)
 userCode a = catchH (Just <$> a) (return Nothing)
@@ -149,7 +142,7 @@ userCodeDef :: a -> H a -> H a
 userCodeDef defValue a = fromMaybe defValue <$> userCode a
 
 -----------------------------------------------------------
--- * manage/render Event queues
+-- * Manage/Render Event queues
 
 class HasEventQueues env where
   pendingManageQL :: Lens' env (TQueue (H ()))
@@ -163,7 +156,7 @@ getEventQueueFuncs :: (MonadReader env m, HasEventQueues env, MonadIO inner)
                    => m (H e1 -> inner (), H e2 -> inner ()) -- ^ @(queueForManagePhase, queueForRenderPhase)@
 getEventQueueFuncs = (wrap *** wrap) <$> asks ((,) <$> view pendingManageQL <*> view pendingRenderQL)
   where
-    wrap q = atomically . writeTQueue q . fmap (const ())
+    wrap q = atomically . writeTQueue q . void
 
 -----------------------------------------------------------
 -- River & Wayland
@@ -312,4 +305,3 @@ data WindowManageAction
   | WToggleFullscreen
   | WRequestClose
   deriving (Eq, Show, Generic)
-

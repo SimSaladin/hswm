@@ -26,6 +26,12 @@ Figure out the Wl display ID to start programs inside the new session:
 WAYLAND_DISPLAY=wayland-2 kitty
 ```
 
+To restart on the fly, specify the file path to execute in `HSWM_EXECUTABLE`
+environment variable:
+```bash
+HSWM_EXECUTABLE="/path/to/hswm"
+```
+
 ### Generated C sources (`.c`, `.h`)
 
 The Wl protocol bindings (checked into the repo) are generated with

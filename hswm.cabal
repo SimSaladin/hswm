@@ -54,6 +54,7 @@ library
           HSWM
           HSWM.Actions.CycleRecentWS
           HSWM.Actions.CycleWS
+          HSWM.Actions.DynamicWorkspaceOrder
           HSWM.Actions.PhysicalScreens
           HSWM.Actions.Repeatable
           HSWM.Actions.WindowNavigation
@@ -78,6 +79,7 @@ library
           HSWM.Util.GrabKeyboard
           HSWM.Util.IPC
           HSWM.Util.Posix
+          HSWM.Util.RofiPrompt
           HSWM.Util.Types
           HSWM.Util.Waybar
           HSWM.Util.WorkspaceCompare
@@ -111,6 +113,7 @@ library
         , stm
         , text
         , transformers
+        , typed-process
         , typerep-map
         , unix
         , utf8-string

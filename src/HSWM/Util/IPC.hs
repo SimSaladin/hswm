@@ -30,6 +30,8 @@ import qualified River.Objects as R
 import HSWM.Core as HSWM
 import qualified HSWM.StackSet as W
 import HSWM.Operations
+import qualified HSWM.Actions.DynamicWorkspaceOrder as DWO
+import qualified HSWM.Util.WorkspaceCompare as WsComp
 
 -- | Workspace identifier type
 type WsId = String
@@ -192,9 +194,11 @@ fullStateUpdate = do
 
   let outputInfo = OutputInfo [ (T.pack out.outputName, out.screen) | out <- outs ]
 
-  let tags        = [ tag | W.Workspace{..} <- W.workspaces ws ]
+  wsSortPP <- DWO.getSortByOrder
+
+  let focusedTag  = let W.Screen W.Workspace{..} sid _ = W.current ws in (tag, sid, toText $ HSWM.description layout)
       visibleTags = [ (tag, sid, toText $ HSWM.description layout) | W.Screen W.Workspace{..} sid _ <- W.visible ws ]
-      focusedTag  = let W.Screen W.Workspace{..} sid _ = W.current ws in (tag, sid, toText $ HSWM.description layout)
+  let tags        = [ tag | W.Workspace{..} <- wsSortPP (W.workspaces ws) ]
 
   -- basic info about workspaces
   let wsInfo = WsInfo tags focusedTag visibleTags

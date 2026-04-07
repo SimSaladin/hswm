@@ -111,7 +111,6 @@ library
           Wayland.Client
           Wayland.Client.Display
           Wayland.Client.Extras
-          Wayland.Client.Interface
           Wayland.Client.Internal.TH
           Wayland.Client.Internal.Types
           Wayland.Client.Objects
@@ -124,6 +123,8 @@ library
           base >=4.21.0.0 && <4.22
         , c-expr-runtime
         , data-default
+        , deepseq
+        , hashable
         , hs-bindgen-runtime
         , template-haskell
     hs-source-dirs:

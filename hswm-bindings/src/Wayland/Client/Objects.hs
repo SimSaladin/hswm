@@ -15,19 +15,17 @@
 ------------------------------------------------------------------------------
 module Wayland.Client.Objects where
 
-import Wayland.Client.Interface
-
-import qualified Generated.Wayland.Client as C
-import Generated.Wayland.Client.Global as G
-import Generated.Wayland.Client.Safe as Safe
+import           Generated.Wayland.Client as C
+import           Generated.Wayland.Client.Global as G
+import           Generated.Wayland.Client.Safe as Safe
 
 import qualified Generated.Wayland.Util as U
 
+import           Foreign.C
+import           Foreign.C.ConstPtr
+import           Foreign.Ptr
+import           Language.Haskell.TH
 import           Wayland.Client.Internal.TH
-import Foreign.Ptr
-import Foreign.C.ConstPtr
-import Foreign.C
-import Language.Haskell.TH
 
 -- * Array
 mkWlObject $ (wlobj ''U.Wl_array [])

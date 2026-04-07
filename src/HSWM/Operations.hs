@@ -52,23 +52,6 @@ doManage' a rw = modifyWindow rw $ \s -> s {p_manage_action = p_manage_action s 
 doManage :: WindowManageAction -> Window -> H ()
 doManage a w = doManage' a w.river_window
 
--- XXX  XMonad compat
-windows :: (WindowSet -> WindowSet) -> H ()
-windows = modifyWindowSet
-
--- | Return workspace visible on screen @sc@, or 'Nothing'.
-screenWorkspace :: ScreenId -> H (Maybe WorkspaceId)
-screenWorkspace sc = withWindowSet $ return . W.lookupWorkspace sc
-
--- | Run a monadic action with the current stack set
-withWindowSet :: (WindowSet -> H a) -> H a
-withWindowSet f = gets windowset >>= f
-
-modifyWindowSet :: (WindowSet -> WindowSet) -> H ()
-modifyWindowSet f = State.modify' $ \s -> s {windowset = f (windowset s)}
-
---------------------------------------------------------------
-
 -- * Operations not tied to manage/render phases
 
 {-
@@ -165,11 +148,22 @@ reveal, hide :: RiverWindow -> H ()
 reveal rw = withWindow rw $ \_ -> io $ R.riverWindowShow rw
 hide rw = withWindow rw $ \_ -> io $ R.riverWindowHide rw
 
---------------------------------------------------------------
-
---------------------------------------------------------------
-
 -- * WindowSet etc. modifications
+
+-- XXX  XMonad compat
+windows :: (WindowSet -> WindowSet) -> H ()
+windows = modifyWindowSet
+
+-- | Return workspace visible on screen @sc@, or 'Nothing'.
+screenWorkspace :: ScreenId -> H (Maybe WorkspaceId)
+screenWorkspace sc = withWindowSet $ return . W.lookupWorkspace sc
+
+-- | Run a monadic action with the current stack set
+withWindowSet :: (WindowSet -> H a) -> H a
+withWindowSet f = gets windowset >>= f
+
+modifyWindowSet :: (WindowSet -> WindowSet) -> H ()
+modifyWindowSet f = State.modify' $ \s -> s {windowset = f (windowset s)}
 
 -- | Set the focus to the window on top of the stack, or root
 setTopFocus :: H ()
@@ -186,7 +180,15 @@ runOnWorkspaces job = do
       W.current ws : W.visible ws
   modify $ \s -> s {windowset = ws {W.current = c, W.visible = v, W.hidden = h}}
 
+
 {-
+-- | Perform an @H@ action. If it returns @Any True@, unwind the
+-- changes to the @WindowSet@ and replay them using @windows@. This is
+-- a version of @windowBracket@ that discards the return value and
+-- handles an @H@ action that reports its need for refresh via @Any@.
+windowBracket_ :: H Any -> H ()
+windowBracket_ = void . windowBracket getAny
+
 -- | Perform an @H@ action and check its return value against a predicate p.
 -- If p holds, unwind changes to the @WindowSet@ and replay them using @windows@.
 windowBracket :: (a -> Bool) -> H a -> H a
@@ -196,13 +198,6 @@ windowBracket p action = withWindowSet $ \old -> do
     modifyWindowSet $ const old
     windows         $ const new
   return a
-
--- | Perform an @H@ action. If it returns @Any True@, unwind the
--- changes to the @WindowSet@ and replay them using @windows@. This is
--- a version of @windowBracket@ that discards the return value and
--- handles an @H@ action that reports its need for refresh via @Any@.
-windowBracket_ :: H Any -> H ()
-windowBracket_ = void . windowBracket getAny
 -}
 
 -- outputs
@@ -257,7 +252,6 @@ seatEnableBindingsMatching rs mods keys = withSeat rs $ \s -> do
   logInfo $ "seat: restoring bindings to enabled: " <> display (length matchedBinds)
   io . forM_ matchedBinds $ deRefStablePtr >=> R.riverXkbBindingEnable . xkb_binding
 
-
 -- windows
 
 withFocused :: (Window -> H ()) -> H ()
@@ -278,104 +272,9 @@ alterWindow w f = modify $ \s -> s {_windows = M.alter f w s._windows}
 mapWindows :: (Window -> H ()) -> H ()
 mapWindows f = gets _windows >>= mapM_ f
 
--------------------------------------------------------------------
-
--- * Restart with state
-
-data StateData = StateData
-  { sfWins :: W.StackSet WorkspaceId String (IntPtr, String) WorkspaceDetail ScreenId ScreenDetail,
-    sfExt :: [(String, String)]
-  }
-  deriving (Show, Read)
-
-getProgramPath :: IO FilePath
-getProgramPath =
-  lookupEnv "HSWM_EXECUTABLE" >>= \case
-    Just x -> return x
-    Nothing
-      | Just getExe <- executablePath -> do
-          x <- fromMaybe (error "restart: unable to get program path") <$> getExe
-          setEnv "HSWM_EXECUTABLE" x
-          return x
-      | otherwise -> error "restart: unable to resolve program path"
-
-restart :: String -> H ()
-restart prog = do
-  broadcastMessage ReleaseResources
-  void . userCode =<< asks (exitHook . config)
-  writeStateToFile
-  io $ do
-    res <- try $ executeFile prog True [] Nothing
-    case res of
-      Left (SomeException e) -> hPrint stderr e >> exitFailure
-      Right {} -> return ()
-
-writeStateToFile :: H ()
-writeStateToFile = do
-  let path = ".hswm.state"
-      wsData s = W.mapLayout show $ W.mapWindow winIdent $ windowset s
-        where
-          winIdent w
-            | Just win <- L.find (\x -> x.river_window == w) s._windows = (rwToIntPtr w, win.identifier)
-            | otherwise = (rwToIntPtr w, "")
-  let maybeShow (t, Right (PersistentExtension ext)) = Just (t, show ext)
-      maybeShow (t, Left str) = Just (t, str)
-      maybeShow _ = Nothing
-      extState = mapMaybe maybeShow . M.toList . extensibleState
-  stateData <- gets $ \s -> StateData (wsData s) (extState s)
-  liftIO $ catchIO (writeFile path $ show stateData) (print . show)
-  where
-    rwToIntPtr (R.RiverWindow w) = ptrToIntPtr w
-
--- catchIO :: (MonadIO m) => IO () -> m ()
--- catchIO f = io (f `catch` \(SomeException e) -> hPrint stderr e >> hFlush stderr)
-
--- | Read the state of a previous xmonad instance from a file and
--- return that state.  The state file is removed after reading it.
-readStateFile :: (LayoutClass l RiverWindow, Read (l RiverWindow)) => HSWMConfig m l -> IO (Maybe HState)
-readStateFile xmc = do
-  let path = ".hswm.state"
-
-  -- I'm trying really hard here to make sure we read the entire
-  -- contents of the file before it is removed from the file system.
-  res <- try @_ @SomeException $ do
-    raw <- withFile path ReadMode readStrict
-    return $! maybeRead reads raw
-  _ <- try @_ @SomeException $ io (removeFile path)
-
-  case res of
-    Left e -> print e >> return Nothing
-    Right sf' -> return $ do
-      sf <- sf'
-
-      let wins = W.allWindows (sfWins sf)
-      let winset =
-            W.ensureTags layout (workspaces xmc) $
-              W.mapLayout (fromMaybe layout . maybeRead lreads) $
-                W.mapWindow (R.RiverWindow . intPtrToPtr . fst) (sfWins sf)
-          extState = M.fromList . map (second Left) $ sfExt sf
-
-      return
-        def
-          { windowset = winset,
-            windowsetOld = winset,
-            recoveredWindows = M.fromList [(b, R.RiverWindow $ intPtrToPtr a) | (a, b) <- wins],
-            extensibleState = extState
-          }
-  where
-    layout = Layout (layoutHook xmc)
-    lreads = readsLayout layout
-    maybeRead reads' s = case reads' s of
-      [(x, "")] -> Just x
-      _ -> Nothing
-
-    readStrict :: Handle -> IO String
-    readStrict h = hGetContents h >>= \s -> length s `seq` return s
-
-sendRestart :: H ()
-sendRestart = io $ Posix.raiseSignal Posix.sigUSR2
-
 -----------------------------------
+
+-- * Seat / Screen / Window
 
 startSeatOp :: SeatOp -> H ()
 startSeatOp op = modifySeats (const True) $ \seat -> seat {pending_action = S_START_OP op}
@@ -448,6 +347,100 @@ setWindowPosition :: Window -> Int32 -> Int32 -> H ()
 setWindowPosition w x y = do
   setNodePosition w.node x y
   modifyWindow w.river_window $ \s -> s {x, y}
+
+-------------------------------------------------------------------
+
+-- * Restart with state
+
+data StateData = StateData
+  { sfWins :: W.StackSet WorkspaceId String (IntPtr, String) WorkspaceDetail ScreenId ScreenDetail,
+    sfExt :: [(String, String)]
+  }
+  deriving (Show, Read)
+
+getProgramPath :: IO FilePath
+getProgramPath =
+  lookupEnv "HSWM_EXECUTABLE" >>= \case
+    Just x -> return x
+    Nothing
+      | Just getExe <- executablePath -> do
+          x <- fromMaybe (error "restart: unable to get program path") <$> getExe
+          setEnv "HSWM_EXECUTABLE" x
+          return x
+      | otherwise -> error "restart: unable to resolve program path"
+
+restart :: String -> H ()
+restart prog = do
+  broadcastMessage ReleaseResources
+  void . userCode =<< asks (exitHook . config)
+  writeStateToFile
+  io $ do
+    res <- try $ executeFile prog True [] Nothing
+    case res of
+      Left (SomeException e) -> hPrint stderr e >> exitFailure
+      Right {} -> return ()
+
+writeStateToFile :: H ()
+writeStateToFile = do
+  let path = ".hswm.state"
+      wsData s = W.mapLayout show $ W.mapWindow winIdent $ windowset s
+        where
+          winIdent w
+            | Just win <- L.find (\x -> x.river_window == w) s._windows = (rwToIntPtr w, win.identifier)
+            | otherwise = (rwToIntPtr w, "")
+  let maybeShow (t, Right (PersistentExtension ext)) = Just (t, show ext)
+      maybeShow (t, Left str) = Just (t, str)
+      maybeShow _ = Nothing
+      extState = mapMaybe maybeShow . M.toList . extensibleState
+  stateData <- gets $ \s -> StateData (wsData s) (extState s)
+  liftIO $ catchIO (writeFile path $ show stateData) (print . show)
+  where
+    rwToIntPtr (R.RiverWindow w) = ptrToIntPtr w
+
+-- | Read the state of a previous xmonad instance from a file and
+-- return that state.  The state file is removed after reading it.
+readStateFile :: (LayoutClass l RiverWindow, Read (l RiverWindow)) => HSWMConfig m l -> IO (Maybe HState)
+readStateFile xmc = do
+  let path = ".hswm.state"
+
+  -- I'm trying really hard here to make sure we read the entire
+  -- contents of the file before it is removed from the file system.
+  res <- try @_ @SomeException $ do
+    raw <- withFile path ReadMode readStrict
+    return $! maybeRead reads raw
+  _ <- try @_ @SomeException $ io (removeFile path)
+
+  case res of
+    Left e -> print e >> return Nothing
+    Right sf' -> return $ do
+      sf <- sf'
+
+      let wins = W.allWindows (sfWins sf)
+      let winset =
+            W.ensureTags layout (workspaces xmc) $
+              W.mapLayout (fromMaybe layout . maybeRead lreads) $
+                W.mapWindow (R.RiverWindow . intPtrToPtr . fst) (sfWins sf)
+          extState = M.fromList . map (second Left) $ sfExt sf
+
+      return
+        def
+          { windowset = winset,
+            windowsetOld = winset,
+            recoveredWindows = M.fromList [(b, R.RiverWindow $ intPtrToPtr a) | (a, b) <- wins],
+            extensibleState = extState
+          }
+  where
+    layout = Layout (layoutHook xmc)
+    lreads = readsLayout layout
+    maybeRead reads' s = case reads' s of
+      [(x, "")] -> Just x
+      _ -> Nothing
+
+    readStrict :: Handle -> IO String
+    readStrict h = hGetContents h >>= \s -> length s `seq` return s
+
+sendRestart :: H ()
+sendRestart = io $ Posix.raiseSignal Posix.sigUSR2
 
 -----------------------------------------------------------------
 

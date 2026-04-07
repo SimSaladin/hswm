@@ -7,21 +7,24 @@
 
 module Wayland.Client.Internal.TH where
 
-import Control.Monad
-import Data.Char (toLower, toUpper)
-import Data.String (IsString (..))
-import Foreign
-import Foreign.C
-import Foreign.C.ConstPtr
-import GHC.Generics (Generic)
-import HsBindgen.Runtime.Prelude
-import HsBindgen.Runtime.PtrConst
-import Language.Haskell.TH
-import System.IO.Unsafe (unsafePerformIO)
-import Wayland.Client.Internal.Types
-import Data.Maybe
+import           Control.DeepSeq (NFData)
+import           Control.Monad
+import           Data.Char (toLower, toUpper)
+import           Data.Hashable (Hashable)
 import qualified Data.List as L
-import Data.Void
+import           Data.Maybe
+import           Data.String (IsString(..))
+import           Data.Void
+import           Foreign
+import           Foreign.C
+import           Foreign.C.ConstPtr
+import           GHC.Generics (Generic)
+import           HsBindgen.Runtime.Prelude
+import           HsBindgen.Runtime.PtrConst
+import           Language.Haskell.TH
+import           System.IO.Unsafe (unsafePerformIO)
+
+import           Wayland.Client.Internal.Types
 
 -- * Configuration
 
@@ -160,7 +163,17 @@ mkWlObjectType cfg = do
   join <$> sequence
     [ pure <$> newtypeD_doc (pure []) ntName [] Nothing
       (recC ntName [ varBangType (mkName "unwrap") (bangType (bang noSourceUnpackedness noSourceStrictness) [t|Ptr $(conT (objType cfg))|]) ], Nothing, [])
-      [derivClause Nothing [[t|Eq|], [t|Show|], [t|Ord|], [t|Storable|], [t|Generic|]]]
+      [derivClause Nothing [ [t|Eq|]
+                           , [t|Show|]
+                           , [t|Ord|]
+                           , [t|Storable|]
+                           , [t|Generic|]
+                           , [t|Hashable|]
+                           , [t|NFData|]
+                           , [t|IsUserData|] -- via NT (Ptr)
+                           ]
+      ]
+                           -- XXX: [t|Data|]]] Data a => Data (Ptr a)
       (Just $ "See '" ++ nameBase (objType cfg) ++ "'")
     ]
 

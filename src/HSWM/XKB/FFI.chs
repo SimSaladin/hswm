@@ -12,6 +12,12 @@ import System.Posix (Fd(..), closeFd, fdWrite)
 #include <xkbcommon/xkbcommon.h>
 #include <linux/input-event-codes.h>
 
+data XkbCommonException = XkbKeysymNameNotFound String
+                        | XkbKeymapCreateException String
+  deriving Show
+
+instance Exception XkbCommonException
+
 type KeySym    = CUInt
 type Button    = {#type uint32_t#}
 type Modifiers = {#type uint32_t#}
@@ -59,7 +65,7 @@ type ModIndex  = {#type xkb_mod_index_t#}
 xkb_keysym_from_name :: String -> KeySym
 xkb_keysym_from_name name = unsafePerformIO $ withCString name $ \c_name -> return $!
   let res = {#call pure xkb_keysym_from_name as _xkb_keysym_from_name#} c_name 1 in
-      if res == 0 then error ("xkb_keysym_from_name: name not found: " ++ name) else res
+      if res == 0 then impureThrow $ XkbKeysymNameNotFound ("xkb_keysym_from_name(" ++ name ++ ")") else res
 
 -- XKB_EXPORT int
 -- xkb_keysym_get_name(xkb_keysym_t keysym, char *buffer, size_t size);
@@ -108,7 +114,7 @@ newXkbKeymapFromNames :: XkbRuleNames -> IO XkbKeymap
 newXkbKeymapFromNames opts = do
   ctx <- xkbContextNew 0
   res <- xkb_keymap_new_from_names2 ctx opts 1 0
-  when (res == nullPtr) $ error "newXkbKeymapFromNames: failed to get keymap (null)"
+  when (res == nullPtr) $ throwM $ XkbKeymapCreateException "newXkbKeymapFromNames (null)"
   return res
 
 withXkbRuleNames :: XkbRuleNames -> (Ptr () -> IO b) -> IO b

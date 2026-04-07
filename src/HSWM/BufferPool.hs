@@ -18,8 +18,9 @@ import           HSWM.Util.Posix
 
 import qualified Generated.Pixman as P
 import qualified Generated.Pixman.Safe as P
-import qualified Generated.Wayland.Client as WL
 import qualified Wayland.Client as WL
+import qualified Generated.Wayland.Client as WL
+import qualified Generated.Wayland.Client.Safe as WL
 
 import           Data.Proxy
 import           Foreign
@@ -86,7 +87,7 @@ initImageBuffer ImageBufferPool{wlShm = wl_shm, bufferListener = listener} width
         h = height
     (fd, ptr) <- createShm (fi size)
     pool <- io $ WL.shmCreatePool wl_shm (fi fd) (fi size)
-    buf <- io $ WL.shmPoolCreateBuffer pool 0 (fi w) (fi h) (fi stride) (fi (WL.WL_SHM_FORMAT_ABGR8888).unwrap)
+    buf <- io $ WL.shmPoolCreateBuffer pool 0 (fi w) (fi h) (fi stride) (fi $ (.unwrap) WL.WL_SHM_FORMAT_ABGR8888)
     -- create pixman image
     pixmanImage <- io $ P.pixman_image_create_bits_no_clear P.PIXMAN_a8r8g8b8 (fi w) (fi h) (castPtr ptr) (fi stride)
     busy <- Foreign.new True

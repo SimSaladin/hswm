@@ -88,6 +88,7 @@ library:
     - deepseq
     - mtl
     - stm
+    - typed-process
   pkgconfig-depends:
     - xkbcommon
     #- wayland-protocols
