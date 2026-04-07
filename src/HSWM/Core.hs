@@ -36,6 +36,7 @@ import System.Exit (ExitCode (..))
 import Wayland (RegistryCache)
 import Wayland.Client qualified as WL hiding (display)
 import Control.Monad.State
+import Control.Monad.Fix
 
 import HSWM.Types.WM
 import HSWM.Types.Config
@@ -48,14 +49,14 @@ import HSWM.Types.TypeMap
 
 -- | The read-only window manager state.
 data HConf = HConf
-  { config :: !(HSWMConfig H Layout),
-    _display :: !WL.Display,
-    _logFunc :: !LogFunc,
-    -- | The global objects available through wl_registry.
-    globals :: !(IORef RegistryCache),
-    _state :: !(TMVar HState),
-    eventQueue :: !(TQueue MainEvent),
-    blockForManage :: MVar (H (), MVar ())
+  { config :: !(HSWMConfig H Layout), -- ^ User-provided configuration.
+    _display :: !WL.Display, -- ^ The Wayland display pointer
+    _logFunc :: !LogFunc, -- ^ Root logger function.
+    globals :: !(IORef RegistryCache), -- ^ The global objects available through wl_registry.
+    _state :: !(TMVar HState), -- ^ The 'HState' XXX FIXME
+    eventQueue :: !(TQueue MainEvent), -- ^ XXX ???
+    pendingManageQ, pendingRenderQ :: !(TQueue (H ()))
+    -- ^ Pending actions to be emitted in the next manage and render queues (respectively).
   }
   deriving (Generic)
 
@@ -94,6 +95,22 @@ instance HasGlobalTMap HState where
 instance HasLogFunc HConf where
   logFuncL = lens _logFunc (\s a -> s { _logFunc = a })
 
+instance MonadUnliftIO H where
+  withRunInIO :: ((forall a. H a -> IO a) -> IO b) -> H b
+  withRunInIO f = do
+    conf <- ask
+    io $! f (\a -> bracketOnError (atomically $ takeTMVar conf._state) (atomically . putTMVar conf._state) (runner conf a))
+      where
+    runner c a st = do
+      (r, st') <- runH c st a
+      atomically (putTMVar c._state st')
+      return r
+
+instance MonadFix H where
+  mfix :: (a -> H a) -> H a
+  mfix f = H (mfix g) where g a = let H a' = f a in a'
+
+
 -- a la xmonad
 runH :: HConf -> HState -> H a -> IO (a, HState)
 runH c st (H a) = runStateT (runReaderT a c) st
@@ -130,6 +147,23 @@ userCode a = catchH (Just <$> a) (return Nothing)
 -- Maybe, provided for convenience.
 userCodeDef :: a -> H a -> H a
 userCodeDef defValue a = fromMaybe defValue <$> userCode a
+
+-----------------------------------------------------------
+-- * manage/render Event queues
+
+class HasEventQueues env where
+  pendingManageQL :: Lens' env (TQueue (H ()))
+  pendingRenderQL :: Lens' env (TQueue (H ()))
+
+instance HasEventQueues HConf where
+  pendingManageQL = lens pendingManageQ $ \s a -> s { pendingManageQ = a }
+  pendingRenderQL = lens pendingRenderQ $ \s a -> s { pendingRenderQ = a }
+
+getEventQueueFuncs :: (MonadReader env m, HasEventQueues env, MonadIO inner)
+                   => m (H e1 -> inner (), H e2 -> inner ()) -- ^ @(queueForManagePhase, queueForRenderPhase)@
+getEventQueueFuncs = (wrap *** wrap) <$> asks ((,) <$> view pendingManageQL <*> view pendingRenderQL)
+  where
+    wrap q = atomically . writeTQueue q . fmap (const ())
 
 -----------------------------------------------------------
 -- River & Wayland

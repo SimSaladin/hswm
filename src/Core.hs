@@ -40,7 +40,8 @@ startHSWM wlDisplay config = do
     <$> newIORef mempty
     <*> newEmptyTMVarIO
     <*> newTQueueIO
-    <*> newEmptyMVar
+    <*> newTQueueIO
+    <*> newTQueueIO
 
   let
     mainEvent :: MonadIO m => MainEvent -> m ()
@@ -224,9 +225,6 @@ handleWithHook e = do
   evHook <- asks (handleEventHook . config)
   whenM (userCodeDef True $ getAll `fmap` evHook e) (handleEvent e)
 
-doMVarAction :: (H a, MVar a) -> H ()
-doMVarAction (m, var) = m >>= io . putMVar var
-
 handleEvent :: Event -> H ()
 handleEvent (WindowManagerEvent e) = case e of
     R.RiverWindowManagerOutput _ _ out -> Outputs.added out
@@ -235,13 +233,14 @@ handleEvent (WindowManagerEvent e) = case e of
 
     -- /manage sequence/
     R.RiverWindowManagerManageStart _ wm -> do
+      sequence_ =<< atomically . flushTQueue =<< asks (view pendingManageQL)
       Outputs.manage >> Seats.manage >> Windows.manage
-      maybe (pure ()) doMVarAction =<< io . tryTakeMVar =<< asks blockForManage
       void . userCode =<< asks (manageHook . config)
       io (R.riverWindowManagerManageFinish wm)
 
     -- /render sequence/
     R.RiverWindowManagerRenderStart _ wm -> do
+      sequence_ =<< atomically . flushTQueue =<< asks (view pendingRenderQL)
       Outputs.render >> Seats.render >> Windows.render
       void . userCode =<< asks (renderHook . config)
       io (R.riverWindowManagerRenderFinish wm)

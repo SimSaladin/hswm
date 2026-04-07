@@ -18,6 +18,7 @@ common deps
     gi-gtk3,
     hswm,
     text,
+    rio,
 
   pkgconfig-depends: gtk+-3.0
 

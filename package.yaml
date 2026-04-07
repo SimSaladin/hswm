@@ -31,7 +31,7 @@ _common/language: &language
     - PackageImports
     - QuantifiedConstraints
   ghc-options: &common-ghc-options
-    -Wall -Wunused-packages
+    -Wall -Wunused-packages -Wno-partial-type-signatures
 
 internal-libraries:
   hswm-prelude:
@@ -87,6 +87,7 @@ library:
     - aeson
     - deepseq
     - mtl
+    - stm
   pkgconfig-depends:
     - xkbcommon
     #- wayland-protocols

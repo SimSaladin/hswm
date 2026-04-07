@@ -34,6 +34,7 @@ import           Foreign.C.ConstPtr as BasePrelude
 -- import           GHC.Generics as BasePrelude (Generic)
 import Text.Read as BasePrelude (reads)
 import Control.Concurrent as BasePrelude (forkIO, forkFinally, killThread)
+import Control.Concurrent.STM as BasePrelude (flushTQueue)
 
 -- tshow :: Show a => a -> T.Text
 -- tshow = T.pack . show

@@ -120,18 +120,22 @@ cycleWindowSets :: (WindowSet -> [WorkspaceId]) -- ^ A function used to create a
                                                 --   If it's the same as nextOption key, it is effectively ignored.
                 -> H ()
 cycleWindowSets genOptions mods keyNext keyPrev = do
-  (options, unView') <- gets $ (genOptions &&& unView) . windowset
-  let
-     preview = do
-       i <- get
-       lift $ windows (view (options !! (i `mod` n)) . unView')
-       where n = length options
+  -- (options, unView') <- gets $ (genOptions &&& unView) . windowset
+  -- let
+  --    preview = do
+  --      logInfo "[cyclews] previewing!"
+  --      i <- get
+  --      lift $ windows (view (options !! (i `mod` n)) . unView')
+  --      where n = length options
+  undefined
+  -- TODO
+  -- withKeyboardGrab ...
 
    -- grabWhileDo :: acc -> ModMask -> [KeySym] -> (KeySym -> acc -> H acc) -> H ()
-  grabWhileDo (-1) mods [keyPrev, keyNext] $ \s -> if
-    | s == keyNext -> modify succ >> preview
-    | s == keyPrev -> modify pred >> preview
-    | otherwise    -> pure ()
+  --grabWhileDo (-1) mods [keyPrev, keyNext] $ \s -> if
+  --  | s == keyNext -> modify succ >> preview
+  --  | s == keyPrev -> modify pred >> preview
+  --  | otherwise    -> logInfo "[cyclews] previewing!" pure ()
 
 --  void . repeatableSt (-1) mods keyNext $ \t s -> when (t == keyPress) $ if
 --    | s == keyNext -> modify succ >> preview

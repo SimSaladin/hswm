@@ -8,16 +8,15 @@ import Text.Read (readMaybe)
 main :: IO ()
 main = do
   logOpts <- logOptionsHandle stderr True
-  withLogFunc logOpts $ \logFunc -> do
-      putStrLn "Connecting..."
+  withLogFunc logOpts $ \logFunc -> flip runReaderT logFunc $ do
+      logInfo "Connecting..."
 
       let msgHandler = \case
-            _msg -> putStrLn "Response!"
+            _msg -> logInfo "Response!"
 
       clientRun Nothing msgHandler consoleHandler
       where
-        consoleHandler say =
-          forever $
-            IO.getLine >>= \ln -> case readMaybe ln :: Maybe ProtoMsg of
+        consoleHandler say = forever $
+            io IO.getLine >>= \ln -> case readMaybe ln :: Maybe ProtoMsg of
               Just m -> say m
-              Nothing -> putStrLn "error: could not read input message"
+              Nothing -> logInfo "error: could not read input message"

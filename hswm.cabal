@@ -46,7 +46,7 @@ library
           DeriveAnyClass
           PackageImports
           QuantifiedConstraints
-    ghc-options: -Wall -Wunused-packages
+    ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures
     other-modules:
           PackageInfo_hswm
     exposed-modules:
@@ -108,6 +108,7 @@ library
         , network
         , pretty-simple
         , rio
+        , stm
         , text
         , transformers
         , typerep-map
@@ -148,7 +149,7 @@ library hswm-prelude
           DeriveAnyClass
           PackageImports
           QuantifiedConstraints
-    ghc-options: -Wall -Wunused-packages
+    ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures
     build-depends:
           base >=4.21.0 && <4.22
         , data-default
@@ -182,7 +183,7 @@ executable hswm
           DeriveAnyClass
           PackageImports
           QuantifiedConstraints
-    ghc-options: -Wall -Wunused-packages -threaded
+    ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -threaded
 
 executable hswmctl
     main-is: Main.hs
@@ -201,7 +202,7 @@ executable hswmctl
           DeriveAnyClass
           PackageImports
           QuantifiedConstraints
-    ghc-options: -Wall -Wunused-packages -threaded
+    ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -threaded
     build-depends:
           base
         , hswm

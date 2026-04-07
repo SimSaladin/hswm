@@ -19,7 +19,7 @@ import Data.String
 import Control.Concurrent
 import Control.Monad
 import GI.Gtk as Gtk
-import HSWM (withStderrLogging, ScreenId)
+import HSWM (ScreenId)
 import HSWM.Util.IPC (ProtoMsg (..), clientRun)
 import Waybar.CFFI.Plugin.Base
 import Data.IORef
@@ -29,6 +29,7 @@ import qualified Data.List as L
 import Data.Maybe
 import Control.Monad.Fix
 import GHC.Records
+import qualified RIO as RIO
 
 data ModState = ModState
   { tagWidgets :: [Label]
@@ -49,9 +50,11 @@ data MyMod = MyMod
   deriving (Generic)
 
 connectToWM :: (ProtoMsg -> IO ()) -> IO ()
-connectToWM onMsg = withStderrLogging $ do
-  putStrLn "Connecting..."
-  clientRun Nothing onMsg (\_say -> forever $ threadDelay maxBound)
+connectToWM onMsg = do
+  logOpts <- RIO.logOptionsHandle RIO.stderr True
+  RIO.withLogFunc logOpts $ \logFunc -> flip RIO.runReaderT logFunc $ do
+    RIO.liftIO $ putStrLn "Connecting..."
+    clientRun Nothing (RIO.liftIO . onMsg) (\_say -> RIO.liftIO $ forever $ threadDelay maxBound)
 
 instanceNew :: IConf a -> IO MyMod
 instanceNew iconf@IConf {..} = do

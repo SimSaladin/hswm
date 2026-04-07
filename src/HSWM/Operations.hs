@@ -3,9 +3,10 @@ module HSWM.Operations where
 import Data.List qualified as L
 import Data.Map qualified as M
 import Data.Ratio ((%))
-import Foreign (IntPtr, intPtrToPtr, ptrToIntPtr)
+import Foreign (IntPtr, intPtrToPtr, ptrToIntPtr, deRefStablePtr, (.&.))
 import HSWM.Core
 import HSWM.StackSet qualified as W
+import qualified Data.Set as S
 import River.Objects qualified as R
 import River.Safe qualified as R
 import System.Directory (removeFile)
@@ -238,6 +239,25 @@ modifySeats choose f = modify $ \s -> s {_seats = map g (_seats s)}
 mapSeats :: (Seat -> H ()) -> H ()
 mapSeats f = gets _seats >>= mapM_ f
 
+seatDisableBindingsMatching :: RiverSeat -> [ModMask] -> [KeySym] -> H ()
+seatDisableBindingsMatching rs mods keys = withSeat rs $ \s -> do
+  let binds = s.xkb_bindings
+      matchedKeys = S.filter match (M.keysSet binds)
+      match (mod, key) = any (\m -> m .&. mod > 0) mods || key `elem` keys
+      matchedBinds = M.fromSet (binds M.!) matchedKeys
+  logInfo $ "seat: temporarily disabling bindings: " <> display (length matchedBinds)
+  io . forM_ matchedBinds $ deRefStablePtr >=> R.riverXkbBindingDisable . xkb_binding
+
+seatEnableBindingsMatching :: RiverSeat -> [ModMask] -> [KeySym] -> H ()
+seatEnableBindingsMatching rs mods keys = withSeat rs $ \s -> do
+  let binds = s.xkb_bindings
+      matchedKeys = S.filter match (M.keysSet binds)
+      match (mod, key) = any (\m -> m .&. mod > 0) mods || key `elem` keys
+      matchedBinds = M.fromSet (binds M.!) matchedKeys
+  logInfo $ "seat: restoring bindings to enabled: " <> display (length matchedBinds)
+  io . forM_ matchedBinds $ deRefStablePtr >=> R.riverXkbBindingEnable . xkb_binding
+
+
 -- windows
 
 withFocused :: (Window -> H ()) -> H ()
@@ -428,12 +448,6 @@ setWindowPosition :: Window -> Int32 -> Int32 -> H ()
 setWindowPosition w x y = do
   setNodePosition w.node x y
   modifyWindow w.river_window $ \s -> s {x, y}
-
-runInManage :: HConf -> H () -> IO ()
-runInManage st f = do
-  rvar <- newEmptyMVar
-  putMVar st.blockForManage (f, rvar)
-  takeMVar rvar
 
 -----------------------------------------------------------------
 

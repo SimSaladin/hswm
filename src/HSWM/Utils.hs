@@ -76,6 +76,15 @@ resolveModMask d s = go s
                        _ -> error $ "unrecognized modifier: " ++ s
 
 
+logTraceShow :: (MonadIO m, MonadReader env m, HasLogFunc env, Show show) => show -> m ()
+logTraceShow x = logDebug $ display $ P.pShowOpt P.defaultOutputOptionsNoColor
+    { P.outputOptionsPageWidth = 380
+    , P.outputOptionsCompact = True
+    , P.outputOptionsCompactParens = True
+    , P.outputOptionsInitialIndent = 4
+    , P.outputOptionsColorOptions = Just P.defaultColorOptionsDarkBg
+    } x
+
 pTrace :: (MonadIO m, Show a) => a -> m ()
 pTrace = P.pHPrintOpt
   P.CheckColorTty

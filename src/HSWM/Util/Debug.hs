@@ -24,43 +24,43 @@ debugHook :: Event -> H All
 debugHook ev
    | WindowManagerEvent R.RiverWindowManagerManageStart{} <- ev = mempty
    | WindowManagerEvent R.RiverWindowManagerRenderStart{} <- ev = mempty
-   | WindowManagerEvent e                                 <- ev = pTrace e >> mempty
+   | WindowManagerEvent e                                 <- ev = logTraceShow e >> mempty
 
-   | XkbKeyboardEvent e                                   <- ev = pTrace e >> mempty
+   | XkbKeyboardEvent e                                   <- ev = logTraceShow e >> mempty
 
    | XkbEvent (R.RiverXkbBindingPressed dt _)             <- ev = do
       (xb :: XkbBinding (SomeAction H)) <- liftIO $ deRefStablePtr (castPtrToStablePtr $ castPtr dt)
-      debug' $ display $ toText $ printf "[EH] KEY PRESS ev=%s action=%s" (show ev) (show xb.action)
-      pTrace ev
+      logDebug $ display $ toText $ printf "[EH] KEY PRESS ev=%s action=%s" (show ev) (show xb.action)
+      logTraceShow ev
       mempty
 
    | SeatEvent R.RiverSeatPointerPosition{}   <- ev = mempty
-   | SeatEvent e                              <- ev = pTrace e >> mempty
+   | SeatEvent e                              <- ev = logTraceShow e >> mempty
 
-   | OutputEvent e                            <- ev = pTrace e >> mempty
+   | OutputEvent e                            <- ev = logTraceShow e >> mempty
 
    | WindowEvent R.RiverWindowDimensions{}    <- ev = mempty
-   | WindowEvent e                            <- ev = pTrace e >> mempty
+   | WindowEvent e                            <- ev = logTraceShow e >> mempty
 
    -- WL_*
-   | WlOutputEvent _                          <- ev = mempty -- pTrace e >> mempty
+   | WlOutputEvent _                          <- ev = logTraceShow ev >> mempty -- pTrace e >> mempty
    | WlShmEvent (WL.ShmFormat _ _ fmt)        <- ev = log' (display (toText $ "shm format: " ++ ppShmFormat (WL.Wl_shm_format $ fi fmt))) >> mempty
-   | WlSeatEvent e                            <- ev = pTrace e >> mempty
+   | WlSeatEvent e                            <- ev = logTraceShow e >> mempty
 
    -- Ext_*
    | ForeignTopLevelHandleV1 e                <- ev = do
-       io $ case e of
-           WL.ForeignToplevelHandleTitle _ _ s -> pTrace (e, s)
-           WL.ForeignToplevelHandleIdentifier _ _ s -> pTrace (e, s)
-           WL.ForeignToplevelHandleAppId _ _ s -> pTrace (e, s)
+       case e of
+           WL.ForeignToplevelHandleTitle _ _ s -> logTraceShow (e, s)
+           WL.ForeignToplevelHandleIdentifier _ _ s -> logTraceShow (e, s)
+           WL.ForeignToplevelHandleAppId _ _ s -> logTraceShow (e, s)
            _ -> return ()
        mempty
 
-   | otherwise                             = pTrace ev >> mempty
+   | otherwise                             = logTraceShow ev >> mempty
 
 debugAction :: H ()
 debugAction = do
-  pTrace "[[[ Windows ]]]" >> gets _windows >>= mapM_ pTrace . M.elems
-  pTrace "[[[WindowSet]]]" >> gets windowset >>= pTrace
-  pTrace "[[[ Outputs ]]]" >> gets _outputs >>= mapM_ pTrace
-  pTrace "[[[  Seats  ]]]" >> gets _seats >>= mapM_ pTrace
+  logDebug "[[[ Windows ]]]" >> gets _windows  >>= mapM_ logTraceShow . M.elems
+  logDebug "[[[WindowSet]]]" >> gets windowset >>= logTraceShow
+  logDebug "[[[ Outputs ]]]" >> gets _outputs  >>= mapM_ logTraceShow
+  logDebug "[[[  Seats  ]]]" >> gets _seats    >>= mapM_ logTraceShow
