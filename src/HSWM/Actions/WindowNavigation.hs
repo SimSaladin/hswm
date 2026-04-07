@@ -41,7 +41,7 @@ mkWindowNavigationKeys
   :: (key, key, key, key)    -- ^ keys for (Up, Left, Down, Right)
   -> (mask, mask)            -- ^ mask for (go-to-window, swap-window)
   -> (mask -> key -> a)      -- ^ how to combine keys with masks
-  -> IO ([(a, SomeAction)], H ()) -- ^ (keyBindings, logHook)
+  -> IO ([(a, SomeAction H)], H ()) -- ^ (keyBindings, logHook)
 mkWindowNavigationKeys (u, l, d, r) (modGo, modSwap) f = do
   stateRef <- newIORef mempty
   return (

@@ -27,7 +27,7 @@ data WaybarState = WaybarState { wbPID :: Maybe Posix.ProcessID }
   deriving (Show, Eq, Generic)
   deriving anyclass (Default)
 
-waybarSB :: WaybarConfig -> HSWMConfig l -> HSWMConfig l
+waybarSB :: WaybarConfig -> ConfigDoM H
 waybarSB wbcfg ucfg = ucfg
   { startupHook = startupHook ucfg <> waybarStartupHook wbcfg
   , exitHook = exitHook ucfg <> waybarExitHook wbcfg

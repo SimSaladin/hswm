@@ -149,7 +149,7 @@ handleXkbBindingEvent :: R.RiverXkbBindingEvent -> H ()
 handleXkbBindingEvent ev = do
   case ev of
     R.RiverXkbBindingPressed dt _ -> do
-      xb <- io $ deRefStablePtr (castPtrToStablePtr (castPtr dt) :: StablePtr (XkbBinding SomeAction))
+      xb <- io $ deRefStablePtr (castPtrToStablePtr (castPtr dt) :: StablePtr (XkbBinding (SomeAction H)))
       execXkbBinding xb
 
     _ -> return ()
@@ -164,7 +164,7 @@ handlePointerEvent :: R.RiverPointerBindingEvent -> H ()
 handlePointerEvent ev = do
   case ev of
     R.RiverPointerBindingPressed dt _ -> do
-        xb <- io $ deRefStablePtr (castPtrToStablePtr $ castPtr dt :: StablePtr (PointerBinding SomeAction))
+        xb <- io $ deRefStablePtr (castPtrToStablePtr $ castPtr dt :: StablePtr (PointerBinding (SomeAction H)))
         userCodeDef () $ runner xb.action
     _ -> return ()
 
@@ -246,6 +246,8 @@ manage1 s =
         skeys <- createXkbBindings (binds, kbdListen, s.river_seat) actionSubmap keys
         doS $ \s' -> s' { pending_action = S_NONE, inputOverride = Just (onEmpty, skeys) }
         io $ ensureNextKeyEaten s
+
+      _ -> return ()
 
     manageActiveOp = do
       case s.op of
@@ -375,9 +377,9 @@ ensureNextKeyEaten, cancelEnsureNextKeyEaten :: Seat -> IO ()
 ensureNextKeyEaten s = io $ R.riverXkbBindingsSeatEnsureNextKeyEaten s.xkb_bindings_seat
 cancelEnsureNextKeyEaten s = io $ R.riverXkbBindingsSeatCancelEnsureNextKeyEaten s.xkb_bindings_seat
 
-execXkbBinding :: XkbBinding SomeAction -> H ()
+execXkbBinding :: XkbBinding (SomeAction H) -> H ()
 execXkbBinding xb = withSeat xb.river_seat $ \s -> do
-  case (s.submap_pending, actionSubmap xb.action) of
+  case (s.submap_pending, actionSubmap @H xb.action) of
     _ | Just _ <- s.inputOverride -> void $ userCode $ runner xb.action
 
     (Nothing, []) -> userCodeDef () $ runner xb.action

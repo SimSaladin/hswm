@@ -289,7 +289,7 @@ catchIO f = io (f `catch` \(SomeException e) -> hPrint stderr e >> hFlush stderr
 
 -- | Read the state of a previous xmonad instance from a file and
 -- return that state.  The state file is removed after reading it.
-readStateFile :: (LayoutClass l RiverWindow, Read (l RiverWindow)) => HSWMConfig l -> IO (Maybe HState)
+readStateFile :: (LayoutClass l RiverWindow, Read (l RiverWindow)) => HSWMConfig m l -> IO (Maybe HState)
 readStateFile xmc = do
     let path = ".hswm.state"
 
@@ -398,6 +398,11 @@ setWindowPosition w x y = do
   setNodePosition w.node x y
   modifyWindow w.river_window $ \s -> s { x, y }
 
+runInManage :: HConf -> H () -> IO ()
+runInManage st f = do
+  rvar <- newEmptyMVar
+  putMVar st.blockForManage (f, rvar)
+  takeMVar rvar
 
 -----------------------------------------------------------------
 -- * Cursor

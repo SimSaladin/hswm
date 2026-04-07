@@ -33,12 +33,13 @@ import           System.Exit
 import qualified System.Posix as Posix
 import           System.Timeout
 
-startHSWM :: (LayoutClass l RiverWindow, Read (l RiverWindow)) => Display -> HSWMConfig l -> IO ()
+startHSWM :: (m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow)) => Display -> HSWMConfig m l -> IO ()
 startHSWM display config = withStdoutLogging $ do
   conf <- HConf (config { layoutHook = Layout (layoutHook config) }) display
     <$> newIORef mempty
     <*> newEmptyTMVarIO
     <*> newTQueueIO
+    <*> newEmptyMVar
 
   let mainEvent = atomically . writeTQueue conf.eventQueue
 
@@ -82,15 +83,11 @@ startHSWM display config = withStdoutLogging $ do
     _               <- getOrCreateObject $ R.mkRiverLayerShellSeatListener    $ \e -> handleE $ LayerShellSeatEvent e
     _               <- getOrCreateObject $ R.mkRiverInputDeviceListener       $ \e -> handleE $ InputDeviceEvent e
     libinputConfigL <- getOrCreateObject $ R.mkRiverLibinputConfigListener    $ \e -> handleE $ LibinputConfigEvent e
-    libinputDeviceL <- getOrCreateObject $ R.mkRiverLibinputDeviceListener    $ \e -> handleE $ LibinputDeviceEvent e
+    _               <- getOrCreateObject $ R.mkRiverLibinputDeviceListener    $ \e -> handleE $ LibinputDeviceEvent e
     inputManagerL   <- getOrCreateObject $ R.mkRiverInputManagerListener      $ \e -> handleE $ InputManagerEvent e
     managerL        <- getOrCreateObject $ R.mkRiverWindowManagerListener     $ \e -> handleE $ WindowManagerEvent e
     foreignListL    <- getOrCreateObject $ WL.mkForeignToplevelListListener   $ \e -> handleE $ ForeignTopLevelListV1 e
     _               <- getOrCreateObject $ WL.mkForeignToplevelHandleListener $ \e -> handleE $ ForeignTopLevelHandleV1 e
-
-    _               <- getOrCreateObject $ mkZwpInputPopupSurfaceV2Listener       $ handleE . ZwpIM2PopupSurfaceE
-    _               <- getOrCreateObject $ mkZwpInputMethodKeyboardGrabV2Listener $ handleE . ZwpIM2KeyboardGrabE
-    _               <- getOrCreateObject $ mkZwpInputMethodV2Listener             $ handleE . ZwpIM2E
 
     registry <- io $ displayGetRegistry display
     io $ WL.listenerAdd registry regL nullPtr
@@ -107,6 +104,9 @@ startHSWM display config = withStdoutLogging $ do
       WL.Shm <$> WL.registryBind r n WL.shmInterface (fi v)
 
     io $ WL.listenerAdd wl_shm shmL nullPtr
+
+    _ <- getOrCreateObject $ requireGlobal conf.globals ("zwp_input_method_manager_v2", 1) $ \r n v ->
+      io $ WL.registryBind r n zwpInputMethodManagerInterface (fi v)  <&> ZwpInputMethodManager
 
     libinputConfig <- getOrCreateObject $ requireGlobal conf.globals ("river_libinput_config_v1", 1) $ \r n v ->
       WL.registryBind r n R.riverLibinputConfigInterface (fi v) <&> R.RiverLibinputConfig
@@ -135,9 +135,6 @@ startHSWM display config = withStdoutLogging $ do
       WL.registryBind r n WL.foreignToplevelListInterface (fi v) <&> WL.ForeignToplevelList
 
     io $ WL.listenerAdd foreignList foreignListL nullPtr
-
-    im2manager <- getOrCreateObject $ requireGlobal conf.globals ("zwp_input_method_manager_v2", 1) $ \r n v ->
-      io $ WL.registryBind r n zwpInputMethodManagerV2Interface (fi v)  <&> ZwpInputMethodManagerV2
 
     log' "WM: running startup hooks"
     userCodeDef () (startupHook config)
@@ -223,6 +220,9 @@ handleWithHook e = do
   evHook <- asks (handleEventHook . config)
   whenM (userCodeDef True $ getAll `fmap` evHook e) (handleEvent e)
 
+doMVarAction :: (H a, MVar a) -> H ()
+doMVarAction (m, var) = m >>= io . putMVar var
+
 handleEvent :: Event -> H ()
 handleEvent (WindowManagerEvent e) = case e of
     R.RiverWindowManagerOutput _ _ out -> Outputs.added out
@@ -232,6 +232,7 @@ handleEvent (WindowManagerEvent e) = case e of
     -- /manage sequence/
     R.RiverWindowManagerManageStart _ wm -> do
       Outputs.manage >> Seats.manage >> Windows.manage
+      maybe (pure ()) doMVarAction =<< io . tryTakeMVar =<< asks blockForManage
       void . userCode =<< asks (manageHook . config)
       io (R.riverWindowManagerManageFinish wm)
 
@@ -264,31 +265,27 @@ handleEvent (XkbSeatEvent e)          = Seats.handleXkbBindingsSeatEvent e -- XK
 handleEvent (PointerEvent e)          = Seats.handlePointerEvent e -- Pointer events
 
 -- INPUT configuration
--- Keyboard added
-handleEvent (XkbConfigEvent (R.RiverXkbConfigXkbKeyboard _ xkbConfig xkbKeyboard)) = do
-  withObject @R.RiverXkbKeyboardListener $ \l -> io $ R.listenerAdd xkbKeyboard l nullPtr
-  asks (xkbLayout . config) >>= (`whenJust` setKeyboardLayout xkbConfig xkbKeyboard)
-
--- keyboard is removed
-handleEvent (XkbKeyboardEvent (R.RiverXkbKeyboardRemoved _ _kbd)) = return () -- TODO
-
 handleEvent (InputManagerEvent (R.RiverInputManagerInputDevice _ _ dev)) = do
   l <- getObject
   io $ R.listenerAdd dev l nullPtr
   asks (repeatInfo . config) >>= io . (`whenJust` uncurry (R.riverInputDeviceSetRepeatInfo dev)) --  repeatRate repeatDelay
   --io $ R.riverInputDeviceAssignToSeat dev (Just "default")
 
--- handleEvent (InputDevicEvent (R.RiverInputDeviceType' _ _ inputDevice)) = return ()
+-- handleEvent (InputDeviceEvent (R.RiverInputDeviceType' _ _ inputDevice)) = return ()
 
-handleEvent (ForeignTopLevelListV1 (WL.ForeignToplevelListToplevel _ _ fh)) = do
-    l <- getObject
-    _ <- io $ WL.listenerAdd fh l nullPtr
-    return ()
+-- Keyboard added/removed
+handleEvent (XkbConfigEvent (R.RiverXkbConfigXkbKeyboard _ xkbConfig xkbKeyboard)) = do
+  withObject @R.RiverXkbKeyboardListener $ \l -> io $ R.listenerAdd xkbKeyboard l nullPtr
+  asks (xkbLayout . config) >>= (`whenJust` setKeyboardLayout xkbConfig xkbKeyboard)
+handleEvent (XkbKeyboardEvent (R.RiverXkbKeyboardRemoved _ _kbd)) = return () -- TODO
 
 handleEvent (LibinputConfigEvent (R.RiverLibinputConfigLibinputDevice _ _ dev)) = do
   l <- getObject
   io $ WL.listenerAdd dev l nullPtr
-  return ()
+
+handleEvent (ForeignTopLevelListV1 (WL.ForeignToplevelListToplevel _ _ fh)) = do
+  l <- getObject
+  io $ WL.listenerAdd fh l nullPtr
 
 handleEvent _ = return ()
 
@@ -300,17 +297,3 @@ setKeyboardLayout xkbConfig keyboard layout =
     io $ withXkbKeymapFd km $ \fd ->
     R.riverXkbConfigCreateKeymap xkbConfig (fi fd) R.RIVER_XKB_CONFIG_V1_KEYMAP_FORMAT_TEXT_V1 -- RiverXkbConfigKeymapFormatText
     >>= io . R.riverXkbKeyboardSetKeymap keyboard
-
-testIM2 :: H ()
-testIM2 = do
-  im2manager <- getObject
-  mapSeats $ \seat -> do
-    im2 <- io $ zwpInputMethodManagerV2GetInputMethod im2manager seat.wl_seat
-    putObject im2
-    l <- getObject
-    io $ WL.listenerAdd im2 l nullPtr
-
-    log' "Grabbing keyboard"
-    kbGrab <- io $ zwpInputMethodV2GrabKeyboard im2
-    kbgL <- getObject
-    io $ WL.listenerAdd kbGrab kbgL nullPtr

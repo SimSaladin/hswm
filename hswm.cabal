@@ -17,6 +17,7 @@ extra-doc-files:
       README.md
 extra-source-files:
       Makefile
+      hswm-bindings/include/input-method-unstable-v2-client-protocol.h
       hswm-bindings/include/river-input-management-v1-client-protocol.h
       hswm-bindings/include/river-layer-shell-v1-client-protocol.h
       hswm-bindings/include/river-libinput-config-v1-client-protocol.h
@@ -24,6 +25,7 @@ extra-source-files:
       hswm-bindings/include/river-window-management-v1-client-protocol.h
       hswm-bindings/include/river-xkb-bindings-v1-client-protocol.h
       hswm-bindings/include/river-xkb-config-v1-client-protocol.h
+      hswm-bindings/cbits/input-method-unstable-v2-protocol.c
       hswm-bindings/cbits/river-input-management-v1-protocol.c
       hswm-bindings/cbits/river-layer-shell-v1-protocol.c
       hswm-bindings/cbits/river-libinput-config-v1-protocol.c
@@ -53,6 +55,7 @@ library
           HSWM.Actions.CycleRecentWS
           HSWM.Actions.CycleWS
           HSWM.Actions.PhysicalScreens
+          HSWM.Actions.Repeatable
           HSWM.Actions.WindowNavigation
           HSWM.BufferPool
           HSWM.Config
@@ -65,8 +68,12 @@ library
           HSWM.Outputs
           HSWM.Seats
           HSWM.StackSet
+          HSWM.Types.Config
+          HSWM.Types.Layouts
+          HSWM.Types.WM
           HSWM.Util.Debug
           HSWM.Util.ExtensibleState
+          HSWM.Util.GrabKeyboard
           HSWM.Util.IPC
           HSWM.Util.Posix
           HSWM.Util.Types
@@ -112,6 +119,7 @@ library
     include-dirs:
           hswm-bindings/include
     c-sources:
+          hswm-bindings/cbits/input-method-unstable-v2-protocol.c
           hswm-bindings/cbits/river-input-management-v1-protocol.c
           hswm-bindings/cbits/river-layer-shell-v1-protocol.c
           hswm-bindings/cbits/river-libinput-config-v1-protocol.c

@@ -14,7 +14,7 @@ module HSWM.Main  where
 import Core
 import HSWM.Utils
 
-hswm :: (LayoutClass l RiverWindow, Read (l RiverWindow)) => HSWMConfig l -> IO ()
+hswm :: (m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow)) => HSWMConfig m l -> IO ()
 hswm conf = do
   installSignalHandlers
   display <- displayConnect Nothing

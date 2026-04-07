@@ -28,7 +28,7 @@ debugHook ev
    | XkbKeyboardEvent e                                   <- ev = pTrace e >> mempty
 
    | XkbEvent (R.RiverXkbBindingPressed dt _)             <- ev = do
-      (xb :: XkbBinding SomeAction) <- liftIO $ deRefStablePtr (castPtrToStablePtr $ castPtr dt)
+      (xb :: XkbBinding (SomeAction H)) <- liftIO $ deRefStablePtr (castPtrToStablePtr $ castPtr dt)
       debug' $ toText $ printf "[EH] KEY PRESS ev=%s action=%s" (show ev) (show xb.action)
       pTrace ev
       mempty

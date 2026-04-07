@@ -1,9 +1,6 @@
 {-# OPTIONS_GHC -Wno-type-defaults #-}
 {-# OPTIONS_GHC -Wno-unused-binds #-}
 {-# LANGUAGE UndecidableInstances #-}
-
-
-
 module Main (main) where
 
 import           HSWM
@@ -14,9 +11,9 @@ import qualified HSWM.Wallpaper
 import qualified HSWM.Util.IPC as IPC
 import           HSWM.Util.Debug
 import qualified HSWM.Actions.CycleWS as CycleWS
-import qualified HSWM.Actions.CycleRecentWS as CyclRecentWS
+import qualified HSWM.Actions.CycleRecentWS as CycleRecentWS
+import HSWM.Util.GrabKeyboard
 
-import Core (testIM2)
 import           Data.Ratio
 
 default ([Char])
@@ -42,12 +39,12 @@ colCyan    = "0x2aa198" -- "#2aa198"
 colGreen   = "0x859900" -- "#859900"
 
 class IsKeyAction a where
-  toKeyAction :: String -> a -> SomeAction
+  toKeyAction :: String -> a -> SomeAction H
 instance {-# OVERLAPPABLE #-} IsKeyAction (H ()) where toKeyAction = namedA
-instance {-# OVERLAPPABLE #-} IsKeyAction SomeAction where toKeyAction d a = SomeAction $ NamedAction d a
+instance {-# OVERLAPPABLE #-} IsKeyAction (SomeAction H) where toKeyAction d a = SomeAction $ NamedAction d a
 instance {-# OVERLAPPABLE #-} (Message a, Show a) => IsKeyAction a where toKeyAction d a = SomeAction $ NamedActionH (d ++ show a) (sendMessage a)
 
-(=?) :: IsKeyAction a => String -> a -> SomeAction
+(=?) :: IsKeyAction a => String -> a -> SomeAction H
 desc =? action = toKeyAction desc action
 
 main :: IO ()
@@ -60,7 +57,7 @@ main = do
 
     $ HSWM.Wallpaper.usingWallpaper HSWM.Wallpaper.Config { filepath = "/home/sim/wallpaper.png" }
 
-    (def @(HSWMConfig Full))
+    (def @(HSWMConfig H Full))
       { layoutHook      = Tall 1 (3/100) (1/2) ||| Full
       , handleEventHook = debugHook
       , logHook         = navLogHook <> IPC.ipcLogHook
@@ -77,7 +74,7 @@ main = do
     -- ====== Core ==========
     [ ("M-S-c",         "Close the focused window" =? withFocused manageKill)
     , ("M-S-q",         "Restart WM" =? sendRestart)
-    , ("M-Return",      "New terminal window" =? toSomeAction (LaunchProgram "kitty" [])) -- Terminal
+    , ("M-Return",      "New terminal window" =? SomeAction @H (LaunchProgram "kitty" [])) -- Terminal
     , ("M-Escape",      "Print debug stack" =? debugAction)
     -- "M-<F1>" `CF.key'` helpCmd
     -- "M-r M-S-c"     cmdT @"Signal process (SIGKILL) of focused window (_NET_WM_PID)" (withFocused (signalProcessBy Posix.sigKILL))
@@ -116,7 +113,7 @@ main = do
     -- "M-; "        >>+ tags >++> WorkspaceView
     -- "M-; M-"      >>+ tags >++> WorkspaceCopy
     -- "M-S-; "      >>+ tags >++> WorkspaceShiftTo
-    --, ("M-y",        "Cycle recent hidden tags"       =? cycleRecentHiddenWS [xK_Super_L, xK_Alt_L] xK_y xK_p)
+    , ("M-y",        "Cycle recent hidden tags"  =? CycleRecentWS.cycleRecentWS [4, 8] 121 112)
     --, ("M-S-n",      "Shift current tag (forwards)"   =? swapTo Next CycleWS.anyWS) -- XXX: save workspace order?
     --, ("M-S-p",      "Shift current tag (backwards)"  =? swapTo Prev CycleWS.anyWS)
     --, ( "M-g r"      WorkspaceSetNamePrompt
@@ -269,5 +266,5 @@ dvpMyLayout = XkbRuleNames
   , options = "terminate:ctrl_alt_bksp,compose:rctrl-altgr,lv3:ralt_switch,lv3:menu_switch"
   }
 
-launchRofi :: [String] -> SomeAction
-launchRofi args = toSomeAction $ LaunchProgram "rofi" (["-dpi", "150"] ++ args)
+launchRofi :: [String] -> SomeAction H
+launchRofi args = SomeAction $ LaunchProgram "rofi" (["-dpi", "150"] ++ args)

@@ -65,6 +65,7 @@ objDropPrefixSuffix :: String -> String -> ObjectCfg -> ObjectCfg
 objDropPrefixSuffix pre suf cfg = cfg
   { objFunctionPrefix = lowerFirst . fromSnailCase . dropPrefix pre . dropSuffix suf $ nameBase (objType cfg)
   , objTypePrefix = upperFirst . fromSnailCase . dropPrefix pre . dropSuffix suf $ nameBase (objType cfg)
+  , objEventFieldNamesCommon = [ "userdata", lowerFirst . fromSnailCase . dropPrefix pre . dropSuffix suf $ nameBase (objType cfg) ]
   }
 
 objAddMarshall :: [(TypeQ, TypeQ, ExpQ, ExpQ)] -> ObjectCfg -> ObjectCfg
@@ -143,18 +144,16 @@ mkIOPtrArg doc tN cN = (fromString doc)
 
 -- * Functions
 
--- | The generator hides the ConstPtr values... But we can re-create them here.
-toConstPtr :: (Storable a) => a -> IO (ConstPtr a)
-toConstPtr x = malloc >>= \ptr -> poke ptr x >> pure (ConstPtr ptr)
-
------------
-
 mkWlObject :: ObjectCfg -> Q [Dec]
 mkWlObject cfg = do
   a <- mkWlObjectType cfg
   b <- mkWlObjectMisc cfg
   return (a ++ b)
 
+-- |
+-- @
+--   newtype FooBarXyz = FooBarXyz { unwrap :: Ptr Foo_bar_xyz }
+-- @
 mkWlObjectType :: ObjectCfg -> Q [Dec]
 mkWlObjectType cfg = do
   let ntName = mkName $ objTypePrefix cfg
@@ -165,9 +164,45 @@ mkWlObjectType cfg = do
       (Just $ "See '" ++ nameBase (objType cfg) ++ "'")
     ]
 
+-- |
+-- Common operations ('IsWlObject'):
+--
+-- @
+--   instance IsWlObject Foo ...
+-- @
+--
+-- Destructor API:
+-- @
+--   instance HasDestructor Foo ...
+-- @
+--
+-- Listener API:
+--
+-- @
+--   instance AddListener Foo ...
+--
+--   type FooListener = PtrConst (ObjectListener Foo)
+-- @
+--
+-- Interface and event:
+--
+-- @
+--   fooInterface :: ConstPtr wl_interface
+--   fooInterface = ...
+--
+--   data FoobarEvent = ...
+--
+--   mkFoobarListener :: (FoobarEvent -> IO ()) -> IO FoobarListener
+--   mkFoobarListener h = FoobarListener <$> toFunPtr (\a b c -> h (FoobarEvent a b c)) -}
+-- @
+--
+-- Functions:
+--
+-- @
+--   fooThing1, fooThing2 :: Foo -> ...
+-- @
 mkWlObjectMisc :: ObjectCfg -> Q [Dec]
 mkWlObjectMisc cfg = do
-  pname <- newName "p"
   let isWlObjDocS =
         """
         @
@@ -182,34 +217,29 @@ mkWlObjectMisc cfg = do
         'Wayland.Client.Internal.Types.objectDestroy' object
         @
         """
-  wloD <- join <$> sequence
-      [ withDecsDoc isWlObjDocS $ pure <$> instanceD
-          (pure [])
-          (appT (conT ''IsWlObject) (conT ntName))
-          [ funD 'getVersion [clause [conP ntName [varP pname]] (normalB (appE (varE (getFn (objType cfg) "get_version")) (varE pname))) []],
-            funD 'getUserData [clause [conP ntName [varP pname]] (normalB (appE (varE (getFn (objType cfg) "get_user_data")) (varE pname))) []],
-            funD 'setUserData [clause [conP ntName [varP pname]] (normalB (appE (varE (getFn (objType cfg) "set_user_data")) (varE pname))) []]
-          ]
-      | objIsWlObject cfg
-      ]
 
-  destroyD <- join <$> sequence
-    [ withDecsDoc destroyDocS
-        [d|
-          instance HasDestructor $(conT ntName) where
-            objectDestroy $(conP ntName [varP pname]) = $(varE (getFn (objType cfg) "destroy")) $(varE pname)
-        |] | objHasDestructor cfg ]
+  wloD <- join <$> sequence [ withDecsDoc isWlObjDocS [d|
+    instance IsWlObject $(conT ntName) where
+      getVersion  $(conP ntName [[p|x|]]) = $(varE $ getFn (objType cfg) "get_version") x
+      getUserData $(conP ntName [[p|x|]]) = $(varE $ getFn (objType cfg) "get_user_data") x
+      setUserData $(conP ntName [[p|x|]]) = $(varE $ getFn (objType cfg) "set_user_data") x
+    |] | objIsWlObject cfg ]
 
-  listenerD <- case objListener cfg of
-    Nothing -> pure []
-    Just listener -> mkAddListenerInst (objType cfg) listener
+  destroyD <- join <$> sequence [ withDecsDoc destroyDocS [d|
+    instance HasDestructor $(conT ntName) where
+      objectDestroy $(conP ntName [[p|x|]]) = $(varE (getFn (objType cfg) "destroy")) x
+    |] | objHasDestructor cfg ]
+
+  listenerD <- join <$> sequence [
+    mkAddListenerInst (objType cfg) listener
+      | Just listener <- [objListener cfg] ]
 
   ifDs <- case (objListener cfg, objInterface cfg) of
     (Just listener, Just iface) -> mkInterfaceNew cfg listener iface
     (Nothing, Just iface) -> mkInterfaceNew cfg (objType cfg) iface
     _ -> return []
 
-  fnDs <- forM (objFunctions cfg) $ \x -> mkFn x
+  fnDs <- forM (objFunctions cfg) mkFn
 
   return $ wloD ++ destroyD ++ listenerD ++ ifDs ++ concat fnDs
   where
@@ -292,23 +322,25 @@ mkWlObjectMisc cfg = do
       mapType (AppT (ConT ''Ptr) (ConT (objType cfg))) (ConT ntName)
         . mapType (AppT (ConT ''PtrConst) (ConT ''CChar)) (AppT (ConT ''Maybe) (ConT ''String))
 
+-- | New "foobar :: ConstPtr Wl_interface" with "{-# NOINLINE foobar #-}"
 mkInterfaceNew :: ObjectCfg -> Name -> Name -> Q [Dec]
 mkInterfaceNew cfg@ObjectCfg {..} listenerValName ifaceVN = do
   let ifaceVN' = mkName $ objFunctionPrefix ++ "Interface" -- nameBase ifaceVN -- const pointer
-      ifaceVN'' = mkName $ objFunctionPrefix ++ "Interface_" -- refers to the interface struct directly
       ifaceT = reifyType ifaceVN
   lev <- mkListenerEventNew cfg listenerValName
   sequence $
-    -- New "foobar :: ConstPtr Wl_interface" with "{-# NOINLINE foobar #-}"
     [ sigD ifaceVN' $ appT [t|ConstPtr|] ifaceT,
       pragInlD ifaceVN' NoInline FunLike AllPhases,
-      valD (varP ifaceVN') (normalB $ appE [|unsafePerformIO . toConstPtr|] (varE ifaceVN)) [],
-      -- Old value renamed
-      sigD ifaceVN'' ifaceT,
-      valD (varP ifaceVN'') (normalB $ varE ifaceVN) []
-    ]
-      ++ map pure lev
+      valD (varP ifaceVN') (normalB $ appE [|unsafePerformIO . toConstPtr|] (varE ifaceVN)) []
+    ] ++ map pure lev
 
+-- |
+-- @
+--   data FoobarEvent = ...
+--
+--   mkFoobarListener :: (FoobarEvent -> IO ()) -> IO FoobarListener
+--   mkFoobarListener h = FoobarListener <$> toFunPtr (\a b c -> h (FoobarEvent a b c)) -}
+-- @
 mkListenerEventNew :: ObjectCfg -> Name -> Q [Dec]
 mkListenerEventNew ObjectCfg {..} listenerTypeName = do
   res <- reify listenerTypeName
@@ -319,12 +351,9 @@ mkListenerEventNew ObjectCfg {..} listenerTypeName = do
           objectName = objTypePrefix
           evName = mkName $ objectName ++ "Event"
       sequence
-          -- data FoobarEvent = ...
         [ dataD (pure []) evName [] Nothing (map mkEvCon recs)
             [derivClause Nothing [conT ''Eq, conT ''Show, conT ''Generic]]
 
-        {- mkFoobarListener :: (FoobarEvent -> IO ()) -> IO FoobarListener
-           mkFoobarListener h = FoobarListener <$> toFunPtr (\a b c -> h (FoobarEvent a b c)) -}
         , sigD (mkName $ "mk" ++ listenerName') [t|($(conT evName) -> IO ()) -> IO (PtrConst $(conT listenerName))|]
         , funD_doc
             (mkName $ "mk" ++ listenerName')
@@ -359,7 +388,7 @@ mkListenerEventNew ObjectCfg {..} listenerTypeName = do
                         | otherwise -> return $ mkName $ lowerFirst $ nameBase nm
                       AppT (ConT nm) (ConT nm')
                         | nm == ''PtrConst, nm' == ''CChar -> return $ mkName $ "string_" ++ show i
-                        | otherwise -> return $ mkName $ "_" ++ (lowerFirst $ dropPrefix "Wl_" $ nameBase nm')
+                        | otherwise -> return $ mkName $ "_" ++ lowerFirst (dropPrefix "Wl_" $ nameBase nm')
                       _ -> return $ mkName $ "_" ++ nameBase eN ++ "_" ++ show i
 
         mkEvCon :: (Name, Bang, Type) -> Q Con
@@ -417,6 +446,10 @@ mkListenerEventNew ObjectCfg {..} listenerTypeName = do
           mapType (AppT (ConT ''Ptr) (ConT objType)) (ConT (mkName objTypePrefix))
             . mapType (AppT (ConT ''PtrConst) (ConT ''CChar)) (ConT ''String)
     go _ = return []
+
+-- | The generator hides the ConstPtr values... But we can re-create them here.
+toConstPtr :: (Storable a) => a -> IO (ConstPtr a)
+toConstPtr x = malloc >>= \ptr -> poke ptr x >> pure (ConstPtr ptr)
 
 -- * Type utils
 

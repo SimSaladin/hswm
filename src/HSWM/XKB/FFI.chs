@@ -31,6 +31,18 @@ type ModIndex  = {#type xkb_mod_index_t#}
 
 {#fun xkb_state_get_keymap {`XkbState'} -> `XkbKeymap' #}
 
+{#fun xkb_keymap_unref {`XkbKeymap'} -> `()'#}
+{#fun xkb_state_unref {`XkbState'} -> `()'#}
+{#fun xkb_state_new {`XkbKeymap'} -> `XkbState'#}
+{#fun xkb_state_update_mask
+  {`XkbState', `Word32', `Word32', `Word32', `Word32', `Word32', `Word32'}
+  -> `()'#}
+
+{#fun xkb_state_key_get_one_sym
+  { `XkbState'
+  , `CUInt'
+  } -> `CUInt' #}
+
 -- | returns A keymap compiled according to the [RMLVO] names, or `NULL` if
 -- the compilation failed.
 {#fun xkb_keymap_new_from_names2
@@ -61,8 +73,20 @@ xkbKeysymToText k = unsafePerformIO $ allocaBytes 64 $ \buf ->
 
 createKeymap :: Fd -> CUInt -> IO XkbKeymap
 createKeymap fd size = do
-  ptr <- {#call mmap as _mmap#} nullPtr (fromIntegral size) {#const PROT_READ#} {#const MAP_PRIVATE#} (fromIntegral fd) 0
   ctx <- xkbContextNew 0
+  createKeymap' ctx fd size
+
+createKeymap' :: XkbContext -> Fd -> CUInt -> IO XkbKeymap
+createKeymap' ctx fd size = do
+  ptr <- {#call mmap as _mmap#} nullPtr (fromIntegral size) {#const PROT_READ#} {#const MAP_PRIVATE#} (fromIntegral fd) 0
+  keymap <- xkbKeymapNewFromString ctx (castPtr ptr) 1 {-xkb_KEYMAP_FORMAT_TEXT_V1-} 0
+  _ <- {#call munmap#} ptr (fromIntegral size)
+  closeFd fd
+  return keymap
+
+createKeymap'' :: XkbContext -> Fd -> CUInt -> IO XkbKeymap
+createKeymap'' ctx fd size = do
+  ptr <- {#call mmap as _mmap#} nullPtr (fromIntegral size) {#const PROT_READ#} {#const MAP_SHARED#} (fromIntegral fd) 0
   keymap <- xkbKeymapNewFromString ctx (castPtr ptr) 1 {-xkb_KEYMAP_FORMAT_TEXT_V1-} 0
   _ <- {#call munmap#} ptr (fromIntegral size)
   closeFd fd

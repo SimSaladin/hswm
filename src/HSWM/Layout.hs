@@ -155,14 +155,14 @@ instance Message NextNoWrap
 
 -- | A small wrapper around handleMessage, as it is tedious to write
 -- SomeMessage repeatedly.
-handle :: (LayoutClass l a, Message m) => l a -> m -> H (Maybe (l a))
+handle :: HandleLayouts m => (LayoutClass l a, Message msg) => l a -> msg -> m (Maybe (l a))
 handle l m = handleMessage l (SomeMessage m)
 
 -- | A smart constructor that takes some potential modifications, returns a
 -- new structure if any fields have changed, and performs any necessary cleanup
 -- on newly non-visible layouts.
-choose :: (LayoutClass l a, LayoutClass r a)
-       => Choose l r a -> CLR -> Maybe (l a) -> Maybe (r a) -> H (Maybe (Choose l r a))
+choose :: (HandleLayouts m, LayoutClass l a, LayoutClass r a)
+       => Choose l r a -> CLR -> Maybe (l a) -> Maybe (r a) -> m (Maybe (Choose l r a))
 choose (Choose d _ _) d' Nothing Nothing | d == d' = return Nothing
 choose (Choose d l r) d' ml      mr = f lr
  where

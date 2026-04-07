@@ -19,7 +19,6 @@ import qualified River.Objects as R
 import           River.WMP
 
 import           Foreign
---import           Foreign.Storable.Generic (GStorable(..))
 import qualified Data.Map as M
 
 type XBKey = (Modifiers, KeySym)
@@ -32,9 +31,6 @@ data XkbBinding a = XkbBinding
   , action      :: a
   , subKeymap   :: XkbBindingMap a
   } deriving (Generic)
-
--- instance GStorable (XkbBindingMap ())
--- instance GStorable (XkbBinding ())
 
 createXkbBindings
   :: (MonadIO m, Show a)

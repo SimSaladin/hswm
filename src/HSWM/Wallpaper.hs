@@ -50,7 +50,7 @@ data Ctx = Ctx
   , bufferPool        :: !(Maybe BP.ImageBufferPool)
   } deriving (Generic)
 
-usingWallpaper :: Config -> HSWMConfig l -> HSWMConfig l
+usingWallpaper :: Config -> HSWMConfig H l -> HSWMConfig H l
 usingWallpaper cfg userConf = userConf
   { startupHook     = userConf.startupHook <> wpStartupHook cfg
   , exitHook        = userConf.exitHook <> wpExitHook
