@@ -14,6 +14,7 @@ import qualified HSWM.Seats as Seats
 import qualified HSWM.StackSet as W
 import           HSWM.Util.Posix
 import qualified HSWM.Windows as Windows
+import qualified HSWM.InputConfig as InputConfig
 import           HSWM.XKB
 import           HSWM.Utils
 
@@ -266,37 +267,14 @@ handleEvent (WindowEvent e)           = Windows.handleEvent e
 handleEvent (XkbEvent e)              = Seats.handleXkbBindingEvent e -- XKB Keyboard events
 handleEvent (XkbSeatEvent e)          = Seats.handleXkbBindingsSeatEvent e -- XKB Keyboard events
 handleEvent (PointerEvent e)          = Seats.handlePointerEvent e -- Pointer events
-
--- INPUT configuration
-handleEvent (InputManagerEvent (R.RiverInputManagerInputDevice _ _ dev)) = do
-  l <- getObject
-  io $ R.listenerAdd dev l nullPtr
-  asks (repeatInfo . config) >>= io . (`whenJust` uncurry (R.riverInputDeviceSetRepeatInfo dev)) --  repeatRate repeatDelay
-  --io $ R.riverInputDeviceAssignToSeat dev (Just "default")
-
--- handleEvent (InputDeviceEvent (R.RiverInputDeviceType' _ _ inputDevice)) = return ()
-
--- Keyboard added/removed
-handleEvent (XkbConfigEvent (R.RiverXkbConfigXkbKeyboard _ xkbConfig xkbKeyboard)) = do
-  withObject @R.RiverXkbKeyboardListener $ \l -> io $ R.listenerAdd xkbKeyboard l nullPtr
-  asks (xkbLayout . config) >>= (`whenJust` setKeyboardLayout xkbConfig xkbKeyboard)
-handleEvent (XkbKeyboardEvent (R.RiverXkbKeyboardRemoved _ _kbd)) = return () -- TODO
-
-handleEvent (LibinputConfigEvent (R.RiverLibinputConfigLibinputDevice _ _ dev)) = do
-  l <- getObject
-  io $ WL.listenerAdd dev l nullPtr
+handleEvent (InputManagerEvent e)     = InputConfig.handleInputManagerEvent e
+handleEvent (InputDeviceEvent e)      = InputConfig.handleInputDeviceEvent e
+handleEvent (LibinputConfigEvent e)   = InputConfig.handleLibinputEvent e
+handleEvent (XkbConfigEvent e)        = InputConfig.handleXkbConfigEvent e
+handleEvent (XkbKeyboardEvent e)      = InputConfig.handleXkbKeyboardEvent e
 
 handleEvent (ForeignTopLevelListV1 (WL.ForeignToplevelListToplevel _ _ fh)) = do
   l <- getObject
   io $ WL.listenerAdd fh l nullPtr
 
 handleEvent _ = return ()
-
-----------------------------------------------------------------------------------
-
-setKeyboardLayout :: R.RiverXkbConfig -> R.RiverXkbKeyboard -> XkbRuleNames -> H ()
-setKeyboardLayout xkbConfig keyboard layout =
-    io (newXkbKeymapFromNames layout) >>= \km ->
-    io $ withXkbKeymapFd km $ \fd ->
-    R.riverXkbConfigCreateKeymap xkbConfig (fi fd) R.RIVER_XKB_CONFIG_V1_KEYMAP_FORMAT_TEXT_V1 -- RiverXkbConfigKeymapFormatText
-    >>= io . R.riverXkbKeyboardSetKeymap keyboard

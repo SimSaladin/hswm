@@ -62,7 +62,7 @@ library
           HSWM.Config
           HSWM.Core
           HSWM.Hooks.WorkspaceHistory
-          HSWM.Keyboards
+          HSWM.InputConfig
           HSWM.Layout
           HSWM.Main
           HSWM.Operations
