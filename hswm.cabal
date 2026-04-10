@@ -40,6 +40,7 @@ library
     default-extensions:
           RecordWildCards
           OverloadedRecordDot
+          OverloadedLabels
           DuplicateRecordFields
           OverloadedStrings
           DerivingVia
@@ -55,6 +56,7 @@ library
           HSWM.Actions.CycleRecentWS
           HSWM.Actions.CycleWS
           HSWM.Actions.DynamicWorkspaceOrder
+          HSWM.Actions.DynamicWorkspaces
           HSWM.Actions.PhysicalScreens
           HSWM.Actions.Repeatable
           HSWM.Actions.WindowNavigation
@@ -146,6 +148,7 @@ library hswm-prelude
     default-extensions:
           RecordWildCards
           OverloadedRecordDot
+          OverloadedLabels
           DuplicateRecordFields
           OverloadedStrings
           DerivingVia
@@ -156,7 +159,6 @@ library hswm-prelude
     build-depends:
           base >=4.21.0 && <4.22
         , data-default
-        , logging
         , mtl
         , rio
         , stm
@@ -180,6 +182,7 @@ executable hswm
     default-extensions:
           RecordWildCards
           OverloadedRecordDot
+          OverloadedLabels
           DuplicateRecordFields
           OverloadedStrings
           DerivingVia
@@ -199,6 +202,7 @@ executable hswmctl
     default-extensions:
           RecordWildCards
           OverloadedRecordDot
+          OverloadedLabels
           DuplicateRecordFields
           OverloadedStrings
           DerivingVia

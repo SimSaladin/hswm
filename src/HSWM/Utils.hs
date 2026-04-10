@@ -81,7 +81,7 @@ logTraceShow x = logDebug $ display $ P.pShowOpt P.defaultOutputOptionsNoColor
     { P.outputOptionsPageWidth = 380
     , P.outputOptionsCompact = True
     , P.outputOptionsCompactParens = True
-    , P.outputOptionsInitialIndent = 4
+    , P.outputOptionsInitialIndent = 0
     , P.outputOptionsColorOptions = Just P.defaultColorOptionsDarkBg
     } x
 

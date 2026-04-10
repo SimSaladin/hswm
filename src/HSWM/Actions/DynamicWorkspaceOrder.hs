@@ -41,11 +41,10 @@ import qualified HSWM.StackSet as W
 import qualified HSWM.Util.ExtensibleState as XS
 
 import HSWM.Util.WorkspaceCompare (WorkspaceCompare, WorkspaceSort, mkWsSort)
-import HSWM.Actions.CycleWS (findWorkspace, WSType(..), Direction1D(..), doTo)
+import HSWM.Actions.CycleWS (findWorkspace, WSType(..), doTo)
 
 import qualified Data.Map as M
 import qualified Data.Set as S
-import Data.Ord (comparing)
 import Data.Maybe (fromJust)
 import Data.List (maximum)
 
@@ -105,7 +104,7 @@ withWSO f = WSO . fmap f . unWSO
 
 -- | Update the ordering storage: initialize if it doesn't yet exist;
 -- add newly created workspaces at the end as necessary.
-updateOrder :: H ()
+updateOrder :: HS ()
 updateOrder = do
   WSO mm <- XS.get
   case mm of
@@ -124,7 +123,7 @@ updateOrder = do
 
 -- | A comparison function which orders workspaces according to the
 -- stored dynamic ordering.
-getWsCompareByOrder :: H WorkspaceCompare
+getWsCompareByOrder :: HS WorkspaceCompare
 getWsCompareByOrder = do
   updateOrder
   -- after the call to updateOrder we are guaranteed that the dynamic
@@ -134,22 +133,22 @@ getWsCompareByOrder = do
   return $ comparing (fromMaybe 1000 . flip M.lookup m)
 
 -- | Sort workspaces according to the stored dynamic ordering.
-getSortByOrder :: H WorkspaceSort
+getSortByOrder :: HS WorkspaceSort
 getSortByOrder = mkWsSort getWsCompareByOrder
 
 -- | Swap the current workspace with another workspace in the stored
 -- dynamic order.
-swapWith :: Direction1D -> WSType -> H ()
+swapWith :: Direction1D -> WSType -> HS ()
 swapWith dir which = findWorkspace getSortByOrder dir which 1 >>= swapWithCurrent
 
 -- | Swap the given workspace with the current one.
-swapWithCurrent :: WorkspaceId -> H ()
+swapWithCurrent :: WorkspaceId -> HS ()
 swapWithCurrent w = do
   cur <- gets (W.currentTag . windowset)
   swapOrder w cur
 
 -- | Swap the two given workspaces in the dynamic order.
-swapOrder :: WorkspaceId -> WorkspaceId -> H ()
+swapOrder :: WorkspaceId -> WorkspaceId -> HS ()
 swapOrder w1 w2 = do
   --io $ print (w1,w2)
   WSO (Just m) <- XS.get
@@ -159,11 +158,11 @@ swapOrder w1 w2 = do
   windows id  -- force a status bar update
 
 -- | Update the name of a workspace in the stored order.
-updateName :: WorkspaceId -> WorkspaceId -> H ()
+updateName :: WorkspaceId -> WorkspaceId -> HS ()
 updateName oldId newId = XS.modify . withWSO $ changeKey oldId newId
 
 -- | Remove a workspace from the stored order.
-removeName :: WorkspaceId -> H ()
+removeName :: WorkspaceId -> HS ()
 removeName = XS.modify . withWSO . M.delete
 
 -- | Update a key in a Map.
@@ -175,22 +174,22 @@ changeKey oldKey newKey oldMap =
 
 -- | View the next workspace of the given type in the given direction,
 -- where \"next\" is determined using the dynamic workspace order.
-moveTo :: Direction1D -> WSType -> H ()
+moveTo :: Direction1D -> WSType -> HS ()
 moveTo dir t = doTo dir t getSortByOrder (windows . W.view)
 
 -- | Same as 'moveTo', but using 'greedyView' instead of 'view'.
-moveToGreedy :: Direction1D -> WSType -> H ()
+moveToGreedy :: Direction1D -> WSType -> HS ()
 moveToGreedy dir t = doTo dir t getSortByOrder (windows . W.greedyView)
 
 -- | Shift the currently focused window to the next workspace of the
 -- given type in the given direction, using the dynamic workspace order.
-shiftTo :: Direction1D -> WSType -> H ()
+shiftTo :: Direction1D -> WSType -> HS ()
 shiftTo dir t = doTo dir t getSortByOrder (windows . W.shift)
 
 -- | Do something with the nth workspace in the dynamic order after
 --   transforming it.  The callback is given the workspace's tag as well
 --   as the 'WindowSet' of the workspace itself.
-withNthWorkspace' :: ([WorkspaceId] -> [WorkspaceId]) -> (String -> WindowSet -> WindowSet) -> Int -> H ()
+withNthWorkspace' :: ([WorkspaceId] -> [WorkspaceId]) -> (String -> WindowSet -> WindowSet) -> Int -> HS ()
 withNthWorkspace' tr job wnum = do
   sort <- getSortByOrder
   ws <- gets (tr . map W.tag . sort . W.workspaces . windowset)
@@ -201,5 +200,5 @@ withNthWorkspace' tr job wnum = do
 -- | Do something with the nth workspace in the dynamic order.  The
 --   callback is given the workspace's tag as well as the 'WindowSet'
 --   of the workspace itself.
-withNthWorkspace :: (String -> WindowSet -> WindowSet) -> Int -> H ()
+withNthWorkspace :: (String -> WindowSet -> WindowSet) -> Int -> HS ()
 withNthWorkspace = withNthWorkspace' id

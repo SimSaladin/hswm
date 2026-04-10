@@ -73,21 +73,21 @@ instance ExtensionClass WorkspaceHistory where
 
 -- | A 'logHook' that keeps track of the order in which workspaces have
 -- been viewed.
-workspaceHistoryHook :: H ()
+workspaceHistoryHook :: HS ()
 workspaceHistoryHook = workspaceHistoryHookExclude []
 
 -- | Like 'workspaceHistoryHook', but with the ability to exclude
 -- certain workspaces.
-workspaceHistoryHookExclude :: [WorkspaceId] -> H ()
+workspaceHistoryHookExclude :: [WorkspaceId] -> HS ()
 workspaceHistoryHookExclude ws = XS.modify' . update =<< gets windowset
   where
     update :: WindowSet -> WorkspaceHistory -> WorkspaceHistory
     update s = force . updateLastActiveOnEachScreenExclude ws s
 
-workspaceHistoryWithScreen :: H [(ScreenId, WorkspaceId)]
+workspaceHistoryWithScreen :: HS [(ScreenId, WorkspaceId)]
 workspaceHistoryWithScreen = XS.gets history
 
-workspaceHistoryByScreen :: H [(ScreenId, [WorkspaceId])]
+workspaceHistoryByScreen :: HS [(ScreenId, [WorkspaceId])]
 workspaceHistoryByScreen =
   map (\wss -> (maybe 0 fst (listToMaybe wss), map snd wss)) .
   L.groupBy (\a b -> fst a == fst b) .
@@ -97,10 +97,10 @@ workspaceHistoryByScreen =
 -- | A list of workspace tags in the order they have been viewed, with the
 -- most recent first. No duplicates are present, but not all workspaces are
 -- guaranteed to appear, and there may be workspaces that no longer exist.
-workspaceHistory :: H [WorkspaceId]
+workspaceHistory :: HS [WorkspaceId]
 workspaceHistory = L.nub . map snd <$> XS.gets history
 
-workspaceHistoryTransaction :: H () -> H ()
+workspaceHistoryTransaction :: HS () -> HS ()
 workspaceHistoryTransaction action = do
   startingHistory <- XS.gets history
   action
@@ -128,5 +128,5 @@ updateLastActiveOnEachScreenExclude ws StackSet {current = cur, visible = vis} w
       in if alreadyCurrent || wid `elem` ws then curr else newEntry : L.delete newEntry curr
 
 -- | Modify a the workspace history with a given pure function.
-workspaceHistoryModify :: ([(ScreenId, WorkspaceId)] -> [(ScreenId, WorkspaceId)]) -> H ()
+workspaceHistoryModify :: ([(ScreenId, WorkspaceId)] -> [(ScreenId, WorkspaceId)]) -> HS ()
 workspaceHistoryModify action = XS.modify' $ force . WorkspaceHistory . action . history

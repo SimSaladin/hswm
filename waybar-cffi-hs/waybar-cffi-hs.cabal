@@ -15,6 +15,7 @@ common deps
     base >=4.20.2.0,
     bytestring,
     derive-storable,
+    haskell-gi-base,
     gi-gtk3,
     hswm,
     text,
@@ -63,9 +64,11 @@ foreign-library waybarhaskellplugin
   type: native-shared
   lib-version-info: 1:0:0
   hs-source-dirs: lib
+  build-depends:
+    waybar-cffi-hs
   other-modules:
     Waybar.CFFI.Plugin
-    Waybar.CFFI.Plugin.Base
-    Waybar.CFFI.Plugin.HSWM
+    --Waybar.CFFI.Plugin.Base
+    --Waybar.CFFI.Plugin.HSWM
 
   c-sources: cbits/module-init.c

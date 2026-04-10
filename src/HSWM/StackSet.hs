@@ -307,6 +307,9 @@ workspaces s = workspace (current s) : map workspace (visible s) ++ hidden s
 allWindows :: Eq a => StackSet i l a wd s sd -> [a]
 allWindows = L.nub . concatMap (integrate' . stack) . workspaces
 
+allTags :: StackSet i l a wd s sd -> [i]
+allTags = map tag . workspaces
+
 -- | Get the tag of the currently focused workspace.
 currentTag :: StackSet i l a wd s sd -> i
 currentTag = tag . workspace . current

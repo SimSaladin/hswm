@@ -28,7 +28,6 @@ import HSWM
 import qualified HSWM.StackSet as S
 import HSWM.Actions.PhysicalScreens (ScreenComparator(ScreenComparator), getScreenIdAndRectangle, screenComparatorById)
 
-import Data.Function (on)
 import Data.List (elemIndex, find, sortBy)
 import Data.Maybe (fromJust)
 
@@ -59,24 +58,24 @@ indexCompare a b = compare a b
 
 -- | A comparison function for WorkspaceId, based on the index of the
 --   tags in the user's config.
-getWsCompare :: H WorkspaceCompare
+getWsCompare :: HS WorkspaceCompare
 getWsCompare = do
-    wsIndex <- getWsIndex
+    wsIndex <- liftH getWsIndex
     return $ mconcat [indexCompare `on` wsIndex, compare]
 
 -- | A simple comparison function that orders workspaces
 --   lexicographically by tag.
-getWsCompareByTag :: H WorkspaceCompare
+getWsCompareByTag :: HS WorkspaceCompare
 getWsCompareByTag = return compare
 
 -- | A comparison function for Xinerama based on visibility, workspace
 --   and screen id. It produces the same ordering as
 --   'XMonad.Hooks.StatusBar.PP.pprWindowSetXinerama'.
-getXineramaWsCompare :: H WorkspaceCompare
+getXineramaWsCompare :: HS WorkspaceCompare
 getXineramaWsCompare = getXineramaPhysicalWsCompare $ screenComparatorById compare
 
 -- | A comparison function like 'getXineramaWsCompare', but uses physical locations for screens.
-getXineramaPhysicalWsCompare :: ScreenComparator -> H WorkspaceCompare
+getXineramaPhysicalWsCompare :: ScreenComparator -> HS WorkspaceCompare
 getXineramaPhysicalWsCompare (ScreenComparator sc) = do
     w <- gets windowset
     return $ \ a b -> case (isOnScreen a w, isOnScreen b w) of
@@ -92,26 +91,26 @@ getXineramaPhysicalWsCompare (ScreenComparator sc) = do
 
 -- | Create a workspace sorting function from a workspace comparison
 --   function.
-mkWsSort :: H WorkspaceCompare -> H WorkspaceSort
+mkWsSort :: HS WorkspaceCompare -> HS WorkspaceSort
 mkWsSort cmpX = do
   cmp <- cmpX
   return $ sortBy (\a b -> cmp (S.tag a) (S.tag b))
 
 -- | Sort several workspaces according to their tags' indices in the
 --   user's config.
-getSortByIndex :: H WorkspaceSort
+getSortByIndex :: HS WorkspaceSort
 getSortByIndex = mkWsSort getWsCompare
 
 -- | Sort workspaces lexicographically by tag.
-getSortByTag :: H WorkspaceSort
+getSortByTag :: HS WorkspaceSort
 getSortByTag = mkWsSort getWsCompareByTag
 
 -- | Sort serveral workspaces for xinerama displays, in the same order
 --   produced by 'XMonad.Hooks.StatusBar.PP.pprWindowSetXinerama': first
 --   visible workspaces, sorted by screen, then hidden workspaces,
 --   sorted by tag.
-getSortByXineramaRule :: H WorkspaceSort
+getSortByXineramaRule :: HS WorkspaceSort
 getSortByXineramaRule = mkWsSort getXineramaWsCompare
 -- | Like 'getSortByXineramaRule', but allow you to use physical locations for screens.
-getSortByXineramaPhysicalRule :: ScreenComparator -> H WorkspaceSort
+getSortByXineramaPhysicalRule :: ScreenComparator -> HS WorkspaceSort
 getSortByXineramaPhysicalRule sc = mkWsSort $ getXineramaPhysicalWsCompare sc

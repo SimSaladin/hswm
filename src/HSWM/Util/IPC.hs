@@ -1,7 +1,6 @@
 {-# LANGUAGE MultiWayIf #-}
 {-# LANGUAGE PartialTypeSignatures #-}
 
-
 -- |
 -- Module      : HSWM.Util.IPC
 -- Description : Short description
@@ -15,7 +14,6 @@ module HSWM.Util.IPC where
 import Data.Aeson qualified as A
 import Data.ByteString.Lazy qualified as BL
 import Data.ByteString.UTF8 qualified as BUTF8
-import Data.ByteString (ByteString)
 import qualified Data.ByteString.Char8 as C8
 import Data.Map qualified as M
 import Data.Version (showVersion)
@@ -31,7 +29,8 @@ import HSWM.Core as HSWM
 import qualified HSWM.StackSet as W
 import HSWM.Operations
 import qualified HSWM.Actions.DynamicWorkspaceOrder as DWO
-import qualified HSWM.Util.WorkspaceCompare as WsComp
+
+type MonadIPC env m = (env ~ HConf, MonadReader env m, HasLogFunc env, MonadIO m)
 
 -- | Workspace identifier type
 type WsId = String
@@ -49,8 +48,8 @@ data ProtoMsg
   = -- | Sent at the beginning of the connection (both ways)
     Identify {name :: String, version :: Int, description :: Maybe String}
 
-  | Ping {seqn :: Int}
-  | Pong {seqn :: Int}
+  | Ping {seqn :: !Int}
+  | Pong {seqn :: !Int}
 
   | OutputInfo {outputs :: [(T.Text, ScreenId)]}
 
@@ -58,19 +57,40 @@ data ProtoMsg
     WsInfo {wsNames :: [WsId], wsFocused :: (WsId, ScreenId, LayoutDesc), wsVisible :: [(WsId, ScreenId, LayoutDesc)]}
 
   | -- | Inform the client about the details of the currently focused window.
-    FocusedWindow {wId :: Word, wTitle, wAppId, wIdentifier :: String, wPid :: Maybe Int}
+    FocusedWindow {window :: WindowInfo}
   | -- | There is nothing currently focused
     FocusedNone
 
   deriving (Eq, Show, Read, Generic)
 
+data WindowInfo = WindowInfo
+  { wid :: Word
+  , title, appId, identifier :: Text
+  , pid :: Maybe Int
+  } deriving (Eq, Show, Read, Generic)
+
+instance A.ToJSON WindowInfo
+
+instance A.FromJSON WindowInfo
 
 instance A.ToJSON ProtoMsg
 
 instance A.FromJSON ProtoMsg
 
-socketPath :: FilePath
-socketPath = "/run/user/1000/hswm-1"
+data ServerConfig = ServerConfig
+  { socketAddr :: SockAddr
+  , maxPendingConns :: Int
+  } deriving (Eq, Show)
+
+instance Default ServerConfig where
+  def = ServerConfig (SockAddrUnix "/run/user/1000/hswm-1") 8
+
+data ClientConfig = ClientConfig
+  { connectTo :: SockAddr
+  } deriving (Eq, Show)
+
+instance Default ClientConfig where
+  def = ClientConfig (SockAddrUnix "/run/user/1000/hswm-1")
 
 ipcLogHook :: H ()
 ipcLogHook = withObject $ \(sRef :: IORef ConnectedPeers) -> do
@@ -78,39 +98,45 @@ ipcLogHook = withObject $ \(sRef :: IORef ConnectedPeers) -> do
   s <- io $ readIORef sRef
   forM_ (M.elems s.connected) $ \c -> io . forkIO $ mapM_ (sendMsg c) msgs
 
-serverStartupHook :: H ()
-serverStartupHook = do
+serverStartupHook :: ServerConfig -> H ()
+serverStartupHook conf = do
+  logInfo "Starting IPC server"
   stateRef <- getOrCreateObject (newIORef (def :: ConnectedPeers))
+  env <- ask
   logFunc <- asks (view logFuncL)
-  withRunInH $ \runInH ->
-    void $ forkFinally
-      (flip runReaderT logFunc $ serverRun stateRef (\c -> io . runInH . serverHandleMsg c))
+  void $ io $ forkFinally
+      (flip runReaderT logFunc $ serverRun conf stateRef (\c -> io . flip runReaderT env . serverHandleMsg c))
       (\_ ->flip runReaderT logFunc $ log' "IPC server thread finished" )
+  logInfo "IPC server started"
 
-serverRun :: forall env m. (MonadIO m, MonadUnliftIO m, MonadReader env m, HasLogFunc env) => IORef ConnectedPeers -> (Socket -> ProtoMsg -> m ()) -> m ()
-serverRun stateRef onMsg = do
-  exists <- io $ doesFileExist socketPath
-  io $ when exists $ removeFile socketPath
+serverRun :: forall env m. (MonadIO m, MonadUnliftIO m, MonadReader env m, HasLogFunc env)
+          => ServerConfig -> IORef ConnectedPeers -> (Socket -> ProtoMsg -> m ()) -> m ()
+serverRun conf stateRef onMsg = do
+  case conf.socketAddr of
+    SockAddrUnix socketPath -> do
+      exists <- io $ doesFileExist socketPath
+      io $ when exists $ removeFile socketPath
+    _ -> return ()
 
   bracket (io $ socket AF_UNIX Stream defaultProtocol) (io . close) $ \sock -> do
-    io $ bind sock (SockAddrUnix socketPath)
-    io $ listen sock 8
-    log' $ display $ "Socket server listening at: " <> toText socketPath
+    io $ bind sock conf.socketAddr
+    io $ listen sock conf.maxPendingConns
+    logInfo $ "Socket server listening at: " <> displayShow conf.socketAddr
     acceptLoop sock
   where
     acceptLoop ::  _ -> m ()
     acceptLoop sock = forever $ do
       (conn, _) <- io $ accept sock
       let ck = show conn
-      log' $ display $ "New domain socket client connected: " <> tshow conn
+      logInfo $ "New domain socket client connected: " <> displayShow conn
+      let cleanup = do
+            modifyIORef stateRef $ \s -> s {connected = M.delete ck s.connected}
+            io $ close conn
+      _clientAs <- async $ handleClient ck conn `finally` cleanup
       modifyIORef stateRef $ \s -> s {connected = M.insert ck conn s.connected}
-      withAsync (handleClient ck conn) $ \as -> do
-          r <- waitCatch as
-          modifyIORef stateRef $ \s -> s {connected = M.delete ck s.connected}
-          io $ close conn
 
     handleClient :: _ -> _ -> m ()
-    handleClient _ck conn = do
+    handleClient ck conn = do
       sendMsg conn $ Identify (PKG.name ++ "-server") 0 (Just $ PKG.synopsis ++ " " ++ showVersion PKG.version)
       let worker lo = do
             (resps, leftover) <- io $ recvLines conn lo
@@ -121,54 +147,45 @@ serverRun stateRef onMsg = do
                   Left e -> log' $ display $ "Received malformed message from client: " <> toText e
                   Right (Ping n) -> sendMsg conn (Pong n)
                   Right (msg :: ProtoMsg) -> do
-                    debug' $ display $ "IPC client event (raw): " <> toText (BUTF8.toString resp)
+                    logDebug $ display $ "IPC client event (raw): " <> fromString ck <> ": " <> toText (BUTF8.toString resp)
                     --debug' $ "IPC client event (decoded): " <> tshow msg
                     onMsg conn msg
       worker ""
 
-serverHandleMsg :: Socket -> ProtoMsg -> H ()
+serverHandleMsg :: MonadIPC env m => Socket -> ProtoMsg -> m ()
 serverHandleMsg c Identify{} = fullStateUpdate >>= mapM_ (sendMsg c)
 serverHandleMsg _ msg = log' $ display $ "[IPC] warn: unhandled message: " <> tshow msg
 
 clientRun :: (MonadIO m, MonadUnliftIO m, MonadReader env m, HasLogFunc env) =>
-  Maybe FilePath ->
+  ClientConfig ->
   -- | Process incoming
   (ProtoMsg -> m ()) ->
   -- | Emit outgoing msg
   ((ProtoMsg -> m ()) -> m ()) -> m ()
-clientRun mSockPath onMsg cb = bracket (io $ socket AF_UNIX Stream defaultProtocol) (io . close) $ \sock -> do
-  io $ connect sock (SockAddrUnix $ fromMaybe socketPath mSockPath)
+clientRun conf onMsg cb = bracket (io $ socket AF_UNIX Stream defaultProtocol) (io . close) $ \sock -> do
+  io $ connect sock conf.connectTo
   io $ sendMsg sock $ Identify (PKG.name ++ "-client") 0 (Just $ PKG.synopsis ++ " " ++ showVersion PKG.version)
-  mainThread <- io myThreadId
-  let inputWorker = forever $ do
+  withAsync (inputWorker sock) $ \inputAs -> do
+    link inputAs
+    cb (sendMsg sock) `finally` cancel inputAs
+
+    where
+    inputWorker sock = do
         let worker lo = do
               (resps, leftover) <- io $ recvLines sock lo
               mapM_ doMsg resps
               worker leftover
 
             doMsg resp = case A.eitherDecodeStrict' resp of
-              Left e -> do
-                log' $ display $ "Received malformed message from server: " <> toText e <> ": " <> toText (BUTF8.toString resp)
+              Left e -> logWarn $ display $ "Received malformed message from server: " <> toText e <> ": " <> toText (BUTF8.toString resp)
               Right (Ping n) -> sendMsg sock (Pong n)
               Right msg -> do
                 debug' $ display $ "IPC server event (raw): " <> toText (BUTF8.toString resp)
-                --debug' $ "IPC server event (decoded): " <> tshow msg
                 onMsg msg
-        worker ""
-
-      andThen r = io $ do
-        case r of
-          Left ex -> throwTo mainThread (ex :: SomeException)
-          Right _ -> killThread mainThread
-
-  withAsync (inputWorker `finally` andThen (Right ())) $ \inputAs ->
-    cb (sendMsg sock) `finally` cancel inputAs
+        forever $ worker ""
 
 sendMsg :: MonadIO m => Socket -> ProtoMsg -> m ()
 sendMsg sock msg = io $ NB.sendAll sock (BL.toStrict $ A.encode msg <> "\n")
-
-toWindowId :: RiverWindow -> Word
-toWindowId (R.RiverWindow w) = let WordPtr res = ptrToWordPtr w in res
 
 recvLines :: Socket -> ByteString -> IO ([ByteString], ByteString)
 recvLines sock leftover = do
@@ -187,8 +204,8 @@ recvLines sock leftover = do
 -- Info for status bars
 
 -- | Set of events to fully refresh statusbar's tracked state
-fullStateUpdate :: H [ProtoMsg]
-fullStateUpdate = do
+fullStateUpdate :: MonadIPC env m => m [ProtoMsg]
+fullStateUpdate = runInHS $ do
   outs <- gets _outputs
   ws <- gets windowset
 
@@ -206,8 +223,20 @@ fullStateUpdate = do
   -- info about focused window (if any)
   focusedInfo <-
     if | Just fw <- W.peek ws -> lookupWindow fw >>= \case
-              Just w -> return $ FocusedWindow (toWindowId fw) w.title w.appId w.identifier w.unreliablePid
+              Just w -> return $ FocusedWindow $ toWindowInfo w
               Nothing -> return FocusedNone
        | otherwise -> return FocusedNone
 
   return [outputInfo, wsInfo, focusedInfo]
+
+toWindowId :: RiverWindow -> Word
+toWindowId (R.RiverWindow w) = let WordPtr res = ptrToWordPtr w in res
+
+toWindowInfo :: Window -> WindowInfo
+toWindowInfo w = WindowInfo
+  { wid = toWindowId w.river_window
+  , title = toText w.title
+  , appId = toText w.appId
+  , identifier = toText w.identifier
+  , pid = w.unreliablePid
+  }

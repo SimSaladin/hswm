@@ -114,8 +114,8 @@ mkWlObject $ (wlobj ''C.Wl_surface
   { objHasDestructor = True
   , objEventFieldNames = [ ("enter", ["surface", "output"] )
                          , ("leave", ["surface", "output"] )
-                         , ("preferred_buffer_scale", ["surface"] ) -- XXX
-                         , ("preferred_buffer_transform", ["surface"] )
+                         , ("preferred_buffer_scale", ["surface", "factor"] )
+                         , ("preferred_buffer_transform", ["surface", "transform"] )
                          ]
   }
 
@@ -186,7 +186,11 @@ mkWlObject $ (wlobj ''C.Wl_shell_surface
     , "set_toplevel"
     , "set_transient"
   ])
-  { objHasDestructor = True }
+  { objHasDestructor = True
+  , objEventFieldNames = [ ("ping", ["shellSurface", "serial"] )
+                         , ("configure", ["shellSurface", "edges", "width", "height" ] )
+                         ]
+  }
 
 -- * Shell
 mkWlObject $ (wlobj ''C.Wl_shell
@@ -229,7 +233,17 @@ mkWlObject $ (wlobj ''C.Wl_subcompositor
 -- * Output
 mkWlObject $ (wlobj ''C.Wl_output
   [ "release" ])
-  { objHasDestructor = True }
+  { objHasDestructor = True
+  , objEventFieldNames = [ ("geometry", ["output", "x", "y"
+                                        , "physical_width", "physical_height"
+                                        , "subpixel", "make", "model", "transform"
+                                        ] )
+                         , ("mode", ["output", "flags", "width", "height", "refresh"] )
+                         , ("scale", ["output", "factor"] )
+                         , ("name", ["output", "name"] )
+                         , ("description", ["output", "description"] )
+                         ]
+  }
 
 -- * DataOffer
 mkWlObject $ (wlobj ''C.Wl_data_offer
@@ -238,14 +252,24 @@ mkWlObject $ (wlobj ''C.Wl_data_offer
   , "receive"
   , "set_actions"
   ])
-  { objHasDestructor = True }
+  { objHasDestructor = True
+  , objEventFieldNames = [ ("offer", ["dataOffer", "mime_type"] )
+                         , ("source_actions", ["dataOffer", "sourceActions"] )
+                         , ("action", ["dataOffer", "dndAction"] )
+                         ]
+  }
 
 -- * DataSource
 mkWlObject $ (wlobj ''C.Wl_data_source
   [ "offer"
   , "set_actions"
   ])
-  { objHasDestructor = True }
+  { objHasDestructor = True
+  , objEventFieldNames = [ ("target", ["dataSource", "mime_type"] )
+                         , ("send", ["dataSource", "mime_type", "fd"] )
+                         , ("action", ["dataSource", "dnd_action"] )
+                         ]
+  }
 
 -- * DataDevice
 mkWlObject $ (wlobj ''C.Wl_data_device
@@ -253,7 +277,13 @@ mkWlObject $ (wlobj ''C.Wl_data_device
   , "set_selection"
   , "start_drag"
   ])
-  { objHasDestructor = True }
+  { objHasDestructor = True
+  , objEventFieldNames = [ ("data_offer", ["dataDevice", "dataOffer"] )
+                         , ("enter", ["dataDevice", "serial", "surface", "x", "y", "dataOffer"] )
+                         , ("motion", ["dataDevice", "time", "x", "y"] )
+                         , ("selection", ["dataDevice", "dataOffer"] )
+                         ]
+  }
 
 -- * DataDeviceManager
 mkWlObject $ (wlobj ''C.Wl_data_device_manager
@@ -267,19 +297,46 @@ mkWlObject $ (wlobj ''C.Wl_pointer
   [ "release"
   , "set_cursor" { of_arguments = [ "pointer", "w", mkPtrArg "surface" ''Surface 'Surface ] }
   ])
-  { objHasDestructor = True }
+  { objHasDestructor = True
+  , objEventFieldNames = [ ("enter", ["pointer", "serial", "surface", "surface_x", "surface_y"] )
+                         , ("leave", ["pointer", "serial", "surface"] )
+                         , ("motion", ["pointer", "time", "surface_x", "surface_y" ] )
+                         , ("button", ["pointer", "serial", "time", "button", "state"] )
+                         , ("axis", ["pointer", "time", "axis", "value"] )
+                         , ("axis_source", ["pointer", "axis_source"] )
+                         , ("axis_stop", ["pointer", "time", "axis"] )
+                         , ("axis_discrete", ["pointer", "axis", "discrete"] )
+                         , ("axis_value120", ["pointer", "axis", "value120"] )
+                         , ("axis_relative_direction", ["pointer", "axis", "direction"] )
+                         ]
+  }
 
 -- * Keyboard
 mkWlObject $ (wlobj ''C.Wl_keyboard
   [ "release"
   ])
-  { objHasDestructor = True }
+  { objHasDestructor = True
+  , objEventFieldNames = [ ("keymap", ["keyboard", "format", "fd", "size"] )
+                         , ("enter", ["keyboard", "serial", "surface", "keys"] )
+                         , ("leave", ["keyboard", "serial", "surface"] )
+                         , ("key", ["keyboard", "serial", "time", "key", "state"] )
+                         , ("modifiers", ["keyboard", "serial", "modsDepressed", "modsLatched", "modsLocked", "group"] )
+                         , ("repeat_info", ["keyboard", "rate", "delay"] )
+                         ]
+  }
 
 -- * Touch
 mkWlObject $ (wlobj ''C.Wl_touch
   [ "release"
   ])
-  { objHasDestructor = True }
+  { objHasDestructor = True
+  , objEventFieldNames = [ ("down", ["touch", "serial", "time", "surface", "id", "x", "y"] )
+                         , ("up", ["touch", "serial", "time", "id"] )
+                         , ("motion", ["touch", "time", "id", "x", "y"] )
+                         , ("shape", ["touch", "id", "major", "minor"] )
+                         , ("orientation", ["touch", "id", "orientation"] )
+                         ]
+  }
 
 -- * Seat
 mkWlObject $ (wlobj ''C.Wl_seat
@@ -290,4 +347,80 @@ mkWlObject $ (wlobj ''C.Wl_seat
   ])
   { objHasDestructor = True
   , objAutoMarshall = objAutoMarshall (riverObj ''C.Wl_seat [])
+  , objEventFieldNames = [ ("capabilities", ["seat", "capabilities"] )
+                         , ("name", ["seat", "name"] )
+                         ]
   }
+
+-- * Display
+mkWlObject $
+  (wlobj ''Wl_display
+  [ "connect"
+    { of_nullCheck = True, of_getErrno = True }
+  , "connect_to_fd"
+    { of_nullCheck = True, of_getErrno = True }
+  , "cancel_read"
+    { of_arguments = [ "display" ] }
+  , "create_queue"
+    { of_nullCheck = True
+    , of_arguments = [ "display" , mkIOPtrArg "eventQueue" ''EventQueue 'EventQueue ] }
+  , "create_queue_with_name"
+    { of_arguments = [ "display" , "name" , mkIOPtrArg "eventQueue" ''EventQueue 'EventQueue ] }
+  , "disconnect"
+    { of_arguments = [ "display" ] }
+  , "dispatch"
+    { of_throwIfMinus1 = True
+    , of_getErrno      = True
+    }
+  , "dispatch_pending"
+    { of_throwIfMinus1 = True
+    , of_getErrno      = True
+    }
+  , "dispatch_queue"
+    { of_throwIfMinus1 = True
+    , of_getErrno      = True
+    , of_arguments = [ "display", mkPtrArg "eventQueue" ''EventQueue 'EventQueue ]
+    }
+  , "dispatch_queue_pending"
+    { of_throwIfMinus1 = True
+    , of_getErrno      = True
+    , of_arguments     = [ "display", mkPtrArg "eventQueue" ''EventQueue 'EventQueue ]
+    }
+  , "dispatch_queue_timeout"
+    { of_arguments = [ "display", mkPtrArg "eventQueue" ''EventQueue 'EventQueue, "timespec" ]
+    }
+  , "dispatch_timeout"
+    { of_arguments = [ "display", "timespec" ]
+    }
+  , "flush"
+    { of_throwIfMinus1 = True
+    , of_getErrno      = True
+    }
+  , "get_error"
+  , "get_fd"
+  , "get_protocol_error"
+  , "get_registry"
+    { of_arguments = [ "display", mkIOPtrArg "registry" ''Registry 'Registry ] }
+  , "prepare_read"
+    { of_throwIfMinus1 = True
+    , of_getErrno      = True
+    }
+  , "prepare_read_queue"
+    { of_throwIfMinus1 = True
+    , of_arguments = [ "display", mkPtrArg "eventQueue" ''EventQueue 'EventQueue ] }
+  , "read_events"
+    { of_throwIfMinus1 = True
+    , of_getErrno      = True
+    }
+  , "roundtrip"
+    { of_throwIfMinus1 = True }
+  , "roundtrip_queue"
+    { of_throwIfMinus1 = True
+    , of_arguments = [ "display", mkPtrArg "eventQueue" ''EventQueue 'EventQueue ] }
+  , "set_max_buffer_size"
+  , "sync"
+    { of_arguments = [ "display", mkIOPtrArg "callback" ''Callback 'Callback ] }
+  ])
+    {
+    objEventFieldNames = [("error", ["display", "object_id", "code", "message"]), ("delete_id", ["display", "delete_id"])]
+    }

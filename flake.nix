@@ -10,6 +10,10 @@
       url = "github:well-typed/hs-bindgen";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    typed-process = {
+      url = "github:sol/typed-process?ref=dev";
+      flake = false;
+    };
   };
 
   outputs = inputs@{ self, nixpkgs, flake-utils, ... }:
@@ -30,8 +34,19 @@
           inputs.hs-bindgen.overlays.default
         ];
       };
+      haskellProjects.ghc912 = {
+        defaults.packages = {};
+        devShell.enable = false;
+        autoWire = [ ];
+        packages = {
+          # XXX: infinite recursion...
+          #typed-process.source = inputs.typed-process;
+        };
+        basePackages = pkgs.haskell.packages.ghc912;
+      };
       haskellProjects.default = {
         projectRoot = ./.;
+        #basePackages = config.haskellProjects.ghc912.outputs.finalPackages;
         basePackages = pkgs.haskell.packages.ghc912;
         #basePackages = pkgs.haskell.packages.ghc914;
         devShell = {
@@ -49,6 +64,17 @@
               ;
           };
         };
+        #settings.typed-process = {
+        #  custom = (p: p.overrideAttrs (oa: rec {
+        #    version = "0.2.12.0";
+        #    src = inputs.typed-process;
+        #    hash = "";
+        #    prePatch = ''
+        #      ${pkgs.haskell.packages.ghc912.hpack}/bin/hpack
+        #      set -x
+        #    '' + oa.prePatch or "";
+        #  }));
+        #};
       };
       packages = {
         # Export our overridden river for convenience.

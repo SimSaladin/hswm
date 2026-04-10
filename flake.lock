@@ -160,7 +160,8 @@
         "flake-utils": "flake-utils",
         "haskell-flake": "haskell-flake",
         "hs-bindgen": "hs-bindgen",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "typed-process": "typed-process"
       }
     },
     "systems": {
@@ -175,6 +176,23 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "typed-process": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1684837633,
+        "narHash": "sha256-K5w3Yxi4R0mSul6NjX1SP4t3bUlu79pZL/yPDnfZVSE=",
+        "owner": "sol",
+        "repo": "typed-process",
+        "rev": "bc3a7f662e97f0211c5cc367abf68b12dac2d3f2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "sol",
+        "ref": "dev",
+        "repo": "typed-process",
         "type": "github"
       }
     }

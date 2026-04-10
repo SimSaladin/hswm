@@ -4,7 +4,6 @@
 -- Module      : River.WMP
 -- Description : Short description
 -- Copyright   : (c) Samuli Thomasson, 2026
--- License     : WTFPL
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@paivola.fi>
 -- Stability   : unstable
@@ -29,25 +28,29 @@ import qualified Data.List as L
 import           Foreign
 import           Foreign.Storable.Generic (GStorable(..))
 
-pattern EdgeNone :: R.River_window_v1_edges
+type WindowEdges = R.River_window_v1_edges
+
+pattern EdgeNone :: WindowEdges
 pattern EdgeNone = R.RIVER_WINDOW_V1_EDGES_NONE
-pattern EdgeLeft :: R.River_window_v1_edges
+pattern EdgeLeft :: WindowEdges
 pattern EdgeLeft = R.RIVER_WINDOW_V1_EDGES_LEFT
-pattern EdgeRight :: R.River_window_v1_edges
+pattern EdgeRight :: WindowEdges
 pattern EdgeRight = R.RIVER_WINDOW_V1_EDGES_RIGHT
-pattern EdgeBottom :: R.River_window_v1_edges
+pattern EdgeBottom :: WindowEdges
 pattern EdgeBottom = R.RIVER_WINDOW_V1_EDGES_BOTTOM
-pattern EdgeTop :: R.River_window_v1_edges
+pattern EdgeTop :: WindowEdges
 pattern EdgeTop = R.RIVER_WINDOW_V1_EDGES_TOP
 
-pattern Maximize :: R.River_window_v1_capabilities
-pattern Maximize = R.RIVER_WINDOW_V1_CAPABILITIES_MAXIMIZE
-pattern Fullscreen :: R.River_window_v1_capabilities
-pattern Fullscreen = R.RIVER_WINDOW_V1_CAPABILITIES_FULLSCREEN
-pattern Minimize :: R.River_window_v1_capabilities
-pattern Minimize = R.RIVER_WINDOW_V1_CAPABILITIES_MINIMIZE
+type WindowCaps = R.River_window_v1_capabilities
 
-type WindowCaps = Word32 -- {#type uint32_t#}
+pattern WindowMenu :: WindowCaps
+pattern WindowMenu = R.RIVER_WINDOW_V1_CAPABILITIES_WINDOW_MENU
+pattern Maximize :: WindowCaps
+pattern Maximize = R.RIVER_WINDOW_V1_CAPABILITIES_MAXIMIZE
+pattern Fullscreen :: WindowCaps
+pattern Fullscreen = R.RIVER_WINDOW_V1_CAPABILITIES_FULLSCREEN
+pattern Minimize :: WindowCaps
+pattern Minimize = R.RIVER_WINDOW_V1_CAPABILITIES_MINIMIZE
 
 data WindowBorders = WindowBorders
   { wb_edges               :: !Word32 -- ^ Edges on which to draw borders
@@ -74,7 +77,7 @@ ppXkbModsKey m ksym =
       , (R.RIVER_SEAT_V1_MODIFIERS_MOD4, "M4")
       , (R.RIVER_SEAT_V1_MODIFIERS_MOD5, "M5") ]
     , fi x.unwrap .&. m /= 0 ]
-    ++ [ xkbKeysymToText ksym ]
+    ++ [ xkbKeysymGetName ksym ]
 
 setNodePosition :: MonadIO m => R.RiverNode -> Int32 -> Int32 -> m ()
 setNodePosition n x y = liftIO $ R.riverNodeSetPosition n x y

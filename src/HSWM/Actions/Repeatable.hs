@@ -1,4 +1,4 @@
-{-# LANGUAGE BangPatterns, BlockArguments, LambdaCase #-}
+{-# LANGUAGE BlockArguments #-}
 
 -----------------------------------------------------------------------------
 -- |
@@ -35,9 +35,9 @@ module HSWM.Actions.Repeatable (
 
 ) where
 
-import Data.Functor (($>))
-import Control.Monad.State (StateT(..))
-import HSWM
+-- import Data.Functor (($>))
+-- import Control.Monad.State (StateT(..))
+-- import HSWM
 
 {-
 -- | An action that temporarily usurps and responds to key press/release events,
@@ -80,9 +80,9 @@ repeatableM run mods key handler = concludableM run mods key press event
   event (t, s) = Right <$> handler t s
 -}
 
-data Done        = Done
-data NotOurEvent = NotOurEvent
-
+--data Done        = Done
+--data NotOurEvent = NotOurEvent
+--
 {-
 -- | A generalisation of `repeatable` which may conclude early with `NotOurEvent` or `Done`.
 concludable

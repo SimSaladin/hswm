@@ -174,7 +174,7 @@ mkWlObjectType cfg = do
                            ]
       ]
                            -- XXX: [t|Data|]]] Data a => Data (Ptr a)
-      (Just $ "See '" ++ nameBase (objType cfg) ++ "'")
+      (Just $ "See '" ++ pprint (objType cfg) ++ "'")
     ]
 
 -- |
@@ -298,6 +298,7 @@ mkWlObjectMisc cfg = do
             | ObjectFnA{fa_val_out = Just vE} : _ <- drop (length args - 1) of_args = vE
             | otherwise = [|return|]
       argNames <- replicateM (length (init args)) $ newName "a"
+      f_doc <- getDoc $ DeclDoc f_name
       let c_pat = do
             (argT, argN, fa) <- zip3 (init args) argNames of_args
             return $
@@ -320,12 +321,12 @@ mkWlObjectMisc cfg = do
                 ++ [noBindS [|when ($(varE resN) == -1)      $ error    $ $(litE . StringL $ nameBase nm) ++ " returned -1"|] | of_throwIfMinus1, not of_getErrno]
                 ++ [noBindS [|when ($(varE resN) == -1)      $ throwErrno $(litE $ StringL $ nameBase nm)|] | of_throwIfMinus1, of_getErrno]
                 ++ [noBindS $ appE res_trans (varE resN)]
-          docStr =
-            unlines $
-                [ "Argument " ++ show i ++ ": " ++ fromMaybe "_" (fa_doc oa) ++ "\n" | (i, oa) <- zip [(1::Int)..] of_args ]
-                ++ ["See: '" ++ nameBase f_name ++ "'"]
-                ++ ["\nThrows an exception on -1 return value." | of_throwIfMinus1]
-                ++ ["\nThrows an exception on null return value." | of_nullCheck]
+          docStr = unlines $
+            maybeToList f_doc
+            ++ [ nameBase nm ++ " " ++ unwords [ fromMaybe "_" (fa_doc oa) | (_, oa) <- zip [(1::Int)..] of_args ] ]
+            ++ ["\nSee: '" ++ nameBase f_name ++ "'"]
+            ++ ["\nThrows an exception on -1 return value." | of_throwIfMinus1]
+            ++ ["\nThrows an exception on null return value." | of_nullCheck]
       sequence
         [ funD_doc nm [clause c_pat c_body []] (Just docStr) ([fa_doc x | x <- of_args]),
           sigD nm (return $ mapTypeArgs of_args $ typeTrans f_type)
@@ -363,9 +364,11 @@ mkListenerEventNew ObjectCfg {..} listenerTypeName = do
       let listenerName' = objTypePrefix ++ "Listener"
           objectName = objTypePrefix
           evName = mkName $ objectName ++ "Event"
+      cons <- mapM mkEvCon recs
       sequence
-        [ dataD (pure []) evName [] Nothing (map mkEvCon recs)
+        [ dataD_doc (pure []) evName [] Nothing cons
             [derivClause Nothing [conT ''Eq, conT ''Show, conT ''Generic]]
+            (Just "")
 
         , sigD (mkName $ "mk" ++ listenerName') [t|($(conT evName) -> IO ()) -> IO (PtrConst $(conT listenerName))|]
         , funD_doc
@@ -404,22 +407,26 @@ mkListenerEventNew ObjectCfg {..} listenerTypeName = do
                         | otherwise -> return $ mkName $ "_" ++ lowerFirst (dropPrefix "Wl_" $ nameBase nm')
                       _ -> return $ mkName $ "_" ++ nameBase eN ++ "_" ++ show i
 
-        mkEvCon :: (Name, Bang, Type) -> Q Con
+        mkEvCon :: (Name, Bang, Type) -> Q (Q Con, Maybe String, [Maybe String])
         mkEvCon (evName, _bang, evType) = do
-          let prefix = mkName objTypePrefix
-          let evConN = mkName $ nameBase prefix ++ upperFirst (fromSnailCase $ nameBase evName)
-          fields' <- forM (zip [(0::Int)..] $ getFields evType) $ \(idx, fT) -> do
-            fa <- if | Just doA <- objAutoMarshall -> doA 1 fT
-                     -- | Just userA <- of_arguments L.!? idx -> return userA
-                     | otherwise -> return $ fromString ""
-            fN <- fieldName evName idx (fa_type fa fT)
-            return (fT, fa, fN)
-          let fields = snd $ foldl (\(used, res) x@(fT,fa,fN) ->
-                if fN `elem` used
-                   then (mkName (nameBase fN ++ "_2") : used, res ++ [(fT,fa,mkName $ nameBase fN ++ "_2")])
-                   else (fN : used, res ++ [x])
-                ) ([],[]) fields'
-          recC evConN [varBangType fN (bangType (bang noSourceUnpackedness sourceStrict) (pure $ typeTrans $ fa_type fa fT)) | (fT, fa, fN) <- fields]
+          mdoc <- getDoc $ DeclDoc evName
+          return (con, Just $ "'" ++ pprint evName ++ "'\n\n" ++ fromMaybe "" mdoc, [])
+         where
+           con = do
+              let prefix = mkName objTypePrefix
+              let evConN = mkName $ nameBase prefix ++ upperFirst (fromSnailCase $ nameBase evName)
+              fields' <- forM (zip [(0::Int)..] $ getFields evType) $ \(idx, fT) -> do
+                fa <- if | Just doA <- objAutoMarshall -> doA 1 fT
+                         -- | Just userA <- of_arguments L.!? idx -> return userA
+                         | otherwise -> return $ fromString ""
+                fN <- fieldName evName idx (fa_type fa fT)
+                return (fT, fa, fN)
+              let fields = snd $ foldl (\(used, res) x@(fT,fa,fN) ->
+                    if fN `elem` used
+                       then (mkName (nameBase fN ++ "_2") : used, res ++ [(fT,fa,mkName $ nameBase fN ++ "_2")])
+                       else (fN : used, res ++ [x])
+                    ) ([],[]) fields'
+              recC evConN [varBangType fN (bangType (bang noSourceUnpackedness sourceStrict) (pure $ typeTrans $ fa_type fa fT)) | (fT, fa, fN) <- fields]
 
         mkListenerFun prefix recs' = do
           handle <- newName "h"

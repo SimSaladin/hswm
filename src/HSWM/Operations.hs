@@ -14,21 +14,20 @@ import System.Environment
 import System.IO (hGetContents, print, hPrint, writeFile)
 import System.Posix qualified as Posix
 import System.Posix.Process (executeFile)
-import Text.Read (reads)
 import qualified Control.Monad.State as State
 
 -- * Manage tasks that defer to next manage sequence
 
-manageReveal, manageHide :: RiverWindow -> H ()
+manageReveal, manageHide :: RiverWindow -> HS ()
 manageReveal = flip modifyWindow $ \s -> s {p_set_visible = Just True}
 manageHide = flip modifyWindow $ \s -> s {p_set_visible = Just False}
 
-manageKill :: Window -> H ()
+manageKill :: Window -> HS ()
 manageKill = doManage WRequestClose
 
 -- | /manage/
 -- Move and resize @w@ such that it fits inside the given rectangle, including its border.
-tileWindow :: Bool -> RiverWindow -> Rectangle -> H ()
+tileWindow :: Bool -> RiverWindow -> Rectangle -> HS ()
 tileWindow placeTop i r = withWindow i $ \w -> do
   bw <- asks (fi . borderWidth . config)
   -- give all windows at least 1x1 pixels
@@ -38,18 +37,17 @@ tileWindow placeTop i r = withWindow i $ \w -> do
   io $ R.riverWindowProposeDimensions w.river_window (least $ fi r.width) (least $ fi r.height)
   modifyWindow i $ \s ->
     s
-      { -- setNodePosition w.node (fi r.x + bw) (fi r.y + bw)
-        p_render_pos = Just (fi r.x + bw, fi r.y + bw),
+      { p_render_pos = Just (fi r.x + bw, fi r.y + bw),
         p_render_place = if placeTop then R.rIVER_NODE_V1_PLACE_TOP else 0
       }
 
-manageWindowBorder :: RiverWindow -> RiverColor -> H ()
+manageWindowBorder :: RiverWindow -> RiverColor -> HS ()
 manageWindowBorder rw rc = modifyWindow rw $ \s -> s {p_render_border = Just rc}
 
-doManage' :: WindowManageAction -> RiverWindow -> H ()
+doManage' :: WindowManageAction -> RiverWindow -> HS ()
 doManage' a rw = modifyWindow rw $ \s -> s {p_manage_action = p_manage_action s ++ [a]}
 
-doManage :: WindowManageAction -> Window -> H ()
+doManage :: WindowManageAction -> Window -> HS ()
 doManage a w = doManage' a w.river_window
 
 -- * Operations not tied to manage/render phases
@@ -58,10 +56,10 @@ doManage a w = doManage' a w.river_window
 -- | Throw a message to the current 'LayoutClass' possibly modifying how we
 -- layout the windows, in which case changes are handled through a refresh.
 -}
-sendMessage :: (Message a) => a -> H ()
+sendMessage :: (Message a) => a -> HS ()
 sendMessage a = do
   w <- gets $ W.workspace . W.current . windowset
-  ml' <- handleMessage (W.layout w) (SomeMessage a) `catchH` return Nothing
+  ml' <- handleMessage (W.layout w) (SomeMessage a) `catchHS` return Nothing
   whenJust ml' $ \l' -> do
     modifyWindowSet $ \ws ->
       ws
@@ -73,7 +71,7 @@ sendMessage a = do
                     }
               }
         }
-    manageDirty
+    liftH manageDirty
   return ()
 
 --  Xmonad impl:
@@ -87,7 +85,7 @@ sendMessage a = do
 --    return (Any $ isJust ml')
 
 -- | Send a message to all layouts, without refreshing.
-broadcastMessage :: (Message a) => a -> H ()
+broadcastMessage :: (Message a) => a -> HS ()
 broadcastMessage a = withWindowSet $ \ws -> do
   -- this is O(n²), but we can't really fix this as there's code in
   -- xmonad-contrib that touches the windowset during handleMessage
@@ -100,39 +98,48 @@ broadcastMessage a = withWindowSet $ \ws -> do
   mapM_ (sendMessageWithNoRefresh a) (c : v ++ h)
 
 -- | Send a message to a layout, without refreshing.
-sendMessageWithNoRefresh :: (Message a) => a -> WindowSpace -> H ()
+sendMessageWithNoRefresh :: (Message a) => a -> WindowSpace -> HS ()
 sendMessageWithNoRefresh a w =
-  handleMessage (W.layout w) (SomeMessage a) `catchH` return Nothing
+  handleMessage (W.layout w) (SomeMessage a) `catchHS` return Nothing
     >>= updateLayout (W.tag w)
 
 -- | Update the layout field of a workspace.
-updateLayout :: WorkspaceId -> Maybe (Layout RiverWindow) -> H ()
+updateLayout :: WorkspaceId -> Maybe (Layout RiverWindow) -> HS ()
 updateLayout i ml = whenJust ml $ \l ->
   runOnWorkspaces $ \ww -> return $ if W.tag ww == i then ww {W.layout = l} else ww
 
-withScreenOutput :: ScreenId -> (Output -> H ()) -> H ()
+withScreenOutput :: ScreenId -> (Output -> HS ()) -> HS ()
 withScreenOutput sid f = mapM_ f . L.find (\o -> o.screen == sid) =<< gets _outputs
 
 -- | Force new manage sequence.
-manageDirty :: H ()
-manageDirty = withObject (io . R.riverWindowManagerManageDirty)
+manageDirty :: MonadStateGlobal env m => m ()
+manageDirty = do
+  logDebug "manageDirty"
+  withObject (io . R.riverWindowManagerManageDirty)
 
 -- * Manage sequence /only/
 
 -- | /manage sequence/ focus a window in every seat.
-setFocusH :: RiverWindow -> H ()
+setFocusH :: RiverWindow -> HS ()
 setFocusH rw = mapSeats $ \s -> do
   io $ R.riverSeatFocusWindow s.river_seat rw
   withWindow rw $ \w -> do
-    log' "manage: warping pointer!"
-    io $ R.riverSeatPointerWarp s.river_seat (w.x + (w.width `div` 2)) (w.y + (w.height `div` 2))
+    if s.focused /= rw
+       then do
+          modifySeat s.river_seat $ \x -> x { focused = rw }
+          let (x', y') = fromMaybe (w.x, w.y) w.p_render_pos
+              px = x' + (w.width `div` 2)
+              py = y' + (w.height `div` 2)
+          logInfo $ "manage: warping pointer to " <> displayShow (px, py)
+          io $ R.riverSeatPointerWarp s.river_seat px py
+       else return ()
 
 --------------------------------------------------------------
 
 -- * Render sequence / defer to render sequence
 
 -- | /render sequence/ Draw borders on the the window.
-setWindowBorder :: RiverWindow -> RiverColor -> H ()
+setWindowBorder :: RiverWindow -> RiverColor -> HS ()
 setWindowBorder w RiverColor {red = wb_r, green = wb_g, blue = wb_b, alpha = wb_a} = withWindow w $ \_ -> do
   wb_width <- asks (borderWidth . config)
   wb_edges <- asks (fi . borderEdges . config)
@@ -144,34 +151,34 @@ riverWindowSetBorders w WindowBorders {..} =
   R.riverWindowSetBorders w wb_edges wb_width wb_r wb_g wb_b wb_a
 
 -- | /render sequence/
-reveal, hide :: RiverWindow -> H ()
+reveal, hide :: RiverWindow -> HS ()
 reveal rw = withWindow rw $ \_ -> io $ R.riverWindowShow rw
 hide rw = withWindow rw $ \_ -> io $ R.riverWindowHide rw
 
 -- * WindowSet etc. modifications
 
 -- XXX  XMonad compat
-windows :: (WindowSet -> WindowSet) -> H ()
+windows :: (WindowSet -> WindowSet) -> HS ()
 windows = modifyWindowSet
 
 -- | Return workspace visible on screen @sc@, or 'Nothing'.
-screenWorkspace :: ScreenId -> H (Maybe WorkspaceId)
+screenWorkspace :: ScreenId -> HS (Maybe WorkspaceId)
 screenWorkspace sc = withWindowSet $ return . W.lookupWorkspace sc
 
 -- | Run a monadic action with the current stack set
-withWindowSet :: (WindowSet -> H a) -> H a
+withWindowSet :: (WindowSet -> HS a) -> HS a
 withWindowSet f = gets windowset >>= f
 
-modifyWindowSet :: (WindowSet -> WindowSet) -> H ()
+modifyWindowSet :: (WindowSet -> WindowSet) -> HS ()
 modifyWindowSet f = State.modify' $ \s -> s {windowset = f (windowset s)}
 
 -- | Set the focus to the window on top of the stack, or root
-setTopFocus :: H ()
+setTopFocus :: HS ()
 setTopFocus = withWindowSet $ maybe (pure ()) setFocusH . W.peek
 
 -- | This is basically a map function, running a function in the 'H' monad on
 -- each workspace with the output of that function being the modified workspace.
-runOnWorkspaces :: (WindowSpace -> H WindowSpace) -> H ()
+runOnWorkspaces :: (WindowSpace -> HS WindowSpace) -> HS ()
 runOnWorkspaces job = do
   ws <- gets windowset
   h <- mapM job $ W.hidden ws
@@ -202,10 +209,10 @@ windowBracket p action = withWindowSet $ \old -> do
 
 -- outputs
 
-withOutput :: RiverOutput -> (Output -> H ()) -> H ()
+withOutput :: RiverOutput -> (Output -> HS ()) -> HS ()
 withOutput k m = gets _outputs >>= mapM_ (\x -> when (x.river_output == k) (m x))
 
-modifyOutput :: RiverOutput -> (Output -> Output) -> H ()
+modifyOutput :: RiverOutput -> (Output -> Output) -> HS ()
 modifyOutput ro f = modify $ \s -> s {_outputs = map g (_outputs s)}
   where
     g a@Output {..}
@@ -214,77 +221,80 @@ modifyOutput ro f = modify $ \s -> s {_outputs = map g (_outputs s)}
 
 -- seats
 
-withSeat :: RiverSeat -> (Seat -> H ()) -> H ()
+lookupSeat :: RiverSeat -> HS (Maybe Seat)
+lookupSeat rs = L.find (\x -> x.river_seat == rs) <$> gets _seats
+
+withSeat :: RiverSeat -> (Seat -> HS ()) -> HS ()
 withSeat sid f = gets _seats >>= mapM_ (\s -> when (s.river_seat == sid) (f s))
 
-modifySeat :: RiverSeat -> (Seat -> Seat) -> H ()
+modifySeat :: RiverSeat -> (Seat -> Seat) -> HS ()
 modifySeat ro f = modify $ \s -> s {_seats = map g (_seats s)}
   where
     g x@Seat {}
       | x.river_seat == ro = f x
       | otherwise = x
 
-modifySeats :: (Seat -> Bool) -> (Seat -> Seat) -> H ()
+modifySeats :: (Seat -> Bool) -> (Seat -> Seat) -> HS ()
 modifySeats choose f = modify $ \s -> s {_seats = map g (_seats s)}
   where
     g x
       | choose x = f x
       | otherwise = x
 
-mapSeats :: (Seat -> H ()) -> H ()
+mapSeats :: (Seat -> HS ()) -> HS ()
 mapSeats f = gets _seats >>= mapM_ f
 
-seatDisableBindingsMatching :: RiverSeat -> [ModMask] -> [KeySym] -> H ()
+seatDisableBindingsMatching :: RiverSeat -> [ModMask] -> [KeySym] -> HS ()
 seatDisableBindingsMatching rs mods keys = withSeat rs $ \s -> do
   let binds = s.xkb_bindings
       matchedKeys = S.filter match (M.keysSet binds)
-      match (mod, key) = any (\m -> m .&. mod > 0) mods || key `elem` keys
+      match (mod', key) = any (\m -> m .&. mod' > 0) mods || key `elem` keys
       matchedBinds = M.fromSet (binds M.!) matchedKeys
   logInfo $ "seat: temporarily disabling bindings: " <> display (length matchedBinds)
   io . forM_ matchedBinds $ deRefStablePtr >=> R.riverXkbBindingDisable . xkb_binding
 
-seatEnableBindingsMatching :: RiverSeat -> [ModMask] -> [KeySym] -> H ()
+seatEnableBindingsMatching :: RiverSeat -> [ModMask] -> [KeySym] -> HS ()
 seatEnableBindingsMatching rs mods keys = withSeat rs $ \s -> do
   let binds = s.xkb_bindings
       matchedKeys = S.filter match (M.keysSet binds)
-      match (mod, key) = any (\m -> m .&. mod > 0) mods || key `elem` keys
+      match (mod', key) = any (\m -> m .&. mod' > 0) mods || key `elem` keys
       matchedBinds = M.fromSet (binds M.!) matchedKeys
   logInfo $ "seat: restoring bindings to enabled: " <> display (length matchedBinds)
   io . forM_ matchedBinds $ deRefStablePtr >=> R.riverXkbBindingEnable . xkb_binding
 
 -- windows
 
-withFocused :: (Window -> H ()) -> H ()
+withFocused :: (Window -> HS ()) -> HS ()
 withFocused f = gets windowset >>= \ws -> whenJust (W.peek ws) (`withWindow` f)
 
-lookupWindow :: RiverWindow -> H (Maybe Window)
+lookupWindow :: RiverWindow -> HS (Maybe Window)
 lookupWindow wid = gets (M.lookup wid . _windows)
 
-withWindow :: RiverWindow -> (Window -> H ()) -> H ()
+withWindow :: RiverWindow -> (Window -> HS ()) -> HS ()
 withWindow wid f = gets (M.lookup wid . _windows) >>= (`whenJust` f)
 
-modifyWindow :: RiverWindow -> (Window -> Window) -> H ()
+modifyWindow :: RiverWindow -> (Window -> Window) -> HS ()
 modifyWindow w f = alterWindow w (fmap f)
 
-alterWindow :: RiverWindow -> (Maybe Window -> Maybe Window) -> H ()
+alterWindow :: RiverWindow -> (Maybe Window -> Maybe Window) -> HS ()
 alterWindow w f = modify $ \s -> s {_windows = M.alter f w s._windows}
 
-mapWindows :: (Window -> H ()) -> H ()
+mapWindows :: (Window -> HS ()) -> HS ()
 mapWindows f = gets _windows >>= mapM_ f
 
 -----------------------------------
 
 -- * Seat / Screen / Window
 
-startSeatOp :: SeatOp -> H ()
+startSeatOp :: SeatOp -> HS ()
 startSeatOp op = modifySeats (const True) $ \seat -> seat {pending_action = S_START_OP op}
 
-seatInputOverride :: String -> H Bool -> [((ModMask, KeySym), H ())] -> H ()
+seatInputOverride :: String -> HS Bool -> [((ModMask, KeySym), H ())] -> HS ()
 seatInputOverride seat onempty keys = modifySeats (\s -> s.name == seat) $ \s ->
   s {pending_action = S_INPUT_OVERRIDE onempty (map (second SomeAction) keys)}
 
 -- | Make a tiled window floating, using its suggested rectangle
-float :: RiverWindow -> H ()
+float :: RiverWindow -> HS ()
 float rw = withWindow rw $ \w -> do
   (sc, rr) <- floatLocation w
   modifyWindowSet $ \ws -> W.float rw rr . fromMaybe ws $ do
@@ -296,7 +306,7 @@ float rw = withWindow rw $ \w -> do
 
 -- | Given a window, find the screen it is located on, and compute
 -- the geometry of that window WRT that screen.
-floatLocation :: Window -> H (ScreenId, W.RationalRect)
+floatLocation :: Window -> HS (ScreenId, W.RationalRect)
 floatLocation w = go
   where
     -- -- Fallback solution if `go' fails.  Which it might, since it
@@ -335,7 +345,7 @@ floatLocation w = go
 pointScreen ::
   Position ->
   Position ->
-  H (Maybe (W.Screen WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail ScreenId ScreenDetail))
+  HS (Maybe (W.Screen WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail ScreenId ScreenDetail))
 pointScreen x y = withWindowSet $ return . L.find p . W.screens
   where
     p = pointWithin x y . screenRect . W.screenDetail
@@ -343,7 +353,7 @@ pointScreen x y = withWindowSet $ return . L.find p . W.screens
 screenRect :: ScreenDetail -> Rectangle
 screenRect SD {..} = Rectangle (fi x) (fi y) (fi width) (fi height)
 
-setWindowPosition :: Window -> Int32 -> Int32 -> H ()
+setWindowPosition :: Window -> Int32 -> Int32 -> HS ()
 setWindowPosition w x y = do
   setNodePosition w.node x y
   modifyWindow w.river_window $ \s -> s {x, y}
@@ -371,16 +381,16 @@ getProgramPath =
 
 restart :: String -> H ()
 restart prog = do
-  broadcastMessage ReleaseResources
+  runInHS $ broadcastMessage ReleaseResources
   void . userCode =<< asks (exitHook . config)
-  writeStateToFile
+  runInHS $ writeStateToFile
   io $ do
     res <- try $ executeFile prog True [] Nothing
     case res of
       Left (SomeException e) -> hPrint stderr e >> exitFailure
       Right {} -> return ()
 
-writeStateToFile :: H ()
+writeStateToFile :: HS ()
 writeStateToFile = do
   let path = ".hswm.state"
       wsData s = W.mapLayout show $ W.mapWindow winIdent $ windowset s
@@ -441,15 +451,3 @@ readStateFile xmc = do
 
 sendRestart :: H ()
 sendRestart = io $ Posix.raiseSignal Posix.sigUSR2
-
------------------------------------------------------------------
-
--- * Cursor
-
--- XXX: also set XCURSOR_THEME= ? XCURSOR_PATH= ?
-setXCursorTheme :: H ()
-setXCursorTheme = do
-  let cursorTheme = "Vanilla-DMZ"
-      cursorSize = 24
-  mapSeats $ \seat -> do
-    io $ R.riverSeatSetXcursorTheme seat.river_seat (Just cursorTheme) cursorSize

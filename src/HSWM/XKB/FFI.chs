@@ -1,5 +1,6 @@
 module HSWM.XKB.FFI where
 
+import Data.Enum
 import Foreign
 import Foreign.C
 import System.IO.Unsafe
@@ -10,112 +11,131 @@ import System.Posix (Fd(..), closeFd, fdWrite)
 #include <unistd.h>
 #include <sys/mman.h>
 #include <xkbcommon/xkbcommon.h>
-#include <linux/input-event-codes.h>
+
+-- * Exceptions
 
 data XkbCommonException = XkbKeysymNameNotFound String
                         | XkbKeymapCreateException String
+                        | XkbException String
   deriving Show
 
 instance Exception XkbCommonException
 
-type KeySym    = CUInt
-type Button    = {#type uint32_t#}
-type Modifiers = {#type uint32_t#}
-type ModMask   = {#type xkb_mod_index_t#}
-type ModIndex  = {#type xkb_mod_index_t#}
+-- * Types
 
+type KeySym       = CUInt
+type Modifiers    = {#type uint32_t#}
+type ModMask      = {#type xkb_mod_index_t#}
+type ModIndex     = {#type xkb_mod_index_t#}
+type LayoutIndex  = {#type xkb_layout_index_t#}
+type XkbKeycode   = {#type xkb_keycode_t#}
+
+{#pointer *xkb_context as XkbContext #}
 {#pointer *xkb_keymap  as XkbKeymap #}
 {#pointer *xkb_state   as XkbState #}
-{#pointer *xkb_context as XkbContext #}
 
-{#fun xkb_context_new as ^ {`CInt'} -> `XkbContext'#}
+{#enum xkb_context_flags        as XkbContextFlag        {} deriving (Eq, Show)#}
+{#enum xkb_keymap_format        as XkbKeymapFormat       {} deriving (Eq, Show)#}
+{#enum xkb_keymap_compile_flags as XkbKeymapCompileFlags {} deriving (Eq, Show)#}
+{#enum xkb_state_component      as XkbStateComponent     {} deriving (Eq, Show)#}
 
-{#fun xkb_keymap_new_from_string as ^ {`XkbContext', `CString', `CUInt', `CUInt'} -> `XkbKeymap' #}
-{#fun xkb_keymap_mod_get_mask         {`XkbKeymap', `String'} -> `ModMask' fromIntegral #}
-{#fun xkb_keymap_mod_get_name         {`XkbKeymap', fromIntegral `ModIndex'} -> `String'#}
-{#fun xkb_keymap_get_as_string as ^   {`XkbKeymap', `CUInt'} -> `String' #}
+-- | @ struct xkb_rule_names @
+data XkbRuleNames = XkbRuleNames { rules, model, layout, variant, options :: !String }
+  deriving (Show, Read, Eq)
 
-{#fun xkb_state_get_keymap {`XkbState'} -> `XkbKeymap' #}
+-- ** Internal utilities
 
-{#fun xkb_keymap_unref {`XkbKeymap'} -> `()'#}
-{#fun xkb_state_unref {`XkbState'} -> `()'#}
-{#fun xkb_state_new {`XkbKeymap'} -> `XkbState'#}
-{#fun xkb_state_update_mask
-  {`XkbState', `Word32', `Word32', `Word32', `Word32', `Word32', `Word32'}
-  -> `()'#}
+enumsToIntegral :: (Enum a, Integral b) => [a] -> b
+enumsToIntegral xs = fi $ foldl' (.&.) 0 (map fromEnum xs)
 
-{#fun xkb_state_key_get_one_sym
-  { `XkbState'
-  , `CUInt'
-  } -> `CUInt' #}
+checkXkbKeymapResult :: XkbKeymap -> IO XkbKeymap
+checkXkbKeymapResult res = do
+  when (res == nullPtr) $ throwM $ XkbKeymapCreateException "keymap creation failed (return null)"
+  return res
+
+xkbThrowIfNull :: String -> Ptr a -> IO (Ptr a)
+xkbThrowIfNull str res = do
+  when (res == nullPtr) $ throwM $ XkbException str
+  return res
+
+checkXkbContext :: XkbContext -> IO XkbContext
+checkXkbContext = xkbThrowIfNull "xkb_context_new returned null"
+
+checkXkbState :: XkbState -> IO XkbState
+checkXkbState = xkbThrowIfNull "xkb_state_new returned null"
+
+maybeToEnum :: (Enum a, Integral b) => b -> Maybe a
+maybeToEnum a = if fromInteger 0 == a then Nothing else Just (toEnum $ fromIntegral a)
+
+-- * XkbContext
+
+{#fun xkb_context_new as ^
+  { enumsToIntegral `[XkbContextFlag]'
+  } -> `XkbContext' checkXkbContext* #}
+
+{#fun xkb_context_unref as ^ {`XkbContext'} -> `()'#}
+
+withXkbContext :: [XkbContextFlag] -> (XkbContext -> IO a) -> IO a
+withXkbContext a1 f = bracket (xkbContextNew a1) xkbContextUnref f
+
+-- * XkbKeymap
+
+{#fun xkb_keymap_new_from_string as ^
+  { `XkbContext'
+  , `CString'
+  , `XkbKeymapFormat'
+  , `XkbKeymapCompileFlags'
+  } -> `XkbKeymap' checkXkbKeymapResult* #}
 
 -- | returns A keymap compiled according to the [RMLVO] names, or `NULL` if
 -- the compilation failed.
-{#fun xkb_keymap_new_from_names2
+{#fun xkb_keymap_new_from_names2 as ^
   {                   `XkbContext'
-  , withXkbRuleNames* `XkbRuleNames' -- @param names   The [RMLVO] names to use.  See xkb_rule_names.
-  ,                   `CUInt' -- xkb_keymap_format
-  ,                   `CUInt' -- xkb_keymap_compile_flags
-  } -> `XkbKeymap' #}
+  , withXkbRuleNames* `XkbRuleNames'
+  ,                   `XkbKeymapFormat'
+  ,                   `XkbKeymapCompileFlags'
+  } -> `XkbKeymap' checkXkbKeymapResult* #}
 
--- enum xkb_keysym_flags:
---     XKB_KEYSYM_NO_FLAGS         = 0,       /** Do not apply any flags. */
---     XKB_KEYSYM_CASE_INSENSITIVE = (1 << 0) /** Find keysym by case-insensitive search. */
+{#fun xkb_keymap_unref as ^ {`XkbKeymap'} -> `()'#}
 
-xkb_keysym_from_name :: String -> KeySym
-xkb_keysym_from_name name = unsafePerformIO $ withCString name $ \c_name -> return $!
-  let res = {#call pure xkb_keysym_from_name as _xkb_keysym_from_name#} c_name 1 in
-      if res == 0 then impureThrow $ XkbKeysymNameNotFound ("xkb_keysym_from_name(" ++ name ++ ")") else res
+{#fun xkb_keymap_get_as_string as ^   {`XkbKeymap', `XkbKeymapFormat'} -> `String' #}
+{#fun xkb_keymap_mod_get_mask as ^    {`XkbKeymap', `String'} -> `ModMask' fromIntegral #}
+{#fun xkb_keymap_mod_get_name as ^    {`XkbKeymap', fromIntegral `ModIndex'} -> `String'#}
 
--- XKB_EXPORT int
--- xkb_keysym_get_name(xkb_keysym_t keysym, char *buffer, size_t size);
--- {#fun xkb_keysym_get_name as ^ { `KeySym' , alloca-
-
-xkbKeysymToText :: KeySym -> String
-xkbKeysymToText k = unsafePerformIO $ allocaBytes 64 $ \buf ->
-    let len = {#call pure xkb_keysym_get_name#} k buf 64 in peekCStringLen (buf, fi len)
-
--- * Keymap and XkbRules
-
-createKeymap :: Fd -> CUInt -> IO XkbKeymap
-createKeymap fd size = do
-  ctx <- xkbContextNew 0
+createKeymap :: Fd -> CSize -> IO XkbKeymap
+createKeymap fd size = withXkbContext [] $ \ctx -> do
   createKeymap' ctx fd size
 
-createKeymap' :: XkbContext -> Fd -> CUInt -> IO XkbKeymap
+createKeymap' :: XkbContext -> Fd -> CSize -> IO XkbKeymap
 createKeymap' ctx fd size = do
-  ptr <- {#call mmap as _mmap#} nullPtr (fromIntegral size) {#const PROT_READ#} {#const MAP_PRIVATE#} (fromIntegral fd) 0
-  keymap <- xkbKeymapNewFromString ctx (castPtr ptr) 1 {-xkb_KEYMAP_FORMAT_TEXT_V1-} 0
-  _ <- {#call munmap#} ptr (fromIntegral size)
+  keymap <- bracket
+     ({#call mmap as _mmap#} nullPtr (fromIntegral size) {#const PROT_READ#} {#const MAP_PRIVATE#} (fromIntegral fd) 0)
+     (\ptr -> {#call munmap#} ptr (fromIntegral size)) $ \ptr ->
+       xkbKeymapNewFromString ctx (castPtr ptr) XKB_KEYMAP_FORMAT_TEXT_V1 XKB_KEYMAP_COMPILE_NO_FLAGS
   closeFd fd
   return keymap
 
-createKeymap'' :: XkbContext -> Fd -> CUInt -> IO XkbKeymap
+createKeymap'' :: XkbContext -> Fd -> CSize -> IO XkbKeymap
 createKeymap'' ctx fd size = do
-  ptr <- {#call mmap as _mmap#} nullPtr (fromIntegral size) {#const PROT_READ#} {#const MAP_SHARED#} (fromIntegral fd) 0
-  keymap <- xkbKeymapNewFromString ctx (castPtr ptr) 1 {-xkb_KEYMAP_FORMAT_TEXT_V1-} 0
-  _ <- {#call munmap#} ptr (fromIntegral size)
+  keymap <- bracket
+     ({#call mmap as _mmap#} nullPtr (fromIntegral size) {#const PROT_READ#} {#const MAP_SHARED#} (fromIntegral fd) 0)
+     (\ptr -> {#call munmap#} ptr (fromIntegral size)) $ \ptr ->
+       xkbKeymapNewFromString ctx (castPtr ptr) XKB_KEYMAP_FORMAT_TEXT_V1 XKB_KEYMAP_COMPILE_NO_FLAGS
   closeFd fd
   return keymap
-
-data XkbRuleNames = XkbRuleNames { rules, model, layout, variant, options :: !String }
-  deriving (Show, Read, Eq)
 
 withXkbKeymapFd :: XkbKeymap -> (Fd -> IO b) -> IO b
 withXkbKeymapFd kmap f = withCString "hswm-xkb-keymap" $ \c_name -> do
   fd <- Fd <$> {#call memfd_create#} c_name (1 {- MFD_CLOEXEC-} .|. 2 {- MFD_ALLOW_SEALING -})
-  str <- xkbKeymapGetAsString kmap 1
+  str <- xkbKeymapGetAsString kmap XKB_KEYMAP_FORMAT_TEXT_V1
   _ <- fdWrite fd str
   r <- f fd
   closeFd fd
   return r
 
 newXkbKeymapFromNames :: XkbRuleNames -> IO XkbKeymap
-newXkbKeymapFromNames opts = do
-  ctx <- xkbContextNew 0
-  res <- xkb_keymap_new_from_names2 ctx opts 1 0
-  when (res == nullPtr) $ throwM $ XkbKeymapCreateException "newXkbKeymapFromNames (null)"
-  return res
+newXkbKeymapFromNames opts = withXkbContext [] $ \ctx ->
+  xkbKeymapNewFromNames2 ctx opts XKB_KEYMAP_FORMAT_TEXT_V1 XKB_KEYMAP_COMPILE_NO_FLAGS
 
 withXkbRuleNames :: XkbRuleNames -> (Ptr () -> IO b) -> IO b
 withXkbRuleNames x m = allocaBytesAligned {#sizeof xkb_rule_names#} {#alignof xkb_rule_names#} $ \p ->
@@ -131,6 +151,43 @@ withXkbRuleNames x m = allocaBytesAligned {#sizeof xkb_rule_names#} {#alignof xk
       {#set xkb_rule_names.options#} p c_options
       m $ castPtr p
 
+-- * XkbState
+
+{#fun xkb_state_new as ^ {`XkbKeymap'} -> `XkbState' checkXkbState* #}
+
+{#fun xkb_state_unref as ^ {`XkbState'} -> `()'#}
+
+-- | Note: the lifetime of the keymap is tied to the state by default!
+{#fun xkb_state_get_keymap as ^ {`XkbState'} -> `XkbKeymap' #}
+
+{#fun xkb_state_update_mask as ^
+  {`XkbState'
+  ,id `ModMask'
+  ,id `ModMask'
+  ,id `ModMask'
+  ,id `LayoutIndex'
+  ,id `LayoutIndex'
+  ,id `LayoutIndex'
+  } -> `Maybe XkbStateComponent' maybeToEnum #}
+
+{#fun xkb_state_key_get_one_sym as ^ { `XkbState' , fi `XkbKeycode' } -> `KeySym' fi #}
+
+-- * XkbKeysym
+
+-- enum xkb_keysym_flags:
+--     XKB_KEYSYM_NO_FLAGS         = 0,       /** Do not apply any flags. */
+--     XKB_KEYSYM_CASE_INSENSITIVE = (1 << 0) /** Find keysym by case-insensitive search. */
+
+xkbKeysymFromName :: String -> KeySym
+xkbKeysymFromName name = unsafePerformIO $ withCString name $ \c_name -> return $!
+  let res = {#call pure xkb_keysym_from_name as _xkb_keysym_from_name#} c_name 1 in
+      if res == 0 then impureThrow $ XkbKeysymNameNotFound ("xkb_keysym_from_name(" ++ name ++ ")") else res
+
+xkbKeysymGetName :: KeySym -> String
+xkbKeysymGetName k = unsafePerformIO $ allocaBytes 64 $ \buf ->
+    let len = {#call pure xkb_keysym_get_name#} k buf 64 in
+    if len == -1 then impureThrow $ XkbKeysymNameNotFound ("xkb_keysym_get_name " ++ show k) else peekCStringLen (buf, fi len)
+
 -----------------------------------------------------------------------------
 -- * KeySyms
 
@@ -139,7 +196,7 @@ withXkbRuleNames x m = allocaBytesAligned {#sizeof xkb_rule_names#} {#alignof xk
 
 -- | real-modifier-names
 _XKB_MOD_NAME_SHIFT, _XKB_MOD_NAME_CAPS, _XKB_MOD_NAME_CTRL, _XKB_MOD_NAME_MOD1, _XKB_MOD_NAME_MOD2, _XKB_MOD_NAME_MOD3, _XKB_MOD_NAME_MOD4, _XKB_MOD_NAME_MOD5 :: String
-_XKB_MOD_NAME_SHIFT = {#const XKB_MOD_NAME_SHIFT#} --   "Shift"
+_XKB_MOD_NAME_SHIFT = {#const XKB_MOD_NAME_SHIFT#} -- "Shift"
 _XKB_MOD_NAME_CAPS  = {#const XKB_MOD_NAME_CAPS #} -- "Lock"
 _XKB_MOD_NAME_CTRL  = {#const XKB_MOD_NAME_CTRL #} -- "Control"
 _XKB_MOD_NAME_MOD1  = {#const XKB_MOD_NAME_MOD1 #} -- "Mod1"
@@ -165,8 +222,4 @@ xkbRealModifierNames = [_XKB_MOD_NAME_SHIFT, _XKB_MOD_NAME_CAPS, _XKB_MOD_NAME_C
 xkbVirtualModifierNames :: [String]
 xkbVirtualModifierNames = [_XKB_VMOD_NAME_ALT, _XKB_VMOD_NAME_HYPER, _XKB_VMOD_NAME_LEVEL3, _XKB_VMOD_NAME_LEVEL5, _XKB_VMOD_NAME_META, _XKB_VMOD_NAME_NUM, _XKB_VMOD_NAME_SCROLL, _XKB_VMOD_NAME_SUPER]
 
--- * evdev-codes
-
-_BTN_LEFT, _BTN_RIGHT :: Button
-_BTN_LEFT  = {#const BTN_LEFT#}
-_BTN_RIGHT = {#const BTN_RIGHT#}
+-- * Internal

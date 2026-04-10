@@ -58,7 +58,7 @@ newXKBBinding
   -> XkbBindingMap action -- ^ Submap keys
   -> m (StablePtr (XkbBinding action))
 newXKBBinding xkbBinds xkb_binding_listener seat enable mods keysym action subKM = do
-  debug' $ "[keys] binding key: " <> fromString (ppXkbModsKey mods keysym) <> " " <> fromString (show action)
+  logDebug $ "[keys] binding key: " <> fromString (ppXkbModsKey mods keysym) <> " " <> fromString (show action)
   xb <- io $ R.riverXkbBindingsGetXkbBinding xkbBinds seat (fi keysym) (fi mods)
   -- subP <- io $ newStablePtr subKM
   dtPtr <- io $ newStablePtr $ XkbBinding xb seat action subKM

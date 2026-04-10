@@ -10,20 +10,74 @@ import qualified HSWM.Util.Waybar as WB
 import qualified HSWM.Wallpaper
 import qualified HSWM.Util.IPC as IPC
 import           HSWM.Util.Debug
+import qualified HSWM.Actions.PhysicalScreens as PScreen
 import qualified HSWM.Actions.CycleWS as CycleWS
 import qualified HSWM.Actions.CycleRecentWS as CycleRecentWS
-import HSWM.Util.GrabKeyboard
+import qualified HSWM.Actions.DynamicWorkspaces as DynWS
+import qualified HSWM.Actions.DynamicWorkspaceOrder as DWO
 import qualified HSWM.Util.RofiPrompt as RP
 
 import           Data.Ratio
-import qualified HSWM.Actions.DynamicWorkspaceOrder as DWO
+import qualified Data.Map as M
 
+tagKeys      = map (:[]) ['a'..'z']
+screenKeys   = map (:[]) "wvza"
+tagKeysTags  = zip tagKeys [(0::Int)..]
+screenKeysScreens = zip screenKeys [(PScreen.P 0)..]
+
+rofiPrompt :: RP.RofiPromptConfig
 rofiPrompt = def
   { RP._dmenu = True
-  , RP._msg = "Choose thing"
+  , RP._prompt = "Choose thing"
+  , RP._markupRows = True
+  , RP._dpi = 150
   }
 
-rofiAction = RP.rofiRun rofiPrompt ["foo", "bar", "baz"] >>= (`whenJust` liftIO . putStrLn)
+mkWorkspacePrompt prompt apply = do
+  (curTag, allTags) <- runInHS $ withWindowSet $ return . (W.currentTag &&& W.allTags)
+  RP.rofiRun (prompt rofiPrompt curTag) allTags >>= (`whenJust` doApply curTag)
+  where
+    doApply cur input = do
+      apply cur input
+      asks (logHook . config) >>= void . userCode
+
+windowPrompt :: H ()
+windowPrompt = do
+  (wss, wState) <- runInHS $ do
+    a <- withWindowSet $ return . W.workspaces
+    b <- gets _windows
+    return (a, b)
+  let windows = [ (rw, W.tag ws, w) | ws <- wss, rw <- W.integrate' (W.stack ws), Just w <- [M.lookup rw wState] ]
+  RP.rofiRun rofiPrompt { RP._prompt = "Go to window" } (map fmtWindow windows) >>= (`whenJust` doApply)
+  where
+    fmtWindow (rw, tag, w) = "<b>" <> w.appId <> "</b> (" <> w.title <> ") [" <> tag <> "]"
+    doApply input = do
+      logInfo $ fromString input
+      return ()
+      -- TODO
+
+renameWorkspacePrompt :: H ()
+renameWorkspacePrompt = do
+  (curTag, allTags) <- runInHS $ withWindowSet $ return . (W.currentTag &&& W.allTags)
+  RP.rofiRun rofiPrompt { RP._prompt = "Rename " ++ curTag } allTags >>= (`whenJust` doRename curTag)
+  where
+    doRename old new = do
+      runInHS $ do
+        DWO.updateName old new
+        DynWS.renameWorkspaceByName new
+      asks (logHook . config) >>= void . userCode
+
+addWorkspacePrompt :: H ()
+addWorkspacePrompt = mkWorkspacePrompt
+  (\p _ -> p { RP._prompt = "Add workspace" })
+  (\_ input -> runInHS $ DynWS.addWorkspace input)
+
+removeFocusedWorkspace = do
+  (curTag, ws) <- withWindowSet $ return . (W.currentTag &&& (W.workspace . W.current))
+  when (null $ W.integrate' (W.stack ws)) $ do
+    DynWS.removeWorkspaceByTag curTag
+    DWO.removeName curTag
+
 
 main :: IO ()
 main = do
@@ -44,7 +98,8 @@ main = do
       , repeatInfo      = Just (20, 150)
       , normalBorder    = parseRgba colBase02
       , focusedBorder   = parseRgba colCyan
-      , startupHook     = IPC.serverStartupHook
+      , startupHook     = IPC.serverStartupHook def
+      , xcursor         = Just ("Vanilla-DMZ", 24)
       }
   where
 
@@ -61,7 +116,6 @@ main = do
     -- "M-S-<Return>"  FloatNext.floatNext True >> spawnTerm def "" ? "Terminal (floating)"
     -- "M-$"           spawn (sh "physlock -p \"${HOSTNAME} ${DISPLAY}\"") ? "Lock (physlock)"
     -- "M-<Print>"     takeScreenshot
-    --, ("M-r t", "Test IM2" =? (void $ userCode testIM2)) -- TESTING
 
      -- ======== Execute ==========
     , ("M-r r",         "Prompt: run command" =? launchRofi ["-modes", "run", "-show", "run"])
@@ -80,34 +134,31 @@ main = do
     -- ===== Screens =====
     , ("M-C-Right", "Focus previous screen" =? CycleWS.nextScreen)
     , ("M-C-Left",  "Focus next screen"     =? CycleWS.prevScreen)
-    --let wsViewScreen scomp = "View screen %s" (PScreen.viewScreen scomp) (printf "%i" . fromEnum)
-    --"M-"          >>+ skeys >++> wsViewScreen def
-    --"M-S-"        >>+ skeys >++> WorkspaceSendToScreen
+    ]
+    ++ [("M-" ++ key,   ("View screen " ++ show i)     =? PScreen.viewScreen def i)  | (key, i) <- screenKeysScreens ]
+    ++ [("M-S-" ++ key,   ("Send workspace to screen " ++ show i)     =? PScreen.sendToScreen def i)  | (key, i) <- screenKeysScreens ]
     --"M-M1-"       >>+ skeys >++> WorkspaceOnScreen FocusCurrent
     --"M-C-"        >>+ skeys >++> WorkspaceOnScreen FocusNew
 
     -- ===== Workspaces =====
     --
-    -- "M-; "        >>+ tags >++> WorkspaceView
+    ++ [("M-SemiColon " ++ key,   ("View workspace " ++ show i)     =? DWO.withNthWorkspace W.view i)  | (key, i) <- tagKeysTags ]
+    ++ [("M-S-SemiColon " ++ key, ("Shift to workspace " ++ show i) =? DWO.withNthWorkspace W.shift i) | (key, i) <- tagKeysTags ]
     -- "M-; M-"      >>+ tags >++> WorkspaceCopy
-    -- "M-S-; "      >>+ tags >++> WorkspaceShiftTo
-    , ("M-y",        "Cycle recent hidden tags"       =? CycleRecentWS.cycleRecentWS [4, 8] 121 112)
+    ++
+    [ ("M-y",        "Cycle recent hidden tags"       =? CycleRecentWS.cycleRecentWS [4, 8] 121 112)
     , ("M-S-n",      "Shift current tag (forwards)"   =? DWO.swapWith Next CycleWS.anyWS) -- XXX: save workspace order?
     , ("M-S-p",      "Shift current tag (backwards)"  =? DWO.swapWith Prev CycleWS.anyWS)
-    --, ( "M-g r"      WorkspaceSetNamePrompt
-    , ("M-g r",      "Test Rofi prompt" =? (rofiAction :: H ()))
-    --, ( "M-g n"      WorkspaceAddPrompt
-    --, ( "M-g d"      WorkspaceRemoveFocused
+    , ("M-g r",      "Rename workspace (prompt)"      =? renameWorkspacePrompt)
+    , ("M-g n",      "Add workspace (prompt)"         =? addWorkspacePrompt)
+    , ("M-g d",      "Remove focused workspace"       =? removeFocusedWorkspace)
     -- ( "M-g S-n"     wsPromptNew' "New tag for window: " ?+ (\to -> DynWS.addHiddenWorkspace to >> defile (shift to))   ? "Move window to new tag (XP)"
     -- ( "M-g c"       wsPrompt'    "Copy to tag: "        ?+ (\to -> withFocii $ \_ w -> windows $ CW.copyWindow w to)   ? "Copy window to this tag (XP)"
     -- ( "M-g m"       wsPrompt'    "Shift to tag: "       ?+ (defile . shift                                           ) ? "Move window to this tag (XP)"
     -- ( "M-g g"       wsPrompt'    "View tag: "           ?+ (defile . greedyView                                      ) ? "Go to tag (XP)"
     -- ( "M-g s"       GS.goToSelected gsconfig1                          ? "Go to window (GS)"
     -- ( "M-g f"       XP.windowPrompt xpConfigAuto XP.Goto XP.allWindows ? "Go to window (XP)"
-
-    , ("M-SemiColon a", "View workspace 1" =? DWO.withNthWorkspace W.view 0)
-    , ("M-SemiColon b", "View workspace 2" =? DWO.withNthWorkspace W.view 1)
-    , ("M-SemiColon c", "View workspace 3" =? DWO.withNthWorkspace W.view 2)
+    , ("M-g f",      "Go to window" =? windowPrompt)
 
     -- ===== Workspace Groups ====
     -- "M-g M-n" >+ wsPromptNew' "New Workspace group: " ?+ addWSG ? "New WSG"
@@ -120,9 +171,6 @@ main = do
     , ("M-Period",      "Layout: " =? IncMasterN 1)
     , ("M-x",           "Layout: " =? Shrink)
     , ("M-S-x",         "Layout: " =? Expand)
-     --   "M-C-<Space>" >+ ResetLayout
-     --   "M-."         >+ msgT (IncMasterN 1)    :>> Mosaic.Taller
-     --   "M-,"         >+ msgT (IncMasterN (-1)) :>> Mosaic.Wider
      --   "M-b t"       >+ msgT ManageDocks.ToggleStruts
      --   "M-b l"       >+ msgT Magnifier.Toggle
      --   "M-m"         >+ MaximizeRestore
@@ -232,8 +280,8 @@ main = do
     ]
 
   myPointerBinds =
-    [ (("M", _BTN_LEFT),  namedA "Move"    $ startSeatOp SEAT_OP_MOVE)
-    , (("M", _BTN_RIGHT), namedA "Stretch" $ startSeatOp SEAT_OP_RESIZE)
+    [ (("M", _BTN_LEFT),  namedAS "Move"    $ startSeatOp SEAT_OP_MOVE)
+    , (("M", _BTN_RIGHT), namedAS "Stretch" $ startSeatOp SEAT_OP_RESIZE)
     ]
 
 dvpMyLayout :: XkbRuleNames
@@ -274,8 +322,9 @@ colGreen   = "0x859900" -- "#859900"
 class IsKeyAction a where
   toKeyAction :: String -> a -> SomeAction H
 instance {-# OVERLAPPABLE #-} IsKeyAction (H ()) where toKeyAction = namedA
+instance {-# OVERLAPPABLE #-} IsKeyAction (HS ()) where toKeyAction = namedAS
 instance {-# OVERLAPPABLE #-} IsKeyAction (SomeAction H) where toKeyAction d a = SomeAction $ NamedAction d a
-instance {-# OVERLAPPABLE #-} (Message a, Show a) => IsKeyAction a where toKeyAction d a = SomeAction $ NamedActionH (d ++ show a) (sendMessage a)
+instance {-# OVERLAPPABLE #-} (Message a, Show a) => IsKeyAction a where toKeyAction d a = SomeAction $ NamedActionHS (d ++ show a) (sendMessage a)
 
 (=?) :: IsKeyAction a => String -> a -> SomeAction H
 desc =? action = toKeyAction desc action

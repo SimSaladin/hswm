@@ -20,9 +20,7 @@ import qualified Generated.Pixman as P
 import qualified Generated.Pixman.Safe as P
 import qualified Wayland.Client as WL
 import qualified Generated.Wayland.Client as WL
-import qualified Generated.Wayland.Client.Safe as WL
 
-import           Data.Proxy
 import           Foreign
 import           System.Posix (Fd)
 

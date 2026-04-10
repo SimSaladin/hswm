@@ -39,7 +39,9 @@ data HSWMConfig m l = HSWMConfig
     xkbLayout :: !(Maybe XkbRuleNames),
     workspaces :: [WorkspaceId],
     -- | Keyboard repeat (rate, delay)
-    repeatInfo :: !(Maybe (Int32, Int32))
+    repeatInfo :: !(Maybe (Int32, Int32)),
+    -- | XCursor theme and size
+    xcursor :: !(Maybe (String, Word32))
   }
   deriving stock (Generic)
 
@@ -60,7 +62,8 @@ instance (Default (m ()), Monoid (m ()), Monoid (m All)) => Default (HSWMConfig 
         layoutHook = Full,
         logHook = mempty,
         xkbLayout = Nothing,
-        workspaces = ["1", "2", "3", "4"]
+        workspaces = ["1", "2", "3", "4"],
+        xcursor = Nothing
       }
 
 deriving anyclass instance (Default (m ()), Monoid (m All), Monoid (m ())) => Default (HSWMConfig m Layout)

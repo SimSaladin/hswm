@@ -11,6 +11,7 @@
 -- Portability : unportable
 module Waybar.CFFI.Plugin where
 
+import Data.String (IsString(..))
 import Control.Exception qualified as E
 import Control.Monad
 import Data.Void
@@ -19,6 +20,7 @@ import GI.Gtk.Objects.Container as Container
 import Waybar.CFFI.Plugin.Base
 import Waybar.CFFI.Plugin.HSWM qualified as HSWM
 import qualified Data.Aeson as A
+import qualified Data.Aeson.KeyMap as A.KM
 import qualified Data.ByteString as BS
 
 ------------------------------------------------------------------------------
@@ -52,11 +54,12 @@ pluginRuntimeDestroy = pure ()
 pluginInit :: Ptr InitInfo -> Ptr ConfigEntry -> CSize -> IO (Ptr ())
 pluginInit infoPtr cfgEntries cfgEntriesLen = do
   initInfo@InitInfo {wbcffi_module = wbModule} <- peek infoPtr
-  configs <- forM [0 .. (fromIntegral cfgEntriesLen - 1)] $ \i -> do
-    ConfigEntry pk pv <- peek (plusPtr cfgEntries (i * 2))
+  configsList <- forM [0 .. (fromIntegral cfgEntriesLen - 1)] $ \i -> do
+    ConfigEntry pk pv <- peek (advancePtr cfgEntries i)
     (k, v) <- (,) <$> peekCString pk <*> BS.packCString pv
     let Just v' = A.decodeStrict' v :: Maybe A.Value
-    return (k, v')
+    return (fromString k, v')
+  let configs = A.KM.fromList configsList
   wbVersion <- peekCString (waybar_version initInfo)
   rootWidget <- mkGetRootFun (get_root_widget initInfo) (wbcffi_module initInfo) >>= newObject Container.Container
   let queueUpdate = mkQueueUpdate (queue_update initInfo) wbModule

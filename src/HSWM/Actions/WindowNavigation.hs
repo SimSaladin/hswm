@@ -23,7 +23,6 @@ import qualified HSWM.StackSet as W
 import           HSWM.Operations hiding (mapWindows)
 import           HSWM.Config
 
-import           Prelude hiding (state)
 import qualified Data.List as L
 import qualified Data.Map as M
 import qualified Data.Set as S
@@ -65,8 +64,8 @@ swap :: IORef WNState -> Direction2D -> H ()
 swap stateRef dir = runPureAction stateRef (swapPure dir)
 
 -- | Run the pure action inside H monad.
-runPureAction :: IORef WNState -> (WNInput H -> H WNOutput) -> H ()
-runPureAction stateRef action = do
+runPureAction :: IORef WNState -> (WNInput HS -> HS WNOutput) -> H ()
+runPureAction stateRef action = runInHS $ do
   oldState <- io (readIORef stateRef)
   oldWindowSet <- gets windowset
   mappedWindows <- M.keysSet <$> gets _windows
@@ -131,7 +130,7 @@ withTargetWindow adj dir input@(oldState, oldWindowSet, _, _) = do
 
 -- | Update position on outside changes in windows.
 trackMovement :: IORef WNState -> H ()
-trackMovement stateRef = do
+trackMovement stateRef = runInHS $ do
   oldState <- io (readIORef stateRef)
   oldWindowSet <- gets windowset
   mappedWindows <- gets (M.keysSet . _windows)
@@ -339,7 +338,7 @@ windowRects (_, oldWindowSet, mappedWindows, windowRect) =
     windowRect2 w = fmap (w,) <$> windowRect w
   in catMaybes <$> mapM windowRect2 allWindows
 
-windowRectX :: Window -> H (Maybe Rectangle)
+windowRectX :: Window -> HS (Maybe Rectangle)
 windowRectX rw = lookupWindow rw >>= \case
   Nothing -> pure Nothing
   Just win -> return $ Just $ Rectangle (fi win.x) (fi win.y) (fi win.width) (fi win.height)

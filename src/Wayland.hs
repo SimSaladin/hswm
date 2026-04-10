@@ -1,10 +1,8 @@
 module Wayland
   ( module Wayland
-  , module Wayland.Client.Display
   ) where
 
-import           Wayland.Client as WL
-import           Wayland.Client.Display
+import qualified Wayland.Client as WL
 
 import qualified Data.List as L
 
@@ -24,10 +22,10 @@ instance Monoid RegistryCache where
   mappend = (<>)
 
 data RegistryItem = RegistryItem
-  { name      :: Word32 -- ^ Name (unique)
-  , interface :: String -- ^ Interface description
-  , version   :: Version -- ^ Interface version
-  , registry  :: WlRegistry
+  { name      :: !Word32 -- ^ Name (unique)
+  , interface :: !String -- ^ Interface description
+  , version   :: !Version -- ^ Interface version
+  , registry  :: !WlRegistry
   } deriving (Show, Generic)
 
 removeGlobal :: Word32 -> RegistryCache -> RegistryCache
@@ -50,3 +48,11 @@ requireGlobal rref (k, v) bind = io (readIORef rref) >>= \x -> case L.find (\i -
 
 data WlRegistryException = NoSuchRegistryObject String Version deriving (Show, Eq)
 instance Exception WlRegistryException
+
+handleRegistryEvent :: (MonadIO m, MonadReader env m, HasLogFunc env) => IORef RegistryCache -> WL.RegistryEvent -> m ()
+handleRegistryEvent ref (WL.RegistryGlobal _ registry name iface version) = do
+    log' $ display $ "[GLOBALS] new registry item: " <> toText iface <> " version=" <> tshow version <> " (" <> tshow name <> ")"
+    modifyIORef ref $ registerGlobal name iface version registry
+handleRegistryEvent ref (WL.RegistryGlobalRemove _ _ name) = do
+    log' $ display $ "[GLOBALS] registry entry removed: " <> tshow name
+    modifyIORef ref (removeGlobal name)

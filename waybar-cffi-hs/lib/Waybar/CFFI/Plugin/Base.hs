@@ -22,17 +22,16 @@ import GHC.Generics as RXP (Generic)
 import GI.Gtk.Objects.Container as RXP (Container)
 import qualified Data.Aeson as A
 
-data IConf a = IConf
+data IConf id = IConf
   { wbModule :: !(Ptr WbcffiModule),
     -- | waybar version
     wbVersion :: !String,
     -- | Widget root widget
     rootWidget :: !Container,
-    -- | TODO: parse value as JSON
-    configs :: ![(String, A.Value)],
+    configs :: !A.Object,
     -- | Queue update to waybar
     queueUpdate :: !(IO ()),
-    instanceData :: a
+    instanceData :: id
   }
   deriving (Generic)
 

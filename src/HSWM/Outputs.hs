@@ -48,7 +48,7 @@ added out = do
       io $ R.riverLayerShellGetOutput shell out
     _ <- io $ R.listenerAdd layerShellOutput shellOutputListener out
 
-    screenId <- nextScreenId om
+    screenId <- runInHS $ nextScreenId om
 
     let output = def
           { river_output = out
@@ -65,7 +65,7 @@ handle :: R.RiverOutputEvent -> H ()
 handle e = do
   om <- getOrCreateObject $ pure def
   case e of
-    R.RiverOutputRemoved _ output -> withOutput output $
+    R.RiverOutputRemoved _ output -> runInHS $ withOutput output $
       \Output{screen, river_layerShellOutput = layerShellOutput } -> do
         -- delete screen from windowset
         modifyWindowSet $ W.deleteScreen screen
@@ -135,11 +135,11 @@ manage = do
 
   -- handle new outputs
   forM_ om.pending_manage $ \output -> do
-    modify $ \s -> s { _outputs = _outputs s ++ [output] }
+    runInHS $ modify $ \s -> s { _outputs = _outputs s ++ [output] }
 
     -- Adding to WindowSet
     defLayout <- asks (layoutHook . config)
-    modifyWindowSet $ W.insertScreen defLayout output.screen (getScreenDetail output)
+    runInHS $ modifyWindowSet $ W.insertScreen defLayout output.screen (getScreenDetail output)
 
     io $ R.riverLayerShellOutputSetDefault output.river_layerShellOutput
 
@@ -154,7 +154,7 @@ render = return ()
 ----------------------------------------------------------
 -- * Utilities
 
-nextScreenId :: OutputManager -> H ScreenId
+nextScreenId :: OutputManager -> HS ScreenId
 nextScreenId om = do
     curOutputs <- gets _outputs
     case [ i | i <- [S 1..], isNothing $ L.find ((i==) . screen) (curOutputs ++ M.elems om.pending_setup) ] of
@@ -166,13 +166,13 @@ getScreenDetail o = case o.nonExclusive of
   Nothing -> SD { x = fi o.x, y = fi o.y, height = fi o.height, width = fi o.width }
   Just (x, y, w, h) ->  SD { x = fi x, y = fi y, height = fi h, width = fi w }
 
-updateScreenDetail :: RiverOutput -> H ()
+updateScreenDetail :: RiverOutput -> HS ()
 updateScreenDetail output = withOutput output $ \o -> do
   modifyWindowSet $ modifyScreen o.screen $ modifyScreenDetail $ \sd ->
     case o.nonExclusive of
       Nothing -> sd { x = fi o.x, y = fi o.y, height = fi o.height, width = fi o.width }
       Just (x, y, w, h) ->  sd { x = fi x, y = fi y, height = fi h, width = fi w }
-  manageDirty
+  liftH manageDirty
   where
     modifyScreen sid f = W.mapScreen (\s -> if sid == W.screen s then f s else s)
     modifyScreenDetail f scr = scr { W.screenDetail = f (W.screenDetail scr) }
@@ -182,4 +182,4 @@ modifyOutput' output f = do
   om <- getObject
   case M.lookup output (pending_setup om) of
     Just o -> putObject om { pending_setup = M.insert output (f o) om.pending_setup }
-    Nothing -> modifyOutput output f >> updateScreenDetail output
+    Nothing -> runInHS $ modifyOutput output f >> updateScreenDetail output

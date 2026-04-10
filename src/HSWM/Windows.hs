@@ -28,18 +28,19 @@ added :: RiverWindow -> H ()
 added w = do
   -- setup WL window listener
   window_listener <- getObject
-  liftIO $ R.listenerAdd w window_listener nullPtr
+  io $ R.listenerAdd w window_listener nullPtr
   nd <- io $ R.riverWindowGetNode w
   let win = def {new = True, river_window = w, node = nd, max_height = maxBound, max_width = maxBound}
   -- insert window to stack and state
-  alterWindow w (\_ -> Just win)
-  modifyWindowSet (W.insertUp w)
+  runInHS $ do
+    alterWindow w (\_ -> Just win)
+    modifyWindowSet (W.insertUp w)
 
-applyManageActions :: Window -> [WindowManageAction] -> H (Maybe Window)
+applyManageActions :: Window -> [WindowManageAction] -> HS (Maybe Window)
 applyManageActions _ [] = return Nothing
 applyManageActions w0 xs0 = doAll w0 xs0 >>= \w' -> return $ Just w' {p_manage_action = []}
   where
-    doAll :: Window -> [WindowManageAction] -> H Window
+    doAll :: Window -> [WindowManageAction] -> HS Window
     doAll w [] = pure w
     doAll w (x : xs) = doIt w x >>= flip doAll xs
 
@@ -69,11 +70,11 @@ applyManageActions w0 xs0 = doAll w0 xs0 >>= \w' -> return $ Just w' {p_manage_a
 
 -- | Do nothing while pointer operation is in progress.
 manage :: H ()
-manage = do
+manage = runInHS $ do
   ss <- gets _seats
   unless (any (\s -> s.op /= SEAT_OP_NONE) ss) manage_
 
-manage_ :: H ()
+manage_ :: HS ()
 manage_ = do
   -- get rid of any closed windows
   -- do initial properties for new windows
@@ -116,7 +117,7 @@ manage_ = do
     -- now tile the windows on this workspace, modified by the gap
     (rs, ml') <-
       runLayout wsp {W.stack = tiled} viewrect
-        `catchH` runLayout wsp {W.stack = tiled, W.layout = Layout Full} viewrect
+        `catchHS` runLayout wsp {W.stack = tiled, W.layout = Layout Full} viewrect
     updateLayout n ml'
 
     let m = W.floating ws
@@ -134,7 +135,7 @@ manage_ = do
 
   mapM_ (\(a, b, c) -> tileWindow c a b) rects
 
-  sm <- Seats.getSMgr
+  sm <- liftH Seats.getSMgr
 
   whenJust (W.peek ws) $ \w ->
     if sm.seat_lshell_focus == Seats.FocusNone
@@ -148,10 +149,8 @@ manage_ = do
   -- given a position by a layout now.
   mapM_ manageHide (L.nub (oldvisible ++ newwindows) L.\\ visible)
 
-  asks (logHook . config) >>= userCodeDef ()
-
 render :: H ()
-render = do
+render = runInHS $ do
   mapWindows $ \w -> do
     whenJust w.p_render_pos $ uncurry (setWindowPosition w)
     whenJust w.p_render_border $ setWindowBorder w.river_window
@@ -171,7 +170,7 @@ render = do
         }
 
 -- | /manage/
-setInitialManageProperties :: Window -> H ()
+setInitialManageProperties :: Window -> HS ()
 setInitialManageProperties Window {river_window = rw} = do
   io $ R.riverWindowUseSsd rw
   io $ R.riverWindowSetCapabilities rw (fi $ foldl' (.|.) 0 $ map (.unwrap) [Maximize, Fullscreen])
@@ -179,7 +178,7 @@ setInitialManageProperties Window {river_window = rw} = do
   bcolor <- asks (normalBorder . config)
   modifyWindow rw $ \s -> s {new = False, p_render_border = Just bcolor}
 
-doRemoveWindow :: Window -> H ()
+doRemoveWindow :: Window -> HS ()
 doRemoveWindow w@Window {} = do
   -- reove from stack
   modifyWindowSet $ W.delete w.river_window
@@ -207,13 +206,13 @@ handleEvent :: R.RiverWindowEvent -> H ()
 handleEvent e = case e of
   -- The window has been closed by the server, perhaps due to an xdg_toplevel.close request or similar.
   -- The server will send no further events on this object and ignore any request other than river_window_v1.destroy made after this event is sent. The client should destroy this object with the river_window_v1.destroy request to free up resources.
-  R.RiverWindowClosed _ w -> modifyWindow w $ \s -> s {closed = True}
+  R.RiverWindowClosed _ w -> runInHS $ modifyWindow w $ \s -> s {closed = True}
   -- properties
-  R.RiverWindowParent _ window we_parent -> modifyWindow window $ \s -> s {parent = Just we_parent}
-  R.RiverWindowAppId _ window we_app_id -> modifyWindow window $ \s -> s {appId = we_app_id}
-  R.RiverWindowTitle _ window we_title -> modifyWindow window $ \s -> s {title = we_title}
-  R.RiverWindowUnreliablePid _ window we_unreliable_pid -> modifyWindow window $ \s -> s {unreliablePid = Just $ fi we_unreliable_pid}
-  R.RiverWindowIdentifier _ window we_identifier -> do
+  R.RiverWindowParent _ window we_parent -> runInHS $ modifyWindow window $ \s -> s {parent = Just we_parent}
+  R.RiverWindowAppId _ window we_app_id -> runInHS $ modifyWindow window $ \s -> s {appId = we_app_id}
+  R.RiverWindowTitle _ window we_title -> runInHS $ modifyWindow window $ \s -> s {title = we_title}
+  R.RiverWindowUnreliablePid _ window we_unreliable_pid -> runInHS $ modifyWindow window $ \s -> s {unreliablePid = Just $ fi we_unreliable_pid}
+  R.RiverWindowIdentifier _ window we_identifier -> runInHS $ do
     modifyWindow window $ \s -> s {identifier = we_identifier}
     let recoverWindow w = do
           modifyWindowSet $ W.mapWindow (\x -> if x == w then window else x) . W.delete window
@@ -221,20 +220,20 @@ handleEvent e = case e of
     gets (M.lookup we_identifier . recoveredWindows) >>= (`whenJust` recoverWindow)
 
   -- updated width + height
-  R.RiverWindowDimensions _ window we_width we_height -> modifyWindow window $ \s -> s {width = fi we_width, height = fi we_height}
+  R.RiverWindowDimensions _ window we_width we_height -> runInHS $ modifyWindow window $ \s -> s {width = fi we_width, height = fi we_height}
   -- Hints
-  R.RiverWindowDecorationHint _ window we_hint -> modifyWindow window $ \s -> s {decorationHint = Just $ R.River_window_v1_decoration_hint (fi we_hint)}
-  R.RiverWindowPresentationHint _ window we_hint -> modifyWindow window $ \s -> s {presentationHint = Just (R.River_output_v1_presentation_mode (fi we_hint))}
+  R.RiverWindowDecorationHint _ window we_hint -> runInHS $ modifyWindow window $ \s -> s {decorationHint = Just $ R.River_window_v1_decoration_hint (fi we_hint)}
+  R.RiverWindowPresentationHint _ window we_hint -> runInHS $ modifyWindow window $ \s -> s {presentationHint = Just (R.River_output_v1_presentation_mode (fi we_hint))}
   R.RiverWindowDimensionsHint _ window we_min_width we_min_height we_max_width we_max_height ->
-    modifyWindow window $ \s -> s {min_width = fi we_min_width, min_height = fi we_min_height, max_width = fi we_max_width, max_height = fi we_max_height}
+    runInHS $ modifyWindow window $ \s -> s {min_width = fi we_min_width, min_height = fi we_min_height, max_width = fi we_max_width, max_height = fi we_max_height}
   -- fullscreen
-  R.RiverWindowFullscreenRequested _ window output -> doManage' (if output == def then WFullscreen else WFullscreenOnScreen output) window
-  R.RiverWindowExitFullscreenRequested _ window -> doManage' WExitFullscreen window
+  R.RiverWindowFullscreenRequested _ window output -> runInHS $ doManage' (if output == def then WFullscreen else WFullscreenOnScreen output) window
+  R.RiverWindowExitFullscreenRequested _ window -> runInHS $ doManage' WExitFullscreen window
   -- TODO what's this
   R.RiverWindowPointerMoveRequested _ w seat ->
-    modifyWindow w $ \s -> s {pointer_move_requested = seat}
+    runInHS $ modifyWindow w $ \s -> s {pointer_move_requested = seat}
   R.RiverWindowPointerResizeRequested _ w seat edges ->
-    modifyWindow w $ \x -> x {pointer_resize_requested = seat, pointer_resize_requested_edges = fromIntegral edges}
+    runInHS $ modifyWindow w $ \x -> x {pointer_resize_requested = seat, pointer_resize_requested_edges = fromIntegral edges}
   -- TODO maximize
   R.RiverWindowMaximizeRequested _ _w -> return ()
   R.RiverWindowUnmaximizeRequested _ _w -> return ()

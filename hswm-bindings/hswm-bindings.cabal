@@ -28,6 +28,7 @@ extra-source-files:
       include/river-window-management-v1-client-protocol.h
       include/river-xkb-bindings-v1-client-protocol.h
       include/river-xkb-config-v1-client-protocol.h
+      binding-specs/pixman.yaml
       binding-specs/river-input-management.yaml
       binding-specs/river-window-management.yaml
       binding-specs/wayland-client.yaml
@@ -109,7 +110,6 @@ library
           River.XkbBindings
           River.XkbConfig
           Wayland.Client
-          Wayland.Client.Display
           Wayland.Client.Extras
           Wayland.Client.Internal.TH
           Wayland.Client.Internal.Types

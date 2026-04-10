@@ -31,36 +31,43 @@ named str a = SomeAction $ NamedAction str (SomeAction a)
 
 data NamedAction = NamedAction String (SomeAction H)
                  | NamedActionH String (H ())
+                 | NamedActionHS String (HS ())
 
 instance IsAction H NamedAction where
   runner (NamedActionH _ m) = m
   runner (NamedAction _ a)  = runner a
+  runner (NamedActionHS _ a)  = runInHS a
 
   actionSubmap (NamedActionH _ _) = []
+  actionSubmap (NamedActionHS _ _) = []
   actionSubmap (NamedAction _ a)  = actionSubmap a
 
   actionDescription _ (NamedActionH nm _) = nm
+  actionDescription _ (NamedActionHS nm _) = nm
   actionDescription _ (NamedAction nm _)  = nm
 
   --typeDescription _ = ""
 
-namedA :: String -> H () -> (SomeAction H)
+namedA :: String -> H () -> SomeAction H
 namedA desc m = SomeAction (NamedActionH desc m)
 
-messageA :: (Message a, Show a) => a -> (SomeAction H)
-messageA a = SomeAction $ NamedActionH (show a) (sendMessage a)
+namedAS :: String -> HS () -> SomeAction H
+namedAS desc m = SomeAction (NamedActionHS desc m)
 
-windowsA :: String -> (WindowSet -> WindowSet) -> (SomeAction H)
-windowsA desc f = SomeAction $ NamedActionH desc $ modifyWindowSet f
+messageA :: (Message a, Show a) => a -> SomeAction H
+messageA a = SomeAction $ NamedActionHS (show a) (sendMessage a)
 
-windowsMA :: String -> (WindowSet -> H WindowSet) -> (SomeAction H)
-windowsMA desc f = SomeAction $ NamedActionH desc $ withWindowSet $ f >=> modifyWindowSet . const
+windowsA :: String -> (WindowSet -> WindowSet) -> SomeAction H
+windowsA desc f = SomeAction $ NamedActionHS desc $ modifyWindowSet f
+
+windowsMA :: String -> (WindowSet -> HS WindowSet) -> SomeAction H
+windowsMA desc f = SomeAction $ NamedActionHS desc $ withWindowSet $ f >=> modifyWindowSet . const
 
 -- * Keys/submaps
 
 addKeys :: (IsKeySym k, IsAction m a) => [((ModMask, k), a)] -> ConfigDoM m
 addKeys keys c = c
-  { keyBindings = (keyBindings c) ++
+  { keyBindings = keyBindings c ++
     [ ((m, toKeySym k), SomeAction a) | ((m, k), a) <- keys ]
   }
 
@@ -77,7 +84,7 @@ submap defAct subKeys =
 
    in SomeAction smap
 
-fromADTKeys :: [ KeyAction (String, KeySym) (SomeAction H) ] -> [((ModMask, KeySym), (SomeAction H))]
+fromADTKeys :: [ KeyAction (String, KeySym) (SomeAction H) ] -> [((ModMask, KeySym), SomeAction H)]
 fromADTKeys = map doKey where
   doKey (KeyAction k a)  = (doMK k, a)
   doKey (KeySubmap k xs) = (doMK k, submap Nothing (fromADTKeys xs))
@@ -87,16 +94,16 @@ data KeyAction mk a = KeyAction mk a
                     | KeySubmap mk [KeyAction mk a]
                     deriving (Show, Generic)
 
-parseSubmaps :: [(String, (SomeAction H))] -> [ KeyAction (String, KeySym) (SomeAction H) ]
+parseSubmaps :: [(String, SomeAction H)] -> [ KeyAction (String, KeySym) (SomeAction H) ]
 parseSubmaps ks0 =
-  let sanitized = [(L.words s, a) | (s, a) <- ks0 ] :: [([String], (SomeAction H))]
+  let sanitized = [(L.words s, a) | (s, a) <- ks0 ] :: [([String], SomeAction H)]
 
-      keypaths :: [ ( [(String, KeySym)], (SomeAction H) ) ]
+      keypaths :: [ ( [(String, KeySym)], SomeAction H ) ]
       keypaths = do
         (keyseq, a) <- sanitized -- ([String], a)
         return ( [ (L.intercalate "-" (L.init (breakKeys k)) :: String, toKeySym $ L.last (breakKeys k) :: KeySym) | k <- keyseq ], a)
 
-      toADT :: ([(String, KeySym)], (SomeAction H)) -> KeyAction (String, KeySym) (SomeAction H)
+      toADT :: ([(String, KeySym)], SomeAction H) -> KeyAction (String, KeySym) (SomeAction H)
       toADT ([ k ], a)  = KeyAction k a
       toADT (k : ks, a) = KeySubmap k [toADT (ks, a)]
       toADT ([], _)     = error "toADT"
@@ -133,10 +140,3 @@ instance (MonadIO m, MonadReader env m, HasLogFunc env) => IsAction m LaunchProg
   runner (LaunchProgram cmd args) = do
     log' $ display $ "[launch] " <> toText cmd <> " " <> tshow args
     void $ spawnProcess cmd args
-
--- * KeySym parsing
-
-class IsKeySym a where toKeySym :: a -> KeySym
-
-instance IsKeySym KeySym where toKeySym = id
-instance IsKeySym String where toKeySym = xkb_keysym_from_name

@@ -3,7 +3,6 @@ module Main (main) where
 import HSWM
 import HSWM.Util.IPC
 import System.IO qualified as IO
-import Text.Read (readMaybe)
 
 main :: IO ()
 main = do
@@ -14,7 +13,7 @@ main = do
       let msgHandler = \case
             _msg -> logInfo "Response!"
 
-      clientRun Nothing msgHandler consoleHandler
+      clientRun def msgHandler consoleHandler
       where
         consoleHandler say = forever $
             io IO.getLine >>= \ln -> case readMaybe ln :: Maybe ProtoMsg of

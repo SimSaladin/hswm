@@ -22,7 +22,6 @@ module HSWM.Core
   )
 where
 
-import Data.IORef
 import Data.Map qualified as M
 import Data.Monoid (Ap (..))
 import Foreign hiding (void)
@@ -32,7 +31,6 @@ import HSWM.XKB
 import River
 import River.Objects qualified as R
 import River.Safe qualified as R
-import System.Exit (ExitCode (..))
 import Wayland (RegistryCache)
 import Wayland.Client qualified as WL hiding (display)
 import Control.Monad.State
@@ -48,22 +46,30 @@ import HSWM.Types.TypeMap
 
 -- | The read-only window manager state.
 data HConf = HConf
-  { config :: !(HSWMConfig H Layout), -- ^ User-provided configuration.
+  { _stateLocked :: Bool,
+    thisSeat :: Maybe RiverSeat, -- ^ Just when executing seat-originating key/pointer bindings.
+    config :: !(HSWMConfig H Layout), -- ^ User-provided configuration.
     _display :: !WL.Display, -- ^ The Wayland display pointer
     _logFunc :: !LogFunc, -- ^ Root logger function.
     globals :: !(IORef RegistryCache), -- ^ The global objects available through wl_registry.
     _state :: !(TMVar HState), -- ^ The 'HState' XXX FIXME
     eventQueue :: !(TQueue MainEvent), -- ^ XXX ???
-    pendingManageQ, pendingRenderQ :: !(TQueue (H ()))
+    pendingManageQ, pendingRenderQ :: !(TQueue (HS ())),
     -- ^ Pending actions to be emitted in the next manage and render queues (respectively).
+    globalTypeMap :: !(TMVar TypeMap)
   }
   deriving (Generic)
+
+instance HasGlobalTMap HConf where
+  globalTMap = lens globalTypeMap (\s a -> s { globalTypeMap = a })
+
+instance HasLogFunc HConf where
+  logFuncL = lens _logFunc (\s a -> s { _logFunc = a })
 
 -- | Mutable stete.
 data HState = HState
   { windowset :: !WindowSet,
     windowsetOld :: !WindowSet,
-    wlObjects :: !TypeMap,
     _seats :: [Seat],
     _outputs :: [Output],
     _windows :: M.Map RiverWindow Window,
@@ -78,57 +84,63 @@ data HState = HState
 
 -- * H Monad
 
--- a la xmonad
-newtype H a = H (ReaderT HConf (StateT HState IO) a)
-  deriving newtype (Functor, Applicative, Monad, MonadFail, MonadIO, MonadState HState, MonadReader HConf, MonadThrow)
+newtype H a = H (ReaderT HConf IO a)
+  deriving newtype (Functor, Applicative, Monad, MonadFail, MonadIO, MonadReader HConf, MonadThrow, MonadUnliftIO)
   deriving (Semigroup, Monoid) via Ap H a
 
+newtype HS a = HS (ReaderT HConf (StateT HState IO) a)
+  deriving newtype (Functor, Applicative, Monad, MonadFail, MonadIO, MonadState HState, MonadReader HConf, MonadThrow)
+  deriving (Semigroup, Monoid) via Ap HS a
+
 instance Default (H ()) where def = return ()
+instance Default (HS ()) where def = return ()
 
 instance IsAction H (H ()) where runner = id
-
-instance HasGlobalTMap HState where
-  globalTMap = lens wlObjects (\s a -> s { wlObjects = a })
-
-instance HasLogFunc HConf where
-  logFuncL = lens _logFunc (\s a -> s { _logFunc = a })
-
-instance MonadUnliftIO H where
-  withRunInIO :: ((forall a. H a -> IO a) -> IO b) -> H b
-  withRunInIO f = do
-    conf <- ask
-    io $! f (bracketOnError (atomically $ takeTMVar conf._state) (atomically . putTMVar conf._state) . runner conf)
-      where
-    runner c a st = do
-      (r, st') <- runH c st a
-      atomically (putTMVar c._state st')
-      return r
 
 instance MonadFix H where
   mfix :: (a -> H a) -> H a
   mfix f = H (mfix g) where g a = let H a' = f a in a'
+instance MonadFix HS where
+  mfix :: (a -> HS a) -> HS a
+  mfix f = HS (mfix g) where g a = let HS a' = f a in a'
 
--- a la xmonad
-runH :: HConf -> HState -> H a -> IO (a, HState)
-runH c st (H a) = runStateT (runReaderT a c) st
+runH :: HConf -> H a -> IO a
+runH c (H a) = runReaderT a c
 
-withRunInH :: ((forall a. H a -> IO a) -> IO b) -> H b
-withRunInH f = do
+runHS :: HConf -> HState -> HS a -> IO (a, HState)
+runHS c st (HS a) = runStateT (runReaderT a c) st
+
+runInHS :: (MonadIO m, MonadReader HConf m) => HS a -> m a
+runInHS a = do
   conf <- ask
-  io $ f $ \a -> bracketOnError (atomically $ takeTMVar conf._state) (atomically . putTMVar conf._state) $ \st -> do
-    (r, st') <- runH conf st a
+  when conf._stateLocked $ throwString "runInHS: state locked (attempted to nest state lock?)"
+  io $ bracketOnError (atomically $ takeTMVar conf._state) (atomically . putTMVar conf._state) $ \st -> do
+    (r, st') <- runHS conf { _stateLocked = True } st a
     atomically $ putTMVar conf._state st'
     return r
+
+liftH :: (MonadReader HConf m, MonadIO m) => H a -> m a
+liftH a = do
+  c <- ask
+  io $ runH c a
 
 -- a la xmonad
 catchH :: H a -> H a -> H a
 catchH job errcase = do
-  st <- get
   c <- ask
-  (a, s') <- liftIO $ runH c st job
+  liftIO $ runH c job
         `catch` \e -> case fromException e of
           Just (_ :: ExitCode) -> throwM e
-          _ -> hPutBuilder stderr (getUtf8Builder $ display @Text "error: " <> display (tshow e)) >> runH c st errcase
+          _ -> hPutBuilder stderr (getUtf8Builder $ display @Text "error: " <> display (tshow e)) >> runH c errcase
+
+catchHS :: HS a -> HS a -> HS a
+catchHS job errcase = do
+  c <- ask
+  s <- get
+  (a, s') <- liftIO $ runHS c s job
+        `catch` \e -> case fromException e of
+          Just (_ :: ExitCode) -> throwM e
+          _ -> hPutBuilder stderr (getUtf8Builder $ display @Text "error: " <> display (tshow e)) >> runHS c s errcase
   put s'
   return a
 
@@ -145,15 +157,15 @@ userCodeDef defValue a = fromMaybe defValue <$> userCode a
 -- * Manage/Render Event queues
 
 class HasEventQueues env where
-  pendingManageQL :: Lens' env (TQueue (H ()))
-  pendingRenderQL :: Lens' env (TQueue (H ()))
+  pendingManageQL :: Lens' env (TQueue (HS ()))
+  pendingRenderQL :: Lens' env (TQueue (HS ()))
 
 instance HasEventQueues HConf where
   pendingManageQL = lens pendingManageQ $ \s a -> s { pendingManageQ = a }
   pendingRenderQL = lens pendingRenderQ $ \s a -> s { pendingRenderQ = a }
 
 getEventQueueFuncs :: (MonadReader env m, HasEventQueues env, MonadIO inner)
-                   => m (H e1 -> inner (), H e2 -> inner ()) -- ^ @(queueForManagePhase, queueForRenderPhase)@
+                   => m (HS e1 -> inner (), HS e2 -> inner ()) -- ^ @(queueForManagePhase, queueForRenderPhase)@
 getEventQueueFuncs = (wrap *** wrap) <$> asks ((,) <$> view pendingManageQL <*> view pendingRenderQL)
   where
     wrap q = atomically . writeTQueue q . void
@@ -176,7 +188,7 @@ data Seat = Seat
     --
     pending_action :: !SeatAction,
     submap_pending :: Maybe (SomeAction H, XkbBindingMap (SomeAction H)),
-    inputOverride :: !(Maybe (H Bool, XkbBindingMap (SomeAction H))),
+    inputOverride :: !(Maybe (HS Bool, XkbBindingMap (SomeAction H))),
     -- Pointer move/resize
     op :: SeatOp,
     op_window :: RiverWindow,
@@ -200,7 +212,7 @@ data SeatAction
   | -- | Cancel submap input, resetting to root bindings.
     S_SUBMAP_CANCEL
   | -- | Temporarily interpret all keyboard input differently.
-    S_INPUT_OVERRIDE (H Bool) [((ModMask, KeySym), SomeAction H)]
+    S_INPUT_OVERRIDE (HS Bool) [((ModMask, KeySym), SomeAction H)]
   | -- | Cancel input override mode
     S_INPUT_OVERRIDE_CANCEL
   deriving (Show, Generic)
@@ -212,6 +224,7 @@ instance Show (StablePtr a) where show :: StablePtr a -> String
                                   show _ = "<SP>"
 instance Show (H ()) where show _ = "H()"
 instance Show (H Bool) where show _ = "H()"
+instance Show (HS Bool) where show _ = "HS()"
 
 instance Default Seat where
   def =

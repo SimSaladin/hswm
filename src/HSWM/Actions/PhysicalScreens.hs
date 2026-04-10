@@ -85,7 +85,7 @@ getScreenIdAndRectangle screen = (W.screen screen, rect) where
   rect = screenRect $ W.screenDetail screen
 
 -- | Translate a physical screen index to a 'ScreenId'
-getScreen:: ScreenComparator -> PhysicalScreen -> H (Maybe ScreenId)
+getScreen:: ScreenComparator -> PhysicalScreen -> HS (Maybe ScreenId)
 getScreen (ScreenComparator cmpScreen) (P i) = do w <- gets windowset
                                                   let screens = W.current w : W.visible w
                                                   if i<0 || i >= length screens
@@ -94,14 +94,14 @@ getScreen (ScreenComparator cmpScreen) (P i) = do w <- gets windowset
                                                     in return $ Just $ W.screen $ ss !! i
 
 -- | Switch to a given physical screen
-viewScreen :: ScreenComparator -> PhysicalScreen -> H ()
+viewScreen :: ScreenComparator -> PhysicalScreen -> HS ()
 viewScreen sc p = do i <- getScreen sc p
                      whenJust i $ \s -> do
                          w <- screenWorkspace s
                          whenJust w $ windows . W.view
 
 -- | Send the active window to a given physical screen
-sendToScreen :: ScreenComparator -> PhysicalScreen -> H ()
+sendToScreen :: ScreenComparator -> PhysicalScreen -> HS ()
 sendToScreen sc p = do i <- getScreen sc p
                        whenJust i $ \s -> do
                          w <- screenWorkspace s
@@ -135,7 +135,7 @@ horizontalScreenOrderer = screenComparatorByRectangle comparator where
     comparator (Rectangle x1 y1 _ _) (Rectangle x2 y2 _ _) = compare (x1, y1) (x2, y2)
 
 -- | Get ScreenId for neighbours of the current screen based on position offset.
-getNeighbour :: ScreenComparator -> Int -> H ScreenId
+getNeighbour :: ScreenComparator -> Int -> HS ScreenId
 getNeighbour (ScreenComparator cmpScreen) d =
   do w <- gets windowset
      let ss = map W.screen $ sortBy (cmpScreen `on` getScreenIdAndRectangle) $ W.current w : W.visible w
@@ -143,17 +143,17 @@ getNeighbour (ScreenComparator cmpScreen) d =
          pos = (curPos + d) `mod` length ss
      return $ ss !! pos
 
-neighbourWindows :: ScreenComparator -> Int -> (WorkspaceId -> WindowSet -> WindowSet) -> H ()
+neighbourWindows :: ScreenComparator -> Int -> (WorkspaceId -> WindowSet -> WindowSet) -> HS ()
 neighbourWindows sc d f = do s <- getNeighbour sc d
                              w <- screenWorkspace s
                              whenJust w $ windows . f
 
 -- | Apply operation on a WindowSet with the WorkspaceId of the next screen in the physical order as parameter.
-onNextNeighbour :: ScreenComparator -> (WorkspaceId -> WindowSet -> WindowSet) -> H ()
+onNextNeighbour :: ScreenComparator -> (WorkspaceId -> WindowSet -> WindowSet) -> HS ()
 onNextNeighbour sc = neighbourWindows sc 1
 
 -- | Apply operation on a WindowSet with the WorkspaceId of the previous screen in the physical order as parameter.
-onPrevNeighbour :: ScreenComparator -> (WorkspaceId -> WindowSet -> WindowSet) -> H ()
+onPrevNeighbour :: ScreenComparator -> (WorkspaceId -> WindowSet -> WindowSet) -> HS ()
 onPrevNeighbour sc = neighbourWindows sc (-1)
 
 -- | An alternative to 'HSWM.Operations.rescreen' that avoids reshuffling
@@ -162,7 +162,7 @@ onPrevNeighbour sc = neighbourWindows sc (-1)
 --
 -- See 'HSWM.Hooks.Rescreen.setRescreenWorkspacesHook', which lets you
 -- replace the builtin rescreen handler.
-rescreen :: ScreenComparator -> H ()
+rescreen :: ScreenComparator -> HS ()
 rescreen (ScreenComparator cmpScreen) = do
   log' "warning: physcreen/rescreen is not implemented!"
 

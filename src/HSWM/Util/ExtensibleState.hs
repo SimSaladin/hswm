@@ -33,16 +33,15 @@ module HSWM.Util.ExtensibleState (
 import Data.Typeable (typeOf,cast)
 import qualified Data.Map as M
 
-import Prelude hiding (put, get, modify, modify', gets)
-import HSWM.Core (H, ExtensionClass(..), StateExtension(..), HState(..))
+import Prelude hiding (modify, gets)
+import HSWM.Core (HS, ExtensionClass(..), StateExtension(..), HState(..))
 
 --import HSWM.Util.PureX
 import qualified Control.Monad.State as State
-import Control.Concurrent (forkIO, killThread)
 
 class MonadState HState m => XLike m where
 
-instance XLike H
+instance XLike HS
 
 -- ---------------------------------------------------------------------
 -- $usage

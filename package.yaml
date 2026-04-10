@@ -24,6 +24,7 @@ _common/language: &language
   default-extensions: &default-extensions
     - RecordWildCards
     - OverloadedRecordDot
+    - OverloadedLabels
     - DuplicateRecordFields
     - OverloadedStrings
     - DerivingVia
@@ -46,7 +47,6 @@ internal-libraries:
       - rio
       - text
       - mtl
-      - logging
       - data-default
       - stm
 

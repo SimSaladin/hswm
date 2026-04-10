@@ -80,6 +80,7 @@ $(bindGenSpecDir)/Generated.Pixman.yaml: FORCE
 	  --gen-binding-spec $@ \
 	  --module $(patsubst %.yaml,%,$(@F)) \
 	  $(shell pkg-config --cflags pixman-1) \
+	  --prescriptive-binding-spec $(bindingSpecs)/pixman.yaml \
 	  --select-from-main-header-dirs
 
 $(bindGenSpecDir)/Generated.Wayland.Util.yaml: FORCE

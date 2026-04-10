@@ -59,7 +59,7 @@ debugHook ev
    | otherwise                             = logTraceShow ev >> mempty
 
 debugAction :: H ()
-debugAction = do
+debugAction = runInHS $ do
   logDebug "[[[ Windows ]]]" >> gets _windows  >>= mapM_ logTraceShow . M.elems
   logDebug "[[[WindowSet]]]" >> gets windowset >>= logTraceShow
   logDebug "[[[ Outputs ]]]" >> gets _outputs  >>= mapM_ logTraceShow

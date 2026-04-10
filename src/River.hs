@@ -17,7 +17,6 @@ module River
   , module River.XKB.Bindings
   ) where
 
-import Data.Word (Word32)
 import River.WMP
 import River.XKB.Bindings
 

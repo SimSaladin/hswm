@@ -100,7 +100,6 @@
 module Wayland.Client
 
   ( module Types
-  , module Wayland.Client.Display
   , module Wayland.Client.Objects
   , module Safe
 
@@ -336,7 +335,6 @@ module Wayland.Client
   --    struct wl_proxy * wl_proxy_marshal_constructor_versioned(struct wl_proxy *proxy, uint32_t opcode, const struct wl_interface *interface, uint32_t version, ...);
   -- @
 
-import           Wayland.Client.Display
 import           Wayland.Client.Internal.Types as Types
 import           Wayland.Client.Objects
 

@@ -1,7 +1,6 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE PatternGuards #-}
-{-# LANGUAGE MultiWayIf #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  HSWM.Actions.CycleRecentWS
@@ -43,12 +42,6 @@ import Data.List ((!!), splitAt)
 import Prelude hiding (view)
 import HSWM hiding (workspaces, screen, view)
 import HSWM.StackSet hiding (filter, modify)
-import Control.Monad.State (get)
-
-import Control.Arrow ((&&&))
-import Data.Function (on)
-import Control.Monad.State (lift)
-
 import HSWM.Util.GrabKeyboard
 
 -- $usage
@@ -88,12 +81,12 @@ cycleRecentNonEmptyWS = cycleWindowSets $ recentWS (not . null . stack)
 
 -- | Switch to the most recent workspace. The stack of most recently used workspaces
 -- is updated, so repeated use toggles between a pair of workspaces.
-toggleRecentWS :: H ()
+toggleRecentWS :: HS ()
 toggleRecentWS = toggleWindowSets $ recentWS (const True)
 
 
 -- | Like 'toggleRecentWS', but restricted to non-empty workspaces.
-toggleRecentNonEmptyWS :: H ()
+toggleRecentNonEmptyWS :: HS ()
 toggleRecentNonEmptyWS = toggleWindowSets $ recentWS (not . null . stack)
 
 
@@ -119,28 +112,28 @@ cycleWindowSets :: (WindowSet -> [WorkspaceId]) -- ^ A function used to create a
                 -> KeySym                       -- ^ Key used to preview previous workspace from the list of generated options.
                                                 --   If it's the same as nextOption key, it is effectively ignored.
                 -> H ()
-cycleWindowSets genOptions mods keyNext keyPrev = do
-  -- (options, unView') <- gets $ (genOptions &&& unView) . windowset
-  -- let
-  --    preview = do
-  --      logInfo "[cyclews] previewing!"
-  --      i <- get
-  --      lift $ windows (view (options !! (i `mod` n)) . unView')
-  --      where n = length options
-  undefined
-  -- TODO
-  -- withKeyboardGrab ...
+cycleWindowSets genOptions holdMods keyNext keyPrev = do
+  (options, unView') <- runInHS $ gets $ (genOptions &&& unView) . windowset
+  let
+     previewWS i = do
+       logInfo $ "[cyclews] previewing " <> fromString (show i)
+       runInHS $ windows (view (options !! (i `mod` n)) . unView')
+       manageDirty
+       where n = length options
 
-   -- grabWhileDo :: acc -> ModMask -> [KeySym] -> (KeySym -> acc -> H acc) -> H ()
-  --grabWhileDo (-1) mods [keyPrev, keyNext] $ \s -> if
-  --  | s == keyNext -> modify succ >> preview
-  --  | s == keyPrev -> modify pred >> preview
-  --  | otherwise    -> logInfo "[cyclews] previewing!" pure ()
+     process s (Right GK{..})
+       | state > 0, keysym == fi keyNext = previewWS (succ s) >> pure (Right (succ s))
+       | state > 0, keysym == fi keyPrev = previewWS (pred s) >> pure (Right (pred s))
+       | otherwise = pure (Right s)
+     process s (Right GMod{..})
+       | mods == 0 = pure (Left Done)
+       | otherwise = pure (Right s)
+     process _ Left{} = pure (Left Done)
 
---  void . repeatableSt (-1) mods keyNext $ \t s -> when (t == keyPress) $ if
---    | s == keyNext -> modify succ >> preview
---    | s == keyPrev -> modify pred >> preview
---    | otherwise    -> pure ()
+  Just rs <- asks thisSeat
+  Just seat <- runInHS $ lookupSeat rs
+  previewWS 0
+  withKeyboardGrab seat holdMods [keyNext, keyPrev] process 0
 
 -- | Given an old and a new 'WindowSet', which is __exactly__ one
 -- 'view' away from the old one, restore the workspace order of the
@@ -166,7 +159,7 @@ unView w0 w1 = fixOrderH . fixOrderV . view' (currentTag w0) $ w1
 
 -- | Given some function that generates a list of workspaces from a
 -- given 'WindowSet', switch to the first generated workspace.
-toggleWindowSets :: (WindowSet -> [WorkspaceId]) -> H ()
+toggleWindowSets :: (WindowSet -> [WorkspaceId]) -> HS ()
 toggleWindowSets genOptions = do
   options <- gets $ genOptions . windowset
   case options of

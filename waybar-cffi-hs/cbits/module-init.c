@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <HsFFI.h>
+#include <Rts.h>
 #include "Waybar/CFFI/Plugin_stub.h"
 
 extern void CAT(__stginit_, MODULE)(void);
@@ -21,7 +22,11 @@ static HsBool library_init(void)
     static char *argv[] = { STR(MODULE) ".so", 0 }, **argp = argv;
     static int argc = 0;
 
-    hs_init(&argc, &argp);
+    //hs_init(&argc, &argp);
+
+    RtsConfig conf = defaultRtsConfig;
+    conf.rts_opts_enabled = RtsOptsAll;
+    hs_init_ghc(&argc, &argp, conf);
 
     plugin_runtime_init();
 
