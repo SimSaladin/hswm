@@ -69,7 +69,6 @@ library
           HSWM.Wallpaper
           HSWM.Windows
           HSWM.XKB
-          HSWM.XKB.FFI
           River
           River.WMP
           River.XKB.Bindings
@@ -100,6 +99,7 @@ library
         , unix
         , utf8-string
         , vector
+        , xkbcommon-bindings
     mixins:
           base hiding (Prelude)
         , hswm:hswm-prelude (HSWM.Prelude as Prelude)

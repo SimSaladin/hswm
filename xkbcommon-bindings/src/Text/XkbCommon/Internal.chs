@@ -1,5 +1,6 @@
-module HSWM.XKB.FFI where
+module Text.XkbCommon.Internal where
 
+import RIO
 import Data.Enum
 import Foreign
 import Foreign.C
@@ -46,7 +47,7 @@ data XkbRuleNames = XkbRuleNames { rules, model, layout, variant, options :: !St
 -- ** Internal utilities
 
 enumsToIntegral :: (Enum a, Integral b) => [a] -> b
-enumsToIntegral xs = fi $ foldl' (.&.) 0 (map fromEnum xs)
+enumsToIntegral xs = fromIntegral $ foldl' (.&.) 0 (map fromEnum xs)
 
 checkXkbKeymapResult :: XkbKeymap -> IO XkbKeymap
 checkXkbKeymapResult res = do
@@ -170,7 +171,7 @@ withXkbRuleNames x m = allocaBytesAligned {#sizeof xkb_rule_names#} {#alignof xk
   ,id `LayoutIndex'
   } -> `Maybe XkbStateComponent' maybeToEnum #}
 
-{#fun xkb_state_key_get_one_sym as ^ { `XkbState' , fi `XkbKeycode' } -> `KeySym' fi #}
+{#fun xkb_state_key_get_one_sym as ^ { `XkbState' , fromIntegral `XkbKeycode' } -> `KeySym' fromIntegral #}
 
 -- * XkbKeysym
 
@@ -186,7 +187,7 @@ xkbKeysymFromName name = unsafePerformIO $ withCString name $ \c_name -> return 
 xkbKeysymGetName :: KeySym -> String
 xkbKeysymGetName k = unsafePerformIO $ allocaBytes 64 $ \buf ->
     let len = {#call pure xkb_keysym_get_name#} k buf 64 in
-    if len == -1 then impureThrow $ XkbKeysymNameNotFound ("xkb_keysym_get_name " ++ show k) else peekCStringLen (buf, fi len)
+    if len == -1 then impureThrow $ XkbKeysymNameNotFound ("xkb_keysym_get_name " ++ show k) else peekCStringLen (buf, fromIntegral len)
 
 -----------------------------------------------------------------------------
 -- * KeySyms

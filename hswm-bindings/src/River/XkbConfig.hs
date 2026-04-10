@@ -1,4 +1,4 @@
--- |((
+-- |
 -- Module      : River.XkbConfig
 -- Description : Short description
 -- Copyright   : (c) Samuli Thomasson, 2026
@@ -11,7 +11,9 @@ module River.XkbConfig where
 import Generated.River.XkbConfigV1
 import Generated.River.XkbConfigV1.Global
 import Generated.River.XkbConfigV1.Safe
+
 import River.InputManagement
+
 import Wayland.Client.Internal.TH
 import Language.Haskell.TH
 

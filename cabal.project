@@ -2,6 +2,7 @@ packages:
   hswm
   hswm-bindings
   waybar-cffi-hs
+  xkbcommon-bindings
 
 jobs: $ncpus
 documentation: True

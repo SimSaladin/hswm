@@ -88,8 +88,7 @@ library:
     - mtl
     - stm
     - typed-process
-  pkgconfig-depends:
-    - xkbcommon
+    - xkbcommon-bindings
   build-tools:
     - c2hs:c2hs  # Note: may need to "cabal update for this to start working
 

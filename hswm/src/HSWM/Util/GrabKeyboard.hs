@@ -18,7 +18,7 @@ import           Foreign hiding (void)
 --import           Generated.Wayland.Client (pattern WL_KEYBOARD_KEY_STATE_PRESSED)
 import           HSWM.Core
 import           HSWM.Operations
-import           HSWM.XKB.FFI
+import           HSWM.XKB
 import qualified Wayland.Client as WL
 import           Wlr
 

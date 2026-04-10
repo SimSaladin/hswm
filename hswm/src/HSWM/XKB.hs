@@ -2,10 +2,10 @@
 
 module HSWM.XKB
   ( module HSWM.XKB
-  , module HSWM.XKB.FFI
+  , module Text.XkbCommon.Internal
   ) where
 
-import HSWM.XKB.FFI
+import Text.XkbCommon.Internal
 import Foreign.C
 
 -- * Linux evdev codes
