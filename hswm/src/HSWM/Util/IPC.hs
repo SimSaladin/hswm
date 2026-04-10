@@ -6,7 +6,7 @@
 -- Description : Short description
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
--- Maintainer  : Samuli Thomasson <samuli.thomasson@paivola.fi>
+-- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
 module HSWM.Util.IPC where
