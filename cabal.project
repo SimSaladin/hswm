@@ -1,5 +1,5 @@
 packages:
-  .
+  hswm
   hswm-bindings
   waybar-cffi-hs
 

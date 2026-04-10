@@ -13,26 +13,6 @@ maintainer:         samuli.thomasson@pm.me
 license:            MIT
 license-file:       LICENSE
 build-type:         Simple
-extra-doc-files:
-      README.md
-extra-source-files:
-      Makefile
-      hswm-bindings/include/input-method-unstable-v2-client-protocol.h
-      hswm-bindings/include/river-input-management-v1-client-protocol.h
-      hswm-bindings/include/river-layer-shell-v1-client-protocol.h
-      hswm-bindings/include/river-libinput-config-v1-client-protocol.h
-      hswm-bindings/include/river-status-unstable-v1-server-protocol.h
-      hswm-bindings/include/river-window-management-v1-client-protocol.h
-      hswm-bindings/include/river-xkb-bindings-v1-client-protocol.h
-      hswm-bindings/include/river-xkb-config-v1-client-protocol.h
-      hswm-bindings/cbits/input-method-unstable-v2-protocol.c
-      hswm-bindings/cbits/river-input-management-v1-protocol.c
-      hswm-bindings/cbits/river-layer-shell-v1-protocol.c
-      hswm-bindings/cbits/river-libinput-config-v1-protocol.c
-      hswm-bindings/cbits/river-status-unstable-v1-protocol.c
-      hswm-bindings/cbits/river-window-management-v1-protocol.c
-      hswm-bindings/cbits/river-xkb-bindings-v1-protocol.c
-      hswm-bindings/cbits/river-xkb-config-v1-protocol.c
 
 library
     hs-source-dirs:
@@ -124,17 +104,6 @@ library
           base hiding (Prelude)
         , hswm:hswm-prelude (HSWM.Prelude as Prelude)
     default-language: GHC2024
-    include-dirs:
-          hswm-bindings/include
-    c-sources:
-          hswm-bindings/cbits/input-method-unstable-v2-protocol.c
-          hswm-bindings/cbits/river-input-management-v1-protocol.c
-          hswm-bindings/cbits/river-layer-shell-v1-protocol.c
-          hswm-bindings/cbits/river-libinput-config-v1-protocol.c
-          hswm-bindings/cbits/river-status-unstable-v1-protocol.c
-          hswm-bindings/cbits/river-window-management-v1-protocol.c
-          hswm-bindings/cbits/river-xkb-bindings-v1-protocol.c
-          hswm-bindings/cbits/river-xkb-config-v1-protocol.c
     pkgconfig-depends:
           xkbcommon
     build-tool-depends:

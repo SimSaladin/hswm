@@ -1,15 +1,15 @@
 cradle:
   cabal:
-    - path: "./src"
+    - path: "hswm/src"
       component: "lib:hswm"
 
-    - path: "./hswm-prelude"
+    - path: "hswm/hswm-prelude"
       component: "hswm:lib:hswm-prelude"
 
-    - path: "./app/Main.hs"
+    - path: "hswm/app/Main.hs"
       component: "hswm:exe:hswm"
 
-    - path: "./app-ctl/Main.hs"
+    - path: "hswm/app-ctl/Main.hs"
       component: "hswm:exe:hswmctl"
 
     - path: "hswm-bindings/src"

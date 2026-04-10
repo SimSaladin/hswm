@@ -12,12 +12,11 @@ author:             Samuli Thomasson
 maintainer:         samuli.thomasson@pm.me
 # copyright:
 build-type:         Simple
-extra-doc-files:    README.md
+#extra-doc-files:    README.md
 #                  CHANGELOG.md
-extra-source-files:
-  - Makefile
-  - hswm-bindings/include/*.h
-  - hswm-bindings/cbits/*.c
+#extra-source-files:
+#  - hswm-bindings/include/*.h
+#  - hswm-bindings/cbits/*.c
 
 _common/language: &language
   language: GHC2024
@@ -91,14 +90,6 @@ library:
     - typed-process
   pkgconfig-depends:
     - xkbcommon
-    #- wayland-protocols
-    #- wayland-client
-    #- pixman-1
-    #- gtk+-3.0 # XXX not strictly needed /here/
-  include-dirs:
-    - hswm-bindings/include
-  c-sources:
-    - hswm-bindings/cbits/*-protocol.c
   build-tools:
     - c2hs:c2hs  # Note: may need to "cabal update for this to start working
 
