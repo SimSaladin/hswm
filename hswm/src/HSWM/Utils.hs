@@ -15,6 +15,8 @@ module HSWM.Utils where
 
 import           HSWM.XKB (ModMask)
 
+import qualified Data.ByteString.Lazy as LB
+import qualified Data.ByteString.Char8 as C8
 import           Data.Bits
 import           Data.Char (toLower)
 import qualified Data.List as L
@@ -28,6 +30,8 @@ import           System.Posix.Process (createSession, executeFile, forkProcess,
 import           System.Posix.Signals
 import           System.Posix.Types (ProcessID)
 import qualified Text.Pretty.Simple as P
+
+import System.Process.Typed
 
 -- | Parse a color in the format 0xRRGGBB or 0xRRGGBBAA and convert it to
 -- 32-bit color values (used by Window.set_borders in rwm).
@@ -261,3 +265,12 @@ uninstallSignalHandlers = io $ do
     _ <- installHandler openEndedPipe Default Nothing
     _ <- installHandler sigCHLD Default Nothing
     return ()
+
+readProcess cmd args = do
+  p <- startProcess
+    $ setStdout byteStringOutput
+    $ proc cmd args
+  out <- atomically $ getStdout p
+  _ <- try @_ @SomeException $ stopProcess p
+  return $ L.init $ C8.unpack $ LB.toStrict out
+

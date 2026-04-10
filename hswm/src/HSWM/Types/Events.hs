@@ -13,6 +13,7 @@ import River.Objects qualified as R
 import Wayland.Client qualified as WL
 import Wayland.Client.Extras qualified as WL
 import Wlr qualified as Zwp
+import qualified Bindings.Wayland.ExtSessionLockV1 as SL
 
 -- | Mash-up of all River/Wayland generated events
 data Event
@@ -41,6 +42,7 @@ data Event
   | -- Ext_*
     ForeignTopLevelListV1 !WL.ForeignToplevelListEvent
   | ForeignTopLevelHandleV1 !WL.ForeignToplevelHandleEvent
+  | SessionLockEvent !SL.SessionLockEvent
   | -- Zwp_*
     ZwpIM2PopupSurfaceE !Zwp.ZwpInputPopupSurfaceEvent
   | ZwpIM2KeyboardGrabE !Zwp.ZwpInputMethodKeyboardGrabEvent

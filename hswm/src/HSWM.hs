@@ -20,6 +20,7 @@ module HSWM
   , module River
   , module Prelude
   , module ReExports
+  , module Core
   ) where
 
 import           HSWM.Config
@@ -29,6 +30,7 @@ import           HSWM.Main
 import           HSWM.Operations
 import           HSWM.Utils
 import           HSWM.XKB
+import           Core
 import           River
 
 import           Data.Default as ReExports

@@ -72,7 +72,8 @@ bindgen-river:	\
 	$(bindGenSpecDir)/Generated.River.XkbBindingsV1.yaml \
 	$(bindGenSpecDir)/Generated.River.LibinputConfigV1.yaml \
 	$(bindGenSpecDir)/Generated.River.LayerShellV1.yaml \
-	$(bindGenSpecDir)/Generated.Wlr.InputMethodV2.yaml
+	$(bindGenSpecDir)/Generated.Wlr.InputMethodV2.yaml \
+	$(bindGenSpecDir)/Bindings.Wayland.ExtSessionLockV1.Generated.yaml
 
 $(bindGenSpecDir)/Generated.Pixman.yaml: FORCE
 	$(HS_BIND_GEN) \
@@ -172,6 +173,15 @@ $(bindGenSpecDir)/Generated.Wayland.Protocol.ForeignTopLevelListV1.yaml: $(HEADE
 
 # input-method-unstable-v2-client-protocol.h
 $(bindGenSpecDir)/Generated.Wlr.InputMethodV2.yaml: $(HEADERDIR)/input-method-unstable-v2-client-protocol.h FORCE
+	$(HS_BIND_GEN) $(<F) \
+	  --gen-binding-spec $@ \
+	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \
+	  --module $(patsubst %.yaml,%,$(@F)) \
+	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml \
+	  --external-binding-spec $(bindingSpecs)/wayland-client.yaml
+
+# ext-session-lock-client-protocol.h
+$(bindGenSpecDir)/Bindings.Wayland.ExtSessionLockV1.Generated.yaml: $(HEADERDIR)/ext-session-lock-v1-client-protocol.h FORCE
 	$(HS_BIND_GEN) $(<F) \
 	  --gen-binding-spec $@ \
 	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \

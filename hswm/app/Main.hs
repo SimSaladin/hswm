@@ -19,6 +19,9 @@ import qualified HSWM.Util.RofiPrompt as RP
 
 import           Data.Ratio
 import qualified Data.Map as M
+import qualified Data.List as L
+import qualified System.Environment
+import Text.Printf
 
 tagKeys      = map (:[]) ['a'..'z']
 screenKeys   = map (:[]) "wvza"
@@ -32,6 +35,26 @@ rofiPrompt = def
   , RP._markupRows = True
   , RP._dpi = 150
   }
+
+environPrompt :: H ()
+environPrompt = do
+  varsEnv <- io System.Environment.getEnvironment
+  varsSessionString <- readProcess "systemctl" [ "--user", "--no-block", "--no-pager", "show-environment" ]
+  let varsSession = map parseLine $ lines varsSessionString
+      vars = varsSession ++ [ entry | entry@(k, _) <- varsEnv, k `notElem` map fst varsSession ]
+      rows = [ "<b>" <> k <> "</b>=" <> v | (k,v) <- vars ]
+  RP.rofiRun rofiPrompt { RP._format = "p" } rows >>= (`whenJust` doApply)
+    where
+      doApply input = do
+        logInfo $ "environ prompt: " <> fromString input
+
+      parseLine :: String -> (String, String)
+      parseLine line = let (key, rest) = L.break (== '=') line
+                           in case rest of
+                                ('=':val) -> (key, val)
+                                _         -> (key, "")  -- fallback in case there's no '='
+
+
 
 mkWorkspacePrompt prompt apply = do
   (curTag, allTags) <- runInHS $ withWindowSet $ return . (W.currentTag &&& W.allTags)
@@ -114,7 +137,7 @@ main = do
     -- "M-q"           myRecompileRestart False True ? "Recompile && Restart"
     -- "M-C-q"         myRecompileRestart True False ? "Recompile (force)"
     -- "M-S-<Return>"  FloatNext.floatNext True >> spawnTerm def "" ? "Terminal (floating)"
-    -- "M-$"           spawn (sh "physlock -p \"${HOSTNAME} ${DISPLAY}\"") ? "Lock (physlock)"
+    , ("M-Dollar", "Lock session" =? void (spawnProcess @H "swaylock" ["-k"]))
     -- "M-<Print>"     takeScreenshot
 
      -- ======== Execute ==========
@@ -228,8 +251,8 @@ main = do
      -- "M-f h"     >+ pidPrompt xpConfig "SpawnOn/PPID" ?+ (\p -> wsPromptWithCurrent xpConfig "Shift to:" ?+ setManageByPPID p) ? "SpawnOn by Window PID"
 
      -- ====== Media
-     --   "M-+"                     >+ volume 3
-     --   "M--"                     >+ volume (-3)
+     , ("M-plus",                    volume 3)
+     , ("M-minus",                   volume (-3))
      --   "M-#"                     >+ togglePad "ncmpcpp"
      --   "M-@"                     >+ togglePad "taskwarrior-tui"
      --   "M-c m"                   >+ spawnOnceKitty "Pulsemixer" "pulsemixer" [] doCenterFloat
@@ -245,15 +268,15 @@ main = do
      --   "<XF86AudioStop>"         >+ mpc ["stop"]
      --   "<XF86AudioPrev>"         >+ mpc ["prev"]
      --   "<XF86AudioNext>"         >+ mpc ["next"]
-     --   "<XF86AudioMute>"         >+ toggleMuteSink
-     --   "<XF86AudioMicMute>"      >+ toggleMuteSource
-     --   "<XF86AudioRaiseVolume>"  >+ volume 3
-     --   "<XF86AudioLowerVolume>"  >+ volume (-3)
+     , ("XF86AudioMute",        toggleMuteSink)
+     , ("XF86AudioMicMute",     toggleMuteSource)
+     , ("XF86AudioRaiseVolume",  volume 3)
+     , ("XF86AudioLowerVolume",  volume (-3))
      --   "<XF86MonBrightnessUp>"   >+ backlight   2
      --   "<XF86MonBrightnessDown>" >+ backlight (-2)
 
      -- group "Prompts (Execute)" $ do
-     --   "M-r e"   >+ environPrompt xpConfig               ? "Environ (Prompt)"
+     , ("M-r e",               "Environment prompt" =? environPrompt)
      --   "M-r p"   >+ XP.Pass.passPrompt xpConfig          ? "Pass (Prompt)"
      --   "M-r C-p" >+ XP.Pass.passOTPPrompt xpConfig       ? "Pass OTP (Prompt)"
      --   "M-r C-u" >+ XP.Pass.passPromptWith "show-field --clip username" xpConfig ? "Pass username (Prompt)"
@@ -261,21 +284,6 @@ main = do
      --   "M-r s"   >+ inputPromptWithCompl xpConfig "scratchpad" (scratchpadCompl xpConfig myScratchpads) ?+ getAction . togglePad ? "Prompt: pad"
      --   "M-r d"   >+ desktopEntryPrompt xpConfig [] ? "Desktop Entry Launch Prompt"
      --   "M-r u"   >+ inputPromptWithHistCompl xpConfig "browser-app" ?+ (\s -> launchDesktopEntry "chrome-app" [s]) ? "Chrome App"
-
-     -- ======== Prompts (XMonad)
-     --   let allCommands =
-     --         [ enumCommands (Proxy :: Proxy MiscCommand)
-     --         , enumCommands (Proxy :: Proxy LayoutCommand)
-     --         , enumCommands (Proxy :: Proxy LayoutGridCommand)
-     --         ]
-     --       cmdPromptAll = do
-     --         bound <- boundCommands
-     --         mkCmdPrompt (CmdPrompt "Cmd (ALL)" (nubBy ((==) `on` describe) $ concat allCommands ++ bound)) xpConfig
-     --   "M-r M-c" >+ cmdPromptAll ? "Prompt: Cmd (ALL)"
-     --   "M-r M-w" >+ cmdPrompt xpConfig (Proxy :: Proxy MiscCommand)
-     --   "M-r M-l" >+ cmdPrompt xpConfig (Proxy :: Proxy LayoutCommand)
-     --   "M-r M-g" >+ cmdPrompt xpConfig (Proxy :: Proxy LayoutGridCommand)
-     --   "M-r S-w" >+ windowPromptWithMinimized xpConfig ? "Maximize Hidden Window (Prompt)"
 
     ]
 
@@ -295,6 +303,16 @@ dvpMyLayout = XkbRuleNames
 
 launchRofi :: [String] -> SomeAction H
 launchRofi args = SomeAction $ LaunchProgram "rofi" (["-dpi", "150"] ++ args)
+
+pactl :: [String] -> SomeAction H
+pactl args = unwords ("[PULSE]":args) =? void (spawnProcess @H "pactl" args)
+
+volume :: Int -> SomeAction H
+volume d         = pactl ["set-sink-volume", "@DEFAULT_SINK@", printf "%+i%%" d]
+
+toggleMuteSource = pactl ["set-source-mute", "@DEFAULT_SOURCE@", "toggle"]
+toggleMuteSink   = pactl ["set-sink-mute", "@DEFAULT_SINK@", "toggle"]
+
 
 -- * Colors
 

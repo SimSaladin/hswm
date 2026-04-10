@@ -1,0 +1,110 @@
+version:
+  hs_bindgen: 0.1.0
+  binding_specification: '1.0'
+hsmodule: Bindings.Wayland.ExtSessionLockV1.Generated
+ctypes:
+- headers: ext-session-lock-v1-client-protocol.h
+  cname: struct ext_session_lock_manager_v1
+  hsname: Ext_session_lock_manager_v1
+- headers: ext-session-lock-v1-client-protocol.h
+  cname: struct ext_session_lock_surface_v1
+  hsname: Ext_session_lock_surface_v1
+- headers: ext-session-lock-v1-client-protocol.h
+  cname: struct ext_session_lock_v1
+  hsname: Ext_session_lock_v1
+- headers: ext-session-lock-v1-client-protocol.h
+  cname: enum ext_session_lock_v1_error
+  hsname: Ext_session_lock_v1_error
+- headers: ext-session-lock-v1-client-protocol.h
+  cname: struct ext_session_lock_v1_listener
+  hsname: Ext_session_lock_v1_listener
+- headers: ext-session-lock-v1-client-protocol.h
+  cname: enum ext_session_lock_surface_v1_error
+  hsname: Ext_session_lock_surface_v1_error
+- headers: ext-session-lock-v1-client-protocol.h
+  cname: struct ext_session_lock_surface_v1_listener
+  hsname: Ext_session_lock_surface_v1_listener
+hstypes:
+- hsname: Ext_session_lock_manager_v1
+  representation: emptydata
+- hsname: Ext_session_lock_surface_v1
+  representation: emptydata
+- hsname: Ext_session_lock_surface_v1_error
+  representation:
+    newtype:
+      constructor: Ext_session_lock_surface_v1_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Ext_session_lock_surface_v1_listener
+  representation:
+    record:
+      constructor: Ext_session_lock_surface_v1_listener
+      fields:
+      - configure
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Ext_session_lock_v1
+  representation: emptydata
+- hsname: Ext_session_lock_v1_error
+  representation:
+    newtype:
+      constructor: Ext_session_lock_v1_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Ext_session_lock_v1_listener
+  representation:
+    record:
+      constructor: Ext_session_lock_v1_listener
+      fields:
+      - locked
+      - finished
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw

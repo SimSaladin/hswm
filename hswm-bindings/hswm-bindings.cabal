@@ -12,6 +12,7 @@ author:             Samuli Thomasson
 maintainer:         samuli.thomasson@pm.me
 build-type:         Simple
 extra-source-files:
+      cbits/ext-session-lock-v1-protocol.c
       cbits/input-method-unstable-v2-protocol.c
       cbits/river-input-management-v1-protocol.c
       cbits/river-layer-shell-v1-protocol.c
@@ -20,6 +21,7 @@ extra-source-files:
       cbits/river-window-management-v1-protocol.c
       cbits/river-xkb-bindings-v1-protocol.c
       cbits/river-xkb-config-v1-protocol.c
+      include/ext-session-lock-v1-client-protocol.h
       include/input-method-unstable-v2-client-protocol.h
       include/river-input-management-v1-client-protocol.h
       include/river-layer-shell-v1-client-protocol.h
@@ -32,6 +34,7 @@ extra-source-files:
       binding-specs/river-input-management.yaml
       binding-specs/river-window-management.yaml
       binding-specs/wayland-client.yaml
+      generated/Bindings.Wayland.ExtSessionLockV1.Generated.yaml
       generated/Generated.Pixman.yaml
       generated/Generated.River.InputManagementV1.yaml
       generated/Generated.River.LayerShellV1.yaml
@@ -48,6 +51,12 @@ extra-doc-files:
 
 library
     exposed-modules:
+          Bindings.Wayland.ExtSessionLockV1
+          Bindings.Wayland.ExtSessionLockV1.Generated
+          Bindings.Wayland.ExtSessionLockV1.Generated.FunPtr
+          Bindings.Wayland.ExtSessionLockV1.Generated.Global
+          Bindings.Wayland.ExtSessionLockV1.Generated.Safe
+          Bindings.Wayland.ExtSessionLockV1.Generated.Unsafe
           Generated.Pixman
           Generated.Pixman.FunPtr
           Generated.Pixman.Safe
@@ -139,6 +148,7 @@ library
           include
           include/wayland-protocols
     c-sources:
+          cbits/ext-session-lock-v1-protocol.c
           cbits/input-method-unstable-v2-protocol.c
           cbits/river-input-management-v1-protocol.c
           cbits/river-layer-shell-v1-protocol.c

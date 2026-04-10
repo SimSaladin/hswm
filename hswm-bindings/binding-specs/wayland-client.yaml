@@ -8,6 +8,7 @@ ctypes:
   - river-input-management-v1-client-protocol.h
   - river-status-unstable-v1-server-protocol.h
   - input-method-unstable-v2-client-protocol.h
+  - ext-session-lock-v1-client-protocol.h
   cname: struct wl_output
   hsname: Wl_output
 - headers: *headers

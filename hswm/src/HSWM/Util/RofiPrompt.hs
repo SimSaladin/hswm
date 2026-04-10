@@ -30,6 +30,8 @@ data RofiPromptConfig
     -- ^ @-no-custom@ - do not allow custom input.
     , _lines :: Int
     -- ^ @-l@ - number of lines to show.
+    , _format :: String
+    -- ^ @-format@
     }
     deriving (Show, Read, Generic, Data, Default)
 
@@ -60,5 +62,6 @@ toRofiArgs RofiPromptConfig{..} = join $
   [ [ "-p", _prompt] | _prompt /= "" ] ++
   [ [ "-mesg", _mesg ] | _mesg /= "" ] ++
   [ [ "-a", _active ] | _active /= "" ] ++
+  [ [ "-format", _format ] | _format /= "" ] ++
   [ [ "-no-custom" ] | _noCustom ] ++
   [ ["-markup-rows"] | _markupRows ]

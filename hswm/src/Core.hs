@@ -14,6 +14,7 @@ import qualified HSWM.StackSet as W
 import           HSWM.Util.Posix
 import qualified HSWM.Windows as Windows
 import qualified HSWM.InputConfig as InputConfig
+import qualified HSWM.BufferPool as BP
 
 --import qualified River as R
 import qualified River.Objects as R
@@ -22,6 +23,7 @@ import           Wayland.Client (displayGetRegistry, displayFlush, displayDispat
 import qualified Wayland as WL
 import qualified Wayland.Client as WL
 import qualified Wayland.Client.Extras as WL
+import qualified Bindings.Wayland.ExtSessionLockV1 as SL
 import           Wlr
 
 import           Foreign hiding (new, void)
@@ -86,6 +88,7 @@ startHSWM wlDisplay config = do
     managerL        <- getOrCreateObject $ R.mkRiverWindowManagerListener     $ \e -> handleE $ WindowManagerEvent e
     foreignListL    <- getOrCreateObject $ WL.mkForeignToplevelListListener   $ \e -> handleE $ ForeignTopLevelListV1 e
     _               <- getOrCreateObject $ WL.mkForeignToplevelHandleListener $ \e -> handleE $ ForeignTopLevelHandleV1 e
+    _               <- getOrCreateObject $ SL.mkSessionLockListener           $ handleE . SessionLockEvent
     logDebug "created event listeners"
 
     registry <- io $ displayGetRegistry wlDisplay
@@ -134,6 +137,10 @@ startHSWM wlDisplay config = do
       WL.registryBind r n WL.foreignToplevelListInterface (fi v) <&> WL.ForeignToplevelList
 
     io $ WL.listenerAdd foreignList foreignListL nullPtr
+
+    _ <- getOrCreateObject $ requireGlobal conf.globals ("ext_session_lock_manager_v1", 1) $ \r n v ->
+      WL.registryBind r n SL.sessionLockManagerInterface (fi v) <&> SL.SessionLockManager
+
 
     logDebug "WM: running startup hooks"
     void $ userCode (startupHook config)
@@ -238,6 +245,18 @@ handleEvent (WindowManagerEvent e) = case e of
       log' "river_window_manage_v1 finished, exiting."
       io $ Posix.raiseSignal Posix.sigINT
 
+    R.RiverWindowManagerSessionLocked _ wm -> do
+      q <- asks (view pendingManageQL)
+      atomically $ writeTQueue q $ do
+        mapSeats $ \s ->
+          io $ mapM_ (deRefStablePtr >=> R.riverXkbBindingDisable . xkb_binding) s.xkb_bindings
+
+    R.RiverWindowManagerSessionUnlocked _ wm -> do
+      q <- asks (view pendingManageQL)
+      atomically $ writeTQueue q $ do
+        mapSeats $ \s ->
+          io $ mapM_ (deRefStablePtr >=> R.riverXkbBindingEnable . xkb_binding) s.xkb_bindings
+
     _ -> return ()
 
 handleEvent (OutputEvent e)           = Outputs.handle e
@@ -256,8 +275,45 @@ handleEvent (LibinputConfigEvent e)   = InputConfig.handleLibinputEvent e
 handleEvent (XkbConfigEvent e)        = InputConfig.handleXkbConfigEvent e
 handleEvent (XkbKeyboardEvent e)      = InputConfig.handleXkbKeyboardEvent e
 
+handleEvent (SessionLockEvent e) =
+  case e of
+    SL.SessionLockLocked _ _slock -> pure ()
+    SL.SessionLockFinished _ slock ->
+      io $ SL.sessionLockUnlockAndDestroy slock
+
+
 handleEvent (ForeignTopLevelListV1 (WL.ForeignToplevelListToplevel _ _ fh)) = do
   l <- getObject
   io $ WL.listenerAdd fh l nullPtr
 
 handleEvent _ = return ()
+
+lockSession :: H ()
+lockSession = do
+  sm <- getObject
+  slock <- io $ SL.sessionLockManagerLock sm
+  outputs <- runInHS $ gets _outputs
+  compositor <- getObject
+  -- TODO should use shared pool
+  bp <- BP.newImageBufferPool
+
+  slsListener <- io $ SL.mkSessionLockSurfaceListener $ \case
+    SL.SessionLockSurfaceConfigure ud sls serial w h -> do
+      let surface = WL.Surface $ castPtr ud
+      let scale = 1
+      SL.sessionLockSurfaceAckConfigure sls serial
+      region <- io $ WL.compositorCreateRegion compositor
+      io $ WL.regionAdd region 0 0 (fi w) (fi h)
+      io $ WL.surfaceSetOpaqueRegion surface region
+      io $ WL.objectDestroy region
+      buf <- io $ BP.nextBuffer bp (fi $ w * scale) (fi $ h * scale)
+      io $ WL.surfaceAttach surface buf.buf 0 0
+      io $ WL.surfaceDamageBuffer surface 0 0 (fi $ w * scale) (fi $ h * scale)
+      io $ WL.surfaceCommit surface
+
+  -- create sessionlock surfaces
+  forM_ outputs $ \o -> do
+    wo <- Outputs.getWlOutput o.river_output
+    surface <- io $ WL.compositorCreateSurface compositor
+    sls <- io $ SL.sessionLockGetLockSurface slock surface wo
+    WL.listenerAdd sls slsListener (surface.unwrap)

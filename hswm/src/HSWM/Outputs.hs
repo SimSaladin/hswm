@@ -183,3 +183,10 @@ modifyOutput' output f = do
   case M.lookup output (pending_setup om) of
     Just o -> putObject om { pending_setup = M.insert output (f o) om.pending_setup }
     Nothing -> runInHS $ modifyOutput output f >> updateScreenDetail output
+
+getWlOutput :: RiverOutput -> H WL.Output
+getWlOutput ro = do
+  (om :: OutputManager) <- getOrCreateObject $ pure def
+  case M.lookup ro om.wl_outputs of
+    Just wo -> return wo
+    Nothing -> error "No wl output output found"
