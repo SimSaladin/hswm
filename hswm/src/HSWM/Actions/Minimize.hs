@@ -1,4 +1,7 @@
 ----------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------
+
 -- |
 -- Module      :  HSWM.Actions.Minimize
 -- Description :  Actions for minimizing and maximizing windows.
@@ -19,33 +22,30 @@
 --
 -- >        , ((modm,               xK_m     ), withFocused minimizeWindow)
 -- >        , ((modm .|. shiftMask, xK_m     ), withLastMinimized maximizeWindowAndFocus)
---
------------------------------------------------------------------------------
-
 module HSWM.Actions.Minimize
   ( -- * Usage
     -- $usage
-    minimizeWindow
-  , maximizeWindow
-  , maximizeWindowAndFocus
-  , withLastMinimized
-  , withLastMinimized'
-  , withFirstMinimized
-  , withFirstMinimized'
-  , withMinimized
-  ) where
+    minimizeWindow,
+    maximizeWindow,
+    maximizeWindowAndFocus,
+    withLastMinimized,
+    withLastMinimized',
+    withFirstMinimized,
+    withFirstMinimized',
+    withMinimized,
+  )
+where
 
-import HSWM
-import qualified HSWM.StackSet as W
+-- import HSWM.Util.RiverWindowProperties (getProp32)
 
-import qualified HSWM.Layout.BoringWindows as BW
-import qualified HSWM.Util.ExtensibleState as XS
-import HSWM.Util.Minimize
---import HSWM.Util.RiverWindowProperties (getProp32)
-
+import Data.List qualified as L
+import Data.Map qualified as M
 import Foreign.C.Types (CLong)
-import qualified Data.List as L
-import qualified Data.Map as M
+import HSWM
+import HSWM.Layout.BoringWindows qualified as BW
+import HSWM.StackSet qualified as W
+import HSWM.Util.ExtensibleState qualified as XS
+import HSWM.Util.Minimize
 
 -- $usage
 -- Import this module with "HSWM.Layout.Minimize" and "HSWM.Layout.BoringWindows":
@@ -65,8 +65,8 @@ import qualified Data.Map as M
 -- >        , ((modm .|. shiftMask, xK_m     ), withLastMinimized maximizeWindow)
 
 setMinimizedState :: RiverWindow -> Bool -> HS ()
-setMinimizedState win True = modifyWindow win $ \s -> s { minimized = True, p_set_visible = Just False }
-setMinimizedState win False = modifyWindow win $ \s -> s { minimized = False, p_set_visible = Just True }
+setMinimizedState win True = modifyWindow win $ \s -> s {minimized = True, p_set_visible = Just False}
+setMinimizedState win False = modifyWindow win $ \s -> s {minimized = False, p_set_visible = Just True}
 
 setMinimized :: RiverWindow -> HS ()
 setMinimized win = setMinimizedState win True
@@ -78,15 +78,15 @@ setNotMinimized win = setMinimizedState win False
 -- order in which elements were added (newer first)
 modified :: (RectMap -> RectMap) -> HS Bool
 modified f = XS.modified $
-    \Minimized { rectMap = oldRectMap, minimizedStack = oldStack } ->
-      let newRectMap = f oldRectMap
-          newWindows = M.keys newRectMap
-       in Minimized { rectMap = newRectMap
-                    , minimizedStack = (newWindows L.\\ oldStack)
-                                       ++
-                                       (oldStack `L.intersect` newWindows)
-                    }
-
+  \Minimized {rectMap = oldRectMap, minimizedStack = oldStack} ->
+    let newRectMap = f oldRectMap
+        newWindows = M.keys newRectMap
+     in Minimized
+          { rectMap = newRectMap,
+            minimizedStack =
+              (newWindows L.\\ oldStack)
+                ++ (oldStack `L.intersect` newWindows)
+          }
 
 -- | Minimize a window
 minimizeWindow :: RiverWindow -> HS ()
@@ -95,7 +95,6 @@ minimizeWindow w = withWindowSet $ \ws ->
     setMinimized w
     windows $ W.sink w
     BW.focusDown
-
 
 -- | Maximize window and apply a function to maximized window and 'WindowSet'
 maximizeWindowAndChangeWSet :: (RiverWindow -> WindowSet -> WindowSet) -> RiverWindow -> HS ()

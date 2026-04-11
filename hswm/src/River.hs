@@ -1,4 +1,7 @@
 ------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+
 -- |
 -- Module      : River
 -- Description : Short description
@@ -9,17 +12,16 @@
 -- Portability : unportable
 --
 -- Longer description of this module.
---
-------------------------------------------------------------------------------
 module River
-  ( module River
-  , module River.WMP
-  , module River.XKB.Bindings
-  ) where
+  ( module River,
+    module River.WMP,
+    module River.XKB.Bindings,
+  )
+where
 
 import River.WMP
 import River.XKB.Bindings
 
-data RiverColor = RiverColor { red, green, blue, alpha :: !Word32 }
+data RiverColor = RiverColor {red, green, blue, alpha :: !Word32}
   deriving (Show, Read, Eq, Generic)
   deriving (Default)

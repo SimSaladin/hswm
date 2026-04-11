@@ -1,6 +1,9 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 -----------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------
+
 -- |
 -- Module      :  HSWM.Util.Invisible
 -- Description :  A data type to store the layout state.
@@ -12,16 +15,14 @@
 -- Portability :  unportable
 --
 -- A data type to store the layout state
---
------------------------------------------------------------------------------
-
-module HSWM.Util.Invisible (
-                             -- * Usage:
-                             -- $usage
-                             Invisible (..)
-                            , whenIJust
-                            , fromIMaybe
-                            ) where
+module HSWM.Util.Invisible
+  ( -- * Usage:
+    -- $usage
+    Invisible (..),
+    whenIJust,
+    fromIMaybe,
+  )
+where
 
 import Control.Monad.Fail
 import Text.Read
@@ -36,15 +37,15 @@ newtype Invisible m a = I (m a)
   deriving newtype (Monad, MonadFail, Applicative, Functor)
 
 instance (Functor m, Monad m, MonadFail m) => Read (Invisible m a) where
-    readsPrec _ s = [(Control.Monad.Fail.fail "Read Invisible", s)]
+  readsPrec _ s = [(Control.Monad.Fail.fail "Read Invisible", s)]
 
-instance Monad m => Show (Invisible m a) where
-    show _ = ""
+instance (Monad m) => Show (Invisible m a) where
+  show _ = ""
 
 whenIJust :: (Monad m) => Invisible Maybe a -> (a -> m ()) -> m ()
-whenIJust (I (Just x)) f  = f x
-whenIJust (I  Nothing) _  = return ()
+whenIJust (I (Just x)) f = f x
+whenIJust (I Nothing) _ = return ()
 
 fromIMaybe :: a -> Invisible Maybe a -> a
 fromIMaybe _ (I (Just x)) = x
-fromIMaybe a (I  Nothing) = a
+fromIMaybe a (I Nothing) = a

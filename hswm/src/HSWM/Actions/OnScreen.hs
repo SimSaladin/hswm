@@ -25,7 +25,7 @@ where
 
 import HSWM
 import HSWM.StackSet hiding (new)
-import qualified HSWM.StackSet as W
+import HSWM.StackSet qualified as W
 
 -- | Focus data definitions
 data Focus

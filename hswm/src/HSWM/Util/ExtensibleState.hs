@@ -1,6 +1,10 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE PatternGuards #-}
+
 -----------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------
+
 -- |
 -- Module      :  HSWM.Util.ExtensibleState
 -- Description :  Module for storing custom mutable state in xmonad.
@@ -12,38 +16,35 @@
 -- Portability :  not portable
 --
 -- Module for storing custom mutable state in xmonad.
---
------------------------------------------------------------------------------
+module HSWM.Util.ExtensibleState
+  ( -- * Usage
+    -- $usage
+    put,
+    modify,
+    modify',
+    modifyM,
+    modifyM',
+    remove,
+    get,
+    gets,
+    modified,
+    modifiedM,
+  )
+where
 
-module HSWM.Util.ExtensibleState (
-                              -- * Usage
-                              -- $usage
-                              put
-                              , modify
-                              , modify'
-                              , modifyM
-                              , modifyM'
-                              , remove
-                              , get
-                              , gets
-                              , modified
-                              , modifiedM
-                              ) where
+-- import HSWM.Util.PureX
+import Control.Monad.State qualified as State
+import Data.Map qualified as M
+import Data.Typeable (cast, typeOf)
+import HSWM.Core (ExtensionClass (..), HS, HState (..), StateExtension (..))
+import Prelude hiding (gets, modify)
 
-import Data.Typeable (typeOf,cast)
-import qualified Data.Map as M
-
-import Prelude hiding (modify, gets)
-import HSWM.Core (HS, ExtensionClass(..), StateExtension(..), HState(..))
-
---import HSWM.Util.PureX
-import qualified Control.Monad.State as State
-
-class MonadState HState m => XLike m where
+class (MonadState HState m) => XLike m
 
 instance XLike HS
 
 -- ---------------------------------------------------------------------
+
 -- $usage
 --
 -- To utilize this feature in a contrib module, create a data type
@@ -84,15 +85,15 @@ instance XLike HS
 -- A module should not try to store common datatypes(e.g. a list of Integers)
 -- without a custom data type as a wrapper to avoid collisions with other modules
 -- trying to store the same data type without a wrapper.
---
 
 -- | Modify the map of state extensions by applying the given function.
-modifyStateExts
-  :: XLike m
-  => (M.Map String (Either String StateExtension)
-  -> M.Map String (Either String StateExtension))
-  -> m ()
-modifyStateExts f = State.modify $ \st -> st { extensibleState = f (extensibleState st) }
+modifyStateExts ::
+  (XLike m) =>
+  ( M.Map String (Either String StateExtension) ->
+    M.Map String (Either String StateExtension)
+  ) ->
+  m ()
+modifyStateExts f = State.modify $ \st -> st {extensibleState = f (extensibleState st)}
 
 -- | Apply a function to a stored value of the matching type or the initial value if there
 -- is none.
@@ -121,21 +122,22 @@ put v = modifyStateExts . M.insert (show . typeOf $ v) . Right . extensionType $
 -- | Try to retrieve a value of the requested type, return an initial value if there is no such value.
 get :: (ExtensionClass a, XLike m) => m a
 get = getState' undefined -- `trick' to avoid needing -XScopedTypeVariables
-  where toValue val = fromMaybe initialValue $ cast val
-        getState' :: (ExtensionClass a, XLike m) => a -> m a
-        getState' k = do
-          v <- State.gets $ M.lookup (show . typeOf $ k) . extensibleState
-          case v of
-            Just (Right (StateExtension val)) -> return $ toValue val
-            Just (Right (PersistentExtension val)) -> return $ toValue val
-            Just (Left str) | PersistentExtension x <- extensionType k -> do
-                let val = fromMaybe initialValue $ cast =<< safeRead str `asTypeOf` Just x
-                put (val `asTypeOf` k)
-                return val
-            _ -> return initialValue
-        safeRead str = case reads str of
-                         [(x,"")] -> Just x
-                         _ -> Nothing
+  where
+    toValue val = fromMaybe initialValue $ cast val
+    getState' :: (ExtensionClass a, XLike m) => a -> m a
+    getState' k = do
+      v <- State.gets $ M.lookup (show . typeOf $ k) . extensibleState
+      case v of
+        Just (Right (StateExtension val)) -> return $ toValue val
+        Just (Right (PersistentExtension val)) -> return $ toValue val
+        Just (Left str) | PersistentExtension x <- extensionType k -> do
+          let val = fromMaybe initialValue $ cast =<< safeRead str `asTypeOf` Just x
+          put (val `asTypeOf` k)
+          return val
+        _ -> return initialValue
+    safeRead str = case reads str of
+      [(x, "")] -> Just x
+      _ -> Nothing
 
 gets :: (ExtensionClass a, XLike m) => (a -> b) -> m b
 gets = flip fmap get
@@ -149,7 +151,8 @@ modified = modifiedM . (pure .)
 
 modifiedM :: (ExtensionClass a, Eq a, XLike m) => (a -> m a) -> m Bool
 modifiedM f = do
-    v <- get
-    f v >>= \case
-        v' | v' == v   -> return False
-           | otherwise -> put v' >> return True
+  v <- get
+  f v >>= \case
+    v'
+      | v' == v -> return False
+      | otherwise -> put v' >> return True

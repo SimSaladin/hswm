@@ -6,17 +6,16 @@
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
---
 module HSWM.Types.Events where
 
+import Bindings.Wayland.ExtSessionLockV1 qualified as SL
+import Bindings.Wayland.FractionalScaleV1 qualified as FS
+import Bindings.Wayland.WlrOutputManagementUnstableV1 qualified as Wlr
+import Bindings.Wayland.XdgOutputUnstableV1 qualified as Zdg
 import River.Objects qualified as R
 import Wayland.Client qualified as WL
 import Wayland.Client.Extras qualified as WL
 import Wlr qualified as Zwp
-import qualified Bindings.Wayland.ExtSessionLockV1 as SL
-import qualified Bindings.Wayland.XdgOutputUnstableV1 as Zdg
-import qualified Bindings.Wayland.WlrOutputManagementUnstableV1 as Wlr
-import qualified Bindings.Wayland.FractionalScaleV1 as FS
 
 -- | Mash-up of all River/Wayland generated events
 data Event
@@ -51,11 +50,11 @@ data Event
     ZwpIM2PopupSurfaceE !Zwp.ZwpInputPopupSurfaceEvent
   | ZwpIM2KeyboardGrabE !Zwp.ZwpInputMethodKeyboardGrabEvent
   | ZwpIM2E !Zwp.ZwpInputMethodEvent
-   -- Wlr_*
-  | WlrOutputManagerEvent !Wlr.OutputManagerEvent
+  | -- Wlr_*
+    WlrOutputManagerEvent !Wlr.OutputManagerEvent
   | WlrOutputHeadEvent !Wlr.OutputHeadEvent
-   -- Xdg
-  | ZdgOutputEvent !Zdg.OutputEvent
+  | -- Xdg
+    ZdgOutputEvent !Zdg.OutputEvent
   deriving (Show, Generic)
 
 -- XXX is this used?
@@ -64,4 +63,4 @@ data MainEvent
   | MainExit String
   deriving (Eq, Show, Generic)
 
-instance Monoid (m All) => Default (Event -> m All) where def _ = mempty
+instance (Monoid (m All)) => Default (Event -> m All) where def _ = mempty

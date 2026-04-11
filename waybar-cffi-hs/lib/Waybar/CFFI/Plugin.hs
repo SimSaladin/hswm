@@ -11,17 +11,17 @@
 -- Portability : unportable
 module Waybar.CFFI.Plugin where
 
-import Data.String (IsString(..))
 import Control.Exception qualified as E
 import Control.Monad
+import Data.Aeson qualified as A
+import Data.Aeson.KeyMap qualified as A.KM
+import Data.ByteString qualified as BS
+import Data.String (IsString (..))
 import Data.Void
 import GI.Gtk as Gtk
 import GI.Gtk.Objects.Container as Container
 import Waybar.CFFI.Plugin.Base
 import Waybar.CFFI.Plugin.HSWM qualified as HSWM
-import qualified Data.Aeson as A
-import qualified Data.Aeson.KeyMap as A.KM
-import qualified Data.ByteString as BS
 
 ------------------------------------------------------------------------------
 
@@ -34,7 +34,6 @@ foreign export ccall "plugin_runtime_destroy" pluginRuntimeDestroy :: IO ()
 pluginRuntimeInit, pluginRuntimeDestroy :: IO ()
 pluginRuntimeInit = do
   putStrLn "CFFI plugin initialized"
-
 pluginRuntimeDestroy = pure ()
 
 ------------------------------------------------------------------------------
@@ -85,7 +84,7 @@ pluginDeinit p = (deRefStablePtr sp >>= HSWM.instanceDestroy) `E.finally` freeSt
 -- @param action_name Action name
 pluginUpdate :: Ptr Void -> IO ()
 pluginUpdate p = do
-  --putStrLn "[cffip] update"
+  -- putStrLn "[cffip] update"
   deRefStablePtr sp >>= HSWM.updateDo
   where
     sp = castPtrToStablePtr $ castPtr p

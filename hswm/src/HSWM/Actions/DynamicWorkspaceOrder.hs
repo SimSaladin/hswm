@@ -1,4 +1,7 @@
 -----------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------
+
 -- |
 -- Module      :  HSWM.Actions.DynamicWorkspaceOrder
 -- Description :  Remember a dynamically updateable ordering on workspaces.
@@ -12,41 +15,33 @@
 -- Remember a dynamically updateable ordering on workspaces, together
 -- with tools for using this ordering with "HSWM.Actions.CycleWS"
 -- and "HSWM.Hooks.StatusBar.PP".
---
------------------------------------------------------------------------------
-
 module HSWM.Actions.DynamicWorkspaceOrder
-    ( -- * Usage
-      -- $usage
+  ( -- * Usage
+    -- $usage
+    getWsCompareByOrder,
+    getSortByOrder,
+    swapWith,
+    swapWithCurrent,
+    swapOrder,
+    updateName,
+    removeName,
+    moveTo,
+    moveToGreedy,
+    shiftTo,
+    withNthWorkspace',
+    withNthWorkspace,
+  )
+where
 
-      getWsCompareByOrder
-    , getSortByOrder
-    , swapWith
-    , swapWithCurrent
-    , swapOrder
-    , updateName
-    , removeName
-
-    , moveTo
-    , moveToGreedy
-    , shiftTo
-
-    , withNthWorkspace'
-    , withNthWorkspace
-
-    ) where
-
-import HSWM
-import qualified HSWM.StackSet as W
-import qualified HSWM.Util.ExtensibleState as XS
-
-import HSWM.Util.WorkspaceCompare (WorkspaceCompare, WorkspaceSort, mkWsSort)
-import HSWM.Actions.CycleWS (findWorkspace, WSType(..), doTo)
-
-import qualified Data.Map as M
-import qualified Data.Set as S
-import Data.Maybe (fromJust)
 import Data.List (maximum)
+import Data.Map qualified as M
+import Data.Maybe (fromJust)
+import Data.Set qualified as S
+import HSWM
+import HSWM.Actions.CycleWS (WSType (..), doTo, findWorkspace)
+import HSWM.StackSet qualified as W
+import HSWM.Util.ExtensibleState qualified as XS
+import HSWM.Util.WorkspaceCompare (WorkspaceCompare, WorkspaceSort, mkWsSort)
 
 -- $usage
 -- You can use this module by importing it into your @xmonad.hs@ file:
@@ -90,7 +85,7 @@ import Data.List (maximum)
 -- tweak as desired.
 
 -- | Extensible state storage for the workspace order.
-newtype WSOrderStorage = WSO { unWSO :: Maybe (M.Map WorkspaceId Int) }
+newtype WSOrderStorage = WSO {unWSO :: Maybe (M.Map WorkspaceId Int)}
   deriving (Read, Show)
 
 instance ExtensionClass WSOrderStorage where
@@ -98,8 +93,9 @@ instance ExtensionClass WSOrderStorage where
   extensionType = PersistentExtension
 
 -- | Lift a Map function to a function on WSOrderStorage.
-withWSO :: (M.Map WorkspaceId Int -> M.Map WorkspaceId Int)
-           -> (WSOrderStorage -> WSOrderStorage)
+withWSO ::
+  (M.Map WorkspaceId Int -> M.Map WorkspaceId Int) ->
+  (WSOrderStorage -> WSOrderStorage)
 withWSO f = WSO . fmap f . unWSO
 
 -- | Update the ordering storage: initialize if it doesn't yet exist;
@@ -111,14 +107,14 @@ updateOrder = do
     Nothing -> do
       -- initialize using ordering of workspaces from the user's config
       ws <- asks (workspaces . config)
-      XS.put . WSO . Just . M.fromList $ zip ws [0..]
+      XS.put . WSO . Just . M.fromList $ zip ws [0 ..]
     Just m -> do
       -- check for new workspaces and add them at the end
       curWs <- gets (S.fromList . map W.tag . W.workspaces . windowset)
-      let mappedWs  = M.keysSet m
-          newWs     = curWs `S.difference` mappedWs
+      let mappedWs = M.keysSet m
+          newWs = curWs `S.difference` mappedWs
           nextIndex = 1 + maximum (-1 : M.elems m)
-          newWsIxs  = zip (S.toAscList newWs) [nextIndex..]
+          newWsIxs = zip (S.toAscList newWs) [nextIndex ..]
       XS.modify . withWSO . M.union . M.fromList $ newWsIxs
 
 -- | A comparison function which orders workspaces according to the
@@ -150,12 +146,12 @@ swapWithCurrent w = do
 -- | Swap the two given workspaces in the dynamic order.
 swapOrder :: WorkspaceId -> WorkspaceId -> HS ()
 swapOrder w1 w2 = do
-  --io $ print (w1,w2)
+  -- io $ print (w1,w2)
   WSO (Just m) <- XS.get
   let i1 = fromJust (w1 `M.lookup` m)
   let i2 = fromJust (w2 `M.lookup` m)
   XS.modify (withWSO (M.insert w1 i2 . M.insert w2 i1))
-  windows id  -- force a status bar update
+  windows id -- force a status bar update
 
 -- | Update the name of a workspace in the stored order.
 updateName :: WorkspaceId -> WorkspaceId -> HS ()
@@ -166,7 +162,7 @@ removeName :: WorkspaceId -> HS ()
 removeName = XS.modify . withWSO . M.delete
 
 -- | Update a key in a Map.
-changeKey :: Ord k => k -> k -> M.Map k a -> M.Map k a
+changeKey :: (Ord k) => k -> k -> M.Map k a -> M.Map k a
 changeKey oldKey newKey oldMap =
   case M.updateLookupWithKey (\_ _ -> Nothing) oldKey oldMap of
     (Nothing, _) -> oldMap
@@ -194,8 +190,8 @@ withNthWorkspace' tr job wnum = do
   sort <- getSortByOrder
   ws <- gets (tr . map W.tag . sort . W.workspaces . windowset)
   case drop wnum ws of
-    (w:_) -> windows $ job w
-    []    -> return ()
+    (w : _) -> windows $ job w
+    [] -> return ()
 
 -- | Do something with the nth workspace in the dynamic order.  The
 --   callback is given the workspace's tag as well as the 'WindowSet'

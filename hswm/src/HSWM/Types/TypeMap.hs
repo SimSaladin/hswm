@@ -10,10 +10,10 @@
 -- Type-indexed globals
 module HSWM.Types.TypeMap where
 
-import RIO
 import Data.TMap qualified as TM
 import Data.Typeable
-import Prelude (Default(def))
+import RIO
+import Prelude (Default (def))
 
 newtype TypeMap = TypeMap {unTypeMap :: TM.TMap}
   deriving (Show, Generic)
@@ -50,10 +50,10 @@ getOrCreateObject m = do
     case TM.lookup $ unTypeMap tm of
       Just x -> return (x, tm)
       Nothing -> do
-          a <- liftIO m
-          return (a, TypeMap $ TM.insert a $ unTypeMap tm)
+        a <- liftIO m
+        return (a, TypeMap $ TM.insert a $ unTypeMap tm)
 
-withObjects :: MonadStateGlobal s m => (TM.TMap -> m a) -> m a
+withObjects :: (MonadStateGlobal s m) => (TM.TMap -> m a) -> m a
 withObjects f = do
   tm <- asks (view globalTMap) >>= atomically . readTMVar
   f (unTypeMap tm)
@@ -77,7 +77,7 @@ withObject f = do
     (Nothing :: Maybe a) -> error ("withObject: no such object: " ++ show (typeRep (Proxy :: Proxy a)))
     Just x -> f x
 
-modifyWlObjects :: MonadStateGlobal s m => (TM.TMap -> TM.TMap) -> m ()
+modifyWlObjects :: (MonadStateGlobal s m) => (TM.TMap -> TM.TMap) -> m ()
 modifyWlObjects f = do
   tmV <- asks (view globalTMap)
   withTMVar tmV $ \s -> return ((), TypeMap . f $ unTypeMap s)

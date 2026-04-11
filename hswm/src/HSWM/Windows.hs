@@ -80,8 +80,8 @@ manage_ = do
   -- do initial properties for new windows
   mapWindows $ \w -> do
     if
-      | w.closed  -> doRemoveWindow w
-      | w.new     -> do
+      | w.closed -> doRemoveWindow w
+      | w.new -> do
           setInitialManageProperties w
           modifyWindow w.river_window (\s -> s {new = False})
           mh <- asks (manageHook . config)
@@ -97,7 +97,7 @@ manage_ = do
   whenJust (W.peek old) $ \otherw ->
     manageWindowBorder otherw =<< asks (normalBorder . config)
 
-  --modify (\s -> s {windowsetOld = ws})
+  -- modify (\s -> s {windowsetOld = ws})
 
   let tags_oldvisible = map (W.tag . W.workspace) $ W.current old : W.visible old
       gottenhidden = filter (flip elem tags_oldvisible . W.tag) $ W.hidden ws
@@ -149,21 +149,21 @@ manage_ = do
     if sm.seat_lshell_focus == Seats.FocusNone
       then manageWindowBorder w =<< asks (focusedBorder . config)
       else manageWindowBorder w =<< asks (normalBorder . config)
-    whenJust (L.find (\(a, b, c) -> a == w) rects) $ \(_,Rectangle{..},_) -> do
+    whenJust (L.find (\(a, b, c) -> a == w) rects) $ \(_, Rectangle {..}, _) -> do
       mapSeats $ \s -> do
         io $ R.riverSeatFocusWindow s.river_seat w
         if s.focused /= w && s.hovered /= w
-           then do
-              modifySeat s.river_seat $ \x -> x { focused = w }
-              let px = x + (fi width `div` 2)
-                  py = y + (fi height `div` 2)
-              logInfo $ "manage: warping pointer to " <> displayShow (px, py)
-              io $ R.riverSeatPointerWarp s.river_seat px py
-           else return ()
+          then do
+            modifySeat s.river_seat $ \x -> x {focused = w}
+            let px = x + (fi width `div` 2)
+                py = y + (fi height `div` 2)
+            logInfo $ "manage: warping pointer to " <> displayShow (px, py)
+            io $ R.riverSeatPointerWarp s.river_seat px py
+          else return ()
 
   if isNothing (W.peek ws) && W.tag (W.workspace $ W.current ws) /= W.tag (W.workspace $ W.current old)
-     then warpPointerToScreen (W.screenDetail $ W.current ws) (W.screen $ W.current ws)
-     else withScreenOutput (W.screen $ W.current ws) $ \o -> io $ R.riverLayerShellOutputSetDefault o.river_layerShellOutput
+    then warpPointerToScreen (W.screenDetail $ W.current ws) (W.screen $ W.current ws)
+    else withScreenOutput (W.screen $ W.current ws) $ \o -> io $ R.riverLayerShellOutputSetDefault o.river_layerShellOutput
 
   -- hide every window that was potentially visible before, but is not
   -- given a position by a layout now.
@@ -172,7 +172,7 @@ manage_ = do
   gets windowset >>= \ws' -> modify (\s -> s {windowsetOld = ws'})
 
 warpPointerToScreen :: ScreenDetail -> ScreenId -> HS ()
-warpPointerToScreen SD{..} sid = do
+warpPointerToScreen SD {..} sid = do
   mapSeats $ \s -> io $ R.riverSeatPointerWarp s.river_seat px py
   withScreenOutput sid $ \o -> io $ R.riverLayerShellOutputSetDefault o.river_layerShellOutput
   where
@@ -190,8 +190,9 @@ render = runInHS $ do
         | i == R.rIVER_NODE_V1_PLACE_BOTTOM -> unless w.minimized $ io $ R.riverNodePlaceBottom w.node
       _ -> return ()
     whenJust w.p_set_visible $ \viz ->
-      if viz then unless w.minimized $ reveal w.river_window
-             else hide w.river_window
+      if viz
+        then unless w.minimized $ reveal w.river_window
+        else hide w.river_window
     -- reset pending fields
     modifyWindow w.river_window $ \s ->
       s

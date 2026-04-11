@@ -1,4 +1,5 @@
 {-# LANGUAGE DefaultSignatures #-}
+
 -- |
 -- Module      : HSWM.Types.WM
 -- Description : Short description
@@ -11,27 +12,26 @@
 -- Basic window management -related types.
 module HSWM.Types.WM where
 
-import HSWM.XKB
+import Control.Monad.Fix
+import Control.Monad.State
 import Data.Aeson qualified as A
+import Data.Map qualified as M
+import Data.Monoid (Ap (..))
 import Data.Typeable
+import Foreign
+import Foreign.C
+import HSWM.StackSet as W
+import HSWM.Types.Events
+import HSWM.Types.TypeMap
+import HSWM.Util.Types
+import HSWM.Utils
+import HSWM.XKB
 import River
 import River.Objects
-import Foreign.C
-import Foreign
 import River.Objects qualified as R
 import River.Safe qualified as R
 import Wayland (RegistryCache)
 import Wayland.Client qualified as WL hiding (display)
-import HSWM.StackSet as W
-import HSWM.Util.Types
-import Control.Monad.Fix
-import Data.Monoid (Ap (..))
-import Control.Monad.State
-import Data.Map qualified as M
-import HSWM.XKB
-import HSWM.Types.TypeMap
-import HSWM.Types.Events
-import HSWM.Utils
 
 -- | Virtual workspace indices
 type WorkspaceId = String
@@ -108,15 +108,16 @@ class (Monad m, MonadIO m) => IsAction m a where
   default typeDescription :: (Typeable a) => Proxy m -> a -> String
   typeDescription _ = show . typeOf
 
-instance MonadIO m => IsAction m (SomeAction m) where
-  runner            (SomeAction a) = runner a
-  actionSubmap      (SomeAction a) = actionSubmap a
+instance (MonadIO m) => IsAction m (SomeAction m) where
+  runner (SomeAction a) = runner a
+  actionSubmap (SomeAction a) = actionSubmap a
   actionDescription mp (SomeAction a) = actionDescription mp a
-  typeDescription   mp (SomeAction a) = typeDescription mp a
+  typeDescription mp (SomeAction a) = typeDescription mp a
 
 instance (MonadIO m) => Show (SomeAction m) where
   show x = case x of
-                SomeAction (val :: IsAction m a => a) -> actionDescription (Proxy :: Proxy m) val
+    SomeAction (val :: (IsAction m a) => a) -> actionDescription (Proxy :: Proxy m) val
+
 instance (MonadIO m) => Display (SomeAction m) where
   textDisplay = toText . show
 
@@ -129,9 +130,10 @@ data Submap m = Submap
 instance (MonadIO m, Typeable m) => IsAction m (Submap m) where
   runner Submap {..} = whenJust submapDefault runner
   actionSubmap Submap {..} = submapKeys
+
 -- actionDescription Submap{..} = "Submap"
 
-instance MonadIO m => IsAction m (IO ()) where
+instance (MonadIO m) => IsAction m (IO ()) where
   runner = liftIO
 
 type WindowSet = W.StackSet WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail ScreenId ScreenDetail
@@ -221,7 +223,7 @@ class (Show (layout a), Typeable layout) => LayoutClass layout a where
   --   use of more of the 'Workspace' information (for example,
   --   "XMonad.Layout.PerWorkspace").
   runLayout ::
-    HandleLayouts m =>
+    (HandleLayouts m) =>
     Workspace WorkspaceId (layout a) a WorkspaceDetail ->
     Rectangle ->
     m ([(a, Rectangle)], Maybe (layout a))
@@ -242,7 +244,7 @@ class (Show (layout a), Typeable layout) => LayoutClass layout a where
   -- manager state, or configuration) and do not keep track of their
   -- own state should implement 'pureLayout' instead of 'doLayout'.
   doLayout ::
-    HandleLayouts m =>
+    (HandleLayouts m) =>
     layout a ->
     Rectangle ->
     Stack a ->
@@ -256,7 +258,7 @@ class (Show (layout a), Typeable layout) => LayoutClass layout a where
   pureLayout _ r s = [(W.focus s, r)]
 
   -- | 'emptyLayout' is called when there are no windows.
-  emptyLayout :: HandleLayouts m => layout a -> Rectangle -> m ([(a, Rectangle)], Maybe (layout a))
+  emptyLayout :: (HandleLayouts m) => layout a -> Rectangle -> m ([(a, Rectangle)], Maybe (layout a))
   emptyLayout _ _ = return ([], Nothing)
 
   -- | 'handleMessage' performs message handling.  If
@@ -269,7 +271,7 @@ class (Show (layout a), Typeable layout) => LayoutClass layout a where
   -- to handle messages should implement 'pureMessage' instead of
   -- 'handleMessage' (this restricts the risk of error, and makes
   -- testing much easier).
-  handleMessage :: HandleLayouts m => layout a -> SomeMessage -> m (Maybe (layout a))
+  handleMessage :: (HandleLayouts m) => layout a -> SomeMessage -> m (Maybe (layout a))
   handleMessage l = return . pureMessage l
 
   -- | Respond to a message by (possibly) changing our layout, but
@@ -318,24 +320,31 @@ fromMessage (SomeMessage m) = cast m
 -- | The read-only window manager state.
 data HConf = HConf
   { _stateLocked :: Bool,
-    thisSeat :: Maybe RiverSeat, -- ^ Just when executing seat-originating key/pointer bindings.
-    config :: !(HSWMConfig H Layout), -- ^ User-provided configuration.
-    _display :: !WL.Display, -- ^ The Wayland display pointer
-    _logFunc :: !LogFunc, -- ^ Root logger function.
-    globals :: !(IORef RegistryCache), -- ^ The global objects available through wl_registry.
-    _state :: !(TMVar HState), -- ^ The 'HState' XXX FIXME
-    eventQueue :: !(TQueue MainEvent), -- ^ XXX ???
+    -- | Just when executing seat-originating key/pointer bindings.
+    thisSeat :: Maybe RiverSeat,
+    -- | User-provided configuration.
+    config :: !(HSWMConfig H Layout),
+    -- | The Wayland display pointer
+    _display :: !WL.Display,
+    -- | Root logger function.
+    _logFunc :: !LogFunc,
+    -- | The global objects available through wl_registry.
+    globals :: !(IORef RegistryCache),
+    -- | The 'HState' XXX FIXME
+    _state :: !(TMVar HState),
+    -- | XXX ???
+    eventQueue :: !(TQueue MainEvent),
+    -- | Pending actions to be emitted in the next manage and render queues (respectively).
     pendingManageQ, pendingRenderQ :: !(TQueue (HS ())),
-    -- ^ Pending actions to be emitted in the next manage and render queues (respectively).
     globalTypeMap :: !(TMVar TypeMap)
   }
   deriving (Generic)
 
 instance HasGlobalTMap HConf where
-  globalTMap = lens globalTypeMap (\s a -> s { globalTypeMap = a })
+  globalTMap = lens globalTypeMap (\s a -> s {globalTypeMap = a})
 
 instance HasLogFunc HConf where
-  logFuncL = lens _logFunc (\s a -> s { _logFunc = a })
+  logFuncL = lens _logFunc (\s a -> s {_logFunc = a})
 
 -- | Mutable stete.
 data HState = HState
@@ -377,6 +386,7 @@ newtype HS a = HS (ReaderT HConf (StateT HState IO) a)
   deriving (Semigroup, Monoid) via Ap HS a
 
 instance Default (H ()) where def = return ()
+
 instance Default (HS ()) where def = return ()
 
 instance IsAction H (H ()) where runner = id
@@ -384,6 +394,7 @@ instance IsAction H (H ()) where runner = id
 instance MonadFix H where
   mfix :: (a -> H a) -> H a
   mfix f = H (mfix g) where g a = let H a' = f a in a'
+
 instance MonadFix HS where
   mfix :: (a -> HS a) -> HS a
   mfix f = HS (mfix g) where g a = let HS a' = f a in a'
@@ -439,10 +450,14 @@ data SeatAction
 instance Default SeatAction where def = S_NONE
 
 -- XXX
-instance Show (StablePtr a) where show :: StablePtr a -> String
-                                  show _ = "<SP>"
+instance Show (StablePtr a) where
+  show :: StablePtr a -> String
+  show _ = "<SP>"
+
 instance Show (H ()) where show _ = "H()"
+
 instance Show (H Bool) where show _ = "H()"
+
 instance Show (HS Bool) where show _ = "HS()"
 
 instance Default Seat where
@@ -525,7 +540,6 @@ data HSWMConfig m l = HSWMConfig
     xcursor :: !(Maybe (String, Word32))
   }
   deriving stock (Generic)
-
 
 -- | Default config (defaults).
 instance (Default (m ()), Monoid (m ()), Monoid (m All)) => Default (HSWMConfig m Full) where

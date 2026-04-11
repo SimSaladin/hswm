@@ -1,20 +1,20 @@
 module HSWM.Operations where
 
+import Control.Monad.State qualified as State
 import Data.List qualified as L
 import Data.Map qualified as M
 import Data.Ratio ((%))
-import Foreign (IntPtr, intPtrToPtr, ptrToIntPtr, deRefStablePtr, (.&.))
+import Data.Set qualified as S
+import Foreign (IntPtr, deRefStablePtr, intPtrToPtr, ptrToIntPtr, (.&.))
 import HSWM.Core
 import HSWM.StackSet qualified as W
-import qualified Data.Set as S
 import River.Objects qualified as R
 import River.Safe qualified as R
 import System.Directory (removeFile)
 import System.Environment
-import System.IO (hGetContents, print, hPrint, writeFile)
+import System.IO (hGetContents, hPrint, print, writeFile)
 import System.Posix qualified as Posix
 import System.Posix.Process (executeFile)
-import qualified Control.Monad.State as State
 
 -- * Manage tasks that defer to next manage sequence
 
@@ -25,13 +25,13 @@ manageHide = flip modifyWindow $ \s -> s {p_set_visible = Just False}
 manageKill :: Window -> HS ()
 manageKill = doManage WRequestClose
 
---minimizeWindow :: Window -> HS ()
---minimizeWindow w = do
+-- minimizeWindow :: Window -> HS ()
+-- minimizeWindow w = do
 --  modifyWindow w.river_window $ \s -> s { p_set_visible = Just False, minimized = True }
 --  liftH manageDirty
 --
---maximizeWindowAndFocus :: Window -> HS ()
---maximizeWindowAndFocus w = do
+-- maximizeWindowAndFocus :: Window -> HS ()
+-- maximizeWindowAndFocus w = do
 --  modifyWindow w.river_window $ \s ->
 --    s { p_set_visible = Just True, minimized = False }
 --  liftH manageDirty
@@ -117,9 +117,9 @@ sendMessageWithNoRefresh a w =
 -- | Set the layout of the currently viewed workspace.
 setLayout :: Layout RiverWindow -> HS ()
 setLayout l = do
-    ss@W.StackSet{ W.current = c@W.Screen{ W.workspace = ws }} <- gets windowset
-    handleMessage (W.layout ws) (SomeMessage ReleaseResources)
-    windows $ const $ ss{ W.current = c{ W.workspace = ws{ W.layout = l } } }
+  ss@W.StackSet {W.current = c@W.Screen {W.workspace = ws}} <- gets windowset
+  handleMessage (W.layout ws) (SomeMessage ReleaseResources)
+  windows $ const $ ss {W.current = c {W.workspace = ws {W.layout = l}}}
 
 -- | Update the layout field of a workspace.
 updateLayout :: WorkspaceId -> Maybe (Layout RiverWindow) -> HS ()
@@ -130,7 +130,7 @@ withScreenOutput :: ScreenId -> (Output -> HS ()) -> HS ()
 withScreenOutput sid f = mapM_ f . L.find (\o -> o.screen == sid) =<< gets _outputs
 
 -- | Force new manage sequence.
-manageDirty :: MonadStateGlobal env m => m ()
+manageDirty :: (MonadStateGlobal env m) => m ()
 manageDirty = do
   logDebug "manageDirty"
   withObject (io . R.riverWindowManagerManageDirty)
@@ -143,14 +143,14 @@ setFocusH rw = mapSeats $ \s -> do
   io $ R.riverSeatFocusWindow s.river_seat rw
   withWindow rw $ \w -> do
     if s.focused /= rw
-       then do
-          modifySeat s.river_seat $ \x -> x { focused = rw }
-          let (x', y') = fromMaybe (w.x, w.y) w.p_render_pos
-              px = x' + (w.width `div` 2)
-              py = y' + (w.height `div` 2)
-          logInfo $ "manage: warping pointer to " <> displayShow (px, py)
-          io $ R.riverSeatPointerWarp s.river_seat px py
-       else return ()
+      then do
+        modifySeat s.river_seat $ \x -> x {focused = rw}
+        let (x', y') = fromMaybe (w.x, w.y) w.p_render_pos
+            px = x' + (w.width `div` 2)
+            py = y' + (w.height `div` 2)
+        logInfo $ "manage: warping pointer to " <> displayShow (px, py)
+        io $ R.riverSeatPointerWarp s.river_seat px py
+      else return ()
 
 --------------------------------------------------------------
 
@@ -204,7 +204,6 @@ runOnWorkspaces job = do
     mapM (\s -> (\w -> s {W.workspace = w}) <$> job (W.workspace s)) $
       W.current ws : W.visible ws
   modify $ \s -> s {windowset = ws {W.current = c, W.visible = v, W.hidden = h}}
-
 
 {-
 -- | Perform an @H@ action. If it returns @Any True@, unwind the

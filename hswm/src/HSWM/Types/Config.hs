@@ -6,18 +6,16 @@
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
---
 module HSWM.Types.Config where
 
 import Foreign
+import HSWM.Types.Events
+import HSWM.Types.Layouts
+import HSWM.Types.WM
 import HSWM.Utils
 import HSWM.XKB
 import River
 import River.Safe qualified as R
-
-import HSWM.Types.WM
-import HSWM.Types.Layouts
-import HSWM.Types.Events
 
 -- | Composable config modification.
 type ConfigDoPure = forall m l. HSWMConfig m l -> HSWMConfig m l

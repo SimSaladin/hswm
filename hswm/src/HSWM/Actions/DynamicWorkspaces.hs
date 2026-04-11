@@ -1,4 +1,7 @@
 -----------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------
+
 -- |
 -- Module      :  HSWM.Actions.DynamicWorkspaces
 -- Description :  Provides bindings to add and delete workspaces.
@@ -10,39 +13,41 @@
 -- Portability :  unportable
 --
 -- Provides bindings to add and delete workspaces.
---
------------------------------------------------------------------------------
+module HSWM.Actions.DynamicWorkspaces
+  ( -- * Usage
+    -- $usage
+    addWorkspace, -- addWorkspacePrompt,
+    appendWorkspace, -- appendWorkspacePrompt,
+    addWorkspaceAt,
+    removeWorkspace,
+    removeWorkspaceByTag,
+    removeEmptyWorkspace,
+    removeEmptyWorkspaceByTag,
+    removeEmptyWorkspaceAfter,
+    removeEmptyWorkspaceAfterExcept,
+    addHiddenWorkspace,
+    addHiddenWorkspaceAt,
+    -- withWorkspace,
+    -- selectWorkspace, renameWorkspace,
+    renameWorkspaceByName,
+    toNthWorkspace,
+    withNthWorkspace,
+    setWorkspaceIndex,
+    withWorkspaceIndex,
+    WorkspaceIndex,
+  )
+where
 
-module HSWM.Actions.DynamicWorkspaces (
-                                         -- * Usage
-                                         -- $usage
-                                         addWorkspace, --addWorkspacePrompt,
-                                         appendWorkspace, --appendWorkspacePrompt,
-                                         addWorkspaceAt,
-                                         removeWorkspace,
-                                         removeWorkspaceByTag,
-                                         removeEmptyWorkspace,
-                                         removeEmptyWorkspaceByTag,
-                                         removeEmptyWorkspaceAfter,
-                                         removeEmptyWorkspaceAfterExcept,
-                                         addHiddenWorkspace, addHiddenWorkspaceAt,
-                                         --withWorkspace,
-                                         --selectWorkspace, renameWorkspace,
-                                         renameWorkspaceByName,
-                                         toNthWorkspace, withNthWorkspace,
-                                         setWorkspaceIndex, withWorkspaceIndex,
-                                         WorkspaceIndex
-                                       ) where
+-- import HSWM.Prelude (find, isNothing, nub, when)
+import Data.List (find, nub)
+-- import HSWM.Prompt.Workspace ( Wor(Wor), workspacePrompt )
+-- import HSWM.Prompt ( XPConfig, mkComplFunFromList', mkXPrompt )
 
---import HSWM.Prelude (find, isNothing, nub, when)
-import Data.List (nub, find)
+import Data.Map.Strict qualified as Map
 import HSWM hiding (workspaces)
-import HSWM.StackSet hiding (filter, modify, delete)
---import HSWM.Prompt.Workspace ( Wor(Wor), workspacePrompt )
---import HSWM.Prompt ( XPConfig, mkComplFunFromList', mkXPrompt )
-import HSWM.Util.WorkspaceCompare ( getSortByIndex )
-import qualified Data.Map.Strict as Map
-import qualified HSWM.Util.ExtensibleState as XS
+import HSWM.StackSet hiding (delete, filter, modify)
+import HSWM.Util.ExtensibleState qualified as XS
+import HSWM.Util.WorkspaceCompare (getSortByIndex)
 
 -- $usage
 -- You can use this module with the following in your @xmonad.hs@ file:
@@ -80,9 +85,10 @@ import qualified HSWM.Util.ExtensibleState as XS
 -- "HSWM.Actions.CopyWindow", 'windows', 'shift', and 'XPConfig'.
 
 type WorkspaceTag = String
+
 -- | The workspace index is mapped to a workspace tag by the user and
 -- can be updated.
-type WorkspaceIndex  = Int
+type WorkspaceIndex = Int
 
 -- | Internal dynamic project state that stores a mapping between
 --   workspace indexes and workspace tags.
@@ -96,7 +102,7 @@ instance ExtensionClass DynamicWorkspaceState where
 -- | Set the index of the current workspace.
 setWorkspaceIndex :: WorkspaceIndex -> HS ()
 setWorkspaceIndex widx = do
-  wtag  <- gets (currentTag . windowset)
+  wtag <- gets (currentTag . windowset)
   wmap <- XS.gets workspaceIndexMap
   XS.modify $ \s -> s {workspaceIndexMap = Map.insert widx wtag wmap}
 
@@ -104,48 +110,53 @@ withWorkspaceIndex :: (String -> WindowSet -> WindowSet) -> WorkspaceIndex -> HS
 withWorkspaceIndex job widx = do
   wtag <- ilookup widx
   maybe (return ()) (windows . job) wtag
-    where
-      ilookup :: WorkspaceIndex -> HS (Maybe WorkspaceTag)
-      ilookup idx = Map.lookup idx <$> XS.gets workspaceIndexMap
+  where
+    ilookup :: WorkspaceIndex -> HS (Maybe WorkspaceTag)
+    ilookup idx = Map.lookup idx <$> XS.gets workspaceIndexMap
 
---withWorkspace :: XPConfig -> (String -> HS ()) -> HS ()
---withWorkspace c job = do ws <- gets (workspaces . windowset)
+-- withWorkspace :: XPConfig -> (String -> HS ()) -> HS ()
+-- withWorkspace c job = do ws <- gets (workspaces . windowset)
 --                         sort <- getSortByIndex
 --                         let ts = map tag $ sort ws
 --                             job' t | t `elem` ts = job t
 --                                    | otherwise = addHiddenWorkspace t >> job t
 --                         mkXPrompt (Wor "") c (mkComplFunFromList' c ts) job'
 --
---renameWorkspace :: XPConfig -> HS ()
---renameWorkspace conf = workspacePrompt conf renameWorkspaceByName
+-- renameWorkspace :: XPConfig -> HS ()
+-- renameWorkspace conf = workspacePrompt conf renameWorkspaceByName
 
 renameWorkspaceByName :: String -> HS ()
-renameWorkspaceByName w = do old  <- gets (currentTag . windowset)
-                             windows $ \s -> let sett wk = wk { tag = w }
-                                                 setscr scr = scr { workspace = sett $ workspace scr }
-                                                 sets q = q { current = setscr $ current q }
-                                             in sets $ removeWorkspace' w s
-                             updateIndexMap old w
-  where updateIndexMap oldIM newIM = do
-          wmap <- XS.gets workspaceIndexMap
-          XS.modify $ \s -> s {workspaceIndexMap = Map.map (\t -> if t == oldIM then newIM else t) wmap}
+renameWorkspaceByName w = do
+  old <- gets (currentTag . windowset)
+  windows $ \s ->
+    let sett wk = wk {tag = w}
+        setscr scr = scr {workspace = sett $ workspace scr}
+        sets q = q {current = setscr $ current q}
+     in sets $ removeWorkspace' w s
+  updateIndexMap old w
+  where
+    updateIndexMap oldIM newIM = do
+      wmap <- XS.gets workspaceIndexMap
+      XS.modify $ \s -> s {workspaceIndexMap = Map.map (\t -> if t == oldIM then newIM else t) wmap}
 
 toNthWorkspace :: (String -> HS ()) -> Int -> HS ()
-toNthWorkspace job wnum = do sort <- getSortByIndex
-                             ws <- gets (map tag . sort . workspaces . windowset)
-                             case drop wnum ws of
-                               (w:_) -> job w
-                               [] -> return ()
+toNthWorkspace job wnum = do
+  sort <- getSortByIndex
+  ws <- gets (map tag . sort . workspaces . windowset)
+  case drop wnum ws of
+    (w : _) -> job w
+    [] -> return ()
 
 withNthWorkspace :: (String -> WindowSet -> WindowSet) -> Int -> HS ()
-withNthWorkspace job wnum = do sort <- getSortByIndex
-                               ws <- gets (map tag . sort . workspaces . windowset)
-                               case drop wnum ws of
-                                 (w:_) -> windows $ job w
-                                 [] -> return ()
+withNthWorkspace job wnum = do
+  sort <- getSortByIndex
+  ws <- gets (map tag . sort . workspaces . windowset)
+  case drop wnum ws of
+    (w : _) -> windows $ job w
+    [] -> return ()
 
---selectWorkspace :: XPConfig -> HS ()
---selectWorkspace conf = workspacePrompt conf $ \w ->
+-- selectWorkspace :: XPConfig -> HS ()
+-- selectWorkspace conf = workspacePrompt conf $ \w ->
 --                       do s <- gets windowset
 --                          if tagMember w s
 --                            then windows $ greedyView w
@@ -169,13 +180,13 @@ addWorkspaceAt add newtag = addHiddenWorkspaceAt add newtag >> windows (greedyVi
 
 ---- | Prompt for the name of a new workspace, add it if it does not
 ----   already exist, and switch to it.
---addWorkspacePrompt :: XPConfig -> HS ()
---addWorkspacePrompt conf = mkXPrompt (Wor "New workspace name: ") conf (const (return [])) addWorkspace
+-- addWorkspacePrompt :: XPConfig -> HS ()
+-- addWorkspacePrompt conf = mkXPrompt (Wor "New workspace name: ") conf (const (return [])) addWorkspace
 --
 ---- | Prompt for the name of a new workspace, appending it to the end of the list of workspaces
 ----   if it does not already exist, and switch to it.
---appendWorkspacePrompt :: XPConfig -> HS ()
---appendWorkspacePrompt conf = mkXPrompt (Wor "New workspace name: ") conf (const (return [])) appendWorkspace
+-- appendWorkspacePrompt :: XPConfig -> HS ()
+-- appendWorkspacePrompt conf = mkXPrompt (Wor "New workspace name: ") conf (const (return [])) appendWorkspace
 
 -- | Add a new hidden workspace with the given name, or do nothing if
 --   a workspace with the given name already exists. Takes a function to insert
@@ -206,12 +217,12 @@ removeEmptyWorkspaceByTag t = whenM (isEmpty t) $ removeWorkspaceByTag t
 -- | Remove workspace with specific tag.
 removeWorkspaceByTag :: String -> HS ()
 removeWorkspaceByTag torem = do
-    s <- gets windowset
-    case s of
-        StackSet { current = Screen { workspace = cur }, hidden = (w:_) } -> do
-                when (torem==tag cur) $ windows $ HSWM.StackSet.view $ tag w
-                windows $ removeWorkspace' torem
-        _ -> return ()
+  s <- gets windowset
+  case s of
+    StackSet {current = Screen {workspace = cur}, hidden = (w : _)} -> do
+      when (torem == tag cur) $ windows $ HSWM.StackSet.view $ tag w
+      windows $ removeWorkspace' torem
+    _ -> return ()
 
 -- | Remove the current workspace after an operation if it is empty and hidden.
 --   Can be used to remove a workspace if it is empty when leaving it. The
@@ -224,32 +235,40 @@ removeEmptyWorkspaceAfter = removeEmptyWorkspaceAfterExcept []
 --   whose entries will never be removed.
 removeEmptyWorkspaceAfterExcept :: [String] -> HS () -> HS ()
 removeEmptyWorkspaceAfterExcept sticky f = do
-    before <- gets (currentTag . windowset)
-    f
-    after <- gets (currentTag . windowset)
-    when (before/=after && before `notElem` sticky) $ removeEmptyWorkspaceByTag before
+  before <- gets (currentTag . windowset)
+  f
+  after <- gets (currentTag . windowset)
+  when (before /= after && before `notElem` sticky) $ removeEmptyWorkspaceByTag before
 
 isEmpty :: String -> HS Bool
-isEmpty t = do wsl <- gets $ workspaces . windowset
-               let mws = find (\ws -> tag ws == t) wsl
-               return $ maybe True (isNothing . stack) mws
+isEmpty t = do
+  wsl <- gets $ workspaces . windowset
+  let mws = find (\ws -> tag ws == t) wsl
+  return $ maybe True (isNothing . stack) mws
 
-addHiddenWorkspace' :: Default wd => (Workspace i l a wd -> [Workspace i l a wd] -> [Workspace i l a wd]) -> i -> l -> StackSet i l a wd sid sd -> StackSet i l a wd sid sd
-addHiddenWorkspace' add newtag l s@StackSet{ hidden = ws } = s { hidden = add (Workspace newtag l Nothing def) ws }
+addHiddenWorkspace' :: (Default wd) => (Workspace i l a wd -> [Workspace i l a wd] -> [Workspace i l a wd]) -> i -> l -> StackSet i l a wd sid sd -> StackSet i l a wd sid sd
+addHiddenWorkspace' add newtag l s@StackSet {hidden = ws} = s {hidden = add (Workspace newtag l Nothing def) ws}
 
 -- | Remove the hidden workspace with the given tag from the StackSet, if
 --   it exists. All the windows in that workspace are moved to the current
 --   workspace.
 removeWorkspace' :: (Eq i, Eq a) => i -> StackSet i l a wd sid sd -> StackSet i l a wd sid sd
-removeWorkspace' torem s@StackSet{ current = scr@Screen { workspace = wc }
-                                 , hidden  = hs }
-    = let (xs, ys) = break ((== torem) . tag) hs
-      in removeWorkspace'' xs ys
-   where meld Nothing Nothing = Nothing
-         meld x Nothing = x
-         meld Nothing x = x
-         meld (Just x) (Just y) = differentiate . nub $ integrate x ++ integrate y
-         removeWorkspace'' xs (y:ys) = s { current = scr { workspace = wc { stack = meld (stack y) (stack wc) } }
-                                         , hidden = xs ++ ys }
-         removeWorkspace'' _  _      = s
-
+removeWorkspace'
+  torem
+  s@StackSet
+    { current = scr@Screen {workspace = wc},
+      hidden = hs
+    } =
+    let (xs, ys) = break ((== torem) . tag) hs
+     in removeWorkspace'' xs ys
+    where
+      meld Nothing Nothing = Nothing
+      meld x Nothing = x
+      meld Nothing x = x
+      meld (Just x) (Just y) = differentiate . nub $ integrate x ++ integrate y
+      removeWorkspace'' xs (y : ys) =
+        s
+          { current = scr {workspace = wc {stack = meld (stack y) (stack wc)}},
+            hidden = xs ++ ys
+          }
+      removeWorkspace'' _ _ = s

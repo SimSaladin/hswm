@@ -1,4 +1,5 @@
 ------------------------------------------------------------------------------
+
 -- |
 -- Module      : HSWM.InputConfig
 -- Description : Short description
@@ -11,34 +12,32 @@
 -- Handling of various user input devices, e.g. pointers, keyboards, touch control
 --
 -- ------------------------------------------------------------------------------
-module HSWM.InputConfig  where
+module HSWM.InputConfig where
 
+import Data.Map qualified as M
+import Foreign
 import HSWM.Core
 import HSWM.XKB
-
-import qualified River.Objects as R
-import qualified River.Safe as R
-import qualified Wayland.Client as WL
-import qualified Data.Map as M
-
-import Foreign
+import River.Objects qualified as R
+import River.Safe qualified as R
+import Wayland.Client qualified as WL
 
 setKeyboardLayout :: R.RiverXkbConfig -> R.RiverXkbKeyboard -> XkbRuleNames -> H ()
 setKeyboardLayout xkbConfig keyboard layout =
-    io (newXkbKeymapFromNames layout) >>= \km ->
+  io (newXkbKeymapFromNames layout) >>= \km ->
     io $ withXkbKeymapFd km $ \fd ->
-    R.riverXkbConfigCreateKeymap xkbConfig (fi fd) R.RIVER_XKB_CONFIG_V1_KEYMAP_FORMAT_TEXT_V1 -- RiverXkbConfigKeymapFormatText
-    >>= io . R.riverXkbKeyboardSetKeymap keyboard
+      R.riverXkbConfigCreateKeymap xkbConfig (fi fd) R.RIVER_XKB_CONFIG_V1_KEYMAP_FORMAT_TEXT_V1 -- RiverXkbConfigKeymapFormatText
+        >>= io . R.riverXkbKeyboardSetKeymap keyboard
 
 updateKeyboardInfo :: (MonadStateGlobal env m) => R.RiverXkbKeyboard -> (KeyboardInfo -> Maybe KeyboardInfo) -> m ()
 updateKeyboardInfo i f = withObjectDef mempty $ putObject . M.alter (f . fromMaybe def) i
 
 data KeyboardInfo = KeyboardInfo
-  { layoutName :: String
-  , layoutIndex :: Int
+  { layoutName :: String,
+    layoutIndex :: Int
   }
   deriving stock (Show, Generic)
-  deriving anyclass Default
+  deriving anyclass (Default)
 
 -- * Event handlers
 
@@ -47,14 +46,14 @@ handleInputManagerEvent (R.RiverInputManagerInputDevice _ _ dev) = do
   l <- getObject
   io $ R.listenerAdd dev l nullPtr
   asks (repeatInfo . config) >>= io . (`whenJust` uncurry (R.riverInputDeviceSetRepeatInfo dev)) --  repeatRate repeatDelay
-  --io $ R.riverInputDeviceAssignToSeat dev (Just "default")
+  -- io $ R.riverInputDeviceAssignToSeat dev (Just "default")
 handleInputManagerEvent _ = return ()
 
-handleInputDeviceEvent :: Monad m => R.RiverInputDeviceEvent -> m ()
+handleInputDeviceEvent :: (Monad m) => R.RiverInputDeviceEvent -> m ()
 handleInputDeviceEvent (R.RiverInputDeviceType' _ _ _inputDevice) = return ()
 handleInputDeviceEvent _ = return ()
 
-handleLibinputEvent :: (HasGlobalTMap s, MonadReader s m, MonadUnliftIO m,  HasLogFunc s) => R.RiverLibinputConfigEvent -> m ()
+handleLibinputEvent :: (HasGlobalTMap s, MonadReader s m, MonadUnliftIO m, HasLogFunc s) => R.RiverLibinputConfigEvent -> m ()
 handleLibinputEvent (R.RiverLibinputConfigLibinputDevice _ _ dev) = do
   l <- getObject
   io $ WL.listenerAdd dev l nullPtr
@@ -70,5 +69,5 @@ handleXkbConfigEvent _ = return ()
 handleXkbKeyboardEvent :: (MonadStateGlobal env m) => R.RiverXkbKeyboardEvent -> m ()
 handleXkbKeyboardEvent (R.RiverXkbKeyboardRemoved _ _kbd) = return () -- TODO
 handleXkbKeyboardEvent (R.RiverXkbKeyboardLayout _ kbd index name) = do
-  updateKeyboardInfo kbd $ \x -> Just x { layoutName = name, layoutIndex = fi index }
+  updateKeyboardInfo kbd $ \x -> Just x {layoutName = name, layoutIndex = fi index}
 handleXkbKeyboardEvent _ = return ()

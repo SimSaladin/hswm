@@ -1,5 +1,6 @@
 module Text.XkbCommon
-  ( module X
-  ) where
+  ( module X,
+  )
+where
 
 import Text.XkbCommon.Internal as X

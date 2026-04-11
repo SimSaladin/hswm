@@ -1,11 +1,11 @@
 module HSWM.ManageHook where
 
+import Data.List (isInfixOf, isPrefixOf, isSuffixOf)
+import HSWM.StackSet qualified as W
 import HSWM.Types.WM
-import Data.List (isPrefixOf, isInfixOf, isSuffixOf)
-import qualified HSWM.StackSet as W
 
 -- | If-then-else lifted to a 'Monad'.
-ifM :: Monad m => m Bool -> m a -> m a -> m a
+ifM :: (Monad m) => m Bool -> m a -> m a -> m a
 ifM mb t f = mb >>= \b -> if b then t else f
 
 idHook :: ManageHook
@@ -21,10 +21,10 @@ data Match a = Match Bool a
 -- (whereas 'composeAll' continues and executes all matching rules).
 composeOne :: (Monoid a, Monad m) => [m (Maybe a)] -> m a
 composeOne = foldr try (return mempty)
-    where
+  where
     try q z = do
-        x <- q
-        maybe z return x
+      x <- q
+      maybe z return x
 
 infix 0 -->
 
@@ -35,17 +35,17 @@ infix 0 -->
 p --> f = p >>= \b -> if b then f else return mempty
 
 -- | @q =? x@. if the result of @q@ equals @x@, return 'True'.
-(=?) :: Eq a => Query a -> a -> Query Bool
+(=?) :: (Eq a) => Query a -> a -> Query Bool
 q =? x = fmap (== x) q
 
 infixr 3 <&&>, <||>
 
 -- | '&&' lifted to a 'Monad'.
-(<&&>) :: Monad m => m Bool -> m Bool -> m Bool
+(<&&>) :: (Monad m) => m Bool -> m Bool -> m Bool
 x <&&> y = ifM x y (pure False)
 
 -- | '||' lifted to a 'Monad'.
-(<||>) :: Monad m => m Bool -> m Bool -> m Bool
+(<||>) :: (Monad m) => m Bool -> m Bool -> m Bool
 x <||> y = ifM x (pure True) y
 
 infixr 0 -?>, -->>, -?>>
@@ -69,13 +69,13 @@ q $? x = fmap (x `isSuffixOf`) q
 -- | q <==? x. if the result of q equals x, return True grouped with q
 (<==?) :: (Eq a, Functor m) => m a -> a -> m (Match a)
 q <==? x = fmap (`eq` x) q
-    where
+  where
     eq q' x' = Match (q' == x') q'
 
 -- | q <\/=? x. if the result of q notequals x, return True grouped with q
 (</=?) :: (Eq a, Functor m) => m a -> a -> m (Match a)
 q </=? x = fmap (`neq` x) q
-    where
+  where
     neq q' x' = Match (q' /= x') q'
 
 -- | A helper operator for use in 'composeOne'. It takes a condition and an action;
@@ -83,20 +83,20 @@ q </=? x = fmap (`neq` x) q
 -- go on and try the next rule.
 (-?>) :: (Functor m, Monad m) => m Bool -> m a -> m (Maybe a)
 p -?> f = do
-    x <- p
-    if x then fmap Just f else return Nothing
+  x <- p
+  if x then fmap Just f else return Nothing
 
 -- | A helper operator for use in 'composeAll'. It takes a condition and a function taking a grouped datum to action.  If 'p' is true, it executes the resulting action.
 (-->>) :: (Monoid b, Monad m) => m (Match a) -> (a -> m b) -> m b
 p -->> f = do
-    Match b m <- p
-    if b then f m else return mempty
+  Match b m <- p
+  if b then f m else return mempty
 
 -- | A helper operator for use in 'composeOne'.  It takes a condition and a function taking a groupdatum to action.  If 'p' is true, it executes the resulting action.  If it fails, it returns 'Nothing' from the 'Query' so 'composeOne' will go on and try the next rule.
 (-?>>) :: (Functor m, Monad m) => m (Match a) -> (a -> m b) -> m (Maybe b)
 p -?>> f = do
-    Match b m <- p
-    if b then fmap  Just (f m) else return Nothing
+  Match b m <- p
+  if b then fmap Just (f m) else return Nothing
 
 -- | A predicate to check whether a window is hidden (minimized).
 isMinimized :: Query Bool
@@ -106,8 +106,10 @@ appName :: Query String
 appName = asks appId
 
 -- | Floats the new window in the given rectangle.
-doRectFloat :: W.RationalRect  -- ^ The rectangle to float the window in. 0 to 1; x, y, w, h.
-            -> ManageHook
+doRectFloat ::
+  -- | The rectangle to float the window in. 0 to 1; x, y, w, h.
+  W.RationalRect ->
+  ManageHook
 doRectFloat r = ask >>= \w -> doF (W.float w.river_window r)
 
 -- | Modify the 'WindowSet' with a pure function.

@@ -1,6 +1,9 @@
 {-# LANGUAGE BlockArguments #-}
 
 -----------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------
+
 -- |
 -- Module      :  HSWM.Actions.Repeatable
 -- Description :  Actions you'd like to repeat.
@@ -16,11 +19,8 @@
 -- "HSWM.Actions.MostRecentlyUsed".
 --
 -- See the source of these modules for usage examples.
---
------------------------------------------------------------------------------
-
-module HSWM.Actions.Repeatable (
-
+module HSWM.Actions.Repeatable
+  (
   -- -- * Repeatable
   -- repeatable,
   -- repeatableSt,
@@ -32,8 +32,8 @@ module HSWM.Actions.Repeatable (
   -- concludable,
   -- concludableSt,
   -- concludableM,
-
-) where
+  )
+where
 
 -- import Data.Functor (($>))
 -- import Control.Monad.State (StateT(..))
@@ -80,8 +80,8 @@ repeatableM run mods key handler = concludableM run mods key press event
   event (t, s) = Right <$> handler t s
 -}
 
---data Done        = Done
---data NotOurEvent = NotOurEvent
+-- data Done        = Done
+-- data NotOurEvent = NotOurEvent
 --
 {-
 -- | A generalisation of `repeatable` which may conclude early with `NotOurEvent` or `Done`.
@@ -140,7 +140,7 @@ concludableM run mods key pressHandler eventHandler = do
   run (concludableRaw d root mods key pressHandler eventHandler)
 -}
 
-  {-
+{-
 concludableRaw
   :: (MonadIO m, Monoid a)
   => [KeySym]

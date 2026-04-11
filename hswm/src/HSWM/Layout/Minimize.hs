@@ -1,5 +1,12 @@
-{-# LANGUAGE MultiParamTypeClasses, TypeSynonymInstances, FlexibleContexts, PatternGuards #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE PatternGuards #-}
+{-# LANGUAGE TypeSynonymInstances #-}
+
 ----------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------
+
 -- |
 -- Module      :  HSWM.Layout.Minimize
 -- Description :  Minimize windows, temporarily removing them from the layout.
@@ -12,22 +19,20 @@
 --
 -- Makes it possible to minimize windows, temporarily removing them
 -- from the layout until they are restored.
---
------------------------------------------------------------------------------
-
-module HSWM.Layout.Minimize (
-        -- * Usage
-        -- $usage
-        Minimize,
-        minimize,
-    ) where
+module HSWM.Layout.Minimize
+  ( -- * Usage
+    -- $usage
+    Minimize,
+    minimize,
+  )
+where
 
 import HSWM hiding (Minimize)
-import qualified HSWM.StackSet as W
-import HSWM.Util.Minimize (Minimized(..))
-import HSWM.Layout.LayoutModifier
 import HSWM.Layout.BoringWindows as BW
-import qualified HSWM.Util.ExtensibleState as XS
+import HSWM.Layout.LayoutModifier
+import HSWM.StackSet qualified as W
+import HSWM.Util.ExtensibleState qualified as XS
+import HSWM.Util.Minimize (Minimized (..))
 
 -- $usage
 -- You can use this module with the following in your @xmonad.hs@:
@@ -53,24 +58,24 @@ import qualified HSWM.Util.ExtensibleState as XS
 -- Also see "HSWM.Hooks.Minimize" if you want to be able to minimize
 -- and restore windows from your taskbar.
 
-data Minimize a = Minimize deriving ( Read, Show )
+data Minimize a = Minimize deriving (Read, Show)
+
 minimize :: l RiverWindow -> ModifiedLayout Minimize l RiverWindow
 minimize = ModifiedLayout Minimize
 
-
 instance LayoutModifier Minimize RiverWindow where
-    modifierDescription _ = "Minimize"
+  modifierDescription _ = "Minimize"
 
-    modifyLayout Minimize wksp rect = do
+  modifyLayout Minimize wksp rect = do
+    minimized <- XS.gets minimizedStack
+    let stack = W.stack wksp
+        filtStack = stack >>= W.filter (`notElem` minimized)
+    runLayout (wksp {W.stack = filtStack}) rect
+
+  handleMess Minimize m
+    | Just BW.UpdateBoring <- fromMessage m = do
         minimized <- XS.gets minimizedStack
-        let stack = W.stack wksp
-            filtStack = stack >>= W.filter (`notElem` minimized)
-        runLayout (wksp {W.stack = filtStack}) rect
-
-    handleMess Minimize m
-        | Just BW.UpdateBoring <- fromMessage m = do
-            minimized <- XS.gets minimizedStack
-            ws <- gets (W.workspace . W.current . windowset)
-            flip sendMessageWithNoRefresh ws $ BW.Replace "Minimize" minimized
-            return Nothing
-        | otherwise = return Nothing
+        ws <- gets (W.workspace . W.current . windowset)
+        flip sendMessageWithNoRefresh ws $ BW.Replace "Minimize" minimized
+        return Nothing
+    | otherwise = return Nothing

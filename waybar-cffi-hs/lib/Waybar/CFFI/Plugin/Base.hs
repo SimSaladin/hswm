@@ -8,19 +8,18 @@
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
---
 module Waybar.CFFI.Plugin.Base
   ( module Waybar.CFFI.Plugin.Base,
     module RXP,
   )
 where
 
+import Data.Aeson qualified as A
 import Foreign as RXP
 import Foreign.C as RXP
 import Foreign.Storable.Generic as RXP (GStorable (..))
 import GHC.Generics as RXP (Generic)
 import GI.Gtk.Objects.Container as RXP (Container)
-import qualified Data.Aeson as A
 
 data IConf id = IConf
   { wbModule :: !(Ptr WbcffiModule),

@@ -1,6 +1,9 @@
 {-# LANGUAGE UndecidableInstances #-}
 
 ------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+
 -- |
 -- Module      : HSWM.Config
 -- Description : Short description
@@ -11,42 +14,41 @@
 -- Portability : unportable
 --
 -- Longer description of this module.
---
-------------------------------------------------------------------------------
 module HSWM.Config
-  ( module HSWM.Config
-  ) where
+  ( module HSWM.Config,
+  )
+where
 
-import           HSWM.Core
-import           HSWM.Operations
-import           HSWM.Utils
-import           HSWM.XKB
-
-import qualified Data.List as L
+import Data.List qualified as L
+import HSWM.Core
+import HSWM.Operations
+import HSWM.Utils
+import HSWM.XKB
 
 -- * Named
 
-named :: IsAction H a => String -> a -> SomeAction H
+named :: (IsAction H a) => String -> a -> SomeAction H
 named str a = SomeAction $ NamedAction str (SomeAction a)
 
-data NamedAction = NamedAction String (SomeAction H)
-                 | NamedActionH String (H ())
-                 | NamedActionHS String (HS ())
+data NamedAction
+  = NamedAction String (SomeAction H)
+  | NamedActionH String (H ())
+  | NamedActionHS String (HS ())
 
 instance IsAction H NamedAction where
   runner (NamedActionH _ m) = m
-  runner (NamedAction _ a)  = runner a
-  runner (NamedActionHS _ a)  = runInHS a
+  runner (NamedAction _ a) = runner a
+  runner (NamedActionHS _ a) = runInHS a
 
   actionSubmap (NamedActionH _ _) = []
   actionSubmap (NamedActionHS _ _) = []
-  actionSubmap (NamedAction _ a)  = actionSubmap a
+  actionSubmap (NamedAction _ a) = actionSubmap a
 
   actionDescription _ (NamedActionH nm _) = nm
   actionDescription _ (NamedActionHS nm _) = nm
-  actionDescription _ (NamedAction nm _)  = nm
+  actionDescription _ (NamedAction nm _) = nm
 
-  --typeDescription _ = ""
+-- typeDescription _ = ""
 
 namedA :: String -> H () -> SomeAction H
 namedA desc m = SomeAction (NamedActionH desc m)
@@ -66,68 +68,69 @@ windowsMA desc f = SomeAction $ NamedActionHS desc $ withWindowSet $ f >=> modif
 -- * Keys/submaps
 
 addKeys :: (IsKeySym k, IsAction m a) => [((ModMask, k), a)] -> ConfigDoM m
-addKeys keys c = c
-  { keyBindings = keyBindings c ++
-    [ ((m, toKeySym k), SomeAction a) | ((m, k), a) <- keys ]
-  }
+addKeys keys c =
+  c
+    { keyBindings =
+        keyBindings c
+          ++ [((m, toKeySym k), SomeAction a) | ((m, k), a) <- keys]
+    }
 
-submap :: forall m a k. (Monad m, IsAction m a, IsAction m (Submap m), IsKeySym k)
-       => Maybe (SomeAction m) -> [((ModMask, k), a)] -> SomeAction m
+submap ::
+  forall m a k.
+  (Monad m, IsAction m a, IsAction m (Submap m), IsKeySym k) =>
+  Maybe (SomeAction m) -> [((ModMask, k), a)] -> SomeAction m
 submap defAct subKeys =
-  let
-      submapKeys    :: [((ModMask, KeySym), SomeAction m)]
-      submapKeys    = [ ((m, toKeySym k), SomeAction a) | ((m, k), a) <- subKeys ]
+  let submapKeys :: [((ModMask, KeySym), SomeAction m)]
+      submapKeys = [((m, toKeySym k), SomeAction a) | ((m, k), a) <- subKeys]
 
       submapDefault = SomeAction <$> defAct
 
-      smap = Submap{..}
-
+      smap = Submap {..}
    in SomeAction smap
 
-fromADTKeys :: [ KeyAction (String, KeySym) (SomeAction H) ] -> [((ModMask, KeySym), SomeAction H)]
-fromADTKeys = map doKey where
-  doKey (KeyAction k a)  = (doMK k, a)
-  doKey (KeySubmap k xs) = (doMK k, submap Nothing (fromADTKeys xs))
-  -- TODO hard-coded default Mod mask
-  doMK (m, k) = (resolveModMask (resolveModMask 0 "super") m, k)
+fromADTKeys :: [KeyAction (String, KeySym) (SomeAction H)] -> [((ModMask, KeySym), SomeAction H)]
+fromADTKeys = map doKey
+  where
+    doKey (KeyAction k a) = (doMK k, a)
+    doKey (KeySubmap k xs) = (doMK k, submap Nothing (fromADTKeys xs))
+    -- TODO hard-coded default Mod mask
+    doMK (m, k) = (resolveModMask (resolveModMask 0 "super") m, k)
 
-data KeyAction mk a = KeyAction mk a
-                    | KeySubmap mk [KeyAction mk a]
-                    deriving (Show, Generic)
+data KeyAction mk a
+  = KeyAction mk a
+  | KeySubmap mk [KeyAction mk a]
+  deriving (Show, Generic)
 
-parseSubmaps :: [(String, SomeAction H)] -> [ KeyAction (String, KeySym) (SomeAction H) ]
+parseSubmaps :: [(String, SomeAction H)] -> [KeyAction (String, KeySym) (SomeAction H)]
 parseSubmaps ks0 =
-  let sanitized = [(L.words s, a) | (s, a) <- ks0 ] :: [([String], SomeAction H)]
+  let sanitized = [(L.words s, a) | (s, a) <- ks0] :: [([String], SomeAction H)]
 
-      keypaths :: [ ( [(String, KeySym)], SomeAction H ) ]
+      keypaths :: [([(String, KeySym)], SomeAction H)]
       keypaths = do
         (keyseq, a) <- sanitized -- ([String], a)
-        return ( [ (L.intercalate "-" (L.init (breakKeys k)) :: String, toKeySym $ L.last (breakKeys k) :: KeySym) | k <- keyseq ], a)
+        return ([(L.intercalate "-" (L.init (breakKeys k)) :: String, toKeySym $ L.last (breakKeys k) :: KeySym) | k <- keyseq], a)
 
       toADT :: ([(String, KeySym)], SomeAction H) -> KeyAction (String, KeySym) (SomeAction H)
-      toADT ([ k ], a)  = KeyAction k a
+      toADT ([k], a) = KeyAction k a
       toADT (k : ks, a) = KeySubmap k [toADT (ks, a)]
-      toADT ([], _)     = error "toADT"
+      toADT ([], _) = error "toADT"
 
-      chains = map toADT keypaths :: [ KeyAction (String, KeySym) (SomeAction H) ]
+      chains = map toADT keypaths :: [KeyAction (String, KeySym) (SomeAction H)]
 
-      combine :: [ KeyAction (String, KeySym) (SomeAction H) ] -> [ KeyAction (String, KeySym) (SomeAction H) ]
+      combine :: [KeyAction (String, KeySym) (SomeAction H)] -> [KeyAction (String, KeySym) (SomeAction H)]
       combine [] = []
       combine (x@(KeyAction _ _) : xs) = x : combine xs
       combine trees@(KeySubmap k _ : _) =
         let (lhs, rhs) = L.partition (\x -> key x == k) trees
-         in KeySubmap k (combine $ L.concat [ xs | KeySubmap _ xs <- lhs ]) : combine rhs
-
-   in
-   combine chains
-
+         in KeySubmap k (combine $ L.concat [xs | KeySubmap _ xs <- lhs]) : combine rhs
+   in combine chains
   where
     breakKeys :: String -> [String]
     breakKeys "" = []
     breakKeys str = case L.span (/= '-') str of
-                      (k,       []) -> [k]
-                      (k, '-' : xs) -> k : breakKeys xs
-                      (_,        _) -> error "breakkeys"
+      (k, []) -> [k]
+      (k, '-' : xs) -> k : breakKeys xs
+      (_, _) -> error "breakkeys"
 
     key (KeyAction k _) = k
     key (KeySubmap k _) = k

@@ -1,4 +1,7 @@
 ------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+
 -- |
 -- Module      : HSWM.Util.Waybar
 -- Description : Short description
@@ -9,14 +12,12 @@
 -- Portability : unportable
 --
 -- Longer description of this module.
---
-------------------------------------------------------------------------------
-module HSWM.Util.Waybar  where
+module HSWM.Util.Waybar where
 
 import HSWM.Core hiding (closed)
-import System.Process.Typed
 import System.IO
 import System.Process (terminateProcess)
+import System.Process.Typed
 
 data WaybarConfig = WaybarConfig
   deriving (Show, Eq, Generic)
@@ -29,30 +30,32 @@ data WaybarState = WaybarState
   deriving anyclass (Default)
 
 waybarSB :: WaybarConfig -> ConfigDoM H
-waybarSB wbcfg ucfg = ucfg
-  { startupHook = startupHook ucfg <> waybarStartupHook wbcfg
-  , exitHook = exitHook ucfg <> waybarExitHook wbcfg
-  }
+waybarSB wbcfg ucfg =
+  ucfg
+    { startupHook = startupHook ucfg <> waybarStartupHook wbcfg,
+      exitHook = exitHook ucfg <> waybarExitHook wbcfg
+    }
 
 waybarStartupHook :: WaybarConfig -> H ()
 waybarStartupHook _ = do
   log' "Starting waybar..."
   st <- getOrCreateObject $ pure (def :: WaybarState)
-  process <- startProcess
-    $ setStdin nullStream
-    $ setStdout nullStream
-    $ setStderr createPipe
-    $ proc "waybar" [ "-l", "debug" ]
+  process <-
+    startProcess $
+      setStdin nullStream $
+        setStdout nullStream $
+          setStderr createPipe $
+            proc "waybar" ["-l", "debug"]
   let errh = getStderr process
   _ <- async $ forever $ do
     ln <- io $ hGetLine errh
     logInfo $ "[waybar] " <> fromString ln
   -- pid <- spawnProcess "waybar" [ "-l", "debug" ]
-  putObject st { wbProcess = Just process }
+  putObject st {wbProcess = Just process}
 
 waybarExitHook :: WaybarConfig -> H ()
 waybarExitHook _ = do
-  withObject $ \WaybarState{wbProcess} ->
+  withObject $ \WaybarState {wbProcess} ->
     -- TODO terminate
     io $ case wbProcess of
       Nothing -> pure ()

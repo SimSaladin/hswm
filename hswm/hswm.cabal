@@ -31,7 +31,6 @@ library
     other-modules:
           PackageInfo_hswm
     exposed-modules:
-          Core
           HSWM
           HSWM.Actions.CycleRecentWS
           HSWM.Actions.CycleWS

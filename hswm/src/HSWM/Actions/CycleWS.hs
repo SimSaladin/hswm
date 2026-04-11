@@ -1,4 +1,7 @@
 -----------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------
+
 -- |
 -- Module      :  HSWM.Actions.CycleWS
 -- Description :  Cycle through workspaces.
@@ -29,69 +32,61 @@
 -- >                 windows . greedyView $ t
 -- >   where bToDir True  = Next
 -- >         bToDir False = Prev
---
------------------------------------------------------------------------------
+module HSWM.Actions.CycleWS
+  ( -- * Usage
+    -- $usage
 
-module HSWM.Actions.CycleWS (
-                                -- * Usage
-                                -- $usage
+    -- * Moving between workspaces
+    -- $moving
+    nextWS,
+    prevWS,
+    shiftToNext,
+    shiftToPrev,
 
-                                -- * Moving between workspaces
-                                -- $moving
+    -- * Toggling the previous workspace
+    -- $toggling
+    toggleWS,
+    toggleWS',
+    toggleOrView,
 
-                                nextWS
-                              , prevWS
-                              , shiftToNext
-                              , shiftToPrev
+    -- * Moving between screens (xinerama)
+    nextScreen,
+    prevScreen,
+    shiftNextScreen,
+    shiftPrevScreen,
+    swapNextScreen,
+    swapPrevScreen,
 
-                                -- * Toggling the previous workspace
-                                -- $toggling
-                              , toggleWS
-                              , toggleWS'
-                              , toggleOrView
+    -- * Moving between workspaces, take two!
+    -- $taketwo
+    Direction1D (..),
+    WSType (..),
+    emptyWS,
+    hiddenWS,
+    anyWS,
+    wsTagGroup,
+    ignoringWSs,
+    shiftTo,
+    moveTo,
+    doTo,
 
-                                -- * Moving between screens (xinerama)
+    -- * The mother-combinator
+    findWorkspace,
+    toggleOrDoSkip,
+    skipTags,
+    screenBy,
+  )
+where
 
-                              , nextScreen
-                              , prevScreen
-                              , shiftNextScreen
-                              , shiftPrevScreen
-                              , swapNextScreen
-                              , swapPrevScreen
+-- import XMonad.Prelude (find, findIndex, isJust, isNothing, liftM2)
 
-                                -- * Moving between workspaces, take two!
-                                -- $taketwo
-
-                              , Direction1D(..)
-                              , WSType(..)
-                              , emptyWS
-                              , hiddenWS
-                              , anyWS
-                              , wsTagGroup
-                              , ignoringWSs
-
-                              , shiftTo
-                              , moveTo
-                              , doTo
-
-                                -- * The mother-combinator
-
-                              , findWorkspace
-                              , toggleOrDoSkip
-                              , skipTags
-
-                              , screenBy
-
-                             ) where
-
---import XMonad.Prelude (find, findIndex, isJust, isNothing, liftM2)
-import HSWM.Core
-import HSWM.Operations
-import qualified HSWM.StackSet as W
-import qualified HSWM.Hooks.WorkspaceHistory as WH
-import HSWM.Util.WorkspaceCompare
-import qualified Data.List as L
 import Data.List ((!!))
+import Data.List qualified as L
+import HSWM.Core
+import HSWM.Hooks.WorkspaceHistory qualified as WH
+import HSWM.Operations
+import HSWM.StackSet qualified as W
+import HSWM.Util.WorkspaceCompare
 
 -- $usage
 -- You can use this module with the following in your @xmonad.hs@ file:
@@ -130,16 +125,14 @@ import Data.List ((!!))
 -- to which you switch is the previously viewed workspace, use the
 -- 'logHook' in "XMonad.Hooks.WorkspaceHistory".
 
-{- $moving
-
-The following commands for moving the view and windows between
-workspaces are somewhat inflexible, but are very simple and probably
-Do The Right Thing for most users.
-
-All of the commands in this section cycle through workspaces in the
-order in which they are given in your config.
-
--}
+-- $moving
+--
+-- The following commands for moving the view and windows between
+-- workspaces are somewhat inflexible, but are very simple and probably
+-- Do The Right Thing for most users.
+--
+-- All of the commands in this section cycle through workspaces in the
+-- order in which they are given in your config.
 
 -- | Switch to the next workspace.
 nextWS :: HS ()
@@ -156,8 +149,6 @@ shiftToNext = shiftBy 1
 -- | Move the focused window to the previous workspace.
 shiftToPrev :: HS ()
 shiftToPrev = shiftBy (-1)
-
--- $toggling
 
 -- | Toggle to the workspace displayed previously.
 toggleWS :: HS ()
@@ -189,13 +180,16 @@ toggleOrView = toggleOrDoSkip [] W.greedyView
 -- >
 -- > -- toggleOrView ignoring scratchpad and named scratchpad workspace
 -- > toggleOrViewNoSP = toggleOrDoSkip ["NSP"] W.greedyView
-toggleOrDoSkip :: [WorkspaceId] -> (WorkspaceId -> WindowSet -> WindowSet)
-                                  -> WorkspaceId -> HS ()
+toggleOrDoSkip ::
+  [WorkspaceId] ->
+  (WorkspaceId -> WindowSet -> WindowSet) ->
+  WorkspaceId ->
+  HS ()
 toggleOrDoSkip skips f toWS = do
-    cur <- gets (W.currentTag . windowset)
-    if toWS == cur
-        then lastViewedHiddenExcept skips >>= flip whenJust (windows . f)
-        else windows (f toWS)
+  cur <- gets (W.currentTag . windowset)
+  if toWS == cur
+    then lastViewedHiddenExcept skips >>= flip whenJust (windows . f)
+    else windows (f toWS)
 
 -- | List difference ('\\') for workspaces and tags. Removes workspaces
 -- matching listed tags from the given workspace list.
@@ -206,11 +200,12 @@ skipTags wss ids = filter ((`notElem` ids) . W.tag) wss
 -- workspace.
 lastViewedHiddenExcept :: [WorkspaceId] -> HS (Maybe WorkspaceId)
 lastViewedHiddenExcept skips = do
-    hs <- gets $ map W.tag . flip skipTags skips . W.hidden . windowset
-    choose hs . L.find (`elem` hs) <$> WH.workspaceHistory
-    where choose []    _           = Nothing
-          choose (h:_) Nothing     = Just h
-          choose _     vh@(Just _) = vh
+  hs <- gets $ map W.tag . flip skipTags skips . W.hidden . windowset
+  choose hs . L.find (`elem` hs) <$> WH.workspaceHistory
+  where
+    choose [] _ = Nothing
+    choose (h : _) Nothing = Just h
+    choose _ vh@(Just _) = vh
 
 switchWorkspace :: Int -> HS ()
 switchWorkspace d = wsBy d >>= windows . W.greedyView
@@ -221,40 +216,42 @@ shiftBy d = wsBy d >>= windows . W.shift
 wsBy :: Int -> HS WorkspaceId
 wsBy = findWorkspace getSortByIndex Next anyWS
 
-{- $taketwo
-
-A few more general commands are also provided, which allow cycling
-through subsets of workspaces.
-
-For example,
-
->   moveTo Next emptyWS
-
-will move to the first available workspace with no windows, and
-
->   shiftTo Prev (WSIs $ return (('p' `elem`) . tag))
-
-will move the focused window backwards to the first workspace containing
-the letter 'p' in its name. =)
-
--}
+-- $taketwo
+--
+-- A few more general commands are also provided, which allow cycling
+-- through subsets of workspaces.
+--
+-- For example,
+--
+-- >   moveTo Next emptyWS
+--
+-- will move to the first available workspace with no windows, and
+--
+-- >   shiftTo Prev (WSIs $ return (('p' `elem`) . tag))
+--
+-- will move the focused window backwards to the first workspace containing
+-- the letter 'p' in its name. =)
 
 -- | What type of workspaces should be included in the cycle?
-data WSType = WSIs (HS (WindowSpace -> Bool))
-                          -- ^ cycle through workspaces satisfying
-                          --   an arbitrary predicate
-            | WSType :&: WSType -- ^ cycle through workspaces satisfying both
-                                --   predicates.
-            | WSType :|: WSType -- ^ cycle through workspaces satisfying one of
-                                --   the predicates.
-            | Not WSType -- ^ cycle through workspaces not satisfying the predicate
+data WSType
+  = -- | cycle through workspaces satisfying
+    --   an arbitrary predicate
+    WSIs (HS (WindowSpace -> Bool))
+  | -- | cycle through workspaces satisfying both
+    --   predicates.
+    WSType :&: WSType
+  | -- | cycle through workspaces satisfying one of
+    --   the predicates.
+    WSType :|: WSType
+  | -- | cycle through workspaces not satisfying the predicate
+    Not WSType
 
 -- | Convert a WSType value to a predicate on workspaces.
 wsTypeToPred :: WSType -> HS (WindowSpace -> Bool)
-wsTypeToPred (WSIs p ) = p
+wsTypeToPred (WSIs p) = p
 wsTypeToPred (p :&: q) = liftM2 (&&) <$> wsTypeToPred p <*> wsTypeToPred q
 wsTypeToPred (p :|: q) = liftM2 (||) <$> wsTypeToPred p <*> wsTypeToPred q
-wsTypeToPred (Not p  ) = fmap not <$> wsTypeToPred p
+wsTypeToPred (Not p) = fmap not <$> wsTypeToPred p
 
 -- | Cycle through empty workspaces
 emptyWS :: WSType
@@ -275,7 +272,6 @@ anyWS = WSIs . return $ const True
 --   "XMonad.Util.NamedScratchpad":
 --
 -- >  moveTo Next $ hiddenWS :&: Not emptyWS :&: ignoringWSs [scratchpadWorkspaceTag]
---
 ignoringWSs :: [WorkspaceId] -> WSType
 ignoringWSs ts = WSIs . return $ (`notElem` ts) . W.tag
 
@@ -286,8 +282,8 @@ wsTagGroup :: Char -> WSType
 wsTagGroup sep = WSIs $ do
   cur <- groupName . W.workspace . W.current <$> gets windowset
   return $ (cur ==) . groupName
-  where groupName = takeWhile (/= sep) . W.tag
-
+  where
+    groupName = takeWhile (/= sep) . W.tag
 
 -- | View the next workspace in the given direction that satisfies
 --   the given condition.
@@ -326,21 +322,22 @@ findWorkspace s dir t n = findWorkspaceGen s (wsTypeToPred t) (maybeNegate dir n
 findWorkspaceGen :: HS WorkspaceSort -> HS (WindowSpace -> Bool) -> Int -> HS WorkspaceId
 findWorkspaceGen _ _ 0 = gets (W.currentTag . windowset)
 findWorkspaceGen sortX wsPredX d = do
-    wsPred <- wsPredX
-    sort   <- sortX
-    ws     <- gets windowset
-    let cur     = W.workspace (W.current ws)
-        sorted  = sort (W.workspaces ws)
-        pivoted = let (a,b) = span ((/= W.tag cur) . W.tag) sorted in b ++ a
-        ws'     = filter wsPred pivoted
-        mCurIx  = findWsIndex cur ws'
-        d'      = if d > 0 then d - 1 else d
-        next    = if null ws'
-                      then cur
-                      else case mCurIx of
-                            Nothing -> ws' !! (d' `mod` length ws')
-                            Just ix -> ws' !! ((ix + d) `mod` length ws')
-    return $ W.tag next
+  wsPred <- wsPredX
+  sort <- sortX
+  ws <- gets windowset
+  let cur = W.workspace (W.current ws)
+      sorted = sort (W.workspaces ws)
+      pivoted = let (a, b) = span ((/= W.tag cur) . W.tag) sorted in b ++ a
+      ws' = filter wsPred pivoted
+      mCurIx = findWsIndex cur ws'
+      d' = if d > 0 then d - 1 else d
+      next =
+        if null ws'
+          then cur
+          else case mCurIx of
+            Nothing -> ws' !! (d' `mod` length ws')
+            Just ix -> ws' !! ((ix + d) `mod` length ws')
+  return $ W.tag next
 
 findWsIndex :: WindowSpace -> [WindowSpace] -> Maybe Int
 findWsIndex ws = L.findIndex ((== W.tag ws) . W.tag)
@@ -354,28 +351,28 @@ prevScreen :: HS ()
 prevScreen = switchScreen (-1)
 
 switchScreen :: Int -> HS ()
-switchScreen d = do s <- screenBy d
-                    mws <- screenWorkspace s
-                    case mws of
-                         Nothing -> return ()
-                         Just ws -> windows (W.view ws)
+switchScreen d = do
+  s <- screenBy d
+  mws <- screenWorkspace s
+  case mws of
+    Nothing -> return ()
+    Just ws -> windows (W.view ws)
 
-{- | Get the 'ScreenId' /d/ places over. Example usage is a variation of the
-the default screen keybindings:
-
->     -- mod-{w,e}, Switch to previous/next Xinerama screen
->     -- mod-shift-{w,e}, Move client to previous/next Xinerama screen
->     --
->     [((m .|. modm, key), sc >>= screenWorkspace >>= flip whenJust (windows . f))
->         | (key, sc) <- zip [xK_w, xK_e] [(screenBy (-1)),(screenBy 1)]
->         , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
-
--}
+-- | Get the 'ScreenId' /d/ places over. Example usage is a variation of the
+-- the default screen keybindings:
+--
+-- >     -- mod-{w,e}, Switch to previous/next Xinerama screen
+-- >     -- mod-shift-{w,e}, Move client to previous/next Xinerama screen
+-- >     --
+-- >     [((m .|. modm, key), sc >>= screenWorkspace >>= flip whenJust (windows . f))
+-- >         | (key, sc) <- zip [xK_w, xK_e] [(screenBy (-1)),(screenBy 1)]
+-- >         , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
 screenBy :: Int -> HS ScreenId
-screenBy d = do ws <- gets windowset
-                --let ss = sortBy screen (screens ws)
-                let now = W.screen (W.current ws)
-                return $ (now + fromIntegral d) `mod` fromIntegral (length (W.screens ws))
+screenBy d = do
+  ws <- gets windowset
+  -- let ss = sortBy screen (screens ws)
+  let now = W.screen (W.current ws)
+  return $ (now + fromIntegral d) `mod` fromIntegral (length (W.screens ws))
 
 -- | Swap current screen with next screen
 swapNextScreen :: HS ()
@@ -386,11 +383,12 @@ swapPrevScreen :: HS ()
 swapPrevScreen = swapScreen (-1)
 
 swapScreen :: Int -> HS ()
-swapScreen d = do s <- screenBy d
-                  mws <- screenWorkspace s
-                  case mws of
-                    Nothing -> return ()
-                    Just ws -> windows (W.greedyView ws)
+swapScreen d = do
+  s <- screenBy d
+  mws <- screenWorkspace s
+  case mws of
+    Nothing -> return ()
+    Just ws -> windows (W.greedyView ws)
 
 -- | Move focused window to workspace on next screen
 shiftNextScreen :: HS ()
@@ -401,8 +399,9 @@ shiftPrevScreen :: HS ()
 shiftPrevScreen = shiftScreenBy (-1)
 
 shiftScreenBy :: Int -> HS ()
-shiftScreenBy d = do s <- screenBy d
-                     mws <- screenWorkspace s
-                     case mws of
-                         Nothing -> return ()
-                         Just ws -> windows (W.shift ws)
+shiftScreenBy d = do
+  s <- screenBy d
+  mws <- screenWorkspace s
+  case mws of
+    Nothing -> return ()
+    Just ws -> windows (W.shift ws)

@@ -23,10 +23,17 @@ module HSWM.Core
   )
 where
 
+import Control.Monad.State
 import Data.Map qualified as M
 import Data.Monoid (Ap (..))
 import Foreign hiding (void)
 import Foreign.C
+import HSWM.ManageHook
+import HSWM.Types.Config
+import HSWM.Types.Events
+import HSWM.Types.Layouts
+import HSWM.Types.TypeMap
+import HSWM.Types.WM
 import HSWM.Util.Types
 import HSWM.XKB
 import River
@@ -34,15 +41,6 @@ import River.Objects qualified as R
 import River.Safe qualified as R
 import Wayland (RegistryCache)
 import Wayland.Client qualified as WL hiding (display)
-import Control.Monad.State
-
-import HSWM.Types.WM
-import HSWM.Types.Config
-import HSWM.Types.Layouts
-import HSWM.Types.Events
-import HSWM.Types.TypeMap
-
-import HSWM.ManageHook
 
 runH :: HConf -> H a -> IO a
 runH c (H a) = runReaderT a c
@@ -55,7 +53,7 @@ runInHS a = do
   conf <- ask
   when conf._stateLocked $ throwString "runInHS: state locked (attempted to nest state lock?)"
   io $ bracketOnError (atomically $ takeTMVar conf._state) (atomically . putTMVar conf._state) $ \st -> do
-    (r, st') <- runHS conf { _stateLocked = True } st a
+    (r, st') <- runHS conf {_stateLocked = True} st a
     atomically $ putTMVar conf._state st'
     return r
 
@@ -68,16 +66,19 @@ liftH a = do
 catchH :: H a -> H a -> H a
 catchH job errcase = do
   c <- ask
-  liftIO $ runH c job
-        `catch` \e -> case fromException e of
-          Just (_ :: ExitCode) -> throwM e
-          _ -> hPutBuilder stderr (getUtf8Builder $ display @Text "error: " <> display (tshow e)) >> runH c errcase
+  liftIO $
+    runH c job
+      `catch` \e -> case fromException e of
+        Just (_ :: ExitCode) -> throwM e
+        _ -> hPutBuilder stderr (getUtf8Builder $ display @Text "error: " <> display (tshow e)) >> runH c errcase
 
 catchHS :: HS a -> HS a -> HS a
 catchHS job errcase = do
   c <- ask
   s <- get
-  (a, s') <- liftIO $ runHS c s job
+  (a, s') <-
+    liftIO $
+      runHS c s job
         `catch` \e -> case fromException e of
           Just (_ :: ExitCode) -> throwM e
           _ -> hPutBuilder stderr (getUtf8Builder $ display @Text "error: " <> display (tshow e)) >> runHS c s errcase
@@ -103,6 +104,7 @@ userCodeDefS :: a -> HS a -> HS a
 userCodeDefS defValue a = fromMaybe defValue <$> userCodeS a
 
 -----------------------------------------------------------
+
 -- * Manage/Render Event queues
 
 class HasEventQueues env where
@@ -110,11 +112,13 @@ class HasEventQueues env where
   pendingRenderQL :: Lens' env (TQueue (HS ()))
 
 instance HasEventQueues HConf where
-  pendingManageQL = lens pendingManageQ $ \s a -> s { pendingManageQ = a }
-  pendingRenderQL = lens pendingRenderQ $ \s a -> s { pendingRenderQ = a }
+  pendingManageQL = lens pendingManageQ $ \s a -> s {pendingManageQ = a}
+  pendingRenderQL = lens pendingRenderQ $ \s a -> s {pendingRenderQ = a}
 
-getEventQueueFuncs :: (MonadReader env m, HasEventQueues env, MonadIO inner)
-                   => m (HS e1 -> inner (), HS e2 -> inner ()) -- ^ @(queueForManagePhase, queueForRenderPhase)@
+getEventQueueFuncs ::
+  (MonadReader env m, HasEventQueues env, MonadIO inner) =>
+  -- | @(queueForManagePhase, queueForRenderPhase)@
+  m (HS e1 -> inner (), HS e2 -> inner ())
 getEventQueueFuncs = (wrap *** wrap) <$> asks ((,) <$> view pendingManageQL <*> view pendingRenderQL)
   where
     wrap q = atomically . writeTQueue q . void
