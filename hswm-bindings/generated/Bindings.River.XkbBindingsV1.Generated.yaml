@@ -1,0 +1,86 @@
+version:
+  hs_bindgen: 0.1.0
+  binding_specification: '1.0'
+hsmodule: Bindings.River.XkbBindingsV1.Generated
+ctypes:
+- headers: river-xkb-bindings-v1-client-protocol.h
+  cname: struct river_xkb_binding_v1
+  hsname: River_xkb_binding_v1
+- headers: river-xkb-bindings-v1-client-protocol.h
+  cname: struct river_xkb_bindings_seat_v1
+  hsname: River_xkb_bindings_seat_v1
+- headers: river-xkb-bindings-v1-client-protocol.h
+  cname: struct river_xkb_bindings_v1
+  hsname: River_xkb_bindings_v1
+- headers: river-xkb-bindings-v1-client-protocol.h
+  cname: enum river_xkb_bindings_v1_error
+  hsname: River_xkb_bindings_v1_error
+- headers: river-xkb-bindings-v1-client-protocol.h
+  cname: struct river_xkb_binding_v1_listener
+  hsname: River_xkb_binding_v1_listener
+- headers: river-xkb-bindings-v1-client-protocol.h
+  cname: struct river_xkb_bindings_seat_v1_listener
+  hsname: River_xkb_bindings_seat_v1_listener
+hstypes:
+- hsname: River_xkb_binding_v1
+  representation: emptydata
+- hsname: River_xkb_binding_v1_listener
+  representation:
+    record:
+      constructor: River_xkb_binding_v1_listener
+      fields:
+      - pressed
+      - released
+      - stop_repeat
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_xkb_bindings_seat_v1
+  representation: emptydata
+- hsname: River_xkb_bindings_seat_v1_listener
+  representation:
+    record:
+      constructor: River_xkb_bindings_seat_v1_listener
+      fields:
+      - ate_unbound_key
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: River_xkb_bindings_v1
+  representation: emptydata
+- hsname: River_xkb_bindings_v1_error
+  representation:
+    newtype:
+      constructor: River_xkb_bindings_v1_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw

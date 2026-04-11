@@ -31,14 +31,15 @@ import Data.Map qualified as M
 import Data.Vector.Storable qualified as V
 import Foreign
 import Foreign.C
-import Generated.Pixman qualified as P
-import Generated.Pixman.Safe qualified as P
+import Bindings.Pixman.Generated qualified as P
+import Bindings.Pixman.Generated.Safe qualified as P
 import HSWM.BufferPool qualified as BP
 import HSWM.Core
-import River.Objects qualified as R
+import Bindings.River qualified as R
 import System.Directory
 import System.IO.Unsafe
-import Wayland.Client qualified as WL
+import Bindings.Wayland.Client qualified as WL
+import Bindings.Wayland.Util.Generated.Safe qualified as WL
 
 data Config = Config
   { filepath :: FilePath

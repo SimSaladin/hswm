@@ -18,9 +18,9 @@ import Data.Map qualified as M
 import Foreign
 import HSWM.Core
 import HSWM.XKB
-import River.Objects qualified as R
-import River.Safe qualified as R
-import Wayland.Client qualified as WL
+import Bindings.River qualified as R
+import Bindings.RiverSafe qualified as R
+import Bindings.Wayland.Client qualified as WL
 
 setKeyboardLayout :: R.RiverXkbConfig -> R.RiverXkbKeyboard -> XkbRuleNames -> H ()
 setKeyboardLayout xkbConfig keyboard layout =

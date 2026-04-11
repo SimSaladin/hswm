@@ -37,10 +37,10 @@ import HSWM.Types.WM
 import HSWM.Util.Types
 import HSWM.XKB
 import River
-import River.Objects qualified as R
-import River.Safe qualified as R
+import Bindings.River qualified as R
+import Bindings.RiverSafe qualified as R
 import Wayland (RegistryCache)
-import Wayland.Client qualified as WL hiding (display)
+import Bindings.Wayland.Client qualified as WL hiding (display)
 
 runH :: HConf -> H a -> IO a
 runH c (H a) = runReaderT a c

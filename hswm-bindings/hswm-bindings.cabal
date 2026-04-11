@@ -40,32 +40,81 @@ extra-source-files:
       include/wlr-layer-shell-unstable-v1-client-protocol.h
       include/wlr-output-management-unstable-v1-client-protocol.h
       include/xdg-output-unstable-v1-client-protocol.h
-      binding-specs/pixman.yaml
       binding-specs/river-input-management.yaml
       binding-specs/river-window-management.yaml
       binding-specs/wayland-client.yaml
+      generated/Bindings.Pixman.Generated.yaml
+      generated/Bindings.River.InputManagementV1.Generated.yaml
+      generated/Bindings.River.LayerShellV1.Generated.yaml
+      generated/Bindings.River.LibinputConfigV1.Generated.yaml
+      generated/Bindings.River.WindowManagementV1.Generated.yaml
+      generated/Bindings.River.XkbBindingsV1.Generated.yaml
+      generated/Bindings.River.XkbConfigV1.Generated.yaml
+      generated/Bindings.Wayland.Client.Generated.yaml
       generated/Bindings.Wayland.ExtSessionLockV1.Generated.yaml
       generated/Bindings.Wayland.FractionalScaleV1.Generated.yaml
+      generated/Bindings.Wayland.Protocol.ForeignTopLevelListV1.Generated.yaml
+      generated/Bindings.Wayland.Protocol.Generated.ForeignTopLevelListV1.yaml
+      generated/Bindings.Wayland.Util.Generated.yaml
       generated/Bindings.Wayland.Viewporter.Generated.yaml
+      generated/Bindings.Wayland.WlrInputMethodUnstableV2.Generated.yaml
+      generated/Bindings.Wayland.WlrInputMethodUnstableV2.yaml
       generated/Bindings.Wayland.WlrLayerShellUnstableV1.Generated.yaml
       generated/Bindings.Wayland.WlrOutputManagementUnstableV1.Generated.yaml
       generated/Bindings.Wayland.XdgOutputUnstableV1.Generated.yaml
-      generated/Generated.Pixman.yaml
-      generated/Generated.River.InputManagementV1.yaml
-      generated/Generated.River.LayerShellV1.yaml
-      generated/Generated.River.LibinputConfigV1.yaml
-      generated/Generated.River.WindowManagementV1.yaml
-      generated/Generated.River.XkbBindingsV1.yaml
-      generated/Generated.River.XkbConfigV1.yaml
-      generated/Generated.Wayland.Client.yaml
-      generated/Generated.Wayland.Protocol.ForeignTopLevelListV1.yaml
-      generated/Generated.Wayland.Util.yaml
-      generated/Generated.Wlr.InputMethodV2.yaml
 extra-doc-files:
       CHANGELOG.md
 
 library
     exposed-modules:
+          Bindings.Pixman.Generated
+          Bindings.Pixman.Generated.FunPtr
+          Bindings.Pixman.Generated.Safe
+          Bindings.Pixman.Generated.Unsafe
+          Bindings.River
+          Bindings.River.InputManagement
+          Bindings.River.InputManagementV1.Generated
+          Bindings.River.InputManagementV1.Generated.FunPtr
+          Bindings.River.InputManagementV1.Generated.Global
+          Bindings.River.InputManagementV1.Generated.Safe
+          Bindings.River.InputManagementV1.Generated.Unsafe
+          Bindings.River.LayerShell
+          Bindings.River.LayerShellV1.Generated
+          Bindings.River.LayerShellV1.Generated.FunPtr
+          Bindings.River.LayerShellV1.Generated.Global
+          Bindings.River.LayerShellV1.Generated.Safe
+          Bindings.River.LayerShellV1.Generated.Unsafe
+          Bindings.River.LibinputConfig
+          Bindings.River.LibinputConfigV1.Generated
+          Bindings.River.LibinputConfigV1.Generated.FunPtr
+          Bindings.River.LibinputConfigV1.Generated.Global
+          Bindings.River.LibinputConfigV1.Generated.Safe
+          Bindings.River.LibinputConfigV1.Generated.Unsafe
+          Bindings.River.WindowManagement
+          Bindings.River.WindowManagementV1.Generated
+          Bindings.River.WindowManagementV1.Generated.FunPtr
+          Bindings.River.WindowManagementV1.Generated.Global
+          Bindings.River.WindowManagementV1.Generated.Safe
+          Bindings.River.WindowManagementV1.Generated.Unsafe
+          Bindings.River.XkbBindings
+          Bindings.River.XkbBindingsV1.Generated
+          Bindings.River.XkbBindingsV1.Generated.FunPtr
+          Bindings.River.XkbBindingsV1.Generated.Global
+          Bindings.River.XkbBindingsV1.Generated.Safe
+          Bindings.River.XkbBindingsV1.Generated.Unsafe
+          Bindings.River.XkbConfig
+          Bindings.River.XkbConfigV1.Generated
+          Bindings.River.XkbConfigV1.Generated.FunPtr
+          Bindings.River.XkbConfigV1.Generated.Global
+          Bindings.River.XkbConfigV1.Generated.Safe
+          Bindings.River.XkbConfigV1.Generated.Unsafe
+          Bindings.RiverSafe
+          Bindings.Wayland.Client
+          Bindings.Wayland.Client.Generated
+          Bindings.Wayland.Client.Generated.FunPtr
+          Bindings.Wayland.Client.Generated.Global
+          Bindings.Wayland.Client.Generated.Safe
+          Bindings.Wayland.Client.Generated.Unsafe
           Bindings.Wayland.ExtSessionLockV1
           Bindings.Wayland.ExtSessionLockV1.Generated
           Bindings.Wayland.ExtSessionLockV1.Generated.FunPtr
@@ -78,12 +127,31 @@ library
           Bindings.Wayland.FractionalScaleV1.Generated.Global
           Bindings.Wayland.FractionalScaleV1.Generated.Safe
           Bindings.Wayland.FractionalScaleV1.Generated.Unsafe
+          Bindings.Wayland.Internal.TH
+          Bindings.Wayland.Internal.Types
+          Bindings.Wayland.Protocol.ForeignTopLevelListV1
+          Bindings.Wayland.Protocol.ForeignTopLevelListV1.Generated
+          Bindings.Wayland.Protocol.ForeignTopLevelListV1.Generated.FunPtr
+          Bindings.Wayland.Protocol.ForeignTopLevelListV1.Generated.Global
+          Bindings.Wayland.Protocol.ForeignTopLevelListV1.Generated.Safe
+          Bindings.Wayland.Protocol.ForeignTopLevelListV1.Generated.Unsafe
+          Bindings.Wayland.Util
+          Bindings.Wayland.Util.Generated
+          Bindings.Wayland.Util.Generated.FunPtr
+          Bindings.Wayland.Util.Generated.Safe
+          Bindings.Wayland.Util.Generated.Unsafe
           Bindings.Wayland.Viewporter
           Bindings.Wayland.Viewporter.Generated
           Bindings.Wayland.Viewporter.Generated.FunPtr
           Bindings.Wayland.Viewporter.Generated.Global
           Bindings.Wayland.Viewporter.Generated.Safe
           Bindings.Wayland.Viewporter.Generated.Unsafe
+          Bindings.Wayland.WlrInputMethodUnstableV2
+          Bindings.Wayland.WlrInputMethodUnstableV2.Generated
+          Bindings.Wayland.WlrInputMethodUnstableV2.Generated.FunPtr
+          Bindings.Wayland.WlrInputMethodUnstableV2.Generated.Global
+          Bindings.Wayland.WlrInputMethodUnstableV2.Generated.Safe
+          Bindings.Wayland.WlrInputMethodUnstableV2.Generated.Unsafe
           Bindings.Wayland.WlrLayerShellUnstableV1
           Bindings.Wayland.WlrLayerShellUnstableV1.Generated
           Bindings.Wayland.WlrLayerShellUnstableV1.Generated.FunPtr
@@ -102,73 +170,6 @@ library
           Bindings.Wayland.XdgOutputUnstableV1.Generated.Global
           Bindings.Wayland.XdgOutputUnstableV1.Generated.Safe
           Bindings.Wayland.XdgOutputUnstableV1.Generated.Unsafe
-          Generated.Pixman
-          Generated.Pixman.FunPtr
-          Generated.Pixman.Safe
-          Generated.Pixman.Unsafe
-          Generated.River.InputManagementV1
-          Generated.River.InputManagementV1.FunPtr
-          Generated.River.InputManagementV1.Global
-          Generated.River.InputManagementV1.Safe
-          Generated.River.InputManagementV1.Unsafe
-          Generated.River.LayerShellV1
-          Generated.River.LayerShellV1.FunPtr
-          Generated.River.LayerShellV1.Global
-          Generated.River.LayerShellV1.Safe
-          Generated.River.LayerShellV1.Unsafe
-          Generated.River.LibinputConfigV1
-          Generated.River.LibinputConfigV1.FunPtr
-          Generated.River.LibinputConfigV1.Global
-          Generated.River.LibinputConfigV1.Safe
-          Generated.River.LibinputConfigV1.Unsafe
-          Generated.River.WindowManagementV1
-          Generated.River.WindowManagementV1.FunPtr
-          Generated.River.WindowManagementV1.Global
-          Generated.River.WindowManagementV1.Safe
-          Generated.River.WindowManagementV1.Unsafe
-          Generated.River.XkbBindingsV1
-          Generated.River.XkbBindingsV1.FunPtr
-          Generated.River.XkbBindingsV1.Global
-          Generated.River.XkbBindingsV1.Safe
-          Generated.River.XkbBindingsV1.Unsafe
-          Generated.River.XkbConfigV1
-          Generated.River.XkbConfigV1.FunPtr
-          Generated.River.XkbConfigV1.Global
-          Generated.River.XkbConfigV1.Safe
-          Generated.River.XkbConfigV1.Unsafe
-          Generated.Wayland.Client
-          Generated.Wayland.Client.FunPtr
-          Generated.Wayland.Client.Global
-          Generated.Wayland.Client.Safe
-          Generated.Wayland.Client.Unsafe
-          Generated.Wayland.Protocol.ForeignTopLevelListV1
-          Generated.Wayland.Protocol.ForeignTopLevelListV1.FunPtr
-          Generated.Wayland.Protocol.ForeignTopLevelListV1.Global
-          Generated.Wayland.Protocol.ForeignTopLevelListV1.Safe
-          Generated.Wayland.Protocol.ForeignTopLevelListV1.Unsafe
-          Generated.Wayland.Util
-          Generated.Wayland.Util.FunPtr
-          Generated.Wayland.Util.Safe
-          Generated.Wayland.Util.Unsafe
-          Generated.Wlr.InputMethodV2
-          Generated.Wlr.InputMethodV2.FunPtr
-          Generated.Wlr.InputMethodV2.Global
-          Generated.Wlr.InputMethodV2.Safe
-          Generated.Wlr.InputMethodV2.Unsafe
-          River.InputManagement
-          River.LayerShell
-          River.LibinputConfig
-          River.Objects
-          River.Safe
-          River.WindowManagement
-          River.XkbBindings
-          River.XkbConfig
-          Wayland.Client
-          Wayland.Client.Extras
-          Wayland.Client.Internal.TH
-          Wayland.Client.Internal.Types
-          Wayland.Client.Objects
-          Wlr
     other-modules:
           Paths_hswm_bindings
     autogen-modules:

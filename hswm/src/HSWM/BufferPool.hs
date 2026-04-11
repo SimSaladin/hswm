@@ -15,13 +15,15 @@
 module HSWM.BufferPool where
 
 import Foreign
-import Generated.Pixman qualified as P
-import Generated.Pixman.Safe qualified as P
-import Generated.Wayland.Client qualified as WL
+import Bindings.Pixman.Generated qualified as P
+import Bindings.Pixman.Generated.Safe qualified as P
+import Bindings.Wayland.Client qualified as WL
 import HSWM.Core
 import HSWM.Util.Posix
 import System.Posix (Fd)
-import Wayland.Client qualified as WL
+import Bindings.Wayland.Client qualified as WL
+import Bindings.Wayland.Client.Generated qualified as WL
+import Bindings.Wayland.Client.Generated.Safe qualified as WL
 
 data ImageBufferPool = ImageBufferPool
   { buffers :: MVar ([ImageBuffer], Int),

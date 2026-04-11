@@ -17,12 +17,11 @@ module HSWM.Util.GrabKeyboard where
 import Control.Monad.Fix
 import Data.Map qualified as M
 import Foreign hiding (void)
--- import           Generated.Wayland.Client (pattern WL_KEYBOARD_KEY_STATE_PRESSED)
 import HSWM.Core
 import HSWM.Operations
 import HSWM.XKB
-import Wayland.Client qualified as WL
-import Wlr
+import Bindings.Wayland.Client qualified as WL
+import Bindings.Wayland.WlrInputMethodUnstableV2 as Wlr
 
 type HasGrabCtx env m = (MonadStateGlobal env m, HasEventQueues env, MonadReader env m, HasLogFunc env, MonadUnliftIO m, MonadFix m)
 

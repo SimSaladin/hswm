@@ -21,8 +21,8 @@ import HSWM.Core
 import HSWM.Operations
 import HSWM.Seats qualified as Seats
 import HSWM.StackSet qualified as W
-import River.Objects qualified as R
-import River.Safe qualified as R
+import Bindings.River qualified as R
+import Bindings.RiverSafe qualified as R
 
 added :: RiverWindow -> H ()
 added w = do

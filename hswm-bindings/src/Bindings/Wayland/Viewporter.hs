@@ -9,15 +9,15 @@
 --
 module Bindings.Wayland.Viewporter where
 
-import Wayland.Client.Internal.TH
+import Bindings.Wayland.Internal.TH
 import Foreign
 
 import Bindings.Wayland.Viewporter.Generated
 import Bindings.Wayland.Viewporter.Generated.Global
 import Bindings.Wayland.Viewporter.Generated.Safe
 
-import Generated.Wayland.Client
-import Wayland.Client.Objects
+import Bindings.Wayland.Client.Generated
+import Bindings.Wayland.Client
 
 -- * Viewport
 mkWlObject $

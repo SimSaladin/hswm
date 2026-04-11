@@ -8,7 +8,7 @@ module Bindings.Wayland.WlrLayerShellUnstableV1.Generated.Global
     )
   where
 
-import qualified Generated.Wayland.Util
+import qualified Bindings.Wayland.Util.Generated
 import qualified HsBindgen.Runtime.Internal.CAPI
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.PtrConst as PtrConst
@@ -34,7 +34,7 @@ foreign import ccall unsafe "hs_bindgen_f614a3b293a1c921" hs_bindgen_f614a3b293a
      IO (RIP.Ptr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrLayerShellUnstableV1_Generated_Bindings.Wayland.WlrLayerShellUnstableV1.Generated_get_zwlr_layer_shell_v1_interface@
-hs_bindgen_f614a3b293a1c921 :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
+hs_bindgen_f614a3b293a1c921 :: IO (PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface)
 hs_bindgen_f614a3b293a1c921 =
   RIP.fromFFIType hs_bindgen_f614a3b293a1c921_base
 
@@ -63,12 +63,12 @@ __exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
 
 __unique:__ @Bindings_Wayland_WlrLayerShellUnstableV1_Generated_Bindings.Wayland.WlrLayerShellUnstableV1.Generated_zwlr_layer_shell_v1_interface@
 -}
-hs_bindgen_3948254d447996fd :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+hs_bindgen_3948254d447996fd :: PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
 hs_bindgen_3948254d447996fd =
   RIP.unsafePerformIO hs_bindgen_f614a3b293a1c921
 
 {-# NOINLINE zwlr_layer_shell_v1_interface #-}
-zwlr_layer_shell_v1_interface :: Generated.Wayland.Util.Wl_interface
+zwlr_layer_shell_v1_interface :: Bindings.Wayland.Util.Generated.Wl_interface
 zwlr_layer_shell_v1_interface =
   RIP.unsafePerformIO (PtrConst.peek hs_bindgen_3948254d447996fd)
 
@@ -77,7 +77,7 @@ foreign import ccall unsafe "hs_bindgen_3952b25154530c20" hs_bindgen_3952b251545
      IO (RIP.Ptr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrLayerShellUnstableV1_Generated_Bindings.Wayland.WlrLayerShellUnstableV1.Generated_get_zwlr_layer_surface_v1_interface@
-hs_bindgen_3952b25154530c20 :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
+hs_bindgen_3952b25154530c20 :: IO (PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface)
 hs_bindgen_3952b25154530c20 =
   RIP.fromFFIType hs_bindgen_3952b25154530c20_base
 
@@ -110,11 +110,11 @@ __exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
 
 __unique:__ @Bindings_Wayland_WlrLayerShellUnstableV1_Generated_Bindings.Wayland.WlrLayerShellUnstableV1.Generated_zwlr_layer_surface_v1_interface@
 -}
-hs_bindgen_d467c05b692300f4 :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+hs_bindgen_d467c05b692300f4 :: PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
 hs_bindgen_d467c05b692300f4 =
   RIP.unsafePerformIO hs_bindgen_3952b25154530c20
 
 {-# NOINLINE zwlr_layer_surface_v1_interface #-}
-zwlr_layer_surface_v1_interface :: Generated.Wayland.Util.Wl_interface
+zwlr_layer_surface_v1_interface :: Bindings.Wayland.Util.Generated.Wl_interface
 zwlr_layer_surface_v1_interface =
   RIP.unsafePerformIO (PtrConst.peek hs_bindgen_d467c05b692300f4)

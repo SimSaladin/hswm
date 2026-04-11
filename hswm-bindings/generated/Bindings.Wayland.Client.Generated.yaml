@@ -1,0 +1,1251 @@
+version:
+  hs_bindgen: 0.1.0
+  binding_specification: '1.0'
+hsmodule: Bindings.Wayland.Client.Generated
+ctypes:
+- headers:
+  - wayland-client-core.h
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct timespec
+  hsname: Timespec
+- headers:
+  - wayland-client-core.h
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_proxy
+  hsname: Wl_proxy
+- headers:
+  - wayland-client-core.h
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_display
+  hsname: Wl_display
+- headers:
+  - wayland-client-core.h
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_event_queue
+  hsname: Wl_event_queue
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_buffer
+  hsname: Wl_buffer
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_callback
+  hsname: Wl_callback
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_compositor
+  hsname: Wl_compositor
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_data_device
+  hsname: Wl_data_device
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_data_device_manager
+  hsname: Wl_data_device_manager
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_data_offer
+  hsname: Wl_data_offer
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_data_source
+  hsname: Wl_data_source
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_fixes
+  hsname: Wl_fixes
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_keyboard
+  hsname: Wl_keyboard
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_output
+  hsname: Wl_output
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_pointer
+  hsname: Wl_pointer
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_region
+  hsname: Wl_region
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_registry
+  hsname: Wl_registry
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_seat
+  hsname: Wl_seat
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_shell
+  hsname: Wl_shell
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_shell_surface
+  hsname: Wl_shell_surface
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_shm
+  hsname: Wl_shm
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_shm_pool
+  hsname: Wl_shm_pool
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_subcompositor
+  hsname: Wl_subcompositor
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_subsurface
+  hsname: Wl_subsurface
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_surface
+  hsname: Wl_surface
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_touch
+  hsname: Wl_touch
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: enum wl_display_error
+  hsname: Wl_display_error
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_display_listener
+  hsname: Wl_display_listener
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_registry_listener
+  hsname: Wl_registry_listener
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_callback_listener
+  hsname: Wl_callback_listener
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: enum wl_shm_error
+  hsname: Wl_shm_error
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: enum wl_shm_format
+  hsname: Wl_shm_format
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_shm_listener
+  hsname: Wl_shm_listener
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_buffer_listener
+  hsname: Wl_buffer_listener
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: enum wl_data_offer_error
+  hsname: Wl_data_offer_error
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_data_offer_listener
+  hsname: Wl_data_offer_listener
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: enum wl_data_source_error
+  hsname: Wl_data_source_error
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_data_source_listener
+  hsname: Wl_data_source_listener
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: enum wl_data_device_error
+  hsname: Wl_data_device_error
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_data_device_listener
+  hsname: Wl_data_device_listener
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: enum wl_data_device_manager_dnd_action
+  hsname: Wl_data_device_manager_dnd_action
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: enum wl_shell_error
+  hsname: Wl_shell_error
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: enum wl_shell_surface_resize
+  hsname: Wl_shell_surface_resize
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: enum wl_shell_surface_transient
+  hsname: Wl_shell_surface_transient
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: enum wl_shell_surface_fullscreen_method
+  hsname: Wl_shell_surface_fullscreen_method
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_shell_surface_listener
+  hsname: Wl_shell_surface_listener
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: enum wl_surface_error
+  hsname: Wl_surface_error
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_surface_listener
+  hsname: Wl_surface_listener
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: enum wl_seat_capability
+  hsname: Wl_seat_capability
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: enum wl_seat_error
+  hsname: Wl_seat_error
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_seat_listener
+  hsname: Wl_seat_listener
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: enum wl_pointer_error
+  hsname: Wl_pointer_error
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: enum wl_pointer_button_state
+  hsname: Wl_pointer_button_state
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: enum wl_pointer_axis
+  hsname: Wl_pointer_axis
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: enum wl_pointer_axis_source
+  hsname: Wl_pointer_axis_source
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: enum wl_pointer_axis_relative_direction
+  hsname: Wl_pointer_axis_relative_direction
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_pointer_listener
+  hsname: Wl_pointer_listener
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: enum wl_keyboard_keymap_format
+  hsname: Wl_keyboard_keymap_format
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: enum wl_keyboard_key_state
+  hsname: Wl_keyboard_key_state
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_keyboard_listener
+  hsname: Wl_keyboard_listener
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_touch_listener
+  hsname: Wl_touch_listener
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: enum wl_output_subpixel
+  hsname: Wl_output_subpixel
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: enum wl_output_transform
+  hsname: Wl_output_transform
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: enum wl_output_mode
+  hsname: Wl_output_mode
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: struct wl_output_listener
+  hsname: Wl_output_listener
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: enum wl_subcompositor_error
+  hsname: Wl_subcompositor_error
+- headers:
+  - wayland-client-protocol.h
+  - wayland-client.h
+  cname: enum wl_subsurface_error
+  hsname: Wl_subsurface_error
+hstypes:
+- hsname: Timespec
+  representation: emptydata
+- hsname: Wl_buffer
+  representation: emptydata
+- hsname: Wl_buffer_listener
+  representation:
+    record:
+      constructor: Wl_buffer_listener
+      fields:
+      - release
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_callback
+  representation: emptydata
+- hsname: Wl_callback_listener
+  representation:
+    record:
+      constructor: Wl_callback_listener
+      fields:
+      - done
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_compositor
+  representation: emptydata
+- hsname: Wl_data_device
+  representation: emptydata
+- hsname: Wl_data_device_error
+  representation:
+    newtype:
+      constructor: Wl_data_device_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_data_device_listener
+  representation:
+    record:
+      constructor: Wl_data_device_listener
+      fields:
+      - data_offer
+      - enter
+      - leave
+      - motion
+      - drop
+      - selection
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_data_device_manager
+  representation: emptydata
+- hsname: Wl_data_device_manager_dnd_action
+  representation:
+    newtype:
+      constructor: Wl_data_device_manager_dnd_action
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_data_offer
+  representation: emptydata
+- hsname: Wl_data_offer_error
+  representation:
+    newtype:
+      constructor: Wl_data_offer_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_data_offer_listener
+  representation:
+    record:
+      constructor: Wl_data_offer_listener
+      fields:
+      - offer
+      - source_actions
+      - action
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_data_source
+  representation: emptydata
+- hsname: Wl_data_source_error
+  representation:
+    newtype:
+      constructor: Wl_data_source_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_data_source_listener
+  representation:
+    record:
+      constructor: Wl_data_source_listener
+      fields:
+      - target
+      - send
+      - cancelled
+      - dnd_drop_performed
+      - dnd_finished
+      - action
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_display
+  representation: emptydata
+- hsname: Wl_display_error
+  representation:
+    newtype:
+      constructor: Wl_display_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_display_listener
+  representation:
+    record:
+      constructor: Wl_display_listener
+      fields:
+      - error
+      - delete_id
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_event_queue
+  representation: emptydata
+- hsname: Wl_fixes
+  representation: emptydata
+- hsname: Wl_keyboard
+  representation: emptydata
+- hsname: Wl_keyboard_key_state
+  representation:
+    newtype:
+      constructor: Wl_keyboard_key_state
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_keyboard_keymap_format
+  representation:
+    newtype:
+      constructor: Wl_keyboard_keymap_format
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_keyboard_listener
+  representation:
+    record:
+      constructor: Wl_keyboard_listener
+      fields:
+      - keymap
+      - enter
+      - leave
+      - key
+      - modifiers
+      - repeat_info
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_output
+  representation: emptydata
+- hsname: Wl_output_listener
+  representation:
+    record:
+      constructor: Wl_output_listener
+      fields:
+      - geometry
+      - mode
+      - done
+      - scale
+      - name
+      - description
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_output_mode
+  representation:
+    newtype:
+      constructor: Wl_output_mode
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_output_subpixel
+  representation:
+    newtype:
+      constructor: Wl_output_subpixel
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_output_transform
+  representation:
+    newtype:
+      constructor: Wl_output_transform
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_pointer
+  representation: emptydata
+- hsname: Wl_pointer_axis
+  representation:
+    newtype:
+      constructor: Wl_pointer_axis
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_pointer_axis_relative_direction
+  representation:
+    newtype:
+      constructor: Wl_pointer_axis_relative_direction
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_pointer_axis_source
+  representation:
+    newtype:
+      constructor: Wl_pointer_axis_source
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_pointer_button_state
+  representation:
+    newtype:
+      constructor: Wl_pointer_button_state
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_pointer_error
+  representation:
+    newtype:
+      constructor: Wl_pointer_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_pointer_listener
+  representation:
+    record:
+      constructor: Wl_pointer_listener
+      fields:
+      - enter
+      - leave
+      - motion
+      - button
+      - axis
+      - frame
+      - axis_source
+      - axis_stop
+      - axis_discrete
+      - axis_value120
+      - axis_relative_direction
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_proxy
+  representation: emptydata
+- hsname: Wl_region
+  representation: emptydata
+- hsname: Wl_registry
+  representation: emptydata
+- hsname: Wl_registry_listener
+  representation:
+    record:
+      constructor: Wl_registry_listener
+      fields:
+      - global
+      - global_remove
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_seat
+  representation: emptydata
+- hsname: Wl_seat_capability
+  representation:
+    newtype:
+      constructor: Wl_seat_capability
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_seat_error
+  representation:
+    newtype:
+      constructor: Wl_seat_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_seat_listener
+  representation:
+    record:
+      constructor: Wl_seat_listener
+      fields:
+      - capabilities
+      - name
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_shell
+  representation: emptydata
+- hsname: Wl_shell_error
+  representation:
+    newtype:
+      constructor: Wl_shell_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_shell_surface
+  representation: emptydata
+- hsname: Wl_shell_surface_fullscreen_method
+  representation:
+    newtype:
+      constructor: Wl_shell_surface_fullscreen_method
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_shell_surface_listener
+  representation:
+    record:
+      constructor: Wl_shell_surface_listener
+      fields:
+      - ping
+      - configure
+      - popup_done
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_shell_surface_resize
+  representation:
+    newtype:
+      constructor: Wl_shell_surface_resize
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_shell_surface_transient
+  representation:
+    newtype:
+      constructor: Wl_shell_surface_transient
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_shm
+  representation: emptydata
+- hsname: Wl_shm_error
+  representation:
+    newtype:
+      constructor: Wl_shm_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_shm_format
+  representation:
+    newtype:
+      constructor: Wl_shm_format
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_shm_listener
+  representation:
+    record:
+      constructor: Wl_shm_listener
+      fields:
+      - format
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_shm_pool
+  representation: emptydata
+- hsname: Wl_subcompositor
+  representation: emptydata
+- hsname: Wl_subcompositor_error
+  representation:
+    newtype:
+      constructor: Wl_subcompositor_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_subsurface
+  representation: emptydata
+- hsname: Wl_subsurface_error
+  representation:
+    newtype:
+      constructor: Wl_subsurface_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_surface
+  representation: emptydata
+- hsname: Wl_surface_error
+  representation:
+    newtype:
+      constructor: Wl_surface_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_surface_listener
+  representation:
+    record:
+      constructor: Wl_surface_listener
+      fields:
+      - enter
+      - leave
+      - preferred_buffer_scale
+      - preferred_buffer_transform
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wl_touch
+  representation: emptydata
+- hsname: Wl_touch_listener
+  representation:
+    record:
+      constructor: Wl_touch_listener
+      fields:
+      - down
+      - up
+      - motion
+      - frame
+      - cancel
+      - shape
+      - orientation
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw

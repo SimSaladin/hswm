@@ -1,7 +1,7 @@
 version:
   hs_bindgen: 0.1.0
   binding_specification: '1.0'
-hsmodule: Generated.Wayland.Client
+hsmodule: Bindings.Wayland.Client.Generated
 ctypes:
 - headers: &headers
   - river-window-management-v1-client-protocol.h

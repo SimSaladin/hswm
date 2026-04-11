@@ -30,8 +30,6 @@ import HSWM.Util.IPC (ProtoMsg (..), WindowInfo (..), clientRun)
 import RIO hiding (set)
 import Waybar.CFFI.Plugin.Base
 
--- import qualified RIO as RIO
-
 type MIO = ReaderT LogFunc IO
 
 data MyMod = MyMod
@@ -56,6 +54,20 @@ data ModState = ModState
 runMIO :: IConf MyMod -> MIO a -> IO a
 runMIO ic a = runReaderT a ic.instanceData.logFunc
 
+-- |
+-- @
+--   box()#hsvm.module
+--     box().workspaces
+--       label().workspace.[|visible|focused]
+--                            {text:format-workspace =? "{name}"}
+--                            {tooltip:...}
+--       *
+--       *
+--     label().current-layout {text:format-layout =? "{name}"}
+--                            {tooltip:...}
+--     label().focused-window {text:format-focused-window =? "{title}"}
+--                            {tooltip:...}
+-- @
 instanceNew :: IConf a -> IO MyMod
 instanceNew iconf@IConf {..} = do
   logOpts <- RIO.logOptionsHandle RIO.stderr True <&> setLogUseLoc False . setLogUseTime False
@@ -71,20 +83,26 @@ instanceNew iconf@IConf {..} = do
     containerAdd rootWidget topContainer
 
     workspacesContainer <- boxNew OrientationHorizontal 5
+    sc' <- widgetGetStyleContext workspacesContainer
+    styleContextAddClass sc' "workspaces"
     containerAdd topContainer workspacesContainer
 
     layoutWidget <- labelNew (Just "Loading...")
+    sc'' <- widgetGetStyleContext layoutWidget
+    styleContextAddClass sc'' "current-layout"
     containerAdd topContainer layoutWidget
 
     focusInfoWidget <- labelNew Nothing
+    sc''' <- widgetGetStyleContext focusInfoWidget
+    styleContextAddClass sc''' "focused-window"
     containerAdd topContainer focusInfoWidget
 
     stRef <- newIORef $ ModState [] "" mempty Nothing Nothing
-
     res <- mfix $ \myMod -> do
       _ <- async $ updateOutputName iconf myMod
       wmThread <- async $ connectToWM (handleMsg iconf myMod)
       return MyMod {..}
+
     logDebug "Instance created"
     return res
 
@@ -96,12 +114,15 @@ connectToWM onMsg = do
 handleMsg :: IConf a -> MyMod -> ProtoMsg -> MIO ()
 handleMsg _ _ Identify {} = pure ()
 handleMsg _ m OutputInfo {..} = modifyIORef (stRef m) $ \s -> s {outputs}
+
 handleMsg ic m WsInfo {..} = do
   modifyIORef (stRef m) $ \s -> s {workspaces = Just (wsNames, wsFocused, wsVisible)}
   liftIO $ queueUpdate ic
+
 handleMsg ic m FocusedWindow {window} = do
   modifyIORef (stRef m) $ \s -> s {curfocus = Just window}
   liftIO $ queueUpdate ic
+
 handleMsg _ _ msg = logWarn $ "unhandled incoming message: " <> fromString (show msg)
 
 -- | Wait for the waybar window to be created, then sniff out the assigned screen name.
@@ -126,7 +147,7 @@ updateWorkspaces m = do
   st <- readIORef (stRef m)
   case workspaces st of
     Nothing -> logWarn "No workspaces found!"
-    Just (tags, (focusedTag, focusedScreen, focusedLayout), visibleTags) -> do
+    Just (tags, focused@(focusedTag, focusedScreen, focusedLayout), visibleTags) -> do
       let thisScreen = fromMaybe maxBound (L.lookup (thisOutputName st) st.outputs)
           add tag = do
             l <- labelNew (Just $ T.pack tag)
@@ -158,11 +179,11 @@ updateWorkspaces m = do
                 [ #tooltipMarkup :=
                     T.intercalate
                       "\r"
-                      [ "Output: " <> maybe "?" fst (L.find (\(_, b) -> b == thisScreen) st.outputs),
+                      [ tshow (fromEnum focusedScreen) <> " - " <> maybe "?" fst (L.find (\(_, b) -> b == thisScreen) st.outputs),
                         "Layout: " <> focusedLayout
                       ]
                 ]
-          | (_, screen, layout) : _ <- [x | x@(vtag, _, _) <- visibleTags, vtag == tag] -> do
+          | (_, screen, layout) : _ <- [x | x@(vtag, _, _) <- focused : visibleTags, vtag == tag] -> do
               styleContextAddClass sc "visible"
               styleContextRemoveClass sc "focused"
               set
@@ -170,7 +191,7 @@ updateWorkspaces m = do
                 [ #tooltipMarkup :=
                     T.intercalate
                       "\r"
-                      [ "Output: " <> maybe "?" fst (L.find (\(_, b) -> b == screen) st.outputs),
+                      [ tshow (fromEnum screen) <> " - " <> maybe "?" fst (L.find (\(_, b) -> b == screen) st.outputs),
                         "Layout: " <> layout
                       ]
                 ]
@@ -187,13 +208,7 @@ updateFocusInfo MyMod {..} = do
   case curfocus st of
     Just WindowInfo {..} -> do
       labelSetText focusInfoWidget title
-      widgetSetTooltipMarkup focusInfoWidget
-        $ Just
-        $ T.intercalate "\r"
-        $ [ title,
-            appId
-          ]
-        ++ ["PID: " <> tshow i | Just i <- [pid]]
+      widgetSetTooltipMarkup focusInfoWidget $ Just $ title <> " - " <> appId <> maybe "" (\i -> "(PID: " <> tshow i <> ")") pid
     Nothing -> do
       labelSetText focusInfoWidget ""
       widgetSetTooltipMarkup focusInfoWidget Nothing

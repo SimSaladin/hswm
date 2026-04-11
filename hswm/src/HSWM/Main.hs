@@ -1,9 +1,5 @@
 {-# OPTIONS_GHC -Wno-ambiguous-fields -Wno-unused-record-wildcards -Wno-name-shadowing #-}
 
-------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------
-
 -- |
 -- Module      : HSWM.Main
 -- Description : Short description
@@ -34,21 +30,21 @@ import HSWM.StackSet qualified as W
 import HSWM.Util.Posix
 import HSWM.Utils
 import HSWM.Windows qualified as Windows
-import River.Objects qualified as R
+import Bindings.River qualified as R
 import System.IO.Error
 import System.Posix qualified as Posix
 import Wayland (registerGlobal, removeGlobal, requireGlobal)
 import Wayland qualified as WL
-import Wayland.Client
+import Bindings.Wayland.Client
   ( displayDispatch,
     displayFlush,
     displayGetFd,
     displayGetRegistry,
     displayRoundtrip,
   )
-import Wayland.Client qualified as WL
-import Wayland.Client.Extras qualified as WL
-import Wlr
+import Bindings.Wayland.Client qualified as WL
+import Bindings.Wayland.WlrInputMethodUnstableV2 as Wlr
+import Bindings.Wayland.Protocol.ForeignTopLevelListV1 as WL
 
 hswm :: (m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow)) => HSWMConfig m l -> IO ()
 hswm conf = do

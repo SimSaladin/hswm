@@ -9,15 +9,15 @@
 --
 module Bindings.Wayland.FractionalScaleV1 where
 
-import Wayland.Client.Internal.TH
+import Bindings.Wayland.Internal.TH
 import Foreign
 
 import Bindings.Wayland.FractionalScaleV1.Generated
 import Bindings.Wayland.FractionalScaleV1.Generated.Global
 import Bindings.Wayland.FractionalScaleV1.Generated.Safe
 
-import Generated.Wayland.Client
-import Wayland.Client.Objects
+import Bindings.Wayland.Client.Generated
+import Bindings.Wayland.Client
 
 -- * FractionalScale
 mkWlObject $

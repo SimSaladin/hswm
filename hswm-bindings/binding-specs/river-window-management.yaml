@@ -1,7 +1,7 @@
 version:
   hs_bindgen: 0.1.0
   binding_specification: '1.0'
-hsmodule: Generated.River.WindowManagementV1
+hsmodule: Bindings.River.WindowManagementV1.Generated
 ctypes:
 - cname: struct river_output_v1
   hsname: River_output_v1

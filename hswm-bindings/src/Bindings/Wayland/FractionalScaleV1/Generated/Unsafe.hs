@@ -16,7 +16,7 @@ module Bindings.Wayland.FractionalScaleV1.Generated.Unsafe
     )
   where
 
-import qualified Generated.Wayland.Client
+import qualified Bindings.Wayland.Client.Generated
 import qualified HsBindgen.Runtime.Internal.CAPI
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.LibC
@@ -219,7 +219,7 @@ foreign import ccall unsafe "hs_bindgen_587fa3f9b0a03fe3" hs_bindgen_587fa3f9b0a
 -- __unique:__ @Bindings_Wayland_FractionalScaleV1_Generated_Bindings.Wayland.FractionalScaleV1.Generated_Unsafe_wp_fractional_scale_manager_v1_get_fractional_scale@
 hs_bindgen_587fa3f9b0a03fe3 ::
      RIP.Ptr Wp_fractional_scale_manager_v1
-  -> RIP.Ptr Generated.Wayland.Client.Wl_surface
+  -> RIP.Ptr Bindings.Wayland.Client.Generated.Wl_surface
   -> IO (RIP.Ptr Wp_fractional_scale_v1)
 hs_bindgen_587fa3f9b0a03fe3 =
   RIP.fromFFIType hs_bindgen_587fa3f9b0a03fe3_base
@@ -239,7 +239,7 @@ __exported by:__ @fractional-scale-v1-client-protocol.h@
 wp_fractional_scale_manager_v1_get_fractional_scale ::
      RIP.Ptr Wp_fractional_scale_manager_v1
      -- ^ __C declaration:__ @wp_fractional_scale_manager_v1@
-  -> RIP.Ptr Generated.Wayland.Client.Wl_surface
+  -> RIP.Ptr Bindings.Wayland.Client.Generated.Wl_surface
      -- ^ __C declaration:__ @surface@
   -> IO (RIP.Ptr Wp_fractional_scale_v1)
 wp_fractional_scale_manager_v1_get_fractional_scale =

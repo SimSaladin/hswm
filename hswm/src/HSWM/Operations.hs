@@ -8,8 +8,8 @@ import Data.Set qualified as S
 import Foreign (IntPtr, deRefStablePtr, intPtrToPtr, ptrToIntPtr, (.&.))
 import HSWM.Core
 import HSWM.StackSet qualified as W
-import River.Objects qualified as R
-import River.Safe qualified as R
+import Bindings.River qualified as R
+import Bindings.RiverSafe qualified as R
 import System.Directory (removeFile)
 import System.Environment
 import System.IO (hGetContents, hPrint, print, writeFile)

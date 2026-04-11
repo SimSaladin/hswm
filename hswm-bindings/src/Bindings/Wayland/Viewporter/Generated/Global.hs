@@ -8,7 +8,7 @@ module Bindings.Wayland.Viewporter.Generated.Global
     )
   where
 
-import qualified Generated.Wayland.Util
+import qualified Bindings.Wayland.Util.Generated
 import qualified HsBindgen.Runtime.Internal.CAPI
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.PtrConst as PtrConst
@@ -34,7 +34,7 @@ foreign import ccall unsafe "hs_bindgen_709be052338d9f2f" hs_bindgen_709be052338
      IO (RIP.Ptr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_Viewporter_Generated_Bindings.Wayland.Viewporter.Generated_get_wp_viewporter_interface@
-hs_bindgen_709be052338d9f2f :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
+hs_bindgen_709be052338d9f2f :: IO (PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface)
 hs_bindgen_709be052338d9f2f =
   RIP.fromFFIType hs_bindgen_709be052338d9f2f_base
 
@@ -63,12 +63,12 @@ __exported by:__ @viewporter-client-protocol.h@
 
 __unique:__ @Bindings_Wayland_Viewporter_Generated_Bindings.Wayland.Viewporter.Generated_wp_viewporter_interface@
 -}
-hs_bindgen_ad15bb79f0b7d1ff :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+hs_bindgen_ad15bb79f0b7d1ff :: PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
 hs_bindgen_ad15bb79f0b7d1ff =
   RIP.unsafePerformIO hs_bindgen_709be052338d9f2f
 
 {-# NOINLINE wp_viewporter_interface #-}
-wp_viewporter_interface :: Generated.Wayland.Util.Wl_interface
+wp_viewporter_interface :: Bindings.Wayland.Util.Generated.Wl_interface
 wp_viewporter_interface =
   RIP.unsafePerformIO (PtrConst.peek hs_bindgen_ad15bb79f0b7d1ff)
 
@@ -77,7 +77,7 @@ foreign import ccall unsafe "hs_bindgen_b671c2647106ce3d" hs_bindgen_b671c264710
      IO (RIP.Ptr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_Viewporter_Generated_Bindings.Wayland.Viewporter.Generated_get_wp_viewport_interface@
-hs_bindgen_b671c2647106ce3d :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
+hs_bindgen_b671c2647106ce3d :: IO (PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface)
 hs_bindgen_b671c2647106ce3d =
   RIP.fromFFIType hs_bindgen_b671c2647106ce3d_base
 
@@ -150,11 +150,11 @@ __exported by:__ @viewporter-client-protocol.h@
 
 __unique:__ @Bindings_Wayland_Viewporter_Generated_Bindings.Wayland.Viewporter.Generated_wp_viewport_interface@
 -}
-hs_bindgen_7b10512397ae87bd :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+hs_bindgen_7b10512397ae87bd :: PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
 hs_bindgen_7b10512397ae87bd =
   RIP.unsafePerformIO hs_bindgen_b671c2647106ce3d
 
 {-# NOINLINE wp_viewport_interface #-}
-wp_viewport_interface :: Generated.Wayland.Util.Wl_interface
+wp_viewport_interface :: Bindings.Wayland.Util.Generated.Wl_interface
 wp_viewport_interface =
   RIP.unsafePerformIO (PtrConst.peek hs_bindgen_7b10512397ae87bd)

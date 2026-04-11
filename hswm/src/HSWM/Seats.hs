@@ -26,11 +26,10 @@ import HSWM.Core
 import HSWM.Operations
 import HSWM.StackSet qualified as W
 import HSWM.Utils
-import River.Objects qualified as R
-import River.Safe qualified as R
-import Wayland hiding (display)
-import Wayland.Client qualified as WL
-import Wayland.Client.Objects qualified as WL
+import Wayland
+import Bindings.River qualified as R
+import Bindings.RiverSafe qualified as R
+import Bindings.Wayland.Client qualified as WL
 
 data LayerShellFocus = FocusNone | FocusLayerShell {exclusive :: !Bool}
   deriving (Eq, Show, Generic)
@@ -197,7 +196,7 @@ manage = do
 
 -- | Manage SeatOp state
 manage1 :: Seat -> HS ()
-manage1 s =
+manage1 s = do
   case s.inputOverride of
     Just (onEmpty, skeys) -> do
       log' "set: input overridden, main loop disabled!"
@@ -212,6 +211,7 @@ manage1 s =
               managePendingAction >> manageActiveOp
         _ -> return ()
     _ -> managePendingAction >> manageActiveOp
+  modifySeat s.river_seat $ \x -> x { suppressChangeFocus = False }
   where
     doS = modifySeat s.river_seat
 

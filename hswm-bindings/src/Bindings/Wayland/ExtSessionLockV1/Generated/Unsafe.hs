@@ -24,7 +24,7 @@ module Bindings.Wayland.ExtSessionLockV1.Generated.Unsafe
     )
   where
 
-import qualified Generated.Wayland.Client
+import qualified Bindings.Wayland.Client.Generated
 import qualified HsBindgen.Runtime.Internal.CAPI
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.LibC
@@ -471,8 +471,8 @@ foreign import ccall unsafe "hs_bindgen_5c40ee8fe8d017ca" hs_bindgen_5c40ee8fe8d
 -- __unique:__ @Bindings_Wayland_ExtSessionLockV1_Generated_Bindings.Wayland.ExtSessionLockV1.Generated_Unsafe_ext_session_lock_v1_get_lock_surface@
 hs_bindgen_5c40ee8fe8d017ca ::
      RIP.Ptr Ext_session_lock_v1
-  -> RIP.Ptr Generated.Wayland.Client.Wl_surface
-  -> RIP.Ptr Generated.Wayland.Client.Wl_output
+  -> RIP.Ptr Bindings.Wayland.Client.Generated.Wl_surface
+  -> RIP.Ptr Bindings.Wayland.Client.Generated.Wl_output
   -> IO (RIP.Ptr Ext_session_lock_surface_v1)
 hs_bindgen_5c40ee8fe8d017ca =
   RIP.fromFFIType hs_bindgen_5c40ee8fe8d017ca_base
@@ -496,9 +496,9 @@ __exported by:__ @ext-session-lock-v1-client-protocol.h@
 ext_session_lock_v1_get_lock_surface ::
      RIP.Ptr Ext_session_lock_v1
      -- ^ __C declaration:__ @ext_session_lock_v1@
-  -> RIP.Ptr Generated.Wayland.Client.Wl_surface
+  -> RIP.Ptr Bindings.Wayland.Client.Generated.Wl_surface
      -- ^ __C declaration:__ @surface@
-  -> RIP.Ptr Generated.Wayland.Client.Wl_output
+  -> RIP.Ptr Bindings.Wayland.Client.Generated.Wl_output
      -- ^ __C declaration:__ @output@
   -> IO (RIP.Ptr Ext_session_lock_surface_v1)
 ext_session_lock_v1_get_lock_surface =

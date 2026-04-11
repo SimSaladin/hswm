@@ -26,7 +26,7 @@ import HSWM.StackSet qualified as W
 import Network.Socket
 import Network.Socket.ByteString qualified as NB
 import PackageInfo_hswm qualified as PKG
-import River.Objects qualified as R
+import Bindings.River qualified as R
 import System.Directory
 
 type MonadIPC env m = (env ~ HConf, MonadReader env m, HasLogFunc env, MonadIO m)

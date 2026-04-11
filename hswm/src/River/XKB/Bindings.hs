@@ -18,7 +18,7 @@ where
 import Data.Map qualified as M
 import Foreign
 import HSWM.XKB
-import River.Objects qualified as R
+import Bindings.River qualified as R
 import River.WMP
 
 type XBKey = (Modifiers, KeySym)

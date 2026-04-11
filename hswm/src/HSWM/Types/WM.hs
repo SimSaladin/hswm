@@ -1,4 +1,5 @@
 {-# LANGUAGE DefaultSignatures #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 
 -- |
 -- Module      : HSWM.Types.WM
@@ -27,11 +28,65 @@ import HSWM.Util.Types
 import HSWM.Utils
 import HSWM.XKB
 import River
-import River.Objects
-import River.Objects qualified as R
-import River.Safe qualified as R
+import Bindings.River qualified as R
+import Bindings.RiverSafe qualified as R
 import Wayland (RegistryCache)
-import Wayland.Client qualified as WL hiding (display)
+import Bindings.Wayland.Client qualified as WL hiding (display)
+
+-- * User configuration
+
+-- | User configuration
+data HSWMConfig m l = HSWMConfig
+  { keyBindings :: [((ModMask, KeySym), SomeAction m)],
+    pointerBindings :: [((String, KeySym), SomeAction m)],
+    defaultModMask :: !String,
+    borderWidth :: !Int32,
+    normalBorder :: !RiverColor,
+    focusedBorder :: !RiverColor,
+    borderEdges :: !Int32,
+    startupHook :: !(m ()),
+    exitHook :: !(m ()),
+    handleEventHook :: !(Event -> m All),
+    layoutHook :: !(l RiverWindow),
+    renderHook :: !(m ()),
+    logHook :: !(m ()),
+    manageHook :: !ManageHook,
+    -- | Keyboard layout set for connected keyboards
+    xkbLayout :: !(Maybe XkbRuleNames),
+    workspaces :: [WorkspaceId],
+    -- | Keyboard repeat (rate, delay)
+    repeatInfo :: !(Maybe (Int32, Int32)),
+    -- | XCursor theme and size
+    xcursor :: !(Maybe (String, Word32))
+  }
+  deriving stock (Generic)
+
+-- | Default config (defaults).
+instance (Default (m ()), Monoid (m ()), Monoid (m All)) => Default (HSWMConfig m Full) where
+  def =
+    (def :: HSWMConfig m Layout)
+      { borderWidth = 2,
+        normalBorder = parseRgba "0x0000B0",
+        focusedBorder = parseRgba "0xFA0050",
+        borderEdges = foldl' (.|.) 0 (fi . (.unwrap) <$> [EdgeLeft, EdgeRight, EdgeTop, EdgeBottom]),
+        keyBindings = [],
+        pointerBindings = [],
+        defaultModMask = "Ctrl",
+        startupHook = mempty,
+        handleEventHook = mempty,
+        layoutHook = Full,
+        logHook = mempty,
+        xkbLayout = Nothing,
+        workspaces = ["1", "2", "3", "4"],
+        xcursor = Nothing
+      }
+
+instance Default (Query (Endo WindowSet)) where
+  def = return $ Endo id
+
+deriving anyclass instance (Default (m ()), Monoid (m All), Monoid (m ())) => Default (HSWMConfig m Layout)
+
+-- WindowSet / Stacks
 
 -- | Virtual workspace indices
 type WorkspaceId = String
@@ -53,6 +108,10 @@ data ScreenDetail = SD {x, y, width, height :: !Int}
 
 data WorkspaceDetail = WD
   deriving (Eq, Show, Read, Generic, Default)
+
+type WindowSet = W.StackSet WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail ScreenId ScreenDetail
+
+type WindowSpace = W.Workspace WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail
 
 -- ---------------------------------------------------------------------
 -- Extensible state/config
@@ -87,110 +146,28 @@ data StateExtension
 -- | Existential type to store a config extension.
 data ConfExtension = forall a. (Typeable a) => ConfExtension a
 
----------------------------------------------------------
--- Actions
+--------------------------------------------------------------
+-- Layout messages
 
-data SomeAction m where
-  SomeAction :: forall m a. (IsAction m a) => a -> SomeAction m
+-- | Based on ideas in /An Extensible Dynamically-Typed Hierarchy of
+-- Exceptions/, Simon Marlow, 2006. Use extensible messages to the
+-- 'handleMessage' handler.
+--
+-- User-extensible messages must be a member of this class.
+class (Typeable a) => Message a
 
-class (Monad m, MonadIO m) => IsAction m a where
-  runner :: a -> m ()
+-- | A wrapped value of some type in the 'Message' class.
+data SomeMessage = forall a. (Message a) => SomeMessage a
 
-  actionSubmap :: a -> [((ModMask, KeySym), SomeAction m)]
-  actionSubmap _ = []
-
-  -- | Description based on the value (defaults to type info)
-  actionDescription :: Proxy m -> a -> String
-  actionDescription = typeDescription
-
-  -- | Description based on type info
-  typeDescription :: Proxy m -> a -> String
-  default typeDescription :: (Typeable a) => Proxy m -> a -> String
-  typeDescription _ = show . typeOf
-
-instance (MonadIO m) => IsAction m (SomeAction m) where
-  runner (SomeAction a) = runner a
-  actionSubmap (SomeAction a) = actionSubmap a
-  actionDescription mp (SomeAction a) = actionDescription mp a
-  typeDescription mp (SomeAction a) = typeDescription mp a
-
-instance (MonadIO m) => Show (SomeAction m) where
-  show x = case x of
-    SomeAction (val :: (IsAction m a) => a) -> actionDescription (Proxy :: Proxy m) val
-
-instance (MonadIO m) => Display (SomeAction m) where
-  textDisplay = toText . show
-
-data Submap m = Submap
-  { submapKeys :: [((ModMask, KeySym), SomeAction m)],
-    submapDefault :: Maybe (SomeAction m)
-  }
-  deriving (Show, Generic)
-
-instance (MonadIO m, Typeable m) => IsAction m (Submap m) where
-  runner Submap {..} = whenJust submapDefault runner
-  actionSubmap Submap {..} = submapKeys
-
--- actionDescription Submap{..} = "Submap"
-
-instance (MonadIO m) => IsAction m (IO ()) where
-  runner = liftIO
-
-type WindowSet = W.StackSet WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail ScreenId ScreenDetail
-
-type WindowSpace = W.Workspace WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail
-
-data Window = Window
-  { river_window :: !RiverWindow,
-    node :: !RiverNode,
-    x, y, width, height :: !Int32,
-    title, appId, identifier :: !String,
-    -- | Dimension hints
-    min_height, min_width, max_height, max_width :: !Int,
-    parent :: !(Maybe RiverWindow),
-    unreliablePid :: !(Maybe Int),
-    decorationHint :: !(Maybe R.River_window_v1_decoration_hint),
-    presentationHint :: !(Maybe R.River_output_v1_presentation_mode),
-    new :: Bool,
-    closed :: Bool,
-    fullscreen, minimized :: Bool,
-    p_manage_action :: [WindowManageAction],
-    p_render_border :: Maybe RiverColor,
-    p_render_pos :: Maybe (Int32, Int32),
-    p_render_place :: CInt,
-    p_set_visible :: Maybe Bool,
-    -- TODO: review below
-    pointer_move_requested :: RiverSeat,
-    pointer_resize_requested :: RiverSeat,
-    pointer_resize_requested_edges :: Int32
-  }
-  deriving stock (Show, Generic)
-  deriving anyclass (Default)
-
--- * WindowManager main loop
-
-data WindowManageAction
-  = WFullscreen
-  | WFullscreenOnScreen RiverOutput
-  | WExitFullscreen
-  | WToggleFullscreen
-  | WRequestClose
-  deriving (Eq, Show, Generic)
+-- | And now, unwrap a given, unknown 'Message' type, performing a (dynamic)
+-- type check on the result.
+fromMessage :: (Message m) => SomeMessage -> Maybe m
+fromMessage (SomeMessage m) = cast m
 
 -------------------------------------------------------------------------
 -- Layouts
 
--- | Simple fullscreen mode. Renders the focused window fullscreen.
-data Full a = Full deriving (Show, Read)
-
-instance LayoutClass Full a
-
-instance Default (Layout a) where
-  def = Layout Full
-
 data Layout a = forall l. (LayoutClass l a, Read (l a)) => Layout (l a)
-
-type HandleLayouts m = (Monad m, m ~ HS)
 
 -- | Every layout must be an instance of 'LayoutClass', which defines
 -- the basic layout operations along with a sensible default for each.
@@ -286,6 +263,16 @@ class (Show (layout a), Typeable layout) => LayoutClass layout a where
   description :: layout a -> String
   description = show
 
+type HandleLayouts m = (Monad m, m ~ HS)
+
+-- | Simple fullscreen mode. Renders the focused window fullscreen.
+data Full a = Full deriving (Show, Read)
+
+instance LayoutClass Full a
+
+instance Default (Layout a) where
+  def = Layout Full
+
 instance LayoutClass Layout RiverWindow where
   runLayout (Workspace i (Layout l) ms wd) r = fmap (fmap Layout) `fmap` runLayout (Workspace i l ms wd) r
   doLayout (Layout l) r s = fmap (fmap Layout) `fmap` doLayout l r s
@@ -295,27 +282,16 @@ instance LayoutClass Layout RiverWindow where
 
 instance Show (Layout a) where show (Layout l) = show l
 
---------------------------------------------------------------
--- Layout messages
+-----------------------------------------------------------
+-- * State & H/HS Monad
 
--- | Based on ideas in /An Extensible Dynamically-Typed Hierarchy of
--- Exceptions/, Simon Marlow, 2006. Use extensible messages to the
--- 'handleMessage' handler.
---
--- User-extensible messages must be a member of this class.
-class (Typeable a) => Message a
+newtype H a = H (ReaderT HConf IO a)
+  deriving newtype (Functor, Applicative, Monad, MonadFail, MonadIO, MonadReader HConf, MonadThrow, MonadUnliftIO)
+  deriving (Semigroup, Monoid) via Ap H a
 
--- |
--- A wrapped value of some type in the 'Message' class.
-data SomeMessage = forall a. (Message a) => SomeMessage a
-
--- |
--- And now, unwrap a given, unknown 'Message' type, performing a (dynamic)
--- type check on the result.
-fromMessage :: (Message m) => SomeMessage -> Maybe m
-fromMessage (SomeMessage m) = cast m
-
--- * Program state (read + write)
+newtype HS a = HS (ReaderT HConf (StateT HState IO) a)
+  deriving newtype (Functor, Applicative, Monad, MonadFail, MonadIO, MonadState HState, MonadReader HConf, MonadThrow)
+  deriving (Semigroup, Monoid) via Ap HS a
 
 -- | The read-only window manager state.
 data HConf = HConf
@@ -340,12 +316,6 @@ data HConf = HConf
   }
   deriving (Generic)
 
-instance HasGlobalTMap HConf where
-  globalTMap = lens globalTypeMap (\s a -> s {globalTypeMap = a})
-
-instance HasLogFunc HConf where
-  logFuncL = lens _logFunc (\s a -> s {_logFunc = a})
-
 -- | Mutable stete.
 data HState = HState
   { windowset :: !WindowSet,
@@ -362,28 +332,11 @@ data HState = HState
   }
   deriving (Generic, Default)
 
-type ManageHook = Query (Endo WindowSet)
+instance HasGlobalTMap HConf where
+  globalTMap = lens globalTypeMap (\s a -> s {globalTypeMap = a})
 
-type MaybeManageHook = Query (Maybe (Endo WindowSet))
-
-newtype Query a = Query (ReaderT Window HS a)
-  deriving newtype (Functor, Applicative, Monad, MonadIO, MonadReader Window)
-
-runQuery :: Query a -> Window -> HS a
-runQuery (Query q) = runReaderT q
-
-liftHS :: HS a -> Query a
-liftHS a = Query (lift a)
-
--- * H Monad
-
-newtype H a = H (ReaderT HConf IO a)
-  deriving newtype (Functor, Applicative, Monad, MonadFail, MonadIO, MonadReader HConf, MonadThrow, MonadUnliftIO)
-  deriving (Semigroup, Monoid) via Ap H a
-
-newtype HS a = HS (ReaderT HConf (StateT HState IO) a)
-  deriving newtype (Functor, Applicative, Monad, MonadFail, MonadIO, MonadState HState, MonadReader HConf, MonadThrow)
-  deriving (Semigroup, Monoid) via Ap HS a
+instance HasLogFunc HConf where
+  logFuncL = lens _logFunc (\s a -> s {_logFunc = a})
 
 instance Default (H ()) where def = return ()
 
@@ -400,7 +353,60 @@ instance MonadFix HS where
   mfix f = HS (mfix g) where g a = let HS a' = f a in a'
 
 -----------------------------------------------------------
+-- * Query & ManageHook
+
+type ManageHook = Query (Endo WindowSet)
+
+type MaybeManageHook = Query (Maybe (Endo WindowSet))
+
+newtype Query a = Query (ReaderT Window HS a)
+  deriving newtype (Functor, Applicative, Monad, MonadIO, MonadReader Window)
+
+runQuery :: Query a -> Window -> HS a
+runQuery (Query q) = runReaderT q
+
+liftHS :: HS a -> Query a
+liftHS a = Query (lift a)
+
+-----------------------------------------------------------
 -- River & Wayland
+
+-- ** Windows
+
+data Window = Window
+  { river_window :: !RiverWindow,
+    node :: !RiverNode,
+    x, y, width, height :: !Int32,
+    title, appId, identifier :: !String,
+    -- | Dimension hints
+    min_height, min_width, max_height, max_width :: !Int,
+    parent :: !(Maybe RiverWindow),
+    unreliablePid :: !(Maybe Int),
+    decorationHint :: !(Maybe R.River_window_v1_decoration_hint),
+    presentationHint :: !(Maybe R.River_output_v1_presentation_mode),
+    new :: Bool,
+    closed :: Bool,
+    fullscreen, minimized :: Bool,
+    p_manage_action :: [WindowManageAction],
+    p_render_border :: Maybe RiverColor,
+    p_render_pos :: Maybe (Int32, Int32),
+    p_render_place :: CInt,
+    p_set_visible :: Maybe Bool,
+    -- TODO: review below
+    pointer_move_requested :: RiverSeat,
+    pointer_resize_requested :: RiverSeat,
+    pointer_resize_requested_edges :: Int32
+  }
+  deriving stock (Show, Generic)
+  deriving anyclass (Default)
+
+data WindowManageAction
+  = WFullscreen
+  | WFullscreenOnScreen RiverOutput
+  | WExitFullscreen
+  | WToggleFullscreen
+  | WRequestClose
+  deriving (Eq, Show, Generic)
 
 -- * River/WL Seat
 
@@ -447,12 +453,13 @@ data SeatAction
     S_INPUT_OVERRIDE_CANCEL
   deriving (Show, Generic)
 
-instance Default SeatAction where def = S_NONE
+data SeatOp
+  = SEAT_OP_NONE
+  | SEAT_OP_MOVE
+  | SEAT_OP_RESIZE
+  deriving (Eq, Show)
 
--- XXX
-instance Show (StablePtr a) where
-  show :: StablePtr a -> String
-  show _ = "<SP>"
+instance Default SeatAction where def = S_NONE
 
 instance Show (H ()) where show _ = "H()"
 
@@ -491,14 +498,7 @@ instance Default Seat where
         suppressChangeFocus = False
       }
 
--- XXX: ????
-data SeatOp
-  = SEAT_OP_NONE
-  | SEAT_OP_MOVE
-  | SEAT_OP_RESIZE
-  deriving (Eq, Show)
-
--- * Wayland/River outputs management
+-- ** Outputs
 
 data Output = Output
   { river_output :: !RiverOutput,
@@ -515,53 +515,56 @@ data Output = Output
 instance Default Output where
   def = Output def 0 0 0 0 0 (S (-1)) "" "" (R.RiverLayerShellOutput nullPtr) Nothing
 
--- | User configuration
-data HSWMConfig m l = HSWMConfig
-  { keyBindings :: [((ModMask, KeySym), SomeAction m)],
-    pointerBindings :: [((String, KeySym), SomeAction m)],
-    defaultModMask :: !String,
-    borderWidth :: !Int32,
-    normalBorder :: !RiverColor,
-    focusedBorder :: !RiverColor,
-    borderEdges :: !Int32,
-    startupHook :: !(m ()),
-    exitHook :: !(m ()),
-    handleEventHook :: !(Event -> m All),
-    layoutHook :: !(l RiverWindow),
-    renderHook :: !(m ()),
-    logHook :: !(m ()),
-    manageHook :: !ManageHook,
-    -- | Keyboard layout set for connected keyboards
-    xkbLayout :: !(Maybe XkbRuleNames),
-    workspaces :: [WorkspaceId],
-    -- | Keyboard repeat (rate, delay)
-    repeatInfo :: !(Maybe (Int32, Int32)),
-    -- | XCursor theme and size
-    xcursor :: !(Maybe (String, Word32))
+---------------------------------------------------------
+-- Actions / Submaps
+
+data SomeAction m where
+  SomeAction :: forall m a. (IsAction m a) => a -> SomeAction m
+
+data Submap m = Submap
+  { submapKeys :: [((ModMask, KeySym), SomeAction m)],
+    submapDefault :: Maybe (SomeAction m)
   }
-  deriving stock (Generic)
+  deriving (Show, Generic)
 
--- | Default config (defaults).
-instance (Default (m ()), Monoid (m ()), Monoid (m All)) => Default (HSWMConfig m Full) where
-  def =
-    (def :: HSWMConfig m Layout)
-      { borderWidth = 2,
-        normalBorder = parseRgba "0x0000B0",
-        focusedBorder = parseRgba "0xFA0050",
-        borderEdges = foldl' (.|.) 0 (fi . (.unwrap) <$> [EdgeLeft, EdgeRight, EdgeTop, EdgeBottom]),
-        keyBindings = [],
-        pointerBindings = [],
-        defaultModMask = "Ctrl",
-        startupHook = mempty,
-        handleEventHook = mempty,
-        layoutHook = Full,
-        logHook = mempty,
-        xkbLayout = Nothing,
-        workspaces = ["1", "2", "3", "4"],
-        xcursor = Nothing
-      }
+class (Monad m, MonadIO m) => IsAction m a where
+  runner :: a -> m ()
 
-instance Default (Query (Endo WindowSet)) where
-  def = return $ Endo id
+  actionSubmap :: a -> [((ModMask, KeySym), SomeAction m)]
+  actionSubmap _ = []
 
-deriving anyclass instance (Default (m ()), Monoid (m All), Monoid (m ())) => Default (HSWMConfig m Layout)
+  -- | Description based on the value (defaults to type info)
+  actionDescription :: Proxy m -> a -> String
+  actionDescription = typeDescription
+
+  -- | Description based on type info
+  typeDescription :: Proxy m -> a -> String
+  default typeDescription :: (Typeable a) => Proxy m -> a -> String
+  typeDescription _ = show . typeOf
+
+instance (MonadIO m) => IsAction m (IO ()) where
+  runner = liftIO
+
+instance (MonadIO m) => IsAction m (SomeAction m) where
+  runner (SomeAction a) = runner a
+  actionSubmap (SomeAction a) = actionSubmap a
+  actionDescription mp (SomeAction a) = actionDescription mp a
+  typeDescription mp (SomeAction a) = typeDescription mp a
+
+instance (MonadIO m, Typeable m) => IsAction m (Submap m) where
+  runner Submap {..} = whenJust submapDefault runner
+  actionSubmap Submap {..} = submapKeys
+
+instance (MonadIO m) => Show (SomeAction m) where
+  show x = case x of
+    SomeAction (val :: (IsAction m a) => a) -> actionDescription (Proxy :: Proxy m) val
+
+instance (MonadIO m) => Display (SomeAction m) where
+  textDisplay = tshow
+
+---------------------------------------------------------
+-- Orphan instances
+
+instance Show (StablePtr a) where
+  show :: StablePtr a -> String
+  show _ = "<SP>"

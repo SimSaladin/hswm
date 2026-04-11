@@ -23,7 +23,7 @@ module Bindings.Wayland.WlrLayerShellUnstableV1.Generated.Unsafe
     )
   where
 
-import qualified Generated.Wayland.Client
+import qualified Bindings.Wayland.Client.Generated
 import qualified HsBindgen.Runtime.Internal.CAPI
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.LibC
@@ -283,8 +283,8 @@ foreign import ccall unsafe "hs_bindgen_4890815c48538cd8" hs_bindgen_4890815c485
 -- __unique:__ @Bindings_Wayland_WlrLayerShellUnstableV1_Generated_Bindings.Wayland.WlrLayerShellUnstableV1.Generated_Unsafe_zwlr_layer_shell_v1_get_layer_surface@
 hs_bindgen_4890815c48538cd8 ::
      RIP.Ptr Zwlr_layer_shell_v1
-  -> RIP.Ptr Generated.Wayland.Client.Wl_surface
-  -> RIP.Ptr Generated.Wayland.Client.Wl_output
+  -> RIP.Ptr Bindings.Wayland.Client.Generated.Wl_surface
+  -> RIP.Ptr Bindings.Wayland.Client.Generated.Wl_output
   -> HsBindgen.Runtime.LibC.Word32
   -> PtrConst.PtrConst RIP.CChar
   -> IO (RIP.Ptr Zwlr_layer_surface_v1)
@@ -312,9 +312,9 @@ __exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
 zwlr_layer_shell_v1_get_layer_surface ::
      RIP.Ptr Zwlr_layer_shell_v1
      -- ^ __C declaration:__ @zwlr_layer_shell_v1@
-  -> RIP.Ptr Generated.Wayland.Client.Wl_surface
+  -> RIP.Ptr Bindings.Wayland.Client.Generated.Wl_surface
      -- ^ __C declaration:__ @surface@
-  -> RIP.Ptr Generated.Wayland.Client.Wl_output
+  -> RIP.Ptr Bindings.Wayland.Client.Generated.Wl_output
      -- ^ __C declaration:__ @output@
   -> HsBindgen.Runtime.LibC.Word32
      -- ^ __C declaration:__ @layer@

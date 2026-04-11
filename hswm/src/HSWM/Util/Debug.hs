@@ -17,10 +17,10 @@ module HSWM.Util.Debug where
 import Data.Map qualified as M
 import Foreign
 import HSWM
-import River.Objects qualified as R
+import Bindings.River qualified as R
 import Text.Printf
-import Wayland.Client qualified as WL
-import Wayland.Client.Extras qualified as WL
+import Bindings.Wayland.Client qualified as WL
+import Bindings.Wayland.Protocol.ForeignTopLevelListV1 as WL
 
 debugHook :: Event -> H All
 debugHook ev

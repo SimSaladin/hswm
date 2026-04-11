@@ -23,9 +23,9 @@ import Foreign
 import HSWM.Core
 import HSWM.Operations
 import HSWM.StackSet qualified as W
-import River.Objects qualified as R
+import Bindings.River qualified as R
 import Wayland
-import Wayland.Client qualified as WL
+import Bindings.Wayland.Client qualified as WL
 
 data OutputManager = OutputManager
   { pending_setup :: M.Map RiverOutput Output,

@@ -44,7 +44,7 @@ module Bindings.Wayland.WlrOutputManagementUnstableV1.Generated.Safe
     )
   where
 
-import qualified Generated.Wayland.Util
+import qualified Bindings.Wayland.Util.Generated
 import qualified HsBindgen.Runtime.Internal.CAPI
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.LibC
@@ -1473,7 +1473,7 @@ foreign import ccall safe "hs_bindgen_b3e23982089a30ce" hs_bindgen_b3e23982089a3
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_Safe_zwlr_output_configuration_head_v1_set_scale@
 hs_bindgen_b3e23982089a30ce ::
      RIP.Ptr Zwlr_output_configuration_head_v1
-  -> Generated.Wayland.Util.Wl_fixed_t
+  -> Bindings.Wayland.Util.Generated.Wl_fixed_t
   -> IO ()
 hs_bindgen_b3e23982089a30ce =
   RIP.fromFFIType hs_bindgen_b3e23982089a30ce_base
@@ -1493,7 +1493,7 @@ __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 zwlr_output_configuration_head_v1_set_scale ::
      RIP.Ptr Zwlr_output_configuration_head_v1
      -- ^ __C declaration:__ @zwlr_output_configuration_head_v1@
-  -> Generated.Wayland.Util.Wl_fixed_t
+  -> Bindings.Wayland.Util.Generated.Wl_fixed_t
      -- ^ __C declaration:__ @scale@
   -> IO ()
 zwlr_output_configuration_head_v1_set_scale =

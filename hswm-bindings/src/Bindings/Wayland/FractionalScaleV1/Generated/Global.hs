@@ -8,7 +8,7 @@ module Bindings.Wayland.FractionalScaleV1.Generated.Global
     )
   where
 
-import qualified Generated.Wayland.Util
+import qualified Bindings.Wayland.Util.Generated
 import qualified HsBindgen.Runtime.Internal.CAPI
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.PtrConst as PtrConst
@@ -34,7 +34,7 @@ foreign import ccall unsafe "hs_bindgen_91b0843e75e35b8e" hs_bindgen_91b0843e75e
      IO (RIP.Ptr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_FractionalScaleV1_Generated_Bindings.Wayland.FractionalScaleV1.Generated_get_wp_fractional_scale_manager_v1_interface@
-hs_bindgen_91b0843e75e35b8e :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
+hs_bindgen_91b0843e75e35b8e :: IO (PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface)
 hs_bindgen_91b0843e75e35b8e =
   RIP.fromFFIType hs_bindgen_91b0843e75e35b8e_base
 
@@ -63,12 +63,12 @@ __exported by:__ @fractional-scale-v1-client-protocol.h@
 
 __unique:__ @Bindings_Wayland_FractionalScaleV1_Generated_Bindings.Wayland.FractionalScaleV1.Generated_wp_fractional_scale_manager_v1_interface@
 -}
-hs_bindgen_42d906124f7ce49c :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+hs_bindgen_42d906124f7ce49c :: PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
 hs_bindgen_42d906124f7ce49c =
   RIP.unsafePerformIO hs_bindgen_91b0843e75e35b8e
 
 {-# NOINLINE wp_fractional_scale_manager_v1_interface #-}
-wp_fractional_scale_manager_v1_interface :: Generated.Wayland.Util.Wl_interface
+wp_fractional_scale_manager_v1_interface :: Bindings.Wayland.Util.Generated.Wl_interface
 wp_fractional_scale_manager_v1_interface =
   RIP.unsafePerformIO (PtrConst.peek hs_bindgen_42d906124f7ce49c)
 
@@ -77,7 +77,7 @@ foreign import ccall unsafe "hs_bindgen_91b1d88bffe3ee24" hs_bindgen_91b1d88bffe
      IO (RIP.Ptr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_FractionalScaleV1_Generated_Bindings.Wayland.FractionalScaleV1.Generated_get_wp_fractional_scale_v1_interface@
-hs_bindgen_91b1d88bffe3ee24 :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
+hs_bindgen_91b1d88bffe3ee24 :: IO (PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface)
 hs_bindgen_91b1d88bffe3ee24 =
   RIP.fromFFIType hs_bindgen_91b1d88bffe3ee24_base
 
@@ -106,11 +106,11 @@ __exported by:__ @fractional-scale-v1-client-protocol.h@
 
 __unique:__ @Bindings_Wayland_FractionalScaleV1_Generated_Bindings.Wayland.FractionalScaleV1.Generated_wp_fractional_scale_v1_interface@
 -}
-hs_bindgen_d4e9f9c612725922 :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+hs_bindgen_d4e9f9c612725922 :: PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
 hs_bindgen_d4e9f9c612725922 =
   RIP.unsafePerformIO hs_bindgen_91b1d88bffe3ee24
 
 {-# NOINLINE wp_fractional_scale_v1_interface #-}
-wp_fractional_scale_v1_interface :: Generated.Wayland.Util.Wl_interface
+wp_fractional_scale_v1_interface :: Bindings.Wayland.Util.Generated.Wl_interface
 wp_fractional_scale_v1_interface =
   RIP.unsafePerformIO (PtrConst.peek hs_bindgen_d4e9f9c612725922)

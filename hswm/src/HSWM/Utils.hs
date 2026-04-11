@@ -19,11 +19,12 @@ import Data.ByteString.Char8 qualified as C8
 import Data.ByteString.Lazy qualified as LB
 import Data.Char (toLower)
 import Data.List qualified as L
-import Generated.Wayland.Client qualified as WL
+import Bindings.Wayland.Client qualified as WL
+import Bindings.Wayland.Client.Generated qualified as WL
 import HSWM.XKB (ModMask)
 import Numeric (readHex)
 import River
-import River.Safe qualified as R
+import Bindings.RiverSafe qualified as R
 import System.Posix.IO
 import System.Posix.Process
   ( createSession,

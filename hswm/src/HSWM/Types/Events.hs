@@ -9,13 +9,13 @@
 module HSWM.Types.Events where
 
 import Bindings.Wayland.ExtSessionLockV1 qualified as SL
-import Bindings.Wayland.FractionalScaleV1 qualified as FS
+--import Bindings.Wayland.FractionalScaleV1 qualified as FS
 import Bindings.Wayland.WlrOutputManagementUnstableV1 qualified as Wlr
 import Bindings.Wayland.XdgOutputUnstableV1 qualified as Zdg
-import River.Objects qualified as R
-import Wayland.Client qualified as WL
-import Wayland.Client.Extras qualified as WL
-import Wlr qualified as Zwp
+import Bindings.River qualified as R
+import Bindings.Wayland.Client qualified as WL
+import Bindings.Wayland.Protocol.ForeignTopLevelListV1 qualified as WL
+import Bindings.Wayland.WlrInputMethodUnstableV2 qualified as Zwp
 
 -- | Mash-up of all River/Wayland generated events
 data Event

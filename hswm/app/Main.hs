@@ -6,8 +6,6 @@
 
 module Main (main) where
 
--- import qualified HSWM.Actions.WindowNavigation as WNav
-
 import Data.List qualified as L
 import Data.Map qualified as M
 import Data.Ratio
@@ -32,6 +30,29 @@ import HSWM.Wallpaper qualified
 import System.Environment qualified
 import Text.Printf
 
+main :: IO ()
+main =
+  hswm $
+    addKeys (fromADTKeys $ parseSubmaps myKeys) $
+      WB.waybarSB def $
+        HSWM.Wallpaper.usingWallpaper
+          HSWM.Wallpaper.Config {filepath = "/home/sim/wallpaper.png"}
+          (def @(HSWMConfig H Full))
+            { layoutHook = myLayoutHook,
+              handleEventHook = debugHook,
+              logHook = IPC.ipcLogHook,
+              xkbLayout = Just dvpMyLayout,
+              pointerBindings = myPointerBinds,
+              defaultModMask = "mod4",
+              repeatInfo = Just (20, 150),
+              manageHook = myManageHook,
+              borderWidth = 1,
+              normalBorder = parseRgba colBase02,
+              focusedBorder = parseRgba colCyan,
+              startupHook = IPC.serverStartupHook def <> runInHS (scratchpadsStartupHook myScratchpads),
+              xcursor = Just ("Vanilla-DMZ", 24)
+            }
+
 myScratchpads :: [Scratchpad]
 myScratchpads =
   exclusive
@@ -49,14 +70,6 @@ myScratchpads =
   where
     mhd = doRFRR 0.2 0.1 0.6 0.6
     doRFRR x y w h = doRectFloat (W.RationalRect x y w h)
-
-tagKeys = map (: []) ['a' .. 'z']
-
-screenKeys = map (: []) "wvza"
-
-tagKeysTags = zip tagKeys [(0 :: Int) ..]
-
-screenKeysScreens = zip screenKeys [(PScreen.P 0) ..]
 
 rofiPrompt :: RP.RofiPromptConfig
 rofiPrompt =
@@ -114,8 +127,6 @@ windowPrompt = do
       logInfo $ fromString input
       return ()
 
--- TODO
-
 renameWorkspacePrompt :: H ()
 renameWorkspacePrompt = do
   (curTag, allTags) <- runInHS $ withWindowSet $ return . (W.currentTag &&& W.allTags)
@@ -132,7 +143,9 @@ addWorkspacePrompt =
   mkWorkspacePrompt
     (\p _ -> p {RP._prompt = "Add workspace"})
     ( \_ input -> do
-        runInHS $ DynWS.addWorkspace input >> windows (W.view input)
+        runInHS $ do
+          modifySeats (const True) $ \s -> s { suppressChangeFocus = True }
+          DynWS.addWorkspace input
         manageDirty
     )
 
@@ -144,7 +157,8 @@ removeFocusedWorkspace = do
     DWO.removeName curTag
 
 myManageHook :: Query (Endo WindowSet)
-myManageHook = composeOne
+myManageHook =
+  composeOne
     [ managePads
     ]
 
@@ -155,29 +169,7 @@ myLayoutHook =
       WNav.configurableNavigation (WNav.navigateColor colBase00) $ -- apply on top of any modifiers that might modify placement of tiled windows
         Tall 1 (3 / 100) (1 / 2) ||| Full
 
-main :: IO ()
-main =
-  hswm $
-    addKeys (fromADTKeys $ parseSubmaps $ myKeys) $
-      WB.waybarSB def $
-        HSWM.Wallpaper.usingWallpaper
-          HSWM.Wallpaper.Config {filepath = "/home/sim/wallpaper.png"}
-          (def @(HSWMConfig H Full))
-            { layoutHook = myLayoutHook,
-              handleEventHook = debugHook,
-              logHook {-navLogHook <>-} = IPC.ipcLogHook,
-              xkbLayout = Just dvpMyLayout,
-              pointerBindings = myPointerBinds,
-              defaultModMask = "mod4",
-              repeatInfo = Just (20, 150),
-              normalBorder = parseRgba colBase02,
-              manageHook = myManageHook,
-              focusedBorder = parseRgba colCyan,
-              startupHook = IPC.serverStartupHook def <> runInHS (scratchpadsStartupHook myScratchpads),
-              xcursor = Just ("Vanilla-DMZ", 24)
-            }
-
-myKeys :: [([Char], SomeAction H)]
+myKeys :: [(String, SomeAction H)]
 myKeys =
   -- ====== Core ==========
   [ ("M-S-c", "Close the focused window" $?$?= withFocused manageKill),
@@ -214,60 +206,56 @@ myKeys =
     ++ [("M-S-" ++ key, ("Send window to screen " ++ show i) $?$?= PScreen.sendToScreen def i) | (key, i) <- screenKeysScreens]
     ++ [("M-M1-" ++ key, ("Send workspace to screen " ++ show i) $?$?= sendFocusedWorkspaceToScreen OnScreen.FocusCurrent i) | (key, i) <- screenKeysScreens]
     ++ [("M-C-" ++ key, ("Send workspace to screen and focus it " ++ show i) $?$?= sendFocusedWorkspaceToScreen OnScreen.FocusNew i) | (key, i) <- screenKeysScreens]
-
     -- ===== Workspaces =====
     ++ [("M-SemiColon " ++ key, ("View workspace " ++ show i) $?$?= DWO.withNthWorkspace W.view i) | (key, i) <- tagKeysTags]
     ++ [("M-S-SemiColon " ++ key, ("Shift to workspace " ++ show i) $?$?= DWO.withNthWorkspace W.shift i) | (key, i) <- tagKeysTags]
-    -- "M-; M-"      >>+ tags >++> WorkspaceCopy
     ++ [ ("M-y", "Cycle recent hidden tags" $?$?= cycleRecentHiddenWS [4, 8, 64] 121 112),
          ("M-S-n", "Shift current tag (forwards)" $?$?= DWO.swapWith Next CycleWS.anyWS), -- XXX: save workspace order?
          ("M-S-p", "Shift current tag (backwards)" $?$?= DWO.swapWith Prev CycleWS.anyWS),
          ("M-g r", "Rename workspace (prompt)" $?$?= renameWorkspacePrompt),
          ("M-g n", "Add workspace (prompt)" $?$?= addWorkspacePrompt),
          ("M-g d", "Remove focused workspace" $?$?= removeFocusedWorkspace),
+         ("M-g f", "Go to window" $?$?= windowPrompt)
          -- ( "M-g S-n"     wsPromptNew' "New tag for window: " ?+ (\to -> DynWS.addHiddenWorkspace to >> defile (shift to))   ? "Move window to new tag (XP)"
          -- ( "M-g c"       wsPrompt'    "Copy to tag: "        ?+ (\to -> withFocii $ \_ w -> windows $ CW.copyWindow w to)   ? "Copy window to this tag (XP)"
          -- ( "M-g m"       wsPrompt'    "Shift to tag: "       ?+ (defile . shift                                           ) ? "Move window to this tag (XP)"
          -- ( "M-g g"       wsPrompt'    "View tag: "           ?+ (defile . greedyView                                      ) ? "Go to tag (XP)"
          -- ( "M-g s"       GS.goToSelected gsconfig1                          ? "Go to window (GS)"
          -- ( "M-g f"       XP.windowPrompt xpConfigAuto XP.Goto XP.allWindows ? "Go to window (XP)"
-         ("M-g f", "Go to window" $?$?= windowPrompt),
-         -- ===== Workspace Groups ====
-         -- "M-g M-n" >+ wsPromptNew' "New Workspace group: " ?+ addWSG ? "New WSG"
-         -- "M-g M-g" >+ WSG.promptWSGroupView xpConfig "View WSG: " ? "View WSG (XP)"
-
-         -- ====== Layout
-         ("M-Space", "Layout: " $?$?= NextLayout),
-         ("M-Shift-Space", "Layout: " $?$?= FirstLayout),
-         ("M-C-Space", "Layout: Reset" $?$?= (asks (layoutHook . config) >>= setLayout)),
-         ("M-Comma", "Layout: " $?$?= IncMasterN (-1)),
-         ("M-Period", "Layout: " $?$?= IncMasterN 1),
-         ("M-x", "Layout: " $?$?= Shrink),
-         ("M-S-x", "Layout: " $?$?= Expand)
-         --   "M-b t"       >+ msgT ManageDocks.ToggleStruts
-         --   "M-b l"       >+ msgT Magnifier.Toggle
-         --   "M-m"         >+ MaximizeRestore
-         --   "M-b s"       >+ ToggleScreenSpacing :>> ToggleWindowSpacing
-         --   "M-b b"       >+ toggle1 NOBORDERS
-         --   "M-b h"       >+ toggle1 (HINTSPLACEMENT (0.5, 0.5))
-         --   "M-b f"       >+ toggle1 NBFULL
-         --   "M-b m"       >+ toggle1 MIRROR
-         --   "M-b x"       >+ toggle1 REFLECTX
-         --   "M-b y"       >+ toggle1 REFLECTY
-         --   "M-b M-x"     >+ msgT ManageDocks.ToggleStruts :>> toggle1 NOBORDERS :>> ToggleScreenSpacing :>> ToggleWindowSpacing
-
-         -- ======= Layout: BSP
-         --   "M-C-y"   >+ msgT BSP.SelectNode
-         --   "M-C-p"   >+ msgT BSP.MoveNode
-         --   "M-C-u"   >+ msgT BSP.FocusParent
-         --   "M-C-r"   >+ msgT BSP.Rotate
-         --   "M-C-="   >+ msgT BSP.Equalize
-         --   "M-C-!"   >+ msgT BSP.Balance
-         --   "M-C-"    >>+ directions2D >++> msgT . BSP.ExpandTowards
-         --   "M-r M-b" >+ cmdPrompt xpConfig (Proxy :: Proxy LayoutBSPCommand)
-
-         -- ====== Window =============
        ]
+    ++
+    -- ====== Layout
+    [ ("M-Space", "Layout: " $?$?= NextLayout),
+      ("M-Shift-Space", "Layout: " $?$?= FirstLayout),
+      ("M-C-Space", "Layout: Reset" $?$?= (asks (layoutHook . config) >>= setLayout)),
+      ("M-Comma", "Layout: " $?$?= IncMasterN (-1)),
+      ("M-Period", "Layout: " $?$?= IncMasterN 1),
+      ("M-x", "Layout: " $?$?= Shrink),
+      ("M-S-x", "Layout: " $?$?= Expand)
+      --   "M-b t"       >+ msgT ManageDocks.ToggleStruts
+      --   "M-b l"       >+ msgT Magnifier.Toggle
+      --   "M-m"         >+ MaximizeRestore
+      --   "M-b s"       >+ ToggleScreenSpacing :>> ToggleWindowSpacing
+      --   "M-b b"       >+ toggle1 NOBORDERS
+      --   "M-b h"       >+ toggle1 (HINTSPLACEMENT (0.5, 0.5))
+      --   "M-b f"       >+ toggle1 NBFULL
+      --   "M-b m"       >+ toggle1 MIRROR
+      --   "M-b x"       >+ toggle1 REFLECTX
+      --   "M-b y"       >+ toggle1 REFLECTY
+      --   "M-b M-x"     >+ msgT ManageDocks.ToggleStruts :>> toggle1 NOBORDERS :>> ToggleScreenSpacing :>> ToggleWindowSpacing
+
+      -- ======= Layout: BSP
+      --   "M-C-y"   >+ msgT BSP.SelectNode
+      --   "M-C-p"   >+ msgT BSP.MoveNode
+      --   "M-C-u"   >+ msgT BSP.FocusParent
+      --   "M-C-r"   >+ msgT BSP.Rotate
+      --   "M-C-="   >+ msgT BSP.Equalize
+      --   "M-C-!"   >+ msgT BSP.Balance
+      --   "M-C-"    >>+ directions2D >++> msgT . BSP.ExpandTowards
+      --   "M-r M-b" >+ cmdPrompt xpConfig (Proxy :: Proxy LayoutBSPCommand)
+
+      -- ====== Window =============
+    ]
     ++ [("M-" ++ key, "Focus window direction" $?$?= sendMessage (WNav.Go dir)) | (key, dir) <- zip ["k", "j", "l", "h"] [minBound .. maxBound @Direction2D]]
     ++ [("M-S-" ++ key, "Swap window in direction" $?$?= sendMessage (WNav.Swap dir)) | (key, dir) <- zip ["k", "j", "l", "h"] [minBound .. maxBound @Direction2D]]
     ++ [ ("M-n", "Focus down" $?$?= windows W.focusDown),
@@ -338,6 +326,10 @@ myKeys =
        ]
   where
     sendFocusedWorkspaceToScreen focus i = PScreen.getScreen def i >>= (`whenJust` (\s -> windows (W.currentTag >>= \x -> OnScreen.onScreen (W.greedyView x) focus s)))
+    tagKeys = map (: []) ['a' .. 'z']
+    screenKeys = map (: []) "wvza"
+    tagKeysTags = zip tagKeys [(0 :: Int) ..]
+    screenKeysScreens = zip screenKeys [(PScreen.P 0) ..]
 
 myPointerBinds :: [((String, Button), SomeAction H)]
 myPointerBinds =
@@ -373,7 +365,7 @@ toggleMuteSource = pactl ["set-source-mute", "@DEFAULT_SOURCE@", "toggle"]
 toggleMuteSink :: SomeAction H
 toggleMuteSink = pactl ["set-sink-mute", "@DEFAULT_SINK@", "toggle"]
 
--- * Colors
+------------------------------------------------------
 
 -- | Solarized palette
 colBase03, colBase02, colBase01, colBase00, colBase0, colBase1, colBase2, colBase3, colYellow, colOrange, colRed, colMagenta, colViolet, colBlue, colCyan, colGreen :: String

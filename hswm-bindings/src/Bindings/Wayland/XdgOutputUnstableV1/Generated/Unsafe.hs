@@ -16,7 +16,7 @@ module Bindings.Wayland.XdgOutputUnstableV1.Generated.Unsafe
     )
   where
 
-import qualified Generated.Wayland.Client
+import qualified Bindings.Wayland.Client.Generated
 import qualified HsBindgen.Runtime.Internal.CAPI
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.LibC
@@ -221,7 +221,7 @@ foreign import ccall unsafe "hs_bindgen_042d8ba43dcdd798" hs_bindgen_042d8ba43dc
 -- __unique:__ @Bindings_Wayland_XdgOutputUnstableV1_Generated_Bindings.Wayland.XdgOutputUnstableV1.Generated_Unsafe_zxdg_output_manager_v1_get_xdg_output@
 hs_bindgen_042d8ba43dcdd798 ::
      RIP.Ptr Zxdg_output_manager_v1
-  -> RIP.Ptr Generated.Wayland.Client.Wl_output
+  -> RIP.Ptr Bindings.Wayland.Client.Generated.Wl_output
   -> IO (RIP.Ptr Zxdg_output_v1)
 hs_bindgen_042d8ba43dcdd798 =
   RIP.fromFFIType hs_bindgen_042d8ba43dcdd798_base
@@ -241,7 +241,7 @@ __exported by:__ @xdg-output-unstable-v1-client-protocol.h@
 zxdg_output_manager_v1_get_xdg_output ::
      RIP.Ptr Zxdg_output_manager_v1
      -- ^ __C declaration:__ @zxdg_output_manager_v1@
-  -> RIP.Ptr Generated.Wayland.Client.Wl_output
+  -> RIP.Ptr Bindings.Wayland.Client.Generated.Wl_output
      -- ^ __C declaration:__ @output@
   -> IO (RIP.Ptr Zxdg_output_v1)
 zxdg_output_manager_v1_get_xdg_output =

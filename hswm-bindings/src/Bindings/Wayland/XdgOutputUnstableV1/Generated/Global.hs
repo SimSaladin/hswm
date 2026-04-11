@@ -8,7 +8,7 @@ module Bindings.Wayland.XdgOutputUnstableV1.Generated.Global
     )
   where
 
-import qualified Generated.Wayland.Util
+import qualified Bindings.Wayland.Util.Generated
 import qualified HsBindgen.Runtime.Internal.CAPI
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.PtrConst as PtrConst
@@ -34,7 +34,7 @@ foreign import ccall unsafe "hs_bindgen_edfefaf9adeac090" hs_bindgen_edfefaf9ade
      IO (RIP.Ptr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_XdgOutputUnstableV1_Generated_Bindings.Wayland.XdgOutputUnstableV1.Generated_get_zxdg_output_manager_v1_interface@
-hs_bindgen_edfefaf9adeac090 :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
+hs_bindgen_edfefaf9adeac090 :: IO (PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface)
 hs_bindgen_edfefaf9adeac090 =
   RIP.fromFFIType hs_bindgen_edfefaf9adeac090_base
 
@@ -63,12 +63,12 @@ __exported by:__ @xdg-output-unstable-v1-client-protocol.h@
 
 __unique:__ @Bindings_Wayland_XdgOutputUnstableV1_Generated_Bindings.Wayland.XdgOutputUnstableV1.Generated_zxdg_output_manager_v1_interface@
 -}
-hs_bindgen_a58583a514084432 :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+hs_bindgen_a58583a514084432 :: PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
 hs_bindgen_a58583a514084432 =
   RIP.unsafePerformIO hs_bindgen_edfefaf9adeac090
 
 {-# NOINLINE zxdg_output_manager_v1_interface #-}
-zxdg_output_manager_v1_interface :: Generated.Wayland.Util.Wl_interface
+zxdg_output_manager_v1_interface :: Bindings.Wayland.Util.Generated.Wl_interface
 zxdg_output_manager_v1_interface =
   RIP.unsafePerformIO (PtrConst.peek hs_bindgen_a58583a514084432)
 
@@ -77,7 +77,7 @@ foreign import ccall unsafe "hs_bindgen_e247b9eb940667b9" hs_bindgen_e247b9eb940
      IO (RIP.Ptr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_XdgOutputUnstableV1_Generated_Bindings.Wayland.XdgOutputUnstableV1.Generated_get_zxdg_output_v1_interface@
-hs_bindgen_e247b9eb940667b9 :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
+hs_bindgen_e247b9eb940667b9 :: IO (PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface)
 hs_bindgen_e247b9eb940667b9 =
   RIP.fromFFIType hs_bindgen_e247b9eb940667b9_base
 
@@ -114,11 +114,11 @@ __exported by:__ @xdg-output-unstable-v1-client-protocol.h@
 
 __unique:__ @Bindings_Wayland_XdgOutputUnstableV1_Generated_Bindings.Wayland.XdgOutputUnstableV1.Generated_zxdg_output_v1_interface@
 -}
-hs_bindgen_3fea2b0786cf95d6 :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+hs_bindgen_3fea2b0786cf95d6 :: PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
 hs_bindgen_3fea2b0786cf95d6 =
   RIP.unsafePerformIO hs_bindgen_e247b9eb940667b9
 
 {-# NOINLINE zxdg_output_v1_interface #-}
-zxdg_output_v1_interface :: Generated.Wayland.Util.Wl_interface
+zxdg_output_v1_interface :: Bindings.Wayland.Util.Generated.Wl_interface
 zxdg_output_v1_interface =
   RIP.unsafePerformIO (PtrConst.peek hs_bindgen_3fea2b0786cf95d6)

@@ -4,7 +4,7 @@ module Wayland
 where
 
 import Data.List qualified as L
-import Wayland.Client qualified as WL
+import Bindings.Wayland.Client qualified as WL
 
 type Version = Word32
 

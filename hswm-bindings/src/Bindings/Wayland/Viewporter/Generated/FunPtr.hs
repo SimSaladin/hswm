@@ -17,8 +17,8 @@ module Bindings.Wayland.Viewporter.Generated.FunPtr
     )
   where
 
-import qualified Generated.Wayland.Client
-import qualified Generated.Wayland.Util
+import qualified Bindings.Wayland.Client.Generated
+import qualified Bindings.Wayland.Util.Generated
 import qualified HsBindgen.Runtime.Internal.CAPI
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.LibC
@@ -224,7 +224,7 @@ foreign import ccall unsafe "hs_bindgen_883c1e002756a94c" hs_bindgen_883c1e00275
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_Viewporter_Generated_Bindings.Wayland.Viewporter.Generated_get_wp_viewporter_get_viewport@
-hs_bindgen_883c1e002756a94c :: IO (RIP.FunPtr ((RIP.Ptr Wp_viewporter) -> (RIP.Ptr Generated.Wayland.Client.Wl_surface) -> IO (RIP.Ptr Wp_viewport)))
+hs_bindgen_883c1e002756a94c :: IO (RIP.FunPtr ((RIP.Ptr Wp_viewporter) -> (RIP.Ptr Bindings.Wayland.Client.Generated.Wl_surface) -> IO (RIP.Ptr Wp_viewport)))
 hs_bindgen_883c1e002756a94c =
   RIP.fromFFIType hs_bindgen_883c1e002756a94c_base
 
@@ -241,7 +241,7 @@ __defined at:__ @viewporter-client-protocol.h 265:1@
 
 __exported by:__ @viewporter-client-protocol.h@
 -}
-wp_viewporter_get_viewport :: RIP.FunPtr ((RIP.Ptr Wp_viewporter) -> (RIP.Ptr Generated.Wayland.Client.Wl_surface) -> IO (RIP.Ptr Wp_viewport))
+wp_viewporter_get_viewport :: RIP.FunPtr ((RIP.Ptr Wp_viewporter) -> (RIP.Ptr Bindings.Wayland.Client.Generated.Wl_surface) -> IO (RIP.Ptr Wp_viewport))
 wp_viewporter_get_viewport =
   RIP.unsafePerformIO hs_bindgen_883c1e002756a94c
 
@@ -344,7 +344,7 @@ foreign import ccall unsafe "hs_bindgen_7980820135d4290b" hs_bindgen_7980820135d
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_Viewporter_Generated_Bindings.Wayland.Viewporter.Generated_get_wp_viewport_set_source@
-hs_bindgen_7980820135d4290b :: IO (RIP.FunPtr ((RIP.Ptr Wp_viewport) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
+hs_bindgen_7980820135d4290b :: IO (RIP.FunPtr ((RIP.Ptr Wp_viewport) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ()))
 hs_bindgen_7980820135d4290b =
   RIP.fromFFIType hs_bindgen_7980820135d4290b_base
 
@@ -365,7 +365,7 @@ __defined at:__ @viewporter-client-protocol.h 363:1@
 
 __exported by:__ @viewporter-client-protocol.h@
 -}
-wp_viewport_set_source :: RIP.FunPtr ((RIP.Ptr Wp_viewport) -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+wp_viewport_set_source :: RIP.FunPtr ((RIP.Ptr Wp_viewport) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ())
 wp_viewport_set_source =
   RIP.unsafePerformIO hs_bindgen_7980820135d4290b
 

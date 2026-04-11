@@ -27,8 +27,8 @@ import Data.List qualified as L
 import Foreign
 import Foreign.Storable.Generic (GStorable (..))
 import HSWM.XKB
-import River.Objects qualified as R
-import River.Safe qualified as R
+import Bindings.River qualified as R
+import Bindings.RiverSafe qualified as R
 
 type WindowEdges = R.River_window_v1_edges
 

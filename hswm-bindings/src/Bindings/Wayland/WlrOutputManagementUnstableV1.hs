@@ -10,15 +10,15 @@
 module Bindings.Wayland.WlrOutputManagementUnstableV1 where
 
 
-import Wayland.Client.Internal.TH
+import Bindings.Wayland.Internal.TH
 import Foreign
 
 import Bindings.Wayland.WlrOutputManagementUnstableV1.Generated
 import Bindings.Wayland.WlrOutputManagementUnstableV1.Generated.Global
 import Bindings.Wayland.WlrOutputManagementUnstableV1.Generated.Safe
 
-import qualified Generated.Wayland.Client as WL
-import qualified Wayland.Client.Objects as WL
+import qualified Bindings.Wayland.Client as WL.Generated
+import qualified Bindings.Wayland.Client as WL
 
 -- * OutputMode
 mkWlObject $

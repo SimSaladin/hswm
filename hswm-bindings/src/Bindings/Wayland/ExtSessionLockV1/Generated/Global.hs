@@ -9,7 +9,7 @@ module Bindings.Wayland.ExtSessionLockV1.Generated.Global
     )
   where
 
-import qualified Generated.Wayland.Util
+import qualified Bindings.Wayland.Util.Generated
 import qualified HsBindgen.Runtime.Internal.CAPI
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.PtrConst as PtrConst
@@ -41,7 +41,7 @@ foreign import ccall unsafe "hs_bindgen_9da258b15652113a" hs_bindgen_9da258b1565
      IO (RIP.Ptr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_ExtSessionLockV1_Generated_Bindings.Wayland.ExtSessionLockV1.Generated_get_ext_session_lock_manager_v1_interface@
-hs_bindgen_9da258b15652113a :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
+hs_bindgen_9da258b15652113a :: IO (PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface)
 hs_bindgen_9da258b15652113a =
   RIP.fromFFIType hs_bindgen_9da258b15652113a_base
 
@@ -70,12 +70,12 @@ __exported by:__ @ext-session-lock-v1-client-protocol.h@
 
 __unique:__ @Bindings_Wayland_ExtSessionLockV1_Generated_Bindings.Wayland.ExtSessionLockV1.Generated_ext_session_lock_manager_v1_interface@
 -}
-hs_bindgen_490e1837832d5dd9 :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+hs_bindgen_490e1837832d5dd9 :: PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
 hs_bindgen_490e1837832d5dd9 =
   RIP.unsafePerformIO hs_bindgen_9da258b15652113a
 
 {-# NOINLINE ext_session_lock_manager_v1_interface #-}
-ext_session_lock_manager_v1_interface :: Generated.Wayland.Util.Wl_interface
+ext_session_lock_manager_v1_interface :: Bindings.Wayland.Util.Generated.Wl_interface
 ext_session_lock_manager_v1_interface =
   RIP.unsafePerformIO (PtrConst.peek hs_bindgen_490e1837832d5dd9)
 
@@ -84,7 +84,7 @@ foreign import ccall unsafe "hs_bindgen_246e62742da15a83" hs_bindgen_246e62742da
      IO (RIP.Ptr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_ExtSessionLockV1_Generated_Bindings.Wayland.ExtSessionLockV1.Generated_get_ext_session_lock_v1_interface@
-hs_bindgen_246e62742da15a83 :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
+hs_bindgen_246e62742da15a83 :: IO (PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface)
 hs_bindgen_246e62742da15a83 =
   RIP.fromFFIType hs_bindgen_246e62742da15a83_base
 
@@ -145,12 +145,12 @@ __exported by:__ @ext-session-lock-v1-client-protocol.h@
 
 __unique:__ @Bindings_Wayland_ExtSessionLockV1_Generated_Bindings.Wayland.ExtSessionLockV1.Generated_ext_session_lock_v1_interface@
 -}
-hs_bindgen_3e11a2ef651b0fed :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+hs_bindgen_3e11a2ef651b0fed :: PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
 hs_bindgen_3e11a2ef651b0fed =
   RIP.unsafePerformIO hs_bindgen_246e62742da15a83
 
 {-# NOINLINE ext_session_lock_v1_interface #-}
-ext_session_lock_v1_interface :: Generated.Wayland.Util.Wl_interface
+ext_session_lock_v1_interface :: Bindings.Wayland.Util.Generated.Wl_interface
 ext_session_lock_v1_interface =
   RIP.unsafePerformIO (PtrConst.peek hs_bindgen_3e11a2ef651b0fed)
 
@@ -159,7 +159,7 @@ foreign import ccall unsafe "hs_bindgen_7990dc16bed8859a" hs_bindgen_7990dc16bed
      IO (RIP.Ptr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_ExtSessionLockV1_Generated_Bindings.Wayland.ExtSessionLockV1.Generated_get_ext_session_lock_surface_v1_interface@
-hs_bindgen_7990dc16bed8859a :: IO (PtrConst.PtrConst Generated.Wayland.Util.Wl_interface)
+hs_bindgen_7990dc16bed8859a :: IO (PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface)
 hs_bindgen_7990dc16bed8859a =
   RIP.fromFFIType hs_bindgen_7990dc16bed8859a_base
 
@@ -196,11 +196,11 @@ __exported by:__ @ext-session-lock-v1-client-protocol.h@
 
 __unique:__ @Bindings_Wayland_ExtSessionLockV1_Generated_Bindings.Wayland.ExtSessionLockV1.Generated_ext_session_lock_surface_v1_interface@
 -}
-hs_bindgen_faa5f5b6e7c5c9aa :: PtrConst.PtrConst Generated.Wayland.Util.Wl_interface
+hs_bindgen_faa5f5b6e7c5c9aa :: PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
 hs_bindgen_faa5f5b6e7c5c9aa =
   RIP.unsafePerformIO hs_bindgen_7990dc16bed8859a
 
 {-# NOINLINE ext_session_lock_surface_v1_interface #-}
-ext_session_lock_surface_v1_interface :: Generated.Wayland.Util.Wl_interface
+ext_session_lock_surface_v1_interface :: Bindings.Wayland.Util.Generated.Wl_interface
 ext_session_lock_surface_v1_interface =
   RIP.unsafePerformIO (PtrConst.peek hs_bindgen_faa5f5b6e7c5c9aa)

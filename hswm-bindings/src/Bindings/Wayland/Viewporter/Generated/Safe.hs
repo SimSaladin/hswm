@@ -17,8 +17,8 @@ module Bindings.Wayland.Viewporter.Generated.Safe
     )
   where
 
-import qualified Generated.Wayland.Client
-import qualified Generated.Wayland.Util
+import qualified Bindings.Wayland.Client.Generated
+import qualified Bindings.Wayland.Util.Generated
 import qualified HsBindgen.Runtime.Internal.CAPI
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.LibC
@@ -229,7 +229,7 @@ foreign import ccall safe "hs_bindgen_3fccedad7b4978ae" hs_bindgen_3fccedad7b497
 -- __unique:__ @Bindings_Wayland_Viewporter_Generated_Bindings.Wayland.Viewporter.Generated_Safe_wp_viewporter_get_viewport@
 hs_bindgen_3fccedad7b4978ae ::
      RIP.Ptr Wp_viewporter
-  -> RIP.Ptr Generated.Wayland.Client.Wl_surface
+  -> RIP.Ptr Bindings.Wayland.Client.Generated.Wl_surface
   -> IO (RIP.Ptr Wp_viewport)
 hs_bindgen_3fccedad7b4978ae =
   RIP.fromFFIType hs_bindgen_3fccedad7b4978ae_base
@@ -249,7 +249,7 @@ __exported by:__ @viewporter-client-protocol.h@
 wp_viewporter_get_viewport ::
      RIP.Ptr Wp_viewporter
      -- ^ __C declaration:__ @wp_viewporter@
-  -> RIP.Ptr Generated.Wayland.Client.Wl_surface
+  -> RIP.Ptr Bindings.Wayland.Client.Generated.Wl_surface
      -- ^ __C declaration:__ @surface@
   -> IO (RIP.Ptr Wp_viewport)
 wp_viewporter_get_viewport =
@@ -383,10 +383,10 @@ foreign import ccall safe "hs_bindgen_1d5f35fbaadfa3bc" hs_bindgen_1d5f35fbaadfa
 -- __unique:__ @Bindings_Wayland_Viewporter_Generated_Bindings.Wayland.Viewporter.Generated_Safe_wp_viewport_set_source@
 hs_bindgen_1d5f35fbaadfa3bc ::
      RIP.Ptr Wp_viewport
-  -> Generated.Wayland.Util.Wl_fixed_t
-  -> Generated.Wayland.Util.Wl_fixed_t
-  -> Generated.Wayland.Util.Wl_fixed_t
-  -> Generated.Wayland.Util.Wl_fixed_t
+  -> Bindings.Wayland.Util.Generated.Wl_fixed_t
+  -> Bindings.Wayland.Util.Generated.Wl_fixed_t
+  -> Bindings.Wayland.Util.Generated.Wl_fixed_t
+  -> Bindings.Wayland.Util.Generated.Wl_fixed_t
   -> IO ()
 hs_bindgen_1d5f35fbaadfa3bc =
   RIP.fromFFIType hs_bindgen_1d5f35fbaadfa3bc_base
@@ -410,13 +410,13 @@ __exported by:__ @viewporter-client-protocol.h@
 wp_viewport_set_source ::
      RIP.Ptr Wp_viewport
      -- ^ __C declaration:__ @wp_viewport@
-  -> Generated.Wayland.Util.Wl_fixed_t
+  -> Bindings.Wayland.Util.Generated.Wl_fixed_t
      -- ^ __C declaration:__ @x@
-  -> Generated.Wayland.Util.Wl_fixed_t
+  -> Bindings.Wayland.Util.Generated.Wl_fixed_t
      -- ^ __C declaration:__ @y@
-  -> Generated.Wayland.Util.Wl_fixed_t
+  -> Bindings.Wayland.Util.Generated.Wl_fixed_t
      -- ^ __C declaration:__ @width@
-  -> Generated.Wayland.Util.Wl_fixed_t
+  -> Bindings.Wayland.Util.Generated.Wl_fixed_t
      -- ^ __C declaration:__ @height@
   -> IO ()
 wp_viewport_set_source = hs_bindgen_1d5f35fbaadfa3bc

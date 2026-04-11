@@ -34,7 +34,7 @@ where
 
 import HSWM.Core
 import HSWM.StackSet qualified as W
-import River.Objects qualified as R
+import Bindings.River qualified as R
 import Prelude hiding (handle)
 
 -- | Change the size of the master pane.

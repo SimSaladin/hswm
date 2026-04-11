@@ -100,7 +100,7 @@ module Bindings.Wayland.WlrOutputManagementUnstableV1.Generated
     )
   where
 
-import qualified Generated.Wayland.Util
+import qualified Bindings.Wayland.Util.Generated
 import qualified HsBindgen.Runtime.CEnum as CEnum
 import qualified HsBindgen.Runtime.HasCField as HasCField
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
@@ -624,7 +624,7 @@ data Zwlr_output_head_v1_listener = Zwlr_output_head_v1_listener
 
     __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
     -}
-  , scale :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+  , scale :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ())
     {- ^ current scale
 
        This events describes the scale of the head in the global compositor space. It is only sent if the output is enabled.
@@ -891,11 +891,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head
 instance HasCField.HasCField Zwlr_output_head_v1_listener "scale" where
 
   type CFieldType Zwlr_output_head_v1_listener "scale" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
+    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ())
 
   offset# = \_ -> \_ -> 64
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
+instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ()))
          ) => RIP.HasField "scale" (RIP.Ptr Zwlr_output_head_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"scale")
@@ -2227,37 +2227,37 @@ instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> 
 
   fromFunPtr = hs_bindgen_e82386bcf8d0d20a
 
-foreign import ccall safe "wrapper" hs_bindgen_453cf995a4f9ffab_base ::
+foreign import ccall safe "wrapper" hs_bindgen_adf3344f9b7455d6_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ())
   -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
-hs_bindgen_453cf995a4f9ffab ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Generated.Wayland.Util.Wl_fixed_t -> IO ()))
-hs_bindgen_453cf995a4f9ffab =
+-- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ())@
+hs_bindgen_adf3344f9b7455d6 ::
+     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ())
+  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ()))
+hs_bindgen_adf3344f9b7455d6 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_453cf995a4f9ffab_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_adf3344f9b7455d6_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_39f8e72183308c8d_base ::
+foreign import ccall safe "dynamic" hs_bindgen_67cbb9d06d036c41_base ::
      RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ())
   -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Generated.Wayland.Util.Wl_fixed_t -> IO ())@
-hs_bindgen_39f8e72183308c8d ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Generated.Wayland.Util.Wl_fixed_t -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Generated.Wayland.Util.Wl_fixed_t -> IO ()
-hs_bindgen_39f8e72183308c8d =
+-- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ())@
+hs_bindgen_67cbb9d06d036c41 ::
+     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ())
+  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ()
+hs_bindgen_67cbb9d06d036c41 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_39f8e72183308c8d_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_67cbb9d06d036c41_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
+instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ()) where
 
-  toFunPtr = hs_bindgen_453cf995a4f9ffab
+  toFunPtr = hs_bindgen_adf3344f9b7455d6
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Generated.Wayland.Util.Wl_fixed_t -> IO ()) where
+instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ()) where
 
-  fromFunPtr = hs_bindgen_39f8e72183308c8d
+  fromFunPtr = hs_bindgen_67cbb9d06d036c41
 
 foreign import ccall safe "wrapper" hs_bindgen_368259c80982085b_base ::
      ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
