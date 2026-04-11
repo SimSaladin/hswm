@@ -144,7 +144,6 @@ view i s
 -- current workspace to 'hidden'.  If that workspace is 'visible' on another
 -- screen, the workspaces of the current screen and the other screen are
 -- swapped.
-
 greedyView :: (Eq s, Eq i) => i -> StackSet i l a wd s sd -> StackSet i l a wd s sd
 greedyView w ws
      | any wTag (hidden ws) = view w ws

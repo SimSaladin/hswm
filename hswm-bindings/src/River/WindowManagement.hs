@@ -21,9 +21,10 @@ import Data.Default
 import Foreign.Ptr
 import Wayland.Client.Internal.Types
 import GHC.Records
+import Control.Arrow
 
 mkWlObjectType (riverObj ''River_pointer_binding_v1 [])
-mkWlObjectType (riverObj ''River_window_v1 [])
+mkWlObjectType (riverObj ''River_window_v1 []) { objDeriveShow = False }
 mkWlObjectType (riverObj ''River_seat_v1 [])
 
 -- * RiverPointerBinding
@@ -114,6 +115,11 @@ mkWlObjectMisc
         "set_dimension_bounds"
       ]
   )
+
+instance Show RiverWindow where
+  show = show . ptrToWordPtr . getField @"unwrap"
+instance Read RiverWindow where
+  readsPrec n s = fmap (first $ RiverWindow . wordPtrToPtr) $ readsPrec n s
 
 -- * RiverSeat
 

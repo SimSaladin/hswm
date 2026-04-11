@@ -11,31 +11,31 @@
 -- Stability   : unstable
 -- Portability : unportable
 --
--- seat management
+-- Seat management
 --
-------------------------------------------------------------------------------
 module HSWM.Seats where
 
 import           HSWM.Core
 import           HSWM.Operations
 import qualified Wayland.Client.Objects as WL
 -- import qualified HSWM.StackSet as W
+import           GHC.Records
 import qualified HSWM.StackSet as W
 import           HSWM.Utils
 import qualified River.Objects as R
 import qualified River.Safe as R
 import           Wayland hiding (display)
-import GHC.Records
+import qualified Wayland.Client as WL
 
 import           Data.Bits
 import qualified Data.List as L
 import           Foreign hiding (void)
-import qualified Wayland.Client as WL
 
 data LayerShellFocus = FocusNone | FocusLayerShell { exclusive :: !Bool }
   deriving (Eq, Show, Generic)
 
-instance Default LayerShellFocus where def = FocusNone
+instance Default LayerShellFocus where
+  def = FocusNone
 
 data SeatManager = SeatManager
   { pending_manage    :: [Seat]
@@ -89,9 +89,11 @@ handleEvent e = do
     R.RiverSeatRemoved _ seat ->
       runInHS $ withSeat seat deleteRemovedSeat
     R.RiverSeatPointerEnter _ seat window -> do
-      when (sm.seat_lshell_focus == FocusNone) $ runInHS $ do
-        modifySeat seat $ \s -> s { hovered = window }
-        modifyWindowSet $ W.focusWindow window -- focus follow mouse
+      when (sm.seat_lshell_focus == FocusNone) $ do
+        runInHS $ modifySeat seat $ \s -> s { hovered = window }
+          -- focus follow mouse
+        runInHS $ withSeat seat $ \s ->
+          unless s.suppressChangeFocus $ modifyWindowSet $ W.focusWindow window
     R.RiverSeatPointerLeave _ seat ->
       runInHS $ modifySeat seat $ \s -> s { hovered = invalidWindow }
     R.RiverSeatWindowInteraction _ seat window ->
@@ -122,9 +124,13 @@ handleWlSeatEvent e = do
       when (caps > 0) $ do
         log' $ display $ "seat: get keyboard: " <> tshow caps
         wlkeyboard <- io $ WL.seatGetKeyboard s
-        log' "keyboard: set listener"
         wlkeyboardL <- getObject
         io $ WL.listenerAdd wlkeyboard wlkeyboardL nullPtr
+
+        log' $ display $ "seat: get wlpointer: " <> tshow caps
+        wlpointer <- io $ WL.seatGetPointer s
+        wlpl <- getObject
+        io $ WL.listenerAdd wlpointer wlpl nullPtr
 
 handleLayerShellSeat :: R.RiverLayerShellSeatEvent -> H ()
 handleLayerShellSeat e = do

@@ -25,6 +25,17 @@ manageHide = flip modifyWindow $ \s -> s {p_set_visible = Just False}
 manageKill :: Window -> HS ()
 manageKill = doManage WRequestClose
 
+--minimizeWindow :: Window -> HS ()
+--minimizeWindow w = do
+--  modifyWindow w.river_window $ \s -> s { p_set_visible = Just False, minimized = True }
+--  liftH manageDirty
+--
+--maximizeWindowAndFocus :: Window -> HS ()
+--maximizeWindowAndFocus w = do
+--  modifyWindow w.river_window $ \s ->
+--    s { p_set_visible = Just True, minimized = False }
+--  liftH manageDirty
+
 -- | /manage/
 -- Move and resize @w@ such that it fits inside the given rectangle, including its border.
 tileWindow :: Bool -> RiverWindow -> Rectangle -> HS ()
@@ -102,6 +113,13 @@ sendMessageWithNoRefresh :: (Message a) => a -> WindowSpace -> HS ()
 sendMessageWithNoRefresh a w =
   handleMessage (W.layout w) (SomeMessage a) `catchHS` return Nothing
     >>= updateLayout (W.tag w)
+
+-- | Set the layout of the currently viewed workspace.
+setLayout :: Layout RiverWindow -> HS ()
+setLayout l = do
+    ss@W.StackSet{ W.current = c@W.Screen{ W.workspace = ws }} <- gets windowset
+    handleMessage (W.layout ws) (SomeMessage ReleaseResources)
+    windows $ const $ ss{ W.current = c{ W.workspace = ws{ W.layout = l } } }
 
 -- | Update the layout field of a workspace.
 updateLayout :: WorkspaceId -> Maybe (Layout RiverWindow) -> HS ()

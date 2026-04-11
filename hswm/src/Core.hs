@@ -73,6 +73,7 @@ startHSWM wlDisplay config = do
     _               <- getOrCreateObject $ WL.mkShellSurfaceListener          $ \e -> handleE $ WlShellSurfaceEvent e
     _               <- getOrCreateObject $ WL.mkSeatListener                  $ \e -> handleE $ WlSeatEvent e
     _               <- getOrCreateObject $ WL.mkKeyboardListener              $ \e -> handleE $ WlKeyboardEvent e
+    _               <- getOrCreateObject $ WL.mkPointerListener               $ \e -> handleE $ WlPointerEvent e
     xkbConfigL      <- getOrCreateObject $ R.mkRiverXkbConfigListener         $ \e -> handleE $ XkbConfigEvent e
     _               <- getOrCreateObject $ R.mkRiverXkbKeyboardListener       $ \e -> handleE $ XkbKeyboardEvent e
     _               <- getOrCreateObject $ R.mkRiverXkbBindingListener        $ \e -> handleE $ XkbEvent e
@@ -90,9 +91,9 @@ startHSWM wlDisplay config = do
     managerL        <- getOrCreateObject $ R.mkRiverWindowManagerListener     $ \e -> handleE $ WindowManagerEvent e
     foreignListL    <- getOrCreateObject $ WL.mkForeignToplevelListListener   $ \e -> handleE $ ForeignTopLevelListV1 e
     _               <- getOrCreateObject $ WL.mkForeignToplevelHandleListener $ \e -> handleE $ ForeignTopLevelHandleV1 e
-    _               <- getOrCreateObject $ Zdg.mkOutputListener $ \e -> handleE $ ZdgOutputEvent e
-    wlrOmL          <- getOrCreateObject $ Wlr.mkOutputManagerListener $ \e -> handleE $ WlrOutputManagerEvent e
-    _               <- getOrCreateObject $ Wlr.mkOutputHeadListener $ \e -> handleE $ WlrOutputHeadEvent e
+    _               <- getOrCreateObject $ Zdg.mkOutputListener               $ \e -> handleE $ ZdgOutputEvent e
+    wlrOmL          <- getOrCreateObject $ Wlr.mkOutputManagerListener        $ \e -> handleE $ WlrOutputManagerEvent e
+    _               <- getOrCreateObject $ Wlr.mkOutputHeadListener           $ \e -> handleE $ WlrOutputHeadEvent e
     logDebug "created event listeners"
 
     registry <- io $ displayGetRegistry wlDisplay
@@ -241,7 +242,6 @@ handleEvent (WindowManagerEvent e) = case e of
     R.RiverWindowManagerManageStart _ wm -> do
       runInHS . sequence_ =<< atomically . flushTQueue =<< asks (view pendingManageQL)
       Outputs.manage >> Seats.manage >> Windows.manage
-      void . userCode =<< asks (manageHook . config)
       asks (logHook . config) >>= userCodeDef ()
       io (R.riverWindowManagerManageFinish wm)
 

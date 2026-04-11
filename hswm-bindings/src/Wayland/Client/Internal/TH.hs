@@ -39,7 +39,8 @@ data ObjectCfg = ObjectCfg
     objHasDestructor :: Bool, -- ^ has @*_destroy@ function?
     objAutoMarshall :: Maybe (Int -> Type -> Q ObjectFnA), -- ^ type-based field/function argument transformations
     objEventFieldNamesCommon :: [String], -- ^ Common event record field names
-    objEventFieldNames :: [(String, [String])] -- ^ Per-event record field names
+    objEventFieldNames :: [(String, [String])], -- ^ Per-event record field names
+    objDeriveShow :: Bool
   }
 
 data ObjectFn = ObjectFn
@@ -105,6 +106,7 @@ wlobj t fns =
     Nothing
     [ "userdata" ]
     [ ]
+    True
 
 riverObj :: Name -> [ObjectFn] -> ObjectCfg
 riverObj t fns = (wlobj t fns)
@@ -163,15 +165,15 @@ mkWlObjectType cfg = do
   join <$> sequence
     [ pure <$> newtypeD_doc (pure []) ntName [] Nothing
       (recC ntName [ varBangType (mkName "unwrap") (bangType (bang noSourceUnpackedness noSourceStrictness) [t|Ptr $(conT (objType cfg))|]) ], Nothing, [])
-      [derivClause Nothing [ [t|Eq|]
-                           , [t|Show|]
+      [derivClause Nothing $ [ [t|Eq|]
                            , [t|Ord|]
                            , [t|Storable|]
                            , [t|Generic|]
                            , [t|Hashable|]
                            , [t|NFData|]
                            , [t|IsUserData|] -- via NT (Ptr)
-                           ]
+                           ] ++ [ [t|Show|] | objDeriveShow cfg ]
+
       ]
                            -- XXX: [t|Data|]]] Data a => Data (Ptr a)
       (Just $ "See '" ++ pprint (objType cfg) ++ "'")

@@ -4,24 +4,44 @@
 module Main (main) where
 
 import           HSWM
-import qualified HSWM.Actions.WindowNavigation as WNav
+import qualified HSWM.Actions.CycleRecentWS as CycleRecentWS
+import qualified HSWM.Actions.CycleWS as CycleWS
+import qualified HSWM.Actions.DynamicWorkspaceOrder as DWO
+import qualified HSWM.Actions.DynamicWorkspaces as DynWS
+import qualified HSWM.Actions.PhysicalScreens as PScreen
+--import qualified HSWM.Actions.WindowNavigation as WNav
+import qualified HSWM.Layout.WindowNavigation as WNav
+import qualified HSWM.Actions.OnScreen as OnScreen
 import qualified HSWM.StackSet as W
+import           HSWM.Util.Debug
+import qualified HSWM.Util.IPC as IPC
+import qualified HSWM.Util.RofiPrompt as RP
 import qualified HSWM.Util.Waybar as WB
 import qualified HSWM.Wallpaper
-import qualified HSWM.Util.IPC as IPC
-import           HSWM.Util.Debug
-import qualified HSWM.Actions.PhysicalScreens as PScreen
-import qualified HSWM.Actions.CycleWS as CycleWS
-import qualified HSWM.Actions.CycleRecentWS as CycleRecentWS
-import qualified HSWM.Actions.DynamicWorkspaces as DynWS
-import qualified HSWM.Actions.DynamicWorkspaceOrder as DWO
-import qualified HSWM.Util.RofiPrompt as RP
+import qualified HSWM.Layout.Minimize as L.Minimize
+import HSWM.Layout.BoringWindows (boringWindows)
+import qualified HSWM.Layout.BoringWindows as BW
+
+import HSWM.Util.NamedScratchpad
 
 import           Data.Ratio
 import qualified Data.Map as M
 import qualified Data.List as L
 import qualified System.Environment
 import Text.Printf
+
+myScratchpads :: [Scratchpad]
+myScratchpads =
+    exclusive
+    [ mkPad "tmux-0" mhd (appName =? "tmux-0")
+      (void $ spawnProcess "kitty" [ "--app-id=tmux-0", "--detach", "tmux", "a" ])
+    , mkPad "ncmpcpp"         mhd (appName =? "ncmpcpp")
+      (void $ spawnProcess "kitty" [ "--app-id=ncmpcpp", "--detach", "ncmpcpp" ])
+    ]
+      where
+    mhd  = doRFRR 0.2 0.1 0.6 0.6
+    doRFRR x y w h = doRectFloat (W.RationalRect x y w h)
+
 
 tagKeys      = map (:[]) ['a'..'z']
 screenKeys   = map (:[]) "wvza"
@@ -97,7 +117,10 @@ renameWorkspacePrompt = do
 addWorkspacePrompt :: H ()
 addWorkspacePrompt = mkWorkspacePrompt
   (\p _ -> p { RP._prompt = "Add workspace" })
-  (\_ input -> runInHS $ DynWS.addWorkspace input)
+  (\_ input -> do
+    runInHS $ DynWS.addWorkspace input >> windows (W.view input)
+    manageDirty
+  )
 
 removeFocusedWorkspace = do
   (curTag, ws) <- withWindowSet $ return . (W.currentTag &&& (W.workspace . W.current))
@@ -105,48 +128,62 @@ removeFocusedWorkspace = do
     DynWS.removeWorkspaceByTag curTag
     DWO.removeName curTag
 
+myManageHook = composeOne
+   [ managePads
+   ]
 
 main :: IO ()
 main = do
-  (navKeys, navLogHook) <- WNav.mkWindowNavigationKeys ("k", "h", "j", "l") ("M", "M-S") (\m k -> m ++ "-" ++ k)
+  --(navKeys, navLogHook) <- WNav.mkWindowNavigationKeys ("k", "h", "j", "l") ("M", "M-S") (\m k -> m ++ "-" ++ k)
   hswm
-    $ addKeys (fromADTKeys $ parseSubmaps $ myKeys' ++ navKeys)
+    $ addKeys (fromADTKeys $ parseSubmaps $ myKeys' {- ++ navKeys-})
 
     $ WB.waybarSB def
 
     $ HSWM.Wallpaper.usingWallpaper HSWM.Wallpaper.Config { filepath = "/home/sim/wallpaper.png" }
 
     (def @(HSWMConfig H Full))
-      { layoutHook      = Tall 1 (3/100) (1/2) ||| Full
+
+      { layoutHook      =
+
+          L.Minimize.minimize $
+
+          boringWindows $
+
+          WNav.configurableNavigation (WNav.navigateColor colBase00) $ -- apply on top of any modifiers that might modify placement of tiled windows
+
+            Tall 1 (3/100) (1/2) ||| Full
+
       , handleEventHook = debugHook
-      , logHook         = navLogHook <> IPC.ipcLogHook
+      , logHook         = {-navLogHook <>-} IPC.ipcLogHook
       , xkbLayout       = Just dvpMyLayout
       , pointerBindings = myPointerBinds
       , defaultModMask  = "mod4"
       , repeatInfo      = Just (20, 150)
       , normalBorder    = parseRgba colBase02
+      , manageHook      = myManageHook
       , focusedBorder   = parseRgba colCyan
-      , startupHook     = IPC.serverStartupHook def
+      , startupHook     = IPC.serverStartupHook def <> runInHS (scratchpadsStartupHook myScratchpads)
       , xcursor         = Just ("Vanilla-DMZ", 24)
       }
   where
 
   myKeys' =
     -- ====== Core ==========
-    [ ("M-S-c",         "Close the focused window" =? withFocused manageKill)
-    , ("M-S-q",         "Restart WM" =? sendRestart)
-    , ("M-Return",      "New terminal window" =? SomeAction @H (LaunchProgram "kitty" [])) -- Terminal
-    , ("M-Escape",      "Print debug stack" =? debugAction)
+    [ ("M-S-c",         "Close the focused window" $?$?= withFocused manageKill)
+    , ("M-S-q",         "Restart WM" $?$?= sendRestart)
+    , ("M-Return",      "New terminal window" $?$?= SomeAction @H (LaunchProgram "kitty" [])) -- Terminal
+    , ("M-Escape",      "Print debug stack" $?$?= debugAction)
+    , ("M-Dollar",      "Lock session" $?$?= void (spawnProcess @H "swaylock" ["-k"]))
     -- "M-<F1>" `CF.key'` helpCmd
     -- "M-r M-S-c"     cmdT @"Signal process (SIGKILL) of focused window (_NET_WM_PID)" (withFocused (signalProcessBy Posix.sigKILL))
     -- "M-q"           myRecompileRestart False True ? "Recompile && Restart"
     -- "M-C-q"         myRecompileRestart True False ? "Recompile (force)"
     -- "M-S-<Return>"  FloatNext.floatNext True >> spawnTerm def "" ? "Terminal (floating)"
-    , ("M-Dollar", "Lock session" =? void (spawnProcess @H "swaylock" ["-k"]))
     -- "M-<Print>"     takeScreenshot
 
      -- ======== Execute ==========
-    , ("M-r r",         "Prompt: run command" =? launchRofi ["-modes", "run", "-show", "run"])
+    , ("M-r r",         "Prompt: run command" $?$?= launchRofi ["-modes", "run", "-show", "run"])
      -- "M-r S-r"          >+ spawnPrompt xpConfig "Execute (T)"       ((\c -> spawnDialog' $ program (head c) (tail c)) . words) ? "Execute (Prompt)"
      -- "M-r M-r"          >+ spawnPrompt xpConfig "Execute (direct)"  (spawn . shell) ? "Execute (direct sh)"
      -- "M-r <Return>"     >+ spawnPrompt xpConfig "Execute shell"     (spawn . shell) ? "Execute shell (Prompt)"
@@ -160,45 +197,57 @@ main = do
      -- "M-r a" >+ spawn "dmenu_autorandr" ? "autorandr (menu)"
 
     -- ===== Screens =====
-    , ("M-C-Right", "Focus previous screen" =? CycleWS.nextScreen)
-    , ("M-C-Left",  "Focus next screen"     =? CycleWS.prevScreen)
+    , ("M-C-Right", "Focus previous screen" $?$?= CycleWS.nextScreen)
+    , ("M-C-Left",  "Focus next screen"     $?$?= CycleWS.prevScreen)
     ]
-    ++ [("M-" ++ key,   ("View screen " ++ show i)     =? PScreen.viewScreen def i)  | (key, i) <- screenKeysScreens ]
-    ++ [("M-S-" ++ key,   ("Send workspace to screen " ++ show i)     =? PScreen.sendToScreen def i)  | (key, i) <- screenKeysScreens ]
-    --"M-M1-"       >>+ skeys >++> WorkspaceOnScreen FocusCurrent
-    --"M-C-"        >>+ skeys >++> WorkspaceOnScreen FocusNew
+    ++ [("M-"   ++ key,   ("View screen "              ++ show i)     $?$?= PScreen.viewScreen   def i)  | (key, i) <- screenKeysScreens ]
+    ++ [("M-S-" ++ key,   ("Send window to screen " ++ show i)     $?$?= PScreen.sendToScreen def i)  | (key, i) <- screenKeysScreens ]
+
+    ++ let sendFocusedWorkspaceToScreen focus i = PScreen.getScreen def i
+              >>= (`whenJust` (\s -> do -- (manage, _) <- getEventQueueFuncs
+                                        -- modifySeats (const True) $ \s -> s { suppressChangeFocus = True }
+                                        -- _ <- liftH $ async $ do
+                                        --   threadDelay 250000
+                                        --   logInfo "Restoring suppress change"
+                                        --   runInHS $ modifySeats (const True) $ \s -> s { suppressChangeFocus = False }
+                                        windows (W.currentTag >>= \x -> OnScreen.onScreen (W.greedyView x) focus s)
+                              ))
+       in
+       [("M-M1-" ++ key,  ("Send workspace to screen "              ++ show i)   $?$?= sendFocusedWorkspaceToScreen OnScreen.FocusCurrent i)  | (key, i) <- screenKeysScreens ]
+    ++ [("M-C-"  ++ key,  ("Send workspace to screen and focus it " ++ show i)   $?$?= sendFocusedWorkspaceToScreen OnScreen.FocusNew i)  | (key, i) <- screenKeysScreens ]
 
     -- ===== Workspaces =====
     --
-    ++ [("M-SemiColon " ++ key,   ("View workspace " ++ show i)     =? DWO.withNthWorkspace W.view i)  | (key, i) <- tagKeysTags ]
-    ++ [("M-S-SemiColon " ++ key, ("Shift to workspace " ++ show i) =? DWO.withNthWorkspace W.shift i) | (key, i) <- tagKeysTags ]
+    ++ [("M-SemiColon "   ++ key, ("View workspace "     ++ show i) $?$?= DWO.withNthWorkspace W.view i)  | (key, i) <- tagKeysTags ]
+    ++ [("M-S-SemiColon " ++ key, ("Shift to workspace " ++ show i) $?$?= DWO.withNthWorkspace W.shift i) | (key, i) <- tagKeysTags ]
     -- "M-; M-"      >>+ tags >++> WorkspaceCopy
     ++
-    [ ("M-y",        "Cycle recent hidden tags"       =? cycleRecentHiddenWS [4, 8, 64] 121 112)
-    , ("M-S-n",      "Shift current tag (forwards)"   =? DWO.swapWith Next CycleWS.anyWS) -- XXX: save workspace order?
-    , ("M-S-p",      "Shift current tag (backwards)"  =? DWO.swapWith Prev CycleWS.anyWS)
-    , ("M-g r",      "Rename workspace (prompt)"      =? renameWorkspacePrompt)
-    , ("M-g n",      "Add workspace (prompt)"         =? addWorkspacePrompt)
-    , ("M-g d",      "Remove focused workspace"       =? removeFocusedWorkspace)
+    [ ("M-y",        "Cycle recent hidden tags"       $?$?= cycleRecentHiddenWS [4, 8, 64] 121 112)
+    , ("M-S-n",      "Shift current tag (forwards)"   $?$?= DWO.swapWith Next CycleWS.anyWS) -- XXX: save workspace order?
+    , ("M-S-p",      "Shift current tag (backwards)"  $?$?= DWO.swapWith Prev CycleWS.anyWS)
+    , ("M-g r",      "Rename workspace (prompt)"      $?$?= renameWorkspacePrompt)
+    , ("M-g n",      "Add workspace (prompt)"         $?$?= addWorkspacePrompt)
+    , ("M-g d",      "Remove focused workspace"       $?$?= removeFocusedWorkspace)
     -- ( "M-g S-n"     wsPromptNew' "New tag for window: " ?+ (\to -> DynWS.addHiddenWorkspace to >> defile (shift to))   ? "Move window to new tag (XP)"
     -- ( "M-g c"       wsPrompt'    "Copy to tag: "        ?+ (\to -> withFocii $ \_ w -> windows $ CW.copyWindow w to)   ? "Copy window to this tag (XP)"
     -- ( "M-g m"       wsPrompt'    "Shift to tag: "       ?+ (defile . shift                                           ) ? "Move window to this tag (XP)"
     -- ( "M-g g"       wsPrompt'    "View tag: "           ?+ (defile . greedyView                                      ) ? "Go to tag (XP)"
     -- ( "M-g s"       GS.goToSelected gsconfig1                          ? "Go to window (GS)"
     -- ( "M-g f"       XP.windowPrompt xpConfigAuto XP.Goto XP.allWindows ? "Go to window (XP)"
-    , ("M-g f",      "Go to window" =? windowPrompt)
+    , ("M-g f",      "Go to window" $?$?= windowPrompt)
 
     -- ===== Workspace Groups ====
     -- "M-g M-n" >+ wsPromptNew' "New Workspace group: " ?+ addWSG ? "New WSG"
     -- "M-g M-g" >+ WSG.promptWSGroupView xpConfig "View WSG: " ? "View WSG (XP)"
 
      -- ====== Layout
-    , ("M-Space",       "Layout: " =? NextLayout)
-    , ("M-Shift-Space", "Layout: " =? FirstLayout)
-    , ("M-Comma",       "Layout: " =? IncMasterN (-1))
-    , ("M-Period",      "Layout: " =? IncMasterN 1)
-    , ("M-x",           "Layout: " =? Shrink)
-    , ("M-S-x",         "Layout: " =? Expand)
+    , ("M-Space",       "Layout: " $?$?= NextLayout)
+    , ("M-Shift-Space", "Layout: " $?$?= FirstLayout)
+    , ("M-C-Space",     "Layout: Reset" $?$?= (asks (layoutHook . config) >>= setLayout))
+    , ("M-Comma",       "Layout: " $?$?= IncMasterN (-1))
+    , ("M-Period",      "Layout: " $?$?= IncMasterN 1)
+    , ("M-x",           "Layout: " $?$?= Shrink)
+    , ("M-S-x",         "Layout: " $?$?= Expand)
      --   "M-b t"       >+ msgT ManageDocks.ToggleStruts
      --   "M-b l"       >+ msgT Magnifier.Toggle
      --   "M-m"         >+ MaximizeRestore
@@ -222,16 +271,18 @@ main = do
      --   "M-r M-b" >+ cmdPrompt xpConfig (Proxy :: Proxy LayoutBSPCommand)
 
     -- ====== Window =============
-    , ("M-n",           "Focus down" =? windows W.focusDown)
-    , ("M-p" ,          "Focus up"   =? windows W.focusUp)
-    , ("M-b f",         "Toggle fullscreen (focused)" =? withFocused (doManage WToggleFullscreen))
-    , ("M-f f",         "Float (focused)"             =? withFocused (\w -> modifyWindowSet (W.float w.river_window (W.RationalRect (1%10) (1%10) (1%2) (1%2)))))
-    , ("M-f s",         "Sink (focused)"              =? withFocused (\w -> modifyWindowSet (W.sink w.river_window)))
+    ]
+    ++ [ ("M-"   ++ key, "Focus window direction"   $?$?= sendMessage (WNav.Go dir)) | (key, dir) <- zip ["k", "j", "l", "h"] [ minBound..maxBound @Direction2D ] ]
+    ++ [ ("M-S-" ++ key, "Swap window in direction" $?$?= sendMessage (WNav.Swap dir)) | (key, dir) <- zip ["k", "j", "l", "h"] [ minBound..maxBound @Direction2D ] ]
+    ++
+    [ ("M-n",           "Focus down" $?$?= windows W.focusDown)
+    , ("M-p" ,          "Focus up"   $?$?= windows W.focusUp)
+    , ("M-b f",         "Toggle fullscreen (focused)" $?$?= withFocused (doManage WToggleFullscreen))
+    , ("M-f f",         "Float (focused)"             $?$?= withFocused (\w -> modifyWindowSet (W.float w.river_window (W.RationalRect (1%10) (1%10) (1%2) (1%2)))))
+    , ("M-f s",         "Sink (focused)"              $?$?= withFocused (\w -> modifyWindowSet (W.sink w.river_window)))
+    , ("M-Exclam",      "Toggle tmux PAD" $?$?=   togglePad "tmux-0")
      -- "M-<Tab>"   >+ cyclePads
-     -- "M-!"       >+ togglePad "tmux-0"
      -- "M-/"       >+ togglePad "dynamic"
-     -- "M-"        >>+ directions2D >++> WindowNavigation.Go
-     -- "M-S-"      >>+ directions2D >++> WindowNavigation.Swap
      -- "M-f "      >>+ directions2D >++> flip SnapMove   Nothing
      -- "M-f S-"    >>+ directions2D >++> flip SnapGrow   Nothing
      -- "M-f C-"    >>+ directions2D >++> flip SnapShrink Nothing
@@ -258,30 +309,30 @@ main = do
      -- ====== Media
      , ("M-plus",                    volume 3)
      , ("M-minus",                   volume (-3))
-     --   "M-#"                     >+ togglePad "ncmpcpp"
-     --   "M-@"                     >+ togglePad "taskwarrior-tui"
-     --   "M-c m"                   >+ spawnOnceKitty "Pulsemixer" "pulsemixer" [] doCenterFloat
-     --   "M-c n"                   >+ mpc ["next"]
-     --   "M-c p"                   >+ mpc ["prev"]
-     --   "M-c t"                   >+ mpc ["toggle"]
-     --   "M-c y"                   >+ mpc ["single", "once"]
-     --   "M-c r"                   >+ mpc ["random"]
-     --   "M-c +"                   >+ mpc ["volume", "+3"]
-     --   "M-c -"                   >+ mpc ["volume", "-3"]
-     --   "M-c s"                   >+ spawn "sink-switch" ? "Toggle speakers-phones output [PA]" -- uses a custom script in ~/bin
-     --   "<XF86AudioPlay>"         >+ mpc ["toggle"]
-     --   "<XF86AudioStop>"         >+ mpc ["stop"]
-     --   "<XF86AudioPrev>"         >+ mpc ["prev"]
-     --   "<XF86AudioNext>"         >+ mpc ["next"]
-     , ("XF86AudioMute",        toggleMuteSink)
-     , ("XF86AudioMicMute",     toggleMuteSource)
+     , ("M-numbersign",   "Toggle ncmpcpp" $?$?= togglePad "ncmpcpp")
+     , ("M-c n",               mpc ["next"])
+     , ("M-c p",               mpc ["prev"])
+     , ("M-c t",               mpc ["toggle"])
+     , ("M-c y",               mpc ["single", "once"])
+     , ("M-c r",               mpc ["random"])
+     , ("M-c plus",               mpc ["volume", "+3"])
+     , ("M-c minus",               mpc ["volume", "-3"])
+     , ("XF86AudioPlay",        mpc ["toggle"])
+     , ("XF86AudioStop",        mpc ["stop"])
+     , ("XF86AudioPrev",        mpc ["prev"])
+     , ("XF86AudioNext",        mpc ["next"])
+     , ("XF86AudioMute",         toggleMuteSink)
+     , ("XF86AudioMicMute",      toggleMuteSource)
      , ("XF86AudioRaiseVolume",  volume 3)
      , ("XF86AudioLowerVolume",  volume (-3))
      --   "<XF86MonBrightnessUp>"   >+ backlight   2
      --   "<XF86MonBrightnessDown>" >+ backlight (-2)
+     -- , ("M-c s",               spawn "sink-switch" ? "Toggle speakers-phones output [PA]" -- uses a custom script in ~/bin
+     --   "M-@"                     >+ togglePad "taskwarrior-tui"
+     --   "M-c m"                   >+ spawnOnceKitty "Pulsemixer" "pulsemixer" [] doCenterFloat
 
      -- group "Prompts (Execute)" $ do
-     , ("M-r e",               "Environment prompt" =? environPrompt)
+     , ("M-r e",               "Environment prompt" $?$?= environPrompt)
      --   "M-r p"   >+ XP.Pass.passPrompt xpConfig          ? "Pass (Prompt)"
      --   "M-r C-p" >+ XP.Pass.passOTPPrompt xpConfig       ? "Pass OTP (Prompt)"
      --   "M-r C-u" >+ XP.Pass.passPromptWith "show-field --clip username" xpConfig ? "Pass username (Prompt)"
@@ -310,7 +361,9 @@ launchRofi :: [String] -> SomeAction H
 launchRofi args = SomeAction $ LaunchProgram "rofi" (["-dpi", "150"] ++ args)
 
 pactl :: [String] -> SomeAction H
-pactl args = unwords ("[PULSE]":args) =? void (spawnProcess @H "pactl" args)
+pactl args = unwords ("[PULSE]":args) $?$?= void (spawnProcess @H "pactl" args)
+
+mpc args   = printf "MPD: %s" (unwords args) $?$?= void (spawnProcess @H "mpc" args)
 
 volume :: Int -> SomeAction H
 volume d         = pactl ["set-sink-volume", "@DEFAULT_SINK@", printf "%+i%%" d]
@@ -349,5 +402,5 @@ instance {-# OVERLAPPABLE #-} IsKeyAction (HS ()) where toKeyAction = namedAS
 instance {-# OVERLAPPABLE #-} IsKeyAction (SomeAction H) where toKeyAction d a = SomeAction $ NamedAction d a
 instance {-# OVERLAPPABLE #-} (Message a, Show a) => IsKeyAction a where toKeyAction d a = SomeAction $ NamedActionHS (d ++ show a) (sendMessage a)
 
-(=?) :: IsKeyAction a => String -> a -> SomeAction H
-desc =? action = toKeyAction desc action
+($?$?=) :: IsKeyAction a => String -> a -> SomeAction H
+desc $?$?= action = toKeyAction desc action

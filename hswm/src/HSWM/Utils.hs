@@ -66,17 +66,22 @@ resolveModMask d s = go s
     get1 y = case map toLower y of
                        "m"     -> d
                        "none"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_NONE
-                       "s"     -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_SHIFT
                        "shift" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_SHIFT
-                       "c"     -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_CTRL
+                       "s"     -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_SHIFT
                        "ctrl"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_CTRL
+                       "c"     -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_CTRL
                        "mod1"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD1
+                       "m1"    -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD1
                        "alt"   -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD1
+                       "a"     -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD1
                        "mod3"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD3
+                       "m3"    -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD3
                        "mod4"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD4
+                       "m4"    -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD4
                        "super" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD4
                        "logo"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD4
                        "mod5"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD5
+                       "m5"    -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD5
                        _ -> error $ "unrecognized modifier: " ++ s
 
 

@@ -42,6 +42,7 @@ data Event
   | WlOutputEvent !WL.OutputEvent
   | WlShellSurfaceEvent !WL.ShellSurfaceEvent
   | WlKeyboardEvent !WL.KeyboardEvent
+  | WlPointerEvent !WL.PointerEvent
   | -- Ext_*
     ForeignTopLevelListV1 !WL.ForeignToplevelListEvent
   | ForeignTopLevelHandleV1 !WL.ForeignToplevelHandleEvent
@@ -50,9 +51,11 @@ data Event
     ZwpIM2PopupSurfaceE !Zwp.ZwpInputPopupSurfaceEvent
   | ZwpIM2KeyboardGrabE !Zwp.ZwpInputMethodKeyboardGrabEvent
   | ZwpIM2E !Zwp.ZwpInputMethodEvent
-  | ZdgOutputEvent !Zdg.OutputEvent
+   -- Wlr_*
   | WlrOutputManagerEvent !Wlr.OutputManagerEvent
   | WlrOutputHeadEvent !Wlr.OutputHeadEvent
+   -- Xdg
+  | ZdgOutputEvent !Zdg.OutputEvent
   deriving (Show, Generic)
 
 -- XXX is this used?

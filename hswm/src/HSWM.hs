@@ -35,4 +35,4 @@ import           River
 
 import           Data.Default as ReExports
 import           Data.Semigroup as ReExports (All(..))
-import           Prelude
+import           Prelude hiding ((^?))
