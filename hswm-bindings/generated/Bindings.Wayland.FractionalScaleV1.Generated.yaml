@@ -1,0 +1,60 @@
+version:
+  hs_bindgen: 0.1.0
+  binding_specification: '1.0'
+hsmodule: Bindings.Wayland.FractionalScaleV1.Generated
+ctypes:
+- headers: fractional-scale-v1-client-protocol.h
+  cname: struct wp_fractional_scale_manager_v1
+  hsname: Wp_fractional_scale_manager_v1
+- headers: fractional-scale-v1-client-protocol.h
+  cname: struct wp_fractional_scale_v1
+  hsname: Wp_fractional_scale_v1
+- headers: fractional-scale-v1-client-protocol.h
+  cname: enum wp_fractional_scale_manager_v1_error
+  hsname: Wp_fractional_scale_manager_v1_error
+- headers: fractional-scale-v1-client-protocol.h
+  cname: struct wp_fractional_scale_v1_listener
+  hsname: Wp_fractional_scale_v1_listener
+hstypes:
+- hsname: Wp_fractional_scale_manager_v1
+  representation: emptydata
+- hsname: Wp_fractional_scale_manager_v1_error
+  representation:
+    newtype:
+      constructor: Wp_fractional_scale_manager_v1_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wp_fractional_scale_v1
+  representation: emptydata
+- hsname: Wp_fractional_scale_v1_listener
+  representation:
+    record:
+      constructor: Wp_fractional_scale_v1_listener
+      fields:
+      - preferred_scale
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw

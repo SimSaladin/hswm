@@ -8,7 +8,13 @@ CDIR	:= ./hswm-bindings/cbits
 
 CLIENT_PROTOS := river-window-management-v1.xml river-xkb-bindings-v1.xml river-xkb-config-v1.xml \
 		   river-input-management-v1.xml river-layer-shell-v1.xml river-libinput-config-v1.xml \
-		   input-method-unstable-v2.xml ext-session-lock-v1.xml
+		   input-method-unstable-v2.xml ext-session-lock-v1.xml \
+		   xdg-output-unstable-v1.xml \
+		   fractional-scale-v1.xml \
+		   viewporter.xml \
+		   wlr-output-management-unstable-v1.xml \
+		   wlr-layer-shell-unstable-v1.xml
+
 SERVER_PROTOS := river-status-unstable-v1.xml
 
 WAYLAND_PROTO_PREFIX	:= $(shell pkg-config wayland-protocols --variable=pkgdatadir)
@@ -73,7 +79,12 @@ bindgen-river:	\
 	$(bindGenSpecDir)/Generated.River.LibinputConfigV1.yaml \
 	$(bindGenSpecDir)/Generated.River.LayerShellV1.yaml \
 	$(bindGenSpecDir)/Generated.Wlr.InputMethodV2.yaml \
-	$(bindGenSpecDir)/Bindings.Wayland.ExtSessionLockV1.Generated.yaml
+	$(bindGenSpecDir)/Bindings.Wayland.ExtSessionLockV1.Generated.yaml \
+	$(bindGenSpecDir)/Bindings.Wayland.FractionalScaleV1.Generated.yaml \
+	$(bindGenSpecDir)/Bindings.Wayland.XdgOutputUnstableV1.Generated.yaml \
+	$(bindGenSpecDir)/Bindings.Wayland.WlrOutputManagementUnstableV1.Generated.yaml \
+	$(bindGenSpecDir)/Bindings.Wayland.Viewporter.Generated.yaml \
+	$(bindGenSpecDir)/Bindings.Wayland.WlrLayerShellUnstableV1.Generated.yaml
 
 $(bindGenSpecDir)/Generated.Pixman.yaml: FORCE
 	$(HS_BIND_GEN) \
@@ -182,6 +193,51 @@ $(bindGenSpecDir)/Generated.Wlr.InputMethodV2.yaml: $(HEADERDIR)/input-method-un
 
 # ext-session-lock-client-protocol.h
 $(bindGenSpecDir)/Bindings.Wayland.ExtSessionLockV1.Generated.yaml: $(HEADERDIR)/ext-session-lock-v1-client-protocol.h FORCE
+	$(HS_BIND_GEN) $(<F) \
+	  --gen-binding-spec $@ \
+	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \
+	  --module $(patsubst %.yaml,%,$(@F)) \
+	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml \
+	  --external-binding-spec $(bindingSpecs)/wayland-client.yaml
+
+# xdg-output-unstable-v1.xml
+$(bindGenSpecDir)/Bindings.Wayland.XdgOutputUnstableV1.Generated.yaml: $(HEADERDIR)/xdg-output-unstable-v1-client-protocol.h FORCE
+	$(HS_BIND_GEN) $(<F) \
+	  --gen-binding-spec $@ \
+	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \
+	  --module $(patsubst %.yaml,%,$(@F)) \
+	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml \
+	  --external-binding-spec $(bindingSpecs)/wayland-client.yaml
+
+#   fractional-scale-v1.xml
+$(bindGenSpecDir)/Bindings.Wayland.FractionalScaleV1.Generated.yaml: $(HEADERDIR)/fractional-scale-v1-client-protocol.h FORCE
+	$(HS_BIND_GEN) $(<F) \
+	  --gen-binding-spec $@ \
+	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \
+	  --module $(patsubst %.yaml,%,$(@F)) \
+	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml \
+	  --external-binding-spec $(bindingSpecs)/wayland-client.yaml
+
+# wlr-output-management-unstable-v1.xml
+$(bindGenSpecDir)/Bindings.Wayland.WlrOutputManagementUnstableV1.Generated.yaml: $(HEADERDIR)/wlr-output-management-unstable-v1-client-protocol.h FORCE
+	$(HS_BIND_GEN) $(<F) \
+	  --gen-binding-spec $@ \
+	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \
+	  --module $(patsubst %.yaml,%,$(@F)) \
+	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml \
+	  --external-binding-spec $(bindingSpecs)/wayland-client.yaml
+
+# wlr-layer-shell-unstable-v1.xml
+$(bindGenSpecDir)/Bindings.Wayland.WlrLayerShellUnstableV1.Generated.yaml: $(HEADERDIR)/wlr-layer-shell-unstable-v1-client-protocol.h FORCE
+	$(HS_BIND_GEN) $(<F) \
+	  --gen-binding-spec $@ \
+	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \
+	  --module $(patsubst %.yaml,%,$(@F)) \
+	  --external-binding-spec $(bindGenSpecDir)/Generated.Wayland.Util.yaml \
+	  --external-binding-spec $(bindingSpecs)/wayland-client.yaml
+
+# viewporter.xml
+$(bindGenSpecDir)/Bindings.Wayland.Viewporter.Generated.yaml: $(HEADERDIR)/viewporter-client-protocol.h FORCE
 	$(HS_BIND_GEN) $(<F) \
 	  --gen-binding-spec $@ \
 	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \

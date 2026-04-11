@@ -88,7 +88,8 @@ fromADTKeys :: [ KeyAction (String, KeySym) (SomeAction H) ] -> [((ModMask, KeyS
 fromADTKeys = map doKey where
   doKey (KeyAction k a)  = (doMK k, a)
   doKey (KeySubmap k xs) = (doMK k, submap Nothing (fromADTKeys xs))
-  doMK (m, k) = (resolveModMask (resolveModMask 0 "c") m, k)
+  -- TODO hard-coded default Mod mask
+  doMK (m, k) = (resolveModMask (resolveModMask 0 "super") m, k)
 
 data KeyAction mk a = KeyAction mk a
                     | KeySubmap mk [KeyAction mk a]

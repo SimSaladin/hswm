@@ -381,9 +381,13 @@ getProgramPath =
 
 restart :: String -> H ()
 restart prog = do
+  logDebug "restart: broadcast release resources"
   runInHS $ broadcastMessage ReleaseResources
+  logDebug "restart: exit hooks"
   void . userCode =<< asks (exitHook . config)
+  logDebug "restart: write state"
   runInHS $ writeStateToFile
+  logDebug "restart: execute"
   io $ do
     res <- try $ executeFile prog True [] Nothing
     case res of

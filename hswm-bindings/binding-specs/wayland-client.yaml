@@ -9,6 +9,11 @@ ctypes:
   - river-status-unstable-v1-server-protocol.h
   - input-method-unstable-v2-client-protocol.h
   - ext-session-lock-v1-client-protocol.h
+  - fractional-scale-v1-client-protocol.h
+  - xdg-output-unstable-v1-client-protocol.h
+  - wlr-output-management-unstable-v1-client-protocol.h
+  - viewporter-client-protocol.h
+  - wlr-layer-shell-unstable-v1-client-protocol.h
   cname: struct wl_output
   hsname: Wl_output
 - headers: *headers

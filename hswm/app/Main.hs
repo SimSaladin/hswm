@@ -54,6 +54,10 @@ environPrompt = do
                                 ('=':val) -> (key, val)
                                 _         -> (key, "")  -- fallback in case there's no '='
 
+cycleRecentHiddenWS :: [KeySym] -> KeySym -> KeySym -> H ()
+cycleRecentHiddenWS =
+  CycleRecentWS.cycleWindowSets $ \wset ->
+    [W.tag ws | ws <- W.hidden wset ++ [W.workspace (W.current wset)]]
 
 
 mkWorkspacePrompt prompt apply = do
@@ -118,6 +122,7 @@ main = do
       , logHook         = navLogHook <> IPC.ipcLogHook
       , xkbLayout       = Just dvpMyLayout
       , pointerBindings = myPointerBinds
+      , defaultModMask  = "mod4"
       , repeatInfo      = Just (20, 150)
       , normalBorder    = parseRgba colBase02
       , focusedBorder   = parseRgba colCyan
@@ -169,7 +174,7 @@ main = do
     ++ [("M-S-SemiColon " ++ key, ("Shift to workspace " ++ show i) =? DWO.withNthWorkspace W.shift i) | (key, i) <- tagKeysTags ]
     -- "M-; M-"      >>+ tags >++> WorkspaceCopy
     ++
-    [ ("M-y",        "Cycle recent hidden tags"       =? CycleRecentWS.cycleRecentWS [4, 8] 121 112)
+    [ ("M-y",        "Cycle recent hidden tags"       =? cycleRecentHiddenWS [4, 8, 64] 121 112)
     , ("M-S-n",      "Shift current tag (forwards)"   =? DWO.swapWith Next CycleWS.anyWS) -- XXX: save workspace order?
     , ("M-S-p",      "Shift current tag (backwards)"  =? DWO.swapWith Prev CycleWS.anyWS)
     , ("M-g r",      "Rename workspace (prompt)"      =? renameWorkspacePrompt)

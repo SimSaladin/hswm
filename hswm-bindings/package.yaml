@@ -31,6 +31,7 @@ library:
   c-sources:
     - cbits/*.c
     - cbits/wayland-protocols/ext-foreign-toplevel-list-v1-protocol.c
+    - cbits/wayland-protocols/xdg-shell-protocol.c
   pkgconfig-depends:
     - wayland-client
     - pixman-1

@@ -13,6 +13,7 @@ maintainer:         samuli.thomasson@pm.me
 build-type:         Simple
 extra-source-files:
       cbits/ext-session-lock-v1-protocol.c
+      cbits/fractional-scale-v1-protocol.c
       cbits/input-method-unstable-v2-protocol.c
       cbits/river-input-management-v1-protocol.c
       cbits/river-layer-shell-v1-protocol.c
@@ -21,7 +22,12 @@ extra-source-files:
       cbits/river-window-management-v1-protocol.c
       cbits/river-xkb-bindings-v1-protocol.c
       cbits/river-xkb-config-v1-protocol.c
+      cbits/viewporter-protocol.c
+      cbits/wlr-layer-shell-unstable-v1-protocol.c
+      cbits/wlr-output-management-unstable-v1-protocol.c
+      cbits/xdg-output-unstable-v1-protocol.c
       include/ext-session-lock-v1-client-protocol.h
+      include/fractional-scale-v1-client-protocol.h
       include/input-method-unstable-v2-client-protocol.h
       include/river-input-management-v1-client-protocol.h
       include/river-layer-shell-v1-client-protocol.h
@@ -30,11 +36,20 @@ extra-source-files:
       include/river-window-management-v1-client-protocol.h
       include/river-xkb-bindings-v1-client-protocol.h
       include/river-xkb-config-v1-client-protocol.h
+      include/viewporter-client-protocol.h
+      include/wlr-layer-shell-unstable-v1-client-protocol.h
+      include/wlr-output-management-unstable-v1-client-protocol.h
+      include/xdg-output-unstable-v1-client-protocol.h
       binding-specs/pixman.yaml
       binding-specs/river-input-management.yaml
       binding-specs/river-window-management.yaml
       binding-specs/wayland-client.yaml
       generated/Bindings.Wayland.ExtSessionLockV1.Generated.yaml
+      generated/Bindings.Wayland.FractionalScaleV1.Generated.yaml
+      generated/Bindings.Wayland.Viewporter.Generated.yaml
+      generated/Bindings.Wayland.WlrLayerShellUnstableV1.Generated.yaml
+      generated/Bindings.Wayland.WlrOutputManagementUnstableV1.Generated.yaml
+      generated/Bindings.Wayland.XdgOutputUnstableV1.Generated.yaml
       generated/Generated.Pixman.yaml
       generated/Generated.River.InputManagementV1.yaml
       generated/Generated.River.LayerShellV1.yaml
@@ -57,6 +72,36 @@ library
           Bindings.Wayland.ExtSessionLockV1.Generated.Global
           Bindings.Wayland.ExtSessionLockV1.Generated.Safe
           Bindings.Wayland.ExtSessionLockV1.Generated.Unsafe
+          Bindings.Wayland.FractionalScaleV1
+          Bindings.Wayland.FractionalScaleV1.Generated
+          Bindings.Wayland.FractionalScaleV1.Generated.FunPtr
+          Bindings.Wayland.FractionalScaleV1.Generated.Global
+          Bindings.Wayland.FractionalScaleV1.Generated.Safe
+          Bindings.Wayland.FractionalScaleV1.Generated.Unsafe
+          Bindings.Wayland.Viewporter
+          Bindings.Wayland.Viewporter.Generated
+          Bindings.Wayland.Viewporter.Generated.FunPtr
+          Bindings.Wayland.Viewporter.Generated.Global
+          Bindings.Wayland.Viewporter.Generated.Safe
+          Bindings.Wayland.Viewporter.Generated.Unsafe
+          Bindings.Wayland.WlrLayerShellUnstableV1
+          Bindings.Wayland.WlrLayerShellUnstableV1.Generated
+          Bindings.Wayland.WlrLayerShellUnstableV1.Generated.FunPtr
+          Bindings.Wayland.WlrLayerShellUnstableV1.Generated.Global
+          Bindings.Wayland.WlrLayerShellUnstableV1.Generated.Safe
+          Bindings.Wayland.WlrLayerShellUnstableV1.Generated.Unsafe
+          Bindings.Wayland.WlrOutputManagementUnstableV1
+          Bindings.Wayland.WlrOutputManagementUnstableV1.Generated
+          Bindings.Wayland.WlrOutputManagementUnstableV1.Generated.FunPtr
+          Bindings.Wayland.WlrOutputManagementUnstableV1.Generated.Global
+          Bindings.Wayland.WlrOutputManagementUnstableV1.Generated.Safe
+          Bindings.Wayland.WlrOutputManagementUnstableV1.Generated.Unsafe
+          Bindings.Wayland.XdgOutputUnstableV1
+          Bindings.Wayland.XdgOutputUnstableV1.Generated
+          Bindings.Wayland.XdgOutputUnstableV1.Generated.FunPtr
+          Bindings.Wayland.XdgOutputUnstableV1.Generated.Global
+          Bindings.Wayland.XdgOutputUnstableV1.Generated.Safe
+          Bindings.Wayland.XdgOutputUnstableV1.Generated.Unsafe
           Generated.Pixman
           Generated.Pixman.FunPtr
           Generated.Pixman.Safe
@@ -149,6 +194,7 @@ library
           include/wayland-protocols
     c-sources:
           cbits/ext-session-lock-v1-protocol.c
+          cbits/fractional-scale-v1-protocol.c
           cbits/input-method-unstable-v2-protocol.c
           cbits/river-input-management-v1-protocol.c
           cbits/river-layer-shell-v1-protocol.c
@@ -157,7 +203,12 @@ library
           cbits/river-window-management-v1-protocol.c
           cbits/river-xkb-bindings-v1-protocol.c
           cbits/river-xkb-config-v1-protocol.c
+          cbits/viewporter-protocol.c
+          cbits/wlr-layer-shell-unstable-v1-protocol.c
+          cbits/wlr-output-management-unstable-v1-protocol.c
+          cbits/xdg-output-unstable-v1-protocol.c
           cbits/wayland-protocols/ext-foreign-toplevel-list-v1-protocol.c
+          cbits/wayland-protocols/xdg-shell-protocol.c
     pkgconfig-depends:
           wayland-client
         , pixman-1

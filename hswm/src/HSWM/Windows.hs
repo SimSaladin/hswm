@@ -145,9 +145,21 @@ manage_ = do
   mapM_ manageReveal visible
   setTopFocus
 
+  if isNothing (W.peek ws) && W.tag (W.workspace $ W.current ws) /= W.tag (W.workspace $ W.current old)
+     then warpPointerToScreen (W.screenDetail $ W.current ws) (W.screen $ W.current ws)
+     else withScreenOutput (W.screen $ W.current ws) $ \o -> io $ R.riverLayerShellOutputSetDefault o.river_layerShellOutput
+
   -- hide every window that was potentially visible before, but is not
   -- given a position by a layout now.
   mapM_ manageHide (L.nub (oldvisible ++ newwindows) L.\\ visible)
+
+warpPointerToScreen :: ScreenDetail -> ScreenId -> HS ()
+warpPointerToScreen SD{..} sid = do
+  mapSeats $ \s -> io $ R.riverSeatPointerWarp s.river_seat px py
+  withScreenOutput sid $ \o -> io $ R.riverLayerShellOutputSetDefault o.river_layerShellOutput
+  where
+    px = fi $ x + width `div` 2
+    py = fi $ y + height `div` 2
 
 render :: H ()
 render = runInHS $ do

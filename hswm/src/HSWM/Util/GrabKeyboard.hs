@@ -100,9 +100,9 @@ newGrabIM manager seat = mfix $ \final -> do
         when (prev_active /= next_active) $ do
           logInfo $ "grab: active state now: " <> (if next_active then "ACTIVE" else "NOT ACTIVE")
         writeIORef active next_active
-        when (not next_active && prev_active) $ do
-          atomically $ writeTChan bcastChan (Left Done)
-          deactivate final
+        --when (not next_active && prev_active) $ do
+        --  atomically $ writeTChan bcastChan (Left Done)
+        --  deactivate final
 
       ZwpInputMethodUnavailable _ud self -> do
         logError "grap: unavailable"

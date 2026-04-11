@@ -1,0 +1,66 @@
+version:
+  hs_bindgen: 0.1.0
+  binding_specification: '1.0'
+hsmodule: Bindings.Wayland.Viewporter.Generated
+ctypes:
+- headers: viewporter-client-protocol.h
+  cname: struct wp_viewport
+  hsname: Wp_viewport
+- headers: viewporter-client-protocol.h
+  cname: struct wp_viewporter
+  hsname: Wp_viewporter
+- headers: viewporter-client-protocol.h
+  cname: enum wp_viewporter_error
+  hsname: Wp_viewporter_error
+- headers: viewporter-client-protocol.h
+  cname: enum wp_viewport_error
+  hsname: Wp_viewport_error
+hstypes:
+- hsname: Wp_viewport
+  representation: emptydata
+- hsname: Wp_viewport_error
+  representation:
+    newtype:
+      constructor: Wp_viewport_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Wp_viewporter
+  representation: emptydata
+- hsname: Wp_viewporter_error
+  representation:
+    newtype:
+      constructor: Wp_viewporter_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw

@@ -22,7 +22,12 @@ import           Wayland.Client (displayGetRegistry, displayFlush, displayDispat
 import qualified Wayland as WL
 import qualified Wayland.Client as WL
 import qualified Wayland.Client.Extras as WL
+import qualified Bindings.Wayland.XdgOutputUnstableV1 as Zdg
+import qualified Bindings.Wayland.FractionalScaleV1 as FS
+import qualified Bindings.Wayland.Viewporter as VP
 import           Wlr
+import qualified Bindings.Wayland.WlrOutputManagementUnstableV1 as Wlr
+import qualified Bindings.Wayland.WlrLayerShellUnstableV1 as Wlr
 
 import           Foreign hiding (new, void)
 import System.IO.Error
@@ -85,6 +90,9 @@ startHSWM wlDisplay config = do
     managerL        <- getOrCreateObject $ R.mkRiverWindowManagerListener     $ \e -> handleE $ WindowManagerEvent e
     foreignListL    <- getOrCreateObject $ WL.mkForeignToplevelListListener   $ \e -> handleE $ ForeignTopLevelListV1 e
     _               <- getOrCreateObject $ WL.mkForeignToplevelHandleListener $ \e -> handleE $ ForeignTopLevelHandleV1 e
+    _               <- getOrCreateObject $ Zdg.mkOutputListener $ \e -> handleE $ ZdgOutputEvent e
+    wlrOmL          <- getOrCreateObject $ Wlr.mkOutputManagerListener $ \e -> handleE $ WlrOutputManagerEvent e
+    _               <- getOrCreateObject $ Wlr.mkOutputHeadListener $ \e -> handleE $ WlrOutputHeadEvent e
     logDebug "created event listeners"
 
     registry <- io $ displayGetRegistry wlDisplay
@@ -94,7 +102,7 @@ startHSWM wlDisplay config = do
     _ <- io $ displayRoundtrip wlDisplay
 
     -- expect wl_compositor
-    _ <- getOrCreateObject $ requireGlobal conf.globals ("wl_compositor", 6) $ \r n v ->
+    _ <- getOrCreateObject $ requireGlobal conf.globals ("wl_compositor", 4) $ \r n v ->
       WL.Compositor <$> WL.registryBind r n WL.compositorInterface (fi v)
 
     -- expect wl_shm
@@ -133,6 +141,22 @@ startHSWM wlDisplay config = do
       WL.registryBind r n WL.foreignToplevelListInterface (fi v) <&> WL.ForeignToplevelList
 
     io $ WL.listenerAdd foreignList foreignListL nullPtr
+
+    _zdgOutputManager <- getOrCreateObject $ requireGlobal conf.globals ("zxdg_output_manager_v1", 3) $ \r n v ->
+      WL.registryBind r n Zdg.outputManagerInterface (fi v) <&> Zdg.OutputManager
+
+    wlrOutputManager <- getOrCreateObject $ requireGlobal conf.globals ("zwlr_output_manager_v1", 4) $ \r n v ->
+      WL.registryBind r n Wlr.outputManagerInterface (fi v) <&> Wlr.OutputManager
+    io $ WL.listenerAdd wlrOutputManager wlrOmL nullPtr
+
+    wlrLayerShell <- getOrCreateObject $ requireGlobal conf.globals ("zwlr_layer_shell_v1", 4) $ \r n v ->
+      WL.registryBind r n Wlr.layerShellInterface (fi v) <&> Wlr.LayerShell
+
+    _fractionalScaleManager <- getOrCreateObject $ requireGlobal conf.globals ("wp_fractional_scale_manager_v1", 1) $ \r n v ->
+      WL.registryBind r n FS.fractionalScaleManagerInterface (fi v) <&> FS.FractionalScaleManager
+
+    _ <- getOrCreateObject $ requireGlobal conf.globals ("wp_viewporter", 1) $ \r n v ->
+      WL.registryBind r n VP.viewporterInterface (fi v) <&> VP.Viewporter
 
     logDebug "WM: running startup hooks"
     void $ userCode (startupHook config)
@@ -184,7 +208,7 @@ startHSWM wlDisplay config = do
             catch (void $ io $ displayDispatch wlDisplay) $ \case
               (e :: IOError) -> mainEvent $ MainExit $ "error: dispatch failed: " ++ show e
 
-  let main = runInH $ do
+  let main = runInH $ forever $ do
         ev <- atomically $ readTQueue conf.eventQueue
         case ev of
           MainExit s -> do
@@ -269,5 +293,9 @@ handleEvent (XkbKeyboardEvent e)      = InputConfig.handleXkbKeyboardEvent e
 handleEvent (ForeignTopLevelListV1 (WL.ForeignToplevelListToplevel _ _ fh)) = do
   l <- getObject
   io $ WL.listenerAdd fh l nullPtr
+
+handleEvent (WlrOutputManagerEvent (Wlr.OutputManagerHead _ _ head)) = do
+  l <- getObject
+  io $ WL.listenerAdd head l nullPtr
 
 handleEvent _ = return ()

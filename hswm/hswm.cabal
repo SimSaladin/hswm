@@ -37,6 +37,7 @@ library
           HSWM.Actions.CycleWS
           HSWM.Actions.DynamicWorkspaceOrder
           HSWM.Actions.DynamicWorkspaces
+          HSWM.Actions.LockSession
           HSWM.Actions.PhysicalScreens
           HSWM.Actions.Repeatable
           HSWM.Actions.WindowNavigation
@@ -90,6 +91,7 @@ library
         , mtl
         , network
         , pretty-simple
+        , process
         , rio
         , stm
         , text
@@ -104,8 +106,6 @@ library
           base hiding (Prelude)
         , hswm:hswm-prelude (HSWM.Prelude as Prelude)
     default-language: GHC2024
-    pkgconfig-depends:
-          xkbcommon
     build-tool-depends:
           c2hs:c2hs
 

@@ -14,6 +14,9 @@ import Wayland.Client qualified as WL
 import Wayland.Client.Extras qualified as WL
 import Wlr qualified as Zwp
 import qualified Bindings.Wayland.ExtSessionLockV1 as SL
+import qualified Bindings.Wayland.XdgOutputUnstableV1 as Zdg
+import qualified Bindings.Wayland.WlrOutputManagementUnstableV1 as Wlr
+import qualified Bindings.Wayland.FractionalScaleV1 as FS
 
 -- | Mash-up of all River/Wayland generated events
 data Event
@@ -47,6 +50,9 @@ data Event
     ZwpIM2PopupSurfaceE !Zwp.ZwpInputPopupSurfaceEvent
   | ZwpIM2KeyboardGrabE !Zwp.ZwpInputMethodKeyboardGrabEvent
   | ZwpIM2E !Zwp.ZwpInputMethodEvent
+  | ZdgOutputEvent !Zdg.OutputEvent
+  | WlrOutputManagerEvent !Wlr.OutputManagerEvent
+  | WlrOutputHeadEvent !Wlr.OutputHeadEvent
   deriving (Show, Generic)
 
 -- XXX is this used?

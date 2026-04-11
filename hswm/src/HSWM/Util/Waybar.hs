@@ -16,6 +16,7 @@ module HSWM.Util.Waybar  where
 import HSWM.Core hiding (closed)
 import System.Process.Typed
 import System.IO
+import System.Process (terminateProcess)
 
 data WaybarConfig = WaybarConfig
   deriving (Show, Eq, Generic)
@@ -52,6 +53,9 @@ waybarStartupHook _ = do
 waybarExitHook :: WaybarConfig -> H ()
 waybarExitHook _ = do
   withObject $ \WaybarState{wbProcess} ->
+    -- TODO terminate
     io $ case wbProcess of
       Nothing -> pure ()
-      Just p -> void $ try @_ @SomeException $ stopProcess p
+      Just p -> do
+        void $ try @_ @SomeException $ terminateProcess $ unsafeProcessHandle p
+        void $ try @_ @SomeException $ stopProcess p

@@ -87,6 +87,7 @@ library:
     - deepseq
     - mtl
     - stm
+    - process
     - typed-process
     - xkbcommon-bindings
   build-tools:

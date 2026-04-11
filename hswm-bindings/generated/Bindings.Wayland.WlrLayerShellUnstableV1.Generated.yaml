@@ -1,0 +1,140 @@
+version:
+  hs_bindgen: 0.1.0
+  binding_specification: '1.0'
+hsmodule: Bindings.Wayland.WlrLayerShellUnstableV1.Generated
+ctypes:
+- headers: wlr-layer-shell-unstable-v1-client-protocol.h
+  cname: struct xdg_popup
+  hsname: Xdg_popup
+- headers: wlr-layer-shell-unstable-v1-client-protocol.h
+  cname: struct zwlr_layer_shell_v1
+  hsname: Zwlr_layer_shell_v1
+- headers: wlr-layer-shell-unstable-v1-client-protocol.h
+  cname: struct zwlr_layer_surface_v1
+  hsname: Zwlr_layer_surface_v1
+- headers: wlr-layer-shell-unstable-v1-client-protocol.h
+  cname: enum zwlr_layer_shell_v1_error
+  hsname: Zwlr_layer_shell_v1_error
+- headers: wlr-layer-shell-unstable-v1-client-protocol.h
+  cname: enum zwlr_layer_shell_v1_layer
+  hsname: Zwlr_layer_shell_v1_layer
+- headers: wlr-layer-shell-unstable-v1-client-protocol.h
+  cname: enum zwlr_layer_surface_v1_error
+  hsname: Zwlr_layer_surface_v1_error
+- headers: wlr-layer-shell-unstable-v1-client-protocol.h
+  cname: enum zwlr_layer_surface_v1_anchor
+  hsname: Zwlr_layer_surface_v1_anchor
+- headers: wlr-layer-shell-unstable-v1-client-protocol.h
+  cname: struct zwlr_layer_surface_v1_listener
+  hsname: Zwlr_layer_surface_v1_listener
+hstypes:
+- hsname: Xdg_popup
+  representation: emptydata
+- hsname: Zwlr_layer_shell_v1
+  representation: emptydata
+- hsname: Zwlr_layer_shell_v1_error
+  representation:
+    newtype:
+      constructor: Zwlr_layer_shell_v1_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Zwlr_layer_shell_v1_layer
+  representation:
+    newtype:
+      constructor: Zwlr_layer_shell_v1_layer
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Zwlr_layer_surface_v1
+  representation: emptydata
+- hsname: Zwlr_layer_surface_v1_anchor
+  representation:
+    newtype:
+      constructor: Zwlr_layer_surface_v1_anchor
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Zwlr_layer_surface_v1_error
+  representation:
+    newtype:
+      constructor: Zwlr_layer_surface_v1_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Zwlr_layer_surface_v1_listener
+  representation:
+    record:
+      constructor: Zwlr_layer_surface_v1_listener
+      fields:
+      - configure
+      - closed
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw

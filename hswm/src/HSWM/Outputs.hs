@@ -23,6 +23,8 @@ import qualified River.Objects as R
 import           Wayland
 import qualified Wayland.Client as WL
 
+import qualified Bindings.Wayland.XdgOutputUnstableV1 as Zdg
+
 import qualified Data.List as L
 import qualified Data.Map as M
 import           Foreign
@@ -81,10 +83,16 @@ handle e = do
       -- bind a wl_output listener
       registry <- asks globals
       wlOutputListener <- getObject
+      zdgOM <- getObject
+      zdgOutputListener <- getObject
       wl_output <- requireGlobal registry ("wl_output", 4) $ \r _ ver ->
         io $ WL.Output <$> WL.registryBind r name WL.outputInterface (fi ver)
       _ <- io $ WL.listenerAdd wl_output wlOutputListener output
       putObject om { wl_outputs = M.insert output wl_output $ wl_outputs om }
+      -- zdg_output
+      zdg_output <- io $ Zdg.outputManagerGetXdgOutput zdgOM wl_output
+      io $ WL.listenerAdd zdg_output zdgOutputListener output
+      return ()
     R.RiverOutputDimensions _ output width height ->
       modifyOutput' output $ \x -> (x::Output) { width = fi width, height = fi height }
     R.RiverOutputPosition _ output x y ->

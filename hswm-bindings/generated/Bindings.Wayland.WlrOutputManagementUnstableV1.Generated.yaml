@@ -1,0 +1,202 @@
+version:
+  hs_bindgen: 0.1.0
+  binding_specification: '1.0'
+hsmodule: Bindings.Wayland.WlrOutputManagementUnstableV1.Generated
+ctypes:
+- headers: wlr-output-management-unstable-v1-client-protocol.h
+  cname: struct zwlr_output_configuration_head_v1
+  hsname: Zwlr_output_configuration_head_v1
+- headers: wlr-output-management-unstable-v1-client-protocol.h
+  cname: struct zwlr_output_configuration_v1
+  hsname: Zwlr_output_configuration_v1
+- headers: wlr-output-management-unstable-v1-client-protocol.h
+  cname: struct zwlr_output_head_v1
+  hsname: Zwlr_output_head_v1
+- headers: wlr-output-management-unstable-v1-client-protocol.h
+  cname: struct zwlr_output_manager_v1
+  hsname: Zwlr_output_manager_v1
+- headers: wlr-output-management-unstable-v1-client-protocol.h
+  cname: struct zwlr_output_mode_v1
+  hsname: Zwlr_output_mode_v1
+- headers: wlr-output-management-unstable-v1-client-protocol.h
+  cname: struct zwlr_output_manager_v1_listener
+  hsname: Zwlr_output_manager_v1_listener
+- headers: wlr-output-management-unstable-v1-client-protocol.h
+  cname: enum zwlr_output_head_v1_adaptive_sync_state
+  hsname: Zwlr_output_head_v1_adaptive_sync_state
+- headers: wlr-output-management-unstable-v1-client-protocol.h
+  cname: struct zwlr_output_head_v1_listener
+  hsname: Zwlr_output_head_v1_listener
+- headers: wlr-output-management-unstable-v1-client-protocol.h
+  cname: struct zwlr_output_mode_v1_listener
+  hsname: Zwlr_output_mode_v1_listener
+- headers: wlr-output-management-unstable-v1-client-protocol.h
+  cname: enum zwlr_output_configuration_v1_error
+  hsname: Zwlr_output_configuration_v1_error
+- headers: wlr-output-management-unstable-v1-client-protocol.h
+  cname: struct zwlr_output_configuration_v1_listener
+  hsname: Zwlr_output_configuration_v1_listener
+- headers: wlr-output-management-unstable-v1-client-protocol.h
+  cname: enum zwlr_output_configuration_head_v1_error
+  hsname: Zwlr_output_configuration_head_v1_error
+hstypes:
+- hsname: Zwlr_output_configuration_head_v1
+  representation: emptydata
+- hsname: Zwlr_output_configuration_head_v1_error
+  representation:
+    newtype:
+      constructor: Zwlr_output_configuration_head_v1_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Zwlr_output_configuration_v1
+  representation: emptydata
+- hsname: Zwlr_output_configuration_v1_error
+  representation:
+    newtype:
+      constructor: Zwlr_output_configuration_v1_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Zwlr_output_configuration_v1_listener
+  representation:
+    record:
+      constructor: Zwlr_output_configuration_v1_listener
+      fields:
+      - succeeded
+      - failed
+      - cancelled
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Zwlr_output_head_v1
+  representation: emptydata
+- hsname: Zwlr_output_head_v1_adaptive_sync_state
+  representation:
+    newtype:
+      constructor: Zwlr_output_head_v1_adaptive_sync_state
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Zwlr_output_head_v1_listener
+  representation:
+    record:
+      constructor: Zwlr_output_head_v1_listener
+      fields:
+      - name
+      - description
+      - physical_size
+      - mode
+      - enabled
+      - current_mode
+      - position
+      - transform
+      - scale
+      - finished
+      - make
+      - model
+      - serial_number
+      - adaptive_sync
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Zwlr_output_manager_v1
+  representation: emptydata
+- hsname: Zwlr_output_manager_v1_listener
+  representation:
+    record:
+      constructor: Zwlr_output_manager_v1_listener
+      fields:
+      - head
+      - done
+      - finished
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Zwlr_output_mode_v1
+  representation: emptydata
+- hsname: Zwlr_output_mode_v1_listener
+  representation:
+    record:
+      constructor: Zwlr_output_mode_v1_listener
+      fields:
+      - size
+      - refresh
+      - preferred
+      - finished
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw

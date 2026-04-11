@@ -1,0 +1,39 @@
+version:
+  hs_bindgen: 0.1.0
+  binding_specification: '1.0'
+hsmodule: Bindings.Wayland.XdgOutputUnstableV1.Generated
+ctypes:
+- headers: xdg-output-unstable-v1-client-protocol.h
+  cname: struct zxdg_output_manager_v1
+  hsname: Zxdg_output_manager_v1
+- headers: xdg-output-unstable-v1-client-protocol.h
+  cname: struct zxdg_output_v1
+  hsname: Zxdg_output_v1
+- headers: xdg-output-unstable-v1-client-protocol.h
+  cname: struct zxdg_output_v1_listener
+  hsname: Zxdg_output_v1_listener
+hstypes:
+- hsname: Zxdg_output_manager_v1
+  representation: emptydata
+- hsname: Zxdg_output_v1
+  representation: emptydata
+- hsname: Zxdg_output_v1_listener
+  representation:
+    record:
+      constructor: Zxdg_output_v1_listener
+      fields:
+      - logical_position
+      - logical_size
+      - done
+      - name
+      - description
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
