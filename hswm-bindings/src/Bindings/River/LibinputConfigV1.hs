@@ -1,17 +1,19 @@
 -- |
--- Module      : River.LibinputConfig
+-- Module      : River.LibinputConfigV1
 -- Description : Short description
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
-module Bindings.River.LibinputConfig where
+module Bindings.River.LibinputConfigV1 where
 
 import Bindings.River.LibinputConfigV1.Generated
 import Bindings.River.LibinputConfigV1.Generated.Global
 import Bindings.River.LibinputConfigV1.Generated.Safe
-import Bindings.River.InputManagement
+
+import Bindings.River.InputManagementV1
+
 import Bindings.Wayland.Internal.TH
 import Bindings.Wayland.Client
 

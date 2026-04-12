@@ -140,34 +140,36 @@ manage_ = do
 
   mapM_ (\(a, b, c) -> tileWindow c a b) rects
 
-  sm <- liftH Seats.getSMgr
+  -- hide every window that was potentially visible before, but is not
+  -- given a position by a layout now.
+  mapM_ manageHide (L.nub (oldvisible ++ newwindows) L.\\ visible)
 
-  mapM_ manageReveal visible
-  setTopFocus
+  sm <- liftH Seats.getSMgr
 
   whenJust (W.peek ws) $ \w -> do
     if sm.seat_lshell_focus == Seats.FocusNone
       then manageWindowBorder w =<< asks (focusedBorder . config)
       else manageWindowBorder w =<< asks (normalBorder . config)
-    whenJust (L.find (\(a, b, c) -> a == w) rects) $ \(_, Rectangle {..}, _) -> do
-      mapSeats $ \s -> do
-        io $ R.riverSeatFocusWindow s.river_seat w
-        if s.focused /= w && s.hovered /= w
-          then do
-            modifySeat s.river_seat $ \x -> x {focused = w}
-            let px = x + (fi width `div` 2)
-                py = y + (fi height `div` 2)
-            logInfo $ "manage: warping pointer to " <> displayShow (px, py)
-            io $ R.riverSeatPointerWarp s.river_seat px py
-          else return ()
+
+  mapM_ manageReveal visible
+  setTopFocus
+
+    --whenJust (L.find (\(a, b, c) -> a == w) rects) $ \(_, Rectangle {..}, _) -> do
+    --  mapSeats $ \s -> do
+    --    if s.focused /= w && s.hovered /= w
+    --      then do
+    --        io $ R.riverSeatFocusWindow s.river_seat w
+    --        logInfo $ fromString $ "manage: setting seat fo" <> show w
+    --        modifySeat s.river_seat $ \x -> x {focused = w}
+    --        --let px = x + (fi width `div` 2)
+    --        --    py = y + (fi height `div` 2)
+    --        --logInfo $ fromString $ "manage: warping pointer to " <> show (px, py)
+    --        --io $ R.riverSeatPointerWarp s.river_seat px py
+    --      else return ()
 
   if isNothing (W.peek ws) && W.tag (W.workspace $ W.current ws) /= W.tag (W.workspace $ W.current old)
     then warpPointerToScreen (W.screenDetail $ W.current ws) (W.screen $ W.current ws)
     else withScreenOutput (W.screen $ W.current ws) $ \o -> io $ R.riverLayerShellOutputSetDefault o.river_layerShellOutput
-
-  -- hide every window that was potentially visible before, but is not
-  -- given a position by a layout now.
-  mapM_ manageHide (L.nub (oldvisible ++ newwindows) L.\\ visible)
 
   gets windowset >>= \ws' -> modify (\s -> s {windowsetOld = ws'})
 

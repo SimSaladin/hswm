@@ -10,10 +10,8 @@
 -- Type-indexed globals
 module HSWM.Types.TypeMap where
 
-import Data.TMap qualified as TM
 import Data.Typeable
-import RIO
-import Prelude (Default (def))
+import Data.TMap qualified as TM
 
 newtype TypeMap = TypeMap {unTypeMap :: TM.TMap}
   deriving (Show, Generic)
@@ -26,7 +24,7 @@ class HasGlobalTMap env where
 instance HasGlobalTMap (TMVar TypeMap) where
   globalTMap = lens id const
 
-type MonadStateGlobal s m = (HasGlobalTMap s, MonadReader s m, MonadUnliftIO m, HasLogFunc s)
+type MonadStateGlobal s m = (HasGlobalTMap s, MonadReader s m, MonadUnliftIO m, MonadLogger m)
 
 -- | Partial function, assumes the type exists already.
 getObject :: (Typeable a, MonadStateGlobal s m) => m a
@@ -36,15 +34,28 @@ getObject = do
     (Nothing :: Maybe a) -> error ("getObject: no such object: " ++ show (typeRep (Proxy :: Proxy a)))
     Just x -> return x
 
-withTMVar :: (MonadUnliftIO m, HasLogFunc env, MonadReader env m) => TMVar s -> (s -> m (a, s)) -> m a
+withTMVar :: (MonadUnliftIO m, MonadLogger m, MonadReader env m) => TMVar s -> (s -> m (a, s)) -> m a
 withTMVar var f = bracketOnError (atomically $ takeTMVar var) (atomically . tryPutTMVar var) $ \s -> do
   (a, s') <- f s
   atomically $ putTMVar var s'
   return a
 
-getOrCreateObject :: forall a s m. (Typeable a, MonadStateGlobal s m, MonadIO m) => IO a -> m a
+getOrCreateObject :: forall a s m. (Typeable a, MonadStateGlobal s m, MonadIO m) => m a -> m a
 getOrCreateObject m = do
-  let typeS = show $ typeRep (Proxy :: Proxy a)
+  --let typeS = show $ typeRep (Proxy :: Proxy a)
+  --logDebug $ "get or create type object" :# [ "type" .= typeS ]
+  tmV <- asks (view globalTMap)
+  withTMVar tmV $ \tm -> do
+    case TM.lookup $ unTypeMap tm of
+      Just x -> return (x, tm)
+      Nothing -> do
+        a <- m
+        return (a, TypeMap $ TM.insert a $ unTypeMap tm)
+
+getOrCreateObjectIO :: forall a s m. (Typeable a, MonadStateGlobal s m, MonadIO m) => IO a -> m a
+getOrCreateObjectIO m = do
+  --let typeS = show $ typeRep (Proxy :: Proxy a)
+  --logDebug $ "get or create type object" :# [ "type" .= typeS ]
   tmV <- asks (view globalTMap)
   withTMVar tmV $ \tm -> do
     case TM.lookup $ unTypeMap tm of

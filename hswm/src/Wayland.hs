@@ -4,14 +4,35 @@ module Wayland
 where
 
 import Data.List qualified as L
+import Foreign
 import Bindings.Wayland.Client qualified as WL
+import HSWM.Types.TypeMap
+
+------------------------------------------------------------------
+-- * Registry tracking
+
+type Name = Word32
 
 type Version = Word32
 
+type InterfaceVersion = (String, Version)
+
 type WlRegistry = WL.Registry
 
-------------------------------------------------------------------
--- Registry tracking
+data WlRegistryException = NoSuchRegistryObject String Version deriving (Show, Eq)
+
+instance Exception WlRegistryException
+
+data RegistryItem = RegistryItem
+  { -- | Object name (unique)
+    name :: !Name,
+    -- | Interface description
+    interface :: !String,
+    -- | Interface version
+    version :: !Version,
+    registry :: !WlRegistry
+  }
+  deriving (Show, Generic)
 
 -- | Tracks the global objects that are available through wl_registry.
 newtype RegistryCache = RegistryCache {objects :: [RegistryItem]} deriving (Show)
@@ -23,49 +44,58 @@ instance Monoid RegistryCache where
   mempty = RegistryCache []
   mappend = (<>)
 
-data RegistryItem = RegistryItem
-  { -- | Name (unique)
-    name :: !Word32,
-    -- | Interface description
-    interface :: !String,
-    -- | Interface version
-    version :: !Version,
-    registry :: !WlRegistry
-  }
-  deriving (Show, Generic)
+class HasGlobalsRegistry a where
+  globalsRegistryL :: Lens' a (IORef RegistryCache)
 
-removeGlobal :: Word32 -> RegistryCache -> RegistryCache
-removeGlobal name_ r = r {objects = L.filter (\o -> name_ /= o.name) r.objects}
+instance HasGlobalsRegistry (IORef RegistryCache) where
+  globalsRegistryL = lens id const
 
-registerGlobal :: Word32 -> String -> Version -> WlRegistry -> RegistryCache -> RegistryCache
-registerGlobal name text version wlr r = r {objects = RegistryItem name text version wlr : r.objects}
+-- * Registering to global items
 
-tryBindGlobal ::
-  (MonadIO m) =>
-  IORef RegistryCache ->
-  -- | Interface name and version of the target object
-  (String, Version) ->
-  (WlRegistry -> Word32 -> Version -> m a) -> -- bind
-  m (Maybe a)
-tryBindGlobal rref (k, v) bind =
-  io (readIORef rref) >>= \x -> case L.find (\i -> i.interface == k && v <= i.version) (objects x) of
-    Just obj -> Just <$> bind obj.registry obj.name v
-    Nothing -> return Nothing
+bindGlobalWith :: (Typeable a, MonadUnliftIO m, MonadThrow m, MonadLogger m, MonadReader env m,
+                   HasGlobalsRegistry env, HasGlobalTMap env, WL.AddListener a)
+               => InterfaceVersion
+               -> ConstPtr WL.Wl_interface
+               -> (Ptr b -> a) -- ^ Wrapper for the created client object
+               -> [(ConstPtr (WL.ObjectListener a), Ptr a)] -- ^ Optionally a listener/listeners to add after creation
+               -> m a
+bindGlobalWith ifaceVer@(_nm, _ver) iface toa listeners = do
+  obj <- bindGlobalWith_ ifaceVer iface toa
+  obj <$ forM_ listeners (\(l, ud) -> io $ WL.listenerAdd obj l ud)
 
-requireGlobal :: (MonadIO m, MonadThrow m) => IORef RegistryCache -> (String, Version) -> (WlRegistry -> Word32 -> Version -> m a) -> m a
-requireGlobal rref (k, v) bind =
-  io (readIORef rref) >>= \x -> case L.find (\i -> i.interface == k && v <= i.version) $ objects x of
-    Just obj -> bind obj.registry obj.name obj.version
-    Nothing -> throwM $ NoSuchRegistryObject k v
+bindGlobalWith_ :: (Typeable a, MonadUnliftIO m, MonadThrow m, MonadLogger m, MonadReader env m,
+                   HasGlobalsRegistry env, HasGlobalTMap env)
+               => InterfaceVersion
+               -> ConstPtr WL.Wl_interface
+               -> (Ptr b -> a) -- ^ Wrapper for the created client object
+               -> m a
+bindGlobalWith_ ifaceVer@(_nm, _ver) iface toa = do
+  reg <- asks (view globalsRegistryL)
+  obj <- requireGlobal reg ifaceVer (\r n v -> toa <$> io (WL.registryBind r n iface (fi v)))
+  obj <$ putObject obj
 
-data WlRegistryException = NoSuchRegistryObject String Version deriving (Show, Eq)
+requireGlobal :: (MonadIO m, MonadThrow m, MonadLogger m) => IORef RegistryCache -> InterfaceVersion -> (WlRegistry -> Name -> Version -> m a) -> m a
+requireGlobal rref (k, v) bind = tryBindGlobal rref (k, v) bind >>= maybe (throwM $ NoSuchRegistryObject k v) return
 
-instance Exception WlRegistryException
+tryBindGlobal :: (MonadIO m, MonadThrow m, MonadLogger m) => IORef RegistryCache -> InterfaceVersion -> (WlRegistry -> Name -> Version -> m a) -> m (Maybe a)
+tryBindGlobal rref (k, v) bind = io (readIORef rref) >>= \x -> case L.find (\i -> i.interface == k && v <= i.version) (objects x) of
+  Just obj -> do logInfo $ "GLOBALS: new item binding" :# [ "iface" .= k, "version" .= obj.version, "name" .= obj.name, "version-wanted" .= v ]
+                 Just <$> bind obj.registry obj.name (min v obj.version)
+  Nothing -> return Nothing
 
-handleRegistryEvent :: (MonadIO m, MonadReader env m, HasLogFunc env) => IORef RegistryCache -> WL.RegistryEvent -> m ()
+-- * Handling Global events
+
+handleRegistryEvent :: (MonadIO m, MonadReader env m, MonadLogger m) => IORef RegistryCache -> WL.RegistryEvent -> m ()
 handleRegistryEvent ref (WL.RegistryGlobal _ registry name iface version) = do
-  log' $ display $ "[GLOBALS] new registry item: " <> toText iface <> " version=" <> tshow version <> " (" <> tshow name <> ")"
+  logInfo $ "GLOBALS: new registry item" :# [ "iface" .= iface, "version" .= version, "name" .= name ]
   modifyIORef ref $ registerGlobal name iface version registry
+    where
+  registerGlobal :: Name -> String -> Version -> WlRegistry -> RegistryCache -> RegistryCache
+  registerGlobal nm text ver wlr r = r {objects = RegistryItem nm text ver wlr : r.objects}
+
 handleRegistryEvent ref (WL.RegistryGlobalRemove _ _ name) = do
-  log' $ display $ "[GLOBALS] registry entry removed: " <> tshow name
+  logInfo $ "GLOBALS: item removed" :# [ "name" .= name ]
   modifyIORef ref (removeGlobal name)
+    where
+  removeGlobal :: Name -> RegistryCache -> RegistryCache
+  removeGlobal name_ r = r {objects = L.filter (\o -> name_ /= o.name) r.objects}

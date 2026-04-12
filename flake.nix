@@ -22,9 +22,16 @@
     imports = [
       inputs.haskell-flake.flakeModule
     ];
+    debug = true;
+
     perSystem = { system, lib, config, pkgs, ... }: {
       _module.args.pkgs = import inputs.nixpkgs {
         inherit system;
+        config = {
+           problems.handlers = {
+             monad-logger-aeson.broken = "warn"; # or "ignore"
+           };
+         };
         overlays = [
           (final: _: {
             # roll our own for now because the nixpkgs one is rather old and lacks
@@ -64,17 +71,11 @@
               ;
           };
         };
-        #settings.typed-process = {
-        #  custom = (p: p.overrideAttrs (oa: rec {
-        #    version = "0.2.12.0";
-        #    src = inputs.typed-process;
-        #    hash = "";
-        #    prePatch = ''
-        #      ${pkgs.haskell.packages.ghc912.hpack}/bin/hpack
-        #      set -x
-        #    '' + oa.prePatch or "";
-        #  }));
-        #};
+        settings = {
+          monad-logger-aeson = {
+            check = false;
+          };
+        };
       };
       packages = {
         # Export our overridden river for convenience.

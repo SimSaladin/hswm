@@ -22,16 +22,6 @@ import Bindings.River qualified as R
 import Bindings.RiverSafe qualified as R
 import Bindings.Wayland.Client qualified as WL
 
-setKeyboardLayout :: R.RiverXkbConfig -> R.RiverXkbKeyboard -> XkbRuleNames -> H ()
-setKeyboardLayout xkbConfig keyboard layout =
-  io (newXkbKeymapFromNames layout) >>= \km ->
-    io $ withXkbKeymapFd km $ \fd ->
-      R.riverXkbConfigCreateKeymap xkbConfig (fi fd) R.RIVER_XKB_CONFIG_V1_KEYMAP_FORMAT_TEXT_V1 -- RiverXkbConfigKeymapFormatText
-        >>= io . R.riverXkbKeyboardSetKeymap keyboard
-
-updateKeyboardInfo :: (MonadStateGlobal env m) => R.RiverXkbKeyboard -> (KeyboardInfo -> Maybe KeyboardInfo) -> m ()
-updateKeyboardInfo i f = withObjectDef mempty $ putObject . M.alter (f . fromMaybe def) i
-
 data KeyboardInfo = KeyboardInfo
   { layoutName :: String,
     layoutIndex :: Int
@@ -39,9 +29,19 @@ data KeyboardInfo = KeyboardInfo
   deriving stock (Show, Generic)
   deriving anyclass (Default)
 
+setKeyboardLayout :: R.RiverXkbConfig -> R.RiverXkbKeyboard -> XkbRuleNames -> H ()
+setKeyboardLayout xkbConfig keyboard layout =
+  io (newXkbKeymapFromNames layout) >>= \km ->
+    io $ withXkbKeymapFd km $ \fd ->
+      R.riverXkbConfigCreateKeymap xkbConfig (fi fd) R.RIVER_XKB_CONFIG_V1_KEYMAP_FORMAT_TEXT_V1
+        >>= io . R.riverXkbKeyboardSetKeymap keyboard
+
+updateKeyboardInfo :: (MonadStateGlobal env m) => R.RiverXkbKeyboard -> (KeyboardInfo -> Maybe KeyboardInfo) -> m ()
+updateKeyboardInfo i f = withObjectDef mempty $ putObject . M.alter (f . fromMaybe def) i
+
 -- * Event handlers
 
-handleInputManagerEvent :: (MonadUnliftIO m, MonadReader HConf m) => R.RiverInputManagerEvent -> m ()
+handleInputManagerEvent :: (MonadUnliftIO m, MonadLogger m, MonadReader HConf m) => R.RiverInputManagerEvent -> m ()
 handleInputManagerEvent (R.RiverInputManagerInputDevice _ _ dev) = do
   l <- getObject
   io $ R.listenerAdd dev l nullPtr
@@ -53,7 +53,7 @@ handleInputDeviceEvent :: (Monad m) => R.RiverInputDeviceEvent -> m ()
 handleInputDeviceEvent (R.RiverInputDeviceType' _ _ _inputDevice) = return ()
 handleInputDeviceEvent _ = return ()
 
-handleLibinputEvent :: (HasGlobalTMap s, MonadReader s m, MonadUnliftIO m, HasLogFunc s) => R.RiverLibinputConfigEvent -> m ()
+handleLibinputEvent :: (HasGlobalTMap s, MonadReader s m, MonadUnliftIO m, MonadLogger m) => R.RiverLibinputConfigEvent -> m ()
 handleLibinputEvent (R.RiverLibinputConfigLibinputDevice _ _ dev) = do
   l <- getObject
   io $ WL.listenerAdd dev l nullPtr

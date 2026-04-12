@@ -6,14 +6,14 @@ import System.IO qualified as IO
 
 main :: IO ()
 main = do
-  logOpts <- logOptionsHandle stderr True
-  withLogFunc logOpts $ \logFunc -> flip runReaderT logFunc $ do
+  runStdoutLoggingT $ do
     logInfo "Connecting..."
 
     let msgHandler = \case
-          _msg -> logInfo "Response!"
+          StateDumpResponse str -> liftIO $ putStrLn str
+          msg -> liftIO $ print msg
 
-    clientRun def msgHandler consoleHandler
+    runReaderT (clientRun def msgHandler consoleHandler) ()
   where
     consoleHandler say =
       forever $

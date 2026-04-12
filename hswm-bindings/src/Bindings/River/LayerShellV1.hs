@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- |
--- Module      : River.LayerShell
+-- Module      : River.LayerShellV1
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
@@ -8,9 +8,9 @@
 -- Portability : unportable
 --
 ------------------------------------------------------------------------------
-module Bindings.River.LayerShell  where
+module Bindings.River.LayerShellV1  where
 
-import Bindings.River.WindowManagement
+import Bindings.River.WindowManagementV1
 
 import Bindings.Wayland.Internal.TH
 

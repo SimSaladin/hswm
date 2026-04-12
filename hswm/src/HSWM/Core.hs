@@ -48,7 +48,7 @@ runH c (H a) = runReaderT a c
 runHS :: HConf -> HState -> HS a -> IO (a, HState)
 runHS c st (HS a) = runStateT (runReaderT a c) st
 
-runInHS :: (MonadIO m, MonadReader HConf m) => HS a -> m a
+runInHS :: HasCallStack => (MonadIO m, MonadReader HConf m) => HS a -> m a
 runInHS a = do
   conf <- ask
   when conf._stateLocked $ throwString "runInHS: state locked (attempted to nest state lock?)"
@@ -66,22 +66,21 @@ liftH a = do
 catchH :: H a -> H a -> H a
 catchH job errcase = do
   c <- ask
-  liftIO $
-    runH c job
-      `catch` \e -> case fromException e of
-        Just (_ :: ExitCode) -> throwM e
-        _ -> hPutBuilder stderr (getUtf8Builder $ display @Text "error: " <> display (tshow e)) >> runH c errcase
+  io (runH c job)
+    `catch` \e -> case fromException e of
+      Just (_ :: ExitCode) -> throwM e
+      _ -> do logError $ "exception in H action" :# [ "excption" .= show e ]
+              errcase
 
 catchHS :: HS a -> HS a -> HS a
 catchHS job errcase = do
   c <- ask
   s <- get
-  (a, s') <-
-    liftIO $
-      runHS c s job
+  (a, s') <- liftIO $ runHS c s job
         `catch` \e -> case fromException e of
           Just (_ :: ExitCode) -> throwM e
-          _ -> hPutBuilder stderr (getUtf8Builder $ display @Text "error: " <> display (tshow e)) >> runHS c s errcase
+          _ -> do runH c $ logError $ "excption in HS action" :# [ "exception" .= show e ]
+                  runHS c s errcase
   put s'
   return a
 

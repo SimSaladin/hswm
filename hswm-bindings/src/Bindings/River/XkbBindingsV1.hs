@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- |
--- Module      : River.XkbBindings
+-- Module      : River.XkbBindingsV1
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
@@ -8,9 +8,9 @@
 -- Portability : unportable
 --
 ------------------------------------------------------------------------------
-module Bindings.River.XkbBindings  where
+module Bindings.River.XkbBindingsV1  where
 
-import Bindings.River.WindowManagement
+import Bindings.River.WindowManagementV1
 
 import Bindings.Wayland.Internal.TH
 

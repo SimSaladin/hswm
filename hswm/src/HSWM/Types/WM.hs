@@ -30,7 +30,7 @@ import HSWM.XKB
 import River
 import Bindings.River qualified as R
 import Bindings.RiverSafe qualified as R
-import Wayland (RegistryCache)
+import Wayland (RegistryCache, HasGlobalsRegistry(..))
 import Bindings.Wayland.Client qualified as WL hiding (display)
 
 -- * User configuration
@@ -287,11 +287,27 @@ instance Show (Layout a) where show (Layout l) = show l
 
 newtype H a = H (ReaderT HConf IO a)
   deriving newtype (Functor, Applicative, Monad, MonadFail, MonadIO, MonadReader HConf, MonadThrow, MonadUnliftIO)
+  deriving newtype (MonadCatch, MonadMask)
   deriving (Semigroup, Monoid) via Ap H a
+
+instance MonadLogger H where
+  monadLoggerLog loc src lvl msg = do
+    f <- asks _logFunc
+    io $ f loc src lvl $ toLogStr msg
+instance MonadLoggerIO H where
+  askLoggerIO = asks _logFunc
 
 newtype HS a = HS (ReaderT HConf (StateT HState IO) a)
   deriving newtype (Functor, Applicative, Monad, MonadFail, MonadIO, MonadState HState, MonadReader HConf, MonadThrow)
+  deriving newtype (MonadCatch, MonadMask)
   deriving (Semigroup, Monoid) via Ap HS a
+
+instance MonadLogger HS where
+  monadLoggerLog loc src lvl msg = do
+    f <- asks _logFunc
+    io $ f loc src lvl $ toLogStr msg
+instance MonadLoggerIO HS where
+  askLoggerIO = asks _logFunc
 
 -- | The read-only window manager state.
 data HConf = HConf
@@ -303,7 +319,7 @@ data HConf = HConf
     -- | The Wayland display pointer
     _display :: !WL.Display,
     -- | Root logger function.
-    _logFunc :: !LogFunc,
+    _logFunc :: !(Loc -> LogSource -> LogLevel -> LogStr -> IO ()),
     -- | The global objects available through wl_registry.
     globals :: !(IORef RegistryCache),
     -- | The 'HState' XXX FIXME
@@ -335,8 +351,11 @@ data HState = HState
 instance HasGlobalTMap HConf where
   globalTMap = lens globalTypeMap (\s a -> s {globalTypeMap = a})
 
-instance HasLogFunc HConf where
-  logFuncL = lens _logFunc (\s a -> s {_logFunc = a})
+instance HasGlobalsRegistry HConf where
+  globalsRegistryL = lens globals (\s a -> s { globals = a })
+
+-- instance HasLogFunc HConf where
+--   logFuncL = lens _logFunc (\s a -> s {_logFunc = a})
 
 instance Default (H ()) where def = return ()
 
@@ -434,7 +453,7 @@ data Seat = Seat
     -- TODO: review below
     removed :: Bool,
     focused, hovered, interacted :: RiverWindow,
-    suppressChangeFocus :: Bool
+    suppressChangeFocus :: !Int
   }
   deriving (Show, Generic)
 
@@ -451,6 +470,8 @@ data SeatAction
     S_INPUT_OVERRIDE (HS Bool) [((ModMask, KeySym), SomeAction H)]
   | -- | Cancel input override mode
     S_INPUT_OVERRIDE_CANCEL
+  | -- | A key bind autorepeat is in progress.
+    S_KEYBIND_REPEAT R.RiverXkbBinding (Async ())
   deriving (Show, Generic)
 
 data SeatOp
@@ -495,7 +516,7 @@ instance Default Seat where
         pending_action = S_NONE,
         submap_pending = Nothing,
         river_layer_shell_seat = R.RiverLayerShellSeat nullPtr,
-        suppressChangeFocus = False
+        suppressChangeFocus = 0
       }
 
 -- ** Outputs
@@ -559,11 +580,12 @@ instance (MonadIO m) => Show (SomeAction m) where
   show x = case x of
     SomeAction (val :: (IsAction m a) => a) -> actionDescription (Proxy :: Proxy m) val
 
-instance (MonadIO m) => Display (SomeAction m) where
-  textDisplay = tshow
-
 ---------------------------------------------------------
 -- Orphan instances
+
+instance Show (Async a) where
+  show :: Async a -> String
+  show _ = "<Async>"
 
 instance Show (StablePtr a) where
   show :: StablePtr a -> String

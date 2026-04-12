@@ -20,6 +20,8 @@ common deps
     hswm,
     text,
     rio,
+    monad-logger-aeson,
+    containers,
 
   pkgconfig-depends: gtk+-3.0
 

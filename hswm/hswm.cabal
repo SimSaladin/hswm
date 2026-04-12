@@ -138,10 +138,14 @@ library hswm-prelude
     build-depends:
           base >=4.21.0 && <4.22
         , data-default
+        , exceptions
+        , monad-logger-aeson
         , mtl
         , rio
         , stm
         , text
+        , unliftio
+        , unliftio-core
     default-language: GHC2024
 
 executable hswm
@@ -168,7 +172,7 @@ executable hswm
           DeriveAnyClass
           PackageImports
           QuantifiedConstraints
-    ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -threaded
+    ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -threaded -rtsopts "-with-rtsopts=-maxN4 -qn2 -A8M -K64M -M1G -kc8k"
 
 executable hswmctl
     main-is: Main.hs

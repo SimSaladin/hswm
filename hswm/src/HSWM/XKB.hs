@@ -26,4 +26,5 @@ class IsKeySym a where
 
 instance IsKeySym KeySym where toKeySym = id
 
+-- | NOTE: this throws impure exception on invalid keysym names!
 instance IsKeySym String where toKeySym = xkbKeysymFromName

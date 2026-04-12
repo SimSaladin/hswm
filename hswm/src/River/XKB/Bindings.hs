@@ -1,7 +1,3 @@
-------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------
-
 -- |
 -- Module      : River.XKB.Bindings
 -- Description : Short description
@@ -29,12 +25,13 @@ data XkbBinding a = XkbBinding
   { xkb_binding :: R.RiverXkbBinding,
     river_seat :: R.RiverSeat,
     action :: a,
-    subKeymap :: XkbBindingMap a
+    subKeymap :: XkbBindingMap a,
+    autorepeat :: Bool
   }
   deriving (Generic)
 
 createXkbBindings ::
-  (MonadReader env m, HasLogFunc env, MonadIO m, Show a) =>
+  (MonadReader env m, MonadLogger m, MonadIO m, Show a) =>
   (R.RiverXkbBindings, R.RiverXkbBindingListener, R.RiverSeat) ->
   -- | 'actionSubmap' - get subkeys
   (a -> [((ModMask, KeySym), a)]) ->
@@ -49,7 +46,7 @@ createXkbBindings (a1, a2, a3) getSub keys = sequence top
     create1 enable (m, k) = newXKBBinding a1 a2 a3 enable m k
 
 newXKBBinding ::
-  (MonadReader env m, HasLogFunc env, MonadIO m, Show action) =>
+  (MonadReader env m, MonadLogger m, MonadIO m, Show action) =>
   R.RiverXkbBindings ->
   R.RiverXkbBindingListener ->
   R.RiverSeat ->
@@ -63,13 +60,14 @@ newXKBBinding ::
   XkbBindingMap action ->
   m (StablePtr (XkbBinding action))
 newXKBBinding xkbBinds xkb_binding_listener seat enable mods keysym action subKM = do
-  logDebug $ "[keys] binding key: " <> fromString (ppXkbModsKey mods keysym) <> " " <> fromString (show action)
+  logDebug $ "new xkb binding" :# [ "key" .= ppXkbModsKey mods keysym,  "action" .= show action ]
   xb <- io $ R.riverXkbBindingsGetXkbBinding xkbBinds seat (fi keysym) (fi mods)
   -- subP <- io $ newStablePtr subKM
-  dtPtr <- io $ newStablePtr $ XkbBinding xb seat action subKM
+  dtPtr <- io $ newStablePtr $ XkbBinding xb seat action subKM autorepeat
   _ <- io $ R.listenerAdd xb xkb_binding_listener (castPtr $ castStablePtrToPtr dtPtr)
   when enable $ io $ R.riverXkbBindingEnable xb
   return dtPtr
+    where autorepeat = False -- XXX : breaks GrabKeyboard repeating...
 
 destroyXKBBinding :: (MonadIO m) => StablePtr (XkbBinding a) -> m ()
 destroyXKBBinding sptr = do

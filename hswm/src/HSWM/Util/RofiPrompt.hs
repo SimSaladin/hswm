@@ -36,7 +36,7 @@ data RofiPromptConfig
   }
   deriving (Show, Read, Generic, Data, Default)
 
-type MonadRofi env m = (MonadUnliftIO m, MonadReader env m, HasLogFunc env)
+type MonadRofi env m = (MonadUnliftIO m, MonadReader env m, MonadLogger m)
 
 rofiRun :: (MonadRofi env m) => RofiPromptConfig -> [String] -> m (Maybe String)
 rofiRun pcfg input = do
@@ -68,3 +68,13 @@ toRofiArgs RofiPromptConfig {..} =
       ++ [["-format", _format] | _format /= ""]
       ++ [["-no-custom"] | _noCustom]
       ++ [["-markup-rows"] | _markupRows]
+
+runWithSystemD :: MonadRofi env m => String -> m ()
+runWithSystemD cmd = void $ readProcess $ proc "systemd-run" ["--user", "--no-block", "--collect", "--", "bash", "-c", cmd ]
+
+
+promptRofi :: MonadRofi env m => String -> [String] -> m (Maybe String)
+promptRofi prompt input = rofiRun def { _prompt = prompt, _dmenu = True } input
+
+(++>) :: Monad m => m (Maybe String) -> (String -> m ()) -> m ()
+ma ++> f = ma >>= flip whenJust f

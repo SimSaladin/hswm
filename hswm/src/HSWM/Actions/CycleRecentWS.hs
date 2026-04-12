@@ -125,7 +125,7 @@ cycleWindowSets ::
 cycleWindowSets genOptions holdMods keyNext keyPrev = do
   (options, unView') <- runInHS $ gets $ (genOptions &&& unView) . windowset
   let previewWS i = do
-        logInfo $ "[cyclews] previewing " <> fromString (show i)
+        logInfo $ "[cyclews] preview" :# [ "id" .= i ]
         runInHS $ windows (view (options !! (i `mod` n)) . unView')
         manageDirty
         where

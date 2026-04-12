@@ -1,9 +1,5 @@
 {-# LANGUAGE PatternSynonyms #-}
 
-------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------
-
 -- |
 -- Module      : River.WMP
 -- Description : Short description
@@ -29,6 +25,10 @@ import Foreign.Storable.Generic (GStorable (..))
 import HSWM.XKB
 import Bindings.River qualified as R
 import Bindings.RiverSafe qualified as R
+
+data RiverColor = RiverColor {red, green, blue, alpha :: !Word32}
+  deriving (Show, Read, Eq, Generic)
+  deriving (Default)
 
 type WindowEdges = R.River_window_v1_edges
 
@@ -79,6 +79,9 @@ invalidWindow = R.RiverWindow nullPtr
 invalidSeat :: R.RiverSeat
 invalidSeat = R.RiverSeat nullPtr
 
+setNodePosition :: (MonadIO m) => R.RiverNode -> Int32 -> Int32 -> m ()
+setNodePosition n x y = io $ R.riverNodeSetPosition n x y
+
 ppXkbModsKey :: Modifiers -> KeySym -> String
 ppXkbModsKey m ksym =
   L.intercalate "+" $
@@ -95,9 +98,6 @@ ppXkbModsKey m ksym =
     ]
       ++ [xkbKeysymGetName ksym]
 
-setNodePosition :: (MonadIO m) => R.RiverNode -> Int32 -> Int32 -> m ()
-setNodePosition n x y = liftIO $ R.riverNodeSetPosition n x y
-
 -- * Pointer Binds
 
 data PointerBinding a = PointerBinding
@@ -110,7 +110,7 @@ data PointerBinding a = PointerBinding
 instance GStorable (PointerBinding ())
 
 newPointerBinding ::
-  (MonadReader env m, HasLogFunc env, MonadIO m, Show a, Display a) =>
+  (MonadLogger m, MonadIO m, Show a) =>
   R.RiverPointerBindingListener ->
   R.RiverSeat ->
   Modifiers ->
@@ -118,7 +118,7 @@ newPointerBinding ::
   a ->
   m (StablePtr (PointerBinding a))
 newPointerBinding pointerBindingListener seat mods btn action = do
-  log' $ "[pointer] binding button: " <> fromString (ppXkbModsKey mods btn) <> " " <> display action
+  logInfo $ "new pointer binding" :# [ "key" .= ppXkbModsKey mods btn, "action" .= show action ]
   pb' <- io $ R.riverSeatGetPointerBinding seat (fi btn) (fi mods)
   dtPtr <- io $ newStablePtr $ PointerBinding pb' seat action
   io $ R.listenerAdd pb' pointerBindingListener (castPtr $ castStablePtrToPtr dtPtr)

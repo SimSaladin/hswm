@@ -72,37 +72,37 @@ library
           Bindings.Pixman.Generated.Safe
           Bindings.Pixman.Generated.Unsafe
           Bindings.River
-          Bindings.River.InputManagement
+          Bindings.River.InputManagementV1
           Bindings.River.InputManagementV1.Generated
           Bindings.River.InputManagementV1.Generated.FunPtr
           Bindings.River.InputManagementV1.Generated.Global
           Bindings.River.InputManagementV1.Generated.Safe
           Bindings.River.InputManagementV1.Generated.Unsafe
-          Bindings.River.LayerShell
+          Bindings.River.LayerShellV1
           Bindings.River.LayerShellV1.Generated
           Bindings.River.LayerShellV1.Generated.FunPtr
           Bindings.River.LayerShellV1.Generated.Global
           Bindings.River.LayerShellV1.Generated.Safe
           Bindings.River.LayerShellV1.Generated.Unsafe
-          Bindings.River.LibinputConfig
+          Bindings.River.LibinputConfigV1
           Bindings.River.LibinputConfigV1.Generated
           Bindings.River.LibinputConfigV1.Generated.FunPtr
           Bindings.River.LibinputConfigV1.Generated.Global
           Bindings.River.LibinputConfigV1.Generated.Safe
           Bindings.River.LibinputConfigV1.Generated.Unsafe
-          Bindings.River.WindowManagement
+          Bindings.River.WindowManagementV1
           Bindings.River.WindowManagementV1.Generated
           Bindings.River.WindowManagementV1.Generated.FunPtr
           Bindings.River.WindowManagementV1.Generated.Global
           Bindings.River.WindowManagementV1.Generated.Safe
           Bindings.River.WindowManagementV1.Generated.Unsafe
-          Bindings.River.XkbBindings
+          Bindings.River.XkbBindingsV1
           Bindings.River.XkbBindingsV1.Generated
           Bindings.River.XkbBindingsV1.Generated.FunPtr
           Bindings.River.XkbBindingsV1.Generated.Global
           Bindings.River.XkbBindingsV1.Generated.Safe
           Bindings.River.XkbBindingsV1.Generated.Unsafe
-          Bindings.River.XkbConfig
+          Bindings.River.XkbConfigV1
           Bindings.River.XkbConfigV1.Generated
           Bindings.River.XkbConfigV1.Generated.FunPtr
           Bindings.River.XkbConfigV1.Generated.Global

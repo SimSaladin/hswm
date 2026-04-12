@@ -9,19 +9,20 @@
 --
 ------------------------------------------------------------------------------
 module Bindings.River
-  ( module Bindings.River.WindowManagement
-  , module Bindings.River.LayerShell
-  , module Bindings.River.XkbConfig
-  , module Bindings.River.XkbBindings
-  , module Bindings.River.InputManagement
-  , module Bindings.River.LibinputConfig
+  ( module Bindings.River.WindowManagementV1
+  , module Bindings.River.LayerShellV1
+  , module Bindings.River.XkbConfigV1
+  , module Bindings.River.XkbBindingsV1
+  , module Bindings.River.InputManagementV1
+  , module Bindings.River.LibinputConfigV1
   , module Bindings.Wayland.Internal.Types
   ) where
 
-import Bindings.River.WindowManagement
-import Bindings.River.XkbConfig
-import Bindings.River.LayerShell
-import Bindings.River.XkbBindings
-import Bindings.River.InputManagement
-import Bindings.River.LibinputConfig
+import Bindings.River.WindowManagementV1
+import Bindings.River.XkbConfigV1
+import Bindings.River.LayerShellV1
+import Bindings.River.XkbBindingsV1
+import Bindings.River.InputManagementV1
+import Bindings.River.LibinputConfigV1
+
 import Bindings.Wayland.Internal.Types

@@ -1,7 +1,3 @@
-------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------
-
 -- |
 -- Module      : HSWM.Utils
 -- Description : Short description
@@ -90,7 +86,7 @@ resolveModMask d s = go s
       "m5" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD5
       _ -> error $ "unrecognized modifier: " ++ s
 
-logTraceShow :: (MonadIO m, MonadReader env m, HasLogFunc env, Show show) => show -> m ()
+logTraceShow :: (MonadIO m, MonadReader env m, MonadLogger m, Show show) => show -> m ()
 logTraceShow x =
   logDebug $
     display $
@@ -100,7 +96,8 @@ logTraceShow x =
             P.outputOptionsCompact = True,
             P.outputOptionsCompactParens = True,
             P.outputOptionsInitialIndent = 0,
-            P.outputOptionsColorOptions = Just P.defaultColorOptionsDarkBg
+            -- P.outputOptionsColorOptions = Just P.defaultColorOptionsDarkBg
+            P.outputOptionsColorOptions = Nothing
           }
         x
 
@@ -112,8 +109,9 @@ pTrace =
       { P.outputOptionsPageWidth = 380,
         P.outputOptionsCompact = True,
         P.outputOptionsCompactParens = True,
-        P.outputOptionsInitialIndent = 4,
-        P.outputOptionsColorOptions = Just P.defaultColorOptionsDarkBg
+        --P.outputOptionsInitialIndent = 4,
+        --P.outputOptionsColorOptions = Just P.defaultColorOptionsDarkBg
+        P.outputOptionsColorOptions = Nothing
       }
     stderr
 
@@ -291,3 +289,23 @@ readProcess cmd args = do
   out <- atomically $ getStdout p
   _ <- try @_ @SomeException $ stopProcess p
   return $ L.init $ C8.unpack $ LB.toStrict out
+
+
+-- | Solarized palette
+colBase03, colBase02, colBase01, colBase00, colBase0, colBase1, colBase2, colBase3, colYellow, colOrange, colRed, colMagenta, colViolet, colBlue, colCyan, colGreen :: String
+colBase03 = "0x002b36" -- "#002b36"
+colBase02 = "0x073642" -- "#073642"
+colBase01 = "0x586e75" -- "#586e75"
+colBase00 = "0x657b83" -- "#657b83"
+colBase0 = "0x839496" -- "#839496"
+colBase1 = "0x93a1a1" -- "#93a1a1"
+colBase2 = "0xeee8d5" -- "#eee8d5"
+colBase3 = "0xfdf6e3" -- "#fdf6e3"
+colYellow = "0xb58900" -- "#b58900"
+colOrange = "0xcb4b16" -- "#cb4b16"
+colRed = "0xdc322f" -- "#dc322f"
+colMagenta = "0xd33682" -- "#d33682"
+colViolet = "0x6c71c4" -- "#6c71c4"
+colBlue = "0x268bd2" -- "#268bd2"
+colCyan = "0x2aa198" -- "#2aa198"
+colGreen = "0x859900" -- "#859900"

@@ -36,7 +36,7 @@ main =
     addKeys (fromADTKeys $ parseSubmaps myKeys) $
       WB.waybarSB def $
         HSWM.Wallpaper.usingWallpaper
-          HSWM.Wallpaper.Config {filepath = "/home/sim/wallpaper.png"}
+          HSWM.Wallpaper.WallpaperConfig {filepath = "/home/sim/wallpaper.png"}
           (def @(HSWMConfig H Full))
             { layoutHook = myLayoutHook,
               handleEventHook = debugHook,
@@ -71,13 +71,16 @@ myScratchpads =
     mhd = doRFRR 0.2 0.1 0.6 0.6
     doRFRR x y w h = doRectFloat (W.RationalRect x y w h)
 
+rofiRun :: [String] -> H ()
+rofiRun args = void $ spawnProcess "rofi" args
+
 rofiPrompt :: RP.RofiPromptConfig
 rofiPrompt =
   def
     { RP._dmenu = True,
       RP._prompt = "Choose thing",
-      RP._markupRows = True,
-      RP._dpi = 150
+      RP._markupRows = True
+   --   RP._dpi = 150 -- for X
     }
 
 environPrompt :: H ()
@@ -90,7 +93,7 @@ environPrompt = do
   RP.rofiRun rofiPrompt {RP._format = "p"} rows >>= (`whenJust` doApply)
   where
     doApply input = do
-      logInfo $ "environ prompt: " <> fromString input
+      logInfo $ "environ prompt" :# [ "input" .= input ]
 
     parseLine :: String -> (String, String)
     parseLine line =
@@ -103,15 +106,6 @@ cycleRecentHiddenWS :: [KeySym] -> KeySym -> KeySym -> H ()
 cycleRecentHiddenWS =
   CycleRecentWS.cycleWindowSets $ \wset ->
     [W.tag ws | ws <- W.hidden wset ++ [W.workspace (W.current wset)]]
-
-mkWorkspacePrompt :: (RP.RofiPromptConfig -> WorkspaceId -> RP.RofiPromptConfig) -> (WorkspaceId -> String -> H a) -> H ()
-mkWorkspacePrompt prompt apply = do
-  (curTag, allTags) <- runInHS $ withWindowSet $ return . (W.currentTag &&& W.allTags)
-  RP.rofiRun (prompt rofiPrompt curTag) allTags >>= (`whenJust` doApply curTag)
-  where
-    doApply cur input = do
-      _ <- apply cur input
-      asks (logHook . config) >>= void . userCode
 
 windowPrompt :: H ()
 windowPrompt = do
@@ -126,6 +120,16 @@ windowPrompt = do
     doApply input = do
       logInfo $ fromString input
       return ()
+      -- TODO
+
+mkWorkspacePrompt :: (RP.RofiPromptConfig -> WorkspaceId -> RP.RofiPromptConfig) -> (WorkspaceId -> String -> H a) -> H ()
+mkWorkspacePrompt prompt apply = do
+  (curTag, allTags) <- runInHS $ withWindowSet $ return . (W.currentTag &&& W.allTags)
+  RP.rofiRun (prompt rofiPrompt curTag) allTags >>= (`whenJust` doApply curTag)
+  where
+    doApply cur input = do
+      _ <- apply cur input
+      asks (logHook . config) >>= void . userCode
 
 renameWorkspacePrompt :: H ()
 renameWorkspacePrompt = do
@@ -144,7 +148,7 @@ addWorkspacePrompt =
     (\p _ -> p {RP._prompt = "Add workspace"})
     ( \_ input -> do
         runInHS $ do
-          modifySeats (const True) $ \s -> s { suppressChangeFocus = True }
+          modifySeats (const True) $ \s -> s { suppressChangeFocus = 2 }
           DynWS.addWorkspace input
         manageDirty
     )
@@ -173,7 +177,7 @@ myKeys :: [(String, SomeAction H)]
 myKeys =
   -- ====== Core ==========
   [ ("M-S-c", "Close the focused window" $?$?= withFocused manageKill),
-    ("M-S-q", "Restart WM" $?$?= sendRestart),
+    ("M-S-q", "Restart WM" $?$?= sendRestart @H),
     ("M-Return", "New terminal window" $?$?= SomeAction @H (LaunchProgram "kitty" [])), -- Terminal
     ("M-Escape", "Print debug stack" $?$?= debugAction),
     ("M-Dollar", "Lock session" $?$?= void (spawnProcess @H "swaylock" ["-k"])),
@@ -185,11 +189,9 @@ myKeys =
     -- "M-<Print>"     takeScreenshot
 
     -- ======== Execute ==========
-    ("M-r r", "Prompt: run command" $?$?= launchRofi ["-modes", "run", "-show", "run"]),
-    -- "M-r S-r"          >+ spawnPrompt xpConfig "Execute (T)"       ((\c -> spawnDialog' $ program (head c) (tail c)) . words) ? "Execute (Prompt)"
-    -- "M-r M-r"          >+ spawnPrompt xpConfig "Execute (direct)"  (spawn . shell) ? "Execute (direct sh)"
-    -- "M-r <Return>"     >+ spawnPrompt xpConfig "Execute shell"     (spawn . shell) ? "Execute shell (Prompt)"
-    -- "M-r S-<Return>"   >+ spawnPrompt xpConfig "Execute shell (T)" (spawnDialog' . shell) ? "Execute shell in terminal (Prompt)"
+    ("M-r r", "Run shell (prompt)" $?$?= rofiRun ["-modes", "run", "-show", "run"]),
+    ("M-r d", "Run desktop app (prompt)" $?$?= rofiRun ["-modes", "drun", "-show", "drun"]),
+    ("M-r s", "Run via systemd-run (prompt)" $?$?= (RP.promptRofi @_ @H "systemd-run:" [] RP.++> RP.runWithSystemD)),
     -- "M-r c"            >+ spawn "clipmenu" ["-p", "clipmenu", "-i"] ? "clipmenu"
     -- "M-r b"            >+ spawnDialog "bluetoothctl" ? "bluetoothctl"
     -- "M-r m"            >+ spawn "xmag" ["-mag","2","-source","960x540"] ? "xmag"
@@ -347,9 +349,6 @@ dvpMyLayout =
       options = "terminate:ctrl_alt_bksp,compose:rctrl-altgr,lv3:ralt_switch,lv3:menu_switch"
     }
 
-launchRofi :: [String] -> SomeAction H
-launchRofi args = SomeAction $ LaunchProgram "rofi" (["-dpi", "150"] ++ args)
-
 pactl :: [String] -> SomeAction H
 pactl args = unwords ("[PULSE]" : args) $?$?= void (spawnProcess @H "pactl" args)
 
@@ -365,28 +364,10 @@ toggleMuteSource = pactl ["set-source-mute", "@DEFAULT_SOURCE@", "toggle"]
 toggleMuteSink :: SomeAction H
 toggleMuteSink = pactl ["set-sink-mute", "@DEFAULT_SINK@", "toggle"]
 
-------------------------------------------------------
-
--- | Solarized palette
-colBase03, colBase02, colBase01, colBase00, colBase0, colBase1, colBase2, colBase3, colYellow, colOrange, colRed, colMagenta, colViolet, colBlue, colCyan, colGreen :: String
-colBase03 = "0x002b36" -- "#002b36"
-colBase02 = "0x073642" -- "#073642"
-colBase01 = "0x586e75" -- "#586e75"
-colBase00 = "0x657b83" -- "#657b83"
-colBase0 = "0x839496" -- "#839496"
-colBase1 = "0x93a1a1" -- "#93a1a1"
-colBase2 = "0xeee8d5" -- "#eee8d5"
-colBase3 = "0xfdf6e3" -- "#fdf6e3"
-colYellow = "0xb58900" -- "#b58900"
-colOrange = "0xcb4b16" -- "#cb4b16"
-colRed = "0xdc322f" -- "#dc322f"
-colMagenta = "0xd33682" -- "#d33682"
-colViolet = "0x6c71c4" -- "#6c71c4"
-colBlue = "0x268bd2" -- "#268bd2"
-colCyan = "0x2aa198" -- "#2aa198"
-colGreen = "0x859900" -- "#859900"
-
 -- * Utilities
+
+($?$?=) :: (IsKeyAction a) => String -> a -> SomeAction H
+desc $?$?= action = toKeyAction desc action
 
 class IsKeyAction a where
   toKeyAction :: String -> a -> SomeAction H
@@ -398,6 +379,3 @@ instance {-# OVERLAPPABLE #-} IsKeyAction (HS ()) where toKeyAction = namedAS
 instance {-# OVERLAPPABLE #-} IsKeyAction (SomeAction H) where toKeyAction d a = SomeAction $ NamedAction d a
 
 instance {-# OVERLAPPABLE #-} (Message a, Show a) => IsKeyAction a where toKeyAction d a = SomeAction $ NamedActionHS (d ++ show a) (sendMessage a)
-
-($?$?=) :: (IsKeyAction a) => String -> a -> SomeAction H
-desc $?$?= action = toKeyAction desc action

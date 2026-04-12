@@ -2,50 +2,48 @@
 
 module HSWM.Prelude
   ( module RIO,
+    module Control.Monad.Logger.Aeson,
+    module Control.Monad.IO.Unlift,
     module BasePrelude,
+    module UnliftIO.IO,
+    module UnliftIO,
+    module Control.Monad.Catch,
     toText,
     io,
     fi,
     whenJust,
     log',
-    debug',
-    warn',
+    display
   )
 where
 
--- import           "base" Data.Functor as BasePrelude ((<&>))
--- import           "base" Data.Maybe as BasePrelude
+import RIO.Prelude as RIO
+import RIO.Prelude.Simple as RIO
+import RIO.Prelude.Types as RIO
+import RIO.Lens as RIO
+import RIO (Lens', view, ExitCode, exitFailure, exitSuccess, threadDelay)
 
--- import           "base" Text.Printf as BasePrelude
+import UnliftIO
+import UnliftIO.IO
+import Control.Monad.IO.Unlift
 
--- import           Control.Concurrent as BasePrelude
--- import           Control.Concurrent.STM as BasePrelude
--- import           Control.Exception as BasePrelude
--- import           Control.Logging as BasePrelude
--- import           Control.Monad.Reader as BasePrelude
-
--- import           Data.Text as BasePrelude (Text)
-
--- import           Data.Typeable as BasePrelude (Typeable)
--- import           Foreign as BasePrelude (Int32)
-
--- import           GHC.Generics as BasePrelude (Generic)
-
-import Control.Concurrent as BasePrelude (forkFinally, forkIO, killThread)
-import Control.Concurrent.STM as BasePrelude (flushTQueue)
-import Control.Monad.State as BasePrelude (MonadState, gets, modify)
-import Data.Default as BasePrelude
-import Data.Text qualified as T
-import Foreign.C.ConstPtr as BasePrelude
-import RIO
-import Text.Read as BasePrelude (reads)
+import "base" Text.Read as BasePrelude (reads)
 import "base" Data.List as BasePrelude (zip3)
 import "base" Data.Monoid as BasePrelude (Any (..), Endo (..))
 import "base" Data.Semigroup as BasePrelude (All (..))
 import "base" Prelude as BasePrelude (scanl, until)
+import "base" Control.Concurrent as BasePrelude (forkFinally, forkIO, killThread)
+import "base" Foreign.C.ConstPtr as BasePrelude
+import "data-default" Data.Default as BasePrelude
+import "stm" Control.Concurrent.STM as BasePrelude (flushTQueue)
+import "mtl" Control.Monad.State as BasePrelude (MonadState, gets, modify)
 
--- tshow :: Show a => a -> T.Text
--- tshow = T.pack . show
+import "text" Data.Text qualified as T
+
+import "exceptions" Control.Monad.Catch (MonadCatch, MonadMask, throwM)
+
+import Control.Monad.Logger.Aeson hiding (Message)
+import Control.Monad.Logger.Aeson as LA (Message)
 
 toText :: String -> T.Text
 toText = T.pack
@@ -60,11 +58,9 @@ fi = fromIntegral
 whenJust :: (Monad m) => Maybe a -> (a -> m ()) -> m ()
 whenJust mg f = maybe (return ()) f mg
 
-log' :: (MonadIO m, MonadReader env m, HasLogFunc env) => Utf8Builder -> m ()
+log' :: MonadLogger m => LA.Message -> m ()
 log' = logInfo
 
-debug' :: (MonadIO m, MonadReader env m, HasLogFunc env) => Utf8Builder -> m ()
-debug' = logDebug
-
-warn' :: (MonadIO m, MonadReader env m, HasLogFunc env) => Utf8Builder -> m ()
-warn' = logWarn
+-- XXX temp glue code..
+display :: (Show a, IsString b) => a -> b
+display = fromString . show

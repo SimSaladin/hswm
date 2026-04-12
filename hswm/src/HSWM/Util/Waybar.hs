@@ -49,7 +49,7 @@ waybarStartupHook _ = do
   let errh = getStderr process
   _ <- async $ forever $ do
     ln <- io $ hGetLine errh
-    logInfo $ "[waybar] " <> fromString ln
+    logInfo $ fromString ln :# [ "process" .= "waybar" ]
   -- pid <- spawnProcess "waybar" [ "-l", "debug" ]
   putObject st {wbProcess = Just process}
 

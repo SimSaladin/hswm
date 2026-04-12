@@ -1,18 +1,18 @@
 -- |
--- Module      : River.XkbConfig
+-- Module      : Bindings.River.XkbConfigV1
 -- Description : Short description
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
-module Bindings.River.XkbConfig where
+module Bindings.River.XkbConfigV1 where
 
 import Bindings.River.XkbConfigV1.Generated
 import Bindings.River.XkbConfigV1.Generated.Global
 import Bindings.River.XkbConfigV1.Generated.Safe
 
-import Bindings.River.InputManagement
+import Bindings.River.InputManagementV1
 
 import Bindings.Wayland.Internal.TH
 import Language.Haskell.TH

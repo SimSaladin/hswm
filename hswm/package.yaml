@@ -48,6 +48,10 @@ internal-libraries:
       - mtl
       - data-default
       - stm
+      - monad-logger-aeson
+      - unliftio-core
+      - unliftio
+      - exceptions
 
 library:
   <<: *language
@@ -106,6 +110,9 @@ executables:
     ghc-options:
       - *common-ghc-options
       - -threaded
+      #- -pie
+      #- -fPIC
+      - -rtsopts "-with-rtsopts=-maxN4 -qn2 -A8M -K64M -M1G -kc8k"
 
   hswmctl:
     <<: *language

@@ -1,9 +1,5 @@
 {-# OPTIONS_GHC -Wno-type-defaults #-}
 
-------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------
-
 -- |
 -- Module      : HSWM.Util.Debug
 -- Description : Short description
@@ -21,40 +17,36 @@ import Bindings.River qualified as R
 import Text.Printf
 import Bindings.Wayland.Client qualified as WL
 import Bindings.Wayland.Protocol.ForeignTopLevelListV1 as WL
+import qualified Data.Aeson as A
+
+logEvent ev = logDebug (fromString $ "EVENT " ++ show ev) >> mempty
 
 debugHook :: Event -> H All
 debugHook ev
   | WindowManagerEvent R.RiverWindowManagerManageStart {} <- ev = mempty
   | WindowManagerEvent R.RiverWindowManagerRenderStart {} <- ev = mempty
-  | WindowManagerEvent e <- ev = logTraceShow e >> mempty
-  | XkbKeyboardEvent e <- ev = logTraceShow e >> mempty
-  | XkbEvent (R.RiverXkbBindingPressed dt _) <- ev = do
+  | WindowManagerEvent e <- ev = logEvent e
+  | XkbKeyboardEvent e <- ev = logEvent e
+  | XkbEvent (R.RiverXkbBindingPressed dt self) <- ev = do
       (xb :: XkbBinding (SomeAction H)) <- liftIO $ deRefStablePtr (castPtrToStablePtr $ castPtr dt)
-      logDebug $ display $ toText $ printf "[EH] KEY PRESS ev=%s action=%s" (show ev) (show xb.action)
-      logTraceShow ev
+      logDebug $ "KEY PRESS" :# [ "ev" .= show ev, "action" .= show xb.action,  "ptr" .= show self ]
       mempty
   | SeatEvent R.RiverSeatPointerPosition {} <- ev = mempty
-  | SeatEvent e <- ev = logTraceShow e >> mempty
-  | OutputEvent e <- ev = logTraceShow e >> mempty
+  | SeatEvent e <- ev = logEvent e
+  | OutputEvent e <- ev = logEvent e
   | WindowEvent R.RiverWindowDimensions {} <- ev = mempty
-  | WindowEvent e <- ev = logTraceShow e >> mempty
+  | WindowEvent e <- ev = logEvent e
   -- WL_*
-  | WlOutputEvent _ <- ev = logTraceShow ev >> mempty -- pTrace e >> mempty
-  | WlShmEvent (WL.ShmFormat _ _ fmt) <- ev = log' (display (toText $ "shm format: " ++ ppShmFormat (WL.Wl_shm_format $ fi fmt))) >> mempty
-  | WlSeatEvent e <- ev = logTraceShow e >> mempty
+  | WlOutputEvent _ <- ev = logEvent ev
+  | WlShmEvent (WL.ShmFormat _ _ fmt) <- ev = logInfo (fromString ("SHM FORMAT: " <> ppShmFormat (WL.Wl_shm_format $ fi fmt))) >> mempty
+  | WlSeatEvent e <- ev = logEvent e
   -- Ext_*
-  | ForeignTopLevelHandleV1 e <- ev = do
-      case e of
-        WL.ForeignToplevelHandleTitle _ _ s -> logTraceShow (e, s)
-        WL.ForeignToplevelHandleIdentifier _ _ s -> logTraceShow (e, s)
-        WL.ForeignToplevelHandleAppId _ _ s -> logTraceShow (e, s)
-        _ -> return ()
-      mempty
-  | otherwise = logTraceShow ev >> mempty
+  | ForeignTopLevelHandleV1 e <- ev = logEvent e
+  | otherwise = logEvent ev
 
 debugAction :: H ()
 debugAction = runInHS $ do
-  logDebug "[[[ Windows ]]]" >> gets _windows >>= mapM_ logTraceShow . M.elems
+  logDebug "[[[ Windows ]]]" >> gets _windows  >>= mapM_ logTraceShow . M.elems
   logDebug "[[[WindowSet]]]" >> gets windowset >>= logTraceShow
-  logDebug "[[[ Outputs ]]]" >> gets _outputs >>= mapM_ logTraceShow
-  logDebug "[[[  Seats  ]]]" >> gets _seats >>= mapM_ logTraceShow
+  logDebug "[[[ Outputs ]]]" >> gets _outputs  >>= mapM_ logTraceShow
+  logDebug "[[[  Seats  ]]]" >> gets _seats    >>= mapM_ logTraceShow

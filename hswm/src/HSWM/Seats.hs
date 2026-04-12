@@ -1,8 +1,5 @@
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE OverloadedLabels #-}
 {-# OPTIONS_GHC -Wno-ambiguous-fields #-}
-
-------------------------------------------------------------------------------
 
 -- |
 -- Module      : HSWM.Seats
@@ -15,8 +12,6 @@
 --
 -- Seat management
 module HSWM.Seats where
-
--- import qualified HSWM.StackSet as W
 
 import Data.Bits
 import Data.List qualified as L
@@ -93,8 +88,8 @@ handleEvent e = do
       when (sm.seat_lshell_focus == FocusNone) $ do
         runInHS $ modifySeat seat $ \s -> s {hovered = window}
         -- focus follow mouse
-        runInHS $ withSeat seat $ \s ->
-          unless s.suppressChangeFocus $ modifyWindowSet $ W.focusWindow window
+    --  runInHS $ withSeat seat $ \s ->
+    --    unless s.suppressChangeFocus $ modifyWindowSet $ W.focusWindow window
     R.RiverSeatPointerLeave _ seat ->
       runInHS $ modifySeat seat $ \s -> s {hovered = invalidWindow}
     R.RiverSeatWindowInteraction _ seat window ->
@@ -151,12 +146,20 @@ handleLayerShellSeat e = do
   putObject sm {seat_lshell_focus = newFocus}
 
 handleXkbBindingEvent :: R.RiverXkbBindingEvent -> H ()
-handleXkbBindingEvent ev = do
-  case ev of
-    R.RiverXkbBindingPressed dt _ -> do
-      xb <- io $ deRefStablePtr (castPtrToStablePtr (castPtr dt) :: StablePtr (XkbBinding (SomeAction H)))
-      execXkbBinding xb
-    _ -> return ()
+handleXkbBindingEvent = \case
+    R.RiverXkbBindingPressed dt ptr -> do
+     xb <- io $ deRefStablePtr (castPtrToStablePtr (castPtr dt) :: StablePtr (XkbBinding (SomeAction H)))
+     execXkbBinding ptr xb
+
+    R.RiverXkbBindingReleased dt ptr -> do
+     xb <- io $ deRefStablePtr (castPtrToStablePtr (castPtr dt) :: StablePtr (XkbBinding (SomeAction H)))
+     runInHS $ withSeat xb.river_seat $ \s -> case s.pending_action of
+        S_KEYBIND_REPEAT kb as | kb == ptr -> do
+            cancel as
+            modifySeat s.river_seat $ \x -> x { pending_action = S_NONE }
+        _ -> return ()
+
+    R.RiverXkbBindingStopRepeat{} -> return ()
 
 handleXkbBindingsSeatEvent :: R.RiverXkbBindingsSeatEvent -> H ()
 handleXkbBindingsSeatEvent ev = case ev of
@@ -165,12 +168,11 @@ handleXkbBindingsSeatEvent ev = case ev of
     runInHS $ modifySeat' dt $ \s -> s {pending_action = S_SUBMAP_CANCEL}
 
 handlePointerEvent :: R.RiverPointerBindingEvent -> H ()
-handlePointerEvent ev = do
-  case ev of
-    R.RiverPointerBindingPressed dt _ -> do
-      xb <- io $ deRefStablePtr (castPtrToStablePtr $ castPtr dt :: StablePtr (PointerBinding (SomeAction H)))
-      userCodeDef () $ runner xb.action
-    _ -> return ()
+handlePointerEvent ev = case ev of
+  R.RiverPointerBindingPressed dt _ -> do
+    xb <- io $ deRefStablePtr (castPtrToStablePtr $ castPtr dt :: StablePtr (PointerBinding (SomeAction H)))
+    userCodeDef () $ runner xb.action
+  _ -> return ()
 
 ---------------------------------------------------------
 
@@ -211,7 +213,7 @@ manage1 s = do
               managePendingAction >> manageActiveOp
         _ -> return ()
     _ -> managePendingAction >> manageActiveOp
-  modifySeat s.river_seat $ \x -> x { suppressChangeFocus = False }
+  modifySeat s.river_seat $ \x -> x { suppressChangeFocus = max 0 (suppressChangeFocus x - 1) }
   where
     doS = modifySeat s.river_seat
 
@@ -316,7 +318,7 @@ seatPointerMove sid w = do
 seatPointerResize :: RiverSeat -> Window -> Int32 -> HS ()
 seatPointerResize sid w edges = do
   withSeat sid $ \s -> do
-    debug' $ display $ "[seatPointerResize] " <> tshow (sid, w, edges)
+    logDebug $ "seat pointer resize" :# [ "seat" .= show sid, "window" .= show w, "edges" .= edges ]
     seatFocus s w
     io $ R.riverNodePlaceTop w.node
     io $ R.riverWindowInformResizeStart w.river_window
@@ -392,25 +394,27 @@ createSeatBindings s = do
 -- the ate_unbound_key event is sent instead.
 --
 -- /manage sequence/
-ensureNextKeyEaten, cancelEnsureNextKeyEaten :: Seat -> IO ()
+ensureNextKeyEaten, cancelEnsureNextKeyEaten :: MonadIO m => Seat -> m ()
 ensureNextKeyEaten s = io $ R.riverXkbBindingsSeatEnsureNextKeyEaten s.xkb_bindings_seat
 cancelEnsureNextKeyEaten s = io $ R.riverXkbBindingsSeatCancelEnsureNextKeyEaten s.xkb_bindings_seat
 
-execXkbBinding :: XkbBinding (SomeAction H) -> H ()
-execXkbBinding xb = do
-  ms <- runInHS $ L.find (\x -> x.river_seat == xb.river_seat) <$> gets _seats
-  void . async $ local (\r -> r {thisSeat = Just xb.river_seat}) $ case ms of
-    Nothing -> return ()
-    Just s -> case (s.submap_pending, actionSubmap @H xb.action) of
-      _ | Just _ <- s.inputOverride -> void $ userCode $ runner xb.action
-      (Nothing, []) -> userCodeDef () $ runner xb.action
-      -- Submap binding activated
-      (Nothing, _) -> do
-        runInHS $ modifySeat xb.river_seat $ \s' -> s' {pending_action = S_SUBMAP_NEXT_KEY xb.action xb.subKeymap}
-      -- Submap action + reset
-      (Just _, []) -> do
-        runInHS $ modifySeat xb.river_seat $ \s' -> s' {pending_action = S_SUBMAP_CANCEL}
-        userCodeDef () $ runner xb.action
-      -- Submap binding activated (lvl++)
-      (Just (_, _), _ : _) -> do
-        runInHS $ modifySeat xb.river_seat $ \s' -> s' {pending_action = S_SUBMAP_NEXT_KEY xb.action xb.subKeymap}
+execXkbBinding :: R.RiverXkbBinding -> XkbBinding (SomeAction H) -> H ()
+execXkbBinding ref xb = local (\r -> r {thisSeat = Just rs}) $ do
+
+  let next action = runInHS $ modifySeat rs $ \s' -> s' {pending_action = action }
+      execute = void . userCode $ runner xb.action
+      boundAction = if xb.autorepeat
+                       then do logDebug "xkbbind: autorepeat on"
+                               r <- async $ forever $ execute >> threadDelay (1000 * 1300)
+                               next $ S_KEYBIND_REPEAT ref r
+                       else void $ async execute
+
+  ms <- runInHS $ lookupSeat rs
+  whenJust ms $ \s -> case (s.submap_pending, actionSubmap @H xb.action) of
+      _ | Just _ <- s.inputOverride -> void $ async execute -- XXX ?
+      (Nothing, []) -> boundAction
+      (Nothing, _) -> next (S_SUBMAP_NEXT_KEY xb.action xb.subKeymap) -- Submap binding activated
+      (Just _, []) -> next S_SUBMAP_CANCEL >> void (async execute) -- Submap action + reset
+      (Just (_, _), _ : _) -> next (S_SUBMAP_NEXT_KEY xb.action xb.subKeymap) -- Submap binding activated (lvl++)
+  where
+    rs = xb.river_seat

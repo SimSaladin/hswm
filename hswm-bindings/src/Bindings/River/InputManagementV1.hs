@@ -1,11 +1,11 @@
 -- |
--- Module      : River.InputManagement
+-- Module      : River.InputManagementV1
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
-module Bindings.River.InputManagement where
+module Bindings.River.InputManagementV1 where
 
 import Bindings.River.InputManagementV1.Generated
 import Bindings.River.InputManagementV1.Generated.Global

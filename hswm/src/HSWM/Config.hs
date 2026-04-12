@@ -140,7 +140,7 @@ parseSubmaps ks0 =
 data LaunchProgram = LaunchProgram String [String]
   deriving (Show, Generic)
 
-instance (MonadIO m, MonadReader env m, HasLogFunc env) => IsAction m LaunchProgram where
+instance (MonadIO m, MonadReader env m, MonadLogger m) => IsAction m LaunchProgram where
   runner (LaunchProgram cmd args) = do
     log' $ display $ "[launch] " <> toText cmd <> " " <> tshow args
     void $ spawnProcess cmd args

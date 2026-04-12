@@ -28,8 +28,9 @@ import Network.Socket.ByteString qualified as NB
 import PackageInfo_hswm qualified as PKG
 import Bindings.River qualified as R
 import System.Directory
+import qualified Data.List as L
 
-type MonadIPC env m = (env ~ HConf, MonadReader env m, HasLogFunc env, MonadIO m)
+type MonadIPC env m = (MonadReader env m, MonadLogger m, MonadIO m, MonadUnliftIO m, MonadMask m)
 
 -- | Workspace identifier type
 type WsId = String
@@ -50,12 +51,27 @@ data ProtoMsg
   | Pong {seqn :: !Int}
   | OutputInfo {outputs :: [(T.Text, ScreenId)]}
   | -- | Inform the client of current workspace configuration.
-    WsInfo {wsNames :: [WsId], wsFocused :: (WsId, ScreenId, LayoutDesc), wsVisible :: [(WsId, ScreenId, LayoutDesc)]}
+    WsInfo
+      { wsNames :: [(WsId, Text)] -- ^ the correct sort order (+ keyhint)
+      , wsFocused :: (ScreenId, WorkspaceInfo)
+      , wsVisible :: [(ScreenId, WorkspaceInfo)]
+      , wsHidden :: [WorkspaceInfo]
+      }
   | -- | Inform the client about the details of the currently focused window.
     FocusedWindow {window :: WindowInfo}
+
   | -- | There is nothing currently focused
     FocusedNone
+
+  | StateDump
+  | StateDumpResponse String
   deriving (Eq, Show, Read, Generic)
+
+data WorkspaceInfo = WorkspaceInfo
+  { tag :: WsId
+  , layout :: LayoutDesc
+  , windowList :: [WindowInfo]
+  } deriving (Eq, Show, Read, Generic)
 
 data WindowInfo = WindowInfo
   { wid :: Word,
@@ -63,6 +79,11 @@ data WindowInfo = WindowInfo
     pid :: Maybe Int
   }
   deriving (Eq, Show, Read, Generic)
+instance Default WindowInfo where def = WindowInfo def  "" "" "" def
+
+instance A.ToJSON WorkspaceInfo
+
+instance A.FromJSON WorkspaceInfo
 
 instance A.ToJSON WindowInfo
 
@@ -81,9 +102,7 @@ data ServerConfig = ServerConfig
 instance Default ServerConfig where
   def = ServerConfig (SockAddrUnix "/run/user/1000/hswm-1") 8
 
-data ClientConfig = ClientConfig
-  { connectTo :: SockAddr
-  }
+newtype ClientConfig = ClientConfig { connectTo :: SockAddr }
   deriving (Eq, Show)
 
 instance Default ClientConfig where
@@ -100,19 +119,17 @@ serverStartupHook conf = do
   logInfo "Starting IPC server"
   stateRef <- getOrCreateObject (newIORef (def :: ConnectedPeers))
   env <- ask
-  logFunc <- asks (view logFuncL)
-  void $
-    io $
-      forkFinally
-        (flip runReaderT logFunc $ serverRun conf stateRef (\c -> io . flip runReaderT env . serverHandleMsg c))
-        (\_ -> flip runReaderT logFunc $ log' "IPC server thread finished")
+  logFunc <- asks _logFunc
+  _ <- async $ serverRun conf stateRef serverHandleMsg
+      `finally` logInfo "IPC server thread finished"
   logInfo "IPC server started"
 
 serverRun ::
   forall env m.
-  (MonadIO m, MonadUnliftIO m, MonadReader env m, HasLogFunc env) =>
+  (MonadIPC env m, env ~ HConf) =>
   ServerConfig -> IORef ConnectedPeers -> (Socket -> ProtoMsg -> m ()) -> m ()
-serverRun conf stateRef onMsg = do
+serverRun conf stateRef onMsg = withThreadContext ["component" .= "ipc/server"] $ do
+
   case conf.socketAddr of
     SockAddrUnix socketPath -> do
       exists <- io $ doesFileExist socketPath
@@ -122,14 +139,14 @@ serverRun conf stateRef onMsg = do
   bracket (io $ socket AF_UNIX Stream defaultProtocol) (io . close) $ \sock -> do
     io $ bind sock conf.socketAddr
     io $ listen sock conf.maxPendingConns
-    logInfo $ "Socket server listening at: " <> displayShow conf.socketAddr
+    logInfo $ "Socket server listening" :# [ "addr" .= show conf.socketAddr ]
     acceptLoop sock
   where
     acceptLoop :: _ -> m ()
     acceptLoop sock = forever $ do
       (conn, _) <- io $ accept sock
       let ck = show conn
-      logInfo $ "New domain socket client connected: " <> displayShow conn
+      logInfo $ "New domain socket client connected" :# [ "peer" .= show conn ]
       let cleanup = do
             modifyIORef stateRef $ \s -> s {connected = M.delete ck s.connected}
             io $ close conn
@@ -148,24 +165,25 @@ serverRun conf stateRef onMsg = do
             Left e -> log' $ display $ "Received malformed message from client: " <> toText e
             Right (Ping n) -> sendMsg conn (Pong n)
             Right (msg :: ProtoMsg) -> do
-              logDebug $ display $ "IPC client event (raw): " <> fromString ck <> ": " <> toText (BUTF8.toString resp)
+              --logDebug $ "IPC client event (raw)" :# [ "peer" .= fromString ck, "msg" .= BUTF8.toString resp ]
               -- debug' $ "IPC client event (decoded): " <> tshow msg
               onMsg conn msg
       worker ""
 
-serverHandleMsg :: (MonadIPC env m) => Socket -> ProtoMsg -> m ()
+serverHandleMsg :: (MonadIPC env m, env ~ HConf) => Socket -> ProtoMsg -> m ()
 serverHandleMsg c Identify {} = fullStateUpdate >>= mapM_ (sendMsg c)
+serverHandleMsg c StateDump = sendMsg c . StateDumpResponse =<< runInHS dumpStateAsString
 serverHandleMsg _ msg = log' $ display $ "[IPC] warn: unhandled message: " <> tshow msg
 
 clientRun ::
-  (MonadIO m, MonadUnliftIO m, MonadReader env m, HasLogFunc env) =>
+  (MonadIPC env m) =>
   ClientConfig ->
   -- | Process incoming
   (ProtoMsg -> m ()) ->
   -- | Emit outgoing msg
   ((ProtoMsg -> m ()) -> m ()) ->
   m ()
-clientRun conf onMsg cb = bracket (io $ socket AF_UNIX Stream defaultProtocol) (io . close) $ \sock -> do
+clientRun conf onMsg cb = withThreadContext ["component" .= "ipc/client"] $ bracket (io $ socket AF_UNIX Stream defaultProtocol) (io . close) $ \sock -> do
   io $ connect sock conf.connectTo
   io $ sendMsg sock $ Identify (PKG.name ++ "-client") 0 (Just $ PKG.synopsis ++ " " ++ showVersion PKG.version)
   withAsync (inputWorker sock) $ \inputAs -> do
@@ -179,10 +197,10 @@ clientRun conf onMsg cb = bracket (io $ socket AF_UNIX Stream defaultProtocol) (
             worker leftover
 
           doMsg resp = case A.eitherDecodeStrict' resp of
-            Left e -> logWarn $ display $ "Received malformed message from server: " <> toText e <> ": " <> toText (BUTF8.toString resp)
+            Left e -> logWarn $ "Received malformed message from server" :# [ "ex" .= toText e, "msg" .= BUTF8.toString resp ]
             Right (Ping n) -> sendMsg sock (Pong n)
             Right msg -> do
-              debug' $ display $ "IPC server event (raw): " <> toText (BUTF8.toString resp)
+              --logDebug $ "IPC server event (raw)" :# [ "msg" .= BUTF8.toString resp ]
               onMsg msg
       forever $ worker ""
 
@@ -206,21 +224,33 @@ recvLines sock leftover = do
 -- Info for status bars
 
 -- | Set of events to fully refresh statusbar's tracked state
-fullStateUpdate :: (MonadIPC env m) => m [ProtoMsg]
+fullStateUpdate :: (MonadIPC env m, env ~ HConf) => m [ProtoMsg]
 fullStateUpdate = runInHS $ do
   outs <- gets _outputs
   ws <- gets windowset
 
+  -- gather outputs
   let outputInfo = OutputInfo [(T.pack out.outputName, out.screen) | out <- outs]
 
+  -- workspace sort order
   wsSortPP <- DWO.getSortByOrder
 
-  let focusedTag = let W.Screen W.Workspace {..} sid _ = W.current ws in (tag, sid, toText $ HSWM.description layout)
-      visibleTags = [(tag, sid, toText $ HSWM.description layout) | W.Screen W.Workspace {..} sid _ <- W.visible ws]
-  let tags = [tag | W.Workspace {..} <- wsSortPP (W.workspaces ws)]
+  wins <- gets _windows
+
+  let tags = zip [tag | W.Workspace {..} <- wsSortPP (W.workspaces ws)] (keyhints ++ L.repeat "")
+
+      keyhints = map toText $ map (:[]) ['a'..'z']
+
+      focusedTag = let W.Screen ws' sid _ = W.current ws in (sid, getWsData ws')
+      visibleTags = [(sid, getWsData ws') | W.Screen ws' sid _ <- W.visible ws]
+      hiddens = map getWsData $ W.hidden ws
+
+      getWsData W.Workspace{..} = WorkspaceInfo tag (toText $ HSWM.description layout) (map getWindowInfo $ W.integrate' stack)
+
+      getWindowInfo rw = maybe def toWindowInfo (M.lookup rw wins)
 
   -- basic info about workspaces
-  let wsInfo = WsInfo tags focusedTag visibleTags
+  let wsInfo = WsInfo tags focusedTag visibleTags hiddens
 
   -- info about focused window (if any)
   focusedInfo <-
@@ -245,3 +275,7 @@ toWindowInfo w =
       identifier = toText w.identifier,
       pid = w.unreliablePid
     }
+
+runMIO = runStdoutLoggingT
+
+type MIO = LoggingT IO
