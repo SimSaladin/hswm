@@ -20,6 +20,7 @@ import HSWM.Layout.BoringWindows (boringWindows)
 import HSWM.Layout.BoringWindows qualified as BW
 import HSWM.Layout.Minimize qualified as L.Minimize
 import HSWM.Layout.WindowNavigation qualified as WNav
+import HSWM.Layout.BinarySpacePartition qualified as BSP
 import HSWM.StackSet qualified as W
 import HSWM.Util.Debug
 import HSWM.Util.IPC qualified as IPC
@@ -171,7 +172,7 @@ myLayoutHook =
   L.Minimize.minimize $
     boringWindows $
       WNav.configurableNavigation (WNav.navigateColor colBase00) $ -- apply on top of any modifiers that might modify placement of tiled windows
-        Tall 1 (3 / 100) (1 / 2) ||| Full
+        BSP.emptyBSP ||| Tall 1 (3 / 100) (1 / 2) ||| Full
 
 myKeys :: [(String, SomeAction H)]
 myKeys =
@@ -233,7 +234,8 @@ myKeys =
       ("M-Comma", "Layout: " $?$?= IncMasterN (-1)),
       ("M-Period", "Layout: " $?$?= IncMasterN 1),
       ("M-x", "Layout: " $?$?= Shrink),
-      ("M-S-x", "Layout: " $?$?= Expand)
+      ("M-S-x", "Layout: " $?$?= Expand),
+
       --   "M-b t"       >+ msgT ManageDocks.ToggleStruts
       --   "M-b l"       >+ msgT Magnifier.Toggle
       --   "M-m"         >+ MaximizeRestore
@@ -247,17 +249,18 @@ myKeys =
       --   "M-b M-x"     >+ msgT ManageDocks.ToggleStruts :>> toggle1 NOBORDERS :>> ToggleScreenSpacing :>> ToggleWindowSpacing
 
       -- ======= Layout: BSP
-      --   "M-C-y"   >+ msgT BSP.SelectNode
-      --   "M-C-p"   >+ msgT BSP.MoveNode
-      --   "M-C-u"   >+ msgT BSP.FocusParent
-      --   "M-C-r"   >+ msgT BSP.Rotate
-      --   "M-C-="   >+ msgT BSP.Equalize
-      --   "M-C-!"   >+ msgT BSP.Balance
-      --   "M-C-"    >>+ directions2D >++> msgT . BSP.ExpandTowards
-      --   "M-r M-b" >+ cmdPrompt xpConfig (Proxy :: Proxy LayoutBSPCommand)
+      ("M-C-y",  "BSP: Select Node" $?$?= BSP.SelectNode),
+      ("M-C-p",  "BSP: Move Node" $?$?= BSP.MoveNode),
+      ("M-C-u",  "BSP: Focus Parent" $?$?= BSP.FocusParent),
+      ("M-C-r",  "BSP: Rotate" $?$?= BSP.Rotate),
+      ("M-C-equal",  "BSP: Equalize" $?$?= BSP.Equalize),
+      ("M-C-Exclam",  "BSP: Balance" $?$?= BSP.Balance) ]
+    ++
+      [ ("M-C-" ++ key, "BSP: Expand Towards" $?$?= BSP.ExpandTowards dir) | (key, dir) <- directions2D ]
+
+      -- ("M-r M-b", cmdPrompt xpConfig (Proxy :: Proxy LayoutBSPCommand)
 
       -- ====== Window =============
-    ]
     ++ [("M-" ++ key, "Focus window direction" $?$?= sendMessage (WNav.Go dir)) | (key, dir) <- zip ["k", "j", "l", "h"] [minBound .. maxBound @Direction2D]]
     ++ [("M-S-" ++ key, "Swap window in direction" $?$?= sendMessage (WNav.Swap dir)) | (key, dir) <- zip ["k", "j", "l", "h"] [minBound .. maxBound @Direction2D]]
     ++ [ ("M-n", "Focus down" $?$?= windows W.focusDown),
@@ -327,6 +330,7 @@ myKeys =
          --   "M-r u"   >+ inputPromptWithHistCompl xpConfig "browser-app" ?+ (\s -> launchDesktopEntry "chrome-app" [s]) ? "Chrome App"
        ]
   where
+    directions2D = map (:[]) "kjlh" `zip` [minBound..maxBound @Direction2D]
     sendFocusedWorkspaceToScreen focus i = PScreen.getScreen def i >>= (`whenJust` (\s -> windows (W.currentTag >>= \x -> OnScreen.onScreen (W.greedyView x) focus s)))
     tagKeys = map (: []) ['a' .. 'z']
     screenKeys = map (: []) "wvza"

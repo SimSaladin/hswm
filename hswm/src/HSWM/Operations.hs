@@ -307,6 +307,9 @@ seatInputOverride seat onempty keys = modifySeats (\s -> s.name == seat) $ \s ->
 lookupWindow :: RiverWindow -> HS (Maybe Window)
 lookupWindow wid = gets (M.lookup wid . _windows)
 
+lookupWindows :: [RiverWindow] -> HS [Window]
+lookupWindows wids = gets $ catMaybes . (\ws -> map (flip M.lookup ws) wids) . _windows
+
 withWindow :: RiverWindow -> (Window -> HS ()) -> HS ()
 withWindow wid f = gets (M.lookup wid . _windows) >>= (`whenJust` f)
 

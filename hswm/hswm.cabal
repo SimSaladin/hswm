@@ -48,6 +48,7 @@ library
           HSWM.Hooks.WorkspaceHistory
           HSWM.InputConfig
           HSWM.Layout
+          HSWM.Layout.BinarySpacePartition
           HSWM.Layout.BoringWindows
           HSWM.Layout.LayoutModifier
           HSWM.Layout.Minimize
