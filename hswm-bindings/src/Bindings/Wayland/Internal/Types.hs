@@ -25,8 +25,8 @@ import           Data.Proxy
 import           Data.Void
 import           Foreign
 import           Foreign.C
-import           GHC.Records
-import           HsBindgen.Runtime.Prelude as ReExports (FromFunPtr(..), PtrConst, ToFunPtr(..), CEnum(..), CEnumZ(..))
+import           Foreign.C.ConstPtr
+import           HsBindgen.Runtime.Prelude as ReExports (FromFunPtr(..), PtrConst, ToFunPtr(..), CEnum(..), CEnumZ)
 import           Control.Exception
 import Control.Monad.IO.Class
 
@@ -49,6 +49,13 @@ class IsWlObject object where
   getUserData :: object -> IO (Ptr Void)
 
   setUserData :: object -> Ptr Void -> IO ()
+
+class HasInterface object where
+  type InterfaceType object
+  objectInterface :: Proxy object -> ConstPtr (InterfaceType object)
+  objectInterfaceName :: Proxy object -> String
+  objectInterfaceVersion :: Proxy object -> Int
+  objectBindWrap :: Ptr () -> object
 
 class HasDestructor object where
 

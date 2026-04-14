@@ -16,7 +16,8 @@ CLIENT_PROTOS := river-window-management-v1.xml \
 		       fractional-scale-v1.xml \
 		       viewporter.xml \
 		       wlr-output-management-unstable-v1.xml \
-		       wlr-layer-shell-unstable-v1.xml
+		       wlr-layer-shell-unstable-v1.xml \
+		       wlr-output-power-management-unstable-v1.xml
 
 SERVER_PROTOS := river-status-unstable-v1.xml
 
@@ -83,6 +84,7 @@ bindgen-river:	\
 	$(bindGenSpecDir)/Bindings.Wayland.Viewporter.Generated.yaml \
 	$(bindGenSpecDir)/Bindings.Wayland.WlrInputMethodUnstableV2.Generated.yaml \
 	$(bindGenSpecDir)/Bindings.Wayland.WlrOutputManagementUnstableV1.Generated.yaml \
+	$(bindGenSpecDir)/Bindings.Wayland.WlrOutputPowerManagementUnstableV1.Generated.yaml \
 	$(bindGenSpecDir)/Bindings.Wayland.WlrLayerShellUnstableV1.Generated.yaml \
 	$(bindGenSpecDir)/Bindings.Wayland.Protocol.ForeignTopLevelListV1.Generated.yaml
 bindgen-pixman-1:	\
@@ -216,6 +218,15 @@ $(bindGenSpecDir)/Bindings.Wayland.FractionalScaleV1.Generated.yaml: $(HEADERDIR
 
 # wlr-output-management-unstable-v1.xml
 $(bindGenSpecDir)/Bindings.Wayland.WlrOutputManagementUnstableV1.Generated.yaml: $(HEADERDIR)/wlr-output-management-unstable-v1-client-protocol.h FORCE
+	$(HS_BIND_GEN) $(<F) \
+	  --gen-binding-spec $@ \
+	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \
+	  --module $(patsubst %.yaml,%,$(@F)) \
+	  --external-binding-spec $(bindGenSpecDir)/Bindings.Wayland.Util.Generated.yaml \
+	  --external-binding-spec $(bindingSpecs)/wayland-client.yaml
+
+# wlr-output-power-management-unstable-v1.xml
+$(bindGenSpecDir)/Bindings.Wayland.WlrOutputPowerManagementUnstableV1.Generated.yaml: $(HEADERDIR)/wlr-output-power-management-unstable-v1-client-protocol.h FORCE
 	$(HS_BIND_GEN) $(<F) \
 	  --gen-binding-spec $@ \
 	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \

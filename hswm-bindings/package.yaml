@@ -24,7 +24,9 @@ library:
     - template-haskell
     - data-default
     - hashable
+    - text
     - deepseq
+    - xml-conduit
   include-dirs:
     - include
     - include/wayland-protocols

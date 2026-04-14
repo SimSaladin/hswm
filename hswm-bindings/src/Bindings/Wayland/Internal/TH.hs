@@ -5,8 +5,10 @@
 {-# LANGUAGE TemplateHaskellQuotes #-}
 {-# LANGUAGE NoTemplateHaskell #-}
 
-module Bindings.Wayland.Internal.TH where
+module Bindings.Wayland.Internal.TH (module Bindings.Wayland.Internal.TH) where
 
+import Prelude hiding (head)
+import Data.Default as Bindings.Wayland.Internal.TH
 import           Control.DeepSeq (NFData)
 import           Control.Monad
 import           Data.Char (toLower, toUpper)
@@ -14,6 +16,8 @@ import           Data.Hashable (Hashable)
 import qualified Data.List as L
 import           Data.Maybe
 import           Data.String (IsString(..))
+import           Data.Text (Text)
+import qualified Data.Text as T
 import           Data.Void
 import           Foreign
 import           Foreign.C
@@ -22,9 +26,482 @@ import           GHC.Generics (Generic)
 import           HsBindgen.Runtime.Prelude
 import           HsBindgen.Runtime.PtrConst
 import           Language.Haskell.TH
+import           Language.Haskell.TH.Syntax
 import           System.IO.Unsafe (unsafePerformIO)
+import qualified Text.XML as X
+import           Text.XML.Cursor
+import GHC.Stack
+import Control.Arrow
+import Control.Monad.IO.Class
 
 import           Bindings.Wayland.Internal.Types
+
+commonSettings :: ProtocolRenderSettings
+commonSettings = def
+  { prTypeNameModifier = upperFirst . fromSnailCase . dropPrefix "Wl_" . dropPrefix "Wp_" . dropPrefix "wp_" . dropPrefix "zwp_" . dropPrefix "Zwp_" . dropPrefix "ext_" . dropPrefix "Ext_" . dropPrefix "zwlr_" . dropPrefix "Zwlr_" . dropSuffix "_v1" . dropSuffix "_v2"
+  , prValueNameModifier = fromSnailCase . dropPrefix "zwp_" . dropPrefix "zwlr_" . dropPrefix "wp_" . dropPrefix "ext_" . dropSuffix "_v1" . dropSuffix "_v2"
+  }
+
+head :: HasCallStack => [a] -> a
+head (x:_) = x
+head _ = error $ "head: empty list: " ++ prettyCallStack callStack
+
+-- * Protocol XML
+
+data Protocol = Protocol
+  { protocolName :: String
+  , protocolCopyright :: Text
+  , protocolDescription :: (String, String)
+  , protocolInterfaces :: [Interface]
+  } deriving (Show, Eq, Generic)
+
+data Interface = Interface
+  { interfaceName :: String
+  , interfaceVersion :: Int
+  , interfaceDescription :: (String, String)
+  , interfaceEnums :: [IEnum]
+  , interfaceRequests :: [IRequest]
+  , interfaceEvents :: [IEvent]
+  } deriving (Show, Eq, Generic)
+
+data IEnum = IEnum
+  { enumName :: String
+  , enumEntries :: [EnumEntry]
+  } deriving (Show, Eq, Generic)
+
+data EnumEntry = EnumEntry
+  { entryName :: String
+  , entryValue :: String
+  , entrySummary :: String
+  } deriving (Show, Eq, Generic)
+
+data IRequest = IRequest
+  { requestName :: String
+  , requestDescription :: (String, String)
+  , requestType :: Maybe Text
+  , requestArgs :: [Arg]
+  } deriving (Show, Eq, Generic)
+
+data Arg = Arg
+  { argName :: String
+  , argType :: String
+  , argEnum :: Maybe String
+  , argInterface :: Maybe String
+  , argSummary :: String
+  } deriving (Show, Eq, Generic)
+
+data IEvent = IEvent
+  { eventName :: String
+  , eventDescription :: (String, String)
+  , eventArgs :: [Arg]
+  } deriving (Show, Eq, Generic)
+
+clientFromProtocolXML :: ProtocolRenderSettings -> FilePath ->  Q [Dec]
+clientFromProtocolXML settings filepath = do
+  pkgRoot <- getPackageRoot
+  protoDoc <- runIO $ X.readFile X.def (pkgRoot ++ "/../protocol/" ++ filepath)
+  let proto = protocolFromXML $ fromDocument protoDoc
+
+  -- runIO $ print proto
+  addModFinalizer $ putDoc ModuleDoc $ unlines $
+    [ "Description: " ++ fst (protocolDescription proto)
+    , "Stability: unstable"
+    , "Portability: unportable"
+    , ""
+    , "__Protocol:__ @" ++ protocolName proto ++ "@"
+    , ""
+    , formatDescription (snd $ protocolDescription proto)
+    , ""
+    ]
+    ++ [ ifaceDoc settings iface | iface <- protocolInterfaces proto ]
+    ++ [ "\n__Protocol copyright:__ " ++ T.unpack (protocolCopyright proto) ]
+
+  concat <$> forM (protocolInterfaces proto) (renderInterface settings)
+
+ifaceDoc ProtocolRenderSettings{..} Interface{..} = unlines $
+  [ "__Interface__: '" ++ prTypeNameModifier interfaceName ++ "' (" ++ interfaceName ++ ")"
+  , ""
+  ]
+  ++ [ "  - Request: '" ++ prValueNameModifier (prValueNameModifier interfaceName ++ "_" ++ requestName) ++ "'\n" | IRequest{..} <- interfaceRequests ]
+  ++ [ "  - Event: v'" ++ prTypeNameModifier (prTypeNameModifier interfaceName ++ "_" ++ eventName) ++ "'\n" | IEvent{..} <- interfaceEvents ]
+  ++ [ "  - Enum: t'" ++ prTypeNameModifier (prTypeNameModifier interfaceName ++ "_" ++ enumName) ++ "'\n" | IEnum{..} <- interfaceEnums ]
+
+data ProtocolRenderSettings = ProtocolRenderSettings
+  { prValueNameModifier :: String -> String
+  , prTypeNameModifier :: String -> String
+  , prInterfaceName :: ProtocolRenderSettings -> String -> String
+  , prRequestOptions :: [(String, String, RequestSettings)]
+  }
+
+instance Default ProtocolRenderSettings where
+  def = ProtocolRenderSettings
+    fromSnailCase
+    (upperFirst . fromSnailCase)
+    (\s -> prValueNameModifier s . (++ "_interface") . prValueNameModifier s)
+    []
+
+data RequestSettings = RequestSettings
+  { reqErrnoIfError :: Bool
+  , reqCheckNull :: Bool
+  , reqCheckMinusOne :: Bool
+  }
+
+instance Default RequestSettings where
+  def = RequestSettings False False False
+
+renderInterface :: ProtocolRenderSettings -> Interface -> Q [Dec]
+renderInterface s@ProtocolRenderSettings{..} iface@Interface{..} = do
+  let ifN = mkName $ interfaceName <> "_interface"
+  let ifT = reifyType $ mkName $ interfaceName <> "_interface"
+  let ifN' = mkName $ prInterfaceName s interfaceName
+  let doc = "Interface: @" ++ interfaceName ++ "@, version: " ++ show interfaceVersion ++ "\n\n" ++ formatDescription (snd interfaceDescription)
+  ifaceD <- sequence
+    [ sigD ifN' (appT [t|ConstPtr|] ifT)
+    , pragInlD ifN' NoInline FunLike AllPhases
+    , funD_doc ifN' [clause [] (normalB [|unsafePerformIO $ toConstPtr $(varE ifN)|]) []] (Just doc) []
+    ]
+  objectD <- renderInterfaceObject s iface
+  enumsD <- concat <$> mapM (renderEnum s iface) interfaceEnums
+  requestsD <- concat <$> mapM (renderRequest s iface) interfaceRequests
+  let hasListener = not $ null interfaceEvents
+  listenerEventsD <- if hasListener then renderListenerEvents s iface else pure []
+  return $ objectD ++ ifaceD ++ enumsD ++ requestsD ++ listenerEventsD
+
+renderEnum :: ProtocolRenderSettings -> Interface -> IEnum -> Q [Dec]
+renderEnum s Interface{..} IEnum{..} = do
+  let enumN = mkName $ prTypeNameModifier s $ prTypeNameModifier s interfaceName ++ "_" ++ enumName
+      enumT = mkName $ upperFirst interfaceName ++ "_" ++ enumName
+
+  mdoc <- getDoc $ DeclDoc enumT
+  let doc = fromMaybe "" mdoc
+  typD <- withDecDoc doc $ tySynD enumN [] (conT enumT)
+  entriesD <- concat <$> mapM renderEnumEntry enumEntries
+  return $ typD : entriesD
+  where
+    renderEnumEntry EnumEntry{..} = do
+      let enumN = mkName $ prTypeNameModifier s $ prTypeNameModifier s interfaceName ++ "_" ++ enumName
+      let eN = mkName $ prValueNameModifier s $ prValueNameModifier s interfaceName ++ "_" ++ enumName ++ "_" ++ entryName
+      let doc = formatDescription entrySummary ++ "\n\nValue: " ++ entryValue
+      let body = [|toCEnum $(litE $ integerL $ read entryValue)|]
+      sequence
+       [ funD_doc eN [clause [] (normalB body) []] (Just doc) []
+       , sigD eN (conT enumN)
+       ]
+
+renderInterfaceObject :: ProtocolRenderSettings -> Interface -> Q [Dec]
+renderInterfaceObject s Interface{..} = do
+  let objT = mkName $ upperFirst interfaceName
+  let ntName = mkName $ prTypeNameModifier s interfaceName
+  let deriv = derivClause Nothing [ [t|Eq|]
+                           , [t|Ord|]
+                           , [t|Storable|]
+                           , [t|Generic|]
+                           , [t|Hashable|]
+                           , [t|NFData|]
+                           , [t|IsUserData|] -- via NT (Ptr)
+                           ] -- ++ [ [t|Show|] | objDeriveShow cfg ]
+                           -- XXX: [t|Data|]]] Data a => Data (Ptr a)
+
+  let doc = formatDescription (snd interfaceDescription)
+        ++ "\n\nEnums: " ++ unwords [ enumName e | e <- interfaceEnums ]
+        ++ "\n\nRequests: " ++ unwords [ requestName r | r <- interfaceRequests ]
+        ++ "\n\nEvents: " ++ unwords [ eventName e | e <- interfaceEvents ]
+
+  ntD <- newtypeD_doc (pure []) ntName [] Nothing
+      (recC ntName [ varBangType (mkName "unwrap") (bangType (bang noSourceUnpackedness noSourceStrictness) [t|Ptr $(conT objT)|]) ], Nothing, [])
+      [deriv] (Just doc)
+
+  let hasDestroy = any (\x -> requestType x == Just "destructor") interfaceRequests
+
+  let getFn fn = mkName $ interfaceName ++ "_" ++ fn
+
+  let destroyDocS = unlines [ formatDescription (snd $ requestDescription r) | r <- interfaceRequests, requestType r == Just "destructor" ]
+  destroyD <- withDecsDoc destroyDocS (if hasDestroy then [d|
+    instance HasDestructor $(conT ntName) where
+      objectDestroy $(conP ntName [[p|x|]]) = $(varE (getFn "destroy")) x
+    |] else pure [])
+
+  let docIF = "@" ++ show (interfaceName, interfaceVersion) ++ "@"
+  hasIFD <- withDecsDoc docIF [d|
+    instance HasInterface $(conT ntName) where
+      type instance InterfaceType $(conT ntName) = $(conT $ mkName "Wl_interface")
+      objectInterface _ = $(varE $ mkName $ prInterfaceName s s interfaceName)
+      objectInterfaceName _ = $(litE $ stringL interfaceName)
+      objectInterfaceVersion _ = $(litE $ integerL $ fromIntegral interfaceVersion)
+      objectBindWrap = $(conE $ mkName $ prTypeNameModifier s interfaceName) . castPtr
+    |]
+
+  return $ ntD : hasIFD ++ destroyD
+
+renderRequest :: ProtocolRenderSettings -> Interface -> IRequest -> Q [Dec]
+renderRequest _ _ r | requestType r == Just "destructor" = pure []
+renderRequest s Interface{..} IRequest{..}  = do
+  let reqN = mkName $ prValueNameModifier s $ prValueNameModifier s interfaceName ++ "_" ++ requestName
+
+  VarI f_name f_type _ <- reify $ mkName $ interfaceName ++ "_" ++ requestName
+  let (argsT, resT) = (init &&& last) $ getArrowArgs f_type
+  let rargs' = filter (\x -> argName x /= "id") requestArgs
+  let rargs = argSelf : rargs'
+  let argRes = fromMaybe (Arg "id" "" Nothing Nothing "") $ L.find (\x -> argName x == "id") requestArgs
+
+  let doc = unlines $ [ formatDescription (snd requestDescription)
+                      , "\n\nArgs: " ++ unlines [ argDoc a ++ "\n" | a <- requestArgs ]
+                      ]
+        ++ ["\nThrows if NULL." | reqCheckNull reqOpts]
+        ++ ["\nThrows if -1." | reqCheckMinusOne reqOpts]
+
+  namesP <- mapM (\_ -> newName "a") argsT
+  let c_pat = [ varP nm | nm <- namesP ]
+
+  let body = normalB $ do
+        resN <- newName "res"
+        namesR <- mapM (\_ -> newName "r") namesP
+        doE $
+          [ bindS (varP rN) (argTransform arg argT pN) | (pN, rN, (argT, arg)) <- zip3 namesP namesR (zip argsT rargs) ] -- args
+            ++ [bindS (varP resN) $ appE (varE 'liftIO) $ appsE $ varE f_name : [varE n | n <- namesR] ]
+            ++ [noBindS finalizer | (rN, argT) <- zip namesR argsT, Just finalizer <- [argFinalizer argT rN] ]
+            ++ [noBindS [|when ($(varE resN) == nullPtr) $ error    $ $(litE . StringL $ nameBase f_name) ++ " returned NULL"|] | reqCheckNull reqOpts]
+            ++ [noBindS [|when ($(varE resN) == -1)      $ error    $ $(litE . StringL $ nameBase f_name) ++ " returned -1"|] | reqCheckMinusOne reqOpts, not (reqErrnoIfError reqOpts)]
+            ++ [noBindS [|when ($(varE resN) == -1)      $ throwErrno $(litE $ StringL $ nameBase f_name)|] | reqCheckMinusOne reqOpts, reqErrnoIfError reqOpts]
+            ++ [noBindS $ resTransform resT resN ]
+  sequence
+    [ sigD reqN (toTypeTop (zip argsT rargs) (resT, argRes))
+    , funD_doc reqN [clause c_pat body []] (Just doc) []
+    ]
+  where
+    argSelf = Arg "self" "" Nothing Nothing ""
+
+    reqOpts = maybe def (\(_,_,x) -> x) $ L.find (\(ifN, rN, _) -> ifN == interfaceName && rN == requestName) (prRequestOptions s)
+
+    toTypeTop args res = forallT [plainTV (mkName "m")] (pure [AppT (ConT ''MonadIO) $ VarT (mkName "m")]) (toType $ args ++ [res])
+
+    toType [(AppT (ConT cN) t, arg)]
+      | cN == ''IO = appT (varT (mkName "m")) (argTypeTransform arg t)
+    toType [(x, _)] = error $ "toType: unexpected return type: " ++ pprint x
+    toType ((x, arg) : xs) = appT (appT arrowT (argTypeTransform arg x)) (toType xs)
+    toType [] = error "toType: empty list"
+
+    argTypeTransform Arg{..} t
+      | AppT (ConT cN) (ConT tN) <- t, cN == ''Ptr, nameBase tN == upperFirst interfaceName
+      = conT $ mkName $ prTypeNameModifier s interfaceName
+      | AppT (ConT cN) (ConT tN) <- t, cN == ''Ptr
+      = conT $ mkName $ getModule tN ++ prTypeNameModifier s (nameBase tN)
+      | AppT (ConT cN) (ConT tN) <- t, cN == ''PtrConst, tN == ''CChar
+      = conT ''String
+      | Just enum <- argEnum, '.' `notElem` enum
+      = conT (mkName $ prTypeNameModifier s $ prTypeNameModifier s interfaceName ++ "_" ++ enum)
+      | Just enum <- argEnum, (obj, _ : enum') <- span (/= '.') enum
+      = conT (mkName $ getEnumModule enum ++ upperFirst obj ++ "_" ++ enum')
+      | otherwise = pure t
+
+    argTransform arg@Arg{..} t name
+      | arg == argSelf = letE [ valD (conP (mkName $ prTypeNameModifier s interfaceName) [varP $ mkName "x"]) (normalB (varE name)) []] $ appE (varE 'return) $ varE $ mkName "x"
+      | Just _ifName <- argInterface, AppT (ConT cN) (ConT tN) <- t, cN == ''Ptr
+      = letE [ valD (conP (mkName $ getModule tN ++ prTypeNameModifier s (nameBase tN)) [varP $ mkName "x"]) (normalB (varE name)) []] $ appE (varE 'return) $ varE $ mkName "x"
+      | AppT (ConT cN) (ConT tN) <- t, cN == ''PtrConst, tN == ''CChar
+      = [|ConstPtr <$> liftIO (newCString $(varE name))|] -- note: cleanup in argFinalizer
+      | Just enum <- argEnum, '.' `notElem` enum
+      = letE [ valD (conP (mkName $ upperFirst interfaceName ++ "_" ++ enum) [varP $ mkName "x"]) (normalB (varE name)) []] $ appE (varE 'return) $ appE (varE 'fromIntegral) $ varE $ mkName "x"
+      | Just enum <- argEnum, (obj, _ : enum') <- span (/= '.') enum
+      = letE [ valD (conP (mkName $ getEnumModule enum ++ upperFirst obj ++ "_" ++ enum') [varP $ mkName "x"]) (normalB (varE name)) []] $ appE (varE 'return) $ appE (varE 'fromIntegral) $ varE $ mkName "x"
+      | otherwise = [|return $(varE name)|]
+
+    argFinalizer t name
+      | AppT (ConT cN) (ConT tN) <- t, cN == ''PtrConst, tN == ''CChar
+      = Just [|liftIO . free $ unConstPtr $(varE name)|]
+      | otherwise = Nothing
+
+    resTransform (AppT (ConT _IO) (AppT (ConT _Ptr) (ConT obj))) name
+      = appE (varE 'return) $ appE (conE $ mkName $ prTypeNameModifier s $ nameBase obj) (varE name)
+    resTransform _ name = appE (varE 'return) (varE name)
+
+    getModule name = case nameModule name of
+                  -- Just "Bindings.Wayland.Client.Generated" -> "
+                  Just m' -> dropSuffix ".Generated" m' ++ "."
+                  _ -> ""
+
+argDoc :: Arg -> String
+argDoc a
+  | Just iface <- argInterface a = "@" ++ iface ++ "@ (object): " ++ formatDescription (argSummary a)
+  | Just enum <- argEnum a = "@" ++ enum ++ "@ (enum): " ++ formatDescription (argSummary a)
+  | otherwise = argType a ++ " " ++ formatDescription (argSummary a)
+
+renderListenerEvents :: ProtocolRenderSettings -> Interface -> Q [Dec]
+renderListenerEvents s Interface{..} = do
+  -- instance AddListener Foobar
+  -- type FoobarListener = ...
+  listenerD <- mkAddListenerInst
+  -- data FoobarEvent
+  -- mkFoobarListener
+  eventD <- mkEvent
+  return $ listenerD ++ eventD
+  where
+    objN = prTypeNameModifier s interfaceName
+    listenerN = mkName $ upperFirst interfaceName ++ "_listener"
+    evName = mkName $ objN ++ "Event"
+    mkListenerName = mkName $ "mk" ++ objN ++ "Listener"
+
+    mkAddListenerInst :: Q [Dec]
+    mkAddListenerInst = do
+      let mk_clause = do
+            pname <- newName "p"
+            clause [conP (mkName objN) [varP pname]] (normalB (appE (varE (mkName $ interfaceName ++ "_add_listener")) (varE pname))) []
+      let docAddListenerS =
+            """
+            @
+            listener <- 'mk""" ++ objN ++ """Listener'
+            'Bindings.Wayland.Internal.Types.listenerAdd' object listener nullPtr
+            @
+            """
+      sequence
+        [ withDecDoc docAddListenerS $ instanceD
+          (pure [])
+          (appT (conT ''AddListener) (conT $ mkName objN))
+          [ tySynInstD $ tySynEqn Nothing (appT (conT ''ObjectListener) (conT $ mkName objN)) (conT listenerN),
+            funD 'objectListenerAdd [mk_clause]
+          ]
+        , tySynD (mkName $ objN ++ "Listener") [] [t| PtrConst (ObjectListener $(conT $ mkName objN)) |]
+        ]
+
+    argSelf = Arg (prValueNameModifier s interfaceName) "" Nothing Nothing ""
+
+    evParams ev =
+      Arg "userdata" "" Nothing Nothing ""
+      : argSelf
+      : [ arg | IEvent{..} <- interfaceEvents, eventName == ev, arg <- eventArgs ]
+
+    mkEvent :: Q [Dec]
+    mkEvent = do
+      (TyConI (DataD _ _ _ _ [RecC recName recs] _)) <- reify listenerN
+      cons <- mapM mkEvCon recs
+      sequence
+        [ dataD_doc (pure []) evName [] Nothing cons [derivClause Nothing [conT ''Eq, {- conT ''Show, -} conT ''Generic]] (Just "")
+        , sigD mkListenerName [t|forall m. MonadIO m => ($(conT evName) -> IO ()) -> m ($(conT (mkName $ objN ++ "Listener")))|]
+        , funD_doc mkListenerName [mkListenerFun recName recs] (Just "This should be destroyed using destroyListener when no longer needed.") []
+        , instanceD
+            (pure [])
+            (appT (conT ''ListenerEvent) (conT evName))
+            [ tySynInstD $ tySynEqn Nothing (appT (conT ''Listener) (conT evName)) (conT listenerN),
+              funD 'freeListener [mkFreeListener recName recs]
+            ]
+        ]
+
+    mkFreeListener conName recs' = do
+      funNames <- forM recs' $ \_ -> newName "fun"
+      clause
+        [wildP, conP conName [varP nm | nm <- funNames]]
+        (normalB $ doE [noBindS [|freeHaskellFunPtr $(varE nm)|] | nm <- funNames])
+        []
+
+    mkListenerFun :: Name -> [VarBangType] -> Q Clause
+    mkListenerFun recN recs = do
+      handle <- newName "handle"
+      listener <- newName "listener"
+      funNs <- forM recs $ \_ -> newName "f"
+      funPtrs <- forM recs $ \(evN, _, evType) -> do
+        let fields = getFields evType
+            conName = mkName $ objN ++ upperFirst (fromSnailCase $ nameBase evN)
+        let params = evParams $ nameBase evN
+        patNs <- forM fields $ \_ -> newName "a"
+        argNs <- forM fields $ \_ -> newName "b"
+
+        --let toEvent _ = letE [ valD (varP aN) (normalB $ argTransform arg pT pN) [] | ((pN, aN), arg, pT) <- zip3 (zip patNs argNs) params fields ] (appsE $ conE conName : map varE argNs)
+        --appE (varE 'toFunPtr) (lamE (map varP patNs) (appE (varE handle) $ toEvent $ zip patNs fields))
+
+        appE (varE 'toFunPtr) $ lamE (map varP patNs) $ doE $
+            [bindS (varP aN) (argTransform arg pT pN) | ((pN, aN), arg, pT) <- zip3 (zip patNs argNs) params fields ]
+            ++ [noBindS $ appE (varE handle) $ appsE $ conE conName : map varE argNs]
+            -- appE (varE handle) $ toEvent $ zip patNs fields
+
+      listenerExp <- appE (varE 'return) $ appsE $ conE recN : map varE funNs
+      let stmts = [bindS (varP nm) (pure rhs) | (nm, rhs) <- zip funNs funPtrs] ++ [bindS (varP listener) (pure listenerExp), noBindS (toPtr listener)]
+      clause [varP handle] (normalB $ appE (varE 'liftIO) $ doE stmts) []
+
+    -- MonadIO m => a -> m (PtrConst a)
+    toPtr name = [|unsafeFromPtr <$> new $(varE name)|]
+
+    mkEvCon :: (Name, Bang, Type) -> Q (Q Con, Maybe String, [Maybe String])
+    mkEvCon (evName', _, evType) = do
+      let event = head [ e | e <- interfaceEvents, eventName e == nameBase evName' ]
+      -- mdoc <- getDoc $ DeclDoc evName'
+      let params = evParams $ nameBase evName'
+      let evConN = mkName $ objN ++ upperFirst (fromSnailCase $ nameBase evName')
+      let doc = "'" ++ pprint evName' ++ "'\n\n"
+             ++ formatDescription (snd $ eventDescription event)
+             ++ "\n\n" ++ unlines ["- @" ++ argName a ++ "@:" ++ formatDescription (argSummary a) | a <- params]
+             -- ++ "\n\n" ++ fromMaybe "" mdoc
+      let con = do
+            fields <- forM (zip params $ getFields evType) $ \(arg, fT) -> do
+              return (argTypeTrans arg fT, mkName $ fromSnailCase $ argName arg)
+            recC evConN [varBangType fN (bangType (bang noSourceUnpackedness sourceStrict) fT) | (fT, fN) <- fields]
+      length doc `seq` return (con, Just doc, [])
+
+    argTypeTrans Arg{..} t
+      | AppT (ConT cN) (ConT tN) <- t, cN == ''Ptr, nameBase tN == upperFirst interfaceName
+      = conT $ mkName $ prTypeNameModifier s interfaceName
+      | AppT (ConT cN) (ConT tN) <- t, cN == ''Ptr, tN /= ''Void
+      = conT $ mkName $ prTypeNameModifier s $ nameBase tN
+      | AppT (ConT cN) (ConT tN) <- t, cN == ''PtrConst, tN == ''CChar
+      = conT ''String
+      | Just enum <- argEnum, '.' `notElem` enum
+      = conT (mkName $ upperFirst interfaceName ++ "_" ++ enum)
+      | Just enum <- argEnum, (obj, _ : enum') <- span (/= '.') enum
+      = conT (mkName $ getEnumModule enum ++ upperFirst obj ++ "_" ++ enum')
+      | otherwise = pure t
+
+    argTransform arg@Arg{..} t name
+      | arg == argSelf
+      = appE (varE 'return) $ appE (conE (mkName $ prTypeNameModifier s interfaceName)) (varE name)
+      | AppT (ConT cN) (ConT tN) <- t, cN == ''Ptr, tN /= ''Void
+      = appE (varE 'return) $ appE (conE (mkName $ prTypeNameModifier s $ nameBase tN)) (varE name)
+      | AppT (ConT cN) (ConT tN) <- t, cN == ''PtrConst, tN == ''CChar
+      = appE (varE 'peekCString) $ appE (varE 'unConstPtr) (varE name)
+      | Just enum <- argEnum, '.' `notElem` enum
+      = appE (varE 'return) $ appE (conE (mkName $ upperFirst interfaceName ++ "_" ++ enum)) (appE (varE 'fromIntegral) (varE name))
+      | Just enum <- argEnum, (obj, _ : enum') <- span (/= '.') enum
+      = appE (varE 'return) $ appE (conE (mkName $ getEnumModule enum ++ upperFirst obj ++ "_" ++ enum')) (appE (varE 'fromIntegral) (varE name))
+      | otherwise = [|return $(varE name)|]
+
+getEnumModule :: String -> String
+getEnumModule name
+  | "wl_" `L.isPrefixOf` name = "Bindings.Wayland.Client."
+  | otherwise = ""
+
+formatDescription :: String -> String
+formatDescription = concatMap escape
+  where
+    escape x
+      | x `elem` ("\\/'`\"@<$#" :: [Char]) = "\\" ++ [x]
+      | otherwise = [x]
+
+protocolFromXML :: Cursor -> Protocol
+protocolFromXML root = Protocol (name root) (contents $ root $/ element "copyright") (getDescription root)
+  (map getInterface $ root $/ element "interface")
+  where
+    name = T.unpack . head . attribute "name"
+    contents = T.unlines . concatMap ($.// content)
+    summary = fromMaybe "" . listToMaybe . attribute "summary"
+
+    getInterface e = Interface (name e) (read . T.unpack . head $ attribute "version" e) (getDescription e)
+      (map getEnum $ e $/ element "enum")
+      (map getRequest $ e $/ element "request")
+      (map getEvent $ e $/ element "event")
+    -- XXX: summary attribute ignored
+    getDescription e = (unlines . map (T.unpack . summary) $ e $/ element "description", T.unpack . contents $ e $/ element "description")
+    getEnum e = IEnum (name e) (map getEntry $ e $/ element "entry")
+    getEntry e = EnumEntry (name e)
+      (T.unpack . head $ attribute "value" e)
+      (unlines . map T.unpack $ attribute "summary" e)
+    getRequest e = IRequest (name e)
+      (getDescription e)
+      (listToMaybe $ attribute "type" e)
+      (map getArg $ e $/ element "arg")
+    getArg e = Arg (name e)
+      (T.unpack . head $ attribute "type" e)
+      (fmap T.unpack . listToMaybe $ attribute "enum" e)
+      (fmap T.unpack . listToMaybe $ attribute "interface" e)
+      (T.unpack $ summary e)
+    getEvent e = IEvent (name e) (getDescription e) (map getArg $ e $/ element "arg")
 
 -- * Configuration
 
@@ -372,7 +849,7 @@ mkListenerEventNew ObjectCfg {..} listenerTypeName = do
             [derivClause Nothing [conT ''Eq, conT ''Show, conT ''Generic]]
             (Just "")
 
-        , sigD (mkName $ "mk" ++ listenerName') [t|($(conT evName) -> IO ()) -> IO (PtrConst $(conT listenerName))|]
+        , sigD (mkName $ "mk" ++ listenerName') [t|($(conT evName) -> IO ()) -> IO ($(conT (mkName $ objTypePrefix ++ "Listener")))|]
         , funD_doc
             (mkName $ "mk" ++ listenerName')
             [mkListenerFun (mkName objectName) recs]

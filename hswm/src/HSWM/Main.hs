@@ -120,7 +120,7 @@ startHSWM wlDisplay config = do
       registry <- io $ displayGetRegistry wlDisplay
       io $ WL.listenerAdd registry regL nullPtr
 
-      -- Wait for one roundtrip for the registry listener to become aware of all current globals.
+      logDebug "Wait for one roundtrip for the registry listener to become aware of all current globals."
       _ <- io $ displayRoundtrip wlDisplay
 
       -- Bind initial globals

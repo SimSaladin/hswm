@@ -1,0 +1,86 @@
+version:
+  hs_bindgen: 0.1.0
+  binding_specification: '1.0'
+hsmodule: Bindings.Wayland.WlrOutputPowerManagementUnstableV1.Generated
+ctypes:
+- headers: wlr-output-power-management-unstable-v1-client-protocol.h
+  cname: struct zwlr_output_power_manager_v1
+  hsname: Zwlr_output_power_manager_v1
+- headers: wlr-output-power-management-unstable-v1-client-protocol.h
+  cname: struct zwlr_output_power_v1
+  hsname: Zwlr_output_power_v1
+- headers: wlr-output-power-management-unstable-v1-client-protocol.h
+  cname: enum zwlr_output_power_v1_mode
+  hsname: Zwlr_output_power_v1_mode
+- headers: wlr-output-power-management-unstable-v1-client-protocol.h
+  cname: enum zwlr_output_power_v1_error
+  hsname: Zwlr_output_power_v1_error
+- headers: wlr-output-power-management-unstable-v1-client-protocol.h
+  cname: struct zwlr_output_power_v1_listener
+  hsname: Zwlr_output_power_v1_listener
+hstypes:
+- hsname: Zwlr_output_power_manager_v1
+  representation: emptydata
+- hsname: Zwlr_output_power_v1
+  representation: emptydata
+- hsname: Zwlr_output_power_v1_error
+  representation:
+    newtype:
+      constructor: Zwlr_output_power_v1_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Zwlr_output_power_v1_listener
+  representation:
+    record:
+      constructor: Zwlr_output_power_v1_listener
+      fields:
+      - mode
+      - failed
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Zwlr_output_power_v1_mode
+  representation:
+    newtype:
+      constructor: Zwlr_output_power_v1_mode
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw

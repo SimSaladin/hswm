@@ -193,10 +193,8 @@ myKeys =
     ("M-r r", "Run shell (prompt)" $?$?= rofiRun ["-modes", "run", "-show", "run"]),
     ("M-r d", "Run desktop app (prompt)" $?$?= rofiRun ["-modes", "drun", "-show", "drun"]),
     ("M-r s", "Run via systemd-run (prompt)" $?$?= (RP.promptRofi @_ @H "systemd-run:" [] RP.++> RP.runWithSystemD)),
-    -- "M-r c"            >+ spawn "clipmenu" ["-p", "clipmenu", "-i"] ? "clipmenu"
+    ("M-r c", "Open cliphist prompt" $?$?= rofiRun [ "-modi", "clipboard:cliphist-rofi-img", "-show", "clipboard", "-show-icons" ]),
     -- "M-r b"            >+ spawnDialog "bluetoothctl" ? "bluetoothctl"
-    -- "M-r m"            >+ spawn "xmag" ["-mag","2","-source","960x540"] ? "xmag"
-    -- "M-r t"            >+ spawnTermTmux def Nothing ? "Terminal (tmux)"
     -- "M-r f"            >+ spawnOnceKitty "fself" "bash" ["-lic", "fself"] doCenterFloat
     --   -- spawnDialog ("bash", ["-ic", "fself"]) ? "FZF multi-prompt"
     -- "M-r a" >+ spawn "dmenu_autorandr" ? "autorandr (menu)"

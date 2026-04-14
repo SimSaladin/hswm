@@ -99,3 +99,14 @@ handleRegistryEvent ref (WL.RegistryGlobalRemove _ _ name) = do
     where
   removeGlobal :: Name -> RegistryCache -> RegistryCache
   removeGlobal name_ r = r {objects = L.filter (\o -> name_ /= o.name) r.objects}
+
+-- * Callbacks
+
+
+-- | Wait for a callback to trigger.
+callbackWait_ :: MonadIO m => WL.Callback -> m ()
+callbackWait_ cb = liftIO $ do
+  mvar <- newEmptyMVar
+  cbListener <- WL.mkCallbackListener $ \WL.CallbackDone{} -> putMVar mvar ()
+  WL.listenerAdd cb cbListener nullPtr
+  takeMVar mvar

@@ -25,6 +25,7 @@ extra-source-files:
       cbits/viewporter-protocol.c
       cbits/wlr-layer-shell-unstable-v1-protocol.c
       cbits/wlr-output-management-unstable-v1-protocol.c
+      cbits/wlr-output-power-management-unstable-v1-protocol.c
       cbits/xdg-output-unstable-v1-protocol.c
       include/ext-session-lock-v1-client-protocol.h
       include/fractional-scale-v1-client-protocol.h
@@ -39,6 +40,7 @@ extra-source-files:
       include/viewporter-client-protocol.h
       include/wlr-layer-shell-unstable-v1-client-protocol.h
       include/wlr-output-management-unstable-v1-client-protocol.h
+      include/wlr-output-power-management-unstable-v1-client-protocol.h
       include/xdg-output-unstable-v1-client-protocol.h
       binding-specs/river-input-management.yaml
       binding-specs/river-window-management.yaml
@@ -61,6 +63,7 @@ extra-source-files:
       generated/Bindings.Wayland.WlrInputMethodUnstableV2.yaml
       generated/Bindings.Wayland.WlrLayerShellUnstableV1.Generated.yaml
       generated/Bindings.Wayland.WlrOutputManagementUnstableV1.Generated.yaml
+      generated/Bindings.Wayland.WlrOutputPowerManagementUnstableV1.Generated.yaml
       generated/Bindings.Wayland.XdgOutputUnstableV1.Generated.yaml
 extra-doc-files:
       CHANGELOG.md
@@ -164,6 +167,12 @@ library
           Bindings.Wayland.WlrOutputManagementUnstableV1.Generated.Global
           Bindings.Wayland.WlrOutputManagementUnstableV1.Generated.Safe
           Bindings.Wayland.WlrOutputManagementUnstableV1.Generated.Unsafe
+          Bindings.Wayland.WlrOutputPowerManagementUnstableV1
+          Bindings.Wayland.WlrOutputPowerManagementUnstableV1.Generated
+          Bindings.Wayland.WlrOutputPowerManagementUnstableV1.Generated.FunPtr
+          Bindings.Wayland.WlrOutputPowerManagementUnstableV1.Generated.Global
+          Bindings.Wayland.WlrOutputPowerManagementUnstableV1.Generated.Safe
+          Bindings.Wayland.WlrOutputPowerManagementUnstableV1.Generated.Unsafe
           Bindings.Wayland.XdgOutputUnstableV1
           Bindings.Wayland.XdgOutputUnstableV1.Generated
           Bindings.Wayland.XdgOutputUnstableV1.Generated.FunPtr
@@ -182,6 +191,8 @@ library
         , hashable
         , hs-bindgen-runtime
         , template-haskell
+        , text
+        , xml-conduit
     hs-source-dirs:
           src
     default-extensions:
@@ -207,6 +218,7 @@ library
           cbits/viewporter-protocol.c
           cbits/wlr-layer-shell-unstable-v1-protocol.c
           cbits/wlr-output-management-unstable-v1-protocol.c
+          cbits/wlr-output-power-management-unstable-v1-protocol.c
           cbits/xdg-output-unstable-v1-protocol.c
           cbits/wayland-protocols/ext-foreign-toplevel-list-v1-protocol.c
           cbits/wayland-protocols/xdg-shell-protocol.c
