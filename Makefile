@@ -11,13 +11,16 @@ CLIENT_PROTOS := river-window-management-v1.xml \
 		       river-xkb-config-v1.xml \
 		       river-input-management-v1.xml \
 		       river-layer-shell-v1.xml river-libinput-config-v1.xml \
-		       input-method-unstable-v2.xml ext-session-lock-v1.xml \
+		       input-method-unstable-v2.xml \
+		       ext-session-lock-v1.xml \
+		       ext-idle-notify-v1.xml \
 		       xdg-output-unstable-v1.xml \
 		       fractional-scale-v1.xml \
 		       viewporter.xml \
 		       wlr-output-management-unstable-v1.xml \
 		       wlr-layer-shell-unstable-v1.xml \
 		       wlr-output-power-management-unstable-v1.xml
+		       #wayland.xml
 
 SERVER_PROTOS := river-status-unstable-v1.xml
 
@@ -79,6 +82,7 @@ bindgen-river:	\
 	$(bindGenSpecDir)/Bindings.River.LibinputConfigV1.Generated.yaml \
 	$(bindGenSpecDir)/Bindings.River.LayerShellV1.Generated.yaml \
 	$(bindGenSpecDir)/Bindings.Wayland.ExtSessionLockV1.Generated.yaml \
+	$(bindGenSpecDir)/Bindings.Wayland.ExtIdleNotifyV1.Generated.yaml \
 	$(bindGenSpecDir)/Bindings.Wayland.FractionalScaleV1.Generated.yaml \
 	$(bindGenSpecDir)/Bindings.Wayland.XdgOutputUnstableV1.Generated.yaml \
 	$(bindGenSpecDir)/Bindings.Wayland.Viewporter.Generated.yaml \
@@ -191,6 +195,15 @@ $(bindGenSpecDir)/Bindings.Wayland.WlrInputMethodUnstableV2.Generated.yaml: $(HE
 
 # ext-session-lock-client-protocol.h
 $(bindGenSpecDir)/Bindings.Wayland.ExtSessionLockV1.Generated.yaml: $(HEADERDIR)/ext-session-lock-v1-client-protocol.h FORCE
+	$(HS_BIND_GEN) $(<F) \
+	  --gen-binding-spec $@ \
+	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \
+	  --module $(patsubst %.yaml,%,$(@F)) \
+	  --external-binding-spec $(bindGenSpecDir)/Bindings.Wayland.Util.Generated.yaml \
+	  --external-binding-spec $(bindingSpecs)/wayland-client.yaml
+
+# ext-idle-notify-client-protocol.h
+$(bindGenSpecDir)/Bindings.Wayland.ExtIdleNotifyV1.Generated.yaml: $(HEADERDIR)/ext-idle-notify-v1-client-protocol.h FORCE
 	$(HS_BIND_GEN) $(<F) \
 	  --gen-binding-spec $@ \
 	  --unique-id $(patsubst Generated.%,%,$(patsubst %.yaml,%,$(@F))) \

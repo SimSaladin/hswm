@@ -52,6 +52,27 @@ instance HasGlobalsRegistry (IORef RegistryCache) where
 
 -- * Registering to global items
 
+bindGlobalAuto_ :: forall a m env. (Typeable a, WL.HasInterface a, WL.InterfaceType a ~ WL.Wl_interface,
+                   MonadUnliftIO m, MonadThrow m, MonadLogger m, MonadReader env m,
+                   HasGlobalsRegistry env, HasGlobalTMap env) => m a
+bindGlobalAuto_ = bindGlobalWith_ (WL.objectInterfaceName proxy, fi $ WL.objectInterfaceVersion proxy)
+  (WL.objectInterface proxy) WL.objectBindWrap
+    where
+      proxy :: Proxy a
+      proxy = Proxy
+
+bindGlobalAuto :: forall a m env. (Typeable a, WL.HasInterface a, WL.InterfaceType a ~ WL.Wl_interface, WL.AddListener a,
+                   MonadUnliftIO m, MonadThrow m, MonadLogger m, MonadReader env m,
+                   HasGlobalsRegistry env, HasGlobalTMap env)
+                     => [(ConstPtr (WL.ObjectListener a), Ptr a)] -- ^ Optionally a listener/listeners to add after creation
+                       -> m a
+bindGlobalAuto = bindGlobalWith (WL.objectInterfaceName proxy, fi $ WL.objectInterfaceVersion proxy)
+  (WL.objectInterface proxy) WL.objectBindWrap
+    where
+      proxy :: Proxy a
+      proxy = Proxy
+
+
 bindGlobalWith :: (Typeable a, MonadUnliftIO m, MonadThrow m, MonadLogger m, MonadReader env m,
                    HasGlobalsRegistry env, HasGlobalTMap env, WL.AddListener a)
                => InterfaceVersion
@@ -71,7 +92,7 @@ bindGlobalWith_ :: (Typeable a, MonadUnliftIO m, MonadThrow m, MonadLogger m, Mo
                -> m a
 bindGlobalWith_ ifaceVer@(_nm, _ver) iface toa = do
   reg <- asks (view globalsRegistryL)
-  obj <- requireGlobal reg ifaceVer (\r n v -> toa <$> io (WL.registryBind r n iface (fi v)))
+  obj <- requireGlobal reg ifaceVer (\r n v -> toa . castPtr <$> WL.registryBind r n iface (fi v))
   obj <$ putObject obj
 
 requireGlobal :: (MonadIO m, MonadThrow m, MonadLogger m) => IORef RegistryCache -> InterfaceVersion -> (WlRegistry -> Name -> Version -> m a) -> m a

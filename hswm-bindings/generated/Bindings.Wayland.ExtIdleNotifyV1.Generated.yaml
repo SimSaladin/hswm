@@ -1,0 +1,36 @@
+version:
+  hs_bindgen: 0.1.0
+  binding_specification: '1.0'
+hsmodule: Bindings.Wayland.ExtIdleNotifyV1.Generated
+ctypes:
+- headers: ext-idle-notify-v1-client-protocol.h
+  cname: struct ext_idle_notification_v1
+  hsname: Ext_idle_notification_v1
+- headers: ext-idle-notify-v1-client-protocol.h
+  cname: struct ext_idle_notifier_v1
+  hsname: Ext_idle_notifier_v1
+- headers: ext-idle-notify-v1-client-protocol.h
+  cname: struct ext_idle_notification_v1_listener
+  hsname: Ext_idle_notification_v1_listener
+hstypes:
+- hsname: Ext_idle_notification_v1
+  representation: emptydata
+- hsname: Ext_idle_notification_v1_listener
+  representation:
+    record:
+      constructor: Ext_idle_notification_v1_listener
+      fields:
+      - idled
+      - resumed
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Ext_idle_notifier_v1
+  representation: emptydata

@@ -1,7 +1,3 @@
-------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------
-
 -- |
 -- Module      : HSWM.BufferPool
 -- Description : Short description
@@ -11,7 +7,6 @@
 -- Stability   : unstable
 -- Portability : unportable
 --
--- Longer description of this module.
 module HSWM.BufferPool where
 
 import Foreign
@@ -92,7 +87,7 @@ initImageBuffer ImageBufferPool {wlShm = wl_shm, bufferListener = listener} widt
       h = height
   (fd, ptr) <- createShm (fi size)
   pool <- io $ WL.shmCreatePool wl_shm (fi fd) (fi size)
-  buf <- io $ WL.shmPoolCreateBuffer pool 0 (fi w) (fi h) (fi stride) (fi $ (.unwrap) WL.WL_SHM_FORMAT_ABGR8888)
+  buf <- WL.shmPoolCreateBuffer pool 0 (fi w) (fi h) (fi stride) WL.WL_SHM_FORMAT_ABGR8888
   -- create pixman image
   pixmanImage <- io $ P.pixman_image_create_bits_no_clear P.PIXMAN_a8r8g8b8 (fi w) (fi h) (castPtr ptr) (fi stride)
   busy <- Foreign.new True

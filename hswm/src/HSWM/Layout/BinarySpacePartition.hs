@@ -46,7 +46,7 @@ import HSWM.Util.Stack hiding (Zipper)
 --import HSWM.Util.XUtils
 
 import qualified Data.Map as M
-import qualified Data.Set as S
+--import qualified Data.Set as S
 import Data.Ratio ((%))
 import Data.List (foldl, elemIndex, (!!), (\\))
 import Control.Monad.State (get, put)
@@ -709,7 +709,7 @@ getHidden :: HS [RiverWindow]
 getHidden = getStackSet
   >>= lookupWindows . W.integrate'
   >>=  filterM (runQuery isMinimized)
-  >>= return . map river_window
+  <&> map river_window
 
 getStackSet :: HS (Maybe (W.Stack RiverWindow))
 getStackSet = W.stack . W.workspace . W.current <$> gets windowset -- windows on this WS (with floating)
@@ -831,15 +831,15 @@ changedDirs (Rectangle _ _ ow oh) (Rectangle _ _ w h) (mx,my) = catMaybes [lr, u
 -- node focus border helpers
 ----------------------------
 updateNodeRef :: BinarySpacePartition RiverWindow -> Bool -> Rectangle -> HS (BinarySpacePartition RiverWindow)
-updateNodeRef b force r = do
+updateNodeRef b force' r = do
     let n = getFocusedNode b
     let s = getSelectedNode b
     removeBorder (refWins n++refWins s)
     l <- getCurrFocused
-    b' <- if refLeaf n /= l || refLeaf n == (-1) || force
+    b' <- if refLeaf n /= l || refLeaf n == (-1) || force'
             then return b{getFocusedNode=leafToNodeRef l b}
             else return b
-    b'' <- if force then return b'{getSelectedNode=noRef} else return b'
+    b'' <- if force' then return b'{getSelectedNode=noRef} else return b'
     renderBorders r b''
   where getCurrFocused = maybe 0 index <$> (withoutFloating <$> getFloating <*> getHidden <*> getStackSet)
 

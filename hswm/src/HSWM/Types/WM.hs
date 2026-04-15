@@ -32,6 +32,7 @@ import Bindings.River qualified as R
 import Bindings.RiverSafe qualified as R
 import Wayland (RegistryCache, HasGlobalsRegistry(..))
 import Bindings.Wayland.Client qualified as WL hiding (display)
+import Bindings.Wayland.WlrOutputPowerManagementUnstableV1 qualified as Wlr
 
 -- * User configuration
 
@@ -529,12 +530,13 @@ data Output = Output
     outputName :: !String,
     outputDescription :: !String,
     river_layerShellOutput :: !R.RiverLayerShellOutput,
-    nonExclusive :: Maybe (Int32, Int32, Int32, Int32) -- x, y, w, h
+    nonExclusive :: Maybe (Int32, Int32, Int32, Int32), -- x, y, w, h
+    outputPower :: Maybe Wlr.OutputPower
   }
   deriving (Show, Generic)
 
 instance Default Output where
-  def = Output def 0 0 0 0 0 (S (-1)) "" "" (R.RiverLayerShellOutput nullPtr) Nothing
+  def = Output def 0 0 0 0 0 (S (-1)) "" "" (R.RiverLayerShellOutput nullPtr) Nothing Nothing
 
 ---------------------------------------------------------
 -- Actions / Submaps

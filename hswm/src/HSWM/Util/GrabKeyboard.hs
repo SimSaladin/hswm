@@ -1,9 +1,5 @@
 {-# LANGUAGE ConstraintKinds #-}
 
-------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------
-
 -- |
 -- Module      : HSWM.Util.GrabKeyboard
 -- Description : Grab keyboard in wlroots
@@ -28,10 +24,10 @@ type HasGrabCtx env m = (MonadStateGlobal env m, HasEventQueues env, MonadReader
 data GrabIM = GrabIM
   { reserved :: MVar (),
     bcastChan :: TChan (Either Done GrabbedKey),
-    inputMethod :: ZwpInputMethod,
-    inputMethodListener :: ZwpInputMethodListener,
-    imKeyboardGrab :: MVar ZwpInputMethodKeyboardGrab,
-    imKeyboardGrabListener :: ZwpInputMethodKeyboardGrabListener
+    inputMethod :: Wlr.InputMethod,
+    inputMethodListener :: Wlr.InputMethodListener,
+    imKeyboardGrab :: MVar Wlr.InputMethodKeyboardGrab,
+    imKeyboardGrabListener :: Wlr.InputMethodKeyboardGrabListener
   }
 
 data GrabbedKey
@@ -98,7 +94,7 @@ lookupGrabIM s = do
 
 newGrabIM ::
   (MonadReader env m, MonadLogger m, MonadUnliftIO m, MonadFix m) =>
-  ZwpInputMethodManager -> WL.Seat -> m GrabIM
+  Wlr.InputMethodManager -> WL.Seat -> m GrabIM
 newGrabIM manager seat = do
 
   reserved <- newEmptyMVar
@@ -112,17 +108,17 @@ newGrabIM manager seat = do
   runInIO <- askRunInIO
 
   logDebug "grab: creating input method listener"
-  inputMethodListener <- io $ mkZwpInputMethodListener $ \e -> runInIO $ case e of
-    ZwpInputMethodUnavailable _ud self -> do
+  inputMethodListener <- io $ Wlr.mkInputMethodListener $ \e -> runInIO $ case e of
+    Wlr.InputMethodUnavailable _ud self -> do
       logError "grap: unavailable"
       atomically $ writeTChan bcastChan (Left Done)
       io $ WL.objectDestroy self
-    ZwpInputMethodActivate _ _ -> do
+    Wlr.InputMethodActivate _ _ -> do
       writeIORef pending_active True
-    ZwpInputMethodDeactivate _ _ -> do
+    Wlr.InputMethodDeactivate _ _ -> do
       writeIORef pending_active False
 
-    ZwpInputMethodDone _ _ -> do
+    Wlr.InputMethodDone _ _ -> do
       prev_active <- readIORef active
       next_active <- readIORef pending_active
       when (prev_active /= next_active) $ do
@@ -136,30 +132,30 @@ newGrabIM manager seat = do
 
 
   logDebug "grab: creating keyboard grab listener"
-  imKeyboardGrabListener <- io $ mkZwpInputMethodKeyboardGrabListener $ \e -> runInIO $ case e of
-    ZwpInputMethodKeyboardGrabKeymap _ _ _fmt fd size -> do
+  imKeyboardGrabListener <- io $ Wlr.mkInputMethodKeyboardGrabListener $ \e -> runInIO $ case e of
+    Wlr.InputMethodKeyboardGrabKeymap _ _ _fmt fd size -> do
       res <- io $ createKeymap'' xkbContext (fi fd) (fi size)
       st <- io $ xkbStateNew res
       io $ xkbKeymapUnref res
       writeIORef xkbState st
       logDebug "grab: XKB keymap updated"
-    ZwpInputMethodKeyboardGrabModifiers _ _ _ depressed latched locked group -> do
+    Wlr.InputMethodKeyboardGrabModifiers _ _ _ depressed latched locked group -> do
       st <- readIORef xkbState
       _ <- io $ xkbStateUpdateMask st (fi depressed) (fi latched) (fi locked) 0 0 (fi group)
       let it = Right GMod {mods = fi depressed}
       logDebug $ "grab: modifier grabbed" :# [ "mod" .= tshow it ]
       atomically $ writeTChan bcastChan it
-    ZwpInputMethodKeyboardGrabKey _ _ _ _time key st -> do
+    Wlr.InputMethodKeyboardGrabKey _ _ _ _time key st -> do
       xst <- readIORef xkbState
       keysym <- io $ xkbStateKeyGetOneSym xst (fi $ key + 8)
-      let it = Right GK {state = fi st, keysym = fi keysym, keycode = fi key}
+      let it = Right GK {state = fi st.unwrap, keysym = fi keysym, keycode = fi key}
       logDebug $ "grab: key grabbed" :# [ "key" .= show it ]
       atomically $ writeTChan bcastChan it
     -- let pressed = fi st == WL.fromCEnum WL_KEYBOARD_KEY_STATE_PRESSED
 
-    ZwpInputMethodKeyboardGrabRepeatInfo {} -> pure () -- pTrace e -- ignored
+    Wlr.InputMethodKeyboardGrabRepeatInfo {} -> pure () -- pTrace e -- ignored
   logDebug "grab: getting input method"
-  inputMethod <- io $ zwpInputMethodManagerGetInputMethod manager seat
+  inputMethod <- io $ Wlr.inputMethodManagerGetInputMethod manager seat
 
   logDebug "grab: adding input method listener"
   io $ WL.listenerAdd inputMethod inputMethodListener nullPtr
@@ -169,7 +165,7 @@ newGrabIM manager seat = do
 activate :: (MonadIO m, MonadLogger m, MonadReader env m) => GrabIM -> m ()
 activate GrabIM {..} = do
   logDebug "grab: activating..."
-  res <- io $ zwpInputMethodGrabKeyboard inputMethod
+  res <- io $ Wlr.inputMethodGrabKeyboard inputMethod
   when (res.unwrap == nullPtr) $ do
     logError "grab: failed to activate (failed to grab keyboard)"
     error "Failed to grab"
@@ -184,5 +180,5 @@ deactivate GrabIM {..} = do
   case res of
     Just kbdg | kbdg.unwrap /= nullPtr -> do
       logDebug "grab: releasing keyboard grab"
-      io $ zwpInputMethodKeyboardGrabRelease kbdg
+      io $ WL.objectDestroy kbdg
     _ -> pure ()

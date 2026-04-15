@@ -1,13 +1,12 @@
 -- |
 -- Module      : HSWM.Core
--- Description : Short description
+-- Description :
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
 --
--- Longer description of this module.
 module HSWM.Core
   ( module HSWM.Core,
     module HSWM.Types.Config,
@@ -24,10 +23,6 @@ module HSWM.Core
 where
 
 import Control.Monad.State
-import Data.Map qualified as M
-import Data.Monoid (Ap (..))
-import Foreign hiding (void)
-import Foreign.C
 import HSWM.ManageHook
 import HSWM.Types.Config
 import HSWM.Types.Events
@@ -37,10 +32,7 @@ import HSWM.Types.WM
 import HSWM.Util.Types
 import HSWM.XKB
 import River
-import Bindings.River qualified as R
-import Bindings.RiverSafe qualified as R
-import Wayland (RegistryCache)
-import Bindings.Wayland.Client qualified as WL hiding (display)
+import GHC.Stack
 
 runH :: HConf -> H a -> IO a
 runH c (H a) = runReaderT a c
@@ -51,11 +43,12 @@ runHS c st (HS a) = runStateT (runReaderT a c) st
 runInHS :: HasCallStack => (MonadIO m, MonadReader HConf m) => HS a -> m a
 runInHS a = do
   conf <- ask
-  when conf._stateLocked $ throwString "runInHS: state locked (attempted to nest state lock?)"
-  io $ bracketOnError (atomically $ takeTMVar conf._state) (atomically . putTMVar conf._state) $ \st -> do
-    (r, st') <- runHS conf {_stateLocked = True} st a
-    atomically $ putTMVar conf._state st'
-    return r
+  when conf._stateLocked $ throwString $ "runInHS: state locked (attempted to nest state lock?)\n" ++ prettyCallStack callStack
+  io $ bracketOnError (atomically $ takeTMVar conf._state) (atomically . tryPutTMVar conf._state) $ \st -> do
+    res <- timeout 2000000 $ runHS conf {_stateLocked = True} st a
+    case res of
+      Just (r, st') -> atomically (putTMVar conf._state st') >> return r
+      Nothing -> throwString $ "runInHS: timed out (2s): " ++ prettyCallStack callStack
 
 liftH :: (MonadReader HConf m, MonadIO m) => H a -> m a
 liftH a = do

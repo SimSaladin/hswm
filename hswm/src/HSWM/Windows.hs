@@ -23,6 +23,7 @@ import HSWM.Seats qualified as Seats
 import HSWM.StackSet qualified as W
 import Bindings.River qualified as R
 import Bindings.RiverSafe qualified as R
+import Bindings.Wayland.Client qualified as WL
 
 added :: RiverWindow -> H ()
 added w = do
@@ -208,8 +209,8 @@ render = runInHS $ do
 setInitialManageProperties :: Window -> HS ()
 setInitialManageProperties Window {river_window = rw} = do
   io $ R.riverWindowUseSsd rw
-  io $ R.riverWindowSetCapabilities rw (fi $ foldl' (.|.) 0 $ map (.unwrap) [Maximize, Fullscreen])
-  io $ R.riverWindowSetTiled rw (fi $ foldl' (.|.) 0 $ map (.unwrap) [EdgeTop, EdgeBottom, EdgeLeft, EdgeRight])
+  io $ R.riverWindowSetCapabilities rw (WL.toCEnum . fi $ foldl' (.|.) 0 $ map (.unwrap) [Maximize, Fullscreen])
+  io $ R.riverWindowSetTiled rw (WL.toCEnum . fi $ foldl' (.|.) 0 $ map (.unwrap) [EdgeTop, EdgeBottom, EdgeLeft, EdgeRight])
   bcolor <- asks (normalBorder . config)
   modifyWindow rw $ \s -> s {new = False, p_render_border = Just bcolor}
 
@@ -257,8 +258,8 @@ handleEvent e = case e of
   -- updated width + height
   R.RiverWindowDimensions _ window we_width we_height -> runInHS $ modifyWindow window $ \s -> s {width = fi we_width, height = fi we_height}
   -- Hints
-  R.RiverWindowDecorationHint _ window we_hint -> runInHS $ modifyWindow window $ \s -> s {decorationHint = Just $ R.River_window_v1_decoration_hint (fi we_hint)}
-  R.RiverWindowPresentationHint _ window we_hint -> runInHS $ modifyWindow window $ \s -> s {presentationHint = Just (R.River_output_v1_presentation_mode (fi we_hint))}
+  R.RiverWindowDecorationHint _ window we_hint -> runInHS $ modifyWindow window $ \s -> s {decorationHint = Just  we_hint}
+  R.RiverWindowPresentationHint _ window we_hint -> runInHS $ modifyWindow window $ \s -> s {presentationHint = Just we_hint}
   R.RiverWindowDimensionsHint _ window we_min_width we_min_height we_max_width we_max_height ->
     runInHS $ modifyWindow window $ \s -> s {min_width = fi we_min_width, min_height = fi we_min_height, max_width = fi we_max_width, max_height = fi we_max_height}
   -- fullscreen
@@ -268,7 +269,7 @@ handleEvent e = case e of
   R.RiverWindowPointerMoveRequested _ w seat ->
     runInHS $ modifyWindow w $ \s -> s {pointer_move_requested = seat}
   R.RiverWindowPointerResizeRequested _ w seat edges ->
-    runInHS $ modifyWindow w $ \x -> x {pointer_resize_requested = seat, pointer_resize_requested_edges = fromIntegral edges}
+    runInHS $ modifyWindow w $ \x -> x {pointer_resize_requested = seat, pointer_resize_requested_edges = fi $ WL.fromCEnum edges}
   -- TODO maximize
   R.RiverWindowMaximizeRequested _ _w -> return ()
   R.RiverWindowUnmaximizeRequested _ _w -> return ()

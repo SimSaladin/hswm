@@ -182,6 +182,8 @@ myKeys =
     ("M-Return", "New terminal window" $?$?= SomeAction @H (LaunchProgram "kitty" [])), -- Terminal
     ("M-Escape", "Print debug stack" $?$?= debugAction),
     ("M-Dollar", "Lock session" $?$?= void (spawnProcess @H "swaylock" ["-k"])),
+    ("M-C-Return", "" $?$?= void @H (async (runInHS (setOutputPower False) >> threadDelay 5000000 >> runInHS (setOutputPower True)))),
+    -- ("C-Return", "" $?$?= void @H (async (runInHS (setOutputPower False) >> threadDelay 5000000 >> runInHS (setOutputPower True)))),
     -- "M-<F1>" `CF.key'` helpCmd
     -- "M-r M-S-c"     cmdT @"Signal process (SIGKILL) of focused window (_NET_WM_PID)" (withFocused (signalProcessBy Posix.sigKILL))
     -- "M-q"           myRecompileRestart False True ? "Recompile && Restart"

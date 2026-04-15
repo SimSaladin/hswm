@@ -19,6 +19,7 @@ import Bindings.Wayland.FractionalScaleV1 qualified as FS
 import Bindings.Wayland.Viewporter qualified as VP
 import Bindings.Wayland.WlrLayerShellUnstableV1 qualified as Wlr
 import Bindings.Wayland.WlrOutputManagementUnstableV1 qualified as Wlr
+import Bindings.Wayland.WlrOutputPowerManagementUnstableV1 qualified as Wlr
 import Bindings.Wayland.XdgOutputUnstableV1 qualified as Zdg
 import Foreign hiding (new, void)
 import HSWM.Core
@@ -45,6 +46,7 @@ import Bindings.Wayland.Client
 import Bindings.Wayland.Client qualified as WL
 import Bindings.Wayland.WlrInputMethodUnstableV2 as Wlr
 import Bindings.Wayland.Protocol.ForeignTopLevelListV1 as WL
+import Bindings.Wayland.ExtIdleNotifyV1 as Ext
 
 hswm :: (m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow)) => HSWMConfig m l -> IO ()
 hswm conf = do
@@ -114,6 +116,7 @@ startHSWM wlDisplay config = do
       _ <- getOrCreateObjectIO $ Zdg.mkOutputListener $ \e -> handleE $ ZdgOutputEvent e
       wlrOmL <- getOrCreateObjectIO $ Wlr.mkOutputManagerListener $ \e -> handleE $ WlrOutputManagerEvent e
       _ <- getOrCreateObjectIO $ Wlr.mkOutputHeadListener $ \e -> handleE $ WlrOutputHeadEvent e
+      _ <- getOrCreateObjectIO $ Ext.mkIdleNotificationListener $ handleE . ExtIdleNotificationEvent
 
       logDebug "created event listeners"
 
@@ -124,21 +127,23 @@ startHSWM wlDisplay config = do
       _ <- io $ displayRoundtrip wlDisplay
 
       -- Bind initial globals
-      _ <- bindGlobalWith_ ("wl_compositor", 4) WL.compositorInterface WL.Compositor
-      _ <- bindGlobalWith  ("wl_shm", 2) WL.shmInterface WL.Shm [(shmL, nullPtr)]
-      _ <- bindGlobalWith_ ("zwp_input_method_manager_v2", 1) zwpInputMethodManagerInterface ZwpInputMethodManager
-      _ <- bindGlobalWith  ("river_libinput_config_v1", 1) R.riverLibinputConfigInterface R.RiverLibinputConfig [(libinputConfigL, nullPtr)]
-      _ <- bindGlobalWith  ("river_input_manager_v1", 1) R.riverInputManagerInterface R.RiverInputManager [(inputManagerL, nullPtr)]
-      _ <- bindGlobalWith_ ("river_layer_shell_v1", 1) R.riverLayerShellInterface R.RiverLayerShell
-      _ <- bindGlobalWith  ("river_window_manager_v1", 4) R.riverWindowManagerInterface R.RiverWindowManager [(managerL, nullPtr)]
-      _ <- bindGlobalWith_ ("river_xkb_bindings_v1", 2) R.riverXkbBindingsInterface R.RiverXkbBindings
-      _ <- bindGlobalWith  ("river_xkb_config_v1", 1) R.riverXkbConfigInterface R.RiverXkbConfig [(xkbConfigL, nullPtr)]
-      _ <- bindGlobalWith  ("ext_foreign_toplevel_list_v1", 1) WL.foreignToplevelListInterface WL.ForeignToplevelList [(foreignListL, nullPtr)]
-      _ <- bindGlobalWith_ ("zxdg_output_manager_v1", 3) Zdg.outputManagerInterface Zdg.OutputManager
-      _ <- bindGlobalWith  ("zwlr_output_manager_v1", 4) Wlr.outputManagerInterface Wlr.OutputManager [(wlrOmL, nullPtr)]
-      _ <- bindGlobalWith_ ("zwlr_layer_shell_v1", 4) Wlr.layerShellInterface Wlr.LayerShell
-      _ <- bindGlobalWith_ ("wp_fractional_scale_manager_v1", 1) FS.fractionalScaleManagerInterface FS.FractionalScaleManager
-      _ <- bindGlobalWith_ ("wp_viewporter", 1) VP.viewporterInterface VP.Viewporter
+      _ <- bindGlobalAuto_ @WL.Compositor
+      _ <- bindGlobalAuto  @WL.Shm [(shmL, nullPtr)]
+      _ <- bindGlobalAuto_ @Wlr.InputMethodManager
+      _ <- bindGlobalAuto  @R.RiverLibinputConfig [(libinputConfigL, nullPtr)]
+      _ <- bindGlobalAuto  @R.RiverInputManager [(inputManagerL, nullPtr)]
+      _ <- bindGlobalAuto_ @R.RiverLayerShell
+      _ <- bindGlobalAuto  @R.RiverWindowManager [(managerL, nullPtr)]
+      _ <- bindGlobalAuto_ @R.RiverXkbBindings
+      _ <- bindGlobalAuto  @R.RiverXkbConfig [(xkbConfigL, nullPtr)]
+      _ <- bindGlobalAuto_ @Zdg.OutputManager
+      _ <- bindGlobalAuto  @Wlr.OutputManager [(wlrOmL, nullPtr)]
+      _ <- bindGlobalAuto_ @Wlr.LayerShell
+      _ <- bindGlobalAuto_ @FS.FractionalScaleManager
+      _ <- bindGlobalAuto_ @VP.Viewporter
+      _ <- bindGlobalAuto_ @Wlr.OutputPowerManager
+      _ <- bindGlobalAuto_ @Ext.IdleNotifier
+      -- _ <- bindGlobalAuto  @WL.ForeignToplevelList [(foreignListL, nullPtr)]
 
       logDebug "running startup hooks"
       void $ userCode (startupHook config)
@@ -173,8 +178,7 @@ startHSWM wlDisplay config = do
       forever $ do
         -- flush outgoing requests
         catch (void $ io (displayFlush wlDisplay)) $ \case
-          e
-            | isFullError e -> io $ setPollEvents wlPollFd (pOLLIN .|. pOLLOUT)
+          e | isFullError e -> io $ setPollEvents wlPollFd (pOLLIN .|. pOLLOUT)
             | otherwise -> io $ mainEvent $ MainExit $ "flush failed: " ++ show e
 
         io $
@@ -244,13 +248,13 @@ handleEvent (WindowManagerEvent e) = case e of
     log' "river_window_manage_v1 finished, exiting."
     io $ Posix.raiseSignal Posix.sigINT
 
-  R.RiverWindowManagerSessionLocked _ wm -> do
+  R.RiverWindowManagerSessionLocked _ _wm -> do
     q <- asks (view pendingManageQL)
     atomically $ writeTQueue q $ do
       mapSeats $ \s ->
         io $ mapM_ (deRefStablePtr >=> R.riverXkbBindingDisable . xkb_binding) s.xkb_bindings
 
-  R.RiverWindowManagerSessionUnlocked _ wm -> do
+  R.RiverWindowManagerSessionUnlocked _ _wm -> do
     q <- asks (view pendingManageQL)
     atomically $ writeTQueue q $ do
       mapSeats $ \s ->
@@ -277,4 +281,10 @@ handleEvent (ForeignTopLevelListV1 (WL.ForeignToplevelListToplevel _ _ fh)) = do
 handleEvent (WlrOutputManagerEvent (Wlr.OutputManagerHead _ _ head)) = do
   l <- getObject
   io $ WL.listenerAdd head l nullPtr
+
+handleEvent (ExtIdleNotificationEvent e) =
+  case e of
+    Ext.IdleNotificationIdled _ _ -> runInHS $ setOutputPower False
+    Ext.IdleNotificationResumed _ _ -> runInHS $ setOutputPower True
+
 handleEvent _ = return ()

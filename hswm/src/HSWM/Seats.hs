@@ -25,6 +25,7 @@ import Wayland
 import Bindings.River qualified as R
 import Bindings.RiverSafe qualified as R
 import Bindings.Wayland.Client qualified as WL
+import Bindings.Wayland.ExtIdleNotifyV1 qualified as Ext
 
 data LayerShellFocus = FocusNone | FocusLayerShell {exclusive :: !Bool}
   deriving (Eq, Show, Generic)
@@ -40,7 +41,7 @@ data SeatManager = SeatManager
   deriving anyclass (Default)
 
 modifySeat' :: Ptr Void -> (Seat -> Seat) -> HS ()
-modifySeat' ud f = modifySeat (R.RiverSeat $ castPtr ud) f
+modifySeat' ud = modifySeat (R.RiverSeat $ castPtr ud)
 
 getSMgr :: H SeatManager
 getSMgr = getOrCreateObject (pure def)
@@ -61,6 +62,7 @@ added river_seat = do
   -- Add xkb bindings seat listener
   xkb_bindings_seat <- io $ R.riverXkbBindingsGetSeat xkbBindings river_seat
   io $ R.listenerAdd xkb_bindings_seat xkbBindingsSeatListener river_seat
+  --
   let seat = def {river_seat, river_layer_shell_seat, xkb_bindings_seat}
   om <- getSMgr
   putObject om {pending_manage = seat : pending_manage om}
@@ -102,8 +104,14 @@ handleEvent e = do
       registry <- asks globals
       wlseatL <- getObject
       wlseat <- requireGlobal registry ("wl_seat", 9) $ \r _ ver ->
-        io $ WL.registryBind r name WL.seatInterface (fi ver) <&> WL.Seat
+        WL.registryBind r name WL.seatInterface (fi ver) <&> WL.Seat . castPtr
       io $ R.listenerAdd wlseat wlseatL seat
+      -- Register idle notifier
+      idleNotify <- getObject
+      idleNotifyL <- getObject
+      idleN <- Ext.idleNotifierGetIdleNotification idleNotify (10 * 60 * 1000) wlseat
+      --idleN <- Ext.idleNotifierGetIdleNotification idleNotify (10 * 1000) wlseat
+      WL.listenerAdd idleN idleNotifyL seat
     _ -> return ()
 
 handleWlSeatEvent :: WL.SeatEvent -> H ()
@@ -111,12 +119,11 @@ handleWlSeatEvent e = do
   case e of
     WL.SeatName ud wl_seat name -> runInHS $ do
       modifySeat' ud $ \x -> x {name = name, wl_seat}
-      mapSeats $ pTrace
     WL.SeatCapabilities ud s caps -> do
       runInHS $ do
-        modifySeat' ud $ \x -> x {caps = WL.toCEnum (fi caps)}
+        modifySeat' ud $ \x -> x {caps = WL.toCEnum (fi caps.unwrap)}
 
-      when (caps > 0) $ do
+      when (caps.unwrap > 0) $ do
         log' $ display $ "seat: get keyboard: " <> tshow caps
         wlkeyboard <- io $ WL.seatGetKeyboard s
         wlkeyboardL <- getObject

@@ -14,11 +14,10 @@ import Data.Map qualified as M
 import Foreign
 import HSWM
 import Bindings.River qualified as R
-import Text.Printf
+--import Text.Printf
 import Bindings.Wayland.Client qualified as WL
-import Bindings.Wayland.Protocol.ForeignTopLevelListV1 as WL
-import qualified Data.Aeson as A
 
+logEvent :: (MonadLogger m, Show a, Monoid (m b)) => a -> m b
 logEvent ev = logDebug (fromString $ "EVENT " ++ show ev) >> mempty
 
 debugHook :: Event -> H All
@@ -38,7 +37,7 @@ debugHook ev
   | WindowEvent e <- ev = logEvent e
   -- WL_*
   | WlOutputEvent _ <- ev = logEvent ev
-  | WlShmEvent (WL.ShmFormat _ _ fmt) <- ev = logInfo (fromString ("SHM FORMAT: " <> ppShmFormat (WL.Wl_shm_format $ fi fmt))) >> mempty
+  | WlShmEvent (WL.ShmFormat _ _ fmt) <- ev = logInfo (fromString ("SHM FORMAT: " <> ppShmFormat fmt)) >> mempty
   | WlSeatEvent e <- ev = logEvent e
   -- Ext_*
   | ForeignTopLevelHandleV1 e <- ev = logEvent e

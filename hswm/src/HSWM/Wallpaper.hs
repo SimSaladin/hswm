@@ -34,7 +34,6 @@ import Bindings.River qualified as R
 import System.Directory
 import System.IO.Unsafe
 import Bindings.Wayland.Client qualified as WL
-import Bindings.Wayland.Util.Generated.Safe qualified as WL
 
 -- * Usage
 
@@ -263,9 +262,9 @@ initOutput ro = withOutputState ro $ \os -> do
           runInIO $ updateOutputState ro $ \x -> x {pref_fract_scale = fscale, pending_render = True}
       io $ WL.listenerAdd fractSurface fsl nullPtr
 
-      layerSurface <- io $ Wlr.layerShellGetLayerSurface layerShell wl_surface os.wl_output (fi $ R.fromCEnum Wlr.ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND) (Just "wallpaper")
+      layerSurface <- io $ Wlr.layerShellGetLayerSurface layerShell wl_surface os.wl_output Wlr.ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND (Just "wallpaper")
       io $ Wlr.layerSurfaceSetSize layerSurface 0 0
-      io $ Wlr.layerSurfaceSetAnchor layerSurface (1 + 2 + 4 + 8)
+      io $ Wlr.layerSurfaceSetAnchor layerSurface (WL.toCEnum $ 1 + 2 + 4 + 8)
       io $ Wlr.layerSurfaceSetExclusiveZone layerSurface (-1)
 
       viewport <- io $ VP.viewporterGetViewport vpr wl_surface

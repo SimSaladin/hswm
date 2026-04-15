@@ -16,6 +16,7 @@ import Foreign
 import HSWM.XKB
 import Bindings.River qualified as R
 import River.WMP
+import qualified Bindings.Wayland.Client as WL
 
 type XBKey = (Modifiers, KeySym)
 
@@ -61,7 +62,7 @@ newXKBBinding ::
   m (StablePtr (XkbBinding action))
 newXKBBinding xkbBinds xkb_binding_listener seat enable mods keysym action subKM = do
   logDebug $ "new xkb binding" :# [ "key" .= ppXkbModsKey mods keysym,  "action" .= show action ]
-  xb <- io $ R.riverXkbBindingsGetXkbBinding xkbBinds seat (fi keysym) (fi mods)
+  xb <- io $ R.riverXkbBindingsGetXkbBinding xkbBinds seat (fi keysym) (WL.toCEnum mods)
   -- subP <- io $ newStablePtr subKM
   dtPtr <- io $ newStablePtr $ XkbBinding xb seat action subKM autorepeat
   _ <- io $ R.listenerAdd xb xkb_binding_listener (castPtr $ castStablePtrToPtr dtPtr)

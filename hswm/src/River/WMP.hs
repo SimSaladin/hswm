@@ -25,6 +25,7 @@ import Foreign.Storable.Generic (GStorable (..))
 import HSWM.XKB
 import Bindings.River qualified as R
 import Bindings.RiverSafe qualified as R
+import qualified Bindings.Wayland.Client as WL
 
 data RiverColor = RiverColor {red, green, blue, alpha :: !Word32}
   deriving (Show, Read, Eq, Generic)
@@ -119,7 +120,7 @@ newPointerBinding ::
   m (StablePtr (PointerBinding a))
 newPointerBinding pointerBindingListener seat mods btn action = do
   logInfo $ "new pointer binding" :# [ "key" .= ppXkbModsKey mods btn, "action" .= show action ]
-  pb' <- io $ R.riverSeatGetPointerBinding seat (fi btn) (fi mods)
+  pb' <- io $ R.riverSeatGetPointerBinding seat (fi btn) (WL.toCEnum mods)
   dtPtr <- io $ newStablePtr $ PointerBinding pb' seat action
   io $ R.listenerAdd pb' pointerBindingListener (castPtr $ castStablePtrToPtr dtPtr)
   _ <- liftIO $ R.riverPointerBindingEnable pb'

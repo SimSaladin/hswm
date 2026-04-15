@@ -17,6 +17,7 @@
 module HSWM.Outputs where
 
 import Bindings.Wayland.XdgOutputUnstableV1 qualified as Zdg
+import Bindings.Wayland.WlrOutputPowerManagementUnstableV1 qualified as Wlr
 import Data.List qualified as L
 import Data.Map qualified as M
 import Foreign
@@ -79,7 +80,7 @@ handle e = do
           -- destroy output
           liftIO $ R.objectDestroy output
           -- release wl_output
-          forM_ (M.lookup output om.wl_outputs) $ \p -> io $ WL.outputRelease p
+          forM_ (M.lookup output om.wl_outputs) $ \p -> io $ WL.objectDestroy p
     R.RiverOutputWlOutput _ output name -> do
       -- bind a wl_output listener
       registry <- asks globals
@@ -87,13 +88,18 @@ handle e = do
       zdgOM <- getObject
       zdgOutputListener <- getObject
       wl_output <- requireGlobal registry ("wl_output", 4) $ \r _ ver ->
-        io $ WL.Output <$> WL.registryBind r name WL.outputInterface (fi ver)
-      _ <- io $ WL.listenerAdd wl_output wlOutputListener output
-      putObject om {wl_outputs = M.insert output wl_output $ wl_outputs om}
-      -- zdg_output
+        WL.Output . castPtr <$> WL.registryBind r name WL.outputInterface (fi ver)
+      _ <- WL.listenerAdd wl_output wlOutputListener output
+      -- xdg_output
       zdg_output <- io $ Zdg.outputManagerGetXdgOutput zdgOM wl_output
       io $ WL.listenerAdd zdg_output zdgOutputListener output
-      return ()
+      -- output power mgmt
+      opm <- getObject
+      power <- Wlr.outputPowerManagerGetOutputPower opm wl_output
+      putObject om
+        { wl_outputs = M.insert output wl_output $ wl_outputs om
+        , pending_setup = M.adjust (\o -> o { outputPower = Just power }) output (pending_setup om)
+        }
     R.RiverOutputDimensions _ output width height ->
       modifyOutput' output $ \x -> (x :: Output) {width = fi width, height = fi height}
     R.RiverOutputPosition _ output x y ->

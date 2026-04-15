@@ -15,6 +15,8 @@ import System.Environment
 import System.IO (hGetContents, hPrint, print, writeFile)
 import System.Posix qualified as Posix
 import System.Posix.Process (executeFile)
+import qualified Bindings.Wayland.Client as WL
+import qualified Bindings.Wayland.WlrOutputPowerManagementUnstableV1 as Wlr
 
 -- * Misc. pure operations
 
@@ -42,13 +44,13 @@ manageKill = doManage WRequestClose
 --
 -- /manage/
 tileWindow :: Bool -> RiverWindow -> Rectangle -> HS ()
-tileWindow placeTop rw r = withWindow rw $ \w -> do
+tileWindow placeTop rw r = do
   bw <- asks (fi . borderWidth . config)
   -- give all windows at least 1x1 pixels
   let least x
         | x <= bw * 2 = 1
         | otherwise = x - bw * 2
-  io $ R.riverWindowProposeDimensions w.river_window (least $ fi r.width) (least $ fi r.height)
+  withWindow rw $ \w -> R.riverWindowProposeDimensions w.river_window (least $ fi r.width) (least $ fi r.height)
   modifyWindow rw $ \w ->
     w
       { p_render_pos = Just (fi r.x + bw, fi r.y + bw),
@@ -197,7 +199,7 @@ setWindowBorder w RiverColor {red = wb_r, green = wb_g, blue = wb_b, alpha = wb_
 
 riverWindowSetBorders :: RiverWindow -> WindowBorders -> IO ()
 riverWindowSetBorders w WindowBorders {..} =
-  R.riverWindowSetBorders w wb_edges wb_width wb_r wb_g wb_b wb_a
+  R.riverWindowSetBorders w (WL.toCEnum $ fi wb_edges) wb_width wb_r wb_g wb_b wb_a
 
 setWindowPosition :: Window -> Int32 -> Int32 -> HS ()
 setWindowPosition w x y = do
@@ -266,6 +268,15 @@ modifyOutput ro f = modify $ \s -> s {_outputs = map g (_outputs s)}
       | river_output == ro = f a
       | otherwise = a
 
+setOutputPower :: Bool -> HS ()
+setOutputPower mode = do
+  ops <- map outputPower <$> gets _outputs
+  forM_ ops $ \case
+    Nothing -> return ()
+    Just power -> do
+      logInfo $ "setting output power" :# [ "mode_on" .= mode ]
+      Wlr.outputPowerSetMode power (if mode then Wlr.outputPowerModeOn else Wlr.outputPowerModeOff)
+
 --------------------------------------------------------------
 -- * Seats
 
@@ -308,7 +319,7 @@ lookupWindow :: RiverWindow -> HS (Maybe Window)
 lookupWindow wid = gets (M.lookup wid . _windows)
 
 lookupWindows :: [RiverWindow] -> HS [Window]
-lookupWindows wids = gets $ catMaybes . (\ws -> map (flip M.lookup ws) wids) . _windows
+lookupWindows wids = gets $ catMaybes . (\ws -> map (`M.lookup` ws) wids) . _windows
 
 withWindow :: RiverWindow -> (Window -> HS ()) -> HS ()
 withWindow wid f = gets (M.lookup wid . _windows) >>= (`whenJust` f)
@@ -349,7 +360,7 @@ floatLocation w = go
     go = do
       ws <- gets windowset
       let bw = 2 :: Int -- (fromIntegral . wa_border_width) wa
-      point_sc <- pointScreen (fi w.x) (fi $ w.y)
+      point_sc <- pointScreen (fi w.x) (fi w.y)
 
       -- ignore pointScreen for new windows unless it's the current
       -- screen, otherwise the float's relative size is computed against
@@ -359,11 +370,11 @@ floatLocation w = go
             fromMaybe (W.current ws) $
               if point_sc `sr_eq` Just (W.current ws) then point_sc else Nothing
           sr = screenRect . W.screenDetail $ sc
-          x = (fi w.x - fi (sr.x)) % fi (sr.width)
-          y = (fi w.y - fi (sr.y)) % fi (sr.height)
+          x = (fi w.x - fi sr.x) % fi sr.width
+          y = (fi w.y - fi sr.y) % fi sr.height
           (width, height) = {- applySizeHintsContents sh -} (fi w.width, fi w.height)
-          rwidth = fi (width + bw * 2) % fi (sr.width)
-          rheight = fi (height + bw * 2) % fi (sr.height)
+          rwidth = fi (width + bw * 2) % fi sr.width
+          rheight = fi (height + bw * 2) % fi sr.height
           -- adjust x/y of unmanaged windows if we ignored or didn't get pointScreen,
           -- it might be out of bounds otherwise
           rr =
@@ -389,7 +400,7 @@ restart :: String -> H ()
 restart prog = do
   runInHS $ broadcastMessage ReleaseResources
   void . userCode =<< asks (exitHook . config)
-  runInHS $ writeStateToFile
+  runInHS writeStateToFile
   logInfo $ "restart: executing" :# [ "program" .= prog ]
   io $ do
     res <- try $ executeFile prog True [] Nothing

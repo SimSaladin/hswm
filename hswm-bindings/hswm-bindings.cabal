@@ -12,6 +12,7 @@ author:             Samuli Thomasson
 maintainer:         samuli.thomasson@pm.me
 build-type:         Simple
 extra-source-files:
+      cbits/ext-idle-notify-v1-protocol.c
       cbits/ext-session-lock-v1-protocol.c
       cbits/fractional-scale-v1-protocol.c
       cbits/input-method-unstable-v2-protocol.c
@@ -27,6 +28,7 @@ extra-source-files:
       cbits/wlr-output-management-unstable-v1-protocol.c
       cbits/wlr-output-power-management-unstable-v1-protocol.c
       cbits/xdg-output-unstable-v1-protocol.c
+      include/ext-idle-notify-v1-client-protocol.h
       include/ext-session-lock-v1-client-protocol.h
       include/fractional-scale-v1-client-protocol.h
       include/input-method-unstable-v2-client-protocol.h
@@ -53,6 +55,7 @@ extra-source-files:
       generated/Bindings.River.XkbBindingsV1.Generated.yaml
       generated/Bindings.River.XkbConfigV1.Generated.yaml
       generated/Bindings.Wayland.Client.Generated.yaml
+      generated/Bindings.Wayland.ExtIdleNotifyV1.Generated.yaml
       generated/Bindings.Wayland.ExtSessionLockV1.Generated.yaml
       generated/Bindings.Wayland.FractionalScaleV1.Generated.yaml
       generated/Bindings.Wayland.Protocol.ForeignTopLevelListV1.Generated.yaml
@@ -118,6 +121,12 @@ library
           Bindings.Wayland.Client.Generated.Global
           Bindings.Wayland.Client.Generated.Safe
           Bindings.Wayland.Client.Generated.Unsafe
+          Bindings.Wayland.ExtIdleNotifyV1
+          Bindings.Wayland.ExtIdleNotifyV1.Generated
+          Bindings.Wayland.ExtIdleNotifyV1.Generated.FunPtr
+          Bindings.Wayland.ExtIdleNotifyV1.Generated.Global
+          Bindings.Wayland.ExtIdleNotifyV1.Generated.Safe
+          Bindings.Wayland.ExtIdleNotifyV1.Generated.Unsafe
           Bindings.Wayland.ExtSessionLockV1
           Bindings.Wayland.ExtSessionLockV1.Generated
           Bindings.Wayland.ExtSessionLockV1.Generated.FunPtr
@@ -205,6 +214,7 @@ library
           include
           include/wayland-protocols
     c-sources:
+          cbits/ext-idle-notify-v1-protocol.c
           cbits/ext-session-lock-v1-protocol.c
           cbits/fractional-scale-v1-protocol.c
           cbits/input-method-unstable-v2-protocol.c

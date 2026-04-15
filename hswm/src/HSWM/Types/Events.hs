@@ -16,6 +16,7 @@ import Bindings.River qualified as R
 import Bindings.Wayland.Client qualified as WL
 import Bindings.Wayland.Protocol.ForeignTopLevelListV1 qualified as WL
 import Bindings.Wayland.WlrInputMethodUnstableV2 qualified as Zwp
+import Bindings.Wayland.ExtIdleNotifyV1 qualified as Ext
 
 -- | Mash-up of all River/Wayland generated events
 data Event
@@ -46,10 +47,11 @@ data Event
     ForeignTopLevelListV1 !WL.ForeignToplevelListEvent
   | ForeignTopLevelHandleV1 !WL.ForeignToplevelHandleEvent
   | SessionLockEvent !SL.SessionLockEvent
+  | ExtIdleNotificationEvent !Ext.IdleNotificationEvent
   | -- Zwp_*
-    ZwpIM2PopupSurfaceE !Zwp.ZwpInputPopupSurfaceEvent
-  | ZwpIM2KeyboardGrabE !Zwp.ZwpInputMethodKeyboardGrabEvent
-  | ZwpIM2E !Zwp.ZwpInputMethodEvent
+    ZwpIM2PopupSurfaceE !Zwp.InputPopupSurfaceEvent
+  | ZwpIM2KeyboardGrabE !Zwp.InputMethodKeyboardGrabEvent
+  | ZwpIM2E !Zwp.InputMethodEvent
   | -- Wlr_*
     WlrOutputManagerEvent !Wlr.OutputManagerEvent
   | WlrOutputHeadEvent !Wlr.OutputHeadEvent
