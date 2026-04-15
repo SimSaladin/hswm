@@ -28,7 +28,6 @@ import HSWM.Operations
 import HSWM.Outputs qualified as Outputs
 import HSWM.Seats qualified as Seats
 import HSWM.StackSet qualified as W
-import HSWM.Util.Posix
 import HSWM.Utils
 import HSWM.Windows qualified as Windows
 import Bindings.River qualified as R
@@ -37,8 +36,7 @@ import System.Posix qualified as Posix
 import Wayland
 import Wayland qualified as WL
 import Bindings.Wayland.Client
-  ( displayDispatch,
-    displayFlush,
+  ( displayFlush,
     displayGetFd,
     displayGetRegistry,
     displayRoundtrip,
@@ -47,12 +45,11 @@ import Bindings.Wayland.Client qualified as WL
 import Bindings.Wayland.WlrInputMethodUnstableV2 as Wlr
 import Bindings.Wayland.Protocol.ForeignTopLevelListV1 as WL
 import Bindings.Wayland.ExtIdleNotifyV1 as Ext
+import Control.Concurrent (threadWaitRead, threadWaitWrite)
 
 hswm :: (m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow)) => HSWMConfig m l -> IO ()
 hswm conf = do
   installSignalHandlers
-  -- logOpts <- logOptionsHandle stderr True <&> setLogUseLoc False
-  -- withLogFunc logOpts $ \logFunc -> flip runReaderT logFunc $ do
   display <- WL.displayConnect Nothing
   startHSWM display conf
 
@@ -111,7 +108,7 @@ startHSWM wlDisplay config = do
       _ <- getOrCreateObjectIO $ R.mkRiverLibinputDeviceListener $ \e -> handleE $ LibinputDeviceEvent e
       inputManagerL <- getOrCreateObjectIO $ R.mkRiverInputManagerListener $ \e -> handleE $ InputManagerEvent e
       managerL <- getOrCreateObjectIO $ R.mkRiverWindowManagerListener $ \e -> handleE $ WindowManagerEvent e
-      foreignListL <- getOrCreateObjectIO $ WL.mkForeignToplevelListListener $ \e -> handleE $ ForeignTopLevelListV1 e
+      --foreignListL <- getOrCreateObjectIO $ WL.mkForeignToplevelListListener $ \e -> handleE $ ForeignTopLevelListV1 e
       _ <- getOrCreateObjectIO $ WL.mkForeignToplevelHandleListener $ \e -> handleE $ ForeignTopLevelHandleV1 e
       _ <- getOrCreateObjectIO $ Zdg.mkOutputListener $ \e -> handleE $ ZdgOutputEvent e
       wlrOmL <- getOrCreateObjectIO $ Wlr.mkOutputManagerListener $ \e -> handleE $ WlrOutputManagerEvent e
@@ -158,52 +155,64 @@ startHSWM wlDisplay config = do
       _ <- io $ Posix.installHandler Posix.sigUSR2 (Posix.Catch $ runInH $ io getProgramPath >>= mainEvent . MainRestart) Nothing
       return ()
 
-    -- main loop
-    -- However, if you have a more sophisticated application, you can build your own event loop in any manner you please,
-    -- and obtain the Wayland display's file descriptor with wl_display_get_fd.
-    --
-    -- Upon POLLIN events, call wl_display_dispatch to process incoming events.
-    --
-    -- To flush outgoing requests, call wl_display_flush.
-
     waylandFd <- displayGetFd wlDisplay
 
-    let pollfdWayland = PollFd (Posix.Fd waylandFd) pOLLIN 0
+    runInH $ logInfo "register wayland fd pollers"
 
-    pollAsync <- async $ withPollFds [pollfdWayland] $ \(fds, fdsLen) -> do
-      let wlPollFd = fds
-          whenRevent fd ev f = do
-            r <- isRevent fd ev
-            when r f
-      forever $ do
-        -- flush outgoing requests
-        catch (void $ io (displayFlush wlDisplay)) $ \case
-          e | isFullError e -> io $ setPollEvents wlPollFd (pOLLIN .|. pOLLOUT)
-            | otherwise -> io $ mainEvent $ MainExit $ "flush failed: " ++ show e
+    let dispatchPending =
+          let go = do
+                    r <- try @_ @IOError $ WL.displayPrepareRead wlDisplay
+                    case r of
+                      Right 0 -> return $ Right ()
+                      _ -> do
+                        r' <- try @_ @IOError $ WL.displayDispatchPending wlDisplay
+                        case r' of
+                          Right{} -> go
+                          Left e -> return $ Left $ MainExit $ "error: dispatch pending: " ++ show e
+              in io go
 
-        io $
-          c_poll fds fdsLen PollBlock >>= \r -> flip runLoggingT logFunc $ case r of
-            PollError -> mainEvent $ MainExit "main: poll error"
-            PollTimeout -> return ()
-            PollResult _ -> do
-              io $ whenRevent wlPollFd pOLLHUP $ mainEvent $ MainExit "disconnected by compositor"
-              io $ whenRevent wlPollFd pOLLIN $ do
-                -- process incoming events
-                catch (void $ io $ displayDispatch wlDisplay) $ \case
-                  (e :: IOError) -> mainEvent $ MainExit $ "error: dispatch failed: " ++ show e
+    -- flush outgoing requests
+    let flushRequests = try (void $ displayFlush wlDisplay) >>= \case
+            Left e
+              | isFullError e -> return $ Right True -- XXX io $ setPollEvents wlPollFd (pOLLIN .|. pOLLOUT)
+              | otherwise -> return $ Left $ MainExit $ "flush failed: " ++ show e
+            Right{} -> return $ Right False -- XXX io $ setPollEvents wlPollFd pOLLIN
 
-    let main = runInH $ forever $ do
-          ev <- atomically $ readTQueue conf.eventQueue
-          case ev of
-            MainExit s -> do
-              log' $ display $ "main: exiting: " <> toText s
-              void $ userCode config.exitHook
-              exitFailure
-            MainRestart prog -> do
-              log' "[main] restaring"
-              restart prog
-    link pollAsync
-    main
+    -- process incoming events
+    let readIncomingEvents = try (void $ WL.displayReadEvents wlDisplay) >>= \case
+            Left (e :: IOError) -> return $ Left $ MainExit $ "error: failed to read events: " ++ show e
+            Right{} -> return $ Right ()
+
+    let wlPollFd = Posix.Fd waylandFd
+
+    let main MainPoll = do
+          dispatchPending >>= \case
+            Left end -> main end
+            Right{} -> flushRequests >>= \case
+              Left end -> main end
+              Right pollWrite -> do
+                let pollfd = if pollWrite then io (threadWaitWrite wlPollFd `race_` threadWaitRead wlPollFd)
+                                          else io (threadWaitRead wlPollFd)
+                res <- atomically (readTQueue conf.eventQueue) `race` pollfd
+                res' <- readIncomingEvents
+                case (res, res') of
+                  (Left ev, _) -> main ev
+                  (_, Left ev) -> main ev
+                  _ -> main MainPoll
+
+        main (MainExit s) = do
+          log' $ fromString $ "main: exiting: " <> s
+          void $ userCode config.exitHook
+          exitFailure
+
+        main (MainRestart prog) = do
+          log' "[main] restaring"
+          restart prog
+          main MainPoll -- if restart failed
+
+    runInH $ do
+      logInfo "starting main loop"
+      main MainPoll
 
 ---------------------------------------------------
 -- event handling
@@ -275,9 +284,11 @@ handleEvent (InputDeviceEvent e) = InputConfig.handleInputDeviceEvent e
 handleEvent (LibinputConfigEvent e) = InputConfig.handleLibinputEvent e
 handleEvent (XkbConfigEvent e) = InputConfig.handleXkbConfigEvent e
 handleEvent (XkbKeyboardEvent e) = InputConfig.handleXkbKeyboardEvent e
+
 handleEvent (ForeignTopLevelListV1 (WL.ForeignToplevelListToplevel _ _ fh)) = do
   l <- getObject
   io $ WL.listenerAdd fh l nullPtr
+
 handleEvent (WlrOutputManagerEvent (Wlr.OutputManagerHead _ _ head)) = do
   l <- getObject
   io $ WL.listenerAdd head l nullPtr

@@ -148,6 +148,7 @@ manage_ = do
   sm <- liftH Seats.getSMgr
 
   whenJust (W.peek ws) $ \w -> do
+    manageWindowPlace w R.rIVER_NODE_V1_PLACE_TOP
     if sm.seat_lshell_focus == Seats.FocusNone
       then manageWindowBorder w =<< asks (focusedBorder . config)
       else manageWindowBorder w =<< asks (normalBorder . config)
@@ -184,9 +185,10 @@ warpPointerToScreen SD {..} sid = do
 
 render :: H ()
 render = runInHS $ do
+  bwDef <- asks (borderWidth . config)
   mapWindows $ \w -> do
     whenJust w.p_render_pos $ unless w.minimized . uncurry (setWindowPosition w)
-    whenJust w.p_render_border $ setWindowBorder w.river_window
+    whenJust w.p_render_border $ setWindowBorder w.river_window (fromMaybe bwDef w.wBorderWidth)
     case w.p_render_place of
       i
         | i == R.rIVER_NODE_V1_PLACE_TOP -> unless w.minimized $ io $ R.riverNodePlaceTop w.node

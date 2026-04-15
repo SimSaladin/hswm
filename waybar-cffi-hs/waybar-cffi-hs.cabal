@@ -17,6 +17,7 @@ common deps
     derive-storable,
     haskell-gi-base,
     gi-gtk3,
+    gi-pango,
     hswm,
     text,
     rio,

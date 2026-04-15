@@ -10,38 +10,38 @@ module HSWM.Util.NamedScratchpad where
 
 import Data.List qualified as L
 import Data.Map qualified as M
-import Data.Maybe
 import HSWM.Actions.Minimize
 import HSWM.Core
 import HSWM.Operations
 import HSWM.StackSet qualified as W
 import HSWM.Util.ExtensibleState qualified as XS
+import HSWM.Util.RofiPrompt qualified as RP
 import Text.Printf
 
 type ScratchpadId = String
 
 data Scratchpad = SP
   { spName :: ScratchpadId,
-    spCmd :: HS (),
+    spCmd :: H (),
     spQuery :: Query Bool,
     spHook :: ManageHook,
     spExclusive :: [String]
   }
 
 -- | "mkPad name mh match launch"
-mkPad :: ScratchpadId -> ManageHook -> Query Bool -> HS () -> Scratchpad
+mkPad :: ScratchpadId -> ManageHook -> Query Bool -> H () -> Scratchpad
 mkPad nm mh q a = SP nm a q mh []
 
 -- | Make exclusive set.
 exclusive :: [Scratchpad] -> [Scratchpad]
 exclusive xs = [x {spExclusive = L.delete (spName x) (map spName xs)} | x <- xs]
 
-newtype Scratchpads = Scratchpads {xpads :: M.Map ScratchpadId Scratchpad} deriving (Typeable)
+newtype Scratchpads = Scratchpads {xpads :: M.Map ScratchpadId Scratchpad}
 
 instance ExtensionClass Scratchpads where
   initialValue = Scratchpads mempty
 
-newtype ScratchpadDyn = ScratchpadDyn {dynWins :: M.Map ScratchpadId RiverWindow} deriving (Typeable, Read, Show)
+newtype ScratchpadDyn = ScratchpadDyn {dynWins :: M.Map ScratchpadId RiverWindow} deriving (Read, Show)
 
 instance ExtensionClass ScratchpadDyn where
   initialValue = ScratchpadDyn mempty
@@ -52,27 +52,27 @@ instance ExtensionClass ScratchpadDyn where
 -- | First, minimize any pads exclusive with target.
 -- Then, look for an existing instance in focused workspace.
 -- If that fails, look for an instance across all windows.
-toggleScratchpad :: Bool -> ScratchpadId -> HS ()
+toggleScratchpad :: Bool -> ScratchpadId -> H ()
 toggleScratchpad createIfMissing k = do
-  spads <- XS.gets xpads
+  spads <- runInHS $ XS.gets xpads
   whenJust (M.lookup k spads) $ toggleScratchpad' createIfMissing
 
-toggleScratchpad' :: Bool -> Scratchpad -> HS ()
+toggleScratchpad' :: Bool -> Scratchpad -> H ()
 toggleScratchpad' createIfMissing sp@SP {spQuery = q, spHook = h} = do
-  s <- XS.gets xpads
+  s <- runInHS $ XS.gets xpads
   case M.lookup (spName sp) s of
-    Nothing -> XS.modify $ \s -> s {xpads = M.alter (const $ Just sp) (spName sp) (xpads s)}
+    Nothing -> runInHS $ XS.modify $ \x -> x {xpads = M.alter (const $ Just sp) (spName sp) (xpads x)}
     Just _ -> return ()
   toggle [x | x <- M.elems s, spName x `elem` spExclusive sp]
   where
+    toggle :: [Scratchpad] -> H ()
     toggle excl = do
-      -- trace ("togglePad: " ++ k ++ " " ++ show (map spName excl))
-      minimizeScratchpads excl
-      withWindowSet currentWindows' >>= filterM (runQuery q) >>= \case
-        w : _ -> toggleWindow Nothing h w
+      runInHS $ minimizeScratchpads excl
+      runInHS (withWindowSet currentWindows' >>= filterM (runQuery q)) >>= \case
+        w : _ -> runInHS $ toggleWindow Nothing h w
         [] ->
-          withWindowSet (asWindows . W.allWindows) >>= filterM (runQuery q) >>= \case
-            w : _ -> toggleWindow Nothing h w
+          runInHS (withWindowSet (asWindows . W.allWindows) >>= filterM (runQuery q)) >>= \case
+            w : _ -> runInHS $ toggleWindow Nothing h w
             []
               | createIfMissing -> spCmd sp
               | otherwise -> return ()
@@ -84,15 +84,19 @@ minimizeScratchpads xs = mapM_ hook =<< withWindowSet currentWindows'
     go w sp = toggleWindow (Just False) (spHook sp) w
 
 --   "Toggle scratchpad %s" name
-togglePad name = toggleScratchpad True name
+togglePad :: ScratchpadId -> H ()
+togglePad = toggleScratchpad True
 
 -- | Don't create if missing
+togglePadNoCreate :: ScratchpadId -> H ()
 togglePadNoCreate = toggleScratchpad False
 
 {-
-cyclePads = (? "Toggle next scratchpad (cyclic)") $ do
-    padsAll <- XS.gets (M.elems . xpads)
-    padsExist <- withWindowSet $ \wset ->
+-- | Toggle next scratchpad (cyclic)
+cyclePads :: H ()
+cyclePads = do
+    padsAll <- runInHS $ XS.gets (M.elems . xpads)
+    padsExist <- runInHS $ withWindowSet $ \wset ->
       catMaybes <$> mapM (runQuery xpad) (W.allWindows wset)
     let pads = [pad | pad <- padsAll, any ((==) (spName pad) . spName) padsExist]
     res <- withFocii $ \_ w ->
@@ -159,40 +163,40 @@ dynPadToggleFocused :: ScratchpadId -> HS ()
 dynPadToggleFocused k = do
     cur <- dynPadCurrent k
     withFocused $ \foc -> dynPadSet k $ if Just foc == cur then Nothing else Just foc
+-}
 
-dynPadSet :: ScratchpadId -> Maybe Window -> HS ()
+dynPadSet :: ScratchpadId -> Maybe Window -> H ()
 dynPadSet k w = do
-    old <- dynPadCurrent k
-    XS.modify $ \s -> s { dynWins = M.alter (const w) k (dynWins s) }
-    forM_ old (toggleWindow (Just True) idHook)
+    old <- runInHS $ dynPadCurrent k
+    runInHS $ XS.modify $ \s -> s { dynWins = M.alter (const $ fmap (\x -> x.river_window) w) k (dynWins s) }
+    runInHS $ forM_ old (`withWindow` toggleWindow (Just True) idHook)
     whenJust w (\_ -> togglePadNoCreate k)
 
--}
 dynPadSet' :: Scratchpad -> Maybe RiverWindow -> HS ()
 dynPadSet' sp w = do
   XS.modify $ \s -> s {xpads = M.alter (const $ Just sp) (spName sp) (xpads s)}
   XS.modify $ \s -> s {dynWins = M.alter (const w) (spName sp) (dynWins s)}
 
-{-
-dynPadCurrent :: ScratchpadId -> HS (Maybe Window)
+dynPadCurrent :: ScratchpadId -> HS (Maybe RiverWindow)
 dynPadCurrent k = XS.gets $ M.lookup k . dynWins
--}
 
-{-
 -- | Pad with no static launch action. Use the provided action to bind to an existing window.
-mkPadDyn :: ScratchpadId -> XP.XPConfig -> ManageHook -> Scratchpad
-mkPadDyn nm xpc mh = mkPad nm mh q a
-  where q = liftX (dynPadCurrent nm) >>= \mw -> asks Just =? mw
-        a = dynDefaultPrompt xpc nm
+mkPadDyn :: ScratchpadId -> RP.RofiPromptConfig -> ManageHook -> Scratchpad
+mkPadDyn nm rpc mh = mkPad nm mh q a
+  where q = liftHS (dynPadCurrent nm) >>= \mw -> asks (\x -> Just x.river_window) =? mw
+        a = dynDefaultPrompt rpc nm
         -- a = dynPadToggleFocused nm
 
 -- | Add a launch action to a dynamic pad. It prompts for confirmation to bind focused window to the pad.
-dynDefaultPrompt :: XP.XPConfig -> ScratchpadId -> HS ()
-dynDefaultPrompt xpc k = withFocused $ \foc -> do
-    tt <- runQuery title foc
-    let text = printf "%s: Bind window %X '%s'" k foc tt
-    confirmPrompt xpc text (dynPadSet k (Just foc))
--}
+dynDefaultPrompt :: RP.RofiPromptConfig -> ScratchpadId -> H ()
+dynDefaultPrompt rpc k = do
+  mfoc <- runInHS $ gets windowset >>= maybe (return Nothing) lookupWindow . W.peek
+  case mfoc of
+    Just foc -> do
+      let text = printf "%s: Bind window %s '%s'" k (show foc.river_window) foc.title
+      RP.confirmPrompt rpc text (dynPadSet k (Just foc))
+
+    Nothing -> return ()
 
 -- * Misc.
 

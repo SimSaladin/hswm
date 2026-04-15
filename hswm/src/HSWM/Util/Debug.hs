@@ -28,12 +28,17 @@ debugHook ev
   | XkbKeyboardEvent e <- ev = logEvent e
   | XkbEvent (R.RiverXkbBindingPressed dt self) <- ev = do
       (xb :: XkbBinding (SomeAction H)) <- liftIO $ deRefStablePtr (castPtrToStablePtr $ castPtr dt)
-      logDebug $ "KEY PRESS" :# [ "ev" .= show ev, "action" .= show xb.action,  "ptr" .= show self ]
+      logDebug $ "EVENT XKB KEY PRESSED" :# [ "action" .= show xb.action,  "bind" .= show self ]
       mempty
-  | SeatEvent R.RiverSeatPointerPosition {} <- ev = mempty
+  | XkbEvent (R.RiverXkbBindingReleased dt self) <- ev = do
+      (xb :: XkbBinding (SomeAction H)) <- liftIO $ deRefStablePtr (castPtrToStablePtr $ castPtr dt)
+      logDebug $ "EVENT XKB KEY RELEASED" :# [ "action" .= show xb.action,  "bind" .= show self ]
+      mempty
+  -- | SeatEvent R.RiverSeatPointerPosition {} <- ev = mempty
   | SeatEvent e <- ev = logEvent e
   | OutputEvent e <- ev = logEvent e
   | WindowEvent R.RiverWindowDimensions {} <- ev = mempty
+  | WindowEvent R.RiverWindowTitle {} <- ev = mempty
   | WindowEvent e <- ev = logEvent e
   -- WL_*
   | WlOutputEvent _ <- ev = logEvent ev

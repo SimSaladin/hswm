@@ -56,43 +56,43 @@ liftH a = do
   io $ runH c a
 
 -- a la xmonad
-catchH :: H a -> H a -> H a
+catchH :: HasCallStack => H a -> H a -> H a
 catchH job errcase = do
   c <- ask
   io (runH c job)
     `catch` \e -> case fromException e of
       Just (_ :: ExitCode) -> throwM e
-      _ -> do logError $ "exception in H action" :# [ "excption" .= show e ]
+      _ -> do logError $ "exception in H action" :# [ "excption" .= show e, "callstack" .= prettyCallStack callStack ]
               errcase
 
-catchHS :: HS a -> HS a -> HS a
+catchHS :: HasCallStack => HS a -> HS a -> HS a
 catchHS job errcase = do
   c <- ask
   s <- get
   (a, s') <- liftIO $ runHS c s job
         `catch` \e -> case fromException e of
           Just (_ :: ExitCode) -> throwM e
-          _ -> do runH c $ logError $ "excption in HS action" :# [ "exception" .= show e ]
+          _ -> do runH c $ logError $ "excption in HS action" :# [ "exception" .= show e, "callstack" .= prettyCallStack callStack ]
                   runHS c s errcase
   put s'
   return a
 
 -- a la xmonad
-userCode :: H a -> H (Maybe a)
+userCode :: HasCallStack => H a -> H (Maybe a)
 userCode a = catchH (Just <$> a) (return Nothing)
 
 -- | Same as userCode but with a default argument to return instead of using
 -- Maybe, provided for convenience.
-userCodeDef :: a -> H a -> H a
+userCodeDef :: HasCallStack => a -> H a -> H a
 userCodeDef defValue a = fromMaybe defValue <$> userCode a
 
 -- a la xmonad
-userCodeS :: HS a -> HS (Maybe a)
+userCodeS :: HasCallStack => HS a -> HS (Maybe a)
 userCodeS a = catchHS (Just <$> a) (return Nothing)
 
 -- | Same as userCode but with a default argument to return instead of using
 -- Maybe, provided for convenience.
-userCodeDefS :: a -> HS a -> HS a
+userCodeDefS :: HasCallStack => a -> HS a -> HS a
 userCodeDefS defValue a = fromMaybe defValue <$> userCodeS a
 
 -----------------------------------------------------------
@@ -102,10 +102,12 @@ userCodeDefS defValue a = fromMaybe defValue <$> userCodeS a
 class HasEventQueues env where
   pendingManageQL :: Lens' env (TQueue (HS ()))
   pendingRenderQL :: Lens' env (TQueue (HS ()))
+  mainEventQL :: Lens' env (TQueue MainEvent)
 
 instance HasEventQueues HConf where
   pendingManageQL = lens pendingManageQ $ \s a -> s {pendingManageQ = a}
   pendingRenderQL = lens pendingRenderQ $ \s a -> s {pendingRenderQ = a}
+  mainEventQL = lens eventQueue $ \s a -> s { eventQueue = a}
 
 getEventQueueFuncs ::
   (MonadReader env m, HasEventQueues env, MonadIO inner) =>

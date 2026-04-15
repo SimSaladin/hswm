@@ -404,6 +404,7 @@ data Window = Window
     unreliablePid :: !(Maybe Int),
     decorationHint :: !(Maybe R.River_window_v1_decoration_hint),
     presentationHint :: !(Maybe R.River_output_v1_presentation_mode),
+    wBorderWidth :: !(Maybe Int32),
     new :: Bool,
     closed :: Bool,
     fullscreen, minimized :: Bool,
@@ -435,6 +436,7 @@ data Seat = Seat
     river_layer_shell_seat :: !R.RiverLayerShellSeat,
     xkb_bindings_seat :: !R.RiverXkbBindingsSeat,
     wl_seat :: !WL.Seat,
+    position :: !(Int32, Int32), -- x, y
     name :: !String,
     caps :: !WL.Wl_seat_capability,
     --
@@ -443,6 +445,8 @@ data Seat = Seat
     --
     pending_action :: !SeatAction,
     submap_pending :: Maybe (SomeAction H, XkbBindingMap (SomeAction H)),
+    currentFocus :: !SeatFocus,
+    pendingPointerEnter :: !(Maybe (RiverWindow, (Int32, Int32))),
     inputOverride :: !(Maybe (HS Bool, XkbBindingMap (SomeAction H))),
     -- Pointer move/resize
     op :: SeatOp,
@@ -456,6 +460,12 @@ data Seat = Seat
     focused, hovered, interacted :: RiverWindow,
     suppressChangeFocus :: !Int
   }
+  deriving (Show, Generic)
+
+data SeatFocus
+  = SFocusNone
+  | SFocusLayerShell SeatFocus -- ^ previous focus
+  | SFocusWindow RiverWindow
   deriving (Show, Generic)
 
 data SeatAction
@@ -496,9 +506,12 @@ instance Default Seat where
         wl_seat = WL.Seat nullPtr,
         xkb_bindings_seat = R.RiverXkbBindingsSeat nullPtr,
         inputOverride = Nothing,
+        position = (0,0),
         name = "",
         caps = WL.toCEnum 0,
         removed = False,
+        currentFocus = SFocusNone,
+        pendingPointerEnter = Nothing,
         focused = invalidWindow,
         hovered = invalidWindow,
         interacted = invalidWindow,
@@ -531,12 +544,13 @@ data Output = Output
     outputDescription :: !String,
     river_layerShellOutput :: !R.RiverLayerShellOutput,
     nonExclusive :: Maybe (Int32, Int32, Int32, Int32), -- x, y, w, h
-    outputPower :: Maybe Wlr.OutputPower
+    outputPower :: Maybe Wlr.OutputPower,
+    wlOutput :: !WL.Output
   }
   deriving (Show, Generic)
 
 instance Default Output where
-  def = Output def 0 0 0 0 0 (S (-1)) "" "" (R.RiverLayerShellOutput nullPtr) Nothing Nothing
+  def = Output def 0 0 0 0 0 (S (-1)) "" "" (R.RiverLayerShellOutput nullPtr) Nothing Nothing (WL.Output nullPtr)
 
 ---------------------------------------------------------
 -- Actions / Submaps

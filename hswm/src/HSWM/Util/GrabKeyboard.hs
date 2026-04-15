@@ -68,6 +68,7 @@ withKeyboardGrab seat mods keys fun acc0 = do
         (deactivate grabIM >> manage (freeSeatActions >> seatEnableBindingsMatching seat.river_seat mods keys) >> manageDirty)
         $ do
           takeMVar syncVar
+          logDebug "grab: starting processing"
           void $
             let process s = do
                     inp <- atomically (readTChan rdChan)
@@ -85,7 +86,15 @@ lookupGrabIM :: (HasGrabCtx env m) => Seat -> m GrabIM
 lookupGrabIM s = do
   seatInputMethods <- getOrCreateObject @(Map WL.Seat GrabIM) $ pure mempty
   case M.lookup s.wl_seat seatInputMethods of
-    Just im -> return im
+    Just im -> do
+      isFree <- isEmptyMVar im.reserved
+      case isFree of
+        True -> do
+          imManager <- getObject
+          grabIM <- newGrabIM imManager s.wl_seat
+          putObject $ M.insert s.wl_seat grabIM seatInputMethods
+          return grabIM
+        False -> return im
     Nothing -> do
       imManager <- getObject
       grabIM <- newGrabIM imManager s.wl_seat
@@ -107,10 +116,9 @@ newGrabIM manager seat = do
 
   runInIO <- askRunInIO
 
-  logDebug "grab: creating input method listener"
   inputMethodListener <- io $ Wlr.mkInputMethodListener $ \e -> runInIO $ case e of
     Wlr.InputMethodUnavailable _ud self -> do
-      logError "grap: unavailable"
+      logError "grab: unavailable"
       atomically $ writeTChan bcastChan (Left Done)
       io $ WL.objectDestroy self
     Wlr.InputMethodActivate _ _ -> do
@@ -122,16 +130,12 @@ newGrabIM manager seat = do
       prev_active <- readIORef active
       next_active <- readIORef pending_active
       when (prev_active /= next_active) $ do
-        logInfo $ "grab active state" :# [ "active" .= next_active ]
+        logInfo $ "grab: active state" :# [ "active" .= next_active ]
       writeIORef active next_active
-    -- when (not next_active && prev_active) $ do
-    --  atomically $ writeTChan bcastChan (Left Done)
-    --  deactivate final
 
     _ -> pure () -- ignored
 
 
-  logDebug "grab: creating keyboard grab listener"
   imKeyboardGrabListener <- io $ Wlr.mkInputMethodKeyboardGrabListener $ \e -> runInIO $ case e of
     Wlr.InputMethodKeyboardGrabKeymap _ _ _fmt fd size -> do
       res <- io $ createKeymap'' xkbContext (fi fd) (fi size)
@@ -154,17 +158,14 @@ newGrabIM manager seat = do
     -- let pressed = fi st == WL.fromCEnum WL_KEYBOARD_KEY_STATE_PRESSED
 
     Wlr.InputMethodKeyboardGrabRepeatInfo {} -> pure () -- pTrace e -- ignored
-  logDebug "grab: getting input method"
   inputMethod <- io $ Wlr.inputMethodManagerGetInputMethod manager seat
-
-  logDebug "grab: adding input method listener"
   io $ WL.listenerAdd inputMethod inputMethodListener nullPtr
 
+  logDebug "grab: created"
   return GrabIM {..}
 
 activate :: (MonadIO m, MonadLogger m, MonadReader env m) => GrabIM -> m ()
 activate GrabIM {..} = do
-  logDebug "grab: activating..."
   res <- io $ Wlr.inputMethodGrabKeyboard inputMethod
   when (res.unwrap == nullPtr) $ do
     logError "grab: failed to activate (failed to grab keyboard)"
@@ -175,10 +176,15 @@ activate GrabIM {..} = do
 
 deactivate :: (MonadIO m, MonadLogger m, MonadReader env m) => GrabIM -> m ()
 deactivate GrabIM {..} = do
-  logDebug "grab: deactivating..."
   res <- tryTakeMVar imKeyboardGrab
   case res of
     Just kbdg | kbdg.unwrap /= nullPtr -> do
       logDebug "grab: releasing keyboard grab"
       io $ WL.objectDestroy kbdg
     _ -> pure ()
+  io $ do
+    WL.objectDestroy inputMethod
+    _ <- WL.freeListener (Proxy :: Proxy Wlr.InputMethodEvent) =<< peek (unConstPtr inputMethodListener)
+    _ <- WL.freeListener (Proxy :: Proxy Wlr.InputMethodKeyboardGrabEvent) =<< peek (unConstPtr imKeyboardGrabListener)
+    return ()
+  logDebug "grab: deactivated"

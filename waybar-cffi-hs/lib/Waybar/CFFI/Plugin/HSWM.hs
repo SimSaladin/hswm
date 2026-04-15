@@ -21,12 +21,10 @@ import Data.List qualified as L
 import Data.Maybe
 import Data.String
 import Data.Text qualified as T
-import qualified Data.Map as M
-import GHC.OverloadedLabels
-import GHC.Records
 import GI.Gtk as Gtk
-import HSWM (ScreenId, def)
-import HSWM.Util.IPC (ProtoMsg (..), WindowInfo (..), WorkspaceInfo(..), WsId, clientRun)
+import GI.Pango.Enums
+import HSWM (ScreenId, def, try, SomeException)
+import HSWM.Util.IPC (ProtoMsg (..), WindowInfo (..), WorkspaceInfo(..), WsId, clientRun, runMIO)
 import Waybar.CFFI.Plugin.Base
 import Control.Monad.Logger.Aeson hiding (Message)
 import qualified Data.Aeson.KeyMap as A
@@ -34,8 +32,6 @@ import RIO.Prelude
 import RIO.Prelude.Types
 import RIO (Async, IORef, readIORef, cancel, writeIORef, liftIO, threadDelay, modifyIORef, async, newIORef)
 import Text.Printf
-
-runMIO = runStdoutLoggingT
 
 type MIO = LoggingT IO
 
@@ -81,7 +77,7 @@ data WSList = WSList
 instanceNew :: IConf a -> IO MyMod
 instanceNew iconf@IConf {..} =
   runMIO $ do
-    logInfo $ "cffi_hswm: init config: waybar " :# [ "version" .= fromString wbVersion ]
+    logInfo $ "cffi_hswm: init config" :# [ "waybar_version" .= wbVersion ]
     logInfo $ "plugin settings" :# [ k .= v | (k,v) <- A.toList configs ]
 
     -- Add a container for displaying the next widgets
@@ -102,6 +98,7 @@ instanceNew iconf@IConf {..} =
     containerAdd topContainer layoutWidget
 
     focusInfoWidget <- labelNew Nothing
+    set focusInfoWidget [ #maxWidthChars := 42, #ellipsize := EllipsizeModeEnd ]
     sc''' <- widgetGetStyleContext focusInfoWidget
     styleContextAddClass sc''' "focused-window"
     containerAdd topContainer focusInfoWidget
@@ -118,7 +115,15 @@ instanceNew iconf@IConf {..} =
 connectToWM :: (ProtoMsg -> MIO ()) -> MIO ()
 connectToWM onMsg = do
   logInfo "Connecting..."
-  flip runReaderT () $ clientRun def (lift . onMsg) (\_say -> forever $ threadDelay maxBound)
+  res <- try $ flip runReaderT () $ clientRun def (lift . onMsg) $ \_say -> do
+    logInfo "Connected"
+    forever $ threadDelay maxBound
+  case res of
+    Right{} -> return ()
+    Left (ex :: SomeException) -> do
+      logError $ "IPC disconnect (exception)" :# [ "exception" .= show ex ]
+      threadDelay 5000000
+      connectToWM onMsg
 
 handleMsg :: IConf a -> MyMod -> ProtoMsg -> MIO ()
 handleMsg _ _ Identify {} = pure ()
@@ -159,7 +164,7 @@ updateWorkspaces m = do
 
       thisScreen = fromMaybe maxBound (L.lookup (thisOutputName st) st.outputs)
 
-      add (tag, hint) = do
+      add _ = do
         l <- labelNew (Just "")
         sc <- widgetGetStyleContext l
         styleContextAddClass sc "workspace"
@@ -169,7 +174,7 @@ updateWorkspaces m = do
 
       remove = widgetDestroy
 
-      setWidgetWSI sc w screen WorkspaceInfo{tag, layout, windowList} = do
+      setWidgetWSI sc w screen WorkspaceInfo{layout, windowList} = do
         let wcount = length windowList
         if wcount > 0
            then styleContextRemoveClass sc "empty"
@@ -198,15 +203,17 @@ updateWorkspaces m = do
         thisScreen == foScreen -> do
           styleContextAddClass sc "focused"
           styleContextRemoveClass sc "visible"
-          labelSetText (layoutWidget m) foWSI.layout
+          labelSetText (layoutWidget m) $ last $ T.words foWSI.layout
+          set (layoutWidget m) [ #tooltipMarkup := foWSI.layout ]
           setWidgetWSI sc w (Just foScreen) foWSI
 
       | (screen, wsi) : _ <- [x | x@(_, wsi) <- focused : visible, wsi.tag == tag] -> do
           styleContextAddClass sc "visible"
           styleContextRemoveClass sc "focused"
           setWidgetWSI sc w (Just screen) wsi
-          when (screen == thisScreen) $
-            labelSetText (layoutWidget m) wsi.layout
+          when (screen == thisScreen) $ do
+            labelSetText (layoutWidget m) $ last $ T.words wsi.layout
+            set (layoutWidget m) [ #tooltipMarkup := wsi.layout ]
 
       | wsi : _ <- [wsi | wsi <- hidden, wsi.tag == tag] -> do
           styleContextRemoveClass sc "visible"
@@ -224,20 +231,20 @@ updateFocusInfo MyMod {..} = do
   case curfocus st of
     Just WindowInfo {..} -> do
       labelSetText focusInfoWidget title
-      widgetSetTooltipMarkup focusInfoWidget $ Just $ title <> " - " <> appId <> maybe "" (\i -> "(PID: " <> tshow i <> ")") pid
+      widgetSetTooltipMarkup focusInfoWidget $ Just $ title <> " - " <> appId <> maybe "" (\i -> "\r(PID: " <> tshow i <> ")") pid
     Nothing -> do
       labelSetText focusInfoWidget ""
       widgetSetTooltipMarkup focusInfoWidget Nothing
 
 instanceDestroy :: IConf MyMod -> IO ()
-instanceDestroy ic@IConf {instanceData = MyMod {..}} = runMIO $ do
+instanceDestroy IConf {instanceData = MyMod {..}} = runMIO $ do
   logInfo "Shutting down.."
   cancel wmThread
   widgetDestroy topContainer
 
 -- | Update the UI
 updateDo :: IConf MyMod -> IO ()
-updateDo ic@IConf {..} = runMIO $ updateWorkspaces instanceData >> updateFocusInfo instanceData
+updateDo IConf {..} = runMIO $ updateWorkspaces instanceData >> updateFocusInfo instanceData
 
 -- | Handle signal which was propagated by waybar (reload, etc.)
 signalDo :: IConf MyMod -> Int -> IO ()
@@ -245,5 +252,5 @@ signalDo _ _ = pure ()
 
 -- | Trigger a module action
 actionDo :: IConf MyMod -> String -> IO ()
-actionDo ic actStr = runMIO $ do
+actionDo _ actStr = runMIO $ do
   logWarn $ fromString $ "unhandled module action: " <> fromString actStr

@@ -1,7 +1,3 @@
-----------------------------------------------------------------------------
-
------------------------------------------------------------------------------
-
 -- |
 -- Module      :  HSWM.Actions.Minimize
 -- Description :  Actions for minimizing and maximizing windows.
@@ -40,7 +36,6 @@ where
 
 import Data.List qualified as L
 import Data.Map qualified as M
-import Foreign.C.Types (CLong)
 import HSWM
 import HSWM.Layout.BoringWindows qualified as BW
 import HSWM.StackSet qualified as W

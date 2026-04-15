@@ -36,10 +36,9 @@ module HSWM.Actions.PhysicalScreens
   )
 where
 
-import Data.Function (on)
 import Data.List (elemIndex, sortBy, (!!))
-import Data.List.NonEmpty (NonEmpty ((:|)), nonEmpty)
-import Data.List.NonEmpty qualified as NE
+--import Data.List.NonEmpty (NonEmpty ((:|)), nonEmpty)
+--import Data.List.NonEmpty qualified as NE
 import HSWM
 import HSWM.StackSet qualified as W
 
@@ -174,7 +173,7 @@ onPrevNeighbour sc = neighbourWindows sc (-1)
 -- See 'HSWM.Hooks.Rescreen.setRescreenWorkspacesHook', which lets you
 -- replace the builtin rescreen handler.
 rescreen :: ScreenComparator -> HS ()
-rescreen (ScreenComparator cmpScreen) = do
+rescreen (ScreenComparator _cmpScreen) = do
   log' "warning: physcreen/rescreen is not implemented!"
 
 -- withDisplay (fmap nonEmpty . getCleanedScreenInfo) >>= \case

@@ -28,8 +28,8 @@ newMemfd :: String -> IO Fd
 newMemfd name = withCString name $ \c_name ->
   Fd <$> {#call memfd_create#} c_name (1 {- MFD_CLOEXEC-} .|. 2 {- MFD_ALLOW_SEALING -})
 
-foreign import ccall safe "fcntl" c_fcntl :: Fd -> CUInt -> CUInt -> IO ()
-foreign import ccall safe "munmap" munmap :: Ptr () -> Int -> IO ()
+foreign import ccall unsafe "fcntl" c_fcntl :: Fd -> CUInt -> CUInt -> IO ()
+foreign import ccall unsafe "munmap" munmap :: Ptr () -> Int -> IO ()
 
 createShm :: Int -> IO (Fd, Ptr ())
 createShm size = do
@@ -94,7 +94,7 @@ asPollTimeout :: PollTimeout -> CInt
 asPollTimeout PollBlock = -1
 asPollTimeout (PollWaitMs i) = fi i
 
-{#fun poll as c_poll
+{#fun unsafe poll as c_poll
   { `PollFdPtr'
   , `CULong'
   , asPollTimeout `PollTimeout'

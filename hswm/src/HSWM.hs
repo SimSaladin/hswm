@@ -32,4 +32,4 @@ import HSWM.Operations
 import HSWM.Utils
 import HSWM.XKB
 import River
-import Prelude hiding ((^?))
+import Prelude

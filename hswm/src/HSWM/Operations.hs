@@ -17,6 +17,7 @@ import System.Posix qualified as Posix
 import System.Posix.Process (executeFile)
 import qualified Bindings.Wayland.Client as WL
 import qualified Bindings.Wayland.WlrOutputPowerManagementUnstableV1 as Wlr
+import Foreign.C.Types
 
 -- * Misc. pure operations
 
@@ -45,20 +46,28 @@ manageKill = doManage WRequestClose
 -- /manage/
 tileWindow :: Bool -> RiverWindow -> Rectangle -> HS ()
 tileWindow placeTop rw r = do
-  bw <- asks (fi . borderWidth . config)
-  -- give all windows at least 1x1 pixels
-  let least x
-        | x <= bw * 2 = 1
-        | otherwise = x - bw * 2
-  withWindow rw $ \w -> R.riverWindowProposeDimensions w.river_window (least $ fi r.width) (least $ fi r.height)
-  modifyWindow rw $ \w ->
-    w
-      { p_render_pos = Just (fi r.x + bw, fi r.y + bw),
-        p_render_place = if placeTop then R.rIVER_NODE_V1_PLACE_TOP else 0
-      }
+  bwDef <- asks (fi . borderWidth . config)
+  withWindow rw $ \w -> do
+    let bw = fromMaybe bwDef w.wBorderWidth
+    -- give all windows at least 1x1 pixels
+    let least x
+          | x <= bw * 2 = 1
+          | otherwise = x - bw * 2
+    R.riverWindowProposeDimensions w.river_window (least $ fi r.width) (least $ fi r.height)
+    modifyWindow rw $ \w' ->
+      w'
+        { p_render_pos = Just (fi r.x + bw, fi r.y + bw),
+          p_render_place = if placeTop then R.rIVER_NODE_V1_PLACE_TOP else 0
+        }
+
+manageWindowPlace :: RiverWindow -> CInt -> HS ()
+manageWindowPlace rw p = modifyWindow rw $ \w -> w {p_render_place = fi p}
 
 manageWindowBorder :: RiverWindow -> RiverColor -> HS ()
 manageWindowBorder rw rc = modifyWindow rw $ \w -> w {p_render_border = Just rc}
+
+manageWindowBorderWidth :: RiverWindow -> Maybe Int32 -> HS ()
+manageWindowBorderWidth rw bw = modifyWindow rw $ \w -> w {wBorderWidth = bw}
 
 doManage' :: WindowManageAction -> RiverWindow -> HS ()
 doManage' a rw = modifyWindow rw $ \s -> s {p_manage_action = p_manage_action s ++ [a]}
@@ -136,10 +145,17 @@ withScreenOutput :: ScreenId -> (Output -> HS ()) -> HS ()
 withScreenOutput sid f = mapM_ f . L.find (\o -> o.screen == sid) =<< gets _outputs
 
 -- | Force new manage sequence.
-manageDirty :: (MonadStateGlobal env m) => m ()
+manageDirty :: (MonadStateGlobal env m, HasEventQueues env) => m ()
 manageDirty = do
-  logDebug "wm request: manage_dirty"
-  withObject (io . R.riverWindowManagerManageDirty)
+  withObject $ \wm -> do
+    logDebug "wm request: manage_dirty"
+    R.riverWindowManagerManageDirty wm
+    writeMainEvent MainPoll
+
+writeMainEvent :: (MonadIO m, MonadReader env m, HasEventQueues env) => MainEvent -> m ()
+writeMainEvent ev = do
+  q <- asks $ view mainEventQL
+  atomically $ writeTQueue q ev
 
 --------------------------------------------------------------
 -- * Manage sequence /only/
@@ -152,15 +168,18 @@ setTopFocus = withWindowSet $ maybe (pure ()) setTopFocus' . W.peek
 
 setTopFocus' :: RiverWindow -> HS ()
 setTopFocus' rw = mapSeats $ \s -> do
-  io $ R.riverSeatFocusWindow s.river_seat rw
-  withWindow rw $ \w -> do
-    when (s.focused /= rw && s.suppressChangeFocus <= 0) $ do
-        modifySeat s.river_seat $ \x -> x {focused = rw}
-        let (x', y') = fromMaybe (w.x, w.y) w.p_render_pos
-            px = x' + (w.width `div` 2)
-            py = y' + (w.height `div` 2)
-        logInfo $ "set focus: seat pointer warping" :# [ "dest" .= (px, py), "seat" .= s.name, "window" .= show w ]
-        io $ R.riverSeatPointerWarp s.river_seat px py
+  when (s.focused /= rw) $ do
+    logInfo $ "seat: focus window" :# [ "window" .= show rw, "seat" .= s.name ]
+    io $ R.riverSeatFocusWindow s.river_seat rw
+    modifySeat s.river_seat $ \x -> x {focused = rw}
+    withWindow rw $ \w -> do
+      when (s.suppressChangeFocus <= 0) $ do
+          -- modifySeat s.river_seat $ \x -> x {focused = rw}
+          let (x', y') = fromMaybe (w.x, w.y) w.p_render_pos
+              px = x' + (w.width `div` 2)
+              py = y' + (w.height `div` 2)
+          logInfo $ "seat: pointer warp" :# [ "dest" .= (px, py), "seat" .= s.name, "window" .= show w ]
+          io $ R.riverSeatPointerWarp s.river_seat px py
 
 seatDisableBindingsMatching :: RiverSeat -> [ModMask] -> [KeySym] -> HS ()
 seatDisableBindingsMatching rs mods keys = withSeat rs $ \s -> do
@@ -190,9 +209,8 @@ reveal rw = withWindow rw $ \_ -> io $ R.riverWindowShow rw
 hide rw = withWindow rw $ \_ -> io $ R.riverWindowHide rw
 
 -- | /render sequence/ Draw borders on the the window.
-setWindowBorder :: RiverWindow -> RiverColor -> HS ()
-setWindowBorder w RiverColor {red = wb_r, green = wb_g, blue = wb_b, alpha = wb_a} = withWindow w $ \_ -> do
-  wb_width <- asks (borderWidth . config)
+setWindowBorder :: RiverWindow -> Int32 -> RiverColor -> HS ()
+setWindowBorder w wb_width RiverColor {red = wb_r, green = wb_g, blue = wb_b, alpha = wb_a} = withWindow w $ \_ -> do
   wb_edges <- asks (fi . borderEdges . config)
   let borders = WindowBorders {..}
   io $ riverWindowSetBorders w borders

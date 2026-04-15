@@ -1,9 +1,5 @@
 {-# OPTIONS_GHC -Wno-ambiguous-fields #-}
 
-------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------
-
 -- |
 -- Module      : HSWM.Outputs
 -- Description : Short description
@@ -30,8 +26,7 @@ import Bindings.Wayland.Client qualified as WL
 
 data OutputManager = OutputManager
   { pending_setup :: M.Map RiverOutput Output,
-    pending_manage :: [Output],
-    wl_outputs :: M.Map RiverOutput WL.Output
+    pending_manage :: [Output]
   }
   deriving stock (Generic)
   deriving anyclass (Default)
@@ -70,7 +65,7 @@ handle e = do
   case e of
     R.RiverOutputRemoved _ output -> runInHS $
       withOutput output $
-        \Output {screen, river_layerShellOutput = layerShellOutput} -> do
+        \o@Output {screen, river_layerShellOutput = layerShellOutput, wlOutput} -> do
           -- delete screen from windowset
           modifyWindowSet $ W.deleteScreen screen
           -- delete from list of outputs
@@ -78,28 +73,28 @@ handle e = do
           -- destroy layer shell output
           io $ R.objectDestroy layerShellOutput
           -- destroy output
-          liftIO $ R.objectDestroy output
+          io $ R.objectDestroy output
           -- release wl_output
-          forM_ (M.lookup output om.wl_outputs) $ \p -> io $ WL.objectDestroy p
+          io $ WL.objectDestroy wlOutput
+          io $ whenJust (outputPower o) WL.objectDestroy
     R.RiverOutputWlOutput _ output name -> do
       -- bind a wl_output listener
       registry <- asks globals
       wlOutputListener <- getObject
-      zdgOM <- getObject
-      zdgOutputListener <- getObject
       wl_output <- requireGlobal registry ("wl_output", 4) $ \r _ ver ->
         WL.Output . castPtr <$> WL.registryBind r name WL.outputInterface (fi ver)
-      _ <- WL.listenerAdd wl_output wlOutputListener output
+      WL.listenerAdd wl_output wlOutputListener output
       -- xdg_output
+      zdgOM <- getObject
+      zdgOutputListener <- getObject
       zdg_output <- io $ Zdg.outputManagerGetXdgOutput zdgOM wl_output
-      io $ WL.listenerAdd zdg_output zdgOutputListener output
+      WL.listenerAdd zdg_output zdgOutputListener output
       -- output power mgmt
       opm <- getObject
       power <- Wlr.outputPowerManagerGetOutputPower opm wl_output
+      --
       putObject om
-        { wl_outputs = M.insert output wl_output $ wl_outputs om
-        , pending_setup = M.adjust (\o -> o { outputPower = Just power }) output (pending_setup om)
-        }
+        { pending_setup = M.adjust (\o -> o { wlOutput = wl_output, outputPower = Just power }) output (pending_setup om) }
     R.RiverOutputDimensions _ output width height ->
       modifyOutput' output $ \x -> (x :: Output) {width = fi width, height = fi height}
     R.RiverOutputPosition _ output x y ->
@@ -179,16 +174,14 @@ nextScreenId om = do
     _ -> error "impossible"
 
 getScreenDetail :: Output -> ScreenDetail
-getScreenDetail o = case o.nonExclusive of
-  Nothing -> SD {x = fi o.x, y = fi o.y, height = fi o.height, width = fi o.width}
-  Just (x, y, w, h) -> SD {x = fi x, y = fi y, height = fi h, width = fi w}
+-- getScreenDetail o = case o.nonExclusive of
+--   Nothing -> SD {x = fi o.x, y = fi o.y, height = fi o.height, width = fi o.width}
+--   Just (x, y, w, h) -> SD {x = fi x, y = fi y, height = fi h, width = fi w}
+getScreenDetail o = SD {x = fi o.x, y = fi o.y, height = fi o.height, width = fi o.width}
 
 updateScreenDetail :: RiverOutput -> HS ()
 updateScreenDetail output = withOutput output $ \o -> do
-  modifyWindowSet $ modifyScreen o.screen $ modifyScreenDetail $ \sd ->
-    case o.nonExclusive of
-      Nothing -> sd {x = fi o.x, y = fi o.y, height = fi o.height, width = fi o.width}
-      Just (x, y, w, h) -> sd {x = fi x, y = fi y, height = fi h, width = fi w}
+  modifyWindowSet $ modifyScreen o.screen $ modifyScreenDetail $ \_ -> getScreenDetail o
   liftH manageDirty
   where
     modifyScreen sid f = W.mapScreen (\s -> if sid == W.screen s then f s else s)
@@ -200,10 +193,3 @@ modifyOutput' output f = do
   case M.lookup output (pending_setup om) of
     Just o -> putObject om {pending_setup = M.insert output (f o) om.pending_setup}
     Nothing -> runInHS $ modifyOutput output f >> updateScreenDetail output
-
-getWlOutput :: RiverOutput -> H WL.Output
-getWlOutput ro = do
-  (om :: OutputManager) <- getOrCreateObject $ pure def
-  case M.lookup ro om.wl_outputs of
-    Just wo -> return wo
-    Nothing -> error "No wl output output found"

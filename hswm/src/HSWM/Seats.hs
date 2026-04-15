@@ -58,7 +58,7 @@ added river_seat = do
   io $ R.listenerAdd river_seat seatListener nullPtr
   -- Add layer shell seat listener
   river_layer_shell_seat <- io $ R.riverLayerShellGetSeat layerShell river_seat
-  io $ R.listenerAdd river_layer_shell_seat shellSeatListener nullPtr
+  io $ R.listenerAdd river_layer_shell_seat shellSeatListener river_seat
   -- Add xkb bindings seat listener
   xkb_bindings_seat <- io $ R.riverXkbBindingsGetSeat xkbBindings river_seat
   io $ R.listenerAdd xkb_bindings_seat xkbBindingsSeatListener river_seat
@@ -88,12 +88,14 @@ handleEvent e = do
       runInHS $ withSeat seat deleteRemovedSeat
     R.RiverSeatPointerEnter _ seat window -> do
       when (sm.seat_lshell_focus == FocusNone) $ do
-        runInHS $ modifySeat seat $ \s -> s {hovered = window}
+        runInHS $ modifySeat seat $ \s -> s {hovered = window, pendingPointerEnter = Just (window, s.position)}
         -- focus follow mouse
     --  runInHS $ withSeat seat $ \s ->
     --    unless s.suppressChangeFocus $ modifyWindowSet $ W.focusWindow window
     R.RiverSeatPointerLeave _ seat ->
-      runInHS $ modifySeat seat $ \s -> s {hovered = invalidWindow}
+      runInHS $ modifySeat seat $ \s -> s {hovered = invalidWindow, pendingPointerEnter = Nothing}
+    R.RiverSeatPointerPosition _ seat x y ->
+      runInHS $ modifySeat seat $ \s -> s {position = (x,y)}
     R.RiverSeatWindowInteraction _ seat window ->
       runInHS $ modifySeat seat $ \s -> s {interacted = window}
     R.RiverSeatOpDelta _ seat dx dy ->
@@ -139,17 +141,23 @@ handleLayerShellSeat e = do
   sm <- getSMgr
   newFocus <- case e of
     -- layer shell surface has exclusive focus
-    R.RiverLayerShellSeatFocusExclusive _ _ -> pure $ FocusLayerShell True
+    R.RiverLayerShellSeatFocusExclusive ud _ -> do
+      runInHS $ modifySeat' ud $ \s -> s { currentFocus = SFocusLayerShell (currentFocus s) }
+      pure $ FocusLayerShell True
     -- layer shell surface wants non-exclusive focus
     -- A layer shell surface will be given non-exclusive keyboard focus at the end
     -- of the manage sequence in which this event is sent. The window manager may want
     -- to update window decorations or similar to indicate that no window is focused.
-    R.RiverLayerShellSeatFocusNonExclusive _ _ -> pure $ FocusLayerShell False
+    R.RiverLayerShellSeatFocusNonExclusive ud _ -> do
+      runInHS $ modifySeat' ud $ \s -> s { currentFocus = SFocusLayerShell (currentFocus s) }
+      pure $ FocusLayerShell False
     -- no layer shell surface has focus
     -- No layer shell surface will have keyboard focus at the end
     -- of the manage sequence in which this event is sent. The window
     -- manager may want to return focus to whichever window last had focus, for example.
-    R.RiverLayerShellSeatFocusNone _ _ -> pure FocusNone
+    R.RiverLayerShellSeatFocusNone ud _ -> do
+      runInHS $ modifySeat' ud $ \s -> s { currentFocus = SFocusNone }
+      pure FocusNone
   putObject sm {seat_lshell_focus = newFocus}
 
 handleXkbBindingEvent :: R.RiverXkbBindingEvent -> H ()
@@ -197,9 +205,10 @@ manage = do
   om <- getObject
   -- Handle new seats
   newSeats <- forM om.pending_manage createSeatBindings
-  forM_ newSeats $ \s -> setXCursorTheme $ getField @"river_seat" s
-  runInHS $ modify $ \s -> s {_seats = _seats s ++ newSeats}
-  putObject om {pending_manage = []}
+  when (not $ null newSeats) $ do
+    forM_ newSeats $ \s -> setXCursorTheme $ getField @"river_seat" s
+    runInHS $ modify $ \s -> s {_seats = _seats s ++ newSeats}
+    putObject om {pending_manage = []}
   -- Manage existing ones
   runInHS $ gets _seats >>= mapM_ manage1
 
@@ -225,7 +234,24 @@ manage1 s = do
     doS = modifySeat s.river_seat
 
     managePendingAction = case s.pending_action of
-      S_NONE -> return ()
+      S_NONE -> do
+        case s.currentFocus of
+          SFocusNone -> do
+            withWindow s.focused $ \_ -> R.riverSeatFocusWindow s.river_seat s.focused
+            doS $ \x -> x { currentFocus = SFocusWindow s.focused }
+
+          SFocusWindow{} -> case s.pendingPointerEnter of
+            Just (rw, pos) -> do
+              doS $ \x -> x { pendingPointerEnter = Nothing }
+              when (pos /= s.position) $ do
+                logInfo "seat: focus changed by pointer"
+                doS $ \x -> x { focused = rw }
+                R.riverSeatFocusWindow s.river_seat rw
+                windows $ W.focusWindow rw
+            _ -> pure ()
+
+          _ -> pure ()
+
       S_SUBMAP_NEXT_KEY action subkeys -> do
         -- make sure next key is devoured
         io $ ensureNextKeyEaten s
@@ -250,13 +276,14 @@ manage1 s = do
             doS $ \s' -> s' {pending_action = S_NONE}
             withWindow w $ seatPointerMove s.river_seat
       S_START_OP SEAT_OP_RESIZE -> do
-        mw <- withWindowSet $ return . W.peek
+        mw <- withWindowSet $ maybe (pure Nothing) lookupWindow . W.peek
         case mw of
           Nothing -> return ()
           Just w -> do
             log' "seat: start resize op"
             doS $ \s' -> s' {pending_action = S_NONE}
-            withWindow w $ \rv -> seatPointerResize s.river_seat rv (2 .|. 8) --  .|. 4 .|. 8)
+            let edges = calcResizeEdges w s.position
+            seatPointerResize s.river_seat w edges
       S_INPUT_OVERRIDE onEmpty keys -> do
         log' "seat: input override mode"
         kbdListen <- liftH getObject
@@ -425,3 +452,9 @@ execXkbBinding ref xb = local (\r -> r {thisSeat = Just rs}) $ do
       (Just (_, _), _ : _) -> next (S_SUBMAP_NEXT_KEY xb.action xb.subKeymap) -- Submap binding activated (lvl++)
   where
     rs = xb.river_seat
+
+calcResizeEdges :: Window -> (Int32, Int32) -> Int32
+calcResizeEdges w (sx, sy) = (if closerL then 4 else 8) .|. (if closerU then 1 else 2)
+  where
+  closerL = (sx - w.x) < (w.x + w.width - sx)
+  closerU = (sy - w.y) < (w.y + w.height - sy)

@@ -16,6 +16,7 @@ module HSWM.Util.Types where
 
 import Data.Word (Word32)
 import HSWM.StackSet as W
+import Data.Ratio
 
 -- | One-dimensional directions:
 data Direction1D = Next | Prev deriving (Eq, Read, Show)
@@ -63,3 +64,7 @@ scaleRationalRect (Rectangle sx sy sw sh) (W.RationalRect rx ry rw rh) =
   Rectangle (sx + scale sw rx) (sy + scale sh ry) (scale sw rw) (scale sh rh)
   where
     scale s r = floor (toRational s * r)
+
+rationalRectIn :: Rectangle -> Rectangle -> W.RationalRect
+rationalRectIn (Rectangle wx wy ww wh) (Rectangle sx sy sw sh) =
+  W.RationalRect ((fi wx - fi sx) % fi sw) ((fi wy - fi sy) % fi sh) (fi ww % fi sw) (fi wh % fi sh)

@@ -105,6 +105,9 @@ isMinimized = asks minimized
 appName :: Query String
 appName = asks appId
 
+wTitle :: Query String
+wTitle = asks title
+
 -- | Floats the new window in the given rectangle.
 doRectFloat ::
   -- | The rectangle to float the window in. 0 to 1; x, y, w, h.

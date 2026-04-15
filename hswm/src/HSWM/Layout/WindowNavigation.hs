@@ -133,7 +133,7 @@ configurableNavigation conf = ModifiedLayout (WindowNavigation conf (I Nothing))
 instance LayoutModifier WindowNavigation RiverWindow where
   redoLayout (WindowNavigation conf (I st)) rscr (Just s) origwrs =
     do
-      HSWMConfig {normalBorder = nbc, focusedBorder = fbc} <- asks config
+      HSWMConfig {normalBorder = nbc, focusedBorder = _fbc} <- asks config
 
       -- TODO
       let [uc, dc, lc, rc] = take 4 $ repeat nbc
@@ -198,7 +198,7 @@ instance LayoutModifier WindowNavigation RiverWindow where
               focusWindowHere :: HState -> HState
               focusWindowHere s
                 | Just w == W.peek (windowset s) = s
-                | has w $ W.stack $ W.workspace $ W.current $ windowset s =
+                | has_ w $ W.stack $ W.workspace $ W.current $ windowset s =
                     s
                       { windowset =
                           until
@@ -207,8 +207,8 @@ instance LayoutModifier WindowNavigation RiverWindow where
                             $ windowset s
                       }
                 | otherwise = s
-              has _ Nothing = False
-              has x (Just (W.Stack t l rr)) = x `elem` (t : l ++ rr)
+              has_ _ Nothing = False
+              has_ x (Just (W.Stack t l rr)) = x `elem` (t : l ++ rr)
     | Just (Swap d) <- fromMessage m =
         case navigable d pt wrs of
           [] -> return Nothing

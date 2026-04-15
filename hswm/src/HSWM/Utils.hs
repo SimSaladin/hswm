@@ -281,6 +281,7 @@ uninstallSignalHandlers = io $ do
   _ <- installHandler sigCHLD Default Nothing
   return ()
 
+readProcess :: MonadUnliftIO m => FilePath -> [String] -> m [Char]
 readProcess cmd args = do
   p <-
     startProcess $

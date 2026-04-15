@@ -1,9 +1,5 @@
 {-# LANGUAGE DerivingVia #-}
 
------------------------------------------------------------------------------
-
------------------------------------------------------------------------------
-
 -- |
 -- Module      :  HSWM.Hooks.WorkspaceHistory
 -- Description :  Keep track of workspace viewing order.
@@ -32,7 +28,6 @@ module HSWM.Hooks.WorkspaceHistory
   )
 where
 
-import Control.DeepSeq
 import Data.List qualified as L
 import HSWM
 import HSWM.StackSet hiding (delete, filter, new)

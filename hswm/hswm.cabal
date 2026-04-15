@@ -45,13 +45,18 @@ library
           HSWM.BufferPool
           HSWM.Config
           HSWM.Core
+          HSWM.Hooks.NonExclusiveArea
           HSWM.Hooks.WorkspaceHistory
           HSWM.InputConfig
           HSWM.Layout
           HSWM.Layout.BinarySpacePartition
           HSWM.Layout.BoringWindows
           HSWM.Layout.LayoutModifier
+          HSWM.Layout.Maximize
           HSWM.Layout.Minimize
+          HSWM.Layout.MultiToggle
+          HSWM.Layout.MultiToggle.Instances
+          HSWM.Layout.NoBorders
           HSWM.Layout.WindowNavigation
           HSWM.Main
           HSWM.ManageHook
@@ -72,6 +77,7 @@ library
           HSWM.Util.Minimize
           HSWM.Util.NamedScratchpad
           HSWM.Util.Posix
+          HSWM.Util.Rectangle
           HSWM.Util.RofiPrompt
           HSWM.Util.Stack
           HSWM.Util.Types

@@ -203,7 +203,10 @@ import           Bindings.Wayland.Internal.Types as Types
 
 import           Bindings.Wayland.Client.Generated
 import           Bindings.Wayland.Client.Generated.Global as G
-import           Bindings.Wayland.Client.Generated.Safe as Safe
+import qualified Bindings.Wayland.Client.Generated.Safe as Safe
+
+import Bindings.Wayland.Client.Generated.Safe hiding (wl_display_flush, wl_display_dispatch)
+import Bindings.Wayland.Client.Generated.Unsafe (wl_display_flush, wl_display_dispatch)
 
 import           Bindings.Wayland.Internal.TH
 
@@ -233,6 +236,7 @@ clientFromProtocolXML commonSettings
           [ IRequest "connect" ("","") Nothing [arg "name"]
           , IRequest "connect_to_fd" ("","") Nothing []
           , IRequest "cancel_read" ("","") Nothing []
+          , IRequest "read_events" ("","") Nothing []
           -- , IRequest "create_queue" ("","") Nothing []
           -- , IRequest "create_queue_with_name" ("","") Nothing []
           , IRequest "disconnect" ("","") Nothing []

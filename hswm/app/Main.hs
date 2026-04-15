@@ -8,7 +8,6 @@ module Main (main) where
 
 import Data.List qualified as L
 import Data.Map qualified as M
-import Data.Ratio
 import HSWM
 import HSWM.Actions.CycleRecentWS qualified as CycleRecentWS
 import HSWM.Actions.CycleWS qualified as CycleWS
@@ -17,16 +16,21 @@ import HSWM.Actions.DynamicWorkspaces qualified as DynWS
 import HSWM.Actions.OnScreen qualified as OnScreen
 import HSWM.Actions.PhysicalScreens qualified as PScreen
 import HSWM.Layout.BoringWindows (boringWindows)
-import HSWM.Layout.BoringWindows qualified as BW
+--import HSWM.Layout.BoringWindows qualified as BW
 import HSWM.Layout.Minimize qualified as L.Minimize
 import HSWM.Layout.WindowNavigation qualified as WNav
 import HSWM.Layout.BinarySpacePartition qualified as BSP
+import HSWM.Layout.Maximize qualified as L.Maximize
+import HSWM.Layout.NoBorders qualified as L.NoBorders
+import HSWM.Layout.MultiToggle (mkToggle1, Toggle(..))
+import HSWM.Layout.MultiToggle.Instances
 import HSWM.StackSet qualified as W
 import HSWM.Util.Debug
 import HSWM.Util.IPC qualified as IPC
 import HSWM.Util.NamedScratchpad
 import HSWM.Util.RofiPrompt qualified as RP
 import HSWM.Util.Waybar qualified as WB
+import HSWM.Hooks.NonExclusiveArea qualified as NEArea
 import HSWM.Wallpaper qualified
 import System.Environment qualified
 import Text.Printf
@@ -67,7 +71,7 @@ myScratchpads =
         mhd
         (appName =? "ncmpcpp")
         (void $ spawnProcess "kitty" ["--app-id=ncmpcpp", "--detach", "ncmpcpp"])
-    ]
+    ] ++ [mkPadDyn "dynamic" def idHook]
   where
     mhd = doRFRR 0.2 0.1 0.6 0.6
     doRFRR x y w h = doRectFloat (W.RationalRect x y w h)
@@ -115,13 +119,20 @@ windowPrompt = do
     b <- gets _windows
     return (a, b)
   let wins = [(rw, W.tag ws, w) | ws <- wss, rw <- W.integrate' (W.stack ws), Just w <- [M.lookup rw wState]]
-  RP.rofiRun rofiPrompt {RP._prompt = "Go to window"} (map fmtWindow wins) >>= (`whenJust` doApply)
+  RP.rofiRun rp (map fmtWindow wins) >>= (`whenJust` doApply wins)
   where
-    fmtWindow (_rw, tag, w) = "<b>" <> w.appId <> "</b> (" <> w.title <> ") [" <> tag <> "]"
-    doApply input = do
-      logInfo $ fromString input
-      return ()
-      -- TODO
+    rp = rofiPrompt
+      { RP._prompt = "Go to window",
+        RP._format = "i",
+        RP._noCustom = True
+      }
+    fmtWindow (_rw, tag, w) = "<b>" <> w.appId <> "</b> on " <> tag <> " \"" <> w.title <> "\"" <> maybe "" ((" " <>) . show) w.unreliablePid
+    doApply wins idxStr = do
+      let idx = read idxStr :: Int
+          (rw, _, _) = wins !! idx
+      logInfo $ fromString $ show idx
+      runInHS $ windows $ W.focusWindow rw
+      manageDirty
 
 mkWorkspacePrompt :: (RP.RofiPromptConfig -> WorkspaceId -> RP.RofiPromptConfig) -> (WorkspaceId -> String -> H a) -> H ()
 mkWorkspacePrompt prompt apply = do
@@ -154,6 +165,17 @@ addWorkspacePrompt =
         manageDirty
     )
 
+workspacePrompt :: H ()
+workspacePrompt =
+  mkWorkspacePrompt
+    (\p _ -> p {RP._prompt = "Go to workspace"})
+    ( \_ input -> do
+        runInHS $ do
+          logInfo $ "switching workspace" :# [ "tag" .= input ]
+          windows $ W.view input
+        manageDirty
+    )
+
 removeFocusedWorkspace :: HS ()
 removeFocusedWorkspace = do
   (curTag, ws) <- withWindowSet $ return . (W.currentTag &&& (W.workspace . W.current))
@@ -170,9 +192,18 @@ myManageHook =
 myLayoutHook :: _
 myLayoutHook =
   L.Minimize.minimize $
-    boringWindows $
-      WNav.configurableNavigation (WNav.navigateColor colBase00) $ -- apply on top of any modifiers that might modify placement of tiled windows
-        BSP.emptyBSP ||| Tall 1 (3 / 100) (1 / 2) ||| Full
+  boringWindows $
+  mkToggle1 NOBORDERS $
+  mkToggle1 NBFULL $
+  NEArea.nonExclusiveArea $
+  L.Maximize.maximize $
+  WNav.configurableNavigation (WNav.navigateColor colBase00) $ -- apply on top of any modifiers that might modify placement of tiled windows
+  --mkToggle1 REFLECTX $
+  --mkToggle1 REFLECTY $
+  mkToggle1 MIRROR $
+        BSP.emptyBSP
+        ||| Tall 1 (3 / 100) (1 / 2)
+        ||| L.NoBorders.noBorders Full
 
 myKeys :: [(String, SomeAction H)]
 myKeys =
@@ -182,19 +213,17 @@ myKeys =
     ("M-Return", "New terminal window" $?$?= SomeAction @H (LaunchProgram "kitty" [])), -- Terminal
     ("M-Escape", "Print debug stack" $?$?= debugAction),
     ("M-Dollar", "Lock session" $?$?= void (spawnProcess @H "swaylock" ["-k"])),
-    ("M-C-Return", "" $?$?= void @H (async (runInHS (setOutputPower False) >> threadDelay 5000000 >> runInHS (setOutputPower True)))),
-    -- ("C-Return", "" $?$?= void @H (async (runInHS (setOutputPower False) >> threadDelay 5000000 >> runInHS (setOutputPower True)))),
-    -- "M-<F1>" `CF.key'` helpCmd
+    ("M-Print", "Screenshot" $?$?= void (spawnProcess @H "sh" ["-c", "grim -g \"$(slurp)\""])),
     -- "M-r M-S-c"     cmdT @"Signal process (SIGKILL) of focused window (_NET_WM_PID)" (withFocused (signalProcessBy Posix.sigKILL))
     -- "M-q"           myRecompileRestart False True ? "Recompile && Restart"
     -- "M-C-q"         myRecompileRestart True False ? "Recompile (force)"
     -- "M-S-<Return>"  FloatNext.floatNext True >> spawnTerm def "" ? "Terminal (floating)"
-    -- "M-<Print>"     takeScreenshot
+    -- "M-<F1>" `CF.key'` helpCmd
 
     -- ======== Execute ==========
     ("M-r r", "Run shell (prompt)" $?$?= rofiRun ["-modes", "run", "-show", "run"]),
     ("M-r d", "Run desktop app (prompt)" $?$?= rofiRun ["-modes", "drun", "-show", "drun"]),
-    ("M-r s", "Run via systemd-run (prompt)" $?$?= (RP.promptRofi @_ @H "systemd-run:" [] RP.++> RP.runWithSystemD)),
+    ("M-r s", "Run via systemd-run (prompt)" $?$?= (RP.rofiRun @_ @H def { RP.history = Just "systemd-run", RP._prompt = "systemd-run", RP._dmenu = True } [] RP.++> RP.runWithSystemD)),
     ("M-r c", "Open cliphist prompt" $?$?= rofiRun [ "-modi", "clipboard:cliphist-rofi-img", "-show", "clipboard", "-show-icons" ]),
     -- "M-r b"            >+ spawnDialog "bluetoothctl" ? "bluetoothctl"
     -- "M-r f"            >+ spawnOnceKitty "fself" "bash" ["-lic", "fself"] doCenterFloat
@@ -217,14 +246,10 @@ myKeys =
          ("M-S-p", "Shift current tag (backwards)" $?$?= DWO.swapWith Prev CycleWS.anyWS),
          ("M-g r", "Rename workspace (prompt)" $?$?= renameWorkspacePrompt),
          ("M-g n", "Add workspace (prompt)" $?$?= addWorkspacePrompt),
+         ("M-g g", "Go to workspace (prompt)" $?$?= workspacePrompt),
          ("M-g d", "Remove focused workspace" $?$?= removeFocusedWorkspace),
          ("M-g f", "Go to window" $?$?= windowPrompt)
-         -- ( "M-g S-n"     wsPromptNew' "New tag for window: " ?+ (\to -> DynWS.addHiddenWorkspace to >> defile (shift to))   ? "Move window to new tag (XP)"
-         -- ( "M-g c"       wsPrompt'    "Copy to tag: "        ?+ (\to -> withFocii $ \_ w -> windows $ CW.copyWindow w to)   ? "Copy window to this tag (XP)"
-         -- ( "M-g m"       wsPrompt'    "Shift to tag: "       ?+ (defile . shift                                           ) ? "Move window to this tag (XP)"
-         -- ( "M-g g"       wsPrompt'    "View tag: "           ?+ (defile . greedyView                                      ) ? "Go to tag (XP)"
-         -- ( "M-g s"       GS.goToSelected gsconfig1                          ? "Go to window (GS)"
-         -- ( "M-g f"       XP.windowPrompt xpConfigAuto XP.Goto XP.allWindows ? "Go to window (XP)"
+         -- ( "M-g m"       wsPrompt'    "Shift to tag: "       ?+ (defile . shift) ? "Move window to this tag (XP)"
        ]
     ++
     -- ====== Layout
@@ -235,18 +260,17 @@ myKeys =
       ("M-Period", "Layout: " $?$?= IncMasterN 1),
       ("M-x", "Layout: " $?$?= Shrink),
       ("M-S-x", "Layout: " $?$?= Expand),
-
-      --   "M-b t"       >+ msgT ManageDocks.ToggleStruts
-      --   "M-b l"       >+ msgT Magnifier.Toggle
-      --   "M-m"         >+ MaximizeRestore
-      --   "M-b s"       >+ ToggleScreenSpacing :>> ToggleWindowSpacing
-      --   "M-b b"       >+ toggle1 NOBORDERS
-      --   "M-b h"       >+ toggle1 (HINTSPLACEMENT (0.5, 0.5))
-      --   "M-b f"       >+ toggle1 NBFULL
-      --   "M-b m"       >+ toggle1 MIRROR
+      ("M-b t", "Toggle NonExcl. Area" $?$?= NEArea.ToggleNonExclusiveArea),
+      ("M-m",   "Maximize Restore" $?$?= withFocused (sendMessage . L.Maximize.maximizeRestore . river_window)),
+      ("M-b b", "Toggle NOBORDERS" $?$?= sendMessage (Toggle NOBORDERS)),
+      ("M-b m", "Toggle MIRROR" $?$?= sendMessage (Toggle MIRROR)),
+      ("M-b f", "Toggle NBFULL" $?$?= sendMessage (Toggle NBFULL)),
       --   "M-b x"       >+ toggle1 REFLECTX
       --   "M-b y"       >+ toggle1 REFLECTY
-      --   "M-b M-x"     >+ msgT ManageDocks.ToggleStruts :>> toggle1 NOBORDERS :>> ToggleScreenSpacing :>> ToggleWindowSpacing
+      --   "M-b h"       >+ toggle1 (HINTSPLACEMENT (0.5, 0.5))
+      --   "M-b s"       >+ ToggleScreenSpacing :>> ToggleWindowSpacing
+      --   "M-b l"       >+ msgT Magnifier.Toggle
+      ("M-b M-x", "Toggle struts/border/spacing" $?$?= (sendMessage NEArea.ToggleNonExclusiveArea >> sendMessage (Toggle NOBORDERS) {-ToggleScreenSpacing :>> ToggleWindowSpacing -})),
 
       -- ======= Layout: BSP
       ("M-C-y",  "BSP: Select Node" $?$?= BSP.SelectNode),
@@ -266,11 +290,14 @@ myKeys =
     ++ [ ("M-n", "Focus down" $?$?= windows W.focusDown),
          ("M-p", "Focus up" $?$?= windows W.focusUp),
          ("M-b f", "Toggle fullscreen (focused)" $?$?= withFocused (doManage WToggleFullscreen)),
-         ("M-f f", "Float (focused)" $?$?= withFocused (\w -> modifyWindowSet (W.float w.river_window (W.RationalRect (1 % 10) (1 % 10) (1 % 2) (1 % 2))))),
+         ("M-f f", "Float (focused)" $?$?=
+           withFocused (\w -> modifyWindowSet (\ws ->
+             W.float w.river_window (rationalRectIn (Rectangle w.x w.y (fi w.width) (fi w.height)) (screenRect $ W.screenDetail $ W.current ws)) ws
+                                              ))),
          ("M-f s", "Sink (focused)" $?$?= withFocused (\w -> modifyWindowSet (W.sink w.river_window))),
          ("M-Exclam", "Toggle tmux PAD" $?$?= togglePad "tmux-0"),
-         -- "M-<Tab>"   >+ cyclePads
-         -- "M-/"       >+ togglePad "dynamic"
+         ("M-Slash", "Toggle dynamic PAD" $?$?= togglePad "dynamic"),
+         -- ("M-Tab",  "Cycle PADs" $?$?= cyclePads),
          -- "M-f "      >>+ directions2D >++> flip SnapMove   Nothing
          -- "M-f S-"    >>+ directions2D >++> flip SnapGrow   Nothing
          -- "M-f C-"    >>+ directions2D >++> flip SnapShrink Nothing
@@ -287,9 +314,7 @@ myKeys =
          -- "M-f u"     >+ FocusUrgent
          -- "M-f b"     >+ ToggleFocusedWindowBorder
          -- "M-f c"     >+ CenterWindow
-         -- "M-f s"     >+ SinkWindow
          -- "M-f S-s"   >+ SinkAll
-         -- "M-f f"     >+ FloatWindow
          -- "M-f S-f"   >+ ToggleFloatAllNew
          -- "M-f y"     >+ SwitchLayer
          -- "M-f h"     >+ pidPrompt xpConfig "SpawnOn/PPID" ?+ (\p -> wsPromptWithCurrent xpConfig "Shift to:" ?+ setManageByPPID p) ? "SpawnOn by Window PID"
@@ -319,7 +344,7 @@ myKeys =
          --   "M-@"                     >+ togglePad "taskwarrior-tui"
          --   "M-c m"                   >+ spawnOnceKitty "Pulsemixer" "pulsemixer" [] doCenterFloat
 
-         -- group "Prompts (Execute)" $ do
+         -- ===== "Prompts (Execute)"
          ("M-r e", "Environment prompt" $?$?= environPrompt)
          --   "M-r p"   >+ XP.Pass.passPrompt xpConfig          ? "Pass (Prompt)"
          --   "M-r C-p" >+ XP.Pass.passOTPPrompt xpConfig       ? "Pass OTP (Prompt)"

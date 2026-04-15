@@ -189,7 +189,8 @@ drawImage bp OutputState {..} img Surfaces {..} = do
   io $ WL.surfaceSetOpaqueRegion wl_surface opaqueRegion
   io $ WL.objectDestroy opaqueRegion
 
-  logDebug $ "drawing wallpaper" :# [ "output" .= (w, h)
+  logDebug $ "drawing wallpaper" :# [ "outsize" .= (w, h)
+                                    , "output" .= name
                                     , "image" .= (src_w, src_h)
                                     , "scale" .= scale
                                     , "bufsize" .= buf_size
@@ -253,43 +254,47 @@ initOutput ro = withOutputState ro $ \os -> do
       vpr <- getObject
       layerShell <- getObject
       runInIO <- askRunInIO
-
+      -- Surface
       wl_surface <- io $ WL.compositorCreateSurface compositor
-
+      -- fractional scale
       fractSurface <- io $ FS.fractionalScaleManagerGetFractionalScale fsm wl_surface
       fsl <- io $ FS.mkFractionalScaleListener $ \case
         FS.FractionalScalePreferredScale _ _ fscale ->
-          runInIO $ updateOutputState ro $ \x -> x {pref_fract_scale = fscale, pending_render = True}
+          runInIO $ do
+            updateOutputState ro $ \x -> x {pref_fract_scale = fscale, pending_render = True}
       io $ WL.listenerAdd fractSurface fsl nullPtr
-
+      -- viewport
+      viewport <- io $ VP.viewporterGetViewport vpr wl_surface
+       -- layersurface
       layerSurface <- io $ Wlr.layerShellGetLayerSurface layerShell wl_surface os.wl_output Wlr.ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND (Just "wallpaper")
       io $ Wlr.layerSurfaceSetSize layerSurface 0 0
       io $ Wlr.layerSurfaceSetAnchor layerSurface (WL.toCEnum $ 1 + 2 + 4 + 8)
       io $ Wlr.layerSurfaceSetExclusiveZone layerSurface (-1)
-
-      viewport <- io $ VP.viewporterGetViewport vpr wl_surface
-
       lsListener <- io $ Wlr.mkLayerSurfaceListener $ \case
         Wlr.LayerSurfaceConfigure _ ls serial _w _h -> do
           Wlr.layerSurfaceAckConfigure ls serial
-          runInIO $ updateOutputState ro $ \x -> x {out_width = fi w, out_height = fi h, configured = True, pending_render = True}
+          runInIO $ do
+            updateOutputState ro $ \x -> x
+              { out_width = fi w
+              , out_height = fi h
+              , configured = True
+              , pending_render = not x.configured || (x.out_width, x.out_height) /= (fi w, fi h)
+              }
         Wlr.LayerSurfaceClosed {} -> do
           runInIO $ logError "Layer surface closed!"
           return ()
       io $ WL.listenerAdd layerSurface lsListener nullPtr
-
       io $ WL.surfaceCommit wl_surface
-
       return $ Surfaces {wl_surface = wl_surface, layerSurface, outViewport = Just viewport}
     Just ss -> return ss
 
   -- set no input region
-  emptyRegion <- io $ WL.compositorCreateRegion compositor
+  emptyRegion <- WL.compositorCreateRegion compositor
   io $ WL.surfaceSetInputRegion ss.wl_surface emptyRegion
   io $ WL.objectDestroy emptyRegion
 
   -- set opaque region
-  opaqueRegion <- io $ WL.compositorCreateRegion compositor
+  opaqueRegion <- WL.compositorCreateRegion compositor
   io $ WL.regionAdd opaqueRegion 0 0 w h
   io $ WL.surfaceSetOpaqueRegion ss.wl_surface opaqueRegion
   io $ WL.objectDestroy opaqueRegion

@@ -118,8 +118,6 @@ serverStartupHook :: ServerConfig -> H ()
 serverStartupHook conf = do
   logInfo "Starting IPC server"
   stateRef <- getOrCreateObject (newIORef (def :: ConnectedPeers))
-  env <- ask
-  logFunc <- asks _logFunc
   _ <- async $ serverRun conf stateRef serverHandleMsg
       `finally` logInfo "IPC server thread finished"
   logInfo "IPC server started"
@@ -128,7 +126,7 @@ serverRun ::
   forall env m.
   (MonadIPC env m, env ~ HConf) =>
   ServerConfig -> IORef ConnectedPeers -> (Socket -> ProtoMsg -> m ()) -> m ()
-serverRun conf stateRef onMsg = withThreadContext ["component" .= "ipc/server"] $ do
+serverRun conf stateRef onMsg = withThreadContext ["component" .= ("ipc/server"::String)] $ do
 
   case conf.socketAddr of
     SockAddrUnix socketPath -> do
@@ -154,7 +152,7 @@ serverRun conf stateRef onMsg = withThreadContext ["component" .= "ipc/server"] 
       modifyIORef stateRef $ \s -> s {connected = M.insert ck conn s.connected}
 
     handleClient :: _ -> _ -> m ()
-    handleClient ck conn = do
+    handleClient _ck conn = do
       sendMsg conn $ Identify (PKG.name ++ "-server") 0 (Just $ PKG.synopsis ++ " " ++ showVersion PKG.version)
       let worker lo = do
             (resps, leftover) <- io $ recvLines conn lo
@@ -183,7 +181,7 @@ clientRun ::
   -- | Emit outgoing msg
   ((ProtoMsg -> m ()) -> m ()) ->
   m ()
-clientRun conf onMsg cb = withThreadContext ["component" .= "ipc/client"] $ bracket (io $ socket AF_UNIX Stream defaultProtocol) (io . close) $ \sock -> do
+clientRun conf onMsg cb = withThreadContext ["component" .= ("ipc/client"::String)] $ bracket (io $ socket AF_UNIX Stream defaultProtocol) (io . close) $ \sock -> do
   io $ connect sock conf.connectTo
   io $ sendMsg sock $ Identify (PKG.name ++ "-client") 0 (Just $ PKG.synopsis ++ " " ++ showVersion PKG.version)
   withAsync (inputWorker sock) $ \inputAs -> do
@@ -239,7 +237,7 @@ fullStateUpdate = runInHS $ do
 
   let tags = zip [tag | W.Workspace {..} <- wsSortPP (W.workspaces ws)] (keyhints ++ L.repeat "")
 
-      keyhints = map toText $ map (:[]) ['a'..'z']
+      keyhints = map (toText . (:[])) ['a'..'z']
 
       focusedTag = let W.Screen ws' sid _ = W.current ws in (sid, getWsData ws')
       visibleTags = [(sid, getWsData ws') | W.Screen ws' sid _ <- W.visible ws]
@@ -276,6 +274,7 @@ toWindowInfo w =
       pid = w.unreliablePid
     }
 
+runMIO :: LoggingT m a -> m a
 runMIO = runStdoutLoggingT
 
 type MIO = LoggingT IO
