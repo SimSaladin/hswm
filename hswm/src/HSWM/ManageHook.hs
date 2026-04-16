@@ -20,9 +20,9 @@ data Match a = Match Bool a
 -- a candidate returns a 'Just' value, effectively running only the first match
 -- (whereas 'composeAll' continues and executes all matching rules).
 composeOne :: (Monoid a, Monad m) => [m (Maybe a)] -> m a
-composeOne = foldr try (return mempty)
+composeOne = foldr f (return mempty)
   where
-    try q z = do
+    f q z = do
       x <- q
       maybe z return x
 

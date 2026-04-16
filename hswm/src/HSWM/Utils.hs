@@ -32,10 +32,12 @@ import System.Posix.Signals
 import System.Posix.Types (ProcessID)
 import System.Process.Typed
 import Text.Pretty.Simple qualified as P
+import GHC.Stack
+import Data.Ord
 
 -- | Parse a color in the format 0xRRGGBB or 0xRRGGBBAA and convert it to
 -- 32-bit color values (used by Window.set_borders in rwm).
-parseRgba :: String -> RiverColor
+parseRgba :: HasCallStack => String -> RiverColor
 parseRgba s
   | '#' : s' <- s = parseRgba ('0' : 'x' : s')
   | '0' : 'x' : s' <- s,
@@ -45,17 +47,71 @@ parseRgba s
           -- If the color is 0xRRGGBB, add FF for the alpha channel
           | length s == 8 -> shiftL c 8 .|. 0xff
           | otherwise -> c
-        _ -> error "invalid rgba"
-  | otherwise = error "InvalidRgba"
+        _ -> error $ "Invalid RGBA text: '" ++ s ++ "'\n" ++ prettyCallStack callStack
+  | otherwise = error $ "Invalid RGBA text: '" ++ s ++ "'\n" ++ prettyCallStack callStack
 
+-- | Parses unsigned 32-bit int into RGBA: @RRGGBBAA@
 bytesToRiverColor :: Word32 -> RiverColor
 bytesToRiverColor bytes =
   RiverColor
-    { red = bytes .&. 0xFF000000, -- [3];
-      green = (bytes .&. 0x00FF0000) .<<. 8, -- [2];
-      blue = (bytes .&. 0x0000FF00) .<<. 16, -- [1];
-      alpha = (bytes .&. 0x000000FF) .<<. 24 -- [0];
+    { red = bytes .&. 0xFF000000,
+      green = (bytes .&. 0x00FF0000) .<<. 8,
+      blue = (bytes .&. 0x0000FF00) .<<. 16,
+      alpha = (bytes .&. 0x000000FF) .<<. 24
     }
+
+data RGBA a = RGBA {red, green, blue, alpha :: !a}
+
+fromRiverColor :: RiverColor -> RGBA Double
+fromRiverColor rc = RGBA
+  { red = fi rc.red / 255.0
+  , green = fi rc.green / 255.0
+  , blue = fi rc.blue / 255.0
+  , alpha = fi rc.alpha / 255.0
+  }
+
+packRGBA :: RGBA Double -> RiverColor
+packRGBA c = RiverColor
+  { red = to8 c.red
+  , green = to8 c.green
+  , blue = to8 c.blue
+  , alpha = to8 c.alpha
+  } where to8 x = floor (clamp (0, 1) x * 255.0)
+
+-- | Blend to RGBA colors (\"over\" operation)
+overRGBA :: RiverColor -> RiverColor -> RiverColor
+overRGBA ra rb =
+  let (a, b) = fromRiverColor *** fromRiverColor $ (ra, rb)
+      oA = a.alpha + b.alpha * (1 - a.alpha)
+      oR = (a.red   * a.alpha + b.red   * b.alpha * (1 - a.alpha)) / oA
+      oG = (a.green * a.alpha + b.green * b.alpha * (1 - a.alpha)) / oA
+      oB = (a.blue  * a.alpha + b.blue  * b.alpha * (1 - a.alpha)) / oA
+   in if oA == 0 then RiverColor 0 0 0 0
+                 else packRGBA RGBA { red = oR, green = oG, blue = oB, alpha = oA }
+
+mixRGBA :: Double -> RiverColor -> RiverColor -> RiverColor
+mixRGBA t ra rb =
+  let (a, b) = premult . fromRiverColor *** premult . fromRiverColor $ (ra, rb)
+   in packRGBA $ unpremult RGBA
+         { red = lerp t a.red b.red
+         , blue = lerp t a.blue b.blue
+         , green = lerp t a.green b.green
+         , alpha = lerp t a.alpha b.alpha
+         }
+
+-- | Linear interpolate: @ lerp t_c2 c1 c2 @
+lerp :: Double -> Double -> Double -> Double
+lerp t a b = a * (1 - t) + b * t
+
+-- | Alpha premultiplied
+premult :: RGBA Double -> RGBA Double
+premult (RGBA r g b a) = RGBA (r * a) (g * a) (b * a) a
+
+-- | Alpha un-premultiplied
+unpremult :: RGBA Double -> RGBA Double
+unpremult (RGBA r g b a)
+  | a == 0    = RGBA 0 0 0 0
+  | otherwise = RGBA (r / a) (g / a) (b / a) a
 
 resolveModMask :: ModMask -> String -> ModMask
 resolveModMask d s = go s

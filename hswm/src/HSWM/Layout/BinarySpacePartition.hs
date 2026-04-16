@@ -430,6 +430,7 @@ findSplit d z@(_, LeftCrumb s _:_)
   | axis s == d = Just z
 findSplit d z = goUp z >>= findSplit d
 
+{- TODO: BorderResize/MouseResize
 resizeSplit :: Direction2D -> (Rational,Rational) -> Zipper Split -> Maybe (Zipper Split)
 resizeSplit _ _ z@(_, []) = Just z
 resizeSplit dir (xsc,ysc) z = case goToBorder dir z of
@@ -454,6 +455,7 @@ goToBorder U z@(_, RightCrumb (Split Horizontal _) _:_) = goUp z
 goToBorder U z = goUp z >>= goToBorder U
 goToBorder D z@(_, LeftCrumb  (Split Horizontal _) _:_) = goUp z
 goToBorder D z = goUp z >>= goToBorder D
+-}
 
 -- takes a list of indices and numerates the leaves of a given tree
 numerate :: [Int] -> Tree a -> Tree a
@@ -607,10 +609,12 @@ autoSizeNth _ _ (BinarySpacePartition _ _ _ Nothing) = emptyBSP
 autoSizeNth _ _ b@(BinarySpacePartition _ _ _ (Just (Leaf _))) = b
 autoSizeNth dir diff b = doToNth (autoSizeTree dir diff) b
 
+{- TODO: BorderResize/MouseResize
 resizeSplitNth :: Direction2D -> (Rational,Rational) -> BinarySpacePartition a -> BinarySpacePartition a
 resizeSplitNth _ _ (BinarySpacePartition _ _ _ Nothing) = emptyBSP
 resizeSplitNth _ _ b@(BinarySpacePartition _ _ _ (Just (Leaf _))) = b
 resizeSplitNth dir sc b = doToNth (resizeSplit dir sc) b
+-}
 
 -- rotate tree left or right around parent of nth leaf
 rotateTreeNth :: Direction2D -> BinarySpacePartition a -> BinarySpacePartition a
@@ -794,7 +798,7 @@ instance LayoutClass BinarySpacePartition RiverWindow where
 
   description _  = "BSP"
 
-{- -- TODO
+{- TODO: BorderResize/MouseResize
 -- React to SetGeometry message to work with BorderResize/MouseResize
 handleResize :: BinarySpacePartition RiverWindow -> WindowArrangerMsg -> HS (Maybe (BinarySpacePartition RiverWindow))
 handleResize b (SetGeometry newrect@(Rectangle _ _ w h)) = do
@@ -818,7 +822,6 @@ handleResize b (SetGeometry newrect@(Rectangle _ _ w h)) = do
                 Nothing -> Nothing --focused window is floating -> ignore
   where rough v = min 1.5 $ max 0.75 v -- extreme scale factors are forbidden
 handleResize _ _ = return Nothing
--}
 
 -- find out which borders have been pulled. We need the old and new rects and the mouse coordinates
 changedDirs :: Rectangle -> Rectangle -> (Int,Int) -> [Direction2D]
@@ -827,6 +830,7 @@ changedDirs (Rectangle _ _ ow oh) (Rectangle _ _ w h) (mx,my) = catMaybes [lr, u
             else Just (if (fi mx :: Double) >  (fi ow :: Double)/2 then R else L)
        ud = if oh==h then Nothing
             else Just (if (fi my :: Double) > (fi oh :: Double)/2 then D else U)
+-}
 
 -- node focus border helpers
 ----------------------------
@@ -860,27 +864,29 @@ renderBorders r b = do
 createBorder :: Rectangle -> Maybe RiverColor -> HS [RiverWindow]
 createBorder (Rectangle wx wy ww wh) c = do
   bw <- asks (borderWidth . config)
-  bc <- case c of
-         Nothing -> asks (focusedBorder . config)
-         Just s -> return s
 
-  let rects = [ Rectangle wx wy ww (fi bw)
-              , Rectangle wx wy (fi bw) wh
-              , Rectangle wx (wy+fi wh-fi bw) ww (fi bw)
-              , Rectangle (wx+fi ww-fi bw) wy (fi bw) wh
-              ]
-  -- TODO
+  pure []
+  -- TODO: setting border color
+  --
+  --bc <- case c of
+  --       Nothing -> asks (focusedBorder . config)
+  --       Just s -> return s
+
+  --let rects = [ Rectangle wx wy ww (fi bw)
+  --            , Rectangle wx wy (fi bw) wh
+  --            , Rectangle wx (wy+fi wh-fi bw) ww (fi bw)
+  --            , Rectangle (wx+fi ww-fi bw) wy (fi bw) wh
+  --            ]
+
   --ws <- mapM (\r -> createNewWindow r Nothing bc False) rects
   --showWindows ws
   --replaceStack . maybe Nothing (\s -> Just s{W.down=W.down s ++ ws}) =<< getStackSet
   --replaceFloating . M.union (M.fromList $ zip ws $ map toRR rects) . W.floating . windowset =<< get
 
-  -- TODO
   --modify (\s -> s{ mapped = mapped s `S.union` S.fromList ws})
 
   -- show <$> mapM isClient ws >>= debug
   --return ws
-  pure []
   --where toRR (Rectangle x y w h) = W.RationalRect (fi x) (fi y) (fi w) (fi h)
 
 -- remove border line windows from stack + floating, kill

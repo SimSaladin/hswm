@@ -16,7 +16,6 @@ import Bindings.Pixman.Generated qualified as P
 import Bindings.Pixman.Generated.Safe qualified as P
 import Bindings.Wayland.Client qualified as WL
 import Bindings.Wayland.Client.Generated qualified as WL
-import Bindings.Wayland.Client.Generated.Safe qualified as WL
 
 import Foreign
 import System.Posix (Fd)

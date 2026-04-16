@@ -1,9 +1,5 @@
 {-# LANGUAGE PatternGuards #-}
 
------------------------------------------------------------------------------
-
------------------------------------------------------------------------------
-
 -- |
 -- Module      :  HSWM.Util.Stack
 -- Description :  Utility functions for manipulating @Maybe Stack@s.
@@ -91,7 +87,6 @@ module HSWM.Util.Stack
   )
 where
 
-import Control.Applicative ((<|>))
 import Data.List (foldl, last, repeat, sortBy, splitAt, (!?))
 import HSWM.StackSet qualified as W
 

@@ -2,10 +2,6 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE PatternGuards #-}
 
------------------------------------------------------------------------------
-
------------------------------------------------------------------------------
-
 -- |
 -- Module      :  HSWM.Layout.WindowNavigation
 -- Description :  A layout modifier to allow easy navigation of a workspace.
@@ -133,16 +129,12 @@ configurableNavigation conf = ModifiedLayout (WindowNavigation conf (I Nothing))
 instance LayoutModifier WindowNavigation RiverWindow where
   redoLayout (WindowNavigation conf (I st)) rscr (Just s) origwrs =
     do
-      HSWMConfig {normalBorder = nbc, focusedBorder = _fbc} <- asks config
+      HSWMConfig {normalBorder = nbc, focusedBorder = fbc} <- asks config
 
-      -- TODO
-      let [uc, dc, lc, rc] = take 4 $ repeat nbc
-      -- [uc,dc,lc,rc] <-
-      --    case brightness conf of
-      --    Just frac -> do myc <- averagePixels fbc nbc frac
-      --                    return [myc,myc,myc,myc]
-      --    Nothing -> mapM (stringToPixel dpy) [upColor conf, downColor conf,
-      --                                         leftColor conf, rightColor conf]
+      let [uc,dc,lc,rc] = case brightness conf of
+            Just frac -> let myc = mixRGBA frac fbc nbc in [myc,myc,myc,myc]
+            Nothing -> map parseRgba [upColor conf, downColor conf, leftColor conf, rightColor conf]
+
       let dirc U = uc
           dirc D = dc
           dirc L = lc
@@ -179,6 +171,7 @@ instance LayoutModifier WindowNavigation RiverWindow where
       mapM_ (sc nbc) (wothers \\ map fst wnavigable)
       mapM_ (\(win, c) -> sc c win) wnavigablec
       return (origwrs, Just $ WindowNavigation conf $ I $ Just $ NS pt wnavigable)
+
   redoLayout _ _ _ origwrs = return (origwrs, Nothing)
 
   handleMessOrMaybeModifyIt (WindowNavigation conf (I (Just (NS pt wrs)))) m

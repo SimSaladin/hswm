@@ -1,7 +1,3 @@
-------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------
-
 -- |
 -- Module      : HSWM.Util.Types
 -- Description : Short description
@@ -14,7 +10,6 @@
 -- Commonly used misc. types.
 module HSWM.Util.Types where
 
-import Data.Word (Word32)
 import HSWM.StackSet as W
 import Data.Ratio
 
@@ -65,6 +60,7 @@ scaleRationalRect (Rectangle sx sy sw sh) (W.RationalRect rx ry rw rh) =
   where
     scale s r = floor (toRational s * r)
 
+-- | @inner `rationalRectIn` outer@ describes @inner@ relative to @outer@.
 rationalRectIn :: Rectangle -> Rectangle -> W.RationalRect
 rationalRectIn (Rectangle wx wy ww wh) (Rectangle sx sy sw sh) =
   W.RationalRect ((fi wx - fi sx) % fi sw) ((fi wy - fi sy) % fi sh) (fi ww % fi sw) (fi wh % fi sh)

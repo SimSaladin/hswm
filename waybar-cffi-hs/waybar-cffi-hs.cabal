@@ -4,6 +4,8 @@ cabal-version: 3.4
 -- see: https://github.com/sol/hpack
 name: waybar-cffi-hs
 version: 0.0.1
+synopsis: Waybar C FFI module
+description: Waybar C FFI module
 build-type: Simple
 extra-source-files:
   cbits/module-init.c
@@ -40,6 +42,7 @@ common build-settings
   ghc-options:
     -Wall
     -Wunused-packages
+    -Wno-ambiguous-fields
     -stubdir
     stub
     -threaded

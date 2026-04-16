@@ -1,7 +1,3 @@
-------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------
-
 -- |
 -- Module      : HSWM.StackSet
 -- Description : Short description
@@ -387,10 +383,10 @@ member a s = isJust (findTag a s)
 findTag :: (Eq a) => a -> StackSet i l a wd s sd -> Maybe i
 findTag a s =
   listToMaybe
-    [tag w | w <- workspaces s, has a (stack w)]
+    [tag w | w <- workspaces s, has_ a (stack w)]
   where
-    has _ Nothing = False
-    has x (Just (Stack t l r)) = x `elem` (t : l ++ r)
+    has_ _ Nothing = False
+    has_ x (Just (Stack t l r)) = x `elem` (t : l ++ r)
 
 -- ---------------------------------------------------------------------
 

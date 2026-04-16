@@ -27,7 +27,9 @@ library
           DeriveAnyClass
           PackageImports
           QuantifiedConstraints
-    ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures
+    ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -Wno-ambiguous-fields
+    build-tool-depends:
+          c2hs:c2hs
     other-modules:
           PackageInfo_hswm
     exposed-modules:
@@ -66,7 +68,6 @@ library
           HSWM.StackSet
           HSWM.Types.Config
           HSWM.Types.Events
-          HSWM.Types.Layouts
           HSWM.Types.TypeMap
           HSWM.Types.WM
           HSWM.Util.Debug
@@ -123,8 +124,6 @@ library
           base hiding (Prelude)
         , hswm:hswm-prelude (HSWM.Prelude as Prelude)
     default-language: GHC2024
-    build-tool-depends:
-          c2hs:c2hs
 
 library hswm-prelude
     exposed-modules:
@@ -141,7 +140,7 @@ library hswm-prelude
           DeriveAnyClass
           PackageImports
           QuantifiedConstraints
-    ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures
+    ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -Wno-ambiguous-fields
     build-depends:
           async
         , base >=4.21.0 && <4.22
@@ -180,7 +179,7 @@ executable hswm
           DeriveAnyClass
           PackageImports
           QuantifiedConstraints
-    ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -threaded -rtsopts "-with-rtsopts=-maxN4 -qn2 -A8M -K64M -M1G -kc8k"
+    ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -Wno-ambiguous-fields -threaded -rtsopts "-with-rtsopts=-maxN4 -qn2 -A8M -K64M -M1G -kc8k"
 
 executable hswmctl
     main-is: Main.hs
@@ -200,7 +199,7 @@ executable hswmctl
           DeriveAnyClass
           PackageImports
           QuantifiedConstraints
-    ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -threaded
+    ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -Wno-ambiguous-fields -threaded
     build-depends:
           base
         , hswm

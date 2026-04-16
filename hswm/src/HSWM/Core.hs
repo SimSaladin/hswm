@@ -11,7 +11,6 @@ module HSWM.Core
   ( module HSWM.Core,
     module HSWM.Types.Config,
     module HSWM.Types.Events,
-    module HSWM.Types.Layouts,
     module HSWM.Types.WM,
     module HSWM.Types.TypeMap,
     module HSWM.Util.Types,
@@ -26,7 +25,6 @@ import Control.Monad.State
 import HSWM.ManageHook
 import HSWM.Types.Config
 import HSWM.Types.Events
-import HSWM.Types.Layouts
 import HSWM.Types.TypeMap
 import HSWM.Types.WM
 import HSWM.Util.Types

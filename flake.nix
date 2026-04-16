@@ -22,9 +22,33 @@
     imports = [
       inputs.haskell-flake.flakeModule
     ];
+
     debug = true;
 
-    perSystem = { system, lib, config, pkgs, ... }: {
+    perSystem = { system, lib, config, pkgs, ... }@perSys:
+    let
+      haskellProjectBase = { config, ... }: {
+        imports = [ perSys.config.haskellProjects.ghc912.defaults.projectModules.output ];
+        basePackages = perSys.config.haskellProjects.ghc912.outputs.finalPackages;
+        defaults.settings.defined.haddock = true;
+        #defaults.projectModules.output = { inherit (config) packages settings ; };
+        autoWire = [ "devShells" ]; # "packages" "apps" ];
+        devShell.tools = hp: {
+          inherit (hp)
+            hs-bindgen
+            ;
+          inherit (pkgs)
+            river
+            wayland-scanner
+            weston
+            libxkbcommon
+            pixman
+            gtk3
+            ;
+        };
+      };
+    in
+    {
       _module.args.pkgs = import inputs.nixpkgs {
         inherit system;
         config = {
@@ -43,54 +67,68 @@
       };
 
       haskellProjects.ghc912 = {
-        defaults.packages = {};
-        devShell.enable = false;
-        autoWire = [ ];
-        packages = {
-          # XXX: infinite recursion...
-          #typed-process.source = inputs.typed-process;
-        };
+        defaults.enable = false;
         basePackages = pkgs.haskell.packages.ghc912;
+        settings.monad-logger-aeson.check = false; # Tests broken
+        autoWire = [];
       };
 
       haskellProjects.ghc914 = {
-        defaults.packages = {};
-        devShell.enable = false;
-        autoWire = [ ];
-        packages = { };
+        defaults.enable = false;
         basePackages = pkgs.haskell.packages.ghc914;
+        autoWire = [];
       };
 
-      haskellProjects.default = {
-        projectRoot = ./.;
-        basePackages = config.haskellProjects.ghc912.outputs.finalPackages;
-        defaults.settings.defined.haddock = true;
+      haskellProjects.default = rec {
+        imports = [ haskellProjectBase ];
+        # To avoid unnecessary rebuilds, we filter projectRoot:
+        # https://community.flake.parts/haskell-flake/local#rebuild
+        projectRoot = builtins.toString (lib.fileset.toSource rec {
+          root = ./.;
+          fileset = lib.fileset.unions [
+            #(root + /LICENSE)
+            (root + /README.md)
+            (root + /hswm)
+            (root + /hswm-bindings)
+            (root + /xkbcommon-bindings)
+            (root + /waybar-cffi-hs)
+            #(root + /cabal.project)
+          ];
+        });
+        packages = {
+          hswm.source = projectRoot + "/hswm";
+          hswm-bindings.source = projectRoot + "/hswm-bindings";
+          xkbcommon-bindings.source = projectRoot + "/xkbcommon-bindings";
+          waybar-cffi-hs.source = projectRoot + "/waybar-cffi-hs";
+        };
+        autoWire = lib.mkForce [ "devShells" "packages" "apps" "checks" ];
+      };
 
-        devShell = {
-          tools = hp: {
-            inherit (hp)
-              hs-bindgen
-              ;
-            inherit (pkgs)
-              wayland-scanner
-              libxkbcommon
-              weston
-              river
-              pixman
-              gtk3
-              ;
-          };
-        };
-        settings = {
-          monad-logger-aeson.check = false; # Tests broken
-        };
+      haskellProjects.xkbcommon-bindings = {
+        imports = [ haskellProjectBase ];
+        projectRoot = ./xkbcommon-bindings;
+      };
+
+      haskellProjects.hswm-bindings = {
+        imports = [ haskellProjectBase ];
+        projectRoot = ./hswm-bindings;
       };
 
       haskellProjects.hswm = {
+        imports = [
+          haskellProjectBase
+          config.haskellProjects.hswm-bindings.defaults.projectModules.output
+          config.haskellProjects.xkbcommon-bindings.defaults.projectModules.output
+        ];
         projectRoot = ./hswm;
-        basePackages = config.haskellProjects.default.outputs.finalPackages;
-        autoWire = [ ];
-        inherit (config.haskellProjects.default) defaults devShell settings;
+      };
+
+      haskellProjects.waybar-cffi-hs = {
+        imports = [
+          haskellProjectBase
+          config.haskellProjects.hswm.defaults.projectModules.output
+        ];
+        projectRoot = ./waybar-cffi-hs;
       };
 
       packages = {

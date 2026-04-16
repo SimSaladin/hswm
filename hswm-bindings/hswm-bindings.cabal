@@ -12,6 +12,23 @@ author:             Samuli Thomasson
 maintainer:         samuli.thomasson@pm.me
 build-type:         Simple
 extra-source-files:
+      protocol/ext-idle-notify-v1.xml
+      protocol/ext-session-lock-v1.xml
+      protocol/fractional-scale-v1.xml
+      protocol/input-method-unstable-v2.xml
+      protocol/river-input-management-v1.xml
+      protocol/river-layer-shell-v1.xml
+      protocol/river-libinput-config-v1.xml
+      protocol/river-status-unstable-v1.xml
+      protocol/river-window-management-v1.xml
+      protocol/river-xkb-bindings-v1.xml
+      protocol/river-xkb-config-v1.xml
+      protocol/viewporter.xml
+      protocol/wayland.xml
+      protocol/wlr-layer-shell-unstable-v1.xml
+      protocol/wlr-output-management-unstable-v1.xml
+      protocol/wlr-output-power-management-unstable-v1.xml
+      protocol/xdg-output-unstable-v1.xml
       cbits/ext-idle-notify-v1-protocol.c
       cbits/ext-session-lock-v1-protocol.c
       cbits/fractional-scale-v1-protocol.c
@@ -44,6 +61,63 @@ extra-source-files:
       include/wlr-output-management-unstable-v1-client-protocol.h
       include/wlr-output-power-management-unstable-v1-client-protocol.h
       include/xdg-output-unstable-v1-client-protocol.h
+      include/wayland-protocols/alpha-modifier-v1-client-protocol.h
+      include/wayland-protocols/color-management-v1-client-protocol.h
+      include/wayland-protocols/color-representation-v1-client-protocol.h
+      include/wayland-protocols/commit-timing-v1-client-protocol.h
+      include/wayland-protocols/content-type-v1-client-protocol.h
+      include/wayland-protocols/cursor-shape-v1-client-protocol.h
+      include/wayland-protocols/drm-lease-v1-client-protocol.h
+      include/wayland-protocols/ext-background-effect-v1-client-protocol.h
+      include/wayland-protocols/ext-data-control-v1-client-protocol.h
+      include/wayland-protocols/ext-foreign-toplevel-list-v1-client-protocol.h
+      include/wayland-protocols/ext-idle-notify-v1-client-protocol.h
+      include/wayland-protocols/ext-image-capture-source-v1-client-protocol.h
+      include/wayland-protocols/ext-image-copy-capture-v1-client-protocol.h
+      include/wayland-protocols/ext-session-lock-v1-client-protocol.h
+      include/wayland-protocols/ext-transient-seat-v1-client-protocol.h
+      include/wayland-protocols/ext-workspace-v1-client-protocol.h
+      include/wayland-protocols/fifo-v1-client-protocol.h
+      include/wayland-protocols/fractional-scale-v1-client-protocol.h
+      include/wayland-protocols/fullscreen-shell-unstable-v1-client-protocol.h
+      include/wayland-protocols/idle-inhibit-unstable-v1-client-protocol.h
+      include/wayland-protocols/input-method-unstable-v1-client-protocol.h
+      include/wayland-protocols/input-timestamps-unstable-v1-client-protocol.h
+      include/wayland-protocols/keyboard-shortcuts-inhibit-unstable-v1-client-protocol.h
+      include/wayland-protocols/linux-dmabuf-unstable-v1-client-protocol.h
+      include/wayland-protocols/linux-dmabuf-v1-client-protocol.h
+      include/wayland-protocols/linux-drm-syncobj-v1-client-protocol.h
+      include/wayland-protocols/linux-explicit-synchronization-unstable-v1-client-protocol.h
+      include/wayland-protocols/pointer-constraints-unstable-v1-client-protocol.h
+      include/wayland-protocols/pointer-gestures-unstable-v1-client-protocol.h
+      include/wayland-protocols/pointer-warp-v1-client-protocol.h
+      include/wayland-protocols/presentation-time-client-protocol.h
+      include/wayland-protocols/primary-selection-unstable-v1-client-protocol.h
+      include/wayland-protocols/relative-pointer-unstable-v1-client-protocol.h
+      include/wayland-protocols/security-context-v1-client-protocol.h
+      include/wayland-protocols/single-pixel-buffer-v1-client-protocol.h
+      include/wayland-protocols/tablet-unstable-v1-client-protocol.h
+      include/wayland-protocols/tablet-unstable-v2-client-protocol.h
+      include/wayland-protocols/tablet-v2-client-protocol.h
+      include/wayland-protocols/tearing-control-v1-client-protocol.h
+      include/wayland-protocols/text-input-unstable-v1-client-protocol.h
+      include/wayland-protocols/text-input-unstable-v3-client-protocol.h
+      include/wayland-protocols/viewporter-client-protocol.h
+      include/wayland-protocols/xdg-activation-v1-client-protocol.h
+      include/wayland-protocols/xdg-decoration-unstable-v1-client-protocol.h
+      include/wayland-protocols/xdg-dialog-v1-client-protocol.h
+      include/wayland-protocols/xdg-foreign-unstable-v1-client-protocol.h
+      include/wayland-protocols/xdg-foreign-unstable-v2-client-protocol.h
+      include/wayland-protocols/xdg-output-unstable-v1-client-protocol.h
+      include/wayland-protocols/xdg-shell-client-protocol.h
+      include/wayland-protocols/xdg-shell-unstable-v5-client-protocol.h
+      include/wayland-protocols/xdg-shell-unstable-v6-client-protocol.h
+      include/wayland-protocols/xdg-system-bell-v1-client-protocol.h
+      include/wayland-protocols/xdg-toplevel-drag-v1-client-protocol.h
+      include/wayland-protocols/xdg-toplevel-icon-v1-client-protocol.h
+      include/wayland-protocols/xdg-toplevel-tag-v1-client-protocol.h
+      include/wayland-protocols/xwayland-keyboard-grab-unstable-v1-client-protocol.h
+      include/wayland-protocols/xwayland-shell-v1-client-protocol.h
       binding-specs/river-input-management.yaml
       binding-specs/river-window-management.yaml
       binding-specs/wayland-client.yaml

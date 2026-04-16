@@ -63,7 +63,9 @@ manageWindowPlace :: RiverWindow -> CInt -> HS ()
 manageWindowPlace rw p = modifyWindow rw $ \w -> w {p_render_place = fi p}
 
 manageWindowBorder :: RiverWindow -> RiverColor -> HS ()
-manageWindowBorder rw rc = modifyWindow rw $ \w -> w {p_render_border = Just rc}
+manageWindowBorder rw rc = do
+  --logDebug $ "W: set border" :# [ "window" .= show rw, "color" .= show rc ]
+  modifyWindow rw $ \w -> w {p_render_border = Just rc}
 
 manageWindowBorderWidth :: RiverWindow -> Maybe Int32 -> HS ()
 manageWindowBorderWidth rw bw = modifyWindow rw $ \w -> w {wBorderWidth = bw}

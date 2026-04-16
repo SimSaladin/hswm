@@ -16,9 +16,8 @@ import HSWM.Actions.DynamicWorkspaces qualified as DynWS
 import HSWM.Actions.OnScreen qualified as OnScreen
 import HSWM.Actions.PhysicalScreens qualified as PScreen
 import HSWM.Layout.BoringWindows (boringWindows)
---import HSWM.Layout.BoringWindows qualified as BW
 import HSWM.Layout.Minimize qualified as L.Minimize
-import HSWM.Layout.WindowNavigation qualified as WNav
+import HSWM.Layout.WindowNavigation qualified as L.WNavigation
 import HSWM.Layout.BinarySpacePartition qualified as BSP
 import HSWM.Layout.Maximize qualified as L.Maximize
 import HSWM.Layout.NoBorders qualified as L.NoBorders
@@ -32,7 +31,7 @@ import HSWM.Util.RofiPrompt qualified as RP
 import HSWM.Util.Waybar qualified as WB
 import HSWM.Hooks.NonExclusiveArea qualified as NEArea
 import HSWM.Wallpaper qualified
-import System.Environment qualified
+import System.Environment qualified as ENV
 import Text.Printf
 
 main :: IO ()
@@ -90,15 +89,46 @@ rofiPrompt =
 
 environPrompt :: H ()
 environPrompt = do
-  varsEnv <- io System.Environment.getEnvironment
+  varsEnv <- io ENV.getEnvironment
+
   varsSessionString <- readProcess "systemctl" ["--user", "--no-block", "--no-pager", "show-environment"]
   let varsSession = map parseLine $ lines varsSessionString
-      vars = varsSession ++ [entry | entry@(k, _) <- varsEnv, k `notElem` map fst varsSession]
-      rows = ["<b>" <> k <> "</b>=" <> v | (k, v) <- vars]
-  RP.rofiRun rofiPrompt {RP._format = "p"} rows >>= (`whenJust` doApply)
+
+      varsMap = M.unionWith (\(e1, s1) (e2, s2) -> (e1 <|> e2, s1 <|> s2))
+        (M.fromList [ (k, (Nothing, Just v)) | (k, v) <- varsSession ])
+        (M.fromList [(k, (Just v, Nothing)) | (k, v) <- varsEnv])
+
+      rows =
+        [ "<b>" <> k <> "</b>"
+          <> (maybe "" (\v -> "=" <> escval v) vEnv)
+          <> (if vEnv /= vSD then maybe "" (\v -> "=" <> escval v) vSD else "")
+          <> (if isNothing vSD then " <i>(not in systemd user env)</i>" else "")
+          <> (if isNothing vEnv then " <i>(not in WM env)</i>" else "")
+        | (k, (vEnv, vSD)) <- M.toList varsMap]
+
+      -- TODO: use https://docs.gtk.org/glib/func.markup_escape_text.html
+      escval [] = []
+      escval (x:xs)
+        | x == '\n' = '\\' : 'n' : escval xs
+        | x == '\r' = '\\' : 'r' : escval xs
+        | x == '<' = "&lt;" ++ escval xs
+        | x == '>' = "&gt;" ++ escval xs
+        | x == '&' = "&amp;" ++ escval xs
+        | otherwise = x : escval xs
+
+  RP.rofiRun rofiPrompt {RP._prompt = "Set env variable", RP._format = "p"} rows >>= (`whenJust` doApply)
   where
     doApply input = do
       logInfo $ "environ prompt" :# [ "input" .= input ]
+      case L.span (/='=') input of
+        ("", _) -> return ()
+        (name, []) -> do
+          logInfo $ "Unset environment variable" :# [ "name" .= name ]
+          io $ ENV.unsetEnv name
+        (name, '=' : value) -> do
+          logInfo $ "Set environment variable" :# [ "name" .= name, "value" .= value ]
+          io $ ENV.setEnv name value -- TODO systemd env too
+        _ -> return ()
 
     parseLine :: String -> (String, String)
     parseLine line =
@@ -197,13 +227,13 @@ myLayoutHook =
   mkToggle1 NBFULL $
   NEArea.nonExclusiveArea $
   L.Maximize.maximize $
-  WNav.configurableNavigation (WNav.navigateColor colBase00) $ -- apply on top of any modifiers that might modify placement of tiled windows
+  L.WNavigation.configurableNavigation (L.WNavigation.navigateBrightness 0.8) $ -- apply on top of any modifiers that might modify placement of tiled windows
   --mkToggle1 REFLECTX $
   --mkToggle1 REFLECTY $
   mkToggle1 MIRROR $
-        BSP.emptyBSP
-        ||| Tall 1 (3 / 100) (1 / 2)
-        ||| L.NoBorders.noBorders Full
+    BSP.emptyBSP |||
+      Tall 1 (3 / 100) (1 / 2) |||
+        L.NoBorders.noBorders Full
 
 myKeys :: [(String, SomeAction H)]
 myKeys =
@@ -285,8 +315,8 @@ myKeys =
       -- ("M-r M-b", cmdPrompt xpConfig (Proxy :: Proxy LayoutBSPCommand)
 
       -- ====== Window =============
-    ++ [("M-" ++ key, "Focus window direction" $?$?= sendMessage (WNav.Go dir)) | (key, dir) <- zip ["k", "j", "l", "h"] [minBound .. maxBound @Direction2D]]
-    ++ [("M-S-" ++ key, "Swap window in direction" $?$?= sendMessage (WNav.Swap dir)) | (key, dir) <- zip ["k", "j", "l", "h"] [minBound .. maxBound @Direction2D]]
+    ++ [("M-" ++ key, "Focus window direction" $?$?= sendMessage (L.WNavigation.Go dir)) | (key, dir) <- zip ["k", "j", "l", "h"] [minBound .. maxBound @Direction2D]]
+    ++ [("M-S-" ++ key, "Swap window in direction" $?$?= sendMessage (L.WNavigation.Swap dir)) | (key, dir) <- zip ["k", "j", "l", "h"] [minBound .. maxBound @Direction2D]]
     ++ [ ("M-n", "Focus down" $?$?= windows W.focusDown),
          ("M-p", "Focus up" $?$?= windows W.focusUp),
          ("M-b f", "Toggle fullscreen (focused)" $?$?= withFocused (doManage WToggleFullscreen)),

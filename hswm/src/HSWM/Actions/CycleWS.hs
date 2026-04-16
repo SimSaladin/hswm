@@ -336,7 +336,7 @@ findWorkspaceGen sortX wsPredX d = do
           then cur
           else case mCurIx of
             Nothing -> ws' !! (d' `mod` length ws')
-            Just ix -> ws' !! ((ix + d) `mod` length ws')
+            Just i  -> ws' !! ((i + d) `mod` length ws')
   return $ W.tag next
 
 findWsIndex :: WindowSpace -> [WindowSpace] -> Maybe Int

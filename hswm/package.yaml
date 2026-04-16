@@ -28,8 +28,12 @@ _common/language: &language
     - DeriveAnyClass
     - PackageImports
     - QuantifiedConstraints
+    # https://discourse.haskell.org/t/what-are-you-supposed-to-do-about-wambiguous-fields/9545/36?page=2
   ghc-options: &common-ghc-options
-    -Wall -Wunused-packages -Wno-partial-type-signatures
+    -Wall
+    -Wunused-packages
+    -Wno-partial-type-signatures
+    -Wno-ambiguous-fields
 
 internal-libraries:
   hswm-prelude:
@@ -93,6 +97,8 @@ library:
     - process
     - typed-process
     - xkbcommon-bindings
+  build-tools:
+    - c2hs:c2hs  # Note: may need to "cabal update for this to start working
 
 executables:
   hswm:
@@ -107,9 +113,9 @@ executables:
     ghc-options:
       - *common-ghc-options
       - -threaded
+      - -rtsopts "-with-rtsopts=-maxN4 -qn2 -A8M -K64M -M1G -kc8k"
       #- -pie
       #- -fPIC
-      - -rtsopts "-with-rtsopts=-maxN4 -qn2 -A8M -K64M -M1G -kc8k"
 
   hswmctl:
     <<: *language

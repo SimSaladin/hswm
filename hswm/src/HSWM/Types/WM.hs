@@ -283,6 +283,24 @@ instance LayoutClass Layout RiverWindow where
 
 instance Show (Layout a) where show (Layout l) = show l
 
+-- | Using the 'Layout' as a witness, parse existentially wrapped windows
+-- from a 'String'.
+readsLayout :: Layout a -> String -> [(Layout a, String)]
+readsLayout (Layout l) s = [(Layout (asTypeOf x l), rs) | (x, rs) <- reads s]
+
+-- | 'LayoutMessages' are core messages that all layouts (especially stateful
+-- layouts) should consider handling.
+data LayoutMessages
+  = -- | sent when a layout becomes non-visible
+    Hide
+  | -- | sent when xmonad is exiting or restarting
+    ReleaseResources
+  deriving (Eq, Show)
+
+instance Message LayoutMessages
+
+instance Message Event
+
 -----------------------------------------------------------
 -- * State & H/HS Monad
 

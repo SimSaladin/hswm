@@ -1,5 +1,3 @@
-{-# OPTIONS_GHC -ddump-splices #-}
-
 module Bindings.River.InputManagementV1 where
 
 import Bindings.River.InputManagementV1.Generated
