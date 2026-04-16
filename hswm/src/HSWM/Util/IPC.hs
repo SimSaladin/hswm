@@ -27,7 +27,6 @@ import Network.Socket
 import Network.Socket.ByteString qualified as NB
 import PackageInfo_hswm qualified as PKG
 import Bindings.River qualified as R
-import System.Directory
 import qualified Data.List as L
 
 type MonadIPC env m = (MonadReader env m, MonadLogger m, MonadIO m, MonadUnliftIO m, MonadMask m)

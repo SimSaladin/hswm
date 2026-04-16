@@ -29,7 +29,7 @@
         inherit system;
         config = {
            problems.handlers = {
-             monad-logger-aeson.broken = "warn"; # or "ignore"
+             monad-logger-aeson.broken = "warn";
            };
          };
         overlays = [
@@ -41,6 +41,7 @@
           inputs.hs-bindgen.overlays.default
         ];
       };
+
       haskellProjects.ghc912 = {
         defaults.packages = {};
         devShell.enable = false;
@@ -51,11 +52,20 @@
         };
         basePackages = pkgs.haskell.packages.ghc912;
       };
+
+      haskellProjects.ghc914 = {
+        defaults.packages = {};
+        devShell.enable = false;
+        autoWire = [ ];
+        packages = { };
+        basePackages = pkgs.haskell.packages.ghc914;
+      };
+
       haskellProjects.default = {
         projectRoot = ./.;
-        #basePackages = config.haskellProjects.ghc912.outputs.finalPackages;
-        basePackages = pkgs.haskell.packages.ghc912;
-        #basePackages = pkgs.haskell.packages.ghc914;
+        basePackages = config.haskellProjects.ghc912.outputs.finalPackages;
+        defaults.settings.defined.haddock = true;
+
         devShell = {
           tools = hp: {
             inherit (hp)
@@ -72,11 +82,17 @@
           };
         };
         settings = {
-          monad-logger-aeson = {
-            check = false;
-          };
+          monad-logger-aeson.check = false; # Tests broken
         };
       };
+
+      haskellProjects.hswm = {
+        projectRoot = ./hswm;
+        basePackages = config.haskellProjects.default.outputs.finalPackages;
+        autoWire = [ ];
+        inherit (config.haskellProjects.default) defaults devShell settings;
+      };
+
       packages = {
         # Export our overridden river for convenience.
         inherit (pkgs) river;

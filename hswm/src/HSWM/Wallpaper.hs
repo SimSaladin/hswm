@@ -31,7 +31,6 @@ import Bindings.Pixman.Generated.Safe qualified as P
 import HSWM.BufferPool qualified as BP
 import HSWM.Core
 import Bindings.River qualified as R
-import System.Directory
 import System.IO.Unsafe
 import Bindings.Wayland.Client qualified as WL
 
@@ -152,8 +151,7 @@ calculateScale :: (Integral i) => i -> Int32 -> Int32 -> Double
 calculateScale src out scale = fi src / (fi out * fi scale)
 
 calculateTransform :: (Integral i) => i -> Int32 -> Double -> Double
-calculateTransform src out scale =
-  (fi src / scale - fi out) / 2 / scale
+calculateTransform src out scale = (fi src / scale - fi out) / 2 / scale
 
 render :: H ()
 render = do
@@ -189,17 +187,9 @@ drawImage bp OutputState {..} img Surfaces {..} = do
   io $ WL.surfaceSetOpaqueRegion wl_surface opaqueRegion
   io $ WL.objectDestroy opaqueRegion
 
-  logDebug $ "drawing wallpaper" :# [ "outsize" .= (w, h)
-                                    , "output" .= name
-                                    , "image" .= (src_w, src_h)
-                                    , "scale" .= scale
-                                    , "bufsize" .= buf_size
-                                    , "fscale" .= pref_fract_scale ]
-
-  io $ V.unsafeWith (JP.imageData img) $ \bits ->
-    alloca $ \t2 ->
-      alloca $ \fTransform -> do
-          pix <- P.pixman_image_create_bits P.PIXMAN_a8r8g8b8 (fi src_w) (fi src_h) (castPtr bits) (fi src_stride)
+  runInIO <- askRunInIO
+  io $ V.unsafeWith (JP.imageData img) $ \bits -> alloca $ \t2 -> alloca $ \fTransform -> runInIO $ do
+          pix <- io $ P.pixman_image_create_bits P.PIXMAN_a8r8g8b8 (fi src_w) (fi src_h) (castPtr bits) (fi src_stride)
 
           -- calculate scale
           let sx' = calculateScale src_w buf_w 1 -- scale
@@ -208,17 +198,33 @@ drawImage bp OutputState {..} img Surfaces {..} = do
               tx = calculateTransform src_w buf_w sx
               ty = calculateTransform src_h buf_h sy
 
-          P.pixman_f_transform_init_identity fTransform
-          _ <- P.pixman_f_transform_scale fTransform nullPtr (CDouble sx) (CDouble sy)
-          _ <- P.pixman_f_transform_translate fTransform nullPtr (CDouble tx) (CDouble ty)
-          _ <- P.pixman_transform_from_pixman_f_transform t2 (ConstPtr fTransform)
-          _ <- P.pixman_image_set_transform pix (ConstPtr $ castPtr t2)
-          _ <- P.pixman_image_set_filter pix P.PIXMAN_FILTER_BEST (ConstPtr nullPtr) 0
+          io $ P.pixman_f_transform_init_identity fTransform
+          _ <- io $ P.pixman_f_transform_translate fTransform nullPtr (CDouble tx) (CDouble ty)
+          _ <- io $ P.pixman_f_transform_scale fTransform nullPtr (CDouble sx) (CDouble sy)
+
+          _ <- io $ P.pixman_transform_from_pixman_f_transform t2 (ConstPtr fTransform)
+          _ <- io $ P.pixman_image_set_transform pix (ConstPtr $ castPtr t2)
+
+          _ <- io $ P.pixman_image_set_filter pix P.PIXMAN_FILTER_BEST (ConstPtr nullPtr) 0
 
           buf <- io $ BP.nextBuffer bp (fi buf_w) (fi buf_h)
 
-          P.pixman_image_composite32 P.PIXMAN_OP_SRC pix nullPtr buf.pixmanImage 0 0 0 0 0 0 buf_w buf_h
-          _ <- P.pixman_image_unref pix
+          -- fill bg
+          -- io $ with (P.Pixman_color_t 0 0 0 maxBound) $ \color ->
+          --   with (P.Pixman_box32_t 0 0 buf_w buf_h) $ \box ->
+          --     P.pixman_image_fill_boxes P.PIXMAN_OP_SRC buf.pixmanImage (ConstPtr color) 1 (ConstPtr box)
+
+          -- OP_SRC is faster, but not always correct
+          io $ P.pixman_image_composite32 P.PIXMAN_OP_OVER pix nullPtr buf.pixmanImage 0 0 0 0 0 0 buf_w buf_h
+          _ <- io $ P.pixman_image_unref pix
+
+          logDebug $ "drawing wallpaper" :#
+            [ "out" .= name, "out-size" .= (w, h), "out-scale" .= scale, "out-fscale" .= pref_fract_scale
+            , "src-size" .= (src_w, src_h)
+            , "buf-size" .= buf_size
+            , "calc-scale" .= ((sx', sy'), (sx, sy))
+            , "calc-trans" .= (tx, ty)
+            ]
 
           WL.surfaceAttach wl_surface buf.buf 0 0
           WL.surfaceDamageBuffer wl_surface 0 0 buf_w buf_h
@@ -260,18 +266,17 @@ initOutput ro = withOutputState ro $ \os -> do
       fractSurface <- io $ FS.fractionalScaleManagerGetFractionalScale fsm wl_surface
       fsl <- io $ FS.mkFractionalScaleListener $ \case
         FS.FractionalScalePreferredScale _ _ fscale ->
-          runInIO $ do
-            updateOutputState ro $ \x -> x {pref_fract_scale = fscale, pending_render = True}
+          runInIO $ updateOutputState ro $ \x -> x {pref_fract_scale = fscale, pending_render = True}
       io $ WL.listenerAdd fractSurface fsl nullPtr
       -- viewport
       viewport <- io $ VP.viewporterGetViewport vpr wl_surface
        -- layersurface
       layerSurface <- io $ Wlr.layerShellGetLayerSurface layerShell wl_surface os.wl_output Wlr.ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND (Just "wallpaper")
       io $ Wlr.layerSurfaceSetSize layerSurface 0 0
-      io $ Wlr.layerSurfaceSetAnchor layerSurface (WL.toCEnum $ 1 + 2 + 4 + 8)
+      io $ Wlr.layerSurfaceSetAnchor layerSurface (WL.toCEnum $ 1 + 2 + 4 + 8) --1 + 2 + 4 + 8)
       io $ Wlr.layerSurfaceSetExclusiveZone layerSurface (-1)
       lsListener <- io $ Wlr.mkLayerSurfaceListener $ \case
-        Wlr.LayerSurfaceConfigure _ ls serial _w _h -> do
+        Wlr.LayerSurfaceConfigure _ ls serial _cw _ch -> do
           Wlr.layerSurfaceAckConfigure ls serial
           runInIO $ do
             updateOutputState ro $ \x -> x

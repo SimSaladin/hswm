@@ -18,7 +18,7 @@ import Bindings.River qualified as R
 import Bindings.Wayland.Client qualified as WL
 
 logEvent :: (MonadLogger m, Show a, Monoid (m b)) => a -> m b
-logEvent ev = logDebug (fromString $ "EVENT " ++ show ev) >> mempty
+logEvent ev = logDebug (fromString $ "evt: " ++ show ev) >> mempty
 
 debugHook :: Event -> H All
 debugHook ev
@@ -28,11 +28,11 @@ debugHook ev
   | XkbKeyboardEvent e <- ev = logEvent e
   | XkbEvent (R.RiverXkbBindingPressed dt self) <- ev = do
       (xb :: XkbBinding (SomeAction H)) <- liftIO $ deRefStablePtr (castPtrToStablePtr $ castPtr dt)
-      logDebug $ "EVENT XKB KEY PRESSED" :# [ "action" .= show xb.action,  "bind" .= show self ]
+      logDebug $ "XK (pressed)" :# [ "action" .= show xb.action,  "bind" .= show self ]
       mempty
   | XkbEvent (R.RiverXkbBindingReleased dt self) <- ev = do
       (xb :: XkbBinding (SomeAction H)) <- liftIO $ deRefStablePtr (castPtrToStablePtr $ castPtr dt)
-      logDebug $ "EVENT XKB KEY RELEASED" :# [ "action" .= show xb.action,  "bind" .= show self ]
+      logDebug $ "XK (released)" :# [ "action" .= show xb.action,  "bind" .= show self ]
       mempty
   -- | SeatEvent R.RiverSeatPointerPosition {} <- ev = mempty
   | SeatEvent e <- ev = logEvent e

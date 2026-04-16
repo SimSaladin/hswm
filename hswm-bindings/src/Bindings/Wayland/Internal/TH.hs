@@ -486,7 +486,8 @@ renderListenerEvents s Interface{..} = do
       | AppT (ConT cN) (ConT tN) <- t, cN == ''Ptr, tN /= ''Void
       = appE (varE 'return) $ appE (conE (mkName $ prTypeNameModifier s $ nameBase tN)) (varE name)
       | AppT (ConT cN) (ConT tN) <- t, cN == ''PtrConst, tN == ''CChar
-      = appE (varE 'peekCString) $ appE (varE 'unConstPtr) (varE name)
+      -- = appE (varE 'peekCString) $ appE (varE 'unConstPtr) (varE name)
+      = [|let p = unConstPtr $(varE name) in if p == nullPtr then return "" else peekCString p|]
       | Just enum <- argEnum, '.' `notElem` enum
       = appE (varE 'return) $ appE (conE (mkName $ upperFirst interfaceName ++ "_" ++ enum)) (appE (varE 'fromIntegral) (varE name))
       | Just enum <- argEnum, (obj, _ : enum') <- span (/= '.') enum
@@ -948,7 +949,7 @@ mkListenerEventNew ObjectCfg {..} listenerTypeName = do
                       letE [valD (varP arg) (normalB $ appE (conE $ mkName objTypePrefix) (varE anm)) []] (toEventE (args ++ [varE arg]) xs)
                   | t == AppT (ConT ''PtrConst) (ConT ''CChar) = do
                       arg <- newName "a"
-                      [|peekCString (unConstPtr $(varE anm)) >>= $(lamE [varP arg] (toEventE (args ++ [varE arg]) xs))|]
+                      [|(if unConstPtr $(varE anm) == nullPtr then pure "" else peekCString (unConstPtr $(varE anm))) >>= $(lamE [varP arg] (toEventE (args ++ [varE arg]) xs))|]
                   | Just doA <- objAutoMarshall = do
                       arg <- newName "a"
                       fa <- doA 1 t

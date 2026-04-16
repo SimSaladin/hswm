@@ -210,6 +210,8 @@ render = runInHS $ do
 -- | /manage/
 setInitialManageProperties :: Window -> HS ()
 setInitialManageProperties Window {river_window = rw} = do
+  -- Initial dimensions
+  io $ R.riverWindowProposeDimensions rw 400 400
   io $ R.riverWindowUseSsd rw
   io $ R.riverWindowSetCapabilities rw (WL.toCEnum . fi $ foldl' (.|.) 0 $ map (.unwrap) [Maximize, Fullscreen])
   io $ R.riverWindowSetTiled rw (WL.toCEnum . fi $ foldl' (.|.) 0 $ map (.unwrap) [EdgeTop, EdgeBottom, EdgeLeft, EdgeRight])

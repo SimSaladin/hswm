@@ -1,5 +1,3 @@
-------------------------------------------------------------------------------
-
 -- |
 -- Module      : HSWM.InputConfig
 -- Description : Short description
@@ -11,7 +9,6 @@
 --
 -- Handling of various user input devices, e.g. pointers, keyboards, touch control
 --
--- ------------------------------------------------------------------------------
 module HSWM.InputConfig where
 
 import Data.Map qualified as M

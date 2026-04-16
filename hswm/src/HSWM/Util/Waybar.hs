@@ -1,7 +1,3 @@
-------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------
-
 -- |
 -- Module      : HSWM.Util.Waybar
 -- Description : Short description
@@ -24,7 +20,8 @@ data WaybarConfig = WaybarConfig
   deriving anyclass (Default)
 
 data WaybarState = WaybarState
-  { wbProcess :: !(Maybe (Process () () Handle))
+  { wbProcess :: !(Maybe (Process () Handle Handle))
+  , wbAsyncs :: [Async ()]
   }
   deriving (Show, Generic)
   deriving anyclass (Default)
@@ -43,22 +40,27 @@ waybarStartupHook _ = do
   process <-
     startProcess $
       setStdin nullStream $
-        setStdout nullStream $
+        setStdout createPipe $
           setStderr createPipe $
-            proc "waybar" ["-l", "debug"]
+            proc "waybar" [{-"-l", "debug"-}]
   let errh = getStderr process
-  _ <- async $ forever $ do
+  let outh = getStdout process
+  a1 <- async $ forever $ do
     ln <- io $ hGetLine errh
-    logInfo $ fromString ln :# [ "process" .= "waybar" ]
-  -- pid <- spawnProcess "waybar" [ "-l", "debug" ]
-  putObject st {wbProcess = Just process}
+    logInfo $ fromString ln :# [ "process" .= ("waybar" :: String) ]
+  a2 <- async $ forever $ do
+    ln <- io $ hGetLine outh
+    logInfo $ fromString ln :# [ "process" .= ("waybar" :: String) ]
+
+  putObject st {wbProcess = Just process, wbAsyncs = [a1, a2]}
 
 waybarExitHook :: WaybarConfig -> H ()
 waybarExitHook _ = do
-  withObject $ \WaybarState {wbProcess} ->
-    -- TODO terminate
+  withObject $ \WaybarState {wbProcess, wbAsyncs} -> do
     io $ case wbProcess of
       Nothing -> pure ()
       Just p -> do
         void $ try @_ @SomeException $ terminateProcess $ unsafeProcessHandle p
         void $ try @_ @SomeException $ stopProcess p
+
+    cancelMany wbAsyncs

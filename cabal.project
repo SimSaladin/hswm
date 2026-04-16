@@ -6,13 +6,3 @@ packages:
 
 jobs: $ncpus
 documentation: True
-
--- https://github.com/haskell/c2hs/issues/300
---package hswm
---  c2hs-options: -C -std=gnu18
-
---source-repository-package
---  type: git
---  location: https://github.com/sol/typed-process
---  branch: dev
---  post-checkout-command: bash -c "sed -ie s/0.2.12.0/0.2.13.0/ package.yaml && hpack"

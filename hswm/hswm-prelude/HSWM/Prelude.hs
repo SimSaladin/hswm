@@ -6,14 +6,11 @@ module HSWM.Prelude
     module Control.Monad.IO.Unlift,
     module BasePrelude,
     module UnliftIO.IO,
+    module UnliftIO.Async,
+    module UnliftIO.Directory,
     module UnliftIO,
     module Control.Monad.Catch,
-    toText,
-    io,
-    fi,
-    whenJust,
-    log',
-    display
+    module HSWM.Prelude
   )
 where
 
@@ -24,6 +21,8 @@ import RIO.Lens as RIO
 import RIO (Lens', view, ExitCode, exitFailure, exitSuccess, threadDelay)
 
 import UnliftIO
+import UnliftIO.Async
+import UnliftIO.Directory
 import UnliftIO.IO
 import Control.Monad.IO.Unlift
 
@@ -41,6 +40,7 @@ import "mtl" Control.Monad.State as BasePrelude (MonadState, gets, modify)
 import "text" Data.Text qualified as T
 
 import "exceptions" Control.Monad.Catch (MonadCatch, MonadMask, throwM)
+import "async" Control.Concurrent.Async qualified as Async
 
 import Control.Monad.Logger.Aeson hiding (Message)
 import Control.Monad.Logger.Aeson as LA (Message)
@@ -64,3 +64,6 @@ log' = logInfo
 -- XXX temp glue code..
 display :: (Show a, IsString b) => a -> b
 display = fromString . show
+
+cancelMany :: MonadIO m => [Async ()] -> m ()
+cancelMany = io . Async.cancelMany

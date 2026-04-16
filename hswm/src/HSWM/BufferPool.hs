@@ -9,16 +9,17 @@
 --
 module HSWM.BufferPool where
 
-import Foreign
+import HSWM.Core
+import HSWM.Util.Posix
+
 import Bindings.Pixman.Generated qualified as P
 import Bindings.Pixman.Generated.Safe qualified as P
 import Bindings.Wayland.Client qualified as WL
-import HSWM.Core
-import HSWM.Util.Posix
-import System.Posix (Fd)
-import Bindings.Wayland.Client qualified as WL
 import Bindings.Wayland.Client.Generated qualified as WL
 import Bindings.Wayland.Client.Generated.Safe qualified as WL
+
+import Foreign
+import System.Posix (Fd)
 
 data ImageBufferPool = ImageBufferPool
   { buffers :: MVar ([ImageBuffer], Int),
@@ -28,16 +29,31 @@ data ImageBufferPool = ImageBufferPool
   deriving (Generic)
 
 data ImageBuffer = ImageBuffer
-  { fd :: !Fd,
+  { width, height, size :: !Int,
+    fd :: !Fd,
     ptr :: !(Ptr ()),
-    width, height :: !Int,
-    size :: !Int,
-    buf :: !WL.Buffer,
-    pixmanImage :: !(Ptr P.Pixman_image_t),
     busy :: !(Ptr Bool),
-    pool :: !WL.ShmPool
+    buf :: !WL.Buffer,
+    pool :: !WL.ShmPool,
+    pixmanImage :: !(Ptr P.Pixman_image_t)
   }
   deriving (Generic)
+
+destroyImageBufferPool :: ImageBufferPool -> IO ()
+destroyImageBufferPool pool = do
+  tryReadMVar pool.buffers >>= \case
+    Nothing -> pure ()
+    Just (xs, _) -> forM_ xs destroyImageBuffer
+  let p = unConstPtr pool.bufferListener
+  WL.freeListener (Proxy :: Proxy WL.BufferEvent) =<< peek p
+
+destroyImageBuffer :: ImageBuffer -> IO ()
+destroyImageBuffer ibuf = do
+  WL.objectDestroy ibuf.buf
+  WL.objectDestroy ibuf.pool
+  _ <- P.pixman_image_unref ibuf.pixmanImage
+  munmap ibuf.ptr ibuf.size
+  free ibuf.busy
 
 newImageBufferPool :: H ImageBufferPool
 newImageBufferPool = do
@@ -94,20 +110,3 @@ initImageBuffer ImageBufferPool {wlShm = wl_shm, bufferListener = listener} widt
   -- Sets busy = False
   _ <- io $ {-WL.wl_buffer_add_listener-} WL.listenerAdd buf listener (castPtr busy)
   return ImageBuffer {..}
-
-destroyImageBufferPool :: ImageBufferPool -> IO ()
-destroyImageBufferPool pool = do
-  tryReadMVar pool.buffers >>= \case
-    Nothing -> pure ()
-    Just (xs, _) -> forM_ xs destroyImageBuffer
-  let p = unConstPtr pool.bufferListener
-  WL.freeListener (Proxy :: Proxy WL.BufferEvent) =<< peek p
-  free p
-
-destroyImageBuffer :: ImageBuffer -> IO ()
-destroyImageBuffer ibuf = do
-  WL.objectDestroy ibuf.buf
-  WL.objectDestroy ibuf.pool
-  _ <- P.pixman_image_unref ibuf.pixmanImage
-  munmap ibuf.ptr ibuf.size
-  free ibuf.busy

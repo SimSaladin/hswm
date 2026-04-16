@@ -1,8 +1,8 @@
 cabal-version:      3.0
 name:               xkbcommon-bindings
 version:            0.1.0.0
--- synopsis:
--- description:
+synopsis:           Low-level bindings to libxkbcommon
+description:        Low-level bindings to libxkbcommon e.g. xkbcommon.h (incomplete)
 license:            MIT
 license-file:       LICENSE
 author:             Samuli Thomasson
@@ -19,9 +19,8 @@ common warnings
 library
     import:           warnings
     exposed-modules:
-      Text.XkbCommon.Internal
-    -- other-modules:
-    -- other-extensions:
+       Text.XkbCommon
+     , Text.XkbCommon.Internal
     build-depends:
        base ^>=4.21.0.0
      , unix
@@ -33,3 +32,5 @@ library
     extra-libraries: xkbcommon
     build-tool-depends:
       c2hs:c2hs
+    -- https://github.com/haskell/c2hs/issues/300                                                                    |
+    cpp-options: -std=gnu18

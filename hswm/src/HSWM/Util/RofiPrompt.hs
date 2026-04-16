@@ -13,7 +13,6 @@ import Data.ByteString.Char8 qualified as C8
 import Data.ByteString.Lazy qualified as LB
 import Data.List qualified as L
 import System.Process.Typed
-import System.Directory
 import System.IO (readFile, appendFile)
 
 data RofiPromptConfig
@@ -72,7 +71,7 @@ rofiHistoryInput s input
       hinput <- io (doesFileExist histFile) >>= \case
         False -> return []
         True -> lines <$> io (readFile histFile)
-      return $ reverse hinput ++ input
+      return $ reverse (L.nub hinput) ++ input
   | otherwise = pure input
 
 rofiHistorySave :: MonadRofi env m => RofiPromptConfig -> String -> m ()
