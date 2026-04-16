@@ -15,8 +15,6 @@ build-type:         Simple
 #extra-doc-files:    README.md
 #                  CHANGELOG.md
 #extra-source-files:
-#  - hswm-bindings/include/*.h
-#  - hswm-bindings/cbits/*.c
 
 _common/language: &language
   language: GHC2024
@@ -95,8 +93,6 @@ library:
     - process
     - typed-process
     - xkbcommon-bindings
-  build-tools:
-    - c2hs:c2hs  # Note: may need to "cabal update for this to start working
 
 executables:
   hswm:

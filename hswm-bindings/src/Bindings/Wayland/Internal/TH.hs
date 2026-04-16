@@ -114,7 +114,7 @@ data IEvent = IEvent
 clientFromProtocolXML :: ProtocolRenderSettings -> FilePath ->  Q [Dec]
 clientFromProtocolXML settings filepath = do
   pkgRoot <- getPackageRoot
-  protoDoc <- runIO $ X.readFile X.def (pkgRoot ++ "/../protocol/" ++ filepath)
+  protoDoc <- runIO $ X.readFile X.def (pkgRoot ++ "/protocol/" ++ filepath)
   let proto = prProtocolModifier settings $ protocolFromXML $ fromDocument protoDoc
 
   -- runIO $ print proto

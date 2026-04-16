@@ -2,45 +2,48 @@
 
 WAYLAND_SCANNER	:= wayland-scanner --include-core-only --strict
 
-PROTODIR	:= ./protocol
-HEADERDIR := ./hswm-bindings/include
-CDIR	:= ./hswm-bindings/cbits
+PROTODIR		:= ./protocol
+HEADERDIR		:= ./include
+CDIR		:= ./cbits
+bindingSpecs	:= ./binding-specs
+bindGenOutDir	:= ./src
+bindGenSpecDir	:= ./generated
 
-CLIENT_PROTOS := river-window-management-v1.xml \
-		       river-xkb-bindings-v1.xml \
-		       river-xkb-config-v1.xml \
-		       river-input-management-v1.xml \
-		       river-layer-shell-v1.xml river-libinput-config-v1.xml \
-		       input-method-unstable-v2.xml \
-		       ext-session-lock-v1.xml \
-		       ext-idle-notify-v1.xml \
-		       xdg-output-unstable-v1.xml \
-		       fractional-scale-v1.xml \
-		       viewporter.xml \
-		       wlr-output-management-unstable-v1.xml \
-		       wlr-layer-shell-unstable-v1.xml \
-		       wlr-output-power-management-unstable-v1.xml
-		       #wayland.xml
+CLIENT_PROTOS := \
+	ext-idle-notify-v1.xml \
+	ext-session-lock-v1.xml \
+	fractional-scale-v1.xml \
+	input-method-unstable-v2.xml \
+	river-input-management-v1.xml \
+	river-layer-shell-v1.xml river-libinput-config-v1.xml \
+	river-window-management-v1.xml \
+	river-xkb-bindings-v1.xml \
+	river-xkb-config-v1.xml \
+	viewporter.xml \
+	wlr-layer-shell-unstable-v1.xml \
+	wlr-output-management-unstable-v1.xml \
+	wlr-output-power-management-unstable-v1.xml \
+	xdg-output-unstable-v1.xml
+	#wayland.xml
 
-SERVER_PROTOS := river-status-unstable-v1.xml
+CLIENT_HEADERS := $(CLIENT_PROTOS:.xml=-client-protocol.h)
+SERVER_HEADERS := $(SERVER_PROTOS:.xml=-server-protocol.h)
+PRIVATE_CODE   := $(CLIENT_PROTOS:.xml=-protocol.c)
+
 
 WAYLAND_PROTO_PREFIX	:= $(shell pkg-config wayland-protocols --variable=pkgdatadir)
 WAYLAND_PROTOS		:= $(wildcard $(WAYLAND_PROTO_PREFIX)/*/*/*.xml)
 WaYLAND_CLIENT_HEADERS	:= $(subst $(WAYLAND_PROTO_PREFIX), , $(WAYLAND_PROTOS))
 
-CLIENT_HEADERS := $(CLIENT_PROTOS:.xml=-client-protocol.h)
-SERVER_HEADERS := $(SERVER_PROTOS:.xml=-server-protocol.h)
-PRIVATE_CODE   := $(CLIENT_PROTOS:.xml=-protocol.c) $(SERVER_PROTOS:.xml=-protocol.c)
-
-bindingSpecs	:= hswm-bindings/binding-specs
-bindGenOutDir	:= hswm-bindings/src
-bindGenSpecDir	:= hswm-bindings/generated
-
-HS_BIND_GEN	:= hs-bindgen-cli preprocess \
-			   --hs-output-dir $(bindGenOutDir) --create-output-dirs --overwrite-files \
-			   --omit-field-prefixes --enable-program-slicing --clang-option '-std=gnu23' \
-			   -I /nix/store/j8irrc0mpx029dw0rmadsjylg7h31ync-glibc-2.42-51-dev/include \
-			   -I $(HEADERDIR)
+HS_BIND_GEN := hs-bindgen-cli preprocess \
+	--hs-output-dir $(bindGenOutDir) \
+	--create-output-dirs \
+	--overwrite-files \
+	--omit-field-prefixes \
+	--enable-program-slicing \
+	--clang-option '-std=gnu23' \
+	-I /nix/store/j8irrc0mpx029dw0rmadsjylg7h31ync-glibc-2.42-51-dev/include \
+	-I $(HEADERDIR)
 
 .PHONY: all bindgen bindgen-wayland-client bindgen-river-protocols bindgen-pixman-1
 
@@ -73,7 +76,6 @@ bindgen: bindgen-wayland bindgen-river bindgen-pixman-1
 bindgen-wayland:	\
 	$(bindGenSpecDir)/Bindings.Wayland.Util.Generated.yaml \
 	$(bindGenSpecDir)/Bindings.Wayland.Client.Generated.yaml
-#	$(bindGenSpecDir)/Bindings.Wayland.Server.Generated.yaml
 bindgen-river:	\
 	$(bindGenSpecDir)/Bindings.River.InputManagementV1.Generated.yaml \
 	$(bindGenSpecDir)/Bindings.River.WindowManagementV1.Generated.yaml \
