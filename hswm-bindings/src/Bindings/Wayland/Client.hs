@@ -198,15 +198,16 @@ module Bindings.Wayland.Client
 
   ) where
 
-import           Bindings.Wayland.Util
 import           Bindings.Wayland.Internal.Types as Types
+import           Bindings.Wayland.Util
 
 import           Bindings.Wayland.Client.Generated
 import           Bindings.Wayland.Client.Generated.Global as G
 import qualified Bindings.Wayland.Client.Generated.Safe as Safe
 
-import Bindings.Wayland.Client.Generated.Safe hiding (wl_display_flush, wl_display_dispatch)
-import Bindings.Wayland.Client.Generated.Unsafe (wl_display_flush, wl_display_dispatch)
+import           Bindings.Wayland.Client.Generated.Safe hiding (wl_display_dispatch,
+                                                         wl_display_flush)
+import           Bindings.Wayland.Client.Generated.Unsafe (wl_display_dispatch, wl_display_flush)
 
 import           Bindings.Wayland.Internal.TH
 

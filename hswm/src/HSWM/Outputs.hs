@@ -35,24 +35,21 @@ data OutputManager = OutputManager
 added :: RiverOutput -> H ()
 added out = do
   om <- getOrCreateObject $ pure def
-
-  -- create layer shell output
-  output_listener <- getObject
-  shellOutputListener <- getObject -- @R.RiverLayerShellOutputListener
-  _ <- liftIO $ R.listenerAdd out output_listener nullPtr
-  layerShellOutput <- withObject @R.RiverLayerShell $ \shell ->
-    io $ R.riverLayerShellGetOutput shell out
-  _ <- io $ R.listenerAdd layerShellOutput shellOutputListener out
-
+  -- Add RiverOutput event listener
+  outL <- getObject
+  _ <- io $ R.listenerAdd out outL nullPtr
+  -- Create layer shell output
+  layerShellOutput <- withObject @R.RiverLayerShell $ \shell -> io $ R.riverLayerShellGetOutput shell out
+  -- Add layer shell output listener
+  shOutL <- getObject
+  _ <- io $ R.listenerAdd layerShellOutput shOutL out
+  -- Assign screen Id
   screenId <- runInHS $ nextScreenId om
-
-  let output =
-        def
+  let output = def
           { river_output = out,
             screen = screenId,
             river_layerShellOutput = layerShellOutput
           }
-
   putObject om {pending_setup = M.insert out output $ pending_setup om}
 
 ----------------------------------------------------------
@@ -100,26 +97,21 @@ handle e = do
     R.RiverOutputPosition _ output x y ->
       modifyOutput' output $ \a -> a {x = fi x, y = fi y}
 
--- toUserData (R.RiverOutput p) = castPtr p
-
 handleWlOutput :: WL.OutputEvent -> H ()
 handleWlOutput e = case e of
-  -- WL.OutputGeometry _o _ x y pw ph subpix make_s model_s trans -> do
-  --   --make <- io . peekCString $ unConstPtr make_s
-  --   --model <- io . peekCString $ unConstPtr model_s
-  --   --log' $ "output geometry: " <> tshow ((x, y), (pw, ph), subpix)
-  --   --  <> " make: " <> toText make
-  --   --  <> " model: " <> toText model
-  --   --  <> " transform: " <> tshow trans
-
-  -- WL.OutputMode _o _ _flags _w _h _refresh -> return ()
-
   WL.OutputScale o _ i ->
     modifyOutput' (R.RiverOutput $ castPtr o) $ \x -> (x :: Output) {scale = i}
   WL.OutputName o _ name -> do
     modifyOutput' (R.RiverOutput $ castPtr o) $ \x -> (x :: Output) {outputName = name}
   WL.OutputDescription o _ desc -> do
     modifyOutput' (R.RiverOutput $ castPtr o) $ \x -> (x :: Output) {outputDescription = desc}
+  --WL.OutputGeometry _o _ x y pw ph subpix make_s model_s trans -> do
+  --  --log' $ "output geometry: " <> tshow ((x, y), (pw, ph), subpix)
+  --  --  <> " make: " <> toText make
+  --  --  <> " model: " <> toText model
+  --  --  <> " transform: " <> tshow trans
+
+  --WL.OutputMode _o _ _flags _w _h _refresh -> return ()
   WL.OutputDone o _ -> do
     om <- getObject
     forM_ (M.lookup (R.RiverOutput $ castPtr o) $ pending_setup om) $ \output ->
@@ -128,6 +120,7 @@ handleWlOutput e = case e of
           { pending_setup = M.delete (R.RiverOutput $ castPtr o) (pending_setup om),
             pending_manage = output : pending_manage om
           }
+
   _ -> mempty
 
 handleLayerShell :: R.RiverLayerShellOutputEvent -> H ()
@@ -174,9 +167,6 @@ nextScreenId om = do
     _ -> error "impossible"
 
 getScreenDetail :: Output -> ScreenDetail
--- getScreenDetail o = case o.nonExclusive of
---   Nothing -> SD {x = fi o.x, y = fi o.y, height = fi o.height, width = fi o.width}
---   Just (x, y, w, h) -> SD {x = fi x, y = fi y, height = fi h, width = fi w}
 getScreenDetail o = SD {x = fi o.x, y = fi o.y, height = fi o.height, width = fi o.width}
 
 updateScreenDetail :: RiverOutput -> HS ()

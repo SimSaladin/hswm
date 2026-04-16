@@ -122,3 +122,6 @@ initImageBuffer ImageBufferPool {wlShm = wl_shm, bufferListener = listener} widt
   -- Sets busy = False
   _ <- io $ WL.listenerAdd buf listener (castPtr busy)
   return ImageBuffer {..}
+
+incSurfaceCount :: Int -> ImageBufferPool -> ImageBufferPool
+incSurfaceCount n bp = bp { surfaceCount = bp.surfaceCount + n }

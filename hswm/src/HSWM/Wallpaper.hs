@@ -120,6 +120,9 @@ wpHandleEventHook (OutputEvent (R.RiverOutputDimensions _ ro w h)) = do
 wpHandleEventHook (OutputEvent (R.RiverOutputPosition _ ro x y)) = do
   updateOutputState ro $ \a -> a {pending_render = True, out_x = fi x, out_y = fi y}
   mempty
+wpHandleEventHook (OutputEvent (R.RiverOutputRemoved _ _ro)) = do
+  io $ modifyMVar_ ctxMVar $ \c -> pure c {bufferPool = fmap (BP.incSurfaceCount (-1)) (bufferPool c)}
+  mempty
 wpHandleEventHook (WlOutputEvent (WL.OutputScale ro _ scale)) = do
   let ro' = R.RiverOutput $ castPtr ro
   updateOutputState ro' $ \x -> x {pending_render = True, scale = scale}
@@ -129,6 +132,7 @@ wpHandleEventHook (WlOutputEvent (WL.OutputName ro wl_output name)) = do
   updateOutputState ro' $ \x -> x {name = name, wl_output = wl_output}
   mempty
 wpHandleEventHook (WlOutputEvent (WL.OutputDone ro _)) = do
+  io $ modifyMVar_ ctxMVar $ \c -> pure c {bufferPool = fmap (BP.incSurfaceCount 1) (bufferPool c)}
   let ro' = R.RiverOutput $ castPtr ro
   initOutput ro'
   mempty

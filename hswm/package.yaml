@@ -99,6 +99,7 @@ library:
     - xkbcommon-bindings
     - time
     - unbounded-delays
+    - fast-logger
   build-tools:
     - c2hs:c2hs  # Note: may need to "cabal update for this to start working
 

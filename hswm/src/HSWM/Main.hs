@@ -47,16 +47,42 @@ import Bindings.Wayland.Protocol.ForeignTopLevelListV1 as WL
 import Bindings.Wayland.ExtIdleNotifyV1 as Ext
 import Control.Concurrent (threadWaitRead, threadWaitWrite)
 import Control.Concurrent.Thread.Delay as Conc (delay)
+import System.Environment (getArgs)
+import System.Log.FastLogger
+
+-- | Main entrypoint settings.
+data MainRun = MainRun
+  { mainLogFile :: Maybe FilePath -- ^ If not logging to file, logs are sent to stdout
+  , mainLogLevel :: LogLevel -- ^ Default: debug
+  } deriving (Show, Read)
+
+instance Default MainRun where
+  def = MainRun (Just "") LevelDebug
+
+parseMainArgs :: [String] -> MainRun
+parseMainArgs args = def -- TODO
 
 hswm :: (m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow)) => HSWMConfig m l -> IO ()
 hswm conf = do
+  mainRun <- parseMainArgs <$> io getArgs
+  loggerSet <- case mainRun.mainLogFile of
+                 Nothing -> newStdoutLoggerSet defaultBufSize
+                 Just "" -> newFileLoggerSet defaultBufSize =<< defaultLogFile
+                 Just file -> newFileLoggerSet defaultBufSize file
+  let logFunc = fastLoggerOutput loggerSet
   installSignalHandlers
   display <- WL.displayConnect Nothing
-  startHSWM display conf
+  startHSWM logFunc display conf
+    where
+      defaultLogFile = do
+        d <- getXdgDirectory XdgData "hswm"
+        createDirectoryIfMissing True d
+        return $ d ++ "/" ++ "hswm.log"
 
-startHSWM :: (m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow)) => WL.Display -> HSWMConfig m l -> IO ()
-startHSWM wlDisplay config = do
-    let logFunc = defaultOutput stderr
+startHSWM :: (m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow))
+          => (Loc -> LogSource -> LogLevel -> LogStr -> IO ())
+          -> WL.Display -> HSWMConfig m l -> IO ()
+startHSWM logFunc wlDisplay config = do
     let withLogging = flip runLoggingT logFunc
 
     conf <- HConf False Nothing (config {layoutHook = Layout (layoutHook config)}) wlDisplay logFunc

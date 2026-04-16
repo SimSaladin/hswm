@@ -27,12 +27,12 @@ import Bindings.Wayland.Client qualified as WL
 
 added :: RiverWindow -> H ()
 added w = do
-  -- setup WL window listener
-  window_listener <- getObject
-  io $ R.listenerAdd w window_listener nullPtr
-  nd <- io $ R.riverWindowGetNode w
-  let win = def {new = True, river_window = w, node = nd, max_height = maxBound, max_width = maxBound}
-  -- insert window to stack and state
+  -- Setup WL window listener
+  winL <- getObject
+  io $ R.listenerAdd w winL nullPtr
+  node <- io $ R.riverWindowGetNode w
+  let win = def {new = True, river_window = w, node = node, max_height = maxBound, max_width = maxBound}
+  -- Insert it into stack and state
   runInHS $ do
     alterWindow w (\_ -> Just win)
     modifyWindowSet (W.insertUp w)
@@ -77,8 +77,8 @@ manage = runInHS $ do
 
 manage_ :: HS ()
 manage_ = do
-  -- get rid of any closed windows
-  -- do initial properties for new windows
+  -- Do initial properties for new windows
+  -- Get rid of any closed windows
   mapWindows $ \w -> do
     if
       | w.closed -> doRemoveWindow w
@@ -97,8 +97,6 @@ manage_ = do
 
   whenJust (W.peek old) $ \otherw ->
     manageWindowBorder otherw =<< asks (normalBorder . config)
-
-  -- modify (\s -> s {windowsetOld = ws})
 
   let tags_oldvisible = map (W.tag . W.workspace) $ W.current old : W.visible old
       gottenhidden = filter (flip elem tags_oldvisible . W.tag) $ W.hidden ws
@@ -156,19 +154,6 @@ manage_ = do
   mapM_ manageReveal visible
   setTopFocus
 
-    --whenJust (L.find (\(a, b, c) -> a == w) rects) $ \(_, Rectangle {..}, _) -> do
-    --  mapSeats $ \s -> do
-    --    if s.focused /= w && s.hovered /= w
-    --      then do
-    --        io $ R.riverSeatFocusWindow s.river_seat w
-    --        logInfo $ fromString $ "manage: setting seat fo" <> show w
-    --        modifySeat s.river_seat $ \x -> x {focused = w}
-    --        --let px = x + (fi width `div` 2)
-    --        --    py = y + (fi height `div` 2)
-    --        --logInfo $ fromString $ "manage: warping pointer to " <> show (px, py)
-    --        --io $ R.riverSeatPointerWarp s.river_seat px py
-    --      else return ()
-
   if isNothing (W.peek ws) && W.tag (W.workspace $ W.current ws) /= W.tag (W.workspace $ W.current old)
     then warpPointerToScreen (W.screenDetail $ W.current ws) (W.screen $ W.current ws)
     else withScreenOutput (W.screen $ W.current ws) $ \o -> io $ R.riverLayerShellOutputSetDefault o.river_layerShellOutput
@@ -210,13 +195,11 @@ render = runInHS $ do
 -- | /manage/
 setInitialManageProperties :: Window -> HS ()
 setInitialManageProperties Window {river_window = rw} = do
-  -- Initial dimensions
-  io $ R.riverWindowProposeDimensions rw 400 400
-  io $ R.riverWindowUseSsd rw
-  io $ R.riverWindowSetCapabilities rw (WL.toCEnum . fi $ foldl' (.|.) 0 $ map (.unwrap) [Maximize, Fullscreen])
-  io $ R.riverWindowSetTiled rw (WL.toCEnum . fi $ foldl' (.|.) 0 $ map (.unwrap) [EdgeTop, EdgeBottom, EdgeLeft, EdgeRight])
-  bcolor <- asks (normalBorder . config)
-  modifyWindow rw $ \s -> s {new = False, p_render_border = Just bcolor}
+  R.riverWindowUseSsd rw
+  R.riverWindowSetCapabilities rw (WL.toCEnum . fi $ foldl' (.|.) 0 $ map (.unwrap) [Maximize, Fullscreen])
+  R.riverWindowSetTiled rw (WL.toCEnum . fi $ foldl' (.|.) 0 $ map (.unwrap) [EdgeTop, EdgeBottom, EdgeLeft, EdgeRight])
+  nbc <- asks (normalBorder . config)
+  modifyWindow rw $ \s -> s {new = False, p_render_border = Just nbc}
 
 doRemoveWindow :: Window -> HS ()
 doRemoveWindow w@Window {} = do
@@ -266,7 +249,7 @@ handleEvent e = case e of
   R.RiverWindowPresentationHint _ window we_hint -> runInHS $ modifyWindow window $ \s -> s {presentationHint = Just we_hint}
   R.RiverWindowDimensionsHint _ window we_min_width we_min_height we_max_width we_max_height ->
     runInHS $ modifyWindow window $ \s -> s {min_width = fi we_min_width, min_height = fi we_min_height, max_width = fi we_max_width, max_height = fi we_max_height}
-  -- fullscreen
+  -- Set fullscreen
   R.RiverWindowFullscreenRequested _ window output -> runInHS $ doManage' (if output == def then WFullscreen else WFullscreenOnScreen output) window
   R.RiverWindowExitFullscreenRequested _ window -> runInHS $ doManage' WExitFullscreen window
   -- TODO what's this

@@ -104,6 +104,7 @@ library
         , deepseq
         , derive-storable
         , directory
+        , fast-logger
         , hswm-bindings
         , hswm:hswm-prelude
         , mtl
