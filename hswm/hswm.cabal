@@ -113,9 +113,11 @@ library
         , rio
         , stm
         , text
+        , time
         , transformers
         , typed-process
         , typerep-map
+        , unbounded-delays
         , unix
         , utf8-string
         , vector

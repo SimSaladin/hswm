@@ -63,6 +63,7 @@ data MainEvent
   = MainRestart FilePath
   | MainExit String
   | MainPoll
+  | MainSaveToDisk
   deriving (Eq, Show, Generic)
 
 instance (Monoid (m All)) => Default (Event -> m All) where def _ = mempty

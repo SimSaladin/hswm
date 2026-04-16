@@ -30,7 +30,7 @@ module HSWM.Layout.WindowNavigation
   )
 where
 
-import Data.List (nub, repeat, sortBy, (\\))
+import Data.List (nub, sortBy, (\\))
 import HSWM hiding (Point)
 import HSWM.Layout.LayoutModifier
 import HSWM.StackSet qualified as W

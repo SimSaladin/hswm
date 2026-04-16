@@ -17,6 +17,8 @@ import System.Posix.Process (executeFile)
 import qualified Bindings.Wayland.Client as WL
 import qualified Bindings.Wayland.WlrOutputPowerManagementUnstableV1 as Wlr
 import Foreign.C.Types
+import Data.Time.Clock.System
+import Text.Printf
 
 -- * Misc. pure operations
 
@@ -415,23 +417,43 @@ data StateData = StateData
 sendRestart :: MonadIO m => m ()
 sendRestart = io $ Posix.raiseSignal Posix.sigUSR2
 
+getStateDirectory :: MonadIO m => m FilePath
+getStateDirectory = do
+  dir <- getXdgDirectory XdgState "hswm"
+  createDirectoryIfMissing True dir
+  return dir
+
+getTimeStamp :: MonadIO m => m Int64
+getTimeStamp = systemSeconds <$> io getSystemTime
+
 restart :: String -> H ()
 restart prog = do
   runInHS $ broadcastMessage ReleaseResources
   void . userCode =<< asks (exitHook . config)
-  runInHS writeStateToFile
+  statefile <- runInHS writeStateToFile
   logInfo $ "restart: executing" :# [ "program" .= prog ]
   io $ do
-    res <- try $ executeFile prog True [] Nothing
+    res <- try $ executeFile prog True [ "--statefile", statefile ] Nothing
     case res of
       Left (SomeException e) -> hPrint stderr e >> exitFailure
       Right {} -> return ()
 
-writeStateToFile :: HS ()
+writeStateToFile :: HS FilePath
 writeStateToFile = do
-  let path = ".hswm.state"
+  dir <- getStateDirectory
+  ts <- getTimeStamp
+  let filename = printf "savedstate-%i" ts
+  let filepath = dir ++ "/" ++ filename
+      linkpath = dir ++ "/" ++ "savedstate"
   stateString <- dumpStateAsString
-  liftIO $ catchIO (writeFile path stateString) (print . show)
+  io $ catchIO (writeFile filepath stateString >> updateLink filename linkpath) (print . show)
+  logInfo $ "Wrote current WM state to disk" :# [ "statefile" .= filepath ]
+  return filepath
+    where
+      updateLink src dst = do
+        b <- doesFileExist dst
+        when b $ removeFile dst
+        createFileLink src dst
 
 dumpStateAsString :: HS String
 dumpStateAsString = do
@@ -451,39 +473,49 @@ dumpStateAsString = do
 
 -- | Read the state of a previous xmonad instance from a file and
 -- return that state.  The state file is removed after reading it.
-readStateFile :: (LayoutClass l RiverWindow, Read (l RiverWindow)) => HSWMConfig m l -> IO (Maybe HState)
+readStateFile :: forall m l m2. (MonadUnliftIO m, MonadLogger m, LayoutClass l RiverWindow, Read (l RiverWindow)) => HSWMConfig m2 l -> m (Maybe HState)
 readStateFile xmc = do
-  let path = ".hswm.state"
+  dir <- getStateDirectory
+  let linkpath = dir ++ "/" ++ "savedstate"
+  exists <- doesFileExist linkpath
+  if exists
+     then doIt linkpath
+     else return Nothing
 
-  -- I'm trying really hard here to make sure we read the entire
-  -- contents of the file before it is removed from the file system.
-  res <- try @_ @SomeException $ do
-    raw <- withFile path ReadMode readStrict
-    return $! maybeRead reads raw
-  _ <- try @_ @SomeException $ io (removeFile path)
-
-  case res of
-    Left e -> print e >> return Nothing
-    Right sf' -> return $ do
-      sf <- sf'
-
-      let wins = W.allWindows (sfWins sf)
-      let winset =
-            W.ensureTags layout (workspaces xmc) $
-              W.mapLayout (fromMaybe layout . maybeRead lreads) $
-                W.mapWindow (R.RiverWindow . intPtrToPtr . fst) (sfWins sf)
-          extState = M.fromList . map (second Left) $ sfExt sf
-
-      return
-        def
-          { windowset = winset,
-            windowsetOld = winset,
-            recoveredWindows = M.fromList [(b, R.RiverWindow $ intPtrToPtr a) | (a, b) <- wins],
-            extensibleState = extState
-          }
   where
+    doIt :: FilePath -> m (Maybe HState)
+    doIt path = do
+      -- I'm trying really hard here to make sure we read the entire
+      -- contents of the file before it is removed from the file system.
+      res <- try @_ @SomeException $ do
+        raw <- io $ withFile path ReadMode readStrict
+        return $! maybeRead reads raw
+
+      case res of
+        Left e -> do
+          logError $ "Failed to restore WM state from file" :# [ "exception" .= show e ]
+          return Nothing
+        Right sf' -> do
+          logInfo $ "Restoring WM state from file" :# [ "statefile" .= path ]
+          return $ do
+            sf <- sf'
+            let wins = W.allWindows (sfWins sf)
+            let winset =
+                  W.ensureTags layout (workspaces xmc) $
+                    W.mapLayout (fromMaybe layout . maybeRead lreads) $
+                      W.mapWindow (R.RiverWindow . intPtrToPtr . fst) (sfWins sf)
+                extState = M.fromList . map (second Left) $ sfExt sf
+            return
+              def
+                { windowset = winset,
+                  windowsetOld = winset,
+                  recoveredWindows = M.fromList [(b, R.RiverWindow $ intPtrToPtr a) | (a, b) <- wins],
+                  extensibleState = extState
+                }
+
     layout = Layout (layoutHook xmc)
     lreads = readsLayout layout
+
     maybeRead reads' s = case reads' s of
       [(x, "")] -> Just x
       _ -> Nothing

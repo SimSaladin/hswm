@@ -97,6 +97,8 @@ library:
     - process
     - typed-process
     - xkbcommon-bindings
+    - time
+    - unbounded-delays
   build-tools:
     - c2hs:c2hs  # Note: may need to "cabal update for this to start working
 

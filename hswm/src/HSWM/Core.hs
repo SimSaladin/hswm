@@ -43,7 +43,7 @@ runInHS a = do
   conf <- ask
   when conf._stateLocked $ throwString $ "runInHS: state locked (attempted to nest state lock?)\n" ++ prettyCallStack callStack
   io $ bracketOnError (atomically $ takeTMVar conf._state) (atomically . tryPutTMVar conf._state) $ \st -> do
-    res <- timeout 2000000 $ runHS conf {_stateLocked = True} st a
+    res <- timeout 2_000_000 $ runHS conf {_stateLocked = True} st a
     case res of
       Just (r, st') -> atomically (putTMVar conf._state st') >> return r
       Nothing -> throwString $ "runInHS: timed out (2s): " ++ prettyCallStack callStack
