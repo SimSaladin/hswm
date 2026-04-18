@@ -16,7 +16,7 @@
   wayland,
   wayland-protocols,
   wayland-scanner,
-  wlroots_0_19,
+  wlroots_0_20,
   xwayland,
   zig_0_15,
   withManpages ? true,
@@ -32,8 +32,8 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromCodeberg {
     owner = "river";
     repo = "river";
-    rev = "9e2cbc9b9735c208165ec5be06e5ac03cba15c20";
-    hash = "sha256-F7MoE2mBeG5Wo5zS9T68Tf7bHu5aQVtHui3vYxh5wJQ=";
+    rev = "170d7836c178bef3bf042ec561ec5fd5771d91de";
+    hash = "sha256-ase1mCqZl9xpYdHZAilj8amvKZ0AMlQlIIFTgrlC1u4=";
   };
 
   strictDeps = true;
@@ -59,7 +59,7 @@ stdenv.mkDerivation (finalAttrs: {
     wayland
     wayland-protocols
     wayland-scanner
-    wlroots_0_19
+    wlroots_0_20
   ]
   ++ lib.optionals xwaylandSupport [
     libx11
