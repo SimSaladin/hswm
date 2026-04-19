@@ -60,7 +60,7 @@ catchH job errcase = do
   io (runH c job)
     `catch` \e -> case fromException e of
       Just (_ :: ExitCode) -> throwM e
-      _ -> do logError $ "exception in H action" :# [ "excption" .= show e, "callstack" .= prettyCallStack callStack ]
+      _ -> do logError $ "exception in H action" :# [ "exception" .= show e, "callstack" .= prettyCallStack callStack ]
               errcase
 
 catchHS :: HasCallStack => HS a -> HS a -> HS a

@@ -18,6 +18,7 @@ import HSWM.XKB
 import Bindings.River qualified as R
 import Bindings.RiverSafe qualified as R
 import Bindings.Wayland.Client qualified as WL
+import System.IO.Unsafe
 
 data KeyboardInfo = KeyboardInfo
   { layoutName :: String,
@@ -56,9 +57,15 @@ handleLibinputEvent (R.RiverLibinputConfigLibinputDevice _ _ dev) = do
   io $ WL.listenerAdd dev l nullPtr
 handleLibinputEvent _ = return ()
 
+-- TODO refactor into HState
+kbdVar :: IORef [(R.RiverXkbConfig, R.RiverXkbKeyboard)]
+kbdVar = unsafePerformIO $ newIORef []
+{-# NOINLINE kbdVar #-}
+
 -- Keyboard added/removed
 handleXkbConfigEvent :: R.RiverXkbConfigEvent -> H ()
 handleXkbConfigEvent (R.RiverXkbConfigXkbKeyboard _ xkbConfig xkbKeyboard) = do
+  modifyIORef kbdVar $ (:) (xkbConfig, xkbKeyboard)
   withObject @R.RiverXkbKeyboardListener $ \l -> io $ R.listenerAdd xkbKeyboard l nullPtr
   asks (xkbLayout . config) >>= (`whenJust` setKeyboardLayout xkbConfig xkbKeyboard)
 handleXkbConfigEvent _ = return ()
@@ -68,3 +75,10 @@ handleXkbKeyboardEvent (R.RiverXkbKeyboardRemoved _ _kbd) = return () -- TODO
 handleXkbKeyboardEvent (R.RiverXkbKeyboardLayout _ kbd index name) = do
   updateKeyboardInfo kbd $ \x -> Just x {layoutName = name, layoutIndex = fi index}
 handleXkbKeyboardEvent _ = return ()
+
+setKbdLayout :: Maybe String -> H ()
+setKbdLayout ml = do
+  rules <- maybe (asks $ fromMaybe undefined . xkbLayout . config) (\name -> pure $
+    XkbRuleNames { rules = "", model = "pc104", layout = name, variant = "intl", options = "" }) ml
+  xs <- readIORef kbdVar
+  forM_ xs $ \(cfg, kbd) -> setKeyboardLayout cfg kbd rules

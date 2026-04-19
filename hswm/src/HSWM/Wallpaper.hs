@@ -265,9 +265,9 @@ initOutput ro = withOutputState ro $ \os -> do
       layerShell <- getObject
       runInIO <- askRunInIO
       -- Surface
-      wl_surface <- io $ WL.compositorCreateSurface compositor
+      wl_surface <- WL.compositorCreateSurface compositor
       -- fractional scale
-      fractSurface <- io $ FS.fractionalScaleManagerGetFractionalScale fsm wl_surface
+      fractSurface <- FS.fractionalScaleManagerGetFractionalScale fsm wl_surface
       fsl <- io $ FS.mkFractionalScaleListener $ \case
         FS.FractionalScalePreferredScale _ _ fscale ->
           runInIO $ updateOutputState ro $ \x -> x {pref_fract_scale = fscale, pending_render = True}
@@ -275,7 +275,7 @@ initOutput ro = withOutputState ro $ \os -> do
       -- viewport
       viewport <- io $ VP.viewporterGetViewport vpr wl_surface
        -- layersurface
-      layerSurface <- io $ Wlr.layerShellGetLayerSurface layerShell wl_surface os.wl_output Wlr.ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND (Just "wallpaper")
+      layerSurface <- Wlr.layerShellGetLayerSurface layerShell wl_surface os.wl_output Wlr.ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND (Just "wallpaper")
       io $ Wlr.layerSurfaceSetSize layerSurface 0 0
       io $ Wlr.layerSurfaceSetAnchor layerSurface (WL.toCEnum $ 1 + 2 + 4 + 8) --1 + 2 + 4 + 8)
       io $ Wlr.layerSurfaceSetExclusiveZone layerSurface (-1)

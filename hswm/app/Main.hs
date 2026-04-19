@@ -100,7 +100,7 @@ environPrompt = do
 
       rows =
         [ "<b>" <> k <> "</b>"
-          <> (maybe "" (\v -> "=" <> escval v) vEnv)
+          <> maybe "" (\v -> "=" <> escval v) vEnv
           <> (if vEnv /= vSD then maybe "" (\v -> "=" <> escval v) vSD else "")
           <> (if isNothing vSD then " <i>(not in systemd user env)</i>" else "")
           <> (if isNothing vEnv then " <i>(not in WM env)</i>" else "")
@@ -217,7 +217,10 @@ myManageHook :: Query (Endo WindowSet)
 myManageHook =
   composeOne
     [ managePads
+    -- , appName =? "gimp" <&&> wTitle =? "GIMP Startup" -?> doCenterFloat
     ]
+      where
+        doCenterFloat = doRectFloat $ W.RationalRect (1/3) (1/3) (1/5) (1/5)
 
 myLayoutHook :: _
 myLayoutHook =
@@ -249,6 +252,8 @@ myKeys =
     -- "M-C-q"         myRecompileRestart True False ? "Recompile (force)"
     -- "M-S-<Return>"  FloatNext.floatNext True >> spawnTerm def "" ? "Terminal (floating)"
     -- "M-<F1>" `CF.key'` helpCmd
+    ("M-F3", "" $?$?= setKbdLayout Nothing),
+    ("M-F4", "" $?$?= setKbdLayout (Just "us")),
 
     -- ======== Execute ==========
     ("M-r r", "Run shell (prompt)" $?$?= rofiRun ["-modes", "run", "-show", "run"]),

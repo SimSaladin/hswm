@@ -30,7 +30,7 @@ added w = do
   -- Setup WL window listener
   winL <- getObject
   io $ R.listenerAdd w winL nullPtr
-  node <- io $ R.riverWindowGetNode w
+  node <- R.riverWindowGetNode w
   let win = def {new = True, river_window = w, node = node, max_height = maxBound, max_width = maxBound}
   -- Insert it into stack and state
   runInHS $ do
@@ -49,24 +49,29 @@ applyManageActions w0 xs0 = doAll w0 xs0 >>= \w' -> return $ Just w' {p_manage_a
       let rw = w.river_window
       case a of
         WRequestClose -> do
-          io $ R.riverWindowClose rw
+          R.riverWindowClose rw
           pure w
         WFullscreenOnScreen ro -> do
-          io $ R.riverWindowFullscreen rw ro
-          io $ R.riverWindowInformFullscreen rw
-          pure w {fullscreen = True}
+          R.riverWindowFullscreen rw ro
+          R.riverWindowInformFullscreen rw
+          -- The position does not get updated otherwise
+          lookupOutput ro >>= \case
+            Nothing -> pure w {fullscreen = Just ro}
+            Just o ->  pure w {fullscreen = Just ro, x = o.x, y = o.y}
         WFullscreen -> do
           sid <- gets $ W.screen . W.current . windowset
-          withScreenOutput sid $ \o -> do
-            io $ R.riverWindowFullscreen rw o.river_output
-            io $ R.riverWindowInformFullscreen rw
-          pure w {fullscreen = True}
+          lookupOutputBy (\x -> x.screen == sid) >>= \case
+            Nothing -> pure w
+            Just o -> do
+              R.riverWindowFullscreen rw o.river_output
+              R.riverWindowInformFullscreen rw
+              pure w {fullscreen = Just o.river_output, x = o.x, y = o.y}
         WExitFullscreen -> do
-          io $ R.riverWindowExitFullscreen rw
-          io $ R.riverWindowInformNotFullscreen rw
-          pure w {fullscreen = False}
+          R.riverWindowExitFullscreen rw
+          R.riverWindowInformNotFullscreen rw
+          pure w {fullscreen = Nothing}
         WToggleFullscreen
-          | w.fullscreen -> doIt w WExitFullscreen
+          | isJust w.fullscreen -> doIt w WExitFullscreen
           | otherwise -> doIt w WFullscreen
 
 -- | Do nothing while pointer operation is in progress.
@@ -137,7 +142,7 @@ manage_ = do
 
   let visible = map (\(a, _, _) -> a) rects
 
-  mapM_ (\(a, b, c) -> tileWindow c a b) rects
+  mapM_ (\(rw, rect, top) -> tileWindow top rw rect) rects
 
   -- hide every window that was potentially visible before, but is not
   -- given a position by a layout now.
@@ -162,7 +167,9 @@ manage_ = do
 
 warpPointerToScreen :: ScreenDetail -> ScreenId -> HS ()
 warpPointerToScreen SD {..} sid = do
-  mapSeats $ \s -> io $ R.riverSeatPointerWarp s.river_seat px py
+  mapSeats $ \s -> do
+    R.riverSeatPointerWarp s.river_seat px py
+    modifySeat s.river_seat $ \s' -> s' {focused = invalidWindow}
   withScreenOutput sid $ \o -> io $ R.riverLayerShellOutputSetDefault o.river_layerShellOutput
   where
     px = fi $ x + width `div` 2
@@ -225,6 +232,16 @@ doRemoveWindow w@Window {} = do
   io $ R.objectDestroy w.node
   io $ R.objectDestroy w.river_window
 
+-- | End recovering windows. Removes any leftoover windows that are no longer present.
+finishRecovery :: HS ()
+finishRecovery = do
+  rwins <- gets recoveredWindows
+  unless (M.null rwins) $ do
+    State.modify' $ \s -> s {recoveredWindows = mempty}
+    forM_ (M.toList rwins) $ \(_, rw) -> do
+      modifyWindowSet $ W.delete rw
+      alterWindow rw $ const Nothing
+
 handleEvent :: R.RiverWindowEvent -> H ()
 handleEvent e = case e of
   -- The window has been closed by the server, perhaps due to an xdg_toplevel.close request or similar.
@@ -235,6 +252,8 @@ handleEvent e = case e of
   R.RiverWindowAppId _ window we_app_id -> runInHS $ modifyWindow window $ \s -> s {appId = we_app_id}
   R.RiverWindowTitle _ window we_title -> runInHS $ modifyWindow window $ \s -> s {title = we_title}
   R.RiverWindowUnreliablePid _ window we_unreliable_pid -> runInHS $ modifyWindow window $ \s -> s {unreliablePid = Just $ fi we_unreliable_pid}
+
+  -- we use the unique identifier to recover windows after restart
   R.RiverWindowIdentifier _ window we_identifier -> runInHS $ do
     modifyWindow window $ \s -> s {identifier = we_identifier}
     let recoverWindow w = do
@@ -242,13 +261,23 @@ handleEvent e = case e of
           State.modify' $ \s -> s {recoveredWindows = M.delete we_identifier s.recoveredWindows}
     gets (M.lookup we_identifier . recoveredWindows) >>= (`whenJust` recoverWindow)
 
-  -- updated width + height
-  R.RiverWindowDimensions _ window we_width we_height -> runInHS $ modifyWindow window $ \s -> s {width = fi we_width, height = fi we_height}
   -- Hints
   R.RiverWindowDecorationHint _ window we_hint -> runInHS $ modifyWindow window $ \s -> s {decorationHint = Just  we_hint}
   R.RiverWindowPresentationHint _ window we_hint -> runInHS $ modifyWindow window $ \s -> s {presentationHint = Just we_hint}
-  R.RiverWindowDimensionsHint _ window we_min_width we_min_height we_max_width we_max_height ->
-    runInHS $ modifyWindow window $ \s -> s {min_width = fi we_min_width, min_height = fi we_min_height, max_width = fi we_max_width, max_height = fi we_max_height}
+
+  R.RiverWindowDimensionsHint _ window minw minh maxw maxh -> do
+    runInHS $ modifyWindow window $ \s -> s {min_width = fi minw, min_height = fi minh, max_width = fi maxw, max_height = fi maxh}
+    -- auto-float fixed-size windows
+    let fixed = maxw > 0 && maxh > 0 && maxw == minw && maxh == minh
+    when fixed $ runInHS $
+      withWindow window $ \w ->
+        modifyWindowSet $ \ws ->
+          W.float window (centerRationalRect $ rationalRectIn (Rectangle w.x w.y (fi maxw) (fi maxh)) (screenRect $ W.screenDetail $ W.current ws)) ws
+
+  -- updated width + height
+  R.RiverWindowDimensions _ rw w h ->
+    runInHS $ modifyWindow rw $ \s -> s {width = w, height = h}
+
   -- Set fullscreen
   R.RiverWindowFullscreenRequested _ window output -> runInHS $ doManage' (if output == def then WFullscreen else WFullscreenOnScreen output) window
   R.RiverWindowExitFullscreenRequested _ window -> runInHS $ doManage' WExitFullscreen window

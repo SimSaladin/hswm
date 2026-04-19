@@ -64,3 +64,6 @@ scaleRationalRect (Rectangle sx sy sw sh) (W.RationalRect rx ry rw rh) =
 rationalRectIn :: Rectangle -> Rectangle -> W.RationalRect
 rationalRectIn (Rectangle wx wy ww wh) (Rectangle sx sy sw sh) =
   W.RationalRect ((fi wx - fi sx) % fi sw) ((fi wy - fi sy) % fi sh) (fi ww % fi sw) (fi wh % fi sh)
+
+centerRationalRect :: W.RationalRect -> W.RationalRect
+centerRationalRect r = r { x = (1 - r.width) / 2, y = (1 - r.height) / 2 }

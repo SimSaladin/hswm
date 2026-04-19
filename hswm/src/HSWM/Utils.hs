@@ -64,11 +64,12 @@ data RGBA a = RGBA {red, green, blue, alpha :: !a}
 
 fromRiverColor :: RiverColor -> RGBA Double
 fromRiverColor rc = RGBA
-  { red = fi rc.red / 255.0
-  , green = fi rc.green / 255.0
-  , blue = fi rc.blue / 255.0
-  , alpha = fi rc.alpha / 255.0
-  }
+  { red = fi rc.red / t
+  , green = fi rc.green / t
+  , blue = fi rc.blue / t
+  , alpha = fi rc.alpha / t
+  } where
+    t = fi (maxBound :: Word32)
 
 packRGBA :: RGBA Double -> RiverColor
 packRGBA c = RiverColor
@@ -76,7 +77,9 @@ packRGBA c = RiverColor
   , green = to8 c.green
   , blue = to8 c.blue
   , alpha = to8 c.alpha
-  } where to8 x = floor (clamp (0, 1) x * 255.0)
+  } where
+    to8 x = floor (clamp (0, 1) x * t)
+    t = fi (maxBound :: Word32)
 
 -- | Blend to RGBA colors (\"over\" operation)
 overRGBA :: RiverColor -> RiverColor -> RiverColor

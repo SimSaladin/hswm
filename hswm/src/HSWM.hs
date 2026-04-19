@@ -14,6 +14,7 @@ module HSWM
     module HSWM.Operations,
     module HSWM.Utils,
     module HSWM.XKB,
+    module HSWM.InputConfig,
     --
     module River,
     --
@@ -29,6 +30,7 @@ import HSWM.Core
 import HSWM.Layout
 import HSWM.Main
 import HSWM.Operations
+import HSWM.InputConfig
 import HSWM.Utils
 import HSWM.XKB
 import River

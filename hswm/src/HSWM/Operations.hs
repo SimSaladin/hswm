@@ -47,19 +47,40 @@ manageKill = doManage WRequestClose
 -- /manage/
 tileWindow :: Bool -> RiverWindow -> Rectangle -> HS ()
 tileWindow placeTop rw r = do
-  bwDef <- asks (fi . borderWidth . config)
   withWindow rw $ \w -> do
-    let bw = fromMaybe bwDef w.wBorderWidth
-    -- give all windows at least 1x1 pixels
-    let least x
-          | x <= bw * 2 = 1
-          | otherwise = x - bw * 2
-    R.riverWindowProposeDimensions w.river_window (least $ fi r.width) (least $ fi r.height)
-    modifyWindow rw $ \w' ->
-      w'
-        { p_render_pos = Just (fi r.x + bw, fi r.y + bw),
-          p_render_place = if placeTop then R.rIVER_NODE_V1_PLACE_TOP else 0
-        }
+    --logDebug $ "Tiling window" :# [ "window" .= show rw, "title" .= w.title, "placetop" .= placeTop ]
+    case w.fullscreen of
+      Nothing -> do
+        bwDef <- asks (fi . borderWidth . config)
+        let bw = fromMaybe bwDef w.wBorderWidth
+        -- give all windows at least 1x1 pixels
+        let least x
+              | x <= bw * 2 = 1
+              | otherwise = x - bw * 2
+        R.riverWindowProposeDimensions w.river_window (least $ fi r.width) (least $ fi r.height)
+        modifyWindow rw $ \w' ->
+          w'
+            { p_render_pos = Just (fi r.x + bw, fi r.y + bw),
+              p_render_place = if placeTop then R.rIVER_NODE_V1_PLACE_TOP else 0
+            }
+      Just ro -> do
+        sid <- pointScreen r.x r.y
+        lookupOutputBy (\x -> Just x.screen == fmap W.screen sid) >>= \mo -> do
+          case mo of
+            Nothing -> return ()
+            Just o
+              | ro == o.river_output -> modifyWindow rw $ \w' -> w' { p_render_place = if placeTop then R.rIVER_NODE_V1_PLACE_TOP else 0 }
+              | otherwise -> do
+                -- need to change the output where the window is fullscreened
+                R.riverWindowFullscreen rw o.river_output
+                modifyWindow rw $ \w' -> w'
+                  { p_render_place = if placeTop then R.rIVER_NODE_V1_PLACE_TOP else 0
+                  , fullscreen = Just o.river_output
+                  , x = o.x
+                  , y = o.y
+                  , height = o.height
+                  , width = o.width
+                  }
 
 manageWindowPlace :: RiverWindow -> CInt -> HS ()
 manageWindowPlace rw p = modifyWindow rw $ \w -> w {p_render_place = fi p}
@@ -172,11 +193,13 @@ setTopFocus = withWindowSet $ maybe (pure ()) setTopFocus' . W.peek
 setTopFocus' :: RiverWindow -> HS ()
 setTopFocus' rw = mapSeats $ \s -> do
   when (s.focused /= rw) $ do
-    logInfo $ "seat: focus window" :# [ "window" .= show rw, "seat" .= s.name ]
-    io $ R.riverSeatFocusWindow s.river_seat rw
-    modifySeat s.river_seat $ \x -> x {focused = rw}
     withWindow rw $ \w -> do
-      when (s.suppressChangeFocus <= 0) $ do
+      logInfo $ "seat: focus window" :# [ "window" .= show rw, "seat" .= s.name ]
+      R.riverSeatFocusWindow s.river_seat rw
+      modifySeat s.river_seat $ \x -> x {focused = rw}
+      -- FIXME: when focusing a newly created window, we end up here when w.x and w.y are still 0. The position is updated
+      -- a bit later by the WindowDimensions event.
+      when (s.suppressChangeFocus <= 0 && (w.width, w.height) /= (0, 0)) $ do
           -- modifySeat s.river_seat $ \x -> x {focused = rw}
           let (x', y') = fromMaybe (w.x, w.y) w.p_render_pos
               px = x' + (w.width `div` 2)
@@ -208,8 +231,8 @@ seatEnableBindingsMatching rs mods keys = withSeat rs $ \s -> do
 
 -- | /render sequence/
 reveal, hide :: RiverWindow -> HS ()
-reveal rw = withWindow rw $ \_ -> io $ R.riverWindowShow rw
-hide rw = withWindow rw $ \_ -> io $ R.riverWindowHide rw
+reveal rw = withWindow rw $ \_ -> R.riverWindowShow rw
+hide rw = withWindow rw $ \_ -> R.riverWindowHide rw
 
 -- | /render sequence/ Draw borders on the the window.
 setWindowBorder :: RiverWindow -> Int32 -> RiverColor -> HS ()
@@ -257,27 +280,14 @@ runOnWorkspaces job = do
       W.current ws : W.visible ws
   modify $ \s -> s {windowset = ws {W.current = c, W.visible = v, W.hidden = h}}
 
-{-
--- | Perform an @H@ action. If it returns @Any True@, unwind the
--- changes to the @WindowSet@ and replay them using @windows@. This is
--- a version of @windowBracket@ that discards the return value and
--- handles an @H@ action that reports its need for refresh via @Any@.
-windowBracket_ :: H Any -> H ()
-windowBracket_ = void . windowBracket getAny
-
--- | Perform an @H@ action and check its return value against a predicate p.
--- If p holds, unwind changes to the @WindowSet@ and replay them using @windows@.
-windowBracket :: (a -> Bool) -> H a -> H a
-windowBracket p action = withWindowSet $ \old -> do
-  a <- action
-  when (p a) . withWindowSet $ \new -> do
-    modifyWindowSet $ const old
-    windows         $ const new
-  return a
--}
-
 --------------------------------------------------------------
 -- * Outputs
+
+lookupOutput :: RiverOutput -> HS (Maybe Output)
+lookupOutput k = gets _outputs <&> L.find (\x -> x.river_output == k)
+
+lookupOutputBy :: (Output -> Bool) -> HS (Maybe Output)
+lookupOutputBy f = gets _outputs <&> L.find f
 
 withOutput :: RiverOutput -> (Output -> HS ()) -> HS ()
 withOutput k m = gets _outputs >>= mapM_ (\x -> when (x.river_output == k) (m x))
@@ -295,7 +305,7 @@ setOutputPower mode = do
   forM_ ops $ \case
     Nothing -> return ()
     Just power -> do
-      logInfo $ "setting output power" :# [ "mode_on" .= mode ]
+      logInfo $ "setting output power" :# [ "on" .= mode ]
       Wlr.outputPowerSetMode power (if mode then Wlr.outputPowerModeOn else Wlr.outputPowerModeOff)
 
 --------------------------------------------------------------
@@ -373,11 +383,6 @@ float rw = withWindow rw $ \w -> do
 floatLocation :: Window -> HS (ScreenId, W.RationalRect)
 floatLocation w = go
   where
-    -- -- Fallback solution if `go' fails.  Which it might, since it
-    -- -- calls `getWindowAttributes'.
-    -- sc <- gets $ W.current . windowset
-    -- return (W.screen sc, W.RationalRect 0 0 1 1)
-
     go = do
       ws <- gets windowset
       let bw = 2 :: Int -- (fromIntegral . wa_border_width) wa

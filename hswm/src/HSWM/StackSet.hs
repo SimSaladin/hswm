@@ -97,7 +97,7 @@ instance Traversable Stack where
       <*> traverse f (down s)
 
 -- | A structure for window geometries
-data RationalRect = RationalRect !Rational !Rational !Rational !Rational
+data RationalRect = RationalRect { x, y, width, height :: !Rational }
   deriving (Show, Read, Eq)
 
 -- ---------------------------------------------------------------------

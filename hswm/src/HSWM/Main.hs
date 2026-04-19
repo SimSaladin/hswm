@@ -257,8 +257,13 @@ handleWithHook e = do
 handleEvent :: Event -> H ()
 handleEvent (WindowManagerEvent e) = case e of
   R.RiverWindowManagerOutput _ _ out -> Outputs.added out
-  R.RiverWindowManagerSeat _ _ seat -> Seats.added seat
   R.RiverWindowManagerWindow _ _ w -> Windows.added w
+
+  R.RiverWindowManagerSeat _ _ seat -> do
+    -- river does not indicate when it is done signalling about present windows, so we assume that it is done by the
+    -- time first seat is announced.
+    runInHS Windows.finishRecovery
+    Seats.added seat
 
   -- /manage sequence/
   R.RiverWindowManagerManageStart _ wm -> do
