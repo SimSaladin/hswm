@@ -127,6 +127,7 @@ executables:
     dependencies:
       - base
       - hswm
+      - text
     ghc-options:
       - *common-ghc-options
       - -threaded

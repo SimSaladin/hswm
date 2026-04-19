@@ -252,8 +252,8 @@ myKeys =
     -- "M-C-q"         myRecompileRestart True False ? "Recompile (force)"
     -- "M-S-<Return>"  FloatNext.floatNext True >> spawnTerm def "" ? "Terminal (floating)"
     -- "M-<F1>" `CF.key'` helpCmd
-    ("M-F3", "" $?$?= setKbdLayout Nothing),
-    ("M-F4", "" $?$?= setKbdLayout (Just "us")),
+    ("M-F3", "" $?$?= (`whenJust` setKeyboardKeymaps (const True)) =<< asks (xkbLayout . config)),
+    ("M-F4", "" $?$?= setKeyboardKeymaps (const True) (keymapFromString "us")),
 
     -- ======== Execute ==========
     ("M-r r", "Run shell (prompt)" $?$?= rofiRun ["-modes", "run", "-show", "run"]),
@@ -430,6 +430,7 @@ toggleMuteSink = pactl ["set-sink-mute", "@DEFAULT_SINK@", "toggle"]
 
 -- * Utilities
 
+infixr 1 $?$?=
 ($?$?=) :: (IsKeyAction a) => String -> a -> SomeAction H
 desc $?$?= action = toKeyAction desc action
 

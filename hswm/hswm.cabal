@@ -206,4 +206,5 @@ executable hswmctl
     build-depends:
           base
         , hswm
+        , text
     default-language: GHC2024

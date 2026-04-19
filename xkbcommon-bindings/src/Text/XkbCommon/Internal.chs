@@ -125,11 +125,16 @@ createKeymap'' ctx fd size = do
   closeFd fd
   return keymap
 
-withXkbKeymapFd :: XkbKeymap -> (Fd -> IO b) -> IO b
-withXkbKeymapFd kmap f = withCString "hswm-xkb-keymap" $ \c_name -> do
+createXkbKeymapFd :: XkbKeymap -> IO Fd
+createXkbKeymapFd kmap = withCString "hswm-xkb-keymap" $ \c_name -> do
   fd <- Fd <$> {#call memfd_create#} c_name (1 {- MFD_CLOEXEC-} .|. 2 {- MFD_ALLOW_SEALING -})
   str <- xkbKeymapGetAsString kmap XKB_KEYMAP_FORMAT_TEXT_V1
   _ <- fdWrite fd str
+  return fd
+
+withXkbKeymapFd :: XkbKeymap -> (Fd -> IO b) -> IO b
+withXkbKeymapFd kmap f = do
+  fd <- createXkbKeymapFd kmap
   r <- f fd
   closeFd fd
   return r

@@ -17,6 +17,7 @@ import Data.ByteString.Lazy qualified as BL
 import Data.ByteString.UTF8 qualified as BUTF8
 import Data.Map qualified as M
 import Data.Text qualified as T
+import Data.Text.Lazy qualified as TL
 import Data.Version (showVersion)
 import Foreign.Ptr
 import HSWM.Actions.DynamicWorkspaceOrder qualified as DWO
@@ -28,6 +29,18 @@ import Network.Socket.ByteString qualified as NB
 import PackageInfo_hswm qualified as PKG
 import Bindings.River qualified as R
 import qualified Data.List as L
+import HSWM.InputConfig (InputConfigState)
+import Text.Pretty.Simple qualified as P
+
+runStdoutAsTextLoggingT :: MonadIO m => LoggingT m a -> m a
+runStdoutAsTextLoggingT a = do
+  let logFunc = defaultOutput stdout
+  runLoggingT a logFunc
+
+runMIO :: LoggingT m a -> m a
+runMIO = runStdoutLoggingT
+
+type MIO = LoggingT IO
 
 type MonadIPC env m = (MonadReader env m, MonadLogger m, MonadIO m, MonadUnliftIO m, MonadMask m)
 
@@ -62,8 +75,8 @@ data ProtoMsg
   | -- | There is nothing currently focused
     FocusedNone
 
-  | StateDump
-  | StateDumpResponse String
+  | StateDump { param :: String }
+  | StateDumpResponse TL.Text
   deriving (Eq, Show, Read, Generic)
 
 data WorkspaceInfo = WorkspaceInfo
@@ -169,8 +182,12 @@ serverRun conf stateRef onMsg = withThreadContext ["component" .= ("ipc/server":
 
 serverHandleMsg :: (MonadIPC env m, env ~ HConf) => Socket -> ProtoMsg -> m ()
 serverHandleMsg c Identify {} = fullStateUpdate >>= mapM_ (sendMsg c)
-serverHandleMsg c StateDump = sendMsg c . StateDumpResponse =<< runInHS dumpStateAsString
-serverHandleMsg _ msg = log' $ display $ "[IPC] warn: unhandled message: " <> tshow msg
+serverHandleMsg c StateDump{..} = do
+  dump <- case param of
+            "input-config-state" -> P.pShow <$> getObjectDef @InputConfigState
+            _ -> TL.pack <$> runInHS dumpStateAsString
+  sendMsg c $ StateDumpResponse dump
+serverHandleMsg c msg = logWarn $ "[IPC] unhandled message" :# [ "message" .= msg, "peer" .= show c ]
 
 clientRun ::
   (MonadIPC env m) =>
@@ -272,8 +289,3 @@ toWindowInfo w =
       identifier = toText w.identifier,
       pid = w.unreliablePid
     }
-
-runMIO :: LoggingT m a -> m a
-runMIO = runStdoutLoggingT
-
-type MIO = LoggingT IO

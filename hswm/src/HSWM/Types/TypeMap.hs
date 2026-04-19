@@ -34,6 +34,13 @@ getObject = do
     (Nothing :: Maybe a) -> error ("getObject: no such object: " ++ show (typeRep (Proxy :: Proxy a)))
     Just x -> return x
 
+getObjectDef :: (Typeable a, Default a, MonadStateGlobal s m) => m a
+getObjectDef = do
+  tm <- asks (view globalTMap) >>= atomically . readTMVar
+  case TM.lookup $ unTypeMap tm of
+    Just x -> return x
+    Nothing -> return def
+
 withTMVar :: (MonadUnliftIO m, MonadLogger m, MonadReader env m) => TMVar s -> (s -> m (a, s)) -> m a
 withTMVar var f = bracketOnError (atomically $ takeTMVar var) (atomically . tryPutTMVar var) $ \s -> do
   (a, s') <- f s
@@ -92,3 +99,23 @@ modifyWlObjects :: (MonadStateGlobal s m) => (TM.TMap -> TM.TMap) -> m ()
 modifyWlObjects f = do
   tmV <- asks (view globalTMap)
   withTMVar tmV $ \s -> return ((), TypeMap . f $ unTypeMap s)
+
+modifyObjectDef :: (Typeable a, Default a, MonadStateGlobal env m) => (a -> a) -> m ()
+modifyObjectDef f = do
+  tmV <- asks (view globalTMap)
+  withTMVar tmV $ \s -> return ((), TypeMap . g $ unTypeMap s)
+    where
+      g tm = flip TM.insert tm $ f $ case TM.lookup tm of
+               Just a -> a
+               Nothing -> def
+
+modifyObjectDef' :: (Typeable a, Default a, MonadStateGlobal env m) => (a -> (b, a)) -> m b
+modifyObjectDef' f = do
+  tmV <- asks (view globalTMap)
+  withTMVar tmV $ \s -> return (g $ unTypeMap s)
+    where
+      g tm =
+        let (r, a') = f $ case TM.lookup tm of
+                           Just a -> a
+                           Nothing -> def
+         in (r, TypeMap $ TM.insert a' tm)

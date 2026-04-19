@@ -3,15 +3,16 @@ module Main (main) where
 import HSWM
 import HSWM.Util.IPC
 import System.IO qualified as IO
+import Data.Text.Lazy.IO qualified as TL
 
 main :: IO ()
 main = do
-  runStdoutLoggingT $ do
+  runStdoutAsTextLoggingT $ do
     logInfo "Connecting..."
 
     let msgHandler = \case
-          StateDumpResponse str -> liftIO $ putStrLn str
-          msg -> liftIO $ print msg
+          StateDumpResponse str -> io $ TL.putStrLn str
+          msg -> io $ print msg
 
     runReaderT (clientRun def msgHandler consoleHandler) ()
   where

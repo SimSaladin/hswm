@@ -317,6 +317,7 @@ handleEvent (PointerEvent e) = Seats.handlePointerEvent e -- Pointer events
 handleEvent (InputManagerEvent e) = InputConfig.handleInputManagerEvent e
 handleEvent (InputDeviceEvent e) = InputConfig.handleInputDeviceEvent e
 handleEvent (LibinputConfigEvent e) = InputConfig.handleLibinputEvent e
+handleEvent (LibinputDeviceEvent e) = InputConfig.handleLibinputDeviceEvent e
 handleEvent (XkbConfigEvent e) = InputConfig.handleXkbConfigEvent e
 handleEvent (XkbKeyboardEvent e) = InputConfig.handleXkbKeyboardEvent e
 
