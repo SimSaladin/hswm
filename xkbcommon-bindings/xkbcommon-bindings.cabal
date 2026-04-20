@@ -20,17 +20,36 @@ library
     import:           warnings
     exposed-modules:
        Text.XkbCommon
-     , Text.XkbCommon.Internal
+     , Text.XkbCommon.FFI
+     , Text.XkbCommon.Registry
     build-depends:
        base ^>=4.21.0.0
      , unix
      , rio
+     , data-default
     hs-source-dirs:   src
     default-language: Haskell2010
     default-extensions:
           OverloadedRecordDot
-    extra-libraries: xkbcommon
+    extra-libraries:
+       xkbcommon
+     , xkbregistry
     build-tool-depends:
-      c2hs:c2hs
-    -- https://github.com/haskell/c2hs/issues/300                                                                    |
-    cpp-options: -std=gnu18
+       hsc2hs:hsc2hs
+
+test-suite spec
+  import: warnings
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Text.XkbCommonSpec
+    , Text.XkbRegistrySpec
+  hs-source-dirs: tests
+  build-depends:
+      base
+    , xkbcommon-bindings
+    , hspec
+    , QuickCheck
+  build-tool-depends:
+    hspec-discover:hspec-discover
+  default-language: Haskell2010

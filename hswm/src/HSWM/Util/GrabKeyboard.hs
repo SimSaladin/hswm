@@ -138,7 +138,7 @@ newGrabIM manager seat = do
 
   imKeyboardGrabListener <- io $ Wlr.mkInputMethodKeyboardGrabListener $ \e -> runInIO $ case e of
     Wlr.InputMethodKeyboardGrabKeymap _ _ _fmt fd size -> do
-      res <- io $ createKeymap'' xkbContext (fi fd) (fi size)
+      res <- io $ createKeymapFromFd xkbContext (fi fd) (fi size) False
       st <- io $ xkbStateNew res
       io $ xkbKeymapUnref res
       writeIORef xkbState st
