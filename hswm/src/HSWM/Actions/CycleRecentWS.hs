@@ -143,7 +143,7 @@ cycleWindowSets genOptions holdMods keyNext keyPrev = do
   Just rs <- asks thisSeat
   Just seat <- runInHS $ lookupSeat rs
   previewWS 0
-  withKeyboardGrab seat holdMods [keyNext, keyPrev] process 0
+  withKeyboardGrab seat (map fi holdMods) [keyNext, keyPrev] process 0
 
 -- | Given an old and a new 'WindowSet', which is __exactly__ one
 -- 'view' away from the old one, restore the workspace order of the

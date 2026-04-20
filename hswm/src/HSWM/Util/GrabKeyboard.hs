@@ -110,8 +110,8 @@ newGrabIM manager seat = do
   active <- newIORef False
   pending_active <- newIORef False
   bcastChan <- newBroadcastTChanIO
-  xkbContext <- io $ xkbContextNew [] -- TODO free
-  xkbState <- newIORef nullPtr -- @XkbState TODO free
+  xkbContext <- io $ xkbContextNew mempty -- TODO free
+  xkbState <- newIORef $ XkbState nullPtr -- @XkbState TODO free
   imKeyboardGrab <- newEmptyMVar
 
   runInIO <- askRunInIO

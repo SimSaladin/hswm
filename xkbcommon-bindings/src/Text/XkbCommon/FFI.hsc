@@ -40,8 +40,8 @@ instance Exception XkbCommonException
 
 -- * KeySym queries
 
-xkbKeysymFromName :: String -> XkbKeysymFlags -> Maybe KeySym
-xkbKeysymFromName name flags = unsafePerformIO $ withCString name $ \c_name ->
+xkbKeysymFromName :: XkbKeysymFlags -> String -> Maybe KeySym
+xkbKeysymFromName flags name = unsafePerformIO $ withCString name $ \c_name ->
   return $! case _xkbKeysymFromName c_name flags of
     0 -> Nothing
     r -> Just r
@@ -55,8 +55,8 @@ xkbKeysymGetName k = unsafePerformIO $ allocaBytes 64 $ \buf ->
 -- ** Unsafe (partial)
 
 -- | Throws 'XkbKeysymNotFound' if the lookup fails.
-xkbKeysymFromNameUnsafe :: String -> XkbKeysymFlags -> KeySym
-xkbKeysymFromNameUnsafe name flags = fromMaybe err $ xkbKeysymFromName name flags where
+xkbKeysymFromNameUnsafe :: XkbKeysymFlags -> String -> KeySym
+xkbKeysymFromNameUnsafe flags name = fromMaybe err $ xkbKeysymFromName flags name where
   err = impureThrow $ XkbKeysymNotFound "xkbKeysymFromNameUnsafe" name
 
 -- | Throws 'XkbKeysymNotFound' if the lookup fails.

@@ -33,6 +33,7 @@ import HSWM.Core
 import Bindings.River qualified as R
 import System.IO.Unsafe
 import Bindings.Wayland.Client qualified as WL
+import Bindings.Wayland.Client.Generated qualified as WL
 
 -- * Usage
 
@@ -193,7 +194,12 @@ drawImage bp OutputState {..} img Surfaces {..} = do
 
   runInIO <- askRunInIO
   io $ V.unsafeWith (JP.imageData img) $ \bits -> alloca $ \t2 -> alloca $ \fTransform -> runInIO $ do
-          pix <- io $ P.pixman_image_create_bits P.PIXMAN_a8r8g8b8 (fi src_w) (fi src_h) (castPtr bits) (fi src_stride)
+
+          let shmFormat = WL.WL_SHM_FORMAT_ABGR8888
+
+          buf <- io $ BP.nextBuffer bp (fi buf_w) (fi buf_h) shmFormat
+
+          pix <- io $ P.pixman_image_create_bits buf.pixmanFormat (fi src_w) (fi src_h) (castPtr bits) (fi src_stride)
 
           -- calculate scale
           let sx' = calculateScale src_w buf_w 1 -- scale
@@ -210,8 +216,6 @@ drawImage bp OutputState {..} img Surfaces {..} = do
           _ <- io $ P.pixman_image_set_transform pix (ConstPtr $ castPtr t2)
 
           _ <- io $ P.pixman_image_set_filter pix P.PIXMAN_FILTER_BEST (ConstPtr nullPtr) 0
-
-          buf <- io $ BP.nextBuffer bp (fi buf_w) (fi buf_h)
 
           -- fill bg
           -- io $ with (P.Pixman_color_t 0 0 0 maxBound) $ \color ->
@@ -243,12 +247,9 @@ deinit = do
   io $ modifyMVar_ ctxMVar $ \ctx -> case ctx.bufferPool of
     Nothing -> return ctx
     Just _ -> do
-      -- return ctx -- XXX: ??
       forM_ ctx.outputsState $ \os -> case os.surfaces of
           Nothing -> return ()
           Just ss -> do
-            -- io $ R.objectDestroy ss.node
-            -- io $ R.objectDestroy ss.rs_surface
             io $ WL.objectDestroy ss.wl_surface
       return ctx {outputsState = mempty}
 

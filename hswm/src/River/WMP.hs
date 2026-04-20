@@ -97,7 +97,7 @@ ppXkbModsKey m ksym =
         ],
       fi x.unwrap .&. m /= 0
     ]
-      ++ [xkbKeysymGetName ksym]
+      ++ [xkbKeysymGetNameUnsafe ksym]
 
 -- * Pointer Binds
 
@@ -120,7 +120,7 @@ newPointerBinding ::
   m (StablePtr (PointerBinding a))
 newPointerBinding pointerBindingListener seat mods btn action = do
   logInfo $ "new pointer binding" :# [ "key" .= ppXkbModsKey mods btn, "action" .= show action ]
-  pb' <- io $ R.riverSeatGetPointerBinding seat (fi btn) (WL.toCEnum mods)
+  pb' <- io $ R.riverSeatGetPointerBinding seat (fi btn) (WL.toCEnum $ fi mods)
   dtPtr <- io $ newStablePtr $ PointerBinding pb' seat action
   io $ R.listenerAdd pb' pointerBindingListener (castPtr $ castStablePtrToPtr dtPtr)
   _ <- liftIO $ R.riverPointerBindingEnable pb'

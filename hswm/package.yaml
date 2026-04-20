@@ -75,33 +75,34 @@ library:
       name: hswm:hswm-prelude
       mixin:
         - (HSWM.Prelude as Prelude)
+    - JuicyPixels ^>=3.3.9
+    - aeson
+    - bytestring ^>=0.12.2
     - containers ^>=0.7
     - data-default ^>=0.8.0
-    - derive-storable
-    - utf8-string
-    - pretty-simple
-    - text
-    - transformers
-    - typerep-map
-    - unix
-    - hswm-bindings # Generated C bindings
-    - directory
-    - vector
-    - JuicyPixels ^>=3.3.9
-    - network
-    - bytestring ^>=0.12.2
-    - aeson
     - deepseq
-    - mtl
-    - stm
-    - process
-    - typed-process
-    - xkbcommon-bindings
-    - time
-    - unbounded-delays
+    - derive-storable
+    - directory
     - fast-logger
+    - hswm-bindings # Generated C bindings
+    - mtl
+    - network
+    - optparse-generic ^>=1.5
+    - pretty-simple
+    - process
+    - stm
+    - text
+    - time
+    - transformers
+    - typed-process
+    - typerep-map
+    - unbounded-delays
+    - unix
+    - utf8-string
+    - vector
+    - xkbcommon-bindings
   build-tools:
-    - c2hs:c2hs  # Note: may need to "cabal update for this to start working
+    - hsc2hs:hsc2hs
 
 executables:
   hswm:
@@ -128,6 +129,13 @@ executables:
       - base
       - hswm
       - text
+      - bytestring
+      - time
+      - haskeline
+      - monad-logger-aeson
+      - aeson
+      - prettyprinter
+      - prettyprinter-ansi-terminal
     ghc-options:
       - *common-ghc-options
       - -threaded

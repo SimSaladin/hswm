@@ -29,7 +29,7 @@ library
           QuantifiedConstraints
     ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -Wno-ambiguous-fields
     build-tool-depends:
-          c2hs:c2hs
+          hsc2hs:hsc2hs
     other-modules:
           PackageInfo_hswm
     exposed-modules:
@@ -109,6 +109,7 @@ library
         , hswm:hswm-prelude
         , mtl
         , network
+        , optparse-generic ==1.5.*
         , pretty-simple
         , process
         , rio
@@ -204,7 +205,14 @@ executable hswmctl
           QuantifiedConstraints
     ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -Wno-ambiguous-fields -threaded
     build-depends:
-          base
+          aeson
+        , base
+        , bytestring
+        , haskeline
         , hswm
+        , monad-logger-aeson
+        , prettyprinter
+        , prettyprinter-ansi-terminal
         , text
+        , time
     default-language: GHC2024

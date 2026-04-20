@@ -2,12 +2,12 @@
 
 module HSWM.XKB
   ( module HSWM.XKB,
-    module Text.XkbCommon.Internal,
+    module Text.XkbCommon,
   )
 where
 
 import Foreign.C
-import Text.XkbCommon.Internal
+import Text.XkbCommon
 
 -- * Linux evdev codes
 
@@ -27,4 +27,4 @@ class IsKeySym a where
 instance IsKeySym KeySym where toKeySym = id
 
 -- | NOTE: this throws impure exception on invalid keysym names!
-instance IsKeySym String where toKeySym = xkbKeysymFromName
+instance IsKeySym String where toKeySym = fromMaybe 0xffffffff . xkbKeysymFromName xkbKeysymCaseInsensitive
