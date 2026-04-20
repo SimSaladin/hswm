@@ -15,10 +15,21 @@ import Data.List qualified as L
 import System.Process.Typed
 import System.IO (readFile, appendFile)
 
+-- [ "-modi", "clipboard:cliphist-rofi-img", "-show", "clipboard", "-show-icons" ]
+
 data RofiPromptConfig
   = RofiPromptConfig
-  { -- | @-dmenu@ - use rofi-dmenu mode.
+    {
+    -- | @-modes@
+    _modes :: String,
+    -- | @-show@
+    _show :: String,
+    -- | @-show-icons@
+    showIcons :: Bool,
+    -- | @-dmenu@ - use rofi-dmenu mode.
     _dmenu :: Bool,
+    -- | @-modi@ e.g. @"clipboard:cliphist-rofi-img"@
+    _modi :: String,
     -- | @-p Prompt:@
     _prompt :: String,
     -- | @ -mesg @. Supports Pango markup.
@@ -44,6 +55,16 @@ data RofiPromptConfig
 
 type MonadRofi env m = (MonadUnliftIO m, MonadReader env m, MonadLogger m)
 
+-- | Launch the prompt without reading output.
+rofiLaunch :: (MonadRofi env m) => RofiPromptConfig -> m ()
+rofiLaunch rp = do
+  _p <- startProcess $
+      setStdin nullStream $
+      setStdout nullStream $
+      rofiToProc rp
+  return ()
+
+-- | Launch a prompt and read the output.
 rofiRun :: (MonadRofi env m) => RofiPromptConfig -> [String] -> m (Maybe String)
 rofiRun pcfg input = do
   input' <- rofiHistoryInput pcfg input
@@ -93,7 +114,11 @@ rofiToProc pcfg =
 toRofiArgs :: RofiPromptConfig -> [String]
 toRofiArgs RofiPromptConfig {..} =
   join $
-    [["-dmenu"] | _dmenu]
+    [["-modes", _modes] | _modes /= ""]
+      ++ [["-modi", _modi] | _modi /= ""]
+      ++ [["-show", _show] | _show /= ""]
+      ++ [["-show-icons"] | showIcons]
+      ++ [["-dmenu"] | _dmenu]
       ++ [["-dpi", show _dpi] | _dpi /= 0]
       ++ [["-l", show _lines] | _lines > 0]
       ++ [["-p", _prompt] | _prompt /= ""]

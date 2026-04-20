@@ -7,8 +7,8 @@ spec :: Spec
 spec = do
   describe "XkbContext" $ do
     it "xkbkeysymFromName" $ do
-      xkbKeysymFromNameUnsafe "a" mempty `shouldBe` 97
-      xkbKeysymFromNameUnsafe "Return" mempty `shouldBe` 65293
+      xkbKeysymFromNameUnsafe mempty "a" `shouldBe` 97
+      xkbKeysymFromNameUnsafe mempty "Return" `shouldBe` 65293
 
     it "xkbkeysymGetName" $ do
       xkbKeysymGetNameUnsafe 97 `shouldBe` "a"

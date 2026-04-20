@@ -17,8 +17,11 @@
   };
 
   outputs = inputs@{ self, nixpkgs, flake-utils, ... }:
+
   inputs.flake-parts.lib.mkFlake { inherit inputs; } {
+
     systems = [ "x86_64-linux" "aarch64-linux" ];
+
     imports = [
       inputs.haskell-flake.flakeModule
     ];
@@ -61,6 +64,8 @@
             # roll our own for now because the nixpkgs one is rather old and lacks
             # features (the wm protocol etc.)
             river = final.callPackage ./river/package.nix { };
+
+            xkbregistry = final.libxkbcommon;
           })
           inputs.hs-bindgen.overlays.default
         ];
