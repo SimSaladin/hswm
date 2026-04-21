@@ -40,6 +40,7 @@ foreign import ccall unsafe "fcntl" _fcntl :: Fd -> CUInt -> CUInt -> IO CInt
 foreign import ccall unsafe "munmap" _munmap :: Ptr Void -> CSize -> IO CInt
 foreign import ccall unsafe "mmap" _mmap :: Ptr Void -> CSize -> CUInt {- prot -} -> CUInt {- flags -} -> Fd {- fildes -} -> CSize {- offset -} -> IO (Ptr Void)
 foreign import ccall unsafe "poll" _poll :: Ptr PollFd -> CULong -> CInt -> IO CInt
+foreign import ccall unsafe "close_range" _close_range :: CUInt -> CUInt -> CInt -> IO CInt
 
 -- | @newMemFd name@
 newMemFd :: String -> IO Fd
@@ -101,3 +102,21 @@ poll pfd npfd to = do
   where
     asPollTimeout PollBlock = -1
     asPollTimeout (PollWaitMs i) = fi i
+
+-- * GNU extras
+
+-- | Close a range of file descriptors (efficiently).
+--
+-- @
+--   closeRange 0 maxBound False True
+-- @
+closeRange :: Integral i
+           => i -- ^ First fd to close
+           -> i -- ^ Last fd (max)
+           -> Bool -- ^ Don't close, just set CLOEXEC?
+           -> Bool -- ^ Unshare the fds before closing?
+           -> IO ()
+closeRange first last cloexec unshare =
+  throwErrnoIfMinus1_ "close_range" $ _close_range (fi first) (fi last) $
+    (if cloexec then #{const CLOSE_RANGE_CLOEXEC} else 0) .|.
+    (if unshare then #{const CLOSE_RANGE_UNSHARE} else 0)

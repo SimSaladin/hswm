@@ -625,3 +625,9 @@ instance Show (Async a) where
 instance Show (StablePtr a) where
   show :: StablePtr a -> String
   show _ = "<SP>"
+
+instance Default R.RiverInputDevice where
+  def = R.RiverInputDevice nullPtr
+
+instance Default WL.Array where
+  def = WL.Array nullPtr

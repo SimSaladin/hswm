@@ -72,7 +72,6 @@ bindGlobalAuto = bindGlobalWith (WL.objectInterfaceName proxy, fi $ WL.objectInt
       proxy :: Proxy a
       proxy = Proxy
 
-
 bindGlobalWith :: (Typeable a, MonadUnliftIO m, MonadThrow m, MonadLogger m, MonadReader env m,
                    HasGlobalsRegistry env, HasGlobalTMap env, WL.AddListener a)
                => InterfaceVersion
@@ -122,7 +121,6 @@ handleRegistryEvent ref (WL.RegistryGlobalRemove _ _ name) = do
   removeGlobal name_ r = r {objects = L.filter (\o -> name_ /= o.name) r.objects}
 
 -- * Callbacks
-
 
 -- | Wait for a callback to trigger.
 callbackWait_ :: MonadIO m => WL.Callback -> m ()

@@ -114,6 +114,7 @@ executables:
       - hswm
       - hswm-bindings
       - containers
+      - bytestring
     ghc-options:
       - *common-ghc-options
       - -threaded

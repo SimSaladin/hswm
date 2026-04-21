@@ -6,6 +6,7 @@
 
 module Main (main) where
 
+import Data.ByteString.Lazy.Char8 qualified as BLC8
 import Data.List qualified as L
 import Data.Map qualified as M
 import HSWM
@@ -81,11 +82,15 @@ myScratchpads =
     mhd = doRFRR 0.2 0.1 0.6 0.6
     doRFRR x y w h = doRectFloat (W.RationalRect x y w h)
 
+spawnOnceKitty :: ScratchpadId -> String -> [String] -> ManageHook -> SomeAction H
+spawnOnceKitty name prog args mh = toggleScratchpad' True sp <?> "Spawn " <> name
+  where
+    sp = mkPad name mh (appName =? name) $
+      void $ spawnProcess "kitty" $ ["--app-id=" ++ name, "--detach", "--", prog ] ++ args
+
 rofiPrompt :: RP.RofiPromptConfig
-rofiPrompt =
-  def
+rofiPrompt = def
     { RP._dmenu = True,
-      RP._prompt = "Choose thing",
       RP._markupRows = True
    --   RP._dpi = 150 -- for X
     }
@@ -94,7 +99,8 @@ environPrompt :: H ()
 environPrompt = do
   varsEnv <- io ENV.getEnvironment
 
-  varsSessionString <- readProcess "systemctl" ["--user", "--no-block", "--no-pager", "show-environment"]
+  (_, varsSessionBS, _) <- readProcess $ proc "systemctl" ["--user", "--no-block", "--no-pager", "show-environment"]
+  let varsSessionString = BLC8.unpack varsSessionBS
   let varsSession = map parseLine $ lines varsSessionString
 
       varsMap = M.unionWith (\(e1, s1) (e2, s2) -> (e1 <|> e2, s1 <|> s2))
@@ -167,7 +173,9 @@ windowPrompt = do
       runInHS $ windows $ W.focusWindow rw
       manageDirty
 
-mkWorkspacePrompt :: (RP.RofiPromptConfig -> WorkspaceId -> RP.RofiPromptConfig) -> (WorkspaceId -> String -> H a) -> H ()
+mkWorkspacePrompt :: (RP.RofiPromptConfig -> WorkspaceId -> RP.RofiPromptConfig)
+                  -> (WorkspaceId -> String -> H a)
+                  -> H ()
 mkWorkspacePrompt prompt apply = do
   (curTag, allTags) <- runInHS $ withWindowSet $ return . (W.currentTag &&& W.allTags)
   RP.rofiRun (prompt rofiPrompt curTag) allTags >>= (`whenJust` doApply curTag)
@@ -218,10 +226,7 @@ myManageHook :: Query (Endo WindowSet)
 myManageHook =
   composeOne
     [ managePads
-    -- , appName =? "gimp" <&&> wTitle =? "GIMP Startup" -?> doCenterFloat
     ]
-      where
-        doCenterFloat = doRectFloat $ W.RationalRect (1/3) (1/3) (1/5) (1/5)
 
 myLayoutHook :: _
 myLayoutHook =
@@ -242,94 +247,94 @@ myLayoutHook =
 myKeys :: [(String, SomeAction H)]
 myKeys =
   -- ====== Core ==========
-  [ ("M-S-c", "Close the focused window" $?$?= withFocused manageKill),
-    ("M-S-q", "Restart WM" $?$?= sendRestart @H),
-    ("M-Return", "New terminal window" $?$?= SomeAction @H (LaunchProgram "kitty" [])), -- Terminal
-    ("M-Escape", "Print debug stack" $?$?= debugAction),
-    ("M-Dollar", "Lock session" $?$?= void (spawnProcess @H "swaylock" ["-k"])),
-    ("M-Print", "Screenshot" $?$?= void (spawnProcess @H "sh" ["-c", "grim -g \"$(slurp)\""])),
+  [ ("M-S-c",     "Close the focused window" <??> withFocused manageKill),
+    ("M-q",       "Restart WM" <??> sendRestart @H),
+    ("M-Return",  "New terminal window" <??> void (spawnProcess @H "kitty" [])),
+    ("M-Escape",  "Print debug stack" <??> debugAction),
+    ("M-Dollar",  "Lock session" <??> void (spawnProcess @H "swaylock" ["-k"])),
+    ("M-Print",   "Screenshot" <??> void (spawnProcess @H "sh" ["-c", "grim -g \"$(slurp)\""])),
     -- "M-r M-S-c"     cmdT @"Signal process (SIGKILL) of focused window (_NET_WM_PID)" (withFocused (signalProcessBy Posix.sigKILL))
-    -- "M-q"           myRecompileRestart False True ? "Recompile && Restart"
-    -- "M-C-q"         myRecompileRestart True False ? "Recompile (force)"
     -- "M-S-<Return>"  FloatNext.floatNext True >> spawnTerm def "" ? "Terminal (floating)"
     -- "M-<F1>" `CF.key'` helpCmd
-    ("M-F3", "" $?$?= (`whenJust` setKeyboardKeymaps (const True)) =<< asks (xkbLayout . config)),
-    ("M-F4", "" $?$?= setKeyboardKeymaps (const True) (keymapFromString "us")),
+    --("M-F3", "" <??> (`whenJust` setKeyboardKeymaps (const True)) =<< asks (xkbLayout . config)),
+    --("M-F4", "" <??> setKeyboardKeymaps (const True) (keymapFromString "us")),
 
     -- ======== Execute ==========
-    ("M-r r", "Run shell (prompt)" $?$?= RP.rofiLaunch @_ @H def { RP._modes = "run", RP._show = "run" }),
-    ("M-r d", "Run desktop app (prompt)" $?$?= RP.rofiLaunch @_ @H def { RP._modes = "drun", RP._show = "drun" }),
-    ("M-r s", "Run via systemd-run (prompt)" $?$?= RP.rofiRun @_ @H def { RP.history = Just "systemd-run", RP._prompt = "systemd-run", RP._dmenu = True } [] RP.++> RP.runWithSystemD),
-    ("M-r c", "Open cliphist prompt" $?$?= RP.rofiLaunch @_ @H def { RP._modi = "clipboard:cliphist-rofi-img", RP._show = "clipboard", RP.showIcons = True }),
-    -- "M-r b"            >+ spawnDialog "bluetoothctl" ? "bluetoothctl"
+    ("M-r r", "Run shell (prompt)" <??> RP.rofiLaunch @_ @H def { RP._modes = "run", RP._show = "run" }),
+    ("M-r d", "Run desktop app (prompt)" <??> RP.rofiLaunch @_ @H def { RP._modes = "drun", RP._show = "drun" }),
+    ("M-r s", "Run via systemd-run (prompt)" <??> RP.rofiRun @_ @H def { RP.history = Just "systemd-run", RP._prompt = "systemd-run", RP._dmenu = True } [] RP.++> RP.runWithSystemD),
+    ("M-r c", "Open cliphist prompt" <??> RP.rofiLaunch @_ @H def { RP._modi = "clipboard:cliphist-rofi-img", RP._show = "clipboard", RP.showIcons = True }),
+    ("M-r b", spawnOnceKitty "bluetoothctl@kitty" "bluetoothctl" [] (doCenterFloat (3/5) (2/3))),
+
     -- "M-r f"            >+ spawnOnceKitty "fself" "bash" ["-lic", "fself"] doCenterFloat
     --   -- spawnDialog ("bash", ["-ic", "fself"]) ? "FZF multi-prompt"
     -- "M-r a" >+ spawn "dmenu_autorandr" ? "autorandr (menu)"
 
     -- ===== Screens =====
-    ("M-C-Right", "Focus previous screen" $?$?= CycleWS.nextScreen),
-    ("M-C-Left", "Focus next screen" $?$?= CycleWS.prevScreen)
+    ("M-C-Right", "Focus previous screen" <??> CycleWS.nextScreen),
+    ("M-C-Left",  "Focus next screen" <??> CycleWS.prevScreen)
   ]
-    ++ [("M-" ++ key, ("View screen " ++ show i) $?$?= PScreen.viewScreen def i) | (key, i) <- screenKeysScreens]
-    ++ [("M-S-" ++ key, ("Send window to screen " ++ show i) $?$?= PScreen.sendToScreen def i) | (key, i) <- screenKeysScreens]
-    ++ [("M-M1-" ++ key, ("Send workspace to screen " ++ show i) $?$?= sendFocusedWorkspaceToScreen OnScreen.FocusCurrent i) | (key, i) <- screenKeysScreens]
-    ++ [("M-C-" ++ key, ("Send workspace to screen and focus it " ++ show i) $?$?= sendFocusedWorkspaceToScreen OnScreen.FocusNew i) | (key, i) <- screenKeysScreens]
+    ++ [("M-" ++ key,    "View screen " ++ show i <??> PScreen.viewScreen def i) | (key, i) <- screenKeysScreens]
+    ++ [("M-S-" ++ key,  "Send window to screen " ++ show i <??> PScreen.sendToScreen def i) | (key, i) <- screenKeysScreens]
+    ++ [("M-M1-" ++ key, "Send workspace to screen " ++ show i <??> sendFocusedWorkspaceToScreen OnScreen.FocusCurrent i) | (key, i) <- screenKeysScreens]
+    ++ [("M-C-" ++ key,  "Send workspace to screen and focus it " ++ show i <??> sendFocusedWorkspaceToScreen OnScreen.FocusNew i) | (key, i) <- screenKeysScreens]
+
     -- ===== Workspaces =====
-    ++ [("M-SemiColon " ++ key, ("View workspace " ++ show i) $?$?= DWO.withNthWorkspace W.view i) | (key, i) <- tagKeysTags]
-    ++ [("M-S-SemiColon " ++ key, ("Shift to workspace " ++ show i) $?$?= DWO.withNthWorkspace W.shift i) | (key, i) <- tagKeysTags]
-    ++ [ ("M-y", "Cycle recent hidden tags" $?$?= cycleRecentHiddenWS [4, 8, 64] 121 112),
-         ("M-S-n", "Shift current tag (forwards)" $?$?= DWO.swapWith Next CycleWS.anyWS), -- XXX: save workspace order?
-         ("M-S-p", "Shift current tag (backwards)" $?$?= DWO.swapWith Prev CycleWS.anyWS),
-         ("M-g r", "Rename workspace (prompt)" $?$?= renameWorkspacePrompt),
-         ("M-g n", "Add workspace (prompt)" $?$?= addWorkspacePrompt),
-         ("M-g g", "Go to workspace (prompt)" $?$?= workspacePrompt),
-         ("M-g d", "Remove focused workspace" $?$?= removeFocusedWorkspace),
-         ("M-g f", "Go to window" $?$?= windowPrompt)
+    ++ [("M-SemiColon " ++ key,    "View workspace " ++ show i <??> DWO.withNthWorkspace W.view i) | (key, i) <- tagKeysTags]
+    ++ [("M-S-SemiColon " ++ key,  "Shift to workspace " ++ show i <??> DWO.withNthWorkspace W.shift i) | (key, i) <- tagKeysTags]
+    ++ [ ("M-y",   "Cycle recent hidden tags" <??> cycleRecentHiddenWS [4, 8, 64] 121 112),
+         ("M-S-n", "Shift current tag (forwards)" <??> DWO.swapWith Next CycleWS.anyWS), -- XXX: save workspace order?
+         ("M-S-p", "Shift current tag (backwards)" <??> DWO.swapWith Prev CycleWS.anyWS),
+         ("M-g r", "Rename workspace (prompt)" <??> renameWorkspacePrompt),
+         ("M-g n", "Add workspace (prompt)" <??> addWorkspacePrompt),
+         ("M-g g", "Go to workspace (prompt)" <??> workspacePrompt),
+         ("M-g d", "Remove focused workspace" <??> removeFocusedWorkspace),
+         ("M-g f", "Go to window" <??> windowPrompt)
          -- ( "M-g m"    "Shift to tag: "       ?+ (defile . shift) ? "Move window to this tag (XP)"
        ]
     ++
     -- ====== Layout
-    [ ("M-Space",       "Layout: " $?$?= NextLayout),
-      ("M-Shift-Space", "Layout: " $?$?= FirstLayout),
-      ("M-C-Space",     "Layout: Reset" $?$?= (asks (layoutHook . config) >>= setLayout)),
-      ("M-Comma",       "Layout: " $?$?= IncMasterN (-1)),
-      ("M-Period",      "Layout: " $?$?= IncMasterN 1),
-      ("M-x",           "Layout: " $?$?= Shrink),
-      ("M-S-x",         "Layout: " $?$?= Expand),
-      ("M-b t",         "Toggle NonExcl. Area" $?$?= NEArea.ToggleNonExclusiveArea),
-      ("M-m",           "Maximize Restore" $?$?= withFocused (sendMessage . L.Maximize.maximizeRestore . river_window)),
-      ("M-b b",         "Toggle NOBORDERS" $?$?= sendMessage (Toggle NOBORDERS)),
-      ("M-b m",         "Toggle MIRROR" $?$?= sendMessage (Toggle MIRROR)),
-      ("M-b f",         "Toggle NBFULL" $?$?= sendMessage (Toggle NBFULL)),
+    [ ("M-Space",       "Layout: " <??> NextLayout),
+      ("M-Shift-Space", "Layout: " <??> FirstLayout),
+      ("M-C-Space",     "Layout: Reset" <??> (asks (layoutHook . config) >>= setLayout)),
+      ("M-Comma",       "Layout: " <??> IncMasterN (-1)),
+      ("M-Period",      "Layout: " <??> IncMasterN 1),
+      ("M-x",           "Layout: " <??> Shrink),
+      ("M-S-x",         "Layout: " <??> Expand),
+      ("M-b t",         "Toggle NonExcl. Area" <??> NEArea.ToggleNonExclusiveArea),
+      ("M-m",           "Maximize Restore" <??> withFocused (sendMessage . L.Maximize.maximizeRestore . river_window)),
+      ("M-b b",         "Toggle NOBORDERS" <??> sendMessage (Toggle NOBORDERS)),
+      ("M-b m",         "Toggle MIRROR" <??> sendMessage (Toggle MIRROR)),
+      ("M-b f",         "Toggle NBFULL" <??> sendMessage (Toggle NBFULL)),
       --   "M-b x"       >+ toggle1 REFLECTX
       --   "M-b y"       >+ toggle1 REFLECTY
       --   "M-b s"       >+ ToggleScreenSpacing :>> ToggleWindowSpacing
       --   "M-b l"       >+ msgT Magnifier.Toggle
-      ("M-b M-x",       "Toggle struts/border/spacing" $?$?= (sendMessage NEArea.ToggleNonExclusiveArea >> sendMessage (Toggle NOBORDERS) {-ToggleScreenSpacing :>> ToggleWindowSpacing -})),
+      ("M-b M-x",       "Toggle struts/border/spacing" <??> (sendMessage NEArea.ToggleNonExclusiveArea >> sendMessage (Toggle NOBORDERS) {-ToggleScreenSpacing :>> ToggleWindowSpacing -})),
 
       -- ======= Layout: BSP
-      ("M-C-y",       "BSP: Select Node" $?$?= BSP.SelectNode),
-      ("M-C-p",       "BSP: Move Node" $?$?= BSP.MoveNode),
-      ("M-C-u",       "BSP: Focus Parent" $?$?= BSP.FocusParent),
-      ("M-C-r",       "BSP: Rotate" $?$?= BSP.Rotate),
-      ("M-C-equal",   "BSP: Equalize" $?$?= BSP.Equalize),
-      ("M-C-Exclam",  "BSP: Balance" $?$?= BSP.Balance) ]
-    ++[("M-C-" ++ key, "BSP: Expand Towards" $?$?= BSP.ExpandTowards dir) | (key, dir) <- directions2D ]
+      ("M-C-y",       "BSP: Select Node" <??> BSP.SelectNode),
+      ("M-C-p",       "BSP: Move Node" <??> BSP.MoveNode),
+      ("M-C-u",       "BSP: Focus Parent" <??> BSP.FocusParent),
+      ("M-C-r",       "BSP: Rotate" <??> BSP.Rotate),
+      ("M-C-equal",   "BSP: Equalize" <??> BSP.Equalize),
+      ("M-C-Exclam",  "BSP: Balance" <??> BSP.Balance) ]
+    ++[("M-C-" ++ key, "BSP: Expand Towards" <??> BSP.ExpandTowards dir) | (key, dir) <- directions2D ]
 
       -- ====== Window =============
-    ++ [("M-" ++ key, "Focus window direction" $?$?= sendMessage (L.WNavigation.Go dir)) | (key, dir) <- zip ["k", "j", "l", "h"] [minBound .. maxBound @Direction2D]]
-    ++ [("M-S-" ++ key, "Swap window in direction" $?$?= sendMessage (L.WNavigation.Swap dir)) | (key, dir) <- zip ["k", "j", "l", "h"] [minBound .. maxBound @Direction2D]]
-    ++ [ ("M-n", "Focus down" $?$?= windows W.focusDown),
-         ("M-p", "Focus up" $?$?= windows W.focusUp),
-         ("M-b f", "Toggle fullscreen (focused)" $?$?= withFocused (doManage WToggleFullscreen)),
-         ("M-f f", "Float (focused)" $?$?=
+    ++ [("M-" ++ key,   "Focus window direction" <??> sendMessage (L.WNavigation.Go dir)) | (key, dir) <- zip ["k", "j", "l", "h"] [minBound .. maxBound @Direction2D]]
+    ++ [("M-S-" ++ key, "Swap window in direction" <??> sendMessage (L.WNavigation.Swap dir)) | (key, dir) <- zip ["k", "j", "l", "h"] [minBound .. maxBound @Direction2D]]
+    ++ [ ("M-n",        "Focus down" <??> windows W.focusDown),
+         ("M-p",        "Focus up" <??> windows W.focusUp),
+         ("M-b f",      "Toggle fullscreen (focused)" <??> withFocused (doManage WToggleFullscreen)),
+         ("M-f f",      "Float (focused)" <??>
            withFocused (\w -> modifyWindowSet (\ws ->
              W.float w.river_window (rationalRectIn (Rectangle w.x w.y (fi w.width) (fi w.height)) (screenRect $ W.screenDetail $ W.current ws)) ws
                                               ))),
-         ("M-f s", "Sink (focused)" $?$?= withFocused (\w -> modifyWindowSet (W.sink w.river_window))),
-         ("M-Exclam", "Toggle tmux PAD" $?$?= togglePad "tmux-0"),
-         ("M-Slash", "Toggle dynamic PAD" $?$?= togglePad "dynamic"),
-         -- ("M-Tab",  "Cycle PADs" $?$?= cyclePads),
+         ("M-f s",      "Sink (focused)" <??> withFocused (\w -> modifyWindowSet (W.sink w.river_window))),
+         ("M-Exclam",   "Toggle tmux PAD" <??> togglePad "tmux-0"),
+         ("M-Slash",    "Toggle dynamic PAD" <??> togglePad "dynamic"),
+         -- ("M-Tab",  "Cycle PADs" <??> cyclePads),
          -- "M-f "      >>+ directions2D >++> flip SnapMove   Nothing
          -- "M-f S-"    >>+ directions2D >++> flip SnapGrow   Nothing
          -- "M-f C-"    >>+ directions2D >++> flip SnapShrink Nothing
@@ -352,32 +357,32 @@ myKeys =
          -- "M-f h"     >+ pidPrompt xpConfig "SpawnOn/PPID" ?+ (\p -> wsPromptWithCurrent xpConfig "Shift to:" ?+ setManageByPPID p) ? "SpawnOn by Window PID"
 
          -- ====== Media
-         ("M-plus", volume 3),
-         ("M-minus", volume (-3)),
-         ("M-numbersign", "Toggle ncmpcpp" $?$?= togglePad "ncmpcpp"),
-         ("M-c n", mpc ["next"]),
-         ("M-c p", mpc ["prev"]),
-         ("M-c t", mpc ["toggle"]),
-         ("M-c y", mpc ["single", "once"]),
-         ("M-c r", mpc ["random"]),
-         ("M-c plus", mpc ["volume", "+3"]),
-         ("M-c minus", mpc ["volume", "-3"]),
-         ("XF86AudioPlay", mpc ["toggle"]),
-         ("XF86AudioStop", mpc ["stop"]),
-         ("XF86AudioPrev", mpc ["prev"]),
-         ("XF86AudioNext", mpc ["next"]),
-         ("XF86AudioMute", toggleMuteSink),
-         ("XF86AudioMicMute", toggleMuteSource),
-         ("XF86AudioRaiseVolume", volume 3),
-         ("XF86AudioLowerVolume", volume (-3)),
-         --"XF86MonBrightnessUp", backlight   2
-         --"XF86MonBrightnessDown", backlight (-2)
-         --("M-c s", "Toggle speakers-phones output" spawn "sink-switch" -- uses a custom script in ~/bin
+         ("M-plus",                volume 3),
+         ("M-minus",               volume (-3)),
+         ("M-numbersign",          togglePad "ncmpcpp" <?> "Toggle ncmpcpp"),
+         ("M-c n",                 mpc ["next"]),
+         ("M-c p",                 mpc ["prev"]),
+         ("M-c t",                 mpc ["toggle"]),
+         ("M-c y",                 mpc ["single", "once"]),
+         ("M-c r",                 mpc ["random"]),
+         ("M-c plus",              mpc ["volume", "+3"]),
+         ("M-c minus",             mpc ["volume", "-3"]),
+         ("XF86AudioPlay",         mpc ["toggle"]),
+         ("XF86AudioStop",         mpc ["stop"]),
+         ("XF86AudioPrev",         mpc ["prev"]),
+         ("XF86AudioNext",         mpc ["next"]),
+         ("XF86AudioMute",         toggleMuteSink),
+         ("XF86AudioMicMute",      toggleMuteSource),
+         ("XF86AudioRaiseVolume",  volume 3),
+         ("XF86AudioLowerVolume",  volume (-3)),
+         ("XF86MonBrightnessUp",   backlight ["set", "2%+"]),
+         ("XF86MonBrightnessDown", backlight ["set", "2%-"]),
+         ("M-c s",                 spawnProcess @H "sink-switch" [] <?> "Toggle speakers-phones output"),
+         ("M-c m",                 spawnOnceKitty "pulsemixer@kitty" "pulsemixer" [] (doCenterFloat (1/2) (2/3))),
          --   "M-@"                     >+ togglePad "taskwarrior-tui"
-         --   "M-c m"                   >+ spawnOnceKitty "Pulsemixer" "pulsemixer" [] doCenterFloat
 
          -- ===== "Prompts (Execute)"
-         ("M-r e", "Environment prompt" $?$?= environPrompt)
+         ("M-r e", "Environment prompt" <??> environPrompt)
          --   "M-r p"   >+ XP.Pass.passPrompt xpConfig          ? "Pass (Prompt)"
          --   "M-r C-p" >+ XP.Pass.passOTPPrompt xpConfig       ? "Pass OTP (Prompt)"
          --   "M-r C-u" >+ XP.Pass.passPromptWith "show-field --clip username" xpConfig ? "Pass username (Prompt)"
@@ -396,15 +401,18 @@ myKeys =
 
 myPointerBinds :: [((String, Button), SomeAction H)]
 myPointerBinds =
-  [ (("M", _BTN_LEFT), namedAS "Move" $ startSeatOp SEAT_OP_MOVE),
-    (("M", _BTN_RIGHT), namedAS "Stretch" $ startSeatOp SEAT_OP_RESIZE)
+  [ (("M", _BTN_LEFT),  "Move window" <??> startSeatOp SEAT_OP_MOVE),
+    (("M", _BTN_RIGHT), "Resize (stretch) window" <??> startSeatOp SEAT_OP_RESIZE)
   ]
 
+backlight :: [String] -> SomeAction H
+backlight args = spawnProcess @H "brightnessctl" ("--machine-readable" : args) <?> "Display brightness: " ++ unwords args
+
 pactl :: [String] -> SomeAction H
-pactl args = unwords ("[PULSE]" : args) $?$?= void (spawnProcess @H "pactl" args)
+pactl args = spawnProcess @H "pactl" args <?> "Audio: " ++ unwords args
 
 mpc :: [String] -> SomeAction H
-mpc args = printf "MPD: %s" (unwords args) $?$?= void (spawnProcess @H "mpc" args)
+mpc args = spawnProcess @H "mpc" args <?> "MPD: " ++ unwords args
 
 volume :: Int -> SomeAction H
 volume d = pactl ["set-sink-volume", "@DEFAULT_SINK@", printf "%+i%%" d]
@@ -415,19 +423,8 @@ toggleMuteSource = pactl ["set-source-mute", "@DEFAULT_SOURCE@", "toggle"]
 toggleMuteSink :: SomeAction H
 toggleMuteSink = pactl ["set-sink-mute", "@DEFAULT_SINK@", "toggle"]
 
--- * Utilities
-
-infixr 1 $?$?=
-($?$?=) :: (IsKeyAction a) => String -> a -> SomeAction H
-desc $?$?= action = toKeyAction desc action
-
-class IsKeyAction a where
-  toKeyAction :: String -> a -> SomeAction H
-
-instance {-# OVERLAPPABLE #-} IsKeyAction (H ()) where toKeyAction = namedA
-
-instance {-# OVERLAPPABLE #-} IsKeyAction (HS ()) where toKeyAction = namedAS
-
-instance {-# OVERLAPPABLE #-} IsKeyAction (SomeAction H) where toKeyAction d a = SomeAction $ NamedAction d a
-
-instance {-# OVERLAPPABLE #-} (Message a, Show a) => IsKeyAction a where toKeyAction d a = SomeAction $ NamedActionHS (d ++ show a) (sendMessage a)
+spawnProcess :: MonadProcessSpawn m => String -> [String] -> m ()
+spawnProcess prog args = void . async $ runProcess $
+  setCloseFds True $
+  setNewSession True $
+  proc prog args

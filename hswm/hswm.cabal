@@ -78,6 +78,7 @@ library
           HSWM.Util.Minimize
           HSWM.Util.NamedScratchpad
           HSWM.Util.Posix
+          HSWM.Util.Process
           HSWM.Util.Rectangle
           HSWM.Util.RofiPrompt
           HSWM.Util.Stack
@@ -167,6 +168,7 @@ executable hswm
           Paths_hswm
     build-depends:
           base
+        , bytestring
         , containers
         , hswm
         , hswm-bindings

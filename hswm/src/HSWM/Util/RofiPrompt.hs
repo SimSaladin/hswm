@@ -12,10 +12,18 @@ import HSWM hiding (readProcess)
 import Data.ByteString.Char8 qualified as C8
 import Data.ByteString.Lazy qualified as LB
 import Data.List qualified as L
-import System.Process.Typed
+import System.Process.Typed as PT
 import System.IO (readFile, appendFile)
 
--- [ "-modi", "clipboard:cliphist-rofi-img", "-show", "clipboard", "-show-icons" ]
+signalTest :: H ()
+signalTest = do
+  void $ PT.readProcess $
+   PT.setCreateGroup True $
+   PT.setNewSession True $
+   PT.setCloseFds True $
+    PT.proc "sleep" ["1000"]
+
+type MonadRofi env m = (MonadUnliftIO m, MonadReader env m, MonadLogger m)
 
 data RofiPromptConfig
   = RofiPromptConfig
@@ -53,29 +61,28 @@ data RofiPromptConfig
   }
   deriving (Show, Read, Generic, Data, Default)
 
-type MonadRofi env m = (MonadUnliftIO m, MonadReader env m, MonadLogger m)
-
 -- | Launch the prompt without reading output.
 rofiLaunch :: (MonadRofi env m) => RofiPromptConfig -> m ()
-rofiLaunch rp = do
-  _p <- startProcess $
-      setStdin nullStream $
-      setStdout nullStream $
-      rofiToProc rp
-  return ()
+rofiLaunch rp =
+  void $ PT.readProcess $
+    PT.setStdin PT.nullStream $
+    PT.setStdout PT.nullStream $
+    rofiToProc rp
 
 -- | Launch a prompt and read the output.
 rofiRun :: (MonadRofi env m) => RofiPromptConfig -> [String] -> m (Maybe String)
 rofiRun pcfg input = do
   input' <- rofiHistoryInput pcfg input
-  p <-
-    startProcess $
-      setStdout byteStringOutput $
-        setStdin (byteStringInput $ LB.fromStrict $ C8.pack $ L.intercalate "\n" input') $
-          setStderr byteStringOutput $
-          rofiToProc pcfg
-  out <- atomically (getStdout p)
-  res <- try @_ @SomeException $ stopProcess p
+  p <- PT.startProcess $
+    PT.setStdin (PT.byteStringInput $ LB.fromStrict $ C8.pack $ L.intercalate "\n" input') $
+    PT.setStdout PT.byteStringOutput $
+    PT.setStderr PT.byteStringOutput $
+    rofiToProc pcfg
+  out <- atomically (PT.getStdout p)
+  err <- atomically (PT.getStderr p)
+  when (err /= "") $
+    logWarn $ "rofi output to stderr" :# [ "output" .= C8.unpack (LB.toStrict err) ]
+  res <- try @_ @SomeException $ PT.stopProcess p
   logInfo $ "rofi: process stop" :# [ "result" .= show res ]
   case out of
     "" -> return Nothing
@@ -104,12 +111,12 @@ rofiHistorySave s ln
       io $ appendFile histFile $ ln ++ "\n"
   | otherwise = pure ()
 
-rofiToProc :: RofiPromptConfig -> ProcessConfig () () ()
+rofiToProc :: RofiPromptConfig -> PT.ProcessConfig () () ()
 rofiToProc pcfg =
-   setCreateGroup True $
-     setNewSession True $
-       setCloseFds True $
-        proc "rofi" (toRofiArgs pcfg)
+   PT.setCreateGroup True $
+   PT.setNewSession True $
+   PT.setCloseFds True $
+   PT.proc "rofi" (toRofiArgs pcfg)
 
 toRofiArgs :: RofiPromptConfig -> [String]
 toRofiArgs RofiPromptConfig {..} =
@@ -129,7 +136,8 @@ toRofiArgs RofiPromptConfig {..} =
       ++ [["-markup-rows"] | _markupRows]
 
 runWithSystemD :: (HasCallStack, MonadRofi env m) => String -> m ()
-runWithSystemD cmd = void $ readProcess $ proc "systemd-run" ["--user", "--no-block", "--collect", "--", "bash", "-c", cmd ]
+runWithSystemD cmd = void $ PT.readProcess $ PT.proc "systemd-run"
+  [ "--user", "--no-block", "--collect", "--", "bash", "-c", cmd ]
 
 promptRofi :: MonadRofi env m => String -> [String] -> m (Maybe String)
 promptRofi prompt = rofiRun def { _prompt = prompt, _dmenu = True }

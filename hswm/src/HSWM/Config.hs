@@ -1,9 +1,5 @@
 {-# LANGUAGE UndecidableInstances #-}
 
-------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------
-
 -- |
 -- Module      : HSWM.Config
 -- Description : Short description
@@ -25,10 +21,40 @@ import HSWM.Operations
 import HSWM.Utils
 import HSWM.XKB
 
--- * Named
+infixr 1 <??>, <?>
 
-named :: (IsAction H a) => String -> a -> SomeAction H
-named str a = SomeAction $ NamedAction str (SomeAction a)
+-- | Attach a description to some action:
+--
+-- @
+--   "Restart" <??> restart
+-- @
+(<?>) :: IsKeyAction a => a -> String -> SomeAction H
+action <?> desc = toKeyAction desc action
+
+-- | Attach a description to some action:
+--
+-- @
+--   "Restart" <??> restart
+-- @
+(<??>) :: IsKeyAction a => String -> a -> SomeAction H
+desc <??> action = toKeyAction desc action
+
+class IsKeyAction a where
+  toKeyAction :: String -> a -> SomeAction H
+
+instance {-# OVERLAPPABLE #-} IsKeyAction (H b) where
+  toKeyAction d = namedA d . void
+
+instance {-# OVERLAPPABLE #-} IsKeyAction (HS b) where
+  toKeyAction d = namedAS d . void
+
+instance {-# OVERLAPPABLE #-} IsKeyAction (SomeAction H) where
+  toKeyAction d a = SomeAction $ NamedAction d a
+
+instance {-# OVERLAPPABLE #-} (Message a, Show a) => IsKeyAction a where
+  toKeyAction d a = SomeAction $ NamedActionHS (d ++ ": " ++ show a) (sendMessage a)
+
+-- * Named
 
 data NamedAction
   = NamedAction String (SomeAction H)
@@ -48,7 +74,8 @@ instance IsAction H NamedAction where
   actionDescription _ (NamedActionHS nm _) = nm
   actionDescription _ (NamedAction nm _) = nm
 
--- typeDescription _ = ""
+named :: (IsAction H a) => String -> a -> SomeAction H
+named str a = SomeAction $ NamedAction str (SomeAction a)
 
 namedA :: String -> H () -> SomeAction H
 namedA desc m = SomeAction (NamedActionH desc m)
@@ -68,12 +95,8 @@ windowsMA desc f = SomeAction $ NamedActionHS desc $ withWindowSet $ f >=> modif
 -- * Keys/submaps
 
 addKeys :: (IsKeySym k, IsAction m a) => [((ModMask, k), a)] -> ConfigDoM m
-addKeys keys c =
-  c
-    { keyBindings =
-        keyBindings c
-          ++ [((m, toKeySym k), SomeAction a) | ((m, k), a) <- keys]
-    }
+addKeys keys c = c
+  { keyBindings = keyBindings c ++ [((m, toKeySym k), SomeAction a) | ((m, k), a) <- keys] }
 
 submap ::
   forall m a k.
@@ -107,7 +130,7 @@ parseSubmaps ks0 =
 
       keypaths :: [([(String, KeySym)], SomeAction H)]
       keypaths = do
-        (keyseq, a) <- sanitized -- ([String], a)
+        (keyseq, a) <- sanitized
         return ([(L.intercalate "-" (L.init (breakKeys k)) :: String, toKeySym $ L.last (breakKeys k) :: KeySym) | k <- keyseq], a)
 
       toADT :: ([(String, KeySym)], SomeAction H) -> KeyAction (String, KeySym) (SomeAction H)
@@ -134,13 +157,3 @@ parseSubmaps ks0 =
 
     key (KeyAction k _) = k
     key (KeySubmap k _) = k
-
--- * Spawning processes
-
-data LaunchProgram = LaunchProgram String [String]
-  deriving (Show, Generic)
-
-instance (MonadIO m, MonadReader env m, MonadLogger m) => IsAction m LaunchProgram where
-  runner (LaunchProgram cmd args) = do
-    log' $ display $ "[launch] " <> toText cmd <> " " <> tshow args
-    void $ spawnProcess cmd args

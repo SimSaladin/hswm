@@ -3,6 +3,7 @@ module HSWM.ManageHook where
 import Data.List (isInfixOf, isPrefixOf, isSuffixOf)
 import HSWM.StackSet qualified as W
 import HSWM.Types.WM
+import HSWM.Util.Types
 
 -- | If-then-else lifted to a 'Monad'.
 ifM :: (Monad m) => m Bool -> m a -> m a -> m a
@@ -114,6 +115,12 @@ doRectFloat ::
   W.RationalRect ->
   ManageHook
 doRectFloat r = ask >>= \w -> doF (W.float w.river_window r)
+
+-- | Float the window in given relative size at the center of the screen.
+doCenterFloat :: Rational -> Rational -> ManageHook
+doCenterFloat width height = do
+  w <- ask
+  doF $ W.float w.river_window (centerRationalRect $ W.RationalRect 0 0 width height)
 
 -- | Modify the 'WindowSet' with a pure function.
 doF :: (s -> s) -> Query (Endo s)

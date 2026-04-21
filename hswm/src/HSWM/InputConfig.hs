@@ -65,11 +65,6 @@ data LibinputDeviceState = LibinputDeviceState
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Default)
 
-instance Default R.RiverInputDevice where
-  def = R.RiverInputDevice nullPtr
-instance Default WL.Array where
-  def = WL.Array nullPtr
-
 -- | (support, default, current)
 data SDC support a = SDC
   { support :: support
@@ -183,7 +178,6 @@ handleInputManagerEvent (R.RiverInputManagerInputDevice _ _ dev) = do
   modifyObjectDef $ \st -> st { inputDevices = M.insert dev def st.inputDevices }
   l <- getObject
   io $ R.listenerAdd dev l nullPtr
-handleInputManagerEvent _ = return ()
 
 handleInputDeviceEvent :: (MonadStateGlobal HConf m) => R.RiverInputDeviceEvent -> m ()
 handleInputDeviceEvent (R.RiverInputDeviceType' _ dev deviceType) = do
@@ -207,7 +201,6 @@ handleXkbConfigEvent (R.RiverXkbConfigXkbKeyboard _ _ kbd) = do
   io $ R.listenerAdd kbd l nullPtr
   -- Set the default keymap
   asks (xkbLayout . config) >>= (`whenJust` setKeyboardKeymap kbd)
-handleXkbConfigEvent _ = return ()
 
 handleXkbKeyboardEvent :: (MonadStateGlobal env m) => R.RiverXkbKeyboardEvent -> m ()
 handleXkbKeyboardEvent (R.RiverXkbKeyboardRemoved _ kbd) = do
@@ -225,7 +218,6 @@ handleLibinputEvent (R.RiverLibinputConfigLibinputDevice _ _ dev) = do
   modifyObjectDef $ \st -> st { libinputDevices = M.insert dev def st.libinputDevices }
   l <- getObject
   io $ WL.listenerAdd dev l nullPtr
-handleLibinputEvent _ = return ()
 
 handleLibinputDeviceEvent :: (HasGlobalTMap s, MonadReader s m, MonadUnliftIO m, MonadLogger m) => R.RiverLibinputDeviceEvent -> m ()
 handleLibinputDeviceEvent = \case
