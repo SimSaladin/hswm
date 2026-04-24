@@ -6,6 +6,7 @@
 {-# LANGUAGE EmptyDataDecls #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MagicHash #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -141,7 +142,7 @@ instance Read Wp_viewporter_error where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr Wp_viewporter_error) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -153,13 +154,11 @@ instance HasCField.HasCField Wp_viewporter_error "unwrap" where
 
   offset# = \_ -> \_ -> 0
 
-{-| the surface already has a viewport object associated
+{-| __C declaration:__ @WP_VIEWPORTER_ERROR_VIEWPORT_EXISTS@
 
-__C declaration:__ @WP_VIEWPORTER_ERROR_VIEWPORT_EXISTS@
+    __defined at:__ @viewporter-client-protocol.h 205:2@
 
-__defined at:__ @viewporter-client-protocol.h 205:2@
-
-__exported by:__ @viewporter-client-protocol.h@
+    __exported by:__ @viewporter-client-protocol.h@
 -}
 pattern WP_VIEWPORTER_ERROR_VIEWPORT_EXISTS :: Wp_viewporter_error
 pattern WP_VIEWPORTER_ERROR_VIEWPORT_EXISTS = Wp_viewporter_error 0
@@ -283,7 +282,7 @@ instance Read Wp_viewport_error where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr Wp_viewport_error) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -295,46 +294,38 @@ instance HasCField.HasCField Wp_viewport_error "unwrap" where
 
   offset# = \_ -> \_ -> 0
 
-{-| negative or zero values in width or height
+{-| __C declaration:__ @WP_VIEWPORT_ERROR_BAD_VALUE@
 
-__C declaration:__ @WP_VIEWPORT_ERROR_BAD_VALUE@
+    __defined at:__ @viewporter-client-protocol.h 281:2@
 
-__defined at:__ @viewporter-client-protocol.h 281:2@
-
-__exported by:__ @viewporter-client-protocol.h@
+    __exported by:__ @viewporter-client-protocol.h@
 -}
 pattern WP_VIEWPORT_ERROR_BAD_VALUE :: Wp_viewport_error
 pattern WP_VIEWPORT_ERROR_BAD_VALUE = Wp_viewport_error 0
 
-{-| destination size is not integer
+{-| __C declaration:__ @WP_VIEWPORT_ERROR_BAD_SIZE@
 
-__C declaration:__ @WP_VIEWPORT_ERROR_BAD_SIZE@
+    __defined at:__ @viewporter-client-protocol.h 285:2@
 
-__defined at:__ @viewporter-client-protocol.h 285:2@
-
-__exported by:__ @viewporter-client-protocol.h@
+    __exported by:__ @viewporter-client-protocol.h@
 -}
 pattern WP_VIEWPORT_ERROR_BAD_SIZE :: Wp_viewport_error
 pattern WP_VIEWPORT_ERROR_BAD_SIZE = Wp_viewport_error 1
 
-{-| source rectangle extends outside of the content area
+{-| __C declaration:__ @WP_VIEWPORT_ERROR_OUT_OF_BUFFER@
 
-__C declaration:__ @WP_VIEWPORT_ERROR_OUT_OF_BUFFER@
+    __defined at:__ @viewporter-client-protocol.h 289:2@
 
-__defined at:__ @viewporter-client-protocol.h 289:2@
-
-__exported by:__ @viewporter-client-protocol.h@
+    __exported by:__ @viewporter-client-protocol.h@
 -}
 pattern WP_VIEWPORT_ERROR_OUT_OF_BUFFER :: Wp_viewport_error
 pattern WP_VIEWPORT_ERROR_OUT_OF_BUFFER = Wp_viewport_error 2
 
-{-| the wl_surface was destroyed
+{-| __C declaration:__ @WP_VIEWPORT_ERROR_NO_SURFACE@
 
-__C declaration:__ @WP_VIEWPORT_ERROR_NO_SURFACE@
+    __defined at:__ @viewporter-client-protocol.h 293:2@
 
-__defined at:__ @viewporter-client-protocol.h 293:2@
-
-__exported by:__ @viewporter-client-protocol.h@
+    __exported by:__ @viewporter-client-protocol.h@
 -}
 pattern WP_VIEWPORT_ERROR_NO_SURFACE :: Wp_viewport_error
 pattern WP_VIEWPORT_ERROR_NO_SURFACE = Wp_viewport_error 3

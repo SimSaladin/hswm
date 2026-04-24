@@ -7,6 +7,7 @@
 {-# LANGUAGE EmptyDataDecls #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MagicHash #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -108,53 +109,11 @@ import qualified HsBindgen.Runtime.LibC
 import qualified HsBindgen.Runtime.Marshal as Marshal
 import qualified HsBindgen.Runtime.PtrConst as PtrConst
 
-{-|
+{-| __C declaration:__ @struct zwlr_output_configuration_head_v1@
 
-  > page_wlr_output_management_unstable_v1 The wlr_output_management_unstable_v1 protocol
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 65:8@
 
-  protocol to configure output devices
-
-  > page_desc_wlr_output_management_unstable_v1 Description
-
-  This protocol exposes interfaces to obtain and modify output device configuration.
-
-  Warning! The protocol described in this file is experimental and backward incompatible changes may be made. Backward compatible changes may be added together with the corresponding interface version bump. Backward incompatible changes are done by bumping the version number in the protocol and interface names and resetting the interface version. Once the protocol is to be declared stable, the 'z' prefix and the version number in the protocol and interface names are removed and the interface version number is reset.
-
-  > page_ifaces_wlr_output_management_unstable_v1 Interfaces
-
-  -
-
-  > page_iface_zwlr_output_manager_v1 - output device configuration manager
-
-  -
-
-  > page_iface_zwlr_output_head_v1 - output device
-
-  -
-
-  > page_iface_zwlr_output_mode_v1 - output mode
-
-  -
-
-  > page_iface_zwlr_output_configuration_v1 - output configuration
-
-  -
-
-  > page_iface_zwlr_output_configuration_head_v1 - head configuration
-
-  > page_copyright_wlr_output_management_unstable_v1 Copyright
-
-  Copyright © 2019 Purism SPC
-
-  Permission to use, copy, modify, distribute, and sell this software and its documentation for any purpose is hereby granted without fee, provided that the above copyright notice appear in all copies and that both that copyright notice and this permission notice appear in supporting documentation, and that the name of the copyright holders not be used in advertising or publicity pertaining to distribution of the software without specific, written prior permission.  The copyright holders make no representations about the suitability of this software for any purpose.  It is provided "as is" without express or implied warranty.
-
-  THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
-__C declaration:__ @struct zwlr_output_configuration_head_v1@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 65:8@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 data Zwlr_output_configuration_head_v1
 
@@ -190,57 +149,51 @@ data Zwlr_output_manager_v1
 -}
 data Zwlr_output_mode_v1
 
-{-|
+{-| __C declaration:__ @struct zwlr_output_manager_v1_listener@
 
-  > iface_zwlr_output_manager_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 273:8@
 
-  > zwlr_output_manager_v1_listener
-
-__C declaration:__ @struct zwlr_output_manager_v1_listener@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 273:8@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 data Zwlr_output_manager_v1_listener = Zwlr_output_manager_v1_listener
-  { head :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> (RIP.Ptr Zwlr_output_head_v1) -> IO ())
+  { head :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> RIP.Ptr Zwlr_output_head_v1 -> IO ())
     {- ^ introduce a new head
 
-       This event introduces a new head. This happens whenever a new head appears (e.g. a monitor is plugged in) or after the output manager is bound.
+         This event introduces a new head. This happens whenever a new head appears (e.g. a monitor is plugged in) or after the output manager is bound.
 
-    __C declaration:__ @head@
+         __C declaration:__ @head@
 
-    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 281:9@
+         __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 281:9@
 
-    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
     -}
-  , done :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , done :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ sent all information about current configuration
 
-       This event is sent after all information has been sent after binding to the output manager object and after any subsequent changes. This applies to child head and mode objects as well. In other words, this event is sent whenever a head or mode is created or destroyed and whenever one of their properties has been changed. Not all state is re-sent each time the current configuration changes: only the actual changes are sent.
+         This event is sent after all information has been sent after binding to the output manager object and after any subsequent changes. This applies to child head and mode objects as well. In other words, this event is sent whenever a head or mode is created or destroyed and whenever one of their properties has been changed. Not all state is re-sent each time the current configuration changes: only the actual changes are sent.
 
-       This allows changes to the output configuration to be seen as atomic, even if they happen via multiple events.
+         This allows changes to the output configuration to be seen as atomic, even if they happen via multiple events.
 
-       A serial is sent to be used in a future create_configuration request.
+         A serial is sent to be used in a future create_configuration request.
 
-       [__@serial@ /(input)/__]: current configuration serial
+         [__@serial@__]: current configuration serial
 
-    __C declaration:__ @done@
+         __C declaration:__ @done@
 
-    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 302:9@
+         __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 302:9@
 
-    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
     -}
-  , finished :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> IO ())
+  , finished :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> IO ())
     {- ^ the compositor has finished with the manager
 
-       This event indicates that the compositor is done sending manager events. The compositor will destroy the object immediately after sending this event, so it will become invalid and the client should release any resources associated with it.
+         This event indicates that the compositor is done sending manager events. The compositor will destroy the object immediately after sending this event, so it will become invalid and the client should release any resources associated with it.
 
-    __C declaration:__ @finished@
+         __C declaration:__ @finished@
 
-    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 313:9@
+         __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 313:9@
 
-    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
     -}
   }
   deriving stock (Eq, RIP.Generic, Show)
@@ -276,11 +229,11 @@ deriving via Marshal.EquivStorable Zwlr_output_manager_v1_listener instance RIP.
 instance HasCField.HasCField Zwlr_output_manager_v1_listener "head" where
 
   type CFieldType Zwlr_output_manager_v1_listener "head" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> (RIP.Ptr Zwlr_output_head_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> RIP.Ptr Zwlr_output_head_v1 -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> (RIP.Ptr Zwlr_output_head_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> RIP.Ptr Zwlr_output_head_v1 -> IO ())
          ) => RIP.HasField "head" (RIP.Ptr Zwlr_output_manager_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"head")
@@ -288,11 +241,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mana
 instance HasCField.HasCField Zwlr_output_manager_v1_listener "done" where
 
   type CFieldType Zwlr_output_manager_v1_listener "done" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "done" (RIP.Ptr Zwlr_output_manager_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"done")
@@ -300,11 +253,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mana
 instance HasCField.HasCField Zwlr_output_manager_v1_listener "finished" where
 
   type CFieldType Zwlr_output_manager_v1_listener "finished" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> IO ())
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> IO ())
          ) => RIP.HasField "finished" (RIP.Ptr Zwlr_output_manager_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"finished")
@@ -461,7 +414,7 @@ instance Read Zwlr_output_head_v1_adaptive_sync_state where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr Zwlr_output_head_v1_adaptive_sync_state) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -473,254 +426,244 @@ instance HasCField.HasCField Zwlr_output_head_v1_adaptive_sync_state "unwrap" wh
 
   offset# = \_ -> \_ -> 0
 
-{-| adaptive sync is disabled
+{-| __C declaration:__ @ZWLR_OUTPUT_HEAD_V1_ADAPTIVE_SYNC_STATE_DISABLED@
 
-__C declaration:__ @ZWLR_OUTPUT_HEAD_V1_ADAPTIVE_SYNC_STATE_DISABLED@
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 419:2@
 
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 419:2@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 pattern ZWLR_OUTPUT_HEAD_V1_ADAPTIVE_SYNC_STATE_DISABLED :: Zwlr_output_head_v1_adaptive_sync_state
 pattern ZWLR_OUTPUT_HEAD_V1_ADAPTIVE_SYNC_STATE_DISABLED = Zwlr_output_head_v1_adaptive_sync_state 0
 
-{-| adaptive sync is enabled
+{-| __C declaration:__ @ZWLR_OUTPUT_HEAD_V1_ADAPTIVE_SYNC_STATE_ENABLED@
 
-__C declaration:__ @ZWLR_OUTPUT_HEAD_V1_ADAPTIVE_SYNC_STATE_ENABLED@
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 423:2@
 
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 423:2@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 pattern ZWLR_OUTPUT_HEAD_V1_ADAPTIVE_SYNC_STATE_ENABLED :: Zwlr_output_head_v1_adaptive_sync_state
 pattern ZWLR_OUTPUT_HEAD_V1_ADAPTIVE_SYNC_STATE_ENABLED = Zwlr_output_head_v1_adaptive_sync_state 1
 
-{-|
+{-| __C declaration:__ @struct zwlr_output_head_v1_listener@
 
-  > iface_zwlr_output_head_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 431:8@
 
-  > zwlr_output_head_v1_listener
-
-__C declaration:__ @struct zwlr_output_head_v1_listener@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 431:8@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 data Zwlr_output_head_v1_listener = Zwlr_output_head_v1_listener
-  { name :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  { name :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
     {- ^ head name
 
-       This event describes the head name.
+         This event describes the head name.
 
-       The naming convention is compositor defined, but limited to alphanumeric characters and dashes (-). Each name is unique among all wlr_output_head objects, but if a wlr_output_head object is destroyed the same name may be reused later. The names will also remain consistent across sessions with the same hardware and software configuration.
+         The naming convention is compositor defined, but limited to alphanumeric characters and dashes (-). Each name is unique among all wlr_output_head objects, but if a wlr_output_head object is destroyed the same name may be reused later. The names will also remain consistent across sessions with the same hardware and software configuration.
 
-       Examples of names include 'HDMI-A-1', 'WL-1', 'X11-1', etc. However, do not assume that the name is a reflection of an underlying DRM connector, X11 connection, etc.
+         Examples of names include 'HDMI-A-1', 'WL-1', 'X11-1', etc. However, do not assume that the name is a reflection of an underlying DRM connector, X11 connection, etc.
 
-       If this head matches a wl_output, the wl_output.name event must report the same name.
+         If this head matches a wl_output, the wl_output.name event must report the same name.
 
-       The name event is sent after a wlr_output_head object is created. This event is only sent once per object, and the name does not change over the lifetime of the wlr_output_head object.
+         The name event is sent after a wlr_output_head object is created. This event is only sent once per object, and the name does not change over the lifetime of the wlr_output_head object.
 
-    __C declaration:__ @name@
+         __C declaration:__ @name@
 
-    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 455:9@
+         __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 455:9@
 
-    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
     -}
-  , description :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  , description :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
     {- ^ head description
 
-       This event describes a human-readable description of the head.
+         This event describes a human-readable description of the head.
 
-       The description is a UTF-8 string with no convention defined for its contents. Examples might include 'Foocorp 11" Display' or 'Virtual X11 output via :1'. However, do not assume that the name is a reflection of the make, model, serial of the underlying DRM connector or the display name of the underlying X11 connection, etc.
+         The description is a UTF-8 string with no convention defined for its contents. Examples might include 'Foocorp 11" Display' or 'Virtual X11 output via :1'. However, do not assume that the name is a reflection of the make, model, serial of the underlying DRM connector or the display name of the underlying X11 connection, etc.
 
-       If this head matches a wl_output, the wl_output.description event must report the same name.
+         If this head matches a wl_output, the wl_output.description event must report the same name.
 
-       The description event is sent after a wlr_output_head object is created. This event is only sent once per object, and the description does not change over the lifetime of the wlr_output_head object.
+         The description event is sent after a wlr_output_head object is created. This event is only sent once per object, and the description does not change over the lifetime of the wlr_output_head object.
 
-    __C declaration:__ @description@
+         __C declaration:__ @description@
 
-    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 478:9@
+         __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 478:9@
 
-    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
     -}
-  , physical_size :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , physical_size :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ head physical size
 
-       This event describes the physical size of the head. This event is only sent if the head has a physical size (e.g. is not a projector or a virtual device).
+         This event describes the physical size of the head. This event is only sent if the head has a physical size (e.g. is not a projector or a virtual device).
 
-       The physical size event is sent after a wlr_output_head object is created. This event is only sent once per object, and the physical size does not change over the lifetime of the wlr_output_head object.
+         The physical size event is sent after a wlr_output_head object is created. This event is only sent once per object, and the physical size does not change over the lifetime of the wlr_output_head object.
 
-       [__@width@ /(input)/__]: width in millimeters of the output
+         [__@width@__]: width in millimeters of the output
 
-       [__@height@ /(input)/__]: height in millimeters of the output
+         [__@height@__]: height in millimeters of the output
 
-    __C declaration:__ @physical_size@
+         __C declaration:__ @physical_size@
 
-    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 495:9@
+         __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 495:9@
 
-    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
     -}
-  , mode :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ())
+  , mode :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> RIP.Ptr Zwlr_output_mode_v1 -> IO ())
     {- ^ introduce a mode
 
-       This event introduces a mode for this head. It is sent once per supported mode.
+         This event introduces a mode for this head. It is sent once per supported mode.
 
-    __C declaration:__ @mode@
+         __C declaration:__ @mode@
 
-    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 505:9@
+         __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 505:9@
 
-    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
     -}
-  , enabled :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , enabled :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ head is enabled or disabled
 
-       This event describes whether the head is enabled. A disabled head is not mapped to a region of the global compositor space.
+         This event describes whether the head is enabled. A disabled head is not mapped to a region of the global compositor space.
 
-       When a head is disabled, some properties (current_mode, position, transform and scale) are irrelevant.
+         When a head is disabled, some properties (current_mode, position, transform and scale) are irrelevant.
 
-       [__@enabled@ /(input)/__]: zero if disabled, non-zero if enabled
+         [__@@__]: zero if disabled, non-zero if enabled
 
-    __C declaration:__ @enabled@
+         __C declaration:__ @enabled@
 
-    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 518:9@
+         __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 518:9@
 
-    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
     -}
-  , current_mode :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ())
+  , current_mode :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> RIP.Ptr Zwlr_output_mode_v1 -> IO ())
     {- ^ current mode
 
-       This event describes the mode currently in use for this head. It is only sent if the output is enabled.
+         This event describes the mode currently in use for this head. It is only sent if the output is enabled.
 
-    __C declaration:__ @current_mode@
+         __C declaration:__ @current_mode@
 
-    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 527:9@
+         __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 527:9@
 
-    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
     -}
-  , position :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , position :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ current position
 
-       This events describes the position of the head in the global compositor space. It is only sent if the output is enabled.
+         This events describes the position of the head in the global compositor space. It is only sent if the output is enabled.
 
-       [__@x@ /(input)/__]: x position within the global compositor space
+         [__@x@__]: x position within the global compositor space
 
-       [__@y@ /(input)/__]: y position within the global compositor space
+         [__@y@__]: y position within the global compositor space
 
-    __C declaration:__ @position@
+         __C declaration:__ @position@
 
-    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 538:9@
+         __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 538:9@
 
-    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
     -}
-  , transform :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , transform :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ current transformation
 
-       This event describes the transformation currently applied to the head. It is only sent if the output is enabled.
+         This event describes the transformation currently applied to the head. It is only sent if the output is enabled.
 
-    __C declaration:__ @transform@
+         __C declaration:__ @transform@
 
-    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 548:9@
+         __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 548:9@
 
-    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
     -}
-  , scale :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ())
+  , scale :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ())
     {- ^ current scale
 
-       This events describes the scale of the head in the global compositor space. It is only sent if the output is enabled.
+         This events describes the scale of the head in the global compositor space. It is only sent if the output is enabled.
 
-    __C declaration:__ @scale@
+         __C declaration:__ @scale@
 
-    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 557:9@
+         __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 557:9@
 
-    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
     -}
-  , finished :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> IO ())
+  , finished :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> IO ())
     {- ^ the head has disappeared
 
-       This event indicates that the head is no longer available. The head object becomes inert. Clients should send a destroy request and release any resources associated with it.
+         This event indicates that the head is no longer available. The head object becomes inert. Clients should send a destroy request and release any resources associated with it.
 
-    __C declaration:__ @finished@
+         __C declaration:__ @finished@
 
-    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 567:9@
+         __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 567:9@
 
-    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
     -}
-  , make :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  , make :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
     {- ^ head manufacturer
 
-       This event describes the manufacturer of the head.
+         This event describes the manufacturer of the head.
 
-       Together with the model and serial_number events the purpose is to allow clients to recognize heads from previous sessions and for example load head-specific configurations back.
+         Together with the model and serial_number events the purpose is to allow clients to recognize heads from previous sessions and for example load head-specific configurations back.
 
-       It is not guaranteed this event will be ever sent. A reason for that can be that the compositor does not have information about the make of the head or the definition of a make is not sensible in the current setup, for example in a virtual session. Clients can still try to identify the head by available information from other events but should be aware that there is an increased risk of false positives.
+         It is not guaranteed this event will be ever sent. A reason for that can be that the compositor does not have information about the make of the head or the definition of a make is not sensible in the current setup, for example in a virtual session. Clients can still try to identify the head by available information from other events but should be aware that there is an increased risk of false positives.
 
-       If sent, the make event is sent after a wlr_output_head object is created and only sent once per object. The make does not change over the lifetime of the wlr_output_head object.
+         If sent, the make event is sent after a wlr_output_head object is created and only sent once per object. The make does not change over the lifetime of the wlr_output_head object.
 
-       It is not recommended to display the make string in UI to users. For that the string provided by the description event should be preferred.
+         It is not recommended to display the make string in UI to users. For that the string provided by the description event should be preferred.
 
-       @since:  2
+         @since 2
 
-    __C declaration:__ @make@
+         __C declaration:__ @make@
 
-    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 595:9@
+         __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 595:9@
 
-    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
     -}
-  , model :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  , model :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
     {- ^ head model
 
-       This event describes the model of the head.
+         This event describes the model of the head.
 
-       Together with the make and serial_number events the purpose is to allow clients to recognize heads from previous sessions and for example load head-specific configurations back.
+         Together with the make and serial_number events the purpose is to allow clients to recognize heads from previous sessions and for example load head-specific configurations back.
 
-       It is not guaranteed this event will be ever sent. A reason for that can be that the compositor does not have information about the model of the head or the definition of a model is not sensible in the current setup, for example in a virtual session. Clients can still try to identify the head by available information from other events but should be aware that there is an increased risk of false positives.
+         It is not guaranteed this event will be ever sent. A reason for that can be that the compositor does not have information about the model of the head or the definition of a model is not sensible in the current setup, for example in a virtual session. Clients can still try to identify the head by available information from other events but should be aware that there is an increased risk of false positives.
 
-       If sent, the model event is sent after a wlr_output_head object is created and only sent once per object. The model does not change over the lifetime of the wlr_output_head object.
+         If sent, the model event is sent after a wlr_output_head object is created and only sent once per object. The model does not change over the lifetime of the wlr_output_head object.
 
-       It is not recommended to display the model string in UI to users. For that the string provided by the description event should be preferred.
+         It is not recommended to display the model string in UI to users. For that the string provided by the description event should be preferred.
 
-       @since:  2
+         @since 2
 
-    __C declaration:__ @model@
+         __C declaration:__ @model@
 
-    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 624:9@
+         __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 624:9@
 
-    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
     -}
-  , serial_number :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  , serial_number :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
     {- ^ head serial number
 
-       This event describes the serial number of the head.
+         This event describes the serial number of the head.
 
-       Together with the make and model events the purpose is to allow clients to recognize heads from previous sessions and for example load head- specific configurations back.
+         Together with the make and model events the purpose is to allow clients to recognize heads from previous sessions and for example load head- specific configurations back.
 
-       It is not guaranteed this event will be ever sent. A reason for that can be that the compositor does not have information about the serial number of the head or the definition of a serial number is not sensible in the current setup. Clients can still try to identify the head by available information from other events but should be aware that there is an increased risk of false positives.
+         It is not guaranteed this event will be ever sent. A reason for that can be that the compositor does not have information about the serial number of the head or the definition of a serial number is not sensible in the current setup. Clients can still try to identify the head by available information from other events but should be aware that there is an increased risk of false positives.
 
-       If sent, the serial number event is sent after a wlr_output_head object is created and only sent once per object. The serial number does not change over the lifetime of the wlr_output_head object.
+         If sent, the serial number event is sent after a wlr_output_head object is created and only sent once per object. The serial number does not change over the lifetime of the wlr_output_head object.
 
-       It is not recommended to display the serial_number string in UI to users. For that the string provided by the description event should be preferred.
+         It is not recommended to display the serial_number string in UI to users. For that the string provided by the description event should be preferred.
 
-       @since:  2
+         @since 2
 
-    __C declaration:__ @serial_number@
+         __C declaration:__ @serial_number@
 
-    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 654:9@
+         __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 654:9@
 
-    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
     -}
-  , adaptive_sync :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , adaptive_sync :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ current adaptive sync state
 
-       This event describes whether adaptive sync is currently enabled for the head or not. Adaptive sync is also known as Variable Refresh Rate or VRR.
+         This event describes whether adaptive sync is currently enabled for the head or not. Adaptive sync is also known as Variable Refresh Rate or VRR.
 
-       @since:  4
+         @since 4
 
-    __C declaration:__ @adaptive_sync@
+         __C declaration:__ @adaptive_sync@
 
-    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 665:9@
+         __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 665:9@
 
-    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
     -}
   }
   deriving stock (Eq, RIP.Generic, Show)
@@ -792,11 +735,11 @@ deriving via Marshal.EquivStorable Zwlr_output_head_v1_listener instance RIP.Sto
 instance HasCField.HasCField Zwlr_output_head_v1_listener "name" where
 
   type CFieldType Zwlr_output_head_v1_listener "name" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
          ) => RIP.HasField "name" (RIP.Ptr Zwlr_output_head_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"name")
@@ -804,11 +747,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head
 instance HasCField.HasCField Zwlr_output_head_v1_listener "description" where
 
   type CFieldType Zwlr_output_head_v1_listener "description" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
          ) => RIP.HasField "description" (RIP.Ptr Zwlr_output_head_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -817,11 +760,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head
 instance HasCField.HasCField Zwlr_output_head_v1_listener "physical_size" where
 
   type CFieldType Zwlr_output_head_v1_listener "physical_size" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
          ) => RIP.HasField "physical_size" (RIP.Ptr Zwlr_output_head_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -830,11 +773,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head
 instance HasCField.HasCField Zwlr_output_head_v1_listener "mode" where
 
   type CFieldType Zwlr_output_head_v1_listener "mode" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> RIP.Ptr Zwlr_output_mode_v1 -> IO ())
 
   offset# = \_ -> \_ -> 24
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> RIP.Ptr Zwlr_output_mode_v1 -> IO ())
          ) => RIP.HasField "mode" (RIP.Ptr Zwlr_output_head_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"mode")
@@ -842,11 +785,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head
 instance HasCField.HasCField Zwlr_output_head_v1_listener "enabled" where
 
   type CFieldType Zwlr_output_head_v1_listener "enabled" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 32
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
          ) => RIP.HasField "enabled" (RIP.Ptr Zwlr_output_head_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"enabled")
@@ -854,11 +797,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head
 instance HasCField.HasCField Zwlr_output_head_v1_listener "current_mode" where
 
   type CFieldType Zwlr_output_head_v1_listener "current_mode" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> RIP.Ptr Zwlr_output_mode_v1 -> IO ())
 
   offset# = \_ -> \_ -> 40
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> RIP.Ptr Zwlr_output_mode_v1 -> IO ())
          ) => RIP.HasField "current_mode" (RIP.Ptr Zwlr_output_head_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -867,11 +810,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head
 instance HasCField.HasCField Zwlr_output_head_v1_listener "position" where
 
   type CFieldType Zwlr_output_head_v1_listener "position" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 48
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
          ) => RIP.HasField "position" (RIP.Ptr Zwlr_output_head_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"position")
@@ -879,11 +822,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head
 instance HasCField.HasCField Zwlr_output_head_v1_listener "transform" where
 
   type CFieldType Zwlr_output_head_v1_listener "transform" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 56
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
          ) => RIP.HasField "transform" (RIP.Ptr Zwlr_output_head_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"transform")
@@ -891,11 +834,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head
 instance HasCField.HasCField Zwlr_output_head_v1_listener "scale" where
 
   type CFieldType Zwlr_output_head_v1_listener "scale" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ())
 
   offset# = \_ -> \_ -> 64
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ())
          ) => RIP.HasField "scale" (RIP.Ptr Zwlr_output_head_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"scale")
@@ -903,11 +846,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head
 instance HasCField.HasCField Zwlr_output_head_v1_listener "finished" where
 
   type CFieldType Zwlr_output_head_v1_listener "finished" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> IO ())
 
   offset# = \_ -> \_ -> 72
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> IO ())
          ) => RIP.HasField "finished" (RIP.Ptr Zwlr_output_head_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"finished")
@@ -915,11 +858,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head
 instance HasCField.HasCField Zwlr_output_head_v1_listener "make" where
 
   type CFieldType Zwlr_output_head_v1_listener "make" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
 
   offset# = \_ -> \_ -> 80
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
          ) => RIP.HasField "make" (RIP.Ptr Zwlr_output_head_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"make")
@@ -927,11 +870,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head
 instance HasCField.HasCField Zwlr_output_head_v1_listener "model" where
 
   type CFieldType Zwlr_output_head_v1_listener "model" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
 
   offset# = \_ -> \_ -> 88
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
          ) => RIP.HasField "model" (RIP.Ptr Zwlr_output_head_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"model")
@@ -939,11 +882,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head
 instance HasCField.HasCField Zwlr_output_head_v1_listener "serial_number" where
 
   type CFieldType Zwlr_output_head_v1_listener "serial_number" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
 
   offset# = \_ -> \_ -> 96
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
          ) => RIP.HasField "serial_number" (RIP.Ptr Zwlr_output_head_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -952,11 +895,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head
 instance HasCField.HasCField Zwlr_output_head_v1_listener "adaptive_sync" where
 
   type CFieldType Zwlr_output_head_v1_listener "adaptive_sync" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 104
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "adaptive_sync" (RIP.Ptr Zwlr_output_head_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -1121,68 +1064,62 @@ zWLR_OUTPUT_HEAD_V1_RELEASE_SINCE_VERSION :: RIP.CInt
 zWLR_OUTPUT_HEAD_V1_RELEASE_SINCE_VERSION =
   (3 :: RIP.CInt)
 
-{-|
+{-| __C declaration:__ @struct zwlr_output_mode_v1_listener@
 
-  > iface_zwlr_output_mode_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 789:8@
 
-  > zwlr_output_mode_v1_listener
-
-__C declaration:__ @struct zwlr_output_mode_v1_listener@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 789:8@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 data Zwlr_output_mode_v1_listener = Zwlr_output_mode_v1_listener
-  { size :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  { size :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ mode size
 
-       This event describes the mode size. The size is given in physical hardware units of the output device. This is not necessarily the same as the output size in the global compositor space. For instance, the output may be scaled or transformed.
+         This event describes the mode size. The size is given in physical hardware units of the output device. This is not necessarily the same as the output size in the global compositor space. For instance, the output may be scaled or transformed.
 
-       [__@width@ /(input)/__]: width of the mode in hardware units
+         [__@width@__]: width of the mode in hardware units
 
-       [__@height@ /(input)/__]: height of the mode in hardware units
+         [__@height@__]: height of the mode in hardware units
 
-    __C declaration:__ @size@
+         __C declaration:__ @size@
 
-    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 800:9@
+         __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 800:9@
 
-    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
     -}
-  , refresh :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , refresh :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ mode refresh rate
 
-       This event describes the mode's fixed vertical refresh rate. It is only sent if the mode has a fixed refresh rate.
+         This event describes the mode's fixed vertical refresh rate. It is only sent if the mode has a fixed refresh rate.
 
-       [__@refresh@ /(input)/__]: vertical refresh rate in mHz
+         [__@@__]: vertical refresh rate in mHz
 
-    __C declaration:__ @refresh@
+         __C declaration:__ @refresh@
 
-    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 811:9@
+         __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 811:9@
 
-    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
     -}
-  , preferred :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ())
+  , preferred :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> IO ())
     {- ^ mode is preferred
 
-       This event advertises this mode as preferred.
+         This event advertises this mode as preferred.
 
-    __C declaration:__ @preferred@
+         __C declaration:__ @preferred@
 
-    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 819:9@
+         __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 819:9@
 
-    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
     -}
-  , finished :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ())
+  , finished :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> IO ())
     {- ^ the mode has disappeared
 
-       This event indicates that the mode is no longer available. The mode object becomes inert. Clients should send a destroy request and release any resources associated with it.
+         This event indicates that the mode is no longer available. The mode object becomes inert. Clients should send a destroy request and release any resources associated with it.
 
-    __C declaration:__ @finished@
+         __C declaration:__ @finished@
 
-    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 828:9@
+         __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 828:9@
 
-    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
     -}
   }
   deriving stock (Eq, RIP.Generic, Show)
@@ -1220,11 +1157,11 @@ deriving via Marshal.EquivStorable Zwlr_output_mode_v1_listener instance RIP.Sto
 instance HasCField.HasCField Zwlr_output_mode_v1_listener "size" where
 
   type CFieldType Zwlr_output_mode_v1_listener "size" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
          ) => RIP.HasField "size" (RIP.Ptr Zwlr_output_mode_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"size")
@@ -1232,11 +1169,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode
 instance HasCField.HasCField Zwlr_output_mode_v1_listener "refresh" where
 
   type CFieldType Zwlr_output_mode_v1_listener "refresh" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
          ) => RIP.HasField "refresh" (RIP.Ptr Zwlr_output_mode_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"refresh")
@@ -1244,11 +1181,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode
 instance HasCField.HasCField Zwlr_output_mode_v1_listener "preferred" where
 
   type CFieldType Zwlr_output_mode_v1_listener "preferred" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> IO ())
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> IO ())
          ) => RIP.HasField "preferred" (RIP.Ptr Zwlr_output_mode_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"preferred")
@@ -1256,11 +1193,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode
 instance HasCField.HasCField Zwlr_output_mode_v1_listener "finished" where
 
   type CFieldType Zwlr_output_mode_v1_listener "finished" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> IO ())
 
   offset# = \_ -> \_ -> 24
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> IO ())
          ) => RIP.HasField "finished" (RIP.Ptr Zwlr_output_mode_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"finished")
@@ -1408,7 +1345,7 @@ instance Read Zwlr_output_configuration_v1_error where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr Zwlr_output_configuration_v1_error) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -1420,94 +1357,82 @@ instance HasCField.HasCField Zwlr_output_configuration_v1_error "unwrap" where
 
   offset# = \_ -> \_ -> 0
 
-{-| head has been configured twice
+{-| __C declaration:__ @ZWLR_OUTPUT_CONFIGURATION_V1_ERROR_ALREADY_CONFIGURED_HEAD@
 
-__C declaration:__ @ZWLR_OUTPUT_CONFIGURATION_V1_ERROR_ALREADY_CONFIGURED_HEAD@
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 913:2@
 
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 913:2@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 pattern ZWLR_OUTPUT_CONFIGURATION_V1_ERROR_ALREADY_CONFIGURED_HEAD :: Zwlr_output_configuration_v1_error
 pattern ZWLR_OUTPUT_CONFIGURATION_V1_ERROR_ALREADY_CONFIGURED_HEAD = Zwlr_output_configuration_v1_error 1
 
-{-| head has not been configured
+{-| __C declaration:__ @ZWLR_OUTPUT_CONFIGURATION_V1_ERROR_UNCONFIGURED_HEAD@
 
-__C declaration:__ @ZWLR_OUTPUT_CONFIGURATION_V1_ERROR_UNCONFIGURED_HEAD@
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 917:2@
 
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 917:2@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 pattern ZWLR_OUTPUT_CONFIGURATION_V1_ERROR_UNCONFIGURED_HEAD :: Zwlr_output_configuration_v1_error
 pattern ZWLR_OUTPUT_CONFIGURATION_V1_ERROR_UNCONFIGURED_HEAD = Zwlr_output_configuration_v1_error 2
 
-{-| request sent after configuration has been applied or tested
+{-| __C declaration:__ @ZWLR_OUTPUT_CONFIGURATION_V1_ERROR_ALREADY_USED@
 
-__C declaration:__ @ZWLR_OUTPUT_CONFIGURATION_V1_ERROR_ALREADY_USED@
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 921:2@
 
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 921:2@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 pattern ZWLR_OUTPUT_CONFIGURATION_V1_ERROR_ALREADY_USED :: Zwlr_output_configuration_v1_error
 pattern ZWLR_OUTPUT_CONFIGURATION_V1_ERROR_ALREADY_USED = Zwlr_output_configuration_v1_error 3
 
-{-|
+{-| __C declaration:__ @struct zwlr_output_configuration_v1_listener@
 
-  > iface_zwlr_output_configuration_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 929:8@
 
-  > zwlr_output_configuration_v1_listener
-
-__C declaration:__ @struct zwlr_output_configuration_v1_listener@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 929:8@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 data Zwlr_output_configuration_v1_listener = Zwlr_output_configuration_v1_listener
-  { succeeded :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_configuration_v1) -> IO ())
+  { succeeded :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_configuration_v1 -> IO ())
     {- ^ configuration changes succeeded
 
-       Sent after the compositor has successfully applied the changes or tested them.
+         Sent after the compositor has successfully applied the changes or tested them.
 
-       Upon receiving this event, the client should destroy this object.
+         Upon receiving this event, the client should destroy this object.
 
-       If the current configuration has changed, events to describe the changes will be sent followed by a wlr_output_manager.done event.
+         If the current configuration has changed, events to describe the changes will be sent followed by a wlr_output_manager.done event.
 
-    __C declaration:__ @succeeded@
+         __C declaration:__ @succeeded@
 
-    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 943:9@
+         __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 943:9@
 
-    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
     -}
-  , failed :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_configuration_v1) -> IO ())
+  , failed :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_configuration_v1 -> IO ())
     {- ^ configuration changes failed
 
-       Sent if the compositor rejects the changes or failed to apply them. The compositor should revert any changes made by the apply request that triggered this event.
+         Sent if the compositor rejects the changes or failed to apply them. The compositor should revert any changes made by the apply request that triggered this event.
 
-       Upon receiving this event, the client should destroy this object.
+         Upon receiving this event, the client should destroy this object.
 
-    __C declaration:__ @failed@
+         __C declaration:__ @failed@
 
-    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 955:9@
+         __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 955:9@
 
-    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
     -}
-  , cancelled :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_configuration_v1) -> IO ())
+  , cancelled :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_configuration_v1 -> IO ())
     {- ^ configuration has been cancelled
 
-       Sent if the compositor cancels the configuration because the state of an output changed and the client has outdated information (e.g. after an output has been hotplugged).
+         Sent if the compositor cancels the configuration because the state of an output changed and the client has outdated information (e.g. after an output has been hotplugged).
 
-       The client can create a new configuration with a newer serial and try again.
+         The client can create a new configuration with a newer serial and try again.
 
-       Upon receiving this event, the client should destroy this object.
+         Upon receiving this event, the client should destroy this object.
 
-    __C declaration:__ @cancelled@
+         __C declaration:__ @cancelled@
 
-    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 970:9@
+         __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 970:9@
 
-    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
     -}
   }
   deriving stock (Eq, RIP.Generic, Show)
@@ -1543,11 +1468,11 @@ deriving via Marshal.EquivStorable Zwlr_output_configuration_v1_listener instanc
 instance HasCField.HasCField Zwlr_output_configuration_v1_listener "succeeded" where
 
   type CFieldType Zwlr_output_configuration_v1_listener "succeeded" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_configuration_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_configuration_v1 -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_configuration_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_configuration_v1 -> IO ())
          ) => RIP.HasField "succeeded" (RIP.Ptr Zwlr_output_configuration_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"succeeded")
@@ -1555,11 +1480,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_conf
 instance HasCField.HasCField Zwlr_output_configuration_v1_listener "failed" where
 
   type CFieldType Zwlr_output_configuration_v1_listener "failed" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_configuration_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_configuration_v1 -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_configuration_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_configuration_v1 -> IO ())
          ) => RIP.HasField "failed" (RIP.Ptr Zwlr_output_configuration_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"failed")
@@ -1567,11 +1492,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_conf
 instance HasCField.HasCField Zwlr_output_configuration_v1_listener "cancelled" where
 
   type CFieldType Zwlr_output_configuration_v1_listener "cancelled" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_configuration_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_configuration_v1 -> IO ())
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_configuration_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_configuration_v1 -> IO ())
          ) => RIP.HasField "cancelled" (RIP.Ptr Zwlr_output_configuration_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"cancelled")
@@ -1793,7 +1718,7 @@ instance Read Zwlr_output_configuration_head_v1_error where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr Zwlr_output_configuration_head_v1_error) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -1805,70 +1730,56 @@ instance HasCField.HasCField Zwlr_output_configuration_head_v1_error "unwrap" wh
 
   offset# = \_ -> \_ -> 0
 
-{-| property has already been set
+{-| __C declaration:__ @ZWLR_OUTPUT_CONFIGURATION_HEAD_V1_ERROR_ALREADY_SET@
 
-__C declaration:__ @ZWLR_OUTPUT_CONFIGURATION_HEAD_V1_ERROR_ALREADY_SET@
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1138:2@
 
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1138:2@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 pattern ZWLR_OUTPUT_CONFIGURATION_HEAD_V1_ERROR_ALREADY_SET :: Zwlr_output_configuration_head_v1_error
 pattern ZWLR_OUTPUT_CONFIGURATION_HEAD_V1_ERROR_ALREADY_SET = Zwlr_output_configuration_head_v1_error 1
 
-{-| mode doesn't belong to head
+{-| __C declaration:__ @ZWLR_OUTPUT_CONFIGURATION_HEAD_V1_ERROR_INVALID_MODE@
 
-__C declaration:__ @ZWLR_OUTPUT_CONFIGURATION_HEAD_V1_ERROR_INVALID_MODE@
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1142:2@
 
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1142:2@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 pattern ZWLR_OUTPUT_CONFIGURATION_HEAD_V1_ERROR_INVALID_MODE :: Zwlr_output_configuration_head_v1_error
 pattern ZWLR_OUTPUT_CONFIGURATION_HEAD_V1_ERROR_INVALID_MODE = Zwlr_output_configuration_head_v1_error 2
 
-{-| mode is invalid
+{-| __C declaration:__ @ZWLR_OUTPUT_CONFIGURATION_HEAD_V1_ERROR_INVALID_CUSTOM_MODE@
 
-__C declaration:__ @ZWLR_OUTPUT_CONFIGURATION_HEAD_V1_ERROR_INVALID_CUSTOM_MODE@
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1146:2@
 
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1146:2@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 pattern ZWLR_OUTPUT_CONFIGURATION_HEAD_V1_ERROR_INVALID_CUSTOM_MODE :: Zwlr_output_configuration_head_v1_error
 pattern ZWLR_OUTPUT_CONFIGURATION_HEAD_V1_ERROR_INVALID_CUSTOM_MODE = Zwlr_output_configuration_head_v1_error 3
 
-{-| transform value outside enum
+{-| __C declaration:__ @ZWLR_OUTPUT_CONFIGURATION_HEAD_V1_ERROR_INVALID_TRANSFORM@
 
-__C declaration:__ @ZWLR_OUTPUT_CONFIGURATION_HEAD_V1_ERROR_INVALID_TRANSFORM@
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1150:2@
 
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1150:2@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 pattern ZWLR_OUTPUT_CONFIGURATION_HEAD_V1_ERROR_INVALID_TRANSFORM :: Zwlr_output_configuration_head_v1_error
 pattern ZWLR_OUTPUT_CONFIGURATION_HEAD_V1_ERROR_INVALID_TRANSFORM = Zwlr_output_configuration_head_v1_error 4
 
-{-| scale negative or zero
+{-| __C declaration:__ @ZWLR_OUTPUT_CONFIGURATION_HEAD_V1_ERROR_INVALID_SCALE@
 
-__C declaration:__ @ZWLR_OUTPUT_CONFIGURATION_HEAD_V1_ERROR_INVALID_SCALE@
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1154:2@
 
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1154:2@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 pattern ZWLR_OUTPUT_CONFIGURATION_HEAD_V1_ERROR_INVALID_SCALE :: Zwlr_output_configuration_head_v1_error
 pattern ZWLR_OUTPUT_CONFIGURATION_HEAD_V1_ERROR_INVALID_SCALE = Zwlr_output_configuration_head_v1_error 5
 
-{-| invalid enum value used in the set_adaptive_sync request
+{-| __C declaration:__ @ZWLR_OUTPUT_CONFIGURATION_HEAD_V1_ERROR_INVALID_ADAPTIVE_SYNC_STATE@
 
-  @since:  4
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1159:2@
 
-__C declaration:__ @ZWLR_OUTPUT_CONFIGURATION_HEAD_V1_ERROR_INVALID_ADAPTIVE_SYNC_STATE@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1159:2@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 pattern ZWLR_OUTPUT_CONFIGURATION_HEAD_V1_ERROR_INVALID_ADAPTIVE_SYNC_STATE :: Zwlr_output_configuration_head_v1_error
 pattern ZWLR_OUTPUT_CONFIGURATION_HEAD_V1_ERROR_INVALID_ADAPTIVE_SYNC_STATE = Zwlr_output_configuration_head_v1_error 6
@@ -2003,450 +1914,450 @@ zWLR_OUTPUT_CONFIGURATION_HEAD_V1_SET_ADAPTIVE_SYNC_SINCE_VERSION :: RIP.CInt
 zWLR_OUTPUT_CONFIGURATION_HEAD_V1_SET_ADAPTIVE_SYNC_SINCE_VERSION =
   (4 :: RIP.CInt)
 
-foreign import ccall safe "wrapper" hs_bindgen_a78997c96869db8a_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_fd35ef98008da708_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_configuration_v1) -> IO ())@
-hs_bindgen_a78997c96869db8a ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_configuration_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_configuration_v1) -> IO ()))
-hs_bindgen_a78997c96869db8a =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_configuration_v1 -> IO ())@
+hs_bindgen_fd35ef98008da708 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_configuration_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_configuration_v1 -> IO ()))
+hs_bindgen_fd35ef98008da708 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_a78997c96869db8a_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_fd35ef98008da708_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_f9019cf523abfecd_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_bcfc225eb9342bc4_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_configuration_v1) -> IO ())@
-hs_bindgen_f9019cf523abfecd ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_configuration_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_configuration_v1) -> IO ()
-hs_bindgen_f9019cf523abfecd =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_configuration_v1 -> IO ())@
+hs_bindgen_bcfc225eb9342bc4 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_configuration_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_configuration_v1 -> IO ()
+hs_bindgen_bcfc225eb9342bc4 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_f9019cf523abfecd_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_bcfc225eb9342bc4_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_configuration_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_configuration_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_a78997c96869db8a
+  toFunPtr = hs_bindgen_fd35ef98008da708
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_configuration_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_configuration_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_f9019cf523abfecd
+  fromFunPtr = hs_bindgen_bcfc225eb9342bc4
 
-foreign import ccall safe "wrapper" hs_bindgen_a07329181997e376_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_d05a56039046f195_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> IO ())@
-hs_bindgen_a07329181997e376 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> IO ()))
-hs_bindgen_a07329181997e376 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> IO ())@
+hs_bindgen_d05a56039046f195 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> IO ()))
+hs_bindgen_d05a56039046f195 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_a07329181997e376_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_d05a56039046f195_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_31b23b142c8c666d_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_a32dda2d9d0661a0_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> IO ())@
-hs_bindgen_31b23b142c8c666d ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> IO ()
-hs_bindgen_31b23b142c8c666d =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> IO ())@
+hs_bindgen_a32dda2d9d0661a0 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> IO ()
+hs_bindgen_a32dda2d9d0661a0 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_31b23b142c8c666d_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_a32dda2d9d0661a0_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_a07329181997e376
+  toFunPtr = hs_bindgen_d05a56039046f195
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_31b23b142c8c666d
+  fromFunPtr = hs_bindgen_a32dda2d9d0661a0
 
-foreign import ccall safe "wrapper" hs_bindgen_87d91ef6b35bb47c_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_30c89ca76ad7e135_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ())@
-hs_bindgen_87d91ef6b35bb47c ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ()))
-hs_bindgen_87d91ef6b35bb47c =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> RIP.Ptr Zwlr_output_mode_v1 -> IO ())@
+hs_bindgen_30c89ca76ad7e135 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> RIP.Ptr Zwlr_output_mode_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> RIP.Ptr Zwlr_output_mode_v1 -> IO ()))
+hs_bindgen_30c89ca76ad7e135 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_87d91ef6b35bb47c_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_30c89ca76ad7e135_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_383df10c2d4ebb2c_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_3dba5ce3c1f77330_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ())@
-hs_bindgen_383df10c2d4ebb2c ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ()
-hs_bindgen_383df10c2d4ebb2c =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> RIP.Ptr Zwlr_output_mode_v1 -> IO ())@
+hs_bindgen_3dba5ce3c1f77330 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> RIP.Ptr Zwlr_output_mode_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> RIP.Ptr Zwlr_output_mode_v1 -> IO ()
+hs_bindgen_3dba5ce3c1f77330 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_383df10c2d4ebb2c_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_3dba5ce3c1f77330_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> RIP.Ptr Zwlr_output_mode_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_87d91ef6b35bb47c
+  toFunPtr = hs_bindgen_30c89ca76ad7e135
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> RIP.Ptr Zwlr_output_mode_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_383df10c2d4ebb2c
+  fromFunPtr = hs_bindgen_3dba5ce3c1f77330
 
-foreign import ccall safe "wrapper" hs_bindgen_0f4ec8767f4e8fff_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_63c959532434bffa_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())@
-hs_bindgen_0f4ec8767f4e8fff ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
-hs_bindgen_0f4ec8767f4e8fff =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())@
+hs_bindgen_63c959532434bffa ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> PtrConst.PtrConst RIP.CChar -> IO ()))
+hs_bindgen_63c959532434bffa =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_0f4ec8767f4e8fff_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_63c959532434bffa_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_0a6f6ff09549a362_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_57e865a713434184_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())@
-hs_bindgen_0a6f6ff09549a362 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ()
-hs_bindgen_0a6f6ff09549a362 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())@
+hs_bindgen_57e865a713434184 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> PtrConst.PtrConst RIP.CChar -> IO ()
+hs_bindgen_57e865a713434184 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_0a6f6ff09549a362_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_57e865a713434184_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> PtrConst.PtrConst RIP.CChar -> IO ()) where
 
-  toFunPtr = hs_bindgen_0f4ec8767f4e8fff
+  toFunPtr = hs_bindgen_63c959532434bffa
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> PtrConst.PtrConst RIP.CChar -> IO ()) where
 
-  fromFunPtr = hs_bindgen_0a6f6ff09549a362
+  fromFunPtr = hs_bindgen_57e865a713434184
 
-foreign import ccall safe "wrapper" hs_bindgen_bcfbcecae420b34a_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_5b714f8ae5468cf6_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_bcfbcecae420b34a ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-hs_bindgen_bcfbcecae420b34a =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_5b714f8ae5468cf6 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_5b714f8ae5468cf6 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_bcfbcecae420b34a_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_5b714f8ae5468cf6_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_e670abbc0518e67f_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_5865804438281151_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_e670abbc0518e67f ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()
-hs_bindgen_e670abbc0518e67f =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_5865804438281151 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ()
+hs_bindgen_5865804438281151 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_e670abbc0518e67f_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_5865804438281151_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_bcfbcecae420b34a
+  toFunPtr = hs_bindgen_5b714f8ae5468cf6
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_e670abbc0518e67f
+  fromFunPtr = hs_bindgen_5865804438281151
 
-foreign import ccall safe "wrapper" hs_bindgen_ae4516666289cab2_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_159115240593ccd3_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> RIP.Int32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_ae4516666289cab2 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-hs_bindgen_ae4516666289cab2 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_159115240593ccd3 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_159115240593ccd3 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_ae4516666289cab2_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_159115240593ccd3_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_b4dc784cf65f80fe_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_d77b6c6c16c20b76_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> RIP.Int32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_b4dc784cf65f80fe ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()
-hs_bindgen_b4dc784cf65f80fe =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_d77b6c6c16c20b76 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()
+hs_bindgen_d77b6c6c16c20b76 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_b4dc784cf65f80fe_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_d77b6c6c16c20b76_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_ae4516666289cab2
+  toFunPtr = hs_bindgen_159115240593ccd3
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_b4dc784cf65f80fe
+  fromFunPtr = hs_bindgen_d77b6c6c16c20b76
 
-foreign import ccall safe "wrapper" hs_bindgen_86c7ff6ccad3f9de_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_7d6f20699d8ea6bb_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_86c7ff6ccad3f9de ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_86c7ff6ccad3f9de =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_7d6f20699d8ea6bb ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_7d6f20699d8ea6bb =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_86c7ff6ccad3f9de_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_7d6f20699d8ea6bb_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_e82386bcf8d0d20a_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_4bc400cda98aa2f9_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_e82386bcf8d0d20a ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
-hs_bindgen_e82386bcf8d0d20a =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_4bc400cda98aa2f9 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()
+hs_bindgen_4bc400cda98aa2f9 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_e82386bcf8d0d20a_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_4bc400cda98aa2f9_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_86c7ff6ccad3f9de
+  toFunPtr = hs_bindgen_7d6f20699d8ea6bb
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_e82386bcf8d0d20a
+  fromFunPtr = hs_bindgen_4bc400cda98aa2f9
 
-foreign import ccall safe "wrapper" hs_bindgen_adf3344f9b7455d6_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_9fb0f35e55241ec8_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ())@
-hs_bindgen_adf3344f9b7455d6 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ()))
-hs_bindgen_adf3344f9b7455d6 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ())@
+hs_bindgen_9fb0f35e55241ec8 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ()))
+hs_bindgen_9fb0f35e55241ec8 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_adf3344f9b7455d6_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_9fb0f35e55241ec8_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_67cbb9d06d036c41_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_190b8f2f4c7297ec_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ())@
-hs_bindgen_67cbb9d06d036c41 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ()
-hs_bindgen_67cbb9d06d036c41 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ())@
+hs_bindgen_190b8f2f4c7297ec ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ()
+hs_bindgen_190b8f2f4c7297ec =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_67cbb9d06d036c41_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_190b8f2f4c7297ec_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ()) where
 
-  toFunPtr = hs_bindgen_adf3344f9b7455d6
+  toFunPtr = hs_bindgen_9fb0f35e55241ec8
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_head_v1) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_head_v1 -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ()) where
 
-  fromFunPtr = hs_bindgen_67cbb9d06d036c41
+  fromFunPtr = hs_bindgen_190b8f2f4c7297ec
 
-foreign import ccall safe "wrapper" hs_bindgen_368259c80982085b_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_a796c080ccd2147a_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> IO ())@
-hs_bindgen_368259c80982085b ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> IO ()))
-hs_bindgen_368259c80982085b =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> IO ())@
+hs_bindgen_a796c080ccd2147a ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> IO ()))
+hs_bindgen_a796c080ccd2147a =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_368259c80982085b_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_a796c080ccd2147a_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_caea25b331ef7eff_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_5d2e1049492ac4e6_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> IO ())@
-hs_bindgen_caea25b331ef7eff ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> IO ()
-hs_bindgen_caea25b331ef7eff =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> IO ())@
+hs_bindgen_5d2e1049492ac4e6 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> IO ()
+hs_bindgen_5d2e1049492ac4e6 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_caea25b331ef7eff_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_5d2e1049492ac4e6_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_368259c80982085b
+  toFunPtr = hs_bindgen_a796c080ccd2147a
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_caea25b331ef7eff
+  fromFunPtr = hs_bindgen_5d2e1049492ac4e6
 
-foreign import ccall safe "wrapper" hs_bindgen_865823199460de65_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_b981c62d6496a295_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> (RIP.Ptr Zwlr_output_head_v1) -> IO ())@
-hs_bindgen_865823199460de65 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> (RIP.Ptr Zwlr_output_head_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> (RIP.Ptr Zwlr_output_head_v1) -> IO ()))
-hs_bindgen_865823199460de65 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> RIP.Ptr Zwlr_output_head_v1 -> IO ())@
+hs_bindgen_b981c62d6496a295 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> RIP.Ptr Zwlr_output_head_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> RIP.Ptr Zwlr_output_head_v1 -> IO ()))
+hs_bindgen_b981c62d6496a295 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_865823199460de65_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_b981c62d6496a295_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_2fe136d9a13aac3a_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_d8621f8169f7515d_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> (RIP.Ptr Zwlr_output_head_v1) -> IO ())@
-hs_bindgen_2fe136d9a13aac3a ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> (RIP.Ptr Zwlr_output_head_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> (RIP.Ptr Zwlr_output_head_v1) -> IO ()
-hs_bindgen_2fe136d9a13aac3a =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> RIP.Ptr Zwlr_output_head_v1 -> IO ())@
+hs_bindgen_d8621f8169f7515d ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> RIP.Ptr Zwlr_output_head_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> RIP.Ptr Zwlr_output_head_v1 -> IO ()
+hs_bindgen_d8621f8169f7515d =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_2fe136d9a13aac3a_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_d8621f8169f7515d_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> (RIP.Ptr Zwlr_output_head_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> RIP.Ptr Zwlr_output_head_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_865823199460de65
+  toFunPtr = hs_bindgen_b981c62d6496a295
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> (RIP.Ptr Zwlr_output_head_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> RIP.Ptr Zwlr_output_head_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_2fe136d9a13aac3a
+  fromFunPtr = hs_bindgen_d8621f8169f7515d
 
-foreign import ccall safe "wrapper" hs_bindgen_f77fb8298d6ecea5_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_3e744dba45a07f65_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_f77fb8298d6ecea5 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_f77fb8298d6ecea5 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_3e744dba45a07f65 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_3e744dba45a07f65 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_f77fb8298d6ecea5_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_3e744dba45a07f65_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_d861b895dcd47d38_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_6f731119c45feb06_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_d861b895dcd47d38 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
-hs_bindgen_d861b895dcd47d38 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_6f731119c45feb06 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()
+hs_bindgen_6f731119c45feb06 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_d861b895dcd47d38_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_6f731119c45feb06_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_f77fb8298d6ecea5
+  toFunPtr = hs_bindgen_3e744dba45a07f65
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_manager_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_manager_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_d861b895dcd47d38
+  fromFunPtr = hs_bindgen_6f731119c45feb06
 
-foreign import ccall safe "wrapper" hs_bindgen_9b9e687a25e82268_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_283c0772ba64b345_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ())@
-hs_bindgen_9b9e687a25e82268 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ()))
-hs_bindgen_9b9e687a25e82268 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> IO ())@
+hs_bindgen_283c0772ba64b345 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> IO ()))
+hs_bindgen_283c0772ba64b345 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_9b9e687a25e82268_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_283c0772ba64b345_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_44cb31e2a7058856_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_effa959fb395c3f9_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ())@
-hs_bindgen_44cb31e2a7058856 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ()
-hs_bindgen_44cb31e2a7058856 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> IO ())@
+hs_bindgen_effa959fb395c3f9 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> IO ()
+hs_bindgen_effa959fb395c3f9 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_44cb31e2a7058856_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_effa959fb395c3f9_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_9b9e687a25e82268
+  toFunPtr = hs_bindgen_283c0772ba64b345
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_44cb31e2a7058856
+  fromFunPtr = hs_bindgen_effa959fb395c3f9
 
-foreign import ccall safe "wrapper" hs_bindgen_ebf848142f24891a_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_3a124250b40449a2_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_ebf848142f24891a ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-hs_bindgen_ebf848142f24891a =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_3a124250b40449a2 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_3a124250b40449a2 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_ebf848142f24891a_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_3a124250b40449a2_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_8f153b5ce639ce3a_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_605f280556af66d0_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_8f153b5ce639ce3a ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()
-hs_bindgen_8f153b5ce639ce3a =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_605f280556af66d0 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ()
+hs_bindgen_605f280556af66d0 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_8f153b5ce639ce3a_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_605f280556af66d0_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_ebf848142f24891a
+  toFunPtr = hs_bindgen_3a124250b40449a2
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_8f153b5ce639ce3a
+  fromFunPtr = hs_bindgen_605f280556af66d0
 
-foreign import ccall safe "wrapper" hs_bindgen_464b2e0506e76606_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_abd070a8533f370a_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> RIP.Int32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_464b2e0506e76606 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-hs_bindgen_464b2e0506e76606 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_abd070a8533f370a ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_abd070a8533f370a =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_464b2e0506e76606_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_abd070a8533f370a_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_94d2a54695090bc2_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_05d87beef2fbdf86_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> RIP.Int32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_94d2a54695090bc2 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()
-hs_bindgen_94d2a54695090bc2 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_05d87beef2fbdf86 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()
+hs_bindgen_05d87beef2fbdf86 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_94d2a54695090bc2_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_05d87beef2fbdf86_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_464b2e0506e76606
+  toFunPtr = hs_bindgen_abd070a8533f370a
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_mode_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_mode_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_94d2a54695090bc2
+  fromFunPtr = hs_bindgen_05d87beef2fbdf86

@@ -39,29 +39,13 @@ hs_bindgen_308f1b4a4542d483 =
   RIP.fromFFIType hs_bindgen_308f1b4a4542d483_base
 
 {-# NOINLINE hs_bindgen_87458346588f959e #-}
-{-|
+{-| __C declaration:__ @river_input_manager_v1_interface@
 
-  > page_iface_river_input_manager_v1 river_input_manager_v1
+    __defined at:__ @river-input-management-v1-client-protocol.h 74:34@
 
-  > page_iface_river_input_manager_v1_desc Description
+    __exported by:__ @river-input-management-v1-client-protocol.h@
 
-  Input manager global interface.
-
-  > page_iface_river_input_manager_v1_api API
-
-  See @iface_river_input_manager_v1@ .
-
-  > iface_river_input_manager_v1 The river_input_manager_v1 interface
-
-  Input manager global interface.
-
-__C declaration:__ @river_input_manager_v1_interface@
-
-__defined at:__ @river-input-management-v1-client-protocol.h 74:34@
-
-__exported by:__ @river-input-management-v1-client-protocol.h@
-
-__unique:__ @Bindings_River_InputManagementV1_Generated_Bindings.River.InputManagementV1.Generated_river_input_manager_v1_interface@
+    __unique:__ @Bindings_River_InputManagementV1_Generated_Bindings.River.InputManagementV1.Generated_river_input_manager_v1_interface@
 -}
 hs_bindgen_87458346588f959e :: PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
 hs_bindgen_87458346588f959e =
@@ -82,29 +66,13 @@ hs_bindgen_e669758538003f92 =
   RIP.fromFFIType hs_bindgen_e669758538003f92_base
 
 {-# NOINLINE hs_bindgen_08b85a09320e9df1 #-}
-{-|
+{-| __C declaration:__ @river_input_device_v1_interface@
 
-  > page_iface_river_input_device_v1 river_input_device_v1
+    __defined at:__ @river-input-management-v1-client-protocol.h 95:34@
 
-  > page_iface_river_input_device_v1_desc Description
+    __exported by:__ @river-input-management-v1-client-protocol.h@
 
-  An input device represents a physical keyboard, mouse, touchscreen, or drawing tablet tool. It is assigned to exactly one seat at a time. By default, all input devices are assigned to the default seat.
-
-  > page_iface_river_input_device_v1_api API
-
-  See @iface_river_input_device_v1@ .
-
-  > iface_river_input_device_v1 The river_input_device_v1 interface
-
-  An input device represents a physical keyboard, mouse, touchscreen, or drawing tablet tool. It is assigned to exactly one seat at a time. By default, all input devices are assigned to the default seat.
-
-__C declaration:__ @river_input_device_v1_interface@
-
-__defined at:__ @river-input-management-v1-client-protocol.h 95:34@
-
-__exported by:__ @river-input-management-v1-client-protocol.h@
-
-__unique:__ @Bindings_River_InputManagementV1_Generated_Bindings.River.InputManagementV1.Generated_river_input_device_v1_interface@
+    __unique:__ @Bindings_River_InputManagementV1_Generated_Bindings.River.InputManagementV1.Generated_river_input_device_v1_interface@
 -}
 hs_bindgen_08b85a09320e9df1 :: PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
 hs_bindgen_08b85a09320e9df1 =

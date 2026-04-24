@@ -7,6 +7,7 @@
 {-# LANGUAGE EmptyDataDecls #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MagicHash #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -182,7 +183,7 @@ instance Read Zwlr_output_power_v1_mode where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr Zwlr_output_power_v1_mode) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -194,24 +195,20 @@ instance HasCField.HasCField Zwlr_output_power_v1_mode "unwrap" where
 
   offset# = \_ -> \_ -> 0
 
-{-| Output is turned off.
+{-| __C declaration:__ @ZWLR_OUTPUT_POWER_V1_MODE_OFF@
 
-__C declaration:__ @ZWLR_OUTPUT_POWER_V1_MODE_OFF@
+    __defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 177:2@
 
-__defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 177:2@
-
-__exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
 -}
 pattern ZWLR_OUTPUT_POWER_V1_MODE_OFF :: Zwlr_output_power_v1_mode
 pattern ZWLR_OUTPUT_POWER_V1_MODE_OFF = Zwlr_output_power_v1_mode 0
 
-{-| Output is turned on, no power saving
+{-| __C declaration:__ @ZWLR_OUTPUT_POWER_V1_MODE_ON@
 
-__C declaration:__ @ZWLR_OUTPUT_POWER_V1_MODE_ON@
+    __defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 181:2@
 
-__defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 181:2@
-
-__exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
 -}
 pattern ZWLR_OUTPUT_POWER_V1_MODE_ON :: Zwlr_output_power_v1_mode
 pattern ZWLR_OUTPUT_POWER_V1_MODE_ON = Zwlr_output_power_v1_mode 1
@@ -296,7 +293,7 @@ instance Read Zwlr_output_power_v1_error where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr Zwlr_output_power_v1_error) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -308,57 +305,49 @@ instance HasCField.HasCField Zwlr_output_power_v1_error "unwrap" where
 
   offset# = \_ -> \_ -> 0
 
-{-| nonexistent power save mode
+{-| __C declaration:__ @ZWLR_OUTPUT_POWER_V1_ERROR_INVALID_MODE@
 
-__C declaration:__ @ZWLR_OUTPUT_POWER_V1_ERROR_INVALID_MODE@
+    __defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 191:2@
 
-__defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 191:2@
-
-__exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
 -}
 pattern ZWLR_OUTPUT_POWER_V1_ERROR_INVALID_MODE :: Zwlr_output_power_v1_error
 pattern ZWLR_OUTPUT_POWER_V1_ERROR_INVALID_MODE = Zwlr_output_power_v1_error 1
 
-{-|
+{-| __C declaration:__ @struct zwlr_output_power_v1_listener@
 
-  > iface_zwlr_output_power_v1
+    __defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 199:8@
 
-  > zwlr_output_power_v1_listener
-
-__C declaration:__ @struct zwlr_output_power_v1_listener@
-
-__defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 199:8@
-
-__exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
 -}
 data Zwlr_output_power_v1_listener = Zwlr_output_power_v1_listener
-  { mode :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_power_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  { mode :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_power_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ Report a power management mode change
 
-       Report the power management mode change of an output.
+         Report the power management mode change of an output.
 
-       The mode event is sent after an output changed its power management mode. The reason can be a client using set_mode or the compositor deciding to change an output's mode. This event is also sent immediately when the object is created so the client is informed about the current power management mode.
+         The mode event is sent after an output changed its power management mode. The reason can be a client using set_mode or the compositor deciding to change an output's mode. This event is also sent immediately when the object is created so the client is informed about the current power management mode.
 
-       [__@mode@ /(input)/__]: the output's new power management mode
+         [__@@__]: the output's new power management mode
 
-    __C declaration:__ @mode@
+         __C declaration:__ @mode@
 
-    __defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 212:9@
+         __defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 212:9@
 
-    __exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
     -}
-  , failed :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_power_v1) -> IO ())
+  , failed :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_power_v1 -> IO ())
     {- ^ object no longer valid
 
-       This event indicates that the output power management mode control is no longer valid. This can happen for a number of reasons, including: - The output doesn't support power management - Another client already has exclusive power management mode control for this output - The output disappeared
+         This event indicates that the output power management mode control is no longer valid. This can happen for a number of reasons, including: - The output doesn't support power management - Another client already has exclusive power management mode control for this output - The output disappeared
 
-       Upon receiving this event, the client should destroy this object.
+         Upon receiving this event, the client should destroy this object.
 
-    __C declaration:__ @failed@
+         __C declaration:__ @failed@
 
-    __defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 227:9@
+         __defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 227:9@
 
-    __exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
     -}
   }
   deriving stock (Eq, RIP.Generic, Show)
@@ -392,11 +381,11 @@ deriving via Marshal.EquivStorable Zwlr_output_power_v1_listener instance RIP.St
 instance HasCField.HasCField Zwlr_output_power_v1_listener "mode" where
 
   type CFieldType Zwlr_output_power_v1_listener "mode" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_power_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_power_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_power_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_power_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "mode" (RIP.Ptr Zwlr_output_power_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"mode")
@@ -404,11 +393,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_powe
 instance HasCField.HasCField Zwlr_output_power_v1_listener "failed" where
 
   type CFieldType Zwlr_output_power_v1_listener "failed" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_power_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_power_v1 -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_power_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_power_v1 -> IO ())
          ) => RIP.HasField "failed" (RIP.Ptr Zwlr_output_power_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"failed")
@@ -471,66 +460,66 @@ zWLR_OUTPUT_POWER_V1_DESTROY_SINCE_VERSION :: RIP.CInt
 zWLR_OUTPUT_POWER_V1_DESTROY_SINCE_VERSION =
   (1 :: RIP.CInt)
 
-foreign import ccall safe "wrapper" hs_bindgen_ab60574ca1e169a1_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_238a978faac5c1dd_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_power_v1) -> IO ())@
-hs_bindgen_ab60574ca1e169a1 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_power_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_power_v1) -> IO ()))
-hs_bindgen_ab60574ca1e169a1 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_power_v1 -> IO ())@
+hs_bindgen_238a978faac5c1dd ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_power_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_power_v1 -> IO ()))
+hs_bindgen_238a978faac5c1dd =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_ab60574ca1e169a1_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_238a978faac5c1dd_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_781868ed9b577b42_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_5dd243eecc2ec366_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_power_v1) -> IO ())@
-hs_bindgen_781868ed9b577b42 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_power_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_power_v1) -> IO ()
-hs_bindgen_781868ed9b577b42 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_power_v1 -> IO ())@
+hs_bindgen_5dd243eecc2ec366 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_power_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_power_v1 -> IO ()
+hs_bindgen_5dd243eecc2ec366 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_781868ed9b577b42_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_5dd243eecc2ec366_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_power_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_power_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_ab60574ca1e169a1
+  toFunPtr = hs_bindgen_238a978faac5c1dd
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_power_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_power_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_781868ed9b577b42
+  fromFunPtr = hs_bindgen_5dd243eecc2ec366
 
-foreign import ccall safe "wrapper" hs_bindgen_3c1371497f1401f2_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_4fb65e1bb461e5e6_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_power_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_3c1371497f1401f2 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_power_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_power_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_3c1371497f1401f2 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_power_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_4fb65e1bb461e5e6 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_power_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_power_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_4fb65e1bb461e5e6 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_3c1371497f1401f2_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_4fb65e1bb461e5e6_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_cc36e14225db201f_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_fc366223fc1c877c_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_power_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_cc36e14225db201f ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_power_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_power_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
-hs_bindgen_cc36e14225db201f =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_power_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_fc366223fc1c877c ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_power_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_power_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()
+hs_bindgen_fc366223fc1c877c =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_cc36e14225db201f_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_fc366223fc1c877c_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_power_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_power_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_3c1371497f1401f2
+  toFunPtr = hs_bindgen_4fb65e1bb461e5e6
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_output_power_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_output_power_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_cc36e14225db201f
+  fromFunPtr = hs_bindgen_fc366223fc1c877c

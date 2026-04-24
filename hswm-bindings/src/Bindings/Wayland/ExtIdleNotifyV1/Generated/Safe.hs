@@ -116,15 +116,11 @@ hs_bindgen_701f704089214a2f ::
 hs_bindgen_701f704089214a2f =
   RIP.fromFFIType hs_bindgen_701f704089214a2f_base
 
-{-|
+{-| __C declaration:__ @ext_idle_notifier_v1_set_user_data@
 
-  > iface_ext_idle_notifier_v1
+    __defined at:__ @ext-idle-notify-v1-client-protocol.h 152:1@
 
-__C declaration:__ @ext_idle_notifier_v1_set_user_data@
-
-__defined at:__ @ext-idle-notify-v1-client-protocol.h 152:1@
-
-__exported by:__ @ext-idle-notify-v1-client-protocol.h@
+    __exported by:__ @ext-idle-notify-v1-client-protocol.h@
 -}
 ext_idle_notifier_v1_set_user_data ::
      RIP.Ptr Ext_idle_notifier_v1
@@ -147,15 +143,11 @@ hs_bindgen_e204c81e21efa0d5 ::
 hs_bindgen_e204c81e21efa0d5 =
   RIP.fromFFIType hs_bindgen_e204c81e21efa0d5_base
 
-{-|
+{-| __C declaration:__ @ext_idle_notifier_v1_get_user_data@
 
-  > iface_ext_idle_notifier_v1
+    __defined at:__ @ext-idle-notify-v1-client-protocol.h 159:1@
 
-__C declaration:__ @ext_idle_notifier_v1_get_user_data@
-
-__defined at:__ @ext-idle-notify-v1-client-protocol.h 159:1@
-
-__exported by:__ @ext-idle-notify-v1-client-protocol.h@
+    __exported by:__ @ext-idle-notify-v1-client-protocol.h@
 -}
 ext_idle_notifier_v1_get_user_data ::
      RIP.Ptr Ext_idle_notifier_v1
@@ -201,17 +193,13 @@ hs_bindgen_9e8def318bd5f8c3 ::
 hs_bindgen_9e8def318bd5f8c3 =
   RIP.fromFFIType hs_bindgen_9e8def318bd5f8c3_base
 
-{-|
+{-| Destroy the manager object. All objects created via this interface remain valid.
 
-  > iface_ext_idle_notifier_v1
+    __C declaration:__ @ext_idle_notifier_v1_destroy@
 
-  Destroy the manager object. All objects created via this interface remain valid.
+    __defined at:__ @ext-idle-notify-v1-client-protocol.h 177:1@
 
-__C declaration:__ @ext_idle_notifier_v1_destroy@
-
-__defined at:__ @ext-idle-notify-v1-client-protocol.h 177:1@
-
-__exported by:__ @ext-idle-notify-v1-client-protocol.h@
+    __exported by:__ @ext-idle-notify-v1-client-protocol.h@
 -}
 ext_idle_notifier_v1_destroy ::
      RIP.Ptr Ext_idle_notifier_v1
@@ -236,21 +224,17 @@ hs_bindgen_e39152346e44df01 ::
 hs_bindgen_e39152346e44df01 =
   RIP.fromFFIType hs_bindgen_e39152346e44df01_base
 
-{-|
+{-| Create a new idle notification object.
 
-  > iface_ext_idle_notifier_v1
+    The notification object has a minimum timeout duration and is tied to a seat. The client will be notified if the seat is inactive for at least the provided timeout. See ext_idle_notification_v1 for more details.
 
-  Create a new idle notification object.
+    A zero timeout is valid and means the client wants to be notified as soon as possible when the seat is inactive.
 
-  The notification object has a minimum timeout duration and is tied to a seat. The client will be notified if the seat is inactive for at least the provided timeout. See ext_idle_notification_v1 for more details.
+    __C declaration:__ @ext_idle_notifier_v1_get_idle_notification@
 
-  A zero timeout is valid and means the client wants to be notified as soon as possible when the seat is inactive.
+    __defined at:__ @ext-idle-notify-v1-client-protocol.h 196:1@
 
-__C declaration:__ @ext_idle_notifier_v1_get_idle_notification@
-
-__defined at:__ @ext-idle-notify-v1-client-protocol.h 196:1@
-
-__exported by:__ @ext-idle-notify-v1-client-protocol.h@
+    __exported by:__ @ext-idle-notify-v1-client-protocol.h@
 -}
 ext_idle_notifier_v1_get_idle_notification ::
      RIP.Ptr Ext_idle_notifier_v1
@@ -279,21 +263,17 @@ hs_bindgen_f9ebd0aa4fc7625d ::
 hs_bindgen_f9ebd0aa4fc7625d =
   RIP.fromFFIType hs_bindgen_f9ebd0aa4fc7625d_base
 
-{-|
+{-| Create a new idle notification object to track input from the user, such as keyboard and mouse movement. Because this object is meant to track user input alone, it ignores idle inhibitors.
 
-  > iface_ext_idle_notifier_v1
+    The notification object has a minimum timeout duration and is tied to a seat. The client will be notified if the seat is inactive for at least the provided timeout. See ext_idle_notification_v1 for more details.
 
-  Create a new idle notification object to track input from the user, such as keyboard and mouse movement. Because this object is meant to track user input alone, it ignores idle inhibitors.
+    A zero timeout is valid and means the client wants to be notified as soon as possible when the seat is inactive.
 
-  The notification object has a minimum timeout duration and is tied to a seat. The client will be notified if the seat is inactive for at least the provided timeout. See ext_idle_notification_v1 for more details.
+    __C declaration:__ @ext_idle_notifier_v1_get_input_idle_notification@
 
-  A zero timeout is valid and means the client wants to be notified as soon as possible when the seat is inactive.
+    __defined at:__ @ext-idle-notify-v1-client-protocol.h 221:1@
 
-__C declaration:__ @ext_idle_notifier_v1_get_input_idle_notification@
-
-__defined at:__ @ext-idle-notify-v1-client-protocol.h 221:1@
-
-__exported by:__ @ext-idle-notify-v1-client-protocol.h@
+    __exported by:__ @ext-idle-notify-v1-client-protocol.h@
 -}
 ext_idle_notifier_v1_get_input_idle_notification ::
      RIP.Ptr Ext_idle_notifier_v1
@@ -322,15 +302,11 @@ hs_bindgen_2a917520652baa3f ::
 hs_bindgen_2a917520652baa3f =
   RIP.fromFFIType hs_bindgen_2a917520652baa3f_base
 
-{-|
+{-| __C declaration:__ @ext_idle_notification_v1_add_listener@
 
-  > iface_ext_idle_notification_v1
+    __defined at:__ @ext-idle-notify-v1-client-protocol.h 264:1@
 
-__C declaration:__ @ext_idle_notification_v1_add_listener@
-
-__defined at:__ @ext-idle-notify-v1-client-protocol.h 264:1@
-
-__exported by:__ @ext-idle-notify-v1-client-protocol.h@
+    __exported by:__ @ext-idle-notify-v1-client-protocol.h@
 -}
 ext_idle_notification_v1_add_listener ::
      RIP.Ptr Ext_idle_notification_v1
@@ -357,15 +333,11 @@ hs_bindgen_8de5acb9d47cc725 ::
 hs_bindgen_8de5acb9d47cc725 =
   RIP.fromFFIType hs_bindgen_8de5acb9d47cc725_base
 
-{-|
+{-| __C declaration:__ @ext_idle_notification_v1_set_user_data@
 
-  > iface_ext_idle_notification_v1
+    __defined at:__ @ext-idle-notify-v1-client-protocol.h 289:1@
 
-__C declaration:__ @ext_idle_notification_v1_set_user_data@
-
-__defined at:__ @ext-idle-notify-v1-client-protocol.h 289:1@
-
-__exported by:__ @ext-idle-notify-v1-client-protocol.h@
+    __exported by:__ @ext-idle-notify-v1-client-protocol.h@
 -}
 ext_idle_notification_v1_set_user_data ::
      RIP.Ptr Ext_idle_notification_v1
@@ -388,15 +360,11 @@ hs_bindgen_143dc3a948dcd5a6 ::
 hs_bindgen_143dc3a948dcd5a6 =
   RIP.fromFFIType hs_bindgen_143dc3a948dcd5a6_base
 
-{-|
+{-| __C declaration:__ @ext_idle_notification_v1_get_user_data@
 
-  > iface_ext_idle_notification_v1
+    __defined at:__ @ext-idle-notify-v1-client-protocol.h 296:1@
 
-__C declaration:__ @ext_idle_notification_v1_get_user_data@
-
-__defined at:__ @ext-idle-notify-v1-client-protocol.h 296:1@
-
-__exported by:__ @ext-idle-notify-v1-client-protocol.h@
+    __exported by:__ @ext-idle-notify-v1-client-protocol.h@
 -}
 ext_idle_notification_v1_get_user_data ::
      RIP.Ptr Ext_idle_notification_v1
@@ -442,17 +410,13 @@ hs_bindgen_67a6fef945a679a2 ::
 hs_bindgen_67a6fef945a679a2 =
   RIP.fromFFIType hs_bindgen_67a6fef945a679a2_base
 
-{-|
+{-| Destroy the notification object.
 
-  > iface_ext_idle_notification_v1
+    __C declaration:__ @ext_idle_notification_v1_destroy@
 
-  Destroy the notification object.
+    __defined at:__ @ext-idle-notify-v1-client-protocol.h 313:1@
 
-__C declaration:__ @ext_idle_notification_v1_destroy@
-
-__defined at:__ @ext-idle-notify-v1-client-protocol.h 313:1@
-
-__exported by:__ @ext-idle-notify-v1-client-protocol.h@
+    __exported by:__ @ext-idle-notify-v1-client-protocol.h@
 -}
 ext_idle_notification_v1_destroy ::
      RIP.Ptr Ext_idle_notification_v1

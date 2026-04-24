@@ -114,15 +114,11 @@ hs_bindgen_0583543d812119bb ::
 hs_bindgen_0583543d812119bb =
   RIP.fromFFIType hs_bindgen_0583543d812119bb_base
 
-{-|
+{-| __C declaration:__ @zwlr_output_power_manager_v1_set_user_data@
 
-  > iface_zwlr_output_power_manager_v1
+    __defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 123:1@
 
-__C declaration:__ @zwlr_output_power_manager_v1_set_user_data@
-
-__defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 123:1@
-
-__exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_power_manager_v1_set_user_data ::
      RIP.Ptr Zwlr_output_power_manager_v1
@@ -145,15 +141,11 @@ hs_bindgen_99a1cf31e49565e3 ::
 hs_bindgen_99a1cf31e49565e3 =
   RIP.fromFFIType hs_bindgen_99a1cf31e49565e3_base
 
-{-|
+{-| __C declaration:__ @zwlr_output_power_manager_v1_get_user_data@
 
-  > iface_zwlr_output_power_manager_v1
+    __defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 130:1@
 
-__C declaration:__ @zwlr_output_power_manager_v1_get_user_data@
-
-__defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 130:1@
-
-__exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_power_manager_v1_get_user_data ::
      RIP.Ptr Zwlr_output_power_manager_v1
@@ -201,17 +193,13 @@ hs_bindgen_c4151f19ec458130 ::
 hs_bindgen_c4151f19ec458130 =
   RIP.fromFFIType hs_bindgen_c4151f19ec458130_base
 
-{-|
+{-| Create an output power management mode control that can be used to adjust the power management mode for a given output.
 
-  > iface_zwlr_output_power_manager_v1
+    __C declaration:__ @zwlr_output_power_manager_v1_get_output_power@
 
-  Create an output power management mode control that can be used to adjust the power management mode for a given output.
+    __defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 148:1@
 
-__C declaration:__ @zwlr_output_power_manager_v1_get_output_power@
-
-__defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 148:1@
-
-__exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_power_manager_v1_get_output_power ::
      RIP.Ptr Zwlr_output_power_manager_v1
@@ -234,17 +222,13 @@ hs_bindgen_2451478f9b279341 ::
 hs_bindgen_2451478f9b279341 =
   RIP.fromFFIType hs_bindgen_2451478f9b279341_base
 
-{-|
+{-| All objects created by the manager will still remain valid, until their appropriate destroy request has been called.
 
-  > iface_zwlr_output_power_manager_v1
+    __C declaration:__ @zwlr_output_power_manager_v1_destroy@
 
-  All objects created by the manager will still remain valid, until their appropriate destroy request has been called.
+    __defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 165:1@
 
-__C declaration:__ @zwlr_output_power_manager_v1_destroy@
-
-__defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 165:1@
-
-__exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_power_manager_v1_destroy ::
      RIP.Ptr Zwlr_output_power_manager_v1
@@ -269,15 +253,11 @@ hs_bindgen_26d3a32f360563b6 ::
 hs_bindgen_26d3a32f360563b6 =
   RIP.fromFFIType hs_bindgen_26d3a32f360563b6_base
 
-{-|
+{-| __C declaration:__ @zwlr_output_power_v1_add_listener@
 
-  > iface_zwlr_output_power_v1
+    __defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 235:1@
 
-__C declaration:__ @zwlr_output_power_v1_add_listener@
-
-__defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 235:1@
-
-__exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_power_v1_add_listener ::
      RIP.Ptr Zwlr_output_power_v1
@@ -304,15 +284,11 @@ hs_bindgen_38367243468cc0bf ::
 hs_bindgen_38367243468cc0bf =
   RIP.fromFFIType hs_bindgen_38367243468cc0bf_base
 
-{-|
+{-| __C declaration:__ @zwlr_output_power_v1_set_user_data@
 
-  > iface_zwlr_output_power_v1
+    __defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 265:1@
 
-__C declaration:__ @zwlr_output_power_v1_set_user_data@
-
-__defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 265:1@
-
-__exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_power_v1_set_user_data ::
      RIP.Ptr Zwlr_output_power_v1
@@ -335,15 +311,11 @@ hs_bindgen_2aa716266a7bfc34 ::
 hs_bindgen_2aa716266a7bfc34 =
   RIP.fromFFIType hs_bindgen_2aa716266a7bfc34_base
 
-{-|
+{-| __C declaration:__ @zwlr_output_power_v1_get_user_data@
 
-  > iface_zwlr_output_power_v1
+    __defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 272:1@
 
-__C declaration:__ @zwlr_output_power_v1_get_user_data@
-
-__defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 272:1@
-
-__exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_power_v1_get_user_data ::
      RIP.Ptr Zwlr_output_power_v1
@@ -391,17 +363,13 @@ hs_bindgen_ebd26d57c53fbf42 ::
 hs_bindgen_ebd26d57c53fbf42 =
   RIP.fromFFIType hs_bindgen_ebd26d57c53fbf42_base
 
-{-|
+{-| Set an output's power save mode to the given mode. The mode change is effective immediately. If the output does not support the given mode a failed event is sent.
 
-  > iface_zwlr_output_power_v1
+    __C declaration:__ @zwlr_output_power_v1_set_mode@
 
-  Set an output's power save mode to the given mode. The mode change is effective immediately. If the output does not support the given mode a failed event is sent.
+    __defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 291:1@
 
-__C declaration:__ @zwlr_output_power_v1_set_mode@
-
-__defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 291:1@
-
-__exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_power_v1_set_mode ::
      RIP.Ptr Zwlr_output_power_v1
@@ -424,17 +392,13 @@ hs_bindgen_2bd1aefc5715e87d ::
 hs_bindgen_2bd1aefc5715e87d =
   RIP.fromFFIType hs_bindgen_2bd1aefc5715e87d_base
 
-{-|
+{-| Destroys the output power management mode control object.
 
-  > iface_zwlr_output_power_v1
+    __C declaration:__ @zwlr_output_power_v1_destroy@
 
-  Destroys the output power management mode control object.
+    __defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 303:1@
 
-__C declaration:__ @zwlr_output_power_v1_destroy@
-
-__defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 303:1@
-
-__exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_power_v1_destroy ::
      RIP.Ptr Zwlr_output_power_v1

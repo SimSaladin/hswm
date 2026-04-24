@@ -39,29 +39,13 @@ hs_bindgen_edfefaf9adeac090 =
   RIP.fromFFIType hs_bindgen_edfefaf9adeac090_base
 
 {-# NOINLINE hs_bindgen_a58583a514084432 #-}
-{-|
+{-| __C declaration:__ @zxdg_output_manager_v1_interface@
 
-  > page_iface_zxdg_output_manager_v1 zxdg_output_manager_v1
+    __defined at:__ @xdg-output-unstable-v1-client-protocol.h 95:34@
 
-  > page_iface_zxdg_output_manager_v1_desc Description
+    __exported by:__ @xdg-output-unstable-v1-client-protocol.h@
 
-  A global factory interface for xdg_output objects.
-
-  > page_iface_zxdg_output_manager_v1_api API
-
-  See @iface_zxdg_output_manager_v1@ .
-
-  > iface_zxdg_output_manager_v1 The zxdg_output_manager_v1 interface
-
-  A global factory interface for xdg_output objects.
-
-__C declaration:__ @zxdg_output_manager_v1_interface@
-
-__defined at:__ @xdg-output-unstable-v1-client-protocol.h 95:34@
-
-__exported by:__ @xdg-output-unstable-v1-client-protocol.h@
-
-__unique:__ @Bindings_Wayland_XdgOutputUnstableV1_Generated_Bindings.Wayland.XdgOutputUnstableV1.Generated_zxdg_output_manager_v1_interface@
+    __unique:__ @Bindings_Wayland_XdgOutputUnstableV1_Generated_Bindings.Wayland.XdgOutputUnstableV1.Generated_zxdg_output_manager_v1_interface@
 -}
 hs_bindgen_a58583a514084432 :: PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
 hs_bindgen_a58583a514084432 =
@@ -82,37 +66,13 @@ hs_bindgen_e247b9eb940667b9 =
   RIP.fromFFIType hs_bindgen_e247b9eb940667b9_base
 
 {-# NOINLINE hs_bindgen_3fea2b0786cf95d6 #-}
-{-|
+{-| __C declaration:__ @zxdg_output_v1_interface@
 
-  > page_iface_zxdg_output_v1 zxdg_output_v1
+    __defined at:__ @xdg-output-unstable-v1-client-protocol.h 128:34@
 
-  > page_iface_zxdg_output_v1_desc Description
+    __exported by:__ @xdg-output-unstable-v1-client-protocol.h@
 
-  An xdg_output describes part of the compositor geometry.
-
-  This typically corresponds to a monitor that displays part of the compositor space.
-
-  For objects version 3 onwards, after all xdg_output properties have been sent (when the object is created and when properties are updated), a wl_output.done event is sent. This allows changes to the output properties to be seen as atomic, even if they happen via multiple events.
-
-  > page_iface_zxdg_output_v1_api API
-
-  See @iface_zxdg_output_v1@ .
-
-  > iface_zxdg_output_v1 The zxdg_output_v1 interface
-
-  An xdg_output describes part of the compositor geometry.
-
-  This typically corresponds to a monitor that displays part of the compositor space.
-
-  For objects version 3 onwards, after all xdg_output properties have been sent (when the object is created and when properties are updated), a wl_output.done event is sent. This allows changes to the output properties to be seen as atomic, even if they happen via multiple events.
-
-__C declaration:__ @zxdg_output_v1_interface@
-
-__defined at:__ @xdg-output-unstable-v1-client-protocol.h 128:34@
-
-__exported by:__ @xdg-output-unstable-v1-client-protocol.h@
-
-__unique:__ @Bindings_Wayland_XdgOutputUnstableV1_Generated_Bindings.Wayland.XdgOutputUnstableV1.Generated_zxdg_output_v1_interface@
+    __unique:__ @Bindings_Wayland_XdgOutputUnstableV1_Generated_Bindings.Wayland.XdgOutputUnstableV1.Generated_zxdg_output_v1_interface@
 -}
 hs_bindgen_3fea2b0786cf95d6 :: PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
 hs_bindgen_3fea2b0786cf95d6 =

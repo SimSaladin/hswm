@@ -7,6 +7,7 @@
 {-# LANGUAGE EmptyDataDecls #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MagicHash #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -176,7 +177,7 @@ instance Read Zwlr_layer_shell_v1_error where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr Zwlr_layer_shell_v1_error) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -188,52 +189,42 @@ instance HasCField.HasCField Zwlr_layer_shell_v1_error "unwrap" where
 
   offset# = \_ -> \_ -> 0
 
-{-| wl_surface has another role
+{-| __C declaration:__ @ZWLR_LAYER_SHELL_V1_ERROR_ROLE@
 
-__C declaration:__ @ZWLR_LAYER_SHELL_V1_ERROR_ROLE@
+    __defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 117:2@
 
-__defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 117:2@
-
-__exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
 -}
 pattern ZWLR_LAYER_SHELL_V1_ERROR_ROLE :: Zwlr_layer_shell_v1_error
 pattern ZWLR_LAYER_SHELL_V1_ERROR_ROLE = Zwlr_layer_shell_v1_error 0
 
-{-| layer value is invalid
+{-| __C declaration:__ @ZWLR_LAYER_SHELL_V1_ERROR_INVALID_LAYER@
 
-__C declaration:__ @ZWLR_LAYER_SHELL_V1_ERROR_INVALID_LAYER@
+    __defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 121:2@
 
-__defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 121:2@
-
-__exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
 -}
 pattern ZWLR_LAYER_SHELL_V1_ERROR_INVALID_LAYER :: Zwlr_layer_shell_v1_error
 pattern ZWLR_LAYER_SHELL_V1_ERROR_INVALID_LAYER = Zwlr_layer_shell_v1_error 1
 
-{-| wl_surface has a buffer attached or committed
+{-| __C declaration:__ @ZWLR_LAYER_SHELL_V1_ERROR_ALREADY_CONSTRUCTED@
 
-__C declaration:__ @ZWLR_LAYER_SHELL_V1_ERROR_ALREADY_CONSTRUCTED@
+    __defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 125:2@
 
-__defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 125:2@
-
-__exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
 -}
 pattern ZWLR_LAYER_SHELL_V1_ERROR_ALREADY_CONSTRUCTED :: Zwlr_layer_shell_v1_error
 pattern ZWLR_LAYER_SHELL_V1_ERROR_ALREADY_CONSTRUCTED = Zwlr_layer_shell_v1_error 2
 
-{-|
+{-| available layers for surfaces
 
-  > iface_zwlr_layer_shell_v1
+    These values indicate which layers a surface can be rendered in. They are ordered by z depth, bottom-most first. Traditional shell surfaces will typically be rendered between the bottom and top layers. Fullscreen shell surfaces are typically rendered at the top layer. Multiple surfaces can share a single layer, and ordering within a single layer is undefined.
 
-  available layers for surfaces
+    __C declaration:__ @enum zwlr_layer_shell_v1_layer@
 
-  These values indicate which layers a surface can be rendered in. They are ordered by z depth, bottom-most first. Traditional shell surfaces will typically be rendered between the bottom and top layers. Fullscreen shell surfaces are typically rendered at the top layer. Multiple surfaces can share a single layer, and ordering within a single layer is undefined.
+    __defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 142:6@
 
-__C declaration:__ @enum zwlr_layer_shell_v1_layer@
-
-__defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 142:6@
-
-__exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
 -}
 newtype Zwlr_layer_shell_v1_layer = Zwlr_layer_shell_v1_layer
   { unwrap :: RIP.CUInt
@@ -312,7 +303,7 @@ instance Read Zwlr_layer_shell_v1_layer where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr Zwlr_layer_shell_v1_layer) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -463,7 +454,7 @@ instance Read Zwlr_layer_surface_v1_error where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr Zwlr_layer_surface_v1_error) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -475,35 +466,29 @@ instance HasCField.HasCField Zwlr_layer_surface_v1_error "unwrap" where
 
   offset# = \_ -> \_ -> 0
 
-{-| provided surface state is invalid
+{-| __C declaration:__ @ZWLR_LAYER_SURFACE_V1_ERROR_INVALID_SURFACE_STATE@
 
-__C declaration:__ @ZWLR_LAYER_SURFACE_V1_ERROR_INVALID_SURFACE_STATE@
+    __defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 221:2@
 
-__defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 221:2@
-
-__exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
 -}
 pattern ZWLR_LAYER_SURFACE_V1_ERROR_INVALID_SURFACE_STATE :: Zwlr_layer_surface_v1_error
 pattern ZWLR_LAYER_SURFACE_V1_ERROR_INVALID_SURFACE_STATE = Zwlr_layer_surface_v1_error 0
 
-{-| size is invalid
+{-| __C declaration:__ @ZWLR_LAYER_SURFACE_V1_ERROR_INVALID_SIZE@
 
-__C declaration:__ @ZWLR_LAYER_SURFACE_V1_ERROR_INVALID_SIZE@
+    __defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 225:2@
 
-__defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 225:2@
-
-__exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
 -}
 pattern ZWLR_LAYER_SURFACE_V1_ERROR_INVALID_SIZE :: Zwlr_layer_surface_v1_error
 pattern ZWLR_LAYER_SURFACE_V1_ERROR_INVALID_SIZE = Zwlr_layer_surface_v1_error 1
 
-{-| anchor bitfield is invalid
+{-| __C declaration:__ @ZWLR_LAYER_SURFACE_V1_ERROR_INVALID_ANCHOR@
 
-__C declaration:__ @ZWLR_LAYER_SURFACE_V1_ERROR_INVALID_ANCHOR@
+    __defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 229:2@
 
-__defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 229:2@
-
-__exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
 -}
 pattern ZWLR_LAYER_SURFACE_V1_ERROR_INVALID_ANCHOR :: Zwlr_layer_surface_v1_error
 pattern ZWLR_LAYER_SURFACE_V1_ERROR_INVALID_ANCHOR = Zwlr_layer_surface_v1_error 2
@@ -580,7 +565,7 @@ instance Read Zwlr_layer_surface_v1_anchor where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr Zwlr_layer_surface_v1_anchor) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -592,94 +577,80 @@ instance HasCField.HasCField Zwlr_layer_surface_v1_anchor "unwrap" where
 
   offset# = \_ -> \_ -> 0
 
-{-| the top edge of the anchor rectangle
+{-| __C declaration:__ @ZWLR_LAYER_SURFACE_V1_ANCHOR_TOP@
 
-__C declaration:__ @ZWLR_LAYER_SURFACE_V1_ANCHOR_TOP@
+    __defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 239:2@
 
-__defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 239:2@
-
-__exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
 -}
 pattern ZWLR_LAYER_SURFACE_V1_ANCHOR_TOP :: Zwlr_layer_surface_v1_anchor
 pattern ZWLR_LAYER_SURFACE_V1_ANCHOR_TOP = Zwlr_layer_surface_v1_anchor 1
 
-{-| the bottom edge of the anchor rectangle
+{-| __C declaration:__ @ZWLR_LAYER_SURFACE_V1_ANCHOR_BOTTOM@
 
-__C declaration:__ @ZWLR_LAYER_SURFACE_V1_ANCHOR_BOTTOM@
+    __defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 243:2@
 
-__defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 243:2@
-
-__exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
 -}
 pattern ZWLR_LAYER_SURFACE_V1_ANCHOR_BOTTOM :: Zwlr_layer_surface_v1_anchor
 pattern ZWLR_LAYER_SURFACE_V1_ANCHOR_BOTTOM = Zwlr_layer_surface_v1_anchor 2
 
-{-| the left edge of the anchor rectangle
+{-| __C declaration:__ @ZWLR_LAYER_SURFACE_V1_ANCHOR_LEFT@
 
-__C declaration:__ @ZWLR_LAYER_SURFACE_V1_ANCHOR_LEFT@
+    __defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 247:2@
 
-__defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 247:2@
-
-__exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
 -}
 pattern ZWLR_LAYER_SURFACE_V1_ANCHOR_LEFT :: Zwlr_layer_surface_v1_anchor
 pattern ZWLR_LAYER_SURFACE_V1_ANCHOR_LEFT = Zwlr_layer_surface_v1_anchor 4
 
-{-| the right edge of the anchor rectangle
+{-| __C declaration:__ @ZWLR_LAYER_SURFACE_V1_ANCHOR_RIGHT@
 
-__C declaration:__ @ZWLR_LAYER_SURFACE_V1_ANCHOR_RIGHT@
+    __defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 251:2@
 
-__defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 251:2@
-
-__exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
 -}
 pattern ZWLR_LAYER_SURFACE_V1_ANCHOR_RIGHT :: Zwlr_layer_surface_v1_anchor
 pattern ZWLR_LAYER_SURFACE_V1_ANCHOR_RIGHT = Zwlr_layer_surface_v1_anchor 8
 
-{-|
+{-| __C declaration:__ @struct zwlr_layer_surface_v1_listener@
 
-  > iface_zwlr_layer_surface_v1
+    __defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 259:8@
 
-  > zwlr_layer_surface_v1_listener
-
-__C declaration:__ @struct zwlr_layer_surface_v1_listener@
-
-__defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 259:8@
-
-__exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
 -}
 data Zwlr_layer_surface_v1_listener = Zwlr_layer_surface_v1_listener
-  { configure :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_layer_surface_v1) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  { configure :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_layer_surface_v1 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ suggest a surface change
 
-       The configure event asks the client to resize its surface.
+         The configure event asks the client to resize its surface.
 
-       Clients should arrange their surface for the new states, and then send an ack_configure request with the serial sent in this configure event at some point before committing the new surface.
+         Clients should arrange their surface for the new states, and then send an ack_configure request with the serial sent in this configure event at some point before committing the new surface.
 
-       The client is free to dismiss all but the last configure event it received.
+         The client is free to dismiss all but the last configure event it received.
 
-       The width and height arguments specify the size of the window in surface-local coordinates.
+         The width and height arguments specify the size of the window in surface-local coordinates.
 
-       The size is a hint, in the sense that the client is free to ignore it if it doesn't resize, pick a smaller size (to satisfy aspect ratio or resize in steps of NxM pixels). If the client picks a smaller size and is anchored to two opposite anchors (e.g. 'top' and 'bottom'), the surface will be centered on this axis.
+         The size is a hint, in the sense that the client is free to ignore it if it doesn't resize, pick a smaller size (to satisfy aspect ratio or resize in steps of NxM pixels). If the client picks a smaller size and is anchored to two opposite anchors (e.g. 'top' and 'bottom'), the surface will be centered on this axis.
 
-       If the width or height arguments are zero, it means the client should decide its own window dimension.
+         If the width or height arguments are zero, it means the client should decide its own window dimension.
 
-    __C declaration:__ @configure@
+         __C declaration:__ @configure@
 
-    __defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 285:9@
+         __defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 285:9@
 
-    __exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
     -}
-  , closed :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_layer_surface_v1) -> IO ())
+  , closed :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_layer_surface_v1 -> IO ())
     {- ^ surface should be closed
 
-       The closed event is sent by the compositor when the surface will no longer be shown. The output may have been destroyed or the user may have asked for it to be removed. Further changes to the surface will be ignored. The client should destroy the resource after receiving this event, and create a new surface if they so choose.
+         The closed event is sent by the compositor when the surface will no longer be shown. The output may have been destroyed or the user may have asked for it to be removed. Further changes to the surface will be ignored. The client should destroy the resource after receiving this event, and create a new surface if they so choose.
 
-    __C declaration:__ @closed@
+         __C declaration:__ @closed@
 
-    __defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 300:9@
+         __defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 300:9@
 
-    __exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
+         __exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
     -}
   }
   deriving stock (Eq, RIP.Generic, Show)
@@ -713,11 +684,11 @@ deriving via Marshal.EquivStorable Zwlr_layer_surface_v1_listener instance RIP.S
 instance HasCField.HasCField Zwlr_layer_surface_v1_listener "configure" where
 
   type CFieldType Zwlr_layer_surface_v1_listener "configure" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_layer_surface_v1) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_layer_surface_v1 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_layer_surface_v1) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_layer_surface_v1 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "configure" (RIP.Ptr Zwlr_layer_surface_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"configure")
@@ -725,11 +696,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_layer_surfa
 instance HasCField.HasCField Zwlr_layer_surface_v1_listener "closed" where
 
   type CFieldType Zwlr_layer_surface_v1_listener "closed" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_layer_surface_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_layer_surface_v1 -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_layer_surface_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_layer_surface_v1 -> IO ())
          ) => RIP.HasField "closed" (RIP.Ptr Zwlr_layer_surface_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"closed")
@@ -908,66 +879,66 @@ zWLR_LAYER_SURFACE_V1_DESTROY_SINCE_VERSION :: RIP.CInt
 zWLR_LAYER_SURFACE_V1_DESTROY_SINCE_VERSION =
   (1 :: RIP.CInt)
 
-foreign import ccall safe "wrapper" hs_bindgen_7b1bc94f28557aeb_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_bdefea8225cd04c5_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_layer_surface_v1) -> IO ())@
-hs_bindgen_7b1bc94f28557aeb ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_layer_surface_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_layer_surface_v1) -> IO ()))
-hs_bindgen_7b1bc94f28557aeb =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_layer_surface_v1 -> IO ())@
+hs_bindgen_bdefea8225cd04c5 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_layer_surface_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_layer_surface_v1 -> IO ()))
+hs_bindgen_bdefea8225cd04c5 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_7b1bc94f28557aeb_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_bdefea8225cd04c5_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_734b46017e67326b_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_ce27b8e8d342a388_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_layer_surface_v1) -> IO ())@
-hs_bindgen_734b46017e67326b ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_layer_surface_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_layer_surface_v1) -> IO ()
-hs_bindgen_734b46017e67326b =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_layer_surface_v1 -> IO ())@
+hs_bindgen_ce27b8e8d342a388 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_layer_surface_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_layer_surface_v1 -> IO ()
+hs_bindgen_ce27b8e8d342a388 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_734b46017e67326b_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_ce27b8e8d342a388_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_layer_surface_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_layer_surface_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_7b1bc94f28557aeb
+  toFunPtr = hs_bindgen_bdefea8225cd04c5
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_layer_surface_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_layer_surface_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_734b46017e67326b
+  fromFunPtr = hs_bindgen_ce27b8e8d342a388
 
-foreign import ccall safe "wrapper" hs_bindgen_12bb0c573c73319f_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_f6d5339754beacdb_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_layer_surface_v1) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_12bb0c573c73319f ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_layer_surface_v1) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_layer_surface_v1) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_12bb0c573c73319f =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_layer_surface_v1 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_f6d5339754beacdb ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_layer_surface_v1 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_layer_surface_v1 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_f6d5339754beacdb =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_12bb0c573c73319f_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_f6d5339754beacdb_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_e5bcb88bcc1668b0_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_7340d7946fcef6eb_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> RIP.Word32 -> RIP.Word32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_layer_surface_v1) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_e5bcb88bcc1668b0 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_layer_surface_v1) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_layer_surface_v1) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()
-hs_bindgen_e5bcb88bcc1668b0 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_layer_surface_v1 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_7340d7946fcef6eb ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_layer_surface_v1 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_layer_surface_v1 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()
+hs_bindgen_7340d7946fcef6eb =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_e5bcb88bcc1668b0_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_7340d7946fcef6eb_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_layer_surface_v1) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_layer_surface_v1 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_12bb0c573c73319f
+  toFunPtr = hs_bindgen_f6d5339754beacdb
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr Zwlr_layer_surface_v1) -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr Zwlr_layer_surface_v1 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_e5bcb88bcc1668b0
+  fromFunPtr = hs_bindgen_7340d7946fcef6eb

@@ -324,15 +324,11 @@ hs_bindgen_57b8abf70ae4cb0d ::
 hs_bindgen_57b8abf70ae4cb0d =
   RIP.fromFFIType hs_bindgen_57b8abf70ae4cb0d_base
 
-{-|
+{-| __C declaration:__ @zwlr_output_manager_v1_add_listener@
 
-  > iface_zwlr_output_manager_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 321:1@
 
-__C declaration:__ @zwlr_output_manager_v1_add_listener@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 321:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_manager_v1_add_listener ::
      RIP.Ptr Zwlr_output_manager_v1
@@ -359,15 +355,11 @@ hs_bindgen_7cd5a0ccf158a3d7 ::
 hs_bindgen_7cd5a0ccf158a3d7 =
   RIP.fromFFIType hs_bindgen_7cd5a0ccf158a3d7_base
 
-{-|
+{-| __C declaration:__ @zwlr_output_manager_v1_set_user_data@
 
-  > iface_zwlr_output_manager_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 355:1@
 
-__C declaration:__ @zwlr_output_manager_v1_set_user_data@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 355:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_manager_v1_set_user_data ::
      RIP.Ptr Zwlr_output_manager_v1
@@ -390,15 +382,11 @@ hs_bindgen_6376cbf1142a9ae3 ::
 hs_bindgen_6376cbf1142a9ae3 =
   RIP.fromFFIType hs_bindgen_6376cbf1142a9ae3_base
 
-{-|
+{-| __C declaration:__ @zwlr_output_manager_v1_get_user_data@
 
-  > iface_zwlr_output_manager_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 362:1@
 
-__C declaration:__ @zwlr_output_manager_v1_get_user_data@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 362:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_manager_v1_get_user_data ::
      RIP.Ptr Zwlr_output_manager_v1
@@ -444,15 +432,11 @@ hs_bindgen_8267b7e974d6cc87 ::
 hs_bindgen_8267b7e974d6cc87 =
   RIP.fromFFIType hs_bindgen_8267b7e974d6cc87_base
 
-{-|
+{-| __C declaration:__ @zwlr_output_manager_v1_destroy@
 
-  > iface_zwlr_output_manager_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 375:1@
 
-__C declaration:__ @zwlr_output_manager_v1_destroy@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 375:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_manager_v1_destroy ::
      RIP.Ptr Zwlr_output_manager_v1
@@ -475,17 +459,13 @@ hs_bindgen_135e6bd5684c4ce3 ::
 hs_bindgen_135e6bd5684c4ce3 =
   RIP.fromFFIType hs_bindgen_135e6bd5684c4ce3_base
 
-{-|
+{-| Create a new output configuration object. This allows to update head properties.
 
-  > iface_zwlr_output_manager_v1
+    __C declaration:__ @zwlr_output_manager_v1_create_configuration@
 
-  Create a new output configuration object. This allows to update head properties.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 387:1@
 
-__C declaration:__ @zwlr_output_manager_v1_create_configuration@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 387:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_manager_v1_create_configuration ::
      RIP.Ptr Zwlr_output_manager_v1
@@ -508,19 +488,15 @@ hs_bindgen_a001796580578afc ::
 hs_bindgen_a001796580578afc =
   RIP.fromFFIType hs_bindgen_a001796580578afc_base
 
-{-|
+{-| Indicates the client no longer wishes to receive events for output configuration changes. However the compositor may emit further events, until the finished event is emitted.
 
-  > iface_zwlr_output_manager_v1
+    The client must not send any more requests after this one.
 
-  Indicates the client no longer wishes to receive events for output configuration changes. However the compositor may emit further events, until the finished event is emitted.
+    __C declaration:__ @zwlr_output_manager_v1_stop@
 
-  The client must not send any more requests after this one.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 407:1@
 
-__C declaration:__ @zwlr_output_manager_v1_stop@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 407:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_manager_v1_stop ::
      RIP.Ptr Zwlr_output_manager_v1
@@ -545,15 +521,11 @@ hs_bindgen_649bf31808512f79 ::
 hs_bindgen_649bf31808512f79 =
   RIP.fromFFIType hs_bindgen_649bf31808512f79_base
 
-{-|
+{-| __C declaration:__ @zwlr_output_head_v1_add_listener@
 
-  > iface_zwlr_output_head_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 674:1@
 
-__C declaration:__ @zwlr_output_head_v1_add_listener@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 674:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_head_v1_add_listener ::
      RIP.Ptr Zwlr_output_head_v1
@@ -580,15 +552,11 @@ hs_bindgen_4eea76e1f2f0281e ::
 hs_bindgen_4eea76e1f2f0281e =
   RIP.fromFFIType hs_bindgen_4eea76e1f2f0281e_base
 
-{-|
+{-| __C declaration:__ @zwlr_output_head_v1_set_user_data@
 
-  > iface_zwlr_output_head_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 747:1@
 
-__C declaration:__ @zwlr_output_head_v1_set_user_data@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 747:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_head_v1_set_user_data ::
      RIP.Ptr Zwlr_output_head_v1
@@ -611,15 +579,11 @@ hs_bindgen_aad3ce95479b22fd ::
 hs_bindgen_aad3ce95479b22fd =
   RIP.fromFFIType hs_bindgen_aad3ce95479b22fd_base
 
-{-|
+{-| __C declaration:__ @zwlr_output_head_v1_get_user_data@
 
-  > iface_zwlr_output_head_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 754:1@
 
-__C declaration:__ @zwlr_output_head_v1_get_user_data@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 754:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_head_v1_get_user_data ::
      RIP.Ptr Zwlr_output_head_v1
@@ -665,15 +629,11 @@ hs_bindgen_270d647b6ee84b53 ::
 hs_bindgen_270d647b6ee84b53 =
   RIP.fromFFIType hs_bindgen_270d647b6ee84b53_base
 
-{-|
+{-| __C declaration:__ @zwlr_output_head_v1_destroy@
 
-  > iface_zwlr_output_head_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 767:1@
 
-__C declaration:__ @zwlr_output_head_v1_destroy@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 767:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_head_v1_destroy ::
      RIP.Ptr Zwlr_output_head_v1
@@ -694,17 +654,13 @@ hs_bindgen_0cbf7998f31dfdb0 ::
 hs_bindgen_0cbf7998f31dfdb0 =
   RIP.fromFFIType hs_bindgen_0cbf7998f31dfdb0_base
 
-{-|
+{-| This request indicates that the client will no longer use this head object.
 
-  > iface_zwlr_output_head_v1
+    __C declaration:__ @zwlr_output_head_v1_release@
 
-  This request indicates that the client will no longer use this head object.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 779:1@
 
-__C declaration:__ @zwlr_output_head_v1_release@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 779:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_head_v1_release ::
      RIP.Ptr Zwlr_output_head_v1
@@ -729,15 +685,11 @@ hs_bindgen_1fb1b1e3d8b37add ::
 hs_bindgen_1fb1b1e3d8b37add =
   RIP.fromFFIType hs_bindgen_1fb1b1e3d8b37add_base
 
-{-|
+{-| __C declaration:__ @zwlr_output_mode_v1_add_listener@
 
-  > iface_zwlr_output_mode_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 836:1@
 
-__C declaration:__ @zwlr_output_mode_v1_add_listener@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 836:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_mode_v1_add_listener ::
      RIP.Ptr Zwlr_output_mode_v1
@@ -764,15 +716,11 @@ hs_bindgen_9e552a4714efefc0 ::
 hs_bindgen_9e552a4714efefc0 =
   RIP.fromFFIType hs_bindgen_9e552a4714efefc0_base
 
-{-|
+{-| __C declaration:__ @zwlr_output_mode_v1_set_user_data@
 
-  > iface_zwlr_output_mode_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 869:1@
 
-__C declaration:__ @zwlr_output_mode_v1_set_user_data@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 869:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_mode_v1_set_user_data ::
      RIP.Ptr Zwlr_output_mode_v1
@@ -795,15 +743,11 @@ hs_bindgen_465cee8a52457cca ::
 hs_bindgen_465cee8a52457cca =
   RIP.fromFFIType hs_bindgen_465cee8a52457cca_base
 
-{-|
+{-| __C declaration:__ @zwlr_output_mode_v1_get_user_data@
 
-  > iface_zwlr_output_mode_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 876:1@
 
-__C declaration:__ @zwlr_output_mode_v1_get_user_data@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 876:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_mode_v1_get_user_data ::
      RIP.Ptr Zwlr_output_mode_v1
@@ -849,15 +793,11 @@ hs_bindgen_53e42f8ca811338e ::
 hs_bindgen_53e42f8ca811338e =
   RIP.fromFFIType hs_bindgen_53e42f8ca811338e_base
 
-{-|
+{-| __C declaration:__ @zwlr_output_mode_v1_destroy@
 
-  > iface_zwlr_output_mode_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 889:1@
 
-__C declaration:__ @zwlr_output_mode_v1_destroy@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 889:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_mode_v1_destroy ::
      RIP.Ptr Zwlr_output_mode_v1
@@ -878,17 +818,13 @@ hs_bindgen_dea6b0b94ef8fbac ::
 hs_bindgen_dea6b0b94ef8fbac =
   RIP.fromFFIType hs_bindgen_dea6b0b94ef8fbac_base
 
-{-|
+{-| This request indicates that the client will no longer use this mode object.
 
-  > iface_zwlr_output_mode_v1
+    __C declaration:__ @zwlr_output_mode_v1_release@
 
-  This request indicates that the client will no longer use this mode object.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 901:1@
 
-__C declaration:__ @zwlr_output_mode_v1_release@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 901:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_mode_v1_release ::
      RIP.Ptr Zwlr_output_mode_v1
@@ -913,15 +849,11 @@ hs_bindgen_6ce8b9f1770bce30 ::
 hs_bindgen_6ce8b9f1770bce30 =
   RIP.fromFFIType hs_bindgen_6ce8b9f1770bce30_base
 
-{-|
+{-| __C declaration:__ @zwlr_output_configuration_v1_add_listener@
 
-  > iface_zwlr_output_configuration_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 978:1@
 
-__C declaration:__ @zwlr_output_configuration_v1_add_listener@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 978:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_configuration_v1_add_listener ::
      RIP.Ptr Zwlr_output_configuration_v1
@@ -948,15 +880,11 @@ hs_bindgen_982f8dc37451e752 ::
 hs_bindgen_982f8dc37451e752 =
   RIP.fromFFIType hs_bindgen_982f8dc37451e752_base
 
-{-|
+{-| __C declaration:__ @zwlr_output_configuration_v1_set_user_data@
 
-  > iface_zwlr_output_configuration_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1027:1@
 
-__C declaration:__ @zwlr_output_configuration_v1_set_user_data@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1027:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_configuration_v1_set_user_data ::
      RIP.Ptr Zwlr_output_configuration_v1
@@ -979,15 +907,11 @@ hs_bindgen_aa0ed9663093d571 ::
 hs_bindgen_aa0ed9663093d571 =
   RIP.fromFFIType hs_bindgen_aa0ed9663093d571_base
 
-{-|
+{-| __C declaration:__ @zwlr_output_configuration_v1_get_user_data@
 
-  > iface_zwlr_output_configuration_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1034:1@
 
-__C declaration:__ @zwlr_output_configuration_v1_get_user_data@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1034:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_configuration_v1_get_user_data ::
      RIP.Ptr Zwlr_output_configuration_v1
@@ -1035,17 +959,13 @@ hs_bindgen_1fac2cf07607f484 ::
 hs_bindgen_1fac2cf07607f484 =
   RIP.fromFFIType hs_bindgen_1fac2cf07607f484_base
 
-{-|
+{-| Enable a head. This request creates a head configuration object that can be used to change the head's properties.
 
-  > iface_zwlr_output_configuration_v1
+    __C declaration:__ @zwlr_output_configuration_v1_enable_head@
 
-  Enable a head. This request creates a head configuration object that can be used to change the head's properties.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1052:1@
 
-__C declaration:__ @zwlr_output_configuration_v1_enable_head@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1052:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_configuration_v1_enable_head ::
      RIP.Ptr Zwlr_output_configuration_v1
@@ -1070,17 +990,13 @@ hs_bindgen_2ae3e58b8608f7ba ::
 hs_bindgen_2ae3e58b8608f7ba =
   RIP.fromFFIType hs_bindgen_2ae3e58b8608f7ba_base
 
-{-|
+{-| Disable a head.
 
-  > iface_zwlr_output_configuration_v1
+    __C declaration:__ @zwlr_output_configuration_v1_disable_head@
 
-  Disable a head.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1068:1@
 
-__C declaration:__ @zwlr_output_configuration_v1_disable_head@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1068:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_configuration_v1_disable_head ::
      RIP.Ptr Zwlr_output_configuration_v1
@@ -1103,21 +1019,17 @@ hs_bindgen_671a0e1542ab64ce ::
 hs_bindgen_671a0e1542ab64ce =
   RIP.fromFFIType hs_bindgen_671a0e1542ab64ce_base
 
-{-|
+{-| Apply the new output configuration.
 
-  > iface_zwlr_output_configuration_v1
+    In case the configuration is successfully applied, there is no guarantee that the new output state matches completely the requested configuration. For instance, a compositor might round the scale if it doesn't support fractional scaling.
 
-  Apply the new output configuration.
+    After this request has been sent, the compositor must respond with an succeeded, failed or cancelled event. Sending a request that isn't the destructor is a protocol error.
 
-  In case the configuration is successfully applied, there is no guarantee that the new output state matches completely the requested configuration. For instance, a compositor might round the scale if it doesn't support fractional scaling.
+    __C declaration:__ @zwlr_output_configuration_v1_apply@
 
-  After this request has been sent, the compositor must respond with an succeeded, failed or cancelled event. Sending a request that isn't the destructor is a protocol error.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1089:1@
 
-__C declaration:__ @zwlr_output_configuration_v1_apply@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1089:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_configuration_v1_apply ::
      RIP.Ptr Zwlr_output_configuration_v1
@@ -1138,21 +1050,17 @@ hs_bindgen_eeeeb61be7aad082 ::
 hs_bindgen_eeeeb61be7aad082 =
   RIP.fromFFIType hs_bindgen_eeeeb61be7aad082_base
 
-{-|
+{-| Test the new output configuration. The configuration won't be applied, but will only be validated.
 
-  > iface_zwlr_output_configuration_v1
+    Even if the compositor succeeds to test a configuration, applying it may fail.
 
-  Test the new output configuration. The configuration won't be applied, but will only be validated.
+    After this request has been sent, the compositor must respond with an succeeded, failed or cancelled event. Sending a request that isn't the destructor is a protocol error.
 
-  Even if the compositor succeeds to test a configuration, applying it may fail.
+    __C declaration:__ @zwlr_output_configuration_v1_test@
 
-  After this request has been sent, the compositor must respond with an succeeded, failed or cancelled event. Sending a request that isn't the destructor is a protocol error.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1109:1@
 
-__C declaration:__ @zwlr_output_configuration_v1_test@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1109:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_configuration_v1_test ::
      RIP.Ptr Zwlr_output_configuration_v1
@@ -1173,19 +1081,15 @@ hs_bindgen_d4ef5f8739e0c6fe ::
 hs_bindgen_d4ef5f8739e0c6fe =
   RIP.fromFFIType hs_bindgen_d4ef5f8739e0c6fe_base
 
-{-|
+{-| Using this request a client can tell the compositor that it is not going to use the configuration object anymore. Any changes to the outputs that have not been applied will be discarded.
 
-  > iface_zwlr_output_configuration_v1
+    This request also destroys wlr_output_configuration_head objects created via this object.
 
-  Using this request a client can tell the compositor that it is not going to use the configuration object anymore. Any changes to the outputs that have not been applied will be discarded.
+    __C declaration:__ @zwlr_output_configuration_v1_destroy@
 
-  This request also destroys wlr_output_configuration_head objects created via this object.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1126:1@
 
-__C declaration:__ @zwlr_output_configuration_v1_destroy@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1126:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_configuration_v1_destroy ::
      RIP.Ptr Zwlr_output_configuration_v1
@@ -1208,15 +1112,11 @@ hs_bindgen_a439a9e4bedf700f ::
 hs_bindgen_a439a9e4bedf700f =
   RIP.fromFFIType hs_bindgen_a439a9e4bedf700f_base
 
-{-|
+{-| __C declaration:__ @zwlr_output_configuration_head_v1_set_user_data@
 
-  > iface_zwlr_output_configuration_head_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1202:1@
 
-__C declaration:__ @zwlr_output_configuration_head_v1_set_user_data@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1202:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_configuration_head_v1_set_user_data ::
      RIP.Ptr Zwlr_output_configuration_head_v1
@@ -1239,15 +1139,11 @@ hs_bindgen_f2ea4f72e5ac6d5f ::
 hs_bindgen_f2ea4f72e5ac6d5f =
   RIP.fromFFIType hs_bindgen_f2ea4f72e5ac6d5f_base
 
-{-|
+{-| __C declaration:__ @zwlr_output_configuration_head_v1_get_user_data@
 
-  > iface_zwlr_output_configuration_head_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1209:1@
 
-__C declaration:__ @zwlr_output_configuration_head_v1_get_user_data@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1209:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_configuration_head_v1_get_user_data ::
      RIP.Ptr Zwlr_output_configuration_head_v1
@@ -1293,15 +1189,11 @@ hs_bindgen_1b9a3ff4f2c4942a ::
 hs_bindgen_1b9a3ff4f2c4942a =
   RIP.fromFFIType hs_bindgen_1b9a3ff4f2c4942a_base
 
-{-|
+{-| __C declaration:__ @zwlr_output_configuration_head_v1_destroy@
 
-  > iface_zwlr_output_configuration_head_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1222:1@
 
-__C declaration:__ @zwlr_output_configuration_head_v1_destroy@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1222:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_configuration_head_v1_destroy ::
      RIP.Ptr Zwlr_output_configuration_head_v1
@@ -1324,17 +1216,13 @@ hs_bindgen_6b81cf850d5b1e6c ::
 hs_bindgen_6b81cf850d5b1e6c =
   RIP.fromFFIType hs_bindgen_6b81cf850d5b1e6c_base
 
-{-|
+{-| This request sets the head's mode.
 
-  > iface_zwlr_output_configuration_head_v1
+    __C declaration:__ @zwlr_output_configuration_head_v1_set_mode@
 
-  This request sets the head's mode.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1233:1@
 
-__C declaration:__ @zwlr_output_configuration_head_v1_set_mode@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1233:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_configuration_head_v1_set_mode ::
      RIP.Ptr Zwlr_output_configuration_head_v1
@@ -1363,19 +1251,15 @@ hs_bindgen_cb92fc32a1f65b6b ::
 hs_bindgen_cb92fc32a1f65b6b =
   RIP.fromFFIType hs_bindgen_cb92fc32a1f65b6b_base
 
-{-|
+{-| This request assigns a custom mode to the head. The size is given in physical hardware units of the output device. If set to zero, the refresh rate is unspecified.
 
-  > iface_zwlr_output_configuration_head_v1
+    It is a protocol error to set both a mode and a custom mode.
 
-  This request assigns a custom mode to the head. The size is given in physical hardware units of the output device. If set to zero, the refresh rate is unspecified.
+    __C declaration:__ @zwlr_output_configuration_head_v1_set_custom_mode@
 
-  It is a protocol error to set both a mode and a custom mode.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1249:1@
 
-__C declaration:__ @zwlr_output_configuration_head_v1_set_custom_mode@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1249:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_configuration_head_v1_set_custom_mode ::
      RIP.Ptr Zwlr_output_configuration_head_v1
@@ -1406,17 +1290,13 @@ hs_bindgen_9fdedc2ed9ad54df ::
 hs_bindgen_9fdedc2ed9ad54df =
   RIP.fromFFIType hs_bindgen_9fdedc2ed9ad54df_base
 
-{-|
+{-| This request sets the head's position in the global compositor space.
 
-  > iface_zwlr_output_configuration_head_v1
+    __C declaration:__ @zwlr_output_configuration_head_v1_set_position@
 
-  This request sets the head's position in the global compositor space.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1261:1@
 
-__C declaration:__ @zwlr_output_configuration_head_v1_set_position@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1261:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_configuration_head_v1_set_position ::
      RIP.Ptr Zwlr_output_configuration_head_v1
@@ -1443,17 +1323,13 @@ hs_bindgen_b78e04a6a5b730af ::
 hs_bindgen_b78e04a6a5b730af =
   RIP.fromFFIType hs_bindgen_b78e04a6a5b730af_base
 
-{-|
+{-| This request sets the head's transform.
 
-  > iface_zwlr_output_configuration_head_v1
+    __C declaration:__ @zwlr_output_configuration_head_v1_set_transform@
 
-  This request sets the head's transform.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1273:1@
 
-__C declaration:__ @zwlr_output_configuration_head_v1_set_transform@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1273:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_configuration_head_v1_set_transform ::
      RIP.Ptr Zwlr_output_configuration_head_v1
@@ -1478,17 +1354,13 @@ hs_bindgen_b3e23982089a30ce ::
 hs_bindgen_b3e23982089a30ce =
   RIP.fromFFIType hs_bindgen_b3e23982089a30ce_base
 
-{-|
+{-| This request sets the head's scale.
 
-  > iface_zwlr_output_configuration_head_v1
+    __C declaration:__ @zwlr_output_configuration_head_v1_set_scale@
 
-  This request sets the head's scale.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1285:1@
 
-__C declaration:__ @zwlr_output_configuration_head_v1_set_scale@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1285:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_configuration_head_v1_set_scale ::
      RIP.Ptr Zwlr_output_configuration_head_v1
@@ -1513,17 +1385,13 @@ hs_bindgen_048de8ad09d87637 ::
 hs_bindgen_048de8ad09d87637 =
   RIP.fromFFIType hs_bindgen_048de8ad09d87637_base
 
-{-|
+{-| This request enables/disables adaptive sync. Adaptive sync is also known as Variable Refresh Rate or VRR.
 
-  > iface_zwlr_output_configuration_head_v1
+    __C declaration:__ @zwlr_output_configuration_head_v1_set_adaptive_sync@
 
-  This request enables/disables adaptive sync. Adaptive sync is also known as Variable Refresh Rate or VRR.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1298:1@
 
-__C declaration:__ @zwlr_output_configuration_head_v1_set_adaptive_sync@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1298:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
 zwlr_output_configuration_head_v1_set_adaptive_sync ::
      RIP.Ptr Zwlr_output_configuration_head_v1

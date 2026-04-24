@@ -106,15 +106,11 @@ hs_bindgen_7aea777ba1ab440f ::
 hs_bindgen_7aea777ba1ab440f =
   RIP.fromFFIType hs_bindgen_7aea777ba1ab440f_base
 
-{-|
+{-| __C declaration:__ @wp_fractional_scale_manager_v1_set_user_data@
 
-  > iface_wp_fractional_scale_manager_v1
+    __defined at:__ @fractional-scale-v1-client-protocol.h 133:1@
 
-__C declaration:__ @wp_fractional_scale_manager_v1_set_user_data@
-
-__defined at:__ @fractional-scale-v1-client-protocol.h 133:1@
-
-__exported by:__ @fractional-scale-v1-client-protocol.h@
+    __exported by:__ @fractional-scale-v1-client-protocol.h@
 -}
 wp_fractional_scale_manager_v1_set_user_data ::
      RIP.Ptr Wp_fractional_scale_manager_v1
@@ -137,15 +133,11 @@ hs_bindgen_eafd715fa14bebf4 ::
 hs_bindgen_eafd715fa14bebf4 =
   RIP.fromFFIType hs_bindgen_eafd715fa14bebf4_base
 
-{-|
+{-| __C declaration:__ @wp_fractional_scale_manager_v1_get_user_data@
 
-  > iface_wp_fractional_scale_manager_v1
+    __defined at:__ @fractional-scale-v1-client-protocol.h 140:1@
 
-__C declaration:__ @wp_fractional_scale_manager_v1_get_user_data@
-
-__defined at:__ @fractional-scale-v1-client-protocol.h 140:1@
-
-__exported by:__ @fractional-scale-v1-client-protocol.h@
+    __exported by:__ @fractional-scale-v1-client-protocol.h@
 -}
 wp_fractional_scale_manager_v1_get_user_data ::
      RIP.Ptr Wp_fractional_scale_manager_v1
@@ -191,17 +183,13 @@ hs_bindgen_832f3c3f3d823721 ::
 hs_bindgen_832f3c3f3d823721 =
   RIP.fromFFIType hs_bindgen_832f3c3f3d823721_base
 
-{-|
+{-| Informs the server that the client will not be using this protocol object anymore. This does not affect any other objects, wp_fractional_scale_v1 objects included.
 
-  > iface_wp_fractional_scale_manager_v1
+    __C declaration:__ @wp_fractional_scale_manager_v1_destroy@
 
-  Informs the server that the client will not be using this protocol object anymore. This does not affect any other objects, wp_fractional_scale_v1 objects included.
+    __defined at:__ @fractional-scale-v1-client-protocol.h 159:1@
 
-__C declaration:__ @wp_fractional_scale_manager_v1_destroy@
-
-__defined at:__ @fractional-scale-v1-client-protocol.h 159:1@
-
-__exported by:__ @fractional-scale-v1-client-protocol.h@
+    __exported by:__ @fractional-scale-v1-client-protocol.h@
 -}
 wp_fractional_scale_manager_v1_destroy ::
      RIP.Ptr Wp_fractional_scale_manager_v1
@@ -224,17 +212,13 @@ hs_bindgen_587fa3f9b0a03fe3 ::
 hs_bindgen_587fa3f9b0a03fe3 =
   RIP.fromFFIType hs_bindgen_587fa3f9b0a03fe3_base
 
-{-|
+{-| Create an add-on object for the the wl_surface to let the compositor request fractional scales. If the given wl_surface already has a wp_fractional_scale_v1 object associated, the fractional_scale_exists protocol error is raised.
 
-  > iface_wp_fractional_scale_manager_v1
+    __C declaration:__ @wp_fractional_scale_manager_v1_get_fractional_scale@
 
-  Create an add-on object for the the wl_surface to let the compositor request fractional scales. If the given wl_surface already has a wp_fractional_scale_v1 object associated, the fractional_scale_exists protocol error is raised.
+    __defined at:__ @fractional-scale-v1-client-protocol.h 174:1@
 
-__C declaration:__ @wp_fractional_scale_manager_v1_get_fractional_scale@
-
-__defined at:__ @fractional-scale-v1-client-protocol.h 174:1@
-
-__exported by:__ @fractional-scale-v1-client-protocol.h@
+    __exported by:__ @fractional-scale-v1-client-protocol.h@
 -}
 wp_fractional_scale_manager_v1_get_fractional_scale ::
      RIP.Ptr Wp_fractional_scale_manager_v1
@@ -261,15 +245,11 @@ hs_bindgen_f0fa1e9cc7de2f21 ::
 hs_bindgen_f0fa1e9cc7de2f21 =
   RIP.fromFFIType hs_bindgen_f0fa1e9cc7de2f21_base
 
-{-|
+{-| __C declaration:__ @wp_fractional_scale_v1_add_listener@
 
-  > iface_wp_fractional_scale_v1
+    __defined at:__ @fractional-scale-v1-client-protocol.h 208:1@
 
-__C declaration:__ @wp_fractional_scale_v1_add_listener@
-
-__defined at:__ @fractional-scale-v1-client-protocol.h 208:1@
-
-__exported by:__ @fractional-scale-v1-client-protocol.h@
+    __exported by:__ @fractional-scale-v1-client-protocol.h@
 -}
 wp_fractional_scale_v1_add_listener ::
      RIP.Ptr Wp_fractional_scale_v1
@@ -296,15 +276,11 @@ hs_bindgen_75bfae0fd6eb5061 ::
 hs_bindgen_75bfae0fd6eb5061 =
   RIP.fromFFIType hs_bindgen_75bfae0fd6eb5061_base
 
-{-|
+{-| __C declaration:__ @wp_fractional_scale_v1_set_user_data@
 
-  > iface_wp_fractional_scale_v1
+    __defined at:__ @fractional-scale-v1-client-protocol.h 229:1@
 
-__C declaration:__ @wp_fractional_scale_v1_set_user_data@
-
-__defined at:__ @fractional-scale-v1-client-protocol.h 229:1@
-
-__exported by:__ @fractional-scale-v1-client-protocol.h@
+    __exported by:__ @fractional-scale-v1-client-protocol.h@
 -}
 wp_fractional_scale_v1_set_user_data ::
      RIP.Ptr Wp_fractional_scale_v1
@@ -327,15 +303,11 @@ hs_bindgen_e995c80a6273625f ::
 hs_bindgen_e995c80a6273625f =
   RIP.fromFFIType hs_bindgen_e995c80a6273625f_base
 
-{-|
+{-| __C declaration:__ @wp_fractional_scale_v1_get_user_data@
 
-  > iface_wp_fractional_scale_v1
+    __defined at:__ @fractional-scale-v1-client-protocol.h 236:1@
 
-__C declaration:__ @wp_fractional_scale_v1_get_user_data@
-
-__defined at:__ @fractional-scale-v1-client-protocol.h 236:1@
-
-__exported by:__ @fractional-scale-v1-client-protocol.h@
+    __exported by:__ @fractional-scale-v1-client-protocol.h@
 -}
 wp_fractional_scale_v1_get_user_data ::
      RIP.Ptr Wp_fractional_scale_v1
@@ -381,17 +353,13 @@ hs_bindgen_7fc6065c900b71d4 ::
 hs_bindgen_7fc6065c900b71d4 =
   RIP.fromFFIType hs_bindgen_7fc6065c900b71d4_base
 
-{-|
+{-| Destroy the fractional scale object. When this object is destroyed, preferred_scale events will no longer be sent.
 
-  > iface_wp_fractional_scale_v1
+    __C declaration:__ @wp_fractional_scale_v1_destroy@
 
-  Destroy the fractional scale object. When this object is destroyed, preferred_scale events will no longer be sent.
+    __defined at:__ @fractional-scale-v1-client-protocol.h 254:1@
 
-__C declaration:__ @wp_fractional_scale_v1_destroy@
-
-__defined at:__ @fractional-scale-v1-client-protocol.h 254:1@
-
-__exported by:__ @fractional-scale-v1-client-protocol.h@
+    __exported by:__ @fractional-scale-v1-client-protocol.h@
 -}
 wp_fractional_scale_v1_destroy ::
      RIP.Ptr Wp_fractional_scale_v1

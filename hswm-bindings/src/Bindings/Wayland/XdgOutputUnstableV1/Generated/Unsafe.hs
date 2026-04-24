@@ -106,15 +106,11 @@ hs_bindgen_a371a5bcc3712d33 ::
 hs_bindgen_a371a5bcc3712d33 =
   RIP.fromFFIType hs_bindgen_a371a5bcc3712d33_base
 
-{-|
+{-| __C declaration:__ @zxdg_output_manager_v1_set_user_data@
 
-  > iface_zxdg_output_manager_v1
+    __defined at:__ @xdg-output-unstable-v1-client-protocol.h 146:1@
 
-__C declaration:__ @zxdg_output_manager_v1_set_user_data@
-
-__defined at:__ @xdg-output-unstable-v1-client-protocol.h 146:1@
-
-__exported by:__ @xdg-output-unstable-v1-client-protocol.h@
+    __exported by:__ @xdg-output-unstable-v1-client-protocol.h@
 -}
 zxdg_output_manager_v1_set_user_data ::
      RIP.Ptr Zxdg_output_manager_v1
@@ -137,15 +133,11 @@ hs_bindgen_4366db778517df62 ::
 hs_bindgen_4366db778517df62 =
   RIP.fromFFIType hs_bindgen_4366db778517df62_base
 
-{-|
+{-| __C declaration:__ @zxdg_output_manager_v1_get_user_data@
 
-  > iface_zxdg_output_manager_v1
+    __defined at:__ @xdg-output-unstable-v1-client-protocol.h 153:1@
 
-__C declaration:__ @zxdg_output_manager_v1_get_user_data@
-
-__defined at:__ @xdg-output-unstable-v1-client-protocol.h 153:1@
-
-__exported by:__ @xdg-output-unstable-v1-client-protocol.h@
+    __exported by:__ @xdg-output-unstable-v1-client-protocol.h@
 -}
 zxdg_output_manager_v1_get_user_data ::
      RIP.Ptr Zxdg_output_manager_v1
@@ -191,19 +183,15 @@ hs_bindgen_c16fb9abdb94ca03 ::
 hs_bindgen_c16fb9abdb94ca03 =
   RIP.fromFFIType hs_bindgen_c16fb9abdb94ca03_base
 
-{-|
+{-| Using this request a client can tell the server that it is not going to use the xdg_output_manager object anymore.
 
-  > iface_zxdg_output_manager_v1
+    Any objects already created through this instance are not affected.
 
-  Using this request a client can tell the server that it is not going to use the xdg_output_manager object anymore.
+    __C declaration:__ @zxdg_output_manager_v1_destroy@
 
-  Any objects already created through this instance are not affected.
+    __defined at:__ @xdg-output-unstable-v1-client-protocol.h 173:1@
 
-__C declaration:__ @zxdg_output_manager_v1_destroy@
-
-__defined at:__ @xdg-output-unstable-v1-client-protocol.h 173:1@
-
-__exported by:__ @xdg-output-unstable-v1-client-protocol.h@
+    __exported by:__ @xdg-output-unstable-v1-client-protocol.h@
 -}
 zxdg_output_manager_v1_destroy ::
      RIP.Ptr Zxdg_output_manager_v1
@@ -226,17 +214,13 @@ hs_bindgen_042d8ba43dcdd798 ::
 hs_bindgen_042d8ba43dcdd798 =
   RIP.fromFFIType hs_bindgen_042d8ba43dcdd798_base
 
-{-|
+{-| This creates a new xdg_output object for the given wl_output.
 
-  > iface_zxdg_output_manager_v1
+    __C declaration:__ @zxdg_output_manager_v1_get_xdg_output@
 
-  This creates a new xdg_output object for the given wl_output.
+    __defined at:__ @xdg-output-unstable-v1-client-protocol.h 185:1@
 
-__C declaration:__ @zxdg_output_manager_v1_get_xdg_output@
-
-__defined at:__ @xdg-output-unstable-v1-client-protocol.h 185:1@
-
-__exported by:__ @xdg-output-unstable-v1-client-protocol.h@
+    __exported by:__ @xdg-output-unstable-v1-client-protocol.h@
 -}
 zxdg_output_manager_v1_get_xdg_output ::
      RIP.Ptr Zxdg_output_manager_v1
@@ -263,15 +247,11 @@ hs_bindgen_ccc3da42deb080a2 ::
 hs_bindgen_ccc3da42deb080a2 =
   RIP.fromFFIType hs_bindgen_ccc3da42deb080a2_base
 
-{-|
+{-| __C declaration:__ @zxdg_output_v1_add_listener@
 
-  > iface_zxdg_output_v1
+    __defined at:__ @xdg-output-unstable-v1-client-protocol.h 343:1@
 
-__C declaration:__ @zxdg_output_v1_add_listener@
-
-__defined at:__ @xdg-output-unstable-v1-client-protocol.h 343:1@
-
-__exported by:__ @xdg-output-unstable-v1-client-protocol.h@
+    __exported by:__ @xdg-output-unstable-v1-client-protocol.h@
 -}
 zxdg_output_v1_add_listener ::
      RIP.Ptr Zxdg_output_v1
@@ -298,15 +278,11 @@ hs_bindgen_7a094afd37f5fab3 ::
 hs_bindgen_7a094afd37f5fab3 =
   RIP.fromFFIType hs_bindgen_7a094afd37f5fab3_base
 
-{-|
+{-| __C declaration:__ @zxdg_output_v1_set_user_data@
 
-  > iface_zxdg_output_v1
+    __defined at:__ @xdg-output-unstable-v1-client-protocol.h 380:1@
 
-__C declaration:__ @zxdg_output_v1_set_user_data@
-
-__defined at:__ @xdg-output-unstable-v1-client-protocol.h 380:1@
-
-__exported by:__ @xdg-output-unstable-v1-client-protocol.h@
+    __exported by:__ @xdg-output-unstable-v1-client-protocol.h@
 -}
 zxdg_output_v1_set_user_data ::
      RIP.Ptr Zxdg_output_v1
@@ -329,15 +305,11 @@ hs_bindgen_2f04f82671b2b3b1 ::
 hs_bindgen_2f04f82671b2b3b1 =
   RIP.fromFFIType hs_bindgen_2f04f82671b2b3b1_base
 
-{-|
+{-| __C declaration:__ @zxdg_output_v1_get_user_data@
 
-  > iface_zxdg_output_v1
+    __defined at:__ @xdg-output-unstable-v1-client-protocol.h 387:1@
 
-__C declaration:__ @zxdg_output_v1_get_user_data@
-
-__defined at:__ @xdg-output-unstable-v1-client-protocol.h 387:1@
-
-__exported by:__ @xdg-output-unstable-v1-client-protocol.h@
+    __exported by:__ @xdg-output-unstable-v1-client-protocol.h@
 -}
 zxdg_output_v1_get_user_data ::
      RIP.Ptr Zxdg_output_v1
@@ -383,17 +355,13 @@ hs_bindgen_52dddfc44ccd51b9 ::
 hs_bindgen_52dddfc44ccd51b9 =
   RIP.fromFFIType hs_bindgen_52dddfc44ccd51b9_base
 
-{-|
+{-| Using this request a client can tell the server that it is not going to use the xdg_output object anymore.
 
-  > iface_zxdg_output_v1
+    __C declaration:__ @zxdg_output_v1_destroy@
 
-  Using this request a client can tell the server that it is not going to use the xdg_output object anymore.
+    __defined at:__ @xdg-output-unstable-v1-client-protocol.h 405:1@
 
-__C declaration:__ @zxdg_output_v1_destroy@
-
-__defined at:__ @xdg-output-unstable-v1-client-protocol.h 405:1@
-
-__exported by:__ @xdg-output-unstable-v1-client-protocol.h@
+    __exported by:__ @xdg-output-unstable-v1-client-protocol.h@
 -}
 zxdg_output_v1_destroy ::
      RIP.Ptr Zxdg_output_v1

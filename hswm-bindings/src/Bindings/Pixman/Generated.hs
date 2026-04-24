@@ -7,6 +7,7 @@
 {-# LANGUAGE EmptyDataDecls #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MagicHash #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -293,7 +294,7 @@ pIXMAN_VERSION_STRING =
 
     __exported by:__ @pixman.h@
 -}
-pIXMAN_VERSION_ENCODE :: forall a0 b1 c2. (C.Expr.HostPlatform.Add ((C.Expr.HostPlatform.MultRes a0) RIP.CInt)) ((C.Expr.HostPlatform.MultRes b1) RIP.CInt) => (C.Expr.HostPlatform.Add ((C.Expr.HostPlatform.AddRes ((C.Expr.HostPlatform.MultRes a0) RIP.CInt)) ((C.Expr.HostPlatform.MultRes b1) RIP.CInt))) ((C.Expr.HostPlatform.MultRes c2) RIP.CInt) => (C.Expr.HostPlatform.Mult c2) RIP.CInt => (C.Expr.HostPlatform.Mult b1) RIP.CInt => (C.Expr.HostPlatform.Mult a0) RIP.CInt => a0 -> b1 -> c2 -> (C.Expr.HostPlatform.AddRes ((C.Expr.HostPlatform.AddRes ((C.Expr.HostPlatform.MultRes a0) RIP.CInt)) ((C.Expr.HostPlatform.MultRes b1) RIP.CInt))) ((C.Expr.HostPlatform.MultRes c2) RIP.CInt)
+pIXMAN_VERSION_ENCODE :: forall a0 b1 c2. C.Expr.HostPlatform.Add (C.Expr.HostPlatform.MultRes a0 RIP.CInt) (C.Expr.HostPlatform.MultRes b1 RIP.CInt) => C.Expr.HostPlatform.Add (C.Expr.HostPlatform.AddRes (C.Expr.HostPlatform.MultRes a0 RIP.CInt) (C.Expr.HostPlatform.MultRes b1 RIP.CInt)) (C.Expr.HostPlatform.MultRes c2 RIP.CInt) => C.Expr.HostPlatform.Mult c2 RIP.CInt => C.Expr.HostPlatform.Mult b1 RIP.CInt => C.Expr.HostPlatform.Mult a0 RIP.CInt => a0 -> b1 -> c2 -> C.Expr.HostPlatform.AddRes (C.Expr.HostPlatform.AddRes (C.Expr.HostPlatform.MultRes a0 RIP.CInt) (C.Expr.HostPlatform.MultRes b1 RIP.CInt)) (C.Expr.HostPlatform.MultRes c2 RIP.CInt)
 pIXMAN_VERSION_ENCODE =
   \major0 ->
     \minor1 ->
@@ -338,7 +339,7 @@ newtype Pixman_bool_t = Pixman_bool_t
     , Marshal.WriteRaw
     )
 
-instance ( ((~) ty) RIP.CInt
+instance ( ty ~ RIP.CInt
          ) => RIP.HasField "unwrap" (RIP.Ptr Pixman_bool_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -377,7 +378,7 @@ newtype Pixman_fixed_32_32_t = Pixman_fixed_32_32_t
     , Marshal.WriteRaw
     )
 
-instance ( ((~) ty) HsBindgen.Runtime.LibC.Int64
+instance ( ty ~ HsBindgen.Runtime.LibC.Int64
          ) => RIP.HasField "unwrap" (RIP.Ptr Pixman_fixed_32_32_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -417,7 +418,7 @@ newtype Pixman_fixed_48_16_t = Pixman_fixed_48_16_t
     , Marshal.WriteRaw
     )
 
-instance ( ((~) ty) Pixman_fixed_32_32_t
+instance ( ty ~ Pixman_fixed_32_32_t
          ) => RIP.HasField "unwrap" (RIP.Ptr Pixman_fixed_48_16_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -457,7 +458,7 @@ newtype Pixman_fixed_1_31_t = Pixman_fixed_1_31_t
     , Marshal.WriteRaw
     )
 
-instance ( ((~) ty) HsBindgen.Runtime.LibC.Word32
+instance ( ty ~ HsBindgen.Runtime.LibC.Word32
          ) => RIP.HasField "unwrap" (RIP.Ptr Pixman_fixed_1_31_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -497,7 +498,7 @@ newtype Pixman_fixed_1_16_t = Pixman_fixed_1_16_t
     , Marshal.WriteRaw
     )
 
-instance ( ((~) ty) HsBindgen.Runtime.LibC.Word32
+instance ( ty ~ HsBindgen.Runtime.LibC.Word32
          ) => RIP.HasField "unwrap" (RIP.Ptr Pixman_fixed_1_16_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -537,7 +538,7 @@ newtype Pixman_fixed_16_16_t = Pixman_fixed_16_16_t
     , Marshal.WriteRaw
     )
 
-instance ( ((~) ty) HsBindgen.Runtime.LibC.Int32
+instance ( ty ~ HsBindgen.Runtime.LibC.Int32
          ) => RIP.HasField "unwrap" (RIP.Ptr Pixman_fixed_16_16_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -577,7 +578,7 @@ newtype Pixman_fixed_t = Pixman_fixed_t
     , Marshal.WriteRaw
     )
 
-instance ( ((~) ty) Pixman_fixed_16_16_t
+instance ( ty ~ Pixman_fixed_16_16_t
          ) => RIP.HasField "unwrap" (RIP.Ptr Pixman_fixed_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -664,7 +665,7 @@ instance HasCField.HasCField Pixman_color_t "red" where
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) HsBindgen.Runtime.LibC.Word16
+instance ( ty ~ HsBindgen.Runtime.LibC.Word16
          ) => RIP.HasField "red" (RIP.Ptr Pixman_color_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"red")
@@ -676,7 +677,7 @@ instance HasCField.HasCField Pixman_color_t "green" where
 
   offset# = \_ -> \_ -> 2
 
-instance ( ((~) ty) HsBindgen.Runtime.LibC.Word16
+instance ( ty ~ HsBindgen.Runtime.LibC.Word16
          ) => RIP.HasField "green" (RIP.Ptr Pixman_color_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"green")
@@ -688,7 +689,7 @@ instance HasCField.HasCField Pixman_color_t "blue" where
 
   offset# = \_ -> \_ -> 4
 
-instance ( ((~) ty) HsBindgen.Runtime.LibC.Word16
+instance ( ty ~ HsBindgen.Runtime.LibC.Word16
          ) => RIP.HasField "blue" (RIP.Ptr Pixman_color_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"blue")
@@ -700,7 +701,7 @@ instance HasCField.HasCField Pixman_color_t "alpha" where
 
   offset# = \_ -> \_ -> 6
 
-instance ( ((~) ty) HsBindgen.Runtime.LibC.Word16
+instance ( ty ~ HsBindgen.Runtime.LibC.Word16
          ) => RIP.HasField "alpha" (RIP.Ptr Pixman_color_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"alpha")
@@ -762,7 +763,7 @@ instance HasCField.HasCField Pixman_point_fixed_t "x" where
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) Pixman_fixed_t
+instance ( ty ~ Pixman_fixed_t
          ) => RIP.HasField "x" (RIP.Ptr Pixman_point_fixed_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"x")
@@ -774,7 +775,7 @@ instance HasCField.HasCField Pixman_point_fixed_t "y" where
 
   offset# = \_ -> \_ -> 4
 
-instance ( ((~) ty) Pixman_fixed_t
+instance ( ty ~ Pixman_fixed_t
          ) => RIP.HasField "y" (RIP.Ptr Pixman_point_fixed_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"y")
@@ -836,7 +837,7 @@ instance HasCField.HasCField Pixman_line_fixed_t "p1" where
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) Pixman_point_fixed_t
+instance ( ty ~ Pixman_point_fixed_t
          ) => RIP.HasField "p1" (RIP.Ptr Pixman_line_fixed_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"p1")
@@ -848,7 +849,7 @@ instance HasCField.HasCField Pixman_line_fixed_t "p2" where
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) Pixman_point_fixed_t
+instance ( ty ~ Pixman_point_fixed_t
          ) => RIP.HasField "p2" (RIP.Ptr Pixman_line_fixed_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"p2")
@@ -860,7 +861,7 @@ instance ( ((~) ty) Pixman_point_fixed_t
     __exported by:__ @pixman.h@
 -}
 data Pixman_vector = Pixman_vector
-  { vector :: (CA.ConstantArray 3) Pixman_fixed_t
+  { vector :: CA.ConstantArray 3 Pixman_fixed_t
     {- ^ __C declaration:__ @vector@
 
          __defined at:__ @pixman.h 175:20@
@@ -897,11 +898,11 @@ deriving via Marshal.EquivStorable Pixman_vector instance RIP.Storable Pixman_ve
 instance HasCField.HasCField Pixman_vector "vector" where
 
   type CFieldType Pixman_vector "vector" =
-    (CA.ConstantArray 3) Pixman_fixed_t
+    CA.ConstantArray 3 Pixman_fixed_t
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) ((CA.ConstantArray 3) Pixman_fixed_t)
+instance ( ty ~ CA.ConstantArray 3 Pixman_fixed_t
          ) => RIP.HasField "vector" (RIP.Ptr Pixman_vector) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"vector")
@@ -923,7 +924,7 @@ newtype Pixman_vector_t = Pixman_vector_t
     , Marshal.WriteRaw
     )
 
-instance ( ((~) ty) Pixman_vector
+instance ( ty ~ Pixman_vector
          ) => RIP.HasField "unwrap" (RIP.Ptr Pixman_vector_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -942,7 +943,7 @@ instance HasCField.HasCField Pixman_vector_t "unwrap" where
     __exported by:__ @pixman.h@
 -}
 data Pixman_transform = Pixman_transform
-  { matrix :: (CA.ConstantArray 3) ((CA.ConstantArray 3) Pixman_fixed_t)
+  { matrix :: CA.ConstantArray 3 (CA.ConstantArray 3 Pixman_fixed_t)
     {- ^ __C declaration:__ @matrix@
 
          __defined at:__ @pixman.h 180:20@
@@ -979,11 +980,11 @@ deriving via Marshal.EquivStorable Pixman_transform instance RIP.Storable Pixman
 instance HasCField.HasCField Pixman_transform "matrix" where
 
   type CFieldType Pixman_transform "matrix" =
-    (CA.ConstantArray 3) ((CA.ConstantArray 3) Pixman_fixed_t)
+    CA.ConstantArray 3 (CA.ConstantArray 3 Pixman_fixed_t)
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) ((CA.ConstantArray 3) ((CA.ConstantArray 3) Pixman_fixed_t))
+instance ( ty ~ CA.ConstantArray 3 (CA.ConstantArray 3 Pixman_fixed_t)
          ) => RIP.HasField "matrix" (RIP.Ptr Pixman_transform) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"matrix")
@@ -1005,7 +1006,7 @@ newtype Pixman_transform_t = Pixman_transform_t
     , Marshal.WriteRaw
     )
 
-instance ( ((~) ty) Pixman_transform
+instance ( ty ~ Pixman_transform
          ) => RIP.HasField "unwrap" (RIP.Ptr Pixman_transform_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -1032,7 +1033,7 @@ data Pixman_image_t
     __exported by:__ @pixman.h@
 -}
 data Pixman_f_transform = Pixman_f_transform
-  { m :: (CA.ConstantArray 3) ((CA.ConstantArray 3) RIP.CDouble)
+  { m :: CA.ConstantArray 3 (CA.ConstantArray 3 RIP.CDouble)
     {- ^ __C declaration:__ @m@
 
          __defined at:__ @pixman.h 270:13@
@@ -1069,11 +1070,11 @@ deriving via Marshal.EquivStorable Pixman_f_transform instance RIP.Storable Pixm
 instance HasCField.HasCField Pixman_f_transform "m" where
 
   type CFieldType Pixman_f_transform "m" =
-    (CA.ConstantArray 3) ((CA.ConstantArray 3) RIP.CDouble)
+    CA.ConstantArray 3 (CA.ConstantArray 3 RIP.CDouble)
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) ((CA.ConstantArray 3) ((CA.ConstantArray 3) RIP.CDouble))
+instance ( ty ~ CA.ConstantArray 3 (CA.ConstantArray 3 RIP.CDouble)
          ) => RIP.HasField "m" (RIP.Ptr Pixman_f_transform) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"m")
@@ -1095,7 +1096,7 @@ newtype Pixman_f_transform_t = Pixman_f_transform_t
     , Marshal.WriteRaw
     )
 
-instance ( ((~) ty) Pixman_f_transform
+instance ( ty ~ Pixman_f_transform
          ) => RIP.HasField "unwrap" (RIP.Ptr Pixman_f_transform_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -1114,7 +1115,7 @@ instance HasCField.HasCField Pixman_f_transform_t "unwrap" where
     __exported by:__ @pixman.h@
 -}
 data Pixman_f_vector = Pixman_f_vector
-  { v :: (CA.ConstantArray 3) RIP.CDouble
+  { v :: CA.ConstantArray 3 RIP.CDouble
     {- ^ __C declaration:__ @v@
 
          __defined at:__ @pixman.h 265:13@
@@ -1151,11 +1152,11 @@ deriving via Marshal.EquivStorable Pixman_f_vector instance RIP.Storable Pixman_
 instance HasCField.HasCField Pixman_f_vector "v" where
 
   type CFieldType Pixman_f_vector "v" =
-    (CA.ConstantArray 3) RIP.CDouble
+    CA.ConstantArray 3 RIP.CDouble
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) ((CA.ConstantArray 3) RIP.CDouble)
+instance ( ty ~ CA.ConstantArray 3 RIP.CDouble
          ) => RIP.HasField "v" (RIP.Ptr Pixman_f_vector) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"v")
@@ -1177,7 +1178,7 @@ newtype Pixman_f_vector_t = Pixman_f_vector_t
     , Marshal.WriteRaw
     )
 
-instance ( ((~) ty) Pixman_f_vector
+instance ( ty ~ Pixman_f_vector
          ) => RIP.HasField "unwrap" (RIP.Ptr Pixman_f_vector_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -1271,7 +1272,7 @@ instance Read Pixman_repeat_t where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr Pixman_repeat_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -1403,7 +1404,7 @@ instance Read Pixman_dither_t where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr Pixman_dither_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -1554,7 +1555,7 @@ instance Read Pixman_filter_t where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr Pixman_filter_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -1749,7 +1750,7 @@ instance Read Pixman_op_t where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr Pixman_op_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -2294,7 +2295,7 @@ instance HasCField.HasCField Pixman_region16_data_t "size" where
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) RIP.CLong
+instance ( ty ~ RIP.CLong
          ) => RIP.HasField "size" (RIP.Ptr Pixman_region16_data_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"size")
@@ -2306,7 +2307,7 @@ instance HasCField.HasCField Pixman_region16_data_t "numRects" where
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) RIP.CLong
+instance ( ty ~ RIP.CLong
          ) => RIP.HasField "numRects" (RIP.Ptr Pixman_region16_data_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"numRects")
@@ -2386,7 +2387,7 @@ instance HasCField.HasCField Pixman_box16 "x1" where
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) HsBindgen.Runtime.LibC.Int16
+instance ( ty ~ HsBindgen.Runtime.LibC.Int16
          ) => RIP.HasField "x1" (RIP.Ptr Pixman_box16) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"x1")
@@ -2398,7 +2399,7 @@ instance HasCField.HasCField Pixman_box16 "y1" where
 
   offset# = \_ -> \_ -> 2
 
-instance ( ((~) ty) HsBindgen.Runtime.LibC.Int16
+instance ( ty ~ HsBindgen.Runtime.LibC.Int16
          ) => RIP.HasField "y1" (RIP.Ptr Pixman_box16) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"y1")
@@ -2410,7 +2411,7 @@ instance HasCField.HasCField Pixman_box16 "x2" where
 
   offset# = \_ -> \_ -> 4
 
-instance ( ((~) ty) HsBindgen.Runtime.LibC.Int16
+instance ( ty ~ HsBindgen.Runtime.LibC.Int16
          ) => RIP.HasField "x2" (RIP.Ptr Pixman_box16) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"x2")
@@ -2422,7 +2423,7 @@ instance HasCField.HasCField Pixman_box16 "y2" where
 
   offset# = \_ -> \_ -> 6
 
-instance ( ((~) ty) HsBindgen.Runtime.LibC.Int16
+instance ( ty ~ HsBindgen.Runtime.LibC.Int16
          ) => RIP.HasField "y2" (RIP.Ptr Pixman_box16) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"y2")
@@ -2444,7 +2445,7 @@ newtype Pixman_box16_t = Pixman_box16_t
     , Marshal.WriteRaw
     )
 
-instance ( ((~) ty) Pixman_box16
+instance ( ty ~ Pixman_box16
          ) => RIP.HasField "unwrap" (RIP.Ptr Pixman_box16_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -2531,7 +2532,7 @@ instance HasCField.HasCField Pixman_rectangle16_t "x" where
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) HsBindgen.Runtime.LibC.Int16
+instance ( ty ~ HsBindgen.Runtime.LibC.Int16
          ) => RIP.HasField "x" (RIP.Ptr Pixman_rectangle16_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"x")
@@ -2543,7 +2544,7 @@ instance HasCField.HasCField Pixman_rectangle16_t "y" where
 
   offset# = \_ -> \_ -> 2
 
-instance ( ((~) ty) HsBindgen.Runtime.LibC.Int16
+instance ( ty ~ HsBindgen.Runtime.LibC.Int16
          ) => RIP.HasField "y" (RIP.Ptr Pixman_rectangle16_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"y")
@@ -2555,7 +2556,7 @@ instance HasCField.HasCField Pixman_rectangle16_t "width" where
 
   offset# = \_ -> \_ -> 4
 
-instance ( ((~) ty) HsBindgen.Runtime.LibC.Word16
+instance ( ty ~ HsBindgen.Runtime.LibC.Word16
          ) => RIP.HasField "width" (RIP.Ptr Pixman_rectangle16_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"width")
@@ -2567,7 +2568,7 @@ instance HasCField.HasCField Pixman_rectangle16_t "height" where
 
   offset# = \_ -> \_ -> 6
 
-instance ( ((~) ty) HsBindgen.Runtime.LibC.Word16
+instance ( ty ~ HsBindgen.Runtime.LibC.Word16
          ) => RIP.HasField "height" (RIP.Ptr Pixman_rectangle16_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"height")
@@ -2629,7 +2630,7 @@ instance HasCField.HasCField Pixman_region16_t "extents" where
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) Pixman_box16_t
+instance ( ty ~ Pixman_box16_t
          ) => RIP.HasField "extents" (RIP.Ptr Pixman_region16_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"extents")
@@ -2641,7 +2642,7 @@ instance HasCField.HasCField Pixman_region16_t "data'" where
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.Ptr Pixman_region16_data_t)
+instance ( ty ~ RIP.Ptr Pixman_region16_data_t
          ) => RIP.HasField "data'" (RIP.Ptr Pixman_region16_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"data'")
@@ -2727,7 +2728,7 @@ instance Read Pixman_region_overlap_t where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr Pixman_region_overlap_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -2823,7 +2824,7 @@ instance HasCField.HasCField Pixman_region32_data_t "size" where
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) RIP.CLong
+instance ( ty ~ RIP.CLong
          ) => RIP.HasField "size" (RIP.Ptr Pixman_region32_data_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"size")
@@ -2835,7 +2836,7 @@ instance HasCField.HasCField Pixman_region32_data_t "numRects" where
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) RIP.CLong
+instance ( ty ~ RIP.CLong
          ) => RIP.HasField "numRects" (RIP.Ptr Pixman_region32_data_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"numRects")
@@ -2915,7 +2916,7 @@ instance HasCField.HasCField Pixman_box32_t "x1" where
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) HsBindgen.Runtime.LibC.Int32
+instance ( ty ~ HsBindgen.Runtime.LibC.Int32
          ) => RIP.HasField "x1" (RIP.Ptr Pixman_box32_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"x1")
@@ -2927,7 +2928,7 @@ instance HasCField.HasCField Pixman_box32_t "y1" where
 
   offset# = \_ -> \_ -> 4
 
-instance ( ((~) ty) HsBindgen.Runtime.LibC.Int32
+instance ( ty ~ HsBindgen.Runtime.LibC.Int32
          ) => RIP.HasField "y1" (RIP.Ptr Pixman_box32_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"y1")
@@ -2939,7 +2940,7 @@ instance HasCField.HasCField Pixman_box32_t "x2" where
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) HsBindgen.Runtime.LibC.Int32
+instance ( ty ~ HsBindgen.Runtime.LibC.Int32
          ) => RIP.HasField "x2" (RIP.Ptr Pixman_box32_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"x2")
@@ -2951,7 +2952,7 @@ instance HasCField.HasCField Pixman_box32_t "y2" where
 
   offset# = \_ -> \_ -> 12
 
-instance ( ((~) ty) HsBindgen.Runtime.LibC.Int32
+instance ( ty ~ HsBindgen.Runtime.LibC.Int32
          ) => RIP.HasField "y2" (RIP.Ptr Pixman_box32_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"y2")
@@ -3031,7 +3032,7 @@ instance HasCField.HasCField Pixman_rectangle32_t "x" where
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) HsBindgen.Runtime.LibC.Int32
+instance ( ty ~ HsBindgen.Runtime.LibC.Int32
          ) => RIP.HasField "x" (RIP.Ptr Pixman_rectangle32_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"x")
@@ -3043,7 +3044,7 @@ instance HasCField.HasCField Pixman_rectangle32_t "y" where
 
   offset# = \_ -> \_ -> 4
 
-instance ( ((~) ty) HsBindgen.Runtime.LibC.Int32
+instance ( ty ~ HsBindgen.Runtime.LibC.Int32
          ) => RIP.HasField "y" (RIP.Ptr Pixman_rectangle32_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"y")
@@ -3055,7 +3056,7 @@ instance HasCField.HasCField Pixman_rectangle32_t "width" where
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) HsBindgen.Runtime.LibC.Word32
+instance ( ty ~ HsBindgen.Runtime.LibC.Word32
          ) => RIP.HasField "width" (RIP.Ptr Pixman_rectangle32_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"width")
@@ -3067,7 +3068,7 @@ instance HasCField.HasCField Pixman_rectangle32_t "height" where
 
   offset# = \_ -> \_ -> 12
 
-instance ( ((~) ty) HsBindgen.Runtime.LibC.Word32
+instance ( ty ~ HsBindgen.Runtime.LibC.Word32
          ) => RIP.HasField "height" (RIP.Ptr Pixman_rectangle32_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"height")
@@ -3129,7 +3130,7 @@ instance HasCField.HasCField Pixman_region32_t "extents" where
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) Pixman_box32_t
+instance ( ty ~ Pixman_box32_t
          ) => RIP.HasField "extents" (RIP.Ptr Pixman_region32_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"extents")
@@ -3141,7 +3142,7 @@ instance HasCField.HasCField Pixman_region32_t "data'" where
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) (RIP.Ptr Pixman_region32_data_t)
+instance ( ty ~ RIP.Ptr Pixman_region32_data_t
          ) => RIP.HasField "data'" (RIP.Ptr Pixman_region32_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"data'")
@@ -3203,7 +3204,7 @@ instance HasCField.HasCField Pixman_region64f_data_t "size" where
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) RIP.CLong
+instance ( ty ~ RIP.CLong
          ) => RIP.HasField "size" (RIP.Ptr Pixman_region64f_data_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"size")
@@ -3215,7 +3216,7 @@ instance HasCField.HasCField Pixman_region64f_data_t "numRects" where
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) RIP.CLong
+instance ( ty ~ RIP.CLong
          ) => RIP.HasField "numRects" (RIP.Ptr Pixman_region64f_data_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"numRects")
@@ -3294,7 +3295,7 @@ instance HasCField.HasCField Pixman_box64f_t "x1" where
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) RIP.CDouble
+instance ( ty ~ RIP.CDouble
          ) => RIP.HasField "x1" (RIP.Ptr Pixman_box64f_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"x1")
@@ -3305,7 +3306,7 @@ instance HasCField.HasCField Pixman_box64f_t "y1" where
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) RIP.CDouble
+instance ( ty ~ RIP.CDouble
          ) => RIP.HasField "y1" (RIP.Ptr Pixman_box64f_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"y1")
@@ -3316,7 +3317,7 @@ instance HasCField.HasCField Pixman_box64f_t "x2" where
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) RIP.CDouble
+instance ( ty ~ RIP.CDouble
          ) => RIP.HasField "x2" (RIP.Ptr Pixman_box64f_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"x2")
@@ -3327,7 +3328,7 @@ instance HasCField.HasCField Pixman_box64f_t "y2" where
 
   offset# = \_ -> \_ -> 24
 
-instance ( ((~) ty) RIP.CDouble
+instance ( ty ~ RIP.CDouble
          ) => RIP.HasField "y2" (RIP.Ptr Pixman_box64f_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"y2")
@@ -3407,7 +3408,7 @@ instance HasCField.HasCField Pixman_rectangle64f_t "x" where
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) RIP.CDouble
+instance ( ty ~ RIP.CDouble
          ) => RIP.HasField "x" (RIP.Ptr Pixman_rectangle64f_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"x")
@@ -3419,7 +3420,7 @@ instance HasCField.HasCField Pixman_rectangle64f_t "y" where
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) RIP.CDouble
+instance ( ty ~ RIP.CDouble
          ) => RIP.HasField "y" (RIP.Ptr Pixman_rectangle64f_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"y")
@@ -3431,7 +3432,7 @@ instance HasCField.HasCField Pixman_rectangle64f_t "width" where
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) RIP.CDouble
+instance ( ty ~ RIP.CDouble
          ) => RIP.HasField "width" (RIP.Ptr Pixman_rectangle64f_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"width")
@@ -3443,7 +3444,7 @@ instance HasCField.HasCField Pixman_rectangle64f_t "height" where
 
   offset# = \_ -> \_ -> 24
 
-instance ( ((~) ty) RIP.CDouble
+instance ( ty ~ RIP.CDouble
          ) => RIP.HasField "height" (RIP.Ptr Pixman_rectangle64f_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"height")
@@ -3505,7 +3506,7 @@ instance HasCField.HasCField Pixman_region64f_t "extents" where
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) Pixman_box64f_t
+instance ( ty ~ Pixman_box64f_t
          ) => RIP.HasField "extents" (RIP.Ptr Pixman_region64f_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"extents")
@@ -3517,7 +3518,7 @@ instance HasCField.HasCField Pixman_region64f_t "data'" where
 
   offset# = \_ -> \_ -> 32
 
-instance ( ((~) ty) (RIP.Ptr Pixman_region64f_data_t)
+instance ( ty ~ RIP.Ptr Pixman_region64f_data_t
          ) => RIP.HasField "data'" (RIP.Ptr Pixman_region64f_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"data'")
@@ -3550,7 +3551,7 @@ newtype Pixman_index_type = Pixman_index_type
     , Marshal.WriteRaw
     )
 
-instance ( ((~) ty) HsBindgen.Runtime.LibC.Word8
+instance ( ty ~ HsBindgen.Runtime.LibC.Word8
          ) => RIP.HasField "unwrap" (RIP.Ptr Pixman_index_type) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -3576,14 +3577,14 @@ data Pixman_indexed_t = Pixman_indexed_t
 
          __exported by:__ @pixman.h@
     -}
-  , rgba :: (CA.ConstantArray 256) HsBindgen.Runtime.LibC.Word32
+  , rgba :: CA.ConstantArray 256 HsBindgen.Runtime.LibC.Word32
     {- ^ __C declaration:__ @rgba@
 
          __defined at:__ @pixman.h 994:15@
 
          __exported by:__ @pixman.h@
     -}
-  , ent :: (CA.ConstantArray 32768) Pixman_index_type
+  , ent :: CA.ConstantArray 32768 Pixman_index_type
     {- ^ __C declaration:__ @ent@
 
          __defined at:__ @pixman.h 995:23@
@@ -3628,7 +3629,7 @@ instance HasCField.HasCField Pixman_indexed_t "color" where
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) Pixman_bool_t
+instance ( ty ~ Pixman_bool_t
          ) => RIP.HasField "color" (RIP.Ptr Pixman_indexed_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"color")
@@ -3636,11 +3637,11 @@ instance ( ((~) ty) Pixman_bool_t
 instance HasCField.HasCField Pixman_indexed_t "rgba" where
 
   type CFieldType Pixman_indexed_t "rgba" =
-    (CA.ConstantArray 256) HsBindgen.Runtime.LibC.Word32
+    CA.ConstantArray 256 HsBindgen.Runtime.LibC.Word32
 
   offset# = \_ -> \_ -> 4
 
-instance ( ((~) ty) ((CA.ConstantArray 256) HsBindgen.Runtime.LibC.Word32)
+instance ( ty ~ CA.ConstantArray 256 HsBindgen.Runtime.LibC.Word32
          ) => RIP.HasField "rgba" (RIP.Ptr Pixman_indexed_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"rgba")
@@ -3648,11 +3649,11 @@ instance ( ((~) ty) ((CA.ConstantArray 256) HsBindgen.Runtime.LibC.Word32)
 instance HasCField.HasCField Pixman_indexed_t "ent" where
 
   type CFieldType Pixman_indexed_t "ent" =
-    (CA.ConstantArray 32768) Pixman_index_type
+    CA.ConstantArray 32768 Pixman_index_type
 
   offset# = \_ -> \_ -> 1028
 
-instance ( ((~) ty) ((CA.ConstantArray 32768) Pixman_index_type)
+instance ( ty ~ CA.ConstantArray 32768 Pixman_index_type
          ) => RIP.HasField "ent" (RIP.Ptr Pixman_indexed_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"ent")
@@ -3714,7 +3715,7 @@ instance HasCField.HasCField Pixman_gradient_stop_t "x" where
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) Pixman_fixed_t
+instance ( ty ~ Pixman_fixed_t
          ) => RIP.HasField "x" (RIP.Ptr Pixman_gradient_stop_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"x")
@@ -3726,28 +3727,28 @@ instance HasCField.HasCField Pixman_gradient_stop_t "color" where
 
   offset# = \_ -> \_ -> 4
 
-instance ( ((~) ty) Pixman_color_t
+instance ( ty ~ Pixman_color_t
          ) => RIP.HasField "color" (RIP.Ptr Pixman_gradient_stop_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"color")
 
 {-| Auxiliary type used by 'Pixman_read_memory_func_t'
 
-__C declaration:__ @pixman_read_memory_func_t@
+    __C declaration:__ @pixman_read_memory_func_t@
 
-__defined at:__ @pixman.h 975:21@
+    __defined at:__ @pixman.h 975:21@
 
-__exported by:__ @pixman.h@
+    __exported by:__ @pixman.h@
 -}
 newtype Pixman_read_memory_func_t_Aux = Pixman_read_memory_func_t_Aux
-  { unwrap :: (PtrConst.PtrConst RIP.Void) -> RIP.CInt -> IO HsBindgen.Runtime.LibC.Word32
+  { unwrap :: PtrConst.PtrConst RIP.Void -> RIP.CInt -> IO HsBindgen.Runtime.LibC.Word32
   }
   deriving stock (RIP.Generic)
   deriving newtype (RIP.HasFFIType)
 
 foreign import ccall safe "wrapper" hs_bindgen_51326a51b8c35a14_base ::
-     ((RIP.Ptr RIP.Void) -> RIP.Int32 -> IO RIP.Word32)
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> RIP.Int32 -> IO RIP.Word32))
+     (RIP.Ptr RIP.Void -> RIP.Int32 -> IO RIP.Word32)
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Int32 -> IO RIP.Word32))
 
 -- __unique:__ @toPixman_read_memory_func_t_Aux@
 hs_bindgen_51326a51b8c35a14 ::
@@ -3758,8 +3759,8 @@ hs_bindgen_51326a51b8c35a14 =
     fmap RIP.castFunPtrFromFFIType (hs_bindgen_51326a51b8c35a14_base (RIP.toFFIType fun0))
 
 foreign import ccall safe "dynamic" hs_bindgen_51728ff679dcc0c5_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> RIP.Int32 -> IO RIP.Word32)
-  -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO RIP.Word32
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Int32 -> IO RIP.Word32)
+  -> RIP.Ptr RIP.Void -> RIP.Int32 -> IO RIP.Word32
 
 -- __unique:__ @fromPixman_read_memory_func_t_Aux@
 hs_bindgen_51728ff679dcc0c5 ::
@@ -3777,7 +3778,7 @@ instance RIP.FromFunPtr Pixman_read_memory_func_t_Aux where
 
   fromFunPtr = hs_bindgen_51728ff679dcc0c5
 
-instance ( ((~) ty) ((PtrConst.PtrConst RIP.Void) -> RIP.CInt -> IO HsBindgen.Runtime.LibC.Word32)
+instance ( ty ~ (PtrConst.PtrConst RIP.Void -> RIP.CInt -> IO HsBindgen.Runtime.LibC.Word32)
          ) => RIP.HasField "unwrap" (RIP.Ptr Pixman_read_memory_func_t_Aux) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -3785,7 +3786,7 @@ instance ( ((~) ty) ((PtrConst.PtrConst RIP.Void) -> RIP.CInt -> IO HsBindgen.Ru
 instance HasCField.HasCField Pixman_read_memory_func_t_Aux "unwrap" where
 
   type CFieldType Pixman_read_memory_func_t_Aux "unwrap" =
-    (PtrConst.PtrConst RIP.Void) -> RIP.CInt -> IO HsBindgen.Runtime.LibC.Word32
+    PtrConst.PtrConst RIP.Void -> RIP.CInt -> IO HsBindgen.Runtime.LibC.Word32
 
   offset# = \_ -> \_ -> 0
 
@@ -3807,7 +3808,7 @@ newtype Pixman_read_memory_func_t = Pixman_read_memory_func_t
     , Marshal.WriteRaw
     )
 
-instance ( ((~) ty) (RIP.FunPtr Pixman_read_memory_func_t_Aux)
+instance ( ty ~ RIP.FunPtr Pixman_read_memory_func_t_Aux
          ) => RIP.HasField "unwrap" (RIP.Ptr Pixman_read_memory_func_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -3821,21 +3822,21 @@ instance HasCField.HasCField Pixman_read_memory_func_t "unwrap" where
 
 {-| Auxiliary type used by 'Pixman_write_memory_func_t'
 
-__C declaration:__ @pixman_write_memory_func_t@
+    __C declaration:__ @pixman_write_memory_func_t@
 
-__defined at:__ @pixman.h 976:21@
+    __defined at:__ @pixman.h 976:21@
 
-__exported by:__ @pixman.h@
+    __exported by:__ @pixman.h@
 -}
 newtype Pixman_write_memory_func_t_Aux = Pixman_write_memory_func_t_Aux
-  { unwrap :: (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> RIP.CInt -> IO ()
+  { unwrap :: RIP.Ptr RIP.Void -> HsBindgen.Runtime.LibC.Word32 -> RIP.CInt -> IO ()
   }
   deriving stock (RIP.Generic)
   deriving newtype (RIP.HasFFIType)
 
 foreign import ccall safe "wrapper" hs_bindgen_0d14a8fca82bcab0_base ::
-     ((RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> IO ()))
+     (RIP.Ptr RIP.Void -> RIP.Word32 -> RIP.Int32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Word32 -> RIP.Int32 -> IO ()))
 
 -- __unique:__ @toPixman_write_memory_func_t_Aux@
 hs_bindgen_0d14a8fca82bcab0 ::
@@ -3846,8 +3847,8 @@ hs_bindgen_0d14a8fca82bcab0 =
     fmap RIP.castFunPtrFromFFIType (hs_bindgen_0d14a8fca82bcab0_base (RIP.toFFIType fun0))
 
 foreign import ccall safe "dynamic" hs_bindgen_f8dd2e91e8d45935_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> RIP.Int32 -> IO ()
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Word32 -> RIP.Int32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Word32 -> RIP.Int32 -> IO ()
 
 -- __unique:__ @fromPixman_write_memory_func_t_Aux@
 hs_bindgen_f8dd2e91e8d45935 ::
@@ -3865,7 +3866,7 @@ instance RIP.FromFunPtr Pixman_write_memory_func_t_Aux where
 
   fromFunPtr = hs_bindgen_f8dd2e91e8d45935
 
-instance ( ((~) ty) ((RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> RIP.CInt -> IO ())
+instance ( ty ~ (RIP.Ptr RIP.Void -> HsBindgen.Runtime.LibC.Word32 -> RIP.CInt -> IO ())
          ) => RIP.HasField "unwrap" (RIP.Ptr Pixman_write_memory_func_t_Aux) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -3873,7 +3874,7 @@ instance ( ((~) ty) ((RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> RIP.
 instance HasCField.HasCField Pixman_write_memory_func_t_Aux "unwrap" where
 
   type CFieldType Pixman_write_memory_func_t_Aux "unwrap" =
-    (RIP.Ptr RIP.Void) -> HsBindgen.Runtime.LibC.Word32 -> RIP.CInt -> IO ()
+    RIP.Ptr RIP.Void -> HsBindgen.Runtime.LibC.Word32 -> RIP.CInt -> IO ()
 
   offset# = \_ -> \_ -> 0
 
@@ -3895,7 +3896,7 @@ newtype Pixman_write_memory_func_t = Pixman_write_memory_func_t
     , Marshal.WriteRaw
     )
 
-instance ( ((~) ty) (RIP.FunPtr Pixman_write_memory_func_t_Aux)
+instance ( ty ~ RIP.FunPtr Pixman_write_memory_func_t_Aux
          ) => RIP.HasField "unwrap" (RIP.Ptr Pixman_write_memory_func_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -3909,21 +3910,21 @@ instance HasCField.HasCField Pixman_write_memory_func_t "unwrap" where
 
 {-| Auxiliary type used by 'Pixman_image_destroy_func_t'
 
-__C declaration:__ @pixman_image_destroy_func_t@
+    __C declaration:__ @pixman_image_destroy_func_t@
 
-__defined at:__ @pixman.h 978:21@
+    __defined at:__ @pixman.h 978:21@
 
-__exported by:__ @pixman.h@
+    __exported by:__ @pixman.h@
 -}
 newtype Pixman_image_destroy_func_t_Aux = Pixman_image_destroy_func_t_Aux
-  { unwrap :: (RIP.Ptr Pixman_image_t) -> (RIP.Ptr RIP.Void) -> IO ()
+  { unwrap :: RIP.Ptr Pixman_image_t -> RIP.Ptr RIP.Void -> IO ()
   }
   deriving stock (RIP.Generic)
   deriving newtype (RIP.HasFFIType)
 
 foreign import ccall safe "wrapper" hs_bindgen_b37df2dde220b04b_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
 -- __unique:__ @toPixman_image_destroy_func_t_Aux@
 hs_bindgen_b37df2dde220b04b ::
@@ -3934,8 +3935,8 @@ hs_bindgen_b37df2dde220b04b =
     fmap RIP.castFunPtrFromFFIType (hs_bindgen_b37df2dde220b04b_base (RIP.toFFIType fun0))
 
 foreign import ccall safe "dynamic" hs_bindgen_175c0e20f9395cab_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
 -- __unique:__ @fromPixman_image_destroy_func_t_Aux@
 hs_bindgen_175c0e20f9395cab ::
@@ -3953,7 +3954,7 @@ instance RIP.FromFunPtr Pixman_image_destroy_func_t_Aux where
 
   fromFunPtr = hs_bindgen_175c0e20f9395cab
 
-instance ( ((~) ty) ((RIP.Ptr Pixman_image_t) -> (RIP.Ptr RIP.Void) -> IO ())
+instance ( ty ~ (RIP.Ptr Pixman_image_t -> RIP.Ptr RIP.Void -> IO ())
          ) => RIP.HasField "unwrap" (RIP.Ptr Pixman_image_destroy_func_t_Aux) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -3961,7 +3962,7 @@ instance ( ((~) ty) ((RIP.Ptr Pixman_image_t) -> (RIP.Ptr RIP.Void) -> IO ())
 instance HasCField.HasCField Pixman_image_destroy_func_t_Aux "unwrap" where
 
   type CFieldType Pixman_image_destroy_func_t_Aux "unwrap" =
-    (RIP.Ptr Pixman_image_t) -> (RIP.Ptr RIP.Void) -> IO ()
+    RIP.Ptr Pixman_image_t -> RIP.Ptr RIP.Void -> IO ()
 
   offset# = \_ -> \_ -> 0
 
@@ -3983,7 +3984,7 @@ newtype Pixman_image_destroy_func_t = Pixman_image_destroy_func_t
     , Marshal.WriteRaw
     )
 
-instance ( ((~) ty) (RIP.FunPtr Pixman_image_destroy_func_t_Aux)
+instance ( ty ~ RIP.FunPtr Pixman_image_destroy_func_t_Aux
          ) => RIP.HasField "unwrap" (RIP.Ptr Pixman_image_destroy_func_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -4010,7 +4011,7 @@ pIXMAN_MAX_INDEXED = (256 :: RIP.CInt)
 
     __exported by:__ @pixman.h@
 -}
-pIXMAN_FORMAT :: forall a10 a21 a32 a43 a54 a65. (C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.ShiftRes a10)) (C.Expr.HostPlatform.ShiftRes a21) => (C.Expr.HostPlatform.Bitwise ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a10)) (C.Expr.HostPlatform.ShiftRes a21))) (C.Expr.HostPlatform.ShiftRes a32) => (C.Expr.HostPlatform.Bitwise ((C.Expr.HostPlatform.BitsRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a10)) (C.Expr.HostPlatform.ShiftRes a21))) (C.Expr.HostPlatform.ShiftRes a32))) (C.Expr.HostPlatform.ShiftRes a43) => (C.Expr.HostPlatform.Bitwise ((C.Expr.HostPlatform.BitsRes ((C.Expr.HostPlatform.BitsRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a10)) (C.Expr.HostPlatform.ShiftRes a21))) (C.Expr.HostPlatform.ShiftRes a32))) (C.Expr.HostPlatform.ShiftRes a43))) (C.Expr.HostPlatform.ShiftRes a54) => (C.Expr.HostPlatform.Bitwise ((C.Expr.HostPlatform.BitsRes ((C.Expr.HostPlatform.BitsRes ((C.Expr.HostPlatform.BitsRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a10)) (C.Expr.HostPlatform.ShiftRes a21))) (C.Expr.HostPlatform.ShiftRes a32))) (C.Expr.HostPlatform.ShiftRes a43))) (C.Expr.HostPlatform.ShiftRes a54))) a65 => (C.Expr.HostPlatform.Shift a54) RIP.CInt => (C.Expr.HostPlatform.Shift a43) RIP.CInt => (C.Expr.HostPlatform.Shift a32) RIP.CInt => (C.Expr.HostPlatform.Shift a21) RIP.CInt => (C.Expr.HostPlatform.Shift a10) RIP.CInt => a10 -> a21 -> a32 -> a43 -> a54 -> a65 -> (C.Expr.HostPlatform.BitsRes ((C.Expr.HostPlatform.BitsRes ((C.Expr.HostPlatform.BitsRes ((C.Expr.HostPlatform.BitsRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a10)) (C.Expr.HostPlatform.ShiftRes a21))) (C.Expr.HostPlatform.ShiftRes a32))) (C.Expr.HostPlatform.ShiftRes a43))) (C.Expr.HostPlatform.ShiftRes a54))) a65
+pIXMAN_FORMAT :: forall a10 a21 a32 a43 a54 a65. C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.ShiftRes a10) (C.Expr.HostPlatform.ShiftRes a21) => C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a10) (C.Expr.HostPlatform.ShiftRes a21)) (C.Expr.HostPlatform.ShiftRes a32) => C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a10) (C.Expr.HostPlatform.ShiftRes a21)) (C.Expr.HostPlatform.ShiftRes a32)) (C.Expr.HostPlatform.ShiftRes a43) => C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a10) (C.Expr.HostPlatform.ShiftRes a21)) (C.Expr.HostPlatform.ShiftRes a32)) (C.Expr.HostPlatform.ShiftRes a43)) (C.Expr.HostPlatform.ShiftRes a54) => C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a10) (C.Expr.HostPlatform.ShiftRes a21)) (C.Expr.HostPlatform.ShiftRes a32)) (C.Expr.HostPlatform.ShiftRes a43)) (C.Expr.HostPlatform.ShiftRes a54)) a65 => C.Expr.HostPlatform.Shift a54 RIP.CInt => C.Expr.HostPlatform.Shift a43 RIP.CInt => C.Expr.HostPlatform.Shift a32 RIP.CInt => C.Expr.HostPlatform.Shift a21 RIP.CInt => C.Expr.HostPlatform.Shift a10 RIP.CInt => a10 -> a21 -> a32 -> a43 -> a54 -> a65 -> C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a10) (C.Expr.HostPlatform.ShiftRes a21)) (C.Expr.HostPlatform.ShiftRes a32)) (C.Expr.HostPlatform.ShiftRes a43)) (C.Expr.HostPlatform.ShiftRes a54)) a65
 pIXMAN_FORMAT =
   \bpp0 ->
     \type1 ->
@@ -4026,7 +4027,7 @@ pIXMAN_FORMAT =
 
     __exported by:__ @pixman.h@
 -}
-pIXMAN_FORMAT_BYTE :: forall a10 a21 a32 a43 a54 a65. (C.Expr.HostPlatform.Bitwise ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a10))) RIP.CInt)) (C.Expr.HostPlatform.ShiftRes a21) => (C.Expr.HostPlatform.Bitwise ((C.Expr.HostPlatform.BitsRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a10))) RIP.CInt)) (C.Expr.HostPlatform.ShiftRes a21))) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a32)) => (C.Expr.HostPlatform.Bitwise ((C.Expr.HostPlatform.BitsRes ((C.Expr.HostPlatform.BitsRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a10))) RIP.CInt)) (C.Expr.HostPlatform.ShiftRes a21))) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a32)))) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a43)) => (C.Expr.HostPlatform.Bitwise ((C.Expr.HostPlatform.BitsRes ((C.Expr.HostPlatform.BitsRes ((C.Expr.HostPlatform.BitsRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a10))) RIP.CInt)) (C.Expr.HostPlatform.ShiftRes a21))) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a32)))) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a43)))) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a54)) => (C.Expr.HostPlatform.Bitwise ((C.Expr.HostPlatform.BitsRes ((C.Expr.HostPlatform.BitsRes ((C.Expr.HostPlatform.BitsRes ((C.Expr.HostPlatform.BitsRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a10))) RIP.CInt)) (C.Expr.HostPlatform.ShiftRes a21))) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a32)))) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a43)))) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a54)))) (C.Expr.HostPlatform.ShiftRes a65) => (C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a10))) RIP.CInt => (C.Expr.HostPlatform.Shift a65) RIP.CInt => (C.Expr.HostPlatform.Shift a54) RIP.CInt => (C.Expr.HostPlatform.Shift (C.Expr.HostPlatform.ShiftRes a54)) RIP.CInt => (C.Expr.HostPlatform.Shift a43) RIP.CInt => (C.Expr.HostPlatform.Shift (C.Expr.HostPlatform.ShiftRes a43)) RIP.CInt => (C.Expr.HostPlatform.Shift a32) RIP.CInt => (C.Expr.HostPlatform.Shift (C.Expr.HostPlatform.ShiftRes a32)) RIP.CInt => (C.Expr.HostPlatform.Shift a21) RIP.CInt => (C.Expr.HostPlatform.Shift a10) RIP.CInt => (C.Expr.HostPlatform.Shift (C.Expr.HostPlatform.ShiftRes a10)) RIP.CInt => a10 -> a21 -> a32 -> a43 -> a54 -> a65 -> (C.Expr.HostPlatform.BitsRes ((C.Expr.HostPlatform.BitsRes ((C.Expr.HostPlatform.BitsRes ((C.Expr.HostPlatform.BitsRes ((C.Expr.HostPlatform.BitsRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a10))) RIP.CInt)) (C.Expr.HostPlatform.ShiftRes a21))) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a32)))) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a43)))) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a54)))) (C.Expr.HostPlatform.ShiftRes a65)
+pIXMAN_FORMAT_BYTE :: forall a10 a21 a32 a43 a54 a65. C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a10)) RIP.CInt) (C.Expr.HostPlatform.ShiftRes a21) => C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a10)) RIP.CInt) (C.Expr.HostPlatform.ShiftRes a21)) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a32)) => C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a10)) RIP.CInt) (C.Expr.HostPlatform.ShiftRes a21)) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a32))) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a43)) => C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a10)) RIP.CInt) (C.Expr.HostPlatform.ShiftRes a21)) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a32))) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a43))) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a54)) => C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a10)) RIP.CInt) (C.Expr.HostPlatform.ShiftRes a21)) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a32))) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a43))) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a54))) (C.Expr.HostPlatform.ShiftRes a65) => C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a10)) RIP.CInt => C.Expr.HostPlatform.Shift a65 RIP.CInt => C.Expr.HostPlatform.Shift a54 RIP.CInt => C.Expr.HostPlatform.Shift (C.Expr.HostPlatform.ShiftRes a54) RIP.CInt => C.Expr.HostPlatform.Shift a43 RIP.CInt => C.Expr.HostPlatform.Shift (C.Expr.HostPlatform.ShiftRes a43) RIP.CInt => C.Expr.HostPlatform.Shift a32 RIP.CInt => C.Expr.HostPlatform.Shift (C.Expr.HostPlatform.ShiftRes a32) RIP.CInt => C.Expr.HostPlatform.Shift a21 RIP.CInt => C.Expr.HostPlatform.Shift a10 RIP.CInt => C.Expr.HostPlatform.Shift (C.Expr.HostPlatform.ShiftRes a10) RIP.CInt => a10 -> a21 -> a32 -> a43 -> a54 -> a65 -> C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a10)) RIP.CInt) (C.Expr.HostPlatform.ShiftRes a21)) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a32))) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a43))) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.ShiftRes a54))) (C.Expr.HostPlatform.ShiftRes a65)
 pIXMAN_FORMAT_BYTE =
   \bpp0 ->
     \type1 ->
@@ -4042,7 +4043,7 @@ pIXMAN_FORMAT_BYTE =
 
     __exported by:__ @pixman.h@
 -}
-pIXMAN_FORMAT_RESHIFT :: forall a0 b1 c2. (C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt => (C.Expr.HostPlatform.Shift a0) b1 => (C.Expr.HostPlatform.Shift ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt)) ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt) => (C.Expr.HostPlatform.Shift a0) RIP.CInt => (C.Expr.HostPlatform.Shift RIP.CInt) c2 => a0 -> b1 -> c2 -> C.Expr.HostPlatform.ShiftRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt)
+pIXMAN_FORMAT_RESHIFT :: forall a0 b1 c2. C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt => C.Expr.HostPlatform.Shift a0 b1 => C.Expr.HostPlatform.Shift (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt) (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt) => C.Expr.HostPlatform.Shift a0 RIP.CInt => C.Expr.HostPlatform.Shift RIP.CInt c2 => a0 -> b1 -> c2 -> C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt)
 pIXMAN_FORMAT_RESHIFT =
   \val0 ->
     \ofs1 ->
@@ -4055,7 +4056,7 @@ pIXMAN_FORMAT_RESHIFT =
 
     __exported by:__ @pixman.h@
 -}
-pIXMAN_FORMAT_BPP :: forall a0. (C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt => (C.Expr.HostPlatform.Shift ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt)) ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt) => (C.Expr.HostPlatform.Shift a0) RIP.CInt => a0 -> C.Expr.HostPlatform.ShiftRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt)
+pIXMAN_FORMAT_BPP :: forall a0. C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt => C.Expr.HostPlatform.Shift (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt) (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt) => C.Expr.HostPlatform.Shift a0 RIP.CInt => a0 -> C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt)
 pIXMAN_FORMAT_BPP =
   \f0 ->
     pIXMAN_FORMAT_RESHIFT f0 (24 :: RIP.CInt) (8 :: RIP.CInt)
@@ -4066,7 +4067,7 @@ pIXMAN_FORMAT_BPP =
 
     __exported by:__ @pixman.h@
 -}
-pIXMAN_FORMAT_TYPE :: forall a0. (C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt => (C.Expr.HostPlatform.Shift a0) RIP.CInt => a0 -> (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt
+pIXMAN_FORMAT_TYPE :: forall a0. C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt => C.Expr.HostPlatform.Shift a0 RIP.CInt => a0 -> C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt
 pIXMAN_FORMAT_TYPE =
   \f0 ->
     (C.Expr.HostPlatform..&.) ((C.Expr.HostPlatform.>>) f0 (16 :: RIP.CInt)) (63 :: RIP.CInt)
@@ -4077,7 +4078,7 @@ pIXMAN_FORMAT_TYPE =
 
     __exported by:__ @pixman.h@
 -}
-pIXMAN_FORMAT_A :: forall a0. (C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt => (C.Expr.HostPlatform.Shift ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt)) ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt) => (C.Expr.HostPlatform.Shift a0) RIP.CInt => a0 -> C.Expr.HostPlatform.ShiftRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt)
+pIXMAN_FORMAT_A :: forall a0. C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt => C.Expr.HostPlatform.Shift (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt) (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt) => C.Expr.HostPlatform.Shift a0 RIP.CInt => a0 -> C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt)
 pIXMAN_FORMAT_A =
   \f0 ->
     pIXMAN_FORMAT_RESHIFT f0 (12 :: RIP.CInt) (4 :: RIP.CInt)
@@ -4088,7 +4089,7 @@ pIXMAN_FORMAT_A =
 
     __exported by:__ @pixman.h@
 -}
-pIXMAN_FORMAT_R :: forall a0. (C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt => (C.Expr.HostPlatform.Shift ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt)) ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt) => (C.Expr.HostPlatform.Shift a0) RIP.CInt => a0 -> C.Expr.HostPlatform.ShiftRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt)
+pIXMAN_FORMAT_R :: forall a0. C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt => C.Expr.HostPlatform.Shift (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt) (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt) => C.Expr.HostPlatform.Shift a0 RIP.CInt => a0 -> C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt)
 pIXMAN_FORMAT_R =
   \f0 ->
     pIXMAN_FORMAT_RESHIFT f0 (8 :: RIP.CInt) (4 :: RIP.CInt)
@@ -4099,7 +4100,7 @@ pIXMAN_FORMAT_R =
 
     __exported by:__ @pixman.h@
 -}
-pIXMAN_FORMAT_G :: forall a0. (C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt => (C.Expr.HostPlatform.Shift ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt)) ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt) => (C.Expr.HostPlatform.Shift a0) RIP.CInt => a0 -> C.Expr.HostPlatform.ShiftRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt)
+pIXMAN_FORMAT_G :: forall a0. C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt => C.Expr.HostPlatform.Shift (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt) (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt) => C.Expr.HostPlatform.Shift a0 RIP.CInt => a0 -> C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt)
 pIXMAN_FORMAT_G =
   \f0 ->
     pIXMAN_FORMAT_RESHIFT f0 (4 :: RIP.CInt) (4 :: RIP.CInt)
@@ -4110,7 +4111,7 @@ pIXMAN_FORMAT_G =
 
     __exported by:__ @pixman.h@
 -}
-pIXMAN_FORMAT_B :: forall a0. (C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt => (C.Expr.HostPlatform.Shift ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt)) ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt) => (C.Expr.HostPlatform.Shift a0) RIP.CInt => a0 -> C.Expr.HostPlatform.ShiftRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt)
+pIXMAN_FORMAT_B :: forall a0. C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt => C.Expr.HostPlatform.Shift (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt) (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt) => C.Expr.HostPlatform.Shift a0 RIP.CInt => a0 -> C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt)
 pIXMAN_FORMAT_B =
   \f0 ->
     pIXMAN_FORMAT_RESHIFT f0 (0 :: RIP.CInt) (4 :: RIP.CInt)
@@ -4121,7 +4122,7 @@ pIXMAN_FORMAT_B =
 
     __exported by:__ @pixman.h@
 -}
-pIXMAN_FORMAT_RGB :: forall a0. (C.Expr.HostPlatform.Bitwise a0) RIP.CInt => a0 -> (C.Expr.HostPlatform.BitsRes a0) RIP.CInt
+pIXMAN_FORMAT_RGB :: forall a0. C.Expr.HostPlatform.Bitwise a0 RIP.CInt => a0 -> C.Expr.HostPlatform.BitsRes a0 RIP.CInt
 pIXMAN_FORMAT_RGB =
   \f0 ->
     (C.Expr.HostPlatform..&.) f0 (4095 :: RIP.CInt)
@@ -4132,7 +4133,7 @@ pIXMAN_FORMAT_RGB =
 
     __exported by:__ @pixman.h@
 -}
-pIXMAN_FORMAT_VIS :: forall a0. (C.Expr.HostPlatform.Bitwise a0) RIP.CInt => a0 -> (C.Expr.HostPlatform.BitsRes a0) RIP.CInt
+pIXMAN_FORMAT_VIS :: forall a0. C.Expr.HostPlatform.Bitwise a0 RIP.CInt => a0 -> C.Expr.HostPlatform.BitsRes a0 RIP.CInt
 pIXMAN_FORMAT_VIS =
   \f0 ->
     (C.Expr.HostPlatform..&.) f0 (65535 :: RIP.CInt)
@@ -4143,7 +4144,7 @@ pIXMAN_FORMAT_VIS =
 
     __exported by:__ @pixman.h@
 -}
-pIXMAN_FORMAT_DEPTH :: forall a0. (C.Expr.HostPlatform.Add (C.Expr.HostPlatform.ShiftRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt))) (C.Expr.HostPlatform.ShiftRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt)) => (C.Expr.HostPlatform.Add ((C.Expr.HostPlatform.AddRes (C.Expr.HostPlatform.ShiftRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt))) (C.Expr.HostPlatform.ShiftRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt)))) (C.Expr.HostPlatform.ShiftRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt)) => (C.Expr.HostPlatform.Add ((C.Expr.HostPlatform.AddRes ((C.Expr.HostPlatform.AddRes (C.Expr.HostPlatform.ShiftRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt))) (C.Expr.HostPlatform.ShiftRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt)))) (C.Expr.HostPlatform.ShiftRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt)))) (C.Expr.HostPlatform.ShiftRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt)) => (C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt => (C.Expr.HostPlatform.Shift ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt)) ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt) => (C.Expr.HostPlatform.Shift a0) RIP.CInt => a0 -> (C.Expr.HostPlatform.AddRes ((C.Expr.HostPlatform.AddRes ((C.Expr.HostPlatform.AddRes (C.Expr.HostPlatform.ShiftRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt))) (C.Expr.HostPlatform.ShiftRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt)))) (C.Expr.HostPlatform.ShiftRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt)))) (C.Expr.HostPlatform.ShiftRes ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt))
+pIXMAN_FORMAT_DEPTH :: forall a0. C.Expr.HostPlatform.Add (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt)) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt)) => C.Expr.HostPlatform.Add (C.Expr.HostPlatform.AddRes (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt)) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt))) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt)) => C.Expr.HostPlatform.Add (C.Expr.HostPlatform.AddRes (C.Expr.HostPlatform.AddRes (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt)) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt))) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt))) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt)) => C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt => C.Expr.HostPlatform.Shift (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt) (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt) => C.Expr.HostPlatform.Shift a0 RIP.CInt => a0 -> C.Expr.HostPlatform.AddRes (C.Expr.HostPlatform.AddRes (C.Expr.HostPlatform.AddRes (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt)) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt))) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt))) (C.Expr.HostPlatform.ShiftRes (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt))
 pIXMAN_FORMAT_DEPTH =
   \f0 ->
     (C.Expr.HostPlatform.+) ((C.Expr.HostPlatform.+) ((C.Expr.HostPlatform.+) (pIXMAN_FORMAT_A f0) (pIXMAN_FORMAT_R f0)) (pIXMAN_FORMAT_G f0)) (pIXMAN_FORMAT_B f0)
@@ -4262,7 +4263,7 @@ pIXMAN_TYPE_RGBA_FLOAT = (11 :: RIP.CInt)
 
     __exported by:__ @pixman.h@
 -}
-pIXMAN_FORMAT_COLOR :: forall a0. (C.Expr.HostPlatform.RelEq ((C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt)) RIP.CInt => (C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.ShiftRes a0)) RIP.CInt => (C.Expr.HostPlatform.Shift a0) RIP.CInt => a0 -> RIP.CInt
+pIXMAN_FORMAT_COLOR :: forall a0. C.Expr.HostPlatform.RelEq (C.Expr.HostPlatform.BitsRes (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt) RIP.CInt => C.Expr.HostPlatform.Bitwise (C.Expr.HostPlatform.ShiftRes a0) RIP.CInt => C.Expr.HostPlatform.Shift a0 RIP.CInt => a0 -> RIP.CInt
 pIXMAN_FORMAT_COLOR =
   \f0 ->
     (C.Expr.HostPlatform.||) ((C.Expr.HostPlatform.||) ((C.Expr.HostPlatform.||) ((C.Expr.HostPlatform.||) ((C.Expr.HostPlatform.==) (pIXMAN_FORMAT_TYPE f0) pIXMAN_TYPE_ARGB) ((C.Expr.HostPlatform.==) (pIXMAN_FORMAT_TYPE f0) pIXMAN_TYPE_ABGR)) ((C.Expr.HostPlatform.==) (pIXMAN_FORMAT_TYPE f0) pIXMAN_TYPE_BGRA)) ((C.Expr.HostPlatform.==) (pIXMAN_FORMAT_TYPE f0) pIXMAN_TYPE_RGBA)) ((C.Expr.HostPlatform.==) (pIXMAN_FORMAT_TYPE f0) pIXMAN_TYPE_RGBA_FLOAT)
@@ -4384,7 +4385,7 @@ instance Read Pixman_format_code_t where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr Pixman_format_code_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -4941,7 +4942,7 @@ instance Read Pixman_kernel_t where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr Pixman_kernel_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -5097,7 +5098,7 @@ instance HasCField.HasCField Pixman_glyph_t "x" where
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) RIP.CInt
+instance ( ty ~ RIP.CInt
          ) => RIP.HasField "x" (RIP.Ptr Pixman_glyph_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"x")
@@ -5108,7 +5109,7 @@ instance HasCField.HasCField Pixman_glyph_t "y" where
 
   offset# = \_ -> \_ -> 4
 
-instance ( ((~) ty) RIP.CInt
+instance ( ty ~ RIP.CInt
          ) => RIP.HasField "y" (RIP.Ptr Pixman_glyph_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"y")
@@ -5120,7 +5121,7 @@ instance HasCField.HasCField Pixman_glyph_t "glyph" where
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (PtrConst.PtrConst RIP.Void)
+instance ( ty ~ PtrConst.PtrConst RIP.Void
          ) => RIP.HasField "glyph" (RIP.Ptr Pixman_glyph_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"glyph")
@@ -5263,7 +5264,7 @@ instance HasCField.HasCField Pixman_edge_t "x" where
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) Pixman_fixed_t
+instance ( ty ~ Pixman_fixed_t
          ) => RIP.HasField "x" (RIP.Ptr Pixman_edge_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"x")
@@ -5274,7 +5275,7 @@ instance HasCField.HasCField Pixman_edge_t "e" where
 
   offset# = \_ -> \_ -> 4
 
-instance ( ((~) ty) Pixman_fixed_t
+instance ( ty ~ Pixman_fixed_t
          ) => RIP.HasField "e" (RIP.Ptr Pixman_edge_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"e")
@@ -5286,7 +5287,7 @@ instance HasCField.HasCField Pixman_edge_t "stepx" where
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) Pixman_fixed_t
+instance ( ty ~ Pixman_fixed_t
          ) => RIP.HasField "stepx" (RIP.Ptr Pixman_edge_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"stepx")
@@ -5298,7 +5299,7 @@ instance HasCField.HasCField Pixman_edge_t "signdx" where
 
   offset# = \_ -> \_ -> 12
 
-instance ( ((~) ty) Pixman_fixed_t
+instance ( ty ~ Pixman_fixed_t
          ) => RIP.HasField "signdx" (RIP.Ptr Pixman_edge_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"signdx")
@@ -5309,7 +5310,7 @@ instance HasCField.HasCField Pixman_edge_t "dy" where
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) Pixman_fixed_t
+instance ( ty ~ Pixman_fixed_t
          ) => RIP.HasField "dy" (RIP.Ptr Pixman_edge_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"dy")
@@ -5320,7 +5321,7 @@ instance HasCField.HasCField Pixman_edge_t "dx" where
 
   offset# = \_ -> \_ -> 20
 
-instance ( ((~) ty) Pixman_fixed_t
+instance ( ty ~ Pixman_fixed_t
          ) => RIP.HasField "dx" (RIP.Ptr Pixman_edge_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"dx")
@@ -5332,7 +5333,7 @@ instance HasCField.HasCField Pixman_edge_t "stepx_small" where
 
   offset# = \_ -> \_ -> 24
 
-instance ( ((~) ty) Pixman_fixed_t
+instance ( ty ~ Pixman_fixed_t
          ) => RIP.HasField "stepx_small" (RIP.Ptr Pixman_edge_t) (RIP.Ptr ty) where
 
   getField =
@@ -5345,7 +5346,7 @@ instance HasCField.HasCField Pixman_edge_t "stepx_big" where
 
   offset# = \_ -> \_ -> 28
 
-instance ( ((~) ty) Pixman_fixed_t
+instance ( ty ~ Pixman_fixed_t
          ) => RIP.HasField "stepx_big" (RIP.Ptr Pixman_edge_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"stepx_big")
@@ -5357,7 +5358,7 @@ instance HasCField.HasCField Pixman_edge_t "dx_small" where
 
   offset# = \_ -> \_ -> 32
 
-instance ( ((~) ty) Pixman_fixed_t
+instance ( ty ~ Pixman_fixed_t
          ) => RIP.HasField "dx_small" (RIP.Ptr Pixman_edge_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"dx_small")
@@ -5369,7 +5370,7 @@ instance HasCField.HasCField Pixman_edge_t "dx_big" where
 
   offset# = \_ -> \_ -> 36
 
-instance ( ((~) ty) Pixman_fixed_t
+instance ( ty ~ Pixman_fixed_t
          ) => RIP.HasField "dx_big" (RIP.Ptr Pixman_edge_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"dx_big")
@@ -5449,7 +5450,7 @@ instance HasCField.HasCField Pixman_trapezoid_t "top" where
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) Pixman_fixed_t
+instance ( ty ~ Pixman_fixed_t
          ) => RIP.HasField "top" (RIP.Ptr Pixman_trapezoid_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"top")
@@ -5461,7 +5462,7 @@ instance HasCField.HasCField Pixman_trapezoid_t "bottom" where
 
   offset# = \_ -> \_ -> 4
 
-instance ( ((~) ty) Pixman_fixed_t
+instance ( ty ~ Pixman_fixed_t
          ) => RIP.HasField "bottom" (RIP.Ptr Pixman_trapezoid_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"bottom")
@@ -5473,7 +5474,7 @@ instance HasCField.HasCField Pixman_trapezoid_t "left" where
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) Pixman_line_fixed_t
+instance ( ty ~ Pixman_line_fixed_t
          ) => RIP.HasField "left" (RIP.Ptr Pixman_trapezoid_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"left")
@@ -5485,7 +5486,7 @@ instance HasCField.HasCField Pixman_trapezoid_t "right" where
 
   offset# = \_ -> \_ -> 24
 
-instance ( ((~) ty) Pixman_line_fixed_t
+instance ( ty ~ Pixman_line_fixed_t
          ) => RIP.HasField "right" (RIP.Ptr Pixman_trapezoid_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"right")
@@ -5556,7 +5557,7 @@ instance HasCField.HasCField Pixman_span_fix_t "l" where
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) Pixman_fixed_t
+instance ( ty ~ Pixman_fixed_t
          ) => RIP.HasField "l" (RIP.Ptr Pixman_span_fix_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"l")
@@ -5568,7 +5569,7 @@ instance HasCField.HasCField Pixman_span_fix_t "r" where
 
   offset# = \_ -> \_ -> 4
 
-instance ( ((~) ty) Pixman_fixed_t
+instance ( ty ~ Pixman_fixed_t
          ) => RIP.HasField "r" (RIP.Ptr Pixman_span_fix_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"r")
@@ -5580,7 +5581,7 @@ instance HasCField.HasCField Pixman_span_fix_t "y" where
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) Pixman_fixed_t
+instance ( ty ~ Pixman_fixed_t
          ) => RIP.HasField "y" (RIP.Ptr Pixman_span_fix_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"y")
@@ -5642,7 +5643,7 @@ instance HasCField.HasCField Pixman_trap_t "top" where
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) Pixman_span_fix_t
+instance ( ty ~ Pixman_span_fix_t
          ) => RIP.HasField "top" (RIP.Ptr Pixman_trap_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"top")
@@ -5654,7 +5655,7 @@ instance HasCField.HasCField Pixman_trap_t "bot" where
 
   offset# = \_ -> \_ -> 12
 
-instance ( ((~) ty) Pixman_span_fix_t
+instance ( ty ~ Pixman_span_fix_t
          ) => RIP.HasField "bot" (RIP.Ptr Pixman_trap_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"bot")
@@ -5725,7 +5726,7 @@ instance HasCField.HasCField Pixman_triangle_t "p1" where
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) Pixman_point_fixed_t
+instance ( ty ~ Pixman_point_fixed_t
          ) => RIP.HasField "p1" (RIP.Ptr Pixman_triangle_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"p1")
@@ -5737,7 +5738,7 @@ instance HasCField.HasCField Pixman_triangle_t "p2" where
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) Pixman_point_fixed_t
+instance ( ty ~ Pixman_point_fixed_t
          ) => RIP.HasField "p2" (RIP.Ptr Pixman_triangle_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"p2")
@@ -5749,7 +5750,7 @@ instance HasCField.HasCField Pixman_triangle_t "p3" where
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) Pixman_point_fixed_t
+instance ( ty ~ Pixman_point_fixed_t
          ) => RIP.HasField "p3" (RIP.Ptr Pixman_triangle_t) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"p3")

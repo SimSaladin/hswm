@@ -1,4 +1,6 @@
 {
+  src,
+  zon_nix,
   lib,
   stdenv,
   callPackage,
@@ -18,11 +20,42 @@
   wayland-scanner,
   wlroots_0_20,
   xwayland,
-  zig_0_15,
+  zig_0_16,
   withManpages ? true,
   xwaylandSupport ? true,
   withDebug ? false,
+  pkgs,
 }:
+let
+  mkZon2Nix = { zonfile, outputHash ? "" }: pkgs.runCommand "zon2nix" {
+    buildInputs = [
+      pkgs.cacert
+      pkgs.zon2nix
+      pkgs.nix-prefetch-git
+      pkgs.nix
+      pkgs.zig
+      pkgs.strace
+      pkgs.git
+    ];
+    outputHashMode = "recursive";
+    outputHashAlgo = "sha256";
+    inherit outputHash;
+  }
+  ''
+    export HOME=$PWD
+    export TMPDIR=$PWD
+    zon2nix ${zonfile} > $out
+  '';
+
+  deps = callPackage zon_nix { };
+  extra = mkZon2Nix {
+    zonfile = "${deps}/translate_c-0.0.0-Q_BUWlX1BgCD1wo6uo97prlp9VJ4gxAjwN_vZ7nsSjGN/build.zig.zon";
+    outputHash = "sha256-MJc+N/T2B8yW2sz1Ys8rGkhjgmmm+nXxNXnubCm0e6U=";
+  };
+  deps' = callPackage zon_nix { linkFarm = name: ps: ps; };
+  extra' = callPackage extra { linkFarm = name: ps: ps; };
+  depsFinal = pkgs.linkFarm "zig-packages" (deps' ++ extra');
+in
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "river";
@@ -30,23 +63,26 @@ stdenv.mkDerivation (finalAttrs: {
 
   outputs = [ "out" ] ++ lib.optionals withManpages [ "man" ];
 
-  src = fetchFromCodeberg {
-    owner = "river";
-    repo = "river";
-    rev = "170d7836c178bef3bf042ec561ec5fd5771d91de";
-    hash = "sha256-ase1mCqZl9xpYdHZAilj8amvKZ0AMlQlIIFTgrlC1u4=";
-  };
+  inherit src;
+  #src = fetchFromCodeberg {
+  #  owner = "river";
+  #  repo = "river";
+  #  rev = "170d7836c178bef3bf042ec561ec5fd5771d91de";
+  #  hash = "sha256-ase1mCqZl9xpYdHZAilj8amvKZ0AMlQlIIFTgrlC1u4=";
+  #};
 
   strictDeps = true;
 
   # zon2nix build.zig.zon > /home/sim/hswm/river.zig.zon.nix
-  deps = callPackage ./river.zig.zon.nix { };
+  #deps = callPackage ./river.zig.zon.nix { };
+  #deps = callPackage zon_nix { };
+  deps = depsFinal;
 
   nativeBuildInputs = [
     pkg-config
     wayland-scanner
     xwayland
-    zig_0_15
+    zig_0_16
   ]
   ++ lib.optional withManpages scdoc;
 

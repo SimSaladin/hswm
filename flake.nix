@@ -14,6 +14,10 @@
       url = "github:sol/typed-process?ref=dev";
       flake = false;
     };
+    river = {
+      url = "git+https://codeberg.org/river/river";
+      flake = false;
+    };
   };
 
   outputs = inputs@{ self, nixpkgs, flake-utils, ... }:
@@ -45,6 +49,7 @@
             river
             wayland-scanner
             weston
+            doxygen
             libxkbcommon
             pixman
             gtk3
@@ -64,7 +69,30 @@
           (final: _: {
             # roll our own for now because the nixpkgs one is rather old and lacks
             # features (the wm protocol etc.)
-            river = final.callPackage ./river/package.nix { };
+            river = final.callPackage ./river/package.nix {
+              src = inputs.river;
+              zon_nix = final.runCommand "zon2nix" {
+                buildInputs = [
+                  final.cacert
+                  final.zon2nix
+                  final.nix-prefetch-git
+                  final.nix
+                  final.zig
+                  final.strace
+                  final.git
+                ];
+                outputHashMode = "recursive";
+                outputHashAlgo = "sha256";
+                outputHash = "sha256-34omHpyhGKynwUrflc5vV4uD+BrSlG0s7qeBB3GPqLA=";
+              }
+              ''
+                export HOME=$PWD
+                export TMPDIR=$PWD
+                ls -la ${inputs.river}/build.zig.zon
+                # strace -f
+                zon2nix ${inputs.river}/build.zig.zon > $out
+              '';
+            };
 
             xkbregistry = final.libxkbcommon;
           })

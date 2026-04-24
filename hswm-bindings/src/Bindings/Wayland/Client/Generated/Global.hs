@@ -35,7 +35,7 @@ import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.PtrConst as PtrConst
 
 $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.unlines
-  [ "#include <wayland-client.h>"
+  [ "#include <wayland-client-protocol.h>"
   , "/* Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_get_wl_display_interface */"
   , "__attribute__ ((const))"
   , "struct wl_interface const *hs_bindgen_5bca9df8710e6a7e (void)"
@@ -190,7 +190,7 @@ hs_bindgen_5bca9df8710e6a7e =
 
     __defined at:__ @wayland-client-protocol.h 110:34@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 
     __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_wl_display_interface@
 -}
@@ -217,7 +217,7 @@ hs_bindgen_92c77ea3533154cc =
 
     __defined at:__ @wayland-client-protocol.h 165:34@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 
     __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_wl_registry_interface@
 -}
@@ -244,7 +244,7 @@ hs_bindgen_4dc5a6c9d679d232 =
 
     __defined at:__ @wayland-client-protocol.h 190:34@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 
     __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_wl_callback_interface@
 -}
@@ -271,7 +271,7 @@ hs_bindgen_b9bfbbea506dacd2 =
 
     __defined at:__ @wayland-client-protocol.h 211:34@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 
     __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_wl_compositor_interface@
 -}
@@ -298,7 +298,7 @@ hs_bindgen_c0086b396ae072ee =
 
     __defined at:__ @wayland-client-protocol.h 240:34@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 
     __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_wl_shm_pool_interface@
 -}
@@ -325,7 +325,7 @@ hs_bindgen_1dbe7af6233d4f94 =
 
     __defined at:__ @wayland-client-protocol.h 273:34@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 
     __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_wl_shm_interface@
 -}
@@ -352,7 +352,7 @@ hs_bindgen_68c9979ec16f8fb7 =
 
     __defined at:__ @wayland-client-protocol.h 318:34@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 
     __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_wl_buffer_interface@
 -}
@@ -379,7 +379,7 @@ hs_bindgen_ccf872579548e998 =
 
     __defined at:__ @wayland-client-protocol.h 345:34@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 
     __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_wl_data_offer_interface@
 -}
@@ -406,7 +406,7 @@ hs_bindgen_0d9e4192f2530306 =
 
     __defined at:__ @wayland-client-protocol.h 368:34@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 
     __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_wl_data_source_interface@
 -}
@@ -433,7 +433,7 @@ hs_bindgen_217b0131df65fa7d =
 
     __defined at:__ @wayland-client-protocol.h 393:34@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 
     __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_wl_data_device_interface@
 -}
@@ -460,7 +460,7 @@ hs_bindgen_08a84c6de1835b43 =
 
     __defined at:__ @wayland-client-protocol.h 428:34@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 
     __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_wl_data_device_manager_interface@
 -}
@@ -487,7 +487,7 @@ hs_bindgen_b224adb789396fca =
 
     __defined at:__ @wayland-client-protocol.h 461:34@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 
     __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_wl_shell_interface@
 -}
@@ -514,7 +514,7 @@ hs_bindgen_c8be7273879c9474 =
 
     __defined at:__ @wayland-client-protocol.h 498:34@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 
     __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_wl_shell_surface_interface@
 -}
@@ -541,7 +541,7 @@ hs_bindgen_fe9c458d2c2d0188 =
 
     __defined at:__ @wayland-client-protocol.h 597:34@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 
     __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_wl_surface_interface@
 -}
@@ -568,7 +568,7 @@ hs_bindgen_bbffd2a7a7d3f819 =
 
     __defined at:__ @wayland-client-protocol.h 620:34@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 
     __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_wl_seat_interface@
 -}
@@ -595,7 +595,7 @@ hs_bindgen_01f4381ed9ab418e =
 
     __defined at:__ @wayland-client-protocol.h 651:34@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 
     __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_wl_pointer_interface@
 -}
@@ -622,7 +622,7 @@ hs_bindgen_19afabf7d1af5746 =
 
     __defined at:__ @wayland-client-protocol.h 690:34@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 
     __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_wl_keyboard_interface@
 -}
@@ -649,7 +649,7 @@ hs_bindgen_628eb5e2fb2eef8f =
 
     __defined at:__ @wayland-client-protocol.h 721:34@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 
     __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_wl_touch_interface@
 -}
@@ -676,7 +676,7 @@ hs_bindgen_a21c43ba0feba183 =
 
     __defined at:__ @wayland-client-protocol.h 748:34@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 
     __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_wl_output_interface@
 -}
@@ -703,7 +703,7 @@ hs_bindgen_d40b887d2bade940 =
 
     __defined at:__ @wayland-client-protocol.h 771:34@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 
     __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_wl_region_interface@
 -}
@@ -730,7 +730,7 @@ hs_bindgen_341346cccd6acb17 =
 
     __defined at:__ @wayland-client-protocol.h 824:34@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 
     __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_wl_subcompositor_interface@
 -}
@@ -757,7 +757,7 @@ hs_bindgen_dfe3004359d73de6 =
 
     __defined at:__ @wayland-client-protocol.h 943:34@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 
     __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_wl_subsurface_interface@
 -}
@@ -784,7 +784,7 @@ hs_bindgen_c581dac03d0bed84 =
 
     __defined at:__ @wayland-client-protocol.h 962:34@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 
     __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_wl_fixes_interface@
 -}

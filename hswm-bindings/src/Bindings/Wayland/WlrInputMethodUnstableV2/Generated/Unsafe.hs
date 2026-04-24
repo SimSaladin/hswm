@@ -241,15 +241,11 @@ hs_bindgen_9d717627be8c6112 ::
 hs_bindgen_9d717627be8c6112 =
   RIP.fromFFIType hs_bindgen_9d717627be8c6112_base
 
-{-|
+{-| __C declaration:__ @zwp_input_method_v2_add_listener@
 
-  > iface_zwp_input_method_v2
+    __defined at:__ @input-method-unstable-v2-client-protocol.h 387:1@
 
-__C declaration:__ @zwp_input_method_v2_add_listener@
-
-__defined at:__ @input-method-unstable-v2-client-protocol.h 387:1@
-
-__exported by:__ @input-method-unstable-v2-client-protocol.h@
+    __exported by:__ @input-method-unstable-v2-client-protocol.h@
 -}
 zwp_input_method_v2_add_listener ::
      RIP.Ptr Zwp_input_method_v2
@@ -276,15 +272,11 @@ hs_bindgen_99babd96b953f7ee ::
 hs_bindgen_99babd96b953f7ee =
   RIP.fromFFIType hs_bindgen_99babd96b953f7ee_base
 
-{-|
+{-| __C declaration:__ @zwp_input_method_v2_set_user_data@
 
-  > iface_zwp_input_method_v2
+    __defined at:__ @input-method-unstable-v2-client-protocol.h 462:1@
 
-__C declaration:__ @zwp_input_method_v2_set_user_data@
-
-__defined at:__ @input-method-unstable-v2-client-protocol.h 462:1@
-
-__exported by:__ @input-method-unstable-v2-client-protocol.h@
+    __exported by:__ @input-method-unstable-v2-client-protocol.h@
 -}
 zwp_input_method_v2_set_user_data ::
      RIP.Ptr Zwp_input_method_v2
@@ -307,15 +299,11 @@ hs_bindgen_4df201281f30d16b ::
 hs_bindgen_4df201281f30d16b =
   RIP.fromFFIType hs_bindgen_4df201281f30d16b_base
 
-{-|
+{-| __C declaration:__ @zwp_input_method_v2_get_user_data@
 
-  > iface_zwp_input_method_v2
+    __defined at:__ @input-method-unstable-v2-client-protocol.h 469:1@
 
-__C declaration:__ @zwp_input_method_v2_get_user_data@
-
-__defined at:__ @input-method-unstable-v2-client-protocol.h 469:1@
-
-__exported by:__ @input-method-unstable-v2-client-protocol.h@
+    __exported by:__ @input-method-unstable-v2-client-protocol.h@
 -}
 zwp_input_method_v2_get_user_data ::
      RIP.Ptr Zwp_input_method_v2
@@ -363,25 +351,21 @@ hs_bindgen_3bb6aa6ddc144752 ::
 hs_bindgen_3bb6aa6ddc144752 =
   RIP.fromFFIType hs_bindgen_3bb6aa6ddc144752_base
 
-{-|
+{-| Send the commit string text for insertion to the application.
 
-  > iface_zwp_input_method_v2
+    Inserts a string at current cursor position (see commit event sequence). The string to commit could be either just a single character after a key press or the result of some composing.
 
-  Send the commit string text for insertion to the application.
+    The argument text is a buffer containing the string to insert. There is a maximum length of wayland messages, so text can not be longer than 4000 bytes.
 
-  Inserts a string at current cursor position (see commit event sequence). The string to commit could be either just a single character after a key press or the result of some composing.
+    Values set with this event are double-buffered. They must be applied and reset to initial on the next zwp_text_input_v3.commit request.
 
-  The argument text is a buffer containing the string to insert. There is a maximum length of wayland messages, so text can not be longer than 4000 bytes.
+    The initial value of text is an empty string.
 
-  Values set with this event are double-buffered. They must be applied and reset to initial on the next zwp_text_input_v3.commit request.
+    __C declaration:__ @zwp_input_method_v2_commit_string@
 
-  The initial value of text is an empty string.
+    __defined at:__ @input-method-unstable-v2-client-protocol.h 499:1@
 
-__C declaration:__ @zwp_input_method_v2_commit_string@
-
-__defined at:__ @input-method-unstable-v2-client-protocol.h 499:1@
-
-__exported by:__ @input-method-unstable-v2-client-protocol.h@
+    __exported by:__ @input-method-unstable-v2-client-protocol.h@
 -}
 zwp_input_method_v2_commit_string ::
      RIP.Ptr Zwp_input_method_v2
@@ -410,29 +394,25 @@ hs_bindgen_212c1f6e34eb7a56 ::
 hs_bindgen_212c1f6e34eb7a56 =
   RIP.fromFFIType hs_bindgen_212c1f6e34eb7a56_base
 
-{-|
+{-| Send the pre-edit string text to the application text input.
 
-  > iface_zwp_input_method_v2
+    Place a new composing text (pre-edit) at the current cursor position. Any previously set composing text must be removed. Any previously existing selected text must be removed. The cursor is moved to a new position within the preedit string.
 
-  Send the pre-edit string text to the application text input.
+    The argument text is a buffer containing the preedit string. There is a maximum length of wayland messages, so text can not be longer than 4000 bytes.
 
-  Place a new composing text (pre-edit) at the current cursor position. Any previously set composing text must be removed. Any previously existing selected text must be removed. The cursor is moved to a new position within the preedit string.
+    The arguments cursor_begin and cursor_end are counted in bytes relative to the beginning of the submitted string buffer. Cursor should be hidden by the text input when both are equal to -1.
 
-  The argument text is a buffer containing the preedit string. There is a maximum length of wayland messages, so text can not be longer than 4000 bytes.
+    cursor_begin indicates the beginning of the cursor. cursor_end indicates the end of the cursor. It may be equal or different than cursor_begin.
 
-  The arguments cursor_begin and cursor_end are counted in bytes relative to the beginning of the submitted string buffer. Cursor should be hidden by the text input when both are equal to -1.
+    Values set with this event are double-buffered. They must be applied on the next zwp_input_method_v2.commit event.
 
-  cursor_begin indicates the beginning of the cursor. cursor_end indicates the end of the cursor. It may be equal or different than cursor_begin.
+    The initial value of text is an empty string. The initial value of cursor_begin, and cursor_end are both 0.
 
-  Values set with this event are double-buffered. They must be applied on the next zwp_input_method_v2.commit event.
+    __C declaration:__ @zwp_input_method_v2_set_preedit_string@
 
-  The initial value of text is an empty string. The initial value of cursor_begin, and cursor_end are both 0.
+    __defined at:__ @input-method-unstable-v2-client-protocol.h 534:1@
 
-__C declaration:__ @zwp_input_method_v2_set_preedit_string@
-
-__defined at:__ @input-method-unstable-v2-client-protocol.h 534:1@
-
-__exported by:__ @input-method-unstable-v2-client-protocol.h@
+    __exported by:__ @input-method-unstable-v2-client-protocol.h@
 -}
 zwp_input_method_v2_set_preedit_string ::
      RIP.Ptr Zwp_input_method_v2
@@ -463,25 +443,21 @@ hs_bindgen_9b19282d188d5352 ::
 hs_bindgen_9b19282d188d5352 =
   RIP.fromFFIType hs_bindgen_9b19282d188d5352_base
 
-{-|
+{-| Remove the surrounding text.
 
-  > iface_zwp_input_method_v2
+    before_length and after_length are the number of bytes before and after the current cursor index (excluding the preedit text) to delete.
 
-  Remove the surrounding text.
+    If any preedit text is present, it is replaced with the cursor for the purpose of this event. In effect before_length is counted from the beginning of preedit text, and after_length from its end (see commit event sequence).
 
-  before_length and after_length are the number of bytes before and after the current cursor index (excluding the preedit text) to delete.
+    Values set with this event are double-buffered. They must be applied and reset to initial on the next zwp_input_method_v2.commit request.
 
-  If any preedit text is present, it is replaced with the cursor for the purpose of this event. In effect before_length is counted from the beginning of preedit text, and after_length from its end (see commit event sequence).
+    The initial values of both before_length and after_length are 0.
 
-  Values set with this event are double-buffered. They must be applied and reset to initial on the next zwp_input_method_v2.commit request.
+    __C declaration:__ @zwp_input_method_v2_delete_surrounding_text@
 
-  The initial values of both before_length and after_length are 0.
+    __defined at:__ @input-method-unstable-v2-client-protocol.h 559:1@
 
-__C declaration:__ @zwp_input_method_v2_delete_surrounding_text@
-
-__defined at:__ @input-method-unstable-v2-client-protocol.h 559:1@
-
-__exported by:__ @input-method-unstable-v2-client-protocol.h@
+    __exported by:__ @input-method-unstable-v2-client-protocol.h@
 -}
 zwp_input_method_v2_delete_surrounding_text ::
      RIP.Ptr Zwp_input_method_v2
@@ -508,35 +484,31 @@ hs_bindgen_a6b490ef883a98ca ::
 hs_bindgen_a6b490ef883a98ca =
   RIP.fromFFIType hs_bindgen_a6b490ef883a98ca_base
 
-{-|
+{-| Apply state changes from commit_string, set_preedit_string and delete_surrounding_text requests.
 
-  > iface_zwp_input_method_v2
+    The state relating to these events is double-buffered, and each one modifies the pending state. This request replaces the current state with the pending state.
 
-  Apply state changes from commit_string, set_preedit_string and delete_surrounding_text requests.
+    The connected text input is expected to proceed by evaluating the changes in the following order:
 
-  The state relating to these events is double-buffered, and each one modifies the pending state. This request replaces the current state with the pending state.
+    1. Replace existing preedit string with the cursor.
 
-  The connected text input is expected to proceed by evaluating the changes in the following order:
+    2. Delete requested surrounding text.
 
-  1. Replace existing preedit string with the cursor.
+    3. Insert commit string with the cursor at its end.
 
-  2. Delete requested surrounding text.
+    4. Calculate surrounding text to send.
 
-  3. Insert commit string with the cursor at its end.
+    5. Insert new preedit text in cursor position.
 
-  4. Calculate surrounding text to send.
+    6. Place cursor inside preedit text.
 
-  5. Insert new preedit text in cursor position.
+    The serial number reflects the last state of the zwp_input_method_v2 object known to the client. The value of the serial argument must be equal to the number of done events already issued by that object. When the compositor receives a commit request with a serial different than the number of past done events, it must proceed as normal, except it should not change the current state of the zwp_input_method_v2 object.
 
-  6. Place cursor inside preedit text.
+    __C declaration:__ @zwp_input_method_v2_commit@
 
-  The serial number reflects the last state of the zwp_input_method_v2 object known to the client. The value of the serial argument must be equal to the number of done events already issued by that object. When the compositor receives a commit request with a serial different than the number of past done events, it must proceed as normal, except it should not change the current state of the zwp_input_method_v2 object.
+    __defined at:__ @input-method-unstable-v2-client-protocol.h 593:1@
 
-__C declaration:__ @zwp_input_method_v2_commit@
-
-__defined at:__ @input-method-unstable-v2-client-protocol.h 593:1@
-
-__exported by:__ @input-method-unstable-v2-client-protocol.h@
+    __exported by:__ @input-method-unstable-v2-client-protocol.h@
 -}
 zwp_input_method_v2_commit ::
      RIP.Ptr Zwp_input_method_v2
@@ -561,19 +533,15 @@ hs_bindgen_ebe1c8735ff90a1a ::
 hs_bindgen_ebe1c8735ff90a1a =
   RIP.fromFFIType hs_bindgen_ebe1c8735ff90a1a_base
 
-{-|
+{-| Creates a new zwp_input_popup_surface_v2 object wrapping a given surface.
 
-  > iface_zwp_input_method_v2
+    The surface gets assigned the "input_popup" role. If the surface already has an assigned role, the compositor must issue a protocol error.
 
-  Creates a new zwp_input_popup_surface_v2 object wrapping a given surface.
+    __C declaration:__ @zwp_input_method_v2_get_input_popup_surface@
 
-  The surface gets assigned the "input_popup" role. If the surface already has an assigned role, the compositor must issue a protocol error.
+    __defined at:__ @input-method-unstable-v2-client-protocol.h 610:1@
 
-__C declaration:__ @zwp_input_method_v2_get_input_popup_surface@
-
-__defined at:__ @input-method-unstable-v2-client-protocol.h 610:1@
-
-__exported by:__ @input-method-unstable-v2-client-protocol.h@
+    __exported by:__ @input-method-unstable-v2-client-protocol.h@
 -}
 zwp_input_method_v2_get_input_popup_surface ::
      RIP.Ptr Zwp_input_method_v2
@@ -596,21 +564,17 @@ hs_bindgen_2993f79e3099526d ::
 hs_bindgen_2993f79e3099526d =
   RIP.fromFFIType hs_bindgen_2993f79e3099526d_base
 
-{-|
+{-| Allow an input method to receive hardware keyboard input and process key events to generate text events (with pre-edit) over the wire. This allows input methods which compose multiple key events for inputting text like it is done for CJK languages.
 
-  > iface_zwp_input_method_v2
+    The compositor should send all keyboard events on the seat to the grab holder via the returned wl_keyboard object. Nevertheless, the compositor may decide not to forward any particular event. The compositor must not further process any event after it has been forwarded to the grab holder.
 
-  Allow an input method to receive hardware keyboard input and process key events to generate text events (with pre-edit) over the wire. This allows input methods which compose multiple key events for inputting text like it is done for CJK languages.
+    Releasing the resulting wl_keyboard object releases the grab.
 
-  The compositor should send all keyboard events on the seat to the grab holder via the returned wl_keyboard object. Nevertheless, the compositor may decide not to forward any particular event. The compositor must not further process any event after it has been forwarded to the grab holder.
+    __C declaration:__ @zwp_input_method_v2_grab_keyboard@
 
-  Releasing the resulting wl_keyboard object releases the grab.
+    __defined at:__ @input-method-unstable-v2-client-protocol.h 637:1@
 
-__C declaration:__ @zwp_input_method_v2_grab_keyboard@
-
-__defined at:__ @input-method-unstable-v2-client-protocol.h 637:1@
-
-__exported by:__ @input-method-unstable-v2-client-protocol.h@
+    __exported by:__ @input-method-unstable-v2-client-protocol.h@
 -}
 zwp_input_method_v2_grab_keyboard ::
      RIP.Ptr Zwp_input_method_v2
@@ -631,17 +595,13 @@ hs_bindgen_969fe3152e44bfcf ::
 hs_bindgen_969fe3152e44bfcf =
   RIP.fromFFIType hs_bindgen_969fe3152e44bfcf_base
 
-{-|
+{-| Destroys the zwp_text_input_v2 object and any associated child objects, i.e. zwp_input_popup_surface_v2 and zwp_input_method_keyboard_grab_v2.
 
-  > iface_zwp_input_method_v2
+    __C declaration:__ @zwp_input_method_v2_destroy@
 
-  Destroys the zwp_text_input_v2 object and any associated child objects, i.e. zwp_input_popup_surface_v2 and zwp_input_method_keyboard_grab_v2.
+    __defined at:__ @input-method-unstable-v2-client-protocol.h 655:1@
 
-__C declaration:__ @zwp_input_method_v2_destroy@
-
-__defined at:__ @input-method-unstable-v2-client-protocol.h 655:1@
-
-__exported by:__ @input-method-unstable-v2-client-protocol.h@
+    __exported by:__ @input-method-unstable-v2-client-protocol.h@
 -}
 zwp_input_method_v2_destroy ::
      RIP.Ptr Zwp_input_method_v2
@@ -666,15 +626,11 @@ hs_bindgen_c3ed9b1dc9133402 ::
 hs_bindgen_c3ed9b1dc9133402 =
   RIP.fromFFIType hs_bindgen_c3ed9b1dc9133402_base
 
-{-|
+{-| __C declaration:__ @zwp_input_popup_surface_v2_add_listener@
 
-  > iface_zwp_input_popup_surface_v2
+    __defined at:__ @input-method-unstable-v2-client-protocol.h 687:1@
 
-__C declaration:__ @zwp_input_popup_surface_v2_add_listener@
-
-__defined at:__ @input-method-unstable-v2-client-protocol.h 687:1@
-
-__exported by:__ @input-method-unstable-v2-client-protocol.h@
+    __exported by:__ @input-method-unstable-v2-client-protocol.h@
 -}
 zwp_input_popup_surface_v2_add_listener ::
      RIP.Ptr Zwp_input_popup_surface_v2
@@ -701,15 +657,11 @@ hs_bindgen_139b6f8782137f72 ::
 hs_bindgen_139b6f8782137f72 =
   RIP.fromFFIType hs_bindgen_139b6f8782137f72_base
 
-{-|
+{-| __C declaration:__ @zwp_input_popup_surface_v2_set_user_data@
 
-  > iface_zwp_input_popup_surface_v2
+    __defined at:__ @input-method-unstable-v2-client-protocol.h 708:1@
 
-__C declaration:__ @zwp_input_popup_surface_v2_set_user_data@
-
-__defined at:__ @input-method-unstable-v2-client-protocol.h 708:1@
-
-__exported by:__ @input-method-unstable-v2-client-protocol.h@
+    __exported by:__ @input-method-unstable-v2-client-protocol.h@
 -}
 zwp_input_popup_surface_v2_set_user_data ::
      RIP.Ptr Zwp_input_popup_surface_v2
@@ -732,15 +684,11 @@ hs_bindgen_f12da39d008a3d89 ::
 hs_bindgen_f12da39d008a3d89 =
   RIP.fromFFIType hs_bindgen_f12da39d008a3d89_base
 
-{-|
+{-| __C declaration:__ @zwp_input_popup_surface_v2_get_user_data@
 
-  > iface_zwp_input_popup_surface_v2
+    __defined at:__ @input-method-unstable-v2-client-protocol.h 715:1@
 
-__C declaration:__ @zwp_input_popup_surface_v2_get_user_data@
-
-__defined at:__ @input-method-unstable-v2-client-protocol.h 715:1@
-
-__exported by:__ @input-method-unstable-v2-client-protocol.h@
+    __exported by:__ @input-method-unstable-v2-client-protocol.h@
 -}
 zwp_input_popup_surface_v2_get_user_data ::
      RIP.Ptr Zwp_input_popup_surface_v2
@@ -786,15 +734,11 @@ hs_bindgen_da328d6a1c84e810 ::
 hs_bindgen_da328d6a1c84e810 =
   RIP.fromFFIType hs_bindgen_da328d6a1c84e810_base
 
-{-|
+{-| __C declaration:__ @zwp_input_popup_surface_v2_destroy@
 
-  > iface_zwp_input_popup_surface_v2
+    __defined at:__ @input-method-unstable-v2-client-protocol.h 730:1@
 
-__C declaration:__ @zwp_input_popup_surface_v2_destroy@
-
-__defined at:__ @input-method-unstable-v2-client-protocol.h 730:1@
-
-__exported by:__ @input-method-unstable-v2-client-protocol.h@
+    __exported by:__ @input-method-unstable-v2-client-protocol.h@
 -}
 zwp_input_popup_surface_v2_destroy ::
      RIP.Ptr Zwp_input_popup_surface_v2
@@ -819,15 +763,11 @@ hs_bindgen_13e3fcf0f7ace79e ::
 hs_bindgen_13e3fcf0f7ace79e =
   RIP.fromFFIType hs_bindgen_13e3fcf0f7ace79e_base
 
-{-|
+{-| __C declaration:__ @zwp_input_method_keyboard_grab_v2_add_listener@
 
-  > iface_zwp_input_method_keyboard_grab_v2
+    __defined at:__ @input-method-unstable-v2-client-protocol.h 819:1@
 
-__C declaration:__ @zwp_input_method_keyboard_grab_v2_add_listener@
-
-__defined at:__ @input-method-unstable-v2-client-protocol.h 819:1@
-
-__exported by:__ @input-method-unstable-v2-client-protocol.h@
+    __exported by:__ @input-method-unstable-v2-client-protocol.h@
 -}
 zwp_input_method_keyboard_grab_v2_add_listener ::
      RIP.Ptr Zwp_input_method_keyboard_grab_v2
@@ -854,15 +794,11 @@ hs_bindgen_59fc2496fb0ca778 ::
 hs_bindgen_59fc2496fb0ca778 =
   RIP.fromFFIType hs_bindgen_59fc2496fb0ca778_base
 
-{-|
+{-| __C declaration:__ @zwp_input_method_keyboard_grab_v2_set_user_data@
 
-  > iface_zwp_input_method_keyboard_grab_v2
+    __defined at:__ @input-method-unstable-v2-client-protocol.h 852:1@
 
-__C declaration:__ @zwp_input_method_keyboard_grab_v2_set_user_data@
-
-__defined at:__ @input-method-unstable-v2-client-protocol.h 852:1@
-
-__exported by:__ @input-method-unstable-v2-client-protocol.h@
+    __exported by:__ @input-method-unstable-v2-client-protocol.h@
 -}
 zwp_input_method_keyboard_grab_v2_set_user_data ::
      RIP.Ptr Zwp_input_method_keyboard_grab_v2
@@ -885,15 +821,11 @@ hs_bindgen_c3829f9b63715fa9 ::
 hs_bindgen_c3829f9b63715fa9 =
   RIP.fromFFIType hs_bindgen_c3829f9b63715fa9_base
 
-{-|
+{-| __C declaration:__ @zwp_input_method_keyboard_grab_v2_get_user_data@
 
-  > iface_zwp_input_method_keyboard_grab_v2
+    __defined at:__ @input-method-unstable-v2-client-protocol.h 859:1@
 
-__C declaration:__ @zwp_input_method_keyboard_grab_v2_get_user_data@
-
-__defined at:__ @input-method-unstable-v2-client-protocol.h 859:1@
-
-__exported by:__ @input-method-unstable-v2-client-protocol.h@
+    __exported by:__ @input-method-unstable-v2-client-protocol.h@
 -}
 zwp_input_method_keyboard_grab_v2_get_user_data ::
      RIP.Ptr Zwp_input_method_keyboard_grab_v2
@@ -939,15 +871,11 @@ hs_bindgen_ae8f0eeb821ecf34 ::
 hs_bindgen_ae8f0eeb821ecf34 =
   RIP.fromFFIType hs_bindgen_ae8f0eeb821ecf34_base
 
-{-|
+{-| __C declaration:__ @zwp_input_method_keyboard_grab_v2_destroy@
 
-  > iface_zwp_input_method_keyboard_grab_v2
+    __defined at:__ @input-method-unstable-v2-client-protocol.h 872:1@
 
-__C declaration:__ @zwp_input_method_keyboard_grab_v2_destroy@
-
-__defined at:__ @input-method-unstable-v2-client-protocol.h 872:1@
-
-__exported by:__ @input-method-unstable-v2-client-protocol.h@
+    __exported by:__ @input-method-unstable-v2-client-protocol.h@
 -}
 zwp_input_method_keyboard_grab_v2_destroy ::
      RIP.Ptr Zwp_input_method_keyboard_grab_v2
@@ -968,15 +896,11 @@ hs_bindgen_9634d21d4c93eee5 ::
 hs_bindgen_9634d21d4c93eee5 =
   RIP.fromFFIType hs_bindgen_9634d21d4c93eee5_base
 
-{-|
+{-| __C declaration:__ @zwp_input_method_keyboard_grab_v2_release@
 
-  > iface_zwp_input_method_keyboard_grab_v2
+    __defined at:__ @input-method-unstable-v2-client-protocol.h 881:1@
 
-__C declaration:__ @zwp_input_method_keyboard_grab_v2_release@
-
-__defined at:__ @input-method-unstable-v2-client-protocol.h 881:1@
-
-__exported by:__ @input-method-unstable-v2-client-protocol.h@
+    __exported by:__ @input-method-unstable-v2-client-protocol.h@
 -}
 zwp_input_method_keyboard_grab_v2_release ::
      RIP.Ptr Zwp_input_method_keyboard_grab_v2
@@ -999,15 +923,11 @@ hs_bindgen_dfbf47ac87c0823e ::
 hs_bindgen_dfbf47ac87c0823e =
   RIP.fromFFIType hs_bindgen_dfbf47ac87c0823e_base
 
-{-|
+{-| __C declaration:__ @zwp_input_method_manager_v2_set_user_data@
 
-  > iface_zwp_input_method_manager_v2
+    __defined at:__ @input-method-unstable-v2-client-protocol.h 902:1@
 
-__C declaration:__ @zwp_input_method_manager_v2_set_user_data@
-
-__defined at:__ @input-method-unstable-v2-client-protocol.h 902:1@
-
-__exported by:__ @input-method-unstable-v2-client-protocol.h@
+    __exported by:__ @input-method-unstable-v2-client-protocol.h@
 -}
 zwp_input_method_manager_v2_set_user_data ::
      RIP.Ptr Zwp_input_method_manager_v2
@@ -1030,15 +950,11 @@ hs_bindgen_7124559d0e6d8cfd ::
 hs_bindgen_7124559d0e6d8cfd =
   RIP.fromFFIType hs_bindgen_7124559d0e6d8cfd_base
 
-{-|
+{-| __C declaration:__ @zwp_input_method_manager_v2_get_user_data@
 
-  > iface_zwp_input_method_manager_v2
+    __defined at:__ @input-method-unstable-v2-client-protocol.h 909:1@
 
-__C declaration:__ @zwp_input_method_manager_v2_get_user_data@
-
-__defined at:__ @input-method-unstable-v2-client-protocol.h 909:1@
-
-__exported by:__ @input-method-unstable-v2-client-protocol.h@
+    __exported by:__ @input-method-unstable-v2-client-protocol.h@
 -}
 zwp_input_method_manager_v2_get_user_data ::
      RIP.Ptr Zwp_input_method_manager_v2
@@ -1086,17 +1002,13 @@ hs_bindgen_8928d23c1b268038 ::
 hs_bindgen_8928d23c1b268038 =
   RIP.fromFFIType hs_bindgen_8928d23c1b268038_base
 
-{-|
+{-| Request a new input zwp_input_method_v2 object associated with a given seat.
 
-  > iface_zwp_input_method_manager_v2
+    __C declaration:__ @zwp_input_method_manager_v2_get_input_method@
 
-  Request a new input zwp_input_method_v2 object associated with a given seat.
+    __defined at:__ @input-method-unstable-v2-client-protocol.h 927:1@
 
-__C declaration:__ @zwp_input_method_manager_v2_get_input_method@
-
-__defined at:__ @input-method-unstable-v2-client-protocol.h 927:1@
-
-__exported by:__ @input-method-unstable-v2-client-protocol.h@
+    __exported by:__ @input-method-unstable-v2-client-protocol.h@
 -}
 zwp_input_method_manager_v2_get_input_method ::
      RIP.Ptr Zwp_input_method_manager_v2
@@ -1119,19 +1031,15 @@ hs_bindgen_bae46b14e2436741 ::
 hs_bindgen_bae46b14e2436741 =
   RIP.fromFFIType hs_bindgen_bae46b14e2436741_base
 
-{-|
+{-| Destroys the zwp_input_method_manager_v2 object.
 
-  > iface_zwp_input_method_manager_v2
+    The zwp_input_method_v2 objects originating from it remain valid.
 
-  Destroys the zwp_input_method_manager_v2 object.
+    __C declaration:__ @zwp_input_method_manager_v2_destroy@
 
-  The zwp_input_method_v2 objects originating from it remain valid.
+    __defined at:__ @input-method-unstable-v2-client-protocol.h 945:1@
 
-__C declaration:__ @zwp_input_method_manager_v2_destroy@
-
-__defined at:__ @input-method-unstable-v2-client-protocol.h 945:1@
-
-__exported by:__ @input-method-unstable-v2-client-protocol.h@
+    __exported by:__ @input-method-unstable-v2-client-protocol.h@
 -}
 zwp_input_method_manager_v2_destroy ::
      RIP.Ptr Zwp_input_method_manager_v2

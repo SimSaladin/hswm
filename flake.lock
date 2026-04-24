@@ -56,11 +56,11 @@
     },
     "haskell-flake": {
       "locked": {
-        "lastModified": 1775425479,
-        "narHash": "sha256-U1vex46DO0kyObmPAQ69/fk3L/5Zjysdk+SjhlODfOU=",
+        "lastModified": 1776783293,
+        "narHash": "sha256-Na95Y2awqZsLhFNfBNbLj0hk4zyE3eKUROB2o9Qdqi8=",
         "owner": "srid",
         "repo": "haskell-flake",
-        "rev": "27e5e6e21b40056c1eee29062e3a227860eb3606",
+        "rev": "f52ac89b2232dd50e5d1110416ebc5bbb09265bd",
         "type": "github"
       },
       "original": {
@@ -78,11 +78,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1775730419,
-        "narHash": "sha256-SXiYz5z5v0WO3sSZJh2RsFM6eYQ2K+dPWlD8wIOwmZk=",
+        "lastModified": 1776974373,
+        "narHash": "sha256-UjmW5qP1ZdM5OrZek3fToT2rWddFIi8Y5D5JE2yhQjk=",
         "owner": "well-typed",
         "repo": "hs-bindgen",
-        "rev": "9e3e45be6e4fb85ea366a3697949f4d2fd8a91a0",
+        "rev": "7469bc2c3892754d9462f40495e1cd7ebf6200ca",
         "type": "github"
       },
       "original": {
@@ -94,27 +94,27 @@
     "libclang-bindings-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1774600891,
-        "narHash": "sha256-LTAyNMY4Vu0vPeEq2wXB0KWY4kGtqtHTRmADjLdkv78=",
+        "lastModified": 1776409433,
+        "narHash": "sha256-Hmv9XBUhsEsq5BVCYUoISbZLSlPbPgvhFuwdzbnbVa4=",
         "owner": "well-typed",
         "repo": "libclang",
-        "rev": "1054474fae403bfb52c7919680cac03d3d3d4237",
+        "rev": "cdbf817187a261ebf8c31b32c85c5693eedf298d",
         "type": "github"
       },
       "original": {
         "owner": "well-typed",
         "repo": "libclang",
-        "rev": "1054474fae403bfb52c7919680cac03d3d3d4237",
+        "rev": "cdbf817187a261ebf8c31b32c85c5693eedf298d",
         "type": "github"
       }
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1775710090,
-        "narHash": "sha256-ar3rofg+awPB8QXDaFJhJ2jJhu+KqN/PRCXeyuXR76E=",
+        "lastModified": 1776548001,
+        "narHash": "sha256-ZSK0NL4a1BwVbbTBoSnWgbJy9HeZFXLYQizjb2DPF24=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "4c1018dae018162ec878d42fec712642d214fdfa",
+        "rev": "b12141ef619e0a9c1c84dc8c684040326f27cdcc",
         "type": "github"
       },
       "original": {
@@ -154,6 +154,22 @@
         "type": "github"
       }
     },
+    "river": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1777027583,
+        "narHash": "sha256-9MXybPkEvZc3OGF3hNjgRaLtXEMbvz6pAwmFd96q9zg=",
+        "ref": "refs/heads/main",
+        "rev": "48c2b1e86e257421c3bbafe9cbf284e4134d1438",
+        "revCount": 1700,
+        "type": "git",
+        "url": "https://codeberg.org/river/river"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://codeberg.org/river/river"
+      }
+    },
     "root": {
       "inputs": {
         "flake-parts": "flake-parts",
@@ -161,6 +177,7 @@
         "haskell-flake": "haskell-flake",
         "hs-bindgen": "hs-bindgen",
         "nixpkgs": "nixpkgs",
+        "river": "river",
         "typed-process": "typed-process"
       }
     },

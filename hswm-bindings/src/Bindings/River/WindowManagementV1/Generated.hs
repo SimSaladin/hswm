@@ -7,6 +7,7 @@
 {-# LANGUAGE EmptyDataDecls #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MagicHash #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -242,67 +243,11 @@ import qualified HsBindgen.Runtime.LibC
 import qualified HsBindgen.Runtime.Marshal as Marshal
 import qualified HsBindgen.Runtime.PtrConst as PtrConst
 
-{-|
+{-| __C declaration:__ @struct river_decoration_v1@
 
-  > page_river_window_management_v1 The river_window_management_v1 protocol
+    __defined at:__ @river-window-management-v1-client-protocol.h 63:8@
 
-  frame-perfect window management
-
-  > page_desc_river_window_management_v1 Description
-
-  This protocol allows a single "window manager" client to determine the window management policy of the compositor. State is globally double-buffered allowing for frame perfect state changes involving multiple windows.
-
-  The key words "must", "must not", "required", "shall", "shall not", "should", "should not", "recommended", "may", and "optional" in this document are to be interpreted as described in IETF RFC 2119.
-
-  > page_ifaces_river_window_management_v1 Interfaces
-
-  -
-
-  > page_iface_river_window_manager_v1 - window manager global interface
-
-  -
-
-  > page_iface_river_window_v1 - a logical window
-
-  -
-
-  > page_iface_river_decoration_v1 - a window decoration
-
-  -
-
-  > page_iface_river_shell_surface_v1 - a surface for window manager UI
-
-  -
-
-  > page_iface_river_node_v1 - a node in the render list
-
-  -
-
-  > page_iface_river_output_v1 - a logical output
-
-  -
-
-  > page_iface_river_seat_v1 - a window management seat
-
-  -
-
-  > page_iface_river_pointer_binding_v1 - configure a pointer binding, receive trigger events
-
-  > page_copyright_river_window_management_v1 Copyright
-
-  SPDX-FileCopyrightText: © 2024 Isaac Freund SPDX-License-Identifier: MIT
-
-  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-__C declaration:__ @struct river_decoration_v1@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 63:8@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 data River_decoration_v1
 
@@ -445,7 +390,7 @@ instance Read River_window_manager_v1_error where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_window_manager_v1_error) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -457,180 +402,168 @@ instance HasCField.HasCField River_window_manager_v1_error "unwrap" where
 
   offset# = \_ -> \_ -> 0
 
-{-| request violates manage/render sequence ordering
+{-| __C declaration:__ @RIVER_WINDOW_MANAGER_V1_ERROR_SEQUENCE_ORDER@
 
-__C declaration:__ @RIVER_WINDOW_MANAGER_V1_ERROR_SEQUENCE_ORDER@
+    __defined at:__ @river-window-management-v1-client-protocol.h 470:2@
 
-__defined at:__ @river-window-management-v1-client-protocol.h 470:2@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 pattern RIVER_WINDOW_MANAGER_V1_ERROR_SEQUENCE_ORDER :: River_window_manager_v1_error
 pattern RIVER_WINDOW_MANAGER_V1_ERROR_SEQUENCE_ORDER = River_window_manager_v1_error 0
 
-{-| given wl_surface already has a role
+{-| __C declaration:__ @RIVER_WINDOW_MANAGER_V1_ERROR_ROLE@
 
-__C declaration:__ @RIVER_WINDOW_MANAGER_V1_ERROR_ROLE@
+    __defined at:__ @river-window-management-v1-client-protocol.h 474:2@
 
-__defined at:__ @river-window-management-v1-client-protocol.h 474:2@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 pattern RIVER_WINDOW_MANAGER_V1_ERROR_ROLE :: River_window_manager_v1_error
 pattern RIVER_WINDOW_MANAGER_V1_ERROR_ROLE = River_window_manager_v1_error 1
 
-{-| window manager unresponsive
+{-| __C declaration:__ @RIVER_WINDOW_MANAGER_V1_ERROR_UNRESPONSIVE@
 
-__C declaration:__ @RIVER_WINDOW_MANAGER_V1_ERROR_UNRESPONSIVE@
+    __defined at:__ @river-window-management-v1-client-protocol.h 478:2@
 
-__defined at:__ @river-window-management-v1-client-protocol.h 478:2@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 pattern RIVER_WINDOW_MANAGER_V1_ERROR_UNRESPONSIVE :: River_window_manager_v1_error
 pattern RIVER_WINDOW_MANAGER_V1_ERROR_UNRESPONSIVE = River_window_manager_v1_error 2
 
-{-|
+{-| __C declaration:__ @struct river_window_manager_v1_listener@
 
-  > iface_river_window_manager_v1
+    __defined at:__ @river-window-management-v1-client-protocol.h 486:8@
 
-  > river_window_manager_v1_listener
-
-__C declaration:__ @struct river_window_manager_v1_listener@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 486:8@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 data River_window_manager_v1_listener = River_window_manager_v1_listener
-  { unavailable :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> IO ())
+  { unavailable :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> IO ())
     {- ^ window management unavailable
 
-       This event indicates that window management is not available to the client, perhaps due to another window management client already running. The circumstances causing this event to be sent are compositor policy.
+         This event indicates that window management is not available to the client, perhaps due to another window management client already running. The circumstances causing this event to be sent are compositor policy.
 
-       If sent, this event is guaranteed to be the first and only event sent by the server.
+         If sent, this event is guaranteed to be the first and only event sent by the server.
 
-       The server will send no further events on this object. The client should destroy this object and all objects created through this interface.
+         The server will send no further events on this object. The client should destroy this object and all objects created through this interface.
 
-    __C declaration:__ @unavailable@
+         __C declaration:__ @unavailable@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 502:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 502:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , finished :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> IO ())
+  , finished :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> IO ())
     {- ^ the server has finished with the window manager
 
-       This event indicates that the server will send no further events on this object. The client should destroy the object. See river_window_manager_v1.destroy for more information.
+         This event indicates that the server will send no further events on this object. The client should destroy the object. See river_window_manager_v1.destroy for more information.
 
-    __C declaration:__ @finished@
+         __C declaration:__ @finished@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 511:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 511:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , manage_start :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> IO ())
+  , manage_start :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> IO ())
     {- ^ start a manage sequence
 
-       This event indicates that the server has sent events indicating all state changes since the last manage sequence.
+         This event indicates that the server has sent events indicating all state changes since the last manage sequence.
 
-       In response to this event, the client should make requests modifying window management state as it chooses. Then, the client must make the manage_finish request.
+         In response to this event, the client should make requests modifying window management state as it chooses. Then, the client must make the manage_finish request.
 
-       See the description of the river_window_manager_v1 interface for a complete overview of the manage/render sequence loop.
+         See the description of the river_window_manager_v1 interface for a complete overview of the manage/render sequence loop.
 
-    __C declaration:__ @manage_start@
+         __C declaration:__ @manage_start@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 526:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 526:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , render_start :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> IO ())
+  , render_start :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> IO ())
     {- ^ start a render sequence
 
-       This event indicates that the server has sent all river_node_v1.position and river_window_v1.dimensions events necessary.
+         This event indicates that the server has sent all river_node_v1.position and river_window_v1.dimensions events necessary.
 
-       In response to this event, the client should make requests modifying rendering state as it chooses. Then, the client must make the render_finish request.
+         In response to this event, the client should make requests modifying rendering state as it chooses. Then, the client must make the render_finish request.
 
-       See the description of the river_window_manager_v1 interface for a complete overview of the manage/render sequence loop.
+         See the description of the river_window_manager_v1 interface for a complete overview of the manage/render sequence loop.
 
-    __C declaration:__ @render_start@
+         __C declaration:__ @render_start@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 542:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 542:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , session_locked :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> IO ())
+  , session_locked :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> IO ())
     {- ^ the session has been locked
 
-       This event indicates that the session has been locked.
+         This event indicates that the session has been locked.
 
-       The window manager may wish to restrict which key bindings are available while locked or otherwise use this information.
+         The window manager may wish to restrict which key bindings are available while locked or otherwise use this information.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-    __C declaration:__ @session_locked@
+         __C declaration:__ @session_locked@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 555:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 555:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , session_unlocked :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> IO ())
+  , session_unlocked :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> IO ())
     {- ^ the session has been unlocked
 
-       This event indicates that the session has been unlocked.
+         This event indicates that the session has been unlocked.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-    __C declaration:__ @session_unlocked@
+         __C declaration:__ @session_unlocked@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 565:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 565:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , window :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_window_v1) -> IO ())
+  , window :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_window_v1 -> IO ())
     {- ^ new window
 
-       A new window has been created.
+         A new window has been created.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-       [__@id@ /(input)/__]: new window
+         [__@id@__]: new window
 
-    __C declaration:__ @window@
+         __C declaration:__ @window@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 576:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 576:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , output :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_output_v1) -> IO ())
+  , output :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_output_v1 -> IO ())
     {- ^ new output
 
-       A new logical output has been created, perhaps due to a new physical monitor being plugged in or perhaps due to a change in configuration.
+         A new logical output has been created, perhaps due to a new physical monitor being plugged in or perhaps due to a change in configuration.
 
-       This event will be followed by river_output_v1.position and dimensions events as well as a manage_start event after all other new state has been sent by the server.
+         This event will be followed by river_output_v1.position and dimensions events as well as a manage_start event after all other new state has been sent by the server.
 
-       [__@id@ /(input)/__]: new output
+         [__@id@__]: new output
 
-    __C declaration:__ @output@
+         __C declaration:__ @output@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 591:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 591:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , seat :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_seat_v1) -> IO ())
+  , seat :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_seat_v1 -> IO ())
     {- ^ new seat
 
-       A new seat has been created.
+         A new seat has been created.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-       [__@id@ /(input)/__]: new seat
+         [__@id@__]: new seat
 
-    __C declaration:__ @seat@
+         __C declaration:__ @seat@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 603:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 603:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
   }
   deriving stock (Eq, RIP.Generic, Show)
@@ -687,11 +620,11 @@ deriving via Marshal.EquivStorable River_window_manager_v1_listener instance RIP
 instance HasCField.HasCField River_window_manager_v1_listener "unavailable" where
 
   type CFieldType River_window_manager_v1_listener "unavailable" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> IO ())
          ) => RIP.HasField "unavailable" (RIP.Ptr River_window_manager_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -700,11 +633,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_man
 instance HasCField.HasCField River_window_manager_v1_listener "finished" where
 
   type CFieldType River_window_manager_v1_listener "finished" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> IO ())
          ) => RIP.HasField "finished" (RIP.Ptr River_window_manager_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"finished")
@@ -712,11 +645,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_man
 instance HasCField.HasCField River_window_manager_v1_listener "manage_start" where
 
   type CFieldType River_window_manager_v1_listener "manage_start" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> IO ())
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> IO ())
          ) => RIP.HasField "manage_start" (RIP.Ptr River_window_manager_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -725,11 +658,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_man
 instance HasCField.HasCField River_window_manager_v1_listener "render_start" where
 
   type CFieldType River_window_manager_v1_listener "render_start" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> IO ())
 
   offset# = \_ -> \_ -> 24
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> IO ())
          ) => RIP.HasField "render_start" (RIP.Ptr River_window_manager_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -738,11 +671,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_man
 instance HasCField.HasCField River_window_manager_v1_listener "session_locked" where
 
   type CFieldType River_window_manager_v1_listener "session_locked" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> IO ())
 
   offset# = \_ -> \_ -> 32
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> IO ())
          ) => RIP.HasField "session_locked" (RIP.Ptr River_window_manager_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -751,11 +684,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_man
 instance HasCField.HasCField River_window_manager_v1_listener "session_unlocked" where
 
   type CFieldType River_window_manager_v1_listener "session_unlocked" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> IO ())
 
   offset# = \_ -> \_ -> 40
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> IO ())
          ) => RIP.HasField "session_unlocked" (RIP.Ptr River_window_manager_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -764,11 +697,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_man
 instance HasCField.HasCField River_window_manager_v1_listener "window" where
 
   type CFieldType River_window_manager_v1_listener "window" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_window_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_window_v1 -> IO ())
 
   offset# = \_ -> \_ -> 48
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_window_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_window_v1 -> IO ())
          ) => RIP.HasField "window" (RIP.Ptr River_window_manager_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"window")
@@ -776,11 +709,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_man
 instance HasCField.HasCField River_window_manager_v1_listener "output" where
 
   type CFieldType River_window_manager_v1_listener "output" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_output_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_output_v1 -> IO ())
 
   offset# = \_ -> \_ -> 56
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_output_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_output_v1 -> IO ())
          ) => RIP.HasField "output" (RIP.Ptr River_window_manager_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"output")
@@ -788,11 +721,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_man
 instance HasCField.HasCField River_window_manager_v1_listener "seat" where
 
   type CFieldType River_window_manager_v1_listener "seat" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_seat_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_seat_v1 -> IO ())
 
   offset# = \_ -> \_ -> 64
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_seat_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_seat_v1 -> IO ())
          ) => RIP.HasField "seat" (RIP.Ptr River_window_manager_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"seat")
@@ -1108,7 +1041,7 @@ instance Read River_window_v1_error where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_window_v1_error) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -1120,46 +1053,38 @@ instance HasCField.HasCField River_window_v1_error "unwrap" where
 
   offset# = \_ -> \_ -> 0
 
-{-| window already has a node object
+{-| __C declaration:__ @RIVER_WINDOW_V1_ERROR_NODE_EXISTS@
 
-__C declaration:__ @RIVER_WINDOW_V1_ERROR_NODE_EXISTS@
+    __defined at:__ @river-window-management-v1-client-protocol.h 857:2@
 
-__defined at:__ @river-window-management-v1-client-protocol.h 857:2@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 pattern RIVER_WINDOW_V1_ERROR_NODE_EXISTS :: River_window_v1_error
 pattern RIVER_WINDOW_V1_ERROR_NODE_EXISTS = River_window_v1_error 0
 
-{-| proposed dimensions out of bounds
+{-| __C declaration:__ @RIVER_WINDOW_V1_ERROR_INVALID_DIMENSIONS@
 
-__C declaration:__ @RIVER_WINDOW_V1_ERROR_INVALID_DIMENSIONS@
+    __defined at:__ @river-window-management-v1-client-protocol.h 861:2@
 
-__defined at:__ @river-window-management-v1-client-protocol.h 861:2@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 pattern RIVER_WINDOW_V1_ERROR_INVALID_DIMENSIONS :: River_window_v1_error
 pattern RIVER_WINDOW_V1_ERROR_INVALID_DIMENSIONS = River_window_v1_error 1
 
-{-| invalid arg to set_borders
+{-| __C declaration:__ @RIVER_WINDOW_V1_ERROR_INVALID_BORDER@
 
-__C declaration:__ @RIVER_WINDOW_V1_ERROR_INVALID_BORDER@
+    __defined at:__ @river-window-management-v1-client-protocol.h 865:2@
 
-__defined at:__ @river-window-management-v1-client-protocol.h 865:2@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 pattern RIVER_WINDOW_V1_ERROR_INVALID_BORDER :: River_window_v1_error
 pattern RIVER_WINDOW_V1_ERROR_INVALID_BORDER = River_window_v1_error 2
 
-{-| invalid arg to set_clip_box
+{-| __C declaration:__ @RIVER_WINDOW_V1_ERROR_INVALID_CLIP_BOX@
 
-__C declaration:__ @RIVER_WINDOW_V1_ERROR_INVALID_CLIP_BOX@
+    __defined at:__ @river-window-management-v1-client-protocol.h 869:2@
 
-__defined at:__ @river-window-management-v1-client-protocol.h 869:2@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 pattern RIVER_WINDOW_V1_ERROR_INVALID_CLIP_BOX :: River_window_v1_error
 pattern RIVER_WINDOW_V1_ERROR_INVALID_CLIP_BOX = River_window_v1_error 3
@@ -1249,7 +1174,7 @@ instance Read River_window_v1_decoration_hint where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_window_v1_decoration_hint) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -1261,46 +1186,38 @@ instance HasCField.HasCField River_window_v1_decoration_hint "unwrap" where
 
   offset# = \_ -> \_ -> 0
 
-{-| only supports client side decoration
+{-| __C declaration:__ @RIVER_WINDOW_V1_DECORATION_HINT_ONLY_SUPPORTS_CSD@
 
-__C declaration:__ @RIVER_WINDOW_V1_DECORATION_HINT_ONLY_SUPPORTS_CSD@
+    __defined at:__ @river-window-management-v1-client-protocol.h 879:2@
 
-__defined at:__ @river-window-management-v1-client-protocol.h 879:2@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 pattern RIVER_WINDOW_V1_DECORATION_HINT_ONLY_SUPPORTS_CSD :: River_window_v1_decoration_hint
 pattern RIVER_WINDOW_V1_DECORATION_HINT_ONLY_SUPPORTS_CSD = River_window_v1_decoration_hint 0
 
-{-| client side decoration preferred, both CSD and SSD supported
+{-| __C declaration:__ @RIVER_WINDOW_V1_DECORATION_HINT_PREFERS_CSD@
 
-__C declaration:__ @RIVER_WINDOW_V1_DECORATION_HINT_PREFERS_CSD@
+    __defined at:__ @river-window-management-v1-client-protocol.h 883:2@
 
-__defined at:__ @river-window-management-v1-client-protocol.h 883:2@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 pattern RIVER_WINDOW_V1_DECORATION_HINT_PREFERS_CSD :: River_window_v1_decoration_hint
 pattern RIVER_WINDOW_V1_DECORATION_HINT_PREFERS_CSD = River_window_v1_decoration_hint 1
 
-{-| server side decoration preferred, both CSD and SSD supported
+{-| __C declaration:__ @RIVER_WINDOW_V1_DECORATION_HINT_PREFERS_SSD@
 
-__C declaration:__ @RIVER_WINDOW_V1_DECORATION_HINT_PREFERS_SSD@
+    __defined at:__ @river-window-management-v1-client-protocol.h 887:2@
 
-__defined at:__ @river-window-management-v1-client-protocol.h 887:2@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 pattern RIVER_WINDOW_V1_DECORATION_HINT_PREFERS_SSD :: River_window_v1_decoration_hint
 pattern RIVER_WINDOW_V1_DECORATION_HINT_PREFERS_SSD = River_window_v1_decoration_hint 2
 
-{-| no preference, both CSD and SSD supported
+{-| __C declaration:__ @RIVER_WINDOW_V1_DECORATION_HINT_NO_PREFERENCE@
 
-__C declaration:__ @RIVER_WINDOW_V1_DECORATION_HINT_NO_PREFERENCE@
+    __defined at:__ @river-window-management-v1-client-protocol.h 891:2@
 
-__defined at:__ @river-window-management-v1-client-protocol.h 891:2@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 pattern RIVER_WINDOW_V1_DECORATION_HINT_NO_PREFERENCE :: River_window_v1_decoration_hint
 pattern RIVER_WINDOW_V1_DECORATION_HINT_NO_PREFERENCE = River_window_v1_decoration_hint 3
@@ -1378,7 +1295,7 @@ instance Read River_window_v1_edges where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_window_v1_edges) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -1507,7 +1424,7 @@ instance Read River_window_v1_capabilities where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_window_v1_capabilities) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -1555,358 +1472,352 @@ pattern RIVER_WINDOW_V1_CAPABILITIES_FULLSCREEN = River_window_v1_capabilities 4
 pattern RIVER_WINDOW_V1_CAPABILITIES_MINIMIZE :: River_window_v1_capabilities
 pattern RIVER_WINDOW_V1_CAPABILITIES_MINIMIZE = River_window_v1_capabilities 8
 
-{-|
+{-| __C declaration:__ @struct river_window_v1_listener@
 
-  > iface_river_window_v1
+    __defined at:__ @river-window-management-v1-client-protocol.h 920:8@
 
-  > river_window_v1_listener
-
-__C declaration:__ @struct river_window_v1_listener@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 920:8@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 data River_window_v1_listener = River_window_v1_listener
-  { closed :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> IO ())
+  { closed :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> IO ())
     {- ^ the window has been closed
 
-       The window has been closed by the server, perhaps due to an xdg_toplevel.close request or similar.
+         The window has been closed by the server, perhaps due to an xdg_toplevel.close request or similar.
 
-       The server will send no further events on this object and ignore any request other than river_window_v1.destroy made after this event is sent. The client should destroy this object with the river_window_v1.destroy request to free up resources.
+         The server will send no further events on this object and ignore any request other than river_window_v1.destroy made after this event is sent. The client should destroy this object with the river_window_v1.destroy request to free up resources.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-    __C declaration:__ @closed@
+         __C declaration:__ @closed@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 935:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 935:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , dimensions_hint :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , dimensions_hint :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ the window's preferred min/max dimensions
 
-       This event informs the window manager of the window's preferred min/max dimensions. These preferences are a hint, and the window manager is free to propose dimensions outside of these bounds.
+         This event informs the window manager of the window's preferred min/max dimensions. These preferences are a hint, and the window manager is free to propose dimensions outside of these bounds.
 
-       All min/max width/height values must be strictly greater than or equal to 0. A value of 0 indicates that the window has no preference for that value.
+         All min/max width/height values must be strictly greater than or equal to 0. A value of 0 indicates that the window has no preference for that value.
 
-       The min_width/min_height must be strictly less than or equal to the max_width/max_height.
+         The min_width/min_height must be strictly less than or equal to the max_width/max_height.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-       [__@min_width@ /(input)/__]: minimum width
+         [__@min_width@__]: minimum width
 
-       [__@min_height@ /(input)/__]: minimum height
+         [__@min_height@__]: minimum height
 
-       [__@max_width@ /(input)/__]: maximum width
+         [__@max_width@__]: maximum width
 
-       [__@max_height@ /(input)/__]: maximum height
+         [__@max_height@__]: maximum height
 
-    __C declaration:__ @dimensions_hint@
+         __C declaration:__ @dimensions_hint@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 959:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 959:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , dimensions :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , dimensions :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ window dimensions
 
-       This event indicates the dimensions of the window in the compositor's logical coordinate space. The width and height must be strictly greater than zero.
+         This event indicates the dimensions of the window in the compositor's logical coordinate space. The width and height must be strictly greater than zero.
 
-       Note that the dimensions of a river_window_v1 refer to the dimensions of the window content and are unaffected by the presence of borders or decoration surfaces.
+         Note that the dimensions of a river_window_v1 refer to the dimensions of the window content and are unaffected by the presence of borders or decoration surfaces.
 
-       This event is sent as part of a render sequence before the render_start event.
+         This event is sent as part of a render sequence before the render_start event.
 
-       It may be sent due to a propose_dimensions or fullscreen request in a previous manage sequence or because a window independently decides to change its dimensions.
+         It may be sent due to a propose_dimensions or fullscreen request in a previous manage sequence or because a window independently decides to change its dimensions.
 
-       The window will not be displayed until the first dimensions event is received and the render sequence is finished.
+         The window will not be displayed until the first dimensions event is received and the render sequence is finished.
 
-       [__@width@ /(input)/__]: window content width
+         [__@width@__]: window content width
 
-       [__@height@ /(input)/__]: window content height
+         [__@height@__]: window content height
 
-    __C declaration:__ @dimensions@
+         __C declaration:__ @dimensions@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 988:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 988:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , app_id :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  , app_id :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
     {- ^ the window set an application ID
 
-       The window set an application ID.
+         The window set an application ID.
 
-       The app_id argument will be null if the window has never set an application ID or if the window cleared its application ID. (Xwayland windows may do this for example, though xdg-toplevels may not.)
+         The app_id argument will be null if the window has never set an application ID or if the window cleared its application ID. (Xwayland windows may do this for example, though xdg-toplevels may not.)
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-       [__@app_id@ /(input)/__]: window application ID
+         [__@@__]: window application ID
 
-    __C declaration:__ @app_id@
+         __C declaration:__ @app_id@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 1006:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 1006:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , title :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  , title :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
     {- ^ the window set a title
 
-       The window set a title.
+         The window set a title.
 
-       The title argument will be null if the window has never set a title or if the window cleared its title. (Xwayland windows may do this for example, though xdg-toplevels may not.)
+         The title argument will be null if the window has never set a title or if the window cleared its title. (Xwayland windows may do this for example, though xdg-toplevels may not.)
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-       [__@title@ /(input)/__]: window title
+         [__@@__]: window title
 
-    __C declaration:__ @title@
+         __C declaration:__ @title@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 1022:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 1022:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , parent :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_window_v1) -> IO ())
+  , parent :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_window_v1 -> IO ())
     {- ^ the window set a parent
 
-       The window set a parent window. If this event is never received or if the parent argument is null then the window has no parent.
+         The window set a parent window. If this event is never received or if the parent argument is null then the window has no parent.
 
-       A surface with a parent set might be a dialog, file picker, or similar for the parent window.
+         A surface with a parent set might be a dialog, file picker, or similar for the parent window.
 
-       Child windows should generally be rendered directly above their parent.
+         Child windows should generally be rendered directly above their parent.
 
-       The compositor must guarantee that there are no loops in the window tree: a parent must not be the descendant of one of its children.
+         The compositor must guarantee that there are no loops in the window tree: a parent must not be the descendant of one of its children.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-       [__@parent@ /(input)/__]: parent window, if any
+         [__@@__]: parent window, if any
 
-    __C declaration:__ @parent@
+         __C declaration:__ @parent@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 1046:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 1046:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , decoration_hint :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , decoration_hint :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ supported/preferred decoration style
 
-       Information from the window about the supported and preferred client side/server side decoration options.
+         Information from the window about the supported and preferred client side/server side decoration options.
 
-       This event may be sent multiple times over the lifetime of the window if the window changes its preferences.
+         This event may be sent multiple times over the lifetime of the window if the window changes its preferences.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-       [__@hint@ /(input)/__]: decoration hint
+         [__@hint@__]: decoration hint
 
-    __C declaration:__ @decoration_hint@
+         __C declaration:__ @decoration_hint@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 1062:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 1062:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , pointer_move_requested :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_seat_v1) -> IO ())
+  , pointer_move_requested :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_seat_v1 -> IO ())
     {- ^ window requested interactive pointer move
 
-       This event informs the window manager that the window has requested to be interactively moved using the pointer. The seat argument indicates the seat for the move.
+         This event informs the window manager that the window has requested to be interactively moved using the pointer. The seat argument indicates the seat for the move.
 
-       The xdg-shell protocol for example allows windows to request that an interactive move be started, perhaps when a client-side rendered titlebar is dragged.
+         The xdg-shell protocol for example allows windows to request that an interactive move be started, perhaps when a client-side rendered titlebar is dragged.
 
-       The window manager may use the river_seat_v1.op_start_pointer request to interactively move the window or ignore this event entirely.
+         The window manager may use the river_seat_v1.op_start_pointer request to interactively move the window or ignore this event entirely.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-       [__@seat@ /(input)/__]: requested seat
+         [__@seat@__]: requested seat
 
-    __C declaration:__ @pointer_move_requested@
+         __C declaration:__ @pointer_move_requested@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 1084:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 1084:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , pointer_resize_requested :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , pointer_resize_requested :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ window requested interactive pointer resize
 
-       This event informs the window manager that the window has requested to be interactively resized using the pointer. The seat argument indicates the seat for the resize.
+         This event informs the window manager that the window has requested to be interactively resized using the pointer. The seat argument indicates the seat for the resize.
 
-       The edges argument indicates which edges the window has requested to be resized from. The edges argument will never be none and will never have both top and bottom or both left and right edges set.
+         The edges argument indicates which edges the window has requested to be resized from. The edges argument will never be none and will never have both top and bottom or both left and right edges set.
 
-       The xdg-shell protocol for example allows windows to request that an interactive resize be started, perhaps when the corner of client-side rendered decorations is dragged.
+         The xdg-shell protocol for example allows windows to request that an interactive resize be started, perhaps when the corner of client-side rendered decorations is dragged.
 
-       The window manager may use the river_seat_v1.op_start_pointer request to interactively resize the window or ignore this event entirely.
+         The window manager may use the river_seat_v1.op_start_pointer request to interactively resize the window or ignore this event entirely.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-       [__@seat@ /(input)/__]: requested seat
+         [__@seat@__]: requested seat
 
-       [__@edges@ /(input)/__]: requested edges
+         [__@edges@__]: requested edges
 
-    __C declaration:__ @pointer_resize_requested@
+         __C declaration:__ @pointer_resize_requested@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 1112:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 1112:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , show_window_menu_requested :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , show_window_menu_requested :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ window requested that the window menu be shown
 
-       The xdg-shell protocol for example allows windows to request that a window menu be shown, for example when the user right clicks on client side window decorations.
+         The xdg-shell protocol for example allows windows to request that a window menu be shown, for example when the user right clicks on client side window decorations.
 
-       A window menu might include options to maximize or minimize the window.
+         A window menu might include options to maximize or minimize the window.
 
-       The window manager is free to ignore this request and decide what the window menu contains if it does choose to show one.
+         The window manager is free to ignore this request and decide what the window menu contains if it does choose to show one.
 
-       The x and y arguments indicate where the window requested that the window menu be shown.
+         The x and y arguments indicate where the window requested that the window menu be shown.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-       [__@x@ /(input)/__]: x offset from top left corner
+         [__@x@__]: x offset from top left corner
 
-       [__@y@ /(input)/__]: y offset from top left corner
+         [__@y@__]: y offset from top left corner
 
-    __C declaration:__ @show_window_menu_requested@
+         __C declaration:__ @show_window_menu_requested@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 1137:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 1137:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , maximize_requested :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> IO ())
+  , maximize_requested :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> IO ())
     {- ^ the window requested to be maximized
 
-       The xdg-shell protocol for example allows windows to request to be maximized.
+         The xdg-shell protocol for example allows windows to request to be maximized.
 
-       The window manager is free to honor this request using river_window_v1.inform_maximize or ignore it.
+         The window manager is free to honor this request using river_window_v1.inform_maximize or ignore it.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-    __C declaration:__ @maximize_requested@
+         __C declaration:__ @maximize_requested@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 1153:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 1153:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , unmaximize_requested :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> IO ())
+  , unmaximize_requested :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> IO ())
     {- ^ the window requested to be unmaximized
 
-       The xdg-shell protocol for example allows windows to request to be unmaximized.
+         The xdg-shell protocol for example allows windows to request to be unmaximized.
 
-       The window manager is free to honor this request using river_window_v1.inform_unmaximized or ignore it.
+         The window manager is free to honor this request using river_window_v1.inform_unmaximized or ignore it.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-    __C declaration:__ @unmaximize_requested@
+         __C declaration:__ @unmaximize_requested@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 1167:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 1167:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , fullscreen_requested :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_output_v1) -> IO ())
+  , fullscreen_requested :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_output_v1 -> IO ())
     {- ^ the window requested to be fullscreen
 
-       The xdg-shell protocol for example allows windows to request that they be made fullscreen and allows them to provide an optional output hint.
+         The xdg-shell protocol for example allows windows to request that they be made fullscreen and allows them to provide an optional output hint.
 
-       If the output argument is null, the window has no preference and the window manager should choose an output.
+         If the output argument is null, the window has no preference and the window manager should choose an output.
 
-       The window manager is free to honor this request using river_window_v1.fullscreen or ignore it.
+         The window manager is free to honor this request using river_window_v1.fullscreen or ignore it.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-       [__@output@ /(input)/__]: fullscreen output requested
+         [__@output@__]: fullscreen output requested
 
-    __C declaration:__ @fullscreen_requested@
+         __C declaration:__ @fullscreen_requested@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 1186:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 1186:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , exit_fullscreen_requested :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> IO ())
+  , exit_fullscreen_requested :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> IO ())
     {- ^ the window requested to exit fullscreen
 
-       The xdg-shell protocol for example allows windows to request to exit fullscreen.
+         The xdg-shell protocol for example allows windows to request to exit fullscreen.
 
-       The window manager is free to honor this request using river_window_v1.exit_fullscreen or ignore it.
+         The window manager is free to honor this request using river_window_v1.exit_fullscreen or ignore it.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-    __C declaration:__ @exit_fullscreen_requested@
+         __C declaration:__ @exit_fullscreen_requested@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 1201:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 1201:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , minimize_requested :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> IO ())
+  , minimize_requested :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> IO ())
     {- ^ the window requested to be minimized
 
-       The xdg-shell protocol for example allows windows to request to be minimized.
+         The xdg-shell protocol for example allows windows to request to be minimized.
 
-       The window manager is free to ignore this request, hide the window, or do whatever else it chooses.
+         The window manager is free to ignore this request, hide the window, or do whatever else it chooses.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-    __C declaration:__ @minimize_requested@
+         __C declaration:__ @minimize_requested@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 1215:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 1215:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , unreliable_pid :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , unreliable_pid :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ unreliable PID of the window's creator
 
-       This event gives an unreliable PID of the process that created the window. Obtaining this information is inherently racy due to PID reuse. Therefore, this PID must not be used for anything security sensitive.
+         This event gives an unreliable PID of the process that created the window. Obtaining this information is inherently racy due to PID reuse. Therefore, this PID must not be used for anything security sensitive.
 
-       Note also that a single process may create multiple windows, so there is not necessarily a 1-to-1 mapping from PID to window. Multiple windows may have the same PID.
+         Note also that a single process may create multiple windows, so there is not necessarily a 1-to-1 mapping from PID to window. Multiple windows may have the same PID.
 
-       This event is sent once when the river_window_v1 is created and never sent again.
+         This event is sent once when the river_window_v1 is created and never sent again.
 
-       [__@unreliable_pid@ /(input)/__]: unreliable PID
+         [__@@__]: unreliable PID
 
-       @since:  2
+         @since 2
 
-    __C declaration:__ @unreliable_pid@
+         __C declaration:__ @unreliable_pid@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 1234:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 1234:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , presentation_hint :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , presentation_hint :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ presentation hint set by the window
 
-       This event communicates the window's preferred presentation mode.
+         This event communicates the window's preferred presentation mode.
 
-       This event will be followed by a render_start event after all other new state has been sent by the server.
+         This event will be followed by a render_start event after all other new state has been sent by the server.
 
-       [__@hint@ /(input)/__]: presentation hint
+         [__@hint@__]: presentation hint
 
-       @since:  4
+         @since 4
 
-    __C declaration:__ @presentation_hint@
+         __C declaration:__ @presentation_hint@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 1248:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 1248:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , identifier :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  , identifier :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
     {- ^ unique window identifier
 
-       The identifier is a string that contains up to 32 printable ASCII bytes. The identifier must not be an empty string.
+         The identifier is a string that contains up to 32 printable ASCII bytes. The identifier must not be an empty string.
 
-       It is compositor policy how the identifier is generated, but the following properties must be upheld:
+         It is compositor policy how the identifier is generated, but the following properties must be upheld:
 
-       1. The identifier must uniquely identify the window. Two windows must not share the same identifier.
+         1. The identifier must uniquely identify the window. Two windows must not share the same identifier.
 
-       2. The identifier must not be reused. This avoids races around window creation/destruction when identifiers are used in out-of-band IPC.
+         2. The identifier must not be reused. This avoids races around window creation/destruction when identifiers are used in out-of-band IPC.
 
-       If the compositor implements the ext-foreign-toplevel-list-v1 protocol, the river_window_v1.identifier event must match the corresponding ext_foreign_toplevel_handle_v1.identifier event.
+         If the compositor implements the ext-foreign-toplevel-list-v1 protocol, the river_window_v1.identifier event must match the corresponding ext_foreign_toplevel_handle_v1.identifier event.
 
-       This event is sent once when the river_window_v1 is created and never sent again.
+         This event is sent once when the river_window_v1 is created and never sent again.
 
-       [__@identifier@ /(input)/__]: unique identifier
+         [__@@__]: unique identifier
 
-       @since:  4
+         @since 4
 
-    __C declaration:__ @identifier@
+         __C declaration:__ @identifier@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 1276:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 1276:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
   }
   deriving stock (Eq, RIP.Generic, Show)
@@ -1990,11 +1901,11 @@ deriving via Marshal.EquivStorable River_window_v1_listener instance RIP.Storabl
 instance HasCField.HasCField River_window_v1_listener "closed" where
 
   type CFieldType River_window_v1_listener "closed" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> IO ())
          ) => RIP.HasField "closed" (RIP.Ptr River_window_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"closed")
@@ -2002,11 +1913,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1)
 instance HasCField.HasCField River_window_v1_listener "dimensions_hint" where
 
   type CFieldType River_window_v1_listener "dimensions_hint" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
          ) => RIP.HasField "dimensions_hint" (RIP.Ptr River_window_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -2015,11 +1926,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1)
 instance HasCField.HasCField River_window_v1_listener "dimensions" where
 
   type CFieldType River_window_v1_listener "dimensions" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
          ) => RIP.HasField "dimensions" (RIP.Ptr River_window_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -2028,11 +1939,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1)
 instance HasCField.HasCField River_window_v1_listener "app_id" where
 
   type CFieldType River_window_v1_listener "app_id" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
 
   offset# = \_ -> \_ -> 24
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
          ) => RIP.HasField "app_id" (RIP.Ptr River_window_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"app_id")
@@ -2040,11 +1951,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1)
 instance HasCField.HasCField River_window_v1_listener "title" where
 
   type CFieldType River_window_v1_listener "title" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
 
   offset# = \_ -> \_ -> 32
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
          ) => RIP.HasField "title" (RIP.Ptr River_window_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"title")
@@ -2052,11 +1963,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1)
 instance HasCField.HasCField River_window_v1_listener "parent" where
 
   type CFieldType River_window_v1_listener "parent" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_window_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_window_v1 -> IO ())
 
   offset# = \_ -> \_ -> 40
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_window_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_window_v1 -> IO ())
          ) => RIP.HasField "parent" (RIP.Ptr River_window_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"parent")
@@ -2064,11 +1975,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1)
 instance HasCField.HasCField River_window_v1_listener "decoration_hint" where
 
   type CFieldType River_window_v1_listener "decoration_hint" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 48
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "decoration_hint" (RIP.Ptr River_window_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -2077,11 +1988,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1)
 instance HasCField.HasCField River_window_v1_listener "pointer_move_requested" where
 
   type CFieldType River_window_v1_listener "pointer_move_requested" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_seat_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_seat_v1 -> IO ())
 
   offset# = \_ -> \_ -> 56
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_seat_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_seat_v1 -> IO ())
          ) => RIP.HasField "pointer_move_requested" (RIP.Ptr River_window_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -2090,11 +2001,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1)
 instance HasCField.HasCField River_window_v1_listener "pointer_resize_requested" where
 
   type CFieldType River_window_v1_listener "pointer_resize_requested" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 64
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "pointer_resize_requested" (RIP.Ptr River_window_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -2103,11 +2014,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1)
 instance HasCField.HasCField River_window_v1_listener "show_window_menu_requested" where
 
   type CFieldType River_window_v1_listener "show_window_menu_requested" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 72
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
          ) => RIP.HasField "show_window_menu_requested" (RIP.Ptr River_window_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -2116,11 +2027,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1)
 instance HasCField.HasCField River_window_v1_listener "maximize_requested" where
 
   type CFieldType River_window_v1_listener "maximize_requested" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> IO ())
 
   offset# = \_ -> \_ -> 80
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> IO ())
          ) => RIP.HasField "maximize_requested" (RIP.Ptr River_window_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -2129,11 +2040,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1)
 instance HasCField.HasCField River_window_v1_listener "unmaximize_requested" where
 
   type CFieldType River_window_v1_listener "unmaximize_requested" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> IO ())
 
   offset# = \_ -> \_ -> 88
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> IO ())
          ) => RIP.HasField "unmaximize_requested" (RIP.Ptr River_window_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -2142,11 +2053,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1)
 instance HasCField.HasCField River_window_v1_listener "fullscreen_requested" where
 
   type CFieldType River_window_v1_listener "fullscreen_requested" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_output_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_output_v1 -> IO ())
 
   offset# = \_ -> \_ -> 96
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_output_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_output_v1 -> IO ())
          ) => RIP.HasField "fullscreen_requested" (RIP.Ptr River_window_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -2155,11 +2066,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1)
 instance HasCField.HasCField River_window_v1_listener "exit_fullscreen_requested" where
 
   type CFieldType River_window_v1_listener "exit_fullscreen_requested" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> IO ())
 
   offset# = \_ -> \_ -> 104
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> IO ())
          ) => RIP.HasField "exit_fullscreen_requested" (RIP.Ptr River_window_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -2168,11 +2079,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1)
 instance HasCField.HasCField River_window_v1_listener "minimize_requested" where
 
   type CFieldType River_window_v1_listener "minimize_requested" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> IO ())
 
   offset# = \_ -> \_ -> 112
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> IO ())
          ) => RIP.HasField "minimize_requested" (RIP.Ptr River_window_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -2181,11 +2092,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1)
 instance HasCField.HasCField River_window_v1_listener "unreliable_pid" where
 
   type CFieldType River_window_v1_listener "unreliable_pid" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 120
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
          ) => RIP.HasField "unreliable_pid" (RIP.Ptr River_window_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -2194,11 +2105,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1)
 instance HasCField.HasCField River_window_v1_listener "presentation_hint" where
 
   type CFieldType River_window_v1_listener "presentation_hint" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 128
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "presentation_hint" (RIP.Ptr River_window_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -2207,11 +2118,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1)
 instance HasCField.HasCField River_window_v1_listener "identifier" where
 
   type CFieldType River_window_v1_listener "identifier" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
 
   offset# = \_ -> \_ -> 136
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
          ) => RIP.HasField "identifier" (RIP.Ptr River_window_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -2935,7 +2846,7 @@ instance Read River_decoration_v1_error where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_decoration_v1_error) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -2947,13 +2858,11 @@ instance HasCField.HasCField River_decoration_v1_error "unwrap" where
 
   offset# = \_ -> \_ -> 0
 
-{-| failed to commit the surface before the window manager commit
+{-| __C declaration:__ @RIVER_DECORATION_V1_ERROR_NO_COMMIT@
 
-__C declaration:__ @RIVER_DECORATION_V1_ERROR_NO_COMMIT@
+    __defined at:__ @river-window-management-v1-client-protocol.h 2075:2@
 
-__defined at:__ @river-window-management-v1-client-protocol.h 2075:2@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 pattern RIVER_DECORATION_V1_ERROR_NO_COMMIT :: River_decoration_v1_error
 pattern RIVER_DECORATION_V1_ERROR_NO_COMMIT = River_decoration_v1_error 0
@@ -3098,7 +3007,7 @@ instance Read River_shell_surface_v1_error where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_shell_surface_v1_error) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -3110,24 +3019,20 @@ instance HasCField.HasCField River_shell_surface_v1_error "unwrap" where
 
   offset# = \_ -> \_ -> 0
 
-{-| shell surface already has a node object
+{-| __C declaration:__ @RIVER_SHELL_SURFACE_V1_ERROR_NODE_EXISTS@
 
-__C declaration:__ @RIVER_SHELL_SURFACE_V1_ERROR_NODE_EXISTS@
+    __defined at:__ @river-window-management-v1-client-protocol.h 2176:2@
 
-__defined at:__ @river-window-management-v1-client-protocol.h 2176:2@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 pattern RIVER_SHELL_SURFACE_V1_ERROR_NODE_EXISTS :: River_shell_surface_v1_error
 pattern RIVER_SHELL_SURFACE_V1_ERROR_NODE_EXISTS = River_shell_surface_v1_error 0
 
-{-| failed to commit the surface before the window manager commit
+{-| __C declaration:__ @RIVER_SHELL_SURFACE_V1_ERROR_NO_COMMIT@
 
-__C declaration:__ @RIVER_SHELL_SURFACE_V1_ERROR_NO_COMMIT@
+    __defined at:__ @river-window-management-v1-client-protocol.h 2180:2@
 
-__defined at:__ @river-window-management-v1-client-protocol.h 2180:2@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 pattern RIVER_SHELL_SURFACE_V1_ERROR_NO_COMMIT :: River_shell_surface_v1_error
 pattern RIVER_SHELL_SURFACE_V1_ERROR_NO_COMMIT = River_shell_surface_v1_error 1
@@ -3383,7 +3288,7 @@ instance Read River_output_v1_error where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_output_v1_error) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -3395,15 +3300,11 @@ instance HasCField.HasCField River_output_v1_error "unwrap" where
 
   offset# = \_ -> \_ -> 0
 
-{-| invalid presentation mode enum value
+{-| __C declaration:__ @RIVER_OUTPUT_V1_ERROR_INVALID_PRESENTATION_MODE@
 
-  @since:  4
+    __defined at:__ @river-window-management-v1-client-protocol.h 2439:2@
 
-__C declaration:__ @RIVER_OUTPUT_V1_ERROR_INVALID_PRESENTATION_MODE@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2439:2@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 pattern RIVER_OUTPUT_V1_ERROR_INVALID_PRESENTATION_MODE :: River_output_v1_error
 pattern RIVER_OUTPUT_V1_ERROR_INVALID_PRESENTATION_MODE = River_output_v1_error 0
@@ -3501,7 +3402,7 @@ instance Read River_output_v1_presentation_mode where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_output_v1_presentation_mode) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -3513,124 +3414,110 @@ instance HasCField.HasCField River_output_v1_presentation_mode "unwrap" where
 
   offset# = \_ -> \_ -> 0
 
-{-| tearing-free presentation
+{-| __C declaration:__ @RIVER_OUTPUT_V1_PRESENTATION_MODE_VSYNC@
 
-  Output page-flips should be synchronized to the vertical blanking period, eliminating tearing. This is the default presentation mode.
+    __defined at:__ @river-window-management-v1-client-protocol.h 2457:2@
 
-__C declaration:__ @RIVER_OUTPUT_V1_PRESENTATION_MODE_VSYNC@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2457:2@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 pattern RIVER_OUTPUT_V1_PRESENTATION_MODE_VSYNC :: River_output_v1_presentation_mode
 pattern RIVER_OUTPUT_V1_PRESENTATION_MODE_VSYNC = River_output_v1_presentation_mode 0
 
-{-| asynchronous presentation
+{-| __C declaration:__ @RIVER_OUTPUT_V1_PRESENTATION_MODE_ASYNC@
 
-  Output page-flips should not be synchronized to the vertical blanking period, visual screen tearing may occur.
+    __defined at:__ @river-window-management-v1-client-protocol.h 2464:2@
 
-__C declaration:__ @RIVER_OUTPUT_V1_PRESENTATION_MODE_ASYNC@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2464:2@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 pattern RIVER_OUTPUT_V1_PRESENTATION_MODE_ASYNC :: River_output_v1_presentation_mode
 pattern RIVER_OUTPUT_V1_PRESENTATION_MODE_ASYNC = River_output_v1_presentation_mode 1
 
-{-|
+{-| __C declaration:__ @struct river_output_v1_listener@
 
-  > iface_river_output_v1
+    __defined at:__ @river-window-management-v1-client-protocol.h 2472:8@
 
-  > river_output_v1_listener
-
-__C declaration:__ @struct river_output_v1_listener@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2472:8@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 data River_output_v1_listener = River_output_v1_listener
-  { removed :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> IO ())
+  { removed :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> IO ())
     {- ^ the output is removed
 
-       This event indicates that the logical output is no longer conceptually part of window management space.
+         This event indicates that the logical output is no longer conceptually part of window management space.
 
-       The server will send no further events on this object and ignore any request (other than river_output_v1.destroy) made after this event is sent. The client should destroy this object with the river_output_v1.destroy request to free up resources.
+         The server will send no further events on this object and ignore any request (other than river_output_v1.destroy) made after this event is sent. The client should destroy this object with the river_output_v1.destroy request to free up resources.
 
-       This event may be sent because a corresponding physical output has been physically unplugged or because some output configuration has changed.
+         This event may be sent because a corresponding physical output has been physically unplugged or because some output configuration has changed.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-    __C declaration:__ @removed@
+         __C declaration:__ @removed@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 2491:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 2491:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , wl_output :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , wl_output :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ corresponding wl_output
 
-       The wl_output object corresponding to the river_output_v1. The argument is the global name of the wl_output advertised with wl_registry.global.
+         The wl_output object corresponding to the river_output_v1. The argument is the global name of the wl_output advertised with wl_registry.global.
 
-       It is guaranteed that the corresponding wl_output is advertised before this event is sent.
+         It is guaranteed that the corresponding wl_output is advertised before this event is sent.
 
-       This event is sent exactly once. The wl_output associated with a river_output_v1 cannot change. It is guaranteed that there is a 1-to-1 mapping between wl_output and river_output_v1 objects.
+         This event is sent exactly once. The wl_output associated with a river_output_v1 cannot change. It is guaranteed that there is a 1-to-1 mapping between wl_output and river_output_v1 objects.
 
-       The global_remove event for the corresponding wl_output may be sent before the river_output_v1.remove event. This is due to the fact that river_output_v1 state changes are synced to the river window management manage sequence while changes to globals are not.
+         The global_remove event for the corresponding wl_output may be sent before the river_output_v1.remove event. This is due to the fact that river_output_v1 state changes are synced to the river window management manage sequence while changes to globals are not.
 
-       Rationale: The window manager may need information provided by the wl_output interface such as the name/description. It also may need the wl_output object to start screencopy for example.
+         Rationale: The window manager may need information provided by the wl_output interface such as the name/description. It also may need the wl_output object to start screencopy for example.
 
-       [__@name@ /(input)/__]: name of the wl_output global
+         [__@name@__]: name of the wl_output global
 
-    __C declaration:__ @wl_output@
+         __C declaration:__ @wl_output@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 2518:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 2518:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , position :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , position :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ output position
 
-       This event indicates the position of the output in the compositor's logical coordinate space. The x and y coordinates may be positive or negative.
+         This event indicates the position of the output in the compositor's logical coordinate space. The x and y coordinates may be positive or negative.
 
-       This event is sent once when the river_output_v1 is created and again whenever the position changes.
+         This event is sent once when the river_output_v1 is created and again whenever the position changes.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-       The server must guarantee that the position and dimensions events do not cause the areas of multiple logical outputs to overlap when the corresponding manage_start event is received.
+         The server must guarantee that the position and dimensions events do not cause the areas of multiple logical outputs to overlap when the corresponding manage_start event is received.
 
-       [__@x@ /(input)/__]: global x coordinate
+         [__@x@__]: global x coordinate
 
-       [__@y@ /(input)/__]: global y coordinate
+         [__@y@__]: global y coordinate
 
-    __C declaration:__ @position@
+         __C declaration:__ @position@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 2540:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 2540:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , dimensions :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , dimensions :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ output dimensions
 
-       This event indicates the dimensions of the output in the compositor's logical coordinate space. The width and height will always be strictly greater than zero.
+         This event indicates the dimensions of the output in the compositor's logical coordinate space. The width and height will always be strictly greater than zero.
 
-       This event is sent once when the river_output_v1 is created and again whenever the dimensions change.
+         This event is sent once when the river_output_v1 is created and again whenever the dimensions change.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-       The server must guarantee that the position and dimensions events do not cause the areas of multiple logical outputs to overlap when the corresponding manage_start event is received.
+         The server must guarantee that the position and dimensions events do not cause the areas of multiple logical outputs to overlap when the corresponding manage_start event is received.
 
-       [__@width@ /(input)/__]: output width
+         [__@width@__]: output width
 
-       [__@height@ /(input)/__]: output height
+         [__@height@__]: output height
 
-    __C declaration:__ @dimensions@
+         __C declaration:__ @dimensions@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 2563:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 2563:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
   }
   deriving stock (Eq, RIP.Generic, Show)
@@ -3668,11 +3555,11 @@ deriving via Marshal.EquivStorable River_output_v1_listener instance RIP.Storabl
 instance HasCField.HasCField River_output_v1_listener "removed" where
 
   type CFieldType River_output_v1_listener "removed" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> IO ())
          ) => RIP.HasField "removed" (RIP.Ptr River_output_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"removed")
@@ -3680,11 +3567,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1)
 instance HasCField.HasCField River_output_v1_listener "wl_output" where
 
   type CFieldType River_output_v1_listener "wl_output" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "wl_output" (RIP.Ptr River_output_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"wl_output")
@@ -3692,11 +3579,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1)
 instance HasCField.HasCField River_output_v1_listener "position" where
 
   type CFieldType River_output_v1_listener "position" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
          ) => RIP.HasField "position" (RIP.Ptr River_output_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"position")
@@ -3704,11 +3591,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1)
 instance HasCField.HasCField River_output_v1_listener "dimensions" where
 
   type CFieldType River_output_v1_listener "dimensions" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 24
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
          ) => RIP.HasField "dimensions" (RIP.Ptr River_output_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -3793,21 +3680,17 @@ rIVER_OUTPUT_V1_SET_PRESENTATION_MODE_SINCE_VERSION :: RIP.CInt
 rIVER_OUTPUT_V1_SET_PRESENTATION_MODE_SINCE_VERSION =
   (4 :: RIP.CInt)
 
-{-|
+{-| a set of keyboard modifiers
 
-  > iface_river_seat_v1
+    This enum is used to describe the keyboard modifiers that must be held down to trigger a key binding or pointer binding.
 
-  a set of keyboard modifiers
+    Note that river and wlroots use the values 2 and 16 for capslock and numlock internally. It doesn't make sense to use locked modifiers for bindings however so these values are not included in this enum.
 
-  This enum is used to describe the keyboard modifiers that must be held down to trigger a key binding or pointer binding.
+    __C declaration:__ @enum river_seat_v1_modifiers@
 
-  Note that river and wlroots use the values 2 and 16 for capslock and numlock internally. It doesn't make sense to use locked modifiers for bindings however so these values are not included in this enum.
+    __defined at:__ @river-window-management-v1-client-protocol.h 2675:6@
 
-__C declaration:__ @enum river_seat_v1_modifiers@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2675:6@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 newtype River_seat_v1_modifiers = River_seat_v1_modifiers
   { unwrap :: RIP.CUInt
@@ -3878,7 +3761,7 @@ instance Read River_seat_v1_modifiers where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_seat_v1_modifiers) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -3919,221 +3802,211 @@ pattern RIVER_SEAT_V1_MODIFIERS_CTRL = River_seat_v1_modifiers 4
 
 {-| commonly called alt
 
-__C declaration:__ @RIVER_SEAT_V1_MODIFIERS_MOD1@
+    __C declaration:__ @RIVER_SEAT_V1_MODIFIERS_MOD1@
 
-__defined at:__ @river-window-management-v1-client-protocol.h 2682:2@
+    __defined at:__ @river-window-management-v1-client-protocol.h 2682:2@
 
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 pattern RIVER_SEAT_V1_MODIFIERS_MOD1 :: River_seat_v1_modifiers
 pattern RIVER_SEAT_V1_MODIFIERS_MOD1 = River_seat_v1_modifiers 8
 
-{-| commonly called alt
+{-| __C declaration:__ @RIVER_SEAT_V1_MODIFIERS_MOD3@
 
-__C declaration:__ @RIVER_SEAT_V1_MODIFIERS_MOD3@
+    __defined at:__ @river-window-management-v1-client-protocol.h 2683:2@
 
-__defined at:__ @river-window-management-v1-client-protocol.h 2683:2@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 pattern RIVER_SEAT_V1_MODIFIERS_MOD3 :: River_seat_v1_modifiers
 pattern RIVER_SEAT_V1_MODIFIERS_MOD3 = River_seat_v1_modifiers 32
 
 {-| commonly called super or logo
 
-__C declaration:__ @RIVER_SEAT_V1_MODIFIERS_MOD4@
+    __C declaration:__ @RIVER_SEAT_V1_MODIFIERS_MOD4@
 
-__defined at:__ @river-window-management-v1-client-protocol.h 2687:2@
+    __defined at:__ @river-window-management-v1-client-protocol.h 2687:2@
 
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 pattern RIVER_SEAT_V1_MODIFIERS_MOD4 :: River_seat_v1_modifiers
 pattern RIVER_SEAT_V1_MODIFIERS_MOD4 = River_seat_v1_modifiers 64
 
-{-| commonly called super or logo
+{-| __C declaration:__ @RIVER_SEAT_V1_MODIFIERS_MOD5@
 
-__C declaration:__ @RIVER_SEAT_V1_MODIFIERS_MOD5@
+    __defined at:__ @river-window-management-v1-client-protocol.h 2688:2@
 
-__defined at:__ @river-window-management-v1-client-protocol.h 2688:2@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 pattern RIVER_SEAT_V1_MODIFIERS_MOD5 :: River_seat_v1_modifiers
 pattern RIVER_SEAT_V1_MODIFIERS_MOD5 = River_seat_v1_modifiers 128
 
-{-|
+{-| __C declaration:__ @struct river_seat_v1_listener@
 
-  > iface_river_seat_v1
+    __defined at:__ @river-window-management-v1-client-protocol.h 2696:8@
 
-  > river_seat_v1_listener
-
-__C declaration:__ @struct river_seat_v1_listener@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2696:8@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 data River_seat_v1_listener = River_seat_v1_listener
-  { removed :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> IO ())
+  { removed :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> IO ())
     {- ^ the seat is removed
 
-       This event indicates that seat is no longer in use and should be destroyed.
+         This event indicates that seat is no longer in use and should be destroyed.
 
-       The server will send no further events on this object and ignore any request (other than river_seat_v1.destroy) made after this event is sent. The client should destroy this object with the river_seat_v1.destroy request to free up resources.
+         The server will send no further events on this object and ignore any request (other than river_seat_v1.destroy) made after this event is sent. The client should destroy this object with the river_seat_v1.destroy request to free up resources.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-    __C declaration:__ @removed@
+         __C declaration:__ @removed@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 2711:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 2711:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , wl_seat :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , wl_seat :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ corresponding wl_seat
 
-       The wl_seat object corresponding to the river_seat_v1. The argument is the global name of the wl_seat advertised with wl_registry.global.
+         The wl_seat object corresponding to the river_seat_v1. The argument is the global name of the wl_seat advertised with wl_registry.global.
 
-       It is guaranteed that the corresponding wl_seat is advertised before this event is sent.
+         It is guaranteed that the corresponding wl_seat is advertised before this event is sent.
 
-       This event is sent exactly once. The wl_seat associated with a river_seat_v1 cannot change. It is guaranteed that there is a 1-to-1 mapping between wl_seat and river_seat_v1 objects.
+         This event is sent exactly once. The wl_seat associated with a river_seat_v1 cannot change. It is guaranteed that there is a 1-to-1 mapping between wl_seat and river_seat_v1 objects.
 
-       The global_remove event for the corresponding wl_seat may be sent before the river_seat_v1.remove event. This is due to the fact that river_seat_v1 state changes are synced to the river window management manage sequence while changes to globals are not.
+         The global_remove event for the corresponding wl_seat may be sent before the river_seat_v1.remove event. This is due to the fact that river_seat_v1 state changes are synced to the river window management manage sequence while changes to globals are not.
 
-       Rationale: The window manager may want to trigger window management state changes based on normal input events received by its shell surfaces for example.
+         Rationale: The window manager may want to trigger window management state changes based on normal input events received by its shell surfaces for example.
 
-       [__@name@ /(input)/__]: name of the wl_seat global
+         [__@name@__]: name of the wl_seat global
 
-    __C declaration:__ @wl_seat@
+         __C declaration:__ @wl_seat@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 2738:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 2738:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , pointer_enter :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> (RIP.Ptr River_window_v1) -> IO ())
+  , pointer_enter :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> RIP.Ptr River_window_v1 -> IO ())
     {- ^ pointer entered a window
 
-       The seat's pointer entered the given window's area.
+         The seat's pointer entered the given window's area.
 
-       The area of a window is defined to include the area defined by the window dimensions, borders configured using river_window_v1.set_borders, and the input regions of decoration surfaces. In particular, it does not include input regions of surfaces belonging to the window that extend outside the window dimensions.
+         The area of a window is defined to include the area defined by the window dimensions, borders configured using river_window_v1.set_borders, and the input regions of decoration surfaces. In particular, it does not include input regions of surfaces belonging to the window that extend outside the window dimensions.
 
-       The pointer of a seat may only enter a single window at a time. When the pointer moves between windows, the pointer_leave event for the old window must be sent before the pointer_enter event for the new window.
+         The pointer of a seat may only enter a single window at a time. When the pointer moves between windows, the pointer_leave event for the old window must be sent before the pointer_enter event for the new window.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-       [__@window@ /(input)/__]: window entered
+         [__@window@__]: window entered
 
-    __C declaration:__ @pointer_enter@
+         __C declaration:__ @pointer_enter@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 2762:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 2762:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , pointer_leave :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> IO ())
+  , pointer_leave :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> IO ())
     {- ^ pointer left the entered window
 
-       The seat's pointer left the window for which pointer_enter was most recently sent. See pointer_enter for details.
+         The seat's pointer left the window for which pointer_enter was most recently sent. See pointer_enter for details.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-    __C declaration:__ @pointer_leave@
+         __C declaration:__ @pointer_leave@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 2774:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 2774:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , window_interaction :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> (RIP.Ptr River_window_v1) -> IO ())
+  , window_interaction :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> RIP.Ptr River_window_v1 -> IO ())
     {- ^ a window has been interacted with
 
-       A window has been interacted with beyond the pointer merely passing over it. This event might be sent due to a pointer button press or due to a touch/tablet tool interaction with the window.
+         A window has been interacted with beyond the pointer merely passing over it. This event might be sent due to a pointer button press or due to a touch/tablet tool interaction with the window.
 
-       There are no guarantees regarding how this event is sent in relation to the pointer_enter and pointer_leave events as the interaction may use touch or tablet tool input.
+         There are no guarantees regarding how this event is sent in relation to the pointer_enter and pointer_leave events as the interaction may use touch or tablet tool input.
 
-       Rationale: this event gives window managers necessary information to determine when to send keyboard focus, raise a window that already has keyboard focus, etc. Rather than expose all pointer, touch, and tablet events to window managers, a policy over mechanism approach is taken.
+         Rationale: this event gives window managers necessary information to determine when to send keyboard focus, raise a window that already has keyboard focus, etc. Rather than expose all pointer, touch, and tablet events to window managers, a policy over mechanism approach is taken.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-       [__@window@ /(input)/__]: window interacted with
+         [__@window@__]: window interacted with
 
-    __C declaration:__ @window_interaction@
+         __C declaration:__ @window_interaction@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 2798:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 2798:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , shell_surface_interaction :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> (RIP.Ptr River_shell_surface_v1) -> IO ())
+  , shell_surface_interaction :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> RIP.Ptr River_shell_surface_v1 -> IO ())
     {- ^ a shell surface has been interacted with
 
-       A shell surface has been interacted with beyond the pointer merely passing over it. This event might be sent due to a pointer button press or due to a touch/tablet tool interaction with the shell_surface.
+         A shell surface has been interacted with beyond the pointer merely passing over it. This event might be sent due to a pointer button press or due to a touch/tablet tool interaction with the shell_surface.
 
-       There are no guarantees regarding how this event is sent in relation to the pointer_enter and pointer_leave events as the interaction may use touch or tablet tool input.
+         There are no guarantees regarding how this event is sent in relation to the pointer_enter and pointer_leave events as the interaction may use touch or tablet tool input.
 
-       Rationale: While the shell surface does receive all wl_pointer, wl_touch, etc. input events for the surface directly, these events do not necessarily trigger a manage sequence and therefore do not allow the window manager to update focus or perform other actions in response to the input in a race-free way.
+         Rationale: While the shell surface does receive all wl_pointer, wl_touch, etc. input events for the surface directly, these events do not necessarily trigger a manage sequence and therefore do not allow the window manager to update focus or perform other actions in response to the input in a race-free way.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-       [__@shell_surface@ /(input)/__]: shell surface interacted with
+         [__@shell_surface@__]: shell surface interacted with
 
-    __C declaration:__ @shell_surface_interaction@
+         __C declaration:__ @shell_surface_interaction@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 2824:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 2824:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , op_delta :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , op_delta :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ total cumulative motion since op start
 
-       This event indicates the total change in position since the start of the operation of the pointer/touch point/etc.
+         This event indicates the total change in position since the start of the operation of the pointer/touch point/etc.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-       [__@dx@ /(input)/__]: total change in x
+         [__@dx@__]: total change in x
 
-       [__@dy@ /(input)/__]: total change in y
+         [__@dy@__]: total change in y
 
-    __C declaration:__ @op_delta@
+         __C declaration:__ @op_delta@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 2838:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 2838:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , op_release :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> IO ())
+  , op_release :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> IO ())
     {- ^ operation input has been released
 
-       The input driving the current interactive operation has been released. For a pointer op for example, all pointer buttons have been released.
+         The input driving the current interactive operation has been released. For a pointer op for example, all pointer buttons have been released.
 
-       Depending on the op type, op_delta events may continue to be sent until the op is ended with the op_end request.
+         Depending on the op type, op_delta events may continue to be sent until the op is ended with the op_end request.
 
-       This event is sent at most once during an interactive operation.
+         This event is sent at most once during an interactive operation.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-    __C declaration:__ @op_release@
+         __C declaration:__ @op_release@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 2857:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 2857:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , pointer_position :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , pointer_position :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ The current position of the pointer
 
-       The current position of the pointer in the compositor's logical coordinate space.
+         The current position of the pointer in the compositor's logical coordinate space.
 
-       This state is special in that a change in pointer position alone must not cause the compositor to start a manage sequence.
+         This state is special in that a change in pointer position alone must not cause the compositor to start a manage sequence.
 
-       Assuming the seat has a pointer, this event must be sent in every manage sequence unless there is no change in x/y position since the last time this event was sent.
+         Assuming the seat has a pointer, this event must be sent in every manage sequence unless there is no change in x/y position since the last time this event was sent.
 
-       [__@x@ /(input)/__]: global x coordinate
+         [__@x@__]: global x coordinate
 
-       [__@y@ /(input)/__]: global y coordinate
+         [__@y@__]: global y coordinate
 
-       @since:  2
+         @since 2
 
-    __C declaration:__ @pointer_position@
+         __C declaration:__ @pointer_position@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 2875:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 2875:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
   }
   deriving stock (Eq, RIP.Generic, Show)
@@ -4190,11 +4063,11 @@ deriving via Marshal.EquivStorable River_seat_v1_listener instance RIP.Storable 
 instance HasCField.HasCField River_seat_v1_listener "removed" where
 
   type CFieldType River_seat_v1_listener "removed" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> IO ())
          ) => RIP.HasField "removed" (RIP.Ptr River_seat_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"removed")
@@ -4202,11 +4075,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -
 instance HasCField.HasCField River_seat_v1_listener "wl_seat" where
 
   type CFieldType River_seat_v1_listener "wl_seat" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "wl_seat" (RIP.Ptr River_seat_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"wl_seat")
@@ -4214,11 +4087,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -
 instance HasCField.HasCField River_seat_v1_listener "pointer_enter" where
 
   type CFieldType River_seat_v1_listener "pointer_enter" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> (RIP.Ptr River_window_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> RIP.Ptr River_window_v1 -> IO ())
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> (RIP.Ptr River_window_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> RIP.Ptr River_window_v1 -> IO ())
          ) => RIP.HasField "pointer_enter" (RIP.Ptr River_seat_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4227,11 +4100,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -
 instance HasCField.HasCField River_seat_v1_listener "pointer_leave" where
 
   type CFieldType River_seat_v1_listener "pointer_leave" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> IO ())
 
   offset# = \_ -> \_ -> 24
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> IO ())
          ) => RIP.HasField "pointer_leave" (RIP.Ptr River_seat_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4240,11 +4113,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -
 instance HasCField.HasCField River_seat_v1_listener "window_interaction" where
 
   type CFieldType River_seat_v1_listener "window_interaction" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> (RIP.Ptr River_window_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> RIP.Ptr River_window_v1 -> IO ())
 
   offset# = \_ -> \_ -> 32
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> (RIP.Ptr River_window_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> RIP.Ptr River_window_v1 -> IO ())
          ) => RIP.HasField "window_interaction" (RIP.Ptr River_seat_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4253,11 +4126,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -
 instance HasCField.HasCField River_seat_v1_listener "shell_surface_interaction" where
 
   type CFieldType River_seat_v1_listener "shell_surface_interaction" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> (RIP.Ptr River_shell_surface_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> RIP.Ptr River_shell_surface_v1 -> IO ())
 
   offset# = \_ -> \_ -> 40
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> (RIP.Ptr River_shell_surface_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> RIP.Ptr River_shell_surface_v1 -> IO ())
          ) => RIP.HasField "shell_surface_interaction" (RIP.Ptr River_seat_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4266,11 +4139,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -
 instance HasCField.HasCField River_seat_v1_listener "op_delta" where
 
   type CFieldType River_seat_v1_listener "op_delta" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 48
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
          ) => RIP.HasField "op_delta" (RIP.Ptr River_seat_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"op_delta")
@@ -4278,11 +4151,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -
 instance HasCField.HasCField River_seat_v1_listener "op_release" where
 
   type CFieldType River_seat_v1_listener "op_release" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> IO ())
 
   offset# = \_ -> \_ -> 56
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> IO ())
          ) => RIP.HasField "op_release" (RIP.Ptr River_seat_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4291,11 +4164,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -
 instance HasCField.HasCField River_seat_v1_listener "pointer_position" where
 
   type CFieldType River_seat_v1_listener "pointer_position" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 64
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
          ) => RIP.HasField "pointer_position" (RIP.Ptr River_seat_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4558,50 +4431,44 @@ rIVER_SEAT_V1_POINTER_WARP_SINCE_VERSION :: RIP.CInt
 rIVER_SEAT_V1_POINTER_WARP_SINCE_VERSION =
   (3 :: RIP.CInt)
 
-{-|
+{-| __C declaration:__ @struct river_pointer_binding_v1_listener@
 
-  > iface_river_pointer_binding_v1
+    __defined at:__ @river-window-management-v1-client-protocol.h 3170:8@
 
-  > river_pointer_binding_v1_listener
-
-__C declaration:__ @struct river_pointer_binding_v1_listener@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 3170:8@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 data River_pointer_binding_v1_listener = River_pointer_binding_v1_listener
-  { pressed :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_pointer_binding_v1) -> IO ())
+  { pressed :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_pointer_binding_v1 -> IO ())
     {- ^ the bound pointer button has been pressed
 
-       This event indicates that the pointer button triggering the binding has been pressed.
+         This event indicates that the pointer button triggering the binding has been pressed.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-       The compositor should wait for the manage sequence to complete before processing further input events. This allows the window manager client to, for example, modify key bindings and keyboard focus without racing against future input events. The window manager should of course respond as soon as possible as the capacity of the compositor to buffer incoming input events is finite.
+         The compositor should wait for the manage sequence to complete before processing further input events. This allows the window manager client to, for example, modify key bindings and keyboard focus without racing against future input events. The window manager should of course respond as soon as possible as the capacity of the compositor to buffer incoming input events is finite.
 
-    __C declaration:__ @pressed@
+         __C declaration:__ @pressed@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 3188:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 3188:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
-  , released :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_pointer_binding_v1) -> IO ())
+  , released :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_pointer_binding_v1 -> IO ())
     {- ^ the bound pointer button has been released
 
-       This event indicates that the pointer button triggering the binding has been released.
+         This event indicates that the pointer button triggering the binding has been released.
 
-       Releasing the modifiers for the binding without releasing the pointer button does not trigger the release event. This event is sent when the pointer button is released, even if the modifiers have changed since the pressed event.
+         Releasing the modifiers for the binding without releasing the pointer button does not trigger the release event. This event is sent when the pointer button is released, even if the modifiers have changed since the pressed event.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-       The compositor should wait for the manage sequence to complete before processing further input events. This allows the window manager client to, for example, modify key bindings and keyboard focus without racing against future input events. The window manager should of course respond as soon as possible as the capacity of the compositor to buffer incoming input events is finite.
+         The compositor should wait for the manage sequence to complete before processing further input events. This allows the window manager client to, for example, modify key bindings and keyboard focus without racing against future input events. The window manager should of course respond as soon as possible as the capacity of the compositor to buffer incoming input events is finite.
 
-    __C declaration:__ @released@
+         __C declaration:__ @released@
 
-    __defined at:__ @river-window-management-v1-client-protocol.h 3212:9@
+         __defined at:__ @river-window-management-v1-client-protocol.h 3212:9@
 
-    __exported by:__ @river-window-management-v1-client-protocol.h@
+         __exported by:__ @river-window-management-v1-client-protocol.h@
     -}
   }
   deriving stock (Eq, RIP.Generic, Show)
@@ -4635,11 +4502,11 @@ deriving via Marshal.EquivStorable River_pointer_binding_v1_listener instance RI
 instance HasCField.HasCField River_pointer_binding_v1_listener "pressed" where
 
   type CFieldType River_pointer_binding_v1_listener "pressed" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_pointer_binding_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_pointer_binding_v1 -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_pointer_binding_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_pointer_binding_v1 -> IO ())
          ) => RIP.HasField "pressed" (RIP.Ptr River_pointer_binding_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"pressed")
@@ -4647,11 +4514,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_pointer_bi
 instance HasCField.HasCField River_pointer_binding_v1_listener "released" where
 
   type CFieldType River_pointer_binding_v1_listener "released" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_pointer_binding_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_pointer_binding_v1 -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_pointer_binding_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_pointer_binding_v1 -> IO ())
          ) => RIP.HasField "released" (RIP.Ptr River_pointer_binding_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"released")
@@ -4733,738 +4600,738 @@ rIVER_POINTER_BINDING_V1_DISABLE_SINCE_VERSION :: RIP.CInt
 rIVER_POINTER_BINDING_V1_DISABLE_SINCE_VERSION =
   (1 :: RIP.CInt)
 
-foreign import ccall safe "wrapper" hs_bindgen_59f91b6cc1dfc8e8_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_500bcb22424319da_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> IO ())@
-hs_bindgen_59f91b6cc1dfc8e8 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> IO ()))
-hs_bindgen_59f91b6cc1dfc8e8 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> IO ())@
+hs_bindgen_500bcb22424319da ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> IO ()))
+hs_bindgen_500bcb22424319da =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_59f91b6cc1dfc8e8_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_500bcb22424319da_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_ac33449592e15548_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_e465fdea45568a68_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> IO ())@
-hs_bindgen_ac33449592e15548 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> IO ()
-hs_bindgen_ac33449592e15548 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> IO ())@
+hs_bindgen_e465fdea45568a68 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> IO ()
+hs_bindgen_e465fdea45568a68 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_ac33449592e15548_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_e465fdea45568a68_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_59f91b6cc1dfc8e8
+  toFunPtr = hs_bindgen_500bcb22424319da
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_ac33449592e15548
+  fromFunPtr = hs_bindgen_e465fdea45568a68
 
-foreign import ccall safe "wrapper" hs_bindgen_e332ffcea9ef0d4e_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_ee601530d55b5ed1_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> RIP.Int32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_e332ffcea9ef0d4e ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-hs_bindgen_e332ffcea9ef0d4e =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_ee601530d55b5ed1 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_ee601530d55b5ed1 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_e332ffcea9ef0d4e_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_ee601530d55b5ed1_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_6d04d7acb7000eec_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_634108e3f667c2a8_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> RIP.Int32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_6d04d7acb7000eec ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()
-hs_bindgen_6d04d7acb7000eec =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_634108e3f667c2a8 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()
+hs_bindgen_634108e3f667c2a8 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_6d04d7acb7000eec_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_634108e3f667c2a8_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_e332ffcea9ef0d4e
+  toFunPtr = hs_bindgen_ee601530d55b5ed1
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_6d04d7acb7000eec
+  fromFunPtr = hs_bindgen_634108e3f667c2a8
 
-foreign import ccall safe "wrapper" hs_bindgen_f387883367cc67c5_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_92d9da7414db5eba_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_f387883367cc67c5 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_f387883367cc67c5 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_92d9da7414db5eba ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_92d9da7414db5eba =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_f387883367cc67c5_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_92d9da7414db5eba_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_e30cbc52e5ea519f_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_a92a843c9c2385ff_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_e30cbc52e5ea519f ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
-hs_bindgen_e30cbc52e5ea519f =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_a92a843c9c2385ff ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()
+hs_bindgen_a92a843c9c2385ff =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_e30cbc52e5ea519f_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_a92a843c9c2385ff_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_f387883367cc67c5
+  toFunPtr = hs_bindgen_92d9da7414db5eba
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_output_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_output_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_e30cbc52e5ea519f
+  fromFunPtr = hs_bindgen_a92a843c9c2385ff
 
-foreign import ccall safe "wrapper" hs_bindgen_b4ef5fa4e25e217f_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_61c99e1a59485e66_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_pointer_binding_v1) -> IO ())@
-hs_bindgen_b4ef5fa4e25e217f ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_pointer_binding_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_pointer_binding_v1) -> IO ()))
-hs_bindgen_b4ef5fa4e25e217f =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_pointer_binding_v1 -> IO ())@
+hs_bindgen_61c99e1a59485e66 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_pointer_binding_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_pointer_binding_v1 -> IO ()))
+hs_bindgen_61c99e1a59485e66 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_b4ef5fa4e25e217f_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_61c99e1a59485e66_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_34f187dc937bddb2_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_94da84272cf88422_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_pointer_binding_v1) -> IO ())@
-hs_bindgen_34f187dc937bddb2 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_pointer_binding_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_pointer_binding_v1) -> IO ()
-hs_bindgen_34f187dc937bddb2 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_pointer_binding_v1 -> IO ())@
+hs_bindgen_94da84272cf88422 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_pointer_binding_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_pointer_binding_v1 -> IO ()
+hs_bindgen_94da84272cf88422 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_34f187dc937bddb2_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_94da84272cf88422_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_pointer_binding_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_pointer_binding_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_b4ef5fa4e25e217f
+  toFunPtr = hs_bindgen_61c99e1a59485e66
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_pointer_binding_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_pointer_binding_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_34f187dc937bddb2
+  fromFunPtr = hs_bindgen_94da84272cf88422
 
-foreign import ccall safe "wrapper" hs_bindgen_840059a88042d0be_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_d99effb788915cb8_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> IO ())@
-hs_bindgen_840059a88042d0be ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> IO ()))
-hs_bindgen_840059a88042d0be =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> IO ())@
+hs_bindgen_d99effb788915cb8 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> IO ()))
+hs_bindgen_d99effb788915cb8 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_840059a88042d0be_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_d99effb788915cb8_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_54eeb9c4f8fb4709_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_eabaf2861accbd48_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> IO ())@
-hs_bindgen_54eeb9c4f8fb4709 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> IO ()
-hs_bindgen_54eeb9c4f8fb4709 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> IO ())@
+hs_bindgen_eabaf2861accbd48 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> IO ()
+hs_bindgen_eabaf2861accbd48 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_54eeb9c4f8fb4709_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_eabaf2861accbd48_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_840059a88042d0be
+  toFunPtr = hs_bindgen_d99effb788915cb8
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_54eeb9c4f8fb4709
+  fromFunPtr = hs_bindgen_eabaf2861accbd48
 
-foreign import ccall safe "wrapper" hs_bindgen_58d2fac9bcc70d1c_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_2ad7677d74f9181b_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> (RIP.Ptr River_shell_surface_v1) -> IO ())@
-hs_bindgen_58d2fac9bcc70d1c ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> (RIP.Ptr River_shell_surface_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> (RIP.Ptr River_shell_surface_v1) -> IO ()))
-hs_bindgen_58d2fac9bcc70d1c =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> RIP.Ptr River_shell_surface_v1 -> IO ())@
+hs_bindgen_2ad7677d74f9181b ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> RIP.Ptr River_shell_surface_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> RIP.Ptr River_shell_surface_v1 -> IO ()))
+hs_bindgen_2ad7677d74f9181b =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_58d2fac9bcc70d1c_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_2ad7677d74f9181b_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_4bd02460257bac7f_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_11cccd1c0d46984a_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> (RIP.Ptr River_shell_surface_v1) -> IO ())@
-hs_bindgen_4bd02460257bac7f ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> (RIP.Ptr River_shell_surface_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> (RIP.Ptr River_shell_surface_v1) -> IO ()
-hs_bindgen_4bd02460257bac7f =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> RIP.Ptr River_shell_surface_v1 -> IO ())@
+hs_bindgen_11cccd1c0d46984a ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> RIP.Ptr River_shell_surface_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> RIP.Ptr River_shell_surface_v1 -> IO ()
+hs_bindgen_11cccd1c0d46984a =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_4bd02460257bac7f_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_11cccd1c0d46984a_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> (RIP.Ptr River_shell_surface_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> RIP.Ptr River_shell_surface_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_58d2fac9bcc70d1c
+  toFunPtr = hs_bindgen_2ad7677d74f9181b
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> (RIP.Ptr River_shell_surface_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> RIP.Ptr River_shell_surface_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_4bd02460257bac7f
+  fromFunPtr = hs_bindgen_11cccd1c0d46984a
 
-foreign import ccall safe "wrapper" hs_bindgen_2dec2c9185e84483_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_6b879d98b7fce1d1_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> (RIP.Ptr River_window_v1) -> IO ())@
-hs_bindgen_2dec2c9185e84483 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> (RIP.Ptr River_window_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> (RIP.Ptr River_window_v1) -> IO ()))
-hs_bindgen_2dec2c9185e84483 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> RIP.Ptr River_window_v1 -> IO ())@
+hs_bindgen_6b879d98b7fce1d1 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> RIP.Ptr River_window_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> RIP.Ptr River_window_v1 -> IO ()))
+hs_bindgen_6b879d98b7fce1d1 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_2dec2c9185e84483_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_6b879d98b7fce1d1_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_f5d537042fbf619c_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_11e6be7c6f4268e4_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> (RIP.Ptr River_window_v1) -> IO ())@
-hs_bindgen_f5d537042fbf619c ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> (RIP.Ptr River_window_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> (RIP.Ptr River_window_v1) -> IO ()
-hs_bindgen_f5d537042fbf619c =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> RIP.Ptr River_window_v1 -> IO ())@
+hs_bindgen_11e6be7c6f4268e4 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> RIP.Ptr River_window_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> RIP.Ptr River_window_v1 -> IO ()
+hs_bindgen_11e6be7c6f4268e4 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_f5d537042fbf619c_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_11e6be7c6f4268e4_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> (RIP.Ptr River_window_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> RIP.Ptr River_window_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_2dec2c9185e84483
+  toFunPtr = hs_bindgen_6b879d98b7fce1d1
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> (RIP.Ptr River_window_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> RIP.Ptr River_window_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_f5d537042fbf619c
+  fromFunPtr = hs_bindgen_11e6be7c6f4268e4
 
-foreign import ccall safe "wrapper" hs_bindgen_afdaaf2cde9e43bd_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_3b02a69a71a9391c_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> RIP.Int32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_afdaaf2cde9e43bd ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-hs_bindgen_afdaaf2cde9e43bd =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_3b02a69a71a9391c ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_3b02a69a71a9391c =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_afdaaf2cde9e43bd_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_3b02a69a71a9391c_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_14a98f315044eb9b_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_6519decf7ddc192a_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> RIP.Int32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_14a98f315044eb9b ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()
-hs_bindgen_14a98f315044eb9b =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_6519decf7ddc192a ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()
+hs_bindgen_6519decf7ddc192a =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_14a98f315044eb9b_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_6519decf7ddc192a_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_afdaaf2cde9e43bd
+  toFunPtr = hs_bindgen_3b02a69a71a9391c
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_14a98f315044eb9b
+  fromFunPtr = hs_bindgen_6519decf7ddc192a
 
-foreign import ccall safe "wrapper" hs_bindgen_43dff34b3cffdace_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_f56e7bb5c1b2fa3a_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_43dff34b3cffdace ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_43dff34b3cffdace =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_f56e7bb5c1b2fa3a ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_f56e7bb5c1b2fa3a =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_43dff34b3cffdace_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_f56e7bb5c1b2fa3a_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_bac23145968db2ff_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_1c2291db6ce7f9f1_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_bac23145968db2ff ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
-hs_bindgen_bac23145968db2ff =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_1c2291db6ce7f9f1 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()
+hs_bindgen_1c2291db6ce7f9f1 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_bac23145968db2ff_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_1c2291db6ce7f9f1_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_43dff34b3cffdace
+  toFunPtr = hs_bindgen_f56e7bb5c1b2fa3a
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_bac23145968db2ff
+  fromFunPtr = hs_bindgen_1c2291db6ce7f9f1
 
-foreign import ccall safe "wrapper" hs_bindgen_c73e7b062c4641db_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_3befd091660ba317_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> IO ())@
-hs_bindgen_c73e7b062c4641db ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> IO ()))
-hs_bindgen_c73e7b062c4641db =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> IO ())@
+hs_bindgen_3befd091660ba317 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> IO ()))
+hs_bindgen_3befd091660ba317 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_c73e7b062c4641db_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_3befd091660ba317_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_d7a59e7d00e69f5e_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_bd434e36a9c75443_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> IO ())@
-hs_bindgen_d7a59e7d00e69f5e ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> IO ()
-hs_bindgen_d7a59e7d00e69f5e =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> IO ())@
+hs_bindgen_bd434e36a9c75443 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> IO ()
+hs_bindgen_bd434e36a9c75443 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_d7a59e7d00e69f5e_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_bd434e36a9c75443_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_c73e7b062c4641db
+  toFunPtr = hs_bindgen_3befd091660ba317
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_d7a59e7d00e69f5e
+  fromFunPtr = hs_bindgen_bd434e36a9c75443
 
-foreign import ccall safe "wrapper" hs_bindgen_74894d0049211074_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_bb79d7fbf494f33a_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_output_v1) -> IO ())@
-hs_bindgen_74894d0049211074 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_output_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_output_v1) -> IO ()))
-hs_bindgen_74894d0049211074 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_output_v1 -> IO ())@
+hs_bindgen_bb79d7fbf494f33a ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_output_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_output_v1 -> IO ()))
+hs_bindgen_bb79d7fbf494f33a =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_74894d0049211074_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_bb79d7fbf494f33a_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_c798f0e103377bb8_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_a6f2e16b4a052e05_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_output_v1) -> IO ())@
-hs_bindgen_c798f0e103377bb8 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_output_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_output_v1) -> IO ()
-hs_bindgen_c798f0e103377bb8 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_output_v1 -> IO ())@
+hs_bindgen_a6f2e16b4a052e05 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_output_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_output_v1 -> IO ()
+hs_bindgen_a6f2e16b4a052e05 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_c798f0e103377bb8_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_a6f2e16b4a052e05_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_output_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_output_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_74894d0049211074
+  toFunPtr = hs_bindgen_bb79d7fbf494f33a
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_output_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_output_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_c798f0e103377bb8
+  fromFunPtr = hs_bindgen_a6f2e16b4a052e05
 
-foreign import ccall safe "wrapper" hs_bindgen_64ea08fe88c8cf14_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_68df6819b275367d_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_seat_v1) -> IO ())@
-hs_bindgen_64ea08fe88c8cf14 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_seat_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_seat_v1) -> IO ()))
-hs_bindgen_64ea08fe88c8cf14 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_seat_v1 -> IO ())@
+hs_bindgen_68df6819b275367d ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_seat_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_seat_v1 -> IO ()))
+hs_bindgen_68df6819b275367d =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_64ea08fe88c8cf14_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_68df6819b275367d_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_20a8a2e8430a6902_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_b4b822ecfff10844_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_seat_v1) -> IO ())@
-hs_bindgen_20a8a2e8430a6902 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_seat_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_seat_v1) -> IO ()
-hs_bindgen_20a8a2e8430a6902 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_seat_v1 -> IO ())@
+hs_bindgen_b4b822ecfff10844 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_seat_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_seat_v1 -> IO ()
+hs_bindgen_b4b822ecfff10844 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_20a8a2e8430a6902_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_b4b822ecfff10844_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_seat_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_seat_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_64ea08fe88c8cf14
+  toFunPtr = hs_bindgen_68df6819b275367d
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_seat_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_seat_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_20a8a2e8430a6902
+  fromFunPtr = hs_bindgen_b4b822ecfff10844
 
-foreign import ccall safe "wrapper" hs_bindgen_b94d0c64844c1884_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_76a55fdb7a82dc2f_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_window_v1) -> IO ())@
-hs_bindgen_b94d0c64844c1884 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_window_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_window_v1) -> IO ()))
-hs_bindgen_b94d0c64844c1884 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_window_v1 -> IO ())@
+hs_bindgen_76a55fdb7a82dc2f ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_window_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_window_v1 -> IO ()))
+hs_bindgen_76a55fdb7a82dc2f =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_b94d0c64844c1884_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_76a55fdb7a82dc2f_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_ce04eba7a2d1987c_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_9d3debceedd66fec_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_window_v1) -> IO ())@
-hs_bindgen_ce04eba7a2d1987c ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_window_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_window_v1) -> IO ()
-hs_bindgen_ce04eba7a2d1987c =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_window_v1 -> IO ())@
+hs_bindgen_9d3debceedd66fec ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_window_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_window_v1 -> IO ()
+hs_bindgen_9d3debceedd66fec =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_ce04eba7a2d1987c_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_9d3debceedd66fec_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_window_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_window_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_b94d0c64844c1884
+  toFunPtr = hs_bindgen_76a55fdb7a82dc2f
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_manager_v1) -> (RIP.Ptr River_window_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_manager_v1 -> RIP.Ptr River_window_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_ce04eba7a2d1987c
+  fromFunPtr = hs_bindgen_9d3debceedd66fec
 
-foreign import ccall safe "wrapper" hs_bindgen_61c9ff455210d87b_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_75706f9bffb014e2_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> IO ())@
-hs_bindgen_61c9ff455210d87b ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> IO ()))
-hs_bindgen_61c9ff455210d87b =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> IO ())@
+hs_bindgen_75706f9bffb014e2 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> IO ()))
+hs_bindgen_75706f9bffb014e2 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_61c9ff455210d87b_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_75706f9bffb014e2_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_b1bb3ea4bb70852b_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_705894cc6238e4fb_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> IO ())@
-hs_bindgen_b1bb3ea4bb70852b ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> IO ()
-hs_bindgen_b1bb3ea4bb70852b =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> IO ())@
+hs_bindgen_705894cc6238e4fb ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> IO ()
+hs_bindgen_705894cc6238e4fb =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_b1bb3ea4bb70852b_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_705894cc6238e4fb_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_61c9ff455210d87b
+  toFunPtr = hs_bindgen_75706f9bffb014e2
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_b1bb3ea4bb70852b
+  fromFunPtr = hs_bindgen_705894cc6238e4fb
 
-foreign import ccall safe "wrapper" hs_bindgen_456d28a36160654a_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_6ca343e73efdd3dd_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_output_v1) -> IO ())@
-hs_bindgen_456d28a36160654a ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_output_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_output_v1) -> IO ()))
-hs_bindgen_456d28a36160654a =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_output_v1 -> IO ())@
+hs_bindgen_6ca343e73efdd3dd ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_output_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_output_v1 -> IO ()))
+hs_bindgen_6ca343e73efdd3dd =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_456d28a36160654a_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_6ca343e73efdd3dd_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_d05d999f892efebf_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_a6246c5ade4dcac2_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_output_v1) -> IO ())@
-hs_bindgen_d05d999f892efebf ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_output_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_output_v1) -> IO ()
-hs_bindgen_d05d999f892efebf =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_output_v1 -> IO ())@
+hs_bindgen_a6246c5ade4dcac2 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_output_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_output_v1 -> IO ()
+hs_bindgen_a6246c5ade4dcac2 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_d05d999f892efebf_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_a6246c5ade4dcac2_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_output_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_output_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_456d28a36160654a
+  toFunPtr = hs_bindgen_6ca343e73efdd3dd
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_output_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_output_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_d05d999f892efebf
+  fromFunPtr = hs_bindgen_a6246c5ade4dcac2
 
-foreign import ccall safe "wrapper" hs_bindgen_c2d836f04e147683_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_d1e1db004c4a675f_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_seat_v1) -> IO ())@
-hs_bindgen_c2d836f04e147683 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_seat_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_seat_v1) -> IO ()))
-hs_bindgen_c2d836f04e147683 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_seat_v1 -> IO ())@
+hs_bindgen_d1e1db004c4a675f ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_seat_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_seat_v1 -> IO ()))
+hs_bindgen_d1e1db004c4a675f =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_c2d836f04e147683_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_d1e1db004c4a675f_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_e2d69df049f61779_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_9b0e4f9272c4a98c_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_seat_v1) -> IO ())@
-hs_bindgen_e2d69df049f61779 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_seat_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_seat_v1) -> IO ()
-hs_bindgen_e2d69df049f61779 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_seat_v1 -> IO ())@
+hs_bindgen_9b0e4f9272c4a98c ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_seat_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_seat_v1 -> IO ()
+hs_bindgen_9b0e4f9272c4a98c =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_e2d69df049f61779_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_9b0e4f9272c4a98c_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_seat_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_seat_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_c2d836f04e147683
+  toFunPtr = hs_bindgen_d1e1db004c4a675f
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_seat_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_seat_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_e2d69df049f61779
+  fromFunPtr = hs_bindgen_9b0e4f9272c4a98c
 
-foreign import ccall safe "wrapper" hs_bindgen_ae873c4a401722e4_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_fa2c04ab109efab5_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_ae873c4a401722e4 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_ae873c4a401722e4 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_fa2c04ab109efab5 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_fa2c04ab109efab5 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_ae873c4a401722e4_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_fa2c04ab109efab5_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_b8c3af5e78c9b479_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_c8002ee1abdec801_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_b8c3af5e78c9b479 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
-hs_bindgen_b8c3af5e78c9b479 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_c8002ee1abdec801 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()
+hs_bindgen_c8002ee1abdec801 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_b8c3af5e78c9b479_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_c8002ee1abdec801_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_ae873c4a401722e4
+  toFunPtr = hs_bindgen_fa2c04ab109efab5
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_seat_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_seat_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_b8c3af5e78c9b479
+  fromFunPtr = hs_bindgen_c8002ee1abdec801
 
-foreign import ccall safe "wrapper" hs_bindgen_0638ea536e5c819b_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_58f2c83e78f0c696_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_window_v1) -> IO ())@
-hs_bindgen_0638ea536e5c819b ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_window_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_window_v1) -> IO ()))
-hs_bindgen_0638ea536e5c819b =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_window_v1 -> IO ())@
+hs_bindgen_58f2c83e78f0c696 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_window_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_window_v1 -> IO ()))
+hs_bindgen_58f2c83e78f0c696 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_0638ea536e5c819b_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_58f2c83e78f0c696_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_90029d8f7fa5c867_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_68551833bf3d9da9_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_window_v1) -> IO ())@
-hs_bindgen_90029d8f7fa5c867 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_window_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_window_v1) -> IO ()
-hs_bindgen_90029d8f7fa5c867 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_window_v1 -> IO ())@
+hs_bindgen_68551833bf3d9da9 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_window_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_window_v1 -> IO ()
+hs_bindgen_68551833bf3d9da9 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_90029d8f7fa5c867_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_68551833bf3d9da9_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_window_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_window_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_0638ea536e5c819b
+  toFunPtr = hs_bindgen_58f2c83e78f0c696
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (RIP.Ptr River_window_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> RIP.Ptr River_window_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_90029d8f7fa5c867
+  fromFunPtr = hs_bindgen_68551833bf3d9da9
 
-foreign import ccall safe "wrapper" hs_bindgen_385d9996c55e8574_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_f5f945e370353965_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())@
-hs_bindgen_385d9996c55e8574 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
-hs_bindgen_385d9996c55e8574 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())@
+hs_bindgen_f5f945e370353965 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> PtrConst.PtrConst RIP.CChar -> IO ()))
+hs_bindgen_f5f945e370353965 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_385d9996c55e8574_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_f5f945e370353965_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_719e57caf018e0b0_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_96866f818ba69cdd_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())@
-hs_bindgen_719e57caf018e0b0 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ()
-hs_bindgen_719e57caf018e0b0 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())@
+hs_bindgen_96866f818ba69cdd ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> PtrConst.PtrConst RIP.CChar -> IO ()
+hs_bindgen_96866f818ba69cdd =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_719e57caf018e0b0_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_96866f818ba69cdd_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> PtrConst.PtrConst RIP.CChar -> IO ()) where
 
-  toFunPtr = hs_bindgen_385d9996c55e8574
+  toFunPtr = hs_bindgen_f5f945e370353965
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> PtrConst.PtrConst RIP.CChar -> IO ()) where
 
-  fromFunPtr = hs_bindgen_719e57caf018e0b0
+  fromFunPtr = hs_bindgen_96866f818ba69cdd
 
-foreign import ccall safe "wrapper" hs_bindgen_2213b2856c219aff_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_51fd903e88f31233_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_2213b2856c219aff ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-hs_bindgen_2213b2856c219aff =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_51fd903e88f31233 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_51fd903e88f31233 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_2213b2856c219aff_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_51fd903e88f31233_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_8031d9e0e660d3f9_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_7aa966ef59c78c96_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_8031d9e0e660d3f9 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()
-hs_bindgen_8031d9e0e660d3f9 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_7aa966ef59c78c96 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ()
+hs_bindgen_7aa966ef59c78c96 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_8031d9e0e660d3f9_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_7aa966ef59c78c96_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_2213b2856c219aff
+  toFunPtr = hs_bindgen_51fd903e88f31233
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_8031d9e0e660d3f9
+  fromFunPtr = hs_bindgen_7aa966ef59c78c96
 
-foreign import ccall safe "wrapper" hs_bindgen_1c4fa8f07142c9bd_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_54aec8c295ec65db_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> RIP.Int32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_1c4fa8f07142c9bd ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-hs_bindgen_1c4fa8f07142c9bd =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_54aec8c295ec65db ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_54aec8c295ec65db =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_1c4fa8f07142c9bd_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_54aec8c295ec65db_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_3fc58390d1a70680_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_943be9856648ab1b_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> RIP.Int32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_3fc58390d1a70680 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()
-hs_bindgen_3fc58390d1a70680 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_943be9856648ab1b ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()
+hs_bindgen_943be9856648ab1b =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_3fc58390d1a70680_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_943be9856648ab1b_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_1c4fa8f07142c9bd
+  toFunPtr = hs_bindgen_54aec8c295ec65db
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_3fc58390d1a70680
+  fromFunPtr = hs_bindgen_943be9856648ab1b
 
-foreign import ccall safe "wrapper" hs_bindgen_366a03853a7d0011_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_b8b320dd689576a5_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_366a03853a7d0011 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-hs_bindgen_366a03853a7d0011 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_b8b320dd689576a5 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_b8b320dd689576a5 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_366a03853a7d0011_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_b8b320dd689576a5_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_eb227ab5b0639f04_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_77b3ddf8602deebf_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_eb227ab5b0639f04 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()
-hs_bindgen_eb227ab5b0639f04 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_77b3ddf8602deebf ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()
+hs_bindgen_77b3ddf8602deebf =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_eb227ab5b0639f04_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_77b3ddf8602deebf_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_366a03853a7d0011
+  toFunPtr = hs_bindgen_b8b320dd689576a5
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_eb227ab5b0639f04
+  fromFunPtr = hs_bindgen_77b3ddf8602deebf
 
-foreign import ccall safe "wrapper" hs_bindgen_11c315a2e81161a4_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_3e0e0e43f2187c84_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_11c315a2e81161a4 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_11c315a2e81161a4 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_3e0e0e43f2187c84 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_3e0e0e43f2187c84 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_11c315a2e81161a4_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_3e0e0e43f2187c84_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_e36088b8a98e1866_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_e6653d642de6b159_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_e36088b8a98e1866 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
-hs_bindgen_e36088b8a98e1866 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_e6653d642de6b159 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()
+hs_bindgen_e6653d642de6b159 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_e36088b8a98e1866_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_e6653d642de6b159_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_11c315a2e81161a4
+  toFunPtr = hs_bindgen_3e0e0e43f2187c84
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_window_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_window_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_e36088b8a98e1866
+  fromFunPtr = hs_bindgen_e6653d642de6b159

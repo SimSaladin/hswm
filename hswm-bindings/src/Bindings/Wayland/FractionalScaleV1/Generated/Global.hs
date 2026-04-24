@@ -39,29 +39,13 @@ hs_bindgen_91b0843e75e35b8e =
   RIP.fromFFIType hs_bindgen_91b0843e75e35b8e_base
 
 {-# NOINLINE hs_bindgen_42d906124f7ce49c #-}
-{-|
+{-| __C declaration:__ @wp_fractional_scale_manager_v1_interface@
 
-  > page_iface_wp_fractional_scale_manager_v1 wp_fractional_scale_manager_v1
+    __defined at:__ @fractional-scale-v1-client-protocol.h 86:34@
 
-  > page_iface_wp_fractional_scale_manager_v1_desc Description
+    __exported by:__ @fractional-scale-v1-client-protocol.h@
 
-  A global interface for requesting surfaces to use fractional scales.
-
-  > page_iface_wp_fractional_scale_manager_v1_api API
-
-  See @iface_wp_fractional_scale_manager_v1@ .
-
-  > iface_wp_fractional_scale_manager_v1 The wp_fractional_scale_manager_v1 interface
-
-  A global interface for requesting surfaces to use fractional scales.
-
-__C declaration:__ @wp_fractional_scale_manager_v1_interface@
-
-__defined at:__ @fractional-scale-v1-client-protocol.h 86:34@
-
-__exported by:__ @fractional-scale-v1-client-protocol.h@
-
-__unique:__ @Bindings_Wayland_FractionalScaleV1_Generated_Bindings.Wayland.FractionalScaleV1.Generated_wp_fractional_scale_manager_v1_interface@
+    __unique:__ @Bindings_Wayland_FractionalScaleV1_Generated_Bindings.Wayland.FractionalScaleV1.Generated_wp_fractional_scale_manager_v1_interface@
 -}
 hs_bindgen_42d906124f7ce49c :: PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
 hs_bindgen_42d906124f7ce49c =
@@ -82,29 +66,13 @@ hs_bindgen_91b1d88bffe3ee24 =
   RIP.fromFFIType hs_bindgen_91b1d88bffe3ee24_base
 
 {-# NOINLINE hs_bindgen_d4e9f9c612725922 #-}
-{-|
+{-| __C declaration:__ @wp_fractional_scale_v1_interface@
 
-  > page_iface_wp_fractional_scale_v1 wp_fractional_scale_v1
+    __defined at:__ @fractional-scale-v1-client-protocol.h 105:34@
 
-  > page_iface_wp_fractional_scale_v1_desc Description
+    __exported by:__ @fractional-scale-v1-client-protocol.h@
 
-  An additional interface to a wl_surface object which allows the compositor to inform the client of the preferred scale.
-
-  > page_iface_wp_fractional_scale_v1_api API
-
-  See @iface_wp_fractional_scale_v1@ .
-
-  > iface_wp_fractional_scale_v1 The wp_fractional_scale_v1 interface
-
-  An additional interface to a wl_surface object which allows the compositor to inform the client of the preferred scale.
-
-__C declaration:__ @wp_fractional_scale_v1_interface@
-
-__defined at:__ @fractional-scale-v1-client-protocol.h 105:34@
-
-__exported by:__ @fractional-scale-v1-client-protocol.h@
-
-__unique:__ @Bindings_Wayland_FractionalScaleV1_Generated_Bindings.Wayland.FractionalScaleV1.Generated_wp_fractional_scale_v1_interface@
+    __unique:__ @Bindings_Wayland_FractionalScaleV1_Generated_Bindings.Wayland.FractionalScaleV1.Generated_wp_fractional_scale_v1_interface@
 -}
 hs_bindgen_d4e9f9c612725922 :: PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
 hs_bindgen_d4e9f9c612725922 =

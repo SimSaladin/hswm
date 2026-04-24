@@ -214,15 +214,11 @@ hs_bindgen_15a16c4a14e0de0b ::
 hs_bindgen_15a16c4a14e0de0b =
   RIP.fromFFIType hs_bindgen_15a16c4a14e0de0b_base
 
-{-|
+{-| __C declaration:__ @river_xkb_config_v1_add_listener@
 
-  > iface_river_xkb_config_v1
+    __defined at:__ @river-xkb-config-v1-client-protocol.h 174:1@
 
-__C declaration:__ @river_xkb_config_v1_add_listener@
-
-__defined at:__ @river-xkb-config-v1-client-protocol.h 174:1@
-
-__exported by:__ @river-xkb-config-v1-client-protocol.h@
+    __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_config_v1_add_listener ::
      RIP.Ptr River_xkb_config_v1
@@ -249,15 +245,11 @@ hs_bindgen_de09761b7f94c262 ::
 hs_bindgen_de09761b7f94c262 =
   RIP.fromFFIType hs_bindgen_de09761b7f94c262_base
 
-{-|
+{-| __C declaration:__ @river_xkb_config_v1_set_user_data@
 
-  > iface_river_xkb_config_v1
+    __defined at:__ @river-xkb-config-v1-client-protocol.h 209:1@
 
-__C declaration:__ @river_xkb_config_v1_set_user_data@
-
-__defined at:__ @river-xkb-config-v1-client-protocol.h 209:1@
-
-__exported by:__ @river-xkb-config-v1-client-protocol.h@
+    __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_config_v1_set_user_data ::
      RIP.Ptr River_xkb_config_v1
@@ -280,15 +272,11 @@ hs_bindgen_5eaca3e2ccb4fada ::
 hs_bindgen_5eaca3e2ccb4fada =
   RIP.fromFFIType hs_bindgen_5eaca3e2ccb4fada_base
 
-{-|
+{-| __C declaration:__ @river_xkb_config_v1_get_user_data@
 
-  > iface_river_xkb_config_v1
+    __defined at:__ @river-xkb-config-v1-client-protocol.h 216:1@
 
-__C declaration:__ @river_xkb_config_v1_get_user_data@
-
-__defined at:__ @river-xkb-config-v1-client-protocol.h 216:1@
-
-__exported by:__ @river-xkb-config-v1-client-protocol.h@
+    __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_config_v1_get_user_data ::
      RIP.Ptr River_xkb_config_v1
@@ -334,19 +322,15 @@ hs_bindgen_663cdcc7bf35e50b ::
 hs_bindgen_663cdcc7bf35e50b =
   RIP.fromFFIType hs_bindgen_663cdcc7bf35e50b_base
 
-{-|
+{-| This request indicates that the client no longer wishes to receive events on this object.
 
-  > iface_river_xkb_config_v1
+    The Wayland protocol is asynchronous, which means the server may send further events until the stop request is processed. The client must wait for a river_xkb_config_v1.finished event before destroying this object.
 
-  This request indicates that the client no longer wishes to receive events on this object.
+    __C declaration:__ @river_xkb_config_v1_stop@
 
-  The Wayland protocol is asynchronous, which means the server may send further events until the stop request is processed. The client must wait for a river_xkb_config_v1.finished event before destroying this object.
+    __defined at:__ @river-xkb-config-v1-client-protocol.h 238:1@
 
-__C declaration:__ @river_xkb_config_v1_stop@
-
-__defined at:__ @river-xkb-config-v1-client-protocol.h 238:1@
-
-__exported by:__ @river-xkb-config-v1-client-protocol.h@
+    __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_config_v1_stop ::
      RIP.Ptr River_xkb_config_v1
@@ -367,21 +351,17 @@ hs_bindgen_410009db7c619dc4 ::
 hs_bindgen_410009db7c619dc4 =
   RIP.fromFFIType hs_bindgen_410009db7c619dc4_base
 
-{-|
+{-| This request should be called after the finished event has been received to complete destruction of the object.
 
-  > iface_river_xkb_config_v1
+    It is a protocol error to make this request before the finished event has been received.
 
-  This request should be called after the finished event has been received to complete destruction of the object.
+    If a client wishes to destroy this object it should send a river_xkb_config_v1.stop request and wait for a river_xkb_config_v1.finished event. Once the finished event is received it is safe to destroy this object and any other objects created through this interface.
 
-  It is a protocol error to make this request before the finished event has been received.
+    __C declaration:__ @river_xkb_config_v1_destroy@
 
-  If a client wishes to destroy this object it should send a river_xkb_config_v1.stop request and wait for a river_xkb_config_v1.finished event. Once the finished event is received it is safe to destroy this object and any other objects created through this interface.
+    __defined at:__ @river-xkb-config-v1-client-protocol.h 260:1@
 
-__C declaration:__ @river_xkb_config_v1_destroy@
-
-__defined at:__ @river-xkb-config-v1-client-protocol.h 260:1@
-
-__exported by:__ @river-xkb-config-v1-client-protocol.h@
+    __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_config_v1_destroy ::
      RIP.Ptr River_xkb_config_v1
@@ -406,17 +386,13 @@ hs_bindgen_2a6f5be62c52a1bb ::
 hs_bindgen_2a6f5be62c52a1bb =
   RIP.fromFFIType hs_bindgen_2a6f5be62c52a1bb_base
 
-{-|
+{-| The server must be able to mmap the fd with MAP_PRIVATE. The server will fstat the fd to obtain the size of the keymap. The client must not modify the contents of the fd after making this request. The client should seal the fd with fcntl.
 
-  > iface_river_xkb_config_v1
+    __C declaration:__ @river_xkb_config_v1_create_keymap@
 
-  The server must be able to mmap the fd with MAP_PRIVATE. The server will fstat the fd to obtain the size of the keymap. The client must not modify the contents of the fd after making this request. The client should seal the fd with fcntl.
+    __defined at:__ @river-xkb-config-v1-client-protocol.h 275:1@
 
-__C declaration:__ @river_xkb_config_v1_create_keymap@
-
-__defined at:__ @river-xkb-config-v1-client-protocol.h 275:1@
-
-__exported by:__ @river-xkb-config-v1-client-protocol.h@
+    __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_config_v1_create_keymap ::
      RIP.Ptr River_xkb_config_v1
@@ -445,15 +421,11 @@ hs_bindgen_96faee094cd7a25f ::
 hs_bindgen_96faee094cd7a25f =
   RIP.fromFFIType hs_bindgen_96faee094cd7a25f_base
 
-{-|
+{-| __C declaration:__ @river_xkb_keymap_v1_add_listener@
 
-  > iface_river_xkb_keymap_v1
+    __defined at:__ @river-xkb-config-v1-client-protocol.h 316:1@
 
-__C declaration:__ @river_xkb_keymap_v1_add_listener@
-
-__defined at:__ @river-xkb-config-v1-client-protocol.h 316:1@
-
-__exported by:__ @river-xkb-config-v1-client-protocol.h@
+    __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keymap_v1_add_listener ::
      RIP.Ptr River_xkb_keymap_v1
@@ -480,15 +452,11 @@ hs_bindgen_2364e109ba6eea89 ::
 hs_bindgen_2364e109ba6eea89 =
   RIP.fromFFIType hs_bindgen_2364e109ba6eea89_base
 
-{-|
+{-| __C declaration:__ @river_xkb_keymap_v1_set_user_data@
 
-  > iface_river_xkb_keymap_v1
+    __defined at:__ @river-xkb-config-v1-client-protocol.h 341:1@
 
-__C declaration:__ @river_xkb_keymap_v1_set_user_data@
-
-__defined at:__ @river-xkb-config-v1-client-protocol.h 341:1@
-
-__exported by:__ @river-xkb-config-v1-client-protocol.h@
+    __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keymap_v1_set_user_data ::
      RIP.Ptr River_xkb_keymap_v1
@@ -511,15 +479,11 @@ hs_bindgen_89c351477b981cb7 ::
 hs_bindgen_89c351477b981cb7 =
   RIP.fromFFIType hs_bindgen_89c351477b981cb7_base
 
-{-|
+{-| __C declaration:__ @river_xkb_keymap_v1_get_user_data@
 
-  > iface_river_xkb_keymap_v1
+    __defined at:__ @river-xkb-config-v1-client-protocol.h 348:1@
 
-__C declaration:__ @river_xkb_keymap_v1_get_user_data@
-
-__defined at:__ @river-xkb-config-v1-client-protocol.h 348:1@
-
-__exported by:__ @river-xkb-config-v1-client-protocol.h@
+    __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keymap_v1_get_user_data ::
      RIP.Ptr River_xkb_keymap_v1
@@ -565,17 +529,13 @@ hs_bindgen_73355f179233757f ::
 hs_bindgen_73355f179233757f =
   RIP.fromFFIType hs_bindgen_73355f179233757f_base
 
-{-|
+{-| This request indicates that the client will no longer use the keymap object and that it may be safely destroyed.
 
-  > iface_river_xkb_keymap_v1
+    __C declaration:__ @river_xkb_keymap_v1_destroy@
 
-  This request indicates that the client will no longer use the keymap object and that it may be safely destroyed.
+    __defined at:__ @river-xkb-config-v1-client-protocol.h 366:1@
 
-__C declaration:__ @river_xkb_keymap_v1_destroy@
-
-__defined at:__ @river-xkb-config-v1-client-protocol.h 366:1@
-
-__exported by:__ @river-xkb-config-v1-client-protocol.h@
+    __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keymap_v1_destroy ::
      RIP.Ptr River_xkb_keymap_v1
@@ -600,15 +560,11 @@ hs_bindgen_761aa8674990bdde ::
 hs_bindgen_761aa8674990bdde =
   RIP.fromFFIType hs_bindgen_761aa8674990bdde_base
 
-{-|
+{-| __C declaration:__ @river_xkb_keyboard_v1_add_listener@
 
-  > iface_river_xkb_keyboard_v1
+    __defined at:__ @river-xkb-config-v1-client-protocol.h 466:1@
 
-__C declaration:__ @river_xkb_keyboard_v1_add_listener@
-
-__defined at:__ @river-xkb-config-v1-client-protocol.h 466:1@
-
-__exported by:__ @river-xkb-config-v1-client-protocol.h@
+    __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keyboard_v1_add_listener ::
      RIP.Ptr River_xkb_keyboard_v1
@@ -635,15 +591,11 @@ hs_bindgen_87f1ddd55a41f01d ::
 hs_bindgen_87f1ddd55a41f01d =
   RIP.fromFFIType hs_bindgen_87f1ddd55a41f01d_base
 
-{-|
+{-| __C declaration:__ @river_xkb_keyboard_v1_set_user_data@
 
-  > iface_river_xkb_keyboard_v1
+    __defined at:__ @river-xkb-config-v1-client-protocol.h 546:1@
 
-__C declaration:__ @river_xkb_keyboard_v1_set_user_data@
-
-__defined at:__ @river-xkb-config-v1-client-protocol.h 546:1@
-
-__exported by:__ @river-xkb-config-v1-client-protocol.h@
+    __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keyboard_v1_set_user_data ::
      RIP.Ptr River_xkb_keyboard_v1
@@ -666,15 +618,11 @@ hs_bindgen_e3d26ba007cc7d86 ::
 hs_bindgen_e3d26ba007cc7d86 =
   RIP.fromFFIType hs_bindgen_e3d26ba007cc7d86_base
 
-{-|
+{-| __C declaration:__ @river_xkb_keyboard_v1_get_user_data@
 
-  > iface_river_xkb_keyboard_v1
+    __defined at:__ @river-xkb-config-v1-client-protocol.h 553:1@
 
-__C declaration:__ @river_xkb_keyboard_v1_get_user_data@
-
-__defined at:__ @river-xkb-config-v1-client-protocol.h 553:1@
-
-__exported by:__ @river-xkb-config-v1-client-protocol.h@
+    __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keyboard_v1_get_user_data ::
      RIP.Ptr River_xkb_keyboard_v1
@@ -720,17 +668,13 @@ hs_bindgen_7e83e5c11fbba2f5 ::
 hs_bindgen_7e83e5c11fbba2f5 =
   RIP.fromFFIType hs_bindgen_7e83e5c11fbba2f5_base
 
-{-|
+{-| This request indicates that the client will no longer use the keyboard object and that it may be safely destroyed.
 
-  > iface_river_xkb_keyboard_v1
+    __C declaration:__ @river_xkb_keyboard_v1_destroy@
 
-  This request indicates that the client will no longer use the keyboard object and that it may be safely destroyed.
+    __defined at:__ @river-xkb-config-v1-client-protocol.h 571:1@
 
-__C declaration:__ @river_xkb_keyboard_v1_destroy@
-
-__defined at:__ @river-xkb-config-v1-client-protocol.h 571:1@
-
-__exported by:__ @river-xkb-config-v1-client-protocol.h@
+    __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keyboard_v1_destroy ::
      RIP.Ptr River_xkb_keyboard_v1
@@ -753,19 +697,15 @@ hs_bindgen_46894b8e892c7568 ::
 hs_bindgen_46894b8e892c7568 =
   RIP.fromFFIType hs_bindgen_46894b8e892c7568_base
 
-{-|
+{-| Set the keymap for the keyboard.
 
-  > iface_river_xkb_keyboard_v1
+    It is a protocol error to pass a keymap object for which the river_xkb_keymap_v1.success event was not received.
 
-  Set the keymap for the keyboard.
+    __C declaration:__ @river_xkb_keyboard_v1_set_keymap@
 
-  It is a protocol error to pass a keymap object for which the river_xkb_keymap_v1.success event was not received.
+    __defined at:__ @river-xkb-config-v1-client-protocol.h 586:1@
 
-__C declaration:__ @river_xkb_keyboard_v1_set_keymap@
-
-__defined at:__ @river-xkb-config-v1-client-protocol.h 586:1@
-
-__exported by:__ @river-xkb-config-v1-client-protocol.h@
+    __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keyboard_v1_set_keymap ::
      RIP.Ptr River_xkb_keyboard_v1
@@ -790,17 +730,13 @@ hs_bindgen_6c828294eb0311b8 ::
 hs_bindgen_6c828294eb0311b8 =
   RIP.fromFFIType hs_bindgen_6c828294eb0311b8_base
 
-{-|
+{-| Set the active layout for the keyboard's keymap. Has no effect if the layout index is out of bounds for the current keymap.
 
-  > iface_river_xkb_keyboard_v1
+    __C declaration:__ @river_xkb_keyboard_v1_set_layout_by_index@
 
-  Set the active layout for the keyboard's keymap. Has no effect if the layout index is out of bounds for the current keymap.
+    __defined at:__ @river-xkb-config-v1-client-protocol.h 599:1@
 
-__C declaration:__ @river_xkb_keyboard_v1_set_layout_by_index@
-
-__defined at:__ @river-xkb-config-v1-client-protocol.h 599:1@
-
-__exported by:__ @river-xkb-config-v1-client-protocol.h@
+    __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keyboard_v1_set_layout_by_index ::
      RIP.Ptr River_xkb_keyboard_v1
@@ -825,17 +761,13 @@ hs_bindgen_205ec276daa5040f ::
 hs_bindgen_205ec276daa5040f =
   RIP.fromFFIType hs_bindgen_205ec276daa5040f_base
 
-{-|
+{-| Set the active layout for the keyboard's keymap. Has no effect if there is no layout with the give name for the keyboard's keymap.
 
-  > iface_river_xkb_keyboard_v1
+    __C declaration:__ @river_xkb_keyboard_v1_set_layout_by_name@
 
-  Set the active layout for the keyboard's keymap. Has no effect if there is no layout with the give name for the keyboard's keymap.
+    __defined at:__ @river-xkb-config-v1-client-protocol.h 612:1@
 
-__C declaration:__ @river_xkb_keyboard_v1_set_layout_by_name@
-
-__defined at:__ @river-xkb-config-v1-client-protocol.h 612:1@
-
-__exported by:__ @river-xkb-config-v1-client-protocol.h@
+    __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keyboard_v1_set_layout_by_name ::
      RIP.Ptr River_xkb_keyboard_v1
@@ -858,17 +790,13 @@ hs_bindgen_6eec062289ff76d9 ::
 hs_bindgen_6eec062289ff76d9 =
   RIP.fromFFIType hs_bindgen_6eec062289ff76d9_base
 
-{-|
+{-| Enable capslock for the keyboard.
 
-  > iface_river_xkb_keyboard_v1
+    __C declaration:__ @river_xkb_keyboard_v1_capslock_enable@
 
-  Enable capslock for the keyboard.
+    __defined at:__ @river-xkb-config-v1-client-protocol.h 624:1@
 
-__C declaration:__ @river_xkb_keyboard_v1_capslock_enable@
-
-__defined at:__ @river-xkb-config-v1-client-protocol.h 624:1@
-
-__exported by:__ @river-xkb-config-v1-client-protocol.h@
+    __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keyboard_v1_capslock_enable ::
      RIP.Ptr River_xkb_keyboard_v1
@@ -889,17 +817,13 @@ hs_bindgen_ae0093b22b54ef8e ::
 hs_bindgen_ae0093b22b54ef8e =
   RIP.fromFFIType hs_bindgen_ae0093b22b54ef8e_base
 
-{-|
+{-| Disable capslock for the keyboard.
 
-  > iface_river_xkb_keyboard_v1
+    __C declaration:__ @river_xkb_keyboard_v1_capslock_disable@
 
-  Disable capslock for the keyboard.
+    __defined at:__ @river-xkb-config-v1-client-protocol.h 636:1@
 
-__C declaration:__ @river_xkb_keyboard_v1_capslock_disable@
-
-__defined at:__ @river-xkb-config-v1-client-protocol.h 636:1@
-
-__exported by:__ @river-xkb-config-v1-client-protocol.h@
+    __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keyboard_v1_capslock_disable ::
      RIP.Ptr River_xkb_keyboard_v1
@@ -920,17 +844,13 @@ hs_bindgen_e1f1ab2b658cb252 ::
 hs_bindgen_e1f1ab2b658cb252 =
   RIP.fromFFIType hs_bindgen_e1f1ab2b658cb252_base
 
-{-|
+{-| Enable numlock for the keyboard.
 
-  > iface_river_xkb_keyboard_v1
+    __C declaration:__ @river_xkb_keyboard_v1_numlock_enable@
 
-  Enable numlock for the keyboard.
+    __defined at:__ @river-xkb-config-v1-client-protocol.h 648:1@
 
-__C declaration:__ @river_xkb_keyboard_v1_numlock_enable@
-
-__defined at:__ @river-xkb-config-v1-client-protocol.h 648:1@
-
-__exported by:__ @river-xkb-config-v1-client-protocol.h@
+    __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keyboard_v1_numlock_enable ::
      RIP.Ptr River_xkb_keyboard_v1
@@ -951,17 +871,13 @@ hs_bindgen_8570053e543a67fa ::
 hs_bindgen_8570053e543a67fa =
   RIP.fromFFIType hs_bindgen_8570053e543a67fa_base
 
-{-|
+{-| Disable numlock for the keyboard.
 
-  > iface_river_xkb_keyboard_v1
+    __C declaration:__ @river_xkb_keyboard_v1_numlock_disable@
 
-  Disable numlock for the keyboard.
+    __defined at:__ @river-xkb-config-v1-client-protocol.h 660:1@
 
-__C declaration:__ @river_xkb_keyboard_v1_numlock_disable@
-
-__defined at:__ @river-xkb-config-v1-client-protocol.h 660:1@
-
-__exported by:__ @river-xkb-config-v1-client-protocol.h@
+    __exported by:__ @river-xkb-config-v1-client-protocol.h@
 -}
 river_xkb_keyboard_v1_numlock_disable ::
      RIP.Ptr River_xkb_keyboard_v1

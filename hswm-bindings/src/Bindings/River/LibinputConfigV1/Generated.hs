@@ -7,6 +7,7 @@
 {-# LANGUAGE EmptyDataDecls #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MagicHash #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -347,7 +348,7 @@ instance Read River_libinput_config_v1_error where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_libinput_config_v1_error) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -359,62 +360,52 @@ instance HasCField.HasCField River_libinput_config_v1_error "unwrap" where
 
   offset# = \_ -> \_ -> 0
 
-{-| invalid enum value or similar
+{-| __C declaration:__ @RIVER_LIBINPUT_CONFIG_V1_ERROR_INVALID_ARG@
 
-__C declaration:__ @RIVER_LIBINPUT_CONFIG_V1_ERROR_INVALID_ARG@
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 163:2@
 
-__defined at:__ @river-libinput-config-v1-client-protocol.h 163:2@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 pattern RIVER_LIBINPUT_CONFIG_V1_ERROR_INVALID_ARG :: River_libinput_config_v1_error
 pattern RIVER_LIBINPUT_CONFIG_V1_ERROR_INVALID_ARG = River_libinput_config_v1_error 0
 
-{-| invalid enum value or similar
+{-| __C declaration:__ @RIVER_LIBINPUT_CONFIG_V1_ERROR_INVALID_DESTROY@
 
-__C declaration:__ @RIVER_LIBINPUT_CONFIG_V1_ERROR_INVALID_DESTROY@
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 164:2@
 
-__defined at:__ @river-libinput-config-v1-client-protocol.h 164:2@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 pattern RIVER_LIBINPUT_CONFIG_V1_ERROR_INVALID_DESTROY :: River_libinput_config_v1_error
 pattern RIVER_LIBINPUT_CONFIG_V1_ERROR_INVALID_DESTROY = River_libinput_config_v1_error 1
 
-{-|
+{-| __C declaration:__ @struct river_libinput_config_v1_listener@
 
-  > iface_river_libinput_config_v1
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 172:8@
 
-  > river_libinput_config_v1_listener
-
-__C declaration:__ @struct river_libinput_config_v1_listener@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 172:8@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 data River_libinput_config_v1_listener = River_libinput_config_v1_listener
-  { finished :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_config_v1) -> IO ())
+  { finished :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_config_v1 -> IO ())
     {- ^ the server has finished with the object
 
-       This event indicates that the server will send no further events on this object. The client should destroy the object. See river_libinput_config_v1.destroy for more information.
+         This event indicates that the server will send no further events on this object. The client should destroy the object. See river_libinput_config_v1.destroy for more information.
 
-    __C declaration:__ @finished@
+         __C declaration:__ @finished@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 180:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 180:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , libinput_device :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_config_v1) -> (RIP.Ptr River_libinput_device_v1) -> IO ())
+  , libinput_device :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_config_v1 -> RIP.Ptr River_libinput_device_v1 -> IO ())
     {- ^ new libinput device
 
-       A new libinput device has been created. Not every river_input_device_v1 is necessarily a libinput device as well.
+         A new libinput device has been created. Not every river_input_device_v1 is necessarily a libinput device as well.
 
-    __C declaration:__ @libinput_device@
+         __C declaration:__ @libinput_device@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 188:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 188:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
   }
   deriving stock (Eq, RIP.Generic, Show)
@@ -448,11 +439,11 @@ deriving via Marshal.EquivStorable River_libinput_config_v1_listener instance RI
 instance HasCField.HasCField River_libinput_config_v1_listener "finished" where
 
   type CFieldType River_libinput_config_v1_listener "finished" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_config_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_config_v1 -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_config_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_config_v1 -> IO ())
          ) => RIP.HasField "finished" (RIP.Ptr River_libinput_config_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"finished")
@@ -460,11 +451,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_c
 instance HasCField.HasCField River_libinput_config_v1_listener "libinput_device" where
 
   type CFieldType River_libinput_config_v1_listener "libinput_device" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_config_v1) -> (RIP.Ptr River_libinput_device_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_config_v1 -> RIP.Ptr River_libinput_device_v1 -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_config_v1) -> (RIP.Ptr River_libinput_device_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_config_v1 -> RIP.Ptr River_libinput_device_v1 -> IO ())
          ) => RIP.HasField "libinput_device" (RIP.Ptr River_libinput_config_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -629,7 +620,7 @@ instance Read River_libinput_device_v1_error where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_libinput_device_v1_error) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -641,13 +632,11 @@ instance HasCField.HasCField River_libinput_device_v1_error "unwrap" where
 
   offset# = \_ -> \_ -> 0
 
-{-| invalid enum value or similar
+{-| __C declaration:__ @RIVER_LIBINPUT_DEVICE_V1_ERROR_INVALID_ARG@
 
-__C declaration:__ @RIVER_LIBINPUT_DEVICE_V1_ERROR_INVALID_ARG@
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 313:2@
 
-__defined at:__ @river-libinput-config-v1-client-protocol.h 313:2@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 pattern RIVER_LIBINPUT_DEVICE_V1_ERROR_INVALID_ARG :: River_libinput_device_v1_error
 pattern RIVER_LIBINPUT_DEVICE_V1_ERROR_INVALID_ARG = River_libinput_device_v1_error 0
@@ -738,7 +727,7 @@ instance Read River_libinput_device_v1_send_events_modes where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_libinput_device_v1_send_events_modes) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -860,7 +849,7 @@ instance Read River_libinput_device_v1_tap_state where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_libinput_device_v1_tap_state) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -973,7 +962,7 @@ instance Read River_libinput_device_v1_tap_button_map where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_libinput_device_v1_tap_button_map) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -985,24 +974,20 @@ instance HasCField.HasCField River_libinput_device_v1_tap_button_map "unwrap" wh
 
   offset# = \_ -> \_ -> 0
 
-{-| 1/2/3 finger tap maps to left/right/middle
+{-| __C declaration:__ @RIVER_LIBINPUT_DEVICE_V1_TAP_BUTTON_MAP_LRM@
 
-__C declaration:__ @RIVER_LIBINPUT_DEVICE_V1_TAP_BUTTON_MAP_LRM@
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 340:2@
 
-__defined at:__ @river-libinput-config-v1-client-protocol.h 340:2@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 pattern RIVER_LIBINPUT_DEVICE_V1_TAP_BUTTON_MAP_LRM :: River_libinput_device_v1_tap_button_map
 pattern RIVER_LIBINPUT_DEVICE_V1_TAP_BUTTON_MAP_LRM = River_libinput_device_v1_tap_button_map 0
 
-{-| 1/2/3 finger tap maps to left/middle/right
+{-| __C declaration:__ @RIVER_LIBINPUT_DEVICE_V1_TAP_BUTTON_MAP_LMR@
 
-__C declaration:__ @RIVER_LIBINPUT_DEVICE_V1_TAP_BUTTON_MAP_LMR@
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 344:2@
 
-__defined at:__ @river-libinput-config-v1-client-protocol.h 344:2@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 pattern RIVER_LIBINPUT_DEVICE_V1_TAP_BUTTON_MAP_LMR :: River_libinput_device_v1_tap_button_map
 pattern RIVER_LIBINPUT_DEVICE_V1_TAP_BUTTON_MAP_LMR = River_libinput_device_v1_tap_button_map 1
@@ -1090,7 +1075,7 @@ instance Read River_libinput_device_v1_drag_state where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_libinput_device_v1_drag_state) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -1204,7 +1189,7 @@ instance Read River_libinput_device_v1_drag_lock_state where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_libinput_device_v1_drag_lock_state) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -1332,7 +1317,7 @@ instance Read River_libinput_device_v1_three_finger_drag_state where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_libinput_device_v1_three_finger_drag_state) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -1444,7 +1429,7 @@ instance Read River_libinput_device_v1_accel_profile where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_libinput_device_v1_accel_profile) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -1565,7 +1550,7 @@ instance Read River_libinput_device_v1_accel_profiles where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_libinput_device_v1_accel_profiles) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -1697,7 +1682,7 @@ instance Read River_libinput_device_v1_natural_scroll_state where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_libinput_device_v1_natural_scroll_state) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -1810,7 +1795,7 @@ instance Read River_libinput_device_v1_left_handed_state where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_libinput_device_v1_left_handed_state) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -1924,7 +1909,7 @@ instance Read River_libinput_device_v1_click_method where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_libinput_device_v1_click_method) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -2047,7 +2032,7 @@ instance Read River_libinput_device_v1_click_methods where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_libinput_device_v1_click_methods) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -2170,7 +2155,7 @@ instance Read River_libinput_device_v1_clickfinger_button_map where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_libinput_device_v1_clickfinger_button_map) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -2284,7 +2269,7 @@ instance Read River_libinput_device_v1_middle_emulation_state where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_libinput_device_v1_middle_emulation_state) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -2387,7 +2372,7 @@ instance Read River_libinput_device_v1_scroll_method where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_libinput_device_v1_scroll_method) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -2508,7 +2493,7 @@ instance Read River_libinput_device_v1_scroll_methods where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_libinput_device_v1_scroll_methods) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -2640,7 +2625,7 @@ instance Read River_libinput_device_v1_scroll_button_lock_state where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_libinput_device_v1_scroll_button_lock_state) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -2753,7 +2738,7 @@ instance Read River_libinput_device_v1_dwt_state where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_libinput_device_v1_dwt_state) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -2866,7 +2851,7 @@ instance Read River_libinput_device_v1_dwtp_state where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_libinput_device_v1_dwtp_state) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -2896,647 +2881,641 @@ pattern RIVER_LIBINPUT_DEVICE_V1_DWTP_STATE_DISABLED = River_libinput_device_v1_
 pattern RIVER_LIBINPUT_DEVICE_V1_DWTP_STATE_ENABLED :: River_libinput_device_v1_dwtp_state
 pattern RIVER_LIBINPUT_DEVICE_V1_DWTP_STATE_ENABLED = River_libinput_device_v1_dwtp_state 1
 
-{-|
+{-| __C declaration:__ @struct river_libinput_device_v1_listener@
 
-  > iface_river_libinput_device_v1
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 492:8@
 
-  > river_libinput_device_v1_listener
-
-__C declaration:__ @struct river_libinput_device_v1_listener@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 492:8@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 data River_libinput_device_v1_listener = River_libinput_device_v1_listener
-  { removed :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> IO ())
+  { removed :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> IO ())
     {- ^ the libinput device is removed
 
-       This event indicates that the libinput device has been removed.
+         This event indicates that the libinput device has been removed.
 
-       The server will send no further events on this object and ignore any request (other than river_libinput_device_v1.destroy) made after this event is sent. The client should destroy this object with the river_libinput_device_v1.destroy request to free up resources.
+         The server will send no further events on this object and ignore any request (other than river_libinput_device_v1.destroy) made after this event is sent. The client should destroy this object with the river_libinput_device_v1.destroy request to free up resources.
 
-    __C declaration:__ @removed@
+         __C declaration:__ @removed@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 505:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 505:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , input_device :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.River.InputManagementV1.Generated.River_input_device_v1) -> IO ())
+  , input_device :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.River.InputManagementV1.Generated.River_input_device_v1 -> IO ())
     {- ^ corresponding river input device
 
-       The river_input_device_v1 corresponding to this libinput device. This event will always be the first event sent on the river_libinput_device_v1 object, and it will be sent exactly once.
+         The river_input_device_v1 corresponding to this libinput device. This event will always be the first event sent on the river_libinput_device_v1 object, and it will be sent exactly once.
 
-    __C declaration:__ @input_device@
+         __C declaration:__ @input_device@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 515:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 515:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , send_events_support :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , send_events_support :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ supported send events modes
 
-       Supported send events modes.
+         Supported send events modes.
 
-    __C declaration:__ @send_events_support@
+         __C declaration:__ @send_events_support@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 523:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 523:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , send_events_default :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , send_events_default :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ default send events mode
 
-       Default send events mode.
+         Default send events mode.
 
-    __C declaration:__ @send_events_default@
+         __C declaration:__ @send_events_default@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 531:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 531:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , send_events_current :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , send_events_current :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ current send events mode
 
-       Current send events mode.
+         Current send events mode.
 
-    __C declaration:__ @send_events_current@
+         __C declaration:__ @send_events_current@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 539:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 539:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , tap_support :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , tap_support :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ tap-to-click/drag support
 
-       The number of fingers supported for tap-to-click/drag. If finger_count is 0, tap-to-click and drag are unsupported.
+         The number of fingers supported for tap-to-click/drag. If finger_count is 0, tap-to-click and drag are unsupported.
 
-    __C declaration:__ @tap_support@
+         __C declaration:__ @tap_support@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 548:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 548:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , tap_default :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , tap_default :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ default tap-to-click state
 
-       Default tap-to-click state.
+         Default tap-to-click state.
 
-    __C declaration:__ @tap_default@
+         __C declaration:__ @tap_default@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 556:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 556:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , tap_current :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , tap_current :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ current tap-to-click state
 
-       Current tap-to-click state.
+         Current tap-to-click state.
 
-    __C declaration:__ @tap_current@
+         __C declaration:__ @tap_current@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 564:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 564:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , tap_button_map_default :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , tap_button_map_default :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ default tap-to-click button map
 
-       Default tap-to-click button map.
+         Default tap-to-click button map.
 
-    __C declaration:__ @tap_button_map_default@
+         __C declaration:__ @tap_button_map_default@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 572:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 572:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , tap_button_map_current :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , tap_button_map_current :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ current tap-to-click button map
 
-       Current tap-to-click button map.
+         Current tap-to-click button map.
 
-    __C declaration:__ @tap_button_map_current@
+         __C declaration:__ @tap_button_map_current@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 580:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 580:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , drag_default :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , drag_default :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ default tap-and-drag state
 
-       Default tap-and-drag state.
+         Default tap-and-drag state.
 
-    __C declaration:__ @drag_default@
+         __C declaration:__ @drag_default@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 588:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 588:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , drag_current :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , drag_current :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ current tap-and-drag state
 
-       Current tap-and-drag state.
+         Current tap-and-drag state.
 
-    __C declaration:__ @drag_current@
+         __C declaration:__ @drag_current@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 596:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 596:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , drag_lock_default :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , drag_lock_default :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ default drag lock state
 
-       Default drag lock state.
+         Default drag lock state.
 
-    __C declaration:__ @drag_lock_default@
+         __C declaration:__ @drag_lock_default@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 604:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 604:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , drag_lock_current :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , drag_lock_current :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ current drag lock state
 
-       Current drag lock state.
+         Current drag lock state.
 
-    __C declaration:__ @drag_lock_current@
+         __C declaration:__ @drag_lock_current@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 612:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 612:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , three_finger_drag_support :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , three_finger_drag_support :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ three finger drag support
 
-       The number of fingers supported for three/four finger drag. If finger_count is less than 3, three finger drag is unsupported.
+         The number of fingers supported for three/four finger drag. If finger_count is less than 3, three finger drag is unsupported.
 
-    __C declaration:__ @three_finger_drag_support@
+         __C declaration:__ @three_finger_drag_support@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 621:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 621:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , three_finger_drag_default :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , three_finger_drag_default :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ default three finger drag state
 
-       Default three finger drag state.
+         Default three finger drag state.
 
-    __C declaration:__ @three_finger_drag_default@
+         __C declaration:__ @three_finger_drag_default@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 629:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 629:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , three_finger_drag_current :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , three_finger_drag_current :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ current three finger drag state
 
-       Current three finger drag state.
+         Current three finger drag state.
 
-    __C declaration:__ @three_finger_drag_current@
+         __C declaration:__ @three_finger_drag_current@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 637:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 637:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , calibration_matrix_support :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , calibration_matrix_support :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ support for a calibration matrix
 
-       A calibration matrix is supported if the supported argument is non-zero.
+         A calibration matrix is supported if the supported argument is non-zero.
 
-       [__@supported@ /(input)/__]: boolean
+         [__@supported@__]: boolean
 
-    __C declaration:__ @calibration_matrix_support@
+         __C declaration:__ @calibration_matrix_support@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 647:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 647:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , calibration_matrix_default :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array) -> IO ())
+  , calibration_matrix_default :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array -> IO ())
     {- ^ default calibration matrix
 
-       Default calibration matrix.
+         Default calibration matrix.
 
-       [__@matrix@ /(input)/__]: array of 6 floats
+         [__@matrix@__]: array of 6 floats
 
-    __C declaration:__ @calibration_matrix_default@
+         __C declaration:__ @calibration_matrix_default@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 656:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 656:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , calibration_matrix_current :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array) -> IO ())
+  , calibration_matrix_current :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array -> IO ())
     {- ^ current calibration matrix
 
-       Current calibration matrix.
+         Current calibration matrix.
 
-       [__@matrix@ /(input)/__]: array of 6 floats
+         [__@matrix@__]: array of 6 floats
 
-    __C declaration:__ @calibration_matrix_current@
+         __C declaration:__ @calibration_matrix_current@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 665:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 665:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , accel_profiles_support :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , accel_profiles_support :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ supported acceleration profiles
 
-       Supported acceleration profiles.
+         Supported acceleration profiles.
 
-    __C declaration:__ @accel_profiles_support@
+         __C declaration:__ @accel_profiles_support@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 673:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 673:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , accel_profile_default :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , accel_profile_default :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ default acceleration profile
 
-       Default acceleration profile.
+         Default acceleration profile.
 
-    __C declaration:__ @accel_profile_default@
+         __C declaration:__ @accel_profile_default@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 681:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 681:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , accel_profile_current :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , accel_profile_current :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ current send events mode
 
-       Current acceleration profile.
+         Current acceleration profile.
 
-    __C declaration:__ @accel_profile_current@
+         __C declaration:__ @accel_profile_current@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 689:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 689:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , accel_speed_default :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array) -> IO ())
+  , accel_speed_default :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array -> IO ())
     {- ^ default acceleration speed
 
-       Default acceleration speed.
+         Default acceleration speed.
 
-       [__@speed@ /(input)/__]: double
+         [__@speed@__]: double
 
-    __C declaration:__ @accel_speed_default@
+         __C declaration:__ @accel_speed_default@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 698:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 698:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , accel_speed_current :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array) -> IO ())
+  , accel_speed_current :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array -> IO ())
     {- ^ current acceleration speed
 
-       Current acceleration speed.
+         Current acceleration speed.
 
-       [__@speed@ /(input)/__]: double
+         [__@speed@__]: double
 
-    __C declaration:__ @accel_speed_current@
+         __C declaration:__ @accel_speed_current@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 707:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 707:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , natural_scroll_support :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , natural_scroll_support :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ support for natural scroll
 
-       Natural scroll is supported if the supported argument is non-zero.
+         Natural scroll is supported if the supported argument is non-zero.
 
-       [__@supported@ /(input)/__]: boolean
+         [__@supported@__]: boolean
 
-    __C declaration:__ @natural_scroll_support@
+         __C declaration:__ @natural_scroll_support@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 717:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 717:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , natural_scroll_default :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , natural_scroll_default :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ default natural scroll
 
-       Default natural scroll.
+         Default natural scroll.
 
-    __C declaration:__ @natural_scroll_default@
+         __C declaration:__ @natural_scroll_default@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 725:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 725:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , natural_scroll_current :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , natural_scroll_current :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ current natural scroll state
 
-       Current natural scroll.
+         Current natural scroll.
 
-    __C declaration:__ @natural_scroll_current@
+         __C declaration:__ @natural_scroll_current@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 733:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 733:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , left_handed_support :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , left_handed_support :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ support for left-handed mode
 
-       Left-handed mode is supported if the supported argument is non-zero.
+         Left-handed mode is supported if the supported argument is non-zero.
 
-       [__@supported@ /(input)/__]: boolean
+         [__@supported@__]: boolean
 
-    __C declaration:__ @left_handed_support@
+         __C declaration:__ @left_handed_support@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 743:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 743:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , left_handed_default :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , left_handed_default :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ default left-handed mode
 
-       Default left-handed mode.
+         Default left-handed mode.
 
-    __C declaration:__ @left_handed_default@
+         __C declaration:__ @left_handed_default@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 751:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 751:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , left_handed_current :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , left_handed_current :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ current left-handed mode state
 
-       Current left-handed mode.
+         Current left-handed mode.
 
-    __C declaration:__ @left_handed_current@
+         __C declaration:__ @left_handed_current@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 759:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 759:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , click_method_support :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , click_method_support :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ supported click methods
 
-       The click methods supported by the device.
+         The click methods supported by the device.
 
-    __C declaration:__ @click_method_support@
+         __C declaration:__ @click_method_support@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 767:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 767:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , click_method_default :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , click_method_default :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ default click method
 
-       Default click method.
+         Default click method.
 
-    __C declaration:__ @click_method_default@
+         __C declaration:__ @click_method_default@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 775:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 775:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , click_method_current :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , click_method_current :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ current click method
 
-       Current click method.
+         Current click method.
 
-    __C declaration:__ @click_method_current@
+         __C declaration:__ @click_method_current@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 783:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 783:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , clickfinger_button_map_default :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , clickfinger_button_map_default :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ default clickfinger button map
 
-       Default clickfinger button map. Supported if click_methods.clickfinger is supported.
+         Default clickfinger button map. Supported if click_methods.clickfinger is supported.
 
-    __C declaration:__ @clickfinger_button_map_default@
+         __C declaration:__ @clickfinger_button_map_default@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 792:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 792:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , clickfinger_button_map_current :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , clickfinger_button_map_current :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ current clickfinger button map
 
-       Current clickfinger button map. Supported if click_methods.clickfinger is supported.
+         Current clickfinger button map. Supported if click_methods.clickfinger is supported.
 
-    __C declaration:__ @clickfinger_button_map_current@
+         __C declaration:__ @clickfinger_button_map_current@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 801:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 801:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , middle_emulation_support :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , middle_emulation_support :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ support for middle mouse button emulation
 
-       Middle mouse button emulation is supported if the supported argument is non-zero.
+         Middle mouse button emulation is supported if the supported argument is non-zero.
 
-       [__@supported@ /(input)/__]: boolean
+         [__@supported@__]: boolean
 
-    __C declaration:__ @middle_emulation_support@
+         __C declaration:__ @middle_emulation_support@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 811:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 811:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , middle_emulation_default :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , middle_emulation_default :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ default middle mouse button emulation
 
-       Default middle mouse button emulation.
+         Default middle mouse button emulation.
 
-    __C declaration:__ @middle_emulation_default@
+         __C declaration:__ @middle_emulation_default@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 819:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 819:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , middle_emulation_current :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , middle_emulation_current :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ current middle mouse button emulation state
 
-       Current middle mouse button emulation.
+         Current middle mouse button emulation.
 
-    __C declaration:__ @middle_emulation_current@
+         __C declaration:__ @middle_emulation_current@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 827:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 827:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , scroll_method_support :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , scroll_method_support :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ supported scroll methods
 
-       The scroll methods supported by the device.
+         The scroll methods supported by the device.
 
-    __C declaration:__ @scroll_method_support@
+         __C declaration:__ @scroll_method_support@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 835:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 835:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , scroll_method_default :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , scroll_method_default :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ default scroll method
 
-       Default scroll method.
+         Default scroll method.
 
-    __C declaration:__ @scroll_method_default@
+         __C declaration:__ @scroll_method_default@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 843:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 843:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , scroll_method_current :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , scroll_method_current :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ current scroll method
 
-       Current scroll method.
+         Current scroll method.
 
-    __C declaration:__ @scroll_method_current@
+         __C declaration:__ @scroll_method_current@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 851:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 851:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , scroll_button_default :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , scroll_button_default :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ default scroll button
 
-       Default scroll button. Supported if scroll_methods.on_button_down is supported.
+         Default scroll button. Supported if scroll_methods.on_button_down is supported.
 
-    __C declaration:__ @scroll_button_default@
+         __C declaration:__ @scroll_button_default@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 860:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 860:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , scroll_button_current :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , scroll_button_current :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ current scroll button
 
-       Current scroll button. Supported if scroll_methods.on_button_down is supported.
+         Current scroll button. Supported if scroll_methods.on_button_down is supported.
 
-    __C declaration:__ @scroll_button_current@
+         __C declaration:__ @scroll_button_current@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 869:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 869:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , scroll_button_lock_default :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , scroll_button_lock_default :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ default scroll button lock state
 
-       Default scroll button lock state. Supported if scroll_methods.on_button_down is supported.
+         Default scroll button lock state. Supported if scroll_methods.on_button_down is supported.
 
-    __C declaration:__ @scroll_button_lock_default@
+         __C declaration:__ @scroll_button_lock_default@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 878:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 878:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , scroll_button_lock_current :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , scroll_button_lock_current :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ current scroll button lock state
 
-       Current scroll button lock state. Supported if scroll_methods.on_button_down is supported.
+         Current scroll button lock state. Supported if scroll_methods.on_button_down is supported.
 
-    __C declaration:__ @scroll_button_lock_current@
+         __C declaration:__ @scroll_button_lock_current@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 887:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 887:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , dwt_support :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , dwt_support :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ support for disable-while-typing
 
-       Disable-while-typing is supported if the supported argument is non-zero.
+         Disable-while-typing is supported if the supported argument is non-zero.
 
-       [__@supported@ /(input)/__]: boolean
+         [__@supported@__]: boolean
 
-    __C declaration:__ @dwt_support@
+         __C declaration:__ @dwt_support@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 897:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 897:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , dwt_default :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , dwt_default :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ default disable-while-typing state
 
-       Default disable-while-typing state.
+         Default disable-while-typing state.
 
-    __C declaration:__ @dwt_default@
+         __C declaration:__ @dwt_default@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 905:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 905:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , dwt_current :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , dwt_current :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ current disable-while-typing state
 
-       Current disable-while-typing state.
+         Current disable-while-typing state.
 
-    __C declaration:__ @dwt_current@
+         __C declaration:__ @dwt_current@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 913:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 913:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , dwtp_support :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , dwtp_support :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ support for disable-while-trackpointing
 
-       Disable-while-trackpointing is supported if the supported argument is non-zero.
+         Disable-while-trackpointing is supported if the supported argument is non-zero.
 
-       [__@supported@ /(input)/__]: boolean
+         [__@supported@__]: boolean
 
-    __C declaration:__ @dwtp_support@
+         __C declaration:__ @dwtp_support@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 923:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 923:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , dwtp_default :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , dwtp_default :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ default disable-while-trackpointing state
 
-       Default disable-while-trackpointing state.
+         Default disable-while-trackpointing state.
 
-    __C declaration:__ @dwtp_default@
+         __C declaration:__ @dwtp_default@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 931:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 931:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , dwtp_current :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , dwtp_current :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ current disable-while-trackpointing state
 
-       Current disable-while-trackpointing state.
+         Current disable-while-trackpointing state.
 
-    __C declaration:__ @dwtp_current@
+         __C declaration:__ @dwtp_current@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 939:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 939:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , rotation_support :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  , rotation_support :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
     {- ^ support for rotation
 
-       Rotation is supported if the supported argument is non-zero.
+         Rotation is supported if the supported argument is non-zero.
 
-       [__@supported@ /(input)/__]: boolean
+         [__@supported@__]: boolean
 
-    __C declaration:__ @rotation_support@
+         __C declaration:__ @rotation_support@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 948:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 948:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , rotation_default :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , rotation_default :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ default rotation angle
 
-       Default rotation angle.
+         Default rotation angle.
 
-    __C declaration:__ @rotation_default@
+         __C declaration:__ @rotation_default@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 956:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 956:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , rotation_current :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , rotation_current :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ current rotation angle
 
-       Current rotation angle.
+         Current rotation angle.
 
-    __C declaration:__ @rotation_current@
+         __C declaration:__ @rotation_current@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 964:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 964:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
   }
   deriving stock (Eq, RIP.Generic, Show)
@@ -3731,11 +3710,11 @@ deriving via Marshal.EquivStorable River_libinput_device_v1_listener instance RI
 instance HasCField.HasCField River_libinput_device_v1_listener "removed" where
 
   type CFieldType River_libinput_device_v1_listener "removed" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> IO ())
          ) => RIP.HasField "removed" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"removed")
@@ -3743,11 +3722,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "input_device" where
 
   type CFieldType River_libinput_device_v1_listener "input_device" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.River.InputManagementV1.Generated.River_input_device_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.River.InputManagementV1.Generated.River_input_device_v1 -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.River.InputManagementV1.Generated.River_input_device_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.River.InputManagementV1.Generated.River_input_device_v1 -> IO ())
          ) => RIP.HasField "input_device" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -3756,11 +3735,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "send_events_support" where
 
   type CFieldType River_libinput_device_v1_listener "send_events_support" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "send_events_support" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -3769,11 +3748,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "send_events_default" where
 
   type CFieldType River_libinput_device_v1_listener "send_events_default" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 24
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "send_events_default" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -3782,11 +3761,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "send_events_current" where
 
   type CFieldType River_libinput_device_v1_listener "send_events_current" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 32
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "send_events_current" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -3795,11 +3774,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "tap_support" where
 
   type CFieldType River_libinput_device_v1_listener "tap_support" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 40
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
          ) => RIP.HasField "tap_support" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -3808,11 +3787,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "tap_default" where
 
   type CFieldType River_libinput_device_v1_listener "tap_default" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 48
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "tap_default" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -3821,11 +3800,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "tap_current" where
 
   type CFieldType River_libinput_device_v1_listener "tap_current" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 56
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "tap_current" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -3834,11 +3813,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "tap_button_map_default" where
 
   type CFieldType River_libinput_device_v1_listener "tap_button_map_default" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 64
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "tap_button_map_default" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -3847,11 +3826,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "tap_button_map_current" where
 
   type CFieldType River_libinput_device_v1_listener "tap_button_map_current" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 72
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "tap_button_map_current" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -3860,11 +3839,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "drag_default" where
 
   type CFieldType River_libinput_device_v1_listener "drag_default" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 80
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "drag_default" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -3873,11 +3852,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "drag_current" where
 
   type CFieldType River_libinput_device_v1_listener "drag_current" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 88
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "drag_current" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -3886,11 +3865,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "drag_lock_default" where
 
   type CFieldType River_libinput_device_v1_listener "drag_lock_default" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 96
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "drag_lock_default" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -3899,11 +3878,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "drag_lock_current" where
 
   type CFieldType River_libinput_device_v1_listener "drag_lock_current" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 104
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "drag_lock_current" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -3912,11 +3891,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "three_finger_drag_support" where
 
   type CFieldType River_libinput_device_v1_listener "three_finger_drag_support" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 112
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
          ) => RIP.HasField "three_finger_drag_support" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -3925,11 +3904,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "three_finger_drag_default" where
 
   type CFieldType River_libinput_device_v1_listener "three_finger_drag_default" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 120
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "three_finger_drag_default" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -3938,11 +3917,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "three_finger_drag_current" where
 
   type CFieldType River_libinput_device_v1_listener "three_finger_drag_current" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 128
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "three_finger_drag_current" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -3951,11 +3930,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "calibration_matrix_support" where
 
   type CFieldType River_libinput_device_v1_listener "calibration_matrix_support" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 136
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
          ) => RIP.HasField "calibration_matrix_support" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -3964,11 +3943,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "calibration_matrix_default" where
 
   type CFieldType River_libinput_device_v1_listener "calibration_matrix_default" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array -> IO ())
 
   offset# = \_ -> \_ -> 144
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array -> IO ())
          ) => RIP.HasField "calibration_matrix_default" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -3977,11 +3956,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "calibration_matrix_current" where
 
   type CFieldType River_libinput_device_v1_listener "calibration_matrix_current" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array -> IO ())
 
   offset# = \_ -> \_ -> 152
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array -> IO ())
          ) => RIP.HasField "calibration_matrix_current" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -3990,11 +3969,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "accel_profiles_support" where
 
   type CFieldType River_libinput_device_v1_listener "accel_profiles_support" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 160
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "accel_profiles_support" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4003,11 +3982,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "accel_profile_default" where
 
   type CFieldType River_libinput_device_v1_listener "accel_profile_default" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 168
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "accel_profile_default" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4016,11 +3995,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "accel_profile_current" where
 
   type CFieldType River_libinput_device_v1_listener "accel_profile_current" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 176
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "accel_profile_current" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4029,11 +4008,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "accel_speed_default" where
 
   type CFieldType River_libinput_device_v1_listener "accel_speed_default" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array -> IO ())
 
   offset# = \_ -> \_ -> 184
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array -> IO ())
          ) => RIP.HasField "accel_speed_default" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4042,11 +4021,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "accel_speed_current" where
 
   type CFieldType River_libinput_device_v1_listener "accel_speed_current" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array -> IO ())
 
   offset# = \_ -> \_ -> 192
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array -> IO ())
          ) => RIP.HasField "accel_speed_current" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4055,11 +4034,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "natural_scroll_support" where
 
   type CFieldType River_libinput_device_v1_listener "natural_scroll_support" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 200
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
          ) => RIP.HasField "natural_scroll_support" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4068,11 +4047,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "natural_scroll_default" where
 
   type CFieldType River_libinput_device_v1_listener "natural_scroll_default" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 208
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "natural_scroll_default" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4081,11 +4060,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "natural_scroll_current" where
 
   type CFieldType River_libinput_device_v1_listener "natural_scroll_current" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 216
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "natural_scroll_current" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4094,11 +4073,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "left_handed_support" where
 
   type CFieldType River_libinput_device_v1_listener "left_handed_support" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 224
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
          ) => RIP.HasField "left_handed_support" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4107,11 +4086,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "left_handed_default" where
 
   type CFieldType River_libinput_device_v1_listener "left_handed_default" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 232
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "left_handed_default" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4120,11 +4099,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "left_handed_current" where
 
   type CFieldType River_libinput_device_v1_listener "left_handed_current" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 240
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "left_handed_current" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4133,11 +4112,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "click_method_support" where
 
   type CFieldType River_libinput_device_v1_listener "click_method_support" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 248
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "click_method_support" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4146,11 +4125,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "click_method_default" where
 
   type CFieldType River_libinput_device_v1_listener "click_method_default" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 256
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "click_method_default" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4159,11 +4138,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "click_method_current" where
 
   type CFieldType River_libinput_device_v1_listener "click_method_current" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 264
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "click_method_current" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4172,11 +4151,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "clickfinger_button_map_default" where
 
   type CFieldType River_libinput_device_v1_listener "clickfinger_button_map_default" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 272
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "clickfinger_button_map_default" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4185,11 +4164,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "clickfinger_button_map_current" where
 
   type CFieldType River_libinput_device_v1_listener "clickfinger_button_map_current" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 280
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "clickfinger_button_map_current" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4198,11 +4177,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "middle_emulation_support" where
 
   type CFieldType River_libinput_device_v1_listener "middle_emulation_support" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 288
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
          ) => RIP.HasField "middle_emulation_support" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4211,11 +4190,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "middle_emulation_default" where
 
   type CFieldType River_libinput_device_v1_listener "middle_emulation_default" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 296
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "middle_emulation_default" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4224,11 +4203,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "middle_emulation_current" where
 
   type CFieldType River_libinput_device_v1_listener "middle_emulation_current" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 304
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "middle_emulation_current" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4237,11 +4216,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "scroll_method_support" where
 
   type CFieldType River_libinput_device_v1_listener "scroll_method_support" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 312
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "scroll_method_support" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4250,11 +4229,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "scroll_method_default" where
 
   type CFieldType River_libinput_device_v1_listener "scroll_method_default" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 320
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "scroll_method_default" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4263,11 +4242,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "scroll_method_current" where
 
   type CFieldType River_libinput_device_v1_listener "scroll_method_current" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 328
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "scroll_method_current" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4276,11 +4255,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "scroll_button_default" where
 
   type CFieldType River_libinput_device_v1_listener "scroll_button_default" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 336
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "scroll_button_default" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4289,11 +4268,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "scroll_button_current" where
 
   type CFieldType River_libinput_device_v1_listener "scroll_button_current" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 344
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "scroll_button_current" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4302,11 +4281,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "scroll_button_lock_default" where
 
   type CFieldType River_libinput_device_v1_listener "scroll_button_lock_default" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 352
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "scroll_button_lock_default" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4315,11 +4294,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "scroll_button_lock_current" where
 
   type CFieldType River_libinput_device_v1_listener "scroll_button_lock_current" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 360
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "scroll_button_lock_current" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4328,11 +4307,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "dwt_support" where
 
   type CFieldType River_libinput_device_v1_listener "dwt_support" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 368
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
          ) => RIP.HasField "dwt_support" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4341,11 +4320,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "dwt_default" where
 
   type CFieldType River_libinput_device_v1_listener "dwt_default" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 376
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "dwt_default" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4354,11 +4333,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "dwt_current" where
 
   type CFieldType River_libinput_device_v1_listener "dwt_current" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 384
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "dwt_current" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4367,11 +4346,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "dwtp_support" where
 
   type CFieldType River_libinput_device_v1_listener "dwtp_support" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 392
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
          ) => RIP.HasField "dwtp_support" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4380,11 +4359,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "dwtp_default" where
 
   type CFieldType River_libinput_device_v1_listener "dwtp_default" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 400
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "dwtp_default" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4393,11 +4372,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "dwtp_current" where
 
   type CFieldType River_libinput_device_v1_listener "dwtp_current" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 408
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "dwtp_current" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4406,11 +4385,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "rotation_support" where
 
   type CFieldType River_libinput_device_v1_listener "rotation_support" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 
   offset# = \_ -> \_ -> 416
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
          ) => RIP.HasField "rotation_support" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4419,11 +4398,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "rotation_default" where
 
   type CFieldType River_libinput_device_v1_listener "rotation_default" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 424
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "rotation_default" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -4432,11 +4411,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_d
 instance HasCField.HasCField River_libinput_device_v1_listener "rotation_current" where
 
   type CFieldType River_libinput_device_v1_listener "rotation_current" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 432
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "rotation_current" (RIP.Ptr River_libinput_device_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -5508,7 +5487,7 @@ instance Read River_libinput_accel_config_v1_error where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_libinput_accel_config_v1_error) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -5520,13 +5499,11 @@ instance HasCField.HasCField River_libinput_accel_config_v1_error "unwrap" where
 
   offset# = \_ -> \_ -> 0
 
-{-| invalid enum value or similar
+{-| __C declaration:__ @RIVER_LIBINPUT_ACCEL_CONFIG_V1_ERROR_INVALID_ARG@
 
-__C declaration:__ @RIVER_LIBINPUT_ACCEL_CONFIG_V1_ERROR_INVALID_ARG@
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1701:2@
 
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1701:2@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 pattern RIVER_LIBINPUT_ACCEL_CONFIG_V1_ERROR_INVALID_ARG :: River_libinput_accel_config_v1_error
 pattern RIVER_LIBINPUT_ACCEL_CONFIG_V1_ERROR_INVALID_ARG = River_libinput_accel_config_v1_error 0
@@ -5615,7 +5592,7 @@ instance Read River_libinput_accel_config_v1_accel_type where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_libinput_accel_config_v1_accel_type) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -5694,51 +5671,45 @@ rIVER_LIBINPUT_ACCEL_CONFIG_V1_SET_POINTS_SINCE_VERSION :: RIP.CInt
 rIVER_LIBINPUT_ACCEL_CONFIG_V1_SET_POINTS_SINCE_VERSION =
   (1 :: RIP.CInt)
 
-{-|
+{-| __C declaration:__ @struct river_libinput_result_v1_listener@
 
-  > iface_river_libinput_result_v1
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1781:8@
 
-  > river_libinput_result_v1_listener
-
-__C declaration:__ @struct river_libinput_result_v1_listener@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1781:8@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 data River_libinput_result_v1_listener = River_libinput_result_v1_listener
-  { success :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_result_v1) -> IO ())
+  { success :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_result_v1 -> IO ())
     {- ^ config success
 
-       The configuration was successfully applied to the device.
+         The configuration was successfully applied to the device.
 
-    __C declaration:__ @success@
+         __C declaration:__ @success@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 1787:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 1787:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , unsupported :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_result_v1) -> IO ())
+  , unsupported :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_result_v1 -> IO ())
     {- ^ config unsupported
 
-       The configuration is unsupported by the device and was ignored.
+         The configuration is unsupported by the device and was ignored.
 
-    __C declaration:__ @unsupported@
+         __C declaration:__ @unsupported@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 1795:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 1795:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
-  , invalid :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_result_v1) -> IO ())
+  , invalid :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_result_v1 -> IO ())
     {- ^ config invalid
 
-       The configuration is invalid and was ignored.
+         The configuration is invalid and was ignored.
 
-    __C declaration:__ @invalid@
+         __C declaration:__ @invalid@
 
-    __defined at:__ @river-libinput-config-v1-client-protocol.h 1802:9@
+         __defined at:__ @river-libinput-config-v1-client-protocol.h 1802:9@
 
-    __exported by:__ @river-libinput-config-v1-client-protocol.h@
+         __exported by:__ @river-libinput-config-v1-client-protocol.h@
     -}
   }
   deriving stock (Eq, RIP.Generic, Show)
@@ -5774,11 +5745,11 @@ deriving via Marshal.EquivStorable River_libinput_result_v1_listener instance RI
 instance HasCField.HasCField River_libinput_result_v1_listener "success" where
 
   type CFieldType River_libinput_result_v1_listener "success" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_result_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_result_v1 -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_result_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_result_v1 -> IO ())
          ) => RIP.HasField "success" (RIP.Ptr River_libinput_result_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"success")
@@ -5786,11 +5757,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_r
 instance HasCField.HasCField River_libinput_result_v1_listener "unsupported" where
 
   type CFieldType River_libinput_result_v1_listener "unsupported" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_result_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_result_v1 -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_result_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_result_v1 -> IO ())
          ) => RIP.HasField "unsupported" (RIP.Ptr River_libinput_result_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -5799,11 +5770,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_r
 instance HasCField.HasCField River_libinput_result_v1_listener "invalid" where
 
   type CFieldType River_libinput_result_v1_listener "invalid" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_result_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_result_v1 -> IO ())
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_result_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_result_v1 -> IO ())
          ) => RIP.HasField "invalid" (RIP.Ptr River_libinput_result_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"invalid")
@@ -5838,258 +5809,258 @@ rIVER_LIBINPUT_RESULT_V1_INVALID_SINCE_VERSION :: RIP.CInt
 rIVER_LIBINPUT_RESULT_V1_INVALID_SINCE_VERSION =
   (1 :: RIP.CInt)
 
-foreign import ccall safe "wrapper" hs_bindgen_7355a54ca7140778_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_28bd53522d81b79c_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_config_v1) -> IO ())@
-hs_bindgen_7355a54ca7140778 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_config_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_config_v1) -> IO ()))
-hs_bindgen_7355a54ca7140778 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_config_v1 -> IO ())@
+hs_bindgen_28bd53522d81b79c ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_config_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_config_v1 -> IO ()))
+hs_bindgen_28bd53522d81b79c =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_7355a54ca7140778_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_28bd53522d81b79c_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_0666cd176c983c6b_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_77475bf1b56dd406_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_config_v1) -> IO ())@
-hs_bindgen_0666cd176c983c6b ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_config_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_config_v1) -> IO ()
-hs_bindgen_0666cd176c983c6b =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_config_v1 -> IO ())@
+hs_bindgen_77475bf1b56dd406 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_config_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_config_v1 -> IO ()
+hs_bindgen_77475bf1b56dd406 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_0666cd176c983c6b_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_77475bf1b56dd406_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_config_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_config_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_7355a54ca7140778
+  toFunPtr = hs_bindgen_28bd53522d81b79c
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_config_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_config_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_0666cd176c983c6b
+  fromFunPtr = hs_bindgen_77475bf1b56dd406
 
-foreign import ccall safe "wrapper" hs_bindgen_8866a871eb076178_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_16485c0eb567bf20_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_config_v1) -> (RIP.Ptr River_libinput_device_v1) -> IO ())@
-hs_bindgen_8866a871eb076178 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_config_v1) -> (RIP.Ptr River_libinput_device_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_config_v1) -> (RIP.Ptr River_libinput_device_v1) -> IO ()))
-hs_bindgen_8866a871eb076178 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_config_v1 -> RIP.Ptr River_libinput_device_v1 -> IO ())@
+hs_bindgen_16485c0eb567bf20 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_config_v1 -> RIP.Ptr River_libinput_device_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_config_v1 -> RIP.Ptr River_libinput_device_v1 -> IO ()))
+hs_bindgen_16485c0eb567bf20 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_8866a871eb076178_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_16485c0eb567bf20_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_73ce8ab7c62f314c_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_bafb8de5f2be5898_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_config_v1) -> (RIP.Ptr River_libinput_device_v1) -> IO ())@
-hs_bindgen_73ce8ab7c62f314c ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_config_v1) -> (RIP.Ptr River_libinput_device_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_config_v1) -> (RIP.Ptr River_libinput_device_v1) -> IO ()
-hs_bindgen_73ce8ab7c62f314c =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_config_v1 -> RIP.Ptr River_libinput_device_v1 -> IO ())@
+hs_bindgen_bafb8de5f2be5898 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_config_v1 -> RIP.Ptr River_libinput_device_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_config_v1 -> RIP.Ptr River_libinput_device_v1 -> IO ()
+hs_bindgen_bafb8de5f2be5898 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_73ce8ab7c62f314c_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_bafb8de5f2be5898_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_config_v1) -> (RIP.Ptr River_libinput_device_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_config_v1 -> RIP.Ptr River_libinput_device_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_8866a871eb076178
+  toFunPtr = hs_bindgen_16485c0eb567bf20
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_config_v1) -> (RIP.Ptr River_libinput_device_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_config_v1 -> RIP.Ptr River_libinput_device_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_73ce8ab7c62f314c
+  fromFunPtr = hs_bindgen_bafb8de5f2be5898
 
-foreign import ccall safe "wrapper" hs_bindgen_da0dd34a11d523d2_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_6fdaef1762473692_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> IO ())@
-hs_bindgen_da0dd34a11d523d2 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> IO ()))
-hs_bindgen_da0dd34a11d523d2 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> IO ())@
+hs_bindgen_6fdaef1762473692 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> IO ()))
+hs_bindgen_6fdaef1762473692 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_da0dd34a11d523d2_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_6fdaef1762473692_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_6cf8ab7cabe77448_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_563fa4ae7a1fdd5a_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> IO ())@
-hs_bindgen_6cf8ab7cabe77448 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> IO ()
-hs_bindgen_6cf8ab7cabe77448 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> IO ())@
+hs_bindgen_563fa4ae7a1fdd5a ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> IO ()
+hs_bindgen_563fa4ae7a1fdd5a =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_6cf8ab7cabe77448_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_563fa4ae7a1fdd5a_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_da0dd34a11d523d2
+  toFunPtr = hs_bindgen_6fdaef1762473692
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_6cf8ab7cabe77448
+  fromFunPtr = hs_bindgen_563fa4ae7a1fdd5a
 
-foreign import ccall safe "wrapper" hs_bindgen_99a09fd9ebaefa04_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_c25ead6002124f32_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.River.InputManagementV1.Generated.River_input_device_v1) -> IO ())@
-hs_bindgen_99a09fd9ebaefa04 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.River.InputManagementV1.Generated.River_input_device_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.River.InputManagementV1.Generated.River_input_device_v1) -> IO ()))
-hs_bindgen_99a09fd9ebaefa04 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.River.InputManagementV1.Generated.River_input_device_v1 -> IO ())@
+hs_bindgen_c25ead6002124f32 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.River.InputManagementV1.Generated.River_input_device_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.River.InputManagementV1.Generated.River_input_device_v1 -> IO ()))
+hs_bindgen_c25ead6002124f32 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_99a09fd9ebaefa04_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_c25ead6002124f32_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_f4f94844efe7f95d_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_b5cf073437a1b867_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.River.InputManagementV1.Generated.River_input_device_v1) -> IO ())@
-hs_bindgen_f4f94844efe7f95d ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.River.InputManagementV1.Generated.River_input_device_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.River.InputManagementV1.Generated.River_input_device_v1) -> IO ()
-hs_bindgen_f4f94844efe7f95d =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.River.InputManagementV1.Generated.River_input_device_v1 -> IO ())@
+hs_bindgen_b5cf073437a1b867 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.River.InputManagementV1.Generated.River_input_device_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.River.InputManagementV1.Generated.River_input_device_v1 -> IO ()
+hs_bindgen_b5cf073437a1b867 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_f4f94844efe7f95d_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_b5cf073437a1b867_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.River.InputManagementV1.Generated.River_input_device_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.River.InputManagementV1.Generated.River_input_device_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_99a09fd9ebaefa04
+  toFunPtr = hs_bindgen_c25ead6002124f32
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.River.InputManagementV1.Generated.River_input_device_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.River.InputManagementV1.Generated.River_input_device_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_f4f94844efe7f95d
+  fromFunPtr = hs_bindgen_b5cf073437a1b867
 
-foreign import ccall safe "wrapper" hs_bindgen_9620fcd50a0b2197_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_db3c0f7f9489d241_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array) -> IO ())@
-hs_bindgen_9620fcd50a0b2197 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array) -> IO ()))
-hs_bindgen_9620fcd50a0b2197 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array -> IO ())@
+hs_bindgen_db3c0f7f9489d241 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array -> IO ()))
+hs_bindgen_db3c0f7f9489d241 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_9620fcd50a0b2197_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_db3c0f7f9489d241_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_ae2d39253a573017_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_95d456837863de8a_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array) -> IO ())@
-hs_bindgen_ae2d39253a573017 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array) -> IO ()
-hs_bindgen_ae2d39253a573017 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array -> IO ())@
+hs_bindgen_95d456837863de8a ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array -> IO ()
+hs_bindgen_95d456837863de8a =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_ae2d39253a573017_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_95d456837863de8a_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array -> IO ()) where
 
-  toFunPtr = hs_bindgen_9620fcd50a0b2197
+  toFunPtr = hs_bindgen_db3c0f7f9489d241
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> (RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> RIP.Ptr Bindings.Wayland.Util.Generated.Wl_array -> IO ()) where
 
-  fromFunPtr = hs_bindgen_ae2d39253a573017
+  fromFunPtr = hs_bindgen_95d456837863de8a
 
-foreign import ccall safe "wrapper" hs_bindgen_18686de1898fdad6_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_d58502b9bd2b810f_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_18686de1898fdad6 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
-hs_bindgen_18686de1898fdad6 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_d58502b9bd2b810f ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_d58502b9bd2b810f =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_18686de1898fdad6_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_d58502b9bd2b810f_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_d790e20cecd6ecde_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Int32 -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_9d9bf97c0244fdb9_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Int32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
-hs_bindgen_d790e20cecd6ecde ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()
-hs_bindgen_d790e20cecd6ecde =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())@
+hs_bindgen_9d9bf97c0244fdb9 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ()
+hs_bindgen_9d9bf97c0244fdb9 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_d790e20cecd6ecde_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_9d9bf97c0244fdb9_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_18686de1898fdad6
+  toFunPtr = hs_bindgen_d58502b9bd2b810f
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_d790e20cecd6ecde
+  fromFunPtr = hs_bindgen_9d9bf97c0244fdb9
 
-foreign import ccall safe "wrapper" hs_bindgen_4cd1637b7baf0b00_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_74ab028118e6a36c_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_4cd1637b7baf0b00 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_4cd1637b7baf0b00 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_74ab028118e6a36c ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_74ab028118e6a36c =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_4cd1637b7baf0b00_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_74ab028118e6a36c_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_c1883285347d2068_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_6145994d35cda8fd_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_c1883285347d2068 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
-hs_bindgen_c1883285347d2068 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_6145994d35cda8fd ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()
+hs_bindgen_6145994d35cda8fd =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_c1883285347d2068_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_6145994d35cda8fd_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_4cd1637b7baf0b00
+  toFunPtr = hs_bindgen_74ab028118e6a36c
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_c1883285347d2068
+  fromFunPtr = hs_bindgen_6145994d35cda8fd
 
-foreign import ccall safe "wrapper" hs_bindgen_462acd92a87f897c_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_d93484c7555d19da_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_result_v1) -> IO ())@
-hs_bindgen_462acd92a87f897c ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_result_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_result_v1) -> IO ()))
-hs_bindgen_462acd92a87f897c =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_result_v1 -> IO ())@
+hs_bindgen_d93484c7555d19da ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_result_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_result_v1 -> IO ()))
+hs_bindgen_d93484c7555d19da =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_462acd92a87f897c_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_d93484c7555d19da_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_5431b650fe4979d9_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_4625756dd553cda7_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_result_v1) -> IO ())@
-hs_bindgen_5431b650fe4979d9 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_result_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_result_v1) -> IO ()
-hs_bindgen_5431b650fe4979d9 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_result_v1 -> IO ())@
+hs_bindgen_4625756dd553cda7 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_result_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_result_v1 -> IO ()
+hs_bindgen_4625756dd553cda7 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_5431b650fe4979d9_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_4625756dd553cda7_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_result_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_result_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_462acd92a87f897c
+  toFunPtr = hs_bindgen_d93484c7555d19da
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_libinput_result_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_libinput_result_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_5431b650fe4979d9
+  fromFunPtr = hs_bindgen_4625756dd553cda7

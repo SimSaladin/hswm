@@ -46,33 +46,13 @@ hs_bindgen_77fd3fe57a604e4f =
   RIP.fromFFIType hs_bindgen_77fd3fe57a604e4f_base
 
 {-# NOINLINE hs_bindgen_b0a78a046142c564 #-}
-{-|
+{-| __C declaration:__ @river_xkb_config_v1_interface@
 
-  > page_iface_river_xkb_config_v1 river_xkb_config_v1
+    __defined at:__ @river-xkb-config-v1-client-protocol.h 83:34@
 
-  > page_iface_river_xkb_config_v1_desc Description
+    __exported by:__ @river-xkb-config-v1-client-protocol.h@
 
-  Global interface for configuring xkb devices.
-
-  This global should only be advertised if river_input_manager_v1 is advertised as well.
-
-  > page_iface_river_xkb_config_v1_api API
-
-  See @iface_river_xkb_config_v1@ .
-
-  > iface_river_xkb_config_v1 The river_xkb_config_v1 interface
-
-  Global interface for configuring xkb devices.
-
-  This global should only be advertised if river_input_manager_v1 is advertised as well.
-
-__C declaration:__ @river_xkb_config_v1_interface@
-
-__defined at:__ @river-xkb-config-v1-client-protocol.h 83:34@
-
-__exported by:__ @river-xkb-config-v1-client-protocol.h@
-
-__unique:__ @Bindings_River_XkbConfigV1_Generated_Bindings.River.XkbConfigV1.Generated_river_xkb_config_v1_interface@
+    __unique:__ @Bindings_River_XkbConfigV1_Generated_Bindings.River.XkbConfigV1.Generated_river_xkb_config_v1_interface@
 -}
 hs_bindgen_b0a78a046142c564 :: PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
 hs_bindgen_b0a78a046142c564 =
@@ -93,29 +73,13 @@ hs_bindgen_c4e262357815bc0d =
   RIP.fromFFIType hs_bindgen_c4e262357815bc0d_base
 
 {-# NOINLINE hs_bindgen_baf4a8e1a3f712c5 #-}
-{-|
+{-| __C declaration:__ @river_xkb_keymap_v1_interface@
 
-  > page_iface_river_xkb_keymap_v1 river_xkb_keymap_v1
+    __defined at:__ @river-xkb-config-v1-client-protocol.h 100:34@
 
-  > page_iface_river_xkb_keymap_v1_desc Description
+    __exported by:__ @river-xkb-config-v1-client-protocol.h@
 
-  This object is the result of attempting to create an xkbcommon keymap.
-
-  > page_iface_river_xkb_keymap_v1_api API
-
-  See @iface_river_xkb_keymap_v1@ .
-
-  > iface_river_xkb_keymap_v1 The river_xkb_keymap_v1 interface
-
-  This object is the result of attempting to create an xkbcommon keymap.
-
-__C declaration:__ @river_xkb_keymap_v1_interface@
-
-__defined at:__ @river-xkb-config-v1-client-protocol.h 100:34@
-
-__exported by:__ @river-xkb-config-v1-client-protocol.h@
-
-__unique:__ @Bindings_River_XkbConfigV1_Generated_Bindings.River.XkbConfigV1.Generated_river_xkb_keymap_v1_interface@
+    __unique:__ @Bindings_River_XkbConfigV1_Generated_Bindings.River.XkbConfigV1.Generated_river_xkb_keymap_v1_interface@
 -}
 hs_bindgen_baf4a8e1a3f712c5 :: PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
 hs_bindgen_baf4a8e1a3f712c5 =
@@ -136,29 +100,13 @@ hs_bindgen_4091930eb0f88db9 =
   RIP.fromFFIType hs_bindgen_4091930eb0f88db9_base
 
 {-# NOINLINE hs_bindgen_2f0796f51b88b5fe #-}
-{-|
+{-| __C declaration:__ @river_xkb_keyboard_v1_interface@
 
-  > page_iface_river_xkb_keyboard_v1 river_xkb_keyboard_v1
+    __defined at:__ @river-xkb-config-v1-client-protocol.h 119:34@
 
-  > page_iface_river_xkb_keyboard_v1_desc Description
+    __exported by:__ @river-xkb-config-v1-client-protocol.h@
 
-  This object represent a physical keyboard which has its configuration and state managed by xkbcommon.
-
-  > page_iface_river_xkb_keyboard_v1_api API
-
-  See @iface_river_xkb_keyboard_v1@ .
-
-  > iface_river_xkb_keyboard_v1 The river_xkb_keyboard_v1 interface
-
-  This object represent a physical keyboard which has its configuration and state managed by xkbcommon.
-
-__C declaration:__ @river_xkb_keyboard_v1_interface@
-
-__defined at:__ @river-xkb-config-v1-client-protocol.h 119:34@
-
-__exported by:__ @river-xkb-config-v1-client-protocol.h@
-
-__unique:__ @Bindings_River_XkbConfigV1_Generated_Bindings.River.XkbConfigV1.Generated_river_xkb_keyboard_v1_interface@
+    __unique:__ @Bindings_River_XkbConfigV1_Generated_Bindings.River.XkbConfigV1.Generated_river_xkb_keyboard_v1_interface@
 -}
 hs_bindgen_2f0796f51b88b5fe :: PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
 hs_bindgen_2f0796f51b88b5fe =

@@ -53,29 +53,13 @@ hs_bindgen_2aa540e8c3b51e4c =
   RIP.fromFFIType hs_bindgen_2aa540e8c3b51e4c_base
 
 {-# NOINLINE hs_bindgen_e0242fe3e2e5ca70 #-}
-{-|
+{-| __C declaration:__ @river_libinput_config_v1_interface@
 
-  > page_iface_river_libinput_config_v1 river_libinput_config_v1
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 95:34@
 
-  > page_iface_river_libinput_config_v1_desc Description
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 
-  Global interface for configuring libinput devices. This global should only be advertised if river_input_manager_v1 is advertised as well.
-
-  > page_iface_river_libinput_config_v1_api API
-
-  See @iface_river_libinput_config_v1@ .
-
-  > iface_river_libinput_config_v1 The river_libinput_config_v1 interface
-
-  Global interface for configuring libinput devices. This global should only be advertised if river_input_manager_v1 is advertised as well.
-
-__C declaration:__ @river_libinput_config_v1_interface@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 95:34@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
-
-__unique:__ @Bindings_River_LibinputConfigV1_Generated_Bindings.River.LibinputConfigV1.Generated_river_libinput_config_v1_interface@
+    __unique:__ @Bindings_River_LibinputConfigV1_Generated_Bindings.River.LibinputConfigV1.Generated_river_libinput_config_v1_interface@
 -}
 hs_bindgen_e0242fe3e2e5ca70 :: PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
 hs_bindgen_e0242fe3e2e5ca70 =
@@ -96,29 +80,13 @@ hs_bindgen_74c6dfef5487b02a =
   RIP.fromFFIType hs_bindgen_74c6dfef5487b02a_base
 
 {-# NOINLINE hs_bindgen_8d19899c1dc78378 #-}
-{-|
+{-| __C declaration:__ @river_libinput_device_v1_interface@
 
-  > page_iface_river_libinput_device_v1 river_libinput_device_v1
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 120:34@
 
-  > page_iface_river_libinput_device_v1_desc Description
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 
-  In general, *_support events will be sent exactly once directly after the river_libinput_device_v1 is created. *_default events will be sent after *_support events if the config option is supported, and *_current events willl be sent after the *_default events and again whenever the config option is changed.
-
-  > page_iface_river_libinput_device_v1_api API
-
-  See @iface_river_libinput_device_v1@ .
-
-  > iface_river_libinput_device_v1 The river_libinput_device_v1 interface
-
-  In general, *_support events will be sent exactly once directly after the river_libinput_device_v1 is created. *_default events will be sent after *_support events if the config option is supported, and *_current events willl be sent after the *_default events and again whenever the config option is changed.
-
-__C declaration:__ @river_libinput_device_v1_interface@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 120:34@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
-
-__unique:__ @Bindings_River_LibinputConfigV1_Generated_Bindings.River.LibinputConfigV1.Generated_river_libinput_device_v1_interface@
+    __unique:__ @Bindings_River_LibinputConfigV1_Generated_Bindings.River.LibinputConfigV1.Generated_river_libinput_device_v1_interface@
 -}
 hs_bindgen_8d19899c1dc78378 :: PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
 hs_bindgen_8d19899c1dc78378 =
@@ -139,29 +107,13 @@ hs_bindgen_57d8c49954f266be =
   RIP.fromFFIType hs_bindgen_57d8c49954f266be_base
 
 {-# NOINLINE hs_bindgen_ce2f3f9a3ad7ed47 #-}
-{-|
+{-| __C declaration:__ @river_libinput_accel_config_v1_interface@
 
-  > page_iface_river_libinput_accel_config_v1 river_libinput_accel_config_v1
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 137:34@
 
-  > page_iface_river_libinput_accel_config_v1_desc Description
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 
-  The result returned by libinput on setting configuration for a device.
-
-  > page_iface_river_libinput_accel_config_v1_api API
-
-  See @iface_river_libinput_accel_config_v1@ .
-
-  > iface_river_libinput_accel_config_v1 The river_libinput_accel_config_v1 interface
-
-  The result returned by libinput on setting configuration for a device.
-
-__C declaration:__ @river_libinput_accel_config_v1_interface@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 137:34@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
-
-__unique:__ @Bindings_River_LibinputConfigV1_Generated_Bindings.River.LibinputConfigV1.Generated_river_libinput_accel_config_v1_interface@
+    __unique:__ @Bindings_River_LibinputConfigV1_Generated_Bindings.River.LibinputConfigV1.Generated_river_libinput_accel_config_v1_interface@
 -}
 hs_bindgen_ce2f3f9a3ad7ed47 :: PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
 hs_bindgen_ce2f3f9a3ad7ed47 =
@@ -182,29 +134,13 @@ hs_bindgen_1f7089280f371326 =
   RIP.fromFFIType hs_bindgen_1f7089280f371326_base
 
 {-# NOINLINE hs_bindgen_4e4faf8378726833 #-}
-{-|
+{-| __C declaration:__ @river_libinput_result_v1_interface@
 
-  > page_iface_river_libinput_result_v1 river_libinput_result_v1
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 154:34@
 
-  > page_iface_river_libinput_result_v1_desc Description
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 
-  The result returned by libinput on setting configuration for a device.
-
-  > page_iface_river_libinput_result_v1_api API
-
-  See @iface_river_libinput_result_v1@ .
-
-  > iface_river_libinput_result_v1 The river_libinput_result_v1 interface
-
-  The result returned by libinput on setting configuration for a device.
-
-__C declaration:__ @river_libinput_result_v1_interface@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 154:34@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
-
-__unique:__ @Bindings_River_LibinputConfigV1_Generated_Bindings.River.LibinputConfigV1.Generated_river_libinput_result_v1_interface@
+    __unique:__ @Bindings_River_LibinputConfigV1_Generated_Bindings.River.LibinputConfigV1.Generated_river_libinput_result_v1_interface@
 -}
 hs_bindgen_4e4faf8378726833 :: PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
 hs_bindgen_4e4faf8378726833 =

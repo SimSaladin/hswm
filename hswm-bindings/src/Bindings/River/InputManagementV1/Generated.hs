@@ -7,6 +7,7 @@
 {-# LANGUAGE EmptyDataDecls #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MagicHash #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -69,43 +70,11 @@ import qualified HsBindgen.Runtime.LibC
 import qualified HsBindgen.Runtime.Marshal as Marshal
 import qualified HsBindgen.Runtime.PtrConst as PtrConst
 
-{-|
+{-| __C declaration:__ @struct river_input_device_v1@
 
-  > page_river_input_management_v1 The river_input_management_v1 protocol
+    __defined at:__ @river-input-management-v1-client-protocol.h 55:8@
 
-  manage seats and input devices
-
-  > page_desc_river_input_management_v1 Description
-
-  This protocol supports creating/destroying seats, assigning input devices to seats, and configuring input devices (e.g. setting keyboard repeat rate).
-
-  The key words "must", "must not", "required", "shall", "shall not", "should", "should not", "recommended", "may", and "optional" in this document are to be interpreted as described in IETF RFC 2119.
-
-  > page_ifaces_river_input_management_v1 Interfaces
-
-  -
-
-  > page_iface_river_input_manager_v1 - input manager global interface
-
-  -
-
-  > page_iface_river_input_device_v1 - an input device
-
-  > page_copyright_river_input_management_v1 Copyright
-
-  SPDX-FileCopyrightText: © 2025 Isaac Freund SPDX-License-Identifier: MIT
-
-  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-__C declaration:__ @struct river_input_device_v1@
-
-__defined at:__ @river-input-management-v1-client-protocol.h 55:8@
-
-__exported by:__ @river-input-management-v1-client-protocol.h@
+    __exported by:__ @river-input-management-v1-client-protocol.h@
 -}
 data River_input_device_v1
 
@@ -197,7 +166,7 @@ instance Read River_input_manager_v1_error where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_input_manager_v1_error) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -218,40 +187,34 @@ instance HasCField.HasCField River_input_manager_v1_error "unwrap" where
 pattern RIVER_INPUT_MANAGER_V1_ERROR_INVALID_DESTROY :: River_input_manager_v1_error
 pattern RIVER_INPUT_MANAGER_V1_ERROR_INVALID_DESTROY = River_input_manager_v1_error 0
 
-{-|
+{-| __C declaration:__ @struct river_input_manager_v1_listener@
 
-  > iface_river_input_manager_v1
+    __defined at:__ @river-input-management-v1-client-protocol.h 109:8@
 
-  > river_input_manager_v1_listener
-
-__C declaration:__ @struct river_input_manager_v1_listener@
-
-__defined at:__ @river-input-management-v1-client-protocol.h 109:8@
-
-__exported by:__ @river-input-management-v1-client-protocol.h@
+    __exported by:__ @river-input-management-v1-client-protocol.h@
 -}
 data River_input_manager_v1_listener = River_input_manager_v1_listener
-  { finished :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_manager_v1) -> IO ())
+  { finished :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_manager_v1 -> IO ())
     {- ^ the server has finished with the input manager
 
-       This event indicates that the server will send no further events on this object. The client should destroy the object. See river_input_manager_v1.destroy for more information.
+         This event indicates that the server will send no further events on this object. The client should destroy the object. See river_input_manager_v1.destroy for more information.
 
-    __C declaration:__ @finished@
+         __C declaration:__ @finished@
 
-    __defined at:__ @river-input-management-v1-client-protocol.h 117:9@
+         __defined at:__ @river-input-management-v1-client-protocol.h 117:9@
 
-    __exported by:__ @river-input-management-v1-client-protocol.h@
+         __exported by:__ @river-input-management-v1-client-protocol.h@
     -}
-  , input_device :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_manager_v1) -> (RIP.Ptr River_input_device_v1) -> IO ())
+  , input_device :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_manager_v1 -> RIP.Ptr River_input_device_v1 -> IO ())
     {- ^ new input device
 
-       A new input device has been created.
+         A new input device has been created.
 
-    __C declaration:__ @input_device@
+         __C declaration:__ @input_device@
 
-    __defined at:__ @river-input-management-v1-client-protocol.h 124:9@
+         __defined at:__ @river-input-management-v1-client-protocol.h 124:9@
 
-    __exported by:__ @river-input-management-v1-client-protocol.h@
+         __exported by:__ @river-input-management-v1-client-protocol.h@
     -}
   }
   deriving stock (Eq, RIP.Generic, Show)
@@ -285,11 +248,11 @@ deriving via Marshal.EquivStorable River_input_manager_v1_listener instance RIP.
 instance HasCField.HasCField River_input_manager_v1_listener "finished" where
 
   type CFieldType River_input_manager_v1_listener "finished" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_manager_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_manager_v1 -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_manager_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_manager_v1 -> IO ())
          ) => RIP.HasField "finished" (RIP.Ptr River_input_manager_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"finished")
@@ -297,11 +260,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_mana
 instance HasCField.HasCField River_input_manager_v1_listener "input_device" where
 
   type CFieldType River_input_manager_v1_listener "input_device" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_manager_v1) -> (RIP.Ptr River_input_device_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_manager_v1 -> RIP.Ptr River_input_device_v1 -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_manager_v1) -> (RIP.Ptr River_input_device_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_manager_v1 -> RIP.Ptr River_input_device_v1 -> IO ())
          ) => RIP.HasField "input_device" (RIP.Ptr River_input_manager_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -486,7 +449,7 @@ instance Read River_input_device_v1_error where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_input_device_v1_error) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -608,7 +571,7 @@ instance Read River_input_device_v1_type where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_input_device_v1_type) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -656,53 +619,47 @@ pattern RIVER_INPUT_DEVICE_V1_TYPE_TOUCH = River_input_device_v1_type 2
 pattern RIVER_INPUT_DEVICE_V1_TYPE_TABLET :: River_input_device_v1_type
 pattern RIVER_INPUT_DEVICE_V1_TYPE_TABLET = River_input_device_v1_type 3
 
-{-|
+{-| __C declaration:__ @struct river_input_device_v1_listener@
 
-  > iface_river_input_device_v1
+    __defined at:__ @river-input-management-v1-client-protocol.h 289:8@
 
-  > river_input_device_v1_listener
-
-__C declaration:__ @struct river_input_device_v1_listener@
-
-__defined at:__ @river-input-management-v1-client-protocol.h 289:8@
-
-__exported by:__ @river-input-management-v1-client-protocol.h@
+    __exported by:__ @river-input-management-v1-client-protocol.h@
 -}
 data River_input_device_v1_listener = River_input_device_v1_listener
-  { removed :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> IO ())
+  { removed :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> IO ())
     {- ^ the input device is removed
 
-       This event indicates that the input device has been removed.
+         This event indicates that the input device has been removed.
 
-       The server will send no further events on this object and ignore any request (other than river_input_device_v1.destroy) made after this event is sent. The client should destroy this object with the river_input_device_v1.destroy request to free up resources.
+         The server will send no further events on this object and ignore any request (other than river_input_device_v1.destroy) made after this event is sent. The client should destroy this object with the river_input_device_v1.destroy request to free up resources.
 
-    __C declaration:__ @removed@
+         __C declaration:__ @removed@
 
-    __defined at:__ @river-input-management-v1-client-protocol.h 301:9@
+         __defined at:__ @river-input-management-v1-client-protocol.h 301:9@
 
-    __exported by:__ @river-input-management-v1-client-protocol.h@
+         __exported by:__ @river-input-management-v1-client-protocol.h@
     -}
-  , type' :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  , type' :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
     {- ^ the type of the input device
 
-       The type of the input device. This event is sent once when the river_input_device_v1 object is created. The device type cannot change during the lifetime of the object.
+         The type of the input device. This event is sent once when the river_input_device_v1 object is created. The device type cannot change during the lifetime of the object.
 
-    __C declaration:__ @type@
+         __C declaration:__ @type@
 
-    __defined at:__ @river-input-management-v1-client-protocol.h 310:9@
+         __defined at:__ @river-input-management-v1-client-protocol.h 310:9@
 
-    __exported by:__ @river-input-management-v1-client-protocol.h@
+         __exported by:__ @river-input-management-v1-client-protocol.h@
     -}
-  , name :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+  , name :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
     {- ^ the name of the input device
 
-       The name of the input device. This event is sent once when the river_input_device_v1 object is created. The device name cannot change during the lifetime of the object.
+         The name of the input device. This event is sent once when the river_input_device_v1 object is created. The device name cannot change during the lifetime of the object.
 
-    __C declaration:__ @name@
+         __C declaration:__ @name@
 
-    __defined at:__ @river-input-management-v1-client-protocol.h 320:9@
+         __defined at:__ @river-input-management-v1-client-protocol.h 320:9@
 
-    __exported by:__ @river-input-management-v1-client-protocol.h@
+         __exported by:__ @river-input-management-v1-client-protocol.h@
     -}
   }
   deriving stock (Eq, RIP.Generic, Show)
@@ -738,11 +695,11 @@ deriving via Marshal.EquivStorable River_input_device_v1_listener instance RIP.S
 instance HasCField.HasCField River_input_device_v1_listener "removed" where
 
   type CFieldType River_input_device_v1_listener "removed" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> IO ())
          ) => RIP.HasField "removed" (RIP.Ptr River_input_device_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"removed")
@@ -750,11 +707,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_devi
 instance HasCField.HasCField River_input_device_v1_listener "type'" where
 
   type CFieldType River_input_device_v1_listener "type'" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
          ) => RIP.HasField "type'" (RIP.Ptr River_input_device_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"type'")
@@ -762,11 +719,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_devi
 instance HasCField.HasCField River_input_device_v1_listener "name" where
 
   type CFieldType River_input_device_v1_listener "name" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
          ) => RIP.HasField "name" (RIP.Ptr River_input_device_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"name")
@@ -919,162 +876,162 @@ rIVER_INPUT_DEVICE_V1_MAP_TO_RECTANGLE_SINCE_VERSION :: RIP.CInt
 rIVER_INPUT_DEVICE_V1_MAP_TO_RECTANGLE_SINCE_VERSION =
   (1 :: RIP.CInt)
 
-foreign import ccall safe "wrapper" hs_bindgen_0a3b825c854fdb0b_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_49d3503346a5ef19_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> IO ())@
-hs_bindgen_0a3b825c854fdb0b ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> IO ()))
-hs_bindgen_0a3b825c854fdb0b =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> IO ())@
+hs_bindgen_49d3503346a5ef19 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> IO ()))
+hs_bindgen_49d3503346a5ef19 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_0a3b825c854fdb0b_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_49d3503346a5ef19_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_a20acc2f6323de82_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_e4c5a486f62e34dd_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> IO ())@
-hs_bindgen_a20acc2f6323de82 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> IO ()
-hs_bindgen_a20acc2f6323de82 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> IO ())@
+hs_bindgen_e4c5a486f62e34dd ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> IO ()
+hs_bindgen_e4c5a486f62e34dd =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_a20acc2f6323de82_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_e4c5a486f62e34dd_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_0a3b825c854fdb0b
+  toFunPtr = hs_bindgen_49d3503346a5ef19
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_a20acc2f6323de82
+  fromFunPtr = hs_bindgen_e4c5a486f62e34dd
 
-foreign import ccall safe "wrapper" hs_bindgen_58419936d87ebf4e_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_abcd22b44c5a2178_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())@
-hs_bindgen_58419936d87ebf4e ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ()))
-hs_bindgen_58419936d87ebf4e =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())@
+hs_bindgen_abcd22b44c5a2178 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> PtrConst.PtrConst RIP.CChar -> IO ()))
+hs_bindgen_abcd22b44c5a2178 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_58419936d87ebf4e_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_abcd22b44c5a2178_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_72d174005b48fdd2_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_23d5dc786faea5b7_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())@
-hs_bindgen_72d174005b48fdd2 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ()
-hs_bindgen_72d174005b48fdd2 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())@
+hs_bindgen_23d5dc786faea5b7 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> PtrConst.PtrConst RIP.CChar -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> PtrConst.PtrConst RIP.CChar -> IO ()
+hs_bindgen_23d5dc786faea5b7 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_72d174005b48fdd2_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_23d5dc786faea5b7_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> PtrConst.PtrConst RIP.CChar -> IO ()) where
 
-  toFunPtr = hs_bindgen_58419936d87ebf4e
+  toFunPtr = hs_bindgen_abcd22b44c5a2178
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> (PtrConst.PtrConst RIP.CChar) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> PtrConst.PtrConst RIP.CChar -> IO ()) where
 
-  fromFunPtr = hs_bindgen_72d174005b48fdd2
+  fromFunPtr = hs_bindgen_23d5dc786faea5b7
 
-foreign import ccall safe "wrapper" hs_bindgen_7297099aef3714ca_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_8567a4d98656863e_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_7297099aef3714ca ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
-hs_bindgen_7297099aef3714ca =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_8567a4d98656863e ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_8567a4d98656863e =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_7297099aef3714ca_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_8567a4d98656863e_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_5197b110e3a140ce_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.Word32 -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_2aa3ffa834c639cf_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Word32 -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
-hs_bindgen_5197b110e3a140ce ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()
-hs_bindgen_5197b110e3a140ce =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())@
+hs_bindgen_2aa3ffa834c639cf ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()
+hs_bindgen_2aa3ffa834c639cf =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_5197b110e3a140ce_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_2aa3ffa834c639cf_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  toFunPtr = hs_bindgen_7297099aef3714ca
+  toFunPtr = hs_bindgen_8567a4d98656863e
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_device_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_device_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_5197b110e3a140ce
+  fromFunPtr = hs_bindgen_2aa3ffa834c639cf
 
-foreign import ccall safe "wrapper" hs_bindgen_a3aa706b42fea7d4_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_d817a5d53f6188e3_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_manager_v1) -> IO ())@
-hs_bindgen_a3aa706b42fea7d4 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_manager_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_manager_v1) -> IO ()))
-hs_bindgen_a3aa706b42fea7d4 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_manager_v1 -> IO ())@
+hs_bindgen_d817a5d53f6188e3 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_input_manager_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_manager_v1 -> IO ()))
+hs_bindgen_d817a5d53f6188e3 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_a3aa706b42fea7d4_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_d817a5d53f6188e3_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_ba70e28e7b0fa586_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_6a9dea5b3e3e99ef_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_manager_v1) -> IO ())@
-hs_bindgen_ba70e28e7b0fa586 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_manager_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_manager_v1) -> IO ()
-hs_bindgen_ba70e28e7b0fa586 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_manager_v1 -> IO ())@
+hs_bindgen_6a9dea5b3e3e99ef ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_manager_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_input_manager_v1 -> IO ()
+hs_bindgen_6a9dea5b3e3e99ef =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_ba70e28e7b0fa586_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_6a9dea5b3e3e99ef_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_manager_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_manager_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_a3aa706b42fea7d4
+  toFunPtr = hs_bindgen_d817a5d53f6188e3
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_manager_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_manager_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_ba70e28e7b0fa586
+  fromFunPtr = hs_bindgen_6a9dea5b3e3e99ef
 
-foreign import ccall safe "wrapper" hs_bindgen_47962fb6d8b63d41_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_ec2cb2d8ab2eb645_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_manager_v1) -> (RIP.Ptr River_input_device_v1) -> IO ())@
-hs_bindgen_47962fb6d8b63d41 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_manager_v1) -> (RIP.Ptr River_input_device_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_manager_v1) -> (RIP.Ptr River_input_device_v1) -> IO ()))
-hs_bindgen_47962fb6d8b63d41 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_manager_v1 -> RIP.Ptr River_input_device_v1 -> IO ())@
+hs_bindgen_ec2cb2d8ab2eb645 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_input_manager_v1 -> RIP.Ptr River_input_device_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_manager_v1 -> RIP.Ptr River_input_device_v1 -> IO ()))
+hs_bindgen_ec2cb2d8ab2eb645 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_47962fb6d8b63d41_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_ec2cb2d8ab2eb645_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_28ba6f97d03cf736_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_87a2551ccec8324f_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_manager_v1) -> (RIP.Ptr River_input_device_v1) -> IO ())@
-hs_bindgen_28ba6f97d03cf736 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_manager_v1) -> (RIP.Ptr River_input_device_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_manager_v1) -> (RIP.Ptr River_input_device_v1) -> IO ()
-hs_bindgen_28ba6f97d03cf736 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_manager_v1 -> RIP.Ptr River_input_device_v1 -> IO ())@
+hs_bindgen_87a2551ccec8324f ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_manager_v1 -> RIP.Ptr River_input_device_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_input_manager_v1 -> RIP.Ptr River_input_device_v1 -> IO ()
+hs_bindgen_87a2551ccec8324f =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_28ba6f97d03cf736_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_87a2551ccec8324f_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_manager_v1) -> (RIP.Ptr River_input_device_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_manager_v1 -> RIP.Ptr River_input_device_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_47962fb6d8b63d41
+  toFunPtr = hs_bindgen_ec2cb2d8ab2eb645
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_input_manager_v1) -> (RIP.Ptr River_input_device_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_input_manager_v1 -> RIP.Ptr River_input_device_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_28ba6f97d03cf736
+  fromFunPtr = hs_bindgen_87a2551ccec8324f

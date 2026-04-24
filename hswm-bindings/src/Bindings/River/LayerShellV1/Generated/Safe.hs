@@ -159,15 +159,11 @@ hs_bindgen_77cb5f8aa714e0d1 ::
 hs_bindgen_77cb5f8aa714e0d1 =
   RIP.fromFFIType hs_bindgen_77cb5f8aa714e0d1_base
 
-{-|
+{-| __C declaration:__ @river_layer_shell_v1_set_user_data@
 
-  > iface_river_layer_shell_v1
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 164:1@
 
-__C declaration:__ @river_layer_shell_v1_set_user_data@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 164:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
 river_layer_shell_v1_set_user_data ::
      RIP.Ptr River_layer_shell_v1
@@ -190,15 +186,11 @@ hs_bindgen_10d9db324cbfad53 ::
 hs_bindgen_10d9db324cbfad53 =
   RIP.fromFFIType hs_bindgen_10d9db324cbfad53_base
 
-{-|
+{-| __C declaration:__ @river_layer_shell_v1_get_user_data@
 
-  > iface_river_layer_shell_v1
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 171:1@
 
-__C declaration:__ @river_layer_shell_v1_get_user_data@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 171:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
 river_layer_shell_v1_get_user_data ::
      RIP.Ptr River_layer_shell_v1
@@ -244,17 +236,13 @@ hs_bindgen_7a66c966c1f8b28e ::
 hs_bindgen_7a66c966c1f8b28e =
   RIP.fromFFIType hs_bindgen_7a66c966c1f8b28e_base
 
-{-|
+{-| This request indicates that the client will no longer use the river_layer_shell_v1 object.
 
-  > iface_river_layer_shell_v1
+    __C declaration:__ @river_layer_shell_v1_destroy@
 
-  This request indicates that the client will no longer use the river_layer_shell_v1 object.
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 189:1@
 
-__C declaration:__ @river_layer_shell_v1_destroy@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 189:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
 river_layer_shell_v1_destroy ::
      RIP.Ptr River_layer_shell_v1
@@ -277,17 +265,13 @@ hs_bindgen_af18197f3dc71bb5 ::
 hs_bindgen_af18197f3dc71bb5 =
   RIP.fromFFIType hs_bindgen_af18197f3dc71bb5_base
 
-{-|
+{-| It is a protocol error to make this request more than once for a given river_output_v1 object.
 
-  > iface_river_layer_shell_v1
+    __C declaration:__ @river_layer_shell_v1_get_output@
 
-  It is a protocol error to make this request more than once for a given river_output_v1 object.
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 202:1@
 
-__C declaration:__ @river_layer_shell_v1_get_output@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 202:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
 river_layer_shell_v1_get_output ::
      RIP.Ptr River_layer_shell_v1
@@ -312,17 +296,13 @@ hs_bindgen_b419d4b0b8d98a32 ::
 hs_bindgen_b419d4b0b8d98a32 =
   RIP.fromFFIType hs_bindgen_b419d4b0b8d98a32_base
 
-{-|
+{-| It is a protocol error to make this request more than once for a given river_seat_v1 object.
 
-  > iface_river_layer_shell_v1
+    __C declaration:__ @river_layer_shell_v1_get_seat@
 
-  It is a protocol error to make this request more than once for a given river_seat_v1 object.
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 219:1@
 
-__C declaration:__ @river_layer_shell_v1_get_seat@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 219:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
 river_layer_shell_v1_get_seat ::
      RIP.Ptr River_layer_shell_v1
@@ -349,15 +329,11 @@ hs_bindgen_ebb581f6cef6f926 ::
 hs_bindgen_ebb581f6cef6f926 =
   RIP.fromFFIType hs_bindgen_ebb581f6cef6f926_base
 
-{-|
+{-| __C declaration:__ @river_layer_shell_output_v1_add_listener@
 
-  > iface_river_layer_shell_output_v1
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 264:1@
 
-__C declaration:__ @river_layer_shell_output_v1_add_listener@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 264:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
 river_layer_shell_output_v1_add_listener ::
      RIP.Ptr River_layer_shell_output_v1
@@ -384,15 +360,11 @@ hs_bindgen_bb224bc01132f861 ::
 hs_bindgen_bb224bc01132f861 =
   RIP.fromFFIType hs_bindgen_bb224bc01132f861_base
 
-{-|
+{-| __C declaration:__ @river_layer_shell_output_v1_set_user_data@
 
-  > iface_river_layer_shell_output_v1
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 290:1@
 
-__C declaration:__ @river_layer_shell_output_v1_set_user_data@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 290:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
 river_layer_shell_output_v1_set_user_data ::
      RIP.Ptr River_layer_shell_output_v1
@@ -415,15 +387,11 @@ hs_bindgen_3de146c32d498310 ::
 hs_bindgen_3de146c32d498310 =
   RIP.fromFFIType hs_bindgen_3de146c32d498310_base
 
-{-|
+{-| __C declaration:__ @river_layer_shell_output_v1_get_user_data@
 
-  > iface_river_layer_shell_output_v1
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 297:1@
 
-__C declaration:__ @river_layer_shell_output_v1_get_user_data@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 297:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
 river_layer_shell_output_v1_get_user_data ::
      RIP.Ptr River_layer_shell_output_v1
@@ -469,19 +437,15 @@ hs_bindgen_9092df016d2f1315 ::
 hs_bindgen_9092df016d2f1315 =
   RIP.fromFFIType hs_bindgen_9092df016d2f1315_base
 
-{-|
+{-| This request indicates that the client will no longer use the river_layer_shell_output_v1 object and that it may be safely destroyed.
 
-  > iface_river_layer_shell_output_v1
+    This request should be made after the river_output_v1.removed event is received to complete destruction of the output.
 
-  This request indicates that the client will no longer use the river_layer_shell_output_v1 object and that it may be safely destroyed.
+    __C declaration:__ @river_layer_shell_output_v1_destroy@
 
-  This request should be made after the river_output_v1.removed event is received to complete destruction of the output.
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 318:1@
 
-__C declaration:__ @river_layer_shell_output_v1_destroy@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 318:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
 river_layer_shell_output_v1_destroy ::
      RIP.Ptr River_layer_shell_output_v1
@@ -502,21 +466,17 @@ hs_bindgen_1b816e827c088aa4 ::
 hs_bindgen_1b816e827c088aa4 =
   RIP.fromFFIType hs_bindgen_1b816e827c088aa4_base
 
-{-|
+{-| Mark this output as the default for new layer surfaces which do not request a specific output themselves. This request overrides any previous set_default request on any river_layer_shell_output_v1 object.
 
-  > iface_river_layer_shell_output_v1
+    If no set_default request is made or if the default output is destroyed, the default output is undefined until the next set_default request.
 
-  Mark this output as the default for new layer surfaces which do not request a specific output themselves. This request overrides any previous set_default request on any river_layer_shell_output_v1 object.
+    This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
 
-  If no set_default request is made or if the default output is destroyed, the default output is undefined until the next set_default request.
+    __C declaration:__ @river_layer_shell_output_v1_set_default@
 
-  This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 338:1@
 
-__C declaration:__ @river_layer_shell_output_v1_set_default@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 338:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
 river_layer_shell_output_v1_set_default ::
      RIP.Ptr River_layer_shell_output_v1
@@ -541,15 +501,11 @@ hs_bindgen_b5ef1b4febd2df44 ::
 hs_bindgen_b5ef1b4febd2df44 =
   RIP.fromFFIType hs_bindgen_b5ef1b4febd2df44_base
 
-{-|
+{-| __C declaration:__ @river_layer_shell_seat_v1_add_listener@
 
-  > iface_river_layer_shell_seat_v1
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 407:1@
 
-__C declaration:__ @river_layer_shell_seat_v1_add_listener@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 407:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
 river_layer_shell_seat_v1_add_listener ::
      RIP.Ptr River_layer_shell_seat_v1
@@ -576,15 +532,11 @@ hs_bindgen_fa2c1653ad552ce3 ::
 hs_bindgen_fa2c1653ad552ce3 =
   RIP.fromFFIType hs_bindgen_fa2c1653ad552ce3_base
 
-{-|
+{-| __C declaration:__ @river_layer_shell_seat_v1_set_user_data@
 
-  > iface_river_layer_shell_seat_v1
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 436:1@
 
-__C declaration:__ @river_layer_shell_seat_v1_set_user_data@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 436:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
 river_layer_shell_seat_v1_set_user_data ::
      RIP.Ptr River_layer_shell_seat_v1
@@ -607,15 +559,11 @@ hs_bindgen_3b5ff7435c3e66f4 ::
 hs_bindgen_3b5ff7435c3e66f4 =
   RIP.fromFFIType hs_bindgen_3b5ff7435c3e66f4_base
 
-{-|
+{-| __C declaration:__ @river_layer_shell_seat_v1_get_user_data@
 
-  > iface_river_layer_shell_seat_v1
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 443:1@
 
-__C declaration:__ @river_layer_shell_seat_v1_get_user_data@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 443:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
 river_layer_shell_seat_v1_get_user_data ::
      RIP.Ptr River_layer_shell_seat_v1
@@ -661,19 +609,15 @@ hs_bindgen_437b037dc1e42ffd ::
 hs_bindgen_437b037dc1e42ffd =
   RIP.fromFFIType hs_bindgen_437b037dc1e42ffd_base
 
-{-|
+{-| This request indicates that the client will no longer use the river_layer_shell_seat_v1 object and that it may be safely destroyed.
 
-  > iface_river_layer_shell_seat_v1
+    This request should be made after the river_seat_v1.removed event is received to complete destruction of the seat.
 
-  This request indicates that the client will no longer use the river_layer_shell_seat_v1 object and that it may be safely destroyed.
+    __C declaration:__ @river_layer_shell_seat_v1_destroy@
 
-  This request should be made after the river_seat_v1.removed event is received to complete destruction of the seat.
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 464:1@
 
-__C declaration:__ @river_layer_shell_seat_v1_destroy@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 464:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
 river_layer_shell_seat_v1_destroy ::
      RIP.Ptr River_layer_shell_seat_v1

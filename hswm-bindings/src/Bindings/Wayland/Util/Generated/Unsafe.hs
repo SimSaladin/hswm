@@ -386,7 +386,13 @@ hs_bindgen_748f3a86317d5de3 ::
 hs_bindgen_748f3a86317d5de3 =
   RIP.fromFFIType hs_bindgen_748f3a86317d5de3_base
 
-{-| __C declaration:__ @wl_fixed_to_double@
+{-| Converts a fixed-point number to a floating-point number.
+
+    [__@f@__]: Fixed-point number to convert
+
+    __Returns:__ Floating-point representation of the fixed-point argument
+
+    __C declaration:__ @wl_fixed_to_double@
 
     __defined at:__ @wayland-util.h 631:1@
 
@@ -394,7 +400,12 @@ hs_bindgen_748f3a86317d5de3 =
 -}
 wl_fixed_to_double ::
      Wl_fixed_t
-     -- ^ __C declaration:__ @f@
+     {- ^
+
+          [__@f@__]: Fixed-point number to convert
+
+          __C declaration:__ @f@
+     -}
   -> IO RIP.CDouble
 wl_fixed_to_double = hs_bindgen_748f3a86317d5de3
 
@@ -410,7 +421,13 @@ hs_bindgen_306db2b852eb59c4 ::
 hs_bindgen_306db2b852eb59c4 =
   RIP.fromFFIType hs_bindgen_306db2b852eb59c4_base
 
-{-| __C declaration:__ @wl_fixed_from_double@
+{-| Converts a floating-point number to a fixed-point number.
+
+    [__@d@__]: Floating-point number to convert
+
+    __Returns:__ Fixed-point representation of the floating-point argument
+
+    __C declaration:__ @wl_fixed_from_double@
 
     __defined at:__ @wayland-util.h 644:1@
 
@@ -418,7 +435,12 @@ hs_bindgen_306db2b852eb59c4 =
 -}
 wl_fixed_from_double ::
      RIP.CDouble
-     -- ^ __C declaration:__ @d@
+     {- ^
+
+          [__@d@__]: Floating-point number to convert
+
+          __C declaration:__ @d@
+     -}
   -> IO Wl_fixed_t
 wl_fixed_from_double = hs_bindgen_306db2b852eb59c4
 
@@ -434,7 +456,13 @@ hs_bindgen_8f29cc6304537604 ::
 hs_bindgen_8f29cc6304537604 =
   RIP.fromFFIType hs_bindgen_8f29cc6304537604_base
 
-{-| __C declaration:__ @wl_fixed_to_int@
+{-| Converts a fixed-point number to an integer.
+
+    [__@f@__]: Fixed-point number to convert
+
+    __Returns:__ Integer component of the fixed-point argument
+
+    __C declaration:__ @wl_fixed_to_int@
 
     __defined at:__ @wayland-util.h 657:1@
 
@@ -442,7 +470,12 @@ hs_bindgen_8f29cc6304537604 =
 -}
 wl_fixed_to_int ::
      Wl_fixed_t
-     -- ^ __C declaration:__ @f@
+     {- ^
+
+          [__@f@__]: Fixed-point number to convert
+
+          __C declaration:__ @f@
+     -}
   -> IO RIP.CInt
 wl_fixed_to_int = hs_bindgen_8f29cc6304537604
 
@@ -458,7 +491,13 @@ hs_bindgen_a4db3c1f47a2ad8c ::
 hs_bindgen_a4db3c1f47a2ad8c =
   RIP.fromFFIType hs_bindgen_a4db3c1f47a2ad8c_base
 
-{-| __C declaration:__ @wl_fixed_from_int@
+{-| Converts an integer to a fixed-point number.
+
+    [__@i@__]: Integer to convert
+
+    __Returns:__ Fixed-point representation of the integer argument
+
+    __C declaration:__ @wl_fixed_from_int@
 
     __defined at:__ @wayland-util.h 670:1@
 
@@ -466,6 +505,11 @@ hs_bindgen_a4db3c1f47a2ad8c =
 -}
 wl_fixed_from_int ::
      RIP.CInt
-     -- ^ __C declaration:__ @i@
+     {- ^
+
+          [__@i@__]: Integer to convert
+
+          __C declaration:__ @i@
+     -}
   -> IO Wl_fixed_t
 wl_fixed_from_int = hs_bindgen_a4db3c1f47a2ad8c

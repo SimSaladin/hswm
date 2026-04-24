@@ -369,15 +369,11 @@ hs_bindgen_ff51bc2a60b62a4d ::
 hs_bindgen_ff51bc2a60b62a4d =
   RIP.fromFFIType hs_bindgen_ff51bc2a60b62a4d_base
 
-{-|
+{-| __C declaration:__ @river_libinput_config_v1_add_listener@
 
-  > iface_river_libinput_config_v1
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 197:1@
 
-__C declaration:__ @river_libinput_config_v1_add_listener@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 197:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_config_v1_add_listener ::
      RIP.Ptr River_libinput_config_v1
@@ -404,15 +400,11 @@ hs_bindgen_8769d13b44bf3c70 ::
 hs_bindgen_8769d13b44bf3c70 =
   RIP.fromFFIType hs_bindgen_8769d13b44bf3c70_base
 
-{-|
+{-| __C declaration:__ @river_libinput_config_v1_set_user_data@
 
-  > iface_river_libinput_config_v1
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 232:1@
 
-__C declaration:__ @river_libinput_config_v1_set_user_data@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 232:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_config_v1_set_user_data ::
      RIP.Ptr River_libinput_config_v1
@@ -435,15 +427,11 @@ hs_bindgen_a39b117aabe8f9bc ::
 hs_bindgen_a39b117aabe8f9bc =
   RIP.fromFFIType hs_bindgen_a39b117aabe8f9bc_base
 
-{-|
+{-| __C declaration:__ @river_libinput_config_v1_get_user_data@
 
-  > iface_river_libinput_config_v1
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 239:1@
 
-__C declaration:__ @river_libinput_config_v1_get_user_data@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 239:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_config_v1_get_user_data ::
      RIP.Ptr River_libinput_config_v1
@@ -489,19 +477,15 @@ hs_bindgen_b98bb0918803dc1d ::
 hs_bindgen_b98bb0918803dc1d =
   RIP.fromFFIType hs_bindgen_b98bb0918803dc1d_base
 
-{-|
+{-| This request indicates that the client no longer wishes to receive events on this object.
 
-  > iface_river_libinput_config_v1
+    The Wayland protocol is asynchronous, which means the server may send further events until the stop request is processed. The client must wait for a river_libinput_config_v1.finished event before destroying this object.
 
-  This request indicates that the client no longer wishes to receive events on this object.
+    __C declaration:__ @river_libinput_config_v1_stop@
 
-  The Wayland protocol is asynchronous, which means the server may send further events until the stop request is processed. The client must wait for a river_libinput_config_v1.finished event before destroying this object.
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 262:1@
 
-__C declaration:__ @river_libinput_config_v1_stop@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 262:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_config_v1_stop ::
      RIP.Ptr River_libinput_config_v1
@@ -522,21 +506,17 @@ hs_bindgen_0a4b7f42d6373f90 ::
 hs_bindgen_0a4b7f42d6373f90 =
   RIP.fromFFIType hs_bindgen_0a4b7f42d6373f90_base
 
-{-|
+{-| This request should be called after the finished event has been received to complete destruction of the object.
 
-  > iface_river_libinput_config_v1
+    It is a protocol error to make this request before the finished event has been received.
 
-  This request should be called after the finished event has been received to complete destruction of the object.
+    If a client wishes to destroy this object it should send a river_libinput_config_v1.stop request and wait for a river_libinput_config_v1.finished event. Once the finished event is received it is safe to destroy this object and any other objects created through this interface.
 
-  It is a protocol error to make this request before the finished event has been received.
+    __C declaration:__ @river_libinput_config_v1_destroy@
 
-  If a client wishes to destroy this object it should send a river_libinput_config_v1.stop request and wait for a river_libinput_config_v1.finished event. Once the finished event is received it is safe to destroy this object and any other objects created through this interface.
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 284:1@
 
-__C declaration:__ @river_libinput_config_v1_destroy@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 284:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_config_v1_destroy ::
      RIP.Ptr River_libinput_config_v1
@@ -559,17 +539,13 @@ hs_bindgen_0143dd8731d4481c ::
 hs_bindgen_0143dd8731d4481c =
   RIP.fromFFIType hs_bindgen_0143dd8731d4481c_base
 
-{-|
+{-| Create a acceleration config which can be applied with river_libinput_device_v1.apply_accel_config.
 
-  > iface_river_libinput_config_v1
+    __C declaration:__ @river_libinput_config_v1_create_accel_config@
 
-  Create a acceleration config which can be applied with river_libinput_device_v1.apply_accel_config.
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 297:1@
 
-__C declaration:__ @river_libinput_config_v1_create_accel_config@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 297:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_config_v1_create_accel_config ::
      RIP.Ptr River_libinput_config_v1
@@ -596,15 +572,11 @@ hs_bindgen_c3ef91505ffc3568 ::
 hs_bindgen_c3ef91505ffc3568 =
   RIP.fromFFIType hs_bindgen_c3ef91505ffc3568_base
 
-{-|
+{-| __C declaration:__ @river_libinput_device_v1_add_listener@
 
-  > iface_river_libinput_device_v1
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 973:1@
 
-__C declaration:__ @river_libinput_device_v1_add_listener@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 973:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_device_v1_add_listener ::
      RIP.Ptr River_libinput_device_v1
@@ -631,15 +603,11 @@ hs_bindgen_cdb7761449a052d7 ::
 hs_bindgen_cdb7761449a052d7 =
   RIP.fromFFIType hs_bindgen_cdb7761449a052d7_base
 
-{-|
+{-| __C declaration:__ @river_libinput_device_v1_set_user_data@
 
-  > iface_river_libinput_device_v1
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1315:1@
 
-__C declaration:__ @river_libinput_device_v1_set_user_data@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1315:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_device_v1_set_user_data ::
      RIP.Ptr River_libinput_device_v1
@@ -662,15 +630,11 @@ hs_bindgen_085bf9b1b7a9ac5c ::
 hs_bindgen_085bf9b1b7a9ac5c =
   RIP.fromFFIType hs_bindgen_085bf9b1b7a9ac5c_base
 
-{-|
+{-| __C declaration:__ @river_libinput_device_v1_get_user_data@
 
-  > iface_river_libinput_device_v1
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1322:1@
 
-__C declaration:__ @river_libinput_device_v1_get_user_data@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1322:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_device_v1_get_user_data ::
      RIP.Ptr River_libinput_device_v1
@@ -716,17 +680,13 @@ hs_bindgen_4de4e2b782efa86c ::
 hs_bindgen_4de4e2b782efa86c =
   RIP.fromFFIType hs_bindgen_4de4e2b782efa86c_base
 
-{-|
+{-| This request indicates that the client will no longer use the input device object and that it may be safely destroyed.
 
-  > iface_river_libinput_device_v1
+    __C declaration:__ @river_libinput_device_v1_destroy@
 
-  This request indicates that the client will no longer use the input device object and that it may be safely destroyed.
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1340:1@
 
-__C declaration:__ @river_libinput_device_v1_destroy@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1340:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_device_v1_destroy ::
      RIP.Ptr River_libinput_device_v1
@@ -749,17 +709,13 @@ hs_bindgen_b97dc044aa9333f1 ::
 hs_bindgen_b97dc044aa9333f1 =
   RIP.fromFFIType hs_bindgen_b97dc044aa9333f1_base
 
-{-|
+{-| Set the send events mode for the device.
 
-  > iface_river_libinput_device_v1
+    __C declaration:__ @river_libinput_device_v1_set_send_events@
 
-  Set the send events mode for the device.
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1352:1@
 
-__C declaration:__ @river_libinput_device_v1_set_send_events@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1352:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_device_v1_set_send_events ::
      RIP.Ptr River_libinput_device_v1
@@ -784,17 +740,13 @@ hs_bindgen_0849cb1db54b09fc ::
 hs_bindgen_0849cb1db54b09fc =
   RIP.fromFFIType hs_bindgen_0849cb1db54b09fc_base
 
-{-|
+{-| Configure tap-to-click on this device, with a default mapping of 1, 2, 3 finger tap mapping to left, right, middle click, respectively.
 
-  > iface_river_libinput_device_v1
+    __C declaration:__ @river_libinput_device_v1_set_tap@
 
-  Configure tap-to-click on this device, with a default mapping of 1, 2, 3 finger tap mapping to left, right, middle click, respectively.
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1369:1@
 
-__C declaration:__ @river_libinput_device_v1_set_tap@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1369:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_device_v1_set_tap ::
      RIP.Ptr River_libinput_device_v1
@@ -819,17 +771,13 @@ hs_bindgen_d1557260d2406c3a ::
 hs_bindgen_d1557260d2406c3a =
   RIP.fromFFIType hs_bindgen_d1557260d2406c3a_base
 
-{-|
+{-| Set the finger number to button number mapping for tap-to-click. The default mapping on most devices is to have a 1, 2 and 3 finger tap to map to the left, right and middle button, respectively.
 
-  > iface_river_libinput_device_v1
+    __C declaration:__ @river_libinput_device_v1_set_tap_button_map@
 
-  Set the finger number to button number mapping for tap-to-click. The default mapping on most devices is to have a 1, 2 and 3 finger tap to map to the left, right and middle button, respectively.
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1387:1@
 
-__C declaration:__ @river_libinput_device_v1_set_tap_button_map@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1387:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_device_v1_set_tap_button_map ::
      RIP.Ptr River_libinput_device_v1
@@ -854,17 +802,13 @@ hs_bindgen_2c4d464817b213ce ::
 hs_bindgen_2c4d464817b213ce =
   RIP.fromFFIType hs_bindgen_2c4d464817b213ce_base
 
-{-|
+{-| Configure tap-and-drag functionality on the device.
 
-  > iface_river_libinput_device_v1
+    __C declaration:__ @river_libinput_device_v1_set_drag@
 
-  Configure tap-and-drag functionality on the device.
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1403:1@
 
-__C declaration:__ @river_libinput_device_v1_set_drag@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1403:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_device_v1_set_drag ::
      RIP.Ptr River_libinput_device_v1
@@ -889,17 +833,13 @@ hs_bindgen_5d471b1f3b0b8029 ::
 hs_bindgen_5d471b1f3b0b8029 =
   RIP.fromFFIType hs_bindgen_5d471b1f3b0b8029_base
 
-{-|
+{-| Configure drag-lock during tapping on this device. When enabled, a finger may be lifted and put back on the touchpad and the drag process continues. A timeout for lifting the finger is optional. When disabled, lifting the finger during a tap-and-drag will immediately stop the drag. See the libinput documentation for more details.
 
-  > iface_river_libinput_device_v1
+    __C declaration:__ @river_libinput_device_v1_set_drag_lock@
 
-  Configure drag-lock during tapping on this device. When enabled, a finger may be lifted and put back on the touchpad and the drag process continues. A timeout for lifting the finger is optional. When disabled, lifting the finger during a tap-and-drag will immediately stop the drag. See the libinput documentation for more details.
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1423:1@
 
-__C declaration:__ @river_libinput_device_v1_set_drag_lock@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1423:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_device_v1_set_drag_lock ::
      RIP.Ptr River_libinput_device_v1
@@ -924,17 +864,13 @@ hs_bindgen_cc5035d08806acb5 ::
 hs_bindgen_cc5035d08806acb5 =
   RIP.fromFFIType hs_bindgen_cc5035d08806acb5_base
 
-{-|
+{-| Configure three finger drag functionality for the device.
 
-  > iface_river_libinput_device_v1
+    __C declaration:__ @river_libinput_device_v1_set_three_finger_drag@
 
-  Configure three finger drag functionality for the device.
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1439:1@
 
-__C declaration:__ @river_libinput_device_v1_set_three_finger_drag@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1439:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_device_v1_set_three_finger_drag ::
      RIP.Ptr River_libinput_device_v1
@@ -959,17 +895,13 @@ hs_bindgen_77126f8d41cd13d2 ::
 hs_bindgen_77126f8d41cd13d2 =
   RIP.fromFFIType hs_bindgen_77126f8d41cd13d2_base
 
-{-|
+{-| Set calibration matrix.
 
-  > iface_river_libinput_device_v1
+    __C declaration:__ @river_libinput_device_v1_set_calibration_matrix@
 
-  Set calibration matrix.
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1455:1@
 
-__C declaration:__ @river_libinput_device_v1_set_calibration_matrix@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1455:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_device_v1_set_calibration_matrix ::
      RIP.Ptr River_libinput_device_v1
@@ -994,17 +926,13 @@ hs_bindgen_c855630bdca89425 ::
 hs_bindgen_c855630bdca89425 =
   RIP.fromFFIType hs_bindgen_c855630bdca89425_base
 
-{-|
+{-| Set the acceleration profile.
 
-  > iface_river_libinput_device_v1
+    __C declaration:__ @river_libinput_device_v1_set_accel_profile@
 
-  Set the acceleration profile.
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1471:1@
 
-__C declaration:__ @river_libinput_device_v1_set_accel_profile@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1471:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_device_v1_set_accel_profile ::
      RIP.Ptr River_libinput_device_v1
@@ -1029,17 +957,13 @@ hs_bindgen_8d0b4b02452aad24 ::
 hs_bindgen_8d0b4b02452aad24 =
   RIP.fromFFIType hs_bindgen_8d0b4b02452aad24_base
 
-{-|
+{-| Set the acceleration speed within a range of [-1, 1], where 0 is the default acceleration for this device, -1 is the slowest acceleration and 1 is the maximum acceleration available on this device.
 
-  > iface_river_libinput_device_v1
+    __C declaration:__ @river_libinput_device_v1_set_accel_speed@
 
-  Set the acceleration speed within a range of [-1, 1], where 0 is the default acceleration for this device, -1 is the slowest acceleration and 1 is the maximum acceleration available on this device.
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1489:1@
 
-__C declaration:__ @river_libinput_device_v1_set_accel_speed@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1489:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_device_v1_set_accel_speed ::
      RIP.Ptr River_libinput_device_v1
@@ -1064,17 +988,13 @@ hs_bindgen_b1d27652a9f15f10 ::
 hs_bindgen_b1d27652a9f15f10 =
   RIP.fromFFIType hs_bindgen_b1d27652a9f15f10_base
 
-{-|
+{-| Apply a pointer accleration config.
 
-  > iface_river_libinput_device_v1
+    __C declaration:__ @river_libinput_device_v1_apply_accel_config@
 
-  Apply a pointer accleration config.
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1505:1@
 
-__C declaration:__ @river_libinput_device_v1_apply_accel_config@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1505:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_device_v1_apply_accel_config ::
      RIP.Ptr River_libinput_device_v1
@@ -1099,17 +1019,13 @@ hs_bindgen_2fe985f6ed2efa4d ::
 hs_bindgen_2fe985f6ed2efa4d =
   RIP.fromFFIType hs_bindgen_2fe985f6ed2efa4d_base
 
-{-|
+{-| Set natural scroll state.
 
-  > iface_river_libinput_device_v1
+    __C declaration:__ @river_libinput_device_v1_set_natural_scroll@
 
-  Set natural scroll state.
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1521:1@
 
-__C declaration:__ @river_libinput_device_v1_set_natural_scroll@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1521:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_device_v1_set_natural_scroll ::
      RIP.Ptr River_libinput_device_v1
@@ -1134,17 +1050,13 @@ hs_bindgen_6f03814656ee58a0 ::
 hs_bindgen_6f03814656ee58a0 =
   RIP.fromFFIType hs_bindgen_6f03814656ee58a0_base
 
-{-|
+{-| Set left-handed mode state.
 
-  > iface_river_libinput_device_v1
+    __C declaration:__ @river_libinput_device_v1_set_left_handed@
 
-  Set left-handed mode state.
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1537:1@
 
-__C declaration:__ @river_libinput_device_v1_set_left_handed@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1537:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_device_v1_set_left_handed ::
      RIP.Ptr River_libinput_device_v1
@@ -1169,17 +1081,13 @@ hs_bindgen_09b6d087396a979c ::
 hs_bindgen_09b6d087396a979c =
   RIP.fromFFIType hs_bindgen_09b6d087396a979c_base
 
-{-|
+{-| Set click method.
 
-  > iface_river_libinput_device_v1
+    __C declaration:__ @river_libinput_device_v1_set_click_method@
 
-  Set click method.
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1553:1@
 
-__C declaration:__ @river_libinput_device_v1_set_click_method@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1553:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_device_v1_set_click_method ::
      RIP.Ptr River_libinput_device_v1
@@ -1204,17 +1112,13 @@ hs_bindgen_68f3b75e58511c52 ::
 hs_bindgen_68f3b75e58511c52 =
   RIP.fromFFIType hs_bindgen_68f3b75e58511c52_base
 
-{-|
+{-| Set clickfinger button map. Supported if click_methods.clickfinger is supported.
 
-  > iface_river_libinput_device_v1
+    __C declaration:__ @river_libinput_device_v1_set_clickfinger_button_map@
 
-  Set clickfinger button map. Supported if click_methods.clickfinger is supported.
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1570:1@
 
-__C declaration:__ @river_libinput_device_v1_set_clickfinger_button_map@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1570:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_device_v1_set_clickfinger_button_map ::
      RIP.Ptr River_libinput_device_v1
@@ -1239,17 +1143,13 @@ hs_bindgen_301bbc23f7aaca69 ::
 hs_bindgen_301bbc23f7aaca69 =
   RIP.fromFFIType hs_bindgen_301bbc23f7aaca69_base
 
-{-|
+{-| Set middle mouse button emulation state.
 
-  > iface_river_libinput_device_v1
+    __C declaration:__ @river_libinput_device_v1_set_middle_emulation@
 
-  Set middle mouse button emulation state.
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1586:1@
 
-__C declaration:__ @river_libinput_device_v1_set_middle_emulation@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1586:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_device_v1_set_middle_emulation ::
      RIP.Ptr River_libinput_device_v1
@@ -1274,17 +1174,13 @@ hs_bindgen_cff7e52fc303663e ::
 hs_bindgen_cff7e52fc303663e =
   RIP.fromFFIType hs_bindgen_cff7e52fc303663e_base
 
-{-|
+{-| Set scroll method.
 
-  > iface_river_libinput_device_v1
+    __C declaration:__ @river_libinput_device_v1_set_scroll_method@
 
-  Set scroll method.
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1602:1@
 
-__C declaration:__ @river_libinput_device_v1_set_scroll_method@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1602:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_device_v1_set_scroll_method ::
      RIP.Ptr River_libinput_device_v1
@@ -1309,17 +1205,13 @@ hs_bindgen_82349eee22972b16 ::
 hs_bindgen_82349eee22972b16 =
   RIP.fromFFIType hs_bindgen_82349eee22972b16_base
 
-{-|
+{-| Set scroll button. Supported if scroll_methods.on_button_down is supported.
 
-  > iface_river_libinput_device_v1
+    __C declaration:__ @river_libinput_device_v1_set_scroll_button@
 
-  Set scroll button. Supported if scroll_methods.on_button_down is supported.
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1619:1@
 
-__C declaration:__ @river_libinput_device_v1_set_scroll_button@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1619:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_device_v1_set_scroll_button ::
      RIP.Ptr River_libinput_device_v1
@@ -1344,17 +1236,13 @@ hs_bindgen_ec97b3fea2f71776 ::
 hs_bindgen_ec97b3fea2f71776 =
   RIP.fromFFIType hs_bindgen_ec97b3fea2f71776_base
 
-{-|
+{-| Set scroll button lock state. Supported if scroll_methods.on_button_down is supported.
 
-  > iface_river_libinput_device_v1
+    __C declaration:__ @river_libinput_device_v1_set_scroll_button_lock@
 
-  Set scroll button lock state. Supported if scroll_methods.on_button_down is supported.
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1636:1@
 
-__C declaration:__ @river_libinput_device_v1_set_scroll_button_lock@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1636:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_device_v1_set_scroll_button_lock ::
      RIP.Ptr River_libinput_device_v1
@@ -1379,17 +1267,13 @@ hs_bindgen_0504ec4ef5abca8d ::
 hs_bindgen_0504ec4ef5abca8d =
   RIP.fromFFIType hs_bindgen_0504ec4ef5abca8d_base
 
-{-|
+{-| Set disable-while-typing state.
 
-  > iface_river_libinput_device_v1
+    __C declaration:__ @river_libinput_device_v1_set_dwt@
 
-  Set disable-while-typing state.
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1652:1@
 
-__C declaration:__ @river_libinput_device_v1_set_dwt@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1652:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_device_v1_set_dwt ::
      RIP.Ptr River_libinput_device_v1
@@ -1414,17 +1298,13 @@ hs_bindgen_6a85a202201fc375 ::
 hs_bindgen_6a85a202201fc375 =
   RIP.fromFFIType hs_bindgen_6a85a202201fc375_base
 
-{-|
+{-| Set disable-while-trackpointing state.
 
-  > iface_river_libinput_device_v1
+    __C declaration:__ @river_libinput_device_v1_set_dwtp@
 
-  Set disable-while-trackpointing state.
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1668:1@
 
-__C declaration:__ @river_libinput_device_v1_set_dwtp@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1668:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_device_v1_set_dwtp ::
      RIP.Ptr River_libinput_device_v1
@@ -1449,17 +1329,13 @@ hs_bindgen_658f91a0a1345878 ::
 hs_bindgen_658f91a0a1345878 =
   RIP.fromFFIType hs_bindgen_658f91a0a1345878_base
 
-{-|
+{-| Set rotation angle in degrees clockwise off the logical neutral position. Angle must be in the range [0-360).
 
-  > iface_river_libinput_device_v1
+    __C declaration:__ @river_libinput_device_v1_set_rotation@
 
-  Set rotation angle in degrees clockwise off the logical neutral position. Angle must be in the range [0-360).
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1685:1@
 
-__C declaration:__ @river_libinput_device_v1_set_rotation@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1685:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_device_v1_set_rotation ::
      RIP.Ptr River_libinput_device_v1
@@ -1484,15 +1360,11 @@ hs_bindgen_177ed16f0fbee1b4 ::
 hs_bindgen_177ed16f0fbee1b4 =
   RIP.fromFFIType hs_bindgen_177ed16f0fbee1b4_base
 
-{-|
+{-| __C declaration:__ @river_libinput_accel_config_v1_set_user_data@
 
-  > iface_river_libinput_accel_config_v1
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1729:1@
 
-__C declaration:__ @river_libinput_accel_config_v1_set_user_data@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1729:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_accel_config_v1_set_user_data ::
      RIP.Ptr River_libinput_accel_config_v1
@@ -1515,15 +1387,11 @@ hs_bindgen_7905b95ed6e9e3a1 ::
 hs_bindgen_7905b95ed6e9e3a1 =
   RIP.fromFFIType hs_bindgen_7905b95ed6e9e3a1_base
 
-{-|
+{-| __C declaration:__ @river_libinput_accel_config_v1_get_user_data@
 
-  > iface_river_libinput_accel_config_v1
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1736:1@
 
-__C declaration:__ @river_libinput_accel_config_v1_get_user_data@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1736:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_accel_config_v1_get_user_data ::
      RIP.Ptr River_libinput_accel_config_v1
@@ -1569,17 +1437,13 @@ hs_bindgen_89033991f0010306 ::
 hs_bindgen_89033991f0010306 =
   RIP.fromFFIType hs_bindgen_89033991f0010306_base
 
-{-|
+{-| This request indicates that the client will no longer use the accel config object and that it may be safely destroyed.
 
-  > iface_river_libinput_accel_config_v1
+    __C declaration:__ @river_libinput_accel_config_v1_destroy@
 
-  This request indicates that the client will no longer use the accel config object and that it may be safely destroyed.
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1754:1@
 
-__C declaration:__ @river_libinput_accel_config_v1_destroy@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1754:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_accel_config_v1_destroy ::
      RIP.Ptr River_libinput_accel_config_v1
@@ -1606,17 +1470,13 @@ hs_bindgen_6e0fb9984e0a7a06 ::
 hs_bindgen_6e0fb9984e0a7a06 =
   RIP.fromFFIType hs_bindgen_6e0fb9984e0a7a06_base
 
-{-|
+{-| Defines the acceleration function for a given movement type in an acceleration configuration with custom accel profile.
 
-  > iface_river_libinput_accel_config_v1
+    __C declaration:__ @river_libinput_accel_config_v1_set_points@
 
-  Defines the acceleration function for a given movement type in an acceleration configuration with custom accel profile.
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1767:1@
 
-__C declaration:__ @river_libinput_accel_config_v1_set_points@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1767:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_accel_config_v1_set_points ::
      RIP.Ptr River_libinput_accel_config_v1
@@ -1647,15 +1507,11 @@ hs_bindgen_72e5c64db559b5ec ::
 hs_bindgen_72e5c64db559b5ec =
   RIP.fromFFIType hs_bindgen_72e5c64db559b5ec_base
 
-{-|
+{-| __C declaration:__ @river_libinput_result_v1_add_listener@
 
-  > iface_river_libinput_result_v1
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1810:1@
 
-__C declaration:__ @river_libinput_result_v1_add_listener@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1810:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_result_v1_add_listener ::
      RIP.Ptr River_libinput_result_v1
@@ -1682,15 +1538,11 @@ hs_bindgen_09cbfd4acc599a90 ::
 hs_bindgen_09cbfd4acc599a90 =
   RIP.fromFFIType hs_bindgen_09cbfd4acc599a90_base
 
-{-|
+{-| __C declaration:__ @river_libinput_result_v1_set_user_data@
 
-  > iface_river_libinput_result_v1
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1833:1@
 
-__C declaration:__ @river_libinput_result_v1_set_user_data@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1833:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_result_v1_set_user_data ::
      RIP.Ptr River_libinput_result_v1
@@ -1713,15 +1565,11 @@ hs_bindgen_01f613215f696260 ::
 hs_bindgen_01f613215f696260 =
   RIP.fromFFIType hs_bindgen_01f613215f696260_base
 
-{-|
+{-| __C declaration:__ @river_libinput_result_v1_get_user_data@
 
-  > iface_river_libinput_result_v1
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1840:1@
 
-__C declaration:__ @river_libinput_result_v1_get_user_data@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1840:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_result_v1_get_user_data ::
      RIP.Ptr River_libinput_result_v1
@@ -1767,15 +1615,11 @@ hs_bindgen_230d3b8f63df5c95 ::
 hs_bindgen_230d3b8f63df5c95 =
   RIP.fromFFIType hs_bindgen_230d3b8f63df5c95_base
 
-{-|
+{-| __C declaration:__ @river_libinput_result_v1_destroy@
 
-  > iface_river_libinput_result_v1
+    __defined at:__ @river-libinput-config-v1-client-protocol.h 1853:1@
 
-__C declaration:__ @river_libinput_result_v1_destroy@
-
-__defined at:__ @river-libinput-config-v1-client-protocol.h 1853:1@
-
-__exported by:__ @river-libinput-config-v1-client-protocol.h@
+    __exported by:__ @river-libinput-config-v1-client-protocol.h@
 -}
 river_libinput_result_v1_destroy ::
      RIP.Ptr River_libinput_result_v1

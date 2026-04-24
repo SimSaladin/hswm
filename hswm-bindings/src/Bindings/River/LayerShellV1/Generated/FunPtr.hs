@@ -184,22 +184,18 @@ foreign import ccall unsafe "hs_bindgen_1da62e8263d46b14" hs_bindgen_1da62e8263d
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_River_LayerShellV1_Generated_Bindings.River.LayerShellV1.Generated_get_river_layer_shell_v1_set_user_data@
-hs_bindgen_1da62e8263d46b14 :: IO (RIP.FunPtr ((RIP.Ptr River_layer_shell_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
+hs_bindgen_1da62e8263d46b14 :: IO (RIP.FunPtr (RIP.Ptr River_layer_shell_v1 -> RIP.Ptr RIP.Void -> IO ()))
 hs_bindgen_1da62e8263d46b14 =
   RIP.fromFFIType hs_bindgen_1da62e8263d46b14_base
 
 {-# NOINLINE river_layer_shell_v1_set_user_data #-}
-{-|
+{-| __C declaration:__ @river_layer_shell_v1_set_user_data@
 
-  > iface_river_layer_shell_v1
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 164:1@
 
-__C declaration:__ @river_layer_shell_v1_set_user_data@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 164:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
-river_layer_shell_v1_set_user_data :: RIP.FunPtr ((RIP.Ptr River_layer_shell_v1) -> (RIP.Ptr RIP.Void) -> IO ())
+river_layer_shell_v1_set_user_data :: RIP.FunPtr (RIP.Ptr River_layer_shell_v1 -> RIP.Ptr RIP.Void -> IO ())
 river_layer_shell_v1_set_user_data =
   RIP.unsafePerformIO hs_bindgen_1da62e8263d46b14
 
@@ -208,22 +204,18 @@ foreign import ccall unsafe "hs_bindgen_79e76af533a9857d" hs_bindgen_79e76af533a
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_River_LayerShellV1_Generated_Bindings.River.LayerShellV1.Generated_get_river_layer_shell_v1_get_user_data@
-hs_bindgen_79e76af533a9857d :: IO (RIP.FunPtr ((RIP.Ptr River_layer_shell_v1) -> IO (RIP.Ptr RIP.Void)))
+hs_bindgen_79e76af533a9857d :: IO (RIP.FunPtr (RIP.Ptr River_layer_shell_v1 -> IO (RIP.Ptr RIP.Void)))
 hs_bindgen_79e76af533a9857d =
   RIP.fromFFIType hs_bindgen_79e76af533a9857d_base
 
 {-# NOINLINE river_layer_shell_v1_get_user_data #-}
-{-|
+{-| __C declaration:__ @river_layer_shell_v1_get_user_data@
 
-  > iface_river_layer_shell_v1
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 171:1@
 
-__C declaration:__ @river_layer_shell_v1_get_user_data@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 171:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
-river_layer_shell_v1_get_user_data :: RIP.FunPtr ((RIP.Ptr River_layer_shell_v1) -> IO (RIP.Ptr RIP.Void))
+river_layer_shell_v1_get_user_data :: RIP.FunPtr (RIP.Ptr River_layer_shell_v1 -> IO (RIP.Ptr RIP.Void))
 river_layer_shell_v1_get_user_data =
   RIP.unsafePerformIO hs_bindgen_79e76af533a9857d
 
@@ -232,7 +224,7 @@ foreign import ccall unsafe "hs_bindgen_aa9dd43da5b646b6" hs_bindgen_aa9dd43da5b
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_River_LayerShellV1_Generated_Bindings.River.LayerShellV1.Generated_get_river_layer_shell_v1_get_version@
-hs_bindgen_aa9dd43da5b646b6 :: IO (RIP.FunPtr ((RIP.Ptr River_layer_shell_v1) -> IO HsBindgen.Runtime.LibC.Word32))
+hs_bindgen_aa9dd43da5b646b6 :: IO (RIP.FunPtr (RIP.Ptr River_layer_shell_v1 -> IO HsBindgen.Runtime.LibC.Word32))
 hs_bindgen_aa9dd43da5b646b6 =
   RIP.fromFFIType hs_bindgen_aa9dd43da5b646b6_base
 
@@ -243,7 +235,7 @@ hs_bindgen_aa9dd43da5b646b6 =
 
     __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
-river_layer_shell_v1_get_version :: RIP.FunPtr ((RIP.Ptr River_layer_shell_v1) -> IO HsBindgen.Runtime.LibC.Word32)
+river_layer_shell_v1_get_version :: RIP.FunPtr (RIP.Ptr River_layer_shell_v1 -> IO HsBindgen.Runtime.LibC.Word32)
 river_layer_shell_v1_get_version =
   RIP.unsafePerformIO hs_bindgen_aa9dd43da5b646b6
 
@@ -252,24 +244,20 @@ foreign import ccall unsafe "hs_bindgen_eb0f1a258ae6d6a4" hs_bindgen_eb0f1a258ae
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_River_LayerShellV1_Generated_Bindings.River.LayerShellV1.Generated_get_river_layer_shell_v1_destroy@
-hs_bindgen_eb0f1a258ae6d6a4 :: IO (RIP.FunPtr ((RIP.Ptr River_layer_shell_v1) -> IO ()))
+hs_bindgen_eb0f1a258ae6d6a4 :: IO (RIP.FunPtr (RIP.Ptr River_layer_shell_v1 -> IO ()))
 hs_bindgen_eb0f1a258ae6d6a4 =
   RIP.fromFFIType hs_bindgen_eb0f1a258ae6d6a4_base
 
 {-# NOINLINE river_layer_shell_v1_destroy #-}
-{-|
+{-| This request indicates that the client will no longer use the river_layer_shell_v1 object.
 
-  > iface_river_layer_shell_v1
+    __C declaration:__ @river_layer_shell_v1_destroy@
 
-  This request indicates that the client will no longer use the river_layer_shell_v1 object.
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 189:1@
 
-__C declaration:__ @river_layer_shell_v1_destroy@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 189:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
-river_layer_shell_v1_destroy :: RIP.FunPtr ((RIP.Ptr River_layer_shell_v1) -> IO ())
+river_layer_shell_v1_destroy :: RIP.FunPtr (RIP.Ptr River_layer_shell_v1 -> IO ())
 river_layer_shell_v1_destroy =
   RIP.unsafePerformIO hs_bindgen_eb0f1a258ae6d6a4
 
@@ -278,24 +266,20 @@ foreign import ccall unsafe "hs_bindgen_106bcefa7f901436" hs_bindgen_106bcefa7f9
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_River_LayerShellV1_Generated_Bindings.River.LayerShellV1.Generated_get_river_layer_shell_v1_get_output@
-hs_bindgen_106bcefa7f901436 :: IO (RIP.FunPtr ((RIP.Ptr River_layer_shell_v1) -> (RIP.Ptr Bindings.River.WindowManagementV1.Generated.River_output_v1) -> IO (RIP.Ptr River_layer_shell_output_v1)))
+hs_bindgen_106bcefa7f901436 :: IO (RIP.FunPtr (RIP.Ptr River_layer_shell_v1 -> RIP.Ptr Bindings.River.WindowManagementV1.Generated.River_output_v1 -> IO (RIP.Ptr River_layer_shell_output_v1)))
 hs_bindgen_106bcefa7f901436 =
   RIP.fromFFIType hs_bindgen_106bcefa7f901436_base
 
 {-# NOINLINE river_layer_shell_v1_get_output #-}
-{-|
+{-| It is a protocol error to make this request more than once for a given river_output_v1 object.
 
-  > iface_river_layer_shell_v1
+    __C declaration:__ @river_layer_shell_v1_get_output@
 
-  It is a protocol error to make this request more than once for a given river_output_v1 object.
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 202:1@
 
-__C declaration:__ @river_layer_shell_v1_get_output@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 202:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
-river_layer_shell_v1_get_output :: RIP.FunPtr ((RIP.Ptr River_layer_shell_v1) -> (RIP.Ptr Bindings.River.WindowManagementV1.Generated.River_output_v1) -> IO (RIP.Ptr River_layer_shell_output_v1))
+river_layer_shell_v1_get_output :: RIP.FunPtr (RIP.Ptr River_layer_shell_v1 -> RIP.Ptr Bindings.River.WindowManagementV1.Generated.River_output_v1 -> IO (RIP.Ptr River_layer_shell_output_v1))
 river_layer_shell_v1_get_output =
   RIP.unsafePerformIO hs_bindgen_106bcefa7f901436
 
@@ -304,24 +288,20 @@ foreign import ccall unsafe "hs_bindgen_246354c5aa6fa460" hs_bindgen_246354c5aa6
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_River_LayerShellV1_Generated_Bindings.River.LayerShellV1.Generated_get_river_layer_shell_v1_get_seat@
-hs_bindgen_246354c5aa6fa460 :: IO (RIP.FunPtr ((RIP.Ptr River_layer_shell_v1) -> (RIP.Ptr Bindings.River.WindowManagementV1.Generated.River_seat_v1) -> IO (RIP.Ptr River_layer_shell_seat_v1)))
+hs_bindgen_246354c5aa6fa460 :: IO (RIP.FunPtr (RIP.Ptr River_layer_shell_v1 -> RIP.Ptr Bindings.River.WindowManagementV1.Generated.River_seat_v1 -> IO (RIP.Ptr River_layer_shell_seat_v1)))
 hs_bindgen_246354c5aa6fa460 =
   RIP.fromFFIType hs_bindgen_246354c5aa6fa460_base
 
 {-# NOINLINE river_layer_shell_v1_get_seat #-}
-{-|
+{-| It is a protocol error to make this request more than once for a given river_seat_v1 object.
 
-  > iface_river_layer_shell_v1
+    __C declaration:__ @river_layer_shell_v1_get_seat@
 
-  It is a protocol error to make this request more than once for a given river_seat_v1 object.
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 219:1@
 
-__C declaration:__ @river_layer_shell_v1_get_seat@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 219:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
-river_layer_shell_v1_get_seat :: RIP.FunPtr ((RIP.Ptr River_layer_shell_v1) -> (RIP.Ptr Bindings.River.WindowManagementV1.Generated.River_seat_v1) -> IO (RIP.Ptr River_layer_shell_seat_v1))
+river_layer_shell_v1_get_seat :: RIP.FunPtr (RIP.Ptr River_layer_shell_v1 -> RIP.Ptr Bindings.River.WindowManagementV1.Generated.River_seat_v1 -> IO (RIP.Ptr River_layer_shell_seat_v1))
 river_layer_shell_v1_get_seat =
   RIP.unsafePerformIO hs_bindgen_246354c5aa6fa460
 
@@ -330,22 +310,18 @@ foreign import ccall unsafe "hs_bindgen_8910fa0937a98d3f" hs_bindgen_8910fa0937a
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_River_LayerShellV1_Generated_Bindings.River.LayerShellV1.Generated_get_river_layer_shell_output_v1_add_listener@
-hs_bindgen_8910fa0937a98d3f :: IO (RIP.FunPtr ((RIP.Ptr River_layer_shell_output_v1) -> (PtrConst.PtrConst River_layer_shell_output_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt))
+hs_bindgen_8910fa0937a98d3f :: IO (RIP.FunPtr (RIP.Ptr River_layer_shell_output_v1 -> PtrConst.PtrConst River_layer_shell_output_v1_listener -> RIP.Ptr RIP.Void -> IO RIP.CInt))
 hs_bindgen_8910fa0937a98d3f =
   RIP.fromFFIType hs_bindgen_8910fa0937a98d3f_base
 
 {-# NOINLINE river_layer_shell_output_v1_add_listener #-}
-{-|
+{-| __C declaration:__ @river_layer_shell_output_v1_add_listener@
 
-  > iface_river_layer_shell_output_v1
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 264:1@
 
-__C declaration:__ @river_layer_shell_output_v1_add_listener@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 264:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
-river_layer_shell_output_v1_add_listener :: RIP.FunPtr ((RIP.Ptr River_layer_shell_output_v1) -> (PtrConst.PtrConst River_layer_shell_output_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt)
+river_layer_shell_output_v1_add_listener :: RIP.FunPtr (RIP.Ptr River_layer_shell_output_v1 -> PtrConst.PtrConst River_layer_shell_output_v1_listener -> RIP.Ptr RIP.Void -> IO RIP.CInt)
 river_layer_shell_output_v1_add_listener =
   RIP.unsafePerformIO hs_bindgen_8910fa0937a98d3f
 
@@ -354,22 +330,18 @@ foreign import ccall unsafe "hs_bindgen_0556d85230c06356" hs_bindgen_0556d85230c
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_River_LayerShellV1_Generated_Bindings.River.LayerShellV1.Generated_get_river_layer_shell_output_v1_set_user_data@
-hs_bindgen_0556d85230c06356 :: IO (RIP.FunPtr ((RIP.Ptr River_layer_shell_output_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
+hs_bindgen_0556d85230c06356 :: IO (RIP.FunPtr (RIP.Ptr River_layer_shell_output_v1 -> RIP.Ptr RIP.Void -> IO ()))
 hs_bindgen_0556d85230c06356 =
   RIP.fromFFIType hs_bindgen_0556d85230c06356_base
 
 {-# NOINLINE river_layer_shell_output_v1_set_user_data #-}
-{-|
+{-| __C declaration:__ @river_layer_shell_output_v1_set_user_data@
 
-  > iface_river_layer_shell_output_v1
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 290:1@
 
-__C declaration:__ @river_layer_shell_output_v1_set_user_data@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 290:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
-river_layer_shell_output_v1_set_user_data :: RIP.FunPtr ((RIP.Ptr River_layer_shell_output_v1) -> (RIP.Ptr RIP.Void) -> IO ())
+river_layer_shell_output_v1_set_user_data :: RIP.FunPtr (RIP.Ptr River_layer_shell_output_v1 -> RIP.Ptr RIP.Void -> IO ())
 river_layer_shell_output_v1_set_user_data =
   RIP.unsafePerformIO hs_bindgen_0556d85230c06356
 
@@ -378,22 +350,18 @@ foreign import ccall unsafe "hs_bindgen_995852853340c629" hs_bindgen_99585285334
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_River_LayerShellV1_Generated_Bindings.River.LayerShellV1.Generated_get_river_layer_shell_output_v1_get_user_data@
-hs_bindgen_995852853340c629 :: IO (RIP.FunPtr ((RIP.Ptr River_layer_shell_output_v1) -> IO (RIP.Ptr RIP.Void)))
+hs_bindgen_995852853340c629 :: IO (RIP.FunPtr (RIP.Ptr River_layer_shell_output_v1 -> IO (RIP.Ptr RIP.Void)))
 hs_bindgen_995852853340c629 =
   RIP.fromFFIType hs_bindgen_995852853340c629_base
 
 {-# NOINLINE river_layer_shell_output_v1_get_user_data #-}
-{-|
+{-| __C declaration:__ @river_layer_shell_output_v1_get_user_data@
 
-  > iface_river_layer_shell_output_v1
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 297:1@
 
-__C declaration:__ @river_layer_shell_output_v1_get_user_data@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 297:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
-river_layer_shell_output_v1_get_user_data :: RIP.FunPtr ((RIP.Ptr River_layer_shell_output_v1) -> IO (RIP.Ptr RIP.Void))
+river_layer_shell_output_v1_get_user_data :: RIP.FunPtr (RIP.Ptr River_layer_shell_output_v1 -> IO (RIP.Ptr RIP.Void))
 river_layer_shell_output_v1_get_user_data =
   RIP.unsafePerformIO hs_bindgen_995852853340c629
 
@@ -402,7 +370,7 @@ foreign import ccall unsafe "hs_bindgen_2e28b1350855e72f" hs_bindgen_2e28b135085
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_River_LayerShellV1_Generated_Bindings.River.LayerShellV1.Generated_get_river_layer_shell_output_v1_get_version@
-hs_bindgen_2e28b1350855e72f :: IO (RIP.FunPtr ((RIP.Ptr River_layer_shell_output_v1) -> IO HsBindgen.Runtime.LibC.Word32))
+hs_bindgen_2e28b1350855e72f :: IO (RIP.FunPtr (RIP.Ptr River_layer_shell_output_v1 -> IO HsBindgen.Runtime.LibC.Word32))
 hs_bindgen_2e28b1350855e72f =
   RIP.fromFFIType hs_bindgen_2e28b1350855e72f_base
 
@@ -413,7 +381,7 @@ hs_bindgen_2e28b1350855e72f =
 
     __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
-river_layer_shell_output_v1_get_version :: RIP.FunPtr ((RIP.Ptr River_layer_shell_output_v1) -> IO HsBindgen.Runtime.LibC.Word32)
+river_layer_shell_output_v1_get_version :: RIP.FunPtr (RIP.Ptr River_layer_shell_output_v1 -> IO HsBindgen.Runtime.LibC.Word32)
 river_layer_shell_output_v1_get_version =
   RIP.unsafePerformIO hs_bindgen_2e28b1350855e72f
 
@@ -422,26 +390,22 @@ foreign import ccall unsafe "hs_bindgen_7ae87f668f27f365" hs_bindgen_7ae87f668f2
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_River_LayerShellV1_Generated_Bindings.River.LayerShellV1.Generated_get_river_layer_shell_output_v1_destroy@
-hs_bindgen_7ae87f668f27f365 :: IO (RIP.FunPtr ((RIP.Ptr River_layer_shell_output_v1) -> IO ()))
+hs_bindgen_7ae87f668f27f365 :: IO (RIP.FunPtr (RIP.Ptr River_layer_shell_output_v1 -> IO ()))
 hs_bindgen_7ae87f668f27f365 =
   RIP.fromFFIType hs_bindgen_7ae87f668f27f365_base
 
 {-# NOINLINE river_layer_shell_output_v1_destroy #-}
-{-|
+{-| This request indicates that the client will no longer use the river_layer_shell_output_v1 object and that it may be safely destroyed.
 
-  > iface_river_layer_shell_output_v1
+    This request should be made after the river_output_v1.removed event is received to complete destruction of the output.
 
-  This request indicates that the client will no longer use the river_layer_shell_output_v1 object and that it may be safely destroyed.
+    __C declaration:__ @river_layer_shell_output_v1_destroy@
 
-  This request should be made after the river_output_v1.removed event is received to complete destruction of the output.
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 318:1@
 
-__C declaration:__ @river_layer_shell_output_v1_destroy@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 318:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
-river_layer_shell_output_v1_destroy :: RIP.FunPtr ((RIP.Ptr River_layer_shell_output_v1) -> IO ())
+river_layer_shell_output_v1_destroy :: RIP.FunPtr (RIP.Ptr River_layer_shell_output_v1 -> IO ())
 river_layer_shell_output_v1_destroy =
   RIP.unsafePerformIO hs_bindgen_7ae87f668f27f365
 
@@ -450,28 +414,24 @@ foreign import ccall unsafe "hs_bindgen_0fb8f0cf620533f4" hs_bindgen_0fb8f0cf620
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_River_LayerShellV1_Generated_Bindings.River.LayerShellV1.Generated_get_river_layer_shell_output_v1_set_default@
-hs_bindgen_0fb8f0cf620533f4 :: IO (RIP.FunPtr ((RIP.Ptr River_layer_shell_output_v1) -> IO ()))
+hs_bindgen_0fb8f0cf620533f4 :: IO (RIP.FunPtr (RIP.Ptr River_layer_shell_output_v1 -> IO ()))
 hs_bindgen_0fb8f0cf620533f4 =
   RIP.fromFFIType hs_bindgen_0fb8f0cf620533f4_base
 
 {-# NOINLINE river_layer_shell_output_v1_set_default #-}
-{-|
+{-| Mark this output as the default for new layer surfaces which do not request a specific output themselves. This request overrides any previous set_default request on any river_layer_shell_output_v1 object.
 
-  > iface_river_layer_shell_output_v1
+    If no set_default request is made or if the default output is destroyed, the default output is undefined until the next set_default request.
 
-  Mark this output as the default for new layer surfaces which do not request a specific output themselves. This request overrides any previous set_default request on any river_layer_shell_output_v1 object.
+    This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
 
-  If no set_default request is made or if the default output is destroyed, the default output is undefined until the next set_default request.
+    __C declaration:__ @river_layer_shell_output_v1_set_default@
 
-  This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 338:1@
 
-__C declaration:__ @river_layer_shell_output_v1_set_default@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 338:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
-river_layer_shell_output_v1_set_default :: RIP.FunPtr ((RIP.Ptr River_layer_shell_output_v1) -> IO ())
+river_layer_shell_output_v1_set_default :: RIP.FunPtr (RIP.Ptr River_layer_shell_output_v1 -> IO ())
 river_layer_shell_output_v1_set_default =
   RIP.unsafePerformIO hs_bindgen_0fb8f0cf620533f4
 
@@ -480,22 +440,18 @@ foreign import ccall unsafe "hs_bindgen_393d877d083a3b1d" hs_bindgen_393d877d083
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_River_LayerShellV1_Generated_Bindings.River.LayerShellV1.Generated_get_river_layer_shell_seat_v1_add_listener@
-hs_bindgen_393d877d083a3b1d :: IO (RIP.FunPtr ((RIP.Ptr River_layer_shell_seat_v1) -> (PtrConst.PtrConst River_layer_shell_seat_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt))
+hs_bindgen_393d877d083a3b1d :: IO (RIP.FunPtr (RIP.Ptr River_layer_shell_seat_v1 -> PtrConst.PtrConst River_layer_shell_seat_v1_listener -> RIP.Ptr RIP.Void -> IO RIP.CInt))
 hs_bindgen_393d877d083a3b1d =
   RIP.fromFFIType hs_bindgen_393d877d083a3b1d_base
 
 {-# NOINLINE river_layer_shell_seat_v1_add_listener #-}
-{-|
+{-| __C declaration:__ @river_layer_shell_seat_v1_add_listener@
 
-  > iface_river_layer_shell_seat_v1
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 407:1@
 
-__C declaration:__ @river_layer_shell_seat_v1_add_listener@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 407:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
-river_layer_shell_seat_v1_add_listener :: RIP.FunPtr ((RIP.Ptr River_layer_shell_seat_v1) -> (PtrConst.PtrConst River_layer_shell_seat_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt)
+river_layer_shell_seat_v1_add_listener :: RIP.FunPtr (RIP.Ptr River_layer_shell_seat_v1 -> PtrConst.PtrConst River_layer_shell_seat_v1_listener -> RIP.Ptr RIP.Void -> IO RIP.CInt)
 river_layer_shell_seat_v1_add_listener =
   RIP.unsafePerformIO hs_bindgen_393d877d083a3b1d
 
@@ -504,22 +460,18 @@ foreign import ccall unsafe "hs_bindgen_365f707b1b036d34" hs_bindgen_365f707b1b0
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_River_LayerShellV1_Generated_Bindings.River.LayerShellV1.Generated_get_river_layer_shell_seat_v1_set_user_data@
-hs_bindgen_365f707b1b036d34 :: IO (RIP.FunPtr ((RIP.Ptr River_layer_shell_seat_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
+hs_bindgen_365f707b1b036d34 :: IO (RIP.FunPtr (RIP.Ptr River_layer_shell_seat_v1 -> RIP.Ptr RIP.Void -> IO ()))
 hs_bindgen_365f707b1b036d34 =
   RIP.fromFFIType hs_bindgen_365f707b1b036d34_base
 
 {-# NOINLINE river_layer_shell_seat_v1_set_user_data #-}
-{-|
+{-| __C declaration:__ @river_layer_shell_seat_v1_set_user_data@
 
-  > iface_river_layer_shell_seat_v1
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 436:1@
 
-__C declaration:__ @river_layer_shell_seat_v1_set_user_data@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 436:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
-river_layer_shell_seat_v1_set_user_data :: RIP.FunPtr ((RIP.Ptr River_layer_shell_seat_v1) -> (RIP.Ptr RIP.Void) -> IO ())
+river_layer_shell_seat_v1_set_user_data :: RIP.FunPtr (RIP.Ptr River_layer_shell_seat_v1 -> RIP.Ptr RIP.Void -> IO ())
 river_layer_shell_seat_v1_set_user_data =
   RIP.unsafePerformIO hs_bindgen_365f707b1b036d34
 
@@ -528,22 +480,18 @@ foreign import ccall unsafe "hs_bindgen_fc0e64d46ac3da51" hs_bindgen_fc0e64d46ac
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_River_LayerShellV1_Generated_Bindings.River.LayerShellV1.Generated_get_river_layer_shell_seat_v1_get_user_data@
-hs_bindgen_fc0e64d46ac3da51 :: IO (RIP.FunPtr ((RIP.Ptr River_layer_shell_seat_v1) -> IO (RIP.Ptr RIP.Void)))
+hs_bindgen_fc0e64d46ac3da51 :: IO (RIP.FunPtr (RIP.Ptr River_layer_shell_seat_v1 -> IO (RIP.Ptr RIP.Void)))
 hs_bindgen_fc0e64d46ac3da51 =
   RIP.fromFFIType hs_bindgen_fc0e64d46ac3da51_base
 
 {-# NOINLINE river_layer_shell_seat_v1_get_user_data #-}
-{-|
+{-| __C declaration:__ @river_layer_shell_seat_v1_get_user_data@
 
-  > iface_river_layer_shell_seat_v1
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 443:1@
 
-__C declaration:__ @river_layer_shell_seat_v1_get_user_data@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 443:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
-river_layer_shell_seat_v1_get_user_data :: RIP.FunPtr ((RIP.Ptr River_layer_shell_seat_v1) -> IO (RIP.Ptr RIP.Void))
+river_layer_shell_seat_v1_get_user_data :: RIP.FunPtr (RIP.Ptr River_layer_shell_seat_v1 -> IO (RIP.Ptr RIP.Void))
 river_layer_shell_seat_v1_get_user_data =
   RIP.unsafePerformIO hs_bindgen_fc0e64d46ac3da51
 
@@ -552,7 +500,7 @@ foreign import ccall unsafe "hs_bindgen_1dc7c3be2f3705fe" hs_bindgen_1dc7c3be2f3
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_River_LayerShellV1_Generated_Bindings.River.LayerShellV1.Generated_get_river_layer_shell_seat_v1_get_version@
-hs_bindgen_1dc7c3be2f3705fe :: IO (RIP.FunPtr ((RIP.Ptr River_layer_shell_seat_v1) -> IO HsBindgen.Runtime.LibC.Word32))
+hs_bindgen_1dc7c3be2f3705fe :: IO (RIP.FunPtr (RIP.Ptr River_layer_shell_seat_v1 -> IO HsBindgen.Runtime.LibC.Word32))
 hs_bindgen_1dc7c3be2f3705fe =
   RIP.fromFFIType hs_bindgen_1dc7c3be2f3705fe_base
 
@@ -563,7 +511,7 @@ hs_bindgen_1dc7c3be2f3705fe =
 
     __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
-river_layer_shell_seat_v1_get_version :: RIP.FunPtr ((RIP.Ptr River_layer_shell_seat_v1) -> IO HsBindgen.Runtime.LibC.Word32)
+river_layer_shell_seat_v1_get_version :: RIP.FunPtr (RIP.Ptr River_layer_shell_seat_v1 -> IO HsBindgen.Runtime.LibC.Word32)
 river_layer_shell_seat_v1_get_version =
   RIP.unsafePerformIO hs_bindgen_1dc7c3be2f3705fe
 
@@ -572,25 +520,21 @@ foreign import ccall unsafe "hs_bindgen_39cd9ad538616479" hs_bindgen_39cd9ad5386
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_River_LayerShellV1_Generated_Bindings.River.LayerShellV1.Generated_get_river_layer_shell_seat_v1_destroy@
-hs_bindgen_39cd9ad538616479 :: IO (RIP.FunPtr ((RIP.Ptr River_layer_shell_seat_v1) -> IO ()))
+hs_bindgen_39cd9ad538616479 :: IO (RIP.FunPtr (RIP.Ptr River_layer_shell_seat_v1 -> IO ()))
 hs_bindgen_39cd9ad538616479 =
   RIP.fromFFIType hs_bindgen_39cd9ad538616479_base
 
 {-# NOINLINE river_layer_shell_seat_v1_destroy #-}
-{-|
+{-| This request indicates that the client will no longer use the river_layer_shell_seat_v1 object and that it may be safely destroyed.
 
-  > iface_river_layer_shell_seat_v1
+    This request should be made after the river_seat_v1.removed event is received to complete destruction of the seat.
 
-  This request indicates that the client will no longer use the river_layer_shell_seat_v1 object and that it may be safely destroyed.
+    __C declaration:__ @river_layer_shell_seat_v1_destroy@
 
-  This request should be made after the river_seat_v1.removed event is received to complete destruction of the seat.
+    __defined at:__ @river-layer-shell-v1-client-protocol.h 464:1@
 
-__C declaration:__ @river_layer_shell_seat_v1_destroy@
-
-__defined at:__ @river-layer-shell-v1-client-protocol.h 464:1@
-
-__exported by:__ @river-layer-shell-v1-client-protocol.h@
+    __exported by:__ @river-layer-shell-v1-client-protocol.h@
 -}
-river_layer_shell_seat_v1_destroy :: RIP.FunPtr ((RIP.Ptr River_layer_shell_seat_v1) -> IO ())
+river_layer_shell_seat_v1_destroy :: RIP.FunPtr (RIP.Ptr River_layer_shell_seat_v1 -> IO ())
 river_layer_shell_seat_v1_destroy =
   RIP.unsafePerformIO hs_bindgen_39cd9ad538616479

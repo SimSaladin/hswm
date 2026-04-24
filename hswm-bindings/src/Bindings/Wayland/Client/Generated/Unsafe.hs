@@ -225,7 +225,8 @@ import qualified HsBindgen.Runtime.PtrConst as PtrConst
 import Bindings.Wayland.Client.Generated
 
 $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.unlines
-  [ "#include <wayland-client.h>"
+  [ "#include <wayland-client-core.h>"
+  , "#include <wayland-client-protocol.h>"
   , "void hs_bindgen_c0388837cb3840ed ("
   , "  struct wl_event_queue *arg1"
   , ")"
@@ -1682,7 +1683,7 @@ hs_bindgen_c0388837cb3840ed =
 
     __defined at:__ @wayland-client-core.h 130:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_event_queue_destroy ::
      RIP.Ptr Wl_event_queue
@@ -1716,7 +1717,7 @@ hs_bindgen_6d7017b940b017b9 =
 
     __defined at:__ @wayland-client-core.h 139:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_proxy_marshal_array_flags ::
      RIP.Ptr Wl_proxy
@@ -1755,7 +1756,7 @@ hs_bindgen_68044c025b9e3280 =
 
     __defined at:__ @wayland-client-core.h 149:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_proxy_marshal_array ::
      RIP.Ptr Wl_proxy
@@ -1785,7 +1786,7 @@ hs_bindgen_7393b25844c10e75 =
 
     __defined at:__ @wayland-client-core.h 153:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_proxy_create ::
      RIP.Ptr Wl_proxy
@@ -1811,7 +1812,7 @@ hs_bindgen_b7e95dd2fa3f7dfe =
 
     __defined at:__ @wayland-client-core.h 157:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_proxy_create_wrapper ::
      RIP.Ptr RIP.Void
@@ -1835,7 +1836,7 @@ hs_bindgen_d63473222f7a24ec =
 
     __defined at:__ @wayland-client-core.h 160:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_proxy_wrapper_destroy ::
      RIP.Ptr RIP.Void
@@ -1866,7 +1867,7 @@ hs_bindgen_6d03300682f7f682 =
 
     __defined at:__ @wayland-client-core.h 176:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_proxy_marshal_array_constructor ::
      RIP.Ptr Wl_proxy
@@ -1905,7 +1906,7 @@ hs_bindgen_423fddcc59ee334d =
 
     __defined at:__ @wayland-client-core.h 181:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_proxy_marshal_array_constructor_versioned ::
      RIP.Ptr Wl_proxy
@@ -1938,7 +1939,7 @@ hs_bindgen_b743cdc366fc3faa =
 
     __defined at:__ @wayland-client-core.h 188:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_proxy_destroy ::
      RIP.Ptr Wl_proxy
@@ -1966,7 +1967,7 @@ hs_bindgen_7690cc4901000e4a =
 
     __defined at:__ @wayland-client-core.h 191:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_proxy_add_listener ::
      RIP.Ptr Wl_proxy
@@ -1994,7 +1995,7 @@ hs_bindgen_0492013db798ee67 =
 
     __defined at:__ @wayland-client-core.h 195:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_proxy_get_listener ::
      RIP.Ptr Wl_proxy
@@ -2024,7 +2025,7 @@ hs_bindgen_0637c5404c1cd12b =
 
     __defined at:__ @wayland-client-core.h 198:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_proxy_add_dispatcher ::
      RIP.Ptr Wl_proxy
@@ -2056,7 +2057,7 @@ hs_bindgen_50a01d3fde30456a =
 
     __defined at:__ @wayland-client-core.h 203:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_proxy_set_user_data ::
      RIP.Ptr Wl_proxy
@@ -2082,7 +2083,7 @@ hs_bindgen_c8bbd78eaaa34308 =
 
     __defined at:__ @wayland-client-core.h 206:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_proxy_get_user_data ::
      RIP.Ptr Wl_proxy
@@ -2106,7 +2107,7 @@ hs_bindgen_976d1db71f9ecc8c =
 
     __defined at:__ @wayland-client-core.h 209:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_proxy_get_version ::
      RIP.Ptr Wl_proxy
@@ -2130,7 +2131,7 @@ hs_bindgen_6ed7b0ab40f0325d =
 
     __defined at:__ @wayland-client-core.h 212:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_proxy_get_id ::
      RIP.Ptr Wl_proxy
@@ -2156,7 +2157,7 @@ hs_bindgen_cdd18c99eed1321f =
 
     __defined at:__ @wayland-client-core.h 215:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_proxy_set_tag ::
      RIP.Ptr Wl_proxy
@@ -2182,7 +2183,7 @@ hs_bindgen_b9bc682a1c93f78c =
 
     __defined at:__ @wayland-client-core.h 219:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_proxy_get_tag ::
      RIP.Ptr Wl_proxy
@@ -2206,7 +2207,7 @@ hs_bindgen_abf1dc1eb368aca7 =
 
     __defined at:__ @wayland-client-core.h 222:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_proxy_get_class ::
      RIP.Ptr Wl_proxy
@@ -2230,7 +2231,7 @@ hs_bindgen_0118e949dee574d8 =
 
     __defined at:__ @wayland-client-core.h 225:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_proxy_get_interface ::
      RIP.Ptr Wl_proxy
@@ -2254,7 +2255,7 @@ hs_bindgen_7b6673ed9ab7c9f0 =
 
     __defined at:__ @wayland-client-core.h 228:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_proxy_get_display ::
      RIP.Ptr Wl_proxy
@@ -2280,7 +2281,7 @@ hs_bindgen_7533da8ddfa932fa =
 
     __defined at:__ @wayland-client-core.h 231:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_proxy_set_queue ::
      RIP.Ptr Wl_proxy
@@ -2306,7 +2307,7 @@ hs_bindgen_3e030cfe015f0f9f =
 
     __defined at:__ @wayland-client-core.h 234:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_proxy_get_queue ::
      PtrConst.PtrConst Wl_proxy
@@ -2330,7 +2331,7 @@ hs_bindgen_41c2a84b6c8dafd2 =
 
     __defined at:__ @wayland-client-core.h 237:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_event_queue_get_name ::
      PtrConst.PtrConst Wl_event_queue
@@ -2354,7 +2355,7 @@ hs_bindgen_c5e19798bc4639dc =
 
     __defined at:__ @wayland-client-core.h 240:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_connect ::
      PtrConst.PtrConst RIP.CChar
@@ -2378,7 +2379,7 @@ hs_bindgen_55d60da342655531 =
 
     __defined at:__ @wayland-client-core.h 243:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_connect_to_fd ::
      RIP.CInt
@@ -2403,7 +2404,7 @@ hs_bindgen_dd5abd9167723c2d =
 
     __defined at:__ @wayland-client-core.h 246:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_disconnect ::
      RIP.Ptr Wl_display
@@ -2427,7 +2428,7 @@ hs_bindgen_c74c6e8c40f440e8 =
 
     __defined at:__ @wayland-client-core.h 249:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_get_fd ::
      RIP.Ptr Wl_display
@@ -2451,7 +2452,7 @@ hs_bindgen_12f67434b716a725 =
 
     __defined at:__ @wayland-client-core.h 252:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_dispatch ::
      RIP.Ptr Wl_display
@@ -2477,7 +2478,7 @@ hs_bindgen_a21de4859d9869f0 =
 
     __defined at:__ @wayland-client-core.h 255:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_dispatch_queue ::
      RIP.Ptr Wl_display
@@ -2506,7 +2507,7 @@ hs_bindgen_6e062bfb8b154cfc =
 
     __defined at:__ @wayland-client-core.h 259:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_dispatch_timeout ::
      RIP.Ptr Wl_display
@@ -2537,7 +2538,7 @@ hs_bindgen_38b3e50b2e0d1243 =
 
     __defined at:__ @wayland-client-core.h 263:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_dispatch_queue_timeout ::
      RIP.Ptr Wl_display
@@ -2568,7 +2569,7 @@ hs_bindgen_c20c179814201dae =
 
     __defined at:__ @wayland-client-core.h 268:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_dispatch_queue_pending ::
      RIP.Ptr Wl_display
@@ -2595,7 +2596,7 @@ hs_bindgen_23485b881cfcbc16 =
 
     __defined at:__ @wayland-client-core.h 272:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_dispatch_pending ::
      RIP.Ptr Wl_display
@@ -2620,7 +2621,7 @@ hs_bindgen_2cb713d19866b580 =
 
     __defined at:__ @wayland-client-core.h 275:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_get_error ::
      RIP.Ptr Wl_display
@@ -2648,7 +2649,7 @@ hs_bindgen_a4c908588761da56 =
 
     __defined at:__ @wayland-client-core.h 278:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_get_protocol_error ::
      RIP.Ptr Wl_display
@@ -2677,7 +2678,7 @@ hs_bindgen_0f30a71f68b6ddd0 =
 
     __defined at:__ @wayland-client-core.h 283:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_flush ::
      RIP.Ptr Wl_display
@@ -2703,7 +2704,7 @@ hs_bindgen_00ee8f58a7f82cd5 =
 
     __defined at:__ @wayland-client-core.h 286:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_roundtrip_queue ::
      RIP.Ptr Wl_display
@@ -2730,7 +2731,7 @@ hs_bindgen_5348f12bb437b82b =
 
     __defined at:__ @wayland-client-core.h 290:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_roundtrip ::
      RIP.Ptr Wl_display
@@ -2754,7 +2755,7 @@ hs_bindgen_7333b63fccff9722 =
 
     __defined at:__ @wayland-client-core.h 293:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_create_queue ::
      RIP.Ptr Wl_display
@@ -2780,7 +2781,7 @@ hs_bindgen_31acb16b2e1f41fd =
 
     __defined at:__ @wayland-client-core.h 296:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_create_queue_with_name ::
      RIP.Ptr Wl_display
@@ -2809,7 +2810,7 @@ hs_bindgen_3f796bd9eb943ef7 =
 
     __defined at:__ @wayland-client-core.h 300:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_prepare_read_queue ::
      RIP.Ptr Wl_display
@@ -2836,7 +2837,7 @@ hs_bindgen_cc8be32e0b40198f =
 
     __defined at:__ @wayland-client-core.h 304:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_prepare_read ::
      RIP.Ptr Wl_display
@@ -2860,7 +2861,7 @@ hs_bindgen_838b92c5aaec4742 =
 
     __defined at:__ @wayland-client-core.h 307:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_cancel_read ::
      RIP.Ptr Wl_display
@@ -2884,7 +2885,7 @@ hs_bindgen_e5f95d6ef6fe7278 =
 
     __defined at:__ @wayland-client-core.h 310:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_read_events ::
      RIP.Ptr Wl_display
@@ -2910,7 +2911,7 @@ hs_bindgen_8d7cab53e4fcb170 =
 
     __defined at:__ @wayland-client-core.h 316:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-core.h@
+    __exported by:__ @wayland-client-core.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_set_max_buffer_size ::
      RIP.Ptr Wl_display
@@ -2941,7 +2942,7 @@ hs_bindgen_bf29f3eee179ff1d =
 
     __defined at:__ @wayland-client-protocol.h 1037:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_add_listener ::
      RIP.Ptr Wl_display
@@ -2971,7 +2972,7 @@ hs_bindgen_0bae63f38098a27f =
 
     __defined at:__ @wayland-client-protocol.h 1067:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_set_user_data ::
      RIP.Ptr Wl_display
@@ -2998,7 +2999,7 @@ hs_bindgen_587917b549defda5 =
 
     __defined at:__ @wayland-client-protocol.h 1074:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_get_user_data ::
      RIP.Ptr Wl_display
@@ -3023,7 +3024,7 @@ hs_bindgen_a3d56d3aaedd71a9 =
 
     __defined at:__ @wayland-client-protocol.h 1080:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_get_version ::
      RIP.Ptr Wl_display
@@ -3043,11 +3044,17 @@ hs_bindgen_7703cd12322e5c25 ::
 hs_bindgen_7703cd12322e5c25 =
   RIP.fromFFIType hs_bindgen_7703cd12322e5c25_base
 
-{-| __C declaration:__ @wl_display_sync@
+{-| The sync request asks the server to emit the 'done' event on the returned wl_callback object. Since requests are handled in-order and events are delivered in-order, this can be used as a barrier to ensure all previous requests and the resulting events have been handled.
+
+    The object returned by this request will be destroyed by the compositor after the callback is fired and as such the client must not attempt to use it after that point.
+
+    The callback_data passed in the callback is undefined and should be ignored.
+
+    __C declaration:__ @wl_display_sync@
 
     __defined at:__ @wayland-client-protocol.h 1101:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_sync ::
      RIP.Ptr Wl_display
@@ -3067,11 +3074,15 @@ hs_bindgen_363a017a6f90fc52 ::
 hs_bindgen_363a017a6f90fc52 =
   RIP.fromFFIType hs_bindgen_363a017a6f90fc52_base
 
-{-| __C declaration:__ @wl_display_get_registry@
+{-| This request creates a registry object that allows the client to list and bind the global objects available from the compositor.
+
+    It should be noted that the server side resources consumed in response to a get_registry request can only be released when the client disconnects, not when the client side proxy is destroyed. Therefore, clients should invoke get_registry as infrequently as possible to avoid wasting memory.
+
+    __C declaration:__ @wl_display_get_registry@
 
     __defined at:__ @wayland-client-protocol.h 1125:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_display_get_registry ::
      RIP.Ptr Wl_display
@@ -3099,7 +3110,7 @@ hs_bindgen_d915ca2070ee32ed =
 
     __defined at:__ @wayland-client-protocol.h 1181:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_registry_add_listener ::
      RIP.Ptr Wl_registry
@@ -3130,7 +3141,7 @@ hs_bindgen_ec2d1a3930e9f0c4 =
 
     __defined at:__ @wayland-client-protocol.h 1206:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_registry_set_user_data ::
      RIP.Ptr Wl_registry
@@ -3157,7 +3168,7 @@ hs_bindgen_14eea5d36faa779e =
 
     __defined at:__ @wayland-client-protocol.h 1213:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_registry_get_user_data ::
      RIP.Ptr Wl_registry
@@ -3182,7 +3193,7 @@ hs_bindgen_099845409eabb519 =
 
     __defined at:__ @wayland-client-protocol.h 1219:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_registry_get_version ::
      RIP.Ptr Wl_registry
@@ -3206,7 +3217,7 @@ hs_bindgen_c513efa16d46d8f0 =
 
     __defined at:__ @wayland-client-protocol.h 1226:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_registry_destroy ::
      RIP.Ptr Wl_registry
@@ -3232,11 +3243,13 @@ hs_bindgen_4dd74d23d4f8da2e ::
 hs_bindgen_4dd74d23d4f8da2e =
   RIP.fromFFIType hs_bindgen_4dd74d23d4f8da2e_base
 
-{-| __C declaration:__ @wl_registry_bind@
+{-| Binds a new, client-created object to the server using the specified name as the identifier.
+
+    __C declaration:__ @wl_registry_bind@
 
     __defined at:__ @wayland-client-protocol.h 1238:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_registry_bind ::
      RIP.Ptr Wl_registry
@@ -3270,7 +3283,7 @@ hs_bindgen_7203537434096f0f =
 
     __defined at:__ @wayland-client-protocol.h 1268:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_callback_add_listener ::
      RIP.Ptr Wl_callback
@@ -3301,7 +3314,7 @@ hs_bindgen_c750f3f7dcc0886a =
 
     __defined at:__ @wayland-client-protocol.h 1283:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_callback_set_user_data ::
      RIP.Ptr Wl_callback
@@ -3328,7 +3341,7 @@ hs_bindgen_b432aa3c2929faae =
 
     __defined at:__ @wayland-client-protocol.h 1290:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_callback_get_user_data ::
      RIP.Ptr Wl_callback
@@ -3353,7 +3366,7 @@ hs_bindgen_365435cff9c642a6 =
 
     __defined at:__ @wayland-client-protocol.h 1296:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_callback_get_version ::
      RIP.Ptr Wl_callback
@@ -3377,7 +3390,7 @@ hs_bindgen_df73d99ec7bb43ac =
 
     __defined at:__ @wayland-client-protocol.h 1303:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_callback_destroy ::
      RIP.Ptr Wl_callback
@@ -3403,7 +3416,7 @@ hs_bindgen_4ac544d5d160691e =
 
     __defined at:__ @wayland-client-protocol.h 1323:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_compositor_set_user_data ::
      RIP.Ptr Wl_compositor
@@ -3430,7 +3443,7 @@ hs_bindgen_3b2c70650227fe52 =
 
     __defined at:__ @wayland-client-protocol.h 1330:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_compositor_get_user_data ::
      RIP.Ptr Wl_compositor
@@ -3455,7 +3468,7 @@ hs_bindgen_92a66bbe2c003c69 =
 
     __defined at:__ @wayland-client-protocol.h 1336:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_compositor_get_version ::
      RIP.Ptr Wl_compositor
@@ -3480,7 +3493,7 @@ hs_bindgen_901061393c1d1849 =
 
     __defined at:__ @wayland-client-protocol.h 1343:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_compositor_destroy ::
      RIP.Ptr Wl_compositor
@@ -3500,11 +3513,13 @@ hs_bindgen_15ca37c6fa1b6d61 ::
 hs_bindgen_15ca37c6fa1b6d61 =
   RIP.fromFFIType hs_bindgen_15ca37c6fa1b6d61_base
 
-{-| __C declaration:__ @wl_compositor_create_surface@
+{-| Ask the compositor to create a new surface.
+
+    __C declaration:__ @wl_compositor_create_surface@
 
     __defined at:__ @wayland-client-protocol.h 1354:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_compositor_create_surface ::
      RIP.Ptr Wl_compositor
@@ -3525,11 +3540,13 @@ hs_bindgen_43461638ecc75908 ::
 hs_bindgen_43461638ecc75908 =
   RIP.fromFFIType hs_bindgen_43461638ecc75908_base
 
-{-| __C declaration:__ @wl_compositor_create_region@
+{-| Ask the compositor to create a new region.
+
+    __C declaration:__ @wl_compositor_create_region@
 
     __defined at:__ @wayland-client-protocol.h 1370:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_compositor_create_region ::
      RIP.Ptr Wl_compositor
@@ -3556,7 +3573,7 @@ hs_bindgen_0677cfa1412c5a14 =
 
     __defined at:__ @wayland-client-protocol.h 1400:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shm_pool_set_user_data ::
      RIP.Ptr Wl_shm_pool
@@ -3583,7 +3600,7 @@ hs_bindgen_89c4138c8ffe03a0 =
 
     __defined at:__ @wayland-client-protocol.h 1407:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shm_pool_get_user_data ::
      RIP.Ptr Wl_shm_pool
@@ -3608,7 +3625,7 @@ hs_bindgen_f5fb78c241356467 =
 
     __defined at:__ @wayland-client-protocol.h 1413:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shm_pool_get_version ::
      RIP.Ptr Wl_shm_pool
@@ -3638,11 +3655,17 @@ hs_bindgen_3974b85f9ba8b605 ::
 hs_bindgen_3974b85f9ba8b605 =
   RIP.fromFFIType hs_bindgen_3974b85f9ba8b605_base
 
-{-| __C declaration:__ @wl_shm_pool_create_buffer@
+{-| Create a wl_buffer object from the pool.
+
+    The buffer is created offset bytes into the pool and has width and height as specified. The stride argument specifies the number of bytes from the beginning of one row to the beginning of the next. The format is the pixel format of the buffer and must be one of those advertised through the wl_shm.format event.
+
+    A buffer will keep a reference to the pool it was created from so it is valid to destroy the pool immediately after creating a buffer from it.
+
+    __C declaration:__ @wl_shm_pool_create_buffer@
 
     __defined at:__ @wayland-client-protocol.h 1434:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shm_pool_create_buffer ::
      RIP.Ptr Wl_shm_pool
@@ -3673,11 +3696,15 @@ hs_bindgen_5889ab30206040a3 ::
 hs_bindgen_5889ab30206040a3 =
   RIP.fromFFIType hs_bindgen_5889ab30206040a3_base
 
-{-| __C declaration:__ @wl_shm_pool_destroy@
+{-| Destroy the shared memory pool.
+
+    The mmapped memory will be released when all buffers that have been created from this pool are gone.
+
+    __C declaration:__ @wl_shm_pool_destroy@
 
     __defined at:__ @wayland-client-protocol.h 1454:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shm_pool_destroy ::
      RIP.Ptr Wl_shm_pool
@@ -3699,11 +3726,15 @@ hs_bindgen_8a627e0c9e453b06 ::
 hs_bindgen_8a627e0c9e453b06 =
   RIP.fromFFIType hs_bindgen_8a627e0c9e453b06_base
 
-{-| __C declaration:__ @wl_shm_pool_resize@
+{-| This request will cause the server to remap the backing memory for the pool from the file descriptor passed when the pool was created, but using the new size. This request can only be used to make the pool bigger.
+
+    This request only changes the amount of bytes that are mmapped by the server and does not touch the file corresponding to the file descriptor passed at creation time. It is the client's responsibility to ensure that the file is at least as big as the new pool size.
+
+    __C declaration:__ @wl_shm_pool_resize@
 
     __defined at:__ @wayland-client-protocol.h 1475:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shm_pool_resize ::
      RIP.Ptr Wl_shm_pool
@@ -3733,7 +3764,7 @@ hs_bindgen_33e3f1723567a99f =
 
     __defined at:__ @wayland-client-protocol.h 2005:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shm_add_listener ::
      RIP.Ptr Wl_shm
@@ -3763,7 +3794,7 @@ hs_bindgen_99a1deee7314866a =
 
     __defined at:__ @wayland-client-protocol.h 2031:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shm_set_user_data ::
      RIP.Ptr Wl_shm
@@ -3789,7 +3820,7 @@ hs_bindgen_ae1ff1fe07e8a740 =
 
     __defined at:__ @wayland-client-protocol.h 2038:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shm_get_user_data ::
      RIP.Ptr Wl_shm
@@ -3813,7 +3844,7 @@ hs_bindgen_cc3dcc44caccfeee =
 
     __defined at:__ @wayland-client-protocol.h 2044:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shm_get_version ::
      RIP.Ptr Wl_shm
@@ -3837,7 +3868,7 @@ hs_bindgen_5ef425827ecd834d =
 
     __defined at:__ @wayland-client-protocol.h 2051:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shm_destroy ::
      RIP.Ptr Wl_shm
@@ -3861,11 +3892,15 @@ hs_bindgen_8c4086f59ca3a872 ::
 hs_bindgen_8c4086f59ca3a872 =
   RIP.fromFFIType hs_bindgen_8c4086f59ca3a872_base
 
-{-| __C declaration:__ @wl_shm_create_pool@
+{-| Create a new wl_shm_pool object.
+
+    The pool can be used to create shared memory based buffer objects. The server will mmap size bytes of the passed file descriptor, to use as backing memory for the pool.
+
+    __C declaration:__ @wl_shm_create_pool@
 
     __defined at:__ @wayland-client-protocol.h 2066:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shm_create_pool ::
      RIP.Ptr Wl_shm
@@ -3889,11 +3924,15 @@ hs_bindgen_d88560bdb97810bb ::
 hs_bindgen_d88560bdb97810bb =
   RIP.fromFFIType hs_bindgen_d88560bdb97810bb_base
 
-{-| __C declaration:__ @wl_shm_release@
+{-| Using this request a client can tell the server that it is not going to use the shm object anymore.
+
+    Objects created via this interface remain unaffected.
+
+    __C declaration:__ @wl_shm_release@
 
     __defined at:__ @wayland-client-protocol.h 2085:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shm_release ::
      RIP.Ptr Wl_shm
@@ -3921,7 +3960,7 @@ hs_bindgen_1d576d28065eb17d =
 
     __defined at:__ @wayland-client-protocol.h 2122:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_buffer_add_listener ::
      RIP.Ptr Wl_buffer
@@ -3951,7 +3990,7 @@ hs_bindgen_91126bb1743aad39 =
 
     __defined at:__ @wayland-client-protocol.h 2143:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_buffer_set_user_data ::
      RIP.Ptr Wl_buffer
@@ -3977,7 +4016,7 @@ hs_bindgen_278cb52b6692d44e =
 
     __defined at:__ @wayland-client-protocol.h 2150:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_buffer_get_user_data ::
      RIP.Ptr Wl_buffer
@@ -4001,7 +4040,7 @@ hs_bindgen_6d1433669435b309 =
 
     __defined at:__ @wayland-client-protocol.h 2156:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_buffer_get_version ::
      RIP.Ptr Wl_buffer
@@ -4021,11 +4060,15 @@ hs_bindgen_276fbe8cb0850b69 ::
 hs_bindgen_276fbe8cb0850b69 =
   RIP.fromFFIType hs_bindgen_276fbe8cb0850b69_base
 
-{-| __C declaration:__ @wl_buffer_destroy@
+{-| Destroy a buffer. If and how you need to release the backing storage is defined by the buffer factory interface.
+
+    For possible side-effects to a surface, see wl_surface.attach.
+
+    __C declaration:__ @wl_buffer_destroy@
 
     __defined at:__ @wayland-client-protocol.h 2170:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_buffer_destroy ::
      RIP.Ptr Wl_buffer
@@ -4053,7 +4096,7 @@ hs_bindgen_ea5246eb7890d417 =
 
     __defined at:__ @wayland-client-protocol.h 2278:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_offer_add_listener ::
      RIP.Ptr Wl_data_offer
@@ -4084,7 +4127,7 @@ hs_bindgen_d6caffdd1217e3ae =
 
     __defined at:__ @wayland-client-protocol.h 2327:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_offer_set_user_data ::
      RIP.Ptr Wl_data_offer
@@ -4111,7 +4154,7 @@ hs_bindgen_09fde85cb91417d4 =
 
     __defined at:__ @wayland-client-protocol.h 2334:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_offer_get_user_data ::
      RIP.Ptr Wl_data_offer
@@ -4136,7 +4179,7 @@ hs_bindgen_ed45dcc66b59f0f0 =
 
     __defined at:__ @wayland-client-protocol.h 2340:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_offer_get_version ::
      RIP.Ptr Wl_data_offer
@@ -4161,11 +4204,17 @@ hs_bindgen_6ff8e4db332d0aa8 ::
 hs_bindgen_6ff8e4db332d0aa8 =
   RIP.fromFFIType hs_bindgen_6ff8e4db332d0aa8_base
 
-{-| __C declaration:__ @wl_data_offer_accept@
+{-| Indicate that the client can accept the given mime type, or NULL for not accepted.
+
+    For objects of version 2 or older, this request is used by the client to give feedback whether the client can receive the given mime type, or NULL if none is accepted; the feedback does not determine whether the drag-and-drop operation succeeds or not.
+
+    For objects of version 3 or newer, this request determines the final result of the drag-and-drop operation. If the end result is that no mime types were accepted, the drag-and-drop operation will be cancelled and the corresponding drag source will receive wl_data_source.cancelled. Clients may still use this event in conjunction with wl_data_source.action for feedback.
+
+    __C declaration:__ @wl_data_offer_accept@
 
     __defined at:__ @wayland-client-protocol.h 2364:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_offer_accept ::
      RIP.Ptr Wl_data_offer
@@ -4193,11 +4242,17 @@ hs_bindgen_885275e21716e677 ::
 hs_bindgen_885275e21716e677 =
   RIP.fromFFIType hs_bindgen_885275e21716e677_base
 
-{-| __C declaration:__ @wl_data_offer_receive@
+{-| To transfer the offered data, the client issues this request and indicates the mime type it wants to receive. The transfer happens through the passed file descriptor (typically created with the pipe system call). The source client writes the data in the mime type representation requested and then closes the file descriptor.
+
+    The receiving client reads from the read end of the pipe until EOF and then closes its end, at which point the transfer is complete.
+
+    This request may happen multiple times for different mime types, both before and after wl_data_device.drop. Drag-and-drop destination clients may preemptively fetch data or examine it more closely to determine acceptance.
+
+    __C declaration:__ @wl_data_offer_receive@
 
     __defined at:__ @wayland-client-protocol.h 2390:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_offer_receive ::
      RIP.Ptr Wl_data_offer
@@ -4221,11 +4276,13 @@ hs_bindgen_2fb57445cbb7e00b ::
 hs_bindgen_2fb57445cbb7e00b =
   RIP.fromFFIType hs_bindgen_2fb57445cbb7e00b_base
 
-{-| __C declaration:__ @wl_data_offer_destroy@
+{-| Destroy the data offer.
+
+    __C declaration:__ @wl_data_offer_destroy@
 
     __defined at:__ @wayland-client-protocol.h 2402:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_offer_destroy ::
      RIP.Ptr Wl_data_offer
@@ -4245,11 +4302,19 @@ hs_bindgen_7850c44aa5b02ea1 ::
 hs_bindgen_7850c44aa5b02ea1 =
   RIP.fromFFIType hs_bindgen_7850c44aa5b02ea1_base
 
-{-| __C declaration:__ @wl_data_offer_finish@
+{-| Notifies the compositor that the drag destination successfully finished the drag-and-drop operation.
+
+    Upon receiving this request, the compositor will emit wl_data_source.dnd_finished on the drag source client.
+
+    It is a client error to perform other requests than wl_data_offer.destroy after this one. It is also an error to perform this request after a NULL mime type has been set in wl_data_offer.accept or no action was received through wl_data_offer.action.
+
+    If wl_data_offer.finish request is received for a non drag and drop operation, the invalid_finish protocol error is raised.
+
+    __C declaration:__ @wl_data_offer_finish@
 
     __defined at:__ @wayland-client-protocol.h 2427:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_offer_finish ::
      RIP.Ptr Wl_data_offer
@@ -4273,11 +4338,25 @@ hs_bindgen_c55195529c24ef90 ::
 hs_bindgen_c55195529c24ef90 =
   RIP.fromFFIType hs_bindgen_c55195529c24ef90_base
 
-{-| __C declaration:__ @wl_data_offer_set_actions@
+{-| Sets the actions that the destination side client supports for this operation. This request may trigger the emission of wl_data_source.action and wl_data_offer.action events if the compositor needs to change the selected action.
+
+    This request can be called multiple times throughout the drag-and-drop operation, typically in response to wl_data_device.enter or wl_data_device.motion events.
+
+    This request determines the final result of the drag-and-drop operation. If the end result is that no action is accepted, the drag source will receive wl_data_source.cancelled.
+
+    The dnd_actions argument must contain only values expressed in the wl_data_device_manager.dnd_actions enum, and the preferred_action argument must only contain one of those values set, otherwise it will result in a protocol error.
+
+    While managing an "ask" action, the destination drag-and-drop client may perform further wl_data_offer.receive requests, and is expected to perform one last wl_data_offer.set_actions request with a preferred action other than "ask" (and optionally wl_data_offer.accept) before requesting wl_data_offer.finish, in order to convey the action selected by the user. If the preferred action is not in the wl_data_offer.source_actions mask, an error will be raised.
+
+    If the "ask" action is dismissed (e.g. user cancellation), the client is expected to perform wl_data_offer.destroy right away.
+
+    This request can only be made on drag-and-drop offers, a protocol error will be raised otherwise.
+
+    __C declaration:__ @wl_data_offer_set_actions@
 
     __defined at:__ @wayland-client-protocol.h 2469:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_offer_set_actions ::
      RIP.Ptr Wl_data_offer
@@ -4310,7 +4389,7 @@ hs_bindgen_e566cd1d98199064 =
 
     __defined at:__ @wayland-client-protocol.h 2617:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_source_add_listener ::
      RIP.Ptr Wl_data_source
@@ -4341,7 +4420,7 @@ hs_bindgen_2fd0ff3cc9436e9c =
 
     __defined at:__ @wayland-client-protocol.h 2668:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_source_set_user_data ::
      RIP.Ptr Wl_data_source
@@ -4368,7 +4447,7 @@ hs_bindgen_a26207178f093080 =
 
     __defined at:__ @wayland-client-protocol.h 2675:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_source_get_user_data ::
      RIP.Ptr Wl_data_source
@@ -4393,7 +4472,7 @@ hs_bindgen_97dec80f0ad00430 =
 
     __defined at:__ @wayland-client-protocol.h 2681:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_source_get_version ::
      RIP.Ptr Wl_data_source
@@ -4416,11 +4495,13 @@ hs_bindgen_610b56020eead1da ::
 hs_bindgen_610b56020eead1da =
   RIP.fromFFIType hs_bindgen_610b56020eead1da_base
 
-{-| __C declaration:__ @wl_data_source_offer@
+{-| This request adds a mime type to the set of mime types advertised to targets. Can be called several times to offer multiple types.
+
+    __C declaration:__ @wl_data_source_offer@
 
     __defined at:__ @wayland-client-protocol.h 2694:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_source_offer ::
      RIP.Ptr Wl_data_source
@@ -4442,11 +4523,13 @@ hs_bindgen_96f458e272b44a47 ::
 hs_bindgen_96f458e272b44a47 =
   RIP.fromFFIType hs_bindgen_96f458e272b44a47_base
 
-{-| __C declaration:__ @wl_data_source_destroy@
+{-| Destroy the data source.
+
+    __C declaration:__ @wl_data_source_destroy@
 
     __defined at:__ @wayland-client-protocol.h 2706:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_source_destroy ::
      RIP.Ptr Wl_data_source
@@ -4468,11 +4551,17 @@ hs_bindgen_5f9651e1c63205f7 ::
 hs_bindgen_5f9651e1c63205f7 =
   RIP.fromFFIType hs_bindgen_5f9651e1c63205f7_base
 
-{-| __C declaration:__ @wl_data_source_set_actions@
+{-| Sets the actions that the source side client supports for this operation. This request may trigger wl_data_source.action and wl_data_offer.action events if the compositor needs to change the selected action.
+
+    The dnd_actions argument must contain only values expressed in the wl_data_device_manager.dnd_actions enum, otherwise it will result in a protocol error.
+
+    This request must be made once only, and can only be made on sources used in drag-and-drop, so it must be performed before wl_data_device.start_drag. Attempting to use the source other than for drag-and-drop will raise a protocol error.
+
+    __C declaration:__ @wl_data_source_set_actions@
 
     __defined at:__ @wayland-client-protocol.h 2730:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_source_set_actions ::
      RIP.Ptr Wl_data_source
@@ -4503,7 +4592,7 @@ hs_bindgen_08bce99837c93787 =
 
     __defined at:__ @wayland-client-protocol.h 2860:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_device_add_listener ::
      RIP.Ptr Wl_data_device
@@ -4534,7 +4623,7 @@ hs_bindgen_006d301ba3a52a5e =
 
     __defined at:__ @wayland-client-protocol.h 2911:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_device_set_user_data ::
      RIP.Ptr Wl_data_device
@@ -4561,7 +4650,7 @@ hs_bindgen_1037ea72f6fce511 =
 
     __defined at:__ @wayland-client-protocol.h 2918:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_device_get_user_data ::
      RIP.Ptr Wl_data_device
@@ -4586,7 +4675,7 @@ hs_bindgen_65ec0d864e846d2e =
 
     __defined at:__ @wayland-client-protocol.h 2924:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_device_get_version ::
      RIP.Ptr Wl_data_device
@@ -4611,7 +4700,7 @@ hs_bindgen_d98d70204a294872 =
 
     __defined at:__ @wayland-client-protocol.h 2931:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_device_destroy ::
      RIP.Ptr Wl_data_device
@@ -4639,11 +4728,23 @@ hs_bindgen_39d2bb3f7083d7c2 ::
 hs_bindgen_39d2bb3f7083d7c2 =
   RIP.fromFFIType hs_bindgen_39d2bb3f7083d7c2_base
 
-{-| __C declaration:__ @wl_data_device_start_drag@
+{-| This request asks the compositor to start a drag-and-drop operation on behalf of the client.
+
+    The source argument is the data source that provides the data for the eventual data transfer. If source is NULL, enter, leave and motion events are sent only to the client that initiated the drag and the client is expected to handle the data passing internally. If source is destroyed, the drag-and-drop session will be cancelled.
+
+    The origin surface is the surface where the drag originates and the client must have an active implicit grab that matches the serial.
+
+    The icon surface is an optional (can be NULL) surface that provides an icon to be moved around with the cursor. Initially, the top-left corner of the icon surface is placed at the cursor hotspot, but subsequent wl_surface.offset requests can move the relative position. Attach requests must be confirmed with wl_surface.commit as usual. The icon surface is given the role of a drag-and-drop icon. If the icon surface already has another role, it raises a protocol error.
+
+    The input region is ignored for wl_surfaces with the role of a drag-and-drop icon.
+
+    The given source may not be used in any further set_selection or start_drag requests. Attempting to reuse a previously-used source may send a used_source error.
+
+    __C declaration:__ @wl_data_device_start_drag@
 
     __defined at:__ @wayland-client-protocol.h 2970:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_device_start_drag ::
      RIP.Ptr Wl_data_device
@@ -4676,11 +4777,17 @@ hs_bindgen_4382577358af4b8a ::
 hs_bindgen_4382577358af4b8a =
   RIP.fromFFIType hs_bindgen_4382577358af4b8a_base
 
-{-| __C declaration:__ @wl_data_device_set_selection@
+{-| This request asks the compositor to set the selection to the data from the source on behalf of the client.
+
+    To unset the selection, set the source to NULL.
+
+    The given source may not be used in any further set_selection or start_drag requests. Attempting to reuse a previously-used source may send a used_source error.
+
+    __C declaration:__ @wl_data_device_set_selection@
 
     __defined at:__ @wayland-client-protocol.h 2989:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_device_set_selection ::
      RIP.Ptr Wl_data_device
@@ -4705,11 +4812,13 @@ hs_bindgen_14e7bbd785e48b18 ::
 hs_bindgen_14e7bbd785e48b18 =
   RIP.fromFFIType hs_bindgen_14e7bbd785e48b18_base
 
-{-| __C declaration:__ @wl_data_device_release@
+{-| This request destroys the data device.
+
+    __C declaration:__ @wl_data_device_release@
 
     __defined at:__ @wayland-client-protocol.h 3001:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_device_release ::
      RIP.Ptr Wl_data_device
@@ -4735,7 +4844,7 @@ hs_bindgen_f462a3ff1a547ac3 =
 
     __defined at:__ @wayland-client-protocol.h 3072:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_device_manager_set_user_data ::
      RIP.Ptr Wl_data_device_manager
@@ -4762,7 +4871,7 @@ hs_bindgen_cfe0dc032d08b5d2 =
 
     __defined at:__ @wayland-client-protocol.h 3079:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_device_manager_get_user_data ::
      RIP.Ptr Wl_data_device_manager
@@ -4787,7 +4896,7 @@ hs_bindgen_c8463b75e767c5e9 =
 
     __defined at:__ @wayland-client-protocol.h 3085:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_device_manager_get_version ::
      RIP.Ptr Wl_data_device_manager
@@ -4812,7 +4921,7 @@ hs_bindgen_21456986b335e177 =
 
     __defined at:__ @wayland-client-protocol.h 3092:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_device_manager_destroy ::
      RIP.Ptr Wl_data_device_manager
@@ -4833,11 +4942,13 @@ hs_bindgen_34a273fda3051d34 ::
 hs_bindgen_34a273fda3051d34 =
   RIP.fromFFIType hs_bindgen_34a273fda3051d34_base
 
-{-| __C declaration:__ @wl_data_device_manager_create_data_source@
+{-| Create a new data source.
+
+    __C declaration:__ @wl_data_device_manager_create_data_source@
 
     __defined at:__ @wayland-client-protocol.h 3103:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_device_manager_create_data_source ::
      RIP.Ptr Wl_data_device_manager
@@ -4860,11 +4971,13 @@ hs_bindgen_2f9e9140eab18d0b ::
 hs_bindgen_2f9e9140eab18d0b =
   RIP.fromFFIType hs_bindgen_2f9e9140eab18d0b_base
 
-{-| __C declaration:__ @wl_data_device_manager_get_data_device@
+{-| Create a new data device for a given seat.
+
+    __C declaration:__ @wl_data_device_manager_get_data_device@
 
     __defined at:__ @wayland-client-protocol.h 3119:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_data_device_manager_get_data_device ::
      RIP.Ptr Wl_data_device_manager
@@ -4893,7 +5006,7 @@ hs_bindgen_4e4c7266fcb1eb23 =
 
     __defined at:__ @wayland-client-protocol.h 3149:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shell_set_user_data ::
      RIP.Ptr Wl_shell
@@ -4919,7 +5032,7 @@ hs_bindgen_5d871f273a55b163 =
 
     __defined at:__ @wayland-client-protocol.h 3156:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shell_get_user_data ::
      RIP.Ptr Wl_shell
@@ -4943,7 +5056,7 @@ hs_bindgen_8637c714c31cd402 =
 
     __defined at:__ @wayland-client-protocol.h 3162:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shell_get_version ::
      RIP.Ptr Wl_shell
@@ -4967,7 +5080,7 @@ hs_bindgen_cf7bb0680ad077d5 =
 
     __defined at:__ @wayland-client-protocol.h 3169:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shell_destroy ::
      RIP.Ptr Wl_shell
@@ -4989,11 +5102,15 @@ hs_bindgen_c2297ce9ae229360 ::
 hs_bindgen_c2297ce9ae229360 =
   RIP.fromFFIType hs_bindgen_c2297ce9ae229360_base
 
-{-| __C declaration:__ @wl_shell_get_shell_surface@
+{-| Create a shell surface for an existing surface. This gives the wl_surface the role of a shell surface. If the wl_surface already has another role, it raises a protocol error.
+
+    Only one shell surface can be associated with a given surface.
+
+    __C declaration:__ @wl_shell_get_shell_surface@
 
     __defined at:__ @wayland-client-protocol.h 3184:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shell_get_shell_surface ::
      RIP.Ptr Wl_shell
@@ -5024,7 +5141,7 @@ hs_bindgen_954479603f8329bd =
 
     __defined at:__ @wayland-client-protocol.h 3351:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shell_surface_add_listener ::
      RIP.Ptr Wl_shell_surface
@@ -5055,7 +5172,7 @@ hs_bindgen_547a1a3995c63eca =
 
     __defined at:__ @wayland-client-protocol.h 3425:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shell_surface_set_user_data ::
      RIP.Ptr Wl_shell_surface
@@ -5082,7 +5199,7 @@ hs_bindgen_0ead2c2f5c314b54 =
 
     __defined at:__ @wayland-client-protocol.h 3432:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shell_surface_get_user_data ::
      RIP.Ptr Wl_shell_surface
@@ -5107,7 +5224,7 @@ hs_bindgen_12a934bba84c3a62 =
 
     __defined at:__ @wayland-client-protocol.h 3438:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shell_surface_get_version ::
      RIP.Ptr Wl_shell_surface
@@ -5132,7 +5249,7 @@ hs_bindgen_2eb4ae1be699ebb9 =
 
     __defined at:__ @wayland-client-protocol.h 3445:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shell_surface_destroy ::
      RIP.Ptr Wl_shell_surface
@@ -5155,11 +5272,13 @@ hs_bindgen_2d7c2aa3da9df105 ::
 hs_bindgen_2d7c2aa3da9df105 =
   RIP.fromFFIType hs_bindgen_2d7c2aa3da9df105_base
 
-{-| __C declaration:__ @wl_shell_surface_pong@
+{-| A client must respond to a ping event with a pong request or the client may be deemed unresponsive.
+
+    __C declaration:__ @wl_shell_surface_pong@
 
     __defined at:__ @wayland-client-protocol.h 3457:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shell_surface_pong ::
      RIP.Ptr Wl_shell_surface
@@ -5185,11 +5304,15 @@ hs_bindgen_a8f9a1895878c2a2 ::
 hs_bindgen_a8f9a1895878c2a2 =
   RIP.fromFFIType hs_bindgen_a8f9a1895878c2a2_base
 
-{-| __C declaration:__ @wl_shell_surface_move@
+{-| Start a pointer-driven move of the surface.
+
+    This request must be used in response to a button press event. The server may ignore move requests depending on the state of the surface (e.g. fullscreen or maximized).
+
+    __C declaration:__ @wl_shell_surface_move@
 
     __defined at:__ @wayland-client-protocol.h 3473:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shell_surface_move ::
      RIP.Ptr Wl_shell_surface
@@ -5219,11 +5342,15 @@ hs_bindgen_4231c259adaa299d ::
 hs_bindgen_4231c259adaa299d =
   RIP.fromFFIType hs_bindgen_4231c259adaa299d_base
 
-{-| __C declaration:__ @wl_shell_surface_resize@
+{-| Start a pointer-driven resizing of the surface.
+
+    This request must be used in response to a button press event. The server may ignore resize requests depending on the state of the surface (e.g. fullscreen or maximized).
+
+    __C declaration:__ @wl_shell_surface_resize@
 
     __defined at:__ @wayland-client-protocol.h 3489:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shell_surface_resize ::
      RIP.Ptr Wl_shell_surface
@@ -5249,11 +5376,15 @@ hs_bindgen_1e6e0d3a382170e3 ::
 hs_bindgen_1e6e0d3a382170e3 =
   RIP.fromFFIType hs_bindgen_1e6e0d3a382170e3_base
 
-{-| __C declaration:__ @wl_shell_surface_set_toplevel@
+{-| Map the surface as a toplevel surface.
+
+    A toplevel surface is not fullscreen, maximized or transient.
+
+    __C declaration:__ @wl_shell_surface_set_toplevel@
 
     __defined at:__ @wayland-client-protocol.h 3503:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shell_surface_set_toplevel ::
      RIP.Ptr Wl_shell_surface
@@ -5282,11 +5413,17 @@ hs_bindgen_5ac5efab1cab1aeb ::
 hs_bindgen_5ac5efab1cab1aeb =
   RIP.fromFFIType hs_bindgen_5ac5efab1cab1aeb_base
 
-{-| __C declaration:__ @wl_shell_surface_set_transient@
+{-| Map the surface relative to an existing surface.
+
+    The x and y arguments specify the location of the upper left corner of the surface relative to the upper left corner of the parent surface, in surface-local coordinates.
+
+    The flags argument controls details of the transient behaviour.
+
+    __C declaration:__ @wl_shell_surface_set_transient@
 
     __defined at:__ @wayland-client-protocol.h 3521:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shell_surface_set_transient ::
      RIP.Ptr Wl_shell_surface
@@ -5321,11 +5458,25 @@ hs_bindgen_c28dc1f5fef8800b ::
 hs_bindgen_c28dc1f5fef8800b =
   RIP.fromFFIType hs_bindgen_c28dc1f5fef8800b_base
 
-{-| __C declaration:__ @wl_shell_surface_set_fullscreen@
+{-| Map the surface as a fullscreen surface.
+
+    If an output parameter is given then the surface will be made fullscreen on that output. If the client does not specify the output then the compositor will apply its policy - usually choosing the output on which the surface has the biggest surface area.
+
+    The client may specify a method to resolve a size conflict between the output size and the surface size - this is provided through the method parameter.
+
+    The framerate parameter is used only when the method is set to "driver", to indicate the preferred framerate. A value of 0 indicates that the client does not care about framerate. The framerate is specified in mHz, that is framerate of 60000 is 60Hz.
+
+    A method of "scale" or "driver" implies a scaling operation of the surface, either via a direct scaling operation or a change of the output mode. This will override any kind of output scaling, so that mapping a surface with a buffer size equal to the mode can fill the screen independent of buffer_scale.
+
+    A method of "fill" means we don't scale up the buffer, however any output scale is applied. This means that you may run into an edge case where the application maps a buffer with the same size of the output mode but buffer_scale 1 (thus making a surface larger than the output). In this case it is allowed to downscale the results to fit the screen.
+
+    The compositor must reply to this request with a configure event with the dimensions for the output on which the surface will be made fullscreen.
+
+    __C declaration:__ @wl_shell_surface_set_fullscreen@
 
     __defined at:__ @wayland-client-protocol.h 3565:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shell_surface_set_fullscreen ::
      RIP.Ptr Wl_shell_surface
@@ -5364,11 +5515,21 @@ hs_bindgen_545dc1d9911af50d ::
 hs_bindgen_545dc1d9911af50d =
   RIP.fromFFIType hs_bindgen_545dc1d9911af50d_base
 
-{-| __C declaration:__ @wl_shell_surface_set_popup@
+{-| Map the surface as a popup.
+
+    A popup surface is a transient surface with an added pointer grab.
+
+    An existing implicit grab will be changed to owner-events mode, and the popup grab will continue after the implicit grab ends (i.e. releasing the mouse button does not cause the popup to be unmapped).
+
+    The popup grab continues until the window is destroyed or a mouse button is pressed in any other client's window. A click in any of the client's surfaces is reported as normal, however, clicks in other clients' surfaces will be discarded and trigger the callback.
+
+    The x and y arguments specify the location of the upper left corner of the surface relative to the upper left corner of the parent surface, in surface-local coordinates.
+
+    __C declaration:__ @wl_shell_surface_set_popup@
 
     __defined at:__ @wayland-client-protocol.h 3595:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shell_surface_set_popup ::
      RIP.Ptr Wl_shell_surface
@@ -5403,11 +5564,21 @@ hs_bindgen_99f8d3be3d6dd675 ::
 hs_bindgen_99f8d3be3d6dd675 =
   RIP.fromFFIType hs_bindgen_99f8d3be3d6dd675_base
 
-{-| __C declaration:__ @wl_shell_surface_set_maximized@
+{-| Map the surface as a maximized surface.
+
+    If an output parameter is given then the surface will be maximized on that output. If the client does not specify the output then the compositor will apply its policy - usually choosing the output on which the surface has the biggest surface area.
+
+    The compositor will reply with a configure event telling the expected new surface size. The operation is completed on the next buffer attach to this surface.
+
+    A maximized surface typically fills the entire output it is bound to, except for desktop elements such as panels. This is the main difference between a maximized shell surface and a fullscreen shell surface.
+
+    The details depend on the compositor implementation.
+
+    __C declaration:__ @wl_shell_surface_set_maximized@
 
     __defined at:__ @wayland-client-protocol.h 3624:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shell_surface_set_maximized ::
      RIP.Ptr Wl_shell_surface
@@ -5432,11 +5603,17 @@ hs_bindgen_260f4c6e77a72f9b ::
 hs_bindgen_260f4c6e77a72f9b =
   RIP.fromFFIType hs_bindgen_260f4c6e77a72f9b_base
 
-{-| __C declaration:__ @wl_shell_surface_set_title@
+{-| Set a short title for the surface.
+
+    This string may be used to identify the surface in a task bar, window list, or other user interface elements provided by the compositor.
+
+    The string must be encoded in UTF-8.
+
+    __C declaration:__ @wl_shell_surface_set_title@
 
     __defined at:__ @wayland-client-protocol.h 3642:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shell_surface_set_title ::
      RIP.Ptr Wl_shell_surface
@@ -5461,11 +5638,15 @@ hs_bindgen_6265669007a918e2 ::
 hs_bindgen_6265669007a918e2 =
   RIP.fromFFIType hs_bindgen_6265669007a918e2_base
 
-{-| __C declaration:__ @wl_shell_surface_set_class@
+{-| Set a class for the surface.
+
+    The surface class identifies the general class of applications to which the surface belongs. A common convention is to use the file name (or the full path if it is a non-standard location) of the application's .desktop file as the class.
+
+    __C declaration:__ @wl_shell_surface_set_class@
 
     __defined at:__ @wayland-client-protocol.h 3659:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_shell_surface_set_class ::
      RIP.Ptr Wl_shell_surface
@@ -5496,7 +5677,7 @@ hs_bindgen_1d38b390046f5669 =
 
     __defined at:__ @wayland-client-protocol.h 3780:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_surface_add_listener ::
      RIP.Ptr Wl_surface
@@ -5526,7 +5707,7 @@ hs_bindgen_164334442259c81c =
 
     __defined at:__ @wayland-client-protocol.h 3863:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_surface_set_user_data ::
      RIP.Ptr Wl_surface
@@ -5553,7 +5734,7 @@ hs_bindgen_bf81736f8bacc49b =
 
     __defined at:__ @wayland-client-protocol.h 3870:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_surface_get_user_data ::
      RIP.Ptr Wl_surface
@@ -5578,7 +5759,7 @@ hs_bindgen_ea892a7db75826a1 =
 
     __defined at:__ @wayland-client-protocol.h 3876:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_surface_get_version ::
      RIP.Ptr Wl_surface
@@ -5598,11 +5779,13 @@ hs_bindgen_fb464699899cd00e ::
 hs_bindgen_fb464699899cd00e =
   RIP.fromFFIType hs_bindgen_fb464699899cd00e_base
 
-{-| __C declaration:__ @wl_surface_destroy@
+{-| Deletes the surface and invalidates its object ID.
+
+    __C declaration:__ @wl_surface_destroy@
 
     __defined at:__ @wayland-client-protocol.h 3887:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_surface_destroy ::
      RIP.Ptr Wl_surface
@@ -5628,11 +5811,33 @@ hs_bindgen_f058a4ec3eb0bd81 ::
 hs_bindgen_f058a4ec3eb0bd81 =
   RIP.fromFFIType hs_bindgen_f058a4ec3eb0bd81_base
 
-{-| __C declaration:__ @wl_surface_attach@
+{-| Set a buffer as the content of this surface.
+
+    The new size of the surface is calculated based on the buffer size transformed by the inverse buffer_transform and the inverse buffer_scale. This means that at commit time the supplied buffer size must be an integer multiple of the buffer_scale. If that's not the case, an invalid_size error is sent.
+
+    The x and y arguments specify the location of the new pending buffer's upper left corner, relative to the current buffer's upper left corner, in surface-local coordinates. In other words, the x and y, combined with the new surface size define in which directions the surface's size changes. Setting anything other than 0 as x and y arguments is discouraged, and should instead be replaced with using the separate wl_surface.offset request.
+
+    When the bound wl_surface version is 5 or higher, passing any non-zero x or y is a protocol violation, and will result in an 'invalid_offset' error being raised. The x and y arguments are ignored and do not change the pending state. To achieve equivalent semantics, use wl_surface.offset.
+
+    Surface contents are double-buffered state, see wl_surface.commit.
+
+    The initial surface contents are void; there is no content. wl_surface.attach assigns the given wl_buffer as the pending wl_buffer. wl_surface.commit makes the pending wl_buffer the new surface contents, and the size of the surface becomes the size calculated from the wl_buffer, as described above. After commit, there is no pending buffer until the next attach.
+
+    Committing a pending wl_buffer allows the compositor to read the pixels in the wl_buffer. The compositor may access the pixels at any time after the wl_surface.commit request. When the compositor will not access the pixels anymore, it will send the wl_buffer.release event. Only after receiving wl_buffer.release, the client may reuse the wl_buffer. A wl_buffer that has been attached and then replaced by another attach instead of committed will not receive a release event, and is not used by the compositor.
+
+    If a pending wl_buffer has been committed to more than one wl_surface, the delivery of wl_buffer.release events becomes undefined. A well behaved client should not rely on wl_buffer.release events in this case. Alternatively, a client could create multiple wl_buffer objects from the same backing storage or use a protocol extension providing per-commit release notifications.
+
+    Destroying the wl_buffer after wl_buffer.release does not change the surface contents. Destroying the wl_buffer before wl_buffer.release is allowed as long as the underlying buffer storage isn't re-used (this can happen e.g. on client process termination). However, if the client destroys the wl_buffer before receiving the wl_buffer.release event and mutates the underlying buffer storage, the surface contents become undefined immediately.
+
+    If wl_surface.attach is sent with a NULL wl_buffer, the following wl_surface.commit will remove the surface content.
+
+    If a pending wl_buffer has been destroyed, the result is not specified. Many compositors are known to remove the surface content on the following wl_surface.commit, but this behaviour is not universal. Clients seeking to maximise compatibility should not destroy pending buffers and should ensure that they explicitly remove content from surfaces, even after destroying buffers.
+
+    __C declaration:__ @wl_surface_attach@
 
     __defined at:__ @wayland-client-protocol.h 3963:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_surface_attach ::
      RIP.Ptr Wl_surface
@@ -5666,11 +5871,23 @@ hs_bindgen_e67d2e69a4529473 ::
 hs_bindgen_e67d2e69a4529473 =
   RIP.fromFFIType hs_bindgen_e67d2e69a4529473_base
 
-{-| __C declaration:__ @wl_surface_damage@
+{-| This request is used to describe the regions where the pending buffer is different from the current surface contents, and where the surface therefore needs to be repainted. The compositor ignores the parts of the damage that fall outside of the surface.
+
+    Damage is double-buffered state, see wl_surface.commit.
+
+    The damage rectangle is specified in surface-local coordinates, where x and y specify the upper left corner of the damage rectangle.
+
+    The initial value for pending damage is empty: no damage. wl_surface.damage adds pending damage: the new pending damage is the union of old pending damage and the given rectangle.
+
+    wl_surface.commit assigns pending damage as the current damage, and clears pending damage. The server will clear the current damage as it repaints the surface.
+
+    Note! New clients should not use this request. Instead damage can be posted with wl_surface.damage_buffer which uses buffer coordinates instead of surface coordinates.
+
+    __C declaration:__ @wl_surface_damage@
 
     __defined at:__ @wayland-client-protocol.h 3995:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_surface_damage ::
      RIP.Ptr Wl_surface
@@ -5698,11 +5915,25 @@ hs_bindgen_349b0a3b9f1abc41 ::
 hs_bindgen_349b0a3b9f1abc41 =
   RIP.fromFFIType hs_bindgen_349b0a3b9f1abc41_base
 
-{-| __C declaration:__ @wl_surface_frame@
+{-| Request a notification when it is a good time to start drawing a new frame, by creating a frame callback. This is useful for throttling redrawing operations, and driving animations.
+
+    When a client is animating on a wl_surface, it can use the 'frame' request to get notified when it is a good time to draw and commit the next frame of animation. If the client commits an update earlier than that, it is likely that some updates will not make it to the display, and the client is wasting resources by drawing too often.
+
+    The frame request will take effect on the next wl_surface.commit. The notification will only be posted for one frame unless requested again. For a wl_surface, the notifications are posted in the order the frame requests were committed.
+
+    The server must send the notifications so that a client will not send excessive updates, while still allowing the highest possible update rate for clients that wait for the reply before drawing again. The server should give some time for the client to draw and commit after sending the frame callback events to let it hit the next output refresh.
+
+    A server should avoid signaling the frame callbacks if the surface is not visible in any way, e.g. the surface is off-screen, or completely obscured by other opaque surfaces.
+
+    The object returned by this request will be destroyed by the compositor after the callback is fired and as such the client must not attempt to use it after that point.
+
+    The callback_data passed in the callback is the current time, in milliseconds, with an undefined base.
+
+    __C declaration:__ @wl_surface_frame@
 
     __defined at:__ @wayland-client-protocol.h 4038:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_surface_frame ::
      RIP.Ptr Wl_surface
@@ -5724,11 +5955,25 @@ hs_bindgen_ad9eccc3b6b156f4 ::
 hs_bindgen_ad9eccc3b6b156f4 =
   RIP.fromFFIType hs_bindgen_ad9eccc3b6b156f4_base
 
-{-| __C declaration:__ @wl_surface_set_opaque_region@
+{-| This request sets the region of the surface that contains opaque content.
+
+    The opaque region is an optimization hint for the compositor that lets it optimize the redrawing of content behind opaque regions. Setting an opaque region is not required for correct behaviour, but marking transparent content as opaque will result in repaint artifacts.
+
+    The opaque region is specified in surface-local coordinates.
+
+    The compositor ignores the parts of the opaque region that fall outside of the surface.
+
+    Opaque region is double-buffered state, see wl_surface.commit.
+
+    wl_surface.set_opaque_region changes the pending opaque region. wl_surface.commit copies the pending region to the current region. Otherwise, the pending and current regions are never changed.
+
+    The initial value for an opaque region is empty. Setting the pending opaque region has copy semantics, and the wl_region object can be destroyed immediately. A NULL wl_region causes the pending opaque region to be set to empty.
+
+    __C declaration:__ @wl_surface_set_opaque_region@
 
     __defined at:__ @wayland-client-protocol.h 4077:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_surface_set_opaque_region ::
      RIP.Ptr Wl_surface
@@ -5753,11 +5998,23 @@ hs_bindgen_3353bcd502b9fee1 ::
 hs_bindgen_3353bcd502b9fee1 =
   RIP.fromFFIType hs_bindgen_3353bcd502b9fee1_base
 
-{-| __C declaration:__ @wl_surface_set_input_region@
+{-| This request sets the region of the surface that can receive pointer and touch events.
+
+    Input events happening outside of this region will try the next surface in the server surface stack. The compositor ignores the parts of the input region that fall outside of the surface.
+
+    The input region is specified in surface-local coordinates.
+
+    Input region is double-buffered state, see wl_surface.commit.
+
+    wl_surface.set_input_region changes the pending input region. wl_surface.commit copies the pending region to the current region. Otherwise the pending and current regions are never changed, except cursor and icon surfaces are special cases, see wl_pointer.set_cursor and wl_data_device.start_drag.
+
+    The initial value for an input region is infinite. That means the whole surface will accept input. Setting the pending input region has copy semantics, and the wl_region object can be destroyed immediately. A NULL wl_region causes the input region to be set to infinite.
+
+    __C declaration:__ @wl_surface_set_input_region@
 
     __defined at:__ @wayland-client-protocol.h 4110:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_surface_set_input_region ::
      RIP.Ptr Wl_surface
@@ -5780,11 +6037,21 @@ hs_bindgen_27338c576ab202ac ::
 hs_bindgen_27338c576ab202ac =
   RIP.fromFFIType hs_bindgen_27338c576ab202ac_base
 
-{-| __C declaration:__ @wl_surface_commit@
+{-| Surface state (input, opaque, and damage regions, attached buffers, etc.) is double-buffered. Protocol requests modify the pending state, as opposed to the active state in use by the compositor.
+
+    A commit request atomically creates a content update from the pending state, even if the pending state has not been touched. The content update is placed in a queue until it becomes active. After commit, the new pending state is as documented for each related request.
+
+    When the content update is applied, the wl_buffer is applied before all other state. This means that all coordinates in double-buffered state are relative to the newly attached wl_buffers, except for wl_surface.attach itself. If there is no newly attached wl_buffer, the coordinates are relative to the previous content update.
+
+    All requests that need a commit to become effective are documented to affect double-buffered state.
+
+    Other interfaces may add further double-buffered surface state.
+
+    __C declaration:__ @wl_surface_commit@
 
     __defined at:__ @wayland-client-protocol.h 4140:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_surface_commit ::
      RIP.Ptr Wl_surface
@@ -5806,11 +6073,27 @@ hs_bindgen_be71d8c01b214e26 ::
 hs_bindgen_be71d8c01b214e26 =
   RIP.fromFFIType hs_bindgen_be71d8c01b214e26_base
 
-{-| __C declaration:__ @wl_surface_set_buffer_transform@
+{-| This request sets the transformation that the client has already applied to the content of the buffer. The accepted values for the transform parameter are the values for wl_output.transform.
+
+    The compositor applies the inverse of this transformation whenever it uses the buffer contents.
+
+    Buffer transform is double-buffered state, see wl_surface.commit.
+
+    A newly created surface has its buffer transformation set to normal.
+
+    wl_surface.set_buffer_transform changes the pending buffer transformation. wl_surface.commit copies the pending buffer transformation to the current one. Otherwise, the pending and current values are never changed.
+
+    The purpose of this request is to allow clients to render content according to the output transform, thus permitting the compositor to use certain optimizations even if the display is rotated. Using hardware overlays and scanning out a client buffer for fullscreen surfaces are examples of such optimizations. Those optimizations are highly dependent on the compositor implementation, so the use of this request should be considered on a case-by-case basis.
+
+    Note that if the transform value includes 90 or 270 degree rotation, the width of the buffer will become the surface height and the height of the buffer will become the surface width.
+
+    If transform is not one of the values from the wl_output.transform enum the invalid_transform protocol error is raised.
+
+    __C declaration:__ @wl_surface_set_buffer_transform@
 
     __defined at:__ @wayland-client-protocol.h 4182:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_surface_set_buffer_transform ::
      RIP.Ptr Wl_surface
@@ -5835,11 +6118,25 @@ hs_bindgen_177a44fe834fb37b ::
 hs_bindgen_177a44fe834fb37b =
   RIP.fromFFIType hs_bindgen_177a44fe834fb37b_base
 
-{-| __C declaration:__ @wl_surface_set_buffer_scale@
+{-| This request sets an optional scaling factor on how the compositor interprets the contents of the buffer attached to the window.
+
+    Buffer scale is double-buffered state, see wl_surface.commit.
+
+    A newly created surface has its buffer scale set to 1.
+
+    wl_surface.set_buffer_scale changes the pending buffer scale. wl_surface.commit copies the pending buffer scale to the current one. Otherwise, the pending and current values are never changed.
+
+    The purpose of this request is to allow clients to supply higher resolution buffer data for use on high resolution outputs. It is intended that you pick the same buffer scale as the scale of the output that the surface is displayed on. This means the compositor can avoid scaling when rendering the surface on that output.
+
+    Note that if the scale is larger than 1, then you have to attach a buffer that is larger (by a factor of scale in each dimension) than the desired surface size.
+
+    If scale is not greater than 0 the invalid_scale protocol error is raised.
+
+    __C declaration:__ @wl_surface_set_buffer_scale@
 
     __defined at:__ @wayland-client-protocol.h 4216:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_surface_set_buffer_scale ::
      RIP.Ptr Wl_surface
@@ -5870,11 +6167,25 @@ hs_bindgen_2aa56255948e63c7 ::
 hs_bindgen_2aa56255948e63c7 =
   RIP.fromFFIType hs_bindgen_2aa56255948e63c7_base
 
-{-| __C declaration:__ @wl_surface_damage_buffer@
+{-| This request is used to describe the regions where the pending buffer is different from the current surface contents, and where the surface therefore needs to be repainted. The compositor ignores the parts of the damage that fall outside of the surface.
+
+    Damage is double-buffered state, see wl_surface.commit.
+
+    The damage rectangle is specified in buffer coordinates, where x and y specify the upper left corner of the damage rectangle.
+
+    The initial value for pending damage is empty: no damage. wl_surface.damage_buffer adds pending damage: the new pending damage is the union of old pending damage and the given rectangle.
+
+    wl_surface.commit assigns pending damage as the current damage, and clears pending damage. The server will clear the current damage as it repaints the surface.
+
+    This request differs from wl_surface.damage in only one way - it takes damage in buffer coordinates instead of surface-local coordinates. While this generally is more intuitive than surface coordinates, it is especially desirable when using wp_viewport or when a drawing library (like EGL) is unaware of buffer scale and buffer transform.
+
+    Note: Because buffer transformation changes and damage requests may be interleaved in the protocol stream, it is impossible to determine the actual mapping between surface and buffer damage until wl_surface.commit time. Therefore, compositors wishing to take both kinds of damage into account will have to accumulate damage from the two requests separately and only transform from one to the other after receiving the wl_surface.commit.
+
+    __C declaration:__ @wl_surface_damage_buffer@
 
     __defined at:__ @wayland-client-protocol.h 4259:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_surface_damage_buffer ::
      RIP.Ptr Wl_surface
@@ -5907,11 +6218,19 @@ hs_bindgen_dd901bddc9b47863 ::
 hs_bindgen_dd901bddc9b47863 =
   RIP.fromFFIType hs_bindgen_dd901bddc9b47863_base
 
-{-| __C declaration:__ @wl_surface_offset@
+{-| The x and y arguments specify the location of the new pending buffer's upper left corner, relative to the current buffer's upper left corner, in surface-local coordinates. In other words, the x and y, combined with the new surface size define in which directions the surface's size changes.
+
+    The exact semantics of wl_surface.offset are role-specific. Refer to the documentation of specific roles for more information.
+
+    Surface location offset is double-buffered state, see wl_surface.commit.
+
+    This request is semantically equivalent to and the replaces the x and y arguments in the wl_surface.attach request in wl_surface versions prior to 5. See wl_surface.attach for details.
+
+    __C declaration:__ @wl_surface_offset@
 
     __defined at:__ @wayland-client-protocol.h 4285:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_surface_offset ::
      RIP.Ptr Wl_surface
@@ -5943,7 +6262,7 @@ hs_bindgen_7a6480fb86b10913 =
 
     __defined at:__ @wayland-client-protocol.h 4406:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_seat_add_listener ::
      RIP.Ptr Wl_seat
@@ -5973,7 +6292,7 @@ hs_bindgen_8eda8aec3c115e6b =
 
     __defined at:__ @wayland-client-protocol.h 4446:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_seat_set_user_data ::
      RIP.Ptr Wl_seat
@@ -5999,7 +6318,7 @@ hs_bindgen_e997631dc09aee2e =
 
     __defined at:__ @wayland-client-protocol.h 4453:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_seat_get_user_data ::
      RIP.Ptr Wl_seat
@@ -6023,7 +6342,7 @@ hs_bindgen_21400e8b3fb632a1 =
 
     __defined at:__ @wayland-client-protocol.h 4459:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_seat_get_version ::
      RIP.Ptr Wl_seat
@@ -6047,7 +6366,7 @@ hs_bindgen_690b8ff7f2387af5 =
 
     __defined at:__ @wayland-client-protocol.h 4466:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_seat_destroy ::
      RIP.Ptr Wl_seat
@@ -6067,11 +6386,15 @@ hs_bindgen_6c1ffd009deddb3c ::
 hs_bindgen_6c1ffd009deddb3c =
   RIP.fromFFIType hs_bindgen_6c1ffd009deddb3c_base
 
-{-| __C declaration:__ @wl_seat_get_pointer@
+{-| The ID provided will be initialized to the wl_pointer interface for this seat.
+
+    This request only takes effect if the seat has the pointer capability, or has had the pointer capability in the past. It is a protocol violation to issue this request on a seat that has never had the pointer capability. The missing_capability error will be sent in this case.
+
+    __C declaration:__ @wl_seat_get_pointer@
 
     __defined at:__ @wayland-client-protocol.h 4484:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_seat_get_pointer ::
      RIP.Ptr Wl_seat
@@ -6091,11 +6414,15 @@ hs_bindgen_338c4477e8e554fe ::
 hs_bindgen_338c4477e8e554fe =
   RIP.fromFFIType hs_bindgen_338c4477e8e554fe_base
 
-{-| __C declaration:__ @wl_seat_get_keyboard@
+{-| The ID provided will be initialized to the wl_keyboard interface for this seat.
+
+    This request only takes effect if the seat has the keyboard capability, or has had the keyboard capability in the past. It is a protocol violation to issue this request on a seat that has never had the keyboard capability. The missing_capability error will be sent in this case.
+
+    __C declaration:__ @wl_seat_get_keyboard@
 
     __defined at:__ @wayland-client-protocol.h 4507:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_seat_get_keyboard ::
      RIP.Ptr Wl_seat
@@ -6115,11 +6442,15 @@ hs_bindgen_95d89b33dc8cf8e8 ::
 hs_bindgen_95d89b33dc8cf8e8 =
   RIP.fromFFIType hs_bindgen_95d89b33dc8cf8e8_base
 
-{-| __C declaration:__ @wl_seat_get_touch@
+{-| The ID provided will be initialized to the wl_touch interface for this seat.
+
+    This request only takes effect if the seat has the touch capability, or has had the touch capability in the past. It is a protocol violation to issue this request on a seat that has never had the touch capability. The missing_capability error will be sent in this case.
+
+    __C declaration:__ @wl_seat_get_touch@
 
     __defined at:__ @wayland-client-protocol.h 4530:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_seat_get_touch ::
      RIP.Ptr Wl_seat
@@ -6139,11 +6470,13 @@ hs_bindgen_47784b3cdbeb35e0 ::
 hs_bindgen_47784b3cdbeb35e0 =
   RIP.fromFFIType hs_bindgen_47784b3cdbeb35e0_base
 
-{-| __C declaration:__ @wl_seat_release@
+{-| Using this request a client can tell the server that it is not going to use the seat object anymore.
+
+    __C declaration:__ @wl_seat_release@
 
     __defined at:__ @wayland-client-protocol.h 4547:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_seat_release ::
      RIP.Ptr Wl_seat
@@ -6171,7 +6504,7 @@ hs_bindgen_e3a756f6757d7896 =
 
     __defined at:__ @wayland-client-protocol.h 5010:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_pointer_add_listener ::
      RIP.Ptr Wl_pointer
@@ -6201,7 +6534,7 @@ hs_bindgen_0a47af221bf6ed6f =
 
     __defined at:__ @wayland-client-protocol.h 5076:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_pointer_set_user_data ::
      RIP.Ptr Wl_pointer
@@ -6228,7 +6561,7 @@ hs_bindgen_2912b040d73727cb =
 
     __defined at:__ @wayland-client-protocol.h 5083:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_pointer_get_user_data ::
      RIP.Ptr Wl_pointer
@@ -6253,7 +6586,7 @@ hs_bindgen_827101fd7efdfda9 =
 
     __defined at:__ @wayland-client-protocol.h 5089:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_pointer_get_version ::
      RIP.Ptr Wl_pointer
@@ -6277,7 +6610,7 @@ hs_bindgen_9fba91c1f511c785 =
 
     __defined at:__ @wayland-client-protocol.h 5096:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_pointer_destroy ::
      RIP.Ptr Wl_pointer
@@ -6305,11 +6638,25 @@ hs_bindgen_ba1ba653297db2b2 ::
 hs_bindgen_ba1ba653297db2b2 =
   RIP.fromFFIType hs_bindgen_ba1ba653297db2b2_base
 
-{-| __C declaration:__ @wl_pointer_set_cursor@
+{-| Set the pointer surface, i.e., the surface that contains the pointer image (cursor). This request gives the surface the role of a cursor. If the surface already has another role, it raises a protocol error.
+
+    The cursor actually changes only if the pointer focus for this device is one of the requesting client's surfaces or the surface parameter is the current pointer surface. If there was a previous surface set with this request it is replaced. If surface is NULL, the pointer image is hidden.
+
+    The parameters hotspot_x and hotspot_y define the position of the pointer surface relative to the pointer location. Its top-left corner is always at (x, y) - (hotspot_x, hotspot_y), where (x, y) are the coordinates of the pointer location, in surface-local coordinates.
+
+    On wl_surface.offset requests to the pointer surface, hotspot_x and hotspot_y are decremented by the x and y parameters passed to the request. The offset must be applied by wl_surface.commit as usual.
+
+    The hotspot can also be updated by passing the currently set pointer surface to this request with new values for hotspot_x and hotspot_y.
+
+    The input region is ignored for wl_surfaces with the role of a cursor. When the use as a cursor ends, the wl_surface is unmapped.
+
+    The serial parameter must match the latest wl_pointer.enter serial number sent to the client. Otherwise the request will be ignored.
+
+    __C declaration:__ @wl_pointer_set_cursor@
 
     __defined at:__ @wayland-client-protocol.h 5139:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_pointer_set_cursor ::
      RIP.Ptr Wl_pointer
@@ -6337,11 +6684,15 @@ hs_bindgen_4f8702919e12249f ::
 hs_bindgen_4f8702919e12249f =
   RIP.fromFFIType hs_bindgen_4f8702919e12249f_base
 
-{-| __C declaration:__ @wl_pointer_release@
+{-| Using this request a client can tell the server that it is not going to use the pointer object anymore.
+
+    This request destroys the pointer proxy object, so clients must not call wl_pointer_destroy() after using this request.
+
+    __C declaration:__ @wl_pointer_release@
 
     __defined at:__ @wayland-client-protocol.h 5155:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_pointer_release ::
      RIP.Ptr Wl_pointer
@@ -6369,7 +6720,7 @@ hs_bindgen_1b73cdca489cad45 =
 
     __defined at:__ @wayland-client-protocol.h 5385:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_keyboard_add_listener ::
      RIP.Ptr Wl_keyboard
@@ -6400,7 +6751,7 @@ hs_bindgen_558cd2337ec81157 =
 
     __defined at:__ @wayland-client-protocol.h 5426:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_keyboard_set_user_data ::
      RIP.Ptr Wl_keyboard
@@ -6427,7 +6778,7 @@ hs_bindgen_bf65382390466fe8 =
 
     __defined at:__ @wayland-client-protocol.h 5433:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_keyboard_get_user_data ::
      RIP.Ptr Wl_keyboard
@@ -6452,7 +6803,7 @@ hs_bindgen_6b83a04234ac1b3c =
 
     __defined at:__ @wayland-client-protocol.h 5439:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_keyboard_get_version ::
      RIP.Ptr Wl_keyboard
@@ -6476,7 +6827,7 @@ hs_bindgen_526329ca067a7411 =
 
     __defined at:__ @wayland-client-protocol.h 5446:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_keyboard_destroy ::
      RIP.Ptr Wl_keyboard
@@ -6500,7 +6851,7 @@ hs_bindgen_1d88dbf9293fb0a2 =
 
     __defined at:__ @wayland-client-protocol.h 5455:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_keyboard_release ::
      RIP.Ptr Wl_keyboard
@@ -6528,7 +6879,7 @@ hs_bindgen_5b386a3595042abd =
 
     __defined at:__ @wayland-client-protocol.h 5625:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_touch_add_listener ::
      RIP.Ptr Wl_touch
@@ -6558,7 +6909,7 @@ hs_bindgen_d61c5e13a95d9d99 =
 
     __defined at:__ @wayland-client-protocol.h 5670:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_touch_set_user_data ::
      RIP.Ptr Wl_touch
@@ -6584,7 +6935,7 @@ hs_bindgen_b2ef5cf0329b5752 =
 
     __defined at:__ @wayland-client-protocol.h 5677:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_touch_get_user_data ::
      RIP.Ptr Wl_touch
@@ -6608,7 +6959,7 @@ hs_bindgen_dcde1833312d24ac =
 
     __defined at:__ @wayland-client-protocol.h 5683:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_touch_get_version ::
      RIP.Ptr Wl_touch
@@ -6632,7 +6983,7 @@ hs_bindgen_3acf9cb883de85ec =
 
     __defined at:__ @wayland-client-protocol.h 5690:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_touch_destroy ::
      RIP.Ptr Wl_touch
@@ -6656,7 +7007,7 @@ hs_bindgen_f6c88fbdd8492a0d =
 
     __defined at:__ @wayland-client-protocol.h 5699:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_touch_release ::
      RIP.Ptr Wl_touch
@@ -6684,7 +7035,7 @@ hs_bindgen_05706740de558f4c =
 
     __defined at:__ @wayland-client-protocol.h 6018:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_output_add_listener ::
      RIP.Ptr Wl_output
@@ -6714,7 +7065,7 @@ hs_bindgen_92a5ee30cfe56481 =
 
     __defined at:__ @wayland-client-protocol.h 6059:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_output_set_user_data ::
      RIP.Ptr Wl_output
@@ -6740,7 +7091,7 @@ hs_bindgen_8a38d30444034e5d =
 
     __defined at:__ @wayland-client-protocol.h 6066:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_output_get_user_data ::
      RIP.Ptr Wl_output
@@ -6764,7 +7115,7 @@ hs_bindgen_6e8c234869fcf3ec =
 
     __defined at:__ @wayland-client-protocol.h 6072:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_output_get_version ::
      RIP.Ptr Wl_output
@@ -6788,7 +7139,7 @@ hs_bindgen_bf43c8bf0591fd0a =
 
     __defined at:__ @wayland-client-protocol.h 6079:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_output_destroy ::
      RIP.Ptr Wl_output
@@ -6808,11 +7159,13 @@ hs_bindgen_ab07eb8b7ec72840 ::
 hs_bindgen_ab07eb8b7ec72840 =
   RIP.fromFFIType hs_bindgen_ab07eb8b7ec72840_base
 
-{-| __C declaration:__ @wl_output_release@
+{-| Using this request a client can tell the server that it is not going to use the output object anymore.
+
+    __C declaration:__ @wl_output_release@
 
     __defined at:__ @wayland-client-protocol.h 6091:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_output_release ::
      RIP.Ptr Wl_output
@@ -6838,7 +7191,7 @@ hs_bindgen_82825f8930c2ca34 =
 
     __defined at:__ @wayland-client-protocol.h 6117:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_region_set_user_data ::
      RIP.Ptr Wl_region
@@ -6864,7 +7217,7 @@ hs_bindgen_a1211daa5c5cb8cf =
 
     __defined at:__ @wayland-client-protocol.h 6124:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_region_get_user_data ::
      RIP.Ptr Wl_region
@@ -6888,7 +7241,7 @@ hs_bindgen_736a7c402e32957f =
 
     __defined at:__ @wayland-client-protocol.h 6130:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_region_get_version ::
      RIP.Ptr Wl_region
@@ -6908,11 +7261,13 @@ hs_bindgen_75d43b8eee224193 ::
 hs_bindgen_75d43b8eee224193 =
   RIP.fromFFIType hs_bindgen_75d43b8eee224193_base
 
-{-| __C declaration:__ @wl_region_destroy@
+{-| Destroy the region. This will invalidate the object ID.
+
+    __C declaration:__ @wl_region_destroy@
 
     __defined at:__ @wayland-client-protocol.h 6141:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_region_destroy ::
      RIP.Ptr Wl_region
@@ -6940,11 +7295,13 @@ hs_bindgen_1661545efe194fd5 ::
 hs_bindgen_1661545efe194fd5 =
   RIP.fromFFIType hs_bindgen_1661545efe194fd5_base
 
-{-| __C declaration:__ @wl_region_add@
+{-| Add the specified rectangle to the region.
+
+    __C declaration:__ @wl_region_add@
 
     __defined at:__ @wayland-client-protocol.h 6153:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_region_add ::
      RIP.Ptr Wl_region
@@ -6980,11 +7337,13 @@ hs_bindgen_042ccfa17db116dd ::
 hs_bindgen_042ccfa17db116dd =
   RIP.fromFFIType hs_bindgen_042ccfa17db116dd_base
 
-{-| __C declaration:__ @wl_region_subtract@
+{-| Subtract the specified rectangle from the region.
+
+    __C declaration:__ @wl_region_subtract@
 
     __defined at:__ @wayland-client-protocol.h 6165:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_region_subtract ::
      RIP.Ptr Wl_region
@@ -7018,7 +7377,7 @@ hs_bindgen_5dcb0c963e42b98d =
 
     __defined at:__ @wayland-client-protocol.h 6200:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_subcompositor_set_user_data ::
      RIP.Ptr Wl_subcompositor
@@ -7045,7 +7404,7 @@ hs_bindgen_92061dd23cbaedd3 =
 
     __defined at:__ @wayland-client-protocol.h 6207:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_subcompositor_get_user_data ::
      RIP.Ptr Wl_subcompositor
@@ -7070,7 +7429,7 @@ hs_bindgen_8c9e6d18efe00b64 =
 
     __defined at:__ @wayland-client-protocol.h 6213:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_subcompositor_get_version ::
      RIP.Ptr Wl_subcompositor
@@ -7091,11 +7450,13 @@ hs_bindgen_afd334eea0d39898 ::
 hs_bindgen_afd334eea0d39898 =
   RIP.fromFFIType hs_bindgen_afd334eea0d39898_base
 
-{-| __C declaration:__ @wl_subcompositor_destroy@
+{-| Informs the server that the client will not be using this protocol object anymore. This does not affect any other objects, wl_subsurface objects included.
+
+    __C declaration:__ @wl_subcompositor_destroy@
 
     __defined at:__ @wayland-client-protocol.h 6226:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_subcompositor_destroy ::
      RIP.Ptr Wl_subcompositor
@@ -7120,11 +7481,21 @@ hs_bindgen_0a0bd92fd58bd78a ::
 hs_bindgen_0a0bd92fd58bd78a =
   RIP.fromFFIType hs_bindgen_0a0bd92fd58bd78a_base
 
-{-| __C declaration:__ @wl_subcompositor_get_subsurface@
+{-| Create a sub-surface interface for the given surface, and associate it with the given parent surface. This turns a plain wl_surface into a sub-surface.
+
+    The to-be sub-surface must not already have another role, and it must not have an existing wl_subsurface object. Otherwise the bad_surface protocol error is raised.
+
+    Adding sub-surfaces to a parent is a double-buffered operation on the parent (see wl_surface.commit). The effect of adding a sub-surface becomes visible on the next time the state of the parent surface is applied.
+
+    The parent surface must not be one of the child surface's descendants, and the parent must be different from the child surface, otherwise the bad_parent protocol error is raised.
+
+    This request modifies the behaviour of wl_surface.commit request on the sub-surface, see the documentation on wl_subsurface interface.
+
+    __C declaration:__ @wl_subcompositor_get_subsurface@
 
     __defined at:__ @wayland-client-protocol.h 6256:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_subcompositor_get_subsurface ::
      RIP.Ptr Wl_subcompositor
@@ -7155,7 +7526,7 @@ hs_bindgen_c7aca1a502fb200e =
 
     __defined at:__ @wayland-client-protocol.h 6311:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_subsurface_set_user_data ::
      RIP.Ptr Wl_subsurface
@@ -7182,7 +7553,7 @@ hs_bindgen_2cee939f9c08f68c =
 
     __defined at:__ @wayland-client-protocol.h 6318:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_subsurface_get_user_data ::
      RIP.Ptr Wl_subsurface
@@ -7207,7 +7578,7 @@ hs_bindgen_cd1627957a6faa84 =
 
     __defined at:__ @wayland-client-protocol.h 6324:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_subsurface_get_version ::
      RIP.Ptr Wl_subsurface
@@ -7228,11 +7599,13 @@ hs_bindgen_293b99ea7e6090d0 ::
 hs_bindgen_293b99ea7e6090d0 =
   RIP.fromFFIType hs_bindgen_293b99ea7e6090d0_base
 
-{-| __C declaration:__ @wl_subsurface_destroy@
+{-| The sub-surface interface is removed from the wl_surface object that was turned into a sub-surface with a wl_subcompositor.get_subsurface request. The wl_surface's association to the parent is deleted. The wl_surface is unmapped immediately.
+
+    __C declaration:__ @wl_subsurface_destroy@
 
     __defined at:__ @wayland-client-protocol.h 6338:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_subsurface_destroy ::
      RIP.Ptr Wl_subsurface
@@ -7256,11 +7629,19 @@ hs_bindgen_e085bdfd656e7ab7 ::
 hs_bindgen_e085bdfd656e7ab7 =
   RIP.fromFFIType hs_bindgen_e085bdfd656e7ab7_base
 
-{-| __C declaration:__ @wl_subsurface_set_position@
+{-| This schedules a sub-surface position change. The sub-surface will be moved so that its origin (top left corner pixel) will be at the location x, y of the parent surface coordinate system. The coordinates are not restricted to the parent surface area. Negative values are allowed.
+
+    The scheduled coordinates will take effect whenever the state of the parent surface is applied.
+
+    If more than one set_position request is invoked by the client before the commit of the parent surface, the position of a new request always replaces the scheduled position from any previous request.
+
+    The initial position is 0, 0.
+
+    __C declaration:__ @wl_subsurface_set_position@
 
     __defined at:__ @wayland-client-protocol.h 6363:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_subsurface_set_position ::
      RIP.Ptr Wl_subsurface
@@ -7287,11 +7668,17 @@ hs_bindgen_26240ec5ec861980 ::
 hs_bindgen_26240ec5ec861980 =
   RIP.fromFFIType hs_bindgen_26240ec5ec861980_base
 
-{-| __C declaration:__ @wl_subsurface_place_above@
+{-| This sub-surface is taken from the stack, and put back just above the reference surface, changing the z-order of the sub-surfaces. The reference surface must be one of the sibling surfaces, or the parent surface. Using any other surface, including this sub-surface, will cause a protocol error.
+
+    The z-order is double-buffered. Requests are handled in order and applied immediately to a pending state. The final pending state is copied to the active state the next time the state of the parent surface is applied.
+
+    A new sub-surface is initially added as the top-most in the stack of its siblings and parent.
+
+    __C declaration:__ @wl_subsurface_place_above@
 
     __defined at:__ @wayland-client-protocol.h 6387:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_subsurface_place_above ::
      RIP.Ptr Wl_subsurface
@@ -7316,11 +7703,13 @@ hs_bindgen_b793e1b7f6eea854 ::
 hs_bindgen_b793e1b7f6eea854 =
   RIP.fromFFIType hs_bindgen_b793e1b7f6eea854_base
 
-{-| __C declaration:__ @wl_subsurface_place_below@
+{-| The sub-surface is placed just below the reference surface. See wl_subsurface.place_above.
+
+    __C declaration:__ @wl_subsurface_place_below@
 
     __defined at:__ @wayland-client-protocol.h 6400:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_subsurface_place_below ::
      RIP.Ptr Wl_subsurface
@@ -7343,11 +7732,17 @@ hs_bindgen_b61ba3819c8344eb ::
 hs_bindgen_b61ba3819c8344eb =
   RIP.fromFFIType hs_bindgen_b61ba3819c8344eb_base
 
-{-| __C declaration:__ @wl_subsurface_set_sync@
+{-| Change the commit behaviour of the sub-surface to synchronized mode, also described as the parent dependent mode.
+
+    In synchronized mode, wl_surface.commit on a sub-surface will accumulate the committed state in a cache, but the state will not be applied and hence will not change the compositor output. The cached state is applied to the sub-surface immediately after the parent surface's state is applied. This ensures atomic updates of the parent and all its synchronized sub-surfaces. Applying the cached state will invalidate the cache, so further parent surface commits do not (re-)apply old state.
+
+    See wl_subsurface for the recursive effect of this mode.
+
+    __C declaration:__ @wl_subsurface_set_sync@
 
     __defined at:__ @wayland-client-protocol.h 6424:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_subsurface_set_sync ::
      RIP.Ptr Wl_subsurface
@@ -7367,11 +7762,21 @@ hs_bindgen_5ea901b11a239386 ::
 hs_bindgen_5ea901b11a239386 =
   RIP.fromFFIType hs_bindgen_5ea901b11a239386_base
 
-{-| __C declaration:__ @wl_subsurface_set_desync@
+{-| Change the commit behaviour of the sub-surface to desynchronized mode, also described as independent or freely running mode.
+
+    In desynchronized mode, wl_surface.commit on a sub-surface will apply the pending state directly, without caching, as happens normally with a wl_surface. Calling wl_surface.commit on the parent surface has no effect on the sub-surface's wl_surface state. This mode allows a sub-surface to be updated on its own.
+
+    If cached state exists when wl_surface.commit is called in desynchronized mode, the pending state is added to the cached state, and applied as a whole. This invalidates the cache.
+
+    Note: even if a sub-surface is set to desynchronized, a parent sub-surface may override it to behave as synchronized. For details, see wl_subsurface.
+
+    If a surface's parent surface behaves as desynchronized, then the cached state is applied on set_desync.
+
+    __C declaration:__ @wl_subsurface_set_desync@
 
     __defined at:__ @wayland-client-protocol.h 6454:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_subsurface_set_desync ::
      RIP.Ptr Wl_subsurface
@@ -7398,7 +7803,7 @@ hs_bindgen_48bf43869a6842eb =
 
     __defined at:__ @wayland-client-protocol.h 6475:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_fixes_set_user_data ::
      RIP.Ptr Wl_fixes
@@ -7424,7 +7829,7 @@ hs_bindgen_90db223121eeaaca =
 
     __defined at:__ @wayland-client-protocol.h 6482:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_fixes_get_user_data ::
      RIP.Ptr Wl_fixes
@@ -7448,7 +7853,7 @@ hs_bindgen_3ef376c297cebd75 =
 
     __defined at:__ @wayland-client-protocol.h 6488:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_fixes_get_version ::
      RIP.Ptr Wl_fixes
@@ -7472,7 +7877,7 @@ hs_bindgen_4783446e642c8297 =
 
     __defined at:__ @wayland-client-protocol.h 6497:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_fixes_destroy ::
      RIP.Ptr Wl_fixes
@@ -7494,11 +7899,17 @@ hs_bindgen_6b5104feef7f97e6 ::
 hs_bindgen_6b5104feef7f97e6 =
   RIP.fromFFIType hs_bindgen_6b5104feef7f97e6_base
 
-{-| __C declaration:__ @wl_fixes_destroy_registry@
+{-| This request destroys a wl_registry object.
+
+    The client should no longer use the wl_registry after making this request.
+
+    The compositor will emit a wl_display.delete_id event with the object ID of the registry and will no longer emit any events on the registry. The client should re-use the object ID once it receives the wl_display.delete_id event.
+
+    __C declaration:__ @wl_fixes_destroy_registry@
 
     __defined at:__ @wayland-client-protocol.h 6517:1@
 
-    __exported by:__ @wayland-client.h@, @wayland-client-protocol.h@, @wayland-client-protocol.h@
+    __exported by:__ @wayland-client-protocol.h@, @wayland-client.h@, @wayland-client-protocol.h@
 -}
 wl_fixes_destroy_registry ::
      RIP.Ptr Wl_fixes

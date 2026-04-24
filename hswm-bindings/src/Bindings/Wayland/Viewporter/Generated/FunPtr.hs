@@ -130,22 +130,18 @@ foreign import ccall unsafe "hs_bindgen_b8d69774c9572afd" hs_bindgen_b8d69774c95
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_Viewporter_Generated_Bindings.Wayland.Viewporter.Generated_get_wp_viewporter_set_user_data@
-hs_bindgen_b8d69774c9572afd :: IO (RIP.FunPtr ((RIP.Ptr Wp_viewporter) -> (RIP.Ptr RIP.Void) -> IO ()))
+hs_bindgen_b8d69774c9572afd :: IO (RIP.FunPtr (RIP.Ptr Wp_viewporter -> RIP.Ptr RIP.Void -> IO ()))
 hs_bindgen_b8d69774c9572afd =
   RIP.fromFFIType hs_bindgen_b8d69774c9572afd_base
 
 {-# NOINLINE wp_viewporter_set_user_data #-}
-{-|
+{-| __C declaration:__ @wp_viewporter_set_user_data@
 
-  > iface_wp_viewporter
+    __defined at:__ @viewporter-client-protocol.h 224:1@
 
-__C declaration:__ @wp_viewporter_set_user_data@
-
-__defined at:__ @viewporter-client-protocol.h 224:1@
-
-__exported by:__ @viewporter-client-protocol.h@
+    __exported by:__ @viewporter-client-protocol.h@
 -}
-wp_viewporter_set_user_data :: RIP.FunPtr ((RIP.Ptr Wp_viewporter) -> (RIP.Ptr RIP.Void) -> IO ())
+wp_viewporter_set_user_data :: RIP.FunPtr (RIP.Ptr Wp_viewporter -> RIP.Ptr RIP.Void -> IO ())
 wp_viewporter_set_user_data =
   RIP.unsafePerformIO hs_bindgen_b8d69774c9572afd
 
@@ -154,22 +150,18 @@ foreign import ccall unsafe "hs_bindgen_d84c8583c1e722a8" hs_bindgen_d84c8583c1e
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_Viewporter_Generated_Bindings.Wayland.Viewporter.Generated_get_wp_viewporter_get_user_data@
-hs_bindgen_d84c8583c1e722a8 :: IO (RIP.FunPtr ((RIP.Ptr Wp_viewporter) -> IO (RIP.Ptr RIP.Void)))
+hs_bindgen_d84c8583c1e722a8 :: IO (RIP.FunPtr (RIP.Ptr Wp_viewporter -> IO (RIP.Ptr RIP.Void)))
 hs_bindgen_d84c8583c1e722a8 =
   RIP.fromFFIType hs_bindgen_d84c8583c1e722a8_base
 
 {-# NOINLINE wp_viewporter_get_user_data #-}
-{-|
+{-| __C declaration:__ @wp_viewporter_get_user_data@
 
-  > iface_wp_viewporter
+    __defined at:__ @viewporter-client-protocol.h 231:1@
 
-__C declaration:__ @wp_viewporter_get_user_data@
-
-__defined at:__ @viewporter-client-protocol.h 231:1@
-
-__exported by:__ @viewporter-client-protocol.h@
+    __exported by:__ @viewporter-client-protocol.h@
 -}
-wp_viewporter_get_user_data :: RIP.FunPtr ((RIP.Ptr Wp_viewporter) -> IO (RIP.Ptr RIP.Void))
+wp_viewporter_get_user_data :: RIP.FunPtr (RIP.Ptr Wp_viewporter -> IO (RIP.Ptr RIP.Void))
 wp_viewporter_get_user_data =
   RIP.unsafePerformIO hs_bindgen_d84c8583c1e722a8
 
@@ -178,7 +170,7 @@ foreign import ccall unsafe "hs_bindgen_3def60022de15cd0" hs_bindgen_3def60022de
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_Viewporter_Generated_Bindings.Wayland.Viewporter.Generated_get_wp_viewporter_get_version@
-hs_bindgen_3def60022de15cd0 :: IO (RIP.FunPtr ((RIP.Ptr Wp_viewporter) -> IO HsBindgen.Runtime.LibC.Word32))
+hs_bindgen_3def60022de15cd0 :: IO (RIP.FunPtr (RIP.Ptr Wp_viewporter -> IO HsBindgen.Runtime.LibC.Word32))
 hs_bindgen_3def60022de15cd0 =
   RIP.fromFFIType hs_bindgen_3def60022de15cd0_base
 
@@ -189,7 +181,7 @@ hs_bindgen_3def60022de15cd0 =
 
     __exported by:__ @viewporter-client-protocol.h@
 -}
-wp_viewporter_get_version :: RIP.FunPtr ((RIP.Ptr Wp_viewporter) -> IO HsBindgen.Runtime.LibC.Word32)
+wp_viewporter_get_version :: RIP.FunPtr (RIP.Ptr Wp_viewporter -> IO HsBindgen.Runtime.LibC.Word32)
 wp_viewporter_get_version =
   RIP.unsafePerformIO hs_bindgen_3def60022de15cd0
 
@@ -198,24 +190,20 @@ foreign import ccall unsafe "hs_bindgen_6b31bd47bebabe4b" hs_bindgen_6b31bd47beb
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_Viewporter_Generated_Bindings.Wayland.Viewporter.Generated_get_wp_viewporter_destroy@
-hs_bindgen_6b31bd47bebabe4b :: IO (RIP.FunPtr ((RIP.Ptr Wp_viewporter) -> IO ()))
+hs_bindgen_6b31bd47bebabe4b :: IO (RIP.FunPtr (RIP.Ptr Wp_viewporter -> IO ()))
 hs_bindgen_6b31bd47bebabe4b =
   RIP.fromFFIType hs_bindgen_6b31bd47bebabe4b_base
 
 {-# NOINLINE wp_viewporter_destroy #-}
-{-|
+{-| Informs the server that the client will not be using this protocol object anymore. This does not affect any other objects, wp_viewport objects included.
 
-  > iface_wp_viewporter
+    __C declaration:__ @wp_viewporter_destroy@
 
-  Informs the server that the client will not be using this protocol object anymore. This does not affect any other objects, wp_viewport objects included.
+    __defined at:__ @viewporter-client-protocol.h 250:1@
 
-__C declaration:__ @wp_viewporter_destroy@
-
-__defined at:__ @viewporter-client-protocol.h 250:1@
-
-__exported by:__ @viewporter-client-protocol.h@
+    __exported by:__ @viewporter-client-protocol.h@
 -}
-wp_viewporter_destroy :: RIP.FunPtr ((RIP.Ptr Wp_viewporter) -> IO ())
+wp_viewporter_destroy :: RIP.FunPtr (RIP.Ptr Wp_viewporter -> IO ())
 wp_viewporter_destroy =
   RIP.unsafePerformIO hs_bindgen_6b31bd47bebabe4b
 
@@ -224,24 +212,20 @@ foreign import ccall unsafe "hs_bindgen_883c1e002756a94c" hs_bindgen_883c1e00275
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_Viewporter_Generated_Bindings.Wayland.Viewporter.Generated_get_wp_viewporter_get_viewport@
-hs_bindgen_883c1e002756a94c :: IO (RIP.FunPtr ((RIP.Ptr Wp_viewporter) -> (RIP.Ptr Bindings.Wayland.Client.Generated.Wl_surface) -> IO (RIP.Ptr Wp_viewport)))
+hs_bindgen_883c1e002756a94c :: IO (RIP.FunPtr (RIP.Ptr Wp_viewporter -> RIP.Ptr Bindings.Wayland.Client.Generated.Wl_surface -> IO (RIP.Ptr Wp_viewport)))
 hs_bindgen_883c1e002756a94c =
   RIP.fromFFIType hs_bindgen_883c1e002756a94c_base
 
 {-# NOINLINE wp_viewporter_get_viewport #-}
-{-|
+{-| Instantiate an interface extension for the given wl_surface to crop and scale its content. If the given wl_surface already has a wp_viewport object associated, the viewport_exists protocol error is raised.
 
-  > iface_wp_viewporter
+    __C declaration:__ @wp_viewporter_get_viewport@
 
-  Instantiate an interface extension for the given wl_surface to crop and scale its content. If the given wl_surface already has a wp_viewport object associated, the viewport_exists protocol error is raised.
+    __defined at:__ @viewporter-client-protocol.h 265:1@
 
-__C declaration:__ @wp_viewporter_get_viewport@
-
-__defined at:__ @viewporter-client-protocol.h 265:1@
-
-__exported by:__ @viewporter-client-protocol.h@
+    __exported by:__ @viewporter-client-protocol.h@
 -}
-wp_viewporter_get_viewport :: RIP.FunPtr ((RIP.Ptr Wp_viewporter) -> (RIP.Ptr Bindings.Wayland.Client.Generated.Wl_surface) -> IO (RIP.Ptr Wp_viewport))
+wp_viewporter_get_viewport :: RIP.FunPtr (RIP.Ptr Wp_viewporter -> RIP.Ptr Bindings.Wayland.Client.Generated.Wl_surface -> IO (RIP.Ptr Wp_viewport))
 wp_viewporter_get_viewport =
   RIP.unsafePerformIO hs_bindgen_883c1e002756a94c
 
@@ -250,22 +234,18 @@ foreign import ccall unsafe "hs_bindgen_b6a590af96ac905a" hs_bindgen_b6a590af96a
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_Viewporter_Generated_Bindings.Wayland.Viewporter.Generated_get_wp_viewport_set_user_data@
-hs_bindgen_b6a590af96ac905a :: IO (RIP.FunPtr ((RIP.Ptr Wp_viewport) -> (RIP.Ptr RIP.Void) -> IO ()))
+hs_bindgen_b6a590af96ac905a :: IO (RIP.FunPtr (RIP.Ptr Wp_viewport -> RIP.Ptr RIP.Void -> IO ()))
 hs_bindgen_b6a590af96ac905a =
   RIP.fromFFIType hs_bindgen_b6a590af96ac905a_base
 
 {-# NOINLINE wp_viewport_set_user_data #-}
-{-|
+{-| __C declaration:__ @wp_viewport_set_user_data@
 
-  > iface_wp_viewport
+    __defined at:__ @viewporter-client-protocol.h 317:1@
 
-__C declaration:__ @wp_viewport_set_user_data@
-
-__defined at:__ @viewporter-client-protocol.h 317:1@
-
-__exported by:__ @viewporter-client-protocol.h@
+    __exported by:__ @viewporter-client-protocol.h@
 -}
-wp_viewport_set_user_data :: RIP.FunPtr ((RIP.Ptr Wp_viewport) -> (RIP.Ptr RIP.Void) -> IO ())
+wp_viewport_set_user_data :: RIP.FunPtr (RIP.Ptr Wp_viewport -> RIP.Ptr RIP.Void -> IO ())
 wp_viewport_set_user_data =
   RIP.unsafePerformIO hs_bindgen_b6a590af96ac905a
 
@@ -274,22 +254,18 @@ foreign import ccall unsafe "hs_bindgen_c9f85946d7a47cdc" hs_bindgen_c9f85946d7a
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_Viewporter_Generated_Bindings.Wayland.Viewporter.Generated_get_wp_viewport_get_user_data@
-hs_bindgen_c9f85946d7a47cdc :: IO (RIP.FunPtr ((RIP.Ptr Wp_viewport) -> IO (RIP.Ptr RIP.Void)))
+hs_bindgen_c9f85946d7a47cdc :: IO (RIP.FunPtr (RIP.Ptr Wp_viewport -> IO (RIP.Ptr RIP.Void)))
 hs_bindgen_c9f85946d7a47cdc =
   RIP.fromFFIType hs_bindgen_c9f85946d7a47cdc_base
 
 {-# NOINLINE wp_viewport_get_user_data #-}
-{-|
+{-| __C declaration:__ @wp_viewport_get_user_data@
 
-  > iface_wp_viewport
+    __defined at:__ @viewporter-client-protocol.h 324:1@
 
-__C declaration:__ @wp_viewport_get_user_data@
-
-__defined at:__ @viewporter-client-protocol.h 324:1@
-
-__exported by:__ @viewporter-client-protocol.h@
+    __exported by:__ @viewporter-client-protocol.h@
 -}
-wp_viewport_get_user_data :: RIP.FunPtr ((RIP.Ptr Wp_viewport) -> IO (RIP.Ptr RIP.Void))
+wp_viewport_get_user_data :: RIP.FunPtr (RIP.Ptr Wp_viewport -> IO (RIP.Ptr RIP.Void))
 wp_viewport_get_user_data =
   RIP.unsafePerformIO hs_bindgen_c9f85946d7a47cdc
 
@@ -298,7 +274,7 @@ foreign import ccall unsafe "hs_bindgen_7af6f6755f391ab8" hs_bindgen_7af6f6755f3
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_Viewporter_Generated_Bindings.Wayland.Viewporter.Generated_get_wp_viewport_get_version@
-hs_bindgen_7af6f6755f391ab8 :: IO (RIP.FunPtr ((RIP.Ptr Wp_viewport) -> IO HsBindgen.Runtime.LibC.Word32))
+hs_bindgen_7af6f6755f391ab8 :: IO (RIP.FunPtr (RIP.Ptr Wp_viewport -> IO HsBindgen.Runtime.LibC.Word32))
 hs_bindgen_7af6f6755f391ab8 =
   RIP.fromFFIType hs_bindgen_7af6f6755f391ab8_base
 
@@ -309,7 +285,7 @@ hs_bindgen_7af6f6755f391ab8 =
 
     __exported by:__ @viewporter-client-protocol.h@
 -}
-wp_viewport_get_version :: RIP.FunPtr ((RIP.Ptr Wp_viewport) -> IO HsBindgen.Runtime.LibC.Word32)
+wp_viewport_get_version :: RIP.FunPtr (RIP.Ptr Wp_viewport -> IO HsBindgen.Runtime.LibC.Word32)
 wp_viewport_get_version =
   RIP.unsafePerformIO hs_bindgen_7af6f6755f391ab8
 
@@ -318,24 +294,20 @@ foreign import ccall unsafe "hs_bindgen_2c3394d906a4466c" hs_bindgen_2c3394d906a
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_Viewporter_Generated_Bindings.Wayland.Viewporter.Generated_get_wp_viewport_destroy@
-hs_bindgen_2c3394d906a4466c :: IO (RIP.FunPtr ((RIP.Ptr Wp_viewport) -> IO ()))
+hs_bindgen_2c3394d906a4466c :: IO (RIP.FunPtr (RIP.Ptr Wp_viewport -> IO ()))
 hs_bindgen_2c3394d906a4466c =
   RIP.fromFFIType hs_bindgen_2c3394d906a4466c_base
 
 {-# NOINLINE wp_viewport_destroy #-}
-{-|
+{-| The associated wl_surface's crop and scale state is removed. The change is applied on the next wl_surface.commit.
 
-  > iface_wp_viewport
+    __C declaration:__ @wp_viewport_destroy@
 
-  The associated wl_surface's crop and scale state is removed. The change is applied on the next wl_surface.commit.
+    __defined at:__ @viewporter-client-protocol.h 342:1@
 
-__C declaration:__ @wp_viewport_destroy@
-
-__defined at:__ @viewporter-client-protocol.h 342:1@
-
-__exported by:__ @viewporter-client-protocol.h@
+    __exported by:__ @viewporter-client-protocol.h@
 -}
-wp_viewport_destroy :: RIP.FunPtr ((RIP.Ptr Wp_viewport) -> IO ())
+wp_viewport_destroy :: RIP.FunPtr (RIP.Ptr Wp_viewport -> IO ())
 wp_viewport_destroy =
   RIP.unsafePerformIO hs_bindgen_2c3394d906a4466c
 
@@ -344,28 +316,24 @@ foreign import ccall unsafe "hs_bindgen_7980820135d4290b" hs_bindgen_7980820135d
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_Viewporter_Generated_Bindings.Wayland.Viewporter.Generated_get_wp_viewport_set_source@
-hs_bindgen_7980820135d4290b :: IO (RIP.FunPtr ((RIP.Ptr Wp_viewport) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ()))
+hs_bindgen_7980820135d4290b :: IO (RIP.FunPtr (RIP.Ptr Wp_viewport -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ()))
 hs_bindgen_7980820135d4290b =
   RIP.fromFFIType hs_bindgen_7980820135d4290b_base
 
 {-# NOINLINE wp_viewport_set_source #-}
-{-|
+{-| Set the source rectangle of the associated wl_surface. See wp_viewport for the description, and relation to the wl_buffer size.
 
-  > iface_wp_viewport
+    If all of x, y, width and height are -1.0, the source rectangle is unset instead. Any other set of values where width or height are zero or negative, or x or y are negative, raise the bad_value protocol error.
 
-  Set the source rectangle of the associated wl_surface. See wp_viewport for the description, and relation to the wl_buffer size.
+    The crop and scale state is double-buffered, see wl_surface.commit.
 
-  If all of x, y, width and height are -1.0, the source rectangle is unset instead. Any other set of values where width or height are zero or negative, or x or y are negative, raise the bad_value protocol error.
+    __C declaration:__ @wp_viewport_set_source@
 
-  The crop and scale state is double-buffered, see wl_surface.commit.
+    __defined at:__ @viewporter-client-protocol.h 363:1@
 
-__C declaration:__ @wp_viewport_set_source@
-
-__defined at:__ @viewporter-client-protocol.h 363:1@
-
-__exported by:__ @viewporter-client-protocol.h@
+    __exported by:__ @viewporter-client-protocol.h@
 -}
-wp_viewport_set_source :: RIP.FunPtr ((RIP.Ptr Wp_viewport) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ())
+wp_viewport_set_source :: RIP.FunPtr (RIP.Ptr Wp_viewport -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ())
 wp_viewport_set_source =
   RIP.unsafePerformIO hs_bindgen_7980820135d4290b
 
@@ -374,27 +342,23 @@ foreign import ccall unsafe "hs_bindgen_cbd9f16b526956ed" hs_bindgen_cbd9f16b526
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_Viewporter_Generated_Bindings.Wayland.Viewporter.Generated_get_wp_viewport_set_destination@
-hs_bindgen_cbd9f16b526956ed :: IO (RIP.FunPtr ((RIP.Ptr Wp_viewport) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_cbd9f16b526956ed :: IO (RIP.FunPtr (RIP.Ptr Wp_viewport -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
 hs_bindgen_cbd9f16b526956ed =
   RIP.fromFFIType hs_bindgen_cbd9f16b526956ed_base
 
 {-# NOINLINE wp_viewport_set_destination #-}
-{-|
+{-| Set the destination size of the associated wl_surface. See wp_viewport for the description, and relation to the wl_buffer size.
 
-  > iface_wp_viewport
+    If width is -1 and height is -1, the destination size is unset instead. Any other pair of values for width and height that contains zero or negative values raises the bad_value protocol error.
 
-  Set the destination size of the associated wl_surface. See wp_viewport for the description, and relation to the wl_buffer size.
+    The crop and scale state is double-buffered, see wl_surface.commit.
 
-  If width is -1 and height is -1, the destination size is unset instead. Any other pair of values for width and height that contains zero or negative values raises the bad_value protocol error.
+    __C declaration:__ @wp_viewport_set_destination@
 
-  The crop and scale state is double-buffered, see wl_surface.commit.
+    __defined at:__ @viewporter-client-protocol.h 384:1@
 
-__C declaration:__ @wp_viewport_set_destination@
-
-__defined at:__ @viewporter-client-protocol.h 384:1@
-
-__exported by:__ @viewporter-client-protocol.h@
+    __exported by:__ @viewporter-client-protocol.h@
 -}
-wp_viewport_set_destination :: RIP.FunPtr ((RIP.Ptr Wp_viewport) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+wp_viewport_set_destination :: RIP.FunPtr (RIP.Ptr Wp_viewport -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 wp_viewport_set_destination =
   RIP.unsafePerformIO hs_bindgen_cbd9f16b526956ed

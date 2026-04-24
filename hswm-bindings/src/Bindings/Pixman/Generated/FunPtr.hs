@@ -2005,7 +2005,7 @@ foreign import ccall unsafe "hs_bindgen_fead03fdc4408d83" hs_bindgen_fead03fdc44
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_transform_init_identity@
-hs_bindgen_fead03fdc4408d83 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_transform) -> IO ()))
+hs_bindgen_fead03fdc4408d83 :: IO (RIP.FunPtr (RIP.Ptr Pixman_transform -> IO ()))
 hs_bindgen_fead03fdc4408d83 =
   RIP.fromFFIType hs_bindgen_fead03fdc4408d83_base
 
@@ -2016,7 +2016,7 @@ hs_bindgen_fead03fdc4408d83 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_transform_init_identity :: RIP.FunPtr ((RIP.Ptr Pixman_transform) -> IO ())
+pixman_transform_init_identity :: RIP.FunPtr (RIP.Ptr Pixman_transform -> IO ())
 pixman_transform_init_identity =
   RIP.unsafePerformIO hs_bindgen_fead03fdc4408d83
 
@@ -2025,7 +2025,7 @@ foreign import ccall unsafe "hs_bindgen_158c18915ee7ad43" hs_bindgen_158c18915ee
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_transform_point_3d@
-hs_bindgen_158c18915ee7ad43 :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_transform) -> (RIP.Ptr Pixman_vector) -> IO Pixman_bool_t))
+hs_bindgen_158c18915ee7ad43 :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_transform -> RIP.Ptr Pixman_vector -> IO Pixman_bool_t))
 hs_bindgen_158c18915ee7ad43 =
   RIP.fromFFIType hs_bindgen_158c18915ee7ad43_base
 
@@ -2036,7 +2036,7 @@ hs_bindgen_158c18915ee7ad43 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_transform_point_3d :: RIP.FunPtr ((PtrConst.PtrConst Pixman_transform) -> (RIP.Ptr Pixman_vector) -> IO Pixman_bool_t)
+pixman_transform_point_3d :: RIP.FunPtr (PtrConst.PtrConst Pixman_transform -> RIP.Ptr Pixman_vector -> IO Pixman_bool_t)
 pixman_transform_point_3d =
   RIP.unsafePerformIO hs_bindgen_158c18915ee7ad43
 
@@ -2045,7 +2045,7 @@ foreign import ccall unsafe "hs_bindgen_2aa68e890b8aae7b" hs_bindgen_2aa68e890b8
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_transform_point@
-hs_bindgen_2aa68e890b8aae7b :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_transform) -> (RIP.Ptr Pixman_vector) -> IO Pixman_bool_t))
+hs_bindgen_2aa68e890b8aae7b :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_transform -> RIP.Ptr Pixman_vector -> IO Pixman_bool_t))
 hs_bindgen_2aa68e890b8aae7b =
   RIP.fromFFIType hs_bindgen_2aa68e890b8aae7b_base
 
@@ -2056,7 +2056,7 @@ hs_bindgen_2aa68e890b8aae7b =
 
     __exported by:__ @pixman.h@
 -}
-pixman_transform_point :: RIP.FunPtr ((PtrConst.PtrConst Pixman_transform) -> (RIP.Ptr Pixman_vector) -> IO Pixman_bool_t)
+pixman_transform_point :: RIP.FunPtr (PtrConst.PtrConst Pixman_transform -> RIP.Ptr Pixman_vector -> IO Pixman_bool_t)
 pixman_transform_point =
   RIP.unsafePerformIO hs_bindgen_2aa68e890b8aae7b
 
@@ -2065,7 +2065,7 @@ foreign import ccall unsafe "hs_bindgen_8b7ee05b83a852bd" hs_bindgen_8b7ee05b83a
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_transform_multiply@
-hs_bindgen_8b7ee05b83a852bd :: IO (RIP.FunPtr ((RIP.Ptr Pixman_transform) -> (PtrConst.PtrConst Pixman_transform) -> (PtrConst.PtrConst Pixman_transform) -> IO Pixman_bool_t))
+hs_bindgen_8b7ee05b83a852bd :: IO (RIP.FunPtr (RIP.Ptr Pixman_transform -> PtrConst.PtrConst Pixman_transform -> PtrConst.PtrConst Pixman_transform -> IO Pixman_bool_t))
 hs_bindgen_8b7ee05b83a852bd =
   RIP.fromFFIType hs_bindgen_8b7ee05b83a852bd_base
 
@@ -2076,7 +2076,7 @@ hs_bindgen_8b7ee05b83a852bd =
 
     __exported by:__ @pixman.h@
 -}
-pixman_transform_multiply :: RIP.FunPtr ((RIP.Ptr Pixman_transform) -> (PtrConst.PtrConst Pixman_transform) -> (PtrConst.PtrConst Pixman_transform) -> IO Pixman_bool_t)
+pixman_transform_multiply :: RIP.FunPtr (RIP.Ptr Pixman_transform -> PtrConst.PtrConst Pixman_transform -> PtrConst.PtrConst Pixman_transform -> IO Pixman_bool_t)
 pixman_transform_multiply =
   RIP.unsafePerformIO hs_bindgen_8b7ee05b83a852bd
 
@@ -2085,7 +2085,7 @@ foreign import ccall unsafe "hs_bindgen_e12635e3ff421181" hs_bindgen_e12635e3ff4
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_transform_init_scale@
-hs_bindgen_e12635e3ff421181 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_transform) -> Pixman_fixed_t -> Pixman_fixed_t -> IO ()))
+hs_bindgen_e12635e3ff421181 :: IO (RIP.FunPtr (RIP.Ptr Pixman_transform -> Pixman_fixed_t -> Pixman_fixed_t -> IO ()))
 hs_bindgen_e12635e3ff421181 =
   RIP.fromFFIType hs_bindgen_e12635e3ff421181_base
 
@@ -2096,7 +2096,7 @@ hs_bindgen_e12635e3ff421181 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_transform_init_scale :: RIP.FunPtr ((RIP.Ptr Pixman_transform) -> Pixman_fixed_t -> Pixman_fixed_t -> IO ())
+pixman_transform_init_scale :: RIP.FunPtr (RIP.Ptr Pixman_transform -> Pixman_fixed_t -> Pixman_fixed_t -> IO ())
 pixman_transform_init_scale =
   RIP.unsafePerformIO hs_bindgen_e12635e3ff421181
 
@@ -2105,7 +2105,7 @@ foreign import ccall unsafe "hs_bindgen_0523c08db41f607b" hs_bindgen_0523c08db41
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_transform_scale@
-hs_bindgen_0523c08db41f607b :: IO (RIP.FunPtr ((RIP.Ptr Pixman_transform) -> (RIP.Ptr Pixman_transform) -> Pixman_fixed_t -> Pixman_fixed_t -> IO Pixman_bool_t))
+hs_bindgen_0523c08db41f607b :: IO (RIP.FunPtr (RIP.Ptr Pixman_transform -> RIP.Ptr Pixman_transform -> Pixman_fixed_t -> Pixman_fixed_t -> IO Pixman_bool_t))
 hs_bindgen_0523c08db41f607b =
   RIP.fromFFIType hs_bindgen_0523c08db41f607b_base
 
@@ -2116,7 +2116,7 @@ hs_bindgen_0523c08db41f607b =
 
     __exported by:__ @pixman.h@
 -}
-pixman_transform_scale :: RIP.FunPtr ((RIP.Ptr Pixman_transform) -> (RIP.Ptr Pixman_transform) -> Pixman_fixed_t -> Pixman_fixed_t -> IO Pixman_bool_t)
+pixman_transform_scale :: RIP.FunPtr (RIP.Ptr Pixman_transform -> RIP.Ptr Pixman_transform -> Pixman_fixed_t -> Pixman_fixed_t -> IO Pixman_bool_t)
 pixman_transform_scale =
   RIP.unsafePerformIO hs_bindgen_0523c08db41f607b
 
@@ -2125,7 +2125,7 @@ foreign import ccall unsafe "hs_bindgen_b440e0d88ff61081" hs_bindgen_b440e0d88ff
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_transform_init_rotate@
-hs_bindgen_b440e0d88ff61081 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_transform) -> Pixman_fixed_t -> Pixman_fixed_t -> IO ()))
+hs_bindgen_b440e0d88ff61081 :: IO (RIP.FunPtr (RIP.Ptr Pixman_transform -> Pixman_fixed_t -> Pixman_fixed_t -> IO ()))
 hs_bindgen_b440e0d88ff61081 =
   RIP.fromFFIType hs_bindgen_b440e0d88ff61081_base
 
@@ -2136,7 +2136,7 @@ hs_bindgen_b440e0d88ff61081 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_transform_init_rotate :: RIP.FunPtr ((RIP.Ptr Pixman_transform) -> Pixman_fixed_t -> Pixman_fixed_t -> IO ())
+pixman_transform_init_rotate :: RIP.FunPtr (RIP.Ptr Pixman_transform -> Pixman_fixed_t -> Pixman_fixed_t -> IO ())
 pixman_transform_init_rotate =
   RIP.unsafePerformIO hs_bindgen_b440e0d88ff61081
 
@@ -2145,7 +2145,7 @@ foreign import ccall unsafe "hs_bindgen_0008e797fd0e247b" hs_bindgen_0008e797fd0
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_transform_rotate@
-hs_bindgen_0008e797fd0e247b :: IO (RIP.FunPtr ((RIP.Ptr Pixman_transform) -> (RIP.Ptr Pixman_transform) -> Pixman_fixed_t -> Pixman_fixed_t -> IO Pixman_bool_t))
+hs_bindgen_0008e797fd0e247b :: IO (RIP.FunPtr (RIP.Ptr Pixman_transform -> RIP.Ptr Pixman_transform -> Pixman_fixed_t -> Pixman_fixed_t -> IO Pixman_bool_t))
 hs_bindgen_0008e797fd0e247b =
   RIP.fromFFIType hs_bindgen_0008e797fd0e247b_base
 
@@ -2156,7 +2156,7 @@ hs_bindgen_0008e797fd0e247b =
 
     __exported by:__ @pixman.h@
 -}
-pixman_transform_rotate :: RIP.FunPtr ((RIP.Ptr Pixman_transform) -> (RIP.Ptr Pixman_transform) -> Pixman_fixed_t -> Pixman_fixed_t -> IO Pixman_bool_t)
+pixman_transform_rotate :: RIP.FunPtr (RIP.Ptr Pixman_transform -> RIP.Ptr Pixman_transform -> Pixman_fixed_t -> Pixman_fixed_t -> IO Pixman_bool_t)
 pixman_transform_rotate =
   RIP.unsafePerformIO hs_bindgen_0008e797fd0e247b
 
@@ -2165,7 +2165,7 @@ foreign import ccall unsafe "hs_bindgen_6baa01bf5214126c" hs_bindgen_6baa01bf521
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_transform_init_translate@
-hs_bindgen_6baa01bf5214126c :: IO (RIP.FunPtr ((RIP.Ptr Pixman_transform) -> Pixman_fixed_t -> Pixman_fixed_t -> IO ()))
+hs_bindgen_6baa01bf5214126c :: IO (RIP.FunPtr (RIP.Ptr Pixman_transform -> Pixman_fixed_t -> Pixman_fixed_t -> IO ()))
 hs_bindgen_6baa01bf5214126c =
   RIP.fromFFIType hs_bindgen_6baa01bf5214126c_base
 
@@ -2176,7 +2176,7 @@ hs_bindgen_6baa01bf5214126c =
 
     __exported by:__ @pixman.h@
 -}
-pixman_transform_init_translate :: RIP.FunPtr ((RIP.Ptr Pixman_transform) -> Pixman_fixed_t -> Pixman_fixed_t -> IO ())
+pixman_transform_init_translate :: RIP.FunPtr (RIP.Ptr Pixman_transform -> Pixman_fixed_t -> Pixman_fixed_t -> IO ())
 pixman_transform_init_translate =
   RIP.unsafePerformIO hs_bindgen_6baa01bf5214126c
 
@@ -2185,7 +2185,7 @@ foreign import ccall unsafe "hs_bindgen_e04f7d76b2872062" hs_bindgen_e04f7d76b28
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_transform_translate@
-hs_bindgen_e04f7d76b2872062 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_transform) -> (RIP.Ptr Pixman_transform) -> Pixman_fixed_t -> Pixman_fixed_t -> IO Pixman_bool_t))
+hs_bindgen_e04f7d76b2872062 :: IO (RIP.FunPtr (RIP.Ptr Pixman_transform -> RIP.Ptr Pixman_transform -> Pixman_fixed_t -> Pixman_fixed_t -> IO Pixman_bool_t))
 hs_bindgen_e04f7d76b2872062 =
   RIP.fromFFIType hs_bindgen_e04f7d76b2872062_base
 
@@ -2196,7 +2196,7 @@ hs_bindgen_e04f7d76b2872062 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_transform_translate :: RIP.FunPtr ((RIP.Ptr Pixman_transform) -> (RIP.Ptr Pixman_transform) -> Pixman_fixed_t -> Pixman_fixed_t -> IO Pixman_bool_t)
+pixman_transform_translate :: RIP.FunPtr (RIP.Ptr Pixman_transform -> RIP.Ptr Pixman_transform -> Pixman_fixed_t -> Pixman_fixed_t -> IO Pixman_bool_t)
 pixman_transform_translate =
   RIP.unsafePerformIO hs_bindgen_e04f7d76b2872062
 
@@ -2205,7 +2205,7 @@ foreign import ccall unsafe "hs_bindgen_1e832a8d591a7679" hs_bindgen_1e832a8d591
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_transform_bounds@
-hs_bindgen_1e832a8d591a7679 :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_transform) -> (RIP.Ptr Pixman_box16) -> IO Pixman_bool_t))
+hs_bindgen_1e832a8d591a7679 :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_transform -> RIP.Ptr Pixman_box16 -> IO Pixman_bool_t))
 hs_bindgen_1e832a8d591a7679 =
   RIP.fromFFIType hs_bindgen_1e832a8d591a7679_base
 
@@ -2216,7 +2216,7 @@ hs_bindgen_1e832a8d591a7679 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_transform_bounds :: RIP.FunPtr ((PtrConst.PtrConst Pixman_transform) -> (RIP.Ptr Pixman_box16) -> IO Pixman_bool_t)
+pixman_transform_bounds :: RIP.FunPtr (PtrConst.PtrConst Pixman_transform -> RIP.Ptr Pixman_box16 -> IO Pixman_bool_t)
 pixman_transform_bounds =
   RIP.unsafePerformIO hs_bindgen_1e832a8d591a7679
 
@@ -2225,7 +2225,7 @@ foreign import ccall unsafe "hs_bindgen_78b0b3daf40470e3" hs_bindgen_78b0b3daf40
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_transform_invert@
-hs_bindgen_78b0b3daf40470e3 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_transform) -> (PtrConst.PtrConst Pixman_transform) -> IO Pixman_bool_t))
+hs_bindgen_78b0b3daf40470e3 :: IO (RIP.FunPtr (RIP.Ptr Pixman_transform -> PtrConst.PtrConst Pixman_transform -> IO Pixman_bool_t))
 hs_bindgen_78b0b3daf40470e3 =
   RIP.fromFFIType hs_bindgen_78b0b3daf40470e3_base
 
@@ -2236,7 +2236,7 @@ hs_bindgen_78b0b3daf40470e3 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_transform_invert :: RIP.FunPtr ((RIP.Ptr Pixman_transform) -> (PtrConst.PtrConst Pixman_transform) -> IO Pixman_bool_t)
+pixman_transform_invert :: RIP.FunPtr (RIP.Ptr Pixman_transform -> PtrConst.PtrConst Pixman_transform -> IO Pixman_bool_t)
 pixman_transform_invert =
   RIP.unsafePerformIO hs_bindgen_78b0b3daf40470e3
 
@@ -2245,7 +2245,7 @@ foreign import ccall unsafe "hs_bindgen_5d122634bdf0dbdf" hs_bindgen_5d122634bdf
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_transform_is_identity@
-hs_bindgen_5d122634bdf0dbdf :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_transform) -> IO Pixman_bool_t))
+hs_bindgen_5d122634bdf0dbdf :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_transform -> IO Pixman_bool_t))
 hs_bindgen_5d122634bdf0dbdf =
   RIP.fromFFIType hs_bindgen_5d122634bdf0dbdf_base
 
@@ -2256,7 +2256,7 @@ hs_bindgen_5d122634bdf0dbdf =
 
     __exported by:__ @pixman.h@
 -}
-pixman_transform_is_identity :: RIP.FunPtr ((PtrConst.PtrConst Pixman_transform) -> IO Pixman_bool_t)
+pixman_transform_is_identity :: RIP.FunPtr (PtrConst.PtrConst Pixman_transform -> IO Pixman_bool_t)
 pixman_transform_is_identity =
   RIP.unsafePerformIO hs_bindgen_5d122634bdf0dbdf
 
@@ -2265,7 +2265,7 @@ foreign import ccall unsafe "hs_bindgen_4337b4c24675d9c2" hs_bindgen_4337b4c2467
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_transform_is_scale@
-hs_bindgen_4337b4c24675d9c2 :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_transform) -> IO Pixman_bool_t))
+hs_bindgen_4337b4c24675d9c2 :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_transform -> IO Pixman_bool_t))
 hs_bindgen_4337b4c24675d9c2 =
   RIP.fromFFIType hs_bindgen_4337b4c24675d9c2_base
 
@@ -2276,7 +2276,7 @@ hs_bindgen_4337b4c24675d9c2 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_transform_is_scale :: RIP.FunPtr ((PtrConst.PtrConst Pixman_transform) -> IO Pixman_bool_t)
+pixman_transform_is_scale :: RIP.FunPtr (PtrConst.PtrConst Pixman_transform -> IO Pixman_bool_t)
 pixman_transform_is_scale =
   RIP.unsafePerformIO hs_bindgen_4337b4c24675d9c2
 
@@ -2285,7 +2285,7 @@ foreign import ccall unsafe "hs_bindgen_23a72204a277800e" hs_bindgen_23a72204a27
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_transform_is_int_translate@
-hs_bindgen_23a72204a277800e :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_transform) -> IO Pixman_bool_t))
+hs_bindgen_23a72204a277800e :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_transform -> IO Pixman_bool_t))
 hs_bindgen_23a72204a277800e =
   RIP.fromFFIType hs_bindgen_23a72204a277800e_base
 
@@ -2296,7 +2296,7 @@ hs_bindgen_23a72204a277800e =
 
     __exported by:__ @pixman.h@
 -}
-pixman_transform_is_int_translate :: RIP.FunPtr ((PtrConst.PtrConst Pixman_transform) -> IO Pixman_bool_t)
+pixman_transform_is_int_translate :: RIP.FunPtr (PtrConst.PtrConst Pixman_transform -> IO Pixman_bool_t)
 pixman_transform_is_int_translate =
   RIP.unsafePerformIO hs_bindgen_23a72204a277800e
 
@@ -2305,7 +2305,7 @@ foreign import ccall unsafe "hs_bindgen_f2fc6407630af25b" hs_bindgen_f2fc6407630
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_transform_is_inverse@
-hs_bindgen_f2fc6407630af25b :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_transform) -> (PtrConst.PtrConst Pixman_transform) -> IO Pixman_bool_t))
+hs_bindgen_f2fc6407630af25b :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_transform -> PtrConst.PtrConst Pixman_transform -> IO Pixman_bool_t))
 hs_bindgen_f2fc6407630af25b =
   RIP.fromFFIType hs_bindgen_f2fc6407630af25b_base
 
@@ -2316,7 +2316,7 @@ hs_bindgen_f2fc6407630af25b =
 
     __exported by:__ @pixman.h@
 -}
-pixman_transform_is_inverse :: RIP.FunPtr ((PtrConst.PtrConst Pixman_transform) -> (PtrConst.PtrConst Pixman_transform) -> IO Pixman_bool_t)
+pixman_transform_is_inverse :: RIP.FunPtr (PtrConst.PtrConst Pixman_transform -> PtrConst.PtrConst Pixman_transform -> IO Pixman_bool_t)
 pixman_transform_is_inverse =
   RIP.unsafePerformIO hs_bindgen_f2fc6407630af25b
 
@@ -2325,7 +2325,7 @@ foreign import ccall unsafe "hs_bindgen_35a1446cca1d531a" hs_bindgen_35a1446cca1
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_transform_from_pixman_f_transform@
-hs_bindgen_35a1446cca1d531a :: IO (RIP.FunPtr ((RIP.Ptr Pixman_transform) -> (PtrConst.PtrConst Pixman_f_transform) -> IO Pixman_bool_t))
+hs_bindgen_35a1446cca1d531a :: IO (RIP.FunPtr (RIP.Ptr Pixman_transform -> PtrConst.PtrConst Pixman_f_transform -> IO Pixman_bool_t))
 hs_bindgen_35a1446cca1d531a =
   RIP.fromFFIType hs_bindgen_35a1446cca1d531a_base
 
@@ -2336,7 +2336,7 @@ hs_bindgen_35a1446cca1d531a =
 
     __exported by:__ @pixman.h@
 -}
-pixman_transform_from_pixman_f_transform :: RIP.FunPtr ((RIP.Ptr Pixman_transform) -> (PtrConst.PtrConst Pixman_f_transform) -> IO Pixman_bool_t)
+pixman_transform_from_pixman_f_transform :: RIP.FunPtr (RIP.Ptr Pixman_transform -> PtrConst.PtrConst Pixman_f_transform -> IO Pixman_bool_t)
 pixman_transform_from_pixman_f_transform =
   RIP.unsafePerformIO hs_bindgen_35a1446cca1d531a
 
@@ -2345,7 +2345,7 @@ foreign import ccall unsafe "hs_bindgen_54fb63b5a36b528e" hs_bindgen_54fb63b5a36
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_f_transform_from_pixman_transform@
-hs_bindgen_54fb63b5a36b528e :: IO (RIP.FunPtr ((RIP.Ptr Pixman_f_transform) -> (PtrConst.PtrConst Pixman_transform) -> IO ()))
+hs_bindgen_54fb63b5a36b528e :: IO (RIP.FunPtr (RIP.Ptr Pixman_f_transform -> PtrConst.PtrConst Pixman_transform -> IO ()))
 hs_bindgen_54fb63b5a36b528e =
   RIP.fromFFIType hs_bindgen_54fb63b5a36b528e_base
 
@@ -2356,7 +2356,7 @@ hs_bindgen_54fb63b5a36b528e =
 
     __exported by:__ @pixman.h@
 -}
-pixman_f_transform_from_pixman_transform :: RIP.FunPtr ((RIP.Ptr Pixman_f_transform) -> (PtrConst.PtrConst Pixman_transform) -> IO ())
+pixman_f_transform_from_pixman_transform :: RIP.FunPtr (RIP.Ptr Pixman_f_transform -> PtrConst.PtrConst Pixman_transform -> IO ())
 pixman_f_transform_from_pixman_transform =
   RIP.unsafePerformIO hs_bindgen_54fb63b5a36b528e
 
@@ -2365,7 +2365,7 @@ foreign import ccall unsafe "hs_bindgen_78df1cef460fd205" hs_bindgen_78df1cef460
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_f_transform_invert@
-hs_bindgen_78df1cef460fd205 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_f_transform) -> (PtrConst.PtrConst Pixman_f_transform) -> IO Pixman_bool_t))
+hs_bindgen_78df1cef460fd205 :: IO (RIP.FunPtr (RIP.Ptr Pixman_f_transform -> PtrConst.PtrConst Pixman_f_transform -> IO Pixman_bool_t))
 hs_bindgen_78df1cef460fd205 =
   RIP.fromFFIType hs_bindgen_78df1cef460fd205_base
 
@@ -2376,7 +2376,7 @@ hs_bindgen_78df1cef460fd205 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_f_transform_invert :: RIP.FunPtr ((RIP.Ptr Pixman_f_transform) -> (PtrConst.PtrConst Pixman_f_transform) -> IO Pixman_bool_t)
+pixman_f_transform_invert :: RIP.FunPtr (RIP.Ptr Pixman_f_transform -> PtrConst.PtrConst Pixman_f_transform -> IO Pixman_bool_t)
 pixman_f_transform_invert =
   RIP.unsafePerformIO hs_bindgen_78df1cef460fd205
 
@@ -2385,7 +2385,7 @@ foreign import ccall unsafe "hs_bindgen_b3c65d08b169ff41" hs_bindgen_b3c65d08b16
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_f_transform_point@
-hs_bindgen_b3c65d08b169ff41 :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_f_transform) -> (RIP.Ptr Pixman_f_vector) -> IO Pixman_bool_t))
+hs_bindgen_b3c65d08b169ff41 :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_f_transform -> RIP.Ptr Pixman_f_vector -> IO Pixman_bool_t))
 hs_bindgen_b3c65d08b169ff41 =
   RIP.fromFFIType hs_bindgen_b3c65d08b169ff41_base
 
@@ -2396,7 +2396,7 @@ hs_bindgen_b3c65d08b169ff41 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_f_transform_point :: RIP.FunPtr ((PtrConst.PtrConst Pixman_f_transform) -> (RIP.Ptr Pixman_f_vector) -> IO Pixman_bool_t)
+pixman_f_transform_point :: RIP.FunPtr (PtrConst.PtrConst Pixman_f_transform -> RIP.Ptr Pixman_f_vector -> IO Pixman_bool_t)
 pixman_f_transform_point =
   RIP.unsafePerformIO hs_bindgen_b3c65d08b169ff41
 
@@ -2405,7 +2405,7 @@ foreign import ccall unsafe "hs_bindgen_62884c6dfd65b98d" hs_bindgen_62884c6dfd6
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_f_transform_point_3d@
-hs_bindgen_62884c6dfd65b98d :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_f_transform) -> (RIP.Ptr Pixman_f_vector) -> IO ()))
+hs_bindgen_62884c6dfd65b98d :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_f_transform -> RIP.Ptr Pixman_f_vector -> IO ()))
 hs_bindgen_62884c6dfd65b98d =
   RIP.fromFFIType hs_bindgen_62884c6dfd65b98d_base
 
@@ -2416,7 +2416,7 @@ hs_bindgen_62884c6dfd65b98d =
 
     __exported by:__ @pixman.h@
 -}
-pixman_f_transform_point_3d :: RIP.FunPtr ((PtrConst.PtrConst Pixman_f_transform) -> (RIP.Ptr Pixman_f_vector) -> IO ())
+pixman_f_transform_point_3d :: RIP.FunPtr (PtrConst.PtrConst Pixman_f_transform -> RIP.Ptr Pixman_f_vector -> IO ())
 pixman_f_transform_point_3d =
   RIP.unsafePerformIO hs_bindgen_62884c6dfd65b98d
 
@@ -2425,7 +2425,7 @@ foreign import ccall unsafe "hs_bindgen_cc8e4a45b4f09390" hs_bindgen_cc8e4a45b4f
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_f_transform_multiply@
-hs_bindgen_cc8e4a45b4f09390 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_f_transform) -> (PtrConst.PtrConst Pixman_f_transform) -> (PtrConst.PtrConst Pixman_f_transform) -> IO ()))
+hs_bindgen_cc8e4a45b4f09390 :: IO (RIP.FunPtr (RIP.Ptr Pixman_f_transform -> PtrConst.PtrConst Pixman_f_transform -> PtrConst.PtrConst Pixman_f_transform -> IO ()))
 hs_bindgen_cc8e4a45b4f09390 =
   RIP.fromFFIType hs_bindgen_cc8e4a45b4f09390_base
 
@@ -2436,7 +2436,7 @@ hs_bindgen_cc8e4a45b4f09390 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_f_transform_multiply :: RIP.FunPtr ((RIP.Ptr Pixman_f_transform) -> (PtrConst.PtrConst Pixman_f_transform) -> (PtrConst.PtrConst Pixman_f_transform) -> IO ())
+pixman_f_transform_multiply :: RIP.FunPtr (RIP.Ptr Pixman_f_transform -> PtrConst.PtrConst Pixman_f_transform -> PtrConst.PtrConst Pixman_f_transform -> IO ())
 pixman_f_transform_multiply =
   RIP.unsafePerformIO hs_bindgen_cc8e4a45b4f09390
 
@@ -2445,7 +2445,7 @@ foreign import ccall unsafe "hs_bindgen_053460bee80edd5d" hs_bindgen_053460bee80
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_f_transform_init_scale@
-hs_bindgen_053460bee80edd5d :: IO (RIP.FunPtr ((RIP.Ptr Pixman_f_transform) -> RIP.CDouble -> RIP.CDouble -> IO ()))
+hs_bindgen_053460bee80edd5d :: IO (RIP.FunPtr (RIP.Ptr Pixman_f_transform -> RIP.CDouble -> RIP.CDouble -> IO ()))
 hs_bindgen_053460bee80edd5d =
   RIP.fromFFIType hs_bindgen_053460bee80edd5d_base
 
@@ -2456,7 +2456,7 @@ hs_bindgen_053460bee80edd5d =
 
     __exported by:__ @pixman.h@
 -}
-pixman_f_transform_init_scale :: RIP.FunPtr ((RIP.Ptr Pixman_f_transform) -> RIP.CDouble -> RIP.CDouble -> IO ())
+pixman_f_transform_init_scale :: RIP.FunPtr (RIP.Ptr Pixman_f_transform -> RIP.CDouble -> RIP.CDouble -> IO ())
 pixman_f_transform_init_scale =
   RIP.unsafePerformIO hs_bindgen_053460bee80edd5d
 
@@ -2465,7 +2465,7 @@ foreign import ccall unsafe "hs_bindgen_41cd841fa2b71f82" hs_bindgen_41cd841fa2b
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_f_transform_scale@
-hs_bindgen_41cd841fa2b71f82 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_f_transform) -> (RIP.Ptr Pixman_f_transform) -> RIP.CDouble -> RIP.CDouble -> IO Pixman_bool_t))
+hs_bindgen_41cd841fa2b71f82 :: IO (RIP.FunPtr (RIP.Ptr Pixman_f_transform -> RIP.Ptr Pixman_f_transform -> RIP.CDouble -> RIP.CDouble -> IO Pixman_bool_t))
 hs_bindgen_41cd841fa2b71f82 =
   RIP.fromFFIType hs_bindgen_41cd841fa2b71f82_base
 
@@ -2476,7 +2476,7 @@ hs_bindgen_41cd841fa2b71f82 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_f_transform_scale :: RIP.FunPtr ((RIP.Ptr Pixman_f_transform) -> (RIP.Ptr Pixman_f_transform) -> RIP.CDouble -> RIP.CDouble -> IO Pixman_bool_t)
+pixman_f_transform_scale :: RIP.FunPtr (RIP.Ptr Pixman_f_transform -> RIP.Ptr Pixman_f_transform -> RIP.CDouble -> RIP.CDouble -> IO Pixman_bool_t)
 pixman_f_transform_scale =
   RIP.unsafePerformIO hs_bindgen_41cd841fa2b71f82
 
@@ -2485,7 +2485,7 @@ foreign import ccall unsafe "hs_bindgen_a1c97e777631ac73" hs_bindgen_a1c97e77763
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_f_transform_init_rotate@
-hs_bindgen_a1c97e777631ac73 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_f_transform) -> RIP.CDouble -> RIP.CDouble -> IO ()))
+hs_bindgen_a1c97e777631ac73 :: IO (RIP.FunPtr (RIP.Ptr Pixman_f_transform -> RIP.CDouble -> RIP.CDouble -> IO ()))
 hs_bindgen_a1c97e777631ac73 =
   RIP.fromFFIType hs_bindgen_a1c97e777631ac73_base
 
@@ -2496,7 +2496,7 @@ hs_bindgen_a1c97e777631ac73 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_f_transform_init_rotate :: RIP.FunPtr ((RIP.Ptr Pixman_f_transform) -> RIP.CDouble -> RIP.CDouble -> IO ())
+pixman_f_transform_init_rotate :: RIP.FunPtr (RIP.Ptr Pixman_f_transform -> RIP.CDouble -> RIP.CDouble -> IO ())
 pixman_f_transform_init_rotate =
   RIP.unsafePerformIO hs_bindgen_a1c97e777631ac73
 
@@ -2505,7 +2505,7 @@ foreign import ccall unsafe "hs_bindgen_bdadc517cd43b2b8" hs_bindgen_bdadc517cd4
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_f_transform_rotate@
-hs_bindgen_bdadc517cd43b2b8 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_f_transform) -> (RIP.Ptr Pixman_f_transform) -> RIP.CDouble -> RIP.CDouble -> IO Pixman_bool_t))
+hs_bindgen_bdadc517cd43b2b8 :: IO (RIP.FunPtr (RIP.Ptr Pixman_f_transform -> RIP.Ptr Pixman_f_transform -> RIP.CDouble -> RIP.CDouble -> IO Pixman_bool_t))
 hs_bindgen_bdadc517cd43b2b8 =
   RIP.fromFFIType hs_bindgen_bdadc517cd43b2b8_base
 
@@ -2516,7 +2516,7 @@ hs_bindgen_bdadc517cd43b2b8 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_f_transform_rotate :: RIP.FunPtr ((RIP.Ptr Pixman_f_transform) -> (RIP.Ptr Pixman_f_transform) -> RIP.CDouble -> RIP.CDouble -> IO Pixman_bool_t)
+pixman_f_transform_rotate :: RIP.FunPtr (RIP.Ptr Pixman_f_transform -> RIP.Ptr Pixman_f_transform -> RIP.CDouble -> RIP.CDouble -> IO Pixman_bool_t)
 pixman_f_transform_rotate =
   RIP.unsafePerformIO hs_bindgen_bdadc517cd43b2b8
 
@@ -2525,7 +2525,7 @@ foreign import ccall unsafe "hs_bindgen_cdb9a70ee8254773" hs_bindgen_cdb9a70ee82
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_f_transform_init_translate@
-hs_bindgen_cdb9a70ee8254773 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_f_transform) -> RIP.CDouble -> RIP.CDouble -> IO ()))
+hs_bindgen_cdb9a70ee8254773 :: IO (RIP.FunPtr (RIP.Ptr Pixman_f_transform -> RIP.CDouble -> RIP.CDouble -> IO ()))
 hs_bindgen_cdb9a70ee8254773 =
   RIP.fromFFIType hs_bindgen_cdb9a70ee8254773_base
 
@@ -2536,7 +2536,7 @@ hs_bindgen_cdb9a70ee8254773 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_f_transform_init_translate :: RIP.FunPtr ((RIP.Ptr Pixman_f_transform) -> RIP.CDouble -> RIP.CDouble -> IO ())
+pixman_f_transform_init_translate :: RIP.FunPtr (RIP.Ptr Pixman_f_transform -> RIP.CDouble -> RIP.CDouble -> IO ())
 pixman_f_transform_init_translate =
   RIP.unsafePerformIO hs_bindgen_cdb9a70ee8254773
 
@@ -2545,7 +2545,7 @@ foreign import ccall unsafe "hs_bindgen_c34f7e8b00b601ba" hs_bindgen_c34f7e8b00b
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_f_transform_translate@
-hs_bindgen_c34f7e8b00b601ba :: IO (RIP.FunPtr ((RIP.Ptr Pixman_f_transform) -> (RIP.Ptr Pixman_f_transform) -> RIP.CDouble -> RIP.CDouble -> IO Pixman_bool_t))
+hs_bindgen_c34f7e8b00b601ba :: IO (RIP.FunPtr (RIP.Ptr Pixman_f_transform -> RIP.Ptr Pixman_f_transform -> RIP.CDouble -> RIP.CDouble -> IO Pixman_bool_t))
 hs_bindgen_c34f7e8b00b601ba =
   RIP.fromFFIType hs_bindgen_c34f7e8b00b601ba_base
 
@@ -2556,7 +2556,7 @@ hs_bindgen_c34f7e8b00b601ba =
 
     __exported by:__ @pixman.h@
 -}
-pixman_f_transform_translate :: RIP.FunPtr ((RIP.Ptr Pixman_f_transform) -> (RIP.Ptr Pixman_f_transform) -> RIP.CDouble -> RIP.CDouble -> IO Pixman_bool_t)
+pixman_f_transform_translate :: RIP.FunPtr (RIP.Ptr Pixman_f_transform -> RIP.Ptr Pixman_f_transform -> RIP.CDouble -> RIP.CDouble -> IO Pixman_bool_t)
 pixman_f_transform_translate =
   RIP.unsafePerformIO hs_bindgen_c34f7e8b00b601ba
 
@@ -2565,7 +2565,7 @@ foreign import ccall unsafe "hs_bindgen_c74eeeaf52af84a7" hs_bindgen_c74eeeaf52a
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_f_transform_bounds@
-hs_bindgen_c74eeeaf52af84a7 :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_f_transform) -> (RIP.Ptr Pixman_box16) -> IO Pixman_bool_t))
+hs_bindgen_c74eeeaf52af84a7 :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_f_transform -> RIP.Ptr Pixman_box16 -> IO Pixman_bool_t))
 hs_bindgen_c74eeeaf52af84a7 =
   RIP.fromFFIType hs_bindgen_c74eeeaf52af84a7_base
 
@@ -2576,7 +2576,7 @@ hs_bindgen_c74eeeaf52af84a7 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_f_transform_bounds :: RIP.FunPtr ((PtrConst.PtrConst Pixman_f_transform) -> (RIP.Ptr Pixman_box16) -> IO Pixman_bool_t)
+pixman_f_transform_bounds :: RIP.FunPtr (PtrConst.PtrConst Pixman_f_transform -> RIP.Ptr Pixman_box16 -> IO Pixman_bool_t)
 pixman_f_transform_bounds =
   RIP.unsafePerformIO hs_bindgen_c74eeeaf52af84a7
 
@@ -2585,7 +2585,7 @@ foreign import ccall unsafe "hs_bindgen_1b6fc8875b86404e" hs_bindgen_1b6fc8875b8
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_f_transform_init_identity@
-hs_bindgen_1b6fc8875b86404e :: IO (RIP.FunPtr ((RIP.Ptr Pixman_f_transform) -> IO ()))
+hs_bindgen_1b6fc8875b86404e :: IO (RIP.FunPtr (RIP.Ptr Pixman_f_transform -> IO ()))
 hs_bindgen_1b6fc8875b86404e =
   RIP.fromFFIType hs_bindgen_1b6fc8875b86404e_base
 
@@ -2596,7 +2596,7 @@ hs_bindgen_1b6fc8875b86404e =
 
     __exported by:__ @pixman.h@
 -}
-pixman_f_transform_init_identity :: RIP.FunPtr ((RIP.Ptr Pixman_f_transform) -> IO ())
+pixman_f_transform_init_identity :: RIP.FunPtr (RIP.Ptr Pixman_f_transform -> IO ())
 pixman_f_transform_init_identity =
   RIP.unsafePerformIO hs_bindgen_1b6fc8875b86404e
 
@@ -2605,7 +2605,7 @@ foreign import ccall unsafe "hs_bindgen_532fe274a302c8b3" hs_bindgen_532fe274a30
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region_set_static_pointers@
-hs_bindgen_532fe274a302c8b3 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_box16_t) -> (RIP.Ptr Pixman_region16_data_t) -> (RIP.Ptr Pixman_region16_data_t) -> IO ()))
+hs_bindgen_532fe274a302c8b3 :: IO (RIP.FunPtr (RIP.Ptr Pixman_box16_t -> RIP.Ptr Pixman_region16_data_t -> RIP.Ptr Pixman_region16_data_t -> IO ()))
 hs_bindgen_532fe274a302c8b3 =
   RIP.fromFFIType hs_bindgen_532fe274a302c8b3_base
 
@@ -2616,7 +2616,7 @@ hs_bindgen_532fe274a302c8b3 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region_set_static_pointers :: RIP.FunPtr ((RIP.Ptr Pixman_box16_t) -> (RIP.Ptr Pixman_region16_data_t) -> (RIP.Ptr Pixman_region16_data_t) -> IO ())
+pixman_region_set_static_pointers :: RIP.FunPtr (RIP.Ptr Pixman_box16_t -> RIP.Ptr Pixman_region16_data_t -> RIP.Ptr Pixman_region16_data_t -> IO ())
 pixman_region_set_static_pointers =
   RIP.unsafePerformIO hs_bindgen_532fe274a302c8b3
 
@@ -2625,7 +2625,7 @@ foreign import ccall unsafe "hs_bindgen_79e6b82fa272e209" hs_bindgen_79e6b82fa27
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region_init@
-hs_bindgen_79e6b82fa272e209 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> IO ()))
+hs_bindgen_79e6b82fa272e209 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region16_t -> IO ()))
 hs_bindgen_79e6b82fa272e209 =
   RIP.fromFFIType hs_bindgen_79e6b82fa272e209_base
 
@@ -2636,7 +2636,7 @@ hs_bindgen_79e6b82fa272e209 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region_init :: RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> IO ())
+pixman_region_init :: RIP.FunPtr (RIP.Ptr Pixman_region16_t -> IO ())
 pixman_region_init =
   RIP.unsafePerformIO hs_bindgen_79e6b82fa272e209
 
@@ -2645,7 +2645,7 @@ foreign import ccall unsafe "hs_bindgen_ddc9b5bf442b1c7c" hs_bindgen_ddc9b5bf442
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region_init_rect@
-hs_bindgen_ddc9b5bf442b1c7c :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO ()))
+hs_bindgen_ddc9b5bf442b1c7c :: IO (RIP.FunPtr (RIP.Ptr Pixman_region16_t -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO ()))
 hs_bindgen_ddc9b5bf442b1c7c =
   RIP.fromFFIType hs_bindgen_ddc9b5bf442b1c7c_base
 
@@ -2656,7 +2656,7 @@ hs_bindgen_ddc9b5bf442b1c7c =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region_init_rect :: RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO ())
+pixman_region_init_rect :: RIP.FunPtr (RIP.Ptr Pixman_region16_t -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO ())
 pixman_region_init_rect =
   RIP.unsafePerformIO hs_bindgen_ddc9b5bf442b1c7c
 
@@ -2665,7 +2665,7 @@ foreign import ccall unsafe "hs_bindgen_3069b1703e0d9d31" hs_bindgen_3069b1703e0
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region_init_rects@
-hs_bindgen_3069b1703e0d9d31 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> (PtrConst.PtrConst Pixman_box16_t) -> RIP.CInt -> IO Pixman_bool_t))
+hs_bindgen_3069b1703e0d9d31 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region16_t -> PtrConst.PtrConst Pixman_box16_t -> RIP.CInt -> IO Pixman_bool_t))
 hs_bindgen_3069b1703e0d9d31 =
   RIP.fromFFIType hs_bindgen_3069b1703e0d9d31_base
 
@@ -2676,7 +2676,7 @@ hs_bindgen_3069b1703e0d9d31 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region_init_rects :: RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> (PtrConst.PtrConst Pixman_box16_t) -> RIP.CInt -> IO Pixman_bool_t)
+pixman_region_init_rects :: RIP.FunPtr (RIP.Ptr Pixman_region16_t -> PtrConst.PtrConst Pixman_box16_t -> RIP.CInt -> IO Pixman_bool_t)
 pixman_region_init_rects =
   RIP.unsafePerformIO hs_bindgen_3069b1703e0d9d31
 
@@ -2685,7 +2685,7 @@ foreign import ccall unsafe "hs_bindgen_22b1d75bdd49a5eb" hs_bindgen_22b1d75bdd4
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region_init_with_extents@
-hs_bindgen_22b1d75bdd49a5eb :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> (PtrConst.PtrConst Pixman_box16_t) -> IO ()))
+hs_bindgen_22b1d75bdd49a5eb :: IO (RIP.FunPtr (RIP.Ptr Pixman_region16_t -> PtrConst.PtrConst Pixman_box16_t -> IO ()))
 hs_bindgen_22b1d75bdd49a5eb =
   RIP.fromFFIType hs_bindgen_22b1d75bdd49a5eb_base
 
@@ -2696,7 +2696,7 @@ hs_bindgen_22b1d75bdd49a5eb =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region_init_with_extents :: RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> (PtrConst.PtrConst Pixman_box16_t) -> IO ())
+pixman_region_init_with_extents :: RIP.FunPtr (RIP.Ptr Pixman_region16_t -> PtrConst.PtrConst Pixman_box16_t -> IO ())
 pixman_region_init_with_extents =
   RIP.unsafePerformIO hs_bindgen_22b1d75bdd49a5eb
 
@@ -2705,7 +2705,7 @@ foreign import ccall unsafe "hs_bindgen_feaccb17e09294d6" hs_bindgen_feaccb17e09
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region_init_from_image@
-hs_bindgen_feaccb17e09294d6 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> (RIP.Ptr Pixman_image_t) -> IO ()))
+hs_bindgen_feaccb17e09294d6 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region16_t -> RIP.Ptr Pixman_image_t -> IO ()))
 hs_bindgen_feaccb17e09294d6 =
   RIP.fromFFIType hs_bindgen_feaccb17e09294d6_base
 
@@ -2716,7 +2716,7 @@ hs_bindgen_feaccb17e09294d6 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region_init_from_image :: RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> (RIP.Ptr Pixman_image_t) -> IO ())
+pixman_region_init_from_image :: RIP.FunPtr (RIP.Ptr Pixman_region16_t -> RIP.Ptr Pixman_image_t -> IO ())
 pixman_region_init_from_image =
   RIP.unsafePerformIO hs_bindgen_feaccb17e09294d6
 
@@ -2725,7 +2725,7 @@ foreign import ccall unsafe "hs_bindgen_229eaa50289cac10" hs_bindgen_229eaa50289
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region_fini@
-hs_bindgen_229eaa50289cac10 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> IO ()))
+hs_bindgen_229eaa50289cac10 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region16_t -> IO ()))
 hs_bindgen_229eaa50289cac10 =
   RIP.fromFFIType hs_bindgen_229eaa50289cac10_base
 
@@ -2736,7 +2736,7 @@ hs_bindgen_229eaa50289cac10 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region_fini :: RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> IO ())
+pixman_region_fini :: RIP.FunPtr (RIP.Ptr Pixman_region16_t -> IO ())
 pixman_region_fini =
   RIP.unsafePerformIO hs_bindgen_229eaa50289cac10
 
@@ -2745,7 +2745,7 @@ foreign import ccall unsafe "hs_bindgen_7217deec8dfd3eb2" hs_bindgen_7217deec8df
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region_translate@
-hs_bindgen_7217deec8dfd3eb2 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> RIP.CInt -> RIP.CInt -> IO ()))
+hs_bindgen_7217deec8dfd3eb2 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region16_t -> RIP.CInt -> RIP.CInt -> IO ()))
 hs_bindgen_7217deec8dfd3eb2 =
   RIP.fromFFIType hs_bindgen_7217deec8dfd3eb2_base
 
@@ -2756,7 +2756,7 @@ hs_bindgen_7217deec8dfd3eb2 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region_translate :: RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> RIP.CInt -> RIP.CInt -> IO ())
+pixman_region_translate :: RIP.FunPtr (RIP.Ptr Pixman_region16_t -> RIP.CInt -> RIP.CInt -> IO ())
 pixman_region_translate =
   RIP.unsafePerformIO hs_bindgen_7217deec8dfd3eb2
 
@@ -2765,7 +2765,7 @@ foreign import ccall unsafe "hs_bindgen_00982bbbdb0b24a9" hs_bindgen_00982bbbdb0
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region_copy@
-hs_bindgen_00982bbbdb0b24a9 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> (PtrConst.PtrConst Pixman_region16_t) -> IO Pixman_bool_t))
+hs_bindgen_00982bbbdb0b24a9 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region16_t -> PtrConst.PtrConst Pixman_region16_t -> IO Pixman_bool_t))
 hs_bindgen_00982bbbdb0b24a9 =
   RIP.fromFFIType hs_bindgen_00982bbbdb0b24a9_base
 
@@ -2776,7 +2776,7 @@ hs_bindgen_00982bbbdb0b24a9 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region_copy :: RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> (PtrConst.PtrConst Pixman_region16_t) -> IO Pixman_bool_t)
+pixman_region_copy :: RIP.FunPtr (RIP.Ptr Pixman_region16_t -> PtrConst.PtrConst Pixman_region16_t -> IO Pixman_bool_t)
 pixman_region_copy =
   RIP.unsafePerformIO hs_bindgen_00982bbbdb0b24a9
 
@@ -2785,7 +2785,7 @@ foreign import ccall unsafe "hs_bindgen_87c3eca83c95346c" hs_bindgen_87c3eca83c9
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region_intersect@
-hs_bindgen_87c3eca83c95346c :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> (PtrConst.PtrConst Pixman_region16_t) -> (PtrConst.PtrConst Pixman_region16_t) -> IO Pixman_bool_t))
+hs_bindgen_87c3eca83c95346c :: IO (RIP.FunPtr (RIP.Ptr Pixman_region16_t -> PtrConst.PtrConst Pixman_region16_t -> PtrConst.PtrConst Pixman_region16_t -> IO Pixman_bool_t))
 hs_bindgen_87c3eca83c95346c =
   RIP.fromFFIType hs_bindgen_87c3eca83c95346c_base
 
@@ -2796,7 +2796,7 @@ hs_bindgen_87c3eca83c95346c =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region_intersect :: RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> (PtrConst.PtrConst Pixman_region16_t) -> (PtrConst.PtrConst Pixman_region16_t) -> IO Pixman_bool_t)
+pixman_region_intersect :: RIP.FunPtr (RIP.Ptr Pixman_region16_t -> PtrConst.PtrConst Pixman_region16_t -> PtrConst.PtrConst Pixman_region16_t -> IO Pixman_bool_t)
 pixman_region_intersect =
   RIP.unsafePerformIO hs_bindgen_87c3eca83c95346c
 
@@ -2805,7 +2805,7 @@ foreign import ccall unsafe "hs_bindgen_f2db9f12cb001c00" hs_bindgen_f2db9f12cb0
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region_union@
-hs_bindgen_f2db9f12cb001c00 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> (PtrConst.PtrConst Pixman_region16_t) -> (PtrConst.PtrConst Pixman_region16_t) -> IO Pixman_bool_t))
+hs_bindgen_f2db9f12cb001c00 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region16_t -> PtrConst.PtrConst Pixman_region16_t -> PtrConst.PtrConst Pixman_region16_t -> IO Pixman_bool_t))
 hs_bindgen_f2db9f12cb001c00 =
   RIP.fromFFIType hs_bindgen_f2db9f12cb001c00_base
 
@@ -2816,7 +2816,7 @@ hs_bindgen_f2db9f12cb001c00 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region_union :: RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> (PtrConst.PtrConst Pixman_region16_t) -> (PtrConst.PtrConst Pixman_region16_t) -> IO Pixman_bool_t)
+pixman_region_union :: RIP.FunPtr (RIP.Ptr Pixman_region16_t -> PtrConst.PtrConst Pixman_region16_t -> PtrConst.PtrConst Pixman_region16_t -> IO Pixman_bool_t)
 pixman_region_union =
   RIP.unsafePerformIO hs_bindgen_f2db9f12cb001c00
 
@@ -2825,7 +2825,7 @@ foreign import ccall unsafe "hs_bindgen_e6a3749aae75fd5f" hs_bindgen_e6a3749aae7
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region_union_rect@
-hs_bindgen_e6a3749aae75fd5f :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> (PtrConst.PtrConst Pixman_region16_t) -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO Pixman_bool_t))
+hs_bindgen_e6a3749aae75fd5f :: IO (RIP.FunPtr (RIP.Ptr Pixman_region16_t -> PtrConst.PtrConst Pixman_region16_t -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO Pixman_bool_t))
 hs_bindgen_e6a3749aae75fd5f =
   RIP.fromFFIType hs_bindgen_e6a3749aae75fd5f_base
 
@@ -2836,7 +2836,7 @@ hs_bindgen_e6a3749aae75fd5f =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region_union_rect :: RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> (PtrConst.PtrConst Pixman_region16_t) -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO Pixman_bool_t)
+pixman_region_union_rect :: RIP.FunPtr (RIP.Ptr Pixman_region16_t -> PtrConst.PtrConst Pixman_region16_t -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO Pixman_bool_t)
 pixman_region_union_rect =
   RIP.unsafePerformIO hs_bindgen_e6a3749aae75fd5f
 
@@ -2845,7 +2845,7 @@ foreign import ccall unsafe "hs_bindgen_b4f1a0e301f45c36" hs_bindgen_b4f1a0e301f
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region_intersect_rect@
-hs_bindgen_b4f1a0e301f45c36 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> (PtrConst.PtrConst Pixman_region16_t) -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO Pixman_bool_t))
+hs_bindgen_b4f1a0e301f45c36 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region16_t -> PtrConst.PtrConst Pixman_region16_t -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO Pixman_bool_t))
 hs_bindgen_b4f1a0e301f45c36 =
   RIP.fromFFIType hs_bindgen_b4f1a0e301f45c36_base
 
@@ -2856,7 +2856,7 @@ hs_bindgen_b4f1a0e301f45c36 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region_intersect_rect :: RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> (PtrConst.PtrConst Pixman_region16_t) -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO Pixman_bool_t)
+pixman_region_intersect_rect :: RIP.FunPtr (RIP.Ptr Pixman_region16_t -> PtrConst.PtrConst Pixman_region16_t -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO Pixman_bool_t)
 pixman_region_intersect_rect =
   RIP.unsafePerformIO hs_bindgen_b4f1a0e301f45c36
 
@@ -2865,7 +2865,7 @@ foreign import ccall unsafe "hs_bindgen_04d7f4dab22febc5" hs_bindgen_04d7f4dab22
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region_subtract@
-hs_bindgen_04d7f4dab22febc5 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> (PtrConst.PtrConst Pixman_region16_t) -> (PtrConst.PtrConst Pixman_region16_t) -> IO Pixman_bool_t))
+hs_bindgen_04d7f4dab22febc5 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region16_t -> PtrConst.PtrConst Pixman_region16_t -> PtrConst.PtrConst Pixman_region16_t -> IO Pixman_bool_t))
 hs_bindgen_04d7f4dab22febc5 =
   RIP.fromFFIType hs_bindgen_04d7f4dab22febc5_base
 
@@ -2876,7 +2876,7 @@ hs_bindgen_04d7f4dab22febc5 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region_subtract :: RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> (PtrConst.PtrConst Pixman_region16_t) -> (PtrConst.PtrConst Pixman_region16_t) -> IO Pixman_bool_t)
+pixman_region_subtract :: RIP.FunPtr (RIP.Ptr Pixman_region16_t -> PtrConst.PtrConst Pixman_region16_t -> PtrConst.PtrConst Pixman_region16_t -> IO Pixman_bool_t)
 pixman_region_subtract =
   RIP.unsafePerformIO hs_bindgen_04d7f4dab22febc5
 
@@ -2885,7 +2885,7 @@ foreign import ccall unsafe "hs_bindgen_d014039fa4af24ba" hs_bindgen_d014039fa4a
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region_inverse@
-hs_bindgen_d014039fa4af24ba :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> (PtrConst.PtrConst Pixman_region16_t) -> (PtrConst.PtrConst Pixman_box16_t) -> IO Pixman_bool_t))
+hs_bindgen_d014039fa4af24ba :: IO (RIP.FunPtr (RIP.Ptr Pixman_region16_t -> PtrConst.PtrConst Pixman_region16_t -> PtrConst.PtrConst Pixman_box16_t -> IO Pixman_bool_t))
 hs_bindgen_d014039fa4af24ba =
   RIP.fromFFIType hs_bindgen_d014039fa4af24ba_base
 
@@ -2896,7 +2896,7 @@ hs_bindgen_d014039fa4af24ba =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region_inverse :: RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> (PtrConst.PtrConst Pixman_region16_t) -> (PtrConst.PtrConst Pixman_box16_t) -> IO Pixman_bool_t)
+pixman_region_inverse :: RIP.FunPtr (RIP.Ptr Pixman_region16_t -> PtrConst.PtrConst Pixman_region16_t -> PtrConst.PtrConst Pixman_box16_t -> IO Pixman_bool_t)
 pixman_region_inverse =
   RIP.unsafePerformIO hs_bindgen_d014039fa4af24ba
 
@@ -2905,7 +2905,7 @@ foreign import ccall unsafe "hs_bindgen_a6057ad586656e6e" hs_bindgen_a6057ad5866
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region_contains_point@
-hs_bindgen_a6057ad586656e6e :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_region16_t) -> RIP.CInt -> RIP.CInt -> (RIP.Ptr Pixman_box16_t) -> IO Pixman_bool_t))
+hs_bindgen_a6057ad586656e6e :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_region16_t -> RIP.CInt -> RIP.CInt -> RIP.Ptr Pixman_box16_t -> IO Pixman_bool_t))
 hs_bindgen_a6057ad586656e6e =
   RIP.fromFFIType hs_bindgen_a6057ad586656e6e_base
 
@@ -2916,7 +2916,7 @@ hs_bindgen_a6057ad586656e6e =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region_contains_point :: RIP.FunPtr ((PtrConst.PtrConst Pixman_region16_t) -> RIP.CInt -> RIP.CInt -> (RIP.Ptr Pixman_box16_t) -> IO Pixman_bool_t)
+pixman_region_contains_point :: RIP.FunPtr (PtrConst.PtrConst Pixman_region16_t -> RIP.CInt -> RIP.CInt -> RIP.Ptr Pixman_box16_t -> IO Pixman_bool_t)
 pixman_region_contains_point =
   RIP.unsafePerformIO hs_bindgen_a6057ad586656e6e
 
@@ -2925,7 +2925,7 @@ foreign import ccall unsafe "hs_bindgen_81c87548e9fbd88c" hs_bindgen_81c87548e9f
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region_contains_rectangle@
-hs_bindgen_81c87548e9fbd88c :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_region16_t) -> (PtrConst.PtrConst Pixman_box16_t) -> IO Pixman_region_overlap_t))
+hs_bindgen_81c87548e9fbd88c :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_region16_t -> PtrConst.PtrConst Pixman_box16_t -> IO Pixman_region_overlap_t))
 hs_bindgen_81c87548e9fbd88c =
   RIP.fromFFIType hs_bindgen_81c87548e9fbd88c_base
 
@@ -2936,7 +2936,7 @@ hs_bindgen_81c87548e9fbd88c =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region_contains_rectangle :: RIP.FunPtr ((PtrConst.PtrConst Pixman_region16_t) -> (PtrConst.PtrConst Pixman_box16_t) -> IO Pixman_region_overlap_t)
+pixman_region_contains_rectangle :: RIP.FunPtr (PtrConst.PtrConst Pixman_region16_t -> PtrConst.PtrConst Pixman_box16_t -> IO Pixman_region_overlap_t)
 pixman_region_contains_rectangle =
   RIP.unsafePerformIO hs_bindgen_81c87548e9fbd88c
 
@@ -2945,7 +2945,7 @@ foreign import ccall unsafe "hs_bindgen_7c9408eefd552f76" hs_bindgen_7c9408eefd5
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region_empty@
-hs_bindgen_7c9408eefd552f76 :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_region16_t) -> IO Pixman_bool_t))
+hs_bindgen_7c9408eefd552f76 :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_region16_t -> IO Pixman_bool_t))
 hs_bindgen_7c9408eefd552f76 =
   RIP.fromFFIType hs_bindgen_7c9408eefd552f76_base
 
@@ -2956,7 +2956,7 @@ hs_bindgen_7c9408eefd552f76 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region_empty :: RIP.FunPtr ((PtrConst.PtrConst Pixman_region16_t) -> IO Pixman_bool_t)
+pixman_region_empty :: RIP.FunPtr (PtrConst.PtrConst Pixman_region16_t -> IO Pixman_bool_t)
 pixman_region_empty =
   RIP.unsafePerformIO hs_bindgen_7c9408eefd552f76
 
@@ -2965,7 +2965,7 @@ foreign import ccall unsafe "hs_bindgen_a9b7f51afea0eeef" hs_bindgen_a9b7f51afea
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region_not_empty@
-hs_bindgen_a9b7f51afea0eeef :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_region16_t) -> IO Pixman_bool_t))
+hs_bindgen_a9b7f51afea0eeef :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_region16_t -> IO Pixman_bool_t))
 hs_bindgen_a9b7f51afea0eeef =
   RIP.fromFFIType hs_bindgen_a9b7f51afea0eeef_base
 
@@ -2976,7 +2976,7 @@ hs_bindgen_a9b7f51afea0eeef =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region_not_empty :: RIP.FunPtr ((PtrConst.PtrConst Pixman_region16_t) -> IO Pixman_bool_t)
+pixman_region_not_empty :: RIP.FunPtr (PtrConst.PtrConst Pixman_region16_t -> IO Pixman_bool_t)
 pixman_region_not_empty =
   RIP.unsafePerformIO hs_bindgen_a9b7f51afea0eeef
 
@@ -2985,7 +2985,7 @@ foreign import ccall unsafe "hs_bindgen_e5078a2053b17fc1" hs_bindgen_e5078a2053b
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region_extents@
-hs_bindgen_e5078a2053b17fc1 :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_region16_t) -> IO (RIP.Ptr Pixman_box16_t)))
+hs_bindgen_e5078a2053b17fc1 :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_region16_t -> IO (RIP.Ptr Pixman_box16_t)))
 hs_bindgen_e5078a2053b17fc1 =
   RIP.fromFFIType hs_bindgen_e5078a2053b17fc1_base
 
@@ -2996,7 +2996,7 @@ hs_bindgen_e5078a2053b17fc1 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region_extents :: RIP.FunPtr ((PtrConst.PtrConst Pixman_region16_t) -> IO (RIP.Ptr Pixman_box16_t))
+pixman_region_extents :: RIP.FunPtr (PtrConst.PtrConst Pixman_region16_t -> IO (RIP.Ptr Pixman_box16_t))
 pixman_region_extents =
   RIP.unsafePerformIO hs_bindgen_e5078a2053b17fc1
 
@@ -3005,7 +3005,7 @@ foreign import ccall unsafe "hs_bindgen_ffe15d36014b0d24" hs_bindgen_ffe15d36014
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region_n_rects@
-hs_bindgen_ffe15d36014b0d24 :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_region16_t) -> IO RIP.CInt))
+hs_bindgen_ffe15d36014b0d24 :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_region16_t -> IO RIP.CInt))
 hs_bindgen_ffe15d36014b0d24 =
   RIP.fromFFIType hs_bindgen_ffe15d36014b0d24_base
 
@@ -3016,7 +3016,7 @@ hs_bindgen_ffe15d36014b0d24 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region_n_rects :: RIP.FunPtr ((PtrConst.PtrConst Pixman_region16_t) -> IO RIP.CInt)
+pixman_region_n_rects :: RIP.FunPtr (PtrConst.PtrConst Pixman_region16_t -> IO RIP.CInt)
 pixman_region_n_rects =
   RIP.unsafePerformIO hs_bindgen_ffe15d36014b0d24
 
@@ -3025,7 +3025,7 @@ foreign import ccall unsafe "hs_bindgen_dc191ee8aa7fd985" hs_bindgen_dc191ee8aa7
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region_rectangles@
-hs_bindgen_dc191ee8aa7fd985 :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_region16_t) -> (RIP.Ptr RIP.CInt) -> IO (RIP.Ptr Pixman_box16_t)))
+hs_bindgen_dc191ee8aa7fd985 :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_region16_t -> RIP.Ptr RIP.CInt -> IO (RIP.Ptr Pixman_box16_t)))
 hs_bindgen_dc191ee8aa7fd985 =
   RIP.fromFFIType hs_bindgen_dc191ee8aa7fd985_base
 
@@ -3036,7 +3036,7 @@ hs_bindgen_dc191ee8aa7fd985 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region_rectangles :: RIP.FunPtr ((PtrConst.PtrConst Pixman_region16_t) -> (RIP.Ptr RIP.CInt) -> IO (RIP.Ptr Pixman_box16_t))
+pixman_region_rectangles :: RIP.FunPtr (PtrConst.PtrConst Pixman_region16_t -> RIP.Ptr RIP.CInt -> IO (RIP.Ptr Pixman_box16_t))
 pixman_region_rectangles =
   RIP.unsafePerformIO hs_bindgen_dc191ee8aa7fd985
 
@@ -3045,7 +3045,7 @@ foreign import ccall unsafe "hs_bindgen_7d059f5d8c9611a7" hs_bindgen_7d059f5d8c9
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region_equal@
-hs_bindgen_7d059f5d8c9611a7 :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_region16_t) -> (PtrConst.PtrConst Pixman_region16_t) -> IO Pixman_bool_t))
+hs_bindgen_7d059f5d8c9611a7 :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_region16_t -> PtrConst.PtrConst Pixman_region16_t -> IO Pixman_bool_t))
 hs_bindgen_7d059f5d8c9611a7 =
   RIP.fromFFIType hs_bindgen_7d059f5d8c9611a7_base
 
@@ -3056,7 +3056,7 @@ hs_bindgen_7d059f5d8c9611a7 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region_equal :: RIP.FunPtr ((PtrConst.PtrConst Pixman_region16_t) -> (PtrConst.PtrConst Pixman_region16_t) -> IO Pixman_bool_t)
+pixman_region_equal :: RIP.FunPtr (PtrConst.PtrConst Pixman_region16_t -> PtrConst.PtrConst Pixman_region16_t -> IO Pixman_bool_t)
 pixman_region_equal =
   RIP.unsafePerformIO hs_bindgen_7d059f5d8c9611a7
 
@@ -3065,7 +3065,7 @@ foreign import ccall unsafe "hs_bindgen_cbfe4c2dc86958a8" hs_bindgen_cbfe4c2dc86
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region_selfcheck@
-hs_bindgen_cbfe4c2dc86958a8 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> IO Pixman_bool_t))
+hs_bindgen_cbfe4c2dc86958a8 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region16_t -> IO Pixman_bool_t))
 hs_bindgen_cbfe4c2dc86958a8 =
   RIP.fromFFIType hs_bindgen_cbfe4c2dc86958a8_base
 
@@ -3076,7 +3076,7 @@ hs_bindgen_cbfe4c2dc86958a8 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region_selfcheck :: RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> IO Pixman_bool_t)
+pixman_region_selfcheck :: RIP.FunPtr (RIP.Ptr Pixman_region16_t -> IO Pixman_bool_t)
 pixman_region_selfcheck =
   RIP.unsafePerformIO hs_bindgen_cbfe4c2dc86958a8
 
@@ -3085,7 +3085,7 @@ foreign import ccall unsafe "hs_bindgen_ca3f6b90a242240a" hs_bindgen_ca3f6b90a24
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region_reset@
-hs_bindgen_ca3f6b90a242240a :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> (PtrConst.PtrConst Pixman_box16_t) -> IO ()))
+hs_bindgen_ca3f6b90a242240a :: IO (RIP.FunPtr (RIP.Ptr Pixman_region16_t -> PtrConst.PtrConst Pixman_box16_t -> IO ()))
 hs_bindgen_ca3f6b90a242240a =
   RIP.fromFFIType hs_bindgen_ca3f6b90a242240a_base
 
@@ -3096,7 +3096,7 @@ hs_bindgen_ca3f6b90a242240a =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region_reset :: RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> (PtrConst.PtrConst Pixman_box16_t) -> IO ())
+pixman_region_reset :: RIP.FunPtr (RIP.Ptr Pixman_region16_t -> PtrConst.PtrConst Pixman_box16_t -> IO ())
 pixman_region_reset =
   RIP.unsafePerformIO hs_bindgen_ca3f6b90a242240a
 
@@ -3105,7 +3105,7 @@ foreign import ccall unsafe "hs_bindgen_bca6fe0273343aee" hs_bindgen_bca6fe02733
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region_clear@
-hs_bindgen_bca6fe0273343aee :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> IO ()))
+hs_bindgen_bca6fe0273343aee :: IO (RIP.FunPtr (RIP.Ptr Pixman_region16_t -> IO ()))
 hs_bindgen_bca6fe0273343aee =
   RIP.fromFFIType hs_bindgen_bca6fe0273343aee_base
 
@@ -3116,7 +3116,7 @@ hs_bindgen_bca6fe0273343aee =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region_clear :: RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> IO ())
+pixman_region_clear :: RIP.FunPtr (RIP.Ptr Pixman_region16_t -> IO ())
 pixman_region_clear =
   RIP.unsafePerformIO hs_bindgen_bca6fe0273343aee
 
@@ -3125,7 +3125,7 @@ foreign import ccall unsafe "hs_bindgen_c46e49c01db895af" hs_bindgen_c46e49c01db
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region32_init@
-hs_bindgen_c46e49c01db895af :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> IO ()))
+hs_bindgen_c46e49c01db895af :: IO (RIP.FunPtr (RIP.Ptr Pixman_region32_t -> IO ()))
 hs_bindgen_c46e49c01db895af =
   RIP.fromFFIType hs_bindgen_c46e49c01db895af_base
 
@@ -3136,7 +3136,7 @@ hs_bindgen_c46e49c01db895af =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region32_init :: RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> IO ())
+pixman_region32_init :: RIP.FunPtr (RIP.Ptr Pixman_region32_t -> IO ())
 pixman_region32_init =
   RIP.unsafePerformIO hs_bindgen_c46e49c01db895af
 
@@ -3145,7 +3145,7 @@ foreign import ccall unsafe "hs_bindgen_b53f7c1cb9573f2b" hs_bindgen_b53f7c1cb95
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region32_init_rect@
-hs_bindgen_b53f7c1cb9573f2b :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO ()))
+hs_bindgen_b53f7c1cb9573f2b :: IO (RIP.FunPtr (RIP.Ptr Pixman_region32_t -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO ()))
 hs_bindgen_b53f7c1cb9573f2b =
   RIP.fromFFIType hs_bindgen_b53f7c1cb9573f2b_base
 
@@ -3156,7 +3156,7 @@ hs_bindgen_b53f7c1cb9573f2b =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region32_init_rect :: RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO ())
+pixman_region32_init_rect :: RIP.FunPtr (RIP.Ptr Pixman_region32_t -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO ())
 pixman_region32_init_rect =
   RIP.unsafePerformIO hs_bindgen_b53f7c1cb9573f2b
 
@@ -3165,7 +3165,7 @@ foreign import ccall unsafe "hs_bindgen_9f5b675560302cd8" hs_bindgen_9f5b6755603
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region32_init_rects@
-hs_bindgen_9f5b675560302cd8 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> (PtrConst.PtrConst Pixman_box32_t) -> RIP.CInt -> IO Pixman_bool_t))
+hs_bindgen_9f5b675560302cd8 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region32_t -> PtrConst.PtrConst Pixman_box32_t -> RIP.CInt -> IO Pixman_bool_t))
 hs_bindgen_9f5b675560302cd8 =
   RIP.fromFFIType hs_bindgen_9f5b675560302cd8_base
 
@@ -3176,7 +3176,7 @@ hs_bindgen_9f5b675560302cd8 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region32_init_rects :: RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> (PtrConst.PtrConst Pixman_box32_t) -> RIP.CInt -> IO Pixman_bool_t)
+pixman_region32_init_rects :: RIP.FunPtr (RIP.Ptr Pixman_region32_t -> PtrConst.PtrConst Pixman_box32_t -> RIP.CInt -> IO Pixman_bool_t)
 pixman_region32_init_rects =
   RIP.unsafePerformIO hs_bindgen_9f5b675560302cd8
 
@@ -3185,7 +3185,7 @@ foreign import ccall unsafe "hs_bindgen_9865ccd273902b1b" hs_bindgen_9865ccd2739
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region32_init_with_extents@
-hs_bindgen_9865ccd273902b1b :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> (PtrConst.PtrConst Pixman_box32_t) -> IO ()))
+hs_bindgen_9865ccd273902b1b :: IO (RIP.FunPtr (RIP.Ptr Pixman_region32_t -> PtrConst.PtrConst Pixman_box32_t -> IO ()))
 hs_bindgen_9865ccd273902b1b =
   RIP.fromFFIType hs_bindgen_9865ccd273902b1b_base
 
@@ -3196,7 +3196,7 @@ hs_bindgen_9865ccd273902b1b =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region32_init_with_extents :: RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> (PtrConst.PtrConst Pixman_box32_t) -> IO ())
+pixman_region32_init_with_extents :: RIP.FunPtr (RIP.Ptr Pixman_region32_t -> PtrConst.PtrConst Pixman_box32_t -> IO ())
 pixman_region32_init_with_extents =
   RIP.unsafePerformIO hs_bindgen_9865ccd273902b1b
 
@@ -3205,7 +3205,7 @@ foreign import ccall unsafe "hs_bindgen_258556866d1527ef" hs_bindgen_258556866d1
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region32_init_from_image@
-hs_bindgen_258556866d1527ef :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> (RIP.Ptr Pixman_image_t) -> IO ()))
+hs_bindgen_258556866d1527ef :: IO (RIP.FunPtr (RIP.Ptr Pixman_region32_t -> RIP.Ptr Pixman_image_t -> IO ()))
 hs_bindgen_258556866d1527ef =
   RIP.fromFFIType hs_bindgen_258556866d1527ef_base
 
@@ -3216,7 +3216,7 @@ hs_bindgen_258556866d1527ef =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region32_init_from_image :: RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> (RIP.Ptr Pixman_image_t) -> IO ())
+pixman_region32_init_from_image :: RIP.FunPtr (RIP.Ptr Pixman_region32_t -> RIP.Ptr Pixman_image_t -> IO ())
 pixman_region32_init_from_image =
   RIP.unsafePerformIO hs_bindgen_258556866d1527ef
 
@@ -3225,7 +3225,7 @@ foreign import ccall unsafe "hs_bindgen_d8ab96f034348a79" hs_bindgen_d8ab96f0343
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region32_fini@
-hs_bindgen_d8ab96f034348a79 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> IO ()))
+hs_bindgen_d8ab96f034348a79 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region32_t -> IO ()))
 hs_bindgen_d8ab96f034348a79 =
   RIP.fromFFIType hs_bindgen_d8ab96f034348a79_base
 
@@ -3236,7 +3236,7 @@ hs_bindgen_d8ab96f034348a79 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region32_fini :: RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> IO ())
+pixman_region32_fini :: RIP.FunPtr (RIP.Ptr Pixman_region32_t -> IO ())
 pixman_region32_fini =
   RIP.unsafePerformIO hs_bindgen_d8ab96f034348a79
 
@@ -3245,7 +3245,7 @@ foreign import ccall unsafe "hs_bindgen_6284f05d075b07b5" hs_bindgen_6284f05d075
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region32_translate@
-hs_bindgen_6284f05d075b07b5 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> RIP.CInt -> RIP.CInt -> IO ()))
+hs_bindgen_6284f05d075b07b5 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region32_t -> RIP.CInt -> RIP.CInt -> IO ()))
 hs_bindgen_6284f05d075b07b5 =
   RIP.fromFFIType hs_bindgen_6284f05d075b07b5_base
 
@@ -3256,7 +3256,7 @@ hs_bindgen_6284f05d075b07b5 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region32_translate :: RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> RIP.CInt -> RIP.CInt -> IO ())
+pixman_region32_translate :: RIP.FunPtr (RIP.Ptr Pixman_region32_t -> RIP.CInt -> RIP.CInt -> IO ())
 pixman_region32_translate =
   RIP.unsafePerformIO hs_bindgen_6284f05d075b07b5
 
@@ -3265,7 +3265,7 @@ foreign import ccall unsafe "hs_bindgen_8e1ad0feca8a8aa9" hs_bindgen_8e1ad0feca8
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region32_copy@
-hs_bindgen_8e1ad0feca8a8aa9 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> (PtrConst.PtrConst Pixman_region32_t) -> IO Pixman_bool_t))
+hs_bindgen_8e1ad0feca8a8aa9 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region32_t -> PtrConst.PtrConst Pixman_region32_t -> IO Pixman_bool_t))
 hs_bindgen_8e1ad0feca8a8aa9 =
   RIP.fromFFIType hs_bindgen_8e1ad0feca8a8aa9_base
 
@@ -3276,7 +3276,7 @@ hs_bindgen_8e1ad0feca8a8aa9 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region32_copy :: RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> (PtrConst.PtrConst Pixman_region32_t) -> IO Pixman_bool_t)
+pixman_region32_copy :: RIP.FunPtr (RIP.Ptr Pixman_region32_t -> PtrConst.PtrConst Pixman_region32_t -> IO Pixman_bool_t)
 pixman_region32_copy =
   RIP.unsafePerformIO hs_bindgen_8e1ad0feca8a8aa9
 
@@ -3285,7 +3285,7 @@ foreign import ccall unsafe "hs_bindgen_b69307cdc3e76478" hs_bindgen_b69307cdc3e
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region32_intersect@
-hs_bindgen_b69307cdc3e76478 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> (PtrConst.PtrConst Pixman_region32_t) -> (PtrConst.PtrConst Pixman_region32_t) -> IO Pixman_bool_t))
+hs_bindgen_b69307cdc3e76478 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region32_t -> PtrConst.PtrConst Pixman_region32_t -> PtrConst.PtrConst Pixman_region32_t -> IO Pixman_bool_t))
 hs_bindgen_b69307cdc3e76478 =
   RIP.fromFFIType hs_bindgen_b69307cdc3e76478_base
 
@@ -3296,7 +3296,7 @@ hs_bindgen_b69307cdc3e76478 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region32_intersect :: RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> (PtrConst.PtrConst Pixman_region32_t) -> (PtrConst.PtrConst Pixman_region32_t) -> IO Pixman_bool_t)
+pixman_region32_intersect :: RIP.FunPtr (RIP.Ptr Pixman_region32_t -> PtrConst.PtrConst Pixman_region32_t -> PtrConst.PtrConst Pixman_region32_t -> IO Pixman_bool_t)
 pixman_region32_intersect =
   RIP.unsafePerformIO hs_bindgen_b69307cdc3e76478
 
@@ -3305,7 +3305,7 @@ foreign import ccall unsafe "hs_bindgen_1c7e49a986fc678c" hs_bindgen_1c7e49a986f
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region32_union@
-hs_bindgen_1c7e49a986fc678c :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> (PtrConst.PtrConst Pixman_region32_t) -> (PtrConst.PtrConst Pixman_region32_t) -> IO Pixman_bool_t))
+hs_bindgen_1c7e49a986fc678c :: IO (RIP.FunPtr (RIP.Ptr Pixman_region32_t -> PtrConst.PtrConst Pixman_region32_t -> PtrConst.PtrConst Pixman_region32_t -> IO Pixman_bool_t))
 hs_bindgen_1c7e49a986fc678c =
   RIP.fromFFIType hs_bindgen_1c7e49a986fc678c_base
 
@@ -3316,7 +3316,7 @@ hs_bindgen_1c7e49a986fc678c =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region32_union :: RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> (PtrConst.PtrConst Pixman_region32_t) -> (PtrConst.PtrConst Pixman_region32_t) -> IO Pixman_bool_t)
+pixman_region32_union :: RIP.FunPtr (RIP.Ptr Pixman_region32_t -> PtrConst.PtrConst Pixman_region32_t -> PtrConst.PtrConst Pixman_region32_t -> IO Pixman_bool_t)
 pixman_region32_union =
   RIP.unsafePerformIO hs_bindgen_1c7e49a986fc678c
 
@@ -3325,7 +3325,7 @@ foreign import ccall unsafe "hs_bindgen_bc04910b850f7f2c" hs_bindgen_bc04910b850
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region32_intersect_rect@
-hs_bindgen_bc04910b850f7f2c :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> (PtrConst.PtrConst Pixman_region32_t) -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO Pixman_bool_t))
+hs_bindgen_bc04910b850f7f2c :: IO (RIP.FunPtr (RIP.Ptr Pixman_region32_t -> PtrConst.PtrConst Pixman_region32_t -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO Pixman_bool_t))
 hs_bindgen_bc04910b850f7f2c =
   RIP.fromFFIType hs_bindgen_bc04910b850f7f2c_base
 
@@ -3336,7 +3336,7 @@ hs_bindgen_bc04910b850f7f2c =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region32_intersect_rect :: RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> (PtrConst.PtrConst Pixman_region32_t) -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO Pixman_bool_t)
+pixman_region32_intersect_rect :: RIP.FunPtr (RIP.Ptr Pixman_region32_t -> PtrConst.PtrConst Pixman_region32_t -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO Pixman_bool_t)
 pixman_region32_intersect_rect =
   RIP.unsafePerformIO hs_bindgen_bc04910b850f7f2c
 
@@ -3345,7 +3345,7 @@ foreign import ccall unsafe "hs_bindgen_a2c2a005007fadb5" hs_bindgen_a2c2a005007
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region32_union_rect@
-hs_bindgen_a2c2a005007fadb5 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> (PtrConst.PtrConst Pixman_region32_t) -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO Pixman_bool_t))
+hs_bindgen_a2c2a005007fadb5 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region32_t -> PtrConst.PtrConst Pixman_region32_t -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO Pixman_bool_t))
 hs_bindgen_a2c2a005007fadb5 =
   RIP.fromFFIType hs_bindgen_a2c2a005007fadb5_base
 
@@ -3356,7 +3356,7 @@ hs_bindgen_a2c2a005007fadb5 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region32_union_rect :: RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> (PtrConst.PtrConst Pixman_region32_t) -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO Pixman_bool_t)
+pixman_region32_union_rect :: RIP.FunPtr (RIP.Ptr Pixman_region32_t -> PtrConst.PtrConst Pixman_region32_t -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO Pixman_bool_t)
 pixman_region32_union_rect =
   RIP.unsafePerformIO hs_bindgen_a2c2a005007fadb5
 
@@ -3365,7 +3365,7 @@ foreign import ccall unsafe "hs_bindgen_a2f2d4d31d74f111" hs_bindgen_a2f2d4d31d7
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region32_subtract@
-hs_bindgen_a2f2d4d31d74f111 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> (PtrConst.PtrConst Pixman_region32_t) -> (PtrConst.PtrConst Pixman_region32_t) -> IO Pixman_bool_t))
+hs_bindgen_a2f2d4d31d74f111 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region32_t -> PtrConst.PtrConst Pixman_region32_t -> PtrConst.PtrConst Pixman_region32_t -> IO Pixman_bool_t))
 hs_bindgen_a2f2d4d31d74f111 =
   RIP.fromFFIType hs_bindgen_a2f2d4d31d74f111_base
 
@@ -3376,7 +3376,7 @@ hs_bindgen_a2f2d4d31d74f111 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region32_subtract :: RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> (PtrConst.PtrConst Pixman_region32_t) -> (PtrConst.PtrConst Pixman_region32_t) -> IO Pixman_bool_t)
+pixman_region32_subtract :: RIP.FunPtr (RIP.Ptr Pixman_region32_t -> PtrConst.PtrConst Pixman_region32_t -> PtrConst.PtrConst Pixman_region32_t -> IO Pixman_bool_t)
 pixman_region32_subtract =
   RIP.unsafePerformIO hs_bindgen_a2f2d4d31d74f111
 
@@ -3385,7 +3385,7 @@ foreign import ccall unsafe "hs_bindgen_0c7869ec124eeec5" hs_bindgen_0c7869ec124
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region32_inverse@
-hs_bindgen_0c7869ec124eeec5 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> (PtrConst.PtrConst Pixman_region32_t) -> (PtrConst.PtrConst Pixman_box32_t) -> IO Pixman_bool_t))
+hs_bindgen_0c7869ec124eeec5 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region32_t -> PtrConst.PtrConst Pixman_region32_t -> PtrConst.PtrConst Pixman_box32_t -> IO Pixman_bool_t))
 hs_bindgen_0c7869ec124eeec5 =
   RIP.fromFFIType hs_bindgen_0c7869ec124eeec5_base
 
@@ -3396,7 +3396,7 @@ hs_bindgen_0c7869ec124eeec5 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region32_inverse :: RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> (PtrConst.PtrConst Pixman_region32_t) -> (PtrConst.PtrConst Pixman_box32_t) -> IO Pixman_bool_t)
+pixman_region32_inverse :: RIP.FunPtr (RIP.Ptr Pixman_region32_t -> PtrConst.PtrConst Pixman_region32_t -> PtrConst.PtrConst Pixman_box32_t -> IO Pixman_bool_t)
 pixman_region32_inverse =
   RIP.unsafePerformIO hs_bindgen_0c7869ec124eeec5
 
@@ -3405,7 +3405,7 @@ foreign import ccall unsafe "hs_bindgen_6969fabb6d77a4e9" hs_bindgen_6969fabb6d7
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region32_contains_point@
-hs_bindgen_6969fabb6d77a4e9 :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_region32_t) -> RIP.CInt -> RIP.CInt -> (RIP.Ptr Pixman_box32_t) -> IO Pixman_bool_t))
+hs_bindgen_6969fabb6d77a4e9 :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_region32_t -> RIP.CInt -> RIP.CInt -> RIP.Ptr Pixman_box32_t -> IO Pixman_bool_t))
 hs_bindgen_6969fabb6d77a4e9 =
   RIP.fromFFIType hs_bindgen_6969fabb6d77a4e9_base
 
@@ -3416,7 +3416,7 @@ hs_bindgen_6969fabb6d77a4e9 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region32_contains_point :: RIP.FunPtr ((PtrConst.PtrConst Pixman_region32_t) -> RIP.CInt -> RIP.CInt -> (RIP.Ptr Pixman_box32_t) -> IO Pixman_bool_t)
+pixman_region32_contains_point :: RIP.FunPtr (PtrConst.PtrConst Pixman_region32_t -> RIP.CInt -> RIP.CInt -> RIP.Ptr Pixman_box32_t -> IO Pixman_bool_t)
 pixman_region32_contains_point =
   RIP.unsafePerformIO hs_bindgen_6969fabb6d77a4e9
 
@@ -3425,7 +3425,7 @@ foreign import ccall unsafe "hs_bindgen_31f8e896c9803db1" hs_bindgen_31f8e896c98
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region32_contains_rectangle@
-hs_bindgen_31f8e896c9803db1 :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_region32_t) -> (PtrConst.PtrConst Pixman_box32_t) -> IO Pixman_region_overlap_t))
+hs_bindgen_31f8e896c9803db1 :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_region32_t -> PtrConst.PtrConst Pixman_box32_t -> IO Pixman_region_overlap_t))
 hs_bindgen_31f8e896c9803db1 =
   RIP.fromFFIType hs_bindgen_31f8e896c9803db1_base
 
@@ -3436,7 +3436,7 @@ hs_bindgen_31f8e896c9803db1 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region32_contains_rectangle :: RIP.FunPtr ((PtrConst.PtrConst Pixman_region32_t) -> (PtrConst.PtrConst Pixman_box32_t) -> IO Pixman_region_overlap_t)
+pixman_region32_contains_rectangle :: RIP.FunPtr (PtrConst.PtrConst Pixman_region32_t -> PtrConst.PtrConst Pixman_box32_t -> IO Pixman_region_overlap_t)
 pixman_region32_contains_rectangle =
   RIP.unsafePerformIO hs_bindgen_31f8e896c9803db1
 
@@ -3445,7 +3445,7 @@ foreign import ccall unsafe "hs_bindgen_a8bb82b47e85dfe5" hs_bindgen_a8bb82b47e8
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region32_empty@
-hs_bindgen_a8bb82b47e85dfe5 :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_region32_t) -> IO Pixman_bool_t))
+hs_bindgen_a8bb82b47e85dfe5 :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_region32_t -> IO Pixman_bool_t))
 hs_bindgen_a8bb82b47e85dfe5 =
   RIP.fromFFIType hs_bindgen_a8bb82b47e85dfe5_base
 
@@ -3456,7 +3456,7 @@ hs_bindgen_a8bb82b47e85dfe5 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region32_empty :: RIP.FunPtr ((PtrConst.PtrConst Pixman_region32_t) -> IO Pixman_bool_t)
+pixman_region32_empty :: RIP.FunPtr (PtrConst.PtrConst Pixman_region32_t -> IO Pixman_bool_t)
 pixman_region32_empty =
   RIP.unsafePerformIO hs_bindgen_a8bb82b47e85dfe5
 
@@ -3465,7 +3465,7 @@ foreign import ccall unsafe "hs_bindgen_fea69c849c72d268" hs_bindgen_fea69c849c7
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region32_not_empty@
-hs_bindgen_fea69c849c72d268 :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_region32_t) -> IO Pixman_bool_t))
+hs_bindgen_fea69c849c72d268 :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_region32_t -> IO Pixman_bool_t))
 hs_bindgen_fea69c849c72d268 =
   RIP.fromFFIType hs_bindgen_fea69c849c72d268_base
 
@@ -3476,7 +3476,7 @@ hs_bindgen_fea69c849c72d268 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region32_not_empty :: RIP.FunPtr ((PtrConst.PtrConst Pixman_region32_t) -> IO Pixman_bool_t)
+pixman_region32_not_empty :: RIP.FunPtr (PtrConst.PtrConst Pixman_region32_t -> IO Pixman_bool_t)
 pixman_region32_not_empty =
   RIP.unsafePerformIO hs_bindgen_fea69c849c72d268
 
@@ -3485,7 +3485,7 @@ foreign import ccall unsafe "hs_bindgen_c739057512371ea9" hs_bindgen_c7390575123
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region32_extents@
-hs_bindgen_c739057512371ea9 :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_region32_t) -> IO (RIP.Ptr Pixman_box32_t)))
+hs_bindgen_c739057512371ea9 :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_region32_t -> IO (RIP.Ptr Pixman_box32_t)))
 hs_bindgen_c739057512371ea9 =
   RIP.fromFFIType hs_bindgen_c739057512371ea9_base
 
@@ -3496,7 +3496,7 @@ hs_bindgen_c739057512371ea9 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region32_extents :: RIP.FunPtr ((PtrConst.PtrConst Pixman_region32_t) -> IO (RIP.Ptr Pixman_box32_t))
+pixman_region32_extents :: RIP.FunPtr (PtrConst.PtrConst Pixman_region32_t -> IO (RIP.Ptr Pixman_box32_t))
 pixman_region32_extents =
   RIP.unsafePerformIO hs_bindgen_c739057512371ea9
 
@@ -3505,7 +3505,7 @@ foreign import ccall unsafe "hs_bindgen_2c817fae4e3b325f" hs_bindgen_2c817fae4e3
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region32_n_rects@
-hs_bindgen_2c817fae4e3b325f :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_region32_t) -> IO RIP.CInt))
+hs_bindgen_2c817fae4e3b325f :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_region32_t -> IO RIP.CInt))
 hs_bindgen_2c817fae4e3b325f =
   RIP.fromFFIType hs_bindgen_2c817fae4e3b325f_base
 
@@ -3516,7 +3516,7 @@ hs_bindgen_2c817fae4e3b325f =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region32_n_rects :: RIP.FunPtr ((PtrConst.PtrConst Pixman_region32_t) -> IO RIP.CInt)
+pixman_region32_n_rects :: RIP.FunPtr (PtrConst.PtrConst Pixman_region32_t -> IO RIP.CInt)
 pixman_region32_n_rects =
   RIP.unsafePerformIO hs_bindgen_2c817fae4e3b325f
 
@@ -3525,7 +3525,7 @@ foreign import ccall unsafe "hs_bindgen_a9a7220782d9eca7" hs_bindgen_a9a7220782d
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region32_rectangles@
-hs_bindgen_a9a7220782d9eca7 :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_region32_t) -> (RIP.Ptr RIP.CInt) -> IO (RIP.Ptr Pixman_box32_t)))
+hs_bindgen_a9a7220782d9eca7 :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_region32_t -> RIP.Ptr RIP.CInt -> IO (RIP.Ptr Pixman_box32_t)))
 hs_bindgen_a9a7220782d9eca7 =
   RIP.fromFFIType hs_bindgen_a9a7220782d9eca7_base
 
@@ -3536,7 +3536,7 @@ hs_bindgen_a9a7220782d9eca7 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region32_rectangles :: RIP.FunPtr ((PtrConst.PtrConst Pixman_region32_t) -> (RIP.Ptr RIP.CInt) -> IO (RIP.Ptr Pixman_box32_t))
+pixman_region32_rectangles :: RIP.FunPtr (PtrConst.PtrConst Pixman_region32_t -> RIP.Ptr RIP.CInt -> IO (RIP.Ptr Pixman_box32_t))
 pixman_region32_rectangles =
   RIP.unsafePerformIO hs_bindgen_a9a7220782d9eca7
 
@@ -3545,7 +3545,7 @@ foreign import ccall unsafe "hs_bindgen_fa3fad8092fbe22c" hs_bindgen_fa3fad8092f
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region32_equal@
-hs_bindgen_fa3fad8092fbe22c :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_region32_t) -> (PtrConst.PtrConst Pixman_region32_t) -> IO Pixman_bool_t))
+hs_bindgen_fa3fad8092fbe22c :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_region32_t -> PtrConst.PtrConst Pixman_region32_t -> IO Pixman_bool_t))
 hs_bindgen_fa3fad8092fbe22c =
   RIP.fromFFIType hs_bindgen_fa3fad8092fbe22c_base
 
@@ -3556,7 +3556,7 @@ hs_bindgen_fa3fad8092fbe22c =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region32_equal :: RIP.FunPtr ((PtrConst.PtrConst Pixman_region32_t) -> (PtrConst.PtrConst Pixman_region32_t) -> IO Pixman_bool_t)
+pixman_region32_equal :: RIP.FunPtr (PtrConst.PtrConst Pixman_region32_t -> PtrConst.PtrConst Pixman_region32_t -> IO Pixman_bool_t)
 pixman_region32_equal =
   RIP.unsafePerformIO hs_bindgen_fa3fad8092fbe22c
 
@@ -3565,7 +3565,7 @@ foreign import ccall unsafe "hs_bindgen_48cbc3c66b048725" hs_bindgen_48cbc3c66b0
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region32_selfcheck@
-hs_bindgen_48cbc3c66b048725 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> IO Pixman_bool_t))
+hs_bindgen_48cbc3c66b048725 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region32_t -> IO Pixman_bool_t))
 hs_bindgen_48cbc3c66b048725 =
   RIP.fromFFIType hs_bindgen_48cbc3c66b048725_base
 
@@ -3576,7 +3576,7 @@ hs_bindgen_48cbc3c66b048725 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region32_selfcheck :: RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> IO Pixman_bool_t)
+pixman_region32_selfcheck :: RIP.FunPtr (RIP.Ptr Pixman_region32_t -> IO Pixman_bool_t)
 pixman_region32_selfcheck =
   RIP.unsafePerformIO hs_bindgen_48cbc3c66b048725
 
@@ -3585,7 +3585,7 @@ foreign import ccall unsafe "hs_bindgen_f57b7b0ac5848c9c" hs_bindgen_f57b7b0ac58
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region32_reset@
-hs_bindgen_f57b7b0ac5848c9c :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> (PtrConst.PtrConst Pixman_box32_t) -> IO ()))
+hs_bindgen_f57b7b0ac5848c9c :: IO (RIP.FunPtr (RIP.Ptr Pixman_region32_t -> PtrConst.PtrConst Pixman_box32_t -> IO ()))
 hs_bindgen_f57b7b0ac5848c9c =
   RIP.fromFFIType hs_bindgen_f57b7b0ac5848c9c_base
 
@@ -3596,7 +3596,7 @@ hs_bindgen_f57b7b0ac5848c9c =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region32_reset :: RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> (PtrConst.PtrConst Pixman_box32_t) -> IO ())
+pixman_region32_reset :: RIP.FunPtr (RIP.Ptr Pixman_region32_t -> PtrConst.PtrConst Pixman_box32_t -> IO ())
 pixman_region32_reset =
   RIP.unsafePerformIO hs_bindgen_f57b7b0ac5848c9c
 
@@ -3605,7 +3605,7 @@ foreign import ccall unsafe "hs_bindgen_7f50c416aa385688" hs_bindgen_7f50c416aa3
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region32_clear@
-hs_bindgen_7f50c416aa385688 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> IO ()))
+hs_bindgen_7f50c416aa385688 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region32_t -> IO ()))
 hs_bindgen_7f50c416aa385688 =
   RIP.fromFFIType hs_bindgen_7f50c416aa385688_base
 
@@ -3616,7 +3616,7 @@ hs_bindgen_7f50c416aa385688 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region32_clear :: RIP.FunPtr ((RIP.Ptr Pixman_region32_t) -> IO ())
+pixman_region32_clear :: RIP.FunPtr (RIP.Ptr Pixman_region32_t -> IO ())
 pixman_region32_clear =
   RIP.unsafePerformIO hs_bindgen_7f50c416aa385688
 
@@ -3625,7 +3625,7 @@ foreign import ccall unsafe "hs_bindgen_cb161006de44d9b0" hs_bindgen_cb161006de4
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_init@
-hs_bindgen_cb161006de44d9b0 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> IO ()))
+hs_bindgen_cb161006de44d9b0 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> IO ()))
 hs_bindgen_cb161006de44d9b0 =
   RIP.fromFFIType hs_bindgen_cb161006de44d9b0_base
 
@@ -3636,7 +3636,7 @@ hs_bindgen_cb161006de44d9b0 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_init :: RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> IO ())
+pixman_region64f_init :: RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> IO ())
 pixman_region64f_init =
   RIP.unsafePerformIO hs_bindgen_cb161006de44d9b0
 
@@ -3645,7 +3645,7 @@ foreign import ccall unsafe "hs_bindgen_ef66d593b9a4c443" hs_bindgen_ef66d593b9a
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_init_rect@
-hs_bindgen_ef66d593b9a4c443 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO ()))
+hs_bindgen_ef66d593b9a4c443 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO ()))
 hs_bindgen_ef66d593b9a4c443 =
   RIP.fromFFIType hs_bindgen_ef66d593b9a4c443_base
 
@@ -3656,7 +3656,7 @@ hs_bindgen_ef66d593b9a4c443 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_init_rect :: RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO ())
+pixman_region64f_init_rect :: RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO ())
 pixman_region64f_init_rect =
   RIP.unsafePerformIO hs_bindgen_ef66d593b9a4c443
 
@@ -3665,7 +3665,7 @@ foreign import ccall unsafe "hs_bindgen_e16b3402e310d8a2" hs_bindgen_e16b3402e31
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_init_rectf@
-hs_bindgen_e16b3402e310d8a2 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> IO ()))
+hs_bindgen_e16b3402e310d8a2 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> IO ()))
 hs_bindgen_e16b3402e310d8a2 =
   RIP.fromFFIType hs_bindgen_e16b3402e310d8a2_base
 
@@ -3676,7 +3676,7 @@ hs_bindgen_e16b3402e310d8a2 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_init_rectf :: RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> IO ())
+pixman_region64f_init_rectf :: RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> IO ())
 pixman_region64f_init_rectf =
   RIP.unsafePerformIO hs_bindgen_e16b3402e310d8a2
 
@@ -3685,7 +3685,7 @@ foreign import ccall unsafe "hs_bindgen_b6d2422ececf3370" hs_bindgen_b6d2422ecec
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_init_rects@
-hs_bindgen_b6d2422ececf3370 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_box64f_t) -> RIP.CInt -> IO Pixman_bool_t))
+hs_bindgen_b6d2422ececf3370 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> PtrConst.PtrConst Pixman_box64f_t -> RIP.CInt -> IO Pixman_bool_t))
 hs_bindgen_b6d2422ececf3370 =
   RIP.fromFFIType hs_bindgen_b6d2422ececf3370_base
 
@@ -3696,7 +3696,7 @@ hs_bindgen_b6d2422ececf3370 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_init_rects :: RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_box64f_t) -> RIP.CInt -> IO Pixman_bool_t)
+pixman_region64f_init_rects :: RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> PtrConst.PtrConst Pixman_box64f_t -> RIP.CInt -> IO Pixman_bool_t)
 pixman_region64f_init_rects =
   RIP.unsafePerformIO hs_bindgen_b6d2422ececf3370
 
@@ -3705,7 +3705,7 @@ foreign import ccall unsafe "hs_bindgen_ba2c9e2dd7324bb1" hs_bindgen_ba2c9e2dd73
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_init_with_extents@
-hs_bindgen_ba2c9e2dd7324bb1 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_box64f_t) -> IO ()))
+hs_bindgen_ba2c9e2dd7324bb1 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> PtrConst.PtrConst Pixman_box64f_t -> IO ()))
 hs_bindgen_ba2c9e2dd7324bb1 =
   RIP.fromFFIType hs_bindgen_ba2c9e2dd7324bb1_base
 
@@ -3716,7 +3716,7 @@ hs_bindgen_ba2c9e2dd7324bb1 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_init_with_extents :: RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_box64f_t) -> IO ())
+pixman_region64f_init_with_extents :: RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> PtrConst.PtrConst Pixman_box64f_t -> IO ())
 pixman_region64f_init_with_extents =
   RIP.unsafePerformIO hs_bindgen_ba2c9e2dd7324bb1
 
@@ -3725,7 +3725,7 @@ foreign import ccall unsafe "hs_bindgen_6bbe152b114cae5d" hs_bindgen_6bbe152b114
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_init_from_image@
-hs_bindgen_6bbe152b114cae5d :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> (RIP.Ptr Pixman_image_t) -> IO ()))
+hs_bindgen_6bbe152b114cae5d :: IO (RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> RIP.Ptr Pixman_image_t -> IO ()))
 hs_bindgen_6bbe152b114cae5d =
   RIP.fromFFIType hs_bindgen_6bbe152b114cae5d_base
 
@@ -3736,7 +3736,7 @@ hs_bindgen_6bbe152b114cae5d =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_init_from_image :: RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> (RIP.Ptr Pixman_image_t) -> IO ())
+pixman_region64f_init_from_image :: RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> RIP.Ptr Pixman_image_t -> IO ())
 pixman_region64f_init_from_image =
   RIP.unsafePerformIO hs_bindgen_6bbe152b114cae5d
 
@@ -3745,7 +3745,7 @@ foreign import ccall unsafe "hs_bindgen_dee9382f319e6017" hs_bindgen_dee9382f319
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_fini@
-hs_bindgen_dee9382f319e6017 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> IO ()))
+hs_bindgen_dee9382f319e6017 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> IO ()))
 hs_bindgen_dee9382f319e6017 =
   RIP.fromFFIType hs_bindgen_dee9382f319e6017_base
 
@@ -3756,7 +3756,7 @@ hs_bindgen_dee9382f319e6017 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_fini :: RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> IO ())
+pixman_region64f_fini :: RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> IO ())
 pixman_region64f_fini =
   RIP.unsafePerformIO hs_bindgen_dee9382f319e6017
 
@@ -3765,7 +3765,7 @@ foreign import ccall unsafe "hs_bindgen_db5357d9d53fd2ad" hs_bindgen_db5357d9d53
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_translate@
-hs_bindgen_db5357d9d53fd2ad :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> RIP.CInt -> RIP.CInt -> IO ()))
+hs_bindgen_db5357d9d53fd2ad :: IO (RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> RIP.CInt -> RIP.CInt -> IO ()))
 hs_bindgen_db5357d9d53fd2ad =
   RIP.fromFFIType hs_bindgen_db5357d9d53fd2ad_base
 
@@ -3776,7 +3776,7 @@ hs_bindgen_db5357d9d53fd2ad =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_translate :: RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> RIP.CInt -> RIP.CInt -> IO ())
+pixman_region64f_translate :: RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> RIP.CInt -> RIP.CInt -> IO ())
 pixman_region64f_translate =
   RIP.unsafePerformIO hs_bindgen_db5357d9d53fd2ad
 
@@ -3785,7 +3785,7 @@ foreign import ccall unsafe "hs_bindgen_eec67e76ca3af89f" hs_bindgen_eec67e76ca3
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_translatef@
-hs_bindgen_eec67e76ca3af89f :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> RIP.CDouble -> RIP.CDouble -> IO ()))
+hs_bindgen_eec67e76ca3af89f :: IO (RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> RIP.CDouble -> RIP.CDouble -> IO ()))
 hs_bindgen_eec67e76ca3af89f =
   RIP.fromFFIType hs_bindgen_eec67e76ca3af89f_base
 
@@ -3796,7 +3796,7 @@ hs_bindgen_eec67e76ca3af89f =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_translatef :: RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> RIP.CDouble -> RIP.CDouble -> IO ())
+pixman_region64f_translatef :: RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> RIP.CDouble -> RIP.CDouble -> IO ())
 pixman_region64f_translatef =
   RIP.unsafePerformIO hs_bindgen_eec67e76ca3af89f
 
@@ -3805,7 +3805,7 @@ foreign import ccall unsafe "hs_bindgen_8c2facfbd273e900" hs_bindgen_8c2facfbd27
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_copy@
-hs_bindgen_8c2facfbd273e900 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> IO Pixman_bool_t))
+hs_bindgen_8c2facfbd273e900 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> PtrConst.PtrConst Pixman_region64f_t -> IO Pixman_bool_t))
 hs_bindgen_8c2facfbd273e900 =
   RIP.fromFFIType hs_bindgen_8c2facfbd273e900_base
 
@@ -3816,7 +3816,7 @@ hs_bindgen_8c2facfbd273e900 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_copy :: RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> IO Pixman_bool_t)
+pixman_region64f_copy :: RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> PtrConst.PtrConst Pixman_region64f_t -> IO Pixman_bool_t)
 pixman_region64f_copy =
   RIP.unsafePerformIO hs_bindgen_8c2facfbd273e900
 
@@ -3825,7 +3825,7 @@ foreign import ccall unsafe "hs_bindgen_35656130ff524824" hs_bindgen_35656130ff5
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_intersect@
-hs_bindgen_35656130ff524824 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> IO Pixman_bool_t))
+hs_bindgen_35656130ff524824 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> PtrConst.PtrConst Pixman_region64f_t -> PtrConst.PtrConst Pixman_region64f_t -> IO Pixman_bool_t))
 hs_bindgen_35656130ff524824 =
   RIP.fromFFIType hs_bindgen_35656130ff524824_base
 
@@ -3836,7 +3836,7 @@ hs_bindgen_35656130ff524824 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_intersect :: RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> IO Pixman_bool_t)
+pixman_region64f_intersect :: RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> PtrConst.PtrConst Pixman_region64f_t -> PtrConst.PtrConst Pixman_region64f_t -> IO Pixman_bool_t)
 pixman_region64f_intersect =
   RIP.unsafePerformIO hs_bindgen_35656130ff524824
 
@@ -3845,7 +3845,7 @@ foreign import ccall unsafe "hs_bindgen_9f88d44f7819670c" hs_bindgen_9f88d44f781
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_union@
-hs_bindgen_9f88d44f7819670c :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> IO Pixman_bool_t))
+hs_bindgen_9f88d44f7819670c :: IO (RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> PtrConst.PtrConst Pixman_region64f_t -> PtrConst.PtrConst Pixman_region64f_t -> IO Pixman_bool_t))
 hs_bindgen_9f88d44f7819670c =
   RIP.fromFFIType hs_bindgen_9f88d44f7819670c_base
 
@@ -3856,7 +3856,7 @@ hs_bindgen_9f88d44f7819670c =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_union :: RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> IO Pixman_bool_t)
+pixman_region64f_union :: RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> PtrConst.PtrConst Pixman_region64f_t -> PtrConst.PtrConst Pixman_region64f_t -> IO Pixman_bool_t)
 pixman_region64f_union =
   RIP.unsafePerformIO hs_bindgen_9f88d44f7819670c
 
@@ -3865,7 +3865,7 @@ foreign import ccall unsafe "hs_bindgen_5a349666c36d07ec" hs_bindgen_5a349666c36
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_intersect_rect@
-hs_bindgen_5a349666c36d07ec :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO Pixman_bool_t))
+hs_bindgen_5a349666c36d07ec :: IO (RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> PtrConst.PtrConst Pixman_region64f_t -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO Pixman_bool_t))
 hs_bindgen_5a349666c36d07ec =
   RIP.fromFFIType hs_bindgen_5a349666c36d07ec_base
 
@@ -3876,7 +3876,7 @@ hs_bindgen_5a349666c36d07ec =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_intersect_rect :: RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO Pixman_bool_t)
+pixman_region64f_intersect_rect :: RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> PtrConst.PtrConst Pixman_region64f_t -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO Pixman_bool_t)
 pixman_region64f_intersect_rect =
   RIP.unsafePerformIO hs_bindgen_5a349666c36d07ec
 
@@ -3885,7 +3885,7 @@ foreign import ccall unsafe "hs_bindgen_755a087837bf877d" hs_bindgen_755a087837b
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_intersect_rectf@
-hs_bindgen_755a087837bf877d :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> IO Pixman_bool_t))
+hs_bindgen_755a087837bf877d :: IO (RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> PtrConst.PtrConst Pixman_region64f_t -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> IO Pixman_bool_t))
 hs_bindgen_755a087837bf877d =
   RIP.fromFFIType hs_bindgen_755a087837bf877d_base
 
@@ -3896,7 +3896,7 @@ hs_bindgen_755a087837bf877d =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_intersect_rectf :: RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> IO Pixman_bool_t)
+pixman_region64f_intersect_rectf :: RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> PtrConst.PtrConst Pixman_region64f_t -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> IO Pixman_bool_t)
 pixman_region64f_intersect_rectf =
   RIP.unsafePerformIO hs_bindgen_755a087837bf877d
 
@@ -3905,7 +3905,7 @@ foreign import ccall unsafe "hs_bindgen_530f23e2251aaaaf" hs_bindgen_530f23e2251
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_union_rect@
-hs_bindgen_530f23e2251aaaaf :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO Pixman_bool_t))
+hs_bindgen_530f23e2251aaaaf :: IO (RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> PtrConst.PtrConst Pixman_region64f_t -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO Pixman_bool_t))
 hs_bindgen_530f23e2251aaaaf =
   RIP.fromFFIType hs_bindgen_530f23e2251aaaaf_base
 
@@ -3916,7 +3916,7 @@ hs_bindgen_530f23e2251aaaaf =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_union_rect :: RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO Pixman_bool_t)
+pixman_region64f_union_rect :: RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> PtrConst.PtrConst Pixman_region64f_t -> RIP.CInt -> RIP.CInt -> RIP.CUInt -> RIP.CUInt -> IO Pixman_bool_t)
 pixman_region64f_union_rect =
   RIP.unsafePerformIO hs_bindgen_530f23e2251aaaaf
 
@@ -3925,7 +3925,7 @@ foreign import ccall unsafe "hs_bindgen_2810427ebb10ad2f" hs_bindgen_2810427ebb1
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_union_rectf@
-hs_bindgen_2810427ebb10ad2f :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> IO Pixman_bool_t))
+hs_bindgen_2810427ebb10ad2f :: IO (RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> PtrConst.PtrConst Pixman_region64f_t -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> IO Pixman_bool_t))
 hs_bindgen_2810427ebb10ad2f =
   RIP.fromFFIType hs_bindgen_2810427ebb10ad2f_base
 
@@ -3936,7 +3936,7 @@ hs_bindgen_2810427ebb10ad2f =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_union_rectf :: RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> IO Pixman_bool_t)
+pixman_region64f_union_rectf :: RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> PtrConst.PtrConst Pixman_region64f_t -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> IO Pixman_bool_t)
 pixman_region64f_union_rectf =
   RIP.unsafePerformIO hs_bindgen_2810427ebb10ad2f
 
@@ -3945,7 +3945,7 @@ foreign import ccall unsafe "hs_bindgen_84cd574a2dd9ebcc" hs_bindgen_84cd574a2dd
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_subtract@
-hs_bindgen_84cd574a2dd9ebcc :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> IO Pixman_bool_t))
+hs_bindgen_84cd574a2dd9ebcc :: IO (RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> PtrConst.PtrConst Pixman_region64f_t -> PtrConst.PtrConst Pixman_region64f_t -> IO Pixman_bool_t))
 hs_bindgen_84cd574a2dd9ebcc =
   RIP.fromFFIType hs_bindgen_84cd574a2dd9ebcc_base
 
@@ -3956,7 +3956,7 @@ hs_bindgen_84cd574a2dd9ebcc =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_subtract :: RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> IO Pixman_bool_t)
+pixman_region64f_subtract :: RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> PtrConst.PtrConst Pixman_region64f_t -> PtrConst.PtrConst Pixman_region64f_t -> IO Pixman_bool_t)
 pixman_region64f_subtract =
   RIP.unsafePerformIO hs_bindgen_84cd574a2dd9ebcc
 
@@ -3965,7 +3965,7 @@ foreign import ccall unsafe "hs_bindgen_fed71e9d61fc617c" hs_bindgen_fed71e9d61f
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_inverse@
-hs_bindgen_fed71e9d61fc617c :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_box64f_t) -> IO Pixman_bool_t))
+hs_bindgen_fed71e9d61fc617c :: IO (RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> PtrConst.PtrConst Pixman_region64f_t -> PtrConst.PtrConst Pixman_box64f_t -> IO Pixman_bool_t))
 hs_bindgen_fed71e9d61fc617c =
   RIP.fromFFIType hs_bindgen_fed71e9d61fc617c_base
 
@@ -3976,7 +3976,7 @@ hs_bindgen_fed71e9d61fc617c =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_inverse :: RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_box64f_t) -> IO Pixman_bool_t)
+pixman_region64f_inverse :: RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> PtrConst.PtrConst Pixman_region64f_t -> PtrConst.PtrConst Pixman_box64f_t -> IO Pixman_bool_t)
 pixman_region64f_inverse =
   RIP.unsafePerformIO hs_bindgen_fed71e9d61fc617c
 
@@ -3985,7 +3985,7 @@ foreign import ccall unsafe "hs_bindgen_f31870069a2a49f4" hs_bindgen_f31870069a2
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_contains_point@
-hs_bindgen_f31870069a2a49f4 :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_region64f_t) -> RIP.CInt -> RIP.CInt -> (RIP.Ptr Pixman_box64f_t) -> IO Pixman_bool_t))
+hs_bindgen_f31870069a2a49f4 :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_region64f_t -> RIP.CInt -> RIP.CInt -> RIP.Ptr Pixman_box64f_t -> IO Pixman_bool_t))
 hs_bindgen_f31870069a2a49f4 =
   RIP.fromFFIType hs_bindgen_f31870069a2a49f4_base
 
@@ -3996,7 +3996,7 @@ hs_bindgen_f31870069a2a49f4 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_contains_point :: RIP.FunPtr ((PtrConst.PtrConst Pixman_region64f_t) -> RIP.CInt -> RIP.CInt -> (RIP.Ptr Pixman_box64f_t) -> IO Pixman_bool_t)
+pixman_region64f_contains_point :: RIP.FunPtr (PtrConst.PtrConst Pixman_region64f_t -> RIP.CInt -> RIP.CInt -> RIP.Ptr Pixman_box64f_t -> IO Pixman_bool_t)
 pixman_region64f_contains_point =
   RIP.unsafePerformIO hs_bindgen_f31870069a2a49f4
 
@@ -4005,7 +4005,7 @@ foreign import ccall unsafe "hs_bindgen_4679c4caf13cd1a4" hs_bindgen_4679c4caf13
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_contains_pointf@
-hs_bindgen_4679c4caf13cd1a4 :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_region64f_t) -> RIP.CDouble -> RIP.CDouble -> (RIP.Ptr Pixman_box64f_t) -> IO Pixman_bool_t))
+hs_bindgen_4679c4caf13cd1a4 :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_region64f_t -> RIP.CDouble -> RIP.CDouble -> RIP.Ptr Pixman_box64f_t -> IO Pixman_bool_t))
 hs_bindgen_4679c4caf13cd1a4 =
   RIP.fromFFIType hs_bindgen_4679c4caf13cd1a4_base
 
@@ -4016,7 +4016,7 @@ hs_bindgen_4679c4caf13cd1a4 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_contains_pointf :: RIP.FunPtr ((PtrConst.PtrConst Pixman_region64f_t) -> RIP.CDouble -> RIP.CDouble -> (RIP.Ptr Pixman_box64f_t) -> IO Pixman_bool_t)
+pixman_region64f_contains_pointf :: RIP.FunPtr (PtrConst.PtrConst Pixman_region64f_t -> RIP.CDouble -> RIP.CDouble -> RIP.Ptr Pixman_box64f_t -> IO Pixman_bool_t)
 pixman_region64f_contains_pointf =
   RIP.unsafePerformIO hs_bindgen_4679c4caf13cd1a4
 
@@ -4025,7 +4025,7 @@ foreign import ccall unsafe "hs_bindgen_4fe5d0c114ff78dd" hs_bindgen_4fe5d0c114f
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_contains_rectangle@
-hs_bindgen_4fe5d0c114ff78dd :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_box64f_t) -> IO Pixman_region_overlap_t))
+hs_bindgen_4fe5d0c114ff78dd :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_region64f_t -> PtrConst.PtrConst Pixman_box64f_t -> IO Pixman_region_overlap_t))
 hs_bindgen_4fe5d0c114ff78dd =
   RIP.fromFFIType hs_bindgen_4fe5d0c114ff78dd_base
 
@@ -4036,7 +4036,7 @@ hs_bindgen_4fe5d0c114ff78dd =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_contains_rectangle :: RIP.FunPtr ((PtrConst.PtrConst Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_box64f_t) -> IO Pixman_region_overlap_t)
+pixman_region64f_contains_rectangle :: RIP.FunPtr (PtrConst.PtrConst Pixman_region64f_t -> PtrConst.PtrConst Pixman_box64f_t -> IO Pixman_region_overlap_t)
 pixman_region64f_contains_rectangle =
   RIP.unsafePerformIO hs_bindgen_4fe5d0c114ff78dd
 
@@ -4045,7 +4045,7 @@ foreign import ccall unsafe "hs_bindgen_2afc619c95fba254" hs_bindgen_2afc619c95f
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_empty@
-hs_bindgen_2afc619c95fba254 :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_region64f_t) -> IO Pixman_bool_t))
+hs_bindgen_2afc619c95fba254 :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_region64f_t -> IO Pixman_bool_t))
 hs_bindgen_2afc619c95fba254 =
   RIP.fromFFIType hs_bindgen_2afc619c95fba254_base
 
@@ -4056,7 +4056,7 @@ hs_bindgen_2afc619c95fba254 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_empty :: RIP.FunPtr ((PtrConst.PtrConst Pixman_region64f_t) -> IO Pixman_bool_t)
+pixman_region64f_empty :: RIP.FunPtr (PtrConst.PtrConst Pixman_region64f_t -> IO Pixman_bool_t)
 pixman_region64f_empty =
   RIP.unsafePerformIO hs_bindgen_2afc619c95fba254
 
@@ -4065,7 +4065,7 @@ foreign import ccall unsafe "hs_bindgen_575abd78c0ab1192" hs_bindgen_575abd78c0a
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_not_empty@
-hs_bindgen_575abd78c0ab1192 :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_region64f_t) -> IO Pixman_bool_t))
+hs_bindgen_575abd78c0ab1192 :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_region64f_t -> IO Pixman_bool_t))
 hs_bindgen_575abd78c0ab1192 =
   RIP.fromFFIType hs_bindgen_575abd78c0ab1192_base
 
@@ -4076,7 +4076,7 @@ hs_bindgen_575abd78c0ab1192 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_not_empty :: RIP.FunPtr ((PtrConst.PtrConst Pixman_region64f_t) -> IO Pixman_bool_t)
+pixman_region64f_not_empty :: RIP.FunPtr (PtrConst.PtrConst Pixman_region64f_t -> IO Pixman_bool_t)
 pixman_region64f_not_empty =
   RIP.unsafePerformIO hs_bindgen_575abd78c0ab1192
 
@@ -4085,7 +4085,7 @@ foreign import ccall unsafe "hs_bindgen_db8a4e277f964c8e" hs_bindgen_db8a4e277f9
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_extents@
-hs_bindgen_db8a4e277f964c8e :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_region64f_t) -> IO (RIP.Ptr Pixman_box64f_t)))
+hs_bindgen_db8a4e277f964c8e :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_region64f_t -> IO (RIP.Ptr Pixman_box64f_t)))
 hs_bindgen_db8a4e277f964c8e =
   RIP.fromFFIType hs_bindgen_db8a4e277f964c8e_base
 
@@ -4096,7 +4096,7 @@ hs_bindgen_db8a4e277f964c8e =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_extents :: RIP.FunPtr ((PtrConst.PtrConst Pixman_region64f_t) -> IO (RIP.Ptr Pixman_box64f_t))
+pixman_region64f_extents :: RIP.FunPtr (PtrConst.PtrConst Pixman_region64f_t -> IO (RIP.Ptr Pixman_box64f_t))
 pixman_region64f_extents =
   RIP.unsafePerformIO hs_bindgen_db8a4e277f964c8e
 
@@ -4105,7 +4105,7 @@ foreign import ccall unsafe "hs_bindgen_6a32ca8a83fa2ce5" hs_bindgen_6a32ca8a83f
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_n_rects@
-hs_bindgen_6a32ca8a83fa2ce5 :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_region64f_t) -> IO RIP.CInt))
+hs_bindgen_6a32ca8a83fa2ce5 :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_region64f_t -> IO RIP.CInt))
 hs_bindgen_6a32ca8a83fa2ce5 =
   RIP.fromFFIType hs_bindgen_6a32ca8a83fa2ce5_base
 
@@ -4116,7 +4116,7 @@ hs_bindgen_6a32ca8a83fa2ce5 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_n_rects :: RIP.FunPtr ((PtrConst.PtrConst Pixman_region64f_t) -> IO RIP.CInt)
+pixman_region64f_n_rects :: RIP.FunPtr (PtrConst.PtrConst Pixman_region64f_t -> IO RIP.CInt)
 pixman_region64f_n_rects =
   RIP.unsafePerformIO hs_bindgen_6a32ca8a83fa2ce5
 
@@ -4125,7 +4125,7 @@ foreign import ccall unsafe "hs_bindgen_8c9e34d533827173" hs_bindgen_8c9e34d5338
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_rectangles@
-hs_bindgen_8c9e34d533827173 :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_region64f_t) -> (RIP.Ptr RIP.CInt) -> IO (RIP.Ptr Pixman_box64f_t)))
+hs_bindgen_8c9e34d533827173 :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_region64f_t -> RIP.Ptr RIP.CInt -> IO (RIP.Ptr Pixman_box64f_t)))
 hs_bindgen_8c9e34d533827173 =
   RIP.fromFFIType hs_bindgen_8c9e34d533827173_base
 
@@ -4136,7 +4136,7 @@ hs_bindgen_8c9e34d533827173 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_rectangles :: RIP.FunPtr ((PtrConst.PtrConst Pixman_region64f_t) -> (RIP.Ptr RIP.CInt) -> IO (RIP.Ptr Pixman_box64f_t))
+pixman_region64f_rectangles :: RIP.FunPtr (PtrConst.PtrConst Pixman_region64f_t -> RIP.Ptr RIP.CInt -> IO (RIP.Ptr Pixman_box64f_t))
 pixman_region64f_rectangles =
   RIP.unsafePerformIO hs_bindgen_8c9e34d533827173
 
@@ -4145,7 +4145,7 @@ foreign import ccall unsafe "hs_bindgen_575c42e3eddd1589" hs_bindgen_575c42e3edd
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_equal@
-hs_bindgen_575c42e3eddd1589 :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> IO Pixman_bool_t))
+hs_bindgen_575c42e3eddd1589 :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_region64f_t -> PtrConst.PtrConst Pixman_region64f_t -> IO Pixman_bool_t))
 hs_bindgen_575c42e3eddd1589 =
   RIP.fromFFIType hs_bindgen_575c42e3eddd1589_base
 
@@ -4156,7 +4156,7 @@ hs_bindgen_575c42e3eddd1589 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_equal :: RIP.FunPtr ((PtrConst.PtrConst Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> IO Pixman_bool_t)
+pixman_region64f_equal :: RIP.FunPtr (PtrConst.PtrConst Pixman_region64f_t -> PtrConst.PtrConst Pixman_region64f_t -> IO Pixman_bool_t)
 pixman_region64f_equal =
   RIP.unsafePerformIO hs_bindgen_575c42e3eddd1589
 
@@ -4165,7 +4165,7 @@ foreign import ccall unsafe "hs_bindgen_acf78dc354c3132e" hs_bindgen_acf78dc354c
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_selfcheck@
-hs_bindgen_acf78dc354c3132e :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> IO Pixman_bool_t))
+hs_bindgen_acf78dc354c3132e :: IO (RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> IO Pixman_bool_t))
 hs_bindgen_acf78dc354c3132e =
   RIP.fromFFIType hs_bindgen_acf78dc354c3132e_base
 
@@ -4176,7 +4176,7 @@ hs_bindgen_acf78dc354c3132e =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_selfcheck :: RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> IO Pixman_bool_t)
+pixman_region64f_selfcheck :: RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> IO Pixman_bool_t)
 pixman_region64f_selfcheck =
   RIP.unsafePerformIO hs_bindgen_acf78dc354c3132e
 
@@ -4185,7 +4185,7 @@ foreign import ccall unsafe "hs_bindgen_f47806869e72ec73" hs_bindgen_f47806869e7
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_reset@
-hs_bindgen_f47806869e72ec73 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_box64f_t) -> IO ()))
+hs_bindgen_f47806869e72ec73 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> PtrConst.PtrConst Pixman_box64f_t -> IO ()))
 hs_bindgen_f47806869e72ec73 =
   RIP.fromFFIType hs_bindgen_f47806869e72ec73_base
 
@@ -4196,7 +4196,7 @@ hs_bindgen_f47806869e72ec73 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_reset :: RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> (PtrConst.PtrConst Pixman_box64f_t) -> IO ())
+pixman_region64f_reset :: RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> PtrConst.PtrConst Pixman_box64f_t -> IO ())
 pixman_region64f_reset =
   RIP.unsafePerformIO hs_bindgen_f47806869e72ec73
 
@@ -4205,7 +4205,7 @@ foreign import ccall unsafe "hs_bindgen_5c3613e8dfc2b0a5" hs_bindgen_5c3613e8dfc
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_region64f_clear@
-hs_bindgen_5c3613e8dfc2b0a5 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> IO ()))
+hs_bindgen_5c3613e8dfc2b0a5 :: IO (RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> IO ()))
 hs_bindgen_5c3613e8dfc2b0a5 =
   RIP.fromFFIType hs_bindgen_5c3613e8dfc2b0a5_base
 
@@ -4216,7 +4216,7 @@ hs_bindgen_5c3613e8dfc2b0a5 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_region64f_clear :: RIP.FunPtr ((RIP.Ptr Pixman_region64f_t) -> IO ())
+pixman_region64f_clear :: RIP.FunPtr (RIP.Ptr Pixman_region64f_t -> IO ())
 pixman_region64f_clear =
   RIP.unsafePerformIO hs_bindgen_5c3613e8dfc2b0a5
 
@@ -4225,7 +4225,7 @@ foreign import ccall unsafe "hs_bindgen_eb9eaee5217bd7e7" hs_bindgen_eb9eaee5217
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_blt@
-hs_bindgen_eb9eaee5217bd7e7 :: IO (RIP.FunPtr ((RIP.Ptr HsBindgen.Runtime.LibC.Word32) -> (RIP.Ptr HsBindgen.Runtime.LibC.Word32) -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> IO Pixman_bool_t))
+hs_bindgen_eb9eaee5217bd7e7 :: IO (RIP.FunPtr (RIP.Ptr HsBindgen.Runtime.LibC.Word32 -> RIP.Ptr HsBindgen.Runtime.LibC.Word32 -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> IO Pixman_bool_t))
 hs_bindgen_eb9eaee5217bd7e7 =
   RIP.fromFFIType hs_bindgen_eb9eaee5217bd7e7_base
 
@@ -4236,7 +4236,7 @@ hs_bindgen_eb9eaee5217bd7e7 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_blt :: RIP.FunPtr ((RIP.Ptr HsBindgen.Runtime.LibC.Word32) -> (RIP.Ptr HsBindgen.Runtime.LibC.Word32) -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> IO Pixman_bool_t)
+pixman_blt :: RIP.FunPtr (RIP.Ptr HsBindgen.Runtime.LibC.Word32 -> RIP.Ptr HsBindgen.Runtime.LibC.Word32 -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> IO Pixman_bool_t)
 pixman_blt =
   RIP.unsafePerformIO hs_bindgen_eb9eaee5217bd7e7
 
@@ -4245,7 +4245,7 @@ foreign import ccall unsafe "hs_bindgen_3f935b8493090451" hs_bindgen_3f935b84930
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_fill@
-hs_bindgen_3f935b8493090451 :: IO (RIP.FunPtr ((RIP.Ptr HsBindgen.Runtime.LibC.Word32) -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> HsBindgen.Runtime.LibC.Word32 -> IO Pixman_bool_t))
+hs_bindgen_3f935b8493090451 :: IO (RIP.FunPtr (RIP.Ptr HsBindgen.Runtime.LibC.Word32 -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> HsBindgen.Runtime.LibC.Word32 -> IO Pixman_bool_t))
 hs_bindgen_3f935b8493090451 =
   RIP.fromFFIType hs_bindgen_3f935b8493090451_base
 
@@ -4256,7 +4256,7 @@ hs_bindgen_3f935b8493090451 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_fill :: RIP.FunPtr ((RIP.Ptr HsBindgen.Runtime.LibC.Word32) -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> HsBindgen.Runtime.LibC.Word32 -> IO Pixman_bool_t)
+pixman_fill :: RIP.FunPtr (RIP.Ptr HsBindgen.Runtime.LibC.Word32 -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> HsBindgen.Runtime.LibC.Word32 -> IO Pixman_bool_t)
 pixman_fill =
   RIP.unsafePerformIO hs_bindgen_3f935b8493090451
 
@@ -4345,7 +4345,7 @@ foreign import ccall unsafe "hs_bindgen_896c4fa920f1158f" hs_bindgen_896c4fa920f
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_create_solid_fill@
-hs_bindgen_896c4fa920f1158f :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_color_t) -> IO (RIP.Ptr Pixman_image_t)))
+hs_bindgen_896c4fa920f1158f :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_color_t -> IO (RIP.Ptr Pixman_image_t)))
 hs_bindgen_896c4fa920f1158f =
   RIP.fromFFIType hs_bindgen_896c4fa920f1158f_base
 
@@ -4356,7 +4356,7 @@ hs_bindgen_896c4fa920f1158f =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_create_solid_fill :: RIP.FunPtr ((PtrConst.PtrConst Pixman_color_t) -> IO (RIP.Ptr Pixman_image_t))
+pixman_image_create_solid_fill :: RIP.FunPtr (PtrConst.PtrConst Pixman_color_t -> IO (RIP.Ptr Pixman_image_t))
 pixman_image_create_solid_fill =
   RIP.unsafePerformIO hs_bindgen_896c4fa920f1158f
 
@@ -4365,7 +4365,7 @@ foreign import ccall unsafe "hs_bindgen_41e35ea8cfc8b4c2" hs_bindgen_41e35ea8cfc
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_create_linear_gradient@
-hs_bindgen_41e35ea8cfc8b4c2 :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_point_fixed_t) -> (PtrConst.PtrConst Pixman_point_fixed_t) -> (PtrConst.PtrConst Pixman_gradient_stop_t) -> RIP.CInt -> IO (RIP.Ptr Pixman_image_t)))
+hs_bindgen_41e35ea8cfc8b4c2 :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_point_fixed_t -> PtrConst.PtrConst Pixman_point_fixed_t -> PtrConst.PtrConst Pixman_gradient_stop_t -> RIP.CInt -> IO (RIP.Ptr Pixman_image_t)))
 hs_bindgen_41e35ea8cfc8b4c2 =
   RIP.fromFFIType hs_bindgen_41e35ea8cfc8b4c2_base
 
@@ -4376,7 +4376,7 @@ hs_bindgen_41e35ea8cfc8b4c2 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_create_linear_gradient :: RIP.FunPtr ((PtrConst.PtrConst Pixman_point_fixed_t) -> (PtrConst.PtrConst Pixman_point_fixed_t) -> (PtrConst.PtrConst Pixman_gradient_stop_t) -> RIP.CInt -> IO (RIP.Ptr Pixman_image_t))
+pixman_image_create_linear_gradient :: RIP.FunPtr (PtrConst.PtrConst Pixman_point_fixed_t -> PtrConst.PtrConst Pixman_point_fixed_t -> PtrConst.PtrConst Pixman_gradient_stop_t -> RIP.CInt -> IO (RIP.Ptr Pixman_image_t))
 pixman_image_create_linear_gradient =
   RIP.unsafePerformIO hs_bindgen_41e35ea8cfc8b4c2
 
@@ -4385,7 +4385,7 @@ foreign import ccall unsafe "hs_bindgen_02c14a226d367f59" hs_bindgen_02c14a226d3
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_create_radial_gradient@
-hs_bindgen_02c14a226d367f59 :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_point_fixed_t) -> (PtrConst.PtrConst Pixman_point_fixed_t) -> Pixman_fixed_t -> Pixman_fixed_t -> (PtrConst.PtrConst Pixman_gradient_stop_t) -> RIP.CInt -> IO (RIP.Ptr Pixman_image_t)))
+hs_bindgen_02c14a226d367f59 :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_point_fixed_t -> PtrConst.PtrConst Pixman_point_fixed_t -> Pixman_fixed_t -> Pixman_fixed_t -> PtrConst.PtrConst Pixman_gradient_stop_t -> RIP.CInt -> IO (RIP.Ptr Pixman_image_t)))
 hs_bindgen_02c14a226d367f59 =
   RIP.fromFFIType hs_bindgen_02c14a226d367f59_base
 
@@ -4396,7 +4396,7 @@ hs_bindgen_02c14a226d367f59 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_create_radial_gradient :: RIP.FunPtr ((PtrConst.PtrConst Pixman_point_fixed_t) -> (PtrConst.PtrConst Pixman_point_fixed_t) -> Pixman_fixed_t -> Pixman_fixed_t -> (PtrConst.PtrConst Pixman_gradient_stop_t) -> RIP.CInt -> IO (RIP.Ptr Pixman_image_t))
+pixman_image_create_radial_gradient :: RIP.FunPtr (PtrConst.PtrConst Pixman_point_fixed_t -> PtrConst.PtrConst Pixman_point_fixed_t -> Pixman_fixed_t -> Pixman_fixed_t -> PtrConst.PtrConst Pixman_gradient_stop_t -> RIP.CInt -> IO (RIP.Ptr Pixman_image_t))
 pixman_image_create_radial_gradient =
   RIP.unsafePerformIO hs_bindgen_02c14a226d367f59
 
@@ -4405,7 +4405,7 @@ foreign import ccall unsafe "hs_bindgen_cab763e232b53fe6" hs_bindgen_cab763e232b
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_create_conical_gradient@
-hs_bindgen_cab763e232b53fe6 :: IO (RIP.FunPtr ((PtrConst.PtrConst Pixman_point_fixed_t) -> Pixman_fixed_t -> (PtrConst.PtrConst Pixman_gradient_stop_t) -> RIP.CInt -> IO (RIP.Ptr Pixman_image_t)))
+hs_bindgen_cab763e232b53fe6 :: IO (RIP.FunPtr (PtrConst.PtrConst Pixman_point_fixed_t -> Pixman_fixed_t -> PtrConst.PtrConst Pixman_gradient_stop_t -> RIP.CInt -> IO (RIP.Ptr Pixman_image_t)))
 hs_bindgen_cab763e232b53fe6 =
   RIP.fromFFIType hs_bindgen_cab763e232b53fe6_base
 
@@ -4416,7 +4416,7 @@ hs_bindgen_cab763e232b53fe6 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_create_conical_gradient :: RIP.FunPtr ((PtrConst.PtrConst Pixman_point_fixed_t) -> Pixman_fixed_t -> (PtrConst.PtrConst Pixman_gradient_stop_t) -> RIP.CInt -> IO (RIP.Ptr Pixman_image_t))
+pixman_image_create_conical_gradient :: RIP.FunPtr (PtrConst.PtrConst Pixman_point_fixed_t -> Pixman_fixed_t -> PtrConst.PtrConst Pixman_gradient_stop_t -> RIP.CInt -> IO (RIP.Ptr Pixman_image_t))
 pixman_image_create_conical_gradient =
   RIP.unsafePerformIO hs_bindgen_cab763e232b53fe6
 
@@ -4425,7 +4425,7 @@ foreign import ccall unsafe "hs_bindgen_5970b93008fad135" hs_bindgen_5970b93008f
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_create_bits@
-hs_bindgen_5970b93008fad135 :: IO (RIP.FunPtr (Pixman_format_code_t -> RIP.CInt -> RIP.CInt -> (RIP.Ptr HsBindgen.Runtime.LibC.Word32) -> RIP.CInt -> IO (RIP.Ptr Pixman_image_t)))
+hs_bindgen_5970b93008fad135 :: IO (RIP.FunPtr (Pixman_format_code_t -> RIP.CInt -> RIP.CInt -> RIP.Ptr HsBindgen.Runtime.LibC.Word32 -> RIP.CInt -> IO (RIP.Ptr Pixman_image_t)))
 hs_bindgen_5970b93008fad135 =
   RIP.fromFFIType hs_bindgen_5970b93008fad135_base
 
@@ -4436,7 +4436,7 @@ hs_bindgen_5970b93008fad135 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_create_bits :: RIP.FunPtr (Pixman_format_code_t -> RIP.CInt -> RIP.CInt -> (RIP.Ptr HsBindgen.Runtime.LibC.Word32) -> RIP.CInt -> IO (RIP.Ptr Pixman_image_t))
+pixman_image_create_bits :: RIP.FunPtr (Pixman_format_code_t -> RIP.CInt -> RIP.CInt -> RIP.Ptr HsBindgen.Runtime.LibC.Word32 -> RIP.CInt -> IO (RIP.Ptr Pixman_image_t))
 pixman_image_create_bits =
   RIP.unsafePerformIO hs_bindgen_5970b93008fad135
 
@@ -4445,7 +4445,7 @@ foreign import ccall unsafe "hs_bindgen_e9ef3b7a9a46c54c" hs_bindgen_e9ef3b7a9a4
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_create_bits_no_clear@
-hs_bindgen_e9ef3b7a9a46c54c :: IO (RIP.FunPtr (Pixman_format_code_t -> RIP.CInt -> RIP.CInt -> (RIP.Ptr HsBindgen.Runtime.LibC.Word32) -> RIP.CInt -> IO (RIP.Ptr Pixman_image_t)))
+hs_bindgen_e9ef3b7a9a46c54c :: IO (RIP.FunPtr (Pixman_format_code_t -> RIP.CInt -> RIP.CInt -> RIP.Ptr HsBindgen.Runtime.LibC.Word32 -> RIP.CInt -> IO (RIP.Ptr Pixman_image_t)))
 hs_bindgen_e9ef3b7a9a46c54c =
   RIP.fromFFIType hs_bindgen_e9ef3b7a9a46c54c_base
 
@@ -4456,7 +4456,7 @@ hs_bindgen_e9ef3b7a9a46c54c =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_create_bits_no_clear :: RIP.FunPtr (Pixman_format_code_t -> RIP.CInt -> RIP.CInt -> (RIP.Ptr HsBindgen.Runtime.LibC.Word32) -> RIP.CInt -> IO (RIP.Ptr Pixman_image_t))
+pixman_image_create_bits_no_clear :: RIP.FunPtr (Pixman_format_code_t -> RIP.CInt -> RIP.CInt -> RIP.Ptr HsBindgen.Runtime.LibC.Word32 -> RIP.CInt -> IO (RIP.Ptr Pixman_image_t))
 pixman_image_create_bits_no_clear =
   RIP.unsafePerformIO hs_bindgen_e9ef3b7a9a46c54c
 
@@ -4465,7 +4465,7 @@ foreign import ccall unsafe "hs_bindgen_2600bafb90ac5273" hs_bindgen_2600bafb90a
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_ref@
-hs_bindgen_2600bafb90ac5273 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> IO (RIP.Ptr Pixman_image_t)))
+hs_bindgen_2600bafb90ac5273 :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> IO (RIP.Ptr Pixman_image_t)))
 hs_bindgen_2600bafb90ac5273 =
   RIP.fromFFIType hs_bindgen_2600bafb90ac5273_base
 
@@ -4476,7 +4476,7 @@ hs_bindgen_2600bafb90ac5273 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_ref :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> IO (RIP.Ptr Pixman_image_t))
+pixman_image_ref :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> IO (RIP.Ptr Pixman_image_t))
 pixman_image_ref =
   RIP.unsafePerformIO hs_bindgen_2600bafb90ac5273
 
@@ -4485,7 +4485,7 @@ foreign import ccall unsafe "hs_bindgen_315b1b86f75b2497" hs_bindgen_315b1b86f75
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_unref@
-hs_bindgen_315b1b86f75b2497 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> IO Pixman_bool_t))
+hs_bindgen_315b1b86f75b2497 :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> IO Pixman_bool_t))
 hs_bindgen_315b1b86f75b2497 =
   RIP.fromFFIType hs_bindgen_315b1b86f75b2497_base
 
@@ -4496,7 +4496,7 @@ hs_bindgen_315b1b86f75b2497 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_unref :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> IO Pixman_bool_t)
+pixman_image_unref :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> IO Pixman_bool_t)
 pixman_image_unref =
   RIP.unsafePerformIO hs_bindgen_315b1b86f75b2497
 
@@ -4505,7 +4505,7 @@ foreign import ccall unsafe "hs_bindgen_cd62f4d52f774b29" hs_bindgen_cd62f4d52f7
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_set_destroy_function@
-hs_bindgen_cd62f4d52f774b29 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> Pixman_image_destroy_func_t -> (RIP.Ptr RIP.Void) -> IO ()))
+hs_bindgen_cd62f4d52f774b29 :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> Pixman_image_destroy_func_t -> RIP.Ptr RIP.Void -> IO ()))
 hs_bindgen_cd62f4d52f774b29 =
   RIP.fromFFIType hs_bindgen_cd62f4d52f774b29_base
 
@@ -4516,7 +4516,7 @@ hs_bindgen_cd62f4d52f774b29 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_set_destroy_function :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> Pixman_image_destroy_func_t -> (RIP.Ptr RIP.Void) -> IO ())
+pixman_image_set_destroy_function :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> Pixman_image_destroy_func_t -> RIP.Ptr RIP.Void -> IO ())
 pixman_image_set_destroy_function =
   RIP.unsafePerformIO hs_bindgen_cd62f4d52f774b29
 
@@ -4525,7 +4525,7 @@ foreign import ccall unsafe "hs_bindgen_7a55663709020b47" hs_bindgen_7a556637090
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_get_destroy_data@
-hs_bindgen_7a55663709020b47 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> IO (RIP.Ptr RIP.Void)))
+hs_bindgen_7a55663709020b47 :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> IO (RIP.Ptr RIP.Void)))
 hs_bindgen_7a55663709020b47 =
   RIP.fromFFIType hs_bindgen_7a55663709020b47_base
 
@@ -4536,7 +4536,7 @@ hs_bindgen_7a55663709020b47 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_get_destroy_data :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> IO (RIP.Ptr RIP.Void))
+pixman_image_get_destroy_data :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> IO (RIP.Ptr RIP.Void))
 pixman_image_get_destroy_data =
   RIP.unsafePerformIO hs_bindgen_7a55663709020b47
 
@@ -4545,7 +4545,7 @@ foreign import ccall unsafe "hs_bindgen_baa365dccc87ba8d" hs_bindgen_baa365dccc8
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_set_clip_region@
-hs_bindgen_baa365dccc87ba8d :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> (PtrConst.PtrConst Pixman_region16_t) -> IO Pixman_bool_t))
+hs_bindgen_baa365dccc87ba8d :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> PtrConst.PtrConst Pixman_region16_t -> IO Pixman_bool_t))
 hs_bindgen_baa365dccc87ba8d =
   RIP.fromFFIType hs_bindgen_baa365dccc87ba8d_base
 
@@ -4556,7 +4556,7 @@ hs_bindgen_baa365dccc87ba8d =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_set_clip_region :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> (PtrConst.PtrConst Pixman_region16_t) -> IO Pixman_bool_t)
+pixman_image_set_clip_region :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> PtrConst.PtrConst Pixman_region16_t -> IO Pixman_bool_t)
 pixman_image_set_clip_region =
   RIP.unsafePerformIO hs_bindgen_baa365dccc87ba8d
 
@@ -4565,7 +4565,7 @@ foreign import ccall unsafe "hs_bindgen_89088b859f2d3556" hs_bindgen_89088b859f2
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_set_clip_region32@
-hs_bindgen_89088b859f2d3556 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> (PtrConst.PtrConst Pixman_region32_t) -> IO Pixman_bool_t))
+hs_bindgen_89088b859f2d3556 :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> PtrConst.PtrConst Pixman_region32_t -> IO Pixman_bool_t))
 hs_bindgen_89088b859f2d3556 =
   RIP.fromFFIType hs_bindgen_89088b859f2d3556_base
 
@@ -4576,7 +4576,7 @@ hs_bindgen_89088b859f2d3556 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_set_clip_region32 :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> (PtrConst.PtrConst Pixman_region32_t) -> IO Pixman_bool_t)
+pixman_image_set_clip_region32 :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> PtrConst.PtrConst Pixman_region32_t -> IO Pixman_bool_t)
 pixman_image_set_clip_region32 =
   RIP.unsafePerformIO hs_bindgen_89088b859f2d3556
 
@@ -4585,7 +4585,7 @@ foreign import ccall unsafe "hs_bindgen_dad7c11b577b5101" hs_bindgen_dad7c11b577
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_set_clip_region64f@
-hs_bindgen_dad7c11b577b5101 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> IO Pixman_bool_t))
+hs_bindgen_dad7c11b577b5101 :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> PtrConst.PtrConst Pixman_region64f_t -> IO Pixman_bool_t))
 hs_bindgen_dad7c11b577b5101 =
   RIP.fromFFIType hs_bindgen_dad7c11b577b5101_base
 
@@ -4596,7 +4596,7 @@ hs_bindgen_dad7c11b577b5101 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_set_clip_region64f :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> (PtrConst.PtrConst Pixman_region64f_t) -> IO Pixman_bool_t)
+pixman_image_set_clip_region64f :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> PtrConst.PtrConst Pixman_region64f_t -> IO Pixman_bool_t)
 pixman_image_set_clip_region64f =
   RIP.unsafePerformIO hs_bindgen_dad7c11b577b5101
 
@@ -4605,7 +4605,7 @@ foreign import ccall unsafe "hs_bindgen_0e204b36401cec56" hs_bindgen_0e204b36401
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_set_has_client_clip@
-hs_bindgen_0e204b36401cec56 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> Pixman_bool_t -> IO ()))
+hs_bindgen_0e204b36401cec56 :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> Pixman_bool_t -> IO ()))
 hs_bindgen_0e204b36401cec56 =
   RIP.fromFFIType hs_bindgen_0e204b36401cec56_base
 
@@ -4616,7 +4616,7 @@ hs_bindgen_0e204b36401cec56 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_set_has_client_clip :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> Pixman_bool_t -> IO ())
+pixman_image_set_has_client_clip :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> Pixman_bool_t -> IO ())
 pixman_image_set_has_client_clip =
   RIP.unsafePerformIO hs_bindgen_0e204b36401cec56
 
@@ -4625,7 +4625,7 @@ foreign import ccall unsafe "hs_bindgen_4dde608de6dbe7e0" hs_bindgen_4dde608de6d
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_set_transform@
-hs_bindgen_4dde608de6dbe7e0 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> (PtrConst.PtrConst Pixman_transform_t) -> IO Pixman_bool_t))
+hs_bindgen_4dde608de6dbe7e0 :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> PtrConst.PtrConst Pixman_transform_t -> IO Pixman_bool_t))
 hs_bindgen_4dde608de6dbe7e0 =
   RIP.fromFFIType hs_bindgen_4dde608de6dbe7e0_base
 
@@ -4636,7 +4636,7 @@ hs_bindgen_4dde608de6dbe7e0 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_set_transform :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> (PtrConst.PtrConst Pixman_transform_t) -> IO Pixman_bool_t)
+pixman_image_set_transform :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> PtrConst.PtrConst Pixman_transform_t -> IO Pixman_bool_t)
 pixman_image_set_transform =
   RIP.unsafePerformIO hs_bindgen_4dde608de6dbe7e0
 
@@ -4645,7 +4645,7 @@ foreign import ccall unsafe "hs_bindgen_fffebeb6316e6591" hs_bindgen_fffebeb6316
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_set_repeat@
-hs_bindgen_fffebeb6316e6591 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> Pixman_repeat_t -> IO ()))
+hs_bindgen_fffebeb6316e6591 :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> Pixman_repeat_t -> IO ()))
 hs_bindgen_fffebeb6316e6591 =
   RIP.fromFFIType hs_bindgen_fffebeb6316e6591_base
 
@@ -4656,7 +4656,7 @@ hs_bindgen_fffebeb6316e6591 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_set_repeat :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> Pixman_repeat_t -> IO ())
+pixman_image_set_repeat :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> Pixman_repeat_t -> IO ())
 pixman_image_set_repeat =
   RIP.unsafePerformIO hs_bindgen_fffebeb6316e6591
 
@@ -4665,7 +4665,7 @@ foreign import ccall unsafe "hs_bindgen_5fdc8f03bab067aa" hs_bindgen_5fdc8f03bab
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_set_dither@
-hs_bindgen_5fdc8f03bab067aa :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> Pixman_dither_t -> IO ()))
+hs_bindgen_5fdc8f03bab067aa :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> Pixman_dither_t -> IO ()))
 hs_bindgen_5fdc8f03bab067aa =
   RIP.fromFFIType hs_bindgen_5fdc8f03bab067aa_base
 
@@ -4676,7 +4676,7 @@ hs_bindgen_5fdc8f03bab067aa =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_set_dither :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> Pixman_dither_t -> IO ())
+pixman_image_set_dither :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> Pixman_dither_t -> IO ())
 pixman_image_set_dither =
   RIP.unsafePerformIO hs_bindgen_5fdc8f03bab067aa
 
@@ -4685,7 +4685,7 @@ foreign import ccall unsafe "hs_bindgen_ab6a8cf31d5cc994" hs_bindgen_ab6a8cf31d5
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_set_dither_offset@
-hs_bindgen_ab6a8cf31d5cc994 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> RIP.CInt -> RIP.CInt -> IO ()))
+hs_bindgen_ab6a8cf31d5cc994 :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> RIP.CInt -> RIP.CInt -> IO ()))
 hs_bindgen_ab6a8cf31d5cc994 =
   RIP.fromFFIType hs_bindgen_ab6a8cf31d5cc994_base
 
@@ -4696,7 +4696,7 @@ hs_bindgen_ab6a8cf31d5cc994 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_set_dither_offset :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> RIP.CInt -> RIP.CInt -> IO ())
+pixman_image_set_dither_offset :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> RIP.CInt -> RIP.CInt -> IO ())
 pixman_image_set_dither_offset =
   RIP.unsafePerformIO hs_bindgen_ab6a8cf31d5cc994
 
@@ -4705,7 +4705,7 @@ foreign import ccall unsafe "hs_bindgen_01080516b0861277" hs_bindgen_01080516b08
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_set_filter@
-hs_bindgen_01080516b0861277 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> Pixman_filter_t -> (PtrConst.PtrConst Pixman_fixed_t) -> RIP.CInt -> IO Pixman_bool_t))
+hs_bindgen_01080516b0861277 :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> Pixman_filter_t -> PtrConst.PtrConst Pixman_fixed_t -> RIP.CInt -> IO Pixman_bool_t))
 hs_bindgen_01080516b0861277 =
   RIP.fromFFIType hs_bindgen_01080516b0861277_base
 
@@ -4716,7 +4716,7 @@ hs_bindgen_01080516b0861277 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_set_filter :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> Pixman_filter_t -> (PtrConst.PtrConst Pixman_fixed_t) -> RIP.CInt -> IO Pixman_bool_t)
+pixman_image_set_filter :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> Pixman_filter_t -> PtrConst.PtrConst Pixman_fixed_t -> RIP.CInt -> IO Pixman_bool_t)
 pixman_image_set_filter =
   RIP.unsafePerformIO hs_bindgen_01080516b0861277
 
@@ -4725,7 +4725,7 @@ foreign import ccall unsafe "hs_bindgen_cdd644b3dea81799" hs_bindgen_cdd644b3dea
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_set_source_clipping@
-hs_bindgen_cdd644b3dea81799 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> Pixman_bool_t -> IO ()))
+hs_bindgen_cdd644b3dea81799 :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> Pixman_bool_t -> IO ()))
 hs_bindgen_cdd644b3dea81799 =
   RIP.fromFFIType hs_bindgen_cdd644b3dea81799_base
 
@@ -4736,7 +4736,7 @@ hs_bindgen_cdd644b3dea81799 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_set_source_clipping :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> Pixman_bool_t -> IO ())
+pixman_image_set_source_clipping :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> Pixman_bool_t -> IO ())
 pixman_image_set_source_clipping =
   RIP.unsafePerformIO hs_bindgen_cdd644b3dea81799
 
@@ -4745,7 +4745,7 @@ foreign import ccall unsafe "hs_bindgen_4bcb50884e7aeb61" hs_bindgen_4bcb50884e7
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_set_alpha_map@
-hs_bindgen_4bcb50884e7aeb61 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_image_t) -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> IO ()))
+hs_bindgen_4bcb50884e7aeb61 :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_image_t -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> IO ()))
 hs_bindgen_4bcb50884e7aeb61 =
   RIP.fromFFIType hs_bindgen_4bcb50884e7aeb61_base
 
@@ -4756,7 +4756,7 @@ hs_bindgen_4bcb50884e7aeb61 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_set_alpha_map :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_image_t) -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> IO ())
+pixman_image_set_alpha_map :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_image_t -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> IO ())
 pixman_image_set_alpha_map =
   RIP.unsafePerformIO hs_bindgen_4bcb50884e7aeb61
 
@@ -4765,7 +4765,7 @@ foreign import ccall unsafe "hs_bindgen_939bf323693e03a5" hs_bindgen_939bf323693
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_set_component_alpha@
-hs_bindgen_939bf323693e03a5 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> Pixman_bool_t -> IO ()))
+hs_bindgen_939bf323693e03a5 :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> Pixman_bool_t -> IO ()))
 hs_bindgen_939bf323693e03a5 =
   RIP.fromFFIType hs_bindgen_939bf323693e03a5_base
 
@@ -4776,7 +4776,7 @@ hs_bindgen_939bf323693e03a5 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_set_component_alpha :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> Pixman_bool_t -> IO ())
+pixman_image_set_component_alpha :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> Pixman_bool_t -> IO ())
 pixman_image_set_component_alpha =
   RIP.unsafePerformIO hs_bindgen_939bf323693e03a5
 
@@ -4785,7 +4785,7 @@ foreign import ccall unsafe "hs_bindgen_cbcc9e40a5569020" hs_bindgen_cbcc9e40a55
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_get_component_alpha@
-hs_bindgen_cbcc9e40a5569020 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> IO Pixman_bool_t))
+hs_bindgen_cbcc9e40a5569020 :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> IO Pixman_bool_t))
 hs_bindgen_cbcc9e40a5569020 =
   RIP.fromFFIType hs_bindgen_cbcc9e40a5569020_base
 
@@ -4796,7 +4796,7 @@ hs_bindgen_cbcc9e40a5569020 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_get_component_alpha :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> IO Pixman_bool_t)
+pixman_image_get_component_alpha :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> IO Pixman_bool_t)
 pixman_image_get_component_alpha =
   RIP.unsafePerformIO hs_bindgen_cbcc9e40a5569020
 
@@ -4805,7 +4805,7 @@ foreign import ccall unsafe "hs_bindgen_a80a14864d3812fe" hs_bindgen_a80a14864d3
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_set_accessors@
-hs_bindgen_a80a14864d3812fe :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> Pixman_read_memory_func_t -> Pixman_write_memory_func_t -> IO ()))
+hs_bindgen_a80a14864d3812fe :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> Pixman_read_memory_func_t -> Pixman_write_memory_func_t -> IO ()))
 hs_bindgen_a80a14864d3812fe =
   RIP.fromFFIType hs_bindgen_a80a14864d3812fe_base
 
@@ -4816,7 +4816,7 @@ hs_bindgen_a80a14864d3812fe =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_set_accessors :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> Pixman_read_memory_func_t -> Pixman_write_memory_func_t -> IO ())
+pixman_image_set_accessors :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> Pixman_read_memory_func_t -> Pixman_write_memory_func_t -> IO ())
 pixman_image_set_accessors =
   RIP.unsafePerformIO hs_bindgen_a80a14864d3812fe
 
@@ -4825,7 +4825,7 @@ foreign import ccall unsafe "hs_bindgen_9117fdbd5718dfe2" hs_bindgen_9117fdbd571
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_set_indexed@
-hs_bindgen_9117fdbd5718dfe2 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> (PtrConst.PtrConst Pixman_indexed_t) -> IO ()))
+hs_bindgen_9117fdbd5718dfe2 :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> PtrConst.PtrConst Pixman_indexed_t -> IO ()))
 hs_bindgen_9117fdbd5718dfe2 =
   RIP.fromFFIType hs_bindgen_9117fdbd5718dfe2_base
 
@@ -4836,7 +4836,7 @@ hs_bindgen_9117fdbd5718dfe2 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_set_indexed :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> (PtrConst.PtrConst Pixman_indexed_t) -> IO ())
+pixman_image_set_indexed :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> PtrConst.PtrConst Pixman_indexed_t -> IO ())
 pixman_image_set_indexed =
   RIP.unsafePerformIO hs_bindgen_9117fdbd5718dfe2
 
@@ -4845,7 +4845,7 @@ foreign import ccall unsafe "hs_bindgen_f4310415cbb703a8" hs_bindgen_f4310415cbb
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_get_data@
-hs_bindgen_f4310415cbb703a8 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> IO (RIP.Ptr HsBindgen.Runtime.LibC.Word32)))
+hs_bindgen_f4310415cbb703a8 :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> IO (RIP.Ptr HsBindgen.Runtime.LibC.Word32)))
 hs_bindgen_f4310415cbb703a8 =
   RIP.fromFFIType hs_bindgen_f4310415cbb703a8_base
 
@@ -4856,7 +4856,7 @@ hs_bindgen_f4310415cbb703a8 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_get_data :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> IO (RIP.Ptr HsBindgen.Runtime.LibC.Word32))
+pixman_image_get_data :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> IO (RIP.Ptr HsBindgen.Runtime.LibC.Word32))
 pixman_image_get_data =
   RIP.unsafePerformIO hs_bindgen_f4310415cbb703a8
 
@@ -4865,7 +4865,7 @@ foreign import ccall unsafe "hs_bindgen_70a0c04de349d2f0" hs_bindgen_70a0c04de34
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_get_width@
-hs_bindgen_70a0c04de349d2f0 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> IO RIP.CInt))
+hs_bindgen_70a0c04de349d2f0 :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> IO RIP.CInt))
 hs_bindgen_70a0c04de349d2f0 =
   RIP.fromFFIType hs_bindgen_70a0c04de349d2f0_base
 
@@ -4876,7 +4876,7 @@ hs_bindgen_70a0c04de349d2f0 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_get_width :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> IO RIP.CInt)
+pixman_image_get_width :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> IO RIP.CInt)
 pixman_image_get_width =
   RIP.unsafePerformIO hs_bindgen_70a0c04de349d2f0
 
@@ -4885,7 +4885,7 @@ foreign import ccall unsafe "hs_bindgen_4d118f3f6ea70b29" hs_bindgen_4d118f3f6ea
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_get_height@
-hs_bindgen_4d118f3f6ea70b29 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> IO RIP.CInt))
+hs_bindgen_4d118f3f6ea70b29 :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> IO RIP.CInt))
 hs_bindgen_4d118f3f6ea70b29 =
   RIP.fromFFIType hs_bindgen_4d118f3f6ea70b29_base
 
@@ -4896,7 +4896,7 @@ hs_bindgen_4d118f3f6ea70b29 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_get_height :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> IO RIP.CInt)
+pixman_image_get_height :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> IO RIP.CInt)
 pixman_image_get_height =
   RIP.unsafePerformIO hs_bindgen_4d118f3f6ea70b29
 
@@ -4905,7 +4905,7 @@ foreign import ccall unsafe "hs_bindgen_2805635f0f8d7385" hs_bindgen_2805635f0f8
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_get_stride@
-hs_bindgen_2805635f0f8d7385 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> IO RIP.CInt))
+hs_bindgen_2805635f0f8d7385 :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> IO RIP.CInt))
 hs_bindgen_2805635f0f8d7385 =
   RIP.fromFFIType hs_bindgen_2805635f0f8d7385_base
 
@@ -4916,7 +4916,7 @@ hs_bindgen_2805635f0f8d7385 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_get_stride :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> IO RIP.CInt)
+pixman_image_get_stride :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> IO RIP.CInt)
 pixman_image_get_stride =
   RIP.unsafePerformIO hs_bindgen_2805635f0f8d7385
 
@@ -4925,7 +4925,7 @@ foreign import ccall unsafe "hs_bindgen_db2f3e0fbbf35ccb" hs_bindgen_db2f3e0fbbf
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_get_depth@
-hs_bindgen_db2f3e0fbbf35ccb :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> IO RIP.CInt))
+hs_bindgen_db2f3e0fbbf35ccb :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> IO RIP.CInt))
 hs_bindgen_db2f3e0fbbf35ccb =
   RIP.fromFFIType hs_bindgen_db2f3e0fbbf35ccb_base
 
@@ -4936,7 +4936,7 @@ hs_bindgen_db2f3e0fbbf35ccb =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_get_depth :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> IO RIP.CInt)
+pixman_image_get_depth :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> IO RIP.CInt)
 pixman_image_get_depth =
   RIP.unsafePerformIO hs_bindgen_db2f3e0fbbf35ccb
 
@@ -4945,7 +4945,7 @@ foreign import ccall unsafe "hs_bindgen_762bb7ca6da283b4" hs_bindgen_762bb7ca6da
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_get_format@
-hs_bindgen_762bb7ca6da283b4 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> IO Pixman_format_code_t))
+hs_bindgen_762bb7ca6da283b4 :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> IO Pixman_format_code_t))
 hs_bindgen_762bb7ca6da283b4 =
   RIP.fromFFIType hs_bindgen_762bb7ca6da283b4_base
 
@@ -4956,7 +4956,7 @@ hs_bindgen_762bb7ca6da283b4 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_get_format :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> IO Pixman_format_code_t)
+pixman_image_get_format :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> IO Pixman_format_code_t)
 pixman_image_get_format =
   RIP.unsafePerformIO hs_bindgen_762bb7ca6da283b4
 
@@ -4965,7 +4965,7 @@ foreign import ccall unsafe "hs_bindgen_dc2b6ebb3a4164bd" hs_bindgen_dc2b6ebb3a4
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_filter_create_separable_convolution@
-hs_bindgen_dc2b6ebb3a4164bd :: IO (RIP.FunPtr ((RIP.Ptr RIP.CInt) -> Pixman_fixed_t -> Pixman_fixed_t -> Pixman_kernel_t -> Pixman_kernel_t -> Pixman_kernel_t -> Pixman_kernel_t -> RIP.CInt -> RIP.CInt -> IO (RIP.Ptr Pixman_fixed_t)))
+hs_bindgen_dc2b6ebb3a4164bd :: IO (RIP.FunPtr (RIP.Ptr RIP.CInt -> Pixman_fixed_t -> Pixman_fixed_t -> Pixman_kernel_t -> Pixman_kernel_t -> Pixman_kernel_t -> Pixman_kernel_t -> RIP.CInt -> RIP.CInt -> IO (RIP.Ptr Pixman_fixed_t)))
 hs_bindgen_dc2b6ebb3a4164bd =
   RIP.fromFFIType hs_bindgen_dc2b6ebb3a4164bd_base
 
@@ -4976,7 +4976,7 @@ hs_bindgen_dc2b6ebb3a4164bd =
 
     __exported by:__ @pixman.h@
 -}
-pixman_filter_create_separable_convolution :: RIP.FunPtr ((RIP.Ptr RIP.CInt) -> Pixman_fixed_t -> Pixman_fixed_t -> Pixman_kernel_t -> Pixman_kernel_t -> Pixman_kernel_t -> Pixman_kernel_t -> RIP.CInt -> RIP.CInt -> IO (RIP.Ptr Pixman_fixed_t))
+pixman_filter_create_separable_convolution :: RIP.FunPtr (RIP.Ptr RIP.CInt -> Pixman_fixed_t -> Pixman_fixed_t -> Pixman_kernel_t -> Pixman_kernel_t -> Pixman_kernel_t -> Pixman_kernel_t -> RIP.CInt -> RIP.CInt -> IO (RIP.Ptr Pixman_fixed_t))
 pixman_filter_create_separable_convolution =
   RIP.unsafePerformIO hs_bindgen_dc2b6ebb3a4164bd
 
@@ -4985,7 +4985,7 @@ foreign import ccall unsafe "hs_bindgen_275e3f578a606433" hs_bindgen_275e3f578a6
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_fill_rectangles@
-hs_bindgen_275e3f578a606433 :: IO (RIP.FunPtr (Pixman_op_t -> (RIP.Ptr Pixman_image_t) -> (PtrConst.PtrConst Pixman_color_t) -> RIP.CInt -> (PtrConst.PtrConst Pixman_rectangle16_t) -> IO Pixman_bool_t))
+hs_bindgen_275e3f578a606433 :: IO (RIP.FunPtr (Pixman_op_t -> RIP.Ptr Pixman_image_t -> PtrConst.PtrConst Pixman_color_t -> RIP.CInt -> PtrConst.PtrConst Pixman_rectangle16_t -> IO Pixman_bool_t))
 hs_bindgen_275e3f578a606433 =
   RIP.fromFFIType hs_bindgen_275e3f578a606433_base
 
@@ -4996,7 +4996,7 @@ hs_bindgen_275e3f578a606433 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_fill_rectangles :: RIP.FunPtr (Pixman_op_t -> (RIP.Ptr Pixman_image_t) -> (PtrConst.PtrConst Pixman_color_t) -> RIP.CInt -> (PtrConst.PtrConst Pixman_rectangle16_t) -> IO Pixman_bool_t)
+pixman_image_fill_rectangles :: RIP.FunPtr (Pixman_op_t -> RIP.Ptr Pixman_image_t -> PtrConst.PtrConst Pixman_color_t -> RIP.CInt -> PtrConst.PtrConst Pixman_rectangle16_t -> IO Pixman_bool_t)
 pixman_image_fill_rectangles =
   RIP.unsafePerformIO hs_bindgen_275e3f578a606433
 
@@ -5005,7 +5005,7 @@ foreign import ccall unsafe "hs_bindgen_32b44ce8b34fdf5b" hs_bindgen_32b44ce8b34
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_fill_boxes@
-hs_bindgen_32b44ce8b34fdf5b :: IO (RIP.FunPtr (Pixman_op_t -> (RIP.Ptr Pixman_image_t) -> (PtrConst.PtrConst Pixman_color_t) -> RIP.CInt -> (PtrConst.PtrConst Pixman_box32_t) -> IO Pixman_bool_t))
+hs_bindgen_32b44ce8b34fdf5b :: IO (RIP.FunPtr (Pixman_op_t -> RIP.Ptr Pixman_image_t -> PtrConst.PtrConst Pixman_color_t -> RIP.CInt -> PtrConst.PtrConst Pixman_box32_t -> IO Pixman_bool_t))
 hs_bindgen_32b44ce8b34fdf5b =
   RIP.fromFFIType hs_bindgen_32b44ce8b34fdf5b_base
 
@@ -5016,7 +5016,7 @@ hs_bindgen_32b44ce8b34fdf5b =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_fill_boxes :: RIP.FunPtr (Pixman_op_t -> (RIP.Ptr Pixman_image_t) -> (PtrConst.PtrConst Pixman_color_t) -> RIP.CInt -> (PtrConst.PtrConst Pixman_box32_t) -> IO Pixman_bool_t)
+pixman_image_fill_boxes :: RIP.FunPtr (Pixman_op_t -> RIP.Ptr Pixman_image_t -> PtrConst.PtrConst Pixman_color_t -> RIP.CInt -> PtrConst.PtrConst Pixman_box32_t -> IO Pixman_bool_t)
 pixman_image_fill_boxes =
   RIP.unsafePerformIO hs_bindgen_32b44ce8b34fdf5b
 
@@ -5025,7 +5025,7 @@ foreign import ccall unsafe "hs_bindgen_02fc82a9b3b3fb8c" hs_bindgen_02fc82a9b3b
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_compute_composite_region@
-hs_bindgen_02fc82a9b3b3fb8c :: IO (RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> (RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_image_t) -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Word16 -> HsBindgen.Runtime.LibC.Word16 -> IO Pixman_bool_t))
+hs_bindgen_02fc82a9b3b3fb8c :: IO (RIP.FunPtr (RIP.Ptr Pixman_region16_t -> RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_image_t -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Word16 -> HsBindgen.Runtime.LibC.Word16 -> IO Pixman_bool_t))
 hs_bindgen_02fc82a9b3b3fb8c =
   RIP.fromFFIType hs_bindgen_02fc82a9b3b3fb8c_base
 
@@ -5036,7 +5036,7 @@ hs_bindgen_02fc82a9b3b3fb8c =
 
     __exported by:__ @pixman.h@
 -}
-pixman_compute_composite_region :: RIP.FunPtr ((RIP.Ptr Pixman_region16_t) -> (RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_image_t) -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Word16 -> HsBindgen.Runtime.LibC.Word16 -> IO Pixman_bool_t)
+pixman_compute_composite_region :: RIP.FunPtr (RIP.Ptr Pixman_region16_t -> RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_image_t -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Word16 -> HsBindgen.Runtime.LibC.Word16 -> IO Pixman_bool_t)
 pixman_compute_composite_region =
   RIP.unsafePerformIO hs_bindgen_02fc82a9b3b3fb8c
 
@@ -5045,7 +5045,7 @@ foreign import ccall unsafe "hs_bindgen_8c85e4e145c73aef" hs_bindgen_8c85e4e145c
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_composite@
-hs_bindgen_8c85e4e145c73aef :: IO (RIP.FunPtr (Pixman_op_t -> (RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_image_t) -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Word16 -> HsBindgen.Runtime.LibC.Word16 -> IO ()))
+hs_bindgen_8c85e4e145c73aef :: IO (RIP.FunPtr (Pixman_op_t -> RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_image_t -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Word16 -> HsBindgen.Runtime.LibC.Word16 -> IO ()))
 hs_bindgen_8c85e4e145c73aef =
   RIP.fromFFIType hs_bindgen_8c85e4e145c73aef_base
 
@@ -5056,7 +5056,7 @@ hs_bindgen_8c85e4e145c73aef =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_composite :: RIP.FunPtr (Pixman_op_t -> (RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_image_t) -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Word16 -> HsBindgen.Runtime.LibC.Word16 -> IO ())
+pixman_image_composite :: RIP.FunPtr (Pixman_op_t -> RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_image_t -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Word16 -> HsBindgen.Runtime.LibC.Word16 -> IO ())
 pixman_image_composite =
   RIP.unsafePerformIO hs_bindgen_8c85e4e145c73aef
 
@@ -5065,7 +5065,7 @@ foreign import ccall unsafe "hs_bindgen_765c594673336ffe" hs_bindgen_765c5946733
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_composite32@
-hs_bindgen_765c594673336ffe :: IO (RIP.FunPtr (Pixman_op_t -> (RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_image_t) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_765c594673336ffe :: IO (RIP.FunPtr (Pixman_op_t -> RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_image_t -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
 hs_bindgen_765c594673336ffe =
   RIP.fromFFIType hs_bindgen_765c594673336ffe_base
 
@@ -5076,7 +5076,7 @@ hs_bindgen_765c594673336ffe =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_composite32 :: RIP.FunPtr (Pixman_op_t -> (RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_image_t) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+pixman_image_composite32 :: RIP.FunPtr (Pixman_op_t -> RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_image_t -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 pixman_image_composite32 =
   RIP.unsafePerformIO hs_bindgen_765c594673336ffe
 
@@ -5085,7 +5085,7 @@ foreign import ccall unsafe "hs_bindgen_08dc958796114fb1" hs_bindgen_08dc9587961
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_image_composite64f@
-hs_bindgen_08dc958796114fb1 :: IO (RIP.FunPtr (Pixman_op_t -> (RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_image_t) -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> IO ()))
+hs_bindgen_08dc958796114fb1 :: IO (RIP.FunPtr (Pixman_op_t -> RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_image_t -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> IO ()))
 hs_bindgen_08dc958796114fb1 =
   RIP.fromFFIType hs_bindgen_08dc958796114fb1_base
 
@@ -5096,7 +5096,7 @@ hs_bindgen_08dc958796114fb1 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_image_composite64f :: RIP.FunPtr (Pixman_op_t -> (RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_image_t) -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> IO ())
+pixman_image_composite64f :: RIP.FunPtr (Pixman_op_t -> RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_image_t -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> RIP.CDouble -> IO ())
 pixman_image_composite64f =
   RIP.unsafePerformIO hs_bindgen_08dc958796114fb1
 
@@ -5145,7 +5145,7 @@ foreign import ccall unsafe "hs_bindgen_d1c31531aa84559d" hs_bindgen_d1c31531aa8
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_glyph_cache_destroy@
-hs_bindgen_d1c31531aa84559d :: IO (RIP.FunPtr ((RIP.Ptr Pixman_glyph_cache_t) -> IO ()))
+hs_bindgen_d1c31531aa84559d :: IO (RIP.FunPtr (RIP.Ptr Pixman_glyph_cache_t -> IO ()))
 hs_bindgen_d1c31531aa84559d =
   RIP.fromFFIType hs_bindgen_d1c31531aa84559d_base
 
@@ -5156,7 +5156,7 @@ hs_bindgen_d1c31531aa84559d =
 
     __exported by:__ @pixman.h@
 -}
-pixman_glyph_cache_destroy :: RIP.FunPtr ((RIP.Ptr Pixman_glyph_cache_t) -> IO ())
+pixman_glyph_cache_destroy :: RIP.FunPtr (RIP.Ptr Pixman_glyph_cache_t -> IO ())
 pixman_glyph_cache_destroy =
   RIP.unsafePerformIO hs_bindgen_d1c31531aa84559d
 
@@ -5165,7 +5165,7 @@ foreign import ccall unsafe "hs_bindgen_9eb3ebad7cc5a30d" hs_bindgen_9eb3ebad7cc
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_glyph_cache_freeze@
-hs_bindgen_9eb3ebad7cc5a30d :: IO (RIP.FunPtr ((RIP.Ptr Pixman_glyph_cache_t) -> IO ()))
+hs_bindgen_9eb3ebad7cc5a30d :: IO (RIP.FunPtr (RIP.Ptr Pixman_glyph_cache_t -> IO ()))
 hs_bindgen_9eb3ebad7cc5a30d =
   RIP.fromFFIType hs_bindgen_9eb3ebad7cc5a30d_base
 
@@ -5176,7 +5176,7 @@ hs_bindgen_9eb3ebad7cc5a30d =
 
     __exported by:__ @pixman.h@
 -}
-pixman_glyph_cache_freeze :: RIP.FunPtr ((RIP.Ptr Pixman_glyph_cache_t) -> IO ())
+pixman_glyph_cache_freeze :: RIP.FunPtr (RIP.Ptr Pixman_glyph_cache_t -> IO ())
 pixman_glyph_cache_freeze =
   RIP.unsafePerformIO hs_bindgen_9eb3ebad7cc5a30d
 
@@ -5185,7 +5185,7 @@ foreign import ccall unsafe "hs_bindgen_466e3ba50a7e3ceb" hs_bindgen_466e3ba50a7
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_glyph_cache_thaw@
-hs_bindgen_466e3ba50a7e3ceb :: IO (RIP.FunPtr ((RIP.Ptr Pixman_glyph_cache_t) -> IO ()))
+hs_bindgen_466e3ba50a7e3ceb :: IO (RIP.FunPtr (RIP.Ptr Pixman_glyph_cache_t -> IO ()))
 hs_bindgen_466e3ba50a7e3ceb =
   RIP.fromFFIType hs_bindgen_466e3ba50a7e3ceb_base
 
@@ -5196,7 +5196,7 @@ hs_bindgen_466e3ba50a7e3ceb =
 
     __exported by:__ @pixman.h@
 -}
-pixman_glyph_cache_thaw :: RIP.FunPtr ((RIP.Ptr Pixman_glyph_cache_t) -> IO ())
+pixman_glyph_cache_thaw :: RIP.FunPtr (RIP.Ptr Pixman_glyph_cache_t -> IO ())
 pixman_glyph_cache_thaw =
   RIP.unsafePerformIO hs_bindgen_466e3ba50a7e3ceb
 
@@ -5205,7 +5205,7 @@ foreign import ccall unsafe "hs_bindgen_e53cc86aafa55344" hs_bindgen_e53cc86aafa
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_glyph_cache_lookup@
-hs_bindgen_e53cc86aafa55344 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_glyph_cache_t) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO (PtrConst.PtrConst RIP.Void)))
+hs_bindgen_e53cc86aafa55344 :: IO (RIP.FunPtr (RIP.Ptr Pixman_glyph_cache_t -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO (PtrConst.PtrConst RIP.Void)))
 hs_bindgen_e53cc86aafa55344 =
   RIP.fromFFIType hs_bindgen_e53cc86aafa55344_base
 
@@ -5216,7 +5216,7 @@ hs_bindgen_e53cc86aafa55344 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_glyph_cache_lookup :: RIP.FunPtr ((RIP.Ptr Pixman_glyph_cache_t) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO (PtrConst.PtrConst RIP.Void))
+pixman_glyph_cache_lookup :: RIP.FunPtr (RIP.Ptr Pixman_glyph_cache_t -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO (PtrConst.PtrConst RIP.Void))
 pixman_glyph_cache_lookup =
   RIP.unsafePerformIO hs_bindgen_e53cc86aafa55344
 
@@ -5225,7 +5225,7 @@ foreign import ccall unsafe "hs_bindgen_0532e10ed6bce111" hs_bindgen_0532e10ed6b
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_glyph_cache_insert@
-hs_bindgen_0532e10ed6bce111 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_glyph_cache_t) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.CInt -> RIP.CInt -> (RIP.Ptr Pixman_image_t) -> IO (PtrConst.PtrConst RIP.Void)))
+hs_bindgen_0532e10ed6bce111 :: IO (RIP.FunPtr (RIP.Ptr Pixman_glyph_cache_t -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.CInt -> RIP.CInt -> RIP.Ptr Pixman_image_t -> IO (PtrConst.PtrConst RIP.Void)))
 hs_bindgen_0532e10ed6bce111 =
   RIP.fromFFIType hs_bindgen_0532e10ed6bce111_base
 
@@ -5236,7 +5236,7 @@ hs_bindgen_0532e10ed6bce111 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_glyph_cache_insert :: RIP.FunPtr ((RIP.Ptr Pixman_glyph_cache_t) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> RIP.CInt -> RIP.CInt -> (RIP.Ptr Pixman_image_t) -> IO (PtrConst.PtrConst RIP.Void))
+pixman_glyph_cache_insert :: RIP.FunPtr (RIP.Ptr Pixman_glyph_cache_t -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> RIP.CInt -> RIP.CInt -> RIP.Ptr Pixman_image_t -> IO (PtrConst.PtrConst RIP.Void))
 pixman_glyph_cache_insert =
   RIP.unsafePerformIO hs_bindgen_0532e10ed6bce111
 
@@ -5245,7 +5245,7 @@ foreign import ccall unsafe "hs_bindgen_5f53f5434f1210fc" hs_bindgen_5f53f5434f1
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_glyph_cache_remove@
-hs_bindgen_5f53f5434f1210fc :: IO (RIP.FunPtr ((RIP.Ptr Pixman_glyph_cache_t) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+hs_bindgen_5f53f5434f1210fc :: IO (RIP.FunPtr (RIP.Ptr Pixman_glyph_cache_t -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 hs_bindgen_5f53f5434f1210fc =
   RIP.fromFFIType hs_bindgen_5f53f5434f1210fc_base
 
@@ -5256,7 +5256,7 @@ hs_bindgen_5f53f5434f1210fc =
 
     __exported by:__ @pixman.h@
 -}
-pixman_glyph_cache_remove :: RIP.FunPtr ((RIP.Ptr Pixman_glyph_cache_t) -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
+pixman_glyph_cache_remove :: RIP.FunPtr (RIP.Ptr Pixman_glyph_cache_t -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
 pixman_glyph_cache_remove =
   RIP.unsafePerformIO hs_bindgen_5f53f5434f1210fc
 
@@ -5265,7 +5265,7 @@ foreign import ccall unsafe "hs_bindgen_35df3cb5819eab2f" hs_bindgen_35df3cb5819
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_glyph_get_extents@
-hs_bindgen_35df3cb5819eab2f :: IO (RIP.FunPtr ((RIP.Ptr Pixman_glyph_cache_t) -> RIP.CInt -> (RIP.Ptr Pixman_glyph_t) -> (RIP.Ptr Pixman_box32_t) -> IO ()))
+hs_bindgen_35df3cb5819eab2f :: IO (RIP.FunPtr (RIP.Ptr Pixman_glyph_cache_t -> RIP.CInt -> RIP.Ptr Pixman_glyph_t -> RIP.Ptr Pixman_box32_t -> IO ()))
 hs_bindgen_35df3cb5819eab2f =
   RIP.fromFFIType hs_bindgen_35df3cb5819eab2f_base
 
@@ -5276,7 +5276,7 @@ hs_bindgen_35df3cb5819eab2f =
 
     __exported by:__ @pixman.h@
 -}
-pixman_glyph_get_extents :: RIP.FunPtr ((RIP.Ptr Pixman_glyph_cache_t) -> RIP.CInt -> (RIP.Ptr Pixman_glyph_t) -> (RIP.Ptr Pixman_box32_t) -> IO ())
+pixman_glyph_get_extents :: RIP.FunPtr (RIP.Ptr Pixman_glyph_cache_t -> RIP.CInt -> RIP.Ptr Pixman_glyph_t -> RIP.Ptr Pixman_box32_t -> IO ())
 pixman_glyph_get_extents =
   RIP.unsafePerformIO hs_bindgen_35df3cb5819eab2f
 
@@ -5285,7 +5285,7 @@ foreign import ccall unsafe "hs_bindgen_d433f443bdad60c1" hs_bindgen_d433f443bda
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_glyph_get_mask_format@
-hs_bindgen_d433f443bdad60c1 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_glyph_cache_t) -> RIP.CInt -> (PtrConst.PtrConst Pixman_glyph_t) -> IO Pixman_format_code_t))
+hs_bindgen_d433f443bdad60c1 :: IO (RIP.FunPtr (RIP.Ptr Pixman_glyph_cache_t -> RIP.CInt -> PtrConst.PtrConst Pixman_glyph_t -> IO Pixman_format_code_t))
 hs_bindgen_d433f443bdad60c1 =
   RIP.fromFFIType hs_bindgen_d433f443bdad60c1_base
 
@@ -5296,7 +5296,7 @@ hs_bindgen_d433f443bdad60c1 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_glyph_get_mask_format :: RIP.FunPtr ((RIP.Ptr Pixman_glyph_cache_t) -> RIP.CInt -> (PtrConst.PtrConst Pixman_glyph_t) -> IO Pixman_format_code_t)
+pixman_glyph_get_mask_format :: RIP.FunPtr (RIP.Ptr Pixman_glyph_cache_t -> RIP.CInt -> PtrConst.PtrConst Pixman_glyph_t -> IO Pixman_format_code_t)
 pixman_glyph_get_mask_format =
   RIP.unsafePerformIO hs_bindgen_d433f443bdad60c1
 
@@ -5305,7 +5305,7 @@ foreign import ccall unsafe "hs_bindgen_75079933c2778d71" hs_bindgen_75079933c27
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_composite_glyphs@
-hs_bindgen_75079933c2778d71 :: IO (RIP.FunPtr (Pixman_op_t -> (RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_image_t) -> Pixman_format_code_t -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> (RIP.Ptr Pixman_glyph_cache_t) -> RIP.CInt -> (PtrConst.PtrConst Pixman_glyph_t) -> IO ()))
+hs_bindgen_75079933c2778d71 :: IO (RIP.FunPtr (Pixman_op_t -> RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_image_t -> Pixman_format_code_t -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> RIP.Ptr Pixman_glyph_cache_t -> RIP.CInt -> PtrConst.PtrConst Pixman_glyph_t -> IO ()))
 hs_bindgen_75079933c2778d71 =
   RIP.fromFFIType hs_bindgen_75079933c2778d71_base
 
@@ -5316,7 +5316,7 @@ hs_bindgen_75079933c2778d71 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_composite_glyphs :: RIP.FunPtr (Pixman_op_t -> (RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_image_t) -> Pixman_format_code_t -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> (RIP.Ptr Pixman_glyph_cache_t) -> RIP.CInt -> (PtrConst.PtrConst Pixman_glyph_t) -> IO ())
+pixman_composite_glyphs :: RIP.FunPtr (Pixman_op_t -> RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_image_t -> Pixman_format_code_t -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> RIP.Ptr Pixman_glyph_cache_t -> RIP.CInt -> PtrConst.PtrConst Pixman_glyph_t -> IO ())
 pixman_composite_glyphs =
   RIP.unsafePerformIO hs_bindgen_75079933c2778d71
 
@@ -5325,7 +5325,7 @@ foreign import ccall unsafe "hs_bindgen_566ccca90eb4ed79" hs_bindgen_566ccca90eb
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_composite_glyphs_no_mask@
-hs_bindgen_566ccca90eb4ed79 :: IO (RIP.FunPtr (Pixman_op_t -> (RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_image_t) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> (RIP.Ptr Pixman_glyph_cache_t) -> RIP.CInt -> (PtrConst.PtrConst Pixman_glyph_t) -> IO ()))
+hs_bindgen_566ccca90eb4ed79 :: IO (RIP.FunPtr (Pixman_op_t -> RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_image_t -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> RIP.Ptr Pixman_glyph_cache_t -> RIP.CInt -> PtrConst.PtrConst Pixman_glyph_t -> IO ()))
 hs_bindgen_566ccca90eb4ed79 =
   RIP.fromFFIType hs_bindgen_566ccca90eb4ed79_base
 
@@ -5336,7 +5336,7 @@ hs_bindgen_566ccca90eb4ed79 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_composite_glyphs_no_mask :: RIP.FunPtr (Pixman_op_t -> (RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_image_t) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> (RIP.Ptr Pixman_glyph_cache_t) -> RIP.CInt -> (PtrConst.PtrConst Pixman_glyph_t) -> IO ())
+pixman_composite_glyphs_no_mask :: RIP.FunPtr (Pixman_op_t -> RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_image_t -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> RIP.Ptr Pixman_glyph_cache_t -> RIP.CInt -> PtrConst.PtrConst Pixman_glyph_t -> IO ())
 pixman_composite_glyphs_no_mask =
   RIP.unsafePerformIO hs_bindgen_566ccca90eb4ed79
 
@@ -5385,7 +5385,7 @@ foreign import ccall unsafe "hs_bindgen_41d6937f5b1a25fa" hs_bindgen_41d6937f5b1
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_edge_step@
-hs_bindgen_41d6937f5b1a25fa :: IO (RIP.FunPtr ((RIP.Ptr Pixman_edge_t) -> RIP.CInt -> IO ()))
+hs_bindgen_41d6937f5b1a25fa :: IO (RIP.FunPtr (RIP.Ptr Pixman_edge_t -> RIP.CInt -> IO ()))
 hs_bindgen_41d6937f5b1a25fa =
   RIP.fromFFIType hs_bindgen_41d6937f5b1a25fa_base
 
@@ -5396,7 +5396,7 @@ hs_bindgen_41d6937f5b1a25fa =
 
     __exported by:__ @pixman.h@
 -}
-pixman_edge_step :: RIP.FunPtr ((RIP.Ptr Pixman_edge_t) -> RIP.CInt -> IO ())
+pixman_edge_step :: RIP.FunPtr (RIP.Ptr Pixman_edge_t -> RIP.CInt -> IO ())
 pixman_edge_step =
   RIP.unsafePerformIO hs_bindgen_41d6937f5b1a25fa
 
@@ -5405,7 +5405,7 @@ foreign import ccall unsafe "hs_bindgen_07c5052dd43c1552" hs_bindgen_07c5052dd43
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_edge_init@
-hs_bindgen_07c5052dd43c1552 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_edge_t) -> RIP.CInt -> Pixman_fixed_t -> Pixman_fixed_t -> Pixman_fixed_t -> Pixman_fixed_t -> Pixman_fixed_t -> IO ()))
+hs_bindgen_07c5052dd43c1552 :: IO (RIP.FunPtr (RIP.Ptr Pixman_edge_t -> RIP.CInt -> Pixman_fixed_t -> Pixman_fixed_t -> Pixman_fixed_t -> Pixman_fixed_t -> Pixman_fixed_t -> IO ()))
 hs_bindgen_07c5052dd43c1552 =
   RIP.fromFFIType hs_bindgen_07c5052dd43c1552_base
 
@@ -5416,7 +5416,7 @@ hs_bindgen_07c5052dd43c1552 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_edge_init :: RIP.FunPtr ((RIP.Ptr Pixman_edge_t) -> RIP.CInt -> Pixman_fixed_t -> Pixman_fixed_t -> Pixman_fixed_t -> Pixman_fixed_t -> Pixman_fixed_t -> IO ())
+pixman_edge_init :: RIP.FunPtr (RIP.Ptr Pixman_edge_t -> RIP.CInt -> Pixman_fixed_t -> Pixman_fixed_t -> Pixman_fixed_t -> Pixman_fixed_t -> Pixman_fixed_t -> IO ())
 pixman_edge_init =
   RIP.unsafePerformIO hs_bindgen_07c5052dd43c1552
 
@@ -5425,7 +5425,7 @@ foreign import ccall unsafe "hs_bindgen_fe4379f056a49497" hs_bindgen_fe4379f056a
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_line_fixed_edge_init@
-hs_bindgen_fe4379f056a49497 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_edge_t) -> RIP.CInt -> Pixman_fixed_t -> (PtrConst.PtrConst Pixman_line_fixed_t) -> RIP.CInt -> RIP.CInt -> IO ()))
+hs_bindgen_fe4379f056a49497 :: IO (RIP.FunPtr (RIP.Ptr Pixman_edge_t -> RIP.CInt -> Pixman_fixed_t -> PtrConst.PtrConst Pixman_line_fixed_t -> RIP.CInt -> RIP.CInt -> IO ()))
 hs_bindgen_fe4379f056a49497 =
   RIP.fromFFIType hs_bindgen_fe4379f056a49497_base
 
@@ -5436,7 +5436,7 @@ hs_bindgen_fe4379f056a49497 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_line_fixed_edge_init :: RIP.FunPtr ((RIP.Ptr Pixman_edge_t) -> RIP.CInt -> Pixman_fixed_t -> (PtrConst.PtrConst Pixman_line_fixed_t) -> RIP.CInt -> RIP.CInt -> IO ())
+pixman_line_fixed_edge_init :: RIP.FunPtr (RIP.Ptr Pixman_edge_t -> RIP.CInt -> Pixman_fixed_t -> PtrConst.PtrConst Pixman_line_fixed_t -> RIP.CInt -> RIP.CInt -> IO ())
 pixman_line_fixed_edge_init =
   RIP.unsafePerformIO hs_bindgen_fe4379f056a49497
 
@@ -5445,7 +5445,7 @@ foreign import ccall unsafe "hs_bindgen_769148ca4984b3d8" hs_bindgen_769148ca498
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_rasterize_edges@
-hs_bindgen_769148ca4984b3d8 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_edge_t) -> (RIP.Ptr Pixman_edge_t) -> Pixman_fixed_t -> Pixman_fixed_t -> IO ()))
+hs_bindgen_769148ca4984b3d8 :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_edge_t -> RIP.Ptr Pixman_edge_t -> Pixman_fixed_t -> Pixman_fixed_t -> IO ()))
 hs_bindgen_769148ca4984b3d8 =
   RIP.fromFFIType hs_bindgen_769148ca4984b3d8_base
 
@@ -5456,7 +5456,7 @@ hs_bindgen_769148ca4984b3d8 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_rasterize_edges :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_edge_t) -> (RIP.Ptr Pixman_edge_t) -> Pixman_fixed_t -> Pixman_fixed_t -> IO ())
+pixman_rasterize_edges :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_edge_t -> RIP.Ptr Pixman_edge_t -> Pixman_fixed_t -> Pixman_fixed_t -> IO ())
 pixman_rasterize_edges =
   RIP.unsafePerformIO hs_bindgen_769148ca4984b3d8
 
@@ -5465,7 +5465,7 @@ foreign import ccall unsafe "hs_bindgen_cdc6a6b9165f6142" hs_bindgen_cdc6a6b9165
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_add_traps@
-hs_bindgen_cdc6a6b9165f6142 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> RIP.CInt -> (PtrConst.PtrConst Pixman_trap_t) -> IO ()))
+hs_bindgen_cdc6a6b9165f6142 :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> RIP.CInt -> PtrConst.PtrConst Pixman_trap_t -> IO ()))
 hs_bindgen_cdc6a6b9165f6142 =
   RIP.fromFFIType hs_bindgen_cdc6a6b9165f6142_base
 
@@ -5476,7 +5476,7 @@ hs_bindgen_cdc6a6b9165f6142 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_add_traps :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> RIP.CInt -> (PtrConst.PtrConst Pixman_trap_t) -> IO ())
+pixman_add_traps :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> HsBindgen.Runtime.LibC.Int16 -> HsBindgen.Runtime.LibC.Int16 -> RIP.CInt -> PtrConst.PtrConst Pixman_trap_t -> IO ())
 pixman_add_traps =
   RIP.unsafePerformIO hs_bindgen_cdc6a6b9165f6142
 
@@ -5485,7 +5485,7 @@ foreign import ccall unsafe "hs_bindgen_d057ed8ad1e0fa42" hs_bindgen_d057ed8ad1e
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_add_trapezoids@
-hs_bindgen_d057ed8ad1e0fa42 :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> HsBindgen.Runtime.LibC.Int16 -> RIP.CInt -> RIP.CInt -> (PtrConst.PtrConst Pixman_trapezoid_t) -> IO ()))
+hs_bindgen_d057ed8ad1e0fa42 :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> HsBindgen.Runtime.LibC.Int16 -> RIP.CInt -> RIP.CInt -> PtrConst.PtrConst Pixman_trapezoid_t -> IO ()))
 hs_bindgen_d057ed8ad1e0fa42 =
   RIP.fromFFIType hs_bindgen_d057ed8ad1e0fa42_base
 
@@ -5496,7 +5496,7 @@ hs_bindgen_d057ed8ad1e0fa42 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_add_trapezoids :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> HsBindgen.Runtime.LibC.Int16 -> RIP.CInt -> RIP.CInt -> (PtrConst.PtrConst Pixman_trapezoid_t) -> IO ())
+pixman_add_trapezoids :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> HsBindgen.Runtime.LibC.Int16 -> RIP.CInt -> RIP.CInt -> PtrConst.PtrConst Pixman_trapezoid_t -> IO ())
 pixman_add_trapezoids =
   RIP.unsafePerformIO hs_bindgen_d057ed8ad1e0fa42
 
@@ -5505,7 +5505,7 @@ foreign import ccall unsafe "hs_bindgen_9b1c659a71ea73ff" hs_bindgen_9b1c659a71e
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_rasterize_trapezoid@
-hs_bindgen_9b1c659a71ea73ff :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> (PtrConst.PtrConst Pixman_trapezoid_t) -> RIP.CInt -> RIP.CInt -> IO ()))
+hs_bindgen_9b1c659a71ea73ff :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> PtrConst.PtrConst Pixman_trapezoid_t -> RIP.CInt -> RIP.CInt -> IO ()))
 hs_bindgen_9b1c659a71ea73ff =
   RIP.fromFFIType hs_bindgen_9b1c659a71ea73ff_base
 
@@ -5516,7 +5516,7 @@ hs_bindgen_9b1c659a71ea73ff =
 
     __exported by:__ @pixman.h@
 -}
-pixman_rasterize_trapezoid :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> (PtrConst.PtrConst Pixman_trapezoid_t) -> RIP.CInt -> RIP.CInt -> IO ())
+pixman_rasterize_trapezoid :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> PtrConst.PtrConst Pixman_trapezoid_t -> RIP.CInt -> RIP.CInt -> IO ())
 pixman_rasterize_trapezoid =
   RIP.unsafePerformIO hs_bindgen_9b1c659a71ea73ff
 
@@ -5525,7 +5525,7 @@ foreign import ccall unsafe "hs_bindgen_4d4da28f5e4e2dab" hs_bindgen_4d4da28f5e4
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_composite_trapezoids@
-hs_bindgen_4d4da28f5e4e2dab :: IO (RIP.FunPtr (Pixman_op_t -> (RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_image_t) -> Pixman_format_code_t -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> (PtrConst.PtrConst Pixman_trapezoid_t) -> IO ()))
+hs_bindgen_4d4da28f5e4e2dab :: IO (RIP.FunPtr (Pixman_op_t -> RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_image_t -> Pixman_format_code_t -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> PtrConst.PtrConst Pixman_trapezoid_t -> IO ()))
 hs_bindgen_4d4da28f5e4e2dab =
   RIP.fromFFIType hs_bindgen_4d4da28f5e4e2dab_base
 
@@ -5536,7 +5536,7 @@ hs_bindgen_4d4da28f5e4e2dab =
 
     __exported by:__ @pixman.h@
 -}
-pixman_composite_trapezoids :: RIP.FunPtr (Pixman_op_t -> (RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_image_t) -> Pixman_format_code_t -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> (PtrConst.PtrConst Pixman_trapezoid_t) -> IO ())
+pixman_composite_trapezoids :: RIP.FunPtr (Pixman_op_t -> RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_image_t -> Pixman_format_code_t -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> PtrConst.PtrConst Pixman_trapezoid_t -> IO ())
 pixman_composite_trapezoids =
   RIP.unsafePerformIO hs_bindgen_4d4da28f5e4e2dab
 
@@ -5545,7 +5545,7 @@ foreign import ccall unsafe "hs_bindgen_c087cd5222570325" hs_bindgen_c087cd52225
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_composite_triangles@
-hs_bindgen_c087cd5222570325 :: IO (RIP.FunPtr (Pixman_op_t -> (RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_image_t) -> Pixman_format_code_t -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> (PtrConst.PtrConst Pixman_triangle_t) -> IO ()))
+hs_bindgen_c087cd5222570325 :: IO (RIP.FunPtr (Pixman_op_t -> RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_image_t -> Pixman_format_code_t -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> PtrConst.PtrConst Pixman_triangle_t -> IO ()))
 hs_bindgen_c087cd5222570325 =
   RIP.fromFFIType hs_bindgen_c087cd5222570325_base
 
@@ -5556,7 +5556,7 @@ hs_bindgen_c087cd5222570325 =
 
     __exported by:__ @pixman.h@
 -}
-pixman_composite_triangles :: RIP.FunPtr (Pixman_op_t -> (RIP.Ptr Pixman_image_t) -> (RIP.Ptr Pixman_image_t) -> Pixman_format_code_t -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> (PtrConst.PtrConst Pixman_triangle_t) -> IO ())
+pixman_composite_triangles :: RIP.FunPtr (Pixman_op_t -> RIP.Ptr Pixman_image_t -> RIP.Ptr Pixman_image_t -> Pixman_format_code_t -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> RIP.CInt -> PtrConst.PtrConst Pixman_triangle_t -> IO ())
 pixman_composite_triangles =
   RIP.unsafePerformIO hs_bindgen_c087cd5222570325
 
@@ -5565,7 +5565,7 @@ foreign import ccall unsafe "hs_bindgen_dd6b68f0b4b1a4aa" hs_bindgen_dd6b68f0b4b
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_get_pixman_add_triangles@
-hs_bindgen_dd6b68f0b4b1a4aa :: IO (RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> RIP.CInt -> (PtrConst.PtrConst Pixman_triangle_t) -> IO ()))
+hs_bindgen_dd6b68f0b4b1a4aa :: IO (RIP.FunPtr (RIP.Ptr Pixman_image_t -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> RIP.CInt -> PtrConst.PtrConst Pixman_triangle_t -> IO ()))
 hs_bindgen_dd6b68f0b4b1a4aa =
   RIP.fromFFIType hs_bindgen_dd6b68f0b4b1a4aa_base
 
@@ -5576,6 +5576,6 @@ hs_bindgen_dd6b68f0b4b1a4aa =
 
     __exported by:__ @pixman.h@
 -}
-pixman_add_triangles :: RIP.FunPtr ((RIP.Ptr Pixman_image_t) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> RIP.CInt -> (PtrConst.PtrConst Pixman_triangle_t) -> IO ())
+pixman_add_triangles :: RIP.FunPtr (RIP.Ptr Pixman_image_t -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> RIP.CInt -> PtrConst.PtrConst Pixman_triangle_t -> IO ())
 pixman_add_triangles =
   RIP.unsafePerformIO hs_bindgen_dd6b68f0b4b1a4aa

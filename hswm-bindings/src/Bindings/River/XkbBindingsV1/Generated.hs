@@ -7,6 +7,7 @@
 {-# LANGUAGE EmptyDataDecls #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MagicHash #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -163,7 +164,7 @@ instance Read River_xkb_bindings_v1_error where
 
   readListPrec = RIP.readListPrecDefault
 
-instance ( ((~) ty) RIP.CUInt
+instance ( ty ~ RIP.CUInt
          ) => RIP.HasField "unwrap" (RIP.Ptr River_xkb_bindings_v1_error) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"unwrap")
@@ -175,15 +176,11 @@ instance HasCField.HasCField River_xkb_bindings_v1_error "unwrap" where
 
   offset# = \_ -> \_ -> 0
 
-{-|
+{-| __C declaration:__ @RIVER_XKB_BINDINGS_V1_ERROR_OBJECT_ALREADY_CREATED@
 
-  @since:  2
+    __defined at:__ @river-xkb-bindings-v1-client-protocol.h 158:2@
 
-__C declaration:__ @RIVER_XKB_BINDINGS_V1_ERROR_OBJECT_ALREADY_CREATED@
-
-__defined at:__ @river-xkb-bindings-v1-client-protocol.h 158:2@
-
-__exported by:__ @river-xkb-bindings-v1-client-protocol.h@
+    __exported by:__ @river-xkb-bindings-v1-client-protocol.h@
 -}
 pattern RIVER_XKB_BINDINGS_V1_ERROR_OBJECT_ALREADY_CREATED :: River_xkb_bindings_v1_error
 pattern RIVER_XKB_BINDINGS_V1_ERROR_OBJECT_ALREADY_CREATED = River_xkb_bindings_v1_error 0
@@ -256,67 +253,61 @@ rIVER_XKB_BINDINGS_V1_GET_SEAT_SINCE_VERSION :: RIP.CInt
 rIVER_XKB_BINDINGS_V1_GET_SEAT_SINCE_VERSION =
   (2 :: RIP.CInt)
 
-{-|
+{-| __C declaration:__ @struct river_xkb_binding_v1_listener@
 
-  > iface_river_xkb_binding_v1
+    __defined at:__ @river-xkb-bindings-v1-client-protocol.h 260:8@
 
-  > river_xkb_binding_v1_listener
-
-__C declaration:__ @struct river_xkb_binding_v1_listener@
-
-__defined at:__ @river-xkb-bindings-v1-client-protocol.h 260:8@
-
-__exported by:__ @river-xkb-bindings-v1-client-protocol.h@
+    __exported by:__ @river-xkb-bindings-v1-client-protocol.h@
 -}
 data River_xkb_binding_v1_listener = River_xkb_binding_v1_listener
-  { pressed :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_binding_v1) -> IO ())
+  { pressed :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_binding_v1 -> IO ())
     {- ^ the key triggering the binding has been pressed
 
-       This event indicates that the physical key triggering the binding has been pressed.
+         This event indicates that the physical key triggering the binding has been pressed.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-       The compositor should wait for the manage sequence to complete before processing further input events. This allows the window manager client to, for example, modify key bindings and keyboard focus without racing against future input events. The window manager should of course respond as soon as possible as the capacity of the compositor to buffer incoming input events is finite.
+         The compositor should wait for the manage sequence to complete before processing further input events. This allows the window manager client to, for example, modify key bindings and keyboard focus without racing against future input events. The window manager should of course respond as soon as possible as the capacity of the compositor to buffer incoming input events is finite.
 
-    __C declaration:__ @pressed@
+         __C declaration:__ @pressed@
 
-    __defined at:__ @river-xkb-bindings-v1-client-protocol.h 278:9@
+         __defined at:__ @river-xkb-bindings-v1-client-protocol.h 278:9@
 
-    __exported by:__ @river-xkb-bindings-v1-client-protocol.h@
+         __exported by:__ @river-xkb-bindings-v1-client-protocol.h@
     -}
-  , released :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_binding_v1) -> IO ())
+  , released :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_binding_v1 -> IO ())
     {- ^ the key triggering the binding has been released
 
-       This event indicates that the physical key triggering the binding has been released.
+         This event indicates that the physical key triggering the binding has been released.
 
-       Releasing the modifiers for the binding without releasing the "main" physical key that produces the bound keysym does not trigger the release event. This event is sent when the "main" key is released, even if the modifiers have changed since the pressed event.
+         Releasing the modifiers for the binding without releasing the "main" physical key that produces the bound keysym does not trigger the release event. This event is sent when the "main" key is released, even if the modifiers have changed since the pressed event.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-       The compositor should wait for the manage sequence to complete before processing further input events. This allows the window manager client to, for example, modify key bindings and keyboard focus without racing against future input events. The window manager should of course respond as soon as possible as the capacity of the compositor to buffer incoming input events is finite.
+         The compositor should wait for the manage sequence to complete before processing further input events. This allows the window manager client to, for example, modify key bindings and keyboard focus without racing against future input events. The window manager should of course respond as soon as possible as the capacity of the compositor to buffer incoming input events is finite.
 
-    __C declaration:__ @released@
+         __C declaration:__ @released@
 
-    __defined at:__ @river-xkb-bindings-v1-client-protocol.h 303:9@
+         __defined at:__ @river-xkb-bindings-v1-client-protocol.h 303:9@
 
-    __exported by:__ @river-xkb-bindings-v1-client-protocol.h@
+         __exported by:__ @river-xkb-bindings-v1-client-protocol.h@
     -}
-  , stop_repeat :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_binding_v1) -> IO ())
+  , stop_repeat :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_binding_v1 -> IO ())
     {- ^ repeating should be stopped
 
-       This event indicates that repeating should be stopped for the binding if the window manager has been repeating some action since the pressed event.
+         This event indicates that repeating should be stopped for the binding if the window manager has been repeating some action since the pressed event.
 
-       This event is generally sent when some other (possible unbound) key is pressed after the pressed event is sent and before the released event is sent for this binding.
+         This event is generally sent when some other (possible unbound) key is pressed after the pressed event is sent and before the released event is sent for this binding.
 
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
 
-       @since:  2
+         @since 2
 
-    __C declaration:__ @stop_repeat@
+         __C declaration:__ @stop_repeat@
 
-    __defined at:__ @river-xkb-bindings-v1-client-protocol.h 320:9@
+         __defined at:__ @river-xkb-bindings-v1-client-protocol.h 320:9@
 
-    __exported by:__ @river-xkb-bindings-v1-client-protocol.h@
+         __exported by:__ @river-xkb-bindings-v1-client-protocol.h@
     -}
   }
   deriving stock (Eq, RIP.Generic, Show)
@@ -352,11 +343,11 @@ deriving via Marshal.EquivStorable River_xkb_binding_v1_listener instance RIP.St
 instance HasCField.HasCField River_xkb_binding_v1_listener "pressed" where
 
   type CFieldType River_xkb_binding_v1_listener "pressed" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_binding_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_binding_v1 -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_binding_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_binding_v1 -> IO ())
          ) => RIP.HasField "pressed" (RIP.Ptr River_xkb_binding_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"pressed")
@@ -364,11 +355,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_bindin
 instance HasCField.HasCField River_xkb_binding_v1_listener "released" where
 
   type CFieldType River_xkb_binding_v1_listener "released" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_binding_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_binding_v1 -> IO ())
 
   offset# = \_ -> \_ -> 8
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_binding_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_binding_v1 -> IO ())
          ) => RIP.HasField "released" (RIP.Ptr River_xkb_binding_v1_listener) (RIP.Ptr ty) where
 
   getField = HasCField.fromPtr (RIP.Proxy @"released")
@@ -376,11 +367,11 @@ instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_bindin
 instance HasCField.HasCField River_xkb_binding_v1_listener "stop_repeat" where
 
   type CFieldType River_xkb_binding_v1_listener "stop_repeat" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_binding_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_binding_v1 -> IO ())
 
   offset# = \_ -> \_ -> 16
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_binding_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_binding_v1 -> IO ())
          ) => RIP.HasField "stop_repeat" (RIP.Ptr River_xkb_binding_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -493,33 +484,27 @@ rIVER_XKB_BINDING_V1_DISABLE_SINCE_VERSION :: RIP.CInt
 rIVER_XKB_BINDING_V1_DISABLE_SINCE_VERSION =
   (1 :: RIP.CInt)
 
-{-|
+{-| __C declaration:__ @struct river_xkb_bindings_seat_v1_listener@
 
-  > iface_river_xkb_bindings_seat_v1
-
-  > river_xkb_bindings_seat_v1_listener
-
-__C declaration:__ @struct river_xkb_bindings_seat_v1_listener@
-
-__defined at:__ @river-xkb-bindings-v1-client-protocol.h 463:8@
-
-__exported by:__ @river-xkb-bindings-v1-client-protocol.h@
--}
-data River_xkb_bindings_seat_v1_listener = River_xkb_bindings_seat_v1_listener
-  { ate_unbound_key :: RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_bindings_seat_v1) -> IO ())
-    {- ^ an unbound key press event was eaten
-
-       An unbound key press event was eaten due to the ensure_next_key_eaten request.
-
-       This event will be followed by a manage_start event after all other new state has been sent by the server.
-
-       @since:  2
-
-    __C declaration:__ @ate_unbound_key@
-
-    __defined at:__ @river-xkb-bindings-v1-client-protocol.h 474:9@
+    __defined at:__ @river-xkb-bindings-v1-client-protocol.h 463:8@
 
     __exported by:__ @river-xkb-bindings-v1-client-protocol.h@
+-}
+data River_xkb_bindings_seat_v1_listener = River_xkb_bindings_seat_v1_listener
+  { ate_unbound_key :: RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_bindings_seat_v1 -> IO ())
+    {- ^ an unbound key press event was eaten
+
+         An unbound key press event was eaten due to the ensure_next_key_eaten request.
+
+         This event will be followed by a manage_start event after all other new state has been sent by the server.
+
+         @since 2
+
+         __C declaration:__ @ate_unbound_key@
+
+         __defined at:__ @river-xkb-bindings-v1-client-protocol.h 474:9@
+
+         __exported by:__ @river-xkb-bindings-v1-client-protocol.h@
     -}
   }
   deriving stock (Eq, RIP.Generic, Show)
@@ -551,11 +536,11 @@ deriving via Marshal.EquivStorable River_xkb_bindings_seat_v1_listener instance 
 instance HasCField.HasCField River_xkb_bindings_seat_v1_listener "ate_unbound_key" where
 
   type CFieldType River_xkb_bindings_seat_v1_listener "ate_unbound_key" =
-    RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_bindings_seat_v1) -> IO ())
+    RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_bindings_seat_v1 -> IO ())
 
   offset# = \_ -> \_ -> 0
 
-instance ( ((~) ty) (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_bindings_seat_v1) -> IO ()))
+instance ( ty ~ RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_bindings_seat_v1 -> IO ())
          ) => RIP.HasField "ate_unbound_key" (RIP.Ptr River_xkb_bindings_seat_v1_listener) (RIP.Ptr ty) where
 
   getField =
@@ -630,66 +615,66 @@ rIVER_XKB_BINDINGS_SEAT_V1_CANCEL_ENSURE_NEXT_KEY_EATEN_SINCE_VERSION :: RIP.CIn
 rIVER_XKB_BINDINGS_SEAT_V1_CANCEL_ENSURE_NEXT_KEY_EATEN_SINCE_VERSION =
   (2 :: RIP.CInt)
 
-foreign import ccall safe "wrapper" hs_bindgen_ee6b40765debab99_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_bbb353ef712d5768_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_binding_v1) -> IO ())@
-hs_bindgen_ee6b40765debab99 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_binding_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_binding_v1) -> IO ()))
-hs_bindgen_ee6b40765debab99 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_binding_v1 -> IO ())@
+hs_bindgen_bbb353ef712d5768 ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_binding_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_binding_v1 -> IO ()))
+hs_bindgen_bbb353ef712d5768 =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_ee6b40765debab99_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_bbb353ef712d5768_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_b1be695d6785a235_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_8849e01671789ca9_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_binding_v1) -> IO ())@
-hs_bindgen_b1be695d6785a235 ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_binding_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_binding_v1) -> IO ()
-hs_bindgen_b1be695d6785a235 =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_binding_v1 -> IO ())@
+hs_bindgen_8849e01671789ca9 ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_binding_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_binding_v1 -> IO ()
+hs_bindgen_8849e01671789ca9 =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_b1be695d6785a235_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_8849e01671789ca9_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_binding_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_binding_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_ee6b40765debab99
+  toFunPtr = hs_bindgen_bbb353ef712d5768
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_binding_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_binding_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_b1be695d6785a235
+  fromFunPtr = hs_bindgen_8849e01671789ca9
 
-foreign import ccall safe "wrapper" hs_bindgen_0f528cf5e3453d26_base ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()))
+foreign import ccall safe "wrapper" hs_bindgen_a9a42e7a5ea6fd7b_base ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()))
 
--- __unique:__ @instance ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_bindings_seat_v1) -> IO ())@
-hs_bindgen_0f528cf5e3453d26 ::
-     ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_bindings_seat_v1) -> IO ())
-  -> IO (RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_bindings_seat_v1) -> IO ()))
-hs_bindgen_0f528cf5e3453d26 =
+-- __unique:__ @instance ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_bindings_seat_v1 -> IO ())@
+hs_bindgen_a9a42e7a5ea6fd7b ::
+     (RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_bindings_seat_v1 -> IO ())
+  -> IO (RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_bindings_seat_v1 -> IO ()))
+hs_bindgen_a9a42e7a5ea6fd7b =
   \fun0 ->
-    fmap RIP.castFunPtrFromFFIType (hs_bindgen_0f528cf5e3453d26_base (RIP.toFFIType fun0))
+    fmap RIP.castFunPtrFromFFIType (hs_bindgen_a9a42e7a5ea6fd7b_base (RIP.toFFIType fun0))
 
-foreign import ccall safe "dynamic" hs_bindgen_11cdc0355c7b165b_base ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr RIP.Void) -> IO ()
+foreign import ccall safe "dynamic" hs_bindgen_6fdab2f2567b6e5c_base ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr RIP.Void -> IO ()
 
--- __unique:__ @instance FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_bindings_seat_v1) -> IO ())@
-hs_bindgen_11cdc0355c7b165b ::
-     RIP.FunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_bindings_seat_v1) -> IO ())
-  -> (RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_bindings_seat_v1) -> IO ()
-hs_bindgen_11cdc0355c7b165b =
+-- __unique:__ @instance FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_bindings_seat_v1 -> IO ())@
+hs_bindgen_6fdab2f2567b6e5c ::
+     RIP.FunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_bindings_seat_v1 -> IO ())
+  -> RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_bindings_seat_v1 -> IO ()
+hs_bindgen_6fdab2f2567b6e5c =
   \funPtr0 ->
-    RIP.fromFFIType (hs_bindgen_11cdc0355c7b165b_base (RIP.castFunPtrToFFIType funPtr0))
+    RIP.fromFFIType (hs_bindgen_6fdab2f2567b6e5c_base (RIP.castFunPtrToFFIType funPtr0))
 
-instance RIP.ToFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_bindings_seat_v1) -> IO ()) where
+instance RIP.ToFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_bindings_seat_v1 -> IO ()) where
 
-  toFunPtr = hs_bindgen_0f528cf5e3453d26
+  toFunPtr = hs_bindgen_a9a42e7a5ea6fd7b
 
-instance RIP.FromFunPtr ((RIP.Ptr RIP.Void) -> (RIP.Ptr River_xkb_bindings_seat_v1) -> IO ()) where
+instance RIP.FromFunPtr (RIP.Ptr RIP.Void -> RIP.Ptr River_xkb_bindings_seat_v1 -> IO ()) where
 
-  fromFunPtr = hs_bindgen_11cdc0355c7b165b
+  fromFunPtr = hs_bindgen_6fdab2f2567b6e5c

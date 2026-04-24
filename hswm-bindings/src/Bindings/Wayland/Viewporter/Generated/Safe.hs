@@ -117,15 +117,11 @@ hs_bindgen_fdfebdb316249d3d ::
 hs_bindgen_fdfebdb316249d3d =
   RIP.fromFFIType hs_bindgen_fdfebdb316249d3d_base
 
-{-|
+{-| __C declaration:__ @wp_viewporter_set_user_data@
 
-  > iface_wp_viewporter
+    __defined at:__ @viewporter-client-protocol.h 224:1@
 
-__C declaration:__ @wp_viewporter_set_user_data@
-
-__defined at:__ @viewporter-client-protocol.h 224:1@
-
-__exported by:__ @viewporter-client-protocol.h@
+    __exported by:__ @viewporter-client-protocol.h@
 -}
 wp_viewporter_set_user_data ::
      RIP.Ptr Wp_viewporter
@@ -148,15 +144,11 @@ hs_bindgen_1bb1b869aa8bf844 ::
 hs_bindgen_1bb1b869aa8bf844 =
   RIP.fromFFIType hs_bindgen_1bb1b869aa8bf844_base
 
-{-|
+{-| __C declaration:__ @wp_viewporter_get_user_data@
 
-  > iface_wp_viewporter
+    __defined at:__ @viewporter-client-protocol.h 231:1@
 
-__C declaration:__ @wp_viewporter_get_user_data@
-
-__defined at:__ @viewporter-client-protocol.h 231:1@
-
-__exported by:__ @viewporter-client-protocol.h@
+    __exported by:__ @viewporter-client-protocol.h@
 -}
 wp_viewporter_get_user_data ::
      RIP.Ptr Wp_viewporter
@@ -202,17 +194,13 @@ hs_bindgen_af6acd2d82f1e2af ::
 hs_bindgen_af6acd2d82f1e2af =
   RIP.fromFFIType hs_bindgen_af6acd2d82f1e2af_base
 
-{-|
+{-| Informs the server that the client will not be using this protocol object anymore. This does not affect any other objects, wp_viewport objects included.
 
-  > iface_wp_viewporter
+    __C declaration:__ @wp_viewporter_destroy@
 
-  Informs the server that the client will not be using this protocol object anymore. This does not affect any other objects, wp_viewport objects included.
+    __defined at:__ @viewporter-client-protocol.h 250:1@
 
-__C declaration:__ @wp_viewporter_destroy@
-
-__defined at:__ @viewporter-client-protocol.h 250:1@
-
-__exported by:__ @viewporter-client-protocol.h@
+    __exported by:__ @viewporter-client-protocol.h@
 -}
 wp_viewporter_destroy ::
      RIP.Ptr Wp_viewporter
@@ -234,17 +222,13 @@ hs_bindgen_3fccedad7b4978ae ::
 hs_bindgen_3fccedad7b4978ae =
   RIP.fromFFIType hs_bindgen_3fccedad7b4978ae_base
 
-{-|
+{-| Instantiate an interface extension for the given wl_surface to crop and scale its content. If the given wl_surface already has a wp_viewport object associated, the viewport_exists protocol error is raised.
 
-  > iface_wp_viewporter
+    __C declaration:__ @wp_viewporter_get_viewport@
 
-  Instantiate an interface extension for the given wl_surface to crop and scale its content. If the given wl_surface already has a wp_viewport object associated, the viewport_exists protocol error is raised.
+    __defined at:__ @viewporter-client-protocol.h 265:1@
 
-__C declaration:__ @wp_viewporter_get_viewport@
-
-__defined at:__ @viewporter-client-protocol.h 265:1@
-
-__exported by:__ @viewporter-client-protocol.h@
+    __exported by:__ @viewporter-client-protocol.h@
 -}
 wp_viewporter_get_viewport ::
      RIP.Ptr Wp_viewporter
@@ -269,15 +253,11 @@ hs_bindgen_1ad1119bdc2d3132 ::
 hs_bindgen_1ad1119bdc2d3132 =
   RIP.fromFFIType hs_bindgen_1ad1119bdc2d3132_base
 
-{-|
+{-| __C declaration:__ @wp_viewport_set_user_data@
 
-  > iface_wp_viewport
+    __defined at:__ @viewporter-client-protocol.h 317:1@
 
-__C declaration:__ @wp_viewport_set_user_data@
-
-__defined at:__ @viewporter-client-protocol.h 317:1@
-
-__exported by:__ @viewporter-client-protocol.h@
+    __exported by:__ @viewporter-client-protocol.h@
 -}
 wp_viewport_set_user_data ::
      RIP.Ptr Wp_viewport
@@ -300,15 +280,11 @@ hs_bindgen_1ba1e2844d574756 ::
 hs_bindgen_1ba1e2844d574756 =
   RIP.fromFFIType hs_bindgen_1ba1e2844d574756_base
 
-{-|
+{-| __C declaration:__ @wp_viewport_get_user_data@
 
-  > iface_wp_viewport
+    __defined at:__ @viewporter-client-protocol.h 324:1@
 
-__C declaration:__ @wp_viewport_get_user_data@
-
-__defined at:__ @viewporter-client-protocol.h 324:1@
-
-__exported by:__ @viewporter-client-protocol.h@
+    __exported by:__ @viewporter-client-protocol.h@
 -}
 wp_viewport_get_user_data ::
      RIP.Ptr Wp_viewport
@@ -353,17 +329,13 @@ hs_bindgen_d19fed0e01b811ea ::
 hs_bindgen_d19fed0e01b811ea =
   RIP.fromFFIType hs_bindgen_d19fed0e01b811ea_base
 
-{-|
+{-| The associated wl_surface's crop and scale state is removed. The change is applied on the next wl_surface.commit.
 
-  > iface_wp_viewport
+    __C declaration:__ @wp_viewport_destroy@
 
-  The associated wl_surface's crop and scale state is removed. The change is applied on the next wl_surface.commit.
+    __defined at:__ @viewporter-client-protocol.h 342:1@
 
-__C declaration:__ @wp_viewport_destroy@
-
-__defined at:__ @viewporter-client-protocol.h 342:1@
-
-__exported by:__ @viewporter-client-protocol.h@
+    __exported by:__ @viewporter-client-protocol.h@
 -}
 wp_viewport_destroy ::
      RIP.Ptr Wp_viewport
@@ -391,21 +363,17 @@ hs_bindgen_1d5f35fbaadfa3bc ::
 hs_bindgen_1d5f35fbaadfa3bc =
   RIP.fromFFIType hs_bindgen_1d5f35fbaadfa3bc_base
 
-{-|
+{-| Set the source rectangle of the associated wl_surface. See wp_viewport for the description, and relation to the wl_buffer size.
 
-  > iface_wp_viewport
+    If all of x, y, width and height are -1.0, the source rectangle is unset instead. Any other set of values where width or height are zero or negative, or x or y are negative, raise the bad_value protocol error.
 
-  Set the source rectangle of the associated wl_surface. See wp_viewport for the description, and relation to the wl_buffer size.
+    The crop and scale state is double-buffered, see wl_surface.commit.
 
-  If all of x, y, width and height are -1.0, the source rectangle is unset instead. Any other set of values where width or height are zero or negative, or x or y are negative, raise the bad_value protocol error.
+    __C declaration:__ @wp_viewport_set_source@
 
-  The crop and scale state is double-buffered, see wl_surface.commit.
+    __defined at:__ @viewporter-client-protocol.h 363:1@
 
-__C declaration:__ @wp_viewport_set_source@
-
-__defined at:__ @viewporter-client-protocol.h 363:1@
-
-__exported by:__ @viewporter-client-protocol.h@
+    __exported by:__ @viewporter-client-protocol.h@
 -}
 wp_viewport_set_source ::
      RIP.Ptr Wp_viewport
@@ -437,21 +405,17 @@ hs_bindgen_2a82dc9b735457f7 ::
 hs_bindgen_2a82dc9b735457f7 =
   RIP.fromFFIType hs_bindgen_2a82dc9b735457f7_base
 
-{-|
+{-| Set the destination size of the associated wl_surface. See wp_viewport for the description, and relation to the wl_buffer size.
 
-  > iface_wp_viewport
+    If width is -1 and height is -1, the destination size is unset instead. Any other pair of values for width and height that contains zero or negative values raises the bad_value protocol error.
 
-  Set the destination size of the associated wl_surface. See wp_viewport for the description, and relation to the wl_buffer size.
+    The crop and scale state is double-buffered, see wl_surface.commit.
 
-  If width is -1 and height is -1, the destination size is unset instead. Any other pair of values for width and height that contains zero or negative values raises the bad_value protocol error.
+    __C declaration:__ @wp_viewport_set_destination@
 
-  The crop and scale state is double-buffered, see wl_surface.commit.
+    __defined at:__ @viewporter-client-protocol.h 384:1@
 
-__C declaration:__ @wp_viewport_set_destination@
-
-__defined at:__ @viewporter-client-protocol.h 384:1@
-
-__exported by:__ @viewporter-client-protocol.h@
+    __exported by:__ @viewporter-client-protocol.h@
 -}
 wp_viewport_set_destination ::
      RIP.Ptr Wp_viewport

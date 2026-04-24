@@ -39,29 +39,13 @@ hs_bindgen_5263cd29db3b6cbe =
   RIP.fromFFIType hs_bindgen_5263cd29db3b6cbe_base
 
 {-# NOINLINE hs_bindgen_e41b5381946a3521 #-}
-{-|
+{-| __C declaration:__ @zwlr_output_power_manager_v1_interface@
 
-  > page_iface_zwlr_output_power_manager_v1 zwlr_output_power_manager_v1
+    __defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 86:34@
 
-  > page_iface_zwlr_output_power_manager_v1_desc Description
+    __exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
 
-  This interface is a manager that allows creating per-output power management mode controls.
-
-  > page_iface_zwlr_output_power_manager_v1_api API
-
-  See @iface_zwlr_output_power_manager_v1@ .
-
-  > iface_zwlr_output_power_manager_v1 The zwlr_output_power_manager_v1 interface
-
-  This interface is a manager that allows creating per-output power management mode controls.
-
-__C declaration:__ @zwlr_output_power_manager_v1_interface@
-
-__defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 86:34@
-
-__exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
-
-__unique:__ @Bindings_Wayland_WlrOutputPowerManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputPowerManagementUnstableV1.Generated_zwlr_output_power_manager_v1_interface@
+    __unique:__ @Bindings_Wayland_WlrOutputPowerManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputPowerManagementUnstableV1.Generated_zwlr_output_power_manager_v1_interface@
 -}
 hs_bindgen_e41b5381946a3521 :: PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
 hs_bindgen_e41b5381946a3521 =
@@ -82,29 +66,13 @@ hs_bindgen_8703c7defa845923 =
   RIP.fromFFIType hs_bindgen_8703c7defa845923_base
 
 {-# NOINLINE hs_bindgen_d11ee847a45dcf88 #-}
-{-|
+{-| __C declaration:__ @zwlr_output_power_v1_interface@
 
-  > page_iface_zwlr_output_power_v1 zwlr_output_power_v1
+    __defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 105:34@
 
-  > page_iface_zwlr_output_power_v1_desc Description
+    __exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
 
-  This object offers requests to set the power management mode of an output.
-
-  > page_iface_zwlr_output_power_v1_api API
-
-  See @iface_zwlr_output_power_v1@ .
-
-  > iface_zwlr_output_power_v1 The zwlr_output_power_v1 interface
-
-  This object offers requests to set the power management mode of an output.
-
-__C declaration:__ @zwlr_output_power_v1_interface@
-
-__defined at:__ @wlr-output-power-management-unstable-v1-client-protocol.h 105:34@
-
-__exported by:__ @wlr-output-power-management-unstable-v1-client-protocol.h@
-
-__unique:__ @Bindings_Wayland_WlrOutputPowerManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputPowerManagementUnstableV1.Generated_zwlr_output_power_v1_interface@
+    __unique:__ @Bindings_Wayland_WlrOutputPowerManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputPowerManagementUnstableV1.Generated_zwlr_output_power_v1_interface@
 -}
 hs_bindgen_d11ee847a45dcf88 :: PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
 hs_bindgen_d11ee847a45dcf88 =

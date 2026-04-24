@@ -129,22 +129,18 @@ foreign import ccall unsafe "hs_bindgen_38be5d418cc1391d" hs_bindgen_38be5d418cc
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_ExtIdleNotifyV1_Generated_Bindings.Wayland.ExtIdleNotifyV1.Generated_get_ext_idle_notifier_v1_set_user_data@
-hs_bindgen_38be5d418cc1391d :: IO (RIP.FunPtr ((RIP.Ptr Ext_idle_notifier_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
+hs_bindgen_38be5d418cc1391d :: IO (RIP.FunPtr (RIP.Ptr Ext_idle_notifier_v1 -> RIP.Ptr RIP.Void -> IO ()))
 hs_bindgen_38be5d418cc1391d =
   RIP.fromFFIType hs_bindgen_38be5d418cc1391d_base
 
 {-# NOINLINE ext_idle_notifier_v1_set_user_data #-}
-{-|
+{-| __C declaration:__ @ext_idle_notifier_v1_set_user_data@
 
-  > iface_ext_idle_notifier_v1
+    __defined at:__ @ext-idle-notify-v1-client-protocol.h 152:1@
 
-__C declaration:__ @ext_idle_notifier_v1_set_user_data@
-
-__defined at:__ @ext-idle-notify-v1-client-protocol.h 152:1@
-
-__exported by:__ @ext-idle-notify-v1-client-protocol.h@
+    __exported by:__ @ext-idle-notify-v1-client-protocol.h@
 -}
-ext_idle_notifier_v1_set_user_data :: RIP.FunPtr ((RIP.Ptr Ext_idle_notifier_v1) -> (RIP.Ptr RIP.Void) -> IO ())
+ext_idle_notifier_v1_set_user_data :: RIP.FunPtr (RIP.Ptr Ext_idle_notifier_v1 -> RIP.Ptr RIP.Void -> IO ())
 ext_idle_notifier_v1_set_user_data =
   RIP.unsafePerformIO hs_bindgen_38be5d418cc1391d
 
@@ -153,22 +149,18 @@ foreign import ccall unsafe "hs_bindgen_db3da0eb94ec2c01" hs_bindgen_db3da0eb94e
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_ExtIdleNotifyV1_Generated_Bindings.Wayland.ExtIdleNotifyV1.Generated_get_ext_idle_notifier_v1_get_user_data@
-hs_bindgen_db3da0eb94ec2c01 :: IO (RIP.FunPtr ((RIP.Ptr Ext_idle_notifier_v1) -> IO (RIP.Ptr RIP.Void)))
+hs_bindgen_db3da0eb94ec2c01 :: IO (RIP.FunPtr (RIP.Ptr Ext_idle_notifier_v1 -> IO (RIP.Ptr RIP.Void)))
 hs_bindgen_db3da0eb94ec2c01 =
   RIP.fromFFIType hs_bindgen_db3da0eb94ec2c01_base
 
 {-# NOINLINE ext_idle_notifier_v1_get_user_data #-}
-{-|
+{-| __C declaration:__ @ext_idle_notifier_v1_get_user_data@
 
-  > iface_ext_idle_notifier_v1
+    __defined at:__ @ext-idle-notify-v1-client-protocol.h 159:1@
 
-__C declaration:__ @ext_idle_notifier_v1_get_user_data@
-
-__defined at:__ @ext-idle-notify-v1-client-protocol.h 159:1@
-
-__exported by:__ @ext-idle-notify-v1-client-protocol.h@
+    __exported by:__ @ext-idle-notify-v1-client-protocol.h@
 -}
-ext_idle_notifier_v1_get_user_data :: RIP.FunPtr ((RIP.Ptr Ext_idle_notifier_v1) -> IO (RIP.Ptr RIP.Void))
+ext_idle_notifier_v1_get_user_data :: RIP.FunPtr (RIP.Ptr Ext_idle_notifier_v1 -> IO (RIP.Ptr RIP.Void))
 ext_idle_notifier_v1_get_user_data =
   RIP.unsafePerformIO hs_bindgen_db3da0eb94ec2c01
 
@@ -177,7 +169,7 @@ foreign import ccall unsafe "hs_bindgen_75c2fc7d183c375a" hs_bindgen_75c2fc7d183
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_ExtIdleNotifyV1_Generated_Bindings.Wayland.ExtIdleNotifyV1.Generated_get_ext_idle_notifier_v1_get_version@
-hs_bindgen_75c2fc7d183c375a :: IO (RIP.FunPtr ((RIP.Ptr Ext_idle_notifier_v1) -> IO HsBindgen.Runtime.LibC.Word32))
+hs_bindgen_75c2fc7d183c375a :: IO (RIP.FunPtr (RIP.Ptr Ext_idle_notifier_v1 -> IO HsBindgen.Runtime.LibC.Word32))
 hs_bindgen_75c2fc7d183c375a =
   RIP.fromFFIType hs_bindgen_75c2fc7d183c375a_base
 
@@ -188,7 +180,7 @@ hs_bindgen_75c2fc7d183c375a =
 
     __exported by:__ @ext-idle-notify-v1-client-protocol.h@
 -}
-ext_idle_notifier_v1_get_version :: RIP.FunPtr ((RIP.Ptr Ext_idle_notifier_v1) -> IO HsBindgen.Runtime.LibC.Word32)
+ext_idle_notifier_v1_get_version :: RIP.FunPtr (RIP.Ptr Ext_idle_notifier_v1 -> IO HsBindgen.Runtime.LibC.Word32)
 ext_idle_notifier_v1_get_version =
   RIP.unsafePerformIO hs_bindgen_75c2fc7d183c375a
 
@@ -197,24 +189,20 @@ foreign import ccall unsafe "hs_bindgen_bb396f0d802e0ccb" hs_bindgen_bb396f0d802
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_ExtIdleNotifyV1_Generated_Bindings.Wayland.ExtIdleNotifyV1.Generated_get_ext_idle_notifier_v1_destroy@
-hs_bindgen_bb396f0d802e0ccb :: IO (RIP.FunPtr ((RIP.Ptr Ext_idle_notifier_v1) -> IO ()))
+hs_bindgen_bb396f0d802e0ccb :: IO (RIP.FunPtr (RIP.Ptr Ext_idle_notifier_v1 -> IO ()))
 hs_bindgen_bb396f0d802e0ccb =
   RIP.fromFFIType hs_bindgen_bb396f0d802e0ccb_base
 
 {-# NOINLINE ext_idle_notifier_v1_destroy #-}
-{-|
+{-| Destroy the manager object. All objects created via this interface remain valid.
 
-  > iface_ext_idle_notifier_v1
+    __C declaration:__ @ext_idle_notifier_v1_destroy@
 
-  Destroy the manager object. All objects created via this interface remain valid.
+    __defined at:__ @ext-idle-notify-v1-client-protocol.h 177:1@
 
-__C declaration:__ @ext_idle_notifier_v1_destroy@
-
-__defined at:__ @ext-idle-notify-v1-client-protocol.h 177:1@
-
-__exported by:__ @ext-idle-notify-v1-client-protocol.h@
+    __exported by:__ @ext-idle-notify-v1-client-protocol.h@
 -}
-ext_idle_notifier_v1_destroy :: RIP.FunPtr ((RIP.Ptr Ext_idle_notifier_v1) -> IO ())
+ext_idle_notifier_v1_destroy :: RIP.FunPtr (RIP.Ptr Ext_idle_notifier_v1 -> IO ())
 ext_idle_notifier_v1_destroy =
   RIP.unsafePerformIO hs_bindgen_bb396f0d802e0ccb
 
@@ -223,28 +211,24 @@ foreign import ccall unsafe "hs_bindgen_e78058f8438bcc41" hs_bindgen_e78058f8438
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_ExtIdleNotifyV1_Generated_Bindings.Wayland.ExtIdleNotifyV1.Generated_get_ext_idle_notifier_v1_get_idle_notification@
-hs_bindgen_e78058f8438bcc41 :: IO (RIP.FunPtr ((RIP.Ptr Ext_idle_notifier_v1) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Bindings.Wayland.Client.Generated.Wl_seat) -> IO (RIP.Ptr Ext_idle_notification_v1)))
+hs_bindgen_e78058f8438bcc41 :: IO (RIP.FunPtr (RIP.Ptr Ext_idle_notifier_v1 -> HsBindgen.Runtime.LibC.Word32 -> RIP.Ptr Bindings.Wayland.Client.Generated.Wl_seat -> IO (RIP.Ptr Ext_idle_notification_v1)))
 hs_bindgen_e78058f8438bcc41 =
   RIP.fromFFIType hs_bindgen_e78058f8438bcc41_base
 
 {-# NOINLINE ext_idle_notifier_v1_get_idle_notification #-}
-{-|
+{-| Create a new idle notification object.
 
-  > iface_ext_idle_notifier_v1
+    The notification object has a minimum timeout duration and is tied to a seat. The client will be notified if the seat is inactive for at least the provided timeout. See ext_idle_notification_v1 for more details.
 
-  Create a new idle notification object.
+    A zero timeout is valid and means the client wants to be notified as soon as possible when the seat is inactive.
 
-  The notification object has a minimum timeout duration and is tied to a seat. The client will be notified if the seat is inactive for at least the provided timeout. See ext_idle_notification_v1 for more details.
+    __C declaration:__ @ext_idle_notifier_v1_get_idle_notification@
 
-  A zero timeout is valid and means the client wants to be notified as soon as possible when the seat is inactive.
+    __defined at:__ @ext-idle-notify-v1-client-protocol.h 196:1@
 
-__C declaration:__ @ext_idle_notifier_v1_get_idle_notification@
-
-__defined at:__ @ext-idle-notify-v1-client-protocol.h 196:1@
-
-__exported by:__ @ext-idle-notify-v1-client-protocol.h@
+    __exported by:__ @ext-idle-notify-v1-client-protocol.h@
 -}
-ext_idle_notifier_v1_get_idle_notification :: RIP.FunPtr ((RIP.Ptr Ext_idle_notifier_v1) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Bindings.Wayland.Client.Generated.Wl_seat) -> IO (RIP.Ptr Ext_idle_notification_v1))
+ext_idle_notifier_v1_get_idle_notification :: RIP.FunPtr (RIP.Ptr Ext_idle_notifier_v1 -> HsBindgen.Runtime.LibC.Word32 -> RIP.Ptr Bindings.Wayland.Client.Generated.Wl_seat -> IO (RIP.Ptr Ext_idle_notification_v1))
 ext_idle_notifier_v1_get_idle_notification =
   RIP.unsafePerformIO hs_bindgen_e78058f8438bcc41
 
@@ -253,28 +237,24 @@ foreign import ccall unsafe "hs_bindgen_2e3462657ca622d9" hs_bindgen_2e3462657ca
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_ExtIdleNotifyV1_Generated_Bindings.Wayland.ExtIdleNotifyV1.Generated_get_ext_idle_notifier_v1_get_input_idle_notification@
-hs_bindgen_2e3462657ca622d9 :: IO (RIP.FunPtr ((RIP.Ptr Ext_idle_notifier_v1) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Bindings.Wayland.Client.Generated.Wl_seat) -> IO (RIP.Ptr Ext_idle_notification_v1)))
+hs_bindgen_2e3462657ca622d9 :: IO (RIP.FunPtr (RIP.Ptr Ext_idle_notifier_v1 -> HsBindgen.Runtime.LibC.Word32 -> RIP.Ptr Bindings.Wayland.Client.Generated.Wl_seat -> IO (RIP.Ptr Ext_idle_notification_v1)))
 hs_bindgen_2e3462657ca622d9 =
   RIP.fromFFIType hs_bindgen_2e3462657ca622d9_base
 
 {-# NOINLINE ext_idle_notifier_v1_get_input_idle_notification #-}
-{-|
+{-| Create a new idle notification object to track input from the user, such as keyboard and mouse movement. Because this object is meant to track user input alone, it ignores idle inhibitors.
 
-  > iface_ext_idle_notifier_v1
+    The notification object has a minimum timeout duration and is tied to a seat. The client will be notified if the seat is inactive for at least the provided timeout. See ext_idle_notification_v1 for more details.
 
-  Create a new idle notification object to track input from the user, such as keyboard and mouse movement. Because this object is meant to track user input alone, it ignores idle inhibitors.
+    A zero timeout is valid and means the client wants to be notified as soon as possible when the seat is inactive.
 
-  The notification object has a minimum timeout duration and is tied to a seat. The client will be notified if the seat is inactive for at least the provided timeout. See ext_idle_notification_v1 for more details.
+    __C declaration:__ @ext_idle_notifier_v1_get_input_idle_notification@
 
-  A zero timeout is valid and means the client wants to be notified as soon as possible when the seat is inactive.
+    __defined at:__ @ext-idle-notify-v1-client-protocol.h 221:1@
 
-__C declaration:__ @ext_idle_notifier_v1_get_input_idle_notification@
-
-__defined at:__ @ext-idle-notify-v1-client-protocol.h 221:1@
-
-__exported by:__ @ext-idle-notify-v1-client-protocol.h@
+    __exported by:__ @ext-idle-notify-v1-client-protocol.h@
 -}
-ext_idle_notifier_v1_get_input_idle_notification :: RIP.FunPtr ((RIP.Ptr Ext_idle_notifier_v1) -> HsBindgen.Runtime.LibC.Word32 -> (RIP.Ptr Bindings.Wayland.Client.Generated.Wl_seat) -> IO (RIP.Ptr Ext_idle_notification_v1))
+ext_idle_notifier_v1_get_input_idle_notification :: RIP.FunPtr (RIP.Ptr Ext_idle_notifier_v1 -> HsBindgen.Runtime.LibC.Word32 -> RIP.Ptr Bindings.Wayland.Client.Generated.Wl_seat -> IO (RIP.Ptr Ext_idle_notification_v1))
 ext_idle_notifier_v1_get_input_idle_notification =
   RIP.unsafePerformIO hs_bindgen_2e3462657ca622d9
 
@@ -283,22 +263,18 @@ foreign import ccall unsafe "hs_bindgen_5ba4d4ea68f21af2" hs_bindgen_5ba4d4ea68f
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_ExtIdleNotifyV1_Generated_Bindings.Wayland.ExtIdleNotifyV1.Generated_get_ext_idle_notification_v1_add_listener@
-hs_bindgen_5ba4d4ea68f21af2 :: IO (RIP.FunPtr ((RIP.Ptr Ext_idle_notification_v1) -> (PtrConst.PtrConst Ext_idle_notification_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt))
+hs_bindgen_5ba4d4ea68f21af2 :: IO (RIP.FunPtr (RIP.Ptr Ext_idle_notification_v1 -> PtrConst.PtrConst Ext_idle_notification_v1_listener -> RIP.Ptr RIP.Void -> IO RIP.CInt))
 hs_bindgen_5ba4d4ea68f21af2 =
   RIP.fromFFIType hs_bindgen_5ba4d4ea68f21af2_base
 
 {-# NOINLINE ext_idle_notification_v1_add_listener #-}
-{-|
+{-| __C declaration:__ @ext_idle_notification_v1_add_listener@
 
-  > iface_ext_idle_notification_v1
+    __defined at:__ @ext-idle-notify-v1-client-protocol.h 264:1@
 
-__C declaration:__ @ext_idle_notification_v1_add_listener@
-
-__defined at:__ @ext-idle-notify-v1-client-protocol.h 264:1@
-
-__exported by:__ @ext-idle-notify-v1-client-protocol.h@
+    __exported by:__ @ext-idle-notify-v1-client-protocol.h@
 -}
-ext_idle_notification_v1_add_listener :: RIP.FunPtr ((RIP.Ptr Ext_idle_notification_v1) -> (PtrConst.PtrConst Ext_idle_notification_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt)
+ext_idle_notification_v1_add_listener :: RIP.FunPtr (RIP.Ptr Ext_idle_notification_v1 -> PtrConst.PtrConst Ext_idle_notification_v1_listener -> RIP.Ptr RIP.Void -> IO RIP.CInt)
 ext_idle_notification_v1_add_listener =
   RIP.unsafePerformIO hs_bindgen_5ba4d4ea68f21af2
 
@@ -307,22 +283,18 @@ foreign import ccall unsafe "hs_bindgen_7c549166ca88ac6c" hs_bindgen_7c549166ca8
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_ExtIdleNotifyV1_Generated_Bindings.Wayland.ExtIdleNotifyV1.Generated_get_ext_idle_notification_v1_set_user_data@
-hs_bindgen_7c549166ca88ac6c :: IO (RIP.FunPtr ((RIP.Ptr Ext_idle_notification_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
+hs_bindgen_7c549166ca88ac6c :: IO (RIP.FunPtr (RIP.Ptr Ext_idle_notification_v1 -> RIP.Ptr RIP.Void -> IO ()))
 hs_bindgen_7c549166ca88ac6c =
   RIP.fromFFIType hs_bindgen_7c549166ca88ac6c_base
 
 {-# NOINLINE ext_idle_notification_v1_set_user_data #-}
-{-|
+{-| __C declaration:__ @ext_idle_notification_v1_set_user_data@
 
-  > iface_ext_idle_notification_v1
+    __defined at:__ @ext-idle-notify-v1-client-protocol.h 289:1@
 
-__C declaration:__ @ext_idle_notification_v1_set_user_data@
-
-__defined at:__ @ext-idle-notify-v1-client-protocol.h 289:1@
-
-__exported by:__ @ext-idle-notify-v1-client-protocol.h@
+    __exported by:__ @ext-idle-notify-v1-client-protocol.h@
 -}
-ext_idle_notification_v1_set_user_data :: RIP.FunPtr ((RIP.Ptr Ext_idle_notification_v1) -> (RIP.Ptr RIP.Void) -> IO ())
+ext_idle_notification_v1_set_user_data :: RIP.FunPtr (RIP.Ptr Ext_idle_notification_v1 -> RIP.Ptr RIP.Void -> IO ())
 ext_idle_notification_v1_set_user_data =
   RIP.unsafePerformIO hs_bindgen_7c549166ca88ac6c
 
@@ -331,22 +303,18 @@ foreign import ccall unsafe "hs_bindgen_849587193c1f0591" hs_bindgen_849587193c1
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_ExtIdleNotifyV1_Generated_Bindings.Wayland.ExtIdleNotifyV1.Generated_get_ext_idle_notification_v1_get_user_data@
-hs_bindgen_849587193c1f0591 :: IO (RIP.FunPtr ((RIP.Ptr Ext_idle_notification_v1) -> IO (RIP.Ptr RIP.Void)))
+hs_bindgen_849587193c1f0591 :: IO (RIP.FunPtr (RIP.Ptr Ext_idle_notification_v1 -> IO (RIP.Ptr RIP.Void)))
 hs_bindgen_849587193c1f0591 =
   RIP.fromFFIType hs_bindgen_849587193c1f0591_base
 
 {-# NOINLINE ext_idle_notification_v1_get_user_data #-}
-{-|
+{-| __C declaration:__ @ext_idle_notification_v1_get_user_data@
 
-  > iface_ext_idle_notification_v1
+    __defined at:__ @ext-idle-notify-v1-client-protocol.h 296:1@
 
-__C declaration:__ @ext_idle_notification_v1_get_user_data@
-
-__defined at:__ @ext-idle-notify-v1-client-protocol.h 296:1@
-
-__exported by:__ @ext-idle-notify-v1-client-protocol.h@
+    __exported by:__ @ext-idle-notify-v1-client-protocol.h@
 -}
-ext_idle_notification_v1_get_user_data :: RIP.FunPtr ((RIP.Ptr Ext_idle_notification_v1) -> IO (RIP.Ptr RIP.Void))
+ext_idle_notification_v1_get_user_data :: RIP.FunPtr (RIP.Ptr Ext_idle_notification_v1 -> IO (RIP.Ptr RIP.Void))
 ext_idle_notification_v1_get_user_data =
   RIP.unsafePerformIO hs_bindgen_849587193c1f0591
 
@@ -355,7 +323,7 @@ foreign import ccall unsafe "hs_bindgen_dfcfe9a8e4dc351b" hs_bindgen_dfcfe9a8e4d
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_ExtIdleNotifyV1_Generated_Bindings.Wayland.ExtIdleNotifyV1.Generated_get_ext_idle_notification_v1_get_version@
-hs_bindgen_dfcfe9a8e4dc351b :: IO (RIP.FunPtr ((RIP.Ptr Ext_idle_notification_v1) -> IO HsBindgen.Runtime.LibC.Word32))
+hs_bindgen_dfcfe9a8e4dc351b :: IO (RIP.FunPtr (RIP.Ptr Ext_idle_notification_v1 -> IO HsBindgen.Runtime.LibC.Word32))
 hs_bindgen_dfcfe9a8e4dc351b =
   RIP.fromFFIType hs_bindgen_dfcfe9a8e4dc351b_base
 
@@ -366,7 +334,7 @@ hs_bindgen_dfcfe9a8e4dc351b =
 
     __exported by:__ @ext-idle-notify-v1-client-protocol.h@
 -}
-ext_idle_notification_v1_get_version :: RIP.FunPtr ((RIP.Ptr Ext_idle_notification_v1) -> IO HsBindgen.Runtime.LibC.Word32)
+ext_idle_notification_v1_get_version :: RIP.FunPtr (RIP.Ptr Ext_idle_notification_v1 -> IO HsBindgen.Runtime.LibC.Word32)
 ext_idle_notification_v1_get_version =
   RIP.unsafePerformIO hs_bindgen_dfcfe9a8e4dc351b
 
@@ -375,23 +343,19 @@ foreign import ccall unsafe "hs_bindgen_66c6065ca27fcb20" hs_bindgen_66c6065ca27
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_ExtIdleNotifyV1_Generated_Bindings.Wayland.ExtIdleNotifyV1.Generated_get_ext_idle_notification_v1_destroy@
-hs_bindgen_66c6065ca27fcb20 :: IO (RIP.FunPtr ((RIP.Ptr Ext_idle_notification_v1) -> IO ()))
+hs_bindgen_66c6065ca27fcb20 :: IO (RIP.FunPtr (RIP.Ptr Ext_idle_notification_v1 -> IO ()))
 hs_bindgen_66c6065ca27fcb20 =
   RIP.fromFFIType hs_bindgen_66c6065ca27fcb20_base
 
 {-# NOINLINE ext_idle_notification_v1_destroy #-}
-{-|
+{-| Destroy the notification object.
 
-  > iface_ext_idle_notification_v1
+    __C declaration:__ @ext_idle_notification_v1_destroy@
 
-  Destroy the notification object.
+    __defined at:__ @ext-idle-notify-v1-client-protocol.h 313:1@
 
-__C declaration:__ @ext_idle_notification_v1_destroy@
-
-__defined at:__ @ext-idle-notify-v1-client-protocol.h 313:1@
-
-__exported by:__ @ext-idle-notify-v1-client-protocol.h@
+    __exported by:__ @ext-idle-notify-v1-client-protocol.h@
 -}
-ext_idle_notification_v1_destroy :: RIP.FunPtr ((RIP.Ptr Ext_idle_notification_v1) -> IO ())
+ext_idle_notification_v1_destroy :: RIP.FunPtr (RIP.Ptr Ext_idle_notification_v1 -> IO ())
 ext_idle_notification_v1_destroy =
   RIP.unsafePerformIO hs_bindgen_66c6065ca27fcb20

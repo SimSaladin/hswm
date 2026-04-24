@@ -117,22 +117,18 @@ foreign import ccall unsafe "hs_bindgen_621a8c1f1d187c08" hs_bindgen_621a8c1f1d1
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_XdgOutputUnstableV1_Generated_Bindings.Wayland.XdgOutputUnstableV1.Generated_get_zxdg_output_manager_v1_set_user_data@
-hs_bindgen_621a8c1f1d187c08 :: IO (RIP.FunPtr ((RIP.Ptr Zxdg_output_manager_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
+hs_bindgen_621a8c1f1d187c08 :: IO (RIP.FunPtr (RIP.Ptr Zxdg_output_manager_v1 -> RIP.Ptr RIP.Void -> IO ()))
 hs_bindgen_621a8c1f1d187c08 =
   RIP.fromFFIType hs_bindgen_621a8c1f1d187c08_base
 
 {-# NOINLINE zxdg_output_manager_v1_set_user_data #-}
-{-|
+{-| __C declaration:__ @zxdg_output_manager_v1_set_user_data@
 
-  > iface_zxdg_output_manager_v1
+    __defined at:__ @xdg-output-unstable-v1-client-protocol.h 146:1@
 
-__C declaration:__ @zxdg_output_manager_v1_set_user_data@
-
-__defined at:__ @xdg-output-unstable-v1-client-protocol.h 146:1@
-
-__exported by:__ @xdg-output-unstable-v1-client-protocol.h@
+    __exported by:__ @xdg-output-unstable-v1-client-protocol.h@
 -}
-zxdg_output_manager_v1_set_user_data :: RIP.FunPtr ((RIP.Ptr Zxdg_output_manager_v1) -> (RIP.Ptr RIP.Void) -> IO ())
+zxdg_output_manager_v1_set_user_data :: RIP.FunPtr (RIP.Ptr Zxdg_output_manager_v1 -> RIP.Ptr RIP.Void -> IO ())
 zxdg_output_manager_v1_set_user_data =
   RIP.unsafePerformIO hs_bindgen_621a8c1f1d187c08
 
@@ -141,22 +137,18 @@ foreign import ccall unsafe "hs_bindgen_0fc35954190a9355" hs_bindgen_0fc35954190
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_XdgOutputUnstableV1_Generated_Bindings.Wayland.XdgOutputUnstableV1.Generated_get_zxdg_output_manager_v1_get_user_data@
-hs_bindgen_0fc35954190a9355 :: IO (RIP.FunPtr ((RIP.Ptr Zxdg_output_manager_v1) -> IO (RIP.Ptr RIP.Void)))
+hs_bindgen_0fc35954190a9355 :: IO (RIP.FunPtr (RIP.Ptr Zxdg_output_manager_v1 -> IO (RIP.Ptr RIP.Void)))
 hs_bindgen_0fc35954190a9355 =
   RIP.fromFFIType hs_bindgen_0fc35954190a9355_base
 
 {-# NOINLINE zxdg_output_manager_v1_get_user_data #-}
-{-|
+{-| __C declaration:__ @zxdg_output_manager_v1_get_user_data@
 
-  > iface_zxdg_output_manager_v1
+    __defined at:__ @xdg-output-unstable-v1-client-protocol.h 153:1@
 
-__C declaration:__ @zxdg_output_manager_v1_get_user_data@
-
-__defined at:__ @xdg-output-unstable-v1-client-protocol.h 153:1@
-
-__exported by:__ @xdg-output-unstable-v1-client-protocol.h@
+    __exported by:__ @xdg-output-unstable-v1-client-protocol.h@
 -}
-zxdg_output_manager_v1_get_user_data :: RIP.FunPtr ((RIP.Ptr Zxdg_output_manager_v1) -> IO (RIP.Ptr RIP.Void))
+zxdg_output_manager_v1_get_user_data :: RIP.FunPtr (RIP.Ptr Zxdg_output_manager_v1 -> IO (RIP.Ptr RIP.Void))
 zxdg_output_manager_v1_get_user_data =
   RIP.unsafePerformIO hs_bindgen_0fc35954190a9355
 
@@ -165,7 +157,7 @@ foreign import ccall unsafe "hs_bindgen_1db6d93f790e331d" hs_bindgen_1db6d93f790
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_XdgOutputUnstableV1_Generated_Bindings.Wayland.XdgOutputUnstableV1.Generated_get_zxdg_output_manager_v1_get_version@
-hs_bindgen_1db6d93f790e331d :: IO (RIP.FunPtr ((RIP.Ptr Zxdg_output_manager_v1) -> IO HsBindgen.Runtime.LibC.Word32))
+hs_bindgen_1db6d93f790e331d :: IO (RIP.FunPtr (RIP.Ptr Zxdg_output_manager_v1 -> IO HsBindgen.Runtime.LibC.Word32))
 hs_bindgen_1db6d93f790e331d =
   RIP.fromFFIType hs_bindgen_1db6d93f790e331d_base
 
@@ -176,7 +168,7 @@ hs_bindgen_1db6d93f790e331d =
 
     __exported by:__ @xdg-output-unstable-v1-client-protocol.h@
 -}
-zxdg_output_manager_v1_get_version :: RIP.FunPtr ((RIP.Ptr Zxdg_output_manager_v1) -> IO HsBindgen.Runtime.LibC.Word32)
+zxdg_output_manager_v1_get_version :: RIP.FunPtr (RIP.Ptr Zxdg_output_manager_v1 -> IO HsBindgen.Runtime.LibC.Word32)
 zxdg_output_manager_v1_get_version =
   RIP.unsafePerformIO hs_bindgen_1db6d93f790e331d
 
@@ -185,26 +177,22 @@ foreign import ccall unsafe "hs_bindgen_143809a1f7466ef2" hs_bindgen_143809a1f74
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_XdgOutputUnstableV1_Generated_Bindings.Wayland.XdgOutputUnstableV1.Generated_get_zxdg_output_manager_v1_destroy@
-hs_bindgen_143809a1f7466ef2 :: IO (RIP.FunPtr ((RIP.Ptr Zxdg_output_manager_v1) -> IO ()))
+hs_bindgen_143809a1f7466ef2 :: IO (RIP.FunPtr (RIP.Ptr Zxdg_output_manager_v1 -> IO ()))
 hs_bindgen_143809a1f7466ef2 =
   RIP.fromFFIType hs_bindgen_143809a1f7466ef2_base
 
 {-# NOINLINE zxdg_output_manager_v1_destroy #-}
-{-|
+{-| Using this request a client can tell the server that it is not going to use the xdg_output_manager object anymore.
 
-  > iface_zxdg_output_manager_v1
+    Any objects already created through this instance are not affected.
 
-  Using this request a client can tell the server that it is not going to use the xdg_output_manager object anymore.
+    __C declaration:__ @zxdg_output_manager_v1_destroy@
 
-  Any objects already created through this instance are not affected.
+    __defined at:__ @xdg-output-unstable-v1-client-protocol.h 173:1@
 
-__C declaration:__ @zxdg_output_manager_v1_destroy@
-
-__defined at:__ @xdg-output-unstable-v1-client-protocol.h 173:1@
-
-__exported by:__ @xdg-output-unstable-v1-client-protocol.h@
+    __exported by:__ @xdg-output-unstable-v1-client-protocol.h@
 -}
-zxdg_output_manager_v1_destroy :: RIP.FunPtr ((RIP.Ptr Zxdg_output_manager_v1) -> IO ())
+zxdg_output_manager_v1_destroy :: RIP.FunPtr (RIP.Ptr Zxdg_output_manager_v1 -> IO ())
 zxdg_output_manager_v1_destroy =
   RIP.unsafePerformIO hs_bindgen_143809a1f7466ef2
 
@@ -213,24 +201,20 @@ foreign import ccall unsafe "hs_bindgen_7cb7d35aa7fadcc7" hs_bindgen_7cb7d35aa7f
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_XdgOutputUnstableV1_Generated_Bindings.Wayland.XdgOutputUnstableV1.Generated_get_zxdg_output_manager_v1_get_xdg_output@
-hs_bindgen_7cb7d35aa7fadcc7 :: IO (RIP.FunPtr ((RIP.Ptr Zxdg_output_manager_v1) -> (RIP.Ptr Bindings.Wayland.Client.Generated.Wl_output) -> IO (RIP.Ptr Zxdg_output_v1)))
+hs_bindgen_7cb7d35aa7fadcc7 :: IO (RIP.FunPtr (RIP.Ptr Zxdg_output_manager_v1 -> RIP.Ptr Bindings.Wayland.Client.Generated.Wl_output -> IO (RIP.Ptr Zxdg_output_v1)))
 hs_bindgen_7cb7d35aa7fadcc7 =
   RIP.fromFFIType hs_bindgen_7cb7d35aa7fadcc7_base
 
 {-# NOINLINE zxdg_output_manager_v1_get_xdg_output #-}
-{-|
+{-| This creates a new xdg_output object for the given wl_output.
 
-  > iface_zxdg_output_manager_v1
+    __C declaration:__ @zxdg_output_manager_v1_get_xdg_output@
 
-  This creates a new xdg_output object for the given wl_output.
+    __defined at:__ @xdg-output-unstable-v1-client-protocol.h 185:1@
 
-__C declaration:__ @zxdg_output_manager_v1_get_xdg_output@
-
-__defined at:__ @xdg-output-unstable-v1-client-protocol.h 185:1@
-
-__exported by:__ @xdg-output-unstable-v1-client-protocol.h@
+    __exported by:__ @xdg-output-unstable-v1-client-protocol.h@
 -}
-zxdg_output_manager_v1_get_xdg_output :: RIP.FunPtr ((RIP.Ptr Zxdg_output_manager_v1) -> (RIP.Ptr Bindings.Wayland.Client.Generated.Wl_output) -> IO (RIP.Ptr Zxdg_output_v1))
+zxdg_output_manager_v1_get_xdg_output :: RIP.FunPtr (RIP.Ptr Zxdg_output_manager_v1 -> RIP.Ptr Bindings.Wayland.Client.Generated.Wl_output -> IO (RIP.Ptr Zxdg_output_v1))
 zxdg_output_manager_v1_get_xdg_output =
   RIP.unsafePerformIO hs_bindgen_7cb7d35aa7fadcc7
 
@@ -239,22 +223,18 @@ foreign import ccall unsafe "hs_bindgen_ac8bbca26374e3be" hs_bindgen_ac8bbca2637
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_XdgOutputUnstableV1_Generated_Bindings.Wayland.XdgOutputUnstableV1.Generated_get_zxdg_output_v1_add_listener@
-hs_bindgen_ac8bbca26374e3be :: IO (RIP.FunPtr ((RIP.Ptr Zxdg_output_v1) -> (PtrConst.PtrConst Zxdg_output_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt))
+hs_bindgen_ac8bbca26374e3be :: IO (RIP.FunPtr (RIP.Ptr Zxdg_output_v1 -> PtrConst.PtrConst Zxdg_output_v1_listener -> RIP.Ptr RIP.Void -> IO RIP.CInt))
 hs_bindgen_ac8bbca26374e3be =
   RIP.fromFFIType hs_bindgen_ac8bbca26374e3be_base
 
 {-# NOINLINE zxdg_output_v1_add_listener #-}
-{-|
+{-| __C declaration:__ @zxdg_output_v1_add_listener@
 
-  > iface_zxdg_output_v1
+    __defined at:__ @xdg-output-unstable-v1-client-protocol.h 343:1@
 
-__C declaration:__ @zxdg_output_v1_add_listener@
-
-__defined at:__ @xdg-output-unstable-v1-client-protocol.h 343:1@
-
-__exported by:__ @xdg-output-unstable-v1-client-protocol.h@
+    __exported by:__ @xdg-output-unstable-v1-client-protocol.h@
 -}
-zxdg_output_v1_add_listener :: RIP.FunPtr ((RIP.Ptr Zxdg_output_v1) -> (PtrConst.PtrConst Zxdg_output_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt)
+zxdg_output_v1_add_listener :: RIP.FunPtr (RIP.Ptr Zxdg_output_v1 -> PtrConst.PtrConst Zxdg_output_v1_listener -> RIP.Ptr RIP.Void -> IO RIP.CInt)
 zxdg_output_v1_add_listener =
   RIP.unsafePerformIO hs_bindgen_ac8bbca26374e3be
 
@@ -263,22 +243,18 @@ foreign import ccall unsafe "hs_bindgen_fca646535a3d4ef5" hs_bindgen_fca646535a3
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_XdgOutputUnstableV1_Generated_Bindings.Wayland.XdgOutputUnstableV1.Generated_get_zxdg_output_v1_set_user_data@
-hs_bindgen_fca646535a3d4ef5 :: IO (RIP.FunPtr ((RIP.Ptr Zxdg_output_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
+hs_bindgen_fca646535a3d4ef5 :: IO (RIP.FunPtr (RIP.Ptr Zxdg_output_v1 -> RIP.Ptr RIP.Void -> IO ()))
 hs_bindgen_fca646535a3d4ef5 =
   RIP.fromFFIType hs_bindgen_fca646535a3d4ef5_base
 
 {-# NOINLINE zxdg_output_v1_set_user_data #-}
-{-|
+{-| __C declaration:__ @zxdg_output_v1_set_user_data@
 
-  > iface_zxdg_output_v1
+    __defined at:__ @xdg-output-unstable-v1-client-protocol.h 380:1@
 
-__C declaration:__ @zxdg_output_v1_set_user_data@
-
-__defined at:__ @xdg-output-unstable-v1-client-protocol.h 380:1@
-
-__exported by:__ @xdg-output-unstable-v1-client-protocol.h@
+    __exported by:__ @xdg-output-unstable-v1-client-protocol.h@
 -}
-zxdg_output_v1_set_user_data :: RIP.FunPtr ((RIP.Ptr Zxdg_output_v1) -> (RIP.Ptr RIP.Void) -> IO ())
+zxdg_output_v1_set_user_data :: RIP.FunPtr (RIP.Ptr Zxdg_output_v1 -> RIP.Ptr RIP.Void -> IO ())
 zxdg_output_v1_set_user_data =
   RIP.unsafePerformIO hs_bindgen_fca646535a3d4ef5
 
@@ -287,22 +263,18 @@ foreign import ccall unsafe "hs_bindgen_e14693e43ba5c711" hs_bindgen_e14693e43ba
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_XdgOutputUnstableV1_Generated_Bindings.Wayland.XdgOutputUnstableV1.Generated_get_zxdg_output_v1_get_user_data@
-hs_bindgen_e14693e43ba5c711 :: IO (RIP.FunPtr ((RIP.Ptr Zxdg_output_v1) -> IO (RIP.Ptr RIP.Void)))
+hs_bindgen_e14693e43ba5c711 :: IO (RIP.FunPtr (RIP.Ptr Zxdg_output_v1 -> IO (RIP.Ptr RIP.Void)))
 hs_bindgen_e14693e43ba5c711 =
   RIP.fromFFIType hs_bindgen_e14693e43ba5c711_base
 
 {-# NOINLINE zxdg_output_v1_get_user_data #-}
-{-|
+{-| __C declaration:__ @zxdg_output_v1_get_user_data@
 
-  > iface_zxdg_output_v1
+    __defined at:__ @xdg-output-unstable-v1-client-protocol.h 387:1@
 
-__C declaration:__ @zxdg_output_v1_get_user_data@
-
-__defined at:__ @xdg-output-unstable-v1-client-protocol.h 387:1@
-
-__exported by:__ @xdg-output-unstable-v1-client-protocol.h@
+    __exported by:__ @xdg-output-unstable-v1-client-protocol.h@
 -}
-zxdg_output_v1_get_user_data :: RIP.FunPtr ((RIP.Ptr Zxdg_output_v1) -> IO (RIP.Ptr RIP.Void))
+zxdg_output_v1_get_user_data :: RIP.FunPtr (RIP.Ptr Zxdg_output_v1 -> IO (RIP.Ptr RIP.Void))
 zxdg_output_v1_get_user_data =
   RIP.unsafePerformIO hs_bindgen_e14693e43ba5c711
 
@@ -311,7 +283,7 @@ foreign import ccall unsafe "hs_bindgen_e447ff5275067da6" hs_bindgen_e447ff52750
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_XdgOutputUnstableV1_Generated_Bindings.Wayland.XdgOutputUnstableV1.Generated_get_zxdg_output_v1_get_version@
-hs_bindgen_e447ff5275067da6 :: IO (RIP.FunPtr ((RIP.Ptr Zxdg_output_v1) -> IO HsBindgen.Runtime.LibC.Word32))
+hs_bindgen_e447ff5275067da6 :: IO (RIP.FunPtr (RIP.Ptr Zxdg_output_v1 -> IO HsBindgen.Runtime.LibC.Word32))
 hs_bindgen_e447ff5275067da6 =
   RIP.fromFFIType hs_bindgen_e447ff5275067da6_base
 
@@ -322,7 +294,7 @@ hs_bindgen_e447ff5275067da6 =
 
     __exported by:__ @xdg-output-unstable-v1-client-protocol.h@
 -}
-zxdg_output_v1_get_version :: RIP.FunPtr ((RIP.Ptr Zxdg_output_v1) -> IO HsBindgen.Runtime.LibC.Word32)
+zxdg_output_v1_get_version :: RIP.FunPtr (RIP.Ptr Zxdg_output_v1 -> IO HsBindgen.Runtime.LibC.Word32)
 zxdg_output_v1_get_version =
   RIP.unsafePerformIO hs_bindgen_e447ff5275067da6
 
@@ -331,23 +303,19 @@ foreign import ccall unsafe "hs_bindgen_a6639dd49135c36f" hs_bindgen_a6639dd4913
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_XdgOutputUnstableV1_Generated_Bindings.Wayland.XdgOutputUnstableV1.Generated_get_zxdg_output_v1_destroy@
-hs_bindgen_a6639dd49135c36f :: IO (RIP.FunPtr ((RIP.Ptr Zxdg_output_v1) -> IO ()))
+hs_bindgen_a6639dd49135c36f :: IO (RIP.FunPtr (RIP.Ptr Zxdg_output_v1 -> IO ()))
 hs_bindgen_a6639dd49135c36f =
   RIP.fromFFIType hs_bindgen_a6639dd49135c36f_base
 
 {-# NOINLINE zxdg_output_v1_destroy #-}
-{-|
+{-| Using this request a client can tell the server that it is not going to use the xdg_output object anymore.
 
-  > iface_zxdg_output_v1
+    __C declaration:__ @zxdg_output_v1_destroy@
 
-  Using this request a client can tell the server that it is not going to use the xdg_output object anymore.
+    __defined at:__ @xdg-output-unstable-v1-client-protocol.h 405:1@
 
-__C declaration:__ @zxdg_output_v1_destroy@
-
-__defined at:__ @xdg-output-unstable-v1-client-protocol.h 405:1@
-
-__exported by:__ @xdg-output-unstable-v1-client-protocol.h@
+    __exported by:__ @xdg-output-unstable-v1-client-protocol.h@
 -}
-zxdg_output_v1_destroy :: RIP.FunPtr ((RIP.Ptr Zxdg_output_v1) -> IO ())
+zxdg_output_v1_destroy :: RIP.FunPtr (RIP.Ptr Zxdg_output_v1 -> IO ())
 zxdg_output_v1_destroy =
   RIP.unsafePerformIO hs_bindgen_a6639dd49135c36f

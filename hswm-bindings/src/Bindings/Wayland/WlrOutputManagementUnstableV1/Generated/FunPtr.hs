@@ -389,22 +389,18 @@ foreign import ccall unsafe "hs_bindgen_b82f5bb4372bac4d" hs_bindgen_b82f5bb4372
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_manager_v1_add_listener@
-hs_bindgen_b82f5bb4372bac4d :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_manager_v1) -> (PtrConst.PtrConst Zwlr_output_manager_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt))
+hs_bindgen_b82f5bb4372bac4d :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_manager_v1 -> PtrConst.PtrConst Zwlr_output_manager_v1_listener -> RIP.Ptr RIP.Void -> IO RIP.CInt))
 hs_bindgen_b82f5bb4372bac4d =
   RIP.fromFFIType hs_bindgen_b82f5bb4372bac4d_base
 
 {-# NOINLINE zwlr_output_manager_v1_add_listener #-}
-{-|
+{-| __C declaration:__ @zwlr_output_manager_v1_add_listener@
 
-  > iface_zwlr_output_manager_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 321:1@
 
-__C declaration:__ @zwlr_output_manager_v1_add_listener@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 321:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_manager_v1_add_listener :: RIP.FunPtr ((RIP.Ptr Zwlr_output_manager_v1) -> (PtrConst.PtrConst Zwlr_output_manager_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt)
+zwlr_output_manager_v1_add_listener :: RIP.FunPtr (RIP.Ptr Zwlr_output_manager_v1 -> PtrConst.PtrConst Zwlr_output_manager_v1_listener -> RIP.Ptr RIP.Void -> IO RIP.CInt)
 zwlr_output_manager_v1_add_listener =
   RIP.unsafePerformIO hs_bindgen_b82f5bb4372bac4d
 
@@ -413,22 +409,18 @@ foreign import ccall unsafe "hs_bindgen_49420786d62af558" hs_bindgen_49420786d62
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_manager_v1_set_user_data@
-hs_bindgen_49420786d62af558 :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_manager_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
+hs_bindgen_49420786d62af558 :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_manager_v1 -> RIP.Ptr RIP.Void -> IO ()))
 hs_bindgen_49420786d62af558 =
   RIP.fromFFIType hs_bindgen_49420786d62af558_base
 
 {-# NOINLINE zwlr_output_manager_v1_set_user_data #-}
-{-|
+{-| __C declaration:__ @zwlr_output_manager_v1_set_user_data@
 
-  > iface_zwlr_output_manager_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 355:1@
 
-__C declaration:__ @zwlr_output_manager_v1_set_user_data@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 355:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_manager_v1_set_user_data :: RIP.FunPtr ((RIP.Ptr Zwlr_output_manager_v1) -> (RIP.Ptr RIP.Void) -> IO ())
+zwlr_output_manager_v1_set_user_data :: RIP.FunPtr (RIP.Ptr Zwlr_output_manager_v1 -> RIP.Ptr RIP.Void -> IO ())
 zwlr_output_manager_v1_set_user_data =
   RIP.unsafePerformIO hs_bindgen_49420786d62af558
 
@@ -437,22 +429,18 @@ foreign import ccall unsafe "hs_bindgen_8e968720df9c84c8" hs_bindgen_8e968720df9
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_manager_v1_get_user_data@
-hs_bindgen_8e968720df9c84c8 :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_manager_v1) -> IO (RIP.Ptr RIP.Void)))
+hs_bindgen_8e968720df9c84c8 :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_manager_v1 -> IO (RIP.Ptr RIP.Void)))
 hs_bindgen_8e968720df9c84c8 =
   RIP.fromFFIType hs_bindgen_8e968720df9c84c8_base
 
 {-# NOINLINE zwlr_output_manager_v1_get_user_data #-}
-{-|
+{-| __C declaration:__ @zwlr_output_manager_v1_get_user_data@
 
-  > iface_zwlr_output_manager_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 362:1@
 
-__C declaration:__ @zwlr_output_manager_v1_get_user_data@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 362:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_manager_v1_get_user_data :: RIP.FunPtr ((RIP.Ptr Zwlr_output_manager_v1) -> IO (RIP.Ptr RIP.Void))
+zwlr_output_manager_v1_get_user_data :: RIP.FunPtr (RIP.Ptr Zwlr_output_manager_v1 -> IO (RIP.Ptr RIP.Void))
 zwlr_output_manager_v1_get_user_data =
   RIP.unsafePerformIO hs_bindgen_8e968720df9c84c8
 
@@ -461,7 +449,7 @@ foreign import ccall unsafe "hs_bindgen_8803bc4089445025" hs_bindgen_8803bc40894
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_manager_v1_get_version@
-hs_bindgen_8803bc4089445025 :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_manager_v1) -> IO HsBindgen.Runtime.LibC.Word32))
+hs_bindgen_8803bc4089445025 :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_manager_v1 -> IO HsBindgen.Runtime.LibC.Word32))
 hs_bindgen_8803bc4089445025 =
   RIP.fromFFIType hs_bindgen_8803bc4089445025_base
 
@@ -472,7 +460,7 @@ hs_bindgen_8803bc4089445025 =
 
     __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_manager_v1_get_version :: RIP.FunPtr ((RIP.Ptr Zwlr_output_manager_v1) -> IO HsBindgen.Runtime.LibC.Word32)
+zwlr_output_manager_v1_get_version :: RIP.FunPtr (RIP.Ptr Zwlr_output_manager_v1 -> IO HsBindgen.Runtime.LibC.Word32)
 zwlr_output_manager_v1_get_version =
   RIP.unsafePerformIO hs_bindgen_8803bc4089445025
 
@@ -481,22 +469,18 @@ foreign import ccall unsafe "hs_bindgen_15e1c57a283cc45a" hs_bindgen_15e1c57a283
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_manager_v1_destroy@
-hs_bindgen_15e1c57a283cc45a :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_manager_v1) -> IO ()))
+hs_bindgen_15e1c57a283cc45a :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_manager_v1 -> IO ()))
 hs_bindgen_15e1c57a283cc45a =
   RIP.fromFFIType hs_bindgen_15e1c57a283cc45a_base
 
 {-# NOINLINE zwlr_output_manager_v1_destroy #-}
-{-|
+{-| __C declaration:__ @zwlr_output_manager_v1_destroy@
 
-  > iface_zwlr_output_manager_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 375:1@
 
-__C declaration:__ @zwlr_output_manager_v1_destroy@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 375:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_manager_v1_destroy :: RIP.FunPtr ((RIP.Ptr Zwlr_output_manager_v1) -> IO ())
+zwlr_output_manager_v1_destroy :: RIP.FunPtr (RIP.Ptr Zwlr_output_manager_v1 -> IO ())
 zwlr_output_manager_v1_destroy =
   RIP.unsafePerformIO hs_bindgen_15e1c57a283cc45a
 
@@ -505,24 +489,20 @@ foreign import ccall unsafe "hs_bindgen_f35208b0c2321b04" hs_bindgen_f35208b0c23
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_manager_v1_create_configuration@
-hs_bindgen_f35208b0c2321b04 :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_manager_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO (RIP.Ptr Zwlr_output_configuration_v1)))
+hs_bindgen_f35208b0c2321b04 :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_manager_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO (RIP.Ptr Zwlr_output_configuration_v1)))
 hs_bindgen_f35208b0c2321b04 =
   RIP.fromFFIType hs_bindgen_f35208b0c2321b04_base
 
 {-# NOINLINE zwlr_output_manager_v1_create_configuration #-}
-{-|
+{-| Create a new output configuration object. This allows to update head properties.
 
-  > iface_zwlr_output_manager_v1
+    __C declaration:__ @zwlr_output_manager_v1_create_configuration@
 
-  Create a new output configuration object. This allows to update head properties.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 387:1@
 
-__C declaration:__ @zwlr_output_manager_v1_create_configuration@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 387:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_manager_v1_create_configuration :: RIP.FunPtr ((RIP.Ptr Zwlr_output_manager_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO (RIP.Ptr Zwlr_output_configuration_v1))
+zwlr_output_manager_v1_create_configuration :: RIP.FunPtr (RIP.Ptr Zwlr_output_manager_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO (RIP.Ptr Zwlr_output_configuration_v1))
 zwlr_output_manager_v1_create_configuration =
   RIP.unsafePerformIO hs_bindgen_f35208b0c2321b04
 
@@ -531,26 +511,22 @@ foreign import ccall unsafe "hs_bindgen_94967fc7dd6d38bc" hs_bindgen_94967fc7dd6
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_manager_v1_stop@
-hs_bindgen_94967fc7dd6d38bc :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_manager_v1) -> IO ()))
+hs_bindgen_94967fc7dd6d38bc :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_manager_v1 -> IO ()))
 hs_bindgen_94967fc7dd6d38bc =
   RIP.fromFFIType hs_bindgen_94967fc7dd6d38bc_base
 
 {-# NOINLINE zwlr_output_manager_v1_stop #-}
-{-|
+{-| Indicates the client no longer wishes to receive events for output configuration changes. However the compositor may emit further events, until the finished event is emitted.
 
-  > iface_zwlr_output_manager_v1
+    The client must not send any more requests after this one.
 
-  Indicates the client no longer wishes to receive events for output configuration changes. However the compositor may emit further events, until the finished event is emitted.
+    __C declaration:__ @zwlr_output_manager_v1_stop@
 
-  The client must not send any more requests after this one.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 407:1@
 
-__C declaration:__ @zwlr_output_manager_v1_stop@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 407:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_manager_v1_stop :: RIP.FunPtr ((RIP.Ptr Zwlr_output_manager_v1) -> IO ())
+zwlr_output_manager_v1_stop :: RIP.FunPtr (RIP.Ptr Zwlr_output_manager_v1 -> IO ())
 zwlr_output_manager_v1_stop =
   RIP.unsafePerformIO hs_bindgen_94967fc7dd6d38bc
 
@@ -559,22 +535,18 @@ foreign import ccall unsafe "hs_bindgen_cad66b0b292cabb5" hs_bindgen_cad66b0b292
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_head_v1_add_listener@
-hs_bindgen_cad66b0b292cabb5 :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_head_v1) -> (PtrConst.PtrConst Zwlr_output_head_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt))
+hs_bindgen_cad66b0b292cabb5 :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_head_v1 -> PtrConst.PtrConst Zwlr_output_head_v1_listener -> RIP.Ptr RIP.Void -> IO RIP.CInt))
 hs_bindgen_cad66b0b292cabb5 =
   RIP.fromFFIType hs_bindgen_cad66b0b292cabb5_base
 
 {-# NOINLINE zwlr_output_head_v1_add_listener #-}
-{-|
+{-| __C declaration:__ @zwlr_output_head_v1_add_listener@
 
-  > iface_zwlr_output_head_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 674:1@
 
-__C declaration:__ @zwlr_output_head_v1_add_listener@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 674:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_head_v1_add_listener :: RIP.FunPtr ((RIP.Ptr Zwlr_output_head_v1) -> (PtrConst.PtrConst Zwlr_output_head_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt)
+zwlr_output_head_v1_add_listener :: RIP.FunPtr (RIP.Ptr Zwlr_output_head_v1 -> PtrConst.PtrConst Zwlr_output_head_v1_listener -> RIP.Ptr RIP.Void -> IO RIP.CInt)
 zwlr_output_head_v1_add_listener =
   RIP.unsafePerformIO hs_bindgen_cad66b0b292cabb5
 
@@ -583,22 +555,18 @@ foreign import ccall unsafe "hs_bindgen_51a8b67ceec72f06" hs_bindgen_51a8b67ceec
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_head_v1_set_user_data@
-hs_bindgen_51a8b67ceec72f06 :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_head_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
+hs_bindgen_51a8b67ceec72f06 :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_head_v1 -> RIP.Ptr RIP.Void -> IO ()))
 hs_bindgen_51a8b67ceec72f06 =
   RIP.fromFFIType hs_bindgen_51a8b67ceec72f06_base
 
 {-# NOINLINE zwlr_output_head_v1_set_user_data #-}
-{-|
+{-| __C declaration:__ @zwlr_output_head_v1_set_user_data@
 
-  > iface_zwlr_output_head_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 747:1@
 
-__C declaration:__ @zwlr_output_head_v1_set_user_data@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 747:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_head_v1_set_user_data :: RIP.FunPtr ((RIP.Ptr Zwlr_output_head_v1) -> (RIP.Ptr RIP.Void) -> IO ())
+zwlr_output_head_v1_set_user_data :: RIP.FunPtr (RIP.Ptr Zwlr_output_head_v1 -> RIP.Ptr RIP.Void -> IO ())
 zwlr_output_head_v1_set_user_data =
   RIP.unsafePerformIO hs_bindgen_51a8b67ceec72f06
 
@@ -607,22 +575,18 @@ foreign import ccall unsafe "hs_bindgen_c5a427986310ce4e" hs_bindgen_c5a42798631
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_head_v1_get_user_data@
-hs_bindgen_c5a427986310ce4e :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_head_v1) -> IO (RIP.Ptr RIP.Void)))
+hs_bindgen_c5a427986310ce4e :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_head_v1 -> IO (RIP.Ptr RIP.Void)))
 hs_bindgen_c5a427986310ce4e =
   RIP.fromFFIType hs_bindgen_c5a427986310ce4e_base
 
 {-# NOINLINE zwlr_output_head_v1_get_user_data #-}
-{-|
+{-| __C declaration:__ @zwlr_output_head_v1_get_user_data@
 
-  > iface_zwlr_output_head_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 754:1@
 
-__C declaration:__ @zwlr_output_head_v1_get_user_data@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 754:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_head_v1_get_user_data :: RIP.FunPtr ((RIP.Ptr Zwlr_output_head_v1) -> IO (RIP.Ptr RIP.Void))
+zwlr_output_head_v1_get_user_data :: RIP.FunPtr (RIP.Ptr Zwlr_output_head_v1 -> IO (RIP.Ptr RIP.Void))
 zwlr_output_head_v1_get_user_data =
   RIP.unsafePerformIO hs_bindgen_c5a427986310ce4e
 
@@ -631,7 +595,7 @@ foreign import ccall unsafe "hs_bindgen_a6af1b7fe9184c52" hs_bindgen_a6af1b7fe91
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_head_v1_get_version@
-hs_bindgen_a6af1b7fe9184c52 :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_head_v1) -> IO HsBindgen.Runtime.LibC.Word32))
+hs_bindgen_a6af1b7fe9184c52 :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_head_v1 -> IO HsBindgen.Runtime.LibC.Word32))
 hs_bindgen_a6af1b7fe9184c52 =
   RIP.fromFFIType hs_bindgen_a6af1b7fe9184c52_base
 
@@ -642,7 +606,7 @@ hs_bindgen_a6af1b7fe9184c52 =
 
     __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_head_v1_get_version :: RIP.FunPtr ((RIP.Ptr Zwlr_output_head_v1) -> IO HsBindgen.Runtime.LibC.Word32)
+zwlr_output_head_v1_get_version :: RIP.FunPtr (RIP.Ptr Zwlr_output_head_v1 -> IO HsBindgen.Runtime.LibC.Word32)
 zwlr_output_head_v1_get_version =
   RIP.unsafePerformIO hs_bindgen_a6af1b7fe9184c52
 
@@ -651,22 +615,18 @@ foreign import ccall unsafe "hs_bindgen_1646cd83f02c4f36" hs_bindgen_1646cd83f02
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_head_v1_destroy@
-hs_bindgen_1646cd83f02c4f36 :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_head_v1) -> IO ()))
+hs_bindgen_1646cd83f02c4f36 :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_head_v1 -> IO ()))
 hs_bindgen_1646cd83f02c4f36 =
   RIP.fromFFIType hs_bindgen_1646cd83f02c4f36_base
 
 {-# NOINLINE zwlr_output_head_v1_destroy #-}
-{-|
+{-| __C declaration:__ @zwlr_output_head_v1_destroy@
 
-  > iface_zwlr_output_head_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 767:1@
 
-__C declaration:__ @zwlr_output_head_v1_destroy@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 767:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_head_v1_destroy :: RIP.FunPtr ((RIP.Ptr Zwlr_output_head_v1) -> IO ())
+zwlr_output_head_v1_destroy :: RIP.FunPtr (RIP.Ptr Zwlr_output_head_v1 -> IO ())
 zwlr_output_head_v1_destroy =
   RIP.unsafePerformIO hs_bindgen_1646cd83f02c4f36
 
@@ -675,24 +635,20 @@ foreign import ccall unsafe "hs_bindgen_7925cd5f17133c5e" hs_bindgen_7925cd5f171
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_head_v1_release@
-hs_bindgen_7925cd5f17133c5e :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_head_v1) -> IO ()))
+hs_bindgen_7925cd5f17133c5e :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_head_v1 -> IO ()))
 hs_bindgen_7925cd5f17133c5e =
   RIP.fromFFIType hs_bindgen_7925cd5f17133c5e_base
 
 {-# NOINLINE zwlr_output_head_v1_release #-}
-{-|
+{-| This request indicates that the client will no longer use this head object.
 
-  > iface_zwlr_output_head_v1
+    __C declaration:__ @zwlr_output_head_v1_release@
 
-  This request indicates that the client will no longer use this head object.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 779:1@
 
-__C declaration:__ @zwlr_output_head_v1_release@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 779:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_head_v1_release :: RIP.FunPtr ((RIP.Ptr Zwlr_output_head_v1) -> IO ())
+zwlr_output_head_v1_release :: RIP.FunPtr (RIP.Ptr Zwlr_output_head_v1 -> IO ())
 zwlr_output_head_v1_release =
   RIP.unsafePerformIO hs_bindgen_7925cd5f17133c5e
 
@@ -701,22 +657,18 @@ foreign import ccall unsafe "hs_bindgen_0509c0e7c43bd189" hs_bindgen_0509c0e7c43
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_mode_v1_add_listener@
-hs_bindgen_0509c0e7c43bd189 :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_mode_v1) -> (PtrConst.PtrConst Zwlr_output_mode_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt))
+hs_bindgen_0509c0e7c43bd189 :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_mode_v1 -> PtrConst.PtrConst Zwlr_output_mode_v1_listener -> RIP.Ptr RIP.Void -> IO RIP.CInt))
 hs_bindgen_0509c0e7c43bd189 =
   RIP.fromFFIType hs_bindgen_0509c0e7c43bd189_base
 
 {-# NOINLINE zwlr_output_mode_v1_add_listener #-}
-{-|
+{-| __C declaration:__ @zwlr_output_mode_v1_add_listener@
 
-  > iface_zwlr_output_mode_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 836:1@
 
-__C declaration:__ @zwlr_output_mode_v1_add_listener@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 836:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_mode_v1_add_listener :: RIP.FunPtr ((RIP.Ptr Zwlr_output_mode_v1) -> (PtrConst.PtrConst Zwlr_output_mode_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt)
+zwlr_output_mode_v1_add_listener :: RIP.FunPtr (RIP.Ptr Zwlr_output_mode_v1 -> PtrConst.PtrConst Zwlr_output_mode_v1_listener -> RIP.Ptr RIP.Void -> IO RIP.CInt)
 zwlr_output_mode_v1_add_listener =
   RIP.unsafePerformIO hs_bindgen_0509c0e7c43bd189
 
@@ -725,22 +677,18 @@ foreign import ccall unsafe "hs_bindgen_bdaf81a4e036a965" hs_bindgen_bdaf81a4e03
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_mode_v1_set_user_data@
-hs_bindgen_bdaf81a4e036a965 :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_mode_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
+hs_bindgen_bdaf81a4e036a965 :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_mode_v1 -> RIP.Ptr RIP.Void -> IO ()))
 hs_bindgen_bdaf81a4e036a965 =
   RIP.fromFFIType hs_bindgen_bdaf81a4e036a965_base
 
 {-# NOINLINE zwlr_output_mode_v1_set_user_data #-}
-{-|
+{-| __C declaration:__ @zwlr_output_mode_v1_set_user_data@
 
-  > iface_zwlr_output_mode_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 869:1@
 
-__C declaration:__ @zwlr_output_mode_v1_set_user_data@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 869:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_mode_v1_set_user_data :: RIP.FunPtr ((RIP.Ptr Zwlr_output_mode_v1) -> (RIP.Ptr RIP.Void) -> IO ())
+zwlr_output_mode_v1_set_user_data :: RIP.FunPtr (RIP.Ptr Zwlr_output_mode_v1 -> RIP.Ptr RIP.Void -> IO ())
 zwlr_output_mode_v1_set_user_data =
   RIP.unsafePerformIO hs_bindgen_bdaf81a4e036a965
 
@@ -749,22 +697,18 @@ foreign import ccall unsafe "hs_bindgen_3cd7b4af3c24ccec" hs_bindgen_3cd7b4af3c2
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_mode_v1_get_user_data@
-hs_bindgen_3cd7b4af3c24ccec :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_mode_v1) -> IO (RIP.Ptr RIP.Void)))
+hs_bindgen_3cd7b4af3c24ccec :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_mode_v1 -> IO (RIP.Ptr RIP.Void)))
 hs_bindgen_3cd7b4af3c24ccec =
   RIP.fromFFIType hs_bindgen_3cd7b4af3c24ccec_base
 
 {-# NOINLINE zwlr_output_mode_v1_get_user_data #-}
-{-|
+{-| __C declaration:__ @zwlr_output_mode_v1_get_user_data@
 
-  > iface_zwlr_output_mode_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 876:1@
 
-__C declaration:__ @zwlr_output_mode_v1_get_user_data@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 876:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_mode_v1_get_user_data :: RIP.FunPtr ((RIP.Ptr Zwlr_output_mode_v1) -> IO (RIP.Ptr RIP.Void))
+zwlr_output_mode_v1_get_user_data :: RIP.FunPtr (RIP.Ptr Zwlr_output_mode_v1 -> IO (RIP.Ptr RIP.Void))
 zwlr_output_mode_v1_get_user_data =
   RIP.unsafePerformIO hs_bindgen_3cd7b4af3c24ccec
 
@@ -773,7 +717,7 @@ foreign import ccall unsafe "hs_bindgen_b38ecb6018b4f2d0" hs_bindgen_b38ecb6018b
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_mode_v1_get_version@
-hs_bindgen_b38ecb6018b4f2d0 :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_mode_v1) -> IO HsBindgen.Runtime.LibC.Word32))
+hs_bindgen_b38ecb6018b4f2d0 :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_mode_v1 -> IO HsBindgen.Runtime.LibC.Word32))
 hs_bindgen_b38ecb6018b4f2d0 =
   RIP.fromFFIType hs_bindgen_b38ecb6018b4f2d0_base
 
@@ -784,7 +728,7 @@ hs_bindgen_b38ecb6018b4f2d0 =
 
     __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_mode_v1_get_version :: RIP.FunPtr ((RIP.Ptr Zwlr_output_mode_v1) -> IO HsBindgen.Runtime.LibC.Word32)
+zwlr_output_mode_v1_get_version :: RIP.FunPtr (RIP.Ptr Zwlr_output_mode_v1 -> IO HsBindgen.Runtime.LibC.Word32)
 zwlr_output_mode_v1_get_version =
   RIP.unsafePerformIO hs_bindgen_b38ecb6018b4f2d0
 
@@ -793,22 +737,18 @@ foreign import ccall unsafe "hs_bindgen_4e059a5a11f396d1" hs_bindgen_4e059a5a11f
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_mode_v1_destroy@
-hs_bindgen_4e059a5a11f396d1 :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_mode_v1) -> IO ()))
+hs_bindgen_4e059a5a11f396d1 :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_mode_v1 -> IO ()))
 hs_bindgen_4e059a5a11f396d1 =
   RIP.fromFFIType hs_bindgen_4e059a5a11f396d1_base
 
 {-# NOINLINE zwlr_output_mode_v1_destroy #-}
-{-|
+{-| __C declaration:__ @zwlr_output_mode_v1_destroy@
 
-  > iface_zwlr_output_mode_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 889:1@
 
-__C declaration:__ @zwlr_output_mode_v1_destroy@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 889:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_mode_v1_destroy :: RIP.FunPtr ((RIP.Ptr Zwlr_output_mode_v1) -> IO ())
+zwlr_output_mode_v1_destroy :: RIP.FunPtr (RIP.Ptr Zwlr_output_mode_v1 -> IO ())
 zwlr_output_mode_v1_destroy =
   RIP.unsafePerformIO hs_bindgen_4e059a5a11f396d1
 
@@ -817,24 +757,20 @@ foreign import ccall unsafe "hs_bindgen_6476c32ae4673d14" hs_bindgen_6476c32ae46
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_mode_v1_release@
-hs_bindgen_6476c32ae4673d14 :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_mode_v1) -> IO ()))
+hs_bindgen_6476c32ae4673d14 :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_mode_v1 -> IO ()))
 hs_bindgen_6476c32ae4673d14 =
   RIP.fromFFIType hs_bindgen_6476c32ae4673d14_base
 
 {-# NOINLINE zwlr_output_mode_v1_release #-}
-{-|
+{-| This request indicates that the client will no longer use this mode object.
 
-  > iface_zwlr_output_mode_v1
+    __C declaration:__ @zwlr_output_mode_v1_release@
 
-  This request indicates that the client will no longer use this mode object.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 901:1@
 
-__C declaration:__ @zwlr_output_mode_v1_release@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 901:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_mode_v1_release :: RIP.FunPtr ((RIP.Ptr Zwlr_output_mode_v1) -> IO ())
+zwlr_output_mode_v1_release :: RIP.FunPtr (RIP.Ptr Zwlr_output_mode_v1 -> IO ())
 zwlr_output_mode_v1_release =
   RIP.unsafePerformIO hs_bindgen_6476c32ae4673d14
 
@@ -843,22 +779,18 @@ foreign import ccall unsafe "hs_bindgen_31ff3ebe19ddcfdb" hs_bindgen_31ff3ebe19d
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_configuration_v1_add_listener@
-hs_bindgen_31ff3ebe19ddcfdb :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_v1) -> (PtrConst.PtrConst Zwlr_output_configuration_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt))
+hs_bindgen_31ff3ebe19ddcfdb :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_v1 -> PtrConst.PtrConst Zwlr_output_configuration_v1_listener -> RIP.Ptr RIP.Void -> IO RIP.CInt))
 hs_bindgen_31ff3ebe19ddcfdb =
   RIP.fromFFIType hs_bindgen_31ff3ebe19ddcfdb_base
 
 {-# NOINLINE zwlr_output_configuration_v1_add_listener #-}
-{-|
+{-| __C declaration:__ @zwlr_output_configuration_v1_add_listener@
 
-  > iface_zwlr_output_configuration_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 978:1@
 
-__C declaration:__ @zwlr_output_configuration_v1_add_listener@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 978:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_configuration_v1_add_listener :: RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_v1) -> (PtrConst.PtrConst Zwlr_output_configuration_v1_listener) -> (RIP.Ptr RIP.Void) -> IO RIP.CInt)
+zwlr_output_configuration_v1_add_listener :: RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_v1 -> PtrConst.PtrConst Zwlr_output_configuration_v1_listener -> RIP.Ptr RIP.Void -> IO RIP.CInt)
 zwlr_output_configuration_v1_add_listener =
   RIP.unsafePerformIO hs_bindgen_31ff3ebe19ddcfdb
 
@@ -867,22 +799,18 @@ foreign import ccall unsafe "hs_bindgen_5eba53132ccbf9ed" hs_bindgen_5eba53132cc
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_configuration_v1_set_user_data@
-hs_bindgen_5eba53132ccbf9ed :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
+hs_bindgen_5eba53132ccbf9ed :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_v1 -> RIP.Ptr RIP.Void -> IO ()))
 hs_bindgen_5eba53132ccbf9ed =
   RIP.fromFFIType hs_bindgen_5eba53132ccbf9ed_base
 
 {-# NOINLINE zwlr_output_configuration_v1_set_user_data #-}
-{-|
+{-| __C declaration:__ @zwlr_output_configuration_v1_set_user_data@
 
-  > iface_zwlr_output_configuration_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1027:1@
 
-__C declaration:__ @zwlr_output_configuration_v1_set_user_data@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1027:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_configuration_v1_set_user_data :: RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_v1) -> (RIP.Ptr RIP.Void) -> IO ())
+zwlr_output_configuration_v1_set_user_data :: RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_v1 -> RIP.Ptr RIP.Void -> IO ())
 zwlr_output_configuration_v1_set_user_data =
   RIP.unsafePerformIO hs_bindgen_5eba53132ccbf9ed
 
@@ -891,22 +819,18 @@ foreign import ccall unsafe "hs_bindgen_94c679972fd524f3" hs_bindgen_94c679972fd
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_configuration_v1_get_user_data@
-hs_bindgen_94c679972fd524f3 :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_v1) -> IO (RIP.Ptr RIP.Void)))
+hs_bindgen_94c679972fd524f3 :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_v1 -> IO (RIP.Ptr RIP.Void)))
 hs_bindgen_94c679972fd524f3 =
   RIP.fromFFIType hs_bindgen_94c679972fd524f3_base
 
 {-# NOINLINE zwlr_output_configuration_v1_get_user_data #-}
-{-|
+{-| __C declaration:__ @zwlr_output_configuration_v1_get_user_data@
 
-  > iface_zwlr_output_configuration_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1034:1@
 
-__C declaration:__ @zwlr_output_configuration_v1_get_user_data@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1034:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_configuration_v1_get_user_data :: RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_v1) -> IO (RIP.Ptr RIP.Void))
+zwlr_output_configuration_v1_get_user_data :: RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_v1 -> IO (RIP.Ptr RIP.Void))
 zwlr_output_configuration_v1_get_user_data =
   RIP.unsafePerformIO hs_bindgen_94c679972fd524f3
 
@@ -915,7 +839,7 @@ foreign import ccall unsafe "hs_bindgen_fad361301635a5c8" hs_bindgen_fad36130163
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_configuration_v1_get_version@
-hs_bindgen_fad361301635a5c8 :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_v1) -> IO HsBindgen.Runtime.LibC.Word32))
+hs_bindgen_fad361301635a5c8 :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_v1 -> IO HsBindgen.Runtime.LibC.Word32))
 hs_bindgen_fad361301635a5c8 =
   RIP.fromFFIType hs_bindgen_fad361301635a5c8_base
 
@@ -926,7 +850,7 @@ hs_bindgen_fad361301635a5c8 =
 
     __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_configuration_v1_get_version :: RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_v1) -> IO HsBindgen.Runtime.LibC.Word32)
+zwlr_output_configuration_v1_get_version :: RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_v1 -> IO HsBindgen.Runtime.LibC.Word32)
 zwlr_output_configuration_v1_get_version =
   RIP.unsafePerformIO hs_bindgen_fad361301635a5c8
 
@@ -935,24 +859,20 @@ foreign import ccall unsafe "hs_bindgen_53e3ac0863e6cd15" hs_bindgen_53e3ac0863e
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_configuration_v1_enable_head@
-hs_bindgen_53e3ac0863e6cd15 :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_v1) -> (RIP.Ptr Zwlr_output_head_v1) -> IO (RIP.Ptr Zwlr_output_configuration_head_v1)))
+hs_bindgen_53e3ac0863e6cd15 :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_v1 -> RIP.Ptr Zwlr_output_head_v1 -> IO (RIP.Ptr Zwlr_output_configuration_head_v1)))
 hs_bindgen_53e3ac0863e6cd15 =
   RIP.fromFFIType hs_bindgen_53e3ac0863e6cd15_base
 
 {-# NOINLINE zwlr_output_configuration_v1_enable_head #-}
-{-|
+{-| Enable a head. This request creates a head configuration object that can be used to change the head's properties.
 
-  > iface_zwlr_output_configuration_v1
+    __C declaration:__ @zwlr_output_configuration_v1_enable_head@
 
-  Enable a head. This request creates a head configuration object that can be used to change the head's properties.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1052:1@
 
-__C declaration:__ @zwlr_output_configuration_v1_enable_head@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1052:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_configuration_v1_enable_head :: RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_v1) -> (RIP.Ptr Zwlr_output_head_v1) -> IO (RIP.Ptr Zwlr_output_configuration_head_v1))
+zwlr_output_configuration_v1_enable_head :: RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_v1 -> RIP.Ptr Zwlr_output_head_v1 -> IO (RIP.Ptr Zwlr_output_configuration_head_v1))
 zwlr_output_configuration_v1_enable_head =
   RIP.unsafePerformIO hs_bindgen_53e3ac0863e6cd15
 
@@ -961,24 +881,20 @@ foreign import ccall unsafe "hs_bindgen_02574e543a322535" hs_bindgen_02574e543a3
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_configuration_v1_disable_head@
-hs_bindgen_02574e543a322535 :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_v1) -> (RIP.Ptr Zwlr_output_head_v1) -> IO ()))
+hs_bindgen_02574e543a322535 :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_v1 -> RIP.Ptr Zwlr_output_head_v1 -> IO ()))
 hs_bindgen_02574e543a322535 =
   RIP.fromFFIType hs_bindgen_02574e543a322535_base
 
 {-# NOINLINE zwlr_output_configuration_v1_disable_head #-}
-{-|
+{-| Disable a head.
 
-  > iface_zwlr_output_configuration_v1
+    __C declaration:__ @zwlr_output_configuration_v1_disable_head@
 
-  Disable a head.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1068:1@
 
-__C declaration:__ @zwlr_output_configuration_v1_disable_head@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1068:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_configuration_v1_disable_head :: RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_v1) -> (RIP.Ptr Zwlr_output_head_v1) -> IO ())
+zwlr_output_configuration_v1_disable_head :: RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_v1 -> RIP.Ptr Zwlr_output_head_v1 -> IO ())
 zwlr_output_configuration_v1_disable_head =
   RIP.unsafePerformIO hs_bindgen_02574e543a322535
 
@@ -987,28 +903,24 @@ foreign import ccall unsafe "hs_bindgen_6cb1de186d3cd2a5" hs_bindgen_6cb1de186d3
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_configuration_v1_apply@
-hs_bindgen_6cb1de186d3cd2a5 :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_v1) -> IO ()))
+hs_bindgen_6cb1de186d3cd2a5 :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_v1 -> IO ()))
 hs_bindgen_6cb1de186d3cd2a5 =
   RIP.fromFFIType hs_bindgen_6cb1de186d3cd2a5_base
 
 {-# NOINLINE zwlr_output_configuration_v1_apply #-}
-{-|
+{-| Apply the new output configuration.
 
-  > iface_zwlr_output_configuration_v1
+    In case the configuration is successfully applied, there is no guarantee that the new output state matches completely the requested configuration. For instance, a compositor might round the scale if it doesn't support fractional scaling.
 
-  Apply the new output configuration.
+    After this request has been sent, the compositor must respond with an succeeded, failed or cancelled event. Sending a request that isn't the destructor is a protocol error.
 
-  In case the configuration is successfully applied, there is no guarantee that the new output state matches completely the requested configuration. For instance, a compositor might round the scale if it doesn't support fractional scaling.
+    __C declaration:__ @zwlr_output_configuration_v1_apply@
 
-  After this request has been sent, the compositor must respond with an succeeded, failed or cancelled event. Sending a request that isn't the destructor is a protocol error.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1089:1@
 
-__C declaration:__ @zwlr_output_configuration_v1_apply@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1089:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_configuration_v1_apply :: RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_v1) -> IO ())
+zwlr_output_configuration_v1_apply :: RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_v1 -> IO ())
 zwlr_output_configuration_v1_apply =
   RIP.unsafePerformIO hs_bindgen_6cb1de186d3cd2a5
 
@@ -1017,28 +929,24 @@ foreign import ccall unsafe "hs_bindgen_87ffdabff3974b56" hs_bindgen_87ffdabff39
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_configuration_v1_test@
-hs_bindgen_87ffdabff3974b56 :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_v1) -> IO ()))
+hs_bindgen_87ffdabff3974b56 :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_v1 -> IO ()))
 hs_bindgen_87ffdabff3974b56 =
   RIP.fromFFIType hs_bindgen_87ffdabff3974b56_base
 
 {-# NOINLINE zwlr_output_configuration_v1_test #-}
-{-|
+{-| Test the new output configuration. The configuration won't be applied, but will only be validated.
 
-  > iface_zwlr_output_configuration_v1
+    Even if the compositor succeeds to test a configuration, applying it may fail.
 
-  Test the new output configuration. The configuration won't be applied, but will only be validated.
+    After this request has been sent, the compositor must respond with an succeeded, failed or cancelled event. Sending a request that isn't the destructor is a protocol error.
 
-  Even if the compositor succeeds to test a configuration, applying it may fail.
+    __C declaration:__ @zwlr_output_configuration_v1_test@
 
-  After this request has been sent, the compositor must respond with an succeeded, failed or cancelled event. Sending a request that isn't the destructor is a protocol error.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1109:1@
 
-__C declaration:__ @zwlr_output_configuration_v1_test@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1109:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_configuration_v1_test :: RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_v1) -> IO ())
+zwlr_output_configuration_v1_test :: RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_v1 -> IO ())
 zwlr_output_configuration_v1_test =
   RIP.unsafePerformIO hs_bindgen_87ffdabff3974b56
 
@@ -1047,26 +955,22 @@ foreign import ccall unsafe "hs_bindgen_75051e143cfedccf" hs_bindgen_75051e143cf
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_configuration_v1_destroy@
-hs_bindgen_75051e143cfedccf :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_v1) -> IO ()))
+hs_bindgen_75051e143cfedccf :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_v1 -> IO ()))
 hs_bindgen_75051e143cfedccf =
   RIP.fromFFIType hs_bindgen_75051e143cfedccf_base
 
 {-# NOINLINE zwlr_output_configuration_v1_destroy #-}
-{-|
+{-| Using this request a client can tell the compositor that it is not going to use the configuration object anymore. Any changes to the outputs that have not been applied will be discarded.
 
-  > iface_zwlr_output_configuration_v1
+    This request also destroys wlr_output_configuration_head objects created via this object.
 
-  Using this request a client can tell the compositor that it is not going to use the configuration object anymore. Any changes to the outputs that have not been applied will be discarded.
+    __C declaration:__ @zwlr_output_configuration_v1_destroy@
 
-  This request also destroys wlr_output_configuration_head objects created via this object.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1126:1@
 
-__C declaration:__ @zwlr_output_configuration_v1_destroy@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1126:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_configuration_v1_destroy :: RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_v1) -> IO ())
+zwlr_output_configuration_v1_destroy :: RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_v1 -> IO ())
 zwlr_output_configuration_v1_destroy =
   RIP.unsafePerformIO hs_bindgen_75051e143cfedccf
 
@@ -1075,22 +979,18 @@ foreign import ccall unsafe "hs_bindgen_f9ac72ef7a252118" hs_bindgen_f9ac72ef7a2
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_configuration_head_v1_set_user_data@
-hs_bindgen_f9ac72ef7a252118 :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_head_v1) -> (RIP.Ptr RIP.Void) -> IO ()))
+hs_bindgen_f9ac72ef7a252118 :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_head_v1 -> RIP.Ptr RIP.Void -> IO ()))
 hs_bindgen_f9ac72ef7a252118 =
   RIP.fromFFIType hs_bindgen_f9ac72ef7a252118_base
 
 {-# NOINLINE zwlr_output_configuration_head_v1_set_user_data #-}
-{-|
+{-| __C declaration:__ @zwlr_output_configuration_head_v1_set_user_data@
 
-  > iface_zwlr_output_configuration_head_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1202:1@
 
-__C declaration:__ @zwlr_output_configuration_head_v1_set_user_data@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1202:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_configuration_head_v1_set_user_data :: RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_head_v1) -> (RIP.Ptr RIP.Void) -> IO ())
+zwlr_output_configuration_head_v1_set_user_data :: RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_head_v1 -> RIP.Ptr RIP.Void -> IO ())
 zwlr_output_configuration_head_v1_set_user_data =
   RIP.unsafePerformIO hs_bindgen_f9ac72ef7a252118
 
@@ -1099,22 +999,18 @@ foreign import ccall unsafe "hs_bindgen_e5701956dbab4e80" hs_bindgen_e5701956dba
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_configuration_head_v1_get_user_data@
-hs_bindgen_e5701956dbab4e80 :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_head_v1) -> IO (RIP.Ptr RIP.Void)))
+hs_bindgen_e5701956dbab4e80 :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_head_v1 -> IO (RIP.Ptr RIP.Void)))
 hs_bindgen_e5701956dbab4e80 =
   RIP.fromFFIType hs_bindgen_e5701956dbab4e80_base
 
 {-# NOINLINE zwlr_output_configuration_head_v1_get_user_data #-}
-{-|
+{-| __C declaration:__ @zwlr_output_configuration_head_v1_get_user_data@
 
-  > iface_zwlr_output_configuration_head_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1209:1@
 
-__C declaration:__ @zwlr_output_configuration_head_v1_get_user_data@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1209:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_configuration_head_v1_get_user_data :: RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_head_v1) -> IO (RIP.Ptr RIP.Void))
+zwlr_output_configuration_head_v1_get_user_data :: RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_head_v1 -> IO (RIP.Ptr RIP.Void))
 zwlr_output_configuration_head_v1_get_user_data =
   RIP.unsafePerformIO hs_bindgen_e5701956dbab4e80
 
@@ -1123,7 +1019,7 @@ foreign import ccall unsafe "hs_bindgen_74428623fe16ef2f" hs_bindgen_74428623fe1
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_configuration_head_v1_get_version@
-hs_bindgen_74428623fe16ef2f :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_head_v1) -> IO HsBindgen.Runtime.LibC.Word32))
+hs_bindgen_74428623fe16ef2f :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_head_v1 -> IO HsBindgen.Runtime.LibC.Word32))
 hs_bindgen_74428623fe16ef2f =
   RIP.fromFFIType hs_bindgen_74428623fe16ef2f_base
 
@@ -1134,7 +1030,7 @@ hs_bindgen_74428623fe16ef2f =
 
     __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_configuration_head_v1_get_version :: RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_head_v1) -> IO HsBindgen.Runtime.LibC.Word32)
+zwlr_output_configuration_head_v1_get_version :: RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_head_v1 -> IO HsBindgen.Runtime.LibC.Word32)
 zwlr_output_configuration_head_v1_get_version =
   RIP.unsafePerformIO hs_bindgen_74428623fe16ef2f
 
@@ -1143,22 +1039,18 @@ foreign import ccall unsafe "hs_bindgen_0b4ab2a69f14298b" hs_bindgen_0b4ab2a69f1
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_configuration_head_v1_destroy@
-hs_bindgen_0b4ab2a69f14298b :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_head_v1) -> IO ()))
+hs_bindgen_0b4ab2a69f14298b :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_head_v1 -> IO ()))
 hs_bindgen_0b4ab2a69f14298b =
   RIP.fromFFIType hs_bindgen_0b4ab2a69f14298b_base
 
 {-# NOINLINE zwlr_output_configuration_head_v1_destroy #-}
-{-|
+{-| __C declaration:__ @zwlr_output_configuration_head_v1_destroy@
 
-  > iface_zwlr_output_configuration_head_v1
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1222:1@
 
-__C declaration:__ @zwlr_output_configuration_head_v1_destroy@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1222:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_configuration_head_v1_destroy :: RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_head_v1) -> IO ())
+zwlr_output_configuration_head_v1_destroy :: RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_head_v1 -> IO ())
 zwlr_output_configuration_head_v1_destroy =
   RIP.unsafePerformIO hs_bindgen_0b4ab2a69f14298b
 
@@ -1167,24 +1059,20 @@ foreign import ccall unsafe "hs_bindgen_146e753977bd12d5" hs_bindgen_146e753977b
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_configuration_head_v1_set_mode@
-hs_bindgen_146e753977bd12d5 :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_head_v1) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ()))
+hs_bindgen_146e753977bd12d5 :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_head_v1 -> RIP.Ptr Zwlr_output_mode_v1 -> IO ()))
 hs_bindgen_146e753977bd12d5 =
   RIP.fromFFIType hs_bindgen_146e753977bd12d5_base
 
 {-# NOINLINE zwlr_output_configuration_head_v1_set_mode #-}
-{-|
+{-| This request sets the head's mode.
 
-  > iface_zwlr_output_configuration_head_v1
+    __C declaration:__ @zwlr_output_configuration_head_v1_set_mode@
 
-  This request sets the head's mode.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1233:1@
 
-__C declaration:__ @zwlr_output_configuration_head_v1_set_mode@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1233:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_configuration_head_v1_set_mode :: RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_head_v1) -> (RIP.Ptr Zwlr_output_mode_v1) -> IO ())
+zwlr_output_configuration_head_v1_set_mode :: RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_head_v1 -> RIP.Ptr Zwlr_output_mode_v1 -> IO ())
 zwlr_output_configuration_head_v1_set_mode =
   RIP.unsafePerformIO hs_bindgen_146e753977bd12d5
 
@@ -1193,26 +1081,22 @@ foreign import ccall unsafe "hs_bindgen_2f341cabbc487c66" hs_bindgen_2f341cabbc4
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_configuration_head_v1_set_custom_mode@
-hs_bindgen_2f341cabbc487c66 :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_2f341cabbc487c66 :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
 hs_bindgen_2f341cabbc487c66 =
   RIP.fromFFIType hs_bindgen_2f341cabbc487c66_base
 
 {-# NOINLINE zwlr_output_configuration_head_v1_set_custom_mode #-}
-{-|
+{-| This request assigns a custom mode to the head. The size is given in physical hardware units of the output device. If set to zero, the refresh rate is unspecified.
 
-  > iface_zwlr_output_configuration_head_v1
+    It is a protocol error to set both a mode and a custom mode.
 
-  This request assigns a custom mode to the head. The size is given in physical hardware units of the output device. If set to zero, the refresh rate is unspecified.
+    __C declaration:__ @zwlr_output_configuration_head_v1_set_custom_mode@
 
-  It is a protocol error to set both a mode and a custom mode.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1249:1@
 
-__C declaration:__ @zwlr_output_configuration_head_v1_set_custom_mode@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1249:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_configuration_head_v1_set_custom_mode :: RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+zwlr_output_configuration_head_v1_set_custom_mode :: RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 zwlr_output_configuration_head_v1_set_custom_mode =
   RIP.unsafePerformIO hs_bindgen_2f341cabbc487c66
 
@@ -1221,24 +1105,20 @@ foreign import ccall unsafe "hs_bindgen_4e011389c9b0a78c" hs_bindgen_4e011389c9b
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_configuration_head_v1_set_position@
-hs_bindgen_4e011389c9b0a78c :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_4e011389c9b0a78c :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
 hs_bindgen_4e011389c9b0a78c =
   RIP.fromFFIType hs_bindgen_4e011389c9b0a78c_base
 
 {-# NOINLINE zwlr_output_configuration_head_v1_set_position #-}
-{-|
+{-| This request sets the head's position in the global compositor space.
 
-  > iface_zwlr_output_configuration_head_v1
+    __C declaration:__ @zwlr_output_configuration_head_v1_set_position@
 
-  This request sets the head's position in the global compositor space.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1261:1@
 
-__C declaration:__ @zwlr_output_configuration_head_v1_set_position@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1261:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_configuration_head_v1_set_position :: RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+zwlr_output_configuration_head_v1_set_position :: RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 zwlr_output_configuration_head_v1_set_position =
   RIP.unsafePerformIO hs_bindgen_4e011389c9b0a78c
 
@@ -1247,24 +1127,20 @@ foreign import ccall unsafe "hs_bindgen_db63a7e9fb827956" hs_bindgen_db63a7e9fb8
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_configuration_head_v1_set_transform@
-hs_bindgen_db63a7e9fb827956 :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
+hs_bindgen_db63a7e9fb827956 :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ()))
 hs_bindgen_db63a7e9fb827956 =
   RIP.fromFFIType hs_bindgen_db63a7e9fb827956_base
 
 {-# NOINLINE zwlr_output_configuration_head_v1_set_transform #-}
-{-|
+{-| This request sets the head's transform.
 
-  > iface_zwlr_output_configuration_head_v1
+    __C declaration:__ @zwlr_output_configuration_head_v1_set_transform@
 
-  This request sets the head's transform.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1273:1@
 
-__C declaration:__ @zwlr_output_configuration_head_v1_set_transform@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1273:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_configuration_head_v1_set_transform :: RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_head_v1) -> HsBindgen.Runtime.LibC.Int32 -> IO ())
+zwlr_output_configuration_head_v1_set_transform :: RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_head_v1 -> HsBindgen.Runtime.LibC.Int32 -> IO ())
 zwlr_output_configuration_head_v1_set_transform =
   RIP.unsafePerformIO hs_bindgen_db63a7e9fb827956
 
@@ -1273,24 +1149,20 @@ foreign import ccall unsafe "hs_bindgen_960f036a089e1212" hs_bindgen_960f036a089
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_configuration_head_v1_set_scale@
-hs_bindgen_960f036a089e1212 :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_head_v1) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ()))
+hs_bindgen_960f036a089e1212 :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_head_v1 -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ()))
 hs_bindgen_960f036a089e1212 =
   RIP.fromFFIType hs_bindgen_960f036a089e1212_base
 
 {-# NOINLINE zwlr_output_configuration_head_v1_set_scale #-}
-{-|
+{-| This request sets the head's scale.
 
-  > iface_zwlr_output_configuration_head_v1
+    __C declaration:__ @zwlr_output_configuration_head_v1_set_scale@
 
-  This request sets the head's scale.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1285:1@
 
-__C declaration:__ @zwlr_output_configuration_head_v1_set_scale@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1285:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_configuration_head_v1_set_scale :: RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_head_v1) -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ())
+zwlr_output_configuration_head_v1_set_scale :: RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_head_v1 -> Bindings.Wayland.Util.Generated.Wl_fixed_t -> IO ())
 zwlr_output_configuration_head_v1_set_scale =
   RIP.unsafePerformIO hs_bindgen_960f036a089e1212
 
@@ -1299,23 +1171,19 @@ foreign import ccall unsafe "hs_bindgen_b36b58b4a58d69c3" hs_bindgen_b36b58b4a58
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrOutputManagementUnstableV1_Generated_Bindings.Wayland.WlrOutputManagementUnstableV1.Generated_get_zwlr_output_configuration_head_v1_set_adaptive_sync@
-hs_bindgen_b36b58b4a58d69c3 :: IO (RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_head_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
+hs_bindgen_b36b58b4a58d69c3 :: IO (RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_head_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ()))
 hs_bindgen_b36b58b4a58d69c3 =
   RIP.fromFFIType hs_bindgen_b36b58b4a58d69c3_base
 
 {-# NOINLINE zwlr_output_configuration_head_v1_set_adaptive_sync #-}
-{-|
+{-| This request enables/disables adaptive sync. Adaptive sync is also known as Variable Refresh Rate or VRR.
 
-  > iface_zwlr_output_configuration_head_v1
+    __C declaration:__ @zwlr_output_configuration_head_v1_set_adaptive_sync@
 
-  This request enables/disables adaptive sync. Adaptive sync is also known as Variable Refresh Rate or VRR.
+    __defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1298:1@
 
-__C declaration:__ @zwlr_output_configuration_head_v1_set_adaptive_sync@
-
-__defined at:__ @wlr-output-management-unstable-v1-client-protocol.h 1298:1@
-
-__exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
+    __exported by:__ @wlr-output-management-unstable-v1-client-protocol.h@
 -}
-zwlr_output_configuration_head_v1_set_adaptive_sync :: RIP.FunPtr ((RIP.Ptr Zwlr_output_configuration_head_v1) -> HsBindgen.Runtime.LibC.Word32 -> IO ())
+zwlr_output_configuration_head_v1_set_adaptive_sync :: RIP.FunPtr (RIP.Ptr Zwlr_output_configuration_head_v1 -> HsBindgen.Runtime.LibC.Word32 -> IO ())
 zwlr_output_configuration_head_v1_set_adaptive_sync =
   RIP.unsafePerformIO hs_bindgen_b36b58b4a58d69c3

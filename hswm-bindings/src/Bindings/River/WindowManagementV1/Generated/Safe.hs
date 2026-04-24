@@ -692,15 +692,11 @@ hs_bindgen_84e59fecbd74e107 ::
 hs_bindgen_84e59fecbd74e107 =
   RIP.fromFFIType hs_bindgen_84e59fecbd74e107_base
 
-{-|
+{-| __C declaration:__ @river_window_manager_v1_add_listener@
 
-  > iface_river_window_manager_v1
+    __defined at:__ @river-window-management-v1-client-protocol.h 612:1@
 
-__C declaration:__ @river_window_manager_v1_add_listener@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 612:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_manager_v1_add_listener ::
      RIP.Ptr River_window_manager_v1
@@ -727,15 +723,11 @@ hs_bindgen_296bdb6eeb0873a5 ::
 hs_bindgen_296bdb6eeb0873a5 =
   RIP.fromFFIType hs_bindgen_296bdb6eeb0873a5_base
 
-{-|
+{-| __C declaration:__ @river_window_manager_v1_set_user_data@
 
-  > iface_river_window_manager_v1
+    __defined at:__ @river-window-management-v1-client-protocol.h 695:1@
 
-__C declaration:__ @river_window_manager_v1_set_user_data@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 695:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_manager_v1_set_user_data ::
      RIP.Ptr River_window_manager_v1
@@ -758,15 +750,11 @@ hs_bindgen_70f05d0546645078 ::
 hs_bindgen_70f05d0546645078 =
   RIP.fromFFIType hs_bindgen_70f05d0546645078_base
 
-{-|
+{-| __C declaration:__ @river_window_manager_v1_get_user_data@
 
-  > iface_river_window_manager_v1
+    __defined at:__ @river-window-management-v1-client-protocol.h 702:1@
 
-__C declaration:__ @river_window_manager_v1_get_user_data@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 702:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_manager_v1_get_user_data ::
      RIP.Ptr River_window_manager_v1
@@ -812,19 +800,15 @@ hs_bindgen_d08cbcaf4be000db ::
 hs_bindgen_d08cbcaf4be000db =
   RIP.fromFFIType hs_bindgen_d08cbcaf4be000db_base
 
-{-|
+{-| This request indicates that the client no longer wishes to receive events on this object.
 
-  > iface_river_window_manager_v1
+    The Wayland protocol is asynchronous, which means the server may send further events until the stop request is processed. The client must wait for a river_window_manager_v1.finished event before destroying this object.
 
-  This request indicates that the client no longer wishes to receive events on this object.
+    __C declaration:__ @river_window_manager_v1_stop@
 
-  The Wayland protocol is asynchronous, which means the server may send further events until the stop request is processed. The client must wait for a river_window_manager_v1.finished event before destroying this object.
+    __defined at:__ @river-window-management-v1-client-protocol.h 725:1@
 
-__C declaration:__ @river_window_manager_v1_stop@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 725:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_manager_v1_stop ::
      RIP.Ptr River_window_manager_v1
@@ -845,19 +829,15 @@ hs_bindgen_0a17be69a58d526c ::
 hs_bindgen_0a17be69a58d526c =
   RIP.fromFFIType hs_bindgen_0a17be69a58d526c_base
 
-{-|
+{-| This request should be called after the finished event has been received to complete destruction of the object.
 
-  > iface_river_window_manager_v1
+    If a client wishes to destroy this object it should send a river_window_manager_v1.stop request and wait for a river_window_manager_v1.finished event. Once the finished event is received it is safe to destroy this object and any other objects created through this interface.
 
-  This request should be called after the finished event has been received to complete destruction of the object.
+    __C declaration:__ @river_window_manager_v1_destroy@
 
-  If a client wishes to destroy this object it should send a river_window_manager_v1.stop request and wait for a river_window_manager_v1.finished event. Once the finished event is received it is safe to destroy this object and any other objects created through this interface.
+    __defined at:__ @river-window-management-v1-client-protocol.h 744:1@
 
-__C declaration:__ @river_window_manager_v1_destroy@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 744:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_manager_v1_destroy ::
      RIP.Ptr River_window_manager_v1
@@ -878,21 +858,17 @@ hs_bindgen_da74092354fa709c ::
 hs_bindgen_da74092354fa709c =
   RIP.fromFFIType hs_bindgen_da74092354fa709c_base
 
-{-|
+{-| This request indicates that the client has made all changes to window management state it wishes to include in the current manage sequence and that the server should atomically send these state changes to the windows and continue with the manage sequence.
 
-  > iface_river_window_manager_v1
+    After sending this request, it is a protocol error for the client to make further changes to window management state until the next manage_start event is received.
 
-  This request indicates that the client has made all changes to window management state it wishes to include in the current manage sequence and that the server should atomically send these state changes to the windows and continue with the manage sequence.
+    See the description of the river_window_manager_v1 interface for a complete overview of the manage/render sequence loop.
 
-  After sending this request, it is a protocol error for the client to make further changes to window management state until the next manage_start event is received.
+    __C declaration:__ @river_window_manager_v1_manage_finish@
 
-  See the description of the river_window_manager_v1 interface for a complete overview of the manage/render sequence loop.
+    __defined at:__ @river-window-management-v1-client-protocol.h 766:1@
 
-__C declaration:__ @river_window_manager_v1_manage_finish@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 766:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_manager_v1_manage_finish ::
      RIP.Ptr River_window_manager_v1
@@ -913,19 +889,15 @@ hs_bindgen_b7019be23ce3ccab ::
 hs_bindgen_b7019be23ce3ccab =
   RIP.fromFFIType hs_bindgen_b7019be23ce3ccab_base
 
-{-|
+{-| This request ensures a manage sequence is started and that a manage_start event is sent by the server. If this request is made during an ongoing manage sequence, a new manage sequence will be started as soon as the current one is completed.
 
-  > iface_river_window_manager_v1
+    The client may want to use this request due to an internal state change that the compositor is not aware of (e.g. a dbus event) which should affect window management or rendering state.
 
-  This request ensures a manage sequence is started and that a manage_start event is sent by the server. If this request is made during an ongoing manage sequence, a new manage sequence will be started as soon as the current one is completed.
+    __C declaration:__ @river_window_manager_v1_manage_dirty@
 
-  The client may want to use this request due to an internal state change that the compositor is not aware of (e.g. a dbus event) which should affect window management or rendering state.
+    __defined at:__ @river-window-management-v1-client-protocol.h 785:1@
 
-__C declaration:__ @river_window_manager_v1_manage_dirty@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 785:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_manager_v1_manage_dirty ::
      RIP.Ptr River_window_manager_v1
@@ -946,21 +918,17 @@ hs_bindgen_b0b3b48d996875eb ::
 hs_bindgen_b0b3b48d996875eb =
   RIP.fromFFIType hs_bindgen_b0b3b48d996875eb_base
 
-{-|
+{-| This request indicates that the client has made all changes to rendering state it wishes to include in the current manage sequence and that the server should atomically apply and display these state changes to the user.
 
-  > iface_river_window_manager_v1
+    After sending this request, it is a protocol error for the client to make further changes to rendering state until the next manage_start or render_start event is received, whichever comes first.
 
-  This request indicates that the client has made all changes to rendering state it wishes to include in the current manage sequence and that the server should atomically apply and display these state changes to the user.
+    See the description of the river_window_manager_v1 interface for a complete overview of the manage/render sequence loop.
 
-  After sending this request, it is a protocol error for the client to make further changes to rendering state until the next manage_start or render_start event is received, whichever comes first.
+    __C declaration:__ @river_window_manager_v1_render_finish@
 
-  See the description of the river_window_manager_v1 interface for a complete overview of the manage/render sequence loop.
+    __defined at:__ @river-window-management-v1-client-protocol.h 807:1@
 
-__C declaration:__ @river_window_manager_v1_render_finish@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 807:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_manager_v1_render_finish ::
      RIP.Ptr River_window_manager_v1
@@ -983,19 +951,15 @@ hs_bindgen_fbb0f1592d807ee4 ::
 hs_bindgen_fbb0f1592d807ee4 =
   RIP.fromFFIType hs_bindgen_fbb0f1592d807ee4_base
 
-{-|
+{-| Create a new shell surface for window manager UI and assign the river_shell_surface_v1 role to the surface.
 
-  > iface_river_window_manager_v1
+    Providing a wl_surface which already has a role or already has a buffer attached or committed is a protocol error.
 
-  Create a new shell surface for window manager UI and assign the river_shell_surface_v1 role to the surface.
+    __C declaration:__ @river_window_manager_v1_get_shell_surface@
 
-  Providing a wl_surface which already has a role or already has a buffer attached or committed is a protocol error.
+    __defined at:__ @river-window-management-v1-client-protocol.h 823:1@
 
-__C declaration:__ @river_window_manager_v1_get_shell_surface@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 823:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_manager_v1_get_shell_surface ::
      RIP.Ptr River_window_manager_v1
@@ -1018,19 +982,15 @@ hs_bindgen_00b39ac8caf62cc6 ::
 hs_bindgen_00b39ac8caf62cc6 =
   RIP.fromFFIType hs_bindgen_00b39ac8caf62cc6_base
 
-{-|
+{-| End the current Wayland session and exit the compositor. All Wayland clients running in the current session, including the window manager, will be disconnected.
 
-  > iface_river_window_manager_v1
+    Window managers should only make this request if the user explicitly asks to exit the Wayland session, not for example on normal window manager termination.
 
-  End the current Wayland session and exit the compositor. All Wayland clients running in the current session, including the window manager, will be disconnected.
+    __C declaration:__ @river_window_manager_v1_exit_session@
 
-  Window managers should only make this request if the user explicitly asks to exit the Wayland session, not for example on normal window manager termination.
+    __defined at:__ @river-window-management-v1-client-protocol.h 845:1@
 
-__C declaration:__ @river_window_manager_v1_exit_session@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 845:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_manager_v1_exit_session ::
      RIP.Ptr River_window_manager_v1
@@ -1055,15 +1015,11 @@ hs_bindgen_35a2bd6fed3d893d ::
 hs_bindgen_35a2bd6fed3d893d =
   RIP.fromFFIType hs_bindgen_35a2bd6fed3d893d_base
 
-{-|
+{-| __C declaration:__ @river_window_v1_add_listener@
 
-  > iface_river_window_v1
+    __defined at:__ @river-window-management-v1-client-protocol.h 1285:1@
 
-__C declaration:__ @river_window_v1_add_listener@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 1285:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_add_listener ::
      RIP.Ptr River_window_v1
@@ -1090,15 +1046,11 @@ hs_bindgen_bb6dd815f3905865 ::
 hs_bindgen_bb6dd815f3905865 =
   RIP.fromFFIType hs_bindgen_bb6dd815f3905865_base
 
-{-|
+{-| __C declaration:__ @river_window_v1_set_user_data@
 
-  > iface_river_window_v1
+    __defined at:__ @river-window-management-v1-client-protocol.h 1489:1@
 
-__C declaration:__ @river_window_v1_set_user_data@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 1489:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_set_user_data ::
      RIP.Ptr River_window_v1
@@ -1121,15 +1073,11 @@ hs_bindgen_113e15f0593236c2 ::
 hs_bindgen_113e15f0593236c2 =
   RIP.fromFFIType hs_bindgen_113e15f0593236c2_base
 
-{-|
+{-| __C declaration:__ @river_window_v1_get_user_data@
 
-  > iface_river_window_v1
+    __defined at:__ @river-window-management-v1-client-protocol.h 1496:1@
 
-__C declaration:__ @river_window_v1_get_user_data@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 1496:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_get_user_data ::
      RIP.Ptr River_window_v1
@@ -1175,19 +1123,15 @@ hs_bindgen_93d56a25067741aa ::
 hs_bindgen_93d56a25067741aa =
   RIP.fromFFIType hs_bindgen_93d56a25067741aa_base
 
-{-|
+{-| This request indicates that the client will no longer use the window object and that it may be safely destroyed.
 
-  > iface_river_window_v1
+    This request should be made after the river_window_v1.closed event or river_window_manager_v1.finished is received to complete destruction of the window.
 
-  This request indicates that the client will no longer use the window object and that it may be safely destroyed.
+    __C declaration:__ @river_window_v1_destroy@
 
-  This request should be made after the river_window_v1.closed event or river_window_manager_v1.finished is received to complete destruction of the window.
+    __defined at:__ @river-window-management-v1-client-protocol.h 1518:1@
 
-__C declaration:__ @river_window_v1_destroy@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 1518:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_destroy ::
      RIP.Ptr River_window_v1
@@ -1207,21 +1151,17 @@ hs_bindgen_c5da0b3665e1c65e ::
 hs_bindgen_c5da0b3665e1c65e =
   RIP.fromFFIType hs_bindgen_c5da0b3665e1c65e_base
 
-{-|
+{-| Request that the window be closed. The window may ignore this request or only close after some delay, perhaps opening a dialog asking the user to save their work or similar.
 
-  > iface_river_window_v1
+    The server will send a river_window_v1.closed event if/when the window has been closed.
 
-  Request that the window be closed. The window may ignore this request or only close after some delay, perhaps opening a dialog asking the user to save their work or similar.
+    This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
 
-  The server will send a river_window_v1.closed event if/when the window has been closed.
+    __C declaration:__ @river_window_v1_close@
 
-  This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 1538:1@
 
-__C declaration:__ @river_window_v1_close@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 1538:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_close ::
      RIP.Ptr River_window_v1
@@ -1241,19 +1181,15 @@ hs_bindgen_5b442f28739f2b11 ::
 hs_bindgen_5b442f28739f2b11 =
   RIP.fromFFIType hs_bindgen_5b442f28739f2b11_base
 
-{-|
+{-| Get the node in the render list corresponding to the window.
 
-  > iface_river_window_v1
+    It is a protocol error to make this request more than once for a single window.
 
-  Get the node in the render list corresponding to the window.
+    __C declaration:__ @river_window_v1_get_node@
 
-  It is a protocol error to make this request more than once for a single window.
+    __defined at:__ @river-window-management-v1-client-protocol.h 1553:1@
 
-__C declaration:__ @river_window_v1_get_node@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 1553:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_get_node ::
      RIP.Ptr River_window_v1
@@ -1278,27 +1214,23 @@ hs_bindgen_ec633c16297e219d ::
 hs_bindgen_ec633c16297e219d =
   RIP.fromFFIType hs_bindgen_ec633c16297e219d_base
 
-{-|
+{-| This request proposes dimensions for the window in the compositor's logical coordinate space.
 
-  > iface_river_window_v1
+    The width and height must be greater than or equal to zero. If the width or height is zero the window will be allowed to decide its own dimensions.
 
-  This request proposes dimensions for the window in the compositor's logical coordinate space.
+    The window may not take the exact dimensions proposed. The actual dimensions taken by the window will be sent in a subsequent river_window_v1.dimensions event. For example, a terminal emulator may only allow dimensions that are multiple of the cell size.
 
-  The width and height must be greater than or equal to zero. If the width or height is zero the window will be allowed to decide its own dimensions.
+    When a propose_dimensions request is made, the server must send a dimensions event in response as soon as possible. It may not be possible to send a dimensions event in the very next render sequence if, for example, the window takes too long to respond to the proposed dimensions. In this case, the server will send the dimensions event in a future render sequence.
 
-  The window may not take the exact dimensions proposed. The actual dimensions taken by the window will be sent in a subsequent river_window_v1.dimensions event. For example, a terminal emulator may only allow dimensions that are multiple of the cell size.
+    Note that the dimensions of a river_window_v1 refer to the dimensions of the window content and are unaffected by the presence of borders or decoration surfaces.
 
-  When a propose_dimensions request is made, the server must send a dimensions event in response as soon as possible. It may not be possible to send a dimensions event in the very next render sequence if, for example, the window takes too long to respond to the proposed dimensions. In this case, the server will send the dimensions event in a future render sequence.
+    This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
 
-  Note that the dimensions of a river_window_v1 refer to the dimensions of the window content and are unaffected by the presence of borders or decoration surfaces.
+    __C declaration:__ @river_window_v1_propose_dimensions@
 
-  This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 1593:1@
 
-__C declaration:__ @river_window_v1_propose_dimensions@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 1593:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_propose_dimensions ::
      RIP.Ptr River_window_v1
@@ -1323,21 +1255,17 @@ hs_bindgen_bde75e5400d7ccc7 ::
 hs_bindgen_bde75e5400d7ccc7 =
   RIP.fromFFIType hs_bindgen_bde75e5400d7ccc7_base
 
-{-|
+{-| Request that the window be hidden. Has no effect if the window is already hidden. Hides any window borders and decorations as well.
 
-  > iface_river_window_v1
+    Newly created windows are considered shown unless explicitly hidden with the hide request.
 
-  Request that the window be hidden. Has no effect if the window is already hidden. Hides any window borders and decorations as well.
+    This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
 
-  Newly created windows are considered shown unless explicitly hidden with the hide request.
+    __C declaration:__ @river_window_v1_hide@
 
-  This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 1612:1@
 
-__C declaration:__ @river_window_v1_hide@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 1612:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_hide ::
      RIP.Ptr River_window_v1
@@ -1357,21 +1285,17 @@ hs_bindgen_fba2ec8287bc1843 ::
 hs_bindgen_fba2ec8287bc1843 =
   RIP.fromFFIType hs_bindgen_fba2ec8287bc1843_base
 
-{-|
+{-| Request that the window be shown. Has no effect if the window is not hidden. Does not guarantee that the window is visible as it may be completely obscured by other windows placed above it for example.
 
-  > iface_river_window_v1
+    Newly created windows are considered shown unless explicitly hidden with the hide request.
 
-  Request that the window be shown. Has no effect if the window is not hidden. Does not guarantee that the window is visible as it may be completely obscured by other windows placed above it for example.
+    This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
 
-  Newly created windows are considered shown unless explicitly hidden with the hide request.
+    __C declaration:__ @river_window_v1_show@
 
-  This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 1632:1@
 
-__C declaration:__ @river_window_v1_show@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 1632:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_show ::
      RIP.Ptr River_window_v1
@@ -1391,21 +1315,17 @@ hs_bindgen_113409cbffc9e47d ::
 hs_bindgen_113409cbffc9e47d =
   RIP.fromFFIType hs_bindgen_113409cbffc9e47d_base
 
-{-|
+{-| Tell the client to use client side decoration and draw its own title bar, borders, etc.
 
-  > iface_river_window_v1
+    This is the default if neither this request nor the use_ssd request is ever made.
 
-  Tell the client to use client side decoration and draw its own title bar, borders, etc.
+    This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
 
-  This is the default if neither this request nor the use_ssd request is ever made.
+    __C declaration:__ @river_window_v1_use_csd@
 
-  This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 1651:1@
 
-__C declaration:__ @river_window_v1_use_csd@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 1651:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_use_csd ::
      RIP.Ptr River_window_v1
@@ -1425,21 +1345,17 @@ hs_bindgen_e4617bace3f46afe ::
 hs_bindgen_e4617bace3f46afe =
   RIP.fromFFIType hs_bindgen_e4617bace3f46afe_base
 
-{-|
+{-| Tell the client to use server side decoration and not draw any client side decorations.
 
-  > iface_river_window_v1
+    This request will have no effect if the client only supports client side decoration, see the decoration_hint event.
 
-  Tell the client to use server side decoration and not draw any client side decorations.
+    This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
 
-  This request will have no effect if the client only supports client side decoration, see the decoration_hint event.
+    __C declaration:__ @river_window_v1_use_ssd@
 
-  This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 1670:1@
 
-__C declaration:__ @river_window_v1_use_ssd@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 1670:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_use_ssd ::
      RIP.Ptr River_window_v1
@@ -1471,31 +1387,27 @@ hs_bindgen_cd68bbb3e31f2e08 ::
 hs_bindgen_cd68bbb3e31f2e08 =
   RIP.fromFFIType hs_bindgen_cd68bbb3e31f2e08_base
 
-{-|
+{-| This request decorates the window with borders drawn by the compositor on the specified edges of the window. Borders are drawn above the window content.
 
-  > iface_river_window_v1
+    Corners are drawn only between borders on adjacent edges. If e.g. the left edge has a border and the top edge does not, the border drawn on the left edge will not extend vertically beyond the top edge of the window.
 
-  This request decorates the window with borders drawn by the compositor on the specified edges of the window. Borders are drawn above the window content.
+    Borders are not drawn while the window is fullscreen.
 
-  Corners are drawn only between borders on adjacent edges. If e.g. the left edge has a border and the top edge does not, the border drawn on the left edge will not extend vertically beyond the top edge of the window.
+    The color is defined by four 32-bit RGBA values. Unless specified in another protocol extension, the RGBA values use pre-multiplied alpha.
 
-  Borders are not drawn while the window is fullscreen.
+    Setting the edges to none or the width to 0 disables the borders. Setting a negative width is a protocol error.
 
-  The color is defined by four 32-bit RGBA values. Unless specified in another protocol extension, the RGBA values use pre-multiplied alpha.
+    This request completely overrides all previous set_borders requests. Only the most recent set_borders request has an effect.
 
-  Setting the edges to none or the width to 0 disables the borders. Setting a negative width is a protocol error.
+    Note that the position/dimensions of a river_window_v1 refer to the position/dimensions of the window content and are unaffected by the presence of borders or decoration surfaces.
 
-  This request completely overrides all previous set_borders requests. Only the most recent set_borders request has an effect.
+    This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
 
-  Note that the position/dimensions of a river_window_v1 refer to the position/dimensions of the window content and are unaffected by the presence of borders or decoration surfaces.
+    __C declaration:__ @river_window_v1_set_borders@
 
-  This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 1707:1@
 
-__C declaration:__ @river_window_v1_set_borders@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 1707:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_set_borders ::
      RIP.Ptr River_window_v1
@@ -1530,23 +1442,19 @@ hs_bindgen_5b9e10ed88a029b1 ::
 hs_bindgen_5b9e10ed88a029b1 =
   RIP.fromFFIType hs_bindgen_5b9e10ed88a029b1_base
 
-{-|
+{-| Inform the window that it is part of a tiled layout and adjacent to other elements in the tiled layout on the given edges.
 
-  > iface_river_window_v1
+    The window should use this information to change the style of its client side decorations and avoid drawing e.g. drop shadows outside of the window dimensions on the tiled edges.
 
-  Inform the window that it is part of a tiled layout and adjacent to other elements in the tiled layout on the given edges.
+    Setting the edges argument to none informs the window that it is not part of a tiled layout. If this request is never made, the window is informed that it is not part of a tiled layout.
 
-  The window should use this information to change the style of its client side decorations and avoid drawing e.g. drop shadows outside of the window dimensions on the tiled edges.
+    This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
 
-  Setting the edges argument to none informs the window that it is not part of a tiled layout. If this request is never made, the window is informed that it is not part of a tiled layout.
+    __C declaration:__ @river_window_v1_set_tiled@
 
-  This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 1731:1@
 
-__C declaration:__ @river_window_v1_set_tiled@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 1731:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_set_tiled ::
      RIP.Ptr River_window_v1
@@ -1571,19 +1479,15 @@ hs_bindgen_41f7e37f1cde84b1 ::
 hs_bindgen_41f7e37f1cde84b1 =
   RIP.fromFFIType hs_bindgen_41f7e37f1cde84b1_base
 
-{-|
+{-| Create a decoration surface and assign the river_decoration_v1 role to the surface. The created decoration is placed above the window in rendering order, see the description of river_decoration_v1.
 
-  > iface_river_window_v1
+    Providing a wl_surface which already has a role or already has a buffer attached or committed is a protocol error.
 
-  Create a decoration surface and assign the river_decoration_v1 role to the surface. The created decoration is placed above the window in rendering order, see the description of river_decoration_v1.
+    __C declaration:__ @river_window_v1_get_decoration_above@
 
-  Providing a wl_surface which already has a role or already has a buffer attached or committed is a protocol error.
+    __defined at:__ @river-window-management-v1-client-protocol.h 1748:1@
 
-__C declaration:__ @river_window_v1_get_decoration_above@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 1748:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_get_decoration_above ::
      RIP.Ptr River_window_v1
@@ -1608,19 +1512,15 @@ hs_bindgen_c423b328e3f93e9f ::
 hs_bindgen_c423b328e3f93e9f =
   RIP.fromFFIType hs_bindgen_c423b328e3f93e9f_base
 
-{-|
+{-| Create a decoration surface and assign the river_decoration_v1 role to the surface. The created decoration is placed below the window in rendering order, see the description of river_decoration_v1.
 
-  > iface_river_window_v1
+    Providing a wl_surface which already has a role or already has a buffer attached or committed is a protocol error.
 
-  Create a decoration surface and assign the river_decoration_v1 role to the surface. The created decoration is placed below the window in rendering order, see the description of river_decoration_v1.
+    __C declaration:__ @river_window_v1_get_decoration_below@
 
-  Providing a wl_surface which already has a role or already has a buffer attached or committed is a protocol error.
+    __defined at:__ @river-window-management-v1-client-protocol.h 1769:1@
 
-__C declaration:__ @river_window_v1_get_decoration_below@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 1769:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_get_decoration_below ::
      RIP.Ptr River_window_v1
@@ -1643,21 +1543,17 @@ hs_bindgen_cb866c21248ff5af ::
 hs_bindgen_cb866c21248ff5af =
   RIP.fromFFIType hs_bindgen_cb866c21248ff5af_base
 
-{-|
+{-| Inform the window that it is being resized. The window manager should use this request to inform windows that are the target of an interactive resize for example.
 
-  > iface_river_window_v1
+    The window manager remains responsible for handling the position and dimensions of the window while it is resizing.
 
-  Inform the window that it is being resized. The window manager should use this request to inform windows that are the target of an interactive resize for example.
+    This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
 
-  The window manager remains responsible for handling the position and dimensions of the window while it is resizing.
+    __C declaration:__ @river_window_v1_inform_resize_start@
 
-  This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 1793:1@
 
-__C declaration:__ @river_window_v1_inform_resize_start@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 1793:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_inform_resize_start ::
      RIP.Ptr River_window_v1
@@ -1678,19 +1574,15 @@ hs_bindgen_dac1c091078692fb ::
 hs_bindgen_dac1c091078692fb =
   RIP.fromFFIType hs_bindgen_dac1c091078692fb_base
 
-{-|
+{-| Inform the window that it is no longer being resized. The window manager should use this request to inform windows that are the target of an interactive resize that the interactive resize has ended for example.
 
-  > iface_river_window_v1
+    This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
 
-  Inform the window that it is no longer being resized. The window manager should use this request to inform windows that are the target of an interactive resize that the interactive resize has ended for example.
+    __C declaration:__ @river_window_v1_inform_resize_end@
 
-  This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 1810:1@
 
-__C declaration:__ @river_window_v1_inform_resize_end@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 1810:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_inform_resize_end ::
      RIP.Ptr River_window_v1
@@ -1713,23 +1605,19 @@ hs_bindgen_3f2536117d888347 ::
 hs_bindgen_3f2536117d888347 =
   RIP.fromFFIType hs_bindgen_3f2536117d888347_base
 
-{-|
+{-| This request informs the window of the capabilities supported by the window manager. If the window manager, for example, ignores requests to be maximized from the window it should not tell the window that it supports the maximize capability.
 
-  > iface_river_window_v1
+    The window might use this information to, for example, only show a maximize button if the window manager supports the maximize capability.
 
-  This request informs the window of the capabilities supported by the window manager. If the window manager, for example, ignores requests to be maximized from the window it should not tell the window that it supports the maximize capability.
+    The window manager client should use this request to set capabilities for all new windows. If this request is never made, the compositor will inform windows that all capabilities are supported.
 
-  The window might use this information to, for example, only show a maximize button if the window manager supports the maximize capability.
+    This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
 
-  The window manager client should use this request to set capabilities for all new windows. If this request is never made, the compositor will inform windows that all capabilities are supported.
+    __C declaration:__ @river_window_v1_set_capabilities@
 
-  This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 1835:1@
 
-__C declaration:__ @river_window_v1_set_capabilities@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 1835:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_set_capabilities ::
      RIP.Ptr River_window_v1
@@ -1752,21 +1640,17 @@ hs_bindgen_6ca2d09111716aae ::
 hs_bindgen_6ca2d09111716aae =
   RIP.fromFFIType hs_bindgen_6ca2d09111716aae_base
 
-{-|
+{-| Inform the window that it is maximized. The window might use this information to adapt the style of its client-side window decorations for example.
 
-  > iface_river_window_v1
+    The window manager remains responsible for handling the position and dimensions of the window while it is maximized.
 
-  Inform the window that it is maximized. The window might use this information to adapt the style of its client-side window decorations for example.
+    This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
 
-  The window manager remains responsible for handling the position and dimensions of the window while it is maximized.
+    __C declaration:__ @river_window_v1_inform_maximized@
 
-  This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 1855:1@
 
-__C declaration:__ @river_window_v1_inform_maximized@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 1855:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_inform_maximized ::
      RIP.Ptr River_window_v1
@@ -1787,19 +1671,15 @@ hs_bindgen_12b029dccebbad7f ::
 hs_bindgen_12b029dccebbad7f =
   RIP.fromFFIType hs_bindgen_12b029dccebbad7f_base
 
-{-|
+{-| Inform the window that it is unmaximized. The window might use this information to adapt the style of its client-side window decorations for example.
 
-  > iface_river_window_v1
+    This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
 
-  Inform the window that it is unmaximized. The window might use this information to adapt the style of its client-side window decorations for example.
+    __C declaration:__ @river_window_v1_inform_unmaximized@
 
-  This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 1872:1@
 
-__C declaration:__ @river_window_v1_inform_unmaximized@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 1872:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_inform_unmaximized ::
      RIP.Ptr River_window_v1
@@ -1820,21 +1700,17 @@ hs_bindgen_3850b233234ee09a ::
 hs_bindgen_3850b233234ee09a =
   RIP.fromFFIType hs_bindgen_3850b233234ee09a_base
 
-{-|
+{-| Inform the window that it is fullscreen. The window might use this information to adapt the style of its client-side window decorations for example.
 
-  > iface_river_window_v1
+    This request does not affect the size/position of the window or cause it to become the only window rendered, see the river_window_v1.fullscreen and exit_fullscreen requests for that.
 
-  Inform the window that it is fullscreen. The window might use this information to adapt the style of its client-side window decorations for example.
+    This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
 
-  This request does not affect the size/position of the window or cause it to become the only window rendered, see the river_window_v1.fullscreen and exit_fullscreen requests for that.
+    __C declaration:__ @river_window_v1_inform_fullscreen@
 
-  This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 1893:1@
 
-__C declaration:__ @river_window_v1_inform_fullscreen@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 1893:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_inform_fullscreen ::
      RIP.Ptr River_window_v1
@@ -1855,21 +1731,17 @@ hs_bindgen_2219265bd9c108da ::
 hs_bindgen_2219265bd9c108da =
   RIP.fromFFIType hs_bindgen_2219265bd9c108da_base
 
-{-|
+{-| Inform the window that it is not fullscreen. The window might use this information to adapt the style of its client-side window decorations for example.
 
-  > iface_river_window_v1
+    This request does not affect the size/position of the window or cause it to become the only window rendered, see the river_window_v1.fullscreen and exit_fullscreen requests for that.
 
-  Inform the window that it is not fullscreen. The window might use this information to adapt the style of its client-side window decorations for example.
+    This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
 
-  This request does not affect the size/position of the window or cause it to become the only window rendered, see the river_window_v1.fullscreen and exit_fullscreen requests for that.
+    __C declaration:__ @river_window_v1_inform_not_fullscreen@
 
-  This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 1914:1@
 
-__C declaration:__ @river_window_v1_inform_not_fullscreen@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 1914:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_inform_not_fullscreen ::
      RIP.Ptr River_window_v1
@@ -1892,31 +1764,27 @@ hs_bindgen_0a28ba7bf634ba17 ::
 hs_bindgen_0a28ba7bf634ba17 =
   RIP.fromFFIType hs_bindgen_0a28ba7bf634ba17_base
 
-{-|
+{-| Make the window fullscreen on the given output. If multiple windows are fullscreen on the same output at the same time only the "top" window in rendering order shall be displayed.
 
-  > iface_river_window_v1
+    All river_shell_surface_v1 objects above the top fullscreen window in the rendering order will continue to be rendered.
 
-  Make the window fullscreen on the given output. If multiple windows are fullscreen on the same output at the same time only the "top" window in rendering order shall be displayed.
+    The compositor will handle the position and dimensions of the window while it is fullscreen. The set_position and propose_dimensions requests shall not affect the current position and dimensions of a fullscreen window.
 
-  All river_shell_surface_v1 objects above the top fullscreen window in the rendering order will continue to be rendered.
+    When a fullscreen request is made, the server must send a dimensions event in response as soon as possible. It may not be possible to send a dimensions event in the very next render sequence if, for example, the window takes too long to respond. In this case, the server will send the dimensions event in a future render sequence.
 
-  The compositor will handle the position and dimensions of the window while it is fullscreen. The set_position and propose_dimensions requests shall not affect the current position and dimensions of a fullscreen window.
+    The compositor will clip window content, decoration surfaces, and borders to the given output's dimensions while the window is fullscreen. The effects of set_clip_box and set_content_clip_box are ignored while the window is fullscreen.
 
-  When a fullscreen request is made, the server must send a dimensions event in response as soon as possible. It may not be possible to send a dimensions event in the very next render sequence if, for example, the window takes too long to respond. In this case, the server will send the dimensions event in a future render sequence.
+    If the output on which a window is currently fullscreen is removed, the windowing state is modified as if there were an exit_fullscreen request made in the same manage sequence as the river_output_v1.removed event.
 
-  The compositor will clip window content, decoration surfaces, and borders to the given output's dimensions while the window is fullscreen. The effects of set_clip_box and set_content_clip_box are ignored while the window is fullscreen.
+    This request does not inform the window that it is fullscreen, see the river_window_v1.inform_fullscreen and inform_not_fullscreen requests.
 
-  If the output on which a window is currently fullscreen is removed, the windowing state is modified as if there were an exit_fullscreen request made in the same manage sequence as the river_output_v1.removed event.
+    This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
 
-  This request does not inform the window that it is fullscreen, see the river_window_v1.inform_fullscreen and inform_not_fullscreen requests.
+    __C declaration:__ @river_window_v1_fullscreen@
 
-  This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 1957:1@
 
-__C declaration:__ @river_window_v1_fullscreen@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 1957:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_fullscreen ::
      RIP.Ptr River_window_v1
@@ -1939,25 +1807,21 @@ hs_bindgen_ca97757567d4326e ::
 hs_bindgen_ca97757567d4326e =
   RIP.fromFFIType hs_bindgen_ca97757567d4326e_base
 
-{-|
+{-| Make the window not fullscreen.
 
-  > iface_river_window_v1
+    The position and dimensions are undefined after this request is made until a manage sequence in which the window manager makes the propose_dimensions and set_position requests is completed.
 
-  Make the window not fullscreen.
+    The window manager should make propose_dimensions and set_position requests in the same manage sequence as the exit_fullscreen request for frame perfection.
 
-  The position and dimensions are undefined after this request is made until a manage sequence in which the window manager makes the propose_dimensions and set_position requests is completed.
+    This request does not inform the window that it is fullscreen, see the river_window_v1.inform_fullscreen and inform_not_fullscreen requests.
 
-  The window manager should make propose_dimensions and set_position requests in the same manage sequence as the exit_fullscreen request for frame perfection.
+    This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
 
-  This request does not inform the window that it is fullscreen, see the river_window_v1.inform_fullscreen and inform_not_fullscreen requests.
+    __C declaration:__ @river_window_v1_exit_fullscreen@
 
-  This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 1983:1@
 
-__C declaration:__ @river_window_v1_exit_fullscreen@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 1983:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_exit_fullscreen ::
      RIP.Ptr River_window_v1
@@ -1986,27 +1850,23 @@ hs_bindgen_3b12e900c90be7bf ::
 hs_bindgen_3b12e900c90be7bf =
   RIP.fromFFIType hs_bindgen_3b12e900c90be7bf_base
 
-{-|
+{-| Clip the window, including borders and decoration surfaces, to the box specified by the x, y, width, and height arguments. The x/y position of the box is relative to the top left corner of the window.
 
-  > iface_river_window_v1
+    The width and height arguments must be greater than or equal to 0.
 
-  Clip the window, including borders and decoration surfaces, to the box specified by the x, y, width, and height arguments. The x/y position of the box is relative to the top left corner of the window.
+    Setting a clip box with 0 width or height disables clipping.
 
-  The width and height arguments must be greater than or equal to 0.
+    The clip box is ignored while the window is fullscreen.
 
-  Setting a clip box with 0 width or height disables clipping.
+    Both set_clip_box and set_content_clip_box may be enabled simultaneously.
 
-  The clip box is ignored while the window is fullscreen.
+    This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
 
-  Both set_clip_box and set_content_clip_box may be enabled simultaneously.
+    __C declaration:__ @river_window_v1_set_clip_box@
 
-  This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 2008:1@
 
-__C declaration:__ @river_window_v1_set_clip_box@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2008:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_set_clip_box ::
      RIP.Ptr River_window_v1
@@ -2043,29 +1903,25 @@ hs_bindgen_ed12b3b13a8d3964 ::
 hs_bindgen_ed12b3b13a8d3964 =
   RIP.fromFFIType hs_bindgen_ed12b3b13a8d3964_base
 
-{-|
+{-| Clip the content of the window, excluding borders and decoration surfaces, to the box specified by the x, y, width, and height arguments. The x/y position of the box is relative to the top left corner of the window.
 
-  > iface_river_window_v1
+    Borders drawn by the compositor (see set_borders) are placed around the intersection of the window content (as defined by the dimensions event) and the content clip box when content clipping is enabled.
 
-  Clip the content of the window, excluding borders and decoration surfaces, to the box specified by the x, y, width, and height arguments. The x/y position of the box is relative to the top left corner of the window.
+    The width and height arguments must be greater than or equal to 0.
 
-  Borders drawn by the compositor (see set_borders) are placed around the intersection of the window content (as defined by the dimensions event) and the content clip box when content clipping is enabled.
+    Setting a box with 0 width or height disables content clipping.
 
-  The width and height arguments must be greater than or equal to 0.
+    The content clip box is ignored while the window is fullscreen.
 
-  Setting a box with 0 width or height disables content clipping.
+    Both set_clip_box and set_content_clip_box may be enabled simultaneously.
 
-  The content clip box is ignored while the window is fullscreen.
+    This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
 
-  Both set_clip_box and set_content_clip_box may be enabled simultaneously.
+    __C declaration:__ @river_window_v1_set_content_clip_box@
 
-  This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 2038:1@
 
-__C declaration:__ @river_window_v1_set_content_clip_box@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2038:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_set_content_clip_box ::
      RIP.Ptr River_window_v1
@@ -2098,25 +1954,21 @@ hs_bindgen_d8991446a20fa848 ::
 hs_bindgen_d8991446a20fa848 =
   RIP.fromFFIType hs_bindgen_d8991446a20fa848_base
 
-{-|
+{-| Recommend that the window keep its dimensions within a given maximum width/height. This recommendation is only a hint and the window may ignore it.
 
-  > iface_river_window_v1
+    Setting the width and height to 0 indicates that there are no bounds and is equivalent to having never made this request.
 
-  Recommend that the window keep its dimensions within a given maximum width/height. This recommendation is only a hint and the window may ignore it.
+    Setting width or height to a negative value is a protocol error.
 
-  Setting the width and height to 0 indicates that there are no bounds and is equivalent to having never made this request.
+    The server should communicate this hint to an xdg_toplevel window with the xdg_toplevel.configure_bounds event for example.
 
-  Setting width or height to a negative value is a protocol error.
+    This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
 
-  The server should communicate this hint to an xdg_toplevel window with the xdg_toplevel.configure_bounds event for example.
+    __C declaration:__ @river_window_v1_set_dimension_bounds@
 
-  This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 2063:1@
 
-__C declaration:__ @river_window_v1_set_dimension_bounds@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2063:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_window_v1_set_dimension_bounds ::
      RIP.Ptr River_window_v1
@@ -2143,15 +1995,11 @@ hs_bindgen_93ec3d920c34cb58 ::
 hs_bindgen_93ec3d920c34cb58 =
   RIP.fromFFIType hs_bindgen_93ec3d920c34cb58_base
 
-{-|
+{-| __C declaration:__ @river_decoration_v1_set_user_data@
 
-  > iface_river_decoration_v1
+    __defined at:__ @river-window-management-v1-client-protocol.h 2099:1@
 
-__C declaration:__ @river_decoration_v1_set_user_data@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2099:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_decoration_v1_set_user_data ::
      RIP.Ptr River_decoration_v1
@@ -2174,15 +2022,11 @@ hs_bindgen_ab3965ce4fde5491 ::
 hs_bindgen_ab3965ce4fde5491 =
   RIP.fromFFIType hs_bindgen_ab3965ce4fde5491_base
 
-{-|
+{-| __C declaration:__ @river_decoration_v1_get_user_data@
 
-  > iface_river_decoration_v1
+    __defined at:__ @river-window-management-v1-client-protocol.h 2106:1@
 
-__C declaration:__ @river_decoration_v1_get_user_data@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2106:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_decoration_v1_get_user_data ::
      RIP.Ptr River_decoration_v1
@@ -2228,17 +2072,13 @@ hs_bindgen_c65fb82dca5e273f ::
 hs_bindgen_c65fb82dca5e273f =
   RIP.fromFFIType hs_bindgen_c65fb82dca5e273f_base
 
-{-|
+{-| This request indicates that the client will no longer use the decoration object and that it may be safely destroyed.
 
-  > iface_river_decoration_v1
+    __C declaration:__ @river_decoration_v1_destroy@
 
-  This request indicates that the client will no longer use the decoration object and that it may be safely destroyed.
+    __defined at:__ @river-window-management-v1-client-protocol.h 2124:1@
 
-__C declaration:__ @river_decoration_v1_destroy@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2124:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_decoration_v1_destroy ::
      RIP.Ptr River_decoration_v1
@@ -2263,21 +2103,17 @@ hs_bindgen_2a283b399508ae78 ::
 hs_bindgen_2a283b399508ae78 =
   RIP.fromFFIType hs_bindgen_2a283b399508ae78_base
 
-{-|
+{-| This request sets the offset of the decoration surface from the top left corner of the window.
 
-  > iface_river_decoration_v1
+    If this request is never sent, the x and y offsets are undefined by this protocol and left up to the compositor.
 
-  This request sets the offset of the decoration surface from the top left corner of the window.
+    This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
 
-  If this request is never sent, the x and y offsets are undefined by this protocol and left up to the compositor.
+    __C declaration:__ @river_decoration_v1_set_offset@
 
-  This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 2143:1@
 
-__C declaration:__ @river_decoration_v1_set_offset@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2143:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_decoration_v1_set_offset ::
      RIP.Ptr River_decoration_v1
@@ -2302,21 +2138,17 @@ hs_bindgen_5c0886bd425534bf ::
 hs_bindgen_5c0886bd425534bf =
   RIP.fromFFIType hs_bindgen_5c0886bd425534bf_base
 
-{-|
+{-| Synchronize application of the next wl_surface.commit request on the decoration surface with rest of the state atomically applied with the next river_window_manager_v1.render_finish request.
 
-  > iface_river_decoration_v1
+    The client must make a wl_surface.commit request on the decoration surface after this request and before the render_finish request, failure to do so is a protocol error.
 
-  Synchronize application of the next wl_surface.commit request on the decoration surface with rest of the state atomically applied with the next river_window_manager_v1.render_finish request.
+    This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
 
-  The client must make a wl_surface.commit request on the decoration surface after this request and before the render_finish request, failure to do so is a protocol error.
+    __C declaration:__ @river_decoration_v1_sync_next_commit@
 
-  This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 2164:1@
 
-__C declaration:__ @river_decoration_v1_sync_next_commit@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2164:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_decoration_v1_sync_next_commit ::
      RIP.Ptr River_decoration_v1
@@ -2339,15 +2171,11 @@ hs_bindgen_b4093a38c76d99c6 ::
 hs_bindgen_b4093a38c76d99c6 =
   RIP.fromFFIType hs_bindgen_b4093a38c76d99c6_base
 
-{-|
+{-| __C declaration:__ @river_shell_surface_v1_set_user_data@
 
-  > iface_river_shell_surface_v1
+    __defined at:__ @river-window-management-v1-client-protocol.h 2204:1@
 
-__C declaration:__ @river_shell_surface_v1_set_user_data@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2204:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_shell_surface_v1_set_user_data ::
      RIP.Ptr River_shell_surface_v1
@@ -2370,15 +2198,11 @@ hs_bindgen_70c8a0991ada3605 ::
 hs_bindgen_70c8a0991ada3605 =
   RIP.fromFFIType hs_bindgen_70c8a0991ada3605_base
 
-{-|
+{-| __C declaration:__ @river_shell_surface_v1_get_user_data@
 
-  > iface_river_shell_surface_v1
+    __defined at:__ @river-window-management-v1-client-protocol.h 2211:1@
 
-__C declaration:__ @river_shell_surface_v1_get_user_data@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2211:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_shell_surface_v1_get_user_data ::
      RIP.Ptr River_shell_surface_v1
@@ -2424,17 +2248,13 @@ hs_bindgen_8dfbfc8fae2817e9 ::
 hs_bindgen_8dfbfc8fae2817e9 =
   RIP.fromFFIType hs_bindgen_8dfbfc8fae2817e9_base
 
-{-|
+{-| This request indicates that the client will no longer use the shell surface object and that it may be safely destroyed.
 
-  > iface_river_shell_surface_v1
+    __C declaration:__ @river_shell_surface_v1_destroy@
 
-  This request indicates that the client will no longer use the shell surface object and that it may be safely destroyed.
+    __defined at:__ @river-window-management-v1-client-protocol.h 2229:1@
 
-__C declaration:__ @river_shell_surface_v1_destroy@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2229:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_shell_surface_v1_destroy ::
      RIP.Ptr River_shell_surface_v1
@@ -2455,19 +2275,15 @@ hs_bindgen_9b1adbb2e4345357 ::
 hs_bindgen_9b1adbb2e4345357 =
   RIP.fromFFIType hs_bindgen_9b1adbb2e4345357_base
 
-{-|
+{-| Get the node in the render list corresponding to the shell surface.
 
-  > iface_river_shell_surface_v1
+    It is a protocol error to make this request more than once for a single shell surface.
 
-  Get the node in the render list corresponding to the shell surface.
+    __C declaration:__ @river_shell_surface_v1_get_node@
 
-  It is a protocol error to make this request more than once for a single shell surface.
+    __defined at:__ @river-window-management-v1-client-protocol.h 2244:1@
 
-__C declaration:__ @river_shell_surface_v1_get_node@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2244:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_shell_surface_v1_get_node ::
      RIP.Ptr River_shell_surface_v1
@@ -2488,21 +2304,17 @@ hs_bindgen_90bc0ba60402e551 ::
 hs_bindgen_90bc0ba60402e551 =
   RIP.fromFFIType hs_bindgen_90bc0ba60402e551_base
 
-{-|
+{-| Synchronize application of the next wl_surface.commit request on the shell surface with rest of the rendering state atomically applied with the next river_window_manager_v1.render_finish request.
 
-  > iface_river_shell_surface_v1
+    The client must make a wl_surface.commit request on the shell surface after this request and before the render_finish request, failure to do so is a protocol error.
 
-  Synchronize application of the next wl_surface.commit request on the shell surface with rest of the rendering state atomically applied with the next river_window_manager_v1.render_finish request.
+    This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
 
-  The client must make a wl_surface.commit request on the shell surface after this request and before the render_finish request, failure to do so is a protocol error.
+    __C declaration:__ @river_shell_surface_v1_sync_next_commit@
 
-  This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 2269:1@
 
-__C declaration:__ @river_shell_surface_v1_sync_next_commit@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2269:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_shell_surface_v1_sync_next_commit ::
      RIP.Ptr River_shell_surface_v1
@@ -2525,15 +2337,11 @@ hs_bindgen_6ac3a259092f6e13 ::
 hs_bindgen_6ac3a259092f6e13 =
   RIP.fromFFIType hs_bindgen_6ac3a259092f6e13_base
 
-{-|
+{-| __C declaration:__ @river_node_v1_set_user_data@
 
-  > iface_river_node_v1
+    __defined at:__ @river-window-management-v1-client-protocol.h 2310:1@
 
-__C declaration:__ @river_node_v1_set_user_data@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2310:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_node_v1_set_user_data ::
      RIP.Ptr River_node_v1
@@ -2556,15 +2364,11 @@ hs_bindgen_f905bcda3d6d36e0 ::
 hs_bindgen_f905bcda3d6d36e0 =
   RIP.fromFFIType hs_bindgen_f905bcda3d6d36e0_base
 
-{-|
+{-| __C declaration:__ @river_node_v1_get_user_data@
 
-  > iface_river_node_v1
+    __defined at:__ @river-window-management-v1-client-protocol.h 2317:1@
 
-__C declaration:__ @river_node_v1_get_user_data@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2317:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_node_v1_get_user_data ::
      RIP.Ptr River_node_v1
@@ -2610,17 +2414,13 @@ hs_bindgen_8e0f4a87ca201794 ::
 hs_bindgen_8e0f4a87ca201794 =
   RIP.fromFFIType hs_bindgen_8e0f4a87ca201794_base
 
-{-|
+{-| This request indicates that the client will no longer use the node object and that it may be safely destroyed.
 
-  > iface_river_node_v1
+    __C declaration:__ @river_node_v1_destroy@
 
-  This request indicates that the client will no longer use the node object and that it may be safely destroyed.
+    __defined at:__ @river-window-management-v1-client-protocol.h 2335:1@
 
-__C declaration:__ @river_node_v1_destroy@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2335:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_node_v1_destroy ::
      RIP.Ptr River_node_v1
@@ -2644,23 +2444,19 @@ hs_bindgen_6f8a92c43136bc29 ::
 hs_bindgen_6f8a92c43136bc29 =
   RIP.fromFFIType hs_bindgen_6f8a92c43136bc29_base
 
-{-|
+{-| Set the absolute position of the node in the compositor's logical coordinate space. The x and y coordinates may be positive or negative.
 
-  > iface_river_node_v1
+    Note that the position of a river_window_v1 refers to the position of the window content and is unaffected by the presence of borders or decoration surfaces.
 
-  Set the absolute position of the node in the compositor's logical coordinate space. The x and y coordinates may be positive or negative.
+    If this request is never sent, the position of the node is undefined by this protocol and left up to the compositor.
 
-  Note that the position of a river_window_v1 refers to the position of the window content and is unaffected by the presence of borders or decoration surfaces.
+    This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
 
-  If this request is never sent, the position of the node is undefined by this protocol and left up to the compositor.
+    __C declaration:__ @river_node_v1_set_position@
 
-  This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 2358:1@
 
-__C declaration:__ @river_node_v1_set_position@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2358:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_node_v1_set_position ::
      RIP.Ptr River_node_v1
@@ -2685,19 +2481,15 @@ hs_bindgen_d6f32f3b91f966a1 ::
 hs_bindgen_d6f32f3b91f966a1 =
   RIP.fromFFIType hs_bindgen_d6f32f3b91f966a1_base
 
-{-|
+{-| This request places the node above all other nodes in the compositor's render list.
 
-  > iface_river_node_v1
+    This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
 
-  This request places the node above all other nodes in the compositor's render list.
+    __C declaration:__ @river_node_v1_place_top@
 
-  This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 2374:1@
 
-__C declaration:__ @river_node_v1_place_top@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2374:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_node_v1_place_top ::
      RIP.Ptr River_node_v1
@@ -2717,19 +2509,15 @@ hs_bindgen_9405b95504f18dc0 ::
 hs_bindgen_9405b95504f18dc0 =
   RIP.fromFFIType hs_bindgen_9405b95504f18dc0_base
 
-{-|
+{-| This request places the node below all other nodes in the compositor's render list.
 
-  > iface_river_node_v1
+    This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
 
-  This request places the node below all other nodes in the compositor's render list.
+    __C declaration:__ @river_node_v1_place_bottom@
 
-  This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 2390:1@
 
-__C declaration:__ @river_node_v1_place_bottom@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2390:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_node_v1_place_bottom ::
      RIP.Ptr River_node_v1
@@ -2752,21 +2540,17 @@ hs_bindgen_4e6d34e8c06a9af1 ::
 hs_bindgen_4e6d34e8c06a9af1 =
   RIP.fromFFIType hs_bindgen_4e6d34e8c06a9af1_base
 
-{-|
+{-| This request places the node directly above another node in the compositor's render list.
 
-  > iface_river_node_v1
+    Attempting to place a node above itself has no effect.
 
-  This request places the node directly above another node in the compositor's render list.
+    This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
 
-  Attempting to place a node above itself has no effect.
+    __C declaration:__ @river_node_v1_place_above@
 
-  This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 2408:1@
 
-__C declaration:__ @river_node_v1_place_above@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2408:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_node_v1_place_above ::
      RIP.Ptr River_node_v1
@@ -2791,21 +2575,17 @@ hs_bindgen_1d44d692b44fd84d ::
 hs_bindgen_1d44d692b44fd84d =
   RIP.fromFFIType hs_bindgen_1d44d692b44fd84d_base
 
-{-|
+{-| This request places the node directly below another node in the compositor's render list.
 
-  > iface_river_node_v1
+    Attempting to place a node below itself has no effect.
 
-  This request places the node directly below another node in the compositor's render list.
+    This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
 
-  Attempting to place a node below itself has no effect.
+    __C declaration:__ @river_node_v1_place_below@
 
-  This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 2426:1@
 
-__C declaration:__ @river_node_v1_place_below@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2426:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_node_v1_place_below ::
      RIP.Ptr River_node_v1
@@ -2832,15 +2612,11 @@ hs_bindgen_72bc304ec807828c ::
 hs_bindgen_72bc304ec807828c =
   RIP.fromFFIType hs_bindgen_72bc304ec807828c_base
 
-{-|
+{-| __C declaration:__ @river_output_v1_add_listener@
 
-  > iface_river_output_v1
+    __defined at:__ @river-window-management-v1-client-protocol.h 2573:1@
 
-__C declaration:__ @river_output_v1_add_listener@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2573:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_output_v1_add_listener ::
      RIP.Ptr River_output_v1
@@ -2867,15 +2643,11 @@ hs_bindgen_c48096744bdf06f6 ::
 hs_bindgen_c48096744bdf06f6 =
   RIP.fromFFIType hs_bindgen_c48096744bdf06f6_base
 
-{-|
+{-| __C declaration:__ @river_output_v1_set_user_data@
 
-  > iface_river_output_v1
+    __defined at:__ @river-window-management-v1-client-protocol.h 2611:1@
 
-__C declaration:__ @river_output_v1_set_user_data@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2611:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_output_v1_set_user_data ::
      RIP.Ptr River_output_v1
@@ -2898,15 +2670,11 @@ hs_bindgen_6db08467b1b54e90 ::
 hs_bindgen_6db08467b1b54e90 =
   RIP.fromFFIType hs_bindgen_6db08467b1b54e90_base
 
-{-|
+{-| __C declaration:__ @river_output_v1_get_user_data@
 
-  > iface_river_output_v1
+    __defined at:__ @river-window-management-v1-client-protocol.h 2618:1@
 
-__C declaration:__ @river_output_v1_get_user_data@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2618:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_output_v1_get_user_data ::
      RIP.Ptr River_output_v1
@@ -2952,19 +2720,15 @@ hs_bindgen_bf5402b04e381035 ::
 hs_bindgen_bf5402b04e381035 =
   RIP.fromFFIType hs_bindgen_bf5402b04e381035_base
 
-{-|
+{-| This request indicates that the client will no longer use the output object and that it may be safely destroyed.
 
-  > iface_river_output_v1
+    This request should be made after the river_output_v1.removed event is received to complete destruction of the output.
 
-  This request indicates that the client will no longer use the output object and that it may be safely destroyed.
+    __C declaration:__ @river_output_v1_destroy@
 
-  This request should be made after the river_output_v1.removed event is received to complete destruction of the output.
+    __defined at:__ @river-window-management-v1-client-protocol.h 2639:1@
 
-__C declaration:__ @river_output_v1_destroy@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2639:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_output_v1_destroy ::
      RIP.Ptr River_output_v1
@@ -2986,19 +2750,15 @@ hs_bindgen_1508fddeba221eb7 ::
 hs_bindgen_1508fddeba221eb7 =
   RIP.fromFFIType hs_bindgen_1508fddeba221eb7_base
 
-{-|
+{-| Set the preferred presentation mode of the output. The compositor should always respect the preference of the window manager if possible. If this request is never made, the preferred presentation mode is vsync.
 
-  > iface_river_output_v1
+    This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
 
-  Set the preferred presentation mode of the output. The compositor should always respect the preference of the window manager if possible. If this request is never made, the preferred presentation mode is vsync.
+    __C declaration:__ @river_output_v1_set_presentation_mode@
 
-  This request modifies rendering state and may only be made as part of a render sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 2656:1@
 
-__C declaration:__ @river_output_v1_set_presentation_mode@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2656:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_output_v1_set_presentation_mode ::
      RIP.Ptr River_output_v1
@@ -3025,15 +2785,11 @@ hs_bindgen_cc8aecb46e943f55 ::
 hs_bindgen_cc8aecb46e943f55 =
   RIP.fromFFIType hs_bindgen_cc8aecb46e943f55_base
 
-{-|
+{-| __C declaration:__ @river_seat_v1_add_listener@
 
-  > iface_river_seat_v1
+    __defined at:__ @river-window-management-v1-client-protocol.h 2885:1@
 
-__C declaration:__ @river_seat_v1_add_listener@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2885:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_seat_v1_add_listener ::
      RIP.Ptr River_seat_v1
@@ -3060,15 +2816,11 @@ hs_bindgen_be045e74c0e6b556 ::
 hs_bindgen_be045e74c0e6b556 =
   RIP.fromFFIType hs_bindgen_be045e74c0e6b556_base
 
-{-|
+{-| __C declaration:__ @river_seat_v1_set_user_data@
 
-  > iface_river_seat_v1
+    __defined at:__ @river-window-management-v1-client-protocol.h 2978:1@
 
-__C declaration:__ @river_seat_v1_set_user_data@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2978:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_seat_v1_set_user_data ::
      RIP.Ptr River_seat_v1
@@ -3091,15 +2843,11 @@ hs_bindgen_bd027a37ebf85c11 ::
 hs_bindgen_bd027a37ebf85c11 =
   RIP.fromFFIType hs_bindgen_bd027a37ebf85c11_base
 
-{-|
+{-| __C declaration:__ @river_seat_v1_get_user_data@
 
-  > iface_river_seat_v1
+    __defined at:__ @river-window-management-v1-client-protocol.h 2985:1@
 
-__C declaration:__ @river_seat_v1_get_user_data@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 2985:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_seat_v1_get_user_data ::
      RIP.Ptr River_seat_v1
@@ -3145,19 +2893,15 @@ hs_bindgen_3ee9a2fd3c1686bd ::
 hs_bindgen_3ee9a2fd3c1686bd =
   RIP.fromFFIType hs_bindgen_3ee9a2fd3c1686bd_base
 
-{-|
+{-| This request indicates that the client will no longer use the seat object and that it may be safely destroyed.
 
-  > iface_river_seat_v1
+    This request should be made after the river_seat_v1.removed event is received to complete destruction of the seat.
 
-  This request indicates that the client will no longer use the seat object and that it may be safely destroyed.
+    __C declaration:__ @river_seat_v1_destroy@
 
-  This request should be made after the river_seat_v1.removed event is received to complete destruction of the seat.
+    __defined at:__ @river-window-management-v1-client-protocol.h 3006:1@
 
-__C declaration:__ @river_seat_v1_destroy@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 3006:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_seat_v1_destroy ::
      RIP.Ptr River_seat_v1
@@ -3179,19 +2923,15 @@ hs_bindgen_88c120b012a596f9 ::
 hs_bindgen_88c120b012a596f9 =
   RIP.fromFFIType hs_bindgen_88c120b012a596f9_base
 
-{-|
+{-| Request that the compositor send keyboard input to the given window.
 
-  > iface_river_seat_v1
+    This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
 
-  Request that the compositor send keyboard input to the given window.
+    __C declaration:__ @river_seat_v1_focus_window@
 
-  This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 3021:1@
 
-__C declaration:__ @river_seat_v1_focus_window@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 3021:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_seat_v1_focus_window ::
      RIP.Ptr River_seat_v1
@@ -3216,19 +2956,15 @@ hs_bindgen_145f114775d8d1b1 ::
 hs_bindgen_145f114775d8d1b1 =
   RIP.fromFFIType hs_bindgen_145f114775d8d1b1_base
 
-{-|
+{-| Request that the compositor send keyboard input to the given shell surface.
 
-  > iface_river_seat_v1
+    This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
 
-  Request that the compositor send keyboard input to the given shell surface.
+    __C declaration:__ @river_seat_v1_focus_shell_surface@
 
-  This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 3037:1@
 
-__C declaration:__ @river_seat_v1_focus_shell_surface@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 3037:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_seat_v1_focus_shell_surface ::
      RIP.Ptr River_seat_v1
@@ -3251,19 +2987,15 @@ hs_bindgen_0e93f481b919f55a ::
 hs_bindgen_0e93f481b919f55a =
   RIP.fromFFIType hs_bindgen_0e93f481b919f55a_base
 
-{-|
+{-| Request that the compositor not send keyboard input to any client.
 
-  > iface_river_seat_v1
+    This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
 
-  Request that the compositor not send keyboard input to any client.
+    __C declaration:__ @river_seat_v1_clear_focus@
 
-  This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 3052:1@
 
-__C declaration:__ @river_seat_v1_clear_focus@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 3052:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_seat_v1_clear_focus ::
      RIP.Ptr River_seat_v1
@@ -3284,29 +3016,25 @@ hs_bindgen_c71a12899e9735bd ::
 hs_bindgen_c71a12899e9735bd =
   RIP.fromFFIType hs_bindgen_c71a12899e9735bd_base
 
-{-|
+{-| Start an interactive pointer operation. During the operation, op_delta events will be sent based on pointer input.
 
-  > iface_river_seat_v1
+    When all pointer buttons are released, the op_release event is sent.
 
-  Start an interactive pointer operation. During the operation, op_delta events will be sent based on pointer input.
+    The pointer operation continues until the op_end request is made during a manage sequence and that manage sequence is finished.
 
-  When all pointer buttons are released, the op_release event is sent.
+    The window manager may use this operation to implement interactive move/resize of windows by setting the position of windows and proposing dimensions based off of the op_delta events.
 
-  The pointer operation continues until the op_end request is made during a manage sequence and that manage sequence is finished.
+    This request is ignored if an operation is already in progress.
 
-  The window manager may use this operation to implement interactive move/resize of windows by setting the position of windows and proposing dimensions based off of the op_delta events.
+    The compositor must ensure that no client has pointer focus from this seat during the pointer operation. This means that the window manager has control over the pointer's cursor surface/shape during the pointer operation. See the river_seat_v1 description.
 
-  This request is ignored if an operation is already in progress.
+    This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
 
-  The compositor must ensure that no client has pointer focus from this seat during the pointer operation. This means that the window manager has control over the pointer's cursor surface/shape during the pointer operation. See the river_seat_v1 description.
+    __C declaration:__ @river_seat_v1_op_start_pointer@
 
-  This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 3084:1@
 
-__C declaration:__ @river_seat_v1_op_start_pointer@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 3084:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_seat_v1_op_start_pointer ::
      RIP.Ptr River_seat_v1
@@ -3327,21 +3055,17 @@ hs_bindgen_07d8309d82be68dd ::
 hs_bindgen_07d8309d82be68dd =
   RIP.fromFFIType hs_bindgen_07d8309d82be68dd_base
 
-{-|
+{-| End an interactive operation.
 
-  > iface_river_seat_v1
+    This request is ignored if there is no operation in progress.
 
-  End an interactive operation.
+    This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
 
-  This request is ignored if there is no operation in progress.
+    __C declaration:__ @river_seat_v1_op_end@
 
-  This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 3101:1@
 
-__C declaration:__ @river_seat_v1_op_end@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 3101:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_seat_v1_op_end ::
      RIP.Ptr River_seat_v1
@@ -3365,21 +3089,17 @@ hs_bindgen_90bdd43f2dd8badd ::
 hs_bindgen_90bdd43f2dd8badd =
   RIP.fromFFIType hs_bindgen_90bdd43f2dd8badd_base
 
-{-|
+{-| Define a pointer binding in terms of a pointer button, keyboard modifiers, and other configurable properties.
 
-  > iface_river_seat_v1
+    The button argument is a Linux input event code defined in the linux/input-event-codes.h header file (e.g. BTN_RIGHT).
 
-  Define a pointer binding in terms of a pointer button, keyboard modifiers, and other configurable properties.
+    The new pointer binding is not enabled until initial configuration is completed and the enable request is made during a manage sequence.
 
-  The button argument is a Linux input event code defined in the linux/input-event-codes.h header file (e.g. BTN_RIGHT).
+    __C declaration:__ @river_seat_v1_get_pointer_binding@
 
-  The new pointer binding is not enabled until initial configuration is completed and the enable request is made during a manage sequence.
+    __defined at:__ @river-window-management-v1-client-protocol.h 3120:1@
 
-__C declaration:__ @river_seat_v1_get_pointer_binding@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 3120:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_seat_v1_get_pointer_binding ::
      RIP.Ptr River_seat_v1
@@ -3408,19 +3128,15 @@ hs_bindgen_58c11449c85d661a ::
 hs_bindgen_58c11449c85d661a =
   RIP.fromFFIType hs_bindgen_58c11449c85d661a_base
 
-{-|
+{-| Set the XCursor theme for the seat. This theme is used for cursors rendered by the compositor, but not necessarily for cursors rendered by clients.
 
-  > iface_river_seat_v1
+    Note: The window manager may also wish to set the XCURSOR_THEME and XCURSOR_SIZE environment variable for programs it starts.
 
-  Set the XCursor theme for the seat. This theme is used for cursors rendered by the compositor, but not necessarily for cursors rendered by clients.
+    __C declaration:__ @river_seat_v1_set_xcursor_theme@
 
-  Note: The window manager may also wish to set the XCURSOR_THEME and XCURSOR_SIZE environment variable for programs it starts.
+    __defined at:__ @river-window-management-v1-client-protocol.h 3141:1@
 
-__C declaration:__ @river_seat_v1_set_xcursor_theme@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 3141:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_seat_v1_set_xcursor_theme ::
      RIP.Ptr River_seat_v1
@@ -3449,21 +3165,17 @@ hs_bindgen_7d0af1c5bbd184b8 ::
 hs_bindgen_7d0af1c5bbd184b8 =
   RIP.fromFFIType hs_bindgen_7d0af1c5bbd184b8_base
 
-{-|
+{-| Warp the pointer to the given position in the compositor's logical coordinate space.
 
-  > iface_river_seat_v1
+    If the given position is outside the bounds of all outputs, the pointer will be warped to the closest point inside an output instead.
 
-  Warp the pointer to the given position in the compositor's logical coordinate space.
+    This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
 
-  If the given position is outside the bounds of all outputs, the pointer will be warped to the closest point inside an output instead.
+    __C declaration:__ @river_seat_v1_pointer_warp@
 
-  This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 3160:1@
 
-__C declaration:__ @river_seat_v1_pointer_warp@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 3160:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_seat_v1_pointer_warp ::
      RIP.Ptr River_seat_v1
@@ -3492,15 +3204,11 @@ hs_bindgen_085b3ff92617def4 ::
 hs_bindgen_085b3ff92617def4 =
   RIP.fromFFIType hs_bindgen_085b3ff92617def4_base
 
-{-|
+{-| __C declaration:__ @river_pointer_binding_v1_add_listener@
 
-  > iface_river_pointer_binding_v1
+    __defined at:__ @river-window-management-v1-client-protocol.h 3220:1@
 
-__C declaration:__ @river_pointer_binding_v1_add_listener@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 3220:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_pointer_binding_v1_add_listener ::
      RIP.Ptr River_pointer_binding_v1
@@ -3527,15 +3235,11 @@ hs_bindgen_9f451715747e97e9 ::
 hs_bindgen_9f451715747e97e9 =
   RIP.fromFFIType hs_bindgen_9f451715747e97e9_base
 
-{-|
+{-| __C declaration:__ @river_pointer_binding_v1_set_user_data@
 
-  > iface_river_pointer_binding_v1
+    __defined at:__ @river-window-management-v1-client-protocol.h 3255:1@
 
-__C declaration:__ @river_pointer_binding_v1_set_user_data@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 3255:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_pointer_binding_v1_set_user_data ::
      RIP.Ptr River_pointer_binding_v1
@@ -3558,15 +3262,11 @@ hs_bindgen_0a1223a2725a3a80 ::
 hs_bindgen_0a1223a2725a3a80 =
   RIP.fromFFIType hs_bindgen_0a1223a2725a3a80_base
 
-{-|
+{-| __C declaration:__ @river_pointer_binding_v1_get_user_data@
 
-  > iface_river_pointer_binding_v1
+    __defined at:__ @river-window-management-v1-client-protocol.h 3262:1@
 
-__C declaration:__ @river_pointer_binding_v1_get_user_data@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 3262:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_pointer_binding_v1_get_user_data ::
      RIP.Ptr River_pointer_binding_v1
@@ -3612,17 +3312,13 @@ hs_bindgen_667e07d3e6fa9940 ::
 hs_bindgen_667e07d3e6fa9940 =
   RIP.fromFFIType hs_bindgen_667e07d3e6fa9940_base
 
-{-|
+{-| This request indicates that the client will no longer use the pointer binding object and that it may be safely destroyed.
 
-  > iface_river_pointer_binding_v1
+    __C declaration:__ @river_pointer_binding_v1_destroy@
 
-  This request indicates that the client will no longer use the pointer binding object and that it may be safely destroyed.
+    __defined at:__ @river-window-management-v1-client-protocol.h 3280:1@
 
-__C declaration:__ @river_pointer_binding_v1_destroy@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 3280:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_pointer_binding_v1_destroy ::
      RIP.Ptr River_pointer_binding_v1
@@ -3643,19 +3339,15 @@ hs_bindgen_d9c9c1781a86422b ::
 hs_bindgen_d9c9c1781a86422b =
   RIP.fromFFIType hs_bindgen_d9c9c1781a86422b_base
 
-{-|
+{-| This request should be made after all initial configuration has been completed and the window manager wishes the pointer binding to be able to be triggered.
 
-  > iface_river_pointer_binding_v1
+    This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
 
-  This request should be made after all initial configuration has been completed and the window manager wishes the pointer binding to be able to be triggered.
+    __C declaration:__ @river_pointer_binding_v1_enable@
 
-  This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 3297:1@
 
-__C declaration:__ @river_pointer_binding_v1_enable@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 3297:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_pointer_binding_v1_enable ::
      RIP.Ptr River_pointer_binding_v1
@@ -3676,19 +3368,15 @@ hs_bindgen_2030bf6a52464d20 ::
 hs_bindgen_2030bf6a52464d20 =
   RIP.fromFFIType hs_bindgen_2030bf6a52464d20_base
 
-{-|
+{-| This request may be used to temporarily disable the pointer binding. It may be later re-enabled with the enable request.
 
-  > iface_river_pointer_binding_v1
+    This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
 
-  This request may be used to temporarily disable the pointer binding. It may be later re-enabled with the enable request.
+    __C declaration:__ @river_pointer_binding_v1_disable@
 
-  This request modifies window management state and may only be made as part of a manage sequence, see the river_window_manager_v1 description.
+    __defined at:__ @river-window-management-v1-client-protocol.h 3313:1@
 
-__C declaration:__ @river_pointer_binding_v1_disable@
-
-__defined at:__ @river-window-management-v1-client-protocol.h 3313:1@
-
-__exported by:__ @river-window-management-v1-client-protocol.h@
+    __exported by:__ @river-window-management-v1-client-protocol.h@
 -}
 river_pointer_binding_v1_disable ::
      RIP.Ptr River_pointer_binding_v1
