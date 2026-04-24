@@ -1,16 +1,12 @@
 /* From: http://weblog.haskell.cz/pivnik/building-a-shared-library-in-haskell/ */
 
-#define CAT(a,b) XCAT(a,b)
-#define XCAT(a,b) a ## b
 #define STR(a) XSTR(a)
 #define XSTR(a) #a
 
 #include <stdio.h>
-#include <HsFFI.h>
-#include <Rts.h>
+#include "HsFFI.h"
+#include "Rts.h"
 #include "Waybar/CFFI/Plugin_stub.h"
-
-extern void CAT(__stginit_, MODULE)(void);
 
 // FFI would export this as a function but waybar expects a const value...
 extern const size_t wbcffi_version;
@@ -22,15 +18,13 @@ static HsBool library_init(void)
     static char *argv[] = { STR(MODULE) ".so", 0 }, **argp = argv;
     static int argc = 0;
 
-    //hs_init(&argc, &argp);
-
     RtsConfig conf = defaultRtsConfig;
     conf.rts_opts_enabled = RtsOptsAll;
     hs_init_ghc(&argc, &argp, conf);
 
     plugin_runtime_init();
 
-   return HS_BOOL_TRUE;
+    return HS_BOOL_TRUE;
 }
 
 static void library_exit(void) __attribute__((destructor));

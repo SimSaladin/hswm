@@ -1,15 +1,21 @@
 verbatim:
-  cabal-version:      3.4
+  cabal-version:      3.12
 name:               hswm-bindings
 version:            0.1.0.0
 license:            MIT
 license-file:       LICENSE
 author:             Samuli Thomasson
 maintainer:         samuli.thomasson@pm.me
-build-type:         Simple
+build-type:         Custom
 extra-doc-files:    CHANGELOG.md
 
+custom-setup:
+  dependencies:
+    - base
+    - Cabal
+
 extra-source-files:
+  - Makefile
   - protocol/*.xml
   - cbits/*.c
   - include/*.h
@@ -32,20 +38,13 @@ library:
   include-dirs:
     - include
     - include/wayland-protocols
-  c-sources:
-    - cbits/*.c
-    - cbits/wayland-protocols/ext-foreign-toplevel-list-v1-protocol.c
-    - cbits/wayland-protocols/xdg-shell-protocol.c
   pkgconfig-depends:
     - wayland-client
     - pixman-1
-  #extra-libraries:
-  #  - wayland-client
-  #  - pixman-1
+    - wayland-protocols
   ghc-options:
     - -Wall
     - -Wunused-packages
-    - -haddock
     - -fPIC
   language: GHC2024
   default-extensions:

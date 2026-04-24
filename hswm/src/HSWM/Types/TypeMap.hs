@@ -105,9 +105,7 @@ modifyObjectDef f = do
   tmV <- asks (view globalTMap)
   withTMVar tmV $ \s -> return ((), TypeMap . g $ unTypeMap s)
     where
-      g tm = flip TM.insert tm $ f $ case TM.lookup tm of
-               Just a -> a
-               Nothing -> def
+      g tm = flip TM.insert tm $ f $ fromMaybe def $ TM.lookup tm
 
 modifyObjectDef' :: (Typeable a, Default a, MonadStateGlobal env m) => (a -> (b, a)) -> m b
 modifyObjectDef' f = do
@@ -115,7 +113,5 @@ modifyObjectDef' f = do
   withTMVar tmV $ \s -> return (g $ unTypeMap s)
     where
       g tm =
-        let (r, a') = f $ case TM.lookup tm of
-                           Just a -> a
-                           Nothing -> def
+        let (r, a') = f $ fromMaybe def $ TM.lookup tm
          in (r, TypeMap $ TM.insert a' tm)

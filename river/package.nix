@@ -21,6 +21,7 @@
   zig_0_15,
   withManpages ? true,
   xwaylandSupport ? true,
+  withDebug ? false,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -69,8 +70,12 @@ stdenv.mkDerivation (finalAttrs: {
     "--system"
     "${finalAttrs.deps}"
   ]
+  ++ lib.optional withDebug "-Doptimize=Debug"
   ++ lib.optional withManpages "-Dman-pages"
   ++ lib.optional xwaylandSupport "-Dxwayland";
+
+  dontStrip = withDebug;
+  separateDebugInfo = withDebug;
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];

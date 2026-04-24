@@ -34,6 +34,10 @@ debugHook ev
       (xb :: XkbBinding (SomeAction H)) <- liftIO $ deRefStablePtr (castPtrToStablePtr $ castPtr dt)
       logDebug $ "XK (released)" :# [ "action" .= show xb.action,  "bind" .= show self ]
       mempty
+  | XkbEvent (R.RiverXkbBindingStopRepeat dt self) <- ev = do
+      (xb :: XkbBinding (SomeAction H)) <- liftIO $ deRefStablePtr (castPtrToStablePtr $ castPtr dt)
+      logDebug $ "XK (stop-repeat)" :# [ "action" .= show xb.action,  "bind" .= show self ]
+      mempty
   | SeatEvent R.RiverSeatPointerPosition {} <- ev = mempty
   | SeatEvent e <- ev = logEvent e
   | OutputEvent e <- ev = logEvent e

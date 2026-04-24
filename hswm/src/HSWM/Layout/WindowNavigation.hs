@@ -81,6 +81,12 @@ data Navigate
 
 instance Message Navigate
 
+instance Show Navigate where
+  show (Go d) = "Go " ++ show d
+  show (Swap d) = "Swap " ++ show d
+  show (Move d) = "Move " ++ show d
+  show (Apply _ d) = "Apply " ++ show d
+
 -- | Used with 'configurableNavigation' to specify how to show reachable windows'
 -- borders. You cannot create 'WNConfig' values directly; use 'def' or one of the following
 -- three functions to create one.

@@ -1,9 +1,3 @@
-{-# LANGUAGE DataKinds, TypeApplications, FlexibleContexts #-}
-{-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE DerivingStrategies, DeriveAnyClass, DeriveGeneric, DeriveDataTypeable #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-
-
 module Text.XkbCommon.FFI where
 
 #define _GNU_SOURCE
@@ -22,9 +16,8 @@ import Data.Default
 
 -- * Types
 
-type KeySym       = CUInt
-type Modifiers    = #{type uint32_t}
-type ModMask      = #{type xkb_mod_index_t}
+type KeySym       = #{type xkb_keysym_t}
+type ModMask      = #{type xkb_mod_mask_t}
 type ModIndex     = #{type xkb_mod_index_t}
 type LayoutIndex  = #{type xkb_layout_index_t}
 type XkbKeycode   = #{type xkb_keycode_t}

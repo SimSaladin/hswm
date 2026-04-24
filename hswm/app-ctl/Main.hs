@@ -12,6 +12,9 @@ import Data.Time
 import Data.Aeson qualified as A
 import Prettyprinter
 import Prettyprinter.Render.Terminal
+import Options.Generic
+import qualified Options.Applicative          as Options
+import qualified Options.Applicative.Types    as Options
 
 type CM = InputT (LoggingT (ReaderT () IO))
 
@@ -45,9 +48,9 @@ main = do
 prettyLogMsg :: LoggedMessage -> Doc AnsiStyle
 prettyLogMsg LoggedMessage{..} =
   ppLevel loggedMessageLevel <> space <>
-    pretty loggedMessageText <> space <>
-      annotate (color Black) (pretty (BL.unpack (A.encode loggedMessageMeta))) <>
-        line
+  pretty loggedMessageText <> space <>
+  annotate (color Black <> bold) (pretty (BL.unpack (A.encode loggedMessageMeta))) <>
+  line
     where
       ppLevel = \case
         LevelError   -> annotate (color Red) "error"
@@ -69,12 +72,21 @@ msgHandler = \case
   FocusedWindow{} -> return ()
   msg -> outputStrLn $ show msg
 
-consoleHandler :: (ProtoMsg -> CM ()) -> CM ()
+consoleHandler :: (Request -> CM ()) -> CM ()
 consoleHandler say = forever $ do
   minput <- getInputLine ">>> "
   case minput of
     Nothing -> return ()
     Just "" -> return ()
-    Just ln -> case readMaybe ln :: Maybe ProtoMsg of
-      Just m -> say m
-      Nothing -> logError "Could not read input message"
+    Just ln -> do
+      let
+        header = Options.header "hswmctl"
+        info   = Options.info (parseRecord @Request) header
+      let pres = Options.execParserPure (Options.prefs defaultParserPrefs) info (words ln)
+      case pres of
+        Options.Success msg -> say msg
+        Options.Failure pfail -> outputStrLn $ fst $ Options.renderFailure pfail "hswm"
+        _ -> return ()
+
+defaultParserPrefs :: Options.PrefsMod
+defaultParserPrefs = Options.multiSuffix "..."

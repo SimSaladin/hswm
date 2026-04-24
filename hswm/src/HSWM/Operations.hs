@@ -438,7 +438,7 @@ restart prog = do
   statefile <- runInHS writeStateToFile
   logInfo $ "restart: executing" :# [ "program" .= prog ]
   io $ do
-    res <- try $ executeFile prog True [ "--statefile", statefile ] Nothing
+    res <- try $ executeFile prog True [ "--state-file", statefile ] Nothing
     case res of
       Left (SomeException e) -> hPrint stderr e >> exitFailure
       Right {} -> return ()
@@ -478,13 +478,19 @@ dumpStateAsString = do
 
 -- | Read the state of a previous xmonad instance from a file and
 -- return that state.  The state file is removed after reading it.
-readStateFile :: forall m l m2. (MonadUnliftIO m, MonadLogger m, LayoutClass l RiverWindow, Read (l RiverWindow)) => HSWMConfig m2 l -> m (Maybe HState)
-readStateFile xmc = do
-  dir <- getStateDirectory
-  let linkpath = dir ++ "/" ++ "savedstate"
-  exists <- doesFileExist linkpath
+readStateFile :: forall m l m2. (MonadUnliftIO m, MonadLogger m, LayoutClass l RiverWindow, Read (l RiverWindow))
+              => Maybe FilePath
+              -> HSWMConfig m2 l
+              -> m (Maybe HState)
+readStateFile msf xmc = do
+  sfile <- case msf of
+             Just x -> return x
+             Nothing -> do
+                  dir <- getStateDirectory
+                  return $ dir ++ "/" ++ "savedstate"
+  exists <- doesFileExist sfile
   if exists
-     then doIt linkpath
+     then doIt sfile
      else return Nothing
 
   where

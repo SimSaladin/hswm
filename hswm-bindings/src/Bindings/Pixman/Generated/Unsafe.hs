@@ -193,27 +193,27 @@ import Bindings.Pixman.Generated
 
 $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.unlines
   [ "#include <pixman.h>"
-  , "void hs_bindgen_46871e40db5d2e5f ("
+  , "void hs_bindgen_a2cf5fc86c8c88da ("
   , "  struct pixman_transform *arg1"
   , ")"
   , "{"
   , "  (pixman_transform_init_identity)(arg1);"
   , "}"
-  , "pixman_bool_t hs_bindgen_803553b54310aa37 ("
+  , "pixman_bool_t hs_bindgen_336e61345b1f5c66 ("
   , "  struct pixman_transform const *arg1,"
   , "  struct pixman_vector *arg2"
   , ")"
   , "{"
   , "  return (pixman_transform_point_3d)(arg1, arg2);"
   , "}"
-  , "pixman_bool_t hs_bindgen_9301d48f2e16fbd3 ("
+  , "pixman_bool_t hs_bindgen_aff2869ecd997685 ("
   , "  struct pixman_transform const *arg1,"
   , "  struct pixman_vector *arg2"
   , ")"
   , "{"
   , "  return (pixman_transform_point)(arg1, arg2);"
   , "}"
-  , "pixman_bool_t hs_bindgen_8d74835d1806bedb ("
+  , "pixman_bool_t hs_bindgen_bbaf9f4bb55833d6 ("
   , "  struct pixman_transform *arg1,"
   , "  struct pixman_transform const *arg2,"
   , "  struct pixman_transform const *arg3"
@@ -221,7 +221,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_transform_multiply)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_d8d6c60ebffe5827 ("
+  , "void hs_bindgen_3a778a31199f5caf ("
   , "  struct pixman_transform *arg1,"
   , "  pixman_fixed_t arg2,"
   , "  pixman_fixed_t arg3"
@@ -229,7 +229,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_transform_init_scale)(arg1, arg2, arg3);"
   , "}"
-  , "pixman_bool_t hs_bindgen_846a50751cd8851e ("
+  , "pixman_bool_t hs_bindgen_7c493c2871836b68 ("
   , "  struct pixman_transform *arg1,"
   , "  struct pixman_transform *arg2,"
   , "  pixman_fixed_t arg3,"
@@ -238,7 +238,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_transform_scale)(arg1, arg2, arg3, arg4);"
   , "}"
-  , "void hs_bindgen_b9c22b6ce5194d8f ("
+  , "void hs_bindgen_8a0618a4d90c1142 ("
   , "  struct pixman_transform *arg1,"
   , "  pixman_fixed_t arg2,"
   , "  pixman_fixed_t arg3"
@@ -246,7 +246,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_transform_init_rotate)(arg1, arg2, arg3);"
   , "}"
-  , "pixman_bool_t hs_bindgen_1bc75ef96e46ab1a ("
+  , "pixman_bool_t hs_bindgen_44d4a63e1916e9ef ("
   , "  struct pixman_transform *arg1,"
   , "  struct pixman_transform *arg2,"
   , "  pixman_fixed_t arg3,"
@@ -255,7 +255,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_transform_rotate)(arg1, arg2, arg3, arg4);"
   , "}"
-  , "void hs_bindgen_c4061affa4594923 ("
+  , "void hs_bindgen_16cd1326a9b6c3d6 ("
   , "  struct pixman_transform *arg1,"
   , "  pixman_fixed_t arg2,"
   , "  pixman_fixed_t arg3"
@@ -263,7 +263,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_transform_init_translate)(arg1, arg2, arg3);"
   , "}"
-  , "pixman_bool_t hs_bindgen_9aa983c04f447ce6 ("
+  , "pixman_bool_t hs_bindgen_9c4012243522d689 ("
   , "  struct pixman_transform *arg1,"
   , "  struct pixman_transform *arg2,"
   , "  pixman_fixed_t arg3,"
@@ -272,81 +272,81 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_transform_translate)(arg1, arg2, arg3, arg4);"
   , "}"
-  , "pixman_bool_t hs_bindgen_32918d4f073af029 ("
+  , "pixman_bool_t hs_bindgen_e379e5b668a7919c ("
   , "  struct pixman_transform const *arg1,"
   , "  struct pixman_box16 *arg2"
   , ")"
   , "{"
   , "  return (pixman_transform_bounds)(arg1, arg2);"
   , "}"
-  , "pixman_bool_t hs_bindgen_f2cb11c5963e48ab ("
+  , "pixman_bool_t hs_bindgen_f3884317f774fa68 ("
   , "  struct pixman_transform *arg1,"
   , "  struct pixman_transform const *arg2"
   , ")"
   , "{"
   , "  return (pixman_transform_invert)(arg1, arg2);"
   , "}"
-  , "pixman_bool_t hs_bindgen_06efb32c4c6fd1d0 ("
+  , "pixman_bool_t hs_bindgen_e9d514ed052d4f3a ("
   , "  struct pixman_transform const *arg1"
   , ")"
   , "{"
   , "  return (pixman_transform_is_identity)(arg1);"
   , "}"
-  , "pixman_bool_t hs_bindgen_313ead91b9a86d66 ("
+  , "pixman_bool_t hs_bindgen_56aae067222466f2 ("
   , "  struct pixman_transform const *arg1"
   , ")"
   , "{"
   , "  return (pixman_transform_is_scale)(arg1);"
   , "}"
-  , "pixman_bool_t hs_bindgen_d4fce75acebd8c00 ("
+  , "pixman_bool_t hs_bindgen_c16e5ade3f3da5ae ("
   , "  struct pixman_transform const *arg1"
   , ")"
   , "{"
   , "  return (pixman_transform_is_int_translate)(arg1);"
   , "}"
-  , "pixman_bool_t hs_bindgen_dc816363ef17cc40 ("
+  , "pixman_bool_t hs_bindgen_f35911e0531115a3 ("
   , "  struct pixman_transform const *arg1,"
   , "  struct pixman_transform const *arg2"
   , ")"
   , "{"
   , "  return (pixman_transform_is_inverse)(arg1, arg2);"
   , "}"
-  , "pixman_bool_t hs_bindgen_a10d774ca7c5fe1f ("
+  , "pixman_bool_t hs_bindgen_e204007d188b0ace ("
   , "  struct pixman_transform *arg1,"
   , "  struct pixman_f_transform const *arg2"
   , ")"
   , "{"
   , "  return (pixman_transform_from_pixman_f_transform)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_ebc55d2d1056910a ("
+  , "void hs_bindgen_0fb138356928cb4e ("
   , "  struct pixman_f_transform *arg1,"
   , "  struct pixman_transform const *arg2"
   , ")"
   , "{"
   , "  (pixman_f_transform_from_pixman_transform)(arg1, arg2);"
   , "}"
-  , "pixman_bool_t hs_bindgen_86d667116b57925d ("
+  , "pixman_bool_t hs_bindgen_333dcf96cc14faa7 ("
   , "  struct pixman_f_transform *arg1,"
   , "  struct pixman_f_transform const *arg2"
   , ")"
   , "{"
   , "  return (pixman_f_transform_invert)(arg1, arg2);"
   , "}"
-  , "pixman_bool_t hs_bindgen_4feb1a82b73af9d1 ("
+  , "pixman_bool_t hs_bindgen_8197d9a54a3b1b59 ("
   , "  struct pixman_f_transform const *arg1,"
   , "  struct pixman_f_vector *arg2"
   , ")"
   , "{"
   , "  return (pixman_f_transform_point)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_24cbcffde2c6062e ("
+  , "void hs_bindgen_ec3efa972ab7dccf ("
   , "  struct pixman_f_transform const *arg1,"
   , "  struct pixman_f_vector *arg2"
   , ")"
   , "{"
   , "  (pixman_f_transform_point_3d)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_764752c4b0477355 ("
+  , "void hs_bindgen_562c53736ca53139 ("
   , "  struct pixman_f_transform *arg1,"
   , "  struct pixman_f_transform const *arg2,"
   , "  struct pixman_f_transform const *arg3"
@@ -354,7 +354,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_f_transform_multiply)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_feb981ce89546279 ("
+  , "void hs_bindgen_51523252fc304f94 ("
   , "  struct pixman_f_transform *arg1,"
   , "  double arg2,"
   , "  double arg3"
@@ -362,7 +362,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_f_transform_init_scale)(arg1, arg2, arg3);"
   , "}"
-  , "pixman_bool_t hs_bindgen_92642c0145a73eb2 ("
+  , "pixman_bool_t hs_bindgen_adddd2fa64360684 ("
   , "  struct pixman_f_transform *arg1,"
   , "  struct pixman_f_transform *arg2,"
   , "  double arg3,"
@@ -371,7 +371,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_f_transform_scale)(arg1, arg2, arg3, arg4);"
   , "}"
-  , "void hs_bindgen_b793e250484b9913 ("
+  , "void hs_bindgen_71df425567458d5f ("
   , "  struct pixman_f_transform *arg1,"
   , "  double arg2,"
   , "  double arg3"
@@ -379,7 +379,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_f_transform_init_rotate)(arg1, arg2, arg3);"
   , "}"
-  , "pixman_bool_t hs_bindgen_26a59a73c80ac00c ("
+  , "pixman_bool_t hs_bindgen_86e994e100c1aebc ("
   , "  struct pixman_f_transform *arg1,"
   , "  struct pixman_f_transform *arg2,"
   , "  double arg3,"
@@ -388,7 +388,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_f_transform_rotate)(arg1, arg2, arg3, arg4);"
   , "}"
-  , "void hs_bindgen_5c4ba2b053ec2f40 ("
+  , "void hs_bindgen_0d445ff940bb5d26 ("
   , "  struct pixman_f_transform *arg1,"
   , "  double arg2,"
   , "  double arg3"
@@ -396,7 +396,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_f_transform_init_translate)(arg1, arg2, arg3);"
   , "}"
-  , "pixman_bool_t hs_bindgen_63287dbf5e918075 ("
+  , "pixman_bool_t hs_bindgen_c2861d08cf0af515 ("
   , "  struct pixman_f_transform *arg1,"
   , "  struct pixman_f_transform *arg2,"
   , "  double arg3,"
@@ -405,20 +405,20 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_f_transform_translate)(arg1, arg2, arg3, arg4);"
   , "}"
-  , "pixman_bool_t hs_bindgen_e998f863f3a2037f ("
+  , "pixman_bool_t hs_bindgen_872532155486dd08 ("
   , "  struct pixman_f_transform const *arg1,"
   , "  struct pixman_box16 *arg2"
   , ")"
   , "{"
   , "  return (pixman_f_transform_bounds)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_b9ea984611af3edc ("
+  , "void hs_bindgen_e3aeb9ec910358d7 ("
   , "  struct pixman_f_transform *arg1"
   , ")"
   , "{"
   , "  (pixman_f_transform_init_identity)(arg1);"
   , "}"
-  , "void hs_bindgen_7ae5a1513241c915 ("
+  , "void hs_bindgen_641075d17ecf973f ("
   , "  pixman_box16_t *arg1,"
   , "  pixman_region16_data_t *arg2,"
   , "  pixman_region16_data_t *arg3"
@@ -426,13 +426,13 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_region_set_static_pointers)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_11ea79fe20c43102 ("
+  , "void hs_bindgen_76b85a0c3f64cc52 ("
   , "  pixman_region16_t *arg1"
   , ")"
   , "{"
   , "  (pixman_region_init)(arg1);"
   , "}"
-  , "void hs_bindgen_0882dccfdec9d6e5 ("
+  , "void hs_bindgen_711e4dd7fbcb8ea2 ("
   , "  pixman_region16_t *arg1,"
   , "  signed int arg2,"
   , "  signed int arg3,"
@@ -442,7 +442,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_region_init_rect)(arg1, arg2, arg3, arg4, arg5);"
   , "}"
-  , "pixman_bool_t hs_bindgen_d166b8c58a763f99 ("
+  , "pixman_bool_t hs_bindgen_b8779e0958b2fbbc ("
   , "  pixman_region16_t *arg1,"
   , "  pixman_box16_t const *arg2,"
   , "  signed int arg3"
@@ -450,27 +450,27 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_region_init_rects)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_54522b18ae0b36a0 ("
+  , "void hs_bindgen_9130007e3e649313 ("
   , "  pixman_region16_t *arg1,"
   , "  pixman_box16_t const *arg2"
   , ")"
   , "{"
   , "  (pixman_region_init_with_extents)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_cebd83455c43f166 ("
+  , "void hs_bindgen_255adfebd1db3828 ("
   , "  pixman_region16_t *arg1,"
   , "  pixman_image_t *arg2"
   , ")"
   , "{"
   , "  (pixman_region_init_from_image)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_38e0f26d9214945b ("
+  , "void hs_bindgen_d02c34656d08dd84 ("
   , "  pixman_region16_t *arg1"
   , ")"
   , "{"
   , "  (pixman_region_fini)(arg1);"
   , "}"
-  , "void hs_bindgen_692aeec51977f9ad ("
+  , "void hs_bindgen_62346ee301a5531e ("
   , "  pixman_region16_t *arg1,"
   , "  signed int arg2,"
   , "  signed int arg3"
@@ -478,14 +478,14 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_region_translate)(arg1, arg2, arg3);"
   , "}"
-  , "pixman_bool_t hs_bindgen_fa3c4ab5c234268b ("
+  , "pixman_bool_t hs_bindgen_5409874e3c6f1ebf ("
   , "  pixman_region16_t *arg1,"
   , "  pixman_region16_t const *arg2"
   , ")"
   , "{"
   , "  return (pixman_region_copy)(arg1, arg2);"
   , "}"
-  , "pixman_bool_t hs_bindgen_93e94b8346d50e61 ("
+  , "pixman_bool_t hs_bindgen_b9ee82f202152c02 ("
   , "  pixman_region16_t *arg1,"
   , "  pixman_region16_t const *arg2,"
   , "  pixman_region16_t const *arg3"
@@ -493,7 +493,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_region_intersect)(arg1, arg2, arg3);"
   , "}"
-  , "pixman_bool_t hs_bindgen_c624ad2ee102cd4f ("
+  , "pixman_bool_t hs_bindgen_9343e39517725718 ("
   , "  pixman_region16_t *arg1,"
   , "  pixman_region16_t const *arg2,"
   , "  pixman_region16_t const *arg3"
@@ -501,7 +501,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_region_union)(arg1, arg2, arg3);"
   , "}"
-  , "pixman_bool_t hs_bindgen_be52fa94a0a6a1d6 ("
+  , "pixman_bool_t hs_bindgen_9d16565960bd3229 ("
   , "  pixman_region16_t *arg1,"
   , "  pixman_region16_t const *arg2,"
   , "  signed int arg3,"
@@ -512,7 +512,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_region_union_rect)(arg1, arg2, arg3, arg4, arg5, arg6);"
   , "}"
-  , "pixman_bool_t hs_bindgen_38a6ec1f2b3987bc ("
+  , "pixman_bool_t hs_bindgen_141a5a82886df3a2 ("
   , "  pixman_region16_t *arg1,"
   , "  pixman_region16_t const *arg2,"
   , "  signed int arg3,"
@@ -523,7 +523,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_region_intersect_rect)(arg1, arg2, arg3, arg4, arg5, arg6);"
   , "}"
-  , "pixman_bool_t hs_bindgen_14d882d75941c137 ("
+  , "pixman_bool_t hs_bindgen_f58def6e6cadcd44 ("
   , "  pixman_region16_t *arg1,"
   , "  pixman_region16_t const *arg2,"
   , "  pixman_region16_t const *arg3"
@@ -531,7 +531,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_region_subtract)(arg1, arg2, arg3);"
   , "}"
-  , "pixman_bool_t hs_bindgen_558d516f575cf7ae ("
+  , "pixman_bool_t hs_bindgen_f5c6601328fb5353 ("
   , "  pixman_region16_t *arg1,"
   , "  pixman_region16_t const *arg2,"
   , "  pixman_box16_t const *arg3"
@@ -539,7 +539,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_region_inverse)(arg1, arg2, arg3);"
   , "}"
-  , "pixman_bool_t hs_bindgen_e22e0b5521717be1 ("
+  , "pixman_bool_t hs_bindgen_7d8531da490bcee2 ("
   , "  pixman_region16_t const *arg1,"
   , "  signed int arg2,"
   , "  signed int arg3,"
@@ -548,77 +548,77 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_region_contains_point)(arg1, arg2, arg3, arg4);"
   , "}"
-  , "pixman_region_overlap_t hs_bindgen_8c035abaa7f658a1 ("
+  , "pixman_region_overlap_t hs_bindgen_347b09bf995224c7 ("
   , "  pixman_region16_t const *arg1,"
   , "  pixman_box16_t const *arg2"
   , ")"
   , "{"
   , "  return (pixman_region_contains_rectangle)(arg1, arg2);"
   , "}"
-  , "pixman_bool_t hs_bindgen_55fbac6d560a11be ("
+  , "pixman_bool_t hs_bindgen_b9ffe06d3ded22cd ("
   , "  pixman_region16_t const *arg1"
   , ")"
   , "{"
   , "  return (pixman_region_empty)(arg1);"
   , "}"
-  , "pixman_bool_t hs_bindgen_7841920424df5182 ("
+  , "pixman_bool_t hs_bindgen_15970d1bc094c7a4 ("
   , "  pixman_region16_t const *arg1"
   , ")"
   , "{"
   , "  return (pixman_region_not_empty)(arg1);"
   , "}"
-  , "pixman_box16_t *hs_bindgen_8f7af2dd117be8ea ("
+  , "pixman_box16_t *hs_bindgen_84dcdc42818f66d0 ("
   , "  pixman_region16_t const *arg1"
   , ")"
   , "{"
   , "  return (pixman_region_extents)(arg1);"
   , "}"
-  , "signed int hs_bindgen_877576f483afe5e5 ("
+  , "signed int hs_bindgen_f01b384f69d0dbba ("
   , "  pixman_region16_t const *arg1"
   , ")"
   , "{"
   , "  return (pixman_region_n_rects)(arg1);"
   , "}"
-  , "pixman_box16_t *hs_bindgen_6dc7a6faa00e19ce ("
+  , "pixman_box16_t *hs_bindgen_1c75b50f82c11e57 ("
   , "  pixman_region16_t const *arg1,"
   , "  signed int *arg2"
   , ")"
   , "{"
   , "  return (pixman_region_rectangles)(arg1, arg2);"
   , "}"
-  , "pixman_bool_t hs_bindgen_b73b226c73cc564b ("
+  , "pixman_bool_t hs_bindgen_b5953cc8e3d7fdd0 ("
   , "  pixman_region16_t const *arg1,"
   , "  pixman_region16_t const *arg2"
   , ")"
   , "{"
   , "  return (pixman_region_equal)(arg1, arg2);"
   , "}"
-  , "pixman_bool_t hs_bindgen_34a6221ba26bb931 ("
+  , "pixman_bool_t hs_bindgen_e093cc3cd7225a9e ("
   , "  pixman_region16_t *arg1"
   , ")"
   , "{"
   , "  return (pixman_region_selfcheck)(arg1);"
   , "}"
-  , "void hs_bindgen_ab8cf6620697cdf2 ("
+  , "void hs_bindgen_0fd0e6d0611637a2 ("
   , "  pixman_region16_t *arg1,"
   , "  pixman_box16_t const *arg2"
   , ")"
   , "{"
   , "  (pixman_region_reset)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_3c3c60beb8993dc5 ("
+  , "void hs_bindgen_0366b88627a5e320 ("
   , "  pixman_region16_t *arg1"
   , ")"
   , "{"
   , "  (pixman_region_clear)(arg1);"
   , "}"
-  , "void hs_bindgen_86bfdca2909f75b6 ("
+  , "void hs_bindgen_b0c2f9276120d1f6 ("
   , "  pixman_region32_t *arg1"
   , ")"
   , "{"
   , "  (pixman_region32_init)(arg1);"
   , "}"
-  , "void hs_bindgen_91c22e5e6c6d5368 ("
+  , "void hs_bindgen_605df1f00ccf63ed ("
   , "  pixman_region32_t *arg1,"
   , "  signed int arg2,"
   , "  signed int arg3,"
@@ -628,7 +628,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_region32_init_rect)(arg1, arg2, arg3, arg4, arg5);"
   , "}"
-  , "pixman_bool_t hs_bindgen_e04b01141f38f6fe ("
+  , "pixman_bool_t hs_bindgen_383c09a05e0c0045 ("
   , "  pixman_region32_t *arg1,"
   , "  pixman_box32_t const *arg2,"
   , "  signed int arg3"
@@ -636,27 +636,27 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_region32_init_rects)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_d0ce0aa7aa2b6893 ("
+  , "void hs_bindgen_66c4a40fec0deeab ("
   , "  pixman_region32_t *arg1,"
   , "  pixman_box32_t const *arg2"
   , ")"
   , "{"
   , "  (pixman_region32_init_with_extents)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_42287f8f08754df2 ("
+  , "void hs_bindgen_b838b99db46e89eb ("
   , "  pixman_region32_t *arg1,"
   , "  pixman_image_t *arg2"
   , ")"
   , "{"
   , "  (pixman_region32_init_from_image)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_2851e8362a4158d7 ("
+  , "void hs_bindgen_f5afdafe8a555a4b ("
   , "  pixman_region32_t *arg1"
   , ")"
   , "{"
   , "  (pixman_region32_fini)(arg1);"
   , "}"
-  , "void hs_bindgen_e328ea12e137059b ("
+  , "void hs_bindgen_1040638d55b23407 ("
   , "  pixman_region32_t *arg1,"
   , "  signed int arg2,"
   , "  signed int arg3"
@@ -664,14 +664,14 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_region32_translate)(arg1, arg2, arg3);"
   , "}"
-  , "pixman_bool_t hs_bindgen_ff47e3528fcd2bae ("
+  , "pixman_bool_t hs_bindgen_00ec163aaf740479 ("
   , "  pixman_region32_t *arg1,"
   , "  pixman_region32_t const *arg2"
   , ")"
   , "{"
   , "  return (pixman_region32_copy)(arg1, arg2);"
   , "}"
-  , "pixman_bool_t hs_bindgen_4b78dd852da51ae3 ("
+  , "pixman_bool_t hs_bindgen_555e73235dd1b613 ("
   , "  pixman_region32_t *arg1,"
   , "  pixman_region32_t const *arg2,"
   , "  pixman_region32_t const *arg3"
@@ -679,7 +679,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_region32_intersect)(arg1, arg2, arg3);"
   , "}"
-  , "pixman_bool_t hs_bindgen_a31ce4be3b30a117 ("
+  , "pixman_bool_t hs_bindgen_d72d63390a733e97 ("
   , "  pixman_region32_t *arg1,"
   , "  pixman_region32_t const *arg2,"
   , "  pixman_region32_t const *arg3"
@@ -687,7 +687,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_region32_union)(arg1, arg2, arg3);"
   , "}"
-  , "pixman_bool_t hs_bindgen_0b3984ece3d1441b ("
+  , "pixman_bool_t hs_bindgen_187fbeb4ad3ed67d ("
   , "  pixman_region32_t *arg1,"
   , "  pixman_region32_t const *arg2,"
   , "  signed int arg3,"
@@ -698,7 +698,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_region32_intersect_rect)(arg1, arg2, arg3, arg4, arg5, arg6);"
   , "}"
-  , "pixman_bool_t hs_bindgen_e53d7c7832f42101 ("
+  , "pixman_bool_t hs_bindgen_4059a674b8bb337b ("
   , "  pixman_region32_t *arg1,"
   , "  pixman_region32_t const *arg2,"
   , "  signed int arg3,"
@@ -709,7 +709,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_region32_union_rect)(arg1, arg2, arg3, arg4, arg5, arg6);"
   , "}"
-  , "pixman_bool_t hs_bindgen_67ec2d3b5c3b2db1 ("
+  , "pixman_bool_t hs_bindgen_25ebf8e8e5242949 ("
   , "  pixman_region32_t *arg1,"
   , "  pixman_region32_t const *arg2,"
   , "  pixman_region32_t const *arg3"
@@ -717,7 +717,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_region32_subtract)(arg1, arg2, arg3);"
   , "}"
-  , "pixman_bool_t hs_bindgen_760e49687c1d97c0 ("
+  , "pixman_bool_t hs_bindgen_2979192ef2832311 ("
   , "  pixman_region32_t *arg1,"
   , "  pixman_region32_t const *arg2,"
   , "  pixman_box32_t const *arg3"
@@ -725,7 +725,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_region32_inverse)(arg1, arg2, arg3);"
   , "}"
-  , "pixman_bool_t hs_bindgen_8438b54b9e99a921 ("
+  , "pixman_bool_t hs_bindgen_fd11006a2fcc94ab ("
   , "  pixman_region32_t const *arg1,"
   , "  signed int arg2,"
   , "  signed int arg3,"
@@ -734,77 +734,77 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_region32_contains_point)(arg1, arg2, arg3, arg4);"
   , "}"
-  , "pixman_region_overlap_t hs_bindgen_d3e1fed52a8ad529 ("
+  , "pixman_region_overlap_t hs_bindgen_8c0e9776b628a9d5 ("
   , "  pixman_region32_t const *arg1,"
   , "  pixman_box32_t const *arg2"
   , ")"
   , "{"
   , "  return (pixman_region32_contains_rectangle)(arg1, arg2);"
   , "}"
-  , "pixman_bool_t hs_bindgen_af76cfd678b4dded ("
+  , "pixman_bool_t hs_bindgen_537b9c2cd57c2352 ("
   , "  pixman_region32_t const *arg1"
   , ")"
   , "{"
   , "  return (pixman_region32_empty)(arg1);"
   , "}"
-  , "pixman_bool_t hs_bindgen_d300f6c8ce35a48f ("
+  , "pixman_bool_t hs_bindgen_aeedefd4710c62b0 ("
   , "  pixman_region32_t const *arg1"
   , ")"
   , "{"
   , "  return (pixman_region32_not_empty)(arg1);"
   , "}"
-  , "pixman_box32_t *hs_bindgen_b909ca4525c863a3 ("
+  , "pixman_box32_t *hs_bindgen_e887b46132ef6b4d ("
   , "  pixman_region32_t const *arg1"
   , ")"
   , "{"
   , "  return (pixman_region32_extents)(arg1);"
   , "}"
-  , "signed int hs_bindgen_755bab9a973b03d8 ("
+  , "signed int hs_bindgen_05a8b8d161997b84 ("
   , "  pixman_region32_t const *arg1"
   , ")"
   , "{"
   , "  return (pixman_region32_n_rects)(arg1);"
   , "}"
-  , "pixman_box32_t *hs_bindgen_64f6998c8f512660 ("
+  , "pixman_box32_t *hs_bindgen_17cc0d25fc0fa531 ("
   , "  pixman_region32_t const *arg1,"
   , "  signed int *arg2"
   , ")"
   , "{"
   , "  return (pixman_region32_rectangles)(arg1, arg2);"
   , "}"
-  , "pixman_bool_t hs_bindgen_0d615078f7b9c2b6 ("
+  , "pixman_bool_t hs_bindgen_cda8948d9eddf0aa ("
   , "  pixman_region32_t const *arg1,"
   , "  pixman_region32_t const *arg2"
   , ")"
   , "{"
   , "  return (pixman_region32_equal)(arg1, arg2);"
   , "}"
-  , "pixman_bool_t hs_bindgen_4947d831c5a730a5 ("
+  , "pixman_bool_t hs_bindgen_619ec7d76893b0b3 ("
   , "  pixman_region32_t *arg1"
   , ")"
   , "{"
   , "  return (pixman_region32_selfcheck)(arg1);"
   , "}"
-  , "void hs_bindgen_0a4c3cacb3024df7 ("
+  , "void hs_bindgen_bb88de8e2c7fbc63 ("
   , "  pixman_region32_t *arg1,"
   , "  pixman_box32_t const *arg2"
   , ")"
   , "{"
   , "  (pixman_region32_reset)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_c4f16cde3ba8f0a1 ("
+  , "void hs_bindgen_a5fe3c2caa1cc60b ("
   , "  pixman_region32_t *arg1"
   , ")"
   , "{"
   , "  (pixman_region32_clear)(arg1);"
   , "}"
-  , "void hs_bindgen_218c59bd5c35070a ("
+  , "void hs_bindgen_36ee650609772dce ("
   , "  pixman_region64f_t *arg1"
   , ")"
   , "{"
   , "  (pixman_region64f_init)(arg1);"
   , "}"
-  , "void hs_bindgen_d02ad431dd1a8833 ("
+  , "void hs_bindgen_62cbe8690a397704 ("
   , "  pixman_region64f_t *arg1,"
   , "  signed int arg2,"
   , "  signed int arg3,"
@@ -814,7 +814,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_region64f_init_rect)(arg1, arg2, arg3, arg4, arg5);"
   , "}"
-  , "void hs_bindgen_8e6be7d2778de95f ("
+  , "void hs_bindgen_51fd7d23208abe38 ("
   , "  pixman_region64f_t *arg1,"
   , "  double arg2,"
   , "  double arg3,"
@@ -824,7 +824,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_region64f_init_rectf)(arg1, arg2, arg3, arg4, arg5);"
   , "}"
-  , "pixman_bool_t hs_bindgen_a425b81efa258160 ("
+  , "pixman_bool_t hs_bindgen_863d2461b31a9b6b ("
   , "  pixman_region64f_t *arg1,"
   , "  pixman_box64f_t const *arg2,"
   , "  signed int arg3"
@@ -832,27 +832,27 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_region64f_init_rects)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_7930276a7f635dbc ("
+  , "void hs_bindgen_281b6e60a5f60278 ("
   , "  pixman_region64f_t *arg1,"
   , "  pixman_box64f_t const *arg2"
   , ")"
   , "{"
   , "  (pixman_region64f_init_with_extents)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_440b0b2ebdf03318 ("
+  , "void hs_bindgen_e21a84c6a240822a ("
   , "  pixman_region64f_t *arg1,"
   , "  pixman_image_t *arg2"
   , ")"
   , "{"
   , "  (pixman_region64f_init_from_image)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_c621fb89f72810f1 ("
+  , "void hs_bindgen_3a3ee0c726b150dc ("
   , "  pixman_region64f_t *arg1"
   , ")"
   , "{"
   , "  (pixman_region64f_fini)(arg1);"
   , "}"
-  , "void hs_bindgen_515210fe44bc0b53 ("
+  , "void hs_bindgen_c11e8b65b7e55a9a ("
   , "  pixman_region64f_t *arg1,"
   , "  signed int arg2,"
   , "  signed int arg3"
@@ -860,7 +860,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_region64f_translate)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_ed225dc6935678f7 ("
+  , "void hs_bindgen_6cb1e610b0935514 ("
   , "  pixman_region64f_t *arg1,"
   , "  double arg2,"
   , "  double arg3"
@@ -868,14 +868,14 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_region64f_translatef)(arg1, arg2, arg3);"
   , "}"
-  , "pixman_bool_t hs_bindgen_981fbcfd9b9d63ff ("
+  , "pixman_bool_t hs_bindgen_03a7970b2a01fef2 ("
   , "  pixman_region64f_t *arg1,"
   , "  pixman_region64f_t const *arg2"
   , ")"
   , "{"
   , "  return (pixman_region64f_copy)(arg1, arg2);"
   , "}"
-  , "pixman_bool_t hs_bindgen_ea6430db2c0ea1fe ("
+  , "pixman_bool_t hs_bindgen_9e46b978d1300e80 ("
   , "  pixman_region64f_t *arg1,"
   , "  pixman_region64f_t const *arg2,"
   , "  pixman_region64f_t const *arg3"
@@ -883,7 +883,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_region64f_intersect)(arg1, arg2, arg3);"
   , "}"
-  , "pixman_bool_t hs_bindgen_0ec78d6da403289b ("
+  , "pixman_bool_t hs_bindgen_31dc1c625b24969f ("
   , "  pixman_region64f_t *arg1,"
   , "  pixman_region64f_t const *arg2,"
   , "  pixman_region64f_t const *arg3"
@@ -891,7 +891,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_region64f_union)(arg1, arg2, arg3);"
   , "}"
-  , "pixman_bool_t hs_bindgen_7fd5f7980c8232f0 ("
+  , "pixman_bool_t hs_bindgen_dfc5f9075a379683 ("
   , "  pixman_region64f_t *arg1,"
   , "  pixman_region64f_t const *arg2,"
   , "  signed int arg3,"
@@ -902,7 +902,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_region64f_intersect_rect)(arg1, arg2, arg3, arg4, arg5, arg6);"
   , "}"
-  , "pixman_bool_t hs_bindgen_b70cf01e3a03c94a ("
+  , "pixman_bool_t hs_bindgen_fe7367e228567ba8 ("
   , "  pixman_region64f_t *arg1,"
   , "  pixman_region64f_t const *arg2,"
   , "  double arg3,"
@@ -913,7 +913,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_region64f_intersect_rectf)(arg1, arg2, arg3, arg4, arg5, arg6);"
   , "}"
-  , "pixman_bool_t hs_bindgen_a8bbd0a1113bce09 ("
+  , "pixman_bool_t hs_bindgen_c09116814ccf1d80 ("
   , "  pixman_region64f_t *arg1,"
   , "  pixman_region64f_t const *arg2,"
   , "  signed int arg3,"
@@ -924,7 +924,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_region64f_union_rect)(arg1, arg2, arg3, arg4, arg5, arg6);"
   , "}"
-  , "pixman_bool_t hs_bindgen_289b6dfa1a70fa66 ("
+  , "pixman_bool_t hs_bindgen_0a5e031ab78f556f ("
   , "  pixman_region64f_t *arg1,"
   , "  pixman_region64f_t const *arg2,"
   , "  double arg3,"
@@ -935,7 +935,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_region64f_union_rectf)(arg1, arg2, arg3, arg4, arg5, arg6);"
   , "}"
-  , "pixman_bool_t hs_bindgen_2686d28a5a7f1b20 ("
+  , "pixman_bool_t hs_bindgen_1cd246d7a6111c08 ("
   , "  pixman_region64f_t *arg1,"
   , "  pixman_region64f_t const *arg2,"
   , "  pixman_region64f_t const *arg3"
@@ -943,7 +943,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_region64f_subtract)(arg1, arg2, arg3);"
   , "}"
-  , "pixman_bool_t hs_bindgen_60330acd24477d9f ("
+  , "pixman_bool_t hs_bindgen_4286c3ecf19e61c5 ("
   , "  pixman_region64f_t *arg1,"
   , "  pixman_region64f_t const *arg2,"
   , "  pixman_box64f_t const *arg3"
@@ -951,7 +951,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_region64f_inverse)(arg1, arg2, arg3);"
   , "}"
-  , "pixman_bool_t hs_bindgen_5ccb0115bd39a1de ("
+  , "pixman_bool_t hs_bindgen_3586d64b39f437ba ("
   , "  pixman_region64f_t const *arg1,"
   , "  signed int arg2,"
   , "  signed int arg3,"
@@ -960,7 +960,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_region64f_contains_point)(arg1, arg2, arg3, arg4);"
   , "}"
-  , "pixman_bool_t hs_bindgen_21c71abdcb70de24 ("
+  , "pixman_bool_t hs_bindgen_0156d17b0429279c ("
   , "  pixman_region64f_t const *arg1,"
   , "  double arg2,"
   , "  double arg3,"
@@ -969,71 +969,71 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_region64f_contains_pointf)(arg1, arg2, arg3, arg4);"
   , "}"
-  , "pixman_region_overlap_t hs_bindgen_1a5e48c55ba86760 ("
+  , "pixman_region_overlap_t hs_bindgen_6a0b5d88cfc7f0b7 ("
   , "  pixman_region64f_t const *arg1,"
   , "  pixman_box64f_t const *arg2"
   , ")"
   , "{"
   , "  return (pixman_region64f_contains_rectangle)(arg1, arg2);"
   , "}"
-  , "pixman_bool_t hs_bindgen_38b16f065ada117d ("
+  , "pixman_bool_t hs_bindgen_210a79751254a8a9 ("
   , "  pixman_region64f_t const *arg1"
   , ")"
   , "{"
   , "  return (pixman_region64f_empty)(arg1);"
   , "}"
-  , "pixman_bool_t hs_bindgen_fda44b2b1ca71185 ("
+  , "pixman_bool_t hs_bindgen_c0ca8ab3e83a9b90 ("
   , "  pixman_region64f_t const *arg1"
   , ")"
   , "{"
   , "  return (pixman_region64f_not_empty)(arg1);"
   , "}"
-  , "pixman_box64f_t *hs_bindgen_f4c76499386df33f ("
+  , "pixman_box64f_t *hs_bindgen_350d46bb2a18c15f ("
   , "  pixman_region64f_t const *arg1"
   , ")"
   , "{"
   , "  return (pixman_region64f_extents)(arg1);"
   , "}"
-  , "signed int hs_bindgen_7b9774c629b4e311 ("
+  , "signed int hs_bindgen_a8f4307c1dc3f679 ("
   , "  pixman_region64f_t const *arg1"
   , ")"
   , "{"
   , "  return (pixman_region64f_n_rects)(arg1);"
   , "}"
-  , "pixman_box64f_t *hs_bindgen_a854cc7e9e176d85 ("
+  , "pixman_box64f_t *hs_bindgen_67a5a38558ce0ac2 ("
   , "  pixman_region64f_t const *arg1,"
   , "  signed int *arg2"
   , ")"
   , "{"
   , "  return (pixman_region64f_rectangles)(arg1, arg2);"
   , "}"
-  , "pixman_bool_t hs_bindgen_7b0403d74f3860a3 ("
+  , "pixman_bool_t hs_bindgen_6981dcd8f9b770d7 ("
   , "  pixman_region64f_t const *arg1,"
   , "  pixman_region64f_t const *arg2"
   , ")"
   , "{"
   , "  return (pixman_region64f_equal)(arg1, arg2);"
   , "}"
-  , "pixman_bool_t hs_bindgen_7224fa4d4eab4212 ("
+  , "pixman_bool_t hs_bindgen_561ca6ca7e7f5252 ("
   , "  pixman_region64f_t *arg1"
   , ")"
   , "{"
   , "  return (pixman_region64f_selfcheck)(arg1);"
   , "}"
-  , "void hs_bindgen_748045251552d712 ("
+  , "void hs_bindgen_cb6110f846ba90bb ("
   , "  pixman_region64f_t *arg1,"
   , "  pixman_box64f_t const *arg2"
   , ")"
   , "{"
   , "  (pixman_region64f_reset)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_42e1bd9ce9da53b1 ("
+  , "void hs_bindgen_b1faac0c1ce28ddd ("
   , "  pixman_region64f_t *arg1"
   , ")"
   , "{"
   , "  (pixman_region64f_clear)(arg1);"
   , "}"
-  , "pixman_bool_t hs_bindgen_114720d00b414b32 ("
+  , "pixman_bool_t hs_bindgen_cd4a3ebac6feaa6b ("
   , "  uint32_t *arg1,"
   , "  uint32_t *arg2,"
   , "  signed int arg3,"
@@ -1050,7 +1050,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_blt)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);"
   , "}"
-  , "pixman_bool_t hs_bindgen_9fe8dfbafc0c22f9 ("
+  , "pixman_bool_t hs_bindgen_de224fed3e6075a1 ("
   , "  uint32_t *arg1,"
   , "  signed int arg2,"
   , "  signed int arg3,"
@@ -1063,33 +1063,33 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_fill)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);"
   , "}"
-  , "signed int hs_bindgen_51103296059e1228 (void)"
+  , "signed int hs_bindgen_9b845398f7b32954 (void)"
   , "{"
   , "  return (pixman_version)();"
   , "}"
-  , "char const *hs_bindgen_8b5e66565e425d79 (void)"
+  , "char const *hs_bindgen_91c834578fe1cf77 (void)"
   , "{"
   , "  return (pixman_version_string)();"
   , "}"
-  , "pixman_bool_t hs_bindgen_7232fe4030c3805a ("
+  , "pixman_bool_t hs_bindgen_ab807779ff357e7b ("
   , "  pixman_format_code_t arg1"
   , ")"
   , "{"
   , "  return (pixman_format_supported_destination)(arg1);"
   , "}"
-  , "pixman_bool_t hs_bindgen_be0ea2840846a7d7 ("
+  , "pixman_bool_t hs_bindgen_a47b4ef4c05be526 ("
   , "  pixman_format_code_t arg1"
   , ")"
   , "{"
   , "  return (pixman_format_supported_source)(arg1);"
   , "}"
-  , "pixman_image_t *hs_bindgen_9ba5eba1f1c2a664 ("
+  , "pixman_image_t *hs_bindgen_88d94c651777b94a ("
   , "  pixman_color_t const *arg1"
   , ")"
   , "{"
   , "  return (pixman_image_create_solid_fill)(arg1);"
   , "}"
-  , "pixman_image_t *hs_bindgen_c4c0ebb0dde80837 ("
+  , "pixman_image_t *hs_bindgen_8a86d47f7d09b9ba ("
   , "  pixman_point_fixed_t const *arg1,"
   , "  pixman_point_fixed_t const *arg2,"
   , "  pixman_gradient_stop_t const *arg3,"
@@ -1098,7 +1098,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_image_create_linear_gradient)(arg1, arg2, arg3, arg4);"
   , "}"
-  , "pixman_image_t *hs_bindgen_e8e8ba9b8214f9a1 ("
+  , "pixman_image_t *hs_bindgen_99980a61019207e3 ("
   , "  pixman_point_fixed_t const *arg1,"
   , "  pixman_point_fixed_t const *arg2,"
   , "  pixman_fixed_t arg3,"
@@ -1109,7 +1109,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_image_create_radial_gradient)(arg1, arg2, arg3, arg4, arg5, arg6);"
   , "}"
-  , "pixman_image_t *hs_bindgen_a38daa420b25a6ff ("
+  , "pixman_image_t *hs_bindgen_5900e94f7bb2cd87 ("
   , "  pixman_point_fixed_t const *arg1,"
   , "  pixman_fixed_t arg2,"
   , "  pixman_gradient_stop_t const *arg3,"
@@ -1118,7 +1118,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_image_create_conical_gradient)(arg1, arg2, arg3, arg4);"
   , "}"
-  , "pixman_image_t *hs_bindgen_0aa98f3558bcd807 ("
+  , "pixman_image_t *hs_bindgen_1762a519e07c6c17 ("
   , "  pixman_format_code_t arg1,"
   , "  signed int arg2,"
   , "  signed int arg3,"
@@ -1128,7 +1128,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_image_create_bits)(arg1, arg2, arg3, arg4, arg5);"
   , "}"
-  , "pixman_image_t *hs_bindgen_6404f8132b864d11 ("
+  , "pixman_image_t *hs_bindgen_52135524e6f03505 ("
   , "  pixman_format_code_t arg1,"
   , "  signed int arg2,"
   , "  signed int arg3,"
@@ -1138,19 +1138,19 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_image_create_bits_no_clear)(arg1, arg2, arg3, arg4, arg5);"
   , "}"
-  , "pixman_image_t *hs_bindgen_32fd96d463fc0f50 ("
+  , "pixman_image_t *hs_bindgen_e23c9fbbec95e19f ("
   , "  pixman_image_t *arg1"
   , ")"
   , "{"
   , "  return (pixman_image_ref)(arg1);"
   , "}"
-  , "pixman_bool_t hs_bindgen_4c5f6935faca53f6 ("
+  , "pixman_bool_t hs_bindgen_f67a17fff3431235 ("
   , "  pixman_image_t *arg1"
   , ")"
   , "{"
   , "  return (pixman_image_unref)(arg1);"
   , "}"
-  , "void hs_bindgen_2d5edc6ebb86bbeb ("
+  , "void hs_bindgen_d867f14a89c21da9 ("
   , "  pixman_image_t *arg1,"
   , "  pixman_image_destroy_func_t arg2,"
   , "  void *arg3"
@@ -1158,62 +1158,62 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_image_set_destroy_function)(arg1, arg2, arg3);"
   , "}"
-  , "void *hs_bindgen_bceaa431ef0437e3 ("
+  , "void *hs_bindgen_04ee8f0af70e58ae ("
   , "  pixman_image_t *arg1"
   , ")"
   , "{"
   , "  return (pixman_image_get_destroy_data)(arg1);"
   , "}"
-  , "pixman_bool_t hs_bindgen_74151f04643333cf ("
+  , "pixman_bool_t hs_bindgen_1f85eb51908d7409 ("
   , "  pixman_image_t *arg1,"
   , "  pixman_region16_t const *arg2"
   , ")"
   , "{"
   , "  return (pixman_image_set_clip_region)(arg1, arg2);"
   , "}"
-  , "pixman_bool_t hs_bindgen_bda2959e752162bf ("
+  , "pixman_bool_t hs_bindgen_1b6fdaa0af65c44d ("
   , "  pixman_image_t *arg1,"
   , "  pixman_region32_t const *arg2"
   , ")"
   , "{"
   , "  return (pixman_image_set_clip_region32)(arg1, arg2);"
   , "}"
-  , "pixman_bool_t hs_bindgen_f85aa0a4b40bd63d ("
+  , "pixman_bool_t hs_bindgen_d78ea3196c3b708a ("
   , "  pixman_image_t *arg1,"
   , "  pixman_region64f_t const *arg2"
   , ")"
   , "{"
   , "  return (pixman_image_set_clip_region64f)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_93a32f8d45b3a6b6 ("
+  , "void hs_bindgen_1bb159789430fbb8 ("
   , "  pixman_image_t *arg1,"
   , "  pixman_bool_t arg2"
   , ")"
   , "{"
   , "  (pixman_image_set_has_client_clip)(arg1, arg2);"
   , "}"
-  , "pixman_bool_t hs_bindgen_aa1c5916abd1ff8c ("
+  , "pixman_bool_t hs_bindgen_3fb46dc7f6a9f54a ("
   , "  pixman_image_t *arg1,"
   , "  pixman_transform_t const *arg2"
   , ")"
   , "{"
   , "  return (pixman_image_set_transform)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_a7c968f5009f7ba1 ("
+  , "void hs_bindgen_b3106227cc956aaa ("
   , "  pixman_image_t *arg1,"
   , "  pixman_repeat_t arg2"
   , ")"
   , "{"
   , "  (pixman_image_set_repeat)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_fbb2c64a6d78413f ("
+  , "void hs_bindgen_77c33d21e0165252 ("
   , "  pixman_image_t *arg1,"
   , "  pixman_dither_t arg2"
   , ")"
   , "{"
   , "  (pixman_image_set_dither)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_a649b61233a31616 ("
+  , "void hs_bindgen_1431b3d49fcfa3e1 ("
   , "  pixman_image_t *arg1,"
   , "  signed int arg2,"
   , "  signed int arg3"
@@ -1221,7 +1221,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_image_set_dither_offset)(arg1, arg2, arg3);"
   , "}"
-  , "pixman_bool_t hs_bindgen_2152f7e3ab8b9356 ("
+  , "pixman_bool_t hs_bindgen_849d6127fa5d8712 ("
   , "  pixman_image_t *arg1,"
   , "  pixman_filter_t arg2,"
   , "  pixman_fixed_t const *arg3,"
@@ -1230,14 +1230,14 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_image_set_filter)(arg1, arg2, arg3, arg4);"
   , "}"
-  , "void hs_bindgen_adf7134df249c24f ("
+  , "void hs_bindgen_00c878cc07723b63 ("
   , "  pixman_image_t *arg1,"
   , "  pixman_bool_t arg2"
   , ")"
   , "{"
   , "  (pixman_image_set_source_clipping)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_5026a7fb7dda60b2 ("
+  , "void hs_bindgen_4476180713276b3b ("
   , "  pixman_image_t *arg1,"
   , "  pixman_image_t *arg2,"
   , "  int16_t arg3,"
@@ -1246,20 +1246,20 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_image_set_alpha_map)(arg1, arg2, arg3, arg4);"
   , "}"
-  , "void hs_bindgen_7ca42fcca4ad506f ("
+  , "void hs_bindgen_a63268652849f811 ("
   , "  pixman_image_t *arg1,"
   , "  pixman_bool_t arg2"
   , ")"
   , "{"
   , "  (pixman_image_set_component_alpha)(arg1, arg2);"
   , "}"
-  , "pixman_bool_t hs_bindgen_0b037f2394e2b638 ("
+  , "pixman_bool_t hs_bindgen_0d5aa35e996ddec5 ("
   , "  pixman_image_t *arg1"
   , ")"
   , "{"
   , "  return (pixman_image_get_component_alpha)(arg1);"
   , "}"
-  , "void hs_bindgen_6982ab514d6dacc5 ("
+  , "void hs_bindgen_25fd15b9e1b30e91 ("
   , "  pixman_image_t *arg1,"
   , "  pixman_read_memory_func_t arg2,"
   , "  pixman_write_memory_func_t arg3"
@@ -1267,50 +1267,50 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_image_set_accessors)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_a6f7d4ea13b61ee8 ("
+  , "void hs_bindgen_769e3c5adbae3d58 ("
   , "  pixman_image_t *arg1,"
   , "  pixman_indexed_t const *arg2"
   , ")"
   , "{"
   , "  (pixman_image_set_indexed)(arg1, arg2);"
   , "}"
-  , "uint32_t *hs_bindgen_5077f5c34f6c4546 ("
+  , "uint32_t *hs_bindgen_a3e8f31382abb74d ("
   , "  pixman_image_t *arg1"
   , ")"
   , "{"
   , "  return (pixman_image_get_data)(arg1);"
   , "}"
-  , "signed int hs_bindgen_5c3d1e70a1176bf0 ("
+  , "signed int hs_bindgen_655f90256df0e744 ("
   , "  pixman_image_t *arg1"
   , ")"
   , "{"
   , "  return (pixman_image_get_width)(arg1);"
   , "}"
-  , "signed int hs_bindgen_f390ea618ba7982f ("
+  , "signed int hs_bindgen_4da3f3bc169c476e ("
   , "  pixman_image_t *arg1"
   , ")"
   , "{"
   , "  return (pixman_image_get_height)(arg1);"
   , "}"
-  , "signed int hs_bindgen_b3a0196c0b153e23 ("
+  , "signed int hs_bindgen_b0f32ed9ad65553d ("
   , "  pixman_image_t *arg1"
   , ")"
   , "{"
   , "  return (pixman_image_get_stride)(arg1);"
   , "}"
-  , "signed int hs_bindgen_d79985184355bfd2 ("
+  , "signed int hs_bindgen_0e777d600e27ab4e ("
   , "  pixman_image_t *arg1"
   , ")"
   , "{"
   , "  return (pixman_image_get_depth)(arg1);"
   , "}"
-  , "pixman_format_code_t hs_bindgen_071b4e803d59bbed ("
+  , "pixman_format_code_t hs_bindgen_e51c5da890582990 ("
   , "  pixman_image_t *arg1"
   , ")"
   , "{"
   , "  return (pixman_image_get_format)(arg1);"
   , "}"
-  , "pixman_fixed_t *hs_bindgen_48518fa73b9068f9 ("
+  , "pixman_fixed_t *hs_bindgen_c73c689d57c975a0 ("
   , "  signed int *arg1,"
   , "  pixman_fixed_t arg2,"
   , "  pixman_fixed_t arg3,"
@@ -1324,7 +1324,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_filter_create_separable_convolution)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);"
   , "}"
-  , "pixman_bool_t hs_bindgen_ce2c0b050eadccdc ("
+  , "pixman_bool_t hs_bindgen_a02dff89e5cff416 ("
   , "  pixman_op_t arg1,"
   , "  pixman_image_t *arg2,"
   , "  pixman_color_t const *arg3,"
@@ -1334,7 +1334,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_image_fill_rectangles)(arg1, arg2, arg3, arg4, arg5);"
   , "}"
-  , "pixman_bool_t hs_bindgen_65eb3eb415dad148 ("
+  , "pixman_bool_t hs_bindgen_3b6014e8c8fd420c ("
   , "  pixman_op_t arg1,"
   , "  pixman_image_t *arg2,"
   , "  pixman_color_t const *arg3,"
@@ -1344,7 +1344,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_image_fill_boxes)(arg1, arg2, arg3, arg4, arg5);"
   , "}"
-  , "pixman_bool_t hs_bindgen_584e8c3ec7907161 ("
+  , "pixman_bool_t hs_bindgen_7202904a2aff8014 ("
   , "  pixman_region16_t *arg1,"
   , "  pixman_image_t *arg2,"
   , "  pixman_image_t *arg3,"
@@ -1361,7 +1361,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_compute_composite_region)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);"
   , "}"
-  , "void hs_bindgen_93b485a074265e91 ("
+  , "void hs_bindgen_07ae38b2eee95971 ("
   , "  pixman_op_t arg1,"
   , "  pixman_image_t *arg2,"
   , "  pixman_image_t *arg3,"
@@ -1378,7 +1378,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_image_composite)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);"
   , "}"
-  , "void hs_bindgen_185573f5a71a031c ("
+  , "void hs_bindgen_ed685ce058a1c6ef ("
   , "  pixman_op_t arg1,"
   , "  pixman_image_t *arg2,"
   , "  pixman_image_t *arg3,"
@@ -1395,7 +1395,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_image_composite32)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);"
   , "}"
-  , "void hs_bindgen_983cd6bc06bd2921 ("
+  , "void hs_bindgen_a5d4b510ed878c91 ("
   , "  pixman_op_t arg1,"
   , "  pixman_image_t *arg2,"
   , "  pixman_image_t *arg3,"
@@ -1412,33 +1412,33 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_image_composite64f)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);"
   , "}"
-  , "void hs_bindgen_89b262220c1b3b7d (void)"
+  , "void hs_bindgen_a41ff5ded26cf273 (void)"
   , "{"
   , "  (pixman_disable_out_of_bounds_workaround)();"
   , "}"
-  , "pixman_glyph_cache_t *hs_bindgen_6b3e6417f1bad155 (void)"
+  , "pixman_glyph_cache_t *hs_bindgen_a0969e3d34e10e29 (void)"
   , "{"
   , "  return (pixman_glyph_cache_create)();"
   , "}"
-  , "void hs_bindgen_8f18b092993fd937 ("
+  , "void hs_bindgen_39911d48fcdf946d ("
   , "  pixman_glyph_cache_t *arg1"
   , ")"
   , "{"
   , "  (pixman_glyph_cache_destroy)(arg1);"
   , "}"
-  , "void hs_bindgen_5b7113388edc649c ("
+  , "void hs_bindgen_8b81763d6ca4e8ad ("
   , "  pixman_glyph_cache_t *arg1"
   , ")"
   , "{"
   , "  (pixman_glyph_cache_freeze)(arg1);"
   , "}"
-  , "void hs_bindgen_3a53fa0e7537358c ("
+  , "void hs_bindgen_b591ef6316ef1b8f ("
   , "  pixman_glyph_cache_t *arg1"
   , ")"
   , "{"
   , "  (pixman_glyph_cache_thaw)(arg1);"
   , "}"
-  , "void const *hs_bindgen_3270c793262ad671 ("
+  , "void const *hs_bindgen_19fdaf5120e67a36 ("
   , "  pixman_glyph_cache_t *arg1,"
   , "  void *arg2,"
   , "  void *arg3"
@@ -1446,7 +1446,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_glyph_cache_lookup)(arg1, arg2, arg3);"
   , "}"
-  , "void const *hs_bindgen_7c435b0086a80da8 ("
+  , "void const *hs_bindgen_844ca395a102777c ("
   , "  pixman_glyph_cache_t *arg1,"
   , "  void *arg2,"
   , "  void *arg3,"
@@ -1457,7 +1457,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_glyph_cache_insert)(arg1, arg2, arg3, arg4, arg5, arg6);"
   , "}"
-  , "void hs_bindgen_1b4c225caeec6a1a ("
+  , "void hs_bindgen_8bea6dc0e43e5aed ("
   , "  pixman_glyph_cache_t *arg1,"
   , "  void *arg2,"
   , "  void *arg3"
@@ -1465,7 +1465,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_glyph_cache_remove)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_4127bd6c0043179b ("
+  , "void hs_bindgen_18def1ff1265b9d7 ("
   , "  pixman_glyph_cache_t *arg1,"
   , "  signed int arg2,"
   , "  pixman_glyph_t *arg3,"
@@ -1474,7 +1474,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_glyph_get_extents)(arg1, arg2, arg3, arg4);"
   , "}"
-  , "pixman_format_code_t hs_bindgen_d1d1300cd6727dcd ("
+  , "pixman_format_code_t hs_bindgen_71785a569a31d431 ("
   , "  pixman_glyph_cache_t *arg1,"
   , "  signed int arg2,"
   , "  pixman_glyph_t const *arg3"
@@ -1482,7 +1482,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (pixman_glyph_get_mask_format)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_60181a27baad2b83 ("
+  , "void hs_bindgen_404b38bb0ea2d632 ("
   , "  pixman_op_t arg1,"
   , "  pixman_image_t *arg2,"
   , "  pixman_image_t *arg3,"
@@ -1502,7 +1502,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_composite_glyphs)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15);"
   , "}"
-  , "void hs_bindgen_1fa27dcfd3356cf5 ("
+  , "void hs_bindgen_8358abbe37c951ff ("
   , "  pixman_op_t arg1,"
   , "  pixman_image_t *arg2,"
   , "  pixman_image_t *arg3,"
@@ -1517,28 +1517,28 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_composite_glyphs_no_mask)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);"
   , "}"
-  , "pixman_fixed_t hs_bindgen_34eb61c697dfd398 ("
+  , "pixman_fixed_t hs_bindgen_a497813cdf900259 ("
   , "  pixman_fixed_t arg1,"
   , "  signed int arg2"
   , ")"
   , "{"
   , "  return (pixman_sample_ceil_y)(arg1, arg2);"
   , "}"
-  , "pixman_fixed_t hs_bindgen_fcf2e8933f198de7 ("
+  , "pixman_fixed_t hs_bindgen_29847e1ce56c69d8 ("
   , "  pixman_fixed_t arg1,"
   , "  signed int arg2"
   , ")"
   , "{"
   , "  return (pixman_sample_floor_y)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_b09e4f1133f1ba4d ("
+  , "void hs_bindgen_964b9cc612320062 ("
   , "  pixman_edge_t *arg1,"
   , "  signed int arg2"
   , ")"
   , "{"
   , "  (pixman_edge_step)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_ce47fb99b6526173 ("
+  , "void hs_bindgen_8be428ab25f065f7 ("
   , "  pixman_edge_t *arg1,"
   , "  signed int arg2,"
   , "  pixman_fixed_t arg3,"
@@ -1550,7 +1550,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_edge_init)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);"
   , "}"
-  , "void hs_bindgen_9164bcb16f9dffc7 ("
+  , "void hs_bindgen_e9e4f1d92e3687a5 ("
   , "  pixman_edge_t *arg1,"
   , "  signed int arg2,"
   , "  pixman_fixed_t arg3,"
@@ -1561,7 +1561,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_line_fixed_edge_init)(arg1, arg2, arg3, arg4, arg5, arg6);"
   , "}"
-  , "void hs_bindgen_149e66915232be95 ("
+  , "void hs_bindgen_ea4a65fb321d85b7 ("
   , "  pixman_image_t *arg1,"
   , "  pixman_edge_t *arg2,"
   , "  pixman_edge_t *arg3,"
@@ -1571,7 +1571,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_rasterize_edges)(arg1, arg2, arg3, arg4, arg5);"
   , "}"
-  , "void hs_bindgen_0584a8643b7d1a56 ("
+  , "void hs_bindgen_2acb3af28d162663 ("
   , "  pixman_image_t *arg1,"
   , "  int16_t arg2,"
   , "  int16_t arg3,"
@@ -1581,7 +1581,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_add_traps)(arg1, arg2, arg3, arg4, arg5);"
   , "}"
-  , "void hs_bindgen_9861ca3066f3a896 ("
+  , "void hs_bindgen_d47de53cc831877b ("
   , "  pixman_image_t *arg1,"
   , "  int16_t arg2,"
   , "  signed int arg3,"
@@ -1591,7 +1591,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_add_trapezoids)(arg1, arg2, arg3, arg4, arg5);"
   , "}"
-  , "void hs_bindgen_db32fc2c5ec38d74 ("
+  , "void hs_bindgen_0091e5f8242f0827 ("
   , "  pixman_image_t *arg1,"
   , "  pixman_trapezoid_t const *arg2,"
   , "  signed int arg3,"
@@ -1600,7 +1600,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_rasterize_trapezoid)(arg1, arg2, arg3, arg4);"
   , "}"
-  , "void hs_bindgen_9e9c5d1de1c6cc4f ("
+  , "void hs_bindgen_1d4d21fa236f4051 ("
   , "  pixman_op_t arg1,"
   , "  pixman_image_t *arg2,"
   , "  pixman_image_t *arg3,"
@@ -1615,7 +1615,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_composite_trapezoids)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);"
   , "}"
-  , "void hs_bindgen_118007b928d49a7e ("
+  , "void hs_bindgen_0c339127975d35d6 ("
   , "  pixman_op_t arg1,"
   , "  pixman_image_t *arg2,"
   , "  pixman_image_t *arg3,"
@@ -1630,7 +1630,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (pixman_composite_triangles)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);"
   , "}"
-  , "void hs_bindgen_f6b8954b7a0f13f4 ("
+  , "void hs_bindgen_ef7eb28296e85527 ("
   , "  pixman_image_t *arg1,"
   , "  int32_t arg2,"
   , "  int32_t arg3,"
@@ -1642,17 +1642,17 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "}"
   ]))
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_init_identity@
-foreign import ccall unsafe "hs_bindgen_46871e40db5d2e5f" hs_bindgen_46871e40db5d2e5f_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_init_identity@
+foreign import ccall unsafe "hs_bindgen_a2cf5fc86c8c88da" hs_bindgen_a2cf5fc86c8c88da_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_init_identity@
-hs_bindgen_46871e40db5d2e5f ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_init_identity@
+hs_bindgen_a2cf5fc86c8c88da ::
      RIP.Ptr Pixman_transform
   -> IO ()
-hs_bindgen_46871e40db5d2e5f =
-  RIP.fromFFIType hs_bindgen_46871e40db5d2e5f_base
+hs_bindgen_a2cf5fc86c8c88da =
+  RIP.fromFFIType hs_bindgen_a2cf5fc86c8c88da_base
 
 {-| __C declaration:__ @pixman_transform_init_identity@
 
@@ -1665,21 +1665,21 @@ pixman_transform_init_identity ::
      -- ^ __C declaration:__ @matrix@
   -> IO ()
 pixman_transform_init_identity =
-  hs_bindgen_46871e40db5d2e5f
+  hs_bindgen_a2cf5fc86c8c88da
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_point_3d@
-foreign import ccall unsafe "hs_bindgen_803553b54310aa37" hs_bindgen_803553b54310aa37_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_point_3d@
+foreign import ccall unsafe "hs_bindgen_336e61345b1f5c66" hs_bindgen_336e61345b1f5c66_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_point_3d@
-hs_bindgen_803553b54310aa37 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_point_3d@
+hs_bindgen_336e61345b1f5c66 ::
      PtrConst.PtrConst Pixman_transform
   -> RIP.Ptr Pixman_vector
   -> IO Pixman_bool_t
-hs_bindgen_803553b54310aa37 =
-  RIP.fromFFIType hs_bindgen_803553b54310aa37_base
+hs_bindgen_336e61345b1f5c66 =
+  RIP.fromFFIType hs_bindgen_336e61345b1f5c66_base
 
 {-| __C declaration:__ @pixman_transform_point_3d@
 
@@ -1694,21 +1694,21 @@ pixman_transform_point_3d ::
      -- ^ __C declaration:__ @vector@
   -> IO Pixman_bool_t
 pixman_transform_point_3d =
-  hs_bindgen_803553b54310aa37
+  hs_bindgen_336e61345b1f5c66
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_point@
-foreign import ccall unsafe "hs_bindgen_9301d48f2e16fbd3" hs_bindgen_9301d48f2e16fbd3_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_point@
+foreign import ccall unsafe "hs_bindgen_aff2869ecd997685" hs_bindgen_aff2869ecd997685_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_point@
-hs_bindgen_9301d48f2e16fbd3 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_point@
+hs_bindgen_aff2869ecd997685 ::
      PtrConst.PtrConst Pixman_transform
   -> RIP.Ptr Pixman_vector
   -> IO Pixman_bool_t
-hs_bindgen_9301d48f2e16fbd3 =
-  RIP.fromFFIType hs_bindgen_9301d48f2e16fbd3_base
+hs_bindgen_aff2869ecd997685 =
+  RIP.fromFFIType hs_bindgen_aff2869ecd997685_base
 
 {-| __C declaration:__ @pixman_transform_point@
 
@@ -1722,23 +1722,23 @@ pixman_transform_point ::
   -> RIP.Ptr Pixman_vector
      -- ^ __C declaration:__ @vector@
   -> IO Pixman_bool_t
-pixman_transform_point = hs_bindgen_9301d48f2e16fbd3
+pixman_transform_point = hs_bindgen_aff2869ecd997685
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_multiply@
-foreign import ccall unsafe "hs_bindgen_8d74835d1806bedb" hs_bindgen_8d74835d1806bedb_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_multiply@
+foreign import ccall unsafe "hs_bindgen_bbaf9f4bb55833d6" hs_bindgen_bbaf9f4bb55833d6_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_multiply@
-hs_bindgen_8d74835d1806bedb ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_multiply@
+hs_bindgen_bbaf9f4bb55833d6 ::
      RIP.Ptr Pixman_transform
   -> PtrConst.PtrConst Pixman_transform
   -> PtrConst.PtrConst Pixman_transform
   -> IO Pixman_bool_t
-hs_bindgen_8d74835d1806bedb =
-  RIP.fromFFIType hs_bindgen_8d74835d1806bedb_base
+hs_bindgen_bbaf9f4bb55833d6 =
+  RIP.fromFFIType hs_bindgen_bbaf9f4bb55833d6_base
 
 {-| __C declaration:__ @pixman_transform_multiply@
 
@@ -1755,23 +1755,23 @@ pixman_transform_multiply ::
      -- ^ __C declaration:__ @r@
   -> IO Pixman_bool_t
 pixman_transform_multiply =
-  hs_bindgen_8d74835d1806bedb
+  hs_bindgen_bbaf9f4bb55833d6
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_init_scale@
-foreign import ccall unsafe "hs_bindgen_d8d6c60ebffe5827" hs_bindgen_d8d6c60ebffe5827_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_init_scale@
+foreign import ccall unsafe "hs_bindgen_3a778a31199f5caf" hs_bindgen_3a778a31199f5caf_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_init_scale@
-hs_bindgen_d8d6c60ebffe5827 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_init_scale@
+hs_bindgen_3a778a31199f5caf ::
      RIP.Ptr Pixman_transform
   -> Pixman_fixed_t
   -> Pixman_fixed_t
   -> IO ()
-hs_bindgen_d8d6c60ebffe5827 =
-  RIP.fromFFIType hs_bindgen_d8d6c60ebffe5827_base
+hs_bindgen_3a778a31199f5caf =
+  RIP.fromFFIType hs_bindgen_3a778a31199f5caf_base
 
 {-| __C declaration:__ @pixman_transform_init_scale@
 
@@ -1788,25 +1788,25 @@ pixman_transform_init_scale ::
      -- ^ __C declaration:__ @sy@
   -> IO ()
 pixman_transform_init_scale =
-  hs_bindgen_d8d6c60ebffe5827
+  hs_bindgen_3a778a31199f5caf
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_scale@
-foreign import ccall unsafe "hs_bindgen_846a50751cd8851e" hs_bindgen_846a50751cd8851e_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_scale@
+foreign import ccall unsafe "hs_bindgen_7c493c2871836b68" hs_bindgen_7c493c2871836b68_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_scale@
-hs_bindgen_846a50751cd8851e ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_scale@
+hs_bindgen_7c493c2871836b68 ::
      RIP.Ptr Pixman_transform
   -> RIP.Ptr Pixman_transform
   -> Pixman_fixed_t
   -> Pixman_fixed_t
   -> IO Pixman_bool_t
-hs_bindgen_846a50751cd8851e =
-  RIP.fromFFIType hs_bindgen_846a50751cd8851e_base
+hs_bindgen_7c493c2871836b68 =
+  RIP.fromFFIType hs_bindgen_7c493c2871836b68_base
 
 {-| __C declaration:__ @pixman_transform_scale@
 
@@ -1824,23 +1824,23 @@ pixman_transform_scale ::
   -> Pixman_fixed_t
      -- ^ __C declaration:__ @sy@
   -> IO Pixman_bool_t
-pixman_transform_scale = hs_bindgen_846a50751cd8851e
+pixman_transform_scale = hs_bindgen_7c493c2871836b68
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_init_rotate@
-foreign import ccall unsafe "hs_bindgen_b9c22b6ce5194d8f" hs_bindgen_b9c22b6ce5194d8f_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_init_rotate@
+foreign import ccall unsafe "hs_bindgen_8a0618a4d90c1142" hs_bindgen_8a0618a4d90c1142_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_init_rotate@
-hs_bindgen_b9c22b6ce5194d8f ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_init_rotate@
+hs_bindgen_8a0618a4d90c1142 ::
      RIP.Ptr Pixman_transform
   -> Pixman_fixed_t
   -> Pixman_fixed_t
   -> IO ()
-hs_bindgen_b9c22b6ce5194d8f =
-  RIP.fromFFIType hs_bindgen_b9c22b6ce5194d8f_base
+hs_bindgen_8a0618a4d90c1142 =
+  RIP.fromFFIType hs_bindgen_8a0618a4d90c1142_base
 
 {-| __C declaration:__ @pixman_transform_init_rotate@
 
@@ -1857,25 +1857,25 @@ pixman_transform_init_rotate ::
      -- ^ __C declaration:__ @sin@
   -> IO ()
 pixman_transform_init_rotate =
-  hs_bindgen_b9c22b6ce5194d8f
+  hs_bindgen_8a0618a4d90c1142
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_rotate@
-foreign import ccall unsafe "hs_bindgen_1bc75ef96e46ab1a" hs_bindgen_1bc75ef96e46ab1a_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_rotate@
+foreign import ccall unsafe "hs_bindgen_44d4a63e1916e9ef" hs_bindgen_44d4a63e1916e9ef_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_rotate@
-hs_bindgen_1bc75ef96e46ab1a ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_rotate@
+hs_bindgen_44d4a63e1916e9ef ::
      RIP.Ptr Pixman_transform
   -> RIP.Ptr Pixman_transform
   -> Pixman_fixed_t
   -> Pixman_fixed_t
   -> IO Pixman_bool_t
-hs_bindgen_1bc75ef96e46ab1a =
-  RIP.fromFFIType hs_bindgen_1bc75ef96e46ab1a_base
+hs_bindgen_44d4a63e1916e9ef =
+  RIP.fromFFIType hs_bindgen_44d4a63e1916e9ef_base
 
 {-| __C declaration:__ @pixman_transform_rotate@
 
@@ -1893,23 +1893,23 @@ pixman_transform_rotate ::
   -> Pixman_fixed_t
      -- ^ __C declaration:__ @s@
   -> IO Pixman_bool_t
-pixman_transform_rotate = hs_bindgen_1bc75ef96e46ab1a
+pixman_transform_rotate = hs_bindgen_44d4a63e1916e9ef
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_init_translate@
-foreign import ccall unsafe "hs_bindgen_c4061affa4594923" hs_bindgen_c4061affa4594923_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_init_translate@
+foreign import ccall unsafe "hs_bindgen_16cd1326a9b6c3d6" hs_bindgen_16cd1326a9b6c3d6_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_init_translate@
-hs_bindgen_c4061affa4594923 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_init_translate@
+hs_bindgen_16cd1326a9b6c3d6 ::
      RIP.Ptr Pixman_transform
   -> Pixman_fixed_t
   -> Pixman_fixed_t
   -> IO ()
-hs_bindgen_c4061affa4594923 =
-  RIP.fromFFIType hs_bindgen_c4061affa4594923_base
+hs_bindgen_16cd1326a9b6c3d6 =
+  RIP.fromFFIType hs_bindgen_16cd1326a9b6c3d6_base
 
 {-| __C declaration:__ @pixman_transform_init_translate@
 
@@ -1926,25 +1926,25 @@ pixman_transform_init_translate ::
      -- ^ __C declaration:__ @ty@
   -> IO ()
 pixman_transform_init_translate =
-  hs_bindgen_c4061affa4594923
+  hs_bindgen_16cd1326a9b6c3d6
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_translate@
-foreign import ccall unsafe "hs_bindgen_9aa983c04f447ce6" hs_bindgen_9aa983c04f447ce6_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_translate@
+foreign import ccall unsafe "hs_bindgen_9c4012243522d689" hs_bindgen_9c4012243522d689_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_translate@
-hs_bindgen_9aa983c04f447ce6 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_translate@
+hs_bindgen_9c4012243522d689 ::
      RIP.Ptr Pixman_transform
   -> RIP.Ptr Pixman_transform
   -> Pixman_fixed_t
   -> Pixman_fixed_t
   -> IO Pixman_bool_t
-hs_bindgen_9aa983c04f447ce6 =
-  RIP.fromFFIType hs_bindgen_9aa983c04f447ce6_base
+hs_bindgen_9c4012243522d689 =
+  RIP.fromFFIType hs_bindgen_9c4012243522d689_base
 
 {-| __C declaration:__ @pixman_transform_translate@
 
@@ -1963,21 +1963,21 @@ pixman_transform_translate ::
      -- ^ __C declaration:__ @ty@
   -> IO Pixman_bool_t
 pixman_transform_translate =
-  hs_bindgen_9aa983c04f447ce6
+  hs_bindgen_9c4012243522d689
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_bounds@
-foreign import ccall unsafe "hs_bindgen_32918d4f073af029" hs_bindgen_32918d4f073af029_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_bounds@
+foreign import ccall unsafe "hs_bindgen_e379e5b668a7919c" hs_bindgen_e379e5b668a7919c_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_bounds@
-hs_bindgen_32918d4f073af029 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_bounds@
+hs_bindgen_e379e5b668a7919c ::
      PtrConst.PtrConst Pixman_transform
   -> RIP.Ptr Pixman_box16
   -> IO Pixman_bool_t
-hs_bindgen_32918d4f073af029 =
-  RIP.fromFFIType hs_bindgen_32918d4f073af029_base
+hs_bindgen_e379e5b668a7919c =
+  RIP.fromFFIType hs_bindgen_e379e5b668a7919c_base
 
 {-| __C declaration:__ @pixman_transform_bounds@
 
@@ -1991,21 +1991,21 @@ pixman_transform_bounds ::
   -> RIP.Ptr Pixman_box16
      -- ^ __C declaration:__ @b@
   -> IO Pixman_bool_t
-pixman_transform_bounds = hs_bindgen_32918d4f073af029
+pixman_transform_bounds = hs_bindgen_e379e5b668a7919c
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_invert@
-foreign import ccall unsafe "hs_bindgen_f2cb11c5963e48ab" hs_bindgen_f2cb11c5963e48ab_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_invert@
+foreign import ccall unsafe "hs_bindgen_f3884317f774fa68" hs_bindgen_f3884317f774fa68_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_invert@
-hs_bindgen_f2cb11c5963e48ab ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_invert@
+hs_bindgen_f3884317f774fa68 ::
      RIP.Ptr Pixman_transform
   -> PtrConst.PtrConst Pixman_transform
   -> IO Pixman_bool_t
-hs_bindgen_f2cb11c5963e48ab =
-  RIP.fromFFIType hs_bindgen_f2cb11c5963e48ab_base
+hs_bindgen_f3884317f774fa68 =
+  RIP.fromFFIType hs_bindgen_f3884317f774fa68_base
 
 {-| __C declaration:__ @pixman_transform_invert@
 
@@ -2019,19 +2019,19 @@ pixman_transform_invert ::
   -> PtrConst.PtrConst Pixman_transform
      -- ^ __C declaration:__ @src@
   -> IO Pixman_bool_t
-pixman_transform_invert = hs_bindgen_f2cb11c5963e48ab
+pixman_transform_invert = hs_bindgen_f3884317f774fa68
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_is_identity@
-foreign import ccall unsafe "hs_bindgen_06efb32c4c6fd1d0" hs_bindgen_06efb32c4c6fd1d0_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_is_identity@
+foreign import ccall unsafe "hs_bindgen_e9d514ed052d4f3a" hs_bindgen_e9d514ed052d4f3a_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_is_identity@
-hs_bindgen_06efb32c4c6fd1d0 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_is_identity@
+hs_bindgen_e9d514ed052d4f3a ::
      PtrConst.PtrConst Pixman_transform
   -> IO Pixman_bool_t
-hs_bindgen_06efb32c4c6fd1d0 =
-  RIP.fromFFIType hs_bindgen_06efb32c4c6fd1d0_base
+hs_bindgen_e9d514ed052d4f3a =
+  RIP.fromFFIType hs_bindgen_e9d514ed052d4f3a_base
 
 {-| __C declaration:__ @pixman_transform_is_identity@
 
@@ -2044,19 +2044,19 @@ pixman_transform_is_identity ::
      -- ^ __C declaration:__ @t@
   -> IO Pixman_bool_t
 pixman_transform_is_identity =
-  hs_bindgen_06efb32c4c6fd1d0
+  hs_bindgen_e9d514ed052d4f3a
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_is_scale@
-foreign import ccall unsafe "hs_bindgen_313ead91b9a86d66" hs_bindgen_313ead91b9a86d66_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_is_scale@
+foreign import ccall unsafe "hs_bindgen_56aae067222466f2" hs_bindgen_56aae067222466f2_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_is_scale@
-hs_bindgen_313ead91b9a86d66 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_is_scale@
+hs_bindgen_56aae067222466f2 ::
      PtrConst.PtrConst Pixman_transform
   -> IO Pixman_bool_t
-hs_bindgen_313ead91b9a86d66 =
-  RIP.fromFFIType hs_bindgen_313ead91b9a86d66_base
+hs_bindgen_56aae067222466f2 =
+  RIP.fromFFIType hs_bindgen_56aae067222466f2_base
 
 {-| __C declaration:__ @pixman_transform_is_scale@
 
@@ -2069,19 +2069,19 @@ pixman_transform_is_scale ::
      -- ^ __C declaration:__ @t@
   -> IO Pixman_bool_t
 pixman_transform_is_scale =
-  hs_bindgen_313ead91b9a86d66
+  hs_bindgen_56aae067222466f2
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_is_int_translate@
-foreign import ccall unsafe "hs_bindgen_d4fce75acebd8c00" hs_bindgen_d4fce75acebd8c00_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_is_int_translate@
+foreign import ccall unsafe "hs_bindgen_c16e5ade3f3da5ae" hs_bindgen_c16e5ade3f3da5ae_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_is_int_translate@
-hs_bindgen_d4fce75acebd8c00 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_is_int_translate@
+hs_bindgen_c16e5ade3f3da5ae ::
      PtrConst.PtrConst Pixman_transform
   -> IO Pixman_bool_t
-hs_bindgen_d4fce75acebd8c00 =
-  RIP.fromFFIType hs_bindgen_d4fce75acebd8c00_base
+hs_bindgen_c16e5ade3f3da5ae =
+  RIP.fromFFIType hs_bindgen_c16e5ade3f3da5ae_base
 
 {-| __C declaration:__ @pixman_transform_is_int_translate@
 
@@ -2094,21 +2094,21 @@ pixman_transform_is_int_translate ::
      -- ^ __C declaration:__ @t@
   -> IO Pixman_bool_t
 pixman_transform_is_int_translate =
-  hs_bindgen_d4fce75acebd8c00
+  hs_bindgen_c16e5ade3f3da5ae
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_is_inverse@
-foreign import ccall unsafe "hs_bindgen_dc816363ef17cc40" hs_bindgen_dc816363ef17cc40_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_is_inverse@
+foreign import ccall unsafe "hs_bindgen_f35911e0531115a3" hs_bindgen_f35911e0531115a3_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_is_inverse@
-hs_bindgen_dc816363ef17cc40 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_is_inverse@
+hs_bindgen_f35911e0531115a3 ::
      PtrConst.PtrConst Pixman_transform
   -> PtrConst.PtrConst Pixman_transform
   -> IO Pixman_bool_t
-hs_bindgen_dc816363ef17cc40 =
-  RIP.fromFFIType hs_bindgen_dc816363ef17cc40_base
+hs_bindgen_f35911e0531115a3 =
+  RIP.fromFFIType hs_bindgen_f35911e0531115a3_base
 
 {-| __C declaration:__ @pixman_transform_is_inverse@
 
@@ -2123,21 +2123,21 @@ pixman_transform_is_inverse ::
      -- ^ __C declaration:__ @b@
   -> IO Pixman_bool_t
 pixman_transform_is_inverse =
-  hs_bindgen_dc816363ef17cc40
+  hs_bindgen_f35911e0531115a3
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_from_pixman_f_transform@
-foreign import ccall unsafe "hs_bindgen_a10d774ca7c5fe1f" hs_bindgen_a10d774ca7c5fe1f_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_from_pixman_f_transform@
+foreign import ccall unsafe "hs_bindgen_e204007d188b0ace" hs_bindgen_e204007d188b0ace_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_transform_from_pixman_f_transform@
-hs_bindgen_a10d774ca7c5fe1f ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_transform_from_pixman_f_transform@
+hs_bindgen_e204007d188b0ace ::
      RIP.Ptr Pixman_transform
   -> PtrConst.PtrConst Pixman_f_transform
   -> IO Pixman_bool_t
-hs_bindgen_a10d774ca7c5fe1f =
-  RIP.fromFFIType hs_bindgen_a10d774ca7c5fe1f_base
+hs_bindgen_e204007d188b0ace =
+  RIP.fromFFIType hs_bindgen_e204007d188b0ace_base
 
 {-| __C declaration:__ @pixman_transform_from_pixman_f_transform@
 
@@ -2152,21 +2152,21 @@ pixman_transform_from_pixman_f_transform ::
      -- ^ __C declaration:__ @ft@
   -> IO Pixman_bool_t
 pixman_transform_from_pixman_f_transform =
-  hs_bindgen_a10d774ca7c5fe1f
+  hs_bindgen_e204007d188b0ace
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_from_pixman_transform@
-foreign import ccall unsafe "hs_bindgen_ebc55d2d1056910a" hs_bindgen_ebc55d2d1056910a_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_from_pixman_transform@
+foreign import ccall unsafe "hs_bindgen_0fb138356928cb4e" hs_bindgen_0fb138356928cb4e_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_from_pixman_transform@
-hs_bindgen_ebc55d2d1056910a ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_from_pixman_transform@
+hs_bindgen_0fb138356928cb4e ::
      RIP.Ptr Pixman_f_transform
   -> PtrConst.PtrConst Pixman_transform
   -> IO ()
-hs_bindgen_ebc55d2d1056910a =
-  RIP.fromFFIType hs_bindgen_ebc55d2d1056910a_base
+hs_bindgen_0fb138356928cb4e =
+  RIP.fromFFIType hs_bindgen_0fb138356928cb4e_base
 
 {-| __C declaration:__ @pixman_f_transform_from_pixman_transform@
 
@@ -2181,21 +2181,21 @@ pixman_f_transform_from_pixman_transform ::
      -- ^ __C declaration:__ @t@
   -> IO ()
 pixman_f_transform_from_pixman_transform =
-  hs_bindgen_ebc55d2d1056910a
+  hs_bindgen_0fb138356928cb4e
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_invert@
-foreign import ccall unsafe "hs_bindgen_86d667116b57925d" hs_bindgen_86d667116b57925d_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_invert@
+foreign import ccall unsafe "hs_bindgen_333dcf96cc14faa7" hs_bindgen_333dcf96cc14faa7_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_invert@
-hs_bindgen_86d667116b57925d ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_invert@
+hs_bindgen_333dcf96cc14faa7 ::
      RIP.Ptr Pixman_f_transform
   -> PtrConst.PtrConst Pixman_f_transform
   -> IO Pixman_bool_t
-hs_bindgen_86d667116b57925d =
-  RIP.fromFFIType hs_bindgen_86d667116b57925d_base
+hs_bindgen_333dcf96cc14faa7 =
+  RIP.fromFFIType hs_bindgen_333dcf96cc14faa7_base
 
 {-| __C declaration:__ @pixman_f_transform_invert@
 
@@ -2210,21 +2210,21 @@ pixman_f_transform_invert ::
      -- ^ __C declaration:__ @src@
   -> IO Pixman_bool_t
 pixman_f_transform_invert =
-  hs_bindgen_86d667116b57925d
+  hs_bindgen_333dcf96cc14faa7
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_point@
-foreign import ccall unsafe "hs_bindgen_4feb1a82b73af9d1" hs_bindgen_4feb1a82b73af9d1_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_point@
+foreign import ccall unsafe "hs_bindgen_8197d9a54a3b1b59" hs_bindgen_8197d9a54a3b1b59_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_point@
-hs_bindgen_4feb1a82b73af9d1 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_point@
+hs_bindgen_8197d9a54a3b1b59 ::
      PtrConst.PtrConst Pixman_f_transform
   -> RIP.Ptr Pixman_f_vector
   -> IO Pixman_bool_t
-hs_bindgen_4feb1a82b73af9d1 =
-  RIP.fromFFIType hs_bindgen_4feb1a82b73af9d1_base
+hs_bindgen_8197d9a54a3b1b59 =
+  RIP.fromFFIType hs_bindgen_8197d9a54a3b1b59_base
 
 {-| __C declaration:__ @pixman_f_transform_point@
 
@@ -2239,21 +2239,21 @@ pixman_f_transform_point ::
      -- ^ __C declaration:__ @v@
   -> IO Pixman_bool_t
 pixman_f_transform_point =
-  hs_bindgen_4feb1a82b73af9d1
+  hs_bindgen_8197d9a54a3b1b59
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_point_3d@
-foreign import ccall unsafe "hs_bindgen_24cbcffde2c6062e" hs_bindgen_24cbcffde2c6062e_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_point_3d@
+foreign import ccall unsafe "hs_bindgen_ec3efa972ab7dccf" hs_bindgen_ec3efa972ab7dccf_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_point_3d@
-hs_bindgen_24cbcffde2c6062e ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_point_3d@
+hs_bindgen_ec3efa972ab7dccf ::
      PtrConst.PtrConst Pixman_f_transform
   -> RIP.Ptr Pixman_f_vector
   -> IO ()
-hs_bindgen_24cbcffde2c6062e =
-  RIP.fromFFIType hs_bindgen_24cbcffde2c6062e_base
+hs_bindgen_ec3efa972ab7dccf =
+  RIP.fromFFIType hs_bindgen_ec3efa972ab7dccf_base
 
 {-| __C declaration:__ @pixman_f_transform_point_3d@
 
@@ -2268,23 +2268,23 @@ pixman_f_transform_point_3d ::
      -- ^ __C declaration:__ @v@
   -> IO ()
 pixman_f_transform_point_3d =
-  hs_bindgen_24cbcffde2c6062e
+  hs_bindgen_ec3efa972ab7dccf
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_multiply@
-foreign import ccall unsafe "hs_bindgen_764752c4b0477355" hs_bindgen_764752c4b0477355_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_multiply@
+foreign import ccall unsafe "hs_bindgen_562c53736ca53139" hs_bindgen_562c53736ca53139_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_multiply@
-hs_bindgen_764752c4b0477355 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_multiply@
+hs_bindgen_562c53736ca53139 ::
      RIP.Ptr Pixman_f_transform
   -> PtrConst.PtrConst Pixman_f_transform
   -> PtrConst.PtrConst Pixman_f_transform
   -> IO ()
-hs_bindgen_764752c4b0477355 =
-  RIP.fromFFIType hs_bindgen_764752c4b0477355_base
+hs_bindgen_562c53736ca53139 =
+  RIP.fromFFIType hs_bindgen_562c53736ca53139_base
 
 {-| __C declaration:__ @pixman_f_transform_multiply@
 
@@ -2301,23 +2301,23 @@ pixman_f_transform_multiply ::
      -- ^ __C declaration:__ @r@
   -> IO ()
 pixman_f_transform_multiply =
-  hs_bindgen_764752c4b0477355
+  hs_bindgen_562c53736ca53139
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_init_scale@
-foreign import ccall unsafe "hs_bindgen_feb981ce89546279" hs_bindgen_feb981ce89546279_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_init_scale@
+foreign import ccall unsafe "hs_bindgen_51523252fc304f94" hs_bindgen_51523252fc304f94_base ::
      RIP.Ptr RIP.Void
   -> Double
   -> Double
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_init_scale@
-hs_bindgen_feb981ce89546279 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_init_scale@
+hs_bindgen_51523252fc304f94 ::
      RIP.Ptr Pixman_f_transform
   -> RIP.CDouble
   -> RIP.CDouble
   -> IO ()
-hs_bindgen_feb981ce89546279 =
-  RIP.fromFFIType hs_bindgen_feb981ce89546279_base
+hs_bindgen_51523252fc304f94 =
+  RIP.fromFFIType hs_bindgen_51523252fc304f94_base
 
 {-| __C declaration:__ @pixman_f_transform_init_scale@
 
@@ -2334,25 +2334,25 @@ pixman_f_transform_init_scale ::
      -- ^ __C declaration:__ @sy@
   -> IO ()
 pixman_f_transform_init_scale =
-  hs_bindgen_feb981ce89546279
+  hs_bindgen_51523252fc304f94
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_scale@
-foreign import ccall unsafe "hs_bindgen_92642c0145a73eb2" hs_bindgen_92642c0145a73eb2_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_scale@
+foreign import ccall unsafe "hs_bindgen_adddd2fa64360684" hs_bindgen_adddd2fa64360684_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> Double
   -> Double
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_scale@
-hs_bindgen_92642c0145a73eb2 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_scale@
+hs_bindgen_adddd2fa64360684 ::
      RIP.Ptr Pixman_f_transform
   -> RIP.Ptr Pixman_f_transform
   -> RIP.CDouble
   -> RIP.CDouble
   -> IO Pixman_bool_t
-hs_bindgen_92642c0145a73eb2 =
-  RIP.fromFFIType hs_bindgen_92642c0145a73eb2_base
+hs_bindgen_adddd2fa64360684 =
+  RIP.fromFFIType hs_bindgen_adddd2fa64360684_base
 
 {-| __C declaration:__ @pixman_f_transform_scale@
 
@@ -2371,23 +2371,23 @@ pixman_f_transform_scale ::
      -- ^ __C declaration:__ @sy@
   -> IO Pixman_bool_t
 pixman_f_transform_scale =
-  hs_bindgen_92642c0145a73eb2
+  hs_bindgen_adddd2fa64360684
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_init_rotate@
-foreign import ccall unsafe "hs_bindgen_b793e250484b9913" hs_bindgen_b793e250484b9913_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_init_rotate@
+foreign import ccall unsafe "hs_bindgen_71df425567458d5f" hs_bindgen_71df425567458d5f_base ::
      RIP.Ptr RIP.Void
   -> Double
   -> Double
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_init_rotate@
-hs_bindgen_b793e250484b9913 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_init_rotate@
+hs_bindgen_71df425567458d5f ::
      RIP.Ptr Pixman_f_transform
   -> RIP.CDouble
   -> RIP.CDouble
   -> IO ()
-hs_bindgen_b793e250484b9913 =
-  RIP.fromFFIType hs_bindgen_b793e250484b9913_base
+hs_bindgen_71df425567458d5f =
+  RIP.fromFFIType hs_bindgen_71df425567458d5f_base
 
 {-| __C declaration:__ @pixman_f_transform_init_rotate@
 
@@ -2404,25 +2404,25 @@ pixman_f_transform_init_rotate ::
      -- ^ __C declaration:__ @sin@
   -> IO ()
 pixman_f_transform_init_rotate =
-  hs_bindgen_b793e250484b9913
+  hs_bindgen_71df425567458d5f
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_rotate@
-foreign import ccall unsafe "hs_bindgen_26a59a73c80ac00c" hs_bindgen_26a59a73c80ac00c_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_rotate@
+foreign import ccall unsafe "hs_bindgen_86e994e100c1aebc" hs_bindgen_86e994e100c1aebc_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> Double
   -> Double
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_rotate@
-hs_bindgen_26a59a73c80ac00c ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_rotate@
+hs_bindgen_86e994e100c1aebc ::
      RIP.Ptr Pixman_f_transform
   -> RIP.Ptr Pixman_f_transform
   -> RIP.CDouble
   -> RIP.CDouble
   -> IO Pixman_bool_t
-hs_bindgen_26a59a73c80ac00c =
-  RIP.fromFFIType hs_bindgen_26a59a73c80ac00c_base
+hs_bindgen_86e994e100c1aebc =
+  RIP.fromFFIType hs_bindgen_86e994e100c1aebc_base
 
 {-| __C declaration:__ @pixman_f_transform_rotate@
 
@@ -2441,23 +2441,23 @@ pixman_f_transform_rotate ::
      -- ^ __C declaration:__ @s@
   -> IO Pixman_bool_t
 pixman_f_transform_rotate =
-  hs_bindgen_26a59a73c80ac00c
+  hs_bindgen_86e994e100c1aebc
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_init_translate@
-foreign import ccall unsafe "hs_bindgen_5c4ba2b053ec2f40" hs_bindgen_5c4ba2b053ec2f40_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_init_translate@
+foreign import ccall unsafe "hs_bindgen_0d445ff940bb5d26" hs_bindgen_0d445ff940bb5d26_base ::
      RIP.Ptr RIP.Void
   -> Double
   -> Double
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_init_translate@
-hs_bindgen_5c4ba2b053ec2f40 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_init_translate@
+hs_bindgen_0d445ff940bb5d26 ::
      RIP.Ptr Pixman_f_transform
   -> RIP.CDouble
   -> RIP.CDouble
   -> IO ()
-hs_bindgen_5c4ba2b053ec2f40 =
-  RIP.fromFFIType hs_bindgen_5c4ba2b053ec2f40_base
+hs_bindgen_0d445ff940bb5d26 =
+  RIP.fromFFIType hs_bindgen_0d445ff940bb5d26_base
 
 {-| __C declaration:__ @pixman_f_transform_init_translate@
 
@@ -2474,25 +2474,25 @@ pixman_f_transform_init_translate ::
      -- ^ __C declaration:__ @ty@
   -> IO ()
 pixman_f_transform_init_translate =
-  hs_bindgen_5c4ba2b053ec2f40
+  hs_bindgen_0d445ff940bb5d26
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_translate@
-foreign import ccall unsafe "hs_bindgen_63287dbf5e918075" hs_bindgen_63287dbf5e918075_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_translate@
+foreign import ccall unsafe "hs_bindgen_c2861d08cf0af515" hs_bindgen_c2861d08cf0af515_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> Double
   -> Double
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_translate@
-hs_bindgen_63287dbf5e918075 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_translate@
+hs_bindgen_c2861d08cf0af515 ::
      RIP.Ptr Pixman_f_transform
   -> RIP.Ptr Pixman_f_transform
   -> RIP.CDouble
   -> RIP.CDouble
   -> IO Pixman_bool_t
-hs_bindgen_63287dbf5e918075 =
-  RIP.fromFFIType hs_bindgen_63287dbf5e918075_base
+hs_bindgen_c2861d08cf0af515 =
+  RIP.fromFFIType hs_bindgen_c2861d08cf0af515_base
 
 {-| __C declaration:__ @pixman_f_transform_translate@
 
@@ -2511,21 +2511,21 @@ pixman_f_transform_translate ::
      -- ^ __C declaration:__ @ty@
   -> IO Pixman_bool_t
 pixman_f_transform_translate =
-  hs_bindgen_63287dbf5e918075
+  hs_bindgen_c2861d08cf0af515
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_bounds@
-foreign import ccall unsafe "hs_bindgen_e998f863f3a2037f" hs_bindgen_e998f863f3a2037f_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_bounds@
+foreign import ccall unsafe "hs_bindgen_872532155486dd08" hs_bindgen_872532155486dd08_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_bounds@
-hs_bindgen_e998f863f3a2037f ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_bounds@
+hs_bindgen_872532155486dd08 ::
      PtrConst.PtrConst Pixman_f_transform
   -> RIP.Ptr Pixman_box16
   -> IO Pixman_bool_t
-hs_bindgen_e998f863f3a2037f =
-  RIP.fromFFIType hs_bindgen_e998f863f3a2037f_base
+hs_bindgen_872532155486dd08 =
+  RIP.fromFFIType hs_bindgen_872532155486dd08_base
 
 {-| __C declaration:__ @pixman_f_transform_bounds@
 
@@ -2540,19 +2540,19 @@ pixman_f_transform_bounds ::
      -- ^ __C declaration:__ @b@
   -> IO Pixman_bool_t
 pixman_f_transform_bounds =
-  hs_bindgen_e998f863f3a2037f
+  hs_bindgen_872532155486dd08
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_init_identity@
-foreign import ccall unsafe "hs_bindgen_b9ea984611af3edc" hs_bindgen_b9ea984611af3edc_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_init_identity@
+foreign import ccall unsafe "hs_bindgen_e3aeb9ec910358d7" hs_bindgen_e3aeb9ec910358d7_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_init_identity@
-hs_bindgen_b9ea984611af3edc ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_f_transform_init_identity@
+hs_bindgen_e3aeb9ec910358d7 ::
      RIP.Ptr Pixman_f_transform
   -> IO ()
-hs_bindgen_b9ea984611af3edc =
-  RIP.fromFFIType hs_bindgen_b9ea984611af3edc_base
+hs_bindgen_e3aeb9ec910358d7 =
+  RIP.fromFFIType hs_bindgen_e3aeb9ec910358d7_base
 
 {-| __C declaration:__ @pixman_f_transform_init_identity@
 
@@ -2565,23 +2565,23 @@ pixman_f_transform_init_identity ::
      -- ^ __C declaration:__ @t@
   -> IO ()
 pixman_f_transform_init_identity =
-  hs_bindgen_b9ea984611af3edc
+  hs_bindgen_e3aeb9ec910358d7
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_set_static_pointers@
-foreign import ccall unsafe "hs_bindgen_7ae5a1513241c915" hs_bindgen_7ae5a1513241c915_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_set_static_pointers@
+foreign import ccall unsafe "hs_bindgen_641075d17ecf973f" hs_bindgen_641075d17ecf973f_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_set_static_pointers@
-hs_bindgen_7ae5a1513241c915 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_set_static_pointers@
+hs_bindgen_641075d17ecf973f ::
      RIP.Ptr Pixman_box16_t
   -> RIP.Ptr Pixman_region16_data_t
   -> RIP.Ptr Pixman_region16_data_t
   -> IO ()
-hs_bindgen_7ae5a1513241c915 =
-  RIP.fromFFIType hs_bindgen_7ae5a1513241c915_base
+hs_bindgen_641075d17ecf973f =
+  RIP.fromFFIType hs_bindgen_641075d17ecf973f_base
 
 {-| __C declaration:__ @pixman_region_set_static_pointers@
 
@@ -2598,19 +2598,19 @@ pixman_region_set_static_pointers ::
      -- ^ __C declaration:__ @broken_data@
   -> IO ()
 pixman_region_set_static_pointers =
-  hs_bindgen_7ae5a1513241c915
+  hs_bindgen_641075d17ecf973f
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_init@
-foreign import ccall unsafe "hs_bindgen_11ea79fe20c43102" hs_bindgen_11ea79fe20c43102_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_init@
+foreign import ccall unsafe "hs_bindgen_76b85a0c3f64cc52" hs_bindgen_76b85a0c3f64cc52_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_init@
-hs_bindgen_11ea79fe20c43102 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_init@
+hs_bindgen_76b85a0c3f64cc52 ::
      RIP.Ptr Pixman_region16_t
   -> IO ()
-hs_bindgen_11ea79fe20c43102 =
-  RIP.fromFFIType hs_bindgen_11ea79fe20c43102_base
+hs_bindgen_76b85a0c3f64cc52 =
+  RIP.fromFFIType hs_bindgen_76b85a0c3f64cc52_base
 
 {-| __C declaration:__ @pixman_region_init@
 
@@ -2622,10 +2622,10 @@ pixman_region_init ::
      RIP.Ptr Pixman_region16_t
      -- ^ __C declaration:__ @region@
   -> IO ()
-pixman_region_init = hs_bindgen_11ea79fe20c43102
+pixman_region_init = hs_bindgen_76b85a0c3f64cc52
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_init_rect@
-foreign import ccall unsafe "hs_bindgen_0882dccfdec9d6e5" hs_bindgen_0882dccfdec9d6e5_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_init_rect@
+foreign import ccall unsafe "hs_bindgen_711e4dd7fbcb8ea2" hs_bindgen_711e4dd7fbcb8ea2_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
@@ -2633,16 +2633,16 @@ foreign import ccall unsafe "hs_bindgen_0882dccfdec9d6e5" hs_bindgen_0882dccfdec
   -> RIP.Word32
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_init_rect@
-hs_bindgen_0882dccfdec9d6e5 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_init_rect@
+hs_bindgen_711e4dd7fbcb8ea2 ::
      RIP.Ptr Pixman_region16_t
   -> RIP.CInt
   -> RIP.CInt
   -> RIP.CUInt
   -> RIP.CUInt
   -> IO ()
-hs_bindgen_0882dccfdec9d6e5 =
-  RIP.fromFFIType hs_bindgen_0882dccfdec9d6e5_base
+hs_bindgen_711e4dd7fbcb8ea2 =
+  RIP.fromFFIType hs_bindgen_711e4dd7fbcb8ea2_base
 
 {-| __C declaration:__ @pixman_region_init_rect@
 
@@ -2662,23 +2662,23 @@ pixman_region_init_rect ::
   -> RIP.CUInt
      -- ^ __C declaration:__ @height@
   -> IO ()
-pixman_region_init_rect = hs_bindgen_0882dccfdec9d6e5
+pixman_region_init_rect = hs_bindgen_711e4dd7fbcb8ea2
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_init_rects@
-foreign import ccall unsafe "hs_bindgen_d166b8c58a763f99" hs_bindgen_d166b8c58a763f99_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_init_rects@
+foreign import ccall unsafe "hs_bindgen_b8779e0958b2fbbc" hs_bindgen_b8779e0958b2fbbc_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Int32
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_init_rects@
-hs_bindgen_d166b8c58a763f99 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_init_rects@
+hs_bindgen_b8779e0958b2fbbc ::
      RIP.Ptr Pixman_region16_t
   -> PtrConst.PtrConst Pixman_box16_t
   -> RIP.CInt
   -> IO Pixman_bool_t
-hs_bindgen_d166b8c58a763f99 =
-  RIP.fromFFIType hs_bindgen_d166b8c58a763f99_base
+hs_bindgen_b8779e0958b2fbbc =
+  RIP.fromFFIType hs_bindgen_b8779e0958b2fbbc_base
 
 {-| __C declaration:__ @pixman_region_init_rects@
 
@@ -2695,21 +2695,21 @@ pixman_region_init_rects ::
      -- ^ __C declaration:__ @count@
   -> IO Pixman_bool_t
 pixman_region_init_rects =
-  hs_bindgen_d166b8c58a763f99
+  hs_bindgen_b8779e0958b2fbbc
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_init_with_extents@
-foreign import ccall unsafe "hs_bindgen_54522b18ae0b36a0" hs_bindgen_54522b18ae0b36a0_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_init_with_extents@
+foreign import ccall unsafe "hs_bindgen_9130007e3e649313" hs_bindgen_9130007e3e649313_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_init_with_extents@
-hs_bindgen_54522b18ae0b36a0 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_init_with_extents@
+hs_bindgen_9130007e3e649313 ::
      RIP.Ptr Pixman_region16_t
   -> PtrConst.PtrConst Pixman_box16_t
   -> IO ()
-hs_bindgen_54522b18ae0b36a0 =
-  RIP.fromFFIType hs_bindgen_54522b18ae0b36a0_base
+hs_bindgen_9130007e3e649313 =
+  RIP.fromFFIType hs_bindgen_9130007e3e649313_base
 
 {-| __C declaration:__ @pixman_region_init_with_extents@
 
@@ -2724,21 +2724,21 @@ pixman_region_init_with_extents ::
      -- ^ __C declaration:__ @extents@
   -> IO ()
 pixman_region_init_with_extents =
-  hs_bindgen_54522b18ae0b36a0
+  hs_bindgen_9130007e3e649313
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_init_from_image@
-foreign import ccall unsafe "hs_bindgen_cebd83455c43f166" hs_bindgen_cebd83455c43f166_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_init_from_image@
+foreign import ccall unsafe "hs_bindgen_255adfebd1db3828" hs_bindgen_255adfebd1db3828_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_init_from_image@
-hs_bindgen_cebd83455c43f166 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_init_from_image@
+hs_bindgen_255adfebd1db3828 ::
      RIP.Ptr Pixman_region16_t
   -> RIP.Ptr Pixman_image_t
   -> IO ()
-hs_bindgen_cebd83455c43f166 =
-  RIP.fromFFIType hs_bindgen_cebd83455c43f166_base
+hs_bindgen_255adfebd1db3828 =
+  RIP.fromFFIType hs_bindgen_255adfebd1db3828_base
 
 {-| __C declaration:__ @pixman_region_init_from_image@
 
@@ -2753,19 +2753,19 @@ pixman_region_init_from_image ::
      -- ^ __C declaration:__ @image@
   -> IO ()
 pixman_region_init_from_image =
-  hs_bindgen_cebd83455c43f166
+  hs_bindgen_255adfebd1db3828
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_fini@
-foreign import ccall unsafe "hs_bindgen_38e0f26d9214945b" hs_bindgen_38e0f26d9214945b_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_fini@
+foreign import ccall unsafe "hs_bindgen_d02c34656d08dd84" hs_bindgen_d02c34656d08dd84_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_fini@
-hs_bindgen_38e0f26d9214945b ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_fini@
+hs_bindgen_d02c34656d08dd84 ::
      RIP.Ptr Pixman_region16_t
   -> IO ()
-hs_bindgen_38e0f26d9214945b =
-  RIP.fromFFIType hs_bindgen_38e0f26d9214945b_base
+hs_bindgen_d02c34656d08dd84 =
+  RIP.fromFFIType hs_bindgen_d02c34656d08dd84_base
 
 {-| __C declaration:__ @pixman_region_fini@
 
@@ -2777,23 +2777,23 @@ pixman_region_fini ::
      RIP.Ptr Pixman_region16_t
      -- ^ __C declaration:__ @region@
   -> IO ()
-pixman_region_fini = hs_bindgen_38e0f26d9214945b
+pixman_region_fini = hs_bindgen_d02c34656d08dd84
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_translate@
-foreign import ccall unsafe "hs_bindgen_692aeec51977f9ad" hs_bindgen_692aeec51977f9ad_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_translate@
+foreign import ccall unsafe "hs_bindgen_62346ee301a5531e" hs_bindgen_62346ee301a5531e_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_translate@
-hs_bindgen_692aeec51977f9ad ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_translate@
+hs_bindgen_62346ee301a5531e ::
      RIP.Ptr Pixman_region16_t
   -> RIP.CInt
   -> RIP.CInt
   -> IO ()
-hs_bindgen_692aeec51977f9ad =
-  RIP.fromFFIType hs_bindgen_692aeec51977f9ad_base
+hs_bindgen_62346ee301a5531e =
+  RIP.fromFFIType hs_bindgen_62346ee301a5531e_base
 
 {-| __C declaration:__ @pixman_region_translate@
 
@@ -2809,21 +2809,21 @@ pixman_region_translate ::
   -> RIP.CInt
      -- ^ __C declaration:__ @y@
   -> IO ()
-pixman_region_translate = hs_bindgen_692aeec51977f9ad
+pixman_region_translate = hs_bindgen_62346ee301a5531e
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_copy@
-foreign import ccall unsafe "hs_bindgen_fa3c4ab5c234268b" hs_bindgen_fa3c4ab5c234268b_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_copy@
+foreign import ccall unsafe "hs_bindgen_5409874e3c6f1ebf" hs_bindgen_5409874e3c6f1ebf_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_copy@
-hs_bindgen_fa3c4ab5c234268b ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_copy@
+hs_bindgen_5409874e3c6f1ebf ::
      RIP.Ptr Pixman_region16_t
   -> PtrConst.PtrConst Pixman_region16_t
   -> IO Pixman_bool_t
-hs_bindgen_fa3c4ab5c234268b =
-  RIP.fromFFIType hs_bindgen_fa3c4ab5c234268b_base
+hs_bindgen_5409874e3c6f1ebf =
+  RIP.fromFFIType hs_bindgen_5409874e3c6f1ebf_base
 
 {-| __C declaration:__ @pixman_region_copy@
 
@@ -2837,23 +2837,23 @@ pixman_region_copy ::
   -> PtrConst.PtrConst Pixman_region16_t
      -- ^ __C declaration:__ @source@
   -> IO Pixman_bool_t
-pixman_region_copy = hs_bindgen_fa3c4ab5c234268b
+pixman_region_copy = hs_bindgen_5409874e3c6f1ebf
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_intersect@
-foreign import ccall unsafe "hs_bindgen_93e94b8346d50e61" hs_bindgen_93e94b8346d50e61_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_intersect@
+foreign import ccall unsafe "hs_bindgen_b9ee82f202152c02" hs_bindgen_b9ee82f202152c02_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_intersect@
-hs_bindgen_93e94b8346d50e61 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_intersect@
+hs_bindgen_b9ee82f202152c02 ::
      RIP.Ptr Pixman_region16_t
   -> PtrConst.PtrConst Pixman_region16_t
   -> PtrConst.PtrConst Pixman_region16_t
   -> IO Pixman_bool_t
-hs_bindgen_93e94b8346d50e61 =
-  RIP.fromFFIType hs_bindgen_93e94b8346d50e61_base
+hs_bindgen_b9ee82f202152c02 =
+  RIP.fromFFIType hs_bindgen_b9ee82f202152c02_base
 
 {-| __C declaration:__ @pixman_region_intersect@
 
@@ -2869,23 +2869,23 @@ pixman_region_intersect ::
   -> PtrConst.PtrConst Pixman_region16_t
      -- ^ __C declaration:__ @reg2@
   -> IO Pixman_bool_t
-pixman_region_intersect = hs_bindgen_93e94b8346d50e61
+pixman_region_intersect = hs_bindgen_b9ee82f202152c02
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_union@
-foreign import ccall unsafe "hs_bindgen_c624ad2ee102cd4f" hs_bindgen_c624ad2ee102cd4f_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_union@
+foreign import ccall unsafe "hs_bindgen_9343e39517725718" hs_bindgen_9343e39517725718_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_union@
-hs_bindgen_c624ad2ee102cd4f ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_union@
+hs_bindgen_9343e39517725718 ::
      RIP.Ptr Pixman_region16_t
   -> PtrConst.PtrConst Pixman_region16_t
   -> PtrConst.PtrConst Pixman_region16_t
   -> IO Pixman_bool_t
-hs_bindgen_c624ad2ee102cd4f =
-  RIP.fromFFIType hs_bindgen_c624ad2ee102cd4f_base
+hs_bindgen_9343e39517725718 =
+  RIP.fromFFIType hs_bindgen_9343e39517725718_base
 
 {-| __C declaration:__ @pixman_region_union@
 
@@ -2901,10 +2901,10 @@ pixman_region_union ::
   -> PtrConst.PtrConst Pixman_region16_t
      -- ^ __C declaration:__ @reg2@
   -> IO Pixman_bool_t
-pixman_region_union = hs_bindgen_c624ad2ee102cd4f
+pixman_region_union = hs_bindgen_9343e39517725718
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_union_rect@
-foreign import ccall unsafe "hs_bindgen_be52fa94a0a6a1d6" hs_bindgen_be52fa94a0a6a1d6_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_union_rect@
+foreign import ccall unsafe "hs_bindgen_9d16565960bd3229" hs_bindgen_9d16565960bd3229_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Int32
@@ -2913,8 +2913,8 @@ foreign import ccall unsafe "hs_bindgen_be52fa94a0a6a1d6" hs_bindgen_be52fa94a0a
   -> RIP.Word32
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_union_rect@
-hs_bindgen_be52fa94a0a6a1d6 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_union_rect@
+hs_bindgen_9d16565960bd3229 ::
      RIP.Ptr Pixman_region16_t
   -> PtrConst.PtrConst Pixman_region16_t
   -> RIP.CInt
@@ -2922,8 +2922,8 @@ hs_bindgen_be52fa94a0a6a1d6 ::
   -> RIP.CUInt
   -> RIP.CUInt
   -> IO Pixman_bool_t
-hs_bindgen_be52fa94a0a6a1d6 =
-  RIP.fromFFIType hs_bindgen_be52fa94a0a6a1d6_base
+hs_bindgen_9d16565960bd3229 =
+  RIP.fromFFIType hs_bindgen_9d16565960bd3229_base
 
 {-| __C declaration:__ @pixman_region_union_rect@
 
@@ -2946,10 +2946,10 @@ pixman_region_union_rect ::
      -- ^ __C declaration:__ @height@
   -> IO Pixman_bool_t
 pixman_region_union_rect =
-  hs_bindgen_be52fa94a0a6a1d6
+  hs_bindgen_9d16565960bd3229
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_intersect_rect@
-foreign import ccall unsafe "hs_bindgen_38a6ec1f2b3987bc" hs_bindgen_38a6ec1f2b3987bc_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_intersect_rect@
+foreign import ccall unsafe "hs_bindgen_141a5a82886df3a2" hs_bindgen_141a5a82886df3a2_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Int32
@@ -2958,8 +2958,8 @@ foreign import ccall unsafe "hs_bindgen_38a6ec1f2b3987bc" hs_bindgen_38a6ec1f2b3
   -> RIP.Word32
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_intersect_rect@
-hs_bindgen_38a6ec1f2b3987bc ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_intersect_rect@
+hs_bindgen_141a5a82886df3a2 ::
      RIP.Ptr Pixman_region16_t
   -> PtrConst.PtrConst Pixman_region16_t
   -> RIP.CInt
@@ -2967,8 +2967,8 @@ hs_bindgen_38a6ec1f2b3987bc ::
   -> RIP.CUInt
   -> RIP.CUInt
   -> IO Pixman_bool_t
-hs_bindgen_38a6ec1f2b3987bc =
-  RIP.fromFFIType hs_bindgen_38a6ec1f2b3987bc_base
+hs_bindgen_141a5a82886df3a2 =
+  RIP.fromFFIType hs_bindgen_141a5a82886df3a2_base
 
 {-| __C declaration:__ @pixman_region_intersect_rect@
 
@@ -2991,23 +2991,23 @@ pixman_region_intersect_rect ::
      -- ^ __C declaration:__ @height@
   -> IO Pixman_bool_t
 pixman_region_intersect_rect =
-  hs_bindgen_38a6ec1f2b3987bc
+  hs_bindgen_141a5a82886df3a2
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_subtract@
-foreign import ccall unsafe "hs_bindgen_14d882d75941c137" hs_bindgen_14d882d75941c137_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_subtract@
+foreign import ccall unsafe "hs_bindgen_f58def6e6cadcd44" hs_bindgen_f58def6e6cadcd44_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_subtract@
-hs_bindgen_14d882d75941c137 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_subtract@
+hs_bindgen_f58def6e6cadcd44 ::
      RIP.Ptr Pixman_region16_t
   -> PtrConst.PtrConst Pixman_region16_t
   -> PtrConst.PtrConst Pixman_region16_t
   -> IO Pixman_bool_t
-hs_bindgen_14d882d75941c137 =
-  RIP.fromFFIType hs_bindgen_14d882d75941c137_base
+hs_bindgen_f58def6e6cadcd44 =
+  RIP.fromFFIType hs_bindgen_f58def6e6cadcd44_base
 
 {-| __C declaration:__ @pixman_region_subtract@
 
@@ -3023,23 +3023,23 @@ pixman_region_subtract ::
   -> PtrConst.PtrConst Pixman_region16_t
      -- ^ __C declaration:__ @reg_s@
   -> IO Pixman_bool_t
-pixman_region_subtract = hs_bindgen_14d882d75941c137
+pixman_region_subtract = hs_bindgen_f58def6e6cadcd44
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_inverse@
-foreign import ccall unsafe "hs_bindgen_558d516f575cf7ae" hs_bindgen_558d516f575cf7ae_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_inverse@
+foreign import ccall unsafe "hs_bindgen_f5c6601328fb5353" hs_bindgen_f5c6601328fb5353_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_inverse@
-hs_bindgen_558d516f575cf7ae ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_inverse@
+hs_bindgen_f5c6601328fb5353 ::
      RIP.Ptr Pixman_region16_t
   -> PtrConst.PtrConst Pixman_region16_t
   -> PtrConst.PtrConst Pixman_box16_t
   -> IO Pixman_bool_t
-hs_bindgen_558d516f575cf7ae =
-  RIP.fromFFIType hs_bindgen_558d516f575cf7ae_base
+hs_bindgen_f5c6601328fb5353 =
+  RIP.fromFFIType hs_bindgen_f5c6601328fb5353_base
 
 {-| __C declaration:__ @pixman_region_inverse@
 
@@ -3055,25 +3055,25 @@ pixman_region_inverse ::
   -> PtrConst.PtrConst Pixman_box16_t
      -- ^ __C declaration:__ @inv_rect@
   -> IO Pixman_bool_t
-pixman_region_inverse = hs_bindgen_558d516f575cf7ae
+pixman_region_inverse = hs_bindgen_f5c6601328fb5353
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_contains_point@
-foreign import ccall unsafe "hs_bindgen_e22e0b5521717be1" hs_bindgen_e22e0b5521717be1_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_contains_point@
+foreign import ccall unsafe "hs_bindgen_7d8531da490bcee2" hs_bindgen_7d8531da490bcee2_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_contains_point@
-hs_bindgen_e22e0b5521717be1 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_contains_point@
+hs_bindgen_7d8531da490bcee2 ::
      PtrConst.PtrConst Pixman_region16_t
   -> RIP.CInt
   -> RIP.CInt
   -> RIP.Ptr Pixman_box16_t
   -> IO Pixman_bool_t
-hs_bindgen_e22e0b5521717be1 =
-  RIP.fromFFIType hs_bindgen_e22e0b5521717be1_base
+hs_bindgen_7d8531da490bcee2 =
+  RIP.fromFFIType hs_bindgen_7d8531da490bcee2_base
 
 {-| __C declaration:__ @pixman_region_contains_point@
 
@@ -3092,21 +3092,21 @@ pixman_region_contains_point ::
      -- ^ __C declaration:__ @box@
   -> IO Pixman_bool_t
 pixman_region_contains_point =
-  hs_bindgen_e22e0b5521717be1
+  hs_bindgen_7d8531da490bcee2
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_contains_rectangle@
-foreign import ccall unsafe "hs_bindgen_8c035abaa7f658a1" hs_bindgen_8c035abaa7f658a1_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_contains_rectangle@
+foreign import ccall unsafe "hs_bindgen_347b09bf995224c7" hs_bindgen_347b09bf995224c7_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_contains_rectangle@
-hs_bindgen_8c035abaa7f658a1 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_contains_rectangle@
+hs_bindgen_347b09bf995224c7 ::
      PtrConst.PtrConst Pixman_region16_t
   -> PtrConst.PtrConst Pixman_box16_t
   -> IO Pixman_region_overlap_t
-hs_bindgen_8c035abaa7f658a1 =
-  RIP.fromFFIType hs_bindgen_8c035abaa7f658a1_base
+hs_bindgen_347b09bf995224c7 =
+  RIP.fromFFIType hs_bindgen_347b09bf995224c7_base
 
 {-| __C declaration:__ @pixman_region_contains_rectangle@
 
@@ -3121,19 +3121,19 @@ pixman_region_contains_rectangle ::
      -- ^ __C declaration:__ @prect@
   -> IO Pixman_region_overlap_t
 pixman_region_contains_rectangle =
-  hs_bindgen_8c035abaa7f658a1
+  hs_bindgen_347b09bf995224c7
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_empty@
-foreign import ccall unsafe "hs_bindgen_55fbac6d560a11be" hs_bindgen_55fbac6d560a11be_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_empty@
+foreign import ccall unsafe "hs_bindgen_b9ffe06d3ded22cd" hs_bindgen_b9ffe06d3ded22cd_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_empty@
-hs_bindgen_55fbac6d560a11be ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_empty@
+hs_bindgen_b9ffe06d3ded22cd ::
      PtrConst.PtrConst Pixman_region16_t
   -> IO Pixman_bool_t
-hs_bindgen_55fbac6d560a11be =
-  RIP.fromFFIType hs_bindgen_55fbac6d560a11be_base
+hs_bindgen_b9ffe06d3ded22cd =
+  RIP.fromFFIType hs_bindgen_b9ffe06d3ded22cd_base
 
 {-| __C declaration:__ @pixman_region_empty@
 
@@ -3145,19 +3145,19 @@ pixman_region_empty ::
      PtrConst.PtrConst Pixman_region16_t
      -- ^ __C declaration:__ @region@
   -> IO Pixman_bool_t
-pixman_region_empty = hs_bindgen_55fbac6d560a11be
+pixman_region_empty = hs_bindgen_b9ffe06d3ded22cd
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_not_empty@
-foreign import ccall unsafe "hs_bindgen_7841920424df5182" hs_bindgen_7841920424df5182_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_not_empty@
+foreign import ccall unsafe "hs_bindgen_15970d1bc094c7a4" hs_bindgen_15970d1bc094c7a4_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_not_empty@
-hs_bindgen_7841920424df5182 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_not_empty@
+hs_bindgen_15970d1bc094c7a4 ::
      PtrConst.PtrConst Pixman_region16_t
   -> IO Pixman_bool_t
-hs_bindgen_7841920424df5182 =
-  RIP.fromFFIType hs_bindgen_7841920424df5182_base
+hs_bindgen_15970d1bc094c7a4 =
+  RIP.fromFFIType hs_bindgen_15970d1bc094c7a4_base
 
 {-| __C declaration:__ @pixman_region_not_empty@
 
@@ -3169,19 +3169,19 @@ pixman_region_not_empty ::
      PtrConst.PtrConst Pixman_region16_t
      -- ^ __C declaration:__ @region@
   -> IO Pixman_bool_t
-pixman_region_not_empty = hs_bindgen_7841920424df5182
+pixman_region_not_empty = hs_bindgen_15970d1bc094c7a4
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_extents@
-foreign import ccall unsafe "hs_bindgen_8f7af2dd117be8ea" hs_bindgen_8f7af2dd117be8ea_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_extents@
+foreign import ccall unsafe "hs_bindgen_84dcdc42818f66d0" hs_bindgen_84dcdc42818f66d0_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_extents@
-hs_bindgen_8f7af2dd117be8ea ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_extents@
+hs_bindgen_84dcdc42818f66d0 ::
      PtrConst.PtrConst Pixman_region16_t
   -> IO (RIP.Ptr Pixman_box16_t)
-hs_bindgen_8f7af2dd117be8ea =
-  RIP.fromFFIType hs_bindgen_8f7af2dd117be8ea_base
+hs_bindgen_84dcdc42818f66d0 =
+  RIP.fromFFIType hs_bindgen_84dcdc42818f66d0_base
 
 {-| __C declaration:__ @pixman_region_extents@
 
@@ -3193,19 +3193,19 @@ pixman_region_extents ::
      PtrConst.PtrConst Pixman_region16_t
      -- ^ __C declaration:__ @region@
   -> IO (RIP.Ptr Pixman_box16_t)
-pixman_region_extents = hs_bindgen_8f7af2dd117be8ea
+pixman_region_extents = hs_bindgen_84dcdc42818f66d0
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_n_rects@
-foreign import ccall unsafe "hs_bindgen_877576f483afe5e5" hs_bindgen_877576f483afe5e5_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_n_rects@
+foreign import ccall unsafe "hs_bindgen_f01b384f69d0dbba" hs_bindgen_f01b384f69d0dbba_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_n_rects@
-hs_bindgen_877576f483afe5e5 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_n_rects@
+hs_bindgen_f01b384f69d0dbba ::
      PtrConst.PtrConst Pixman_region16_t
   -> IO RIP.CInt
-hs_bindgen_877576f483afe5e5 =
-  RIP.fromFFIType hs_bindgen_877576f483afe5e5_base
+hs_bindgen_f01b384f69d0dbba =
+  RIP.fromFFIType hs_bindgen_f01b384f69d0dbba_base
 
 {-| __C declaration:__ @pixman_region_n_rects@
 
@@ -3217,21 +3217,21 @@ pixman_region_n_rects ::
      PtrConst.PtrConst Pixman_region16_t
      -- ^ __C declaration:__ @region@
   -> IO RIP.CInt
-pixman_region_n_rects = hs_bindgen_877576f483afe5e5
+pixman_region_n_rects = hs_bindgen_f01b384f69d0dbba
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_rectangles@
-foreign import ccall unsafe "hs_bindgen_6dc7a6faa00e19ce" hs_bindgen_6dc7a6faa00e19ce_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_rectangles@
+foreign import ccall unsafe "hs_bindgen_1c75b50f82c11e57" hs_bindgen_1c75b50f82c11e57_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_rectangles@
-hs_bindgen_6dc7a6faa00e19ce ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_rectangles@
+hs_bindgen_1c75b50f82c11e57 ::
      PtrConst.PtrConst Pixman_region16_t
   -> RIP.Ptr RIP.CInt
   -> IO (RIP.Ptr Pixman_box16_t)
-hs_bindgen_6dc7a6faa00e19ce =
-  RIP.fromFFIType hs_bindgen_6dc7a6faa00e19ce_base
+hs_bindgen_1c75b50f82c11e57 =
+  RIP.fromFFIType hs_bindgen_1c75b50f82c11e57_base
 
 {-| __C declaration:__ @pixman_region_rectangles@
 
@@ -3246,21 +3246,21 @@ pixman_region_rectangles ::
      -- ^ __C declaration:__ @n_rects@
   -> IO (RIP.Ptr Pixman_box16_t)
 pixman_region_rectangles =
-  hs_bindgen_6dc7a6faa00e19ce
+  hs_bindgen_1c75b50f82c11e57
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_equal@
-foreign import ccall unsafe "hs_bindgen_b73b226c73cc564b" hs_bindgen_b73b226c73cc564b_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_equal@
+foreign import ccall unsafe "hs_bindgen_b5953cc8e3d7fdd0" hs_bindgen_b5953cc8e3d7fdd0_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_equal@
-hs_bindgen_b73b226c73cc564b ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_equal@
+hs_bindgen_b5953cc8e3d7fdd0 ::
      PtrConst.PtrConst Pixman_region16_t
   -> PtrConst.PtrConst Pixman_region16_t
   -> IO Pixman_bool_t
-hs_bindgen_b73b226c73cc564b =
-  RIP.fromFFIType hs_bindgen_b73b226c73cc564b_base
+hs_bindgen_b5953cc8e3d7fdd0 =
+  RIP.fromFFIType hs_bindgen_b5953cc8e3d7fdd0_base
 
 {-| __C declaration:__ @pixman_region_equal@
 
@@ -3274,19 +3274,19 @@ pixman_region_equal ::
   -> PtrConst.PtrConst Pixman_region16_t
      -- ^ __C declaration:__ @region2@
   -> IO Pixman_bool_t
-pixman_region_equal = hs_bindgen_b73b226c73cc564b
+pixman_region_equal = hs_bindgen_b5953cc8e3d7fdd0
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_selfcheck@
-foreign import ccall unsafe "hs_bindgen_34a6221ba26bb931" hs_bindgen_34a6221ba26bb931_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_selfcheck@
+foreign import ccall unsafe "hs_bindgen_e093cc3cd7225a9e" hs_bindgen_e093cc3cd7225a9e_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_selfcheck@
-hs_bindgen_34a6221ba26bb931 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_selfcheck@
+hs_bindgen_e093cc3cd7225a9e ::
      RIP.Ptr Pixman_region16_t
   -> IO Pixman_bool_t
-hs_bindgen_34a6221ba26bb931 =
-  RIP.fromFFIType hs_bindgen_34a6221ba26bb931_base
+hs_bindgen_e093cc3cd7225a9e =
+  RIP.fromFFIType hs_bindgen_e093cc3cd7225a9e_base
 
 {-| __C declaration:__ @pixman_region_selfcheck@
 
@@ -3298,21 +3298,21 @@ pixman_region_selfcheck ::
      RIP.Ptr Pixman_region16_t
      -- ^ __C declaration:__ @region@
   -> IO Pixman_bool_t
-pixman_region_selfcheck = hs_bindgen_34a6221ba26bb931
+pixman_region_selfcheck = hs_bindgen_e093cc3cd7225a9e
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_reset@
-foreign import ccall unsafe "hs_bindgen_ab8cf6620697cdf2" hs_bindgen_ab8cf6620697cdf2_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_reset@
+foreign import ccall unsafe "hs_bindgen_0fd0e6d0611637a2" hs_bindgen_0fd0e6d0611637a2_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_reset@
-hs_bindgen_ab8cf6620697cdf2 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_reset@
+hs_bindgen_0fd0e6d0611637a2 ::
      RIP.Ptr Pixman_region16_t
   -> PtrConst.PtrConst Pixman_box16_t
   -> IO ()
-hs_bindgen_ab8cf6620697cdf2 =
-  RIP.fromFFIType hs_bindgen_ab8cf6620697cdf2_base
+hs_bindgen_0fd0e6d0611637a2 =
+  RIP.fromFFIType hs_bindgen_0fd0e6d0611637a2_base
 
 {-| __C declaration:__ @pixman_region_reset@
 
@@ -3326,19 +3326,19 @@ pixman_region_reset ::
   -> PtrConst.PtrConst Pixman_box16_t
      -- ^ __C declaration:__ @box@
   -> IO ()
-pixman_region_reset = hs_bindgen_ab8cf6620697cdf2
+pixman_region_reset = hs_bindgen_0fd0e6d0611637a2
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_clear@
-foreign import ccall unsafe "hs_bindgen_3c3c60beb8993dc5" hs_bindgen_3c3c60beb8993dc5_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_clear@
+foreign import ccall unsafe "hs_bindgen_0366b88627a5e320" hs_bindgen_0366b88627a5e320_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region_clear@
-hs_bindgen_3c3c60beb8993dc5 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region_clear@
+hs_bindgen_0366b88627a5e320 ::
      RIP.Ptr Pixman_region16_t
   -> IO ()
-hs_bindgen_3c3c60beb8993dc5 =
-  RIP.fromFFIType hs_bindgen_3c3c60beb8993dc5_base
+hs_bindgen_0366b88627a5e320 =
+  RIP.fromFFIType hs_bindgen_0366b88627a5e320_base
 
 {-| __C declaration:__ @pixman_region_clear@
 
@@ -3350,19 +3350,19 @@ pixman_region_clear ::
      RIP.Ptr Pixman_region16_t
      -- ^ __C declaration:__ @region@
   -> IO ()
-pixman_region_clear = hs_bindgen_3c3c60beb8993dc5
+pixman_region_clear = hs_bindgen_0366b88627a5e320
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_init@
-foreign import ccall unsafe "hs_bindgen_86bfdca2909f75b6" hs_bindgen_86bfdca2909f75b6_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_init@
+foreign import ccall unsafe "hs_bindgen_b0c2f9276120d1f6" hs_bindgen_b0c2f9276120d1f6_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_init@
-hs_bindgen_86bfdca2909f75b6 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_init@
+hs_bindgen_b0c2f9276120d1f6 ::
      RIP.Ptr Pixman_region32_t
   -> IO ()
-hs_bindgen_86bfdca2909f75b6 =
-  RIP.fromFFIType hs_bindgen_86bfdca2909f75b6_base
+hs_bindgen_b0c2f9276120d1f6 =
+  RIP.fromFFIType hs_bindgen_b0c2f9276120d1f6_base
 
 {-| __C declaration:__ @pixman_region32_init@
 
@@ -3374,10 +3374,10 @@ pixman_region32_init ::
      RIP.Ptr Pixman_region32_t
      -- ^ __C declaration:__ @region@
   -> IO ()
-pixman_region32_init = hs_bindgen_86bfdca2909f75b6
+pixman_region32_init = hs_bindgen_b0c2f9276120d1f6
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_init_rect@
-foreign import ccall unsafe "hs_bindgen_91c22e5e6c6d5368" hs_bindgen_91c22e5e6c6d5368_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_init_rect@
+foreign import ccall unsafe "hs_bindgen_605df1f00ccf63ed" hs_bindgen_605df1f00ccf63ed_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
@@ -3385,16 +3385,16 @@ foreign import ccall unsafe "hs_bindgen_91c22e5e6c6d5368" hs_bindgen_91c22e5e6c6
   -> RIP.Word32
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_init_rect@
-hs_bindgen_91c22e5e6c6d5368 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_init_rect@
+hs_bindgen_605df1f00ccf63ed ::
      RIP.Ptr Pixman_region32_t
   -> RIP.CInt
   -> RIP.CInt
   -> RIP.CUInt
   -> RIP.CUInt
   -> IO ()
-hs_bindgen_91c22e5e6c6d5368 =
-  RIP.fromFFIType hs_bindgen_91c22e5e6c6d5368_base
+hs_bindgen_605df1f00ccf63ed =
+  RIP.fromFFIType hs_bindgen_605df1f00ccf63ed_base
 
 {-| __C declaration:__ @pixman_region32_init_rect@
 
@@ -3415,23 +3415,23 @@ pixman_region32_init_rect ::
      -- ^ __C declaration:__ @height@
   -> IO ()
 pixman_region32_init_rect =
-  hs_bindgen_91c22e5e6c6d5368
+  hs_bindgen_605df1f00ccf63ed
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_init_rects@
-foreign import ccall unsafe "hs_bindgen_e04b01141f38f6fe" hs_bindgen_e04b01141f38f6fe_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_init_rects@
+foreign import ccall unsafe "hs_bindgen_383c09a05e0c0045" hs_bindgen_383c09a05e0c0045_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Int32
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_init_rects@
-hs_bindgen_e04b01141f38f6fe ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_init_rects@
+hs_bindgen_383c09a05e0c0045 ::
      RIP.Ptr Pixman_region32_t
   -> PtrConst.PtrConst Pixman_box32_t
   -> RIP.CInt
   -> IO Pixman_bool_t
-hs_bindgen_e04b01141f38f6fe =
-  RIP.fromFFIType hs_bindgen_e04b01141f38f6fe_base
+hs_bindgen_383c09a05e0c0045 =
+  RIP.fromFFIType hs_bindgen_383c09a05e0c0045_base
 
 {-| __C declaration:__ @pixman_region32_init_rects@
 
@@ -3448,21 +3448,21 @@ pixman_region32_init_rects ::
      -- ^ __C declaration:__ @count@
   -> IO Pixman_bool_t
 pixman_region32_init_rects =
-  hs_bindgen_e04b01141f38f6fe
+  hs_bindgen_383c09a05e0c0045
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_init_with_extents@
-foreign import ccall unsafe "hs_bindgen_d0ce0aa7aa2b6893" hs_bindgen_d0ce0aa7aa2b6893_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_init_with_extents@
+foreign import ccall unsafe "hs_bindgen_66c4a40fec0deeab" hs_bindgen_66c4a40fec0deeab_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_init_with_extents@
-hs_bindgen_d0ce0aa7aa2b6893 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_init_with_extents@
+hs_bindgen_66c4a40fec0deeab ::
      RIP.Ptr Pixman_region32_t
   -> PtrConst.PtrConst Pixman_box32_t
   -> IO ()
-hs_bindgen_d0ce0aa7aa2b6893 =
-  RIP.fromFFIType hs_bindgen_d0ce0aa7aa2b6893_base
+hs_bindgen_66c4a40fec0deeab =
+  RIP.fromFFIType hs_bindgen_66c4a40fec0deeab_base
 
 {-| __C declaration:__ @pixman_region32_init_with_extents@
 
@@ -3477,21 +3477,21 @@ pixman_region32_init_with_extents ::
      -- ^ __C declaration:__ @extents@
   -> IO ()
 pixman_region32_init_with_extents =
-  hs_bindgen_d0ce0aa7aa2b6893
+  hs_bindgen_66c4a40fec0deeab
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_init_from_image@
-foreign import ccall unsafe "hs_bindgen_42287f8f08754df2" hs_bindgen_42287f8f08754df2_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_init_from_image@
+foreign import ccall unsafe "hs_bindgen_b838b99db46e89eb" hs_bindgen_b838b99db46e89eb_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_init_from_image@
-hs_bindgen_42287f8f08754df2 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_init_from_image@
+hs_bindgen_b838b99db46e89eb ::
      RIP.Ptr Pixman_region32_t
   -> RIP.Ptr Pixman_image_t
   -> IO ()
-hs_bindgen_42287f8f08754df2 =
-  RIP.fromFFIType hs_bindgen_42287f8f08754df2_base
+hs_bindgen_b838b99db46e89eb =
+  RIP.fromFFIType hs_bindgen_b838b99db46e89eb_base
 
 {-| __C declaration:__ @pixman_region32_init_from_image@
 
@@ -3506,19 +3506,19 @@ pixman_region32_init_from_image ::
      -- ^ __C declaration:__ @image@
   -> IO ()
 pixman_region32_init_from_image =
-  hs_bindgen_42287f8f08754df2
+  hs_bindgen_b838b99db46e89eb
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_fini@
-foreign import ccall unsafe "hs_bindgen_2851e8362a4158d7" hs_bindgen_2851e8362a4158d7_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_fini@
+foreign import ccall unsafe "hs_bindgen_f5afdafe8a555a4b" hs_bindgen_f5afdafe8a555a4b_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_fini@
-hs_bindgen_2851e8362a4158d7 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_fini@
+hs_bindgen_f5afdafe8a555a4b ::
      RIP.Ptr Pixman_region32_t
   -> IO ()
-hs_bindgen_2851e8362a4158d7 =
-  RIP.fromFFIType hs_bindgen_2851e8362a4158d7_base
+hs_bindgen_f5afdafe8a555a4b =
+  RIP.fromFFIType hs_bindgen_f5afdafe8a555a4b_base
 
 {-| __C declaration:__ @pixman_region32_fini@
 
@@ -3530,23 +3530,23 @@ pixman_region32_fini ::
      RIP.Ptr Pixman_region32_t
      -- ^ __C declaration:__ @region@
   -> IO ()
-pixman_region32_fini = hs_bindgen_2851e8362a4158d7
+pixman_region32_fini = hs_bindgen_f5afdafe8a555a4b
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_translate@
-foreign import ccall unsafe "hs_bindgen_e328ea12e137059b" hs_bindgen_e328ea12e137059b_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_translate@
+foreign import ccall unsafe "hs_bindgen_1040638d55b23407" hs_bindgen_1040638d55b23407_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_translate@
-hs_bindgen_e328ea12e137059b ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_translate@
+hs_bindgen_1040638d55b23407 ::
      RIP.Ptr Pixman_region32_t
   -> RIP.CInt
   -> RIP.CInt
   -> IO ()
-hs_bindgen_e328ea12e137059b =
-  RIP.fromFFIType hs_bindgen_e328ea12e137059b_base
+hs_bindgen_1040638d55b23407 =
+  RIP.fromFFIType hs_bindgen_1040638d55b23407_base
 
 {-| __C declaration:__ @pixman_region32_translate@
 
@@ -3563,21 +3563,21 @@ pixman_region32_translate ::
      -- ^ __C declaration:__ @y@
   -> IO ()
 pixman_region32_translate =
-  hs_bindgen_e328ea12e137059b
+  hs_bindgen_1040638d55b23407
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_copy@
-foreign import ccall unsafe "hs_bindgen_ff47e3528fcd2bae" hs_bindgen_ff47e3528fcd2bae_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_copy@
+foreign import ccall unsafe "hs_bindgen_00ec163aaf740479" hs_bindgen_00ec163aaf740479_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_copy@
-hs_bindgen_ff47e3528fcd2bae ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_copy@
+hs_bindgen_00ec163aaf740479 ::
      RIP.Ptr Pixman_region32_t
   -> PtrConst.PtrConst Pixman_region32_t
   -> IO Pixman_bool_t
-hs_bindgen_ff47e3528fcd2bae =
-  RIP.fromFFIType hs_bindgen_ff47e3528fcd2bae_base
+hs_bindgen_00ec163aaf740479 =
+  RIP.fromFFIType hs_bindgen_00ec163aaf740479_base
 
 {-| __C declaration:__ @pixman_region32_copy@
 
@@ -3591,23 +3591,23 @@ pixman_region32_copy ::
   -> PtrConst.PtrConst Pixman_region32_t
      -- ^ __C declaration:__ @source@
   -> IO Pixman_bool_t
-pixman_region32_copy = hs_bindgen_ff47e3528fcd2bae
+pixman_region32_copy = hs_bindgen_00ec163aaf740479
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_intersect@
-foreign import ccall unsafe "hs_bindgen_4b78dd852da51ae3" hs_bindgen_4b78dd852da51ae3_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_intersect@
+foreign import ccall unsafe "hs_bindgen_555e73235dd1b613" hs_bindgen_555e73235dd1b613_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_intersect@
-hs_bindgen_4b78dd852da51ae3 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_intersect@
+hs_bindgen_555e73235dd1b613 ::
      RIP.Ptr Pixman_region32_t
   -> PtrConst.PtrConst Pixman_region32_t
   -> PtrConst.PtrConst Pixman_region32_t
   -> IO Pixman_bool_t
-hs_bindgen_4b78dd852da51ae3 =
-  RIP.fromFFIType hs_bindgen_4b78dd852da51ae3_base
+hs_bindgen_555e73235dd1b613 =
+  RIP.fromFFIType hs_bindgen_555e73235dd1b613_base
 
 {-| __C declaration:__ @pixman_region32_intersect@
 
@@ -3624,23 +3624,23 @@ pixman_region32_intersect ::
      -- ^ __C declaration:__ @reg2@
   -> IO Pixman_bool_t
 pixman_region32_intersect =
-  hs_bindgen_4b78dd852da51ae3
+  hs_bindgen_555e73235dd1b613
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_union@
-foreign import ccall unsafe "hs_bindgen_a31ce4be3b30a117" hs_bindgen_a31ce4be3b30a117_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_union@
+foreign import ccall unsafe "hs_bindgen_d72d63390a733e97" hs_bindgen_d72d63390a733e97_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_union@
-hs_bindgen_a31ce4be3b30a117 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_union@
+hs_bindgen_d72d63390a733e97 ::
      RIP.Ptr Pixman_region32_t
   -> PtrConst.PtrConst Pixman_region32_t
   -> PtrConst.PtrConst Pixman_region32_t
   -> IO Pixman_bool_t
-hs_bindgen_a31ce4be3b30a117 =
-  RIP.fromFFIType hs_bindgen_a31ce4be3b30a117_base
+hs_bindgen_d72d63390a733e97 =
+  RIP.fromFFIType hs_bindgen_d72d63390a733e97_base
 
 {-| __C declaration:__ @pixman_region32_union@
 
@@ -3656,10 +3656,10 @@ pixman_region32_union ::
   -> PtrConst.PtrConst Pixman_region32_t
      -- ^ __C declaration:__ @reg2@
   -> IO Pixman_bool_t
-pixman_region32_union = hs_bindgen_a31ce4be3b30a117
+pixman_region32_union = hs_bindgen_d72d63390a733e97
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_intersect_rect@
-foreign import ccall unsafe "hs_bindgen_0b3984ece3d1441b" hs_bindgen_0b3984ece3d1441b_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_intersect_rect@
+foreign import ccall unsafe "hs_bindgen_187fbeb4ad3ed67d" hs_bindgen_187fbeb4ad3ed67d_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Int32
@@ -3668,8 +3668,8 @@ foreign import ccall unsafe "hs_bindgen_0b3984ece3d1441b" hs_bindgen_0b3984ece3d
   -> RIP.Word32
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_intersect_rect@
-hs_bindgen_0b3984ece3d1441b ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_intersect_rect@
+hs_bindgen_187fbeb4ad3ed67d ::
      RIP.Ptr Pixman_region32_t
   -> PtrConst.PtrConst Pixman_region32_t
   -> RIP.CInt
@@ -3677,8 +3677,8 @@ hs_bindgen_0b3984ece3d1441b ::
   -> RIP.CUInt
   -> RIP.CUInt
   -> IO Pixman_bool_t
-hs_bindgen_0b3984ece3d1441b =
-  RIP.fromFFIType hs_bindgen_0b3984ece3d1441b_base
+hs_bindgen_187fbeb4ad3ed67d =
+  RIP.fromFFIType hs_bindgen_187fbeb4ad3ed67d_base
 
 {-| __C declaration:__ @pixman_region32_intersect_rect@
 
@@ -3701,10 +3701,10 @@ pixman_region32_intersect_rect ::
      -- ^ __C declaration:__ @height@
   -> IO Pixman_bool_t
 pixman_region32_intersect_rect =
-  hs_bindgen_0b3984ece3d1441b
+  hs_bindgen_187fbeb4ad3ed67d
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_union_rect@
-foreign import ccall unsafe "hs_bindgen_e53d7c7832f42101" hs_bindgen_e53d7c7832f42101_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_union_rect@
+foreign import ccall unsafe "hs_bindgen_4059a674b8bb337b" hs_bindgen_4059a674b8bb337b_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Int32
@@ -3713,8 +3713,8 @@ foreign import ccall unsafe "hs_bindgen_e53d7c7832f42101" hs_bindgen_e53d7c7832f
   -> RIP.Word32
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_union_rect@
-hs_bindgen_e53d7c7832f42101 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_union_rect@
+hs_bindgen_4059a674b8bb337b ::
      RIP.Ptr Pixman_region32_t
   -> PtrConst.PtrConst Pixman_region32_t
   -> RIP.CInt
@@ -3722,8 +3722,8 @@ hs_bindgen_e53d7c7832f42101 ::
   -> RIP.CUInt
   -> RIP.CUInt
   -> IO Pixman_bool_t
-hs_bindgen_e53d7c7832f42101 =
-  RIP.fromFFIType hs_bindgen_e53d7c7832f42101_base
+hs_bindgen_4059a674b8bb337b =
+  RIP.fromFFIType hs_bindgen_4059a674b8bb337b_base
 
 {-| __C declaration:__ @pixman_region32_union_rect@
 
@@ -3746,23 +3746,23 @@ pixman_region32_union_rect ::
      -- ^ __C declaration:__ @height@
   -> IO Pixman_bool_t
 pixman_region32_union_rect =
-  hs_bindgen_e53d7c7832f42101
+  hs_bindgen_4059a674b8bb337b
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_subtract@
-foreign import ccall unsafe "hs_bindgen_67ec2d3b5c3b2db1" hs_bindgen_67ec2d3b5c3b2db1_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_subtract@
+foreign import ccall unsafe "hs_bindgen_25ebf8e8e5242949" hs_bindgen_25ebf8e8e5242949_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_subtract@
-hs_bindgen_67ec2d3b5c3b2db1 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_subtract@
+hs_bindgen_25ebf8e8e5242949 ::
      RIP.Ptr Pixman_region32_t
   -> PtrConst.PtrConst Pixman_region32_t
   -> PtrConst.PtrConst Pixman_region32_t
   -> IO Pixman_bool_t
-hs_bindgen_67ec2d3b5c3b2db1 =
-  RIP.fromFFIType hs_bindgen_67ec2d3b5c3b2db1_base
+hs_bindgen_25ebf8e8e5242949 =
+  RIP.fromFFIType hs_bindgen_25ebf8e8e5242949_base
 
 {-| __C declaration:__ @pixman_region32_subtract@
 
@@ -3779,23 +3779,23 @@ pixman_region32_subtract ::
      -- ^ __C declaration:__ @reg_s@
   -> IO Pixman_bool_t
 pixman_region32_subtract =
-  hs_bindgen_67ec2d3b5c3b2db1
+  hs_bindgen_25ebf8e8e5242949
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_inverse@
-foreign import ccall unsafe "hs_bindgen_760e49687c1d97c0" hs_bindgen_760e49687c1d97c0_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_inverse@
+foreign import ccall unsafe "hs_bindgen_2979192ef2832311" hs_bindgen_2979192ef2832311_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_inverse@
-hs_bindgen_760e49687c1d97c0 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_inverse@
+hs_bindgen_2979192ef2832311 ::
      RIP.Ptr Pixman_region32_t
   -> PtrConst.PtrConst Pixman_region32_t
   -> PtrConst.PtrConst Pixman_box32_t
   -> IO Pixman_bool_t
-hs_bindgen_760e49687c1d97c0 =
-  RIP.fromFFIType hs_bindgen_760e49687c1d97c0_base
+hs_bindgen_2979192ef2832311 =
+  RIP.fromFFIType hs_bindgen_2979192ef2832311_base
 
 {-| __C declaration:__ @pixman_region32_inverse@
 
@@ -3811,25 +3811,25 @@ pixman_region32_inverse ::
   -> PtrConst.PtrConst Pixman_box32_t
      -- ^ __C declaration:__ @inv_rect@
   -> IO Pixman_bool_t
-pixman_region32_inverse = hs_bindgen_760e49687c1d97c0
+pixman_region32_inverse = hs_bindgen_2979192ef2832311
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_contains_point@
-foreign import ccall unsafe "hs_bindgen_8438b54b9e99a921" hs_bindgen_8438b54b9e99a921_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_contains_point@
+foreign import ccall unsafe "hs_bindgen_fd11006a2fcc94ab" hs_bindgen_fd11006a2fcc94ab_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_contains_point@
-hs_bindgen_8438b54b9e99a921 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_contains_point@
+hs_bindgen_fd11006a2fcc94ab ::
      PtrConst.PtrConst Pixman_region32_t
   -> RIP.CInt
   -> RIP.CInt
   -> RIP.Ptr Pixman_box32_t
   -> IO Pixman_bool_t
-hs_bindgen_8438b54b9e99a921 =
-  RIP.fromFFIType hs_bindgen_8438b54b9e99a921_base
+hs_bindgen_fd11006a2fcc94ab =
+  RIP.fromFFIType hs_bindgen_fd11006a2fcc94ab_base
 
 {-| __C declaration:__ @pixman_region32_contains_point@
 
@@ -3848,21 +3848,21 @@ pixman_region32_contains_point ::
      -- ^ __C declaration:__ @box@
   -> IO Pixman_bool_t
 pixman_region32_contains_point =
-  hs_bindgen_8438b54b9e99a921
+  hs_bindgen_fd11006a2fcc94ab
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_contains_rectangle@
-foreign import ccall unsafe "hs_bindgen_d3e1fed52a8ad529" hs_bindgen_d3e1fed52a8ad529_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_contains_rectangle@
+foreign import ccall unsafe "hs_bindgen_8c0e9776b628a9d5" hs_bindgen_8c0e9776b628a9d5_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_contains_rectangle@
-hs_bindgen_d3e1fed52a8ad529 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_contains_rectangle@
+hs_bindgen_8c0e9776b628a9d5 ::
      PtrConst.PtrConst Pixman_region32_t
   -> PtrConst.PtrConst Pixman_box32_t
   -> IO Pixman_region_overlap_t
-hs_bindgen_d3e1fed52a8ad529 =
-  RIP.fromFFIType hs_bindgen_d3e1fed52a8ad529_base
+hs_bindgen_8c0e9776b628a9d5 =
+  RIP.fromFFIType hs_bindgen_8c0e9776b628a9d5_base
 
 {-| __C declaration:__ @pixman_region32_contains_rectangle@
 
@@ -3877,19 +3877,19 @@ pixman_region32_contains_rectangle ::
      -- ^ __C declaration:__ @prect@
   -> IO Pixman_region_overlap_t
 pixman_region32_contains_rectangle =
-  hs_bindgen_d3e1fed52a8ad529
+  hs_bindgen_8c0e9776b628a9d5
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_empty@
-foreign import ccall unsafe "hs_bindgen_af76cfd678b4dded" hs_bindgen_af76cfd678b4dded_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_empty@
+foreign import ccall unsafe "hs_bindgen_537b9c2cd57c2352" hs_bindgen_537b9c2cd57c2352_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_empty@
-hs_bindgen_af76cfd678b4dded ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_empty@
+hs_bindgen_537b9c2cd57c2352 ::
      PtrConst.PtrConst Pixman_region32_t
   -> IO Pixman_bool_t
-hs_bindgen_af76cfd678b4dded =
-  RIP.fromFFIType hs_bindgen_af76cfd678b4dded_base
+hs_bindgen_537b9c2cd57c2352 =
+  RIP.fromFFIType hs_bindgen_537b9c2cd57c2352_base
 
 {-| __C declaration:__ @pixman_region32_empty@
 
@@ -3901,19 +3901,19 @@ pixman_region32_empty ::
      PtrConst.PtrConst Pixman_region32_t
      -- ^ __C declaration:__ @region@
   -> IO Pixman_bool_t
-pixman_region32_empty = hs_bindgen_af76cfd678b4dded
+pixman_region32_empty = hs_bindgen_537b9c2cd57c2352
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_not_empty@
-foreign import ccall unsafe "hs_bindgen_d300f6c8ce35a48f" hs_bindgen_d300f6c8ce35a48f_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_not_empty@
+foreign import ccall unsafe "hs_bindgen_aeedefd4710c62b0" hs_bindgen_aeedefd4710c62b0_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_not_empty@
-hs_bindgen_d300f6c8ce35a48f ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_not_empty@
+hs_bindgen_aeedefd4710c62b0 ::
      PtrConst.PtrConst Pixman_region32_t
   -> IO Pixman_bool_t
-hs_bindgen_d300f6c8ce35a48f =
-  RIP.fromFFIType hs_bindgen_d300f6c8ce35a48f_base
+hs_bindgen_aeedefd4710c62b0 =
+  RIP.fromFFIType hs_bindgen_aeedefd4710c62b0_base
 
 {-| __C declaration:__ @pixman_region32_not_empty@
 
@@ -3926,19 +3926,19 @@ pixman_region32_not_empty ::
      -- ^ __C declaration:__ @region@
   -> IO Pixman_bool_t
 pixman_region32_not_empty =
-  hs_bindgen_d300f6c8ce35a48f
+  hs_bindgen_aeedefd4710c62b0
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_extents@
-foreign import ccall unsafe "hs_bindgen_b909ca4525c863a3" hs_bindgen_b909ca4525c863a3_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_extents@
+foreign import ccall unsafe "hs_bindgen_e887b46132ef6b4d" hs_bindgen_e887b46132ef6b4d_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_extents@
-hs_bindgen_b909ca4525c863a3 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_extents@
+hs_bindgen_e887b46132ef6b4d ::
      PtrConst.PtrConst Pixman_region32_t
   -> IO (RIP.Ptr Pixman_box32_t)
-hs_bindgen_b909ca4525c863a3 =
-  RIP.fromFFIType hs_bindgen_b909ca4525c863a3_base
+hs_bindgen_e887b46132ef6b4d =
+  RIP.fromFFIType hs_bindgen_e887b46132ef6b4d_base
 
 {-| __C declaration:__ @pixman_region32_extents@
 
@@ -3950,19 +3950,19 @@ pixman_region32_extents ::
      PtrConst.PtrConst Pixman_region32_t
      -- ^ __C declaration:__ @region@
   -> IO (RIP.Ptr Pixman_box32_t)
-pixman_region32_extents = hs_bindgen_b909ca4525c863a3
+pixman_region32_extents = hs_bindgen_e887b46132ef6b4d
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_n_rects@
-foreign import ccall unsafe "hs_bindgen_755bab9a973b03d8" hs_bindgen_755bab9a973b03d8_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_n_rects@
+foreign import ccall unsafe "hs_bindgen_05a8b8d161997b84" hs_bindgen_05a8b8d161997b84_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_n_rects@
-hs_bindgen_755bab9a973b03d8 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_n_rects@
+hs_bindgen_05a8b8d161997b84 ::
      PtrConst.PtrConst Pixman_region32_t
   -> IO RIP.CInt
-hs_bindgen_755bab9a973b03d8 =
-  RIP.fromFFIType hs_bindgen_755bab9a973b03d8_base
+hs_bindgen_05a8b8d161997b84 =
+  RIP.fromFFIType hs_bindgen_05a8b8d161997b84_base
 
 {-| __C declaration:__ @pixman_region32_n_rects@
 
@@ -3974,21 +3974,21 @@ pixman_region32_n_rects ::
      PtrConst.PtrConst Pixman_region32_t
      -- ^ __C declaration:__ @region@
   -> IO RIP.CInt
-pixman_region32_n_rects = hs_bindgen_755bab9a973b03d8
+pixman_region32_n_rects = hs_bindgen_05a8b8d161997b84
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_rectangles@
-foreign import ccall unsafe "hs_bindgen_64f6998c8f512660" hs_bindgen_64f6998c8f512660_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_rectangles@
+foreign import ccall unsafe "hs_bindgen_17cc0d25fc0fa531" hs_bindgen_17cc0d25fc0fa531_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_rectangles@
-hs_bindgen_64f6998c8f512660 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_rectangles@
+hs_bindgen_17cc0d25fc0fa531 ::
      PtrConst.PtrConst Pixman_region32_t
   -> RIP.Ptr RIP.CInt
   -> IO (RIP.Ptr Pixman_box32_t)
-hs_bindgen_64f6998c8f512660 =
-  RIP.fromFFIType hs_bindgen_64f6998c8f512660_base
+hs_bindgen_17cc0d25fc0fa531 =
+  RIP.fromFFIType hs_bindgen_17cc0d25fc0fa531_base
 
 {-| __C declaration:__ @pixman_region32_rectangles@
 
@@ -4003,21 +4003,21 @@ pixman_region32_rectangles ::
      -- ^ __C declaration:__ @n_rects@
   -> IO (RIP.Ptr Pixman_box32_t)
 pixman_region32_rectangles =
-  hs_bindgen_64f6998c8f512660
+  hs_bindgen_17cc0d25fc0fa531
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_equal@
-foreign import ccall unsafe "hs_bindgen_0d615078f7b9c2b6" hs_bindgen_0d615078f7b9c2b6_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_equal@
+foreign import ccall unsafe "hs_bindgen_cda8948d9eddf0aa" hs_bindgen_cda8948d9eddf0aa_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_equal@
-hs_bindgen_0d615078f7b9c2b6 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_equal@
+hs_bindgen_cda8948d9eddf0aa ::
      PtrConst.PtrConst Pixman_region32_t
   -> PtrConst.PtrConst Pixman_region32_t
   -> IO Pixman_bool_t
-hs_bindgen_0d615078f7b9c2b6 =
-  RIP.fromFFIType hs_bindgen_0d615078f7b9c2b6_base
+hs_bindgen_cda8948d9eddf0aa =
+  RIP.fromFFIType hs_bindgen_cda8948d9eddf0aa_base
 
 {-| __C declaration:__ @pixman_region32_equal@
 
@@ -4031,19 +4031,19 @@ pixman_region32_equal ::
   -> PtrConst.PtrConst Pixman_region32_t
      -- ^ __C declaration:__ @region2@
   -> IO Pixman_bool_t
-pixman_region32_equal = hs_bindgen_0d615078f7b9c2b6
+pixman_region32_equal = hs_bindgen_cda8948d9eddf0aa
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_selfcheck@
-foreign import ccall unsafe "hs_bindgen_4947d831c5a730a5" hs_bindgen_4947d831c5a730a5_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_selfcheck@
+foreign import ccall unsafe "hs_bindgen_619ec7d76893b0b3" hs_bindgen_619ec7d76893b0b3_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_selfcheck@
-hs_bindgen_4947d831c5a730a5 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_selfcheck@
+hs_bindgen_619ec7d76893b0b3 ::
      RIP.Ptr Pixman_region32_t
   -> IO Pixman_bool_t
-hs_bindgen_4947d831c5a730a5 =
-  RIP.fromFFIType hs_bindgen_4947d831c5a730a5_base
+hs_bindgen_619ec7d76893b0b3 =
+  RIP.fromFFIType hs_bindgen_619ec7d76893b0b3_base
 
 {-| __C declaration:__ @pixman_region32_selfcheck@
 
@@ -4056,21 +4056,21 @@ pixman_region32_selfcheck ::
      -- ^ __C declaration:__ @region@
   -> IO Pixman_bool_t
 pixman_region32_selfcheck =
-  hs_bindgen_4947d831c5a730a5
+  hs_bindgen_619ec7d76893b0b3
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_reset@
-foreign import ccall unsafe "hs_bindgen_0a4c3cacb3024df7" hs_bindgen_0a4c3cacb3024df7_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_reset@
+foreign import ccall unsafe "hs_bindgen_bb88de8e2c7fbc63" hs_bindgen_bb88de8e2c7fbc63_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_reset@
-hs_bindgen_0a4c3cacb3024df7 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_reset@
+hs_bindgen_bb88de8e2c7fbc63 ::
      RIP.Ptr Pixman_region32_t
   -> PtrConst.PtrConst Pixman_box32_t
   -> IO ()
-hs_bindgen_0a4c3cacb3024df7 =
-  RIP.fromFFIType hs_bindgen_0a4c3cacb3024df7_base
+hs_bindgen_bb88de8e2c7fbc63 =
+  RIP.fromFFIType hs_bindgen_bb88de8e2c7fbc63_base
 
 {-| __C declaration:__ @pixman_region32_reset@
 
@@ -4084,19 +4084,19 @@ pixman_region32_reset ::
   -> PtrConst.PtrConst Pixman_box32_t
      -- ^ __C declaration:__ @box@
   -> IO ()
-pixman_region32_reset = hs_bindgen_0a4c3cacb3024df7
+pixman_region32_reset = hs_bindgen_bb88de8e2c7fbc63
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_clear@
-foreign import ccall unsafe "hs_bindgen_c4f16cde3ba8f0a1" hs_bindgen_c4f16cde3ba8f0a1_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_clear@
+foreign import ccall unsafe "hs_bindgen_a5fe3c2caa1cc60b" hs_bindgen_a5fe3c2caa1cc60b_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region32_clear@
-hs_bindgen_c4f16cde3ba8f0a1 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region32_clear@
+hs_bindgen_a5fe3c2caa1cc60b ::
      RIP.Ptr Pixman_region32_t
   -> IO ()
-hs_bindgen_c4f16cde3ba8f0a1 =
-  RIP.fromFFIType hs_bindgen_c4f16cde3ba8f0a1_base
+hs_bindgen_a5fe3c2caa1cc60b =
+  RIP.fromFFIType hs_bindgen_a5fe3c2caa1cc60b_base
 
 {-| __C declaration:__ @pixman_region32_clear@
 
@@ -4108,19 +4108,19 @@ pixman_region32_clear ::
      RIP.Ptr Pixman_region32_t
      -- ^ __C declaration:__ @region@
   -> IO ()
-pixman_region32_clear = hs_bindgen_c4f16cde3ba8f0a1
+pixman_region32_clear = hs_bindgen_a5fe3c2caa1cc60b
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_init@
-foreign import ccall unsafe "hs_bindgen_218c59bd5c35070a" hs_bindgen_218c59bd5c35070a_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_init@
+foreign import ccall unsafe "hs_bindgen_36ee650609772dce" hs_bindgen_36ee650609772dce_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_init@
-hs_bindgen_218c59bd5c35070a ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_init@
+hs_bindgen_36ee650609772dce ::
      RIP.Ptr Pixman_region64f_t
   -> IO ()
-hs_bindgen_218c59bd5c35070a =
-  RIP.fromFFIType hs_bindgen_218c59bd5c35070a_base
+hs_bindgen_36ee650609772dce =
+  RIP.fromFFIType hs_bindgen_36ee650609772dce_base
 
 {-| __C declaration:__ @pixman_region64f_init@
 
@@ -4132,10 +4132,10 @@ pixman_region64f_init ::
      RIP.Ptr Pixman_region64f_t
      -- ^ __C declaration:__ @region@
   -> IO ()
-pixman_region64f_init = hs_bindgen_218c59bd5c35070a
+pixman_region64f_init = hs_bindgen_36ee650609772dce
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_init_rect@
-foreign import ccall unsafe "hs_bindgen_d02ad431dd1a8833" hs_bindgen_d02ad431dd1a8833_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_init_rect@
+foreign import ccall unsafe "hs_bindgen_62cbe8690a397704" hs_bindgen_62cbe8690a397704_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
@@ -4143,16 +4143,16 @@ foreign import ccall unsafe "hs_bindgen_d02ad431dd1a8833" hs_bindgen_d02ad431dd1
   -> RIP.Word32
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_init_rect@
-hs_bindgen_d02ad431dd1a8833 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_init_rect@
+hs_bindgen_62cbe8690a397704 ::
      RIP.Ptr Pixman_region64f_t
   -> RIP.CInt
   -> RIP.CInt
   -> RIP.CUInt
   -> RIP.CUInt
   -> IO ()
-hs_bindgen_d02ad431dd1a8833 =
-  RIP.fromFFIType hs_bindgen_d02ad431dd1a8833_base
+hs_bindgen_62cbe8690a397704 =
+  RIP.fromFFIType hs_bindgen_62cbe8690a397704_base
 
 {-| __C declaration:__ @pixman_region64f_init_rect@
 
@@ -4173,10 +4173,10 @@ pixman_region64f_init_rect ::
      -- ^ __C declaration:__ @height@
   -> IO ()
 pixman_region64f_init_rect =
-  hs_bindgen_d02ad431dd1a8833
+  hs_bindgen_62cbe8690a397704
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_init_rectf@
-foreign import ccall unsafe "hs_bindgen_8e6be7d2778de95f" hs_bindgen_8e6be7d2778de95f_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_init_rectf@
+foreign import ccall unsafe "hs_bindgen_51fd7d23208abe38" hs_bindgen_51fd7d23208abe38_base ::
      RIP.Ptr RIP.Void
   -> Double
   -> Double
@@ -4184,16 +4184,16 @@ foreign import ccall unsafe "hs_bindgen_8e6be7d2778de95f" hs_bindgen_8e6be7d2778
   -> Double
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_init_rectf@
-hs_bindgen_8e6be7d2778de95f ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_init_rectf@
+hs_bindgen_51fd7d23208abe38 ::
      RIP.Ptr Pixman_region64f_t
   -> RIP.CDouble
   -> RIP.CDouble
   -> RIP.CDouble
   -> RIP.CDouble
   -> IO ()
-hs_bindgen_8e6be7d2778de95f =
-  RIP.fromFFIType hs_bindgen_8e6be7d2778de95f_base
+hs_bindgen_51fd7d23208abe38 =
+  RIP.fromFFIType hs_bindgen_51fd7d23208abe38_base
 
 {-| __C declaration:__ @pixman_region64f_init_rectf@
 
@@ -4214,23 +4214,23 @@ pixman_region64f_init_rectf ::
      -- ^ __C declaration:__ @height@
   -> IO ()
 pixman_region64f_init_rectf =
-  hs_bindgen_8e6be7d2778de95f
+  hs_bindgen_51fd7d23208abe38
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_init_rects@
-foreign import ccall unsafe "hs_bindgen_a425b81efa258160" hs_bindgen_a425b81efa258160_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_init_rects@
+foreign import ccall unsafe "hs_bindgen_863d2461b31a9b6b" hs_bindgen_863d2461b31a9b6b_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Int32
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_init_rects@
-hs_bindgen_a425b81efa258160 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_init_rects@
+hs_bindgen_863d2461b31a9b6b ::
      RIP.Ptr Pixman_region64f_t
   -> PtrConst.PtrConst Pixman_box64f_t
   -> RIP.CInt
   -> IO Pixman_bool_t
-hs_bindgen_a425b81efa258160 =
-  RIP.fromFFIType hs_bindgen_a425b81efa258160_base
+hs_bindgen_863d2461b31a9b6b =
+  RIP.fromFFIType hs_bindgen_863d2461b31a9b6b_base
 
 {-| __C declaration:__ @pixman_region64f_init_rects@
 
@@ -4247,21 +4247,21 @@ pixman_region64f_init_rects ::
      -- ^ __C declaration:__ @count@
   -> IO Pixman_bool_t
 pixman_region64f_init_rects =
-  hs_bindgen_a425b81efa258160
+  hs_bindgen_863d2461b31a9b6b
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_init_with_extents@
-foreign import ccall unsafe "hs_bindgen_7930276a7f635dbc" hs_bindgen_7930276a7f635dbc_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_init_with_extents@
+foreign import ccall unsafe "hs_bindgen_281b6e60a5f60278" hs_bindgen_281b6e60a5f60278_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_init_with_extents@
-hs_bindgen_7930276a7f635dbc ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_init_with_extents@
+hs_bindgen_281b6e60a5f60278 ::
      RIP.Ptr Pixman_region64f_t
   -> PtrConst.PtrConst Pixman_box64f_t
   -> IO ()
-hs_bindgen_7930276a7f635dbc =
-  RIP.fromFFIType hs_bindgen_7930276a7f635dbc_base
+hs_bindgen_281b6e60a5f60278 =
+  RIP.fromFFIType hs_bindgen_281b6e60a5f60278_base
 
 {-| __C declaration:__ @pixman_region64f_init_with_extents@
 
@@ -4276,21 +4276,21 @@ pixman_region64f_init_with_extents ::
      -- ^ __C declaration:__ @extents@
   -> IO ()
 pixman_region64f_init_with_extents =
-  hs_bindgen_7930276a7f635dbc
+  hs_bindgen_281b6e60a5f60278
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_init_from_image@
-foreign import ccall unsafe "hs_bindgen_440b0b2ebdf03318" hs_bindgen_440b0b2ebdf03318_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_init_from_image@
+foreign import ccall unsafe "hs_bindgen_e21a84c6a240822a" hs_bindgen_e21a84c6a240822a_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_init_from_image@
-hs_bindgen_440b0b2ebdf03318 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_init_from_image@
+hs_bindgen_e21a84c6a240822a ::
      RIP.Ptr Pixman_region64f_t
   -> RIP.Ptr Pixman_image_t
   -> IO ()
-hs_bindgen_440b0b2ebdf03318 =
-  RIP.fromFFIType hs_bindgen_440b0b2ebdf03318_base
+hs_bindgen_e21a84c6a240822a =
+  RIP.fromFFIType hs_bindgen_e21a84c6a240822a_base
 
 {-| __C declaration:__ @pixman_region64f_init_from_image@
 
@@ -4305,19 +4305,19 @@ pixman_region64f_init_from_image ::
      -- ^ __C declaration:__ @image@
   -> IO ()
 pixman_region64f_init_from_image =
-  hs_bindgen_440b0b2ebdf03318
+  hs_bindgen_e21a84c6a240822a
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_fini@
-foreign import ccall unsafe "hs_bindgen_c621fb89f72810f1" hs_bindgen_c621fb89f72810f1_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_fini@
+foreign import ccall unsafe "hs_bindgen_3a3ee0c726b150dc" hs_bindgen_3a3ee0c726b150dc_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_fini@
-hs_bindgen_c621fb89f72810f1 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_fini@
+hs_bindgen_3a3ee0c726b150dc ::
      RIP.Ptr Pixman_region64f_t
   -> IO ()
-hs_bindgen_c621fb89f72810f1 =
-  RIP.fromFFIType hs_bindgen_c621fb89f72810f1_base
+hs_bindgen_3a3ee0c726b150dc =
+  RIP.fromFFIType hs_bindgen_3a3ee0c726b150dc_base
 
 {-| __C declaration:__ @pixman_region64f_fini@
 
@@ -4329,23 +4329,23 @@ pixman_region64f_fini ::
      RIP.Ptr Pixman_region64f_t
      -- ^ __C declaration:__ @region@
   -> IO ()
-pixman_region64f_fini = hs_bindgen_c621fb89f72810f1
+pixman_region64f_fini = hs_bindgen_3a3ee0c726b150dc
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_translate@
-foreign import ccall unsafe "hs_bindgen_515210fe44bc0b53" hs_bindgen_515210fe44bc0b53_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_translate@
+foreign import ccall unsafe "hs_bindgen_c11e8b65b7e55a9a" hs_bindgen_c11e8b65b7e55a9a_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_translate@
-hs_bindgen_515210fe44bc0b53 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_translate@
+hs_bindgen_c11e8b65b7e55a9a ::
      RIP.Ptr Pixman_region64f_t
   -> RIP.CInt
   -> RIP.CInt
   -> IO ()
-hs_bindgen_515210fe44bc0b53 =
-  RIP.fromFFIType hs_bindgen_515210fe44bc0b53_base
+hs_bindgen_c11e8b65b7e55a9a =
+  RIP.fromFFIType hs_bindgen_c11e8b65b7e55a9a_base
 
 {-| __C declaration:__ @pixman_region64f_translate@
 
@@ -4362,23 +4362,23 @@ pixman_region64f_translate ::
      -- ^ __C declaration:__ @y@
   -> IO ()
 pixman_region64f_translate =
-  hs_bindgen_515210fe44bc0b53
+  hs_bindgen_c11e8b65b7e55a9a
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_translatef@
-foreign import ccall unsafe "hs_bindgen_ed225dc6935678f7" hs_bindgen_ed225dc6935678f7_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_translatef@
+foreign import ccall unsafe "hs_bindgen_6cb1e610b0935514" hs_bindgen_6cb1e610b0935514_base ::
      RIP.Ptr RIP.Void
   -> Double
   -> Double
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_translatef@
-hs_bindgen_ed225dc6935678f7 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_translatef@
+hs_bindgen_6cb1e610b0935514 ::
      RIP.Ptr Pixman_region64f_t
   -> RIP.CDouble
   -> RIP.CDouble
   -> IO ()
-hs_bindgen_ed225dc6935678f7 =
-  RIP.fromFFIType hs_bindgen_ed225dc6935678f7_base
+hs_bindgen_6cb1e610b0935514 =
+  RIP.fromFFIType hs_bindgen_6cb1e610b0935514_base
 
 {-| __C declaration:__ @pixman_region64f_translatef@
 
@@ -4395,21 +4395,21 @@ pixman_region64f_translatef ::
      -- ^ __C declaration:__ @y@
   -> IO ()
 pixman_region64f_translatef =
-  hs_bindgen_ed225dc6935678f7
+  hs_bindgen_6cb1e610b0935514
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_copy@
-foreign import ccall unsafe "hs_bindgen_981fbcfd9b9d63ff" hs_bindgen_981fbcfd9b9d63ff_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_copy@
+foreign import ccall unsafe "hs_bindgen_03a7970b2a01fef2" hs_bindgen_03a7970b2a01fef2_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_copy@
-hs_bindgen_981fbcfd9b9d63ff ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_copy@
+hs_bindgen_03a7970b2a01fef2 ::
      RIP.Ptr Pixman_region64f_t
   -> PtrConst.PtrConst Pixman_region64f_t
   -> IO Pixman_bool_t
-hs_bindgen_981fbcfd9b9d63ff =
-  RIP.fromFFIType hs_bindgen_981fbcfd9b9d63ff_base
+hs_bindgen_03a7970b2a01fef2 =
+  RIP.fromFFIType hs_bindgen_03a7970b2a01fef2_base
 
 {-| __C declaration:__ @pixman_region64f_copy@
 
@@ -4423,23 +4423,23 @@ pixman_region64f_copy ::
   -> PtrConst.PtrConst Pixman_region64f_t
      -- ^ __C declaration:__ @source@
   -> IO Pixman_bool_t
-pixman_region64f_copy = hs_bindgen_981fbcfd9b9d63ff
+pixman_region64f_copy = hs_bindgen_03a7970b2a01fef2
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_intersect@
-foreign import ccall unsafe "hs_bindgen_ea6430db2c0ea1fe" hs_bindgen_ea6430db2c0ea1fe_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_intersect@
+foreign import ccall unsafe "hs_bindgen_9e46b978d1300e80" hs_bindgen_9e46b978d1300e80_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_intersect@
-hs_bindgen_ea6430db2c0ea1fe ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_intersect@
+hs_bindgen_9e46b978d1300e80 ::
      RIP.Ptr Pixman_region64f_t
   -> PtrConst.PtrConst Pixman_region64f_t
   -> PtrConst.PtrConst Pixman_region64f_t
   -> IO Pixman_bool_t
-hs_bindgen_ea6430db2c0ea1fe =
-  RIP.fromFFIType hs_bindgen_ea6430db2c0ea1fe_base
+hs_bindgen_9e46b978d1300e80 =
+  RIP.fromFFIType hs_bindgen_9e46b978d1300e80_base
 
 {-| __C declaration:__ @pixman_region64f_intersect@
 
@@ -4456,23 +4456,23 @@ pixman_region64f_intersect ::
      -- ^ __C declaration:__ @reg2@
   -> IO Pixman_bool_t
 pixman_region64f_intersect =
-  hs_bindgen_ea6430db2c0ea1fe
+  hs_bindgen_9e46b978d1300e80
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_union@
-foreign import ccall unsafe "hs_bindgen_0ec78d6da403289b" hs_bindgen_0ec78d6da403289b_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_union@
+foreign import ccall unsafe "hs_bindgen_31dc1c625b24969f" hs_bindgen_31dc1c625b24969f_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_union@
-hs_bindgen_0ec78d6da403289b ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_union@
+hs_bindgen_31dc1c625b24969f ::
      RIP.Ptr Pixman_region64f_t
   -> PtrConst.PtrConst Pixman_region64f_t
   -> PtrConst.PtrConst Pixman_region64f_t
   -> IO Pixman_bool_t
-hs_bindgen_0ec78d6da403289b =
-  RIP.fromFFIType hs_bindgen_0ec78d6da403289b_base
+hs_bindgen_31dc1c625b24969f =
+  RIP.fromFFIType hs_bindgen_31dc1c625b24969f_base
 
 {-| __C declaration:__ @pixman_region64f_union@
 
@@ -4488,10 +4488,10 @@ pixman_region64f_union ::
   -> PtrConst.PtrConst Pixman_region64f_t
      -- ^ __C declaration:__ @reg2@
   -> IO Pixman_bool_t
-pixman_region64f_union = hs_bindgen_0ec78d6da403289b
+pixman_region64f_union = hs_bindgen_31dc1c625b24969f
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_intersect_rect@
-foreign import ccall unsafe "hs_bindgen_7fd5f7980c8232f0" hs_bindgen_7fd5f7980c8232f0_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_intersect_rect@
+foreign import ccall unsafe "hs_bindgen_dfc5f9075a379683" hs_bindgen_dfc5f9075a379683_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Int32
@@ -4500,8 +4500,8 @@ foreign import ccall unsafe "hs_bindgen_7fd5f7980c8232f0" hs_bindgen_7fd5f7980c8
   -> RIP.Word32
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_intersect_rect@
-hs_bindgen_7fd5f7980c8232f0 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_intersect_rect@
+hs_bindgen_dfc5f9075a379683 ::
      RIP.Ptr Pixman_region64f_t
   -> PtrConst.PtrConst Pixman_region64f_t
   -> RIP.CInt
@@ -4509,8 +4509,8 @@ hs_bindgen_7fd5f7980c8232f0 ::
   -> RIP.CUInt
   -> RIP.CUInt
   -> IO Pixman_bool_t
-hs_bindgen_7fd5f7980c8232f0 =
-  RIP.fromFFIType hs_bindgen_7fd5f7980c8232f0_base
+hs_bindgen_dfc5f9075a379683 =
+  RIP.fromFFIType hs_bindgen_dfc5f9075a379683_base
 
 {-| __C declaration:__ @pixman_region64f_intersect_rect@
 
@@ -4533,10 +4533,10 @@ pixman_region64f_intersect_rect ::
      -- ^ __C declaration:__ @height@
   -> IO Pixman_bool_t
 pixman_region64f_intersect_rect =
-  hs_bindgen_7fd5f7980c8232f0
+  hs_bindgen_dfc5f9075a379683
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_intersect_rectf@
-foreign import ccall unsafe "hs_bindgen_b70cf01e3a03c94a" hs_bindgen_b70cf01e3a03c94a_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_intersect_rectf@
+foreign import ccall unsafe "hs_bindgen_fe7367e228567ba8" hs_bindgen_fe7367e228567ba8_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> Double
@@ -4545,8 +4545,8 @@ foreign import ccall unsafe "hs_bindgen_b70cf01e3a03c94a" hs_bindgen_b70cf01e3a0
   -> Double
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_intersect_rectf@
-hs_bindgen_b70cf01e3a03c94a ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_intersect_rectf@
+hs_bindgen_fe7367e228567ba8 ::
      RIP.Ptr Pixman_region64f_t
   -> PtrConst.PtrConst Pixman_region64f_t
   -> RIP.CDouble
@@ -4554,8 +4554,8 @@ hs_bindgen_b70cf01e3a03c94a ::
   -> RIP.CDouble
   -> RIP.CDouble
   -> IO Pixman_bool_t
-hs_bindgen_b70cf01e3a03c94a =
-  RIP.fromFFIType hs_bindgen_b70cf01e3a03c94a_base
+hs_bindgen_fe7367e228567ba8 =
+  RIP.fromFFIType hs_bindgen_fe7367e228567ba8_base
 
 {-| __C declaration:__ @pixman_region64f_intersect_rectf@
 
@@ -4578,10 +4578,10 @@ pixman_region64f_intersect_rectf ::
      -- ^ __C declaration:__ @height@
   -> IO Pixman_bool_t
 pixman_region64f_intersect_rectf =
-  hs_bindgen_b70cf01e3a03c94a
+  hs_bindgen_fe7367e228567ba8
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_union_rect@
-foreign import ccall unsafe "hs_bindgen_a8bbd0a1113bce09" hs_bindgen_a8bbd0a1113bce09_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_union_rect@
+foreign import ccall unsafe "hs_bindgen_c09116814ccf1d80" hs_bindgen_c09116814ccf1d80_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Int32
@@ -4590,8 +4590,8 @@ foreign import ccall unsafe "hs_bindgen_a8bbd0a1113bce09" hs_bindgen_a8bbd0a1113
   -> RIP.Word32
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_union_rect@
-hs_bindgen_a8bbd0a1113bce09 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_union_rect@
+hs_bindgen_c09116814ccf1d80 ::
      RIP.Ptr Pixman_region64f_t
   -> PtrConst.PtrConst Pixman_region64f_t
   -> RIP.CInt
@@ -4599,8 +4599,8 @@ hs_bindgen_a8bbd0a1113bce09 ::
   -> RIP.CUInt
   -> RIP.CUInt
   -> IO Pixman_bool_t
-hs_bindgen_a8bbd0a1113bce09 =
-  RIP.fromFFIType hs_bindgen_a8bbd0a1113bce09_base
+hs_bindgen_c09116814ccf1d80 =
+  RIP.fromFFIType hs_bindgen_c09116814ccf1d80_base
 
 {-| __C declaration:__ @pixman_region64f_union_rect@
 
@@ -4623,10 +4623,10 @@ pixman_region64f_union_rect ::
      -- ^ __C declaration:__ @height@
   -> IO Pixman_bool_t
 pixman_region64f_union_rect =
-  hs_bindgen_a8bbd0a1113bce09
+  hs_bindgen_c09116814ccf1d80
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_union_rectf@
-foreign import ccall unsafe "hs_bindgen_289b6dfa1a70fa66" hs_bindgen_289b6dfa1a70fa66_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_union_rectf@
+foreign import ccall unsafe "hs_bindgen_0a5e031ab78f556f" hs_bindgen_0a5e031ab78f556f_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> Double
@@ -4635,8 +4635,8 @@ foreign import ccall unsafe "hs_bindgen_289b6dfa1a70fa66" hs_bindgen_289b6dfa1a7
   -> Double
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_union_rectf@
-hs_bindgen_289b6dfa1a70fa66 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_union_rectf@
+hs_bindgen_0a5e031ab78f556f ::
      RIP.Ptr Pixman_region64f_t
   -> PtrConst.PtrConst Pixman_region64f_t
   -> RIP.CDouble
@@ -4644,8 +4644,8 @@ hs_bindgen_289b6dfa1a70fa66 ::
   -> RIP.CDouble
   -> RIP.CDouble
   -> IO Pixman_bool_t
-hs_bindgen_289b6dfa1a70fa66 =
-  RIP.fromFFIType hs_bindgen_289b6dfa1a70fa66_base
+hs_bindgen_0a5e031ab78f556f =
+  RIP.fromFFIType hs_bindgen_0a5e031ab78f556f_base
 
 {-| __C declaration:__ @pixman_region64f_union_rectf@
 
@@ -4668,23 +4668,23 @@ pixman_region64f_union_rectf ::
      -- ^ __C declaration:__ @height@
   -> IO Pixman_bool_t
 pixman_region64f_union_rectf =
-  hs_bindgen_289b6dfa1a70fa66
+  hs_bindgen_0a5e031ab78f556f
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_subtract@
-foreign import ccall unsafe "hs_bindgen_2686d28a5a7f1b20" hs_bindgen_2686d28a5a7f1b20_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_subtract@
+foreign import ccall unsafe "hs_bindgen_1cd246d7a6111c08" hs_bindgen_1cd246d7a6111c08_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_subtract@
-hs_bindgen_2686d28a5a7f1b20 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_subtract@
+hs_bindgen_1cd246d7a6111c08 ::
      RIP.Ptr Pixman_region64f_t
   -> PtrConst.PtrConst Pixman_region64f_t
   -> PtrConst.PtrConst Pixman_region64f_t
   -> IO Pixman_bool_t
-hs_bindgen_2686d28a5a7f1b20 =
-  RIP.fromFFIType hs_bindgen_2686d28a5a7f1b20_base
+hs_bindgen_1cd246d7a6111c08 =
+  RIP.fromFFIType hs_bindgen_1cd246d7a6111c08_base
 
 {-| __C declaration:__ @pixman_region64f_subtract@
 
@@ -4701,23 +4701,23 @@ pixman_region64f_subtract ::
      -- ^ __C declaration:__ @reg_s@
   -> IO Pixman_bool_t
 pixman_region64f_subtract =
-  hs_bindgen_2686d28a5a7f1b20
+  hs_bindgen_1cd246d7a6111c08
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_inverse@
-foreign import ccall unsafe "hs_bindgen_60330acd24477d9f" hs_bindgen_60330acd24477d9f_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_inverse@
+foreign import ccall unsafe "hs_bindgen_4286c3ecf19e61c5" hs_bindgen_4286c3ecf19e61c5_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_inverse@
-hs_bindgen_60330acd24477d9f ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_inverse@
+hs_bindgen_4286c3ecf19e61c5 ::
      RIP.Ptr Pixman_region64f_t
   -> PtrConst.PtrConst Pixman_region64f_t
   -> PtrConst.PtrConst Pixman_box64f_t
   -> IO Pixman_bool_t
-hs_bindgen_60330acd24477d9f =
-  RIP.fromFFIType hs_bindgen_60330acd24477d9f_base
+hs_bindgen_4286c3ecf19e61c5 =
+  RIP.fromFFIType hs_bindgen_4286c3ecf19e61c5_base
 
 {-| __C declaration:__ @pixman_region64f_inverse@
 
@@ -4734,25 +4734,25 @@ pixman_region64f_inverse ::
      -- ^ __C declaration:__ @inv_rect@
   -> IO Pixman_bool_t
 pixman_region64f_inverse =
-  hs_bindgen_60330acd24477d9f
+  hs_bindgen_4286c3ecf19e61c5
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_contains_point@
-foreign import ccall unsafe "hs_bindgen_5ccb0115bd39a1de" hs_bindgen_5ccb0115bd39a1de_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_contains_point@
+foreign import ccall unsafe "hs_bindgen_3586d64b39f437ba" hs_bindgen_3586d64b39f437ba_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_contains_point@
-hs_bindgen_5ccb0115bd39a1de ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_contains_point@
+hs_bindgen_3586d64b39f437ba ::
      PtrConst.PtrConst Pixman_region64f_t
   -> RIP.CInt
   -> RIP.CInt
   -> RIP.Ptr Pixman_box64f_t
   -> IO Pixman_bool_t
-hs_bindgen_5ccb0115bd39a1de =
-  RIP.fromFFIType hs_bindgen_5ccb0115bd39a1de_base
+hs_bindgen_3586d64b39f437ba =
+  RIP.fromFFIType hs_bindgen_3586d64b39f437ba_base
 
 {-| __C declaration:__ @pixman_region64f_contains_point@
 
@@ -4771,25 +4771,25 @@ pixman_region64f_contains_point ::
      -- ^ __C declaration:__ @box@
   -> IO Pixman_bool_t
 pixman_region64f_contains_point =
-  hs_bindgen_5ccb0115bd39a1de
+  hs_bindgen_3586d64b39f437ba
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_contains_pointf@
-foreign import ccall unsafe "hs_bindgen_21c71abdcb70de24" hs_bindgen_21c71abdcb70de24_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_contains_pointf@
+foreign import ccall unsafe "hs_bindgen_0156d17b0429279c" hs_bindgen_0156d17b0429279c_base ::
      RIP.Ptr RIP.Void
   -> Double
   -> Double
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_contains_pointf@
-hs_bindgen_21c71abdcb70de24 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_contains_pointf@
+hs_bindgen_0156d17b0429279c ::
      PtrConst.PtrConst Pixman_region64f_t
   -> RIP.CDouble
   -> RIP.CDouble
   -> RIP.Ptr Pixman_box64f_t
   -> IO Pixman_bool_t
-hs_bindgen_21c71abdcb70de24 =
-  RIP.fromFFIType hs_bindgen_21c71abdcb70de24_base
+hs_bindgen_0156d17b0429279c =
+  RIP.fromFFIType hs_bindgen_0156d17b0429279c_base
 
 {-| __C declaration:__ @pixman_region64f_contains_pointf@
 
@@ -4808,21 +4808,21 @@ pixman_region64f_contains_pointf ::
      -- ^ __C declaration:__ @box@
   -> IO Pixman_bool_t
 pixman_region64f_contains_pointf =
-  hs_bindgen_21c71abdcb70de24
+  hs_bindgen_0156d17b0429279c
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_contains_rectangle@
-foreign import ccall unsafe "hs_bindgen_1a5e48c55ba86760" hs_bindgen_1a5e48c55ba86760_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_contains_rectangle@
+foreign import ccall unsafe "hs_bindgen_6a0b5d88cfc7f0b7" hs_bindgen_6a0b5d88cfc7f0b7_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_contains_rectangle@
-hs_bindgen_1a5e48c55ba86760 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_contains_rectangle@
+hs_bindgen_6a0b5d88cfc7f0b7 ::
      PtrConst.PtrConst Pixman_region64f_t
   -> PtrConst.PtrConst Pixman_box64f_t
   -> IO Pixman_region_overlap_t
-hs_bindgen_1a5e48c55ba86760 =
-  RIP.fromFFIType hs_bindgen_1a5e48c55ba86760_base
+hs_bindgen_6a0b5d88cfc7f0b7 =
+  RIP.fromFFIType hs_bindgen_6a0b5d88cfc7f0b7_base
 
 {-| __C declaration:__ @pixman_region64f_contains_rectangle@
 
@@ -4837,19 +4837,19 @@ pixman_region64f_contains_rectangle ::
      -- ^ __C declaration:__ @prect@
   -> IO Pixman_region_overlap_t
 pixman_region64f_contains_rectangle =
-  hs_bindgen_1a5e48c55ba86760
+  hs_bindgen_6a0b5d88cfc7f0b7
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_empty@
-foreign import ccall unsafe "hs_bindgen_38b16f065ada117d" hs_bindgen_38b16f065ada117d_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_empty@
+foreign import ccall unsafe "hs_bindgen_210a79751254a8a9" hs_bindgen_210a79751254a8a9_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_empty@
-hs_bindgen_38b16f065ada117d ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_empty@
+hs_bindgen_210a79751254a8a9 ::
      PtrConst.PtrConst Pixman_region64f_t
   -> IO Pixman_bool_t
-hs_bindgen_38b16f065ada117d =
-  RIP.fromFFIType hs_bindgen_38b16f065ada117d_base
+hs_bindgen_210a79751254a8a9 =
+  RIP.fromFFIType hs_bindgen_210a79751254a8a9_base
 
 {-| __C declaration:__ @pixman_region64f_empty@
 
@@ -4861,19 +4861,19 @@ pixman_region64f_empty ::
      PtrConst.PtrConst Pixman_region64f_t
      -- ^ __C declaration:__ @region@
   -> IO Pixman_bool_t
-pixman_region64f_empty = hs_bindgen_38b16f065ada117d
+pixman_region64f_empty = hs_bindgen_210a79751254a8a9
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_not_empty@
-foreign import ccall unsafe "hs_bindgen_fda44b2b1ca71185" hs_bindgen_fda44b2b1ca71185_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_not_empty@
+foreign import ccall unsafe "hs_bindgen_c0ca8ab3e83a9b90" hs_bindgen_c0ca8ab3e83a9b90_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_not_empty@
-hs_bindgen_fda44b2b1ca71185 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_not_empty@
+hs_bindgen_c0ca8ab3e83a9b90 ::
      PtrConst.PtrConst Pixman_region64f_t
   -> IO Pixman_bool_t
-hs_bindgen_fda44b2b1ca71185 =
-  RIP.fromFFIType hs_bindgen_fda44b2b1ca71185_base
+hs_bindgen_c0ca8ab3e83a9b90 =
+  RIP.fromFFIType hs_bindgen_c0ca8ab3e83a9b90_base
 
 {-| __C declaration:__ @pixman_region64f_not_empty@
 
@@ -4886,19 +4886,19 @@ pixman_region64f_not_empty ::
      -- ^ __C declaration:__ @region@
   -> IO Pixman_bool_t
 pixman_region64f_not_empty =
-  hs_bindgen_fda44b2b1ca71185
+  hs_bindgen_c0ca8ab3e83a9b90
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_extents@
-foreign import ccall unsafe "hs_bindgen_f4c76499386df33f" hs_bindgen_f4c76499386df33f_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_extents@
+foreign import ccall unsafe "hs_bindgen_350d46bb2a18c15f" hs_bindgen_350d46bb2a18c15f_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_extents@
-hs_bindgen_f4c76499386df33f ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_extents@
+hs_bindgen_350d46bb2a18c15f ::
      PtrConst.PtrConst Pixman_region64f_t
   -> IO (RIP.Ptr Pixman_box64f_t)
-hs_bindgen_f4c76499386df33f =
-  RIP.fromFFIType hs_bindgen_f4c76499386df33f_base
+hs_bindgen_350d46bb2a18c15f =
+  RIP.fromFFIType hs_bindgen_350d46bb2a18c15f_base
 
 {-| __C declaration:__ @pixman_region64f_extents@
 
@@ -4911,19 +4911,19 @@ pixman_region64f_extents ::
      -- ^ __C declaration:__ @region@
   -> IO (RIP.Ptr Pixman_box64f_t)
 pixman_region64f_extents =
-  hs_bindgen_f4c76499386df33f
+  hs_bindgen_350d46bb2a18c15f
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_n_rects@
-foreign import ccall unsafe "hs_bindgen_7b9774c629b4e311" hs_bindgen_7b9774c629b4e311_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_n_rects@
+foreign import ccall unsafe "hs_bindgen_a8f4307c1dc3f679" hs_bindgen_a8f4307c1dc3f679_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_n_rects@
-hs_bindgen_7b9774c629b4e311 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_n_rects@
+hs_bindgen_a8f4307c1dc3f679 ::
      PtrConst.PtrConst Pixman_region64f_t
   -> IO RIP.CInt
-hs_bindgen_7b9774c629b4e311 =
-  RIP.fromFFIType hs_bindgen_7b9774c629b4e311_base
+hs_bindgen_a8f4307c1dc3f679 =
+  RIP.fromFFIType hs_bindgen_a8f4307c1dc3f679_base
 
 {-| __C declaration:__ @pixman_region64f_n_rects@
 
@@ -4936,21 +4936,21 @@ pixman_region64f_n_rects ::
      -- ^ __C declaration:__ @region@
   -> IO RIP.CInt
 pixman_region64f_n_rects =
-  hs_bindgen_7b9774c629b4e311
+  hs_bindgen_a8f4307c1dc3f679
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_rectangles@
-foreign import ccall unsafe "hs_bindgen_a854cc7e9e176d85" hs_bindgen_a854cc7e9e176d85_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_rectangles@
+foreign import ccall unsafe "hs_bindgen_67a5a38558ce0ac2" hs_bindgen_67a5a38558ce0ac2_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_rectangles@
-hs_bindgen_a854cc7e9e176d85 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_rectangles@
+hs_bindgen_67a5a38558ce0ac2 ::
      PtrConst.PtrConst Pixman_region64f_t
   -> RIP.Ptr RIP.CInt
   -> IO (RIP.Ptr Pixman_box64f_t)
-hs_bindgen_a854cc7e9e176d85 =
-  RIP.fromFFIType hs_bindgen_a854cc7e9e176d85_base
+hs_bindgen_67a5a38558ce0ac2 =
+  RIP.fromFFIType hs_bindgen_67a5a38558ce0ac2_base
 
 {-| __C declaration:__ @pixman_region64f_rectangles@
 
@@ -4965,21 +4965,21 @@ pixman_region64f_rectangles ::
      -- ^ __C declaration:__ @n_rects@
   -> IO (RIP.Ptr Pixman_box64f_t)
 pixman_region64f_rectangles =
-  hs_bindgen_a854cc7e9e176d85
+  hs_bindgen_67a5a38558ce0ac2
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_equal@
-foreign import ccall unsafe "hs_bindgen_7b0403d74f3860a3" hs_bindgen_7b0403d74f3860a3_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_equal@
+foreign import ccall unsafe "hs_bindgen_6981dcd8f9b770d7" hs_bindgen_6981dcd8f9b770d7_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_equal@
-hs_bindgen_7b0403d74f3860a3 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_equal@
+hs_bindgen_6981dcd8f9b770d7 ::
      PtrConst.PtrConst Pixman_region64f_t
   -> PtrConst.PtrConst Pixman_region64f_t
   -> IO Pixman_bool_t
-hs_bindgen_7b0403d74f3860a3 =
-  RIP.fromFFIType hs_bindgen_7b0403d74f3860a3_base
+hs_bindgen_6981dcd8f9b770d7 =
+  RIP.fromFFIType hs_bindgen_6981dcd8f9b770d7_base
 
 {-| __C declaration:__ @pixman_region64f_equal@
 
@@ -4993,19 +4993,19 @@ pixman_region64f_equal ::
   -> PtrConst.PtrConst Pixman_region64f_t
      -- ^ __C declaration:__ @region2@
   -> IO Pixman_bool_t
-pixman_region64f_equal = hs_bindgen_7b0403d74f3860a3
+pixman_region64f_equal = hs_bindgen_6981dcd8f9b770d7
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_selfcheck@
-foreign import ccall unsafe "hs_bindgen_7224fa4d4eab4212" hs_bindgen_7224fa4d4eab4212_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_selfcheck@
+foreign import ccall unsafe "hs_bindgen_561ca6ca7e7f5252" hs_bindgen_561ca6ca7e7f5252_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_selfcheck@
-hs_bindgen_7224fa4d4eab4212 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_selfcheck@
+hs_bindgen_561ca6ca7e7f5252 ::
      RIP.Ptr Pixman_region64f_t
   -> IO Pixman_bool_t
-hs_bindgen_7224fa4d4eab4212 =
-  RIP.fromFFIType hs_bindgen_7224fa4d4eab4212_base
+hs_bindgen_561ca6ca7e7f5252 =
+  RIP.fromFFIType hs_bindgen_561ca6ca7e7f5252_base
 
 {-| __C declaration:__ @pixman_region64f_selfcheck@
 
@@ -5018,21 +5018,21 @@ pixman_region64f_selfcheck ::
      -- ^ __C declaration:__ @region@
   -> IO Pixman_bool_t
 pixman_region64f_selfcheck =
-  hs_bindgen_7224fa4d4eab4212
+  hs_bindgen_561ca6ca7e7f5252
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_reset@
-foreign import ccall unsafe "hs_bindgen_748045251552d712" hs_bindgen_748045251552d712_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_reset@
+foreign import ccall unsafe "hs_bindgen_cb6110f846ba90bb" hs_bindgen_cb6110f846ba90bb_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_reset@
-hs_bindgen_748045251552d712 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_reset@
+hs_bindgen_cb6110f846ba90bb ::
      RIP.Ptr Pixman_region64f_t
   -> PtrConst.PtrConst Pixman_box64f_t
   -> IO ()
-hs_bindgen_748045251552d712 =
-  RIP.fromFFIType hs_bindgen_748045251552d712_base
+hs_bindgen_cb6110f846ba90bb =
+  RIP.fromFFIType hs_bindgen_cb6110f846ba90bb_base
 
 {-| __C declaration:__ @pixman_region64f_reset@
 
@@ -5046,19 +5046,19 @@ pixman_region64f_reset ::
   -> PtrConst.PtrConst Pixman_box64f_t
      -- ^ __C declaration:__ @box@
   -> IO ()
-pixman_region64f_reset = hs_bindgen_748045251552d712
+pixman_region64f_reset = hs_bindgen_cb6110f846ba90bb
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_clear@
-foreign import ccall unsafe "hs_bindgen_42e1bd9ce9da53b1" hs_bindgen_42e1bd9ce9da53b1_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_clear@
+foreign import ccall unsafe "hs_bindgen_b1faac0c1ce28ddd" hs_bindgen_b1faac0c1ce28ddd_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_region64f_clear@
-hs_bindgen_42e1bd9ce9da53b1 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_region64f_clear@
+hs_bindgen_b1faac0c1ce28ddd ::
      RIP.Ptr Pixman_region64f_t
   -> IO ()
-hs_bindgen_42e1bd9ce9da53b1 =
-  RIP.fromFFIType hs_bindgen_42e1bd9ce9da53b1_base
+hs_bindgen_b1faac0c1ce28ddd =
+  RIP.fromFFIType hs_bindgen_b1faac0c1ce28ddd_base
 
 {-| __C declaration:__ @pixman_region64f_clear@
 
@@ -5070,10 +5070,10 @@ pixman_region64f_clear ::
      RIP.Ptr Pixman_region64f_t
      -- ^ __C declaration:__ @region@
   -> IO ()
-pixman_region64f_clear = hs_bindgen_42e1bd9ce9da53b1
+pixman_region64f_clear = hs_bindgen_b1faac0c1ce28ddd
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_blt@
-foreign import ccall unsafe "hs_bindgen_114720d00b414b32" hs_bindgen_114720d00b414b32_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_blt@
+foreign import ccall unsafe "hs_bindgen_cd4a3ebac6feaa6b" hs_bindgen_cd4a3ebac6feaa6b_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Int32
@@ -5088,8 +5088,8 @@ foreign import ccall unsafe "hs_bindgen_114720d00b414b32" hs_bindgen_114720d00b4
   -> RIP.Int32
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_blt@
-hs_bindgen_114720d00b414b32 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_blt@
+hs_bindgen_cd4a3ebac6feaa6b ::
      RIP.Ptr HsBindgen.Runtime.LibC.Word32
   -> RIP.Ptr HsBindgen.Runtime.LibC.Word32
   -> RIP.CInt
@@ -5103,8 +5103,8 @@ hs_bindgen_114720d00b414b32 ::
   -> RIP.CInt
   -> RIP.CInt
   -> IO Pixman_bool_t
-hs_bindgen_114720d00b414b32 =
-  RIP.fromFFIType hs_bindgen_114720d00b414b32_base
+hs_bindgen_cd4a3ebac6feaa6b =
+  RIP.fromFFIType hs_bindgen_cd4a3ebac6feaa6b_base
 
 {-| __C declaration:__ @pixman_blt@
 
@@ -5138,10 +5138,10 @@ pixman_blt ::
   -> RIP.CInt
      -- ^ __C declaration:__ @height@
   -> IO Pixman_bool_t
-pixman_blt = hs_bindgen_114720d00b414b32
+pixman_blt = hs_bindgen_cd4a3ebac6feaa6b
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_fill@
-foreign import ccall unsafe "hs_bindgen_9fe8dfbafc0c22f9" hs_bindgen_9fe8dfbafc0c22f9_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_fill@
+foreign import ccall unsafe "hs_bindgen_de224fed3e6075a1" hs_bindgen_de224fed3e6075a1_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
@@ -5152,8 +5152,8 @@ foreign import ccall unsafe "hs_bindgen_9fe8dfbafc0c22f9" hs_bindgen_9fe8dfbafc0
   -> RIP.Word32
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_fill@
-hs_bindgen_9fe8dfbafc0c22f9 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_fill@
+hs_bindgen_de224fed3e6075a1 ::
      RIP.Ptr HsBindgen.Runtime.LibC.Word32
   -> RIP.CInt
   -> RIP.CInt
@@ -5163,8 +5163,8 @@ hs_bindgen_9fe8dfbafc0c22f9 ::
   -> RIP.CInt
   -> HsBindgen.Runtime.LibC.Word32
   -> IO Pixman_bool_t
-hs_bindgen_9fe8dfbafc0c22f9 =
-  RIP.fromFFIType hs_bindgen_9fe8dfbafc0c22f9_base
+hs_bindgen_de224fed3e6075a1 =
+  RIP.fromFFIType hs_bindgen_de224fed3e6075a1_base
 
 {-| __C declaration:__ @pixman_fill@
 
@@ -5190,16 +5190,16 @@ pixman_fill ::
   -> HsBindgen.Runtime.LibC.Word32
      -- ^ __C declaration:__ @_xor@
   -> IO Pixman_bool_t
-pixman_fill = hs_bindgen_9fe8dfbafc0c22f9
+pixman_fill = hs_bindgen_de224fed3e6075a1
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_version@
-foreign import ccall unsafe "hs_bindgen_51103296059e1228" hs_bindgen_51103296059e1228_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_version@
+foreign import ccall unsafe "hs_bindgen_9b845398f7b32954" hs_bindgen_9b845398f7b32954_base ::
      IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_version@
-hs_bindgen_51103296059e1228 :: IO RIP.CInt
-hs_bindgen_51103296059e1228 =
-  RIP.fromFFIType hs_bindgen_51103296059e1228_base
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_version@
+hs_bindgen_9b845398f7b32954 :: IO RIP.CInt
+hs_bindgen_9b845398f7b32954 =
+  RIP.fromFFIType hs_bindgen_9b845398f7b32954_base
 
 {-| __C declaration:__ @pixman_version@
 
@@ -5208,16 +5208,16 @@ hs_bindgen_51103296059e1228 =
     __exported by:__ @pixman.h@
 -}
 pixman_version :: IO RIP.CInt
-pixman_version = hs_bindgen_51103296059e1228
+pixman_version = hs_bindgen_9b845398f7b32954
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_version_string@
-foreign import ccall unsafe "hs_bindgen_8b5e66565e425d79" hs_bindgen_8b5e66565e425d79_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_version_string@
+foreign import ccall unsafe "hs_bindgen_91c834578fe1cf77" hs_bindgen_91c834578fe1cf77_base ::
      IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_version_string@
-hs_bindgen_8b5e66565e425d79 :: IO (PtrConst.PtrConst RIP.CChar)
-hs_bindgen_8b5e66565e425d79 =
-  RIP.fromFFIType hs_bindgen_8b5e66565e425d79_base
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_version_string@
+hs_bindgen_91c834578fe1cf77 :: IO (PtrConst.PtrConst RIP.CChar)
+hs_bindgen_91c834578fe1cf77 =
+  RIP.fromFFIType hs_bindgen_91c834578fe1cf77_base
 
 {-| __C declaration:__ @pixman_version_string@
 
@@ -5226,19 +5226,19 @@ hs_bindgen_8b5e66565e425d79 =
     __exported by:__ @pixman.h@
 -}
 pixman_version_string :: IO (PtrConst.PtrConst RIP.CChar)
-pixman_version_string = hs_bindgen_8b5e66565e425d79
+pixman_version_string = hs_bindgen_91c834578fe1cf77
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_format_supported_destination@
-foreign import ccall unsafe "hs_bindgen_7232fe4030c3805a" hs_bindgen_7232fe4030c3805a_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_format_supported_destination@
+foreign import ccall unsafe "hs_bindgen_ab807779ff357e7b" hs_bindgen_ab807779ff357e7b_base ::
      RIP.Word32
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_format_supported_destination@
-hs_bindgen_7232fe4030c3805a ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_format_supported_destination@
+hs_bindgen_ab807779ff357e7b ::
      Pixman_format_code_t
   -> IO Pixman_bool_t
-hs_bindgen_7232fe4030c3805a =
-  RIP.fromFFIType hs_bindgen_7232fe4030c3805a_base
+hs_bindgen_ab807779ff357e7b =
+  RIP.fromFFIType hs_bindgen_ab807779ff357e7b_base
 
 {-| __C declaration:__ @pixman_format_supported_destination@
 
@@ -5251,19 +5251,19 @@ pixman_format_supported_destination ::
      -- ^ __C declaration:__ @format@
   -> IO Pixman_bool_t
 pixman_format_supported_destination =
-  hs_bindgen_7232fe4030c3805a
+  hs_bindgen_ab807779ff357e7b
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_format_supported_source@
-foreign import ccall unsafe "hs_bindgen_be0ea2840846a7d7" hs_bindgen_be0ea2840846a7d7_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_format_supported_source@
+foreign import ccall unsafe "hs_bindgen_a47b4ef4c05be526" hs_bindgen_a47b4ef4c05be526_base ::
      RIP.Word32
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_format_supported_source@
-hs_bindgen_be0ea2840846a7d7 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_format_supported_source@
+hs_bindgen_a47b4ef4c05be526 ::
      Pixman_format_code_t
   -> IO Pixman_bool_t
-hs_bindgen_be0ea2840846a7d7 =
-  RIP.fromFFIType hs_bindgen_be0ea2840846a7d7_base
+hs_bindgen_a47b4ef4c05be526 =
+  RIP.fromFFIType hs_bindgen_a47b4ef4c05be526_base
 
 {-| __C declaration:__ @pixman_format_supported_source@
 
@@ -5276,19 +5276,19 @@ pixman_format_supported_source ::
      -- ^ __C declaration:__ @format@
   -> IO Pixman_bool_t
 pixman_format_supported_source =
-  hs_bindgen_be0ea2840846a7d7
+  hs_bindgen_a47b4ef4c05be526
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_create_solid_fill@
-foreign import ccall unsafe "hs_bindgen_9ba5eba1f1c2a664" hs_bindgen_9ba5eba1f1c2a664_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_create_solid_fill@
+foreign import ccall unsafe "hs_bindgen_88d94c651777b94a" hs_bindgen_88d94c651777b94a_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_create_solid_fill@
-hs_bindgen_9ba5eba1f1c2a664 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_create_solid_fill@
+hs_bindgen_88d94c651777b94a ::
      PtrConst.PtrConst Pixman_color_t
   -> IO (RIP.Ptr Pixman_image_t)
-hs_bindgen_9ba5eba1f1c2a664 =
-  RIP.fromFFIType hs_bindgen_9ba5eba1f1c2a664_base
+hs_bindgen_88d94c651777b94a =
+  RIP.fromFFIType hs_bindgen_88d94c651777b94a_base
 
 {-| __C declaration:__ @pixman_image_create_solid_fill@
 
@@ -5301,25 +5301,25 @@ pixman_image_create_solid_fill ::
      -- ^ __C declaration:__ @color@
   -> IO (RIP.Ptr Pixman_image_t)
 pixman_image_create_solid_fill =
-  hs_bindgen_9ba5eba1f1c2a664
+  hs_bindgen_88d94c651777b94a
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_create_linear_gradient@
-foreign import ccall unsafe "hs_bindgen_c4c0ebb0dde80837" hs_bindgen_c4c0ebb0dde80837_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_create_linear_gradient@
+foreign import ccall unsafe "hs_bindgen_8a86d47f7d09b9ba" hs_bindgen_8a86d47f7d09b9ba_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Int32
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_create_linear_gradient@
-hs_bindgen_c4c0ebb0dde80837 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_create_linear_gradient@
+hs_bindgen_8a86d47f7d09b9ba ::
      PtrConst.PtrConst Pixman_point_fixed_t
   -> PtrConst.PtrConst Pixman_point_fixed_t
   -> PtrConst.PtrConst Pixman_gradient_stop_t
   -> RIP.CInt
   -> IO (RIP.Ptr Pixman_image_t)
-hs_bindgen_c4c0ebb0dde80837 =
-  RIP.fromFFIType hs_bindgen_c4c0ebb0dde80837_base
+hs_bindgen_8a86d47f7d09b9ba =
+  RIP.fromFFIType hs_bindgen_8a86d47f7d09b9ba_base
 
 {-| __C declaration:__ @pixman_image_create_linear_gradient@
 
@@ -5338,10 +5338,10 @@ pixman_image_create_linear_gradient ::
      -- ^ __C declaration:__ @n_stops@
   -> IO (RIP.Ptr Pixman_image_t)
 pixman_image_create_linear_gradient =
-  hs_bindgen_c4c0ebb0dde80837
+  hs_bindgen_8a86d47f7d09b9ba
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_create_radial_gradient@
-foreign import ccall unsafe "hs_bindgen_e8e8ba9b8214f9a1" hs_bindgen_e8e8ba9b8214f9a1_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_create_radial_gradient@
+foreign import ccall unsafe "hs_bindgen_99980a61019207e3" hs_bindgen_99980a61019207e3_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Int32
@@ -5350,8 +5350,8 @@ foreign import ccall unsafe "hs_bindgen_e8e8ba9b8214f9a1" hs_bindgen_e8e8ba9b821
   -> RIP.Int32
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_create_radial_gradient@
-hs_bindgen_e8e8ba9b8214f9a1 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_create_radial_gradient@
+hs_bindgen_99980a61019207e3 ::
      PtrConst.PtrConst Pixman_point_fixed_t
   -> PtrConst.PtrConst Pixman_point_fixed_t
   -> Pixman_fixed_t
@@ -5359,8 +5359,8 @@ hs_bindgen_e8e8ba9b8214f9a1 ::
   -> PtrConst.PtrConst Pixman_gradient_stop_t
   -> RIP.CInt
   -> IO (RIP.Ptr Pixman_image_t)
-hs_bindgen_e8e8ba9b8214f9a1 =
-  RIP.fromFFIType hs_bindgen_e8e8ba9b8214f9a1_base
+hs_bindgen_99980a61019207e3 =
+  RIP.fromFFIType hs_bindgen_99980a61019207e3_base
 
 {-| __C declaration:__ @pixman_image_create_radial_gradient@
 
@@ -5383,25 +5383,25 @@ pixman_image_create_radial_gradient ::
      -- ^ __C declaration:__ @n_stops@
   -> IO (RIP.Ptr Pixman_image_t)
 pixman_image_create_radial_gradient =
-  hs_bindgen_e8e8ba9b8214f9a1
+  hs_bindgen_99980a61019207e3
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_create_conical_gradient@
-foreign import ccall unsafe "hs_bindgen_a38daa420b25a6ff" hs_bindgen_a38daa420b25a6ff_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_create_conical_gradient@
+foreign import ccall unsafe "hs_bindgen_5900e94f7bb2cd87" hs_bindgen_5900e94f7bb2cd87_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Ptr RIP.Void
   -> RIP.Int32
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_create_conical_gradient@
-hs_bindgen_a38daa420b25a6ff ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_create_conical_gradient@
+hs_bindgen_5900e94f7bb2cd87 ::
      PtrConst.PtrConst Pixman_point_fixed_t
   -> Pixman_fixed_t
   -> PtrConst.PtrConst Pixman_gradient_stop_t
   -> RIP.CInt
   -> IO (RIP.Ptr Pixman_image_t)
-hs_bindgen_a38daa420b25a6ff =
-  RIP.fromFFIType hs_bindgen_a38daa420b25a6ff_base
+hs_bindgen_5900e94f7bb2cd87 =
+  RIP.fromFFIType hs_bindgen_5900e94f7bb2cd87_base
 
 {-| __C declaration:__ @pixman_image_create_conical_gradient@
 
@@ -5420,10 +5420,10 @@ pixman_image_create_conical_gradient ::
      -- ^ __C declaration:__ @n_stops@
   -> IO (RIP.Ptr Pixman_image_t)
 pixman_image_create_conical_gradient =
-  hs_bindgen_a38daa420b25a6ff
+  hs_bindgen_5900e94f7bb2cd87
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_create_bits@
-foreign import ccall unsafe "hs_bindgen_0aa98f3558bcd807" hs_bindgen_0aa98f3558bcd807_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_create_bits@
+foreign import ccall unsafe "hs_bindgen_1762a519e07c6c17" hs_bindgen_1762a519e07c6c17_base ::
      RIP.Word32
   -> RIP.Int32
   -> RIP.Int32
@@ -5431,16 +5431,16 @@ foreign import ccall unsafe "hs_bindgen_0aa98f3558bcd807" hs_bindgen_0aa98f3558b
   -> RIP.Int32
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_create_bits@
-hs_bindgen_0aa98f3558bcd807 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_create_bits@
+hs_bindgen_1762a519e07c6c17 ::
      Pixman_format_code_t
   -> RIP.CInt
   -> RIP.CInt
   -> RIP.Ptr HsBindgen.Runtime.LibC.Word32
   -> RIP.CInt
   -> IO (RIP.Ptr Pixman_image_t)
-hs_bindgen_0aa98f3558bcd807 =
-  RIP.fromFFIType hs_bindgen_0aa98f3558bcd807_base
+hs_bindgen_1762a519e07c6c17 =
+  RIP.fromFFIType hs_bindgen_1762a519e07c6c17_base
 
 {-| __C declaration:__ @pixman_image_create_bits@
 
@@ -5461,10 +5461,10 @@ pixman_image_create_bits ::
      -- ^ __C declaration:__ @rowstride_bytes@
   -> IO (RIP.Ptr Pixman_image_t)
 pixman_image_create_bits =
-  hs_bindgen_0aa98f3558bcd807
+  hs_bindgen_1762a519e07c6c17
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_create_bits_no_clear@
-foreign import ccall unsafe "hs_bindgen_6404f8132b864d11" hs_bindgen_6404f8132b864d11_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_create_bits_no_clear@
+foreign import ccall unsafe "hs_bindgen_52135524e6f03505" hs_bindgen_52135524e6f03505_base ::
      RIP.Word32
   -> RIP.Int32
   -> RIP.Int32
@@ -5472,16 +5472,16 @@ foreign import ccall unsafe "hs_bindgen_6404f8132b864d11" hs_bindgen_6404f8132b8
   -> RIP.Int32
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_create_bits_no_clear@
-hs_bindgen_6404f8132b864d11 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_create_bits_no_clear@
+hs_bindgen_52135524e6f03505 ::
      Pixman_format_code_t
   -> RIP.CInt
   -> RIP.CInt
   -> RIP.Ptr HsBindgen.Runtime.LibC.Word32
   -> RIP.CInt
   -> IO (RIP.Ptr Pixman_image_t)
-hs_bindgen_6404f8132b864d11 =
-  RIP.fromFFIType hs_bindgen_6404f8132b864d11_base
+hs_bindgen_52135524e6f03505 =
+  RIP.fromFFIType hs_bindgen_52135524e6f03505_base
 
 {-| __C declaration:__ @pixman_image_create_bits_no_clear@
 
@@ -5502,19 +5502,19 @@ pixman_image_create_bits_no_clear ::
      -- ^ __C declaration:__ @rowstride_bytes@
   -> IO (RIP.Ptr Pixman_image_t)
 pixman_image_create_bits_no_clear =
-  hs_bindgen_6404f8132b864d11
+  hs_bindgen_52135524e6f03505
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_ref@
-foreign import ccall unsafe "hs_bindgen_32fd96d463fc0f50" hs_bindgen_32fd96d463fc0f50_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_ref@
+foreign import ccall unsafe "hs_bindgen_e23c9fbbec95e19f" hs_bindgen_e23c9fbbec95e19f_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_ref@
-hs_bindgen_32fd96d463fc0f50 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_ref@
+hs_bindgen_e23c9fbbec95e19f ::
      RIP.Ptr Pixman_image_t
   -> IO (RIP.Ptr Pixman_image_t)
-hs_bindgen_32fd96d463fc0f50 =
-  RIP.fromFFIType hs_bindgen_32fd96d463fc0f50_base
+hs_bindgen_e23c9fbbec95e19f =
+  RIP.fromFFIType hs_bindgen_e23c9fbbec95e19f_base
 
 {-| __C declaration:__ @pixman_image_ref@
 
@@ -5526,19 +5526,19 @@ pixman_image_ref ::
      RIP.Ptr Pixman_image_t
      -- ^ __C declaration:__ @image@
   -> IO (RIP.Ptr Pixman_image_t)
-pixman_image_ref = hs_bindgen_32fd96d463fc0f50
+pixman_image_ref = hs_bindgen_e23c9fbbec95e19f
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_unref@
-foreign import ccall unsafe "hs_bindgen_4c5f6935faca53f6" hs_bindgen_4c5f6935faca53f6_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_unref@
+foreign import ccall unsafe "hs_bindgen_f67a17fff3431235" hs_bindgen_f67a17fff3431235_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_unref@
-hs_bindgen_4c5f6935faca53f6 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_unref@
+hs_bindgen_f67a17fff3431235 ::
      RIP.Ptr Pixman_image_t
   -> IO Pixman_bool_t
-hs_bindgen_4c5f6935faca53f6 =
-  RIP.fromFFIType hs_bindgen_4c5f6935faca53f6_base
+hs_bindgen_f67a17fff3431235 =
+  RIP.fromFFIType hs_bindgen_f67a17fff3431235_base
 
 {-| __C declaration:__ @pixman_image_unref@
 
@@ -5550,23 +5550,23 @@ pixman_image_unref ::
      RIP.Ptr Pixman_image_t
      -- ^ __C declaration:__ @image@
   -> IO Pixman_bool_t
-pixman_image_unref = hs_bindgen_4c5f6935faca53f6
+pixman_image_unref = hs_bindgen_f67a17fff3431235
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_destroy_function@
-foreign import ccall unsafe "hs_bindgen_2d5edc6ebb86bbeb" hs_bindgen_2d5edc6ebb86bbeb_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_destroy_function@
+foreign import ccall unsafe "hs_bindgen_d867f14a89c21da9" hs_bindgen_d867f14a89c21da9_base ::
      RIP.Ptr RIP.Void
   -> RIP.FunPtr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_destroy_function@
-hs_bindgen_2d5edc6ebb86bbeb ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_destroy_function@
+hs_bindgen_d867f14a89c21da9 ::
      RIP.Ptr Pixman_image_t
   -> Pixman_image_destroy_func_t
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_2d5edc6ebb86bbeb =
-  RIP.fromFFIType hs_bindgen_2d5edc6ebb86bbeb_base
+hs_bindgen_d867f14a89c21da9 =
+  RIP.fromFFIType hs_bindgen_d867f14a89c21da9_base
 
 {-| __C declaration:__ @pixman_image_set_destroy_function@
 
@@ -5583,19 +5583,19 @@ pixman_image_set_destroy_function ::
      -- ^ __C declaration:__ @data@
   -> IO ()
 pixman_image_set_destroy_function =
-  hs_bindgen_2d5edc6ebb86bbeb
+  hs_bindgen_d867f14a89c21da9
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_get_destroy_data@
-foreign import ccall unsafe "hs_bindgen_bceaa431ef0437e3" hs_bindgen_bceaa431ef0437e3_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_get_destroy_data@
+foreign import ccall unsafe "hs_bindgen_04ee8f0af70e58ae" hs_bindgen_04ee8f0af70e58ae_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_get_destroy_data@
-hs_bindgen_bceaa431ef0437e3 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_get_destroy_data@
+hs_bindgen_04ee8f0af70e58ae ::
      RIP.Ptr Pixman_image_t
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_bceaa431ef0437e3 =
-  RIP.fromFFIType hs_bindgen_bceaa431ef0437e3_base
+hs_bindgen_04ee8f0af70e58ae =
+  RIP.fromFFIType hs_bindgen_04ee8f0af70e58ae_base
 
 {-| __C declaration:__ @pixman_image_get_destroy_data@
 
@@ -5608,21 +5608,21 @@ pixman_image_get_destroy_data ::
      -- ^ __C declaration:__ @image@
   -> IO (RIP.Ptr RIP.Void)
 pixman_image_get_destroy_data =
-  hs_bindgen_bceaa431ef0437e3
+  hs_bindgen_04ee8f0af70e58ae
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_clip_region@
-foreign import ccall unsafe "hs_bindgen_74151f04643333cf" hs_bindgen_74151f04643333cf_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_clip_region@
+foreign import ccall unsafe "hs_bindgen_1f85eb51908d7409" hs_bindgen_1f85eb51908d7409_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_clip_region@
-hs_bindgen_74151f04643333cf ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_clip_region@
+hs_bindgen_1f85eb51908d7409 ::
      RIP.Ptr Pixman_image_t
   -> PtrConst.PtrConst Pixman_region16_t
   -> IO Pixman_bool_t
-hs_bindgen_74151f04643333cf =
-  RIP.fromFFIType hs_bindgen_74151f04643333cf_base
+hs_bindgen_1f85eb51908d7409 =
+  RIP.fromFFIType hs_bindgen_1f85eb51908d7409_base
 
 {-| __C declaration:__ @pixman_image_set_clip_region@
 
@@ -5637,21 +5637,21 @@ pixman_image_set_clip_region ::
      -- ^ __C declaration:__ @region@
   -> IO Pixman_bool_t
 pixman_image_set_clip_region =
-  hs_bindgen_74151f04643333cf
+  hs_bindgen_1f85eb51908d7409
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_clip_region32@
-foreign import ccall unsafe "hs_bindgen_bda2959e752162bf" hs_bindgen_bda2959e752162bf_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_clip_region32@
+foreign import ccall unsafe "hs_bindgen_1b6fdaa0af65c44d" hs_bindgen_1b6fdaa0af65c44d_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_clip_region32@
-hs_bindgen_bda2959e752162bf ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_clip_region32@
+hs_bindgen_1b6fdaa0af65c44d ::
      RIP.Ptr Pixman_image_t
   -> PtrConst.PtrConst Pixman_region32_t
   -> IO Pixman_bool_t
-hs_bindgen_bda2959e752162bf =
-  RIP.fromFFIType hs_bindgen_bda2959e752162bf_base
+hs_bindgen_1b6fdaa0af65c44d =
+  RIP.fromFFIType hs_bindgen_1b6fdaa0af65c44d_base
 
 {-| __C declaration:__ @pixman_image_set_clip_region32@
 
@@ -5666,21 +5666,21 @@ pixman_image_set_clip_region32 ::
      -- ^ __C declaration:__ @region@
   -> IO Pixman_bool_t
 pixman_image_set_clip_region32 =
-  hs_bindgen_bda2959e752162bf
+  hs_bindgen_1b6fdaa0af65c44d
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_clip_region64f@
-foreign import ccall unsafe "hs_bindgen_f85aa0a4b40bd63d" hs_bindgen_f85aa0a4b40bd63d_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_clip_region64f@
+foreign import ccall unsafe "hs_bindgen_d78ea3196c3b708a" hs_bindgen_d78ea3196c3b708a_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_clip_region64f@
-hs_bindgen_f85aa0a4b40bd63d ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_clip_region64f@
+hs_bindgen_d78ea3196c3b708a ::
      RIP.Ptr Pixman_image_t
   -> PtrConst.PtrConst Pixman_region64f_t
   -> IO Pixman_bool_t
-hs_bindgen_f85aa0a4b40bd63d =
-  RIP.fromFFIType hs_bindgen_f85aa0a4b40bd63d_base
+hs_bindgen_d78ea3196c3b708a =
+  RIP.fromFFIType hs_bindgen_d78ea3196c3b708a_base
 
 {-| __C declaration:__ @pixman_image_set_clip_region64f@
 
@@ -5695,21 +5695,21 @@ pixman_image_set_clip_region64f ::
      -- ^ __C declaration:__ @region@
   -> IO Pixman_bool_t
 pixman_image_set_clip_region64f =
-  hs_bindgen_f85aa0a4b40bd63d
+  hs_bindgen_d78ea3196c3b708a
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_has_client_clip@
-foreign import ccall unsafe "hs_bindgen_93a32f8d45b3a6b6" hs_bindgen_93a32f8d45b3a6b6_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_has_client_clip@
+foreign import ccall unsafe "hs_bindgen_1bb159789430fbb8" hs_bindgen_1bb159789430fbb8_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_has_client_clip@
-hs_bindgen_93a32f8d45b3a6b6 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_has_client_clip@
+hs_bindgen_1bb159789430fbb8 ::
      RIP.Ptr Pixman_image_t
   -> Pixman_bool_t
   -> IO ()
-hs_bindgen_93a32f8d45b3a6b6 =
-  RIP.fromFFIType hs_bindgen_93a32f8d45b3a6b6_base
+hs_bindgen_1bb159789430fbb8 =
+  RIP.fromFFIType hs_bindgen_1bb159789430fbb8_base
 
 {-| __C declaration:__ @pixman_image_set_has_client_clip@
 
@@ -5724,21 +5724,21 @@ pixman_image_set_has_client_clip ::
      -- ^ __C declaration:__ @clien_clip@
   -> IO ()
 pixman_image_set_has_client_clip =
-  hs_bindgen_93a32f8d45b3a6b6
+  hs_bindgen_1bb159789430fbb8
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_transform@
-foreign import ccall unsafe "hs_bindgen_aa1c5916abd1ff8c" hs_bindgen_aa1c5916abd1ff8c_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_transform@
+foreign import ccall unsafe "hs_bindgen_3fb46dc7f6a9f54a" hs_bindgen_3fb46dc7f6a9f54a_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_transform@
-hs_bindgen_aa1c5916abd1ff8c ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_transform@
+hs_bindgen_3fb46dc7f6a9f54a ::
      RIP.Ptr Pixman_image_t
   -> PtrConst.PtrConst Pixman_transform_t
   -> IO Pixman_bool_t
-hs_bindgen_aa1c5916abd1ff8c =
-  RIP.fromFFIType hs_bindgen_aa1c5916abd1ff8c_base
+hs_bindgen_3fb46dc7f6a9f54a =
+  RIP.fromFFIType hs_bindgen_3fb46dc7f6a9f54a_base
 
 {-| __C declaration:__ @pixman_image_set_transform@
 
@@ -5753,21 +5753,21 @@ pixman_image_set_transform ::
      -- ^ __C declaration:__ @transform@
   -> IO Pixman_bool_t
 pixman_image_set_transform =
-  hs_bindgen_aa1c5916abd1ff8c
+  hs_bindgen_3fb46dc7f6a9f54a
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_repeat@
-foreign import ccall unsafe "hs_bindgen_a7c968f5009f7ba1" hs_bindgen_a7c968f5009f7ba1_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_repeat@
+foreign import ccall unsafe "hs_bindgen_b3106227cc956aaa" hs_bindgen_b3106227cc956aaa_base ::
      RIP.Ptr RIP.Void
   -> RIP.Word32
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_repeat@
-hs_bindgen_a7c968f5009f7ba1 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_repeat@
+hs_bindgen_b3106227cc956aaa ::
      RIP.Ptr Pixman_image_t
   -> Pixman_repeat_t
   -> IO ()
-hs_bindgen_a7c968f5009f7ba1 =
-  RIP.fromFFIType hs_bindgen_a7c968f5009f7ba1_base
+hs_bindgen_b3106227cc956aaa =
+  RIP.fromFFIType hs_bindgen_b3106227cc956aaa_base
 
 {-| __C declaration:__ @pixman_image_set_repeat@
 
@@ -5781,21 +5781,21 @@ pixman_image_set_repeat ::
   -> Pixman_repeat_t
      -- ^ __C declaration:__ @repeat@
   -> IO ()
-pixman_image_set_repeat = hs_bindgen_a7c968f5009f7ba1
+pixman_image_set_repeat = hs_bindgen_b3106227cc956aaa
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_dither@
-foreign import ccall unsafe "hs_bindgen_fbb2c64a6d78413f" hs_bindgen_fbb2c64a6d78413f_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_dither@
+foreign import ccall unsafe "hs_bindgen_77c33d21e0165252" hs_bindgen_77c33d21e0165252_base ::
      RIP.Ptr RIP.Void
   -> RIP.Word32
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_dither@
-hs_bindgen_fbb2c64a6d78413f ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_dither@
+hs_bindgen_77c33d21e0165252 ::
      RIP.Ptr Pixman_image_t
   -> Pixman_dither_t
   -> IO ()
-hs_bindgen_fbb2c64a6d78413f =
-  RIP.fromFFIType hs_bindgen_fbb2c64a6d78413f_base
+hs_bindgen_77c33d21e0165252 =
+  RIP.fromFFIType hs_bindgen_77c33d21e0165252_base
 
 {-| __C declaration:__ @pixman_image_set_dither@
 
@@ -5809,23 +5809,23 @@ pixman_image_set_dither ::
   -> Pixman_dither_t
      -- ^ __C declaration:__ @dither@
   -> IO ()
-pixman_image_set_dither = hs_bindgen_fbb2c64a6d78413f
+pixman_image_set_dither = hs_bindgen_77c33d21e0165252
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_dither_offset@
-foreign import ccall unsafe "hs_bindgen_a649b61233a31616" hs_bindgen_a649b61233a31616_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_dither_offset@
+foreign import ccall unsafe "hs_bindgen_1431b3d49fcfa3e1" hs_bindgen_1431b3d49fcfa3e1_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_dither_offset@
-hs_bindgen_a649b61233a31616 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_dither_offset@
+hs_bindgen_1431b3d49fcfa3e1 ::
      RIP.Ptr Pixman_image_t
   -> RIP.CInt
   -> RIP.CInt
   -> IO ()
-hs_bindgen_a649b61233a31616 =
-  RIP.fromFFIType hs_bindgen_a649b61233a31616_base
+hs_bindgen_1431b3d49fcfa3e1 =
+  RIP.fromFFIType hs_bindgen_1431b3d49fcfa3e1_base
 
 {-| __C declaration:__ @pixman_image_set_dither_offset@
 
@@ -5842,25 +5842,25 @@ pixman_image_set_dither_offset ::
      -- ^ __C declaration:__ @offset_y@
   -> IO ()
 pixman_image_set_dither_offset =
-  hs_bindgen_a649b61233a31616
+  hs_bindgen_1431b3d49fcfa3e1
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_filter@
-foreign import ccall unsafe "hs_bindgen_2152f7e3ab8b9356" hs_bindgen_2152f7e3ab8b9356_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_filter@
+foreign import ccall unsafe "hs_bindgen_849d6127fa5d8712" hs_bindgen_849d6127fa5d8712_base ::
      RIP.Ptr RIP.Void
   -> RIP.Word32
   -> RIP.Ptr RIP.Void
   -> RIP.Int32
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_filter@
-hs_bindgen_2152f7e3ab8b9356 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_filter@
+hs_bindgen_849d6127fa5d8712 ::
      RIP.Ptr Pixman_image_t
   -> Pixman_filter_t
   -> PtrConst.PtrConst Pixman_fixed_t
   -> RIP.CInt
   -> IO Pixman_bool_t
-hs_bindgen_2152f7e3ab8b9356 =
-  RIP.fromFFIType hs_bindgen_2152f7e3ab8b9356_base
+hs_bindgen_849d6127fa5d8712 =
+  RIP.fromFFIType hs_bindgen_849d6127fa5d8712_base
 
 {-| __C declaration:__ @pixman_image_set_filter@
 
@@ -5878,21 +5878,21 @@ pixman_image_set_filter ::
   -> RIP.CInt
      -- ^ __C declaration:__ @n_filter_params@
   -> IO Pixman_bool_t
-pixman_image_set_filter = hs_bindgen_2152f7e3ab8b9356
+pixman_image_set_filter = hs_bindgen_849d6127fa5d8712
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_source_clipping@
-foreign import ccall unsafe "hs_bindgen_adf7134df249c24f" hs_bindgen_adf7134df249c24f_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_source_clipping@
+foreign import ccall unsafe "hs_bindgen_00c878cc07723b63" hs_bindgen_00c878cc07723b63_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_source_clipping@
-hs_bindgen_adf7134df249c24f ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_source_clipping@
+hs_bindgen_00c878cc07723b63 ::
      RIP.Ptr Pixman_image_t
   -> Pixman_bool_t
   -> IO ()
-hs_bindgen_adf7134df249c24f =
-  RIP.fromFFIType hs_bindgen_adf7134df249c24f_base
+hs_bindgen_00c878cc07723b63 =
+  RIP.fromFFIType hs_bindgen_00c878cc07723b63_base
 
 {-| __C declaration:__ @pixman_image_set_source_clipping@
 
@@ -5907,25 +5907,25 @@ pixman_image_set_source_clipping ::
      -- ^ __C declaration:__ @source_clipping@
   -> IO ()
 pixman_image_set_source_clipping =
-  hs_bindgen_adf7134df249c24f
+  hs_bindgen_00c878cc07723b63
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_alpha_map@
-foreign import ccall unsafe "hs_bindgen_5026a7fb7dda60b2" hs_bindgen_5026a7fb7dda60b2_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_alpha_map@
+foreign import ccall unsafe "hs_bindgen_4476180713276b3b" hs_bindgen_4476180713276b3b_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Int16
   -> RIP.Int16
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_alpha_map@
-hs_bindgen_5026a7fb7dda60b2 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_alpha_map@
+hs_bindgen_4476180713276b3b ::
      RIP.Ptr Pixman_image_t
   -> RIP.Ptr Pixman_image_t
   -> HsBindgen.Runtime.LibC.Int16
   -> HsBindgen.Runtime.LibC.Int16
   -> IO ()
-hs_bindgen_5026a7fb7dda60b2 =
-  RIP.fromFFIType hs_bindgen_5026a7fb7dda60b2_base
+hs_bindgen_4476180713276b3b =
+  RIP.fromFFIType hs_bindgen_4476180713276b3b_base
 
 {-| __C declaration:__ @pixman_image_set_alpha_map@
 
@@ -5944,21 +5944,21 @@ pixman_image_set_alpha_map ::
      -- ^ __C declaration:__ @y@
   -> IO ()
 pixman_image_set_alpha_map =
-  hs_bindgen_5026a7fb7dda60b2
+  hs_bindgen_4476180713276b3b
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_component_alpha@
-foreign import ccall unsafe "hs_bindgen_7ca42fcca4ad506f" hs_bindgen_7ca42fcca4ad506f_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_component_alpha@
+foreign import ccall unsafe "hs_bindgen_a63268652849f811" hs_bindgen_a63268652849f811_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_component_alpha@
-hs_bindgen_7ca42fcca4ad506f ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_component_alpha@
+hs_bindgen_a63268652849f811 ::
      RIP.Ptr Pixman_image_t
   -> Pixman_bool_t
   -> IO ()
-hs_bindgen_7ca42fcca4ad506f =
-  RIP.fromFFIType hs_bindgen_7ca42fcca4ad506f_base
+hs_bindgen_a63268652849f811 =
+  RIP.fromFFIType hs_bindgen_a63268652849f811_base
 
 {-| __C declaration:__ @pixman_image_set_component_alpha@
 
@@ -5973,19 +5973,19 @@ pixman_image_set_component_alpha ::
      -- ^ __C declaration:__ @component_alpha@
   -> IO ()
 pixman_image_set_component_alpha =
-  hs_bindgen_7ca42fcca4ad506f
+  hs_bindgen_a63268652849f811
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_get_component_alpha@
-foreign import ccall unsafe "hs_bindgen_0b037f2394e2b638" hs_bindgen_0b037f2394e2b638_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_get_component_alpha@
+foreign import ccall unsafe "hs_bindgen_0d5aa35e996ddec5" hs_bindgen_0d5aa35e996ddec5_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_get_component_alpha@
-hs_bindgen_0b037f2394e2b638 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_get_component_alpha@
+hs_bindgen_0d5aa35e996ddec5 ::
      RIP.Ptr Pixman_image_t
   -> IO Pixman_bool_t
-hs_bindgen_0b037f2394e2b638 =
-  RIP.fromFFIType hs_bindgen_0b037f2394e2b638_base
+hs_bindgen_0d5aa35e996ddec5 =
+  RIP.fromFFIType hs_bindgen_0d5aa35e996ddec5_base
 
 {-| __C declaration:__ @pixman_image_get_component_alpha@
 
@@ -5998,23 +5998,23 @@ pixman_image_get_component_alpha ::
      -- ^ __C declaration:__ @image@
   -> IO Pixman_bool_t
 pixman_image_get_component_alpha =
-  hs_bindgen_0b037f2394e2b638
+  hs_bindgen_0d5aa35e996ddec5
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_accessors@
-foreign import ccall unsafe "hs_bindgen_6982ab514d6dacc5" hs_bindgen_6982ab514d6dacc5_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_accessors@
+foreign import ccall unsafe "hs_bindgen_25fd15b9e1b30e91" hs_bindgen_25fd15b9e1b30e91_base ::
      RIP.Ptr RIP.Void
   -> RIP.FunPtr RIP.Void
   -> RIP.FunPtr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_accessors@
-hs_bindgen_6982ab514d6dacc5 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_accessors@
+hs_bindgen_25fd15b9e1b30e91 ::
      RIP.Ptr Pixman_image_t
   -> Pixman_read_memory_func_t
   -> Pixman_write_memory_func_t
   -> IO ()
-hs_bindgen_6982ab514d6dacc5 =
-  RIP.fromFFIType hs_bindgen_6982ab514d6dacc5_base
+hs_bindgen_25fd15b9e1b30e91 =
+  RIP.fromFFIType hs_bindgen_25fd15b9e1b30e91_base
 
 {-| __C declaration:__ @pixman_image_set_accessors@
 
@@ -6031,21 +6031,21 @@ pixman_image_set_accessors ::
      -- ^ __C declaration:__ @write_func@
   -> IO ()
 pixman_image_set_accessors =
-  hs_bindgen_6982ab514d6dacc5
+  hs_bindgen_25fd15b9e1b30e91
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_indexed@
-foreign import ccall unsafe "hs_bindgen_a6f7d4ea13b61ee8" hs_bindgen_a6f7d4ea13b61ee8_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_indexed@
+foreign import ccall unsafe "hs_bindgen_769e3c5adbae3d58" hs_bindgen_769e3c5adbae3d58_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_set_indexed@
-hs_bindgen_a6f7d4ea13b61ee8 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_set_indexed@
+hs_bindgen_769e3c5adbae3d58 ::
      RIP.Ptr Pixman_image_t
   -> PtrConst.PtrConst Pixman_indexed_t
   -> IO ()
-hs_bindgen_a6f7d4ea13b61ee8 =
-  RIP.fromFFIType hs_bindgen_a6f7d4ea13b61ee8_base
+hs_bindgen_769e3c5adbae3d58 =
+  RIP.fromFFIType hs_bindgen_769e3c5adbae3d58_base
 
 {-| __C declaration:__ @pixman_image_set_indexed@
 
@@ -6060,19 +6060,19 @@ pixman_image_set_indexed ::
      -- ^ __C declaration:__ @indexed@
   -> IO ()
 pixman_image_set_indexed =
-  hs_bindgen_a6f7d4ea13b61ee8
+  hs_bindgen_769e3c5adbae3d58
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_get_data@
-foreign import ccall unsafe "hs_bindgen_5077f5c34f6c4546" hs_bindgen_5077f5c34f6c4546_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_get_data@
+foreign import ccall unsafe "hs_bindgen_a3e8f31382abb74d" hs_bindgen_a3e8f31382abb74d_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_get_data@
-hs_bindgen_5077f5c34f6c4546 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_get_data@
+hs_bindgen_a3e8f31382abb74d ::
      RIP.Ptr Pixman_image_t
   -> IO (RIP.Ptr HsBindgen.Runtime.LibC.Word32)
-hs_bindgen_5077f5c34f6c4546 =
-  RIP.fromFFIType hs_bindgen_5077f5c34f6c4546_base
+hs_bindgen_a3e8f31382abb74d =
+  RIP.fromFFIType hs_bindgen_a3e8f31382abb74d_base
 
 {-| __C declaration:__ @pixman_image_get_data@
 
@@ -6084,19 +6084,19 @@ pixman_image_get_data ::
      RIP.Ptr Pixman_image_t
      -- ^ __C declaration:__ @image@
   -> IO (RIP.Ptr HsBindgen.Runtime.LibC.Word32)
-pixman_image_get_data = hs_bindgen_5077f5c34f6c4546
+pixman_image_get_data = hs_bindgen_a3e8f31382abb74d
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_get_width@
-foreign import ccall unsafe "hs_bindgen_5c3d1e70a1176bf0" hs_bindgen_5c3d1e70a1176bf0_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_get_width@
+foreign import ccall unsafe "hs_bindgen_655f90256df0e744" hs_bindgen_655f90256df0e744_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_get_width@
-hs_bindgen_5c3d1e70a1176bf0 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_get_width@
+hs_bindgen_655f90256df0e744 ::
      RIP.Ptr Pixman_image_t
   -> IO RIP.CInt
-hs_bindgen_5c3d1e70a1176bf0 =
-  RIP.fromFFIType hs_bindgen_5c3d1e70a1176bf0_base
+hs_bindgen_655f90256df0e744 =
+  RIP.fromFFIType hs_bindgen_655f90256df0e744_base
 
 {-| __C declaration:__ @pixman_image_get_width@
 
@@ -6108,19 +6108,19 @@ pixman_image_get_width ::
      RIP.Ptr Pixman_image_t
      -- ^ __C declaration:__ @image@
   -> IO RIP.CInt
-pixman_image_get_width = hs_bindgen_5c3d1e70a1176bf0
+pixman_image_get_width = hs_bindgen_655f90256df0e744
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_get_height@
-foreign import ccall unsafe "hs_bindgen_f390ea618ba7982f" hs_bindgen_f390ea618ba7982f_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_get_height@
+foreign import ccall unsafe "hs_bindgen_4da3f3bc169c476e" hs_bindgen_4da3f3bc169c476e_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_get_height@
-hs_bindgen_f390ea618ba7982f ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_get_height@
+hs_bindgen_4da3f3bc169c476e ::
      RIP.Ptr Pixman_image_t
   -> IO RIP.CInt
-hs_bindgen_f390ea618ba7982f =
-  RIP.fromFFIType hs_bindgen_f390ea618ba7982f_base
+hs_bindgen_4da3f3bc169c476e =
+  RIP.fromFFIType hs_bindgen_4da3f3bc169c476e_base
 
 {-| __C declaration:__ @pixman_image_get_height@
 
@@ -6132,19 +6132,19 @@ pixman_image_get_height ::
      RIP.Ptr Pixman_image_t
      -- ^ __C declaration:__ @image@
   -> IO RIP.CInt
-pixman_image_get_height = hs_bindgen_f390ea618ba7982f
+pixman_image_get_height = hs_bindgen_4da3f3bc169c476e
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_get_stride@
-foreign import ccall unsafe "hs_bindgen_b3a0196c0b153e23" hs_bindgen_b3a0196c0b153e23_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_get_stride@
+foreign import ccall unsafe "hs_bindgen_b0f32ed9ad65553d" hs_bindgen_b0f32ed9ad65553d_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_get_stride@
-hs_bindgen_b3a0196c0b153e23 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_get_stride@
+hs_bindgen_b0f32ed9ad65553d ::
      RIP.Ptr Pixman_image_t
   -> IO RIP.CInt
-hs_bindgen_b3a0196c0b153e23 =
-  RIP.fromFFIType hs_bindgen_b3a0196c0b153e23_base
+hs_bindgen_b0f32ed9ad65553d =
+  RIP.fromFFIType hs_bindgen_b0f32ed9ad65553d_base
 
 {-| __C declaration:__ @pixman_image_get_stride@
 
@@ -6156,19 +6156,19 @@ pixman_image_get_stride ::
      RIP.Ptr Pixman_image_t
      -- ^ __C declaration:__ @image@
   -> IO RIP.CInt
-pixman_image_get_stride = hs_bindgen_b3a0196c0b153e23
+pixman_image_get_stride = hs_bindgen_b0f32ed9ad65553d
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_get_depth@
-foreign import ccall unsafe "hs_bindgen_d79985184355bfd2" hs_bindgen_d79985184355bfd2_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_get_depth@
+foreign import ccall unsafe "hs_bindgen_0e777d600e27ab4e" hs_bindgen_0e777d600e27ab4e_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_get_depth@
-hs_bindgen_d79985184355bfd2 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_get_depth@
+hs_bindgen_0e777d600e27ab4e ::
      RIP.Ptr Pixman_image_t
   -> IO RIP.CInt
-hs_bindgen_d79985184355bfd2 =
-  RIP.fromFFIType hs_bindgen_d79985184355bfd2_base
+hs_bindgen_0e777d600e27ab4e =
+  RIP.fromFFIType hs_bindgen_0e777d600e27ab4e_base
 
 {-| __C declaration:__ @pixman_image_get_depth@
 
@@ -6180,19 +6180,19 @@ pixman_image_get_depth ::
      RIP.Ptr Pixman_image_t
      -- ^ __C declaration:__ @image@
   -> IO RIP.CInt
-pixman_image_get_depth = hs_bindgen_d79985184355bfd2
+pixman_image_get_depth = hs_bindgen_0e777d600e27ab4e
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_get_format@
-foreign import ccall unsafe "hs_bindgen_071b4e803d59bbed" hs_bindgen_071b4e803d59bbed_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_get_format@
+foreign import ccall unsafe "hs_bindgen_e51c5da890582990" hs_bindgen_e51c5da890582990_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_get_format@
-hs_bindgen_071b4e803d59bbed ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_get_format@
+hs_bindgen_e51c5da890582990 ::
      RIP.Ptr Pixman_image_t
   -> IO Pixman_format_code_t
-hs_bindgen_071b4e803d59bbed =
-  RIP.fromFFIType hs_bindgen_071b4e803d59bbed_base
+hs_bindgen_e51c5da890582990 =
+  RIP.fromFFIType hs_bindgen_e51c5da890582990_base
 
 {-| __C declaration:__ @pixman_image_get_format@
 
@@ -6204,10 +6204,10 @@ pixman_image_get_format ::
      RIP.Ptr Pixman_image_t
      -- ^ __C declaration:__ @image@
   -> IO Pixman_format_code_t
-pixman_image_get_format = hs_bindgen_071b4e803d59bbed
+pixman_image_get_format = hs_bindgen_e51c5da890582990
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_filter_create_separable_convolution@
-foreign import ccall unsafe "hs_bindgen_48518fa73b9068f9" hs_bindgen_48518fa73b9068f9_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_filter_create_separable_convolution@
+foreign import ccall unsafe "hs_bindgen_c73c689d57c975a0" hs_bindgen_c73c689d57c975a0_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
@@ -6219,8 +6219,8 @@ foreign import ccall unsafe "hs_bindgen_48518fa73b9068f9" hs_bindgen_48518fa73b9
   -> RIP.Int32
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_filter_create_separable_convolution@
-hs_bindgen_48518fa73b9068f9 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_filter_create_separable_convolution@
+hs_bindgen_c73c689d57c975a0 ::
      RIP.Ptr RIP.CInt
   -> Pixman_fixed_t
   -> Pixman_fixed_t
@@ -6231,8 +6231,8 @@ hs_bindgen_48518fa73b9068f9 ::
   -> RIP.CInt
   -> RIP.CInt
   -> IO (RIP.Ptr Pixman_fixed_t)
-hs_bindgen_48518fa73b9068f9 =
-  RIP.fromFFIType hs_bindgen_48518fa73b9068f9_base
+hs_bindgen_c73c689d57c975a0 =
+  RIP.fromFFIType hs_bindgen_c73c689d57c975a0_base
 
 {-| __C declaration:__ @pixman_filter_create_separable_convolution@
 
@@ -6261,10 +6261,10 @@ pixman_filter_create_separable_convolution ::
      -- ^ __C declaration:__ @subsample_bits_y@
   -> IO (RIP.Ptr Pixman_fixed_t)
 pixman_filter_create_separable_convolution =
-  hs_bindgen_48518fa73b9068f9
+  hs_bindgen_c73c689d57c975a0
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_fill_rectangles@
-foreign import ccall unsafe "hs_bindgen_ce2c0b050eadccdc" hs_bindgen_ce2c0b050eadccdc_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_fill_rectangles@
+foreign import ccall unsafe "hs_bindgen_a02dff89e5cff416" hs_bindgen_a02dff89e5cff416_base ::
      RIP.Word32
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
@@ -6272,16 +6272,16 @@ foreign import ccall unsafe "hs_bindgen_ce2c0b050eadccdc" hs_bindgen_ce2c0b050ea
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_fill_rectangles@
-hs_bindgen_ce2c0b050eadccdc ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_fill_rectangles@
+hs_bindgen_a02dff89e5cff416 ::
      Pixman_op_t
   -> RIP.Ptr Pixman_image_t
   -> PtrConst.PtrConst Pixman_color_t
   -> RIP.CInt
   -> PtrConst.PtrConst Pixman_rectangle16_t
   -> IO Pixman_bool_t
-hs_bindgen_ce2c0b050eadccdc =
-  RIP.fromFFIType hs_bindgen_ce2c0b050eadccdc_base
+hs_bindgen_a02dff89e5cff416 =
+  RIP.fromFFIType hs_bindgen_a02dff89e5cff416_base
 
 {-| __C declaration:__ @pixman_image_fill_rectangles@
 
@@ -6302,10 +6302,10 @@ pixman_image_fill_rectangles ::
      -- ^ __C declaration:__ @rects@
   -> IO Pixman_bool_t
 pixman_image_fill_rectangles =
-  hs_bindgen_ce2c0b050eadccdc
+  hs_bindgen_a02dff89e5cff416
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_fill_boxes@
-foreign import ccall unsafe "hs_bindgen_65eb3eb415dad148" hs_bindgen_65eb3eb415dad148_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_fill_boxes@
+foreign import ccall unsafe "hs_bindgen_3b6014e8c8fd420c" hs_bindgen_3b6014e8c8fd420c_base ::
      RIP.Word32
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
@@ -6313,16 +6313,16 @@ foreign import ccall unsafe "hs_bindgen_65eb3eb415dad148" hs_bindgen_65eb3eb415d
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_fill_boxes@
-hs_bindgen_65eb3eb415dad148 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_fill_boxes@
+hs_bindgen_3b6014e8c8fd420c ::
      Pixman_op_t
   -> RIP.Ptr Pixman_image_t
   -> PtrConst.PtrConst Pixman_color_t
   -> RIP.CInt
   -> PtrConst.PtrConst Pixman_box32_t
   -> IO Pixman_bool_t
-hs_bindgen_65eb3eb415dad148 =
-  RIP.fromFFIType hs_bindgen_65eb3eb415dad148_base
+hs_bindgen_3b6014e8c8fd420c =
+  RIP.fromFFIType hs_bindgen_3b6014e8c8fd420c_base
 
 {-| __C declaration:__ @pixman_image_fill_boxes@
 
@@ -6342,10 +6342,10 @@ pixman_image_fill_boxes ::
   -> PtrConst.PtrConst Pixman_box32_t
      -- ^ __C declaration:__ @boxes@
   -> IO Pixman_bool_t
-pixman_image_fill_boxes = hs_bindgen_65eb3eb415dad148
+pixman_image_fill_boxes = hs_bindgen_3b6014e8c8fd420c
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_compute_composite_region@
-foreign import ccall unsafe "hs_bindgen_584e8c3ec7907161" hs_bindgen_584e8c3ec7907161_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_compute_composite_region@
+foreign import ccall unsafe "hs_bindgen_7202904a2aff8014" hs_bindgen_7202904a2aff8014_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
@@ -6360,8 +6360,8 @@ foreign import ccall unsafe "hs_bindgen_584e8c3ec7907161" hs_bindgen_584e8c3ec79
   -> RIP.Word16
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_compute_composite_region@
-hs_bindgen_584e8c3ec7907161 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_compute_composite_region@
+hs_bindgen_7202904a2aff8014 ::
      RIP.Ptr Pixman_region16_t
   -> RIP.Ptr Pixman_image_t
   -> RIP.Ptr Pixman_image_t
@@ -6375,8 +6375,8 @@ hs_bindgen_584e8c3ec7907161 ::
   -> HsBindgen.Runtime.LibC.Word16
   -> HsBindgen.Runtime.LibC.Word16
   -> IO Pixman_bool_t
-hs_bindgen_584e8c3ec7907161 =
-  RIP.fromFFIType hs_bindgen_584e8c3ec7907161_base
+hs_bindgen_7202904a2aff8014 =
+  RIP.fromFFIType hs_bindgen_7202904a2aff8014_base
 
 {-| __C declaration:__ @pixman_compute_composite_region@
 
@@ -6411,10 +6411,10 @@ pixman_compute_composite_region ::
      -- ^ __C declaration:__ @height@
   -> IO Pixman_bool_t
 pixman_compute_composite_region =
-  hs_bindgen_584e8c3ec7907161
+  hs_bindgen_7202904a2aff8014
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_composite@
-foreign import ccall unsafe "hs_bindgen_93b485a074265e91" hs_bindgen_93b485a074265e91_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_composite@
+foreign import ccall unsafe "hs_bindgen_07ae38b2eee95971" hs_bindgen_07ae38b2eee95971_base ::
      RIP.Word32
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
@@ -6429,8 +6429,8 @@ foreign import ccall unsafe "hs_bindgen_93b485a074265e91" hs_bindgen_93b485a0742
   -> RIP.Word16
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_composite@
-hs_bindgen_93b485a074265e91 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_composite@
+hs_bindgen_07ae38b2eee95971 ::
      Pixman_op_t
   -> RIP.Ptr Pixman_image_t
   -> RIP.Ptr Pixman_image_t
@@ -6444,8 +6444,8 @@ hs_bindgen_93b485a074265e91 ::
   -> HsBindgen.Runtime.LibC.Word16
   -> HsBindgen.Runtime.LibC.Word16
   -> IO ()
-hs_bindgen_93b485a074265e91 =
-  RIP.fromFFIType hs_bindgen_93b485a074265e91_base
+hs_bindgen_07ae38b2eee95971 =
+  RIP.fromFFIType hs_bindgen_07ae38b2eee95971_base
 
 {-| __C declaration:__ @pixman_image_composite@
 
@@ -6479,10 +6479,10 @@ pixman_image_composite ::
   -> HsBindgen.Runtime.LibC.Word16
      -- ^ __C declaration:__ @height@
   -> IO ()
-pixman_image_composite = hs_bindgen_93b485a074265e91
+pixman_image_composite = hs_bindgen_07ae38b2eee95971
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_composite32@
-foreign import ccall unsafe "hs_bindgen_185573f5a71a031c" hs_bindgen_185573f5a71a031c_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_composite32@
+foreign import ccall unsafe "hs_bindgen_ed685ce058a1c6ef" hs_bindgen_ed685ce058a1c6ef_base ::
      RIP.Word32
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
@@ -6497,8 +6497,8 @@ foreign import ccall unsafe "hs_bindgen_185573f5a71a031c" hs_bindgen_185573f5a71
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_composite32@
-hs_bindgen_185573f5a71a031c ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_composite32@
+hs_bindgen_ed685ce058a1c6ef ::
      Pixman_op_t
   -> RIP.Ptr Pixman_image_t
   -> RIP.Ptr Pixman_image_t
@@ -6512,8 +6512,8 @@ hs_bindgen_185573f5a71a031c ::
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Int32
   -> IO ()
-hs_bindgen_185573f5a71a031c =
-  RIP.fromFFIType hs_bindgen_185573f5a71a031c_base
+hs_bindgen_ed685ce058a1c6ef =
+  RIP.fromFFIType hs_bindgen_ed685ce058a1c6ef_base
 
 {-| __C declaration:__ @pixman_image_composite32@
 
@@ -6548,10 +6548,10 @@ pixman_image_composite32 ::
      -- ^ __C declaration:__ @height@
   -> IO ()
 pixman_image_composite32 =
-  hs_bindgen_185573f5a71a031c
+  hs_bindgen_ed685ce058a1c6ef
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_composite64f@
-foreign import ccall unsafe "hs_bindgen_983cd6bc06bd2921" hs_bindgen_983cd6bc06bd2921_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_composite64f@
+foreign import ccall unsafe "hs_bindgen_a5d4b510ed878c91" hs_bindgen_a5d4b510ed878c91_base ::
      RIP.Word32
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
@@ -6566,8 +6566,8 @@ foreign import ccall unsafe "hs_bindgen_983cd6bc06bd2921" hs_bindgen_983cd6bc06b
   -> Double
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_image_composite64f@
-hs_bindgen_983cd6bc06bd2921 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_image_composite64f@
+hs_bindgen_a5d4b510ed878c91 ::
      Pixman_op_t
   -> RIP.Ptr Pixman_image_t
   -> RIP.Ptr Pixman_image_t
@@ -6581,8 +6581,8 @@ hs_bindgen_983cd6bc06bd2921 ::
   -> RIP.CDouble
   -> RIP.CDouble
   -> IO ()
-hs_bindgen_983cd6bc06bd2921 =
-  RIP.fromFFIType hs_bindgen_983cd6bc06bd2921_base
+hs_bindgen_a5d4b510ed878c91 =
+  RIP.fromFFIType hs_bindgen_a5d4b510ed878c91_base
 
 {-| __C declaration:__ @pixman_image_composite64f@
 
@@ -6617,16 +6617,16 @@ pixman_image_composite64f ::
      -- ^ __C declaration:__ @height@
   -> IO ()
 pixman_image_composite64f =
-  hs_bindgen_983cd6bc06bd2921
+  hs_bindgen_a5d4b510ed878c91
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_disable_out_of_bounds_workaround@
-foreign import ccall unsafe "hs_bindgen_89b262220c1b3b7d" hs_bindgen_89b262220c1b3b7d_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_disable_out_of_bounds_workaround@
+foreign import ccall unsafe "hs_bindgen_a41ff5ded26cf273" hs_bindgen_a41ff5ded26cf273_base ::
      IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_disable_out_of_bounds_workaround@
-hs_bindgen_89b262220c1b3b7d :: IO ()
-hs_bindgen_89b262220c1b3b7d =
-  RIP.fromFFIType hs_bindgen_89b262220c1b3b7d_base
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_disable_out_of_bounds_workaround@
+hs_bindgen_a41ff5ded26cf273 :: IO ()
+hs_bindgen_a41ff5ded26cf273 =
+  RIP.fromFFIType hs_bindgen_a41ff5ded26cf273_base
 
 {-| __C declaration:__ @pixman_disable_out_of_bounds_workaround@
 
@@ -6636,16 +6636,16 @@ hs_bindgen_89b262220c1b3b7d =
 -}
 pixman_disable_out_of_bounds_workaround :: IO ()
 pixman_disable_out_of_bounds_workaround =
-  hs_bindgen_89b262220c1b3b7d
+  hs_bindgen_a41ff5ded26cf273
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_create@
-foreign import ccall unsafe "hs_bindgen_6b3e6417f1bad155" hs_bindgen_6b3e6417f1bad155_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_create@
+foreign import ccall unsafe "hs_bindgen_a0969e3d34e10e29" hs_bindgen_a0969e3d34e10e29_base ::
      IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_create@
-hs_bindgen_6b3e6417f1bad155 :: IO (RIP.Ptr Pixman_glyph_cache_t)
-hs_bindgen_6b3e6417f1bad155 =
-  RIP.fromFFIType hs_bindgen_6b3e6417f1bad155_base
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_create@
+hs_bindgen_a0969e3d34e10e29 :: IO (RIP.Ptr Pixman_glyph_cache_t)
+hs_bindgen_a0969e3d34e10e29 =
+  RIP.fromFFIType hs_bindgen_a0969e3d34e10e29_base
 
 {-| __C declaration:__ @pixman_glyph_cache_create@
 
@@ -6655,19 +6655,19 @@ hs_bindgen_6b3e6417f1bad155 =
 -}
 pixman_glyph_cache_create :: IO (RIP.Ptr Pixman_glyph_cache_t)
 pixman_glyph_cache_create =
-  hs_bindgen_6b3e6417f1bad155
+  hs_bindgen_a0969e3d34e10e29
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_destroy@
-foreign import ccall unsafe "hs_bindgen_8f18b092993fd937" hs_bindgen_8f18b092993fd937_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_destroy@
+foreign import ccall unsafe "hs_bindgen_39911d48fcdf946d" hs_bindgen_39911d48fcdf946d_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_destroy@
-hs_bindgen_8f18b092993fd937 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_destroy@
+hs_bindgen_39911d48fcdf946d ::
      RIP.Ptr Pixman_glyph_cache_t
   -> IO ()
-hs_bindgen_8f18b092993fd937 =
-  RIP.fromFFIType hs_bindgen_8f18b092993fd937_base
+hs_bindgen_39911d48fcdf946d =
+  RIP.fromFFIType hs_bindgen_39911d48fcdf946d_base
 
 {-| __C declaration:__ @pixman_glyph_cache_destroy@
 
@@ -6680,19 +6680,19 @@ pixman_glyph_cache_destroy ::
      -- ^ __C declaration:__ @cache@
   -> IO ()
 pixman_glyph_cache_destroy =
-  hs_bindgen_8f18b092993fd937
+  hs_bindgen_39911d48fcdf946d
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_freeze@
-foreign import ccall unsafe "hs_bindgen_5b7113388edc649c" hs_bindgen_5b7113388edc649c_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_freeze@
+foreign import ccall unsafe "hs_bindgen_8b81763d6ca4e8ad" hs_bindgen_8b81763d6ca4e8ad_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_freeze@
-hs_bindgen_5b7113388edc649c ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_freeze@
+hs_bindgen_8b81763d6ca4e8ad ::
      RIP.Ptr Pixman_glyph_cache_t
   -> IO ()
-hs_bindgen_5b7113388edc649c =
-  RIP.fromFFIType hs_bindgen_5b7113388edc649c_base
+hs_bindgen_8b81763d6ca4e8ad =
+  RIP.fromFFIType hs_bindgen_8b81763d6ca4e8ad_base
 
 {-| __C declaration:__ @pixman_glyph_cache_freeze@
 
@@ -6705,19 +6705,19 @@ pixman_glyph_cache_freeze ::
      -- ^ __C declaration:__ @cache@
   -> IO ()
 pixman_glyph_cache_freeze =
-  hs_bindgen_5b7113388edc649c
+  hs_bindgen_8b81763d6ca4e8ad
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_thaw@
-foreign import ccall unsafe "hs_bindgen_3a53fa0e7537358c" hs_bindgen_3a53fa0e7537358c_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_thaw@
+foreign import ccall unsafe "hs_bindgen_b591ef6316ef1b8f" hs_bindgen_b591ef6316ef1b8f_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_thaw@
-hs_bindgen_3a53fa0e7537358c ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_thaw@
+hs_bindgen_b591ef6316ef1b8f ::
      RIP.Ptr Pixman_glyph_cache_t
   -> IO ()
-hs_bindgen_3a53fa0e7537358c =
-  RIP.fromFFIType hs_bindgen_3a53fa0e7537358c_base
+hs_bindgen_b591ef6316ef1b8f =
+  RIP.fromFFIType hs_bindgen_b591ef6316ef1b8f_base
 
 {-| __C declaration:__ @pixman_glyph_cache_thaw@
 
@@ -6729,23 +6729,23 @@ pixman_glyph_cache_thaw ::
      RIP.Ptr Pixman_glyph_cache_t
      -- ^ __C declaration:__ @cache@
   -> IO ()
-pixman_glyph_cache_thaw = hs_bindgen_3a53fa0e7537358c
+pixman_glyph_cache_thaw = hs_bindgen_b591ef6316ef1b8f
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_lookup@
-foreign import ccall unsafe "hs_bindgen_3270c793262ad671" hs_bindgen_3270c793262ad671_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_lookup@
+foreign import ccall unsafe "hs_bindgen_19fdaf5120e67a36" hs_bindgen_19fdaf5120e67a36_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_lookup@
-hs_bindgen_3270c793262ad671 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_lookup@
+hs_bindgen_19fdaf5120e67a36 ::
      RIP.Ptr Pixman_glyph_cache_t
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO (PtrConst.PtrConst RIP.Void)
-hs_bindgen_3270c793262ad671 =
-  RIP.fromFFIType hs_bindgen_3270c793262ad671_base
+hs_bindgen_19fdaf5120e67a36 =
+  RIP.fromFFIType hs_bindgen_19fdaf5120e67a36_base
 
 {-| __C declaration:__ @pixman_glyph_cache_lookup@
 
@@ -6762,10 +6762,10 @@ pixman_glyph_cache_lookup ::
      -- ^ __C declaration:__ @glyph_key@
   -> IO (PtrConst.PtrConst RIP.Void)
 pixman_glyph_cache_lookup =
-  hs_bindgen_3270c793262ad671
+  hs_bindgen_19fdaf5120e67a36
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_insert@
-foreign import ccall unsafe "hs_bindgen_7c435b0086a80da8" hs_bindgen_7c435b0086a80da8_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_insert@
+foreign import ccall unsafe "hs_bindgen_844ca395a102777c" hs_bindgen_844ca395a102777c_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
@@ -6774,8 +6774,8 @@ foreign import ccall unsafe "hs_bindgen_7c435b0086a80da8" hs_bindgen_7c435b0086a
   -> RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_insert@
-hs_bindgen_7c435b0086a80da8 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_insert@
+hs_bindgen_844ca395a102777c ::
      RIP.Ptr Pixman_glyph_cache_t
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
@@ -6783,8 +6783,8 @@ hs_bindgen_7c435b0086a80da8 ::
   -> RIP.CInt
   -> RIP.Ptr Pixman_image_t
   -> IO (PtrConst.PtrConst RIP.Void)
-hs_bindgen_7c435b0086a80da8 =
-  RIP.fromFFIType hs_bindgen_7c435b0086a80da8_base
+hs_bindgen_844ca395a102777c =
+  RIP.fromFFIType hs_bindgen_844ca395a102777c_base
 
 {-| __C declaration:__ @pixman_glyph_cache_insert@
 
@@ -6807,23 +6807,23 @@ pixman_glyph_cache_insert ::
      -- ^ __C declaration:__ @glyph_image@
   -> IO (PtrConst.PtrConst RIP.Void)
 pixman_glyph_cache_insert =
-  hs_bindgen_7c435b0086a80da8
+  hs_bindgen_844ca395a102777c
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_remove@
-foreign import ccall unsafe "hs_bindgen_1b4c225caeec6a1a" hs_bindgen_1b4c225caeec6a1a_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_remove@
+foreign import ccall unsafe "hs_bindgen_8bea6dc0e43e5aed" hs_bindgen_8bea6dc0e43e5aed_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_remove@
-hs_bindgen_1b4c225caeec6a1a ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_glyph_cache_remove@
+hs_bindgen_8bea6dc0e43e5aed ::
      RIP.Ptr Pixman_glyph_cache_t
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_1b4c225caeec6a1a =
-  RIP.fromFFIType hs_bindgen_1b4c225caeec6a1a_base
+hs_bindgen_8bea6dc0e43e5aed =
+  RIP.fromFFIType hs_bindgen_8bea6dc0e43e5aed_base
 
 {-| __C declaration:__ @pixman_glyph_cache_remove@
 
@@ -6840,25 +6840,25 @@ pixman_glyph_cache_remove ::
      -- ^ __C declaration:__ @glyph_key@
   -> IO ()
 pixman_glyph_cache_remove =
-  hs_bindgen_1b4c225caeec6a1a
+  hs_bindgen_8bea6dc0e43e5aed
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_glyph_get_extents@
-foreign import ccall unsafe "hs_bindgen_4127bd6c0043179b" hs_bindgen_4127bd6c0043179b_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_glyph_get_extents@
+foreign import ccall unsafe "hs_bindgen_18def1ff1265b9d7" hs_bindgen_18def1ff1265b9d7_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_glyph_get_extents@
-hs_bindgen_4127bd6c0043179b ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_glyph_get_extents@
+hs_bindgen_18def1ff1265b9d7 ::
      RIP.Ptr Pixman_glyph_cache_t
   -> RIP.CInt
   -> RIP.Ptr Pixman_glyph_t
   -> RIP.Ptr Pixman_box32_t
   -> IO ()
-hs_bindgen_4127bd6c0043179b =
-  RIP.fromFFIType hs_bindgen_4127bd6c0043179b_base
+hs_bindgen_18def1ff1265b9d7 =
+  RIP.fromFFIType hs_bindgen_18def1ff1265b9d7_base
 
 {-| __C declaration:__ @pixman_glyph_get_extents@
 
@@ -6877,23 +6877,23 @@ pixman_glyph_get_extents ::
      -- ^ __C declaration:__ @extents@
   -> IO ()
 pixman_glyph_get_extents =
-  hs_bindgen_4127bd6c0043179b
+  hs_bindgen_18def1ff1265b9d7
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_glyph_get_mask_format@
-foreign import ccall unsafe "hs_bindgen_d1d1300cd6727dcd" hs_bindgen_d1d1300cd6727dcd_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_glyph_get_mask_format@
+foreign import ccall unsafe "hs_bindgen_71785a569a31d431" hs_bindgen_71785a569a31d431_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_glyph_get_mask_format@
-hs_bindgen_d1d1300cd6727dcd ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_glyph_get_mask_format@
+hs_bindgen_71785a569a31d431 ::
      RIP.Ptr Pixman_glyph_cache_t
   -> RIP.CInt
   -> PtrConst.PtrConst Pixman_glyph_t
   -> IO Pixman_format_code_t
-hs_bindgen_d1d1300cd6727dcd =
-  RIP.fromFFIType hs_bindgen_d1d1300cd6727dcd_base
+hs_bindgen_71785a569a31d431 =
+  RIP.fromFFIType hs_bindgen_71785a569a31d431_base
 
 {-| __C declaration:__ @pixman_glyph_get_mask_format@
 
@@ -6910,10 +6910,10 @@ pixman_glyph_get_mask_format ::
      -- ^ __C declaration:__ @glyphs@
   -> IO Pixman_format_code_t
 pixman_glyph_get_mask_format =
-  hs_bindgen_d1d1300cd6727dcd
+  hs_bindgen_71785a569a31d431
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_composite_glyphs@
-foreign import ccall unsafe "hs_bindgen_60181a27baad2b83" hs_bindgen_60181a27baad2b83_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_composite_glyphs@
+foreign import ccall unsafe "hs_bindgen_404b38bb0ea2d632" hs_bindgen_404b38bb0ea2d632_base ::
      RIP.Word32
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
@@ -6931,8 +6931,8 @@ foreign import ccall unsafe "hs_bindgen_60181a27baad2b83" hs_bindgen_60181a27baa
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_composite_glyphs@
-hs_bindgen_60181a27baad2b83 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_composite_glyphs@
+hs_bindgen_404b38bb0ea2d632 ::
      Pixman_op_t
   -> RIP.Ptr Pixman_image_t
   -> RIP.Ptr Pixman_image_t
@@ -6949,8 +6949,8 @@ hs_bindgen_60181a27baad2b83 ::
   -> RIP.CInt
   -> PtrConst.PtrConst Pixman_glyph_t
   -> IO ()
-hs_bindgen_60181a27baad2b83 =
-  RIP.fromFFIType hs_bindgen_60181a27baad2b83_base
+hs_bindgen_404b38bb0ea2d632 =
+  RIP.fromFFIType hs_bindgen_404b38bb0ea2d632_base
 
 {-| __C declaration:__ @pixman_composite_glyphs@
 
@@ -6990,10 +6990,10 @@ pixman_composite_glyphs ::
   -> PtrConst.PtrConst Pixman_glyph_t
      -- ^ __C declaration:__ @glyphs@
   -> IO ()
-pixman_composite_glyphs = hs_bindgen_60181a27baad2b83
+pixman_composite_glyphs = hs_bindgen_404b38bb0ea2d632
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_composite_glyphs_no_mask@
-foreign import ccall unsafe "hs_bindgen_1fa27dcfd3356cf5" hs_bindgen_1fa27dcfd3356cf5_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_composite_glyphs_no_mask@
+foreign import ccall unsafe "hs_bindgen_8358abbe37c951ff" hs_bindgen_8358abbe37c951ff_base ::
      RIP.Word32
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
@@ -7006,8 +7006,8 @@ foreign import ccall unsafe "hs_bindgen_1fa27dcfd3356cf5" hs_bindgen_1fa27dcfd33
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_composite_glyphs_no_mask@
-hs_bindgen_1fa27dcfd3356cf5 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_composite_glyphs_no_mask@
+hs_bindgen_8358abbe37c951ff ::
      Pixman_op_t
   -> RIP.Ptr Pixman_image_t
   -> RIP.Ptr Pixman_image_t
@@ -7019,8 +7019,8 @@ hs_bindgen_1fa27dcfd3356cf5 ::
   -> RIP.CInt
   -> PtrConst.PtrConst Pixman_glyph_t
   -> IO ()
-hs_bindgen_1fa27dcfd3356cf5 =
-  RIP.fromFFIType hs_bindgen_1fa27dcfd3356cf5_base
+hs_bindgen_8358abbe37c951ff =
+  RIP.fromFFIType hs_bindgen_8358abbe37c951ff_base
 
 {-| __C declaration:__ @pixman_composite_glyphs_no_mask@
 
@@ -7051,21 +7051,21 @@ pixman_composite_glyphs_no_mask ::
      -- ^ __C declaration:__ @glyphs@
   -> IO ()
 pixman_composite_glyphs_no_mask =
-  hs_bindgen_1fa27dcfd3356cf5
+  hs_bindgen_8358abbe37c951ff
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_sample_ceil_y@
-foreign import ccall unsafe "hs_bindgen_34eb61c697dfd398" hs_bindgen_34eb61c697dfd398_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_sample_ceil_y@
+foreign import ccall unsafe "hs_bindgen_a497813cdf900259" hs_bindgen_a497813cdf900259_base ::
      RIP.Int32
   -> RIP.Int32
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_sample_ceil_y@
-hs_bindgen_34eb61c697dfd398 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_sample_ceil_y@
+hs_bindgen_a497813cdf900259 ::
      Pixman_fixed_t
   -> RIP.CInt
   -> IO Pixman_fixed_t
-hs_bindgen_34eb61c697dfd398 =
-  RIP.fromFFIType hs_bindgen_34eb61c697dfd398_base
+hs_bindgen_a497813cdf900259 =
+  RIP.fromFFIType hs_bindgen_a497813cdf900259_base
 
 {-| __C declaration:__ @pixman_sample_ceil_y@
 
@@ -7079,21 +7079,21 @@ pixman_sample_ceil_y ::
   -> RIP.CInt
      -- ^ __C declaration:__ @bpp@
   -> IO Pixman_fixed_t
-pixman_sample_ceil_y = hs_bindgen_34eb61c697dfd398
+pixman_sample_ceil_y = hs_bindgen_a497813cdf900259
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_sample_floor_y@
-foreign import ccall unsafe "hs_bindgen_fcf2e8933f198de7" hs_bindgen_fcf2e8933f198de7_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_sample_floor_y@
+foreign import ccall unsafe "hs_bindgen_29847e1ce56c69d8" hs_bindgen_29847e1ce56c69d8_base ::
      RIP.Int32
   -> RIP.Int32
   -> IO RIP.Int32
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_sample_floor_y@
-hs_bindgen_fcf2e8933f198de7 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_sample_floor_y@
+hs_bindgen_29847e1ce56c69d8 ::
      Pixman_fixed_t
   -> RIP.CInt
   -> IO Pixman_fixed_t
-hs_bindgen_fcf2e8933f198de7 =
-  RIP.fromFFIType hs_bindgen_fcf2e8933f198de7_base
+hs_bindgen_29847e1ce56c69d8 =
+  RIP.fromFFIType hs_bindgen_29847e1ce56c69d8_base
 
 {-| __C declaration:__ @pixman_sample_floor_y@
 
@@ -7107,21 +7107,21 @@ pixman_sample_floor_y ::
   -> RIP.CInt
      -- ^ __C declaration:__ @bpp@
   -> IO Pixman_fixed_t
-pixman_sample_floor_y = hs_bindgen_fcf2e8933f198de7
+pixman_sample_floor_y = hs_bindgen_29847e1ce56c69d8
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_edge_step@
-foreign import ccall unsafe "hs_bindgen_b09e4f1133f1ba4d" hs_bindgen_b09e4f1133f1ba4d_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_edge_step@
+foreign import ccall unsafe "hs_bindgen_964b9cc612320062" hs_bindgen_964b9cc612320062_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_edge_step@
-hs_bindgen_b09e4f1133f1ba4d ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_edge_step@
+hs_bindgen_964b9cc612320062 ::
      RIP.Ptr Pixman_edge_t
   -> RIP.CInt
   -> IO ()
-hs_bindgen_b09e4f1133f1ba4d =
-  RIP.fromFFIType hs_bindgen_b09e4f1133f1ba4d_base
+hs_bindgen_964b9cc612320062 =
+  RIP.fromFFIType hs_bindgen_964b9cc612320062_base
 
 {-| __C declaration:__ @pixman_edge_step@
 
@@ -7135,10 +7135,10 @@ pixman_edge_step ::
   -> RIP.CInt
      -- ^ __C declaration:__ @n@
   -> IO ()
-pixman_edge_step = hs_bindgen_b09e4f1133f1ba4d
+pixman_edge_step = hs_bindgen_964b9cc612320062
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_edge_init@
-foreign import ccall unsafe "hs_bindgen_ce47fb99b6526173" hs_bindgen_ce47fb99b6526173_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_edge_init@
+foreign import ccall unsafe "hs_bindgen_8be428ab25f065f7" hs_bindgen_8be428ab25f065f7_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
@@ -7148,8 +7148,8 @@ foreign import ccall unsafe "hs_bindgen_ce47fb99b6526173" hs_bindgen_ce47fb99b65
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_edge_init@
-hs_bindgen_ce47fb99b6526173 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_edge_init@
+hs_bindgen_8be428ab25f065f7 ::
      RIP.Ptr Pixman_edge_t
   -> RIP.CInt
   -> Pixman_fixed_t
@@ -7158,8 +7158,8 @@ hs_bindgen_ce47fb99b6526173 ::
   -> Pixman_fixed_t
   -> Pixman_fixed_t
   -> IO ()
-hs_bindgen_ce47fb99b6526173 =
-  RIP.fromFFIType hs_bindgen_ce47fb99b6526173_base
+hs_bindgen_8be428ab25f065f7 =
+  RIP.fromFFIType hs_bindgen_8be428ab25f065f7_base
 
 {-| __C declaration:__ @pixman_edge_init@
 
@@ -7183,10 +7183,10 @@ pixman_edge_init ::
   -> Pixman_fixed_t
      -- ^ __C declaration:__ @y_bot@
   -> IO ()
-pixman_edge_init = hs_bindgen_ce47fb99b6526173
+pixman_edge_init = hs_bindgen_8be428ab25f065f7
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_line_fixed_edge_init@
-foreign import ccall unsafe "hs_bindgen_9164bcb16f9dffc7" hs_bindgen_9164bcb16f9dffc7_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_line_fixed_edge_init@
+foreign import ccall unsafe "hs_bindgen_e9e4f1d92e3687a5" hs_bindgen_e9e4f1d92e3687a5_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
@@ -7195,8 +7195,8 @@ foreign import ccall unsafe "hs_bindgen_9164bcb16f9dffc7" hs_bindgen_9164bcb16f9
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_line_fixed_edge_init@
-hs_bindgen_9164bcb16f9dffc7 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_line_fixed_edge_init@
+hs_bindgen_e9e4f1d92e3687a5 ::
      RIP.Ptr Pixman_edge_t
   -> RIP.CInt
   -> Pixman_fixed_t
@@ -7204,8 +7204,8 @@ hs_bindgen_9164bcb16f9dffc7 ::
   -> RIP.CInt
   -> RIP.CInt
   -> IO ()
-hs_bindgen_9164bcb16f9dffc7 =
-  RIP.fromFFIType hs_bindgen_9164bcb16f9dffc7_base
+hs_bindgen_e9e4f1d92e3687a5 =
+  RIP.fromFFIType hs_bindgen_e9e4f1d92e3687a5_base
 
 {-| __C declaration:__ @pixman_line_fixed_edge_init@
 
@@ -7228,10 +7228,10 @@ pixman_line_fixed_edge_init ::
      -- ^ __C declaration:__ @y_off@
   -> IO ()
 pixman_line_fixed_edge_init =
-  hs_bindgen_9164bcb16f9dffc7
+  hs_bindgen_e9e4f1d92e3687a5
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_rasterize_edges@
-foreign import ccall unsafe "hs_bindgen_149e66915232be95" hs_bindgen_149e66915232be95_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_rasterize_edges@
+foreign import ccall unsafe "hs_bindgen_ea4a65fb321d85b7" hs_bindgen_ea4a65fb321d85b7_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
@@ -7239,16 +7239,16 @@ foreign import ccall unsafe "hs_bindgen_149e66915232be95" hs_bindgen_149e6691523
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_rasterize_edges@
-hs_bindgen_149e66915232be95 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_rasterize_edges@
+hs_bindgen_ea4a65fb321d85b7 ::
      RIP.Ptr Pixman_image_t
   -> RIP.Ptr Pixman_edge_t
   -> RIP.Ptr Pixman_edge_t
   -> Pixman_fixed_t
   -> Pixman_fixed_t
   -> IO ()
-hs_bindgen_149e66915232be95 =
-  RIP.fromFFIType hs_bindgen_149e66915232be95_base
+hs_bindgen_ea4a65fb321d85b7 =
+  RIP.fromFFIType hs_bindgen_ea4a65fb321d85b7_base
 
 {-| __C declaration:__ @pixman_rasterize_edges@
 
@@ -7268,10 +7268,10 @@ pixman_rasterize_edges ::
   -> Pixman_fixed_t
      -- ^ __C declaration:__ @b@
   -> IO ()
-pixman_rasterize_edges = hs_bindgen_149e66915232be95
+pixman_rasterize_edges = hs_bindgen_ea4a65fb321d85b7
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_add_traps@
-foreign import ccall unsafe "hs_bindgen_0584a8643b7d1a56" hs_bindgen_0584a8643b7d1a56_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_add_traps@
+foreign import ccall unsafe "hs_bindgen_2acb3af28d162663" hs_bindgen_2acb3af28d162663_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int16
   -> RIP.Int16
@@ -7279,16 +7279,16 @@ foreign import ccall unsafe "hs_bindgen_0584a8643b7d1a56" hs_bindgen_0584a8643b7
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_add_traps@
-hs_bindgen_0584a8643b7d1a56 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_add_traps@
+hs_bindgen_2acb3af28d162663 ::
      RIP.Ptr Pixman_image_t
   -> HsBindgen.Runtime.LibC.Int16
   -> HsBindgen.Runtime.LibC.Int16
   -> RIP.CInt
   -> PtrConst.PtrConst Pixman_trap_t
   -> IO ()
-hs_bindgen_0584a8643b7d1a56 =
-  RIP.fromFFIType hs_bindgen_0584a8643b7d1a56_base
+hs_bindgen_2acb3af28d162663 =
+  RIP.fromFFIType hs_bindgen_2acb3af28d162663_base
 
 {-| __C declaration:__ @pixman_add_traps@
 
@@ -7308,10 +7308,10 @@ pixman_add_traps ::
   -> PtrConst.PtrConst Pixman_trap_t
      -- ^ __C declaration:__ @traps@
   -> IO ()
-pixman_add_traps = hs_bindgen_0584a8643b7d1a56
+pixman_add_traps = hs_bindgen_2acb3af28d162663
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_add_trapezoids@
-foreign import ccall unsafe "hs_bindgen_9861ca3066f3a896" hs_bindgen_9861ca3066f3a896_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_add_trapezoids@
+foreign import ccall unsafe "hs_bindgen_d47de53cc831877b" hs_bindgen_d47de53cc831877b_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int16
   -> RIP.Int32
@@ -7319,16 +7319,16 @@ foreign import ccall unsafe "hs_bindgen_9861ca3066f3a896" hs_bindgen_9861ca3066f
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_add_trapezoids@
-hs_bindgen_9861ca3066f3a896 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_add_trapezoids@
+hs_bindgen_d47de53cc831877b ::
      RIP.Ptr Pixman_image_t
   -> HsBindgen.Runtime.LibC.Int16
   -> RIP.CInt
   -> RIP.CInt
   -> PtrConst.PtrConst Pixman_trapezoid_t
   -> IO ()
-hs_bindgen_9861ca3066f3a896 =
-  RIP.fromFFIType hs_bindgen_9861ca3066f3a896_base
+hs_bindgen_d47de53cc831877b =
+  RIP.fromFFIType hs_bindgen_d47de53cc831877b_base
 
 {-| __C declaration:__ @pixman_add_trapezoids@
 
@@ -7348,25 +7348,25 @@ pixman_add_trapezoids ::
   -> PtrConst.PtrConst Pixman_trapezoid_t
      -- ^ __C declaration:__ @traps@
   -> IO ()
-pixman_add_trapezoids = hs_bindgen_9861ca3066f3a896
+pixman_add_trapezoids = hs_bindgen_d47de53cc831877b
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_rasterize_trapezoid@
-foreign import ccall unsafe "hs_bindgen_db32fc2c5ec38d74" hs_bindgen_db32fc2c5ec38d74_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_rasterize_trapezoid@
+foreign import ccall unsafe "hs_bindgen_0091e5f8242f0827" hs_bindgen_0091e5f8242f0827_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_rasterize_trapezoid@
-hs_bindgen_db32fc2c5ec38d74 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_rasterize_trapezoid@
+hs_bindgen_0091e5f8242f0827 ::
      RIP.Ptr Pixman_image_t
   -> PtrConst.PtrConst Pixman_trapezoid_t
   -> RIP.CInt
   -> RIP.CInt
   -> IO ()
-hs_bindgen_db32fc2c5ec38d74 =
-  RIP.fromFFIType hs_bindgen_db32fc2c5ec38d74_base
+hs_bindgen_0091e5f8242f0827 =
+  RIP.fromFFIType hs_bindgen_0091e5f8242f0827_base
 
 {-| __C declaration:__ @pixman_rasterize_trapezoid@
 
@@ -7385,10 +7385,10 @@ pixman_rasterize_trapezoid ::
      -- ^ __C declaration:__ @y_off@
   -> IO ()
 pixman_rasterize_trapezoid =
-  hs_bindgen_db32fc2c5ec38d74
+  hs_bindgen_0091e5f8242f0827
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_composite_trapezoids@
-foreign import ccall unsafe "hs_bindgen_9e9c5d1de1c6cc4f" hs_bindgen_9e9c5d1de1c6cc4f_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_composite_trapezoids@
+foreign import ccall unsafe "hs_bindgen_1d4d21fa236f4051" hs_bindgen_1d4d21fa236f4051_base ::
      RIP.Word32
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
@@ -7401,8 +7401,8 @@ foreign import ccall unsafe "hs_bindgen_9e9c5d1de1c6cc4f" hs_bindgen_9e9c5d1de1c
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_composite_trapezoids@
-hs_bindgen_9e9c5d1de1c6cc4f ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_composite_trapezoids@
+hs_bindgen_1d4d21fa236f4051 ::
      Pixman_op_t
   -> RIP.Ptr Pixman_image_t
   -> RIP.Ptr Pixman_image_t
@@ -7414,8 +7414,8 @@ hs_bindgen_9e9c5d1de1c6cc4f ::
   -> RIP.CInt
   -> PtrConst.PtrConst Pixman_trapezoid_t
   -> IO ()
-hs_bindgen_9e9c5d1de1c6cc4f =
-  RIP.fromFFIType hs_bindgen_9e9c5d1de1c6cc4f_base
+hs_bindgen_1d4d21fa236f4051 =
+  RIP.fromFFIType hs_bindgen_1d4d21fa236f4051_base
 
 {-| __C declaration:__ @pixman_composite_trapezoids@
 
@@ -7446,10 +7446,10 @@ pixman_composite_trapezoids ::
      -- ^ __C declaration:__ @traps@
   -> IO ()
 pixman_composite_trapezoids =
-  hs_bindgen_9e9c5d1de1c6cc4f
+  hs_bindgen_1d4d21fa236f4051
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_composite_triangles@
-foreign import ccall unsafe "hs_bindgen_118007b928d49a7e" hs_bindgen_118007b928d49a7e_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_composite_triangles@
+foreign import ccall unsafe "hs_bindgen_0c339127975d35d6" hs_bindgen_0c339127975d35d6_base ::
      RIP.Word32
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
@@ -7462,8 +7462,8 @@ foreign import ccall unsafe "hs_bindgen_118007b928d49a7e" hs_bindgen_118007b928d
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_composite_triangles@
-hs_bindgen_118007b928d49a7e ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_composite_triangles@
+hs_bindgen_0c339127975d35d6 ::
      Pixman_op_t
   -> RIP.Ptr Pixman_image_t
   -> RIP.Ptr Pixman_image_t
@@ -7475,8 +7475,8 @@ hs_bindgen_118007b928d49a7e ::
   -> RIP.CInt
   -> PtrConst.PtrConst Pixman_triangle_t
   -> IO ()
-hs_bindgen_118007b928d49a7e =
-  RIP.fromFFIType hs_bindgen_118007b928d49a7e_base
+hs_bindgen_0c339127975d35d6 =
+  RIP.fromFFIType hs_bindgen_0c339127975d35d6_base
 
 {-| __C declaration:__ @pixman_composite_triangles@
 
@@ -7507,10 +7507,10 @@ pixman_composite_triangles ::
      -- ^ __C declaration:__ @tris@
   -> IO ()
 pixman_composite_triangles =
-  hs_bindgen_118007b928d49a7e
+  hs_bindgen_0c339127975d35d6
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_add_triangles@
-foreign import ccall unsafe "hs_bindgen_f6b8954b7a0f13f4" hs_bindgen_f6b8954b7a0f13f4_base ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_add_triangles@
+foreign import ccall unsafe "hs_bindgen_ef7eb28296e85527" hs_bindgen_ef7eb28296e85527_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
@@ -7518,16 +7518,16 @@ foreign import ccall unsafe "hs_bindgen_f6b8954b7a0f13f4" hs_bindgen_f6b8954b7a0
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_pixman_Bindings.Pixman.Generated_Unsafe_pixman_add_triangles@
-hs_bindgen_f6b8954b7a0f13f4 ::
+-- __unique:__ @Bindings_Pixman_Generated_Bindings.Pixman.Generated_Unsafe_pixman_add_triangles@
+hs_bindgen_ef7eb28296e85527 ::
      RIP.Ptr Pixman_image_t
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Int32
   -> RIP.CInt
   -> PtrConst.PtrConst Pixman_triangle_t
   -> IO ()
-hs_bindgen_f6b8954b7a0f13f4 =
-  RIP.fromFFIType hs_bindgen_f6b8954b7a0f13f4_base
+hs_bindgen_ef7eb28296e85527 =
+  RIP.fromFFIType hs_bindgen_ef7eb28296e85527_base
 
 {-| __C declaration:__ @pixman_add_triangles@
 
@@ -7547,4 +7547,4 @@ pixman_add_triangles ::
   -> PtrConst.PtrConst Pixman_triangle_t
      -- ^ __C declaration:__ @tris@
   -> IO ()
-pixman_add_triangles = hs_bindgen_f6b8954b7a0f13f4
+pixman_add_triangles = hs_bindgen_ef7eb28296e85527

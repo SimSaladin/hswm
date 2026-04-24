@@ -11,18 +11,15 @@
 module HSWM.Util.Waybar where
 
 import HSWM.Core hiding (closed)
-import System.IO
 import System.Process (terminateProcess)
 import System.Process.Typed
+import HSWM.Util.Process
 
-data WaybarConfig = WaybarConfig
+newtype WaybarConfig = WaybarConfig { args :: [String] }
   deriving (Show, Eq, Generic)
   deriving anyclass (Default)
 
-data WaybarState = WaybarState
-  { wbProcess :: !(Maybe (Process () Handle Handle))
-  , wbAsyncs :: [Async ()]
-  }
+newtype WaybarState = WaybarState { wbProcess :: Maybe (Process () () ()) }
   deriving (Show, Generic)
   deriving anyclass (Default)
 
@@ -34,33 +31,21 @@ waybarSB wbcfg ucfg =
     }
 
 waybarStartupHook :: WaybarConfig -> H ()
-waybarStartupHook _ = do
-  log' "Starting waybar..."
-  st <- getOrCreateObject $ pure (def :: WaybarState)
-  process <-
-    startProcess $
+waybarStartupHook cfg = do
+  logInfo "Starting waybar..."
+  logFn <- askLoggerIO
+  process <- startProcess $
       setStdin nullStream $
-        setStdout createPipe $
-          setStderr createPipe $
-            proc "waybar" [{-"-l", "debug"-}]
-  let errh = getStderr process
-  let outh = getStdout process
-  a1 <- async $ forever $ do
-    ln <- io $ hGetLine errh
-    logInfo $ fromString ln :# [ "process" .= ("waybar" :: String) ]
-  a2 <- async $ forever $ do
-    ln <- io $ hGetLine outh
-    logInfo $ fromString ln :# [ "process" .= ("waybar" :: String) ]
-
-  putObject st {wbProcess = Just process, wbAsyncs = [a1, a2]}
+      setStdout (logOutput logFn) $
+      setStderr (logOutput logFn) $
+      proc "waybar" cfg.args
+  modifyObjectDef $ \st -> st {wbProcess = Just process}
 
 waybarExitHook :: WaybarConfig -> H ()
 waybarExitHook _ = do
-  withObject $ \WaybarState {wbProcess, wbAsyncs} -> do
+  withObject $ \WaybarState {wbProcess} -> do
     io $ case wbProcess of
       Nothing -> pure ()
       Just p -> do
         void $ try @_ @SomeException $ terminateProcess $ unsafeProcessHandle p
         void $ try @_ @SomeException $ stopProcess p
-
-    cancelMany wbAsyncs

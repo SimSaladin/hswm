@@ -1,4 +1,6 @@
 {-# OPTIONS_GHC -Wno-ambiguous-fields -Wno-unused-record-wildcards -Wno-name-shadowing #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
+
 
 -- |
 -- Module      : HSWM.Main
@@ -47,24 +49,54 @@ import Bindings.Wayland.Protocol.ForeignTopLevelListV1 as WL
 import Bindings.Wayland.ExtIdleNotifyV1 as Ext
 import Control.Concurrent (threadWaitRead, threadWaitWrite)
 import Control.Concurrent.Thread.Delay as Conc (delay)
-import System.Environment (getArgs)
 import System.Log.FastLogger
+import Options.Generic
+import Options.Applicative qualified as Opts
+import Data.List qualified as L
+import Data.Char
 
 -- | Main entrypoint settings.
-data MainRun = MainRun
-  { mainLogFile :: Maybe FilePath -- ^ If not logging to file, logs are sent to stdout
-  , mainLogLevel :: LogLevel -- ^ Default: debug
-  } deriving (Show, Read)
+data MainRun w = MainRun
+  { mainLogFile :: w ::: Maybe FilePath <?> "If not logging to file, logs are sent to stdout" <!> ""
+  , mainLogLevel :: w ::: LogLevel <?> "Log level (debug, info, warn or error)" <!> "debug"
+  , mainStateFile :: w ::: Maybe FilePath <?> "State file to read on restart"
+  } deriving (Generic)
 
-instance Default MainRun where
-  def = MainRun (Just "") LevelDebug
+instance Default (MainRun Unwrapped) where
+  def = MainRun (Just "") LevelDebug Nothing
 
-parseMainArgs :: [String] -> MainRun
-parseMainArgs args = def -- TODO
+instance ParseField LogLevel where
+  readField = Opts.maybeReader $ \case
+    "debug" -> Just LevelDebug
+    "info" -> Just LevelInfo
+    "error" -> Just LevelError
+    "warn" -> Just LevelWarn
+    _ -> Nothing
+
+instance ParseFields LogLevel
+instance ParseRecord LogLevel where
+  parseRecord = fmap getOnly parseRecord
+
+instance ParseRecord (MainRun Wrapped) where
+  parseRecord = parseRecordWithModifiers defaultModifiers
+    { fieldNameModifier = \name -> fromCC $ fromMaybe name (L.stripPrefix "main" name)
+    }
+
+fromCC :: String -> String
+fromCC [] = []
+fromCC (x:xs) = go $ toLower x : xs
+  where
+    go [] = []
+    go (x:xs)
+      | isUpper x = '-' : toLower x : go xs
+      | otherwise = x : go xs
+
+parseMainArgs :: IO (MainRun Unwrapped)
+parseMainArgs = unwrapRecord "hswm"
 
 hswm :: (m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow)) => HSWMConfig m l -> IO ()
 hswm conf = do
-  mainRun <- parseMainArgs <$> io getArgs
+  mainRun <- parseMainArgs
   loggerSet <- case mainRun.mainLogFile of
                  Nothing -> newStdoutLoggerSet defaultBufSize
                  Just "" -> newFileLoggerSet defaultBufSize =<< defaultLogFile
@@ -72,7 +104,7 @@ hswm conf = do
   let logFunc = fastLoggerOutput loggerSet
   installSignalHandlers
   display <- WL.displayConnect Nothing
-  startHSWM logFunc display conf
+  startHSWM mainRun loggerSet logFunc display conf
     where
       defaultLogFile = do
         d <- getXdgDirectory XdgData "hswm"
@@ -80,9 +112,11 @@ hswm conf = do
         return $ d ++ "/" ++ "hswm.log"
 
 startHSWM :: (m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow))
-          => (Loc -> LogSource -> LogLevel -> LogStr -> IO ())
+          => MainRun Unwrapped
+          -> LoggerSet
+          -> (Loc -> LogSource -> LogLevel -> LogStr -> IO ())
           -> WL.Display -> HSWMConfig m l -> IO ()
-startHSWM logFunc wlDisplay config = do
+startHSWM mainRun loggerSet logFunc wlDisplay config = do
     let withLogging = flip runLoggingT logFunc
 
     conf <- HConf False Nothing (config {layoutHook = Layout (layoutHook config)}) wlDisplay logFunc
@@ -101,7 +135,7 @@ startHSWM logFunc wlDisplay config = do
 
         handleE = runInH . handleWithHook
 
-    initialState <- withLogging $ readStateFile config >>= \case
+    initialState <- withLogging $ readStateFile mainRun.mainStateFile config >>= \case
         Just hs -> return hs
         Nothing ->
           let initialWinSet = W.new conf.config.layoutHook config.workspaces [SD 0 0 0 0]
@@ -138,7 +172,7 @@ startHSWM logFunc wlDisplay config = do
       _ <- getOrCreateObjectIO $ Wlr.mkOutputHeadListener $ handleE . WlrOutputHeadEvent
       _ <- getOrCreateObjectIO $ Ext.mkIdleNotificationListener $ handleE . ExtIdleNotificationEvent
       --_ <- getOrCreateObjectIO $ WL.mkForeignToplevelListListener $ handleE . ForeignTopLevelListV1
-      logDebug "created event listeners"
+      logDebug "Created event listeners"
 
       registry <- displayGetRegistry wlDisplay
       io $ WL.listenerAdd registry regL nullPtr
@@ -223,8 +257,9 @@ startHSWM logFunc wlDisplay config = do
                     (_, Left ev) -> main ev
                     _ -> main MainPoll
           main (MainExit s) = do
-            logInfo $ "(main) Exiting" :# [ "reason" .= s ]
+            logError $ "(main) Exiting" :# [ "reason" .= s ]
             void $ userCode config.exitHook
+            io $ rmLoggerSet loggerSet
             exitFailure
           main (MainRestart prog) = do
             logInfo $ "(main) Restarting" :# [ "program" .= prog ]
@@ -284,13 +319,11 @@ handleEvent (WindowManagerEvent e) = case e of
     --logDebug "main: render finished"
 
   R.RiverWindowManagerUnavailable {} -> do
-    logError "another window manager already running"
-    io $ Posix.raiseSignal Posix.sigTERM
+    writeMainEvent $ MainExit "another window manager already running"
 
   R.RiverWindowManagerFinished _ wm -> do
     io $ R.objectDestroy wm
-    logInfo "river_window_manage_v1 finished, exiting."
-    io $ Posix.raiseSignal Posix.sigINT
+    writeMainEvent $ MainExit "river_window_manage_v1 finished, exiting."
 
   R.RiverWindowManagerSessionLocked _ _wm -> do
     q <- asks (view pendingManageQL)

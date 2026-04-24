@@ -34,11 +34,12 @@ import HSWM.Hooks.NonExclusiveArea qualified as NEArea
 import HSWM.Wallpaper qualified
 import System.Environment qualified as ENV
 import Text.Printf
+import HSWM.Util.PangoMarkup qualified as P
 
 main :: IO ()
 main =
   hswm $
-    addKeys (fromADTKeys $ parseSubmaps myKeys) $
+    addKeys' myKeys $
       WB.waybarSB def $
         HSWM.Wallpaper.usingWallpaper
           HSWM.Wallpaper.WallpaperConfig {filepath = "/home/sim/wallpaper.png"}
@@ -98,34 +99,24 @@ rofiPrompt = def
 environPrompt :: H ()
 environPrompt = do
   varsEnv <- io ENV.getEnvironment
-
   (_, varsSessionBS, _) <- readProcess $ proc "systemctl" ["--user", "--no-block", "--no-pager", "show-environment"]
-  let varsSessionString = BLC8.unpack varsSessionBS
-  let varsSession = map parseLine $ lines varsSessionString
+  let varsSession = map parseLine $ lines $ BLC8.unpack varsSessionBS
 
       varsMap = M.unionWith (\(e1, s1) (e2, s2) -> (e1 <|> e2, s1 <|> s2))
         (M.fromList [ (k, (Nothing, Just v)) | (k, v) <- varsSession ])
         (M.fromList [(k, (Just v, Nothing)) | (k, v) <- varsEnv])
 
       rows =
-        [ "<b>" <> k <> "</b>"
-          <> maybe "" (\v -> "=" <> escval v) vEnv
-          <> (if vEnv /= vSD then maybe "" (\v -> "=" <> escval v) vSD else "")
+        [ "<b>" <> toText k <> "</b>"
+          <> maybe "" (\v -> "=" <> escval (toText v)) vEnv
+          <> (if vEnv /= vSD then maybe "" (\v -> "=" <> escval (toText v)) vSD else "")
           <> (if isNothing vSD then " <i>(not in systemd user env)</i>" else "")
           <> (if isNothing vEnv then " <i>(not in WM env)</i>" else "")
         | (k, (vEnv, vSD)) <- M.toList varsMap]
 
-      -- TODO: use https://docs.gtk.org/glib/func.markup_escape_text.html
-      escval [] = []
-      escval (x:xs)
-        | x == '\n' = '\\' : 'n' : escval xs
-        | x == '\r' = '\\' : 'r' : escval xs
-        | x == '<' = "&lt;" ++ escval xs
-        | x == '>' = "&gt;" ++ escval xs
-        | x == '&' = "&amp;" ++ escval xs
-        | otherwise = x : escval xs
+      escval = P.escapeLineBreaks . P.escapePangoMarkup
 
-  RP.rofiRun rofiPrompt {RP._prompt = "Set env variable", RP._format = "p"} rows >>= (`whenJust` doApply)
+  RP.rofiRun rofiPrompt {RP._prompt = "Set env variable", RP._format = RP.FilterString} rows >>= (`whenJust` doApply)
   where
     doApply input = do
       logInfo $ "environ prompt" :# [ "input" .= input ]
@@ -162,10 +153,15 @@ windowPrompt = do
   where
     rp = rofiPrompt
       { RP._prompt = "Go to window",
-        RP._format = "i",
+        RP._format = RP.SelectedIndex,
         RP._noCustom = True
       }
-    fmtWindow (_rw, tag, w) = "<b>" <> w.appId <> "</b> on " <> tag <> " \"" <> w.title <> "\"" <> maybe "" ((" " <>) . show) w.unreliablePid
+
+    fmtWindow (_rw, tag, w) =
+      P.Bold (P.text w.appId) <> " on " <> P.text tag <>
+      " \"" <> P.text w.title <> "\"" <>
+        maybe "" ((" " <>) . P.fromShow) w.unreliablePid
+
     doApply wins idxStr = do
       let idx = read idxStr :: Int
           (rw, _, _) = wins !! idx
@@ -249,20 +245,20 @@ myKeys =
   -- ====== Core ==========
   [ ("M-S-c",     "Close the focused window" <??> withFocused manageKill),
     ("M-q",       "Restart WM" <??> sendRestart @H),
-    ("M-Return",  "New terminal window" <??> void (spawnProcess @H "kitty" [])),
+    ("M-Return",  "New terminal window" <??> spawnProcess @H "kitty" []),
     ("M-Escape",  "Print debug stack" <??> debugAction),
-    ("M-Dollar",  "Lock session" <??> void (spawnProcess @H "swaylock" ["-k"])),
-    ("M-Print",   "Screenshot" <??> void (spawnProcess @H "sh" ["-c", "grim -g \"$(slurp)\""])),
+    ("M-Dollar",  "Lock session" <??> spawnProcess @H "swaylock" ["-k"]),
+    ("M-Print",   "Screenshot" <??> spawnProcess @H "sh" ["-c", "grim -g \"$(slurp)\""]),
     -- "M-r M-S-c"     cmdT @"Signal process (SIGKILL) of focused window (_NET_WM_PID)" (withFocused (signalProcessBy Posix.sigKILL))
     -- "M-S-<Return>"  FloatNext.floatNext True >> spawnTerm def "" ? "Terminal (floating)"
-    -- "M-<F1>" `CF.key'` helpCmd
+    ("M-F1", showKeyHelp <?> "Show help"),
     --("M-F3", "" <??> (`whenJust` setKeyboardKeymaps (const True)) =<< asks (xkbLayout . config)),
     --("M-F4", "" <??> setKeyboardKeymaps (const True) (keymapFromString "us")),
 
     -- ======== Execute ==========
     ("M-r r", "Run shell (prompt)" <??> RP.rofiLaunch @_ @H def { RP._modes = "run", RP._show = "run" }),
-    ("M-r d", "Run desktop app (prompt)" <??> RP.rofiLaunch @_ @H def { RP._modes = "drun", RP._show = "drun" }),
-    ("M-r s", "Run via systemd-run (prompt)" <??> RP.rofiRun @_ @H def { RP.history = Just "systemd-run", RP._prompt = "systemd-run", RP._dmenu = True } [] RP.++> RP.runWithSystemD),
+    ("M-r d", "Run desktop app (prompt)" <??> RP.rofiLaunch @_ @H def { RP._modes = "drun", RP._show = "drun", RP.showIcons = True }),
+    ("M-r s", "Run via systemd-run (prompt)" <??> RP.rofiRun @_ @H def { RP.history = Just "systemd-run", RP._prompt = "systemd-run", RP._dmenu = True } ([] :: [String]) RP.++> RP.runWithSystemD),
     ("M-r c", "Open cliphist prompt" <??> RP.rofiLaunch @_ @H def { RP._modi = "clipboard:cliphist-rofi-img", RP._show = "clipboard", RP.showIcons = True }),
     ("M-r b", spawnOnceKitty "bluetoothctl@kitty" "bluetoothctl" [] (doCenterFloat (3/5) (2/3))),
 
@@ -283,7 +279,7 @@ myKeys =
     ++ [("M-SemiColon " ++ key,    "View workspace " ++ show i <??> DWO.withNthWorkspace W.view i) | (key, i) <- tagKeysTags]
     ++ [("M-S-SemiColon " ++ key,  "Shift to workspace " ++ show i <??> DWO.withNthWorkspace W.shift i) | (key, i) <- tagKeysTags]
     ++ [ ("M-y",   "Cycle recent hidden tags" <??> cycleRecentHiddenWS [4, 8, 64] 121 112),
-         ("M-S-n", "Shift current tag (forwards)" <??> DWO.swapWith Next CycleWS.anyWS), -- XXX: save workspace order?
+         ("M-S-n", "Shift current tag (forwards)" <??> DWO.swapWith Next CycleWS.anyWS),
          ("M-S-p", "Shift current tag (backwards)" <??> DWO.swapWith Prev CycleWS.anyWS),
          ("M-g r", "Rename workspace (prompt)" <??> renameWorkspacePrompt),
          ("M-g n", "Add workspace (prompt)" <??> addWorkspacePrompt),
@@ -309,7 +305,6 @@ myKeys =
       --   "M-b x"       >+ toggle1 REFLECTX
       --   "M-b y"       >+ toggle1 REFLECTY
       --   "M-b s"       >+ ToggleScreenSpacing :>> ToggleWindowSpacing
-      --   "M-b l"       >+ msgT Magnifier.Toggle
       ("M-b M-x",       "Toggle struts/border/spacing" <??> (sendMessage NEArea.ToggleNonExclusiveArea >> sendMessage (Toggle NOBORDERS) {-ToggleScreenSpacing :>> ToggleWindowSpacing -})),
 
       -- ======= Layout: BSP
@@ -322,10 +317,10 @@ myKeys =
     ++[("M-C-" ++ key, "BSP: Expand Towards" <??> BSP.ExpandTowards dir) | (key, dir) <- directions2D ]
 
       -- ====== Window =============
-    ++ [("M-" ++ key,   "Focus window direction" <??> sendMessage (L.WNavigation.Go dir)) | (key, dir) <- zip ["k", "j", "l", "h"] [minBound .. maxBound @Direction2D]]
-    ++ [("M-S-" ++ key, "Swap window in direction" <??> sendMessage (L.WNavigation.Swap dir)) | (key, dir) <- zip ["k", "j", "l", "h"] [minBound .. maxBound @Direction2D]]
-    ++ [ ("M-n",        "Focus down" <??> windows W.focusDown),
-         ("M-p",        "Focus up" <??> windows W.focusUp),
+    ++ [("M-" ++ key,   L.WNavigation.Go dir <?> "Window") | (key, dir) <- zip ["k", "j", "l", "h"] [minBound .. maxBound @Direction2D]]
+    ++ [("M-S-" ++ key, L.WNavigation.Swap dir <?> "Window") | (key, dir) <- zip ["k", "j", "l", "h"] [minBound .. maxBound @Direction2D]]
+    ++ [ ("M-n",        windows W.focusDown <?> "Focus down"),
+         ("M-p",        windows W.focusUp <?> "Focus up"),
          ("M-b f",      "Toggle fullscreen (focused)" <??> withFocused (doManage WToggleFullscreen)),
          ("M-f f",      "Float (focused)" <??>
            withFocused (\w -> modifyWindowSet (\ws ->
@@ -388,7 +383,6 @@ myKeys =
          --   "M-r C-u" >+ XP.Pass.passPromptWith "show-field --clip username" xpConfig ? "Pass username (Prompt)"
          --   "M-r q"   >+ XP.QB.qutebrowserP xpConfigNoHist "qutebrowser" ?+ XP.QB.qutebrowser ? "Prompt: qutebrowser"
          --   "M-r s"   >+ inputPromptWithCompl xpConfig "scratchpad" (scratchpadCompl xpConfig myScratchpads) ?+ getAction . togglePad ? "Prompt: pad"
-         --   "M-r d"   >+ desktopEntryPrompt xpConfig [] ? "Desktop Entry Launch Prompt"
          --   "M-r u"   >+ inputPromptWithHistCompl xpConfig "browser-app" ?+ (\s -> launchDesktopEntry "chrome-app" [s]) ? "Chrome App"
        ]
   where
@@ -401,8 +395,8 @@ myKeys =
 
 myPointerBinds :: [((String, Button), SomeAction H)]
 myPointerBinds =
-  [ (("M", _BTN_LEFT),  "Move window" <??> startSeatOp SEAT_OP_MOVE),
-    (("M", _BTN_RIGHT), "Resize (stretch) window" <??> startSeatOp SEAT_OP_RESIZE)
+  [ (("M", _BTN_LEFT),  startSeatOp SEAT_OP_MOVE <?> "Move window"),
+    (("M", _BTN_RIGHT), startSeatOp SEAT_OP_RESIZE <?> "Resize (stretch) window")
   ]
 
 backlight :: [String] -> SomeAction H
@@ -422,9 +416,3 @@ toggleMuteSource = pactl ["set-source-mute", "@DEFAULT_SOURCE@", "toggle"]
 
 toggleMuteSink :: SomeAction H
 toggleMuteSink = pactl ["set-sink-mute", "@DEFAULT_SINK@", "toggle"]
-
-spawnProcess :: MonadProcessSpawn m => String -> [String] -> m ()
-spawnProcess prog args = void . async $ runProcess $
-  setCloseFds True $
-  setNewSession True $
-  proc prog args

@@ -166,15 +166,13 @@ handleXkbBindingEvent = \case
      xb <- io $ deRefStablePtr (castPtrToStablePtr (castPtr dt) :: StablePtr (XkbBinding (SomeAction H)))
      execXkbBinding ptr xb
 
-    R.RiverXkbBindingReleased dt ptr -> do
+    R.RiverXkbBindingReleased dt _ -> do
      xb <- io $ deRefStablePtr (castPtrToStablePtr (castPtr dt) :: StablePtr (XkbBinding (SomeAction H)))
-     runInHS $ withSeat xb.river_seat $ \s -> case s.pending_action of
-        S_KEYBIND_REPEAT kb as | kb == ptr -> do
-            cancel as
-            modifySeat s.river_seat $ \x -> x { pending_action = S_NONE }
-        _ -> return ()
+     cancelXkbBinding xb
 
-    R.RiverXkbBindingStopRepeat{} -> return ()
+    R.RiverXkbBindingStopRepeat dt _ -> do
+     xb <- io $ deRefStablePtr (castPtrToStablePtr (castPtr dt) :: StablePtr (XkbBinding (SomeAction H)))
+     cancelXkbBinding xb
 
 handleXkbBindingsSeatEvent :: R.RiverXkbBindingsSeatEvent -> H ()
 handleXkbBindingsSeatEvent ev = case ev of
@@ -432,16 +430,22 @@ ensureNextKeyEaten, cancelEnsureNextKeyEaten :: MonadIO m => Seat -> m ()
 ensureNextKeyEaten s = io $ R.riverXkbBindingsSeatEnsureNextKeyEaten s.xkb_bindings_seat
 cancelEnsureNextKeyEaten s = io $ R.riverXkbBindingsSeatCancelEnsureNextKeyEaten s.xkb_bindings_seat
 
+cancelXkbBinding :: XkbBinding (SomeAction H) -> H ()
+cancelXkbBinding xb = tryTakeMVar xb.running >>= maybe (return ()) cancel
+
 execXkbBinding :: R.RiverXkbBinding -> XkbBinding (SomeAction H) -> H ()
 execXkbBinding ref xb = local (\r -> r {thisSeat = Just rs}) $ do
 
   let next action = runInHS $ modifySeat rs $ \s' -> s' {pending_action = action }
       execute = void . userCode $ runner xb.action
-      boundAction = if xb.autorepeat
-                       then do logDebug "xkbbind: autorepeat on"
-                               r <- async $ forever $ execute >> threadDelay (1000 * 1300)
-                               next $ S_KEYBIND_REPEAT ref r
-                       else void $ async execute
+      boundAction = do
+        tryTakeMVar xb.running >>= maybe (return ()) cancel
+        if xb.autorepeat
+           then do logDebug "xkbbind: autorepeat on"
+                   r <- async $ forever $ execute >> threadDelay (1000 * 1300)
+                   putMVar xb.running r
+           else do r <- async execute
+                   putMVar xb.running r
 
   ms <- runInHS $ lookupSeat rs
   whenJust ms $ \s -> case (s.submap_pending, actionSubmap @H xb.action) of

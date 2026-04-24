@@ -8,4 +8,4 @@ import Bindings.Wayland.Viewporter.Generated.Safe
 
 import Bindings.Wayland.Client
 
-clientFromProtocolXML commonSettings "viewporter.xml"
+clientFromProtocolXML commonSettings "wayland-protocols/viewporter.xml"

@@ -59,8 +59,8 @@ mkWindowNavigationKeys (u, l, d, r) (modGo, modSwap) f = do
       trackMovement stateRef
     )
   where
-    fromWNAction stateRef x@(WNGo dir) = namedA (show x) $ go stateRef dir
-    fromWNAction stateRef x@(WNSwap dir) = namedA (show x) $ swap stateRef dir
+    fromWNAction stateRef x@(WNGo dir) = named (show x) $ go stateRef dir
+    fromWNAction stateRef x@(WNSwap dir) = named (show x) $ swap stateRef dir
 
 -- | Focus window in the given direction.
 go :: IORef WNState -> Direction2D -> H ()

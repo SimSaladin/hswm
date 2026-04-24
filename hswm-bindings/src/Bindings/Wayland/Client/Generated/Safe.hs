@@ -226,13 +226,13 @@ import Bindings.Wayland.Client.Generated
 
 $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.unlines
   [ "#include <wayland-client.h>"
-  , "void hs_bindgen_5dfb8d65eb4cda1f ("
+  , "void hs_bindgen_3c7bb572c9738528 ("
   , "  struct wl_event_queue *arg1"
   , ")"
   , "{"
   , "  (wl_event_queue_destroy)(arg1);"
   , "}"
-  , "struct wl_proxy *hs_bindgen_a92dea01101775a0 ("
+  , "struct wl_proxy *hs_bindgen_947e15003f3dff9b ("
   , "  struct wl_proxy *arg1,"
   , "  uint32_t arg2,"
   , "  struct wl_interface const *arg3,"
@@ -243,7 +243,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (wl_proxy_marshal_array_flags)(arg1, arg2, arg3, arg4, arg5, arg6);"
   , "}"
-  , "void hs_bindgen_da7c2598731036c7 ("
+  , "void hs_bindgen_f3c9f0398f117735 ("
   , "  struct wl_proxy *arg1,"
   , "  uint32_t arg2,"
   , "  union wl_argument *arg3"
@@ -251,26 +251,26 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (wl_proxy_marshal_array)(arg1, arg2, arg3);"
   , "}"
-  , "struct wl_proxy *hs_bindgen_ea6dc6bb1ed192d7 ("
+  , "struct wl_proxy *hs_bindgen_3fba5bc1e147a38c ("
   , "  struct wl_proxy *arg1,"
   , "  struct wl_interface const *arg2"
   , ")"
   , "{"
   , "  return (wl_proxy_create)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_85701f676dbca379 ("
+  , "void *hs_bindgen_dbcd6f30ea58b40c ("
   , "  void *arg1"
   , ")"
   , "{"
   , "  return (wl_proxy_create_wrapper)(arg1);"
   , "}"
-  , "void hs_bindgen_596e8060468914d0 ("
+  , "void hs_bindgen_5bcc8bee89b26e03 ("
   , "  void *arg1"
   , ")"
   , "{"
   , "  (wl_proxy_wrapper_destroy)(arg1);"
   , "}"
-  , "struct wl_proxy *hs_bindgen_b0fa8b968c8f0acb ("
+  , "struct wl_proxy *hs_bindgen_4f1c8f4a68ea4254 ("
   , "  struct wl_proxy *arg1,"
   , "  uint32_t arg2,"
   , "  union wl_argument *arg3,"
@@ -279,7 +279,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (wl_proxy_marshal_array_constructor)(arg1, arg2, arg3, arg4);"
   , "}"
-  , "struct wl_proxy *hs_bindgen_43ebdcb89aaf2464 ("
+  , "struct wl_proxy *hs_bindgen_304f88178494a08f ("
   , "  struct wl_proxy *arg1,"
   , "  uint32_t arg2,"
   , "  union wl_argument *arg3,"
@@ -289,13 +289,13 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (wl_proxy_marshal_array_constructor_versioned)(arg1, arg2, arg3, arg4, arg5);"
   , "}"
-  , "void hs_bindgen_7fdde303c65b3145 ("
+  , "void hs_bindgen_ce5e3926cfe58fe4 ("
   , "  struct wl_proxy *arg1"
   , ")"
   , "{"
   , "  (wl_proxy_destroy)(arg1);"
   , "}"
-  , "signed int hs_bindgen_e2a379af3db7c19b ("
+  , "signed int hs_bindgen_d84424767c487f97 ("
   , "  struct wl_proxy *arg1,"
   , "  void (**arg2) (void),"
   , "  void *arg3"
@@ -303,13 +303,13 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (wl_proxy_add_listener)(arg1, arg2, arg3);"
   , "}"
-  , "void const *hs_bindgen_3b2df94eebf88b6b ("
+  , "void const *hs_bindgen_b3c3246cd305657c ("
   , "  struct wl_proxy *arg1"
   , ")"
   , "{"
   , "  return (wl_proxy_get_listener)(arg1);"
   , "}"
-  , "signed int hs_bindgen_3443ae83c581cc31 ("
+  , "signed int hs_bindgen_a01bc9baa0e54e27 ("
   , "  struct wl_proxy *arg1,"
   , "  wl_dispatcher_func_t arg2,"
   , "  void const *arg3,"
@@ -318,126 +318,126 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (wl_proxy_add_dispatcher)(arg1, arg2, arg3, arg4);"
   , "}"
-  , "void hs_bindgen_53bbf5585247d91c ("
+  , "void hs_bindgen_67a306da31f12964 ("
   , "  struct wl_proxy *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (wl_proxy_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_c9ea9e53a28ee550 ("
+  , "void *hs_bindgen_df97ea19381dccd3 ("
   , "  struct wl_proxy *arg1"
   , ")"
   , "{"
   , "  return (wl_proxy_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_79b2f1f43d9f56a8 ("
+  , "uint32_t hs_bindgen_bfcc0a98a374dd59 ("
   , "  struct wl_proxy *arg1"
   , ")"
   , "{"
   , "  return (wl_proxy_get_version)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_60f2e22067c4f24a ("
+  , "uint32_t hs_bindgen_3701976d337a6b34 ("
   , "  struct wl_proxy *arg1"
   , ")"
   , "{"
   , "  return (wl_proxy_get_id)(arg1);"
   , "}"
-  , "void hs_bindgen_1f55debeb10c2324 ("
+  , "void hs_bindgen_ef6b202bfddcad25 ("
   , "  struct wl_proxy *arg1,"
   , "  char const *const *arg2"
   , ")"
   , "{"
   , "  (wl_proxy_set_tag)(arg1, arg2);"
   , "}"
-  , "char const *const *hs_bindgen_74fbbfb5d0212584 ("
+  , "char const *const *hs_bindgen_7ed78f2b6e0295c5 ("
   , "  struct wl_proxy *arg1"
   , ")"
   , "{"
   , "  return (wl_proxy_get_tag)(arg1);"
   , "}"
-  , "char const *hs_bindgen_9e7884520de5a609 ("
+  , "char const *hs_bindgen_9bb1c2c3f8fc2343 ("
   , "  struct wl_proxy *arg1"
   , ")"
   , "{"
   , "  return (wl_proxy_get_class)(arg1);"
   , "}"
-  , "struct wl_interface const *hs_bindgen_b12b208751b123b7 ("
+  , "struct wl_interface const *hs_bindgen_9a5b4de347d591f4 ("
   , "  struct wl_proxy *arg1"
   , ")"
   , "{"
   , "  return (wl_proxy_get_interface)(arg1);"
   , "}"
-  , "struct wl_display *hs_bindgen_19e29ec485a4673b ("
+  , "struct wl_display *hs_bindgen_e0a82752b1b5f1c3 ("
   , "  struct wl_proxy *arg1"
   , ")"
   , "{"
   , "  return (wl_proxy_get_display)(arg1);"
   , "}"
-  , "void hs_bindgen_b9daeb9683a63e69 ("
+  , "void hs_bindgen_78f4d34a0e2352c7 ("
   , "  struct wl_proxy *arg1,"
   , "  struct wl_event_queue *arg2"
   , ")"
   , "{"
   , "  (wl_proxy_set_queue)(arg1, arg2);"
   , "}"
-  , "struct wl_event_queue *hs_bindgen_0b99a023eae3958e ("
+  , "struct wl_event_queue *hs_bindgen_41f02dc43fdf6011 ("
   , "  struct wl_proxy const *arg1"
   , ")"
   , "{"
   , "  return (wl_proxy_get_queue)(arg1);"
   , "}"
-  , "char const *hs_bindgen_8f0f7cab89a3eeb4 ("
+  , "char const *hs_bindgen_0905dcb3b11b1cbd ("
   , "  struct wl_event_queue const *arg1"
   , ")"
   , "{"
   , "  return (wl_event_queue_get_name)(arg1);"
   , "}"
-  , "struct wl_display *hs_bindgen_bb42064bf6c5a0e3 ("
+  , "struct wl_display *hs_bindgen_3bbbdb2c96e08e8d ("
   , "  char const *arg1"
   , ")"
   , "{"
   , "  return (wl_display_connect)(arg1);"
   , "}"
-  , "struct wl_display *hs_bindgen_240ef2b6cfbb8b90 ("
+  , "struct wl_display *hs_bindgen_3b51ea3473d00146 ("
   , "  signed int arg1"
   , ")"
   , "{"
   , "  return (wl_display_connect_to_fd)(arg1);"
   , "}"
-  , "void hs_bindgen_224b0bbc0877e5c6 ("
+  , "void hs_bindgen_152ae95b4600ff5e ("
   , "  struct wl_display *arg1"
   , ")"
   , "{"
   , "  (wl_display_disconnect)(arg1);"
   , "}"
-  , "signed int hs_bindgen_d9913c6c48bcd7d2 ("
+  , "signed int hs_bindgen_5bae4ad19779f87e ("
   , "  struct wl_display *arg1"
   , ")"
   , "{"
   , "  return (wl_display_get_fd)(arg1);"
   , "}"
-  , "signed int hs_bindgen_6ccadd758747fe82 ("
+  , "signed int hs_bindgen_cbe753ec9bdd44d1 ("
   , "  struct wl_display *arg1"
   , ")"
   , "{"
   , "  return (wl_display_dispatch)(arg1);"
   , "}"
-  , "signed int hs_bindgen_d8094b8790b36611 ("
+  , "signed int hs_bindgen_2c3d038bcac545a8 ("
   , "  struct wl_display *arg1,"
   , "  struct wl_event_queue *arg2"
   , ")"
   , "{"
   , "  return (wl_display_dispatch_queue)(arg1, arg2);"
   , "}"
-  , "signed int hs_bindgen_a8978634afcd1a30 ("
+  , "signed int hs_bindgen_5914b7ce9e7beffd ("
   , "  struct wl_display *arg1,"
   , "  struct timespec const *arg2"
   , ")"
   , "{"
   , "  return (wl_display_dispatch_timeout)(arg1, arg2);"
   , "}"
-  , "signed int hs_bindgen_ef1eb26bb7204ad0 ("
+  , "signed int hs_bindgen_6332fa3c31b0ebac ("
   , "  struct wl_display *arg1,"
   , "  struct wl_event_queue *arg2,"
   , "  struct timespec const *arg3"
@@ -445,26 +445,26 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (wl_display_dispatch_queue_timeout)(arg1, arg2, arg3);"
   , "}"
-  , "signed int hs_bindgen_1b469acbe08193d2 ("
+  , "signed int hs_bindgen_57821371522593d2 ("
   , "  struct wl_display *arg1,"
   , "  struct wl_event_queue *arg2"
   , ")"
   , "{"
   , "  return (wl_display_dispatch_queue_pending)(arg1, arg2);"
   , "}"
-  , "signed int hs_bindgen_4e48e5ca48f802f8 ("
+  , "signed int hs_bindgen_22411b5d8bbdaee0 ("
   , "  struct wl_display *arg1"
   , ")"
   , "{"
   , "  return (wl_display_dispatch_pending)(arg1);"
   , "}"
-  , "signed int hs_bindgen_d01c67c2a753901e ("
+  , "signed int hs_bindgen_0a9cad3177f16e15 ("
   , "  struct wl_display *arg1"
   , ")"
   , "{"
   , "  return (wl_display_get_error)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_7f9e1ca7f0a5d421 ("
+  , "uint32_t hs_bindgen_101c4e5ae7dc7aec ("
   , "  struct wl_display *arg1,"
   , "  struct wl_interface const **arg2,"
   , "  uint32_t *arg3"
@@ -472,71 +472,71 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (wl_display_get_protocol_error)(arg1, arg2, arg3);"
   , "}"
-  , "signed int hs_bindgen_bfdbc6edb813a282 ("
+  , "signed int hs_bindgen_b032ae8060087c07 ("
   , "  struct wl_display *arg1"
   , ")"
   , "{"
   , "  return (wl_display_flush)(arg1);"
   , "}"
-  , "signed int hs_bindgen_01733d21fb13b898 ("
+  , "signed int hs_bindgen_c5ce2d24af6cd240 ("
   , "  struct wl_display *arg1,"
   , "  struct wl_event_queue *arg2"
   , ")"
   , "{"
   , "  return (wl_display_roundtrip_queue)(arg1, arg2);"
   , "}"
-  , "signed int hs_bindgen_516b260dc3da7e30 ("
+  , "signed int hs_bindgen_be5919b56dfc1b74 ("
   , "  struct wl_display *arg1"
   , ")"
   , "{"
   , "  return (wl_display_roundtrip)(arg1);"
   , "}"
-  , "struct wl_event_queue *hs_bindgen_72548357b08504d2 ("
+  , "struct wl_event_queue *hs_bindgen_f2ec36fa20f6c3f9 ("
   , "  struct wl_display *arg1"
   , ")"
   , "{"
   , "  return (wl_display_create_queue)(arg1);"
   , "}"
-  , "struct wl_event_queue *hs_bindgen_a9c9e43f7026e4e8 ("
+  , "struct wl_event_queue *hs_bindgen_71151f4bcefd4106 ("
   , "  struct wl_display *arg1,"
   , "  char const *arg2"
   , ")"
   , "{"
   , "  return (wl_display_create_queue_with_name)(arg1, arg2);"
   , "}"
-  , "signed int hs_bindgen_c42f7d48679fbc7a ("
+  , "signed int hs_bindgen_426fe23dcd82efb7 ("
   , "  struct wl_display *arg1,"
   , "  struct wl_event_queue *arg2"
   , ")"
   , "{"
   , "  return (wl_display_prepare_read_queue)(arg1, arg2);"
   , "}"
-  , "signed int hs_bindgen_08e8d0babf6a209e ("
+  , "signed int hs_bindgen_2844e3e03b0b9c45 ("
   , "  struct wl_display *arg1"
   , ")"
   , "{"
   , "  return (wl_display_prepare_read)(arg1);"
   , "}"
-  , "void hs_bindgen_3dd16353884398e5 ("
+  , "void hs_bindgen_1ffa88b7c2b6632c ("
   , "  struct wl_display *arg1"
   , ")"
   , "{"
   , "  (wl_display_cancel_read)(arg1);"
   , "}"
-  , "signed int hs_bindgen_e64aef5c64b001cc ("
+  , "signed int hs_bindgen_a4b4a1bdee0763ed ("
   , "  struct wl_display *arg1"
   , ")"
   , "{"
   , "  return (wl_display_read_events)(arg1);"
   , "}"
-  , "void hs_bindgen_dd1e5344a4797733 ("
+  , "void hs_bindgen_06bf5de436a6dada ("
   , "  struct wl_display *arg1,"
   , "  size_t arg2"
   , ")"
   , "{"
   , "  (wl_display_set_max_buffer_size)(arg1, arg2);"
   , "}"
-  , "signed int hs_bindgen_5a65e92547a44700 ("
+  , "signed int hs_bindgen_3f7a4abb192eb298 ("
   , "  struct wl_display *arg1,"
   , "  struct wl_display_listener const *arg2,"
   , "  void *arg3"
@@ -544,38 +544,38 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (wl_display_add_listener)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_9d862dbc006d7ea9 ("
+  , "void hs_bindgen_41c437e82613ef3e ("
   , "  struct wl_display *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (wl_display_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_fc241b840d3cb0c3 ("
+  , "void *hs_bindgen_51c4c5da64075593 ("
   , "  struct wl_display *arg1"
   , ")"
   , "{"
   , "  return (wl_display_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_2c112ac55f97b3db ("
+  , "uint32_t hs_bindgen_e7af0344dc6a74f5 ("
   , "  struct wl_display *arg1"
   , ")"
   , "{"
   , "  return (wl_display_get_version)(arg1);"
   , "}"
-  , "struct wl_callback *hs_bindgen_bd4e2e369f0b562f ("
+  , "struct wl_callback *hs_bindgen_115a707b5dfe411c ("
   , "  struct wl_display *arg1"
   , ")"
   , "{"
   , "  return (wl_display_sync)(arg1);"
   , "}"
-  , "struct wl_registry *hs_bindgen_c66fe759d93fa069 ("
+  , "struct wl_registry *hs_bindgen_74b57c961c675015 ("
   , "  struct wl_display *arg1"
   , ")"
   , "{"
   , "  return (wl_display_get_registry)(arg1);"
   , "}"
-  , "signed int hs_bindgen_d2e3dc4d2669c5f4 ("
+  , "signed int hs_bindgen_5d844f76f29543dc ("
   , "  struct wl_registry *arg1,"
   , "  struct wl_registry_listener const *arg2,"
   , "  void *arg3"
@@ -583,32 +583,32 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (wl_registry_add_listener)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_779649cf332b0402 ("
+  , "void hs_bindgen_50eb72f7e8f25245 ("
   , "  struct wl_registry *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (wl_registry_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_4cdbd46548c0f766 ("
+  , "void *hs_bindgen_7c23e04989be19bf ("
   , "  struct wl_registry *arg1"
   , ")"
   , "{"
   , "  return (wl_registry_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_3441d86a9b23d404 ("
+  , "uint32_t hs_bindgen_ca9d9b0cb4fa1262 ("
   , "  struct wl_registry *arg1"
   , ")"
   , "{"
   , "  return (wl_registry_get_version)(arg1);"
   , "}"
-  , "void hs_bindgen_a3e959df3021cfbb ("
+  , "void hs_bindgen_31a7af548370136b ("
   , "  struct wl_registry *arg1"
   , ")"
   , "{"
   , "  (wl_registry_destroy)(arg1);"
   , "}"
-  , "void *hs_bindgen_f3f1c4fca93b47f5 ("
+  , "void *hs_bindgen_09394ba4e23986ec ("
   , "  struct wl_registry *arg1,"
   , "  uint32_t arg2,"
   , "  struct wl_interface const *arg3,"
@@ -617,7 +617,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (wl_registry_bind)(arg1, arg2, arg3, arg4);"
   , "}"
-  , "signed int hs_bindgen_bc4b25ceb4915d32 ("
+  , "signed int hs_bindgen_cf2d81a9ceec2120 ("
   , "  struct wl_callback *arg1,"
   , "  struct wl_callback_listener const *arg2,"
   , "  void *arg3"
@@ -625,88 +625,88 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (wl_callback_add_listener)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_123f847da588a01f ("
+  , "void hs_bindgen_6f3e3961ed55bcaa ("
   , "  struct wl_callback *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (wl_callback_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_575c54180f0b0812 ("
+  , "void *hs_bindgen_b55277f3407435bb ("
   , "  struct wl_callback *arg1"
   , ")"
   , "{"
   , "  return (wl_callback_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_b86394b959b12c0e ("
+  , "uint32_t hs_bindgen_65ef0b9019f6f659 ("
   , "  struct wl_callback *arg1"
   , ")"
   , "{"
   , "  return (wl_callback_get_version)(arg1);"
   , "}"
-  , "void hs_bindgen_8c385fa9bcf03739 ("
+  , "void hs_bindgen_439001916611a1f6 ("
   , "  struct wl_callback *arg1"
   , ")"
   , "{"
   , "  (wl_callback_destroy)(arg1);"
   , "}"
-  , "void hs_bindgen_a510e3a22eb940c6 ("
+  , "void hs_bindgen_f056a5cda8e2f003 ("
   , "  struct wl_compositor *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (wl_compositor_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_a6e34087c1d61903 ("
+  , "void *hs_bindgen_db735ca6a7f6d45e ("
   , "  struct wl_compositor *arg1"
   , ")"
   , "{"
   , "  return (wl_compositor_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_269b4e978a912900 ("
+  , "uint32_t hs_bindgen_9773561407b1d71c ("
   , "  struct wl_compositor *arg1"
   , ")"
   , "{"
   , "  return (wl_compositor_get_version)(arg1);"
   , "}"
-  , "void hs_bindgen_80c79e722f2e5547 ("
+  , "void hs_bindgen_660d5ce26a7d0b6a ("
   , "  struct wl_compositor *arg1"
   , ")"
   , "{"
   , "  (wl_compositor_destroy)(arg1);"
   , "}"
-  , "struct wl_surface *hs_bindgen_b4e5700d02405180 ("
+  , "struct wl_surface *hs_bindgen_06462e38914e2f93 ("
   , "  struct wl_compositor *arg1"
   , ")"
   , "{"
   , "  return (wl_compositor_create_surface)(arg1);"
   , "}"
-  , "struct wl_region *hs_bindgen_64eccf2b309459cf ("
+  , "struct wl_region *hs_bindgen_673945349eb3a8d6 ("
   , "  struct wl_compositor *arg1"
   , ")"
   , "{"
   , "  return (wl_compositor_create_region)(arg1);"
   , "}"
-  , "void hs_bindgen_205154276db5a98c ("
+  , "void hs_bindgen_ec86ea9bb06ee8a0 ("
   , "  struct wl_shm_pool *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (wl_shm_pool_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_82c02e5245059d32 ("
+  , "void *hs_bindgen_aa44e96292477773 ("
   , "  struct wl_shm_pool *arg1"
   , ")"
   , "{"
   , "  return (wl_shm_pool_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_df8c652a35f71061 ("
+  , "uint32_t hs_bindgen_2b7aa272fd1a9000 ("
   , "  struct wl_shm_pool *arg1"
   , ")"
   , "{"
   , "  return (wl_shm_pool_get_version)(arg1);"
   , "}"
-  , "struct wl_buffer *hs_bindgen_c9f583077805ab2f ("
+  , "struct wl_buffer *hs_bindgen_c9d996d5d59ce2c0 ("
   , "  struct wl_shm_pool *arg1,"
   , "  int32_t arg2,"
   , "  int32_t arg3,"
@@ -717,20 +717,20 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (wl_shm_pool_create_buffer)(arg1, arg2, arg3, arg4, arg5, arg6);"
   , "}"
-  , "void hs_bindgen_4393e876b108f2bf ("
+  , "void hs_bindgen_753817445dd26bba ("
   , "  struct wl_shm_pool *arg1"
   , ")"
   , "{"
   , "  (wl_shm_pool_destroy)(arg1);"
   , "}"
-  , "void hs_bindgen_75236c5e893794c0 ("
+  , "void hs_bindgen_371afa88e2234833 ("
   , "  struct wl_shm_pool *arg1,"
   , "  int32_t arg2"
   , ")"
   , "{"
   , "  (wl_shm_pool_resize)(arg1, arg2);"
   , "}"
-  , "signed int hs_bindgen_a923c541743ea7ff ("
+  , "signed int hs_bindgen_2e5f6d3587b615d2 ("
   , "  struct wl_shm *arg1,"
   , "  struct wl_shm_listener const *arg2,"
   , "  void *arg3"
@@ -738,32 +738,32 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (wl_shm_add_listener)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_a91406b4d3218634 ("
+  , "void hs_bindgen_bf55eb0b8cfc7b40 ("
   , "  struct wl_shm *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (wl_shm_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_9467ecef0dfd0cb0 ("
+  , "void *hs_bindgen_7bcaf18cdc10fc1c ("
   , "  struct wl_shm *arg1"
   , ")"
   , "{"
   , "  return (wl_shm_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_e122a188b598bd10 ("
+  , "uint32_t hs_bindgen_ae5791f3423269c4 ("
   , "  struct wl_shm *arg1"
   , ")"
   , "{"
   , "  return (wl_shm_get_version)(arg1);"
   , "}"
-  , "void hs_bindgen_558fdb46b8820a46 ("
+  , "void hs_bindgen_807c1641277cbc1b ("
   , "  struct wl_shm *arg1"
   , ")"
   , "{"
   , "  (wl_shm_destroy)(arg1);"
   , "}"
-  , "struct wl_shm_pool *hs_bindgen_f1493f3b04e61e23 ("
+  , "struct wl_shm_pool *hs_bindgen_c11571793ff56318 ("
   , "  struct wl_shm *arg1,"
   , "  int32_t arg2,"
   , "  int32_t arg3"
@@ -771,13 +771,13 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (wl_shm_create_pool)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_83dad28a6535f73f ("
+  , "void hs_bindgen_e445a87906d5346b ("
   , "  struct wl_shm *arg1"
   , ")"
   , "{"
   , "  (wl_shm_release)(arg1);"
   , "}"
-  , "signed int hs_bindgen_e98212aee99f0ee8 ("
+  , "signed int hs_bindgen_830dcc56a541fc2c ("
   , "  struct wl_buffer *arg1,"
   , "  struct wl_buffer_listener const *arg2,"
   , "  void *arg3"
@@ -785,32 +785,32 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (wl_buffer_add_listener)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_d04ccf79e7dddeb3 ("
+  , "void hs_bindgen_e84b978aa43f62a6 ("
   , "  struct wl_buffer *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (wl_buffer_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_7ec006b2b998d0aa ("
+  , "void *hs_bindgen_06059cd4ce6bf3ab ("
   , "  struct wl_buffer *arg1"
   , ")"
   , "{"
   , "  return (wl_buffer_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_4351919d92013de1 ("
+  , "uint32_t hs_bindgen_8e64c1a5d8acfa43 ("
   , "  struct wl_buffer *arg1"
   , ")"
   , "{"
   , "  return (wl_buffer_get_version)(arg1);"
   , "}"
-  , "void hs_bindgen_1973c12d21d14d85 ("
+  , "void hs_bindgen_04e3a8c6cc6eb62a ("
   , "  struct wl_buffer *arg1"
   , ")"
   , "{"
   , "  (wl_buffer_destroy)(arg1);"
   , "}"
-  , "signed int hs_bindgen_ae3f22c8f06de743 ("
+  , "signed int hs_bindgen_92cf7afddbcf0f53 ("
   , "  struct wl_data_offer *arg1,"
   , "  struct wl_data_offer_listener const *arg2,"
   , "  void *arg3"
@@ -818,26 +818,26 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (wl_data_offer_add_listener)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_87845098cdcabf2b ("
+  , "void hs_bindgen_c1da7dd49677e64d ("
   , "  struct wl_data_offer *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (wl_data_offer_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_a31f2122863ccf2c ("
+  , "void *hs_bindgen_4cf38c98e9176fb4 ("
   , "  struct wl_data_offer *arg1"
   , ")"
   , "{"
   , "  return (wl_data_offer_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_25b1dfa683856f77 ("
+  , "uint32_t hs_bindgen_ec8bc3678eb0a1a5 ("
   , "  struct wl_data_offer *arg1"
   , ")"
   , "{"
   , "  return (wl_data_offer_get_version)(arg1);"
   , "}"
-  , "void hs_bindgen_f130fc15072a7700 ("
+  , "void hs_bindgen_e7b71a405478e7f1 ("
   , "  struct wl_data_offer *arg1,"
   , "  uint32_t arg2,"
   , "  char const *arg3"
@@ -845,7 +845,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (wl_data_offer_accept)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_e5607d7a7a97eb5b ("
+  , "void hs_bindgen_d4c25c3e36bfb92e ("
   , "  struct wl_data_offer *arg1,"
   , "  char const *arg2,"
   , "  int32_t arg3"
@@ -853,19 +853,19 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (wl_data_offer_receive)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_24cb8f62680a08c7 ("
+  , "void hs_bindgen_205ad9d7a562ea45 ("
   , "  struct wl_data_offer *arg1"
   , ")"
   , "{"
   , "  (wl_data_offer_destroy)(arg1);"
   , "}"
-  , "void hs_bindgen_fdc70b565265c32c ("
+  , "void hs_bindgen_2e58d7b061f6342f ("
   , "  struct wl_data_offer *arg1"
   , ")"
   , "{"
   , "  (wl_data_offer_finish)(arg1);"
   , "}"
-  , "void hs_bindgen_6bb43344b73eeda8 ("
+  , "void hs_bindgen_70759ceaa73c63ff ("
   , "  struct wl_data_offer *arg1,"
   , "  uint32_t arg2,"
   , "  uint32_t arg3"
@@ -873,7 +873,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (wl_data_offer_set_actions)(arg1, arg2, arg3);"
   , "}"
-  , "signed int hs_bindgen_1e220d7ed6c62d18 ("
+  , "signed int hs_bindgen_01cb1a5b39336900 ("
   , "  struct wl_data_source *arg1,"
   , "  struct wl_data_source_listener const *arg2,"
   , "  void *arg3"
@@ -881,46 +881,46 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (wl_data_source_add_listener)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_c918067eae83ab08 ("
+  , "void hs_bindgen_06214ac9b00d8b0d ("
   , "  struct wl_data_source *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (wl_data_source_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_42819627aa1de90e ("
+  , "void *hs_bindgen_c0aca14deeb330e9 ("
   , "  struct wl_data_source *arg1"
   , ")"
   , "{"
   , "  return (wl_data_source_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_33b2ef1e2a13059a ("
+  , "uint32_t hs_bindgen_520eac81f9d46f9d ("
   , "  struct wl_data_source *arg1"
   , ")"
   , "{"
   , "  return (wl_data_source_get_version)(arg1);"
   , "}"
-  , "void hs_bindgen_69146ce56f4b481e ("
+  , "void hs_bindgen_7d687807748fe27e ("
   , "  struct wl_data_source *arg1,"
   , "  char const *arg2"
   , ")"
   , "{"
   , "  (wl_data_source_offer)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_a237abc34f2e3532 ("
+  , "void hs_bindgen_a9e2e1f44a2db475 ("
   , "  struct wl_data_source *arg1"
   , ")"
   , "{"
   , "  (wl_data_source_destroy)(arg1);"
   , "}"
-  , "void hs_bindgen_ffbc22a2d0125940 ("
+  , "void hs_bindgen_6837dec7b275f201 ("
   , "  struct wl_data_source *arg1,"
   , "  uint32_t arg2"
   , ")"
   , "{"
   , "  (wl_data_source_set_actions)(arg1, arg2);"
   , "}"
-  , "signed int hs_bindgen_e39b97ecd4b94a3b ("
+  , "signed int hs_bindgen_31a590ba05118335 ("
   , "  struct wl_data_device *arg1,"
   , "  struct wl_data_device_listener const *arg2,"
   , "  void *arg3"
@@ -928,32 +928,32 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (wl_data_device_add_listener)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_5f166e204af07293 ("
+  , "void hs_bindgen_328de1d8ca868c03 ("
   , "  struct wl_data_device *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (wl_data_device_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_3c0b0334740af575 ("
+  , "void *hs_bindgen_a75a5a5405b66afd ("
   , "  struct wl_data_device *arg1"
   , ")"
   , "{"
   , "  return (wl_data_device_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_d847048f71fcbde8 ("
+  , "uint32_t hs_bindgen_02718593ddf3ccee ("
   , "  struct wl_data_device *arg1"
   , ")"
   , "{"
   , "  return (wl_data_device_get_version)(arg1);"
   , "}"
-  , "void hs_bindgen_a385df1265b4d803 ("
+  , "void hs_bindgen_0a6352987598ec66 ("
   , "  struct wl_data_device *arg1"
   , ")"
   , "{"
   , "  (wl_data_device_destroy)(arg1);"
   , "}"
-  , "void hs_bindgen_2392193f23f9fbf8 ("
+  , "void hs_bindgen_3f57c768b9bd1cde ("
   , "  struct wl_data_device *arg1,"
   , "  struct wl_data_source *arg2,"
   , "  struct wl_surface *arg3,"
@@ -963,7 +963,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (wl_data_device_start_drag)(arg1, arg2, arg3, arg4, arg5);"
   , "}"
-  , "void hs_bindgen_55817c18c0450b2c ("
+  , "void hs_bindgen_b1df96900a621bf6 ("
   , "  struct wl_data_device *arg1,"
   , "  struct wl_data_source *arg2,"
   , "  uint32_t arg3"
@@ -971,83 +971,83 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (wl_data_device_set_selection)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_1f112138da3258fb ("
+  , "void hs_bindgen_73ee32ccdcfd6b12 ("
   , "  struct wl_data_device *arg1"
   , ")"
   , "{"
   , "  (wl_data_device_release)(arg1);"
   , "}"
-  , "void hs_bindgen_e080b45ed0712390 ("
+  , "void hs_bindgen_01dab6012bada112 ("
   , "  struct wl_data_device_manager *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (wl_data_device_manager_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_89e0dd9f1d8879bb ("
+  , "void *hs_bindgen_aefba9b75e5f0a45 ("
   , "  struct wl_data_device_manager *arg1"
   , ")"
   , "{"
   , "  return (wl_data_device_manager_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_f1ab9ef79222200b ("
+  , "uint32_t hs_bindgen_c22dd5808fce7f68 ("
   , "  struct wl_data_device_manager *arg1"
   , ")"
   , "{"
   , "  return (wl_data_device_manager_get_version)(arg1);"
   , "}"
-  , "void hs_bindgen_07fe2d3a922c2c91 ("
+  , "void hs_bindgen_a55d578c43136dd1 ("
   , "  struct wl_data_device_manager *arg1"
   , ")"
   , "{"
   , "  (wl_data_device_manager_destroy)(arg1);"
   , "}"
-  , "struct wl_data_source *hs_bindgen_6822fd7201522b09 ("
+  , "struct wl_data_source *hs_bindgen_32b134d1e8718a80 ("
   , "  struct wl_data_device_manager *arg1"
   , ")"
   , "{"
   , "  return (wl_data_device_manager_create_data_source)(arg1);"
   , "}"
-  , "struct wl_data_device *hs_bindgen_135584503dd2fe83 ("
+  , "struct wl_data_device *hs_bindgen_7615860cbeef006a ("
   , "  struct wl_data_device_manager *arg1,"
   , "  struct wl_seat *arg2"
   , ")"
   , "{"
   , "  return (wl_data_device_manager_get_data_device)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_3489a21d9ef9a295 ("
+  , "void hs_bindgen_fde0d30e84292cca ("
   , "  struct wl_shell *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (wl_shell_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_1d08abbfdb10bdee ("
+  , "void *hs_bindgen_c3312dab353c6144 ("
   , "  struct wl_shell *arg1"
   , ")"
   , "{"
   , "  return (wl_shell_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_570e6265686b5081 ("
+  , "uint32_t hs_bindgen_cd55e4cbdd764627 ("
   , "  struct wl_shell *arg1"
   , ")"
   , "{"
   , "  return (wl_shell_get_version)(arg1);"
   , "}"
-  , "void hs_bindgen_ec5dea43b5498e0b ("
+  , "void hs_bindgen_48e190793403ea32 ("
   , "  struct wl_shell *arg1"
   , ")"
   , "{"
   , "  (wl_shell_destroy)(arg1);"
   , "}"
-  , "struct wl_shell_surface *hs_bindgen_3f4c200d8e7126ea ("
+  , "struct wl_shell_surface *hs_bindgen_8f6c9b886ae18b1b ("
   , "  struct wl_shell *arg1,"
   , "  struct wl_surface *arg2"
   , ")"
   , "{"
   , "  return (wl_shell_get_shell_surface)(arg1, arg2);"
   , "}"
-  , "signed int hs_bindgen_d662922bb98fce55 ("
+  , "signed int hs_bindgen_6e4cea4b57d5ef07 ("
   , "  struct wl_shell_surface *arg1,"
   , "  struct wl_shell_surface_listener const *arg2,"
   , "  void *arg3"
@@ -1055,39 +1055,39 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (wl_shell_surface_add_listener)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_a0a052e8a3e0ae8b ("
+  , "void hs_bindgen_a744df44b56d5344 ("
   , "  struct wl_shell_surface *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (wl_shell_surface_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_25dc36ecc4bbd0c7 ("
+  , "void *hs_bindgen_96e562aead0b5dcd ("
   , "  struct wl_shell_surface *arg1"
   , ")"
   , "{"
   , "  return (wl_shell_surface_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_211afcaf3eaf723d ("
+  , "uint32_t hs_bindgen_4773b9ede4fe6f3d ("
   , "  struct wl_shell_surface *arg1"
   , ")"
   , "{"
   , "  return (wl_shell_surface_get_version)(arg1);"
   , "}"
-  , "void hs_bindgen_0cb59d081da222fc ("
+  , "void hs_bindgen_ad82d81c7d81b4cb ("
   , "  struct wl_shell_surface *arg1"
   , ")"
   , "{"
   , "  (wl_shell_surface_destroy)(arg1);"
   , "}"
-  , "void hs_bindgen_dd7702f8d9a7a2ce ("
+  , "void hs_bindgen_ce39fc8627bb0374 ("
   , "  struct wl_shell_surface *arg1,"
   , "  uint32_t arg2"
   , ")"
   , "{"
   , "  (wl_shell_surface_pong)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_a096ff2aa00f2c66 ("
+  , "void hs_bindgen_bbb1a3ddef79d6b4 ("
   , "  struct wl_shell_surface *arg1,"
   , "  struct wl_seat *arg2,"
   , "  uint32_t arg3"
@@ -1095,7 +1095,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (wl_shell_surface_move)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_64785b2bf4651646 ("
+  , "void hs_bindgen_99160dd35b7970d5 ("
   , "  struct wl_shell_surface *arg1,"
   , "  struct wl_seat *arg2,"
   , "  uint32_t arg3,"
@@ -1104,13 +1104,13 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (wl_shell_surface_resize)(arg1, arg2, arg3, arg4);"
   , "}"
-  , "void hs_bindgen_165a04f74f6a8227 ("
+  , "void hs_bindgen_5dfc8d7b10149003 ("
   , "  struct wl_shell_surface *arg1"
   , ")"
   , "{"
   , "  (wl_shell_surface_set_toplevel)(arg1);"
   , "}"
-  , "void hs_bindgen_aa7e47c238e28c08 ("
+  , "void hs_bindgen_ef8c974b79711149 ("
   , "  struct wl_shell_surface *arg1,"
   , "  struct wl_surface *arg2,"
   , "  int32_t arg3,"
@@ -1120,7 +1120,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (wl_shell_surface_set_transient)(arg1, arg2, arg3, arg4, arg5);"
   , "}"
-  , "void hs_bindgen_13bad46dbf7103fc ("
+  , "void hs_bindgen_227d0cfe84e7aa00 ("
   , "  struct wl_shell_surface *arg1,"
   , "  uint32_t arg2,"
   , "  uint32_t arg3,"
@@ -1129,7 +1129,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (wl_shell_surface_set_fullscreen)(arg1, arg2, arg3, arg4);"
   , "}"
-  , "void hs_bindgen_25a280775305e83c ("
+  , "void hs_bindgen_7e134bc698ae94b2 ("
   , "  struct wl_shell_surface *arg1,"
   , "  struct wl_seat *arg2,"
   , "  uint32_t arg3,"
@@ -1141,28 +1141,28 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (wl_shell_surface_set_popup)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);"
   , "}"
-  , "void hs_bindgen_7e34584d62a2b43a ("
+  , "void hs_bindgen_ab8f701829cb19c0 ("
   , "  struct wl_shell_surface *arg1,"
   , "  struct wl_output *arg2"
   , ")"
   , "{"
   , "  (wl_shell_surface_set_maximized)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_ebabb07cfa2b8fbc ("
+  , "void hs_bindgen_2e395cb2c1016cac ("
   , "  struct wl_shell_surface *arg1,"
   , "  char const *arg2"
   , ")"
   , "{"
   , "  (wl_shell_surface_set_title)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_20515759484937bc ("
+  , "void hs_bindgen_13a02b017187de66 ("
   , "  struct wl_shell_surface *arg1,"
   , "  char const *arg2"
   , ")"
   , "{"
   , "  (wl_shell_surface_set_class)(arg1, arg2);"
   , "}"
-  , "signed int hs_bindgen_740ab6aac9194efc ("
+  , "signed int hs_bindgen_c895fd9055c307b8 ("
   , "  struct wl_surface *arg1,"
   , "  struct wl_surface_listener const *arg2,"
   , "  void *arg3"
@@ -1170,32 +1170,32 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (wl_surface_add_listener)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_f0a8a4b4e271bc0f ("
+  , "void hs_bindgen_3936b64fd76ff958 ("
   , "  struct wl_surface *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (wl_surface_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_28cd0198105d0fef ("
+  , "void *hs_bindgen_9d26229495b0b950 ("
   , "  struct wl_surface *arg1"
   , ")"
   , "{"
   , "  return (wl_surface_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_59c22f98a7bc4627 ("
+  , "uint32_t hs_bindgen_1959b276d85514a1 ("
   , "  struct wl_surface *arg1"
   , ")"
   , "{"
   , "  return (wl_surface_get_version)(arg1);"
   , "}"
-  , "void hs_bindgen_4989313584df6b73 ("
+  , "void hs_bindgen_cf64df6b46cbf0f3 ("
   , "  struct wl_surface *arg1"
   , ")"
   , "{"
   , "  (wl_surface_destroy)(arg1);"
   , "}"
-  , "void hs_bindgen_658e93f198624474 ("
+  , "void hs_bindgen_8d56a9cbd337e025 ("
   , "  struct wl_surface *arg1,"
   , "  struct wl_buffer *arg2,"
   , "  int32_t arg3,"
@@ -1204,7 +1204,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (wl_surface_attach)(arg1, arg2, arg3, arg4);"
   , "}"
-  , "void hs_bindgen_e979d71d02ff28f4 ("
+  , "void hs_bindgen_94f85f4dd291199f ("
   , "  struct wl_surface *arg1,"
   , "  int32_t arg2,"
   , "  int32_t arg3,"
@@ -1214,47 +1214,47 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (wl_surface_damage)(arg1, arg2, arg3, arg4, arg5);"
   , "}"
-  , "struct wl_callback *hs_bindgen_506173ce127930e8 ("
+  , "struct wl_callback *hs_bindgen_9d607bd7dc3df487 ("
   , "  struct wl_surface *arg1"
   , ")"
   , "{"
   , "  return (wl_surface_frame)(arg1);"
   , "}"
-  , "void hs_bindgen_c833338257941a59 ("
+  , "void hs_bindgen_7b42843167a9f969 ("
   , "  struct wl_surface *arg1,"
   , "  struct wl_region *arg2"
   , ")"
   , "{"
   , "  (wl_surface_set_opaque_region)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_a58701948293ae17 ("
+  , "void hs_bindgen_98dad4bdb6e3fe91 ("
   , "  struct wl_surface *arg1,"
   , "  struct wl_region *arg2"
   , ")"
   , "{"
   , "  (wl_surface_set_input_region)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_4a2c0ae850cf12aa ("
+  , "void hs_bindgen_165e76f923bc5268 ("
   , "  struct wl_surface *arg1"
   , ")"
   , "{"
   , "  (wl_surface_commit)(arg1);"
   , "}"
-  , "void hs_bindgen_95792d267cb501ff ("
+  , "void hs_bindgen_90d4b80a6e0d8a8e ("
   , "  struct wl_surface *arg1,"
   , "  int32_t arg2"
   , ")"
   , "{"
   , "  (wl_surface_set_buffer_transform)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_1b0414c7a35c0f03 ("
+  , "void hs_bindgen_e0db11ff6db1719f ("
   , "  struct wl_surface *arg1,"
   , "  int32_t arg2"
   , ")"
   , "{"
   , "  (wl_surface_set_buffer_scale)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_894788ac87fc702b ("
+  , "void hs_bindgen_dc0285dd9796a1a4 ("
   , "  struct wl_surface *arg1,"
   , "  int32_t arg2,"
   , "  int32_t arg3,"
@@ -1264,7 +1264,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (wl_surface_damage_buffer)(arg1, arg2, arg3, arg4, arg5);"
   , "}"
-  , "void hs_bindgen_95843727e4e49924 ("
+  , "void hs_bindgen_bf3a36b8d9e3f208 ("
   , "  struct wl_surface *arg1,"
   , "  int32_t arg2,"
   , "  int32_t arg3"
@@ -1272,7 +1272,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (wl_surface_offset)(arg1, arg2, arg3);"
   , "}"
-  , "signed int hs_bindgen_b7d2eae7b29ef34d ("
+  , "signed int hs_bindgen_45c539fbcd74c0be ("
   , "  struct wl_seat *arg1,"
   , "  struct wl_seat_listener const *arg2,"
   , "  void *arg3"
@@ -1280,56 +1280,56 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (wl_seat_add_listener)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_88808ecd9fad0924 ("
+  , "void hs_bindgen_a71198b5a9a41e60 ("
   , "  struct wl_seat *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (wl_seat_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_f3c9aeb257be87fe ("
+  , "void *hs_bindgen_7d01924e8259862f ("
   , "  struct wl_seat *arg1"
   , ")"
   , "{"
   , "  return (wl_seat_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_808a43c633c732eb ("
+  , "uint32_t hs_bindgen_c8567ec4dcfaa98b ("
   , "  struct wl_seat *arg1"
   , ")"
   , "{"
   , "  return (wl_seat_get_version)(arg1);"
   , "}"
-  , "void hs_bindgen_5090d492fcc2ded5 ("
+  , "void hs_bindgen_a516ae81e192cb8b ("
   , "  struct wl_seat *arg1"
   , ")"
   , "{"
   , "  (wl_seat_destroy)(arg1);"
   , "}"
-  , "struct wl_pointer *hs_bindgen_8bc3b746a7121aa3 ("
+  , "struct wl_pointer *hs_bindgen_835145ef74872cec ("
   , "  struct wl_seat *arg1"
   , ")"
   , "{"
   , "  return (wl_seat_get_pointer)(arg1);"
   , "}"
-  , "struct wl_keyboard *hs_bindgen_e247290689fa6d2d ("
+  , "struct wl_keyboard *hs_bindgen_28c834fc368033f4 ("
   , "  struct wl_seat *arg1"
   , ")"
   , "{"
   , "  return (wl_seat_get_keyboard)(arg1);"
   , "}"
-  , "struct wl_touch *hs_bindgen_d00b6ce2f7e21cad ("
+  , "struct wl_touch *hs_bindgen_95f0bafa191ef19e ("
   , "  struct wl_seat *arg1"
   , ")"
   , "{"
   , "  return (wl_seat_get_touch)(arg1);"
   , "}"
-  , "void hs_bindgen_b3451dfa9d411051 ("
+  , "void hs_bindgen_30156de81ed42fd0 ("
   , "  struct wl_seat *arg1"
   , ")"
   , "{"
   , "  (wl_seat_release)(arg1);"
   , "}"
-  , "signed int hs_bindgen_594f1b233a027c8b ("
+  , "signed int hs_bindgen_27c5d1bcac16cbe8 ("
   , "  struct wl_pointer *arg1,"
   , "  struct wl_pointer_listener const *arg2,"
   , "  void *arg3"
@@ -1337,32 +1337,32 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (wl_pointer_add_listener)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_8f7a8e7647a408dd ("
+  , "void hs_bindgen_be60b9805399b9f5 ("
   , "  struct wl_pointer *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (wl_pointer_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_f421e01e3e8d95a9 ("
+  , "void *hs_bindgen_101e597025255d92 ("
   , "  struct wl_pointer *arg1"
   , ")"
   , "{"
   , "  return (wl_pointer_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_6613d6229317f3ea ("
+  , "uint32_t hs_bindgen_35ae89b84a420880 ("
   , "  struct wl_pointer *arg1"
   , ")"
   , "{"
   , "  return (wl_pointer_get_version)(arg1);"
   , "}"
-  , "void hs_bindgen_acf8de268c201589 ("
+  , "void hs_bindgen_9bfd8c27acfb1f04 ("
   , "  struct wl_pointer *arg1"
   , ")"
   , "{"
   , "  (wl_pointer_destroy)(arg1);"
   , "}"
-  , "void hs_bindgen_7133668453b731cc ("
+  , "void hs_bindgen_266266a9e16876d1 ("
   , "  struct wl_pointer *arg1,"
   , "  uint32_t arg2,"
   , "  struct wl_surface *arg3,"
@@ -1372,13 +1372,13 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (wl_pointer_set_cursor)(arg1, arg2, arg3, arg4, arg5);"
   , "}"
-  , "void hs_bindgen_585683dab0b07401 ("
+  , "void hs_bindgen_b986ff77d2ba320f ("
   , "  struct wl_pointer *arg1"
   , ")"
   , "{"
   , "  (wl_pointer_release)(arg1);"
   , "}"
-  , "signed int hs_bindgen_62f58e11f3712370 ("
+  , "signed int hs_bindgen_cfef5fb6570ef667 ("
   , "  struct wl_keyboard *arg1,"
   , "  struct wl_keyboard_listener const *arg2,"
   , "  void *arg3"
@@ -1386,38 +1386,38 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (wl_keyboard_add_listener)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_5d5286a3ed5d6318 ("
+  , "void hs_bindgen_67735a481956ae4f ("
   , "  struct wl_keyboard *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (wl_keyboard_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_fc4797b1ce93eba8 ("
+  , "void *hs_bindgen_dff44b8d3337f026 ("
   , "  struct wl_keyboard *arg1"
   , ")"
   , "{"
   , "  return (wl_keyboard_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_02a917aa47448a5e ("
+  , "uint32_t hs_bindgen_f85ba1e4935c0a2d ("
   , "  struct wl_keyboard *arg1"
   , ")"
   , "{"
   , "  return (wl_keyboard_get_version)(arg1);"
   , "}"
-  , "void hs_bindgen_179d3832b06d2227 ("
+  , "void hs_bindgen_4fed16fcba3fdd61 ("
   , "  struct wl_keyboard *arg1"
   , ")"
   , "{"
   , "  (wl_keyboard_destroy)(arg1);"
   , "}"
-  , "void hs_bindgen_70e622747762269c ("
+  , "void hs_bindgen_d3c7e2d4f955cbad ("
   , "  struct wl_keyboard *arg1"
   , ")"
   , "{"
   , "  (wl_keyboard_release)(arg1);"
   , "}"
-  , "signed int hs_bindgen_77cb6a25b6b04995 ("
+  , "signed int hs_bindgen_7a19ac2bfb9ec80b ("
   , "  struct wl_touch *arg1,"
   , "  struct wl_touch_listener const *arg2,"
   , "  void *arg3"
@@ -1425,38 +1425,38 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (wl_touch_add_listener)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_ab718dcf3a6be53a ("
+  , "void hs_bindgen_32b77d7dfd4d549b ("
   , "  struct wl_touch *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (wl_touch_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_542bd062da0bad43 ("
+  , "void *hs_bindgen_862b694e9a2c4879 ("
   , "  struct wl_touch *arg1"
   , ")"
   , "{"
   , "  return (wl_touch_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_7a6a12134b703c32 ("
+  , "uint32_t hs_bindgen_21c40fba3499b0fc ("
   , "  struct wl_touch *arg1"
   , ")"
   , "{"
   , "  return (wl_touch_get_version)(arg1);"
   , "}"
-  , "void hs_bindgen_580e270b86a3fb07 ("
+  , "void hs_bindgen_c6821c316356b5ec ("
   , "  struct wl_touch *arg1"
   , ")"
   , "{"
   , "  (wl_touch_destroy)(arg1);"
   , "}"
-  , "void hs_bindgen_e0e224d796cc81d5 ("
+  , "void hs_bindgen_4ef4852ccfb18485 ("
   , "  struct wl_touch *arg1"
   , ")"
   , "{"
   , "  (wl_touch_release)(arg1);"
   , "}"
-  , "signed int hs_bindgen_73f035cf11576742 ("
+  , "signed int hs_bindgen_8a7aa13ea43d96a8 ("
   , "  struct wl_output *arg1,"
   , "  struct wl_output_listener const *arg2,"
   , "  void *arg3"
@@ -1464,63 +1464,63 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (wl_output_add_listener)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_e021d4f42256cbb6 ("
+  , "void hs_bindgen_de178bcc6e2652d9 ("
   , "  struct wl_output *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (wl_output_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_787d77feac2aaf61 ("
+  , "void *hs_bindgen_9c94962093ed77b5 ("
   , "  struct wl_output *arg1"
   , ")"
   , "{"
   , "  return (wl_output_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_d01dca2ac608e0ea ("
+  , "uint32_t hs_bindgen_1f90c2cb9b02bf82 ("
   , "  struct wl_output *arg1"
   , ")"
   , "{"
   , "  return (wl_output_get_version)(arg1);"
   , "}"
-  , "void hs_bindgen_041afde8e1eb0da9 ("
+  , "void hs_bindgen_fe7e6e34b3432edd ("
   , "  struct wl_output *arg1"
   , ")"
   , "{"
   , "  (wl_output_destroy)(arg1);"
   , "}"
-  , "void hs_bindgen_fe842249c88c98fd ("
+  , "void hs_bindgen_d7d7b32f80272391 ("
   , "  struct wl_output *arg1"
   , ")"
   , "{"
   , "  (wl_output_release)(arg1);"
   , "}"
-  , "void hs_bindgen_bdaeae23c436cb2b ("
+  , "void hs_bindgen_f895562b9f5af021 ("
   , "  struct wl_region *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (wl_region_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_f7d71ae40b2dda30 ("
+  , "void *hs_bindgen_752f2874d1327be2 ("
   , "  struct wl_region *arg1"
   , ")"
   , "{"
   , "  return (wl_region_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_40639ff56454a1e7 ("
+  , "uint32_t hs_bindgen_8c7175f2a966ca3c ("
   , "  struct wl_region *arg1"
   , ")"
   , "{"
   , "  return (wl_region_get_version)(arg1);"
   , "}"
-  , "void hs_bindgen_486eb03f44d362ac ("
+  , "void hs_bindgen_c73110e755195466 ("
   , "  struct wl_region *arg1"
   , ")"
   , "{"
   , "  (wl_region_destroy)(arg1);"
   , "}"
-  , "void hs_bindgen_fde387363e9d6750 ("
+  , "void hs_bindgen_d5f442993582aa68 ("
   , "  struct wl_region *arg1,"
   , "  int32_t arg2,"
   , "  int32_t arg3,"
@@ -1530,7 +1530,7 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (wl_region_add)(arg1, arg2, arg3, arg4, arg5);"
   , "}"
-  , "void hs_bindgen_39e278d8c0c6ecb5 ("
+  , "void hs_bindgen_afc4395e5115621b ("
   , "  struct wl_region *arg1,"
   , "  int32_t arg2,"
   , "  int32_t arg3,"
@@ -1540,32 +1540,32 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (wl_region_subtract)(arg1, arg2, arg3, arg4, arg5);"
   , "}"
-  , "void hs_bindgen_4b0a19ab9107f836 ("
+  , "void hs_bindgen_373bf0771aa4ae1a ("
   , "  struct wl_subcompositor *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (wl_subcompositor_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_b2fc646a1b90bca5 ("
+  , "void *hs_bindgen_8e614bdc6f1bcfe3 ("
   , "  struct wl_subcompositor *arg1"
   , ")"
   , "{"
   , "  return (wl_subcompositor_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_5db42aa79d4ad119 ("
+  , "uint32_t hs_bindgen_302de69bc97141cf ("
   , "  struct wl_subcompositor *arg1"
   , ")"
   , "{"
   , "  return (wl_subcompositor_get_version)(arg1);"
   , "}"
-  , "void hs_bindgen_0d72467af65a33a9 ("
+  , "void hs_bindgen_94df15227120bccf ("
   , "  struct wl_subcompositor *arg1"
   , ")"
   , "{"
   , "  (wl_subcompositor_destroy)(arg1);"
   , "}"
-  , "struct wl_subsurface *hs_bindgen_b7f245376e840582 ("
+  , "struct wl_subsurface *hs_bindgen_e824da3ffd609848 ("
   , "  struct wl_subcompositor *arg1,"
   , "  struct wl_surface *arg2,"
   , "  struct wl_surface *arg3"
@@ -1573,32 +1573,32 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  return (wl_subcompositor_get_subsurface)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_764b7062a3535be8 ("
+  , "void hs_bindgen_f4d820543fccf5ee ("
   , "  struct wl_subsurface *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (wl_subsurface_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_f241379e3c8b9f02 ("
+  , "void *hs_bindgen_a940d815e7c319cc ("
   , "  struct wl_subsurface *arg1"
   , ")"
   , "{"
   , "  return (wl_subsurface_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_28df81db98d48446 ("
+  , "uint32_t hs_bindgen_f960cabde48332cd ("
   , "  struct wl_subsurface *arg1"
   , ")"
   , "{"
   , "  return (wl_subsurface_get_version)(arg1);"
   , "}"
-  , "void hs_bindgen_af686a13ccd7fb4f ("
+  , "void hs_bindgen_f4d019fd43b5c322 ("
   , "  struct wl_subsurface *arg1"
   , ")"
   , "{"
   , "  (wl_subsurface_destroy)(arg1);"
   , "}"
-  , "void hs_bindgen_3564871cb45445d6 ("
+  , "void hs_bindgen_9e2d5b9e7d3e6fd9 ("
   , "  struct wl_subsurface *arg1,"
   , "  int32_t arg2,"
   , "  int32_t arg3"
@@ -1606,58 +1606,58 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "{"
   , "  (wl_subsurface_set_position)(arg1, arg2, arg3);"
   , "}"
-  , "void hs_bindgen_9ad02e881e03fe7e ("
+  , "void hs_bindgen_7ca593576526e1ea ("
   , "  struct wl_subsurface *arg1,"
   , "  struct wl_surface *arg2"
   , ")"
   , "{"
   , "  (wl_subsurface_place_above)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_1246e6c9c9bf3418 ("
+  , "void hs_bindgen_5aa0b922d2108b9c ("
   , "  struct wl_subsurface *arg1,"
   , "  struct wl_surface *arg2"
   , ")"
   , "{"
   , "  (wl_subsurface_place_below)(arg1, arg2);"
   , "}"
-  , "void hs_bindgen_8d6eb88781020f2c ("
+  , "void hs_bindgen_b50a1cfd29df4785 ("
   , "  struct wl_subsurface *arg1"
   , ")"
   , "{"
   , "  (wl_subsurface_set_sync)(arg1);"
   , "}"
-  , "void hs_bindgen_67d9f17f7bd5a4d2 ("
+  , "void hs_bindgen_26cc4b39caf76692 ("
   , "  struct wl_subsurface *arg1"
   , ")"
   , "{"
   , "  (wl_subsurface_set_desync)(arg1);"
   , "}"
-  , "void hs_bindgen_5b3a62b9834e9038 ("
+  , "void hs_bindgen_ba5d7d7b9f317540 ("
   , "  struct wl_fixes *arg1,"
   , "  void *arg2"
   , ")"
   , "{"
   , "  (wl_fixes_set_user_data)(arg1, arg2);"
   , "}"
-  , "void *hs_bindgen_37c64b4ea2946ea1 ("
+  , "void *hs_bindgen_d23ce2c867804f66 ("
   , "  struct wl_fixes *arg1"
   , ")"
   , "{"
   , "  return (wl_fixes_get_user_data)(arg1);"
   , "}"
-  , "uint32_t hs_bindgen_3fd907c72a6c22bd ("
+  , "uint32_t hs_bindgen_7a684fc4d5086015 ("
   , "  struct wl_fixes *arg1"
   , ")"
   , "{"
   , "  return (wl_fixes_get_version)(arg1);"
   , "}"
-  , "void hs_bindgen_81addaac0e4cc879 ("
+  , "void hs_bindgen_112e1a25004793b5 ("
   , "  struct wl_fixes *arg1"
   , ")"
   , "{"
   , "  (wl_fixes_destroy)(arg1);"
   , "}"
-  , "void hs_bindgen_9472505275067d51 ("
+  , "void hs_bindgen_30bdd2202a993527 ("
   , "  struct wl_fixes *arg1,"
   , "  struct wl_registry *arg2"
   , ")"
@@ -1666,17 +1666,17 @@ $(HsBindgen.Runtime.Internal.CAPI.addCSource (HsBindgen.Runtime.Internal.CAPI.un
   , "}"
   ]))
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_event_queue_destroy@
-foreign import ccall safe "hs_bindgen_5dfb8d65eb4cda1f" hs_bindgen_5dfb8d65eb4cda1f_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_event_queue_destroy@
+foreign import ccall safe "hs_bindgen_3c7bb572c9738528" hs_bindgen_3c7bb572c9738528_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_event_queue_destroy@
-hs_bindgen_5dfb8d65eb4cda1f ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_event_queue_destroy@
+hs_bindgen_3c7bb572c9738528 ::
      RIP.Ptr Wl_event_queue
   -> IO ()
-hs_bindgen_5dfb8d65eb4cda1f =
-  RIP.fromFFIType hs_bindgen_5dfb8d65eb4cda1f_base
+hs_bindgen_3c7bb572c9738528 =
+  RIP.fromFFIType hs_bindgen_3c7bb572c9738528_base
 
 {-| __C declaration:__ @wl_event_queue_destroy@
 
@@ -1688,10 +1688,10 @@ wl_event_queue_destroy ::
      RIP.Ptr Wl_event_queue
      -- ^ __C declaration:__ @queue@
   -> IO ()
-wl_event_queue_destroy = hs_bindgen_5dfb8d65eb4cda1f
+wl_event_queue_destroy = hs_bindgen_3c7bb572c9738528
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_marshal_array_flags@
-foreign import ccall safe "hs_bindgen_a92dea01101775a0" hs_bindgen_a92dea01101775a0_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_marshal_array_flags@
+foreign import ccall safe "hs_bindgen_947e15003f3dff9b" hs_bindgen_947e15003f3dff9b_base ::
      RIP.Ptr RIP.Void
   -> RIP.Word32
   -> RIP.Ptr RIP.Void
@@ -1700,8 +1700,8 @@ foreign import ccall safe "hs_bindgen_a92dea01101775a0" hs_bindgen_a92dea0110177
   -> RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_marshal_array_flags@
-hs_bindgen_a92dea01101775a0 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_marshal_array_flags@
+hs_bindgen_947e15003f3dff9b ::
      RIP.Ptr Wl_proxy
   -> HsBindgen.Runtime.LibC.Word32
   -> PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
@@ -1709,8 +1709,8 @@ hs_bindgen_a92dea01101775a0 ::
   -> HsBindgen.Runtime.LibC.Word32
   -> RIP.Ptr Bindings.Wayland.Util.Generated.Wl_argument
   -> IO (RIP.Ptr Wl_proxy)
-hs_bindgen_a92dea01101775a0 =
-  RIP.fromFFIType hs_bindgen_a92dea01101775a0_base
+hs_bindgen_947e15003f3dff9b =
+  RIP.fromFFIType hs_bindgen_947e15003f3dff9b_base
 
 {-| __C declaration:__ @wl_proxy_marshal_array_flags@
 
@@ -1733,23 +1733,23 @@ wl_proxy_marshal_array_flags ::
      -- ^ __C declaration:__ @args@
   -> IO (RIP.Ptr Wl_proxy)
 wl_proxy_marshal_array_flags =
-  hs_bindgen_a92dea01101775a0
+  hs_bindgen_947e15003f3dff9b
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_marshal_array@
-foreign import ccall safe "hs_bindgen_da7c2598731036c7" hs_bindgen_da7c2598731036c7_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_marshal_array@
+foreign import ccall safe "hs_bindgen_f3c9f0398f117735" hs_bindgen_f3c9f0398f117735_base ::
      RIP.Ptr RIP.Void
   -> RIP.Word32
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_marshal_array@
-hs_bindgen_da7c2598731036c7 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_marshal_array@
+hs_bindgen_f3c9f0398f117735 ::
      RIP.Ptr Wl_proxy
   -> HsBindgen.Runtime.LibC.Word32
   -> RIP.Ptr Bindings.Wayland.Util.Generated.Wl_argument
   -> IO ()
-hs_bindgen_da7c2598731036c7 =
-  RIP.fromFFIType hs_bindgen_da7c2598731036c7_base
+hs_bindgen_f3c9f0398f117735 =
+  RIP.fromFFIType hs_bindgen_f3c9f0398f117735_base
 
 {-| __C declaration:__ @wl_proxy_marshal_array@
 
@@ -1765,21 +1765,21 @@ wl_proxy_marshal_array ::
   -> RIP.Ptr Bindings.Wayland.Util.Generated.Wl_argument
      -- ^ __C declaration:__ @args@
   -> IO ()
-wl_proxy_marshal_array = hs_bindgen_da7c2598731036c7
+wl_proxy_marshal_array = hs_bindgen_f3c9f0398f117735
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_create@
-foreign import ccall safe "hs_bindgen_ea6dc6bb1ed192d7" hs_bindgen_ea6dc6bb1ed192d7_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_create@
+foreign import ccall safe "hs_bindgen_3fba5bc1e147a38c" hs_bindgen_3fba5bc1e147a38c_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_create@
-hs_bindgen_ea6dc6bb1ed192d7 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_create@
+hs_bindgen_3fba5bc1e147a38c ::
      RIP.Ptr Wl_proxy
   -> PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
   -> IO (RIP.Ptr Wl_proxy)
-hs_bindgen_ea6dc6bb1ed192d7 =
-  RIP.fromFFIType hs_bindgen_ea6dc6bb1ed192d7_base
+hs_bindgen_3fba5bc1e147a38c =
+  RIP.fromFFIType hs_bindgen_3fba5bc1e147a38c_base
 
 {-| __C declaration:__ @wl_proxy_create@
 
@@ -1793,19 +1793,19 @@ wl_proxy_create ::
   -> PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
      -- ^ __C declaration:__ @interface@
   -> IO (RIP.Ptr Wl_proxy)
-wl_proxy_create = hs_bindgen_ea6dc6bb1ed192d7
+wl_proxy_create = hs_bindgen_3fba5bc1e147a38c
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_create_wrapper@
-foreign import ccall safe "hs_bindgen_85701f676dbca379" hs_bindgen_85701f676dbca379_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_create_wrapper@
+foreign import ccall safe "hs_bindgen_dbcd6f30ea58b40c" hs_bindgen_dbcd6f30ea58b40c_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_create_wrapper@
-hs_bindgen_85701f676dbca379 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_create_wrapper@
+hs_bindgen_dbcd6f30ea58b40c ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_85701f676dbca379 =
-  RIP.fromFFIType hs_bindgen_85701f676dbca379_base
+hs_bindgen_dbcd6f30ea58b40c =
+  RIP.fromFFIType hs_bindgen_dbcd6f30ea58b40c_base
 
 {-| __C declaration:__ @wl_proxy_create_wrapper@
 
@@ -1817,19 +1817,19 @@ wl_proxy_create_wrapper ::
      RIP.Ptr RIP.Void
      -- ^ __C declaration:__ @proxy@
   -> IO (RIP.Ptr RIP.Void)
-wl_proxy_create_wrapper = hs_bindgen_85701f676dbca379
+wl_proxy_create_wrapper = hs_bindgen_dbcd6f30ea58b40c
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_wrapper_destroy@
-foreign import ccall safe "hs_bindgen_596e8060468914d0" hs_bindgen_596e8060468914d0_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_wrapper_destroy@
+foreign import ccall safe "hs_bindgen_5bcc8bee89b26e03" hs_bindgen_5bcc8bee89b26e03_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_wrapper_destroy@
-hs_bindgen_596e8060468914d0 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_wrapper_destroy@
+hs_bindgen_5bcc8bee89b26e03 ::
      RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_596e8060468914d0 =
-  RIP.fromFFIType hs_bindgen_596e8060468914d0_base
+hs_bindgen_5bcc8bee89b26e03 =
+  RIP.fromFFIType hs_bindgen_5bcc8bee89b26e03_base
 
 {-| __C declaration:__ @wl_proxy_wrapper_destroy@
 
@@ -1842,25 +1842,25 @@ wl_proxy_wrapper_destroy ::
      -- ^ __C declaration:__ @proxy_wrapper@
   -> IO ()
 wl_proxy_wrapper_destroy =
-  hs_bindgen_596e8060468914d0
+  hs_bindgen_5bcc8bee89b26e03
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_marshal_array_constructor@
-foreign import ccall safe "hs_bindgen_b0fa8b968c8f0acb" hs_bindgen_b0fa8b968c8f0acb_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_marshal_array_constructor@
+foreign import ccall safe "hs_bindgen_4f1c8f4a68ea4254" hs_bindgen_4f1c8f4a68ea4254_base ::
      RIP.Ptr RIP.Void
   -> RIP.Word32
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_marshal_array_constructor@
-hs_bindgen_b0fa8b968c8f0acb ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_marshal_array_constructor@
+hs_bindgen_4f1c8f4a68ea4254 ::
      RIP.Ptr Wl_proxy
   -> HsBindgen.Runtime.LibC.Word32
   -> RIP.Ptr Bindings.Wayland.Util.Generated.Wl_argument
   -> PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
   -> IO (RIP.Ptr Wl_proxy)
-hs_bindgen_b0fa8b968c8f0acb =
-  RIP.fromFFIType hs_bindgen_b0fa8b968c8f0acb_base
+hs_bindgen_4f1c8f4a68ea4254 =
+  RIP.fromFFIType hs_bindgen_4f1c8f4a68ea4254_base
 
 {-| __C declaration:__ @wl_proxy_marshal_array_constructor@
 
@@ -1879,10 +1879,10 @@ wl_proxy_marshal_array_constructor ::
      -- ^ __C declaration:__ @interface@
   -> IO (RIP.Ptr Wl_proxy)
 wl_proxy_marshal_array_constructor =
-  hs_bindgen_b0fa8b968c8f0acb
+  hs_bindgen_4f1c8f4a68ea4254
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_marshal_array_constructor_versioned@
-foreign import ccall safe "hs_bindgen_43ebdcb89aaf2464" hs_bindgen_43ebdcb89aaf2464_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_marshal_array_constructor_versioned@
+foreign import ccall safe "hs_bindgen_304f88178494a08f" hs_bindgen_304f88178494a08f_base ::
      RIP.Ptr RIP.Void
   -> RIP.Word32
   -> RIP.Ptr RIP.Void
@@ -1890,16 +1890,16 @@ foreign import ccall safe "hs_bindgen_43ebdcb89aaf2464" hs_bindgen_43ebdcb89aaf2
   -> RIP.Word32
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_marshal_array_constructor_versioned@
-hs_bindgen_43ebdcb89aaf2464 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_marshal_array_constructor_versioned@
+hs_bindgen_304f88178494a08f ::
      RIP.Ptr Wl_proxy
   -> HsBindgen.Runtime.LibC.Word32
   -> RIP.Ptr Bindings.Wayland.Util.Generated.Wl_argument
   -> PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
   -> HsBindgen.Runtime.LibC.Word32
   -> IO (RIP.Ptr Wl_proxy)
-hs_bindgen_43ebdcb89aaf2464 =
-  RIP.fromFFIType hs_bindgen_43ebdcb89aaf2464_base
+hs_bindgen_304f88178494a08f =
+  RIP.fromFFIType hs_bindgen_304f88178494a08f_base
 
 {-| __C declaration:__ @wl_proxy_marshal_array_constructor_versioned@
 
@@ -1920,19 +1920,19 @@ wl_proxy_marshal_array_constructor_versioned ::
      -- ^ __C declaration:__ @version@
   -> IO (RIP.Ptr Wl_proxy)
 wl_proxy_marshal_array_constructor_versioned =
-  hs_bindgen_43ebdcb89aaf2464
+  hs_bindgen_304f88178494a08f
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_destroy@
-foreign import ccall safe "hs_bindgen_7fdde303c65b3145" hs_bindgen_7fdde303c65b3145_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_destroy@
+foreign import ccall safe "hs_bindgen_ce5e3926cfe58fe4" hs_bindgen_ce5e3926cfe58fe4_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_destroy@
-hs_bindgen_7fdde303c65b3145 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_destroy@
+hs_bindgen_ce5e3926cfe58fe4 ::
      RIP.Ptr Wl_proxy
   -> IO ()
-hs_bindgen_7fdde303c65b3145 =
-  RIP.fromFFIType hs_bindgen_7fdde303c65b3145_base
+hs_bindgen_ce5e3926cfe58fe4 =
+  RIP.fromFFIType hs_bindgen_ce5e3926cfe58fe4_base
 
 {-| __C declaration:__ @wl_proxy_destroy@
 
@@ -1944,23 +1944,23 @@ wl_proxy_destroy ::
      RIP.Ptr Wl_proxy
      -- ^ __C declaration:__ @proxy@
   -> IO ()
-wl_proxy_destroy = hs_bindgen_7fdde303c65b3145
+wl_proxy_destroy = hs_bindgen_ce5e3926cfe58fe4
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_add_listener@
-foreign import ccall safe "hs_bindgen_e2a379af3db7c19b" hs_bindgen_e2a379af3db7c19b_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_add_listener@
+foreign import ccall safe "hs_bindgen_d84424767c487f97" hs_bindgen_d84424767c487f97_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_add_listener@
-hs_bindgen_e2a379af3db7c19b ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_add_listener@
+hs_bindgen_d84424767c487f97 ::
      RIP.Ptr Wl_proxy
   -> RIP.Ptr (RIP.FunPtr (IO ()))
   -> RIP.Ptr RIP.Void
   -> IO RIP.CInt
-hs_bindgen_e2a379af3db7c19b =
-  RIP.fromFFIType hs_bindgen_e2a379af3db7c19b_base
+hs_bindgen_d84424767c487f97 =
+  RIP.fromFFIType hs_bindgen_d84424767c487f97_base
 
 {-| __C declaration:__ @wl_proxy_add_listener@
 
@@ -1976,19 +1976,19 @@ wl_proxy_add_listener ::
   -> RIP.Ptr RIP.Void
      -- ^ __C declaration:__ @data@
   -> IO RIP.CInt
-wl_proxy_add_listener = hs_bindgen_e2a379af3db7c19b
+wl_proxy_add_listener = hs_bindgen_d84424767c487f97
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_listener@
-foreign import ccall safe "hs_bindgen_3b2df94eebf88b6b" hs_bindgen_3b2df94eebf88b6b_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_listener@
+foreign import ccall safe "hs_bindgen_b3c3246cd305657c" hs_bindgen_b3c3246cd305657c_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_listener@
-hs_bindgen_3b2df94eebf88b6b ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_listener@
+hs_bindgen_b3c3246cd305657c ::
      RIP.Ptr Wl_proxy
   -> IO (PtrConst.PtrConst RIP.Void)
-hs_bindgen_3b2df94eebf88b6b =
-  RIP.fromFFIType hs_bindgen_3b2df94eebf88b6b_base
+hs_bindgen_b3c3246cd305657c =
+  RIP.fromFFIType hs_bindgen_b3c3246cd305657c_base
 
 {-| __C declaration:__ @wl_proxy_get_listener@
 
@@ -2000,25 +2000,25 @@ wl_proxy_get_listener ::
      RIP.Ptr Wl_proxy
      -- ^ __C declaration:__ @proxy@
   -> IO (PtrConst.PtrConst RIP.Void)
-wl_proxy_get_listener = hs_bindgen_3b2df94eebf88b6b
+wl_proxy_get_listener = hs_bindgen_b3c3246cd305657c
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_add_dispatcher@
-foreign import ccall safe "hs_bindgen_3443ae83c581cc31" hs_bindgen_3443ae83c581cc31_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_add_dispatcher@
+foreign import ccall safe "hs_bindgen_a01bc9baa0e54e27" hs_bindgen_a01bc9baa0e54e27_base ::
      RIP.Ptr RIP.Void
   -> RIP.FunPtr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_add_dispatcher@
-hs_bindgen_3443ae83c581cc31 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_add_dispatcher@
+hs_bindgen_a01bc9baa0e54e27 ::
      RIP.Ptr Wl_proxy
   -> Bindings.Wayland.Util.Generated.Wl_dispatcher_func_t
   -> PtrConst.PtrConst RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.CInt
-hs_bindgen_3443ae83c581cc31 =
-  RIP.fromFFIType hs_bindgen_3443ae83c581cc31_base
+hs_bindgen_a01bc9baa0e54e27 =
+  RIP.fromFFIType hs_bindgen_a01bc9baa0e54e27_base
 
 {-| __C declaration:__ @wl_proxy_add_dispatcher@
 
@@ -2036,21 +2036,21 @@ wl_proxy_add_dispatcher ::
   -> RIP.Ptr RIP.Void
      -- ^ __C declaration:__ @data@
   -> IO RIP.CInt
-wl_proxy_add_dispatcher = hs_bindgen_3443ae83c581cc31
+wl_proxy_add_dispatcher = hs_bindgen_a01bc9baa0e54e27
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_set_user_data@
-foreign import ccall safe "hs_bindgen_53bbf5585247d91c" hs_bindgen_53bbf5585247d91c_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_set_user_data@
+foreign import ccall safe "hs_bindgen_67a306da31f12964" hs_bindgen_67a306da31f12964_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_set_user_data@
-hs_bindgen_53bbf5585247d91c ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_set_user_data@
+hs_bindgen_67a306da31f12964 ::
      RIP.Ptr Wl_proxy
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_53bbf5585247d91c =
-  RIP.fromFFIType hs_bindgen_53bbf5585247d91c_base
+hs_bindgen_67a306da31f12964 =
+  RIP.fromFFIType hs_bindgen_67a306da31f12964_base
 
 {-| __C declaration:__ @wl_proxy_set_user_data@
 
@@ -2064,19 +2064,19 @@ wl_proxy_set_user_data ::
   -> RIP.Ptr RIP.Void
      -- ^ __C declaration:__ @user_data@
   -> IO ()
-wl_proxy_set_user_data = hs_bindgen_53bbf5585247d91c
+wl_proxy_set_user_data = hs_bindgen_67a306da31f12964
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_user_data@
-foreign import ccall safe "hs_bindgen_c9ea9e53a28ee550" hs_bindgen_c9ea9e53a28ee550_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_user_data@
+foreign import ccall safe "hs_bindgen_df97ea19381dccd3" hs_bindgen_df97ea19381dccd3_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_user_data@
-hs_bindgen_c9ea9e53a28ee550 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_user_data@
+hs_bindgen_df97ea19381dccd3 ::
      RIP.Ptr Wl_proxy
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_c9ea9e53a28ee550 =
-  RIP.fromFFIType hs_bindgen_c9ea9e53a28ee550_base
+hs_bindgen_df97ea19381dccd3 =
+  RIP.fromFFIType hs_bindgen_df97ea19381dccd3_base
 
 {-| __C declaration:__ @wl_proxy_get_user_data@
 
@@ -2088,19 +2088,19 @@ wl_proxy_get_user_data ::
      RIP.Ptr Wl_proxy
      -- ^ __C declaration:__ @proxy@
   -> IO (RIP.Ptr RIP.Void)
-wl_proxy_get_user_data = hs_bindgen_c9ea9e53a28ee550
+wl_proxy_get_user_data = hs_bindgen_df97ea19381dccd3
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_version@
-foreign import ccall safe "hs_bindgen_79b2f1f43d9f56a8" hs_bindgen_79b2f1f43d9f56a8_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_version@
+foreign import ccall safe "hs_bindgen_bfcc0a98a374dd59" hs_bindgen_bfcc0a98a374dd59_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_version@
-hs_bindgen_79b2f1f43d9f56a8 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_version@
+hs_bindgen_bfcc0a98a374dd59 ::
      RIP.Ptr Wl_proxy
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_79b2f1f43d9f56a8 =
-  RIP.fromFFIType hs_bindgen_79b2f1f43d9f56a8_base
+hs_bindgen_bfcc0a98a374dd59 =
+  RIP.fromFFIType hs_bindgen_bfcc0a98a374dd59_base
 
 {-| __C declaration:__ @wl_proxy_get_version@
 
@@ -2112,19 +2112,19 @@ wl_proxy_get_version ::
      RIP.Ptr Wl_proxy
      -- ^ __C declaration:__ @proxy@
   -> IO HsBindgen.Runtime.LibC.Word32
-wl_proxy_get_version = hs_bindgen_79b2f1f43d9f56a8
+wl_proxy_get_version = hs_bindgen_bfcc0a98a374dd59
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_id@
-foreign import ccall safe "hs_bindgen_60f2e22067c4f24a" hs_bindgen_60f2e22067c4f24a_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_id@
+foreign import ccall safe "hs_bindgen_3701976d337a6b34" hs_bindgen_3701976d337a6b34_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_id@
-hs_bindgen_60f2e22067c4f24a ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_id@
+hs_bindgen_3701976d337a6b34 ::
      RIP.Ptr Wl_proxy
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_60f2e22067c4f24a =
-  RIP.fromFFIType hs_bindgen_60f2e22067c4f24a_base
+hs_bindgen_3701976d337a6b34 =
+  RIP.fromFFIType hs_bindgen_3701976d337a6b34_base
 
 {-| __C declaration:__ @wl_proxy_get_id@
 
@@ -2136,21 +2136,21 @@ wl_proxy_get_id ::
      RIP.Ptr Wl_proxy
      -- ^ __C declaration:__ @proxy@
   -> IO HsBindgen.Runtime.LibC.Word32
-wl_proxy_get_id = hs_bindgen_60f2e22067c4f24a
+wl_proxy_get_id = hs_bindgen_3701976d337a6b34
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_set_tag@
-foreign import ccall safe "hs_bindgen_1f55debeb10c2324" hs_bindgen_1f55debeb10c2324_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_set_tag@
+foreign import ccall safe "hs_bindgen_ef6b202bfddcad25" hs_bindgen_ef6b202bfddcad25_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_set_tag@
-hs_bindgen_1f55debeb10c2324 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_set_tag@
+hs_bindgen_ef6b202bfddcad25 ::
      RIP.Ptr Wl_proxy
   -> PtrConst.PtrConst (PtrConst.PtrConst RIP.CChar)
   -> IO ()
-hs_bindgen_1f55debeb10c2324 =
-  RIP.fromFFIType hs_bindgen_1f55debeb10c2324_base
+hs_bindgen_ef6b202bfddcad25 =
+  RIP.fromFFIType hs_bindgen_ef6b202bfddcad25_base
 
 {-| __C declaration:__ @wl_proxy_set_tag@
 
@@ -2164,19 +2164,19 @@ wl_proxy_set_tag ::
   -> PtrConst.PtrConst (PtrConst.PtrConst RIP.CChar)
      -- ^ __C declaration:__ @tag@
   -> IO ()
-wl_proxy_set_tag = hs_bindgen_1f55debeb10c2324
+wl_proxy_set_tag = hs_bindgen_ef6b202bfddcad25
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_tag@
-foreign import ccall safe "hs_bindgen_74fbbfb5d0212584" hs_bindgen_74fbbfb5d0212584_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_tag@
+foreign import ccall safe "hs_bindgen_7ed78f2b6e0295c5" hs_bindgen_7ed78f2b6e0295c5_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_tag@
-hs_bindgen_74fbbfb5d0212584 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_tag@
+hs_bindgen_7ed78f2b6e0295c5 ::
      RIP.Ptr Wl_proxy
   -> IO (PtrConst.PtrConst (PtrConst.PtrConst RIP.CChar))
-hs_bindgen_74fbbfb5d0212584 =
-  RIP.fromFFIType hs_bindgen_74fbbfb5d0212584_base
+hs_bindgen_7ed78f2b6e0295c5 =
+  RIP.fromFFIType hs_bindgen_7ed78f2b6e0295c5_base
 
 {-| __C declaration:__ @wl_proxy_get_tag@
 
@@ -2188,19 +2188,19 @@ wl_proxy_get_tag ::
      RIP.Ptr Wl_proxy
      -- ^ __C declaration:__ @proxy@
   -> IO (PtrConst.PtrConst (PtrConst.PtrConst RIP.CChar))
-wl_proxy_get_tag = hs_bindgen_74fbbfb5d0212584
+wl_proxy_get_tag = hs_bindgen_7ed78f2b6e0295c5
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_class@
-foreign import ccall safe "hs_bindgen_9e7884520de5a609" hs_bindgen_9e7884520de5a609_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_class@
+foreign import ccall safe "hs_bindgen_9bb1c2c3f8fc2343" hs_bindgen_9bb1c2c3f8fc2343_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_class@
-hs_bindgen_9e7884520de5a609 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_class@
+hs_bindgen_9bb1c2c3f8fc2343 ::
      RIP.Ptr Wl_proxy
   -> IO (PtrConst.PtrConst RIP.CChar)
-hs_bindgen_9e7884520de5a609 =
-  RIP.fromFFIType hs_bindgen_9e7884520de5a609_base
+hs_bindgen_9bb1c2c3f8fc2343 =
+  RIP.fromFFIType hs_bindgen_9bb1c2c3f8fc2343_base
 
 {-| __C declaration:__ @wl_proxy_get_class@
 
@@ -2212,19 +2212,19 @@ wl_proxy_get_class ::
      RIP.Ptr Wl_proxy
      -- ^ __C declaration:__ @proxy@
   -> IO (PtrConst.PtrConst RIP.CChar)
-wl_proxy_get_class = hs_bindgen_9e7884520de5a609
+wl_proxy_get_class = hs_bindgen_9bb1c2c3f8fc2343
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_interface@
-foreign import ccall safe "hs_bindgen_b12b208751b123b7" hs_bindgen_b12b208751b123b7_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_interface@
+foreign import ccall safe "hs_bindgen_9a5b4de347d591f4" hs_bindgen_9a5b4de347d591f4_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_interface@
-hs_bindgen_b12b208751b123b7 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_interface@
+hs_bindgen_9a5b4de347d591f4 ::
      RIP.Ptr Wl_proxy
   -> IO (PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface)
-hs_bindgen_b12b208751b123b7 =
-  RIP.fromFFIType hs_bindgen_b12b208751b123b7_base
+hs_bindgen_9a5b4de347d591f4 =
+  RIP.fromFFIType hs_bindgen_9a5b4de347d591f4_base
 
 {-| __C declaration:__ @wl_proxy_get_interface@
 
@@ -2236,19 +2236,19 @@ wl_proxy_get_interface ::
      RIP.Ptr Wl_proxy
      -- ^ __C declaration:__ @proxy@
   -> IO (PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface)
-wl_proxy_get_interface = hs_bindgen_b12b208751b123b7
+wl_proxy_get_interface = hs_bindgen_9a5b4de347d591f4
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_display@
-foreign import ccall safe "hs_bindgen_19e29ec485a4673b" hs_bindgen_19e29ec485a4673b_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_display@
+foreign import ccall safe "hs_bindgen_e0a82752b1b5f1c3" hs_bindgen_e0a82752b1b5f1c3_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_display@
-hs_bindgen_19e29ec485a4673b ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_display@
+hs_bindgen_e0a82752b1b5f1c3 ::
      RIP.Ptr Wl_proxy
   -> IO (RIP.Ptr Wl_display)
-hs_bindgen_19e29ec485a4673b =
-  RIP.fromFFIType hs_bindgen_19e29ec485a4673b_base
+hs_bindgen_e0a82752b1b5f1c3 =
+  RIP.fromFFIType hs_bindgen_e0a82752b1b5f1c3_base
 
 {-| __C declaration:__ @wl_proxy_get_display@
 
@@ -2260,21 +2260,21 @@ wl_proxy_get_display ::
      RIP.Ptr Wl_proxy
      -- ^ __C declaration:__ @proxy@
   -> IO (RIP.Ptr Wl_display)
-wl_proxy_get_display = hs_bindgen_19e29ec485a4673b
+wl_proxy_get_display = hs_bindgen_e0a82752b1b5f1c3
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_set_queue@
-foreign import ccall safe "hs_bindgen_b9daeb9683a63e69" hs_bindgen_b9daeb9683a63e69_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_set_queue@
+foreign import ccall safe "hs_bindgen_78f4d34a0e2352c7" hs_bindgen_78f4d34a0e2352c7_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_set_queue@
-hs_bindgen_b9daeb9683a63e69 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_set_queue@
+hs_bindgen_78f4d34a0e2352c7 ::
      RIP.Ptr Wl_proxy
   -> RIP.Ptr Wl_event_queue
   -> IO ()
-hs_bindgen_b9daeb9683a63e69 =
-  RIP.fromFFIType hs_bindgen_b9daeb9683a63e69_base
+hs_bindgen_78f4d34a0e2352c7 =
+  RIP.fromFFIType hs_bindgen_78f4d34a0e2352c7_base
 
 {-| __C declaration:__ @wl_proxy_set_queue@
 
@@ -2288,19 +2288,19 @@ wl_proxy_set_queue ::
   -> RIP.Ptr Wl_event_queue
      -- ^ __C declaration:__ @queue@
   -> IO ()
-wl_proxy_set_queue = hs_bindgen_b9daeb9683a63e69
+wl_proxy_set_queue = hs_bindgen_78f4d34a0e2352c7
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_queue@
-foreign import ccall safe "hs_bindgen_0b99a023eae3958e" hs_bindgen_0b99a023eae3958e_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_queue@
+foreign import ccall safe "hs_bindgen_41f02dc43fdf6011" hs_bindgen_41f02dc43fdf6011_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_queue@
-hs_bindgen_0b99a023eae3958e ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_proxy_get_queue@
+hs_bindgen_41f02dc43fdf6011 ::
      PtrConst.PtrConst Wl_proxy
   -> IO (RIP.Ptr Wl_event_queue)
-hs_bindgen_0b99a023eae3958e =
-  RIP.fromFFIType hs_bindgen_0b99a023eae3958e_base
+hs_bindgen_41f02dc43fdf6011 =
+  RIP.fromFFIType hs_bindgen_41f02dc43fdf6011_base
 
 {-| __C declaration:__ @wl_proxy_get_queue@
 
@@ -2312,19 +2312,19 @@ wl_proxy_get_queue ::
      PtrConst.PtrConst Wl_proxy
      -- ^ __C declaration:__ @proxy@
   -> IO (RIP.Ptr Wl_event_queue)
-wl_proxy_get_queue = hs_bindgen_0b99a023eae3958e
+wl_proxy_get_queue = hs_bindgen_41f02dc43fdf6011
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_event_queue_get_name@
-foreign import ccall safe "hs_bindgen_8f0f7cab89a3eeb4" hs_bindgen_8f0f7cab89a3eeb4_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_event_queue_get_name@
+foreign import ccall safe "hs_bindgen_0905dcb3b11b1cbd" hs_bindgen_0905dcb3b11b1cbd_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_event_queue_get_name@
-hs_bindgen_8f0f7cab89a3eeb4 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_event_queue_get_name@
+hs_bindgen_0905dcb3b11b1cbd ::
      PtrConst.PtrConst Wl_event_queue
   -> IO (PtrConst.PtrConst RIP.CChar)
-hs_bindgen_8f0f7cab89a3eeb4 =
-  RIP.fromFFIType hs_bindgen_8f0f7cab89a3eeb4_base
+hs_bindgen_0905dcb3b11b1cbd =
+  RIP.fromFFIType hs_bindgen_0905dcb3b11b1cbd_base
 
 {-| __C declaration:__ @wl_event_queue_get_name@
 
@@ -2336,19 +2336,19 @@ wl_event_queue_get_name ::
      PtrConst.PtrConst Wl_event_queue
      -- ^ __C declaration:__ @queue@
   -> IO (PtrConst.PtrConst RIP.CChar)
-wl_event_queue_get_name = hs_bindgen_8f0f7cab89a3eeb4
+wl_event_queue_get_name = hs_bindgen_0905dcb3b11b1cbd
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_connect@
-foreign import ccall safe "hs_bindgen_bb42064bf6c5a0e3" hs_bindgen_bb42064bf6c5a0e3_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_connect@
+foreign import ccall safe "hs_bindgen_3bbbdb2c96e08e8d" hs_bindgen_3bbbdb2c96e08e8d_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_connect@
-hs_bindgen_bb42064bf6c5a0e3 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_connect@
+hs_bindgen_3bbbdb2c96e08e8d ::
      PtrConst.PtrConst RIP.CChar
   -> IO (RIP.Ptr Wl_display)
-hs_bindgen_bb42064bf6c5a0e3 =
-  RIP.fromFFIType hs_bindgen_bb42064bf6c5a0e3_base
+hs_bindgen_3bbbdb2c96e08e8d =
+  RIP.fromFFIType hs_bindgen_3bbbdb2c96e08e8d_base
 
 {-| __C declaration:__ @wl_display_connect@
 
@@ -2360,19 +2360,19 @@ wl_display_connect ::
      PtrConst.PtrConst RIP.CChar
      -- ^ __C declaration:__ @name@
   -> IO (RIP.Ptr Wl_display)
-wl_display_connect = hs_bindgen_bb42064bf6c5a0e3
+wl_display_connect = hs_bindgen_3bbbdb2c96e08e8d
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_connect_to_fd@
-foreign import ccall safe "hs_bindgen_240ef2b6cfbb8b90" hs_bindgen_240ef2b6cfbb8b90_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_connect_to_fd@
+foreign import ccall safe "hs_bindgen_3b51ea3473d00146" hs_bindgen_3b51ea3473d00146_base ::
      RIP.Int32
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_connect_to_fd@
-hs_bindgen_240ef2b6cfbb8b90 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_connect_to_fd@
+hs_bindgen_3b51ea3473d00146 ::
      RIP.CInt
   -> IO (RIP.Ptr Wl_display)
-hs_bindgen_240ef2b6cfbb8b90 =
-  RIP.fromFFIType hs_bindgen_240ef2b6cfbb8b90_base
+hs_bindgen_3b51ea3473d00146 =
+  RIP.fromFFIType hs_bindgen_3b51ea3473d00146_base
 
 {-| __C declaration:__ @wl_display_connect_to_fd@
 
@@ -2385,19 +2385,19 @@ wl_display_connect_to_fd ::
      -- ^ __C declaration:__ @fd@
   -> IO (RIP.Ptr Wl_display)
 wl_display_connect_to_fd =
-  hs_bindgen_240ef2b6cfbb8b90
+  hs_bindgen_3b51ea3473d00146
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_disconnect@
-foreign import ccall safe "hs_bindgen_224b0bbc0877e5c6" hs_bindgen_224b0bbc0877e5c6_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_disconnect@
+foreign import ccall safe "hs_bindgen_152ae95b4600ff5e" hs_bindgen_152ae95b4600ff5e_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_disconnect@
-hs_bindgen_224b0bbc0877e5c6 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_disconnect@
+hs_bindgen_152ae95b4600ff5e ::
      RIP.Ptr Wl_display
   -> IO ()
-hs_bindgen_224b0bbc0877e5c6 =
-  RIP.fromFFIType hs_bindgen_224b0bbc0877e5c6_base
+hs_bindgen_152ae95b4600ff5e =
+  RIP.fromFFIType hs_bindgen_152ae95b4600ff5e_base
 
 {-| __C declaration:__ @wl_display_disconnect@
 
@@ -2409,19 +2409,19 @@ wl_display_disconnect ::
      RIP.Ptr Wl_display
      -- ^ __C declaration:__ @display@
   -> IO ()
-wl_display_disconnect = hs_bindgen_224b0bbc0877e5c6
+wl_display_disconnect = hs_bindgen_152ae95b4600ff5e
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_get_fd@
-foreign import ccall safe "hs_bindgen_d9913c6c48bcd7d2" hs_bindgen_d9913c6c48bcd7d2_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_get_fd@
+foreign import ccall safe "hs_bindgen_5bae4ad19779f87e" hs_bindgen_5bae4ad19779f87e_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_get_fd@
-hs_bindgen_d9913c6c48bcd7d2 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_get_fd@
+hs_bindgen_5bae4ad19779f87e ::
      RIP.Ptr Wl_display
   -> IO RIP.CInt
-hs_bindgen_d9913c6c48bcd7d2 =
-  RIP.fromFFIType hs_bindgen_d9913c6c48bcd7d2_base
+hs_bindgen_5bae4ad19779f87e =
+  RIP.fromFFIType hs_bindgen_5bae4ad19779f87e_base
 
 {-| __C declaration:__ @wl_display_get_fd@
 
@@ -2433,19 +2433,19 @@ wl_display_get_fd ::
      RIP.Ptr Wl_display
      -- ^ __C declaration:__ @display@
   -> IO RIP.CInt
-wl_display_get_fd = hs_bindgen_d9913c6c48bcd7d2
+wl_display_get_fd = hs_bindgen_5bae4ad19779f87e
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_dispatch@
-foreign import ccall safe "hs_bindgen_6ccadd758747fe82" hs_bindgen_6ccadd758747fe82_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_dispatch@
+foreign import ccall safe "hs_bindgen_cbe753ec9bdd44d1" hs_bindgen_cbe753ec9bdd44d1_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_dispatch@
-hs_bindgen_6ccadd758747fe82 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_dispatch@
+hs_bindgen_cbe753ec9bdd44d1 ::
      RIP.Ptr Wl_display
   -> IO RIP.CInt
-hs_bindgen_6ccadd758747fe82 =
-  RIP.fromFFIType hs_bindgen_6ccadd758747fe82_base
+hs_bindgen_cbe753ec9bdd44d1 =
+  RIP.fromFFIType hs_bindgen_cbe753ec9bdd44d1_base
 
 {-| __C declaration:__ @wl_display_dispatch@
 
@@ -2457,21 +2457,21 @@ wl_display_dispatch ::
      RIP.Ptr Wl_display
      -- ^ __C declaration:__ @display@
   -> IO RIP.CInt
-wl_display_dispatch = hs_bindgen_6ccadd758747fe82
+wl_display_dispatch = hs_bindgen_cbe753ec9bdd44d1
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_dispatch_queue@
-foreign import ccall safe "hs_bindgen_d8094b8790b36611" hs_bindgen_d8094b8790b36611_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_dispatch_queue@
+foreign import ccall safe "hs_bindgen_2c3d038bcac545a8" hs_bindgen_2c3d038bcac545a8_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_dispatch_queue@
-hs_bindgen_d8094b8790b36611 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_dispatch_queue@
+hs_bindgen_2c3d038bcac545a8 ::
      RIP.Ptr Wl_display
   -> RIP.Ptr Wl_event_queue
   -> IO RIP.CInt
-hs_bindgen_d8094b8790b36611 =
-  RIP.fromFFIType hs_bindgen_d8094b8790b36611_base
+hs_bindgen_2c3d038bcac545a8 =
+  RIP.fromFFIType hs_bindgen_2c3d038bcac545a8_base
 
 {-| __C declaration:__ @wl_display_dispatch_queue@
 
@@ -2486,21 +2486,21 @@ wl_display_dispatch_queue ::
      -- ^ __C declaration:__ @queue@
   -> IO RIP.CInt
 wl_display_dispatch_queue =
-  hs_bindgen_d8094b8790b36611
+  hs_bindgen_2c3d038bcac545a8
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_dispatch_timeout@
-foreign import ccall safe "hs_bindgen_a8978634afcd1a30" hs_bindgen_a8978634afcd1a30_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_dispatch_timeout@
+foreign import ccall safe "hs_bindgen_5914b7ce9e7beffd" hs_bindgen_5914b7ce9e7beffd_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_dispatch_timeout@
-hs_bindgen_a8978634afcd1a30 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_dispatch_timeout@
+hs_bindgen_5914b7ce9e7beffd ::
      RIP.Ptr Wl_display
   -> PtrConst.PtrConst Timespec
   -> IO RIP.CInt
-hs_bindgen_a8978634afcd1a30 =
-  RIP.fromFFIType hs_bindgen_a8978634afcd1a30_base
+hs_bindgen_5914b7ce9e7beffd =
+  RIP.fromFFIType hs_bindgen_5914b7ce9e7beffd_base
 
 {-| __C declaration:__ @wl_display_dispatch_timeout@
 
@@ -2515,23 +2515,23 @@ wl_display_dispatch_timeout ::
      -- ^ __C declaration:__ @timeout@
   -> IO RIP.CInt
 wl_display_dispatch_timeout =
-  hs_bindgen_a8978634afcd1a30
+  hs_bindgen_5914b7ce9e7beffd
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_dispatch_queue_timeout@
-foreign import ccall safe "hs_bindgen_ef1eb26bb7204ad0" hs_bindgen_ef1eb26bb7204ad0_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_dispatch_queue_timeout@
+foreign import ccall safe "hs_bindgen_6332fa3c31b0ebac" hs_bindgen_6332fa3c31b0ebac_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_dispatch_queue_timeout@
-hs_bindgen_ef1eb26bb7204ad0 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_dispatch_queue_timeout@
+hs_bindgen_6332fa3c31b0ebac ::
      RIP.Ptr Wl_display
   -> RIP.Ptr Wl_event_queue
   -> PtrConst.PtrConst Timespec
   -> IO RIP.CInt
-hs_bindgen_ef1eb26bb7204ad0 =
-  RIP.fromFFIType hs_bindgen_ef1eb26bb7204ad0_base
+hs_bindgen_6332fa3c31b0ebac =
+  RIP.fromFFIType hs_bindgen_6332fa3c31b0ebac_base
 
 {-| __C declaration:__ @wl_display_dispatch_queue_timeout@
 
@@ -2548,21 +2548,21 @@ wl_display_dispatch_queue_timeout ::
      -- ^ __C declaration:__ @timeout@
   -> IO RIP.CInt
 wl_display_dispatch_queue_timeout =
-  hs_bindgen_ef1eb26bb7204ad0
+  hs_bindgen_6332fa3c31b0ebac
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_dispatch_queue_pending@
-foreign import ccall safe "hs_bindgen_1b469acbe08193d2" hs_bindgen_1b469acbe08193d2_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_dispatch_queue_pending@
+foreign import ccall safe "hs_bindgen_57821371522593d2" hs_bindgen_57821371522593d2_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_dispatch_queue_pending@
-hs_bindgen_1b469acbe08193d2 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_dispatch_queue_pending@
+hs_bindgen_57821371522593d2 ::
      RIP.Ptr Wl_display
   -> RIP.Ptr Wl_event_queue
   -> IO RIP.CInt
-hs_bindgen_1b469acbe08193d2 =
-  RIP.fromFFIType hs_bindgen_1b469acbe08193d2_base
+hs_bindgen_57821371522593d2 =
+  RIP.fromFFIType hs_bindgen_57821371522593d2_base
 
 {-| __C declaration:__ @wl_display_dispatch_queue_pending@
 
@@ -2577,19 +2577,19 @@ wl_display_dispatch_queue_pending ::
      -- ^ __C declaration:__ @queue@
   -> IO RIP.CInt
 wl_display_dispatch_queue_pending =
-  hs_bindgen_1b469acbe08193d2
+  hs_bindgen_57821371522593d2
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_dispatch_pending@
-foreign import ccall safe "hs_bindgen_4e48e5ca48f802f8" hs_bindgen_4e48e5ca48f802f8_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_dispatch_pending@
+foreign import ccall safe "hs_bindgen_22411b5d8bbdaee0" hs_bindgen_22411b5d8bbdaee0_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_dispatch_pending@
-hs_bindgen_4e48e5ca48f802f8 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_dispatch_pending@
+hs_bindgen_22411b5d8bbdaee0 ::
      RIP.Ptr Wl_display
   -> IO RIP.CInt
-hs_bindgen_4e48e5ca48f802f8 =
-  RIP.fromFFIType hs_bindgen_4e48e5ca48f802f8_base
+hs_bindgen_22411b5d8bbdaee0 =
+  RIP.fromFFIType hs_bindgen_22411b5d8bbdaee0_base
 
 {-| __C declaration:__ @wl_display_dispatch_pending@
 
@@ -2602,19 +2602,19 @@ wl_display_dispatch_pending ::
      -- ^ __C declaration:__ @display@
   -> IO RIP.CInt
 wl_display_dispatch_pending =
-  hs_bindgen_4e48e5ca48f802f8
+  hs_bindgen_22411b5d8bbdaee0
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_get_error@
-foreign import ccall safe "hs_bindgen_d01c67c2a753901e" hs_bindgen_d01c67c2a753901e_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_get_error@
+foreign import ccall safe "hs_bindgen_0a9cad3177f16e15" hs_bindgen_0a9cad3177f16e15_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_get_error@
-hs_bindgen_d01c67c2a753901e ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_get_error@
+hs_bindgen_0a9cad3177f16e15 ::
      RIP.Ptr Wl_display
   -> IO RIP.CInt
-hs_bindgen_d01c67c2a753901e =
-  RIP.fromFFIType hs_bindgen_d01c67c2a753901e_base
+hs_bindgen_0a9cad3177f16e15 =
+  RIP.fromFFIType hs_bindgen_0a9cad3177f16e15_base
 
 {-| __C declaration:__ @wl_display_get_error@
 
@@ -2626,23 +2626,23 @@ wl_display_get_error ::
      RIP.Ptr Wl_display
      -- ^ __C declaration:__ @display@
   -> IO RIP.CInt
-wl_display_get_error = hs_bindgen_d01c67c2a753901e
+wl_display_get_error = hs_bindgen_0a9cad3177f16e15
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_get_protocol_error@
-foreign import ccall safe "hs_bindgen_7f9e1ca7f0a5d421" hs_bindgen_7f9e1ca7f0a5d421_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_get_protocol_error@
+foreign import ccall safe "hs_bindgen_101c4e5ae7dc7aec" hs_bindgen_101c4e5ae7dc7aec_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_get_protocol_error@
-hs_bindgen_7f9e1ca7f0a5d421 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_get_protocol_error@
+hs_bindgen_101c4e5ae7dc7aec ::
      RIP.Ptr Wl_display
   -> RIP.Ptr (PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface)
   -> RIP.Ptr HsBindgen.Runtime.LibC.Word32
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_7f9e1ca7f0a5d421 =
-  RIP.fromFFIType hs_bindgen_7f9e1ca7f0a5d421_base
+hs_bindgen_101c4e5ae7dc7aec =
+  RIP.fromFFIType hs_bindgen_101c4e5ae7dc7aec_base
 
 {-| __C declaration:__ @wl_display_get_protocol_error@
 
@@ -2659,19 +2659,19 @@ wl_display_get_protocol_error ::
      -- ^ __C declaration:__ @id@
   -> IO HsBindgen.Runtime.LibC.Word32
 wl_display_get_protocol_error =
-  hs_bindgen_7f9e1ca7f0a5d421
+  hs_bindgen_101c4e5ae7dc7aec
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_flush@
-foreign import ccall safe "hs_bindgen_bfdbc6edb813a282" hs_bindgen_bfdbc6edb813a282_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_flush@
+foreign import ccall safe "hs_bindgen_b032ae8060087c07" hs_bindgen_b032ae8060087c07_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_flush@
-hs_bindgen_bfdbc6edb813a282 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_flush@
+hs_bindgen_b032ae8060087c07 ::
      RIP.Ptr Wl_display
   -> IO RIP.CInt
-hs_bindgen_bfdbc6edb813a282 =
-  RIP.fromFFIType hs_bindgen_bfdbc6edb813a282_base
+hs_bindgen_b032ae8060087c07 =
+  RIP.fromFFIType hs_bindgen_b032ae8060087c07_base
 
 {-| __C declaration:__ @wl_display_flush@
 
@@ -2683,21 +2683,21 @@ wl_display_flush ::
      RIP.Ptr Wl_display
      -- ^ __C declaration:__ @display@
   -> IO RIP.CInt
-wl_display_flush = hs_bindgen_bfdbc6edb813a282
+wl_display_flush = hs_bindgen_b032ae8060087c07
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_roundtrip_queue@
-foreign import ccall safe "hs_bindgen_01733d21fb13b898" hs_bindgen_01733d21fb13b898_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_roundtrip_queue@
+foreign import ccall safe "hs_bindgen_c5ce2d24af6cd240" hs_bindgen_c5ce2d24af6cd240_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_roundtrip_queue@
-hs_bindgen_01733d21fb13b898 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_roundtrip_queue@
+hs_bindgen_c5ce2d24af6cd240 ::
      RIP.Ptr Wl_display
   -> RIP.Ptr Wl_event_queue
   -> IO RIP.CInt
-hs_bindgen_01733d21fb13b898 =
-  RIP.fromFFIType hs_bindgen_01733d21fb13b898_base
+hs_bindgen_c5ce2d24af6cd240 =
+  RIP.fromFFIType hs_bindgen_c5ce2d24af6cd240_base
 
 {-| __C declaration:__ @wl_display_roundtrip_queue@
 
@@ -2712,19 +2712,19 @@ wl_display_roundtrip_queue ::
      -- ^ __C declaration:__ @queue@
   -> IO RIP.CInt
 wl_display_roundtrip_queue =
-  hs_bindgen_01733d21fb13b898
+  hs_bindgen_c5ce2d24af6cd240
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_roundtrip@
-foreign import ccall safe "hs_bindgen_516b260dc3da7e30" hs_bindgen_516b260dc3da7e30_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_roundtrip@
+foreign import ccall safe "hs_bindgen_be5919b56dfc1b74" hs_bindgen_be5919b56dfc1b74_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_roundtrip@
-hs_bindgen_516b260dc3da7e30 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_roundtrip@
+hs_bindgen_be5919b56dfc1b74 ::
      RIP.Ptr Wl_display
   -> IO RIP.CInt
-hs_bindgen_516b260dc3da7e30 =
-  RIP.fromFFIType hs_bindgen_516b260dc3da7e30_base
+hs_bindgen_be5919b56dfc1b74 =
+  RIP.fromFFIType hs_bindgen_be5919b56dfc1b74_base
 
 {-| __C declaration:__ @wl_display_roundtrip@
 
@@ -2736,19 +2736,19 @@ wl_display_roundtrip ::
      RIP.Ptr Wl_display
      -- ^ __C declaration:__ @display@
   -> IO RIP.CInt
-wl_display_roundtrip = hs_bindgen_516b260dc3da7e30
+wl_display_roundtrip = hs_bindgen_be5919b56dfc1b74
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_create_queue@
-foreign import ccall safe "hs_bindgen_72548357b08504d2" hs_bindgen_72548357b08504d2_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_create_queue@
+foreign import ccall safe "hs_bindgen_f2ec36fa20f6c3f9" hs_bindgen_f2ec36fa20f6c3f9_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_create_queue@
-hs_bindgen_72548357b08504d2 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_create_queue@
+hs_bindgen_f2ec36fa20f6c3f9 ::
      RIP.Ptr Wl_display
   -> IO (RIP.Ptr Wl_event_queue)
-hs_bindgen_72548357b08504d2 =
-  RIP.fromFFIType hs_bindgen_72548357b08504d2_base
+hs_bindgen_f2ec36fa20f6c3f9 =
+  RIP.fromFFIType hs_bindgen_f2ec36fa20f6c3f9_base
 
 {-| __C declaration:__ @wl_display_create_queue@
 
@@ -2760,21 +2760,21 @@ wl_display_create_queue ::
      RIP.Ptr Wl_display
      -- ^ __C declaration:__ @display@
   -> IO (RIP.Ptr Wl_event_queue)
-wl_display_create_queue = hs_bindgen_72548357b08504d2
+wl_display_create_queue = hs_bindgen_f2ec36fa20f6c3f9
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_create_queue_with_name@
-foreign import ccall safe "hs_bindgen_a9c9e43f7026e4e8" hs_bindgen_a9c9e43f7026e4e8_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_create_queue_with_name@
+foreign import ccall safe "hs_bindgen_71151f4bcefd4106" hs_bindgen_71151f4bcefd4106_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_create_queue_with_name@
-hs_bindgen_a9c9e43f7026e4e8 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_create_queue_with_name@
+hs_bindgen_71151f4bcefd4106 ::
      RIP.Ptr Wl_display
   -> PtrConst.PtrConst RIP.CChar
   -> IO (RIP.Ptr Wl_event_queue)
-hs_bindgen_a9c9e43f7026e4e8 =
-  RIP.fromFFIType hs_bindgen_a9c9e43f7026e4e8_base
+hs_bindgen_71151f4bcefd4106 =
+  RIP.fromFFIType hs_bindgen_71151f4bcefd4106_base
 
 {-| __C declaration:__ @wl_display_create_queue_with_name@
 
@@ -2789,21 +2789,21 @@ wl_display_create_queue_with_name ::
      -- ^ __C declaration:__ @name@
   -> IO (RIP.Ptr Wl_event_queue)
 wl_display_create_queue_with_name =
-  hs_bindgen_a9c9e43f7026e4e8
+  hs_bindgen_71151f4bcefd4106
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_prepare_read_queue@
-foreign import ccall safe "hs_bindgen_c42f7d48679fbc7a" hs_bindgen_c42f7d48679fbc7a_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_prepare_read_queue@
+foreign import ccall safe "hs_bindgen_426fe23dcd82efb7" hs_bindgen_426fe23dcd82efb7_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_prepare_read_queue@
-hs_bindgen_c42f7d48679fbc7a ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_prepare_read_queue@
+hs_bindgen_426fe23dcd82efb7 ::
      RIP.Ptr Wl_display
   -> RIP.Ptr Wl_event_queue
   -> IO RIP.CInt
-hs_bindgen_c42f7d48679fbc7a =
-  RIP.fromFFIType hs_bindgen_c42f7d48679fbc7a_base
+hs_bindgen_426fe23dcd82efb7 =
+  RIP.fromFFIType hs_bindgen_426fe23dcd82efb7_base
 
 {-| __C declaration:__ @wl_display_prepare_read_queue@
 
@@ -2818,19 +2818,19 @@ wl_display_prepare_read_queue ::
      -- ^ __C declaration:__ @queue@
   -> IO RIP.CInt
 wl_display_prepare_read_queue =
-  hs_bindgen_c42f7d48679fbc7a
+  hs_bindgen_426fe23dcd82efb7
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_prepare_read@
-foreign import ccall safe "hs_bindgen_08e8d0babf6a209e" hs_bindgen_08e8d0babf6a209e_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_prepare_read@
+foreign import ccall safe "hs_bindgen_2844e3e03b0b9c45" hs_bindgen_2844e3e03b0b9c45_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_prepare_read@
-hs_bindgen_08e8d0babf6a209e ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_prepare_read@
+hs_bindgen_2844e3e03b0b9c45 ::
      RIP.Ptr Wl_display
   -> IO RIP.CInt
-hs_bindgen_08e8d0babf6a209e =
-  RIP.fromFFIType hs_bindgen_08e8d0babf6a209e_base
+hs_bindgen_2844e3e03b0b9c45 =
+  RIP.fromFFIType hs_bindgen_2844e3e03b0b9c45_base
 
 {-| __C declaration:__ @wl_display_prepare_read@
 
@@ -2842,19 +2842,19 @@ wl_display_prepare_read ::
      RIP.Ptr Wl_display
      -- ^ __C declaration:__ @display@
   -> IO RIP.CInt
-wl_display_prepare_read = hs_bindgen_08e8d0babf6a209e
+wl_display_prepare_read = hs_bindgen_2844e3e03b0b9c45
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_cancel_read@
-foreign import ccall safe "hs_bindgen_3dd16353884398e5" hs_bindgen_3dd16353884398e5_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_cancel_read@
+foreign import ccall safe "hs_bindgen_1ffa88b7c2b6632c" hs_bindgen_1ffa88b7c2b6632c_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_cancel_read@
-hs_bindgen_3dd16353884398e5 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_cancel_read@
+hs_bindgen_1ffa88b7c2b6632c ::
      RIP.Ptr Wl_display
   -> IO ()
-hs_bindgen_3dd16353884398e5 =
-  RIP.fromFFIType hs_bindgen_3dd16353884398e5_base
+hs_bindgen_1ffa88b7c2b6632c =
+  RIP.fromFFIType hs_bindgen_1ffa88b7c2b6632c_base
 
 {-| __C declaration:__ @wl_display_cancel_read@
 
@@ -2866,19 +2866,19 @@ wl_display_cancel_read ::
      RIP.Ptr Wl_display
      -- ^ __C declaration:__ @display@
   -> IO ()
-wl_display_cancel_read = hs_bindgen_3dd16353884398e5
+wl_display_cancel_read = hs_bindgen_1ffa88b7c2b6632c
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_read_events@
-foreign import ccall safe "hs_bindgen_e64aef5c64b001cc" hs_bindgen_e64aef5c64b001cc_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_read_events@
+foreign import ccall safe "hs_bindgen_a4b4a1bdee0763ed" hs_bindgen_a4b4a1bdee0763ed_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_read_events@
-hs_bindgen_e64aef5c64b001cc ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_read_events@
+hs_bindgen_a4b4a1bdee0763ed ::
      RIP.Ptr Wl_display
   -> IO RIP.CInt
-hs_bindgen_e64aef5c64b001cc =
-  RIP.fromFFIType hs_bindgen_e64aef5c64b001cc_base
+hs_bindgen_a4b4a1bdee0763ed =
+  RIP.fromFFIType hs_bindgen_a4b4a1bdee0763ed_base
 
 {-| __C declaration:__ @wl_display_read_events@
 
@@ -2890,21 +2890,21 @@ wl_display_read_events ::
      RIP.Ptr Wl_display
      -- ^ __C declaration:__ @display@
   -> IO RIP.CInt
-wl_display_read_events = hs_bindgen_e64aef5c64b001cc
+wl_display_read_events = hs_bindgen_a4b4a1bdee0763ed
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_set_max_buffer_size@
-foreign import ccall safe "hs_bindgen_dd1e5344a4797733" hs_bindgen_dd1e5344a4797733_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_set_max_buffer_size@
+foreign import ccall safe "hs_bindgen_06bf5de436a6dada" hs_bindgen_06bf5de436a6dada_base ::
      RIP.Ptr RIP.Void
   -> RIP.Word64
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_set_max_buffer_size@
-hs_bindgen_dd1e5344a4797733 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_set_max_buffer_size@
+hs_bindgen_06bf5de436a6dada ::
      RIP.Ptr Wl_display
   -> HsBindgen.Runtime.LibC.CSize
   -> IO ()
-hs_bindgen_dd1e5344a4797733 =
-  RIP.fromFFIType hs_bindgen_dd1e5344a4797733_base
+hs_bindgen_06bf5de436a6dada =
+  RIP.fromFFIType hs_bindgen_06bf5de436a6dada_base
 
 {-| __C declaration:__ @wl_display_set_max_buffer_size@
 
@@ -2919,23 +2919,23 @@ wl_display_set_max_buffer_size ::
      -- ^ __C declaration:__ @max_buffer_size@
   -> IO ()
 wl_display_set_max_buffer_size =
-  hs_bindgen_dd1e5344a4797733
+  hs_bindgen_06bf5de436a6dada
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_add_listener@
-foreign import ccall safe "hs_bindgen_5a65e92547a44700" hs_bindgen_5a65e92547a44700_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_add_listener@
+foreign import ccall safe "hs_bindgen_3f7a4abb192eb298" hs_bindgen_3f7a4abb192eb298_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_add_listener@
-hs_bindgen_5a65e92547a44700 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_add_listener@
+hs_bindgen_3f7a4abb192eb298 ::
      RIP.Ptr Wl_display
   -> PtrConst.PtrConst Wl_display_listener
   -> RIP.Ptr RIP.Void
   -> IO RIP.CInt
-hs_bindgen_5a65e92547a44700 =
-  RIP.fromFFIType hs_bindgen_5a65e92547a44700_base
+hs_bindgen_3f7a4abb192eb298 =
+  RIP.fromFFIType hs_bindgen_3f7a4abb192eb298_base
 
 {-| __C declaration:__ @wl_display_add_listener@
 
@@ -2951,21 +2951,21 @@ wl_display_add_listener ::
   -> RIP.Ptr RIP.Void
      -- ^ __C declaration:__ @data@
   -> IO RIP.CInt
-wl_display_add_listener = hs_bindgen_5a65e92547a44700
+wl_display_add_listener = hs_bindgen_3f7a4abb192eb298
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_set_user_data@
-foreign import ccall safe "hs_bindgen_9d862dbc006d7ea9" hs_bindgen_9d862dbc006d7ea9_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_set_user_data@
+foreign import ccall safe "hs_bindgen_41c437e82613ef3e" hs_bindgen_41c437e82613ef3e_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_set_user_data@
-hs_bindgen_9d862dbc006d7ea9 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_set_user_data@
+hs_bindgen_41c437e82613ef3e ::
      RIP.Ptr Wl_display
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_9d862dbc006d7ea9 =
-  RIP.fromFFIType hs_bindgen_9d862dbc006d7ea9_base
+hs_bindgen_41c437e82613ef3e =
+  RIP.fromFFIType hs_bindgen_41c437e82613ef3e_base
 
 {-| __C declaration:__ @wl_display_set_user_data@
 
@@ -2980,19 +2980,19 @@ wl_display_set_user_data ::
      -- ^ __C declaration:__ @user_data@
   -> IO ()
 wl_display_set_user_data =
-  hs_bindgen_9d862dbc006d7ea9
+  hs_bindgen_41c437e82613ef3e
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_get_user_data@
-foreign import ccall safe "hs_bindgen_fc241b840d3cb0c3" hs_bindgen_fc241b840d3cb0c3_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_get_user_data@
+foreign import ccall safe "hs_bindgen_51c4c5da64075593" hs_bindgen_51c4c5da64075593_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_get_user_data@
-hs_bindgen_fc241b840d3cb0c3 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_get_user_data@
+hs_bindgen_51c4c5da64075593 ::
      RIP.Ptr Wl_display
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_fc241b840d3cb0c3 =
-  RIP.fromFFIType hs_bindgen_fc241b840d3cb0c3_base
+hs_bindgen_51c4c5da64075593 =
+  RIP.fromFFIType hs_bindgen_51c4c5da64075593_base
 
 {-| __C declaration:__ @wl_display_get_user_data@
 
@@ -3005,19 +3005,19 @@ wl_display_get_user_data ::
      -- ^ __C declaration:__ @wl_display@
   -> IO (RIP.Ptr RIP.Void)
 wl_display_get_user_data =
-  hs_bindgen_fc241b840d3cb0c3
+  hs_bindgen_51c4c5da64075593
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_get_version@
-foreign import ccall safe "hs_bindgen_2c112ac55f97b3db" hs_bindgen_2c112ac55f97b3db_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_get_version@
+foreign import ccall safe "hs_bindgen_e7af0344dc6a74f5" hs_bindgen_e7af0344dc6a74f5_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_get_version@
-hs_bindgen_2c112ac55f97b3db ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_get_version@
+hs_bindgen_e7af0344dc6a74f5 ::
      RIP.Ptr Wl_display
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_2c112ac55f97b3db =
-  RIP.fromFFIType hs_bindgen_2c112ac55f97b3db_base
+hs_bindgen_e7af0344dc6a74f5 =
+  RIP.fromFFIType hs_bindgen_e7af0344dc6a74f5_base
 
 {-| __C declaration:__ @wl_display_get_version@
 
@@ -3029,19 +3029,19 @@ wl_display_get_version ::
      RIP.Ptr Wl_display
      -- ^ __C declaration:__ @wl_display@
   -> IO HsBindgen.Runtime.LibC.Word32
-wl_display_get_version = hs_bindgen_2c112ac55f97b3db
+wl_display_get_version = hs_bindgen_e7af0344dc6a74f5
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_sync@
-foreign import ccall safe "hs_bindgen_bd4e2e369f0b562f" hs_bindgen_bd4e2e369f0b562f_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_sync@
+foreign import ccall safe "hs_bindgen_115a707b5dfe411c" hs_bindgen_115a707b5dfe411c_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_sync@
-hs_bindgen_bd4e2e369f0b562f ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_sync@
+hs_bindgen_115a707b5dfe411c ::
      RIP.Ptr Wl_display
   -> IO (RIP.Ptr Wl_callback)
-hs_bindgen_bd4e2e369f0b562f =
-  RIP.fromFFIType hs_bindgen_bd4e2e369f0b562f_base
+hs_bindgen_115a707b5dfe411c =
+  RIP.fromFFIType hs_bindgen_115a707b5dfe411c_base
 
 {-| __C declaration:__ @wl_display_sync@
 
@@ -3053,19 +3053,19 @@ wl_display_sync ::
      RIP.Ptr Wl_display
      -- ^ __C declaration:__ @wl_display@
   -> IO (RIP.Ptr Wl_callback)
-wl_display_sync = hs_bindgen_bd4e2e369f0b562f
+wl_display_sync = hs_bindgen_115a707b5dfe411c
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_get_registry@
-foreign import ccall safe "hs_bindgen_c66fe759d93fa069" hs_bindgen_c66fe759d93fa069_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_get_registry@
+foreign import ccall safe "hs_bindgen_74b57c961c675015" hs_bindgen_74b57c961c675015_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_display_get_registry@
-hs_bindgen_c66fe759d93fa069 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_display_get_registry@
+hs_bindgen_74b57c961c675015 ::
      RIP.Ptr Wl_display
   -> IO (RIP.Ptr Wl_registry)
-hs_bindgen_c66fe759d93fa069 =
-  RIP.fromFFIType hs_bindgen_c66fe759d93fa069_base
+hs_bindgen_74b57c961c675015 =
+  RIP.fromFFIType hs_bindgen_74b57c961c675015_base
 
 {-| __C declaration:__ @wl_display_get_registry@
 
@@ -3077,23 +3077,23 @@ wl_display_get_registry ::
      RIP.Ptr Wl_display
      -- ^ __C declaration:__ @wl_display@
   -> IO (RIP.Ptr Wl_registry)
-wl_display_get_registry = hs_bindgen_c66fe759d93fa069
+wl_display_get_registry = hs_bindgen_74b57c961c675015
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_registry_add_listener@
-foreign import ccall safe "hs_bindgen_d2e3dc4d2669c5f4" hs_bindgen_d2e3dc4d2669c5f4_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_registry_add_listener@
+foreign import ccall safe "hs_bindgen_5d844f76f29543dc" hs_bindgen_5d844f76f29543dc_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_registry_add_listener@
-hs_bindgen_d2e3dc4d2669c5f4 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_registry_add_listener@
+hs_bindgen_5d844f76f29543dc ::
      RIP.Ptr Wl_registry
   -> PtrConst.PtrConst Wl_registry_listener
   -> RIP.Ptr RIP.Void
   -> IO RIP.CInt
-hs_bindgen_d2e3dc4d2669c5f4 =
-  RIP.fromFFIType hs_bindgen_d2e3dc4d2669c5f4_base
+hs_bindgen_5d844f76f29543dc =
+  RIP.fromFFIType hs_bindgen_5d844f76f29543dc_base
 
 {-| __C declaration:__ @wl_registry_add_listener@
 
@@ -3110,21 +3110,21 @@ wl_registry_add_listener ::
      -- ^ __C declaration:__ @data@
   -> IO RIP.CInt
 wl_registry_add_listener =
-  hs_bindgen_d2e3dc4d2669c5f4
+  hs_bindgen_5d844f76f29543dc
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_registry_set_user_data@
-foreign import ccall safe "hs_bindgen_779649cf332b0402" hs_bindgen_779649cf332b0402_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_registry_set_user_data@
+foreign import ccall safe "hs_bindgen_50eb72f7e8f25245" hs_bindgen_50eb72f7e8f25245_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_registry_set_user_data@
-hs_bindgen_779649cf332b0402 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_registry_set_user_data@
+hs_bindgen_50eb72f7e8f25245 ::
      RIP.Ptr Wl_registry
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_779649cf332b0402 =
-  RIP.fromFFIType hs_bindgen_779649cf332b0402_base
+hs_bindgen_50eb72f7e8f25245 =
+  RIP.fromFFIType hs_bindgen_50eb72f7e8f25245_base
 
 {-| __C declaration:__ @wl_registry_set_user_data@
 
@@ -3139,19 +3139,19 @@ wl_registry_set_user_data ::
      -- ^ __C declaration:__ @user_data@
   -> IO ()
 wl_registry_set_user_data =
-  hs_bindgen_779649cf332b0402
+  hs_bindgen_50eb72f7e8f25245
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_registry_get_user_data@
-foreign import ccall safe "hs_bindgen_4cdbd46548c0f766" hs_bindgen_4cdbd46548c0f766_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_registry_get_user_data@
+foreign import ccall safe "hs_bindgen_7c23e04989be19bf" hs_bindgen_7c23e04989be19bf_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_registry_get_user_data@
-hs_bindgen_4cdbd46548c0f766 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_registry_get_user_data@
+hs_bindgen_7c23e04989be19bf ::
      RIP.Ptr Wl_registry
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_4cdbd46548c0f766 =
-  RIP.fromFFIType hs_bindgen_4cdbd46548c0f766_base
+hs_bindgen_7c23e04989be19bf =
+  RIP.fromFFIType hs_bindgen_7c23e04989be19bf_base
 
 {-| __C declaration:__ @wl_registry_get_user_data@
 
@@ -3164,19 +3164,19 @@ wl_registry_get_user_data ::
      -- ^ __C declaration:__ @wl_registry@
   -> IO (RIP.Ptr RIP.Void)
 wl_registry_get_user_data =
-  hs_bindgen_4cdbd46548c0f766
+  hs_bindgen_7c23e04989be19bf
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_registry_get_version@
-foreign import ccall safe "hs_bindgen_3441d86a9b23d404" hs_bindgen_3441d86a9b23d404_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_registry_get_version@
+foreign import ccall safe "hs_bindgen_ca9d9b0cb4fa1262" hs_bindgen_ca9d9b0cb4fa1262_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_registry_get_version@
-hs_bindgen_3441d86a9b23d404 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_registry_get_version@
+hs_bindgen_ca9d9b0cb4fa1262 ::
      RIP.Ptr Wl_registry
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_3441d86a9b23d404 =
-  RIP.fromFFIType hs_bindgen_3441d86a9b23d404_base
+hs_bindgen_ca9d9b0cb4fa1262 =
+  RIP.fromFFIType hs_bindgen_ca9d9b0cb4fa1262_base
 
 {-| __C declaration:__ @wl_registry_get_version@
 
@@ -3188,19 +3188,19 @@ wl_registry_get_version ::
      RIP.Ptr Wl_registry
      -- ^ __C declaration:__ @wl_registry@
   -> IO HsBindgen.Runtime.LibC.Word32
-wl_registry_get_version = hs_bindgen_3441d86a9b23d404
+wl_registry_get_version = hs_bindgen_ca9d9b0cb4fa1262
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_registry_destroy@
-foreign import ccall safe "hs_bindgen_a3e959df3021cfbb" hs_bindgen_a3e959df3021cfbb_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_registry_destroy@
+foreign import ccall safe "hs_bindgen_31a7af548370136b" hs_bindgen_31a7af548370136b_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_registry_destroy@
-hs_bindgen_a3e959df3021cfbb ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_registry_destroy@
+hs_bindgen_31a7af548370136b ::
      RIP.Ptr Wl_registry
   -> IO ()
-hs_bindgen_a3e959df3021cfbb =
-  RIP.fromFFIType hs_bindgen_a3e959df3021cfbb_base
+hs_bindgen_31a7af548370136b =
+  RIP.fromFFIType hs_bindgen_31a7af548370136b_base
 
 {-| __C declaration:__ @wl_registry_destroy@
 
@@ -3212,25 +3212,25 @@ wl_registry_destroy ::
      RIP.Ptr Wl_registry
      -- ^ __C declaration:__ @wl_registry@
   -> IO ()
-wl_registry_destroy = hs_bindgen_a3e959df3021cfbb
+wl_registry_destroy = hs_bindgen_31a7af548370136b
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_registry_bind@
-foreign import ccall safe "hs_bindgen_f3f1c4fca93b47f5" hs_bindgen_f3f1c4fca93b47f5_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_registry_bind@
+foreign import ccall safe "hs_bindgen_09394ba4e23986ec" hs_bindgen_09394ba4e23986ec_base ::
      RIP.Ptr RIP.Void
   -> RIP.Word32
   -> RIP.Ptr RIP.Void
   -> RIP.Word32
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_registry_bind@
-hs_bindgen_f3f1c4fca93b47f5 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_registry_bind@
+hs_bindgen_09394ba4e23986ec ::
      RIP.Ptr Wl_registry
   -> HsBindgen.Runtime.LibC.Word32
   -> PtrConst.PtrConst Bindings.Wayland.Util.Generated.Wl_interface
   -> HsBindgen.Runtime.LibC.Word32
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_f3f1c4fca93b47f5 =
-  RIP.fromFFIType hs_bindgen_f3f1c4fca93b47f5_base
+hs_bindgen_09394ba4e23986ec =
+  RIP.fromFFIType hs_bindgen_09394ba4e23986ec_base
 
 {-| __C declaration:__ @wl_registry_bind@
 
@@ -3248,23 +3248,23 @@ wl_registry_bind ::
   -> HsBindgen.Runtime.LibC.Word32
      -- ^ __C declaration:__ @version@
   -> IO (RIP.Ptr RIP.Void)
-wl_registry_bind = hs_bindgen_f3f1c4fca93b47f5
+wl_registry_bind = hs_bindgen_09394ba4e23986ec
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_callback_add_listener@
-foreign import ccall safe "hs_bindgen_bc4b25ceb4915d32" hs_bindgen_bc4b25ceb4915d32_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_callback_add_listener@
+foreign import ccall safe "hs_bindgen_cf2d81a9ceec2120" hs_bindgen_cf2d81a9ceec2120_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_callback_add_listener@
-hs_bindgen_bc4b25ceb4915d32 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_callback_add_listener@
+hs_bindgen_cf2d81a9ceec2120 ::
      RIP.Ptr Wl_callback
   -> PtrConst.PtrConst Wl_callback_listener
   -> RIP.Ptr RIP.Void
   -> IO RIP.CInt
-hs_bindgen_bc4b25ceb4915d32 =
-  RIP.fromFFIType hs_bindgen_bc4b25ceb4915d32_base
+hs_bindgen_cf2d81a9ceec2120 =
+  RIP.fromFFIType hs_bindgen_cf2d81a9ceec2120_base
 
 {-| __C declaration:__ @wl_callback_add_listener@
 
@@ -3281,21 +3281,21 @@ wl_callback_add_listener ::
      -- ^ __C declaration:__ @data@
   -> IO RIP.CInt
 wl_callback_add_listener =
-  hs_bindgen_bc4b25ceb4915d32
+  hs_bindgen_cf2d81a9ceec2120
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_callback_set_user_data@
-foreign import ccall safe "hs_bindgen_123f847da588a01f" hs_bindgen_123f847da588a01f_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_callback_set_user_data@
+foreign import ccall safe "hs_bindgen_6f3e3961ed55bcaa" hs_bindgen_6f3e3961ed55bcaa_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_callback_set_user_data@
-hs_bindgen_123f847da588a01f ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_callback_set_user_data@
+hs_bindgen_6f3e3961ed55bcaa ::
      RIP.Ptr Wl_callback
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_123f847da588a01f =
-  RIP.fromFFIType hs_bindgen_123f847da588a01f_base
+hs_bindgen_6f3e3961ed55bcaa =
+  RIP.fromFFIType hs_bindgen_6f3e3961ed55bcaa_base
 
 {-| __C declaration:__ @wl_callback_set_user_data@
 
@@ -3310,19 +3310,19 @@ wl_callback_set_user_data ::
      -- ^ __C declaration:__ @user_data@
   -> IO ()
 wl_callback_set_user_data =
-  hs_bindgen_123f847da588a01f
+  hs_bindgen_6f3e3961ed55bcaa
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_callback_get_user_data@
-foreign import ccall safe "hs_bindgen_575c54180f0b0812" hs_bindgen_575c54180f0b0812_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_callback_get_user_data@
+foreign import ccall safe "hs_bindgen_b55277f3407435bb" hs_bindgen_b55277f3407435bb_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_callback_get_user_data@
-hs_bindgen_575c54180f0b0812 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_callback_get_user_data@
+hs_bindgen_b55277f3407435bb ::
      RIP.Ptr Wl_callback
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_575c54180f0b0812 =
-  RIP.fromFFIType hs_bindgen_575c54180f0b0812_base
+hs_bindgen_b55277f3407435bb =
+  RIP.fromFFIType hs_bindgen_b55277f3407435bb_base
 
 {-| __C declaration:__ @wl_callback_get_user_data@
 
@@ -3335,19 +3335,19 @@ wl_callback_get_user_data ::
      -- ^ __C declaration:__ @wl_callback@
   -> IO (RIP.Ptr RIP.Void)
 wl_callback_get_user_data =
-  hs_bindgen_575c54180f0b0812
+  hs_bindgen_b55277f3407435bb
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_callback_get_version@
-foreign import ccall safe "hs_bindgen_b86394b959b12c0e" hs_bindgen_b86394b959b12c0e_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_callback_get_version@
+foreign import ccall safe "hs_bindgen_65ef0b9019f6f659" hs_bindgen_65ef0b9019f6f659_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_callback_get_version@
-hs_bindgen_b86394b959b12c0e ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_callback_get_version@
+hs_bindgen_65ef0b9019f6f659 ::
      RIP.Ptr Wl_callback
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_b86394b959b12c0e =
-  RIP.fromFFIType hs_bindgen_b86394b959b12c0e_base
+hs_bindgen_65ef0b9019f6f659 =
+  RIP.fromFFIType hs_bindgen_65ef0b9019f6f659_base
 
 {-| __C declaration:__ @wl_callback_get_version@
 
@@ -3359,19 +3359,19 @@ wl_callback_get_version ::
      RIP.Ptr Wl_callback
      -- ^ __C declaration:__ @wl_callback@
   -> IO HsBindgen.Runtime.LibC.Word32
-wl_callback_get_version = hs_bindgen_b86394b959b12c0e
+wl_callback_get_version = hs_bindgen_65ef0b9019f6f659
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_callback_destroy@
-foreign import ccall safe "hs_bindgen_8c385fa9bcf03739" hs_bindgen_8c385fa9bcf03739_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_callback_destroy@
+foreign import ccall safe "hs_bindgen_439001916611a1f6" hs_bindgen_439001916611a1f6_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_callback_destroy@
-hs_bindgen_8c385fa9bcf03739 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_callback_destroy@
+hs_bindgen_439001916611a1f6 ::
      RIP.Ptr Wl_callback
   -> IO ()
-hs_bindgen_8c385fa9bcf03739 =
-  RIP.fromFFIType hs_bindgen_8c385fa9bcf03739_base
+hs_bindgen_439001916611a1f6 =
+  RIP.fromFFIType hs_bindgen_439001916611a1f6_base
 
 {-| __C declaration:__ @wl_callback_destroy@
 
@@ -3383,21 +3383,21 @@ wl_callback_destroy ::
      RIP.Ptr Wl_callback
      -- ^ __C declaration:__ @wl_callback@
   -> IO ()
-wl_callback_destroy = hs_bindgen_8c385fa9bcf03739
+wl_callback_destroy = hs_bindgen_439001916611a1f6
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_compositor_set_user_data@
-foreign import ccall safe "hs_bindgen_a510e3a22eb940c6" hs_bindgen_a510e3a22eb940c6_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_compositor_set_user_data@
+foreign import ccall safe "hs_bindgen_f056a5cda8e2f003" hs_bindgen_f056a5cda8e2f003_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_compositor_set_user_data@
-hs_bindgen_a510e3a22eb940c6 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_compositor_set_user_data@
+hs_bindgen_f056a5cda8e2f003 ::
      RIP.Ptr Wl_compositor
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_a510e3a22eb940c6 =
-  RIP.fromFFIType hs_bindgen_a510e3a22eb940c6_base
+hs_bindgen_f056a5cda8e2f003 =
+  RIP.fromFFIType hs_bindgen_f056a5cda8e2f003_base
 
 {-| __C declaration:__ @wl_compositor_set_user_data@
 
@@ -3412,19 +3412,19 @@ wl_compositor_set_user_data ::
      -- ^ __C declaration:__ @user_data@
   -> IO ()
 wl_compositor_set_user_data =
-  hs_bindgen_a510e3a22eb940c6
+  hs_bindgen_f056a5cda8e2f003
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_compositor_get_user_data@
-foreign import ccall safe "hs_bindgen_a6e34087c1d61903" hs_bindgen_a6e34087c1d61903_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_compositor_get_user_data@
+foreign import ccall safe "hs_bindgen_db735ca6a7f6d45e" hs_bindgen_db735ca6a7f6d45e_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_compositor_get_user_data@
-hs_bindgen_a6e34087c1d61903 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_compositor_get_user_data@
+hs_bindgen_db735ca6a7f6d45e ::
      RIP.Ptr Wl_compositor
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_a6e34087c1d61903 =
-  RIP.fromFFIType hs_bindgen_a6e34087c1d61903_base
+hs_bindgen_db735ca6a7f6d45e =
+  RIP.fromFFIType hs_bindgen_db735ca6a7f6d45e_base
 
 {-| __C declaration:__ @wl_compositor_get_user_data@
 
@@ -3437,19 +3437,19 @@ wl_compositor_get_user_data ::
      -- ^ __C declaration:__ @wl_compositor@
   -> IO (RIP.Ptr RIP.Void)
 wl_compositor_get_user_data =
-  hs_bindgen_a6e34087c1d61903
+  hs_bindgen_db735ca6a7f6d45e
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_compositor_get_version@
-foreign import ccall safe "hs_bindgen_269b4e978a912900" hs_bindgen_269b4e978a912900_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_compositor_get_version@
+foreign import ccall safe "hs_bindgen_9773561407b1d71c" hs_bindgen_9773561407b1d71c_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_compositor_get_version@
-hs_bindgen_269b4e978a912900 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_compositor_get_version@
+hs_bindgen_9773561407b1d71c ::
      RIP.Ptr Wl_compositor
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_269b4e978a912900 =
-  RIP.fromFFIType hs_bindgen_269b4e978a912900_base
+hs_bindgen_9773561407b1d71c =
+  RIP.fromFFIType hs_bindgen_9773561407b1d71c_base
 
 {-| __C declaration:__ @wl_compositor_get_version@
 
@@ -3462,19 +3462,19 @@ wl_compositor_get_version ::
      -- ^ __C declaration:__ @wl_compositor@
   -> IO HsBindgen.Runtime.LibC.Word32
 wl_compositor_get_version =
-  hs_bindgen_269b4e978a912900
+  hs_bindgen_9773561407b1d71c
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_compositor_destroy@
-foreign import ccall safe "hs_bindgen_80c79e722f2e5547" hs_bindgen_80c79e722f2e5547_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_compositor_destroy@
+foreign import ccall safe "hs_bindgen_660d5ce26a7d0b6a" hs_bindgen_660d5ce26a7d0b6a_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_compositor_destroy@
-hs_bindgen_80c79e722f2e5547 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_compositor_destroy@
+hs_bindgen_660d5ce26a7d0b6a ::
      RIP.Ptr Wl_compositor
   -> IO ()
-hs_bindgen_80c79e722f2e5547 =
-  RIP.fromFFIType hs_bindgen_80c79e722f2e5547_base
+hs_bindgen_660d5ce26a7d0b6a =
+  RIP.fromFFIType hs_bindgen_660d5ce26a7d0b6a_base
 
 {-| __C declaration:__ @wl_compositor_destroy@
 
@@ -3486,19 +3486,19 @@ wl_compositor_destroy ::
      RIP.Ptr Wl_compositor
      -- ^ __C declaration:__ @wl_compositor@
   -> IO ()
-wl_compositor_destroy = hs_bindgen_80c79e722f2e5547
+wl_compositor_destroy = hs_bindgen_660d5ce26a7d0b6a
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_compositor_create_surface@
-foreign import ccall safe "hs_bindgen_b4e5700d02405180" hs_bindgen_b4e5700d02405180_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_compositor_create_surface@
+foreign import ccall safe "hs_bindgen_06462e38914e2f93" hs_bindgen_06462e38914e2f93_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_compositor_create_surface@
-hs_bindgen_b4e5700d02405180 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_compositor_create_surface@
+hs_bindgen_06462e38914e2f93 ::
      RIP.Ptr Wl_compositor
   -> IO (RIP.Ptr Wl_surface)
-hs_bindgen_b4e5700d02405180 =
-  RIP.fromFFIType hs_bindgen_b4e5700d02405180_base
+hs_bindgen_06462e38914e2f93 =
+  RIP.fromFFIType hs_bindgen_06462e38914e2f93_base
 
 {-| __C declaration:__ @wl_compositor_create_surface@
 
@@ -3511,19 +3511,19 @@ wl_compositor_create_surface ::
      -- ^ __C declaration:__ @wl_compositor@
   -> IO (RIP.Ptr Wl_surface)
 wl_compositor_create_surface =
-  hs_bindgen_b4e5700d02405180
+  hs_bindgen_06462e38914e2f93
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_compositor_create_region@
-foreign import ccall safe "hs_bindgen_64eccf2b309459cf" hs_bindgen_64eccf2b309459cf_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_compositor_create_region@
+foreign import ccall safe "hs_bindgen_673945349eb3a8d6" hs_bindgen_673945349eb3a8d6_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_compositor_create_region@
-hs_bindgen_64eccf2b309459cf ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_compositor_create_region@
+hs_bindgen_673945349eb3a8d6 ::
      RIP.Ptr Wl_compositor
   -> IO (RIP.Ptr Wl_region)
-hs_bindgen_64eccf2b309459cf =
-  RIP.fromFFIType hs_bindgen_64eccf2b309459cf_base
+hs_bindgen_673945349eb3a8d6 =
+  RIP.fromFFIType hs_bindgen_673945349eb3a8d6_base
 
 {-| __C declaration:__ @wl_compositor_create_region@
 
@@ -3536,21 +3536,21 @@ wl_compositor_create_region ::
      -- ^ __C declaration:__ @wl_compositor@
   -> IO (RIP.Ptr Wl_region)
 wl_compositor_create_region =
-  hs_bindgen_64eccf2b309459cf
+  hs_bindgen_673945349eb3a8d6
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shm_pool_set_user_data@
-foreign import ccall safe "hs_bindgen_205154276db5a98c" hs_bindgen_205154276db5a98c_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shm_pool_set_user_data@
+foreign import ccall safe "hs_bindgen_ec86ea9bb06ee8a0" hs_bindgen_ec86ea9bb06ee8a0_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shm_pool_set_user_data@
-hs_bindgen_205154276db5a98c ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shm_pool_set_user_data@
+hs_bindgen_ec86ea9bb06ee8a0 ::
      RIP.Ptr Wl_shm_pool
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_205154276db5a98c =
-  RIP.fromFFIType hs_bindgen_205154276db5a98c_base
+hs_bindgen_ec86ea9bb06ee8a0 =
+  RIP.fromFFIType hs_bindgen_ec86ea9bb06ee8a0_base
 
 {-| __C declaration:__ @wl_shm_pool_set_user_data@
 
@@ -3565,19 +3565,19 @@ wl_shm_pool_set_user_data ::
      -- ^ __C declaration:__ @user_data@
   -> IO ()
 wl_shm_pool_set_user_data =
-  hs_bindgen_205154276db5a98c
+  hs_bindgen_ec86ea9bb06ee8a0
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shm_pool_get_user_data@
-foreign import ccall safe "hs_bindgen_82c02e5245059d32" hs_bindgen_82c02e5245059d32_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shm_pool_get_user_data@
+foreign import ccall safe "hs_bindgen_aa44e96292477773" hs_bindgen_aa44e96292477773_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shm_pool_get_user_data@
-hs_bindgen_82c02e5245059d32 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shm_pool_get_user_data@
+hs_bindgen_aa44e96292477773 ::
      RIP.Ptr Wl_shm_pool
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_82c02e5245059d32 =
-  RIP.fromFFIType hs_bindgen_82c02e5245059d32_base
+hs_bindgen_aa44e96292477773 =
+  RIP.fromFFIType hs_bindgen_aa44e96292477773_base
 
 {-| __C declaration:__ @wl_shm_pool_get_user_data@
 
@@ -3590,19 +3590,19 @@ wl_shm_pool_get_user_data ::
      -- ^ __C declaration:__ @wl_shm_pool@
   -> IO (RIP.Ptr RIP.Void)
 wl_shm_pool_get_user_data =
-  hs_bindgen_82c02e5245059d32
+  hs_bindgen_aa44e96292477773
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shm_pool_get_version@
-foreign import ccall safe "hs_bindgen_df8c652a35f71061" hs_bindgen_df8c652a35f71061_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shm_pool_get_version@
+foreign import ccall safe "hs_bindgen_2b7aa272fd1a9000" hs_bindgen_2b7aa272fd1a9000_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shm_pool_get_version@
-hs_bindgen_df8c652a35f71061 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shm_pool_get_version@
+hs_bindgen_2b7aa272fd1a9000 ::
      RIP.Ptr Wl_shm_pool
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_df8c652a35f71061 =
-  RIP.fromFFIType hs_bindgen_df8c652a35f71061_base
+hs_bindgen_2b7aa272fd1a9000 =
+  RIP.fromFFIType hs_bindgen_2b7aa272fd1a9000_base
 
 {-| __C declaration:__ @wl_shm_pool_get_version@
 
@@ -3614,10 +3614,10 @@ wl_shm_pool_get_version ::
      RIP.Ptr Wl_shm_pool
      -- ^ __C declaration:__ @wl_shm_pool@
   -> IO HsBindgen.Runtime.LibC.Word32
-wl_shm_pool_get_version = hs_bindgen_df8c652a35f71061
+wl_shm_pool_get_version = hs_bindgen_2b7aa272fd1a9000
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shm_pool_create_buffer@
-foreign import ccall safe "hs_bindgen_c9f583077805ab2f" hs_bindgen_c9f583077805ab2f_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shm_pool_create_buffer@
+foreign import ccall safe "hs_bindgen_c9d996d5d59ce2c0" hs_bindgen_c9d996d5d59ce2c0_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
@@ -3626,8 +3626,8 @@ foreign import ccall safe "hs_bindgen_c9f583077805ab2f" hs_bindgen_c9f583077805a
   -> RIP.Word32
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shm_pool_create_buffer@
-hs_bindgen_c9f583077805ab2f ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shm_pool_create_buffer@
+hs_bindgen_c9d996d5d59ce2c0 ::
      RIP.Ptr Wl_shm_pool
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Int32
@@ -3635,8 +3635,8 @@ hs_bindgen_c9f583077805ab2f ::
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Word32
   -> IO (RIP.Ptr Wl_buffer)
-hs_bindgen_c9f583077805ab2f =
-  RIP.fromFFIType hs_bindgen_c9f583077805ab2f_base
+hs_bindgen_c9d996d5d59ce2c0 =
+  RIP.fromFFIType hs_bindgen_c9d996d5d59ce2c0_base
 
 {-| __C declaration:__ @wl_shm_pool_create_buffer@
 
@@ -3659,19 +3659,19 @@ wl_shm_pool_create_buffer ::
      -- ^ __C declaration:__ @format@
   -> IO (RIP.Ptr Wl_buffer)
 wl_shm_pool_create_buffer =
-  hs_bindgen_c9f583077805ab2f
+  hs_bindgen_c9d996d5d59ce2c0
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shm_pool_destroy@
-foreign import ccall safe "hs_bindgen_4393e876b108f2bf" hs_bindgen_4393e876b108f2bf_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shm_pool_destroy@
+foreign import ccall safe "hs_bindgen_753817445dd26bba" hs_bindgen_753817445dd26bba_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shm_pool_destroy@
-hs_bindgen_4393e876b108f2bf ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shm_pool_destroy@
+hs_bindgen_753817445dd26bba ::
      RIP.Ptr Wl_shm_pool
   -> IO ()
-hs_bindgen_4393e876b108f2bf =
-  RIP.fromFFIType hs_bindgen_4393e876b108f2bf_base
+hs_bindgen_753817445dd26bba =
+  RIP.fromFFIType hs_bindgen_753817445dd26bba_base
 
 {-| __C declaration:__ @wl_shm_pool_destroy@
 
@@ -3683,21 +3683,21 @@ wl_shm_pool_destroy ::
      RIP.Ptr Wl_shm_pool
      -- ^ __C declaration:__ @wl_shm_pool@
   -> IO ()
-wl_shm_pool_destroy = hs_bindgen_4393e876b108f2bf
+wl_shm_pool_destroy = hs_bindgen_753817445dd26bba
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shm_pool_resize@
-foreign import ccall safe "hs_bindgen_75236c5e893794c0" hs_bindgen_75236c5e893794c0_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shm_pool_resize@
+foreign import ccall safe "hs_bindgen_371afa88e2234833" hs_bindgen_371afa88e2234833_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shm_pool_resize@
-hs_bindgen_75236c5e893794c0 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shm_pool_resize@
+hs_bindgen_371afa88e2234833 ::
      RIP.Ptr Wl_shm_pool
   -> HsBindgen.Runtime.LibC.Int32
   -> IO ()
-hs_bindgen_75236c5e893794c0 =
-  RIP.fromFFIType hs_bindgen_75236c5e893794c0_base
+hs_bindgen_371afa88e2234833 =
+  RIP.fromFFIType hs_bindgen_371afa88e2234833_base
 
 {-| __C declaration:__ @wl_shm_pool_resize@
 
@@ -3711,23 +3711,23 @@ wl_shm_pool_resize ::
   -> HsBindgen.Runtime.LibC.Int32
      -- ^ __C declaration:__ @size@
   -> IO ()
-wl_shm_pool_resize = hs_bindgen_75236c5e893794c0
+wl_shm_pool_resize = hs_bindgen_371afa88e2234833
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shm_add_listener@
-foreign import ccall safe "hs_bindgen_a923c541743ea7ff" hs_bindgen_a923c541743ea7ff_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shm_add_listener@
+foreign import ccall safe "hs_bindgen_2e5f6d3587b615d2" hs_bindgen_2e5f6d3587b615d2_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shm_add_listener@
-hs_bindgen_a923c541743ea7ff ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shm_add_listener@
+hs_bindgen_2e5f6d3587b615d2 ::
      RIP.Ptr Wl_shm
   -> PtrConst.PtrConst Wl_shm_listener
   -> RIP.Ptr RIP.Void
   -> IO RIP.CInt
-hs_bindgen_a923c541743ea7ff =
-  RIP.fromFFIType hs_bindgen_a923c541743ea7ff_base
+hs_bindgen_2e5f6d3587b615d2 =
+  RIP.fromFFIType hs_bindgen_2e5f6d3587b615d2_base
 
 {-| __C declaration:__ @wl_shm_add_listener@
 
@@ -3743,21 +3743,21 @@ wl_shm_add_listener ::
   -> RIP.Ptr RIP.Void
      -- ^ __C declaration:__ @data@
   -> IO RIP.CInt
-wl_shm_add_listener = hs_bindgen_a923c541743ea7ff
+wl_shm_add_listener = hs_bindgen_2e5f6d3587b615d2
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shm_set_user_data@
-foreign import ccall safe "hs_bindgen_a91406b4d3218634" hs_bindgen_a91406b4d3218634_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shm_set_user_data@
+foreign import ccall safe "hs_bindgen_bf55eb0b8cfc7b40" hs_bindgen_bf55eb0b8cfc7b40_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shm_set_user_data@
-hs_bindgen_a91406b4d3218634 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shm_set_user_data@
+hs_bindgen_bf55eb0b8cfc7b40 ::
      RIP.Ptr Wl_shm
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_a91406b4d3218634 =
-  RIP.fromFFIType hs_bindgen_a91406b4d3218634_base
+hs_bindgen_bf55eb0b8cfc7b40 =
+  RIP.fromFFIType hs_bindgen_bf55eb0b8cfc7b40_base
 
 {-| __C declaration:__ @wl_shm_set_user_data@
 
@@ -3771,19 +3771,19 @@ wl_shm_set_user_data ::
   -> RIP.Ptr RIP.Void
      -- ^ __C declaration:__ @user_data@
   -> IO ()
-wl_shm_set_user_data = hs_bindgen_a91406b4d3218634
+wl_shm_set_user_data = hs_bindgen_bf55eb0b8cfc7b40
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shm_get_user_data@
-foreign import ccall safe "hs_bindgen_9467ecef0dfd0cb0" hs_bindgen_9467ecef0dfd0cb0_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shm_get_user_data@
+foreign import ccall safe "hs_bindgen_7bcaf18cdc10fc1c" hs_bindgen_7bcaf18cdc10fc1c_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shm_get_user_data@
-hs_bindgen_9467ecef0dfd0cb0 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shm_get_user_data@
+hs_bindgen_7bcaf18cdc10fc1c ::
      RIP.Ptr Wl_shm
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_9467ecef0dfd0cb0 =
-  RIP.fromFFIType hs_bindgen_9467ecef0dfd0cb0_base
+hs_bindgen_7bcaf18cdc10fc1c =
+  RIP.fromFFIType hs_bindgen_7bcaf18cdc10fc1c_base
 
 {-| __C declaration:__ @wl_shm_get_user_data@
 
@@ -3795,19 +3795,19 @@ wl_shm_get_user_data ::
      RIP.Ptr Wl_shm
      -- ^ __C declaration:__ @wl_shm@
   -> IO (RIP.Ptr RIP.Void)
-wl_shm_get_user_data = hs_bindgen_9467ecef0dfd0cb0
+wl_shm_get_user_data = hs_bindgen_7bcaf18cdc10fc1c
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shm_get_version@
-foreign import ccall safe "hs_bindgen_e122a188b598bd10" hs_bindgen_e122a188b598bd10_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shm_get_version@
+foreign import ccall safe "hs_bindgen_ae5791f3423269c4" hs_bindgen_ae5791f3423269c4_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shm_get_version@
-hs_bindgen_e122a188b598bd10 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shm_get_version@
+hs_bindgen_ae5791f3423269c4 ::
      RIP.Ptr Wl_shm
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_e122a188b598bd10 =
-  RIP.fromFFIType hs_bindgen_e122a188b598bd10_base
+hs_bindgen_ae5791f3423269c4 =
+  RIP.fromFFIType hs_bindgen_ae5791f3423269c4_base
 
 {-| __C declaration:__ @wl_shm_get_version@
 
@@ -3819,19 +3819,19 @@ wl_shm_get_version ::
      RIP.Ptr Wl_shm
      -- ^ __C declaration:__ @wl_shm@
   -> IO HsBindgen.Runtime.LibC.Word32
-wl_shm_get_version = hs_bindgen_e122a188b598bd10
+wl_shm_get_version = hs_bindgen_ae5791f3423269c4
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shm_destroy@
-foreign import ccall safe "hs_bindgen_558fdb46b8820a46" hs_bindgen_558fdb46b8820a46_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shm_destroy@
+foreign import ccall safe "hs_bindgen_807c1641277cbc1b" hs_bindgen_807c1641277cbc1b_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shm_destroy@
-hs_bindgen_558fdb46b8820a46 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shm_destroy@
+hs_bindgen_807c1641277cbc1b ::
      RIP.Ptr Wl_shm
   -> IO ()
-hs_bindgen_558fdb46b8820a46 =
-  RIP.fromFFIType hs_bindgen_558fdb46b8820a46_base
+hs_bindgen_807c1641277cbc1b =
+  RIP.fromFFIType hs_bindgen_807c1641277cbc1b_base
 
 {-| __C declaration:__ @wl_shm_destroy@
 
@@ -3843,23 +3843,23 @@ wl_shm_destroy ::
      RIP.Ptr Wl_shm
      -- ^ __C declaration:__ @wl_shm@
   -> IO ()
-wl_shm_destroy = hs_bindgen_558fdb46b8820a46
+wl_shm_destroy = hs_bindgen_807c1641277cbc1b
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shm_create_pool@
-foreign import ccall safe "hs_bindgen_f1493f3b04e61e23" hs_bindgen_f1493f3b04e61e23_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shm_create_pool@
+foreign import ccall safe "hs_bindgen_c11571793ff56318" hs_bindgen_c11571793ff56318_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shm_create_pool@
-hs_bindgen_f1493f3b04e61e23 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shm_create_pool@
+hs_bindgen_c11571793ff56318 ::
      RIP.Ptr Wl_shm
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Int32
   -> IO (RIP.Ptr Wl_shm_pool)
-hs_bindgen_f1493f3b04e61e23 =
-  RIP.fromFFIType hs_bindgen_f1493f3b04e61e23_base
+hs_bindgen_c11571793ff56318 =
+  RIP.fromFFIType hs_bindgen_c11571793ff56318_base
 
 {-| __C declaration:__ @wl_shm_create_pool@
 
@@ -3875,19 +3875,19 @@ wl_shm_create_pool ::
   -> HsBindgen.Runtime.LibC.Int32
      -- ^ __C declaration:__ @size@
   -> IO (RIP.Ptr Wl_shm_pool)
-wl_shm_create_pool = hs_bindgen_f1493f3b04e61e23
+wl_shm_create_pool = hs_bindgen_c11571793ff56318
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shm_release@
-foreign import ccall safe "hs_bindgen_83dad28a6535f73f" hs_bindgen_83dad28a6535f73f_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shm_release@
+foreign import ccall safe "hs_bindgen_e445a87906d5346b" hs_bindgen_e445a87906d5346b_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shm_release@
-hs_bindgen_83dad28a6535f73f ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shm_release@
+hs_bindgen_e445a87906d5346b ::
      RIP.Ptr Wl_shm
   -> IO ()
-hs_bindgen_83dad28a6535f73f =
-  RIP.fromFFIType hs_bindgen_83dad28a6535f73f_base
+hs_bindgen_e445a87906d5346b =
+  RIP.fromFFIType hs_bindgen_e445a87906d5346b_base
 
 {-| __C declaration:__ @wl_shm_release@
 
@@ -3899,23 +3899,23 @@ wl_shm_release ::
      RIP.Ptr Wl_shm
      -- ^ __C declaration:__ @wl_shm@
   -> IO ()
-wl_shm_release = hs_bindgen_83dad28a6535f73f
+wl_shm_release = hs_bindgen_e445a87906d5346b
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_buffer_add_listener@
-foreign import ccall safe "hs_bindgen_e98212aee99f0ee8" hs_bindgen_e98212aee99f0ee8_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_buffer_add_listener@
+foreign import ccall safe "hs_bindgen_830dcc56a541fc2c" hs_bindgen_830dcc56a541fc2c_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_buffer_add_listener@
-hs_bindgen_e98212aee99f0ee8 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_buffer_add_listener@
+hs_bindgen_830dcc56a541fc2c ::
      RIP.Ptr Wl_buffer
   -> PtrConst.PtrConst Wl_buffer_listener
   -> RIP.Ptr RIP.Void
   -> IO RIP.CInt
-hs_bindgen_e98212aee99f0ee8 =
-  RIP.fromFFIType hs_bindgen_e98212aee99f0ee8_base
+hs_bindgen_830dcc56a541fc2c =
+  RIP.fromFFIType hs_bindgen_830dcc56a541fc2c_base
 
 {-| __C declaration:__ @wl_buffer_add_listener@
 
@@ -3931,21 +3931,21 @@ wl_buffer_add_listener ::
   -> RIP.Ptr RIP.Void
      -- ^ __C declaration:__ @data@
   -> IO RIP.CInt
-wl_buffer_add_listener = hs_bindgen_e98212aee99f0ee8
+wl_buffer_add_listener = hs_bindgen_830dcc56a541fc2c
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_buffer_set_user_data@
-foreign import ccall safe "hs_bindgen_d04ccf79e7dddeb3" hs_bindgen_d04ccf79e7dddeb3_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_buffer_set_user_data@
+foreign import ccall safe "hs_bindgen_e84b978aa43f62a6" hs_bindgen_e84b978aa43f62a6_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_buffer_set_user_data@
-hs_bindgen_d04ccf79e7dddeb3 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_buffer_set_user_data@
+hs_bindgen_e84b978aa43f62a6 ::
      RIP.Ptr Wl_buffer
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_d04ccf79e7dddeb3 =
-  RIP.fromFFIType hs_bindgen_d04ccf79e7dddeb3_base
+hs_bindgen_e84b978aa43f62a6 =
+  RIP.fromFFIType hs_bindgen_e84b978aa43f62a6_base
 
 {-| __C declaration:__ @wl_buffer_set_user_data@
 
@@ -3959,19 +3959,19 @@ wl_buffer_set_user_data ::
   -> RIP.Ptr RIP.Void
      -- ^ __C declaration:__ @user_data@
   -> IO ()
-wl_buffer_set_user_data = hs_bindgen_d04ccf79e7dddeb3
+wl_buffer_set_user_data = hs_bindgen_e84b978aa43f62a6
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_buffer_get_user_data@
-foreign import ccall safe "hs_bindgen_7ec006b2b998d0aa" hs_bindgen_7ec006b2b998d0aa_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_buffer_get_user_data@
+foreign import ccall safe "hs_bindgen_06059cd4ce6bf3ab" hs_bindgen_06059cd4ce6bf3ab_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_buffer_get_user_data@
-hs_bindgen_7ec006b2b998d0aa ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_buffer_get_user_data@
+hs_bindgen_06059cd4ce6bf3ab ::
      RIP.Ptr Wl_buffer
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_7ec006b2b998d0aa =
-  RIP.fromFFIType hs_bindgen_7ec006b2b998d0aa_base
+hs_bindgen_06059cd4ce6bf3ab =
+  RIP.fromFFIType hs_bindgen_06059cd4ce6bf3ab_base
 
 {-| __C declaration:__ @wl_buffer_get_user_data@
 
@@ -3983,19 +3983,19 @@ wl_buffer_get_user_data ::
      RIP.Ptr Wl_buffer
      -- ^ __C declaration:__ @wl_buffer@
   -> IO (RIP.Ptr RIP.Void)
-wl_buffer_get_user_data = hs_bindgen_7ec006b2b998d0aa
+wl_buffer_get_user_data = hs_bindgen_06059cd4ce6bf3ab
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_buffer_get_version@
-foreign import ccall safe "hs_bindgen_4351919d92013de1" hs_bindgen_4351919d92013de1_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_buffer_get_version@
+foreign import ccall safe "hs_bindgen_8e64c1a5d8acfa43" hs_bindgen_8e64c1a5d8acfa43_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_buffer_get_version@
-hs_bindgen_4351919d92013de1 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_buffer_get_version@
+hs_bindgen_8e64c1a5d8acfa43 ::
      RIP.Ptr Wl_buffer
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_4351919d92013de1 =
-  RIP.fromFFIType hs_bindgen_4351919d92013de1_base
+hs_bindgen_8e64c1a5d8acfa43 =
+  RIP.fromFFIType hs_bindgen_8e64c1a5d8acfa43_base
 
 {-| __C declaration:__ @wl_buffer_get_version@
 
@@ -4007,19 +4007,19 @@ wl_buffer_get_version ::
      RIP.Ptr Wl_buffer
      -- ^ __C declaration:__ @wl_buffer@
   -> IO HsBindgen.Runtime.LibC.Word32
-wl_buffer_get_version = hs_bindgen_4351919d92013de1
+wl_buffer_get_version = hs_bindgen_8e64c1a5d8acfa43
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_buffer_destroy@
-foreign import ccall safe "hs_bindgen_1973c12d21d14d85" hs_bindgen_1973c12d21d14d85_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_buffer_destroy@
+foreign import ccall safe "hs_bindgen_04e3a8c6cc6eb62a" hs_bindgen_04e3a8c6cc6eb62a_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_buffer_destroy@
-hs_bindgen_1973c12d21d14d85 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_buffer_destroy@
+hs_bindgen_04e3a8c6cc6eb62a ::
      RIP.Ptr Wl_buffer
   -> IO ()
-hs_bindgen_1973c12d21d14d85 =
-  RIP.fromFFIType hs_bindgen_1973c12d21d14d85_base
+hs_bindgen_04e3a8c6cc6eb62a =
+  RIP.fromFFIType hs_bindgen_04e3a8c6cc6eb62a_base
 
 {-| __C declaration:__ @wl_buffer_destroy@
 
@@ -4031,23 +4031,23 @@ wl_buffer_destroy ::
      RIP.Ptr Wl_buffer
      -- ^ __C declaration:__ @wl_buffer@
   -> IO ()
-wl_buffer_destroy = hs_bindgen_1973c12d21d14d85
+wl_buffer_destroy = hs_bindgen_04e3a8c6cc6eb62a
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_add_listener@
-foreign import ccall safe "hs_bindgen_ae3f22c8f06de743" hs_bindgen_ae3f22c8f06de743_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_add_listener@
+foreign import ccall safe "hs_bindgen_92cf7afddbcf0f53" hs_bindgen_92cf7afddbcf0f53_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_add_listener@
-hs_bindgen_ae3f22c8f06de743 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_add_listener@
+hs_bindgen_92cf7afddbcf0f53 ::
      RIP.Ptr Wl_data_offer
   -> PtrConst.PtrConst Wl_data_offer_listener
   -> RIP.Ptr RIP.Void
   -> IO RIP.CInt
-hs_bindgen_ae3f22c8f06de743 =
-  RIP.fromFFIType hs_bindgen_ae3f22c8f06de743_base
+hs_bindgen_92cf7afddbcf0f53 =
+  RIP.fromFFIType hs_bindgen_92cf7afddbcf0f53_base
 
 {-| __C declaration:__ @wl_data_offer_add_listener@
 
@@ -4064,21 +4064,21 @@ wl_data_offer_add_listener ::
      -- ^ __C declaration:__ @data@
   -> IO RIP.CInt
 wl_data_offer_add_listener =
-  hs_bindgen_ae3f22c8f06de743
+  hs_bindgen_92cf7afddbcf0f53
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_set_user_data@
-foreign import ccall safe "hs_bindgen_87845098cdcabf2b" hs_bindgen_87845098cdcabf2b_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_set_user_data@
+foreign import ccall safe "hs_bindgen_c1da7dd49677e64d" hs_bindgen_c1da7dd49677e64d_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_set_user_data@
-hs_bindgen_87845098cdcabf2b ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_set_user_data@
+hs_bindgen_c1da7dd49677e64d ::
      RIP.Ptr Wl_data_offer
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_87845098cdcabf2b =
-  RIP.fromFFIType hs_bindgen_87845098cdcabf2b_base
+hs_bindgen_c1da7dd49677e64d =
+  RIP.fromFFIType hs_bindgen_c1da7dd49677e64d_base
 
 {-| __C declaration:__ @wl_data_offer_set_user_data@
 
@@ -4093,19 +4093,19 @@ wl_data_offer_set_user_data ::
      -- ^ __C declaration:__ @user_data@
   -> IO ()
 wl_data_offer_set_user_data =
-  hs_bindgen_87845098cdcabf2b
+  hs_bindgen_c1da7dd49677e64d
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_get_user_data@
-foreign import ccall safe "hs_bindgen_a31f2122863ccf2c" hs_bindgen_a31f2122863ccf2c_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_get_user_data@
+foreign import ccall safe "hs_bindgen_4cf38c98e9176fb4" hs_bindgen_4cf38c98e9176fb4_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_get_user_data@
-hs_bindgen_a31f2122863ccf2c ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_get_user_data@
+hs_bindgen_4cf38c98e9176fb4 ::
      RIP.Ptr Wl_data_offer
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_a31f2122863ccf2c =
-  RIP.fromFFIType hs_bindgen_a31f2122863ccf2c_base
+hs_bindgen_4cf38c98e9176fb4 =
+  RIP.fromFFIType hs_bindgen_4cf38c98e9176fb4_base
 
 {-| __C declaration:__ @wl_data_offer_get_user_data@
 
@@ -4118,19 +4118,19 @@ wl_data_offer_get_user_data ::
      -- ^ __C declaration:__ @wl_data_offer@
   -> IO (RIP.Ptr RIP.Void)
 wl_data_offer_get_user_data =
-  hs_bindgen_a31f2122863ccf2c
+  hs_bindgen_4cf38c98e9176fb4
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_get_version@
-foreign import ccall safe "hs_bindgen_25b1dfa683856f77" hs_bindgen_25b1dfa683856f77_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_get_version@
+foreign import ccall safe "hs_bindgen_ec8bc3678eb0a1a5" hs_bindgen_ec8bc3678eb0a1a5_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_get_version@
-hs_bindgen_25b1dfa683856f77 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_get_version@
+hs_bindgen_ec8bc3678eb0a1a5 ::
      RIP.Ptr Wl_data_offer
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_25b1dfa683856f77 =
-  RIP.fromFFIType hs_bindgen_25b1dfa683856f77_base
+hs_bindgen_ec8bc3678eb0a1a5 =
+  RIP.fromFFIType hs_bindgen_ec8bc3678eb0a1a5_base
 
 {-| __C declaration:__ @wl_data_offer_get_version@
 
@@ -4143,23 +4143,23 @@ wl_data_offer_get_version ::
      -- ^ __C declaration:__ @wl_data_offer@
   -> IO HsBindgen.Runtime.LibC.Word32
 wl_data_offer_get_version =
-  hs_bindgen_25b1dfa683856f77
+  hs_bindgen_ec8bc3678eb0a1a5
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_accept@
-foreign import ccall safe "hs_bindgen_f130fc15072a7700" hs_bindgen_f130fc15072a7700_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_accept@
+foreign import ccall safe "hs_bindgen_e7b71a405478e7f1" hs_bindgen_e7b71a405478e7f1_base ::
      RIP.Ptr RIP.Void
   -> RIP.Word32
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_accept@
-hs_bindgen_f130fc15072a7700 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_accept@
+hs_bindgen_e7b71a405478e7f1 ::
      RIP.Ptr Wl_data_offer
   -> HsBindgen.Runtime.LibC.Word32
   -> PtrConst.PtrConst RIP.CChar
   -> IO ()
-hs_bindgen_f130fc15072a7700 =
-  RIP.fromFFIType hs_bindgen_f130fc15072a7700_base
+hs_bindgen_e7b71a405478e7f1 =
+  RIP.fromFFIType hs_bindgen_e7b71a405478e7f1_base
 
 {-| __C declaration:__ @wl_data_offer_accept@
 
@@ -4175,23 +4175,23 @@ wl_data_offer_accept ::
   -> PtrConst.PtrConst RIP.CChar
      -- ^ __C declaration:__ @mime_type@
   -> IO ()
-wl_data_offer_accept = hs_bindgen_f130fc15072a7700
+wl_data_offer_accept = hs_bindgen_e7b71a405478e7f1
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_receive@
-foreign import ccall safe "hs_bindgen_e5607d7a7a97eb5b" hs_bindgen_e5607d7a7a97eb5b_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_receive@
+foreign import ccall safe "hs_bindgen_d4c25c3e36bfb92e" hs_bindgen_d4c25c3e36bfb92e_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_receive@
-hs_bindgen_e5607d7a7a97eb5b ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_receive@
+hs_bindgen_d4c25c3e36bfb92e ::
      RIP.Ptr Wl_data_offer
   -> PtrConst.PtrConst RIP.CChar
   -> HsBindgen.Runtime.LibC.Int32
   -> IO ()
-hs_bindgen_e5607d7a7a97eb5b =
-  RIP.fromFFIType hs_bindgen_e5607d7a7a97eb5b_base
+hs_bindgen_d4c25c3e36bfb92e =
+  RIP.fromFFIType hs_bindgen_d4c25c3e36bfb92e_base
 
 {-| __C declaration:__ @wl_data_offer_receive@
 
@@ -4207,19 +4207,19 @@ wl_data_offer_receive ::
   -> HsBindgen.Runtime.LibC.Int32
      -- ^ __C declaration:__ @fd@
   -> IO ()
-wl_data_offer_receive = hs_bindgen_e5607d7a7a97eb5b
+wl_data_offer_receive = hs_bindgen_d4c25c3e36bfb92e
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_destroy@
-foreign import ccall safe "hs_bindgen_24cb8f62680a08c7" hs_bindgen_24cb8f62680a08c7_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_destroy@
+foreign import ccall safe "hs_bindgen_205ad9d7a562ea45" hs_bindgen_205ad9d7a562ea45_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_destroy@
-hs_bindgen_24cb8f62680a08c7 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_destroy@
+hs_bindgen_205ad9d7a562ea45 ::
      RIP.Ptr Wl_data_offer
   -> IO ()
-hs_bindgen_24cb8f62680a08c7 =
-  RIP.fromFFIType hs_bindgen_24cb8f62680a08c7_base
+hs_bindgen_205ad9d7a562ea45 =
+  RIP.fromFFIType hs_bindgen_205ad9d7a562ea45_base
 
 {-| __C declaration:__ @wl_data_offer_destroy@
 
@@ -4231,19 +4231,19 @@ wl_data_offer_destroy ::
      RIP.Ptr Wl_data_offer
      -- ^ __C declaration:__ @wl_data_offer@
   -> IO ()
-wl_data_offer_destroy = hs_bindgen_24cb8f62680a08c7
+wl_data_offer_destroy = hs_bindgen_205ad9d7a562ea45
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_finish@
-foreign import ccall safe "hs_bindgen_fdc70b565265c32c" hs_bindgen_fdc70b565265c32c_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_finish@
+foreign import ccall safe "hs_bindgen_2e58d7b061f6342f" hs_bindgen_2e58d7b061f6342f_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_finish@
-hs_bindgen_fdc70b565265c32c ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_finish@
+hs_bindgen_2e58d7b061f6342f ::
      RIP.Ptr Wl_data_offer
   -> IO ()
-hs_bindgen_fdc70b565265c32c =
-  RIP.fromFFIType hs_bindgen_fdc70b565265c32c_base
+hs_bindgen_2e58d7b061f6342f =
+  RIP.fromFFIType hs_bindgen_2e58d7b061f6342f_base
 
 {-| __C declaration:__ @wl_data_offer_finish@
 
@@ -4255,23 +4255,23 @@ wl_data_offer_finish ::
      RIP.Ptr Wl_data_offer
      -- ^ __C declaration:__ @wl_data_offer@
   -> IO ()
-wl_data_offer_finish = hs_bindgen_fdc70b565265c32c
+wl_data_offer_finish = hs_bindgen_2e58d7b061f6342f
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_set_actions@
-foreign import ccall safe "hs_bindgen_6bb43344b73eeda8" hs_bindgen_6bb43344b73eeda8_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_set_actions@
+foreign import ccall safe "hs_bindgen_70759ceaa73c63ff" hs_bindgen_70759ceaa73c63ff_base ::
      RIP.Ptr RIP.Void
   -> RIP.Word32
   -> RIP.Word32
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_set_actions@
-hs_bindgen_6bb43344b73eeda8 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_offer_set_actions@
+hs_bindgen_70759ceaa73c63ff ::
      RIP.Ptr Wl_data_offer
   -> HsBindgen.Runtime.LibC.Word32
   -> HsBindgen.Runtime.LibC.Word32
   -> IO ()
-hs_bindgen_6bb43344b73eeda8 =
-  RIP.fromFFIType hs_bindgen_6bb43344b73eeda8_base
+hs_bindgen_70759ceaa73c63ff =
+  RIP.fromFFIType hs_bindgen_70759ceaa73c63ff_base
 
 {-| __C declaration:__ @wl_data_offer_set_actions@
 
@@ -4288,23 +4288,23 @@ wl_data_offer_set_actions ::
      -- ^ __C declaration:__ @preferred_action@
   -> IO ()
 wl_data_offer_set_actions =
-  hs_bindgen_6bb43344b73eeda8
+  hs_bindgen_70759ceaa73c63ff
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_source_add_listener@
-foreign import ccall safe "hs_bindgen_1e220d7ed6c62d18" hs_bindgen_1e220d7ed6c62d18_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_source_add_listener@
+foreign import ccall safe "hs_bindgen_01cb1a5b39336900" hs_bindgen_01cb1a5b39336900_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_source_add_listener@
-hs_bindgen_1e220d7ed6c62d18 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_source_add_listener@
+hs_bindgen_01cb1a5b39336900 ::
      RIP.Ptr Wl_data_source
   -> PtrConst.PtrConst Wl_data_source_listener
   -> RIP.Ptr RIP.Void
   -> IO RIP.CInt
-hs_bindgen_1e220d7ed6c62d18 =
-  RIP.fromFFIType hs_bindgen_1e220d7ed6c62d18_base
+hs_bindgen_01cb1a5b39336900 =
+  RIP.fromFFIType hs_bindgen_01cb1a5b39336900_base
 
 {-| __C declaration:__ @wl_data_source_add_listener@
 
@@ -4321,21 +4321,21 @@ wl_data_source_add_listener ::
      -- ^ __C declaration:__ @data@
   -> IO RIP.CInt
 wl_data_source_add_listener =
-  hs_bindgen_1e220d7ed6c62d18
+  hs_bindgen_01cb1a5b39336900
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_source_set_user_data@
-foreign import ccall safe "hs_bindgen_c918067eae83ab08" hs_bindgen_c918067eae83ab08_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_source_set_user_data@
+foreign import ccall safe "hs_bindgen_06214ac9b00d8b0d" hs_bindgen_06214ac9b00d8b0d_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_source_set_user_data@
-hs_bindgen_c918067eae83ab08 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_source_set_user_data@
+hs_bindgen_06214ac9b00d8b0d ::
      RIP.Ptr Wl_data_source
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_c918067eae83ab08 =
-  RIP.fromFFIType hs_bindgen_c918067eae83ab08_base
+hs_bindgen_06214ac9b00d8b0d =
+  RIP.fromFFIType hs_bindgen_06214ac9b00d8b0d_base
 
 {-| __C declaration:__ @wl_data_source_set_user_data@
 
@@ -4350,19 +4350,19 @@ wl_data_source_set_user_data ::
      -- ^ __C declaration:__ @user_data@
   -> IO ()
 wl_data_source_set_user_data =
-  hs_bindgen_c918067eae83ab08
+  hs_bindgen_06214ac9b00d8b0d
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_source_get_user_data@
-foreign import ccall safe "hs_bindgen_42819627aa1de90e" hs_bindgen_42819627aa1de90e_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_source_get_user_data@
+foreign import ccall safe "hs_bindgen_c0aca14deeb330e9" hs_bindgen_c0aca14deeb330e9_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_source_get_user_data@
-hs_bindgen_42819627aa1de90e ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_source_get_user_data@
+hs_bindgen_c0aca14deeb330e9 ::
      RIP.Ptr Wl_data_source
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_42819627aa1de90e =
-  RIP.fromFFIType hs_bindgen_42819627aa1de90e_base
+hs_bindgen_c0aca14deeb330e9 =
+  RIP.fromFFIType hs_bindgen_c0aca14deeb330e9_base
 
 {-| __C declaration:__ @wl_data_source_get_user_data@
 
@@ -4375,19 +4375,19 @@ wl_data_source_get_user_data ::
      -- ^ __C declaration:__ @wl_data_source@
   -> IO (RIP.Ptr RIP.Void)
 wl_data_source_get_user_data =
-  hs_bindgen_42819627aa1de90e
+  hs_bindgen_c0aca14deeb330e9
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_source_get_version@
-foreign import ccall safe "hs_bindgen_33b2ef1e2a13059a" hs_bindgen_33b2ef1e2a13059a_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_source_get_version@
+foreign import ccall safe "hs_bindgen_520eac81f9d46f9d" hs_bindgen_520eac81f9d46f9d_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_source_get_version@
-hs_bindgen_33b2ef1e2a13059a ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_source_get_version@
+hs_bindgen_520eac81f9d46f9d ::
      RIP.Ptr Wl_data_source
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_33b2ef1e2a13059a =
-  RIP.fromFFIType hs_bindgen_33b2ef1e2a13059a_base
+hs_bindgen_520eac81f9d46f9d =
+  RIP.fromFFIType hs_bindgen_520eac81f9d46f9d_base
 
 {-| __C declaration:__ @wl_data_source_get_version@
 
@@ -4400,21 +4400,21 @@ wl_data_source_get_version ::
      -- ^ __C declaration:__ @wl_data_source@
   -> IO HsBindgen.Runtime.LibC.Word32
 wl_data_source_get_version =
-  hs_bindgen_33b2ef1e2a13059a
+  hs_bindgen_520eac81f9d46f9d
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_source_offer@
-foreign import ccall safe "hs_bindgen_69146ce56f4b481e" hs_bindgen_69146ce56f4b481e_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_source_offer@
+foreign import ccall safe "hs_bindgen_7d687807748fe27e" hs_bindgen_7d687807748fe27e_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_source_offer@
-hs_bindgen_69146ce56f4b481e ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_source_offer@
+hs_bindgen_7d687807748fe27e ::
      RIP.Ptr Wl_data_source
   -> PtrConst.PtrConst RIP.CChar
   -> IO ()
-hs_bindgen_69146ce56f4b481e =
-  RIP.fromFFIType hs_bindgen_69146ce56f4b481e_base
+hs_bindgen_7d687807748fe27e =
+  RIP.fromFFIType hs_bindgen_7d687807748fe27e_base
 
 {-| __C declaration:__ @wl_data_source_offer@
 
@@ -4428,19 +4428,19 @@ wl_data_source_offer ::
   -> PtrConst.PtrConst RIP.CChar
      -- ^ __C declaration:__ @mime_type@
   -> IO ()
-wl_data_source_offer = hs_bindgen_69146ce56f4b481e
+wl_data_source_offer = hs_bindgen_7d687807748fe27e
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_source_destroy@
-foreign import ccall safe "hs_bindgen_a237abc34f2e3532" hs_bindgen_a237abc34f2e3532_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_source_destroy@
+foreign import ccall safe "hs_bindgen_a9e2e1f44a2db475" hs_bindgen_a9e2e1f44a2db475_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_source_destroy@
-hs_bindgen_a237abc34f2e3532 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_source_destroy@
+hs_bindgen_a9e2e1f44a2db475 ::
      RIP.Ptr Wl_data_source
   -> IO ()
-hs_bindgen_a237abc34f2e3532 =
-  RIP.fromFFIType hs_bindgen_a237abc34f2e3532_base
+hs_bindgen_a9e2e1f44a2db475 =
+  RIP.fromFFIType hs_bindgen_a9e2e1f44a2db475_base
 
 {-| __C declaration:__ @wl_data_source_destroy@
 
@@ -4452,21 +4452,21 @@ wl_data_source_destroy ::
      RIP.Ptr Wl_data_source
      -- ^ __C declaration:__ @wl_data_source@
   -> IO ()
-wl_data_source_destroy = hs_bindgen_a237abc34f2e3532
+wl_data_source_destroy = hs_bindgen_a9e2e1f44a2db475
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_source_set_actions@
-foreign import ccall safe "hs_bindgen_ffbc22a2d0125940" hs_bindgen_ffbc22a2d0125940_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_source_set_actions@
+foreign import ccall safe "hs_bindgen_6837dec7b275f201" hs_bindgen_6837dec7b275f201_base ::
      RIP.Ptr RIP.Void
   -> RIP.Word32
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_source_set_actions@
-hs_bindgen_ffbc22a2d0125940 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_source_set_actions@
+hs_bindgen_6837dec7b275f201 ::
      RIP.Ptr Wl_data_source
   -> HsBindgen.Runtime.LibC.Word32
   -> IO ()
-hs_bindgen_ffbc22a2d0125940 =
-  RIP.fromFFIType hs_bindgen_ffbc22a2d0125940_base
+hs_bindgen_6837dec7b275f201 =
+  RIP.fromFFIType hs_bindgen_6837dec7b275f201_base
 
 {-| __C declaration:__ @wl_data_source_set_actions@
 
@@ -4481,23 +4481,23 @@ wl_data_source_set_actions ::
      -- ^ __C declaration:__ @dnd_actions@
   -> IO ()
 wl_data_source_set_actions =
-  hs_bindgen_ffbc22a2d0125940
+  hs_bindgen_6837dec7b275f201
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_add_listener@
-foreign import ccall safe "hs_bindgen_e39b97ecd4b94a3b" hs_bindgen_e39b97ecd4b94a3b_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_add_listener@
+foreign import ccall safe "hs_bindgen_31a590ba05118335" hs_bindgen_31a590ba05118335_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_add_listener@
-hs_bindgen_e39b97ecd4b94a3b ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_add_listener@
+hs_bindgen_31a590ba05118335 ::
      RIP.Ptr Wl_data_device
   -> PtrConst.PtrConst Wl_data_device_listener
   -> RIP.Ptr RIP.Void
   -> IO RIP.CInt
-hs_bindgen_e39b97ecd4b94a3b =
-  RIP.fromFFIType hs_bindgen_e39b97ecd4b94a3b_base
+hs_bindgen_31a590ba05118335 =
+  RIP.fromFFIType hs_bindgen_31a590ba05118335_base
 
 {-| __C declaration:__ @wl_data_device_add_listener@
 
@@ -4514,21 +4514,21 @@ wl_data_device_add_listener ::
      -- ^ __C declaration:__ @data@
   -> IO RIP.CInt
 wl_data_device_add_listener =
-  hs_bindgen_e39b97ecd4b94a3b
+  hs_bindgen_31a590ba05118335
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_set_user_data@
-foreign import ccall safe "hs_bindgen_5f166e204af07293" hs_bindgen_5f166e204af07293_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_set_user_data@
+foreign import ccall safe "hs_bindgen_328de1d8ca868c03" hs_bindgen_328de1d8ca868c03_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_set_user_data@
-hs_bindgen_5f166e204af07293 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_set_user_data@
+hs_bindgen_328de1d8ca868c03 ::
      RIP.Ptr Wl_data_device
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_5f166e204af07293 =
-  RIP.fromFFIType hs_bindgen_5f166e204af07293_base
+hs_bindgen_328de1d8ca868c03 =
+  RIP.fromFFIType hs_bindgen_328de1d8ca868c03_base
 
 {-| __C declaration:__ @wl_data_device_set_user_data@
 
@@ -4543,19 +4543,19 @@ wl_data_device_set_user_data ::
      -- ^ __C declaration:__ @user_data@
   -> IO ()
 wl_data_device_set_user_data =
-  hs_bindgen_5f166e204af07293
+  hs_bindgen_328de1d8ca868c03
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_get_user_data@
-foreign import ccall safe "hs_bindgen_3c0b0334740af575" hs_bindgen_3c0b0334740af575_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_get_user_data@
+foreign import ccall safe "hs_bindgen_a75a5a5405b66afd" hs_bindgen_a75a5a5405b66afd_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_get_user_data@
-hs_bindgen_3c0b0334740af575 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_get_user_data@
+hs_bindgen_a75a5a5405b66afd ::
      RIP.Ptr Wl_data_device
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_3c0b0334740af575 =
-  RIP.fromFFIType hs_bindgen_3c0b0334740af575_base
+hs_bindgen_a75a5a5405b66afd =
+  RIP.fromFFIType hs_bindgen_a75a5a5405b66afd_base
 
 {-| __C declaration:__ @wl_data_device_get_user_data@
 
@@ -4568,19 +4568,19 @@ wl_data_device_get_user_data ::
      -- ^ __C declaration:__ @wl_data_device@
   -> IO (RIP.Ptr RIP.Void)
 wl_data_device_get_user_data =
-  hs_bindgen_3c0b0334740af575
+  hs_bindgen_a75a5a5405b66afd
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_get_version@
-foreign import ccall safe "hs_bindgen_d847048f71fcbde8" hs_bindgen_d847048f71fcbde8_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_get_version@
+foreign import ccall safe "hs_bindgen_02718593ddf3ccee" hs_bindgen_02718593ddf3ccee_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_get_version@
-hs_bindgen_d847048f71fcbde8 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_get_version@
+hs_bindgen_02718593ddf3ccee ::
      RIP.Ptr Wl_data_device
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_d847048f71fcbde8 =
-  RIP.fromFFIType hs_bindgen_d847048f71fcbde8_base
+hs_bindgen_02718593ddf3ccee =
+  RIP.fromFFIType hs_bindgen_02718593ddf3ccee_base
 
 {-| __C declaration:__ @wl_data_device_get_version@
 
@@ -4593,19 +4593,19 @@ wl_data_device_get_version ::
      -- ^ __C declaration:__ @wl_data_device@
   -> IO HsBindgen.Runtime.LibC.Word32
 wl_data_device_get_version =
-  hs_bindgen_d847048f71fcbde8
+  hs_bindgen_02718593ddf3ccee
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_destroy@
-foreign import ccall safe "hs_bindgen_a385df1265b4d803" hs_bindgen_a385df1265b4d803_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_destroy@
+foreign import ccall safe "hs_bindgen_0a6352987598ec66" hs_bindgen_0a6352987598ec66_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_destroy@
-hs_bindgen_a385df1265b4d803 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_destroy@
+hs_bindgen_0a6352987598ec66 ::
      RIP.Ptr Wl_data_device
   -> IO ()
-hs_bindgen_a385df1265b4d803 =
-  RIP.fromFFIType hs_bindgen_a385df1265b4d803_base
+hs_bindgen_0a6352987598ec66 =
+  RIP.fromFFIType hs_bindgen_0a6352987598ec66_base
 
 {-| __C declaration:__ @wl_data_device_destroy@
 
@@ -4617,10 +4617,10 @@ wl_data_device_destroy ::
      RIP.Ptr Wl_data_device
      -- ^ __C declaration:__ @wl_data_device@
   -> IO ()
-wl_data_device_destroy = hs_bindgen_a385df1265b4d803
+wl_data_device_destroy = hs_bindgen_0a6352987598ec66
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_start_drag@
-foreign import ccall safe "hs_bindgen_2392193f23f9fbf8" hs_bindgen_2392193f23f9fbf8_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_start_drag@
+foreign import ccall safe "hs_bindgen_3f57c768b9bd1cde" hs_bindgen_3f57c768b9bd1cde_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
@@ -4628,16 +4628,16 @@ foreign import ccall safe "hs_bindgen_2392193f23f9fbf8" hs_bindgen_2392193f23f9f
   -> RIP.Word32
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_start_drag@
-hs_bindgen_2392193f23f9fbf8 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_start_drag@
+hs_bindgen_3f57c768b9bd1cde ::
      RIP.Ptr Wl_data_device
   -> RIP.Ptr Wl_data_source
   -> RIP.Ptr Wl_surface
   -> RIP.Ptr Wl_surface
   -> HsBindgen.Runtime.LibC.Word32
   -> IO ()
-hs_bindgen_2392193f23f9fbf8 =
-  RIP.fromFFIType hs_bindgen_2392193f23f9fbf8_base
+hs_bindgen_3f57c768b9bd1cde =
+  RIP.fromFFIType hs_bindgen_3f57c768b9bd1cde_base
 
 {-| __C declaration:__ @wl_data_device_start_drag@
 
@@ -4658,23 +4658,23 @@ wl_data_device_start_drag ::
      -- ^ __C declaration:__ @serial@
   -> IO ()
 wl_data_device_start_drag =
-  hs_bindgen_2392193f23f9fbf8
+  hs_bindgen_3f57c768b9bd1cde
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_set_selection@
-foreign import ccall safe "hs_bindgen_55817c18c0450b2c" hs_bindgen_55817c18c0450b2c_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_set_selection@
+foreign import ccall safe "hs_bindgen_b1df96900a621bf6" hs_bindgen_b1df96900a621bf6_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Word32
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_set_selection@
-hs_bindgen_55817c18c0450b2c ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_set_selection@
+hs_bindgen_b1df96900a621bf6 ::
      RIP.Ptr Wl_data_device
   -> RIP.Ptr Wl_data_source
   -> HsBindgen.Runtime.LibC.Word32
   -> IO ()
-hs_bindgen_55817c18c0450b2c =
-  RIP.fromFFIType hs_bindgen_55817c18c0450b2c_base
+hs_bindgen_b1df96900a621bf6 =
+  RIP.fromFFIType hs_bindgen_b1df96900a621bf6_base
 
 {-| __C declaration:__ @wl_data_device_set_selection@
 
@@ -4691,19 +4691,19 @@ wl_data_device_set_selection ::
      -- ^ __C declaration:__ @serial@
   -> IO ()
 wl_data_device_set_selection =
-  hs_bindgen_55817c18c0450b2c
+  hs_bindgen_b1df96900a621bf6
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_release@
-foreign import ccall safe "hs_bindgen_1f112138da3258fb" hs_bindgen_1f112138da3258fb_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_release@
+foreign import ccall safe "hs_bindgen_73ee32ccdcfd6b12" hs_bindgen_73ee32ccdcfd6b12_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_release@
-hs_bindgen_1f112138da3258fb ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_release@
+hs_bindgen_73ee32ccdcfd6b12 ::
      RIP.Ptr Wl_data_device
   -> IO ()
-hs_bindgen_1f112138da3258fb =
-  RIP.fromFFIType hs_bindgen_1f112138da3258fb_base
+hs_bindgen_73ee32ccdcfd6b12 =
+  RIP.fromFFIType hs_bindgen_73ee32ccdcfd6b12_base
 
 {-| __C declaration:__ @wl_data_device_release@
 
@@ -4715,21 +4715,21 @@ wl_data_device_release ::
      RIP.Ptr Wl_data_device
      -- ^ __C declaration:__ @wl_data_device@
   -> IO ()
-wl_data_device_release = hs_bindgen_1f112138da3258fb
+wl_data_device_release = hs_bindgen_73ee32ccdcfd6b12
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_manager_set_user_data@
-foreign import ccall safe "hs_bindgen_e080b45ed0712390" hs_bindgen_e080b45ed0712390_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_manager_set_user_data@
+foreign import ccall safe "hs_bindgen_01dab6012bada112" hs_bindgen_01dab6012bada112_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_manager_set_user_data@
-hs_bindgen_e080b45ed0712390 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_manager_set_user_data@
+hs_bindgen_01dab6012bada112 ::
      RIP.Ptr Wl_data_device_manager
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_e080b45ed0712390 =
-  RIP.fromFFIType hs_bindgen_e080b45ed0712390_base
+hs_bindgen_01dab6012bada112 =
+  RIP.fromFFIType hs_bindgen_01dab6012bada112_base
 
 {-| __C declaration:__ @wl_data_device_manager_set_user_data@
 
@@ -4744,19 +4744,19 @@ wl_data_device_manager_set_user_data ::
      -- ^ __C declaration:__ @user_data@
   -> IO ()
 wl_data_device_manager_set_user_data =
-  hs_bindgen_e080b45ed0712390
+  hs_bindgen_01dab6012bada112
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_manager_get_user_data@
-foreign import ccall safe "hs_bindgen_89e0dd9f1d8879bb" hs_bindgen_89e0dd9f1d8879bb_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_manager_get_user_data@
+foreign import ccall safe "hs_bindgen_aefba9b75e5f0a45" hs_bindgen_aefba9b75e5f0a45_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_manager_get_user_data@
-hs_bindgen_89e0dd9f1d8879bb ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_manager_get_user_data@
+hs_bindgen_aefba9b75e5f0a45 ::
      RIP.Ptr Wl_data_device_manager
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_89e0dd9f1d8879bb =
-  RIP.fromFFIType hs_bindgen_89e0dd9f1d8879bb_base
+hs_bindgen_aefba9b75e5f0a45 =
+  RIP.fromFFIType hs_bindgen_aefba9b75e5f0a45_base
 
 {-| __C declaration:__ @wl_data_device_manager_get_user_data@
 
@@ -4769,19 +4769,19 @@ wl_data_device_manager_get_user_data ::
      -- ^ __C declaration:__ @wl_data_device_manager@
   -> IO (RIP.Ptr RIP.Void)
 wl_data_device_manager_get_user_data =
-  hs_bindgen_89e0dd9f1d8879bb
+  hs_bindgen_aefba9b75e5f0a45
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_manager_get_version@
-foreign import ccall safe "hs_bindgen_f1ab9ef79222200b" hs_bindgen_f1ab9ef79222200b_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_manager_get_version@
+foreign import ccall safe "hs_bindgen_c22dd5808fce7f68" hs_bindgen_c22dd5808fce7f68_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_manager_get_version@
-hs_bindgen_f1ab9ef79222200b ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_manager_get_version@
+hs_bindgen_c22dd5808fce7f68 ::
      RIP.Ptr Wl_data_device_manager
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_f1ab9ef79222200b =
-  RIP.fromFFIType hs_bindgen_f1ab9ef79222200b_base
+hs_bindgen_c22dd5808fce7f68 =
+  RIP.fromFFIType hs_bindgen_c22dd5808fce7f68_base
 
 {-| __C declaration:__ @wl_data_device_manager_get_version@
 
@@ -4794,19 +4794,19 @@ wl_data_device_manager_get_version ::
      -- ^ __C declaration:__ @wl_data_device_manager@
   -> IO HsBindgen.Runtime.LibC.Word32
 wl_data_device_manager_get_version =
-  hs_bindgen_f1ab9ef79222200b
+  hs_bindgen_c22dd5808fce7f68
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_manager_destroy@
-foreign import ccall safe "hs_bindgen_07fe2d3a922c2c91" hs_bindgen_07fe2d3a922c2c91_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_manager_destroy@
+foreign import ccall safe "hs_bindgen_a55d578c43136dd1" hs_bindgen_a55d578c43136dd1_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_manager_destroy@
-hs_bindgen_07fe2d3a922c2c91 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_manager_destroy@
+hs_bindgen_a55d578c43136dd1 ::
      RIP.Ptr Wl_data_device_manager
   -> IO ()
-hs_bindgen_07fe2d3a922c2c91 =
-  RIP.fromFFIType hs_bindgen_07fe2d3a922c2c91_base
+hs_bindgen_a55d578c43136dd1 =
+  RIP.fromFFIType hs_bindgen_a55d578c43136dd1_base
 
 {-| __C declaration:__ @wl_data_device_manager_destroy@
 
@@ -4819,19 +4819,19 @@ wl_data_device_manager_destroy ::
      -- ^ __C declaration:__ @wl_data_device_manager@
   -> IO ()
 wl_data_device_manager_destroy =
-  hs_bindgen_07fe2d3a922c2c91
+  hs_bindgen_a55d578c43136dd1
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_manager_create_data_source@
-foreign import ccall safe "hs_bindgen_6822fd7201522b09" hs_bindgen_6822fd7201522b09_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_manager_create_data_source@
+foreign import ccall safe "hs_bindgen_32b134d1e8718a80" hs_bindgen_32b134d1e8718a80_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_manager_create_data_source@
-hs_bindgen_6822fd7201522b09 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_manager_create_data_source@
+hs_bindgen_32b134d1e8718a80 ::
      RIP.Ptr Wl_data_device_manager
   -> IO (RIP.Ptr Wl_data_source)
-hs_bindgen_6822fd7201522b09 =
-  RIP.fromFFIType hs_bindgen_6822fd7201522b09_base
+hs_bindgen_32b134d1e8718a80 =
+  RIP.fromFFIType hs_bindgen_32b134d1e8718a80_base
 
 {-| __C declaration:__ @wl_data_device_manager_create_data_source@
 
@@ -4844,21 +4844,21 @@ wl_data_device_manager_create_data_source ::
      -- ^ __C declaration:__ @wl_data_device_manager@
   -> IO (RIP.Ptr Wl_data_source)
 wl_data_device_manager_create_data_source =
-  hs_bindgen_6822fd7201522b09
+  hs_bindgen_32b134d1e8718a80
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_manager_get_data_device@
-foreign import ccall safe "hs_bindgen_135584503dd2fe83" hs_bindgen_135584503dd2fe83_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_manager_get_data_device@
+foreign import ccall safe "hs_bindgen_7615860cbeef006a" hs_bindgen_7615860cbeef006a_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_data_device_manager_get_data_device@
-hs_bindgen_135584503dd2fe83 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_data_device_manager_get_data_device@
+hs_bindgen_7615860cbeef006a ::
      RIP.Ptr Wl_data_device_manager
   -> RIP.Ptr Wl_seat
   -> IO (RIP.Ptr Wl_data_device)
-hs_bindgen_135584503dd2fe83 =
-  RIP.fromFFIType hs_bindgen_135584503dd2fe83_base
+hs_bindgen_7615860cbeef006a =
+  RIP.fromFFIType hs_bindgen_7615860cbeef006a_base
 
 {-| __C declaration:__ @wl_data_device_manager_get_data_device@
 
@@ -4873,21 +4873,21 @@ wl_data_device_manager_get_data_device ::
      -- ^ __C declaration:__ @seat@
   -> IO (RIP.Ptr Wl_data_device)
 wl_data_device_manager_get_data_device =
-  hs_bindgen_135584503dd2fe83
+  hs_bindgen_7615860cbeef006a
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_set_user_data@
-foreign import ccall safe "hs_bindgen_3489a21d9ef9a295" hs_bindgen_3489a21d9ef9a295_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_set_user_data@
+foreign import ccall safe "hs_bindgen_fde0d30e84292cca" hs_bindgen_fde0d30e84292cca_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_set_user_data@
-hs_bindgen_3489a21d9ef9a295 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_set_user_data@
+hs_bindgen_fde0d30e84292cca ::
      RIP.Ptr Wl_shell
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_3489a21d9ef9a295 =
-  RIP.fromFFIType hs_bindgen_3489a21d9ef9a295_base
+hs_bindgen_fde0d30e84292cca =
+  RIP.fromFFIType hs_bindgen_fde0d30e84292cca_base
 
 {-| __C declaration:__ @wl_shell_set_user_data@
 
@@ -4901,19 +4901,19 @@ wl_shell_set_user_data ::
   -> RIP.Ptr RIP.Void
      -- ^ __C declaration:__ @user_data@
   -> IO ()
-wl_shell_set_user_data = hs_bindgen_3489a21d9ef9a295
+wl_shell_set_user_data = hs_bindgen_fde0d30e84292cca
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_get_user_data@
-foreign import ccall safe "hs_bindgen_1d08abbfdb10bdee" hs_bindgen_1d08abbfdb10bdee_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_get_user_data@
+foreign import ccall safe "hs_bindgen_c3312dab353c6144" hs_bindgen_c3312dab353c6144_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_get_user_data@
-hs_bindgen_1d08abbfdb10bdee ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_get_user_data@
+hs_bindgen_c3312dab353c6144 ::
      RIP.Ptr Wl_shell
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_1d08abbfdb10bdee =
-  RIP.fromFFIType hs_bindgen_1d08abbfdb10bdee_base
+hs_bindgen_c3312dab353c6144 =
+  RIP.fromFFIType hs_bindgen_c3312dab353c6144_base
 
 {-| __C declaration:__ @wl_shell_get_user_data@
 
@@ -4925,19 +4925,19 @@ wl_shell_get_user_data ::
      RIP.Ptr Wl_shell
      -- ^ __C declaration:__ @wl_shell@
   -> IO (RIP.Ptr RIP.Void)
-wl_shell_get_user_data = hs_bindgen_1d08abbfdb10bdee
+wl_shell_get_user_data = hs_bindgen_c3312dab353c6144
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_get_version@
-foreign import ccall safe "hs_bindgen_570e6265686b5081" hs_bindgen_570e6265686b5081_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_get_version@
+foreign import ccall safe "hs_bindgen_cd55e4cbdd764627" hs_bindgen_cd55e4cbdd764627_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_get_version@
-hs_bindgen_570e6265686b5081 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_get_version@
+hs_bindgen_cd55e4cbdd764627 ::
      RIP.Ptr Wl_shell
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_570e6265686b5081 =
-  RIP.fromFFIType hs_bindgen_570e6265686b5081_base
+hs_bindgen_cd55e4cbdd764627 =
+  RIP.fromFFIType hs_bindgen_cd55e4cbdd764627_base
 
 {-| __C declaration:__ @wl_shell_get_version@
 
@@ -4949,19 +4949,19 @@ wl_shell_get_version ::
      RIP.Ptr Wl_shell
      -- ^ __C declaration:__ @wl_shell@
   -> IO HsBindgen.Runtime.LibC.Word32
-wl_shell_get_version = hs_bindgen_570e6265686b5081
+wl_shell_get_version = hs_bindgen_cd55e4cbdd764627
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_destroy@
-foreign import ccall safe "hs_bindgen_ec5dea43b5498e0b" hs_bindgen_ec5dea43b5498e0b_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_destroy@
+foreign import ccall safe "hs_bindgen_48e190793403ea32" hs_bindgen_48e190793403ea32_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_destroy@
-hs_bindgen_ec5dea43b5498e0b ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_destroy@
+hs_bindgen_48e190793403ea32 ::
      RIP.Ptr Wl_shell
   -> IO ()
-hs_bindgen_ec5dea43b5498e0b =
-  RIP.fromFFIType hs_bindgen_ec5dea43b5498e0b_base
+hs_bindgen_48e190793403ea32 =
+  RIP.fromFFIType hs_bindgen_48e190793403ea32_base
 
 {-| __C declaration:__ @wl_shell_destroy@
 
@@ -4973,21 +4973,21 @@ wl_shell_destroy ::
      RIP.Ptr Wl_shell
      -- ^ __C declaration:__ @wl_shell@
   -> IO ()
-wl_shell_destroy = hs_bindgen_ec5dea43b5498e0b
+wl_shell_destroy = hs_bindgen_48e190793403ea32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_get_shell_surface@
-foreign import ccall safe "hs_bindgen_3f4c200d8e7126ea" hs_bindgen_3f4c200d8e7126ea_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_get_shell_surface@
+foreign import ccall safe "hs_bindgen_8f6c9b886ae18b1b" hs_bindgen_8f6c9b886ae18b1b_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_get_shell_surface@
-hs_bindgen_3f4c200d8e7126ea ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_get_shell_surface@
+hs_bindgen_8f6c9b886ae18b1b ::
      RIP.Ptr Wl_shell
   -> RIP.Ptr Wl_surface
   -> IO (RIP.Ptr Wl_shell_surface)
-hs_bindgen_3f4c200d8e7126ea =
-  RIP.fromFFIType hs_bindgen_3f4c200d8e7126ea_base
+hs_bindgen_8f6c9b886ae18b1b =
+  RIP.fromFFIType hs_bindgen_8f6c9b886ae18b1b_base
 
 {-| __C declaration:__ @wl_shell_get_shell_surface@
 
@@ -5002,23 +5002,23 @@ wl_shell_get_shell_surface ::
      -- ^ __C declaration:__ @surface@
   -> IO (RIP.Ptr Wl_shell_surface)
 wl_shell_get_shell_surface =
-  hs_bindgen_3f4c200d8e7126ea
+  hs_bindgen_8f6c9b886ae18b1b
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_add_listener@
-foreign import ccall safe "hs_bindgen_d662922bb98fce55" hs_bindgen_d662922bb98fce55_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_add_listener@
+foreign import ccall safe "hs_bindgen_6e4cea4b57d5ef07" hs_bindgen_6e4cea4b57d5ef07_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_add_listener@
-hs_bindgen_d662922bb98fce55 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_add_listener@
+hs_bindgen_6e4cea4b57d5ef07 ::
      RIP.Ptr Wl_shell_surface
   -> PtrConst.PtrConst Wl_shell_surface_listener
   -> RIP.Ptr RIP.Void
   -> IO RIP.CInt
-hs_bindgen_d662922bb98fce55 =
-  RIP.fromFFIType hs_bindgen_d662922bb98fce55_base
+hs_bindgen_6e4cea4b57d5ef07 =
+  RIP.fromFFIType hs_bindgen_6e4cea4b57d5ef07_base
 
 {-| __C declaration:__ @wl_shell_surface_add_listener@
 
@@ -5035,21 +5035,21 @@ wl_shell_surface_add_listener ::
      -- ^ __C declaration:__ @data@
   -> IO RIP.CInt
 wl_shell_surface_add_listener =
-  hs_bindgen_d662922bb98fce55
+  hs_bindgen_6e4cea4b57d5ef07
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_user_data@
-foreign import ccall safe "hs_bindgen_a0a052e8a3e0ae8b" hs_bindgen_a0a052e8a3e0ae8b_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_user_data@
+foreign import ccall safe "hs_bindgen_a744df44b56d5344" hs_bindgen_a744df44b56d5344_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_user_data@
-hs_bindgen_a0a052e8a3e0ae8b ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_user_data@
+hs_bindgen_a744df44b56d5344 ::
      RIP.Ptr Wl_shell_surface
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_a0a052e8a3e0ae8b =
-  RIP.fromFFIType hs_bindgen_a0a052e8a3e0ae8b_base
+hs_bindgen_a744df44b56d5344 =
+  RIP.fromFFIType hs_bindgen_a744df44b56d5344_base
 
 {-| __C declaration:__ @wl_shell_surface_set_user_data@
 
@@ -5064,19 +5064,19 @@ wl_shell_surface_set_user_data ::
      -- ^ __C declaration:__ @user_data@
   -> IO ()
 wl_shell_surface_set_user_data =
-  hs_bindgen_a0a052e8a3e0ae8b
+  hs_bindgen_a744df44b56d5344
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_get_user_data@
-foreign import ccall safe "hs_bindgen_25dc36ecc4bbd0c7" hs_bindgen_25dc36ecc4bbd0c7_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_get_user_data@
+foreign import ccall safe "hs_bindgen_96e562aead0b5dcd" hs_bindgen_96e562aead0b5dcd_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_get_user_data@
-hs_bindgen_25dc36ecc4bbd0c7 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_get_user_data@
+hs_bindgen_96e562aead0b5dcd ::
      RIP.Ptr Wl_shell_surface
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_25dc36ecc4bbd0c7 =
-  RIP.fromFFIType hs_bindgen_25dc36ecc4bbd0c7_base
+hs_bindgen_96e562aead0b5dcd =
+  RIP.fromFFIType hs_bindgen_96e562aead0b5dcd_base
 
 {-| __C declaration:__ @wl_shell_surface_get_user_data@
 
@@ -5089,19 +5089,19 @@ wl_shell_surface_get_user_data ::
      -- ^ __C declaration:__ @wl_shell_surface@
   -> IO (RIP.Ptr RIP.Void)
 wl_shell_surface_get_user_data =
-  hs_bindgen_25dc36ecc4bbd0c7
+  hs_bindgen_96e562aead0b5dcd
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_get_version@
-foreign import ccall safe "hs_bindgen_211afcaf3eaf723d" hs_bindgen_211afcaf3eaf723d_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_get_version@
+foreign import ccall safe "hs_bindgen_4773b9ede4fe6f3d" hs_bindgen_4773b9ede4fe6f3d_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_get_version@
-hs_bindgen_211afcaf3eaf723d ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_get_version@
+hs_bindgen_4773b9ede4fe6f3d ::
      RIP.Ptr Wl_shell_surface
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_211afcaf3eaf723d =
-  RIP.fromFFIType hs_bindgen_211afcaf3eaf723d_base
+hs_bindgen_4773b9ede4fe6f3d =
+  RIP.fromFFIType hs_bindgen_4773b9ede4fe6f3d_base
 
 {-| __C declaration:__ @wl_shell_surface_get_version@
 
@@ -5114,19 +5114,19 @@ wl_shell_surface_get_version ::
      -- ^ __C declaration:__ @wl_shell_surface@
   -> IO HsBindgen.Runtime.LibC.Word32
 wl_shell_surface_get_version =
-  hs_bindgen_211afcaf3eaf723d
+  hs_bindgen_4773b9ede4fe6f3d
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_destroy@
-foreign import ccall safe "hs_bindgen_0cb59d081da222fc" hs_bindgen_0cb59d081da222fc_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_destroy@
+foreign import ccall safe "hs_bindgen_ad82d81c7d81b4cb" hs_bindgen_ad82d81c7d81b4cb_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_destroy@
-hs_bindgen_0cb59d081da222fc ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_destroy@
+hs_bindgen_ad82d81c7d81b4cb ::
      RIP.Ptr Wl_shell_surface
   -> IO ()
-hs_bindgen_0cb59d081da222fc =
-  RIP.fromFFIType hs_bindgen_0cb59d081da222fc_base
+hs_bindgen_ad82d81c7d81b4cb =
+  RIP.fromFFIType hs_bindgen_ad82d81c7d81b4cb_base
 
 {-| __C declaration:__ @wl_shell_surface_destroy@
 
@@ -5139,21 +5139,21 @@ wl_shell_surface_destroy ::
      -- ^ __C declaration:__ @wl_shell_surface@
   -> IO ()
 wl_shell_surface_destroy =
-  hs_bindgen_0cb59d081da222fc
+  hs_bindgen_ad82d81c7d81b4cb
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_pong@
-foreign import ccall safe "hs_bindgen_dd7702f8d9a7a2ce" hs_bindgen_dd7702f8d9a7a2ce_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_pong@
+foreign import ccall safe "hs_bindgen_ce39fc8627bb0374" hs_bindgen_ce39fc8627bb0374_base ::
      RIP.Ptr RIP.Void
   -> RIP.Word32
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_pong@
-hs_bindgen_dd7702f8d9a7a2ce ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_pong@
+hs_bindgen_ce39fc8627bb0374 ::
      RIP.Ptr Wl_shell_surface
   -> HsBindgen.Runtime.LibC.Word32
   -> IO ()
-hs_bindgen_dd7702f8d9a7a2ce =
-  RIP.fromFFIType hs_bindgen_dd7702f8d9a7a2ce_base
+hs_bindgen_ce39fc8627bb0374 =
+  RIP.fromFFIType hs_bindgen_ce39fc8627bb0374_base
 
 {-| __C declaration:__ @wl_shell_surface_pong@
 
@@ -5167,23 +5167,23 @@ wl_shell_surface_pong ::
   -> HsBindgen.Runtime.LibC.Word32
      -- ^ __C declaration:__ @serial@
   -> IO ()
-wl_shell_surface_pong = hs_bindgen_dd7702f8d9a7a2ce
+wl_shell_surface_pong = hs_bindgen_ce39fc8627bb0374
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_move@
-foreign import ccall safe "hs_bindgen_a096ff2aa00f2c66" hs_bindgen_a096ff2aa00f2c66_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_move@
+foreign import ccall safe "hs_bindgen_bbb1a3ddef79d6b4" hs_bindgen_bbb1a3ddef79d6b4_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Word32
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_move@
-hs_bindgen_a096ff2aa00f2c66 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_move@
+hs_bindgen_bbb1a3ddef79d6b4 ::
      RIP.Ptr Wl_shell_surface
   -> RIP.Ptr Wl_seat
   -> HsBindgen.Runtime.LibC.Word32
   -> IO ()
-hs_bindgen_a096ff2aa00f2c66 =
-  RIP.fromFFIType hs_bindgen_a096ff2aa00f2c66_base
+hs_bindgen_bbb1a3ddef79d6b4 =
+  RIP.fromFFIType hs_bindgen_bbb1a3ddef79d6b4_base
 
 {-| __C declaration:__ @wl_shell_surface_move@
 
@@ -5199,25 +5199,25 @@ wl_shell_surface_move ::
   -> HsBindgen.Runtime.LibC.Word32
      -- ^ __C declaration:__ @serial@
   -> IO ()
-wl_shell_surface_move = hs_bindgen_a096ff2aa00f2c66
+wl_shell_surface_move = hs_bindgen_bbb1a3ddef79d6b4
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_resize@
-foreign import ccall safe "hs_bindgen_64785b2bf4651646" hs_bindgen_64785b2bf4651646_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_resize@
+foreign import ccall safe "hs_bindgen_99160dd35b7970d5" hs_bindgen_99160dd35b7970d5_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Word32
   -> RIP.Word32
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_resize@
-hs_bindgen_64785b2bf4651646 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_resize@
+hs_bindgen_99160dd35b7970d5 ::
      RIP.Ptr Wl_shell_surface
   -> RIP.Ptr Wl_seat
   -> HsBindgen.Runtime.LibC.Word32
   -> HsBindgen.Runtime.LibC.Word32
   -> IO ()
-hs_bindgen_64785b2bf4651646 =
-  RIP.fromFFIType hs_bindgen_64785b2bf4651646_base
+hs_bindgen_99160dd35b7970d5 =
+  RIP.fromFFIType hs_bindgen_99160dd35b7970d5_base
 
 {-| __C declaration:__ @wl_shell_surface_resize@
 
@@ -5235,19 +5235,19 @@ wl_shell_surface_resize ::
   -> HsBindgen.Runtime.LibC.Word32
      -- ^ __C declaration:__ @edges@
   -> IO ()
-wl_shell_surface_resize = hs_bindgen_64785b2bf4651646
+wl_shell_surface_resize = hs_bindgen_99160dd35b7970d5
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_toplevel@
-foreign import ccall safe "hs_bindgen_165a04f74f6a8227" hs_bindgen_165a04f74f6a8227_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_toplevel@
+foreign import ccall safe "hs_bindgen_5dfc8d7b10149003" hs_bindgen_5dfc8d7b10149003_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_toplevel@
-hs_bindgen_165a04f74f6a8227 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_toplevel@
+hs_bindgen_5dfc8d7b10149003 ::
      RIP.Ptr Wl_shell_surface
   -> IO ()
-hs_bindgen_165a04f74f6a8227 =
-  RIP.fromFFIType hs_bindgen_165a04f74f6a8227_base
+hs_bindgen_5dfc8d7b10149003 =
+  RIP.fromFFIType hs_bindgen_5dfc8d7b10149003_base
 
 {-| __C declaration:__ @wl_shell_surface_set_toplevel@
 
@@ -5260,10 +5260,10 @@ wl_shell_surface_set_toplevel ::
      -- ^ __C declaration:__ @wl_shell_surface@
   -> IO ()
 wl_shell_surface_set_toplevel =
-  hs_bindgen_165a04f74f6a8227
+  hs_bindgen_5dfc8d7b10149003
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_transient@
-foreign import ccall safe "hs_bindgen_aa7e47c238e28c08" hs_bindgen_aa7e47c238e28c08_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_transient@
+foreign import ccall safe "hs_bindgen_ef8c974b79711149" hs_bindgen_ef8c974b79711149_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Int32
@@ -5271,16 +5271,16 @@ foreign import ccall safe "hs_bindgen_aa7e47c238e28c08" hs_bindgen_aa7e47c238e28
   -> RIP.Word32
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_transient@
-hs_bindgen_aa7e47c238e28c08 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_transient@
+hs_bindgen_ef8c974b79711149 ::
      RIP.Ptr Wl_shell_surface
   -> RIP.Ptr Wl_surface
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Word32
   -> IO ()
-hs_bindgen_aa7e47c238e28c08 =
-  RIP.fromFFIType hs_bindgen_aa7e47c238e28c08_base
+hs_bindgen_ef8c974b79711149 =
+  RIP.fromFFIType hs_bindgen_ef8c974b79711149_base
 
 {-| __C declaration:__ @wl_shell_surface_set_transient@
 
@@ -5301,25 +5301,25 @@ wl_shell_surface_set_transient ::
      -- ^ __C declaration:__ @flags@
   -> IO ()
 wl_shell_surface_set_transient =
-  hs_bindgen_aa7e47c238e28c08
+  hs_bindgen_ef8c974b79711149
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_fullscreen@
-foreign import ccall safe "hs_bindgen_13bad46dbf7103fc" hs_bindgen_13bad46dbf7103fc_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_fullscreen@
+foreign import ccall safe "hs_bindgen_227d0cfe84e7aa00" hs_bindgen_227d0cfe84e7aa00_base ::
      RIP.Ptr RIP.Void
   -> RIP.Word32
   -> RIP.Word32
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_fullscreen@
-hs_bindgen_13bad46dbf7103fc ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_fullscreen@
+hs_bindgen_227d0cfe84e7aa00 ::
      RIP.Ptr Wl_shell_surface
   -> HsBindgen.Runtime.LibC.Word32
   -> HsBindgen.Runtime.LibC.Word32
   -> RIP.Ptr Wl_output
   -> IO ()
-hs_bindgen_13bad46dbf7103fc =
-  RIP.fromFFIType hs_bindgen_13bad46dbf7103fc_base
+hs_bindgen_227d0cfe84e7aa00 =
+  RIP.fromFFIType hs_bindgen_227d0cfe84e7aa00_base
 
 {-| __C declaration:__ @wl_shell_surface_set_fullscreen@
 
@@ -5338,10 +5338,10 @@ wl_shell_surface_set_fullscreen ::
      -- ^ __C declaration:__ @output@
   -> IO ()
 wl_shell_surface_set_fullscreen =
-  hs_bindgen_13bad46dbf7103fc
+  hs_bindgen_227d0cfe84e7aa00
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_popup@
-foreign import ccall safe "hs_bindgen_25a280775305e83c" hs_bindgen_25a280775305e83c_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_popup@
+foreign import ccall safe "hs_bindgen_7e134bc698ae94b2" hs_bindgen_7e134bc698ae94b2_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Word32
@@ -5351,8 +5351,8 @@ foreign import ccall safe "hs_bindgen_25a280775305e83c" hs_bindgen_25a280775305e
   -> RIP.Word32
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_popup@
-hs_bindgen_25a280775305e83c ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_popup@
+hs_bindgen_7e134bc698ae94b2 ::
      RIP.Ptr Wl_shell_surface
   -> RIP.Ptr Wl_seat
   -> HsBindgen.Runtime.LibC.Word32
@@ -5361,8 +5361,8 @@ hs_bindgen_25a280775305e83c ::
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Word32
   -> IO ()
-hs_bindgen_25a280775305e83c =
-  RIP.fromFFIType hs_bindgen_25a280775305e83c_base
+hs_bindgen_7e134bc698ae94b2 =
+  RIP.fromFFIType hs_bindgen_7e134bc698ae94b2_base
 
 {-| __C declaration:__ @wl_shell_surface_set_popup@
 
@@ -5387,21 +5387,21 @@ wl_shell_surface_set_popup ::
      -- ^ __C declaration:__ @flags@
   -> IO ()
 wl_shell_surface_set_popup =
-  hs_bindgen_25a280775305e83c
+  hs_bindgen_7e134bc698ae94b2
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_maximized@
-foreign import ccall safe "hs_bindgen_7e34584d62a2b43a" hs_bindgen_7e34584d62a2b43a_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_maximized@
+foreign import ccall safe "hs_bindgen_ab8f701829cb19c0" hs_bindgen_ab8f701829cb19c0_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_maximized@
-hs_bindgen_7e34584d62a2b43a ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_maximized@
+hs_bindgen_ab8f701829cb19c0 ::
      RIP.Ptr Wl_shell_surface
   -> RIP.Ptr Wl_output
   -> IO ()
-hs_bindgen_7e34584d62a2b43a =
-  RIP.fromFFIType hs_bindgen_7e34584d62a2b43a_base
+hs_bindgen_ab8f701829cb19c0 =
+  RIP.fromFFIType hs_bindgen_ab8f701829cb19c0_base
 
 {-| __C declaration:__ @wl_shell_surface_set_maximized@
 
@@ -5416,21 +5416,21 @@ wl_shell_surface_set_maximized ::
      -- ^ __C declaration:__ @output@
   -> IO ()
 wl_shell_surface_set_maximized =
-  hs_bindgen_7e34584d62a2b43a
+  hs_bindgen_ab8f701829cb19c0
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_title@
-foreign import ccall safe "hs_bindgen_ebabb07cfa2b8fbc" hs_bindgen_ebabb07cfa2b8fbc_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_title@
+foreign import ccall safe "hs_bindgen_2e395cb2c1016cac" hs_bindgen_2e395cb2c1016cac_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_title@
-hs_bindgen_ebabb07cfa2b8fbc ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_title@
+hs_bindgen_2e395cb2c1016cac ::
      RIP.Ptr Wl_shell_surface
   -> PtrConst.PtrConst RIP.CChar
   -> IO ()
-hs_bindgen_ebabb07cfa2b8fbc =
-  RIP.fromFFIType hs_bindgen_ebabb07cfa2b8fbc_base
+hs_bindgen_2e395cb2c1016cac =
+  RIP.fromFFIType hs_bindgen_2e395cb2c1016cac_base
 
 {-| __C declaration:__ @wl_shell_surface_set_title@
 
@@ -5445,21 +5445,21 @@ wl_shell_surface_set_title ::
      -- ^ __C declaration:__ @title@
   -> IO ()
 wl_shell_surface_set_title =
-  hs_bindgen_ebabb07cfa2b8fbc
+  hs_bindgen_2e395cb2c1016cac
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_class@
-foreign import ccall safe "hs_bindgen_20515759484937bc" hs_bindgen_20515759484937bc_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_class@
+foreign import ccall safe "hs_bindgen_13a02b017187de66" hs_bindgen_13a02b017187de66_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_class@
-hs_bindgen_20515759484937bc ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_shell_surface_set_class@
+hs_bindgen_13a02b017187de66 ::
      RIP.Ptr Wl_shell_surface
   -> PtrConst.PtrConst RIP.CChar
   -> IO ()
-hs_bindgen_20515759484937bc =
-  RIP.fromFFIType hs_bindgen_20515759484937bc_base
+hs_bindgen_13a02b017187de66 =
+  RIP.fromFFIType hs_bindgen_13a02b017187de66_base
 
 {-| __C declaration:__ @wl_shell_surface_set_class@
 
@@ -5474,23 +5474,23 @@ wl_shell_surface_set_class ::
      -- ^ __C declaration:__ @class_@
   -> IO ()
 wl_shell_surface_set_class =
-  hs_bindgen_20515759484937bc
+  hs_bindgen_13a02b017187de66
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_add_listener@
-foreign import ccall safe "hs_bindgen_740ab6aac9194efc" hs_bindgen_740ab6aac9194efc_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_add_listener@
+foreign import ccall safe "hs_bindgen_c895fd9055c307b8" hs_bindgen_c895fd9055c307b8_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_add_listener@
-hs_bindgen_740ab6aac9194efc ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_add_listener@
+hs_bindgen_c895fd9055c307b8 ::
      RIP.Ptr Wl_surface
   -> PtrConst.PtrConst Wl_surface_listener
   -> RIP.Ptr RIP.Void
   -> IO RIP.CInt
-hs_bindgen_740ab6aac9194efc =
-  RIP.fromFFIType hs_bindgen_740ab6aac9194efc_base
+hs_bindgen_c895fd9055c307b8 =
+  RIP.fromFFIType hs_bindgen_c895fd9055c307b8_base
 
 {-| __C declaration:__ @wl_surface_add_listener@
 
@@ -5506,21 +5506,21 @@ wl_surface_add_listener ::
   -> RIP.Ptr RIP.Void
      -- ^ __C declaration:__ @data@
   -> IO RIP.CInt
-wl_surface_add_listener = hs_bindgen_740ab6aac9194efc
+wl_surface_add_listener = hs_bindgen_c895fd9055c307b8
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_set_user_data@
-foreign import ccall safe "hs_bindgen_f0a8a4b4e271bc0f" hs_bindgen_f0a8a4b4e271bc0f_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_set_user_data@
+foreign import ccall safe "hs_bindgen_3936b64fd76ff958" hs_bindgen_3936b64fd76ff958_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_set_user_data@
-hs_bindgen_f0a8a4b4e271bc0f ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_set_user_data@
+hs_bindgen_3936b64fd76ff958 ::
      RIP.Ptr Wl_surface
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_f0a8a4b4e271bc0f =
-  RIP.fromFFIType hs_bindgen_f0a8a4b4e271bc0f_base
+hs_bindgen_3936b64fd76ff958 =
+  RIP.fromFFIType hs_bindgen_3936b64fd76ff958_base
 
 {-| __C declaration:__ @wl_surface_set_user_data@
 
@@ -5535,19 +5535,19 @@ wl_surface_set_user_data ::
      -- ^ __C declaration:__ @user_data@
   -> IO ()
 wl_surface_set_user_data =
-  hs_bindgen_f0a8a4b4e271bc0f
+  hs_bindgen_3936b64fd76ff958
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_get_user_data@
-foreign import ccall safe "hs_bindgen_28cd0198105d0fef" hs_bindgen_28cd0198105d0fef_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_get_user_data@
+foreign import ccall safe "hs_bindgen_9d26229495b0b950" hs_bindgen_9d26229495b0b950_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_get_user_data@
-hs_bindgen_28cd0198105d0fef ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_get_user_data@
+hs_bindgen_9d26229495b0b950 ::
      RIP.Ptr Wl_surface
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_28cd0198105d0fef =
-  RIP.fromFFIType hs_bindgen_28cd0198105d0fef_base
+hs_bindgen_9d26229495b0b950 =
+  RIP.fromFFIType hs_bindgen_9d26229495b0b950_base
 
 {-| __C declaration:__ @wl_surface_get_user_data@
 
@@ -5560,19 +5560,19 @@ wl_surface_get_user_data ::
      -- ^ __C declaration:__ @wl_surface@
   -> IO (RIP.Ptr RIP.Void)
 wl_surface_get_user_data =
-  hs_bindgen_28cd0198105d0fef
+  hs_bindgen_9d26229495b0b950
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_get_version@
-foreign import ccall safe "hs_bindgen_59c22f98a7bc4627" hs_bindgen_59c22f98a7bc4627_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_get_version@
+foreign import ccall safe "hs_bindgen_1959b276d85514a1" hs_bindgen_1959b276d85514a1_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_get_version@
-hs_bindgen_59c22f98a7bc4627 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_get_version@
+hs_bindgen_1959b276d85514a1 ::
      RIP.Ptr Wl_surface
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_59c22f98a7bc4627 =
-  RIP.fromFFIType hs_bindgen_59c22f98a7bc4627_base
+hs_bindgen_1959b276d85514a1 =
+  RIP.fromFFIType hs_bindgen_1959b276d85514a1_base
 
 {-| __C declaration:__ @wl_surface_get_version@
 
@@ -5584,19 +5584,19 @@ wl_surface_get_version ::
      RIP.Ptr Wl_surface
      -- ^ __C declaration:__ @wl_surface@
   -> IO HsBindgen.Runtime.LibC.Word32
-wl_surface_get_version = hs_bindgen_59c22f98a7bc4627
+wl_surface_get_version = hs_bindgen_1959b276d85514a1
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_destroy@
-foreign import ccall safe "hs_bindgen_4989313584df6b73" hs_bindgen_4989313584df6b73_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_destroy@
+foreign import ccall safe "hs_bindgen_cf64df6b46cbf0f3" hs_bindgen_cf64df6b46cbf0f3_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_destroy@
-hs_bindgen_4989313584df6b73 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_destroy@
+hs_bindgen_cf64df6b46cbf0f3 ::
      RIP.Ptr Wl_surface
   -> IO ()
-hs_bindgen_4989313584df6b73 =
-  RIP.fromFFIType hs_bindgen_4989313584df6b73_base
+hs_bindgen_cf64df6b46cbf0f3 =
+  RIP.fromFFIType hs_bindgen_cf64df6b46cbf0f3_base
 
 {-| __C declaration:__ @wl_surface_destroy@
 
@@ -5608,25 +5608,25 @@ wl_surface_destroy ::
      RIP.Ptr Wl_surface
      -- ^ __C declaration:__ @wl_surface@
   -> IO ()
-wl_surface_destroy = hs_bindgen_4989313584df6b73
+wl_surface_destroy = hs_bindgen_cf64df6b46cbf0f3
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_attach@
-foreign import ccall safe "hs_bindgen_658e93f198624474" hs_bindgen_658e93f198624474_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_attach@
+foreign import ccall safe "hs_bindgen_8d56a9cbd337e025" hs_bindgen_8d56a9cbd337e025_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_attach@
-hs_bindgen_658e93f198624474 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_attach@
+hs_bindgen_8d56a9cbd337e025 ::
      RIP.Ptr Wl_surface
   -> RIP.Ptr Wl_buffer
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Int32
   -> IO ()
-hs_bindgen_658e93f198624474 =
-  RIP.fromFFIType hs_bindgen_658e93f198624474_base
+hs_bindgen_8d56a9cbd337e025 =
+  RIP.fromFFIType hs_bindgen_8d56a9cbd337e025_base
 
 {-| __C declaration:__ @wl_surface_attach@
 
@@ -5644,10 +5644,10 @@ wl_surface_attach ::
   -> HsBindgen.Runtime.LibC.Int32
      -- ^ __C declaration:__ @y@
   -> IO ()
-wl_surface_attach = hs_bindgen_658e93f198624474
+wl_surface_attach = hs_bindgen_8d56a9cbd337e025
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_damage@
-foreign import ccall safe "hs_bindgen_e979d71d02ff28f4" hs_bindgen_e979d71d02ff28f4_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_damage@
+foreign import ccall safe "hs_bindgen_94f85f4dd291199f" hs_bindgen_94f85f4dd291199f_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
@@ -5655,16 +5655,16 @@ foreign import ccall safe "hs_bindgen_e979d71d02ff28f4" hs_bindgen_e979d71d02ff2
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_damage@
-hs_bindgen_e979d71d02ff28f4 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_damage@
+hs_bindgen_94f85f4dd291199f ::
      RIP.Ptr Wl_surface
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Int32
   -> IO ()
-hs_bindgen_e979d71d02ff28f4 =
-  RIP.fromFFIType hs_bindgen_e979d71d02ff28f4_base
+hs_bindgen_94f85f4dd291199f =
+  RIP.fromFFIType hs_bindgen_94f85f4dd291199f_base
 
 {-| __C declaration:__ @wl_surface_damage@
 
@@ -5684,19 +5684,19 @@ wl_surface_damage ::
   -> HsBindgen.Runtime.LibC.Int32
      -- ^ __C declaration:__ @height@
   -> IO ()
-wl_surface_damage = hs_bindgen_e979d71d02ff28f4
+wl_surface_damage = hs_bindgen_94f85f4dd291199f
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_frame@
-foreign import ccall safe "hs_bindgen_506173ce127930e8" hs_bindgen_506173ce127930e8_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_frame@
+foreign import ccall safe "hs_bindgen_9d607bd7dc3df487" hs_bindgen_9d607bd7dc3df487_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_frame@
-hs_bindgen_506173ce127930e8 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_frame@
+hs_bindgen_9d607bd7dc3df487 ::
      RIP.Ptr Wl_surface
   -> IO (RIP.Ptr Wl_callback)
-hs_bindgen_506173ce127930e8 =
-  RIP.fromFFIType hs_bindgen_506173ce127930e8_base
+hs_bindgen_9d607bd7dc3df487 =
+  RIP.fromFFIType hs_bindgen_9d607bd7dc3df487_base
 
 {-| __C declaration:__ @wl_surface_frame@
 
@@ -5708,21 +5708,21 @@ wl_surface_frame ::
      RIP.Ptr Wl_surface
      -- ^ __C declaration:__ @wl_surface@
   -> IO (RIP.Ptr Wl_callback)
-wl_surface_frame = hs_bindgen_506173ce127930e8
+wl_surface_frame = hs_bindgen_9d607bd7dc3df487
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_set_opaque_region@
-foreign import ccall safe "hs_bindgen_c833338257941a59" hs_bindgen_c833338257941a59_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_set_opaque_region@
+foreign import ccall safe "hs_bindgen_7b42843167a9f969" hs_bindgen_7b42843167a9f969_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_set_opaque_region@
-hs_bindgen_c833338257941a59 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_set_opaque_region@
+hs_bindgen_7b42843167a9f969 ::
      RIP.Ptr Wl_surface
   -> RIP.Ptr Wl_region
   -> IO ()
-hs_bindgen_c833338257941a59 =
-  RIP.fromFFIType hs_bindgen_c833338257941a59_base
+hs_bindgen_7b42843167a9f969 =
+  RIP.fromFFIType hs_bindgen_7b42843167a9f969_base
 
 {-| __C declaration:__ @wl_surface_set_opaque_region@
 
@@ -5737,21 +5737,21 @@ wl_surface_set_opaque_region ::
      -- ^ __C declaration:__ @region@
   -> IO ()
 wl_surface_set_opaque_region =
-  hs_bindgen_c833338257941a59
+  hs_bindgen_7b42843167a9f969
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_set_input_region@
-foreign import ccall safe "hs_bindgen_a58701948293ae17" hs_bindgen_a58701948293ae17_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_set_input_region@
+foreign import ccall safe "hs_bindgen_98dad4bdb6e3fe91" hs_bindgen_98dad4bdb6e3fe91_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_set_input_region@
-hs_bindgen_a58701948293ae17 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_set_input_region@
+hs_bindgen_98dad4bdb6e3fe91 ::
      RIP.Ptr Wl_surface
   -> RIP.Ptr Wl_region
   -> IO ()
-hs_bindgen_a58701948293ae17 =
-  RIP.fromFFIType hs_bindgen_a58701948293ae17_base
+hs_bindgen_98dad4bdb6e3fe91 =
+  RIP.fromFFIType hs_bindgen_98dad4bdb6e3fe91_base
 
 {-| __C declaration:__ @wl_surface_set_input_region@
 
@@ -5766,19 +5766,19 @@ wl_surface_set_input_region ::
      -- ^ __C declaration:__ @region@
   -> IO ()
 wl_surface_set_input_region =
-  hs_bindgen_a58701948293ae17
+  hs_bindgen_98dad4bdb6e3fe91
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_commit@
-foreign import ccall safe "hs_bindgen_4a2c0ae850cf12aa" hs_bindgen_4a2c0ae850cf12aa_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_commit@
+foreign import ccall safe "hs_bindgen_165e76f923bc5268" hs_bindgen_165e76f923bc5268_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_commit@
-hs_bindgen_4a2c0ae850cf12aa ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_commit@
+hs_bindgen_165e76f923bc5268 ::
      RIP.Ptr Wl_surface
   -> IO ()
-hs_bindgen_4a2c0ae850cf12aa =
-  RIP.fromFFIType hs_bindgen_4a2c0ae850cf12aa_base
+hs_bindgen_165e76f923bc5268 =
+  RIP.fromFFIType hs_bindgen_165e76f923bc5268_base
 
 {-| __C declaration:__ @wl_surface_commit@
 
@@ -5790,21 +5790,21 @@ wl_surface_commit ::
      RIP.Ptr Wl_surface
      -- ^ __C declaration:__ @wl_surface@
   -> IO ()
-wl_surface_commit = hs_bindgen_4a2c0ae850cf12aa
+wl_surface_commit = hs_bindgen_165e76f923bc5268
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_set_buffer_transform@
-foreign import ccall safe "hs_bindgen_95792d267cb501ff" hs_bindgen_95792d267cb501ff_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_set_buffer_transform@
+foreign import ccall safe "hs_bindgen_90d4b80a6e0d8a8e" hs_bindgen_90d4b80a6e0d8a8e_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_set_buffer_transform@
-hs_bindgen_95792d267cb501ff ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_set_buffer_transform@
+hs_bindgen_90d4b80a6e0d8a8e ::
      RIP.Ptr Wl_surface
   -> HsBindgen.Runtime.LibC.Int32
   -> IO ()
-hs_bindgen_95792d267cb501ff =
-  RIP.fromFFIType hs_bindgen_95792d267cb501ff_base
+hs_bindgen_90d4b80a6e0d8a8e =
+  RIP.fromFFIType hs_bindgen_90d4b80a6e0d8a8e_base
 
 {-| __C declaration:__ @wl_surface_set_buffer_transform@
 
@@ -5819,21 +5819,21 @@ wl_surface_set_buffer_transform ::
      -- ^ __C declaration:__ @transform@
   -> IO ()
 wl_surface_set_buffer_transform =
-  hs_bindgen_95792d267cb501ff
+  hs_bindgen_90d4b80a6e0d8a8e
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_set_buffer_scale@
-foreign import ccall safe "hs_bindgen_1b0414c7a35c0f03" hs_bindgen_1b0414c7a35c0f03_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_set_buffer_scale@
+foreign import ccall safe "hs_bindgen_e0db11ff6db1719f" hs_bindgen_e0db11ff6db1719f_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_set_buffer_scale@
-hs_bindgen_1b0414c7a35c0f03 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_set_buffer_scale@
+hs_bindgen_e0db11ff6db1719f ::
      RIP.Ptr Wl_surface
   -> HsBindgen.Runtime.LibC.Int32
   -> IO ()
-hs_bindgen_1b0414c7a35c0f03 =
-  RIP.fromFFIType hs_bindgen_1b0414c7a35c0f03_base
+hs_bindgen_e0db11ff6db1719f =
+  RIP.fromFFIType hs_bindgen_e0db11ff6db1719f_base
 
 {-| __C declaration:__ @wl_surface_set_buffer_scale@
 
@@ -5848,10 +5848,10 @@ wl_surface_set_buffer_scale ::
      -- ^ __C declaration:__ @scale@
   -> IO ()
 wl_surface_set_buffer_scale =
-  hs_bindgen_1b0414c7a35c0f03
+  hs_bindgen_e0db11ff6db1719f
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_damage_buffer@
-foreign import ccall safe "hs_bindgen_894788ac87fc702b" hs_bindgen_894788ac87fc702b_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_damage_buffer@
+foreign import ccall safe "hs_bindgen_dc0285dd9796a1a4" hs_bindgen_dc0285dd9796a1a4_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
@@ -5859,16 +5859,16 @@ foreign import ccall safe "hs_bindgen_894788ac87fc702b" hs_bindgen_894788ac87fc7
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_damage_buffer@
-hs_bindgen_894788ac87fc702b ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_damage_buffer@
+hs_bindgen_dc0285dd9796a1a4 ::
      RIP.Ptr Wl_surface
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Int32
   -> IO ()
-hs_bindgen_894788ac87fc702b =
-  RIP.fromFFIType hs_bindgen_894788ac87fc702b_base
+hs_bindgen_dc0285dd9796a1a4 =
+  RIP.fromFFIType hs_bindgen_dc0285dd9796a1a4_base
 
 {-| __C declaration:__ @wl_surface_damage_buffer@
 
@@ -5889,23 +5889,23 @@ wl_surface_damage_buffer ::
      -- ^ __C declaration:__ @height@
   -> IO ()
 wl_surface_damage_buffer =
-  hs_bindgen_894788ac87fc702b
+  hs_bindgen_dc0285dd9796a1a4
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_offset@
-foreign import ccall safe "hs_bindgen_95843727e4e49924" hs_bindgen_95843727e4e49924_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_offset@
+foreign import ccall safe "hs_bindgen_bf3a36b8d9e3f208" hs_bindgen_bf3a36b8d9e3f208_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_surface_offset@
-hs_bindgen_95843727e4e49924 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_surface_offset@
+hs_bindgen_bf3a36b8d9e3f208 ::
      RIP.Ptr Wl_surface
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Int32
   -> IO ()
-hs_bindgen_95843727e4e49924 =
-  RIP.fromFFIType hs_bindgen_95843727e4e49924_base
+hs_bindgen_bf3a36b8d9e3f208 =
+  RIP.fromFFIType hs_bindgen_bf3a36b8d9e3f208_base
 
 {-| __C declaration:__ @wl_surface_offset@
 
@@ -5921,23 +5921,23 @@ wl_surface_offset ::
   -> HsBindgen.Runtime.LibC.Int32
      -- ^ __C declaration:__ @y@
   -> IO ()
-wl_surface_offset = hs_bindgen_95843727e4e49924
+wl_surface_offset = hs_bindgen_bf3a36b8d9e3f208
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_seat_add_listener@
-foreign import ccall safe "hs_bindgen_b7d2eae7b29ef34d" hs_bindgen_b7d2eae7b29ef34d_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_seat_add_listener@
+foreign import ccall safe "hs_bindgen_45c539fbcd74c0be" hs_bindgen_45c539fbcd74c0be_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_seat_add_listener@
-hs_bindgen_b7d2eae7b29ef34d ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_seat_add_listener@
+hs_bindgen_45c539fbcd74c0be ::
      RIP.Ptr Wl_seat
   -> PtrConst.PtrConst Wl_seat_listener
   -> RIP.Ptr RIP.Void
   -> IO RIP.CInt
-hs_bindgen_b7d2eae7b29ef34d =
-  RIP.fromFFIType hs_bindgen_b7d2eae7b29ef34d_base
+hs_bindgen_45c539fbcd74c0be =
+  RIP.fromFFIType hs_bindgen_45c539fbcd74c0be_base
 
 {-| __C declaration:__ @wl_seat_add_listener@
 
@@ -5953,21 +5953,21 @@ wl_seat_add_listener ::
   -> RIP.Ptr RIP.Void
      -- ^ __C declaration:__ @data@
   -> IO RIP.CInt
-wl_seat_add_listener = hs_bindgen_b7d2eae7b29ef34d
+wl_seat_add_listener = hs_bindgen_45c539fbcd74c0be
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_seat_set_user_data@
-foreign import ccall safe "hs_bindgen_88808ecd9fad0924" hs_bindgen_88808ecd9fad0924_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_seat_set_user_data@
+foreign import ccall safe "hs_bindgen_a71198b5a9a41e60" hs_bindgen_a71198b5a9a41e60_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_seat_set_user_data@
-hs_bindgen_88808ecd9fad0924 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_seat_set_user_data@
+hs_bindgen_a71198b5a9a41e60 ::
      RIP.Ptr Wl_seat
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_88808ecd9fad0924 =
-  RIP.fromFFIType hs_bindgen_88808ecd9fad0924_base
+hs_bindgen_a71198b5a9a41e60 =
+  RIP.fromFFIType hs_bindgen_a71198b5a9a41e60_base
 
 {-| __C declaration:__ @wl_seat_set_user_data@
 
@@ -5981,19 +5981,19 @@ wl_seat_set_user_data ::
   -> RIP.Ptr RIP.Void
      -- ^ __C declaration:__ @user_data@
   -> IO ()
-wl_seat_set_user_data = hs_bindgen_88808ecd9fad0924
+wl_seat_set_user_data = hs_bindgen_a71198b5a9a41e60
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_seat_get_user_data@
-foreign import ccall safe "hs_bindgen_f3c9aeb257be87fe" hs_bindgen_f3c9aeb257be87fe_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_seat_get_user_data@
+foreign import ccall safe "hs_bindgen_7d01924e8259862f" hs_bindgen_7d01924e8259862f_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_seat_get_user_data@
-hs_bindgen_f3c9aeb257be87fe ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_seat_get_user_data@
+hs_bindgen_7d01924e8259862f ::
      RIP.Ptr Wl_seat
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_f3c9aeb257be87fe =
-  RIP.fromFFIType hs_bindgen_f3c9aeb257be87fe_base
+hs_bindgen_7d01924e8259862f =
+  RIP.fromFFIType hs_bindgen_7d01924e8259862f_base
 
 {-| __C declaration:__ @wl_seat_get_user_data@
 
@@ -6005,19 +6005,19 @@ wl_seat_get_user_data ::
      RIP.Ptr Wl_seat
      -- ^ __C declaration:__ @wl_seat@
   -> IO (RIP.Ptr RIP.Void)
-wl_seat_get_user_data = hs_bindgen_f3c9aeb257be87fe
+wl_seat_get_user_data = hs_bindgen_7d01924e8259862f
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_seat_get_version@
-foreign import ccall safe "hs_bindgen_808a43c633c732eb" hs_bindgen_808a43c633c732eb_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_seat_get_version@
+foreign import ccall safe "hs_bindgen_c8567ec4dcfaa98b" hs_bindgen_c8567ec4dcfaa98b_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_seat_get_version@
-hs_bindgen_808a43c633c732eb ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_seat_get_version@
+hs_bindgen_c8567ec4dcfaa98b ::
      RIP.Ptr Wl_seat
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_808a43c633c732eb =
-  RIP.fromFFIType hs_bindgen_808a43c633c732eb_base
+hs_bindgen_c8567ec4dcfaa98b =
+  RIP.fromFFIType hs_bindgen_c8567ec4dcfaa98b_base
 
 {-| __C declaration:__ @wl_seat_get_version@
 
@@ -6029,19 +6029,19 @@ wl_seat_get_version ::
      RIP.Ptr Wl_seat
      -- ^ __C declaration:__ @wl_seat@
   -> IO HsBindgen.Runtime.LibC.Word32
-wl_seat_get_version = hs_bindgen_808a43c633c732eb
+wl_seat_get_version = hs_bindgen_c8567ec4dcfaa98b
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_seat_destroy@
-foreign import ccall safe "hs_bindgen_5090d492fcc2ded5" hs_bindgen_5090d492fcc2ded5_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_seat_destroy@
+foreign import ccall safe "hs_bindgen_a516ae81e192cb8b" hs_bindgen_a516ae81e192cb8b_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_seat_destroy@
-hs_bindgen_5090d492fcc2ded5 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_seat_destroy@
+hs_bindgen_a516ae81e192cb8b ::
      RIP.Ptr Wl_seat
   -> IO ()
-hs_bindgen_5090d492fcc2ded5 =
-  RIP.fromFFIType hs_bindgen_5090d492fcc2ded5_base
+hs_bindgen_a516ae81e192cb8b =
+  RIP.fromFFIType hs_bindgen_a516ae81e192cb8b_base
 
 {-| __C declaration:__ @wl_seat_destroy@
 
@@ -6053,19 +6053,19 @@ wl_seat_destroy ::
      RIP.Ptr Wl_seat
      -- ^ __C declaration:__ @wl_seat@
   -> IO ()
-wl_seat_destroy = hs_bindgen_5090d492fcc2ded5
+wl_seat_destroy = hs_bindgen_a516ae81e192cb8b
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_seat_get_pointer@
-foreign import ccall safe "hs_bindgen_8bc3b746a7121aa3" hs_bindgen_8bc3b746a7121aa3_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_seat_get_pointer@
+foreign import ccall safe "hs_bindgen_835145ef74872cec" hs_bindgen_835145ef74872cec_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_seat_get_pointer@
-hs_bindgen_8bc3b746a7121aa3 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_seat_get_pointer@
+hs_bindgen_835145ef74872cec ::
      RIP.Ptr Wl_seat
   -> IO (RIP.Ptr Wl_pointer)
-hs_bindgen_8bc3b746a7121aa3 =
-  RIP.fromFFIType hs_bindgen_8bc3b746a7121aa3_base
+hs_bindgen_835145ef74872cec =
+  RIP.fromFFIType hs_bindgen_835145ef74872cec_base
 
 {-| __C declaration:__ @wl_seat_get_pointer@
 
@@ -6077,19 +6077,19 @@ wl_seat_get_pointer ::
      RIP.Ptr Wl_seat
      -- ^ __C declaration:__ @wl_seat@
   -> IO (RIP.Ptr Wl_pointer)
-wl_seat_get_pointer = hs_bindgen_8bc3b746a7121aa3
+wl_seat_get_pointer = hs_bindgen_835145ef74872cec
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_seat_get_keyboard@
-foreign import ccall safe "hs_bindgen_e247290689fa6d2d" hs_bindgen_e247290689fa6d2d_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_seat_get_keyboard@
+foreign import ccall safe "hs_bindgen_28c834fc368033f4" hs_bindgen_28c834fc368033f4_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_seat_get_keyboard@
-hs_bindgen_e247290689fa6d2d ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_seat_get_keyboard@
+hs_bindgen_28c834fc368033f4 ::
      RIP.Ptr Wl_seat
   -> IO (RIP.Ptr Wl_keyboard)
-hs_bindgen_e247290689fa6d2d =
-  RIP.fromFFIType hs_bindgen_e247290689fa6d2d_base
+hs_bindgen_28c834fc368033f4 =
+  RIP.fromFFIType hs_bindgen_28c834fc368033f4_base
 
 {-| __C declaration:__ @wl_seat_get_keyboard@
 
@@ -6101,19 +6101,19 @@ wl_seat_get_keyboard ::
      RIP.Ptr Wl_seat
      -- ^ __C declaration:__ @wl_seat@
   -> IO (RIP.Ptr Wl_keyboard)
-wl_seat_get_keyboard = hs_bindgen_e247290689fa6d2d
+wl_seat_get_keyboard = hs_bindgen_28c834fc368033f4
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_seat_get_touch@
-foreign import ccall safe "hs_bindgen_d00b6ce2f7e21cad" hs_bindgen_d00b6ce2f7e21cad_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_seat_get_touch@
+foreign import ccall safe "hs_bindgen_95f0bafa191ef19e" hs_bindgen_95f0bafa191ef19e_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_seat_get_touch@
-hs_bindgen_d00b6ce2f7e21cad ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_seat_get_touch@
+hs_bindgen_95f0bafa191ef19e ::
      RIP.Ptr Wl_seat
   -> IO (RIP.Ptr Wl_touch)
-hs_bindgen_d00b6ce2f7e21cad =
-  RIP.fromFFIType hs_bindgen_d00b6ce2f7e21cad_base
+hs_bindgen_95f0bafa191ef19e =
+  RIP.fromFFIType hs_bindgen_95f0bafa191ef19e_base
 
 {-| __C declaration:__ @wl_seat_get_touch@
 
@@ -6125,19 +6125,19 @@ wl_seat_get_touch ::
      RIP.Ptr Wl_seat
      -- ^ __C declaration:__ @wl_seat@
   -> IO (RIP.Ptr Wl_touch)
-wl_seat_get_touch = hs_bindgen_d00b6ce2f7e21cad
+wl_seat_get_touch = hs_bindgen_95f0bafa191ef19e
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_seat_release@
-foreign import ccall safe "hs_bindgen_b3451dfa9d411051" hs_bindgen_b3451dfa9d411051_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_seat_release@
+foreign import ccall safe "hs_bindgen_30156de81ed42fd0" hs_bindgen_30156de81ed42fd0_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_seat_release@
-hs_bindgen_b3451dfa9d411051 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_seat_release@
+hs_bindgen_30156de81ed42fd0 ::
      RIP.Ptr Wl_seat
   -> IO ()
-hs_bindgen_b3451dfa9d411051 =
-  RIP.fromFFIType hs_bindgen_b3451dfa9d411051_base
+hs_bindgen_30156de81ed42fd0 =
+  RIP.fromFFIType hs_bindgen_30156de81ed42fd0_base
 
 {-| __C declaration:__ @wl_seat_release@
 
@@ -6149,23 +6149,23 @@ wl_seat_release ::
      RIP.Ptr Wl_seat
      -- ^ __C declaration:__ @wl_seat@
   -> IO ()
-wl_seat_release = hs_bindgen_b3451dfa9d411051
+wl_seat_release = hs_bindgen_30156de81ed42fd0
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_pointer_add_listener@
-foreign import ccall safe "hs_bindgen_594f1b233a027c8b" hs_bindgen_594f1b233a027c8b_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_pointer_add_listener@
+foreign import ccall safe "hs_bindgen_27c5d1bcac16cbe8" hs_bindgen_27c5d1bcac16cbe8_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_pointer_add_listener@
-hs_bindgen_594f1b233a027c8b ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_pointer_add_listener@
+hs_bindgen_27c5d1bcac16cbe8 ::
      RIP.Ptr Wl_pointer
   -> PtrConst.PtrConst Wl_pointer_listener
   -> RIP.Ptr RIP.Void
   -> IO RIP.CInt
-hs_bindgen_594f1b233a027c8b =
-  RIP.fromFFIType hs_bindgen_594f1b233a027c8b_base
+hs_bindgen_27c5d1bcac16cbe8 =
+  RIP.fromFFIType hs_bindgen_27c5d1bcac16cbe8_base
 
 {-| __C declaration:__ @wl_pointer_add_listener@
 
@@ -6181,21 +6181,21 @@ wl_pointer_add_listener ::
   -> RIP.Ptr RIP.Void
      -- ^ __C declaration:__ @data@
   -> IO RIP.CInt
-wl_pointer_add_listener = hs_bindgen_594f1b233a027c8b
+wl_pointer_add_listener = hs_bindgen_27c5d1bcac16cbe8
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_pointer_set_user_data@
-foreign import ccall safe "hs_bindgen_8f7a8e7647a408dd" hs_bindgen_8f7a8e7647a408dd_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_pointer_set_user_data@
+foreign import ccall safe "hs_bindgen_be60b9805399b9f5" hs_bindgen_be60b9805399b9f5_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_pointer_set_user_data@
-hs_bindgen_8f7a8e7647a408dd ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_pointer_set_user_data@
+hs_bindgen_be60b9805399b9f5 ::
      RIP.Ptr Wl_pointer
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_8f7a8e7647a408dd =
-  RIP.fromFFIType hs_bindgen_8f7a8e7647a408dd_base
+hs_bindgen_be60b9805399b9f5 =
+  RIP.fromFFIType hs_bindgen_be60b9805399b9f5_base
 
 {-| __C declaration:__ @wl_pointer_set_user_data@
 
@@ -6210,19 +6210,19 @@ wl_pointer_set_user_data ::
      -- ^ __C declaration:__ @user_data@
   -> IO ()
 wl_pointer_set_user_data =
-  hs_bindgen_8f7a8e7647a408dd
+  hs_bindgen_be60b9805399b9f5
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_pointer_get_user_data@
-foreign import ccall safe "hs_bindgen_f421e01e3e8d95a9" hs_bindgen_f421e01e3e8d95a9_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_pointer_get_user_data@
+foreign import ccall safe "hs_bindgen_101e597025255d92" hs_bindgen_101e597025255d92_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_pointer_get_user_data@
-hs_bindgen_f421e01e3e8d95a9 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_pointer_get_user_data@
+hs_bindgen_101e597025255d92 ::
      RIP.Ptr Wl_pointer
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_f421e01e3e8d95a9 =
-  RIP.fromFFIType hs_bindgen_f421e01e3e8d95a9_base
+hs_bindgen_101e597025255d92 =
+  RIP.fromFFIType hs_bindgen_101e597025255d92_base
 
 {-| __C declaration:__ @wl_pointer_get_user_data@
 
@@ -6235,19 +6235,19 @@ wl_pointer_get_user_data ::
      -- ^ __C declaration:__ @wl_pointer@
   -> IO (RIP.Ptr RIP.Void)
 wl_pointer_get_user_data =
-  hs_bindgen_f421e01e3e8d95a9
+  hs_bindgen_101e597025255d92
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_pointer_get_version@
-foreign import ccall safe "hs_bindgen_6613d6229317f3ea" hs_bindgen_6613d6229317f3ea_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_pointer_get_version@
+foreign import ccall safe "hs_bindgen_35ae89b84a420880" hs_bindgen_35ae89b84a420880_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_pointer_get_version@
-hs_bindgen_6613d6229317f3ea ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_pointer_get_version@
+hs_bindgen_35ae89b84a420880 ::
      RIP.Ptr Wl_pointer
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_6613d6229317f3ea =
-  RIP.fromFFIType hs_bindgen_6613d6229317f3ea_base
+hs_bindgen_35ae89b84a420880 =
+  RIP.fromFFIType hs_bindgen_35ae89b84a420880_base
 
 {-| __C declaration:__ @wl_pointer_get_version@
 
@@ -6259,19 +6259,19 @@ wl_pointer_get_version ::
      RIP.Ptr Wl_pointer
      -- ^ __C declaration:__ @wl_pointer@
   -> IO HsBindgen.Runtime.LibC.Word32
-wl_pointer_get_version = hs_bindgen_6613d6229317f3ea
+wl_pointer_get_version = hs_bindgen_35ae89b84a420880
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_pointer_destroy@
-foreign import ccall safe "hs_bindgen_acf8de268c201589" hs_bindgen_acf8de268c201589_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_pointer_destroy@
+foreign import ccall safe "hs_bindgen_9bfd8c27acfb1f04" hs_bindgen_9bfd8c27acfb1f04_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_pointer_destroy@
-hs_bindgen_acf8de268c201589 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_pointer_destroy@
+hs_bindgen_9bfd8c27acfb1f04 ::
      RIP.Ptr Wl_pointer
   -> IO ()
-hs_bindgen_acf8de268c201589 =
-  RIP.fromFFIType hs_bindgen_acf8de268c201589_base
+hs_bindgen_9bfd8c27acfb1f04 =
+  RIP.fromFFIType hs_bindgen_9bfd8c27acfb1f04_base
 
 {-| __C declaration:__ @wl_pointer_destroy@
 
@@ -6283,10 +6283,10 @@ wl_pointer_destroy ::
      RIP.Ptr Wl_pointer
      -- ^ __C declaration:__ @wl_pointer@
   -> IO ()
-wl_pointer_destroy = hs_bindgen_acf8de268c201589
+wl_pointer_destroy = hs_bindgen_9bfd8c27acfb1f04
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_pointer_set_cursor@
-foreign import ccall safe "hs_bindgen_7133668453b731cc" hs_bindgen_7133668453b731cc_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_pointer_set_cursor@
+foreign import ccall safe "hs_bindgen_266266a9e16876d1" hs_bindgen_266266a9e16876d1_base ::
      RIP.Ptr RIP.Void
   -> RIP.Word32
   -> RIP.Ptr RIP.Void
@@ -6294,16 +6294,16 @@ foreign import ccall safe "hs_bindgen_7133668453b731cc" hs_bindgen_7133668453b73
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_pointer_set_cursor@
-hs_bindgen_7133668453b731cc ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_pointer_set_cursor@
+hs_bindgen_266266a9e16876d1 ::
      RIP.Ptr Wl_pointer
   -> HsBindgen.Runtime.LibC.Word32
   -> RIP.Ptr Wl_surface
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Int32
   -> IO ()
-hs_bindgen_7133668453b731cc =
-  RIP.fromFFIType hs_bindgen_7133668453b731cc_base
+hs_bindgen_266266a9e16876d1 =
+  RIP.fromFFIType hs_bindgen_266266a9e16876d1_base
 
 {-| __C declaration:__ @wl_pointer_set_cursor@
 
@@ -6323,19 +6323,19 @@ wl_pointer_set_cursor ::
   -> HsBindgen.Runtime.LibC.Int32
      -- ^ __C declaration:__ @hotspot_y@
   -> IO ()
-wl_pointer_set_cursor = hs_bindgen_7133668453b731cc
+wl_pointer_set_cursor = hs_bindgen_266266a9e16876d1
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_pointer_release@
-foreign import ccall safe "hs_bindgen_585683dab0b07401" hs_bindgen_585683dab0b07401_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_pointer_release@
+foreign import ccall safe "hs_bindgen_b986ff77d2ba320f" hs_bindgen_b986ff77d2ba320f_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_pointer_release@
-hs_bindgen_585683dab0b07401 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_pointer_release@
+hs_bindgen_b986ff77d2ba320f ::
      RIP.Ptr Wl_pointer
   -> IO ()
-hs_bindgen_585683dab0b07401 =
-  RIP.fromFFIType hs_bindgen_585683dab0b07401_base
+hs_bindgen_b986ff77d2ba320f =
+  RIP.fromFFIType hs_bindgen_b986ff77d2ba320f_base
 
 {-| __C declaration:__ @wl_pointer_release@
 
@@ -6347,23 +6347,23 @@ wl_pointer_release ::
      RIP.Ptr Wl_pointer
      -- ^ __C declaration:__ @wl_pointer@
   -> IO ()
-wl_pointer_release = hs_bindgen_585683dab0b07401
+wl_pointer_release = hs_bindgen_b986ff77d2ba320f
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_keyboard_add_listener@
-foreign import ccall safe "hs_bindgen_62f58e11f3712370" hs_bindgen_62f58e11f3712370_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_keyboard_add_listener@
+foreign import ccall safe "hs_bindgen_cfef5fb6570ef667" hs_bindgen_cfef5fb6570ef667_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_keyboard_add_listener@
-hs_bindgen_62f58e11f3712370 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_keyboard_add_listener@
+hs_bindgen_cfef5fb6570ef667 ::
      RIP.Ptr Wl_keyboard
   -> PtrConst.PtrConst Wl_keyboard_listener
   -> RIP.Ptr RIP.Void
   -> IO RIP.CInt
-hs_bindgen_62f58e11f3712370 =
-  RIP.fromFFIType hs_bindgen_62f58e11f3712370_base
+hs_bindgen_cfef5fb6570ef667 =
+  RIP.fromFFIType hs_bindgen_cfef5fb6570ef667_base
 
 {-| __C declaration:__ @wl_keyboard_add_listener@
 
@@ -6380,21 +6380,21 @@ wl_keyboard_add_listener ::
      -- ^ __C declaration:__ @data@
   -> IO RIP.CInt
 wl_keyboard_add_listener =
-  hs_bindgen_62f58e11f3712370
+  hs_bindgen_cfef5fb6570ef667
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_keyboard_set_user_data@
-foreign import ccall safe "hs_bindgen_5d5286a3ed5d6318" hs_bindgen_5d5286a3ed5d6318_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_keyboard_set_user_data@
+foreign import ccall safe "hs_bindgen_67735a481956ae4f" hs_bindgen_67735a481956ae4f_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_keyboard_set_user_data@
-hs_bindgen_5d5286a3ed5d6318 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_keyboard_set_user_data@
+hs_bindgen_67735a481956ae4f ::
      RIP.Ptr Wl_keyboard
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_5d5286a3ed5d6318 =
-  RIP.fromFFIType hs_bindgen_5d5286a3ed5d6318_base
+hs_bindgen_67735a481956ae4f =
+  RIP.fromFFIType hs_bindgen_67735a481956ae4f_base
 
 {-| __C declaration:__ @wl_keyboard_set_user_data@
 
@@ -6409,19 +6409,19 @@ wl_keyboard_set_user_data ::
      -- ^ __C declaration:__ @user_data@
   -> IO ()
 wl_keyboard_set_user_data =
-  hs_bindgen_5d5286a3ed5d6318
+  hs_bindgen_67735a481956ae4f
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_keyboard_get_user_data@
-foreign import ccall safe "hs_bindgen_fc4797b1ce93eba8" hs_bindgen_fc4797b1ce93eba8_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_keyboard_get_user_data@
+foreign import ccall safe "hs_bindgen_dff44b8d3337f026" hs_bindgen_dff44b8d3337f026_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_keyboard_get_user_data@
-hs_bindgen_fc4797b1ce93eba8 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_keyboard_get_user_data@
+hs_bindgen_dff44b8d3337f026 ::
      RIP.Ptr Wl_keyboard
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_fc4797b1ce93eba8 =
-  RIP.fromFFIType hs_bindgen_fc4797b1ce93eba8_base
+hs_bindgen_dff44b8d3337f026 =
+  RIP.fromFFIType hs_bindgen_dff44b8d3337f026_base
 
 {-| __C declaration:__ @wl_keyboard_get_user_data@
 
@@ -6434,19 +6434,19 @@ wl_keyboard_get_user_data ::
      -- ^ __C declaration:__ @wl_keyboard@
   -> IO (RIP.Ptr RIP.Void)
 wl_keyboard_get_user_data =
-  hs_bindgen_fc4797b1ce93eba8
+  hs_bindgen_dff44b8d3337f026
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_keyboard_get_version@
-foreign import ccall safe "hs_bindgen_02a917aa47448a5e" hs_bindgen_02a917aa47448a5e_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_keyboard_get_version@
+foreign import ccall safe "hs_bindgen_f85ba1e4935c0a2d" hs_bindgen_f85ba1e4935c0a2d_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_keyboard_get_version@
-hs_bindgen_02a917aa47448a5e ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_keyboard_get_version@
+hs_bindgen_f85ba1e4935c0a2d ::
      RIP.Ptr Wl_keyboard
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_02a917aa47448a5e =
-  RIP.fromFFIType hs_bindgen_02a917aa47448a5e_base
+hs_bindgen_f85ba1e4935c0a2d =
+  RIP.fromFFIType hs_bindgen_f85ba1e4935c0a2d_base
 
 {-| __C declaration:__ @wl_keyboard_get_version@
 
@@ -6458,19 +6458,19 @@ wl_keyboard_get_version ::
      RIP.Ptr Wl_keyboard
      -- ^ __C declaration:__ @wl_keyboard@
   -> IO HsBindgen.Runtime.LibC.Word32
-wl_keyboard_get_version = hs_bindgen_02a917aa47448a5e
+wl_keyboard_get_version = hs_bindgen_f85ba1e4935c0a2d
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_keyboard_destroy@
-foreign import ccall safe "hs_bindgen_179d3832b06d2227" hs_bindgen_179d3832b06d2227_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_keyboard_destroy@
+foreign import ccall safe "hs_bindgen_4fed16fcba3fdd61" hs_bindgen_4fed16fcba3fdd61_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_keyboard_destroy@
-hs_bindgen_179d3832b06d2227 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_keyboard_destroy@
+hs_bindgen_4fed16fcba3fdd61 ::
      RIP.Ptr Wl_keyboard
   -> IO ()
-hs_bindgen_179d3832b06d2227 =
-  RIP.fromFFIType hs_bindgen_179d3832b06d2227_base
+hs_bindgen_4fed16fcba3fdd61 =
+  RIP.fromFFIType hs_bindgen_4fed16fcba3fdd61_base
 
 {-| __C declaration:__ @wl_keyboard_destroy@
 
@@ -6482,19 +6482,19 @@ wl_keyboard_destroy ::
      RIP.Ptr Wl_keyboard
      -- ^ __C declaration:__ @wl_keyboard@
   -> IO ()
-wl_keyboard_destroy = hs_bindgen_179d3832b06d2227
+wl_keyboard_destroy = hs_bindgen_4fed16fcba3fdd61
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_keyboard_release@
-foreign import ccall safe "hs_bindgen_70e622747762269c" hs_bindgen_70e622747762269c_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_keyboard_release@
+foreign import ccall safe "hs_bindgen_d3c7e2d4f955cbad" hs_bindgen_d3c7e2d4f955cbad_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_keyboard_release@
-hs_bindgen_70e622747762269c ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_keyboard_release@
+hs_bindgen_d3c7e2d4f955cbad ::
      RIP.Ptr Wl_keyboard
   -> IO ()
-hs_bindgen_70e622747762269c =
-  RIP.fromFFIType hs_bindgen_70e622747762269c_base
+hs_bindgen_d3c7e2d4f955cbad =
+  RIP.fromFFIType hs_bindgen_d3c7e2d4f955cbad_base
 
 {-| __C declaration:__ @wl_keyboard_release@
 
@@ -6506,23 +6506,23 @@ wl_keyboard_release ::
      RIP.Ptr Wl_keyboard
      -- ^ __C declaration:__ @wl_keyboard@
   -> IO ()
-wl_keyboard_release = hs_bindgen_70e622747762269c
+wl_keyboard_release = hs_bindgen_d3c7e2d4f955cbad
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_touch_add_listener@
-foreign import ccall safe "hs_bindgen_77cb6a25b6b04995" hs_bindgen_77cb6a25b6b04995_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_touch_add_listener@
+foreign import ccall safe "hs_bindgen_7a19ac2bfb9ec80b" hs_bindgen_7a19ac2bfb9ec80b_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_touch_add_listener@
-hs_bindgen_77cb6a25b6b04995 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_touch_add_listener@
+hs_bindgen_7a19ac2bfb9ec80b ::
      RIP.Ptr Wl_touch
   -> PtrConst.PtrConst Wl_touch_listener
   -> RIP.Ptr RIP.Void
   -> IO RIP.CInt
-hs_bindgen_77cb6a25b6b04995 =
-  RIP.fromFFIType hs_bindgen_77cb6a25b6b04995_base
+hs_bindgen_7a19ac2bfb9ec80b =
+  RIP.fromFFIType hs_bindgen_7a19ac2bfb9ec80b_base
 
 {-| __C declaration:__ @wl_touch_add_listener@
 
@@ -6538,21 +6538,21 @@ wl_touch_add_listener ::
   -> RIP.Ptr RIP.Void
      -- ^ __C declaration:__ @data@
   -> IO RIP.CInt
-wl_touch_add_listener = hs_bindgen_77cb6a25b6b04995
+wl_touch_add_listener = hs_bindgen_7a19ac2bfb9ec80b
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_touch_set_user_data@
-foreign import ccall safe "hs_bindgen_ab718dcf3a6be53a" hs_bindgen_ab718dcf3a6be53a_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_touch_set_user_data@
+foreign import ccall safe "hs_bindgen_32b77d7dfd4d549b" hs_bindgen_32b77d7dfd4d549b_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_touch_set_user_data@
-hs_bindgen_ab718dcf3a6be53a ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_touch_set_user_data@
+hs_bindgen_32b77d7dfd4d549b ::
      RIP.Ptr Wl_touch
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_ab718dcf3a6be53a =
-  RIP.fromFFIType hs_bindgen_ab718dcf3a6be53a_base
+hs_bindgen_32b77d7dfd4d549b =
+  RIP.fromFFIType hs_bindgen_32b77d7dfd4d549b_base
 
 {-| __C declaration:__ @wl_touch_set_user_data@
 
@@ -6566,19 +6566,19 @@ wl_touch_set_user_data ::
   -> RIP.Ptr RIP.Void
      -- ^ __C declaration:__ @user_data@
   -> IO ()
-wl_touch_set_user_data = hs_bindgen_ab718dcf3a6be53a
+wl_touch_set_user_data = hs_bindgen_32b77d7dfd4d549b
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_touch_get_user_data@
-foreign import ccall safe "hs_bindgen_542bd062da0bad43" hs_bindgen_542bd062da0bad43_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_touch_get_user_data@
+foreign import ccall safe "hs_bindgen_862b694e9a2c4879" hs_bindgen_862b694e9a2c4879_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_touch_get_user_data@
-hs_bindgen_542bd062da0bad43 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_touch_get_user_data@
+hs_bindgen_862b694e9a2c4879 ::
      RIP.Ptr Wl_touch
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_542bd062da0bad43 =
-  RIP.fromFFIType hs_bindgen_542bd062da0bad43_base
+hs_bindgen_862b694e9a2c4879 =
+  RIP.fromFFIType hs_bindgen_862b694e9a2c4879_base
 
 {-| __C declaration:__ @wl_touch_get_user_data@
 
@@ -6590,19 +6590,19 @@ wl_touch_get_user_data ::
      RIP.Ptr Wl_touch
      -- ^ __C declaration:__ @wl_touch@
   -> IO (RIP.Ptr RIP.Void)
-wl_touch_get_user_data = hs_bindgen_542bd062da0bad43
+wl_touch_get_user_data = hs_bindgen_862b694e9a2c4879
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_touch_get_version@
-foreign import ccall safe "hs_bindgen_7a6a12134b703c32" hs_bindgen_7a6a12134b703c32_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_touch_get_version@
+foreign import ccall safe "hs_bindgen_21c40fba3499b0fc" hs_bindgen_21c40fba3499b0fc_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_touch_get_version@
-hs_bindgen_7a6a12134b703c32 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_touch_get_version@
+hs_bindgen_21c40fba3499b0fc ::
      RIP.Ptr Wl_touch
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_7a6a12134b703c32 =
-  RIP.fromFFIType hs_bindgen_7a6a12134b703c32_base
+hs_bindgen_21c40fba3499b0fc =
+  RIP.fromFFIType hs_bindgen_21c40fba3499b0fc_base
 
 {-| __C declaration:__ @wl_touch_get_version@
 
@@ -6614,19 +6614,19 @@ wl_touch_get_version ::
      RIP.Ptr Wl_touch
      -- ^ __C declaration:__ @wl_touch@
   -> IO HsBindgen.Runtime.LibC.Word32
-wl_touch_get_version = hs_bindgen_7a6a12134b703c32
+wl_touch_get_version = hs_bindgen_21c40fba3499b0fc
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_touch_destroy@
-foreign import ccall safe "hs_bindgen_580e270b86a3fb07" hs_bindgen_580e270b86a3fb07_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_touch_destroy@
+foreign import ccall safe "hs_bindgen_c6821c316356b5ec" hs_bindgen_c6821c316356b5ec_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_touch_destroy@
-hs_bindgen_580e270b86a3fb07 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_touch_destroy@
+hs_bindgen_c6821c316356b5ec ::
      RIP.Ptr Wl_touch
   -> IO ()
-hs_bindgen_580e270b86a3fb07 =
-  RIP.fromFFIType hs_bindgen_580e270b86a3fb07_base
+hs_bindgen_c6821c316356b5ec =
+  RIP.fromFFIType hs_bindgen_c6821c316356b5ec_base
 
 {-| __C declaration:__ @wl_touch_destroy@
 
@@ -6638,19 +6638,19 @@ wl_touch_destroy ::
      RIP.Ptr Wl_touch
      -- ^ __C declaration:__ @wl_touch@
   -> IO ()
-wl_touch_destroy = hs_bindgen_580e270b86a3fb07
+wl_touch_destroy = hs_bindgen_c6821c316356b5ec
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_touch_release@
-foreign import ccall safe "hs_bindgen_e0e224d796cc81d5" hs_bindgen_e0e224d796cc81d5_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_touch_release@
+foreign import ccall safe "hs_bindgen_4ef4852ccfb18485" hs_bindgen_4ef4852ccfb18485_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_touch_release@
-hs_bindgen_e0e224d796cc81d5 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_touch_release@
+hs_bindgen_4ef4852ccfb18485 ::
      RIP.Ptr Wl_touch
   -> IO ()
-hs_bindgen_e0e224d796cc81d5 =
-  RIP.fromFFIType hs_bindgen_e0e224d796cc81d5_base
+hs_bindgen_4ef4852ccfb18485 =
+  RIP.fromFFIType hs_bindgen_4ef4852ccfb18485_base
 
 {-| __C declaration:__ @wl_touch_release@
 
@@ -6662,23 +6662,23 @@ wl_touch_release ::
      RIP.Ptr Wl_touch
      -- ^ __C declaration:__ @wl_touch@
   -> IO ()
-wl_touch_release = hs_bindgen_e0e224d796cc81d5
+wl_touch_release = hs_bindgen_4ef4852ccfb18485
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_output_add_listener@
-foreign import ccall safe "hs_bindgen_73f035cf11576742" hs_bindgen_73f035cf11576742_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_output_add_listener@
+foreign import ccall safe "hs_bindgen_8a7aa13ea43d96a8" hs_bindgen_8a7aa13ea43d96a8_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO RIP.Int32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_output_add_listener@
-hs_bindgen_73f035cf11576742 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_output_add_listener@
+hs_bindgen_8a7aa13ea43d96a8 ::
      RIP.Ptr Wl_output
   -> PtrConst.PtrConst Wl_output_listener
   -> RIP.Ptr RIP.Void
   -> IO RIP.CInt
-hs_bindgen_73f035cf11576742 =
-  RIP.fromFFIType hs_bindgen_73f035cf11576742_base
+hs_bindgen_8a7aa13ea43d96a8 =
+  RIP.fromFFIType hs_bindgen_8a7aa13ea43d96a8_base
 
 {-| __C declaration:__ @wl_output_add_listener@
 
@@ -6694,21 +6694,21 @@ wl_output_add_listener ::
   -> RIP.Ptr RIP.Void
      -- ^ __C declaration:__ @data@
   -> IO RIP.CInt
-wl_output_add_listener = hs_bindgen_73f035cf11576742
+wl_output_add_listener = hs_bindgen_8a7aa13ea43d96a8
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_output_set_user_data@
-foreign import ccall safe "hs_bindgen_e021d4f42256cbb6" hs_bindgen_e021d4f42256cbb6_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_output_set_user_data@
+foreign import ccall safe "hs_bindgen_de178bcc6e2652d9" hs_bindgen_de178bcc6e2652d9_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_output_set_user_data@
-hs_bindgen_e021d4f42256cbb6 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_output_set_user_data@
+hs_bindgen_de178bcc6e2652d9 ::
      RIP.Ptr Wl_output
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_e021d4f42256cbb6 =
-  RIP.fromFFIType hs_bindgen_e021d4f42256cbb6_base
+hs_bindgen_de178bcc6e2652d9 =
+  RIP.fromFFIType hs_bindgen_de178bcc6e2652d9_base
 
 {-| __C declaration:__ @wl_output_set_user_data@
 
@@ -6722,19 +6722,19 @@ wl_output_set_user_data ::
   -> RIP.Ptr RIP.Void
      -- ^ __C declaration:__ @user_data@
   -> IO ()
-wl_output_set_user_data = hs_bindgen_e021d4f42256cbb6
+wl_output_set_user_data = hs_bindgen_de178bcc6e2652d9
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_output_get_user_data@
-foreign import ccall safe "hs_bindgen_787d77feac2aaf61" hs_bindgen_787d77feac2aaf61_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_output_get_user_data@
+foreign import ccall safe "hs_bindgen_9c94962093ed77b5" hs_bindgen_9c94962093ed77b5_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_output_get_user_data@
-hs_bindgen_787d77feac2aaf61 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_output_get_user_data@
+hs_bindgen_9c94962093ed77b5 ::
      RIP.Ptr Wl_output
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_787d77feac2aaf61 =
-  RIP.fromFFIType hs_bindgen_787d77feac2aaf61_base
+hs_bindgen_9c94962093ed77b5 =
+  RIP.fromFFIType hs_bindgen_9c94962093ed77b5_base
 
 {-| __C declaration:__ @wl_output_get_user_data@
 
@@ -6746,19 +6746,19 @@ wl_output_get_user_data ::
      RIP.Ptr Wl_output
      -- ^ __C declaration:__ @wl_output@
   -> IO (RIP.Ptr RIP.Void)
-wl_output_get_user_data = hs_bindgen_787d77feac2aaf61
+wl_output_get_user_data = hs_bindgen_9c94962093ed77b5
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_output_get_version@
-foreign import ccall safe "hs_bindgen_d01dca2ac608e0ea" hs_bindgen_d01dca2ac608e0ea_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_output_get_version@
+foreign import ccall safe "hs_bindgen_1f90c2cb9b02bf82" hs_bindgen_1f90c2cb9b02bf82_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_output_get_version@
-hs_bindgen_d01dca2ac608e0ea ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_output_get_version@
+hs_bindgen_1f90c2cb9b02bf82 ::
      RIP.Ptr Wl_output
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_d01dca2ac608e0ea =
-  RIP.fromFFIType hs_bindgen_d01dca2ac608e0ea_base
+hs_bindgen_1f90c2cb9b02bf82 =
+  RIP.fromFFIType hs_bindgen_1f90c2cb9b02bf82_base
 
 {-| __C declaration:__ @wl_output_get_version@
 
@@ -6770,19 +6770,19 @@ wl_output_get_version ::
      RIP.Ptr Wl_output
      -- ^ __C declaration:__ @wl_output@
   -> IO HsBindgen.Runtime.LibC.Word32
-wl_output_get_version = hs_bindgen_d01dca2ac608e0ea
+wl_output_get_version = hs_bindgen_1f90c2cb9b02bf82
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_output_destroy@
-foreign import ccall safe "hs_bindgen_041afde8e1eb0da9" hs_bindgen_041afde8e1eb0da9_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_output_destroy@
+foreign import ccall safe "hs_bindgen_fe7e6e34b3432edd" hs_bindgen_fe7e6e34b3432edd_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_output_destroy@
-hs_bindgen_041afde8e1eb0da9 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_output_destroy@
+hs_bindgen_fe7e6e34b3432edd ::
      RIP.Ptr Wl_output
   -> IO ()
-hs_bindgen_041afde8e1eb0da9 =
-  RIP.fromFFIType hs_bindgen_041afde8e1eb0da9_base
+hs_bindgen_fe7e6e34b3432edd =
+  RIP.fromFFIType hs_bindgen_fe7e6e34b3432edd_base
 
 {-| __C declaration:__ @wl_output_destroy@
 
@@ -6794,19 +6794,19 @@ wl_output_destroy ::
      RIP.Ptr Wl_output
      -- ^ __C declaration:__ @wl_output@
   -> IO ()
-wl_output_destroy = hs_bindgen_041afde8e1eb0da9
+wl_output_destroy = hs_bindgen_fe7e6e34b3432edd
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_output_release@
-foreign import ccall safe "hs_bindgen_fe842249c88c98fd" hs_bindgen_fe842249c88c98fd_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_output_release@
+foreign import ccall safe "hs_bindgen_d7d7b32f80272391" hs_bindgen_d7d7b32f80272391_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_output_release@
-hs_bindgen_fe842249c88c98fd ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_output_release@
+hs_bindgen_d7d7b32f80272391 ::
      RIP.Ptr Wl_output
   -> IO ()
-hs_bindgen_fe842249c88c98fd =
-  RIP.fromFFIType hs_bindgen_fe842249c88c98fd_base
+hs_bindgen_d7d7b32f80272391 =
+  RIP.fromFFIType hs_bindgen_d7d7b32f80272391_base
 
 {-| __C declaration:__ @wl_output_release@
 
@@ -6818,21 +6818,21 @@ wl_output_release ::
      RIP.Ptr Wl_output
      -- ^ __C declaration:__ @wl_output@
   -> IO ()
-wl_output_release = hs_bindgen_fe842249c88c98fd
+wl_output_release = hs_bindgen_d7d7b32f80272391
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_region_set_user_data@
-foreign import ccall safe "hs_bindgen_bdaeae23c436cb2b" hs_bindgen_bdaeae23c436cb2b_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_region_set_user_data@
+foreign import ccall safe "hs_bindgen_f895562b9f5af021" hs_bindgen_f895562b9f5af021_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_region_set_user_data@
-hs_bindgen_bdaeae23c436cb2b ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_region_set_user_data@
+hs_bindgen_f895562b9f5af021 ::
      RIP.Ptr Wl_region
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_bdaeae23c436cb2b =
-  RIP.fromFFIType hs_bindgen_bdaeae23c436cb2b_base
+hs_bindgen_f895562b9f5af021 =
+  RIP.fromFFIType hs_bindgen_f895562b9f5af021_base
 
 {-| __C declaration:__ @wl_region_set_user_data@
 
@@ -6846,19 +6846,19 @@ wl_region_set_user_data ::
   -> RIP.Ptr RIP.Void
      -- ^ __C declaration:__ @user_data@
   -> IO ()
-wl_region_set_user_data = hs_bindgen_bdaeae23c436cb2b
+wl_region_set_user_data = hs_bindgen_f895562b9f5af021
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_region_get_user_data@
-foreign import ccall safe "hs_bindgen_f7d71ae40b2dda30" hs_bindgen_f7d71ae40b2dda30_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_region_get_user_data@
+foreign import ccall safe "hs_bindgen_752f2874d1327be2" hs_bindgen_752f2874d1327be2_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_region_get_user_data@
-hs_bindgen_f7d71ae40b2dda30 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_region_get_user_data@
+hs_bindgen_752f2874d1327be2 ::
      RIP.Ptr Wl_region
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_f7d71ae40b2dda30 =
-  RIP.fromFFIType hs_bindgen_f7d71ae40b2dda30_base
+hs_bindgen_752f2874d1327be2 =
+  RIP.fromFFIType hs_bindgen_752f2874d1327be2_base
 
 {-| __C declaration:__ @wl_region_get_user_data@
 
@@ -6870,19 +6870,19 @@ wl_region_get_user_data ::
      RIP.Ptr Wl_region
      -- ^ __C declaration:__ @wl_region@
   -> IO (RIP.Ptr RIP.Void)
-wl_region_get_user_data = hs_bindgen_f7d71ae40b2dda30
+wl_region_get_user_data = hs_bindgen_752f2874d1327be2
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_region_get_version@
-foreign import ccall safe "hs_bindgen_40639ff56454a1e7" hs_bindgen_40639ff56454a1e7_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_region_get_version@
+foreign import ccall safe "hs_bindgen_8c7175f2a966ca3c" hs_bindgen_8c7175f2a966ca3c_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_region_get_version@
-hs_bindgen_40639ff56454a1e7 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_region_get_version@
+hs_bindgen_8c7175f2a966ca3c ::
      RIP.Ptr Wl_region
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_40639ff56454a1e7 =
-  RIP.fromFFIType hs_bindgen_40639ff56454a1e7_base
+hs_bindgen_8c7175f2a966ca3c =
+  RIP.fromFFIType hs_bindgen_8c7175f2a966ca3c_base
 
 {-| __C declaration:__ @wl_region_get_version@
 
@@ -6894,19 +6894,19 @@ wl_region_get_version ::
      RIP.Ptr Wl_region
      -- ^ __C declaration:__ @wl_region@
   -> IO HsBindgen.Runtime.LibC.Word32
-wl_region_get_version = hs_bindgen_40639ff56454a1e7
+wl_region_get_version = hs_bindgen_8c7175f2a966ca3c
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_region_destroy@
-foreign import ccall safe "hs_bindgen_486eb03f44d362ac" hs_bindgen_486eb03f44d362ac_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_region_destroy@
+foreign import ccall safe "hs_bindgen_c73110e755195466" hs_bindgen_c73110e755195466_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_region_destroy@
-hs_bindgen_486eb03f44d362ac ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_region_destroy@
+hs_bindgen_c73110e755195466 ::
      RIP.Ptr Wl_region
   -> IO ()
-hs_bindgen_486eb03f44d362ac =
-  RIP.fromFFIType hs_bindgen_486eb03f44d362ac_base
+hs_bindgen_c73110e755195466 =
+  RIP.fromFFIType hs_bindgen_c73110e755195466_base
 
 {-| __C declaration:__ @wl_region_destroy@
 
@@ -6918,10 +6918,10 @@ wl_region_destroy ::
      RIP.Ptr Wl_region
      -- ^ __C declaration:__ @wl_region@
   -> IO ()
-wl_region_destroy = hs_bindgen_486eb03f44d362ac
+wl_region_destroy = hs_bindgen_c73110e755195466
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_region_add@
-foreign import ccall safe "hs_bindgen_fde387363e9d6750" hs_bindgen_fde387363e9d6750_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_region_add@
+foreign import ccall safe "hs_bindgen_d5f442993582aa68" hs_bindgen_d5f442993582aa68_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
@@ -6929,16 +6929,16 @@ foreign import ccall safe "hs_bindgen_fde387363e9d6750" hs_bindgen_fde387363e9d6
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_region_add@
-hs_bindgen_fde387363e9d6750 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_region_add@
+hs_bindgen_d5f442993582aa68 ::
      RIP.Ptr Wl_region
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Int32
   -> IO ()
-hs_bindgen_fde387363e9d6750 =
-  RIP.fromFFIType hs_bindgen_fde387363e9d6750_base
+hs_bindgen_d5f442993582aa68 =
+  RIP.fromFFIType hs_bindgen_d5f442993582aa68_base
 
 {-| __C declaration:__ @wl_region_add@
 
@@ -6958,10 +6958,10 @@ wl_region_add ::
   -> HsBindgen.Runtime.LibC.Int32
      -- ^ __C declaration:__ @height@
   -> IO ()
-wl_region_add = hs_bindgen_fde387363e9d6750
+wl_region_add = hs_bindgen_d5f442993582aa68
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_region_subtract@
-foreign import ccall safe "hs_bindgen_39e278d8c0c6ecb5" hs_bindgen_39e278d8c0c6ecb5_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_region_subtract@
+foreign import ccall safe "hs_bindgen_afc4395e5115621b" hs_bindgen_afc4395e5115621b_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
@@ -6969,16 +6969,16 @@ foreign import ccall safe "hs_bindgen_39e278d8c0c6ecb5" hs_bindgen_39e278d8c0c6e
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_region_subtract@
-hs_bindgen_39e278d8c0c6ecb5 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_region_subtract@
+hs_bindgen_afc4395e5115621b ::
      RIP.Ptr Wl_region
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Int32
   -> IO ()
-hs_bindgen_39e278d8c0c6ecb5 =
-  RIP.fromFFIType hs_bindgen_39e278d8c0c6ecb5_base
+hs_bindgen_afc4395e5115621b =
+  RIP.fromFFIType hs_bindgen_afc4395e5115621b_base
 
 {-| __C declaration:__ @wl_region_subtract@
 
@@ -6998,21 +6998,21 @@ wl_region_subtract ::
   -> HsBindgen.Runtime.LibC.Int32
      -- ^ __C declaration:__ @height@
   -> IO ()
-wl_region_subtract = hs_bindgen_39e278d8c0c6ecb5
+wl_region_subtract = hs_bindgen_afc4395e5115621b
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subcompositor_set_user_data@
-foreign import ccall safe "hs_bindgen_4b0a19ab9107f836" hs_bindgen_4b0a19ab9107f836_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subcompositor_set_user_data@
+foreign import ccall safe "hs_bindgen_373bf0771aa4ae1a" hs_bindgen_373bf0771aa4ae1a_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subcompositor_set_user_data@
-hs_bindgen_4b0a19ab9107f836 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subcompositor_set_user_data@
+hs_bindgen_373bf0771aa4ae1a ::
      RIP.Ptr Wl_subcompositor
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_4b0a19ab9107f836 =
-  RIP.fromFFIType hs_bindgen_4b0a19ab9107f836_base
+hs_bindgen_373bf0771aa4ae1a =
+  RIP.fromFFIType hs_bindgen_373bf0771aa4ae1a_base
 
 {-| __C declaration:__ @wl_subcompositor_set_user_data@
 
@@ -7027,19 +7027,19 @@ wl_subcompositor_set_user_data ::
      -- ^ __C declaration:__ @user_data@
   -> IO ()
 wl_subcompositor_set_user_data =
-  hs_bindgen_4b0a19ab9107f836
+  hs_bindgen_373bf0771aa4ae1a
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subcompositor_get_user_data@
-foreign import ccall safe "hs_bindgen_b2fc646a1b90bca5" hs_bindgen_b2fc646a1b90bca5_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subcompositor_get_user_data@
+foreign import ccall safe "hs_bindgen_8e614bdc6f1bcfe3" hs_bindgen_8e614bdc6f1bcfe3_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subcompositor_get_user_data@
-hs_bindgen_b2fc646a1b90bca5 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subcompositor_get_user_data@
+hs_bindgen_8e614bdc6f1bcfe3 ::
      RIP.Ptr Wl_subcompositor
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_b2fc646a1b90bca5 =
-  RIP.fromFFIType hs_bindgen_b2fc646a1b90bca5_base
+hs_bindgen_8e614bdc6f1bcfe3 =
+  RIP.fromFFIType hs_bindgen_8e614bdc6f1bcfe3_base
 
 {-| __C declaration:__ @wl_subcompositor_get_user_data@
 
@@ -7052,19 +7052,19 @@ wl_subcompositor_get_user_data ::
      -- ^ __C declaration:__ @wl_subcompositor@
   -> IO (RIP.Ptr RIP.Void)
 wl_subcompositor_get_user_data =
-  hs_bindgen_b2fc646a1b90bca5
+  hs_bindgen_8e614bdc6f1bcfe3
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subcompositor_get_version@
-foreign import ccall safe "hs_bindgen_5db42aa79d4ad119" hs_bindgen_5db42aa79d4ad119_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subcompositor_get_version@
+foreign import ccall safe "hs_bindgen_302de69bc97141cf" hs_bindgen_302de69bc97141cf_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subcompositor_get_version@
-hs_bindgen_5db42aa79d4ad119 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subcompositor_get_version@
+hs_bindgen_302de69bc97141cf ::
      RIP.Ptr Wl_subcompositor
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_5db42aa79d4ad119 =
-  RIP.fromFFIType hs_bindgen_5db42aa79d4ad119_base
+hs_bindgen_302de69bc97141cf =
+  RIP.fromFFIType hs_bindgen_302de69bc97141cf_base
 
 {-| __C declaration:__ @wl_subcompositor_get_version@
 
@@ -7077,19 +7077,19 @@ wl_subcompositor_get_version ::
      -- ^ __C declaration:__ @wl_subcompositor@
   -> IO HsBindgen.Runtime.LibC.Word32
 wl_subcompositor_get_version =
-  hs_bindgen_5db42aa79d4ad119
+  hs_bindgen_302de69bc97141cf
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subcompositor_destroy@
-foreign import ccall safe "hs_bindgen_0d72467af65a33a9" hs_bindgen_0d72467af65a33a9_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subcompositor_destroy@
+foreign import ccall safe "hs_bindgen_94df15227120bccf" hs_bindgen_94df15227120bccf_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subcompositor_destroy@
-hs_bindgen_0d72467af65a33a9 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subcompositor_destroy@
+hs_bindgen_94df15227120bccf ::
      RIP.Ptr Wl_subcompositor
   -> IO ()
-hs_bindgen_0d72467af65a33a9 =
-  RIP.fromFFIType hs_bindgen_0d72467af65a33a9_base
+hs_bindgen_94df15227120bccf =
+  RIP.fromFFIType hs_bindgen_94df15227120bccf_base
 
 {-| __C declaration:__ @wl_subcompositor_destroy@
 
@@ -7102,23 +7102,23 @@ wl_subcompositor_destroy ::
      -- ^ __C declaration:__ @wl_subcompositor@
   -> IO ()
 wl_subcompositor_destroy =
-  hs_bindgen_0d72467af65a33a9
+  hs_bindgen_94df15227120bccf
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subcompositor_get_subsurface@
-foreign import ccall safe "hs_bindgen_b7f245376e840582" hs_bindgen_b7f245376e840582_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subcompositor_get_subsurface@
+foreign import ccall safe "hs_bindgen_e824da3ffd609848" hs_bindgen_e824da3ffd609848_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subcompositor_get_subsurface@
-hs_bindgen_b7f245376e840582 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subcompositor_get_subsurface@
+hs_bindgen_e824da3ffd609848 ::
      RIP.Ptr Wl_subcompositor
   -> RIP.Ptr Wl_surface
   -> RIP.Ptr Wl_surface
   -> IO (RIP.Ptr Wl_subsurface)
-hs_bindgen_b7f245376e840582 =
-  RIP.fromFFIType hs_bindgen_b7f245376e840582_base
+hs_bindgen_e824da3ffd609848 =
+  RIP.fromFFIType hs_bindgen_e824da3ffd609848_base
 
 {-| __C declaration:__ @wl_subcompositor_get_subsurface@
 
@@ -7135,21 +7135,21 @@ wl_subcompositor_get_subsurface ::
      -- ^ __C declaration:__ @parent@
   -> IO (RIP.Ptr Wl_subsurface)
 wl_subcompositor_get_subsurface =
-  hs_bindgen_b7f245376e840582
+  hs_bindgen_e824da3ffd609848
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_set_user_data@
-foreign import ccall safe "hs_bindgen_764b7062a3535be8" hs_bindgen_764b7062a3535be8_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_set_user_data@
+foreign import ccall safe "hs_bindgen_f4d820543fccf5ee" hs_bindgen_f4d820543fccf5ee_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_set_user_data@
-hs_bindgen_764b7062a3535be8 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_set_user_data@
+hs_bindgen_f4d820543fccf5ee ::
      RIP.Ptr Wl_subsurface
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_764b7062a3535be8 =
-  RIP.fromFFIType hs_bindgen_764b7062a3535be8_base
+hs_bindgen_f4d820543fccf5ee =
+  RIP.fromFFIType hs_bindgen_f4d820543fccf5ee_base
 
 {-| __C declaration:__ @wl_subsurface_set_user_data@
 
@@ -7164,19 +7164,19 @@ wl_subsurface_set_user_data ::
      -- ^ __C declaration:__ @user_data@
   -> IO ()
 wl_subsurface_set_user_data =
-  hs_bindgen_764b7062a3535be8
+  hs_bindgen_f4d820543fccf5ee
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_get_user_data@
-foreign import ccall safe "hs_bindgen_f241379e3c8b9f02" hs_bindgen_f241379e3c8b9f02_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_get_user_data@
+foreign import ccall safe "hs_bindgen_a940d815e7c319cc" hs_bindgen_a940d815e7c319cc_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_get_user_data@
-hs_bindgen_f241379e3c8b9f02 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_get_user_data@
+hs_bindgen_a940d815e7c319cc ::
      RIP.Ptr Wl_subsurface
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_f241379e3c8b9f02 =
-  RIP.fromFFIType hs_bindgen_f241379e3c8b9f02_base
+hs_bindgen_a940d815e7c319cc =
+  RIP.fromFFIType hs_bindgen_a940d815e7c319cc_base
 
 {-| __C declaration:__ @wl_subsurface_get_user_data@
 
@@ -7189,19 +7189,19 @@ wl_subsurface_get_user_data ::
      -- ^ __C declaration:__ @wl_subsurface@
   -> IO (RIP.Ptr RIP.Void)
 wl_subsurface_get_user_data =
-  hs_bindgen_f241379e3c8b9f02
+  hs_bindgen_a940d815e7c319cc
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_get_version@
-foreign import ccall safe "hs_bindgen_28df81db98d48446" hs_bindgen_28df81db98d48446_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_get_version@
+foreign import ccall safe "hs_bindgen_f960cabde48332cd" hs_bindgen_f960cabde48332cd_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_get_version@
-hs_bindgen_28df81db98d48446 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_get_version@
+hs_bindgen_f960cabde48332cd ::
      RIP.Ptr Wl_subsurface
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_28df81db98d48446 =
-  RIP.fromFFIType hs_bindgen_28df81db98d48446_base
+hs_bindgen_f960cabde48332cd =
+  RIP.fromFFIType hs_bindgen_f960cabde48332cd_base
 
 {-| __C declaration:__ @wl_subsurface_get_version@
 
@@ -7214,19 +7214,19 @@ wl_subsurface_get_version ::
      -- ^ __C declaration:__ @wl_subsurface@
   -> IO HsBindgen.Runtime.LibC.Word32
 wl_subsurface_get_version =
-  hs_bindgen_28df81db98d48446
+  hs_bindgen_f960cabde48332cd
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_destroy@
-foreign import ccall safe "hs_bindgen_af686a13ccd7fb4f" hs_bindgen_af686a13ccd7fb4f_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_destroy@
+foreign import ccall safe "hs_bindgen_f4d019fd43b5c322" hs_bindgen_f4d019fd43b5c322_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_destroy@
-hs_bindgen_af686a13ccd7fb4f ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_destroy@
+hs_bindgen_f4d019fd43b5c322 ::
      RIP.Ptr Wl_subsurface
   -> IO ()
-hs_bindgen_af686a13ccd7fb4f =
-  RIP.fromFFIType hs_bindgen_af686a13ccd7fb4f_base
+hs_bindgen_f4d019fd43b5c322 =
+  RIP.fromFFIType hs_bindgen_f4d019fd43b5c322_base
 
 {-| __C declaration:__ @wl_subsurface_destroy@
 
@@ -7238,23 +7238,23 @@ wl_subsurface_destroy ::
      RIP.Ptr Wl_subsurface
      -- ^ __C declaration:__ @wl_subsurface@
   -> IO ()
-wl_subsurface_destroy = hs_bindgen_af686a13ccd7fb4f
+wl_subsurface_destroy = hs_bindgen_f4d019fd43b5c322
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_set_position@
-foreign import ccall safe "hs_bindgen_3564871cb45445d6" hs_bindgen_3564871cb45445d6_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_set_position@
+foreign import ccall safe "hs_bindgen_9e2d5b9e7d3e6fd9" hs_bindgen_9e2d5b9e7d3e6fd9_base ::
      RIP.Ptr RIP.Void
   -> RIP.Int32
   -> RIP.Int32
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_set_position@
-hs_bindgen_3564871cb45445d6 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_set_position@
+hs_bindgen_9e2d5b9e7d3e6fd9 ::
      RIP.Ptr Wl_subsurface
   -> HsBindgen.Runtime.LibC.Int32
   -> HsBindgen.Runtime.LibC.Int32
   -> IO ()
-hs_bindgen_3564871cb45445d6 =
-  RIP.fromFFIType hs_bindgen_3564871cb45445d6_base
+hs_bindgen_9e2d5b9e7d3e6fd9 =
+  RIP.fromFFIType hs_bindgen_9e2d5b9e7d3e6fd9_base
 
 {-| __C declaration:__ @wl_subsurface_set_position@
 
@@ -7271,21 +7271,21 @@ wl_subsurface_set_position ::
      -- ^ __C declaration:__ @y@
   -> IO ()
 wl_subsurface_set_position =
-  hs_bindgen_3564871cb45445d6
+  hs_bindgen_9e2d5b9e7d3e6fd9
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_place_above@
-foreign import ccall safe "hs_bindgen_9ad02e881e03fe7e" hs_bindgen_9ad02e881e03fe7e_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_place_above@
+foreign import ccall safe "hs_bindgen_7ca593576526e1ea" hs_bindgen_7ca593576526e1ea_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_place_above@
-hs_bindgen_9ad02e881e03fe7e ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_place_above@
+hs_bindgen_7ca593576526e1ea ::
      RIP.Ptr Wl_subsurface
   -> RIP.Ptr Wl_surface
   -> IO ()
-hs_bindgen_9ad02e881e03fe7e =
-  RIP.fromFFIType hs_bindgen_9ad02e881e03fe7e_base
+hs_bindgen_7ca593576526e1ea =
+  RIP.fromFFIType hs_bindgen_7ca593576526e1ea_base
 
 {-| __C declaration:__ @wl_subsurface_place_above@
 
@@ -7300,21 +7300,21 @@ wl_subsurface_place_above ::
      -- ^ __C declaration:__ @sibling@
   -> IO ()
 wl_subsurface_place_above =
-  hs_bindgen_9ad02e881e03fe7e
+  hs_bindgen_7ca593576526e1ea
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_place_below@
-foreign import ccall safe "hs_bindgen_1246e6c9c9bf3418" hs_bindgen_1246e6c9c9bf3418_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_place_below@
+foreign import ccall safe "hs_bindgen_5aa0b922d2108b9c" hs_bindgen_5aa0b922d2108b9c_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_place_below@
-hs_bindgen_1246e6c9c9bf3418 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_place_below@
+hs_bindgen_5aa0b922d2108b9c ::
      RIP.Ptr Wl_subsurface
   -> RIP.Ptr Wl_surface
   -> IO ()
-hs_bindgen_1246e6c9c9bf3418 =
-  RIP.fromFFIType hs_bindgen_1246e6c9c9bf3418_base
+hs_bindgen_5aa0b922d2108b9c =
+  RIP.fromFFIType hs_bindgen_5aa0b922d2108b9c_base
 
 {-| __C declaration:__ @wl_subsurface_place_below@
 
@@ -7329,19 +7329,19 @@ wl_subsurface_place_below ::
      -- ^ __C declaration:__ @sibling@
   -> IO ()
 wl_subsurface_place_below =
-  hs_bindgen_1246e6c9c9bf3418
+  hs_bindgen_5aa0b922d2108b9c
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_set_sync@
-foreign import ccall safe "hs_bindgen_8d6eb88781020f2c" hs_bindgen_8d6eb88781020f2c_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_set_sync@
+foreign import ccall safe "hs_bindgen_b50a1cfd29df4785" hs_bindgen_b50a1cfd29df4785_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_set_sync@
-hs_bindgen_8d6eb88781020f2c ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_set_sync@
+hs_bindgen_b50a1cfd29df4785 ::
      RIP.Ptr Wl_subsurface
   -> IO ()
-hs_bindgen_8d6eb88781020f2c =
-  RIP.fromFFIType hs_bindgen_8d6eb88781020f2c_base
+hs_bindgen_b50a1cfd29df4785 =
+  RIP.fromFFIType hs_bindgen_b50a1cfd29df4785_base
 
 {-| __C declaration:__ @wl_subsurface_set_sync@
 
@@ -7353,19 +7353,19 @@ wl_subsurface_set_sync ::
      RIP.Ptr Wl_subsurface
      -- ^ __C declaration:__ @wl_subsurface@
   -> IO ()
-wl_subsurface_set_sync = hs_bindgen_8d6eb88781020f2c
+wl_subsurface_set_sync = hs_bindgen_b50a1cfd29df4785
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_set_desync@
-foreign import ccall safe "hs_bindgen_67d9f17f7bd5a4d2" hs_bindgen_67d9f17f7bd5a4d2_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_set_desync@
+foreign import ccall safe "hs_bindgen_26cc4b39caf76692" hs_bindgen_26cc4b39caf76692_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_set_desync@
-hs_bindgen_67d9f17f7bd5a4d2 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_subsurface_set_desync@
+hs_bindgen_26cc4b39caf76692 ::
      RIP.Ptr Wl_subsurface
   -> IO ()
-hs_bindgen_67d9f17f7bd5a4d2 =
-  RIP.fromFFIType hs_bindgen_67d9f17f7bd5a4d2_base
+hs_bindgen_26cc4b39caf76692 =
+  RIP.fromFFIType hs_bindgen_26cc4b39caf76692_base
 
 {-| __C declaration:__ @wl_subsurface_set_desync@
 
@@ -7378,21 +7378,21 @@ wl_subsurface_set_desync ::
      -- ^ __C declaration:__ @wl_subsurface@
   -> IO ()
 wl_subsurface_set_desync =
-  hs_bindgen_67d9f17f7bd5a4d2
+  hs_bindgen_26cc4b39caf76692
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_fixes_set_user_data@
-foreign import ccall safe "hs_bindgen_5b3a62b9834e9038" hs_bindgen_5b3a62b9834e9038_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_fixes_set_user_data@
+foreign import ccall safe "hs_bindgen_ba5d7d7b9f317540" hs_bindgen_ba5d7d7b9f317540_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_fixes_set_user_data@
-hs_bindgen_5b3a62b9834e9038 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_fixes_set_user_data@
+hs_bindgen_ba5d7d7b9f317540 ::
      RIP.Ptr Wl_fixes
   -> RIP.Ptr RIP.Void
   -> IO ()
-hs_bindgen_5b3a62b9834e9038 =
-  RIP.fromFFIType hs_bindgen_5b3a62b9834e9038_base
+hs_bindgen_ba5d7d7b9f317540 =
+  RIP.fromFFIType hs_bindgen_ba5d7d7b9f317540_base
 
 {-| __C declaration:__ @wl_fixes_set_user_data@
 
@@ -7406,19 +7406,19 @@ wl_fixes_set_user_data ::
   -> RIP.Ptr RIP.Void
      -- ^ __C declaration:__ @user_data@
   -> IO ()
-wl_fixes_set_user_data = hs_bindgen_5b3a62b9834e9038
+wl_fixes_set_user_data = hs_bindgen_ba5d7d7b9f317540
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_fixes_get_user_data@
-foreign import ccall safe "hs_bindgen_37c64b4ea2946ea1" hs_bindgen_37c64b4ea2946ea1_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_fixes_get_user_data@
+foreign import ccall safe "hs_bindgen_d23ce2c867804f66" hs_bindgen_d23ce2c867804f66_base ::
      RIP.Ptr RIP.Void
   -> IO (RIP.Ptr RIP.Void)
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_fixes_get_user_data@
-hs_bindgen_37c64b4ea2946ea1 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_fixes_get_user_data@
+hs_bindgen_d23ce2c867804f66 ::
      RIP.Ptr Wl_fixes
   -> IO (RIP.Ptr RIP.Void)
-hs_bindgen_37c64b4ea2946ea1 =
-  RIP.fromFFIType hs_bindgen_37c64b4ea2946ea1_base
+hs_bindgen_d23ce2c867804f66 =
+  RIP.fromFFIType hs_bindgen_d23ce2c867804f66_base
 
 {-| __C declaration:__ @wl_fixes_get_user_data@
 
@@ -7430,19 +7430,19 @@ wl_fixes_get_user_data ::
      RIP.Ptr Wl_fixes
      -- ^ __C declaration:__ @wl_fixes@
   -> IO (RIP.Ptr RIP.Void)
-wl_fixes_get_user_data = hs_bindgen_37c64b4ea2946ea1
+wl_fixes_get_user_data = hs_bindgen_d23ce2c867804f66
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_fixes_get_version@
-foreign import ccall safe "hs_bindgen_3fd907c72a6c22bd" hs_bindgen_3fd907c72a6c22bd_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_fixes_get_version@
+foreign import ccall safe "hs_bindgen_7a684fc4d5086015" hs_bindgen_7a684fc4d5086015_base ::
      RIP.Ptr RIP.Void
   -> IO RIP.Word32
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_fixes_get_version@
-hs_bindgen_3fd907c72a6c22bd ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_fixes_get_version@
+hs_bindgen_7a684fc4d5086015 ::
      RIP.Ptr Wl_fixes
   -> IO HsBindgen.Runtime.LibC.Word32
-hs_bindgen_3fd907c72a6c22bd =
-  RIP.fromFFIType hs_bindgen_3fd907c72a6c22bd_base
+hs_bindgen_7a684fc4d5086015 =
+  RIP.fromFFIType hs_bindgen_7a684fc4d5086015_base
 
 {-| __C declaration:__ @wl_fixes_get_version@
 
@@ -7454,19 +7454,19 @@ wl_fixes_get_version ::
      RIP.Ptr Wl_fixes
      -- ^ __C declaration:__ @wl_fixes@
   -> IO HsBindgen.Runtime.LibC.Word32
-wl_fixes_get_version = hs_bindgen_3fd907c72a6c22bd
+wl_fixes_get_version = hs_bindgen_7a684fc4d5086015
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_fixes_destroy@
-foreign import ccall safe "hs_bindgen_81addaac0e4cc879" hs_bindgen_81addaac0e4cc879_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_fixes_destroy@
+foreign import ccall safe "hs_bindgen_112e1a25004793b5" hs_bindgen_112e1a25004793b5_base ::
      RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_fixes_destroy@
-hs_bindgen_81addaac0e4cc879 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_fixes_destroy@
+hs_bindgen_112e1a25004793b5 ::
      RIP.Ptr Wl_fixes
   -> IO ()
-hs_bindgen_81addaac0e4cc879 =
-  RIP.fromFFIType hs_bindgen_81addaac0e4cc879_base
+hs_bindgen_112e1a25004793b5 =
+  RIP.fromFFIType hs_bindgen_112e1a25004793b5_base
 
 {-| __C declaration:__ @wl_fixes_destroy@
 
@@ -7478,21 +7478,21 @@ wl_fixes_destroy ::
      RIP.Ptr Wl_fixes
      -- ^ __C declaration:__ @wl_fixes@
   -> IO ()
-wl_fixes_destroy = hs_bindgen_81addaac0e4cc879
+wl_fixes_destroy = hs_bindgen_112e1a25004793b5
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_fixes_destroy_registry@
-foreign import ccall safe "hs_bindgen_9472505275067d51" hs_bindgen_9472505275067d51_base ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_fixes_destroy_registry@
+foreign import ccall safe "hs_bindgen_30bdd2202a993527" hs_bindgen_30bdd2202a993527_base ::
      RIP.Ptr RIP.Void
   -> RIP.Ptr RIP.Void
   -> IO ()
 
--- __unique:__ @hswm_wl_client_Bindings.Wayland.Client.Generated_Safe_wl_fixes_destroy_registry@
-hs_bindgen_9472505275067d51 ::
+-- __unique:__ @Bindings_Wayland_Client_Generated_Bindings.Wayland.Client.Generated_Safe_wl_fixes_destroy_registry@
+hs_bindgen_30bdd2202a993527 ::
      RIP.Ptr Wl_fixes
   -> RIP.Ptr Wl_registry
   -> IO ()
-hs_bindgen_9472505275067d51 =
-  RIP.fromFFIType hs_bindgen_9472505275067d51_base
+hs_bindgen_30bdd2202a993527 =
+  RIP.fromFFIType hs_bindgen_30bdd2202a993527_base
 
 {-| __C declaration:__ @wl_fixes_destroy_registry@
 
@@ -7507,4 +7507,4 @@ wl_fixes_destroy_registry ::
      -- ^ __C declaration:__ @registry@
   -> IO ()
 wl_fixes_destroy_registry =
-  hs_bindgen_9472505275067d51
+  hs_bindgen_30bdd2202a993527

@@ -19,7 +19,7 @@ import Data.Aeson qualified as A
 import Data.Map qualified as M
 import Data.Monoid (Ap (..))
 import Data.Typeable
-import Foreign
+import Foreign hiding (void)
 import Foreign.C
 import HSWM.StackSet as W
 import HSWM.Types.Events
@@ -380,8 +380,6 @@ instance Default (H ()) where def = return ()
 
 instance Default (HS ()) where def = return ()
 
-instance IsAction H (H ()) where runner = id
-
 instance MonadFix H where
   mfix :: (a -> H a) -> H a
   mfix f = H (mfix g) where g a = let H a' = f a in a'
@@ -500,8 +498,6 @@ data SeatAction
     S_INPUT_OVERRIDE (HS Bool) [((ModMask, KeySym), SomeAction H)]
   | -- | Cancel input override mode
     S_INPUT_OVERRIDE_CANCEL
-  | -- | A key bind autorepeat is in progress.
-    S_KEYBIND_REPEAT R.RiverXkbBinding (Async ())
   deriving (Show, Generic)
 
 data SeatOp
@@ -600,6 +596,9 @@ class (Monad m, MonadIO m) => IsAction m a where
 
 instance (MonadIO m) => IsAction m (IO ()) where
   runner = liftIO
+
+instance Typeable a => IsAction H (H a) where
+  runner = void
 
 instance (MonadIO m) => IsAction m (SomeAction m) where
   runner (SomeAction a) = runner a

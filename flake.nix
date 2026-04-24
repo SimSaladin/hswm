@@ -30,9 +30,10 @@
 
     perSystem = { system, lib, config, pkgs, ... }@perSys:
     let
-      haskellProjectBase = { config, ... }: {
-        imports = [ perSys.config.haskellProjects.ghc912.defaults.projectModules.output ];
-        basePackages = perSys.config.haskellProjects.ghc912.outputs.finalPackages;
+      haskellProjectBase = haskellProjectBaseWith "ghc912";
+      haskellProjectBaseWith = ghcVersion: { config, ... }: {
+        imports = [ perSys.config.haskellProjects.${ghcVersion}.defaults.projectModules.output ];
+        basePackages = perSys.config.haskellProjects.${ghcVersion}.outputs.finalPackages;
         defaults.settings.defined.haddock = true;
         #defaults.projectModules.output = { inherit (config) packages settings ; };
         autoWire = [ "devShells" ]; # "packages" "apps" ];
@@ -78,6 +79,24 @@
         autoWire = [];
       };
 
+      haskellProjects.ghc912-reloc = {
+        defaults.enable = false;
+        defaults.settings.defined.haddock = false;
+        defaults.settings.defined.extraConfigureFlags = [ "--ghc-options=-fPIC" ];
+        basePackages = (pkgs.haskell.packages.ghc912.override (oHP: {
+          ghc = oHP.ghc.override {
+            enableRelocatedStaticLibs = true;
+          };
+          buildHaskellPackages = oHP.buildHaskellPackages.override (oBHP: {
+           ghc = oBHP.ghc.override {
+            enableRelocatedStaticLibs = true;
+           };
+         });
+        })).extend (self: super: lib.mapAttrs (_: pkg: if pkg ? getCabalDeps then pkgs.haskell.lib.compose.appendBuildFlag "--ghc-options=-fPIC" pkg else pkg) super);
+        settings.monad-logger-aeson.check = false; # Tests broken
+        autoWire = [];
+      };
+
       haskellProjects.ghc914 = {
         defaults.enable = false;
         basePackages = pkgs.haskell.packages.ghc914;
@@ -100,6 +119,60 @@
             #(root + /cabal.project)
           ];
         });
+        packages = {
+          hswm.source = projectRoot + "/hswm";
+          hswm-bindings.source = projectRoot + "/hswm-bindings";
+          xkbcommon-bindings.source = projectRoot + "/xkbcommon-bindings";
+          waybar-cffi-hs.source = projectRoot + "/waybar-cffi-hs";
+        };
+        autoWire = lib.mkForce [ "devShells" "packages" "apps" "checks" ];
+      };
+      haskellProjects.default-ghc914 = rec {
+        imports = [ (haskellProjectBaseWith "ghc914") ];
+        # To avoid unnecessary rebuilds, we filter projectRoot:
+        # https://community.flake.parts/haskell-flake/local#rebuild
+        projectRoot = builtins.toString (lib.fileset.toSource rec {
+          root = ./.;
+          fileset = lib.fileset.unions [
+            #(root + /LICENSE)
+            (root + /README.md)
+            (root + /hswm)
+            (root + /hswm-bindings)
+            (root + /xkbcommon-bindings)
+            (root + /waybar-cffi-hs)
+            #(root + /cabal.project)
+          ];
+        });
+        packages = {
+          hswm.source = projectRoot + "/hswm";
+          hswm-bindings.source = projectRoot + "/hswm-bindings";
+          xkbcommon-bindings.source = projectRoot + "/xkbcommon-bindings";
+          waybar-cffi-hs.source = projectRoot + "/waybar-cffi-hs";
+        };
+        autoWire = lib.mkForce [ "devShells" "packages" "apps" "checks" ];
+      };
+
+
+      haskellProjects.reloc = rec {
+        imports = [ (haskellProjectBaseWith "ghc912-reloc") ];
+        # To avoid unnecessary rebuilds, we filter projectRoot:
+        # https://community.flake.parts/haskell-flake/local#rebuild
+        defaults.settings.defined.haddock = lib.mkForce false;
+        defaults.settings.all.extraConfigureFlags = [ "--ghc-options=-fPIC" ];
+        settings.random.extraConfigureFlags = [ "--ghc-options=-fPIC" ];
+        projectRoot = builtins.toString (lib.fileset.toSource rec {
+          root = ./.;
+          fileset = lib.fileset.unions [
+            #(root + /LICENSE)
+            (root + /README.md)
+            (root + /hswm)
+            (root + /hswm-bindings)
+            (root + /xkbcommon-bindings)
+            (root + /waybar-cffi-hs)
+            #(root + /cabal.project)
+          ];
+        });
+        settings.waybar-cffi-hs.cabalFlags.static = true;
         packages = {
           hswm.source = projectRoot + "/hswm";
           hswm-bindings.source = projectRoot + "/hswm-bindings";
@@ -139,6 +212,8 @@
       packages = {
         # Export our overridden river for convenience.
         inherit (pkgs) river;
+
+        riverDebug = pkgs.river.override { withDebug = true; };
       };
     };
   };

@@ -8,4 +8,4 @@ import Bindings.Wayland.FractionalScaleV1.Generated.Safe
 
 import Bindings.Wayland.Client
 
-clientFromProtocolXML commonSettings "fractional-scale-v1.xml"
+clientFromProtocolXML commonSettings "wayland-protocols/fractional-scale-v1.xml"

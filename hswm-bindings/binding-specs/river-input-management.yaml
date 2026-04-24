@@ -4,9 +4,9 @@ version:
 hsmodule: Bindings.River.InputManagementV1.Generated
 ctypes:
 - headers:
+  - river-input-management-v1-client-protocol.h
   - river-libinput-config-v1-client-protocol.h
   - river-xkb-config-v1-client-protocol.h
-  - river-input-management-v1-client-protocol.h
   cname: struct river_input_device_v1
   hsname: River_input_device_v1
 hstypes:

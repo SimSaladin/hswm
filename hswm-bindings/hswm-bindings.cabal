@@ -1,4 +1,4 @@
-cabal-version: 3.4
+cabal-version: 3.8
 
 -- This file has been generated from package.yaml by hpack version 0.38.3.
 --
@@ -10,11 +10,9 @@ license:            MIT
 license-file:       LICENSE
 author:             Samuli Thomasson
 maintainer:         samuli.thomasson@pm.me
-build-type:         Simple
+build-type:         Custom
 extra-source-files:
-      protocol/ext-idle-notify-v1.xml
-      protocol/ext-session-lock-v1.xml
-      protocol/fractional-scale-v1.xml
+      Makefile
       protocol/input-method-unstable-v2.xml
       protocol/river-input-management-v1.xml
       protocol/river-layer-shell-v1.xml
@@ -23,44 +21,30 @@ extra-source-files:
       protocol/river-window-management-v1.xml
       protocol/river-xkb-bindings-v1.xml
       protocol/river-xkb-config-v1.xml
-      protocol/viewporter.xml
       protocol/wayland.xml
       protocol/wlr-layer-shell-unstable-v1.xml
       protocol/wlr-output-management-unstable-v1.xml
       protocol/wlr-output-power-management-unstable-v1.xml
-      protocol/xdg-output-unstable-v1.xml
-      cbits/ext-idle-notify-v1-protocol.c
-      cbits/ext-session-lock-v1-protocol.c
-      cbits/fractional-scale-v1-protocol.c
       cbits/input-method-unstable-v2-protocol.c
       cbits/river-input-management-v1-protocol.c
       cbits/river-layer-shell-v1-protocol.c
       cbits/river-libinput-config-v1-protocol.c
-      cbits/river-status-unstable-v1-protocol.c
       cbits/river-window-management-v1-protocol.c
       cbits/river-xkb-bindings-v1-protocol.c
       cbits/river-xkb-config-v1-protocol.c
-      cbits/viewporter-protocol.c
       cbits/wlr-layer-shell-unstable-v1-protocol.c
       cbits/wlr-output-management-unstable-v1-protocol.c
       cbits/wlr-output-power-management-unstable-v1-protocol.c
-      cbits/xdg-output-unstable-v1-protocol.c
-      include/ext-idle-notify-v1-client-protocol.h
-      include/ext-session-lock-v1-client-protocol.h
-      include/fractional-scale-v1-client-protocol.h
       include/input-method-unstable-v2-client-protocol.h
       include/river-input-management-v1-client-protocol.h
       include/river-layer-shell-v1-client-protocol.h
       include/river-libinput-config-v1-client-protocol.h
-      include/river-status-unstable-v1-server-protocol.h
       include/river-window-management-v1-client-protocol.h
       include/river-xkb-bindings-v1-client-protocol.h
       include/river-xkb-config-v1-client-protocol.h
-      include/viewporter-client-protocol.h
       include/wlr-layer-shell-unstable-v1-client-protocol.h
       include/wlr-output-management-unstable-v1-client-protocol.h
       include/wlr-output-power-management-unstable-v1-client-protocol.h
-      include/xdg-output-unstable-v1-client-protocol.h
       include/wayland-protocols/alpha-modifier-v1-client-protocol.h
       include/wayland-protocols/color-management-v1-client-protocol.h
       include/wayland-protocols/color-representation-v1-client-protocol.h
@@ -133,17 +117,20 @@ extra-source-files:
       generated/Bindings.Wayland.ExtSessionLockV1.Generated.yaml
       generated/Bindings.Wayland.FractionalScaleV1.Generated.yaml
       generated/Bindings.Wayland.Protocol.ForeignTopLevelListV1.Generated.yaml
-      generated/Bindings.Wayland.Protocol.Generated.ForeignTopLevelListV1.yaml
       generated/Bindings.Wayland.Util.Generated.yaml
       generated/Bindings.Wayland.Viewporter.Generated.yaml
       generated/Bindings.Wayland.WlrInputMethodUnstableV2.Generated.yaml
-      generated/Bindings.Wayland.WlrInputMethodUnstableV2.yaml
       generated/Bindings.Wayland.WlrLayerShellUnstableV1.Generated.yaml
       generated/Bindings.Wayland.WlrOutputManagementUnstableV1.Generated.yaml
       generated/Bindings.Wayland.WlrOutputPowerManagementUnstableV1.Generated.yaml
       generated/Bindings.Wayland.XdgOutputUnstableV1.Generated.yaml
 extra-doc-files:
       CHANGELOG.md
+
+custom-setup
+    setup-depends:
+          Cabal
+        , base
 
 library
     exposed-modules:
@@ -283,30 +270,12 @@ library
           TypeFamilies
           OverloadedStrings
           DuplicateRecordFields
-    ghc-options: -Wall -Wunused-packages -haddock -fPIC
+    ghc-options: -Wall -Wunused-packages -fPIC
     include-dirs:
           include
           include/wayland-protocols
-    c-sources:
-          cbits/ext-idle-notify-v1-protocol.c
-          cbits/ext-session-lock-v1-protocol.c
-          cbits/fractional-scale-v1-protocol.c
-          cbits/input-method-unstable-v2-protocol.c
-          cbits/river-input-management-v1-protocol.c
-          cbits/river-layer-shell-v1-protocol.c
-          cbits/river-libinput-config-v1-protocol.c
-          cbits/river-status-unstable-v1-protocol.c
-          cbits/river-window-management-v1-protocol.c
-          cbits/river-xkb-bindings-v1-protocol.c
-          cbits/river-xkb-config-v1-protocol.c
-          cbits/viewporter-protocol.c
-          cbits/wlr-layer-shell-unstable-v1-protocol.c
-          cbits/wlr-output-management-unstable-v1-protocol.c
-          cbits/wlr-output-power-management-unstable-v1-protocol.c
-          cbits/xdg-output-unstable-v1-protocol.c
-          cbits/wayland-protocols/ext-foreign-toplevel-list-v1-protocol.c
-          cbits/wayland-protocols/xdg-shell-protocol.c
     pkgconfig-depends:
           wayland-client
         , pixman-1
+        , wayland-protocols
     default-language: GHC2024

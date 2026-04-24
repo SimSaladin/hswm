@@ -1,5 +1,7 @@
 {-# LANGUAGE MultiWayIf #-}
 {-# LANGUAGE OverloadedRecordDot #-}
+{-# LANGUAGE TypeFamilies #-}
+
 
 -- |
 -- Module      : Waybar.CFFI.Plugin.HSWM
@@ -13,25 +15,29 @@
 -- Longer description of this module.
 module Waybar.CFFI.Plugin.HSWM where
 
+import Waybar.CFFI.Plugin.Base
+
+import HSWM (ScreenId, def, try, SomeException)
+import HSWM.Util.IPC (ProtoMsg (..), WindowInfo (..), WorkspaceInfo(..), WsId, clientRun, runMIO)
+
+import GI.Gtk as Gtk
+import GI.Pango.Enums
+
 import Control.Monad
 import Control.Monad.Fix
+import Control.Monad.Logger.Aeson hiding (Message)
 import Data.Char (isDigit)
 import Data.GI.Base.Attributes
 import Data.List qualified as L
 import Data.Maybe
 import Data.String
 import Data.Text qualified as T
-import GI.Gtk as Gtk
-import GI.Pango.Enums
-import HSWM (ScreenId, def, try, SomeException)
-import HSWM.Util.IPC (ProtoMsg (..), WindowInfo (..), WorkspaceInfo(..), WsId, clientRun, runMIO)
-import Waybar.CFFI.Plugin.Base
-import Control.Monad.Logger.Aeson hiding (Message)
 import qualified Data.Aeson.KeyMap as A
 import RIO.Prelude
 import RIO.Prelude.Types
 import RIO (Async, IORef, readIORef, cancel, writeIORef, liftIO, threadDelay, modifyIORef, async, newIORef)
 import Text.Printf
+
 
 type MIO = LoggingT IO
 
@@ -44,6 +50,29 @@ data MyMod = MyMod
     wmThread :: !(Async ())
   }
   deriving (Generic)
+
+instance WaybarPlugin MyMod where
+  type PluginState MyMod = ()
+  type Context MyMod = MIO
+  globalInit _ = pure ()
+  globalDeinit _ _ = pure ()
+
+  runContext _ _ = runMIO
+
+  init = instanceNew'
+
+  deinit IConf {instanceData = MyMod {..}} = do
+    logInfo "Shutting down.."
+    cancel wmThread
+    widgetDestroy topContainer
+
+  update IConf {..} = updateWorkspaces instanceData >> updateFocusInfo instanceData
+
+  -- | Handle signal which was propagated by waybar (reload, etc.)
+  refresh _ sig = logInfo $ "received signal" :# [ "signal" .= show sig ]
+
+  -- | Trigger a module action
+  doaction _ actStr = logWarn $ fromString $ "unhandled module action: " <> fromString actStr
 
 data ModState = ModState
   { tagWidgets :: [Label],
@@ -74,43 +103,38 @@ data WSList = WSList
 --     label().focused-window {text:format-focused-window =? "{title}"}
 --                            {tooltip:...}
 -- @
-instanceNew :: IConf a -> IO MyMod
-instanceNew iconf@IConf {..} =
-  runMIO $ do
-    logInfo $ "cffi_hswm: init config" :# [ "waybar_version" .= wbVersion ]
-    logInfo $ "plugin settings" :# [ k .= v | (k,v) <- A.toList configs ]
+instanceNew' :: IConf a -> MIO MyMod
+instanceNew' iconf@IConf {..} = do
+  logInfo $ "plugin initializing" :# [ "waybar_version" .= wbVersion ]
+  logInfo $ "plugin settings" :# [ k .= v | (k,v) <- A.toList configs ]
 
-    -- Add a container for displaying the next widgets
-    topContainer <- boxNew OrientationHorizontal 5
-    widgetSetName topContainer "hswm"
-    sc <- widgetGetStyleContext topContainer
-    styleContextAddClass sc "module"
-    containerAdd rootWidget topContainer
+  -- Add a container for displaying the next widgets
+  topContainer <- boxNew OrientationHorizontal 5
+  set topContainer [ #name := "hswm" ]
+  widgetGetStyleContext topContainer >>= \sc -> styleContextAddClass sc "module"
+  containerAdd rootWidget topContainer
 
-    workspacesContainer <- boxNew OrientationHorizontal 5
-    sc' <- widgetGetStyleContext workspacesContainer
-    styleContextAddClass sc' "workspaces"
-    containerAdd topContainer workspacesContainer
+  workspacesContainer <- boxNew OrientationHorizontal 5
+  widgetGetStyleContext workspacesContainer >>= \sc -> styleContextAddClass sc "workspaces"
+  containerAdd topContainer workspacesContainer
 
-    layoutWidget <- labelNew (Just "Loading...")
-    sc'' <- widgetGetStyleContext layoutWidget
-    styleContextAddClass sc'' "current-layout"
-    containerAdd topContainer layoutWidget
+  layoutWidget <- labelNew (Just "Loading...")
+  widgetGetStyleContext layoutWidget >>= \sc -> styleContextAddClass sc "current-layout"
+  containerAdd topContainer layoutWidget
 
-    focusInfoWidget <- labelNew Nothing
-    set focusInfoWidget [ #maxWidthChars := 42, #ellipsize := EllipsizeModeEnd ]
-    sc''' <- widgetGetStyleContext focusInfoWidget
-    styleContextAddClass sc''' "focused-window"
-    containerAdd topContainer focusInfoWidget
+  focusInfoWidget <- labelNew Nothing
+  set focusInfoWidget [ #maxWidthChars := 42, #ellipsize := EllipsizeModeEnd ]
+  widgetGetStyleContext focusInfoWidget >>= \sc -> styleContextAddClass sc "focused-window"
+  containerAdd topContainer focusInfoWidget
 
-    stRef <- newIORef $ ModState [] "" mempty (WSList [] (minBound,error "empty wsi") [] []) Nothing
-    res <- lift . mfix $ \myMod -> do
-      _ <- async $ runMIO $ updateOutputName iconf myMod
-      wmThread <- async $ runMIO $ connectToWM (handleMsg iconf myMod)
-      return MyMod {..}
+  stRef <- newIORef $ ModState [] "" mempty (WSList [] (minBound,error "empty wsi") [] []) Nothing
+  res <- lift . mfix $ \myMod -> do
+    _ <- async $ runMIO $ updateOutputName iconf myMod
+    wmThread <- async $ runMIO $ connectToWM (handleMsg iconf myMod)
+    return MyMod {..}
 
-    logDebug "Instance created"
-    return res
+  logDebug "Instance created"
+  return res
 
 connectToWM :: (ProtoMsg -> MIO ()) -> MIO ()
 connectToWM onMsg = do
@@ -122,7 +146,7 @@ connectToWM onMsg = do
     Right{} -> return ()
     Left (ex :: SomeException) -> do
       logError $ "IPC disconnect (exception)" :# [ "exception" .= show ex ]
-      threadDelay 5000000
+      threadDelay 5_000_000
       connectToWM onMsg
 
 handleMsg :: IConf a -> MyMod -> ProtoMsg -> MIO ()
@@ -142,7 +166,7 @@ handleMsg _ _ msg = logWarn $ "unhandled incoming message" :# [ "msg" .= show ms
 -- | Wait for the waybar window to be created, then sniff out the assigned screen name.
 updateOutputName :: IConf a -> MyMod -> MIO ()
 updateOutputName ic m = do
-  threadDelay 1000000
+  threadDelay 1_000_000
   rootPath <- widgetGetPath (topContainer m)
   classes <- widgetPathIterListClasses rootPath 0
   case filter check classes of
@@ -159,52 +183,41 @@ updateOutputName ic m = do
 updateWorkspaces :: MyMod -> MIO ()
 updateWorkspaces m = do
   st <- readIORef (stRef m)
-
   let WSList tags focused@(foScreen, foWSI) visible hidden = workspaces st
-
       thisScreen = fromMaybe maxBound (L.lookup (thisOutputName st) st.outputs)
-
       add _ = do
         l <- labelNew (Just "")
-        sc <- widgetGetStyleContext l
-        styleContextAddClass sc "workspace"
+        widgetGetStyleContext l >>= \sc -> styleContextAddClass sc "workspace"
         containerAdd (workspacesContainer m) l
         widgetShow l
         return l
-
       remove = widgetDestroy
-
       setWidgetWSI sc w screen WorkspaceInfo{layout, windowList} = do
         let wcount = length windowList
+        let tooltip = T.intercalate "\r"
+                [ maybe "" ((<> " - ") . tshow . fromEnum) screen <> maybe "?" fst (L.find (\(_, b) -> Just b == screen) st.outputs)
+                , "Windows: " <> T.pack (if wcount > 0 then show wcount else "(none)")
+                , "Layout: " <> layout ]
         if wcount > 0
            then styleContextRemoveClass sc "empty"
            else styleContextAddClass sc "empty"
-        set w [ #tooltipMarkup := T.intercalate "\r"
-                [ maybe "" ((<> " - ") . tshow . fromEnum) screen <> maybe "?" fst (L.find (\(_, b) -> Just b == screen) st.outputs)
-                , "Windows: " <> T.pack (if wcount > 0 then show wcount else "(none)")
-                , "Layout: " <> layout ] ]
+        set w [ #tooltipMarkup := tooltip ]
 
   -- Create new
   newTags <- forM (drop (length (tagWidgets st)) tags) add
-
   -- Destroy deleted
   forM_ (drop (length tags) (tagWidgets st)) remove
-
   let tagWidgets' = take (length tags) (tagWidgets st) ++ newTags
-
   forM_ (zip tags tagWidgets') $ \((tag, hint), w) -> do
-
     labelSetMarkup w (T.pack $ printf "<span>%s:</span>%s" hint tag)
 
     sc <- widgetGetStyleContext w
-
     if
       | tag == foWSI.tag,
         thisScreen == foScreen -> do
           styleContextAddClass sc "focused"
           styleContextRemoveClass sc "visible"
-          labelSetText (layoutWidget m) $ last $ T.words foWSI.layout
-          set (layoutWidget m) [ #tooltipMarkup := foWSI.layout ]
+          set (layoutWidget m) [ #label := last $ T.words foWSI.layout ]
           setWidgetWSI sc w (Just foScreen) foWSI
 
       | (screen, wsi) : _ <- [x | x@(_, wsi) <- focused : visible, wsi.tag == tag] -> do
@@ -212,13 +225,11 @@ updateWorkspaces m = do
           styleContextRemoveClass sc "focused"
           setWidgetWSI sc w (Just screen) wsi
           when (screen == thisScreen) $ do
-            labelSetText (layoutWidget m) $ last $ T.words wsi.layout
-            set (layoutWidget m) [ #tooltipMarkup := wsi.layout ]
+            set (layoutWidget m) [ #label := last $ T.words wsi.layout ]
 
       | wsi : _ <- [wsi | wsi <- hidden, wsi.tag == tag] -> do
           styleContextRemoveClass sc "visible"
           styleContextRemoveClass sc "focused"
-          clear w #tooltipMarkup
           setWidgetWSI sc w Nothing wsi
 
       | otherwise -> return ()
@@ -230,27 +241,10 @@ updateFocusInfo MyMod {..} = do
   st <- readIORef stRef
   case curfocus st of
     Just WindowInfo {..} -> do
-      labelSetText focusInfoWidget title
-      widgetSetTooltipMarkup focusInfoWidget $ Just $ title <> " - " <> appId <> maybe "" (\i -> "\r(PID: " <> tshow i <> ")") pid
+      set focusInfoWidget
+        [ #label := title
+        , #tooltipMarkup := title <> " - " <> appId <> maybe "" (\i -> "\r(PID: " <> tshow i <> ")") pid
+        ]
     Nothing -> do
-      labelSetText focusInfoWidget ""
-      widgetSetTooltipMarkup focusInfoWidget Nothing
-
-instanceDestroy :: IConf MyMod -> IO ()
-instanceDestroy IConf {instanceData = MyMod {..}} = runMIO $ do
-  logInfo "Shutting down.."
-  cancel wmThread
-  widgetDestroy topContainer
-
--- | Update the UI
-updateDo :: IConf MyMod -> IO ()
-updateDo IConf {..} = runMIO $ updateWorkspaces instanceData >> updateFocusInfo instanceData
-
--- | Handle signal which was propagated by waybar (reload, etc.)
-signalDo :: IConf MyMod -> Int -> IO ()
-signalDo _ _ = pure ()
-
--- | Trigger a module action
-actionDo :: IConf MyMod -> String -> IO ()
-actionDo _ actStr = runMIO $ do
-  logWarn $ fromString $ "unhandled module action: " <> fromString actStr
+      set focusInfoWidget [ #label := "" ]
+      clear focusInfoWidget #tooltipMarkup

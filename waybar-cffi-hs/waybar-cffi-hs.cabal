@@ -1,7 +1,4 @@
-cabal-version: 3.4
--- This file has been generated from package.yaml by hpack version 0.38.3.
---
--- see: https://github.com/sol/hpack
+cabal-version: 3.12
 name: waybar-cffi-hs
 version: 0.0.1
 synopsis: Waybar C FFI module
@@ -10,23 +7,22 @@ build-type: Simple
 extra-source-files:
   cbits/module-init.c
   include/waybar_cffi_module.h
+tested-with:
+  GHC == 9.12.2
 
 common deps
   build-depends:
-    aeson,
-    base >=4.20.2.0,
-    bytestring,
-    derive-storable,
-    haskell-gi-base,
-    gi-gtk3,
-    gi-pango,
+    aeson >=2.2.3 && <2.3,
+    base >=4.20.2.0 && <4.22,
+    bytestring ^>=0.12.2,
+    derive-storable ^>=0.3.1,
+    haskell-gi-base ^>=0.26.9,
+    gi-gtk3 ^>=3.0.44,
+    gi-pango ^>=1.0.30,
     hswm,
-    text,
-    rio,
-    monad-logger-aeson,
-    containers,
-
-  pkgconfig-depends: gtk+-3.0
+    text ^>=2.1.2,
+    rio ^>=0.1.24,
+    monad-logger-aeson ^>=0.4.1,
 
 common default-language
   default-language: GHC2024
@@ -37,25 +33,25 @@ common default-language
     RecordWildCards
 
 common build-settings
-  cpp-options: -DWCFFI_VERSION=2
-  cc-options: -DWCFFI_VERSION=2
   ghc-options:
     -Wall
     -Wunused-packages
     -Wno-ambiguous-fields
-    -stubdir
-    stub
     -threaded
+    -fPIC
+    -fsplit-sections
 
   ghc-shared-options:
-    -fPIC
     -flink-rts
+
+flag static
+  manual: True
+  default: False
 
 library
   import: deps, default-language, build-settings
   hs-source-dirs: lib
   exposed-modules:
-    Waybar.CFFI.Plugin
     Waybar.CFFI.Plugin.Base
     Waybar.CFFI.Plugin.HSWM
 
@@ -65,16 +61,21 @@ library
   autogen-modules:
     Paths_waybar_cffi_hs
 
+  include-dirs: include
+
 foreign-library waybarhaskellplugin
-  import: deps, default-language, build-settings
+  import: default-language, build-settings
   type: native-shared
-  lib-version-info: 1:0:0
-  hs-source-dirs: lib
+  lib-version-linux: 1.0.0
+  hs-source-dirs: plugin
   build-depends:
-    waybar-cffi-hs
+    base,
+    waybar-cffi-hs,
   other-modules:
     Waybar.CFFI.Plugin
-    --Waybar.CFFI.Plugin.Base
-    --Waybar.CFFI.Plugin.HSWM
 
   c-sources: cbits/module-init.c
+  cc-options: -DWCFFI_VERSION=2
+
+  if flag(static)
+    options: standalone

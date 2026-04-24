@@ -11,12 +11,13 @@ module River.XKB.Bindings
   )
 where
 
-import Data.Map qualified as M
-import Foreign
-import HSWM.XKB
-import Bindings.River qualified as R
-import River.WMP
+import           HSWM.XKB
+
+import qualified Bindings.River as R
 import qualified Bindings.Wayland.Client as WL
+import qualified Data.Map as M
+import           Foreign
+import           River.WMP
 
 type XBKey = (Modifiers, KeySym)
 
@@ -27,7 +28,8 @@ data XkbBinding a = XkbBinding
     river_seat :: R.RiverSeat,
     action :: a,
     subKeymap :: XkbBindingMap a,
-    autorepeat :: Bool
+    autorepeat :: Bool,
+    running :: MVar (Async ())
   }
   deriving (Generic)
 
@@ -64,7 +66,8 @@ newXKBBinding xkbBinds xkb_binding_listener seat enable mods keysym action subKM
   logDebug $ "new xkb binding" :# [ "key" .= ppXkbModsKey mods keysym,  "action" .= show action ]
   xb <- io $ R.riverXkbBindingsGetXkbBinding xkbBinds seat (fi keysym) (WL.toCEnum $ fi mods)
   -- subP <- io $ newStablePtr subKM
-  dtPtr <- io $ newStablePtr $ XkbBinding xb seat action subKM autorepeat
+  runvar <- newEmptyMVar
+  dtPtr <- io $ newStablePtr $ XkbBinding xb seat action subKM autorepeat runvar
   _ <- io $ R.listenerAdd xb xkb_binding_listener (castPtr $ castStablePtrToPtr dtPtr)
   when enable $ io $ R.riverXkbBindingEnable xb
   return dtPtr

@@ -2,31 +2,34 @@
 
 -- |
 -- Module      : HSWM.Config
--- Description : Short description
+-- Description :
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
 --
--- Longer description of this module.
 module HSWM.Config
   ( module HSWM.Config,
   )
 where
 
 import Data.List qualified as L
+import Data.Text qualified as T
 import HSWM.Core
 import HSWM.Operations
 import HSWM.Utils
 import HSWM.XKB
+import HSWM.Util.PangoMarkup qualified as P
+import Data.Foldable
+-----
 
 infixr 1 <??>, <?>
 
 -- | Attach a description to some action:
 --
 -- @
---   "Restart" <??> restart
+--   restart <?> "Restart"
 -- @
 (<?>) :: IsKeyAction a => a -> String -> SomeAction H
 action <?> desc = toKeyAction desc action
@@ -43,60 +46,39 @@ class IsKeyAction a where
   toKeyAction :: String -> a -> SomeAction H
 
 instance {-# OVERLAPPABLE #-} IsKeyAction (H b) where
-  toKeyAction d = namedA d . void
+  toKeyAction d = named d . void
 
 instance {-# OVERLAPPABLE #-} IsKeyAction (HS b) where
-  toKeyAction d = namedAS d . void
+  toKeyAction d = named @(H ()) d . runInHS . void
 
 instance {-# OVERLAPPABLE #-} IsKeyAction (SomeAction H) where
   toKeyAction d a = SomeAction $ NamedAction d a
 
 instance {-# OVERLAPPABLE #-} (Message a, Show a) => IsKeyAction a where
-  toKeyAction d a = SomeAction $ NamedActionHS (d ++ ": " ++ show a) (sendMessage a)
+  toKeyAction d a = SomeAction $ named (d ++ ": " ++ show a) (runInHS $ sendMessage a :: H ())
 
 -- * Named
 
-data NamedAction
-  = NamedAction String (SomeAction H)
-  | NamedActionH String (H ())
-  | NamedActionHS String (HS ())
+data NamedAction = NamedAction String (SomeAction H)
 
 instance IsAction H NamedAction where
-  runner (NamedActionH _ m) = m
   runner (NamedAction _ a) = runner a
-  runner (NamedActionHS _ a) = runInHS a
-
-  actionSubmap (NamedActionH _ _) = []
-  actionSubmap (NamedActionHS _ _) = []
   actionSubmap (NamedAction _ a) = actionSubmap a
-
-  actionDescription _ (NamedActionH nm _) = nm
-  actionDescription _ (NamedActionHS nm _) = nm
   actionDescription _ (NamedAction nm _) = nm
 
 named :: (IsAction H a) => String -> a -> SomeAction H
 named str a = SomeAction $ NamedAction str (SomeAction a)
-
-namedA :: String -> H () -> SomeAction H
-namedA desc m = SomeAction (NamedActionH desc m)
-
-namedAS :: String -> HS () -> SomeAction H
-namedAS desc m = SomeAction (NamedActionHS desc m)
-
-messageA :: (Message a, Show a) => a -> SomeAction H
-messageA a = SomeAction $ NamedActionHS (show a) (sendMessage a)
-
-windowsA :: String -> (WindowSet -> WindowSet) -> SomeAction H
-windowsA desc f = SomeAction $ NamedActionHS desc $ modifyWindowSet f
-
-windowsMA :: String -> (WindowSet -> HS WindowSet) -> SomeAction H
-windowsMA desc f = SomeAction $ NamedActionHS desc $ withWindowSet $ f >=> modifyWindowSet . const
 
 -- * Keys/submaps
 
 addKeys :: (IsKeySym k, IsAction m a) => [((ModMask, k), a)] -> ConfigDoM m
 addKeys keys c = c
   { keyBindings = keyBindings c ++ [((m, toKeySym k), SomeAction a) | ((m, k), a) <- keys] }
+
+addKeys' :: [(String, SomeAction H)] -> ConfigDoM H
+addKeys' keys c = c
+  { keyBindings = keyBindings c ++ [((m, toKeySym k), a)
+    | ((m, k), a) <- fromADTKeys c.defaultModMask $ parseSubmaps keys] }
 
 submap ::
   forall m a k.
@@ -111,13 +93,12 @@ submap defAct subKeys =
       smap = Submap {..}
    in SomeAction smap
 
-fromADTKeys :: [KeyAction (String, KeySym) (SomeAction H)] -> [((ModMask, KeySym), SomeAction H)]
-fromADTKeys = map doKey
+fromADTKeys :: String -> [KeyAction (String, KeySym) (SomeAction H)] -> [((ModMask, KeySym), SomeAction H)]
+fromADTKeys defaultModMask = map doKey
   where
     doKey (KeyAction k a) = (doMK k, a)
-    doKey (KeySubmap k xs) = (doMK k, submap Nothing (fromADTKeys xs))
-    -- TODO hard-coded default Mod mask
-    doMK (m, k) = (resolveModMask (resolveModMask 0 "super") m, k)
+    doKey (KeySubmap k xs) = (doMK k, submap Nothing (fromADTKeys defaultModMask xs))
+    doMK (m, k) = (resolveModMask (resolveModMask 0 defaultModMask) m, k)
 
 data KeyAction mk a
   = KeyAction mk a
@@ -157,3 +138,12 @@ parseSubmaps ks0 =
 
     key (KeyAction k _) = k
     key (KeySubmap k _) = k
+
+showKeyHelp :: H ()
+showKeyHelp = do
+  binds <- asks (keyBindings . config)
+  let pretty = [ (ppXkbModsKey m k, actionDescription (Proxy :: Proxy H) a) | ((m, k), a) <- L.sortOn (uncurry ppXkbModsKey . fst) binds ]
+  let indent = maximum $ map (length . fst) pretty
+  let res = P.Monospace $ mconcat [ P.text (T.justifyLeft indent ' ' (toText mk)) <> " " <> P.text a <> "\n" | (mk, a) <- pretty ]
+  void . runProcess $
+    proc "notify-send" [ "--app-name=hswm", "Keys", "--", T.unpack (P.render res) ]

@@ -1,7 +1,3 @@
-{-# LANGUAGE DataKinds, TypeApplications, FlexibleContexts #-}
-{-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE DerivingStrategies, DeriveAnyClass, DeriveGeneric, DeriveDataTypeable #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 -- |
 -- Module      : Text.XkbCommon.Registry
 -- Description : Short description
@@ -12,10 +8,6 @@
 -- Portability : unportable
 --
 module Text.XkbCommon.Registry where
-
--- #define _GNU_SOURCE
--- #include <unistd.h>
--- #include <sys/mman.h>
 
 #include <xkbcommon/xkbregistry.h>
 

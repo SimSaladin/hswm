@@ -26,18 +26,22 @@ import Text.Pretty.Simple qualified as P
 import GHC.Stack
 import Data.Ord
 import HSWM.Util.Process
+import Foreign
+import System.Posix (getEnv)
 
 -- * Keymap utils
 
-resolveModMask :: ModMask -> String -> ModMask
+resolveModMask :: ModMask -- ^ Default mod mask
+               -> String
+               -> ModMask
 resolveModMask d s = go s
   where
     go x = case L.span (/= '-') x of
-      ("", []) -> 0
       (m, '-' : xs) -> get1 m .|. go xs
       (m, []) -> get1 m
       _ -> error $ "malformed mod mask: " ++ s
     get1 y = case map toLower y of
+      "" -> 0
       "m" -> d
       "none" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_NONE
       "shift" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_SHIFT
@@ -56,7 +60,7 @@ resolveModMask d s = go s
       "logo" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD4
       "mod5" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD5
       "m5" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD5
-      _ -> error $ "unrecognized modifier: " ++ s
+      _ -> error $ "unrecognized modifier: " ++ y
 
 -- * Logging and debug
 
@@ -317,3 +321,16 @@ unpremult :: RGBA Double -> RGBA Double
 unpremult (RGBA r g b a)
   | a == 0    = RGBA 0 0 0 0
   | otherwise = RGBA (r / a) (g / a) (b / a) a
+
+-- * Misc.
+
+isLittleEndian :: IO Bool
+isLittleEndian = alloca $ \ptr -> do
+    poke ptr (1 :: Word32)
+    byte <- peek (castPtr ptr :: Ptr Word8)
+    return (byte == 1)
+
+getXdgRuntimeDirectory :: IO FilePath
+getXdgRuntimeDirectory = getEnv "XDG_RUNTIME_DIR" >>= \case
+  Nothing -> error "XDG_RUNTIME_DIR not set"
+  Just dir -> return dir
