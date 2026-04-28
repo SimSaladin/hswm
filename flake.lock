@@ -54,6 +54,58 @@
         "type": "github"
       }
     },
+    "ghc-tcplugins-extra": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1755520404,
+        "narHash": "sha256-miSTW16R0YoHUygZ4mtejBZjZA/8nFn20y/BZaAUi78=",
+        "owner": "sheaf",
+        "repo": "ghc-tcplugins-extra",
+        "rev": "6842eb467dde87cf6249828011f4c9d717f7f2b0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "sheaf",
+        "ref": "ghc-9.14",
+        "repo": "ghc-tcplugins-extra",
+        "type": "github"
+      }
+    },
+    "ghc-typelits-natnormalise": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1773940027,
+        "narHash": "sha256-MGdoDIOWAHk9IERWtGQhxB5AlBAVbmtCUouKJUv122g=",
+        "owner": "clash-lang",
+        "repo": "ghc-typelits-natnormalise",
+        "rev": "5adf333887f5f9f00e47f69368a2b5e9705c9cbc",
+        "type": "github"
+      },
+      "original": {
+        "owner": "clash-lang",
+        "repo": "ghc-typelits-natnormalise",
+        "type": "github"
+      }
+    },
+    "glib": {
+      "flake": false,
+      "locked": {
+        "dir": "glib",
+        "lastModified": 1771066836,
+        "narHash": "sha256-uAum2JrWoYUmQf4TdLe1voGEO32hPVyu4WlhBdB+oXQ=",
+        "owner": "TuongNM",
+        "repo": "gtk2hs",
+        "rev": "16c4adcf5ec20dd7e0e52bf613249df5f43bffdb",
+        "type": "github"
+      },
+      "original": {
+        "dir": "glib",
+        "owner": "TuongNM",
+        "ref": "ghc-rts-api",
+        "repo": "gtk2hs",
+        "type": "github"
+      }
+    },
     "haskell-flake": {
       "locked": {
         "lastModified": 1776783293,
@@ -157,11 +209,11 @@
     "river": {
       "flake": false,
       "locked": {
-        "lastModified": 1777027583,
-        "narHash": "sha256-9MXybPkEvZc3OGF3hNjgRaLtXEMbvz6pAwmFd96q9zg=",
+        "lastModified": 1777361605,
+        "narHash": "sha256-H29b8JpQlbjcfGhfUmKY5/fo6ozvdub2SKHFd9X1AMo=",
         "ref": "refs/heads/main",
-        "rev": "48c2b1e86e257421c3bbafe9cbf284e4134d1438",
-        "revCount": 1700,
+        "rev": "85c2dce31238a2edf794d87db27dccf0877b29af",
+        "revCount": 1708,
         "type": "git",
         "url": "https://codeberg.org/river/river"
       },
@@ -174,11 +226,13 @@
       "inputs": {
         "flake-parts": "flake-parts",
         "flake-utils": "flake-utils",
+        "ghc-tcplugins-extra": "ghc-tcplugins-extra",
+        "ghc-typelits-natnormalise": "ghc-typelits-natnormalise",
+        "glib": "glib",
         "haskell-flake": "haskell-flake",
         "hs-bindgen": "hs-bindgen",
         "nixpkgs": "nixpkgs",
-        "river": "river",
-        "typed-process": "typed-process"
+        "river": "river"
       }
     },
     "systems": {
@@ -193,23 +247,6 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
-        "type": "github"
-      }
-    },
-    "typed-process": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1684837633,
-        "narHash": "sha256-K5w3Yxi4R0mSul6NjX1SP4t3bUlu79pZL/yPDnfZVSE=",
-        "owner": "sol",
-        "repo": "typed-process",
-        "rev": "bc3a7f662e97f0211c5cc367abf68b12dac2d3f2",
-        "type": "github"
-      },
-      "original": {
-        "owner": "sol",
-        "ref": "dev",
-        "repo": "typed-process",
         "type": "github"
       }
     }

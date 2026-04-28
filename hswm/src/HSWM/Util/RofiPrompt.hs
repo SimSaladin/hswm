@@ -184,6 +184,6 @@ promptRofi prompt = rofiRun def { _prompt = prompt, _dmenu = True }
 ma ++> f = ma >>= flip whenJust f
 
 confirmPrompt :: RofiPromptConfig -> String -> H () -> H ()
-confirmPrompt cfg text act = rofiRun cfg { _dmenu = True, _mesg = text } ["yes", "no"] ++> apply
+confirmPrompt cfg text act = rofiRun cfg { _dmenu = True, _mesg = text } ["yes" :: T.Text, "no"] ++> apply
   where apply "yes" = act
         apply _ = return ()

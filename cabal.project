@@ -5,4 +5,15 @@ packages:
   xkbcommon-bindings
 
 jobs: $ncpus
+
+optimization: 0
+
 documentation: True
+haddock-all: True
+haddock-hyperlink-source: True
+
+-- html-location: http://hackage.haskell.org/packages/archive/$pkg/latest/doc/html
+html-location: https://www.stackage.org/haddock/lts-24.38/$pkg/doc-index.html
+
+
+write-ghc-environment-files: always

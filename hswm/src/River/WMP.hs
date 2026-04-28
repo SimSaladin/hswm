@@ -83,7 +83,7 @@ invalidSeat = R.RiverSeat nullPtr
 setNodePosition :: (MonadIO m) => R.RiverNode -> Int32 -> Int32 -> m ()
 setNodePosition n x y = io $ R.riverNodeSetPosition n x y
 
-ppXkbModsKey :: Modifiers -> KeySym -> String
+ppXkbModsKey :: ModMask -> KeySym -> String
 ppXkbModsKey m ksym =
   L.intercalate "+" $
     [ name
@@ -114,12 +114,12 @@ newPointerBinding ::
   (MonadLogger m, MonadIO m, Show a) =>
   R.RiverPointerBindingListener ->
   R.RiverSeat ->
-  Modifiers ->
+  ModMask ->
   Button ->
   a ->
   m (StablePtr (PointerBinding a))
 newPointerBinding pointerBindingListener seat mods btn action = do
-  logInfo $ "new pointer binding" :# [ "key" .= ppXkbModsKey mods btn, "action" .= show action ]
+  logInfo $ "new pointer binding" :# [ "key" .= ppXkbModsKey mods (fi btn) {- TODO wrong -}, "action" .= show action ]
   pb' <- io $ R.riverSeatGetPointerBinding seat (fi btn) (WL.toCEnum $ fi mods)
   dtPtr <- io $ newStablePtr $ PointerBinding pb' seat action
   io $ R.listenerAdd pb' pointerBindingListener (castPtr $ castStablePtrToPtr dtPtr)

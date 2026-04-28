@@ -20,8 +20,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 
 module Bindings.Wayland.WlrLayerShellUnstableV1.Generated
-    ( Bindings.Wayland.WlrLayerShellUnstableV1.Generated.Xdg_popup
-    , Bindings.Wayland.WlrLayerShellUnstableV1.Generated.Zwlr_layer_shell_v1
+    ( Bindings.Wayland.WlrLayerShellUnstableV1.Generated.Zwlr_layer_shell_v1
     , Bindings.Wayland.WlrLayerShellUnstableV1.Generated.Zwlr_layer_surface_v1
     , Bindings.Wayland.WlrLayerShellUnstableV1.Generated.Zwlr_layer_shell_v1_error(..)
     , pattern Bindings.Wayland.WlrLayerShellUnstableV1.Generated.ZWLR_LAYER_SHELL_V1_ERROR_ROLE
@@ -70,14 +69,6 @@ import qualified HsBindgen.Runtime.HasCField as HasCField
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.LibC
 import qualified HsBindgen.Runtime.Marshal as Marshal
-
-{-| __C declaration:__ @struct xdg_popup@
-
-    __defined at:__ @wlr-layer-shell-unstable-v1-client-protocol.h 48:8@
-
-    __exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
--}
-data Xdg_popup
 
 {-| __C declaration:__ @struct zwlr_layer_shell_v1@
 

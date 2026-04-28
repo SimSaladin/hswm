@@ -82,8 +82,8 @@ clean:
 	rm -f $(WAYLAND_PROTO_PRIVATE_CODE) $(WAYLAND_PROTO_CLIENT_HEADERS) $(PRIVATE_CODE:%=$(CDIR)/%) $(CLIENT_HEADERS:%=$(HEADERDIR)/%)
 
 copy-wayland-protos: $(WAYLAND_PROTOS)
-	mkdir -p $(PROTODIR)/wayland-protocols
-	for f in $^; do ln -nsf $$f $(PROTODIR)/wayland-protocols/$$(basename $$f); done
+	@mkdir -p $(PROTODIR)/wayland-protocols
+	@for f in $^; do ln -nsf $$f $(PROTODIR)/wayland-protocols/$$(basename $$f); done
 
 #########
 # wayland scanner: client-header.h, protocol.c
@@ -182,6 +182,11 @@ $(eval $(call bindgen_template,Bindings.Wayland.XdgOutputUnstableV1.Generated.ya
 	  $(bindGenSpecDir)/Bindings.Wayland.Util.Generated.yaml \
 	  $(bindingSpecs)/wayland-client.yaml))
 
+# xdg-shell.xml
+$(eval $(call bindgen_template,Bindings.Wayland.XdgShell.Generated.yaml,$(HEADERDIR)/wayland-protocols/xdg-shell-client-protocol.h,,\
+	  $(bindGenSpecDir)/Bindings.Wayland.Util.Generated.yaml \
+	  $(bindingSpecs)/wayland-client.yaml))
+
 #   fractional-scale-v1.xml
 $(eval $(call bindgen_template,Bindings.Wayland.FractionalScaleV1.Generated.yaml,$(HEADERDIR)/wayland-protocols/fractional-scale-v1-client-protocol.h,,\
 	  $(bindGenSpecDir)/Bindings.Wayland.Util.Generated.yaml \
@@ -200,7 +205,8 @@ $(eval $(call bindgen_template,Bindings.Wayland.WlrOutputPowerManagementUnstable
 # wlr-layer-shell-unstable-v1.xml
 $(eval $(call bindgen_template,Bindings.Wayland.WlrLayerShellUnstableV1.Generated.yaml,$(HEADERDIR)/wlr-layer-shell-unstable-v1-client-protocol.h,,\
 	  $(bindGenSpecDir)/Bindings.Wayland.Util.Generated.yaml \
-	  $(bindingSpecs)/wayland-client.yaml))
+	  $(bindingSpecs)/wayland-client.yaml \
+	  $(bindingSpecs)/xdg-shell.yaml))
 
 # viewporter.xml
 $(eval $(call bindgen_template,Bindings.Wayland.Viewporter.Generated.yaml,$(HEADERDIR)/wayland-protocols/viewporter-client-protocol.h,,\

@@ -1,0 +1,385 @@
+version:
+  hs_bindgen: 0.1.0
+  binding_specification: '1.0'
+hsmodule: Bindings.Wayland.XdgShell.Generated
+ctypes:
+- headers: xdg-shell-client-protocol.h
+  cname: struct xdg_popup
+  hsname: Xdg_popup
+- headers: xdg-shell-client-protocol.h
+  cname: struct xdg_positioner
+  hsname: Xdg_positioner
+- headers: xdg-shell-client-protocol.h
+  cname: struct xdg_surface
+  hsname: Xdg_surface
+- headers: xdg-shell-client-protocol.h
+  cname: struct xdg_toplevel
+  hsname: Xdg_toplevel
+- headers: xdg-shell-client-protocol.h
+  cname: struct xdg_wm_base
+  hsname: Xdg_wm_base
+- headers: xdg-shell-client-protocol.h
+  cname: enum xdg_wm_base_error
+  hsname: Xdg_wm_base_error
+- headers: xdg-shell-client-protocol.h
+  cname: struct xdg_wm_base_listener
+  hsname: Xdg_wm_base_listener
+- headers: xdg-shell-client-protocol.h
+  cname: enum xdg_positioner_error
+  hsname: Xdg_positioner_error
+- headers: xdg-shell-client-protocol.h
+  cname: enum xdg_positioner_anchor
+  hsname: Xdg_positioner_anchor
+- headers: xdg-shell-client-protocol.h
+  cname: enum xdg_positioner_gravity
+  hsname: Xdg_positioner_gravity
+- headers: xdg-shell-client-protocol.h
+  cname: enum xdg_positioner_constraint_adjustment
+  hsname: Xdg_positioner_constraint_adjustment
+- headers: xdg-shell-client-protocol.h
+  cname: enum xdg_surface_error
+  hsname: Xdg_surface_error
+- headers: xdg-shell-client-protocol.h
+  cname: struct xdg_surface_listener
+  hsname: Xdg_surface_listener
+- headers: xdg-shell-client-protocol.h
+  cname: enum xdg_toplevel_error
+  hsname: Xdg_toplevel_error
+- headers: xdg-shell-client-protocol.h
+  cname: enum xdg_toplevel_resize_edge
+  hsname: Xdg_toplevel_resize_edge
+- headers: xdg-shell-client-protocol.h
+  cname: enum xdg_toplevel_state
+  hsname: Xdg_toplevel_state
+- headers: xdg-shell-client-protocol.h
+  cname: enum xdg_toplevel_wm_capabilities
+  hsname: Xdg_toplevel_wm_capabilities
+- headers: xdg-shell-client-protocol.h
+  cname: struct xdg_toplevel_listener
+  hsname: Xdg_toplevel_listener
+- headers: xdg-shell-client-protocol.h
+  cname: enum xdg_popup_error
+  hsname: Xdg_popup_error
+- headers: xdg-shell-client-protocol.h
+  cname: struct xdg_popup_listener
+  hsname: Xdg_popup_listener
+hstypes:
+- hsname: Xdg_popup
+  representation: emptydata
+- hsname: Xdg_popup_error
+  representation:
+    newtype:
+      constructor: Xdg_popup_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Xdg_popup_listener
+  representation:
+    record:
+      constructor: Xdg_popup_listener
+      fields:
+      - configure
+      - popup_done
+      - repositioned
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Xdg_positioner
+  representation: emptydata
+- hsname: Xdg_positioner_anchor
+  representation:
+    newtype:
+      constructor: Xdg_positioner_anchor
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Xdg_positioner_constraint_adjustment
+  representation:
+    newtype:
+      constructor: Xdg_positioner_constraint_adjustment
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Xdg_positioner_error
+  representation:
+    newtype:
+      constructor: Xdg_positioner_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Xdg_positioner_gravity
+  representation:
+    newtype:
+      constructor: Xdg_positioner_gravity
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Xdg_surface
+  representation: emptydata
+- hsname: Xdg_surface_error
+  representation:
+    newtype:
+      constructor: Xdg_surface_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Xdg_surface_listener
+  representation:
+    record:
+      constructor: Xdg_surface_listener
+      fields:
+      - configure
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Xdg_toplevel
+  representation: emptydata
+- hsname: Xdg_toplevel_error
+  representation:
+    newtype:
+      constructor: Xdg_toplevel_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Xdg_toplevel_listener
+  representation:
+    record:
+      constructor: Xdg_toplevel_listener
+      fields:
+      - configure
+      - close
+      - configure_bounds
+      - wm_capabilities
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Xdg_toplevel_resize_edge
+  representation:
+    newtype:
+      constructor: Xdg_toplevel_resize_edge
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Xdg_toplevel_state
+  representation:
+    newtype:
+      constructor: Xdg_toplevel_state
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Xdg_toplevel_wm_capabilities
+  representation:
+    newtype:
+      constructor: Xdg_toplevel_wm_capabilities
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Xdg_wm_base
+  representation: emptydata
+- hsname: Xdg_wm_base_error
+  representation:
+    newtype:
+      constructor: Xdg_wm_base_error
+      fields:
+      - unwrap
+  instances:
+  - CEnum
+  - Eq
+  - Generic
+  - HasCField
+  - HasFFIType
+  - HasField
+  - Ord
+  - Prim
+  - Read
+  - ReadRaw
+  - SequentialCEnum
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw
+- hsname: Xdg_wm_base_listener
+  representation:
+    record:
+      constructor: Xdg_wm_base_listener
+      fields:
+      - ping
+  instances:
+  - Eq
+  - Generic
+  - HasCField
+  - HasField
+  - ReadRaw
+  - Show
+  - StaticSize
+  - Storable
+  - WriteRaw

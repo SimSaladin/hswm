@@ -4,9 +4,6 @@ version:
 hsmodule: Bindings.Wayland.WlrLayerShellUnstableV1.Generated
 ctypes:
 - headers: wlr-layer-shell-unstable-v1-client-protocol.h
-  cname: struct xdg_popup
-  hsname: Xdg_popup
-- headers: wlr-layer-shell-unstable-v1-client-protocol.h
   cname: struct zwlr_layer_shell_v1
   hsname: Zwlr_layer_shell_v1
 - headers: wlr-layer-shell-unstable-v1-client-protocol.h
@@ -28,8 +25,6 @@ ctypes:
   cname: struct zwlr_layer_surface_v1_listener
   hsname: Zwlr_layer_surface_v1_listener
 hstypes:
-- hsname: Xdg_popup
-  representation: emptydata
 - hsname: Zwlr_layer_shell_v1
   representation: emptydata
 - hsname: Zwlr_layer_shell_v1_error

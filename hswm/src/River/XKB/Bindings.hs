@@ -19,7 +19,7 @@ import qualified Data.Map as M
 import           Foreign
 import           River.WMP
 
-type XBKey = (Modifiers, KeySym)
+type XBKey = (ModMask, KeySym)
 
 type XkbBindingMap a = M.Map XBKey (StablePtr (XkbBinding a))
 
@@ -55,7 +55,7 @@ newXKBBinding ::
   R.RiverSeat ->
   -- | Enable by default?
   Bool ->
-  Modifiers ->
+  ModMask ->
   KeySym ->
   -- | Action when pressed
   action ->

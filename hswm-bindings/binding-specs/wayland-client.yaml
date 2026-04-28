@@ -16,6 +16,7 @@ ctypes:
   - wlr-output-management-unstable-v1-client-protocol.h
   - wlr-output-power-management-unstable-v1-client-protocol.h
   - xdg-output-unstable-v1-client-protocol.h
+  - xdg-shell-client-protocol.h
   cname: struct wl_output
   hsname: Wl_output
 - headers: *headers

@@ -8,11 +8,14 @@ author:             Samuli Thomasson
 maintainer:         samuli.thomasson@pm.me
 build-type:         Custom
 extra-doc-files:    CHANGELOG.md
+tested-with:
+  - GHC == 9.12.2
+  - GHC == 9.14.1
 
 custom-setup:
   dependencies:
-    - base
-    - Cabal
+    - base >=4.21.0.0 && <4.23
+    - Cabal >=3.14 && <3.15
 
 extra-source-files:
   - Makefile
@@ -26,15 +29,15 @@ extra-source-files:
 library:
   source-dirs: src
   dependencies:
-    - base ^>=4.21.0.0
-    - c-expr-runtime
-    - hs-bindgen-runtime
-    - template-haskell
-    - data-default
-    - hashable
-    - text
-    - deepseq
-    - xml-conduit
+    - base >=4.21.0.0 && <4.23
+    - c-expr-runtime ^>=0.1.0
+    - hs-bindgen-runtime ^>=0.1.0
+    - template-haskell >=2.23.0 && <2.25
+    - data-default ^>=0.8.0
+    - hashable ^>=1.5.1
+    - text ^>=2.1.2
+    - deepseq ^>=1.5.1
+    - xml-conduit ^>=1.10.1
   include-dirs:
     - include
     - include/wayland-protocols

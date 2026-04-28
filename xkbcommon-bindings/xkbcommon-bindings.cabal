@@ -13,6 +13,7 @@ build-type:         Simple
 extra-doc-files:    CHANGELOG.md
 tested-with:
   GHC == 9.12.2
+  GHC == 9.14.1
 -- extra-source-files:
 
 common warnings
@@ -41,10 +42,10 @@ library
      , Text.XkbCommon.FFI
      , Text.XkbCommon.Registry
     build-depends:
-       base ^>=4.21.0.0
-     , data-default
-     , unix
-     , rio
+       base >=4.21.0.0 && <4.23
+     , data-default ^>=0.8
+     , unix ^>=2.8.6
+     , rio ^>=0.1.24
     hs-source-dirs:   src
     extra-libraries:
        xkbcommon

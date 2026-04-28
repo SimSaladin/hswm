@@ -1,4 +1,4 @@
-cabal-version: 3.8
+cabal-version: 3.12
 
 -- This file has been generated from package.yaml by hpack version 0.38.3.
 --
@@ -11,6 +11,9 @@ license-file:       LICENSE
 author:             Samuli Thomasson
 maintainer:         samuli.thomasson@pm.me
 build-type:         Custom
+tested-with:
+      GHC == 9.12.2
+    , GHC == 9.14.1
 extra-source-files:
       Makefile
       protocol/input-method-unstable-v2.xml
@@ -105,6 +108,7 @@ extra-source-files:
       binding-specs/river-input-management.yaml
       binding-specs/river-window-management.yaml
       binding-specs/wayland-client.yaml
+      binding-specs/xdg-shell.yaml
       generated/Bindings.Pixman.Generated.yaml
       generated/Bindings.River.InputManagementV1.Generated.yaml
       generated/Bindings.River.LayerShellV1.Generated.yaml
@@ -124,13 +128,14 @@ extra-source-files:
       generated/Bindings.Wayland.WlrOutputManagementUnstableV1.Generated.yaml
       generated/Bindings.Wayland.WlrOutputPowerManagementUnstableV1.Generated.yaml
       generated/Bindings.Wayland.XdgOutputUnstableV1.Generated.yaml
+      generated/Bindings.Wayland.XdgShell.Generated.yaml
 extra-doc-files:
       CHANGELOG.md
 
 custom-setup
     setup-depends:
-          Cabal
-        , base
+          Cabal ==3.14.*
+        , base >=4.21.0.0 && <4.23
 
 library
     exposed-modules:
@@ -249,20 +254,26 @@ library
           Bindings.Wayland.XdgOutputUnstableV1.Generated.Global
           Bindings.Wayland.XdgOutputUnstableV1.Generated.Safe
           Bindings.Wayland.XdgOutputUnstableV1.Generated.Unsafe
+          Bindings.Wayland.XdgShell
+          Bindings.Wayland.XdgShell.Generated
+          Bindings.Wayland.XdgShell.Generated.FunPtr
+          Bindings.Wayland.XdgShell.Generated.Global
+          Bindings.Wayland.XdgShell.Generated.Safe
+          Bindings.Wayland.XdgShell.Generated.Unsafe
     other-modules:
           Paths_hswm_bindings
     autogen-modules:
           Paths_hswm_bindings
     build-depends:
-          base >=4.21.0.0 && <4.22
-        , c-expr-runtime
-        , data-default
-        , deepseq
-        , hashable
-        , hs-bindgen-runtime
-        , template-haskell
-        , text
-        , xml-conduit
+          base >=4.21.0.0 && <4.23
+        , c-expr-runtime >=0.1.0 && <0.2
+        , data-default >=0.8.0 && <0.9
+        , deepseq >=1.5.1 && <1.6
+        , hashable >=1.5.1 && <1.6
+        , hs-bindgen-runtime >=0.1.0 && <0.2
+        , template-haskell >=2.23.0 && <2.25
+        , text >=2.1.2 && <2.2
+        , xml-conduit >=1.10.1 && <1.11
     hs-source-dirs:
           src
     default-extensions:

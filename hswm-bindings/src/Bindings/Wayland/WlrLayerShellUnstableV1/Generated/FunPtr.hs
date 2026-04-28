@@ -24,6 +24,7 @@ module Bindings.Wayland.WlrLayerShellUnstableV1.Generated.FunPtr
   where
 
 import qualified Bindings.Wayland.Client.Generated
+import qualified Bindings.Wayland.XdgShell.Generated
 import qualified HsBindgen.Runtime.Internal.CAPI
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.LibC
@@ -516,7 +517,7 @@ foreign import ccall unsafe "hs_bindgen_cca853ab7e5998ce" hs_bindgen_cca853ab7e5
      IO (RIP.FunPtr RIP.Void)
 
 -- __unique:__ @Bindings_Wayland_WlrLayerShellUnstableV1_Generated_Bindings.Wayland.WlrLayerShellUnstableV1.Generated_get_zwlr_layer_surface_v1_get_popup@
-hs_bindgen_cca853ab7e5998ce :: IO (RIP.FunPtr (RIP.Ptr Zwlr_layer_surface_v1 -> RIP.Ptr Xdg_popup -> IO ()))
+hs_bindgen_cca853ab7e5998ce :: IO (RIP.FunPtr (RIP.Ptr Zwlr_layer_surface_v1 -> RIP.Ptr Bindings.Wayland.XdgShell.Generated.Xdg_popup -> IO ()))
 hs_bindgen_cca853ab7e5998ce =
   RIP.fromFFIType hs_bindgen_cca853ab7e5998ce_base
 
@@ -531,7 +532,7 @@ hs_bindgen_cca853ab7e5998ce =
 
     __exported by:__ @wlr-layer-shell-unstable-v1-client-protocol.h@
 -}
-zwlr_layer_surface_v1_get_popup :: RIP.FunPtr (RIP.Ptr Zwlr_layer_surface_v1 -> RIP.Ptr Xdg_popup -> IO ())
+zwlr_layer_surface_v1_get_popup :: RIP.FunPtr (RIP.Ptr Zwlr_layer_surface_v1 -> RIP.Ptr Bindings.Wayland.XdgShell.Generated.Xdg_popup -> IO ())
 zwlr_layer_surface_v1_get_popup =
   RIP.unsafePerformIO hs_bindgen_cca853ab7e5998ce
 

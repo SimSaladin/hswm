@@ -39,7 +39,7 @@ import Bindings.Wayland.WlrOutputPowerManagementUnstableV1 qualified as Wlr
 -- | User configuration
 data HSWMConfig m l = HSWMConfig
   { keyBindings :: [((ModMask, KeySym), SomeAction m)],
-    pointerBindings :: [((String, KeySym), SomeAction m)],
+    pointerBindings :: [((String, Button), SomeAction m)],
     defaultModMask :: !String,
     borderWidth :: !Int32,
     normalBorder :: !RiverColor,

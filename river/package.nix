@@ -1,6 +1,5 @@
 {
   src,
-  zon_nix,
   lib,
   stdenv,
   callPackage,
@@ -27,7 +26,7 @@
   pkgs,
 }:
 let
-  mkZon2Nix = { zonfile, outputHash ? "" }: pkgs.runCommand "zon2nix" {
+  mkZon2Nix = { name, zonfile, outputHash ? "" }: pkgs.runCommand "zon2nix-${name}" {
     buildInputs = [
       pkgs.cacert
       pkgs.zon2nix
@@ -47,13 +46,22 @@ let
     zon2nix ${zonfile} > $out
   '';
 
-  deps = callPackage zon_nix { };
+  deps0 = mkZon2Nix {
+    name = "river";
+    zonfile = "${src}/build.zig.zon";
+    outputHash = "sha256-RomlAd47G7Op1Y9ql5pIUUibw+RO06izo2MPzpDtPg8=";
+  };
+
   extra = mkZon2Nix {
-    zonfile = "${deps}/translate_c-0.0.0-Q_BUWlX1BgCD1wo6uo97prlp9VJ4gxAjwN_vZ7nsSjGN/build.zig.zon";
+    name = "translate_c";
+    zonfile = "${callPackage deps0 {}}/translate_c-0.0.0-Q_BUWlX1BgCD1wo6uo97prlp9VJ4gxAjwN_vZ7nsSjGN/build.zig.zon";
     outputHash = "sha256-MJc+N/T2B8yW2sz1Ys8rGkhjgmmm+nXxNXnubCm0e6U=";
   };
-  deps' = callPackage zon_nix { linkFarm = name: ps: ps; };
+
+  deps' = callPackage deps0 { linkFarm = name: ps: ps; };
+
   extra' = callPackage extra { linkFarm = name: ps: ps; };
+
   depsFinal = pkgs.linkFarm "zig-packages" (deps' ++ extra');
 in
 
@@ -74,8 +82,6 @@ stdenv.mkDerivation (finalAttrs: {
   strictDeps = true;
 
   # zon2nix build.zig.zon > /home/sim/hswm/river.zig.zon.nix
-  #deps = callPackage ./river.zig.zon.nix { };
-  #deps = callPackage zon_nix { };
   deps = depsFinal;
 
   nativeBuildInputs = [

@@ -162,9 +162,9 @@ handleLayerShellSeat e = do
 
 handleXkbBindingEvent :: R.RiverXkbBindingEvent -> H ()
 handleXkbBindingEvent = \case
-    R.RiverXkbBindingPressed dt ptr -> do
+    R.RiverXkbBindingPressed dt _ -> do
      xb <- io $ deRefStablePtr (castPtrToStablePtr (castPtr dt) :: StablePtr (XkbBinding (SomeAction H)))
-     execXkbBinding ptr xb
+     execXkbBinding xb
 
     R.RiverXkbBindingReleased dt _ -> do
      xb <- io $ deRefStablePtr (castPtrToStablePtr (castPtr dt) :: StablePtr (XkbBinding (SomeAction H)))
@@ -433,8 +433,8 @@ cancelEnsureNextKeyEaten s = io $ R.riverXkbBindingsSeatCancelEnsureNextKeyEaten
 cancelXkbBinding :: XkbBinding (SomeAction H) -> H ()
 cancelXkbBinding xb = tryTakeMVar xb.running >>= maybe (return ()) cancel
 
-execXkbBinding :: R.RiverXkbBinding -> XkbBinding (SomeAction H) -> H ()
-execXkbBinding ref xb = local (\r -> r {thisSeat = Just rs}) $ do
+execXkbBinding :: XkbBinding (SomeAction H) -> H ()
+execXkbBinding xb = local (\r -> r {thisSeat = Just rs}) $ do
 
   let next action = runInHS $ modifySeat rs $ \s' -> s' {pending_action = action }
       execute = void . userCode $ runner xb.action

@@ -1,0 +1,13 @@
+version:
+  hs_bindgen: 0.1.0
+  binding_specification: '1.0'
+hsmodule: Bindings.Wayland.XdgShell.Generated
+ctypes:
+- headers: &headers
+  - xdg-shell-client-protocol.h
+  - wlr-layer-shell-unstable-v1-client-protocol.h
+  cname: struct xdg_popup
+  hsname: Xdg_popup
+hstypes:
+- hsname: Xdg_popup
+  representation: emptydata

@@ -1,7 +1,6 @@
 ---
 verbatim:
   - cabal-version:    3.12
-
 name:               hswm
 version: &version   0.1.0.0
 synopsis:           Wayland window manager for River
@@ -15,10 +14,12 @@ build-type:         Simple
 #extra-doc-files:    README.md
 #                  CHANGELOG.md
 #extra-source-files:
+tested-with:
+  - GHC == 9.12.2
 
-_common/language: &language
+_common-language: &language
   language: GHC2024
-  default-extensions: &default-extensions
+  default-extensions:
     - RecordWildCards
     - OverloadedRecordDot
     - OverloadedLabels
@@ -28,12 +29,18 @@ _common/language: &language
     - DeriveAnyClass
     - PackageImports
     - QuantifiedConstraints
+
     # https://discourse.haskell.org/t/what-are-you-supposed-to-do-about-wambiguous-fields/9545/36?page=2
-  ghc-options: &common-ghc-options
+_common-ghc-options: &common-ghc-options
     -Wall
     -Wunused-packages
     -Wno-partial-type-signatures
     -Wno-ambiguous-fields
+
+_common-rts-options: &common-rts-options
+    -threaded
+    -rtsopts "-with-rtsopts=-maxN4 -qn2 -A8M -K64M -M1G -kc8k"
+
 
 internal-libraries:
   hswm-prelude:
@@ -44,7 +51,7 @@ internal-libraries:
     other-modules: []
     dependencies:
       - name: base
-        version: &base-version '>=4.21.0 && < 4.22'
+        version: &base-version '>=4.21.0 && < 4.23'
       - rio
       - text
       - mtl
@@ -55,6 +62,8 @@ internal-libraries:
       - unliftio
       - exceptions
       - async
+    ghc-options:
+      - *common-ghc-options
 
 library:
   <<: *language
@@ -76,36 +85,38 @@ library:
       mixin:
         - (HSWM.Prelude as Prelude)
     - JuicyPixels ^>=3.3.9
-    - aeson
+    - aeson ^>=2.2.3
     - bytestring ^>=0.12.2
-    - containers ^>=0.7
+    - containers >=0.7 && <1.0
     - data-default ^>=0.8.0
-    - deepseq
-    - derive-storable
-    - directory
-    - fast-logger
+    - deepseq ^>=1.5.1
+    - derive-storable ^>=0.3.1
+    - directory ^>=1.3.9
+    - fast-logger ^>=3.2.6
     - hswm-bindings # Generated C bindings
-    - mtl
-    - network
+    - mtl ^>=2.3.1
+    - network ^>=3.2.8
     - optparse-generic ^>=1.5
-    - optparse-applicative
-    - pretty-simple
-    - process
-    - stm
-    - text
-    - time
-    - transformers
-    - typed-process
-    - typerep-map
-    - unbounded-delays
-    - unix
-    - utf8-string
-    - vector
+    - optparse-applicative ^>=0.18.1
+    - pretty-simple ^>=4.1.4
+    - process ^>=1.6.25
+    - stm ^>=2.5.3
+    - text ^>=2.1.2
+    - time >=1.14 && <2.0
+    - transformers ^>=0.6.1
+    - typed-process ^>=0.2.13
+    - typerep-map ^>=0.7.0
+    - unbounded-delays ^>=0.1.1
+    - unix ^>=2.8.6
+    - utf8-string ^>=1.0.2
+    - vector ^>=0.13.2
     - xkbcommon-bindings
-    - filelock
-    - pango
+    - filelock ^>=0.1.1
+    - pango ^>=0.13.12
   build-tools:
     - hsc2hs:hsc2hs
+  ghc-options:
+    - *common-ghc-options
 
 executables:
   hswm:
@@ -120,8 +131,7 @@ executables:
       - bytestring
     ghc-options:
       - *common-ghc-options
-      - -threaded
-      - -rtsopts "-with-rtsopts=-maxN4 -qn2 -A8M -K64M -M1G -kc8k"
+      - *common-rts-options
 
   hswmctl:
     <<: *language
@@ -142,5 +152,4 @@ executables:
       - optparse-applicative
     ghc-options:
       - *common-ghc-options
-      - -threaded
-      - -rtsopts "-with-rtsopts=-maxN4 -qn2 -A8M -K64M -M1G -kc8k"
+      - *common-rts-options
