@@ -14,44 +14,57 @@ tested-with:
 
 custom-setup:
   dependencies:
-    - base >=4.21.0.0 && <4.23
+    - &base
+      base  >=4.21 && <4.23
     - Cabal >=3.14 && <3.15
 
 extra-source-files:
   - Makefile
-  - protocol/*.xml
-  - cbits/*.c
-  - include/*.h
-  - include/*/*.h
   - binding-specs/*.yaml
   - generated/*.yaml
+  - protocol/**/*.xml
+  - cbits/**/*.c
+  - include/**/*.h
+
+flags:
+  use-pkgconfig:
+    description: Use pkgconfig to to resolve C dependencies
+    default: true
+    manual: true
 
 library:
   source-dirs: src
   dependencies:
-    - base >=4.21.0.0 && <4.23
-    - c-expr-runtime ^>=0.1.0
+    - *base
+    - template-haskell    >=2.23   && <2.25
+    - data-default       ^>=0.8.0
+    - hashable           ^>=1.5.1
+    - text               ^>=2.1.2
+    - deepseq            ^>=1.5.1
+    - xml-conduit        ^>=1.10.1
     - hs-bindgen-runtime ^>=0.1.0
-    - template-haskell >=2.23.0 && <2.25
-    - data-default ^>=0.8.0
-    - hashable ^>=1.5.1
-    - text ^>=2.1.2
-    - deepseq ^>=1.5.1
-    - xml-conduit ^>=1.10.1
-  include-dirs:
-    - include
-    - include/wayland-protocols
-  pkgconfig-depends:
-    - wayland-client
-    - pixman-1
-    - wayland-protocols
+    - c-expr-runtime     ^>=0.1.0
+  language: GHC2024
+  default-extensions:
+    - DuplicateRecordFields
+    - OverloadedStrings
+    - TemplateHaskell
+    - TypeFamilies
   ghc-options:
     - -Wall
     - -Wunused-packages
     - -fPIC
-  language: GHC2024
-  default-extensions:
-    - TemplateHaskell
-    - TypeFamilies
-    - OverloadedStrings
-    - DuplicateRecordFields
+  include-dirs:
+    - include
+    - include/wayland-protocols
+  when:
+    - condition: flag(use-pkgconfig)
+      then:
+        pkgconfig-depends:
+          - pixman-1
+          - wayland-client
+          - wayland-protocols
+      else:
+        extra-libraries:
+          - pixman-1
+          - wayland-client

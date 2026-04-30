@@ -1,12 +1,11 @@
-module Wayland
-  ( module Wayland,
-  )
-where
+module Wayland (
+  module Wayland,
+  ) where
 
-import Data.List qualified as L
-import Foreign
-import Bindings.Wayland.Client qualified as WL
-import HSWM.Types.TypeMap
+import qualified Bindings.Wayland.Client as WL
+import qualified Data.List as L
+import           Foreign
+import           HSWM.Types.TypeMap
 
 ------------------------------------------------------------------
 -- * Registry tracking
@@ -19,7 +18,8 @@ type InterfaceVersion = (String, Version)
 
 type WlRegistry = WL.Registry
 
-data WlRegistryException = NoSuchRegistryObject String Version deriving (Show, Eq)
+data WlRegistryException = NoSuchRegistryObject String Version
+  deriving (Show, Eq)
 
 instance Exception WlRegistryException
 
@@ -44,51 +44,54 @@ instance Monoid RegistryCache where
   mempty = RegistryCache []
   mappend = (<>)
 
-class HasGlobalsRegistry a where
-  globalsRegistryL :: Lens' a (IORef RegistryCache)
+class HasGlobalsRegistry env where
+  globalsRegistryL :: Lens' env (IORef RegistryCache)
 
 instance HasGlobalsRegistry (IORef RegistryCache) where
   globalsRegistryL = lens id const
 
 -- * Registering to global items
 
-bindGlobalAuto_ :: forall a m env. (Typeable a, WL.HasInterface a, WL.InterfaceType a ~ WL.Wl_interface,
-                   MonadUnliftIO m, MonadThrow m, MonadLogger m, MonadReader env m,
-                   HasGlobalsRegistry env, HasGlobalTMap env) => m a
+bindGlobalAuto_
+  :: forall a m env. (Typeable a, WL.HasInterface a, WL.InterfaceType a ~ WL.Wl_interface,
+     MonadUnliftIO m, MonadThrow m, MonadLogger m, MonadReader env m,
+     HasGlobalsRegistry env, HasGlobalTMap env)
+  => m a
 bindGlobalAuto_ = bindGlobalWith_ (WL.objectInterfaceName proxy, fi $ WL.objectInterfaceVersion proxy)
   (WL.objectInterface proxy) WL.objectBindWrap
     where
       proxy :: Proxy a
       proxy = Proxy
 
-bindGlobalAuto :: forall a m env. (Typeable a, WL.HasInterface a, WL.InterfaceType a ~ WL.Wl_interface, WL.AddListener a,
-                   MonadUnliftIO m, MonadThrow m, MonadLogger m, MonadReader env m,
-                   HasGlobalsRegistry env, HasGlobalTMap env)
-                     => [(ConstPtr (WL.ObjectListener a), Ptr a)] -- ^ Optionally a listener/listeners to add after creation
-                       -> m a
+bindGlobalAuto
+  :: forall a m env. (Typeable a, WL.HasInterface a, WL.InterfaceType a ~ WL.Wl_interface, WL.HasListener a,
+     MonadUnliftIO m, MonadThrow m, MonadLogger m, MonadReader env m,
+     HasGlobalsRegistry env, HasGlobalTMap env)
+  => [(ConstPtr (WL.ObjectListener a), Ptr a)] -- ^ Optionally a listener/listeners to add after creation
+  -> m a
 bindGlobalAuto = bindGlobalWith (WL.objectInterfaceName proxy, fi $ WL.objectInterfaceVersion proxy)
   (WL.objectInterface proxy) WL.objectBindWrap
     where
       proxy :: Proxy a
       proxy = Proxy
 
-bindGlobalWith :: (Typeable a, MonadUnliftIO m, MonadThrow m, MonadLogger m, MonadReader env m,
-                   HasGlobalsRegistry env, HasGlobalTMap env, WL.AddListener a)
-               => InterfaceVersion
-               -> ConstPtr WL.Wl_interface
-               -> (Ptr b -> a) -- ^ Wrapper for the created client object
-               -> [(ConstPtr (WL.ObjectListener a), Ptr a)] -- ^ Optionally a listener/listeners to add after creation
-               -> m a
+bindGlobalWith
+  :: (Typeable a, MonadUnliftIO m, MonadThrow m, MonadLogger m, MonadReader env m, HasGlobalsRegistry env, HasGlobalTMap env, WL.HasListener a)
+  => InterfaceVersion
+  -> ConstPtr WL.Wl_interface
+  -> (Ptr b -> a) -- ^ Wrapper for the created client object
+  -> [(ConstPtr (WL.ObjectListener a), Ptr a)] -- ^ Optionally a listener/listeners to add after creation
+  -> m a
 bindGlobalWith ifaceVer@(_nm, _ver) iface toa listeners = do
   obj <- bindGlobalWith_ ifaceVer iface toa
   obj <$ forM_ listeners (\(l, ud) -> io $ WL.listenerAdd obj l ud)
 
-bindGlobalWith_ :: (Typeable a, MonadUnliftIO m, MonadThrow m, MonadLogger m, MonadReader env m,
-                   HasGlobalsRegistry env, HasGlobalTMap env)
-               => InterfaceVersion
-               -> ConstPtr WL.Wl_interface
-               -> (Ptr b -> a) -- ^ Wrapper for the created client object
-               -> m a
+bindGlobalWith_
+  :: (Typeable a, MonadUnliftIO m, MonadThrow m, MonadLogger m, MonadReader env m, HasGlobalsRegistry env, HasGlobalTMap env)
+  => InterfaceVersion
+  -> ConstPtr WL.Wl_interface
+  -> (Ptr b -> a) -- ^ Wrapper for the created client object
+  -> m a
 bindGlobalWith_ ifaceVer@(_nm, _ver) iface toa = do
   reg <- asks (view globalsRegistryL)
   obj <- requireGlobal reg ifaceVer (\r n v -> toa . castPtr <$> WL.registryBind r n iface (fi v))

@@ -109,7 +109,7 @@ data KeymapState = KeymapState
   deriving stock (Eq, Show, Generic)
 
 keymapFromString :: String -> XkbRuleNames
-keymapFromString name = XkbRuleNames { rules = "", model = "pc104", layout = name, variant = "intl", options = "" }
+keymapFromString name = def { layouts = [fromString name] }
 
 setKeyboardKeymaps :: (XkbKeyboardState -> Bool) -> XkbRuleNames -> H ()
 setKeyboardKeymaps select params =
@@ -130,14 +130,15 @@ setKeyboardKeymap kbd params = do
 
 createKeyboardKeymap :: XkbRuleNames -> H KeymapState
 createKeyboardKeymap params = lookupKeymaps params >>= \case
-  xs | Just valid <- L.find (\ks -> ks.created) xs -> return valid
-     | Just pending <- L.find (\ks -> ks.failure == Nothing) xs -> return pending
+  xs | Just valid <- L.find (.created) xs -> return valid
+     | Just pending <- L.find (\ks -> isNothing ks.failure) xs -> return pending
      | otherwise -> create
     where
     create = do
       xkbConfig <- getObject
-      kmap <- io $ newXkbKeymapFromNames params
-      fd <- io $ createXkbKeymapFd kmap
+      ctx <- io $ createXkbContext def
+      kmap <- io $ createKeymapFromNames ctx params keymapFormatTextV1
+      fd <- io $ keymapAsStringFd kmap keymapFormatTextV1
       keymap <- R.riverXkbConfigCreateKeymap xkbConfig (fi fd) R.RIVER_XKB_CONFIG_V1_KEYMAP_FORMAT_TEXT_V1
       let kmState = KeymapState { created = False, failure = Nothing, keymap, keymapFd = fd, params = Just params }
       modifyObjectDef $ \st -> st { xkbKeymaps = kmState : st.xkbKeymaps }

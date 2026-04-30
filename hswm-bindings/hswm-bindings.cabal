@@ -16,6 +16,30 @@ tested-with:
     , GHC == 9.14.1
 extra-source-files:
       Makefile
+      binding-specs/river-input-management.yaml
+      binding-specs/river-window-management.yaml
+      binding-specs/wayland-client.yaml
+      binding-specs/xdg-shell.yaml
+      generated/Bindings.Pixman.Generated.yaml
+      generated/Bindings.River.InputManagementV1.Generated.yaml
+      generated/Bindings.River.LayerShellV1.Generated.yaml
+      generated/Bindings.River.LibinputConfigV1.Generated.yaml
+      generated/Bindings.River.WindowManagementV1.Generated.yaml
+      generated/Bindings.River.XkbBindingsV1.Generated.yaml
+      generated/Bindings.River.XkbConfigV1.Generated.yaml
+      generated/Bindings.Wayland.Client.Generated.yaml
+      generated/Bindings.Wayland.ExtIdleNotifyV1.Generated.yaml
+      generated/Bindings.Wayland.ExtSessionLockV1.Generated.yaml
+      generated/Bindings.Wayland.FractionalScaleV1.Generated.yaml
+      generated/Bindings.Wayland.Protocol.ForeignTopLevelListV1.Generated.yaml
+      generated/Bindings.Wayland.Util.Generated.yaml
+      generated/Bindings.Wayland.Viewporter.Generated.yaml
+      generated/Bindings.Wayland.WlrInputMethodUnstableV2.Generated.yaml
+      generated/Bindings.Wayland.WlrLayerShellUnstableV1.Generated.yaml
+      generated/Bindings.Wayland.WlrOutputManagementUnstableV1.Generated.yaml
+      generated/Bindings.Wayland.WlrOutputPowerManagementUnstableV1.Generated.yaml
+      generated/Bindings.Wayland.XdgOutputUnstableV1.Generated.yaml
+      generated/Bindings.Wayland.XdgShell.Generated.yaml
       protocol/input-method-unstable-v2.xml
       protocol/river-input-management-v1.xml
       protocol/river-layer-shell-v1.xml
@@ -24,6 +48,63 @@ extra-source-files:
       protocol/river-window-management-v1.xml
       protocol/river-xkb-bindings-v1.xml
       protocol/river-xkb-config-v1.xml
+      protocol/wayland-protocols/alpha-modifier-v1.xml
+      protocol/wayland-protocols/color-management-v1.xml
+      protocol/wayland-protocols/color-representation-v1.xml
+      protocol/wayland-protocols/commit-timing-v1.xml
+      protocol/wayland-protocols/content-type-v1.xml
+      protocol/wayland-protocols/cursor-shape-v1.xml
+      protocol/wayland-protocols/drm-lease-v1.xml
+      protocol/wayland-protocols/ext-background-effect-v1.xml
+      protocol/wayland-protocols/ext-data-control-v1.xml
+      protocol/wayland-protocols/ext-foreign-toplevel-list-v1.xml
+      protocol/wayland-protocols/ext-idle-notify-v1.xml
+      protocol/wayland-protocols/ext-image-capture-source-v1.xml
+      protocol/wayland-protocols/ext-image-copy-capture-v1.xml
+      protocol/wayland-protocols/ext-session-lock-v1.xml
+      protocol/wayland-protocols/ext-transient-seat-v1.xml
+      protocol/wayland-protocols/ext-workspace-v1.xml
+      protocol/wayland-protocols/fifo-v1.xml
+      protocol/wayland-protocols/fractional-scale-v1.xml
+      protocol/wayland-protocols/fullscreen-shell-unstable-v1.xml
+      protocol/wayland-protocols/idle-inhibit-unstable-v1.xml
+      protocol/wayland-protocols/input-method-unstable-v1.xml
+      protocol/wayland-protocols/input-timestamps-unstable-v1.xml
+      protocol/wayland-protocols/keyboard-shortcuts-inhibit-unstable-v1.xml
+      protocol/wayland-protocols/linux-dmabuf-unstable-v1.xml
+      protocol/wayland-protocols/linux-dmabuf-v1.xml
+      protocol/wayland-protocols/linux-drm-syncobj-v1.xml
+      protocol/wayland-protocols/linux-explicit-synchronization-unstable-v1.xml
+      protocol/wayland-protocols/pointer-constraints-unstable-v1.xml
+      protocol/wayland-protocols/pointer-gestures-unstable-v1.xml
+      protocol/wayland-protocols/pointer-warp-v1.xml
+      protocol/wayland-protocols/presentation-time.xml
+      protocol/wayland-protocols/primary-selection-unstable-v1.xml
+      protocol/wayland-protocols/relative-pointer-unstable-v1.xml
+      protocol/wayland-protocols/security-context-v1.xml
+      protocol/wayland-protocols/single-pixel-buffer-v1.xml
+      protocol/wayland-protocols/tablet-unstable-v1.xml
+      protocol/wayland-protocols/tablet-unstable-v2.xml
+      protocol/wayland-protocols/tablet-v2.xml
+      protocol/wayland-protocols/tearing-control-v1.xml
+      protocol/wayland-protocols/text-input-unstable-v1.xml
+      protocol/wayland-protocols/text-input-unstable-v3.xml
+      protocol/wayland-protocols/viewporter.xml
+      protocol/wayland-protocols/xdg-activation-v1.xml
+      protocol/wayland-protocols/xdg-decoration-unstable-v1.xml
+      protocol/wayland-protocols/xdg-dialog-v1.xml
+      protocol/wayland-protocols/xdg-foreign-unstable-v1.xml
+      protocol/wayland-protocols/xdg-foreign-unstable-v2.xml
+      protocol/wayland-protocols/xdg-output-unstable-v1.xml
+      protocol/wayland-protocols/xdg-shell-unstable-v5.xml
+      protocol/wayland-protocols/xdg-shell-unstable-v6.xml
+      protocol/wayland-protocols/xdg-shell.xml
+      protocol/wayland-protocols/xdg-system-bell-v1.xml
+      protocol/wayland-protocols/xdg-toplevel-drag-v1.xml
+      protocol/wayland-protocols/xdg-toplevel-icon-v1.xml
+      protocol/wayland-protocols/xdg-toplevel-tag-v1.xml
+      protocol/wayland-protocols/xwayland-keyboard-grab-unstable-v1.xml
+      protocol/wayland-protocols/xwayland-shell-v1.xml
       protocol/wayland.xml
       protocol/wlr-layer-shell-unstable-v1.xml
       protocol/wlr-output-management-unstable-v1.xml
@@ -35,6 +116,63 @@ extra-source-files:
       cbits/river-window-management-v1-protocol.c
       cbits/river-xkb-bindings-v1-protocol.c
       cbits/river-xkb-config-v1-protocol.c
+      cbits/wayland-protocols/alpha-modifier-v1-protocol.c
+      cbits/wayland-protocols/color-management-v1-protocol.c
+      cbits/wayland-protocols/color-representation-v1-protocol.c
+      cbits/wayland-protocols/commit-timing-v1-protocol.c
+      cbits/wayland-protocols/content-type-v1-protocol.c
+      cbits/wayland-protocols/cursor-shape-v1-protocol.c
+      cbits/wayland-protocols/drm-lease-v1-protocol.c
+      cbits/wayland-protocols/ext-background-effect-v1-protocol.c
+      cbits/wayland-protocols/ext-data-control-v1-protocol.c
+      cbits/wayland-protocols/ext-foreign-toplevel-list-v1-protocol.c
+      cbits/wayland-protocols/ext-idle-notify-v1-protocol.c
+      cbits/wayland-protocols/ext-image-capture-source-v1-protocol.c
+      cbits/wayland-protocols/ext-image-copy-capture-v1-protocol.c
+      cbits/wayland-protocols/ext-session-lock-v1-protocol.c
+      cbits/wayland-protocols/ext-transient-seat-v1-protocol.c
+      cbits/wayland-protocols/ext-workspace-v1-protocol.c
+      cbits/wayland-protocols/fifo-v1-protocol.c
+      cbits/wayland-protocols/fractional-scale-v1-protocol.c
+      cbits/wayland-protocols/fullscreen-shell-unstable-v1-protocol.c
+      cbits/wayland-protocols/idle-inhibit-unstable-v1-protocol.c
+      cbits/wayland-protocols/input-method-unstable-v1-protocol.c
+      cbits/wayland-protocols/input-timestamps-unstable-v1-protocol.c
+      cbits/wayland-protocols/keyboard-shortcuts-inhibit-unstable-v1-protocol.c
+      cbits/wayland-protocols/linux-dmabuf-unstable-v1-protocol.c
+      cbits/wayland-protocols/linux-dmabuf-v1-protocol.c
+      cbits/wayland-protocols/linux-drm-syncobj-v1-protocol.c
+      cbits/wayland-protocols/linux-explicit-synchronization-unstable-v1-protocol.c
+      cbits/wayland-protocols/pointer-constraints-unstable-v1-protocol.c
+      cbits/wayland-protocols/pointer-gestures-unstable-v1-protocol.c
+      cbits/wayland-protocols/pointer-warp-v1-protocol.c
+      cbits/wayland-protocols/presentation-time-protocol.c
+      cbits/wayland-protocols/primary-selection-unstable-v1-protocol.c
+      cbits/wayland-protocols/relative-pointer-unstable-v1-protocol.c
+      cbits/wayland-protocols/security-context-v1-protocol.c
+      cbits/wayland-protocols/single-pixel-buffer-v1-protocol.c
+      cbits/wayland-protocols/tablet-unstable-v1-protocol.c
+      cbits/wayland-protocols/tablet-unstable-v2-protocol.c
+      cbits/wayland-protocols/tablet-v2-protocol.c
+      cbits/wayland-protocols/tearing-control-v1-protocol.c
+      cbits/wayland-protocols/text-input-unstable-v1-protocol.c
+      cbits/wayland-protocols/text-input-unstable-v3-protocol.c
+      cbits/wayland-protocols/viewporter-protocol.c
+      cbits/wayland-protocols/xdg-activation-v1-protocol.c
+      cbits/wayland-protocols/xdg-decoration-unstable-v1-protocol.c
+      cbits/wayland-protocols/xdg-dialog-v1-protocol.c
+      cbits/wayland-protocols/xdg-foreign-unstable-v1-protocol.c
+      cbits/wayland-protocols/xdg-foreign-unstable-v2-protocol.c
+      cbits/wayland-protocols/xdg-output-unstable-v1-protocol.c
+      cbits/wayland-protocols/xdg-shell-protocol.c
+      cbits/wayland-protocols/xdg-shell-unstable-v5-protocol.c
+      cbits/wayland-protocols/xdg-shell-unstable-v6-protocol.c
+      cbits/wayland-protocols/xdg-system-bell-v1-protocol.c
+      cbits/wayland-protocols/xdg-toplevel-drag-v1-protocol.c
+      cbits/wayland-protocols/xdg-toplevel-icon-v1-protocol.c
+      cbits/wayland-protocols/xdg-toplevel-tag-v1-protocol.c
+      cbits/wayland-protocols/xwayland-keyboard-grab-unstable-v1-protocol.c
+      cbits/wayland-protocols/xwayland-shell-v1-protocol.c
       cbits/wlr-layer-shell-unstable-v1-protocol.c
       cbits/wlr-output-management-unstable-v1-protocol.c
       cbits/wlr-output-power-management-unstable-v1-protocol.c
@@ -45,9 +183,6 @@ extra-source-files:
       include/river-window-management-v1-client-protocol.h
       include/river-xkb-bindings-v1-client-protocol.h
       include/river-xkb-config-v1-client-protocol.h
-      include/wlr-layer-shell-unstable-v1-client-protocol.h
-      include/wlr-output-management-unstable-v1-client-protocol.h
-      include/wlr-output-power-management-unstable-v1-client-protocol.h
       include/wayland-protocols/alpha-modifier-v1-client-protocol.h
       include/wayland-protocols/color-management-v1-client-protocol.h
       include/wayland-protocols/color-representation-v1-client-protocol.h
@@ -105,37 +240,21 @@ extra-source-files:
       include/wayland-protocols/xdg-toplevel-tag-v1-client-protocol.h
       include/wayland-protocols/xwayland-keyboard-grab-unstable-v1-client-protocol.h
       include/wayland-protocols/xwayland-shell-v1-client-protocol.h
-      binding-specs/river-input-management.yaml
-      binding-specs/river-window-management.yaml
-      binding-specs/wayland-client.yaml
-      binding-specs/xdg-shell.yaml
-      generated/Bindings.Pixman.Generated.yaml
-      generated/Bindings.River.InputManagementV1.Generated.yaml
-      generated/Bindings.River.LayerShellV1.Generated.yaml
-      generated/Bindings.River.LibinputConfigV1.Generated.yaml
-      generated/Bindings.River.WindowManagementV1.Generated.yaml
-      generated/Bindings.River.XkbBindingsV1.Generated.yaml
-      generated/Bindings.River.XkbConfigV1.Generated.yaml
-      generated/Bindings.Wayland.Client.Generated.yaml
-      generated/Bindings.Wayland.ExtIdleNotifyV1.Generated.yaml
-      generated/Bindings.Wayland.ExtSessionLockV1.Generated.yaml
-      generated/Bindings.Wayland.FractionalScaleV1.Generated.yaml
-      generated/Bindings.Wayland.Protocol.ForeignTopLevelListV1.Generated.yaml
-      generated/Bindings.Wayland.Util.Generated.yaml
-      generated/Bindings.Wayland.Viewporter.Generated.yaml
-      generated/Bindings.Wayland.WlrInputMethodUnstableV2.Generated.yaml
-      generated/Bindings.Wayland.WlrLayerShellUnstableV1.Generated.yaml
-      generated/Bindings.Wayland.WlrOutputManagementUnstableV1.Generated.yaml
-      generated/Bindings.Wayland.WlrOutputPowerManagementUnstableV1.Generated.yaml
-      generated/Bindings.Wayland.XdgOutputUnstableV1.Generated.yaml
-      generated/Bindings.Wayland.XdgShell.Generated.yaml
+      include/wlr-layer-shell-unstable-v1-client-protocol.h
+      include/wlr-output-management-unstable-v1-client-protocol.h
+      include/wlr-output-power-management-unstable-v1-client-protocol.h
 extra-doc-files:
       CHANGELOG.md
 
 custom-setup
     setup-depends:
           Cabal ==3.14.*
-        , base >=4.21.0.0 && <4.23
+        , base >=4.21 && <4.23
+
+flag use-pkgconfig
+    description: Use pkgconfig to to resolve C dependencies
+    manual: True
+    default: True
 
 library
     exposed-modules:
@@ -265,28 +384,33 @@ library
     autogen-modules:
           Paths_hswm_bindings
     build-depends:
-          base >=4.21.0.0 && <4.23
+          base >=4.21 && <4.23
         , c-expr-runtime >=0.1.0 && <0.2
         , data-default >=0.8.0 && <0.9
         , deepseq >=1.5.1 && <1.6
         , hashable >=1.5.1 && <1.6
         , hs-bindgen-runtime >=0.1.0 && <0.2
-        , template-haskell >=2.23.0 && <2.25
+        , template-haskell >=2.23 && <2.25
         , text >=2.1.2 && <2.2
         , xml-conduit >=1.10.1 && <1.11
     hs-source-dirs:
           src
     default-extensions:
+          DuplicateRecordFields
+          OverloadedStrings
           TemplateHaskell
           TypeFamilies
-          OverloadedStrings
-          DuplicateRecordFields
     ghc-options: -Wall -Wunused-packages -fPIC
     include-dirs:
           include
           include/wayland-protocols
-    pkgconfig-depends:
-          wayland-client
-        , pixman-1
-        , wayland-protocols
     default-language: GHC2024
+    if flag(use-pkgconfig)
+        pkgconfig-depends:
+              pixman-1
+            , wayland-client
+            , wayland-protocols
+    else
+        extra-libraries:
+              pixman-1
+              wayland-client

@@ -1,4 +1,3 @@
-------------------------------------------------------------------------------
 -- |
 -- Module      : River.Objects
 -- Copyright   : (c) Samuli Thomasson, 2026
@@ -6,8 +5,6 @@
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
---
-------------------------------------------------------------------------------
 module Bindings.River
   ( module Bindings.River.WindowManagementV1
   , module Bindings.River.LayerShellV1

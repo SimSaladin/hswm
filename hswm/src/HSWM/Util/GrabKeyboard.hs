@@ -27,7 +27,8 @@ data GrabIM = GrabIM
     inputMethod :: Wlr.InputMethod,
     inputMethodListener :: Wlr.InputMethodListener,
     imKeyboardGrab :: MVar Wlr.InputMethodKeyboardGrab,
-    imKeyboardGrabListener :: Wlr.InputMethodKeyboardGrabListener
+    imKeyboardGrabListener :: Wlr.InputMethodKeyboardGrabListener,
+    xkbState :: IORef XkbState
   }
 
 data GrabbedKey
@@ -58,7 +59,8 @@ withKeyboardGrab seat mods keys fun acc0 = do
   (manage, _) <- getEventQueueFuncs
   syncVar <- newEmptyMVar
   grabIM <- lookupGrabIM seat
-  bracket_
+  -- XXX: fork to avoid cancellation on the first "key released" event
+  void . async $ bracket_
     (tryPutMVar grabIM.reserved () >>= flip unless (throwString "IM busy"))
     (tryTakeMVar grabIM.reserved)
     $ do
@@ -68,7 +70,6 @@ withKeyboardGrab seat mods keys fun acc0 = do
         (deactivate grabIM >> manage (freeSeatActions >> seatEnableBindingsMatching seat.river_seat mods keys) >> manageDirty)
         $ do
           takeMVar syncVar
-          logDebug "grab: starting processing"
           void $
             let process s = do
                     inp <- atomically (readTChan rdChan)
@@ -110,8 +111,7 @@ newGrabIM manager seat = do
   active <- newIORef False
   pending_active <- newIORef False
   bcastChan <- newBroadcastTChanIO
-  xkbContext <- io $ xkbContextNew mempty -- TODO free
-  xkbState <- newIORef $ XkbState nullPtr -- @XkbState TODO free
+  xkbState <- newIORef . XkbState =<< io (newForeignPtr_ nullPtr)
   imKeyboardGrab <- newEmptyMVar
 
   runInIO <- askRunInIO
@@ -135,13 +135,13 @@ newGrabIM manager seat = do
 
     _ -> pure () -- ignored
 
-
   imKeyboardGrabListener <- io $ Wlr.mkInputMethodKeyboardGrabListener $ \e -> runInIO $ case e of
     Wlr.InputMethodKeyboardGrabKeymap _ _ _fmt fd size -> do
-      res <- io $ createKeymapFromFd xkbContext (fi fd) (fi size) False
-      st <- io $ xkbStateNew res
-      io $ xkbKeymapUnref res
-      writeIORef xkbState st
+      io $ do
+        ctx <- createXkbContext def
+        kmap <- createKeymapFromFd ctx (fi fd) (fi size) False keymapFormatTextV1
+        xst <- createXkbState kmap
+        writeIORef xkbState xst
       logDebug "grab: XKB keymap updated"
     Wlr.InputMethodKeyboardGrabModifiers _ _ _ depressed latched locked group -> do
       st <- readIORef xkbState
@@ -151,13 +151,14 @@ newGrabIM manager seat = do
       atomically $ writeTChan bcastChan it
     Wlr.InputMethodKeyboardGrabKey _ _ _ _time key st -> do
       xst <- readIORef xkbState
-      keysym <- io $ xkbStateKeyGetOneSym xst (fi $ key + 8)
+      keysym <- io $ xkbStateKeySym xst (fi $ key + 8)
       let it = Right GK {state = fi st.unwrap, keysym = fi keysym, keycode = fi key}
       logDebug $ "grab: key grabbed" :# [ "key" .= show it ]
       atomically $ writeTChan bcastChan it
     -- let pressed = fi st == WL.fromCEnum WL_KEYBOARD_KEY_STATE_PRESSED
 
     Wlr.InputMethodKeyboardGrabRepeatInfo {} -> pure () -- pTrace e -- ignored
+
   inputMethod <- io $ Wlr.inputMethodManagerGetInputMethod manager seat
   io $ WL.listenerAdd inputMethod inputMethodListener nullPtr
 
@@ -184,7 +185,6 @@ deactivate GrabIM {..} = do
     _ -> pure ()
   io $ do
     WL.objectDestroy inputMethod
-    _ <- WL.freeListener (Proxy :: Proxy Wlr.InputMethodEvent) =<< peek (unConstPtr inputMethodListener)
-    _ <- WL.freeListener (Proxy :: Proxy Wlr.InputMethodKeyboardGrabEvent) =<< peek (unConstPtr imKeyboardGrabListener)
-    return ()
+    void $ WL.freeListener (Proxy :: Proxy Wlr.InputMethod) inputMethodListener
+    void $ WL.freeListener (Proxy :: Proxy Wlr.InputMethodKeyboardGrab) imKeyboardGrabListener
   logDebug "grab: deactivated"

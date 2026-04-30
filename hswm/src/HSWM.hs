@@ -32,6 +32,6 @@ import HSWM.Main
 import HSWM.Operations
 import HSWM.InputConfig
 import HSWM.Utils
-import HSWM.XKB
+import HSWM.XKB hiding (LogLevel(..), Layout)
 import River
 import Prelude

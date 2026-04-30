@@ -1,11 +1,11 @@
-/* From: http://weblog.haskell.cz/pivnik/building-a-shared-library-in-haskell/ */
 
 #define STR(a) XSTR(a)
 #define XSTR(a) #a
 
 #include <stdio.h>
-#include "HsFFI.h"
-#include "Rts.h"
+#include <HsFFI.h>
+#include <Rts.h>
+
 #include "Waybar/CFFI/Plugin_stub.h"
 
 // FFI would export this as a function but waybar expects a const value...

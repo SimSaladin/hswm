@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "doctest-parallel": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1777046262,
+        "narHash": "sha256-xxbPYHWearFYRS3fwMaHkld1E1ADicOv8U9ok0ZFJuY=",
+        "owner": "martijnbastiaan",
+        "repo": "doctest-parallel",
+        "rev": "e18811f1c43c2ad2f99e431e5f8b3ca639fa6f59",
+        "type": "github"
+      },
+      "original": {
+        "owner": "martijnbastiaan",
+        "repo": "doctest-parallel",
+        "type": "github"
+      }
+    },
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": "nixpkgs-lib"
@@ -224,6 +240,7 @@
     },
     "root": {
       "inputs": {
+        "doctest-parallel": "doctest-parallel",
         "flake-parts": "flake-parts",
         "flake-utils": "flake-utils",
         "ghc-tcplugins-extra": "ghc-tcplugins-extra",

@@ -90,9 +90,11 @@ copy-wayland-protos: $(WAYLAND_PROTOS)
 #########
 
 $(WAYLAND_PROTO_CLIENT_HEADERS): $(HEADERDIR)/wayland-protocols/%-client-protocol.h: %.xml
+	@mkdir -p $(HEADERDIR)/wayland-protocols $(CDIR)/wayland-protocols
 	$(WAYLAND_SCANNER) client-header $< $@
 
 $(WAYLAND_PROTO_PRIVATE_CODE): $(CDIR)/wayland-protocols/%-protocol.c: %.xml
+	@mkdir -p $(HEADERDIR)/wayland-protocols $(CDIR)/wayland-protocols
 	$(WAYLAND_SCANNER) private-code $< $@
 
 $(CLIENT_HEADERS:%=$(HEADERDIR)/%): $(HEADERDIR)/%-client-protocol.h: $(PROTODIR)/%.xml

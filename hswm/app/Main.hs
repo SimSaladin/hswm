@@ -47,12 +47,15 @@ main =
             { layoutHook = myLayoutHook,
               handleEventHook = debugHook,
               logHook = IPC.ipcLogHook,
-              xkbLayout = Just XkbRuleNames
-                { rules = "",
-                  model = "pc104",
-                  layout = "dvp-my",
-                  variant = "dvp-my",
-                  options = "terminate:ctrl_alt_bksp,compose:rctrl-altgr,lv3:ralt_switch,lv3:menu_switch"
+              xkbLayout = Just def
+                { model = "pc104",
+                  layouts = [ "dvp-my(dvp-my)" ],
+                  options = Just
+                    [ "terminate:ctrl_alt_bksp"
+                    , "compose:rctrl-altgr"
+                    , "lv3:ralt_switch"
+                    , "lv3:menu_switch"
+                    ]
                 },
               pointerBindings = myPointerBinds,
               defaultModMask = "mod4",

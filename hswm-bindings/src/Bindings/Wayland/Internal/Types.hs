@@ -1,25 +1,32 @@
-{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
 
-------------------------------------------------------------------------------
 -- |
 -- Module      : Bindings.Wayland.Internal.Types
--- Description : Short description
+-- Description : Common types
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
 --
--- Longer description of this module.
---
-------------------------------------------------------------------------------
-module Bindings.Wayland.Internal.Types
-  ( module Bindings.Wayland.Internal.Types
-  , module ReExports
+module Bindings.Wayland.Internal.Types (
+  -- * Exceptions
+  WlClientException(..),
+  -- * Classes
+  IsWlObject(..),
+  HasDestructor(..),
+  HasInterface(..),
+  HasListener(..),
+  IsUserData(..),
+  -- * Functions
+  listenerAdd,
+  -- * Re-exports
+  module ReExports,
   ) where
 
+import           Control.Exception
 import           Control.Monad
+import           Control.Monad.IO.Class
 import           Data.Kind (Type)
 import           Data.Proxy
 import           Data.Void
@@ -27,81 +34,89 @@ import           Foreign
 import           Foreign.C
 import           Foreign.C.ConstPtr
 import           HsBindgen.Runtime.Prelude as ReExports (FromFunPtr(..), PtrConst, ToFunPtr(..), CEnum(..), CEnumZ)
-import           Control.Exception
-import Control.Monad.IO.Class
 
 -- * Exceptions
 
 data WlClientException = WlListenerAddFailed
-  deriving Show
+  deriving (Eq, Show)
+
 instance Exception WlClientException
 
--- * Common fields and attributes
+-- | Class of wayland objects that support operations:
 --
 --   - Reading @Version@
 --   - Read/write @userdata@
---   - Object destruction ('HasDestructor')
-
 class IsWlObject object where
-
+  -- | Read object version.
   getVersion :: object -> IO Word32
 
+  -- | Read object user data.
   getUserData :: object -> IO (Ptr Void)
 
+  -- | Write object user data.
   setUserData :: object -> Ptr Void -> IO ()
 
-class HasInterface object where
-  type InterfaceType object
-  objectInterface :: Proxy object -> ConstPtr (InterfaceType object)
-  objectInterfaceName :: Proxy object -> String
-  objectInterfaceVersion :: Proxy object -> Int
-  objectBindWrap :: Ptr () -> object
-
+-- | Wayland objects that have destructors.
 class HasDestructor object where
-
   objectDestroy :: object -> IO ()
 
+-- | Wayland objects that have interface (e.g. for global registry).
+class HasInterface object where
+  -- | The interface's type, always 'Wl_interface'
+  type InterfaceType object
+
+  -- | The interface global (constant).
+  objectInterface :: Proxy object -> ConstPtr (InterfaceType object)
+
+  -- | Name of this interface (e.g. in global registry).
+  objectInterfaceName :: Proxy object -> String
+
+  -- | Interface version.
+  objectInterfaceVersion :: Proxy object -> Int
+
+  -- | Object constructor.
+  objectBindWrap :: Ptr () -> object
+
+-- | Objects for which it is possible to create listeners.
+class HasListener object where
+
+  -- | The listener interface.
+  type ObjectListener object :: Type
+
+  -- | The event type of the listener.
+  type ObjectListenerEvent object :: Type
+
+  -- | Create a new listener.
+  createListener :: MonadIO m => Proxy object -> (ObjectListenerEvent object -> IO ()) -> m (ConstPtr (ObjectListener object))
+
+  -- | Add listener to object with the given user data.
+  objectListenerAdd :: object -> ConstPtr (ObjectListener object) -> Ptr Void -> IO CInt
+
+  -- | Free (destroy) the listener.
+  freeListener :: Proxy object -> ConstPtr (ObjectListener object) -> IO ()
+
+-- | Class of values that can be used as user data.
 class IsUserData a where
-
-  toUserData :: a -> Ptr Void
-
+  toUserData   :: a -> Ptr Void
   fromUserData :: Ptr Void -> IO a
 
 instance IsUserData () where
-  toUserData _ = nullPtr
+  toUserData   _ = nullPtr
   fromUserData _ = pure ()
 
 instance IsUserData (StablePtr a) where
-  toUserData = castPtr . castStablePtrToPtr
+  toUserData   = castPtr . castStablePtrToPtr
   fromUserData = pure . castPtrToStablePtr . castPtr
 
---instance {-# OVERLAPPABLE #-} (HasField "unwrap" ty (Ptr a), Storable ty) => IsUserData ty where
---  toUserData = castPtr . getField @"unwrap"
---  fromUserData = peek . castPtr
-
 instance {-# OVERLAPPABLE #-} IsUserData (Ptr a) where
-  toUserData = castPtr
+  toUserData   = castPtr
   fromUserData = pure . castPtr
 
--- * Listeners, listener events
-
-listenerAdd :: (MonadIO m, AddListener a, IsUserData ud)
-            => a -- ^ The target object
-            -> PtrConst (ObjectListener a) -- ^ Listener instance (function pointers)
-            -> ud -- ^ Userdata
+listenerAdd :: (MonadIO m, HasListener object, IsUserData userdata)
+            => object -- ^ The target object
+            -> PtrConst (ObjectListener object) -- ^ Listener instance (function pointers)
+            -> userdata -- ^ Userdata
             -> m ()
 listenerAdd obj l ud = liftIO $ do
   res <- objectListenerAdd obj l (toUserData ud)
   when (res < 0) $ throwIO WlListenerAddFailed
-
-class AddListener object where
-
-  type ObjectListener object :: Type
-
-  objectListenerAdd :: object -> PtrConst (ObjectListener object) -> Ptr Void -> IO CInt
-
-class ListenerEvent ev where
-
-  type Listener ev :: Type
-
-  freeListener :: Proxy ev -> Listener ev -> IO ()

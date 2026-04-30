@@ -31,6 +31,10 @@
       url = "github:TuongNM/gtk2hs/ghc-rts-api?dir=glib";
       flake = false;
     };
+    doctest-parallel = {
+      url = "github:martijnbastiaan/doctest-parallel";
+      flake = false;
+    };
   };
 
   outputs = inputs@{ ... }:
@@ -137,7 +141,7 @@
       # GHC 9.14 .. future
       haskellProjects.ghc914 = {
         defaults.enable = false;
-        basePackages = pkgs.haskell.packages.ghc914.extend (self: super: {
+        basePackages = pkgs.haskell.packages.ghc914.extend (_self: super: {
           # XXX: specifying this via packages.glib.source throws infinite
           # recursion...
           glib = pkgs.haskell.lib.compose.overrideSrc { src = inputs.glib; } super.glib;
@@ -145,7 +149,6 @@
 
         packages.ghc-tcplugins-extra.source = inputs.ghc-tcplugins-extra; # GHC 9.14
         packages.ghc-typelits-natnormalise.source = inputs.ghc-typelits-natnormalise; # containers 0.8 etc.
-
         settings.blaze-html.jailbreak = true; # containers 0.8
         settings.blaze-markup.jailbreak = true; # containers 0.8
         settings.boring.jailbreak = true; # base 4.22
@@ -162,6 +165,9 @@
         settings.universe-base.jailbreak = true; # base 4.22
         settings.vec.jailbreak = true; # base 4.22
         settings.pango.jailbreak = true; # base 4.22
+        settings.optics-core.jailbreak = true; # containers
+        packages.ghc-exactprint.source = "1.14.0.0";
+        packages.doctest-parallel.source = inputs.doctest-parallel; # 0.4.1
 
         autoWire = [];
       };
@@ -189,9 +195,6 @@
           xkbcommon-bindings.source = projectRoot + "/xkbcommon-bindings";
           waybar-cffi-hs.source = projectRoot + "/waybar-cffi-hs";
         };
-        #packages.glib.source = inputs.glib; # GHC 9.14
-        #settings.glib.jailbreak = true; # GHC 9.14
-        #settings.glib.buildFromSdist = false;
         autoWire = lib.mkForce [ "devShells" "packages" "apps" "checks" ];
       };
 
@@ -202,7 +205,7 @@
         defaults.settings.defined.haddock = lib.mkForce false;
         defaults.settings.all.extraConfigureFlags = [ "--ghc-options=-fPIC" ];
         projectRoot = cabalProjectRoot;
-        settings.waybar-cffi-hs.cabalFlags.static = true;
+        settings.waybar-cffi-hs.cabalFlags.standalone = true;
         packages = {
           hswm.source = projectRoot + "/hswm";
           hswm-bindings.source = projectRoot + "/hswm-bindings";

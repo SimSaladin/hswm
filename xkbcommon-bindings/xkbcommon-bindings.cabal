@@ -9,12 +9,15 @@ author:             Samuli Thomasson
 maintainer:         samuli.thomasson@pm.me
 -- copyright:
 category:           System
-build-type:         Simple
+build-type:         Custom
 extra-doc-files:    CHANGELOG.md
-tested-with:
-  GHC == 9.12.2
-  GHC == 9.14.1
+tested-with:        GHC == 9.14.1, GHC == 9.12.2
 -- extra-source-files:
+
+custom-setup
+  setup-depends:
+      base
+    , Cabal
 
 common warnings
     ghc-options:
@@ -35,21 +38,35 @@ common language
     OverloadedRecordDot
     TypeApplications
 
+flag use-pkgconfig
+  description: Use pkg-config to find xkbcommon headers
+  default: False
+
 library
     import: warnings, language
     exposed-modules:
        Text.XkbCommon
-     , Text.XkbCommon.FFI
+     , Text.XkbCommon.EventCodes
+     , Text.XkbCommon.Internal
+     , Text.XkbCommon.Internal.TH
+     , Text.XkbCommon.KeySym
+     , Text.XkbCommon.KeySyms
      , Text.XkbCommon.Registry
+     , Text.XkbCommon.Types
+     , Text.XkbCommon.XkbContext
+     , Text.XkbCommon.XkbKeymap
+     , Text.XkbCommon.XkbRmlvoBuilder
+     , Text.XkbCommon.XkbState
     build-depends:
-       base >=4.21.0.0 && <4.23
-     , data-default ^>=0.8
-     , unix ^>=2.8.6
-     , rio ^>=0.1.24
+       base              >=4.21   && <4.23
+     , template-haskell  >=2.23   && <2.25
+     , data-default     ^>=0.8
+     , unix             ^>=2.8.6
     hs-source-dirs:   src
-    extra-libraries:
-       xkbcommon
-     , xkbregistry
+    if flag(use-pkgconfig)
+      pkgconfig-depends: xkbcommon
+    else
+      extra-libraries: xkbcommon, xkbregistry
     build-tool-depends:
        hsc2hs:hsc2hs
 
@@ -57,14 +74,14 @@ test-suite spec
   import: warnings, language
   type: exitcode-stdio-1.0
   main-is: Spec.hs
-  other-modules:
-      Text.XkbCommonSpec
-    , Text.XkbRegistrySpec
   hs-source-dirs: tests
   build-depends:
       base
-    , xkbcommon-bindings
     , hspec
-    , QuickCheck
+    , xkbcommon-bindings
+  other-modules:
+      Text.XkbCommonSpec
+    , Text.XkbRegistrySpec
   build-tool-depends:
     hspec-discover:hspec-discover
+  ghc-options: -threaded -with-rtsopts=-N

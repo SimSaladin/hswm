@@ -26,7 +26,7 @@ import HSWM.Types.Events
 import HSWM.Types.TypeMap
 import HSWM.Util.Types
 import HSWM.Utils
-import HSWM.XKB
+import HSWM.XKB (KeySym, ModMask, XkbRuleNames, Button)
 import River
 import Bindings.River qualified as R
 import Bindings.RiverSafe qualified as R

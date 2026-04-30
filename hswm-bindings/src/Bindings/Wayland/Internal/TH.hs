@@ -359,9 +359,9 @@ argDoc a
 
 renderListenerEvents :: ProtocolRenderSettings -> Interface -> Q [Dec]
 renderListenerEvents s Interface{..} = do
-  -- instance AddListener Foobar
+  -- instance HasListener Foobar
   -- type FoobarListener = ...
-  listenerD <- mkAddListenerInst
+  listenerD <- mkHasListenerInst
   -- data FoobarEvent
   -- mkFoobarListener
   eventD <- mkEvent
@@ -372,12 +372,12 @@ renderListenerEvents s Interface{..} = do
     evName = mkName $ objN ++ "Event"
     mkListenerName = mkName $ "mk" ++ objN ++ "Listener"
 
-    mkAddListenerInst :: Q [Dec]
-    mkAddListenerInst = do
+    mkHasListenerInst :: Q [Dec]
+    mkHasListenerInst = do
       let mk_clause = do
             pname <- newName "p"
             clause [conP (mkName objN) [varP pname]] (normalB (appE (varE (mkName $ interfaceName ++ "_add_listener")) (varE pname))) []
-      let docAddListenerS =
+      let docHasListenerS =
             """
             @
             listener <- 'mk""" ++ objN ++ """Listener'
@@ -385,11 +385,14 @@ renderListenerEvents s Interface{..} = do
             @
             """
       sequence
-        [ withDecDoc docAddListenerS $ instanceD
+        [ withDecDoc docHasListenerS $ instanceD
           (pure [])
-          (appT (conT ''AddListener) (conT $ mkName objN))
-          [ tySynInstD $ tySynEqn Nothing (appT (conT ''ObjectListener) (conT $ mkName objN)) (conT listenerN),
-            funD 'objectListenerAdd [mk_clause]
+          (appT (conT ''HasListener) (conT $ mkName objN))
+          [ tySynInstD $ tySynEqn Nothing (appT (conT ''ObjectListener)      (conT $ mkName objN)) (conT listenerN)
+          , tySynInstD $ tySynEqn Nothing (appT (conT ''ObjectListenerEvent) (conT $ mkName objN)) (conT evName)
+          , funD 'createListener [clause [wildP] (normalB $ varE mkListenerName) []]
+          , funD 'objectListenerAdd [mk_clause]
+          , funD 'freeListener [mkFreeListener]
           ]
         , tySynD (mkName $ objN ++ "Listener") [] [t| PtrConst (ObjectListener $(conT $ mkName objN)) |]
         ]
@@ -409,20 +412,17 @@ renderListenerEvents s Interface{..} = do
         [ dataD_doc (pure []) evName [] Nothing cons [derivClause Nothing [conT ''Eq, conT ''Show, conT ''Generic]] (Just "")
         , sigD mkListenerName [t|forall m. MonadIO m => ($(conT evName) -> IO ()) -> m ($(conT (mkName $ objN ++ "Listener")))|]
         , funD_doc mkListenerName [mkListenerFun recName recs] (Just "This should be destroyed using destroyListener when no longer needed.") []
-        , instanceD
-            (pure [])
-            (appT (conT ''ListenerEvent) (conT evName))
-            [ tySynInstD $ tySynEqn Nothing (appT (conT ''Listener) (conT evName)) (conT listenerN),
-              funD 'freeListener [mkFreeListener recName recs]
-            ]
         ]
 
-    mkFreeListener conName recs' = do
-      funNames <- forM recs' $ \_ -> newName "fun"
-      clause
-        [wildP, conP conName [varP nm | nm <- funNames]]
-        (normalB $ doE [noBindS [|freeHaskellFunPtr $(varE nm)|] | nm <- funNames])
-        []
+    mkFreeListener :: Q Clause
+    mkFreeListener = do
+      (TyConI (DataD _ _ _ _ [RecC conName recs] _)) <- reify listenerN
+      ptrNm <- newName "p"
+      funNames <- forM recs $ \_ -> newName "fun"
+      let stmts = [ bindS (conP conName [varP nm | nm <- funNames]) [|Foreign.peek (unConstPtr $(varE ptrNm))|]
+                  ] ++ [ noBindS [|freeHaskellFunPtr $(varE nm)|] | nm <- funNames ]
+                  ++ [ noBindS [|free $ unConstPtr $(varE ptrNm)|] ]
+      clause [wildP, varP ptrNm] (normalB $ doE stmts) []
 
     mkListenerFun :: Name -> [VarBangType] -> Q Clause
     mkListenerFun recN recs = do
@@ -440,7 +440,10 @@ renderListenerEvents s Interface{..} = do
             ++ [noBindS $ appE (varE handle) $ appsE $ conE conName : map varE argNs]
 
       listenerExp <- appE (varE 'return) $ appsE $ conE recN : map varE funNs
-      let stmts = [bindS (varP nm) (pure rhs) | (nm, rhs) <- zip funNs funPtrs] ++ [bindS (varP listener) (pure listenerExp), noBindS (toPtr listener)]
+      let stmts = [ bindS (varP nm) (pure rhs) | (nm, rhs) <- zip funNs funPtrs] ++
+                  [ bindS (varP listener) (pure listenerExp)
+                  , noBindS (toPtr listener)
+                  ]
       clause [varP handle] (normalB $ appE (varE 'liftIO) $ doE stmts) []
 
     -- MonadIO m => a -> m (PtrConst a)
@@ -700,7 +703,7 @@ mkWlObjectType cfg = do
 -- Listener API:
 --
 -- @
---   instance AddListener Foo ...
+--   instance HasListener Foo ...
 --
 --   type FooListener = PtrConst (ObjectListener Foo)
 -- @
@@ -752,7 +755,7 @@ mkWlObjectMisc cfg = do
     |] | objHasDestructor cfg ]
 
   listenerD <- join <$> sequence [
-    mkAddListenerInst (objType cfg) listener
+    mkHasListenerInst (objType cfg) listener
       | Just listener <- [objListener cfg] ]
 
   ifDs <- case (objListener cfg, objInterface cfg) of
@@ -766,12 +769,12 @@ mkWlObjectMisc cfg = do
   where
     ntName = mkName $ objTypePrefix cfg
 
-    mkAddListenerInst :: Name -> Name -> Q [Dec]
-    mkAddListenerInst objN listenerN = do
+    mkHasListenerInst :: Name -> Name -> Q [Dec]
+    mkHasListenerInst objN listenerN = do
       let mk_clause = do
             pname <- newName "p"
             clause [conP ntName [varP pname]] (normalB (appE (varE (getFn objN "add_listener")) (varE pname))) []
-      let docAddListenerS =
+      let docHasListenerS =
             """
             @
             listener <- 'mk""" ++ objTypePrefix cfg ++ """Listener'
@@ -779,9 +782,9 @@ mkWlObjectMisc cfg = do
             @
             """
       sequence
-        [ withDecDoc docAddListenerS $ instanceD
+        [ withDecDoc docHasListenerS $ instanceD
           (pure [])
-          (appT (conT ''AddListener) (conT ntName))
+          (appT (conT ''HasListener) (conT ntName))
           [ tySynInstD $ tySynEqn Nothing (appT (conT ''ObjectListener) (conT ntName)) (conT listenerN),
             funD 'objectListenerAdd [mk_clause]
           ]
@@ -868,7 +871,7 @@ mkListenerEventNew ObjectCfg {..} listenerTypeName = do
   res <- reify listenerTypeName
   go res
   where
-    go (TyConI (DataD _ listenerName _ _ [RecC recName recs] _)) = do
+    go (TyConI (DataD _ _ _ _ [RecC recName recs] _)) = do
       let listenerName' = objTypePrefix ++ "Listener"
           objectName = objTypePrefix
           evName = mkName $ objectName ++ "Event"
@@ -884,21 +887,8 @@ mkListenerEventNew ObjectCfg {..} listenerTypeName = do
             [mkListenerFun (mkName objectName) recs]
             (Just "This should be destroyed using destroyListener when no longer needed.")
             []
-        , instanceD
-            (pure [])
-            (appT (conT ''ListenerEvent) (conT evName))
-            [ tySynInstD $ tySynEqn Nothing (appT (conT ''Listener) (conT evName)) (conT listenerName),
-              funD 'freeListener [mkFreeListener recName recs]
-            ]
         ]
       where
-        mkFreeListener conName recs' = do
-          funNames <- forM recs' $ \_ -> newName "fun"
-          clause
-            [wildP, conP conName [varP nm | nm <- funNames]]
-            (normalB $ doE [noBindS [|freeHaskellFunPtr $(varE nm)|] | nm <- funNames])
-            []
-
         fieldName eN i fT
           | Just nm <- objEventFieldNamesCommon L.!? i = return $ mkName nm
           | Just xs <- L.lookup (nameBase eN) objEventFieldNames, Just nm <- xs L.!? (i - length objEventFieldNamesCommon) = return $ mkName nm

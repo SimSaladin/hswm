@@ -48,16 +48,31 @@ data MyMod = MyMod
     layoutWidget, focusInfoWidget :: !Label,
     stRef :: !(IORef ModState),
     wmThread :: !(Async ())
-  }
-  deriving (Generic)
+  } deriving (Generic)
+
+data ModState = ModState
+  { tagWidgets     :: [Label],
+    thisOutputName :: !T.Text,
+    outputs        :: ![(Text, ScreenId)],
+    workspaces     :: !WSList,
+    curfocus       :: !(Maybe WindowInfo)
+  } deriving (Generic)
+
+data WSList = WSList
+  { wsNames   :: ![(WsId, Text)] -- ^ the correct sort order (+ keyhint)
+  , wsFocused :: !(ScreenId, WorkspaceInfo)
+  , wsVisible :: ![(ScreenId, WorkspaceInfo)]
+  , wsHidden  :: ![WorkspaceInfo]
+  } deriving (Generic)
 
 instance WaybarPlugin MyMod where
-  type PluginState MyMod = ()
   type Context MyMod = MIO
-  globalInit _ = pure ()
-  globalDeinit _ _ = pure ()
 
-  runContext _ _ = runMIO
+  data GlobalState MyMod = MyState
+
+  globalInit = pure MyState
+
+  runContext _ = runMIO
 
   init = instanceNew'
 
@@ -73,21 +88,6 @@ instance WaybarPlugin MyMod where
 
   -- | Trigger a module action
   doaction _ actStr = logWarn $ fromString $ "unhandled module action: " <> fromString actStr
-
-data ModState = ModState
-  { tagWidgets :: [Label],
-    thisOutputName :: !T.Text,
-    outputs :: [(Text, ScreenId)],
-    workspaces :: WSList,
-    curfocus :: Maybe WindowInfo
-  }
-
-data WSList = WSList
-  { wsNames :: [(WsId, Text)] -- ^ the correct sort order (+ keyhint)
-  , wsFocused :: (ScreenId, WorkspaceInfo)
-  , wsVisible :: [(ScreenId, WorkspaceInfo)]
-  , wsHidden :: [WorkspaceInfo]
-  }
 
 -- |
 -- @

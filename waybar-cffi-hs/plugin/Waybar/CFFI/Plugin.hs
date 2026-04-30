@@ -1,5 +1,8 @@
 {-# LANGUAGE CApiFFI #-}
 {-# LANGUAGE ForeignFunctionInterface #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# OPTIONS_GHC -ddump-splices #-}
+{-# OPTIONS_GHC -Wno-missing-signatures #-}
 
 -- |
 -- Module      : Waybar.CFFI.Plugin
@@ -9,28 +12,24 @@
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
-module Waybar.CFFI.Plugin where
+module Waybar.CFFI.Plugin () where
 
-import Data.Void
-import Waybar.CFFI.Plugin.Base qualified as Base
-import Waybar.CFFI.Plugin.Base (InitInfo, ConfigEntry, CSize, CString)
-import Waybar.CFFI.Plugin.HSWM qualified as HSWM
-import Data.Proxy
-import Foreign
+import           Foreign.C.ConstPtr (ConstPtr(..))
 
-Base.WaybarPluginFFI{..} = Base.mkPlugin (Proxy @HSWM.MyMod)
+import qualified Waybar.CFFI.Plugin.Base as Base
+import qualified Waybar.CFFI.Plugin.HSWM as HSWM (MyMod)
 
-foreign export ccall "plugin_runtime_init" _globalInit :: IO ()
+-- plugin = Base.mkPlugin @HSWM.MyMod
 
-foreign export ccall "plugin_runtime_destroy" _globalDeinit :: IO ()
+stref = Base.mkStateRef @(Base.GlobalState HSWM.MyMod)
+{-# NOINLINE stref #-}
 
-foreign export ccall "wbcffi_init" _init :: Ptr InitInfo -> Ptr ConfigEntry -> CSize -> IO (Ptr Void)
+plugin_runtime_init    = Base._plugin_runtime_init @HSWM.MyMod stref
+plugin_runtime_destroy = Base._plugin_runtime_destroy @HSWM.MyMod stref
+wbcffi_init a b c      = Base._wbcffi_init @HSWM.MyMod stref a b c
+wbcffi_deinit a        = Base._wbcffi_deinit @HSWM.MyMod stref a
+wbcffi_update a        = Base._wbcffi_update @HSWM.MyMod stref a
+wbcffi_doaction a b    = Base._wbcffi_doaction @HSWM.MyMod stref a b
+wbcffi_refresh a b     = Base._wbcffi_refresh  @HSWM.MyMod stref a b
 
-foreign export ccall "wbcffi_deinit" _deinit :: Ptr Void -> IO ()
-
-foreign export ccall "wbcffi_update" _update :: Ptr Void -> IO ()
-
-foreign export ccall "wbcffi_refresh" _refresh :: Ptr Void -> Int -> IO ()
-
-foreign export ccall "wbcffi_doaction" _doaction :: Ptr Void -> CString -> IO ()
-
+Base.makeForeignExports ''Base.WaybarPluginFFI

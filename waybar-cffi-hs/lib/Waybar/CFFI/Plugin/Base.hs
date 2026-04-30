@@ -1,5 +1,7 @@
 {-# LANGUAGE CApiFFI #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE DefaultSignatures #-}
 
 -- |
 -- Module      : Waybar.CFFI.Plugin.Base
@@ -15,26 +17,43 @@ module Waybar.CFFI.Plugin.Base
   )
 where
 
-import Prelude hiding (init)
-import Control.Monad
-import Data.Aeson qualified as A
-import Data.Aeson.KeyMap qualified as A.KM
-import Foreign as RXP
-import Foreign.C as RXP
-import Foreign.Storable.Generic as RXP (GStorable (..))
-import GHC.Generics as RXP (Generic)
-import GI.Gtk.Objects.Container as RXP (Container)
-import Data.Kind
-import Data.Proxy
-import Data.ByteString qualified as BS
-import Data.String (IsString (..))
-import Data.Void
-import GI.Gtk (newObject)
-import GI.Gtk.Objects.Container as Container
-import Data.Dynamic
-import System.IO.Unsafe
-import Data.IORef
-import Control.Exception qualified as E
+import qualified Control.Exception as E
+import           Control.Monad
+import qualified Data.Aeson as A
+import qualified Data.Aeson.KeyMap as A.KM
+import qualified Data.ByteString as BS
+import           Data.Dynamic
+import           Data.IORef
+import qualified Data.Kind as Kind
+import           Data.String (IsString(..))
+import           Data.Void
+import           Foreign as RXP
+import           Foreign.C as RXP
+import           Foreign.C.ConstPtr
+import           Foreign.Storable.Generic as RXP (GStorable(..))
+import           GHC.Generics as RXP (Generic)
+import           GI.Gtk (newObject)
+import           GI.Gtk.Objects.Container as Container
+import           GI.Gtk.Objects.Container as RXP (Container)
+import           Prelude hiding (init)
+import           System.IO.Unsafe
+import           Data.Default
+import Language.Haskell.TH
+
+forExpD :: Callconv -> String -> Name -> Q Type -> Q Dec
+forExpD cc str n ty = do
+  ty' <- ty
+  pure $ ForeignD $ ExportF cc str n ty'
+
+makeForeignExports :: Name -> Q [Dec]
+makeForeignExports rty = do
+  TyConI (DataD _ _ _ _ [RecC _ vbts] _) <- reify rty
+  let xs = [ mkName $ nameBase x | (x,_,_) <- vbts ]
+  mapM mk1 xs
+    where
+      mk1 f = do
+        VarI fN fT _ <- reify f
+        forExpD CCall (nameBase fN) fN (pure fT)
 
 data IConf id = IConf
   { wbModule :: !(Ptr WbcffiModule),
@@ -54,7 +73,7 @@ data {-# CTYPE "waybar_cffi_module.h" "wbcffi_init_info" #-} InitInfo = InitInfo
   { -- | Private Waybar CFFI module
     wbcffi_module :: !(Ptr WbcffiModule),
     -- | Waybar version string
-    waybar_version :: !CString,
+    waybar_version :: !(ConstPtr CChar),
     -- | Returns the waybar widget allocated for this module
     -- @param obj Waybar CFFI object pointer
     get_root_widget :: !(FunPtr (Ptr WbcffiModule -> IO (Ptr Container))),
@@ -80,22 +99,76 @@ instance GStorable InitInfo
 
 instance GStorable ConfigEntry
 
-foreign import ccall "dynamic"
-  mkGetRootFun :: FunPtr (Ptr WbcffiModule -> IO (Ptr Container)) -> Ptr WbcffiModule -> IO (Ptr Container)
+type GetRootFn = Ptr WbcffiModule -> IO (Ptr Container)
 
-foreign import ccall "dynamic"
-  mkQueueUpdate :: FunPtr (Ptr WbcffiModule -> IO ()) -> Ptr WbcffiModule -> IO ()
+type QueueUpdate = Ptr WbcffiModule -> IO ()
 
-class WaybarPlugin a where
-  type PluginState a :: Type
+foreign import ccall "dynamic" mkGetRootFun  :: FunPtr GetRootFn   -> GetRootFn
+foreign import ccall "dynamic" mkQueueUpdate :: FunPtr QueueUpdate -> QueueUpdate
 
-  globalInit :: Proxy a -> IO (PluginState a)
+-- | Exported functions.
+data WaybarPluginFFI plugin = WaybarPluginFFI
+  -- | Module init/new function, called on module instantiation
+  --
+  -- MANDATORY CFFI function
+  --
+  -- @param init_info          Waybar module information
+  -- @param config_entries     Flat representation of the module JSON config. The data only available
+  --                           during wbcffi_init call.
+  -- @param config_entries_len Number of entries in `config_entries`
+  --
+  -- @return A untyped pointer to module data, NULL if the module failed to load.
+  { wbcffi_init :: !(Ptr InitInfo -> Ptr ConfigEntry -> CSize -> IO (Ptr Void))
+  -- | Module deinit/delete function, called when Waybar is closed or when the module is removed
+  --
+  -- MANDATORY CFFI function
+  --
+  -- @param instance Module instance data (as returned by `wbcffi_init`)
+  , wbcffi_deinit :: !(Ptr Void -> IO ())
+  -- | Called from the GTK main event loop, to update the UI
+  --
+  -- Optional CFFI function
+  --
+  -- @param instance Module instance data (as returned by `wbcffi_init`)
+  -- @param action_name Action name
+  , wbcffi_update :: !(Ptr Void -> IO ())
+  -- | Called when Waybar receives a POSIX signal and forwards it to each module
+  --
+  -- Optional CFFI function
+  --
+  -- @param instance Module instance data (as returned by `wbcffi_init`)
+  -- @param signal Signal ID
+  , wbcffi_refresh :: !(Ptr Void -> Int -> IO ())
+  -- | Called on module action (see
+  -- https://github.com/Alexays/Waybar/wiki/Configuration#module-actions-config)
+  --
+  -- Optional CFFI function
+  --
+  -- @param instance Module instance data (as returned by `wbcffi_init`)
+  -- @param action_name Action name
+  , wbcffi_doaction :: !(Ptr Void -> ConstPtr CChar -> IO ())
+  , plugin_runtime_init :: !(IO ())
+  , plugin_runtime_destroy :: !(IO ())
+  }
 
-  globalDeinit :: Proxy a -> PluginState a -> IO ()
+class (Typeable a, Typeable (GlobalState a), Monad (Context a)) => WaybarPlugin a where
+  data GlobalState a :: Kind.Type
 
-  type Context a :: Type -> Type
+  type Context a :: Kind.Type -> Kind.Type
 
-  runContext :: Proxy a -> PluginState a -> Context a r -> IO r
+  globalInit :: IO (GlobalState a)
+  default globalInit :: Default (GlobalState a) => IO (GlobalState a)
+  globalInit = return def
+  {-# INLINE globalInit #-}
+
+  globalDeinit :: GlobalState a -> IO ()
+  globalDeinit _ = return ()
+  {-# INLINE globalDeinit #-}
+
+  runContext :: GlobalState a -> Context a r -> IO r
+  default runContext :: Context a ~ IO => GlobalState a -> Context a r -> IO r
+  runContext _ = id
+  {-# INLINE runContext #-}
 
   init :: Monad (Context a) => IConf () -> Context a a
 
@@ -109,6 +182,55 @@ class WaybarPlugin a where
 
   doaction :: Monad (Context a) => IConf a -> String -> Context a ()
   doaction _ _ = pure ()
+  {-# INLINE update #-}
+  {-# INLINE refresh #-}
+  {-# INLINE doaction #-}
+
+mkStateRef :: IORef a
+mkStateRef = unsafePerformIO (newIORef undefined)
+{-# INLINE mkStateRef #-}
+
+_plugin_runtime_init :: forall a. WaybarPlugin a => IORef (GlobalState a) -> IO ()
+_plugin_runtime_init stref = globalInit @a >>= writeIORef stref
+
+_plugin_runtime_destroy :: forall a. WaybarPlugin a => IORef (GlobalState a) -> IO ()
+_plugin_runtime_destroy stref = readIORef stref >>= globalDeinit @a
+
+_wbcffi_init :: forall a. WaybarPlugin a => IORef (GlobalState a) -> Ptr InitInfo -> Ptr ConfigEntry -> CSize -> IO (Ptr Void)
+_wbcffi_init stref ii ce csize = do
+    initInfo@InitInfo {wbcffi_module = wbModule} <- peek ii
+    wbVersion <- peekCString $ unConstPtr $ waybar_version initInfo
+    configs <- getConfigEntries ce csize
+    rootWidget <- mkGetRootFun (get_root_widget initInfo) (wbcffi_module initInfo)
+      >>= newObject Container.Container
+    let queueUpdate = mkQueueUpdate (queue_update initInfo) wbModule
+        instanceData = ()
+    let iconf = IConf{..}
+    st <- readIORef stref
+    inst <- runContext @a st $ init @a iconf
+    sptr <- newStablePtr iconf { instanceData = inst }
+    return $! castPtr $ castStablePtrToPtr sptr
+
+_wbcffi_deinit :: forall a. WaybarPlugin a => IORef (GlobalState a) -> Ptr Void -> IO ()
+_wbcffi_deinit stref ptr = (deref ptr >>= run @a stref . deinit @a) `E.finally` freeStablePtr (castPtrToStablePtr $ castPtr ptr)
+
+_wbcffi_update :: forall a. WaybarPlugin a => IORef (GlobalState a) -> Ptr Void -> IO ()
+_wbcffi_update stref ptr = deref ptr >>= run @a stref . update @a
+
+_wbcffi_refresh :: forall a. WaybarPlugin a => IORef (GlobalState a) -> Ptr Void -> Int -> IO ()
+_wbcffi_refresh stref ptr i = deref ptr >>= run @a stref . flip (refresh @a) i
+
+_wbcffi_doaction :: forall a. WaybarPlugin a => IORef (GlobalState a) -> Ptr Void -> ConstPtr CChar -> IO ()
+_wbcffi_doaction stref ptr cstr = do
+  action <- peekCString (unConstPtr cstr)
+  deref ptr >>= run @a stref . flip (doaction @a) action
+
+run :: forall a b. WaybarPlugin a => IORef (GlobalState a) -> Context a b -> IO b
+run stref m = do
+  st <- readIORef stref
+  runContext @a st m
+
+deref = deRefStablePtr . castPtrToStablePtr . castPtr
 
 getConfigEntries :: Ptr ConfigEntry -> CSize -> IO A.Object
 getConfigEntries ptr size = fmap A.KM.fromList $
@@ -118,89 +240,3 @@ getConfigEntries ptr size = fmap A.KM.fromList $
     case A.decodeStrict' v :: Maybe A.Value of
       Just v' -> return (fromString k, v')
       Nothing -> error "getConfigEntries: parse error"
-
-data WaybarPluginFFI = WaybarPluginFFI
-  -- | Module init/new function, called on module instantiation
-  --
-  -- MANDATORY CFFI function
-  --
-  -- @param init_info          Waybar module information
-  -- @param config_entries     Flat representation of the module JSON config. The data only available
-  --                           during wbcffi_init call.
-  -- @param config_entries_len Number of entries in `config_entries`
-  --
-  -- @return A untyped pointer to module data, NULL if the module failed to load.
-  { _init :: Ptr InitInfo -> Ptr ConfigEntry -> CSize -> IO (Ptr Void)
-  -- | Module deinit/delete function, called when Waybar is closed or when the module is removed
-  --
-  -- MANDATORY CFFI function
-  --
-  -- @param instance Module instance data (as returned by `wbcffi_init`)
-  , _deinit :: Ptr Void -> IO ()
-  -- | Called from the GTK main event loop, to update the UI
-  --
-  -- Optional CFFI function
-  --
-  -- @param instance Module instance data (as returned by `wbcffi_init`)
-  -- @param action_name Action name
-  , _update :: Ptr Void -> IO ()
-  -- | Called when Waybar receives a POSIX signal and forwards it to each module
-  --
-  -- Optional CFFI function
-  --
-  -- @param instance Module instance data (as returned by `wbcffi_init`)
-  -- @param signal Signal ID
-  , _refresh :: Ptr Void -> Int -> IO ()
-  -- | Called on module action (see
-  -- https://github.com/Alexays/Waybar/wiki/Configuration#module-actions-config)
-  --
-  -- Optional CFFI function
-  --
-  -- @param instance Module instance data (as returned by `wbcffi_init`)
-  -- @param action_name Action name
-  , _doaction :: Ptr Void -> CString -> IO ()
-  , _globalInit :: IO ()
-  , _globalDeinit :: IO ()
-  }
-
-globalStateRef :: IORef Dynamic
-globalStateRef = unsafePerformIO $ newIORef undefined
-{-# NOINLINE globalStateRef #-}
-
-mkPlugin :: forall a. (WaybarPlugin a, Typeable (PluginState a), Monad (Context a)) => Proxy a -> WaybarPluginFFI
-mkPlugin proxy = WaybarPluginFFI {..} where
-  _globalInit = do
-    st <- globalInit proxy
-    writeIORef globalStateRef (toDyn st)
-  _globalDeinit = do
-    Just st <- fromDynamic <$> readIORef globalStateRef
-    globalDeinit proxy st
-
-  _init ii ce csize = do
-    initInfo@InitInfo {wbcffi_module = wbModule} <- peek ii
-    wbVersion <- peekCString (waybar_version initInfo)
-    configs <- getConfigEntries ce csize
-    rootWidget <- mkGetRootFun (get_root_widget initInfo) (wbcffi_module initInfo)
-      >>= newObject Container.Container
-
-    let queueUpdate = mkQueueUpdate (queue_update initInfo) wbModule
-        instanceData = ()
-    let iconf = IConf{..}
-    Just st <- fromDynamic <$> readIORef globalStateRef
-    inst <- runContext proxy st $ init @a iconf
-    sptr <- newStablePtr iconf { instanceData = inst }
-    return $ castPtr $ castStablePtrToPtr sptr
-
-  _deinit ptr = (deref ptr >>= run . deinit @a) `E.finally` freeStablePtr (castPtrToStablePtr $ castPtr ptr)
-
-  _update ptr = deref ptr >>= run . update @a
-  _refresh ptr sig = deref ptr >>= run . flip (refresh @a) sig
-  _doaction ptr cstr = do
-    action <- peekCString cstr
-    deref ptr >>= run . flip (doaction @a) action
-
-  run m = do
-    Just st <- fromDynamic <$> readIORef globalStateRef
-    runContext proxy st m
-
-  deref = deRefStablePtr . castPtrToStablePtr . castPtr

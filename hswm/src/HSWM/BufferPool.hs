@@ -9,29 +9,27 @@
 --
 module HSWM.BufferPool where
 
-import HSWM.Core
-import HSWM.Util.Posix
+import           HSWM.Core
+import           HSWM.Util.Posix
 
-import Bindings.Pixman.Generated qualified as P
-import Bindings.Pixman.Generated.Safe qualified as P
-import Bindings.Wayland.Client qualified as WL
-import Bindings.Wayland.Client.Generated qualified as WL
+import qualified Bindings.Pixman.Generated as P
+import qualified Bindings.Pixman.Generated.Safe as P
+import qualified Bindings.Wayland.Client as WL
+import qualified Bindings.Wayland.Client.Generated as WL
 
-import Foreign hiding (void)
-import System.Posix (closeFd)
 import qualified Data.List as L
+import           Foreign hiding (void)
+import           System.Posix (closeFd)
 
 data ImageBufferPool = ImageBufferPool
-  { wlShm :: !WL.Shm,
-    bufferListener :: !(ConstPtr WL.Wl_buffer_listener),
-    -- | Buffer count limit per surface
+  { -- | Buffer count limit per surface
     bufferMultiplicity :: !Int,
     -- | Number of surfaces serviced by this pool
     surfaceCount :: !Int,
-    -- buffers :: MVar ([ImageBuffer], Int)
+    wlShm :: !WL.Shm,
+    bufferListener :: !(ConstPtr WL.Wl_buffer_listener),
     buffers :: !(IORef ([ImageBuffer], Int))
-  }
-  deriving (Eq, Generic)
+  } deriving (Eq, Generic)
 
 data ImageBuffer = ImageBuffer
   { buf :: !WL.Buffer,
@@ -46,15 +44,13 @@ data ImageBuffer = ImageBuffer
     -- | E.g. 'P.PIXMAN_a8r8g8b8'
     pixmanFormat :: P.Pixman_format_code_t,
     pixmanImage :: !(Ptr P.Pixman_image_t)
-  }
-  deriving (Eq, Generic)
+  } deriving (Eq, Generic)
 
 destroyImageBufferPool :: ImageBufferPool -> IO ()
 destroyImageBufferPool pool = do
   (bufs, _) <- readIORef pool.buffers
   forM_ bufs destroyImageBuffer
-  let p = unConstPtr pool.bufferListener
-  WL.freeListener (Proxy :: Proxy WL.BufferEvent) =<< peek p
+  WL.freeListener (Proxy :: Proxy WL.Buffer) pool.bufferListener
 
 destroyImageBuffer :: ImageBuffer -> IO ()
 destroyImageBuffer ImageBuffer{..} = do

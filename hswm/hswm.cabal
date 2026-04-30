@@ -15,6 +15,7 @@ license-file:       LICENSE
 build-type:         Simple
 tested-with:
       GHC == 9.12.2
+    , GHC == 9.14.1
 
 library
     hs-source-dirs:
@@ -119,7 +120,7 @@ library
         , pango >=0.13.12 && <0.14
         , pretty-simple >=4.1.4 && <4.2
         , process >=1.6.25 && <1.7
-        , rio
+        , rio >=0.1.24 && <0.2
         , stm >=2.5.3 && <2.6
         , text >=2.1.2 && <2.2
         , time >=1.14 && <2.0
@@ -153,17 +154,17 @@ library hswm-prelude
           QuantifiedConstraints
     ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -Wno-ambiguous-fields
     build-depends:
-          async
+          async >=2.2.6 && <2.3
         , base >=4.21.0 && <4.23
-        , data-default
-        , exceptions
-        , monad-logger-aeson
-        , mtl
-        , rio
-        , stm
-        , text
-        , unliftio
-        , unliftio-core
+        , data-default >=0.8.0 && <0.9
+        , exceptions >=0.10.9 && <0.11
+        , monad-logger-aeson >=0.4.1 && <0.5
+        , mtl >=2.3.1 && <2.4
+        , rio >=0.1.24 && <0.2
+        , stm >=2.5.3 && <2.6
+        , text >=2.1.2 && <2.2
+        , unliftio >=0.2.25 && <0.3
+        , unliftio-core >=0.2.1 && <0.3
     default-language: GHC2024
 
 executable hswm
@@ -173,9 +174,9 @@ executable hswm
     autogen-modules:
           Paths_hswm
     build-depends:
-          base
-        , bytestring
-        , containers
+          base >=4.21.0 && <4.23
+        , bytestring >=0.12.2 && <0.13
+        , containers >=0.7 && <1.0
         , hswm
         , hswm-bindings
     default-language: GHC2024
@@ -213,16 +214,16 @@ executable hswmctl
           QuantifiedConstraints
     ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -Wno-ambiguous-fields -threaded -rtsopts "-with-rtsopts=-maxN4 -qn2 -A8M -K64M -M1G -kc8k"
     build-depends:
-          aeson
-        , base
-        , bytestring
-        , haskeline
+          aeson >=2.2.3 && <2.3
+        , base >=4.21.0 && <4.23
+        , bytestring >=0.12.2 && <0.13
+        , haskeline >=0.8.2 && <0.9
         , hswm
-        , monad-logger-aeson
-        , optparse-applicative
-        , optparse-generic
-        , prettyprinter
-        , prettyprinter-ansi-terminal
-        , text
-        , time
+        , monad-logger-aeson >=0.4.1 && <0.5
+        , optparse-applicative >=0.18.1 && <0.19
+        , optparse-generic ==1.5.*
+        , prettyprinter >=1.7.1 && <1.8
+        , prettyprinter-ansi-terminal >=1.1.3 && <1.2
+        , text >=2.1.2 && <2.2
+        , time >=1.14 && <2.0
     default-language: GHC2024

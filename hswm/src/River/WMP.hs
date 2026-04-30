@@ -97,7 +97,7 @@ ppXkbModsKey m ksym =
         ],
       fi x.unwrap .&. m /= 0
     ]
-      ++ [xkbKeysymGetNameUnsafe ksym]
+      ++ [xkbKeysymNameUnsafe ksym]
 
 -- * Pointer Binds
 
