@@ -58,11 +58,11 @@ let
     outputHash = "sha256-MJc+N/T2B8yW2sz1Ys8rGkhjgmmm+nXxNXnubCm0e6U=";
   };
 
-  deps' = callPackage deps0 { linkFarm = name: ps: ps; };
+  deps0Links = callPackage deps0 { linkFarm = _: ps: ps; };
 
-  extra' = callPackage extra { linkFarm = name: ps: ps; };
+  extraLinks = callPackage extra { linkFarm = _: ps: ps; };
 
-  depsFinal = pkgs.linkFarm "zig-packages" (deps' ++ extra');
+  deps = pkgs.linkFarm "zig-packages" (deps0Links ++ extraLinks);
 in
 
 stdenv.mkDerivation (finalAttrs: {
@@ -82,7 +82,7 @@ stdenv.mkDerivation (finalAttrs: {
   strictDeps = true;
 
   # zon2nix build.zig.zon > /home/sim/hswm/river.zig.zon.nix
-  deps = depsFinal;
+  inherit deps;
 
   nativeBuildInputs = [
     pkg-config

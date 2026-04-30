@@ -83,5 +83,3 @@ foreign-library waybarhaskellplugin
     options: standalone
   ghc-options:
     -no-hs-main
-    -rtsopts
-    -with-rtsopts=-maxN4

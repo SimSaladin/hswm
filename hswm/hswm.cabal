@@ -14,8 +14,13 @@ license:            MIT
 license-file:       LICENSE
 build-type:         Simple
 tested-with:
-      GHC == 9.12.2
-    , GHC == 9.14.1
+      GHC == 9.14.1
+    , GHC == 9.12.2
+
+flag use-llvm
+    description: Link with LLVM
+    manual: True
+    default: True
 
 library
     hs-source-dirs:
@@ -136,6 +141,8 @@ library
           base hiding (Prelude)
         , hswm:hswm-prelude (HSWM.Prelude as Prelude)
     default-language: GHC2024
+    if flag(use-llvm) && impl(ghc >= 9.14.1)
+        ghc-options: -fllvm
 
 library hswm-prelude
     exposed-modules:
@@ -180,6 +187,8 @@ executable hswm
         , hswm
         , hswm-bindings
     default-language: GHC2024
+    if flag(use-llvm) && impl(ghc >= 9.14.1)
+        ghc-options: -fllvm
     hs-source-dirs:
           app
     default-extensions:

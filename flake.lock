@@ -225,11 +225,11 @@
     "river": {
       "flake": false,
       "locked": {
-        "lastModified": 1777361605,
-        "narHash": "sha256-H29b8JpQlbjcfGhfUmKY5/fo6ozvdub2SKHFd9X1AMo=",
+        "lastModified": 1777485687,
+        "narHash": "sha256-NDYgugrAMMVSMa1RYF1wGd/Bbi5thipOL6gdAyEkdE4=",
         "ref": "refs/heads/main",
-        "rev": "85c2dce31238a2edf794d87db27dccf0877b29af",
-        "revCount": 1708,
+        "rev": "fec625df3ab24cbcfff8be29bbc05c5a0767ca61",
+        "revCount": 1712,
         "type": "git",
         "url": "https://codeberg.org/river/river"
       },

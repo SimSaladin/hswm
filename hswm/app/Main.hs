@@ -279,8 +279,8 @@ myKeys =
     ++ [("M-C-" ++ key,  "Send workspace to screen and focus it " ++ show i <??> sendFocusedWorkspaceToScreen OnScreen.FocusNew i) | (key, i) <- screenKeysScreens]
 
     -- ===== Workspaces =====
-    ++ [("M-SemiColon " ++ key,    "View workspace " ++ show i <??> DWO.withNthWorkspace W.view i) | (key, i) <- tagKeysTags]
-    ++ [("M-S-SemiColon " ++ key,  "Shift to workspace " ++ show i <??> DWO.withNthWorkspace W.shift i) | (key, i) <- tagKeysTags]
+    ++ [("M-semicolon " ++ key,    "View workspace " ++ show i <??> DWO.withNthWorkspace W.view i) | (key, i) <- tagKeysTags]
+    ++ [("M-S-semicolon " ++ key,  "Shift to workspace " ++ show i <??> DWO.withNthWorkspace W.shift i) | (key, i) <- tagKeysTags]
     ++ [ ("M-y",   "Cycle recent hidden tags" <??> cycleRecentHiddenWS [4, 8, 64] 121 112),
          ("M-S-n", "Shift current tag (forwards)" <??> DWO.swapWith Next CycleWS.anyWS),
          ("M-S-p", "Shift current tag (backwards)" <??> DWO.swapWith Prev CycleWS.anyWS),
@@ -316,7 +316,7 @@ myKeys =
       ("M-C-u",       "BSP: Focus Parent" <??> BSP.FocusParent),
       ("M-C-r",       "BSP: Rotate" <??> BSP.Rotate),
       ("M-C-equal",   "BSP: Equalize" <??> BSP.Equalize),
-      ("M-C-Exclam",  "BSP: Balance" <??> BSP.Balance) ]
+      ("M-C-exclam",  "BSP: Balance" <??> BSP.Balance) ]
     ++[("M-C-" ++ key, "BSP: Expand Towards" <??> BSP.ExpandTowards dir) | (key, dir) <- directions2D ]
 
       -- ====== Window =============
@@ -330,7 +330,7 @@ myKeys =
              W.float w.river_window (rationalRectIn (Rectangle w.x w.y (fi w.width) (fi w.height)) (screenRect $ W.screenDetail $ W.current ws)) ws
                                               ))),
          ("M-f s",      "Sink (focused)" <??> withFocused (\w -> modifyWindowSet (W.sink w.river_window))),
-         ("M-Exclam",   "Toggle tmux PAD" <??> togglePad "tmux-0"),
+         ("M-exclam",   "Toggle tmux PAD" <??> togglePad "tmux-0"),
          ("M-Slash",    "Toggle dynamic PAD" <??> togglePad "dynamic"),
          -- ("M-Tab",  "Cycle PADs" <??> cyclePads),
          -- "M-f "      >>+ directions2D >++> flip SnapMove   Nothing

@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+
     flake-utils.url = "github:numtide/flake-utils";
     flake-parts.url = "github:hercules-ci/flake-parts";
     haskell-flake.url = "github:srid/haskell-flake";
@@ -51,14 +52,21 @@
 
     perSystem = { system, lib, config, pkgs, ... }@perSys:
     let
-      haskellProjectBase = haskellProjectBaseWith "ghc912";
+      defaultGhc = "ghc914";
 
       haskellProjectBaseWith = ghcVersion: { ... }: {
-        imports = [ perSys.config.haskellProjects.${ghcVersion}.defaults.projectModules.output ];
+        imports = [
+          perSys.config.haskellProjects.${ghcVersion}.defaults.projectModules.output
+        ];
         basePackages = perSys.config.haskellProjects.${ghcVersion}.outputs.finalPackages;
         defaults.settings.defined.haddock = true;
-        autoWire = [ "devShells" ];
-        devShell.tools = hp: {
+        defaults.settings.defined = {
+          extraBuildTools = [
+            perSys.config.haskellProjects.${ghcVersion}.outputs.finalPackages.ghc.llvmPackages.llvm
+            perSys.config.haskellProjects.${ghcVersion}.outputs.finalPackages.ghc.llvmPackages.clang
+          ];
+        };
+        defaults.devShell.tools = hp: {
           inherit (hp)
             hs-bindgen
             ;
@@ -72,6 +80,7 @@
             gtk3
             ;
         };
+        autoWire = [ "devShells" ];
       };
 
       # To avoid unnecessary rebuilds, we filter projectRoot:
@@ -79,7 +88,6 @@
       cabalProjectRoot = builtins.toString (lib.fileset.toSource rec {
         root = ./.;
         fileset = lib.fileset.unions [
-          #(root + /LICENSE)
           (root + /README.md)
           (root + /hswm)
           (root + /hswm-bindings)
@@ -88,6 +96,13 @@
           #(root + /cabal.project)
         ];
       });
+
+      cabalPackages = {
+        hswm.source = cabalProjectRoot + "/hswm";
+        hswm-bindings.source = cabalProjectRoot + "/hswm-bindings";
+        xkbcommon-bindings.source = cabalProjectRoot + "/xkbcommon-bindings";
+        waybar-cffi-hs.source = cabalProjectRoot + "/waybar-cffi-hs";
+      };
     in
     {
       _module.args.pkgs = import inputs.nixpkgs {
@@ -123,8 +138,11 @@
       # GHC 9.12 with -fPIC (static shared objects)
       haskellProjects.ghc912-reloc = {
         defaults.enable = false;
-        defaults.settings.defined.haddock = false;
-        defaults.settings.defined.extraConfigureFlags = [ "--ghc-options=-fPIC" ];
+        defaults.settings.defined = {
+          haddock = false;
+          extraConfigureFlags = [ "--ghc-options=-fPIC" ];
+        };
+
         basePackages = (pkgs.haskell.packages.ghc912.override (oHP: {
           ghc = oHP.ghc.override { enableRelocatedStaticLibs = true; };
           buildHaskellPackages = oHP.buildHaskellPackages.override (oBHP: {
@@ -134,100 +152,108 @@
         lib.mapAttrs (_: pkg: if pkg ? getCabalDeps
           then pkgs.haskell.lib.compose.appendBuildFlag "--ghc-options=-fPIC" pkg
           else pkg) super);
+
         settings.monad-logger-aeson.check = false; # Tests broken
+
         autoWire = [];
       };
 
       # GHC 9.14 .. future
       haskellProjects.ghc914 = {
         defaults.enable = false;
+
         basePackages = pkgs.haskell.packages.ghc914.extend (_self: super: {
           # XXX: specifying this via packages.glib.source throws infinite
           # recursion...
           glib = pkgs.haskell.lib.compose.overrideSrc { src = inputs.glib; } super.glib;
         });
 
+        packages.doctest-parallel.source = inputs.doctest-parallel; # 0.4.1
+        packages.ghc-exactprint.source = "1.14.0.0";
         packages.ghc-tcplugins-extra.source = inputs.ghc-tcplugins-extra; # GHC 9.14
+        packages.ghc-typelits-knownnat.source = "0.8.2";
         packages.ghc-typelits-natnormalise.source = inputs.ghc-typelits-natnormalise; # containers 0.8 etc.
+
         settings.blaze-html.jailbreak = true; # containers 0.8
         settings.blaze-markup.jailbreak = true; # containers 0.8
         settings.boring.jailbreak = true; # base 4.22
+        settings.debruijn.jailbreak = true;
         settings.dec.jailbreak = true; # base 4.22
         settings.fin.check = false; # tests  fail?
         settings.fin.jailbreak = true; # base 4.22
-        settings.ghc-typelits-natnormalise.jailbreak = true; # containers 0.8
         settings.ghc-typelits-natnormalise.check = false; # ???
-        packages.ghc-typelits-knownnat.source = "0.8.2";
+        settings.ghc-typelits-natnormalise.jailbreak = true; # containers 0.8
         settings.hedgehog.jailbreak = true; # template-haskell
         settings.lifted-async.jailbreak = true; # base 4.22
         settings.monad-logger-aeson.check = false; # Tests broken
+        settings.optics-core.jailbreak = true; # containers
+        settings.pango.jailbreak = true; # base 4.22
+        settings.skew-list.jailbreak = true;
         settings.some.jailbreak = true; # base 4.22
         settings.universe-base.jailbreak = true; # base 4.22
         settings.vec.jailbreak = true; # base 4.22
-        settings.pango.jailbreak = true; # base 4.22
-        settings.optics-core.jailbreak = true; # containers
-        packages.ghc-exactprint.source = "1.14.0.0";
-        packages.doctest-parallel.source = inputs.doctest-parallel; # 0.4.1
 
         autoWire = [];
       };
 
-      # Default package set
-      haskellProjects.default = rec {
-        imports = [ haskellProjectBase ];
+      # Default package set with GHC 9.12
+      haskellProjects.default-ghc912 = {
+        imports = [ (haskellProjectBaseWith "ghc912") ];
+
         projectRoot = cabalProjectRoot;
-        packages = {
-          hswm.source = projectRoot + "/hswm";
-          hswm-bindings.source = projectRoot + "/hswm-bindings";
-          xkbcommon-bindings.source = projectRoot + "/xkbcommon-bindings";
-          waybar-cffi-hs.source = projectRoot + "/waybar-cffi-hs";
-        };
+        packages = cabalPackages;
+
         autoWire = lib.mkForce [ "devShells" "packages" "apps" "checks" ];
       };
 
       # Default set with GHC next
-      haskellProjects.default-ghc914 = rec {
+      haskellProjects.default-ghc914 = {
         imports = [ (haskellProjectBaseWith "ghc914") ];
+
         projectRoot = cabalProjectRoot;
-        packages = {
-          hswm.source = projectRoot + "/hswm";
-          hswm-bindings.source = projectRoot + "/hswm-bindings";
-          xkbcommon-bindings.source = projectRoot + "/xkbcommon-bindings";
-          waybar-cffi-hs.source = projectRoot + "/waybar-cffi-hs";
-        };
+        packages = cabalPackages;
+
         autoWire = lib.mkForce [ "devShells" "packages" "apps" "checks" ];
       };
 
+      # Default package set
+      haskellProjects.default = {
+        imports = [ (haskellProjectBaseWith defaultGhc) ];
+
+        projectRoot = cabalProjectRoot;
+        packages = cabalPackages;
+
+        autoWire = lib.mkForce [ "devShells" "packages" "apps" "checks" ];
+      };
 
       # Default set with -fPIC
-      haskellProjects.default-reloc = rec {
+      haskellProjects.default-ghc912-reloc = {
         imports = [ (haskellProjectBaseWith "ghc912-reloc") ];
+
         defaults.settings.defined.haddock = lib.mkForce false;
         defaults.settings.all.extraConfigureFlags = [ "--ghc-options=-fPIC" ];
+
         projectRoot = cabalProjectRoot;
+        packages = cabalPackages;
+
         settings.waybar-cffi-hs.cabalFlags.standalone = true;
-        packages = {
-          hswm.source = projectRoot + "/hswm";
-          hswm-bindings.source = projectRoot + "/hswm-bindings";
-          xkbcommon-bindings.source = projectRoot + "/xkbcommon-bindings";
-          waybar-cffi-hs.source = projectRoot + "/waybar-cffi-hs";
-        };
+
         autoWire = lib.mkForce [ "devShells" "packages" "apps" "checks" ];
       };
 
       haskellProjects.xkbcommon-bindings = {
-        imports = [ haskellProjectBase ];
+        imports = [ (haskellProjectBaseWith defaultGhc) ];
         projectRoot = ./xkbcommon-bindings;
       };
 
       haskellProjects.hswm-bindings = {
-        imports = [ haskellProjectBase ];
+        imports = [ (haskellProjectBaseWith defaultGhc) ];
         projectRoot = ./hswm-bindings;
       };
 
       haskellProjects.hswm = {
         imports = [
-          haskellProjectBase
+          (haskellProjectBaseWith defaultGhc)
           config.haskellProjects.hswm-bindings.defaults.projectModules.output
           config.haskellProjects.xkbcommon-bindings.defaults.projectModules.output
         ];
@@ -236,7 +262,7 @@
 
       haskellProjects.waybar-cffi-hs = {
         imports = [
-          haskellProjectBase
+          (haskellProjectBaseWith defaultGhc)
           config.haskellProjects.hswm.defaults.projectModules.output
         ];
         projectRoot = ./waybar-cffi-hs;

@@ -1,15 +1,26 @@
-packages:
-  hswm
-  hswm-bindings
-  waybar-cffi-hs
-  xkbcommon-bindings
+packages: */*.cabal
 
+verbose: 1
 jobs: $ncpus
+--allow-newer: *:*
+--index-state @1777539042
 
--- optimization: 0
+-- * Package configuration options
+
+--optimization: 1
+--debug-info: True
+executable-dynamic: True
+
+-- * Documentation
 
 documentation: True
+haddock-hoogle: True
+haddock-html: True
+haddock-html-location: https://hackage.haskell.org/packages/archive/$pkg/latest/doc/html
 haddock-internal: True
 haddock-hyperlink-source: True
+haddock-keep-temp-files: True
+
+-- * Advanced global config options
 
 write-ghc-environment-files: always

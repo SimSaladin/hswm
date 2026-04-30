@@ -9,7 +9,9 @@
 -- Stability   : unstable
 -- Portability : unportable
 --
-module Text.XkbCommon.Internal.TH where
+module Text.XkbCommon.Internal.TH (
+  mkKeys,
+  ) where
 
 import           Language.Haskell.TH
 import           Language.Haskell.TH.Syntax

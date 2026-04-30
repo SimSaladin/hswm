@@ -248,7 +248,7 @@ extra-doc-files:
 
 custom-setup
     setup-depends:
-          Cabal ==3.14.*
+          Cabal >=3.14 && <3.17
         , base >=4.21 && <4.23
 
 flag use-pkgconfig

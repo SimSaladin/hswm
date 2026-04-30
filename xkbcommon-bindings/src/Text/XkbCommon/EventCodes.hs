@@ -8,10 +8,10 @@
 -- Stability   : unstable
 -- Portability : unportable
 --
+-- Keys defined in @linux/linux-event-codes.h@.
 module Text.XkbCommon.EventCodes where
 
 import           Text.XkbCommon.Internal.TH
-import           Text.XkbCommon.Types
 import           Data.Word
 
 mkKeys ''Word32 "eventcodes.lst" "linux/input-event-codes.h" id ("_" ++)

@@ -46,6 +46,7 @@ data XkbKeymapFormat = KeymapFormatTextV1
   deriving stock (Eq, Ord, Generic, Show)
 
 -- backwards-compat
+keymapFormatTextV1, keymapFormatTextV2 :: XkbKeymapFormat
 keymapFormatTextV1 = KeymapFormatTextV1
 keymapFormatTextV2 = KeymapFormatTextV2
 
@@ -53,10 +54,12 @@ fromKeymapFormat :: XkbKeymapFormat -> CUInt
 fromKeymapFormat KeymapFormatTextV1 = #{const XKB_KEYMAP_FORMAT_TEXT_V1}
 fromKeymapFormat KeymapFormatTextV2 = #{const XKB_KEYMAP_FORMAT_TEXT_V2}
 
+{-
 toKeymapFormat :: CUInt -> XkbKeymapFormat
 toKeymapFormat #{const XKB_KEYMAP_FORMAT_TEXT_V1} = KeymapFormatTextV1
 toKeymapFormat #{const XKB_KEYMAP_FORMAT_TEXT_V2} = KeymapFormatTextV2
 toKeymapFormat x = error $ "toKeymapFormat: " ++ show x
+-}
 
 wrapKeymap :: Ptr XkbKeymap -> IO XkbKeymap
 wrapKeymap = fmap XkbKeymap . newForeignPtr _xkbKeymapUnref
