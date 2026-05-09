@@ -14,15 +14,15 @@ module HSWM.Config
   )
 where
 
-import Data.List qualified as L
-import Data.Text qualified as T
-import HSWM.Core
-import HSWM.Operations
-import HSWM.Utils
-import HSWM.XKB
-import HSWM.Util.PangoMarkup qualified as P
-import Data.Foldable
------
+import           HSWM.Core
+import           HSWM.Operations
+import qualified HSWM.Util.PangoMarkup as P
+import           HSWM.Utils
+import           HSWM.XKB
+
+import           Data.Foldable
+import qualified Data.List as L
+import qualified Data.Text as T
 
 infixr 1 <??>, <?>
 

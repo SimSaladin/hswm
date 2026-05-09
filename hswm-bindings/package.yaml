@@ -44,6 +44,7 @@ library:
     - xml-conduit        ^>=1.10.1
     - hs-bindgen-runtime ^>=0.1.0
     - c-expr-runtime     ^>=0.1.0
+    - unix
   language: GHC2024
   default-extensions:
     - DuplicateRecordFields
@@ -68,3 +69,14 @@ library:
         extra-libraries:
           - pixman-1
           - wayland-client
+
+tests:
+  test-suite:
+    main: Spec.hs
+    source-dirs: tests
+    dependencies:
+      - base
+      - hswm-bindings
+      - hspec
+    build-tools:
+      - hspec-discover:hspec-discover

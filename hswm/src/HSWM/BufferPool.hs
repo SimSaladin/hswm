@@ -25,40 +25,26 @@ data ImageBufferPool = ImageBufferPool
   { -- | Buffer count limit per surface
     bufferMultiplicity :: !Int,
     -- | Number of surfaces serviced by this pool
-    surfaceCount :: !Int,
-    wlShm :: !WL.Shm,
-    bufferListener :: !(ConstPtr WL.Wl_buffer_listener),
-    buffers :: !(IORef ([ImageBuffer], Int))
+    surfaceCount       :: !Int,
+    wlShm              :: !WL.Shm,
+    bufferListener     :: !(ConstPtr WL.Wl_buffer_listener),
+    buffers            :: !(IORef ([ImageBuffer], Int))
   } deriving (Eq, Generic)
 
 data ImageBuffer = ImageBuffer
-  { buf :: !WL.Buffer,
-    pool :: !WL.ShmPool,
+  { buf           :: !WL.Buffer,
+    pool          :: !WL.ShmPool,
     width, height :: !Int,
-    size :: !CSize,
-    ptr :: !(Ptr Void),
-    busy :: !(IORef Bool),
-    busyPtr :: !(StablePtr (IORef Bool)),
+    size          :: !CSize,
     -- | E.g. 'WL.WL_SHM_FORMAT_ABGR8888'
-    shmFormat :: WL.Wl_shm_format,
+    shmFormat     :: !WL.Wl_shm_format,
     -- | E.g. 'P.PIXMAN_a8r8g8b8'
-    pixmanFormat :: P.Pixman_format_code_t,
-    pixmanImage :: !(Ptr P.Pixman_image_t)
+    pixmanFormat  :: !P.Pixman_format_code_t,
+    busy          :: !(IORef Bool),
+    ptr           :: !(Ptr Void),
+    busyPtr       :: !(StablePtr (IORef Bool)),
+    pixmanImage   :: !(Ptr P.Pixman_image_t)
   } deriving (Eq, Generic)
-
-destroyImageBufferPool :: ImageBufferPool -> IO ()
-destroyImageBufferPool pool = do
-  (bufs, _) <- readIORef pool.buffers
-  forM_ bufs destroyImageBuffer
-  WL.freeListener (Proxy :: Proxy WL.Buffer) pool.bufferListener
-
-destroyImageBuffer :: ImageBuffer -> IO ()
-destroyImageBuffer ImageBuffer{..} = do
-  WL.objectDestroy buf
-  WL.objectDestroy pool
-  void $ P.pixman_image_unref pixmanImage
-  munmap ptr size
-  freeStablePtr busyPtr
 
 newImageBufferPool :: H ImageBufferPool
 newImageBufferPool = do
@@ -71,6 +57,38 @@ newImageBufferPool = do
       busy <- deRefStablePtr $ castPtrToStablePtr $ castPtr ud
       modifyIORef' busy $ const False
   return ImageBufferPool {..}
+
+destroyImageBufferPool :: ImageBufferPool -> IO ()
+destroyImageBufferPool pool = do
+  (bufs, _) <- readIORef pool.buffers
+  forM_ bufs destroyImageBuffer
+  WL.freeListener (Proxy :: Proxy WL.Buffer) pool.bufferListener
+
+initImageBuffer :: ImageBufferPool -> Int -> Int -> WL.Wl_shm_format -> P.Pixman_format_code_t -> IO ImageBuffer
+initImageBuffer ImageBufferPool {wlShm = wl_shm, bufferListener = listener} width height shmFormat pixmanFormat = do
+  let stride = width * 4
+      size = fi $ height * stride
+      w = width
+      h = height
+  (fd, ptr) <- createShm (fi size)
+  pool <- WL.shmCreatePool wl_shm (fi fd) (fi size)
+  closeFd fd
+  buf <- WL.shmPoolCreateBuffer pool 0 (fi w) (fi h) (fi stride) shmFormat
+  -- Create pixman image
+  pixmanImage <- P.pixman_image_create_bits_no_clear pixmanFormat (fi w) (fi h) (castPtr ptr) (fi stride)
+  busy <- newIORef True
+  -- Sets busy = False
+  busyPtr <- newStablePtr busy
+  _ <- WL.listenerAdd buf listener busyPtr
+  return ImageBuffer {..}
+
+destroyImageBuffer :: ImageBuffer -> IO ()
+destroyImageBuffer ImageBuffer{..} = do
+  WL.objectDestroy buf
+  WL.objectDestroy pool
+  void $ P.pixman_image_unref pixmanImage
+  munmap ptr size
+  freeStablePtr busyPtr
 
 incSurfaceCount :: Int -> ImageBufferPool -> ImageBufferPool
 incSurfaceCount n bp = bp { surfaceCount = bp.surfaceCount + n }
@@ -106,24 +124,6 @@ nextBuffer pool w h shmFormat = do
 
 tryLockBuffer :: ImageBuffer -> IO Bool
 tryLockBuffer buf = atomicModifyIORef' buf.busy $ \s -> if not s then (True, True) else (s, False)
-
-initImageBuffer :: ImageBufferPool -> Int -> Int -> WL.Wl_shm_format -> P.Pixman_format_code_t -> IO ImageBuffer
-initImageBuffer ImageBufferPool {wlShm = wl_shm, bufferListener = listener} width height shmFormat pixmanFormat = do
-  let stride = width * 4
-      size = fi $ height * stride
-      w = width
-      h = height
-  (fd, ptr) <- createShm (fi size)
-  pool <- WL.shmCreatePool wl_shm (fi fd) (fi size)
-  io $ closeFd fd
-  buf <- WL.shmPoolCreateBuffer pool 0 (fi w) (fi h) (fi stride) shmFormat
-  -- Create pixman image
-  pixmanImage <- io $ P.pixman_image_create_bits_no_clear pixmanFormat (fi w) (fi h) (castPtr ptr) (fi stride)
-  busy <- newIORef True
-  -- Sets busy = False
-  busyPtr <- newStablePtr busy
-  _ <- io $ WL.listenerAdd buf listener (castPtr $ castStablePtrToPtr busyPtr)
-  return ImageBuffer {..}
 
 
 -- | little-endian

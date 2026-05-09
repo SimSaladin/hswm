@@ -11,16 +11,18 @@
 --
 module HSWM.InputConfig where
 
-import Data.Map qualified as M
-import Foreign hiding (void)
-import HSWM.Core
-import HSWM.XKB
-import Bindings.River qualified as R
-import Bindings.RiverSafe qualified as R
-import Bindings.Wayland.Client qualified as WL
-import Bindings.Wayland.Client (CEnum(..))
-import System.Posix
-import Data.List qualified as L
+import           HSWM.Core
+import           HSWM.XKB
+
+import qualified Wayland as WL
+
+import qualified Bindings.River as R
+import qualified Bindings.RiverSafe as R
+import           Bindings.Wayland.Client (CEnum(..))
+
+import qualified Data.List as L
+import qualified Data.Map as M
+import           System.Posix
 
 data InputConfigState = InputConfigState
   { inputDevices :: M.Map R.RiverInputDevice InputDeviceState
@@ -144,7 +146,7 @@ createKeyboardKeymap params = lookupKeymaps params >>= \case
       modifyObjectDef $ \st -> st { xkbKeymaps = kmState : st.xkbKeymaps }
       runInIO <- askRunInIO
       l <- getOrCreateObjectIO $ R.mkRiverXkbKeymapListener $ runInIO . handleXkbKeymapEvent
-      R.listenerAdd keymap l nullPtr
+      R.listenerAdd_ keymap l
       return kmState
 
 lookupKeymaps :: XkbRuleNames -> H [KeymapState]
@@ -178,7 +180,7 @@ handleInputManagerEvent (R.RiverInputManagerFinished _ rim) = do
 handleInputManagerEvent (R.RiverInputManagerInputDevice _ _ dev) = do
   modifyObjectDef $ \st -> st { inputDevices = M.insert dev def st.inputDevices }
   l <- getObject
-  io $ R.listenerAdd dev l nullPtr
+  R.listenerAdd_ dev l
 
 handleInputDeviceEvent :: (MonadStateGlobal HConf m) => R.RiverInputDeviceEvent -> m ()
 handleInputDeviceEvent (R.RiverInputDeviceType' _ dev deviceType) = do
@@ -199,7 +201,7 @@ handleXkbConfigEvent (R.RiverXkbConfigFinished _ xc) = do
 handleXkbConfigEvent (R.RiverXkbConfigXkbKeyboard _ _ kbd) = do
   modifyObjectDef $ \st -> st { xkbKeyboards = M.insert kbd def st.xkbKeyboards }
   l <- getObject
-  io $ R.listenerAdd kbd l nullPtr
+  R.listenerAdd_ kbd l
   -- Set the default keymap
   asks (xkbLayout . config) >>= (`whenJust` setKeyboardKeymap kbd)
 
@@ -218,7 +220,7 @@ handleLibinputEvent (R.RiverLibinputConfigFinished _ lic) = do
 handleLibinputEvent (R.RiverLibinputConfigLibinputDevice _ _ dev) = do
   modifyObjectDef $ \st -> st { libinputDevices = M.insert dev def st.libinputDevices }
   l <- getObject
-  io $ WL.listenerAdd dev l nullPtr
+  WL.listenerAdd_ dev l
 
 handleLibinputDeviceEvent :: (HasGlobalTMap s, MonadReader s m, MonadUnliftIO m, MonadLogger m) => R.RiverLibinputDeviceEvent -> m ()
 handleLibinputDeviceEvent = \case

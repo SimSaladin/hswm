@@ -1,28 +1,31 @@
 -- |
 -- Module      : Text.XkbCommon.Registry
--- Description : xkbregistry.h
+-- Description : Query for available RMLVO
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
 --
+-- Query for available RMLVO (rules, models, layouts, variants and options).
+--
+-- Uses @xkbcommon/xkbregistry.h@
+--
 module Text.XkbCommon.Registry (
-  createRegistry,
+  -- * Create registry
   RegistryOptions(..),
-  def,
-  RxkbContext,
-  createRxkbContext,
-  rxkbContextParseDefault,
-  rxkbContextParse,
-  getRulesInfo,
-  RulesInfo(..),
-  ModelInfo(..),
+  createRegistry,
+  Registry(..),
+  Model(..),
   LayoutInfo(..),
-  OptionGroupInfo(..),
+  LangCode(..),
+  OptionGroup(..),
   OptionInfo(..),
-  RxkbException(..),
   Popularity(..),
+  -- * Exceptions
+  RxkbException(..),
+  -- * Re-exports
+  def,
   ) where
 
 import Data.Default
@@ -33,74 +36,113 @@ import GHC.Generics
 import Control.Exception
 import Data.Data
 import Control.Monad
+import Data.String
+import Data.Char (toLower, toUpper)
 
-import Text.XkbCommon.XkbContext (LogLevel(..))
+import Text.XkbCommon.FFI (LogLevel(..))
 
 #include <xkbcommon/xkbregistry.h>
 
-data RxkbException = RxkbContextParseFailed
+-- | Use "def" to construct the defaults.
+data RegistryOptions = RegistryOptions
+  { ruleSet :: Maybe String
+  -- ^ Load the specified ruleset instead of the default.
+  , noDefaultIncludes :: Bool
+  -- ^ Do not load default include paths.
+  --
+  -- Default: false
+  , exoticRules :: Bool
+  -- ^ Whether to load exotic items.
+  --
+  -- Default: false
+  , noSecureGetenv :: Bool
+  -- ^ Default: false
+  , setLogLevel :: Maybe LogLevel
+  , extraIncludePaths :: [FilePath]
+  } deriving (Eq, Ord, Show, Read, Generic)
+
+instance Default RegistryOptions where
+  def = RegistryOptions Nothing False False False Nothing []
+
+data RxkbException = RxkbContextParseFailed | RxkbContextIncludePathFailed FilePath
   deriving (Eq, Show)
 
 instance Exception RxkbException
 
+-- | Throws "RxkbException" on errors.
+createRegistry :: RegistryOptions -> IO Registry
+createRegistry opts = createRegistryContext opts >>= getRulesInfo
+
 -- * Aggregate rules info
 
-data RulesInfo = RulesInfo
-  { models       :: [ModelInfo]
+data Registry = Registry
+  { models       :: [Model]
   , layouts      :: [LayoutInfo]
-  , optionGroups :: [OptionGroupInfo]
-  } deriving (Eq, Ord, Show)
+  , optionGroups :: [OptionGroup]
+  } deriving (Eq, Ord, Show, Generic)
 
-data ModelInfo = ModelInfo
+data Model = Model
   { name        :: String
   , description :: String
   , vendor      :: String
-  , popularity  :: Popularity
-  } deriving (Eq, Ord)
+  , popularity  :: !Popularity
+  } deriving (Eq, Ord, Generic)
 
-instance Show ModelInfo where
+instance Show Model where
   show mi = "Model \"" ++ mi.name ++ "\" (" ++ mi.description ++ "; vendor: " ++ mi.vendor ++ ")"
    ++ (if mi.popularity == Exotic then " [exotic]" else "")
 
 data LayoutInfo = LayoutInfo
   { name        :: String
-  , description :: String
-  , popularity  :: Popularity
-  , variant     :: Maybe String
-  , brief       :: String
-  , languages   :: [String] -- ^ ISO 639-3
-  , languages2  :: [String] -- ^ ISO 3166
-  } deriving (Eq, Ord)
+  , variant     :: !(Maybe String)
+  , description :: !String
+  , brief       :: !String
+  , popularity  :: !Popularity
+  , languages   :: [LangCode]
+  } deriving (Eq, Ord, Generic)
 
 instance Show LayoutInfo where
   show li = "Layout " ++ li.name ++
     maybe "" (\va -> "(" ++ va ++ ")") li.variant ++
     " \"" ++ li.description ++ "\"" ++
-    " (" ++ li.brief ++ "; " ++ unwords li.languages ++ "/" ++ unwords li.languages2 ++ ")" ++
+    " (" ++ li.brief ++ "; " ++ unwords (map show li.languages) ++ ")" ++
       (if li.popularity == Exotic then " [exotic]" else "")
 
-data OptionGroupInfo = OptionGroupInfo
+data LangCode = Lang639 String -- ^ ISO 639-3 (@us@)
+              | Lang3166 String -- ^ ISO 3166 (@eng@)
+  deriving (Eq, Ord, Generic)
+
+instance Show LangCode where
+  show (Lang639 x) = x
+  show (Lang3166 x) = x
+
+instance IsString LangCode where
+  fromString s@[_, _] = Lang639 $ map toUpper s
+  fromString s@[_, _, _] = Lang3166 $ map toLower s
+  fromString s = error $ "fromString: no parse (LangCode): " ++ s
+
+data OptionGroup = OptionGroup
   { name           :: String
   , description    :: String
-  , popularity     :: Popularity
-  , allowsMultiple :: Bool
+  , multi          :: !Bool -- ^ Whether multiple options in this group can be selected simultaneously.
   , options        :: [OptionInfo]
-  } deriving (Eq, Ord)
+  , popularity     :: !Popularity
+  } deriving (Eq, Ord, Generic)
 
-instance Show OptionGroupInfo where
+instance Show OptionGroup where
   show og = "OptionGroup " ++ og.name ++
     " \"" ++ og.description ++ "\"" ++
-    (if og.allowsMultiple then " [multi]" else "") ++
+    (if og.multi then " [multi]" else "") ++
       (if og.popularity == Exotic then " [exotic]" else "") ++
     "\n" ++
     concatMap (\o -> "  " ++ show o ++ "\n") og.options
 
 data OptionInfo = OptionInfo
-  { name           :: String
-  , brief          :: String
-  , description    :: String
-  , popularity     :: Popularity
-  , layoutSpecific :: Bool
+  { name           :: !String
+  , brief          :: !String
+  , description    :: !String
+  , layoutSpecific :: !Bool
+  , popularity     :: !Popularity
   } deriving (Eq, Ord)
 
 instance Show OptionInfo where
@@ -110,35 +152,24 @@ instance Show OptionInfo where
     (if oi.layoutSpecific then " [layout-specific]" else "") ++
     (if oi.popularity == Exotic then " [exotic]" else "")
 
-data Popularity = PopularityStandard | Exotic | PopularityUnknown Int
-  deriving (Eq, Ord, Show)
+-- | If the exotic items are not loaded, all items will have have the standard popularity.
+data Popularity = PopularityStandard
+                | Exotic
+  deriving (Eq, Ord, Show, Read, Generic)
 
-getPopularity :: CUInt -> Popularity
-getPopularity x = case x of
-                    #{const RXKB_POPULARITY_STANDARD} -> PopularityStandard
-                    #{const RXKB_POPULARITY_EXOTIC} -> Exotic
-                    _ -> PopularityUnknown (fromIntegral x)
-
-getRulesInfo :: RxkbContext -> IO RulesInfo
-getRulesInfo ctx0 =
-  withForeignPtr ctx0.unwrap $ \ctx' ->
-  RulesInfo
+getRulesInfo :: RxkbContext -> IO Registry
+getRulesInfo ctx0 = withForeignPtr ctx0.unwrap $ \ctx' ->
+  Registry
   <$> collectModels ctx'
   <*> collectLayouts ctx'
   <*> collectOptionGroups ctx'
     where
-
-      collectModels :: Ptr RxkbContext -> IO [ModelInfo]
       collectModels ctx = collect (_rxkbModelFirst ctx) _rxkbModelUnref $ \m -> (,) <$> _rxkbModelNext m <*> getModelInfo m
-
-      collectLayouts :: Ptr RxkbContext -> IO [LayoutInfo]
       collectLayouts ctx = collect (_rxkbLayoutFirst ctx) _rxkbLayoutUnref $ \m -> (,) <$> _rxkbLayoutNext m <*> getLayoutInfo m
+      collectOptionGroups ctx = collect (_rxkbOptionGroupFirst ctx) _rxkbOptionGroupUnref $ \m -> (,) <$> _rxkbOptionGroupNext m <*> getOptionGroup m
 
-      collectOptionGroups :: Ptr RxkbContext -> IO [OptionGroupInfo]
-      collectOptionGroups ctx = collect (_rxkbOptionGroupFirst ctx) _rxkbOptionGroupUnref $ \m -> (,) <$> _rxkbOptionGroupNext m <*> getOptionGroupInfo m
-
-      getModelInfo :: RxkbModel -> IO ModelInfo
-      getModelInfo m = ModelInfo
+      getModelInfo :: RxkbModel -> IO Model
+      getModelInfo m = Model
         <$> getString (_rxkbModelGetName m)
         <*> getString (_rxkbModelGetDescription m)
         <*> getString (_rxkbModelGetVendor m)
@@ -147,28 +178,37 @@ getRulesInfo ctx0 =
       getLayoutInfo :: RxkbLayout -> IO LayoutInfo
       getLayoutInfo m = LayoutInfo
         <$> getString (_rxkbLayoutGetName m)
-        <*> getString (_rxkbLayoutGetDescription m)
-        <*> fmap getPopularity (_rxkbLayoutGetPopularity m)
         <*> getStringMaybe (_rxkbLayoutGetVariant m)
+        <*> getString (_rxkbLayoutGetDescription m)
         <*> getString (_rxkbLayoutGetBrief m)
-        <*> collect (_iso639First m) _iso639Unref (\x -> (,) <$> _iso639Next x <*> getString (_iso639GetCode x))
+        <*> fmap getPopularity (_rxkbLayoutGetPopularity m)
+        <*> getLangs m
+
+      getLangs m = (\xs ys -> map Lang639 xs ++ map Lang3166 ys)
+        <$> collect (_iso639First m) _iso639Unref (\x -> (,) <$> _iso639Next x <*> getString (_iso639GetCode x))
         <*> collect (_iso3166First m) _iso3166Unref (\x -> (,) <$> _iso3166Next x <*> getString (_iso3166GetCode x))
 
-      getOptionGroupInfo :: RxkbOptionGroup -> IO OptionGroupInfo
-      getOptionGroupInfo m = OptionGroupInfo
+      getOptionGroup :: RxkbOptionGroup -> IO OptionGroup
+      getOptionGroup m = OptionGroup
         <$> getString (_rxkbOptionGroupGetName m)
         <*> getString (_rxkbOptionGroupGetDescription m)
-        <*> fmap getPopularity (_rxkbOptionGroupGetPopularity m)
         <*> _rxkbOptionGroupAllowsMultiple m
         <*> collect (_rxkbOptionFirst m) _rxkbOptionUnref (\x -> (,) <$> _rxkbOptionNext x <*> getOptionInfo x)
+        <*> fmap getPopularity (_rxkbOptionGroupGetPopularity m)
 
       getOptionInfo :: RxkbOption -> IO OptionInfo
       getOptionInfo m = OptionInfo
         <$> getString (_rxkbOptionGetName m)
         <*> getString (_rxkbOptionGetBrief m)
         <*> getString (_rxkbOptionGetDescription m)
-        <*> fmap getPopularity (_rxkbOptionGetPopularity m)
         <*> _rxkbOptionIsLayoutSpecific m
+        <*> fmap getPopularity (_rxkbOptionGetPopularity m)
+
+      getPopularity :: CUInt -> Popularity
+      getPopularity x = case x of
+                          #{const RXKB_POPULARITY_STANDARD} -> PopularityStandard
+                          #{const RXKB_POPULARITY_EXOTIC} -> Exotic
+                          _ -> error $ "no parse: Popularity: " ++ show x
 
       collect :: HasField "unwrap" a (Ptr u) => IO a -> (Ptr u -> IO ()) -> (a -> IO (a, b)) -> IO [b]
       collect begin unref next = begin >>= go [] where
@@ -188,29 +228,19 @@ getRulesInfo ctx0 =
         r <- m
         if r == nullPtr then return Nothing else Just <$> peekCString r
 
-data RegistryOptions = RegistryOptions
-  { rxkbRuleSet           :: Maybe String
-  , rxkbNoDefaultIncludes :: Bool -- ^ Default: false
-  , rxkbLoadExoticRules   :: Bool -- ^ Default: false
-  , rxkbNoSecureGetenv    :: Bool -- ^ Default: false
-  , rxkbLogLevel          :: LogLevel
-  } deriving (Eq, Ord, Show, Read)
-
-instance Default RegistryOptions where
-  def = RegistryOptions Nothing False False False LevelError
-
-createRegistry :: RegistryOptions -> IO RxkbContext
-createRegistry opts = do
-  ctx <- createRxkbContext flags
-  when (opts.rxkbLogLevel /= LevelError) $ withForeignPtr ctx.unwrap $ \ctx' ->
-    _rxkbContextSetLogLevel ctx' (displayLogLevel opts.rxkbLogLevel)
-  maybe rxkbContextParseDefault (flip rxkbContextParse) opts.rxkbRuleSet ctx
+createRegistryContext :: RegistryOptions -> IO RxkbContext
+createRegistryContext opts = do
+  ctx' <- throwIfNull "createRegistry" $ _rxkbContextNew flags
+  forM_ opts.setLogLevel $ _rxkbContextSetLogLevel ctx' . displayLogLevel
+  forM_ opts.extraIncludePaths $ appendIncludePath ctx'
+  ctx <- RxkbContext <$> newForeignPtr _rxkbContextUnref ctx'
+  maybe rxkbContextParseDefault (flip rxkbContextParse) opts.ruleSet ctx
   return ctx
     where
       flags =
-        f opts.rxkbNoDefaultIncludes #{const RXKB_CONTEXT_NO_DEFAULT_INCLUDES} .|.
-        f opts.rxkbLoadExoticRules #{const RXKB_CONTEXT_LOAD_EXOTIC_RULES} .|.
-        f opts.rxkbNoSecureGetenv #{const RXKB_CONTEXT_NO_SECURE_GETENV}
+        f opts.noDefaultIncludes #{const RXKB_CONTEXT_NO_DEFAULT_INCLUDES} .|.
+        f opts.exoticRules #{const RXKB_CONTEXT_LOAD_EXOTIC_RULES} .|.
+        f opts.noSecureGetenv #{const RXKB_CONTEXT_NO_SECURE_GETENV}
       f True x = x
       f False _ = 0
 
@@ -221,15 +251,10 @@ createRegistry opts = do
                               LevelInfo -> #{const RXKB_LOG_LEVEL_INFO}
                               LevelDebug -> #{const RXKB_LOG_LEVEL_DEBUG}
 
--- * RxkbContext
-
-newtype RxkbContext = RxkbContext { unwrap :: ForeignPtr RxkbContext }
-  deriving newtype (Eq, Ord)
-  deriving stock (Generic, Show, Data)
-
-createRxkbContext :: CUInt -> IO RxkbContext
-createRxkbContext flags = throwIfNull "createRxkbContext" (_rxkbContextNew flags)
-  >>= fmap RxkbContext . newForeignPtr _rxkbContextUnref
+appendIncludePath :: Ptr RxkbContext -> FilePath -> IO ()
+appendIncludePath ctx path = do
+  r <- withCString path $ c_rxkb_context_include_path_append ctx
+  unless r $ throwIO $ RxkbContextIncludePathFailed path
 
 -- | Parse given ruleset (e.g. @"evdev"@).
 --
@@ -247,80 +272,27 @@ rxkbContextParseDefault ctx =
     r <- _rxkbContextParseDefaultRuleset ctx'
     unless r $ throwIO RxkbContextParseFailed
 
-foreign import ccall unsafe "rxkb_context_new"
-  _rxkbContextNew :: CUInt -> IO (Ptr RxkbContext)
+-- * FFI
 
-foreign import ccall unsafe "&rxkb_context_unref"
-  _rxkbContextUnref :: FunPtr (Ptr RxkbContext -> IO ())
-
-foreign import ccall unsafe "rxkb_context_parse"
-  _rxkbContextParse :: Ptr RxkbContext -> CString -> IO Bool
-
-foreign import ccall unsafe "rxkb_context_parse_default_ruleset"
-  _rxkbContextParseDefaultRuleset :: Ptr RxkbContext -> IO Bool
-
-foreign import ccall unsafe "rxkb_context_set_log_level"
-  _rxkbContextSetLogLevel :: Ptr RxkbContext -> CUInt -> IO ()
-
--- * Models
+newtype RxkbContext = RxkbContext { unwrap :: ForeignPtr RxkbContext }
+  deriving newtype (Eq, Ord)
+  deriving stock (Generic, Show, Data)
 
 newtype RxkbModel = RxkbModel { unwrap :: Ptr RxkbModel }
   deriving newtype (Eq, Ord, Storable)
   deriving stock (Generic, Show, Data)
 
-foreign import ccall unsafe "rxkb_model_unref"          _rxkbModelUnref          :: Ptr RxkbModel -> IO ()
-foreign import ccall unsafe "rxkb_model_first"           _rxkbModelFirst          :: Ptr RxkbContext -> IO RxkbModel
-foreign import ccall unsafe "rxkb_model_next"            _rxkbModelNext           :: RxkbModel -> IO RxkbModel
-foreign import ccall unsafe "rxkb_model_get_name"        _rxkbModelGetName        :: RxkbModel -> IO CString
-foreign import ccall unsafe "rxkb_model_get_description" _rxkbModelGetDescription :: RxkbModel -> IO CString
-foreign import ccall unsafe "rxkb_model_get_popularity"  _rxkbModelGetPopularity  :: RxkbModel -> IO CUInt
-foreign import ccall unsafe "rxkb_model_get_vendor"      _rxkbModelGetVendor      :: RxkbModel -> IO CString
-
--- * Layouts
-
 newtype RxkbLayout = RxkbLayout { unwrap :: Ptr RxkbLayout }
   deriving newtype (Eq, Ord, Storable)
   deriving stock (Generic, Show, Data)
-
-foreign import ccall unsafe "rxkb_layout_unref" _rxkbLayoutUnref                   :: Ptr RxkbLayout -> IO ()
-foreign import ccall unsafe "rxkb_layout_first" _rxkbLayoutFirst                    :: Ptr RxkbContext -> IO RxkbLayout
-foreign import ccall unsafe "rxkb_layout_next" _rxkbLayoutNext                      :: RxkbLayout -> IO RxkbLayout
-foreign import ccall unsafe "rxkb_layout_get_name" _rxkbLayoutGetName               :: RxkbLayout -> IO CString
-foreign import ccall unsafe "rxkb_layout_get_description" _rxkbLayoutGetDescription :: RxkbLayout -> IO CString
-foreign import ccall unsafe "rxkb_layout_get_popularity" _rxkbLayoutGetPopularity   :: RxkbLayout -> IO CUInt
-foreign import ccall unsafe "rxkb_layout_get_variant" _rxkbLayoutGetVariant         :: RxkbLayout -> IO CString
-foreign import ccall unsafe "rxkb_layout_get_brief" _rxkbLayoutGetBrief             :: RxkbLayout -> IO CString
-
--- * Option groups
 
 newtype RxkbOptionGroup = RxkbOptionGroup { unwrap :: Ptr RxkbOptionGroup }
   deriving newtype (Eq, Ord, Storable)
   deriving stock (Generic, Show, Data)
 
-foreign import ccall unsafe "rxkb_option_group_unref" _rxkbOptionGroupUnref                   :: Ptr RxkbOptionGroup -> IO ()
-foreign import ccall unsafe "rxkb_option_group_first" _rxkbOptionGroupFirst                    :: Ptr RxkbContext -> IO RxkbOptionGroup
-foreign import ccall unsafe "rxkb_option_group_next" _rxkbOptionGroupNext                      :: RxkbOptionGroup -> IO RxkbOptionGroup
-foreign import ccall unsafe "rxkb_option_group_get_name" _rxkbOptionGroupGetName               :: RxkbOptionGroup -> IO CString
-foreign import ccall unsafe "rxkb_option_group_get_description" _rxkbOptionGroupGetDescription :: RxkbOptionGroup -> IO CString
-foreign import ccall unsafe "rxkb_option_group_get_popularity" _rxkbOptionGroupGetPopularity   :: RxkbOptionGroup -> IO CUInt
-foreign import ccall unsafe "rxkb_option_group_allows_multiple" _rxkbOptionGroupAllowsMultiple :: RxkbOptionGroup -> IO Bool
-
--- * Options
-
 newtype RxkbOption = RxkbOption { unwrap :: Ptr RxkbOption }
   deriving newtype (Eq, Ord, Storable)
   deriving stock (Generic, Show, Data)
-
-foreign import ccall unsafe "rxkb_option_unref" _rxkbOptionUnref                        :: Ptr RxkbOption -> IO ()
-foreign import ccall unsafe "rxkb_option_first" _rxkbOptionFirst                         :: RxkbOptionGroup -> IO RxkbOption
-foreign import ccall unsafe "rxkb_option_next" _rxkbOptionNext                           :: RxkbOption -> IO RxkbOption
-foreign import ccall unsafe "rxkb_option_get_name" _rxkbOptionGetName                    :: RxkbOption -> IO CString
-foreign import ccall unsafe "rxkb_option_get_brief" _rxkbOptionGetBrief                  :: RxkbOption -> IO CString
-foreign import ccall unsafe "rxkb_option_get_description" _rxkbOptionGetDescription      :: RxkbOption -> IO CString
-foreign import ccall unsafe "rxkb_option_get_popularity" _rxkbOptionGetPopularity        :: RxkbOption -> IO CUInt
-foreign import ccall unsafe "rxkb_option_is_layout_specific" _rxkbOptionIsLayoutSpecific :: RxkbOption -> IO Bool
-
--- * Country codes
 
 -- | ISO 639-3 code (@eng@, etc.)
 newtype ISO639 = ISO639 { unwrap :: Ptr ISO639 }
@@ -331,6 +303,47 @@ newtype ISO639 = ISO639 { unwrap :: Ptr ISO639 }
 newtype ISO3166 = ISO3166 { unwrap :: Ptr ISO3166 }
   deriving newtype (Eq, Ord, Storable)
   deriving stock (Generic, Show, Data)
+
+foreign import ccall unsafe "rxkb_context_new" _rxkbContextNew :: CUInt -> IO (Ptr RxkbContext)
+foreign import ccall unsafe "rxkb_context_parse" _rxkbContextParse :: Ptr RxkbContext -> CString -> IO Bool
+foreign import ccall unsafe "rxkb_context_parse_default_ruleset" _rxkbContextParseDefaultRuleset :: Ptr RxkbContext -> IO Bool
+foreign import ccall unsafe "rxkb_context_set_log_level" _rxkbContextSetLogLevel :: Ptr RxkbContext -> CUInt -> IO ()
+foreign import ccall unsafe "rxkb_context_include_path_append" c_rxkb_context_include_path_append :: Ptr RxkbContext -> CString -> IO Bool
+foreign import ccall unsafe "&rxkb_context_unref" _rxkbContextUnref :: FunPtr (Ptr RxkbContext -> IO ())
+
+foreign import ccall unsafe "rxkb_model_unref"          _rxkbModelUnref          :: Ptr RxkbModel -> IO ()
+foreign import ccall unsafe "rxkb_model_first"           _rxkbModelFirst          :: Ptr RxkbContext -> IO RxkbModel
+foreign import ccall unsafe "rxkb_model_next"            _rxkbModelNext           :: RxkbModel -> IO RxkbModel
+foreign import ccall unsafe "rxkb_model_get_name"        _rxkbModelGetName        :: RxkbModel -> IO CString
+foreign import ccall unsafe "rxkb_model_get_description" _rxkbModelGetDescription :: RxkbModel -> IO CString
+foreign import ccall unsafe "rxkb_model_get_popularity"  _rxkbModelGetPopularity  :: RxkbModel -> IO CUInt
+foreign import ccall unsafe "rxkb_model_get_vendor"      _rxkbModelGetVendor      :: RxkbModel -> IO CString
+
+foreign import ccall unsafe "rxkb_layout_unref" _rxkbLayoutUnref                   :: Ptr RxkbLayout -> IO ()
+foreign import ccall unsafe "rxkb_layout_first" _rxkbLayoutFirst                    :: Ptr RxkbContext -> IO RxkbLayout
+foreign import ccall unsafe "rxkb_layout_next" _rxkbLayoutNext                      :: RxkbLayout -> IO RxkbLayout
+foreign import ccall unsafe "rxkb_layout_get_name" _rxkbLayoutGetName               :: RxkbLayout -> IO CString
+foreign import ccall unsafe "rxkb_layout_get_description" _rxkbLayoutGetDescription :: RxkbLayout -> IO CString
+foreign import ccall unsafe "rxkb_layout_get_popularity" _rxkbLayoutGetPopularity   :: RxkbLayout -> IO CUInt
+foreign import ccall unsafe "rxkb_layout_get_variant" _rxkbLayoutGetVariant         :: RxkbLayout -> IO CString
+foreign import ccall unsafe "rxkb_layout_get_brief" _rxkbLayoutGetBrief             :: RxkbLayout -> IO CString
+
+foreign import ccall unsafe "rxkb_option_group_unref" _rxkbOptionGroupUnref                   :: Ptr RxkbOptionGroup -> IO ()
+foreign import ccall unsafe "rxkb_option_group_first" _rxkbOptionGroupFirst                    :: Ptr RxkbContext -> IO RxkbOptionGroup
+foreign import ccall unsafe "rxkb_option_group_next" _rxkbOptionGroupNext                      :: RxkbOptionGroup -> IO RxkbOptionGroup
+foreign import ccall unsafe "rxkb_option_group_get_name" _rxkbOptionGroupGetName               :: RxkbOptionGroup -> IO CString
+foreign import ccall unsafe "rxkb_option_group_get_description" _rxkbOptionGroupGetDescription :: RxkbOptionGroup -> IO CString
+foreign import ccall unsafe "rxkb_option_group_get_popularity" _rxkbOptionGroupGetPopularity   :: RxkbOptionGroup -> IO CUInt
+foreign import ccall unsafe "rxkb_option_group_allows_multiple" _rxkbOptionGroupAllowsMultiple :: RxkbOptionGroup -> IO Bool
+
+foreign import ccall unsafe "rxkb_option_unref" _rxkbOptionUnref                        :: Ptr RxkbOption -> IO ()
+foreign import ccall unsafe "rxkb_option_first" _rxkbOptionFirst                         :: RxkbOptionGroup -> IO RxkbOption
+foreign import ccall unsafe "rxkb_option_next" _rxkbOptionNext                           :: RxkbOption -> IO RxkbOption
+foreign import ccall unsafe "rxkb_option_get_name" _rxkbOptionGetName                    :: RxkbOption -> IO CString
+foreign import ccall unsafe "rxkb_option_get_brief" _rxkbOptionGetBrief                  :: RxkbOption -> IO CString
+foreign import ccall unsafe "rxkb_option_get_description" _rxkbOptionGetDescription      :: RxkbOption -> IO CString
+foreign import ccall unsafe "rxkb_option_get_popularity" _rxkbOptionGetPopularity        :: RxkbOption -> IO CUInt
+foreign import ccall unsafe "rxkb_option_is_layout_specific" _rxkbOptionIsLayoutSpecific :: RxkbOption -> IO Bool
 
 foreign import ccall unsafe "rxkb_layout_get_iso639_first" _iso639First   :: RxkbLayout -> IO ISO639
 foreign import ccall unsafe "rxkb_iso639_code_next" _iso639Next           :: ISO639 -> IO ISO639

@@ -13,54 +13,56 @@
 -- Basic window management -related types.
 module HSWM.Types.WM where
 
-import Control.Monad.Fix
-import Control.Monad.State
-import Data.Aeson qualified as A
-import Data.Map qualified as M
-import Data.Monoid (Ap (..))
-import Data.Typeable
-import Foreign hiding (void)
-import Foreign.C
-import HSWM.StackSet as W
-import HSWM.Types.Events
-import HSWM.Types.TypeMap
-import HSWM.Util.Types
-import HSWM.Utils
-import HSWM.XKB (KeySym, ModMask, XkbRuleNames, Button)
-import River
-import Bindings.River qualified as R
-import Bindings.RiverSafe qualified as R
-import Wayland (RegistryCache, HasGlobalsRegistry(..))
-import Bindings.Wayland.Client qualified as WL hiding (display)
-import Bindings.Wayland.WlrOutputPowerManagementUnstableV1 qualified as Wlr
+import           HSWM.StackSet as W
+import           HSWM.Types.Events
+import           HSWM.Types.TypeMap
+import           HSWM.Util.Types
+import           HSWM.Utils
+import           HSWM.XKB (Button, KeySym, ModMask, XkbRuleNames)
+import           HSWM.Wayland (HasGlobalsRegistry(..), RegistryCache)
+import           River.WMP
+
+import qualified Wayland as WL
+
+import qualified Bindings.River as R
+import qualified Bindings.RiverSafe as R
+import qualified Bindings.Wayland.WlrOutputPowerManagementUnstableV1 as Wlr
+
+import           Control.Monad.Fix
+import           Control.Monad.State
+import qualified Data.Aeson as A
+import qualified Data.Map as M
+import           Data.Monoid (Ap(..))
+import           Data.Typeable
+import           Foreign hiding (void)
+import           Foreign.C
 
 -- * User configuration
 
 -- | User configuration
 data HSWMConfig m l = HSWMConfig
-  { keyBindings :: [((ModMask, KeySym), SomeAction m)],
-    pointerBindings :: [((String, Button), SomeAction m)],
-    defaultModMask :: !String,
-    borderWidth :: !Int32,
-    normalBorder :: !RiverColor,
-    focusedBorder :: !RiverColor,
-    borderEdges :: !Int32,
-    startupHook :: !(m ()),
-    exitHook :: !(m ()),
-    handleEventHook :: !(Event -> m All),
-    layoutHook :: !(l RiverWindow),
-    renderHook :: !(m ()),
-    logHook :: !(m ()),
-    manageHook :: !ManageHook,
-    -- | Keyboard layout set for connected keyboards
-    xkbLayout :: !(Maybe XkbRuleNames),
-    workspaces :: [WorkspaceId],
-    -- | Keyboard repeat (rate, delay)
-    repeatInfo :: !(Maybe (Int32, Int32)),
-    -- | XCursor theme and size
-    xcursor :: !(Maybe (String, Word32))
-  }
-  deriving stock (Generic)
+  { keyBindings     :: [(XBKey, SomeAction m)]
+  , pointerBindings :: [((String, Button), SomeAction m)]
+  , defaultModMask  :: !String
+  , borderWidth     :: !Int32
+  , normalBorder    :: !RiverColor
+  , focusedBorder   :: !RiverColor
+  , borderEdges     :: !Int32
+  , startupHook     :: !(m ())
+  , exitHook        :: !(m ())
+  , handleEventHook :: !(Event -> m All)
+  , layoutHook      :: !(l RiverWindow)
+  , renderHook      :: !(m ())
+  , logHook         :: !(m ())
+  , manageHook      :: !ManageHook
+   -- | Keyboard layout set for connected keyboards
+  , xkbLayout       :: !(Maybe XkbRuleNames)
+  , workspaces      :: [WorkspaceId]
+   -- | Keyboard repeat (rate, delay)
+  , repeatInfo      :: !(Maybe (Int32, Int32))
+   -- | XCursor theme and size
+  , xcursor         :: !(Maybe (String, Word32))
+  } deriving stock (Generic)
 
 -- | Default config (defaults).
 instance (Default (m ()), Monoid (m ()), Monoid (m All)) => Default (HSWMConfig m Full) where
@@ -69,7 +71,7 @@ instance (Default (m ()), Monoid (m ()), Monoid (m All)) => Default (HSWMConfig 
       { borderWidth = 2,
         normalBorder = parseRgba "0x0000B0",
         focusedBorder = parseRgba "0xFA0050",
-        borderEdges = foldl' (.|.) 0 (fi . (.unwrap) <$> [EdgeLeft, EdgeRight, EdgeTop, EdgeBottom]),
+        borderEdges = foldl' (.|.) 0 (fi . (.unwrap) <$> [R.EdgeLeft, R.EdgeRight, R.EdgeTop, R.EdgeBottom]),
         keyBindings = [],
         pointerBindings = [],
         defaultModMask = "Ctrl",
@@ -104,7 +106,7 @@ instance Bounded ScreenId where
 instance Default ScreenId where def = S (-1)
 
 -- | The output dimensions
-data ScreenDetail = SD {x, y, width, height :: !Int}
+data ScreenDetail = SD {x, y, width, height :: {-# UNPACK #-} !Int}
   deriving (Eq, Show, Read, Generic, Default)
 
 data WorkspaceDetail = WD
@@ -309,6 +311,10 @@ newtype H a = H (ReaderT HConf IO a)
   deriving newtype (MonadCatch, MonadMask)
   deriving (Semigroup, Monoid) via Ap H a
 
+instance Show (H ()) where show _ = "H()"
+
+instance Show (H Bool) where show _ = "H()"
+
 instance MonadLogger H where
   monadLoggerLog loc src lvl msg = do
     f <- asks _logFunc
@@ -321,6 +327,8 @@ newtype HS a = HS (ReaderT HConf (StateT HState IO) a)
   deriving newtype (MonadCatch, MonadMask)
   deriving (Semigroup, Monoid) via Ap HS a
 
+instance Show (HS Bool) where show _ = "HS()"
+
 instance MonadLogger HS where
   monadLoggerLog loc src lvl msg = do
     f <- asks _logFunc
@@ -330,42 +338,40 @@ instance MonadLoggerIO HS where
 
 -- | The read-only window manager state.
 data HConf = HConf
-  { _stateLocked :: Bool,
+  { _stateLocked                   :: {-# UNPACK #-} !Bool
     -- | Just when executing seat-originating key/pointer bindings.
-    thisSeat :: Maybe RiverSeat,
+  , thisSeat                       :: !(Maybe RiverSeat)
     -- | User-provided configuration.
-    config :: !(HSWMConfig H Layout),
+  , config                         :: !(HSWMConfig H Layout)
     -- | The Wayland display pointer
-    _display :: !WL.Display,
+  , _display                       :: {-# UNPACK #-} !WL.Display
     -- | Root logger function.
-    _logFunc :: !(Loc -> LogSource -> LogLevel -> LogStr -> IO ()),
+  , _logFunc                       :: !(Loc -> LogSource -> LogLevel -> LogStr -> IO ())
     -- | The global objects available through wl_registry.
-    globals :: !(IORef RegistryCache),
+  , globals                        :: !(MVar RegistryCache)
     -- | The 'HState' XXX FIXME
-    _state :: !(TMVar HState),
+  , _state                         :: !(TMVar HState)
     -- | XXX ???
-    eventQueue :: !(TQueue MainEvent),
+  , eventQueue                     :: !(TQueue MainEvent)
     -- | Pending actions to be emitted in the next manage and render queues (respectively).
-    pendingManageQ, pendingRenderQ :: !(TQueue (HS ())),
-    globalTypeMap :: !(TMVar TypeMap)
-  }
-  deriving (Generic)
+  , pendingManageQ, pendingRenderQ :: !(TQueue (HS ()))
+  , globalTypeMap                  :: !(TMVar TypeMap)
+  } deriving (Generic)
 
 -- | Mutable stete.
 data HState = HState
-  { windowset :: !WindowSet,
-    windowsetOld :: !WindowSet,
-    _seats :: [Seat],
-    _outputs :: [Output],
-    _windows :: M.Map RiverWindow Window,
-    recoveredWindows :: !(M.Map String RiverWindow),
+  { windowset        :: !WindowSet
+  , windowsetOld     :: !WindowSet
+  , _seats           :: ![Seat]
+  , _outputs         :: ![Output]
+  , _windows         :: !(M.Map RiverWindow Window)
+  , recoveredWindows :: !(M.Map String RiverWindow)
     -- | stores custom state information.
     --
     -- The module "XMonad.Util.ExtensibleState" in xmonad-contrib
     -- provides additional information and a simple interface for using this.
-    extensibleState :: !(M.Map String (Either String StateExtension))
-  }
-  deriving (Generic, Default)
+  , extensibleState  :: !(M.Map String (Either String StateExtension))
+  } deriving (Generic, Default)
 
 instance HasGlobalTMap HConf where
   globalTMap = lens globalTypeMap (\s a -> s {globalTypeMap = a})
@@ -410,29 +416,29 @@ liftHS a = Query (lift a)
 -- ** Windows
 
 data Window = Window
-  { river_window :: !RiverWindow,
-    node :: !RiverNode,
-    x, y, width, height :: !Int32,
+  { river_window             :: !RiverWindow,
+    node                     :: !RiverNode,
+    x, y, width, height      :: !Int32,
     title, appId, identifier :: !String,
     -- | Dimension hints
     min_height, min_width, max_height, max_width :: !Int,
-    parent :: !(Maybe RiverWindow),
-    unreliablePid :: !(Maybe Int),
-    decorationHint :: !(Maybe R.River_window_v1_decoration_hint),
-    presentationHint :: !(Maybe R.River_output_v1_presentation_mode),
-    wBorderWidth :: !(Maybe Int32),
-    new :: Bool,
-    closed :: Bool,
-    fullscreen :: Maybe RiverOutput,
-    minimized :: Bool,
-    p_manage_action :: [WindowManageAction],
-    p_render_border :: Maybe RiverColor,
-    p_render_pos :: Maybe (Int32, Int32),
-    p_render_place :: CInt,
-    p_set_visible :: Maybe Bool,
+    parent                   :: !(Maybe RiverWindow),
+    unreliablePid            :: !(Maybe Int),
+    decorationHint           :: !(Maybe R.River_window_v1_decoration_hint),
+    presentationHint         :: !(Maybe R.River_output_v1_presentation_mode),
+    wBorderWidth             :: !(Maybe Int32),
+    new                      :: !Bool,
+    closed                   :: !Bool,
+    fullscreen               :: !(Maybe RiverOutput),
+    minimized                :: !Bool,
+    p_manage_action          :: [WindowManageAction],
+    p_render_border          :: Maybe RiverColor,
+    p_render_pos             :: Maybe (Int32, Int32),
+    p_render_place           :: CInt,
+    p_set_visible            :: Maybe Bool,
     -- TODO: review below
-    pointer_move_requested :: RiverSeat,
-    pointer_resize_requested :: RiverSeat,
+    pointer_move_requested         :: RiverSeat,
+    pointer_resize_requested       :: RiverSeat,
     pointer_resize_requested_edges :: Int32
   }
   deriving stock (Show, Generic)
@@ -449,32 +455,32 @@ data WindowManageAction
 -- * River/WL Seat
 
 data Seat = Seat
-  { river_seat :: !RiverSeat,
+  { river_seat             :: !RiverSeat,
     river_layer_shell_seat :: !R.RiverLayerShellSeat,
-    xkb_bindings_seat :: !R.RiverXkbBindingsSeat,
-    wl_seat :: !WL.Seat,
-    position :: !(Int32, Int32), -- x, y
-    name :: !String,
-    caps :: !WL.Wl_seat_capability,
+    xkb_bindings_seat      :: !R.RiverXkbBindingsSeat,
+    wl_seat                :: !WL.Seat,
+    position               :: !(Int32, Int32), -- x, y
+    name                   :: !String,
+    caps                   :: !WL.SeatCapability,
     --
-    xkb_bindings :: !(XkbBindingMap (SomeAction H)),
-    pointer_bindings :: [StablePtr (PointerBinding (SomeAction H))],
+    xkb_bindings           :: !(XkbBindingMap (SomeAction H)),
+    pointer_bindings       :: [StablePtr (PointerBinding (SomeAction H))],
     --
-    pending_action :: !SeatAction,
-    submap_pending :: Maybe (SomeAction H, XkbBindingMap (SomeAction H)),
-    currentFocus :: !SeatFocus,
-    pendingPointerEnter :: !(Maybe (RiverWindow, (Int32, Int32))),
-    inputOverride :: !(Maybe (HS Bool, XkbBindingMap (SomeAction H))),
+    pending_action         :: !SeatAction,
+    submap_pending         :: Maybe (SomeAction H, XkbBindingMap (SomeAction H)),
+    currentFocus           :: !SeatFocus,
+    pendingPointerEnter    :: !(Maybe (RiverWindow, (Int32, Int32))),
+    inputOverride          :: !(Maybe (HS Bool, XkbBindingMap (SomeAction H))),
     -- Pointer move/resize
-    op :: SeatOp,
-    op_window :: RiverWindow,
-    op_release :: Bool,
-    op_start_x, op_start_y, op_dx, op_dy :: Int32,
-    op_start_width, op_start_height :: Int32,
-    op_edges :: Int32,
+    op                                   :: !SeatOp,
+    op_window                            :: !RiverWindow,
+    op_release                           :: !Bool,
+    op_start_x, op_start_y, op_dx, op_dy :: !Int32,
+    op_start_width, op_start_height      :: !Int32,
+    op_edges                             :: !Int32,
     -- TODO: review below
-    removed :: Bool,
-    focused, hovered, interacted :: RiverWindow,
+    removed :: !Bool,
+    focused, hovered, interacted :: !RiverWindow,
     suppressChangeFocus :: !Int
   }
   deriving (Show, Generic)
@@ -483,7 +489,7 @@ data SeatFocus
   = SFocusNone
   | SFocusLayerShell SeatFocus -- ^ previous focus
   | SFocusWindow RiverWindow
-  deriving (Show, Generic)
+  deriving (Eq, Ord, Show, Generic)
 
 data SeatAction
   = -- | no action / reset
@@ -504,21 +510,14 @@ data SeatOp
   = SEAT_OP_NONE
   | SEAT_OP_MOVE
   | SEAT_OP_RESIZE
-  deriving (Eq, Show)
+  deriving (Eq, Bounded, Enum, Show, Read, Generic)
 
 instance Default SeatAction where def = S_NONE
-
-instance Show (H ()) where show _ = "H()"
-
-instance Show (H Bool) where show _ = "H()"
-
-instance Show (HS Bool) where show _ = "HS()"
-
 instance Default Seat where
   def =
     Seat
       { river_seat = def,
-        wl_seat = WL.Seat nullPtr,
+        wl_seat = def,
         xkb_bindings_seat = R.RiverXkbBindingsSeat nullPtr,
         inputOverride = Nothing,
         position = (0,0),
@@ -527,10 +526,10 @@ instance Default Seat where
         removed = False,
         currentFocus = SFocusNone,
         pendingPointerEnter = Nothing,
-        focused = invalidWindow,
-        hovered = invalidWindow,
-        interacted = invalidWindow,
-        op_window = invalidWindow,
+        focused = R.invalidWindow,
+        hovered = R.invalidWindow,
+        interacted = R.invalidWindow,
+        op_window = R.invalidWindow,
         op = SEAT_OP_NONE,
         op_release = False,
         op_start_x = 0,
@@ -551,21 +550,21 @@ instance Default Seat where
 -- ** Outputs
 
 data Output = Output
-  { river_output :: !RiverOutput,
-    width, height, x, y :: !Int32,
-    scale :: !Int32,
-    screen :: !ScreenId,
-    outputName :: !String,
-    outputDescription :: !String,
+  { river_output           :: !RiverOutput,
+    width, height, x, y    :: !Int32,
+    scale                  :: !Int32,
+    screen                 :: !ScreenId,
+    outputName             :: !String,
+    outputDescription      :: !String,
     river_layerShellOutput :: !R.RiverLayerShellOutput,
-    nonExclusive :: Maybe (Int32, Int32, Int32, Int32), -- x, y, w, h
-    outputPower :: Maybe Wlr.OutputPower,
-    wlOutput :: !WL.Output
+    nonExclusive           :: Maybe (Int32, Int32, Int32, Int32), -- x, y, w, h
+    outputPower            :: Maybe Wlr.OutputPower,
+    wlOutput               :: !WL.Output
   }
   deriving (Show, Generic)
 
 instance Default Output where
-  def = Output def 0 0 0 0 0 (S (-1)) "" "" (R.RiverLayerShellOutput nullPtr) Nothing Nothing (WL.Output nullPtr)
+  def = Output def 0 0 0 0 0 (S (-1)) "" "" (R.RiverLayerShellOutput nullPtr) Nothing Nothing def
 
 ---------------------------------------------------------
 -- Actions / Submaps
@@ -627,6 +626,3 @@ instance Show (StablePtr a) where
 
 instance Default R.RiverInputDevice where
   def = R.RiverInputDevice nullPtr
-
-instance Default WL.Array where
-  def = WL.Array nullPtr

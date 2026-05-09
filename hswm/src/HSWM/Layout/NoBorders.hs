@@ -2,7 +2,6 @@
 {-# LANGUAGE PatternGuards #-}
 {-# OPTIONS_GHC -Wno-dodgy-imports #-} -- singleton in Data.List since base 4.15
 
------------------------------------------------------------------------------
 -- |
 -- Module      :  HSWM.Layout.NoBorders
 -- Description :  Make a given layout display without borders.
@@ -18,8 +17,6 @@
 -- full-screen or tabbed layouts, where you don't really want to waste a
 -- couple of pixels of real estate just to inform yourself that the visible
 -- window has focus.
---
------------------------------------------------------------------------------
 
 module HSWM.Layout.NoBorders ( -- * Usage
                                  -- $usage

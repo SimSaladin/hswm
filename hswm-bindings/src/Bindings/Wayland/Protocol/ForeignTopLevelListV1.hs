@@ -18,7 +18,7 @@ import Bindings.Wayland.Protocol.ForeignTopLevelListV1.Generated
 import Bindings.Wayland.Protocol.ForeignTopLevelListV1.Generated.Global
 import Bindings.Wayland.Protocol.ForeignTopLevelListV1.Generated.Safe
 
-import Bindings.Wayland.Internal.TH
+import Wayland.Internal.TH
 import Bindings.Wayland.Client
 
 clientFromProtocolXML commonSettings "wayland-protocols/ext-foreign-toplevel-list-v1.xml"

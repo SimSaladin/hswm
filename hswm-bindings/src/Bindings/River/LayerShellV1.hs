@@ -2,7 +2,7 @@ module Bindings.River.LayerShellV1  where
 
 import Bindings.River.WindowManagementV1
 
-import Bindings.Wayland.Internal.TH
+import Wayland.Internal.TH
 
 import Bindings.River.LayerShellV1.Generated
 import Bindings.River.LayerShellV1.Generated.Global

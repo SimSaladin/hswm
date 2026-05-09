@@ -9,6 +9,7 @@ where
 
 import Text.XkbCommon
 import Text.XkbCommon.EventCodes
+import Text.XkbCommon.KeySyms (key_NoSymbol)
 
 -- * Linux evdev codes
 
@@ -23,4 +24,4 @@ instance IsKeySym KeySym where
   toKeySym = id
 
 instance IsKeySym String where
-  toKeySym = fromMaybe 0xffffffff . xkbKeysymFromName
+  toKeySym s = fromMaybe key_NoSymbol $ keysymFromName s <|> keysymFromNameCaseInsensitive s

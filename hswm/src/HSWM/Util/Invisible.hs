@@ -1,9 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
------------------------------------------------------------------------------
-
------------------------------------------------------------------------------
-
 -- |
 -- Module      :  HSWM.Util.Invisible
 -- Description :  A data type to store the layout state.

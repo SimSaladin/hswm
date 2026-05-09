@@ -1,6 +1,6 @@
 module Bindings.Wayland.FractionalScaleV1 where
 
-import Bindings.Wayland.Internal.TH
+import Wayland.Internal.TH
 
 import Bindings.Wayland.FractionalScaleV1.Generated
 import Bindings.Wayland.FractionalScaleV1.Generated.Global

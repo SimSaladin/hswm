@@ -1,6 +1,6 @@
 module Bindings.Wayland.WlrOutputManagementUnstableV1 where
 
-import Bindings.Wayland.Internal.TH
+import Wayland.Internal.TH
 
 import Bindings.Wayland.WlrOutputManagementUnstableV1.Generated
 import Bindings.Wayland.WlrOutputManagementUnstableV1.Generated.Global

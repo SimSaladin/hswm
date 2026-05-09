@@ -9,7 +9,7 @@
 --
 module Bindings.Wayland.WlrOutputPowerManagementUnstableV1 where
 
-import Bindings.Wayland.Internal.TH
+import Wayland.Internal.TH
 
 import Bindings.Wayland.WlrOutputPowerManagementUnstableV1.Generated
 import Bindings.Wayland.WlrOutputPowerManagementUnstableV1.Generated.Global

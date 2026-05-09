@@ -2,7 +2,7 @@ module Bindings.River.XkbBindingsV1  where
 
 import Bindings.River.WindowManagementV1
 
-import Bindings.Wayland.Internal.TH
+import Wayland.Internal.TH
 
 import Bindings.River.XkbBindingsV1.Generated
 import Bindings.River.XkbBindingsV1.Generated.Global

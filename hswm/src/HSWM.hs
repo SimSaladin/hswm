@@ -15,16 +15,16 @@ module HSWM
     module HSWM.Utils,
     module HSWM.XKB,
     module HSWM.InputConfig,
-    --
-    module River,
-    --
+    -- * Re-exports
     module Prelude,
     module ReExports,
   )
 where
 
+import Prelude
 import Data.Default as ReExports
 import Data.Semigroup as ReExports (All (..))
+
 import HSWM.Config
 import HSWM.Core
 import HSWM.Layout
@@ -33,5 +33,3 @@ import HSWM.Operations
 import HSWM.InputConfig
 import HSWM.Utils
 import HSWM.XKB hiding (LogLevel(..), Layout)
-import River
-import Prelude

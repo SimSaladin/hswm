@@ -12,7 +12,7 @@ module Bindings.River
   , module Bindings.River.XkbBindingsV1
   , module Bindings.River.InputManagementV1
   , module Bindings.River.LibinputConfigV1
-  , module Bindings.Wayland.Internal.Types
+  , module Wayland.Types
   ) where
 
 import Bindings.River.WindowManagementV1
@@ -22,4 +22,4 @@ import Bindings.River.XkbBindingsV1
 import Bindings.River.InputManagementV1
 import Bindings.River.LibinputConfigV1
 
-import Bindings.Wayland.Internal.Types
+import Wayland.Types

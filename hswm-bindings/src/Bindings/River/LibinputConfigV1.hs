@@ -6,7 +6,7 @@ import Bindings.River.LibinputConfigV1.Generated.Safe
 
 import Bindings.River.InputManagementV1
 
-import Bindings.Wayland.Internal.TH
+import Wayland.Internal.TH
 import Bindings.Wayland.Client
 import Bindings.Wayland.Util
 

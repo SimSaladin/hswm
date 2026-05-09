@@ -6,35 +6,36 @@
 
 module Main (main) where
 
-import Data.ByteString.Lazy.Char8 qualified as BLC8
-import Data.List qualified as L
-import Data.Map qualified as M
-import HSWM
-import HSWM.Actions.CycleRecentWS qualified as CycleRecentWS
-import HSWM.Actions.CycleWS qualified as CycleWS
-import HSWM.Actions.DynamicWorkspaceOrder qualified as DWO
-import HSWM.Actions.DynamicWorkspaces qualified as DynWS
-import HSWM.Actions.OnScreen qualified as OnScreen
-import HSWM.Actions.PhysicalScreens qualified as PScreen
-import HSWM.Layout.BoringWindows (boringWindows)
-import HSWM.Layout.Minimize qualified as L.Minimize
-import HSWM.Layout.WindowNavigation qualified as L.WNavigation
-import HSWM.Layout.BinarySpacePartition qualified as BSP
-import HSWM.Layout.Maximize qualified as L.Maximize
-import HSWM.Layout.NoBorders qualified as L.NoBorders
-import HSWM.Layout.MultiToggle (mkToggle1, Toggle(..))
-import HSWM.Layout.MultiToggle.Instances
-import HSWM.StackSet qualified as W
-import HSWM.Util.Debug
-import HSWM.Util.IPC qualified as IPC
-import HSWM.Util.NamedScratchpad
-import HSWM.Util.RofiPrompt qualified as RP
-import HSWM.Util.Waybar qualified as WB
-import HSWM.Hooks.NonExclusiveArea qualified as NEArea
-import HSWM.Wallpaper qualified
-import System.Environment qualified as ENV
-import Text.Printf
-import HSWM.Util.PangoMarkup qualified as P
+import           HSWM
+import qualified HSWM.Actions.CycleRecentWS as CycleRecentWS
+import qualified HSWM.Actions.CycleWS as CycleWS
+import qualified HSWM.Actions.DynamicWorkspaceOrder as DWO
+import qualified HSWM.Actions.DynamicWorkspaces as DynWS
+import qualified HSWM.Actions.OnScreen as OnScreen
+import qualified HSWM.Actions.PhysicalScreens as PScreen
+import qualified HSWM.Hooks.NonExclusiveArea as NEArea
+import qualified HSWM.Layout.BinarySpacePartition as BSP
+import           HSWM.Layout.BoringWindows (boringWindows)
+import qualified HSWM.Layout.Maximize as L.Maximize
+import qualified HSWM.Layout.Minimize as L.Minimize
+import           HSWM.Layout.MultiToggle (Toggle(..), mkToggle1)
+import           HSWM.Layout.MultiToggle.Instances
+import qualified HSWM.Layout.NoBorders as L.NoBorders
+import qualified HSWM.Layout.WindowNavigation as L.WNavigation
+import qualified HSWM.StackSet as W
+import           HSWM.Util.Debug
+import qualified HSWM.Util.IPC as IPC
+import           HSWM.Util.NamedScratchpad
+import qualified HSWM.Util.PangoMarkup as P
+import qualified HSWM.Util.RofiPrompt as RP
+import qualified HSWM.Util.Waybar as WB
+import qualified HSWM.Wallpaper
+
+import qualified Data.ByteString.Lazy.Char8 as BLC8
+import qualified Data.List as L
+import qualified Data.Map as M
+import qualified System.Environment as ENV
+import           Text.Printf
 
 main :: IO ()
 main =
@@ -240,7 +241,7 @@ myLayoutHook =
   --mkToggle1 REFLECTY $
   mkToggle1 MIRROR $
     BSP.emptyBSP |||
-      Tall 1 (3 / 100) (1 / 2) |||
+      Tall 3 (3 / 100) (1 / 2) |||
         L.NoBorders.noBorders Full
 
 myKeys :: [(String, SomeAction H)]
@@ -293,11 +294,12 @@ myKeys =
        ]
     ++
     -- ====== Layout
-    [ ("M-Space",       "Layout: " <??> NextLayout),
-      ("M-Shift-Space", "Layout: " <??> FirstLayout),
-      ("M-C-Space",     "Layout: Reset" <??> (asks (layoutHook . config) >>= setLayout)),
-      ("M-Comma",       "Layout: " <??> IncMasterN (-1)),
-      ("M-Period",      "Layout: " <??> IncMasterN 1),
+    [ ("M-space",       "Layout: " <??> NextLayout),
+      ("M-F3",          "Layout: " <??> NextLayout),
+      ("M-Shift-space", "Layout: " <??> FirstLayout),
+      ("M-C-space",     "Layout: Reset" <??> (asks (layoutHook . config) >>= setLayout)),
+      ("M-comma",       "Layout: " <??> IncMasterN (-1)),
+      ("M-period",      "Layout: " <??> IncMasterN 1),
       ("M-x",           "Layout: " <??> Shrink),
       ("M-S-x",         "Layout: " <??> Expand),
       ("M-b t",         "Toggle NonExcl. Area" <??> NEArea.ToggleNonExclusiveArea),

@@ -13,21 +13,24 @@ module HSWM.Utils
   , module HSWM.Util.Process
   ) where
 
-import Data.Bits
-import Data.Char (toLower)
-import Data.List qualified as L
-import Bindings.Wayland.Client qualified as WL
-import Bindings.Wayland.Client.Generated qualified as WL
-import HSWM.XKB (ModMask)
-import Numeric (readHex)
-import River
-import Bindings.RiverSafe qualified as R
-import Text.Pretty.Simple qualified as P
-import GHC.Stack
-import Data.Ord
-import HSWM.Util.Process
-import Foreign
-import System.Posix (getEnv)
+import           HSWM.Util.Process
+import           HSWM.XKB (ModMask)
+import           River.WMP
+
+import           Bindings.River (RiverColor(..))
+import qualified Bindings.RiverSafe as R
+
+import qualified Bindings.Wayland.Client.Generated as WL
+
+import           Data.Bits
+import           Data.Char (toLower)
+import qualified Data.List as L
+import           Data.Ord
+import           Foreign
+import           GHC.Stack
+import           Numeric (readHex)
+import           System.Posix (getEnv)
+import qualified Text.Pretty.Simple as P
 
 -- * Keymap utils
 
@@ -41,26 +44,26 @@ resolveModMask d s = go s
       (m, []) -> get1 m
       _ -> error $ "malformed mod mask: " ++ s
     get1 y = case map toLower y of
-      "" -> 0
-      "m" -> d
-      "none" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_NONE
+      ""      -> 0
+      "m"     -> d
+      "none"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_NONE
       "shift" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_SHIFT
-      "s" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_SHIFT
-      "ctrl" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_CTRL
-      "c" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_CTRL
-      "mod1" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD1
-      "m1" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD1
-      "alt" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD1
-      "a" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD1
-      "mod3" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD3
-      "m3" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD3
-      "mod4" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD4
-      "m4" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD4
+      "s"     -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_SHIFT
+      "ctrl"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_CTRL
+      "c"     -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_CTRL
+      "mod1"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD1
+      "m1"    -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD1
+      "alt"   -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD1
+      "a"     -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD1
+      "mod3"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD3
+      "m3"    -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD3
+      "mod4"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD4
+      "m4"    -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD4
       "super" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD4
-      "logo" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD4
-      "mod5" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD5
-      "m5" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD5
-      _ -> error $ "unrecognized modifier: " ++ y
+      "logo"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD4
+      "mod5"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD5
+      "m5"    -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD5
+      _       -> error $ "unrecognized modifier: " ++ y
 
 -- * Logging and debug
 
@@ -258,30 +261,28 @@ parseRgba s
 
 -- | Parses unsigned 32-bit int into RGBA: @RRGGBBAA@
 bytesToRiverColor :: Word32 -> RiverColor
-bytesToRiverColor bytes =
-  RiverColor
-    { red = bytes .&. 0xFF000000,
-      green = (bytes .&. 0x00FF0000) .<<. 8,
-      blue = (bytes .&. 0x0000FF00) .<<. 16,
-      alpha = (bytes .&. 0x000000FF) .<<. 24
-    }
+bytesToRiverColor bytes = RiverColor
+  { red   = bytes .&. 0xFF000000
+  , green = (bytes .&. 0x00FF0000) .<<. 8
+  , blue  = (bytes .&. 0x0000FF00) .<<. 16
+  , alpha = (bytes .&. 0x000000FF) .<<. 24 }
 
 data RGBA a = RGBA {red, green, blue, alpha :: !a}
 
 fromRiverColor :: RiverColor -> RGBA Double
 fromRiverColor rc = RGBA
-  { red = fi rc.red / t
+  { red   = fi rc.red   / t
   , green = fi rc.green / t
-  , blue = fi rc.blue / t
+  , blue  = fi rc.blue  / t
   , alpha = fi rc.alpha / t
   } where
     t = fi (maxBound :: Word32)
 
 packRGBA :: RGBA Double -> RiverColor
 packRGBA c = RiverColor
-  { red = to8 c.red
+  { red   = to8 c.red
   , green = to8 c.green
-  , blue = to8 c.blue
+  , blue  = to8 c.blue
   , alpha = to8 c.alpha
   } where
     to8 x = floor (clamp (0, 1) x * t)
@@ -299,14 +300,13 @@ overRGBA ra rb =
                  else packRGBA RGBA { red = oR, green = oG, blue = oB, alpha = oA }
 
 mixRGBA :: Double -> RiverColor -> RiverColor -> RiverColor
-mixRGBA t ra rb =
-  let (a, b) = premult . fromRiverColor *** premult . fromRiverColor $ (ra, rb)
-   in packRGBA $ unpremult RGBA
-         { red = lerp t a.red b.red
-         , blue = lerp t a.blue b.blue
-         , green = lerp t a.green b.green
-         , alpha = lerp t a.alpha b.alpha
-         }
+mixRGBA t ra rb = packRGBA $ unpremult RGBA
+  { red   = lerp t a.red b.red
+  , blue  = lerp t a.blue b.blue
+  , green = lerp t a.green b.green
+  , alpha = lerp t a.alpha b.alpha
+  } where
+    (a, b) = premult . fromRiverColor *** premult . fromRiverColor $ (ra, rb)
 
 -- | Linear interpolate: @ lerp t_c2 c1 c2 @
 lerp :: Double -> Double -> Double -> Double

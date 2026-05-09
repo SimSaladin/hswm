@@ -16,23 +16,27 @@ module HSWM.Wallpaper
   )
 where
 
-import Bindings.Wayland.FractionalScaleV1 qualified as FS
-import Bindings.Wayland.Viewporter qualified as VP
-import Bindings.Wayland.WlrLayerShellUnstableV1 qualified as Wlr
-import Bindings.Wayland.WlrLayerShellUnstableV1.Generated qualified as Wlr
-import Bindings.Wayland.WlrOutputManagementUnstableV1 qualified as Wlr
-import Codec.Picture qualified as JP
-import Data.Map qualified as M
-import Data.Vector.Storable qualified as V
-import Foreign
-import Foreign.C
-import Bindings.Pixman.Generated qualified as P
-import Bindings.Pixman.Generated.Safe qualified as P
-import HSWM.BufferPool qualified as BP
-import HSWM.Core
-import Bindings.River qualified as R
-import Bindings.Wayland.Client qualified as WL
-import Bindings.Wayland.Client.Generated qualified as WL
+import qualified HSWM.BufferPool as BP
+import           HSWM.Core
+
+import qualified Wayland as WL
+
+import qualified Bindings.Pixman.Generated as P
+import qualified Bindings.Pixman.Generated.Safe as P
+
+import qualified Bindings.River as R
+
+import qualified Bindings.Wayland.FractionalScaleV1 as FS
+import qualified Bindings.Wayland.Viewporter as VP
+import qualified Bindings.Wayland.WlrLayerShellUnstableV1 as Wlr
+import qualified Bindings.Wayland.WlrLayerShellUnstableV1.Generated as Wlr
+import qualified Bindings.Wayland.WlrOutputManagementUnstableV1 as Wlr
+
+import qualified Codec.Picture as JP
+import qualified Data.Map as M
+import qualified Data.Vector.Storable as V
+import           Foreign
+import           Foreign.C
 
 -- * Usage
 
@@ -90,7 +94,7 @@ instance Default WlrOutputState where
   def = WlrOutputState 1 (Wlr.OutputHead nullPtr)
 
 instance Default OutputState where
-  def = OutputState 0 0 0 0 False False Nothing "" 1 0 (WL.Output nullPtr)
+  def = OutputState 0 0 0 0 False False Nothing "" 1 0 def
 
 -- ** Hooks
 
@@ -183,60 +187,54 @@ drawImage bp OutputState {..} img Surfaces {..} = do
                in (buffer_width, buffer_height)
           | otherwise = (w * scale, h * scale)
 
+      shmFormat = WL.ShmFormatABGR8888
+
+      -- calculate scale
+      sx' = calculateScale src_w buf_w 1 -- scale
+      sy' = calculateScale src_h buf_h 1 -- scale
+      (sx, sy) = if sx' > sy' then (sy', sy') else (sx', sx')
+      tx = calculateTransform src_w buf_w sx
+      ty = calculateTransform src_h buf_h sy
+
   -- Set opaque region
   compositor <- getObject
-  opaqueRegion <- io $ WL.compositorCreateRegion compositor
-  io $ WL.regionAdd opaqueRegion 0 0 w h
-  io $ WL.surfaceSetOpaqueRegion wl_surface opaqueRegion
+  opaqueRegion <- WL.compositorCreateRegion compositor
+  WL.regionAdd opaqueRegion 0 0 w h
+  WL.surfaceSetOpaqueRegion wl_surface opaqueRegion
   io $ WL.objectDestroy opaqueRegion
 
   runInIO <- askRunInIO
-  io $ V.unsafeWith (JP.imageData img) $ \bits -> alloca $ \t2 -> alloca $ \fTransform -> runInIO $ do
 
-    let shmFormat = WL.WL_SHM_FORMAT_ABGR8888
+  io $ V.unsafeWith (JP.imageData img) $ \bits ->
+    alloca $ \t2 ->
+    alloca $ \fTransform ->
+    runInIO $ do
+      buf <- io $ BP.nextBuffer bp (fi buf_w) (fi buf_h) shmFormat
+      pix <- io $ P.pixman_image_create_bits buf.pixmanFormat (fi src_w) (fi src_h) (castPtr bits) (fi src_stride)
 
-    buf <- io $ BP.nextBuffer bp (fi buf_w) (fi buf_h) shmFormat
+      io $ P.pixman_f_transform_init_identity fTransform
+      _ <- io $ P.pixman_f_transform_translate fTransform nullPtr (CDouble tx) (CDouble ty)
+      _ <- io $ P.pixman_f_transform_scale fTransform nullPtr (CDouble sx) (CDouble sy)
+      _ <- io $ P.pixman_transform_from_pixman_f_transform t2 (ConstPtr fTransform)
+      _ <- io $ P.pixman_image_set_transform pix (ConstPtr $ castPtr t2)
+      _ <- io $ P.pixman_image_set_filter pix P.PIXMAN_FILTER_BEST (ConstPtr nullPtr) 0
+      io $ P.pixman_image_composite32 P.PIXMAN_OP_SRC pix nullPtr buf.pixmanImage 0 0 0 0 0 0 buf_w buf_h
+      _ <- io $ P.pixman_image_unref pix
 
-    pix <- io $ P.pixman_image_create_bits buf.pixmanFormat (fi src_w) (fi src_h) (castPtr bits) (fi src_stride)
+      logDebug $ "drawing wallpaper" :#
+        [ "out" .= name, "out-size" .= (w, h), "out-scale" .= scale, "out-fscale" .= pref_fract_scale
+        , "src-size" .= (src_w, src_h)
+        , "buf-size" .= buf_size
+        , "calc-scale" .= ((sx', sy'), (sx, sy))
+        , "calc-trans" .= (tx, ty)
+        ]
 
-    -- calculate scale
-    let sx' = calculateScale src_w buf_w 1 -- scale
-        sy' = calculateScale src_h buf_h 1 -- scale
-        (sx, sy) = if sx' > sy' then (sy', sy') else (sx', sx')
-        tx = calculateTransform src_w buf_w sx
-        ty = calculateTransform src_h buf_h sy
-
-    io $ P.pixman_f_transform_init_identity fTransform
-    _ <- io $ P.pixman_f_transform_translate fTransform nullPtr (CDouble tx) (CDouble ty)
-    _ <- io $ P.pixman_f_transform_scale fTransform nullPtr (CDouble sx) (CDouble sy)
-
-    _ <- io $ P.pixman_transform_from_pixman_f_transform t2 (ConstPtr fTransform)
-    _ <- io $ P.pixman_image_set_transform pix (ConstPtr $ castPtr t2)
-
-    _ <- io $ P.pixman_image_set_filter pix P.PIXMAN_FILTER_BEST (ConstPtr nullPtr) 0
-
-    -- fill bg
-    -- io $ with (P.Pixman_color_t 0 0 0 maxBound) $ \color ->
-    --   with (P.Pixman_box32_t 0 0 buf_w buf_h) $ \box ->
-    --     P.pixman_image_fill_boxes P.PIXMAN_OP_SRC buf.pixmanImage (ConstPtr color) 1 (ConstPtr box)
-
-    io $ P.pixman_image_composite32 P.PIXMAN_OP_SRC pix nullPtr buf.pixmanImage 0 0 0 0 0 0 buf_w buf_h
-    _ <- io $ P.pixman_image_unref pix
-
-    logDebug $ "drawing wallpaper" :#
-      [ "out" .= name, "out-size" .= (w, h), "out-scale" .= scale, "out-fscale" .= pref_fract_scale
-      , "src-size" .= (src_w, src_h)
-      , "buf-size" .= buf_size
-      , "calc-scale" .= ((sx', sy'), (sx, sy))
-      , "calc-trans" .= (tx, ty)
-      ]
-
-    WL.surfaceAttach wl_surface buf.buf 0 0
-    WL.surfaceDamageBuffer wl_surface 0 0 buf_w buf_h
-    case outViewport of
-      Just vp -> io $ VP.viewportSetDestination vp w h
-      Nothing -> return () -- io $ WL.surfaceSetBufferScale wl_surface scale -- XXX
-    WL.surfaceCommit wl_surface
+      WL.surfaceAttach wl_surface buf.buf 0 0
+      WL.surfaceDamageBuffer wl_surface 0 0 buf_w buf_h
+      case outViewport of
+        Just vp -> VP.viewportSetDestination vp w h
+        Nothing -> return () -- io $ WL.surfaceSetBufferScale wl_surface scale -- XXX
+      WL.surfaceCommit wl_surface
 
 deinit :: H ()
 deinit = do
@@ -267,7 +265,7 @@ initOutput ro = withOutputState ro $ \os -> do
       wl_surface <- WL.compositorCreateSurface compositor
       -- set no input region
       emptyRegion <- WL.compositorCreateRegion compositor
-      io $ WL.surfaceSetInputRegion wl_surface emptyRegion
+      WL.surfaceSetInputRegion wl_surface emptyRegion
       io $ WL.objectDestroy emptyRegion
       -- fractional scale
       fractSurface <- FS.fractionalScaleManagerGetFractionalScale fsm wl_surface
@@ -275,15 +273,15 @@ initOutput ro = withOutputState ro $ \os -> do
         FS.FractionalScalePreferredScale _ _ fscale -> runInIO $ do
           logInfo $ "wallpaper: fractional scale updated" :# [ "fscale" .= fscale, "output" .= show ro ]
           updateOutputState ro $ \x -> x {pref_fract_scale = fscale, pending_render = True}
-      io $ WL.listenerAdd fractSurface fsl nullPtr
+      WL.listenerAdd_ fractSurface fsl
       -- viewport
-      viewport <- io $ VP.viewporterGetViewport vpr wl_surface
+      viewport <- VP.viewporterGetViewport vpr wl_surface
        -- layersurface
       layerSurface <- Wlr.layerShellGetLayerSurface layerShell wl_surface os.wl_output Wlr.ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND (Just "wallpaper")
-      io $ Wlr.layerSurfaceSetSize layerSurface 0 0
-      io $ Wlr.layerSurfaceSetAnchor layerSurface (WL.toCEnum $ 1 + 2 + 4 + 8) --1 + 2 + 4 + 8)
-      io $ Wlr.layerSurfaceSetExclusiveZone layerSurface (-1)
-      lsListener <- io $ Wlr.mkLayerSurfaceListener $ \case
+      Wlr.layerSurfaceSetSize layerSurface 0 0
+      Wlr.layerSurfaceSetAnchor layerSurface (WL.toCEnum $ 1 + 2 + 4 + 8) --1 + 2 + 4 + 8)
+      Wlr.layerSurfaceSetExclusiveZone layerSurface (-1)
+      lsListener <- Wlr.mkLayerSurfaceListener $ \case
         Wlr.LayerSurfaceConfigure _ ls serial cw ch -> runInIO $ do
           Wlr.layerSurfaceAckConfigure ls serial
           logInfo $ "wallpaper: layer surface configure" :# [ "size" .= show (cw, ch), "old-size" .= show (w, h), "output" .= show ro ]
@@ -296,15 +294,15 @@ initOutput ro = withOutputState ro $ \os -> do
         Wlr.LayerSurfaceClosed {} -> do
           runInIO $ logError "Layer surface closed!"
           return ()
-      io $ WL.listenerAdd layerSurface lsListener nullPtr
-      io $ WL.surfaceCommit wl_surface
+      WL.listenerAdd_ layerSurface lsListener
+      WL.surfaceCommit wl_surface
       return $ Surfaces {wl_surface = wl_surface, layerSurface, outViewport = Just viewport}
     Just ss -> return ss
 
   -- set opaque region
   opaqueRegion <- WL.compositorCreateRegion compositor
-  io $ WL.regionAdd opaqueRegion 0 0 w h
-  io $ WL.surfaceSetOpaqueRegion ss.wl_surface opaqueRegion
+  WL.regionAdd opaqueRegion 0 0 w h
+  WL.surfaceSetOpaqueRegion ss.wl_surface opaqueRegion
   io $ WL.objectDestroy opaqueRegion
 
   -- Update ctx

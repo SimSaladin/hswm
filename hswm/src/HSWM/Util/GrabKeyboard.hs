@@ -10,14 +10,17 @@
 -- Portability : unportable
 module HSWM.Util.GrabKeyboard where
 
-import Control.Monad.Fix
-import Data.Map qualified as M
-import Foreign hiding (void)
-import HSWM.Core
-import HSWM.Operations
-import HSWM.XKB
-import Bindings.Wayland.Client qualified as WL
-import Bindings.Wayland.WlrInputMethodUnstableV2 as Wlr
+import           HSWM.Core
+import           HSWM.Operations
+import           HSWM.XKB
+
+import qualified Wayland as WL
+
+import           Bindings.Wayland.WlrInputMethodUnstableV2 as Wlr
+
+import           Control.Monad.Fix
+import qualified Data.Map as M
+import           Foreign hiding (void)
 
 type HasGrabCtx env m = (MonadStateGlobal env m, HasEventQueues env, MonadReader env m, MonadLogger m, MonadUnliftIO m, MonadFix m)
 
@@ -28,7 +31,7 @@ data GrabIM = GrabIM
     inputMethodListener :: Wlr.InputMethodListener,
     imKeyboardGrab :: MVar Wlr.InputMethodKeyboardGrab,
     imKeyboardGrabListener :: Wlr.InputMethodKeyboardGrabListener,
-    xkbState :: IORef XkbState
+    xkbState :: MVar XkbState
   }
 
 data GrabbedKey
@@ -111,7 +114,7 @@ newGrabIM manager seat = do
   active <- newIORef False
   pending_active <- newIORef False
   bcastChan <- newBroadcastTChanIO
-  xkbState <- newIORef . XkbState =<< io (newForeignPtr_ nullPtr)
+  xkbState <- newEmptyMVar
   imKeyboardGrab <- newEmptyMVar
 
   runInIO <- askRunInIO
@@ -141,37 +144,37 @@ newGrabIM manager seat = do
         ctx <- createXkbContext def
         kmap <- createKeymapFromFd ctx (fi fd) (fi size) False keymapFormatTextV1
         xst <- createXkbState kmap
-        writeIORef xkbState xst
+        _ <- tryTakeMVar xkbState
+        putMVar xkbState xst
       logDebug "grab: XKB keymap updated"
     Wlr.InputMethodKeyboardGrabModifiers _ _ _ depressed latched locked group -> do
-      st <- readIORef xkbState
+      st <- readMVar xkbState
       _ <- io $ xkbStateUpdateMask st (fi depressed) (fi latched) (fi locked) 0 0 (fi group)
       let it = Right GMod {mods = fi depressed}
       logDebug $ "grab: modifier grabbed" :# [ "mod" .= tshow it ]
       atomically $ writeTChan bcastChan it
     Wlr.InputMethodKeyboardGrabKey _ _ _ _time key st -> do
-      xst <- readIORef xkbState
+      xst <- readMVar xkbState
       keysym <- io $ xkbStateKeySym xst (fi $ key + 8)
-      let it = Right GK {state = fi st.unwrap, keysym = fi keysym, keycode = fi key}
+      let it = Right GK {state = fi $ WL.fromCEnum st, keysym = fi keysym, keycode = fi key}
       logDebug $ "grab: key grabbed" :# [ "key" .= show it ]
       atomically $ writeTChan bcastChan it
-    -- let pressed = fi st == WL.fromCEnum WL_KEYBOARD_KEY_STATE_PRESSED
 
     Wlr.InputMethodKeyboardGrabRepeatInfo {} -> pure () -- pTrace e -- ignored
 
-  inputMethod <- io $ Wlr.inputMethodManagerGetInputMethod manager seat
-  io $ WL.listenerAdd inputMethod inputMethodListener nullPtr
+  inputMethod <- Wlr.inputMethodManagerGetInputMethod manager seat
+  WL.listenerAdd_ inputMethod inputMethodListener
 
   logDebug "grab: created"
   return GrabIM {..}
 
 activate :: (MonadIO m, MonadLogger m, MonadReader env m) => GrabIM -> m ()
 activate GrabIM {..} = do
-  res <- io $ Wlr.inputMethodGrabKeyboard inputMethod
+  res <- Wlr.inputMethodGrabKeyboard inputMethod
   when (res.unwrap == nullPtr) $ do
     logError "grab: failed to activate (failed to grab keyboard)"
     error "Failed to grab"
-  io $ WL.listenerAdd res imKeyboardGrabListener nullPtr
+  WL.listenerAdd_ res imKeyboardGrabListener
   putMVar imKeyboardGrab res
   logInfo "grab: activated"
 

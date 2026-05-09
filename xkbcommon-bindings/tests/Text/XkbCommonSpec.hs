@@ -10,15 +10,15 @@ spec :: Spec
 spec = do
   describe "XkbContext" $ do
     it "xkbkeysymFromName" $ do
-      xkbKeysymFromNameUnsafe "a" `shouldBe` 97
-      xkbKeysymFromNameUnsafe "Return" `shouldBe` 65293
+      keysymFromNameUnsafe "a" `shouldBe` 97
+      keysymFromNameUnsafe "Return" `shouldBe` 65293
 
     it "xkbkeysymName" $ do
-      xkbKeysymNameUnsafe 97 `shouldBe` "a"
-      xkbKeysymNameUnsafe 65293 `shouldBe` "Return"
+      keysymNameUnsafe 97 `shouldBe` "a"
+      keysymNameUnsafe 65293 `shouldBe` "Return"
 
     it "keysym to utf8" $ do
-      xkbKeysymToUtf8 97 `shouldBe` Just "a"
+      keysymToUtf8 97 `shouldBe` Just "a"
 
     it "creates and destroys a context" $ do
       ctx <- createXkbContext def
@@ -28,8 +28,8 @@ spec = do
 
     it "creates rmlvo builder and keymap with it" $ do
       withXkbContext def $ \ctx -> do
-        builder <- xkbRmlvoBuilderNew ctx "" ""
-        xkbRmlvoBuilderAppendLayout builder "us" []
+        builder <- newBuilder ctx "" ""
+        appendLayout builder "us"
         _keymap <- createKeymapFromBuilder builder keymapFormatTextV1
         return ()
 

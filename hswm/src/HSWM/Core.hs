@@ -15,13 +15,12 @@ module HSWM.Core
     module HSWM.Types.TypeMap,
     module HSWM.Util.Types,
     module HSWM.ManageHook,
-    module River,
+    module River.WMP,
     ModMask,
     KeySym,
   )
 where
 
-import Control.Monad.State
 import HSWM.ManageHook
 import HSWM.Types.Config
 import HSWM.Types.Events
@@ -29,7 +28,9 @@ import HSWM.Types.TypeMap
 import HSWM.Types.WM
 import HSWM.Util.Types
 import HSWM.XKB
-import River
+import River.WMP
+
+import Control.Monad.State
 import GHC.Stack
 
 runH :: HConf -> H a -> IO a

@@ -3,10 +3,6 @@
 {-# LANGUAGE PatternGuards #-}
 {-# LANGUAGE TupleSections #-}
 
------------------------------------------------------------------------------
-
------------------------------------------------------------------------------
-
 -- |
 -- Module       : HSWM.Layout.LayoutModifier
 -- Description :  A module for writing layout modifiers.

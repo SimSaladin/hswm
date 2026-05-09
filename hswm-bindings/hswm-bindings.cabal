@@ -324,8 +324,6 @@ library
           Bindings.Wayland.FractionalScaleV1.Generated.Global
           Bindings.Wayland.FractionalScaleV1.Generated.Safe
           Bindings.Wayland.FractionalScaleV1.Generated.Unsafe
-          Bindings.Wayland.Internal.TH
-          Bindings.Wayland.Internal.Types
           Bindings.Wayland.Protocol.ForeignTopLevelListV1
           Bindings.Wayland.Protocol.ForeignTopLevelListV1.Generated
           Bindings.Wayland.Protocol.ForeignTopLevelListV1.Generated.FunPtr
@@ -379,6 +377,11 @@ library
           Bindings.Wayland.XdgShell.Generated.Global
           Bindings.Wayland.XdgShell.Generated.Safe
           Bindings.Wayland.XdgShell.Generated.Unsafe
+          Pixman
+          River.WindowManagement
+          Wayland
+          Wayland.Internal.TH
+          Wayland.Types
     other-modules:
           Paths_hswm_bindings
     autogen-modules:
@@ -392,6 +395,7 @@ library
         , hs-bindgen-runtime >=0.1.0 && <0.2
         , template-haskell >=2.23 && <2.25
         , text >=2.1.2 && <2.2
+        , unix
         , xml-conduit >=1.10.1 && <1.11
     hs-source-dirs:
           src
@@ -414,3 +418,21 @@ library
         extra-libraries:
               pixman-1
               wayland-client
+
+test-suite test-suite
+    type: exitcode-stdio-1.0
+    main-is: Spec.hs
+    other-modules:
+          PixmanSpec
+          Paths_hswm_bindings
+    autogen-modules:
+          Paths_hswm_bindings
+    hs-source-dirs:
+          tests
+    build-tool-depends:
+          hspec-discover:hspec-discover
+    build-depends:
+          base
+        , hspec
+        , hswm-bindings
+    default-language: Haskell2010

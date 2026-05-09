@@ -1,6 +1,6 @@
 module Bindings.Wayland.XdgShell where
 
-import Bindings.Wayland.Internal.TH
+import Wayland.Internal.TH
 
 import Bindings.Wayland.XdgShell.Generated
 import Bindings.Wayland.XdgShell.Generated.Global

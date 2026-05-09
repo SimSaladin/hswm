@@ -1,10 +1,6 @@
 {-# LANGUAGE PatternGuards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
------------------------------------------------------------------------------
-
------------------------------------------------------------------------------
-
 -- |
 -- Module      :  HSWM.Actions.CycleRecentWS
 -- Description :  Cycle through most recently used workspaces.

@@ -1,65 +1,60 @@
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE LambdaCase #-}
 
-module Text.XkbCommon.XkbKeymap (
-  XkbKeymap,
+module Text.XkbCommon.Keymap (
+  -- * Create
+  createKeymapFromNames,
+  XkbRuleNames(..),
+  createKeymapFromString,
+  createKeymapFromFd,
+  XkbKeymap(..),
   XkbKeymapFormat(..),
   keymapFormatTextV1,
   keymapFormatTextV2,
-  wrapKeymap,
-  refKeymap,
-  -- * Create
-  createKeymapFromNames,
-  createKeymapFromString,
-  createKeymapFromBuilder,
-  createKeymapFromFd,
+  fromKeymapFormat,
+  LayoutSpec(..),
+  OptionSpec(..),
   -- * Convert to String
   keymapAsString,
-  keymapAsStringFd,
   withKeymapFd,
+  keymapAsStringFd,
   -- * Modifiers
+  ModMask,
+  ModIndex,
+  keymapNumMods,
   keymapModMask,
   keymapModName,
+  -- * Layouts
+  LayoutIndex,
+  LayoutMask,
+  keymapNumLayouts,
+  keymapNumLayoutsForKey,
+  keymapLayoutName,
+  -- * Levels
+  LevelIndex,
+  keymapNumLevelsForKey,
   -- * Keys
+  Keycode,
+  keycodeMax,
+  invalidKeycode,
   keymapKeyName,
   keymapKeyRepeats,
-  -- * Layouts
-  keymapNumLayouts,
-  keymapLayoutName,
   -- * Leds
+  LedIndex,
   keymapNumLeds,
   keymapLedName,
+  -- * Internals
+  wrapKeymap,
+  refKeymap,
   ) where
 
 import Foreign
 import Foreign.C
-import System.Posix (closeFd, fdWrite)
+import System.Posix (closeFd, fdWrite, Fd)
 import Control.Exception
 
-import Text.XkbCommon.Types
+import Text.XkbCommon.FFI
 import Text.XkbCommon.Internal
-
-#include <xkbcommon/xkbcommon.h>
-
-data XkbKeymapFormat = KeymapFormatTextV1
-                     | KeymapFormatTextV2
-  deriving stock (Eq, Ord, Generic, Show)
-
--- backwards-compat
-keymapFormatTextV1, keymapFormatTextV2 :: XkbKeymapFormat
-keymapFormatTextV1 = KeymapFormatTextV1
-keymapFormatTextV2 = KeymapFormatTextV2
-
-fromKeymapFormat :: XkbKeymapFormat -> CUInt
-fromKeymapFormat KeymapFormatTextV1 = #{const XKB_KEYMAP_FORMAT_TEXT_V1}
-fromKeymapFormat KeymapFormatTextV2 = #{const XKB_KEYMAP_FORMAT_TEXT_V2}
-
-{-
-toKeymapFormat :: CUInt -> XkbKeymapFormat
-toKeymapFormat #{const XKB_KEYMAP_FORMAT_TEXT_V1} = KeymapFormatTextV1
-toKeymapFormat #{const XKB_KEYMAP_FORMAT_TEXT_V2} = KeymapFormatTextV2
-toKeymapFormat x = error $ "toKeymapFormat: " ++ show x
--}
 
 wrapKeymap :: Ptr XkbKeymap -> IO XkbKeymap
 wrapKeymap = fmap XkbKeymap . newForeignPtr _xkbKeymapUnref
@@ -75,15 +70,8 @@ createKeymapFromNames ctx rns fmt =
   withForeignPtr ctx.unwrap $ \ctxPtr ->
   withXkbRuleNames rns $ \p ->
     _xkbKeymapNewFromNames2 ctxPtr p (fromKeymapFormat fmt) 0
-    >>= xkbThrowIfNull' (XkbOperationFailed "xkbKeymapNewFromNames2")
-    >>= wrapXkbKeymap
-
-createKeymapFromBuilder :: XkbRmlvoBuilder -> XkbKeymapFormat -> IO XkbKeymap
-createKeymapFromBuilder builder fmt =
-  withForeignPtr builder.unwrap $ \builderPtr ->
-    _xkbKeymapNewFromRmlvo builderPtr (fromKeymapFormat fmt) 0
-    >>= xkbThrowIfNull' (XkbOperationFailed "xkbKeymapNewFromRmlvo")
-    >>= wrapXkbKeymap
+    >>= xkbThrowIfNull' (XkbKeymapCreationFailed $ show (rns, fmt))
+    >>= wrapKeymap
 
 createKeymapFromFd :: XkbContext -> Fd -> CSize -> Bool -> XkbKeymapFormat -> IO XkbKeymap
 createKeymapFromFd ctx fd size private fmt =
@@ -92,29 +80,30 @@ createKeymapFromFd ctx fd size private fmt =
     closeFd fd
     return keymap
     where
-      mmap' = mmap nullPtr (fromIntegral size) pROT_READ (if private then mAP_PRIVATE else mAP_SHARED) fd 0
+      mmap' = mmap nullPtr (fromIntegral size) protRead (if private then mapPrivate else mapShared) fd 0
 
 xkbKeymapNewFromCString :: XkbContext -> CString -> XkbKeymapFormat -> IO XkbKeymap
 xkbKeymapNewFromCString ctx s fmt =
   withForeignPtr ctx.unwrap $ \ctxPtr ->
     _xkbKeymapNewFromString ctxPtr s (fromKeymapFormat fmt) 0
-    >>= xkbThrowIfNull' (XkbOperationFailed "xkbKeymapNewFromString")
-    >>= wrapXkbKeymap
+    >>= xkbThrowIfNull' (XkbKeymapCreationFailed $ show fmt)
+    >>= wrapKeymap
 
 -- | Get the compiled keymap as a string.
 keymapAsString :: XkbKeymap -> XkbKeymapFormat -> IO String
 keymapAsString km fmt =
   withForeignPtr km.unwrap $ \kmPtr ->
-    bracket (_xkbKeymapGetAsString kmPtr (fromKeymapFormat fmt) >>= xkbThrowIfNull' (XkbOperationFailed "xkbKeymapGetAsString"))
+    bracket (_xkbKeymapGetAsString kmPtr (fromKeymapFormat fmt) >>= xkbThrowIfNull' (XkbKeymapFromStringFailed $ show (km, fmt)))
       free peekCString
 
 -- | Get the keymap as a string pointed to by a FD.
 keymapAsStringFd :: XkbKeymap -> XkbKeymapFormat -> IO Fd
 keymapAsStringFd kmap fmt =
-  bracketOnError (memfdCreate "xkbkeymap" (mFD_CLOEXEC .|. mFD_ALLOW_SEALING)) closeFd $ \fd -> do
+  bracketOnError (memfdCreate "xkbkeymap" (mfdCloExec <> mfdAllowSealing)) closeFd $ \fd -> do
     _ <- fdWrite fd =<< keymapAsString kmap fmt
     return fd
 
+-- | Get the keymap as a string pointed to by a FD.
 withKeymapFd :: XkbKeymap -> XkbKeymapFormat -> (Fd -> IO b) -> IO b
 withKeymapFd kmap fmt = bracket (keymapAsStringFd kmap fmt) closeFd
 
@@ -124,6 +113,11 @@ keymapModMask km s =
   withForeignPtr km.unwrap $ \kmPtr ->
   withCString s $ \sC ->
     _xkbKeymapModGetMask kmPtr sC
+
+-- | Get the number of modifiers in the keymap.
+keymapNumMods :: XkbKeymap -> IO ModIndex
+keymapNumMods km = withForeignPtr km.unwrap $ \kmPtr ->
+  c_xkb_keymap_num_mods kmPtr
 
 -- | Get the name of a modifier by index.
 keymapModName :: XkbKeymap -> ModIndex -> IO String
@@ -146,10 +140,20 @@ keymapLayoutName km idx =
     if r == nullPtr then return Nothing else Just <$> peekCString r
 
 -- | Get the number of layouts in the keymap.
-keymapNumLayouts :: XkbKeymap -> IO Int
+keymapNumLayouts :: XkbKeymap -> IO LayoutIndex
 keymapNumLayouts km =
   withForeignPtr km.unwrap $ \kmPtr ->
-    fromIntegral <$> _xkbKeymapNumLayouts kmPtr
+    _xkbKeymapNumLayouts kmPtr
+
+-- | Get the number of layouts for a specific key.
+--
+-- This number can be different from @xkb_keymap_num_layouts()@, but is always
+-- smaller.  It is the appropriate value to use when iterating over the
+-- layouts of a key.
+keymapNumLayoutsForKey :: XkbKeymap -> Keycode -> IO LayoutIndex
+keymapNumLayoutsForKey km kc =
+  withForeignPtr km.unwrap $ \kmPtr ->
+    c_xkb_keymap_num_layouts_for_key kmPtr kc
 
 -- | Check whether a key repeats the keymap.
 keymapKeyRepeats :: XkbKeymap -> Keycode -> IO Bool
@@ -159,10 +163,10 @@ keymapKeyRepeats km kc =
       1 -> return True
       _ -> return False
 
-keymapNumLeds :: XkbKeymap -> IO Int
+keymapNumLeds :: XkbKeymap -> IO LedIndex
 keymapNumLeds km =
   withForeignPtr km.unwrap $ \kmPtr ->
-    fromIntegral <$> _xkbKeymapNumLeds kmPtr
+    _xkbKeymapNumLeds kmPtr
 
 keymapLedName :: XkbKeymap -> LedIndex -> IO (Maybe String)
 keymapLedName km idx =
@@ -170,12 +174,13 @@ keymapLedName km idx =
     r <- _xkbKeymapLedGetName kmPtr idx
     if r == nullPtr then return Nothing else Just <$> peekCString r
 
+-- | Get the number of shift levels for a specific key and layout.
+keymapNumLevelsForKey :: XkbKeymap -> Keycode -> LayoutIndex -> IO LevelIndex
+keymapNumLevelsForKey km kc li =
+  withForeignPtr km.unwrap $ \kmPtr ->
+    c_xkb_keymap_num_levels_for_key kmPtr kc li
+
 -- * Internals
-
-wrapXkbKeymap :: Ptr XkbKeymap -> IO XkbKeymap
-wrapXkbKeymap ptr = XkbKeymap <$> newForeignPtr _xkbKeymapUnref ptr
-
-type XkbKeymapCompileFlags = CUInt
 
 foreign import ccall unsafe "&xkb_keymap_unref"
   _xkbKeymapUnref :: FunPtr (Ptr XkbKeymap -> IO ())
@@ -190,13 +195,10 @@ foreign import ccall unsafe "xkb_keymap_mod_get_name"
   _xkbKeymapModGetName :: Ptr XkbKeymap -> ModIndex -> IO CString
 
 foreign import ccall unsafe "xkb_keymap_new_from_string"
-  _xkbKeymapNewFromString :: Ptr XkbContext -> CString -> CUInt -> XkbKeymapCompileFlags -> IO (Ptr XkbKeymap)
+  _xkbKeymapNewFromString :: Ptr XkbContext -> CString -> CUInt -> CUInt -> IO (Ptr XkbKeymap)
 
 foreign import ccall unsafe "xkb_keymap_new_from_names2"
-  _xkbKeymapNewFromNames2 :: Ptr XkbContext -> Ptr XkbRuleNames -> CUInt -> XkbKeymapCompileFlags -> IO (Ptr XkbKeymap)
-
-foreign import ccall unsafe "xkb_keymap_new_from_rmlvo"
-  _xkbKeymapNewFromRmlvo :: Ptr XkbRmlvoBuilder -> CUInt -> XkbKeymapCompileFlags -> IO (Ptr XkbKeymap)
+  _xkbKeymapNewFromNames2 :: Ptr XkbContext -> Ptr XkbRuleNames -> CUInt -> CUInt -> IO (Ptr XkbKeymap)
 
 foreign import ccall unsafe "xkb_keymap_get_as_string"
   _xkbKeymapGetAsString :: Ptr XkbKeymap -> CUInt -> IO CString
@@ -208,13 +210,22 @@ foreign import ccall unsafe "xkb_keymap_layout_get_name"
   _xkbKeymapLayoutGetName :: Ptr XkbKeymap -> LayoutIndex -> IO CString
 
 foreign import ccall unsafe "xkb_keymap_num_layouts"
-  _xkbKeymapNumLayouts :: Ptr XkbKeymap -> IO CInt
+  _xkbKeymapNumLayouts :: Ptr XkbKeymap -> IO LayoutIndex
+
+foreign import ccall unsafe "xkb_keymap_num_layouts_for_key"
+  c_xkb_keymap_num_layouts_for_key :: Ptr XkbKeymap -> Keycode -> IO LayoutIndex
+
+foreign import ccall unsafe "xkb_keymap_num_levels_for_key"
+  c_xkb_keymap_num_levels_for_key :: Ptr XkbKeymap -> Keycode -> LayoutIndex -> IO LevelIndex
 
 foreign import ccall unsafe "xkb_keymap_key_repeats"
   _xkbKeymapKeyRepeats :: Ptr XkbKeymap -> Keycode -> IO CInt
 
 foreign import ccall unsafe "xkb_keymap_num_leds"
-  _xkbKeymapNumLeds :: Ptr XkbKeymap -> IO CInt
+  _xkbKeymapNumLeds :: Ptr XkbKeymap -> IO LedIndex
 
 foreign import ccall unsafe "xkb_keymap_led_get_name"
   _xkbKeymapLedGetName :: Ptr XkbKeymap -> LedIndex -> IO CString
+
+foreign import ccall unsafe "xkb_keymap_num_mods"
+  c_xkb_keymap_num_mods :: Ptr XkbKeymap -> IO ModIndex

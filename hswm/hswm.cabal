@@ -96,12 +96,11 @@ library
           HSWM.Util.WorkspaceCompare
           HSWM.Utils
           HSWM.Wallpaper
+          HSWM.Wayland
           HSWM.Windows
           HSWM.XKB
-          River
           River.WMP
           River.XKB.Bindings
-          Wayland
     autogen-modules:
           PackageInfo_hswm
     build-depends:

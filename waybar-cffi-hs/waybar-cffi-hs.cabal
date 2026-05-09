@@ -1,4 +1,5 @@
 cabal-version: 3.12
+
 name: waybar-cffi-hs
 version: 0.1.0.0
 synopsis: Waybar C FFI module
@@ -11,10 +12,6 @@ build-type: Simple
 tested-with:
   GHC == 9.14.1
   GHC == 9.12.2
-
-extra-source-files:
-  cbits/module-init.c
-  include/waybar_cffi_module.h
 
 flag standalone
   description: Build a statically linked .so
@@ -34,52 +31,52 @@ common build-settings
     -Wall
     -Wunused-packages
     -Wno-ambiguous-fields
-    -threaded
-    -O2
-    -fPIC
-    -flink-rts
 
 library
   import: default-language, build-settings
-  hs-source-dirs: lib
-  build-depends:
-    base                >=4.20.2 && <4.23,
-    aeson              ^>=2.2.3,
-    bytestring         ^>=0.12.2,
-    data-default,
-    text               ^>=2.1.2,
-    derive-storable    ^>=0.3.1,
-    rio                ^>=0.1.24,
-    monad-logger-aeson ^>=0.4.1,
-    haskell-gi-base    ^>=0.26.9,
-    gi-gtk3            ^>=3.0.44,
-    gi-pango           ^>=1.0.30,
-    template-haskell    >=2.23 && <2.25,
-    hswm,
   exposed-modules:
+    Waybar.CFFI.Plugin.ABIv2
     Waybar.CFFI.Plugin.Base
+    Waybar.CFFI.Plugin.TH
     Waybar.CFFI.Plugin.HSWM
   other-modules:
     Paths_waybar_cffi_hs
   autogen-modules:
     Paths_waybar_cffi_hs
-  --include-dirs: include
+  hs-source-dirs: src
+  build-depends:
+      base                >=4.20   && <5
+    , template-haskell    >=2.23   && <3
+    , bytestring         ^>=0.12.2
+    , data-default
+    , text               ^>=2.1.2
+    , mtl
+    , aeson              ^>=2.2.3
+    , derive-storable    ^>=0.3.1
+    , rio                ^>=0.1.24
+    , monad-logger-aeson ^>=0.4.1
+    , haskell-gi-base    ^>=0.26.9
+    , gi-gtk3            ^>=3.0.44
+    , gi-pango           ^>=1.0.30
+    , hswm
 
 foreign-library waybarhaskellplugin
   import: default-language, build-settings
   type: native-shared
   lib-version-linux: 1.0.0
+  other-modules: Plugin
   hs-source-dirs: plugin
-  other-modules:
-    Waybar.CFFI.Plugin
   build-depends:
-    base,
-    waybar-cffi-hs,
-  c-sources: cbits/module-init.c
-  cc-options: -DWCFFI_VERSION=2
-  extra-libraries: xkbcommon, xkbregistry
+      base
+    , waybar-cffi-hs
+  ghc-options:
+    -threaded
+    -flink-rts
+    -no-hs-main
+
+  if !os(linux)
+    buildable: False
 
   if flag(standalone)
     options: standalone
-  ghc-options:
-    -no-hs-main
+    ghc-options: -fPIC

@@ -13,19 +13,21 @@
 -- Seat management
 module HSWM.Seats where
 
-import Data.Bits
-import Data.List qualified as L
-import Foreign hiding (void)
-import GHC.Records
-import HSWM.Core
-import HSWM.Operations
-import HSWM.StackSet qualified as W
-import HSWM.Utils
-import Wayland
-import Bindings.River qualified as R
-import Bindings.RiverSafe qualified as R
-import Bindings.Wayland.Client qualified as WL
-import Bindings.Wayland.ExtIdleNotifyV1 qualified as Ext
+import           HSWM.Core
+import           HSWM.Operations
+import qualified HSWM.StackSet as W
+import           HSWM.Utils
+
+import qualified Wayland as WL
+
+import qualified Bindings.River as R
+import qualified Bindings.RiverSafe as R
+import qualified Bindings.Wayland.ExtIdleNotifyV1 as Ext
+
+import           Data.Bits
+import qualified Data.List as L
+import           Foreign hiding (void)
+import           GHC.Records
 
 data LayerShellFocus = FocusNone | FocusLayerShell {exclusive :: !Bool}
   deriving (Eq, Show, Generic)
@@ -49,19 +51,19 @@ getSMgr = getOrCreateObject (pure def)
 -- | New seat added
 added :: RiverSeat -> H ()
 added river_seat = do
-  layerShell <- getObject
-  xkbBindings <- getObject
-  seatListener <- getObject
-  shellSeatListener <- getObject
+  layerShell              <- getObject
+  xkbBindings             <- getObject
+  seatListener            <- getObject
+  shellSeatListener       <- getObject
   xkbBindingsSeatListener <- getObject
   -- Add river_seat_listener
-  io $ R.listenerAdd river_seat seatListener nullPtr
+  R.listenerAdd_ river_seat seatListener
   -- Add layer shell seat listener
-  river_layer_shell_seat <- io $ R.riverLayerShellGetSeat layerShell river_seat
-  io $ R.listenerAdd river_layer_shell_seat shellSeatListener river_seat
+  river_layer_shell_seat <- R.riverLayerShellGetSeat layerShell river_seat
+  R.listenerAdd river_layer_shell_seat shellSeatListener river_seat
   -- Add xkb bindings seat listener
-  xkb_bindings_seat <- io $ R.riverXkbBindingsGetSeat xkbBindings river_seat
-  io $ R.listenerAdd xkb_bindings_seat xkbBindingsSeatListener river_seat
+  xkb_bindings_seat <- R.riverXkbBindingsGetSeat xkbBindings river_seat
+  R.listenerAdd xkb_bindings_seat xkbBindingsSeatListener river_seat
   --
   let seat = def {river_seat, river_layer_shell_seat, xkb_bindings_seat}
   om <- getSMgr
@@ -93,7 +95,7 @@ handleEvent e = do
     --  runInHS $ withSeat seat $ \s ->
     --    unless s.suppressChangeFocus $ modifyWindowSet $ W.focusWindow window
     R.RiverSeatPointerLeave _ seat ->
-      runInHS $ modifySeat seat $ \s -> s {hovered = invalidWindow, pendingPointerEnter = Nothing}
+      runInHS $ modifySeat seat $ \s -> s {hovered = R.invalidWindow, pendingPointerEnter = Nothing}
     R.RiverSeatPointerPosition _ seat x y ->
       runInHS $ modifySeat seat $ \s -> s {position = (x,y)}
     R.RiverSeatWindowInteraction _ seat window ->
@@ -103,16 +105,15 @@ handleEvent e = do
     R.RiverSeatOpRelease _ seat ->
       runInHS $ modifySeat seat $ \s -> s {op_release = True}
     R.RiverSeatWlSeat _ seat name -> do
-      registry <- asks globals
-      wlseatL <- getObject
-      wlseat <- requireGlobal registry ("wl_seat", 9) $ \r _ ver ->
-        WL.registryBind r name WL.seatInterface (fi ver) <&> WL.Seat . castPtr
-      io $ R.listenerAdd wlseat wlseatL seat
+      registry <- asks globals >>= readMVar
+      wlseatL  <- getObject
+      wlseat   <- WL.bindGlobal @WL.Seat registry (Just name) (Just 9)
+      --wlseat   <- requireGlobal registry ("wl_seat", 9) $ \r _ ver -> WL.registryBind r name (WL.objectInterface @WL.Seat undefined) (fi ver) <&> WL.objectBindWrap
+      R.listenerAdd wlseat wlseatL seat
       -- Register idle notifier
-      idleNotify <- getObject
+      idleNotify  <- getObject
       idleNotifyL <- getObject
-      idleN <- Ext.idleNotifierGetIdleNotification idleNotify (10 * 60 * 1000) wlseat
-      --idleN <- Ext.idleNotifierGetIdleNotification idleNotify (10 * 1000) wlseat
+      idleN       <- Ext.idleNotifierGetIdleNotification idleNotify (10 * 60 * 1000) wlseat
       WL.listenerAdd idleN idleNotifyL seat
     _ -> return ()
 
@@ -123,18 +124,25 @@ handleWlSeatEvent e = do
       modifySeat' ud $ \x -> x {name = name, wl_seat}
     WL.SeatCapabilities ud s caps -> do
       runInHS $ do
-        modifySeat' ud $ \x -> x {caps = WL.toCEnum (fi caps.unwrap)}
+        modifySeat' ud $ \x -> x {caps = caps}
 
-      when (caps.unwrap > 0) $ do
-        log' $ display $ "seat: get keyboard: " <> tshow caps
-        wlkeyboard <- io $ WL.seatGetKeyboard s
-        wlkeyboardL <- getObject
-        io $ WL.listenerAdd wlkeyboard wlkeyboardL nullPtr
+      forM_ (WL.parseSeatCapabilities caps) $ \case
+        WL.SeatCapabilityKeyboard -> do
+          logDebug $ "seat: get keyboard" :# [ "seat" .= tshow s ]
+          wlkeyboard  <- WL.seatGetKeyboard s
+          wlkeyboardL <- getObject
+          WL.listenerAdd_ wlkeyboard wlkeyboardL
 
-        log' $ display $ "seat: get wlpointer: " <> tshow caps
-        wlpointer <- io $ WL.seatGetPointer s
-        wlpl <- getObject
-        io $ WL.listenerAdd wlpointer wlpl nullPtr
+        WL.SeatCapabilityPointer -> do
+          logDebug $ "seat: got pointer" :# [ "seat" .= tshow s ]
+          wlpl        <- getObject
+          wlpointer   <- WL.seatGetPointer s
+          WL.listenerAdd_ wlpointer wlpl
+
+        WL.SeatCapabilityTouch -> do
+          logDebug $ "seat: got touch" :# [ "seat" .= tshow s ]
+
+        _ -> return ()
 
 handleLayerShellSeat :: R.RiverLayerShellSeatEvent -> H ()
 handleLayerShellSeat e = do
@@ -300,43 +308,43 @@ manage1 s = do
           when s.op_release $ do
             io $ R.riverSeatOpEnd s.river_seat
             float s.op_window
-            modifySeat s.river_seat $ \x -> x {op = SEAT_OP_NONE, op_window = invalidWindow}
+            modifySeat s.river_seat $ \x -> x {op = SEAT_OP_NONE, op_window = R.invalidWindow}
         SEAT_OP_RESIZE -> do
           when s.op_release $ do
             liftIO $ R.riverWindowInformResizeEnd s.op_window
             liftIO $ R.riverSeatOpEnd s.river_seat
             float s.op_window
-            modifySeat s.river_seat $ \x -> x {op = SEAT_OP_NONE, op_window = invalidWindow}
+            modifySeat s.river_seat $ \x -> x {op = SEAT_OP_NONE, op_window = R.invalidWindow}
           withWindow s.op_window $ \w -> do
             let width =
                   s.op_start_width
-                    - (if (s.op_edges .&. fromIntegral ((.unwrap) EdgeLeft)) /= 0 then s.op_dx else 0)
-                    + (if (s.op_edges .&. fromIntegral ((.unwrap) EdgeRight)) /= 0 then s.op_dx else 0)
+                    - (if (s.op_edges .&. fromIntegral ((.unwrap) R.EdgeLeft)) /= 0 then s.op_dx else 0)
+                    + (if (s.op_edges .&. fromIntegral ((.unwrap) R.EdgeRight)) /= 0 then s.op_dx else 0)
             let height =
                   s.op_start_height
-                    - (if (s.op_edges .&. fromIntegral ((.unwrap) EdgeTop)) /= 0 then s.op_dy else 0)
-                    + (if (s.op_edges .&. fromIntegral ((.unwrap) EdgeBottom)) /= 0 then s.op_dy else 0)
+                    - (if (s.op_edges .&. fromIntegral ((.unwrap) R.EdgeTop)) /= 0 then s.op_dy else 0)
+                    + (if (s.op_edges .&. fromIntegral ((.unwrap) R.EdgeBottom)) /= 0 then s.op_dy else 0)
             liftIO $ R.riverWindowProposeDimensions w.river_window (max width 1) (max height 1)
       when s.op_release $ do
         modifySeat s.river_seat $ \x -> x {op_release = False}
 
 seatFocus :: Seat -> Window -> HS ()
-seatFocus s w = when (w.river_window /= invalidWindow) $ do
+seatFocus s w = when (w.river_window /= R.invalidWindow) $ do
   when (w.river_window /= s.focused) $ setFocus w.river_window -- clearFocus
   modifySeat s.river_seat $ \s' -> s' {focused = w.river_window}
   where
-    setFocus rw = when (rw /= invalidWindow) $ liftIO $ R.riverSeatFocusWindow s.river_seat rw
+    setFocus rw = when (rw /= R.invalidWindow) $ liftIO $ R.riverSeatFocusWindow s.river_seat rw
 
 -- | /manage sequence/
 seatClearFocus :: Seat -> H ()
-seatClearFocus s = io $ R.riverSeatClearFocus s.river_seat
+seatClearFocus s = R.riverSeatClearFocus s.river_seat
 
 seatPointerMove :: RiverSeat -> Window -> HS ()
 seatPointerMove sid w = do
-  log' $ display $ "[seatPointerMove] " <> tshow (sid, w)
+  logDebug $ "seatPointerMove" :# [ "seat" .= show sid, "window" .= show w ]
   withSeat sid $ \s -> seatFocus s w
-  io $ R.riverNodePlaceTop w.node
-  io $ R.riverSeatOpStartPointer sid
+  R.riverNodePlaceTop w.node
+  R.riverSeatOpStartPointer sid
   modifySeat sid $ \s ->
     s
       { op = SEAT_OP_MOVE,
@@ -352,9 +360,9 @@ seatPointerResize sid w edges = do
   withSeat sid $ \s -> do
     logDebug $ "seat pointer resize" :# [ "seat" .= show sid, "window" .= show w, "edges" .= edges ]
     seatFocus s w
-    io $ R.riverNodePlaceTop w.node
-    io $ R.riverWindowInformResizeStart w.river_window
-    io $ R.riverSeatOpStartPointer s.river_seat
+    R.riverNodePlaceTop w.node
+    R.riverWindowInformResizeStart w.river_window
+    R.riverSeatOpStartPointer s.river_seat
   modifySeat sid $ \s ->
     s
       { op = SEAT_OP_RESIZE,
@@ -386,8 +394,8 @@ seatRender s = do
             y = s.op_start_y + s.op_dy
         setWindowPosition w x y
     SEAT_OP_RESIZE -> withWindow s.op_window $ \w -> do
-      let x = s.op_start_x + (if (s.op_edges .&. fi ((.unwrap) EdgeLeft)) /= 0 then s.op_start_width - w.width else 0)
-      let y = s.op_start_y + (if (s.op_edges .&. fi ((.unwrap) EdgeTop)) /= 0 then s.op_start_height - w.height else 0)
+      let x = s.op_start_x + (if (s.op_edges .&. fi ((.unwrap) R.EdgeLeft)) /= 0 then s.op_start_width - w.width else 0)
+      let y = s.op_start_y + (if (s.op_edges .&. fi ((.unwrap) R.EdgeTop)) /= 0 then s.op_start_height - w.height else 0)
       setWindowPosition w x y
 
 ----------------------------------------------------------
@@ -397,21 +405,17 @@ seatRender s = do
 createSeatBindings :: Seat -> H Seat
 createSeatBindings s = do
   kbdListen <- getObject
-  binds <- getObject
-  pbListen <- getObject @R.RiverPointerBindingListener
+  binds     <- getObject
+  pbListen  <- getObject @R.RiverPointerBindingListener
 
-  myMod <- asks (defaultModMask . config) <&> resolveModMask 0
+  myMod  <- asks (defaultModMask . config) <&> resolveModMask 0
   pBinds <- asks (pointerBindings . config) >>= resolvePointerBinds myMod
-  pPtrs <- forM pBinds $ \((m, b), a) -> newPointerBinding pbListen s.river_seat m b a
-
-  kPtrs <-
-    createXkbBindings (binds, kbdListen, s.river_seat) actionSubmap
-      =<< asks (keyBindings . config)
-  return
-    s
-      { xkb_bindings = s.xkb_bindings <> kPtrs,
-        pointer_bindings = s.pointer_bindings ++ pPtrs
-      }
+  pPtrs  <- forM pBinds $ \((m, b), a) -> newPointerBinding pbListen s.river_seat m b a
+  kPtrs  <- createXkbBindings (binds, kbdListen, s.river_seat) actionSubmap =<< asks (keyBindings . config)
+  return s
+    { xkb_bindings = s.xkb_bindings <> kPtrs,
+      pointer_bindings = s.pointer_bindings ++ pPtrs
+    }
   where
     resolvePointerBinds mdef = mapM $ \((m, k), a) -> return ((resolveModMask mdef m, k), a)
 
@@ -435,7 +439,6 @@ cancelXkbBinding xb = tryTakeMVar xb.running >>= maybe (return ()) cancel
 
 execXkbBinding :: XkbBinding (SomeAction H) -> H ()
 execXkbBinding xb = local (\r -> r {thisSeat = Just rs}) $ do
-
   let next action = runInHS $ modifySeat rs $ \s' -> s' {pending_action = action }
       execute = void . userCode $ runner xb.action
       boundAction = do
@@ -446,7 +449,6 @@ execXkbBinding xb = local (\r -> r {thisSeat = Just rs}) $ do
                    putMVar xb.running r
            else do r <- async execute
                    putMVar xb.running r
-
   ms <- runInHS $ lookupSeat rs
   whenJust ms $ \s -> case (s.submap_pending, actionSubmap @H xb.action) of
       _ | Just _ <- s.inputOverride -> void $ async execute -- XXX ?

@@ -1,6 +1,6 @@
 module Bindings.Wayland.WlrLayerShellUnstableV1 where
 
-import Bindings.Wayland.Internal.TH
+import Wayland.Internal.TH
 
 import Bindings.Wayland.WlrLayerShellUnstableV1.Generated
 import Bindings.Wayland.WlrLayerShellUnstableV1.Generated.Global

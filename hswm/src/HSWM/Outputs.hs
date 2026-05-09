@@ -12,17 +12,20 @@
 -- Longer description of this module.
 module HSWM.Outputs where
 
-import Bindings.Wayland.XdgOutputUnstableV1 qualified as Zdg
-import Bindings.Wayland.WlrOutputPowerManagementUnstableV1 qualified as Wlr
-import Data.List qualified as L
-import Data.Map qualified as M
-import Foreign
-import HSWM.Core
-import HSWM.Operations
-import HSWM.StackSet qualified as W
-import Bindings.River qualified as R
-import Wayland
-import Bindings.Wayland.Client qualified as WL
+import           HSWM.Core
+import           HSWM.Operations
+import qualified HSWM.StackSet as W
+import           HSWM.Wayland
+
+import qualified Wayland as WL
+
+import qualified Bindings.River as R
+import qualified Bindings.Wayland.WlrOutputPowerManagementUnstableV1 as Wlr
+import qualified Bindings.Wayland.XdgOutputUnstableV1 as Zdg
+
+import qualified Data.List as L
+import qualified Data.Map as M
+import           Foreign
 
 data OutputManager = OutputManager
   { pending_setup :: M.Map RiverOutput Output,
@@ -37,7 +40,7 @@ added out = do
   om <- getOrCreateObject $ pure def
   -- Add RiverOutput event listener
   outL <- getObject
-  _ <- io $ R.listenerAdd out outL nullPtr
+  _ <- R.listenerAdd_ out outL
   -- Create layer shell output
   layerShellOutput <- withObject @R.RiverLayerShell $ \shell -> io $ R.riverLayerShellGetOutput shell out
   -- Add layer shell output listener
@@ -76,10 +79,10 @@ handle e = do
           io $ whenJust (outputPower o) WL.objectDestroy
     R.RiverOutputWlOutput _ output name -> do
       -- bind a wl_output listener
-      registry <- asks globals
+      registry <- asks globals >>= readMVar
       wlOutputListener <- getObject
-      wl_output <- requireGlobal registry ("wl_output", 4) $ \r _ ver ->
-        WL.Output . castPtr <$> WL.registryBind r name WL.outputInterface (fi ver)
+      wl_output <- WL.bindGlobal @WL.Output registry (Just name) (Just 4)
+      --wl_output <- requireGlobal registry ("wl_output", 4) $ \r _ ver -> WL.Output . castPtr <$> WL.registryBind r name WL.outputInterface (fi ver)
       WL.listenerAdd wl_output wlOutputListener output
       -- xdg_output
       zdgOM <- getObject

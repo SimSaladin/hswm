@@ -14,7 +14,8 @@ import HSWM.StackSet as W
 import Data.Ratio
 
 -- | One-dimensional directions:
-data Direction1D = Next | Prev deriving (Eq, Read, Show)
+data Direction1D = Next | Prev
+  deriving (Eq, Ord, Bounded, Enum, Read, Show)
 
 -- | Two-dimensional directions:
 data Direction2D
@@ -26,16 +27,15 @@ data Direction2D
     R
   | -- | Left
     L
-  deriving (Eq, Read, Show, Ord, Enum, Bounded)
+  deriving (Eq, Ord, Bounded, Enum, Read, Show)
 
 data Rectangle = Rectangle
-  { x, y :: !Position,
-    width, height :: !Dimension
-  }
-  deriving (Eq, Show, Read, Ord, Generic)
+  { x, y          :: {-# UNPACK #-} !Position,
+    width, height :: {-# UNPACK #-} !Dimension
+  } deriving (Eq, Ord, Show, Read, Generic)
 
 -- | A position on the (screen) output surface
-data Point = Point {x, y :: !Int32}
+data Point = Point { x, y :: {-# UNPACK #-} !Int32 }
   deriving (Eq, Show, Read, Generic)
 
 -- | Uh, X11 used this...
@@ -48,10 +48,8 @@ type Position = Int32
 -- @r@.
 pointWithin :: Position -> Position -> Rectangle -> Bool
 pointWithin x y r =
-  x >= fi r.x
-    && x < fi r.x + fromIntegral r.width
-    && y >= fi r.y
-    && y < fi r.y + fromIntegral r.height
+  x >= fi r.x && x < fi r.x + fromIntegral r.width &&
+  y >= fi r.y && y < fi r.y + fromIntegral r.height
 
 -- | Produce the actual rectangle from a screen and a ratio on that screen.
 scaleRationalRect :: Rectangle -> W.RationalRect -> Rectangle

@@ -1,4 +1,4 @@
-cabal-version:      3.12
+cabal-version:      3.14
 name:               xkbcommon-bindings
 version:            0.1.0.0
 synopsis:           Low-level bindings to libxkbcommon
@@ -9,7 +9,7 @@ author:             Samuli Thomasson
 maintainer:         samuli.thomasson@pm.me
 -- copyright:
 category:           System
-build-type:         Custom
+build-type:         Hooks
 extra-doc-files:    CHANGELOG.md
 tested-with:        GHC == 9.14.1, GHC == 9.12.2
 -- extra-source-files:
@@ -17,7 +17,7 @@ tested-with:        GHC == 9.14.1, GHC == 9.12.2
 custom-setup
   setup-depends:
       base
-    , Cabal
+    , Cabal-hooks
 
 common warnings
     ghc-options:
@@ -46,20 +46,22 @@ library
     import: warnings, language
     exposed-modules:
        Text.XkbCommon
-     , Text.XkbCommon.EventCodes
-     , Text.XkbCommon.Internal
-     , Text.XkbCommon.Internal.TH
      , Text.XkbCommon.KeySym
-     , Text.XkbCommon.KeySyms
      , Text.XkbCommon.Registry
-     , Text.XkbCommon.Types
-     , Text.XkbCommon.XkbContext
-     , Text.XkbCommon.XkbKeymap
-     , Text.XkbCommon.XkbRmlvoBuilder
-     , Text.XkbCommon.XkbState
+     , Text.XkbCommon.Context
+     , Text.XkbCommon.Keymap
+     , Text.XkbCommon.Keymap.RmlvoBuilder
+     , Text.XkbCommon.State
+     , Text.XkbCommon.EventCodes
+     , Text.XkbCommon.KeySyms
+    other-modules:
+       Text.XkbCommon.Internal
+     , Text.XkbCommon.FFI
+    autogen-modules:
+       Text.XkbCommon.EventCodes
+     , Text.XkbCommon.KeySyms
     build-depends:
-       base              >=4.21   && <4.23
-     , template-haskell  >=2.23   && <2.25
+       base              >=4.21   && <5
      , data-default     ^>=0.8
      , unix             ^>=2.8.6
     hs-source-dirs:   src
@@ -69,6 +71,8 @@ library
       extra-libraries: xkbcommon, xkbregistry
     build-tool-depends:
        hsc2hs:hsc2hs
+    if !os(linux)
+      buildable: False
 
 test-suite spec
   import: warnings, language

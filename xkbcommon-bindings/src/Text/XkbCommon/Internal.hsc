@@ -10,88 +10,90 @@
 -- Portability : unportable
 --
 module Text.XkbCommon.Internal (
-  -- * Error handling
-  xkbThrowIfNull',
   -- * @mmap@
   mmap,
   munmap,
-  mAP_PRIVATE,
-  mAP_SHARED,
-  mAP_FAILED,
-  pROT_READ,
-  pROT_WRITE,
-  pROT_EXEC,
-  pROT_NONE,
+  -- ** Flags
+  MapFlags,
+  mapShared, mapPrivate, mapFixed,
+  -- ** Prot
+  MapProt,
+  protRead, protWrite, protExec, protNone,
   -- * @memfd_create@
   memfdCreate,
-  mFD_CLOEXEC,
-  mFD_ALLOW_SEALING,
+  -- ** Flags
+  MfdFlags,
+  mfdCloExec, mfdAllowSealing,
   ) where
+
+import Foreign
+import Foreign.C
+import System.Posix (Fd(..))
 
 #define _GNU_SOURCE
 #include <unistd.h>
 #include <sys/mman.h>
 
-import Foreign
-import Foreign.C
-import System.Posix (Fd(..))
-import Control.Exception
-import Control.Monad
+newtype MapFlags = MapFlags { unwrap :: CUInt }
+  deriving stock (Eq)
+  deriving newtype (Bits)
 
-xkbThrowIfNull' :: Exception e => e -> Ptr a -> IO (Ptr a)
-xkbThrowIfNull' ex res = do
-  when (res == nullPtr) $ throwIO ex
-  return res
+instance Semigroup MapFlags where (<>) = (.|.)
+instance Monoid MapFlags where mempty = MapFlags 0
 
-mFD_CLOEXEC :: CUInt
-mFD_CLOEXEC = #{const MFD_CLOEXEC}
+mapShared, mapPrivate, mapFixed :: MapFlags
+mapShared  = MapFlags #{const MAP_SHARED}
+mapPrivate = MapFlags #{const MAP_PRIVATE}
+mapFixed   = MapFlags #{const MAP_FIXED}
 
-mFD_ALLOW_SEALING :: CUInt
-mFD_ALLOW_SEALING = #{const MFD_ALLOW_SEALING}
+newtype MapProt = MapProt { unwrap :: CUInt }
+  deriving stock (Eq)
+  deriving newtype (Bits)
 
-mAP_FAILED :: Ptr a
-mAP_FAILED = wordPtrToPtr #{const MAP_FAILED}
+instance Semigroup MapProt where (<>) = (.|.)
+instance Monoid MapProt where mempty = protNone
 
-mAP_PRIVATE :: CUInt
-mAP_PRIVATE = #{const MAP_PRIVATE}
-
-mAP_SHARED :: CUInt
-mAP_SHARED = #{const MAP_SHARED}
-
-pROT_READ :: CUInt
-pROT_READ = #{const PROT_READ}
-
-pROT_WRITE :: CUInt
-pROT_WRITE = #{const PROT_WRITE}
-
-pROT_EXEC :: CUInt
-pROT_EXEC = #{const PROT_EXEC}
-
-pROT_NONE :: CUInt
-pROT_NONE = #{const PROT_NONE}
+protRead, protWrite, protExec, protNone :: MapProt
+protRead  = MapProt #{const PROT_READ}
+protWrite = MapProt #{const PROT_WRITE}
+protExec  = MapProt #{const PROT_EXEC}
+protNone  = MapProt #{const PROT_NONE}
 
 mmap :: forall a any. Ptr a -- ^ @addr@
      -> CSize -- ^ @size@
-     -> CUInt -- ^ @prot@: possible values: 'pROT_READ', 'pROT_WRITE', 'pROT_EXEC', 'pROT_NONE'
-     -> CUInt -- ^ @flags@: 'mAP_SHARED' or 'mAP_PRIVATE'
+     -> MapProt
+     -> MapFlags
      -> Fd -- ^ @fildes@
      -> CSize -- ^ @offset@
      -> IO (Ptr any)
-mmap ptr size prot flags fildes offset = throwErrnoIf (== mAP_FAILED) "mmap" $
-  c_mmap ptr size prot flags fildes offset
+mmap ptr size prot flags fildes offset =
+  throwErrnoIf (== mapFailed) "mmap" $ c_mmap ptr size prot.unwrap flags.unwrap fildes offset
+  where
+  mapFailed :: Ptr x
+  mapFailed = wordPtrToPtr #{const MAP_FAILED}
 
 munmap :: Integral a => Ptr any -> a -> IO ()
-munmap ptr size = throwErrnoIfMinus1_ "munmap" $ c_munmap ptr (fromIntegral size)
+munmap ptr size =
+  throwErrnoIfMinus1_ "munmap" $ c_munmap ptr (fromIntegral size)
+
+newtype MfdFlags = MfdFlags { unwrap :: CUInt }
+  deriving stock (Eq)
+  deriving newtype (Bits)
+
+instance Semigroup MfdFlags where (<>) = (.|.)
+instance Monoid MfdFlags where mempty = MfdFlags 0
+
+mfdCloExec, mfdAllowSealing :: MfdFlags
+mfdCloExec      = MfdFlags #{const MFD_CLOEXEC}
+mfdAllowSealing = MfdFlags #{const MFD_ALLOW_SEALING}
 
 memfdCreate :: String -- ^ Name
-            -> CUInt -- ^ Flags
-            -> IO Fd
+            -> MfdFlags -> IO Fd
 memfdCreate name flags = withCString name $ \c_name ->
-  throwErrnoIfMinus1 "memfd_create" $ c_memfd_create c_name flags
+  throwErrnoIfMinus1 "memfd_create" $ c_memfd_create c_name flags.unwrap
 
 foreign import ccall unsafe "mmap"
-  c_mmap :: forall a any. Ptr any -> CSize -> CUInt {- prot -} -> CUInt {- flags -} -> Fd {- fildes -} -> CSize {- offset -}
-         -> IO (Ptr a)
+  c_mmap :: forall a any. Ptr any -> CSize -> CUInt -> CUInt -> Fd -> CSize -> IO (Ptr a)
 
 foreign import ccall unsafe "munmap"
   c_munmap :: forall a. Ptr a -> CSize -> IO CInt

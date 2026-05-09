@@ -1,6 +1,6 @@
 module Bindings.Wayland.Viewporter where
 
-import Bindings.Wayland.Internal.TH
+import Wayland.Internal.TH
 
 import Bindings.Wayland.Viewporter.Generated
 import Bindings.Wayland.Viewporter.Generated.Global

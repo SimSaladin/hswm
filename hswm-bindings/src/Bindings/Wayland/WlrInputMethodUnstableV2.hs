@@ -6,7 +6,7 @@ import Bindings.Wayland.WlrInputMethodUnstableV2.Generated
 import Bindings.Wayland.WlrInputMethodUnstableV2.Generated.Global
 import Bindings.Wayland.WlrInputMethodUnstableV2.Generated.Safe
 
-import Bindings.Wayland.Internal.TH
+import Wayland.Internal.TH
 import Bindings.Wayland.Client
 
 -- Because this protocol is not imported

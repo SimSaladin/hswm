@@ -223,6 +223,11 @@
         projectRoot = cabalProjectRoot;
         packages = cabalPackages;
 
+        devShell.mkShellArgs.shellHook = ''
+          # Ensure that libs are available to TH splices, cabal repl, etc.
+          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${lib.makeLibraryPath [ pkgs.libxkbcommon ]}
+        '';
+
         autoWire = lib.mkForce [ "devShells" "packages" "apps" "checks" ];
       };
 

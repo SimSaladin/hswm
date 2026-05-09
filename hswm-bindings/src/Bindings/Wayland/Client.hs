@@ -1,122 +1,26 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE PatternSynonyms       #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE RecordWildCards       #-}
+{-# LANGUAGE TypeFamilies          #-}
+{-# LANGUAGE OverloadedRecordDot #-}
 
+
+-- |
+-- Module      : Bindings.Wayland.Client
+-- Description : Wayland Client bindings
+-- Copyright   : (c) Samuli Thomasson, 2026
+--
+-- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
+-- Stability   : unstable
+-- Portability : unportable
+--
 module Bindings.Wayland.Client
-  ( module Bindings.Wayland.Util
+  ( module Wayland.Types
+  , module Bindings.Wayland.Util
   , module Bindings.Wayland.Client
-  , module Types
   , module Safe
 
-  -- * Constants
-  , wL_MARSHAL_FLAG_DESTROY
-
-  -- * Objects
-
-  , Wl_proxy
-  , Wl_display
-  , Wl_event_queue
-  , Wl_buffer
-  , Wl_callback
-  , Wl_compositor
-  , Wl_data_device
-  , Wl_data_device_manager
-  , Wl_data_offer
-  , Wl_data_source
-  , Wl_fixes
-  , Wl_keyboard
-  , Wl_output
-  , Wl_pointer
-  , Wl_region
-  , Wl_registry
-  , Wl_seat
-  , Wl_shell
-  , Wl_shell_surface
-  , Wl_shm
-  , Wl_shm_pool
-  , Wl_subcompositor
-  , Wl_subsurface
-  , Wl_surface
-  , Wl_touch
-
-  -- * Data Device Manager
-
-  , Wl_data_device_manager_dnd_action(..)
-  , pattern WL_DATA_DEVICE_MANAGER_DND_ACTION_NONE
-  , pattern WL_DATA_DEVICE_MANAGER_DND_ACTION_COPY
-  , pattern WL_DATA_DEVICE_MANAGER_DND_ACTION_MOVE
-  , pattern WL_DATA_DEVICE_MANAGER_DND_ACTION_ASK
-
-  -- * Shell Surfaces
-
-  , Wl_shell_surface_resize(..)
-  , pattern WL_SHELL_SURFACE_RESIZE_NONE
-  , pattern WL_SHELL_SURFACE_RESIZE_TOP
-  , pattern WL_SHELL_SURFACE_RESIZE_BOTTOM
-  , pattern WL_SHELL_SURFACE_RESIZE_LEFT
-  , pattern WL_SHELL_SURFACE_RESIZE_TOP_LEFT
-  , pattern WL_SHELL_SURFACE_RESIZE_BOTTOM_LEFT
-  , pattern WL_SHELL_SURFACE_RESIZE_RIGHT
-  , pattern WL_SHELL_SURFACE_RESIZE_TOP_RIGHT
-  , pattern WL_SHELL_SURFACE_RESIZE_BOTTOM_RIGHT
-  , Wl_shell_surface_transient(..)
-  , pattern WL_SHELL_SURFACE_TRANSIENT_INACTIVE
-  , Wl_shell_surface_fullscreen_method(..)
-  , pattern WL_SHELL_SURFACE_FULLSCREEN_METHOD_DEFAULT
-  , pattern WL_SHELL_SURFACE_FULLSCREEN_METHOD_SCALE
-  , pattern WL_SHELL_SURFACE_FULLSCREEN_METHOD_DRIVER
-  , pattern WL_SHELL_SURFACE_FULLSCREEN_METHOD_FILL
-
-  -- * WL Surface
-
-  , Wl_surface_error(..)
-  , pattern WL_SURFACE_ERROR_INVALID_SCALE
-  , pattern WL_SURFACE_ERROR_INVALID_TRANSFORM
-  , pattern WL_SURFACE_ERROR_INVALID_SIZE
-  , pattern WL_SURFACE_ERROR_INVALID_OFFSET
-  , pattern WL_SURFACE_ERROR_DEFUNCT_ROLE_OBJECT
-
-   -- * Wl_Seat
-
-  , Wl_seat_capability(..)
-  , pattern WL_SEAT_CAPABILITY_POINTER
-  , pattern WL_SEAT_CAPABILITY_KEYBOARD
-  , pattern WL_SEAT_CAPABILITY_TOUCH
-  , Wl_seat_error(..)
-  , pattern WL_SEAT_ERROR_MISSING_CAPABILITY
-
-  -- * Pointers
-
-  , Wl_pointer_error(..)
-  , pattern WL_POINTER_ERROR_ROLE
-  , Wl_pointer_button_state(..)
-  , pattern WL_POINTER_BUTTON_STATE_RELEASED
-  , pattern WL_POINTER_BUTTON_STATE_PRESSED
-  , Wl_pointer_axis(..)
-  , pattern WL_POINTER_AXIS_VERTICAL_SCROLL
-  , pattern WL_POINTER_AXIS_HORIZONTAL_SCROLL
-  , Wl_pointer_axis_source(..)
-  , pattern WL_POINTER_AXIS_SOURCE_WHEEL
-  , pattern WL_POINTER_AXIS_SOURCE_FINGER
-  , pattern WL_POINTER_AXIS_SOURCE_CONTINUOUS
-  , pattern WL_POINTER_AXIS_SOURCE_WHEEL_TILT
-  , Wl_pointer_axis_relative_direction(..)
-  , pattern WL_POINTER_AXIS_RELATIVE_DIRECTION_IDENTICAL
-  , pattern WL_POINTER_AXIS_RELATIVE_DIRECTION_INVERTED
-
-  -- * Keyboards / Touch
-
-  , Wl_keyboard_keymap_format(..)
-  , pattern WL_KEYBOARD_KEYMAP_FORMAT_NO_KEYMAP
-  , pattern WL_KEYBOARD_KEYMAP_FORMAT_XKB_V1
-  , Wl_keyboard_key_state(..)
-  , pattern WL_KEYBOARD_KEY_STATE_RELEASED
-  , pattern WL_KEYBOARD_KEY_STATE_PRESSED
-  , pattern WL_KEYBOARD_KEY_STATE_REPEATED
-
   -- *  Outputs
-
   , Wl_output_subpixel(..)
   , pattern WL_OUTPUT_SUBPIXEL_UNKNOWN
   , pattern WL_OUTPUT_SUBPIXEL_NONE
@@ -137,143 +41,348 @@ module Bindings.Wayland.Client
   , pattern WL_OUTPUT_MODE_CURRENT
   , pattern WL_OUTPUT_MODE_PREFERRED
 
-   -- * Subcompositor
-
-  , Wl_subcompositor_error(..)
-  , pattern WL_SUBCOMPOSITOR_ERROR_BAD_SURFACE
-  , pattern WL_SUBCOMPOSITOR_ERROR_BAD_PARENT
-
-  -- * Subsurface
-
-  , Wl_subsurface_error(..)
-  , pattern WL_SUBSURFACE_ERROR_BAD_SURFACE
-
-  -- * SHM Format
-
-  -- | All "pattern WL_SHM_FORMAT_????????"  omitted for brevity.
-  -- They are exported from another module if you need them.
-  , Wl_shm_format(..)
-
-  -- * Errors
-
-  -- ** Display Error
-
-  , Wl_display_error(..)
-  , pattern WL_DISPLAY_ERROR_INVALID_OBJECT
-  , pattern WL_DISPLAY_ERROR_INVALID_METHOD
-  , pattern WL_DISPLAY_ERROR_NO_MEMORY
-  , pattern WL_DISPLAY_ERROR_IMPLEMENTATION
-
-  -- ** Data Offer Error
-
-  , Wl_data_offer_error(..)
-  , pattern WL_DATA_OFFER_ERROR_INVALID_FINISH
-  , pattern WL_DATA_OFFER_ERROR_INVALID_ACTION_MASK
-  , pattern WL_DATA_OFFER_ERROR_INVALID_ACTION
-  , pattern WL_DATA_OFFER_ERROR_INVALID_OFFER
-
-  -- ** SHM Error
-
-  , Wl_shm_error(..)
-  , pattern WL_SHM_ERROR_INVALID_FORMAT
-  , pattern WL_SHM_ERROR_INVALID_STRIDE
-  , pattern WL_SHM_ERROR_INVALID_FD
-
-  -- ** Data Source Error
-
-  , Wl_data_source_error(..)
-  , pattern WL_DATA_SOURCE_ERROR_INVALID_ACTION_MASK
-  , pattern WL_DATA_SOURCE_ERROR_INVALID_SOURCE
-
-  -- ** Shell error
-
-  , Wl_shell_error(..)
-  , pattern WL_SHELL_ERROR_ROLE
-
-  -- ** Data Device Error
-
-  , Wl_data_device_error(..)
-  , pattern WL_DATA_DEVICE_ERROR_ROLE
-  , pattern WL_DATA_DEVICE_ERROR_USED_SOURCE
-
+  , Wl_keyboard_key_state(..)
+  , Wl_keyboard_keymap_format(..)
   ) where
 
-import           Bindings.Wayland.Internal.Types as Types
+
 import           Bindings.Wayland.Util
 
 import           Bindings.Wayland.Client.Generated
 import           Bindings.Wayland.Client.Generated.Global as G
 import qualified Bindings.Wayland.Client.Generated.Safe as Safe
-
-import           Bindings.Wayland.Client.Generated.Safe hiding (wl_display_dispatch,
-                                                         wl_display_flush)
+import           Bindings.Wayland.Client.Generated.Safe hiding (wl_display_dispatch, wl_display_flush)
 import           Bindings.Wayland.Client.Generated.Unsafe (wl_display_dispatch, wl_display_flush)
 
-import           Bindings.Wayland.Internal.TH
+import           Wayland.Types
+import           Wayland.Internal.TH
+
+import           Control.Exception
+import           Control.Monad.IO.Class
+import           Data.Maybe
+import           Foreign
+import           Foreign.C
+import           Foreign.C.ConstPtr
+import qualified HsBindgen.Runtime.Internal.Prelude as RIP
+import           System.Posix
 
 clientFromProtocolXML commonSettings
   { prEnumModule = \_ -> case () of
       _ | otherwise -> ""
-  , prRequestOptions =
-    [ ("wl_display", "connect", def { reqCheckNull = True, reqErrnoIfError = True })
-    , ("wl_display", "connect_to_fd", def { reqCheckNull = True, reqErrnoIfError = True })
-    , ("wl_display", "dispatch", def { reqCheckMinusOne = True, reqErrnoIfError = True })
-    , ("wl_display", "dispatch_pending", def { reqCheckMinusOne = True, reqErrnoIfError = True })
-    , ("wl_display", "dispatch_queue", def { reqCheckMinusOne = True, reqErrnoIfError = True })
-    , ("wl_display", "dispatch_queue_pending", def { reqCheckMinusOne = True, reqErrnoIfError = True })
-    , ("wl_display", "flush", def { reqCheckMinusOne = True, reqErrnoIfError = True })
-    , ("wl_display", "prepare_read", def { reqCheckMinusOne = True, reqErrnoIfError = True })
-    , ("wl_display", "prepare_read_queue", def { reqCheckMinusOne = True, reqErrnoIfError = True })
-    , ("wl_display", "read_events", def { reqCheckMinusOne = True, reqErrnoIfError = True })
-    , ("wl_display", "create_queue", def { reqCheckNull = True })
-    , ("wl_display", "roundtrip", def { reqCheckMinusOne = True })
-    , ("wl_display", "roundtrip_queue", def { reqCheckMinusOne = True })
-    ]
+
   , prProtocolModifier = \proto ->
     let modifyInterface x@Interface{..}
-          | interfaceName == "wl_display" = x { interfaceRequests = interfaceRequests ++ extraDisplayMethods }
+          | interfaceName == "wl_display" = x
+            { interfaceRequests = interfaceRequests ++
+              [ IRequest "disconnect" ("","") Nothing [] ] }
           | otherwise = x
-        extraDisplayMethods =
-          [ IRequest "connect" ("","") Nothing [arg "name"]
-          , IRequest "connect_to_fd" ("","") Nothing []
-          , IRequest "cancel_read" ("","") Nothing []
-          , IRequest "read_events" ("","") Nothing []
-          -- , IRequest "create_queue" ("","") Nothing []
-          -- , IRequest "create_queue_with_name" ("","") Nothing []
-          , IRequest "disconnect" ("","") Nothing []
-          , IRequest "dispatch" ("","") Nothing []
-          , IRequest "dispatch_pending" ("","") Nothing []
-          -- , IRequest "dispatch_queue" ("","") Nothing []
-          -- , IRequest "dispatch_queue_pending" ("","") Nothing []
-          -- , IRequest "dispatch_queue_timeout" ("","") Nothing []
-          , IRequest "dispatch_timeout" ("","") Nothing []
-          , IRequest "flush" ("","") Nothing []
-          , IRequest "get_error" ("","") Nothing []
-          , IRequest "get_fd" ("","") Nothing []
-          , IRequest "get_protocol_error" ("","") Nothing []
-          , IRequest "prepare_read" ("","") Nothing []
-          -- , IRequest "prepare_read_queue" ("","") Nothing []
-          , IRequest "roundtrip" ("","") Nothing []
-          -- , IRequest "roundtrip_queue" ("","") Nothing []
-          , IRequest "set_max_buffer_size" ("","") Nothing []
-          ]
-        arg s = Arg s "string" Nothing Nothing ""
     in proto { protocolInterfaces = map modifyInterface $ protocolInterfaces proto }
+
+  , prRequestOptions =
+    [ ("wl_registry", "bind", def { reqDisable = True }) ]
+
   } "wayland.xml"
 
+instance Default Output where def = Output nullPtr
+instance Default Seat where def = Seat nullPtr
 
--- EventQueue
--- mkWlObject $ (wlobj ''Wl_event_queue
---   [ "get_name" { of_arguments =
---     [ "eventQueue"
---     , "name"
---       { fa_val_out = Just [|peekCString . unConstPtr|]
---       , fa_type = \_ -> AppT (ConT ''IO) (ConT ''String)
---       }
---     ] }
---   ])
---   { objListener = Nothing
---   , objHasDestructor = True
---   , objIsWlObject = False
---   , objInterface = Nothing
---   }
+renderNewType "EventQueue" ''Wl_event_queue ""
+
+-- | wl_display object used to create the queue should not be
+-- destroyed until all event queues created with it are destroyed.
+instance HasDestructor EventQueue where
+  objectDestroy (EventQueue evq) = wl_event_queue_destroy evq
+
+data WaylandProtocolError = WaylandProtocolError
+  { errCode                :: !Word32
+  , errObjectId            :: !Word32
+  , errObjectInterfaceName :: !String
+  } deriving (Eq, Show)
+
+instance Exception WaylandProtocolError
+
+-- | Connect to a Wayland display.
+displayConnect :: MonadIO m => Maybe String -> m Display
+{-# INLINE displayConnect #-}
+displayConnect marg = fmap Display . liftIO $
+  maybe ($ nullPtr) withCString marg $ \c_arg ->
+  throwErrnoIfNull "displayConnect" $ wl_display_connect $ ConstPtr c_arg
+
+-- | Connect to a Wayland display.
+displayConnectToFd :: MonadIO m => Fd -> m Display
+{-# INLINE displayConnectToFd #-}
+displayConnectToFd fd = fmap Display . liftIO $ throwErrnoIfNull "displayConnectToFd" $ wl_display_connect_to_fd (fromIntegral fd)
+
+-- | Access the Wayland socket FD for polling.
+displayGetFd :: MonadIO m => Display -> m Fd
+{-# INLINE displayGetFd #-}
+displayGetFd (Display disp) = fmap fromIntegral . liftIO $ wl_display_get_fd disp
+
+-- | Block until all pending request are processed by the server.
+--
+-- Returns the number of dispatched events.
+--
+-- This function uses wl_display_dispatch_queue() internally. It is not allowed
+-- to call this function while the thread is being prepared for reading events,
+-- and doing so will cause a dead lock.
+displayRoundtrip :: MonadIO m => Display -> m Int
+{-# INLINE displayRoundtrip #-}
+displayRoundtrip (Display d) = fmap fromIntegral . liftIO $
+  throwErrnoIfMinus1 "displayRoundtrip" $ wl_display_roundtrip d
+
+-- | Block until all pending request are processed by the server.
+--
+-- Returns the number of dispatched events.
+--
+-- This function uses wl_display_dispatch_queue() internally. It is not allowed
+-- to call this function while the thread is being prepared for reading events,
+-- and doing so will cause a dead lock.
+displayRoundtripQueue :: MonadIO m => Display -> EventQueue -> m Int
+{-# INLINE displayRoundtripQueue #-}
+displayRoundtripQueue (Display d) (EventQueue evq) = fmap fromIntegral . liftIO $
+  throwErrnoIfMinus1 "displayRoundtripQueue" $ wl_display_roundtrip_queue d evq
+
+-- | Set maximum buffer size for connection.
+displaySetMaxBufferSize :: MonadIO m => Display -> Maybe Int -> m ()
+{-# INLINE displaySetMaxBufferSize #-}
+displaySetMaxBufferSize (Display d) msize = liftIO $ wl_display_set_max_buffer_size d $ fromIntegral $ fromMaybe 0 msize
+
+-- | Flush all pending outgoing requests to the server
+--
+-- This needs to be done regularly to ensure the server receives all your requests.
+--
+-- This never blocks.  It will write as much data as possible, but if all data could
+-- not be written, errno will be set to EAGAIN.  In that case, use poll on the display
+-- file descriptor to wait for it to become writable again.
+displayFlush :: MonadIO m => Display -> m ()
+{-# INLINE displayFlush #-}
+displayFlush (Display d) = liftIO $ throwErrnoIfMinus1_ "displayFlush" $ wl_display_flush d
+
+-- | Read events from display file descriptor.
+--
+-- Calling this function will result in data available on the display file
+-- descriptor being read and read events will be queued on their corresponding
+-- event queues.
+--
+-- Before calling this function, depending on what thread it is to be called
+-- from, 'displayPrepareReadQueue' or 'displayPrepareRead' needs to
+-- be called. See 'displayPrepareReadQueue' for more details.
+--
+-- When being called at a point where other threads have been prepared to read
+-- (using 'displayPrepareReadQueue' or 'displayPrepareRead') this
+-- function will sleep until all other prepared threads have either been
+-- cancelled (using 'displayCancelRead') or them self entered this
+-- function. The last thread that calls this function will then read and queue
+-- events on their corresponding event queues, and finally wake up all other
+-- 'displayReadEvents' calls causing them to return.
+--
+-- If a thread cancels a read preparation when all other threads that have
+-- prepared to read has either called 'displayCancelRead' or
+-- 'displayReadEvents', all reader threads will return without having read
+-- any data.
+--
+-- To dispatch events that may have been queued, call
+-- 'displayDispatchPending' or 'displayDispatchQueuePending'.
+displayReadEvents :: MonadIO m => Display -> m ()
+{-# INLINE displayReadEvents #-}
+displayReadEvents (Display d) = liftIO $
+  throwErrnoIfMinus1_ "displayReadEvents" $ wl_display_read_events d
+
+-- |  Prepare to read events from the display's file descriptor to a queue.
+--
+-- This function (or wl_display_prepare_read()) must be called before reading
+-- from the file descriptor using wl_display_read_events(). Calling
+-- wl_display_prepare_read_queue() announces the calling thread's intention to
+-- read and ensures that until the thread is ready to read and calls
+-- wl_display_read_events(), no other thread will read from the file descriptor.
+-- This only succeeds if the event queue is empty, and if not -1 is returned and
+-- errno set to EAGAIN.
+--
+-- If a thread successfully calls wl_display_prepare_read_queue(), it must
+-- either call wl_display_read_events() when it's ready or cancel the read
+-- intention by calling 'displayCancelRead'.
+--
+-- Use this function before polling on the display fd or integrate the fd into a
+-- toolkit event loop in a race-free way. A correct usage would be (with most
+-- error checking left out):
+--
+-- @
+-- while (displayPrepareReadQueue display queue != 0)
+--         displayDispatchQueuePending display queue
+-- displayFlush display
+--
+-- ret = poll(fds, nfds, -1);
+-- if (has_error(ret))
+--         displayCancelRead display
+-- else
+--         displayReadEvents display
+--
+-- displayDispatchQueuePending display queue
+-- @
+--
+-- Here we call wl_display_prepare_read_queue(), which ensures that between
+-- returning from that call and eventually calling wl_display_read_events(), no
+-- other thread will read from the fd and queue events in our queue. If the call
+-- to wl_display_prepare_read_queue() fails, we dispatch the pending events and
+-- try again until we're successful.
+--
+-- The wl_display_prepare_read_queue() function doesn't acquire exclusive access
+-- to the display's fd. It only registers that the thread calling this function
+-- has intention to read from fd. When all registered readers call
+-- wl_display_read_events(), only one (at random) eventually reads and queues
+-- the events and the others are sleeping meanwhile. This way we avoid races and
+-- still can read from more threads.
+displayPrepareReadQueue :: MonadIO m => Display -> EventQueue -> m ()
+{-# INLINE displayPrepareReadQueue #-}
+displayPrepareReadQueue (Display d) (EventQueue evq) = liftIO $ throwErrnoIfMinus1_ "displayPrepareReadQueue" $ wl_display_prepare_read_queue d evq
+
+-- | This function does the same thing as 'displayPrepareReadQueue'
+-- with the default queue passed as the queue.
+displayPrepareRead :: MonadIO m => Display -> m ()
+{-# INLINE displayPrepareRead #-}
+displayPrepareRead (Display d) = liftIO $ throwErrnoIfMinus1_ "displayPrepareRead" $ wl_display_prepare_read d
+
+-- | Dispatch events on the default event queue.
+displayDispatch :: MonadIO m => Display -> m Int
+{-# INLINE displayDispatch #-}
+displayDispatch (Display d) =
+  fmap fromIntegral . liftIO $ throwErrnoIfMinus1 "displayDispatch" $ wl_display_dispatch d
+
+-- | Dispatch events in an event queue.
+--
+-- If the given event queue is empty, this function blocks until there are
+-- events to be read from the display fd. Events are read and queued on
+-- the appropriate event queues. Finally, events on given event queue are
+-- dispatched. On failure -1 is returned and errno set appropriately.
+--
+-- In a multi threaded environment, do not manually wait using poll() (or
+-- equivalent) before calling this function, as doing so might cause a dead
+-- lock. If external reliance on poll() (or equivalent) is required, see
+-- wl_display_prepare_read_queue() of how to do so.
+--
+-- This function is thread safe as long as it dispatches the right queue on the
+-- right thread. It is also compatible with the multi thread event reading
+-- preparation API (see wl_display_prepare_read_queue()), and uses the
+-- equivalent functionality internally. It is not allowed to call this function
+-- while the thread is being prepared for reading events, and doing so will
+-- cause a dead lock.
+--
+-- It can be used as a helper function to ease the procedure of reading and
+-- dispatching events.
+displayDispatchQueue :: MonadIO m => Display -> EventQueue -> m Int
+{-# INLINE displayDispatchQueue #-}
+displayDispatchQueue (Display d) (EventQueue evq) =
+  fmap fromIntegral . liftIO $ throwErrnoIfMinus1 "displayDispatchQueue" $ wl_display_dispatch_queue d evq
+
+displayDispatchTimeout :: MonadIO m => Display -> ConstPtr Timespec -> m Int
+{-# INLINE displayDispatchTimeout #-}
+displayDispatchTimeout (Display d) tspec =
+  fmap fromIntegral . liftIO $ throwErrnoIfMinus1 "displayDispatchTimeout" $ wl_display_dispatch_timeout d tspec
+
+-- | Dispatch events in an event queue with a timeout
+--
+-- This function behaves identical to wl_display_dispatch_queue() except
+-- that it also takes a timeout and returns 0 if the timeout elapsed.
+--
+-- Passing NULL as a timeout means an infinite timeout. An empty timespec
+-- causes wl_display_dispatch_queue_timeout() to return immediately even if no
+-- events have been dispatched.
+--
+-- Returns the number of dispatched events on success.
+displayDispatchQueueTimeout :: MonadIO m => Display -> EventQueue -> ConstPtr Timespec -> m Int
+{-# INLINE displayDispatchQueueTimeout #-}
+displayDispatchQueueTimeout (Display d) (EventQueue evq) tspec =
+  fmap fromIntegral . liftIO $ throwErrnoIfMinus1 "displayDispatchQueueTimeout" $ wl_display_dispatch_queue_timeout d evq tspec
+
+-- | Dispatch pending events in an event queue
+--
+-- Returns immediately if there are no events queued.
+displayDispatchQueuePending :: MonadIO m => Display -> EventQueue -> m Int
+{-# INLINE displayDispatchQueuePending #-}
+displayDispatchQueuePending (Display d) (EventQueue evq) =
+  fmap fromIntegral . liftIO $ throwErrnoIfMinus1 "displayDispatchQueuePending" $ wl_display_dispatch_queue_pending d evq
+
+-- | Dispatch default queue events without reading from the display fd.
+--
+-- It does not attempt to read the display fd and simply returns zero if the main
+-- queue is empty, i.e., it doesn't block.
+displayDispatchPending :: MonadIO m => Display -> m Int
+{-# INLINE displayDispatchPending #-}
+displayDispatchPending (Display d) =
+  fmap fromIntegral . liftIO $ throwErrnoIfMinus1 "displayDispatchPending" $ wl_display_dispatch_pending d
+
+-- | Cancel read intention on display's fd
+--
+-- After a thread successfully called wl_display_prepare_read() it must
+-- either call wl_display_read_events() or wl_display_cancel_read().
+-- If the threads do not follow this rule it will lead to deadlock.
+displayCancelRead :: MonadIO m => Display -> m ()
+{-# INLINE displayCancelRead #-}
+displayCancelRead (Display d) = liftIO $ wl_display_cancel_read d
+
+-- | Retrieve the last error that occurred on a display.
+--
+-- Return the last error that occurred on the display. This may be an error sent
+-- by the server or caused by the local client.
+--
+-- _Errors are fatal._ If this function returns non-zero the display can no longer be used.
+displayGetError :: MonadIO m => Display -> m (Maybe Int)
+{-# INLINE displayGetError #-}
+displayGetError (Display d) = liftIO $ do
+  ret <- wl_display_get_error d
+  return $! case ret of
+              0 -> Nothing
+              _ -> Just (fromIntegral ret)
+
+-- | Retrieves the information about a protocol error
+--
+-- @
+-- int err = wl_display_get_error(display);
+-- if (err == EPROTO) {
+--        code = wl_display_get_protocol_error(display, &interface, &id);
+--        handle_error(code, interface, id);
+-- }
+-- @
+--
+-- Returns the error code as defined in the interface specification.
+displayGetProtocolError :: MonadIO m => Display -> m WaylandProtocolError
+{-# INLINE displayGetProtocolError #-}
+displayGetProtocolError (Display d) = liftIO $
+  alloca $ \ifacePtr ->
+  alloca $ \objectIdPtr -> do
+    code <- wl_display_get_protocol_error d ifacePtr objectIdPtr
+    iface <- peek ifacePtr >>= \(ConstPtr x) -> if x == nullPtr then return "" else peek x >>= peekCString . unConstPtr . (.name)
+    objectId <- peek objectIdPtr
+    return $ WaylandProtocolError code objectId iface
+
+eventQueueGetName :: MonadIO m => EventQueue -> m (Maybe String)
+{-# INLINE eventQueueGetName #-}
+eventQueueGetName (EventQueue evq) = liftIO $ do
+  ConstPtr p <- wl_event_queue_get_name (ConstPtr evq)
+  if p == nullPtr then return Nothing
+                  else Just <$> peekCString p
+
+-- |  Create a new event queue for this display.
+displayCreateQueue :: MonadIO m => Display -> m EventQueue
+{-# INLINE displayCreateQueue #-}
+displayCreateQueue (Display d) = fmap EventQueue . liftIO $
+  throwErrnoIfNull "displayCreateQueue" $ wl_display_create_queue d
+
+-- |  Create a new event queue for this display.
+displayCreateQueueWithName :: MonadIO m => Display -> String -> m EventQueue
+{-# INLINE displayCreateQueueWithName #-}
+displayCreateQueueWithName (Display d) name = fmap EventQueue . liftIO $ withCString name $ \c_name ->
+  throwErrnoIfNull "displayCreateQueueWithName" $ wl_display_create_queue_with_name d (ConstPtr c_name)
+
+-- | Binds a new, client-created object to the server using the specified name as the identifier.
+registryBind :: (MonadIO m) => Registry -> ObjectName -> PtrConst Wl_interface -> Version -> m (Ptr a)
+{-# INLINE registryBind #-}
+registryBind reg name iface ver = fmap castPtr . liftIO $ wl_registry_bind reg.unwrap name iface ver
+
+registryBindObject :: forall a m. (HasInterface a, InterfaceType a ~ Wl_interface, MonadIO m)
+                   => Registry -> (String -> ObjectName) -> m a
+{-# INLINE registryBindObject #-}
+registryBindObject reg getName = objectBindWrap <$> registryBind reg (getName $ objectInterfaceName p) (objectInterface p) (objectInterfaceVersion p)
+  where
+    p :: RIP.Proxy a
+    p = RIP.Proxy

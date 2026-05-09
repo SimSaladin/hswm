@@ -1,24 +1,27 @@
 module HSWM.Operations where
 
-import Control.Monad.State qualified as State
-import Data.List qualified as L
-import Data.Map qualified as M
-import Data.Ratio ((%))
-import Data.Set qualified as S
-import Foreign (IntPtr, deRefStablePtr, intPtrToPtr, ptrToIntPtr, (.&.))
-import HSWM.Core
-import HSWM.StackSet qualified as W
-import Bindings.River qualified as R
-import Bindings.RiverSafe qualified as R
-import System.Environment
-import System.IO (hGetContents, hPrint, print, writeFile)
-import System.Posix qualified as Posix
-import System.Posix.Process (executeFile)
-import qualified Bindings.Wayland.Client as WL
+import           HSWM.Core
+import qualified HSWM.StackSet as W
+
+import qualified Wayland as WL
+
+import qualified Bindings.River as R
+import qualified Bindings.RiverSafe as R
 import qualified Bindings.Wayland.WlrOutputPowerManagementUnstableV1 as Wlr
-import Foreign.C.Types
-import Data.Time.Clock.System
-import Text.Printf
+
+import qualified Control.Monad.State as State
+import qualified Data.List as L
+import qualified Data.Map as M
+import           Data.Ratio ((%))
+import qualified Data.Set as S
+import           Data.Time.Clock.System
+import           Foreign (IntPtr, deRefStablePtr, intPtrToPtr, ptrToIntPtr, (.&.))
+import           Foreign.C.Types
+import           System.Environment
+import           System.IO (hGetContents, hPrint, print, writeFile)
+import qualified System.Posix as Posix
+import           System.Posix.Process (executeFile)
+import           Text.Printf
 
 -- * Misc. pure operations
 
@@ -86,9 +89,7 @@ manageWindowPlace :: RiverWindow -> CInt -> HS ()
 manageWindowPlace rw p = modifyWindow rw $ \w -> w {p_render_place = fi p}
 
 manageWindowBorder :: RiverWindow -> RiverColor -> HS ()
-manageWindowBorder rw rc = do
-  --logDebug $ "W: set border" :# [ "window" .= show rw, "color" .= show rc ]
-  modifyWindow rw $ \w -> w {p_render_border = Just rc}
+manageWindowBorder rw rc = modifyWindow rw $ \w -> w {p_render_border = Just rc}
 
 manageWindowBorderWidth :: RiverWindow -> Maybe Int32 -> HS ()
 manageWindowBorderWidth rw bw = modifyWindow rw $ \w -> w {wBorderWidth = bw}
@@ -112,15 +113,8 @@ sendMessage a = do
   ml' <- handleMessage (W.layout w) (SomeMessage a) `catchHS` return Nothing
   whenJust ml' $ \l' -> do
     modifyWindowSet $ \ws ->
-      ws
-        { W.current =
-            (W.current ws)
-              { W.workspace =
-                  (W.workspace $ W.current ws)
-                    { W.layout = l'
-                    }
-              }
-        }
+      ws { W.current = (W.current ws)
+              { W.workspace = (W.workspace $ W.current ws) { W.layout = l' } } }
     liftH manageDirty
   return ()
 
@@ -238,16 +232,15 @@ hide rw = withWindow rw $ \_ -> R.riverWindowHide rw
 setWindowBorder :: RiverWindow -> Int32 -> RiverColor -> HS ()
 setWindowBorder w wb_width RiverColor {red = wb_r, green = wb_g, blue = wb_b, alpha = wb_a} = withWindow w $ \_ -> do
   wb_edges <- asks (fi . borderEdges . config)
-  let borders = WindowBorders {..}
+  let borders = R.WindowBorders {..}
   io $ riverWindowSetBorders w borders
 
-riverWindowSetBorders :: RiverWindow -> WindowBorders -> IO ()
-riverWindowSetBorders w WindowBorders {..} =
-  R.riverWindowSetBorders w (WL.toCEnum $ fi wb_edges) wb_width wb_r wb_g wb_b wb_a
+riverWindowSetBorders :: RiverWindow -> R.WindowBorders -> IO ()
+riverWindowSetBorders w R.WindowBorders {..} = R.riverWindowSetBorders w (WL.toCEnum $ fi wb_edges) wb_width wb_r wb_g wb_b wb_a
 
 setWindowPosition :: Window -> Int32 -> Int32 -> HS ()
 setWindowPosition w x y = do
-  setNodePosition w.node x y
+  R.riverNodeSetPosition w.node x y
   modifyWindow w.river_window $ \s -> s {x, y}
 
 --------------------------------------------------------------

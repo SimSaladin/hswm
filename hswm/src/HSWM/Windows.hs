@@ -13,23 +13,25 @@
 -- Longer description of this module.
 module HSWM.Windows where
 
-import Control.Monad.State qualified as State
-import Data.List qualified as L
-import Data.Map qualified as M
-import Foreign
-import HSWM.Core
-import HSWM.Operations
-import HSWM.Seats qualified as Seats
-import HSWM.StackSet qualified as W
-import Bindings.River qualified as R
-import Bindings.RiverSafe qualified as R
-import Bindings.Wayland.Client qualified as WL
+import           HSWM.Core
+import           HSWM.Operations
+import qualified HSWM.Seats as Seats
+import qualified HSWM.StackSet as W
+
+import qualified Wayland as WL
+
+import qualified Bindings.River as R
+import qualified Bindings.RiverSafe as R
+
+import qualified Control.Monad.State as State
+import qualified Data.List as L
+import qualified Data.Map as M
+import           Foreign
 
 added :: RiverWindow -> H ()
 added w = do
   -- Setup WL window listener
-  winL <- getObject
-  io $ R.listenerAdd w winL nullPtr
+  R.listenerAdd_ w =<< getObject
   node <- R.riverWindowGetNode w
   let win = def {new = True, river_window = w, node = node, max_height = maxBound, max_width = maxBound}
   -- Insert it into stack and state
@@ -48,9 +50,7 @@ applyManageActions w0 xs0 = doAll w0 xs0 >>= \w' -> return $ Just w' {p_manage_a
     doIt w a = do
       let rw = w.river_window
       case a of
-        WRequestClose -> do
-          R.riverWindowClose rw
-          pure w
+        WRequestClose -> R.riverWindowClose rw $> w
         WFullscreenOnScreen ro -> do
           R.riverWindowFullscreen rw ro
           R.riverWindowInformFullscreen rw
@@ -84,7 +84,7 @@ manage_ :: HS ()
 manage_ = do
   -- Do initial properties for new windows
   -- Get rid of any closed windows
-  mapWindows $ \w -> do
+  mapWindows $ \w ->
     if
       | w.closed -> doRemoveWindow w
       | w.new -> do
@@ -169,7 +169,7 @@ warpPointerToScreen :: ScreenDetail -> ScreenId -> HS ()
 warpPointerToScreen SD {..} sid = do
   mapSeats $ \s -> do
     R.riverSeatPointerWarp s.river_seat px py
-    modifySeat s.river_seat $ \s' -> s' {focused = invalidWindow}
+    modifySeat s.river_seat $ \s' -> s' {focused = R.invalidWindow}
   withScreenOutput sid $ \o -> io $ R.riverLayerShellOutputSetDefault o.river_layerShellOutput
   where
     px = fi $ x + width `div` 2
@@ -203,8 +203,8 @@ render = runInHS $ do
 setInitialManageProperties :: Window -> HS ()
 setInitialManageProperties Window {river_window = rw} = do
   R.riverWindowUseSsd rw
-  R.riverWindowSetCapabilities rw (WL.toCEnum . fi $ foldl' (.|.) 0 $ map (.unwrap) [Maximize, Fullscreen])
-  R.riverWindowSetTiled rw (WL.toCEnum . fi $ foldl' (.|.) 0 $ map (.unwrap) [EdgeTop, EdgeBottom, EdgeLeft, EdgeRight])
+  R.riverWindowSetCapabilities rw (WL.toCEnum . fi $ foldl' (.|.) 0 $ map (.unwrap) [R.Maximize, R.Fullscreen])
+  R.riverWindowSetTiled rw (WL.toCEnum . fi $ foldl' (.|.) 0 $ map (.unwrap) [R.EdgeTop, R.EdgeBottom, R.EdgeLeft, R.EdgeRight])
   nbc <- asks (normalBorder . config)
   modifyWindow rw $ \s -> s {new = False, p_render_border = Just nbc}
 
@@ -218,14 +218,14 @@ doRemoveWindow w@Window {} = do
     xs' <- forM xs $ \seat' -> do
       let seat =
             seat'
-              { focused = if focused seat' == w.river_window then invalidWindow else focused seat',
-                hovered = if hovered seat' == w.river_window then invalidWindow else hovered seat',
-                interacted = if interacted seat' == w.river_window then invalidWindow else interacted seat'
+              { focused = if focused seat' == w.river_window then R.invalidWindow else focused seat',
+                hovered = if hovered seat' == w.river_window then R.invalidWindow else hovered seat',
+                interacted = if interacted seat' == w.river_window then R.invalidWindow else interacted seat'
               }
       if op_window seat == w.river_window
         then do
           liftIO $ R.riverSeatOpEnd seat.river_seat
-          return $ seat {op_window = invalidWindow, op = SEAT_OP_NONE}
+          return $ seat {op_window = R.invalidWindow, op = SEAT_OP_NONE}
         else return seat
     modify $ \s -> s {_seats = xs'}
   -- destroy WL references
