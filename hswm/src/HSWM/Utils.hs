@@ -15,7 +15,6 @@ module HSWM.Utils
 
 import           HSWM.Util.Process
 import           HSWM.XKB (ModMask)
-import           River.WMP
 
 import           Bindings.River (RiverColor(..))
 import qualified Bindings.RiverSafe as R

@@ -13,8 +13,30 @@
 -- Portability : unportable
 --
 module Wayland
-  ( module Wayland.Types
+  -- * Types
+  ( IsWlObject(..)
+  , HasDestructor(..)
+  , HasInterface(..)
+  , HasListener(..)
+  , IsUserData(..)
+  , InterfaceType
+  , Version
+  , ObjectName
+
+  -- * Wayland.Util
   , module Bindings.Wayland.Util
+
+  -- * Globals
+  , initRegistryState
+  , RegistrySettings(..)
+  , RegistryState
+  , bindGlobal
+  , GlobalException
+
+  -- * Listeners
+  , WlClientException(..)
+  , listenerAdd
+  , listenerAdd_
 
   -- * Display
   , Display
@@ -79,6 +101,7 @@ module Wayland
   -- ** CreateSurface
   , Client.compositorCreateSurface
   -- ** CreateRegion
+  , withNewRegion
   , Client.compositorCreateRegion
 
   -- * ShmPool
@@ -397,12 +420,6 @@ module Wayland
   -- ** DistroyRegistry
   , fixesDestroyRegistry
 
-  -- * Globals
-  , RegistryState
-  , GlobalException
-  , initRegistryState
-  , bindGlobal
-
   ) where
 
 import Wayland.Types
@@ -412,14 +429,43 @@ import           Bindings.Wayland.Client hiding (shmCreatePool)
 import qualified Bindings.Wayland.Client as Client
 import qualified Bindings.Wayland.Client.Generated as Client.G
 
-import Data.Bits
-import Control.Monad.IO.Class
-import System.Posix (Fd)
-import Data.IORef
+import qualified HsBindgen.Runtime.Internal.Prelude as RIP
+import           UnliftIO
+
+import           Control.Monad
+import           Data.Bits
+import           Data.Default
 import qualified Data.List as L
-import Data.Proxy
-import Control.Exception
-import Data.Maybe
+import           Data.Maybe
+import           Data.Proxy
+import           System.Posix (Fd)
+import qualified Data.Map as M
+import           Foreign.C.ConstPtr
+
+
+newtype WlClientException = WlListenerAddFailed String
+  deriving (Eq, Show)
+
+instance Exception WlClientException
+
+-- | Add listener with the specified user data.
+listenerAdd :: (MonadIO m, Show object, HasListener object, IsUserData userdata)
+            => object -- ^ The target object
+            -> PtrConst (ObjectListener object) -- ^ Listener instance (function pointers)
+            -> userdata -- ^ Userdata
+            -> m ()
+{-# INLINE listenerAdd #-}
+listenerAdd obj l ud = liftIO $ do
+  res <- objectListenerAdd obj l (toUserData ud)
+  when (res < 0) $ throwIO $ WlListenerAddFailed $ show obj
+
+-- | Add listener with null user data.
+listenerAdd_ :: (MonadIO m, Show object, HasListener object)
+            => object -- ^ The target object
+            -> PtrConst (ObjectListener object) -- ^ Listener instance (function pointers)
+            -> m ()
+{-# INLINE listenerAdd_ #-}
+listenerAdd_ obj l = listenerAdd obj l ()
 
 pattern RegistryGlobal' :: String -> ObjectName -> Version -> RegistryEvent
 pattern RegistryGlobal' interface name version <- RegistryGlobal{name, interface, version}
@@ -744,44 +790,92 @@ shmCreatePool shm fd size = Client.shmCreatePool shm (fromIntegral fd) (fromInte
 
 -- | Tracks the global objects that are available through wl_registry.
 data RegistryState = RegistryState
-  { registry :: Registry
-  , globals  :: IORef [Global]
+  { registryPtr      :: !Registry
+  , registryListener :: !(ConstPtr (ObjectListener Registry))
+  , registrySettings :: !RegistrySettings
+  , globals          :: !(IORef [Global])
+  , bindings         :: !(IORef (M.Map ObjectName SomeObject))
   }
+
+data SomeObject where
+  SomeObject :: (HasInterface object) => object -> SomeObject
 
 -- | Global description
 data Global = Global
-  { name      :: !ObjectName -- ^ Name of the global.
+  { name      :: {-# UNPACK #-} !ObjectName -- ^ Name of the global.
+  , version   :: {-# UNPACK #-} !Version -- ^ Advertised version of the global.
   , interface :: !String -- ^ Interface of the global.
-  , version   :: !Version -- ^ Advertised version of the global.
   } deriving (Eq, Ord, Show, Read)
 
-data GlobalException = NoSuchGlobal String Version
+data GlobalException = NoSuchGlobal String Version (Maybe ObjectName)
   deriving (Show, Eq)
 
 instance Exception GlobalException
 
-initRegistryState :: Display -> IO RegistryState
-initRegistryState disp = do
-  reg <- displayGetRegistry disp
-  st <- RegistryState reg <$> newIORef mempty
-  listener <- createListener $ \case
-    RegistryGlobal{..} -> modifyIORef st.globals $ \xs -> Global name interface version : xs
-    RegistryGlobalRemove{..} -> modifyIORef st.globals $ filter (\x -> x.name /= name)
-  listenerAdd_ reg listener
+data RegistrySettings = RegistrySettings
+ { regOnEvent :: RegistryEvent -> IO ()
+ , regOnBind :: forall a. HasInterface a => Proxy a -> ObjectName -> Version -> IO ()
+ }
+instance Default RegistrySettings where
+  def = RegistrySettings
+    { regOnEvent = \_ -> pure ()
+    , regOnBind = \_ _ _ -> pure ()
+    }
+
+initRegistryState :: MonadIO m => RegistrySettings -> Display -> m RegistryState
+initRegistryState registrySettings disp = do
+  registryPtr <- displayGetRegistry disp
+  globals <- liftIO (newIORef mempty)
+  bindings <- liftIO (newIORef mempty)
+  registryListener <- createListener $ \ev -> do
+    case ev of
+      RegistryGlobal{..} -> modifyIORef globals $ \xs -> Global name version interface : xs
+      RegistryGlobalRemove{..} -> do
+        modifyIORef globals $ filter (\x -> x.name /= name)
+        bs <- readIORef bindings
+        case M.lookup name bs of
+          Just SomeObject{} -> do
+            -- objectDestroy o
+            modifyIORef bindings $ M.delete name
+          Nothing -> return ()
+    regOnEvent registrySettings ev
+  listenerAdd_ registryPtr registryListener
+  let st = RegistryState{..}
   return st
 
-bindGlobal :: forall a m. (HasInterface a, InterfaceType a ~ Wl_interface, MonadIO m)
-           => RegistryState
-           -> Maybe ObjectName
-           -> Maybe Version
-           -> m a
+bindGlobal :: forall a m.
+  ( MonadIO m
+  , HasInterface a
+  , InterfaceType a ~ Wl_interface
+  ) => RegistryState
+    -> Maybe ObjectName -- ^ Bind to specific object (name)
+    -> Maybe Version -- ^ Request a specific version. The final version is smallest of this and the reported version
+    -> m a
 bindGlobal st reqName reqVersion = liftIO $ L.find check <$> readIORef st.globals >>= \case
-  Just x -> registryBindObject st.registry (const x.name)
-  Nothing -> throwIO $ NoSuchGlobal (objectInterfaceName @a Proxy) reqVersion'
+  Just x -> registryBindObject st x.name (min reqVersion' x.version)
+  Nothing -> throwIO $ NoSuchGlobal (objectInterfaceName @a Proxy) reqVersion' reqName
   where
-    check x = maybe True (== x.name) reqName
-      && x.interface == objectInterfaceName @a Proxy
-      && reqVersion' <= x.version
+    check x = maybe True (== x.name) reqName && x.interface == objectInterfaceName @a Proxy
     reqVersion' = fromMaybe (objectInterfaceVersion @a Proxy) reqVersion
 
+registryBindObject :: forall a m.
+  ( MonadIO m
+  , HasInterface a
+  , InterfaceType a ~ Wl_interface
+  ) => RegistryState -> ObjectName -> Version -> m a
+{-# INLINE registryBindObject #-}
+registryBindObject st name maxVersion = do
+  let ver = min maxVersion $ objectInterfaceVersion p
+  o <- objectBindWrap <$> registryBind st.registryPtr name (objectInterface p) ver
+  liftIO $ modifyIORef st.bindings $ M.insert name $ SomeObject o
+  liftIO $ regOnBind st.registrySettings p name ver
+  return o
+  where
+    p :: RIP.Proxy a
+    p = RIP.Proxy
 
+-- * Compositor
+
+-- | Create a new region and destroy it automatically after the callback finishes.
+withNewRegion :: MonadUnliftIO m => Compositor -> (Region -> m a) -> m a
+withNewRegion comp = bracket (compositorCreateRegion comp) (liftIO . objectDestroy)

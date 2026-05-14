@@ -15,9 +15,11 @@ module HSWM.Core
     module HSWM.Types.TypeMap,
     module HSWM.Util.Types,
     module HSWM.ManageHook,
-    module River.WMP,
-    ModMask,
-    KeySym,
+    module HSWM.XKB,
+    WM.RiverWindow,
+    WM.RiverOutput,
+    WM.RiverSeat,
+    R.RiverColor(..),
   )
 where
 
@@ -27,11 +29,19 @@ import HSWM.Types.Events
 import HSWM.Types.TypeMap
 import HSWM.Types.WM
 import HSWM.Util.Types
-import HSWM.XKB
-import River.WMP
+import HSWM.XKB hiding (LogLevel(..))
+
+import qualified River.WindowManagement as WM
+import qualified Bindings.River as R
 
 import Control.Monad.State
 import GHC.Stack
+
+data HSWMException = HSWMStateLocked String
+                   | HSWMTimeout String
+  deriving (Show)
+
+instance Exception HSWMException
 
 runH :: HConf -> H a -> IO a
 runH c (H a) = runReaderT a c
@@ -39,15 +49,15 @@ runH c (H a) = runReaderT a c
 runHS :: HConf -> HState -> HS a -> IO (a, HState)
 runHS c st (HS a) = runStateT (runReaderT a c) st
 
-runInHS :: HasCallStack => (MonadIO m, MonadReader HConf m) => HS a -> m a
+runInHS :: HasCallStack => (MonadIO m, MonadThrow m, MonadReader HConf m) => HS a -> m a
 runInHS a = do
   conf <- ask
-  when conf._stateLocked $ throwString $ "runInHS: state locked (attempted to nest state lock?)\n" ++ prettyCallStack callStack
+  when conf._stateLocked $ throwM $ HSWMStateLocked $ "attempted to nest state lock?\n" ++ prettyCallStack callStack
   io $ bracketOnError (atomically $ takeTMVar conf._state) (atomically . tryPutTMVar conf._state) $ \st -> do
     res <- timeout 2_000_000 $ runHS conf {_stateLocked = True} st a
     case res of
       Just (r, st') -> atomically (putTMVar conf._state st') >> return r
-      Nothing -> throwString $ "runInHS: timed out (2s): " ++ prettyCallStack callStack
+      Nothing -> throwM $ HSWMTimeout $ "runInHS: timed out (2s): " ++ prettyCallStack callStack
 
 liftH :: (MonadReader HConf m, MonadIO m) => H a -> m a
 liftH a = do
@@ -71,7 +81,7 @@ catchHS job errcase = do
   (a, s') <- liftIO $ runHS c s job
         `catch` \e -> case fromException e of
           Just (_ :: ExitCode) -> throwM e
-          _ -> do runH c $ logError $ "excption in HS action" :# [ "exception" .= show e, "callstack" .= prettyCallStack callStack ]
+          _ -> do runH c $ logError $ "exception in HS action" :# [ "exception" .= show e, "callstack" .= prettyCallStack callStack ]
                   runHS c s errcase
   put s'
   return a
@@ -99,14 +109,14 @@ userCodeDefS defValue a = fromMaybe defValue <$> userCodeS a
 -- * Manage/Render Event queues
 
 class HasEventQueues env where
+  mainEventQL     :: Lens' env (TQueue MainEvent)
   pendingManageQL :: Lens' env (TQueue (HS ()))
   pendingRenderQL :: Lens' env (TQueue (HS ()))
-  mainEventQL :: Lens' env (TQueue MainEvent)
 
 instance HasEventQueues HConf where
+  mainEventQL = lens eventQueue $ \s a -> s { eventQueue = a}
   pendingManageQL = lens pendingManageQ $ \s a -> s {pendingManageQ = a}
   pendingRenderQL = lens pendingRenderQ $ \s a -> s {pendingRenderQ = a}
-  mainEventQL = lens eventQueue $ \s a -> s { eventQueue = a}
 
 getEventQueueFuncs ::
   (MonadReader env m, HasEventQueues env, MonadIO inner) =>
@@ -115,3 +125,7 @@ getEventQueueFuncs ::
 getEventQueueFuncs = (wrap *** wrap) <$> asks ((,) <$> view pendingManageQL <*> view pendingRenderQL)
   where
     wrap q = atomically . writeTQueue q . void
+
+writeManageQ x = do
+    q <- asks (view pendingManageQL)
+    atomically $ writeTQueue q x

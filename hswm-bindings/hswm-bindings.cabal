@@ -299,7 +299,6 @@ library
           Bindings.River.XkbConfigV1.Generated.Global
           Bindings.River.XkbConfigV1.Generated.Safe
           Bindings.River.XkbConfigV1.Generated.Unsafe
-          Bindings.RiverSafe
           Bindings.Wayland.Client
           Bindings.Wayland.Client.Generated
           Bindings.Wayland.Client.Generated.FunPtr
@@ -378,7 +377,13 @@ library
           Bindings.Wayland.XdgShell.Generated.Safe
           Bindings.Wayland.XdgShell.Generated.Unsafe
           Pixman
+          River
+          River.InputManagement
+          River.LayerShell
+          River.LibinputConfig
           River.WindowManagement
+          River.XkbBindings
+          River.XkbConfig
           Wayland
           Wayland.Internal.TH
           Wayland.Types
@@ -389,6 +394,7 @@ library
     build-depends:
           base >=4.21 && <4.23
         , c-expr-runtime >=0.1.0 && <0.2
+        , containers
         , data-default >=0.8.0 && <0.9
         , deepseq >=1.5.1 && <1.6
         , hashable >=1.5.1 && <1.6
@@ -396,14 +402,17 @@ library
         , template-haskell >=2.23 && <2.25
         , text >=2.1.2 && <2.2
         , unix
+        , unliftio
         , xml-conduit >=1.10.1 && <1.11
     hs-source-dirs:
           src
     default-extensions:
           DuplicateRecordFields
           OverloadedStrings
+          OverloadedLabels
           TemplateHaskell
           TypeFamilies
+          PatternSynonyms
     ghc-options: -Wall -Wunused-packages -fPIC
     include-dirs:
           include

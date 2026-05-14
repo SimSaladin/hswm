@@ -15,7 +15,6 @@ module HSWM.Windows where
 
 import           HSWM.Core
 import           HSWM.Operations
-import qualified HSWM.Seats as Seats
 import qualified HSWM.StackSet as W
 
 import qualified Wayland as WL
@@ -31,7 +30,7 @@ import           Foreign
 added :: RiverWindow -> H ()
 added w = do
   -- Setup WL window listener
-  R.listenerAdd_ w =<< getObject
+  withObject $ WL.listenerAdd_ w
   node <- R.riverWindowGetNode w
   let win = def {new = True, river_window = w, node = node, max_height = maxBound, max_width = maxBound}
   -- Insert it into stack and state
@@ -148,20 +147,21 @@ manage_ = do
   -- given a position by a layout now.
   mapM_ manageHide (L.nub (oldvisible ++ newwindows) L.\\ visible)
 
-  sm <- liftH Seats.getSMgr
-
   whenJust (W.peek ws) $ \w -> do
     manageWindowPlace w R.rIVER_NODE_V1_PLACE_TOP
-    if sm.seat_lshell_focus == Seats.FocusNone
-      then manageWindowBorder w =<< asks (focusedBorder . config)
-      else manageWindowBorder w =<< asks (normalBorder . config)
+    --sm <- liftH $ getObjectDef @Seats.SeatManager
+    --if sm.seat_lshell_focus == Seats.FocusNone
+    --  then manageWindowBorder w =<< asks (focusedBorder . config)
+    --  else manageWindowBorder w =<< asks (normalBorder . config)
+    manageWindowBorder w =<< asks (focusedBorder . config)
 
   mapM_ manageReveal visible
   setTopFocus
 
   if isNothing (W.peek ws) && W.tag (W.workspace $ W.current ws) /= W.tag (W.workspace $ W.current old)
     then warpPointerToScreen (W.screenDetail $ W.current ws) (W.screen $ W.current ws)
-    else withScreenOutput (W.screen $ W.current ws) $ \o -> io $ R.riverLayerShellOutputSetDefault o.river_layerShellOutput
+    else withScreenOutput (W.screen $ W.current ws) $ \o ->
+      R.riverLayerShellOutputSetDefault o.layerShellOutput
 
   gets windowset >>= \ws' -> modify (\s -> s {windowsetOld = ws'})
 
@@ -170,7 +170,7 @@ warpPointerToScreen SD {..} sid = do
   mapSeats $ \s -> do
     R.riverSeatPointerWarp s.river_seat px py
     modifySeat s.river_seat $ \s' -> s' {focused = R.invalidWindow}
-  withScreenOutput sid $ \o -> io $ R.riverLayerShellOutputSetDefault o.river_layerShellOutput
+  withScreenOutput sid $ \o -> io $ R.riverLayerShellOutputSetDefault o.layerShellOutput
   where
     px = fi $ x + width `div` 2
     py = fi $ y + height `div` 2
@@ -247,6 +247,7 @@ handleEvent e = case e of
   -- The window has been closed by the server, perhaps due to an xdg_toplevel.close request or similar.
   -- The server will send no further events on this object and ignore any request other than river_window_v1.destroy made after this event is sent. The client should destroy this object with the river_window_v1.destroy request to free up resources.
   R.RiverWindowClosed _ w -> runInHS $ modifyWindow w $ \s -> s {closed = True}
+
   -- properties
   R.RiverWindowParent _ window we_parent -> runInHS $ modifyWindow window $ \s -> s {parent = Just we_parent}
   R.RiverWindowAppId _ window we_app_id -> runInHS $ modifyWindow window $ \s -> s {appId = we_app_id}

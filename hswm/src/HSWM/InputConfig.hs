@@ -9,10 +9,20 @@
 --
 -- Handling of various user input devices, e.g. pointers, keyboards, touch control
 --
-module HSWM.InputConfig where
+module HSWM.InputConfig
+  ( InputConfigState(..)
+  , setKeyboardKeymaps
+  , setKeyboardKeymap
+  -- * Event handling
+  , handleInputManagerEvent
+  , handleInputDeviceEvent
+  , handleLibinputEvent
+  , handleLibinputDeviceEvent
+  , handleXkbConfigEvent
+  , handleXkbKeyboardEvent
+  ) where
 
 import           HSWM.Core
-import           HSWM.XKB
 
 import qualified Wayland as WL
 
@@ -25,14 +35,30 @@ import qualified Data.Map as M
 import           System.Posix
 
 data InputConfigState = InputConfigState
-  { inputDevices :: M.Map R.RiverInputDevice InputDeviceState
+  { xkbKeyboards    :: M.Map R.RiverXkbKeyboard    XkbKeyboardState
+  , xkbKeymaps      :: [KeymapState] -- ^ Created xkbcommon keymaps
+  , inputDevices    :: M.Map R.RiverInputDevice    InputDeviceState
   , libinputDevices :: M.Map R.RiverLibinputDevice LibinputDeviceState
-  , xkbKeyboards :: M.Map R.RiverXkbKeyboard XkbKeyboardState
-  , xkbKeymaps :: [KeymapState] -- M.Map String R.RiverXkbKeymap
-  -- ^ Created xkbcommon keymaps
   }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Default)
+
+data XkbKeyboardState = XkbKeyboardState
+  { inputDevice :: !R.RiverInputDevice
+  , layoutIndex :: !Word32
+  , layoutName  :: !String
+  }
+  deriving stock (Eq, Show, Generic)
+  deriving anyclass (Default)
+
+data KeymapState = KeymapState
+  { keymap   :: !R.RiverXkbKeymap
+  , keymapFd :: !Fd
+  , params   :: !(Maybe XkbRuleNames)
+  , failure  :: !(Maybe String)
+  , created  :: !Bool
+  }
+  deriving stock (Eq, Show, Generic)
 
 data InputDeviceState = InputDeviceState
   { deviceType :: Maybe R.River_input_device_v1_type -- ^ keyboard/pointer/touch/tablet
@@ -70,15 +96,18 @@ data LibinputDeviceState = LibinputDeviceState
 -- | (support, default, current)
 data SDC support a = SDC
   { support :: support
-  , defval, curval :: a }
-  deriving stock (Eq, Show, Generic)
+  , defval, curval :: a
+  } deriving stock (Eq, Show, Generic)
 
 instance {-# OVERLAPPABLE #-} (CEnum a, CEnum b) => Default (SDC a b) where
   def = SDC (toCEnum 42) (toCEnum 42) (toCEnum 42)
+
 instance {-# OVERLAPPABLE #-} (CEnum a) => Default (SDC Int32 a) where
   def = SDC minBound (toCEnum 42) (toCEnum 42)
+
 instance Default (SDC Int32 WL.Array) where
   def = SDC minBound def def
+
 instance Default (SDC Int32 Word32)   where
   def = SDC minBound maxBound maxBound
 
@@ -88,37 +117,20 @@ data DC a = DC { defval, curval :: a }
 
 instance {-# OVERLAPPABLE #-} (CEnum a) => Default (DC a) where
   def = DC (toCEnum 42) (toCEnum 42)
+
 instance Default (DC WL.Array) where
   def = DC def def
+
 instance Default (DC Word32) where
   def = DC maxBound maxBound
 
-data XkbKeyboardState = XkbKeyboardState
-  { inputDevice :: !R.RiverInputDevice
-  , layoutIndex :: !Word32
-  , layoutName :: !String
-  }
-  deriving stock (Eq, Show, Generic)
-  deriving anyclass (Default)
-
-data KeymapState = KeymapState
-  { created :: Bool
-  , failure :: Maybe String
-  , keymap :: R.RiverXkbKeymap
-  , keymapFd :: Fd
-  , params :: Maybe XkbRuleNames
-  }
-  deriving stock (Eq, Show, Generic)
-
-keymapFromString :: String -> XkbRuleNames
-keymapFromString name = def { layouts = [fromString name] }
-
 setKeyboardKeymaps :: (XkbKeyboardState -> Bool) -> XkbRuleNames -> H ()
-setKeyboardKeymaps select params =
-  withObject @InputConfigState $ \st ->
-    forM_ (M.toList st.xkbKeyboards) $ \(kbd, ks) ->
-      when (select ks) $ setKeyboardKeymap kbd params
+setKeyboardKeymaps select params = do
+  st <- getObjectDef @InputConfigState
+  forM_ (M.toList st.xkbKeyboards) $ \(kbd, ks) ->
+    when (select ks) $ setKeyboardKeymap kbd params
 
+-- | Set the keyboard's keymap.
 setKeyboardKeymap :: R.RiverXkbKeyboard -> XkbRuleNames -> H ()
 setKeyboardKeymap kbd params = do
   kmSt <- createKeyboardKeymap params
@@ -130,6 +142,7 @@ setKeyboardKeymap kbd params = do
       Just kmSt -> R.riverXkbKeyboardSetKeymap kbd kmSt.keymap
       Nothing -> logError $ "Cannot set keymap: not created after 2s" :# [ "keyboard" .= show kbd, "params" .= show params ]
 
+-- | Given keymap parameters return a matching keymap. It is created if it does not exist yet.
 createKeyboardKeymap :: XkbRuleNames -> H KeymapState
 createKeyboardKeymap params = lookupKeymaps params >>= \case
   xs | Just valid <- L.find (.created) xs -> return valid
@@ -137,27 +150,28 @@ createKeyboardKeymap params = lookupKeymaps params >>= \case
      | otherwise -> create
     where
     create = do
-      xkbConfig <- getObject
       ctx <- io $ createXkbContext def
       kmap <- io $ createKeymapFromNames ctx params keymapFormatTextV1
       fd <- io $ keymapAsStringFd kmap keymapFormatTextV1
-      keymap <- R.riverXkbConfigCreateKeymap xkbConfig (fi fd) R.RIVER_XKB_CONFIG_V1_KEYMAP_FORMAT_TEXT_V1
+      keymap <- withObject $ \xkbConfig ->
+        R.riverXkbConfigCreateKeymap xkbConfig (fi fd) R.RIVER_XKB_CONFIG_V1_KEYMAP_FORMAT_TEXT_V1
       let kmState = KeymapState { created = False, failure = Nothing, keymap, keymapFd = fd, params = Just params }
       modifyObjectDef $ \st -> st { xkbKeymaps = kmState : st.xkbKeymaps }
-      runInIO <- askRunInIO
-      l <- getOrCreateObjectIO $ R.mkRiverXkbKeymapListener $ runInIO . handleXkbKeymapEvent
-      R.listenerAdd_ keymap l
+      l <- getOrCreateObject $ do
+        runInIO <- askRunInIO
+        R.mkRiverXkbKeymapListener $ runInIO . handleXkbKeymapEvent
+      WL.listenerAdd_ keymap l
       return kmState
 
 lookupKeymaps :: XkbRuleNames -> H [KeymapState]
 lookupKeymaps params = do
   st <- getObjectDef @InputConfigState
-  return $ L.filter (\ks -> ks.params == Just params) st.xkbKeymaps
+  return $! L.filter (\ks -> ks.params == Just params) st.xkbKeymaps
 
 lookupValidKeymap :: XkbRuleNames -> H (Maybe KeymapState)
 lookupValidKeymap params = do
   st <- getObjectDef @InputConfigState
-  return $ L.find (\ks -> ks.created && ks.params == Just params) st.xkbKeymaps
+  return $! L.find (\ks -> ks.created && ks.params == Just params) st.xkbKeymaps
 
 -- * Event handlers
 
@@ -180,13 +194,13 @@ handleInputManagerEvent (R.RiverInputManagerFinished _ rim) = do
 handleInputManagerEvent (R.RiverInputManagerInputDevice _ _ dev) = do
   modifyObjectDef $ \st -> st { inputDevices = M.insert dev def st.inputDevices }
   l <- getObject
-  R.listenerAdd_ dev l
+  WL.listenerAdd_ dev l
 
 handleInputDeviceEvent :: (MonadStateGlobal HConf m) => R.RiverInputDeviceEvent -> m ()
 handleInputDeviceEvent (R.RiverInputDeviceType' _ dev deviceType) = do
   modifyObjectDef $ \st -> st { inputDevices = M.adjust (\ds -> ds { deviceType = Just deviceType }) dev st.inputDevices }
+  -- Set repeat rate & delay for keyboard device
   when (deviceType == R.riverInputDeviceTypeKeyboard) $ do
-    -- Set repeat rate & delay for keyboard device
     asks (repeatInfo . config) >>= (`whenJust` uncurry (R.riverInputDeviceSetRepeatInfo dev))
 handleInputDeviceEvent (R.RiverInputDeviceName _ dev name) = do
   modifyObjectDef $ \st -> st { inputDevices = M.adjust (\ds -> ds { deviceName = name }) dev st.inputDevices }
@@ -196,31 +210,31 @@ handleInputDeviceEvent (R.RiverInputDeviceRemoved _ dev) = do
 
 -- river_xkb_config_v1
 handleXkbConfigEvent :: R.RiverXkbConfigEvent -> H ()
-handleXkbConfigEvent (R.RiverXkbConfigFinished _ xc) = do
-  io $ WL.objectDestroy xc
-handleXkbConfigEvent (R.RiverXkbConfigXkbKeyboard _ _ kbd) = do
-  modifyObjectDef $ \st -> st { xkbKeyboards = M.insert kbd def st.xkbKeyboards }
-  l <- getObject
-  R.listenerAdd_ kbd l
-  -- Set the default keymap
-  asks (xkbLayout . config) >>= (`whenJust` setKeyboardKeymap kbd)
+handleXkbConfigEvent = \case
+  R.RiverXkbConfigXkbKeyboard _ _ kbd -> do
+    modifyObjectDef $ \st -> st { xkbKeyboards = M.insert kbd def st.xkbKeyboards }
+    withObject $ WL.listenerAdd_ kbd
+    -- Set the default keymap
+    asks (xkbLayout . config) >>= (`whenJust` setKeyboardKeymap kbd)
+  R.RiverXkbConfigFinished _ xc -> io $ WL.objectDestroy xc
 
 handleXkbKeyboardEvent :: (MonadStateGlobal env m) => R.RiverXkbKeyboardEvent -> m ()
+handleXkbKeyboardEvent (R.RiverXkbKeyboardLayout _ kbd index name) =
+  modifyObjectDef $ \st -> st { xkbKeyboards = M.adjust (\ks -> ks { layoutIndex = index, layoutName = name }) kbd st.xkbKeyboards }
+handleXkbKeyboardEvent (R.RiverXkbKeyboardInputDevice _ kbd dev) =
+  modifyObjectDef $ \st -> st { xkbKeyboards = M.adjust (\ks -> ks { inputDevice = dev } :: XkbKeyboardState) kbd st.xkbKeyboards }
 handleXkbKeyboardEvent (R.RiverXkbKeyboardRemoved _ kbd) = do
   modifyObjectDef $ \st -> st { xkbKeyboards = M.delete kbd st.xkbKeyboards }
   io $ WL.objectDestroy kbd
-handleXkbKeyboardEvent (R.RiverXkbKeyboardLayout _ kbd index name) = modifyObjectDef $ \st -> st { xkbKeyboards = M.adjust (\ks -> ks { layoutIndex = index, layoutName = name }) kbd st.xkbKeyboards }
-handleXkbKeyboardEvent (R.RiverXkbKeyboardInputDevice _ kbd dev) = modifyObjectDef $ \st -> st { xkbKeyboards = M.adjust (\ks -> ks { inputDevice = dev } :: XkbKeyboardState) kbd st.xkbKeyboards }
 handleXkbKeyboardEvent _ = return ()
 
 -- | river_libinput_config_v1
 handleLibinputEvent :: (HasGlobalTMap s, MonadReader s m, MonadUnliftIO m, MonadLogger m) => R.RiverLibinputConfigEvent -> m ()
-handleLibinputEvent (R.RiverLibinputConfigFinished _ lic) = do
-  io $ WL.objectDestroy lic
 handleLibinputEvent (R.RiverLibinputConfigLibinputDevice _ _ dev) = do
   modifyObjectDef $ \st -> st { libinputDevices = M.insert dev def st.libinputDevices }
-  l <- getObject
-  WL.listenerAdd_ dev l
+  withObject $ WL.listenerAdd_ dev
+handleLibinputEvent (R.RiverLibinputConfigFinished _ lic) = do
+  io $ WL.objectDestroy lic
 
 handleLibinputDeviceEvent :: (HasGlobalTMap s, MonadReader s m, MonadUnliftIO m, MonadLogger m) => R.RiverLibinputDeviceEvent -> m ()
 handleLibinputDeviceEvent = \case

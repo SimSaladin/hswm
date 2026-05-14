@@ -12,7 +12,6 @@ module HSWM.Util.GrabKeyboard where
 
 import           HSWM.Core
 import           HSWM.Operations
-import           HSWM.XKB
 
 import qualified Wayland as WL
 

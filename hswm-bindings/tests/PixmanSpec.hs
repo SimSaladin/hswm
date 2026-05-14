@@ -26,10 +26,10 @@ spec = describe "Pixman" $ do
     let ft = transformScale (transformTranslate transformIdentity 5 5 False) 5 5 False
         t1 = fromFTransform ft
         pix = toImage $ newImage PIXMAN_x8r8g8b8 (100, 100) True
-          +$ imageSetTransform t1
-          +$ imageSetFilter' FilterBest
+          +$ SetTransform t1
+          +$ SetFilter FilterBest []
         res = toImage $ newImage PIXMAN_x8r8g8b8 (100, 100) True
-               +$ imageComposite32 pix ((def :: ImageCompositeParams Int32 Int32) { compositeSize = (100, 100) })
+               +$ (setComposite32 pix) { size = (100 :: Int32, 100) }
     imageWidth res `shouldBe` 100
     imageDepth res `shouldBe` 24
     print (ft, t1, pix, res)

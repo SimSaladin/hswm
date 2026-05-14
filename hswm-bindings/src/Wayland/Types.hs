@@ -1,6 +1,5 @@
-{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE TypeFamilyDependencies #-}
-
+{-# LANGUAGE UndecidableInstances   #-}
 
 -- |
 -- Module      : Wayland.Types
@@ -12,25 +11,19 @@
 -- Portability : unportable
 --
 module Wayland.Types (
-  -- * Exceptions
-  WlClientException(..),
   -- * Types
   Version,
   ObjectName,
   IsWlObject(..),
   HasDestructor(..),
+  InterfaceType,
   HasInterface(..),
   HasListener(..),
   IsUserData(..),
-  -- * Functions
-  listenerAdd,
-  listenerAdd_,
   -- * Re-exports
   module ReExports,
   ) where
 
-import           Control.Exception
-import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.Kind (Type)
 import           Data.Proxy
@@ -41,11 +34,6 @@ import           Foreign.C.ConstPtr
 import           HsBindgen.Runtime.Prelude as ReExports (FromFunPtr(..), PtrConst, ToFunPtr(..), CEnum(..), CEnumZ)
 import           Data.Typeable
 
-data WlClientException = WlListenerAddFailed
-  deriving (Eq, Show)
-
-instance Exception WlClientException
-
 type Version = Word32
 
 type ObjectName = Word32
@@ -55,7 +43,7 @@ type ObjectName = Word32
 --   - Reading @Version@
 --
 --   - Read/write @userdata@
-class Typeable object => IsWlObject object where
+class Typeable object => IsWlObject (object :: Type) where
   -- | Read object version.
   getVersion :: object -> IO Version
 
@@ -66,15 +54,15 @@ class Typeable object => IsWlObject object where
   setUserData :: object -> Ptr Void -> IO ()
 
 -- | Wayland objects that have destructors.
-class Typeable object => HasDestructor object where
+class Typeable object => HasDestructor (object :: Type) where
 
   objectDestroy :: object -> IO ()
 
--- | Wayland objects that have interface (e.g. for global registry).
-class Typeable object => HasInterface object where
+-- | The interface's type, always 'Wl_interface'
+type family InterfaceType object :: Type
 
-  -- | The interface's type, always 'Wl_interface'
-  type InterfaceType object :: Type
+-- | Wayland objects that have interface (e.g. for global registry).
+class IsWlObject object => HasInterface (object :: Type) where
 
   -- | The interface global (constant).
   objectInterface :: Proxy object -> ConstPtr (InterfaceType object)
@@ -89,15 +77,15 @@ class Typeable object => HasInterface object where
   objectBindWrap :: Ptr () -> object
 
 -- | Objects for which it is possible to create listeners.
-class Typeable object => HasListener object where
+class HasInterface object => HasListener (object :: Type) where
 
   -- | The listener interface.
-  type ObjectListener object = r | r -> object
+  type ObjectListener object = (r :: Type) | r -> object
 
   -- | The event type of the listener.
-  type ObjectListenerEvent object = r | r -> object
+  type ObjectListenerEvent object = (r :: Type) | r -> object
 
-  -- | Create a new listener.
+  -- | Create a new listener. The created listener should be freed with 'freeListener'.
   createListener :: MonadIO m => (ObjectListenerEvent object -> IO ()) -> m (ConstPtr (ObjectListener object))
 
   -- | Add listener to object with the given user data.
@@ -105,6 +93,10 @@ class Typeable object => HasListener object where
 
   -- | Free (destroy) the listener.
   freeListener :: Proxy object -> ConstPtr (ObjectListener object) -> IO ()
+
+-- | Simply calls 'freeListener'.
+instance (HasListener object, Typeable a, a ~ ObjectListener object) => HasDestructor (ConstPtr a) where
+  objectDestroy = freeListener Proxy
 
 -- | Class of values that can be used as user data.
 class Typeable a => IsUserData a where
@@ -121,25 +113,6 @@ instance Typeable a => IsUserData (StablePtr a) where
   toUserData   = castPtr . castStablePtrToPtr
   fromUserData = pure . castPtrToStablePtr . castPtr
 
-instance {-# OVERLAPPABLE #-}Typeable a =>  IsUserData (Ptr a) where
+instance {-# OVERLAPPABLE #-} Typeable a => IsUserData (Ptr a) where
   toUserData   = castPtr
   fromUserData = pure . castPtr
-
-listenerAdd :: (MonadIO m, HasListener object, IsUserData userdata)
-            => object -- ^ The target object
-            -> PtrConst (ObjectListener object) -- ^ Listener instance (function pointers)
-            -> userdata -- ^ Userdata
-            -> m ()
-{-# INLINE listenerAdd #-}
-listenerAdd obj l ud = liftIO $ do
-  res <- objectListenerAdd obj l (toUserData ud)
-  when (res < 0) $ throwIO WlListenerAddFailed
-
-listenerAdd_ :: (MonadIO m, HasListener object)
-            => object -- ^ The target object
-            -> PtrConst (ObjectListener object) -- ^ Listener instance (function pointers)
-            -> m ()
-{-# INLINE listenerAdd_ #-}
-listenerAdd_ obj l = liftIO $ do
-  res <- objectListenerAdd obj l nullPtr
-  when (res < 0) $ throwIO WlListenerAddFailed

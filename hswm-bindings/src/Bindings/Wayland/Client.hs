@@ -1,9 +1,6 @@
-{-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE PatternSynonyms       #-}
 {-# LANGUAGE RecordWildCards       #-}
 {-# LANGUAGE TypeFamilies          #-}
-{-# LANGUAGE OverloadedRecordDot #-}
-
+{-# LANGUAGE OverloadedRecordDot   #-}
 
 -- |
 -- Module      : Bindings.Wayland.Client
@@ -15,10 +12,11 @@
 -- Portability : unportable
 --
 module Bindings.Wayland.Client
-  ( module Wayland.Types
-  , module Bindings.Wayland.Util
-  , module Bindings.Wayland.Client
+  ( module Bindings.Wayland.Client
   , module Safe
+
+  , module Bindings.Wayland.Util
+  , module Wayland.Types
 
   -- *  Outputs
   , Wl_output_subpixel(..)
@@ -46,13 +44,13 @@ module Bindings.Wayland.Client
   ) where
 
 
-import           Bindings.Wayland.Util
-
 import           Bindings.Wayland.Client.Generated
 import           Bindings.Wayland.Client.Generated.Global as G
 import qualified Bindings.Wayland.Client.Generated.Safe as Safe
 import           Bindings.Wayland.Client.Generated.Safe hiding (wl_display_dispatch, wl_display_flush)
 import           Bindings.Wayland.Client.Generated.Unsafe (wl_display_dispatch, wl_display_flush)
+
+import           Bindings.Wayland.Util
 
 import           Wayland.Types
 import           Wayland.Internal.TH
@@ -63,7 +61,6 @@ import           Data.Maybe
 import           Foreign
 import           Foreign.C
 import           Foreign.C.ConstPtr
-import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import           System.Posix
 
 clientFromProtocolXML commonSettings
@@ -378,11 +375,3 @@ displayCreateQueueWithName (Display d) name = fmap EventQueue . liftIO $ withCSt
 registryBind :: (MonadIO m) => Registry -> ObjectName -> PtrConst Wl_interface -> Version -> m (Ptr a)
 {-# INLINE registryBind #-}
 registryBind reg name iface ver = fmap castPtr . liftIO $ wl_registry_bind reg.unwrap name iface ver
-
-registryBindObject :: forall a m. (HasInterface a, InterfaceType a ~ Wl_interface, MonadIO m)
-                   => Registry -> (String -> ObjectName) -> m a
-{-# INLINE registryBindObject #-}
-registryBindObject reg getName = objectBindWrap <$> registryBind reg (getName $ objectInterfaceName p) (objectInterface p) (objectInterfaceVersion p)
-  where
-    p :: RIP.Proxy a
-    p = RIP.Proxy

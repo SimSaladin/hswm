@@ -12,89 +12,82 @@ module HSWM.BufferPool where
 import           HSWM.Core
 import           HSWM.Util.Posix
 
-import qualified Bindings.Pixman.Generated as P
-import qualified Bindings.Pixman.Generated.Safe as P
-import qualified Bindings.Wayland.Client as WL
-import qualified Bindings.Wayland.Client.Generated as WL
+import qualified Pixman as P
+import qualified Wayland as WL
 
 import qualified Data.List as L
 import           Foreign hiding (void)
 import           System.Posix (closeFd)
 
 data ImageBufferPool = ImageBufferPool
-  { -- | Buffer count limit per surface
-    bufferMultiplicity :: !Int,
-    -- | Number of surfaces serviced by this pool
-    surfaceCount       :: !Int,
-    wlShm              :: !WL.Shm,
-    bufferListener     :: !(ConstPtr WL.Wl_buffer_listener),
-    buffers            :: !(IORef ([ImageBuffer], Int))
+  { bufferMultiplicity :: !Int -- ^ Buffer count limit per surface
+  , surfaceCount       :: !Int -- ^ Number of surfaces serviced by this pool
+  , wlShm              :: !WL.Shm
+  , bufferListener     :: !(ConstPtr (WL.ObjectListener WL.Buffer))
+  , buffers            :: !(IORef ([ImageBuffer], Int))
   } deriving (Eq, Generic)
 
 data ImageBuffer = ImageBuffer
-  { buf           :: !WL.Buffer,
-    pool          :: !WL.ShmPool,
-    width, height :: !Int,
-    size          :: !CSize,
-    -- | E.g. 'WL.WL_SHM_FORMAT_ABGR8888'
-    shmFormat     :: !WL.Wl_shm_format,
-    -- | E.g. 'P.PIXMAN_a8r8g8b8'
-    pixmanFormat  :: !P.Pixman_format_code_t,
-    busy          :: !(IORef Bool),
-    ptr           :: !(Ptr Void),
-    busyPtr       :: !(StablePtr (IORef Bool)),
-    pixmanImage   :: !(Ptr P.Pixman_image_t)
+  { width, height :: !Int
+  , stride        :: !Int
+  , size          :: !CSize
+  , shmFormat     :: !WL.ShmFormat -- ^ E.g. 'WL.WL_SHM_FORMAT_ABGR8888'
+  , buf           :: !WL.Buffer
+  , pool          :: !WL.ShmPool
+  , ptr           :: !(Ptr Void)
+  , busy          :: !(IORef Bool)
+  , busyPtr       :: !(StablePtr (IORef Bool))
   } deriving (Eq, Generic)
 
 newImageBufferPool :: H ImageBufferPool
 newImageBufferPool = do
   let bufferMultiplicity = 3
-  let surfaceCount = 0
+      surfaceCount = 0
   wlShm <- getObject
   buffers <- newIORef ([], 0)
-  bufferListener <- WL.mkBufferListener $ \case
+  bufferListener <- WL.createListener $ \case
     WL.BufferRelease ud _ -> do
       busy <- deRefStablePtr $ castPtrToStablePtr $ castPtr ud
       modifyIORef' busy $ const False
   return ImageBufferPool {..}
 
-destroyImageBufferPool :: ImageBufferPool -> IO ()
+destroyImageBufferPool :: MonadIO m => ImageBufferPool -> m ()
 destroyImageBufferPool pool = do
   (bufs, _) <- readIORef pool.buffers
   forM_ bufs destroyImageBuffer
-  WL.freeListener (Proxy :: Proxy WL.Buffer) pool.bufferListener
+  io $ WL.objectDestroy pool.bufferListener
 
-initImageBuffer :: ImageBufferPool -> Int -> Int -> WL.Wl_shm_format -> P.Pixman_format_code_t -> IO ImageBuffer
-initImageBuffer ImageBufferPool {wlShm = wl_shm, bufferListener = listener} width height shmFormat pixmanFormat = do
+initImageBuffer :: MonadIO m
+                => ImageBufferPool
+                -> WL.ShmFormat
+                -> Int -- ^ width
+                -> Int -- ^ height
+                -> m ImageBuffer
+initImageBuffer bp shmFormat width height = io $ do
   let stride = width * 4
       size = fi $ height * stride
-      w = width
-      h = height
   (fd, ptr) <- createShm (fi size)
-  pool <- WL.shmCreatePool wl_shm (fi fd) (fi size)
+  pool <- WL.shmCreatePool bp.wlShm (fi fd) (fi size)
   closeFd fd
-  buf <- WL.shmPoolCreateBuffer pool 0 (fi w) (fi h) (fi stride) shmFormat
-  -- Create pixman image
-  pixmanImage <- P.pixman_image_create_bits_no_clear pixmanFormat (fi w) (fi h) (castPtr ptr) (fi stride)
+  buf <- WL.shmPoolCreateBuffer pool 0 (fi width) (fi height) (fi stride) shmFormat
   busy <- newIORef True
   -- Sets busy = False
   busyPtr <- newStablePtr busy
-  _ <- WL.listenerAdd buf listener busyPtr
+  WL.listenerAdd buf bp.bufferListener busyPtr
   return ImageBuffer {..}
 
-destroyImageBuffer :: ImageBuffer -> IO ()
-destroyImageBuffer ImageBuffer{..} = do
+destroyImageBuffer :: MonadIO m => ImageBuffer -> m ()
+destroyImageBuffer ImageBuffer{..} = io $ do
   WL.objectDestroy buf
   WL.objectDestroy pool
-  void $ P.pixman_image_unref pixmanImage
   munmap ptr size
   freeStablePtr busyPtr
 
 incSurfaceCount :: Int -> ImageBufferPool -> ImageBufferPool
 incSurfaceCount n bp = bp { surfaceCount = bp.surfaceCount + n }
 
-nextBuffer :: ImageBufferPool -> Int -> Int -> WL.Wl_shm_format -> IO ImageBuffer
-nextBuffer pool w h shmFormat = do
+nextBuffer :: (MonadIO m) => ImageBufferPool -> WL.ShmFormat -> Int -> Int -> m ImageBuffer
+nextBuffer pool shmFormat w h = io $ do
   (bufs, len) <- readIORef pool.buffers
 
   -- Cull buffers
@@ -112,59 +105,57 @@ nextBuffer pool w h shmFormat = do
   -- Find suitable buffer
   findSuitable . filter check . fst =<< readIORef pool.buffers
   where
-    pixmanFormat = getPixmanFormatBE shmFormat
     check b = b.width == w && b.height == h && b.shmFormat == shmFormat
     findSuitable (b : bs) = tryLockBuffer b >>= \case
                             True -> return b
                             False -> findSuitable bs
     findSuitable [] = do
-      b <- initImageBuffer pool w h shmFormat pixmanFormat
+      b <- initImageBuffer pool shmFormat w h
       modifyIORef' pool.buffers $ \(bs, l) -> (b : bs, l + 1)
       return b
 
-tryLockBuffer :: ImageBuffer -> IO Bool
+tryLockBuffer :: MonadIO m => ImageBuffer -> m Bool
 tryLockBuffer buf = atomicModifyIORef' buf.busy $ \s -> if not s then (True, True) else (s, False)
 
-
 -- | little-endian
-getPixmanFormatLE :: WL.Wl_shm_format -> P.Pixman_format_code_t
+getPixmanFormatLE :: WL.ShmFormat -> P.FormatCode
 getPixmanFormatLE = \case
-  WL.WL_SHM_FORMAT_RGB332      -> P.PIXMAN_r3g3b2
-  WL.WL_SHM_FORMAT_BGR233      -> P.PIXMAN_b2g3r3
-  WL.WL_SHM_FORMAT_ARGB4444    -> P.PIXMAN_a4r4g4b4
-  WL.WL_SHM_FORMAT_XRGB4444    -> P.PIXMAN_x4r4g4b4
-  WL.WL_SHM_FORMAT_ABGR4444    -> P.PIXMAN_a4b4g4r4
-  WL.WL_SHM_FORMAT_XBGR4444    -> P.PIXMAN_x4b4g4r4
-  WL.WL_SHM_FORMAT_ARGB1555    -> P.PIXMAN_a1r5g5b5
-  WL.WL_SHM_FORMAT_XRGB1555    -> P.PIXMAN_x1r5g5b5
-  WL.WL_SHM_FORMAT_ABGR1555    -> P.PIXMAN_a1b5g5r5
-  WL.WL_SHM_FORMAT_XBGR1555    -> P.PIXMAN_x1b5g5r5
-  WL.WL_SHM_FORMAT_RGB565      -> P.PIXMAN_r5g6b5
-  WL.WL_SHM_FORMAT_BGR565      -> P.PIXMAN_b5g6r5
-  WL.WL_SHM_FORMAT_RGB888      -> P.PIXMAN_r8g8b8
-  WL.WL_SHM_FORMAT_BGR888      -> P.PIXMAN_b8g8r8
-  WL.WL_SHM_FORMAT_ARGB8888    -> P.PIXMAN_a8r8g8b8
-  WL.WL_SHM_FORMAT_XRGB8888    -> P.PIXMAN_x8r8g8b8
-  WL.WL_SHM_FORMAT_ABGR8888    -> P.PIXMAN_a8b8g8r8
-  WL.WL_SHM_FORMAT_XBGR8888    -> P.PIXMAN_x8b8g8r8
-  WL.WL_SHM_FORMAT_BGRA8888    -> P.PIXMAN_b8g8r8a8
-  WL.WL_SHM_FORMAT_BGRX8888    -> P.PIXMAN_b8g8r8x8
-  WL.WL_SHM_FORMAT_RGBA8888    -> P.PIXMAN_r8g8b8a8
-  WL.WL_SHM_FORMAT_RGBX8888    -> P.PIXMAN_r8g8b8x8
-  WL.WL_SHM_FORMAT_ARGB2101010 -> P.PIXMAN_a2r10g10b10
-  WL.WL_SHM_FORMAT_ABGR2101010 -> P.PIXMAN_a2b10g10r10
-  WL.WL_SHM_FORMAT_XRGB2101010 -> P.PIXMAN_x2r10g10b10
-  WL.WL_SHM_FORMAT_XBGR2101010 -> P.PIXMAN_x2b10g10r10
-  _                            -> WL.toCEnum 0
+  WL.ShmFormatRGB332      -> P.R3G3B2
+  WL.ShmFormatBGR233      -> P.B2G3R3
+  WL.ShmFormatARGB4444    -> P.A4R4G4B4
+  WL.ShmFormatXRGB4444    -> P.X4R4G4B4
+  WL.ShmFormatABGR4444    -> P.A4B4G4R4
+  WL.ShmFormatXBGR4444    -> P.X4B4G4R4
+  WL.ShmFormatARGB1555    -> P.A1R5G5B5
+  WL.ShmFormatXRGB1555    -> P.X1R5G5B5
+  WL.ShmFormatABGR1555    -> P.A1B5G5R5
+  WL.ShmFormatXBGR1555    -> P.X1B5G5R5
+  WL.ShmFormatRGB565      -> P.R5G6B5
+  WL.ShmFormatBGR565      -> P.B5G6R5
+  WL.ShmFormatRGB888      -> P.R8G8B8
+  WL.ShmFormatBGR888      -> P.B8G8R8
+  WL.ShmFormatARGB8888    -> P.A8R8G8B8
+  WL.ShmFormatXRGB8888    -> P.X8R8G8B8
+  WL.ShmFormatABGR8888    -> P.A8B8G8R8
+  WL.ShmFormatXBGR8888    -> P.X8B8G8R8
+  WL.ShmFormatBGRA8888    -> P.B8G8R8A8
+  WL.ShmFormatBGRX8888    -> P.B8G8R8X8
+  WL.ShmFormatRGBA8888    -> P.R8G8B8A8
+  WL.ShmFormatRGBX8888    -> P.R8G8B8X8
+  WL.ShmFormatARGB2101010 -> P.A2R10G10B10
+  WL.ShmFormatABGR2101010 -> P.A2B10G10R10
+  WL.ShmFormatXRGB2101010 -> P.X2R10G10B10
+  WL.ShmFormatXBGR2101010 -> P.X2B10G10R10
+  _                       -> WL.toCEnum 0
 
-getPixmanFormatBE :: WL.Wl_shm_format -> P.Pixman_format_code_t
+getPixmanFormatBE :: WL.ShmFormat -> P.FormatCode
 getPixmanFormatBE = \case
-  WL.WL_SHM_FORMAT_ARGB8888 -> P.PIXMAN_b8g8r8a8
-  WL.WL_SHM_FORMAT_XRGB8888 -> P.PIXMAN_b8g8r8x8
-  WL.WL_SHM_FORMAT_ABGR8888 -> P.PIXMAN_r8g8b8a8
-  WL.WL_SHM_FORMAT_XBGR8888 -> P.PIXMAN_r8g8b8x8
-  WL.WL_SHM_FORMAT_BGRA8888 -> P.PIXMAN_a8r8g8b8
-  WL.WL_SHM_FORMAT_BGRX8888 -> P.PIXMAN_x8r8g8b8
-  WL.WL_SHM_FORMAT_RGBA8888 -> P.PIXMAN_a8b8g8r8
-  WL.WL_SHM_FORMAT_RGBX8888 -> P.PIXMAN_x8b8g8r8
-  _                         -> WL.toCEnum 0
+  WL.ShmFormatARGB8888 -> P.B8G8R8A8
+  WL.ShmFormatXRGB8888 -> P.B8G8R8X8
+  WL.ShmFormatABGR8888 -> P.R8G8B8A8
+  WL.ShmFormatXBGR8888 -> P.R8G8B8X8
+  WL.ShmFormatBGRA8888 -> P.A8R8G8B8
+  WL.ShmFormatBGRX8888 -> P.X8R8G8B8
+  WL.ShmFormatRGBA8888 -> P.A8B8G8R8
+  WL.ShmFormatRGBX8888 -> P.X8B8G8R8
+  _                    -> WL.toCEnum 0

@@ -14,7 +14,6 @@ import Prettyprinter
 import Prettyprinter.Render.Terminal
 import Options.Generic
 import qualified Options.Applicative          as Options
-import qualified Options.Applicative.Types    as Options
 
 type CM = InputT (LoggingT (ReaderT () IO))
 
@@ -64,11 +63,11 @@ mainCM = do
   logInfo "Connecting..."
   clientRun def msgHandler consoleHandler
 
-msgHandler :: ProtoMsg -> CM ()
+msgHandler :: Response -> CM ()
 msgHandler = \case
   StateDumpResponse str -> outputStrLn $ TL.unpack str
-  OutputInfo{} -> return ()
-  WsInfo{} -> return ()
+  Outputs{} -> return ()
+  Workspaces{} -> return ()
   FocusedWindow{} -> return ()
   msg -> outputStrLn $ show msg
 

@@ -1,13 +1,11 @@
-module Bindings.River.LayerShellV1  where
+module Bindings.River.LayerShellV1 where
 
-import Bindings.River.WindowManagementV1
+import           Bindings.River.LayerShellV1.Generated
+import           Bindings.River.LayerShellV1.Generated.Global
+import           Bindings.River.LayerShellV1.Generated.Unsafe as Unsafe
 
-import Wayland.Internal.TH
+import           Bindings.River.WindowManagementV1 (RiverOutput(..), RiverSeat(..))
 
-import Bindings.River.LayerShellV1.Generated
-import Bindings.River.LayerShellV1.Generated.Global
-import Bindings.River.LayerShellV1.Generated.Safe
-
-import Bindings.Wayland.Client
+import           Wayland.Internal.TH
 
 clientFromProtocolXML commonSettings "river-layer-shell-v1.xml"

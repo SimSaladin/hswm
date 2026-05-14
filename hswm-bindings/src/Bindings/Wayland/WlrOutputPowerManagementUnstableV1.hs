@@ -9,13 +9,12 @@
 --
 module Bindings.Wayland.WlrOutputPowerManagementUnstableV1 where
 
-import Wayland.Internal.TH
-
 import Bindings.Wayland.WlrOutputPowerManagementUnstableV1.Generated
 import Bindings.Wayland.WlrOutputPowerManagementUnstableV1.Generated.Global
 import Bindings.Wayland.WlrOutputPowerManagementUnstableV1.Generated.Safe
 
-import qualified Bindings.Wayland.Client
-import Bindings.Wayland.Client (Wl_interface)
+import Bindings.Wayland.Client (Output(..))
+
+import Wayland.Internal.TH
 
 clientFromProtocolXML commonSettings "wlr-output-power-management-unstable-v1.xml"

@@ -18,11 +18,12 @@ import           HSWM.Types.Events
 import           HSWM.Types.TypeMap
 import           HSWM.Util.Types
 import           HSWM.Utils
-import           HSWM.XKB (Button, KeySym, ModMask, XkbRuleNames)
+import           HSWM.XKB (Button, KeySym, ModMask, XkbRuleNames, XkbBindingMap, XBKey, PointerBinding)
 import           HSWM.Wayland (HasGlobalsRegistry(..), RegistryCache)
-import           River.WMP
 
 import qualified Wayland as WL
+import           River.WindowManagement (RiverWindow, RiverSeat, RiverOutput, RiverNode)
+import           Bindings.River (RiverColor)
 
 import qualified Bindings.River as R
 import qualified Bindings.RiverSafe as R
@@ -379,9 +380,6 @@ instance HasGlobalTMap HConf where
 instance HasGlobalsRegistry HConf where
   globalsRegistryL = lens globals (\s a -> s { globals = a })
 
--- instance HasLogFunc HConf where
---   logFuncL = lens _logFunc (\s a -> s {_logFunc = a})
-
 instance Default (H ()) where def = return ()
 
 instance Default (HS ()) where def = return ()
@@ -487,8 +485,8 @@ data Seat = Seat
 
 data SeatFocus
   = SFocusNone
-  | SFocusLayerShell SeatFocus -- ^ previous focus
   | SFocusWindow RiverWindow
+  | SFocusLayerShell Bool SeatFocus -- ^ exclusive? previous focus
   deriving (Eq, Ord, Show, Generic)
 
 data SeatAction
@@ -556,7 +554,7 @@ data Output = Output
     screen                 :: !ScreenId,
     outputName             :: !String,
     outputDescription      :: !String,
-    river_layerShellOutput :: !R.RiverLayerShellOutput,
+    layerShellOutput       :: !R.RiverLayerShellOutput,
     nonExclusive           :: Maybe (Int32, Int32, Int32, Int32), -- x, y, w, h
     outputPower            :: Maybe Wlr.OutputPower,
     wlOutput               :: !WL.Output

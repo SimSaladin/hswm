@@ -58,6 +58,7 @@ library
     , haskell-gi-base    ^>=0.26.9
     , gi-gtk3            ^>=3.0.44
     , gi-pango           ^>=1.0.30
+    , gi-glib            ^>=2.0
     , hswm
 
 foreign-library waybarhaskellplugin

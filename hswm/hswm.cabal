@@ -99,8 +99,6 @@ library
           HSWM.Wayland
           HSWM.Windows
           HSWM.XKB
-          River.WMP
-          River.XKB.Bindings
     autogen-modules:
           PackageInfo_hswm
     build-depends:

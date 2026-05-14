@@ -1,4 +1,6 @@
-{-# OPTIONS_GHC -Wno-ambiguous-fields -Wno-unused-record-wildcards -Wno-name-shadowing #-}
+{-# OPTIONS_GHC -Wno-ambiguous-fields #-}
+{-# OPTIONS_GHC -Wno-unused-record-wildcards #-}
+{-# OPTIONS_GHC -Wno-name-shadowing #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 -- |
@@ -25,6 +27,7 @@ import qualified HSWM.StackSet as W
 import           HSWM.Utils
 import qualified HSWM.Windows as Windows
 import           HSWM.Wayland
+import qualified HSWM.Util.Debug as Debug
 
 import qualified Wayland as WL
 
@@ -140,56 +143,58 @@ startHSWM mainRun loggerSet logFunc wlDisplay config = do
     atomically $ putTMVar conf._state initialState
 
     runInH $ do
-      regState <- io $ WL.initRegistryState wlDisplay
-      putMVar conf.globals regState
-      --regL            <- mkListener $ handleRegistryEvent conf.globals
-      shmL            <- mkListener $ handleWithHook . WlShmEvent
-      _               <- mkListener $ handleWithHook . WlOutputEvent
-      _               <- mkListener $ handleWithHook . WlShellSurfaceEvent
-      _               <- mkListener $ handleWithHook . WlSeatEvent
-      _               <- mkListener $ handleWithHook . WlKeyboardEvent
-      _               <- mkListener $ handleWithHook . WlPointerEvent
-      xkbConfigL      <- mkListener $ handleWithHook . XkbConfigEvent
-      _               <- mkListener $ handleWithHook . XkbKeyboardEvent
-      _               <- mkListener $ handleWithHook . XkbEvent
-      _               <- mkListener $ handleWithHook . XkbSeatEvent
-      _               <- mkListener $ handleWithHook . PointerEvent
-      _               <- mkListener $ handleWithHook . WindowEvent
-      _               <- mkListener $ handleWithHook . SeatEvent
-      _               <- mkListener $ handleWithHook . OutputEvent
-      _               <- mkListener $ handleWithHook . LayerShellOutputEvent
-      _               <- mkListener $ handleWithHook . LayerShellSeatEvent
-      _               <- mkListener $ handleWithHook . InputDeviceEvent
-      libinputConfigL <- mkListener $ handleWithHook . LibinputConfigEvent
-      _               <- mkListener $ handleWithHook . LibinputDeviceEvent
-      inputManagerL   <- mkListener $ handleWithHook . InputManagerEvent
-      managerL        <- mkListener $ handleWithHook . WindowManagerEvent
-      _               <- mkListener $ handleWithHook . ForeignTopLevelHandleV1
-      _               <- mkListener $ handleWithHook . ZdgOutputEvent
-      wlrOmL          <- mkListener $ handleWithHook . WlrOutputManagerEvent
-      _               <- mkListener $ handleWithHook . WlrOutputHeadEvent
-      _               <- mkListener $ handleWithHook . ExtIdleNotificationEvent
+      _ <- mkListener $ handleWithHook . WlShmEvent
+      _ <- mkListener $ handleWithHook . WlOutputEvent
+      _ <- mkListener $ handleWithHook . WlShellSurfaceEvent
+      _ <- mkListener $ handleWithHook . WlSeatEvent
+      _ <- mkListener $ handleWithHook . WlKeyboardEvent
+      _ <- mkListener $ handleWithHook . WlPointerEvent
+      _ <- mkListener $ handleWithHook . XkbConfigEvent
+      _ <- mkListener $ handleWithHook . XkbKeyboardEvent
+      _ <- mkListener $ handleWithHook . XkbEvent
+      _ <- mkListener $ handleWithHook . XkbSeatEvent
+      _ <- mkListener $ handleWithHook . PointerEvent
+      _ <- mkListener $ handleWithHook . WindowEvent
+      _ <- mkListener $ handleWithHook . SeatEvent
+      _ <- mkListener $ handleWithHook . OutputEvent
+      _ <- mkListener $ handleWithHook . LayerShellOutputEvent
+      _ <- mkListener $ handleWithHook . LayerShellSeatEvent
+      _ <- mkListener $ handleWithHook . InputDeviceEvent
+      _ <- mkListener $ handleWithHook . LibinputConfigEvent
+      _ <- mkListener $ handleWithHook . LibinputDeviceEvent
+      _ <- mkListener $ handleWithHook . InputManagerEvent
+      _ <- mkListener $ handleWithHook . WindowManagerEvent
+      _ <- mkListener $ handleWithHook . ForeignTopLevelHandleV1
+      _ <- mkListener $ handleWithHook . ZdgOutputEvent
+      _ <- mkListener $ handleWithHook . WlrOutputManagerEvent
+      _ <- mkListener $ handleWithHook . WlrOutputHeadEvent
+      _ <- mkListener $ handleWithHook . ExtIdleNotificationEvent
       logDebug "Created event listeners"
 
-      --registry <- WL.displayGetRegistry wlDisplay
-      --WL.listenerAdd_ registry regL
+      runInIO <- askRunInIO
+      regState <- WL.initRegistryState def
+        { WL.regOnEvent = runInIO . Debug.logEvent
+        , WL.regOnBind = \p name ver -> do
+            let ifVer = WL.objectInterfaceVersion p
+            runInIO $ logInfo $ "registry bind global" :# [ "name" .= name, "version" .= ver, "iface-version" .= ifVer, "iface" .= WL.objectInterfaceName p ]
+        } wlDisplay
+      putMVar conf.globals regState
 
       logDebug "Waiting for one roundtrip for the registry listener to become aware of all current globals..."
       _ <- WL.displayRoundtrip wlDisplay
 
       -- Bind initial globals
-
       _ <- bindGlobalAuto_ @WL.Compositor
-      _ <- bindGlobalAuto  @WL.Shm [(shmL, nullPtr)]
+      _ <- bindGlobalAuto'  @WL.Shm
       _ <- bindGlobalAuto_ @Wlr.InputMethodManager
-      _ <- bindGlobalAuto  @R.RiverLibinputConfig [(libinputConfigL, nullPtr)]
-      _ <- bindGlobalAuto  @R.RiverInputManager [(inputManagerL, nullPtr)]
+      _ <- bindGlobalAuto'  @R.RiverLibinputConfig
+      _ <- bindGlobalAuto'  @R.RiverInputManager
       _ <- bindGlobalAuto_ @R.RiverLayerShell
-      _ <- bindGlobalAuto  @R.RiverWindowManager [(managerL, nullPtr)]
+      _ <- bindGlobalAuto'  @R.RiverWindowManager
       _ <- bindGlobalAuto_ @R.RiverXkbBindings
-      _ <- bindGlobalAuto  @R.RiverXkbConfig [(xkbConfigL, nullPtr)]
+      _ <- bindGlobalAuto'  @R.RiverXkbConfig
       _ <- bindGlobalAuto_ @Zdg.OutputManager
-      _ <- bindGlobalAuto  @Wlr.OutputManager [(wlrOmL, nullPtr)]
+      _ <- bindGlobalAuto'  @Wlr.OutputManager
       _ <- bindGlobalAuto_ @Wlr.LayerShell
       _ <- bindGlobalAuto_ @FS.FractionalScaleManager
       _ <- bindGlobalAuto_ @VP.Viewporter
@@ -207,9 +212,7 @@ startHSWM mainRun loggerSet logFunc wlDisplay config = do
       _ <- io $ Posix.installHandler Posix.sigINT  (Posix.Catch $ runInH $ mainEvent $ MainExit "INT") Nothing
       _ <- io $ Posix.installHandler Posix.sigQUIT (Posix.Catch $ runInH $ mainEvent $ MainExit "QUIT") Nothing
       _ <- io $ Posix.installHandler Posix.sigUSR2 (Posix.Catch $ runInH $ io getProgramPath >>= mainEvent . MainRestart) Nothing
-      return ()
 
-    runInH $ do
       logInfo "Entering Wayland main loop"
 
       wlPollFd <- WL.displayGetFd wlDisplay
@@ -257,27 +260,26 @@ startHSWM mainRun loggerSet logFunc wlDisplay config = do
 
 -- Dispatch pending events
 dispatchPending disp = io go where
-  go = do
-    r <- try @_ @IOError $ WL.displayPrepareRead disp
-    case r of
+  go =
+    try (WL.displayPrepareRead disp) >>= \case
       Right{} -> return $ Right ()
-      _ -> do
-        r' <- try @_ @IOError $ WL.displayDispatchPending disp
-        case r' of
+      Left (_ :: IOError) ->
+        try (WL.displayDispatchPending disp) >>= \case
           Right{} -> go
-          Left e -> return $ Left $ MainExit $ "error: dispatch pending: " ++ show e
+          Left (e :: IOError) -> return $ Left $ MainExit $ "error: dispatch pending: " ++ show e
 
 -- Process incoming events
-readIncomingEvents disp = try (void $ WL.displayReadEvents disp) >>= \case
-      Right{}             -> return $ Right ()
-      Left (e :: IOError) -> return $ Left $ MainExit $ "error: failed to read events: " ++ show e
+readIncomingEvents disp =
+  try (WL.displayReadEvents disp) >>= \case
+    Right{}             -> return $ Right ()
+    Left (e :: IOError) -> return $ Left $ MainExit $ "error: failed to read events: " ++ show e
 
 -- Flush outgoing requests
-flushRequests disp = try (WL.displayFlush disp) >>= \case
-    Right{}           -> return $ Right False
-    Left e
-      | isFullError e -> return $ Right True
-      | otherwise     -> return $ Left $ MainExit $ "flush failed: " ++ show e
+flushRequests disp =
+  try (WL.displayFlush disp) >>= \case
+    Right{} -> return $ Right False
+    Left e | isFullError e -> return $ Right True
+           | otherwise     -> return $ Left $ MainExit $ "flush failed: " ++ show e
 
 ---------------------------------------------------
 -- event handling
@@ -320,14 +322,12 @@ handleEvent (WindowManagerEvent e) = case e of
     io $ R.objectDestroy wm
     writeMainEvent $ MainExit "river_window_manage_v1 finished, exiting."
 
-  R.RiverWindowManagerSessionLocked _ _wm -> do
-    q <- asks (view pendingManageQL)
-    atomically $ writeTQueue q $ mapSeats $ \s ->
+  R.RiverWindowManagerSessionLocked _ _wm ->
+    writeManageQ $ mapSeats $ \s ->
       io $ mapM_ (deRefStablePtr >=> R.riverXkbBindingDisable . xkb_binding) s.xkb_bindings
 
-  R.RiverWindowManagerSessionUnlocked _ _wm -> do
-    q <- asks (view pendingManageQL)
-    atomically $ writeTQueue q $ mapSeats $ \s ->
+  R.RiverWindowManagerSessionUnlocked _ _wm ->
+    writeManageQ $ mapSeats $ \s ->
       io $ mapM_ (deRefStablePtr >=> R.riverXkbBindingEnable . xkb_binding) s.xkb_bindings
 
 handleEvent (OutputEvent e) = Outputs.handle e

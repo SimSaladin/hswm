@@ -12,6 +12,7 @@ module Bindings.River
   , module Bindings.River.XkbBindingsV1
   , module Bindings.River.InputManagementV1
   , module Bindings.River.LibinputConfigV1
+
   , module Wayland.Types
   ) where
 

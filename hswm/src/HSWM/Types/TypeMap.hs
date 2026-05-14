@@ -30,19 +30,25 @@ type MonadStateGlobal env m = (HasGlobalTMap env, MonadReader env m, MonadUnlift
 
 -- * With
 
-withObjectDef :: forall a s m b. (MonadStateGlobal s m, Typeable a) => b -> (a -> m b) -> m b
-withObjectDef od f = withObjects $ maybe (return od) f . TM.lookup
+withObjectDef :: forall a s m b. (MonadStateGlobal s m, Typeable a, Default a) => (a -> m b) -> m b
+withObjectDef f = do
+  modifyObjectDef @a id
+  withObjects $ \tm -> f $ fromMaybe def (TM.lookup tm)
 {-# INLINE withObjectDef #-}
 
+-- | Fails if the object does not exist.
 withObject :: forall a s m b.  (MonadStateGlobal s m, Typeable a) => (a -> m b) -> m b
+{-# INLINE withObject #-}
 withObject f = withObjects $ maybe notFound f . TM.lookup
   where notFound = error ("withObject: no such object: " ++ show (typeRep (Proxy :: Proxy a)))
-{-# INLINE withObject #-}
 
 -- * Get / Create
 
 getObjectDef :: forall a s m. (MonadStateGlobal s m, Typeable a, Default a) => m a
-getObjectDef = withObjects $ return . fromMaybe def . TM.lookup
+getObjectDef = withObjectsEx $ \tm ->
+  case TM.lookup $ unTypeMap tm of
+    Just x -> return (x, tm)
+    Nothing -> let x = def in return (x, TypeMap $ TM.insert x $ unTypeMap tm)
 {-# INLINE getObjectDef #-}
 
 -- | Partial function, assumes the type exists already.
@@ -63,10 +69,19 @@ getOrCreateObjectIO = getOrCreateObject . liftIO
 
 -- * Put / Modify
 
+-- | Insert new or replace existing.
 putObject :: forall a s m. (MonadStateGlobal s m, Typeable a) => a -> m ()
 putObject x = withObjectsEx $ \s -> return ((), TypeMap . TM.insert x $ unTypeMap s)
 {-# INLINE putObject #-}
 
+-- | Modify object (if it exists).
+modifyObject :: forall a s m. (Typeable a, MonadStateGlobal s m) => (a -> a) -> m ()
+modifyObject f = withObjectsEx $ \s -> return ((), TypeMap . g $ unTypeMap s)
+  where
+    g tm = maybe id (TM.insert . f) (TM.lookup tm) tm
+{-# INLINE modifyObject #-}
+
+-- | Modify object (if it does not exist, @def@ is used to initialize the value).
 modifyObjectDef :: forall a s m. (Typeable a, Default a, MonadStateGlobal s m) => (a -> a) -> m ()
 modifyObjectDef f = withObjectsEx $ \s -> return ((), TypeMap . g $ unTypeMap s)
   where
@@ -86,13 +101,14 @@ withObjects :: forall a s m. (MonadStateGlobal s m) => (TM.TMap -> m a) -> m a
 withObjects f = asks (view globalTMap) >>= atomically . readTMVar >>= f . unTypeMap
 {-# INLINE withObjects #-}
 
+-- | Do @m@ with the map state locked.
 withObjectsEx :: forall a s m. (MonadStateGlobal s m) => (TypeMap -> m (a, TypeMap)) -> m a
 withObjectsEx f = asks (view globalTMap) >>= flip withTMVar f
 {-# INLINE withObjectsEx #-}
 
 withTMVar :: (MonadUnliftIO m, MonadLogger m, MonadReader env m) => TMVar s -> (s -> m (a, s)) -> m a
+{-# INLINE withTMVar #-}
 withTMVar var f = bracketOnError (atomically $ takeTMVar var) (atomically . tryPutTMVar var) $ \s -> do
   (a, s') <- f s
   atomically $ putTMVar var s'
   return a
-{-# INLINE withTMVar #-}

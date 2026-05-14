@@ -1,16 +1,12 @@
-{-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE OverloadedLabels #-}
-{-# LANGUAGE PatternSynonyms #-}
 {-# LANGUAGE DeriveAnyClass #-}
-
 
 module Bindings.River.WindowManagementV1 where
 
-import Bindings.River.WindowManagementV1.Generated as R
-import Bindings.River.WindowManagementV1.Generated.Global
-import Bindings.River.WindowManagementV1.Generated.Unsafe
+import Bindings.River.WindowManagementV1.Generated
+import Bindings.River.WindowManagementV1.Generated.Global as G
+import Bindings.River.WindowManagementV1.Generated.Unsafe as Unsafe
 
-import Bindings.Wayland.Client
+import Bindings.Wayland.Client (Surface(..))
 
 import Wayland.Internal.TH
 
@@ -21,7 +17,6 @@ import GHC.Generics
 
 clientFromProtocolXML commonSettings "river-window-management-v1.xml"
 
--------
 instance Default RiverWindow where def = RiverWindow nullPtr
 instance Default RiverNode   where def = RiverNode nullPtr
 instance Default RiverSeat   where def = RiverSeat nullPtr
@@ -33,38 +28,37 @@ invalidWindow = def
 invalidSeat :: RiverSeat
 invalidSeat = def
 
-type WindowEdges = R.River_window_v1_edges
-pattern EdgeNone :: WindowEdges
-pattern EdgeNone = R.RIVER_WINDOW_V1_EDGES_NONE
-pattern EdgeLeft :: WindowEdges
-pattern EdgeLeft = R.RIVER_WINDOW_V1_EDGES_LEFT
-pattern EdgeRight :: WindowEdges
-pattern EdgeRight = R.RIVER_WINDOW_V1_EDGES_RIGHT
-pattern EdgeBottom :: WindowEdges
-pattern EdgeBottom = R.RIVER_WINDOW_V1_EDGES_BOTTOM
-pattern EdgeTop :: WindowEdges
-pattern EdgeTop = R.RIVER_WINDOW_V1_EDGES_TOP
+type WindowEdges = River_window_v1_edges
 
-type WindowCaps = R.River_window_v1_capabilities
+pattern EdgeNone   :: WindowEdges
+pattern EdgeLeft   :: WindowEdges
+pattern EdgeRight  :: WindowEdges
+pattern EdgeBottom :: WindowEdges
+pattern EdgeTop    :: WindowEdges
+pattern EdgeNone                  = RIVER_WINDOW_V1_EDGES_NONE
+pattern EdgeLeft                  = RIVER_WINDOW_V1_EDGES_LEFT
+pattern EdgeRight                 = RIVER_WINDOW_V1_EDGES_RIGHT
+pattern EdgeBottom                = RIVER_WINDOW_V1_EDGES_BOTTOM
+pattern EdgeTop                   = RIVER_WINDOW_V1_EDGES_TOP
+
+type WindowCaps = River_window_v1_capabilities
+
 pattern WindowMenu :: WindowCaps
-pattern WindowMenu = R.RIVER_WINDOW_V1_CAPABILITIES_WINDOW_MENU
-pattern Maximize :: WindowCaps
-pattern Maximize = R.RIVER_WINDOW_V1_CAPABILITIES_MAXIMIZE
+pattern Maximize   :: WindowCaps
 pattern Fullscreen :: WindowCaps
-pattern Fullscreen = R.RIVER_WINDOW_V1_CAPABILITIES_FULLSCREEN
-pattern Minimize :: WindowCaps
-pattern Minimize = R.RIVER_WINDOW_V1_CAPABILITIES_MINIMIZE
+pattern Minimize   :: WindowCaps
+pattern WindowMenu               = RIVER_WINDOW_V1_CAPABILITIES_WINDOW_MENU
+pattern Maximize                 = RIVER_WINDOW_V1_CAPABILITIES_MAXIMIZE
+pattern Fullscreen               = RIVER_WINDOW_V1_CAPABILITIES_FULLSCREEN
+pattern Minimize                 = RIVER_WINDOW_V1_CAPABILITIES_MINIMIZE
 
 data WindowBorders = WindowBorders
-  { -- | Edges on which to draw borders
-    wb_edges :: !Word32,
-    -- | Width of border
-    wb_width :: !Int32,
-    -- | RGBA 32-bit
-    wb_r, wb_g, wb_b, wb_a :: !Word32
-  }
-  deriving stock (Eq, Ord, Show)
+  { wb_edges               :: !Word32 -- ^ Edges on which to draw borders
+  , wb_width               :: !Int32  -- ^ Width of border
+  , wb_r, wb_g, wb_b, wb_a :: !Word32 -- ^ RGBA 32-bit
+  } deriving stock (Eq, Ord, Show)
 
-data RiverColor = RiverColor {red, green, blue, alpha :: !Word32}
+data RiverColor = RiverColor
+  { red, green, blue, alpha :: !Word32 }
   deriving stock (Show, Read, Eq, Generic)
   deriving anyclass (Default)

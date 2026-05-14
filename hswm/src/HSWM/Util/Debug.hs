@@ -10,12 +10,14 @@
 -- Portability : unportable
 module HSWM.Util.Debug where
 
-import Data.Map qualified as M
-import Foreign
-import HSWM
-import Bindings.River qualified as R
---import Text.Printf
-import Bindings.Wayland.Client qualified as WL
+import           HSWM.Core
+import           HSWM.Utils
+
+import           Wayland qualified as WL
+import           Bindings.River qualified as R
+
+import           Data.Map qualified as M
+import           Foreign
 
 logEvent :: (MonadLogger m, Show a, Monoid (m b)) => a -> m b
 logEvent ev = logDebug (fromString $ "evt: " ++ show ev) >> mempty

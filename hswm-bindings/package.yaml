@@ -45,12 +45,16 @@ library:
     - hs-bindgen-runtime ^>=0.1.0
     - c-expr-runtime     ^>=0.1.0
     - unix
+    - containers
+    - unliftio
   language: GHC2024
   default-extensions:
     - DuplicateRecordFields
     - OverloadedStrings
+    - OverloadedLabels
     - TemplateHaskell
     - TypeFamilies
+    - PatternSynonyms
   ghc-options:
     - -Wall
     - -Wunused-packages
