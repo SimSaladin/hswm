@@ -14,8 +14,9 @@ import           HSWM.Core
 import           HSWM.Operations
 
 import qualified Wayland as WL
+import qualified River as R
 
-import           Bindings.Wayland.WlrInputMethodUnstableV2 as Wlr
+import           Bindings.Wlr.InputMethodUnstableV2 as Wlr
 
 import           Control.Monad.Fix
 import qualified Data.Map as M
@@ -155,7 +156,7 @@ newGrabIM manager seat = do
     Wlr.InputMethodKeyboardGrabKey _ _ _ _time key st -> do
       xst <- readMVar xkbState
       keysym <- io $ xkbStateKeySym xst (fi $ key + 8)
-      let it = Right GK {state = fi $ WL.fromCEnum st, keysym = fi keysym, keycode = fi key}
+      let it = Right GK {state = fi $ R.fromCEnum st, keysym = fi keysym, keycode = fi key}
       logDebug $ "grab: key grabbed" :# [ "key" .= show it ]
       atomically $ writeTChan bcastChan it
 

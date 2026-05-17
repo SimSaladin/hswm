@@ -4,7 +4,7 @@ version:
 hsmodule: Bindings.Wayland.XdgShell.Generated
 ctypes:
 - headers: &headers
-  - xdg-shell-client-protocol.h
+  - wayland-xdg-shell-client-protocol.h
   - wlr-layer-shell-unstable-v1-client-protocol.h
   cname: struct xdg_popup
   hsname: Xdg_popup

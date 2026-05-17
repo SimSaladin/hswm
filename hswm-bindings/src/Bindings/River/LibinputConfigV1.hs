@@ -10,4 +10,6 @@ import Bindings.Wayland.Util (Array(..))
 
 import Wayland.Internal.TH
 
-clientFromProtocolXML commonSettings "river-libinput-config-v1.xml"
+import Path_river_libinput_config_v1
+
+clientFromProtocolXML' commonSettings protoXml

@@ -14,7 +14,8 @@ import Text.XkbCommon.KeySyms (key_NoSymbol)
 import qualified Wayland as WL
 
 import qualified Bindings.River as R
-import qualified Bindings.RiverSafe as R
+import qualified River as R
+import qualified Bindings.River.WindowManagementV1.Generated as R
 
 import qualified Data.List as L
 import qualified Data.Map as M
@@ -76,7 +77,7 @@ newXKBBinding ::
   -> m (StablePtr (XkbBinding action))
 newXKBBinding xkbBinds xkb_binding_listener seat enable mods keysym action subKM = do
   logDebug $ "new xkb binding" :# [ "key" .= ppXkbModsKey mods keysym,  "action" .= show action ]
-  xb <- R.riverXkbBindingsGetXkbBinding xkbBinds seat (fi keysym) (WL.toCEnum $ fi mods)
+  xb <- R.riverXkbBindingsGetXkbBinding xkbBinds seat (fi keysym) (R.toCEnum $ fi mods)
   -- subP <- io $ newStablePtr subKM
   runvar <- newEmptyMVar
   dtPtr <- io $ newStablePtr $ XkbBinding xb seat action subKM autorepeat runvar
@@ -126,7 +127,7 @@ newPointerBinding ::
   -> m (StablePtr (PointerBinding a))
 newPointerBinding pointerBindingListener seat mods btn action = do
   logInfo $ "new pointer binding" :# [ "key" .= ppXkbModsKey mods (fi btn) {- TODO wrong -}, "action" .= show action ]
-  pb' <- R.riverSeatGetPointerBinding seat (fi btn) (WL.toCEnum $ fi mods)
+  pb' <- R.riverSeatGetPointerBinding seat (fi btn) (R.toCEnum $ fi mods)
   dtPtr <- io $ newStablePtr $ PointerBinding pb' seat action
   WL.listenerAdd pb' pointerBindingListener dtPtr
   _ <- R.riverPointerBindingEnable pb'

@@ -14,6 +14,8 @@ import           HSWM.Util.Posix
 
 import qualified Pixman as P
 import qualified Wayland as WL
+import qualified River as R
+import qualified Bindings.River as R
 
 import qualified Data.List as L
 import           Foreign hiding (void)
@@ -146,7 +148,7 @@ getPixmanFormatLE = \case
   WL.ShmFormatABGR2101010 -> P.A2B10G10R10
   WL.ShmFormatXRGB2101010 -> P.X2R10G10B10
   WL.ShmFormatXBGR2101010 -> P.X2B10G10R10
-  _                       -> WL.toCEnum 0
+  _                       -> R.toCEnum 0
 
 getPixmanFormatBE :: WL.ShmFormat -> P.FormatCode
 getPixmanFormatBE = \case
@@ -158,4 +160,4 @@ getPixmanFormatBE = \case
   WL.ShmFormatBGRX8888 -> P.X8R8G8B8
   WL.ShmFormatRGBA8888 -> P.A8B8G8R8
   WL.ShmFormatRGBX8888 -> P.X8B8G8R8
-  _                    -> WL.toCEnum 0
+  _                    -> R.toCEnum 0

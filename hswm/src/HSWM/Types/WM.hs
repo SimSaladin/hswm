@@ -22,12 +22,13 @@ import           HSWM.XKB (Button, KeySym, ModMask, XkbRuleNames, XkbBindingMap,
 import           HSWM.Wayland (HasGlobalsRegistry(..), RegistryCache)
 
 import qualified Wayland as WL
-import           River.WindowManagement (RiverWindow, RiverSeat, RiverOutput, RiverNode)
-import           Bindings.River (RiverColor)
 
+import           River.WindowManagement (RiverWindow, RiverSeat, RiverOutput, RiverNode)
+
+import           Bindings.River (RiverColor)
 import qualified Bindings.River as R
-import qualified Bindings.RiverSafe as R
-import qualified Bindings.Wayland.WlrOutputPowerManagementUnstableV1 as Wlr
+import qualified Bindings.River.WindowManagementV1.Generated as R
+import qualified Bindings.Wlr.OutputPowerManagementUnstableV1 as Wlr
 
 import           Control.Monad.Fix
 import           Control.Monad.State
@@ -520,7 +521,7 @@ instance Default Seat where
         inputOverride = Nothing,
         position = (0,0),
         name = "",
-        caps = WL.toCEnum 0,
+        caps = R.toCEnum 0,
         removed = False,
         currentFocus = SFocusNone,
         pendingPointerEnter = Nothing,

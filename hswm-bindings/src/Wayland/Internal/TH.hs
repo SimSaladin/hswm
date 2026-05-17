@@ -7,6 +7,7 @@
 
 module Wayland.Internal.TH
   ( clientFromProtocolXML
+  , clientFromProtocolXML'
   , commonSettings
   , ProtocolRenderSettings(..)
   , RequestSettings(..)
@@ -33,6 +34,7 @@ import           Data.Maybe
 import           Data.String (IsString(..))
 import           Data.Text (Text)
 import qualified Data.Text as T
+import qualified Data.Text.Lazy as TL
 import           Data.Void
 import           Foreign
 import           Foreign.C
@@ -193,6 +195,14 @@ clientFromProtocolXML :: ProtocolRenderSettings -> FilePath ->  Q [Dec]
 clientFromProtocolXML settings filepath = do
   pkgRoot <- getPackageRoot
   protoDoc <- runIO $ X.readFile X.def (pkgRoot ++ "/protocol/" ++ filepath)
+  clientFromProtocolXMLDo settings protoDoc
+
+clientFromProtocolXML' :: ProtocolRenderSettings -> String ->  Q [Dec]
+clientFromProtocolXML' settings content = do
+  let protoDoc = X.parseText_ X.def $ TL.pack content
+  clientFromProtocolXMLDo settings protoDoc
+
+clientFromProtocolXMLDo settings protoDoc = do
   let proto = prProtocolModifier settings $ protocolFromXML $ fromDocument protoDoc
   addModFinalizer $ putDoc ModuleDoc $ unlines
     [ "Description: " ++ fst (protocolDescription proto)

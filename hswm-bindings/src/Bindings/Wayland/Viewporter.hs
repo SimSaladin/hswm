@@ -7,5 +7,6 @@ import Bindings.Wayland.Viewporter.Generated.Safe
 import Bindings.Wayland.Client (Surface(..))
 
 import Wayland.Internal.TH
+import Path_wayland_viewporter
 
-clientFromProtocolXML commonSettings "wayland-protocols/viewporter.xml"
+clientFromProtocolXML' commonSettings protoXml

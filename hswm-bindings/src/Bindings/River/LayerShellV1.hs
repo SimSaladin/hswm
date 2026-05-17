@@ -8,4 +8,6 @@ import           Bindings.River.WindowManagementV1 (RiverOutput(..), RiverSeat(.
 
 import           Wayland.Internal.TH
 
-clientFromProtocolXML commonSettings "river-layer-shell-v1.xml"
+import Path_river_layer_shell_v1
+
+clientFromProtocolXML' commonSettings protoXml

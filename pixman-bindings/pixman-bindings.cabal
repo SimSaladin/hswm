@@ -1,0 +1,70 @@
+cabal-version:      3.14
+name:               pixman-bindings
+version:            0.1.0.0
+-- synopsis:
+-- description:
+license:            BSD-3-Clause
+license-file:       LICENSE
+author:             Samuli Thomasson
+maintainer:         samuli.thomasson@pm.me
+-- copyright:
+category:           Graphics
+build-type:         Hooks
+extra-doc-files:    CHANGELOG.md
+-- extra-source-files:
+tested-with:
+    GHC == 9.14.1
+
+custom-setup
+    setup-depends:
+          base >=4.21 && <4.23
+        , Cabal-hooks >=3.14 && <3.17
+        , hs-bindgen-hooks
+
+common warnings
+    ghc-options: -Wall
+
+flag use-pkgconfig
+    description: Use pkgconfig to to resolve C dependencies
+    manual: True
+    default: True
+
+flag hs-bindgen-build-tool
+    description: Use build-tool-depends for hs-bindgen-cli
+    manual: True
+    default: True
+
+library
+    import:           warnings
+    exposed-modules:
+          Pixman
+    build-depends:
+          base >=4.21 && <4.23
+        , hs-bindgen-runtime >=0.1
+        , c-expr-runtime
+        , data-default
+        , deepseq
+    hs-source-dirs:   src
+    default-language: GHC2024
+    extra-libraries: pixman-1
+    if flag(use-pkgconfig)
+        pkgconfig-depends: pixman-1
+
+    if flag(hs-bindgen-build-tool)
+       build-tool-depends:
+           hs-bindgen:hs-bindgen-cli
+
+test-suite pixman-test
+    import:           warnings
+    default-language: GHC2024
+    other-modules:    PixmanSpec
+    type:             exitcode-stdio-1.0
+    hs-source-dirs:   test
+    main-is:          Spec.hs
+    build-depends:
+        base ^>=4.22.0.0
+      , pixman-bindings
+      , deepseq
+      , hspec
+    build-tool-depends:
+          hspec-discover:hspec-discover

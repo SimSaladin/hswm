@@ -27,7 +27,8 @@ import           HSWM.Core
 import qualified Wayland as WL
 
 import qualified Bindings.River as R
-import qualified Bindings.RiverSafe as R
+import qualified Bindings.River.XkbConfigV1.Generated as R
+import qualified Bindings.River.InputManagementV1.Generated as R
 import           Bindings.Wayland.Client (CEnum(..))
 
 import qualified Data.List as L

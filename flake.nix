@@ -11,11 +11,17 @@
     hs-bindgen = {
       url = "github:well-typed/hs-bindgen";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
     };
 
     river = {
       url = "git+https://codeberg.org/river/river";
       flake = false;
+    };
+
+    zon2nix = {
+      url = "github:jcollie/zon2nix";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # GHC 9.14
@@ -59,8 +65,8 @@
           perSys.config.haskellProjects.${ghcVersion}.defaults.projectModules.output
         ];
         basePackages = perSys.config.haskellProjects.${ghcVersion}.outputs.finalPackages;
-        defaults.settings.defined.haddock = true;
         defaults.settings.defined = {
+          haddock = true;
           extraBuildTools = [
             perSys.config.haskellProjects.${ghcVersion}.outputs.finalPackages.ghc.llvmPackages.llvm
             perSys.config.haskellProjects.${ghcVersion}.outputs.finalPackages.ghc.llvmPackages.clang
@@ -93,6 +99,8 @@
           (root + /hswm-bindings)
           (root + /xkbcommon-bindings)
           (root + /waybar-cffi-hs)
+          (root + /hs-bindgen-hooks)
+          (root + /pixman-bindings)
           #(root + /cabal.project)
         ];
       });
@@ -102,6 +110,8 @@
         hswm-bindings.source = cabalProjectRoot + "/hswm-bindings";
         xkbcommon-bindings.source = cabalProjectRoot + "/xkbcommon-bindings";
         waybar-cffi-hs.source = cabalProjectRoot + "/waybar-cffi-hs";
+        pixman-bindings.source = cabalProjectRoot + "/pixman-bindings";
+        hs-bindgen-hooks.source = cabalProjectRoot + "/hs-bindgen-hooks";
       };
     in
     {
@@ -110,6 +120,7 @@
         config = {
            problems.handlers = {
              monad-logger-aeson.broken = "warn";
+             Cabal-hooks.broken = "warn"; # or "ignore"
            };
          };
         overlays = [
@@ -120,14 +131,20 @@
               src = inputs.river;
             };
 
+            # for support "cabal-version: 3.14"
+            cabal2nix-unwrapped = final.haskell.packages.ghc914.cabal2nix;
+
             # For cabal pkg-config-depends: xkbregistry
             xkbregistry = final.libxkbcommon;
+
+            # Different one than the one in nixpkgs
+            zon2nix = inputs.zon2nix.packages.${system}.zon2nix;
           })
           inputs.hs-bindgen.overlays.default
         ];
       };
 
-      # GHC 9.12 (default)
+      # GHC 9.12
       haskellProjects.ghc912 = {
         defaults.enable = false;
         basePackages = pkgs.haskell.packages.ghc912;
@@ -166,14 +183,33 @@
           # XXX: specifying this via packages.glib.source throws infinite
           # recursion...
           glib = pkgs.haskell.lib.compose.overrideSrc { src = inputs.glib; } super.glib;
+
+          # For Cabal-hooks-3.16...
+          Cabal_3_14_2_0 = super.Cabal_3_16_1_0;
         });
 
         packages.doctest-parallel.source = inputs.doctest-parallel; # 0.4.1
         packages.ghc-exactprint.source = "1.14.0.0";
         packages.ghc-tcplugins-extra.source = inputs.ghc-tcplugins-extra; # GHC 9.14
-        packages.ghc-typelits-knownnat.source = "0.8.2";
+        settings.ghc-typelits-knownnat = { # "0.8.4";
+          custom = (p: p.overrideAttrs (oa: rec {
+            version = "0.8.4";
+            src = pkgs.fetchzip {
+              url = "mirror://hackage/${oa.pname}-${version}/${oa.pname}-${version}.tar.gz";
+              sha256 = "sha256-PyYMUvJ8/miqusNl7+xay8OJqtK1/uHNQEiLr1utieg=";
+            };
+          }));
+        };
         packages.ghc-typelits-natnormalise.source = inputs.ghc-typelits-natnormalise; # containers 0.8 etc.
-
+        settings.ghc-tcplugin-api = { # "0.19.0.0"
+          custom = (p: p.overrideAttrs (oa: rec {
+            version = "0.19.0.0";
+            src = pkgs.fetchzip {
+              url = "mirror://hackage/${oa.pname}-${version}/${oa.pname}-${version}.tar.gz";
+              sha256 = "sha256-2jm1Q2lmaG6vtRnxcvxf4U2gvQdVkDL0h8PWaTpDWJA=";
+            };
+          }));
+        };
         settings.blaze-html.jailbreak = true; # containers 0.8
         settings.blaze-markup.jailbreak = true; # containers 0.8
         settings.boring.jailbreak = true; # base 4.22
@@ -182,7 +218,6 @@
         settings.fin.check = false; # tests  fail?
         settings.fin.jailbreak = true; # base 4.22
         settings.ghc-typelits-natnormalise.check = false; # ???
-        settings.ghc-typelits-natnormalise.jailbreak = true; # containers 0.8
         settings.hedgehog.jailbreak = true; # template-haskell
         settings.lifted-async.jailbreak = true; # base 4.22
         settings.monad-logger-aeson.check = false; # Tests broken
@@ -222,6 +257,8 @@
 
         projectRoot = cabalProjectRoot;
         packages = cabalPackages;
+
+        settings.hswm-bindings.extraBuildDepends = [ pkgs.wayland-scanner ];
 
         devShell.mkShellArgs.shellHook = ''
           # Ensure that libs are available to TH splices, cabal repl, etc.
@@ -283,6 +320,8 @@
 
       devShells.all = config.haskellProjects.default.outputs.finalPackages.shellFor {
         packages = ps: [
+          ps.pixman-bindings
+          ps.hswm-bindings
           ps.hswm
           ps.waybar-cffi-hs
         ];

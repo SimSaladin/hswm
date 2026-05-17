@@ -8,15 +8,14 @@
 -- Portability : unportable
 module HSWM.Types.Events where
 
-import Bindings.Wayland.ExtSessionLockV1 qualified as SL
---import Bindings.Wayland.FractionalScaleV1 qualified as FS
-import Bindings.Wayland.WlrOutputManagementUnstableV1 qualified as Wlr
-import Bindings.Wayland.XdgOutputUnstableV1 qualified as Zdg
 import Bindings.River qualified as R
 import Bindings.Wayland.Client qualified as WL
-import Bindings.Wayland.Protocol.ForeignTopLevelListV1 qualified as WL
-import Bindings.Wayland.WlrInputMethodUnstableV2 qualified as Zwp
 import Bindings.Wayland.ExtIdleNotifyV1 qualified as Ext
+import Bindings.Wayland.ExtSessionLockV1 qualified as SL
+import Bindings.Wayland.ExtForeignTopLevelListV1 qualified as WL
+import Bindings.Wayland.XdgOutputUnstableV1 qualified as Zdg
+import Bindings.Wlr.InputMethodUnstableV2 qualified as Zwp
+import Bindings.Wlr.OutputManagementUnstableV1 qualified as Wlr
 
 -- | Mash-up of all River/Wayland generated events
 data Event

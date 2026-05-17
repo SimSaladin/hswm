@@ -1,5 +1,5 @@
 -- |
--- Module      : River.Objects
+-- Module      : River
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>

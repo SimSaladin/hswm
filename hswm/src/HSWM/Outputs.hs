@@ -20,7 +20,7 @@ import           HSWM.Wayland
 import qualified Wayland as WL
 
 import qualified Bindings.River as R
-import qualified Bindings.Wayland.WlrOutputPowerManagementUnstableV1 as Wlr
+import qualified Bindings.Wlr.OutputPowerManagementUnstableV1 as Wlr
 import qualified Bindings.Wayland.XdgOutputUnstableV1 as Zdg
 
 import qualified Data.List as L

@@ -20,7 +20,7 @@ import qualified HSWM.StackSet as W
 import qualified Wayland as WL
 
 import qualified Bindings.River as R
-import qualified Bindings.RiverSafe as R
+import qualified Bindings.River.WindowManagementV1.Generated as R
 
 import qualified Control.Monad.State as State
 import qualified Data.List as L
@@ -203,8 +203,8 @@ render = runInHS $ do
 setInitialManageProperties :: Window -> HS ()
 setInitialManageProperties Window {river_window = rw} = do
   R.riverWindowUseSsd rw
-  R.riverWindowSetCapabilities rw (WL.toCEnum . fi $ foldl' (.|.) 0 $ map (.unwrap) [R.Maximize, R.Fullscreen])
-  R.riverWindowSetTiled rw (WL.toCEnum . fi $ foldl' (.|.) 0 $ map (.unwrap) [R.EdgeTop, R.EdgeBottom, R.EdgeLeft, R.EdgeRight])
+  R.riverWindowSetCapabilities rw (R.toCEnum . fi $ foldl' (.|.) 0 $ map (.unwrap) [R.Maximize, R.Fullscreen])
+  R.riverWindowSetTiled rw (R.toCEnum . fi $ foldl' (.|.) 0 $ map (.unwrap) [R.EdgeTop, R.EdgeBottom, R.EdgeLeft, R.EdgeRight])
   nbc <- asks (normalBorder . config)
   modifyWindow rw $ \s -> s {new = False, p_render_border = Just nbc}
 
@@ -286,7 +286,7 @@ handleEvent e = case e of
   R.RiverWindowPointerMoveRequested _ w seat ->
     runInHS $ modifyWindow w $ \s -> s {pointer_move_requested = seat}
   R.RiverWindowPointerResizeRequested _ w seat edges ->
-    runInHS $ modifyWindow w $ \x -> x {pointer_resize_requested = seat, pointer_resize_requested_edges = fi $ WL.fromCEnum edges}
+    runInHS $ modifyWindow w $ \x -> x {pointer_resize_requested = seat, pointer_resize_requested_edges = fi $ R.fromCEnum edges}
   -- TODO maximize
   R.RiverWindowMaximizeRequested _ _w -> return ()
   R.RiverWindowUnmaximizeRequested _ _w -> return ()

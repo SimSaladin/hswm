@@ -28,6 +28,5 @@ import River.InputManagement
 import River.LibinputConfig
 
 import Bindings.River.LibinputConfigV1
--- import Bindings.River
 
 import Wayland.Types

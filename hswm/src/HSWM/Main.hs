@@ -34,12 +34,12 @@ import qualified Wayland as WL
 import qualified Bindings.River as R
 import           Bindings.Wayland.ExtIdleNotifyV1 as Ext
 import qualified Bindings.Wayland.FractionalScaleV1 as FS
-import           Bindings.Wayland.Protocol.ForeignTopLevelListV1 as WL
+import           Bindings.Wayland.ExtForeignTopLevelListV1 as WL
 import qualified Bindings.Wayland.Viewporter as VP
-import           Bindings.Wayland.WlrInputMethodUnstableV2 as Wlr
-import qualified Bindings.Wayland.WlrLayerShellUnstableV1 as Wlr
-import qualified Bindings.Wayland.WlrOutputManagementUnstableV1 as Wlr
-import qualified Bindings.Wayland.WlrOutputPowerManagementUnstableV1 as Wlr
+import           Bindings.Wlr.InputMethodUnstableV2 as Wlr
+import qualified Bindings.Wlr.LayerShellUnstableV1 as Wlr
+import qualified Bindings.Wlr.OutputManagementUnstableV1 as Wlr
+import qualified Bindings.Wlr.OutputPowerManagementUnstableV1 as Wlr
 import qualified Bindings.Wayland.XdgOutputUnstableV1 as Zdg
 
 import           Control.Concurrent (threadWaitRead, threadWaitWrite)

@@ -21,7 +21,7 @@ import           HSWM.Utils
 import qualified Wayland as WL
 
 import qualified Bindings.River as R
-import qualified Bindings.RiverSafe as R
+import qualified Bindings.River.WindowManagementV1.Generated as R
 import qualified Bindings.Wayland.ExtIdleNotifyV1 as Ext
 
 import           Data.Bits

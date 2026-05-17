@@ -9,5 +9,6 @@ import Bindings.River.WindowManagementV1.Generated (River_seat_v1_modifiers(..))
 
 import Wayland.Internal.TH
 
-clientFromProtocolXML commonSettings "river-xkb-bindings-v1.xml"
+import Path_river_xkb_bindings_v1
 
+clientFromProtocolXML' commonSettings protoXml

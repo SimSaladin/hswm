@@ -8,4 +8,6 @@ import Bindings.Wayland.Client (Output(..))
 
 import Wayland.Internal.TH
 
-clientFromProtocolXML commonSettings "river-input-management-v1.xml"
+import Path_river_input_management_v1
+
+clientFromProtocolXML' commonSettings protoXml

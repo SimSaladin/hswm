@@ -8,5 +8,6 @@ import           Bindings.Wayland.Client (Array(..), Output(..), Seat(..))
 import qualified Bindings.Wayland.Client (Surface(..))
 
 import           Wayland.Internal.TH
+import Path_wayland_xdg_shell
 
-clientFromProtocolXML commonSettings "wayland-protocols/xdg-shell.xml"
+clientFromProtocolXML' commonSettings protoXml

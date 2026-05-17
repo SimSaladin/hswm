@@ -3,7 +3,7 @@
   lib,
   stdenv,
   callPackage,
-  fetchFromCodeberg,
+  #fetchFromCodeberg,
   libGL,
   libx11,
   libevdev,
@@ -23,46 +23,9 @@
   withManpages ? true,
   xwaylandSupport ? true,
   withDebug ? false,
-  pkgs,
 }:
 let
-  mkZon2Nix = { name, zonfile, outputHash ? "" }: pkgs.runCommand "zon2nix-${name}" {
-    buildInputs = [
-      pkgs.cacert
-      pkgs.zon2nix
-      pkgs.nix-prefetch-git
-      pkgs.nix
-      pkgs.zig
-      pkgs.strace
-      pkgs.git
-    ];
-    outputHashMode = "recursive";
-    outputHashAlgo = "sha256";
-    inherit outputHash;
-  }
-  ''
-    export HOME=$PWD
-    export TMPDIR=$PWD
-    zon2nix ${zonfile} > $out
-  '';
-
-  deps0 = mkZon2Nix {
-    name = "river";
-    zonfile = "${src}/build.zig.zon";
-    outputHash = "sha256-RomlAd47G7Op1Y9ql5pIUUibw+RO06izo2MPzpDtPg8=";
-  };
-
-  extra = mkZon2Nix {
-    name = "translate_c";
-    zonfile = "${callPackage deps0 {}}/translate_c-0.0.0-Q_BUWlX1BgCD1wo6uo97prlp9VJ4gxAjwN_vZ7nsSjGN/build.zig.zon";
-    outputHash = "sha256-MJc+N/T2B8yW2sz1Ys8rGkhjgmmm+nXxNXnubCm0e6U=";
-  };
-
-  deps0Links = callPackage deps0 { linkFarm = _: ps: ps; };
-
-  extraLinks = callPackage extra { linkFarm = _: ps: ps; };
-
-  deps = pkgs.linkFarm "zig-packages" (deps0Links ++ extraLinks);
+  callZon2Nix = callPackage ./callZon2nix.nix { };
 in
 
 stdenv.mkDerivation (finalAttrs: {
@@ -81,8 +44,11 @@ stdenv.mkDerivation (finalAttrs: {
 
   strictDeps = true;
 
-  # zon2nix build.zig.zon > /home/sim/hswm/river.zig.zon.nix
-  inherit deps;
+  deps = callPackage (callZon2Nix {
+    pname = "river";
+    inherit src;
+    outputHash = "sha256-tXU9LWcxEQbI24ua4OAJjqhtsJrLlGHBukyFXEUcV/Q=";
+  }) { };
 
   nativeBuildInputs = [
     pkg-config

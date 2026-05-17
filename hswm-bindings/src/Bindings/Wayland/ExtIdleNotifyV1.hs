@@ -7,5 +7,6 @@ import Bindings.Wayland.ExtIdleNotifyV1.Generated.Safe
 import Bindings.Wayland.Client (Seat(..))
 
 import Wayland.Internal.TH
+import Path_wayland_ext_idle_notify_v1
 
-clientFromProtocolXML commonSettings "wayland-protocols/ext-idle-notify-v1.xml"
+clientFromProtocolXML' commonSettings protoXml

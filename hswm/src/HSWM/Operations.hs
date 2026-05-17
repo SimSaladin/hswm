@@ -5,9 +5,11 @@ import qualified HSWM.StackSet as W
 
 import qualified Wayland as WL
 
+import qualified River as R
+
 import qualified Bindings.River as R
-import qualified Bindings.RiverSafe as R
-import qualified Bindings.Wayland.WlrOutputPowerManagementUnstableV1 as Wlr
+import qualified Bindings.River.WindowManagementV1.Generated as R ()
+import qualified Bindings.Wlr.OutputPowerManagementUnstableV1 as Wlr
 
 import qualified Control.Monad.State as State
 import qualified Data.List as L
@@ -72,7 +74,8 @@ tileWindow placeTop rw r = do
           case mo of
             Nothing -> return ()
             Just o
-              | ro == o.river_output -> modifyWindow rw $ \w' -> w' { p_render_place = if placeTop then R.rIVER_NODE_V1_PLACE_TOP else 0 }
+              | ro == o.river_output -> modifyWindow rw $ \w' -> w'
+                { p_render_place = if placeTop then R.rIVER_NODE_V1_PLACE_TOP else 0 }
               | otherwise -> do
                 -- need to change the output where the window is fullscreened
                 R.riverWindowFullscreen rw o.river_output
@@ -236,7 +239,7 @@ setWindowBorder w wb_width RiverColor {red = wb_r, green = wb_g, blue = wb_b, al
   io $ riverWindowSetBorders w borders
 
 riverWindowSetBorders :: RiverWindow -> R.WindowBorders -> IO ()
-riverWindowSetBorders w R.WindowBorders {..} = R.riverWindowSetBorders w (WL.toCEnum $ fi wb_edges) wb_width wb_r wb_g wb_b wb_a
+riverWindowSetBorders w R.WindowBorders {..} = R.riverWindowSetBorders w (R.toCEnum $ fi wb_edges) wb_width wb_r wb_g wb_b wb_a
 
 setWindowPosition :: Window -> Int32 -> Int32 -> HS ()
 setWindowPosition w x y = do

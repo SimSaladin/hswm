@@ -1,89 +1,84 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE OverloadedRecordDot #-}
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE CPP #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE OverloadedLists #-}
-{-# LANGUAGE StaticPointers #-}
+{-# LANGUAGE CPP                      #-}
+{-# LANGUAGE DataKinds                #-}
+{-# LANGUAGE DeriveAnyClass           #-}
+{-# LANGUAGE DisambiguateRecordFields #-}
+{-# LANGUAGE OverloadedLists          #-}
+{-# LANGUAGE OverloadedRecordDot      #-}
+{-# LANGUAGE OverloadedStrings        #-}
+{-# LANGUAGE StaticPointers           #-}
 {-# OPTIONS_GHC -Wall #-}
-
 
 module SetupHooks (setupHooks) where
 
-import           Distribution.Compat.Prelude
+import           Distribution.Compat.Binary
 import           Distribution.ModuleName (ModuleName, toFilePath)
-import           Distribution.Pretty
+import           Distribution.Pretty (prettyShow)
 import           Distribution.Simple.Build (AutogenFile(..), writeAutogenFiles)
+import           Distribution.Simple.LocalBuildInfo (withPrograms)
 import           Distribution.Simple.Program (gccProgram, programInvocation, requireProgram)
 import           Distribution.Simple.Program.Run (getProgramInvocationOutputAndErrors)
-import           Distribution.Simple.SetupHooks (BuildHooks(..), Command,
-                                                 Dict(..), LocalBuildInfo, Location(..),
-                                                 PreBuildComponentInputs(..), ProgramLocation(..),
-                                                 Rules, SetupHooks(..), TargetInfo(..), Verbosity,
-                                                 Component(..),
-                                                 autogenComponentModulesDir,
-                                                 buildingWhatVerbosity, mkCommand, noSetupHooks,
-                                                 registerRule_, rules, staticRule)
+import           Distribution.Simple.SetupHooks
 import           Distribution.Simple.Utils (die', notice, toUTF8LBS, withTempFile)
-import           Distribution.Types.LocalBuildInfo (withPrograms)
-import           Distribution.Utils.IOData
-import           Distribution.Utils.Path
+import           Distribution.Utils.IOData (IOData(..), hPutContents)
+import           Distribution.Utils.Path (makeRelativePathEx, (<.>))
 
 import           Control.Monad
 import qualified Data.List as L
+import           Data.Maybe
+import           GHC.Generics (Generic)
+import           System.Exit (ExitCode(..))
 
 setupHooks :: SetupHooks
 setupHooks = noSetupHooks
-  { buildHooks = mempty { preBuildComponentRules = Just myPreBuildRules } }
+  { buildHooks = mempty
+    { preBuildComponentRules = Just $ rules (static ()) preBuildHook }
+  }
 
-myGenerated :: [Generated]
-myGenerated =
-  [ (mkGenerated "Text.XkbCommon.KeySyms" "KeySym" "xkbcommon/xkbcommon-keysyms.h") -- system package "libxkbcommon"
-    { sStripPrefix = "XKB_KEY_"
-    , sAddPrefix = "key_"
-    , sImports = [ "Text.XkbCommon.KeySym" ]
-    }
-  , (mkGenerated "Text.XkbCommon.EventCodes" "Word32" "linux/input-event-codes.h") -- system package "linux-headers"
-    { sAddPrefix = "_"
-    , sImports = [ "Data.Word" ]
-    }
-  ]
+preBuildHook :: PreBuildComponentInputs -> RulesM ()
+preBuildHook PreBuildComponentInputs{buildingWhat=flags, localBuildInfo=lbi, targetInfo=tgt}
+  | CLibName LMainLibName <- componentName tgt.targetComponent
+  = do
+    let autogendir = autogenComponentModulesDir lbi tgt.targetCLBI
+        mkRule gen = staticRule (action (buildingWhatVerbosity flags, lbi, tgt.targetCLBI, gen)) []
+          [Location autogendir (makeRelativePathEx (toFilePath gen.sModule) <.> "hs")]
 
-data Generated = Generated
+    -- system package "libxkbcommon"
+    registerRule_ "keysyms" $ mkRule GenerateModule
+        { sModule = "Text.XkbCommon.KeySyms"
+        , sImports = [ "Text.XkbCommon.KeySym" ]
+        , sType = "KeySym"
+        , sHeader = "xkbcommon/xkbcommon-keysyms.h"
+        , sStripPrefix = "XKB_KEY_"
+        , sAddPrefix = "key_"
+        }
+
+    -- system package "linux-headers"
+    registerRule_ "eventcodes" $ mkRule GenerateModule
+        { sModule = "Text.XkbCommon.EventCodes"
+        , sImports = [ "Data.Word (Word32)" ]
+        , sType = "Word32"
+        , sHeader = "linux/input-event-codes.h"
+        , sAddPrefix = "_"
+        , sStripPrefix = ""
+        }
+  | otherwise = return ()
+
+action = mkCommand (static Dict) $ static \(verb, lbi, clbi, gen) -> do
+  defines <- getDefines verb lbi gen
+  writeAutogenFiles verb lbi clbi [(AutogenModule gen.sModule "hs", toUTF8LBS defines)]
+
+data GenerateModule = GenerateModule
   { sModule :: ModuleName
+  , sImports :: [String]
   , sType :: String -- ^ E.g. @''Word32@
   , sHeader :: String
   , sStripPrefix :: String
   , sAddPrefix :: String
-  , sImports :: [String]
   } deriving (Show, Generic, Binary)
 
-mkGenerated :: ModuleName -> String -> FilePath -> Generated
-mkGenerated mo ty hdr = Generated mo ty hdr "" "" []
-
-myPreBuildRules :: Rules PreBuildComponentInputs
-myPreBuildRules = rules (static ()) $ \env -> when (buildIsLib env) $ do
-  let lbi = env.localBuildInfo
-      clbi = env.targetInfo.targetCLBI
-  forM_ myGenerated $ \gen ->
-    registerRule_ (fromString $ show gen.sModule) $ staticRule (generateCmd (env, gen)) []
-      [Location (autogenComponentModulesDir lbi clbi) (makeRelativePathEx (toFilePath gen.sModule) <.> "hs")]
-  where
-    buildIsLib x | CLib{} <- x.targetInfo.targetComponent = True
-                 | otherwise = False
-
-generateCmd :: (PreBuildComponentInputs, Generated) -> Command (PreBuildComponentInputs, Generated) (IO ())
-generateCmd = mkCommand (static Dict) $ static \(env, gen) -> do
-  let lbi = env.localBuildInfo
-      clbi = env.targetInfo.targetCLBI
-      verb = buildingWhatVerbosity env.buildingWhat
-  defines <- getDefines verb lbi gen
-  writeAutogenFiles verb lbi clbi [(AutogenModule gen.sModule "hs", toUTF8LBS defines)]
-
-getDefines :: Verbosity -> LocalBuildInfo -> Generated -> IO String
+getDefines :: Verbosity -> LocalBuildInfo -> GenerateModule -> IO String
 getDefines verb lbi gen = do
-  headerFile <- resolveHeader verb lbi gen
+  headerFile <- resolveHeader verb lbi gen.sHeader
   contents <- readFile headerFile
   return $! unlines $
       [ "{-# LANGUAGE CApiFFI #-}"
@@ -104,50 +99,53 @@ getDefines verb lbi gen = do
     where
       getName d = gen.sAddPrefix ++ fromMaybe d (L.stripPrefix gen.sStripPrefix d)
       getType _ = gen.sType
-      getDoc Nothing = ""
+
       getDoc (Just x) = "-- | " ++ x ++ "\n"
+      getDoc Nothing = ""
 
 parseHeader :: String -> [(String, Maybe String)]
-parseHeader = go . lines where
-  go (x : xs)
-    | "#define _" `L.isPrefixOf` x = go xs
-    | "#define "  `L.isPrefixOf` x = parseDefine x : go xs
-    | otherwise = go xs
+parseHeader = parseLine . lines where
+  parseLine (x : xs)
+    | "#define _" `L.isPrefixOf` x = parseLine xs
+    | "#define "  `L.isPrefixOf` x = parseDefine x : parseLine xs
+    | otherwise = parseLine xs
+  parseLine [] = []
 
-  go [] = []
+  parseDefine inp = go $ words inp where
+    go (_: x : xs) = (x, getDoc xs)
+    go _ = error $ "parseHeader: invalid input: " ++ inp
 
-parseDefine = go . words where
-  go (_: x : xs) = (x, getDoc xs)
-  go _ = error "parseDefine"
+    getDoc [] = Nothing
+    getDoc ("/*" : xs) = Just $ unwords $ getDoc1 xs
+    getDoc (_ : xs) = getDoc xs
 
-  getDoc [] = Nothing
-  getDoc ("/*" : xs) = Just $ unwords $ getDoc1 xs
-  getDoc (_ : xs) = getDoc xs
+    getDoc1 ("*/" : _) = []
+    getDoc1 (x : xs) = x : getDoc1 xs
+    getDoc1 [] = []
 
-  getDoc1 ("*/" : _) = []
-  getDoc1 (x : xs) = x : getDoc1 xs
-  getDoc1 [] = []
-
-resolveHeader :: Verbosity -> LocalBuildInfo -> Generated -> IO FilePath
-resolveHeader verb lbi gen = do
+resolveHeader :: Verbosity -> LocalBuildInfo -> FilePath -> IO FilePath
+resolveHeader verb lbi hdr = do
   (gcc, _) <- requireProgram verb gccProgram (withPrograms lbi)
-  let hdr = gen.sHeader
-  withTempCProgram hdr $ \fp -> do
-    (_, cppOut, ec) <- getProgramInvocationOutputAndErrors verb $ programInvocation gcc ["-H", "-fsyntax-only", fp]
-    unless (ec == ExitSuccess) $ die' verb $ "gcc returned " ++ show ec
-    headerFile <- case map words $ lines cppOut of
+  let prog = unlines
+        [ "#include <" ++ hdr ++ ">"
+        , "int main(int argc, char** argv) { return 0; }"
+        ]
+  withTempCProgram prog $ \fp -> do
+    (_, gccErr, ec) <- getProgramInvocationOutputAndErrors verb $ programInvocation gcc ["-H", "-fsyntax-only", fp]
+    unless (ec == ExitSuccess) $ die' verb $ "gcc returned " ++ show ec ++ ": " ++ gccErr
+    headerFile <- case map words $ lines gccErr of
                        (_ : file : _) : _ -> return file
-                       _ -> die' verb $ "failed to locate header file " ++ hdr ++ ": " ++ cppOut
+                       _ -> die' verb $ "Failed to locate header file " ++ hdr ++ ": " ++ gccErr
     notice verb $ "Using header file '" ++ headerFile ++ "' for " ++ hdr
     return headerFile
 
 withTempCProgram :: String -> (FilePath -> IO a) -> IO a
-withTempCProgram hdr f =
+withTempCProgram contents f =
 #if MIN_VERSION_Cabal(3,15,0)
   withTempFile
 #else
   withTempFile "src"
 #endif
   "test.c" $ \fp h -> do
-      hPutContents h $ IODataText $ "#include <" ++ hdr ++ ">\nint main(int argc, char** argv) { return 0; }\n"
+      hPutContents h $ IODataText contents
       f fp

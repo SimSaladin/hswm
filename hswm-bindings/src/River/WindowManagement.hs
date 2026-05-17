@@ -7,28 +7,118 @@
 -- Stability   : unstable
 -- Portability : unportable
 --
-module River.WindowManagement (
+module River.WindowManagement
   -- * RiverWindowManager
-  RiverWindowManager,
-  RiverWindowManagerEvent(..),
+  ( RiverWindowManager
+  -- ** Events
+  , RiverWindowManagerEvent(..)
+  -- ** Requests
+  -- *** ManageFinish (Manage)
+  , riverWindowManagerManageFinish
+  -- *** RenderFinish (Render)
+  , riverWindowManagerRenderFinish
+  -- *** GetShellSurface
+  , riverWindowManagerGetShellSurface
+  -- *** ManageDirty
+  , riverWindowManagerManageDirty
+  -- *** Stop
+  , riverWindowManagerStop
+  -- *** ExitSession
+  , riverWindowManagerExitSession
+
   -- * RiverWindow
-  RiverWindow,
-  RiverWindowEvent(..),
+  , RiverWindow
+  -- ** Events
+  , RiverWindowEvent(..)
+  -- ** Requests
+  -- *** GetNode
+  , riverWindowGetNode
+  -- *** GetDecoration
+  , riverWindowGetDecorationAbove
+  , riverWindowGetDecorationBelow
+  -- *** (Manage)
+  , riverWindowProposeDimensions
+  , riverWindowSetDimensionBounds
+  , riverWindowUseCsd
+  , riverWindowUseSsd
+  , riverWindowSetTiled
+  , riverWindowInformResizeStart
+  , riverWindowInformResizeEnd
+  , riverWindowSetCapabilities
+  , riverWindowInformMaximized
+  , riverWindowInformUnmaximized
+  , riverWindowInformFullscreen
+  , riverWindowInformNotFullscreen
+  , riverWindowFullscreen
+  , riverWindowExitFullscreen
+  , riverWindowClose
+  -- *** (Render)
+  , riverWindowHide
+  , riverWindowShow
+  , riverWindowSetBorders
+  , riverWindowSetClipBox
+  , riverWindowSetContentClipBox
+
   -- * RiverNode
-  RiverNode,
+  , RiverNode
+  -- ** Requests
+  -- *** SetPosition (RenderSeq)
+  , riverNodeSetPosition
+  -- *** PlaceTop / PlaceBottom (RenderSeq)
+  , riverNodePlaceTop
+  , riverNodePlaceBottom
+  -- *** PlaceAbove / PlaceBelow (RenderSeq)
+  , riverNodePlaceAbove
+  , riverNodePlaceBelow
+
   -- * RiverOutput
-  RiverOutput,
-  RiverOutputEvent(..),
+  , RiverOutput
+  -- ** Events
+  , RiverOutputEvent(..)
+  -- ** Requests
+  , riverOutputSetPresentationMode
+
   -- * RiverSeat
-  RiverSeat,
-  RiverSeatEvent(..),
+  , RiverSeat
+  -- ** Events
+  , RiverSeatEvent(..)
+  -- ** Requests
+  , riverSeatFocusWindow
+  , riverSeatFocusShellSurface
+  , riverSeatClearFocus
+  , riverSeatOpStartPointer
+  , riverSeatOpEnd
+  , riverSeatGetPointerBinding
+  , riverSeatSetXcursorTheme
+  , riverSeatPointerWarp
+
   -- * RiverDecoration
-  RiverDecoration,
+  , RiverDecoration
+  -- ** Requests
+  -- *** SetOffset
+  , riverDecorationSetOffset
+  -- *** SyncNextCommit
+  , riverDecorationSyncNextCommit
+
   -- * RiverShellSurface
-  RiverShellSurface,
+  , RiverShellSurface
+  -- ** Requests
+  -- *** GetNode
+  , riverShellSurfaceGetNode
+  -- *** SyncNextCommit
+  , riverShellSurfaceSyncNextCommit
+
   -- * RiverPointerBinding
-  RiverPointerBinding,
-  RiverPointerBindingEvent(..),
+  , RiverPointerBinding
+  -- ** Events
+  , RiverPointerBindingEvent(..)
+  -- ** Requests
+  -- *** Enable / Disable
+  , riverPointerBindingEnable
+  , riverPointerBindingDisable
+
+  -- * WindowBorders
+  , WindowBorders(..)
   ) where
 
 import Bindings.River.WindowManagementV1

@@ -17,7 +17,8 @@ import           HSWM.Util.Process
 import           HSWM.XKB (ModMask)
 
 import           Bindings.River (RiverColor(..))
-import qualified Bindings.RiverSafe as R
+import qualified River as R
+import qualified Bindings.River.WindowManagementV1.Generated as R
 
 import qualified Bindings.Wayland.Client.Generated as WL
 

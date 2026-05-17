@@ -14,8 +14,9 @@ import Foreign.Ptr
 import Data.Word
 import Data.Int
 import GHC.Generics
+import Path_river_window_management_v1
 
-clientFromProtocolXML commonSettings "river-window-management-v1.xml"
+clientFromProtocolXML' commonSettings protoXml
 
 instance Default RiverWindow where def = RiverWindow nullPtr
 instance Default RiverNode   where def = RiverNode nullPtr

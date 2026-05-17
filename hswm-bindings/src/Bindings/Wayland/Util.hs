@@ -1,10 +1,10 @@
-{-# OPTIONS_GHC -Wno-orphans #-}
 {-# LANGUAGE DefaultSignatures    #-}
 {-# LANGUAGE MagicHash            #-}
 {-# LANGUAGE RecordWildCards      #-}
 {-# LANGUAGE RoleAnnotations      #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ViewPatterns         #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 
 -- |
 -- Module      : Bindings.Wayland.Util

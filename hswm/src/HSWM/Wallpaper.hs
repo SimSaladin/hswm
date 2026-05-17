@@ -20,13 +20,13 @@ import qualified HSWM.BufferPool as BP
 import           HSWM.Core
 
 import qualified Wayland as WL
+import qualified Wayland.Viewporter as VP
 import qualified Pixman as P
 
 import qualified Bindings.River as R
 import qualified Bindings.Wayland.FractionalScaleV1 as FS
-import qualified Bindings.Wayland.Viewporter as VP
-import qualified Bindings.Wayland.WlrLayerShellUnstableV1 as Wlr
-import qualified Bindings.Wayland.WlrLayerShellUnstableV1.Generated as Wlr
+import qualified Bindings.Wlr.LayerShellUnstableV1 as Wlr
+import qualified Bindings.Wlr.LayerShellUnstableV1.Generated as Wlr
 
 import qualified Codec.Picture as JP
 
@@ -268,7 +268,7 @@ initOutput ro = withOutputState ro $ \os -> do
       layerSurface <- withObject $ \layerShell ->
         Wlr.layerShellGetLayerSurface layerShell wl_surface os.wl_output Wlr.ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND (Just "wallpaper")
       Wlr.layerSurfaceSetSize layerSurface 0 0
-      Wlr.layerSurfaceSetAnchor layerSurface (WL.toCEnum $ 1 + 2 + 4 + 8) --1 + 2 + 4 + 8)
+      Wlr.layerSurfaceSetAnchor layerSurface (R.toCEnum $ 1 + 2 + 4 + 8) --1 + 2 + 4 + 8)
       Wlr.layerSurfaceSetExclusiveZone layerSurface (-1)
 
       lsListener <- WL.createListener $ \case

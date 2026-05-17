@@ -120,6 +120,7 @@ library
         , optparse-applicative >=0.18.1 && <0.19
         , optparse-generic ==1.5.*
         , pango >=0.13.12 && <0.14
+        , pixman-bindings
         , pretty-simple >=4.1.4 && <4.2
         , process >=1.6.25 && <1.7
         , rio >=0.1.24 && <0.2
@@ -182,7 +183,6 @@ executable hswm
         , bytestring >=0.12.2 && <0.13
         , containers >=0.7 && <1.0
         , hswm
-        , hswm-bindings
     default-language: GHC2024
     if flag(use-llvm) && impl(ghc >= 9.14.1)
         ghc-options: -fllvm
@@ -225,7 +225,6 @@ executable hswmctl
         , bytestring >=0.12.2 && <0.13
         , haskeline >=0.8.2 && <0.9
         , hswm
-        , monad-logger-aeson >=0.4.1 && <0.5
         , optparse-applicative >=0.18.1 && <0.19
         , optparse-generic ==1.5.*
         , prettyprinter >=1.7.1 && <1.8

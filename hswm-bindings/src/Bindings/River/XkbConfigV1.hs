@@ -8,4 +8,6 @@ import Bindings.River.InputManagementV1 (RiverInputDevice(..))
 
 import Wayland.Internal.TH
 
-clientFromProtocolXML commonSettings "river-xkb-config-v1.xml"
+import Path_river_xkb_config_v1
+
+clientFromProtocolXML' commonSettings protoXml
