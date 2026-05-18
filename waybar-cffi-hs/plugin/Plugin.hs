@@ -1,6 +1,4 @@
 {-# LANGUAGE TemplateHaskell #-}
-{-# OPTIONS_GHC -ddump-splices -ddump-inlinings #-}
-
 
 module Plugin () where
 

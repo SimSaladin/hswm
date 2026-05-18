@@ -19,6 +19,7 @@ import qualified HSWM.StackSet as W
 import           HSWM.Utils
 
 import qualified Wayland as WL
+import qualified River as R
 
 import qualified Bindings.River as R
 import qualified Bindings.River.WindowManagementV1.Generated as R
@@ -82,7 +83,7 @@ handleEvent = \case
 
     R.RiverSeatWlSeat _ seat name -> do
       registry <- asks globals >>= readMVar
-      wlseat   <- WL.bindGlobal @WL.Seat registry (Just name) (Just 9)
+      wlseat   <- WL.bindGlobal @WL.Seat registry (Just name) Nothing
       ver <- io $ WL.getVersion wlseat
       logInfo $ "WL SEAT" :# [ "version" .= ver ]
       withObject $ \l -> WL.listenerAdd wlseat l seat

@@ -91,6 +91,15 @@ module River.WindowManagement
   , riverSeatGetPointerBinding
   , riverSeatSetXcursorTheme
   , riverSeatPointerWarp
+  -- ** RiverSeatModifiers
+  , RiverSeatModifiers
+  , riverSeatModifiersNone
+  , riverSeatModifiersShift
+  , riverSeatModifiersCtrl
+  , riverSeatModifiersMod1
+  , riverSeatModifiersMod3
+  , riverSeatModifiersMod4
+  , riverSeatModifiersMod5
 
   -- * RiverDecoration
   , RiverDecoration
@@ -110,6 +119,7 @@ module River.WindowManagement
 
   -- * RiverPointerBinding
   , RiverPointerBinding
+  , RiverPointerBindingListener
   -- ** Events
   , RiverPointerBindingEvent(..)
   -- ** Requests

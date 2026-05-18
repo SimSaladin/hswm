@@ -18,6 +18,7 @@ import           HSWM.Operations
 import qualified HSWM.StackSet as W
 
 import qualified Wayland as WL
+import qualified River as R
 
 import qualified Bindings.River as R
 import qualified Bindings.River.WindowManagementV1.Generated as R
@@ -148,7 +149,7 @@ manage_ = do
   mapM_ manageHide (L.nub (oldvisible ++ newwindows) L.\\ visible)
 
   whenJust (W.peek ws) $ \w -> do
-    manageWindowPlace w R.rIVER_NODE_V1_PLACE_TOP
+    manageWindowPlaceTop w True
     --sm <- liftH $ getObjectDef @Seats.SeatManager
     --if sm.seat_lshell_focus == Seats.FocusNone
     --  then manageWindowBorder w =<< asks (focusedBorder . config)
@@ -181,11 +182,10 @@ render = runInHS $ do
   mapWindows $ \w -> do
     whenJust w.p_render_pos $ unless w.minimized . uncurry (setWindowPosition w)
     whenJust w.p_render_border $ setWindowBorder w.river_window (fromMaybe bwDef w.wBorderWidth)
-    case w.p_render_place of
-      i
-        | i == R.rIVER_NODE_V1_PLACE_TOP -> unless w.minimized $ io $ R.riverNodePlaceTop w.node
-        | i == R.rIVER_NODE_V1_PLACE_BOTTOM -> unless w.minimized $ io $ R.riverNodePlaceBottom w.node
-      _ -> return ()
+    case w.p_render_place_top of
+        Just True  -> unless w.minimized $ R.riverNodePlaceTop w.node
+        Just False -> unless w.minimized $ R.riverNodePlaceBottom w.node
+        Nothing -> return ()
     whenJust w.p_set_visible $ \viz ->
       if viz
         then unless w.minimized $ reveal w.river_window
@@ -195,7 +195,7 @@ render = runInHS $ do
       s
         { p_render_border = Nothing,
           p_render_pos = Nothing,
-          p_render_place = 0,
+          p_render_place_top = Nothing,
           p_set_visible = Nothing
         }
 

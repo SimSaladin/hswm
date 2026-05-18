@@ -37,7 +37,6 @@ import qualified Data.Map as M
 import           Data.Monoid (Ap(..))
 import           Data.Typeable
 import           Foreign hiding (void)
-import           Foreign.C
 
 -- * User configuration
 
@@ -433,7 +432,7 @@ data Window = Window
     p_manage_action          :: [WindowManageAction],
     p_render_border          :: Maybe RiverColor,
     p_render_pos             :: Maybe (Int32, Int32),
-    p_render_place           :: CInt,
+    p_render_place_top       :: Maybe Bool,
     p_set_visible            :: Maybe Bool,
     -- TODO: review below
     pointer_move_requested         :: RiverSeat,

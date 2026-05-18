@@ -43,7 +43,7 @@ _common-ghc-options: &common-ghc-options
 
 _common-rts-options: &common-rts-options
     -threaded
-    -rtsopts "-with-rtsopts=-maxN4 -qn2 -A8M -K64M -M1G -kc8k"
+    -rtsopts "-with-rtsopts=-N -maxN4 -qn2 -A8M -M2G -K64M -M1G -kc8k -Iw1 -xr100G"
 
 internal-libraries:
   hswm-prelude:

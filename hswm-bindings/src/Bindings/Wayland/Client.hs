@@ -55,6 +55,7 @@ import           Bindings.Wayland.Util
 import           Wayland.Types
 import           Wayland.Internal.TH
 
+import           Control.Monad
 import           Control.Exception
 import           Control.Monad.IO.Class
 import           Data.Maybe
@@ -93,27 +94,49 @@ instance HasDestructor EventQueue where
 data WaylandProtocolError = WaylandProtocolError
   { errCode                :: !Word32
   , errObjectId            :: !Word32
-  , errObjectInterfaceName :: !String
+  , errInterface           :: !(ConstPtr Wl_interface)
+  , errObjectInterfaceName :: !(Maybe String)
   } deriving (Eq, Show)
 
 instance Exception WaylandProtocolError
 
+data WaylandDisplayError
+  = DisplayConnectFailed String
+  | DisplayRoundtripFailed Display (Maybe EventQueue)
+  | DisplayErrorNum Display Int
+  deriving (Eq, Ord, Show)
+
+instance Exception WaylandDisplayError
+
 -- | Connect to a Wayland display.
 displayConnect :: MonadIO m => Maybe String -> m Display
 {-# INLINE displayConnect #-}
-displayConnect marg = fmap Display . liftIO $
+displayConnect marg = liftIO $
   maybe ($ nullPtr) withCString marg $ \c_arg ->
-  throwErrnoIfNull "displayConnect" $ wl_display_connect $ ConstPtr c_arg
+    fmap Display $ throwExIfNull (DisplayConnectFailed "displayConnect") $ wl_display_connect $ ConstPtr c_arg
 
--- | Connect to a Wayland display.
+throwExIfNull ex m = do
+  r <- m
+  when (r == nullPtr) $ throwIO ex
+  return r
+
+throwExIfMinus1 ex m = do
+  r <- m
+  when (r == -1) $ throwIO ex
+  return r
+
+-- | Connect to a Wayland display on an already open fd.
+--
+-- The display takes ownership of the fd.
 displayConnectToFd :: MonadIO m => Fd -> m Display
 {-# INLINE displayConnectToFd #-}
-displayConnectToFd fd = fmap Display . liftIO $ throwErrnoIfNull "displayConnectToFd" $ wl_display_connect_to_fd (fromIntegral fd)
+displayConnectToFd fd = liftIO $
+  fmap Display $ throwExIfNull (DisplayConnectFailed "displayConnectToFd") $ wl_display_connect_to_fd (fromIntegral fd)
 
--- | Access the Wayland socket FD for polling.
+-- | Retrieve the Wayland socket FD for polling.
 displayGetFd :: MonadIO m => Display -> m Fd
 {-# INLINE displayGetFd #-}
-displayGetFd (Display disp) = fmap fromIntegral . liftIO $ wl_display_get_fd disp
+displayGetFd (Display disp) = liftIO $ fromIntegral <$> wl_display_get_fd disp
 
 -- | Block until all pending request are processed by the server.
 --
@@ -124,8 +147,8 @@ displayGetFd (Display disp) = fmap fromIntegral . liftIO $ wl_display_get_fd dis
 -- and doing so will cause a dead lock.
 displayRoundtrip :: MonadIO m => Display -> m Int
 {-# INLINE displayRoundtrip #-}
-displayRoundtrip (Display d) = fmap fromIntegral . liftIO $
-  throwErrnoIfMinus1 "displayRoundtrip" $ wl_display_roundtrip d
+displayRoundtrip disp@(Display d) = liftIO $
+  fmap fromIntegral $ throwExIfMinus1 (DisplayRoundtripFailed disp Nothing) $ wl_display_roundtrip d
 
 -- | Block until all pending request are processed by the server.
 --
@@ -136,8 +159,8 @@ displayRoundtrip (Display d) = fmap fromIntegral . liftIO $
 -- and doing so will cause a dead lock.
 displayRoundtripQueue :: MonadIO m => Display -> EventQueue -> m Int
 {-# INLINE displayRoundtripQueue #-}
-displayRoundtripQueue (Display d) (EventQueue evq) = fmap fromIntegral . liftIO $
-  throwErrnoIfMinus1 "displayRoundtripQueue" $ wl_display_roundtrip_queue d evq
+displayRoundtripQueue disp@(Display d) eq@(EventQueue evq) = liftIO $
+  fmap fromIntegral $ throwExIfMinus1 (DisplayRoundtripFailed disp (Just eq)) $ wl_display_roundtrip_queue d evq
 
 -- | Set maximum buffer size for connection.
 displaySetMaxBufferSize :: MonadIO m => Display -> Maybe Int -> m ()
@@ -231,7 +254,8 @@ displayReadEvents (Display d) = liftIO $
 -- still can read from more threads.
 displayPrepareReadQueue :: MonadIO m => Display -> EventQueue -> m ()
 {-# INLINE displayPrepareReadQueue #-}
-displayPrepareReadQueue (Display d) (EventQueue evq) = liftIO $ throwErrnoIfMinus1_ "displayPrepareReadQueue" $ wl_display_prepare_read_queue d evq
+displayPrepareReadQueue (Display d) (EventQueue evq) = liftIO $
+  throwErrnoIfMinus1_ "displayPrepareReadQueue" $ wl_display_prepare_read_queue d evq
 
 -- | This function does the same thing as 'displayPrepareReadQueue'
 -- with the default queue passed as the queue.
@@ -323,13 +347,18 @@ displayCancelRead (Display d) = liftIO $ wl_display_cancel_read d
 -- by the server or caused by the local client.
 --
 -- _Errors are fatal._ If this function returns non-zero the display can no longer be used.
-displayGetError :: MonadIO m => Display -> m (Maybe Int)
+displayGetError :: MonadIO m => Display -> m Int
 {-# INLINE displayGetError #-}
-displayGetError (Display d) = liftIO $ do
-  ret <- wl_display_get_error d
-  return $! case ret of
-              0 -> Nothing
-              _ -> Just (fromIntegral ret)
+displayGetError (Display d) = liftIO $ fromIntegral <$> wl_display_get_error d
+
+-- | Checks if Display has error, and throws either the protocol error or other DisplayError when true.
+displayThrowIfError :: MonadIO m => Display -> m ()
+displayThrowIfError disp = liftIO $ do
+  err <- displayGetError disp
+  case err of
+    0 -> return ()
+    _ | Errno (fromIntegral err) == ePROTO -> displayGetProtocolError disp >>= throwIO
+    _ -> throwIO $ DisplayErrorNum disp err
 
 -- | Retrieves the information about a protocol error
 --
@@ -348,9 +377,20 @@ displayGetProtocolError (Display d) = liftIO $
   alloca $ \ifacePtr ->
   alloca $ \objectIdPtr -> do
     code <- wl_display_get_protocol_error d ifacePtr objectIdPtr
-    iface <- peek ifacePtr >>= \(ConstPtr x) -> if x == nullPtr then return "" else peek x >>= peekCString . unConstPtr . (.name)
     objectId <- peek objectIdPtr
-    return $ WaylandProtocolError code objectId iface
+    iface <- peek ifacePtr
+    name <- peekIfName iface
+    return $ WaylandProtocolError code objectId iface name
+  where
+    peekIfName :: PtrConst Wl_interface -> IO (Maybe String)
+    peekIfName (ConstPtr ptr)
+      | ptr == nullPtr = return Nothing
+      | otherwise = do
+          wlif <- peek ptr
+          peekStr wlif.name
+    peekStr (ConstPtr ptr)
+      | ptr == nullPtr = return Nothing
+      | otherwise = Just <$> peekCString ptr
 
 eventQueueGetName :: MonadIO m => EventQueue -> m (Maybe String)
 {-# INLINE eventQueueGetName #-}

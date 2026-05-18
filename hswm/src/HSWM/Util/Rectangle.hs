@@ -1,4 +1,3 @@
------------------------------------------------------------------------------
 -- |
 -- Module      :  HSWM.Util.Rectangle
 -- Description :  A module for handling pixel rectangles.
@@ -10,10 +9,6 @@
 -- Portability :  unportable
 --
 -- A module for handling pixel rectangles: 'Rectangle'.
---
------------------------------------------------------------------------------
-
-
 module HSWM.Util.Rectangle
     ( -- * Usage
       -- $usage

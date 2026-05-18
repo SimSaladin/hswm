@@ -141,7 +141,8 @@ parseSubmaps ks0 =
 showKeyHelp :: H ()
 showKeyHelp = do
   binds <- asks (keyBindings . config)
-  let pretty = [ (ppXkbModsKey m k, actionDescription (Proxy :: Proxy H) a) | ((m, k), a) <- L.sortOn (uncurry ppXkbModsKey . fst) binds ]
+  let pretty = [ (ppXBKey (m, k), actionDescription (Proxy @H) a)
+                  | ((m, k), a) <- L.sortOn (ppXBKey . fst) binds ]
   let indent = maximum $ map (length . fst) pretty
   let res = P.Monospace $ mconcat [ P.text (T.justifyLeft indent ' ' (toText mk)) <> " " <> P.text a <> "\n" | (mk, a) <- pretty ]
   void . runProcess $

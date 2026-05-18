@@ -3,8 +3,6 @@ module HSWM.Operations where
 import           HSWM.Core
 import qualified HSWM.StackSet as W
 
-import qualified Wayland as WL
-
 import qualified River as R
 
 import qualified Bindings.River as R
@@ -18,7 +16,6 @@ import           Data.Ratio ((%))
 import qualified Data.Set as S
 import           Data.Time.Clock.System
 import           Foreign (IntPtr, deRefStablePtr, intPtrToPtr, ptrToIntPtr, (.&.))
-import           Foreign.C.Types
 import           System.Environment
 import           System.IO (hGetContents, hPrint, print, writeFile)
 import qualified System.Posix as Posix
@@ -66,7 +63,7 @@ tileWindow placeTop rw r = do
         modifyWindow rw $ \w' ->
           w'
             { p_render_pos = Just (fi r.x + bw, fi r.y + bw),
-              p_render_place = if placeTop then R.rIVER_NODE_V1_PLACE_TOP else 0
+              p_render_place_top = Just placeTop
             }
       Just ro -> do
         sid <- pointScreen r.x r.y
@@ -75,12 +72,12 @@ tileWindow placeTop rw r = do
             Nothing -> return ()
             Just o
               | ro == o.river_output -> modifyWindow rw $ \w' -> w'
-                { p_render_place = if placeTop then R.rIVER_NODE_V1_PLACE_TOP else 0 }
+                  { p_render_place_top = Just placeTop }
               | otherwise -> do
                 -- need to change the output where the window is fullscreened
                 R.riverWindowFullscreen rw o.river_output
                 modifyWindow rw $ \w' -> w'
-                  { p_render_place = if placeTop then R.rIVER_NODE_V1_PLACE_TOP else 0
+                  { p_render_place_top = Just placeTop
                   , fullscreen = Just o.river_output
                   , x = o.x
                   , y = o.y
@@ -88,8 +85,9 @@ tileWindow placeTop rw r = do
                   , width = o.width
                   }
 
-manageWindowPlace :: RiverWindow -> CInt -> HS ()
-manageWindowPlace rw p = modifyWindow rw $ \w -> w {p_render_place = fi p}
+manageWindowPlaceTop :: RiverWindow -> Bool -> HS ()
+manageWindowPlaceTop rw top = modifyWindow rw $ \w -> w
+  { p_render_place_top = Just top }
 
 manageWindowBorder :: RiverWindow -> RiverColor -> HS ()
 manageWindowBorder rw rc = modifyWindow rw $ \w -> w {p_render_border = Just rc}

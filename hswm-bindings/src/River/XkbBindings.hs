@@ -10,30 +10,28 @@
 -- "Bindings.River.XkbBindingsV1"
 module River.XkbBindings
   -- * RiverXkbBindings
-  ( RiverXkbBindings(..)
-  -- ** Requests
-  -- *** GetXkbBinding
+  ( RiverXkbBindings
+  -- ** GetXkbBinding
   , riverXkbBindingsGetXkbBinding
-  -- *** GetSeat
+  -- ** GetSeat
   , riverXkbBindingsGetSeat
 
   -- * RiverXkbBinding
-  , RiverXkbBinding(..)
+  , RiverXkbBinding
+  , RiverXkbBindingListener
   -- ** Events
   , RiverXkbBindingEvent(..)
-  -- ** Requests
-  -- *** Enable / Disable
+  -- ** Enable / Disable
   , riverXkbBindingEnable
   , riverXkbBindingDisable
-  -- *** SetLayoutOverride
+  -- ** SetLayoutOverride
   , riverXkbBindingSetLayoutOverride
 
   -- * RiverXkbBindingsSeat
-  , RiverXkbBindingsSeat(..)
+  , RiverXkbBindingsSeat
   -- ** Events
   , RiverXkbBindingsSeatEvent(..)
-  -- ** Requests
-  -- *** NextKeyEaten
+  -- ** EnsureNextKeyEaten
   , riverXkbBindingsSeatEnsureNextKeyEaten
   , riverXkbBindingsSeatCancelEnsureNextKeyEaten
   ) where

@@ -14,17 +14,17 @@ jobs: $ncpus
 
 --optimization: 1
 --debug-info: True
-executable-dynamic: True
+--executable-dynamic: True
 
 -- * Documentation
 
-documentation: True
-haddock-hoogle: True
-haddock-html: True
-haddock-html-location: https://hackage.haskell.org/packages/archive/$pkg/latest/doc/html
-haddock-internal: True
-haddock-hyperlink-source: True
-haddock-keep-temp-files: True
+--documentation: True
+--haddock-hoogle: True
+--haddock-html: True
+--haddock-html-location: https://hackage.haskell.org/packages/archive/$pkg/latest/doc/html
+--haddock-internal: True
+--haddock-hyperlink-source: True
+--haddock-keep-temp-files: True
 
 -- * Advanced global config options
 

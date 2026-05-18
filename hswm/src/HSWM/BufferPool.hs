@@ -15,7 +15,6 @@ import           HSWM.Util.Posix
 import qualified Pixman as P
 import qualified Wayland as WL
 import qualified River as R
-import qualified Bindings.River as R
 
 import qualified Data.List as L
 import           Foreign hiding (void)

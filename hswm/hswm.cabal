@@ -198,7 +198,7 @@ executable hswm
           DeriveAnyClass
           PackageImports
           QuantifiedConstraints
-    ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -Wno-ambiguous-fields -threaded -rtsopts "-with-rtsopts=-maxN4 -qn2 -A8M -K64M -M1G -kc8k"
+    ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -Wno-ambiguous-fields -threaded -rtsopts "-with-rtsopts=-N -maxN4 -qn2 -A8M -M2G -K64M -M1G -kc8k -Iw1 -xr100G"
 
 executable hswmctl
     main-is: Main.hs
@@ -218,7 +218,7 @@ executable hswmctl
           DeriveAnyClass
           PackageImports
           QuantifiedConstraints
-    ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -Wno-ambiguous-fields -threaded -rtsopts "-with-rtsopts=-maxN4 -qn2 -A8M -K64M -M1G -kc8k"
+    ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -Wno-ambiguous-fields -threaded -rtsopts "-with-rtsopts=-N -maxN4 -qn2 -A8M -M2G -K64M -M1G -kc8k -Iw1 -xr100G"
     build-depends:
           aeson >=2.2.3 && <2.3
         , base >=4.21.0 && <4.23

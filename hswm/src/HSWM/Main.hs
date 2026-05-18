@@ -30,17 +30,18 @@ import           HSWM.Wayland
 import qualified HSWM.Util.Debug as Debug
 
 import qualified Wayland as WL
+import qualified River as R
 
 import qualified Bindings.River as R
 import           Bindings.Wayland.ExtIdleNotifyV1 as Ext
 import qualified Bindings.Wayland.FractionalScaleV1 as FS
 import           Bindings.Wayland.ExtForeignTopLevelListV1 as WL
 import qualified Bindings.Wayland.Viewporter as VP
+import qualified Bindings.Wayland.XdgOutputUnstableV1 as Zdg
 import           Bindings.Wlr.InputMethodUnstableV2 as Wlr
 import qualified Bindings.Wlr.LayerShellUnstableV1 as Wlr
 import qualified Bindings.Wlr.OutputManagementUnstableV1 as Wlr
 import qualified Bindings.Wlr.OutputPowerManagementUnstableV1 as Wlr
-import qualified Bindings.Wayland.XdgOutputUnstableV1 as Zdg
 
 import           Control.Concurrent (threadWaitRead, threadWaitWrite)
 import           Control.Concurrent.Thread.Delay as Conc (delay)
@@ -142,6 +143,7 @@ startHSWM mainRun loggerSet logFunc wlDisplay config = do
 
     atomically $ putTMVar conf._state initialState
 
+
     runInH $ do
       _ <- mkListener $ handleWithHook . WlShmEvent
       _ <- mkListener $ handleWithHook . WlOutputEvent
@@ -174,9 +176,9 @@ startHSWM mainRun loggerSet logFunc wlDisplay config = do
       runInIO <- askRunInIO
       regState <- WL.initRegistryState def
         { WL.regOnEvent = runInIO . Debug.logEvent
-        , WL.regOnBind = \p name ver -> do
+        , WL.regOnBind = \p name ver -> runInIO $ do
             let ifVer = WL.objectInterfaceVersion p
-            runInIO $ logInfo $ "registry bind global" :# [ "name" .= name, "version" .= ver, "iface-version" .= ifVer, "iface" .= WL.objectInterfaceName p ]
+            logInfo $ "registry bind global" :# [ "name" .= name, "version" .= ver, "iface-version" .= ifVer, "iface" .= WL.objectInterfaceName p ]
         } wlDisplay
       putMVar conf.globals regState
 
@@ -354,3 +356,8 @@ handleEvent (ExtIdleNotificationEvent e) =
     Ext.IdleNotificationResumed{} -> runInHS $ setOutputPower True
 
 handleEvent _ = return ()
+
+displayEventHandler :: WL.DisplayEvent -> H ()
+displayEventHandler ev = case ev of
+    WL.DisplayError{..} -> logError $ "Display: error event received" :# [ "code" .= code, "msg" .= message, "object" .= show objectId ]
+    WL.DisplayDeleteId{..} -> logInfo $ "Display: delete id" :# [ "id" .= id ]

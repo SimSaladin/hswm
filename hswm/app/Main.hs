@@ -1,5 +1,5 @@
 {-# LANGUAGE PartialTypeSignatures #-}
-{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE UndecidableInstances  #-}
 {-# OPTIONS_GHC -Wno-type-defaults #-}
 {-# OPTIONS_GHC -Wno-typed-holes #-}
 {-# OPTIONS_GHC -Wno-unused-binds #-}
@@ -400,8 +400,8 @@ myKeys =
 
 myPointerBinds :: [((String, Button), SomeAction H)]
 myPointerBinds =
-  [ (("M", _BTN_LEFT),  startSeatOp SEAT_OP_MOVE <?> "Move window"),
-    (("M", _BTN_RIGHT), startSeatOp SEAT_OP_RESIZE <?> "Resize (stretch) window")
+  [ (("M", btnLeft),  startSeatOp SEAT_OP_MOVE <?> "Move window"),
+    (("M", btnRight), startSeatOp SEAT_OP_RESIZE <?> "Resize (stretch) window")
   ]
 
 backlight :: [String] -> SomeAction H

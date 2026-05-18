@@ -12,22 +12,19 @@ import Text.XkbCommon.EventCodes
 import Text.XkbCommon.KeySyms (key_NoSymbol)
 
 import qualified Wayland as WL
-
-import qualified Bindings.River as R
 import qualified River as R
+
+import qualified Bindings.River as R ()
 import qualified Bindings.River.WindowManagementV1.Generated as R
 
 import qualified Data.List as L
 import qualified Data.Map as M
 import           Foreign
 
--- * Linux evdev codes
-
-type Button = Word32
-
 -- * KeySym parsing
 
 class IsKeySym a where
+
   toKeySym :: a -> KeySym
 
 instance IsKeySym KeySym where
@@ -35,8 +32,6 @@ instance IsKeySym KeySym where
 
 instance IsKeySym String where
   toKeySym s = fromMaybe key_NoSymbol $ keysymFromName s <|> keysymFromNameCaseInsensitive s
-
-type XkbBindingMap a = M.Map XBKey (StablePtr (XkbBinding a))
 
 data XkbBinding a = XkbBinding
   { xkb_binding :: {-# UNPACK #-} !R.RiverXkbBinding
@@ -46,6 +41,16 @@ data XkbBinding a = XkbBinding
   , autorepeat  :: {-# UNPACK #-} !Bool
   , running     :: {-# UNPACK #-} !(MVar (Async ()))
   } deriving (Generic)
+
+data PointerBinding a = PointerBinding
+  { pointer_binding :: !R.RiverPointerBinding
+  , river_seat      :: !R.RiverSeat
+  , action          :: !a
+  } deriving (Generic)
+
+type XkbBindingMap a = M.Map XBKey (StablePtr (XkbBinding a))
+
+type Button = Word32
 
 type XBKey = (ModMask, KeySym)
 
@@ -61,24 +66,20 @@ createXkbBindings (a1, a2, a3) getSub keys = sequence top
     createSubs ks = sequence $ M.fromList [(k, create1 False k v =<< createSubs (getSub v)) | (k, v) <- ks]
     create1 enable (m, k) = newXKBBinding a1 a2 a3 enable m k
 
-newXKBBinding ::
-  (MonadReader env m, MonadLogger m, MonadIO m, Show action, Typeable action) =>
-  R.RiverXkbBindings ->
-  R.RiverXkbBindingListener ->
-  R.RiverSeat ->
-  -- | Enable by default?
-  Bool ->
-  ModMask ->
-  KeySym ->
-  -- | Action when pressed
-  action ->
-  -- | Submap keys
-  XkbBindingMap action
+newXKBBinding
+  :: (MonadReader env m, MonadLogger m, MonadIO m, Show action, Typeable action)
+  => R.RiverXkbBindings
+  -> R.RiverXkbBindingListener
+  -> R.RiverSeat
+  -> Bool -- ^ Enable by default?
+  -> ModMask
+  -> KeySym
+  -> action -- ^ Action when pressed
+  -> XkbBindingMap action -- ^ Submap keys
   -> m (StablePtr (XkbBinding action))
 newXKBBinding xkbBinds xkb_binding_listener seat enable mods keysym action subKM = do
-  logDebug $ "new xkb binding" :# [ "key" .= ppXkbModsKey mods keysym,  "action" .= show action ]
+  logDebug $ "new xkb binding" :# [ "key" .= ppXBKey (mods, keysym),  "action" .= show action ]
   xb <- R.riverXkbBindingsGetXkbBinding xkbBinds seat (fi keysym) (R.toCEnum $ fi mods)
-  -- subP <- io $ newStablePtr subKM
   runvar <- newEmptyMVar
   dtPtr <- io $ newStablePtr $ XkbBinding xb seat action subKM autorepeat runvar
   WL.listenerAdd xb xkb_binding_listener dtPtr
@@ -93,29 +94,7 @@ destroyXKBBinding sptr = do
   mapM_ destroyXKBBinding xb.subKeymap
   io $ freeStablePtr sptr
 
-ppXkbModsKey :: ModMask -> KeySym -> String
-ppXkbModsKey m ksym =
-  L.intercalate "+" $
-    [ name
-    | (x, name) <-
-        [ (R.RIVER_SEAT_V1_MODIFIERS_CTRL, "C"),
-          (R.RIVER_SEAT_V1_MODIFIERS_SHIFT, "S"),
-          (R.RIVER_SEAT_V1_MODIFIERS_MOD1, "M1"),
-          (R.RIVER_SEAT_V1_MODIFIERS_MOD3, "M3"),
-          (R.RIVER_SEAT_V1_MODIFIERS_MOD4, "M4"),
-          (R.RIVER_SEAT_V1_MODIFIERS_MOD5, "M5")
-        ],
-      fi x.unwrap .&. m /= 0
-    ]
-      ++ [fromMaybe "???" $ keysymName ksym]
-
 -- * Pointer Binds
-
-data PointerBinding a = PointerBinding
-  { pointer_binding :: !R.RiverPointerBinding
-  , river_seat      :: !R.RiverSeat
-  , action          :: !a
-  } deriving (Generic)
 
 newPointerBinding ::
   (MonadLogger m, MonadIO m, Show a, Typeable a)
@@ -126,7 +105,7 @@ newPointerBinding ::
   -> a
   -> m (StablePtr (PointerBinding a))
 newPointerBinding pointerBindingListener seat mods btn action = do
-  logInfo $ "new pointer binding" :# [ "key" .= ppXkbModsKey mods (fi btn) {- TODO wrong -}, "action" .= show action ]
+  logInfo $ "new pointer binding" :# [ "key" .= ppButton (mods, btn), "action" .= show action ]
   pb' <- R.riverSeatGetPointerBinding seat (fi btn) (R.toCEnum $ fi mods)
   dtPtr <- io $ newStablePtr $ PointerBinding pb' seat action
   WL.listenerAdd pb' pointerBindingListener dtPtr
@@ -138,3 +117,19 @@ destroyPointerBinding sptr = io $ do
   pb <- deRefStablePtr sptr
   WL.objectDestroy pb.pointer_binding
   freeStablePtr sptr
+
+ppXBKey :: XBKey -> String
+ppXBKey (m, ksym) = L.intercalate "+" $ ppModifiers m ++ [fromMaybe "???" $ keysymName ksym]
+
+ppButton :: (ModMask, Button) -> String
+ppButton (m, btn) = L.intercalate "+" $ ppModifiers m ++ [fromMaybe "???" $ fromEventCodeBTN btn]
+
+ppModifiers :: ModMask -> [String]
+ppModifiers bm = [ s | (s, x) <-
+        [ ("C", R.riverSeatModifiersCtrl)
+        , ("S", R.riverSeatModifiersShift)
+        , ("M1", R.riverSeatModifiersMod1)
+        , ("M3", R.riverSeatModifiersMod3)
+        , ("M4", R.riverSeatModifiersMod4)
+        , ("M5", R.riverSeatModifiersMod5)
+        ], fi x.unwrap .&. bm /= 0 ]
