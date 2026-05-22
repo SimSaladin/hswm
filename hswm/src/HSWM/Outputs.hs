@@ -40,15 +40,16 @@ added out = do
   -- Assign screen Id
   om <- getObjectDef
   screen <- runInHS $ nextScreenId om
+
   -- Add RiverOutput event listener
   withObject $ WL.listenerAdd_ out
-  -- Create layer shell output
-  layerShellOutput <- withObject @R.RiverLayerShell $ \shell ->
-    R.riverLayerShellGetOutput shell out
-  -- Add layer shell output listener
+
+  -- Create layer shell output + add listener
+  layerShellOutput <- withObject @R.RiverLayerShell $ \shell -> R.riverLayerShellGetOutput shell out
   withObject $ \l -> WL.listenerAdd layerShellOutput l out
+
   let output = def { river_output = out, screen, layerShellOutput }
-  logInfo $ "Output added" :# [ "output" .= tshow out, "screen" .= tshow screen ]
+  logInfo $ "Output added, pending setup" :# [ "output" .= tshow out, "screen" .= tshow screen ]
   modifyObject $ \st -> st {pending_setup = M.insert out output $ pending_setup st}
 
 ----------------------------------------------------------
@@ -56,39 +57,37 @@ added out = do
 -- * Events
 
 handle :: R.RiverOutputEvent -> H ()
-handle e = do
-  case e of
-    R.RiverOutputRemoved _ output -> runInHS $
-      withOutput output $
-        \o@Output {screen, layerShellOutput, wlOutput} -> do
-          -- delete screen from windowset
-          modifyWindowSet $ W.deleteScreen screen
-          -- delete from list of outputs
-          modify $ \s -> s {_outputs = filter (\x -> x.river_output /= output) s._outputs}
-          -- destroy layer shell output, output, wl_output
-          io $ WL.objectDestroy layerShellOutput
-          io $ WL.objectDestroy output
-          io $ WL.objectDestroy wlOutput
-          io $ whenJust (outputPower o) WL.objectDestroy
+handle = \case
+  R.RiverOutputRemoved _ output -> runInHS $
+    withOutput output $
+      \o@Output {screen, layerShellOutput, wlOutput} -> do
+        -- delete screen from windowset
+        modifyWindowSet $ W.deleteScreen screen
+        -- delete from list of outputs
+        modify $ \s -> s {_outputs = filter (\x -> x.river_output /= output) s._outputs}
+        -- destroy layer shell output, output, wl_output
+        io $ WL.objectDestroy layerShellOutput
+        io $ WL.objectDestroy output
+        io $ WL.objectDestroy wlOutput
+        io $ whenJust (outputPower o) WL.objectDestroy
 
-    R.RiverOutputWlOutput _ output name -> do
-      -- bind a wl_output listener
-      wl_output <- bindGlobalWith @WL.Output name (Just 4)
-      withObject $ \l -> WL.listenerAdd wl_output l output
-      -- xdg_output
-      zdgOM <- getObject
-      zdg_output <- Zdg.outputManagerGetXdgOutput zdgOM wl_output
-      withObject $ \l -> WL.listenerAdd zdg_output l output
-      -- output power mgmt
-      power <- withObject $ \opm -> Wlr.outputPowerManagerGetOutputPower opm wl_output
-      modifyObjectDef $ \om -> om
-        { pending_setup = M.adjust (\o -> o { wlOutput = wl_output, outputPower = Just power }) output (pending_setup om) }
+  R.RiverOutputWlOutput _ output name -> do
+    -- bind a wl_output listener
+    wlOutput <- bindGlobalWith @WL.Output name Nothing
+    withObject $ \l -> WL.listenerAdd wlOutput l output
+    -- xdg_output
+    zdg_output <- withObject $ \om -> Zdg.outputManagerGetXdgOutput om wlOutput
+    withObject $ \l -> WL.listenerAdd zdg_output l output
+    -- output power mgmt
+    power <- withObject $ \opm -> Wlr.outputPowerManagerGetOutputPower opm wlOutput
+    modifyObjectDef $ \om -> om
+      { pending_setup = M.adjust (\o -> o { wlOutput, outputPower = Just power }) output (pending_setup om) }
 
-    R.RiverOutputDimensions _ output width height ->
-      modifyOutput' output $ \x -> (x :: Output) {width = fi width, height = fi height}
+  R.RiverOutputDimensions _ output width height ->
+    modifyOutput' output $ \x -> (x :: Output) {width = fi width, height = fi height}
 
-    R.RiverOutputPosition _ output x y ->
-      modifyOutput' output $ \a -> a {x = fi x, y = fi y}
+  R.RiverOutputPosition _ output x y ->
+    modifyOutput' output $ \a -> a {x = fi x, y = fi y}
 
 handleWlOutput :: WL.OutputEvent -> H ()
 handleWlOutput = \case
@@ -129,7 +128,7 @@ handleLayerShell = \case
 
 manage :: H ()
 manage = do
-  om <- getObject @OutputManager
+  om <- getObjectDef @OutputManager
   -- handle new outputs
   forM_ om.pending_manage $ \output -> do
     runInHS $ modify $ \s -> s {_outputs = _outputs s ++ [output]}
@@ -138,13 +137,6 @@ manage = do
     runInHS $ modifyWindowSet $ W.insertScreen defLayout output.screen (getScreenDetail output)
     R.riverLayerShellOutputSetDefault output.layerShellOutput
     modifyObject $ \st -> st { pending_manage = filter (\x -> x.river_output /= output.river_output) $ pending_manage st }
-
-----------------------------------------------------------
-
--- * Render
-
-render :: H ()
-render = return ()
 
 ----------------------------------------------------------
 

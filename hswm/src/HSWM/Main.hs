@@ -32,7 +32,6 @@ import qualified HSWM.Util.Debug as Debug
 import qualified Wayland as WL
 import qualified River as R
 
-import qualified Bindings.River as R
 import           Bindings.Wayland.ExtIdleNotifyV1 as Ext
 import qualified Bindings.Wayland.FractionalScaleV1 as FS
 import           Bindings.Wayland.ExtForeignTopLevelListV1 as WL
@@ -189,11 +188,11 @@ startHSWM mainRun loggerSet logFunc wlDisplay config = do
       _ <- bindGlobalAuto_  @WL.Compositor
       _ <- bindGlobalAuto'  @WL.Shm
       _ <- bindGlobalAuto_  @Wlr.InputMethodManager
-      _ <- bindGlobalAuto'  @R.RiverLibinputConfig
-      _ <- bindGlobalAuto'  @R.RiverInputManager
-      _ <- bindGlobalAuto_  @R.RiverLayerShell
       _ <- bindGlobalAuto'  @R.RiverWindowManager
       _ <- bindGlobalAuto_  @R.RiverXkbBindings
+      _ <- bindGlobalAuto_  @R.RiverLayerShell
+      _ <- bindGlobalAuto'  @R.RiverLibinputConfig
+      _ <- bindGlobalAuto'  @R.RiverInputManager
       _ <- bindGlobalAuto'  @R.RiverXkbConfig
       _ <- bindGlobalAuto_  @Zdg.OutputManager
       _ <- bindGlobalAuto'  @Wlr.OutputManager
@@ -214,8 +213,6 @@ startHSWM mainRun loggerSet logFunc wlDisplay config = do
       _ <- io $ Posix.installHandler Posix.sigINT  (Posix.Catch $ runInH $ mainEvent $ MainExit "INT") Nothing
       _ <- io $ Posix.installHandler Posix.sigQUIT (Posix.Catch $ runInH $ mainEvent $ MainExit "QUIT") Nothing
       _ <- io $ Posix.installHandler Posix.sigUSR2 (Posix.Catch $ runInH $ io getProgramPath >>= mainEvent . MainRestart) Nothing
-
-      logInfo "Entering Wayland main loop"
 
       wlPollFd <- WL.displayGetFd wlDisplay
 
@@ -316,13 +313,13 @@ handleEvent (WindowManagerEvent e) = case e of
   R.RiverWindowManagerManageStart _ wm -> do
     runInHS . sequence_ =<< atomically . flushTQueue =<< asks (view pendingManageQL)
     Outputs.manage >> Seats.manage >> Windows.manage
-    asks (logHook . config) >>= userCodeDef ()
+    void . userCode =<< asks (logHook . config)
     R.riverWindowManagerManageFinish wm
 
   -- /render sequence/
   R.RiverWindowManagerRenderStart _ wm -> do
     runInHS . sequence_ =<< atomically . flushTQueue =<< asks (view pendingRenderQL)
-    Outputs.render >> Seats.render >> Windows.render
+    Seats.render >> Windows.render
     void . userCode =<< asks (renderHook . config)
     R.riverWindowManagerRenderFinish wm
 

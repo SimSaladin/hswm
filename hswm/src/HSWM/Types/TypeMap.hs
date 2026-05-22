@@ -26,7 +26,13 @@ class HasGlobalTMap env where
 instance HasGlobalTMap (TMVar TypeMap) where
   globalTMap = lens id const
 
-type MonadStateGlobal env m = (HasGlobalTMap env, MonadReader env m, MonadUnliftIO m, MonadLogger m)
+type MonadStateGlobal env m =
+  (HasGlobalTMap env, MonadReader env m, MonadUnliftIO m, MonadLogger m, MonadThrow m)
+
+data TypeMapException = TypeMapError String
+  deriving (Eq, Show)
+
+instance Exception TypeMapException
 
 -- * With
 
@@ -40,7 +46,7 @@ withObjectDef f = do
 withObject :: forall a s m b.  (MonadStateGlobal s m, Typeable a) => (a -> m b) -> m b
 {-# INLINE withObject #-}
 withObject f = withObjects $ maybe notFound f . TM.lookup
-  where notFound = error ("withObject: no such object: " ++ show (typeRep (Proxy :: Proxy a)))
+  where notFound = throwM $ TypeMapError ("withObject: no such object: " ++ show (typeRep (Proxy :: Proxy a)))
 
 -- * Get / Create
 
@@ -54,7 +60,7 @@ getObjectDef = withObjectsEx $ \tm ->
 -- | Partial function, assumes the type exists already.
 getObject :: forall a s m. HasCallStack => (MonadStateGlobal s m, Typeable a) => m a
 getObject = withObjects $ maybe notFound return . TM.lookup
-  where notFound = error ("getObject: no such object: " ++ show (typeRep (Proxy :: Proxy a)))
+  where notFound = throwM $ TypeMapError ("getObject: no such object: " ++ show (typeRep (Proxy :: Proxy a)))
 {-# INLINE getObject #-}
 
 getOrCreateObject :: forall a s m. (MonadStateGlobal s m, Typeable a) => m a -> m a
