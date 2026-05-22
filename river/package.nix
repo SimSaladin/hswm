@@ -23,32 +23,39 @@
   withManpages ? true,
   xwaylandSupport ? true,
   withDebug ? false,
+  runCommand,
 }:
 let
+  version = lib.fileContents (runCommand "get-version" { } ''
+    sed -n '/version =/s/^[^"]*"\(.*\)".*$/\1/p' <${src}/build.zig.zon >$out
+  '');
+
+  suffix = "-g${src.sourceInfo.shortRev}+${lib.substring 0 8 src.sourceInfo.lastModifiedDate}";
+
   callZon2Nix = callPackage ./callZon2nix.nix { };
+
+  zon2nix = callZon2Nix {
+    pname = "river";
+    inherit src;
+    outputHash = "sha256-tXU9LWcxEQbI24ua4OAJjqhtsJrLlGHBukyFXEUcV/Q=";
+  };
 in
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "river";
-  version = "0.5.0-dev";
+  version = version + suffix;
 
   outputs = [ "out" ] ++ lib.optionals withManpages [ "man" ];
 
   inherit src;
-  #src = fetchFromCodeberg {
-  #  owner = "river";
-  #  repo = "river";
-  #  rev = "170d7836c178bef3bf042ec561ec5fd5771d91de";
-  #  hash = "sha256-ase1mCqZl9xpYdHZAilj8amvKZ0AMlQlIIFTgrlC1u4=";
-  #};
+
+  postPatch = ''
+    sed -i '/version =/s/".*"/"${finalAttrs.version}"/' build.zig.zon
+  '';
 
   strictDeps = true;
 
-  deps = callPackage (callZon2Nix {
-    pname = "river";
-    inherit src;
-    outputHash = "sha256-tXU9LWcxEQbI24ua4OAJjqhtsJrLlGHBukyFXEUcV/Q=";
-  }) { };
+  deps = callPackage zon2nix { };
 
   nativeBuildInputs = [
     pkg-config
@@ -92,6 +99,7 @@ stdenv.mkDerivation (finalAttrs: {
   passthru = {
     providedSessions = [ "river" ];
     #updateScript = ./update.sh;
+    depsZon2nix = zon2nix;
   };
 
   meta = {

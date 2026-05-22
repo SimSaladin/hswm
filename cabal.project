@@ -1,4 +1,10 @@
-packages: */*.cabal
+packages:
+  ./hswm
+  ./hswm-bindings
+  ./pixman-bindings
+  ./waybar-cffi-hs
+  ./xkbcommon-bindings
+  ./hs-bindgen-hooks
 
 package pixman-bindings
   flags: -hs-bindgen-build-tool

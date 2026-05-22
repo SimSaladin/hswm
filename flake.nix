@@ -38,8 +38,16 @@
       url = "github:TuongNM/gtk2hs/ghc-rts-api?dir=glib";
       flake = false;
     };
-    doctest-parallel = {
-      url = "github:martijnbastiaan/doctest-parallel";
+    gtk2hs = {
+      url = "github:TuongNM/gtk2hs/ghc-rts-api";
+      flake = false;
+    };
+    cabal = {
+      url = "github:haskell/cabal";
+      flake = false;
+    };
+    hlint = {
+      url = "github:ndmitchell/hlint/ghc-9.14.1";
       flake = false;
     };
   };
@@ -47,9 +55,10 @@
   outputs = inputs@{ ... }:
 
   inputs.flake-parts.lib.mkFlake { inherit inputs; } {
-
-    systems = [ "x86_64-linux" "aarch64-linux" ];
-
+    systems = [
+      "x86_64-linux"
+      #"aarch64-linux"
+    ];
     imports = [
       inputs.haskell-flake.flakeModule
     ];
@@ -60,58 +69,34 @@
     let
       defaultGhc = "ghc914";
 
-      haskellProjectBaseWith = ghcVersion: { ... }: {
+      hlib = pkgs.haskell.lib.compose;
+
+      sourceHackageVersion = { version, hash ? "" }:
+        p:
+        hlib.overrideCabal (_: { editedCabalFile = null; })
+        (p.overrideAttrs (oa: rec {
+          inherit version;
+          src = pkgs.fetchzip {
+            url = "mirror://hackage/${oa.pname}-${version}/${oa.pname}-${version}.tar.gz";
+            sha256 = hash;
+          };
+
+        })) ;
+
+      haskellProjectBaseWith = ghcVersion: { config, ... }: {
         imports = [
           perSys.config.haskellProjects.${ghcVersion}.defaults.projectModules.output
         ];
         basePackages = perSys.config.haskellProjects.${ghcVersion}.outputs.finalPackages;
-        defaults.settings.defined = {
-          haddock = true;
-          extraBuildTools = [
-            perSys.config.haskellProjects.${ghcVersion}.outputs.finalPackages.ghc.llvmPackages.llvm
-            perSys.config.haskellProjects.${ghcVersion}.outputs.finalPackages.ghc.llvmPackages.clang
-          ];
+        defaults = {
+          settings.defined = {
+            extraBuildTools = [
+              config.basePackages.ghc.llvmPackages.llvm
+              config.basePackages.ghc.llvmPackages.clang
+            ];
+          };
         };
-        defaults.devShell.tools = hp: {
-          inherit (hp)
-            hs-bindgen
-            ;
-          inherit (pkgs)
-            river
-            wayland-scanner
-            weston
-            doxygen
-            libxkbcommon
-            pixman
-            gtk3
-            ;
-        };
-        autoWire = [ "devShells" ];
-      };
-
-      # To avoid unnecessary rebuilds, we filter projectRoot:
-      # https://community.flake.parts/haskell-flake/local#rebuild
-      cabalProjectRoot = builtins.toString (lib.fileset.toSource rec {
-        root = ./.;
-        fileset = lib.fileset.unions [
-          (root + /README.md)
-          (root + /hswm)
-          (root + /hswm-bindings)
-          (root + /xkbcommon-bindings)
-          (root + /waybar-cffi-hs)
-          (root + /hs-bindgen-hooks)
-          (root + /pixman-bindings)
-          #(root + /cabal.project)
-        ];
-      });
-
-      cabalPackages = {
-        hswm.source = cabalProjectRoot + "/hswm";
-        hswm-bindings.source = cabalProjectRoot + "/hswm-bindings";
-        xkbcommon-bindings.source = cabalProjectRoot + "/xkbcommon-bindings";
-        waybar-cffi-hs.source = cabalProjectRoot + "/waybar-cffi-hs";
-        pixman-bindings.source = cabalProjectRoot + "/pixman-bindings";
-        hs-bindgen-hooks.source = cabalProjectRoot + "/hs-bindgen-hooks";
+        autoWire = [ ];
       };
     in
     {
@@ -144,171 +129,314 @@
         ];
       };
 
-      # GHC 9.12
-      haskellProjects.ghc912 = {
-        defaults.enable = false;
-        basePackages = pkgs.haskell.packages.ghc912;
-        settings.monad-logger-aeson.check = false; # Tests broken
-        autoWire = [];
-      };
+      haskellProjects.hswm = { config, pkgs, ... }: {
+        # To avoid unnecessary rebuilds, we filter projectRoot:
+        # https://community.flake.parts/haskell-flake/local#rebuild
+        projectRoot = builtins.toString (lib.fileset.toSource rec {
+          root = ./.;
+          fileset = lib.fileset.unions [
+            (root + /cabal.project)
+            (root + /README.md)
+            (root + /hswm)
+            (root + /hswm-bindings)
+            (root + /xkbcommon-bindings)
+            (root + /waybar-cffi-hs)
+            (root + /hs-bindgen-hooks)
+            (root + /pixman-bindings)
+          ];
+        });
 
-      # GHC 9.12 with -fPIC (static shared objects)
-      haskellProjects.ghc912-reloc = {
-        defaults.enable = false;
-        defaults.settings.defined = {
-          haddock = false;
-          extraConfigureFlags = [ "--ghc-options=-fPIC" ];
+        defaults = {
+          enable = false;
+          projectModules.output = {
+            inherit (config)
+              packages
+              settings
+              devShell
+              ;
+          };
         };
 
-        basePackages = (pkgs.haskell.packages.ghc912.override (oHP: {
-          ghc = oHP.ghc.override { enableRelocatedStaticLibs = true; };
-          buildHaskellPackages = oHP.buildHaskellPackages.override (oBHP: {
-           ghc = oBHP.ghc.override { enableRelocatedStaticLibs = true; };
-         });
-        })).extend (_self: super:
-        lib.mapAttrs (_: pkg: if pkg ? getCabalDeps
-          then pkgs.haskell.lib.compose.appendBuildFlag "--ghc-options=-fPIC" pkg
-          else pkg) super);
+        settings = {
+          hswm = { ... }: {
+            #separateBinOutput = true;
+          };
 
-        settings.monad-logger-aeson.check = false; # Tests broken
+          hswm-bindings = { pkgs, ... }: {
+            extraBuildDepends = [ pkgs.wayland-scanner ];
+          };
+          monad-logger-aeson.check = false; # Tests broken
+        };
+
+        devShell = {
+          tools = ps: {
+            inherit (ps) hs-bindgen;
+            inherit (pkgs)
+              #river
+              wayland-scanner
+              weston
+              doxygen
+              #libxkbcommon
+              #pixman
+              #gtk3
+              ;
+          };
+          extraLibraries = ps: { };
+          mkShellArgs.shellHook = ''
+            # Ensure that libs are available to TH splices, cabal repl, etc.
+            export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${lib.makeLibraryPath [ pkgs.libxkbcommon ]}
+          '';
+        };
 
         autoWire = [];
       };
 
       # GHC 9.14 .. future
-      haskellProjects.ghc914 = {
+      haskellProjects.ghc914 = { pkgs, ... }: {
         defaults.enable = false;
 
-        basePackages = pkgs.haskell.packages.ghc914.extend (_self: super: {
+        basePackages = pkgs.haskell.packages.ghc914.extend (self: super: {
+
+          buildHaskellPackages = super.buildHaskellPackages.extend (self: super: {
+            Cabal = self.Cabal_3_16_1_0;
+            Cabal-syntax = self.Cabal-syntax_3_16_1_0;
+          });
+
+          gtk2hs-buildtools = self.buildHaskellPackages.gtk2hs-buildtools;
+
           # XXX: specifying this via packages.glib.source throws infinite
           # recursion...
-          glib = pkgs.haskell.lib.compose.overrideSrc { src = inputs.glib; } super.glib;
+          glib = (pkgs.haskell.lib.compose.overrideSrc { src = inputs.glib; } super.glib).override ({
+            gtk2hs-buildtools = self.buildHaskellPackages.gtk2hs-buildtools;
+          });
 
-          # For Cabal-hooks-3.16...
-          Cabal_3_14_2_0 = super.Cabal_3_16_1_0;
+          Cabal = self.Cabal_3_16_1_0;
+          Cabal-syntax = self.Cabal-syntax_3_16_1_0;
         });
 
-        packages.doctest-parallel.source = inputs.doctest-parallel; # 0.4.1
-        packages.ghc-exactprint.source = "1.14.0.0";
-        packages.ghc-tcplugins-extra.source = inputs.ghc-tcplugins-extra; # GHC 9.14
-        settings.ghc-typelits-knownnat = { # "0.8.4";
-          custom = (p: p.overrideAttrs (oa: rec {
-            version = "0.8.4";
-            src = pkgs.fetchzip {
-              url = "mirror://hackage/${oa.pname}-${version}/${oa.pname}-${version}.tar.gz";
-              sha256 = "sha256-PyYMUvJ8/miqusNl7+xay8OJqtK1/uHNQEiLr1utieg=";
-            };
-          }));
+        packages = {
+          gtk2hs-buildtools.source = inputs.gtk2hs + "/tools";
+          # Cabal master
+          Cabal_3_17.source = inputs.cabal + "/Cabal";
+          Cabal-syntax_3_17.source = inputs.cabal + "/Cabal-syntax";
+          cabal-install_3_17.source = inputs.cabal + "/cabal-install";
+          cabal-install-solver_3_17.source = inputs.cabal + "/cabal-install-solver";
+          Cabal-hooks_3_17.source = inputs.cabal + "/Cabal-hooks";
+          Cabal-described.source = inputs.cabal + "/Cabal-described";
+          Cabal-QuickCheck.source = inputs.cabal + "/Cabal-QuickCheck";
+          Cabal-tests.source = inputs.cabal + "/Cabal-tests";
+          Cabal-tree-diff.source = inputs.cabal + "/Cabal-tree-diff";
+          hooks-exe.source = inputs.cabal + "/hooks-exe";
+
+          ghc-tcplugins-extra.source = inputs.ghc-tcplugins-extra; # GHC 9.14
+          ghc-typelits-natnormalise.source = inputs.ghc-typelits-natnormalise; # containers 0.8 etc.
+          HTTP.source = "4000.5.0";
+
+          hlint.source = inputs.hlint;
         };
-        packages.ghc-typelits-natnormalise.source = inputs.ghc-typelits-natnormalise; # containers 0.8 etc.
-        settings.ghc-tcplugin-api = { # "0.19.0.0"
-          custom = (p: p.overrideAttrs (oa: rec {
-            version = "0.19.0.0";
-            src = pkgs.fetchzip {
-              url = "mirror://hackage/${oa.pname}-${version}/${oa.pname}-${version}.tar.gz";
-              sha256 = "sha256-2jm1Q2lmaG6vtRnxcvxf4U2gvQdVkDL0h8PWaTpDWJA=";
+
+        settings = {
+          HTTP.check = false;
+          Cabal-hooks = { self, super, ... }: {
+            custom = p: p.override {
+              Cabal = self.Cabal_3_16_1_0;
+              Cabal-syntax = self.Cabal-syntax_3_16_1_0;
             };
-          }));
+          };
+
+          Cabal-hooks_3_17 = { self, super, ... }: {
+            custom = p: p.override {
+              Cabal = self.Cabal_3_17;
+              Cabal-syntax = self.Cabal-syntax_3_17;
+            };
+          };
+
+          Cabal_3_17 = { super, ... }: {
+            custom = p: p.override {
+              process = super.process_1_6_27_0;
+              Cabal-syntax = super.Cabal-syntax_3_17;
+            };
+          };
+
+          cabal-install_3_17 = { self, super, ... }: {
+            custom = p: p.override {
+              cabal-install-solver = self.cabal-install-solver_3_17;
+            };
+          };
+
+          cabal-install-solver_3_17 = { self, ... }: {
+            custom = p: p.override {
+              Cabal = self.Cabal_3_17;
+              Cabal-syntax = self.Cabal-syntax_3_17;
+            };
+          };
+
+          hooks-exe = { self, ... }: {
+            custom = p: p.override {
+              Cabal = self.Cabal_3_17;
+              Cabal-syntax = self.Cabal-syntax_3_17;
+            };
+          };
+
+          ghc-typelits-natnormalise.check = false; # ???
+          ghc-typelits-knownnat = { custom = sourceHackageVersion { version = "0.8.4"; hash = "sha256-PyYMUvJ8/miqusNl7+xay8OJqtK1/uHNQEiLr1utieg="; }; };
+          ghc-tcplugin-api = { custom = sourceHackageVersion { version = "0.19.0.0"; hash = "sha256-2jm1Q2lmaG6vtRnxcvxf4U2gvQdVkDL0h8PWaTpDWJA="; }; };
+          string-interpolate.jailbreak = true; # containers 0.8
+          config-ini.jailbreak = true; # containers 0.8
+          brick.jailbreak = true; # containers 0.8
+          blaze-html.jailbreak = true; # containers 0.8
+          blaze-markup.jailbreak = true; # containers 0.8
+          debruijn.jailbreak = true;
+          dec.jailbreak = true; # base 4.22
+          fin.check = false; # tests  fail?
+          fin.jailbreak = true; # base 4.22
+          pango.jailbreak = true; # base 4.22
+          skew-list.jailbreak = true;
+          universe-base.jailbreak = true; # base 4.22
+          vec.jailbreak = true; # base 4.22
+
+          lucid.jailbreak = true;
+          singleton-bool.jailbreak = true;
+          clay.jailbreak = true;
+          algebraic-graphs.jailbreak = true;
+          tasty-hspec.jailbreak = true;
+          binary-orphans.jailbreak = true;
+          apply-refact.jailbreak = true;
+
+          haskell-language-server = { self, ... }: {
+            jailbreak = true;
+            custom = p: hlib.disableCabalFlag "fourmolu" (p.override {
+              Cabal = self.Cabal_3_16_1_0;
+              Cabal-syntax = self.Cabal-syntax_3_16_1_0;
+            });
+            #cabalFlags = {
+              #fourmolu = false;
+            #};
+          };
+
+          cabal-add = { self, ... }: {
+            jailbreak = true;
+            custom = p: p.override {
+              Cabal = self.Cabal_3_16_1_0;
+              Cabal-syntax = self.Cabal-syntax_3_16_1_0;
+            };
+          };
+
+          cabal-doctest = { self, ... }: {
+            #jailbreak = true;
+            custom = p: p.override {
+              Cabal = self.Cabal_3_16_1_0;
+            };
+          };
+
+          fourmolu = { self, ... }: {
+            jailbreak = true;
+            custom = p: p.override {
+              Cabal-syntax = self.Cabal-syntax_3_16_1_0;
+              ghc-lib-parser = self.ghc-lib-parser_9_14_1_20251220;
+            };
+          };
+
+          ormolu = { self, ... }: {
+            custom = p: (sourceHackageVersion { version = "0.8.1.0"; hash = "sha256-a1g+ococHdfwFYn2ImesdPJ4xwCbyP6ey5zQVYzG2PE="; } p).override {
+              Cabal-syntax = self.Cabal-syntax_3_16_1_0;
+              ghc-lib-parser = self.ghc-lib-parser_9_14_1_20251220;
+            };
+          };
+
+          ghc-lib-parser-ex_9_14_2_0 = { self, ... }: {
+            custom = p: p.override {
+              ghc-lib-parser = self.ghc-lib-parser_9_14_1_20251220;
+            };
+          };
+
+          hlint = { self, ... }: {
+            custom = p: p.override {
+              ghc-lib-parser = self.ghc-lib-parser_9_14_1_20251220;
+              ghc-lib-parser-ex = self.ghc-lib-parser-ex_9_14_2_0;
+            };
+          };
         };
-        settings.blaze-html.jailbreak = true; # containers 0.8
-        settings.blaze-markup.jailbreak = true; # containers 0.8
-        settings.boring.jailbreak = true; # base 4.22
-        settings.debruijn.jailbreak = true;
-        settings.dec.jailbreak = true; # base 4.22
-        settings.fin.check = false; # tests  fail?
-        settings.fin.jailbreak = true; # base 4.22
-        settings.ghc-typelits-natnormalise.check = false; # ???
-        settings.hedgehog.jailbreak = true; # template-haskell
-        settings.lifted-async.jailbreak = true; # base 4.22
-        settings.monad-logger-aeson.check = false; # Tests broken
-        settings.optics-core.jailbreak = true; # containers
-        settings.pango.jailbreak = true; # base 4.22
-        settings.skew-list.jailbreak = true;
-        settings.some.jailbreak = true; # base 4.22
-        settings.universe-base.jailbreak = true; # base 4.22
-        settings.vec.jailbreak = true; # base 4.22
 
         autoWire = [];
       };
 
-      # Default package set with GHC 9.12
-      haskellProjects.default-ghc912 = {
-        imports = [ (haskellProjectBaseWith "ghc912") ];
-
-        projectRoot = cabalProjectRoot;
-        packages = cabalPackages;
-
-        autoWire = lib.mkForce [ "devShells" "packages" "apps" "checks" ];
-      };
-
-      # Default set with GHC next
-      haskellProjects.default-ghc914 = {
-        imports = [ (haskellProjectBaseWith "ghc914") ];
-
-        projectRoot = cabalProjectRoot;
-        packages = cabalPackages;
-
-        autoWire = lib.mkForce [ "devShells" "packages" "apps" "checks" ];
-      };
-
       # Default package set
       haskellProjects.default = {
-        imports = [ (haskellProjectBaseWith defaultGhc) ];
+        imports = [
+          (haskellProjectBaseWith defaultGhc)
+          perSys.config.haskellProjects.hswm.defaults.projectModules.output
+        ];
 
-        projectRoot = cabalProjectRoot;
-        packages = cabalPackages;
+        defaults = {
+          settings.defined = {
+            #haddock = true;
+          };
+        };
 
-        settings.hswm-bindings.extraBuildDepends = [ pkgs.wayland-scanner ];
-
-        devShell.mkShellArgs.shellHook = ''
-          # Ensure that libs are available to TH splices, cabal repl, etc.
-          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${lib.makeLibraryPath [ pkgs.libxkbcommon ]}
-        '';
+        devShell = {
+          tools = ps: {
+            haskell-language-server = null; # broken
+            hlint = null;
+          };
+          extraLibraries = ps: {
+            inherit (ps)
+              Cabal_3_17
+              Cabal-hooks_3_17
+              ;
+          };
+        };
 
         autoWire = lib.mkForce [ "devShells" "packages" "apps" "checks" ];
       };
+
+      # GHC 9.12
+      #haskellProjects.ghc912 = {
+      #  defaults.enable = false;
+      #  basePackages = pkgs.haskell.packages.ghc912;
+      #  settings = {
+      #    monad-logger-aeson.check = false; # Tests broken
+      #  };
+      #  autoWire = [];
+      #};
+
+      ## GHC 9.12 with -fPIC (static shared objects)
+      #haskellProjects.ghc912-reloc = {
+      #  basePackages = (pkgs.haskell.packages.ghc912.override (oHP: {
+      #    ghc = oHP.ghc.override { enableRelocatedStaticLibs = true; };
+      #    buildHaskellPackages = oHP.buildHaskellPackages.override (oBHP: {
+      #     ghc = oBHP.ghc.override { enableRelocatedStaticLibs = true; };
+      #   });
+      #  })).extend (_self: super:
+      #  lib.mapAttrs (_: pkg: if pkg ? getCabalDeps
+      #    then pkgs.haskell.lib.compose.appendBuildFlag "--ghc-options=-fPIC" pkg
+      #    else pkg) super);
+
+      #  defaults = {
+      #    enable = false;
+      #    settings.defined = {
+      #      haddock = false;
+      #      extraConfigureFlags = [ "--ghc-options=-fPIC" ];
+      #    };
+      #  };
+
+      #  settings = {
+      #    monad-logger-aeson.check = false; # Tests broken
+      #  };
+
+      #  autoWire = [];
+      #};
 
       # Default set with -fPIC
-      haskellProjects.default-ghc912-reloc = {
-        imports = [ (haskellProjectBaseWith "ghc912-reloc") ];
-
-        defaults.settings.defined.haddock = lib.mkForce false;
-        defaults.settings.all.extraConfigureFlags = [ "--ghc-options=-fPIC" ];
-
-        projectRoot = cabalProjectRoot;
-        packages = cabalPackages;
-
-        settings.waybar-cffi-hs.cabalFlags.standalone = true;
-
-        autoWire = lib.mkForce [ "devShells" "packages" "apps" "checks" ];
-      };
-
-      haskellProjects.xkbcommon-bindings = {
-        imports = [ (haskellProjectBaseWith defaultGhc) ];
-        projectRoot = ./xkbcommon-bindings;
-      };
-
-      haskellProjects.hswm-bindings = {
-        imports = [ (haskellProjectBaseWith defaultGhc) ];
-        projectRoot = ./hswm-bindings;
-      };
-
-      haskellProjects.hswm = {
-        imports = [
-          (haskellProjectBaseWith defaultGhc)
-          config.haskellProjects.hswm-bindings.defaults.projectModules.output
-          config.haskellProjects.xkbcommon-bindings.defaults.projectModules.output
-        ];
-        projectRoot = ./hswm;
-      };
-
-      haskellProjects.waybar-cffi-hs = {
-        imports = [
-          (haskellProjectBaseWith defaultGhc)
-          config.haskellProjects.hswm.defaults.projectModules.output
-        ];
-        projectRoot = ./waybar-cffi-hs;
-      };
+      #haskellProjects.default-ghc912-reloc = {
+      #  imports = [ (haskellProjectBaseWith "ghc912-reloc") ];
+      #  projectRoot = cabalProjectRoot;
+      #  defaults = {
+      #    settings.defined.haddock = lib.mkForce false;
+      #    settings.all.extraConfigureFlags = [ "--ghc-options=-fPIC" ];
+      #  };
+      #  autoWire = lib.mkForce [ "packages" "apps" ];
+      #};
 
       packages = {
         # Export our overridden river for convenience.
@@ -316,15 +444,32 @@
 
         # With debug enabled
         riverDebug = pkgs.river.override { withDebug = true; };
+
+        ormolu = config.haskellProjects.default.outputs.finalPackages.ormolu;
+        hlint = config.haskellProjects.default.outputs.finalPackages.hlint;
+        ghcid = config.haskellProjects.default.outputs.finalPackages.ghcid;
+        fourmolu = config.haskellProjects.default.outputs.finalPackages.fourmolu;
+        hls = config.haskellProjects.default.outputs.finalPackages.haskell-language-server;
+
+        default = pkgs.buildEnv {
+          pname = "hswm-full";
+          version = "0.1.0";
+          paths = [
+            config.packages.hswm
+            config.packages.waybar-cffi-hs
+          ];
+        };
       };
 
-      devShells.all = config.haskellProjects.default.outputs.finalPackages.shellFor {
-        packages = ps: [
-          ps.pixman-bindings
-          ps.hswm-bindings
-          ps.hswm
-          ps.waybar-cffi-hs
-        ];
+      devShells = {
+        all = config.haskellProjects.default.outputs.finalPackages.shellFor {
+          packages = ps: [
+            ps.pixman-bindings
+            ps.hswm-bindings
+            ps.hswm
+            ps.waybar-cffi-hs
+          ];
+        };
       };
     };
   };
