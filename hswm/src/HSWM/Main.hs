@@ -52,6 +52,7 @@ import           Options.Generic
 import           System.IO.Error
 import           System.Log.FastLogger
 import qualified System.Posix as Posix
+import System.Environment (unsetEnv)
 
 -- | Main entrypoint settings.
 data MainRun w = MainRun
@@ -133,6 +134,9 @@ startHSWM mainRun loggerSet logFunc wlDisplay config = do
 
         mkListener :: (WL.HasListener o, Typeable (R.ObjectListener o)) => (WL.ObjectListenerEvent o -> H ()) -> H (ConstPtr (WL.ObjectListener o))
         mkListener f = getOrCreateObjectIO $ WL.createListener (runInH . f)
+
+    -- Do not propagate debug to child processes.
+    unsetEnv "WAYLAND_DEBUG"
 
     initialState <- withLogging $ readStateFile mainRun.mainStateFile config >>= \case
         Just hs -> return hs
@@ -355,8 +359,3 @@ handleEvent (ExtIdleNotificationEvent e) =
     Ext.IdleNotificationResumed{} -> runInHS $ setOutputPower True
 
 handleEvent _ = return ()
-
-displayEventHandler :: WL.DisplayEvent -> H ()
-displayEventHandler ev = case ev of
-    WL.DisplayError{..} -> logError $ "Display: error event received" :# [ "code" .= code, "msg" .= message, "object" .= show objectId ]
-    WL.DisplayDeleteId{..} -> logInfo $ "Display: delete id" :# [ "id" .= id ]

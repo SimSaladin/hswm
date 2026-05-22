@@ -163,11 +163,15 @@ displaySetMaxBufferSize (Display d) msize = liftIO $ wl_display_set_max_buffer_s
 -- This never blocks.  It will write as much data as possible, but if all data could
 -- not be written, errno will be set to EAGAIN.  In that case, use poll on the display
 -- file descriptor to wait for it to become writable again.
-displayFlush :: MonadIO m => Display -> m ()
+displayFlush :: MonadIO m => Display -> m Int
 {-# INLINE displayFlush #-}
 displayFlush (Display d) = liftIO $ do
   ret <- wl_display_flush d
-  throwErrnoIfMinus1_ "displayFlush" (pure ret)
+  when (ret == -1) $ do
+    errno <- getErrno
+    {- TODO when (errno /= eAGAIN) $ -}
+    ioError (errnoToIOError "displayFlush" errno Nothing Nothing)
+  return (fromIntegral ret)
 
 -- | Read events from display file descriptor.
 --
@@ -338,7 +342,7 @@ displayDispatchPending (Display d) =
 -- If the threads do not follow this rule it will lead to deadlock.
 displayCancelRead :: MonadIO m => Display -> m ()
 {-# INLINE displayCancelRead #-}
-displayCancelRead (Display d) = liftIO $ Unsafe.wl_display_cancel_read d
+displayCancelRead (Display d) = liftIO $ wl_display_cancel_read d
 
 -- | Retrieve the last error that occurred on a display.
 --
@@ -348,7 +352,7 @@ displayCancelRead (Display d) = liftIO $ Unsafe.wl_display_cancel_read d
 -- _Errors are fatal._ If this function returns non-zero the display can no longer be used.
 displayGetError :: MonadIO m => Display -> m Int
 {-# INLINE displayGetError #-}
-displayGetError (Display d) = liftIO $ fromIntegral <$> Unsafe.wl_display_get_error d
+displayGetError (Display d) = liftIO $ fromIntegral <$> wl_display_get_error d
 
 -- | Checks if Display has error, and throws either the protocol error or other DisplayError when true.
 displayThrowIfError :: MonadIO m => Display -> m ()
@@ -375,7 +379,7 @@ displayGetProtocolError :: MonadIO m => Display -> m WaylandProtocolError
 displayGetProtocolError (Display d) = liftIO $
   alloca $ \ifacePtr ->
   alloca $ \objectIdPtr -> do
-    code <- Unsafe.wl_display_get_protocol_error d ifacePtr objectIdPtr
+    code <- wl_display_get_protocol_error d ifacePtr objectIdPtr
     objectId <- peek objectIdPtr
     iface <- peek ifacePtr
     name <- peekIfName iface
@@ -392,13 +396,13 @@ displayGetProtocolError (Display d) = liftIO $
 displayCreateQueue :: MonadIO m => Display -> m EventQueue
 {-# INLINE displayCreateQueue #-}
 displayCreateQueue (Display d) = liftIO $
-  fmap EventQueue . throwErrnoIfNull "displayCreateQueue" $ Unsafe.wl_display_create_queue d
+  fmap EventQueue . throwErrnoIfNull "displayCreateQueue" $ wl_display_create_queue d
 
 -- |  Create a new event queue for this display.
 displayCreateQueueWithName :: MonadIO m => Display -> String -> m EventQueue
 {-# INLINE displayCreateQueueWithName #-}
 displayCreateQueueWithName (Display d) name = liftIO $ withCString name $ \c_name ->
-  fmap EventQueue . throwErrnoIfNull ("displayCreateQueueWithName: " ++ name) $ Unsafe.wl_display_create_queue_with_name d (ConstPtr c_name)
+  fmap EventQueue . throwErrnoIfNull ("displayCreateQueueWithName: " ++ name) $ wl_display_create_queue_with_name d (ConstPtr c_name)
 
 -- | Binds a new, client-created object to the server using the specified name as the identifier.
 registryBind :: MonadIO m => Registry -> ObjectName -> PtrConst Wl_interface -> Version -> m (Ptr a)

@@ -472,7 +472,8 @@ data Seat = Seat
     -- TODO: review below
     removed :: !Bool,
     focused, hovered, interacted :: !RiverWindow,
-    suppressChangeFocus :: !Int
+    suppressChangeFocus :: !Int,
+    new :: !Bool
   }
   deriving (Show, Generic)
 
@@ -509,6 +510,7 @@ instance Default Seat where
     Seat
       { river_seat = def,
         wl_seat = def,
+        new = True,
         xkb_bindings_seat = R.RiverXkbBindingsSeat nullPtr,
         inputOverride = Nothing,
         position = (0,0),
