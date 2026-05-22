@@ -18,6 +18,8 @@ import Text.XkbCommon.KeySym as X
 import Text.XkbCommon.Keymap as X
 import Text.XkbCommon.Keymap.RmlvoBuilder as X
 import Text.XkbCommon.State as X
+
 --import Text.XkbCommon.FFI as FFI
+--import Text.XkbCommon.Internal as X
 
 import Data.Default

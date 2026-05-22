@@ -18,6 +18,7 @@ module Text.XkbCommon.Keymap.RmlvoBuilder
 
 import Foreign
 import Foreign.C
+import Foreign.C.ConstPtr
 import Data.Maybe
 import Control.Exception
 import Control.Monad
@@ -68,8 +69,8 @@ appendLayout rmlvo ls =
   withCString ls.layoutLayout $ \laC ->
   withCString (fromMaybe "" ls.layoutVariant) $ \vaC ->
   withMany withCString (map optionOption ls.layoutOptions) $ \optsS ->
-  withArray optsS $ \optsArr -> do
-    r <- c_append_layout ptr laC vaC optsArr (length optsS)
+  withArray (map ConstPtr optsS) $ \optsArr -> do
+    r <- c_append_layout ptr (ConstPtr laC) (ConstPtr vaC) (ConstPtr optsArr) (length optsS)
     unless r $ throwIO $ KeymapBuilderInvalidLayout rmlvo ls
 
 -- | Append an option to the builder.
@@ -82,17 +83,23 @@ appendOption rmlvo opt =
     r <- c_append_option ptr optS
     unless r $ throwIO $ KeymapBuilderInvalidOption rmlvo opt
 
-foreign import ccall unsafe "xkb_rmlvo_builder_new"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_rmlvo_builder_new"
   c_new :: Ptr XkbContext -> CString -> CString -> CUInt -> IO (Ptr XkbRmlvoBuilder)
 
-foreign import ccall unsafe "&xkb_rmlvo_builder_unref"
+foreign import capi unsafe "xkbcommon/xkbcommon.h &xkb_rmlvo_builder_unref"
   c_unref :: FunPtr (Ptr XkbRmlvoBuilder -> IO ())
 
-foreign import ccall unsafe "xkb_rmlvo_builder_append_layout"
-  c_append_layout :: Ptr XkbRmlvoBuilder -> CString -> CString -> Ptr CString -> Int -> IO Bool
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_rmlvo_builder_append_layout"
+  c_append_layout
+    :: Ptr XkbRmlvoBuilder
+    -> ConstPtr CChar
+    -> ConstPtr CChar
+    -> ConstPtr (ConstPtr CChar)
+    -> Int
+    -> IO Bool
 
-foreign import ccall unsafe "xkb_rmlvo_builder_append_option"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_rmlvo_builder_append_option"
   c_append_option :: Ptr XkbRmlvoBuilder -> CString -> IO Bool
 
-foreign import ccall unsafe "xkb_keymap_new_from_rmlvo"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keymap_new_from_rmlvo"
   c_new_from_rmlvo :: Ptr XkbRmlvoBuilder -> CUInt -> CUInt -> IO (Ptr XkbKeymap)

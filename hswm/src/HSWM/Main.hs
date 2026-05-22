@@ -146,7 +146,6 @@ startHSWM mainRun loggerSet logFunc wlDisplay config = do
 
     atomically $ putTMVar conf._state initialState
 
-
     runInH $ do
       _ <- mkListener $ handleWithHook . WlShmEvent
       _ <- mkListener $ handleWithHook . WlOutputEvent
@@ -174,7 +173,7 @@ startHSWM mainRun loggerSet logFunc wlDisplay config = do
       _ <- mkListener $ handleWithHook . WlrOutputManagerEvent
       _ <- mkListener $ handleWithHook . WlrOutputHeadEvent
       _ <- mkListener $ handleWithHook . ExtIdleNotificationEvent
-      logDebug "Created event listeners"
+      logInfo "Created initial event listeners"
 
       runInIO <- askRunInIO
       regState <- WL.initRegistryState def
@@ -185,7 +184,7 @@ startHSWM mainRun loggerSet logFunc wlDisplay config = do
         } wlDisplay
       putMVar conf.globals regState
 
-      logDebug "Waiting for one roundtrip for the registry listener to become aware of all current globals..."
+      logInfo "Waiting for one roundtrip for the registry listener to become aware of all current globals..."
       _ <- WL.displayRoundtrip wlDisplay
 
       -- Bind initial globals
@@ -206,12 +205,6 @@ startHSWM mainRun loggerSet logFunc wlDisplay config = do
       _ <- bindGlobalAuto_  @Wlr.OutputPowerManager
       _ <- bindGlobalAuto_  @Ext.IdleNotifier
 
-      logDebug "Running user startup hooks..."
-      void $ userCode (startupHook config)
-
-      -- Create an additional seat; useful for testing
-      -- io $ R.riverInputManagerCreateSeat inputManager (Just "foobar")
-
       logInfo "Installing signal handlers"
       _ <- io $ Posix.installHandler Posix.sigTERM (Posix.Catch $ runInH $ mainEvent $ MainExit "TERM") Nothing
       _ <- io $ Posix.installHandler Posix.sigINT  (Posix.Catch $ runInH $ mainEvent $ MainExit "INT") Nothing
@@ -219,6 +212,12 @@ startHSWM mainRun loggerSet logFunc wlDisplay config = do
       _ <- io $ Posix.installHandler Posix.sigUSR2 (Posix.Catch $ runInH $ io getProgramPath >>= mainEvent . MainRestart) Nothing
 
       wlPollFd <- WL.displayGetFd wlDisplay
+
+      logInfo "Running user startup hooks..."
+      void $ userCode (startupHook config)
+
+      -- Create an additional seat; useful for testing
+      -- io $ R.riverInputManagerCreateSeat inputManager (Just "foobar")
 
       -- save state to disk every half an hour
       timerAs <- async $ forever $ do
@@ -257,7 +256,7 @@ startHSWM mainRun loggerSet logFunc wlDisplay config = do
             void $ runInHS $ userCodeS writeStateToFile
             main MainPoll
 
-      logInfo "(main) ready"
+      logInfo "main: ready"
       main MainPoll
 
 

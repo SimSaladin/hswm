@@ -7,20 +7,12 @@ import qualified Wayland as WL
 import qualified Data.Set as S
 import           Foreign
 
--- data ConnectionState = ConnectionState
---   { display :: !WL.Display
---   , knownObjects :: !(S.Set (Ptr WL.Wl_proxy))
---   } deriving (Generic)
-
-------------------------------------------------------------------
 -- * Registry tracking
 
-type RegistryCache = WL.RegistryState
-
 class HasGlobalsRegistry env where
-  globalsRegistryL :: Lens' env (MVar RegistryCache)
+  globalsRegistryL :: Lens' env (MVar WL.RegistryState)
 
-instance HasGlobalsRegistry (MVar RegistryCache) where
+instance HasGlobalsRegistry (MVar WL.RegistryState) where
   globalsRegistryL = lens id const
 
 type HasGlobals env m = (MonadUnliftIO m, MonadLogger m, MonadThrow m, MonadReader env m, HasGlobalsRegistry env, HasGlobalTMap env)
@@ -43,10 +35,7 @@ bindGlobalAuto_ :: forall a env m.
   ) => m a
 bindGlobalAuto_ = do
   regState <- asks (view globalsRegistryL) >>= readMVar
-  -- logInfo $ "bindGlobalAuto_: started" :# [ "type" .= show (Proxy @a) ]
-  o <- getOrCreateObjectIO $ WL.bindGlobal regState Nothing Nothing
-  -- logInfo $ "bindGlobalAuto_: finished" :# [ "type" .= show (Proxy @a) ]
-  return o
+  getOrCreateObjectIO $ WL.bindGlobal regState Nothing Nothing
 
 bindGlobalAuto :: forall a env m.
   ( HasGlobals env m

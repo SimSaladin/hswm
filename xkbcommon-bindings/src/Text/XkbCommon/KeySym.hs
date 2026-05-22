@@ -119,18 +119,25 @@ keysymNameUnsafe :: KeySym -> String
 keysymNameUnsafe k = fromMaybe err $! keysymName k where
   err = throw $ NoSuchKeySym k
 
-foreign import ccall unsafe "xkb_keysym_from_name" c_keysymFromName :: CString -> CUInt -> KeySym
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keysym_from_name"
+  c_keysymFromName :: CString -> CUInt -> KeySym
 
-foreign import ccall unsafe "xkb_keysym_get_name" c_keysymGetName :: KeySym -> CString -> CSize -> CInt
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keysym_get_name"
+  c_keysymGetName :: KeySym -> CString -> CSize -> CInt
 
-foreign import ccall unsafe "xkb_keysym_to_utf8" c_keysymToUtf8 :: KeySym -> CString -> CSize -> CInt
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keysym_to_utf8"
+  c_keysymToUtf8 :: KeySym -> CString -> CSize -> CInt
 
-foreign import ccall unsafe "xkb_utf32_to_keysym" c_keysymFromUtf32 :: Word32 -> KeySym
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_utf32_to_keysym"
+  c_keysymFromUtf32 :: Word32 -> KeySym
 
-foreign import ccall unsafe "xkb_keysym_to_utf32" c_keysymToUtf32 :: KeySym -> Word32
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keysym_to_utf32"
+  c_keysymToUtf32 :: KeySym -> Word32
 
 -- | KeySym to uppercase.
-foreign import ccall unsafe "xkb_keysym_to_upper" keysymToUpper :: KeySym -> KeySym
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keysym_to_upper"
+  keysymToUpper :: KeySym -> KeySym
 
 -- | KeySym to lowercase.
-foreign import ccall unsafe "xkb_keysym_to_lower" keysymToLower :: KeySym -> KeySym
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keysym_to_lower"
+  keysymToLower :: KeySym -> KeySym

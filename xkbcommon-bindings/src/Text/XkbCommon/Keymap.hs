@@ -75,6 +75,7 @@ module Text.XkbCommon.Keymap
 
 import Foreign
 import Foreign.C
+import Foreign.C.ConstPtr
 import System.Posix (closeFd, fdWrite, Fd)
 import Control.Exception
 
@@ -174,7 +175,7 @@ keymapNumMods km = withForeignPtr km.unwrap $ \kmPtr ->
 keymapModName :: XkbKeymap -> ModIndex -> IO (Maybe String)
 keymapModName km a =
   withForeignPtr km.unwrap $ \kmPtr -> do
-    r <- _xkbKeymapModGetName kmPtr a
+    ConstPtr r <- _xkbKeymapModGetName kmPtr a
     if r == nullPtr then return Nothing else Just <$> peekCString r
 
 -- | Get the index of a modifier by name.
@@ -190,7 +191,7 @@ keymapModIndex km str =
 keymapKeyName :: XkbKeymap -> Keycode -> IO (Maybe String)
 keymapKeyName km kcode =
   withForeignPtr km.unwrap $ \kmPtr -> do
-    r <- c_xkbKeymapKeyGetName kmPtr kcode
+    ConstPtr r <- c_xkbKeymapKeyGetName kmPtr kcode
     if r == nullPtr then return Nothing else Just <$> peekCString r
 
 -- | Get Keycode by name.
@@ -206,7 +207,7 @@ keymapKeyByName km str =
 keymapLayoutName :: XkbKeymap -> LayoutIndex -> IO (Maybe String)
 keymapLayoutName km idx =
   withForeignPtr km.unwrap $ \kmPtr -> do
-    r <- _xkbKeymapLayoutGetName kmPtr idx
+    ConstPtr r <- _xkbKeymapLayoutGetName kmPtr idx
     if r == nullPtr then return Nothing else Just <$> peekCString r
 
 -- | Get layout index by name.
@@ -252,7 +253,7 @@ keymapNumLeds km =
 keymapLedName :: XkbKeymap -> LedIndex -> IO (Maybe String)
 keymapLedName km idx =
   withForeignPtr km.unwrap $ \kmPtr -> do
-    r <- _xkbKeymapLedGetName kmPtr idx
+    ConstPtr r <- _xkbKeymapLedGetName kmPtr idx
     if r == nullPtr then return Nothing else Just <$> peekCString r
 
 -- | Get LED index by name.
@@ -299,7 +300,7 @@ keymapKeySymsByLevel km kc lay lev =
     case size of
       0 -> return []
       _ -> do
-        arr' <- peek arr
+        ConstPtr arr' <- peek arr
         peekArray size arr'
 
 -- | Get the maximum keycode in the keymap.
@@ -316,90 +317,90 @@ keymapMinKeycode km =
 
 -- * Internals
 
-foreign import ccall unsafe "&xkb_keymap_unref"
+foreign import capi unsafe "xkbcommon/xkbcommon.h &xkb_keymap_unref"
   _xkbKeymapUnref :: FunPtr (Ptr XkbKeymap -> IO ())
 
 -- | Increase reference count of the keymap object.
-foreign import ccall unsafe "xkb_keymap_ref"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keymap_ref"
   refKeymap :: Ptr XkbKeymap -> IO (Ptr XkbKeymap)
 
 -- Mods
 
-foreign import ccall unsafe "xkb_keymap_num_mods"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keymap_num_mods"
   c_xkb_keymap_num_mods :: Ptr XkbKeymap -> IO ModIndex
 
-foreign import ccall unsafe "xkb_keymap_mod_get_name"
-  _xkbKeymapModGetName :: Ptr XkbKeymap -> ModIndex -> IO CString
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keymap_mod_get_name"
+  _xkbKeymapModGetName :: Ptr XkbKeymap -> ModIndex -> IO (ConstPtr CChar)
 
-foreign import ccall unsafe "xkb_keymap_mod_get_index"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keymap_mod_get_index"
   c_xkbKeymapModGetIndex :: Ptr XkbKeymap -> CString -> IO ModIndex
 
-foreign import ccall unsafe "xkb_keymap_mod_get_mask"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keymap_mod_get_mask"
   _xkbKeymapModGetMask :: Ptr XkbKeymap -> CString -> IO ModMask
 
-foreign import ccall unsafe "xkb_keymap_mod_get_mask2"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keymap_mod_get_mask2"
   c_xkbKeymapModGetMask2 :: Ptr XkbKeymap -> ModIndex -> IO ModMask
 
 -- Layouts
 
-foreign import ccall unsafe "xkb_keymap_num_layouts"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keymap_num_layouts"
   _xkbKeymapNumLayouts :: Ptr XkbKeymap -> IO LayoutIndex
 
-foreign import ccall unsafe "xkb_keymap_layout_get_name"
-  _xkbKeymapLayoutGetName :: Ptr XkbKeymap -> LayoutIndex -> IO CString
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keymap_layout_get_name"
+  _xkbKeymapLayoutGetName :: Ptr XkbKeymap -> LayoutIndex -> IO (ConstPtr CChar)
 
-foreign import ccall unsafe "xkb_keymap_layout_get_index"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keymap_layout_get_index"
   c_xkbKeymapLayoutGetIndex :: Ptr XkbKeymap -> CString -> IO LayoutIndex
 
-foreign import ccall unsafe "xkb_keymap_num_layouts_for_key"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keymap_num_layouts_for_key"
   c_xkb_keymap_num_layouts_for_key :: Ptr XkbKeymap -> Keycode -> IO LayoutIndex
 
-foreign import ccall unsafe "xkb_keymap_num_levels_for_key"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keymap_num_levels_for_key"
   c_xkb_keymap_num_levels_for_key :: Ptr XkbKeymap -> Keycode -> LayoutIndex -> IO LevelIndex
 
 -- LEDs
 
-foreign import ccall unsafe "xkb_keymap_num_leds"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keymap_num_leds"
   _xkbKeymapNumLeds :: Ptr XkbKeymap -> IO LedIndex
 
-foreign import ccall unsafe "xkb_keymap_led_get_name"
-  _xkbKeymapLedGetName :: Ptr XkbKeymap -> LedIndex -> IO CString
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keymap_led_get_name"
+  _xkbKeymapLedGetName :: Ptr XkbKeymap -> LedIndex -> IO (ConstPtr CChar)
 
-foreign import ccall unsafe "xkb_keymap_led_get_index"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keymap_led_get_index"
   c_xkbKeymapLedGetIndex :: Ptr XkbKeymap -> CString -> IO LedIndex
 
 -- Keys
 
-foreign import ccall unsafe "xkb_keymap_min_keycode"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keymap_min_keycode"
   c_xkb_keymap_min_keycode :: Ptr XkbKeymap -> IO Keycode
 
-foreign import ccall unsafe "xkb_keymap_max_keycode"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keymap_max_keycode"
   c_xkb_keymap_max_keycode :: Ptr XkbKeymap -> IO Keycode
 
-foreign import ccall unsafe "xkb_keymap_key_repeats"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keymap_key_repeats"
   _xkbKeymapKeyRepeats :: Ptr XkbKeymap -> Keycode -> IO CInt
 
-foreign import ccall unsafe "xkb_keymap_key_get_name"
-  c_xkbKeymapKeyGetName :: Ptr XkbKeymap -> Keycode -> IO CString
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keymap_key_get_name"
+  c_xkbKeymapKeyGetName :: Ptr XkbKeymap -> Keycode -> IO (ConstPtr CChar)
 
-foreign import ccall unsafe "xkb_keymap_key_by_name"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keymap_key_by_name"
   c_xkbKeymapKeyByName :: Ptr XkbKeymap -> CString -> IO Keycode
 
-foreign import ccall unsafe "xkb_keymap_key_get_mods_for_level"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keymap_key_get_mods_for_level"
   c_xkbKeymapKeyGetModsForLevel :: Ptr XkbKeymap -> Keycode -> LayoutIndex -> LevelIndex -> Ptr ModMask -> CSize -> IO CSize
 
-foreign import ccall unsafe "xkb_keymap_key_get_syms_by_level"
-  c_xkbKeymapKeyGetSymsByLevel :: Ptr XkbKeymap -> Keycode -> LayoutIndex -> LevelIndex -> Ptr (Ptr KeySym) -> IO Int
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keymap_key_get_syms_by_level"
+  c_xkbKeymapKeyGetSymsByLevel :: Ptr XkbKeymap -> Keycode -> LayoutIndex -> LevelIndex -> Ptr (ConstPtr KeySym) -> IO Int
 
 -- New
 
-foreign import ccall unsafe "xkb_keymap_new_from_string"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keymap_new_from_string"
   _xkbKeymapNewFromString :: Ptr XkbContext -> CString -> CUInt -> CUInt -> IO (Ptr XkbKeymap)
 
-foreign import ccall unsafe "xkb_keymap_new_from_names2"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keymap_new_from_names2"
   _xkbKeymapNewFromNames2 :: Ptr XkbContext -> Ptr XkbRuleNames -> CUInt -> CUInt -> IO (Ptr XkbKeymap)
 
 -- As string
 
-foreign import ccall unsafe "xkb_keymap_get_as_string"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keymap_get_as_string"
   _xkbKeymapGetAsString :: Ptr XkbKeymap -> CUInt -> IO CString

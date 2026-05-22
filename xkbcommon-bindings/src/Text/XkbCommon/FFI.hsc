@@ -371,13 +371,13 @@ newtype XkbStateComponent = XkbStateComponent { unwrap :: CUInt }
   deriving stock (Generic, Show)
 
 pattern StateModsDepressed
-  , StateModsLatched      
-  , StateModsLocked       
-  , StateModsEffective    
-  , StateLayoutDepressed  
-  , StateLayoutLatched    
-  , StateLayoutLocked     
-  , StateLayoutEffective  
+  , StateModsLatched
+  , StateModsLocked
+  , StateModsEffective
+  , StateLayoutDepressed
+  , StateLayoutLatched
+  , StateLayoutLocked
+  , StateLayoutEffective
   , StateLeds
     :: XkbStateComponent
 

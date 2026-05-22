@@ -25,14 +25,14 @@ module Text.XkbCommon.State (
   -- * XkbStateComponent
   XkbStateComponent
     ( StateModsDepressed
-    , StateModsLatched      
-    , StateModsLocked       
-    , StateModsEffective    
-    , StateLayoutDepressed  
-    , StateLayoutLatched    
-    , StateLayoutLocked     
-    , StateLayoutEffective  
-    , StateLeds             
+    , StateModsLatched
+    , StateModsLocked
+    , StateModsEffective
+    , StateLayoutDepressed
+    , StateLayoutLatched
+    , StateLayoutLocked
+    , StateLayoutEffective
+    , StateLeds
     ),
 
   -- * Exceptions
@@ -41,6 +41,7 @@ module Text.XkbCommon.State (
 
 import Foreign
 import Foreign.C
+import Foreign.C.ConstPtr
 import Control.Monad
 
 import Text.XkbCommon.FFI
@@ -93,7 +94,7 @@ xkbStateKeySyms xst kc = withForeignPtr xst.unwrap $ \xstPtr ->
     n <- _xkbStateKeyGetSyms xstPtr kc keyPtr
     case n of
       0 -> return []
-      _ -> peekArray (fromIntegral n) =<< peek keyPtr
+      _ -> peekArray (fromIntegral n) . unConstPtr =<< peek keyPtr
 
 -- | Get the Unicode/UTF-8 string obtained from pressing a particular key
 -- in a given keyboard state.
@@ -133,36 +134,36 @@ xkbStateKeyLevel xst kc li = withForeignPtr xst.unwrap $ \xstPtr -> do
 
 -- * Internals
 
-foreign import ccall unsafe "&xkb_state_unref"
+foreign import capi unsafe "xkbcommon/xkbcommon.h &xkb_state_unref"
   _xkbStateUnref :: FunPtr (Ptr XkbState -> IO ())
 
-foreign import ccall unsafe "xkb_state_new"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_state_new"
   _xkbStateNew :: Ptr XkbKeymap -> IO (Ptr XkbState)
 
 -- | Note: the lifetime of the keymap is tied to the state by default!
-foreign import ccall unsafe "xkb_state_get_keymap"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_state_get_keymap"
   _xkbStateGetKeymap :: Ptr XkbState -> IO (Ptr XkbKeymap)
 
-foreign import ccall unsafe "xkb_state_update_mask"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_state_update_mask"
   _xkbStateUpdateMask :: Ptr XkbState
                      -> ModMask -> ModMask -> ModMask
                      -> LayoutIndex -> LayoutIndex -> LayoutIndex
                      -> IO XkbStateComponent
 
-foreign import ccall unsafe "xkb_state_key_get_one_sym"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_state_key_get_one_sym"
   _xkbStateKeyGetOneSym :: Ptr XkbState -> Keycode -> IO KeySym
 
-foreign import ccall unsafe "xkb_state_key_get_syms"
-  _xkbStateKeyGetSyms :: Ptr XkbState -> Keycode -> Ptr (Ptr KeySym) -> IO CInt
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_state_key_get_syms"
+  _xkbStateKeyGetSyms :: Ptr XkbState -> Keycode -> Ptr (ConstPtr KeySym) -> IO CInt
 
-foreign import ccall unsafe "xkb_state_key_get_utf8"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_state_key_get_utf8"
   c_xkb_state_key_get_utf8 :: Ptr XkbState -> Keycode -> CString -> CSize -> IO Int
 
-foreign import ccall unsafe "xkb_state_key_get_utf32"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_state_key_get_utf32"
   c_xkb_state_key_get_utf32 :: Ptr XkbState -> Keycode -> IO Word32
 
-foreign import ccall unsafe "xkb_state_key_get_layout"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_state_key_get_layout"
   c_xkb_state_key_get_layout :: Ptr XkbState -> Keycode -> IO LayoutIndex
 
-foreign import ccall unsafe "xkb_state_key_get_level"
+foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_state_key_get_level"
   c_xkb_state_key_get_level :: Ptr XkbState -> Keycode -> LayoutIndex -> IO LevelIndex

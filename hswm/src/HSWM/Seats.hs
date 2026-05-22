@@ -87,8 +87,7 @@ handleEvent = \case
       runInHS $ modifySeat seat $ \s -> s {op_release = True}
 
     R.RiverSeatWlSeat _ seat name -> do
-      registry <- asks globals >>= readMVar
-      wlseat   <- WL.bindGlobal @WL.Seat registry (Just name) Nothing
+      wlseat <- bindGlobalWith @WL.Seat name Nothing
       withObject $ \l -> WL.listenerAdd wlseat l seat
       -- Register idle notifier
       withObject $ \idleNotify -> do

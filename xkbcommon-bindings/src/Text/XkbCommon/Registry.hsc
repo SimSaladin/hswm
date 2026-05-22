@@ -31,6 +31,7 @@ module Text.XkbCommon.Registry (
 import Data.Default
 import Foreign
 import Foreign.C
+import Foreign.C.ConstPtr
 import GHC.Records
 import GHC.Generics
 import Control.Exception
@@ -40,6 +41,8 @@ import Data.String
 import Data.Char (toLower, toUpper)
 
 import Text.XkbCommon.FFI (LogLevel(..))
+
+type ConstCS = ConstPtr CChar
 
 #include <xkbcommon/xkbregistry.h>
 
@@ -170,37 +173,37 @@ getRulesInfo ctx0 = withForeignPtr ctx0.unwrap $ \ctx' ->
 
       getModelInfo :: RxkbModel -> IO Model
       getModelInfo m = Model
-        <$> getString (_rxkbModelGetName m)
-        <*> getString (_rxkbModelGetDescription m)
-        <*> getString (_rxkbModelGetVendor m)
+        <$> getCS (_rxkbModelGetName m)
+        <*> getCS (_rxkbModelGetDescription m)
+        <*> getCS (_rxkbModelGetVendor m)
         <*> fmap getPopularity (_rxkbModelGetPopularity m)
 
       getLayoutInfo :: RxkbLayout -> IO LayoutInfo
       getLayoutInfo m = LayoutInfo
-        <$> getString (_rxkbLayoutGetName m)
-        <*> getStringMaybe (_rxkbLayoutGetVariant m)
-        <*> getString (_rxkbLayoutGetDescription m)
-        <*> getString (_rxkbLayoutGetBrief m)
+        <$> getCS (_rxkbLayoutGetName m)
+        <*> getCSMaybe (_rxkbLayoutGetVariant m)
+        <*> getCS (_rxkbLayoutGetDescription m)
+        <*> getCS (_rxkbLayoutGetBrief m)
         <*> fmap getPopularity (_rxkbLayoutGetPopularity m)
         <*> getLangs m
 
       getLangs m = (\xs ys -> map Lang639 xs ++ map Lang3166 ys)
-        <$> collect (_iso639First m) _iso639Unref (\x -> (,) <$> _iso639Next x <*> getString (_iso639GetCode x))
-        <*> collect (_iso3166First m) _iso3166Unref (\x -> (,) <$> _iso3166Next x <*> getString (_iso3166GetCode x))
+        <$> collect (_iso639First m) _iso639Unref (\x -> (,) <$> _iso639Next x <*> getCS (_iso639GetCode x))
+        <*> collect (_iso3166First m) _iso3166Unref (\x -> (,) <$> _iso3166Next x <*> getCS (_iso3166GetCode x))
 
       getOptionGroup :: RxkbOptionGroup -> IO OptionGroup
       getOptionGroup m = OptionGroup
-        <$> getString (_rxkbOptionGroupGetName m)
-        <*> getString (_rxkbOptionGroupGetDescription m)
+        <$> getCS (_rxkbOptionGroupGetName m)
+        <*> getCS (_rxkbOptionGroupGetDescription m)
         <*> _rxkbOptionGroupAllowsMultiple m
         <*> collect (_rxkbOptionFirst m) _rxkbOptionUnref (\x -> (,) <$> _rxkbOptionNext x <*> getOptionInfo x)
         <*> fmap getPopularity (_rxkbOptionGroupGetPopularity m)
 
       getOptionInfo :: RxkbOption -> IO OptionInfo
       getOptionInfo m = OptionInfo
-        <$> getString (_rxkbOptionGetName m)
-        <*> getString (_rxkbOptionGetBrief m)
-        <*> getString (_rxkbOptionGetDescription m)
+        <$> getCS (_rxkbOptionGetName m)
+        <*> getCS (_rxkbOptionGetBrief m)
+        <*> getCS (_rxkbOptionGetDescription m)
         <*> _rxkbOptionIsLayoutSpecific m
         <*> fmap getPopularity (_rxkbOptionGetPopularity m)
 
@@ -218,6 +221,12 @@ getRulesInfo ctx0 = withForeignPtr ctx0.unwrap $ \ctx' ->
              then return (reverse xs)
              else next m0 >>= \(m1, r) -> unref ptr >> go (r : xs) m1
 
+      getCS :: IO ConstCS -> IO String
+      getCS m = getString (unConstPtr <$> m)
+
+      getCSMaybe :: IO ConstCS -> IO (Maybe String)
+      getCSMaybe m = getStringMaybe (unConstPtr <$> m)
+
       getString :: IO CString -> IO String
       getString m = do
         r <- m
@@ -231,25 +240,28 @@ getRulesInfo ctx0 = withForeignPtr ctx0.unwrap $ \ctx' ->
 createRegistryContext :: RegistryOptions -> IO RxkbContext
 createRegistryContext opts = do
   ctx' <- throwIfNull "createRegistry" $ _rxkbContextNew flags
-  forM_ opts.setLogLevel $ _rxkbContextSetLogLevel ctx' . displayLogLevel
-  forM_ opts.extraIncludePaths $ appendIncludePath ctx'
   ctx <- RxkbContext <$> newForeignPtr _rxkbContextUnref ctx'
+  withForeignPtr ctx.unwrap $ \p -> do
+    forM_ opts.setLogLevel $ _rxkbContextSetLogLevel p . displayLogLevel
+    forM_ opts.extraIncludePaths $ appendIncludePath p
   maybe rxkbContextParseDefault (flip rxkbContextParse) opts.ruleSet ctx
   return ctx
     where
       flags =
         f opts.noDefaultIncludes #{const RXKB_CONTEXT_NO_DEFAULT_INCLUDES} .|.
-        f opts.exoticRules #{const RXKB_CONTEXT_LOAD_EXOTIC_RULES} .|.
-        f opts.noSecureGetenv #{const RXKB_CONTEXT_NO_SECURE_GETENV}
+        f opts.exoticRules       #{const RXKB_CONTEXT_LOAD_EXOTIC_RULES} .|.
+        f opts.noSecureGetenv    #{const RXKB_CONTEXT_NO_SECURE_GETENV}
       f True x = x
       f False _ = 0
 
-      displayLogLevel lvl = case lvl of
-                              LevelCritical -> #{const RXKB_LOG_LEVEL_CRITICAL}
-                              LevelError -> #{const RXKB_LOG_LEVEL_ERROR}
-                              LevelWarning -> #{const RXKB_LOG_LEVEL_WARNING}
-                              LevelInfo -> #{const RXKB_LOG_LEVEL_INFO}
-                              LevelDebug -> #{const RXKB_LOG_LEVEL_DEBUG}
+displayLogLevel :: LogLevel -> CUInt
+displayLogLevel lvl =
+  case lvl of
+    LevelCritical -> #{const RXKB_LOG_LEVEL_CRITICAL}
+    LevelError    -> #{const RXKB_LOG_LEVEL_ERROR}
+    LevelWarning  -> #{const RXKB_LOG_LEVEL_WARNING}
+    LevelInfo     -> #{const RXKB_LOG_LEVEL_INFO}
+    LevelDebug    -> #{const RXKB_LOG_LEVEL_DEBUG}
 
 appendIncludePath :: Ptr RxkbContext -> FilePath -> IO ()
 appendIncludePath ctx path = do
@@ -304,53 +316,53 @@ newtype ISO3166 = ISO3166 { unwrap :: Ptr ISO3166 }
   deriving newtype (Eq, Ord, Storable)
   deriving stock (Generic, Show, Data)
 
-foreign import ccall unsafe "rxkb_context_new" _rxkbContextNew :: CUInt -> IO (Ptr RxkbContext)
-foreign import ccall unsafe "rxkb_context_parse" _rxkbContextParse :: Ptr RxkbContext -> CString -> IO Bool
-foreign import ccall unsafe "rxkb_context_parse_default_ruleset" _rxkbContextParseDefaultRuleset :: Ptr RxkbContext -> IO Bool
-foreign import ccall unsafe "rxkb_context_set_log_level" _rxkbContextSetLogLevel :: Ptr RxkbContext -> CUInt -> IO ()
-foreign import ccall unsafe "rxkb_context_include_path_append" c_rxkb_context_include_path_append :: Ptr RxkbContext -> CString -> IO Bool
-foreign import ccall unsafe "&rxkb_context_unref" _rxkbContextUnref :: FunPtr (Ptr RxkbContext -> IO ())
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_context_new" _rxkbContextNew :: CUInt -> IO (Ptr RxkbContext)
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_context_parse" _rxkbContextParse :: Ptr RxkbContext -> CString -> IO Bool
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_context_parse_default_ruleset" _rxkbContextParseDefaultRuleset :: Ptr RxkbContext -> IO Bool
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_context_set_log_level" _rxkbContextSetLogLevel :: Ptr RxkbContext -> CUInt -> IO ()
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_context_include_path_append" c_rxkb_context_include_path_append :: Ptr RxkbContext -> CString -> IO Bool
+foreign import capi unsafe "xkbcommon/xkbregistry.h &rxkb_context_unref" _rxkbContextUnref :: FunPtr (Ptr RxkbContext -> IO ())
 
-foreign import ccall unsafe "rxkb_model_unref"          _rxkbModelUnref          :: Ptr RxkbModel -> IO ()
-foreign import ccall unsafe "rxkb_model_first"           _rxkbModelFirst          :: Ptr RxkbContext -> IO RxkbModel
-foreign import ccall unsafe "rxkb_model_next"            _rxkbModelNext           :: RxkbModel -> IO RxkbModel
-foreign import ccall unsafe "rxkb_model_get_name"        _rxkbModelGetName        :: RxkbModel -> IO CString
-foreign import ccall unsafe "rxkb_model_get_description" _rxkbModelGetDescription :: RxkbModel -> IO CString
-foreign import ccall unsafe "rxkb_model_get_popularity"  _rxkbModelGetPopularity  :: RxkbModel -> IO CUInt
-foreign import ccall unsafe "rxkb_model_get_vendor"      _rxkbModelGetVendor      :: RxkbModel -> IO CString
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_model_unref"          _rxkbModelUnref          :: Ptr RxkbModel -> IO ()
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_model_first"           _rxkbModelFirst          :: Ptr RxkbContext -> IO RxkbModel
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_model_next"            _rxkbModelNext           :: RxkbModel -> IO RxkbModel
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_model_get_name"        _rxkbModelGetName        :: RxkbModel -> IO ConstCS
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_model_get_description" _rxkbModelGetDescription :: RxkbModel -> IO ConstCS
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_model_get_popularity"  _rxkbModelGetPopularity  :: RxkbModel -> IO CUInt
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_model_get_vendor"      _rxkbModelGetVendor      :: RxkbModel -> IO ConstCS
 
-foreign import ccall unsafe "rxkb_layout_unref" _rxkbLayoutUnref                   :: Ptr RxkbLayout -> IO ()
-foreign import ccall unsafe "rxkb_layout_first" _rxkbLayoutFirst                    :: Ptr RxkbContext -> IO RxkbLayout
-foreign import ccall unsafe "rxkb_layout_next" _rxkbLayoutNext                      :: RxkbLayout -> IO RxkbLayout
-foreign import ccall unsafe "rxkb_layout_get_name" _rxkbLayoutGetName               :: RxkbLayout -> IO CString
-foreign import ccall unsafe "rxkb_layout_get_description" _rxkbLayoutGetDescription :: RxkbLayout -> IO CString
-foreign import ccall unsafe "rxkb_layout_get_popularity" _rxkbLayoutGetPopularity   :: RxkbLayout -> IO CUInt
-foreign import ccall unsafe "rxkb_layout_get_variant" _rxkbLayoutGetVariant         :: RxkbLayout -> IO CString
-foreign import ccall unsafe "rxkb_layout_get_brief" _rxkbLayoutGetBrief             :: RxkbLayout -> IO CString
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_layout_unref" _rxkbLayoutUnref                   :: Ptr RxkbLayout -> IO ()
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_layout_first" _rxkbLayoutFirst                    :: Ptr RxkbContext -> IO RxkbLayout
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_layout_next" _rxkbLayoutNext                      :: RxkbLayout -> IO RxkbLayout
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_layout_get_name" _rxkbLayoutGetName               :: RxkbLayout -> IO ConstCS
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_layout_get_description" _rxkbLayoutGetDescription :: RxkbLayout -> IO ConstCS
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_layout_get_popularity" _rxkbLayoutGetPopularity   :: RxkbLayout -> IO CUInt
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_layout_get_variant" _rxkbLayoutGetVariant         :: RxkbLayout -> IO ConstCS
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_layout_get_brief" _rxkbLayoutGetBrief             :: RxkbLayout -> IO ConstCS
 
-foreign import ccall unsafe "rxkb_option_group_unref" _rxkbOptionGroupUnref                   :: Ptr RxkbOptionGroup -> IO ()
-foreign import ccall unsafe "rxkb_option_group_first" _rxkbOptionGroupFirst                    :: Ptr RxkbContext -> IO RxkbOptionGroup
-foreign import ccall unsafe "rxkb_option_group_next" _rxkbOptionGroupNext                      :: RxkbOptionGroup -> IO RxkbOptionGroup
-foreign import ccall unsafe "rxkb_option_group_get_name" _rxkbOptionGroupGetName               :: RxkbOptionGroup -> IO CString
-foreign import ccall unsafe "rxkb_option_group_get_description" _rxkbOptionGroupGetDescription :: RxkbOptionGroup -> IO CString
-foreign import ccall unsafe "rxkb_option_group_get_popularity" _rxkbOptionGroupGetPopularity   :: RxkbOptionGroup -> IO CUInt
-foreign import ccall unsafe "rxkb_option_group_allows_multiple" _rxkbOptionGroupAllowsMultiple :: RxkbOptionGroup -> IO Bool
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_option_group_unref" _rxkbOptionGroupUnref                   :: Ptr RxkbOptionGroup -> IO ()
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_option_group_first" _rxkbOptionGroupFirst                    :: Ptr RxkbContext -> IO RxkbOptionGroup
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_option_group_next" _rxkbOptionGroupNext                      :: RxkbOptionGroup -> IO RxkbOptionGroup
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_option_group_get_name" _rxkbOptionGroupGetName               :: RxkbOptionGroup -> IO ConstCS
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_option_group_get_description" _rxkbOptionGroupGetDescription :: RxkbOptionGroup -> IO ConstCS
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_option_group_get_popularity" _rxkbOptionGroupGetPopularity   :: RxkbOptionGroup -> IO CUInt
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_option_group_allows_multiple" _rxkbOptionGroupAllowsMultiple :: RxkbOptionGroup -> IO Bool
 
-foreign import ccall unsafe "rxkb_option_unref" _rxkbOptionUnref                        :: Ptr RxkbOption -> IO ()
-foreign import ccall unsafe "rxkb_option_first" _rxkbOptionFirst                         :: RxkbOptionGroup -> IO RxkbOption
-foreign import ccall unsafe "rxkb_option_next" _rxkbOptionNext                           :: RxkbOption -> IO RxkbOption
-foreign import ccall unsafe "rxkb_option_get_name" _rxkbOptionGetName                    :: RxkbOption -> IO CString
-foreign import ccall unsafe "rxkb_option_get_brief" _rxkbOptionGetBrief                  :: RxkbOption -> IO CString
-foreign import ccall unsafe "rxkb_option_get_description" _rxkbOptionGetDescription      :: RxkbOption -> IO CString
-foreign import ccall unsafe "rxkb_option_get_popularity" _rxkbOptionGetPopularity        :: RxkbOption -> IO CUInt
-foreign import ccall unsafe "rxkb_option_is_layout_specific" _rxkbOptionIsLayoutSpecific :: RxkbOption -> IO Bool
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_option_unref" _rxkbOptionUnref                        :: Ptr RxkbOption -> IO ()
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_option_first" _rxkbOptionFirst                         :: RxkbOptionGroup -> IO RxkbOption
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_option_next" _rxkbOptionNext                           :: RxkbOption -> IO RxkbOption
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_option_get_name" _rxkbOptionGetName                    :: RxkbOption -> IO ConstCS
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_option_get_brief" _rxkbOptionGetBrief                  :: RxkbOption -> IO ConstCS
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_option_get_description" _rxkbOptionGetDescription      :: RxkbOption -> IO ConstCS
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_option_get_popularity" _rxkbOptionGetPopularity        :: RxkbOption -> IO CUInt
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_option_is_layout_specific" _rxkbOptionIsLayoutSpecific :: RxkbOption -> IO Bool
 
-foreign import ccall unsafe "rxkb_layout_get_iso639_first" _iso639First   :: RxkbLayout -> IO ISO639
-foreign import ccall unsafe "rxkb_iso639_code_next" _iso639Next           :: ISO639 -> IO ISO639
-foreign import ccall unsafe "rxkb_iso639_code_get_code" _iso639GetCode    :: ISO639 -> IO CString
-foreign import ccall unsafe "rxkb_iso639_code_unref" _iso639Unref         :: Ptr ISO639 -> IO ()
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_layout_get_iso639_first" _iso639First   :: RxkbLayout -> IO ISO639
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_iso639_code_next" _iso639Next           :: ISO639 -> IO ISO639
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_iso639_code_get_code" _iso639GetCode    :: ISO639 -> IO ConstCS
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_iso639_code_unref" _iso639Unref         :: Ptr ISO639 -> IO ()
 
-foreign import ccall unsafe "rxkb_layout_get_iso3166_first" _iso3166First :: RxkbLayout -> IO ISO3166
-foreign import ccall unsafe "rxkb_iso3166_code_next" _iso3166Next         :: ISO3166 -> IO ISO3166
-foreign import ccall unsafe "rxkb_iso3166_code_get_code" _iso3166GetCode  :: ISO3166 -> IO CString
-foreign import ccall unsafe "rxkb_iso3166_code_unref" _iso3166Unref       :: Ptr ISO3166 -> IO ()
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_layout_get_iso3166_first" _iso3166First :: RxkbLayout -> IO ISO3166
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_iso3166_code_next" _iso3166Next         :: ISO3166 -> IO ISO3166
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_iso3166_code_get_code" _iso3166GetCode  :: ISO3166 -> IO ConstCS
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_iso3166_code_unref" _iso3166Unref       :: Ptr ISO3166 -> IO ()
