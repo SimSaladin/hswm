@@ -7,31 +7,17 @@ module HSWM.XKB
   )
 where
 
-import Text.XkbCommon
-import Text.XkbCommon.EventCodes
-import Text.XkbCommon.KeySyms (key_NoSymbol)
+import HSWM.Utils
 
-import qualified Wayland as WL
 import qualified River as R
+import qualified Wayland as WL
+import           Text.XkbCommon
+import           Text.XkbCommon.EventCodes
 
-import qualified Bindings.River as R ()
-import qualified Bindings.River.WindowManagementV1.Generated as R
-
-import qualified Data.List as L
 import qualified Data.Map as M
 import           Foreign
 
 -- * KeySym parsing
-
-class IsKeySym a where
-
-  toKeySym :: a -> KeySym
-
-instance IsKeySym KeySym where
-  toKeySym = id
-
-instance IsKeySym String where
-  toKeySym s = fromMaybe key_NoSymbol $ keysymFromName s <|> keysymFromNameCaseInsensitive s
 
 data XkbBinding a = XkbBinding
   { xkb_binding :: {-# UNPACK #-} !R.RiverXkbBinding
@@ -49,10 +35,6 @@ data PointerBinding a = PointerBinding
   } deriving (Generic)
 
 type XkbBindingMap a = M.Map XBKey (StablePtr (XkbBinding a))
-
-type Button = Word32
-
-type XBKey = (ModMask, KeySym)
 
 createXkbBindings
   :: (MonadReader env m, MonadLogger m, MonadIO m, Show a, Typeable a)
@@ -117,19 +99,3 @@ destroyPointerBinding sptr = io $ do
   pb <- deRefStablePtr sptr
   WL.objectDestroy pb.pointer_binding
   freeStablePtr sptr
-
-ppXBKey :: XBKey -> String
-ppXBKey (m, ksym) = L.intercalate "+" $ ppModifiers m ++ [fromMaybe "???" $ keysymName ksym]
-
-ppButton :: (ModMask, Button) -> String
-ppButton (m, btn) = L.intercalate "+" $ ppModifiers m ++ [fromMaybe "???" $ fromEventCodeBTN btn]
-
-ppModifiers :: ModMask -> [String]
-ppModifiers bm = [ s | (s, x) <-
-        [ ("C", R.riverSeatModifiersCtrl)
-        , ("S", R.riverSeatModifiersShift)
-        , ("M1", R.riverSeatModifiersMod1)
-        , ("M3", R.riverSeatModifiersMod3)
-        , ("M4", R.riverSeatModifiersMod4)
-        , ("M5", R.riverSeatModifiersMod5)
-        ], fi x.unwrap .&. bm /= 0 ]

@@ -21,5 +21,3 @@ module Wayland.Viewporter
   ) where
 
 import Bindings.Wayland.Viewporter
-
--- viewporterGetViewport viewporter surface -> viewport

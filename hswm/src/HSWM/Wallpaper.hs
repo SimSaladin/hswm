@@ -16,8 +16,9 @@ module HSWM.Wallpaper
   )
 where
 
-import qualified HSWM.BufferPool as BP
 import           HSWM.Core
+import qualified HSWM.BufferPool as BP
+import           HSWM.Utils (getPixmanFormatBE)
 
 import qualified Wayland as WL
 import qualified Wayland.Viewporter as VP
@@ -38,10 +39,10 @@ import           Foreign
 
 usingWallpaper :: WallpaperConfig -> HSWMConfig H l -> HSWMConfig H l
 usingWallpaper cfg userConf = userConf
-  { startupHook = userConf.startupHook <> wpStartupHook cfg,
-    exitHook = userConf.exitHook <> wpExitHook,
-    renderHook = userConf.renderHook <> render,
-    handleEventHook = userConf.handleEventHook <> wpHandleEventHook
+  { startupHook = userConf.startupHook <> wpStartupHook cfg
+  , exitHook = userConf.exitHook <> wpExitHook
+  , renderHook = userConf.renderHook <> render
+  , handleEventHook = userConf.handleEventHook <> wpHandleEventHook
   }
 
 newtype WallpaperConfig = WallpaperConfig { filepath :: FilePath }
@@ -51,9 +52,9 @@ newtype WallpaperConfig = WallpaperConfig { filepath :: FilePath }
 -- ** Types
 
 data Ctx = Ctx
-  { outputsState :: !(Map RiverOutput OutputState)
+  { bufferPool   :: !(Maybe BP.ImageBufferPool)
+  , outputsState :: !(Map RiverOutput OutputState)
   , src_image    :: !(Maybe (JP.Image JP.PixelRGBA8))
-  , bufferPool   :: !(Maybe BP.ImageBufferPool)
   }
   deriving (Generic)
 
@@ -166,7 +167,7 @@ drawImage bp OutputState {..} img Surfaces {..} = do
       src_h = JP.imageHeight img
       src_stride = src_w * 4
       shmFormat = WL.ShmFormatABGR8888
-      pixmanFormat = BP.getPixmanFormatBE shmFormat
+      pixmanFormat = getPixmanFormatBE shmFormat
 
       -- Calculate the buffer size
       buf_size@(buf_w, buf_h)
@@ -268,7 +269,7 @@ initOutput ro = withOutputState ro $ \os -> do
       layerSurface <- withObject $ \layerShell ->
         Wlr.layerShellGetLayerSurface layerShell wl_surface os.wl_output Wlr.ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND (Just "wallpaper")
       Wlr.layerSurfaceSetSize layerSurface 0 0
-      Wlr.layerSurfaceSetAnchor layerSurface (R.toCEnum $ 1 + 2 + 4 + 8) --1 + 2 + 4 + 8)
+      Wlr.layerSurfaceSetAnchor layerSurface (R.toCEnum $ 1 + 2 + 4 + 8)
       Wlr.layerSurfaceSetExclusiveZone layerSurface (-1)
 
       lsListener <- WL.createListener $ \case

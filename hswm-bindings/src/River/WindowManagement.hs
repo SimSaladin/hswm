@@ -12,31 +12,29 @@ module River.WindowManagement
   ( RiverWindowManager
   -- ** Events
   , RiverWindowManagerEvent(..)
-  -- ** Requests
-  -- *** ManageFinish (Manage)
+  -- ** ManageFinish (Manage)
   , riverWindowManagerManageFinish
-  -- *** RenderFinish (Render)
+  -- ** RenderFinish (Render)
   , riverWindowManagerRenderFinish
-  -- *** GetShellSurface
+  -- ** Get ShellSurface
   , riverWindowManagerGetShellSurface
-  -- *** ManageDirty
+  -- ** ManageDirty
   , riverWindowManagerManageDirty
-  -- *** Stop
+  -- ** Stop
   , riverWindowManagerStop
-  -- *** ExitSession
+  -- ** Exit Session
   , riverWindowManagerExitSession
 
   -- * RiverWindow
   , RiverWindow
   -- ** Events
   , RiverWindowEvent(..)
-  -- ** Requests
-  -- *** GetNode
+  -- ** Get Node
   , riverWindowGetNode
-  -- *** GetDecoration
+  -- ** Get Decoration
   , riverWindowGetDecorationAbove
   , riverWindowGetDecorationBelow
-  -- *** (Manage)
+  -- ** (Manage)
   , riverWindowProposeDimensions
   , riverWindowSetDimensionBounds
   , riverWindowUseCsd
@@ -52,22 +50,33 @@ module River.WindowManagement
   , riverWindowFullscreen
   , riverWindowExitFullscreen
   , riverWindowClose
-  -- *** (Render)
+  -- ** (Render)
   , riverWindowHide
   , riverWindowShow
   , riverWindowSetBorders
   , riverWindowSetClipBox
   , riverWindowSetContentClipBox
+  -- ** RiverWindowEdges
+  , RiverWindowEdges
+  , pattern EdgeNone
+  , pattern EdgeLeft
+  , pattern EdgeRight
+  , pattern EdgeBottom
+  , pattern EdgeTop
+  -- ** RiverWindowCapabilities
+  , RiverWindowCapabilities
+  , pattern WindowMenu
+  , pattern Maximize
+  , pattern Fullscreen
+  , pattern Minimize
 
   -- * RiverNode
   , RiverNode
-  -- ** Requests
-  -- *** SetPosition (RenderSeq)
+  -- ** SetPosition (Render)
   , riverNodeSetPosition
-  -- *** PlaceTop / PlaceBottom (RenderSeq)
+  -- ** Place (Top / Bottom / Above / Below) (Render)
   , riverNodePlaceTop
   , riverNodePlaceBottom
-  -- *** PlaceAbove / PlaceBelow (RenderSeq)
   , riverNodePlaceAbove
   , riverNodePlaceBelow
 
@@ -75,22 +84,25 @@ module River.WindowManagement
   , RiverOutput
   -- ** Events
   , RiverOutputEvent(..)
-  -- ** Requests
+  -- ** Set Presentation Mode (Render)
   , riverOutputSetPresentationMode
+  , RiverOutputPresentationMode
 
   -- * RiverSeat
   , RiverSeat
   -- ** Events
   , RiverSeatEvent(..)
-  -- ** Requests
+  -- ** Requests (manage)
   , riverSeatFocusWindow
   , riverSeatFocusShellSurface
   , riverSeatClearFocus
   , riverSeatOpStartPointer
   , riverSeatOpEnd
-  , riverSeatGetPointerBinding
-  , riverSeatSetXcursorTheme
   , riverSeatPointerWarp
+  -- ** Get PointerBinding
+  , riverSeatGetPointerBinding
+  -- ** Set XCursorTheme
+  , riverSeatSetXcursorTheme
   -- ** RiverSeatModifiers
   , RiverSeatModifiers
   , riverSeatModifiersNone
@@ -103,18 +115,16 @@ module River.WindowManagement
 
   -- * RiverDecoration
   , RiverDecoration
-  -- ** Requests
-  -- *** SetOffset
+  -- ** SetOffset (Render)
   , riverDecorationSetOffset
-  -- *** SyncNextCommit
+  -- ** SyncNextCommit (Render)
   , riverDecorationSyncNextCommit
 
   -- * RiverShellSurface
   , RiverShellSurface
-  -- ** Requests
-  -- *** GetNode
+  -- ** GetNode
   , riverShellSurfaceGetNode
-  -- *** SyncNextCommit
+  -- ** SyncNextCommit (Render)
   , riverShellSurfaceSyncNextCommit
 
   -- * RiverPointerBinding
@@ -122,8 +132,7 @@ module River.WindowManagement
   , RiverPointerBindingListener
   -- ** Events
   , RiverPointerBindingEvent(..)
-  -- ** Requests
-  -- *** Enable / Disable
+  -- ** Enable / Disable (Manage)
   , riverPointerBindingEnable
   , riverPointerBindingDisable
 
@@ -132,3 +141,33 @@ module River.WindowManagement
   ) where
 
 import Bindings.River.WindowManagementV1
+import Bindings.River.WindowManagementV1.Generated
+
+import Data.Word
+import Data.Int
+
+data WindowBorders = WindowBorders
+  { wb_edges               :: !Word32 -- ^ Edges on which to draw borders
+  , wb_width               :: !Int32  -- ^ Width of border
+  , wb_r, wb_g, wb_b, wb_a :: !Word32 -- ^ RGBA 32-bit
+  } deriving stock (Eq, Ord, Show)
+
+pattern EdgeNone   :: RiverWindowEdges
+pattern EdgeLeft   :: RiverWindowEdges
+pattern EdgeRight  :: RiverWindowEdges
+pattern EdgeBottom :: RiverWindowEdges
+pattern EdgeTop    :: RiverWindowEdges
+pattern EdgeNone   = RIVER_WINDOW_V1_EDGES_NONE
+pattern EdgeLeft   = RIVER_WINDOW_V1_EDGES_LEFT
+pattern EdgeRight  = RIVER_WINDOW_V1_EDGES_RIGHT
+pattern EdgeBottom = RIVER_WINDOW_V1_EDGES_BOTTOM
+pattern EdgeTop    = RIVER_WINDOW_V1_EDGES_TOP
+
+pattern WindowMenu :: RiverWindowCapabilities
+pattern Maximize   :: RiverWindowCapabilities
+pattern Fullscreen :: RiverWindowCapabilities
+pattern Minimize   :: RiverWindowCapabilities
+pattern WindowMenu = RIVER_WINDOW_V1_CAPABILITIES_WINDOW_MENU
+pattern Maximize   = RIVER_WINDOW_V1_CAPABILITIES_MAXIMIZE
+pattern Fullscreen = RIVER_WINDOW_V1_CAPABILITIES_FULLSCREEN
+pattern Minimize   = RIVER_WINDOW_V1_CAPABILITIES_MINIMIZE

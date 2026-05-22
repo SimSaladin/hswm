@@ -18,10 +18,11 @@ import           HSWM.Types.Events
 import           HSWM.Types.TypeMap
 import           HSWM.Util.Types
 import           HSWM.Utils
-import           HSWM.XKB (Button, KeySym, ModMask, XkbRuleNames, XkbBindingMap, XBKey, PointerBinding)
+import           HSWM.XKB (KeySym, ModMask, XkbRuleNames, XkbBindingMap, PointerBinding)
 import           HSWM.Wayland (HasGlobalsRegistry(..), RegistryCache)
 
 import qualified Wayland as WL
+import qualified River as R
 
 import           River.WindowManagement (RiverWindow, RiverSeat, RiverOutput, RiverNode)
 
@@ -37,6 +38,7 @@ import qualified Data.Map as M
 import           Data.Monoid (Ap(..))
 import           Data.Typeable
 import           Foreign hiding (void)
+import           System.Log.FastLogger (LoggerSet)
 
 -- * User configuration
 
@@ -307,36 +309,6 @@ instance Message Event
 -----------------------------------------------------------
 -- * State & H/HS Monad
 
-newtype H a = H (ReaderT HConf IO a)
-  deriving newtype (Functor, Applicative, Monad, MonadFail, MonadIO, MonadReader HConf, MonadThrow, MonadUnliftIO)
-  deriving newtype (MonadCatch, MonadMask)
-  deriving (Semigroup, Monoid) via Ap H a
-
-instance Show (H ()) where show _ = "H()"
-
-instance Show (H Bool) where show _ = "H()"
-
-instance MonadLogger H where
-  monadLoggerLog loc src lvl msg = do
-    f <- asks _logFunc
-    io $ f loc src lvl $ toLogStr msg
-instance MonadLoggerIO H where
-  askLoggerIO = asks _logFunc
-
-newtype HS a = HS (ReaderT HConf (StateT HState IO) a)
-  deriving newtype (Functor, Applicative, Monad, MonadFail, MonadIO, MonadState HState, MonadReader HConf, MonadThrow)
-  deriving newtype (MonadCatch, MonadMask)
-  deriving (Semigroup, Monoid) via Ap HS a
-
-instance Show (HS Bool) where show _ = "HS()"
-
-instance MonadLogger HS where
-  monadLoggerLog loc src lvl msg = do
-    f <- asks _logFunc
-    io $ f loc src lvl $ toLogStr msg
-instance MonadLoggerIO HS where
-  askLoggerIO = asks _logFunc
-
 -- | The read-only window manager state.
 data HConf = HConf
   { _stateLocked                   :: {-# UNPACK #-} !Bool
@@ -349,6 +321,7 @@ data HConf = HConf
     -- | Root logger function.
   , _logFunc                       :: !(Loc -> LogSource -> LogLevel -> LogStr -> IO ())
     -- | The global objects available through wl_registry.
+  , _loggerSet                     :: !LoggerSet
   , globals                        :: !(MVar RegistryCache)
     -- | The 'HState' XXX FIXME
   , _state                         :: !(TMVar HState)
@@ -369,7 +342,7 @@ data HState = HState
   , recoveredWindows :: !(M.Map String RiverWindow)
     -- | stores custom state information.
     --
-    -- The module "XMonad.Util.ExtensibleState" in xmonad-contrib
+    -- The module "HSWM.Util.ExtensibleState"
     -- provides additional information and a simple interface for using this.
   , extensibleState  :: !(M.Map String (Either String StateExtension))
   } deriving (Generic, Default)
@@ -380,17 +353,37 @@ instance HasGlobalTMap HConf where
 instance HasGlobalsRegistry HConf where
   globalsRegistryL = lens globals (\s a -> s { globals = a })
 
-instance Default (H ()) where def = return ()
+newtype H a = H (ReaderT HConf IO a)
+  deriving newtype (Functor, Applicative, Monad, MonadFail, MonadIO, MonadReader HConf, MonadThrow, MonadUnliftIO)
+  deriving newtype (MonadCatch, MonadMask)
+  deriving (Semigroup, Monoid) via Ap H a
 
+newtype HS a = HS (ReaderT HConf (StateT HState IO) a)
+  deriving newtype (Functor, Applicative, Monad, MonadFail, MonadIO, MonadState HState, MonadReader HConf, MonadThrow)
+  deriving newtype (MonadCatch, MonadMask)
+  deriving (Semigroup, Monoid) via Ap HS a
+
+instance Show (H ()) where show _ = "H()"
+instance Show (H Bool) where show _ = "H()"
+instance Show (HS Bool) where show _ = "HS()"
+
+instance Default (H ()) where def = return ()
 instance Default (HS ()) where def = return ()
 
-instance MonadFix H where
-  mfix :: (a -> H a) -> H a
-  mfix f = H (mfix g) where g a = let H a' = f a in a'
+instance MonadFix H where mfix f = H (mfix g) where g a = let H a' = f a in a'
+instance MonadFix HS where mfix f = HS (mfix g) where g a = let HS a' = f a in a'
 
-instance MonadFix HS where
-  mfix :: (a -> HS a) -> HS a
-  mfix f = HS (mfix g) where g a = let HS a' = f a in a'
+instance MonadLoggerIO H where askLoggerIO = asks _logFunc
+instance MonadLoggerIO HS where askLoggerIO = asks _logFunc
+
+instance MonadLogger H where
+  monadLoggerLog loc src lvl msg = do
+    f <- askLoggerIO
+    io $ f loc src lvl $ toLogStr msg
+instance MonadLogger HS where
+  monadLoggerLog loc src lvl msg = do
+    f <- askLoggerIO
+    io $ f loc src lvl $ toLogStr msg
 
 -----------------------------------------------------------
 -- * Query & ManageHook
@@ -614,13 +607,8 @@ instance (MonadIO m) => Show (SomeAction m) where
 ---------------------------------------------------------
 -- Orphan instances
 
-instance Show (Async a) where
-  show :: Async a -> String
-  show _ = "<Async>"
-
-instance Show (StablePtr a) where
-  show :: StablePtr a -> String
-  show _ = "<SP>"
+instance Show (Async a) where show _ = "<Async>"
+instance Show (StablePtr a) where show _ = "<SP>"
 
 instance Default R.RiverInputDevice where
   def = R.RiverInputDevice nullPtr

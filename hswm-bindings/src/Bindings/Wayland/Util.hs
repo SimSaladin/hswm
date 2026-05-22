@@ -71,7 +71,7 @@ module Bindings.Wayland.Util
 import           Bindings.Wayland.Util.Generated
 import qualified Bindings.Wayland.Util.Generated.Unsafe as U
 
-import           Wayland.Internal.TH
+import           Wayland.Internal.TH.NewType
 import           Wayland.Types
 
 import qualified HsBindgen.Runtime.HasCField as CF
@@ -87,6 +87,7 @@ import           Foreign.C.Types
 import           GHC.Generics
 import           GHC.Records
 import           System.IO.Unsafe
+import Data.Default
 
 -- | Orphan instance
 type instance InterfaceType a = Wl_interface

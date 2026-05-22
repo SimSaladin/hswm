@@ -14,10 +14,16 @@ module HSWM.Utils
   ) where
 
 import           HSWM.Util.Process
-import           HSWM.XKB (ModMask)
+
+import           Text.XkbCommon
+import           Text.XkbCommon.KeySyms (key_NoSymbol)
+import           Text.XkbCommon.EventCodes (fromEventCodeBTN)
+
+import qualified River as R
+import qualified Wayland as WL
+import qualified Pixman as P
 
 import           Bindings.River (RiverColor(..))
-import qualified River as R
 import qualified Bindings.River.WindowManagementV1.Generated as R
 
 import qualified Bindings.Wayland.Client.Generated as WL
@@ -29,7 +35,6 @@ import           Data.Ord
 import           Foreign
 import           GHC.Stack
 import           Numeric (readHex)
-import           System.Posix (getEnv)
 import qualified Text.Pretty.Simple as P
 
 -- * Keymap utils
@@ -64,6 +69,36 @@ resolveModMask d s = go s
       "mod5"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD5
       "m5"    -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD5
       _       -> error $ "unrecognized modifier: " ++ y
+
+ppModifiers :: ModMask -> [String]
+ppModifiers bm = [ s | (s, x) <-
+        [ ("C", R.riverSeatModifiersCtrl)
+        , ("S", R.riverSeatModifiersShift)
+        , ("M1", R.riverSeatModifiersMod1)
+        , ("M3", R.riverSeatModifiersMod3)
+        , ("M4", R.riverSeatModifiersMod4)
+        , ("M5", R.riverSeatModifiersMod5)
+        ], fi x.unwrap .&. bm /= 0 ]
+
+ppXBKey :: XBKey -> String
+ppXBKey (m, ksym) = L.intercalate "+" $ ppModifiers m ++ [fromMaybe "???" $ keysymName ksym]
+
+ppButton :: (ModMask, Button) -> String
+ppButton (m, btn) = L.intercalate "+" $ ppModifiers m ++ [fromMaybe "???" $ fromEventCodeBTN btn]
+
+type Button = Word32
+
+type XBKey = (ModMask, KeySym)
+
+class IsKeySym a where
+
+  toKeySym :: a -> KeySym
+
+instance IsKeySym KeySym where
+  toKeySym = id
+
+instance IsKeySym String where
+  toKeySym s = fromMaybe key_NoSymbol $ keysymFromName s <|> keysymFromNameCaseInsensitive s
 
 -- * Logging and debug
 
@@ -330,7 +365,45 @@ isLittleEndian = alloca $ \ptr -> do
     byte <- peek (castPtr ptr :: Ptr Word8)
     return (byte == 1)
 
-getXdgRuntimeDirectory :: IO FilePath
-getXdgRuntimeDirectory = getEnv "XDG_RUNTIME_DIR" >>= \case
-  Nothing -> error "XDG_RUNTIME_DIR not set"
-  Just dir -> return dir
+-- | little-endian
+getPixmanFormatLE :: WL.ShmFormat -> P.FormatCode
+getPixmanFormatLE = \case
+  WL.ShmFormatRGB332      -> P.R3G3B2
+  WL.ShmFormatBGR233      -> P.B2G3R3
+  WL.ShmFormatARGB4444    -> P.A4R4G4B4
+  WL.ShmFormatXRGB4444    -> P.X4R4G4B4
+  WL.ShmFormatABGR4444    -> P.A4B4G4R4
+  WL.ShmFormatXBGR4444    -> P.X4B4G4R4
+  WL.ShmFormatARGB1555    -> P.A1R5G5B5
+  WL.ShmFormatXRGB1555    -> P.X1R5G5B5
+  WL.ShmFormatABGR1555    -> P.A1B5G5R5
+  WL.ShmFormatXBGR1555    -> P.X1B5G5R5
+  WL.ShmFormatRGB565      -> P.R5G6B5
+  WL.ShmFormatBGR565      -> P.B5G6R5
+  WL.ShmFormatRGB888      -> P.R8G8B8
+  WL.ShmFormatBGR888      -> P.B8G8R8
+  WL.ShmFormatARGB8888    -> P.A8R8G8B8
+  WL.ShmFormatXRGB8888    -> P.X8R8G8B8
+  WL.ShmFormatABGR8888    -> P.A8B8G8R8
+  WL.ShmFormatXBGR8888    -> P.X8B8G8R8
+  WL.ShmFormatBGRA8888    -> P.B8G8R8A8
+  WL.ShmFormatBGRX8888    -> P.B8G8R8X8
+  WL.ShmFormatRGBA8888    -> P.R8G8B8A8
+  WL.ShmFormatRGBX8888    -> P.R8G8B8X8
+  WL.ShmFormatARGB2101010 -> P.A2R10G10B10
+  WL.ShmFormatABGR2101010 -> P.A2B10G10R10
+  WL.ShmFormatXRGB2101010 -> P.X2R10G10B10
+  WL.ShmFormatXBGR2101010 -> P.X2B10G10R10
+  _                       -> R.toCEnum 0
+
+getPixmanFormatBE :: WL.ShmFormat -> P.FormatCode
+getPixmanFormatBE = \case
+  WL.ShmFormatARGB8888 -> P.B8G8R8A8
+  WL.ShmFormatXRGB8888 -> P.B8G8R8X8
+  WL.ShmFormatABGR8888 -> P.R8G8B8A8
+  WL.ShmFormatXBGR8888 -> P.R8G8B8X8
+  WL.ShmFormatBGRA8888 -> P.A8R8G8B8
+  WL.ShmFormatBGRX8888 -> P.X8R8G8B8
+  WL.ShmFormatRGBA8888 -> P.A8B8G8R8
+  WL.ShmFormatRGBX8888 -> P.X8B8G8R8
+  _                    -> R.toCEnum 0
