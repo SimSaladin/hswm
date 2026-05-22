@@ -11,6 +11,7 @@ module Text.XkbCommon.State (
   -- * Create
   XkbState,
   createXkbState,
+
   -- * Functions
   xkbStateKeymap,
   xkbStateUpdateMask,
@@ -20,17 +21,22 @@ module Text.XkbCommon.State (
   xkbStateKeyUtf32,
   xkbStateKeyLayout,
   xkbStateKeyLevel,
+
   -- * XkbStateComponent
-  XkbStateComponent,
-  xkbStateModsDepressed,
-  xkbStateModsLatched,
-  xkbStateModsLocked,
-  xkbStateModsEffective,
-  xkbStateLayoutDepressed,
-  xkbStateLayoutLatched,
-  xkbStateLayoutLocked,
-  xkbStateLayoutEffective,
-  xkbStateLeds,
+  XkbStateComponent
+    ( StateModsDepressed
+    , StateModsLatched      
+    , StateModsLocked       
+    , StateModsEffective    
+    , StateLayoutDepressed  
+    , StateLayoutLatched    
+    , StateLayoutLocked     
+    , StateLayoutEffective  
+    , StateLeds             
+    ),
+
+  -- * Exceptions
+  XkbStateException(..),
   ) where
 
 import Foreign
@@ -40,13 +46,20 @@ import Control.Monad
 import Text.XkbCommon.FFI
 import Text.XkbCommon.Keymap
 
+-- | Exceptions related to 't:XkbState'.
+data XkbStateException
+  = XkbStateCreationFailed { keymap :: !XkbKeymap }
+  deriving (Eq, Ord, Show, Generic)
+
+instance Exception XkbStateException
+
 -- | Create a new "XkbState" object for the given keymap.
 --
 -- Throws "XkbStateCreationFailed" on failure.
 createXkbState :: XkbKeymap -> IO XkbState
 createXkbState km = withForeignPtr km.unwrap $ \kmPtr ->
   _xkbStateNew kmPtr
-  >>= xkbThrowIfNull' XkbStateCreationFailed
+  >>= xkbThrowIfNull' (XkbStateCreationFailed km)
   >>= fmap XkbState . newForeignPtr _xkbStateUnref
 
 -- | Get the keymap that was used to construct this state.
@@ -105,7 +118,7 @@ xkbStateKeyLayout :: XkbState -> Keycode -> IO (Maybe LayoutIndex)
 xkbStateKeyLayout xst kc = withForeignPtr xst.unwrap $ \xstPtr -> do
   r <- c_xkb_state_key_get_layout xstPtr kc
   return $! do
-    guard $ r /= layoutInvalid
+    guard $ r /= LayoutIndexInvalid
     return r
 
 -- | Get the effective shift level for a key in a given keyboard state and layout.
@@ -115,7 +128,7 @@ xkbStateKeyLevel :: XkbState -> Keycode -> LayoutIndex -> IO (Maybe LevelIndex)
 xkbStateKeyLevel xst kc li = withForeignPtr xst.unwrap $ \xstPtr -> do
   r <- c_xkb_state_key_get_level xstPtr kc li
   return $! do
-    guard $ r /= levelInvalid
+    guard $ r /= LevelIndexInvalid
     return r
 
 -- * Internals

@@ -49,7 +49,7 @@ preBuildHook PreBuildComponentInputs{buildingWhat=flags, localBuildInfo=lbi, tar
     -- system package "libxkbcommon"
     registerRule_ "keysyms" $ mkRule GenerateModule
         { sModule      = "Text.XkbCommon.KeySyms"
-        , sImports     = [ "Text.XkbCommon.KeySym" ]
+        , sImports     = [ "Text.XkbCommon.KeySym (KeySym)" ]
         , sType        = "KeySym"
         , sHeader      = "xkbcommon/xkbcommon-keysyms.h"
         , sExtra       = ""
@@ -147,7 +147,8 @@ getDefines verb lbi gen = do
       getDoc d Nothing = printf "@%s@" d.cName
 
       mkLookupFn nm ds = unlines $
-        [ printf "%s :: %s -> Maybe String" nm gen.sType
+        [ printf "-- | Try to convert values to labels."
+        , printf "%s :: %s -> Maybe String" nm gen.sType
         , printf "%s x" nm ] ++
         [ printf "  | x == %s = Just \"%s\"" hsName cName | Define{..} <- ds ] ++
         [ printf "  | otherwise = Nothing" ]

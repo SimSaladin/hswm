@@ -9,9 +9,8 @@
 --
 -- Bindings to libxkbcommon.
 module Text.XkbCommon
-  ( module X,
-  FFI.XkbCommonException(..),
-  def
+  ( module X
+  , def
   ) where
 
 import Text.XkbCommon.Context as X
@@ -19,6 +18,6 @@ import Text.XkbCommon.KeySym as X
 import Text.XkbCommon.Keymap as X
 import Text.XkbCommon.Keymap.RmlvoBuilder as X
 import Text.XkbCommon.State as X
-import Text.XkbCommon.FFI as FFI
+--import Text.XkbCommon.FFI as FFI
 
 import Data.Default

@@ -1,17 +1,40 @@
 {-# LANGUAGE ExplicitForAll #-}
 
+-- |
+-- Description : The context contains various general library data and state.
+--
+-- The context contains various general library data and state, like
+-- logging level and include paths.
+--
+-- Objects are created in a specific context, and multiple contexts may
+-- coexist simultaneously.  Objects from different contexts are completely
+-- separated and do not share any memory or state.
 module Text.XkbCommon.Context (
+
+  -- * New
+  XkbContext,
   XkbContextOptions(..),
-  XkbContext(..),
-  LogLevel(..),
   createXkbContext,
   withXkbContext,
-  getIncludePaths,
-  -- * Internals
-  appendIncludePath,
-  setXkbContextUserData,
+
+  -- * Exceptions
+  XkbContextException(..),
+
+  -- * Include Paths
+  contextIncludePathGet,
+  contextIncludePathAppend,
+  contextIncludePathAppendDefault,
+  contextIncludePathClear,
+  contextIncludePathResetDefaults,
+
+  -- * Logging
+  LogLevel(..),
   setXkbContextLogLevel,
   setXkbContextLogVerbosity,
+
+  -- * User data
+  contextGetUserData,
+  setXkbContextUserData,
   ) where
 
 import Foreign
@@ -22,73 +45,128 @@ import Control.Exception
 
 import Text.XkbCommon.FFI
 
-withXkbContext :: XkbContextOptions -> (XkbContext -> IO a) -> IO a
-withXkbContext flags f = createXkbContext flags >>= f
+-- | Context-related exceptions.
+data XkbContextException
+  = XkbContextCreationFailed !XkbContextOptions
+  | IncludePathUnavailable { context :: !XkbContext, path :: !FilePath }
+  deriving (Eq, Ord, Show, Generic)
 
--- | Throws "XkbContextCreationFailed" on failure.
+instance Exception XkbContextException
+
+-- | Create a new "XkbContext" with the given options.
+--
+-- Throws "XkbContextCreationFailed" on failure.
 createXkbContext :: XkbContextOptions -> IO XkbContext
 createXkbContext opts = do
-  ctx <- _xkbContextNew (optionsToFlags opts)
-    >>= xkbThrowIfNull' XkbContextCreationFailed
-    >>= fmap XkbContext . newForeignPtr _xkbContextUnref
+  ctx <- c_xkbContextNew (optionsToFlags opts)
+    >>= xkbThrowIfNull' (XkbContextCreationFailed opts)
+    >>= fmap XkbContext . newForeignPtr c_xkbContextUnref
   forM_ opts.contextLogLevel $ setXkbContextLogLevel ctx
   forM_ opts.contextLogVerbosity $ setXkbContextLogVerbosity ctx
   return ctx
 
+-- | See 'createXkbContext'
+withXkbContext :: XkbContextOptions -> (XkbContext -> IO a) -> IO a
+withXkbContext flags f = createXkbContext flags >>= f
+
+-- | Get the context user data. By default it is @NULL@.
+contextGetUserData :: XkbContext -> IO (Ptr a)
+contextGetUserData ctx = withForeignPtr ctx.unwrap $ \ptr ->
+  c_get_udata ptr
+
+-- | Set the context user data.
 setXkbContextUserData :: XkbContext -> Ptr a -> IO ()
 setXkbContextUserData ctx ud = withForeignPtr ctx.unwrap $ \ctxPtr ->
-  _xkbContextSetUserData ctxPtr ud
+  c_xkbContextSetUserData ctxPtr ud
 
+-- | Set context log level.
 setXkbContextLogLevel :: XkbContext -> LogLevel -> IO ()
 setXkbContextLogLevel ctx level = withForeignPtr ctx.unwrap $ \ctxPtr ->
-  _xkbContextSetLogLevel ctxPtr (fromLogLevel level)
+  c_xkbContextSetLogLevel ctxPtr (fromLogLevel level)
 
+-- | Set context log verbosity. See 'contextLogVerbosity' for details.
 setXkbContextLogVerbosity :: XkbContext -> Int -> IO ()
 setXkbContextLogVerbosity ctx verbosity = withForeignPtr ctx.unwrap $ \ctxPtr ->
-  _xkbContextSetLogVerbosity ctxPtr (fromIntegral verbosity)
+  c_xkbContextSetLogVerbosity ctxPtr (fromIntegral verbosity)
 
-appendIncludePath :: XkbContext -> FilePath -> IO ()
-appendIncludePath ctx fp =
+-- | Append an include path to the context.
+--
+-- Throws "IncludePathUnavailable" on problem.
+contextIncludePathAppend :: XkbContext -> FilePath -> IO ()
+contextIncludePathAppend ctx fp =
   withForeignPtr ctx.unwrap $ \ctxPtr ->
   withCString fp $ \fpPtr -> do
-    r <- _xkb_context_include_path_append ctxPtr $ ConstPtr fpPtr
-    when (r /= 1) $ throwIO $ XkbContextIncludePathFailed fp
+    r <- c_xkb_context_include_path_append ctxPtr $ ConstPtr fpPtr
+    when (r /= 1) $ throwIO $ IncludePathUnavailable ctx fp
+
+-- | Reset the include path to defaults.
+--
+-- Throws "IncludePathUnavailable" on problem.
+contextIncludePathResetDefaults :: XkbContext -> IO ()
+contextIncludePathResetDefaults ctx =
+  withForeignPtr ctx.unwrap $ \ctxPtr -> do
+    r <- c_xkb_context_include_path_reset_defaults ctxPtr
+    when (r /= 1) $ throwIO $ IncludePathUnavailable ctx "(reset)"
+
+-- | Append the default include paths.
+--
+-- Throws "IncludePathUnavailable" on problem.
+contextIncludePathAppendDefault :: XkbContext -> IO ()
+contextIncludePathAppendDefault ctx =
+  withForeignPtr ctx.unwrap $ \ctxPtr -> do
+    r <- c_xkb_context_include_path_append_default ctxPtr
+    when (r /= 1) $ throwIO $ IncludePathUnavailable ctx "(default)"
 
 -- | Enumerate include paths.
-getIncludePaths :: XkbContext -> IO [FilePath]
-getIncludePaths ctx =
+contextIncludePathGet :: XkbContext -> IO [FilePath]
+contextIncludePathGet ctx =
   withForeignPtr ctx.unwrap $ \ctxPtr -> do
-    num <- _xkb_context_num_include_paths ctxPtr
-    forM [0 .. num - 1] $ _xkb_context_include_path_get ctxPtr >=> peekCString
+    num <- c_xkb_context_num_include_paths ctxPtr
+    forM [0 .. num - 1] $ c_xkb_context_include_path_get ctxPtr >=> peekCString
+
+-- | Remove all entries from the include path.
+contextIncludePathClear :: XkbContext -> IO ()
+contextIncludePathClear ctx =
+  withForeignPtr ctx.unwrap $ \ptr ->
+    c_xkb_context_include_path_clear ptr
 
 -- * Internals
 
 foreign import ccall unsafe "xkb_context_new"
-  _xkbContextNew :: CUInt -> IO (Ptr XkbContext)
+  c_xkbContextNew :: CUInt -> IO (Ptr XkbContext)
 
 foreign import ccall unsafe "&xkb_context_unref"
-  _xkbContextUnref :: FunPtr (Ptr XkbContext -> IO ())
+  c_xkbContextUnref :: FunPtr (Ptr XkbContext -> IO ())
+
+foreign import ccall unsafe "xkb_context_get_user_data"
+  c_get_udata :: forall a. Ptr XkbContext -> IO (Ptr a)
 
 foreign import ccall unsafe "xkb_context_set_user_data"
-  _xkbContextSetUserData :: forall a. Ptr XkbContext -> Ptr a -> IO ()
+  c_xkbContextSetUserData :: forall a. Ptr XkbContext -> Ptr a -> IO ()
 
 foreign import ccall unsafe "xkb_context_set_log_level"
-  _xkbContextSetLogLevel :: Ptr XkbContext -> CUInt -> IO ()
+  c_xkbContextSetLogLevel :: Ptr XkbContext -> CUInt -> IO ()
 
 foreign import ccall unsafe "xkb_context_set_log_verbosity"
-  _xkbContextSetLogVerbosity :: Ptr XkbContext -> CInt -> IO ()
+  c_xkbContextSetLogVerbosity :: Ptr XkbContext -> CInt -> IO ()
 
 foreign import ccall unsafe "xkb_context_num_include_paths"
-  _xkb_context_num_include_paths :: Ptr XkbContext -> IO CUInt
+  c_xkb_context_num_include_paths :: Ptr XkbContext -> IO CUInt
 
 foreign import ccall unsafe "xkb_context_include_path_clear"
-  _xkb_context_include_path_clear :: Ptr XkbContext -> IO ()
+  c_xkb_context_include_path_clear :: Ptr XkbContext -> IO ()
 
 foreign import ccall unsafe "xkb_context_include_path_append"
-  _xkb_context_include_path_append :: Ptr XkbContext -> ConstPtr CChar -> IO CInt
+  c_xkb_context_include_path_append :: Ptr XkbContext -> ConstPtr CChar -> IO CInt
+
+foreign import ccall unsafe "xkb_context_include_path_append_default"
+  c_xkb_context_include_path_append_default :: Ptr XkbContext -> IO CInt
 
 foreign import ccall unsafe "xkb_context_include_path_get"
-  _xkb_context_include_path_get :: Ptr XkbContext -> CUInt -> IO CString
+  c_xkb_context_include_path_get :: Ptr XkbContext -> CUInt -> IO CString
+
+foreign import ccall unsafe "xkb_context_include_path_reset_defaults"
+  c_xkb_context_include_path_reset_defaults :: Ptr XkbContext -> IO CInt
 
 --foreign import ccall unsafe "xkb_context_set_log_fn"
 --  _xkbContextSetLogFn :: Ptr XkbContext -> FunPtr XkbLogFn -> IO ()

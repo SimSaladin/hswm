@@ -25,6 +25,7 @@ module HSWM.InputConfig
 import           HSWM.Core
 
 import qualified Wayland as WL
+import qualified River as R
 
 import qualified Bindings.River as R
 import qualified Bindings.River.XkbConfigV1.Generated as R
@@ -37,7 +38,7 @@ import           System.Posix
 
 data InputConfigState = InputConfigState
   { xkbKeyboards    :: M.Map R.RiverXkbKeyboard    XkbKeyboardState
-  , xkbKeymaps      :: [KeymapState] -- ^ Created xkbcommon keymaps
+  , xkbKeymaps      :: M.Map R.RiverXkbKeymap      KeymapState -- ^ xkbcommon keymaps
   , inputDevices    :: M.Map R.RiverInputDevice    InputDeviceState
   , libinputDevices :: M.Map R.RiverLibinputDevice LibinputDeviceState
   }
@@ -151,13 +152,14 @@ createKeyboardKeymap params = lookupKeymaps params >>= \case
      | otherwise -> create
     where
     create = do
+      logInfo $ "Attempting to create a new keymap" :# [ "params" .= show params ]
       ctx <- io $ createXkbContext def
-      kmap <- io $ createKeymapFromNames ctx params keymapFormatTextV1
-      fd <- io $ keymapAsStringFd kmap keymapFormatTextV1
+      kmap <- io $ createKeymapFromNames ctx params KeymapFormatTextV1
+      fd <- io $ keymapAsStringFd kmap KeymapFormatTextV1
       keymap <- withObject $ \xkbConfig ->
         R.riverXkbConfigCreateKeymap xkbConfig (fi fd) R.RIVER_XKB_CONFIG_V1_KEYMAP_FORMAT_TEXT_V1
       let kmState = KeymapState { created = False, failure = Nothing, keymap, keymapFd = fd, params = Just params }
-      modifyObjectDef $ \st -> st { xkbKeymaps = kmState : st.xkbKeymaps }
+      modifyObjectDef $ \st -> st { xkbKeymaps = M.insert keymap kmState st.xkbKeymaps }
       l <- getOrCreateObject $ do
         runInIO <- askRunInIO
         R.mkRiverXkbKeymapListener $ runInIO . handleXkbKeymapEvent
@@ -167,35 +169,32 @@ createKeyboardKeymap params = lookupKeymaps params >>= \case
 lookupKeymaps :: XkbRuleNames -> H [KeymapState]
 lookupKeymaps params = do
   st <- getObjectDef @InputConfigState
-  return $! L.filter (\ks -> ks.params == Just params) st.xkbKeymaps
+  return $! L.filter (\ks -> ks.params == Just params) $ M.elems st.xkbKeymaps
 
 lookupValidKeymap :: XkbRuleNames -> H (Maybe KeymapState)
 lookupValidKeymap params = do
   st <- getObjectDef @InputConfigState
-  return $! L.find (\ks -> ks.created && ks.params == Just params) st.xkbKeymaps
+  return $! L.find (\ks -> ks.created && ks.params == Just params) $ M.elems st.xkbKeymaps
 
 -- * Event handlers
 
-handleXkbKeymapEvent :: (MonadUnliftIO m, MonadLogger m, MonadReader HConf m) => R.RiverXkbKeymapEvent -> m ()
+handleXkbKeymapEvent :: (MonadUnliftIO m, MonadLogger m, MonadReader HConf m, MonadThrow m) => R.RiverXkbKeymapEvent -> m ()
 handleXkbKeymapEvent = \case
   R.RiverXkbKeymapSuccess _ km -> do
     logInfo $ "Keymap created successfully" :# [ "keymap" .= show km ]
-    kmaps <- modifyObjectDef' $ \st -> (st.xkbKeymaps, st { xkbKeymaps = adjust' (\ks -> ks { created = True }) km st.xkbKeymaps })
+    kmaps <- modifyObjectDef' $ \st -> (st.xkbKeymaps, st { xkbKeymaps = M.adjust (\ks -> ks { created = True }) km st.xkbKeymaps })
     io $ forM_ kmaps $ \ks -> when (ks.keymap == km) $ closeFd ks.keymapFd
   R.RiverXkbKeymapFailure _ km err -> do
     logError $ "Keymap creation failed" :# [ "keymap" .= show km, "err-msg" .= err ]
-    kmaps <- modifyObjectDef' $ \st -> (st.xkbKeymaps, st { xkbKeymaps = adjust' (\ks -> ks { failure = Just err }) km st.xkbKeymaps })
+    kmaps <- modifyObjectDef' $ \st -> (st.xkbKeymaps, st { xkbKeymaps = M.adjust (\ks -> ks { failure = Just err }) km st.xkbKeymaps })
     io $ forM_ kmaps $ \ks -> when (ks.keymap == km) $ closeFd ks.keymapFd
-  where
-    adjust' f k = map $ \ks -> if ks.keymap == k then f ks else ks
 
-handleInputManagerEvent :: (MonadUnliftIO m, MonadLogger m, MonadReader HConf m) => R.RiverInputManagerEvent -> m ()
+handleInputManagerEvent :: (MonadUnliftIO m, MonadLogger m, MonadReader HConf m, MonadThrow m) => R.RiverInputManagerEvent -> m ()
 handleInputManagerEvent (R.RiverInputManagerFinished _ rim) = do
   io $ WL.objectDestroy rim
 handleInputManagerEvent (R.RiverInputManagerInputDevice _ _ dev) = do
   modifyObjectDef $ \st -> st { inputDevices = M.insert dev def st.inputDevices }
-  l <- getObject
-  WL.listenerAdd_ dev l
+  withObject $ WL.listenerAdd_ dev
 
 handleInputDeviceEvent :: (MonadStateGlobal HConf m) => R.RiverInputDeviceEvent -> m ()
 handleInputDeviceEvent (R.RiverInputDeviceType' _ dev deviceType) = do
@@ -230,14 +229,14 @@ handleXkbKeyboardEvent (R.RiverXkbKeyboardRemoved _ kbd) = do
 handleXkbKeyboardEvent _ = return ()
 
 -- | river_libinput_config_v1
-handleLibinputEvent :: (HasGlobalTMap s, MonadReader s m, MonadUnliftIO m, MonadLogger m) => R.RiverLibinputConfigEvent -> m ()
+handleLibinputEvent :: (HasGlobalTMap s, MonadReader s m, MonadUnliftIO m, MonadLogger m, MonadThrow m) => R.RiverLibinputConfigEvent -> m ()
 handleLibinputEvent (R.RiverLibinputConfigLibinputDevice _ _ dev) = do
   modifyObjectDef $ \st -> st { libinputDevices = M.insert dev def st.libinputDevices }
   withObject $ WL.listenerAdd_ dev
 handleLibinputEvent (R.RiverLibinputConfigFinished _ lic) = do
   io $ WL.objectDestroy lic
 
-handleLibinputDeviceEvent :: (HasGlobalTMap s, MonadReader s m, MonadUnliftIO m, MonadLogger m) => R.RiverLibinputDeviceEvent -> m ()
+handleLibinputDeviceEvent :: (HasGlobalTMap s, MonadReader s m, MonadUnliftIO m, MonadLogger m, MonadThrow m) => R.RiverLibinputDeviceEvent -> m ()
 handleLibinputDeviceEvent = \case
   R.RiverLibinputDeviceRemoved _ dev -> do
     modifyObjectDef $ \st -> st { libinputDevices = M.delete dev st.libinputDevices }

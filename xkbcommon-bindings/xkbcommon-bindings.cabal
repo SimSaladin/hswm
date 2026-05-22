@@ -16,9 +16,9 @@ tested-with:        GHC == 9.14.1, GHC == 9.12.2
 
 custom-setup
   setup-depends:
-      base
-    , Cabal
-    , Cabal-hooks
+      base           >=4.21   && <5
+    , Cabal          >=3.14   && <3.18
+    , Cabal-hooks    >=3.14   && <3.18
 
 common warnings
     ghc-options:
@@ -38,8 +38,9 @@ common language
     GeneralizedNewtypeDeriving
     OverloadedRecordDot
     TypeApplications
+    PatternSynonyms
 
-flag use-pkgconfig
+flag pkgconfig
   description: Use pkg-config to find xkbcommon headers
   default: False
 
@@ -56,8 +57,8 @@ library
      , Text.XkbCommon.EventCodes
      , Text.XkbCommon.KeySyms
     other-modules:
-       Text.XkbCommon.Internal
-     , Text.XkbCommon.FFI
+       Text.XkbCommon.FFI
+     , Text.XkbCommon.Internal
     autogen-modules:
        Text.XkbCommon.EventCodes
      , Text.XkbCommon.KeySyms
@@ -66,12 +67,14 @@ library
      , data-default     ^>=0.8
      , unix             ^>=2.8.6
     hs-source-dirs:   src
-    if flag(use-pkgconfig)
-      pkgconfig-depends: xkbcommon
-    else
-      extra-libraries: xkbcommon, xkbregistry
     build-tool-depends:
        hsc2hs:hsc2hs
+
+    extra-libraries: xkbcommon, xkbregistry
+
+    if flag(pkgconfig)
+      pkgconfig-depends: xkbcommon
+
     if !os(linux)
       buildable: False
 

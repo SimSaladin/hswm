@@ -25,13 +25,13 @@ import           Foreign hiding (void)
 type HasGrabCtx env m = (MonadStateGlobal env m, HasEventQueues env, MonadReader env m, MonadLogger m, MonadUnliftIO m, MonadFix m)
 
 data GrabIM = GrabIM
-  { reserved :: MVar (),
-    bcastChan :: TChan (Either Done GrabbedKey),
-    inputMethod :: Wlr.InputMethod,
-    inputMethodListener :: Wlr.InputMethodListener,
-    imKeyboardGrab :: MVar Wlr.InputMethodKeyboardGrab,
+  { reserved               :: MVar (),
+    bcastChan              :: TChan (Either Done GrabbedKey),
+    inputMethod            :: Wlr.InputMethod,
+    inputMethodListener    :: Wlr.InputMethodListener,
+    imKeyboardGrab         :: MVar Wlr.InputMethodKeyboardGrab,
     imKeyboardGrabListener :: Wlr.InputMethodKeyboardGrabListener,
-    xkbState :: MVar XkbState
+    xkbState               :: MVar XkbState
   }
 
 data GrabbedKey
@@ -39,7 +39,8 @@ data GrabbedKey
   | GMod {mods :: !Word}
   deriving (Eq, Show, Read)
 
-data Done = Done deriving (Show)
+data Done = Done
+  deriving (Show)
 
 instance Default GrabbedKey where def = GK 0 0 0
 
@@ -119,13 +120,15 @@ newGrabIM manager seat = do
 
   runInIO <- askRunInIO
 
-  inputMethodListener <- io $ Wlr.mkInputMethodListener $ \e -> runInIO $ case e of
+  inputMethodListener <- WL.createListener $ \e -> runInIO $ case e of
     Wlr.InputMethodUnavailable _ud self -> do
       logError "grab: unavailable"
       atomically $ writeTChan bcastChan (Left Done)
       io $ WL.objectDestroy self
+
     Wlr.InputMethodActivate _ _ -> do
       writeIORef pending_active True
+
     Wlr.InputMethodDeactivate _ _ -> do
       writeIORef pending_active False
 
@@ -138,21 +141,24 @@ newGrabIM manager seat = do
 
     _ -> pure () -- ignored
 
-  imKeyboardGrabListener <- io $ Wlr.mkInputMethodKeyboardGrabListener $ \e -> runInIO $ case e of
+  imKeyboardGrabListener <- WL.createListener $ \e -> runInIO $ case e of
+
     Wlr.InputMethodKeyboardGrabKeymap _ _ _fmt fd size -> do
       io $ do
         ctx <- createXkbContext def
-        kmap <- createKeymapFromFd ctx (fi fd) (fi size) False keymapFormatTextV1
+        kmap <- createKeymapFromFd ctx (fi fd) (fi size) False KeymapFormatTextV1
         xst <- createXkbState kmap
         _ <- tryTakeMVar xkbState
         putMVar xkbState xst
       logDebug "grab: XKB keymap updated"
+
     Wlr.InputMethodKeyboardGrabModifiers _ _ _ depressed latched locked group -> do
       st <- readMVar xkbState
       _ <- io $ xkbStateUpdateMask st (fi depressed) (fi latched) (fi locked) 0 0 (fi group)
       let it = Right GMod {mods = fi depressed}
       logDebug $ "grab: modifier grabbed" :# [ "mod" .= tshow it ]
       atomically $ writeTChan bcastChan it
+
     Wlr.InputMethodKeyboardGrabKey _ _ _ _time key st -> do
       xst <- readMVar xkbState
       keysym <- io $ xkbStateKeySym xst (fi $ key + 8)
@@ -165,7 +171,6 @@ newGrabIM manager seat = do
   inputMethod <- Wlr.inputMethodManagerGetInputMethod manager seat
   WL.listenerAdd_ inputMethod inputMethodListener
 
-  logDebug "grab: created"
   return GrabIM {..}
 
 activate :: (MonadIO m, MonadLogger m, MonadReader env m) => GrabIM -> m ()
@@ -188,6 +193,6 @@ deactivate GrabIM {..} = do
     _ -> pure ()
   io $ do
     WL.objectDestroy inputMethod
-    void $ WL.freeListener (Proxy :: Proxy Wlr.InputMethod) inputMethodListener
-    void $ WL.freeListener (Proxy :: Proxy Wlr.InputMethodKeyboardGrab) imKeyboardGrabListener
+    WL.objectDestroy inputMethodListener
+    WL.objectDestroy imKeyboardGrabListener
   logDebug "grab: deactivated"
