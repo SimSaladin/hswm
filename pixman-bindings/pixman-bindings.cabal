@@ -17,14 +17,14 @@ tested-with:
 
 custom-setup
     setup-depends:
-          base >=4.21 && <4.23
-        , Cabal-hooks >=3.14 && <3.17
+          base             >=4.21 && <5
+        , Cabal-hooks      >=3.14 && <3.18
         , hs-bindgen-hooks
 
 common warnings
     ghc-options: -Wall
 
-flag use-pkgconfig
+flag pkgconfig
     description: Use pkgconfig to to resolve C dependencies
     manual: True
     default: True
@@ -39,15 +39,17 @@ library
     exposed-modules:
           Pixman
     build-depends:
-          base >=4.21 && <4.23
-        , hs-bindgen-runtime >=0.1
-        , c-expr-runtime
-        , data-default
-        , deepseq
-    hs-source-dirs:   src
+          base                >=4.21 && <5
+        , data-default       ^>=0.8
+        , deepseq            ^>=1.5
+        , hs-bindgen-runtime  >=0.1  && <0.2
+        , c-expr-runtime      >=0.1  && <0.2
+    hs-source-dirs:
+          src
     default-language: GHC2024
     extra-libraries: pixman-1
-    if flag(use-pkgconfig)
+
+    if flag(pkgconfig)
         pkgconfig-depends: pixman-1
 
     if flag(hs-bindgen-build-tool)
@@ -62,7 +64,7 @@ test-suite pixman-test
     hs-source-dirs:   test
     main-is:          Spec.hs
     build-depends:
-        base ^>=4.22.0.0
+        base
       , pixman-bindings
       , deepseq
       , hspec

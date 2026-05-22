@@ -11,8 +11,8 @@
 
 module SetupHooks (setupHooks) where
 
+import           Distribution.HsBindgen.Hooks
 import           Distribution.Simple.SetupHooks
-import Distribution.HsBindgen.Hooks
 
 setupHooks :: SetupHooks
 setupHooks = hsBindgenSetupHooks [ pixmanSpec ]
