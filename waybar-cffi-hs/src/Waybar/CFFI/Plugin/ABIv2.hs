@@ -1,5 +1,3 @@
-{-# LANGUAGE DeriveAnyClass #-}
-
 -- |
 -- Module      : Waybar.CFFI.Plugin.ABIv2
 -- Description : Waybar CFFI module ABI (version 2)
@@ -11,20 +9,21 @@
 --
 module Waybar.CFFI.Plugin.ABIv2 where
 
-import           Control.Monad
-import           Foreign
-import           Foreign.C
-import           Foreign.C.ConstPtr (ConstPtr(..))
-import           Foreign.Storable.Generic (GStorable(..))
-import           GHC.Generics (Generic)
-import           Control.Exception
+import           GI.Gtk.Objects.Container (Container)
 
 import qualified Data.Aeson as A
 import qualified Data.Aeson.KeyMap as A.KM
 import qualified Data.Aeson.Key as A.Key
 import qualified Data.ByteString as BS
+import qualified Data.Text as T
 import qualified Data.Text.Foreign as T
-import           GI.Gtk.Objects.Container (Container)
+
+import           Control.Exception
+import           Control.Monad
+import           Foreign
+import           Foreign.C
+import           Foreign.C.ConstPtr (ConstPtr(..))
+import           GHC.Generics (Generic)
 
 -- | Private Waybar CFFI module.
 data {-# CTYPE "waybar_cffi_module.h" "wbcffi_module" #-} WbcffiModule
@@ -45,8 +44,7 @@ data {-# CTYPE "waybar_cffi_module.h" "wbcffi_init_info" #-} InitInfo = InitInfo
     --
     -- @param obj Waybar CFFI object pointer
     queue_update :: {-# UNPACK #-} !(FunPtr QueueUpdate)
-  }
-  deriving (Show, Eq, Ord, Generic, GStorable)
+  } deriving (Eq, Ord, Show, Generic)
 
 -- | Config key-value pair
 data {-# CTYPE "waybar_cffi_module.h" "struct wbcffi_config_entry" #-} ConfigEntry = ConfigEntry
@@ -54,26 +52,7 @@ data {-# CTYPE "waybar_cffi_module.h" "struct wbcffi_config_entry" #-} ConfigEnt
     configEntryKey :: {-# UNPACK #-} !(ConstPtr CChar),
     -- | Entry value. In ver 2 this is json object or json string.
     configEntryValue :: {-# UNPACK #-} !(ConstPtr CChar)
-  }
-  deriving (Show, Eq, Ord, Generic, GStorable)
-
--- | Module init/new function, called on module instantiation.
---
--- MANDATORY CFFI function
---
--- @
--- param init_info          Waybar module information
--- param config_entries     Flat representation of the module JSON config. The data only available
---                           during wbcffi_init call.
--- param config_entries_len Number of entries in @config_entries@
---
--- return A untyped pointer to module data, NULL if the module failed to load.
---
--- wbcffi_init :: !(Ptr InitInfo -> Ptr ConfigEntry -> CSize -> IO (Ptr Void))
--- @
-type Init a = ConstPtr InitInfo -> ConstPtr ConfigEntry -> CSize -> IO a
-
-type DoAction a = a -> ConstPtr CChar -> IO ()
+  } deriving (Eq, Ord, Show, Generic)
 
 -- | Type of the get_root_widget function.
 type GetRootWidget = Ptr WbcffiModule -> IO (Ptr Container)
@@ -87,23 +66,52 @@ foreign import ccall "dynamic" mkGetRootWidget :: FunPtr GetRootWidget -> GetRoo
 -- | Call the C function queue_update.
 foreign import ccall "dynamic" mkQueueUpdate :: FunPtr QueueUpdate -> QueueUpdate
 
--- | Parse module configuration.
-parseConfig :: A.FromJSON a => ConstPtr ConfigEntry -> CSize -> IO a
-parseConfig (ConstPtr ptr) size = do
-  values <- forM [0 .. fromIntegral size - 1] $ \i -> peek (advancePtr ptr i) >>= parse
-  case A.fromJSON $ A.Object $ A.KM.fromList values of
-    A.Success a -> return a
-    A.Error msg -> throwIO $ WaybarConfigParseError msg
-  where
-    parse (ConfigEntry (ConstPtr pk) (ConstPtr pv)) = do
-      k <- A.Key.fromText <$> T.peekCString pk
-      v <- BS.packCString pv
-      case A.decodeStrict' v :: Maybe A.Value of
-        Just v' -> return (k, v')
-        Nothing -> throwIO $ WaybarConfigParseError $ "parse error at key '" ++ show k ++ "': " ++ show v
+instance Storable InitInfo where
+  alignment _ = alignment (undefined :: ConstPtr ())
+  sizeOf    _ = sizeOf (undefined :: ConstPtr ()) * 4
+  peek ptr = InitInfo
+    <$> peek (castPtr ptr)
+    <*> peekElemOff (castPtr ptr) 1
+    <*> peekElemOff (castPtr ptr) 2
+    <*> peekElemOff (castPtr ptr) 3
+  poke ptr (InitInfo m v rw qu) = do
+    poke (castPtr ptr) m
+    pokeElemOff (castPtr ptr) 1 v
+    pokeElemOff (castPtr ptr) 2 rw
+    pokeElemOff (castPtr ptr) 3 qu
+
+instance Storable ConfigEntry where
+  alignment _ = alignment (undefined :: ConstPtr ())
+  sizeOf    _ = sizeOf (undefined :: ConstPtr ()) * 2
+  peek ptr = ConfigEntry <$> peek (castPtr ptr) <*> peekElemOff (castPtr ptr) 1
+  poke ptr (ConfigEntry k v) = do
+    poke (castPtr ptr) k
+    pokeElemOff (castPtr ptr) 1 v
+
+-- * Exceptions
 
 data WaybarPluginException
-  = WaybarConfigParseError String
+  = MalformedPluginConfigEntry { cEntryNum :: !Int, cEntryKey :: T.Text, cEntry :: BS.ByteString }
+  | PluginConfigParseError String
+  | PluginVersionParseError String
   deriving (Eq, Ord, Show, Read)
 
 instance Exception WaybarPluginException
+
+-- * Configuration parsing
+
+-- | Parse module configuration.
+parseConfig :: A.FromJSON a => ConstPtr ConfigEntry -> CSize -> IO a
+parseConfig (ConstPtr ptr) size = do
+  values <- forM [0 .. fromIntegral size - 1] peekEntry
+  case A.fromJSON $ A.Object $ A.KM.fromList values of
+    A.Success a -> return a
+    A.Error msg -> throwIO $! PluginConfigParseError msg
+  where
+    peekEntry i = do
+      ConfigEntry (ConstPtr pk) (ConstPtr pv) <- peek (advancePtr ptr i)
+      key <- T.peekCString pk
+      valBS <- BS.packCString pv
+      case A.decodeStrict' valBS :: Maybe A.Value of
+        Just val -> return (A.Key.fromText key, val)
+        Nothing -> throwIO $! MalformedPluginConfigEntry i key valBS

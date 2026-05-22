@@ -3,17 +3,20 @@
 
 module Main (main) where
 
-import HSWM
-import HSWM.Util.IPC
-import Data.Text.Lazy qualified as TL
-import System.Console.Haskeline
-import Data.ByteString.Lazy.Char8 qualified as BL
-import Data.Time
-import Data.Aeson qualified as A
-import Prettyprinter
-import Prettyprinter.Render.Terminal
-import Options.Generic
-import qualified Options.Applicative          as Options
+import           HSWM.IPC
+
+import qualified Data.Aeson as A
+import qualified Data.ByteString.Lazy.Char8 as BL
+import qualified Data.Text.Lazy as TL
+import qualified Options.Applicative as Options
+import           Options.Generic
+import           Prettyprinter
+import           Prettyprinter.Render.Terminal
+import           System.Console.Haskeline
+
+import           Data.Time
+
+instance ParseRecord Request
 
 type CM = InputT (LoggingT (ReaderT () IO))
 

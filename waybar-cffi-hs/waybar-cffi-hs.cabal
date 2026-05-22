@@ -46,30 +46,29 @@ library
   hs-source-dirs: src
   build-depends:
       base                >=4.20   && <5
-    , template-haskell    >=2.23   && <3
-    , bytestring         ^>=0.12.2
-    , data-default
-    , text               ^>=2.1.2
-    , mtl
     , aeson              ^>=2.2.3
-    , derive-storable    ^>=0.3.1
-    , rio                ^>=0.1.24
+    , bytestring         ^>=0.12.2
+    , data-default       ^>=0.8.0
     , monad-logger-aeson ^>=0.4.1
+    , mtl                ^>=2.3.1
+    , rio                ^>=0.1.24
+    , template-haskell    >=2.23   && <3
+    , text               ^>=2.1.2
     , haskell-gi-base    ^>=0.26.9
     , gi-gtk3            ^>=3.0.44
     , gi-pango           ^>=1.0.30
     , gi-glib            ^>=2.0
-    , hswm
+    , hswm:hswm-ipc-api
 
 foreign-library waybarhaskellplugin
   import: default-language, build-settings
   type: native-shared
   lib-version-linux: 1.0.0
-  other-modules: Plugin
+  other-modules:
+    Plugin
   hs-source-dirs: plugin
   build-depends:
-      base
-    , waybar-cffi-hs
+    waybar-cffi-hs
   ghc-options:
     -threaded
     -flink-rts

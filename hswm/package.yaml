@@ -15,35 +15,90 @@ tested-with:
   - GHC == 9.14.1
   - GHC == 9.12.2
 
-flags:
-  use-llvm:
-    description: Link with LLVM
-    default: true
-    manual: true
+__common:
+  language: &language
+    language: GHC2024
+    default-extensions:
+      - RecordWildCards
+      - OverloadedRecordDot
+      - OverloadedLabels
+      - DuplicateRecordFields
+      - OverloadedStrings
+      - DerivingVia
+      - DeriveAnyClass
+      - PackageImports
+      - QuantifiedConstraints
 
-_common-language: &language
-  language: GHC2024
-  default-extensions:
-    - RecordWildCards
-    - OverloadedRecordDot
-    - OverloadedLabels
-    - DuplicateRecordFields
-    - OverloadedStrings
-    - DerivingVia
-    - DeriveAnyClass
-    - PackageImports
-    - QuantifiedConstraints
-
-    # https://discourse.haskell.org/t/what-are-you-supposed-to-do-about-wambiguous-fields/9545/36?page=2
-_common-ghc-options: &common-ghc-options
+  # https://discourse.haskell.org/t/what-are-you-supposed-to-do-about-wambiguous-fields/9545/36?page=2
+  ghc-options: &common-ghc-options
     -Wall
     -Wunused-packages
     -Wno-partial-type-signatures
     -Wno-ambiguous-fields
 
-_common-rts-options: &common-rts-options
+  rts-options: &common-rts-options
     -threaded
-    -rtsopts "-with-rtsopts=-N -maxN4 -qn2 -A8M -M2G -K64M -M1G -kc8k -Iw1 -xr100G"
+    -rtsopts "-with-rtsopts=-N"
+    # -rtsopts "-with-rtsopts=-N -maxN4 -qn2 -A8M -M2G -K64M -M1G -kc8k -Iw1 -xr100G"
+
+__deps:
+  - &dep-base
+    name: base
+    version: &dep-base-version '>=4.21 && <5'
+  - &dep-base-noprelude
+    name: base
+    version: *dep-base-version
+    mixin:
+      - hiding (Prelude)
+  - &dep-hswm-prelude
+    name: hswm:hswm-prelude
+    mixin:
+      - (HSWM.Prelude as Prelude)
+  - &dep-containers containers                  >=0.7 && <1.0
+  - &dep-bytestring bytestring                 ^>=0.12.2
+  - &dep-mtl mtl                               ^>=2.3.1
+  - &dep-stm stm                               ^>=2.5.3
+  - &dep-text text                             ^>=2.1.2
+  - &dep-data-default data-default             ^>=0.8.0
+  - &dep-async async                           ^>=2.2.6
+  - &dep-exceptions exceptions                 ^>=0.10.9
+  - &dep-rio rio                               ^>=0.1.24
+  - &dep-unliftio unliftio                     ^>=0.2.25
+  - &dep-unliftio-core unliftio-core           ^>=0.2.1
+  - &dep-monad-logger-aeson monad-logger-aeson ^>=0.4.1
+  - &dep-aeson aeson                               ^>=2.2.3
+  - &dep-time time                                  >=1.14     && <2.0
+  - &dep-optparse-applicative optparse-applicative ^>=0.18.1
+  - &dep-optparse-generic optparse-generic         ^>=1.5
+  - &dep-network                     network                     ^>=3.2.8
+  - &dep-deepseq                     deepseq                     ^>=1.5.1
+  - &dep-vector                      vector                      ^>=0.13.2
+  - &dep-directory                   directory                   ^>=1.3.9
+  - &dep-fast-logger                 fast-logger                 ^>=3.2.6
+  - &dep-process                     process                     ^>=1.6.25
+  - &dep-transformers                transformers                ^>=0.6.1
+  - &dep-unix                        unix                        ^>=2.8.6
+  - &dep-derive-storable             derive-storable             ^>=0.3.1
+  - &dep-utf8-string                 utf8-string                 ^>=1.0.2
+  - &dep-JuicyPixels                 JuicyPixels                 ^>=3.3.9
+  - &dep-pretty-simple               pretty-simple               ^>=4.1.4
+  - &dep-typed-process               typed-process               ^>=0.2.13
+  - &dep-typerep-map                 typerep-map                 ^>=0.7.0
+  - &dep-unbounded-delays            unbounded-delays            ^>=0.1.1
+  - &dep-filelock                    filelock                    ^>=0.1.1
+  - &dep-pango                       pango                       ^>=0.13.12
+  - &dep-haskeline                   haskeline                   ^>=0.8.2
+  - &dep-prettyprinter               prettyprinter               ^>=1.7.1
+  - &dep-prettyprinter-ansi-terminal prettyprinter-ansi-terminal ^>=1.1.3
+  - &dep-hswm-bindings               hswm-bindings
+  - &dep-pixman-bindings             pixman-bindings
+  - &dep-xkbcommon-bindings          xkbcommon-bindings
+
+flags:
+  use-llvm:
+    description: Link with LLVM
+    default: true
+    manual: true
 
 internal-libraries:
   hswm-prelude:
@@ -53,22 +108,38 @@ internal-libraries:
       - HSWM.Prelude
     other-modules: []
     dependencies:
-      - &base
-        name: base
-        version: &base-version '>=4.21.0 && < 4.23'
-      - &mtl mtl                   ^>=2.3.1
-      - &stm stm                   ^>=2.5.3
-      - &text text                 ^>=2.1.2
-      - &data-default data-default ^>=0.8.0
-      - async                      ^>=2.2.6
-      - exceptions                 ^>=0.10.9
-      - &rio rio                   ^>=0.1.24
-      - unliftio-core              ^>=0.2.1
-      - unliftio                   ^>=0.2.25
-      - &monad-logger-aeson
-        monad-logger-aeson         ^>=0.4.1
+      - *dep-base
+      - *dep-mtl
+      - *dep-stm
+      - *dep-text
+      - *dep-data-default
+      - *dep-async
+      - *dep-exceptions
+      - *dep-rio
+      - *dep-unliftio-core
+      - *dep-unliftio
+      - *dep-monad-logger-aeson
     ghc-options:
       - *common-ghc-options
+
+  hswm-ipc-api:
+    <<: *language
+    source-dirs: ipc-api
+    exposed-modules:
+      - HSWM.IPC
+    other-modules: []
+    generated-other-modules:
+      - PackageInfo_hswm
+    dependencies:
+      - *dep-base-noprelude
+      - *dep-hswm-prelude
+      - *dep-aeson
+      - *dep-text
+      - *dep-network
+      - *dep-containers
+      - *dep-bytestring
+      - *dep-utf8-string
+    visibility: public
 
 library:
   <<: *language
@@ -78,52 +149,40 @@ library:
   generated-other-modules:
     - PackageInfo_hswm
   dependencies:
-    - &base-noprelude
-      name: base
-      version: *base-version
-      mixin:
-        - hiding (Prelude)
-    - &hswm-prelude
-      name: hswm:hswm-prelude
-      mixin:
-        - (HSWM.Prelude as Prelude)
-    - &bytestring
-      bytestring           ^>=0.12.2
-    - &containers
-      containers            >=0.7      && <1.0
-    - *data-default
-    - *mtl
-    - network              ^>=3.2.8
-    - deepseq              ^>=1.5.1
-    - vector               ^>=0.13.2
-    - &aeson
-      aeson                ^>=2.2.3
-    - directory            ^>=1.3.9
-    - fast-logger          ^>=3.2.6
-    - process              ^>=1.6.25
-    - *stm
-    - *text
-    - &time
-      time                  >=1.14     && <2.0
-    - transformers         ^>=0.6.1
-    - unix                 ^>=2.8.6
-    - *rio
-    - &optparse-applicative
-      optparse-applicative ^>=0.18.1
-    - &optparse-generic
-      optparse-generic     ^>=1.5
-    - derive-storable      ^>=0.3.1
-    - utf8-string          ^>=1.0.2
-    - JuicyPixels          ^>=3.3.9
-    - pretty-simple        ^>=4.1.4
-    - typed-process        ^>=0.2.13
-    - typerep-map          ^>=0.7.0
-    - unbounded-delays     ^>=0.1.1
-    - filelock             ^>=0.1.1
-    - pango                ^>=0.13.12
-    - hswm-bindings # Generated C bindings
-    - pixman-bindings
-    - xkbcommon-bindings
+    - *dep-base-noprelude
+    - *dep-hswm-prelude
+    - *dep-bytestring
+    - *dep-containers
+    - *dep-data-default
+    - *dep-mtl
+    # - *dep-stm
+    - *dep-text
+    # - *dep-rio
+    - *dep-aeson
+    - *dep-time
+    - *dep-optparse-applicative
+    - *dep-optparse-generic
+    - *dep-network
+    # - *dep-deepseq
+    - *dep-vector
+    # - *dep-directory
+    - *dep-fast-logger
+    - *dep-process
+    - *dep-transformers
+    - *dep-unix
+    # - *dep-derive-storable
+    - *dep-utf8-string
+    - *dep-JuicyPixels
+    - *dep-pretty-simple
+    - *dep-typed-process
+    - *dep-typerep-map
+    - *dep-unbounded-delays
+    - *dep-filelock
+    - *dep-pango
+    - *dep-hswm-bindings
+    - *dep-pixman-bindings
+    - *dep-xkbcommon-bindings
+    - hswm:hswm-ipc-api
   build-tools:
     - hsc2hs:hsc2hs
   ghc-options:
@@ -137,10 +196,11 @@ executables:
     <<: *language
     main: Main.hs
     source-dirs: app
+    other-modules: []
     dependencies:
-      - *base
-      - *containers
-      - *bytestring
+      - *dep-base
+      - *dep-containers
+      - *dep-bytestring
       - hswm
     ghc-options:
       - *common-ghc-options
@@ -153,18 +213,21 @@ executables:
     <<: *language
     main: Main.hs
     source-dirs: app-ctl
+    other-modules: []
     dependencies:
-      - *base
-      - *text
-      - *bytestring
-      - *time
-      - *aeson
-      - *optparse-generic
-      - *optparse-applicative
-      - haskeline                   ^>=0.8.2
-      - prettyprinter               ^>=1.7.1
-      - prettyprinter-ansi-terminal ^>=1.1.3
+      - *dep-base-noprelude
+      - *dep-hswm-prelude
+      - *dep-bytestring
+      - *dep-text
+      - *dep-time
+      - *dep-aeson
+      - *dep-optparse-applicative
+      - *dep-optparse-generic
+      - *dep-haskeline
+      - *dep-prettyprinter
+      - *dep-prettyprinter-ansi-terminal
       - hswm
+      - hswm:hswm-ipc-api
     ghc-options:
       - *common-ghc-options
       - *common-rts-options

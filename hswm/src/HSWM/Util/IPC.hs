@@ -11,132 +11,35 @@
 -- Portability : unportable
 module HSWM.Util.IPC where
 
+import PackageInfo_hswm qualified as PKG
+
+import HSWM.IPC
+
+import HSWM.Actions.DynamicWorkspaceOrder qualified as DWO
+import HSWM.Core as HSWM
+import HSWM.Operations
+import HSWM.StackSet qualified as W
+import HSWM.InputConfig (InputConfigState)
+
 import Data.Aeson qualified as A
-import Data.Aeson.KeyMap qualified as KM
-import Data.ByteString.Char8 qualified as C8
-import Data.ByteString.Lazy qualified as BL
 import Data.ByteString.UTF8 qualified as BUTF8
 import Data.Map qualified as M
 import Data.Text qualified as T
 import Data.Text.Lazy qualified as TL
 import Data.Version (showVersion)
 import Foreign.Ptr
-import HSWM.Actions.DynamicWorkspaceOrder qualified as DWO
-import HSWM.Core as HSWM
-import HSWM.Operations
-import HSWM.StackSet qualified as W
 import Network.Socket
-import Network.Socket.ByteString qualified as NB
-import PackageInfo_hswm qualified as PKG
 import Bindings.River qualified as R
 import qualified Data.List as L
-import HSWM.InputConfig (InputConfigState)
 import Text.Pretty.Simple qualified as P
-import Options.Generic
-import HSWM.Utils
 import System.FileLock
 
 type MonadIPC env m = (MonadLogger m, MonadIO m, MonadUnliftIO m, MonadMask m, MonadReader env m)
-
-type MonadIPCClient m = (MonadLogger m, MonadIO m, MonadUnliftIO m, MonadMask m)
-
--- | Requests (client to server).
-data Request
-  = IdentifyClient {name :: String, version :: Int, description :: Maybe String }
-  -- ^ Identifies the client to the server.
-
-  | DumpState { param :: String }
-  -- ^ Request a state dump.
-
-  | Pong
-  deriving (Generic, Eq, Show, Read)
-
-instance A.ToJSON Request
-instance A.FromJSON Request
-instance ParseRecord Request
-
--- | Responses (server to client).
-data Response
-  = Identify { name :: String, version :: Int, description :: Maybe String }
-  -- ^ Server identification info.
-
-  | Ping
-
-  | Outputs { outputs :: [(Text, ScreenId)] }
-  -- ^ Outputs updated. @(outputName, screenId)@
-
-  | Workspaces { workspaces :: RWorkspaces }
-  -- ^ Inform the client of current workspace configuration.
-
-  | FocusedWindow { window :: Maybe WindowInfo }
-  -- ^ Details of the currently focused window.
-
-  | StateDumpResponse TL.Text
-  deriving (Eq, Show, Read, Generic)
-
-instance A.ToJSON Response
-instance A.FromJSON Response
-
-data RWorkspaces = RWorkspaces
-  { tags :: [WorkspaceInfo]
-  , focused :: (ScreenId, WsId)
-  , visible :: [(ScreenId, WsId)]
-  } deriving (Eq, Show, Read, Generic)
-
-instance Default RWorkspaces where def = RWorkspaces def (def, def) def
-instance A.ToJSON RWorkspaces
-instance A.FromJSON RWorkspaces
-
-data Msg a = Msg
-  { msgBody :: a
-  , msgSeqn :: Maybe Int
-  }
-
-instance A.ToJSON a => A.ToJSON (Msg a) where
-  toJSON Msg{..} =
-    case A.toJSON msgBody of
-        A.Object o -> A.Object $! KM.insert "seqn" (A.toJSON msgSeqn) o
-        x -> x
-
-instance A.FromJSON a => A.FromJSON (Msg a) where
-  parseJSON v = do
-    msgBody <- A.parseJSON v
-    msgSeqn <- A.withObject "Msg" (\v' -> v' A..:? "seqn") v
-    return Msg{..}
-
-data WorkspaceInfo = WorkspaceInfo
-  { tag        :: WsId
-  , keyhint    :: Text
-  , layout     :: Text
-  , windowList :: [WindowInfo]
-  } deriving (Eq, Show, Read, Generic)
-
-instance A.ToJSON WorkspaceInfo
-instance A.FromJSON WorkspaceInfo
-
-data WindowInfo = WindowInfo
-  { wid :: Word
-  , title, appId, identifier :: Text
-  , pid :: Maybe Int
-  }
-  deriving (Eq, Show, Read, Generic)
-
-instance Default WindowInfo where def = WindowInfo def  "" "" "" def
-instance A.ToJSON WindowInfo
-instance A.FromJSON WindowInfo
-
--- | Workspace identifier type
-type WsId = String
 
 runStdoutAsTextLoggingT :: MonadIO m => LoggingT m a -> m a
 runStdoutAsTextLoggingT a = do
   let logFunc = defaultOutput stdout
   runLoggingT a logFunc
-
-runMIO :: LoggingT m a -> m a
-runMIO = runStderrLoggingT
-
-type MIO = LoggingT IO
 
 -- * Hooks
 
@@ -280,88 +183,6 @@ serverHandleMsg c (Msg r seqn) =
 
     _ -> logWarn $ "Unhandled message" :# [ "message" .= r ]
 
--- * Client
-
--- | IPC client configuration:
---
--- @connectTo@: @unix:[PATH]@
-newtype ClientConfig = ClientConfig
-  { connectTo :: String }
-  deriving (Eq, Show, Read, Generic)
-
-instance Default ClientConfig where
-  def = ClientConfig "unix:"
-
-getClientAI :: MonadIO m => ClientConfig -> m AddrInfo
-getClientAI ClientConfig{..} =
-  case L.break (== ':') connectTo of
-    ("unix", ':' : name) -> do
-      file <- makeAbs $ if name == "" then "hswm-1" else name
-      return defaultHints
-        { addrFamily = AF_UNIX
-        , addrSocketType = Stream
-        , addrAddress = SockAddrUnix file
-        }
-    _ -> throwString $ "cannot parse connect-to parameter: " ++ connectTo
-  where
-    makeAbs name
-      | "/" `L.isPrefixOf` name = return name
-      | otherwise = do
-        rdir <- io getXdgRuntimeDirectory
-        return $ rdir ++ "/" ++ name
-
-clientRun :: MonadIPCClient m
-          => ClientConfig
-          -> (Response -> m ()) -- ^ Process incoming
-          -> ((Request -> m ()) -> m ()) -- ^ Emit outgoing
-          -> m ()
-clientRun conf onMsg cb = withThreadContext ["component" .= ("ipc/client"::String)] $ do
-  ai <- getClientAI conf
-  bracket (open ai) (io . close) $ \sock -> do
-    sendMsg sock $ IdentifyClient (PKG.name ++ "-client") 0 (Just $ PKG.synopsis ++ " " ++ showVersion PKG.version)
-    withAsync (inputWorker sock) $ \inputAs -> do
-      link inputAs
-      cb (sendMsg sock) `finally` cancel inputAs
-  where
-    open ai = bracketOnError (io $ socket ai.addrFamily ai.addrSocketType ai.addrProtocol) (io . close) $ \sock -> do
-      io $ connect sock ai.addrAddress
-      return sock
-
-    inputWorker sock = do
-      let worker lo = do
-            (resps, leftover) <- recvLines sock lo
-            mapM_ doMsg resps
-            worker leftover
-
-          doMsg resp = case A.eitherDecodeStrict' resp of
-            Right (Msg Ping n) -> sendMsg sock $ Msg Pong n
-            Right (Msg msg _) -> onMsg msg
-            --logDebug $ "IPC server event (raw)" :# [ "msg" .= BUTF8.toString resp ]
-            Left e -> logWarn $ "Received malformed message from server" :# [ "ex" .= toText e, "msg" .= BUTF8.toString resp ]
-      worker ""
-
--- * Utilities
-
-sendMsg :: (MonadIO m, A.ToJSON msg) => Socket -> msg -> m ()
-sendMsg sock msg = io $ NB.sendAll sock $ BL.toStrict $ A.encode msg <> "\n"
-
-broadcastMsg :: (MonadIO m, A.ToJSON msg, Traversable t) => msg -> t Socket -> m ()
-broadcastMsg msg socks = io $ forM_ socks $ \s -> NB.sendAll s msg'
-  where msg' = BL.toStrict $ A.encode msg <> "\n"
-
-recvLines :: (MonadIPCClient m) => Socket -> ByteString -> m ([ByteString], ByteString)
-recvLines sock leftover = do
-  res <- io $ NB.recv sock 4096
-  when (res == "") $ throwString "recvLines: disconnected"
-  return $! decode [] (leftover <> res)
-  where
-    decode :: [ByteString] -> ByteString -> ([ByteString], ByteString)
-    decode msgs x =
-      let (as, bs) = C8.break (== '\n') x
-       in case C8.uncons bs of
-            Just ('\n', bs') -> decode (msgs ++ [as]) bs'
-            _ -> (msgs, x)
-
 -- * Info for status bars
 
 -- | Set of events to fully refresh statusbar's tracked state
@@ -370,7 +191,9 @@ fullStateUpdate = runInHS $ sequence [ getOutputsInfo, getWorkspacesInfo, getFoc
   where
     getOutputsInfo = do
       outs <- gets _outputs
-      return $! Outputs [(T.pack out.outputName, out.screen) | out <- outs]
+      return $! Outputs [(T.pack out.outputName, s2o out.screen) | out <- outs]
+
+    s2o (S x) = OutputId x
 
     getWorkspacesInfo = do
       ws <- gets windowset
@@ -385,8 +208,8 @@ fullStateUpdate = runInHS $ sequence [ getOutputsInfo, getWorkspacesInfo, getFoc
           getWindowInfo rw = maybe def toWindowInfo (M.lookup rw wins)
       return $! Workspaces $! RWorkspaces
         { tags = map getWsData $ zip (wsSortPP (W.workspaces ws)) (keyhints ++ L.repeat "")
-        , focused = let W.Screen sws sid _ = W.current ws in (sid, W.tag sws)
-        , visible = [(sid, W.tag sws) | W.Screen sws sid _ <- W.visible ws]
+        , focused = let W.Screen sws sid _ = W.current ws in (s2o sid, W.tag sws)
+        , visible = [(s2o sid, W.tag sws) | W.Screen sws sid _ <- W.visible ws]
         }
 
     keyhints = map (toText . (:[])) ['a'..'z']

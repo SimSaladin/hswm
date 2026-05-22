@@ -18,8 +18,17 @@ module Waybar.CFFI.Plugin.TH (
   CInt(..),
   ) where
 
+import           Waybar.CFFI.Plugin.ABIv2
+import           Waybar.CFFI.Plugin.Base
+
+import qualified GI.Gtk as Gtk
+
+import           Language.Haskell.TH
+import           Language.Haskell.TH.Syntax
+
 import qualified Control.Exception as E
 import           Control.Monad
+import           Control.Monad.Reader
 import           Data.IORef
 import           Data.List (intercalate)
 import           Data.Proxy
@@ -27,21 +36,14 @@ import           Data.Version (parseVersion)
 import           Foreign
 import           Foreign.C
 import           Foreign.C.ConstPtr (ConstPtr(..))
+import           GHC.Exts (inline)
 import           Prelude hiding (init)
-import           System.IO.Unsafe
 import           System.IO (hPrint, stderr)
-import           Text.Read
+import           System.IO.Unsafe
 import           Text.ParserCombinators.ReadP
-import GHC.Exts (inline)
+import           Text.Read
 
-import           Control.Monad.Reader
-import qualified Data.Aeson as A
-import qualified GI.Gtk as Gtk
-import           Language.Haskell.TH
-import           Language.Haskell.TH.Syntax
-
-import           Waybar.CFFI.Plugin.ABIv2
-import           Waybar.CFFI.Plugin.Base
+type DoAction a = a -> ConstPtr CChar -> IO ()
 
 -- |
 --
@@ -105,7 +107,8 @@ makeCFFIModule ty rtsFlags = do
       , funD globalN [clause [] (normalB [|unsafePerformIO $ newIORef =<< (Env <$> newIORef undefined <*> newIORef mempty <*> pure ())|]) []]
       , pragInlD globalN NoInline FunLike AllPhases
       ]
-    , mkDec "plugin_runtime_init"    [t|IO ()|] [|
+
+    , mkDec "plugin_runtime_init" [t|IO ()|] [|
       do env <- readIORef $(varE globalN)
          g <- flip runReaderT env $ runContextT @($(conT ty)) Proxy $ initGlobal @($(conT ty)) Proxy
          writeIORef (envGlobal env) g
@@ -117,11 +120,11 @@ makeCFFIModule ty rtsFlags = do
          flip runReaderT env $ runContextT @($(conT ty)) Proxy $ deinitGlobal @($(conT ty)) Proxy g
       |]
 
-    , mkDec "wbcffi_init"            [t|Init $handleT|]             [|instanceInit $(varE globalN)|]
-    , mkDec "wbcffi_deinit"          [t|$handleT -> IO ()|]         [|instanceDestroy|]
-    , mkDec "wbcffi_update"          [t|$handleT -> IO ()|]         [|instanceUpdate|]
-    , mkDec "wbcffi_refresh"         [t|$handleT -> Signal -> IO ()|] [|instanceRefresh|]
-    , mkDec "wbcffi_doaction"        [t|DoAction $handleT|]         [|instanceDoAction|]
+    , mkDec "wbcffi_init" [t|Init $handleT|] [|instanceInit $(varE globalN)|]
+    , mkDec "wbcffi_deinit" [t|$handleT -> IO ()|] [|instanceDestroy|]
+    , mkDec "wbcffi_update" [t|$handleT -> IO ()|] [|\ptr -> withInstEnv ptr $ \env -> runContext env update |]
+    , mkDec "wbcffi_refresh" [t|$handleT -> Signal -> IO ()|] [|\ptr sig -> withInstEnv ptr $ \env -> runContext env (refresh $ fromIntegral sig)|]
+    , mkDec "wbcffi_doaction" [t|DoAction $handleT|] [|instanceDoAction|]
     ]
 
   Module _ modN <- thisModule
@@ -164,11 +167,11 @@ makeCFFIModule ty rtsFlags = do
     handleT = [t|StablePtr (Env $(conT ty) (IConf $(conT ty)))|]
 
     mkDec expNm ty' body = do
-        nm <- newName expNm
-        sequence [ sigD nm ty'
-                 , funD nm [clause [] (normalB body) []]
-                 , forExpD CCall expNm nm ty'
-                 ]
+      nm <- newName expNm
+      sequence [ sigD nm ty'
+               , funD nm [clause [] (normalB body) []]
+               , forExpD CCall expNm nm ty'
+               ]
 
 
 -- | Create a foreign export declaration.
@@ -177,41 +180,53 @@ makeCFFIModule ty rtsFlags = do
 forExpD :: Quote m => Callconv -> String -> Name -> m Type -> m Dec
 forExpD cc str n ty = ForeignD . ExportF cc str n <$> ty
 
-instanceInit :: forall a. (WaybarPlugin a, A.FromJSON (PluginConfig a), Default (PluginState a)) => IORef (Env a ()) -> Init (StablePtr (Env a (IConf a)))
+-- | Module init/new function, called on module instantiation.
+--
+-- MANDATORY CFFI function
+--
+-- @
+-- param init_info          Waybar module information
+-- param config_entries     Flat representation of the module JSON config. The data only available
+--                           during wbcffi_init call.
+-- param config_entries_len Number of entries in @config_entries@
+--
+-- return A untyped pointer to module data, NULL if the module failed to load.
+--
+-- wbcffi_init :: !(Ptr InitInfo -> Ptr ConfigEntry -> CSize -> IO (Ptr Void))
+-- @
+type Init a = ConstPtr InitInfo -> ConstPtr ConfigEntry -> CSize -> IO a
+
+instanceInit :: forall plugin. (WaybarPlugin plugin, Default (PluginState plugin))
+             => IORef (Env plugin ())
+             -> Init (StablePtr (Env plugin (IConf plugin)))
 {-# INLINE instanceInit #-}
 instanceInit envRef (ConstPtr infoPtr) cep csize = do
-    env <- readIORef envRef
-    info <- peek infoPtr
-    wbVersionStr <- peekCString (unConstPtr (waybar_version info))
-    wbVersion <- case reverse $ readP_to_S parseVersion wbVersionStr of
-                   (v, "") : _ -> return v
-                   _ -> error $ "cannot parse version: " ++ wbVersionStr
-    let IntPtr instId = ptrToIntPtr $! wbcffi_module info
-    instConfig <- parseConfig cep csize
-    instState <- newIORef def
-    instRootWidget <- mkGetRootWidget (get_root_widget info) (wbcffi_module info) >>= Gtk.newObject Gtk.Container
-    let instQueueUpdate = mkQueueUpdate (queue_update info) (wbcffi_module info)
-    let envInit = Env { envInstance = IConf{instData = Const (), ..}, envGlobal = envGlobal env, envInstances = envInstances env }
-    res <- E.try $ runContext envInit init
-    case res of
-      Right instData -> do
-        let ienv = Env { envInstance = IConf{..}, envGlobal = envGlobal env, envInstances = envInstances env }
-        modifyIORef (envInstances env) (envInstance ienv :)
-        newStablePtr ienv
-      Left (ex :: E.SomeException) -> do
-        hPrint stderr ex
-        return $ castPtrToStablePtr nullPtr
+  Env{envInstances, envGlobal} <- readIORef envRef
+  info <- peek infoPtr
+  let IntPtr instId = ptrToIntPtr $! wbcffi_module info
+  instWbVersion <- do
+    str <- peekCString (unConstPtr (waybar_version info))
+    case reverse $ readP_to_S parseVersion str of
+      (v, "") : _ -> return v
+      _ -> E.throwIO $ PluginVersionParseError str
+  instConfig <- parseConfig cep csize
+  instState <- newIORef def
+  instRootWidget <- mkGetRootWidget (get_root_widget info) (wbcffi_module info) >>= Gtk.newObject Gtk.Container
+  let instQueueUpdate = mkQueueUpdate (queue_update info) (wbcffi_module info)
+  res <- E.try $ runContext Env { envInstance = IConf{instData = (), ..}, .. } init
+  case res of
+    Right instData -> do
+      let envInstance = IConf{..}
+      modifyIORef envInstances (envInstance :)
+      newStablePtr Env { .. }
+    Left (ex :: E.SomeException) -> do
+      hPrint stderr ex
+      return (castPtrToStablePtr nullPtr)
 
 instanceDestroy :: WaybarPlugin a => StablePtr (Env a (IConf a)) -> IO ()
 instanceDestroy ptr = withInstEnv ptr $ \env -> do
   modifyIORef (envInstances env) $ filter (/= envInstance env)
   runContext env deinit `E.finally` freeStablePtr ptr
-
-instanceUpdate :: WaybarPlugin a => StablePtr (Env a (IConf a)) -> IO ()
-instanceUpdate ptr = withInstEnv ptr $ \env -> runContext env update
-
-instanceRefresh :: WaybarPlugin a => StablePtr (Env a (IConf a)) -> CInt -> IO ()
-instanceRefresh ptr sig = withInstEnv ptr $ \env -> runContext env (refresh $ fromIntegral sig)
 
 instanceDoAction :: (WaybarPlugin a, Read (PluginAction a)) => DoAction (StablePtr (Env a (IConf a)))
 instanceDoAction ptr aptr = withInstEnv ptr $ \env -> do

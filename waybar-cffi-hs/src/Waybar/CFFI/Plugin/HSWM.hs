@@ -1,8 +1,8 @@
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE OverloadedRecordDot #-}
-{-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE PartialTypeSignatures #-}
 {-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE MultiWayIf            #-}
+{-# LANGUAGE OverloadedRecordDot   #-}
+{-# LANGUAGE PartialTypeSignatures #-}
+{-# LANGUAGE TypeFamilies          #-}
 
 
 -- |
@@ -17,20 +17,19 @@ module Waybar.CFFI.Plugin.HSWM ( MyMod ) where
 
 import           Waybar.CFFI.Plugin.Base
 
-import           HSWM (ScreenId, SomeException, try, askRunInIO)
-import           HSWM.Util.IPC (Response(..), RWorkspaces(..), WindowInfo(..), WorkspaceInfo(..), clientRun, runMIO)
+import           HSWM.IPC (Response(..), RWorkspaces(..), WindowInfo(..), WorkspaceInfo(..), OutputId(..), runMIO, clientRun)
 
-import           GI.Gtk as Gtk
-import           GI.Pango.Enums
-import           GI.GLib.Functions (markupEscapeText)
-import           Data.GI.Base.Attributes
+import           GI.Gtk as Gtk -- "gi-gtk3"
+import           GI.Pango (EllipsizeMode(..)) -- "gi-pango"
+import           GI.GLib (markupEscapeText) -- "gi-glib"
+import           Data.GI.Base.ShortPrelude (clear) -- "haskell-gi-base"
 
-import           RIO (Async, async, cancel, threadDelay)
+import           RIO (Async, async, cancel, threadDelay, SomeException, try, askRunInIO)
 import           RIO.Prelude
 import           RIO.Prelude.Types
+import           Control.Monad.Logger.Aeson hiding (Message)
 
 import           Control.Monad.IO.Class
-import           Control.Monad.Logger.Aeson hiding (Message)
 import           Data.Aeson as A
 import           Data.Char (isDigit)
 import qualified Data.List as L
@@ -42,7 +41,7 @@ type MIO = Context MyMod
 
 data Global = Global
   { wmThread       :: !(Async ())
-  , outputs        :: ![(Text, ScreenId)]
+  , outputs        :: ![(Text, OutputId)]
   , workspacesInfo :: !RWorkspaces
   , curfocus       :: !(Maybe WindowInfo)
   } deriving (Eq, Generic)
@@ -138,6 +137,10 @@ runTextFormat vals = go
 
 instance WaybarPlugin MyMod where
 
+  type GlobalState  MyMod = Global
+  type PluginConfig MyMod = Config
+  type PluginState  MyMod = ModState
+
   type ContextT MyMod = LoggingT
 
   runContextT _ = runMIO
@@ -166,7 +169,11 @@ instance WaybarPlugin MyMod where
   init = do
     c <- getConfig
     ic <- asks envInstance
-    logInfo $ "Plugin initializing" :# [ "waybar_version" .= wbVersion ic, "config" .= c, "instance" .= instId ic ]
+    logInfo $ "Plugin initializing" :#
+      [ "waybar_version" .= instWbVersion ic
+      , "config" .= c
+      , "instance" .= instId ic
+      ]
 
     runInIO <- askRunInIO
     _ <- after (instRootWidget ic) #map $ runInIO updateOutputName
@@ -201,14 +208,11 @@ instance WaybarPlugin MyMod where
   -- | Handle signal which was propagated by waybar (reload, etc.)
   refresh sig = logInfo $ "received signal" :# [ "signal" .= show sig ]
 
+  type PluginAction MyMod = String
+
   -- | Trigger a module action
   doaction act = logWarn $ "unhandled module action" :# [ "action" .= show act ]
   {-# INLINe doaction #-}
-
-type instance GlobalState  MyMod = Global
-type instance PluginConfig MyMod = Config
-type instance PluginState  MyMod = ModState
-type instance PluginAction MyMod = String
 
 connectToWM :: ContextM MyMod a ()
 connectToWM = do
@@ -235,7 +239,7 @@ handleMsgG FocusedWindow {window} = do
 handleMsgG msg = logWarn $ "Unhandled incoming message" :# [ "msg" .= msg ]
 
 -- | Wait for the waybar window to be created, then sniff out the assigned screen name.
-updateOutputName :: (PluginState a ~ ModState) => ContextM MyMod (IConf a) ()
+updateOutputName :: ContextM MyMod (IConf' MyMod a) ()
 updateOutputName = do
   ic <- asks envInstance
   let w = instRootWidget ic
@@ -320,7 +324,7 @@ mkWorkspaceLabel ws = do
              ]
   runTextFormat vals c.wsFormat
 
-mkWorkspaceTooltip :: WorkspaceInfo -> Maybe ScreenId -> Maybe Text -> MIO Text
+mkWorkspaceTooltip :: WorkspaceInfo -> Maybe OutputId -> Maybe Text -> MIO Text
 mkWorkspaceTooltip ws screen outputName = do
   c <- getConfig
   let vals :: [(String, MIO Text)]
