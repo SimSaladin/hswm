@@ -68,14 +68,6 @@ clientFromProtocolXML commonSettings
   { prEnumModule = \_ -> case () of
       _ | otherwise -> ""
 
-  , prProtocolModifier = \proto ->
-    let modifyInterface x@Interface{..}
-          | interfaceName == "wl_display" = x
-            { interfaceRequests = interfaceRequests ++
-              [ IRequest "disconnect" ("","") Nothing [] ] }
-          | otherwise = x
-    in proto { protocolInterfaces = map modifyInterface $ protocolInterfaces proto }
-
   , prRequestOptions =
     [ ("wl_registry", "bind", def { reqDisable = True }) ]
 
@@ -415,3 +407,7 @@ displayCreateQueueWithName (Display d) name = fmap EventQueue . liftIO $ withCSt
 registryBind :: (MonadIO m) => Registry -> ObjectName -> PtrConst Wl_interface -> Version -> m (Ptr a)
 {-# INLINE registryBind #-}
 registryBind reg name iface ver = fmap castPtr . liftIO $ wl_registry_bind reg.unwrap name iface ver
+
+-- | Close the connection to display and free all resources associated with it.
+displayDisconnect :: MonadIO m => Display -> m ()
+displayDisconnect (Display d) = liftIO $ Safe.wl_display_disconnect d

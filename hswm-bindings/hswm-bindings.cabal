@@ -17,13 +17,13 @@ extra-doc-files:
 
 custom-setup
     setup-depends:
-          Cabal >=3.14 && <3.17
-        , base >=4.21 && <4.23
-        , Cabal-hooks
-        , hs-bindgen-hooks
+          base             >=4.21 && <5
+        , Cabal            >=3.14 && <3.18
+        , Cabal-hooks      >=3.14 && <3.18
         , filepath
+        , hs-bindgen-hooks
 
-flag use-pkgconfig
+flag pkgconfig
     description: Use pkgconfig to resolve C dependencies
     manual: True
     default: True
@@ -40,6 +40,8 @@ library
           Wayland.Viewporter
           Wayland.Types
           Wayland.Internal.TH
+          Wayland.Internal.TH.NewType
+          Wayland.Internal.TH.ProtocolXML
           River
           River.InputManagement
           River.LayerShell
@@ -73,18 +75,18 @@ library
     autogen-modules:
           Paths_hswm_bindings
     build-depends:
-          base >=4.21 && <4.23
-        , c-expr-runtime >=0.1.0 && <0.2
+          base                 >=4.21   && <4.23
         , containers
-        , data-default >=0.8.0 && <0.9
-        , deepseq >=1.5.1 && <1.6
-        , hashable >=1.5.1 && <1.6
-        , hs-bindgen-runtime >=0.1.0 && <0.2
-        , template-haskell >=2.23 && <2.25
-        , text >=2.1.2 && <2.2
+        , data-default         >=0.8    && <0.9
+        , deepseq              >=1.5.1  && <1.6
+        , hashable             >=1.5.1  && <1.6
+        , template-haskell     >=2.23   && <2.25
+        , text                 >=2.1.2  && <2.2
         , unix
         , unliftio
-        , xml-conduit >=1.10.1 && <1.11
+        , xml-conduit          >=1.10.1 && <1.11
+        , c-expr-runtime       >=0.1.0  && <0.2
+        , hs-bindgen-runtime   >=0.1.0  && <0.2
     hs-source-dirs:
           src
     default-extensions:
@@ -97,7 +99,7 @@ library
     ghc-options: -Wall -Wunused-packages -fPIC
     default-language: GHC2024
 
-    if flag(use-pkgconfig)
+    if flag(pkgconfig)
         pkgconfig-depends:
               wayland-client
             , wayland-protocols

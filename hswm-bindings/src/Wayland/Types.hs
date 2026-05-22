@@ -53,6 +53,8 @@ class Typeable object => IsWlObject (object :: Type) where
   -- | Write object user data.
   setUserData :: object -> Ptr Void -> IO ()
 
+  toProxy :: forall a. object -> Ptr a
+
 -- | Wayland objects that have destructors.
 class Typeable object => HasDestructor (object :: Type) where
 
