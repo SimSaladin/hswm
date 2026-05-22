@@ -47,6 +47,7 @@ module Bindings.Wayland.Client
 import           Bindings.Wayland.Client.Generated
 import           Bindings.Wayland.Client.Generated.Global as G
 import qualified Bindings.Wayland.Client.Generated.Safe as Safe
+import qualified Bindings.Wayland.Client.Generated.Unsafe as Unsafe
 import           Bindings.Wayland.Client.Generated.Safe hiding (wl_display_dispatch, wl_display_flush)
 import           Bindings.Wayland.Client.Generated.Unsafe (wl_display_dispatch, wl_display_flush)
 
@@ -64,24 +65,21 @@ import           Foreign.C
 import           Foreign.C.ConstPtr
 import           System.Posix
 
+--------------------------------------------------------------------------------------
+-- EVENT QUEUES
+
+renderNewType "EventQueue" ''Wl_event_queue ""
+
+--------------------------------------------------------------------------------------
+-- wayland.xml
+
 clientFromProtocolXML commonSettings
-  { prEnumModule = \_ -> case () of
-      _ | otherwise -> ""
-
-  , prRequestOptions =
-    [ ("wl_registry", "bind", def { reqDisable = True }) ]
-
+  { prEnumModule = \_ -> ""
+  , prRequestOptions = [ ("wl_registry", "bind", def { reqDisable = True }) ]
   } "wayland.xml"
 
 instance Default Output where def = Output nullPtr
 instance Default Seat where def = Seat nullPtr
-
-renderNewType "EventQueue" ''Wl_event_queue ""
-
--- | wl_display object used to create the queue should not be
--- destroyed until all event queues created with it are destroyed.
-instance HasDestructor EventQueue where
-  objectDestroy (EventQueue evq) = wl_event_queue_destroy evq
 
 data WaylandProtocolError = WaylandProtocolError
   { errCode                :: !Word32
@@ -95,27 +93,26 @@ instance Exception WaylandProtocolError
 data WaylandDisplayError
   = DisplayConnectFailed String
   | DisplayRoundtripFailed Display (Maybe EventQueue)
-  | DisplayErrorNum Display Int
+  | DisplayDisplayError Display DisplayError
   deriving (Eq, Ord, Show)
 
 instance Exception WaylandDisplayError
+
+-- | wl_display object used to create the queue should not be
+-- destroyed until all event queues created with it are destroyed.
+instance HasDestructor EventQueue where
+  objectDestroy (EventQueue evq) = wl_event_queue_destroy evq
+
+eventQueueGetName :: MonadIO m => EventQueue -> m (Maybe String)
+{-# INLINE eventQueueGetName #-}
+eventQueueGetName (EventQueue evq) = liftIO $ Unsafe.wl_event_queue_get_name (ConstPtr evq) >>= peekMaybeCString
 
 -- | Connect to a Wayland display.
 displayConnect :: MonadIO m => Maybe String -> m Display
 {-# INLINE displayConnect #-}
 displayConnect marg = liftIO $
   maybe ($ nullPtr) withCString marg $ \c_arg ->
-    fmap Display $ throwExIfNull (DisplayConnectFailed "displayConnect") $ wl_display_connect $ ConstPtr c_arg
-
-throwExIfNull ex m = do
-  r <- m
-  when (r == nullPtr) $ throwIO ex
-  return r
-
-throwExIfMinus1 ex m = do
-  r <- m
-  when (r == -1) $ throwIO ex
-  return r
+    fmap Display $ throwExIfNull (DisplayConnectFailed $ show marg) $ wl_display_connect $ ConstPtr c_arg
 
 -- | Connect to a Wayland display on an already open fd.
 --
@@ -123,7 +120,7 @@ throwExIfMinus1 ex m = do
 displayConnectToFd :: MonadIO m => Fd -> m Display
 {-# INLINE displayConnectToFd #-}
 displayConnectToFd fd = liftIO $
-  fmap Display $ throwExIfNull (DisplayConnectFailed "displayConnectToFd") $ wl_display_connect_to_fd (fromIntegral fd)
+  fmap Display $ throwExIfNull (DisplayConnectFailed $ show fd) $ wl_display_connect_to_fd (fromIntegral fd)
 
 -- | Retrieve the Wayland socket FD for polling.
 displayGetFd :: MonadIO m => Display -> m Fd
@@ -168,7 +165,9 @@ displaySetMaxBufferSize (Display d) msize = liftIO $ wl_display_set_max_buffer_s
 -- file descriptor to wait for it to become writable again.
 displayFlush :: MonadIO m => Display -> m ()
 {-# INLINE displayFlush #-}
-displayFlush (Display d) = liftIO $ throwErrnoIfMinus1_ "displayFlush" $ wl_display_flush d
+displayFlush (Display d) = liftIO $ do
+  ret <- wl_display_flush d
+  throwErrnoIfMinus1_ "displayFlush" (pure ret)
 
 -- | Read events from display file descriptor.
 --
@@ -255,11 +254,19 @@ displayPrepareRead :: MonadIO m => Display -> m ()
 {-# INLINE displayPrepareRead #-}
 displayPrepareRead (Display d) = liftIO $ throwErrnoIfMinus1_ "displayPrepareRead" $ wl_display_prepare_read d
 
+checkPrepareRead loc ma = do
+  ret <- ma
+  if ret < 0 then checkErrno ret else return True
+    where
+      checkErrno ret = do
+        errno <- getErrno
+        if errno == eAGAIN then return False else ioError (errnoToIOError loc errno Nothing Nothing)
+
 -- | Dispatch events on the default event queue.
 displayDispatch :: MonadIO m => Display -> m Int
 {-# INLINE displayDispatch #-}
-displayDispatch (Display d) =
-  fmap fromIntegral . liftIO $ throwErrnoIfMinus1 "displayDispatch" $ wl_display_dispatch d
+displayDispatch (Display d) = liftIO $
+  fmap fromIntegral $ throwErrnoIfMinus1 "displayDispatch" $ wl_display_dispatch d
 
 -- | Dispatch events in an event queue.
 --
@@ -284,13 +291,13 @@ displayDispatch (Display d) =
 -- dispatching events.
 displayDispatchQueue :: MonadIO m => Display -> EventQueue -> m Int
 {-# INLINE displayDispatchQueue #-}
-displayDispatchQueue (Display d) (EventQueue evq) =
-  fmap fromIntegral . liftIO $ throwErrnoIfMinus1 "displayDispatchQueue" $ wl_display_dispatch_queue d evq
+displayDispatchQueue (Display d) (EventQueue evq) = liftIO $
+  fmap fromIntegral $ throwErrnoIfMinus1 "displayDispatchQueue" $ wl_display_dispatch_queue d evq
 
-displayDispatchTimeout :: MonadIO m => Display -> ConstPtr Timespec -> m Int
+displayDispatchTimeout :: MonadIO m => Display -> Maybe (ConstPtr Timespec) -> m Int
 {-# INLINE displayDispatchTimeout #-}
-displayDispatchTimeout (Display d) tspec =
-  fmap fromIntegral . liftIO $ throwErrnoIfMinus1 "displayDispatchTimeout" $ wl_display_dispatch_timeout d tspec
+displayDispatchTimeout (Display d) mtimeout = liftIO $
+  fmap fromIntegral $ throwErrnoIfMinus1 "displayDispatchTimeout" $ wl_display_dispatch_timeout d (fromMaybe (ConstPtr nullPtr) mtimeout)
 
 -- | Dispatch events in an event queue with a timeout
 --
@@ -302,10 +309,10 @@ displayDispatchTimeout (Display d) tspec =
 -- events have been dispatched.
 --
 -- Returns the number of dispatched events on success.
-displayDispatchQueueTimeout :: MonadIO m => Display -> EventQueue -> ConstPtr Timespec -> m Int
+displayDispatchQueueTimeout :: MonadIO m => Display -> EventQueue -> Maybe (ConstPtr Timespec) -> m Int
 {-# INLINE displayDispatchQueueTimeout #-}
-displayDispatchQueueTimeout (Display d) (EventQueue evq) tspec =
-  fmap fromIntegral . liftIO $ throwErrnoIfMinus1 "displayDispatchQueueTimeout" $ wl_display_dispatch_queue_timeout d evq tspec
+displayDispatchQueueTimeout (Display d) (EventQueue evq) mtimeout = liftIO $
+  fmap fromIntegral $ throwErrnoIfMinus1 "displayDispatchQueueTimeout" $ wl_display_dispatch_queue_timeout d evq (fromMaybe (ConstPtr nullPtr) mtimeout)
 
 -- | Dispatch pending events in an event queue
 --
@@ -331,7 +338,7 @@ displayDispatchPending (Display d) =
 -- If the threads do not follow this rule it will lead to deadlock.
 displayCancelRead :: MonadIO m => Display -> m ()
 {-# INLINE displayCancelRead #-}
-displayCancelRead (Display d) = liftIO $ wl_display_cancel_read d
+displayCancelRead (Display d) = liftIO $ Unsafe.wl_display_cancel_read d
 
 -- | Retrieve the last error that occurred on a display.
 --
@@ -341,7 +348,7 @@ displayCancelRead (Display d) = liftIO $ wl_display_cancel_read d
 -- _Errors are fatal._ If this function returns non-zero the display can no longer be used.
 displayGetError :: MonadIO m => Display -> m Int
 {-# INLINE displayGetError #-}
-displayGetError (Display d) = liftIO $ fromIntegral <$> wl_display_get_error d
+displayGetError (Display d) = liftIO $ fromIntegral <$> Unsafe.wl_display_get_error d
 
 -- | Checks if Display has error, and throws either the protocol error or other DisplayError when true.
 displayThrowIfError :: MonadIO m => Display -> m ()
@@ -350,7 +357,7 @@ displayThrowIfError disp = liftIO $ do
   case err of
     0 -> return ()
     _ | Errno (fromIntegral err) == ePROTO -> displayGetProtocolError disp >>= throwIO
-    _ -> throwIO $ DisplayErrorNum disp err
+    _ -> throwIO $ DisplayDisplayError disp (toCEnum $ fromIntegral err)
 
 -- | Retrieves the information about a protocol error
 --
@@ -368,7 +375,7 @@ displayGetProtocolError :: MonadIO m => Display -> m WaylandProtocolError
 displayGetProtocolError (Display d) = liftIO $
   alloca $ \ifacePtr ->
   alloca $ \objectIdPtr -> do
-    code <- wl_display_get_protocol_error d ifacePtr objectIdPtr
+    code <- Unsafe.wl_display_get_protocol_error d ifacePtr objectIdPtr
     objectId <- peek objectIdPtr
     iface <- peek ifacePtr
     name <- peekIfName iface
@@ -379,35 +386,41 @@ displayGetProtocolError (Display d) = liftIO $
       | ptr == nullPtr = return Nothing
       | otherwise = do
           wlif <- peek ptr
-          peekStr wlif.name
-    peekStr (ConstPtr ptr)
-      | ptr == nullPtr = return Nothing
-      | otherwise = Just <$> peekCString ptr
-
-eventQueueGetName :: MonadIO m => EventQueue -> m (Maybe String)
-{-# INLINE eventQueueGetName #-}
-eventQueueGetName (EventQueue evq) = liftIO $ do
-  ConstPtr p <- wl_event_queue_get_name (ConstPtr evq)
-  if p == nullPtr then return Nothing
-                  else Just <$> peekCString p
+          peekMaybeCString wlif.name
 
 -- |  Create a new event queue for this display.
 displayCreateQueue :: MonadIO m => Display -> m EventQueue
 {-# INLINE displayCreateQueue #-}
-displayCreateQueue (Display d) = fmap EventQueue . liftIO $
-  throwErrnoIfNull "displayCreateQueue" $ wl_display_create_queue d
+displayCreateQueue (Display d) = liftIO $
+  fmap EventQueue . throwErrnoIfNull "displayCreateQueue" $ Unsafe.wl_display_create_queue d
 
 -- |  Create a new event queue for this display.
 displayCreateQueueWithName :: MonadIO m => Display -> String -> m EventQueue
 {-# INLINE displayCreateQueueWithName #-}
-displayCreateQueueWithName (Display d) name = fmap EventQueue . liftIO $ withCString name $ \c_name ->
-  throwErrnoIfNull "displayCreateQueueWithName" $ wl_display_create_queue_with_name d (ConstPtr c_name)
+displayCreateQueueWithName (Display d) name = liftIO $ withCString name $ \c_name ->
+  fmap EventQueue . throwErrnoIfNull ("displayCreateQueueWithName: " ++ name) $ Unsafe.wl_display_create_queue_with_name d (ConstPtr c_name)
 
 -- | Binds a new, client-created object to the server using the specified name as the identifier.
-registryBind :: (MonadIO m) => Registry -> ObjectName -> PtrConst Wl_interface -> Version -> m (Ptr a)
+registryBind :: MonadIO m => Registry -> ObjectName -> PtrConst Wl_interface -> Version -> m (Ptr a)
 {-# INLINE registryBind #-}
-registryBind reg name iface ver = fmap castPtr . liftIO $ wl_registry_bind reg.unwrap name iface ver
+registryBind reg name iface ver = liftIO $ castPtr <$> wl_registry_bind reg.unwrap name iface ver
 
 -- | Close the connection to display and free all resources associated with it.
 displayDisconnect :: MonadIO m => Display -> m ()
 displayDisconnect (Display d) = liftIO $ Safe.wl_display_disconnect d
+
+-- UTILS
+
+peekMaybeCString (ConstPtr ptr)
+  | ptr == nullPtr = return Nothing
+  | otherwise = Just <$> peekCString ptr
+
+throwExIfNull ex m = do
+  r <- m
+  when (r == nullPtr) $ throwIO ex
+  return r
+
+throwExIfMinus1 ex m = do
+  r <- m
+  when (r == -1) $ throwIO ex
+  return r

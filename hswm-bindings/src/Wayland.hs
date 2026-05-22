@@ -1,7 +1,6 @@
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE PatternSynonyms #-}
 {-# LANGUAGE OverloadedRecordDot #-}
-
+{-# LANGUAGE PatternSynonyms     #-}
+{-# LANGUAGE RecordWildCards     #-}
 
 -- |
 -- Module      : Wayland
@@ -13,30 +12,41 @@
 -- Portability : unportable
 --
 module Wayland
-  -- * Types
+  -- * Objects
   ( IsWlObject(..)
   , HasDestructor(..)
   , HasInterface(..)
-  , HasListener(..)
-  , IsUserData(..)
   , InterfaceType
   , Version
   , ObjectName
-
-  -- * Wayland.Util
-  , module Bindings.Wayland.Util
-
-  -- * Globals
-  , initRegistryState
-  , RegistrySettings(..)
-  , RegistryState
-  , bindGlobal
-  , GlobalException
-
-  -- * Listeners
-  , WlClientException(..)
+  , getObjectId
+  , getObjectDisplay
+  -- ** Object Tags
+  , Tag
+  , newTag
+  , getObjectTag
+  , setObjectTag
+  -- ** Listeners
+  , HasListener(..)
+  , IsUserData(..)
   , listenerAdd
   , listenerAdd_
+
+  -- * Exceptions
+  , WaylandClientException(..)
+  , GlobalException(..)
+
+  -- * Registry & Globals
+  , RegistryState
+  , RegistrySettings(..)
+  , initRegistryState
+  , bindGlobal
+  , Registry
+  , RegistryEvent(..)
+  , pattern RegistryGlobalRemove'
+  , pattern RegistryGlobal'
+  , registryBind
+  , registryBindObject
 
   -- * Display
   , Display
@@ -81,16 +91,6 @@ module Wayland
   , Client.displayGetFd
   , Client.displayGetError
   , Client.displayGetProtocolError
-
-  -- * Registry
-  , Registry
-  -- ** Events
-  , RegistryEvent(..)
-  , pattern RegistryGlobalRemove'
-  , pattern RegistryGlobal'
-  -- ** Bind
-  , registryBind
-  , registryBindObject
 
   -- * Callback
   , Callback
@@ -418,9 +418,11 @@ module Wayland
 
   -- * Fixes
   , Fixes
-  -- ** DistroyRegistry
+  -- ** DestroyRegistry
   , fixesDestroyRegistry
 
+  -- * Wayland.Util
+  , module Bindings.Wayland.Util
   ) where
 
 import Wayland.Types
@@ -429,6 +431,7 @@ import           Bindings.Wayland.Util
 import           Bindings.Wayland.Client hiding (shmCreatePool)
 import qualified Bindings.Wayland.Client as Client
 import qualified Bindings.Wayland.Client.Generated as Client.G
+import qualified Bindings.Wayland.Client.Generated.Unsafe as C.Unsafe
 
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import           UnliftIO
@@ -441,22 +444,58 @@ import           Data.Maybe
 import           Data.Proxy
 import           System.Posix (Fd)
 import qualified Data.Map as M
+import           Foreign
 import           Foreign.C.ConstPtr
+import           Foreign.C.String
+import           GHC.Generics
 
-
-data WlClientException
+data WaylandClientException
   = WlListenerAddFailed { interfaceName :: String, objectId :: String }
+  | WaylandInvalidId
+  -- ^ When attempting to use an invalid object
   deriving (Eq, Show)
 
-instance Exception WlClientException
+instance Exception WaylandClientException
 
--- | Add listener with the specified user data.
+data GlobalException = NoSuchGlobal String (Maybe Version) (Maybe ObjectName)
+  deriving (Show, Eq)
+
+instance Exception GlobalException
+
+getObjectId :: (MonadIO m, IsWlObject object) => object -> m RIP.Word32
+getObjectId o = liftIO $ C.Unsafe.wl_proxy_get_id (toProxy o)
+
+getObjectDisplay :: (MonadIO m, IsWlObject object) => object -> m Display
+getObjectDisplay o = liftIO $ do
+  ptr <- C.Unsafe.wl_proxy_get_display (toProxy o)
+  when (ptr == nullPtr) $ throwIO WaylandInvalidId
+  return (Display ptr)
+
+type Tag = ConstPtr RIP.CChar
+
+newTag :: MonadIO m => String -> m Tag
+newTag str = liftIO $ ConstPtr <$> newCString str
+
+setObjectTag :: (MonadIO m, IsWlObject object) => object -> Tag -> m ()
+setObjectTag object tag = liftIO $ with tag $ \tagPtr ->
+  C.Unsafe.wl_proxy_set_tag (toProxy object) (ConstPtr tagPtr)
+
+getObjectTag :: (MonadIO m, IsWlObject object) => object -> m (Maybe Tag)
+getObjectTag object = liftIO $ do
+  ConstPtr tag <- C.Unsafe.wl_proxy_get_tag (toProxy object)
+  if tag /= nullPtr
+     then Just <$> peek tag
+     else return Nothing
+
+-- | Add a listener to an object with the specified user data.
+--
+-- Fails if a listener is already set.
 --
 -- Throws 'WlListenerAddFailed' on failure listener fails.
 listenerAdd :: forall object m userdata.
   (MonadIO m, Show object, HasListener object, IsUserData userdata)
             => object -- ^ The target object
-            -> PtrConst (ObjectListener object) -- ^ Listener instance (function pointers)
+            -> ConstPtr (ObjectListener object) -- ^ Listener instance (function pointers)
             -> userdata -- ^ Userdata
             -> m ()
 {-# INLINE listenerAdd #-}
@@ -464,10 +503,10 @@ listenerAdd obj l ud = liftIO $ do
   res <- objectListenerAdd obj l (toUserData ud)
   when (res < 0) $ throwIO $ WlListenerAddFailed (objectInterfaceName @object Proxy) (show obj)
 
--- | Add listener with null user data.
+-- | 'listenerAdd' using @NULL@ user data.
 listenerAdd_ :: (MonadIO m, Show object, HasListener object)
             => object -- ^ The target object
-            -> PtrConst (ObjectListener object) -- ^ Listener instance (function pointers)
+            -> ConstPtr (ObjectListener object) -- ^ Listener instance (function pointers)
             -> m ()
 {-# INLINE listenerAdd_ #-}
 listenerAdd_ obj l = listenerAdd obj l ()
@@ -795,27 +834,33 @@ shmCreatePool shm fd size = Client.shmCreatePool shm (fromIntegral fd) (fromInte
 
 -- | Tracks the global objects that are available through wl_registry.
 data RegistryState = RegistryState
-  { registryPtr      :: !Registry
+  { registrySettings :: !RegistrySettings
+  , registryPtr      :: !Registry
   , registryListener :: !(ConstPtr (ObjectListener Registry))
-  , registrySettings :: !RegistrySettings
+  , fixesMVar        :: !(MVar Fixes)
   , globals          :: !(IORef [Global])
   , bindings         :: !(IORef (M.Map ObjectName SomeObject))
-  }
+  } deriving (Generic)
 
 data SomeObject where
   SomeObject :: (HasInterface object) => object -> SomeObject
 
 -- | Global description
 data Global = Global
-  { name      :: {-# UNPACK #-} !ObjectName -- ^ Name of the global.
-  , version   :: {-# UNPACK #-} !Version -- ^ Advertised version of the global.
-  , interface :: !String -- ^ Interface of the global.
-  } deriving (Eq, Ord, Show, Read)
-
-data GlobalException = NoSuchGlobal String (Maybe Version) (Maybe ObjectName)
-  deriving (Show, Eq)
-
-instance Exception GlobalException
+  { name      :: {-# UNPACK #-} !ObjectName
+  -- ^ Name of the global.
+  --
+  -- This is an identifier used by the server to reference some specific global.
+  , version   :: {-# UNPACK #-} !Version
+  -- ^ Advertised version of the global.
+  --
+  -- This specifies the maximum version of the global that may be bound. This means any lower version of
+  -- the global may be bound.
+  , interface :: !String
+  -- ^ Interface of the global.
+  --
+  -- Describes what type of protocol object the global is.
+  } deriving (Eq, Ord, Show, Read, Generic)
 
 data RegistrySettings = RegistrySettings
  { regOnEvent :: RegistryEvent -> IO ()
@@ -828,14 +873,25 @@ instance Default RegistrySettings where
     , regOnBind = \_ _ _ -> pure ()
     }
 
+instance HasDestructor RegistryState where
+  objectDestroy st = do
+    tryTakeMVar st.fixesMVar >>= \case
+      Just fixes -> do
+        fixesDestroyRegistry fixes st.registryPtr
+        objectDestroy fixes
+        objectDestroy st.registryListener
+      Nothing -> return ()
+
 initRegistryState :: MonadIO m => RegistrySettings -> Display -> m RegistryState
 initRegistryState registrySettings disp = do
   registryPtr <- displayGetRegistry disp
   globals <- liftIO (newIORef mempty)
   bindings <- liftIO (newIORef mempty)
+  fixesMVar <- newEmptyMVar
   registryListener <- createListener $ \ev -> do
     case ev of
-      RegistryGlobal{..} -> modifyIORef globals $ \xs -> Global name version interface : xs
+      RegistryGlobal{..} -> do
+        modifyIORef globals $ \xs -> Global name version interface : xs
       RegistryGlobalRemove{..} -> do
         modifyIORef globals $ filter (\x -> x.name /= name)
         bs <- readIORef bindings
@@ -846,8 +902,7 @@ initRegistryState registrySettings disp = do
           Nothing -> return ()
     regOnEvent registrySettings ev
   listenerAdd_ registryPtr registryListener
-  let st = RegistryState{..}
-  return st
+  return RegistryState{..}
 
 -- |
 -- Throws 'NoSuchGlobal' if the requested global cannot be found.
