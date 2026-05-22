@@ -4,7 +4,13 @@ import           HSWM.Types.TypeMap
 
 import qualified Wayland as WL
 
+import qualified Data.Set as S
 import           Foreign
+
+-- data ConnectionState = ConnectionState
+--   { display :: !WL.Display
+--   , knownObjects :: !(S.Set (Ptr WL.Wl_proxy))
+--   } deriving (Generic)
 
 ------------------------------------------------------------------
 -- * Registry tracking
@@ -17,7 +23,7 @@ class HasGlobalsRegistry env where
 instance HasGlobalsRegistry (MVar RegistryCache) where
   globalsRegistryL = lens id const
 
-type HasGlobals env m = (MonadUnliftIO m, MonadLogger m, MonadReader env m, HasGlobalsRegistry env, HasGlobalTMap env)
+type HasGlobals env m = (MonadUnliftIO m, MonadLogger m, MonadThrow m, MonadReader env m, HasGlobalsRegistry env, HasGlobalTMap env)
 
 bindGlobalWith :: forall a env m.
   ( HasGlobals env m
@@ -37,7 +43,10 @@ bindGlobalAuto_ :: forall a env m.
   ) => m a
 bindGlobalAuto_ = do
   regState <- asks (view globalsRegistryL) >>= readMVar
-  getOrCreateObjectIO $ WL.bindGlobal regState Nothing Nothing
+  -- logInfo $ "bindGlobalAuto_: started" :# [ "type" .= show (Proxy @a) ]
+  o <- getOrCreateObjectIO $ WL.bindGlobal regState Nothing Nothing
+  -- logInfo $ "bindGlobalAuto_: finished" :# [ "type" .= show (Proxy @a) ]
+  return o
 
 bindGlobalAuto :: forall a env m.
   ( HasGlobals env m
@@ -67,13 +76,3 @@ bindGlobalAuto' = do
   o <- getOrCreateObjectIO $ WL.bindGlobal regState Nothing Nothing
   withObject $ \l -> WL.listenerAdd o l (nullPtr :: Ptr ())
   return o
-
--- * Callbacks
-
--- | Wait for a callback to trigger.
-callbackWait_ :: MonadIO m => WL.Callback -> m ()
-callbackWait_ cb = liftIO $ do
-  mvar <- newEmptyMVar
-  cbListener <- WL.createListener $ \WL.CallbackDone{} -> putMVar mvar ()
-  WL.listenerAdd_ cb cbListener
-  takeMVar mvar

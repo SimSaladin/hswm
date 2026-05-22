@@ -150,10 +150,6 @@ manage_ = do
 
   whenJust (W.peek ws) $ \w -> do
     manageWindowPlaceTop w True
-    --sm <- liftH $ getObjectDef @Seats.SeatManager
-    --if sm.seat_lshell_focus == Seats.FocusNone
-    --  then manageWindowBorder w =<< asks (focusedBorder . config)
-    --  else manageWindowBorder w =<< asks (normalBorder . config)
     manageWindowBorder w =<< asks (focusedBorder . config)
 
   mapM_ manageReveal visible
@@ -209,11 +205,11 @@ setInitialManageProperties Window {river_window = rw} = do
   modifyWindow rw $ \s -> s {new = False, p_render_border = Just nbc}
 
 doRemoveWindow :: Window -> HS ()
-doRemoveWindow w@Window {} = do
-  -- reove from stack
+doRemoveWindow w = do
+  -- Remove from stack
   modifyWindowSet $ W.delete w.river_window
   alterWindow w.river_window (const Nothing)
-  -- remove references in seats
+  -- Remove references in seats
   gets _seats >>= \xs -> do
     xs' <- forM xs $ \seat' -> do
       let seat =
@@ -224,7 +220,7 @@ doRemoveWindow w@Window {} = do
               }
       if op_window seat == w.river_window
         then do
-          liftIO $ R.riverSeatOpEnd seat.river_seat
+          R.riverSeatOpEnd seat.river_seat
           return $ seat {op_window = R.invalidWindow, op = SEAT_OP_NONE}
         else return seat
     modify $ \s -> s {_seats = xs'}
@@ -245,10 +241,11 @@ finishRecovery = do
 handleEvent :: R.RiverWindowEvent -> H ()
 handleEvent e = case e of
   -- The window has been closed by the server, perhaps due to an xdg_toplevel.close request or similar.
-  -- The server will send no further events on this object and ignore any request other than river_window_v1.destroy made after this event is sent. The client should destroy this object with the river_window_v1.destroy request to free up resources.
+  -- The server will send no further events on this object and ignore any request other than river_window_v1.destroy made after this event is sent.
+  -- The client should destroy this object with the river_window_v1.destroy request to free up resources.
   R.RiverWindowClosed _ w -> runInHS $ modifyWindow w $ \s -> s {closed = True}
 
-  -- properties
+  -- Properties
   R.RiverWindowParent _ window we_parent -> runInHS $ modifyWindow window $ \s -> s {parent = Just we_parent}
   R.RiverWindowAppId _ window we_app_id -> runInHS $ modifyWindow window $ \s -> s {appId = we_app_id}
   R.RiverWindowTitle _ window we_title -> runInHS $ modifyWindow window $ \s -> s {title = we_title}
@@ -282,12 +279,18 @@ handleEvent e = case e of
   -- Set fullscreen
   R.RiverWindowFullscreenRequested _ window output -> runInHS $ doManage' (if output == def then WFullscreen else WFullscreenOnScreen output) window
   R.RiverWindowExitFullscreenRequested _ window -> runInHS $ doManage' WExitFullscreen window
+
   -- TODO what's this
   R.RiverWindowPointerMoveRequested _ w seat ->
     runInHS $ modifyWindow w $ \s -> s {pointer_move_requested = seat}
+
   R.RiverWindowPointerResizeRequested _ w seat edges ->
     runInHS $ modifyWindow w $ \x -> x {pointer_resize_requested = seat, pointer_resize_requested_edges = fi $ R.fromCEnum edges}
+
   -- TODO maximize
   R.RiverWindowMaximizeRequested _ _w -> return ()
   R.RiverWindowUnmaximizeRequested _ _w -> return ()
-  _ -> return ()
+
+  -- TODO
+  R.RiverWindowShowWindowMenuRequested _ _ _ _ -> return ()
+  R.RiverWindowMinimizeRequested _ _ -> return ()

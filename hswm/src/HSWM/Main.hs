@@ -116,7 +116,7 @@ startHSWM :: (m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow))
           -> HSWMConfig m l
           -> IO ()
 startHSWM mainRun loggerSet logFunc wlDisplay config = do
-    conf <- HConf False Nothing (config {layoutHook = Layout (layoutHook config)}) wlDisplay logFunc
+    conf <- HConf False Nothing (config {layoutHook = Layout (layoutHook config)}) wlDisplay logFunc loggerSet
         <$> newEmptyMVar
         <*> newEmptyTMVarIO
         <*> newTQueueIO
@@ -186,22 +186,22 @@ startHSWM mainRun loggerSet logFunc wlDisplay config = do
       _ <- WL.displayRoundtrip wlDisplay
 
       -- Bind initial globals
-      _ <- bindGlobalAuto_ @WL.Compositor
+      _ <- bindGlobalAuto_  @WL.Compositor
       _ <- bindGlobalAuto'  @WL.Shm
-      _ <- bindGlobalAuto_ @Wlr.InputMethodManager
+      _ <- bindGlobalAuto_  @Wlr.InputMethodManager
       _ <- bindGlobalAuto'  @R.RiverLibinputConfig
       _ <- bindGlobalAuto'  @R.RiverInputManager
-      _ <- bindGlobalAuto_ @R.RiverLayerShell
+      _ <- bindGlobalAuto_  @R.RiverLayerShell
       _ <- bindGlobalAuto'  @R.RiverWindowManager
-      _ <- bindGlobalAuto_ @R.RiverXkbBindings
+      _ <- bindGlobalAuto_  @R.RiverXkbBindings
       _ <- bindGlobalAuto'  @R.RiverXkbConfig
-      _ <- bindGlobalAuto_ @Zdg.OutputManager
+      _ <- bindGlobalAuto_  @Zdg.OutputManager
       _ <- bindGlobalAuto'  @Wlr.OutputManager
-      _ <- bindGlobalAuto_ @Wlr.LayerShell
-      _ <- bindGlobalAuto_ @FS.FractionalScaleManager
-      _ <- bindGlobalAuto_ @VP.Viewporter
-      _ <- bindGlobalAuto_ @Wlr.OutputPowerManager
-      _ <- bindGlobalAuto_ @Ext.IdleNotifier
+      _ <- bindGlobalAuto_  @Wlr.LayerShell
+      _ <- bindGlobalAuto_  @FS.FractionalScaleManager
+      _ <- bindGlobalAuto_  @VP.Viewporter
+      _ <- bindGlobalAuto_  @Wlr.OutputPowerManager
+      _ <- bindGlobalAuto_  @Ext.IdleNotifier
 
       logDebug "Running user startup hooks..."
       void $ userCode (startupHook config)
@@ -295,6 +295,15 @@ handleWithHook e = do
 
 handleEvent :: Event -> H ()
 handleEvent (WindowManagerEvent e) = case e of
+
+  R.RiverWindowManagerUnavailable _ wm -> do
+    io $ R.objectDestroy wm
+    writeMainEvent $ MainExit "another window manager already running"
+
+  R.RiverWindowManagerFinished _ wm -> do
+    io $ R.objectDestroy wm
+    writeMainEvent $ MainExit "river_window_manager_v1 finished, exiting."
+
   R.RiverWindowManagerOutput _ _ out -> Outputs.added out
   R.RiverWindowManagerWindow _ _ w -> Windows.added w
   R.RiverWindowManagerSeat _ _ seat -> do
@@ -316,13 +325,6 @@ handleEvent (WindowManagerEvent e) = case e of
     Outputs.render >> Seats.render >> Windows.render
     void . userCode =<< asks (renderHook . config)
     R.riverWindowManagerRenderFinish wm
-
-  R.RiverWindowManagerUnavailable {} ->
-    writeMainEvent $ MainExit "another window manager already running"
-
-  R.RiverWindowManagerFinished _ wm -> do
-    io $ R.objectDestroy wm
-    writeMainEvent $ MainExit "river_window_manage_v1 finished, exiting."
 
   R.RiverWindowManagerSessionLocked _ _wm ->
     writeManageQ $ mapSeats $ \s ->

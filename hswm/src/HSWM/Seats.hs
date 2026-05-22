@@ -17,6 +17,7 @@ import           HSWM.Core
 import           HSWM.Operations
 import qualified HSWM.StackSet as W
 import           HSWM.Utils
+import           HSWM.Wayland
 
 import qualified Wayland as WL
 import qualified River as R
@@ -64,28 +65,30 @@ deleteRemovedSeat s@Seat {} = do
 
 handleEvent :: R.RiverSeatEvent -> H ()
 handleEvent = \case
-    R.RiverSeatPointerEnter _ seat window -> runInHS $ withSeat seat $ \s' -> do
-      when (s'.currentFocus == SFocusNone) $ do
-        modifySeat seat $ \s -> s {hovered = window, pendingPointerEnter = Just (window, s.position)}
-        -- focus follow mouse
-    --  runInHS $ withSeat seat $ \s ->
-    --    unless s.suppressChangeFocus $ modifyWindowSet $ W.focusWindow window
+
+    R.RiverSeatPointerEnter _ seat window ->
+      runInHS $ withSeat seat $ \s -> do
+          logInfo $ "SEAT: pending pointer focus" :# [ "window" .= show window, "position" .= s.position ]
+          modifySeat seat $ \s' -> s' {hovered = window, pendingPointerEnter = Just (window, s.position)}
+
     R.RiverSeatPointerLeave _ seat ->
       runInHS $ modifySeat seat $ \s -> s {hovered = R.invalidWindow, pendingPointerEnter = Nothing}
+
     R.RiverSeatPointerPosition _ seat x y ->
-      runInHS $ modifySeat seat $ \s -> s {position = (x,y)}
+      runInHS $ modifySeat seat $ \s -> s {position = (x, y)}
+
     R.RiverSeatWindowInteraction _ seat window ->
       runInHS $ modifySeat seat $ \s -> s {interacted = window}
+
     R.RiverSeatOpDelta _ seat dx dy ->
       runInHS $ modifySeat seat $ \s -> s {op_dx = fromIntegral dx, op_dy = fromIntegral dy}
+
     R.RiverSeatOpRelease _ seat ->
       runInHS $ modifySeat seat $ \s -> s {op_release = True}
 
     R.RiverSeatWlSeat _ seat name -> do
       registry <- asks globals >>= readMVar
       wlseat   <- WL.bindGlobal @WL.Seat registry (Just name) Nothing
-      ver <- io $ WL.getVersion wlseat
-      logInfo $ "WL SEAT" :# [ "version" .= ver ]
       withObject $ \l -> WL.listenerAdd wlseat l seat
       -- Register idle notifier
       withObject $ \idleNotify -> do
@@ -181,7 +184,7 @@ handlePointerEvent = \case
 -- * Manage
 
 -- XXX: also set XCURSOR_THEME= ? XCURSOR_PATH= ?
-setXCursorTheme :: RiverSeat -> H ()
+setXCursorTheme :: (MonadIO m, MonadReader HConf m) => RiverSeat -> m ()
 setXCursorTheme rs =
   asks (xcursor . config) >>= \case
     Just (theme, size) -> R.riverSeatSetXcursorTheme rs (Just theme) size
@@ -189,13 +192,14 @@ setXCursorTheme rs =
 
 manage :: H ()
 manage = do
-  om <- getObject @SeatManager
   -- Handle new seats
+  om <- getObject @SeatManager
   newSeats <- forM om.pending_manage createSeatBindings
   unless (null newSeats) $ do
     runInHS $ modify $ \s -> s {_seats = _seats s ++ newSeats}
     forM_ newSeats $ \s -> setXCursorTheme $ getField @"river_seat" s
     modifyObject $ \st -> st { pending_manage = [] }
+
   -- Manage existing ones
   runInHS $ gets _seats >>= mapM_ manage1
 
@@ -222,20 +226,23 @@ manage1 s = do
 
     managePendingAction = \case
       S_NONE -> do
+
+        case s.pendingPointerEnter of
+          Just (rw, pos) -> do
+            doS $ \x -> x { pendingPointerEnter = Nothing }
+            when (pos /= s.position) $ do
+                logInfo "seat: focus changed by pointer"
+                doS $ \x -> x { focused = rw }
+                R.riverSeatFocusWindow s.river_seat rw
+                windows $ W.focusWindow rw
+          _ -> pure ()
+
         case s.currentFocus of
           SFocusNone -> do
             withWindow s.focused $ \_ -> R.riverSeatFocusWindow s.river_seat s.focused
             doS $ \x -> x { currentFocus = SFocusWindow s.focused }
 
-          SFocusWindow{} -> case s.pendingPointerEnter of
-            Just (rw, pos) -> do
-              doS $ \x -> x { pendingPointerEnter = Nothing }
-              when (pos /= s.position) $ do
-                logInfo "seat: focus changed by pointer"
-                doS $ \x -> x { focused = rw }
-                R.riverSeatFocusWindow s.river_seat rw
-                windows $ W.focusWindow rw
-            _ -> pure ()
+          -- SFocusWindow{} ->
 
           _ -> pure ()
 

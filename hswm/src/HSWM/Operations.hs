@@ -165,11 +165,10 @@ withScreenOutput sid f = mapM_ f . L.find (\o -> o.screen == sid) =<< gets _outp
 
 -- | Force new manage sequence.
 manageDirty :: (MonadStateGlobal env m, HasEventQueues env) => m ()
-manageDirty = do
-  withObject $ \wm -> do
-    logDebug "wm request: manage_dirty"
-    R.riverWindowManagerManageDirty wm
-    writeMainEvent MainPoll
+manageDirty = withObject $ \wm -> do
+  logDebug "wm request: manage_dirty"
+  R.riverWindowManagerManageDirty wm
+  writeMainEvent MainPoll
 
 writeMainEvent :: (MonadIO m, MonadReader env m, HasEventQueues env) => MainEvent -> m ()
 writeMainEvent ev = do
