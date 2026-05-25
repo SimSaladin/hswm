@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass #-}
 -- |
 -- Module      : River.WindowManagement
 -- Description : river-window-management v1
@@ -138,13 +139,23 @@ module River.WindowManagement
 
   -- * WindowBorders
   , WindowBorders(..)
+
+  -- * RiverColor
+  , RiverColor(..)
   ) where
 
 import Bindings.River.WindowManagementV1
-import Bindings.River.WindowManagementV1.Generated
+import Bindings.River.WindowManagement.V1.Client.Generated
 
 import Data.Word
 import Data.Int
+import Data.Default
+import GHC.Generics
+
+data RiverColor = RiverColor
+  { red, green, blue, alpha :: !Word32 }
+  deriving stock (Show, Read, Eq, Generic)
+  deriving anyclass (Default)
 
 data WindowBorders = WindowBorders
   { wb_edges               :: !Word32 -- ^ Edges on which to draw borders

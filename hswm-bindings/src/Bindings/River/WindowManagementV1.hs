@@ -1,20 +1,16 @@
 {-# LANGUAGE DeriveAnyClass #-}
-{-# OPTIONS_GHC -ddump-splices #-}
-
 
 module Bindings.River.WindowManagementV1 where
 
-import Bindings.River.WindowManagementV1.Generated
-import Bindings.River.WindowManagementV1.Generated.Global as G
-import Bindings.River.WindowManagementV1.Generated.Unsafe as Unsafe
+import Bindings.River.WindowManagement.V1.Client.Generated
+import Bindings.River.WindowManagement.V1.Client.Generated.Global as G
+import Bindings.River.WindowManagement.V1.Client.Generated.Unsafe as Unsafe
 
 import Bindings.Wayland.Client (Surface(..))
 
 import Wayland.Internal.TH
 
 import Foreign.Ptr
-import Data.Word
-import GHC.Generics
 import Path_river_window_management_v1
 
 clientFromProtocolXML' commonSettings protoXml
@@ -29,8 +25,3 @@ invalidWindow = def
 
 invalidSeat :: RiverSeat
 invalidSeat = def
-
-data RiverColor = RiverColor
-  { red, green, blue, alpha :: !Word32 }
-  deriving stock (Show, Read, Eq, Generic)
-  deriving anyclass (Default)

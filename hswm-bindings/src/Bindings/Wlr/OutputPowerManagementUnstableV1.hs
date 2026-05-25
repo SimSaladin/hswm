@@ -9,9 +9,9 @@
 --
 module Bindings.Wlr.OutputPowerManagementUnstableV1 where
 
-import Bindings.Wlr.OutputPowerManagementUnstableV1.Generated
-import Bindings.Wlr.OutputPowerManagementUnstableV1.Generated.Global
-import Bindings.Wlr.OutputPowerManagementUnstableV1.Generated.Safe
+import Bindings.Wlr.OutputPowerManagement.UnstableV1.Client.Generated
+import Bindings.Wlr.OutputPowerManagement.UnstableV1.Client.Generated.Global
+import Bindings.Wlr.OutputPowerManagement.UnstableV1.Client.Generated.Safe
 
 import Bindings.Wayland.Client (Output(..))
 

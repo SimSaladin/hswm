@@ -59,6 +59,7 @@ library
           Bindings.Wayland.ExtForeignTopLevelListV1
           Bindings.Wayland.Viewporter
           Bindings.Wayland.XdgOutputUnstableV1
+          Bindings.Wayland.TextInputUnstableV3
           Bindings.Wlr.InputMethodUnstableV2
           Bindings.Wlr.LayerShellUnstableV1
           Bindings.Wlr.OutputManagementUnstableV1
@@ -102,10 +103,12 @@ library
     if flag(pkgconfig)
         pkgconfig-depends:
               wayland-client
+            , wayland-server
             , wayland-protocols
     else
         extra-libraries:
               wayland-client
+            , wayland-server
 
     if flag(hs-bindgen-build-tool)
        build-tool-depends:
@@ -116,6 +119,7 @@ test-suite test-suite
     main-is: Spec.hs
     other-modules:
           Paths_hswm_bindings
+          Wayland.UtilSpec
     autogen-modules:
           Paths_hswm_bindings
     hs-source-dirs:
@@ -125,5 +129,8 @@ test-suite test-suite
     build-depends:
           base
         , hspec
+        , hs-bindgen-runtime   >=0.1.0  && <0.2
+        , data-default
         , hswm-bindings
-    default-language: Haskell2010
+    default-language: GHC2024
+    ghc-options: -threaded -with-rtsopts=-N

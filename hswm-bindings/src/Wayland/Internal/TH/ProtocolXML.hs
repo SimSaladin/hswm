@@ -14,52 +14,90 @@ import           GHC.Generics (Generic)
 import           GHC.Stack
 
 data Protocol = Protocol
-  { protocolName        :: String
-  , protocolCopyright   :: Text
-  , protocolDescription :: (String, String)
-  , protocolInterfaces  :: [Interface]
+  { name        :: String
+  , copyright   :: String
+  , description :: Description
+  , interfaces  :: [Interface]
   } deriving (Show, Eq, Generic)
 
 data Interface = Interface
-  { interfaceName        :: String
-  , interfaceVersion     :: Int
-  , interfaceDescription :: (String, String)
-  , interfaceEnums       :: [IEnum]
-  , interfaceRequests    :: [IRequest]
-  , interfaceEvents      :: [IEvent]
+  { name        :: String
+  , version     :: Int
+  , description :: Description
+  , enums       :: [IEnum]
+  , requests    :: [IRequest]
+  , events      :: [IEvent]
   } deriving (Show, Eq, Generic)
 
 data IEnum = IEnum
-  { enumName    :: String
-  , enumEntries :: [EnumEntry]
+  { name        :: String
+  , entries     :: [Entry]
+  , since       :: Maybe Int -- version
   } deriving (Show, Eq, Generic)
 
-data EnumEntry = EnumEntry
-  { entryName    :: String
-  , entryValue   :: String
-  , entrySummary :: String
+data Entry = Entry
+  { name        :: String
+  , value       :: Int
+  , summary     :: String
   } deriving (Show, Eq, Generic)
 
 data IRequest = IRequest
-  { requestName        :: String
-  , requestDescription :: (String, String)
-  , requestType        :: Maybe Text
-  , requestArgs        :: [Arg]
+  { name        :: String
+  , description :: Description
+  , requestType :: Maybe Text
+  , args        :: [Arg]
+  , since       :: Maybe Int -- version
   } deriving (Show, Eq, Generic)
 
 data IEvent = IEvent
-  { eventName        :: String
-  , eventDescription :: (String, String)
-  , eventArgs        :: [Arg]
+  { name        :: String
+  , description :: Description
+  , args        :: [Arg]
+  } deriving (Show, Eq, Generic)
+
+data Description = Description
+  { summary  :: String
+  , contents :: String
   } deriving (Show, Eq, Generic)
 
 data Arg = Arg
-  { argName      :: String
-  , argType      :: String
-  , argEnum      :: Maybe String
-  , argInterface :: Maybe String
-  , argSummary   :: String
+  { name      :: String
+  , summary   :: String
+  , argType   :: ArgType
+  , nullable  :: Maybe Bool
   } deriving (Show, Eq, Generic)
+
+data ArgType
+  = AInt
+  | AUInt
+  | AFixed
+  | AString
+  | AFd
+  | AArray
+  | AEnum { enumName :: String, enumObject :: Maybe String }
+  | ANewId String
+  | AObject String
+  | AEmpty
+  | ASelf
+  deriving (Eq, Show, Generic)
+
+getArgType :: Cursor -> ArgType
+getArgType e =
+  case attribute "type" e of
+    ["int"] -> AInt
+    ["uint"] -> case attribute "enum" e of
+                  [] -> AUInt
+                  [x]
+                    | [obj, enum] <- T.split (== '.') x -> AEnum (T.unpack enum) (Just $ T.unpack obj)
+                    | otherwise -> AEnum (T.unpack x) Nothing
+                  x -> error $ "unknown argument type: uint: " ++ show x
+    ["fixed"] -> AFixed
+    ["string"] -> AString
+    ["fd"] -> AFd
+    ["array"] -> AArray
+    ["new_id"] -> ANewId (T.unpack . head $ attribute "interface" e)
+    ["object"] -> AObject (T.unpack . head $ attribute "interface" e)
+    x -> error $ "unknown argument type: " ++ show x
 
 protocolFromFile :: FilePath -> IO Protocol
 protocolFromFile file = do
@@ -70,37 +108,49 @@ protocolFromString :: String -> Protocol
 protocolFromString str = protocolFromXML $ fromDocument $ X.parseText_ X.def $ TL.pack str
 
 protocolFromXML :: Cursor -> Protocol
-protocolFromXML root = Protocol (name root) (contents $ root $/ element "copyright") (getDescription root) (map getInterface $ root $/ element "interface")
+protocolFromXML root = Protocol (getName root)
+    (getContents $ root $/ element "copyright")
+    (getDescription root)
+    (map getInterface $ root $/ element "interface")
   where
-    getInterface e = Interface (name e)
+    getInterface e = Interface (getName e)
       (read . T.unpack . head $ attribute "version" e)
       (getDescription e)
       (map getEnum $ e $/ element "enum")
       (map getRequest $ e $/ element "request")
       (map getEvent $ e $/ element "event")
-    getEnum e = IEnum (name e)
-      (map getEntry $ e $/ element "entry")
-    getEntry e = EnumEntry (name e)
-      (T.unpack . head $ attribute "value" e)
-      (unlines . map T.unpack $ attribute "summary" e)
-    getRequest e = IRequest (name e) (getDescription e)
-      (listToMaybe $ attribute "type" e)
-      (map getArg $ e $/ element "arg")
-    getArg e = Arg (name e)
-      (T.unpack . head $ attribute "type" e)
-      (fmap T.unpack . listToMaybe $ attribute "enum" e)
-      (fmap T.unpack . listToMaybe $ attribute "interface" e)
-      (T.unpack $ summary e)
-    getEvent e = IEvent (name e)
-      (getDescription e)
-      (map getArg $ e $/ element "arg")
 
-    -- XXX: summary attribute ignored
-    getDescription e = (unlines . map (T.unpack . summary) $ e $/ element "description", T.unpack . contents $ e $/ element "description")
+    getEnum e = IEnum (getName e) (map getEntry $ e $/ element "entry")
+      (getSince e)
 
-    name     = T.unpack . head . attribute "name"
-    contents = T.unlines . concatMap ($.// content)
-    summary  = fromMaybe "" . listToMaybe . attribute "summary"
+    getEntry e = Entry (getName e)
+      (read . T.unpack . head $ attribute "value" e)
+      (getSummary e)
+
+    getRequest e = IRequest (getName e) (getDescription e)
+      (getRequestType e)
+      (getArgs e)
+      (getSince e)
+
+    getSince e = listToMaybe $ read . T.unpack <$> attribute "since" e
+
+    getRequestType e = case attribute "type" e of
+                          [] -> Nothing
+                          ["destructor"] -> Just "destructor"
+                          x -> error $ "requestType: " ++ show x
+
+    getArgs e = map getArg $ e $/ element "arg"
+
+    getArg e = Arg (getName e) (getSummary e) (getArgType e) (getNullable e)
+
+    getEvent e = IEvent (getName e) (getDescription e) (getArgs e)
+
+    getDescription e = Description <$> unlines . map getSummary <*> getContents $ e $/ element "description"
+
+    getNullable e = listToMaybe $ (== "true") <$> attribute "allow-null" e
+    getName = T.unpack . head . attribute "name"
+    getSummary = unlines . map T.unpack . attribute "summary"
+    getContents = T.unpack . T.unlines . concatMap ($.// content)
 
 head :: HasCallStack => [a] -> a
 head (x:_) = x

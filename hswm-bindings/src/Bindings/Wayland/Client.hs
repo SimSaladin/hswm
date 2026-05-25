@@ -43,13 +43,11 @@ module Bindings.Wayland.Client
   , Wl_keyboard_keymap_format(..)
   ) where
 
-
-import           Bindings.Wayland.Client.Generated
-import           Bindings.Wayland.Client.Generated.Global as G
-import qualified Bindings.Wayland.Client.Generated.Safe as Safe
-import qualified Bindings.Wayland.Client.Generated.Unsafe as Unsafe
-import           Bindings.Wayland.Client.Generated.Safe hiding (wl_display_dispatch, wl_display_flush)
-import           Bindings.Wayland.Client.Generated.Unsafe (wl_display_dispatch, wl_display_flush)
+import           Bindings.Wayland.Core.Client.Generated
+import           Bindings.Wayland.Core.Client.Generated.Global as G
+import           Bindings.Wayland.Core.Client.Generated.Safe
+import qualified Bindings.Wayland.Core.Client.Generated.Safe as Safe
+import qualified Bindings.Wayland.Core.Client.Generated.Unsafe as Unsafe
 
 import           Bindings.Wayland.Util
 
@@ -64,6 +62,7 @@ import           Foreign
 import           Foreign.C
 import           Foreign.C.ConstPtr
 import           System.Posix
+import Path_wayland
 
 --------------------------------------------------------------------------------------
 -- EVENT QUEUES
@@ -73,10 +72,22 @@ renderNewType "EventQueue" ''Wl_event_queue ""
 --------------------------------------------------------------------------------------
 -- wayland.xml
 
-clientFromProtocolXML commonSettings
-  { prEnumModule = \_ -> ""
+clientFromProtocolXML' commonSettings
+  { prEnumModule = \_ _ -> ""
   , prRequestOptions = [ ("wl_registry", "bind", def { reqDisable = True }) ]
-  } "wayland.xml"
+
+  , prEventArgTypeTrans = \s iface ev arg t -> do
+    case t of
+      _ | ev.name == "enter", AArray <- arg.argType -> [t|Array Word32|]
+        | AFixed <- arg.argType -> [t|Fixed|]
+      _ -> defaultEventArgTypeTrans s iface ev arg t
+
+  , prEventArgTrans = \s iface ev arg t x -> do
+    case t of
+      _ | AFixed <- arg.argType -> [|return $! Fixed $(x)|]
+      _ -> defaultEventArgTrans s iface ev arg t x
+
+  } protoXml
 
 instance Default Output where def = Output nullPtr
 instance Default Seat where def = Seat nullPtr
@@ -166,7 +177,7 @@ displaySetMaxBufferSize (Display d) msize = liftIO $ wl_display_set_max_buffer_s
 displayFlush :: MonadIO m => Display -> m Int
 {-# INLINE displayFlush #-}
 displayFlush (Display d) = liftIO $ do
-  ret <- wl_display_flush d
+  ret <- Unsafe.wl_display_flush d
   when (ret == -1) $ do
     errno <- getErrno
     {- TODO when (errno /= eAGAIN) $ -}
@@ -201,7 +212,7 @@ displayFlush (Display d) = liftIO $ do
 displayReadEvents :: MonadIO m => Display -> m ()
 {-# INLINE displayReadEvents #-}
 displayReadEvents (Display d) = liftIO $
-  throwErrnoIfMinus1_ "displayReadEvents" $ wl_display_read_events d
+  throwErrnoIfMinus1_ "displayReadEvents" $ Safe.wl_display_read_events d
 
 -- |  Prepare to read events from the display's file descriptor to a queue.
 --
@@ -250,13 +261,13 @@ displayReadEvents (Display d) = liftIO $
 displayPrepareReadQueue :: MonadIO m => Display -> EventQueue -> m ()
 {-# INLINE displayPrepareReadQueue #-}
 displayPrepareReadQueue (Display d) (EventQueue evq) = liftIO $
-  throwErrnoIfMinus1_ "displayPrepareReadQueue" $ wl_display_prepare_read_queue d evq
+  throwErrnoIfMinus1_ "displayPrepareReadQueue" $ Safe.wl_display_prepare_read_queue d evq
 
 -- | This function does the same thing as 'displayPrepareReadQueue'
 -- with the default queue passed as the queue.
 displayPrepareRead :: MonadIO m => Display -> m ()
 {-# INLINE displayPrepareRead #-}
-displayPrepareRead (Display d) = liftIO $ throwErrnoIfMinus1_ "displayPrepareRead" $ wl_display_prepare_read d
+displayPrepareRead (Display d) = liftIO $ throwErrnoIfMinus1_ "displayPrepareRead" $ Safe.wl_display_prepare_read d
 
 checkPrepareRead loc ma = do
   ret <- ma
@@ -270,7 +281,7 @@ checkPrepareRead loc ma = do
 displayDispatch :: MonadIO m => Display -> m Int
 {-# INLINE displayDispatch #-}
 displayDispatch (Display d) = liftIO $
-  fmap fromIntegral $ throwErrnoIfMinus1 "displayDispatch" $ wl_display_dispatch d
+  fmap fromIntegral $ throwErrnoIfMinus1 "displayDispatch" $ Safe.wl_display_dispatch d
 
 -- | Dispatch events in an event queue.
 --
@@ -296,12 +307,12 @@ displayDispatch (Display d) = liftIO $
 displayDispatchQueue :: MonadIO m => Display -> EventQueue -> m Int
 {-# INLINE displayDispatchQueue #-}
 displayDispatchQueue (Display d) (EventQueue evq) = liftIO $
-  fmap fromIntegral $ throwErrnoIfMinus1 "displayDispatchQueue" $ wl_display_dispatch_queue d evq
+  fmap fromIntegral $ throwErrnoIfMinus1 "displayDispatchQueue" $ Safe.wl_display_dispatch_queue d evq
 
 displayDispatchTimeout :: MonadIO m => Display -> Maybe (ConstPtr Timespec) -> m Int
 {-# INLINE displayDispatchTimeout #-}
 displayDispatchTimeout (Display d) mtimeout = liftIO $
-  fmap fromIntegral $ throwErrnoIfMinus1 "displayDispatchTimeout" $ wl_display_dispatch_timeout d (fromMaybe (ConstPtr nullPtr) mtimeout)
+  fmap fromIntegral $ throwErrnoIfMinus1 "displayDispatchTimeout" $ Safe.wl_display_dispatch_timeout d (fromMaybe (ConstPtr nullPtr) mtimeout)
 
 -- | Dispatch events in an event queue with a timeout
 --
@@ -316,7 +327,7 @@ displayDispatchTimeout (Display d) mtimeout = liftIO $
 displayDispatchQueueTimeout :: MonadIO m => Display -> EventQueue -> Maybe (ConstPtr Timespec) -> m Int
 {-# INLINE displayDispatchQueueTimeout #-}
 displayDispatchQueueTimeout (Display d) (EventQueue evq) mtimeout = liftIO $
-  fmap fromIntegral $ throwErrnoIfMinus1 "displayDispatchQueueTimeout" $ wl_display_dispatch_queue_timeout d evq (fromMaybe (ConstPtr nullPtr) mtimeout)
+  fmap fromIntegral $ throwErrnoIfMinus1 "displayDispatchQueueTimeout" $ Safe.wl_display_dispatch_queue_timeout d evq (fromMaybe (ConstPtr nullPtr) mtimeout)
 
 -- | Dispatch pending events in an event queue
 --
@@ -324,7 +335,7 @@ displayDispatchQueueTimeout (Display d) (EventQueue evq) mtimeout = liftIO $
 displayDispatchQueuePending :: MonadIO m => Display -> EventQueue -> m Int
 {-# INLINE displayDispatchQueuePending #-}
 displayDispatchQueuePending (Display d) (EventQueue evq) =
-  fmap fromIntegral . liftIO $ throwErrnoIfMinus1 "displayDispatchQueuePending" $ wl_display_dispatch_queue_pending d evq
+  fmap fromIntegral . liftIO $ throwErrnoIfMinus1 "displayDispatchQueuePending" $ Safe.wl_display_dispatch_queue_pending d evq
 
 -- | Dispatch default queue events without reading from the display fd.
 --
@@ -333,7 +344,7 @@ displayDispatchQueuePending (Display d) (EventQueue evq) =
 displayDispatchPending :: MonadIO m => Display -> m Int
 {-# INLINE displayDispatchPending #-}
 displayDispatchPending (Display d) =
-  fmap fromIntegral . liftIO $ throwErrnoIfMinus1 "displayDispatchPending" $ wl_display_dispatch_pending d
+  fmap fromIntegral . liftIO $ throwErrnoIfMinus1 "displayDispatchPending" $ Safe.wl_display_dispatch_pending d
 
 -- | Cancel read intention on display's fd
 --

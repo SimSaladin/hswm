@@ -24,16 +24,16 @@ module HSWM.InputConfig
 
 import           HSWM.Core
 
-import qualified Wayland as WL
 import qualified River as R
+import qualified Wayland as WL
 
 import qualified Bindings.River as R
-import qualified Bindings.River.XkbConfigV1.Generated as R
-import qualified Bindings.River.InputManagementV1.Generated as R
 import           Bindings.Wayland.Client (CEnum(..))
 
+import           Data.Coerce (coerce)
 import qualified Data.List as L
 import qualified Data.Map as M
+import           Foreign.C.Types
 import           System.Posix
 
 data InputConfigState = InputConfigState
@@ -63,7 +63,7 @@ data KeymapState = KeymapState
   deriving stock (Eq, Show, Generic)
 
 data InputDeviceState = InputDeviceState
-  { deviceType :: Maybe R.River_input_device_v1_type -- ^ keyboard/pointer/touch/tablet
+  { deviceType :: Maybe R.RiverInputDeviceType -- ^ keyboard/pointer/touch/tablet
   , deviceName :: String
   }
   deriving stock (Eq, Show, Generic)
@@ -77,9 +77,9 @@ data LibinputDeviceState = LibinputDeviceState
   , drag :: DC R.RiverLibinputDeviceDragState -- ^ tap-and-drag state
   , dragLock :: DC R.RiverLibinputDeviceDragLockState -- ^ drag lock state
   , threeFingerDrag :: SDC Int32 R.RiverLibinputDeviceThreeFingerDragState -- ^ three finger drag state
-  , calibrationMatrix :: SDC Int32 WL.Array -- ^ calibration matrix. Supported if non-zero
+  , calibrationMatrix :: SDC Int32 [Float] -- ^ calibration matrix. Supported if non-zero
   , accelProfile :: SDC R.RiverLibinputDeviceAccelProfiles R.RiverLibinputDeviceAccelProfile
-  , accelSpeed :: DC WL.Array -- ^ accel speed
+  , accelSpeed :: DC [Double] -- ^ accel speed
   , naturalScroll :: SDC Int32 R.RiverLibinputDeviceNaturalScrollState -- ^ natural scroll, supported if non-zero
   , leftHanded :: SDC Int32 R.RiverLibinputDeviceLeftHandedState -- ^ left-handed mode, supported if non-zero
   , clickMethod :: SDC R.RiverLibinputDeviceClickMethods R.RiverLibinputDeviceClickMethod -- ^ click methods
@@ -107,8 +107,8 @@ instance {-# OVERLAPPABLE #-} (CEnum a, CEnum b) => Default (SDC a b) where
 instance {-# OVERLAPPABLE #-} (CEnum a) => Default (SDC Int32 a) where
   def = SDC minBound (toCEnum 42) (toCEnum 42)
 
-instance Default (SDC Int32 WL.Array) where
-  def = SDC minBound def def
+instance Default (SDC Int32 [a]) where
+  def = SDC minBound [] []
 
 instance Default (SDC Int32 Word32)   where
   def = SDC minBound maxBound maxBound
@@ -120,8 +120,8 @@ data DC a = DC { defval, curval :: a }
 instance {-# OVERLAPPABLE #-} (CEnum a) => Default (DC a) where
   def = DC (toCEnum 42) (toCEnum 42)
 
-instance Default (DC WL.Array) where
-  def = DC def def
+instance Default (DC [a]) where
+  def = DC def []
 
 instance Default (DC Word32) where
   def = DC maxBound maxBound
@@ -157,7 +157,7 @@ createKeyboardKeymap params = lookupKeymaps params >>= \case
       kmap <- io $ createKeymapFromNames ctx params KeymapFormatTextV1
       fd <- io $ keymapAsStringFd kmap KeymapFormatTextV1
       keymap <- withObject $ \xkbConfig ->
-        R.riverXkbConfigCreateKeymap xkbConfig (fi fd) R.RIVER_XKB_CONFIG_V1_KEYMAP_FORMAT_TEXT_V1
+        R.riverXkbConfigCreateKeymap xkbConfig (fi fd) R.riverXkbConfigKeymapFormatTextV1
       let kmState = KeymapState { created = False, failure = Nothing, keymap, keymapFd = fd, params = Just params }
       modifyObjectDef $ \st -> st { xkbKeymaps = M.insert keymap kmState st.xkbKeymaps }
       l <- getOrCreateObject $ do
@@ -258,13 +258,13 @@ handleLibinputDeviceEvent = \case
   R.RiverLibinputDeviceThreeFingerDragDefault _ dev tfdSt       -> modifyLibinputDevice dev $ \s -> s { threeFingerDrag = s.threeFingerDrag { defval = tfdSt } }
   R.RiverLibinputDeviceThreeFingerDragCurrent _ dev tfdSt       -> modifyLibinputDevice dev $ \s -> s { threeFingerDrag = s.threeFingerDrag { curval = tfdSt } }
   R.RiverLibinputDeviceCalibrationMatrixSupport _ dev supported -> modifyLibinputDevice dev $ \s -> s { calibrationMatrix = s.calibrationMatrix { support = supported } }
-  R.RiverLibinputDeviceCalibrationMatrixDefault _ dev mat       -> modifyLibinputDevice dev $ \s -> s { calibrationMatrix = s.calibrationMatrix { defval = mat } }
-  R.RiverLibinputDeviceCalibrationMatrixCurrent _ dev mat       -> modifyLibinputDevice dev $ \s -> s { calibrationMatrix = s.calibrationMatrix { curval = mat } }
+  R.RiverLibinputDeviceCalibrationMatrixDefault _ dev mat       -> WL.arrayToList mat >>= \arr -> modifyLibinputDevice dev $ \s -> s { calibrationMatrix = s.calibrationMatrix { defval = map coerce arr } }
+  R.RiverLibinputDeviceCalibrationMatrixCurrent _ dev mat       -> WL.arrayToList mat >>= \arr -> modifyLibinputDevice dev $ \s -> s { calibrationMatrix = s.calibrationMatrix { curval = map coerce arr } }
   R.RiverLibinputDeviceAccelProfilesSupport _ dev profiles      -> modifyLibinputDevice dev $ \s -> s { accelProfile = s.accelProfile { support = profiles } }
   R.RiverLibinputDeviceAccelProfileDefault _ dev profile        -> modifyLibinputDevice dev $ \s -> s { accelProfile = s.accelProfile { defval = profile } }
   R.RiverLibinputDeviceAccelProfileCurrent _ dev profile        -> modifyLibinputDevice dev $ \s -> s { accelProfile = s.accelProfile { curval = profile } }
-  R.RiverLibinputDeviceAccelSpeedDefault _ dev speed            -> modifyLibinputDevice dev $ \s -> s { accelSpeed = s.accelSpeed { defval = speed } }
-  R.RiverLibinputDeviceAccelSpeedCurrent _ dev speed            -> modifyLibinputDevice dev $ \s -> s { accelSpeed = s.accelSpeed { curval = speed } }
+  R.RiverLibinputDeviceAccelSpeedDefault _ dev speed            -> WL.arrayToList speed >>= \arr -> modifyLibinputDevice dev $ \s -> s { accelSpeed = s.accelSpeed { defval = map coerce arr } }
+  R.RiverLibinputDeviceAccelSpeedCurrent _ dev speed            -> WL.arrayToList speed >>= \arr -> modifyLibinputDevice dev $ \s -> s { accelSpeed = s.accelSpeed { curval = map coerce arr } }
   R.RiverLibinputDeviceNaturalScrollSupport _ dev supported     -> modifyLibinputDevice dev $ \s -> s { naturalScroll = s.naturalScroll { support = supported } }
   R.RiverLibinputDeviceNaturalScrollDefault _ dev nsSt          -> modifyLibinputDevice dev $ \s -> s { naturalScroll = s.naturalScroll { defval = nsSt } }
   R.RiverLibinputDeviceNaturalScrollCurrent _ dev nsSt          -> modifyLibinputDevice dev $ \s -> s { naturalScroll = s.naturalScroll { curval = nsSt } }

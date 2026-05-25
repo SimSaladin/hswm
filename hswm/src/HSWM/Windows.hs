@@ -21,7 +21,7 @@ import qualified Wayland as WL
 import qualified River as R
 
 import qualified Bindings.River as R
-import qualified Bindings.River.WindowManagementV1.Generated as R
+import qualified Bindings.River.WindowManagement.V1.Client.Generated as R
 
 import qualified Control.Monad.State as State
 import qualified Data.List as L

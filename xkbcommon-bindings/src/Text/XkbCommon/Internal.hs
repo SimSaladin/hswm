@@ -45,8 +45,10 @@ munmap ptr size = throwErrnoIfMinus1_ "munmap" $ c_munmap ptr (fromIntegral size
 
 memfdCreate :: String -- ^ Name
             -> MfdFlags -> IO Fd
-memfdCreate name flags = withCString name $ \c_name ->
-  throwErrnoIfMinus1 "memfd_create" $ c_memfd_create c_name flags.unwrap
+memfdCreate name flags =
+  throwErrnoIfMinus1 "memfd_create" $
+  withCString name $ \c_name ->
+    c_memfd_create c_name flags.unwrap
 
 foreign import capi unsafe "sys/mman.h mmap"
   c_mmap :: forall a any. Ptr any -> CSize -> CUInt -> CUInt -> Fd -> CSize -> IO (Ptr a)

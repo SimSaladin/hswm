@@ -27,7 +27,7 @@ import qualified Pixman as P
 import qualified Bindings.River as R
 import qualified Bindings.Wayland.FractionalScaleV1 as FS
 import qualified Bindings.Wlr.LayerShellUnstableV1 as Wlr
-import qualified Bindings.Wlr.LayerShellUnstableV1.Generated as Wlr
+import qualified Bindings.Wlr.LayerShell.UnstableV1.Client.Generated as Wlr
 
 import qualified Codec.Picture as JP
 

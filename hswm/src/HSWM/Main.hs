@@ -49,10 +49,10 @@ import qualified Data.List as L
 import           Foreign hiding (new, void)
 import qualified Options.Applicative as Opts
 import           Options.Generic
+import           System.Environment (unsetEnv)
 import           System.IO.Error
 import           System.Log.FastLogger
 import qualified System.Posix as Posix
-import System.Environment (unsetEnv)
 
 -- | Main entrypoint settings.
 data MainRun w = MainRun
@@ -206,9 +206,9 @@ startHSWM mainRun loggerSet logFunc wlDisplay config = do
       _ <- bindGlobalAuto_  @Ext.IdleNotifier
 
       logInfo "Installing signal handlers"
-      _ <- io $ Posix.installHandler Posix.sigTERM (Posix.Catch $ runInH $ mainEvent $ MainExit "TERM") Nothing
-      _ <- io $ Posix.installHandler Posix.sigINT  (Posix.Catch $ runInH $ mainEvent $ MainExit "INT") Nothing
-      _ <- io $ Posix.installHandler Posix.sigQUIT (Posix.Catch $ runInH $ mainEvent $ MainExit "QUIT") Nothing
+      _ <- io $ Posix.installHandler Posix.sigTERM (Posix.Catch $ runInH $ mainEvent $ MainSignal Posix.sigTERM) Nothing
+      _ <- io $ Posix.installHandler Posix.sigINT  (Posix.Catch $ runInH $ mainEvent $ MainSignal Posix.sigINT) Nothing
+      _ <- io $ Posix.installHandler Posix.sigQUIT (Posix.Catch $ runInH $ mainEvent $ MainSignal Posix.sigQUIT) Nothing
       _ <- io $ Posix.installHandler Posix.sigUSR2 (Posix.Catch $ runInH $ io getProgramPath >>= mainEvent . MainRestart) Nothing
 
       wlPollFd <- WL.displayGetFd wlDisplay
@@ -225,39 +225,51 @@ startHSWM mainRun loggerSet logFunc wlDisplay config = do
         mainEvent MainSaveToDisk
       link timerAs
 
-      let main MainPoll = do
-            dispatchPending wlDisplay >>= \case
-              Left end -> main end
-              Right{} -> flushRequests wlDisplay >>= \case
-                Left end -> main end
-                Right pollWrite -> do
-                  let pollfd = if pollWrite then io (threadWaitWrite wlPollFd `race_` threadWaitRead wlPollFd)
-                                            else io (threadWaitRead wlPollFd)
-                  res <- atomically (readTQueue conf.eventQueue) `race` pollfd
-                  res' <- readIncomingEvents wlDisplay
-                  case (res, res') of
-                    (Left ev, _) -> main ev
-                    (_, Left ev) -> main ev
-                    _ -> main MainPoll
+      mainLoop wlDisplay wlPollFd
 
-          main (MainExit s) = do
-            logError $ "(main) Exiting" :# [ "reason" .= s ]
-            void $ userCode config.exitHook
-            io $ rmLoggerSet loggerSet
+mainLoop wlDisplay wlPollFd = do
+  let main MainPoll = do
+        dispatchPending wlDisplay >>= \case
+          Left end -> main end
+          Right{} -> flushRequests wlDisplay >>= \case
+            Left end -> main end
+            Right pollWrite -> do
+              let pollfd = if pollWrite then io (threadWaitWrite wlPollFd `race_` threadWaitRead wlPollFd)
+                                        else io (threadWaitRead wlPollFd)
+              eq <- asks eventQueue
+              res <- atomically (readTQueue eq) `race` pollfd
+              res' <- readIncomingEvents wlDisplay
+              case (res, res') of
+                (Left ev, _) -> main ev
+                (_, Left ev) -> main ev
+                _ -> main MainPoll
+
+      main (MainSignal sig) =
+        case sig of
+          _ -> do
+            logError $ "Exiting (signal)" :# ["signal" .= show sig ]
+            void . userCode =<< asks (exitHook . config)
+            io . rmLoggerSet =<< asks _loggerSet
             exitFailure
 
-          main (MainRestart prog) = do
-            logInfo $ "(main) Restarting" :# [ "program" .= prog ]
-            restart prog
-            logError "(main) restart was not successful!"
-            main MainPoll
+      main (MainExit desc e) = do
+        logError $ "Exiting (exception)" :# [ "description" .= desc, "exception" .= show e ]
+        void . userCode =<< asks (exitHook . config)
+        io . rmLoggerSet =<< asks _loggerSet
+        exitFailure
 
-          main MainSaveToDisk = do
-            void $ runInHS $ userCodeS writeStateToFile
-            main MainPoll
+      main (MainRestart prog) = do
+        logInfo $ "(main) Restarting" :# [ "program" .= prog ]
+        restart prog
+        logError "(main) restart was not successful!"
+        main MainPoll
 
-      logInfo "main: ready"
-      main MainPoll
+      main MainSaveToDisk = do
+        void $ runInHS $ userCodeS writeStateToFile
+        main MainPoll
+
+  logInfo "main: ready"
+  main MainPoll
 
 
 -- Dispatch pending events
@@ -268,20 +280,20 @@ dispatchPending disp = io go where
       Left (_ :: IOError) ->
         try (WL.displayDispatchPending disp) >>= \case
           Right{} -> go
-          Left (e :: IOError) -> return $ Left $ MainExit $ "error: dispatch pending: " ++ show e
+          Left (e :: IOError) -> return $ Left $ MainExit "dispatch pending" $ toException e
 
 -- Process incoming events
 readIncomingEvents disp =
   try (WL.displayReadEvents disp) >>= \case
     Right{}             -> return $ Right ()
-    Left (e :: IOError) -> return $ Left $ MainExit $ "error: failed to read events: " ++ show e
+    Left (e :: IOError) -> return $ Left $ MainExit "failed to read events" $ toException e
 
 -- Flush outgoing requests
 flushRequests disp =
   try (WL.displayFlush disp) >>= \case
     Right{} -> return $ Right False
     Left e | isFullError e -> return $ Right True
-           | otherwise     -> return $ Left $ MainExit $ "flush failed: " ++ show e
+           | otherwise     -> return $ Left $ MainExit "flush failed" $ toException e
 
 ---------------------------------------------------
 -- event handling
@@ -298,11 +310,11 @@ handleEvent (WindowManagerEvent e) = case e of
 
   R.RiverWindowManagerUnavailable _ wm -> do
     io $ R.objectDestroy wm
-    writeMainEvent $ MainExit "another window manager already running"
+    writeMainEvent $ MainExit "another window manager already running" (toException $ ExitFailure 1)
 
   R.RiverWindowManagerFinished _ wm -> do
     io $ R.objectDestroy wm
-    writeMainEvent $ MainExit "river_window_manager_v1 finished, exiting."
+    writeMainEvent $ MainExit "river_window_manager_v1 finished, exiting." (toException $ ExitFailure 1)
 
   R.RiverWindowManagerOutput _ _ out -> Outputs.added out
   R.RiverWindowManagerWindow _ _ w -> Windows.added w

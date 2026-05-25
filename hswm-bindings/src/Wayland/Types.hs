@@ -16,13 +16,14 @@ module Wayland.Types (
   ObjectName,
   IsWlObject(..),
   HasDestructor(..),
-  InterfaceType,
   HasInterface(..),
   HasListener(..),
   IsUserData(..),
   -- * Re-exports
   module ReExports,
   ) where
+
+import           Bindings.Wayland.Util.Generated (Wl_interface)
 
 import           Control.Monad.IO.Class
 import           Data.Kind (Type)
@@ -60,14 +61,11 @@ class Typeable object => HasDestructor (object :: Type) where
 
   objectDestroy :: object -> IO ()
 
--- | The interface's type, always 'Wl_interface'
-type family InterfaceType object :: Type
-
 -- | Wayland objects that have interface (e.g. for global registry).
 class IsWlObject object => HasInterface (object :: Type) where
 
   -- | The interface global (constant).
-  objectInterface :: Proxy object -> ConstPtr (InterfaceType object)
+  objectInterface :: Proxy object -> ConstPtr Wl_interface
 
   -- | Name of this interface (e.g. in global registry).
   objectInterfaceName :: Proxy object -> String

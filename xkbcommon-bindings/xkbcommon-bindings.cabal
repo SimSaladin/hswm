@@ -41,7 +41,7 @@ common language
     PatternSynonyms
 
 flag pkgconfig
-  description: Use pkg-config to find xkbcommon headers
+  description: Use pkg-config to find external library dependencies
   default: False
 
 library
@@ -72,10 +72,10 @@ library
     build-tool-depends:
        hsc2hs:hsc2hs
 
-    extra-libraries: xkbcommon, xkbregistry
-
     if flag(pkgconfig)
-      pkgconfig-depends: xkbcommon
+      pkgconfig-depends: xkbcommon, xkbregistry
+    else
+      extra-libraries: xkbcommon, xkbregistry
 
     if !os(linux)
       buildable: False

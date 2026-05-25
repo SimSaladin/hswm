@@ -1,8 +1,8 @@
 module Bindings.Wayland.FractionalScaleV1 where
 
-import Bindings.Wayland.FractionalScaleV1.Generated
-import Bindings.Wayland.FractionalScaleV1.Generated.Global
-import Bindings.Wayland.FractionalScaleV1.Generated.Safe
+import Bindings.Wayland.FractionalScale.V1.Client.Generated
+import Bindings.Wayland.FractionalScale.V1.Client.Generated.Global
+import Bindings.Wayland.FractionalScale.V1.Client.Generated.Safe
 
 import Bindings.Wayland.Client (Surface(..))
 

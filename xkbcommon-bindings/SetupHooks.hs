@@ -12,18 +12,18 @@
 module SetupHooks (setupHooks) where
 
 import           Distribution.Compat.Binary
-import           Distribution.ModuleName (ModuleName, toFilePath)
+import           Distribution.ModuleName (ModuleName)
 import           Distribution.Pretty (prettyShow)
-import           Distribution.Simple.Build (AutogenFile(..), writeAutogenFiles)
 import           Distribution.Simple.LocalBuildInfo (withPrograms)
 import           Distribution.Simple.Program (gccProgram, programInvocation, requireProgram)
 import           Distribution.Simple.Program.Run (getProgramInvocationOutputAndErrors)
 import           Distribution.Simple.SetupHooks
-import           Distribution.Simple.Utils (die', notice, toUTF8LBS, withTempFile)
+import           Distribution.Simple.Utils (die', noticeNoWrap, withTempFile, rewriteFileEx)
 import           Distribution.Utils.IOData (IOData(..), hPutContents)
-import           Distribution.Utils.Path (makeRelativePathEx, (<.>))
+import           Distribution.Utils.Path
 
 import           Control.Monad
+import           Control.Monad.IO.Class
 import           Data.Char
 import           Data.Function
 import qualified Data.List as L
@@ -35,60 +35,64 @@ import           Text.Printf
 setupHooks :: SetupHooks
 setupHooks = mempty
   { buildHooks = mempty
-    { preBuildComponentRules = Just $ rules (static ()) preBuildHook }
+    { preBuildComponentRules = Just myRules }
   }
 
-preBuildHook :: PreBuildComponentInputs -> RulesM ()
-preBuildHook PreBuildComponentInputs{buildingWhat=flags, localBuildInfo=lbi, targetInfo=tgt}
-  | CLibName LMainLibName <- componentName tgt.targetComponent
-  = do
-    let autogendir = autogenComponentModulesDir lbi tgt.targetCLBI
-        mkRule gen = staticRule (action (buildingWhatVerbosity flags, lbi, tgt.targetCLBI, gen)) []
-          [Location autogendir (makeRelativePathEx (toFilePath gen.sModule) <.> "hs")]
+myRules :: Rules PreBuildComponentInputs
+myRules = rules (static ()) $ \PreBuildComponentInputs{buildingWhat=flags, localBuildInfo=lbi, targetInfo=tgt} ->
+  case componentName tgt.targetComponent of
+    CLibName LMainLibName -> do
+      let verb = buildingWhatVerbosity flags
+      (gcc, _) <- liftIO $ requireProgram verb gccProgram (withPrograms lbi)
+      let autogendir = autogenComponentModulesDir lbi tgt.targetCLBI
+          mkRule gen =
+            let loc = Location autogendir $ moduleNameSymbolicPath gen.sModule <.> "hs"
+             in staticRule (action (verb, gcc, gen, loc)) [] [loc]
 
-    -- system package "libxkbcommon"
-    registerRule_ "keysyms" $ mkRule GenerateModule
-        { sModule      = "Text.XkbCommon.KeySyms"
-        , sImports     = [ "Text.XkbCommon.KeySym (KeySym)" ]
-        , sType        = "KeySym"
-        , sHeader      = "xkbcommon/xkbcommon-keysyms.h"
-        , sExtra       = ""
-        , sHsNameMod   = NmAddPrefix "key_" $ NmStripPrefix "XKB_KEY_" NmId
-        , sLookupFn    = Nothing
-        , sGroupBy     = Nothing
-        }
+      -- system package "libxkbcommon"
+      registerRule_ "keysyms" $ mkRule GenerateModule
+          { sModule      = "Text.XkbCommon.KeySyms"
+          , sImports     = [ "Text.XkbCommon.KeySym (KeySym)" ]
+          , sType        = "KeySym"
+          , sHeader      = "xkbcommon/xkbcommon-keysyms.h"
+          , sExtra       = ""
+          , sHsNameMod   = NmAddPrefix "key_" $ NmStripPrefix "XKB_KEY_" NmId
+          , sLookupFn    = Nothing
+          , sGroupBy     = Nothing
+          }
 
-    -- system package "linux-headers"
-    registerRule_ "eventcodes" $ mkRule GenerateModule
-        { sModule      = "Text.XkbCommon.EventCodes"
-        , sImports     = [ "Data.Word (Word32)" ]
-        , sType        = "Word32"
-        , sHeader      = "linux/input-event-codes.h"
-        , sExtra       = ""
-        , sHsNameMod   = NmSnakeCase NmId
-        --, sHsNameMod   = NmToLowerHead NmId
-        , sLookupFn    = Just "fromEventCode"
-        , sGroupBy     = Just '_'
-        }
+      -- system package "linux-headers"
+      registerRule_ "eventcodes" $ mkRule GenerateModule
+          { sModule      = "Text.XkbCommon.EventCodes"
+          , sImports     = [ "Data.Word (Word32)" ]
+          , sType        = "Word32"
+          , sHeader      = "linux/input-event-codes.h"
+          , sExtra       = ""
+          , sHsNameMod   = NmSnakeCase NmId
+          --, sHsNameMod   = NmToLowerHead NmId
+          , sLookupFn    = Just "fromEventCode"
+          , sGroupBy     = Just '_'
+          }
 
-  | otherwise = return ()
+    _ -> return ()
 
-      where
-        action = mkCommand (static Dict) $ static \(verb, lbi, clbi, gen) -> do
-          notice verb $ "Processing: " ++ gen.sHeader
-          defines <- getDefines verb lbi gen
-          writeAutogenFiles verb lbi clbi [(AutogenModule gen.sModule "hs", toUTF8LBS defines)]
+  where
+    action = mkCommand (static Dict) $ static \(verb, gcc, gen, loc) -> do
+      let modFile = interpretSymbolicPathCWD $ location loc
+      noticeNoWrap verb $ "Processing: " ++ gen.sHeader
+      defines <- getDefines verb gcc gen
+      rewriteFileEx verb modFile defines
 
 data GenerateModule = GenerateModule
   { sModule       :: ModuleName -- ^ output module name
   , sImports      :: [String] -- ^ modules to import
   , sType         :: String -- ^ Type of forward bindings E.g. @''Word32@
   , sHeader       :: String -- ^ Header file. @foobar.h@
-  , sExtra        :: String
+  , sExtra        :: String -- ^ Additional lines added to the module
   , sHsNameMod    :: NameModifier
   , sLookupFn     :: Maybe String
   , sGroupBy      :: Maybe Char
-  } deriving (Show, Generic, Binary)
+  } deriving (Eq, Show, Generic, Binary)
 
 data NameModifier
   = NmId
@@ -96,7 +100,7 @@ data NameModifier
   | NmAddPrefix String NameModifier
   | NmSnakeCase NameModifier
   | NmToLowerHead NameModifier
-  deriving (Show, Generic, Binary)
+  deriving (Eq, Show, Generic, Binary)
 
 applyNameModifier :: NameModifier -> String -> String
 applyNameModifier = go where
@@ -112,9 +116,9 @@ applyNameModifier = go where
         | otherwise = toLower x : snakeCase False xs
       snakeCase _ [] = []
 
-getDefines :: Verbosity -> LocalBuildInfo -> GenerateModule -> IO String
-getDefines verb lbi gen = do
-  headerFile <- resolveHeader verb lbi gen.sHeader
+getDefines :: Verbosity -> ConfiguredProgram -> GenerateModule -> IO String
+getDefines verb gcc gen = do
+  headerFile <- resolveHeader verb gcc gen.sHeader
   content <- parseHeader gen headerFile
   return $! unlines $
       [ "{-# LANGUAGE CApiFFI #-}"
@@ -159,7 +163,7 @@ data Define = Define
   , cComment :: Maybe String
   , hsName   :: String
   , hsType   :: String
-  } deriving (Show, Generic, Binary)
+  } deriving (Eq, Show, Generic)
 
 parseHeader :: GenerateModule -> FilePath -> IO [Define]
 parseHeader gen hdr = do
@@ -187,29 +191,28 @@ parseHeader gen hdr = do
     getDoc1          [] = []
 
 -- | Given a header file, find the absolute path to it.
-resolveHeader :: Verbosity -> LocalBuildInfo -> FilePath -> IO FilePath
-resolveHeader verb lbi hdr = do
-  (gcc, _) <- requireProgram verb gccProgram (withPrograms lbi)
+resolveHeader :: Verbosity -> ConfiguredProgram -> FilePath -> IO FilePath
+resolveHeader verb gcc hdr = do
   let prog = unlines
         [ "#include <" ++ hdr ++ ">"
         , "int main(int argc, char** argv) { return 0; }"
         ]
-  withTempCProgram prog $ \fp -> do
+  withTempFileContents "test.c" prog $ \fp -> do
     (_, gccErr, ec) <- getProgramInvocationOutputAndErrors verb $ programInvocation gcc ["-H", "-fsyntax-only", fp]
     unless (ec == ExitSuccess) $ die' verb $ "gcc returned " ++ show ec ++ ": " ++ gccErr
     headerFile <- case map words $ lines gccErr of
                        (_ : file : _) : _ -> return file
                        _ -> die' verb $ "Failed to locate header file " ++ hdr ++ ": " ++ gccErr
-    notice verb $ "Using header file '" ++ headerFile ++ "' for " ++ hdr
+    noticeNoWrap verb $ "Using header file '" ++ headerFile ++ "' for " ++ hdr
     return headerFile
 
-withTempCProgram :: String -> (FilePath -> IO a) -> IO a
-withTempCProgram contents f =
+withTempFileContents :: FilePath -> String -> (FilePath -> IO a) -> IO a
+withTempFileContents name contents f =
 #if MIN_VERSION_Cabal(3,15,0)
   withTempFile
 #else
   withTempFile "src"
 #endif
-  "test.c" $ \fp h -> do
+  name $ \fp h -> do
       hPutContents h $ IODataText contents
       f fp

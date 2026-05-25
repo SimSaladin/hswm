@@ -1,10 +1,9 @@
 version:
   hs_bindgen: 0.1.0
   binding_specification: '1.0'
-hsmodule: Bindings.River.InputManagementV1.Generated
+hsmodule: Bindings.River.InputManagement.V1.Client.Generated
 ctypes:
 - headers:
-  - river-input-management-v1-client-protocol.h
   - river-libinput-config-v1-client-protocol.h
   - river-xkb-config-v1-client-protocol.h
   cname: struct river_input_device_v1

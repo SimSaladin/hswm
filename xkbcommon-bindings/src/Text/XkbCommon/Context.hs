@@ -132,7 +132,7 @@ contextIncludePathClear ctx =
 
 -- * Internals
 
-foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_context_new"
+foreign import capi safe "xkbcommon/xkbcommon.h xkb_context_new"
   c_new :: CUInt -> IO (Ptr XkbContext)
 
 foreign import capi unsafe "xkbcommon/xkbcommon.h &xkb_context_unref"
@@ -156,16 +156,16 @@ foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_context_num_include_paths"
 foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_context_include_path_clear"
   c_include_path_clear :: Ptr XkbContext -> IO ()
 
-foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_context_include_path_append"
+foreign import capi safe "xkbcommon/xkbcommon.h xkb_context_include_path_append"
   c_include_path_append :: Ptr XkbContext -> ConstPtr CChar -> IO CInt
 
-foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_context_include_path_append_default"
+foreign import capi safe "xkbcommon/xkbcommon.h xkb_context_include_path_append_default"
   c_include_path_append_default :: Ptr XkbContext -> IO CInt
 
 foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_context_include_path_get"
   c_include_path_get :: Ptr XkbContext -> CUInt -> IO (ConstPtr CChar)
 
-foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_context_include_path_reset_defaults"
+foreign import capi safe "xkbcommon/xkbcommon.h xkb_context_include_path_reset_defaults"
   c_include_path_reset_defaults :: Ptr XkbContext -> IO CInt
 
 --foreign import capi unsafe "xkb_context_set_log_fn"

@@ -16,7 +16,6 @@ module Wayland
   ( IsWlObject(..)
   , HasDestructor(..)
   , HasInterface(..)
-  , InterfaceType
   , Version
   , ObjectName
   , getObjectId
@@ -430,8 +429,8 @@ import Wayland.Types
 import           Bindings.Wayland.Util
 import           Bindings.Wayland.Client hiding (shmCreatePool)
 import qualified Bindings.Wayland.Client as Client
-import qualified Bindings.Wayland.Client.Generated as Client.G
-import qualified Bindings.Wayland.Client.Generated.Unsafe as C.Unsafe
+import qualified Bindings.Wayland.Core.Client.Generated as Client.G
+import qualified Bindings.Wayland.Core.Client.Generated.Unsafe as C.Unsafe
 
 import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import           UnliftIO
@@ -909,7 +908,6 @@ initRegistryState registrySettings disp = do
 bindGlobal :: forall a m.
   ( MonadIO m
   , HasInterface a
-  , InterfaceType a ~ Wl_interface
   ) => RegistryState
     -> Maybe ObjectName -- ^ Bind to specific object (name)
     -> Maybe Version -- ^ Request a specific version. The final version is smallest of this and the reported version
@@ -926,7 +924,6 @@ bindGlobal st reqName reqVersion = liftIO $ L.find check <$> readIORef st.global
 registryBindObject :: forall a m.
   ( MonadIO m
   , HasInterface a
-  , InterfaceType a ~ Wl_interface
   ) => RegistryState -> ObjectName -> Version -> m a
 {-# INLINE registryBindObject #-}
 registryBindObject st name maxVersion = do

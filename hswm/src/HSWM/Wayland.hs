@@ -21,7 +21,6 @@ bindGlobalWith :: forall a env m.
   ( HasGlobals env m
   , WL.IsWlObject a
   , WL.HasInterface a
-  , WL.InterfaceType a ~ WL.Wl_interface
   ) => WL.ObjectName -> Maybe WL.Version -> m a
 bindGlobalWith name mver = do
   regState <- asks (view globalsRegistryL) >>= readMVar
@@ -31,7 +30,6 @@ bindGlobalAuto_ :: forall a env m.
   ( HasGlobals env m
   , WL.IsWlObject a
   , WL.HasInterface a
-  , WL.InterfaceType a ~ WL.Wl_interface
   ) => m a
 bindGlobalAuto_ = do
   regState <- asks (view globalsRegistryL) >>= readMVar
@@ -43,7 +41,6 @@ bindGlobalAuto :: forall a env m.
   , WL.IsWlObject a
   , WL.HasInterface a
   , WL.HasListener a
-  , WL.InterfaceType a ~ WL.Wl_interface
   ) => [(ConstPtr (WL.ObjectListener a), Ptr ())] -> m a
 bindGlobalAuto xs = do
   regState <- asks (view globalsRegistryL) >>= readMVar
@@ -58,7 +55,6 @@ bindGlobalAuto' :: forall a env m.
   , WL.IsWlObject a
   , WL.HasInterface a
   , WL.HasListener a
-  , WL.InterfaceType a ~ WL.Wl_interface
   ) => m a
 bindGlobalAuto' = do
   regState <- asks (view globalsRegistryL) >>= readMVar

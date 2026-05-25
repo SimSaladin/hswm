@@ -26,9 +26,8 @@ import qualified River as R
 
 import           River.WindowManagement (RiverWindow, RiverSeat, RiverOutput, RiverNode)
 
-import           Bindings.River (RiverColor)
 import qualified Bindings.River as R
-import qualified Bindings.River.WindowManagementV1.Generated as R
+import qualified Bindings.River.WindowManagement.V1.Client.Generated as R
 import qualified Bindings.Wlr.OutputPowerManagementUnstableV1 as Wlr
 
 import           Control.Monad.Fix
@@ -48,8 +47,8 @@ data HSWMConfig m l = HSWMConfig
   , pointerBindings :: [((String, Button), SomeAction m)]
   , defaultModMask  :: !String
   , borderWidth     :: !Int32
-  , normalBorder    :: !RiverColor
-  , focusedBorder   :: !RiverColor
+  , normalBorder    :: !R.RiverColor
+  , focusedBorder   :: !R.RiverColor
   , borderEdges     :: !Int32
   , startupHook     :: !(m ())
   , exitHook        :: !(m ())
@@ -424,7 +423,7 @@ data Window = Window
   , minimized                :: !Bool
 
   , p_manage_action          :: [WindowManageAction]
-  , p_render_border          :: Maybe RiverColor
+  , p_render_border          :: Maybe R.RiverColor
   , p_render_pos             :: Maybe (Int32, Int32)
   , p_render_place_top       :: Maybe Bool
   , p_set_visible            :: Maybe Bool

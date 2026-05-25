@@ -23,10 +23,10 @@ import qualified River as R
 import qualified Wayland as WL
 import qualified Pixman as P
 
-import           Bindings.River (RiverColor(..))
-import qualified Bindings.River.WindowManagementV1.Generated as R
+import           River (RiverColor(..))
+import qualified Bindings.River.WindowManagement.V1.Client.Generated as R
 
-import qualified Bindings.Wayland.Client.Generated as WL
+import qualified Bindings.Wayland.Core.Client.Generated as WL
 
 import           Data.Bits
 import           Data.Char (toLower)

@@ -23,7 +23,7 @@ import qualified Wayland as WL
 import qualified River as R
 
 import qualified Bindings.River as R
-import qualified Bindings.River.WindowManagementV1.Generated as R
+import qualified Bindings.River.WindowManagement.V1.Client.Generated as R
 import qualified Bindings.Wayland.ExtIdleNotifyV1 as Ext
 
 import           Data.Bits

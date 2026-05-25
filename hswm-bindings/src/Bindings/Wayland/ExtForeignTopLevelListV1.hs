@@ -1,8 +1,8 @@
 module Bindings.Wayland.ExtForeignTopLevelListV1 where
 
-import Bindings.Wayland.ExtForeignToplevelListV1.Generated
-import Bindings.Wayland.ExtForeignToplevelListV1.Generated.Global
-import Bindings.Wayland.ExtForeignToplevelListV1.Generated.Safe
+import Bindings.Wayland.ExtForeignToplevelList.V1.Client.Generated
+import Bindings.Wayland.ExtForeignToplevelList.V1.Client.Generated.Global
+import Bindings.Wayland.ExtForeignToplevelList.V1.Client.Generated.Safe
 
 import Bindings.Wayland.Client ()
 

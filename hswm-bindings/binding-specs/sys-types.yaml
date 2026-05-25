@@ -1,0 +1,23 @@
+version:
+  hs_bindgen: 0.1.0
+  binding_specification: '1.0'
+hsmodule: System.Posix
+ctypes:
+- headers: &headers
+    - sys/types.h
+  cname: gid_t
+  hsname: GroupID
+- cname: uid_t
+  hsname: UserID
+  headers: *headers
+- cname: pid_t
+  hsname: ProcessID
+  headers: *headers
+
+hstypes:
+  - hsname: GroupID
+    representation: typealias
+  - hsname: UserID
+    representation: typealias
+  - hsname: ProcessID
+    representation: typealias

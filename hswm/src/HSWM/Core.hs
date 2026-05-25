@@ -31,8 +31,8 @@ import HSWM.Types.WM
 import HSWM.Util.Types
 import HSWM.XKB hiding (LogLevel(..))
 
+import qualified River as R
 import qualified River.WindowManagement as WM
-import qualified Bindings.River as R
 
 import Control.Monad.State
 import GHC.Stack

@@ -1,6 +1,4 @@
 {-# LANGUAGE DefaultSignatures    #-}
-{-# LANGUAGE MagicHash            #-}
-{-# LANGUAGE RecordWildCards      #-}
 {-# LANGUAGE RoleAnnotations      #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ViewPatterns         #-}
@@ -17,6 +15,17 @@
 --
 module Bindings.Wayland.Util
   (
+  -- * Arrays
+  Array(..),
+  arrayNew,
+  arrayFromList,
+  arrayToList,
+  printArray,
+  arrayFree,
+  arrayCopy,
+  arrayAddBytes,
+  arrayForEach,
+
   -- * Lists
   List(..),
   ListOf(..),
@@ -37,19 +46,8 @@ module Bindings.Wayland.Util
   listRemove,
   listInsertList,
 
-  TestElem(..),
-  testList,
-
-  -- * Arrays
-  Array(..),
-  arrayInit,
-  arrayFree,
-  arrayCopy,
-  arrayAdd,
-  arrayForEach,
-
   -- * Fixed-point numbers
-  Fixed,
+  Fixed(..),
   fixedToDouble,
   fixedFromDouble,
   fixedToInt,
@@ -71,14 +69,12 @@ module Bindings.Wayland.Util
 import           Bindings.Wayland.Util.Generated
 import qualified Bindings.Wayland.Util.Generated.Unsafe as U
 
-import           Wayland.Internal.TH.NewType
-import           Wayland.Types
-
 import qualified HsBindgen.Runtime.HasCField as CF
 import           UnliftIO
 
 import           Control.Monad
 import           Data.Coerce
+import           Data.Default
 import           Data.Kind
 import           Data.Proxy
 import           Foreign
@@ -87,35 +83,57 @@ import           Foreign.C.Types
 import           GHC.Generics
 import           GHC.Records
 import           System.IO.Unsafe
-import Data.Default
+import qualified Data.Fixed as F
 
--- | Orphan instance
-type instance InterfaceType a = Wl_interface
+-- | Dynamic array
+--
+-- A wl_array is a dynamic array that can only grow until released. It is
+-- intended for relatively small allocations whose size is variable or not known
+-- in advance. While construction of a wl_array does not require all elements to
+-- be of the same size, wl_array_for_each() does require all elements to have
+-- the same type and size.
+newtype Array (a :: k) = Array { unwrap :: Ptr Wl_array }
+  deriving stock (Eq, Ord, Show, Generic)
 
-renderNewType "Array" ''Wl_array ""
+-- | Initializes a new empty array.
+arrayNew :: MonadIO m => m (Array a)
+arrayNew = liftIO $ Array <$> new (Wl_array 0 0 nullPtr)
 
-instance Default Array where
-  def = Array nullPtr
+arrayFromList :: forall a m. (MonadIO m, Storable a) => [a] -> m (Array a)
+arrayFromList xs = liftIO $ do
+  arr <- arrayNew
+  ptr <- arrayAddBytes arr $ length xs * sizeOf (undefined :: a)
+  pokeArray ptr xs
+  return arr
 
-arrayInit :: MonadIO m => Array -> m ()
-arrayInit (Array arr) = liftIO $ U.wl_array_init arr
+arrayToList :: (Storable a, MonadIO m) => Array a -> m [a]
+arrayToList arr = arrayForEach arr return
 
-arrayFree :: MonadIO m => Array -> m ()
-arrayFree (Array arr) = liftIO $ U.wl_array_release arr
+printArray :: MonadIO m => Array a -> m ()
+printArray (Array p) = liftIO $ do
+  arr <- peek p
+  print arr
 
 -- | Increase the size of the array by num bytes.
-arrayAdd :: MonadIO m => Array -> Int -> m (Ptr a)
-arrayAdd (Array arr) size = liftIO $
-  throwIfNull "arrayAdd" $ castPtr <$> U.wl_array_add arr (fromIntegral size)
+--
+-- Returns a pointer to the beginning of the newly appended space.
+arrayAddBytes :: MonadIO m => Array a -> Int -> m (Ptr b)
+arrayAddBytes (Array arr) size = liftIO $
+  throwIfNull "wl_array_add" $ castPtr <$> U.wl_array_add arr (fromIntegral size)
 
-arrayCopy :: MonadIO m => Array -> Array -> m ()
+-- | @arrayCopy array source@: copies the contents of @source@ to @array@.
+arrayCopy :: MonadIO m => Array a -> Array a -> m ()
 arrayCopy (Array dst) (Array src) = liftIO $
-  throwIfNeg_ (\x -> "arrayCopy: " ++ show x) $ U.wl_array_copy dst src
+  throwIfNeg_ (const "wl_array_copy") $ U.wl_array_copy dst src
+
+-- | Releases the array data.
+arrayFree :: MonadIO m => Array a -> m ()
+arrayFree (Array arr) = liftIO $ U.wl_array_release arr
 
 -- | Map over all elements of the array.
 --
 -- Assumes that all elements are equal-size.
-arrayForEach :: forall a b m. (Storable a, MonadIO m) => Array -> (a -> m b) -> m [b]
+arrayForEach :: forall a b m. (Storable a, MonadIO m) => Array a -> (a -> m b) -> m [b]
 arrayForEach (Array arr) f = do
   let dataPP = getField @"data'" arr
       sizeP = getField @"size" arr
@@ -133,8 +151,9 @@ arrayForEach (Array arr) f = do
                     | otherwise  = []
             forM poss $ liftIO . peek >=> f
 
-  pos0 <- liftIO $ peek dataPP
-  go $ castPtr pos0
+  if dataPP == nullPtr
+     then return mempty
+     else liftIO (peek dataPP) >>= go . castPtr
 
 instance Default Wl_list where
   def = Wl_list nullPtr nullPtr
@@ -270,52 +289,46 @@ listSeekForward (List l) = liftIO $ List . next <$> peek l
 listSeekBackward :: MonadIO m => List a -> m (List a)
 listSeekBackward (List l) = liftIO $ List . prev <$> peek l
 
-
-data TestElem = TestElem
-  { field1, field2, field3 :: Int
-  , testLink :: Wl_list
-  } deriving (Eq, Show)
-
-instance Storable TestElem where
-  sizeOf    _ = 3 * sizeOf (0 :: Int) + sizeOf (def :: Wl_list)
-  alignment _ = alignment (0 :: Int)
-  peek p = TestElem
-      <$> peekElemOff (castPtr p) 0
-      <*> peekElemOff (castPtr p) 1
-      <*> peekElemOff (castPtr p) 2
-      <*> peek (castPtr p `plusPtr` (3 * sizeOf (0 :: Int)))
-  poke p x = do
-    pokeElemOff (castPtr p) 0 $ field1 x
-    pokeElemOff (castPtr p) 1 $ field2 x
-    pokeElemOff (castPtr p) 2 $ field3 x
-    poke (castPtr p `plusPtr` (3 * sizeOf (5::Int))) $ testLink x
-
-instance CF.HasCField TestElem "link" where
-
-  type CFieldType TestElem "link" = Wl_list
-
-  offset# _ _ = sizeOf (0 :: Int) * 3
-
-testList :: IO (List TestElem)
-testList = do
-  list <- listNew
-  listInsert list =<< new (TestElem 5 2 3 def)
-  listInsert list =<< new (TestElem 1 2 3 def)
-  return list
-
 -- * Fixed
 
 -- | Fixed-point number
-type Fixed = Wl_fixed_t
+--
+-- A 24.8 signed fixed-point number with a sign bit, 23 bits
+-- of integer precision and 8 bits of decimal precision. Consider @wl_fixed_t@
+-- as an opaque struct with methods that facilitate conversion to and from
+-- Double and Int types.
+newtype Fixed = Fixed { unwrap :: Wl_fixed_t }
+  deriving newtype (Eq, Ord)
+  deriving stock (Generic)
+
+instance Show Fixed where
+  show (Fixed (Wl_fixed_t x)) = F.showFixed True (F.MkFixed $ fromIntegral x :: F.Fixed 256)
+
+instance Num Fixed where
+  (Fixed (Wl_fixed_t a)) + (Fixed (Wl_fixed_t b)) = Fixed . Wl_fixed_t $! a + b
+  (Fixed (Wl_fixed_t a)) - (Fixed (Wl_fixed_t b)) = Fixed . Wl_fixed_t $! a - b
+  (Fixed (Wl_fixed_t a)) * (Fixed (Wl_fixed_t b)) = Fixed . Wl_fixed_t $! div (a * b) 256
+  negate (Fixed (Wl_fixed_t x)) = Fixed . Wl_fixed_t $! negate x
+  abs (Fixed (Wl_fixed_t x)) = Fixed . Wl_fixed_t $! abs x
+  signum (Fixed (Wl_fixed_t x)) = Fixed . Wl_fixed_t $! signum x
+  fromInteger = fixedFromInt
+
+instance Real Fixed where
+  toRational (Fixed (Wl_fixed_t a)) = toRational a / 8
+
+instance Fractional Fixed where
+  (Fixed (Wl_fixed_t a)) / (Fixed (Wl_fixed_t b)) = Fixed . Wl_fixed_t $! div (a * 256) b
+  recip (Fixed (Wl_fixed_t a)) = Fixed . Wl_fixed_t $! div (256 * 256) a
+  fromRational r = Fixed . Wl_fixed_t $! round (r * 256)
 
 fixedToInt :: Fixed -> Int
-fixedToInt = unsafePerformIO . fmap fromIntegral . U.wl_fixed_to_int
+fixedToInt (Fixed x) = unsafePerformIO . fmap fromIntegral $ U.wl_fixed_to_int x
 
 fixedFromInt :: Integral a => a -> Fixed
-fixedFromInt = unsafePerformIO . U.wl_fixed_from_int . fromIntegral
+fixedFromInt = unsafePerformIO . fmap Fixed . U.wl_fixed_from_int . fromIntegral
 
 fixedToDouble :: Fixed -> Double
-fixedToDouble = unsafePerformIO . fmap coerce . U.wl_fixed_to_double
+fixedToDouble (Fixed x) = unsafePerformIO . fmap coerce $ U.wl_fixed_to_double x
 
 fixedFromDouble :: Double -> Fixed
-fixedFromDouble = unsafePerformIO . U.wl_fixed_from_double . coerce
+fixedFromDouble = unsafePerformIO . fmap Fixed . U.wl_fixed_from_double . coerce

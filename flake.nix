@@ -1,12 +1,23 @@
 {
   description = "HsWM: XMonad-inspired window manager for Wayland powered by River (compositor/wm protocol)";
 
+  nixConfig = {
+    extra-trusted-public-keys = [
+      "hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ="
+    ];
+    extra-substituters = [
+      "https://cache.iog.io"
+    ];
+  };
+
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
 
     flake-utils.url = "github:numtide/flake-utils";
     flake-parts.url = "github:hercules-ci/flake-parts";
     haskell-flake.url = "github:srid/haskell-flake";
+
+    haskellNix.url = "github:input-output-hk/haskell.nix";
 
     hs-bindgen = {
       url = "github:well-typed/hs-bindgen";
@@ -48,6 +59,14 @@
     };
     hlint = {
       url = "github:ndmitchell/hlint/ghc-9.14.1";
+      flake = false;
+    };
+    ghc-paths = {
+      url = "github:sorki/ghc-paths/srk/cabal317";
+      flake = false;
+    };
+    entropy = {
+      url = "github:haskell/entropy";
       flake = false;
     };
   };
@@ -125,6 +144,7 @@
             # Different one than the one in nixpkgs
             zon2nix = inputs.zon2nix.packages.${system}.zon2nix;
           })
+          inputs.haskellNix.overlay
           inputs.hs-bindgen.overlays.default
         ];
       };
@@ -197,10 +217,10 @@
 
         basePackages = pkgs.haskell.packages.ghc914.extend (self: super: {
 
-          buildHaskellPackages = super.buildHaskellPackages.extend (self: super: {
-            Cabal = self.Cabal_3_16_1_0;
-            Cabal-syntax = self.Cabal-syntax_3_16_1_0;
-          });
+          #buildHaskellPackages = super.buildHaskellPackages.extend (self: super: {
+          #  Cabal = self.Cabal_3_16_1_0;
+          #  Cabal-syntax = self.Cabal-syntax_3_16_1_0;
+          #});
 
           gtk2hs-buildtools = self.buildHaskellPackages.gtk2hs-buildtools;
 
@@ -210,73 +230,39 @@
             gtk2hs-buildtools = self.buildHaskellPackages.gtk2hs-buildtools;
           });
 
-          Cabal = self.Cabal_3_16_1_0;
-          Cabal-syntax = self.Cabal-syntax_3_16_1_0;
+          #Cabal = self.Cabal_3_16_1_0;
+          #Cabal-syntax = self.Cabal-syntax_3_16_1_0;
         });
 
         packages = {
           gtk2hs-buildtools.source = inputs.gtk2hs + "/tools";
+
           # Cabal master
-          Cabal_3_17.source = inputs.cabal + "/Cabal";
-          Cabal-syntax_3_17.source = inputs.cabal + "/Cabal-syntax";
-          cabal-install_3_17.source = inputs.cabal + "/cabal-install";
-          cabal-install-solver_3_17.source = inputs.cabal + "/cabal-install-solver";
-          Cabal-hooks_3_17.source = inputs.cabal + "/Cabal-hooks";
-          Cabal-described.source = inputs.cabal + "/Cabal-described";
-          Cabal-QuickCheck.source = inputs.cabal + "/Cabal-QuickCheck";
-          Cabal-tests.source = inputs.cabal + "/Cabal-tests";
-          Cabal-tree-diff.source = inputs.cabal + "/Cabal-tree-diff";
-          hooks-exe.source = inputs.cabal + "/hooks-exe";
+          #Cabal_3_17.source = inputs.cabal + "/Cabal";
+          #Cabal-syntax_3_17.source = inputs.cabal + "/Cabal-syntax";
+          #cabal-install_3_17.source = inputs.cabal + "/cabal-install";
+          #cabal-install-solver_3_17.source = inputs.cabal + "/cabal-install-solver";
+          #Cabal-hooks_3_17.source = inputs.cabal + "/Cabal-hooks";
+          #Cabal-described.source = inputs.cabal + "/Cabal-described";
+          #Cabal-QuickCheck.source = inputs.cabal + "/Cabal-QuickCheck";
+          #Cabal-tests.source = inputs.cabal + "/Cabal-tests";
+          #Cabal-tree-diff.source = inputs.cabal + "/Cabal-tree-diff";
+          #hooks-exe.source = inputs.cabal + "/hooks-exe";
 
           ghc-tcplugins-extra.source = inputs.ghc-tcplugins-extra; # GHC 9.14
           ghc-typelits-natnormalise.source = inputs.ghc-typelits-natnormalise; # containers 0.8 etc.
           HTTP.source = "4000.5.0";
-
           hlint.source = inputs.hlint;
         };
 
         settings = {
           HTTP.check = false;
-          Cabal-hooks = { self, super, ... }: {
-            custom = p: p.override {
-              Cabal = self.Cabal_3_16_1_0;
-              Cabal-syntax = self.Cabal-syntax_3_16_1_0;
-            };
-          };
-
-          Cabal-hooks_3_17 = { self, super, ... }: {
-            custom = p: p.override {
-              Cabal = self.Cabal_3_17;
-              Cabal-syntax = self.Cabal-syntax_3_17;
-            };
-          };
-
-          Cabal_3_17 = { super, ... }: {
-            custom = p: p.override {
-              process = super.process_1_6_27_0;
-              Cabal-syntax = super.Cabal-syntax_3_17;
-            };
-          };
-
-          cabal-install_3_17 = { self, super, ... }: {
-            custom = p: p.override {
-              cabal-install-solver = self.cabal-install-solver_3_17;
-            };
-          };
-
-          cabal-install-solver_3_17 = { self, ... }: {
-            custom = p: p.override {
-              Cabal = self.Cabal_3_17;
-              Cabal-syntax = self.Cabal-syntax_3_17;
-            };
-          };
-
-          hooks-exe = { self, ... }: {
-            custom = p: p.override {
-              Cabal = self.Cabal_3_17;
-              Cabal-syntax = self.Cabal-syntax_3_17;
-            };
-          };
+          #Cabal-hooks = { self, super, ... }: {
+          #  custom = p: p.override {
+          #    Cabal = self.Cabal_3_16_1_0;
+          #    Cabal-syntax = self.Cabal-syntax_3_16_1_0;
+          #  };
+          #};
 
           ghc-typelits-natnormalise.check = false; # ???
           ghc-typelits-knownnat = { custom = sourceHackageVersion { version = "0.8.4"; hash = "sha256-PyYMUvJ8/miqusNl7+xay8OJqtK1/uHNQEiLr1utieg="; }; };
@@ -295,6 +281,7 @@
           universe-base.jailbreak = true; # base 4.22
           vec.jailbreak = true; # base 4.22
 
+          optparse-generic.jailbreak = true;
           lucid.jailbreak = true;
           singleton-bool.jailbreak = true;
           clay.jailbreak = true;
@@ -312,21 +299,6 @@
             #cabalFlags = {
               #fourmolu = false;
             #};
-          };
-
-          cabal-add = { self, ... }: {
-            jailbreak = true;
-            custom = p: p.override {
-              Cabal = self.Cabal_3_16_1_0;
-              Cabal-syntax = self.Cabal-syntax_3_16_1_0;
-            };
-          };
-
-          cabal-doctest = { self, ... }: {
-            #jailbreak = true;
-            custom = p: p.override {
-              Cabal = self.Cabal_3_16_1_0;
-            };
           };
 
           fourmolu = { self, ... }: {
@@ -380,10 +352,10 @@
             hlint = null;
           };
           extraLibraries = ps: {
-            inherit (ps)
-              Cabal_3_17
-              Cabal-hooks_3_17
-              ;
+            #inherit (ps)
+              #Cabal_3_17
+              #Cabal-hooks_3_17
+            #  ;
           };
         };
 
@@ -459,6 +431,41 @@
             config.packages.waybar-cffi-hs
           ];
         };
+      };
+
+      legacyPackages =
+        let hlib = pkgs.haskell.lib.compose; in
+        {
+        cabal-latest = pkgs.haskell.packages.ghcHEAD.extend (self: super: {
+
+          buildHaskellPackages = super.buildHaskellPackages.override (oBHP: {
+            #ghc = oBHP.ghc.override { enableRelocatedStaticLibs = true; };
+            overrides = self: super: {
+              process = self.process_1_6_28_0;
+              #ghc = self.ghc_9_14_1; # .override { };
+            };
+          });
+
+          #ghc_9_14_1 = self.ghc_9_14_1; # .override { };
+          ghc-paths = hlib.overrideCabal (drv: {
+            revision = null;
+            editedCabalFile = null;
+          }) (self.callCabal2nix "ghc-paths" (builtins.toPath inputs.ghc-paths) { });
+
+          entropy = self.callCabal2nix "entropy" (inputs.entropy) { };
+
+          Cabal-syntax = self.callCabal2nix "Cabal-syntax" (inputs.cabal + "/Cabal-syntax") { };
+          Cabal-hooks = self.callCabal2nix "Cabal-hooks" (inputs.cabal + "/Cabal-hooks") { };
+          Cabal = self.callCabal2nix "Cabal" (inputs.cabal + "/Cabal") { };
+          Cabal-described = self.callCabal2nix "cabal-described" (inputs.cabal + "/cabal-described") { };
+          Cabal-QuickCheck = self.callCabal2nix "cabal-QuickCheck" (inputs.cabal + "/cabal-QuickCheck") { };
+          Cabal-tests = self.callCabal2nix "cabal-tests" (inputs.cabal + "/cabal-tests") { };
+          Cabal-tree-diff = self.callCabal2nix "cabal-tree-diff" (inputs.cabal + "/cabal-tree-diff") { };
+          hooks-exe = self.callCabal2nix "hooks-exe" (inputs.cabal + "/hooks-exe") { };
+          cabal-install = self.callCabal2nix "cabal-install" (inputs.cabal + "/cabal-install") { };
+          cabal-install-solver = self.callCabal2nix "cabal-install-solver" (inputs.cabal + "/cabal-install-solver") { };
+          process = self.process_1_6_28_0;
+        });
       };
 
       devShells = {

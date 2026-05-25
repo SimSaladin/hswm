@@ -1,8 +1,8 @@
 module Bindings.River.XkbConfigV1 where
 
-import Bindings.River.XkbConfigV1.Generated
-import Bindings.River.XkbConfigV1.Generated.Global
-import Bindings.River.XkbConfigV1.Generated.Unsafe
+import Bindings.River.XkbConfig.V1.Client.Generated
+import Bindings.River.XkbConfig.V1.Client.Generated.Global
+import Bindings.River.XkbConfig.V1.Client.Generated.Unsafe
 
 import Bindings.River.InputManagementV1 (RiverInputDevice(..))
 

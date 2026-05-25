@@ -120,7 +120,7 @@ createKeymapFromFd ctx fd size private fmt =
     closeFd fd
     return keymap
     where
-      mmap' = mmap nullPtr (fromIntegral size) protRead (if private then mapPrivate else mapShared) fd 0
+      mmap' = mmap nullPtr size protRead (if private then mapPrivate else mapShared) fd 0
 
 xkbKeymapNewFromCString :: String -> XkbContext -> CString -> XkbKeymapFormat -> IO XkbKeymap
 xkbKeymapNewFromCString loc ctx s fmt =
@@ -131,11 +131,10 @@ xkbKeymapNewFromCString loc ctx s fmt =
 
 -- | Get the compiled keymap as a string.
 keymapAsString :: XkbKeymap -> XkbKeymapFormat -> IO String
-keymapAsString km fmt =
-  withForeignPtr km.unwrap $ \kmPtr ->
-    bracket (get kmPtr) free peekCString
+keymapAsString km fmt = bracket get free peekCString
   where
-    get ptr = _xkbKeymapGetAsString ptr (fromKeymapFormat fmt)
+    get =
+      withForeignPtr km.unwrap (\ptr -> _xkbKeymapGetAsString ptr (fromKeymapFormat fmt))
       >>= xkbThrowIfNull' (KeymapGetAsStringFailed km fmt)
 
 -- | Get the keymap as a string pointed to by a FD.

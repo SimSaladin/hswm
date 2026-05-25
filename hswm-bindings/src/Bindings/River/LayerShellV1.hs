@@ -1,8 +1,8 @@
 module Bindings.River.LayerShellV1 where
 
-import           Bindings.River.LayerShellV1.Generated
-import           Bindings.River.LayerShellV1.Generated.Global
-import           Bindings.River.LayerShellV1.Generated.Unsafe as Unsafe
+import           Bindings.River.LayerShell.V1.Client.Generated
+import           Bindings.River.LayerShell.V1.Client.Generated.Global
+import           Bindings.River.LayerShell.V1.Client.Generated.Unsafe as Unsafe
 
 import           Bindings.River.WindowManagementV1 (RiverOutput(..), RiverSeat(..))
 

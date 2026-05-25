@@ -6,7 +6,6 @@ import qualified HSWM.StackSet as W
 import qualified River as R
 
 import qualified Bindings.River as R
-import qualified Bindings.River.WindowManagementV1.Generated as R ()
 import qualified Bindings.Wlr.OutputPowerManagementUnstableV1 as Wlr
 
 import qualified Control.Monad.State as State

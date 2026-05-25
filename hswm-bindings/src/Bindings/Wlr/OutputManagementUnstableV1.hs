@@ -1,10 +1,8 @@
 module Bindings.Wlr.OutputManagementUnstableV1 where
 
-import Bindings.Wlr.OutputManagementUnstableV1.Generated
-import Bindings.Wlr.OutputManagementUnstableV1.Generated.Global
-import Bindings.Wlr.OutputManagementUnstableV1.Generated.Safe
-
-import Bindings.Wayland.Client (Wl_output_transform(..))
+import Bindings.Wlr.OutputManagement.UnstableV1.Client.Generated
+import Bindings.Wlr.OutputManagement.UnstableV1.Client.Generated.Global
+import Bindings.Wlr.OutputManagement.UnstableV1.Client.Generated.Safe
 
 import Wayland.Internal.TH
 

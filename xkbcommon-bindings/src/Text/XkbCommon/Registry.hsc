@@ -9,7 +9,7 @@
 --
 -- Query for available RMLVO (rules, models, layouts, variants and options).
 --
--- Uses @xkbcommon/xkbregistry.h@
+-- Uses @libxkbregistry@
 --
 module Text.XkbCommon.Registry (
   -- * Create registry
@@ -48,17 +48,17 @@ type ConstCS = ConstPtr CChar
 
 -- | Use "def" to construct the defaults.
 data RegistryOptions = RegistryOptions
-  { ruleSet :: Maybe String
+  { ruleSet :: !(Maybe String)
   -- ^ Load the specified ruleset instead of the default.
-  , noDefaultIncludes :: Bool
+  , noDefaultIncludes :: !Bool
   -- ^ Do not load default include paths.
   --
   -- Default: false
-  , exoticRules :: Bool
+  , exoticRules :: !Bool
   -- ^ Whether to load exotic items.
   --
   -- Default: false
-  , noSecureGetenv :: Bool
+  , noSecureGetenv :: !Bool
   -- ^ Default: false
   , setLogLevel :: Maybe LogLevel
   , extraIncludePaths :: [FilePath]
@@ -91,10 +91,6 @@ data Model = Model
   , popularity  :: !Popularity
   } deriving (Eq, Ord, Generic)
 
-instance Show Model where
-  show mi = "Model \"" ++ mi.name ++ "\" (" ++ mi.description ++ "; vendor: " ++ mi.vendor ++ ")"
-   ++ (if mi.popularity == Exotic then " [exotic]" else "")
-
 data LayoutInfo = LayoutInfo
   { name        :: String
   , variant     :: !(Maybe String)
@@ -104,16 +100,41 @@ data LayoutInfo = LayoutInfo
   , languages   :: [LangCode]
   } deriving (Eq, Ord, Generic)
 
+data OptionGroup = OptionGroup
+  { name           :: String
+  , description    :: String
+  , multi          :: !Bool -- ^ Whether multiple options in this group can be selected simultaneously.
+  , options        :: [OptionInfo]
+  , popularity     :: !Popularity
+  } deriving (Eq, Ord, Generic)
+
+data OptionInfo = OptionInfo
+  { name           :: !String
+  , brief          :: !String
+  , description    :: !String
+  , layoutSpecific :: !Bool
+  , popularity     :: !Popularity
+  } deriving (Eq, Ord, Generic)
+
+-- | If the exotic items are not loaded, all items will have have the standard popularity.
+data Popularity = PopularityStandard
+                | Exotic
+  deriving (Eq, Ord, Show, Read, Generic)
+
+data LangCode = Lang639 String -- ^ ISO 639-3 (@us@)
+              | Lang3166 String -- ^ ISO 3166 (@eng@)
+  deriving (Eq, Ord, Generic)
+
+instance Show Model where
+  show mi = "Model \"" ++ mi.name ++ "\" (" ++ mi.description ++ "; vendor: " ++ mi.vendor ++ ")"
+   ++ (if mi.popularity == Exotic then " [exotic]" else "")
+
 instance Show LayoutInfo where
   show li = "Layout " ++ li.name ++
     maybe "" (\va -> "(" ++ va ++ ")") li.variant ++
     " \"" ++ li.description ++ "\"" ++
     " (" ++ li.brief ++ "; " ++ unwords (map show li.languages) ++ ")" ++
       (if li.popularity == Exotic then " [exotic]" else "")
-
-data LangCode = Lang639 String -- ^ ISO 639-3 (@us@)
-              | Lang3166 String -- ^ ISO 3166 (@eng@)
-  deriving (Eq, Ord, Generic)
 
 instance Show LangCode where
   show (Lang639 x) = x
@@ -124,14 +145,6 @@ instance IsString LangCode where
   fromString s@[_, _, _] = Lang3166 $ map toLower s
   fromString s = error $ "fromString: no parse (LangCode): " ++ s
 
-data OptionGroup = OptionGroup
-  { name           :: String
-  , description    :: String
-  , multi          :: !Bool -- ^ Whether multiple options in this group can be selected simultaneously.
-  , options        :: [OptionInfo]
-  , popularity     :: !Popularity
-  } deriving (Eq, Ord, Generic)
-
 instance Show OptionGroup where
   show og = "OptionGroup " ++ og.name ++
     " \"" ++ og.description ++ "\"" ++
@@ -140,25 +153,12 @@ instance Show OptionGroup where
     "\n" ++
     concatMap (\o -> "  " ++ show o ++ "\n") og.options
 
-data OptionInfo = OptionInfo
-  { name           :: !String
-  , brief          :: !String
-  , description    :: !String
-  , layoutSpecific :: !Bool
-  , popularity     :: !Popularity
-  } deriving (Eq, Ord)
-
 instance Show OptionInfo where
   show oi = "Option " ++ oi.name ++
     " \"" ++ oi.description ++ "\"" ++
     (if oi.brief /= "" then " (" ++ oi.brief ++ ")" else "") ++
     (if oi.layoutSpecific then " [layout-specific]" else "") ++
     (if oi.popularity == Exotic then " [exotic]" else "")
-
--- | If the exotic items are not loaded, all items will have have the standard popularity.
-data Popularity = PopularityStandard
-                | Exotic
-  deriving (Eq, Ord, Show, Read, Generic)
 
 getRulesInfo :: RxkbContext -> IO Registry
 getRulesInfo ctx0 = withForeignPtr ctx0.unwrap $ \ctx' ->
@@ -239,8 +239,8 @@ getRulesInfo ctx0 = withForeignPtr ctx0.unwrap $ \ctx' ->
 
 createRegistryContext :: RegistryOptions -> IO RxkbContext
 createRegistryContext opts = do
-  ctx' <- throwIfNull "createRegistry" $ _rxkbContextNew flags
-  ctx <- RxkbContext <$> newForeignPtr _rxkbContextUnref ctx'
+  ctx' <- throwIfNull "createRegistry" $ c_ctx_new flags
+  ctx <- RxkbContext <$> newForeignPtr c_ctx_unref ctx'
   withForeignPtr ctx.unwrap $ \p -> do
     forM_ opts.setLogLevel $ _rxkbContextSetLogLevel p . displayLogLevel
     forM_ opts.extraIncludePaths $ appendIncludePath p
@@ -275,53 +275,91 @@ rxkbContextParse :: RxkbContext -> String -> IO ()
 rxkbContextParse ctx nm =
   withForeignPtr ctx.unwrap $ \ctx' ->
   withCString nm $ \nm' -> do
-    r <- _rxkbContextParse ctx' nm'
+    r <- c_ctx_parse ctx' nm'
     unless r $ throwIO RxkbContextParseFailed
 
+-- | Parse the default ruleset as configured at build time.
 rxkbContextParseDefault :: RxkbContext -> IO ()
 rxkbContextParseDefault ctx =
   withForeignPtr ctx.unwrap $ \ctx' -> do
-    r <- _rxkbContextParseDefaultRuleset ctx'
+    r <- c_ctx_parse_default_ruleset ctx'
     unless r $ throwIO RxkbContextParseFailed
 
 -- * FFI
 
+-- | Opaque top level library context object.
 newtype RxkbContext = RxkbContext { unwrap :: ForeignPtr RxkbContext }
   deriving newtype (Eq, Ord)
   deriving stock (Generic, Show, Data)
 
+-- | Opaque struct representing an XKB model.
 newtype RxkbModel = RxkbModel { unwrap :: Ptr RxkbModel }
   deriving newtype (Eq, Ord, Storable)
   deriving stock (Generic, Show, Data)
 
+-- | Opaque struct representing an XKB layout, including an optional variant.
+--
+-- Where the variant is _NULL_, the layout is the base layout.
 newtype RxkbLayout = RxkbLayout { unwrap :: Ptr RxkbLayout }
   deriving newtype (Eq, Ord, Storable)
   deriving stock (Generic, Show, Data)
 
+-- | Opaque struct representing an option group.
+--
+-- Option groups divide the individual options into logical groups. Their main purpose is to indicate
+-- whether some options are mutually exclusive or not.
 newtype RxkbOptionGroup = RxkbOptionGroup { unwrap :: Ptr RxkbOptionGroup }
   deriving newtype (Eq, Ord, Storable)
   deriving stock (Generic, Show, Data)
 
+-- | Opaque struct representing an XKB option. Options are grouped inside an option group.
 newtype RxkbOption = RxkbOption { unwrap :: Ptr RxkbOption }
   deriving newtype (Eq, Ord, Storable)
   deriving stock (Generic, Show, Data)
 
--- | ISO 639-3 code (@eng@, etc.)
+-- | Opaque struct representing an ISO 639-3 code (@eng@, etc.)
+--
+-- There is no guarantee that two identical ISO codes share the same struct. You
+-- must not rely on the pointer value of this struct.
 newtype ISO639 = ISO639 { unwrap :: Ptr ISO639 }
   deriving newtype (Eq, Ord, Storable)
   deriving stock (Generic, Show, Data)
 
--- | ISO 3166 Alpha 2 code (@US@, etc.)
+-- | Opaque struct representing an ISO 3166 Alpha 2 code (e.g. `US`, `FR`).
+--
+-- There is no guarantee that two identical ISO codes share the same struct. You
+-- must not rely on the pointer value of this struct.
 newtype ISO3166 = ISO3166 { unwrap :: Ptr ISO3166 }
   deriving newtype (Eq, Ord, Storable)
   deriving stock (Generic, Show, Data)
 
-foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_context_new" _rxkbContextNew :: CUInt -> IO (Ptr RxkbContext)
-foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_context_parse" _rxkbContextParse :: Ptr RxkbContext -> CString -> IO Bool
-foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_context_parse_default_ruleset" _rxkbContextParseDefaultRuleset :: Ptr RxkbContext -> IO Bool
-foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_context_set_log_level" _rxkbContextSetLogLevel :: Ptr RxkbContext -> CUInt -> IO ()
-foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_context_include_path_append" c_rxkb_context_include_path_append :: Ptr RxkbContext -> CString -> IO Bool
-foreign import capi unsafe "xkbcommon/xkbregistry.h &rxkb_context_unref" _rxkbContextUnref :: FunPtr (Ptr RxkbContext -> IO ())
+-- rxkb_context
+
+foreign import capi safe "xkbcommon/xkbregistry.h rxkb_context_new"
+  c_ctx_new :: CUInt -> IO (Ptr RxkbContext)
+
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_context_parse"
+  c_ctx_parse :: Ptr RxkbContext -> CString -> IO Bool
+
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_context_parse_default_ruleset"
+  c_ctx_parse_default_ruleset :: Ptr RxkbContext -> IO Bool
+
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_context_set_log_level"
+  _rxkbContextSetLogLevel :: Ptr RxkbContext -> CUInt -> IO ()
+
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_context_get_log_level"
+  c_rxkb_context_get_log_level :: Ptr RxkbContext -> IO CUInt
+
+foreign import capi safe "xkbcommon/xkbregistry.h rxkb_context_include_path_append"
+  c_rxkb_context_include_path_append :: Ptr RxkbContext -> CString -> IO Bool
+
+foreign import capi safe "xkbcommon/xkbregistry.h rxkb_context_include_path_append_default"
+  c_rxkb_context_include_path_append_default :: Ptr RxkbContext -> IO Bool
+
+foreign import capi unsafe "xkbcommon/xkbregistry.h &rxkb_context_unref"
+  c_ctx_unref :: FunPtr (Ptr RxkbContext -> IO ())
+
+-- rxkb_model
 
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_model_unref"          _rxkbModelUnref          :: Ptr RxkbModel -> IO ()
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_model_first"           _rxkbModelFirst          :: Ptr RxkbContext -> IO RxkbModel
@@ -330,6 +368,8 @@ foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_model_get_name"        
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_model_get_description" _rxkbModelGetDescription :: RxkbModel -> IO ConstCS
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_model_get_popularity"  _rxkbModelGetPopularity  :: RxkbModel -> IO CUInt
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_model_get_vendor"      _rxkbModelGetVendor      :: RxkbModel -> IO ConstCS
+
+-- layout
 
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_layout_unref" _rxkbLayoutUnref                   :: Ptr RxkbLayout -> IO ()
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_layout_first" _rxkbLayoutFirst                    :: Ptr RxkbContext -> IO RxkbLayout
@@ -340,6 +380,8 @@ foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_layout_get_popularity" 
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_layout_get_variant" _rxkbLayoutGetVariant         :: RxkbLayout -> IO ConstCS
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_layout_get_brief" _rxkbLayoutGetBrief             :: RxkbLayout -> IO ConstCS
 
+-- option_group
+
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_option_group_unref" _rxkbOptionGroupUnref                   :: Ptr RxkbOptionGroup -> IO ()
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_option_group_first" _rxkbOptionGroupFirst                    :: Ptr RxkbContext -> IO RxkbOptionGroup
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_option_group_next" _rxkbOptionGroupNext                      :: RxkbOptionGroup -> IO RxkbOptionGroup
@@ -347,6 +389,8 @@ foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_option_group_get_name" 
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_option_group_get_description" _rxkbOptionGroupGetDescription :: RxkbOptionGroup -> IO ConstCS
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_option_group_get_popularity" _rxkbOptionGroupGetPopularity   :: RxkbOptionGroup -> IO CUInt
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_option_group_allows_multiple" _rxkbOptionGroupAllowsMultiple :: RxkbOptionGroup -> IO Bool
+
+-- option
 
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_option_unref" _rxkbOptionUnref                        :: Ptr RxkbOption -> IO ()
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_option_first" _rxkbOptionFirst                         :: RxkbOptionGroup -> IO RxkbOption
@@ -357,10 +401,14 @@ foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_option_get_description"
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_option_get_popularity" _rxkbOptionGetPopularity        :: RxkbOption -> IO CUInt
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_option_is_layout_specific" _rxkbOptionIsLayoutSpecific :: RxkbOption -> IO Bool
 
+-- iso639
+
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_layout_get_iso639_first" _iso639First   :: RxkbLayout -> IO ISO639
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_iso639_code_next" _iso639Next           :: ISO639 -> IO ISO639
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_iso639_code_get_code" _iso639GetCode    :: ISO639 -> IO ConstCS
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_iso639_code_unref" _iso639Unref         :: Ptr ISO639 -> IO ()
+
+-- iso3166
 
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_layout_get_iso3166_first" _iso3166First :: RxkbLayout -> IO ISO3166
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_iso3166_code_next" _iso3166Next         :: ISO3166 -> IO ISO3166
