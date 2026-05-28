@@ -172,25 +172,26 @@ generateBindings :: Verbosity -> ConfiguredProgram -> SymbolicPath Pkg (Dir Sour
 generateBindings verb bindgen path gen@HsBindGen{..} = do
   notice verb $ "Generating bindings " ++ prettyShow moduleName
   runProgram verb bindgen $
-    [ "preprocess" ] ++
-    [ "--create-output-dirs" ] ++
-    [ "--overwrite-files" ] ++
-    [ "--omit-field-prefixes" | Just True <- pure omitFieldPrefixes ] ++
-    [ "--enable-program-slicing" | Just True <- pure programSlicing ] ++
-    [ "--clang-option-before", "-std=" ++ cStandard ] ++
-    [ "--hs-output-dir=" ++ interpretSymbolicPathCWD path ] ++
-    [ "--module=" ++ prettyShow moduleName ] ++
-    [ "--unique-id=" ++ uniqueId ] ++
-    [ "-I" ++ interpretSymbolicPathCWD path ] ++
-    [ "-I" ++ interpretSymbolicPathCWD x | x <- includeDirs ] ++
-    [ "--prescriptive-binding-spec=" ++ interpretSymbolicPathCWD (location file) | BFile file <- prescriptiveBindingSpecs ] ++
-    [ "--gen-binding-spec=" ++ interpretSymbolicPathCWD (path </> genBindingSpec gen.moduleName) ] ++
-    [ "--external-binding-spec=" ++ interpretSymbolicPathCWD (location file) | BFile file <- extBindingSpecs ] ++
-    [ "--external-binding-spec=" ++ interpretSymbolicPathCWD (path </> genBindingSpec mo) | BModule mo <- extBindingSpecs ] ++
-    [ "--select-from-main-header-dirs" | Just True == selectFromMainHeaderDirs ] ++
-    [ "--select-except-deprecated" | Just True /= selectDeprecated ] ++
-    [ "--select-except-by-decl-name=" ++ x | x <- [excludeByDeclName], x /= "" ] ++
-    extraArgs ++ headers
+        [ "-v", show (fromEnum verb) ] ++
+        [ "preprocess" ] ++
+        [ "--create-output-dirs" ] ++
+        [ "--overwrite-files" ] ++
+        [ "--omit-field-prefixes" | Just True <- pure omitFieldPrefixes ] ++
+        [ "--enable-program-slicing" | Just True <- pure programSlicing ] ++
+        [ "--clang-option-before", "-std=" ++ cStandard ] ++
+        [ "--hs-output-dir=" ++ interpretSymbolicPathCWD path ] ++
+        [ "--module=" ++ prettyShow moduleName ] ++
+        [ "--unique-id=" ++ uniqueId ] ++
+        [ "-I" ++ interpretSymbolicPathCWD path ] ++
+        [ "-I" ++ interpretSymbolicPathCWD x | x <- includeDirs ] ++
+        [ "--prescriptive-binding-spec=" ++ interpretSymbolicPathCWD (location file) | BFile file <- prescriptiveBindingSpecs ] ++
+        [ "--gen-binding-spec=" ++ interpretSymbolicPathCWD (path </> genBindingSpec gen.moduleName) ] ++
+        [ "--external-binding-spec=" ++ interpretSymbolicPathCWD (location file) | BFile file <- extBindingSpecs ] ++
+        [ "--external-binding-spec=" ++ interpretSymbolicPathCWD (path </> genBindingSpec mo) | BModule mo <- extBindingSpecs ] ++
+        [ "--select-from-main-header-dirs" | Just True == selectFromMainHeaderDirs ] ++
+        [ "--select-except-deprecated" | Just True /= selectDeprecated ] ++
+        [ "--select-except-by-decl-name=" ++ x | x <- [excludeByDeclName], x /= "" ] ++
+        extraArgs ++ headers
 
 hsBindgenSetupHooks' :: HsBindGenSetup a -> SetupHooks
 hsBindgenSetupHooks' setup = hsBindgenConfigureHooks specs <> mempty

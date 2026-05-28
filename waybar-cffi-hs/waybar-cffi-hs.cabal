@@ -46,7 +46,7 @@ library
   hs-source-dirs: src
   build-depends:
       base                >=4.20   && <5
-    , aeson              ^>=2.2.3
+    , aeson               >=2.2.3  && <2.4
     , bytestring         ^>=0.12.2
     , data-default       ^>=0.8.0
     , monad-logger-aeson ^>=0.4.1

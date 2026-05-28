@@ -47,10 +47,11 @@ library
     hs-source-dirs:
           src
     default-language: GHC2024
-    extra-libraries: pixman-1
 
     if flag(pkgconfig)
         pkgconfig-depends: pixman-1
+    else
+        extra-libraries: pixman-1
 
     if flag(hs-bindgen-build-tool)
        build-tool-depends:

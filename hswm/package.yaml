@@ -66,9 +66,9 @@ __deps:
   - &dep-unliftio unliftio                     ^>=0.2.25
   - &dep-unliftio-core unliftio-core           ^>=0.2.1
   - &dep-monad-logger-aeson monad-logger-aeson ^>=0.4.1
-  - &dep-aeson aeson                               ^>=2.2.3
+  - &dep-aeson aeson                                >=2.2.3    && <2.4
   - &dep-time time                                  >=1.14     && <2.0
-  - &dep-optparse-applicative optparse-applicative ^>=0.18.1
+  - &dep-optparse-applicative optparse-applicative  >=0.18.1   && <0.20
   - &dep-optparse-generic optparse-generic         ^>=1.5
   - &dep-network                     network                     ^>=3.2.8
   - &dep-deepseq                     deepseq                     ^>=1.5.1

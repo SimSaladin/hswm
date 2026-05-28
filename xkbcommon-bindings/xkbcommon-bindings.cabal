@@ -42,7 +42,7 @@ common language
 
 flag pkgconfig
   description: Use pkg-config to find external library dependencies
-  default: False
+  default: True
 
 library
     import: warnings, language

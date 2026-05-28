@@ -18,10 +18,11 @@ import           Distribution.Simple.LocalBuildInfo (withPrograms)
 import           Distribution.Simple.Program (gccProgram, programInvocation, requireProgram)
 import           Distribution.Simple.Program.Run (getProgramInvocationOutputAndErrors)
 import           Distribution.Simple.SetupHooks
-import           Distribution.Simple.Utils (die', noticeNoWrap, withTempFile, rewriteFileEx)
+import           Distribution.Simple.Utils
 import           Distribution.Utils.IOData (IOData(..), hPutContents)
 import           Distribution.Utils.Path
 
+import qualified System.FilePath as FP
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.Char
@@ -81,6 +82,8 @@ myRules = rules (static ()) $ \PreBuildComponentInputs{buildingWhat=flags, local
       let modFile = interpretSymbolicPathCWD $ location loc
       noticeNoWrap verb $ "Processing: " ++ gen.sHeader
       defines <- getDefines verb gcc gen
+      noticeNoWrap verb $ "Writing to: " ++ modFile
+      createDirectoryIfMissingVerbose verb True (FP.takeDirectory modFile)
       rewriteFileEx verb modFile defines
 
 data GenerateModule = GenerateModule

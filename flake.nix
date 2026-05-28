@@ -87,9 +87,7 @@
     perSystem = { system, lib, config, pkgs, ... }@perSys:
     let
       defaultGhc = "ghc914";
-
       hlib = pkgs.haskell.lib.compose;
-
       sourceHackageVersion = { version, hash ? "" }:
         p:
         hlib.overrideCabal (_: { editedCabalFile = null; })
@@ -99,13 +97,9 @@
             url = "mirror://hackage/${oa.pname}-${version}/${oa.pname}-${version}.tar.gz";
             sha256 = hash;
           };
-
-        })) ;
-
+        }));
       haskellProjectBaseWith = ghcVersion: { config, ... }: {
-        imports = [
-          perSys.config.haskellProjects.${ghcVersion}.defaults.projectModules.output
-        ];
+        imports = [ perSys.config.haskellProjects.${ghcVersion}.defaults.projectModules.output ];
         basePackages = perSys.config.haskellProjects.${ghcVersion}.outputs.finalPackages;
         defaults = {
           settings.defined = {
@@ -144,8 +138,10 @@
             # Different one than the one in nixpkgs
             zon2nix = inputs.zon2nix.packages.${system}.zon2nix;
           })
-          inputs.haskellNix.overlay
+
           inputs.hs-bindgen.overlays.default
+
+          inputs.haskellNix.overlay
         ];
       };
 
@@ -165,43 +161,20 @@
             (root + /pixman-bindings)
           ];
         });
-
         defaults = {
           enable = false;
-          projectModules.output = {
-            inherit (config)
-              packages
-              settings
-              devShell
-              ;
-          };
+          projectModules.output = { inherit (config) packages settings devShell; };
         };
-
         settings = {
-          hswm = { ... }: {
-            #separateBinOutput = true;
-          };
-
-          hswm-bindings = { pkgs, ... }: {
-            extraBuildDepends = [ pkgs.wayland-scanner ];
-          };
+          hswm-bindings = { pkgs, ... }: { extraBuildDepends = [ pkgs.wayland-scanner ]; };
           monad-logger-aeson.check = false; # Tests broken
         };
-
         devShell = {
           tools = ps: {
             inherit (ps) hs-bindgen;
-            inherit (pkgs)
-              #river
-              wayland-scanner
-              weston
-              doxygen
-              #libxkbcommon
-              #pixman
-              #gtk3
-              ;
+            inherit (pkgs) wayland-scanner weston doxygen;
           };
-          extraLibraries = ps: { };
+          #extraLibraries = ps: { };
           mkShellArgs.shellHook = ''
             # Ensure that libs are available to TH splices, cabal repl, etc.
             export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${lib.makeLibraryPath [ pkgs.libxkbcommon ]}
@@ -214,41 +187,18 @@
       # GHC 9.14 .. future
       haskellProjects.ghc914 = { pkgs, ... }: {
         defaults.enable = false;
-
         basePackages = pkgs.haskell.packages.ghc914.extend (self: super: {
-
-          #buildHaskellPackages = super.buildHaskellPackages.extend (self: super: {
-          #  Cabal = self.Cabal_3_16_1_0;
-          #  Cabal-syntax = self.Cabal-syntax_3_16_1_0;
-          #});
-
-          gtk2hs-buildtools = self.buildHaskellPackages.gtk2hs-buildtools;
-
-          # XXX: specifying this via packages.glib.source throws infinite
-          # recursion...
-          glib = (pkgs.haskell.lib.compose.overrideSrc { src = inputs.glib; } super.glib).override ({
-            gtk2hs-buildtools = self.buildHaskellPackages.gtk2hs-buildtools;
+          buildHaskellPackages = super.buildHaskellPackages.extend (self: super: {
+            Cabal = self.Cabal_3_16_1_0;
           });
-
-          #Cabal = self.Cabal_3_16_1_0;
-          #Cabal-syntax = self.Cabal-syntax_3_16_1_0;
+          Cabal = self.Cabal_3_16_1_0;
+          gtk2hs-buildtools = self.buildHaskellPackages.gtk2hs-buildtools;
+          # XXX: specifying this via packages.glib.source throws infinite recursion...
+          glib = hlib.overrideSrc { src = inputs.glib; } super.glib;
         });
 
         packages = {
           gtk2hs-buildtools.source = inputs.gtk2hs + "/tools";
-
-          # Cabal master
-          #Cabal_3_17.source = inputs.cabal + "/Cabal";
-          #Cabal-syntax_3_17.source = inputs.cabal + "/Cabal-syntax";
-          #cabal-install_3_17.source = inputs.cabal + "/cabal-install";
-          #cabal-install-solver_3_17.source = inputs.cabal + "/cabal-install-solver";
-          #Cabal-hooks_3_17.source = inputs.cabal + "/Cabal-hooks";
-          #Cabal-described.source = inputs.cabal + "/Cabal-described";
-          #Cabal-QuickCheck.source = inputs.cabal + "/Cabal-QuickCheck";
-          #Cabal-tests.source = inputs.cabal + "/Cabal-tests";
-          #Cabal-tree-diff.source = inputs.cabal + "/Cabal-tree-diff";
-          #hooks-exe.source = inputs.cabal + "/hooks-exe";
-
           ghc-tcplugins-extra.source = inputs.ghc-tcplugins-extra; # GHC 9.14
           ghc-typelits-natnormalise.source = inputs.ghc-typelits-natnormalise; # containers 0.8 etc.
           HTTP.source = "4000.5.0";
@@ -257,13 +207,6 @@
 
         settings = {
           HTTP.check = false;
-          #Cabal-hooks = { self, super, ... }: {
-          #  custom = p: p.override {
-          #    Cabal = self.Cabal_3_16_1_0;
-          #    Cabal-syntax = self.Cabal-syntax_3_16_1_0;
-          #  };
-          #};
-
           ghc-typelits-natnormalise.check = false; # ???
           ghc-typelits-knownnat = { custom = sourceHackageVersion { version = "0.8.4"; hash = "sha256-PyYMUvJ8/miqusNl7+xay8OJqtK1/uHNQEiLr1utieg="; }; };
           ghc-tcplugin-api = { custom = sourceHackageVersion { version = "0.19.0.0"; hash = "sha256-2jm1Q2lmaG6vtRnxcvxf4U2gvQdVkDL0h8PWaTpDWJA="; }; };
@@ -280,7 +223,6 @@
           skew-list.jailbreak = true;
           universe-base.jailbreak = true; # base 4.22
           vec.jailbreak = true; # base 4.22
-
           optparse-generic.jailbreak = true;
           lucid.jailbreak = true;
           singleton-bool.jailbreak = true;
@@ -289,39 +231,23 @@
           tasty-hspec.jailbreak = true;
           binary-orphans.jailbreak = true;
           apply-refact.jailbreak = true;
-
-          haskell-language-server = { self, ... }: {
-            jailbreak = true;
-            custom = p: hlib.disableCabalFlag "fourmolu" (p.override {
-              Cabal = self.Cabal_3_16_1_0;
-              Cabal-syntax = self.Cabal-syntax_3_16_1_0;
-            });
-            #cabalFlags = {
-              #fourmolu = false;
-            #};
-          };
-
+          haskell-language-server = { self, ... }: { jailbreak = true; };
           fourmolu = { self, ... }: {
             jailbreak = true;
             custom = p: p.override {
-              Cabal-syntax = self.Cabal-syntax_3_16_1_0;
               ghc-lib-parser = self.ghc-lib-parser_9_14_1_20251220;
             };
           };
-
           ormolu = { self, ... }: {
             custom = p: (sourceHackageVersion { version = "0.8.1.0"; hash = "sha256-a1g+ococHdfwFYn2ImesdPJ4xwCbyP6ey5zQVYzG2PE="; } p).override {
-              Cabal-syntax = self.Cabal-syntax_3_16_1_0;
               ghc-lib-parser = self.ghc-lib-parser_9_14_1_20251220;
             };
           };
-
           ghc-lib-parser-ex_9_14_2_0 = { self, ... }: {
             custom = p: p.override {
               ghc-lib-parser = self.ghc-lib-parser_9_14_1_20251220;
             };
           };
-
           hlint = { self, ... }: {
             custom = p: p.override {
               ghc-lib-parser = self.ghc-lib-parser_9_14_1_20251220;
@@ -329,7 +255,6 @@
             };
           };
         };
-
         autoWire = [];
       };
 
@@ -339,38 +264,16 @@
           (haskellProjectBaseWith defaultGhc)
           perSys.config.haskellProjects.hswm.defaults.projectModules.output
         ];
-
-        defaults = {
-          settings.defined = {
-            #haddock = true;
-          };
-        };
-
+        defaults = { settings.defined = { }; };
         devShell = {
           tools = ps: {
             haskell-language-server = null; # broken
             hlint = null;
           };
-          extraLibraries = ps: {
-            #inherit (ps)
-              #Cabal_3_17
-              #Cabal-hooks_3_17
-            #  ;
-          };
+          #extraLibraries = ps: { };
         };
-
         autoWire = lib.mkForce [ "devShells" "packages" "apps" "checks" ];
       };
-
-      # GHC 9.12
-      #haskellProjects.ghc912 = {
-      #  defaults.enable = false;
-      #  basePackages = pkgs.haskell.packages.ghc912;
-      #  settings = {
-      #    monad-logger-aeson.check = false; # Tests broken
-      #  };
-      #  autoWire = [];
-      #};
 
       ## GHC 9.12 with -fPIC (static shared objects)
       #haskellProjects.ghc912-reloc = {
@@ -383,31 +286,14 @@
       #  lib.mapAttrs (_: pkg: if pkg ? getCabalDeps
       #    then pkgs.haskell.lib.compose.appendBuildFlag "--ghc-options=-fPIC" pkg
       #    else pkg) super);
-
-      #  defaults = {
-      #    enable = false;
-      #    settings.defined = {
-      #      haddock = false;
-      #      extraConfigureFlags = [ "--ghc-options=-fPIC" ];
-      #    };
-      #  };
-
-      #  settings = {
-      #    monad-logger-aeson.check = false; # Tests broken
-      #  };
-
-      #  autoWire = [];
+      #  defaults.enable = false;
+      #  defaults.settings.defined.extraConfigureFlags = [ "--ghc-options=-fPIC" ];
       #};
-
+      #
       # Default set with -fPIC
       #haskellProjects.default-ghc912-reloc = {
       #  imports = [ (haskellProjectBaseWith "ghc912-reloc") ];
-      #  projectRoot = cabalProjectRoot;
-      #  defaults = {
-      #    settings.defined.haddock = lib.mkForce false;
-      #    settings.all.extraConfigureFlags = [ "--ghc-options=-fPIC" ];
-      #  };
-      #  autoWire = lib.mkForce [ "packages" "apps" ];
+      #  defaults.settings.all.extraConfigureFlags = [ "--ghc-options=-fPIC" ];
       #};
 
       packages = {
@@ -417,12 +303,6 @@
         # With debug enabled
         riverDebug = pkgs.river.override { withDebug = true; };
 
-        ormolu = config.haskellProjects.default.outputs.finalPackages.ormolu;
-        hlint = config.haskellProjects.default.outputs.finalPackages.hlint;
-        ghcid = config.haskellProjects.default.outputs.finalPackages.ghcid;
-        fourmolu = config.haskellProjects.default.outputs.finalPackages.fourmolu;
-        hls = config.haskellProjects.default.outputs.finalPackages.haskell-language-server;
-
         default = pkgs.buildEnv {
           pname = "hswm-full";
           version = "0.1.0";
@@ -431,44 +311,108 @@
             config.packages.waybar-cffi-hs
           ];
         };
-      };
+      } // config.legacyPackages.hnix-flake.packages;
 
       legacyPackages =
-        let hlib = pkgs.haskell.lib.compose; in
-        {
-        cabal-latest = pkgs.haskell.packages.ghcHEAD.extend (self: super: {
+        rec {
+          hnix = pkgs.haskell-nix.cabalProject ({...}: {
+            src = ./.;
+            compiler-nix-name = "ghc914";
 
-          buildHaskellPackages = super.buildHaskellPackages.override (oBHP: {
-            #ghc = oBHP.ghc.override { enableRelocatedStaticLibs = true; };
-            overrides = self: super: {
-              process = self.process_1_6_28_0;
-              #ghc = self.ghc_9_14_1; # .override { };
-            };
+            modules = [({lib, config, pkgs, ...}: {
+              packages.glib.components.setup.depends = lib.mkForce [
+                config.hsPkgs."gtk2hs-buildtools-0.13.12.0"
+              ];
+
+              packages.c-expr-dsl = {
+                components.library.build-tools = [
+                  config.ghc.package.llvmPackages.llvm
+                  config.ghc.package.llvmPackages.clang
+                  config.ghc.package.llvmPackages.libclang
+                ];
+              };
+
+              packages.libclang-bindings = {
+                components.library.build-tools = [
+                  config.ghc.package.llvmPackages.llvm
+                  config.ghc.package.llvmPackages.clang
+                  config.ghc.package.llvmPackages.libclang
+                ];
+              };
+
+              packages.hs-bindgen = {
+                components.library.build-tools = [
+                  config.ghc.package.llvmPackages.llvm
+                  config.ghc.package.llvmPackages.clang
+                  config.ghc.package.llvmPackages.libclang
+                ];
+                components.sublibs.internal.build-tools = [
+                  config.ghc.package.llvmPackages.llvm
+                  config.ghc.package.llvmPackages.clang
+                  config.ghc.package.llvmPackages.libclang
+                ];
+                components.exes.hs-bindgen-cli.build-tools = [
+                  config.ghc.package.llvmPackages.llvm
+                  config.ghc.package.llvmPackages.clang
+                  config.ghc.package.llvmPackages.libclang
+                ];
+              };
+
+              packages.hswm = {
+                components.library.build-tools = [
+                  config.ghc.package.llvmPackages.llvm
+                  config.ghc.package.llvmPackages.clang
+                  config.ghc.package.llvmPackages.libclang
+                ];
+                components.exes.hswm.build-tools = [
+                  config.ghc.package.llvmPackages.llvm
+                  config.ghc.package.llvmPackages.clang
+                ];
+              };
+
+              packages.pixman-bindings = {
+                flags.hs-bindgen-build-tool = lib.mkForce true;
+                components.library.build-tools = [
+                  pkgs.hs-bindgen-cli
+                  pkgs.hsBindgenHook
+                  config.ghc.package.llvmPackages.llvm
+                  config.ghc.package.llvmPackages.clang
+                  config.ghc.package.llvmPackages.libclang
+                ];
+                components.library.libs = [ pkgs.pixman ];
+                components.setup.build-tools = [
+                  config.ghc.package.llvmPackages.llvm
+                  config.ghc.package.llvmPackages.clang
+                  config.ghc.package.llvmPackages.libclang
+                ];
+              };
+
+              packages.hswm-bindings = {
+                flags.hs-bindgen-build-tool = lib.mkForce true;
+                components.library.configureFlags = [ "-v" ];
+                components.library.libs = [
+                  pkgs.wayland
+                ];
+                components.library.build-tools = [
+                  pkgs.hs-bindgen-cli
+                  pkgs.hsBindgenHook
+                  pkgs.wayland-scanner
+                ];
+                components.setup.build-tools = [
+                  config.ghc.package.llvmPackages.llvm
+                  config.ghc.package.llvmPackages.clang
+                  config.ghc.package.llvmPackages.libclang
+                ];
+              };
+            })];
           });
 
-          #ghc_9_14_1 = self.ghc_9_14_1; # .override { };
-          ghc-paths = hlib.overrideCabal (drv: {
-            revision = null;
-            editedCabalFile = null;
-          }) (self.callCabal2nix "ghc-paths" (builtins.toPath inputs.ghc-paths) { });
-
-          entropy = self.callCabal2nix "entropy" (inputs.entropy) { };
-
-          Cabal-syntax = self.callCabal2nix "Cabal-syntax" (inputs.cabal + "/Cabal-syntax") { };
-          Cabal-hooks = self.callCabal2nix "Cabal-hooks" (inputs.cabal + "/Cabal-hooks") { };
-          Cabal = self.callCabal2nix "Cabal" (inputs.cabal + "/Cabal") { };
-          Cabal-described = self.callCabal2nix "cabal-described" (inputs.cabal + "/cabal-described") { };
-          Cabal-QuickCheck = self.callCabal2nix "cabal-QuickCheck" (inputs.cabal + "/cabal-QuickCheck") { };
-          Cabal-tests = self.callCabal2nix "cabal-tests" (inputs.cabal + "/cabal-tests") { };
-          Cabal-tree-diff = self.callCabal2nix "cabal-tree-diff" (inputs.cabal + "/cabal-tree-diff") { };
-          hooks-exe = self.callCabal2nix "hooks-exe" (inputs.cabal + "/hooks-exe") { };
-          cabal-install = self.callCabal2nix "cabal-install" (inputs.cabal + "/cabal-install") { };
-          cabal-install-solver = self.callCabal2nix "cabal-install-solver" (inputs.cabal + "/cabal-install-solver") { };
-          process = self.process_1_6_28_0;
-        });
+          hnix-flake = hnix.flake { };
       };
 
       devShells = {
+        hnix = config.legacyPackages.hnix-flake.devShells.default;
+
         all = config.haskellProjects.default.outputs.finalPackages.shellFor {
           packages = ps: [
             ps.pixman-bindings
