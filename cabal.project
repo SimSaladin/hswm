@@ -1,25 +1,16 @@
 packages:
+  ./hs-bindgen-hooks
   ./hswm
   ./hswm-bindings
   ./pixman-bindings
   ./waybar-cffi-hs
   ./xkbcommon-bindings
-  ./hs-bindgen-hooks
 
-package pixman-bindings
-  flags: -hs-bindgen-build-tool
-package hswm-bindings
-  flags: -hs-bindgen-build-tool
+extra-packages: generics-sop, lens-sop
+
+jobs: $ncpus
 
 verbose: 1
-jobs: $ncpus
---index-state @1777539042
-
--- * Package configuration options
-
---optimization: 1
---debug-info: True
---executable-dynamic: True
 
 -- * Documentation
 
@@ -35,58 +26,91 @@ jobs: $ncpus
 
 --write-ghc-environment-files: always
 
-constraints: gtk2hs-buildtools >= 0.13.12.0
---    Cabal >= 3.17
+-- repository head.hackage.ghc.haskell.org
+--   url: https://ghc.gitlab.haskell.org/head.hackage/
+--   secure: True
+--   key-threshold: 3
+--   root-keys:
+--      f76d08be13e9a61a377a85e2fb63f4c5435d40f8feb3e12eb05905edb8cdea89
+--      26021a13b401500c8eb2761ca95c61f2d625bfef951b939a8124ed12ecf07329
+--      7541f32a4ccca4f97aea3b22f5e593ba2c0267546016b992dfadcd2fe944e55d
+--   --sha256: sha256-tv3xym0AWegXTr5x1cx8Fgi4aNtwI35CF5TYrjWN4f8=
 
+-- Temporary relaxes for GHC 9.14.1
+if impl(ghc >= 9.14)
+  allow-newer: cairo-0.13.12.0:Cabal
+  allow-newer: cairo-0.13.12.0:time
+  allow-newer: debruijn-0.3.1:base
+  allow-newer: monad-control-1.0.3.1:transformers-compat
+  allow-newer: optparse-generic-1.5.3:time
+  allow-newer: optparse-generic-1.5.3:transformers-compat
+  allow-newer: pango-0.13.12.0:Cabal
+  allow-newer: pango-0.13.12.0:containers
+  allow-newer: skew-list-0.1:QuickCheck
+  allow-newer: skew-list-0.1:base
+  allow-newer: typerep-map-0.7.0.0:base
+
+-- libclang-bindings (unreleased) for hs-bindgen (22-05-2026)
 source-repository-package
-    type: git
-    location: https://github.com/well-typed/libclang-bindings
-    tag: 51b4b4972ea7ee8f7848f962e8524b6cd3eb4a84
-    subdir: libclang-bindings
-    --sha256: 0ah4fjl3mfacz1dgpcwmjlm5ay2c4khv5c54s28b6b5fhvv9zy3v
+  type: git
+  location: https://github.com/well-typed/libclang-bindings
+  tag: 51b4b4972ea7ee8f7848f962e8524b6cd3eb4a84
+  subdir: libclang-bindings
+  --sha256: 0ah4fjl3mfacz1dgpcwmjlm5ay2c4khv5c54s28b6b5fhvv9zy3v
 
+-- doxygen-parser (unreleased) for hs-bindgen (04-05-2026)
 source-repository-package
-    type: git
-    location: https://github.com/well-typed/doxygen-parser
-    tag: 33b5074eb5122062ac41fa8b9ed0596d39913b63
-    --sha256: 0xj6lilgj70rs3fcc86gl30z5imghx9jgiwalvw9q8ldlpd7hvgc
+  type: git
+  location: https://github.com/well-typed/doxygen-parser
+  tag: 33b5074eb5122062ac41fa8b9ed0596d39913b63
+  --sha256: 0xj6lilgj70rs3fcc86gl30z5imghx9jgiwalvw9q8ldlpd7hvgc
 
+-- hs-bindgen (unreleased) (28-05-2026)
 source-repository-package
   type: git
   location: https://github.com/well-typed/hs-bindgen
-  branch: master
-  tag: 6227d5e86a392dd3bbdc963e4149a07f00032564
+  branch: main
+  tag: 24ed914383635226710306cd12499f09d61adb40
   subdir:
+    c-expr-runtime
+    c-expr-dsl
     hs-bindgen
     hs-bindgen-runtime
-    c-expr-dsl
-    c-expr-runtime
-  --sha256: sha256-XaGqlUCDCIMTpiaJK8QDdk6tG3X9IxuWPD/OT/dOW/g=
+  --sha256: sha256-kYyOI/Er47TMHSyNI+qMHaaPHN1lD9a2epAcKLPvPwQ=
 
+-- cabal-doctest fixed for Cabal-3.17
 source-repository-package
   type: git
-  location: https://github.com/TuongNM/gtk2hs
-  branch: ghc-rts-api
-  tag: 16c4adcf5ec20dd7e0e52bf613249df5f43bffdb
-  subdir: tools glib
-  --sha256: 0x51gv80aqb9w6p5qgd1glxq90dynnvp84zy84k8b8fnkbcac2xq
+  location: https://github.com/SimSaladin/cabal-doctest
+  branch: cabal-3.17
+  tag: 615d46e72a47062cd76abe4bdb43d088cc3e0bdb
+  --sha256: 1vn4w9k5mc1mzlhpxaai1j70svvdvfkl7npl7rnabp35vczpp39k
 
---  source-repository-package
---    type: git
---    location: https://github.com/haskell/cabal
---    branch: master
---    tag: 03d6011f6cfda56e03271f00c4b0a455b00e76ed
---    subdir: Cabal Cabal-syntax Cabal-hooks
---    --sha256: 0dsj0r40lcdhnm71l5krvzcrddwjlv4qs42g6ay80ng7b51ps35z
+-- gtk2hs-buildtools, glib, pango fixed for GHC 9.14.1 & Cabal-3.17
+source-repository-package
+  type: git
+  --location: https://github.com/TuongNM/gtk2hs
+  --branch: ghc-rts-api
+  location: https://github.com/SimSaladin/gtk2hs
+  branch: cabal-3.17
+  tag: 9c20d74be3a7f2d2365cc6e6275e95ffe50dabce
+  subdir:
+    glib
+    tools
+    pango
+  --sha256: 0g4i4msdl7qw9n179qfv891fpcdfxf71mgxp85c7v7cnwkf8dba8
 
-if impl(ghc >= 9.14)
-  allow-newer: typerep-map-0.7.0.0:base
-  allow-newer: pango-0.13.12.0:containers
-  allow-newer: pango-0.13.12.0:Cabal
-  allow-newer: cairo-0.13.12.0:Cabal
-  allow-newer: cairo-0.13.12.0:time
-  allow-newer: monad-control-1.0.3.1:transformers-compat
-  allow-newer: optparse-generic-1.5.3:transformers-compat
-  allow-newer: optparse-generic-1.5.3:time
-  allow-newer: debruijn-0.3.1:base
-  allow-newer: skew-list-0.1:base
+-- Cabal, cabal-install 3.17 (unreleased)
+source-repository-package
+  type: git
+  location: https://github.com/haskell/cabal
+  branch: master
+  tag: dd941a5598a0fc0cef25ceb3d8fe2d0059db3691
+  subdir:
+    Cabal
+    Cabal-hooks
+    Cabal-syntax
+    cabal-install
+    cabal-install-solver
+    hooks-exe
+  --sha256: 1r81bnkdssa5203wpxs4aqn58mx2jpdj6blsyh3h09z2qhyi4jx2

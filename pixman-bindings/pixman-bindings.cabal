@@ -9,33 +9,35 @@ author:             Samuli Thomasson
 maintainer:         samuli.thomasson@pm.me
 -- copyright:
 category:           Graphics
-build-type:         Hooks
+--build-type:         Hooks
+build-type:         Custom
 extra-doc-files:    CHANGELOG.md
 -- extra-source-files:
 tested-with:
     GHC == 9.14.1
 
-custom-setup
-    setup-depends:
-          base             >=4.21 && <5
-        , Cabal-hooks      >=3.14 && <3.18
-        , hs-bindgen-hooks
-
-common warnings
-    ghc-options: -Wall
-
-flag pkgconfig
+flag pkg-config
     description: Use pkgconfig to to resolve C dependencies
     manual: True
     default: True
 
-flag hs-bindgen-build-tool
+flag build-tool-depends
     description: Use build-tool-depends for hs-bindgen-cli
     manual: True
     default: True
 
+common warnings
+    ghc-options: -Wall -Wunused-packages
+
+custom-setup
+    setup-depends:
+          base             >=4.21 && <5
+        , Cabal            >=3.14 && <3.18
+        , Cabal-hooks      >=3.14 && <3.18
+        , hs-bindgen-hooks
+
 library
-    import:           warnings
+    import: warnings
     exposed-modules:
           Pixman
     build-depends:
@@ -48,12 +50,12 @@ library
           src
     default-language: GHC2024
 
-    if flag(pkgconfig)
+    if flag(pkg-config)
         pkgconfig-depends: pixman-1
     else
         extra-libraries: pixman-1
 
-    if flag(hs-bindgen-build-tool)
+    if flag(build-tool-depends)
        build-tool-depends:
            hs-bindgen:hs-bindgen-cli
 

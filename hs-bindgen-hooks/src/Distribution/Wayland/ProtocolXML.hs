@@ -1,6 +1,4 @@
-module Wayland.Internal.TH.ProtocolXML
-  ( module Wayland.Internal.TH.ProtocolXML
-  ) where
+module Distribution.Wayland.ProtocolXML ( module Distribution.Wayland.ProtocolXML ) where
 
 import qualified Text.XML as X
 import           Text.XML.Cursor

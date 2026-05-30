@@ -90,6 +90,7 @@ __deps:
   - &dep-haskeline                   haskeline                   ^>=0.8.2
   - &dep-prettyprinter               prettyprinter               ^>=1.7.1
   - &dep-prettyprinter-ansi-terminal prettyprinter-ansi-terminal ^>=1.1.3
+  - &dep-microlens-platform          microlens-platform
   - &dep-hswm-bindings               hswm-bindings
   - &dep-pixman-bindings             pixman-bindings
   - &dep-xkbcommon-bindings          xkbcommon-bindings
@@ -119,6 +120,7 @@ internal-libraries:
       - *dep-unliftio-core
       - *dep-unliftio
       - *dep-monad-logger-aeson
+      - *dep-microlens-platform
     ghc-options:
       - *common-ghc-options
 

@@ -13,6 +13,7 @@
 --
 module Bindings.Wayland.Client
   ( module Bindings.Wayland.Client
+  , module Bindings.Wayland.Core.Enums
   , module Safe
 
   , module Bindings.Wayland.Util
@@ -20,29 +21,30 @@ module Bindings.Wayland.Client
 
   -- *  Outputs
   , Wl_output_subpixel(..)
-  , pattern WL_OUTPUT_SUBPIXEL_UNKNOWN
-  , pattern WL_OUTPUT_SUBPIXEL_NONE
-  , pattern WL_OUTPUT_SUBPIXEL_HORIZONTAL_RGB
-  , pattern WL_OUTPUT_SUBPIXEL_HORIZONTAL_BGR
-  , pattern WL_OUTPUT_SUBPIXEL_VERTICAL_RGB
-  , pattern WL_OUTPUT_SUBPIXEL_VERTICAL_BGR
+  --, pattern WL_OUTPUT_SUBPIXEL_UNKNOWN
+  --, pattern WL_OUTPUT_SUBPIXEL_NONE
+  --, pattern WL_OUTPUT_SUBPIXEL_HORIZONTAL_RGB
+  --, pattern WL_OUTPUT_SUBPIXEL_HORIZONTAL_BGR
+  --, pattern WL_OUTPUT_SUBPIXEL_VERTICAL_RGB
+  --, pattern WL_OUTPUT_SUBPIXEL_VERTICAL_BGR
   , Wl_output_transform(..)
-  , pattern WL_OUTPUT_TRANSFORM_NORMAL
-  , pattern WL_OUTPUT_TRANSFORM_90
-  , pattern WL_OUTPUT_TRANSFORM_180
-  , pattern WL_OUTPUT_TRANSFORM_270
-  , pattern WL_OUTPUT_TRANSFORM_FLIPPED
-  , pattern WL_OUTPUT_TRANSFORM_FLIPPED_90
-  , pattern WL_OUTPUT_TRANSFORM_FLIPPED_180
-  , pattern WL_OUTPUT_TRANSFORM_FLIPPED_270
+ -- , pattern WL_OUTPUT_TRANSFORM_NORMAL
+ -- , pattern WL_OUTPUT_TRANSFORM_90
+ -- , pattern WL_OUTPUT_TRANSFORM_180
+ -- , pattern WL_OUTPUT_TRANSFORM_270
+ -- , pattern WL_OUTPUT_TRANSFORM_FLIPPED
+ -- , pattern WL_OUTPUT_TRANSFORM_FLIPPED_90
+ -- , pattern WL_OUTPUT_TRANSFORM_FLIPPED_180
+ -- , pattern WL_OUTPUT_TRANSFORM_FLIPPED_270
   , Wl_output_mode(..)
-  , pattern WL_OUTPUT_MODE_CURRENT
-  , pattern WL_OUTPUT_MODE_PREFERRED
+  --, pattern WL_OUTPUT_MODE_CURRENT
+ -- , pattern WL_OUTPUT_MODE_PREFERRED
 
   , Wl_keyboard_key_state(..)
   , Wl_keyboard_keymap_format(..)
   ) where
 
+import           Bindings.Wayland.Core.Enums
 import           Bindings.Wayland.Core.Client.Generated
 import           Bindings.Wayland.Core.Client.Generated.Global as G
 import           Bindings.Wayland.Core.Client.Generated.Safe
@@ -269,13 +271,14 @@ displayPrepareRead :: MonadIO m => Display -> m ()
 {-# INLINE displayPrepareRead #-}
 displayPrepareRead (Display d) = liftIO $ throwErrnoIfMinus1_ "displayPrepareRead" $ Safe.wl_display_prepare_read d
 
-checkPrepareRead loc ma = do
-  ret <- ma
-  if ret < 0 then checkErrno ret else return True
-    where
-      checkErrno ret = do
-        errno <- getErrno
-        if errno == eAGAIN then return False else ioError (errnoToIOError loc errno Nothing Nothing)
+-- TODO
+--checkPrepareRead loc ma = do
+--  ret <- ma
+--  if ret < 0 then checkErrno ret else return True
+--    where
+--      checkErrno ret = do
+--        errno <- getErrno
+--        if errno == eAGAIN then return False else ioError (errnoToIOError loc errno Nothing Nothing)
 
 -- | Dispatch events on the default event queue.
 displayDispatch :: MonadIO m => Display -> m Int
@@ -426,15 +429,18 @@ displayDisconnect (Display d) = liftIO $ Safe.wl_display_disconnect d
 
 -- UTILS
 
+peekMaybeCString :: ConstPtr CChar -> IO (Maybe String)
 peekMaybeCString (ConstPtr ptr)
   | ptr == nullPtr = return Nothing
   | otherwise = Just <$> peekCString ptr
 
+throwExIfNull :: Exception e => e -> IO (Ptr a) -> IO (Ptr a)
 throwExIfNull ex m = do
   r <- m
   when (r == nullPtr) $ throwIO ex
   return r
 
+throwExIfMinus1 :: (Eq a, Num a, Exception e) => e -> IO a -> IO a
 throwExIfMinus1 ex m = do
   r <- m
   when (r == -1) $ throwIO ex

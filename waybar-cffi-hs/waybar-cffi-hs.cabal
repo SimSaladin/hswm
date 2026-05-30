@@ -39,6 +39,7 @@ library
     Waybar.CFFI.Plugin.Base
     Waybar.CFFI.Plugin.TH
     Waybar.CFFI.Plugin.HSWM
+    Waybar.CFFI.Plugin.TextFormat
   other-modules:
     Paths_waybar_cffi_hs
   autogen-modules:

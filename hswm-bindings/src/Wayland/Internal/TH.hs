@@ -29,11 +29,13 @@ module Wayland.Internal.TH
 
   -- * Re-export
   , Default(..)
+  , nullPtr
   ) where
 
+import           Wayland.Internal.TH.NewType
 import           Wayland.Types
-import Wayland.Internal.TH.NewType
-import Wayland.Internal.TH.ProtocolXML
+
+import           Distribution.Wayland.ProtocolXML
 
 import           Control.Arrow
 import           Control.Monad

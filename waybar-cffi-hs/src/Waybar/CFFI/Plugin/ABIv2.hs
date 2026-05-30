@@ -19,11 +19,13 @@ import qualified Data.Text as T
 import qualified Data.Text.Foreign as T
 
 import           Control.Exception
-import           Control.Monad
 import           Foreign
 import           Foreign.C
 import           Foreign.C.ConstPtr (ConstPtr(..))
 import           GHC.Generics (Generic)
+import           Text.ParserCombinators.ReadP (readP_to_S)
+import           Text.Read ()
+import           Data.Version (Version, parseVersion)
 
 -- | Private Waybar CFFI module.
 data {-# CTYPE "waybar_cffi_module.h" "wbcffi_module" #-} WbcffiModule
@@ -91,9 +93,8 @@ instance Storable ConfigEntry where
 -- * Exceptions
 
 data WaybarPluginException
-  = MalformedPluginConfigEntry { cEntryNum :: !Int, cEntryKey :: T.Text, cEntry :: BS.ByteString }
-  | PluginConfigParseError String
-  | PluginVersionParseError String
+  = WaybarPluginConfigParseError String
+  | WaybarPluginVersionParseError String
   deriving (Eq, Ord, Show, Read)
 
 instance Exception WaybarPluginException
@@ -103,15 +104,41 @@ instance Exception WaybarPluginException
 -- | Parse module configuration.
 parseConfig :: A.FromJSON a => ConstPtr ConfigEntry -> CSize -> IO a
 parseConfig (ConstPtr ptr) size = do
-  values <- forM [0 .. fromIntegral size - 1] peekEntry
-  case A.fromJSON $ A.Object $ A.KM.fromList values of
+  entries <- peekArray (fromIntegral size) ptr
+  keymap <- A.KM.fromList <$> mapM fromEntry entries
+  case A.fromJSON $ A.Object keymap of
     A.Success a -> return a
-    A.Error msg -> throwIO $! PluginConfigParseError msg
+    A.Error msg -> throwIO $! WaybarPluginConfigParseError msg
   where
-    peekEntry i = do
-      ConfigEntry (ConstPtr pk) (ConstPtr pv) <- peek (advancePtr ptr i)
+    fromEntry (ConfigEntry (ConstPtr pk) (ConstPtr pv)) = do
       key <- T.peekCString pk
       valBS <- BS.packCString pv
-      case A.decodeStrict' valBS :: Maybe A.Value of
-        Just val -> return (A.Key.fromText key, val)
-        Nothing -> throwIO $! MalformedPluginConfigEntry i key valBS
+      case A.eitherDecodeStrict' valBS :: Either String A.Value of
+        Right val -> return (A.Key.fromText key, val)
+        Left err -> throwIO $! WaybarPluginConfigParseError $ err ++ " (while parsing entry '" ++ T.unpack key ++ "':" ++ show valBS ++ ")"
+
+-- | Get waybar version.
+getWaybarVersion :: InitInfo -> IO Version
+getWaybarVersion InitInfo{waybar_version = ConstPtr ptr} = do
+  str <- peekCString ptr
+  case reverse $ readP_to_S parseVersion str of
+    (ver, "") : _ -> return ver
+    _ -> throwIO $ WaybarPluginVersionParseError str
+
+-- | Module init/new function, called on module instantiation.
+--
+-- MANDATORY CFFI function
+--
+-- @
+-- param init_info          Waybar module information
+-- param config_entries     Flat representation of the module JSON config. The data only available
+--                           during wbcffi_init call.
+-- param config_entries_len Number of entries in @config_entries@
+--
+-- return A untyped pointer to module data, NULL if the module failed to load.
+--
+-- wbcffi_init :: !(Ptr InitInfo -> Ptr ConfigEntry -> CSize -> IO (Ptr Void))
+-- @
+type Init a = ConstPtr InitInfo -> ConstPtr ConfigEntry -> CSize -> IO a
+
+type DoAction a = a -> ConstPtr CChar -> IO ()

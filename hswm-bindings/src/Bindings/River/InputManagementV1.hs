@@ -11,3 +11,6 @@ import Wayland.Internal.TH
 import Path_river_input_management_v1
 
 clientFromProtocolXML' commonSettings protoXml
+
+instance Default RiverInputDevice where
+  def = RiverInputDevice nullPtr

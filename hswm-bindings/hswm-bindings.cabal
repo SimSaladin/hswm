@@ -5,7 +5,8 @@ license:            MIT
 license-file:       LICENSE
 author:             Samuli Thomasson
 maintainer:         samuli.thomasson@pm.me
-build-type:         Hooks
+--build-type:         Hooks
+build-type:         Custom
 tested-with:
       GHC == 9.12.2
     , GHC == 9.14.1
@@ -15,6 +16,16 @@ extra-source-files:
 extra-doc-files:
       CHANGELOG.md
 
+flag pkg-config
+    description: Use pkgconfig to resolve C dependencies
+    manual: True
+    default: True
+
+flag build-tool-depends
+    description: Use build-tool-depends for hs-bindgen-cli
+    manual: True
+    default: True
+
 custom-setup
     setup-depends:
           base             >=4.21 && <5
@@ -22,34 +33,32 @@ custom-setup
         , Cabal-hooks      >=3.14 && <3.18
         , filepath
         , hs-bindgen-hooks
+        , microlens
+        , microlens-ghc
 
-flag pkgconfig
-    description: Use pkgconfig to resolve C dependencies
-    manual: True
-    default: True
-
-flag hs-bindgen-build-tool
-    description: Use build-tool-depends for hs-bindgen-cli
-    manual: True
-    default: True
+common language
+    default-language: GHC2024
+    default-extensions:
+          DuplicateRecordFields
+          OverloadedStrings
+          OverloadedLabels
+          OverloadedRecordDot
+          TemplateHaskell
+          TypeFamilies
+          PatternSynonyms
+          LambdaCase
 
 library
+    import: language
     exposed-modules:
-          -- higher-level
-          Wayland
-          Wayland.Viewporter
+          -- core types
           Wayland.Types
+          -- code generation
           Wayland.Internal.TH
           Wayland.Internal.TH.NewType
-          Wayland.Internal.TH.ProtocolXML
-          River
-          River.InputManagement
-          River.LayerShell
-          River.LibinputConfig
-          River.WindowManagement
-          River.XkbBindings
-          River.XkbConfig
-          -- (mostly) generated
+          -- Wayland protocols
+          Wayland
+          Wayland.Viewporter
           Bindings.Wayland.Util
           Bindings.Wayland.Client
           Bindings.Wayland.XdgShell
@@ -60,10 +69,19 @@ library
           Bindings.Wayland.Viewporter
           Bindings.Wayland.XdgOutputUnstableV1
           Bindings.Wayland.TextInputUnstableV3
+          -- wlroots protocols
           Bindings.Wlr.InputMethodUnstableV2
           Bindings.Wlr.LayerShellUnstableV1
           Bindings.Wlr.OutputManagementUnstableV1
           Bindings.Wlr.OutputPowerManagementUnstableV1
+          -- River protocols
+          River
+          River.InputManagement
+          River.LayerShell
+          River.LibinputConfig
+          River.WindowManagement
+          River.XkbBindings
+          River.XkbConfig
           Bindings.River
           Bindings.River.InputManagementV1
           Bindings.River.LayerShellV1
@@ -85,52 +103,41 @@ library
         , text                 >=2.1.2  && <2.2
         , unix
         , unliftio
-        , xml-conduit          >=1.10.1 && <1.11
         , c-expr-runtime       >=0.1.0  && <0.2
         , hs-bindgen-runtime   >=0.1.0  && <0.2
+        , hs-bindgen-hooks
     hs-source-dirs:
           src
-    default-extensions:
-          DuplicateRecordFields
-          OverloadedStrings
-          OverloadedLabels
-          TemplateHaskell
-          TypeFamilies
-          PatternSynonyms
     ghc-options: -Wall -Wunused-packages -fPIC
-    default-language: GHC2024
 
-    if flag(pkgconfig)
+    if flag(pkg-config)
         pkgconfig-depends:
-              wayland-client
-            , wayland-server
-            , wayland-protocols
+              wayland-client >= 1.24
+            , wayland-server >= 1.24
+            , wayland-protocols >= 1.48
     else
         extra-libraries:
               wayland-client
             , wayland-server
 
-    if flag(hs-bindgen-build-tool)
-       build-tool-depends:
-           hs-bindgen:hs-bindgen-cli
+    if flag(build-tool-depends)
+       build-tool-depends: hs-bindgen:hs-bindgen-cli
 
 test-suite test-suite
+    import: language
     type: exitcode-stdio-1.0
-    main-is: Spec.hs
     other-modules:
           Paths_hswm_bindings
           Wayland.UtilSpec
     autogen-modules:
           Paths_hswm_bindings
-    hs-source-dirs:
-          tests
-    build-tool-depends:
-          hspec-discover:hspec-discover
     build-depends:
           base
+        , data-default
         , hspec
         , hs-bindgen-runtime   >=0.1.0  && <0.2
-        , data-default
         , hswm-bindings
-    default-language: GHC2024
+    main-is: Spec.hs
+    hs-source-dirs: tests
+    build-tool-depends: hspec-discover:hspec-discover
     ghc-options: -threaded -with-rtsopts=-N

@@ -19,6 +19,8 @@ module HSWM.Prelude (
   module UnliftIO.Directory,
   module UnliftIO,
   module Control.Monad.Catch,
+  -- * Lenses
+  module Lens.Micro.Platform,
   -- * Logging
   module Control.Monad.Logger.Aeson,
   -- * Misc. utilities
@@ -51,6 +53,7 @@ import           UnliftIO
 import           UnliftIO.Async
 import           UnliftIO.Directory
 import           UnliftIO.IO
+import           Lens.Micro.Platform hiding ((.=))
 
 toText :: String -> T.Text
 toText = T.pack

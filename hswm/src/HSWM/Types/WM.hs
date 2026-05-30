@@ -145,9 +145,6 @@ data StateExtension
   | -- | Persistent extension
     forall a. (Read a, Show a, ExtensionClass a) => PersistentExtension a
 
--- | Existential type to store a config extension.
-data ConfExtension = forall a. (Typeable a) => ConfExtension a
-
 --------------------------------------------------------------
 -- Layout messages
 
@@ -282,7 +279,8 @@ instance LayoutClass Layout RiverWindow where
   handleMessage (Layout l) = fmap (fmap Layout) . handleMessage l
   description (Layout l) = description l
 
-instance Show (Layout a) where show (Layout l) = show l
+instance Show (Layout a) where
+  show (Layout l) = show l
 
 -- | Using the 'Layout' as a witness, parse existentially wrapped windows
 -- from a 'String'.
@@ -292,9 +290,9 @@ readsLayout (Layout l) s = [(Layout (asTypeOf x l), rs) | (x, rs) <- reads s]
 -- | 'LayoutMessages' are core messages that all layouts (especially stateful
 -- layouts) should consider handling.
 data LayoutMessages
-  = -- | sent when a layout becomes non-visible
+  = -- | Sent when a layout becomes non-visible
     Hide
-  | -- | sent when xmonad is exiting or restarting
+  | -- | Sent when WM is exiting or restarting
     ReleaseResources
   deriving (Eq, Show)
 
@@ -617,6 +615,3 @@ instance (MonadIO m) => Show (SomeAction m) where
 
 instance Show (Async a) where show _ = "<Async>"
 instance Show (StablePtr a) where show _ = "<SP>"
-
-instance Default R.RiverInputDevice where
-  def = R.RiverInputDevice nullPtr

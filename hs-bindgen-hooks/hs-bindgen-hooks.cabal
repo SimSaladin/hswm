@@ -19,10 +19,29 @@ common warnings
 library
     import:           warnings
     exposed-modules:  Distribution.HsBindgen.Hooks
+                      Distribution.HsBindgen.Utils
+                      Distribution.HsBindgen.Lens
+                      Distribution.Wayland.Hooks
+                      Distribution.Wayland.ProtocolXML
     build-depends:    base        >=4.21 && <5
                     , Cabal       >=3.14 && <3.18
                     , Cabal-hooks >=3.14 && <3.18
                     , containers
+                    , data-default
                     , yaml
+                    , filepath
+                    , microlens
+                    , microlens-th
+                    , template-haskell
+                    , xml-conduit
+                    , text
     hs-source-dirs:   src
     default-language: GHC2024
+    default-extensions:
+      DeriveAnyClass
+      OverloadedRecordDot
+      RecordWildCards
+      StaticPointers
+      DuplicateRecordFields
+      OverloadedStrings
+    ghc-options: -Wno-ambiguous-fields

@@ -1,5 +1,6 @@
 cabal-version:      3.14
-build-type:         Hooks
+build-type:         Custom
+--build-type:         Hooks
 name:               xkbcommon-bindings
 version:            0.1.0.0
 synopsis:           Low-level bindings to libxkbcommon
@@ -14,11 +15,9 @@ extra-doc-files:    CHANGELOG.md
 tested-with:        GHC == 9.14.1, GHC == 9.12.2
 -- extra-source-files:
 
-custom-setup
-  setup-depends:
-      base           >=4.21   && <5
-    , Cabal          >=3.14   && <3.18
-    , Cabal-hooks    >=3.14   && <3.18
+flag pkg-config
+  description: Use pkg-config to find external library dependencies
+  default: True
 
 common warnings
     ghc-options:
@@ -40,39 +39,41 @@ common language
     TypeApplications
     PatternSynonyms
 
-flag pkgconfig
-  description: Use pkg-config to find external library dependencies
-  default: True
+custom-setup
+  setup-depends:
+      base           >=4.21   && <5
+    , Cabal          >=3.14   && <3.18
+    , Cabal-hooks    >=3.14   && <3.18
+    , filepath       >=1.5    && <2
+    , hs-bindgen-hooks
 
 library
     import: warnings, language
     exposed-modules:
        Text.XkbCommon
-     , Text.XkbCommon.KeySym
-     , Text.XkbCommon.Registry
      , Text.XkbCommon.Context
+     , Text.XkbCommon.EventCodes
+     , Text.XkbCommon.KeySym
+     , Text.XkbCommon.KeySyms
      , Text.XkbCommon.Keymap
      , Text.XkbCommon.Keymap.RmlvoBuilder
+     , Text.XkbCommon.Registry
      , Text.XkbCommon.State
-     , Text.XkbCommon.EventCodes
+    autogen-modules:
+       Text.XkbCommon.EventCodes
      , Text.XkbCommon.KeySyms
     other-modules:
        Text.XkbCommon.FFI
      , Text.XkbCommon.Internal
-    autogen-modules:
-       Text.XkbCommon.EventCodes
-     , Text.XkbCommon.KeySyms
     build-depends:
        base              >=4.21   && <5
      , data-default     ^>=0.8
      , unix             ^>=2.8.6
-    hs-source-dirs:   src
-    default-extensions:
-       CApiFFI
-    build-tool-depends:
-       hsc2hs:hsc2hs
+    hs-source-dirs:     src
+    default-extensions: CApiFFI
+    build-tool-depends: hsc2hs:hsc2hs
 
-    if flag(pkgconfig)
+    if flag(pkg-config)
       pkgconfig-depends: xkbcommon, xkbregistry
     else
       extra-libraries: xkbcommon, xkbregistry
@@ -85,13 +86,13 @@ test-suite spec
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   hs-source-dirs: tests
+  other-modules:
+      Text.XkbCommonSpec
+    , Text.XkbRegistrySpec
   build-depends:
       base
     , hspec
     , xkbcommon-bindings
-  other-modules:
-      Text.XkbCommonSpec
-    , Text.XkbRegistrySpec
   build-tool-depends:
     hspec-discover:hspec-discover
   ghc-options: -threaded -with-rtsopts=-N

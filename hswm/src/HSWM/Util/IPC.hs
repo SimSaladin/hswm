@@ -11,8 +11,6 @@
 -- Portability : unportable
 module HSWM.Util.IPC where
 
-import PackageInfo_hswm qualified as PKG
-
 import HSWM.IPC
 
 import HSWM.Actions.DynamicWorkspaceOrder qualified as DWO
@@ -26,7 +24,6 @@ import Data.ByteString.UTF8 qualified as BUTF8
 import Data.Map qualified as M
 import Data.Text qualified as T
 import Data.Text.Lazy qualified as TL
-import Data.Version (showVersion)
 import Foreign.Ptr
 import Network.Socket
 import Bindings.River qualified as R
@@ -36,27 +33,7 @@ import System.FileLock
 
 type MonadIPC env m = (MonadLogger m, MonadIO m, MonadUnliftIO m, MonadMask m, MonadReader env m)
 
-runStdoutAsTextLoggingT :: MonadIO m => LoggingT m a -> m a
-runStdoutAsTextLoggingT a = do
-  let logFunc = defaultOutput stdout
-  runLoggingT a logFunc
-
--- * Hooks
-
-serverStartupHook :: ServerConfig -> H ()
-serverStartupHook conf = do
-  stateRef <- getOrCreateObject (newIORef (def :: ConnectedPeers))
-  serverThread <- async $ serverRun conf stateRef
-  modifyIORef stateRef $ \st -> st { serverThread = Just serverThread }
-
-ipcLogHook :: H ()
-ipcLogHook = withObject $ \(sRef :: IORef ConnectedPeers) -> do
-  msgs <- fullStateUpdate
-  s <- readIORef sRef
-  atomically $ forM_ (M.elems s.connected) $ \c ->
-    mapM_ (writeTQueue c.connSendQ) msgs
-
--- * Server
+-- * ServerConfig
 
 data ServerConfig = ServerConfig
   { bindTo          :: Maybe AddrInfo
@@ -66,6 +43,8 @@ data ServerConfig = ServerConfig
 
 instance Default ServerConfig where
   def = ServerConfig Nothing 8 serverHandleMsg
+
+-- * Server State
 
 -- | Server-side state.
 data ConnectedPeers = ConnectedPeers
@@ -83,8 +62,25 @@ data Connection = Connection
   , connPid, connUid, connGid :: !Int
   } deriving stock (Generic)
 
+-- * Hooks
+
+serverStartupHook :: ServerConfig -> H ()
+serverStartupHook conf = do
+  stateRef <- getOrCreateObject (newIORef (def :: ConnectedPeers))
+  serverThread <- async $ serverRun conf stateRef
+  modifyIORef stateRef $ \st -> st { serverThread = Just serverThread }
+
+ipcLogHook :: H ()
+ipcLogHook = withObject $ \(sRef :: IORef ConnectedPeers) -> do
+  msgs <- fullStateUpdate
+  s <- readIORef sRef
+  atomically $
+    forM_ msgs $ \msg ->
+      forM_ (M.elems s.connected) $ \c ->
+        writeTQueue c.connSendQ msg
+
 serverRun :: ServerConfig -> IORef ConnectedPeers -> H ()
-serverRun conf stateRef = withThreadContext ["component" .= ("ipc/server"::String)] $ do
+serverRun conf stateRef = withThreadContext ["component" .= ("ipc/server" :: String)] $ do
   (ai, mlockFile) <- getServerAddr conf
   withLock mlockFile $ do
     logInfo $ "Starting IPC server" :# [ "bind" .= show ai ]
@@ -96,13 +92,13 @@ serverRun conf stateRef = withThreadContext ["component" .= ("ipc/server"::Strin
     bracket (open ai) (io . close) loop
       `finally` logInfo "IPC server thread finished"
   where
-    withLock mlock a = case mlock of
-      Nothing -> a
+    withLock mlock f = case mlock of
+      Nothing -> f
       Just file -> do
         r <- io $ tryLockFile file Exclusive
         case r of
-          Just _ -> a
-          Nothing -> logError "Could not lock file"
+          Just _ -> f
+          Nothing -> logError $ "Could not lock lockfile" :# [ "lockfile" .= file ]
 
     open ai = bracketOnError (io $ openSocket ai) (io . close) $ \sock -> do
       io $ withFdSocket sock setCloseOnExecIfNeeded
@@ -114,26 +110,23 @@ serverRun conf stateRef = withThreadContext ["component" .= ("ipc/server"::Strin
     loop :: _ -> H ()
     loop sock = forever $
       bracketOnError (io $ accept sock) (io . close . fst) $ \(conn, _peer) -> do
+        connSendQ <- newTQueueIO
         (connFd :: Int) <- io $ withFdSocket conn $ return . fi
-
         (mpid, muid, mgid) <- io $ getPeerCredential conn
         let pid = fi $ fromMaybe 0 mpid :: Int
         let uid = fi $ fromMaybe 0 muid :: Int
         let gid = fi $ fromMaybe 0 mgid :: Int
-
-        logInfo $ "New domain socket client connected" :# [ "fd" .= connFd, "pid" .= pid, "uid" .= uid, "gid" .= gid ]
-
-        connSendQ <- newTQueueIO
-        connWorkerThread <- async $
-          withThreadContext [ "fd" .= connFd, "pid" .= pid, "uid" .= uid, "gid" .= gid ] $
+        let ctx = [ "fd" .= connFd, "pid" .= pid, "uid" .= uid, "gid" .= gid ]
+        connWorkerThread <- async $ withThreadContext ctx $
           connWorker conn connSendQ `finally` cleanup connFd conn
-
         let c = Connection{connSocket = conn, connPid = pid, connUid = uid, connGid = gid, ..}
-
         modifyIORef stateRef $ \s -> s {connected = M.insert connFd c s.connected}
 
     connWorker :: _ -> _ -> H ()
     connWorker conn sendQ = do
+      logInfo "New domain socket client connected"
+      atomically . writeTQueue sendQ $ Identify (thisPeerIdent "server") 0 (Just thisPeerDescription)
+
       let worker lo = do
             waitRead <- io $ waitReadSocketSTM conn
             r <- atomically $ (Left <$> waitRead) `orElse` (Right <$> readTQueue sendQ)
@@ -148,7 +141,6 @@ serverRun conf stateRef = withThreadContext ["component" .= ("ipc/server"::Strin
                          Right msg -> conf.onClientMessage conn msg
                          Left e -> logWarn $ "Received malformed message from client" :# [ "exception" .= toText e, "msg" .= BUTF8.toString resp ]
 
-      atomically . writeTQueue sendQ $ Identify (PKG.name ++ "-server") 0 (Just $ PKG.synopsis ++ " " ++ showVersion PKG.version)
       worker ""
 
     cleanup connFd conn = do
@@ -225,11 +217,10 @@ toWindowId :: RiverWindow -> Word
 toWindowId (R.RiverWindow w) = let WordPtr res = ptrToWordPtr w in res
 
 toWindowInfo :: Window -> WindowInfo
-toWindowInfo w =
-  WindowInfo
-    { wid = toWindowId w.river_window,
-      title = toText w.title,
-      appId = toText w.appId,
-      identifier = toText w.identifier,
-      pid = w.unreliablePid
-    }
+toWindowInfo w = WindowInfo
+  { wid = toWindowId w.river_window
+  , title = toText w.title
+  , appId = toText w.appId
+  , identifier = toText w.identifier
+  , pid = w.unreliablePid
+  }

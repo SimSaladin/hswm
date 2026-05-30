@@ -9,27 +9,31 @@
 --
 module HSWM.IPC where
 
-import Data.Aeson qualified as A
-import Data.Aeson.KeyMap qualified as KM
-import Data.Text (Text)
-import Data.Text qualified as T
-import Data.Text.Lazy qualified as TL
-import Data.ByteString.Char8 qualified as C8
-import Data.ByteString.Lazy qualified as BL
-import Data.ByteString.UTF8 qualified as BUTF8
-import Data.Map qualified as M
-import Data.Text qualified as T
-import Data.Text.Lazy qualified as TL
-import Data.Version (showVersion)
+import qualified Data.Aeson as A
+import qualified Data.Aeson.KeyMap as KM
+import qualified Data.ByteString.Char8 as C8
+import qualified Data.ByteString.Lazy as BL
+import qualified Data.ByteString.UTF8 as BUTF8
 import qualified Data.List as L
+import qualified Data.Map as M
+import           Data.Text (Text)
+import qualified Data.Text as T
+import qualified Data.Text.Lazy as TL
+import           Data.Version (showVersion)
 import           System.Environment (lookupEnv)
 
-import Foreign.Ptr
+import           Foreign.Ptr
 
-import Network.Socket
-import Network.Socket.ByteString qualified as NB
+import           Network.Socket
+import qualified Network.Socket.ByteString as NB
 
-import PackageInfo_hswm qualified as PKG
+import qualified PackageInfo_hswm as PKG
+
+thisPeerIdent :: String -> String
+thisPeerIdent x = PKG.name ++ "-" ++ x
+
+thisPeerDescription :: String
+thisPeerDescription = PKG.synopsis ++ " " ++ showVersion PKG.version
 
 type MonadIPCClient m = (MonadLogger m, MonadIO m, MonadUnliftIO m, MonadMask m)
 
@@ -81,9 +85,9 @@ data Response
   deriving (Eq, Show, Read, Generic)
 
 data RWorkspaces = RWorkspaces
-  { tags :: [WorkspaceInfo]
-  , focused :: (OutputId, WsId)
-  , visible :: [(OutputId, WsId)]
+  { tags       :: [WorkspaceInfo]
+  , focused    :: (OutputId, WsId)
+  , visible    :: [(OutputId, WsId)]
   } deriving (Eq, Show, Read, Generic)
 
 data WorkspaceInfo = WorkspaceInfo
@@ -164,10 +168,10 @@ clientRun :: MonadIPCClient m
           -> (Response -> m ()) -- ^ Process incoming
           -> ((Request -> m ()) -> m ()) -- ^ Emit outgoing
           -> m ()
-clientRun conf onMsg cb = withThreadContext ["component" .= ("ipc/client"::String)] $ do
+clientRun conf onMsg cb = withThreadContext ["component" .= ("ipc/client" :: String)] $ do
   ai <- getClientAI conf
   bracket (open ai) (io . close) $ \sock -> do
-    sendMsg sock $ IdentifyClient (PKG.name ++ "-client") 0 (Just $ PKG.synopsis ++ " " ++ showVersion PKG.version)
+    sendMsg sock $ IdentifyClient (thisPeerIdent "client") 0 (Just thisPeerDescription)
     withAsync (inputWorker sock) $ \inputAs -> do
       link inputAs
       cb (sendMsg sock) `finally` cancel inputAs
@@ -193,10 +197,6 @@ clientRun conf onMsg cb = withThreadContext ["component" .= ("ipc/client"::Strin
 
 sendMsg :: (MonadIO m, A.ToJSON msg) => Socket -> msg -> m ()
 sendMsg sock msg = io $ NB.sendAll sock $ BL.toStrict $ A.encode msg <> "\n"
-
-broadcastMsg :: (MonadIO m, A.ToJSON msg, Traversable t) => msg -> t Socket -> m ()
-broadcastMsg msg socks = io $ forM_ socks $ \s -> NB.sendAll s msg'
-  where msg' = BL.toStrict $ A.encode msg <> "\n"
 
 recvLines :: (MonadIPCClient m) => Socket -> ByteString -> m ([ByteString], ByteString)
 recvLines sock leftover = do

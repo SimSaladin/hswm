@@ -10,7 +10,6 @@ import Bindings.Wayland.Client (Surface(..))
 
 import Wayland.Internal.TH
 
-import Foreign.Ptr
 import Path_river_window_management_v1
 
 clientFromProtocolXML' commonSettings protoXml

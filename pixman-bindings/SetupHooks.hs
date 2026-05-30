@@ -1,11 +1,5 @@
-{-# LANGUAGE DeriveAnyClass      #-}
-{-# LANGUAGE DerivingStrategies  #-}
-{-# LANGUAGE LambdaCase          #-}
 {-# LANGUAGE OverloadedLists     #-}
-{-# LANGUAGE OverloadedRecordDot #-}
 {-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE RecordWildCards     #-}
-{-# LANGUAGE StaticPointers      #-}
 
 {-# OPTIONS_GHC -Wall #-}
 
@@ -15,10 +9,11 @@ import           Distribution.HsBindgen.Hooks
 import           Distribution.Simple.SetupHooks
 
 setupHooks :: SetupHooks
-setupHooks = hsBindgenSetupHooks [ pixmanSpec ]
+setupHooks = hsBindgenSetupHooks def
+  { modulesSimple = [ pixmanSpec ] }
 
 pixmanSpec :: HsBindGen
-pixmanSpec = bindGenDef
+pixmanSpec = def
   { headers = [ "pixman.h" ]
   , moduleName = "Pixman.Generated"
   , uniqueId = "pixman"

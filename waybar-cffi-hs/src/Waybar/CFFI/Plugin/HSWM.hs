@@ -16,6 +16,7 @@
 module Waybar.CFFI.Plugin.HSWM ( MyMod ) where
 
 import           Waybar.CFFI.Plugin.Base
+import           Waybar.CFFI.Plugin.TextFormat
 
 import           HSWM.IPC (Response(..), RWorkspaces(..), WindowInfo(..), WorkspaceInfo(..), OutputId(..), runMIO, clientRun)
 
@@ -34,18 +35,21 @@ import           Data.Aeson as A
 import           Data.Char (isDigit)
 import qualified Data.List as L
 import qualified Data.Text as T
-import           GHC.TypeLits
-import qualified Text.ParserCombinators.ReadP as RP
 
-type MIO = Context MyMod
-
-data Global = Global
-  { wmThread       :: !(Async ())
-  , outputs        :: ![(Text, OutputId)]
-  , workspacesInfo :: !RWorkspaces
-  , curfocus       :: !(Maybe WindowInfo)
-  } deriving (Eq, Generic)
-
+-- |
+-- @
+--   box()#hsvm.module
+--     box().workspaces
+--       label().workspace.[|visible|focused]
+--                            {text:format-workspace =? "{name}"}
+--                            {tooltip:...}
+--       *
+--       *
+--     label().current-layout {text:format-layout =? "{name}"}
+--                            {tooltip:...}
+--     label().focused-window {text:format-focused-window =? "{title}"}
+--                            {tooltip:...}
+-- @
 data MyMod = MyMod
   { topContainer        :: !Container
   , workspacesContainer :: !Container
@@ -53,24 +57,12 @@ data MyMod = MyMod
   , focusInfoWidget     :: !Label
   } deriving (Eq, Generic)
 
--- | Mutable instance state.
-data ModState = ModState
-  { tagWidgets     :: [Label]
-  , thisOutputName :: !Text -- ^ Name of this output, e.g. eDP-1, DP-2, etc.
-  } deriving (Eq, Generic)
+type MIO = Context MyMod
 
-instance Default ModState where
+instance Default (PluginState MyMod) where
   def = ModState [] ""
 
-data Config = Config
-  { spacing                    :: !Int32
-  , focusedWindowMaxLength     :: !Int32
-  , wsFormat                   :: !TextFormat
-  , wsTooltipFormat            :: !TextFormat
-  , focusedWindowTooltipFormat :: !TextFormat
-  } deriving (Eq, Ord, Show, Read, Generic)
-
-instance FromJSON Config where
+instance FromJSON (PluginConfig MyMod) where
   parseJSON = withObject "Config" $ \v -> Config
     <$> (v .: "spacing" <|> pure 5)
     <*> (v .: "focused-window-max-length" <|> pure 42)
@@ -91,89 +83,45 @@ instance FromJSON Config where
            "AppID: {appId}\r" <>
            "PID: {pid}"
 
-instance ToJSON Config
-
-data TextFormat
-  = TFLit Text
-  | TFInterp SomeSymbol
-  | TFMany [TextFormat]
-  deriving (Eq, Ord, Show, Read, Generic)
-
-instance IsString TextFormat where
-  fromString s = case reverse $ RP.readP_to_S parseTextFormat s of
-                   (x, "") : _ -> x
-                   _ -> error $ "TextFormat: no parse: " ++ s
-
-ppTextFormat :: TextFormat -> Text
-ppTextFormat = go where
-  go (TFLit x) = x
-  go (TFInterp (SomeSymbol p)) = "{" <> T.pack (symbolVal p) <> "}"
-  go (TFMany xs) = mconcat $! map go xs
-
-parseTextFormat :: RP.ReadP TextFormat
-parseTextFormat = (TFMany <$> RP.many (lit RP.+++ interp)) <* RP.eof
-  where
-    lit = TFLit . T.pack <$> RP.munch1 (/= '{')
-    interp = do
-      s <- RP.between (RP.char '{') (RP.char '}') (RP.munch (/= '}'))
-      return $ TFInterp $ someSymbolVal s
-
-instance FromJSON TextFormat where
-  parseJSON = withText "TextFormat" $ \x ->
-    pure $! fromString $! T.unpack x
-
-instance ToJSON TextFormat where
-  toJSON = A.String . ppTextFormat
-
-runTextFormat :: forall m. (Monad m) => [(String, m Text)] -> TextFormat -> m Text
-runTextFormat vals = go
-  where
-    go (TFLit x) = pure x
-    go (TFMany xs) = mconcat <$> mapM go xs
-    go (TFInterp ss) = f ss
-
-    f (SomeSymbol proxy) = fromMaybe (pure "") $ L.lookup (symbolVal proxy) vals
-
+instance ToJSON (PluginConfig MyMod)
 
 instance WaybarPlugin MyMod where
 
-  type GlobalState  MyMod = Global
-  type PluginConfig MyMod = Config
-  type PluginState  MyMod = ModState
-
   type ContextT MyMod = LoggingT
+
+  data GlobalState MyMod = Global
+    { wmThread       :: !(Async ())
+    , outputs        :: ![(Text, OutputId)]
+    , workspacesInfo :: !RWorkspaces
+    , curfocus       :: !(Maybe WindowInfo)
+    } deriving (Eq, Generic)
+
+  data PluginConfig MyMod = Config
+    { spacing                    :: !Int32
+    , focusedWindowMaxLength     :: !Int32
+    , wsFormat                   :: !TextFormat
+    , wsTooltipFormat            :: !TextFormat
+    , focusedWindowTooltipFormat :: !TextFormat
+    } deriving (Eq, Ord, Show, Read, Generic)
+
+  data PluginState MyMod = ModState
+    { tagWidgets     :: [Label]
+    , thisOutputName :: !Text -- ^ Name of this output, e.g. eDP-1, DP-2, etc.
+    } deriving (Eq, Generic)
 
   runContextT _ = runMIO
 
-  initGlobal _ = do
+  initGlobal = do
     wmAs <- async connectToWM
     return $! Global wmAs def def def
 
-  deinitGlobal _ g = do
+  deinitGlobal g = do
     cancel g.wmThread
 
-  -- |
-  -- @
-  --   box()#hsvm.module
-  --     box().workspaces
-  --       label().workspace.[|visible|focused]
-  --                            {text:format-workspace =? "{name}"}
-  --                            {tooltip:...}
-  --       *
-  --       *
-  --     label().current-layout {text:format-layout =? "{name}"}
-  --                            {tooltip:...}
-  --     label().focused-window {text:format-focused-window =? "{title}"}
-  --                            {tooltip:...}
-  -- @
   init = do
     c <- getConfig
-    ic <- asks envInstance
-    logInfo $ "Plugin initializing" :#
-      [ "waybar_version" .= instWbVersion ic
-      , "config" .= c
-      , "instance" .= instId ic
-      ]
+    ic <- asks id
+    logInfo $ "Plugin initializing" :# [ "waybar-version" .= instWbVersion ic, "config" .= c, "id" .= instId ic ]
 
     runInIO <- askRunInIO
     _ <- after (instRootWidget ic) #map $ runInIO updateOutputName
@@ -214,7 +162,7 @@ instance WaybarPlugin MyMod where
   doaction act = logWarn $ "unhandled module action" :# [ "action" .= show act ]
   {-# INLINe doaction #-}
 
-connectToWM :: ContextM MyMod a ()
+connectToWM :: ContextGlobalM MyMod ()
 connectToWM = do
   logInfo "Connecting..."
   res <- try $ clientRun def handleMsgG $ \_ -> do
@@ -227,9 +175,9 @@ connectToWM = do
       threadDelay 5_000_000
       connectToWM
 
-handleMsgG :: Response -> ContextM MyMod a ()
+handleMsgG :: Response -> ContextGlobalM MyMod ()
 handleMsgG Identify {} = pure ()
-handleMsgG Outputs {..} = modifyGlobal @MyMod @Global $ \s -> s {outputs = outputs}
+handleMsgG Outputs {..} = modifyGlobal $ \s -> (s::GlobalState MyMod) {outputs = outputs}
 handleMsgG Workspaces {..} = do
   modifyGlobal $ \s -> s {workspacesInfo = workspaces}
   queueUpdateAll
@@ -239,9 +187,9 @@ handleMsgG FocusedWindow {window} = do
 handleMsgG msg = logWarn $ "Unhandled incoming message" :# [ "msg" .= msg ]
 
 -- | Wait for the waybar window to be created, then sniff out the assigned screen name.
-updateOutputName :: ContextM MyMod (IConf' MyMod a) ()
+updateOutputName :: Context MyMod ()
 updateOutputName = do
-  ic <- asks envInstance
+  ic <- asks id
   let w = instRootWidget ic
   rootPath <- widgetGetPath w
   classes <- widgetPathIterListClasses rootPath 0
@@ -298,7 +246,7 @@ updateWorkspaces = do
       add _ = do
         m <- getInstance
         l <- new Label [ #useMarkup := True ]
-        widgetGetStyleContext l >>= \sc -> styleContextAddClass sc "workspace"
+        addClass l "workspace"
         containerAdd m.workspacesContainer l
         widgetShow l
         return l
@@ -319,29 +267,28 @@ updateFocusInfo = do
 mkWorkspaceLabel :: WorkspaceInfo -> MIO Text
 mkWorkspaceLabel ws = do
   c <- getConfig
-  let vals = [ ("tag", pure $ T.pack ws.tag)
-             , ("keyhint", pure ws.keyhint)
-             ]
-  runTextFormat vals c.wsFormat
+  runTextFormat c.wsFormat
+    [ ("tag",     pure $ T.pack ws.tag)
+    , ("keyhint", pure ws.keyhint)
+    ]
 
 mkWorkspaceTooltip :: WorkspaceInfo -> Maybe OutputId -> Maybe Text -> MIO Text
 mkWorkspaceTooltip ws screen outputName = do
   c <- getConfig
-  let vals :: [(String, MIO Text)]
-      vals = [ ("numWindows", pure $ tshow $ length ws.windowList)
-             , ("layout", pure ws.layout)
-             , ("screen", pure $ maybe "" (tshow . fromEnum) screen)
-             , ("outputName", pure $ fromMaybe "-" outputName)
-             ]
-  runTextFormat vals c.wsTooltipFormat
+  runTextFormat c.wsTooltipFormat
+    [ ("numWindows", pure $ tshow $ length ws.windowList)
+    , ("layout",     pure ws.layout)
+    , ("screen",     pure $ maybe "" (tshow . fromEnum) screen)
+    , ("outputName", pure $ fromMaybe "-" outputName)
+    ]
 
 mkFocusedTooltip :: WindowInfo -> MIO Text
 mkFocusedTooltip wi = do
   c <- getConfig
-  let vals = [ ("title", markupEscape wi.title)
-             , ("appId", markupEscape wi.appId)
-             ]
-  runTextFormat vals c.focusedWindowTooltipFormat
+  runTextFormat c.focusedWindowTooltipFormat
+    [ ("title", markupEscape wi.title)
+    , ("appId", markupEscape wi.appId)
+    ]
 
 markupEscape :: MonadIO m => Text -> m Text
 markupEscape text = markupEscapeText (text <> "\0") (-1)

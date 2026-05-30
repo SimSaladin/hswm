@@ -1,9 +1,8 @@
 {
   src,
+  depsHash ? "",
   lib,
   stdenv,
-  callPackage,
-  #fetchFromCodeberg,
   libGL,
   libx11,
   libevdev,
@@ -23,22 +22,17 @@
   withManpages ? true,
   xwaylandSupport ? true,
   withDebug ? false,
+  useLLVM ? true,
   runCommand,
+  callZon2Nix,
 }:
 let
+
   version = lib.fileContents (runCommand "get-version" { } ''
-    sed -n '/version =/s/^[^"]*"\(.*\)".*$/\1/p' <${src}/build.zig.zon >$out
+    sed -n '/\.version =/s/^[^"]*"\(.*\)".*$/\1/p' ${src}/build.zig.zon >$out
   '');
 
   suffix = "-g${src.sourceInfo.shortRev}+${lib.substring 0 8 src.sourceInfo.lastModifiedDate}";
-
-  callZon2Nix = callPackage ./callZon2nix.nix { };
-
-  zon2nix = callZon2Nix {
-    pname = "river";
-    inherit src;
-    outputHash = "sha256-tXU9LWcxEQbI24ua4OAJjqhtsJrLlGHBukyFXEUcV/Q=";
-  };
 in
 
 stdenv.mkDerivation (finalAttrs: {
@@ -50,12 +44,16 @@ stdenv.mkDerivation (finalAttrs: {
   inherit src;
 
   postPatch = ''
-    sed -i '/version =/s/".*"/"${finalAttrs.version}"/' build.zig.zon
+    sed -i '/\.version =/s/".*"/"${finalAttrs.version}"/' build.zig.zon
   '';
 
   strictDeps = true;
 
-  deps = callPackage zon2nix { };
+  deps = callZon2Nix {
+    name = finalAttrs.pname;
+    inherit (finalAttrs) src;
+    outputHash = depsHash;
+  };
 
   nativeBuildInputs = [
     pkg-config
@@ -81,11 +79,30 @@ stdenv.mkDerivation (finalAttrs: {
     libx11
   ];
 
+  preBuild = ''
+    mkdir -p .zig-pkgs
+    pushd .zig-pkgs
+    for pkg in ${finalAttrs.deps}/*; do
+      name=$(basename "$pkg")
+      pkg=$(readlink -f $pkg)
+      if [[ -d $pkg ]]; then
+        cp -r --no-preserve=all "$pkg" ./"$name"
+      else
+        tar xf "$pkg"
+      fi
+    done
+    ls -la . */
+    popd
+  '';
+
   zigBuildFlags = [
     "--system"
-    "${finalAttrs.deps}"
+    ".zig-pkgs"
   ]
+  ++ lib.optional (!withDebug) "-Dstrip"
+  ++ lib.optional useLLVM "-Dllvm"
   ++ lib.optional withDebug "-Doptimize=Debug"
+  ++ lib.optional (!withDebug) "-Doptimize=ReleaseFast"
   ++ lib.optional withManpages "-Dman-pages"
   ++ lib.optional xwaylandSupport "-Dxwayland";
 
@@ -99,7 +116,6 @@ stdenv.mkDerivation (finalAttrs: {
   passthru = {
     providedSessions = [ "river" ];
     #updateScript = ./update.sh;
-    depsZon2nix = zon2nix;
   };
 
   meta = {
