@@ -5,6 +5,8 @@
 {-# LANGUAGE RecordWildCards       #-}
 {-# LANGUAGE TemplateHaskellQuotes #-}
 {-# LANGUAGE OverloadedRecordDot #-}
+{-# OPTIONS_GHC -Wno-typed-holes #-}
+
 
 
 module Wayland.Internal.TH
@@ -32,10 +34,10 @@ module Wayland.Internal.TH
   , nullPtr
   ) where
 
-import           Wayland.Internal.TH.NewType
 import           Wayland.Types
-
 import           Distribution.Wayland.ProtocolXML
+
+import           HsBindgen.Runtime.PtrConst
 
 import           Control.Arrow
 import           Control.Monad
@@ -44,20 +46,19 @@ import           Data.Char (toUpper)
 import           Data.Default
 import qualified Data.List as L
 import           Data.Maybe
-import qualified Data.Text as T
 import           Data.Void
 import           Foreign
 import           Foreign.C
 import           Foreign.C.ConstPtr
 import           GHC.Generics (Generic)
-
-import           HsBindgen.Runtime.PtrConst
-
 import           Language.Haskell.TH
 import           Language.Haskell.TH.Syntax
-
 import           Prelude hiding (head)
 import           System.IO.Unsafe (unsafePerformIO)
+import           Control.Arrow ()
+import           Control.DeepSeq (NFData)
+import           Data.Hashable (Hashable)
+import           GHC.Records (getField)
 
 data ProtocolRenderSettings = ProtocolRenderSettings
   { prValueNameModifier :: String -> String
@@ -94,7 +95,7 @@ instance Default ProtocolRenderSettings where
     , prTypeNameModifier  = upperFirst . fromSnailCase
     , prInterfaceName     = \s -> s.prValueNameModifier . (++ "_interface") . s.prValueNameModifier
     , prRequestOptions    = []
-    , prEnumModule        = \iface name ->
+    , prEnumModule        = \iface _name ->
       case iface of
         -- Just{} | "wl_" `L.isPrefixOf` name -> "Bindings.Wayland.Client."
         _ -> ""
@@ -105,6 +106,7 @@ instance Default ProtocolRenderSettings where
     , prEventArgTrans = defaultEventArgTrans -- s iface ev arg t name
     }
 
+defaultEventArgTypeTrans :: ProtocolRenderSettings -> Interface -> IEvent -> Arg -> Type -> Q Type
 defaultEventArgTypeTrans s iface _ arg t
   | AppT (ConT cN) (ConT tN) <- t, cN == ''Ptr, nameBase tN == upperFirst iface.name
   = conT $ mkName $ s.prTypeNameModifier iface.name
@@ -122,6 +124,7 @@ defaultEventArgTypeTrans s iface _ arg t
 
   | otherwise = pure t
 
+defaultRequestArgTypeTrans :: ProtocolRenderSettings -> Interface -> IRequest -> Arg -> Type -> Q Type
 defaultRequestArgTypeTrans s iface _ arg t
   | AppT (ConT cN) (ConT tN) <- t, cN == ''Ptr, nameBase tN == upperFirst iface.name
   = conT $ mkName $ s.prTypeNameModifier iface.name
@@ -139,6 +142,7 @@ defaultRequestArgTypeTrans s iface _ arg t
 
   | otherwise = pure t
 
+defaultEventArgTrans :: ProtocolRenderSettings -> Interface -> IEvent -> Arg -> Type -> Q Exp -> Q Exp
 defaultEventArgTrans s iface _ev arg t x
       | ASelf <- arg.argType
       = [|return $! $(conE (mkName $ s.prTypeNameModifier iface.name)) $(x)|]
@@ -224,6 +228,23 @@ clientFromProtocol settings proto = do
       , "* Enums\n"
       , unlines [ "    * t'" ++ prTypeNameModifier (prTypeNameModifier iface.name ++ "_" ++ x.name) ++ "'\n" | x <- iface.enums ]
       ]
+
+renderNewType :: String -> Name -> String -> Q [Dec]
+renderNewType objN objT doc = do
+  let ntName = mkName objN
+  let con = recC ntName [ varBangType (mkName "unwrap") (bangType (bang noSourceUnpackedness noSourceStrictness) [t|Ptr $(conT objT)|]) ]
+  let derivs = [ derivClause (Just StockStrategy)   [ [t|Eq|], [t|Ord|], [t|Generic|] ]
+               , derivClause (Just NewtypeStrategy) [ [t|Storable|], [t|Hashable|], [t|NFData|], [t|IsUserData|] ]
+               ]
+  concat <$> sequence
+    [ sequence [ newtypeD_doc (pure []) ntName [] Nothing (con, Nothing, []) derivs (if doc == "" then Nothing else Just doc) ]
+    , [d|
+      instance Show $(conT ntName) where
+        show = show . ptrToWordPtr . getField @"unwrap"
+      instance Read $(conT ntName) where
+        readsPrec n xs = first ($(conE ntName) . wordPtrToPtr) <$> readsPrec n xs
+      |]
+    ]
 
 renderInterface :: ProtocolRenderSettings -> Interface -> Q [Dec]
 renderInterface s iface = concat <$> sequence
@@ -419,6 +440,7 @@ renderRequest s iface request  = do
 
     resTransform _ name = [|return $(varE name)|]
 
+getModule :: Name -> String
 getModule name = case (nameModule name, nameBase name) of
               -- Just m' -> dropSuffix ".Generated" m' ++ "."
               (Just _, "Wl_surface") -> "Bindings.Wayland.Client."
@@ -562,7 +584,7 @@ mkEvent s iface = do
           con = do
             fields <- forM (zip params $ getFields evType) $ \(arg, fT) -> do
               let name
-                    | arg.name == "id", ANewId iface <- argType arg = prValueNameModifier s iface
+                    | arg.name == "id", ANewId iface' <- argType arg = prValueNameModifier s iface'
                     | arg.name == "type" = "type'"
 
                      -- river wm fix
@@ -580,6 +602,7 @@ mkEvent s iface = do
 
       return (con, Just doc, [])
 
+interfaceListener :: Interface -> Q Info
 interfaceListener iface = reify $ mkName $ upperFirst iface.name ++ "_listener"
 
 -- * Type utils
@@ -622,6 +645,7 @@ escapeString = concatMap escape
       | x `elem` ("\\/'`\"@<$#" :: [Char]) = "\\" ++ [x]
       | otherwise = [x]
 
+formatDescription :: Description -> String
 formatDescription desc = escapeString desc.summary
    ++ (if desc.contents /= "" then "\n\n" ++ escapeString desc.contents else "")
 

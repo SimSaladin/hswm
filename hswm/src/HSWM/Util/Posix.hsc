@@ -108,8 +108,8 @@ withPollFds :: [PollFd] -> ((Ptr PollFd, CULong) -> IO a) -> IO a
 withPollFds fds f = withArray fds $ \p -> f (p, fi $ length fds)
 
 poll :: Ptr PollFd -> Int -> PollTimeout -> IO PollResult
-poll pfd npfd to = do
-  r <- throwErrnoIfMinus1 "poll" $ c_poll pfd (fi npfd) (asPollTimeout to)
+poll pfd npfd time = do
+  r <- throwErrnoIfMinus1 "poll" $ c_poll pfd (fi npfd) (asPollTimeout time)
   return $! if r == 0 then PollTimeout else PollResult (fi r)
   where
     asPollTimeout PollBlock      = -1
@@ -131,9 +131,9 @@ closeRange :: Integral i
            -> Bool -- ^ Don't close, just set CLOEXEC?
            -> Bool -- ^ Unshare the fds before closing?
            -> IO ()
-closeRange first last cloexec unshare =
+closeRange start end cloexec unshare =
   throwErrnoIfMinus1_ "close_range" $
-    c_close_range (fi first) (fi last) $
+    c_close_range (fi start) (fi end) $
       (if cloexec then #{const CLOSE_RANGE_CLOEXEC} else 0) .|.
       (if unshare then #{const CLOSE_RANGE_UNSHARE} else 0)
 

@@ -26,7 +26,7 @@ import qualified Pixman as P
 import           River (RiverColor(..))
 import qualified Bindings.River.WindowManagement.V1.Client.Generated as R
 
-import qualified Bindings.Wayland.Core.Client.Generated as WL
+import qualified Bindings.Wayland.Client as WL
 
 import           Data.Bits
 import           Data.Char (toLower)
@@ -105,7 +105,6 @@ instance IsKeySym String where
 logTraceShow :: (MonadIO m, MonadReader env m, MonadLogger m, Show show) => show -> m ()
 logTraceShow x =
   logDebug $
-    display $
       P.pShowOpt
         P.defaultOutputOptionsNoColor
           { P.outputOptionsPageWidth = 380,
@@ -115,7 +114,7 @@ logTraceShow x =
             -- P.outputOptionsColorOptions = Just P.defaultColorOptionsDarkBg
             P.outputOptionsColorOptions = Nothing
           }
-        x
+        x ^. strict :# [ ]
 
 pTrace :: (MonadIO m, Show a) => a -> m ()
 pTrace =

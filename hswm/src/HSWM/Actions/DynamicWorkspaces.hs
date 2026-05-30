@@ -131,8 +131,8 @@ renameWorkspaceByName w = do
   windows $ \s ->
     let sett wk = wk {tag = w}
         setscr scr = scr {workspace = sett $ workspace scr}
-        sets q = q {current = setscr $ current q}
-     in sets $ removeWorkspace' w s
+        doit q = q {current = setscr $ current q}
+     in doit $ removeWorkspace' w s
   updateIndexMap old w
   where
     updateIndexMap oldIM newIM = do

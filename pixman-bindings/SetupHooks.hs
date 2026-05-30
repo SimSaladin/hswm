@@ -7,16 +7,16 @@ module SetupHooks (setupHooks) where
 
 import           Distribution.HsBindgen.Hooks
 import           Distribution.Simple.SetupHooks
+import           Distribution.Utils.Path
 
 setupHooks :: SetupHooks
 setupHooks = hsBindgenSetupHooks def
-  { modulesSimple = [ pixmanSpec ] }
+  { sources = [ pixmanSpec ] }
 
 pixmanSpec :: HsBindGen
 pixmanSpec = def
-  { headers = [ "pixman.h" ]
-  , moduleName = "Pixman.Generated"
-  , uniqueId = "pixman"
+  { moduleName     = "Pixman.Generated"
+  , headers        = [ makeSymbolicPath "pixman.h" ]
   , programSlicing = Just True
-  , genGlobal = Just False
+  , genGlobal      = Just False
   }

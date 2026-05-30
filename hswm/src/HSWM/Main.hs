@@ -225,8 +225,9 @@ startHSWM mainRun loggerSet logFunc wlDisplay config = do
         mainEvent MainSaveToDisk
       link timerAs
 
-      mainLoop wlDisplay wlPollFd
+      void $ mainLoop wlDisplay wlPollFd
 
+mainLoop :: WL.Display -> Posix.Fd -> H Void
 mainLoop wlDisplay wlPollFd = do
   let main MainPoll = do
         dispatchPending wlDisplay >>= \case

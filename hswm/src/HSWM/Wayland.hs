@@ -4,7 +4,6 @@ import           HSWM.Types.TypeMap
 
 import qualified Wayland as WL
 
-import qualified Data.Set as S
 import           Foreign
 
 -- * Registry tracking

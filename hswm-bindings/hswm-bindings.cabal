@@ -55,7 +55,6 @@ library
           Wayland.Types
           -- code generation
           Wayland.Internal.TH
-          Wayland.Internal.TH.NewType
           -- Wayland protocols
           Wayland
           Wayland.Viewporter

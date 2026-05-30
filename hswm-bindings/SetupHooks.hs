@@ -1,8 +1,7 @@
+{-# LANGUAGE DataKinds         #-}
+{-# LANGUAGE LambdaCase        #-}
+{-# LANGUAGE OverloadedLists   #-}
 {-# LANGUAGE OverloadedStrings #-}
-
-{-# LANGUAGE DataKinds       #-}
-{-# LANGUAGE LambdaCase      #-}
-{-# LANGUAGE OverloadedLists #-}
 
 {-# OPTIONS_GHC -Wall #-}
 {-# OPTIONS_GHC -Wno-ambiguous-fields #-}
@@ -31,6 +30,7 @@ setupHooks = hsBindgenSetupHooks genSetup <> mempty
 genSetup :: HsBindGenSetup ProtocolSpec
 genSetup = def & I.sources <>~ protocolBindSpecs
 
+protoWayland :: ProtocolSpec
 protoWayland = spec
   where
     spec = fromProtocolXML "core/wayland.xml"
@@ -97,6 +97,17 @@ protocolBindSpecs =
   , mkProto "wayland-ext-idle-notify-v1.xml"
   , mkProto "wayland-ext-session-lock-v1.xml"
   , mkProto "wayland-ext-foreign-toplevel-list-v1.xml"
+
+  -- TODO
+  --, mkProto "stable/wayland-xdg-shell.xml"
+  --, mkProto "stable/wayland-viewporter.xml"
+  --, mkProto "staging/wayland-fractional-scale-v1.xml"
+  --, mkProto "unstable/wayland-xdg-output-unstable-v1.xml"
+  --, mkProto "unstable/wayland-text-input-unstable-v3.xml"
+  --, mkProto "staging/wayland-ext-idle-notify-v1.xml"
+  --, mkProto "staging/wayland-ext-session-lock-v1.xml"
+  --, mkProto "staging/wayland-ext-foreign-toplevel-list-v1.xml"
+
   , mkProto "wlr-layer-shell-unstable-v1.xml"      & I.bindGens . each . I.extBindingSpecs <>~ [ bspec "xdg-shell" ]
   , mkProto "wlr-output-management-unstable-v1.xml"
   , mkProto "wlr-output-power-management-unstable-v1.xml"
@@ -109,6 +120,7 @@ protocolBindSpecs =
   , mkProto "river-xkb-config-v1.xml"       & I.bindGens . each . I.extBindingSpecs <>~ [ bspec "river-input-management" ]
   ]
 
+mkProto :: String -> ProtocolSpec
 mkProto catName' = spec where
   spec'     = fromString catName' :: ProtocolSpec
 

@@ -151,7 +151,12 @@
               packages.hs-bindgen = {
                 # Need to be propagated
                 components.exes.hs-bindgen-cli.pkgconfig = [
-                  [ pkgs.hsBindgenHook pkgs.doxygen ]
+                  [
+                    pkgs.hsBindgenHook
+                    pkgs.doxygen
+                    # clang exe needed for full macro support
+                    config.ghc.package.llvmPackages.libclang
+                  ]
                 ];
               };
 
