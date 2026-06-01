@@ -87,7 +87,7 @@ getScreenIdAndRectangle screen = (W.screen screen, rect)
 -- | Translate a physical screen index to a 'ScreenId'
 getScreen :: ScreenComparator -> PhysicalScreen -> HS (Maybe ScreenId)
 getScreen (ScreenComparator cmpScreen) (P i) = do
-  w <- gets windowset
+  w <- use windowset
   let screens = W.current w : W.visible w
   if i < 0 || i >= length screens
     then return Nothing
@@ -146,7 +146,7 @@ horizontalScreenOrderer = screenComparatorByRectangle comparator
 getNeighbour :: ScreenComparator -> Int -> HS ScreenId
 getNeighbour (ScreenComparator cmpScreen) d =
   do
-    w <- gets windowset
+    w <- use windowset
     let ss = map W.screen $ sortBy (cmpScreen `on` getScreenIdAndRectangle) $ W.current w : W.visible w
         curPos = fromMaybe 0 $ elemIndex (W.screen (W.current w)) ss
         pos = (curPos + d) `mod` length ss

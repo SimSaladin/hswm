@@ -190,7 +190,7 @@ mkPadDyn nm rpc mh = mkPad nm mh q a
 -- | Add a launch action to a dynamic pad. It prompts for confirmation to bind focused window to the pad.
 dynDefaultPrompt :: RP.RofiPromptConfig -> ScratchpadId -> H ()
 dynDefaultPrompt rpc k = do
-  mfoc <- runInHS $ gets windowset >>= maybe (return Nothing) lookupWindow . W.peek
+  mfoc <- runInHS $ use windowset >>= maybe (return Nothing) lookupWindow . W.peek
   case mfoc of
     Just foc -> do
       let text = printf "%s: Bind window %s '%s'" k (show foc.river_window) foc.title
@@ -206,12 +206,12 @@ currentWindows = W.integrate' . W.stack . W.workspace . W.current
 currentWindows' :: W.StackSet i l RiverWindow wd sid sd -> HS [Window]
 currentWindows' ws = do
   let cur = currentWindows ws
-  wins <- gets _windows
+  wins <- use _windows
   return [w | rw <- cur, Just w <- [M.lookup rw wins]]
 
 asWindows :: [RiverWindow] -> HS [Window]
 asWindows cur = do
-  wins <- gets _windows
+  wins <- use _windows
   return [w | rw <- cur, Just w <- [M.lookup rw wins]]
 
 --

@@ -33,9 +33,9 @@ where
 import Data.Enum (pred, succ)
 import Data.List (splitAt, (!!))
 import HSWM hiding (screen, view, workspaces)
-import HSWM.StackSet hiding (filter, modify)
+import HSWM.StackSet hiding (filter, modify, view)
+import qualified HSWM.StackSet as W
 import HSWM.Util.GrabKeyboard
-import Prelude hiding (view)
 
 -- $usage
 -- You can use this module with the following in your @xmonad.hs@ file:
@@ -119,10 +119,10 @@ cycleWindowSets ::
   KeySym ->
   H ()
 cycleWindowSets genOptions holdMods keyNext keyPrev = do
-  (options, unView') <- runInHS $ gets $ (genOptions &&& unView) . windowset
+  (options, unView') <- runInHS $ gets $ (genOptions &&& unView) . view windowset
   let previewWS i = do
         logInfo $ "[cyclews] preview" :# [ "id" .= i ]
-        runInHS $ windows (view (options !! (i `mod` n)) . unView')
+        runInHS $ windows (W.view (options !! (i `mod` n)) . unView')
         manageDirty
         where
           n = length options
@@ -136,7 +136,7 @@ cycleWindowSets genOptions holdMods keyNext keyPrev = do
         | otherwise = pure (Right s)
       process _ Left {} = pure (Left Done)
 
-  Just rs <- asks thisSeat
+  Just rs <- view thisSeat
   Just seat <- runInHS $ lookupSeat rs
   previewWS 0
   withKeyboardGrab seat (map fi holdMods) [keyNext, keyPrev] process 0
@@ -151,7 +151,7 @@ unView ::
   StackSet i l a wd s sd -> StackSet i l a wd s sd -> StackSet i l a wd s sd
 unView w0 w1 = fixOrderH . fixOrderV . view' (currentTag w0) $ w1
   where
-    view' = if screen (current w0) == screen (current w1) then greedyView else view
+    view' = if screen (current w0) == screen (current w1) then greedyView else W.view
     fixOrderV w
       | v : vs <- visible w = w {visible = insertAt (pfxV (visible w0) vs) v vs}
       | otherwise = w
@@ -171,7 +171,7 @@ unView w0 w1 = fixOrderH . fixOrderV . view' (currentTag w0) $ w1
 -- given 'WindowSet', switch to the first generated workspace.
 toggleWindowSets :: (WindowSet -> [WorkspaceId]) -> HS ()
 toggleWindowSets genOptions = do
-  options <- gets $ genOptions . windowset
+  options <- gets $ genOptions . view windowset
   case options of
     [] -> return ()
-    o : _ -> windows (view o)
+    o : _ -> windows (W.view o)

@@ -2,6 +2,7 @@
 
 module Bindings.Wayland.XdgShell where
 
+import           Bindings.Wayland.XdgShell.Enums
 import           Bindings.Wayland.XdgShell.Client.Generated
 import           Bindings.Wayland.XdgShell.Client.Generated.Global
 import           Bindings.Wayland.XdgShell.Client.Generated.Safe

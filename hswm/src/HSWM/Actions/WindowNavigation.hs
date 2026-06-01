@@ -71,8 +71,8 @@ swap stateRef dir = runPureAction stateRef (swapPure dir)
 runPureAction :: IORef WNState -> (WNInput HS -> HS WNOutput) -> H ()
 runPureAction stateRef action = runInHS $ do
   oldState <- io (readIORef stateRef)
-  oldWindowSet <- gets windowset
-  mappedWindows <- M.keysSet <$> gets _windows
+  oldWindowSet <- use windowset
+  mappedWindows <- M.keysSet <$> use _windows
   (newState, newWindowSet) <- action (oldState, oldWindowSet, mappedWindows, windowRectX)
   modifyWindowSet (const newWindowSet)
   io $ writeIORef stateRef newState
@@ -141,8 +141,8 @@ withTargetWindow adj dir input@(oldState, oldWindowSet, _, _) = do
 trackMovement :: IORef WNState -> H ()
 trackMovement stateRef = runInHS $ do
   oldState <- io (readIORef stateRef)
-  oldWindowSet <- gets windowset
-  mappedWindows <- gets (M.keysSet . _windows)
+  oldWindowSet <- use windowset
+  mappedWindows <- gets (M.keysSet . view _windows)
   whenJust' (getCurrentWindow (oldState, oldWindowSet, mappedWindows, windowRectX)) () $ \(_, _, pos) -> do
     io $ writeIORef stateRef $ modifyState oldWindowSet pos oldState
 

@@ -45,7 +45,8 @@ import Data.List (find, nub)
 
 import Data.Map.Strict qualified as Map
 import HSWM hiding (workspaces)
-import HSWM.StackSet hiding (delete, filter, modify)
+import HSWM.StackSet hiding (delete, filter, modify, view)
+import qualified HSWM.StackSet as W
 import HSWM.Util.ExtensibleState qualified as XS
 import HSWM.Util.WorkspaceCompare (getSortByIndex)
 
@@ -102,7 +103,7 @@ instance ExtensionClass DynamicWorkspaceState where
 -- | Set the index of the current workspace.
 setWorkspaceIndex :: WorkspaceIndex -> HS ()
 setWorkspaceIndex widx = do
-  wtag <- gets (currentTag . windowset)
+  wtag <- gets (currentTag . view windowset)
   wmap <- XS.gets workspaceIndexMap
   XS.modify $ \s -> s {workspaceIndexMap = Map.insert widx wtag wmap}
 
@@ -127,7 +128,7 @@ withWorkspaceIndex job widx = do
 
 renameWorkspaceByName :: String -> HS ()
 renameWorkspaceByName w = do
-  old <- gets (currentTag . windowset)
+  old <- gets (currentTag . view windowset)
   windows $ \s ->
     let sett wk = wk {tag = w}
         setscr scr = scr {workspace = sett $ workspace scr}
@@ -142,7 +143,7 @@ renameWorkspaceByName w = do
 toNthWorkspace :: (String -> HS ()) -> Int -> HS ()
 toNthWorkspace job wnum = do
   sort <- getSortByIndex
-  ws <- gets (map tag . sort . workspaces . windowset)
+  ws <- gets (map tag . sort . workspaces . view windowset)
   case drop wnum ws of
     (w : _) -> job w
     [] -> return ()
@@ -150,7 +151,7 @@ toNthWorkspace job wnum = do
 withNthWorkspace :: (String -> WindowSet -> WindowSet) -> Int -> HS ()
 withNthWorkspace job wnum = do
   sort <- getSortByIndex
-  ws <- gets (map tag . sort . workspaces . windowset)
+  ws <- gets (map tag . sort . workspaces . view windowset)
   case drop wnum ws of
     (w : _) -> windows $ job w
     [] -> return ()
@@ -193,8 +194,8 @@ addWorkspaceAt add newtag = addHiddenWorkspaceAt add newtag >> windows (greedyVi
 --   the workspace at an arbitrary spot in the list.
 addHiddenWorkspaceAt :: (WindowSpace -> [WindowSpace] -> [WindowSpace]) -> String -> HS ()
 addHiddenWorkspaceAt add newtag =
-  whenM (gets (not . tagMember newtag . windowset)) $ do
-    l <- asks (layoutHook . config)
+  whenM (gets (not . tagMember newtag . view windowset)) $ do
+    l <- view (config . layoutHook)
     windows (addHiddenWorkspace' add newtag l)
 
 -- | Add a new hidden workspace with the given name, or do nothing if
@@ -204,11 +205,11 @@ addHiddenWorkspace = addHiddenWorkspaceAt (:)
 
 -- | Remove the current workspace if it contains no windows.
 removeEmptyWorkspace :: HS ()
-removeEmptyWorkspace = gets (currentTag . windowset) >>= removeEmptyWorkspaceByTag
+removeEmptyWorkspace = gets (currentTag . view windowset) >>= removeEmptyWorkspaceByTag
 
 -- | Remove the current workspace.
 removeWorkspace :: HS ()
-removeWorkspace = gets (currentTag . windowset) >>= removeWorkspaceByTag
+removeWorkspace = gets (currentTag . view windowset) >>= removeWorkspaceByTag
 
 -- | Remove workspace with specific tag if it contains no windows.
 removeEmptyWorkspaceByTag :: String -> HS ()
@@ -217,10 +218,10 @@ removeEmptyWorkspaceByTag t = whenM (isEmpty t) $ removeWorkspaceByTag t
 -- | Remove workspace with specific tag.
 removeWorkspaceByTag :: String -> HS ()
 removeWorkspaceByTag torem = do
-  s <- gets windowset
+  s <- use windowset
   case s of
     StackSet {current = Screen {workspace = cur}, hidden = (w : _)} -> do
-      when (torem == tag cur) $ windows $ HSWM.StackSet.view $ tag w
+      when (torem == tag cur) $ windows $ W.view $ tag w
       windows $ removeWorkspace' torem
     _ -> return ()
 
@@ -235,14 +236,14 @@ removeEmptyWorkspaceAfter = removeEmptyWorkspaceAfterExcept []
 --   whose entries will never be removed.
 removeEmptyWorkspaceAfterExcept :: [String] -> HS () -> HS ()
 removeEmptyWorkspaceAfterExcept sticky f = do
-  before <- gets (currentTag . windowset)
+  before <- gets (currentTag . view windowset)
   f
-  after <- gets (currentTag . windowset)
+  after <- gets (currentTag . view windowset)
   when (before /= after && before `notElem` sticky) $ removeEmptyWorkspaceByTag before
 
 isEmpty :: String -> HS Bool
 isEmpty t = do
-  wsl <- gets $ workspaces . windowset
+  wsl <- gets $ workspaces . view windowset
   let mws = find (\ws -> tag ws == t) wsl
   return $ maybe True (isNothing . stack) mws
 

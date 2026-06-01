@@ -1,10 +1,6 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE PatternGuards #-}
 
------------------------------------------------------------------------------
-
------------------------------------------------------------------------------
-
 -- |
 -- Module      :  HSWM.Util.ExtensibleState
 -- Description :  Module for storing custom mutable state in xmonad.
@@ -36,7 +32,7 @@ where
 import Control.Monad.State qualified as State
 import Data.Map qualified as M
 import Data.Typeable (cast, typeOf)
-import HSWM.Core (ExtensionClass (..), HS, HState (..), StateExtension (..))
+import HSWM.Core (ExtensionClass (..), HS, HState (..), StateExtension (..), extensibleState)
 import Prelude hiding (gets, modify)
 
 class (MonadState HState m) => XLike m
@@ -93,7 +89,7 @@ modifyStateExts ::
     M.Map String (Either String StateExtension)
   ) ->
   m ()
-modifyStateExts f = State.modify $ \st -> st {extensibleState = f (extensibleState st)}
+modifyStateExts f = State.modify $ \st -> st {extensibleState = f st.extensibleState}
 
 -- | Apply a function to a stored value of the matching type or the initial value if there
 -- is none.
@@ -126,7 +122,7 @@ get = getState' undefined -- `trick' to avoid needing -XScopedTypeVariables
     toValue val = fromMaybe initialValue $ cast val
     getState' :: (ExtensionClass a, XLike m) => a -> m a
     getState' k = do
-      v <- State.gets $ M.lookup (show . typeOf $ k) . extensibleState
+      v <- State.gets $ M.lookup (show . typeOf $ k) . view extensibleState
       case v of
         Just (Right (StateExtension val)) -> return $ toValue val
         Just (Right (PersistentExtension val)) -> return $ toValue val

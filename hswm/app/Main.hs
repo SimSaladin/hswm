@@ -150,7 +150,7 @@ windowPrompt :: H ()
 windowPrompt = do
   (wss, wState) <- runInHS $ do
     a <- withWindowSet $ return . W.workspaces
-    b <- gets _windows
+    b <- use _windows
     return (a, b)
   let wins = [(rw, W.tag ws, w) | ws <- wss, rw <- W.integrate' (W.stack ws), Just w <- [M.lookup rw wState]]
   RP.rofiRun rp (map fmtWindow wins) >>= (`whenJust` doApply wins)
@@ -182,7 +182,7 @@ mkWorkspacePrompt prompt apply = do
   where
     doApply cur input = do
       _ <- apply cur input
-      asks (logHook . config) >>= void . userCode
+      view (config . logHook) >>= void . userCode
 
 renameWorkspacePrompt :: H ()
 renameWorkspacePrompt = do
@@ -193,7 +193,7 @@ renameWorkspacePrompt = do
       runInHS $ do
         DWO.updateName old new
         DynWS.renameWorkspaceByName new
-      asks (logHook . config) >>= void . userCode
+      view (config . logHook) >>= void . userCode
 
 addWorkspacePrompt :: H ()
 addWorkspacePrompt =
@@ -297,7 +297,7 @@ myKeys =
     [ ("M-space",       "Layout: " <??> NextLayout),
       ("M-F3",          "Layout: " <??> NextLayout),
       ("M-Shift-space", "Layout: " <??> FirstLayout),
-      ("M-C-space",     "Layout: Reset" <??> (asks (layoutHook . config) >>= setLayout)),
+      ("M-C-space",     "Layout: Reset" <??> (view (config . layoutHook) >>= setLayout)),
       ("M-comma",       "Layout: " <??> IncMasterN (-1)),
       ("M-period",      "Layout: " <??> IncMasterN 1),
       ("M-x",           "Layout: " <??> Shrink),

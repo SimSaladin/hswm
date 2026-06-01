@@ -135,7 +135,7 @@ configurableNavigation conf = ModifiedLayout (WindowNavigation conf (I Nothing))
 instance LayoutModifier WindowNavigation RiverWindow where
   redoLayout (WindowNavigation conf (I st)) rscr (Just s) origwrs =
     do
-      HSWMConfig {normalBorder = nbc, focusedBorder = fbc} <- asks config
+      HSWMConfig {normalBorder = nbc, focusedBorder = fbc} <- view config
 
       let [uc,dc,lc,rc] = case brightness conf of
             Just frac -> let myc = mixRGBA frac fbc nbc in [myc,myc,myc,myc]
@@ -196,14 +196,14 @@ instance LayoutModifier WindowNavigation RiverWindow where
             where
               focusWindowHere :: HState -> HState
               focusWindowHere s
-                | Just w == W.peek (windowset s) = s
-                | has_ w $ W.stack $ W.workspace $ W.current $ windowset s =
+                | Just w == W.peek s.windowset = s
+                | has_ w $ W.stack $ W.workspace $ W.current s.windowset =
                     s
                       { windowset =
                           until
                             ((Just w ==) . W.peek)
                             W.focusUp
-                            $ windowset s
+                            s.windowset
                       }
                 | otherwise = s
               has_ _ Nothing = False
@@ -236,7 +236,7 @@ instance LayoutModifier WindowNavigation RiverWindow where
         case navigable d pt wrs of
           [] -> return Nothing
           ((w, _) : _) -> do
-            mst <- gets (W.stack . W.workspace . W.current . windowset)
+            mst <- gets (W.stack . W.workspace . W.current . view windowset)
             return $ do
               st <- mst
               Just $ Right $ SomeMessage $ MoveWindowToWindow (W.focus st) w
@@ -246,7 +246,7 @@ instance LayoutModifier WindowNavigation RiverWindow where
           ((w, _) : _) -> liftH (f w) >> return Nothing
     | Just Hide <- fromMessage m =
         do
-          HSWMConfig {normalBorder = nbc} <- asks config
+          HSWMConfig {normalBorder = nbc} <- view config
           mapM_ (sc nbc . fst) wrs
           return $ Just $ Left $ WindowNavigation conf $ I $ Just $ NS pt []
     | Just ReleaseResources <- fromMessage m =

@@ -1,11 +1,13 @@
 {-# LANGUAGE CPP                      #-}
+{-# LANGUAGE LambdaCase               #-}
 {-# LANGUAGE DataKinds                #-}
 {-# LANGUAGE DeriveAnyClass           #-}
 {-# LANGUAGE OverloadedLists          #-}
 {-# LANGUAGE OverloadedRecordDot      #-}
 {-# LANGUAGE OverloadedStrings        #-}
 {-# LANGUAGE StaticPointers           #-}
-{-# LANGUAGE RecordWildCards          #-}
+{-# LANGUAGE DisambiguateRecordFields #-}
+
 
 {-# OPTIONS_GHC -Wall #-}
 
@@ -24,46 +26,34 @@ import           Distribution.Simple.Utils
 import           Distribution.Types.Library (explicitLibModules)
 import           Distribution.Utils.IOData (hPutContents)
 import           Distribution.Utils.Path
+import           Distribution.Parsec
+import qualified Distribution.Compat.CharParsing as P
 
-import qualified System.FilePath as FP
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.Char
 import           Data.Function
+import           Data.Functor
 import qualified Data.List as L
 import           Data.Maybe
-import           GHC.Generics (Generic)
-import           System.Exit (ExitCode(..))
-import           Text.Printf
 import           Data.String
-
-type ActionArgs = (VerbosityFlags, ConfiguredProgram, GenerateModule, Location)
+import           GHC.Generics (Generic)
+import           GHC.StaticPtr
+import           System.Exit (ExitCode(..))
+import qualified System.FilePath as FP
+import           Text.Printf
 
 data GenerateModule = GenerateModule
   { sModule       :: ModuleName    -- ^ output module name
   , sImports      :: [String]      -- ^ Import statements
   , sType         :: String        -- ^ Type of forward bindings E.g. @''Word32@
   , sHeader       :: String        -- ^ Header file. @foobar.h@
-  , sHsNameMod    :: NameModifier
+  , sHsNameMod    :: Maybe StaticKey -- (StaticPtr (String -> String)) -- NameModifier
   , sLookupFn     :: Maybe String
   , sGroupBy      :: Maybe Char
   } deriving (Eq, Show, Generic, Binary)
 
-data NameModifier
-  = NmId
-  | NmStripPrefix String NameModifier
-  | NmAddPrefix String NameModifier
-  | NmSnakeCase NameModifier
-  | NmToLowerHead NameModifier
-  deriving (Eq, Show, Generic, Binary)
-
-data Define = Define
-  { dHeader  :: FilePath
-  , cName    :: String
-  , cComment :: Maybe String
-  , hsName   :: String
-  , hsType   :: String
-  } deriving (Eq, Show, Generic)
+type ActionArgs = (VerbosityFlags, GenerateModule, Location)
 
 setupHooks :: SetupHooks
 setupHooks = mempty { buildHooks = mempty { preBuildComponentRules = Just $ rules (static ()) $ myRules settings } }
@@ -75,7 +65,7 @@ settings =
       , sImports     = [ "Text.XkbCommon.KeySym (KeySym)" ]
       , sType        = "KeySym"
       , sHeader      = "xkbcommon/xkbcommon-keysyms.h"
-      , sHsNameMod   = NmAddPrefix "key_" $ NmStripPrefix "XKB_KEY_" NmId
+      , sHsNameMod   = Just $ staticKey $ static \x -> "key_" ++ fromMaybe x (L.stripPrefix "XKB_KEY_" x)
       , sLookupFn    = Nothing
       , sGroupBy     = Nothing
       }
@@ -84,7 +74,7 @@ settings =
       , sImports     = [ "Data.Word (Word32)" ]
       , sType        = "Word32"
       , sHeader      = "linux/input-event-codes.h"
-      , sHsNameMod   = NmSnakeCase NmId
+      , sHsNameMod   = Just $ staticKey $ static toSnakeCase
       , sLookupFn    = Just "fromEventCode"
       , sGroupBy     = Just '_'
       }
@@ -94,11 +84,15 @@ myRules :: [GenerateModule] -> PreBuildComponentInputs -> RulesM ()
 myRules xs PreBuildComponentInputs{buildingWhat=flags, localBuildInfo=lbi, targetInfo=tgt} =
   case tgt.targetComponent of
     CLib lib -> do
-      (gcc, _) <- liftIO $ requireProgram verb gccProgram (withPrograms lbi)
       forM_ xs $ \gen -> do
-        let loc = Location autogendir $ moduleNameSymbolicPath gen.sModule <.> "hs"
+        let res = Location autogendir $ moduleNameSymbolicPath gen.sModule <.> "hs"
         if gen.sModule `elem` explicitLibModules lib
-           then registerRule_ (fromString $ prettyShow gen.sModule) $ staticRule (bindHeaderAction (vflags, gcc, gen, loc)) [] [loc]
+           then registerRule_ (fromString $ prettyShow gen.sModule) $
+                dynamicRule (static Dict)
+                  (mkCommand (static Dict) (static getHeaderDeps) (vflags, withPrograms lbi, gen.sHeader))
+                  (mkCommand (static Dict) (static bindHeaderAction) (vflags, gen, res))
+                  []
+                  [res]
            else liftIO $ warn verb $ "Module not configured in cabal, not generating for this component: " ++ prettyShow gen.sModule
     _ -> return ()
   where
@@ -106,35 +100,39 @@ myRules xs PreBuildComponentInputs{buildingWhat=flags, localBuildInfo=lbi, targe
       verb = verbosityFromFlags vflags
       autogendir = autogenComponentModulesDir lbi tgt.targetCLBI
 
-bindHeaderAction :: ActionArgs -> Command ActionArgs (IO ())
-bindHeaderAction = mkCommand (static Dict) (static f)
+getHeaderDeps :: (VerbosityFlags, ProgramDb, FilePath) -> IO ([Dependency], FilePath)
+getHeaderDeps (vflags, progdb, hdr) = do
+    (gcc, _) <- requireProgram verb gccProgram progdb
+    fp <- resolveHeader verb gcc hdr
+    let dep = FileDependency $ Location (makeSymbolicPath "/") (makeRelativePathEx $ drop 1 $ getAbsolutePath fp)
+    return ([dep], getAbsolutePath fp)
   where
-    f (vflags, gcc, gen, loc) = do
-      let verb = verbosityFromFlags vflags
-          modFile = interpretSymbolicPathCWD $ location loc
-      noticeNoWrap verb $ "Processing header '" ++ gen.sHeader ++ "' for module " ++ prettyShow gen.sModule ++ " (file: " ++ modFile ++ ")"
-      defines <- getDefines verb gcc gen
-      createDirectoryIfMissingVerbose verb True (FP.takeDirectory modFile)
-      rewriteFileEx verb modFile defines
+      verb = verbosityFromFlags vflags
 
-applyNameModifier :: NameModifier -> String -> String
-applyNameModifier = go where
-  go NmId                  s = s
-  go (NmStripPrefix pre m) s = let x = go m s in fromMaybe x (L.stripPrefix pre x)
-  go (NmAddPrefix pre m)   s = pre ++ go m s
-  go (NmToLowerHead m)     s = let x = go m s in map toLower (take 1 x) ++ drop 1 x
-  go (NmSnakeCase m)       s = let x = go m s in snakeCase False x
-    where
-      snakeCase cnext (x : xs)
-        | x == '_'  = snakeCase True xs
-        | cnext     = toUpper x : snakeCase False xs
-        | otherwise = toLower x : snakeCase False xs
-      snakeCase _ [] = []
+bindHeaderAction :: ActionArgs -> FilePath -> IO ()
+bindHeaderAction (vflags, gen, res) headerFile = do
+  let verb = verbosityFromFlags vflags
+      modFile = interpretSymbolicPathCWD $ location res
+  noticeNoWrap verb $ "Processing header '" ++ gen.sHeader ++ "' for module " ++ prettyShow gen.sModule ++ " (file: " ++ modFile ++ ")"
+  defines <- getDefines verb gen headerFile
+  createDirectoryIfMissingVerbose verb True (FP.takeDirectory modFile)
+  rewriteFileEx verb modFile defines
 
-getDefines :: Verbosity -> ConfiguredProgram -> GenerateModule -> IO String
-getDefines verb gcc gen = do
-  headerFile <- resolveHeader verb gcc gen.sHeader
-  content <- parseHeader gen headerFile
+toSnakeCase :: String -> String
+toSnakeCase = snakeCase False
+  where
+    snakeCase cnext (x : xs)
+      | x == '_'  = snakeCase True xs
+      | cnext     = toUpper x : snakeCase False xs
+      | otherwise = toLower x : snakeCase False xs
+    snakeCase _ [] = []
+
+getDefines :: Verbosity -> GenerateModule -> FilePath -> IO String
+getDefines verb gen headerFile = do
+  content <- parseHeader verb headerFile
+  toName <- case gen.sHsNameMod of
+              Just key -> maybe (error "hsnamemod") deRefStaticPtr <$> unsafeLookupStaticPtr key
+              Nothing -> pure id
   return $! unlines $
       [ "{-# LANGUAGE CApiFFI #-}"
       , "-- |"
@@ -148,58 +146,97 @@ getDefines verb gcc gen = do
       , "module " ++ prettyShow gen.sModule ++ " where"
       ]
       ++ [ "import " ++ m | m <- gen.sImports ]
-
-      ++ [ mkLookupFn nm content | Just nm <- [gen.sLookupFn] ]
-
-      ++ [ forImpD d | Nothing <- [gen.sGroupBy], d <- content ]
-
-      ++ [ unlines $ [ "\n-- * " ++ L.takeWhile (/= c) d0.cName ++ "\n" ] ++
-                     [ mkLookupFn (nm ++ L.takeWhile (/= c) d0.cName) ds | Just nm <- [gen.sLookupFn] ] ++
-                     map forImpD ds
-            | Just c <- [gen.sGroupBy]
-            , ds@(d0:_) <- L.groupBy ((==) `on` L.takeWhile (/= c) . cName) $ L.sortOn (L.takeWhile (/= c) . cName) content
-         ]
+      ++ [ mkLookupFn toName nm (concatMap snd content) | Just nm <- [gen.sLookupFn] ]
+      ++ concat
+        [ ("{- * " ++ gname ++ " -}\n")
+         : [ forImpD toName m | m <- macros ]
+         ++ [ mkLookupFn toName (nm ++ gname) macros | gname /= "", Just nm <- [gen.sLookupFn] ]
+         | macros@(_:_) <- grouped content
+        , let gname = groupName macros ]
   where
-    forImpD d@Define{..} =
-      printf "-- | %s\nforeign import capi unsafe \"%s value %s\"\n  %s :: %s\n" (getDoc d cComment :: String) dHeader cName hsName hsType
+    groupName [] = ""
+    groupName (x:_)
+      | Nothing <- gen.sGroupBy = ""
+      | Just c <- gen.sGroupBy = L.takeWhile (/= c) x.key
 
-    getDoc d = maybe (printf "@%s@" d.cName) (\x -> printf "%s (@%s@)" x d.cName)
+    grouped xs
+      | Nothing <- gen.sGroupBy = map snd xs
+      | Just c <- gen.sGroupBy =
+          L.groupBy ((==) `on` L.takeWhile (/= c) . key) $
+          L.sortOn (L.takeWhile (/= c) . key) $
+          concatMap snd xs
 
-    mkLookupFn nm ds = unlines $
+    esc = concatMap $ \case
+      '*' -> "\\*"
+      c -> [c]
+
+    forImpD toName (m :: Macro) =
+      printf "{- | %s\n -}\nforeign import capi unsafe \"%s value %s\"\n  %s :: %s\n"
+        (getDoc m :: String)
+        gen.sHeader m.key (toName m.key) gen.sType
+
+    getDoc m = maybe "" esc m.comment ++ printf "\n\n@%s = %s@" m.key m.value
+
+    mkLookupFn toName fnName macros = unlines $
       [ printf "-- | Try to convert values to labels."
-      , printf "%s :: %s -> Maybe String" nm gen.sType
-      , printf "%s x" nm
+      , printf "%s :: %s -> Maybe String" fnName gen.sType
+      , printf "%s x" fnName
       ] ++
-      [ printf "  | x == %s = Just \"%s\"" hsName cName | Define{..} <- ds ] ++
+      [ printf "  | x == %s = Just \"%s\"" (toName m.key) m.key | m <- macros ] ++
       [ printf "  | otherwise = Nothing" ]
 
-parseHeader :: GenerateModule -> FilePath -> IO [Define]
-parseHeader gen hdr = do
+parseHeader :: Verbosity -> FilePath -> IO [(String, [Macro])]
+parseHeader verb hdr = do
   res <- readFile hdr
-  return $! parseLine $ lines res
+  case explicitEitherParsec hdrParser res of
+    Left er -> die' verb er
+    Right xs -> return xs
+
+data Macro = Macro
+  { key, value :: String
+  , comment :: Maybe String
+  } deriving (Eq, Show, Read, Generic)
+
+hdrParser :: CabalParsing m => m [(String, [Macro])]
+hdrParser = parse1
   where
-  parseLine (x : xs)
-    | "#define _" `L.isPrefixOf` x = parseLine xs
-    | "#define "  `L.isPrefixOf` x = parseDefine x : parseLine xs
-    | otherwise                    = parseLine xs
-  parseLine [] = []
+    parse1 = do
+      _ <- P.many skipped
+      title <- P.optional comment
+      case title of
+        Just x -> do
+          _ <- P.some P.newline
+          xs <- P.endBy define (P.some P.newline)
+          ((x, xs) :) <$> parse1
+        Nothing -> P.eof $> []
 
-  parseDefine inp = go $ words inp where
-    go (_: x : xs) = Define gen.sHeader x (getDoc xs) (getName x) gen.sType
-    go           _ = error $ "parseDefine: bad input: " ++ inp
+    comment = P.try $ (do
+      P.spaces
+      _ <- P.string "/*" *> P.munch (== '*') <* P.many hspace
+      let trimmed = do
+            P.skipOptional $ P.newline *> P.skipOptional (P.char '*' <* P.notFollowedBy (P.char '/')) *> P.many hspace
+            P.anyChar
+      P.manyTill trimmed (P.try (P.spaces *> P.string "*/"))
+                      ) P.<?> "comment"
 
-    getName = applyNameModifier gen.sHsNameMod
+    skipped = P.choice
+      [ P.try $ void P.newline
+      , P.try $ void $ P.string "#ifndef"   <* P.manyTill P.anyChar P.newline
+      , P.try $ void $ P.string "#define _" <* P.manyTill P.anyChar P.newline
+      , P.try $ void $ P.string "#endif"    <* P.manyTill P.anyChar P.newline
+      ] P.<?> "skipped-line"
 
-    getDoc ("/*" : xs) = Just $ unwords $ getDoc1 xs
-    getDoc    (_ : xs) = getDoc xs
-    getDoc          [] = Nothing
+    hspace = P.satisfy (`elem` (" \t" :: String))
 
-    getDoc1 ("*/" :  _) = []
-    getDoc1    (x : xs) = x : getDoc1 xs
-    getDoc1          [] = []
+    define = P.try $ do
+      _ <- P.string "#define " <* P.many hspace
+      key <- P.munch1 (`notElem` (" \t\n" :: String)) <* P.many hspace
+      val <- P.many $ P.try $ P.satisfy (/= '\n') <* P.notFollowedBy (P.string "/*")
+      mc <- P.optional comment
+      return $ Macro key val mc
 
 -- | Given a header file, find the absolute path to it.
-resolveHeader :: Verbosity -> ConfiguredProgram -> FilePath -> IO FilePath
+resolveHeader :: Verbosity -> ConfiguredProgram -> FilePath -> IO (AbsolutePath File)
 resolveHeader verb gcc hdr =
   withTempFileContents "test.c" prog $ \fp -> do
     (_, gccErr, ec) <- getProgramInvocationOutputAndErrors verb $ programInvocation gcc ["-H", "-fsyntax-only", fp]
@@ -207,7 +244,7 @@ resolveHeader verb gcc hdr =
     case map words $ lines gccErr of
       (_ : file : _) : _ -> do
         noticeNoWrap verb $ "Using header file '" ++ file ++ "' for " ++ hdr
-        return file
+        return $ AbsolutePath $ makeSymbolicPath file
       _ -> die' verb $ "Failed to locate header file " ++ hdr ++ ": " ++ gccErr
   where
     prog = unlines

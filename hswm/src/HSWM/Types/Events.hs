@@ -19,6 +19,21 @@ import Bindings.Wlr.OutputManagementUnstableV1 qualified as Wlr
 
 import System.Posix (Signal)
 
+import Data.Kind
+import GHC.TypeLits
+
+-- | Main loop events.
+data MainEvent
+  = MainPoll
+  | MainSignal Signal
+  | MainExit String SomeException
+  | MainRestart FilePath
+  | MainSaveToDisk
+  deriving (Show, Generic)
+
+class HandleEvent m event where
+  handleEvent :: event -> m ()
+
 -- | Mash-up of all River/Wayland generated events
 data Event
   = -- River_*
@@ -59,15 +74,6 @@ data Event
   | -- Xdg
     ZdgOutputEvent !Xdg.OutputEvent
   deriving (Eq, Show, Generic)
-
--- | Main loop events.
-data MainEvent
-  = MainPoll
-  | MainSignal Signal
-  | MainExit String SomeException
-  | MainRestart FilePath
-  | MainSaveToDisk
-  deriving (Show, Generic)
 
 instance (Monoid (m All)) => Default (Event -> m All) where
   def _ = mempty

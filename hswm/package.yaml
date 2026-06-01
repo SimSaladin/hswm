@@ -28,6 +28,8 @@ __common:
       - DeriveAnyClass
       - PackageImports
       - QuantifiedConstraints
+      - FunctionalDependencies
+      - TypeFamilies
 
   # https://discourse.haskell.org/t/what-are-you-supposed-to-do-about-wambiguous-fields/9545/36?page=2
   ghc-options: &common-ghc-options
@@ -184,6 +186,7 @@ library:
     - *dep-hswm-bindings
     - *dep-pixman-bindings
     - *dep-xkbcommon-bindings
+    - template-haskell
     - hswm:hswm-ipc-api
   build-tools:
     - hsc2hs:hsc2hs

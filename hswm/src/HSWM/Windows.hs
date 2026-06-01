@@ -21,7 +21,6 @@ import qualified Wayland as WL
 import qualified River as R
 
 import qualified Bindings.River as R
-import qualified Bindings.River.WindowManagement.V1.Client.Generated as R
 
 import qualified Control.Monad.State as State
 import qualified Data.List as L
@@ -59,7 +58,7 @@ applyManageActions w0 xs0 = doAll w0 xs0 >>= \w' -> return $ Just w' {p_manage_a
             Nothing -> pure w {fullscreen = Just ro}
             Just o ->  pure w {fullscreen = Just ro, x = o.x, y = o.y}
         WFullscreen -> do
-          sid <- gets $ W.screen . W.current . windowset
+          sid <- gets $ W.screen . W.current . view windowset
           lookupOutputBy (\x -> x.screen == sid) >>= \case
             Nothing -> pure w
             Just o -> do
@@ -77,7 +76,7 @@ applyManageActions w0 xs0 = doAll w0 xs0 >>= \w' -> return $ Just w' {p_manage_a
 -- | Do nothing while pointer operation is in progress.
 manage :: H ()
 manage = runInHS $ do
-  ss <- gets _seats
+  ss <- use _seats
   unless (any (\s -> s.op /= SEAT_OP_NONE) ss) manage_
 
 manage_ :: HS ()
@@ -90,18 +89,18 @@ manage_ = do
       | w.new -> do
           setInitialManageProperties w
           modifyWindow w.river_window (\s -> s {new = False})
-          mh <- asks (manageHook . config)
+          mh <- view (config . manageHook)
           g <- appEndo <$> userCodeDefS (Endo id) (runQuery mh w)
           windows g
       | otherwise -> applyManageActions w w.p_manage_action >>= (`whenJust` (modifyWindow w.river_window . const))
 
-  old <- gets windowsetOld
-  ws <- gets windowset
+  old <- use windowsetOld
+  ws <- use windowset
   let oldvisible = concatMap (W.integrate' . W.stack . W.workspace) $ W.current old : W.visible old
       newwindows = W.allWindows ws L.\\ W.allWindows old
 
   whenJust (W.peek old) $ \otherw ->
-    manageWindowBorder otherw =<< asks (normalBorder . config)
+    manageWindowBorder otherw =<< view (config . normalBorder)
 
   let tags_oldvisible = map (W.tag . W.workspace) $ W.current old : W.visible old
       gottenhidden = filter (flip elem tags_oldvisible . W.tag) $ W.hidden ws
@@ -150,7 +149,7 @@ manage_ = do
 
   whenJust (W.peek ws) $ \w -> do
     manageWindowPlaceTop w True
-    manageWindowBorder w =<< asks (focusedBorder . config)
+    manageWindowBorder w =<< view (config . focusedBorder)
 
   mapM_ manageReveal visible
   setTopFocus
@@ -160,7 +159,7 @@ manage_ = do
     else withScreenOutput (W.screen $ W.current ws) $ \o ->
       R.riverLayerShellOutputSetDefault o.layerShellOutput
 
-  gets windowset >>= \ws' -> modify (\s -> s {windowsetOld = ws'})
+  use windowset >>= \ws' -> modify (\s -> s {windowsetOld = ws'})
 
 warpPointerToScreen :: ScreenDetail -> ScreenId -> HS ()
 warpPointerToScreen SD {..} sid = do
@@ -174,7 +173,7 @@ warpPointerToScreen SD {..} sid = do
 
 render :: H ()
 render = runInHS $ do
-  bwDef <- asks (borderWidth . config)
+  bwDef <- view (config . borderWidth)
   mapWindows $ \w -> do
     whenJust w.p_render_pos $ unless w.minimized . uncurry (setWindowPosition w)
     whenJust w.p_render_border $ setWindowBorder w.river_window (fromMaybe bwDef w.wBorderWidth)
@@ -201,7 +200,7 @@ setInitialManageProperties Window {river_window = rw} = do
   R.riverWindowUseSsd rw
   R.riverWindowSetCapabilities rw (R.toCEnum . fi $ foldl' (.|.) 0 $ map (.unwrap) [R.Maximize, R.Fullscreen])
   R.riverWindowSetTiled rw (R.toCEnum . fi $ foldl' (.|.) 0 $ map (.unwrap) [R.EdgeTop, R.EdgeBottom, R.EdgeLeft, R.EdgeRight])
-  nbc <- asks (normalBorder . config)
+  nbc <- view (config . normalBorder)
   modifyWindow rw $ \s -> s {new = False, p_render_border = Just nbc}
 
 doRemoveWindow :: Window -> HS ()
@@ -210,7 +209,7 @@ doRemoveWindow w = do
   modifyWindowSet $ W.delete w.river_window
   alterWindow w.river_window (const Nothing)
   -- Remove references in seats
-  gets _seats >>= \xs -> do
+  use _seats >>= \xs -> do
     xs' <- forM xs $ \seat' -> do
       let seat =
             seat'
@@ -231,7 +230,7 @@ doRemoveWindow w = do
 -- | End recovering windows. Removes any leftoover windows that are no longer present.
 finishRecovery :: HS ()
 finishRecovery = do
-  rwins <- gets recoveredWindows
+  rwins <- use recoveredWindows
   unless (M.null rwins) $ do
     State.modify' $ \s -> s {recoveredWindows = mempty}
     forM_ (M.toList rwins) $ \(_, rw) -> do
@@ -257,7 +256,7 @@ handleEvent e = case e of
     let recoverWindow w = do
           modifyWindowSet $ W.mapWindow (\x -> if x == w then window else x) . W.delete window
           State.modify' $ \s -> s {recoveredWindows = M.delete we_identifier s.recoveredWindows}
-    gets (M.lookup we_identifier . recoveredWindows) >>= (`whenJust` recoverWindow)
+    gets (M.lookup we_identifier . view recoveredWindows) >>= (`whenJust` recoverWindow)
 
   -- Hints
   R.RiverWindowDecorationHint _ window we_hint -> runInHS $ modifyWindow window $ \s -> s {decorationHint = Just  we_hint}

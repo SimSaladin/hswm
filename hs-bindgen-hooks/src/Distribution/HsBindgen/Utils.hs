@@ -49,8 +49,7 @@ verbosityLevelInt = fromEnum
 -- | @pkg-config --variable=pkgdatadir somepkg@
 getPkgConfDataDir :: Verbosity -> ProgramDb -> String -> IO (Maybe (AbsolutePath ('Dir to)))
 getPkgConfDataDir v progdb arg = do
-  (prog, _) <- requireProgram v (simpleProgram "pkg-config") progdb
-  dir <- trim <$> getProgramOutput v prog [arg, "--variable=pkgdatadir"]
+  dir <- trim <$> getDbProgramOutput v pkgConfigProgram progdb [arg, "--variable=pkgdatadir"]
   return $! do
     guard (dir /= "")
     Just $ AbsolutePath $ normaliseSymbolicPath $ makeSymbolicPath dir

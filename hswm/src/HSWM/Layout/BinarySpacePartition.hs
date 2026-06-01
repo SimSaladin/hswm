@@ -693,7 +693,7 @@ adjustStack orig s fw (Just b) =
 replaceStack :: Maybe (W.Stack RiverWindow) -> HS ()
 replaceStack s = do
   st <- get
-  let wset = windowset st
+  let wset = st.windowset
       cur  = W.current wset
       wsp  = W.workspace cur
   put st{windowset=wset{W.current=cur{W.workspace=wsp{W.stack=s}}}}
@@ -701,13 +701,13 @@ replaceStack s = do
 replaceFloating :: M.Map RiverWindow W.RationalRect -> HS ()
 replaceFloating wsm = do
   st <- get
-  let wset = windowset st
+  let wset = st.windowset
   put st{windowset=wset{W.floating=wsm}}
 
 -- some helpers to filter windows
 --
 getFloating :: HS [RiverWindow]
-getFloating = M.keys . W.floating <$> gets windowset -- all floating windows
+getFloating = M.keys . W.floating <$> use windowset -- all floating windows
 
 getHidden :: HS [RiverWindow]
 getHidden = getStackSet
@@ -716,10 +716,10 @@ getHidden = getStackSet
   <&> map river_window
 
 getStackSet :: HS (Maybe (W.Stack RiverWindow))
-getStackSet = W.stack . W.workspace . W.current <$> gets windowset -- windows on this WS (with floating)
+getStackSet = W.stack . W.workspace . W.current <$> use windowset -- windows on this WS (with floating)
 
 getScreenRect :: HS Rectangle
-getScreenRect = screenRect . W.screenDetail . W.current <$> gets windowset
+getScreenRect = screenRect . W.screenDetail . W.current <$> use windowset
 
 withoutFloating :: [RiverWindow] -> [RiverWindow] -> Maybe (W.Stack RiverWindow) -> Maybe (W.Stack RiverWindow)
 withoutFloating fs hs = maybe Nothing (unfloat fs hs)
@@ -863,7 +863,7 @@ renderBorders r b = do
 -- create a window for each border line, show, add into stack and set floating
 createBorder :: Rectangle -> Maybe RiverColor -> HS [RiverWindow]
 createBorder (Rectangle wx wy ww wh) c = do
-  bw <- asks (borderWidth . config)
+  bw <- view (config . borderWidth)
 
   pure []
   -- TODO: setting border color
@@ -894,6 +894,6 @@ removeBorder :: [RiverWindow] -> HS ()
 removeBorder ws = do
   -- TODO
   -- modify (\s -> s{mapped = mapped s `S.difference` S.fromList ws})
-  replaceFloating . flip (foldl (flip M.delete)) ws . W.floating . windowset =<< get
+  replaceFloating . flip (foldl (flip M.delete)) ws . W.floating . view windowset =<< get
   replaceStack . maybe Nothing (\s -> Just s{W.down=W.down s \\ ws}) =<< getStackSet
   --deleteWindows ws

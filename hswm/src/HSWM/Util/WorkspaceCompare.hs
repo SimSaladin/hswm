@@ -49,7 +49,7 @@ filterOutWs ws = filter (\S.Workspace {S.tag = tag} -> tag `notElem` ws)
 -- if that workspace does not exist in the config.
 getWsIndex :: H (WorkspaceId -> Maybe Int)
 getWsIndex = do
-  spaces <- asks (workspaces . config)
+  spaces <- view (config . workspaces)
   return $ flip elemIndex spaces
 
 -- | Compare Maybe's differently, so Nothing (i.e. workspaces without indexes)
@@ -81,7 +81,7 @@ getXineramaWsCompare = getXineramaPhysicalWsCompare $ screenComparatorById compa
 -- | A comparison function like 'getXineramaWsCompare', but uses physical locations for screens.
 getXineramaPhysicalWsCompare :: ScreenComparator -> HS WorkspaceCompare
 getXineramaPhysicalWsCompare (ScreenComparator sc) = do
-  w <- gets windowset
+  w <- use windowset
   return $ \a b -> case (isOnScreen a w, isOnScreen b w) of
     (True, True) -> compareUsingScreen w a b
     (False, False) -> compare a b

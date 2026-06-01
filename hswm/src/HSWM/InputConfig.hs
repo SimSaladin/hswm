@@ -201,7 +201,7 @@ handleInputDeviceEvent (R.RiverInputDeviceType' _ dev deviceType) = do
   modifyObjectDef $ \st -> st { inputDevices = M.adjust (\ds -> ds { deviceType = Just deviceType }) dev st.inputDevices }
   -- Set repeat rate & delay for keyboard device
   when (deviceType == R.riverInputDeviceTypeKeyboard) $ do
-    asks (repeatInfo . config) >>= (`whenJust` uncurry (R.riverInputDeviceSetRepeatInfo dev))
+    view (config . repeatInfo) >>= (`whenJust` uncurry (R.riverInputDeviceSetRepeatInfo dev))
 handleInputDeviceEvent (R.RiverInputDeviceName _ dev name) = do
   modifyObjectDef $ \st -> st { inputDevices = M.adjust (\ds -> ds { deviceName = name }) dev st.inputDevices }
 handleInputDeviceEvent (R.RiverInputDeviceRemoved _ dev) = do
@@ -215,7 +215,7 @@ handleXkbConfigEvent = \case
     modifyObjectDef $ \st -> st { xkbKeyboards = M.insert kbd def st.xkbKeyboards }
     withObject $ WL.listenerAdd_ kbd
     -- Set the default keymap
-    asks (xkbLayout . config) >>= (`whenJust` setKeyboardKeymap kbd)
+    view (config . xkbLayout) >>= (`whenJust` setKeyboardKeymap kbd)
   R.RiverXkbConfigFinished _ xc -> io $ WL.objectDestroy xc
 
 handleXkbKeyboardEvent :: (MonadStateGlobal env m) => R.RiverXkbKeyboardEvent -> m ()

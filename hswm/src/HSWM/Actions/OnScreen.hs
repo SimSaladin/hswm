@@ -90,7 +90,7 @@ onScreen' ::
   ScreenId ->
   HS ()
 onScreen' x foc sc = do
-  st <- gets windowset
+  st <- use windowset
   case lookupWorkspace sc st of
     Nothing -> return ()
     Just ws -> do

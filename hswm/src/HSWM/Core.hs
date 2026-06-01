@@ -16,9 +16,6 @@ module HSWM.Core
     module HSWM.Util.Types,
     module HSWM.ManageHook,
     module HSWM.XKB,
-    WM.RiverWindow,
-    WM.RiverOutput,
-    WM.RiverSeat,
     R.RiverColor(..),
   )
 where
@@ -32,16 +29,9 @@ import HSWM.Util.Types
 import HSWM.XKB hiding (LogLevel(..))
 
 import qualified River as R
-import qualified River.WindowManagement as WM
 
 import Control.Monad.State
 import GHC.Stack
-
-data HSWMException = HSWMStateLocked String
-                   | HSWMTimeout String
-  deriving (Show)
-
-instance Exception HSWMException
 
 runH :: HConf -> H a -> IO a
 runH c (H a) = runReaderT a c
@@ -107,16 +97,6 @@ userCodeDefS defValue a = fromMaybe defValue <$> userCodeS a
 -----------------------------------------------------------
 
 -- * Manage/Render Event queues
-
-class HasEventQueues env where
-  mainEventQL     :: Lens' env (TQueue MainEvent)
-  pendingManageQL :: Lens' env (TQueue (HS ()))
-  pendingRenderQL :: Lens' env (TQueue (HS ()))
-
-instance HasEventQueues HConf where
-  mainEventQL = lens eventQueue $ \s a -> s { eventQueue = a}
-  pendingManageQL = lens pendingManageQ $ \s a -> s {pendingManageQ = a}
-  pendingRenderQL = lens pendingRenderQ $ \s a -> s {pendingRenderQ = a}
 
 getEventQueueFuncs ::
   (MonadReader env m, HasEventQueues env, MonadIO inner) =>

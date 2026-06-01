@@ -56,7 +56,7 @@ debugHook ev
 
 debugAction :: H ()
 debugAction = runInHS $ do
-  logDebug "[[[ Windows ]]]" >> gets _windows  >>= mapM_ logTraceShow . M.elems
-  logDebug "[[[WindowSet]]]" >> gets windowset >>= logTraceShow
-  logDebug "[[[ Outputs ]]]" >> gets _outputs  >>= mapM_ logTraceShow
-  logDebug "[[[  Seats  ]]]" >> gets _seats    >>= mapM_ logTraceShow
+  logDebug "[[[ Windows ]]]" >> use _windows  >>= mapM_ logTraceShow . M.elems
+  logDebug "[[[WindowSet]]]" >> use windowset >>= logTraceShow
+  logDebug "[[[ Outputs ]]]" >> use _outputs  >>= mapM_ logTraceShow
+  logDebug "[[[  Seats  ]]]" >> use _seats    >>= mapM_ logTraceShow

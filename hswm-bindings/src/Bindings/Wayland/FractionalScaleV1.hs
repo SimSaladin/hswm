@@ -1,5 +1,6 @@
 module Bindings.Wayland.FractionalScaleV1 where
 
+import Bindings.Wayland.FractionalScale.V1.Enums
 import Bindings.Wayland.FractionalScale.V1.Client.Generated
 import Bindings.Wayland.FractionalScale.V1.Client.Generated.Global
 import Bindings.Wayland.FractionalScale.V1.Client.Generated.Safe

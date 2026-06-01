@@ -1,5 +1,3 @@
-{-# LANGUAGE CApiFFI #-}
-
 module HSWM.XKB
   ( module HSWM.XKB,
     module Text.XkbCommon,
@@ -8,6 +6,7 @@ module HSWM.XKB
 where
 
 import HSWM.Utils
+import HSWM.Types.Action
 
 import qualified River as R
 import qualified Wayland as WL
@@ -18,23 +17,6 @@ import qualified Data.Map as M
 import           Foreign
 
 -- * KeySym parsing
-
-data XkbBinding a = XkbBinding
-  { xkb_binding :: {-# UNPACK #-} !R.RiverXkbBinding
-  , river_seat  :: {-# UNPACK #-} !R.RiverSeat
-  , action      :: !a
-  , subKeymap   :: !(XkbBindingMap a)
-  , autorepeat  :: {-# UNPACK #-} !Bool
-  , running     :: {-# UNPACK #-} !(MVar (Async ()))
-  } deriving (Generic)
-
-data PointerBinding a = PointerBinding
-  { pointer_binding :: !R.RiverPointerBinding
-  , river_seat      :: !R.RiverSeat
-  , action          :: !a
-  } deriving (Generic)
-
-type XkbBindingMap a = M.Map XBKey (StablePtr (XkbBinding a))
 
 createXkbBindings
   :: (MonadReader env m, MonadLogger m, MonadIO m, Show a, Typeable a)

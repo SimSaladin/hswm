@@ -2,6 +2,7 @@
 
 module Bindings.River.LibinputConfigV1 where
 
+import Bindings.River.LibinputConfig.V1.Enums
 import Bindings.River.LibinputConfig.V1.Client.Generated
 import Bindings.River.LibinputConfig.V1.Client.Generated.Global
 import Bindings.River.LibinputConfig.V1.Client.Generated.Unsafe

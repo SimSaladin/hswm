@@ -182,14 +182,14 @@ fullStateUpdate :: (MonadIPC env m, env ~ HConf) => m [Response]
 fullStateUpdate = runInHS $ sequence [ getOutputsInfo, getWorkspacesInfo, getFocusedInfo ]
   where
     getOutputsInfo = do
-      outs <- gets _outputs
+      outs <- use _outputs
       return $! Outputs [(T.pack out.outputName, s2o out.screen) | out <- outs]
 
     s2o (S x) = OutputId x
 
     getWorkspacesInfo = do
-      ws <- gets windowset
-      wins <- gets _windows
+      ws <- use windowset
+      wins <- use _windows
       wsSortPP <- DWO.getSortByOrder
       let getWsData (W.Workspace{..}, keyhint) = WorkspaceInfo
             { tag = tag
@@ -208,7 +208,7 @@ fullStateUpdate = runInHS $ sequence [ getOutputsInfo, getWorkspacesInfo, getFoc
 
     -- info about focused window (if any)
     getFocusedInfo = do
-      ws <- gets windowset
+      ws <- use windowset
       if
         | Just fw <- W.peek ws -> FocusedWindow . fmap toWindowInfo <$> lookupWindow fw
         | otherwise -> return $! FocusedWindow Nothing

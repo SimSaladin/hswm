@@ -8,6 +8,7 @@ import           Data.Maybe
 import           Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
+import qualified Data.List as L
 import           GHC.Generics (Generic)
 import           GHC.Stack
 
@@ -72,9 +73,9 @@ data ArgType
   | AString
   | AFd
   | AArray
-  | AEnum { enumName :: String, enumObject :: Maybe String }
+  | AEnum { enumName :: !String, enumObject :: !(Maybe String) }
   | ANewId String
-  | AObject String
+  | AObject !(Maybe String)
   | AEmpty
   | ASelf
   deriving (Eq, Show, Generic)
@@ -94,7 +95,7 @@ getArgType e =
     ["fd"] -> AFd
     ["array"] -> AArray
     ["new_id"] -> ANewId (T.unpack . head $ attribute "interface" e)
-    ["object"] -> AObject (T.unpack . head $ attribute "interface" e)
+    ["object"] -> AObject (fmap T.unpack . listToMaybe $ attribute "interface" e)
     x -> error $ "unknown argument type: " ++ show x
 
 protocolFromFile :: FilePath -> IO Protocol
@@ -153,3 +154,14 @@ protocolFromXML root = Protocol (getName root)
 head :: HasCallStack => [a] -> a
 head (x:_) = x
 head _ = error $ "head: empty list: " ++ prettyCallStack callStack
+
+getProtocolInterfaceDeps :: Protocol -> [String]
+getProtocolInterfaceDeps proto = L.nub $ do
+  iface <- proto.interfaces
+  arg <- concat $ [ x.args | x <- iface.requests ] ++ [ x.args | x <- iface.events ]
+  case arg.argType of
+    AEnum _ (Just iface) | check iface -> return iface
+    AObject (Just iface) | check iface -> return iface
+    _ -> []
+  where
+    check x = x `notElem` [ x.name | x <- proto.interfaces ]

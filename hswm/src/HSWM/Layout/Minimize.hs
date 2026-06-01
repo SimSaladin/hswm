@@ -75,7 +75,7 @@ instance LayoutModifier Minimize RiverWindow where
   handleMess Minimize m
     | Just BW.UpdateBoring <- fromMessage m = do
         minimized <- XS.gets minimizedStack
-        ws <- gets (W.workspace . W.current . windowset)
+        ws <- gets (W.workspace . W.current . view windowset)
         flip sendMessageWithNoRefresh ws $ BW.Replace "Minimize" minimized
         return Nothing
     | otherwise = return Nothing

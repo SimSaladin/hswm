@@ -28,6 +28,7 @@ library
                     , Cabal-hooks >=3.14 && <3.18
                     , containers
                     , data-default
+		    , directory
                     , yaml
                     , filepath
                     , microlens

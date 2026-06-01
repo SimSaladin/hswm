@@ -51,7 +51,7 @@ library
     default-language: GHC2024
 
     if flag(pkg-config)
-        pkgconfig-depends: pixman-1
+        pkgconfig-depends: pixman-1 >= 0.46
     else
         extra-libraries: pixman-1
 

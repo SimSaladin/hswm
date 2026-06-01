@@ -64,7 +64,7 @@ handle = \case
         -- delete screen from windowset
         modifyWindowSet $ W.deleteScreen screen
         -- delete from list of outputs
-        modify $ \s -> s {_outputs = filter (\x -> x.river_output /= output) s._outputs}
+        modifying _outputs $ filter (\x -> x.river_output /= output)
         -- destroy layer shell output, output, wl_output
         io $ WL.objectDestroy layerShellOutput
         io $ WL.objectDestroy output
@@ -131,9 +131,9 @@ manage = do
   om <- getObjectDef @OutputManager
   -- handle new outputs
   forM_ om.pending_manage $ \output -> do
-    runInHS $ modify $ \s -> s {_outputs = _outputs s ++ [output]}
+    runInHS $ modifying _outputs (++ [output])
     -- Adding to WindowSet
-    defLayout <- asks (layoutHook . config)
+    defLayout <- view (config . layoutHook)
     runInHS $ modifyWindowSet $ W.insertScreen defLayout output.screen (getScreenDetail output)
     R.riverLayerShellOutputSetDefault output.layerShellOutput
     modifyObject $ \st -> st { pending_manage = filter (\x -> x.river_output /= output.river_output) $ pending_manage st }
@@ -144,7 +144,7 @@ manage = do
 
 nextScreenId :: OutputManager -> HS ScreenId
 nextScreenId om = do
-  curOutputs <- gets _outputs
+  curOutputs <- use _outputs
   case [i | i <- [S 1 ..], isNothing $ L.find ((i ==) . screen) (curOutputs ++ M.elems om.pending_setup ++ om.pending_manage)] of
     i : _ -> return i
     _ -> error "impossible"

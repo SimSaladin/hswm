@@ -1,7 +1,11 @@
 {-# LANGUAGE DeriveAnyClass #-}
 
-module Bindings.River.WindowManagementV1 where
+module Bindings.River.WindowManagementV1
+  ( module Bindings.River.WindowManagementV1
+  , module Bindings.River.WindowManagement.V1.Enums
+  ) where
 
+import Bindings.River.WindowManagement.V1.Enums
 import Bindings.River.WindowManagement.V1.Client.Generated
 import Bindings.River.WindowManagement.V1.Client.Generated.Global as G
 import Bindings.River.WindowManagement.V1.Client.Generated.Unsafe as Unsafe

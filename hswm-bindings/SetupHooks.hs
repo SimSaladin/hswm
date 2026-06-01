@@ -2,6 +2,8 @@
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE OverloadedLists   #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE StaticPointers #-}
+
 
 {-# OPTIONS_GHC -Wall #-}
 {-# OPTIONS_GHC -Wno-ambiguous-fields #-}
@@ -22,45 +24,30 @@ import           Data.Char
 import qualified Data.List as L
 
 setupHooks :: SetupHooks
-setupHooks = hsBindgenSetupHooks genSetup <> mempty
-  { configureHooks = mempty
-    { preConfPackageHook = Just preConfPackage
-    , preConfComponentHook = Just $ preConfComponent protocolBindSpecs } }
+setupHooks = hsBindgenSetupHooks (static ()) genSetup
 
 genSetup :: HsBindGenSetup ProtocolSpec
-genSetup = def & I.sources <>~ protocolBindSpecs
+genSetup = def
+  & I.modulesSimple <>~ [ wlutil ]
+  & I.sources <>~ protocolBindSpecs
+
+wlutil :: HsBindGen
+wlutil = mkBindgen "Bindings.Wayland.Util.Generated"
+  & I.headers                  <>~ [ makeHeader "wayland-util.h" ]
+  & I.genGlobal                ?~ False
+  & I.selectFromMainHeaderDirs ?~ True
+  & I.excludeByDeclName        <>~ "wl_log_func_t"
 
 protoWayland :: ProtocolSpec
-protoWayland = spec
+protoWayland = makeProtocol "Bindings.Wayland.Core" "core/wayland.xml"
+  & I.category .~ "core"
+  & I.stability .~ Stable
+  & I.bindGens . ix ClientBindings %~ client
+  & I.bindGens . ix ServerBindings %~ server
+
   where
-    spec = fromProtocolXML "core/wayland.xml"
-      & I.category     .~ "core"
-      & I.stability    .~ Stable
-      & I.protocolDirs <>~ [ makeSymbolicPath "protocol" ]
-      & I.bindGens . at "Util"   ?~ wlutil
-      & I.bindGens . at "Enums"  ?~ enums
-      & I.bindGens . at "Client" ?~ client
-      & I.bindGens . at "Server" ?~ server
-
-    wlutil = mkBindgen "Bindings.Wayland.Util.Generated"
-      & I.headers                  <>~ [ makeHeader "wayland-util.h" ]
-      & I.genGlobal                ?~ False
-      & I.selectFromMainHeaderDirs ?~ True
-      & I.excludeByDeclName        <>~ "wl_log_func_t"
-
-    enums = mkBindgen "Bindings.Wayland.Core.Enums"
-      & I.headers           <>~ [ getProtoResult relativeSymbolicPath undefined spec EnumHeader ]
-      & I.hasPointer        .~ False
-      & I.hasSafe           .~ False
-      & I.hasUnsafe         .~ False
-      & I.genGlobal         ?~ False
-
-    client = mkBindgen "Bindings.Wayland.Core.Client.Generated"
-      & I.headers           <>~ [ getProtoResult relativeSymbolicPath undefined spec EnumHeader ]
-      & I.headers           <>~ [ makeHeader "wayland-client-core.h"
-                                , makeHeader "wayland-client-protocol.h" ] -- must match ClientHeader
-      & I.extBindingSpecs   <>~ [ wlutil ^. I.moduleName . to BModule
-                                , enums  ^. I.moduleName . to BModule ]
+    client c = c
+      & I.headers %~ ([ makeHeader "wayland-client-core.h" ] <>)
       & I.excludeByDeclName <>~ L.intercalate "|"
           [ "wl_log_set_handler_client" -- variadic
           , "wl_proxy_marshal" -- variadic
@@ -69,13 +56,9 @@ protoWayland = spec
           , "wl_proxy_marshal_constructor_versioned" -- variadic
           ]
 
-    server = mkBindgen "Bindings.Wayland.Core.Server.Generated"
-      & I.headers           <>~ [ getProtoResult relativeSymbolicPath undefined spec EnumHeader ]
-      & I.headers           <>~ [ makeHeader "wayland-server-core.h"
-                                , makeHeader "wayland-server-protocol.h" ] -- must match ServerHeader
-      & I.extBindingSpecs   <>~ [ bspec "sys-types"
-                                , wlutil ^. I.moduleName . to BModule
-                                , enums ^. I.moduleName . to BModule ]
+    server s = s
+      & I.headers %~ ([ makeHeader "wayland-server-core.h" ] <>)
+      & I.extBindingSpecs <>~ [ makeBindingSpec "sys-types" ]
       & I.excludeByDeclName <>~ L.intercalate "|"
           [ "wl_log_func_t"
           , "wl_client_post_implementation_error" -- variadic
@@ -85,6 +68,82 @@ protoWayland = spec
           , "wl_resource_queue_event"
           , "wl_resource_post_event"
           ]
+
+makeProtocol :: String -> ProtocolSpec -> ProtocolSpec
+makeProtocol modroot spec = spec
+    & I.protocolDirs <>~ [ makeSymbolicPath "protocol" ]
+    & I.bindGens . at Enums ?~ enums
+    & I.bindGens . at ClientBindings ?~ client
+    & I.bindGens . at ServerBindings ?~ server
+  where
+    enums = mkBindgen (modroot ++ ".Enums")
+      & I.headers           <>~ [ relativeSymbolicPath $ getProtoHeader spec EnumHeader ]
+      & I.hasPointer        .~ False
+      & I.hasSafe           .~ False
+      & I.hasUnsafe         .~ False
+      & I.genGlobal         ?~ False
+
+    client = mkBindgen (modroot ++ ".Client.Generated")
+      & I.headers           <>~ [ relativeSymbolicPath $ getProtoHeader spec EnumHeader
+                                , relativeSymbolicPath $ getProtoHeader spec ClientHeader ]
+      & I.extBindingSpecs   <>~ [ wlutil ^. I.moduleName . to BModule
+                                , enums  ^. I.moduleName . to BModule ]
+
+    server = mkBindgen (modroot ++ ".Server.Generated")
+      & I.headers           <>~ [ relativeSymbolicPath $ getProtoHeader spec EnumHeader
+                                , relativeSymbolicPath $ getProtoHeader spec ServerHeader ]
+      & I.extBindingSpecs   <>~ [ wlutil ^. I.moduleName . to BModule
+                                , enums  ^. I.moduleName . to BModule ]
+
+makeWaylandProtocol' :: String -> ProtocolSpec -> ProtocolSpec
+makeWaylandProtocol' modroot spec = makeProtocol modroot spec
+    & I.bindGens . ix ClientBindings %~ client
+    & I.bindGens . ix ServerBindings %~ server
+    & I.bindGens . each %~ addCoreEnums
+  where
+  addCoreEnums x = x
+    & I.headers         %~ ([ relativeSymbolicPath $ getProtoHeader protoWayland EnumHeader ] <>)
+    & I.excludeHeaders  %~ ([ relativeSymbolicPath $ getProtoHeader protoWayland EnumHeader ] <>)
+    & I.extBindingSpecs <>~ [ protoWayland ^?! I.bindGens . ix Enums . I.moduleName . to BModule ]
+
+  client x = x
+    & I.headers         %~ ([ relativeSymbolicPath $ getProtoHeader protoWayland ClientHeader ] <>)
+    & I.excludeHeaders  %~ ([ relativeSymbolicPath $ getProtoHeader protoWayland ClientHeader ] <>)
+    & I.extBindingSpecs <>~ [ protoWayland ^?! I.bindGens . ix ClientBindings . I.moduleName . to BModule ]
+
+  server x = x
+    & I.headers         %~ ([ relativeSymbolicPath $ getProtoHeader protoWayland ServerHeader ] <>)
+    & I.excludeHeaders  %~ ([ relativeSymbolicPath $ getProtoHeader protoWayland ServerHeader ] <>)
+    & I.extBindingSpecs <>~ [ protoWayland ^?! I.bindGens . ix ServerBindings . I.moduleName . to BModule ]
+
+makeWaylandProtocol :: ProtocolSpec -> ProtocolSpec
+makeWaylandProtocol spec = makeWaylandProtocol' (getRootModule spec) spec
+
+mkProto :: ProtocolSpec -> ProtocolSpec
+mkProto specIn = spec
+    & I.protocolXML %~ adjustXML
+  where
+    spec = makeWaylandProtocol specIn
+
+    adjustXML x = case cat of
+        "wayland" -> makeRelativePathEx $ map toLower (show stability) </> nameBase </> maybe (error $ show x) id (L.stripPrefix (cat ++ "-") (getSymbolicPath x))
+        _         -> x
+
+    cat       = spec ^. I.category
+    nameBase  = spec ^. I.baseName
+    stability = spec ^. I.stability
+
+getRootModule :: ProtocolSpec -> String
+getRootModule spec =
+    let subMod = case (spec ^. I.stability, spec ^. I.version) of
+                   (Stable,   Nothing) -> []
+                   (Stable,    Just v) -> [ "StableV" ++ show v ]
+                   (Staging,  Nothing) -> [ "Staging" ]
+                   (Staging,   Just v) -> [ 'V' : show v ]
+                   (Unstable, Nothing) -> [ "Unstable" ]
+                   (Unstable,  Just v) -> [ "UnstableV" ++ show v ]
+
+      in L.intercalate "." $ map (_head %~ toUpper) $ [ "Bindings", spec ^. I.category, getName (spec ^. I.baseName) ] ++ subMod
 
 protocolBindSpecs :: [ProtocolSpec]
 protocolBindSpecs =
@@ -108,74 +167,29 @@ protocolBindSpecs =
   --, mkProto "staging/wayland-ext-session-lock-v1.xml"
   --, mkProto "staging/wayland-ext-foreign-toplevel-list-v1.xml"
 
-  , mkProto "wlr-layer-shell-unstable-v1.xml"      & I.bindGens . each . I.extBindingSpecs <>~ [ bspec "xdg-shell" ]
+  , mkProto "wlr-layer-shell-unstable-v1.xml"
+      & I.bindGens . each . I.extBindingSpecs <>~ [ makeBindingSpec "xdg-shell" ]
   , mkProto "wlr-output-management-unstable-v1.xml"
   , mkProto "wlr-output-power-management-unstable-v1.xml"
-  , mkProto "wlr-input-method-unstable-v2.xml"     & I.bindGens . each . I.extBindingSpecs <>~ [ BModule "Bindings.Wayland.TextInput.UnstableV3.Client.Generated" ]
-  , mkProto "river-window-management-v1.xml"
-  , mkProto "river-input-management-v1.xml"
-  , mkProto "river-layer-shell-v1.xml"      & I.bindGens . each . I.extBindingSpecs <>~ [ bspec "river-window-management" ]
-  , mkProto "river-libinput-config-v1.xml"  & I.bindGens . each . I.extBindingSpecs <>~ [ bspec "river-input-management" ]
-  , mkProto "river-xkb-bindings-v1.xml"     & I.bindGens . each . I.extBindingSpecs <>~ [ bspec "river-window-management" ]
-  , mkProto "river-xkb-config-v1.xml"       & I.bindGens . each . I.extBindingSpecs <>~ [ bspec "river-input-management" ]
+  , mkProto "wlr-input-method-unstable-v2.xml"
+
+  , makeWaylandProtocol "river-window-management-v1.xml"
+  , makeWaylandProtocol "river-input-management-v1.xml"
+  , makeWaylandProtocol "river-layer-shell-v1.xml"
+      & I.bindGens . each . I.extBindingSpecs <>~ [ makeBindingSpec "river-window-management" ]
+  , makeWaylandProtocol "river-libinput-config-v1.xml"
+      & I.bindGens . each . I.extBindingSpecs <>~ [ makeBindingSpec "river-input-management" ]
+  , makeWaylandProtocol "river-xkb-bindings-v1.xml"
+      & I.bindGens . each . I.extBindingSpecs <>~ [ makeBindingSpec "river-window-management" ]
+  , makeWaylandProtocol "river-xkb-config-v1.xml"
+      & I.bindGens . each . I.extBindingSpecs <>~ [ makeBindingSpec "river-input-management" ]
   ]
-
-mkProto :: String -> ProtocolSpec
-mkProto catName' = spec where
-  spec'     = fromString catName' :: ProtocolSpec
-
-  cat       = spec' ^. I.category
-  nameBase  = spec' ^. I.baseName
-  stability = spec' ^. I.stability
-
-  modRoot =
-    let subMod = case (spec' ^. I.stability, spec' ^. I.version) of
-                   (Stable,   Nothing) -> []
-                   (Stable,    Just v) -> [ "StableV" ++ show v ]
-                   (Staging,  Nothing) -> [ "Staging" ]
-                   (Staging,   Just v) -> [ 'V' : show v ]
-                   (Unstable, Nothing) -> [ "Unstable" ]
-                   (Unstable,  Just v) -> [ "UnstableV" ++ show v ]
-
-      in L.intercalate "." $ map (_head %~ toUpper) $ [ "Bindings", cat, getName nameBase ] ++ subMod
-
-  adjustXML x = case cat of
-      "wayland" -> makeRelativePathEx $ map toLower (show stability) </> nameBase </> maybe (error $ show x) id (L.stripPrefix (cat ++ "-") (getSymbolicPath x))
-      _         -> x
-
-  spec = spec'
-    & I.protocolXML %~ adjustXML
-    & I.protocolDirs <>~ [ makeSymbolicPath "protocol" ]
-    & I.bindGens . at "Enums"  ?~ (mkBindgen (modRoot ++ ".Enums")
-        & I.headers         <>~ [ makeHeader "wayland-enums.h" ]
-        & I.extBindingSpecs <>~ [ BModule "Bindings.Wayland.Core.Enums" ]
-        & I.headers         <>~ [ getProtoResult relativeSymbolicPath undefined spec EnumHeader ]
-        & I.hasPointer       .~ False
-        & I.hasSafe          .~ False
-        & I.hasUnsafe        .~ False
-        & I.genGlobal        ?~ False)
-    & I.bindGens . at "Client" ?~ (mkBindgen (modRoot ++ ".Client.Generated")
-        & I.headers         <>~ [ makeHeader "wayland-enums.h", makeHeader "wayland-client-protocol.h" ]
-        & I.extBindingSpecs <>~ [ BModule "Bindings.Wayland.Core.Enums"
-                                , BModule "Bindings.Wayland.Core.Client.Generated"
-                                , BModule "Bindings.Wayland.Util.Generated" ]
-        & I.headers         <>~ [ getProtoResult relativeSymbolicPath undefined spec ClientHeader ])
-    & I.bindGens . at "Server" ?~ (mkBindgen (modRoot ++ ".Server.Generated")
-        & I.headers         <>~ [ makeHeader "wayland-enums.h", makeHeader "wayland-server-protocol.h" ]
-        & I.extBindingSpecs <>~ [ BModule "Bindings.Wayland.Core.Enums"
-                                , BModule "Bindings.Wayland.Core.Server.Generated"
-                                , BModule "Bindings.Wayland.Util.Generated" ]
-        & I.headers         <>~ [ getProtoResult relativeSymbolicPath undefined spec ServerHeader ])
 
 mkBindgen :: String -> HsBindGen
 mkBindgen mo = def { moduleName = fromString mo }
 
 makeHeader :: FilePath -> SymbolicPath Include 'File
 makeHeader = makeSymbolicPath
-
--- | Manually crafted binding specification file.
-bspec :: FilePath -> BindingSpec
-bspec x = BFile $ Location sameDirectory $ makeRelativePathEx $ "binding-specs" </> x <.> "yaml"
 
 getName :: String -> String
 getName       [] = []

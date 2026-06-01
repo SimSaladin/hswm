@@ -38,6 +38,13 @@ common language
     OverloadedRecordDot
     TypeApplications
     PatternSynonyms
+    CApiFFI
+
+common deps
+    build-depends:
+       base              >=4.21   && <5
+     , data-default     ^>=0.8
+     , unix             ^>=2.8.6
 
 custom-setup
   setup-depends:
@@ -48,38 +55,49 @@ custom-setup
     , hs-bindgen-hooks
 
 library
-    import: warnings, language
-    exposed-modules:
-       Text.XkbCommon
-     , Text.XkbCommon.Context
-     , Text.XkbCommon.EventCodes
-     , Text.XkbCommon.KeySym
-     , Text.XkbCommon.KeySyms
-     , Text.XkbCommon.Keymap
-     , Text.XkbCommon.Keymap.RmlvoBuilder
-     , Text.XkbCommon.Registry
-     , Text.XkbCommon.State
-    autogen-modules:
-       Text.XkbCommon.EventCodes
-     , Text.XkbCommon.KeySyms
-    other-modules:
-       Text.XkbCommon.FFI
-     , Text.XkbCommon.Internal
-    build-depends:
-       base              >=4.21   && <5
-     , data-default     ^>=0.8
-     , unix             ^>=2.8.6
-    hs-source-dirs:     src
-    default-extensions: CApiFFI
-    build-tool-depends: hsc2hs:hsc2hs
+  import: warnings, language, deps
+  exposed-modules:
+     Text.XkbCommon
+   , Text.XkbCommon.Context
+   , Text.XkbCommon.EventCodes
+   , Text.XkbCommon.KeySym
+   , Text.XkbCommon.KeySyms
+   , Text.XkbCommon.Keymap
+   , Text.XkbCommon.Keymap.RmlvoBuilder
+   , Text.XkbCommon.State
+   , Text.XkbCommon.Registry
+  autogen-modules:
+     Text.XkbCommon.EventCodes
+   , Text.XkbCommon.KeySyms
+  other-modules:
+     Text.XkbCommon.FFI
+   , Text.XkbCommon.Internal
+  hs-source-dirs:     src
+  build-tool-depends: hsc2hs:hsc2hs
 
-    if flag(pkg-config)
-      pkgconfig-depends: xkbcommon, xkbregistry
-    else
-      extra-libraries: xkbcommon, xkbregistry
+  if flag(pkg-config)
+    pkgconfig-depends:
+        xkbcommon   >= 1.13
+      , xkbregistry >= 1.13
+  else
+    extra-libraries: xkbcommon, xkbregistry
 
-    if !os(linux)
-      buildable: False
+  if !os(linux)
+    buildable: False
+
+-- TODO: per-component build not working with Hooks/Custom build-type...
+-- library xkbregistry-bindings
+--   import: warnings, language, deps
+--   visibility: public
+--   exposed-modules:
+--      Text.XkbCommon.Registry
+--   hs-source-dirs: registry
+--   build-depends: xkbcommon-bindings
+--
+--   if flag(pkg-config)
+--     pkgconfig-depends: xkbregistry
+--   else
+--     extra-libraries: xkbregistry
 
 test-suite spec
   import: warnings, language

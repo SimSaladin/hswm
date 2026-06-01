@@ -116,7 +116,9 @@ startHSWM :: (m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow))
           -> HSWMConfig m l
           -> IO ()
 startHSWM mainRun loggerSet logFunc wlDisplay config = do
-    conf <- HConf False Nothing (config {layoutHook = Layout (layoutHook config)}) wlDisplay logFunc loggerSet
+    let config' = config { layoutHook = Layout config.layoutHook }
+
+    conf <- HConf False Nothing config' wlDisplay logFunc loggerSet
         <$> newEmptyMVar
         <*> newEmptyTMVarIO
         <*> newTQueueIO
@@ -127,10 +129,10 @@ startHSWM mainRun loggerSet logFunc wlDisplay config = do
     let runInH :: H a -> IO a
         runInH = runH conf
 
+        withLogging = flip runLoggingT logFunc
+
         mainEvent :: MonadIO m => MainEvent -> m ()
         mainEvent = atomically . writeTQueue conf.eventQueue
-
-        withLogging = flip runLoggingT logFunc
 
         mkListener :: (WL.HasListener o, Typeable (R.ObjectListener o)) => (WL.ObjectListenerEvent o -> H ()) -> H (ConstPtr (WL.ObjectListener o))
         mkListener f = getOrCreateObjectIO $ WL.createListener (runInH . f)
@@ -138,13 +140,14 @@ startHSWM mainRun loggerSet logFunc wlDisplay config = do
     -- Do not propagate debug to child processes.
     unsetEnv "WAYLAND_DEBUG"
 
-    initialState <- withLogging $ readStateFile mainRun.mainStateFile config >>= \case
+    -- Restore or initialize initial state
+    withLogging $ do
+      st <- readStateFile mainRun.mainStateFile config >>= \case
         Just hs -> return hs
         Nothing ->
           let initialWinSet = W.new conf.config.layoutHook config.workspaces [SD 0 0 0 0]
               in return def {windowset = initialWinSet, windowsetOld = initialWinSet}
-
-    atomically $ putTMVar conf._state initialState
+      atomically $ putTMVar conf._state st
 
     runInH $ do
       _ <- mkListener $ handleWithHook . WlShmEvent
@@ -214,7 +217,7 @@ startHSWM mainRun loggerSet logFunc wlDisplay config = do
       wlPollFd <- WL.displayGetFd wlDisplay
 
       logInfo "Running user startup hooks..."
-      void $ userCode (startupHook config)
+      void $ userCode config.startupHook
 
       -- Create an additional seat; useful for testing
       -- io $ R.riverInputManagerCreateSeat inputManager (Just "foobar")
@@ -225,9 +228,9 @@ startHSWM mainRun loggerSet logFunc wlDisplay config = do
         mainEvent MainSaveToDisk
       link timerAs
 
-      void $ mainLoop wlDisplay wlPollFd
+      mainLoop wlDisplay wlPollFd
 
-mainLoop :: WL.Display -> Posix.Fd -> H Void
+mainLoop :: WL.Display -> Posix.Fd -> H ()
 mainLoop wlDisplay wlPollFd = do
   let main MainPoll = do
         dispatchPending wlDisplay >>= \case
@@ -237,7 +240,7 @@ mainLoop wlDisplay wlPollFd = do
             Right pollWrite -> do
               let pollfd = if pollWrite then io (threadWaitWrite wlPollFd `race_` threadWaitRead wlPollFd)
                                         else io (threadWaitRead wlPollFd)
-              eq <- asks eventQueue
+              eq <- view eventQueue
               res <- atomically (readTQueue eq) `race` pollfd
               res' <- readIncomingEvents wlDisplay
               case (res, res') of
@@ -249,14 +252,14 @@ mainLoop wlDisplay wlPollFd = do
         case sig of
           _ -> do
             logError $ "Exiting (signal)" :# ["signal" .= show sig ]
-            void . userCode =<< asks (exitHook . config)
-            io . rmLoggerSet =<< asks _loggerSet
+            void . userCode =<< view (config . exitHook)
+            io . rmLoggerSet =<< view _loggerSet
             exitFailure
 
       main (MainExit desc e) = do
         logError $ "Exiting (exception)" :# [ "description" .= desc, "exception" .= show e ]
-        void . userCode =<< asks (exitHook . config)
-        io . rmLoggerSet =<< asks _loggerSet
+        void . userCode =<< view (config . exitHook)
+        io . rmLoggerSet =<< view _loggerSet
         exitFailure
 
       main (MainRestart prog) = do
@@ -303,71 +306,72 @@ flushRequests disp =
 -- function if it returned True.
 handleWithHook :: Event -> H ()
 handleWithHook e = do
-  evHook <- asks (handleEventHook . config)
+  evHook <- view (config . handleEventHook)
   whenM (userCodeDef True $ getAll `fmap` evHook e) (handleEvent e)
 
-handleEvent :: Event -> H ()
-handleEvent (WindowManagerEvent e) = case e of
+instance HandleEvent H Event where
+  handleEvent (WindowManagerEvent e) = case e of
 
-  R.RiverWindowManagerUnavailable _ wm -> do
-    io $ R.objectDestroy wm
-    writeMainEvent $ MainExit "another window manager already running" (toException $ ExitFailure 1)
+    R.RiverWindowManagerUnavailable _ wm -> do
+      io $ R.objectDestroy wm
+      writeMainEvent $ MainExit "another window manager already running" (toException $ ExitFailure 1)
 
-  R.RiverWindowManagerFinished _ wm -> do
-    io $ R.objectDestroy wm
-    writeMainEvent $ MainExit "river_window_manager_v1 finished, exiting." (toException $ ExitFailure 1)
+    R.RiverWindowManagerFinished _ wm -> do
+      io $ R.objectDestroy wm
+      writeMainEvent $ MainExit "river_window_manager_v1 finished, exiting." (toException $ ExitFailure 1)
 
-  R.RiverWindowManagerOutput _ _ out -> Outputs.added out
-  R.RiverWindowManagerWindow _ _ w -> Windows.added w
-  R.RiverWindowManagerSeat _ _ seat -> do
-    -- river does not indicate when it is done signalling about present windows, so we assume that it is done by the
-    -- time first seat is announced.
-    runInHS Windows.finishRecovery
-    Seats.added seat
+    R.RiverWindowManagerOutput _ _ out -> Outputs.added out
+    R.RiverWindowManagerWindow _ _ w -> Windows.added w
+    R.RiverWindowManagerSeat _ _ seat -> do
+      -- river does not indicate when it is done signalling about present windows, so we assume that it is done by the
+      -- time first seat is announced.
+      runInHS Windows.finishRecovery
+      Seats.added seat
 
-  -- /manage sequence/
-  R.RiverWindowManagerManageStart _ wm -> do
-    runInHS . sequence_ =<< atomically . flushTQueue =<< asks (view pendingManageQL)
-    Outputs.manage >> Seats.manage >> Windows.manage
-    void . userCode =<< asks (logHook . config)
-    R.riverWindowManagerManageFinish wm
+    -- /manage sequence/
+    R.RiverWindowManagerManageStart _ wm -> do
+      runInHS . sequence_ =<< atomically . flushTQueue =<< asks (view pendingManageQL)
+      Outputs.manage >> Seats.manage >> Windows.manage
+      void . userCode =<< view (config . logHook)
+      R.riverWindowManagerManageFinish wm
 
-  -- /render sequence/
-  R.RiverWindowManagerRenderStart _ wm -> do
-    runInHS . sequence_ =<< atomically . flushTQueue =<< asks (view pendingRenderQL)
-    Seats.render >> Windows.render
-    void . userCode =<< asks (renderHook . config)
-    R.riverWindowManagerRenderFinish wm
+    -- /render sequence/
+    R.RiverWindowManagerRenderStart _ wm -> do
+      runInHS . sequence_ =<< atomically . flushTQueue =<< asks (view pendingRenderQL)
+      Seats.render >> Windows.render
+      void . userCode =<< view (config . renderHook)
+      R.riverWindowManagerRenderFinish wm
 
-  R.RiverWindowManagerSessionLocked _ _wm ->
-    writeManageQ $ mapSeats $ \s ->
-      io $ mapM_ (deRefStablePtr >=> R.riverXkbBindingDisable . xkb_binding) s.xkb_bindings
+    R.RiverWindowManagerSessionLocked _ _wm ->
+      writeManageQ $ mapSeats $ \s ->
+        io $ mapM_ (deRefStablePtr >=> R.riverXkbBindingDisable . xkb_binding) s.xkb_bindings
 
-  R.RiverWindowManagerSessionUnlocked _ _wm ->
-    writeManageQ $ mapSeats $ \s ->
-      io $ mapM_ (deRefStablePtr >=> R.riverXkbBindingEnable . xkb_binding) s.xkb_bindings
+    R.RiverWindowManagerSessionUnlocked _ _wm ->
+      writeManageQ $ mapSeats $ \s ->
+        io $ mapM_ (deRefStablePtr >=> R.riverXkbBindingEnable . xkb_binding) s.xkb_bindings
 
-handleEvent (OutputEvent e) = Outputs.handle e
-handleEvent (LayerShellOutputEvent e) = Outputs.handleLayerShell e
-handleEvent (WlOutputEvent e) = Outputs.handleWlOutput e
-handleEvent (SeatEvent e) = Seats.handleEvent e
-handleEvent (LayerShellSeatEvent e) = Seats.handleLayerShellSeat e
-handleEvent (WlSeatEvent e) = Seats.handleWlSeatEvent e
-handleEvent (WindowEvent e) = Windows.handleEvent e
-handleEvent (XkbEvent e) = Seats.handleXkbBindingEvent e -- XKB Keyboard events
-handleEvent (XkbSeatEvent e) = Seats.handleXkbBindingsSeatEvent e -- XKB Keyboard events
-handleEvent (PointerEvent e) = Seats.handlePointerEvent e -- Pointer events
-handleEvent (InputManagerEvent e) = InputConfig.handleInputManagerEvent e
-handleEvent (InputDeviceEvent e) = InputConfig.handleInputDeviceEvent e
-handleEvent (LibinputConfigEvent e) = InputConfig.handleLibinputEvent e
-handleEvent (LibinputDeviceEvent e) = InputConfig.handleLibinputDeviceEvent e
-handleEvent (XkbConfigEvent e) = InputConfig.handleXkbConfigEvent e
-handleEvent (XkbKeyboardEvent e) = InputConfig.handleXkbKeyboardEvent e
-handleEvent (ForeignTopLevelListV1 (WL.ForeignToplevelListToplevel _ _ fh)) = WL.listenerAdd_ fh =<< getObject
-handleEvent (WlrOutputManagerEvent (Wlr.OutputManagerHead _ _ head)) = WL.listenerAdd_ head =<< getObject
-handleEvent (ExtIdleNotificationEvent e) =
-  case e of
+  handleEvent (OutputEvent e) = Outputs.handle e
+  handleEvent (LayerShellOutputEvent e) = Outputs.handleLayerShell e
+  handleEvent (WlOutputEvent e) = Outputs.handleWlOutput e
+  handleEvent (SeatEvent e) = Seats.handleEvent e
+  handleEvent (LayerShellSeatEvent e) = Seats.handleLayerShellSeat e
+  handleEvent (WlSeatEvent e) = Seats.handleWlSeatEvent e
+  handleEvent (WindowEvent e) = Windows.handleEvent e
+  handleEvent (XkbEvent e) = Seats.handleXkbBindingEvent e -- XKB Keyboard events
+  handleEvent (XkbSeatEvent e) = Seats.handleXkbBindingsSeatEvent e -- XKB Keyboard events
+  handleEvent (PointerEvent e) = Seats.handlePointerEvent e -- Pointer events
+  handleEvent (InputManagerEvent e) = InputConfig.handleInputManagerEvent e
+  handleEvent (InputDeviceEvent e) = InputConfig.handleInputDeviceEvent e
+  handleEvent (LibinputConfigEvent e) = InputConfig.handleLibinputEvent e
+  handleEvent (LibinputDeviceEvent e) = InputConfig.handleLibinputDeviceEvent e
+  handleEvent (XkbConfigEvent e) = InputConfig.handleXkbConfigEvent e
+  handleEvent (XkbKeyboardEvent e) = InputConfig.handleXkbKeyboardEvent e
+  handleEvent (ForeignTopLevelListV1 (WL.ForeignToplevelListToplevel _ _ fh)) = WL.listenerAdd_ fh =<< getObject
+  handleEvent (WlrOutputManagerEvent (Wlr.OutputManagerHead _ _ head)) = WL.listenerAdd_ head =<< getObject
+  handleEvent (ExtIdleNotificationEvent e) = handleEvent e
+  handleEvent _ = return ()
+
+instance HandleEvent H Ext.IdleNotificationEvent where
+  handleEvent = \case
     Ext.IdleNotificationIdled{} -> runInHS $ setOutputPower False
     Ext.IdleNotificationResumed{} -> runInHS $ setOutputPower True
-
-handleEvent _ = return ()

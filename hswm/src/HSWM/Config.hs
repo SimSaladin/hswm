@@ -72,11 +72,11 @@ named str a = SomeAction $ NamedAction str (SomeAction a)
 
 addKeys :: (IsKeySym k, IsAction m a) => [((ModMask, k), a)] -> ConfigDoM m
 addKeys keys c = c
-  { keyBindings = keyBindings c ++ [((m, toKeySym k), SomeAction a) | ((m, k), a) <- keys] }
+  { keyBindings = c.keyBindings ++ [((m, toKeySym k), SomeAction a) | ((m, k), a) <- keys] }
 
 addKeys' :: [(String, SomeAction H)] -> ConfigDoM H
 addKeys' keys c = c
-  { keyBindings = keyBindings c ++ [((m, toKeySym k), a)
+  { keyBindings = c.keyBindings ++ [((m, toKeySym k), a)
     | ((m, k), a) <- fromADTKeys c.defaultModMask $ parseSubmaps keys] }
 
 submap ::
@@ -140,7 +140,7 @@ parseSubmaps ks0 =
 
 showKeyHelp :: H ()
 showKeyHelp = do
-  binds <- asks (keyBindings . config)
+  binds <- view (config . keyBindings)
   let pretty = [ (ppXBKey (m, k), actionDescription (Proxy @H) a)
                   | ((m, k), a) <- L.sortOn (ppXBKey . fst) binds ]
   let indent = maximum $ map (length . fst) pretty

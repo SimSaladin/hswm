@@ -26,8 +26,8 @@ newtype WaybarState = WaybarState { wbProcess :: Maybe (Process () () ()) }
 waybarSB :: WaybarConfig -> ConfigDoM H
 waybarSB wbcfg ucfg =
   ucfg
-    { startupHook = startupHook ucfg <> waybarStartupHook wbcfg,
-      exitHook = exitHook ucfg <> waybarExitHook wbcfg
+    { startupHook = ucfg.startupHook <> waybarStartupHook wbcfg,
+      exitHook = ucfg.exitHook <> waybarExitHook wbcfg
     }
 
 waybarStartupHook :: WaybarConfig -> H ()

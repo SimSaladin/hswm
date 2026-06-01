@@ -13,6 +13,7 @@ module HSWM.Utils
   , module HSWM.Util.Process
   ) where
 
+import           HSWM.Types.Action
 import           HSWM.Util.Process
 
 import           Text.XkbCommon
@@ -24,8 +25,7 @@ import qualified Wayland as WL
 import qualified Pixman as P
 
 import           River (RiverColor(..))
-import qualified Bindings.River.WindowManagement.V1.Client.Generated as R
-
+import qualified Bindings.River.WindowManagementV1 as R
 import qualified Bindings.Wayland.Client as WL
 
 import           Data.Bits
@@ -85,20 +85,6 @@ ppXBKey (m, ksym) = L.intercalate "+" $ ppModifiers m ++ [fromMaybe "???" $ keys
 
 ppButton :: (ModMask, Button) -> String
 ppButton (m, btn) = L.intercalate "+" $ ppModifiers m ++ [fromMaybe "???" $ fromEventCodeBTN btn]
-
-type Button = Word32
-
-type XBKey = (ModMask, KeySym)
-
-class IsKeySym a where
-
-  toKeySym :: a -> KeySym
-
-instance IsKeySym KeySym where
-  toKeySym = id
-
-instance IsKeySym String where
-  toKeySym s = fromMaybe key_NoSymbol $ keysymFromName s <|> keysymFromNameCaseInsensitive s
 
 -- * Logging and debug
 

@@ -65,19 +65,14 @@ foreign-library waybarhaskellplugin
   import: default-language, build-settings
   type: native-shared
   lib-version-linux: 1.0.0
-  other-modules:
-    Plugin
+  other-modules: Plugin
   hs-source-dirs: plugin
-  build-depends:
-    waybar-cffi-hs
-  ghc-options:
-    -threaded
-    -flink-rts
-    -no-hs-main
-
-  if !os(linux)
-    buildable: False
+  build-depends: waybar-cffi-hs
+  ghc-options: -threaded -flink-rts -no-hs-main
 
   if flag(standalone)
     options: standalone
     ghc-options: -fPIC
+
+  if !os(linux)
+    buildable: False

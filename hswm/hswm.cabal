@@ -35,6 +35,8 @@ library
           DeriveAnyClass
           PackageImports
           QuantifiedConstraints
+          FunctionalDependencies
+          TypeFamilies
     ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -Wno-ambiguous-fields
     build-tool-depends:
           hsc2hs:hsc2hs
@@ -74,9 +76,13 @@ library
           HSWM.Outputs
           HSWM.Seats
           HSWM.StackSet
+          HSWM.Types.Action
           HSWM.Types.Config
           HSWM.Types.Events
+          HSWM.Types.Output
+          HSWM.Types.Seat
           HSWM.Types.TypeMap
+          HSWM.Types.Window
           HSWM.Types.WM
           HSWM.Util.Debug
           HSWM.Util.ExtensibleState
@@ -121,6 +127,7 @@ library
         , pixman-bindings
         , pretty-simple >=4.1.4 && <4.2
         , process >=1.6.25 && <1.7
+        , template-haskell
         , text >=2.1.2 && <2.2
         , time >=1.14 && <2.0
         , transformers >=0.6.1 && <0.7
@@ -158,6 +165,8 @@ library hswm-ipc-api
           DeriveAnyClass
           PackageImports
           QuantifiedConstraints
+          FunctionalDependencies
+          TypeFamilies
     build-depends:
           aeson >=2.2.3 && <2.4
         , base >=4.21 && <5
@@ -187,6 +196,8 @@ library hswm-prelude
           DeriveAnyClass
           PackageImports
           QuantifiedConstraints
+          FunctionalDependencies
+          TypeFamilies
     ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -Wno-ambiguous-fields
     build-depends:
           async >=2.2.6 && <2.3
@@ -225,6 +236,8 @@ executable hswm
           DeriveAnyClass
           PackageImports
           QuantifiedConstraints
+          FunctionalDependencies
+          TypeFamilies
     ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -Wno-ambiguous-fields -threaded -rtsopts "-with-rtsopts=-N"
 
 executable hswmctl
@@ -241,6 +254,8 @@ executable hswmctl
           DeriveAnyClass
           PackageImports
           QuantifiedConstraints
+          FunctionalDependencies
+          TypeFamilies
     ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -Wno-ambiguous-fields -threaded -rtsopts "-with-rtsopts=-N"
     build-depends:
           aeson >=2.2.3 && <2.4

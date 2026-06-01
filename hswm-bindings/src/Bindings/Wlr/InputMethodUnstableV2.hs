@@ -1,5 +1,6 @@
 module Bindings.Wlr.InputMethodUnstableV2 where
 
+import Bindings.Wlr.InputMethod.UnstableV2.Enums
 import Bindings.Wlr.InputMethod.UnstableV2.Client.Generated
 import Bindings.Wlr.InputMethod.UnstableV2.Client.Generated.Global
 import Bindings.Wlr.InputMethod.UnstableV2.Client.Generated.Safe

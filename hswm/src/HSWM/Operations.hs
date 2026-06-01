@@ -52,7 +52,7 @@ tileWindow placeTop rw r = do
     --logDebug $ "Tiling window" :# [ "window" .= show rw, "title" .= w.title, "placetop" .= placeTop ]
     case w.fullscreen of
       Nothing -> do
-        bwDef <- asks (fi . borderWidth . config)
+        bwDef <- view $ config . borderWidth . to fi
         let bw = fromMaybe bwDef w.wBorderWidth
         -- give all windows at least 1x1 pixels
         let least x
@@ -109,7 +109,7 @@ doManage a w = doManage' a w.river_window
 -}
 sendMessage :: (Message a) => a -> HS ()
 sendMessage a = do
-  w <- gets $ W.workspace . W.current . windowset
+  w <- gets $ W.workspace . W.current . view windowset
   ml' <- handleMessage (W.layout w) (SomeMessage a) `catchHS` return Nothing
   whenJust ml' $ \l' -> do
     modifyWindowSet $ \ws ->
@@ -150,7 +150,7 @@ sendMessageWithNoRefresh a w =
 -- | Set the layout of the currently viewed workspace.
 setLayout :: Layout RiverWindow -> HS ()
 setLayout l = do
-  ss@W.StackSet {W.current = c@W.Screen {W.workspace = ws}} <- gets windowset
+  ss@W.StackSet {W.current = c@W.Screen {W.workspace = ws}} <- use windowset
   _ <- handleMessage (W.layout ws) (SomeMessage ReleaseResources)
   windows $ const $ ss {W.current = c {W.workspace = ws {W.layout = l}}}
 
@@ -160,7 +160,7 @@ updateLayout i ml = whenJust ml $ \l ->
   runOnWorkspaces $ \ww -> return $ if W.tag ww == i then ww {W.layout = l} else ww
 
 withScreenOutput :: ScreenId -> (Output -> HS ()) -> HS ()
-withScreenOutput sid f = mapM_ f . L.find (\o -> o.screen == sid) =<< gets _outputs
+withScreenOutput sid f = mapM_ f . L.find (\o -> o.screen == sid) =<< use _outputs
 
 -- | Force new manage sequence.
 manageDirty :: (MonadStateGlobal env m, HasEventQueues env) => m ()
@@ -230,7 +230,7 @@ hide rw = withWindow rw $ \_ -> R.riverWindowHide rw
 -- | /render sequence/ Draw borders on the the window.
 setWindowBorder :: RiverWindow -> Int32 -> RiverColor -> HS ()
 setWindowBorder w wb_width RiverColor {red = wb_r, green = wb_g, blue = wb_b, alpha = wb_a} = withWindow w $ \_ -> do
-  wb_edges <- asks (fi . borderEdges . config)
+  wb_edges <- asks $ fi . view (config . borderEdges)
   let borders = R.WindowBorders {..}
   io $ riverWindowSetBorders w borders
 
@@ -247,10 +247,10 @@ setWindowPosition w x y = do
 
 -- | Run a monadic action with the current stack set
 withWindowSet :: (WindowSet -> HS a) -> HS a
-withWindowSet f = gets windowset >>= f
+withWindowSet f = use windowset >>= f
 
 modifyWindowSet :: (WindowSet -> WindowSet) -> HS ()
-modifyWindowSet f = State.modify' $ \s -> s {windowset = f (windowset s)}
+modifyWindowSet f = modifying windowset f
 
 windows :: (WindowSet -> WindowSet) -> HS ()
 windows = modifyWindowSet
@@ -265,7 +265,7 @@ screenWorkspace sc = withWindowSet $ return . W.lookupWorkspace sc
 -- each workspace with the output of that function being the modified workspace.
 runOnWorkspaces :: (WindowSpace -> HS WindowSpace) -> HS ()
 runOnWorkspaces job = do
-  ws <- gets windowset
+  ws <- use windowset
   h <- mapM job $ W.hidden ws
   c : v <-
     mapM (\s -> (\w -> s {W.workspace = w}) <$> job (W.workspace s)) $
@@ -276,16 +276,16 @@ runOnWorkspaces job = do
 -- * Outputs
 
 lookupOutput :: RiverOutput -> HS (Maybe Output)
-lookupOutput k = gets _outputs <&> L.find (\x -> x.river_output == k)
+lookupOutput k = use _outputs <&> L.find (\x -> x.river_output == k)
 
 lookupOutputBy :: (Output -> Bool) -> HS (Maybe Output)
-lookupOutputBy f = gets _outputs <&> L.find f
+lookupOutputBy f = use _outputs <&> L.find f
 
 withOutput :: RiverOutput -> (Output -> HS ()) -> HS ()
-withOutput k m = gets _outputs >>= mapM_ (\x -> when (x.river_output == k) (m x))
+withOutput k m = use _outputs >>= mapM_ (\x -> when (x.river_output == k) (m x))
 
 modifyOutput :: RiverOutput -> (Output -> Output) -> HS ()
-modifyOutput ro f = modify $ \s -> s {_outputs = map g (_outputs s)}
+modifyOutput ro f = modifying _outputs $ map g
   where
     g a@Output {..}
       | river_output == ro = f a
@@ -293,7 +293,7 @@ modifyOutput ro f = modify $ \s -> s {_outputs = map g (_outputs s)}
 
 setOutputPower :: Bool -> HS ()
 setOutputPower mode = do
-  ops <- map outputPower <$> gets _outputs
+  ops <- map outputPower <$> use _outputs
   forM_ ops $ \case
     Nothing -> return ()
     Just power -> do
@@ -304,27 +304,27 @@ setOutputPower mode = do
 -- * Seats
 
 lookupSeat :: RiverSeat -> HS (Maybe Seat)
-lookupSeat rs = L.find (\x -> x.river_seat == rs) <$> gets _seats
+lookupSeat rs = L.find (\x -> x.river_seat == rs) <$> use _seats
 
 withSeat :: RiverSeat -> (Seat -> HS ()) -> HS ()
-withSeat sid f = gets _seats >>= mapM_ (\s -> when (s.river_seat == sid) (f s))
+withSeat sid f = use _seats >>= mapM_ (\s -> when (s.river_seat == sid) (f s))
 
 modifySeat :: RiverSeat -> (Seat -> Seat) -> HS ()
-modifySeat ro f = modify $ \s -> s {_seats = map g (_seats s)}
+modifySeat ro f = modifying _seats $ map g
   where
     g x@Seat {}
       | x.river_seat == ro = f x
       | otherwise = x
 
 modifySeats :: (Seat -> Bool) -> (Seat -> Seat) -> HS ()
-modifySeats choose f = modify $ \s -> s {_seats = map g (_seats s)}
+modifySeats choose f = modifying _seats $ map g
   where
     g x
       | choose x = f x
       | otherwise = x
 
 mapSeats :: (Seat -> HS ()) -> HS ()
-mapSeats f = gets _seats >>= mapM_ f
+mapSeats f = use _seats >>= mapM_ f
 
 -- ** Starting Seat operations
 
@@ -339,13 +339,13 @@ seatInputOverride seat onempty keys = modifySeats (\s -> s.name == seat) $ \s ->
 -- * windows
 
 lookupWindow :: RiverWindow -> HS (Maybe Window)
-lookupWindow wid = gets (M.lookup wid . _windows)
+lookupWindow wid = use (_windows . to (M.lookup wid))
 
 lookupWindows :: [RiverWindow] -> HS [Window]
-lookupWindows wids = gets $ catMaybes . (\ws -> map (`M.lookup` ws) wids) . _windows
+lookupWindows wids = gets $ catMaybes . (\ws -> map (`M.lookup` ws) wids) . view _windows
 
 withWindow :: RiverWindow -> (Window -> HS ()) -> HS ()
-withWindow wid f = gets (M.lookup wid . _windows) >>= (`whenJust` f)
+withWindow wid f = gets (M.lookup wid . view _windows) >>= (`whenJust` f)
 
 modifyWindow :: RiverWindow -> (Window -> Window) -> HS ()
 modifyWindow w f = alterWindow w (fmap f)
@@ -354,10 +354,10 @@ alterWindow :: RiverWindow -> (Maybe Window -> Maybe Window) -> HS ()
 alterWindow w f = modify $ \s -> s {_windows = M.alter f w s._windows}
 
 withFocused :: (Window -> HS ()) -> HS ()
-withFocused f = gets windowset >>= \ws -> whenJust (W.peek ws) (`withWindow` f)
+withFocused f = use windowset >>= \ws -> whenJust (W.peek ws) (`withWindow` f)
 
 mapWindows :: (Window -> HS ()) -> HS ()
-mapWindows f = gets _windows >>= mapM_ f
+mapWindows f = use _windows >>= mapM_ f
 
 -- | Make a tiled window floating, using its suggested rectangle (modifies the windowset only).
 float :: RiverWindow -> HS ()
@@ -376,7 +376,7 @@ floatLocation :: Window -> HS (ScreenId, W.RationalRect)
 floatLocation w = go
   where
     go = do
-      ws <- gets windowset
+      ws <- use windowset
       let bw = 2 :: Int -- (fromIntegral . wa_border_width) wa
       point_sc <- pointScreen (fi w.x) (fi w.y)
 
@@ -426,7 +426,7 @@ getTimeStamp = systemSeconds <$> io getSystemTime
 restart :: String -> H ()
 restart prog = do
   runInHS $ broadcastMessage ReleaseResources
-  void . userCode =<< asks (exitHook . config)
+  void . userCode =<< asks (view $ config . exitHook)
   statefile <- runInHS writeStateToFile
   logInfo $ "restart: executing" :# [ "program" .= prog ]
   io $ do
@@ -454,7 +454,7 @@ writeStateToFile = do
 
 dumpStateAsString :: HS String
 dumpStateAsString = do
-  let wsData s = W.mapLayout show $ W.mapWindow winIdent $ windowset s
+  let wsData s = W.mapLayout show $ W.mapWindow winIdent $ s.windowset
         where
           winIdent w
             | Just win <- L.find (\x -> x.river_window == w) s._windows = (rwToIntPtr w, win.identifier)
@@ -462,7 +462,7 @@ dumpStateAsString = do
   let maybeShow (t, Right (PersistentExtension ext)) = Just (t, show ext)
       maybeShow (t, Left str) = Just (t, str)
       maybeShow _ = Nothing
-      extState = mapMaybe maybeShow . M.toList . extensibleState
+      extState = mapMaybe maybeShow . M.toList . view extensibleState
   stateData <- gets $ \s -> StateData (wsData s) (extState s)
   return $! show stateData
   where
@@ -504,7 +504,7 @@ readStateFile msf xmc = do
             sf <- sf'
             let wins = W.allWindows (sfWins sf)
             let winset =
-                  W.ensureTags layout (workspaces xmc) $
+                  W.ensureTags layout xmc.workspaces $
                     W.mapLayout (fromMaybe layout . maybeRead lreads) $
                       W.mapWindow (R.RiverWindow . intPtrToPtr . fst) (sfWins sf)
                 extState = M.fromList . map (second Left) $ sfExt sf
@@ -516,7 +516,7 @@ readStateFile msf xmc = do
                   extensibleState = extState
                 }
 
-    layout = Layout (layoutHook xmc)
+    layout = Layout xmc.layoutHook
     lreads = readsLayout layout
 
     maybeRead reads' s = case reads' s of

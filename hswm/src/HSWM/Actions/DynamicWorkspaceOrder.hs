@@ -106,11 +106,11 @@ updateOrder = do
   case mm of
     Nothing -> do
       -- initialize using ordering of workspaces from the user's config
-      ws <- asks (workspaces . config)
+      ws <- view (config . workspaces)
       XS.put . WSO . Just . M.fromList $ zip ws [0 ..]
     Just m -> do
       -- check for new workspaces and add them at the end
-      curWs <- gets (S.fromList . map W.tag . W.workspaces . windowset)
+      curWs <- gets (S.fromList . map W.tag . W.workspaces . view windowset)
       let mappedWs = M.keysSet m
           newWs = curWs `S.difference` mappedWs
           nextIndex = 1 + maximum (-1 : M.elems m)
@@ -140,7 +140,7 @@ swapWith dir which = findWorkspace getSortByOrder dir which 1 >>= swapWithCurren
 -- | Swap the given workspace with the current one.
 swapWithCurrent :: WorkspaceId -> HS ()
 swapWithCurrent w = do
-  cur <- gets (W.currentTag . windowset)
+  cur <- gets (W.currentTag . view windowset)
   swapOrder w cur
 
 -- | Swap the two given workspaces in the dynamic order.
@@ -188,7 +188,7 @@ shiftTo dir t = doTo dir t getSortByOrder (windows . W.shift)
 withNthWorkspace' :: ([WorkspaceId] -> [WorkspaceId]) -> (String -> WindowSet -> WindowSet) -> Int -> HS ()
 withNthWorkspace' tr job wnum = do
   sort <- getSortByOrder
-  ws <- gets (tr . map W.tag . sort . W.workspaces . windowset)
+  ws <- gets (tr . map W.tag . sort . W.workspaces . view windowset)
   case drop wnum ws of
     (w : _) -> windows $ job w
     [] -> return ()

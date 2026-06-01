@@ -1,5 +1,6 @@
 module Bindings.River.LayerShellV1 where
 
+import           Bindings.River.LayerShell.V1.Enums
 import           Bindings.River.LayerShell.V1.Client.Generated
 import           Bindings.River.LayerShell.V1.Client.Generated.Global
 import           Bindings.River.LayerShell.V1.Client.Generated.Unsafe as Unsafe

@@ -1,7 +1,11 @@
 {-# LANGUAGE OverloadedRecordDot #-}
 
-module Bindings.Wayland.TextInputUnstableV3 where
+module Bindings.Wayland.TextInputUnstableV3
+  ( module Bindings.Wayland.TextInputUnstableV3
+  , module Bindings.Wayland.TextInput.UnstableV3.Enums
+  ) where
 
+import Bindings.Wayland.TextInput.UnstableV3.Enums
 import Bindings.Wayland.TextInput.UnstableV3.Client.Generated
 import Bindings.Wayland.TextInput.UnstableV3.Client.Generated.Global
 import Bindings.Wayland.TextInput.UnstableV3.Client.Generated.Safe

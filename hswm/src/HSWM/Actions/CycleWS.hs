@@ -182,7 +182,7 @@ toggleOrDoSkip ::
   WorkspaceId ->
   HS ()
 toggleOrDoSkip skips f toWS = do
-  cur <- gets (W.currentTag . windowset)
+  cur <- gets (W.currentTag . view windowset)
   if toWS == cur
     then lastViewedHiddenExcept skips >>= flip whenJust (windows . f)
     else windows (f toWS)
@@ -196,7 +196,7 @@ skipTags wss ids = filter ((`notElem` ids) . W.tag) wss
 -- workspace.
 lastViewedHiddenExcept :: [WorkspaceId] -> HS (Maybe WorkspaceId)
 lastViewedHiddenExcept skips = do
-  hs <- gets $ map W.tag . flip skipTags skips . W.hidden . windowset
+  hs <- gets $ map W.tag . flip skipTags skips . W.hidden . view windowset
   choose hs . L.find (`elem` hs) <$> WH.workspaceHistory
   where
     choose [] _ = Nothing
@@ -256,7 +256,7 @@ emptyWS = WSIs . return $ isNothing . W.stack
 -- | Cycle through non-visible workspaces
 hiddenWS :: WSType
 hiddenWS = WSIs $ do
-  hs <- gets (map W.tag . W.hidden . windowset)
+  hs <- gets (map W.tag . W.hidden . view windowset)
   return $ (`elem` hs) . W.tag
 
 -- | Cycle through all workspaces
@@ -276,7 +276,7 @@ ignoringWSs ts = WSIs . return $ (`notElem` ts) . W.tag
 --   separator character or the end of the tag
 wsTagGroup :: Char -> WSType
 wsTagGroup sep = WSIs $ do
-  cur <- groupName . W.workspace . W.current <$> gets windowset
+  cur <- groupName . W.workspace . W.current <$> use windowset
   return $ (cur ==) . groupName
   where
     groupName = takeWhile (/= sep) . W.tag
@@ -316,11 +316,11 @@ findWorkspace s dir t n = findWorkspaceGen s (wsTypeToPred t) (maybeNegate dir n
     maybeNegate Prev d = -d
 
 findWorkspaceGen :: HS WorkspaceSort -> HS (WindowSpace -> Bool) -> Int -> HS WorkspaceId
-findWorkspaceGen _ _ 0 = gets (W.currentTag . windowset)
+findWorkspaceGen _ _ 0 = gets (W.currentTag . view windowset)
 findWorkspaceGen sortX wsPredX d = do
   wsPred <- wsPredX
   sort <- sortX
-  ws <- gets windowset
+  ws <- use windowset
   let cur = W.workspace (W.current ws)
       sorted = sort (W.workspaces ws)
       pivoted = let (a, b) = span ((/= W.tag cur) . W.tag) sorted in b ++ a
@@ -365,7 +365,7 @@ switchScreen d = do
 -- >         , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
 screenBy :: Int -> HS ScreenId
 screenBy d = do
-  ws <- gets windowset
+  ws <- use windowset
   -- let ss = sortBy screen (screens ws)
   let now = W.screen (W.current ws)
   return $ (now + fromIntegral d) `mod` fromIntegral (length (W.screens ws))

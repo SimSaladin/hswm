@@ -2033,6 +2033,7 @@ withPtr x = withForeignPtr (getField @"unwrap" x)
 withImagePtr :: _ => r -> _ -> _
 withImagePtr x f = toImage x >>= flip withPtr f
 
+
 withConstPtr :: HasField "unwrap" r (ForeignPtr a) => r -> (ConstPtr a -> IO b) -> IO b
 withConstPtr x f = withForeignPtr (getField @"unwrap" x) $ f . ConstPtr
 

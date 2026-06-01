@@ -59,10 +59,10 @@ import Data.List ((\\), union, delete, intersect)
 data WithBorder a = WithBorder Dimension [a] deriving ( Read, Show )
 
 instance LayoutModifier WithBorder RiverWindow where
-    unhook (WithBorder _ s) = asks (borderWidth . config) >>= setBorders s . fi
+    unhook (WithBorder _ s) = view (config . borderWidth) >>= setBorders s . fi
 
     redoLayout (WithBorder n s) _ _ wrs = do
-        asks (borderWidth . config) >>= setBorders (s \\ ws) . fi
+        view (config . borderWidth) >>= setBorders (s \\ ws) . fi
         setBorders ws n
         return (wrs, Just $ WithBorder n ws)
      where
@@ -145,13 +145,13 @@ borderEventHook :: Event -> HS All
 borderEventHook _ = return $ All True
 
 instance (Read p, Show p, SetsAmbiguous p) => LayoutModifier (ConfigurableBorder p) RiverWindow where
-    unhook (ConfigurableBorder _ _ _ ch) = asks (borderWidth . config) >>= setBorders ch . fi
+    unhook (ConfigurableBorder _ _ _ ch) = view (config . borderWidth) >>= setBorders ch . fi
 
     redoLayout cb@(ConfigurableBorder gh ah nh ch) lr mst wrs = do
         let gh' wset = let lh = hiddens gh wset lr mst wrs
                        in  return $ (ah `union` lh) \\ nh
         ch' <- withWindowSet gh'
-        asks (borderWidth . config) >>= setBorders (ch \\ ch') . fi
+        view (config . borderWidth) >>= setBorders (ch \\ ch') . fi
         setBorders ch' 0
         return (wrs, Just $ cb { currentHidden = ch' })
 

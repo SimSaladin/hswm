@@ -23,7 +23,6 @@ import qualified Wayland as WL
 import qualified River as R
 
 import qualified Bindings.River as R
-import qualified Bindings.River.WindowManagement.V1.Client.Generated as R
 import qualified Bindings.Wayland.ExtIdleNotifyV1 as Ext
 
 import           Data.Bits
@@ -54,7 +53,7 @@ added river_seat = do
 
 deleteRemovedSeat :: Seat -> HS ()
 deleteRemovedSeat s@Seat {} = do
-  modify $ \st -> st {_seats = L.filter (\x -> (/= s.river_seat) x.river_seat) (_seats st)}
+  modifying _seats $ L.filter (\x -> (/= s.river_seat) x.river_seat)
   forM_ s.xkb_bindings destroyXKBBinding
   forM_ s.pointer_bindings destroyPointerBinding
   io $ R.objectDestroy s.xkb_bindings_seat
@@ -185,7 +184,7 @@ handlePointerEvent = \case
 -- XXX: also set XCURSOR_THEME= ? XCURSOR_PATH= ?
 setXCursorTheme :: (MonadIO m, MonadReader HConf m) => RiverSeat -> m ()
 setXCursorTheme rs =
-  asks (xcursor . config) >>= \case
+  view (config . xcursor) >>= \case
     Just (theme, size) -> R.riverSeatSetXcursorTheme rs (Just theme) size
     Nothing -> pure ()
 
@@ -195,12 +194,12 @@ manage = do
   om <- getObject @SeatManager
   newSeats <- forM om.pending_manage createSeatBindings
   unless (null newSeats) $ do
-    runInHS $ modify $ \s -> s {_seats = _seats s ++ newSeats}
+    runInHS $ modifying _seats (++ newSeats)
     forM_ newSeats $ \s -> setXCursorTheme $ getField @"river_seat" s
     modifyObject $ \st -> st { pending_manage = [] }
 
   -- Manage existing ones
-  runInHS $ gets _seats >>= mapM_ manage1
+  runInHS $ use _seats >>= mapM_ manage1
 
 -- | Manage SeatOp state
 manage1 :: Seat -> HS ()
@@ -219,7 +218,7 @@ manage1 s = do
               managePendingAction s.pending_action >> manageActiveOp
         _ -> return ()
     _ -> managePendingAction s.pending_action >> manageActiveOp
-  modifySeat s.river_seat $ \x -> x { suppressChangeFocus = max 0 (suppressChangeFocus x - 1) }
+  doS $ \x -> x { suppressChangeFocus = max 0 (suppressChangeFocus x - 1) }
   where
     doS = modifySeat s.river_seat
 
@@ -395,10 +394,10 @@ createSeatBindings s = do
   kbdListen <- getObject
   pbListen  <- getObject @R.RiverPointerBindingListener
 
-  myMod  <- asks (defaultModMask . config) <&> resolveModMask 0
-  pBinds <- asks (pointerBindings . config) >>= resolvePointerBinds myMod
+  myMod  <- view (config . defaultModMask) <&> resolveModMask 0
+  pBinds <- view (config . pointerBindings) >>= resolvePointerBinds myMod
   pPtrs  <- forM pBinds $ \((m, b), a) -> newPointerBinding pbListen s.river_seat m b a
-  kPtrs  <- createXkbBindings (binds, kbdListen, s.river_seat) actionSubmap =<< asks (keyBindings . config)
+  kPtrs  <- createXkbBindings (binds, kbdListen, s.river_seat) actionSubmap =<< view (config . keyBindings)
   return s
     { xkb_bindings = s.xkb_bindings <> kPtrs,
       pointer_bindings = s.pointer_bindings ++ pPtrs

@@ -1,5 +1,6 @@
 module Bindings.River.InputManagementV1 where
 
+import Bindings.River.InputManagement.V1.Enums
 import Bindings.River.InputManagement.V1.Client.Generated
 import Bindings.River.InputManagement.V1.Client.Generated.Global
 import Bindings.River.InputManagement.V1.Client.Generated.Unsafe
