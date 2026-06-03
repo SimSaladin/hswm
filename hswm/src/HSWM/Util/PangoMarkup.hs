@@ -9,11 +9,17 @@
 --
 module HSWM.Util.PangoMarkup where
 
-import Graphics.Rendering.Pango (escapeMarkup)
+import GI.GLib.Functions (markupEscapeText)
 import Data.Text qualified as T
+import System.IO.Unsafe
 
-escapePangoMarkup :: Text -> Text
-escapePangoMarkup = escapeMarkup
+escapeMarkup :: MonadIO m => Text -> Int64 -> m Text
+escapeMarkup x len
+  | len < 1   = markupEscapeText (x <> "\0") (-1)
+  | otherwise = markupEscapeText x len
+
+escapeMarkupPure :: Text -> Int64 -> Text
+escapeMarkupPure x len = unsafePerformIO (escapeMarkup x len)
 
 escapeLineBreaks :: Text -> Text
 escapeLineBreaks = T.replace "\n" "\\n" . T.replace "\r" "\\r"
@@ -39,16 +45,20 @@ instance Semigroup (Markup a) where
 instance Monoid (Markup T.Text) where
   mempty = Raw ""
 
-render :: Markup T.Text -> T.Text
+render :: MonadIO m => Markup T.Text -> m T.Text
 render = go
   where
-    go (Concat a b) = go a <> go b
-    go (Raw x) = x
-    go (Escaped x) = escapePangoMarkup x
-    go (Bold x) = "<b>" <> go x <> "</b>"
-    go (Italic x) = "<i>" <> go x <> "</i>"
-    go (Monospace x) = "<tt>" <> go x <> "</tt>"
-    go (x :<> attrs) = "<span" <> T.concat (map prAttrs attrs) <> ">" <> go x <> "</span>"
+    go (Raw x)       = pure x
+    go (Concat a b)  = liftM2 (<>) (go a) (go b)
+    go (Escaped x)   = escapeMarkup x (-1)
+    go (Bold x)      = tag "b" [] $ go x
+    go (Italic x)    = tag "i" [] $ go x
+    go (Monospace x) = tag "tt" [] $ go x
+    go (x :<> attrs) = tag "span" attrs $ go x
+
+    tag label attrs inner = do
+      inner' <- inner
+      return $! "<" <> label <> T.concat (map prAttrs attrs) <> ">" <> inner' <> "</" <> label <> ">"
 
     prAttrs (Attr k v) = " " <> k <> "=\"" <> v <> "\""
 

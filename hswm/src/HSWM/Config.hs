@@ -145,5 +145,6 @@ showKeyHelp = do
                   | ((m, k), a) <- L.sortOn (ppXBKey . fst) binds ]
   let indent = maximum $ map (length . fst) pretty
   let res = P.Monospace $ mconcat [ P.text (T.justifyLeft indent ' ' (toText mk)) <> " " <> P.text a <> "\n" | (mk, a) <- pretty ]
+  text <- P.render res
   void . runProcess $
-    proc "notify-send" [ "--app-name=hswm", "Keys", "--", T.unpack (P.render res) ]
+    proc "notify-send" [ "--app-name=hswm", "Keys", "--", T.unpack text ]

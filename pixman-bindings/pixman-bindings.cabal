@@ -1,4 +1,4 @@
-cabal-version:      3.14
+cabal-version:      2.2
 name:               pixman-bindings
 version:            0.1.0.0
 -- synopsis:
@@ -12,9 +12,10 @@ category:           Graphics
 --build-type:         Hooks
 build-type:         Custom
 extra-doc-files:    CHANGELOG.md
--- extra-source-files:
 tested-with:
-    GHC == 9.14.1
+      GHC == 9.14.1
+    , GHC == 9.12.4
+    , GHC == 9.12.2
 
 flag pkg-config
     description: Use pkgconfig to to resolve C dependencies
@@ -31,10 +32,9 @@ common warnings
 
 custom-setup
     setup-depends:
-          base             >=4.21 && <5
+          hs-bindgen-hooks
+        , base             >=4.21 && <5
         , Cabal            >=3.14 && <3.18
-        , Cabal-hooks      >=3.14 && <3.18
-        , hs-bindgen-hooks
 
 library
     import: warnings
@@ -46,18 +46,17 @@ library
         , deepseq            ^>=1.5
         , hs-bindgen-runtime  >=0.1  && <0.2
         , c-expr-runtime      >=0.1  && <0.2
-    hs-source-dirs:
-          src
+    hs-source-dirs: src
     default-language: GHC2024
+
+    if flag(build-tool-depends)
+       build-tool-depends:
+           hs-bindgen:hs-bindgen-cli
 
     if flag(pkg-config)
         pkgconfig-depends: pixman-1 >= 0.46
     else
         extra-libraries: pixman-1
-
-    if flag(build-tool-depends)
-       build-tool-depends:
-           hs-bindgen:hs-bindgen-cli
 
 test-suite pixman-test
     import:           warnings

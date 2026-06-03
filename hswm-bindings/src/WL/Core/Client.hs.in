@@ -1,0 +1,30 @@
+
+import Data.Word (Word32)
+
+--------------------------------------------------------------------------------------
+-- EVENT QUEUES
+
+renderNewType "EventQueue" ''Wl_event_queue ""
+
+--------------------------------------------------------------------------------------
+-- wayland.xml
+
+clientFromProtocolXML' commonSettings
+  { prRequestOptions = [ ("wl_registry", "bind", def { reqDisable = True }) ]
+
+  , prEventArgTypeTrans = \s iface ev arg t -> do
+    case t of
+      _ | AArray <- arg.argType, ev.name == "enter" -> [t|WL.Util.Array Word32|]
+        | AFixed <- arg.argType                     -> [t|WL.Util.Fixed|]
+      _                                             -> defaultEventArgTypeTrans s iface ev arg t
+
+  , prEventArgTrans = \s iface ev arg t x -> do
+    case t of
+      _ | AFixed <- arg.argType                     -> [|return $! WL.Util.Fixed $(x)|]
+      _ | AArray <- arg.argType, ev.name == "enter" -> [|return $! WL.Util.Array $(x)|]
+      _                                             -> defaultEventArgTrans s iface ev arg t x
+
+  } protoXml
+
+instance Default Output where def = Output nullPtr
+instance Default Seat where def = Seat nullPtr

@@ -96,7 +96,7 @@ data UpdateBoring = UpdateBoring
 instance Message UpdateBoring
 
 markBoring, clearBoring, focusUp, focusDown, focusMaster, swapUp, swapDown, siftUp, siftDown :: HS ()
-markBoring = withFocused (sendMessage . IsBoring . river_window)
+markBoring = withFocused (sendMessage . IsBoring . view river_window)
 clearBoring = sendMessage ClearBoring
 focusUp = sendMessage UpdateBoring >> sendMessage FocusUp
 focusDown = sendMessage UpdateBoring >> sendMessage FocusDown
@@ -109,7 +109,7 @@ siftDown = sendMessage UpdateBoring >> sendMessage SiftDown
 -- | Mark current focused window boring for all layouts.
 -- This is useful in combination with the "HSWM.Actions.CopyWindow" module.
 markBoringEverywhere :: HS ()
-markBoringEverywhere = withFocused (broadcastMessage . IsBoring . river_window)
+markBoringEverywhere = withFocused (broadcastMessage . IsBoring . view river_window)
 
 data BoringWindows a = BoringWindows
   { -- | store borings with a specific source

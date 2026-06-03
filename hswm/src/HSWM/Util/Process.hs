@@ -21,7 +21,7 @@ module HSWM.Util.Process
 import System.Posix ( CPid, getAnyProcessStatus )
 import System.Posix.Signals
 import System.Process (CmdSpec(..))
-import System.Process.Typed
+import System.Process.Typed hiding (closed)
 import System.Process.Typed.Internal
 import qualified Data.ByteString.Char8 as C8
 

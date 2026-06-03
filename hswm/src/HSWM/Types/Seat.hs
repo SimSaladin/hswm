@@ -1,6 +1,6 @@
-{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
-
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE NoFieldSelectors #-}
 
 -- |
 -- Module      : HSWM.Types.Seat
@@ -13,15 +13,15 @@
 --
 module HSWM.Types.Seat where
 
+import HSWM.Types.Simple
+import HSWM.Types.Lens
 import HSWM.Types.Action
 import HSWM.Types.Window
 
 import qualified Wayland as WL
 import qualified River as R
 import qualified Bindings.River as R
-import Foreign.StablePtr
 import Data.Kind
-import Foreign
 
 type family Stateful (m :: Type -> Type) :: Type -> Type
 
@@ -30,7 +30,7 @@ data Seat' (m :: Type -> Type) = Seat
   , river_layer_shell_seat :: !R.RiverLayerShellSeat
   , xkb_bindings_seat      :: !R.RiverXkbBindingsSeat
   , wl_seat                :: !WL.Seat
-  , position               :: !(Int32, Int32) -- x, y
+  , position               :: !Position -- (Int32, Int32) -- x, y
   , name                   :: !String
   , caps                   :: !WL.SeatCapability
 
@@ -42,7 +42,7 @@ data Seat' (m :: Type -> Type) = Seat
   , pending_action         :: !(SeatAction m)
   , submap_pending         :: Maybe (SomeAction m, XkbBindingMap (SomeAction m))
   , currentFocus           :: !SeatFocus
-  , pendingPointerEnter    :: !(Maybe (RiverWindow, (Int32, Int32)))
+  , pendingPointerEnter    :: !(Maybe (RiverWindow, Position))
   , inputOverride          :: !(Maybe (Stateful m Bool, XkbBindingMap (SomeAction m)))
 
   -- Pointer move/resize
@@ -106,7 +106,7 @@ instance Default (Seat' m) where
         new = True,
         xkb_bindings_seat = R.RiverXkbBindingsSeat nullPtr,
         inputOverride = Nothing,
-        position = (0,0),
+        position = Position 0 0,
         name = "",
         caps = R.toCEnum 0,
         removed = False,
@@ -132,3 +132,8 @@ instance Default (Seat' m) where
         river_layer_shell_seat = R.RiverLayerShellSeat nullPtr,
         suppressChangeFocus = 0
       }
+
+makeLenses' [ ''Seat' ]
+
+instance HasPosition (Seat' m) where
+  position = seat'Position

@@ -12,19 +12,20 @@
 -- Portability : unportable
 module HSWM.Types.Config where
 
-import HSWM.Types.Window
-import HSWM.Types.Events
-import HSWM.Types.Action
-import HSWM.Types.Output
-import HSWM.Types.Seat
 import qualified HSWM.StackSet as W
+import           HSWM.Types.Action
+import           HSWM.Types.Events
+import           HSWM.Types.Lens
+import           HSWM.Types.Output
+import           HSWM.Types.Seat
+import           HSWM.Types.Window
+import           HSWM.Utils (parseRgba)
+
 import qualified River as R
-import Data.Kind
-import Data.Default.Internal (gdef)
+
+import           Data.Default.Internal (gdef)
+import           Data.Kind
 import qualified GHC.Generics as Generics
-import HSWM.Utils (parseRgba)
-import Data.Bits
-import Language.Haskell.TH (mkName, nameBase)
 
 -- * User configuration
 
@@ -43,7 +44,7 @@ data HSWMConfig m l = HSWMConfig
   , layoutHook      :: !(l RiverWindow)
   , renderHook      :: !(m ())
   , logHook         :: !(m ())
-  , manageHook      :: !(ManageHookX (Stateful m) (LayoutProxy m RiverWindow))
+  , manageHook      :: !(ManageHookX (Stateful m))
    -- | Keyboard layout set for connected keyboards
   , xkbLayout       :: !(Maybe XkbRuleNames)
   , workspaces      :: [WorkspaceId]
@@ -68,6 +69,7 @@ instance {-# OVERLAPPABLE #-}
         workspaces = ["1", "2", "3", "4"]
       }
 
+-- | This should usually map to @'Layout' 'RiverWindow'@
 type family LayoutProxy (m :: Type -> Type) :: Type -> Type
 
 -- | Composable config modification.
@@ -75,9 +77,9 @@ type ConfigDoPure = forall m l. HSWMConfig m l -> HSWMConfig m l
 
 type ConfigDoM m = forall l. HSWMConfig m l -> HSWMConfig m l
 
-type WindowSetX l = W.StackSet WorkspaceId l {- (Layout RiverWindow) -} RiverWindow WorkspaceDetail ScreenId ScreenDetail
+type WindowSetX l = W.StackSet WorkspaceId (l RiverWindow) RiverWindow WorkspaceDetail ScreenId ScreenDetail
 
-type WindowSpaceX l = W.Workspace WorkspaceId l {- (Layout RiverWindow) -} RiverWindow WorkspaceDetail
+type WindowSpaceX l = W.Workspace WorkspaceId (l RiverWindow) RiverWindow WorkspaceDetail
 
 -- | Virtual workspace indices
 type WorkspaceId = String
@@ -89,17 +91,17 @@ data ScreenDetail = SD {x, y, width, height :: {-# UNPACK #-} !Int}
 data WorkspaceDetail = WD
   deriving (Eq, Show, Read, Generic, Default)
 
-newtype QueryX m a = Query (ReaderT Window m a)
+newtype QueryX (m :: Type -> Type) a = Query (ReaderT Window m a)
   deriving newtype (Functor, Applicative, Monad, MonadIO, MonadReader Window)
 
-type ManageHookX m l = QueryX m (Endo (WindowSetX l))
-
-type MaybeManageHookX m l = QueryX m (Maybe (Endo (WindowSetX l)))
-
-instance Monad m => Default (QueryX m (Endo (WindowSetX l))) where
+instance (Monad m, l ~ LayoutProxy m) => Default (QueryX m (Endo (WindowSetX l))) where
   def = return $ Endo id
+
+type ManageHookX m = QueryX m (Endo (WindowSetX (LayoutProxy m)))
+
+type MaybeManageHookX m = QueryX m (Maybe (Endo (WindowSetX (LayoutProxy m))))
 
 runQuery :: QueryX m a -> Window -> m a
 runQuery (Query q) = runReaderT q
 
-makeLensesWith (classyRules & lensField .~ \_ _ n -> [TopName $ mkName $ nameBase n]) ''HSWMConfig
+makeLenses' [ ''HSWMConfig ]

@@ -1,7 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE FunctionalDependencies #-}
 
-
 -- |
 -- Module      : Distribution.HsBindgen.Lens
 -- Description : Lenses
@@ -14,7 +13,7 @@
 module Distribution.HsBindgen.Lens where
 
 import qualified Distribution.HsBindgen.Hooks as H
-import qualified Distribution.Wayland.Hooks as H
+import qualified Distribution.HsBindgen.Types as H
 
 import Lens.Micro
 import Lens.Micro.TH

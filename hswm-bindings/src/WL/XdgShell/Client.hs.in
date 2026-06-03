@@ -1,0 +1,9 @@
+
+
+clientFromProtocolXML' commonSettings
+  { prEventArgTypeTrans = \s iface ev arg t -> do
+    case arg.argType of
+      AArray | ev.name == "configure"       -> [t|WL.Util.Array $(conT $ mkName "XdgToplevelState")|]
+             | ev.name == "wm_capabilities" -> [t|WL.Util.Array $(conT $ mkName "XdgToplevelWmCapabilities")|]
+      _                                     -> defaultEventArgTypeTrans s iface ev arg t
+  } protoXml

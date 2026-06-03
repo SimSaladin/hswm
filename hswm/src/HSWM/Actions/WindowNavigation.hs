@@ -106,7 +106,7 @@ swapPure = withTargetWindow swapWithFocused
         Nothing -> winSet
     mapWindows f = W.mapWorkspace (mapWindows' f)
     mapWindows' f ws@W.Workspace {W.stack = s} = ws {W.stack = mapWindows'' f <$> s}
-    mapWindows'' f (W.Stack focused up down) = W.Stack (f focused) (map f up) (map f down)
+    mapWindows'' f (W.Stack foc up down) = W.Stack (f foc) (map f up) (map f down)
     swapWin win1 win2 win
       | win == win1 = win2
       | win == win2 = win1
@@ -149,9 +149,9 @@ trackMovement stateRef = runInHS $ do
 -- | Get focused window and current position.
 getCurrentWindow :: (Monad x) => WNInput x -> x (Maybe (Window, Rectangle, Point))
 getCurrentWindow input@(_, oldWindowSet, _, _) =
-  whenJust' (pure $ W.peek oldWindowSet) Nothing $ \window -> do
+  whenJust' (pure $ W.peek oldWindowSet) Nothing $ \w -> do
     (pos, rect) <- currentPosition input
-    return $ Just (window, rect, pos)
+    return $ Just (w, rect, pos)
 
 -- | Gets the current position from the state passed in, or if nothing
 -- (say, from a restart), derives the current position from the current window.
@@ -180,7 +180,7 @@ centerPosition r@(Rectangle rx ry rw rh) pos@(Point x y) = do
     then pos
     else Point (midPoint rx rw) (midPoint ry rh)
 
-midPoint :: Position -> Dimension -> Position
+midPoint :: Position1D -> Dimension -> Position1D
 midPoint pos dim = pos + fromIntegral dim `div` 2
 
 -- | Make a list of target windows we can navigate to,
@@ -311,15 +311,15 @@ navigableTargets input@(_, oldWindowSet, _, _) dir currentRect currentPos = do
 -- navigation direction points to the right.
 -- Allows us to abstract over direction in the navigation functions.
 data DirPoint = DirPoint
-  { point_p :: Position, -- coordinate parallel to the direction
-    point_o :: Position -- coordinate orthogonal to the direction
+  { point_p :: Position1D, -- coordinate parallel to the direction
+    point_o :: Position1D -- coordinate orthogonal to the direction
   }
 
 data DirRectangle = DirRectangle
-  { rect_p1 :: Position, -- lower rectangle coordinate parallel to the direction
-    rect_p2 :: Position, -- higher rectangle coordinate parallel to the direction
-    rect_o1 :: Position, -- lower rectangle coordinate orthogonal to the direction
-    rect_o2 :: Position -- higher rectangle coordinate orthogonal to the direction
+  { rect_p1 :: Position1D, -- lower rectangle coordinate parallel to the direction
+    rect_p2 :: Position1D, -- higher rectangle coordinate parallel to the direction
+    rect_o1 :: Position1D, -- lower rectangle coordinate orthogonal to the direction
+    rect_o2 :: Position1D -- higher rectangle coordinate orthogonal to the direction
   }
 
 {- HLINT ignore "Use camelCase" -}
@@ -361,7 +361,7 @@ windowRectX :: Window -> HS (Maybe Rectangle)
 windowRectX rw =
   lookupWindow rw >>= \case
     Nothing -> pure Nothing
-    Just win -> return $ Just $ Rectangle (fi win.x) (fi win.y) (fi win.width) (fi win.height)
+    Just win -> return $ Just $ Rectangle (fi $ win^._x) (fi $ win^._y) (fi $ win^.width) (fi $ win^.height)
 
 -- Maybe below functions can be replaced with some standard helper functions?
 

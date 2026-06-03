@@ -8,47 +8,27 @@ packages:
 
 extra-packages: generics-sop, lens-sop
 
+--package haskell-language-server
+--  flags: -fourmolu -cabal -class -callHierarchy -eval -importlens -rename
+--    -retrie -hlint -signatureHelp -splice -qualifyImportedNames -codeRange
+--    -changeTypeSignature -gadt -explicitFields -refactor -semanticTokens
+
 jobs: $ncpus
 
 verbose: 1
 
--- * Documentation
-
---documentation: True
---haddock-hoogle: True
---haddock-html: True
---haddock-html-location: https://hackage.haskell.org/packages/archive/$pkg/latest/doc/html
---haddock-internal: True
---haddock-hyperlink-source: True
---haddock-keep-temp-files: True
-
--- * Advanced global config options
-
---write-ghc-environment-files: always
-
--- repository head.hackage.ghc.haskell.org
---   url: https://ghc.gitlab.haskell.org/head.hackage/
---   secure: True
---   key-threshold: 3
---   root-keys:
---      f76d08be13e9a61a377a85e2fb63f4c5435d40f8feb3e12eb05905edb8cdea89
---      26021a13b401500c8eb2761ca95c61f2d625bfef951b939a8124ed12ecf07329
---      7541f32a4ccca4f97aea3b22f5e593ba2c0267546016b992dfadcd2fe944e55d
---   --sha256: sha256-tv3xym0AWegXTr5x1cx8Fgi4aNtwI35CF5TYrjWN4f8=
-
--- Temporary relaxes for GHC 9.14.1
-if impl(ghc >= 9.14)
-  allow-newer: cairo-0.13.12.0:Cabal
-  allow-newer: cairo-0.13.12.0:time
-  allow-newer: debruijn-0.3.1:base
-  allow-newer: monad-control-1.0.3.1:transformers-compat
-  allow-newer: optparse-generic-1.5.3:time
-  allow-newer: optparse-generic-1.5.3:transformers-compat
-  allow-newer: pango-0.13.12.0:Cabal
-  allow-newer: pango-0.13.12.0:containers
-  allow-newer: skew-list-0.1:QuickCheck
-  allow-newer: skew-list-0.1:base
-  allow-newer: typerep-map-0.7.0.0:base
+-- hs-bindgen (unreleased) (28-05-2026)
+source-repository-package
+  type: git
+  location: https://github.com/well-typed/hs-bindgen
+  branch: main
+  tag: 24ed914383635226710306cd12499f09d61adb40
+  subdir:
+    c-expr-runtime
+    c-expr-dsl
+    hs-bindgen
+    hs-bindgen-runtime
+  --sha256: sha256-kYyOI/Er47TMHSyNI+qMHaaPHN1lD9a2epAcKLPvPwQ=
 
 -- libclang-bindings (unreleased) for hs-bindgen (22-05-2026)
 source-repository-package
@@ -65,40 +45,14 @@ source-repository-package
   tag: 33b5074eb5122062ac41fa8b9ed0596d39913b63
   --sha256: 0xj6lilgj70rs3fcc86gl30z5imghx9jgiwalvw9q8ldlpd7hvgc
 
--- hs-bindgen (unreleased) (28-05-2026)
+-- gtk2hs fixed for GHC 9.14.1 & Cabal-3.17
 source-repository-package
   type: git
-  location: https://github.com/well-typed/hs-bindgen
-  branch: main
-  tag: 24ed914383635226710306cd12499f09d61adb40
-  subdir:
-    c-expr-runtime
-    c-expr-dsl
-    hs-bindgen
-    hs-bindgen-runtime
-  --sha256: sha256-kYyOI/Er47TMHSyNI+qMHaaPHN1lD9a2epAcKLPvPwQ=
-
--- cabal-doctest fixed for Cabal-3.17
-source-repository-package
-  type: git
-  location: https://github.com/SimSaladin/cabal-doctest
-  branch: cabal-3.17
-  tag: 615d46e72a47062cd76abe4bdb43d088cc3e0bdb
-  --sha256: 1vn4w9k5mc1mzlhpxaai1j70svvdvfkl7npl7rnabp35vczpp39k
-
--- gtk2hs-buildtools, glib, pango fixed for GHC 9.14.1 & Cabal-3.17
-source-repository-package
-  type: git
-  --location: https://github.com/TuongNM/gtk2hs
-  --branch: ghc-rts-api
   location: https://github.com/SimSaladin/gtk2hs
   branch: cabal-3.17
-  tag: 9c20d74be3a7f2d2365cc6e6275e95ffe50dabce
-  subdir:
-    glib
-    tools
-    pango
-  --sha256: 0g4i4msdl7qw9n179qfv891fpcdfxf71mgxp85c7v7cnwkf8dba8
+  tag: 900fcd8aff7eb1c21b5b83e887cc35ec911d21ed
+  subdir: cairo glib tools pango
+  --sha256: 09kcp0vm0i703fllcny4ph2sa67d0gahr8wknr1vgrlyhwn0hff0
 
 -- Cabal, cabal-install 3.17 (unreleased)
 source-repository-package
@@ -114,3 +68,36 @@ source-repository-package
     cabal-install-solver
     hooks-exe
   --sha256: 1r81bnkdssa5203wpxs4aqn58mx2jpdj6blsyh3h09z2qhyi4jx2
+
+-- cabal-doctest fixed for Cabal-3.17
+source-repository-package
+  type: git
+  location: https://github.com/SimSaladin/cabal-doctest
+  branch: cabal-3.17
+  tag: 615d46e72a47062cd76abe4bdb43d088cc3e0bdb
+  --sha256: 1vn4w9k5mc1mzlhpxaai1j70svvdvfkl7npl7rnabp35vczpp39k
+
+-- Temporary relaxes for GHC 9.14.1
+if impl(ghc >= 9.14)
+  allow-newer: cairo-0.13.12.0:time
+  allow-newer: debruijn-0.3.1:base
+  allow-newer: monad-control-1.0.3.1:transformers-compat
+  allow-newer: optparse-generic-1.5.3:time
+  allow-newer: optparse-generic-1.5.3:transformers-compat
+  allow-newer: pango-0.13.12.0:containers
+  allow-newer: skew-list-0.1:QuickCheck
+  allow-newer: skew-list-0.1:base
+  allow-newer: typerep-map-0.7.0.0:base
+  allow-newer: hs-bindgen:aeson
+
+-- * Documentation
+
+--documentation: True
+--haddock-hoogle: True
+--haddock-html: True
+--haddock-html-location: https://hackage.haskell.org/packages/archive/$pkg/latest/doc/html
+--haddock-internal: True
+--haddock-hyperlink-source: True
+--haddock-keep-temp-files: True
+
+--write-ghc-environment-files: always

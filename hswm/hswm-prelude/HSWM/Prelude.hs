@@ -10,50 +10,67 @@
 -- Portability : unportable
 --
 module HSWM.Prelude (
-  -- * Basics
+  -- * Base
+  module RIO.Prelude.Types,
+  module RIO.Prelude,
   module RIO,
-  module Control.Monad.IO.Unlift,
-  module BasePrelude,
-  module UnliftIO.IO,
-  module UnliftIO.Async,
-  module UnliftIO.Directory,
-  module UnliftIO,
-  module Control.Monad.Catch,
+  module Base,
+
   -- * Lenses
   module Lens.Micro.Platform,
+  module UnliftIO.Exception.Lens,
+
   -- * Logging
   module Control.Monad.Logger.Aeson,
-  -- * Misc. utilities
-  module HSWM.Prelude,
+  log', display,
+
+  -- * UnliftIO
+  module UnliftIO,
+  module UnliftIO.Concurrent,
+  module UnliftIO.Directory,
+  module UnliftIO.Environment,
+  module UnliftIO.Foreign,
+  module UnliftIO.IO.File,
+
+  -- * Other
+  -- ** Async
+  cancelMany,
+  -- ** Control.Monad.Catch
+  module Control.Monad.Catch,
+  -- ** Misc.
+  toText, io, fi, whenJust,
+  module Data.Default,
+  module Misc,
   ) where
 
-import           "base" Control.Concurrent as BasePrelude (forkFinally, forkIO, killThread)
-import qualified "async" Control.Concurrent.Async as Async
-import           "stm" Control.Concurrent.STM as BasePrelude (flushTQueue)
-import           "exceptions" Control.Monad.Catch (MonadCatch, MonadMask, throwM)
-import           "mtl" Control.Monad.State as BasePrelude (MonadState, gets, modify)
-import           "data-default" Data.Default as BasePrelude
-import           "base" Data.List as BasePrelude (zip3)
-import           "base" Data.Monoid as BasePrelude (Any(..), Endo(..))
-import           "base" Data.Semigroup as BasePrelude (All(..))
-import qualified "text" Data.Text as T
-import           "base" Foreign.C.ConstPtr as BasePrelude
-import           "base" Prelude as BasePrelude (scanl, until)
-import           "base" Text.Read as BasePrelude (reads)
+import           "unliftio" UnliftIO
+import           "unliftio" UnliftIO.Concurrent
+import           "unliftio" UnliftIO.Directory
+import           "unliftio" UnliftIO.Foreign
+import           "unliftio" UnliftIO.Environment
+import           "unliftio" UnliftIO.Exception.Lens
+import           "unliftio" UnliftIO.IO.File
 
-import           Control.Monad.IO.Unlift
-import           Control.Monad.Logger.Aeson as LA (Message)
-import           Control.Monad.Logger.Aeson hiding (Message)
-import           RIO (ExitCode, Lens', exitFailure, exitSuccess, threadDelay, view)
-import           RIO.Lens as RIO
-import           RIO.Prelude as RIO
-import           RIO.Prelude.Simple as RIO
-import           RIO.Prelude.Types as RIO
-import           UnliftIO
-import           UnliftIO.Async
-import           UnliftIO.Directory
-import           UnliftIO.IO
-import           Lens.Micro.Platform hiding ((.=))
+import           "base" Data.List as Base (zip3)
+import           "base" Data.Monoid as Base (Any(..), Endo(..))
+import           "base" Data.Semigroup as Base (All(..))
+import           "base" Foreign.C.ConstPtr as Base
+import           "base" Prelude as Base (scanl, until)
+import           "base" Text.Read as Base (reads)
+
+import           "rio" RIO (ExitCode(..), exitFailure, exitSuccess, threadDelay)
+import           "rio" RIO.Prelude
+import           "rio" RIO.Prelude.Types
+
+import           "stm" Control.Concurrent.STM as Misc (flushTQueue)
+import           "exceptions" Control.Monad.Catch (MonadCatch, MonadMask, throwM)
+import           "mtl" Control.Monad.State as Misc (MonadState, gets, modify)
+import           "data-default" Data.Default
+import qualified "async" Control.Concurrent.Async as Async
+import qualified "text" Data.Text as T
+import           "monad-logger-aeson" Control.Monad.Logger.Aeson hiding (Message)
+import           "monad-logger-aeson" Control.Monad.Logger.Aeson as LA (Message)
+import           "microlens-platform" Lens.Micro.Platform hiding ((.=))
 
 toText :: String -> T.Text
 toText = T.pack

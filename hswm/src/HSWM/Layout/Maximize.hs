@@ -75,8 +75,8 @@ maximizeRestore = MaximizeRestore
 
 instance LayoutModifier Maximize RiverWindow where
     modifierDescription (Maximize _ _) = "Maximize"
-    pureModifier (Maximize padding (Just target)) rect (Just (S.Stack focused _ _)) wrs =
-            if focused == target
+    pureModifier (Maximize padding (Just target)) rect (Just (S.Stack fcus _ _)) wrs =
+            if fcus == target
                 then (maxed ++ rest, Nothing)
                 else (rest ++ maxed, lay)
         where

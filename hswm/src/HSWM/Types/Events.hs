@@ -19,9 +19,6 @@ import Bindings.Wlr.OutputManagementUnstableV1 qualified as Wlr
 
 import System.Posix (Signal)
 
-import Data.Kind
-import GHC.TypeLits
-
 -- | Main loop events.
 data MainEvent
   = MainPoll

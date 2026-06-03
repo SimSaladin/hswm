@@ -20,7 +20,6 @@ import           Bindings.Wlr.InputMethodUnstableV2 as Wlr
 
 import           Control.Monad.Fix
 import qualified Data.Map as M
-import           Foreign hiding (void)
 
 type HasGrabCtx env m = (MonadStateGlobal env m, HasEventQueues env, MonadReader env m, MonadLogger m, MonadUnliftIO m, MonadFix m)
 
@@ -143,10 +142,10 @@ newGrabIM manager seat = do
 
   imKeyboardGrabListener <- WL.createListener $ \e -> runInIO $ case e of
 
-    Wlr.InputMethodKeyboardGrabKeymap _ _ _fmt fd size -> do
+    Wlr.InputMethodKeyboardGrabKeymap _ _ _fmt fd sz -> do
       io $ do
         ctx <- createXkbContext def
-        kmap <- createKeymapFromFd ctx (fi fd) (fi size) False KeymapFormatTextV1
+        kmap <- createKeymapFromFd ctx (fi fd) (fi sz) False KeymapFormatTextV1
         xst <- createXkbState kmap
         _ <- tryTakeMVar xkbState
         putMVar xkbState xst

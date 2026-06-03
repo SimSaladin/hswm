@@ -1,10 +1,4 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE ParallelListComp #-}
-
------------------------------------------------------------------------------
-
------------------------------------------------------------------------------
 
 -- |
 -- Module       : HSWM.Actions.PhysicalScreens
@@ -174,7 +168,7 @@ onPrevNeighbour sc = neighbourWindows sc (-1)
 -- replace the builtin rescreen handler.
 rescreen :: ScreenComparator -> HS ()
 rescreen (ScreenComparator _cmpScreen) = do
-  log' "warning: physcreen/rescreen is not implemented!"
+  logError "warning: physcreen/rescreen is not implemented!"
 
 -- withDisplay (fmap nonEmpty . getCleanedScreenInfo) >>= \case
 --  Nothing -> trace "getCleanedScreenInfo returned []"

@@ -15,6 +15,7 @@ license-file:       LICENSE
 build-type:         Simple
 tested-with:
       GHC == 9.14.1
+    , GHC == 9.12.4
     , GHC == 9.12.2
 
 flag use-llvm
@@ -26,22 +27,20 @@ library
     hs-source-dirs:
           src
     default-extensions:
-          RecordWildCards
-          OverloadedRecordDot
-          OverloadedLabels
-          DuplicateRecordFields
-          OverloadedStrings
-          DerivingVia
           DeriveAnyClass
+          DerivingVia
+          DuplicateRecordFields
+          FunctionalDependencies
+          OverloadedLabels
+          OverloadedRecordDot
+          OverloadedStrings
           PackageImports
           QuantifiedConstraints
-          FunctionalDependencies
+          RecordWildCards
           TypeFamilies
     ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -Wno-ambiguous-fields
     build-tool-depends:
           hsc2hs:hsc2hs
-    other-modules:
-          PackageInfo_hswm
     exposed-modules:
           HSWM
           HSWM.Actions.CycleRecentWS
@@ -79,8 +78,10 @@ library
           HSWM.Types.Action
           HSWM.Types.Config
           HSWM.Types.Events
+          HSWM.Types.Lens
           HSWM.Types.Output
           HSWM.Types.Seat
+          HSWM.Types.Simple
           HSWM.Types.TypeMap
           HSWM.Types.Window
           HSWM.Types.WM
@@ -97,7 +98,6 @@ library
           HSWM.Util.Rectangle
           HSWM.Util.RofiPrompt
           HSWM.Util.Stack
-          HSWM.Util.Types
           HSWM.Util.Waybar
           HSWM.Util.WorkspaceCompare
           HSWM.Utils
@@ -105,8 +105,6 @@ library
           HSWM.Wayland
           HSWM.Windows
           HSWM.XKB
-    autogen-modules:
-          PackageInfo_hswm
     build-depends:
           JuicyPixels >=3.3.9 && <3.4
         , aeson >=2.2.3 && <2.4
@@ -116,18 +114,18 @@ library
         , data-default >=0.8.0 && <0.9
         , fast-logger >=3.2.6 && <3.3
         , filelock >=0.1.1 && <0.2
+        , gi-glib >=2.0.30 && <2.1
         , hswm-bindings
-        , hswm:hswm-ipc-api
-        , hswm:hswm-prelude
+        , hswm:ipc-api
+        , hswm:prelude
         , mtl >=2.3.1 && <2.4
         , network >=3.2.8 && <3.3
         , optparse-applicative >=0.18.1 && <0.20
         , optparse-generic ==1.5.*
-        , pango >=0.13.12 && <0.14
         , pixman-bindings
         , pretty-simple >=4.1.4 && <4.2
         , process >=1.6.25 && <1.7
-        , template-haskell
+        , template-haskell >=2.20 && <3
         , text >=2.1.2 && <2.2
         , time >=1.14 && <2.0
         , transformers >=0.6.1 && <0.7
@@ -140,12 +138,12 @@ library
         , xkbcommon-bindings
     mixins:
           base hiding (Prelude)
-        , hswm:hswm-prelude (HSWM.Prelude as Prelude)
+        , hswm:prelude (HSWM.Prelude as Prelude)
     default-language: GHC2024
     if flag(use-llvm) && impl(ghc >= 9.14.1)
         ghc-options: -fllvm
 
-library hswm-ipc-api
+library ipc-api
     visibility: public
     exposed-modules:
           HSWM.IPC
@@ -156,47 +154,50 @@ library hswm-ipc-api
     hs-source-dirs:
           ipc-api
     default-extensions:
-          RecordWildCards
-          OverloadedRecordDot
-          OverloadedLabels
-          DuplicateRecordFields
-          OverloadedStrings
-          DerivingVia
           DeriveAnyClass
+          DerivingVia
+          DuplicateRecordFields
+          FunctionalDependencies
+          OverloadedLabels
+          OverloadedRecordDot
+          OverloadedStrings
           PackageImports
           QuantifiedConstraints
-          FunctionalDependencies
+          RecordWildCards
           TypeFamilies
+    ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -Wno-ambiguous-fields
     build-depends:
           aeson >=2.2.3 && <2.4
         , base >=4.21 && <5
         , bytestring >=0.12.2 && <0.13
-        , containers >=0.7 && <1.0
-        , hswm:hswm-prelude
+        , hswm:prelude
         , network >=3.2.8 && <3.3
         , text >=2.1.2 && <2.2
         , utf8-string >=1.0.2 && <1.1
     mixins:
           base hiding (Prelude)
-        , hswm:hswm-prelude (HSWM.Prelude as Prelude)
+        , hswm:prelude (HSWM.Prelude as Prelude)
     default-language: GHC2024
+    if flag(use-llvm) && impl(ghc >= 9.14.1)
+        ghc-options: -fllvm
 
-library hswm-prelude
+library prelude
+    visibility: public
     exposed-modules:
           HSWM.Prelude
     hs-source-dirs:
           hswm-prelude
     default-extensions:
-          RecordWildCards
-          OverloadedRecordDot
-          OverloadedLabels
-          DuplicateRecordFields
-          OverloadedStrings
-          DerivingVia
           DeriveAnyClass
+          DerivingVia
+          DuplicateRecordFields
+          FunctionalDependencies
+          OverloadedLabels
+          OverloadedRecordDot
+          OverloadedStrings
           PackageImports
           QuantifiedConstraints
-          FunctionalDependencies
+          RecordWildCards
           TypeFamilies
     ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -Wno-ambiguous-fields
     build-depends:
@@ -204,15 +205,16 @@ library hswm-prelude
         , base >=4.21 && <5
         , data-default >=0.8.0 && <0.9
         , exceptions >=0.10.9 && <0.11
-        , microlens-platform
+        , microlens-platform >=0.4 && <1
         , monad-logger-aeson >=0.4.1 && <0.5
         , mtl >=2.3.1 && <2.4
         , rio >=0.1.24 && <0.2
         , stm >=2.5.3 && <2.6
         , text >=2.1.2 && <2.2
         , unliftio >=0.2.25 && <0.3
-        , unliftio-core >=0.2.1 && <0.3
     default-language: GHC2024
+    if flag(use-llvm) && impl(ghc >= 9.14.1)
+        ghc-options: -fllvm
 
 executable hswm
     main-is: Main.hs
@@ -227,44 +229,44 @@ executable hswm
     hs-source-dirs:
           app
     default-extensions:
-          RecordWildCards
-          OverloadedRecordDot
-          OverloadedLabels
-          DuplicateRecordFields
-          OverloadedStrings
-          DerivingVia
           DeriveAnyClass
+          DerivingVia
+          DuplicateRecordFields
+          FunctionalDependencies
+          OverloadedLabels
+          OverloadedRecordDot
+          OverloadedStrings
           PackageImports
           QuantifiedConstraints
-          FunctionalDependencies
+          RecordWildCards
           TypeFamilies
-    ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -Wno-ambiguous-fields -threaded -rtsopts "-with-rtsopts=-N"
+    ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -Wno-ambiguous-fields -threaded -rtsopts "-with-rtsopts=-N -maxN4 -qn2 -A8M -K64M -M512M -kc8k -I5 -xr100G"
 
 executable hswmctl
     main-is: Main.hs
     hs-source-dirs:
           app-ctl
     default-extensions:
-          RecordWildCards
-          OverloadedRecordDot
-          OverloadedLabels
-          DuplicateRecordFields
-          OverloadedStrings
-          DerivingVia
           DeriveAnyClass
+          DerivingVia
+          DuplicateRecordFields
+          FunctionalDependencies
+          OverloadedLabels
+          OverloadedRecordDot
+          OverloadedStrings
           PackageImports
           QuantifiedConstraints
-          FunctionalDependencies
+          RecordWildCards
           TypeFamilies
-    ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -Wno-ambiguous-fields -threaded -rtsopts "-with-rtsopts=-N"
+    ghc-options: -Wall -Wunused-packages -Wno-partial-type-signatures -Wno-ambiguous-fields -threaded -rtsopts "-with-rtsopts=-N -maxN4 -qn2 -A8M -K64M -M512M -kc8k -I5 -xr100G"
     build-depends:
           aeson >=2.2.3 && <2.4
         , base >=4.21 && <5
         , bytestring >=0.12.2 && <0.13
         , haskeline >=0.8.2 && <0.9
         , hswm
-        , hswm:hswm-ipc-api
-        , hswm:hswm-prelude
+        , hswm:ipc-api
+        , hswm:prelude
         , optparse-applicative >=0.18.1 && <0.20
         , optparse-generic ==1.5.*
         , prettyprinter >=1.7.1 && <1.8
@@ -273,5 +275,7 @@ executable hswmctl
         , time >=1.14 && <2.0
     mixins:
           base hiding (Prelude)
-        , hswm:hswm-prelude (HSWM.Prelude as Prelude)
+        , hswm:prelude (HSWM.Prelude as Prelude)
     default-language: GHC2024
+    if flag(use-llvm) && impl(ghc >= 9.14.1)
+        ghc-options: -fllvm

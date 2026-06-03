@@ -1,0 +1,15 @@
+import Foreign.C.Types (CFloat, CDouble)
+
+clientFromProtocolXML' commonSettings
+  { prEventArgTypeTrans = \s iface ev arg t -> case arg.argType of
+      AArray | arg.name == "matrix"                           -> [t|WL.Util.Array CFloat |] -- 32-bit float
+             | arg.name == "speed"                            -> [t|WL.Util.Array CDouble|] -- 64-bit float
+      _                                                       -> defaultEventArgTypeTrans s iface ev arg t
+
+  , prRequestArgTypeTrans = \s iface req arg t -> case arg.argType of
+      AArray | arg.name == "matrix"                           -> [t|WL.Util.Array CFloat|]
+             | arg.name == "speed"                            -> [t|WL.Util.Array CDouble|] -- 64-bit float
+             | req.name == "set_points", arg.name == "step"   -> [t|WL.Util.Array CDouble|]
+             | req.name == "set_points", arg.name == "points" -> [t|WL.Util.Array CDouble|]
+      _                                                       -> defaultRequestArgTypeTrans s iface req arg t
+  } protoXml

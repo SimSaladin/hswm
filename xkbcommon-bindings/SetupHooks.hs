@@ -56,7 +56,11 @@ data GenerateModule = GenerateModule
 type ActionArgs = (VerbosityFlags, GenerateModule, Location)
 
 setupHooks :: SetupHooks
-setupHooks = mempty { buildHooks = mempty { preBuildComponentRules = Just $ rules (static ()) $ myRules settings } }
+setupHooks = mempty
+  { buildHooks = mempty
+    { preBuildComponentRules = Just $ rules (static ()) $ myRules settings
+    }
+  }
 
 settings :: [GenerateModule]
 settings =

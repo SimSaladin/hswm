@@ -11,25 +11,23 @@
 -- Portability : unportable
 module HSWM.Util.IPC where
 
-import HSWM.IPC
+import           HSWM.IPC
+import qualified HSWM.Actions.DynamicWorkspaceOrder as DWO
+import           HSWM.Core as HSWM
+import           HSWM.InputConfig (InputConfigState)
+import           HSWM.Operations
+import qualified HSWM.StackSet as W
 
-import HSWM.Actions.DynamicWorkspaceOrder qualified as DWO
-import HSWM.Core as HSWM
-import HSWM.Operations
-import HSWM.StackSet qualified as W
-import HSWM.InputConfig (InputConfigState)
-
-import Data.Aeson qualified as A
-import Data.ByteString.UTF8 qualified as BUTF8
-import Data.Map qualified as M
-import Data.Text qualified as T
-import Data.Text.Lazy qualified as TL
-import Foreign.Ptr
-import Network.Socket
-import Bindings.River qualified as R
+import qualified Bindings.River as R
+import qualified Data.Aeson as A
+import qualified Data.ByteString.UTF8 as BUTF8
 import qualified Data.List as L
-import Text.Pretty.Simple qualified as P
-import System.FileLock
+import qualified Data.Map as M
+import qualified Data.Text as T
+import qualified Data.Text.Lazy as TL
+import           Network.Socket
+import           System.FileLock
+import qualified Text.Pretty.Simple as P
 
 type MonadIPC env m = (MonadLogger m, MonadIO m, MonadUnliftIO m, MonadMask m, MonadReader env m)
 

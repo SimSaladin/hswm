@@ -29,7 +29,8 @@ module HSWM.Hooks.WorkspaceHistory
 where
 
 import Data.List qualified as L
-import HSWM
+import Prelude hiding (new)
+import HSWM hiding (new)
 import HSWM.StackSet hiding (delete, filter, new)
 import HSWM.Util.ExtensibleState qualified as XS
 

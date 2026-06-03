@@ -1,3 +1,6 @@
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE NoFieldSelectors #-}
+
 -- |
 -- Module      : HSWM.Types.Output
 -- Description :
@@ -9,16 +12,18 @@
 --
 module HSWM.Types.Output where
 
+import           HSWM.Types.Lens
+import           HSWM.Types.Simple
 import           HSWM.Types.Window
 import qualified Wayland as WL
 import qualified River as R
 import qualified Bindings.Wlr.OutputPowerManagementUnstableV1 as Wlr
 import qualified Data.Aeson as A
-import Foreign
 
 data Output = Output
   { river_output           :: !RiverOutput
-  , width, height, x, y    :: !Int32
+  , position               :: !Position
+  , size                   :: !Size
   , scale                  :: !Int32
   , screen                 :: !ScreenId
   , outputName             :: !String
@@ -28,10 +33,8 @@ data Output = Output
   , outputPower            :: Maybe Wlr.OutputPower
   , wlOutput               :: !WL.Output
   }
-  deriving stock (Show, Generic)
-
-instance Default Output where
-  def = Output def 0 0 0 0 0 (S (-1)) "" "" (R.RiverLayerShellOutput nullPtr) Nothing Nothing def
+  deriving stock (Eq, Show, Read, Generic)
+  deriving anyclass (Default)
 
 -- | Physical screen indices
 newtype ScreenId = S Int
@@ -43,3 +46,11 @@ instance Bounded ScreenId where
   maxBound = S maxBound
 
 instance Default ScreenId where def = S (-1)
+
+makeLenses' [ ''Output ]
+
+instance HasSize Output where
+  size = outputSize
+
+instance HasPosition Output where
+  position = outputPosition

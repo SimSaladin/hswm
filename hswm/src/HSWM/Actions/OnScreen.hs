@@ -23,7 +23,8 @@ module HSWM.Actions.OnScreen
   )
 where
 
-import HSWM
+import Prelude hiding (new)
+import HSWM hiding (new)
 import HSWM.StackSet hiding (new)
 import HSWM.StackSet qualified as W
 

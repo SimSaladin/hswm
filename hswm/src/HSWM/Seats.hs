@@ -25,9 +25,7 @@ import qualified River as R
 import qualified Bindings.River as R
 import qualified Bindings.Wayland.ExtIdleNotifyV1 as Ext
 
-import           Data.Bits
 import qualified Data.List as L
-import           Foreign hiding (void)
 import           GHC.Records
 
 newtype SeatManager = SeatManager { pending_manage :: [Seat] }
@@ -39,16 +37,22 @@ modifySeat' ud = modifySeat (R.RiverSeat $ castPtr ud)
 
 -- | New seat added
 added :: RiverSeat -> H ()
-added river_seat = do
+added rs = do
   -- Add river_seat_listener
-  withObject $ WL.listenerAdd_ river_seat
+  withObject $ WL.listenerAdd_ rs
+
   -- Add layer shell seat listener
-  river_layer_shell_seat <- withObject $ \ls -> R.riverLayerShellGetSeat ls river_seat
-  withObject $ \l -> WL.listenerAdd river_layer_shell_seat l river_seat
+  lss {-river_layer_shell_seat-} <- withObject $ \ls -> R.riverLayerShellGetSeat ls rs
+  withObject $ \l -> WL.listenerAdd lss l rs
+
   -- Add xkb bindings seat listener
-  xkb_bindings_seat <- withObject $ \xbs -> R.riverXkbBindingsGetSeat xbs river_seat
-  withObject $ \l -> WL.listenerAdd xkb_bindings_seat l river_seat
-  let seat = def {river_seat, river_layer_shell_seat, xkb_bindings_seat}
+  xbs {-xkb_bindings_seat-} <- withObject $ \xbs -> R.riverXkbBindingsGetSeat xbs rs
+  withObject $ \l -> WL.listenerAdd xbs l rs
+
+  let seat = (def :: Seat) { river_seat = rs }
+        & river_layer_shell_seat .~ lss
+        & xkb_bindings_seat .~ xbs
+
   modifyObjectDef $ \st -> st { pending_manage = seat : pending_manage st }
 
 deleteRemovedSeat :: Seat -> HS ()
@@ -74,7 +78,7 @@ handleEvent = \case
       runInHS $ modifySeat seat $ \s -> s {hovered = R.invalidWindow, pendingPointerEnter = Nothing}
 
     R.RiverSeatPointerPosition _ seat x y ->
-      runInHS $ modifySeat seat $ \s -> s {position = (x, y)}
+      runInHS $ modifySeat seat $ \s -> s {position = Position x y}
 
     R.RiverSeatWindowInteraction _ seat window ->
       runInHS $ modifySeat seat $ \s -> s {interacted = window}
@@ -101,12 +105,12 @@ handleEvent = \case
 handleWlSeatEvent :: WL.SeatEvent -> H ()
 handleWlSeatEvent e = do
   case e of
-    WL.SeatName ud wl_seat name -> runInHS $ do
-      modifySeat' ud $ \x -> x {name = name, wl_seat}
+    WL.SeatName ud wls nm -> runInHS $ do
+      modifySeat' ud $ \x -> x {name = nm, wl_seat = wls}
 
-    WL.SeatCapabilities ud s caps -> do
-      runInHS $ modifySeat' ud $ \x -> x {caps = caps}
-      forM_ (WL.parseSeatCapabilities caps) $ \case
+    WL.SeatCapabilities ud s sc -> do
+      runInHS $ modifySeat' ud $ \x -> x {caps = sc}
+      forM_ (WL.parseSeatCapabilities sc) $ \case
         WL.SeatCapabilityKeyboard -> do
           wlkeyboard <- WL.seatGetKeyboard s
           logDebug $ "seat: get keyboard" :# [ "seat" .= tshow s, "keyboard" .= tshow wlkeyboard ]
@@ -127,7 +131,7 @@ handleLayerShellSeat e = do
   _newFocus <- case e of
     -- layer shell surface has exclusive focus
     R.RiverLayerShellSeatFocusExclusive ud _ -> do
-      runInHS $ modifySeat' ud $ \s -> s { currentFocus = SFocusLayerShell True (currentFocus s) }
+      runInHS $ modifySeat' ud $ \s -> s { currentFocus = SFocusLayerShell True s.currentFocus }
       -- pure $ FocusLayerShell True
 
     -- layer shell surface wants non-exclusive focus
@@ -135,7 +139,7 @@ handleLayerShellSeat e = do
     -- of the manage sequence in which this event is sent. The window manager may want
     -- to update window decorations or similar to indicate that no window is focused.
     R.RiverLayerShellSeatFocusNonExclusive ud _ -> do
-      runInHS $ modifySeat' ud $ \s -> s { currentFocus = SFocusLayerShell False (currentFocus s) }
+      runInHS $ modifySeat' ud $ \s -> s { currentFocus = SFocusLayerShell False s.currentFocus }
       -- pure $ FocusLayerShell False
 
     -- no layer shell surface has focus
@@ -185,7 +189,7 @@ handlePointerEvent = \case
 setXCursorTheme :: (MonadIO m, MonadReader HConf m) => RiverSeat -> m ()
 setXCursorTheme rs =
   view (config . xcursor) >>= \case
-    Just (theme, size) -> R.riverSeatSetXcursorTheme rs (Just theme) size
+    Just (ctheme, csize) -> R.riverSeatSetXcursorTheme rs (Just ctheme) csize
     Nothing -> pure ()
 
 manage :: H ()
@@ -218,7 +222,7 @@ manage1 s = do
               managePendingAction s.pending_action >> manageActiveOp
         _ -> return ()
     _ -> managePendingAction s.pending_action >> manageActiveOp
-  doS $ \x -> x { suppressChangeFocus = max 0 (suppressChangeFocus x - 1) }
+  doS $ \x -> x { suppressChangeFocus = max 0 (x.suppressChangeFocus - 1) }
   where
     doS = modifySeat s.river_seat
 
@@ -302,15 +306,15 @@ manage1 s = do
             float s.op_window
             modifySeat s.river_seat $ \x -> x {op = SEAT_OP_NONE, op_window = R.invalidWindow}
           withWindow s.op_window $ \w -> do
-            let width =
+            let rw =
                   s.op_start_width
                     - (if (s.op_edges .&. fromIntegral ((.unwrap) R.EdgeLeft)) /= 0 then s.op_dx else 0)
                     + (if (s.op_edges .&. fromIntegral ((.unwrap) R.EdgeRight)) /= 0 then s.op_dx else 0)
-            let height =
+            let rh =
                   s.op_start_height
                     - (if (s.op_edges .&. fromIntegral ((.unwrap) R.EdgeTop)) /= 0 then s.op_dy else 0)
                     + (if (s.op_edges .&. fromIntegral ((.unwrap) R.EdgeBottom)) /= 0 then s.op_dy else 0)
-            R.riverWindowProposeDimensions w.river_window (max width 1) (max height 1)
+            R.riverWindowProposeDimensions w.river_window (max rw 1) (max rh 1)
       when s.op_release $ do
         modifySeat s.river_seat $ \x -> x {op_release = False}
 
@@ -335,8 +339,8 @@ seatPointerMove sid w = do
     s
       { op = SEAT_OP_MOVE,
         op_window = w.river_window,
-        op_start_x = w.x,
-        op_start_y = w.y,
+        op_start_x = w^._x,
+        op_start_y = w^._y,
         op_dx = 0,
         op_dy = 0
       }
@@ -354,10 +358,10 @@ seatPointerResize sid w edges = do
       { op = SEAT_OP_RESIZE,
         op_window = w.river_window,
         op_edges = edges,
-        op_start_x = w.x,
-        op_start_y = w.y,
-        op_start_width = w.width,
-        op_start_height = w.height,
+        op_start_x = w^._x,
+        op_start_y = w^._y,
+        op_start_width = w^.width,
+        op_start_height = w^.height,
         op_dx = 0,
         op_dy = 0
       }
@@ -380,8 +384,8 @@ seatRender s = do
             y = s.op_start_y + s.op_dy
         setWindowPosition w x y
     SEAT_OP_RESIZE -> withWindow s.op_window $ \w -> do
-      let x = s.op_start_x + (if (s.op_edges .&. fi ((.unwrap) R.EdgeLeft)) /= 0 then s.op_start_width - w.width else 0)
-      let y = s.op_start_y + (if (s.op_edges .&. fi ((.unwrap) R.EdgeTop)) /= 0 then s.op_start_height - w.height else 0)
+      let x = s.op_start_x + (if (s.op_edges .&. fi ((.unwrap) R.EdgeLeft)) /= 0 then s.op_start_width - w.size.width else 0)
+      let y = s.op_start_y + (if (s.op_edges .&. fi ((.unwrap) R.EdgeTop)) /= 0 then s.op_start_height - w.size.height else 0)
       setWindowPosition w x y
 
 ----------------------------------------------------------
@@ -445,8 +449,8 @@ execXkbBinding xb = local (\r -> r {thisSeat = Just rs}) $ do
   where
     rs = xb.river_seat
 
-calcResizeEdges :: Window -> (Int32, Int32) -> Int32
-calcResizeEdges w (sx, sy) = (if closerL then 4 else 8) .|. (if closerU then 1 else 2)
+calcResizeEdges :: Window -> Position -> Int32
+calcResizeEdges w (Position sx sy) = (if closerL then 4 else 8) .|. (if closerU then 1 else 2)
   where
-  closerL = (sx - w.x) < (w.x + w.width - sx)
-  closerU = (sy - w.y) < (w.y + w.height - sy)
+  closerL = (sx - w.position.x) < (w.position.x + w.size.width - sx)
+  closerU = (sy - w.position.y) < (w.position.y + w.size.height - sy)

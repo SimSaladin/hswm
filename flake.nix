@@ -15,7 +15,8 @@
 
     flake-utils.url = "github:numtide/flake-utils";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    haskell-flake.url = "github:srid/haskell-flake";
+
+    #haskell-flake.url = "github:srid/haskell-flake";
 
     haskellNix.url = "github:input-output-hk/haskell.nix";
 
@@ -34,37 +35,6 @@
       url = "github:jcollie/zon2nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    # GHC 9.14
-    ghc-tcplugins-extra = {
-      url = "github:sheaf/ghc-tcplugins-extra/ghc-9.14";
-      flake = false;
-    };
-    ghc-typelits-natnormalise = {
-      url = "github:clash-lang/ghc-typelits-natnormalise";
-      flake = false;
-    };
-    # https://github.com/gtk2hs/gtk2hs/pull/349
-    #gtk2hs = {
-      #url = "github:TuongNM/gtk2hs/ghc-rts-api";
-      #flake = false;
-    #};
-    cabal = {
-      url = "github:haskell/cabal";
-      flake = false;
-    };
-    hlint = {
-      url = "github:ndmitchell/hlint/ghc-9.14.1";
-      flake = false;
-    };
-    ghc-paths = {
-      url = "github:sorki/ghc-paths/srk/cabal317";
-      flake = false;
-    };
-    entropy = {
-      url = "github:haskell/entropy";
-      flake = false;
-    };
   };
 
   outputs = inputs@{ ... }: inputs.flake-parts.lib.mkFlake { inherit inputs; } {
@@ -80,84 +50,110 @@
 
     perSystem = { system, lib, config, pkgs, ... }:
     let
+      overlays = [
+        (final: _: {
+          # roll our own for now because the nixpkgs one is rather old and lacks
+          # features (the wm protocol etc.)
+          river = final.callPackage ./nix/river.nix {
+            src = inputs.river;
+            depsHash = "sha256-uOEzzsTWg1/0lgcTpdPqY4ZXo2cSj04Jr9M/dcI1d30=";
+          };
+
+          # With debug enabled
+          riverDebug = final.river.override { withDebug = true; };
+
+          # for support "cabal-version: 3.14"
+          cabal2nix-unwrapped = final.haskell.packages.ghc914.cabal2nix;
+
+          # For cabal pkg-config-depends: xkbregistry
+          xkbregistry = final.libxkbcommon;
+
+          # Different one than the one in nixpkgs
+          zon2nix = inputs.zon2nix.packages.${system}.zon2nix;
+
+          callZon2Nix = final.callPackage ./nix/callZon2nix.nix { };
+        })
+        inputs.hs-bindgen.overlays.default
+        inputs.haskellNix.overlay
+        projectOverlay
+      ];
+
       projectOverlay = final: _: {
 
         hnix-flake = final.hnix.flake { };
 
-        hnix = final.haskell-nix.cabalProject' ({ config, pkgs, ... }: {
+        hnix = final.haskell-nix.cabalProject' ({ lib, config, pkgs, ... }: {
           name = "hswm";
           src = ./.;
+
           compiler-nix-name = "ghc9141";
 
-          #builderVersion = 2;
-
-          #useLocalGhcLib = true;
-
-          cabalProjectLocal = ''
-            -- allow-boot-library-installs: True
-          '';
+          flake = {
+            variants = {
+              ghc915.compiler-nix-name = lib.mkForce "ghc915";
+              ghc914llvm.compiler-nix-name = lib.mkForce "ghc9141llvm";
+              ghc9124.compiler-nix-name = lib.mkForce "ghc9124";
+            };
+          };
 
           shell = {
             packages = ps: [
               ps.pixman-bindings
               ps.xkbcommon-bindings
               ps.hswm-bindings
-              ps.glib
-              ps.pango
+              #ps.glib
+              #ps.pango
               ps.haskell-gi
               ps.waybar-cffi-hs
             ];
             exactDeps = false;
             allToolDeps = true;
             tools = {
-              hoogle = { };
+              #hoogle = { };
               #cabal = { };
               #hs-bindgen = { version = "0.1.0"; };
+              #haskell-language-server = { };
             };
             additional = ps: [
-              ps.generics-sop
-              ps.lens-sop
               ps.hs-bindgen
             ];
             nativeBuildInputs = [
               config.hsPkgs.cabal-install.components.exes.cabal
+              #config.hsPkgs.haskell-language-server.components.exes.haskell-language-server
             ];
           };
 
+          #builderVersion = 2;
+          #useLocalGhcLib = true;
+          #cabalProjectLocal = '' '';
           #pkg-def-extras = [(_: { packages = { }; })];
+          #ghcOverride = lib.mkForce (pkgs.buildPackages.haskell-nix.compiler.${"ghc91520260204"}.override {
+          #    bootPkgs = pkgs.buildPackages.haskell-nix.compiler.ghc9141.bootPkgs;
+          #    ghcEvalPackages = config.evalPackages;
+          #});
 
           modules = [({ lib, config, pkgs, ... }: {
-
             config = {
-              #reinstallableLibGhc = true;
+              reinstallableLibGhc = true;
 
               packages.cabal-install.planned = true;
+              #packages.haskell-language-server.planned = true;
 
-              packages.glib = {
-                components.setup.depends = lib.mkForce [
-                  config.hsPkgs."gtk2hs-buildtools-0.13.12.0"
-                ];
+              # As pkg-config deps because these need to be propagated
+              packages.hs-bindgen = {
+                components.exes.hs-bindgen-cli.pkgconfig = [ [
+                  pkgs.hsBindgenHook
+                  pkgs.doxygen
+                  # clang exe needed for full macro support
+                  config.ghc.package.llvmPackages.libclang
+                ] ];
               };
-
               packages.libclang-bindings = {
                 components.library.libs = [ config.ghc.package.llvmPackages.libclang ];
                 components.library.build-tools = [ config.ghc.package.llvmPackages.llvm ];
               };
-
               packages.c-expr-dsl = {
                 components.library.libs = [ config.ghc.package.llvmPackages.libclang ];
-              };
-
-              packages.hs-bindgen = {
-                # Need to be propagated
-                components.exes.hs-bindgen-cli.pkgconfig = [
-                  [
-                    pkgs.hsBindgenHook
-                    pkgs.doxygen
-                    # clang exe needed for full macro support
-                    config.ghc.package.llvmPackages.libclang
-                  ]
-                ];
               };
 
               packages.xkbcommon-bindings = { };
@@ -176,7 +172,6 @@
                 ];
               };
             };
-
           })];
         });
       };
@@ -184,44 +179,13 @@
     in
     {
       _module.args.pkgs = import inputs.nixpkgs {
-        inherit system;
-        config = {
+        inherit system overlays;
+        config = lib.recursiveUpdate inputs.haskellNix.config {
            problems.handlers = {
              monad-logger-aeson.broken = "warn";
              Cabal-hooks.broken = "warn"; # or "ignore"
            };
          };
-
-        overlays = [
-          (final: _: {
-            # roll our own for now because the nixpkgs one is rather old and lacks
-            # features (the wm protocol etc.)
-            river = final.callPackage ./nix/river.nix {
-              src = inputs.river;
-              depsHash = "sha256-uOEzzsTWg1/0lgcTpdPqY4ZXo2cSj04Jr9M/dcI1d30=";
-            };
-
-            # With debug enabled
-            riverDebug = final.river.override { withDebug = true; };
-
-            # for support "cabal-version: 3.14"
-            cabal2nix-unwrapped = final.haskell.packages.ghc914.cabal2nix;
-
-            # For cabal pkg-config-depends: xkbregistry
-            xkbregistry = final.libxkbcommon;
-
-            # Different one than the one in nixpkgs
-            zon2nix = inputs.zon2nix.packages.${system}.zon2nix;
-
-            callZon2Nix = final.callPackage ./nix/callZon2nix.nix { };
-          })
-
-          inputs.hs-bindgen.overlays.default
-
-          inputs.haskellNix.overlay
-
-          projectOverlay
-        ];
       };
 
       packages = pkgs.hnix-flake.packages // {

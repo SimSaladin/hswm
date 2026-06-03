@@ -3,7 +3,6 @@ module HSWM.ManageHook where
 import Data.List (isInfixOf, isPrefixOf, isSuffixOf)
 import HSWM.StackSet qualified as W
 import HSWM.Types.WM
-import HSWM.Util.Types
 
 -- | If-then-else lifted to a 'Monad'.
 ifM :: (Monad m) => m Bool -> m a -> m a -> m a
@@ -101,13 +100,13 @@ p -?>> f = do
 
 -- | A predicate to check whether a window is hidden (minimized).
 isMinimized :: Query Bool
-isMinimized = asks minimized
+isMinimized = view minimized
 
 appName :: Query String
-appName = asks appId
+appName = view appId
 
 wTitle :: Query String
-wTitle = asks title
+wTitle = view title
 
 -- | Floats the new window in the given rectangle.
 doRectFloat ::
@@ -118,9 +117,9 @@ doRectFloat r = ask >>= \w -> doF (W.float w.river_window r)
 
 -- | Float the window in given relative size at the center of the screen.
 doCenterFloat :: Rational -> Rational -> ManageHook
-doCenterFloat width height = do
+doCenterFloat fwidth fheight = do
   w <- ask
-  doF $ W.float w.river_window (centerRationalRect $ W.RationalRect 0 0 width height)
+  doF $ W.float w.river_window (centerRationalRect $ W.RationalRect 0 0 fwidth fheight)
 
 -- | Modify the 'WindowSet' with a pure function.
 doF :: (s -> s) -> Query (Endo s)
@@ -136,4 +135,4 @@ doF = return . Endo
 
 -- | Move the window to a given workspace
 doShift :: WorkspaceId -> ManageHook
-doShift i = doF . W.shiftWin i . river_window =<< ask
+doShift i = doF . W.shiftWin i =<< view river_window

@@ -15,15 +15,8 @@ import qualified Data.ByteString.Char8 as C8
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.ByteString.UTF8 as BUTF8
 import qualified Data.List as L
-import qualified Data.Map as M
-import           Data.Text (Text)
-import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 import           Data.Version (showVersion)
-import           System.Environment (lookupEnv)
-
-import           Foreign.Ptr
-
 import           Network.Socket
 import qualified Network.Socket.ByteString as NB
 
@@ -37,10 +30,7 @@ thisPeerDescription = PKG.synopsis ++ " " ++ showVersion PKG.version
 
 type MonadIPCClient m = (MonadLogger m, MonadIO m, MonadUnliftIO m, MonadMask m)
 
-data Msg a = Msg
-  { msgBody :: a
-  , msgSeqn :: Maybe Int
-  }
+data Msg a = Msg { msgBody :: a, msgSeqn :: Maybe Int }
 
 instance A.ToJSON a => A.ToJSON (Msg a) where
   toJSON Msg{..} =
@@ -91,18 +81,17 @@ data RWorkspaces = RWorkspaces
   } deriving (Eq, Show, Read, Generic)
 
 data WorkspaceInfo = WorkspaceInfo
-  { tag        :: WsId
-  , keyhint    :: Text
-  , layout     :: Text
-  , windowList :: [WindowInfo]
+  { tag        :: !WsId
+  , keyhint    :: !Text
+  , layout     :: !Text
+  , windowList :: ![WindowInfo]
   } deriving (Eq, Show, Read, Generic)
 
 data WindowInfo = WindowInfo
-  { wid :: Word
-  , title, appId, identifier :: Text
-  , pid :: Maybe Int
-  }
-  deriving (Eq, Show, Read, Generic)
+  { wid :: !Word
+  , title, appId, identifier :: !Text
+  , pid :: !(Maybe Int)
+  } deriving (Eq, Show, Read, Generic)
 
 newtype OutputId = OutputId { unwrap :: Int }
   deriving stock (Eq, Show, Read, Generic)
@@ -189,7 +178,6 @@ clientRun conf onMsg cb = withThreadContext ["component" .= ("ipc/client" :: Str
           doMsg resp = case A.eitherDecodeStrict' resp of
             Right (Msg Ping n) -> sendMsg sock $ Msg Pong n
             Right (Msg msg _) -> onMsg msg
-            --logDebug $ "IPC server event (raw)" :# [ "msg" .= BUTF8.toString resp ]
             Left e -> logWarn $ "Received malformed message from server" :# [ "ex" .= toText e, "msg" .= BUTF8.toString resp ]
       worker ""
 

@@ -1,0 +1,4 @@
+
+clientFromProtocolXML' commonSettings protoXml
+
+instance Default RiverLayerShellOutput where def = RiverLayerShellOutput nullPtr

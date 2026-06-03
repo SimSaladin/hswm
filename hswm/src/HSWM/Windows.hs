@@ -25,7 +25,6 @@ import qualified Bindings.River as R
 import qualified Control.Monad.State as State
 import qualified Data.List as L
 import qualified Data.Map as M
-import           Foreign
 
 added :: RiverWindow -> H ()
 added w = do
@@ -55,8 +54,8 @@ applyManageActions w0 xs0 = doAll w0 xs0 >>= \w' -> return $ Just w' {p_manage_a
           R.riverWindowInformFullscreen rw
           -- The position does not get updated otherwise
           lookupOutput ro >>= \case
-            Nothing -> pure w {fullscreen = Just ro}
-            Just o ->  pure w {fullscreen = Just ro, x = o.x, y = o.y}
+            Nothing -> pure $ w & fullscreen ?~ ro
+            Just o ->  pure $ w & fullscreen ?~ ro & size .~ o.size
         WFullscreen -> do
           sid <- gets $ W.screen . W.current . view windowset
           lookupOutputBy (\x -> x.screen == sid) >>= \case
@@ -64,11 +63,11 @@ applyManageActions w0 xs0 = doAll w0 xs0 >>= \w' -> return $ Just w' {p_manage_a
             Just o -> do
               R.riverWindowFullscreen rw o.river_output
               R.riverWindowInformFullscreen rw
-              pure w {fullscreen = Just o.river_output, x = o.x, y = o.y}
+              pure $ w & fullscreen ?~ o.river_output & size .~ o.size
         WExitFullscreen -> do
           R.riverWindowExitFullscreen rw
           R.riverWindowInformNotFullscreen rw
-          pure w {fullscreen = Nothing}
+          pure $ w & fullscreen .~ Nothing
         WToggleFullscreen
           | isJust w.fullscreen -> doIt w WExitFullscreen
           | otherwise -> doIt w WFullscreen
@@ -162,20 +161,20 @@ manage_ = do
   use windowset >>= \ws' -> modify (\s -> s {windowsetOld = ws'})
 
 warpPointerToScreen :: ScreenDetail -> ScreenId -> HS ()
-warpPointerToScreen SD {..} sid = do
+warpPointerToScreen sd sid = do
   mapSeats $ \s -> do
     R.riverSeatPointerWarp s.river_seat px py
     modifySeat s.river_seat $ \s' -> s' {focused = R.invalidWindow}
   withScreenOutput sid $ \o -> io $ R.riverLayerShellOutputSetDefault o.layerShellOutput
   where
-    px = fi $ x + width `div` 2
-    py = fi $ y + height `div` 2
+    px = fi $ sd.x + sd.width `div` 2
+    py = fi $ sd.y + sd.height `div` 2
 
 render :: H ()
 render = runInHS $ do
   bwDef <- view (config . borderWidth)
   mapWindows $ \w -> do
-    whenJust w.p_render_pos $ unless w.minimized . uncurry (setWindowPosition w)
+    whenJust w.p_render_pos $ \(Position x y) -> unless w.minimized $ setWindowPosition w x y
     whenJust w.p_render_border $ setWindowBorder w.river_window (fromMaybe bwDef w.wBorderWidth)
     case w.p_render_place_top of
         Just True  -> unless w.minimized $ R.riverNodePlaceTop w.node
@@ -210,17 +209,15 @@ doRemoveWindow w = do
   alterWindow w.river_window (const Nothing)
   -- Remove references in seats
   use _seats >>= \xs -> do
-    xs' <- forM xs $ \seat' -> do
-      let seat =
-            seat'
-              { focused = if focused seat' == w.river_window then R.invalidWindow else focused seat',
-                hovered = if hovered seat' == w.river_window then R.invalidWindow else hovered seat',
-                interacted = if interacted seat' == w.river_window then R.invalidWindow else interacted seat'
-              }
-      if op_window seat == w.river_window
+    xs' <- forM xs $ \s -> do
+      let seat = s
+            & focused . filtered (== w.river_window) .~ R.invalidWindow
+            & hovered . filtered (== w.river_window) .~ R.invalidWindow
+            & interacted . filtered (== w.river_window) .~ R.invalidWindow
+      if seat.op_window == w.river_window
         then do
           R.riverSeatOpEnd seat.river_seat
-          return $ seat {op_window = R.invalidWindow, op = SEAT_OP_NONE}
+          return $ seat & op_window .~ R.invalidWindow & op .~ SEAT_OP_NONE
         else return seat
     modify $ \s -> s {_seats = xs'}
   -- destroy WL references
@@ -269,11 +266,14 @@ handleEvent e = case e of
     when fixed $ runInHS $
       withWindow window $ \w ->
         modifyWindowSet $ \ws ->
-          W.float window (centerRationalRect $ rationalRectIn (Rectangle w.x w.y (fi maxw) (fi maxh)) (screenRect $ W.screenDetail $ W.current ws)) ws
+          W.float window (centerRationalRect $
+            rationalRectIn
+              (Rectangle w.position.x w.position.y (fi maxw) (fi maxh))
+              (screenRect $ W.screenDetail $ W.current ws)) ws
 
   -- updated width + height
   R.RiverWindowDimensions _ rw w h ->
-    runInHS $ modifyWindow rw $ \s -> s {width = w, height = h}
+    runInHS $ modifyWindow rw $ (width .~ w) . (height .~ h)
 
   -- Set fullscreen
   R.RiverWindowFullscreenRequested _ window output -> runInHS $ doManage' (if output == def then WFullscreen else WFullscreenOnScreen output) window

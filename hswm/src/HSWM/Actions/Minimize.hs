@@ -130,6 +130,6 @@ withLastMinimized' action = withMinimized (action . listToMaybe)
 
 withMinimized :: ([RiverWindow] -> HS a) -> HS a
 withMinimized action = do
-  minimized <- XS.gets minimizedStack
+  minstack <- XS.gets minimizedStack
   currentStack <- withWindowSet $ return . W.index
-  action $ minimized `L.intersect` currentStack
+  action $ minstack `L.intersect` currentStack

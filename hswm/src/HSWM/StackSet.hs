@@ -10,11 +10,11 @@
 -- From xmonad:XMonad.StackSet
 module HSWM.StackSet where
 
-import Control.Applicative.Backwards (Backwards (Backwards, forwards))
-import Data.List qualified as L
-import Data.List.NonEmpty qualified as NE
-import Data.Map qualified as M
-import Prelude hiding (filter, modify, view)
+import           Control.Applicative.Backwards (Backwards(Backwards, forwards))
+import qualified Data.List as L
+import qualified Data.List.NonEmpty as NE
+import qualified Data.Map as M
+import           Prelude hiding (filter, modify, view, peek, with)
 
 ------------------------------------------------------------------------
 

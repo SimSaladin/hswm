@@ -35,7 +35,8 @@ module HSWM.Layout.BinarySpacePartition (
   , SplitShiftDirectional(..)
   ) where
 
-import HSWM
+import Prelude hiding (rotate)
+import HSWM hiding (size, focused, rotate)
 import qualified HSWM.StackSet as W
 import HSWM.Util.Stack hiding (Zipper)
 
@@ -713,7 +714,7 @@ getHidden :: HS [RiverWindow]
 getHidden = getStackSet
   >>= lookupWindows . W.integrate'
   >>=  filterM (runQuery isMinimized)
-  <&> map river_window
+  <&> map (view river_window)
 
 getStackSet :: HS (Maybe (W.Stack RiverWindow))
 getStackSet = W.stack . W.workspace . W.current <$> use windowset -- windows on this WS (with floating)

@@ -1,15 +1,16 @@
 cabal-version: 3.14
+-- build-type:         Custom
+build-type:         Hooks
 name:               hswm-bindings
 version:            0.1.0.0
 license:            MIT
 license-file:       LICENSE
 author:             Samuli Thomasson
 maintainer:         samuli.thomasson@pm.me
---build-type:         Hooks
-build-type:         Custom
 tested-with:
-      GHC == 9.12.2
-    , GHC == 9.14.1
+      GHC == 9.14.1
+    , GHC == 9.12.4
+    , GHC == 9.12.2
 extra-source-files:
       binding-specs/*.yaml
       protocol/*.xml
@@ -28,13 +29,14 @@ flag build-tool-depends
 
 custom-setup
     setup-depends:
-          base             >=4.21 && <5
+          hs-bindgen-hooks
+        , base             >=4.21 && <5
         , Cabal            >=3.14 && <3.18
         , Cabal-hooks      >=3.14 && <3.18
-        , filepath
-        , hs-bindgen-hooks
-        , microlens
         , microlens-ghc
+        , filepath
+        , string-interpolate
+        , directory
 
 common language
     default-language: GHC2024
@@ -51,69 +53,73 @@ common language
 library
     import: language
     exposed-modules:
-          -- core types
-          Wayland.Types
-          -- code generation
-          Wayland.Internal.TH
-          -- Wayland protocols
-          Wayland
-          Wayland.Viewporter
-          Bindings.Wayland.Util
-          Bindings.Wayland.Client
-          Bindings.Wayland.XdgShell
-          Bindings.Wayland.ExtIdleNotifyV1
-          Bindings.Wayland.ExtSessionLockV1
-          Bindings.Wayland.FractionalScaleV1
-          Bindings.Wayland.ExtForeignTopLevelListV1
-          Bindings.Wayland.Viewporter
-          Bindings.Wayland.XdgOutputUnstableV1
-          Bindings.Wayland.TextInputUnstableV3
-          -- wlroots protocols
-          Bindings.Wlr.InputMethodUnstableV2
-          Bindings.Wlr.LayerShellUnstableV1
-          Bindings.Wlr.OutputManagementUnstableV1
-          Bindings.Wlr.OutputPowerManagementUnstableV1
-          -- River protocols
-          River
-          River.InputManagement
-          River.LayerShell
-          River.LibinputConfig
-          River.WindowManagement
-          River.XkbBindings
-          River.XkbConfig
-          Bindings.River
-          Bindings.River.InputManagementV1
-          Bindings.River.LayerShellV1
-          Bindings.River.LibinputConfigV1
-          Bindings.River.WindowManagementV1
-          Bindings.River.XkbBindingsV1
-          Bindings.River.XkbConfigV1
+          WL.Util
+          WL.Internals.TH
+          WL.Internals.Types
+	  -- moduleles determined at build-time dynamically
+          -- WL.Core.Client
+          -- WL.Core.Server
+          -- WL.XdgShell.Client
+          -- WL.XdgShell.Server
+          -- WL.Viewporter.Client
+          -- WL.Viewporter.Server
+          -- WL.FractionalScale.Staging.V1.Client
+          -- WL.FractionalScale.Staging.V1.Server
+          -- WL.XdgOutput.Unstable.V1.Client
+          -- WL.XdgOutput.Unstable.V1.Server
+          -- WL.TextInput.Unstable.V3.Client
+          -- WL.TextInput.Unstable.V3.Server
+          -- WL.ExtIdleNotify.Staging.V1.Client
+          -- WL.ExtIdleNotify.Staging.V1.Server
+          -- WL.ExtSessionLock.Staging.V1.Client
+          -- WL.ExtSessionLock.Staging.V1.Server
+          -- WL.ExtForeignToplevelList.Staging.V1.Client
+          -- WL.ExtForeignToplevelList.Staging.V1.Server
+          -- WL.Wlr.LayerShell.Unstable.V1.Client
+          -- WL.Wlr.LayerShell.Unstable.V1.Server
+          -- WL.Wlr.OutputManagement.Unstable.V1.Client
+          -- WL.Wlr.OutputManagement.Unstable.V1.Server
+          -- WL.Wlr.OutputPowerManagement.Unstable.V1.Client
+          -- WL.Wlr.OutputPowerManagement.Unstable.V1.Server
+          -- WL.Wlr.InputMethod.Unstable.V2.Client
+          -- WL.Wlr.InputMethod.Unstable.V2.Server
+          -- River.WindowManagement.V1.Client
+          -- River.WindowManagement.V1.Server
+          -- River.InputManagement.V1.Client
+          -- River.InputManagement.V1.Server
+          -- River.LayerShell.V1.Client
+          -- River.LayerShell.V1.Server
+          -- River.LibinputConfig.V1.Client
+          -- River.LibinputConfig.V1.Server
+          -- River.XkbBindings.V1.Client
+          -- River.XkbBindings.V1.Server
+          -- River.XkbConfig.V1.Client
+          -- River.XkbConfig.V1.Server
     other-modules:
           Paths_hswm_bindings
     autogen-modules:
           Paths_hswm_bindings
     build-depends:
           base                 >=4.21   && <4.23
-        , containers
+        , containers           >=0.7    && <1.0
         , data-default         >=0.8    && <0.9
         , deepseq              >=1.5.1  && <1.6
         , hashable             >=1.5.1  && <1.6
         , template-haskell     >=2.23   && <2.25
-        , text                 >=2.1.2  && <2.2
-        , unix
-        , unliftio
+        , unix                ^>=2.8.6
+        , unliftio            ^>=0.2.25
         , c-expr-runtime       >=0.1.0  && <0.2
         , hs-bindgen-runtime   >=0.1.0  && <0.2
-        , hs-bindgen-hooks
-    hs-source-dirs:
-          src
+        , hs-bindgen-hooks     ==0.1.0.0
+        , pretty
+    hs-source-dirs: src
     ghc-options: -Wall -Wunused-packages -fPIC
 
     if flag(pkg-config)
         pkgconfig-depends:
-              wayland-client >= 1.24
-            , wayland-server >= 1.24
-            , wayland-protocols >= 1.48
+              wayland-client     >= 1.24
+            , wayland-server     >= 1.24
+            , wayland-protocols  >= 1.48
     else
         extra-libraries:
               wayland-client
@@ -122,7 +128,7 @@ library
     if flag(build-tool-depends)
        build-tool-depends: hs-bindgen:hs-bindgen-cli
 
-test-suite test-suite
+test-suite spec
     import: language
     type: exitcode-stdio-1.0
     other-modules:
@@ -136,7 +142,8 @@ test-suite test-suite
         , hspec
         , hs-bindgen-runtime   >=0.1.0  && <0.2
         , hswm-bindings
+    build-tool-depends:
+        hspec-discover:hspec-discover
     main-is: Spec.hs
     hs-source-dirs: tests
-    build-tool-depends: hspec-discover:hspec-discover
     ghc-options: -threaded -with-rtsopts=-N

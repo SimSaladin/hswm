@@ -21,17 +21,19 @@ module HSWM.Types.WM
   , module HSWM.Types.Seat
   , module HSWM.Types.Output
   , module HSWM.Types.Config
+  , module HSWM.Types.Simple
   ) where
 
 import qualified HSWM.StackSet as W
+import           HSWM.Types.Lens
 import           HSWM.Types.Events
 import           HSWM.Types.TypeMap
 import           HSWM.Types.Action
-import           HSWM.Types.Window
+import           HSWM.Types.Window hiding (window)
 import           HSWM.Types.Seat
-import           HSWM.Types.Output
+import           HSWM.Types.Output hiding (output)
 import           HSWM.Types.Config
-import           HSWM.Util.Types
+import           HSWM.Types.Simple
 import           HSWM.Wayland (HasGlobalsRegistry(..))
 
 import qualified Wayland as WL
@@ -42,10 +44,10 @@ import qualified Data.Map as M
 import           Data.Monoid (Ap(..))
 import           Data.Typeable
 import           System.Log.FastLogger (LoggerSet)
-import Language.Haskell.TH (mkName, nameBase)
 
-type WindowSet = WindowSetX (Layout RiverWindow)
-type WindowSpace = WindowSpaceX (Layout RiverWindow)
+type WindowSet = WindowSetX Layout
+
+type WindowSpace = WindowSpaceX Layout
 
 data HSWMException = HSWMStateLocked String
                    | HSWMTimeout String
@@ -303,6 +305,7 @@ newtype HS a = HS (ReaderT HConf (StateT HState IO) a)
 
 type instance Stateful H = HS
 type instance LayoutProxy H = Layout
+type instance LayoutProxy HS = Layout
 
 instance Show (H ()) where show _ = "H()"
 instance Show (H Bool) where show _ = "H()"
@@ -317,9 +320,9 @@ instance MonadFix HS where mfix f = HS (mfix g) where g a = let HS a' = f a in a
 -----------------------------------------------------------
 -- * Query & ManageHook
 
-type ManageHook = ManageHookX HS (Layout RiverWindow)
+type ManageHook = ManageHookX HS
 
-type MaybeManageHook = MaybeManageHookX HS (Layout RiverWindow)
+type MaybeManageHook = MaybeManageHookX HS
 
 type Query = QueryX HS
 
@@ -333,8 +336,18 @@ instance Show (Async a) where show _ = "<Async>"
 
 -- lenses
 
-makeLensesWith (classyRules & lensField .~ \_ _ n -> [TopName $ mkName $ nameBase n]) ''HConf
-makeLensesWith (classyRules & lensField .~ \_ _ n -> [TopName $ mkName $ nameBase n]) ''HState
+makeLenses' [ ''HConf, ''HState ]
+
+instance HasGlobalTMap HConf where
+  globalTMap = globalTypeMap
+
+instance HasGlobalsRegistry HConf where
+  globalsRegistryL = globals
+
+instance HasEventQueues HConf where
+  mainEventQL = eventQueue
+  pendingManageQL = pendingManageQ
+  pendingRenderQL = pendingRenderQ
 
 instance MonadLoggerIO H  where askLoggerIO = view _logFunc
 instance MonadLoggerIO HS where askLoggerIO = view _logFunc
@@ -347,14 +360,3 @@ instance MonadLogger HS where
   monadLoggerLog loc src lvl msg = do
     f <- askLoggerIO
     io . f loc src lvl $ toLogStr msg
-
-instance HasGlobalTMap HConf where
-  globalTMap = globalTypeMap -- lens globalTypeMap (\s a -> s {globalTypeMap = a})
-
-instance HasGlobalsRegistry HConf where
-  globalsRegistryL = globals  -- lens globals (\s a -> s { globals = a })
-
-instance HasEventQueues HConf where
-  mainEventQL = eventQueue -- lens eventQueue $ \s a -> s { eventQueue = a}
-  pendingManageQL = pendingManageQ --- lens pendingManageQ $ \s a -> s {pendingManageQ = a}
-  pendingRenderQL = pendingRenderQ --- lens pendingRenderQ $ \s a -> s {pendingRenderQ = a}

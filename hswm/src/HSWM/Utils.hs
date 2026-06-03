@@ -17,7 +17,6 @@ import           HSWM.Types.Action
 import           HSWM.Util.Process
 
 import           Text.XkbCommon
-import           Text.XkbCommon.KeySyms (key_NoSymbol)
 import           Text.XkbCommon.EventCodes (fromEventCodeBTN)
 
 import qualified River as R
@@ -28,11 +27,9 @@ import           River (RiverColor(..))
 import qualified Bindings.River.WindowManagementV1 as R
 import qualified Bindings.Wayland.Client as WL
 
-import           Data.Bits
 import           Data.Char (toLower)
 import qualified Data.List as L
 import           Data.Ord
-import           Foreign
 import           GHC.Stack
 import           Numeric (readHex)
 import qualified Text.Pretty.Simple as P

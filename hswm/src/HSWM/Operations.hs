@@ -8,14 +8,13 @@ import qualified River as R
 import qualified Bindings.River as R
 import qualified Bindings.Wlr.OutputPowerManagementUnstableV1 as Wlr
 
-import qualified Control.Monad.State as State
 import qualified Data.List as L
 import qualified Data.Map as M
 import           Data.Ratio ((%))
 import qualified Data.Set as S
 import           Data.Time.Clock.System
-import           Foreign (IntPtr, deRefStablePtr, intPtrToPtr, ptrToIntPtr, (.&.))
-import           System.Environment
+import System.Environment (executablePath)
+-- import           Foreign (IntPtr, deRefStablePtr, intPtrToPtr, ptrToIntPtr, (.&.))
 import           System.IO (hGetContents, hPrint, print, writeFile)
 import qualified System.Posix as Posix
 import           System.Posix.Process (executeFile)
@@ -24,20 +23,20 @@ import           Text.Printf
 -- * Misc. pure operations
 
 -- | Given a point, determine the screen (if any) that contains it.
-pointScreen :: Position -> Position
+pointScreen :: Position1D -> Position1D
             -> HS (Maybe (W.Screen WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail ScreenId ScreenDetail))
 pointScreen x y = withWindowSet $ return . L.find p . W.screens
   where
     p = pointWithin x y . screenRect . W.screenDetail
 
 screenRect :: ScreenDetail -> Rectangle
-screenRect SD {..} = Rectangle (fi x) (fi y) (fi width) (fi height)
+screenRect sd = Rectangle (fi sd.x) (fi sd.y) (fi sd.width) (fi sd.height)
 
 -- * Manage tasks that defer to next manage sequence
 
 manageReveal, manageHide :: RiverWindow -> HS ()
-manageReveal = flip modifyWindow $ \s -> s {p_set_visible = Just True}
-manageHide = flip modifyWindow $ \s -> s {p_set_visible = Just False}
+manageReveal = flip modifyWindow $ p_set_visible ?~ True
+manageHide = flip modifyWindow $ p_set_visible ?~ False
 
 manageKill :: Window -> HS ()
 manageKill = doManage WRequestClose
@@ -59,11 +58,9 @@ tileWindow placeTop rw r = do
               | x <= bw * 2 = 1
               | otherwise = x - bw * 2
         R.riverWindowProposeDimensions w.river_window (least $ fi r.width) (least $ fi r.height)
-        modifyWindow rw $ \w' ->
-          w'
-            { p_render_pos = Just (fi r.x + bw, fi r.y + bw),
-              p_render_place_top = Just placeTop
-            }
+        modifyWindow rw $ \w' -> w'
+            & p_render_pos ?~ Position (fi r.x + bw) (fi r.y + bw)
+            & p_render_place_top ?~ placeTop
       Just ro -> do
         sid <- pointScreen r.x r.y
         lookupOutputBy (\x -> Just x.screen == fmap W.screen sid) >>= \mo -> do
@@ -75,14 +72,11 @@ tileWindow placeTop rw r = do
               | otherwise -> do
                 -- need to change the output where the window is fullscreened
                 R.riverWindowFullscreen rw o.river_output
-                modifyWindow rw $ \w' -> w'
-                  { p_render_place_top = Just placeTop
-                  , fullscreen = Just o.river_output
-                  , x = o.x
-                  , y = o.y
-                  , height = o.height
-                  , width = o.width
-                  }
+                modifyWindow rw $ \x -> x
+                  & p_render_place_top ?~ placeTop
+                  & fullscreen ?~ o.river_output
+                  & position .~ o.position
+                  & size .~ o.size
 
 manageWindowPlaceTop :: RiverWindow -> Bool -> HS ()
 manageWindowPlaceTop rw top = modifyWindow rw $ \w -> w
@@ -95,7 +89,7 @@ manageWindowBorderWidth :: RiverWindow -> Maybe Int32 -> HS ()
 manageWindowBorderWidth rw bw = modifyWindow rw $ \w -> w {wBorderWidth = bw}
 
 doManage' :: WindowManageAction -> RiverWindow -> HS ()
-doManage' a rw = modifyWindow rw $ \s -> s {p_manage_action = p_manage_action s ++ [a]}
+doManage' a rw = modifyWindow rw $ p_manage_action <>~ [a]
 
 doManage :: WindowManageAction -> Window -> HS ()
 doManage a w = doManage' a w.river_window
@@ -189,14 +183,14 @@ setTopFocus' rw = mapSeats $ \s -> do
     withWindow rw $ \w -> do
       logInfo $ "seat: focus window" :# [ "window" .= show rw, "seat" .= s.name ]
       R.riverSeatFocusWindow s.river_seat rw
-      modifySeat s.river_seat $ \x -> x {focused = rw}
+      modifySeat s.river_seat $ focused .~ rw
       -- FIXME: when focusing a newly created window, we end up here when w.x and w.y are still 0. The position is updated
       -- a bit later by the WindowDimensions event.
-      when (s.suppressChangeFocus <= 0 && (w.width, w.height) /= (0, 0)) $ do
+      when (s.suppressChangeFocus <= 0 && w ^. size /= Size 0 0) $ do
           -- modifySeat s.river_seat $ \x -> x {focused = rw}
-          let (x', y') = fromMaybe (w.x, w.y) w.p_render_pos
-              px = x' + (w.width `div` 2)
-              py = y' + (w.height `div` 2)
+          let Position x' y' = fromMaybe w.position w.p_render_pos
+              px = x' + (w.size.width `div` 2)
+              py = y' + (w.size.height `div` 2)
           logInfo $ "seat: pointer warp" :# [ "dest" .= (px, py), "seat" .= s.name, "window" .= show w ]
           io $ R.riverSeatPointerWarp s.river_seat px py
 
@@ -240,7 +234,7 @@ riverWindowSetBorders w R.WindowBorders {..} = R.riverWindowSetBorders w (R.toCE
 setWindowPosition :: Window -> Int32 -> Int32 -> HS ()
 setWindowPosition w x y = do
   R.riverNodeSetPosition w.node x y
-  modifyWindow w.river_window $ \s -> s {x, y}
+  modifyWindow w.river_window $ (_x .~ x) . (_y .~ y)
 
 --------------------------------------------------------------
 -- * WindowSet etc. modifications
@@ -287,14 +281,14 @@ withOutput k m = use _outputs >>= mapM_ (\x -> when (x.river_output == k) (m x))
 modifyOutput :: RiverOutput -> (Output -> Output) -> HS ()
 modifyOutput ro f = modifying _outputs $ map g
   where
-    g a@Output {..}
-      | river_output == ro = f a
-      | otherwise = a
+    g out
+      | out.river_output == ro = f out
+      | otherwise = out
 
 setOutputPower :: Bool -> HS ()
 setOutputPower mode = do
-  ops <- map outputPower <$> use _outputs
-  forM_ ops $ \case
+  outs <- use _outputs
+  forM_ (outs ^.. traversed . outputPower) $ \case
     Nothing -> return ()
     Just power -> do
       logInfo $ "setting output power" :# [ "on" .= mode ]
@@ -329,7 +323,7 @@ mapSeats f = use _seats >>= mapM_ f
 -- ** Starting Seat operations
 
 startSeatOp :: SeatOp -> HS ()
-startSeatOp op = modifySeats (const True) $ \seat -> seat {pending_action = S_START_OP op}
+startSeatOp seatop = modifySeats (const True) $ \seat -> seat {pending_action = S_START_OP seatop}
 
 seatInputOverride :: String -> HS Bool -> [((ModMask, KeySym), H ())] -> HS ()
 seatInputOverride seat onempty keys = modifySeats (\s -> s.name == seat) $ \s ->
@@ -378,7 +372,7 @@ floatLocation w = go
     go = do
       ws <- use windowset
       let bw = 2 :: Int -- (fromIntegral . wa_border_width) wa
-      point_sc <- pointScreen (fi w.x) (fi w.y)
+      point_sc <- pointScreen (fi $ w ^. _x) (fi $ w ^. _y)
 
       -- ignore pointScreen for new windows unless it's the current
       -- screen, otherwise the float's relative size is computed against
@@ -388,11 +382,11 @@ floatLocation w = go
             fromMaybe (W.current ws) $
               if point_sc `sr_eq` Just (W.current ws) then point_sc else Nothing
           sr = screenRect . W.screenDetail $ sc
-          x = (fi w.x - fi sr.x) % fi sr.width
-          y = (fi w.y - fi sr.y) % fi sr.height
-          (width, height) = {- applySizeHintsContents sh -} (fi w.width, fi w.height)
-          rwidth = fi (width + bw * 2) % fi sr.width
-          rheight = fi (height + bw * 2) % fi sr.height
+          x = (fi w.position.x - fi sr.x) % fi sr.width
+          y = (fi w.position.y - fi sr.y) % fi sr.height
+          (width', height') = {- applySizeHintsContents sh -} (fi w.size.width, fi w.size.height)
+          rwidth = fi (width' + bw * 2) % fi sr.width
+          rheight = fi (height' + bw * 2) % fi sr.height
           -- adjust x/y of unmanaged windows if we ignored or didn't get pointScreen,
           -- it might be out of bounds otherwise
           rr =

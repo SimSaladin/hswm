@@ -72,15 +72,9 @@ main =
 myScratchpads :: [Scratchpad]
 myScratchpads =
   exclusive
-    [ mkPad
-        "tmux-0"
-        mhd
-        (appName =? "tmux-0")
-        (void $ spawnProcess "kitty" ["--app-id=tmux-0", "--detach", "tmux", "a"]),
-      mkPad
-        "ncmpcpp"
-        mhd
-        (appName =? "ncmpcpp")
+    [ mkPad "tmux-0" mhd (appName =? "tmux-0")
+        (void $ spawnProcess "kitty" ["--app-id=tmux-0", "--detach", "tmux", "a"])
+    , mkPad "ncmpcpp" mhd (appName =? "ncmpcpp")
         (void $ spawnProcess "kitty" ["--app-id=ncmpcpp", "--detach", "ncmpcpp"])
     ] ++ [mkPadDyn "dynamic" def idHook]
   where
@@ -118,7 +112,7 @@ environPrompt = do
           <> (if isNothing vEnv then " <i>(not in WM env)</i>" else "")
         | (k, (vEnv, vSD)) <- M.toList varsMap]
 
-      escval = P.escapeLineBreaks . P.escapePangoMarkup
+      escval x = P.escapeLineBreaks $ P.escapeMarkupPure x (-1)
 
   RP.rofiRun rofiPrompt {RP._prompt = "Set env variable", RP._format = RP.FilterString} rows >>= (`whenJust` doApply)
   where
@@ -223,10 +217,7 @@ removeFocusedWorkspace = do
     DWO.removeName curTag
 
 myManageHook :: Query (Endo WindowSet)
-myManageHook =
-  composeOne
-    [ managePads
-    ]
+myManageHook = composeOne [ managePads ]
 
 myLayoutHook :: _
 myLayoutHook =
@@ -303,7 +294,7 @@ myKeys =
       ("M-x",           "Layout: " <??> Shrink),
       ("M-S-x",         "Layout: " <??> Expand),
       ("M-b t",         "Toggle NonExcl. Area" <??> NEArea.ToggleNonExclusiveArea),
-      ("M-m",           "Maximize Restore" <??> withFocused (sendMessage . L.Maximize.maximizeRestore . river_window)),
+      ("M-m",           "Maximize Restore" <??> withFocused (sendMessage . L.Maximize.maximizeRestore . view river_window)),
       ("M-b b",         "Toggle NOBORDERS" <??> sendMessage (Toggle NOBORDERS)),
       ("M-b m",         "Toggle MIRROR" <??> sendMessage (Toggle MIRROR)),
       ("M-b f",         "Toggle NBFULL" <??> sendMessage (Toggle NBFULL)),
@@ -329,7 +320,7 @@ myKeys =
          ("M-b f",      "Toggle fullscreen (focused)" <??> withFocused (doManage WToggleFullscreen)),
          ("M-f f",      "Float (focused)" <??>
            withFocused (\w -> modifyWindowSet (\ws ->
-             W.float w.river_window (rationalRectIn (Rectangle w.x w.y (fi w.width) (fi w.height)) (screenRect $ W.screenDetail $ W.current ws)) ws
+             W.float w.river_window (rationalRectIn (Rectangle w.position.x w.position.y (fi w.size.width) (fi w.size.height)) (screenRect $ W.screenDetail $ W.current ws)) ws
                                               ))),
          ("M-f s",      "Sink (focused)" <??> withFocused (\w -> modifyWindowSet (W.sink w.river_window))),
          ("M-exclam",   "Toggle tmux PAD" <??> togglePad "tmux-0"),

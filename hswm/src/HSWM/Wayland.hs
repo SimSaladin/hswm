@@ -4,8 +4,6 @@ import           HSWM.Types.TypeMap
 
 import qualified Wayland as WL
 
-import           Foreign
-
 -- * Registry tracking
 
 class HasGlobalsRegistry env where

@@ -19,11 +19,9 @@ module HSWM.Types.Action
 import qualified River as R
 import           Text.XkbCommon
 import           Text.XkbCommon.KeySyms (key_NoSymbol)
--- import           Text.XkbCommon.EventCodes (fromEventCodeBTN)
 
 import qualified Data.Map as M
-import Data.Typeable
-import Foreign (StablePtr)
+import           Data.Typeable
 
 data XkbBinding a = XkbBinding
   { xkb_binding :: {-# UNPACK #-} !R.RiverXkbBinding

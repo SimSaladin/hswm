@@ -42,14 +42,11 @@ import qualified Bindings.Wlr.LayerShellUnstableV1 as Wlr
 import qualified Bindings.Wlr.OutputManagementUnstableV1 as Wlr
 import qualified Bindings.Wlr.OutputPowerManagementUnstableV1 as Wlr
 
-import           Control.Concurrent (threadWaitRead, threadWaitWrite)
 import           Control.Concurrent.Thread.Delay as Conc (delay)
 import           Data.Char
 import qualified Data.List as L
-import           Foreign hiding (new, void)
 import qualified Options.Applicative as Opts
 import           Options.Generic
-import           System.Environment (unsetEnv)
 import           System.IO.Error
 import           System.Log.FastLogger
 import qualified System.Posix as Posix

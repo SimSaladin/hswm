@@ -18,8 +18,6 @@ module HSWM.Util.Posix
 #include <fcntl.h>
 #include <poll.h>
 
-import Foreign
-import Foreign.C
 import System.Posix (Fd(..))
 import qualified System.Posix as P
 

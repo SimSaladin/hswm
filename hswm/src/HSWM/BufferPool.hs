@@ -9,13 +9,12 @@
 --
 module HSWM.BufferPool where
 
-import           HSWM.Core
+import           HSWM.Core hiding (width, height, size)
 import           HSWM.Util.Posix
 
 import qualified Wayland as WL
 
 import qualified Data.List as L
-import           Foreign hiding (void)
 import           System.Posix (closeFd)
 
 data ImageBufferPool = ImageBufferPool

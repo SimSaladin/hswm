@@ -33,7 +33,6 @@ import           Bindings.Wayland.Client (CEnum(..))
 import           Data.Coerce (coerce)
 import qualified Data.List as L
 import qualified Data.Map as M
-import           Foreign.C.Types
 import           System.Posix
 
 data InputConfigState = InputConfigState

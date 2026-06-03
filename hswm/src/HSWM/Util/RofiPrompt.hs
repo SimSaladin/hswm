@@ -57,8 +57,8 @@ data RofiPromptConfig
   }
   deriving (Show, Read, Generic, Data, Default)
 
-setMessage :: IsRofiInput a => a -> RofiPromptConfig -> RofiPromptConfig
-setMessage a pc = pc { _mesg = toRofiInputString a }
+setMessage :: String -> RofiPromptConfig -> RofiPromptConfig
+setMessage a pc = pc { _mesg =  a }
 
 data RofiFormat
   = SelectedString -- ^ s
@@ -91,20 +91,16 @@ rofiLaunch rp =
     logInfo $ "rofi: launch finished" :# [ "result" .= show res ]
 
 class IsRofiInput a where
-  toRofiInput :: a -> LB.ByteString
-  toRofiInputString :: a -> String
+  toRofiInput       :: MonadIO m => a -> m LB.ByteString
 
 instance IsRofiInput String where
-  toRofiInput = LB.fromStrict . C8.pack
-  toRofiInputString = id
+  toRofiInput = pure . LB.fromStrict . C8.pack
 
 instance IsRofiInput T.Text where
-  toRofiInput = LB.fromStrict . TE.encodeUtf8
-  toRofiInputString = T.unpack
+  toRofiInput = pure . LB.fromStrict . TE.encodeUtf8
 
 instance IsRofiInput (P.Markup T.Text) where
-  toRofiInput = LB.fromStrict . TE.encodeUtf8 . P.render
-  toRofiInputString = T.unpack . P.render
+  toRofiInput = fmap (LB.fromStrict . TE.encodeUtf8) . P.render
 
 -- | Launch a prompt and read the output.
 rofiRun :: (MonadRofi env m, IsRofiInput input) => RofiPromptConfig -> [input] -> m (Maybe String)
@@ -135,9 +131,10 @@ rofiHistoryInput s input
       let histFile = dir ++ "/" ++ historyId ++ ".history"
       hinput <- io (doesFileExist histFile) >>= \case
         False -> return []
-        True -> map toRofiInput . lines <$> io (readFile histFile)
-      return $ reverse (L.nub hinput) ++ map toRofiInput input
-  | otherwise = pure $ map toRofiInput input
+        True -> mapM toRofiInput . lines =<< io (readFile histFile)
+      input' <- mapM toRofiInput input
+      return $ reverse (L.nub hinput) ++ input'
+  | otherwise = mapM toRofiInput input
 
 rofiHistorySave :: MonadRofi env m => RofiPromptConfig -> String -> m ()
 rofiHistorySave s ln
@@ -150,7 +147,6 @@ rofiHistorySave s ln
 
 rofiToProc :: RofiPromptConfig -> ProcessConfig () () ()
 rofiToProc pcfg =
-   --setCreateGroup True $
    setNewSession True $
    setCloseFds True $
    proc "rofi" (toRofiArgs pcfg)

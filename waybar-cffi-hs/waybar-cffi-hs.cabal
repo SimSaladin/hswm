@@ -1,4 +1,4 @@
-cabal-version: 3.12
+cabal-version: 3.0
 
 name: waybar-cffi-hs
 version: 0.1.0.0
@@ -11,6 +11,7 @@ maintainer: samuli.thomasson@pm.me
 build-type: Simple
 tested-with:
   GHC == 9.14.1
+  GHC == 9.12.4
   GHC == 9.12.2
 
 flag standalone
@@ -40,26 +41,24 @@ library
     Waybar.CFFI.Plugin.TH
     Waybar.CFFI.Plugin.HSWM
     Waybar.CFFI.Plugin.TextFormat
-  other-modules:
-    Paths_waybar_cffi_hs
-  autogen-modules:
-    Paths_waybar_cffi_hs
+  other-modules: Paths_waybar_cffi_hs
+  autogen-modules: Paths_waybar_cffi_hs
   hs-source-dirs: src
   build-depends:
-      base                >=4.20   && <5
+      hswm:ipc-api
+    , base                >=4.20   && <5
     , aeson               >=2.2.3  && <2.4
     , bytestring         ^>=0.12.2
     , data-default       ^>=0.8.0
     , monad-logger-aeson ^>=0.4.1
     , mtl                ^>=2.3.1
     , rio                ^>=0.1.24
-    , template-haskell    >=2.23   && <3
+    , template-haskell    >=2.20   && <3
     , text               ^>=2.1.2
     , haskell-gi-base    ^>=0.26.9
     , gi-gtk3            ^>=3.0.44
     , gi-pango           ^>=1.0.30
     , gi-glib            ^>=2.0
-    , hswm:hswm-ipc-api
 
 foreign-library waybarhaskellplugin
   import: default-language, build-settings

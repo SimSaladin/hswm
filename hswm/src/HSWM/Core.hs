@@ -13,7 +13,6 @@ module HSWM.Core
     module HSWM.Types.Events,
     module HSWM.Types.WM,
     module HSWM.Types.TypeMap,
-    module HSWM.Util.Types,
     module HSWM.ManageHook,
     module HSWM.XKB,
     R.RiverColor(..),
@@ -25,7 +24,6 @@ import HSWM.Types.Config
 import HSWM.Types.Events
 import HSWM.Types.TypeMap
 import HSWM.Types.WM
-import HSWM.Util.Types
 import HSWM.XKB hiding (LogLevel(..))
 
 import qualified River as R

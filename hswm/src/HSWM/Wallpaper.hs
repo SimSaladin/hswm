@@ -16,7 +16,7 @@ module HSWM.Wallpaper
   )
 where
 
-import           HSWM.Core
+import           HSWM.Core hiding (size, width, height, scale)
 import qualified HSWM.BufferPool as BP
 import           HSWM.Utils (getPixmanFormatBE)
 
@@ -27,13 +27,11 @@ import qualified Pixman as P
 import qualified Bindings.River as R
 import qualified Bindings.Wayland.FractionalScaleV1 as FS
 import qualified Bindings.Wlr.LayerShellUnstableV1 as Wlr
-import qualified Bindings.Wlr.LayerShell.UnstableV1.Client.Generated as Wlr
 
 import qualified Codec.Picture as JP
 
 import qualified Data.Map as M
 import qualified Data.Vector.Storable as V
-import           Foreign
 
 -- * Usage
 

@@ -14,7 +14,6 @@ import           Text.XkbCommon
 import           Text.XkbCommon.EventCodes
 
 import qualified Data.Map as M
-import           Foreign
 
 -- * KeySym parsing
 

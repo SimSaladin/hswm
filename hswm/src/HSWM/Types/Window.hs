@@ -1,3 +1,6 @@
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE NoFieldSelectors #-}
+
 -- |
 -- Module      : HSWM.Types.Window
 -- Description : Short description
@@ -12,6 +15,8 @@ module HSWM.Types.Window
   , module X
   ) where
 
+import           HSWM.Types.Lens
+import           HSWM.Types.Simple
 import qualified River as R
 import           River.WindowManagement as X (RiverWindow, RiverSeat, RiverOutput, RiverNode)
 import qualified Bindings.River as R
@@ -19,7 +24,9 @@ import qualified Bindings.River as R
 data Window = Window
   { river_window             :: !RiverWindow
   , node                     :: !RiverNode
-  , x, y, width, height      :: !Int32
+  , position :: !Position
+  , size :: !Size
+  -- , x, y, width, height      :: !Int32
   , title, appId, identifier :: !String
     -- | Dimension hints
   , min_height, min_width, max_height, max_width :: !Int
@@ -35,7 +42,7 @@ data Window = Window
 
   , p_manage_action          :: [WindowManageAction]
   , p_render_border          :: Maybe R.RiverColor
-  , p_render_pos             :: Maybe (Int32, Int32)
+  , p_render_pos             :: Maybe Position
   , p_render_place_top       :: Maybe Bool
   , p_set_visible            :: Maybe Bool
 
@@ -54,3 +61,11 @@ data WindowManageAction
   | WToggleFullscreen
   | WRequestClose
   deriving (Eq, Show, Generic)
+
+makeLenses' [ ''Window ]
+
+instance HasSize Window where
+  size = windowSize
+
+instance HasPosition Window where
+  position = windowPosition

@@ -27,7 +27,7 @@ module HSWM.Layout.Minimize
   )
 where
 
-import HSWM hiding (Minimize)
+import HSWM
 import HSWM.Layout.BoringWindows as BW
 import HSWM.Layout.LayoutModifier
 import HSWM.StackSet qualified as W
@@ -67,15 +67,15 @@ instance LayoutModifier Minimize RiverWindow where
   modifierDescription _ = "Minimize"
 
   modifyLayout Minimize wksp rect = do
-    minimized <- XS.gets minimizedStack
+    minstack <- XS.gets minimizedStack
     let stack = W.stack wksp
-        filtStack = stack >>= W.filter (`notElem` minimized)
+        filtStack = stack >>= W.filter (`notElem` minstack)
     runLayout (wksp {W.stack = filtStack}) rect
 
   handleMess Minimize m
     | Just BW.UpdateBoring <- fromMessage m = do
-        minimized <- XS.gets minimizedStack
+        minstack <- XS.gets minimizedStack
         ws <- gets (W.workspace . W.current . view windowset)
-        flip sendMessageWithNoRefresh ws $ BW.Replace "Minimize" minimized
+        flip sendMessageWithNoRefresh ws $ BW.Replace "Minimize" minstack
         return Nothing
     | otherwise = return Nothing

@@ -21,7 +21,7 @@ module HSWM
   )
 where
 
-import Prelude hiding ((^?))
+import Prelude hiding ((^?), setEnv)
 import Data.Default as ReExports
 import Data.Semigroup as ReExports (All (..))
 

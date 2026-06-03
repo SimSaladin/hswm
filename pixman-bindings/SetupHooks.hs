@@ -1,7 +1,6 @@
-{-# LANGUAGE OverloadedLists     #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE StaticPointers #-}
-
+{-# LANGUAGE OverloadedLists   #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE StaticPointers    #-}
 
 {-# OPTIONS_GHC -Wall #-}
 
