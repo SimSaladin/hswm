@@ -11,7 +11,7 @@ import           Distribution.Simple.SetupHooks
 import           Distribution.Utils.Path
 
 setupHooks :: SetupHooks
-setupHooks = hsBindgenSetupHooks (static ()) def
+setupHooks = hsBindgenSetupHooks def
   { sources = [ pixmanSpec ] }
 
 pixmanSpec :: HsBindGen

@@ -13,15 +13,18 @@
 module Distribution.HsBindgen.Lens where
 
 import qualified Distribution.HsBindgen.Hooks as H
-import qualified Distribution.HsBindgen.Types as H
+-- import qualified Distribution.HsBindgen.Types as H
 
 import Lens.Micro
 import Lens.Micro.TH
 import Language.Haskell.TH
+import Data.Char
 
-concat <$> mapM (makeLensesWith (classyRules & lensField .~ (\_ _ n -> [TopName $ mkName $ nameBase n])))
+concat <$> mapM (makeLensesWith (classyRules & lensClass .~ const Nothing & lensField .~ (\_ _ n ->
+  case nameBase n of
+    b@(x : xs) -> [MethodName (mkName $ "Has" ++ toUpper x : xs) (mkName b)]
+    _ -> error "empty")))
   [ ''H.HsBindGenSetup
   , ''H.HsBindGen
-  , ''H.ProtocolSpec
   ]
 

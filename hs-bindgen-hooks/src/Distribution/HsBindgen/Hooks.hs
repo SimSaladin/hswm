@@ -1,4 +1,6 @@
 {-# LANGUAGE CPP                 #-}
+{-# LANGUAGE TypeFamilies #-}
+
 {-# LANGUAGE DerivingStrategies  #-}
 {-# LANGUAGE LambdaCase          #-}
 {-# LANGUAGE OverloadedLists     #-}
@@ -25,6 +27,8 @@ module Distribution.HsBindgen.Hooks
   , ExtBindingSpec(..)
   , makeBindingSpec
   , MkBindRules(..)
+  , PCRE
+  , ToPCRE(..)
 
   -- * Setup hooks
   , hsBindgenSetupHooks
@@ -49,26 +53,125 @@ import           Distribution.Simple.Program
 import           Distribution.Simple.Setup
 import           Distribution.Simple.SetupHooks
 import           Distribution.Simple.Utils
---import           Distribution.Simple.Build.Inputs
+import           Distribution.ModuleName
+import           Distribution.Pretty (prettyShow)
 import qualified Distribution.Types.BuildInfo.Lens as BI
 import           Distribution.Types.Library (explicitLibModules)
 import qualified Distribution.Types.Library.Lens as Lib
 import qualified Distribution.Types.LocalBuildConfig as LBC
 import           Distribution.Utils.Path
-import           Distribution.ModuleName
-import           Distribution.Pretty (prettyShow)
 
-import qualified Data.List.NonEmpty as NE
-import           System.Directory (doesFileExist)
-import           Control.Monad
 import           Control.Applicative
+import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.Default
 import           Data.Foldable
+import qualified Data.List as L
+import qualified Data.List.NonEmpty as NE
 import qualified Data.Map as M
+import           Data.Monoid
+import           Data.String
+import           Distribution.Pretty
+import qualified GHC.Exts as GHC (IsList(..))
 import           GHC.Generics (Generic)
+import           System.Directory (doesFileExist)
 import qualified System.FilePath as FP
-import Data.Monoid
+import qualified Text.PrettyPrint as PP
+
+-- | Settings for a hs-bindgen-cli invocation.
+data HsBindGen = HsBindGen
+  { headers                        :: [Location] -- [SymbolicPath Include 'File] -- ^ Header files
+  , moduleName                     :: Flag ModuleName -- ^ Output module name
+  , uniqueId                       :: Flag String
+  , omitFieldPrefixes              :: Flag Bool
+  , programSlicing                 :: Flag Bool
+  , cStandard                      :: Flag String
+  , genGlobal                      :: Flag Bool
+  , extBindingSpecs                :: [ExtBindingSpec]
+  , bindingSpec                    :: Flag BSpec
+  , selectDeprecated               :: Flag Bool
+  , selectFromMainHeaderDirs       :: Flag Bool
+  , excludeByDeclName              :: PCRE -- ^ PCRE
+  , extraArgs                      :: [String]  -- ^ Arbitrary additional arguments for @hs-bindgen-cli@
+  , includeDirs                    :: [SymbolicPath Pkg ('Dir Include)] -- ^ Include search directories (@-I@)
+  , hasPointer, hasSafe, hasUnsafe :: Flag Bool
+  , excludeHeaders                 :: PCRE -- [SymbolicPath Include 'File]
+  } deriving (Eq, Ord, Show, Generic, Binary)
+
+deriving instance Default HsBindGen
+deriving instance Semigroup HsBindGen
+
+instance Monoid HsBindGen where
+  mempty = def
+
+instance Pretty HsBindGen where
+  pretty c = PP.vcat [ PP.text (l ++ ":") PP.<+> doc
+    | (l, doc) <-
+      [ ("headers", commaSpaceSep $ map location c.headers)
+      , ("exclude-headers", pretty c.excludeHeaders)
+      , ("ext-binding-specs", commaSpaceSep c.extBindingSpecs)
+      ]
+                     ]
+
+-- * PCRE
+
+newtype PCRE = PCRE String
+  deriving (Eq, Ord, Show, Generic, Binary, Default)
+
+instance Semigroup PCRE where
+  p1@(PCRE a) <> p2@(PCRE b)
+    | p1 == mempty = p2
+    | p2 == mempty = p1
+    | otherwise   = PCRE $ a ++ "|" ++ b
+
+instance Monoid PCRE where
+  mempty = PCRE ""
+
+instance IsString PCRE where
+  fromString = PCRE
+
+instance GHC.IsList PCRE where
+  type Item PCRE = PCRE
+  fromList = fold
+  toList = pure
+
+instance Pretty PCRE where
+  pretty (PCRE x) = PP.text x
+
+-- * ToPCRE
+
+class ToPCRE a where
+  toPCRE :: a -> PCRE
+
+instance ToPCRE PCRE where
+  toPCRE = id
+instance {-# OVERLAPS #-} (ToPCRE a, Foldable t) => ToPCRE (t a) where
+  toPCRE = foldMap toPCRE
+instance ToPCRE String where
+  toPCRE = PCRE
+instance ToPCRE (SymbolicPathX abs from to) where
+  toPCRE = PCRE . interpretSymbolicPathCWD . normaliseSymbolicPath
+instance ToPCRE Location where
+  toPCRE = toPCRE . location
+
+-- * MkBindRules
+
+-- | Class of hooks configuration objects that should be followed up with hs-bindgen rules.
+class MkBindRules a where
+  -- | Additional setup hooks to run prior to the hs-bindgen hooks
+  preBindgenHooks :: [a] -> SetupHooks
+  preBindgenHooks _ = mempty
+
+  -- | For configure step.
+  bindTargets :: a -> [HsBindGen]
+
+  -- | For build step.
+  mkBindRules :: Traversable t => PreBuildComponentInputs -> t a -> RulesM [(HsBindGen, [Dependency])]
+
+-- | Run a simple set of hs-bindgen hooks only.
+instance MkBindRules HsBindGen where
+  bindTargets = return
+  mkBindRules _ xs = return [ (x, mempty) | x <- toList xs ]
 
 -- HsBindGenSetup
 
@@ -112,9 +215,6 @@ hsBindgenComponentPreConf setup pci
     genmodules = concatMap bindGenModules specs
     exposed _ = True -- XXX: should autogenerated module be exposed or not?
 
-    -- cdiff out | CLib lib <- pci.component = out { componentDiff = ComponentDiff . CLib $ doLib lib }
-    --           | otherwise                 = out
-
     doLib lib = CLib $ mempty
       & BI.autogenModules  .~ filter (`notElem` autogenModulesOld) genmodules
       & BI.otherModules    .~ filter (not . exposed) undeclaredModules
@@ -128,152 +228,69 @@ hsBindgenComponentPreConf setup pci
 
 preBuildRules :: MkBindRules a => HsBindGenSetup a -> Rules PreBuildComponentInputs -- -> RulesM ()
 preBuildRules setup = rules (static ()) $ \inputs -> do
+    let vflags     = buildingWhatVerbosity inputs.buildingWhat
+    let verb       = verbosityFromFlags vflags
     xs <- mkBindRules inputs setup.sources
     buildRules (map (, []) setup.modulesSimple <> xs) inputs
 
 buildRules :: [(HsBindGen, [Dependency])] -> PreBuildComponentInputs -> RulesM ()
 buildRules specs pbci = mdo
   (bindgen, _) <- liftIO $ requireProgram verb hsBindgenProgram (withPrograms pbci.localBuildInfo)
-  results <- forM (M.fromList [(spec.moduleName, x) | x@(spec, _) <- specs]) $
-    \(spec, extraDeps) ->
-        registerRule (fromString $ prettyShow spec.moduleName) $
-          mkBindgenRule vflags bindgen autogendir results spec extraDeps
+
+  results <- forM (M.fromList [(getModuleName spec, x) | x@(spec, _) <- specs]) $
+    \(spec, extraDeps) -> do
+        let mname = getModuleName spec
+        registerRule (fromString $ prettyShow mname) $
+          mkBindgenRule pbci.buildingWhat vflags bindgen autogendir results spec extraDeps
   return ()
   where
     vflags     = buildingWhatVerbosity pbci.buildingWhat
     verb       = verbosityFromFlags vflags
     autogendir = autogenComponentModulesDir pbci.localBuildInfo (targetCLBI pbci.targetInfo)
 
-mkBindgenRule :: VerbosityFlags
+getModuleName :: HsBindGen -> ModuleName
+getModuleName x = fromFlagOrDefault "Generated" x.moduleName
+
+mkBindgenRule :: BuildingWhat
+              -> VerbosityFlags
               -> ConfiguredProgram
               -> SymbolicPath Pkg (Dir Source)
               -> M.Map ModuleName RuleId
               -> HsBindGen
               -> [Dependency]
               -> Rule
-mkBindgenRule verbosityFlags bindgenProgram hsOutputDir done spec staticDeps =
-  dynamicRule (static Dict)
-    (mkCommand (static Dict) (static computeDepsAction) (done, spec))
-    (mkCommand (static Dict) (static createBindings) args)
-    staticDeps results
+mkBindgenRule what verbosityFlags bindgenProgram hsOutputDir done spec staticDeps =
+  staticRule (mkCommand (static Dict) (static createBindings) args) deps results
   where
-    args = PreProcessArgs{ bindgenOptions = fixup spec, ..}
+    args = PreProcessArgs
+      { bindgenOptions = spec
+      , bindgenCwd = buildingWhatWorkingDir what
+      , ..}
 
     -- 0-1x generated binding spec output (when applicable)
     -- 1-5x hs-bindgen results files (.hs)
-    results = Location hsOutputDir (genBindingSpec spec.moduleName) NE.:|
-      map (Location hsOutputDir) (bindingsModulePaths spec)
+    results = Location genBindingSpecDir (genBindingSpec $ getModuleName spec)
+      NE.:| fmap (Location hsOutputDir) (bindingsModulePaths spec)
 
-    genBindingSpecDir = hsOutputDir
-
-    fixup = appEndo $
-      Endo (\x -> if x.uniqueId == "" then mkUniqueId x else x) <>
-      Endo (\x -> if x.cStandard == "" then setCStd x else x)
-
-    mkUniqueId x = x { uniqueId  = filter (`elem` (['a'..'z'] :: String)) $ prettyShow x.moduleName }
-    setCStd x    = x { cStandard = (def :: HsBindGen).cStandard }
-
--- | Dynamic rule dependencies:
---
--- - Binding specs: static file (when 'BFile') or rule (when 'BModule') dependencies.
-computeDepsAction :: (_, HsBindGen) -> IO ([Dependency], ())
-computeDepsAction (done, spec) = do
-  let deps = spec.extBindingSpecs >>= \case
+    deps = staticDeps ++
+      (spec.extBindingSpecs >>= \case
         BFile loc -> pure $ FileDependency loc
         BModule nm -> pure $ RuleDependency $ RuleOutput (done M.! nm) 0
-  return (deps, ())
+      ) ++
+      [ FileDependency loc | PrescriptiveBSpec loc <- flagToList spec.bindingSpec ]
 
--- * MkBindRules
-
--- | Class of hooks configuration objects that should be followed up with hs-bindgen rules.
-class MkBindRules a where
-  -- | Additional setup hooks to run prior to the hs-bindgen hooks
-  preBindgenHooks :: [a] -> SetupHooks
-  preBindgenHooks _ = mempty
-
-  -- | For configure step.
-  bindTargets :: a -> [HsBindGen]
-
-  -- | For build step.
-  mkBindRules :: Traversable t => PreBuildComponentInputs -> t a -> RulesM [(HsBindGen, [Dependency])]
-
--- | Run a simple set of hs-bindgen hooks only.
-instance MkBindRules HsBindGen where
-  bindTargets = return
-  mkBindRules _ xs = return [ (x, mempty) | x <- toList xs ]
-
--- | Settings for a hs-bindgen-cli invocation.
-data HsBindGen = HsBindGen
-  { headers                        :: [SymbolicPath Include 'File] -- ^ Header files
-  , moduleName                     :: ModuleName -- ^ Output module name
-  , uniqueId                       :: String
-  , omitFieldPrefixes              :: Maybe Bool
-  , programSlicing                 :: Maybe Bool
-  , cStandard                      :: String
-  , genGlobal                      :: Maybe Bool
-  , extBindingSpecs                :: [ExtBindingSpec]
-  , bindingSpec                    :: BSpec
-  , selectDeprecated               :: Maybe Bool
-  , selectFromMainHeaderDirs       :: Maybe Bool
-  , excludeByDeclName              :: String -- ^ PCRE
-  , extraArgs                      :: [String]  -- ^ Arbitrary additional arguments for @hs-bindgen-cli@
-  , includeDirs                    :: [SymbolicPath Pkg ('Dir Include)] -- ^ Include search directories (@-I@)
-  , hasPointer, hasSafe, hasUnsafe :: Bool
-  , excludeHeaders                 :: [SymbolicPath Include 'File]
-  } deriving (Eq, Ord, Show, Generic, Binary)
-
-instance Monoid HsBindGen where
-  mempty = HsBindGen [] "" "" Nothing Nothing "" Nothing [] (GenerateBSpec Nothing) Nothing Nothing "" [] [] True True True []
-
--- | Almost as 'mempty' but a couple pre-filled defaults.
-instance Default HsBindGen where
-  def = mempty
-    { moduleName = "Generated"
-    , omitFieldPrefixes = Just True
-    , cStandard = "gnu23"
-    , genGlobal = Just True
-    }
-
-instance Semigroup HsBindGen where
-  a <> b = HsBindGen
-    { headers                  = a.headers ++ b.headers
-    , moduleName               = nonEmpty "" moduleName
-    , uniqueId                 = nonEmpty "" uniqueId
-    , omitFieldPrefixes        = altr omitFieldPrefixes
-    , programSlicing           = altr programSlicing
-    , cStandard                = nonEmpty "" cStandard
-    , genGlobal                = altr genGlobal
-    , extBindingSpecs          = a.extBindingSpecs ++ b.extBindingSpecs
-    , bindingSpec              = if a.bindingSpec == bindingSpec mempty then b.bindingSpec else a.bindingSpec
-    , selectDeprecated         = altr selectDeprecated
-    , selectFromMainHeaderDirs = altr selectFromMainHeaderDirs
-    , excludeByDeclName        = orPCRE excludeByDeclName
-    , extraArgs                = a.extraArgs ++ b.extraArgs
-    , includeDirs              = a.includeDirs ++ b.includeDirs
-    , hasPointer               = b.hasPointer
-    , hasSafe                  = b.hasSafe
-    , hasUnsafe                = b.hasUnsafe
-    , excludeHeaders           = a.excludeHeaders ++ b.excludeHeaders
-    } where
-      nonEmpty :: Eq a => a -> (HsBindGen -> a) -> a
-      nonEmpty em f = if f a == em then f b else f a
-
-      altr f = f b <|> f a
-
-      orPCRE f
-        | f a == "" = f b
-        | f b == "" = f a
-        | otherwise = "(" ++ f a ++ ")|(" ++ f b ++ ")"
+    genBindingSpecDir = hsOutputDir
 
 -- | Names of the modules that ought to be generated (depends on configuration which files are generated).
 bindGenModules :: HsBindGen -> [ModuleName]
 bindGenModules spec =
-  [ spec.moduleName ] ++
-  [ spec.moduleName `suf` "FunPtr" | spec.hasPointer ] ++
-  [ spec.moduleName `suf` "Safe"   | spec.hasSafe ] ++
-  [ spec.moduleName `suf` "Unsafe" | spec.hasUnsafe ] ++
-  [ spec.moduleName `suf` "Global" | Just False /= spec.genGlobal ]
+  [ mname ] ++
+  [ mname `suf` "FunPtr" | Flag False /= spec.hasPointer ] ++
+  [ mname `suf` "Safe"   | Flag False /= spec.hasSafe ] ++
+  [ mname `suf` "Unsafe" | Flag False /= spec.hasUnsafe ] ++
+  [ mname `suf` "Global" | Flag False /= spec.genGlobal ]
     where
+      mname = getModuleName spec
       suf mo x = fromString $ prettyShow mo <.> x
 
 -- | File names of the generated bindings modules.
@@ -287,6 +304,10 @@ data ExtBindingSpec
   = BFile !Location -- ^ File reference (static)
   | BModule !ModuleName -- ^ Produced by another hs-bindgen-cli instance
   deriving (Eq, Ord, Show, Generic, Binary)
+
+instance Pretty ExtBindingSpec where
+  pretty (BFile l) = "file:" <> pretty (location l)
+  pretty (BModule m) = "mod:" <> pretty m
 
 -- | Prescriptive or generated binding spec for the current module?
 data BSpec
@@ -304,53 +325,58 @@ genBindingSpec nm = makeRelativePathEx $ "bindgen" </> prettyShow nm <.> "yaml"
 
 data PreProcessArgs = PreProcessArgs
   { verbosityFlags    :: VerbosityFlags
+  , bindgenCwd        :: Maybe (SymbolicPath CWD ('Dir Pkg))
   , bindgenProgram    :: ConfiguredProgram
   , bindgenOptions    :: HsBindGen
   , hsOutputDir       :: SymbolicPath Pkg (Dir Source) -- ^ Where to write .hs files
   , genBindingSpecDir :: SymbolicPath Pkg (Dir Source) -- ^ Where to store generated binding specs (.yaml)
   } deriving (Eq, Show, Generic, Binary)
 
-createBindings :: PreProcessArgs -> () -> IO ()
-createBindings PreProcessArgs{ bindgenOptions = gen, .. } _ = do
-  noticeNoWrap verb $ "Generating bindings for " ++ prettyShow gen.moduleName ++ "..."
-  runProgram verb bindgenProgram $
-    [ "-v", show $ verbosityLevelInt verb + 1 ] ++
+createBindings :: PreProcessArgs -> IO ()
+createBindings PreProcessArgs{ bindgenOptions = gen, .. } = do
+  noticeNoWrap verb $ "Generating bindings for " ++ prettyShow mname ++ "..."
+  runProgramCwd verb bindgenCwd bindgenProgram $
+    [ "-v", show $ verbosityLevelInt verb ] ++
     -- [ "--log-enable-macro-warnings" ] ++
     -- [ "--log-squashed-as-notice" ]
     [ "preprocess" ] ++
     [ "-I" ++ dir | dir <- includeSearchDirs ] ++
-    [ "--clang-option-before", "-std=" ++ gen.cStandard ] ++
+    [ "--clang-option-before", "-std=" ++ fromFlagOrDefault "gnu23" gen.cStandard ] ++
     [ "--external-binding-spec=" ++ file | file <- externalBindingSpecs ] ++
-    [ "--select-from-main-header-dirs"     | Just True == gen.selectFromMainHeaderDirs ] ++
-    [ "--select-except-deprecated"         | Just True /= gen.selectDeprecated ] ++
-    [ "--select-except-by-decl-name=" ++ x | x <- pure gen.excludeByDeclName, x /= "" ] ++
-    [ "--select-except-by-header-path=" ++ x | arg <- gen.excludeHeaders, let x = getSymbolicPath arg ] ++
-    [ "--enable-program-slicing"           | Just True <- pure gen.programSlicing ] ++
-    [ "--omit-field-prefixes"              | Just True <- pure gen.omitFieldPrefixes ] ++
-    [ "--unique-id=" ++ gen.uniqueId ] ++
-    [ "--module=" ++ prettyShow gen.moduleName ] ++
+    [ "--select-from-main-header-dirs"     | Flag True == gen.selectFromMainHeaderDirs ] ++
+    [ "--select-except-deprecated"         | Flag True /= gen.selectDeprecated ] ++
+    [ "--select-except-by-decl-name=" ++ x | arg@(PCRE x) <- pure gen.excludeByDeclName, arg /= mempty ] ++
+    [ "--select-except-by-header-path=" ++ x | arg@(PCRE x) <- pure gen.excludeHeaders, arg /= mempty ] ++
+    [ "--enable-program-slicing"           | Flag True == gen.programSlicing ] ++
+    [ "--omit-field-prefixes"              | Flag False /= gen.omitFieldPrefixes ] ++
+    [ "--unique-id=" ++ fromFlagOrDefault mkUniqueId gen.uniqueId ] ++
+    [ "--module=" ++ prettyShow mname ] ++
     [ "--hs-output-dir=" ++ interpretSymbolicPathCWD hsOutputDir ] ++
     [ mkBSpec gen.bindingSpec ] ++
     [ "--create-output-dirs" ] ++
     [ "--overwrite-files" ] ++
     gen.extraArgs ++
-    "--" : map getSymbolicPath gen.headers
-  ensureHsModuleOutput verb (interpretSymbolicPathCWD hsOutputDir) gen.moduleName
+    "--" : map (interpretSymbolicPathCWD . normaliseSymbolicPath . location) gen.headers
+  ensureHsModuleOutput verb (interpretSymbolicPath bindgenCwd hsOutputDir) mname
   where
+    mname = getModuleName gen
     verb = verbosityFromFlags verbosityFlags
     includeSearchDirs = interpretSymbolicPathCWD hsOutputDir : map interpretSymbolicPathCWD gen.includeDirs
     externalBindingSpecs = gen.extBindingSpecs >>= \case
         BFile file      -> pure . interpretSymbolicPathCWD $ location file
         BModule modname -> pure . interpretSymbolicPathCWD $ genBindingSpecDir </> genBindingSpec modname
     mkBSpec = \case
-      GenerateBSpec (Just loc) -> "--gen-binding-spec=" ++ interpretSymbolicPathCWD (location loc)
-      GenerateBSpec Nothing    -> "--gen-binding-spec=" ++ interpretSymbolicPathCWD (genBindingSpecDir </> genBindingSpec gen.moduleName)
-      PrescriptiveBSpec loc    -> "--prescriptive-binding-spec=" ++ interpretSymbolicPathCWD (location loc)
+      Flag (PrescriptiveBSpec loc)    -> "--prescriptive-binding-spec=" ++ interpretSymbolicPathCWD (location loc)
+      Flag (GenerateBSpec (Just loc)) -> "--gen-binding-spec=" ++ interpretSymbolicPathCWD (location loc)
+      _                               -> "--gen-binding-spec=" ++ interpretSymbolicPathCWD (genBindingSpecDir </> genBindingSpec mname)
+
+    mkUniqueId = filter (`elem` (['a'..'z'] :: String)) $ prettyShow mname
 
 ensureHsModuleOutput :: Verbosity -> FilePath -> ModuleName -> IO ()
 ensureHsModuleOutput v dir modname = do
   done <- doesFileExist filepath
   unless done $ do
+      warn v $ "Creating expected output file, because hs-bindgen-cli did not: " ++ filepath
       createDirectoryIfMissingVerbose v True (FP.takeDirectory filepath)
       rewriteFileEx v filepath $ "module " ++ prettyShow modname ++ " where"
   where

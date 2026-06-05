@@ -86,7 +86,7 @@
           name = "hswm";
           src = ./.;
 
-          compiler-nix-name = "ghc9141";
+          compiler-nix-name = "ghc9141llvm";
 
           flake = {
             variants = {
@@ -101,8 +101,6 @@
               ps.pixman-bindings
               ps.xkbcommon-bindings
               ps.hswm-bindings
-              #ps.glib
-              #ps.pango
               ps.haskell-gi
               ps.waybar-cffi-hs
             ];
@@ -110,7 +108,7 @@
             allToolDeps = true;
             tools = {
               #hoogle = { };
-              #cabal = { };
+              #cabal.version = "3.17.0.0";
               #hs-bindgen = { version = "0.1.0"; };
               #haskell-language-server = { };
             };
@@ -163,6 +161,14 @@
               };
               packages.hswm = {
                 components.library.build-tools = [
+                  config.ghc.package.llvmPackages.llvm
+                  config.ghc.package.llvmPackages.libclang
+                ];
+                components.sublibs.prelude.build-tools = [
+                  config.ghc.package.llvmPackages.llvm
+                  config.ghc.package.llvmPackages.libclang
+                ];
+                components.sublibs.ipc-api.build-tools = [
                   config.ghc.package.llvmPackages.llvm
                   config.ghc.package.llvmPackages.libclang
                 ];

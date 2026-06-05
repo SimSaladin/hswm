@@ -3,3 +3,4 @@ cabal.project.local*
 *_stub.h
 dist-newstyle
 dist-newstyle2
+/haddocks

@@ -53,48 +53,18 @@ common language
 library
     import: language
     exposed-modules:
-          WL.Util
+          WL.Viewporter
+          River.Client
+          River.XkbConfig
+          River.XkbBindings
+          River.InputManagement
+          River.WindowManagement
+          WL.Core.Client
           WL.Internals.TH
           WL.Internals.Types
-	  -- moduleles determined at build-time dynamically
-          -- WL.Core.Client
-          -- WL.Core.Server
-          -- WL.XdgShell.Client
-          -- WL.XdgShell.Server
-          -- WL.Viewporter.Client
-          -- WL.Viewporter.Server
-          -- WL.FractionalScale.Staging.V1.Client
-          -- WL.FractionalScale.Staging.V1.Server
-          -- WL.XdgOutput.Unstable.V1.Client
-          -- WL.XdgOutput.Unstable.V1.Server
-          -- WL.TextInput.Unstable.V3.Client
-          -- WL.TextInput.Unstable.V3.Server
-          -- WL.ExtIdleNotify.Staging.V1.Client
-          -- WL.ExtIdleNotify.Staging.V1.Server
-          -- WL.ExtSessionLock.Staging.V1.Client
-          -- WL.ExtSessionLock.Staging.V1.Server
-          -- WL.ExtForeignToplevelList.Staging.V1.Client
-          -- WL.ExtForeignToplevelList.Staging.V1.Server
-          -- WL.Wlr.LayerShell.Unstable.V1.Client
-          -- WL.Wlr.LayerShell.Unstable.V1.Server
-          -- WL.Wlr.OutputManagement.Unstable.V1.Client
-          -- WL.Wlr.OutputManagement.Unstable.V1.Server
-          -- WL.Wlr.OutputPowerManagement.Unstable.V1.Client
-          -- WL.Wlr.OutputPowerManagement.Unstable.V1.Server
-          -- WL.Wlr.InputMethod.Unstable.V2.Client
-          -- WL.Wlr.InputMethod.Unstable.V2.Server
-          -- River.WindowManagement.V1.Client
-          -- River.WindowManagement.V1.Server
-          -- River.InputManagement.V1.Client
-          -- River.InputManagement.V1.Server
-          -- River.LayerShell.V1.Client
-          -- River.LayerShell.V1.Server
-          -- River.LibinputConfig.V1.Client
-          -- River.LibinputConfig.V1.Server
-          -- River.XkbBindings.V1.Client
-          -- River.XkbBindings.V1.Server
-          -- River.XkbConfig.V1.Client
-          -- River.XkbConfig.V1.Server
+          WL.Internals.Utils
+          WL.Util
+          -- Most exposed modules are determined at configure time
     other-modules:
           Paths_hswm_bindings
     autogen-modules:
