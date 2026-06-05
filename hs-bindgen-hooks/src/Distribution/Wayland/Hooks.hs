@@ -1,10 +1,8 @@
 {-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE TypeFamilies #-}
-
 {-# LANGUAGE ViewPatterns #-}
 {-# LANGUAGE PatternSynonyms #-}
 {-# LANGUAGE QuasiQuotes #-}
-
 
 -- |
 -- Module      : Distribution.Wayland.Hooks
@@ -42,7 +40,6 @@ import           Distribution.Types.LocalBuildConfig
 import           Distribution.Types.LocalBuildInfo
 import           Distribution.Utils.Path
 
-import Debug.Trace
 import           Control.Monad
 import           Control.Monad.Fix (MonadFix)
 import           Control.Monad.IO.Class
@@ -83,11 +80,11 @@ instance MkBindRules ProtocolSpec where
     return $ mconcat results
 
 protoAutogenModules :: ProtocolSpec -> [(Bool, ModuleName)] -- bool true if export the module
-protoAutogenModules spec = traceShowId [ (ex, mn)
+protoAutogenModules spec =
+  [ (ex, mn)
     | (ex, k) <- [ (True, WrapClient), (True, WrapServer), (False, InfoModule) ]
     , Just mn <- [ spec ^? computedModuleNames . ix k ]
-    , not $ spec & has (disabled . ix k)
-  ]
+    , not $ spec & has (disabled . ix k) ]
 
 registerProtocolRule :: ProtocolSpec -> String -> Rule -> RulesM RuleId
 registerProtocolRule spec label = registerRule (fromString $ "wl::" ++ spec.fullName ++ "::" ++ label)
@@ -117,6 +114,8 @@ registerGenerateRulesIfEnabled mkenv pbci spec
 -- ** ScannerOutput
 
 instance (Typeable a, HasScannerResult r) => Generated (ScannerOutput a r) where
+
+  -- TODO
   data Env (ScannerOutput a r) = ScannerArgs
     { sVerbosity :: VerbosityFlags -- verbosity
     , sWorkdir   :: Maybe (SymbolicPath CWD ('Dir Pkg)) -- workdir
@@ -125,6 +124,23 @@ instance (Typeable a, HasScannerResult r) => Generated (ScannerOutput a r) where
     , sProtoXML  :: SymbolicPath Pkg 'File -- proto.xml
     , sResult    :: Location -- result
     }
+
+class Typeable a => HasScannerResult (a :: ScannerResult) where
+  scannerResultRelativePath :: Proxy a -> ProtocolSpec -> RelativePath from 'File
+  scannerCommand :: Proxy a -> String
+
+instance HasScannerResult EnumBindings where
+  scannerResultRelativePath _ spec = makeRelativePathEx $ spec.fullName ++ "-enums.h"
+  scannerCommand _ = "enum-header"
+instance HasScannerResult ClientBindings where
+  scannerResultRelativePath _ spec = makeRelativePathEx $ spec.fullName ++ "-client-protocol.h"
+  scannerCommand _ = "client-header"
+instance HasScannerResult ServerBindings where
+  scannerResultRelativePath _ spec = makeRelativePathEx $ spec.fullName ++ "-server-protocol.h"
+  scannerCommand _ = "server-header"
+instance HasScannerResult PrivateSource where
+  scannerResultRelativePath _ spec = makeRelativePathEx $ spec.fullName ++ "-protocol-private.c"
+  scannerCommand _ = "private-code"
 
 type ScannerArgs =
   ( VerbosityFlags -- verbosity
@@ -156,23 +172,6 @@ scannerAction (vflags, mwd, scanner, cmd, protoXml, dst) = do
    v   = verbosityFromFlags vflags
    xml = interpretSymbolicPath mwd protoXml
    froml = interpretSymbolicPath mwd . location
-
-class Typeable a => HasScannerResult (a :: ScannerResult) where
-  scannerResultRelativePath :: Proxy a -> ProtocolSpec -> RelativePath from 'File
-  scannerCommand :: Proxy a -> String
-
-instance HasScannerResult EnumBindings where
-  scannerResultRelativePath _ spec = makeRelativePathEx $ spec.fullName ++ "-enums.h"
-  scannerCommand _ = "enum-header"
-instance HasScannerResult ClientBindings where
-  scannerResultRelativePath _ spec = makeRelativePathEx $ spec.fullName ++ "-client-protocol.h"
-  scannerCommand _ = "client-header"
-instance HasScannerResult ServerBindings where
-  scannerResultRelativePath _ spec = makeRelativePathEx $ spec.fullName ++ "-server-protocol.h"
-  scannerCommand _ = "server-header"
-instance HasScannerResult PrivateSource where
-  scannerResultRelativePath _ spec = makeRelativePathEx $ spec.fullName ++ "-protocol-private.c"
-  scannerCommand _ = "private-code"
 
 -- * InfoModule
 
@@ -253,7 +252,8 @@ wrapRulesWith proxy bindc pbci spec = do
                           , dstModule = modName
                           , bindgen = bgen
                           , inputFile = interpretSymbolicPathLBI pbci.localBuildInfo fileIn
-                          , ..}
+                          , ..
+                          }
 
   -- watch the config files for changes
   addRuleMonitors [ monitorFileHashed $ getSymbolicPath fileIn ]
@@ -292,7 +292,7 @@ generateWrapperModuleAction GenWrapModArgs{..} = do
   override <- doesFileExist inputFile
   contents <- if override
                  then do
-                   notice v $ "Picked up custom template for " ++ prettyShow dstModule ++ " (" ++ inputFile ++ ")"
+                   infoNoWrap v $ "Picked up custom template for " ++ prettyShow dstModule ++ " (" ++ inputFile ++ ")"
                    withFileContents inputFile $ \x -> length x `seq` return x
                  else pure "clientFromProtocolXML' commonSettings protoXml"
 
@@ -364,11 +364,11 @@ preConfComponent specs pci@PreConfComponentInputs{localBuildConfig=lbc, packageB
 protocolRules :: PreBuildComponentInputs -> ProtocolSpec -> RulesM [(HsBindGen, [Dependency])]
 protocolRules pbci@PreBuildComponentInputs{buildingWhat=what, localBuildInfo=lbi} spec = do
 
-  liftIO $ noticeNoWrap v $ prettyShow spec
+  liftIO $ infoNoWrap v $ prettyShow spec
 
   xml' <- liftIO $ findFileCwd v (buildingWhatWorkingDir what) searchDirs spec.protocolXML
   let xmlFP = interpretSymbolicPathLBI lbi xml'
-  liftIO $ notice v $ "Found protocol source file " ++ spec.fullName ++ ": " ++ xmlFP ++ " (" ++ show xml' ++ ")"
+  liftIO $ debugNoWrap v $ "Found protocol source file " ++ spec.fullName ++ ": " ++ xmlFP ++ " (" ++ show xml' ++ ")"
 
   addRuleMonitors $ monitorFileHashedSearchPath [] xmlFP
 
@@ -376,10 +376,10 @@ protocolRules pbci@PreBuildComponentInputs{buildingWhat=what, localBuildInfo=lbi
   let ifaceNames = [ x.name | x <- proto.interfaces ]
       ifaceDeps  = getProtocolInterfaceDeps proto
   liftIO $ do
-    noticeNoWrap v $ "Protocol: " ++ proto.name
-    noticeNoWrap v $ "  Provides: " ++ unwords ifaceNames
-    noticeNoWrap v $ "  Depends on: " ++ unwords ifaceDeps
-    infoNoWrap v $ "Using protocol XML file " ++ xmlFP  ++ " for " ++ spec.fullName ++ " (" ++ getSymbolicPath spec.protocolXML ++ ")"
+    infoNoWrap v $ "Protocol: " ++ proto.name
+    infoNoWrap v $ "  Provides: " ++ unwords ifaceNames
+    infoNoWrap v $ "  Depends on: " ++ unwords ifaceDeps
+    infoNoWrap v $ "  Using protocol XML file " ++ xmlFP  ++ " for " ++ spec.fullName ++ " (" ++ getSymbolicPath spec.protocolXML ++ ")"
 
   (scanner, _) <- liftIO $ requireProgram v (simpleProgram "wayland-scanner") lbi.localBuildConfig.withPrograms
 

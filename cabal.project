@@ -6,41 +6,29 @@ packages:
   ./waybar-cffi-hs
   ./xkbcommon-bindings
 
--- extra-packages: generics-sop, lens-sop
-
-write-ghc-environment-files: never
 jobs: $ncpus
-verbose: 1
-
+optimization: False
+verbose: 0
 index-state: 2026-06-04T23:15:22Z
 
--- hs-bindgen (unreleased) (28-05-2026)
-source-repository-package
-  type: git
-  location: https://github.com/well-typed/hs-bindgen
-  branch: main
-  tag: 24ed914383635226710306cd12499f09d61adb40
-  subdir:
-    c-expr-runtime
-    c-expr-dsl
-    hs-bindgen
-    hs-bindgen-runtime
-  --sha256: sha256-kYyOI/Er47TMHSyNI+qMHaaPHN1lD9a2epAcKLPvPwQ=
+write-ghc-environment-files: never
 
--- libclang-bindings (unreleased) for hs-bindgen (22-05-2026)
-source-repository-package
-  type: git
-  location: https://github.com/well-typed/libclang-bindings
-  tag: 51b4b4972ea7ee8f7848f962e8524b6cd3eb4a84
-  subdir: libclang-bindings
-  --sha256: 0ah4fjl3mfacz1dgpcwmjlm5ay2c4khv5c54s28b6b5fhvv9zy3v
+-- local packages only
+executable-stripping: True
+library-stripping: True
 
--- doxygen-parser (unreleased) for hs-bindgen (04-05-2026)
-source-repository-package
-  type: git
-  location: https://github.com/well-typed/doxygen-parser
-  tag: 33b5074eb5122062ac41fa8b9ed0596d39913b63
-  --sha256: 0xj6lilgj70rs3fcc86gl30z5imghx9jgiwalvw9q8ldlpd7hvgc
+haddock-hoogle: True
+haddock-html: True
+haddock-hyperlink-source: True
+haddock-quickjump: True
+open: true
+
+-- for all packages
+package *
+   documentation: True
+
+import: project-cabal/hs-bindgen.config
+import: project-cabal/cabal-3.17.config
 
 -- gtk2hs fixed for GHC 9.14.1 & Cabal-3.17
 source-repository-package
@@ -50,29 +38,6 @@ source-repository-package
   tag: 900fcd8aff7eb1c21b5b83e887cc35ec911d21ed
   subdir: cairo glib tools pango
   --sha256: 09kcp0vm0i703fllcny4ph2sa67d0gahr8wknr1vgrlyhwn0hff0
-
--- Cabal, cabal-install 3.17 (unreleased)
-source-repository-package
-  type: git
-  location: https://github.com/haskell/cabal
-  -- branch: master
-  tag: 832789ea85297f0b5c3f92d63f8238eb3241614d
-  subdir:
-    Cabal
-    Cabal-hooks
-    Cabal-syntax
-    cabal-install
-    cabal-install-solver
-    hooks-exe
-  --sha256: 0x3rwmldnzzyi718h48ggm0630wiz2bbjgp2f3wpcvyqb46gxwcw
-
--- cabal-doctest fixed for Cabal-3.17
-source-repository-package
-  type: git
-  location: https://github.com/SimSaladin/cabal-doctest
-  branch: cabal-3.17
-  tag: 615d46e72a47062cd76abe4bdb43d088cc3e0bdb
-  --sha256: 1vn4w9k5mc1mzlhpxaai1j70svvdvfkl7npl7rnabp35vczpp39k
 
 -- Temporary relaxes for GHC 9.14.1
 if impl(ghc >= 9.14)
@@ -86,13 +51,3 @@ if impl(ghc >= 9.14)
   allow-newer: skew-list-0.1:base
   allow-newer: typerep-map-0.7.0.0:base
   allow-newer: hs-bindgen:aeson
-
--- * Documentation
-
---documentation: True
---haddock-hoogle: True
---haddock-html: True
---haddock-html-location: https://hackage.haskell.org/packages/archive/$pkg/latest/doc/html
---haddock-internal: True
---haddock-hyperlink-source: True
---haddock-keep-temp-files: True

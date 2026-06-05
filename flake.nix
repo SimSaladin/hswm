@@ -97,7 +97,9 @@
             packages.xkbcommon-bindings = { };
             packages.pixman-bindings = { };
             packages.hswm-bindings = {
-              components.library.build-tools = [ pkgs.wayland-scanner ];
+              components.library.build-tools = [
+                pkgs.wayland-scanner
+              ];
             };
             packages.hswm = {
               components.library.build-tools = [
@@ -121,21 +123,18 @@
         }; # project
 
         hs-bindgen = { lib, config, pkgs, ... }: {
-          # As pkg-config deps because these need to be propagated
           packages.hs-bindgen = {
-            components.exes.hs-bindgen-cli.pkgconfig = [ [
+            # As pkg-config deps because these need to be propagated
+            components.exes.hs-bindgen-cli.pkgconfig = [[
               pkgs.hsBindgenHook
               pkgs.doxygen
-              # clang exe needed for full macro support
-              config.ghc.package.llvmPackages.libclang
-            ] ];
+              config.ghc.package.llvmPackages.libclang # clang exe needed for full macro support
+            ]];
           };
-
           packages.libclang-bindings = {
-            components.library.libs = [ config.ghc.package.llvmPackages.libclang ];
             components.library.build-tools = [ config.ghc.package.llvmPackages.llvm ];
+            components.library.libs = [ config.ghc.package.llvmPackages.libclang ];
           };
-
           packages.c-expr-dsl = {
             components.library.libs = [ config.ghc.package.llvmPackages.libclang ];
           };
@@ -146,9 +145,9 @@
 
         hls = final.haskell-nix.cabalProject' ({ lib, config, buildProject, pkgs, ... }: {
           src = inputs.hls;
-          index-state = "2026-04-16T00:00:00Z";
-          #compiler-nix-name = lib.mkForce "ghc9124";
           compiler-nix-name = "ghc9141llvm";
+          #compiler-nix-name = lib.mkForce "ghc9124";
+          index-state = "2026-04-16T00:00:00Z";
           #builderVersion = 2;
           modules = [({ ... }: {
             #packages.haskell-language-server.planned = true;
@@ -161,16 +160,13 @@
         hnix = final.haskell-nix.cabalProject' ({ lib, config, buildProject, pkgs, ... }: {
           name = "hswm";
           src = ./.;
-
           compiler-nix-name = "ghc9141llvm";
-
           builderVersion = 2;
+          index-state = "2026-06-04T23:15:22Z";
           #useLocalGhcLib = true;
-          #
           #cabalProjectLocal = '' '';
-          #
           #pkg-def-extras = [(_: { packages = { }; })];
-          #
+
           #ghcOverride = lib.mkForce (pkgs.buildPackages.haskell-nix.compiler.${"ghc91520260204"}.override {
           #    bootPkgs = pkgs.buildPackages.haskell-nix.compiler.ghc9141.bootPkgs;
           #    ghcEvalPackages = config.evalPackages;
@@ -184,23 +180,22 @@
 
           flake = {
             variants = {
-              ghc915.compiler-nix-name = lib.mkForce "ghc915";
-              ghc915.flake.packages = _: { };
+              builderV1 = {
+                builderVersion = lib.mkForce 1;
+                flake.packages = _: { };
+              };
+
+              ghc915 = {
+                compiler-nix-name = lib.mkForce "ghc915";
+                flake.packages = _: { };
+              };
+
               #ghc914llvm.compiler-nix-name = lib.mkForce "ghc9141llvm";
 
               ghc9124 = {
                 compiler-nix-name = lib.mkForce "ghc9124";
-                modules = [({ ... }: {
-                  #packages.haskell-language-server.planned = true;
-                })];
-                flake.packages = ps: { inherit (ps) haskell-language-server; };
-                #cabalProjectLocal = ''
-                #  extra-packages: haskell-language-server
-                #'';
+                flake.packages = _: { };
               };
-
-              builderV1.builderVersion = lib.mkForce 1;
-              builderV1.flake.packages = _: { };
             };
           };
 
@@ -230,8 +225,6 @@
             nativeBuildInputs = [
               # broken on v2-builder
               buildProject.projectVariants.builderV1.hsPkgs.cabal-install.components.exes.cabal
-              #config.hsPkgs.cabal-install.components.exes.cabal
-              #buildProject.projectVariants.ghc9124.hsPkgs.haskell-language-server.components.exes.haskell-language-server
               #config.hsPkgs.haskell-language-server.components.exes.haskell-language-server
             ];
             #shellHook = lib.mkBefore ''
@@ -278,15 +271,10 @@
       ) pkgs.hnix-flake.devShells;
 
       legacyPackages = {
-        inherit (pkgs)
-          hls
-          hnix
-          hnix-flake
-          haskell-nix
-          river
-          riverDebug
-          ;
-        };
+        inherit (pkgs) haskell-nix;
+        inherit (pkgs) river riverDebug;
+        inherit (pkgs) hnix hnix-flake hls;
+      };
     };
   };
 }

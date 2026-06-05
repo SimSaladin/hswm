@@ -1,10 +1,9 @@
-{-# LANGUAGE ViewPatterns #-}
-{-# LANGUAGE PatternSynonyms #-}
-{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE NoFieldSelectors #-}
-{-# LANGUAGE TypeData #-}
-
+{-# LANGUAGE NoFieldSelectors       #-}
+{-# LANGUAGE PatternSynonyms        #-}
+{-# LANGUAGE TemplateHaskell        #-}
+{-# LANGUAGE TypeData               #-}
+{-# LANGUAGE ViewPatterns           #-}
 
 -- |
 -- Module      : Distribution.HsBindgen.Types
@@ -17,39 +16,38 @@
 --
 module Distribution.HsBindgen.Types where
 
-import           Distribution.Simple.SetupHooks (Location)
-import           Distribution.HsBindgen.Hooks (HsBindGen, ExtBindingSpec, PCRE)
-import           Distribution.HsBindgen.Lens (HasExtBindingSpecs, HasExcludeByDeclName)
+import           Distribution.HsBindgen.Hooks (ExtBindingSpec, HsBindGen, PCRE)
+import           Distribution.HsBindgen.Lens (HasExcludeByDeclName, HasExtBindingSpecs)
 import qualified Distribution.HsBindgen.Lens as I
-import           Distribution.ModuleName (ModuleName, components)
+import           Distribution.ModuleName (ModuleName)
+import           Distribution.Simple.SetupHooks (Location)
 
 import           Control.Applicative
 import           Data.Char
+import           Data.Default
 import           Data.Functor
 import qualified Data.List as L
 import qualified Data.Map.Strict as M
+import           Data.Monoid
+import           Data.Proxy
 import           Data.Set (Set)
 import           Data.String
+import           Data.Typeable
 import           Distribution.Compat.Binary
 import qualified Distribution.Compat.CharParsing as P
 import           Distribution.Parsec
+import           Distribution.Pretty
 import           Distribution.Utils.Generic
-import Distribution.Pretty
-import qualified Text.PrettyPrint as PP
 import           Distribution.Utils.Path
 import           GHC.Fingerprint
 import           GHC.Generics (Generic)
-import Data.Default
-import Data.Typeable
-import Data.Proxy
+import           Language.Haskell.TH
 import           Lens.Micro
 import           Lens.Micro.GHC ()
-import Lens.Micro.TH
-import Language.Haskell.TH
-import Data.Monoid
+import           Lens.Micro.TH
+import qualified Text.PrettyPrint as PP
 
-getFpr :: forall {k} (a :: k). Typeable a => Proxy a -> Fingerprint
-getFpr _ = typeRepFingerprint (typeRep (undefined :: proxy (a :: k)))
+-- * Stability
 
 data Stability = Unstable | Staging | Stable | Unknown
   deriving (Eq, Ord, Show, Generic, Binary)
@@ -57,11 +55,12 @@ data Stability = Unstable | Staging | Stable | Unknown
 instance Default Stability where
   def = Unknown
 
-type data ScannerResult where
-  EnumBindings   :: ScannerResult
-  PrivateSource  :: ScannerResult
-  ClientBindings :: ScannerResult
-  ServerBindings :: ScannerResult
+-- * Components (Fingerprint)
+
+getFpr :: forall {k} (a :: k). Typeable a => Proxy a -> Fingerprint
+getFpr _ = typeRepFingerprint (typeRep (undefined :: proxy (a :: k)))
+
+-- * Build targes
 
 type data ProtocolResult where
   InfoModule    :: ProtocolResult
@@ -70,29 +69,39 @@ type data ProtocolResult where
 
 type data ClientOrServer = Client | Server
 
+type data ScannerResult where
+  EnumBindings   :: ScannerResult
+  PrivateSource  :: ScannerResult
+  ClientBindings :: ScannerResult
+  ServerBindings :: ScannerResult
+
 type ProtoComponent = Fingerprint
 
-pattern EnumBindings, ClientBindings, ServerBindings, InfoModule :: ProtoComponent
+allComponents, bindgenComponents :: [ProtoComponent]
+allComponents = [ InfoModule, WrapClient, WrapServer, EnumBindings, ClientBindings, ServerBindings ]
+bindgenComponents = [ EnumBindings, ClientBindings, ServerBindings ]
 
+pattern EnumBindings, ClientBindings, ServerBindings, InfoModule, WrapClient, WrapServer :: ProtoComponent
+pattern InfoModule     <- ((== getFpr (Proxy @InfoModule)) -> True) where
+        InfoModule     =       getFpr (Proxy @InfoModule)
+pattern WrapClient     <- ((== getFpr (Proxy @(WrapInterface Client))) -> True) where
+        WrapClient     =       getFpr (Proxy @(WrapInterface Client))
+pattern WrapServer     <- ((== getFpr (Proxy @(WrapInterface Server))) -> True) where
+        WrapServer     =       getFpr (Proxy @(WrapInterface Server))
+pattern EnumBindings   <- ((== getFpr (Proxy @EnumBindings)) -> True) where
+        EnumBindings   =       getFpr (Proxy @EnumBindings)
 pattern ClientBindings <- ((== getFpr (Proxy @ClientBindings)) -> True) where
         ClientBindings =       getFpr (Proxy @ClientBindings)
-
 pattern ServerBindings <- ((== getFpr (Proxy @ServerBindings)) -> True) where
         ServerBindings =       getFpr (Proxy @ServerBindings)
 
-pattern EnumBindings   <- ((== getFpr (Proxy @EnumBindings)) -> True) where
-        EnumBindings   =       getFpr (Proxy @EnumBindings)
-
-pattern InfoModule   <- ((== getFpr (Proxy @InfoModule)) -> True) where
-        InfoModule   =       getFpr (Proxy @InfoModule)
-
-pattern WrapClient, WrapServer :: ProtoComponent
-pattern WrapClient   <- ((== getFpr (Proxy @(WrapInterface Client))) -> True) where
-        WrapClient   =       getFpr (Proxy @(WrapInterface Client))
-pattern WrapServer   <- ((== getFpr (Proxy @(WrapInterface Server))) -> True) where
-        WrapServer   =       getFpr (Proxy @(WrapInterface Server))
+-- * ProtocolID, ProtocolSpec
 
 type ProtocolId = String
+
+type ProtocolConfig = ProtocolSpecX BindConfig
+
+type ProtocolSpec = ProtocolSpecX HsBindGen
 
 data ProtocolSpecX bindgen = ProtocolSpec
   { fullName            :: String -- ^ @river-window-management-v1@
@@ -110,9 +119,7 @@ data ProtocolSpecX bindgen = ProtocolSpec
   , computedComponents  :: Set ProtoComponent
   } deriving (Eq, Show, Generic, Binary)
 
-type ProtocolSpec = ProtocolSpecX HsBindGen
-
-type ProtocolConfig = ProtocolSpecX BindConfig
+-- * BindConfig
 
 data BindConfig = BindConfig
   { bcMainHeaders     :: [Location]
@@ -131,6 +138,8 @@ instance Show BindConfig where
     show x.excludeByDeclName
     ++ "}"
 
+-- * ProtocolScannerOptions
+
 data ProtocolScannerOptions = ProtocolScannerOptions
   { optionProtocolDirs     :: [SymbolicPath Pkg ('Dir DataDir)] -- ^ Additional paths in which to look for the the 'protocolXML' file.
   , optionDisabled         :: Set ProtoComponent
@@ -138,6 +147,7 @@ data ProtocolScannerOptions = ProtocolScannerOptions
   , optionCustom           :: Endo ProtocolSpec
   } deriving (Generic)
 
+-- * Lenses
 
 concat <$> mapM (makeLensesWith (classyRules & lensClass .~ const Nothing & lensField .~ (\_ _ n ->
   case nameBase n of
@@ -146,6 +156,7 @@ concat <$> mapM (makeLensesWith (classyRules & lensClass .~ const Nothing & lens
     [ ''BindConfig
     , ''ProtocolSpecX
     , ''ProtocolScannerOptions
+    , ''Stability
     ]
 
 instance Pretty ProtocolSpec where
@@ -154,9 +165,6 @@ instance Pretty ProtocolSpec where
     [ "Module:" PP.<+> pretty m PP.$+$ pretty bgen
       | (k, m) <- M.toList c.computedModuleNames, Just bgen <- [c ^? bindGens . ix k]
     ]) PP.<> "\n"
-
-allComponents = [ InfoModule, WrapClient, WrapServer, EnumBindings, ClientBindings, ServerBindings ]
-bindgenComponents = [ EnumBindings, ClientBindings, ServerBindings ]
 
 instance Default ProtocolScannerOptions where
   def = ProtocolScannerOptions
@@ -227,26 +235,24 @@ instance Parsec ProtocolConfig where
   parsec :: forall m. CabalParsing m => m ProtocolConfig
   parsec = do
       P.spaces
-      (dirs, (parts, (mstability, version, suffix))) <- parse
-      let fullName = L.intercalate "-" parts ++ maybe "" stability' mstability ++ maybe "" version' version
-          category = L.intercalate "-" (take 1 parts)
-          baseName = L.intercalate "-" (drop 1 parts)
-      return ProtocolSpec
-        { fullName
-        , baseName
-        , category
-        , version
-        , stability = maybe Unknown id mstability
-        , protocolXML = normaliseSymbolicPath $
-            if take 1 dirs /= [""]
-               then makeRelativePathEx (L.intercalate "/" dirs) </> makeRelativePathEx (fullName ++ suffix)
-               else makeRelativePathEx (fullName ++ suffix)
-        , bindGens = M.fromList [ (k, def) | k <- bindgenComponents ]
-        , disabled = mempty
-        , protocolDirs = [ normaliseSymbolicPath $ makeSymbolicPath (L.intercalate "/" dirs) | take 1 dirs == [""] ]
-        , computedModuleNames = mempty
-        , computedComponents = mempty
-        }
+      (dirs, (parts, (mstability, ver, suffix))) <- parse
+      let spec = ProtocolSpec
+            { fullName = L.intercalate "-" parts ++ maybe "" stability' mstability ++ maybe "" version' ver
+            , baseName = L.intercalate "-" (drop 1 parts)
+            , category = L.intercalate "-" (take 1 parts)
+            , version = ver
+            , stability = maybe Unknown id mstability
+            , protocolXML = normaliseSymbolicPath $
+                if take 1 dirs /= [""]
+                   then makeRelativePathEx (L.intercalate "/" dirs) </> makeRelativePathEx (spec.fullName ++ suffix)
+                   else makeRelativePathEx (spec.fullName ++ suffix)
+            , bindGens = M.fromList [ (k, def) | k <- bindgenComponents ]
+            , disabled = mempty
+            , protocolDirs = [ normaliseSymbolicPath $ makeSymbolicPath (L.intercalate "/" dirs) | take 1 dirs == [""] ]
+            , computedModuleNames = mempty
+            , computedComponents = mempty
+            }
+      return spec
     where
       parse = do
           dirs <- pDirs

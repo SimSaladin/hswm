@@ -1,13 +1,22 @@
 cradle:
   cabal:
+    - path: "hs-bindgen-hooks/src"
+      component: "lib:hs-bindgen-hooks"
+
     - path: "xkbcommon-bindings/src"
       component: "lib:xkbcommon-bindings"
+
+    - path: "pixman-bindings/src"
+      component: "lib:pixman-bindings"
 
     - path: "hswm/src"
       component: "lib:hswm"
 
     - path: "hswm/hswm-prelude"
-      component: "hswm:lib:hswm-prelude"
+      component: "hswm:lib:prelude"
+
+    - path: "hswm/ipc-api"
+      component: "hswm:lib:ipc-api"
 
     - path: "hswm/app/Main.hs"
       component: "hswm:exe:hswm"
