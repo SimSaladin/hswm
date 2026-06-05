@@ -15,9 +15,9 @@ module HSWM.Types.Output where
 import           HSWM.Types.Lens
 import           HSWM.Types.Simple
 import           HSWM.Types.Window
-import qualified Wayland as WL
+import qualified WL.Client as WL
 import qualified River as R
-import qualified Bindings.Wlr.OutputPowerManagementUnstableV1 as Wlr
+import qualified WL.Wlr.OutputPowerManagement.Unstable.V1.Client as Wlr
 import qualified Data.Aeson as A
 
 data Output = Output
@@ -30,7 +30,7 @@ data Output = Output
   , outputDescription      :: !String
   , layerShellOutput       :: !R.RiverLayerShellOutput
   , nonExclusive           :: Maybe (Int32, Int32, Int32, Int32) -- x, y, w, h
-  , outputPower            :: Maybe Wlr.OutputPower
+  , outputPower            :: Maybe Wlr.ZwlrOutputPower
   , wlOutput               :: !WL.Output
   }
   deriving stock (Eq, Show, Read, Generic)

@@ -10,8 +10,11 @@
 module River.Client
   ( module X
   , module WL.Internals.Types
+  -- * Misc
+  , CEnum.CEnum(..)
   ) where
 
+import River.WindowManagement as X
 import River.WindowManagement.V1.Client as X
 import River.XkbConfig.V1.Client as X
 import River.LayerShell.V1.Client as X
@@ -20,3 +23,5 @@ import River.InputManagement.V1.Client as X
 import River.LibinputConfig.V1.Client as X
 
 import WL.Internals.Types
+
+import qualified HsBindgen.Runtime.CEnum as CEnum

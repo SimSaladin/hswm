@@ -2,7 +2,7 @@ module HSWM.Wayland where
 
 import           HSWM.Types.TypeMap
 
-import qualified Wayland as WL
+import qualified WL.Client as WL
 
 -- * Registry tracking
 

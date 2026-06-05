@@ -13,10 +13,10 @@ module HSWM.Util.GrabKeyboard where
 import           HSWM.Core
 import           HSWM.Operations
 
-import qualified Wayland as WL
+import qualified WL.Client as WL
 import qualified River as R
 
-import           Bindings.Wlr.InputMethodUnstableV2 as Wlr
+import           WL.Wlr.InputMethod.Unstable.V2.Client as Wlr
 
 import           Control.Monad.Fix
 import qualified Data.Map as M

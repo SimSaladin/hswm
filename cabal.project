@@ -6,16 +6,13 @@ packages:
   ./waybar-cffi-hs
   ./xkbcommon-bindings
 
-extra-packages: generics-sop, lens-sop
+-- extra-packages: generics-sop, lens-sop
 
---package haskell-language-server
---  flags: -fourmolu -cabal -class -callHierarchy -eval -importlens -rename
---    -retrie -hlint -signatureHelp -splice -qualifyImportedNames -codeRange
---    -changeTypeSignature -gadt -explicitFields -refactor -semanticTokens
-
+write-ghc-environment-files: never
 jobs: $ncpus
-
 verbose: 1
+
+index-state: 2026-06-04T23:15:22Z
 
 -- hs-bindgen (unreleased) (28-05-2026)
 source-repository-package
@@ -69,9 +66,6 @@ source-repository-package
     hooks-exe
   --sha256: 0x3rwmldnzzyi718h48ggm0630wiz2bbjgp2f3wpcvyqb46gxwcw
 
--- tag: dd941a5598a0fc0cef25ceb3d8fe2d0059db3691
---sha256: 1r81bnkdssa5203wpxs4aqn58mx2jpdj6blsyh3h09z2qhyi4jx2
-
 -- cabal-doctest fixed for Cabal-3.17
 source-repository-package
   type: git
@@ -102,5 +96,3 @@ if impl(ghc >= 9.14)
 --haddock-internal: True
 --haddock-hyperlink-source: True
 --haddock-keep-temp-files: True
-
---write-ghc-environment-files: always

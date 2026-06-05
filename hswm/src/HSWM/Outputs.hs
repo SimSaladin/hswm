@@ -17,11 +17,10 @@ import           HSWM.Operations
 import qualified HSWM.StackSet as W
 import           HSWM.Wayland
 
-import qualified Wayland as WL
-
-import qualified Bindings.River as R
-import qualified Bindings.Wlr.OutputPowerManagementUnstableV1 as Wlr
-import qualified Bindings.Wayland.XdgOutputUnstableV1 as Zdg
+import qualified WL.Client as WL
+import qualified River as R
+import qualified WL.Wlr.OutputPowerManagement.Unstable.V1.Client as Wlr
+import qualified WL.XdgOutput.Unstable.V1.Client as Zdg
 
 import qualified Data.List as L
 import qualified Data.Map as M
@@ -75,10 +74,10 @@ handle = \case
     wlo <- bindGlobalWith @WL.Output name Nothing
     withObject $ \l -> WL.listenerAdd wlo l output
     -- xdg_output
-    zdg_output <- withObject $ \om -> Zdg.outputManagerGetXdgOutput om wlo
+    zdg_output <- withObject $ \om -> Zdg.zxdgOutputManagerGetXdgOutput om wlo
     withObject $ \l -> WL.listenerAdd zdg_output l output
     -- output power mgmt
-    power <- withObject $ \opm -> Wlr.outputPowerManagerGetOutputPower opm wlo
+    power <- withObject $ \opm -> Wlr.zwlrOutputPowerManagerGetOutputPower opm wlo
     modifyObjectDef $ \om -> om
       { pending_setup = M.adjust (\o -> o { wlOutput = wlo, outputPower = Just power }) output (pending_setup om) }
 

@@ -20,12 +20,11 @@ import           Text.XkbCommon
 import           Text.XkbCommon.EventCodes (fromEventCodeBTN)
 
 import qualified River as R
-import qualified Wayland as WL
 import qualified Pixman as P
 
 import           River (RiverColor(..))
-import qualified Bindings.River.WindowManagementV1 as R
-import qualified Bindings.Wayland.Client as WL
+--import qualified River.WindowManagementV1 as R
+import qualified WL.Client as WL
 
 import           Data.Char (toLower)
 import qualified Data.List as L

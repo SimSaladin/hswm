@@ -19,11 +19,10 @@ import qualified HSWM.StackSet as W
 import           HSWM.Utils
 import           HSWM.Wayland
 
-import qualified Wayland as WL
+import qualified WL.Client as WL
 import qualified River as R
 
-import qualified Bindings.River as R
-import qualified Bindings.Wayland.ExtIdleNotifyV1 as Ext
+import qualified WL.ExtIdleNotify.Staging.V1.Client as Ext
 
 import qualified Data.List as L
 import           GHC.Records
@@ -94,7 +93,7 @@ handleEvent = \case
       withObject $ \l -> WL.listenerAdd wlseat l seat
       -- Register idle notifier
       withObject $ \idleNotify -> do
-        idleN <- Ext.idleNotifierGetIdleNotification idleNotify (10 * 60 * 1000) wlseat
+        idleN <- Ext.extIdleNotifierGetIdleNotification idleNotify (10 * 60 * 1000) wlseat
         withObject $ \l -> WL.listenerAdd idleN l seat
 
     R.RiverSeatRemoved _ seat ->

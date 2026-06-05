@@ -1,4 +1,6 @@
-cabal-version:      2.2
+cabal-version:      3.14
+build-type:         Hooks
+--build-type:         Custom
 name:               pixman-bindings
 version:            0.1.0.0
 -- synopsis:
@@ -9,8 +11,6 @@ author:             Samuli Thomasson
 maintainer:         samuli.thomasson@pm.me
 -- copyright:
 category:           Graphics
---build-type:         Hooks
-build-type:         Custom
 extra-doc-files:    CHANGELOG.md
 tested-with:
       GHC == 9.14.1

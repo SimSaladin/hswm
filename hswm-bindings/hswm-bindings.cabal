@@ -53,17 +53,19 @@ common language
 library
     import: language
     exposed-modules:
-          WL.Viewporter
+          River
           River.Client
-          River.XkbConfig
-          River.XkbBindings
           River.InputManagement
           River.WindowManagement
+          River.XkbBindings
+          River.XkbConfig
+          WL.Client
           WL.Core.Client
           WL.Internals.TH
           WL.Internals.Types
           WL.Internals.Utils
           WL.Util
+          WL.Viewporter
           -- Most exposed modules are determined at configure time
     other-modules:
           Paths_hswm_bindings

@@ -17,10 +17,8 @@ import           HSWM.Core
 import           HSWM.Operations
 import qualified HSWM.StackSet as W
 
-import qualified Wayland as WL
+import qualified WL.Client as WL
 import qualified River as R
-
-import qualified Bindings.River as R
 
 import qualified Control.Monad.State as State
 import qualified Data.List as L

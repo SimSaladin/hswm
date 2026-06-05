@@ -13,8 +13,8 @@ module HSWM.Util.Debug where
 import           HSWM.Core
 import           HSWM.Utils
 
-import           Wayland qualified as WL
-import           Bindings.River qualified as R
+import           WL.Client qualified as WL
+import           River qualified as R
 
 import           Data.Map qualified as M
 

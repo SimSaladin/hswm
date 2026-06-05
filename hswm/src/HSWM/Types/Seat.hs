@@ -18,9 +18,8 @@ import HSWM.Types.Lens
 import HSWM.Types.Action
 import HSWM.Types.Window
 
-import qualified Wayland as WL
+import qualified WL.Client as WL
 import qualified River as R
-import qualified Bindings.River as R
 import Data.Kind
 
 type family Stateful (m :: Type -> Type) :: Type -> Type

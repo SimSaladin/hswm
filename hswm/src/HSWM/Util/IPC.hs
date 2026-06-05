@@ -18,7 +18,7 @@ import           HSWM.InputConfig (InputConfigState)
 import           HSWM.Operations
 import qualified HSWM.StackSet as W
 
-import qualified Bindings.River as R
+import qualified River as R
 import qualified Data.Aeson as A
 import qualified Data.ByteString.UTF8 as BUTF8
 import qualified Data.List as L

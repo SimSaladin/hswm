@@ -8,14 +8,15 @@
 -- Portability : unportable
 module HSWM.Types.Events where
 
-import Bindings.River qualified as R
-import Bindings.Wayland.Client qualified as WL
-import Bindings.Wayland.ExtIdleNotifyV1 qualified as Ext
-import Bindings.Wayland.ExtSessionLockV1 qualified as SL
-import Bindings.Wayland.ExtForeignTopLevelListV1 qualified as WL
-import Bindings.Wayland.XdgOutputUnstableV1 qualified as Xdg
-import Bindings.Wlr.InputMethodUnstableV2 qualified as Zwp
-import Bindings.Wlr.OutputManagementUnstableV1 qualified as Wlr
+import River qualified as R
+import WL.Client qualified as WL
+
+import WL.ExtIdleNotify.Staging.V1.Client qualified as Ext
+import WL.ExtSessionLock.Staging.V1.Client qualified as SL
+import WL.ExtForeignToplevelList.Staging.V1.Client qualified as WL
+import WL.XdgOutput.Unstable.V1.Client qualified as Xdg
+import WL.Wlr.InputMethod.Unstable.V2.Client qualified as Zwp
+import WL.Wlr.OutputManagement.Unstable.V1.Client qualified as Wlr
 
 import System.Posix (Signal)
 
@@ -57,19 +58,19 @@ data Event
   | WlKeyboardEvent !WL.KeyboardEvent
   | WlPointerEvent !WL.PointerEvent
   | -- Ext_*
-    ForeignTopLevelListV1 !WL.ForeignToplevelListEvent
-  | ForeignTopLevelHandleV1 !WL.ForeignToplevelHandleEvent
-  | SessionLockEvent !SL.SessionLockEvent
-  | ExtIdleNotificationEvent !Ext.IdleNotificationEvent
+    ForeignTopLevelListV1 !WL.ExtForeignToplevelListEvent
+  | ForeignTopLevelHandleV1 !WL.ExtForeignToplevelHandleEvent
+  | SessionLockEvent !SL.ExtSessionLockEvent
+  | ExtIdleNotificationEvent !Ext.ExtIdleNotificationEvent
   | -- Zwp_*
     ZwpIM2PopupSurfaceE !Zwp.InputPopupSurfaceEvent
   | ZwpIM2KeyboardGrabE !Zwp.InputMethodKeyboardGrabEvent
   | ZwpIM2E !Zwp.InputMethodEvent
   | -- Wlr_*
-    WlrOutputManagerEvent !Wlr.OutputManagerEvent
-  | WlrOutputHeadEvent !Wlr.OutputHeadEvent
+    WlrOutputManagerEvent !Wlr.ZwlrOutputManagerEvent
+  | WlrOutputHeadEvent !Wlr.ZwlrOutputHeadEvent
   | -- Xdg
-    ZdgOutputEvent !Xdg.OutputEvent
+    ZdgOutputEvent !Xdg.ZxdgOutputEvent
   deriving (Eq, Show, Generic)
 
 instance (Monoid (m All)) => Default (Event -> m All) where

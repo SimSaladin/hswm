@@ -12,7 +12,7 @@ module HSWM.BufferPool where
 import           HSWM.Core hiding (width, height, size)
 import           HSWM.Util.Posix
 
-import qualified Wayland as WL
+import qualified WL.Client as WL
 
 import qualified Data.List as L
 import           System.Posix (closeFd)

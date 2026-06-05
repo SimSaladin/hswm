@@ -19,7 +19,6 @@ import           HSWM.Types.Lens
 import           HSWM.Types.Simple
 import qualified River as R
 import           River.WindowManagement as X (RiverWindow, RiverSeat, RiverOutput, RiverNode)
-import qualified Bindings.River as R
 
 data Window = Window
   { river_window             :: !RiverWindow

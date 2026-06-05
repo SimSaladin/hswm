@@ -29,18 +29,18 @@ import qualified HSWM.Windows as Windows
 import           HSWM.Wayland
 import qualified HSWM.Util.Debug as Debug
 
-import qualified Wayland as WL
+import qualified WL.Client as WL
 import qualified River as R
 
-import           Bindings.Wayland.ExtIdleNotifyV1 as Ext
-import qualified Bindings.Wayland.FractionalScaleV1 as FS
-import           Bindings.Wayland.ExtForeignTopLevelListV1 as WL
-import qualified Bindings.Wayland.Viewporter as VP
-import qualified Bindings.Wayland.XdgOutputUnstableV1 as Zdg
-import           Bindings.Wlr.InputMethodUnstableV2 as Wlr
-import qualified Bindings.Wlr.LayerShellUnstableV1 as Wlr
-import qualified Bindings.Wlr.OutputManagementUnstableV1 as Wlr
-import qualified Bindings.Wlr.OutputPowerManagementUnstableV1 as Wlr
+import           WL.ExtIdleNotify.Staging.V1.Client as Ext
+import qualified WL.FractionalScale.Staging.V1.Client as FS
+import           WL.ExtForeignToplevelList.Staging.V1.Client as WL
+import qualified WL.Viewporter as VP
+import qualified WL.XdgOutput.Unstable.V1.Client as Zdg
+import           WL.Wlr.InputMethod.Unstable.V2.Client as Wlr
+import qualified WL.Wlr.LayerShell.Unstable.V1.Client as Wlr
+import qualified WL.Wlr.OutputManagement.Unstable.V1.Client as Wlr
+import qualified WL.Wlr.OutputPowerManagement.Unstable.V1.Client as Wlr
 
 import           Control.Concurrent.Thread.Delay as Conc (delay)
 import           Data.Char
@@ -197,13 +197,13 @@ startHSWM mainRun loggerSet logFunc wlDisplay config = do
       _ <- bindGlobalAuto'  @R.RiverLibinputConfig
       _ <- bindGlobalAuto'  @R.RiverInputManager
       _ <- bindGlobalAuto'  @R.RiverXkbConfig
-      _ <- bindGlobalAuto_  @Zdg.OutputManager
-      _ <- bindGlobalAuto'  @Wlr.OutputManager
-      _ <- bindGlobalAuto_  @Wlr.LayerShell
+      _ <- bindGlobalAuto_  @Zdg.ZxdgOutputManager
+      _ <- bindGlobalAuto'  @Wlr.ZwlrOutputManager
+      _ <- bindGlobalAuto_  @Wlr.ZwlrLayerShell
       _ <- bindGlobalAuto_  @FS.FractionalScaleManager
       _ <- bindGlobalAuto_  @VP.Viewporter
-      _ <- bindGlobalAuto_  @Wlr.OutputPowerManager
-      _ <- bindGlobalAuto_  @Ext.IdleNotifier
+      _ <- bindGlobalAuto_  @Wlr.ZwlrOutputPowerManager
+      _ <- bindGlobalAuto_  @Ext.ExtIdleNotifier
 
       logInfo "Installing signal handlers"
       _ <- io $ Posix.installHandler Posix.sigTERM (Posix.Catch $ runInH $ mainEvent $ MainSignal Posix.sigTERM) Nothing
@@ -363,12 +363,12 @@ instance HandleEvent H Event where
   handleEvent (LibinputDeviceEvent e) = InputConfig.handleLibinputDeviceEvent e
   handleEvent (XkbConfigEvent e) = InputConfig.handleXkbConfigEvent e
   handleEvent (XkbKeyboardEvent e) = InputConfig.handleXkbKeyboardEvent e
-  handleEvent (ForeignTopLevelListV1 (WL.ForeignToplevelListToplevel _ _ fh)) = WL.listenerAdd_ fh =<< getObject
-  handleEvent (WlrOutputManagerEvent (Wlr.OutputManagerHead _ _ head)) = WL.listenerAdd_ head =<< getObject
+  handleEvent (ForeignTopLevelListV1 (WL.ExtForeignToplevelListToplevel _ _ fh)) = WL.listenerAdd_ fh =<< getObject
+  handleEvent (WlrOutputManagerEvent (Wlr.ZwlrOutputManagerHead _ _ head)) = WL.listenerAdd_ head =<< getObject
   handleEvent (ExtIdleNotificationEvent e) = handleEvent e
   handleEvent _ = return ()
 
-instance HandleEvent H Ext.IdleNotificationEvent where
+instance HandleEvent H Ext.ExtIdleNotificationEvent where
   handleEvent = \case
-    Ext.IdleNotificationIdled{} -> runInHS $ setOutputPower False
-    Ext.IdleNotificationResumed{} -> runInHS $ setOutputPower True
+    Ext.ExtIdleNotificationIdled{} -> runInHS $ setOutputPower False
+    Ext.ExtIdleNotificationResumed{} -> runInHS $ setOutputPower True

@@ -25,10 +25,8 @@ module HSWM.InputConfig
 import           HSWM.Core
 
 import qualified River as R
-import qualified Wayland as WL
-
-import qualified Bindings.River as R
-import           Bindings.Wayland.Client (CEnum(..))
+import qualified WL.Client as WL
+import           WL.Client (CEnum(..))
 
 import           Data.Coerce (coerce)
 import qualified Data.List as L

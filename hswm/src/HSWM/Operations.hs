@@ -5,15 +5,14 @@ import qualified HSWM.StackSet as W
 
 import qualified River as R
 
-import qualified Bindings.River as R
-import qualified Bindings.Wlr.OutputPowerManagementUnstableV1 as Wlr
+import qualified WL.Wlr.OutputPowerManagement.Unstable.V1.Client as Wlr
 
 import qualified Data.List as L
 import qualified Data.Map as M
 import           Data.Ratio ((%))
 import qualified Data.Set as S
 import           Data.Time.Clock.System
-import System.Environment (executablePath)
+import           System.Environment (executablePath)
 -- import           Foreign (IntPtr, deRefStablePtr, intPtrToPtr, ptrToIntPtr, (.&.))
 import           System.IO (hGetContents, hPrint, print, writeFile)
 import qualified System.Posix as Posix
@@ -292,7 +291,7 @@ setOutputPower mode = do
     Nothing -> return ()
     Just power -> do
       logInfo $ "setting output power" :# [ "on" .= mode ]
-      Wlr.outputPowerSetMode power (if mode then Wlr.outputPowerModeOn else Wlr.outputPowerModeOff)
+      Wlr.zwlrOutputPowerSetMode power (if mode then Wlr.zwlrOutputPowerModeOn else Wlr.zwlrOutputPowerModeOff)
 
 --------------------------------------------------------------
 -- * Seats

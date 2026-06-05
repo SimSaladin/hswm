@@ -5,13 +5,13 @@ module HSWM.XKB
   )
 where
 
-import HSWM.Utils
-import HSWM.Types.Action
+import           HSWM.Types.Action
+import           HSWM.Utils
 
 import qualified River as R
-import qualified Wayland as WL
 import           Text.XkbCommon
 import           Text.XkbCommon.EventCodes
+import qualified WL.Client as WL
 
 import qualified Data.Map as M
 

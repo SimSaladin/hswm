@@ -36,7 +36,7 @@ import           HSWM.Types.Config
 import           HSWM.Types.Simple
 import           HSWM.Wayland (HasGlobalsRegistry(..))
 
-import qualified Wayland as WL
+import qualified WL.Client as WL
 
 import           Control.Monad.Fix
 import           Control.Monad.State
