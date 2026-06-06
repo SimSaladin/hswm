@@ -55,6 +55,8 @@
 
     perSystem = { system, lib, config, pkgs, ... }:
     let
+      inherit (inputs.flake-utils.lib) mkApp;
+
       overlays = [
         (final: _: {
           # roll our own for now because the nixpkgs one is rather old and lacks
@@ -142,41 +144,62 @@
       };
 
       projectOverlay = final: _: {
-
         hls = final.haskell-nix.cabalProject' ({ lib, config, buildProject, pkgs, ... }: {
           src = inputs.hls;
           compiler-nix-name = "ghc9141llvm";
-          #compiler-nix-name = lib.mkForce "ghc9124";
+          builderVersion = 1;
           index-state = "2026-04-16T00:00:00Z";
-          #builderVersion = 2;
-          modules = [({ ... }: {
-            #packages.haskell-language-server.planned = true;
-          })];
           flake.packages = ps: { inherit (ps) haskell-language-server; };
+        });
+
+        only-cabal = final.haskell-nix.cabalProject' ({ lib, config, buildProject, pkgs, ... }: {
+          src = ./project-cabal;
+          cabalProjectFileName = "cabal-3.17.cabal";
+          compiler-nix-name = "ghc9141llvm";
+          builderVersion = 1;
         });
 
         hnix-flake = final.hnix.flake { };
 
         hnix = final.haskell-nix.cabalProject' ({ lib, config, buildProject, pkgs, ... }: {
           name = "hswm";
-          src = ./.;
+
+          # Work around haskell.nix not handling sources imported in
+          # cabal.project
+          src = pkgs.runCommand "src" { } ''
+            cp -r --no-preserve=mode ${./.} $out
+            cd $out
+            while IFS=$'\n' read -r line; do
+              if [[ $line = import:* ]]; then
+                read -r _ uri <<< "$line"
+                if [[ $uri != http://* ]] && [[ $uri != https://* ]]; then
+                  cat "$uri"
+                  continue
+                fi
+              fi
+              echo "$line"
+            done <./cabal.project >>cabal.project.new
+            mv -v cabal.project.new cabal.project
+          '';
+
           compiler-nix-name = "ghc9141llvm";
-          builderVersion = 2;
           index-state = "2026-06-04T23:15:22Z";
+          builderVersion = 2;
           #useLocalGhcLib = true;
           #cabalProjectLocal = '' '';
-          #pkg-def-extras = [(_: { packages = { }; })];
 
-          #ghcOverride = lib.mkForce (pkgs.buildPackages.haskell-nix.compiler.${"ghc91520260204"}.override {
-          #    bootPkgs = pkgs.buildPackages.haskell-nix.compiler.ghc9141.bootPkgs;
-          #    ghcEvalPackages = config.evalPackages;
-          #});
+          # Enable optimizations when building as nix derivations
+          cabalProjectLocal = lib.mkAfter ''
+            optimization: True
+          '';
 
           modules = [
             hsNixModules.hs-bindgen
             hsNixModules.main
             hsNixModules.project
           ];
+
+          #pkg-def-extras = [(_: { packages = { }; })];
 
           flake = {
             variants = {
@@ -200,38 +223,55 @@
           };
 
           shell = {
+
             name = "default-shell";
+
             packages = ps: [
-              ps.haskell-gi-base
-              ps.gi-cairo
-              ps.gi-pango
-              ps.gi-glib
-              ps.gi-gtk3
-              ps.pixman-bindings
-              ps.hs-bindgen-hooks
-              ps.xkbcommon-bindings
-              ps.hswm-bindings
-              #ps.waybar-cffi-hs
+            #  ps.haskell-gi-base
+            #  ps.gi-cairo
+            #  ps.gi-pango
+            #  ps.gi-glib
+            #  ps.gi-gtk3
+            #  ps.pixman-bindings
+            #  ps.hs-bindgen-hooks
+            #  ps.xkbcommon-bindings
+            #  ps.hswm-bindings
+            #  #ps.waybar-cffi-hs
             ];
-            exactDeps = false;
-            allToolDeps = true;
+
+            additional = ps: [
+            #  ps.hs-bindgen
+            ];
+
+            withHoogle = true;
+            withHaddock = true;
+
             tools = {
+              #hoogle = { };
               #cabal.version = "3.17.0.0";
               #haskell-language-server = { };
             };
-            additional = ps: [
-              ps.hs-bindgen
-            ];
+
             nativeBuildInputs = [
               # broken on v2-builder
-              buildProject.projectVariants.builderV1.hsPkgs.cabal-install.components.exes.cabal
+              final.only-cabal.hsPkgs.cabal-install.components.exes.cabal
+              #buildProject.projectVariants.builderV1.hsPkgs.cabal-install.components.exes.cabal
               #config.hsPkgs.haskell-language-server.components.exes.haskell-language-server
             ];
-            #shellHook = lib.mkBefore ''
-            #  export CABAL_DIR=$HOME/.local/state/cabal
-            #'';
+
+            allToolDeps = true;
+
+            # force cabal to local packages only (no remote lookup)
+            exactDeps = true;
           };
         });
+      };
+
+      project = pkgs.hnix;
+
+      hoogleShell = project.shellFor {
+        #packages = ps: [ ps.hswm-bindings ];
+        withHoogle = true;
       };
 
     in
@@ -244,6 +284,17 @@
              Cabal-hooks.broken = "warn"; # or "ignore"
            };
          };
+      };
+
+      apps = {
+        hoogle-all = mkApp {
+          name = "hoogle-all";
+          drv = pkgs.writeShellApplication {
+            name = "hoogle-all";
+            runtimeInputs = [ hoogleShell ];
+            text = ''hoogle server --local'';
+          };
+        };
       };
 
       packages = pkgs.hnix-flake.packages // {
@@ -273,7 +324,17 @@
       legacyPackages = {
         inherit (pkgs) haskell-nix;
         inherit (pkgs) river riverDebug;
-        inherit (pkgs) hnix hnix-flake hls;
+        inherit (pkgs) hnix hnix-flake hls only-cabal;
+
+        inherit project;
+        inherit hoogleShell ;
+        hshell = pkgs.writeShellApplication {
+          name = "hoogle-all";
+          runtimeInputs = [ hoogleShell ];
+          text = ''
+            hoogle server --local
+          '';
+        };
       };
     };
   };

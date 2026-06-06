@@ -1,0 +1,10 @@
+-- vim: ft=cabalproject
+
+-- gtk2hs fixed for GHC 9.14.1 & Cabal-3.17
+source-repository-package
+  type: git
+  location: https://github.com/SimSaladin/gtk2hs
+  branch: cabal-3.17
+  tag: 900fcd8aff7eb1c21b5b83e887cc35ec911d21ed
+  subdir: cairo glib tools pango
+  --sha256: 09kcp0vm0i703fllcny4ph2sa67d0gahr8wknr1vgrlyhwn0hff0
