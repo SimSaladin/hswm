@@ -18,7 +18,9 @@
 
     #haskell-flake.url = "github:srid/haskell-flake";
 
-    haskellNix.url = "github:input-output-hk/haskell.nix";
+    # https://github.com/input-output-hk/haskell.nix/pull/2517/changes/
+    #haskellNix.url = "github:input-output-hk/haskell.nix/5b01b482aefbcadbe5388d8eb333f441f2127ce4";
+    haskellNix.url = "git+file:/home/sim/haskell.nix";
 
     hs-bindgen = {
       url = "github:well-typed/hs-bindgen";
@@ -44,20 +46,204 @@
 
   outputs = inputs@{ ... }: inputs.flake-parts.lib.mkFlake { inherit inputs; } {
 
-    systems = [ "x86_64-linux" /* "aarch64-linux" */ ];
-
-    imports = [
-      #inputs.haskell-flake.flakeModule
-      #./nix/haskell-flake.nix
+    systems = [
+      "x86_64-linux"
+    # "aarch64-linux"
     ];
+
+    imports = [ ];
 
     debug = true;
 
-    perSystem = { system, lib, config, pkgs, ... }:
+    perSystem = { self', system, lib, config, pkgs, ... }:
     let
       inherit (inputs.flake-utils.lib) mkApp;
 
+      checkMaterialization = false; # true;
+
+      # Materialization:
+      #
+      #   nix build .#<P>.plan-nix.passthru.generateMaterialized | bash nix/materialized/<P>
+      #
+      #   nix build .#<P>.plan-nix.passthru.calculateMaterializedSha | bash
+      #
+      #   Check:
+      #    1. set "checkMaterialization = true"
+      #    2. nix build .#project.plan-nix
+      #
+      materializeLocations = {
+        project = { attr = "project.plan-nix"; materialized = "./nix/materialized/project"; };
+        only-cabal = { attr = "only-cabal.plan-nix"; materialized = "./nix/materialized/cabal-plan-nix"; };
+      };
+
+      updateMaterialized = mkApp {
+        name = "update-materialized";
+        drv = pkgs.writeShellApplication {
+          name = "update-materialized";
+          runtimeInputs = [ /* self'.devShells.ghc-pkg-shell */ ];
+          text =
+            lib.concatMapStringsSep "\n\n" ({ attr, materialized }: ''
+              # Note: needs to run with checkMaterialization = false
+              if script=$(nix build .#${attr}.passthru.generateMaterialized --print-out-paths --no-link); then
+                env "$script" ${materialized}
+                echo "Successfully updated materialized directory ${materialized}!"
+              fi
+            '') (lib.attrValues materializedLocations);
+        };
+      };
+
+      hsNixModules = {
+
+        main = { lib, config, ... }: {
+          config = {
+            reinstallableLibGhc = true;
+            # workaround hsc2hs problem
+            packages =lib.genAttrs [ "zlib" "network" "haskell-gi" "haskell-gi-base" "filelock" "unix-time" ] (_: { components.library.depends = [ config.hsPkgs.process ]; });
+          };
+        };
+
+        project = { config, pkgs, ... }: {
+          config = {
+            packages.xkbcommon-bindings = { };
+            packages.pixman-bindings = { };
+            packages.hswm-bindings.components.library.build-tools = [ pkgs.wayland-scanner ];
+            packages.hswm = {
+              components.library.build-tools = [
+                config.ghc.package.llvmPackages.llvm
+                config.ghc.package.llvmPackages.libclang
+              ];
+              components.sublibs.prelude.build-tools = [
+                config.ghc.package.llvmPackages.llvm
+                config.ghc.package.llvmPackages.libclang
+              ];
+              components.sublibs.ipc-api.build-tools = [
+                config.ghc.package.llvmPackages.llvm
+                config.ghc.package.llvmPackages.libclang
+              ];
+              components.exes.hswm.build-tools = [
+                config.ghc.package.llvmPackages.llvm
+                config.ghc.package.llvmPackages.libclang
+              ];
+            };
+          };
+        };
+
+        hs-bindgen = { config, pkgs, ... }: {
+          # As pkg-config deps because these need to be propagated.
+          # The clang executable is needed for full macro support.
+          packages.hs-bindgen.components.exes.hs-bindgen-cli.pkgconfig = [[ config.ghc.package.llvmPackages.libclang pkgs.hsBindgenHook pkgs.doxygen ]];
+          packages.libclang-bindings.components.library.build-tools = [ config.ghc.package.llvmPackages.llvm ];
+          packages.libclang-bindings.components.library.libs = [ config.ghc.package.llvmPackages.libclang ];
+          packages.libclang-bindings.components.library.depends = [ config.hsPkgs.process ]; # for hsc2hs
+          packages.c-expr-dsl.components.library.libs = [ config.ghc.package.llvmPackages.libclang ];
+        };
+
+      };
+
+      projectOverlay = final: _: {
+
+        #hls = final.haskell-nix.cabalProject' ({ ... }: {
+        #  index-state = "2026-06-04T23:15:22Z";
+        #  #plan-sha256 = "";
+        #  name = "hls-project";
+        #  src = inputs.hls;
+        #  compiler-nix-name = "ghc9141llvm";
+        #  builderVersion = 1;
+        #  flake.packages = ps: { inherit (ps) haskell-language-server; };
+        #});
+
+        only-cabal = final.haskell-nix.cabalProject' ({ ... }: {
+
+          # important three to fix to avoid materialized drift!
+          compiler-nix-name = "ghc9141llvm";
+          index-state = "2026-06-04T23:15:22Z";
+          evalPackages = final.buildPackages;
+
+          name = "cabal-unreleased";
+          src = ./project-cabal;
+          cabalProjectFileName = "cabal-3.17.cabal";
+          builderVersion = 1;
+
+          materialized = let dir = ./. + materializedLocations.only-cabal.materialized; in
+          if builtins.pathExists (dir + "/default.nix") then dir else null;
+
+          inherit checkMaterialization;
+        });
+
+        project = final.haskell-nix.cabalProject' ({ lib, pkgs, ... }: {
+
+          # important three to fix to avoid materialized drift!
+          compiler-nix-name = "ghc9141llvm";
+          index-state = "2026-06-04T23:15:22Z";
+          evalPackages = final.buildPackages;
+
+          name = "hswm-dev";
+
+          modules = [
+            hsNixModules.hs-bindgen
+            hsNixModules.main
+            hsNixModules.project
+          ];
+
+          builderVersion = 2;
+          #pkg-def-extras = [(_: { packages = { }; })];
+          #useLocalGhcLib = true;
+
+          # Enable optimizations when building as nix derivations
+          cabalProjectLocal = lib.mkAfter ''
+            optimization: True
+          '';
+
+          # Work around haskell.nix not handling sources imported in
+          # cabal.project
+          src = pkgs.runCommand "src" { } ''
+            cp -r --no-preserve=mode ${./.} $out
+            cd $out
+            while IFS=$'\n' read -r line; do
+              if [[ $line = import:* ]]; then
+                read -r _ uri <<< "$line"
+                if [[ $uri != http://* ]] && [[ $uri != https://* ]]; then
+                  cat "$uri"
+                  continue
+                fi
+              fi
+              echo "$line"
+            done <./cabal.project >>cabal.project.new
+            mv -v cabal.project.new cabal.project
+            rm -f project-cabal/*.cabal
+          '';
+
+          flake = {
+            variants.builderV1.builderVersion = lib.mkForce 1;
+            variants.builderV1.flake.packages = _: { };
+          };
+
+          shell = {
+            name = "default-shell";
+            packages = ps: [
+              ps.hswm
+              ps.hswm-bindings
+              ps.pixman-bindings
+              ps.xkbcommon-bindings
+              ps.waybar-cffi-hs
+            ];
+            withHoogle = true;
+            withHaddock = true;
+            tools.hpack = { };
+            # broken on v2-builder
+            nativeBuildInputs = [ final.only-cabal.hsPkgs.cabal-install.components.exes.cabal ];
+            allToolDeps = true;
+          };
+
+          materialized = let dir = ./. + materializedLocations.project.materialized; in
+          if builtins.pathExists (dir + "/default.nix") then dir else null;
+          inherit checkMaterialization;
+        });
+
+      };
+
       overlays = [
+
         (final: _: {
           # roll our own for now because the nixpkgs one is rather old and lacks
           # features (the wm protocol etc.)
@@ -80,199 +266,17 @@
 
           callZon2Nix = final.callPackage ./nix/callZon2nix.nix { };
         })
+
         inputs.hs-bindgen.overlays.default
         inputs.haskellNix.overlay
         projectOverlay
+
       ];
 
-      hsNixModules = {
-        main = { lib, config, pkgs, ... }: {
-          config = {
-            reinstallableLibGhc = true;
-            packages.cabal-install.planned = true;
-            #packages.haskell-language-server.planned = true;
-          };
-        };
+      inherit (pkgs.haskell-nix) haskellLib;
+      inherit (pkgs) project;
 
-        project = { lib, config, pkgs, ... }: {
-          config = {
-            packages.xkbcommon-bindings = { };
-            packages.pixman-bindings = { };
-            packages.hswm-bindings = {
-              components.library.build-tools = [
-                pkgs.wayland-scanner
-              ];
-            };
-            packages.hswm = {
-              components.library.build-tools = [
-                config.ghc.package.llvmPackages.llvm
-                config.ghc.package.llvmPackages.libclang
-              ];
-              components.sublibs.prelude.build-tools = [
-                config.ghc.package.llvmPackages.llvm
-                config.ghc.package.llvmPackages.libclang
-              ];
-              components.sublibs.ipc-api.build-tools = [
-                config.ghc.package.llvmPackages.llvm
-                config.ghc.package.llvmPackages.libclang
-              ];
-              components.exes.hswm.build-tools = [
-                config.ghc.package.llvmPackages.llvm
-                config.ghc.package.llvmPackages.libclang
-              ];
-            };
-          };
-        }; # project
-
-        hs-bindgen = { lib, config, pkgs, ... }: {
-          packages.hs-bindgen = {
-            # As pkg-config deps because these need to be propagated
-            components.exes.hs-bindgen-cli.pkgconfig = [[
-              pkgs.hsBindgenHook
-              pkgs.doxygen
-              config.ghc.package.llvmPackages.libclang # clang exe needed for full macro support
-            ]];
-          };
-          packages.libclang-bindings = {
-            components.library.build-tools = [ config.ghc.package.llvmPackages.llvm ];
-            components.library.libs = [ config.ghc.package.llvmPackages.libclang ];
-          };
-          packages.c-expr-dsl = {
-            components.library.libs = [ config.ghc.package.llvmPackages.libclang ];
-          };
-        };
-      };
-
-      projectOverlay = final: _: {
-        hls = final.haskell-nix.cabalProject' ({ lib, config, buildProject, pkgs, ... }: {
-          src = inputs.hls;
-          compiler-nix-name = "ghc9141llvm";
-          builderVersion = 1;
-          index-state = "2026-04-16T00:00:00Z";
-          flake.packages = ps: { inherit (ps) haskell-language-server; };
-        });
-
-        only-cabal = final.haskell-nix.cabalProject' ({ lib, config, buildProject, pkgs, ... }: {
-          src = ./project-cabal;
-          cabalProjectFileName = "cabal-3.17.cabal";
-          compiler-nix-name = "ghc9141llvm";
-          builderVersion = 1;
-        });
-
-        hnix-flake = final.hnix.flake { };
-
-        hnix = final.haskell-nix.cabalProject' ({ lib, config, buildProject, pkgs, ... }: {
-          name = "hswm";
-
-          # Work around haskell.nix not handling sources imported in
-          # cabal.project
-          src = pkgs.runCommand "src" { } ''
-            cp -r --no-preserve=mode ${./.} $out
-            cd $out
-            while IFS=$'\n' read -r line; do
-              if [[ $line = import:* ]]; then
-                read -r _ uri <<< "$line"
-                if [[ $uri != http://* ]] && [[ $uri != https://* ]]; then
-                  cat "$uri"
-                  continue
-                fi
-              fi
-              echo "$line"
-            done <./cabal.project >>cabal.project.new
-            mv -v cabal.project.new cabal.project
-          '';
-
-          compiler-nix-name = "ghc9141llvm";
-          index-state = "2026-06-04T23:15:22Z";
-          builderVersion = 2;
-          #useLocalGhcLib = true;
-          #cabalProjectLocal = '' '';
-
-          # Enable optimizations when building as nix derivations
-          cabalProjectLocal = lib.mkAfter ''
-            optimization: True
-          '';
-
-          modules = [
-            hsNixModules.hs-bindgen
-            hsNixModules.main
-            hsNixModules.project
-          ];
-
-          #pkg-def-extras = [(_: { packages = { }; })];
-
-          flake = {
-            variants = {
-              builderV1 = {
-                builderVersion = lib.mkForce 1;
-                flake.packages = _: { };
-              };
-
-              ghc915 = {
-                compiler-nix-name = lib.mkForce "ghc915";
-                flake.packages = _: { };
-              };
-
-              #ghc914llvm.compiler-nix-name = lib.mkForce "ghc9141llvm";
-
-              ghc9124 = {
-                compiler-nix-name = lib.mkForce "ghc9124";
-                flake.packages = _: { };
-              };
-            };
-          };
-
-          shell = {
-
-            name = "default-shell";
-
-            packages = ps: [
-            #  ps.haskell-gi-base
-            #  ps.gi-cairo
-            #  ps.gi-pango
-            #  ps.gi-glib
-            #  ps.gi-gtk3
-            #  ps.pixman-bindings
-            #  ps.hs-bindgen-hooks
-            #  ps.xkbcommon-bindings
-            #  ps.hswm-bindings
-            #  #ps.waybar-cffi-hs
-            ];
-
-            additional = ps: [
-            #  ps.hs-bindgen
-            ];
-
-            withHoogle = true;
-            withHaddock = true;
-
-            tools = {
-              #hoogle = { };
-              #cabal.version = "3.17.0.0";
-              #haskell-language-server = { };
-            };
-
-            nativeBuildInputs = [
-              # broken on v2-builder
-              final.only-cabal.hsPkgs.cabal-install.components.exes.cabal
-              #buildProject.projectVariants.builderV1.hsPkgs.cabal-install.components.exes.cabal
-              #config.hsPkgs.haskell-language-server.components.exes.haskell-language-server
-            ];
-
-            allToolDeps = true;
-
-            # force cabal to local packages only (no remote lookup)
-            exactDeps = true;
-          };
-        });
-      };
-
-      project = pkgs.hnix;
-
-      hoogleShell = project.shellFor {
-        #packages = ps: [ ps.hswm-bindings ];
-        withHoogle = true;
-      };
+      projectFlake = project.flake { };
 
     in
     {
@@ -291,13 +295,15 @@
           name = "hoogle-all";
           drv = pkgs.writeShellApplication {
             name = "hoogle-all";
-            runtimeInputs = [ hoogleShell ];
+            runtimeInputs = [ self'.devShells.ghc-pkg-shell ];
             text = ''hoogle server --local'';
           };
         };
+
+        update-materialized = updateMaterialized;
       };
 
-      packages = pkgs.hnix-flake.packages // {
+      packages = projectFlake.packages // {
         # Export our overridden river for convenience.
         inherit (pkgs) river riverDebug;
 
@@ -312,29 +318,70 @@
         };
       };
 
-      devShells = lib.mapAttrs (k: v:
-        v.overrideAttrs (oa: {
-          shellHook = ''
-            export CABAL_DIR=$HOME/.local/state/cabal
-            ${oa.shellHook}
-          '';
-        })
-      ) pkgs.hnix-flake.devShells;
+      devShells =
+        let adjustedShellFor = project: args:
+              let
+                shell = project.shellFor (args);
+                key = if args ? name then args.name else null;
+              in
+              shell.overrideAttrs (oa: {
+                shellHook = ''
+                  ${defaultShellHook key}
+                  ${oa.shellHook}
+                '';
+              });
+
+            adjustShell = key: drv: drv.overrideAttrs (oa: {
+              shellHook = ''
+                ${defaultShellHook key}
+                ${oa.shellHook}
+              '';
+            });
+
+            # For haskell.nix v2 builder (writes to ~/.cabal by default)
+            defaultShellHook = key: ''
+              export CABAL_DIR=${if key == null then "$HOME/.local/state/cabal" else "$HOME/.local/state/cabal/${key}"}
+            '';
+
+            projectNames = [
+              "hs-bindgen-hooks"
+              "hswm"
+              "hswm-bindings"
+              "pixman-bindings"
+              "waybar-cffi-hs"
+              "xkbcommon-bindings"
+            ];
+
+            perProject = name: adjustedShellFor project {
+              name = "hswm-pkg-${name}";
+              packages = lib.mkForce (ps: [ ps.${name} ]);
+            };
+
+            # Note: v2 shell ignores exactDeps, additional, components
+            combinedShellFor = projectShells:
+              adjustedShellFor project {
+                name = "hswm-all";
+                packages = lib.mkForce (_: []);
+                inputsFrom = lib.map (x: x) projectShells;
+                allToolDeps = lib.mkForce false;
+                exposePackagesVia = "ghc-pkg";
+                withHoogle = true;
+                shellHook = ''unset PROMPT_COMMAND'';
+              };
+
+        in
+        lib.mapAttrs (_: adjustShell "hswm-default") projectFlake.devShells //
+        lib.genAttrs projectNames perProject //
+        {
+          ghc-pkg-shell = combinedShellFor (lib.map (name: self'.devShells.${name}) projectNames);
+        };
 
       legacyPackages = {
-        inherit (pkgs) haskell-nix;
-        inherit (pkgs) river riverDebug;
-        inherit (pkgs) hnix hnix-flake hls only-cabal;
-
-        inherit project;
-        inherit hoogleShell ;
-        hshell = pkgs.writeShellApplication {
-          name = "hoogle-all";
-          runtimeInputs = [ hoogleShell ];
-          text = ''
-            hoogle server --local
-          '';
-        };
+        inherit haskellLib;
+        inherit (pkgs) haskell-nix river riverDebug;
+        # haskell.nix projects
+        inherit (pkgs) /*hls*/ only-cabal;
+        inherit project projectFlake;
       };
     };
   };

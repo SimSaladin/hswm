@@ -1,17 +1,13 @@
 -- vim: ft=cabalproject
 
--- hs-bindgen (unreleased) (28-05-2026)
+-- hs-bindgen (unreleased) (04-06-2026)
 source-repository-package
   type: git
   location: https://github.com/well-typed/hs-bindgen
   branch: main
-  tag: 24ed914383635226710306cd12499f09d61adb40
-  subdir:
-    c-expr-runtime
-    c-expr-dsl
-    hs-bindgen
-    hs-bindgen-runtime
-  --sha256: sha256-kYyOI/Er47TMHSyNI+qMHaaPHN1lD9a2epAcKLPvPwQ=
+  tag: 1b988645a1dbd988526d8bfea5f267ae21bebbd7
+  subdir: c-expr-runtime c-expr-dsl hs-bindgen hs-bindgen-runtime
+  --sha256: sha256-gYpUOQ17qU+CozGSUacJ7dCcBR7U6AV/j1ImcJf9R3A=
 
 -- libclang-bindings (unreleased) for hs-bindgen (22-05-2026)
 source-repository-package

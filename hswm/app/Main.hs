@@ -72,11 +72,10 @@ main =
 myScratchpads :: [Scratchpad]
 myScratchpads =
   exclusive
-    [ mkPad "tmux-0" mhd (appName =? "tmux-0")
-        (void $ spawnProcess "kitty" ["--app-id=tmux-0", "--detach", "tmux", "a"])
-    , mkPad "ncmpcpp" mhd (appName =? "ncmpcpp")
-        (void $ spawnProcess "kitty" ["--app-id=ncmpcpp", "--detach", "ncmpcpp"])
-    ] ++ [mkPadDyn "dynamic" def idHook]
+    [ mkPad "tmux-0" mhd (appName =? "tmux-0") (void $ spawnProcess "kitty" ["--app-id=tmux-0", "--detach", "tmux", "a"])
+    , mkPad "ncmpcpp" mhd (appName =? "ncmpcpp") (void $ spawnProcess "kitty" ["--app-id=ncmpcpp", "--detach", "ncmpcpp"])
+    , mkPadDyn "dynamic" def idHook
+    ]
   where
     mhd = doRFRR 0.2 0.1 0.6 0.6
     doRFRR x y w h = doRectFloat (W.RationalRect x y w h)
@@ -382,12 +381,14 @@ myKeys =
          --   "M-r u"   >+ inputPromptWithHistCompl xpConfig "browser-app" ?+ (\s -> launchDesktopEntry "chrome-app" [s]) ? "Chrome App"
        ]
   where
-    directions2D = map (:[]) "kjlh" `zip` [minBound..maxBound @Direction2D]
-    sendFocusedWorkspaceToScreen focus i = PScreen.getScreen def i >>= (`whenJust` (\s -> windows (W.currentTag >>= \x -> OnScreen.onScreen (W.greedyView x) focus s)))
-    tagKeys = map (: []) ['a' .. 'z']
-    screenKeys = map (: []) "wvza"
-    tagKeysTags = zip tagKeys [(0 :: Int) ..]
+    directions2D      = map (:[]) "kjlh" `zip` [minBound..maxBound @Direction2D]
+    tagKeys           = map (: []) ['a' .. 'z']
+    screenKeys        = map (: []) "wvza"
+    tagKeysTags       = zip tagKeys [(0 :: Int) ..]
     screenKeysScreens = zip screenKeys [(PScreen.P 0) ..]
+
+    sendFocusedWorkspaceToScreen focus i =
+      PScreen.getScreen def i >>= (`whenJust` (\s -> windows (W.currentTag >>= \x -> OnScreen.onScreen (W.greedyView x) focus s)))
 
 myPointerBinds :: [((String, Button), SomeAction H)]
 myPointerBinds =
