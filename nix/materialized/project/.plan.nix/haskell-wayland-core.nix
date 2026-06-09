@@ -11,7 +11,7 @@
     flags = { pkg-config = true; build-tool-depends = true; };
     package = {
       specVersion = "3.14";
-      identifier = { name = "hswm-bindings"; version = "0.1.0.0"; };
+      identifier = { name = "haskell-wayland-core"; version = "0.1.0.0"; };
       license = "MIT";
       copyright = "";
       maintainer = "samuli.thomasson@pm.me";
@@ -36,9 +36,9 @@
       licenseFiles = [ "LICENSE" ];
       dataDir = ".";
       dataFiles = [];
-      extraSrcFiles = [ "binding-specs/*.yaml" "protocol/*.xml" ];
+      extraSrcFiles = [ "protocol/*.xml" ];
       extraTmpFiles = [];
-      extraDocFiles = [ "CHANGELOG.md" ];
+      extraDocFiles = [];
     };
     components = {
       "library" = {
@@ -55,7 +55,6 @@
           (hsPkgs."hs-bindgen-runtime" or (errorHandler.buildDepError "hs-bindgen-runtime"))
           (hsPkgs."hs-bindgen-hooks" or (errorHandler.buildDepError "hs-bindgen-hooks"))
           (hsPkgs."pretty" or (errorHandler.buildDepError "pretty"))
-          (hsPkgs."haskell-wayland-core" or (errorHandler.buildDepError "haskell-wayland-core"))
         ];
         libs = pkgs.lib.optionals (!flags.pkg-config) [
           (pkgs."wayland-client" or (errorHandler.sysDepError "wayland-client"))
@@ -64,40 +63,17 @@
         pkgconfig = pkgs.lib.optionals (flags.pkg-config) [
           (pkgconfPkgs."wayland-client" or (errorHandler.pkgConfDepError "wayland-client"))
           (pkgconfPkgs."wayland-server" or (errorHandler.pkgConfDepError "wayland-server"))
-          (pkgconfPkgs."wayland-protocols" or (errorHandler.pkgConfDepError "wayland-protocols"))
         ];
         build-tools = pkgs.lib.optional (flags.build-tool-depends) (hsPkgs.pkgsBuildBuild.hs-bindgen.components.exes.hs-bindgen-cli or (pkgs.pkgsBuildBuild.hs-bindgen-cli or (errorHandler.buildToolDepError "hs-bindgen:hs-bindgen-cli")));
         buildable = true;
         modules = [
-          "Paths_hswm_bindings"
-          "River"
-          "River/Client"
-          "River/InputManagement"
-          "River/WindowManagement"
-          "River/XkbBindings"
-          "River/XkbConfig"
-          "WL/Client"
-          "WL/Viewporter"
+          "WL/Core/Client"
+          "WL/Internals/TH"
+          "WL/Internals/Types"
+          "WL/Internals/Utils"
+          "WL/Util"
         ];
         hsSourceDirs = [ "src" ];
       };
-      tests = {
-        "spec" = {
-          depends = [
-            (hsPkgs."base" or (errorHandler.buildDepError "base"))
-            (hsPkgs."data-default" or (errorHandler.buildDepError "data-default"))
-            (hsPkgs."hspec" or (errorHandler.buildDepError "hspec"))
-            (hsPkgs."hs-bindgen-runtime" or (errorHandler.buildDepError "hs-bindgen-runtime"))
-            (hsPkgs."hswm-bindings" or (errorHandler.buildDepError "hswm-bindings"))
-          ];
-          build-tools = [
-            (hsPkgs.pkgsBuildBuild.hspec-discover.components.exes.hspec-discover or (pkgs.pkgsBuildBuild.hspec-discover or (errorHandler.buildToolDepError "hspec-discover:hspec-discover")))
-          ];
-          buildable = true;
-          modules = [ "Paths_hswm_bindings" "Wayland/UtilSpec" ];
-          hsSourceDirs = [ "tests" ];
-          mainPath = [ "Spec.hs" ];
-        };
-      };
     };
-  } // rec { src = pkgs.lib.mkDefault .././hswm-bindings; }
+  } // rec { src = pkgs.lib.mkDefault .././haskell-wayland-core; }

@@ -351,6 +351,7 @@
         Cabal-hooks = ./.plan.nix/Cabal-hooks.nix;
         doxygen-parser = ./.plan.nix/doxygen-parser.nix;
         c-expr-runtime = ./.plan.nix/c-expr-runtime.nix;
+        haskell-wayland-core = ./.plan.nix/haskell-wayland-core.nix;
         hs-bindgen-runtime = ./.plan.nix/hs-bindgen-runtime.nix;
         Cabal = ./.plan.nix/Cabal.nix;
         pixman-bindings = ./.plan.nix/pixman-bindings.nix;
@@ -406,6 +407,12 @@
           "Cabal-hooks" = { flags = {}; };
           "doxygen-parser" = { flags = {}; };
           "c-expr-runtime" = { flags = {}; };
+          "haskell-wayland-core" = {
+            flags = {
+              "pkg-config" = lib.mkOverride 900 true;
+              "build-tool-depends" = lib.mkOverride 900 true;
+            };
+          };
           "hs-bindgen-runtime" = { flags = {}; };
           "Cabal" = { flags = { "git-rev" = lib.mkOverride 900 false; }; };
           "pixman-bindings" = {
@@ -472,6 +479,7 @@
           "resourcet".components.library.planned = lib.mkOverride 900 true;
           "microlens-platform".components.library.planned = lib.mkOverride 900 true;
           "xml-conduit".components.setup.planned = lib.mkOverride 900 true;
+          "haskell-wayland-core".components.setup.planned = lib.mkOverride 900 true;
           "monad-logger".components.library.planned = lib.mkOverride 900 true;
           "transformers-base".components.library.planned = lib.mkOverride 900 true;
           "mono-traversable".components.library.planned = lib.mkOverride 900 true;
@@ -678,6 +686,7 @@
           "data-default".components.library.planned = lib.mkOverride 900 true;
           "ansi-terminal".components.library.planned = lib.mkOverride 900 true;
           "gi-gio".components.setup.planned = lib.mkOverride 900 true;
+          "haskell-wayland-core".components.library.planned = lib.mkOverride 900 true;
           "haskell-gi".components.library.planned = lib.mkOverride 900 true;
           "terminfo".components.library.planned = lib.mkOverride 900 true;
           "gi-pango".components.setup.planned = lib.mkOverride 900 true;
