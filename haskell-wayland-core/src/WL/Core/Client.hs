@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedLabels #-}
+
 module WL.Core.Client
   ( module WL.Core.Client
   , module WL.Core.Enums
@@ -29,7 +31,7 @@ import           System.Posix
 --------------------------------------------------------------------------------------
 -- EVENT QUEUES
 
-renderNewType "EventQueue" ''Wl_event_queue ""
+renderNewType (mkName "EventQueue") ''Wl_event_queue ""
 
 --------------------------------------------------------------------------------------
 -- wayland.xml
@@ -51,9 +53,6 @@ clientFromProtocolXML' commonSettings
 
   } protoXml
 
-instance Default Output where def = Output nullPtr
-instance Default Seat where def = Seat nullPtr
-
 data WaylandProtocolError = WaylandProtocolError
   { errCode                :: !Word32
   , errObjectId            :: !Word32
@@ -74,7 +73,7 @@ instance Exception WaylandDisplayError
 -- | wl_display object used to create the queue should not be
 -- destroyed until all event queues created with it are destroyed.
 instance HasDestructor EventQueue where
-  objectDestroy (EventQueue evq) = wl_event_queue_destroy evq
+  objectDestroy (EventQueue evq) = liftIO $ wl_event_queue_destroy evq
 
 eventQueueGetName :: MonadIO m => EventQueue -> m (Maybe String)
 {-# INLINE eventQueueGetName #-}
@@ -386,3 +385,8 @@ registryBind reg name iface ver = liftIO $ castPtr <$> wl_registry_bind reg.unwr
 -- | Close the connection to display and free all resources associated with it.
 displayDisconnect :: MonadIO m => Display -> m ()
 displayDisconnect (Display d) = liftIO $ Safe.wl_display_disconnect d
+
+-- calltest :: Display -> IO Registry
+-- calltest d = #get_registry d
+--
+-- test2 = #add (undefined :: Region)

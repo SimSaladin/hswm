@@ -46,10 +46,12 @@ import           Lens.Micro
 import           Lens.Micro.GHC ()
 import           Lens.Micro.TH
 import qualified Text.PrettyPrint as PP
+import Data.Maybe
+import Data.Coerce
 
 -- * Stability
 
-data Stability = Unstable | Staging | Stable | Unknown
+data Stability = Unknown | Unstable | Staging | Stable
   deriving (Eq, Ord, Show, Generic, Binary)
 
 instance Default Stability where
@@ -97,11 +99,15 @@ pattern ServerBindings <- ((== getFpr (Proxy @ServerBindings)) -> True) where
 
 -- * ProtocolID, ProtocolSpec
 
-type ProtocolId = String
+newtype ProtocolVersion = ProtocolVersion { unwrap :: Int }
+  deriving stock (Generic)
+  deriving newtype (Eq, Ord, Show, Binary)
 
-type ProtocolConfig = ProtocolSpecX BindConfig
-
-type ProtocolSpec = ProtocolSpecX HsBindGen
+data ProtocolId = ProtocolId
+  { name      :: String
+  , stability :: Stability
+  , version   :: ProtocolVersion
+  } deriving (Eq, Ord, Show, Generic, Binary)
 
 data ProtocolSpecX bindgen = ProtocolSpec
   { fullName            :: String -- ^ @river-window-management-v1@
@@ -117,13 +123,18 @@ data ProtocolSpecX bindgen = ProtocolSpec
   , bindGens            :: M.Map ProtoComponent bindgen
   , computedModuleNames :: M.Map ProtoComponent ModuleName
   , computedComponents  :: Set ProtoComponent
+  , qualifiedImports    :: Set (ModuleName, String)
   } deriving (Eq, Show, Generic, Binary)
+
+type ProtocolConfig = ProtocolSpecX BindConfig
+
+type ProtocolSpec = ProtocolSpecX HsBindGen
 
 -- * BindConfig
 
 data BindConfig = BindConfig
   { bcMainHeaders     :: [Location]
-  , bcDepends         :: [ProtocolId]
+  , bcDepends         :: [String] -- name
   , bcCustom          :: Endo HsBindGen
   , extBindingSpecs   :: [ExtBindingSpec]
   , excludeByDeclName :: PCRE
@@ -157,6 +168,14 @@ concat <$> mapM (makeLensesWith (classyRules & lensClass .~ const Nothing & lens
     , ''ProtocolSpecX
     , ''ProtocolScannerOptions
     , ''Stability
+    -- , ''ProtocolId
+    ]
+
+concat <$> mapM (makeLensesWith (classyRules & lensClass .~ const Nothing & lensField .~ (\_ _ n ->
+  case nameBase n of
+    b@(x : xs) -> [MethodName (mkName $ "Has" ++ toUpper x : xs) (mkName b)]
+    _ -> error "empty")))
+    [ ''ProtocolId
     ]
 
 instance Pretty ProtocolSpec where
@@ -251,6 +270,7 @@ instance Parsec ProtocolConfig where
             , protocolDirs = [ normaliseSymbolicPath $ makeSymbolicPath (L.intercalate "/" dirs) | take 1 dirs == [""] ]
             , computedModuleNames = mempty
             , computedComponents = mempty
+            , qualifiedImports = mempty
             }
       return spec
     where
@@ -292,3 +312,38 @@ instance Parsec ProtocolConfig where
 
       stability' x = '-' : map toLower (show x)
       version'   x = '-' : 'v' : show x
+
+parseWaylandProtosPath str = case explicitEitherParsec parseWaylandProtosPathP str of
+                               Right k@(s, n, v) -> (ProtocolId n s v, (fromString $ "wayland-" ++ n ++ ".xml")
+                                 { stability = s
+                                 , category = "wayland"
+                                 , baseName = n
+                                 , version = Just $ coerce v
+                                 , protocolXML = makeRelativePathEx str
+                                 , protocolDirs = []
+                                 })
+                               Left e -> error e
+
+-- | To parse "stable/name/name-vN.xml"
+parseWaylandProtosPathP :: forall m. CabalParsing m => m (Stability, String, ProtocolVersion)
+parseWaylandProtosPathP = do
+  stab <- pStability <* P.munch1 (== '/')
+  name <- pName <* P.munch1 (== '/')
+  _ <- P.string name
+  _ <- P.optional (P.try $ P.optional (P.try $ P.char '-') *> pStability)
+  mver <- P.optional (P.try $ P.optional (P.try $ P.char '-') *> pVersion)
+  _ <- P.string ".xml"
+  return (stab, name, fromMaybe (ProtocolVersion 1) mver)
+
+  where
+      -- "v1", "v2", etc.
+      pVersion :: m ProtocolVersion
+      pVersion = P.char 'v' *> fmap ProtocolVersion P.integral P.<?> "Version"
+
+      -- "stable", "unstable", etc.
+      pStability :: m Stability
+      pStability = P.choice [ P.try $ P.string s $> v | (v, s) <- zip [ Stable, Unstable, Staging ] [ "stable", "unstable", "staging" ] ]
+        P.<?> "Stability"
+
+      pName :: m String
+      pName = P.munch1 (/= '/') P.<?> "Name part"

@@ -24,7 +24,6 @@ concat <$> mapM (makeLensesWith (classyRules & lensClass .~ const Nothing & lens
   case nameBase n of
     b@(x : xs) -> [MethodName (mkName $ "Has" ++ toUpper x : xs) (mkName b)]
     _ -> error "empty")))
-  [ ''H.HsBindGenSetup
-  , ''H.HsBindGen
+  [ ''H.HsBindGen
   ]
 

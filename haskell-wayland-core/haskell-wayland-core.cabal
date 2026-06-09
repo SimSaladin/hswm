@@ -1,7 +1,7 @@
 cabal-version: 3.14
 -- build-type:         Custom
 build-type:         Hooks
-name:               hswm-bindings
+name:               haskell-wayland-core
 version:            0.1.0.0
 license:            MIT
 license-file:       LICENSE
@@ -12,10 +12,7 @@ tested-with:
     , GHC == 9.12.4
     , GHC == 9.12.2
 extra-source-files:
-      binding-specs/*.yaml
       protocol/*.xml
-extra-doc-files:
-      CHANGELOG.md
 
 flag pkg-config
     description: Use pkgconfig to resolve C dependencies
@@ -55,19 +52,14 @@ common language
 library
     import: language
     exposed-modules:
-          River
-          River.Client
-          River.InputManagement
-          River.WindowManagement
-          River.XkbBindings
-          River.XkbConfig
-          WL.Client
-          WL.Viewporter
-          -- Most exposed modules are determined at configure time
+          -- WL.Client -- ???
+          WL.Core.Client
+          WL.Internals.TH
+          WL.Internals.Types
+          WL.Internals.Utils
+          WL.Util
     other-modules:
-          Paths_hswm_bindings
     autogen-modules:
-          Paths_hswm_bindings
     build-depends:
           base                 >=4.21   && <4.23
         , containers           >=0.7    && <1.0
@@ -81,7 +73,6 @@ library
         , hs-bindgen-runtime   >=0.1.0  && <0.2
         , hs-bindgen-hooks     ==0.1.0.0
         , pretty
-        , haskell-wayland-core
     hs-source-dirs: src
     ghc-options: -Wall -Wunused-packages -fPIC
 
@@ -89,7 +80,6 @@ library
         pkgconfig-depends:
               wayland-client     >= 1.24
             , wayland-server     >= 1.24
-            , wayland-protocols  >= 1.48
     else
         extra-libraries:
               wayland-client
@@ -97,23 +87,3 @@ library
 
     if flag(build-tool-depends)
        build-tool-depends: hs-bindgen:hs-bindgen-cli
-
-test-suite spec
-    import: language
-    type: exitcode-stdio-1.0
-    other-modules:
-          Paths_hswm_bindings
-          Wayland.UtilSpec
-    autogen-modules:
-          Paths_hswm_bindings
-    build-depends:
-          base
-        , data-default
-        , hspec
-        , hs-bindgen-runtime   >=0.1.0  && <0.2
-        , hswm-bindings
-    build-tool-depends:
-        hspec-discover:hspec-discover
-    main-is: Spec.hs
-    hs-source-dirs: tests
-    ghc-options: -threaded -with-rtsopts=-N

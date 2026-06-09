@@ -1,5 +1,9 @@
 {-# LANGUAGE TypeFamilyDependencies #-}
 {-# LANGUAGE UndecidableInstances   #-}
+{-# LANGUAGE FunctionalDependencies #-}
+-- {-# LANGUAGE AllowAmbiguousTypes #-}
+
+
 
 -- |
 -- Module      : WL.Internals.Types
@@ -15,6 +19,7 @@ module WL.Internals.Types (
   Version,
   ObjectName,
   IsWlObject(..),
+  HasMethod(..),
   HasDestructor(..),
   HasInterface(..),
   HasListener(..),
@@ -34,6 +39,8 @@ import           Foreign.C
 import           Foreign.C.ConstPtr
 import           HsBindgen.Runtime.Prelude as ReExports (FromFunPtr(..), PtrConst, ToFunPtr(..), CEnum(..), CEnumZ)
 import           Data.Typeable
+import GHC.TypeLits
+import GHC.OverloadedLabels
 
 type Version = Word32
 
@@ -56,10 +63,20 @@ class Typeable object => IsWlObject (object :: Type) where
 
   toProxy :: forall a. object -> Ptr a
 
+class Typeable object => HasMethod (method :: Symbol) object (since :: Nat) | object method -> since where
+
+  type ObjectMethod object (method :: Symbol) :: Type
+
+  objectMethod :: Proxy method -> object -> ObjectMethod object method -- ObjectMethod object method
+
+instance (KnownSymbol method, HasMethod method object since, info ~ ObjectMethod object method)
+  => IsLabel method (object -> info) where
+  fromLabel = objectMethod @method Proxy
+
 -- | Wayland objects that have destructors.
 class Typeable object => HasDestructor (object :: Type) where
 
-  objectDestroy :: object -> IO ()
+  objectDestroy :: MonadIO m => object -> m ()
 
 -- | Wayland objects that have interface (e.g. for global registry).
 class IsWlObject object => HasInterface (object :: Type) where
@@ -92,11 +109,11 @@ class HasInterface object => HasListener (object :: Type) where
   objectListenerAdd :: object -> ConstPtr (ObjectListener object) -> Ptr Void -> IO CInt
 
   -- | Free (destroy) the listener.
-  freeListener :: Proxy object -> ConstPtr (ObjectListener object) -> IO ()
+  freeListener :: MonadIO m => ConstPtr (ObjectListener object) -> m ()
 
 -- | Simply calls 'freeListener'.
 instance (HasListener object, Typeable a, a ~ ObjectListener object) => HasDestructor (ConstPtr a) where
-  objectDestroy = freeListener Proxy
+  objectDestroy = freeListener
 
 -- | Class of values that can be used as user data.
 class Typeable a => IsUserData a where

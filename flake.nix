@@ -59,7 +59,8 @@
     let
       inherit (inputs.flake-utils.lib) mkApp;
 
-      checkMaterialization = false; # true;
+      checkMaterialization = false;
+      #checkMaterialization = true;
 
       # Materialization:
       #
@@ -71,26 +72,33 @@
       #    1. set "checkMaterialization = true"
       #    2. nix build .#project.plan-nix
       #
-      materializeLocations = {
-        project = { attr = "project.plan-nix"; materialized = "./nix/materialized/project"; };
-        only-cabal = { attr = "only-cabal.plan-nix"; materialized = "./nix/materialized/cabal-plan-nix"; };
+      materializedLocations = {
+        project = { attr = "project"; materialized = "./nix/materialized/project"; };
+        only-cabal = { attr = "only-cabal"; materialized = "./nix/materialized/cabal-plan-nix"; };
       };
 
-      updateMaterialized = mkApp {
-        name = "update-materialized";
+      materializedUtil = mkApp {
+        name = "materialized-util";
         drv = pkgs.writeShellApplication {
-          name = "update-materialized";
+          name = "materialized-util";
           runtimeInputs = [ /* self'.devShells.ghc-pkg-shell */ ];
-          text =
-            lib.concatMapStringsSep "\n\n" ({ attr, materialized }: ''
               # Note: needs to run with checkMaterialization = false
-              if script=$(nix build .#${attr}.passthru.generateMaterialized --print-out-paths --no-link); then
-                env "$script" ${materialized}
-                echo "Successfully updated materialized directory ${materialized}!"
-              fi
-            '') (lib.attrValues materializedLocations);
+          text = ''
+            set -x
+            ${lib.concatMapStringsSep "\n\n" ({ attr, materialized }: ''
+            ${self'.legacyPackages.${attr}.plan-nix.passthru.generateMaterialized} ${materialized}
+            '') (lib.attrValues materializedLocations)}
+          '';
         };
       };
+
+      # Note: needs to run with checkMaterialization = false
+      calculate-materialized = lib.concatMapStringsSep "\n\n" ({ attr, materialized }: ''
+        set -x
+        sha256=$(env ${self'.legacyPackages.${attr}.plan-nix.passthru.calculateMaterializedSha})
+        hash=$(nix hash convert --hash-algo sha256 "$sha256")
+        echo "Calculated hash $hash for ${materialized}!"
+      '') (lib.attrValues materializedLocations);
 
       hsNixModules = {
 
@@ -98,7 +106,8 @@
           config = {
             reinstallableLibGhc = true;
             # workaround hsc2hs problem
-            packages =lib.genAttrs [ "zlib" "network" "haskell-gi" "haskell-gi-base" "filelock" "unix-time" ] (_: { components.library.depends = [ config.hsPkgs.process ]; });
+            packages =lib.genAttrs [ "zlib" "network" "haskell-gi" "haskell-gi-base" "filelock" "unix-time" ]
+              (_: { components.library.depends = [ config.hsPkgs.process ]; });
           };
         };
 
@@ -300,7 +309,7 @@
           };
         };
 
-        update-materialized = updateMaterialized;
+        materialized-do = materializedUtil;
       };
 
       packages = projectFlake.packages // {
@@ -334,7 +343,9 @@
             adjustShell = key: drv: drv.overrideAttrs (oa: {
               shellHook = ''
                 ${defaultShellHook key}
-                ${oa.shellHook}
+                # Don't exit the shell if the sync fails. The tool to fix it
+                # is inside the shell.
+                ${lib.replaceString "haskell-nix-cabal-store-sync || return 1" "haskell-nix-cabal-store-sync || true" oa.shellHook}
               '';
             });
 
@@ -362,7 +373,7 @@
               adjustedShellFor project {
                 name = "hswm-all";
                 packages = lib.mkForce (_: []);
-                inputsFrom = lib.map (x: x) projectShells;
+                inputsFrom = lib.map (drv: drv.overrideAttrs { shellHook = ""; }) projectShells;
                 allToolDeps = lib.mkForce false;
                 exposePackagesVia = "ghc-pkg";
                 withHoogle = true;

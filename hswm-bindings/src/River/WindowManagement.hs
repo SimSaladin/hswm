@@ -130,7 +130,6 @@ module River.WindowManagement
 
   -- * RiverPointerBinding
   , RiverPointerBinding
-  , RiverPointerBindingListener
   -- ** Events
   , RiverPointerBindingEvent(..)
   -- ** Enable / Disable (Manage)

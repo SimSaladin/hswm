@@ -20,4 +20,4 @@ module WL.Viewporter
   , viewportSetDestination
   ) where
 
-import WL.Viewporter.Client
+import WL.Viewporter.V1.Client

@@ -1,4 +1,0 @@
-
-clientFromProtocolXML' commonSettings protoXml
-
-instance Default RiverInputDevice where def = RiverInputDevice nullPtr

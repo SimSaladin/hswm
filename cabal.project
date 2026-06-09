@@ -5,6 +5,7 @@ jobs: $ncpus
 
 packages:
   ./hs-bindgen-hooks
+  ./haskell-wayland-core
   ./hswm
   ./hswm-bindings
   ./pixman-bindings

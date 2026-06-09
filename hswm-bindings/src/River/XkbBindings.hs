@@ -17,7 +17,6 @@ module River.XkbBindings
 
   -- * RiverXkbBinding
   , RiverXkbBinding
-  , RiverXkbBindingListener
   -- ** Events
   , RiverXkbBindingEvent(..)
   -- ** Enable / Disable
