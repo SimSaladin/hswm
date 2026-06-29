@@ -47,7 +47,6 @@
           "C/Expr/Win64"
           "C/Operator/Internal"
           "C/Operator/TH"
-          "C/Char"
           "C/Expr/HostPlatform"
           "C/Operator/Classes"
           "C/Operator/GenInstances"
@@ -67,8 +66,6 @@
             (hsPkgs."data-default" or (errorHandler.buildDepError "data-default"))
             (hsPkgs."fin" or (errorHandler.buildDepError "fin"))
             (hsPkgs."vec" or (errorHandler.buildDepError "vec"))
-            (hsPkgs."directory" or (errorHandler.buildDepError "directory"))
-            (hsPkgs."filepath" or (errorHandler.buildDepError "filepath"))
             (hsPkgs."text" or (errorHandler.buildDepError "text"))
           ];
           buildable = true;
@@ -80,11 +77,11 @@
     };
   } // {
     src = pkgs.lib.mkDefault (pkgs.fetchgit {
-      url = "0";
+      url = "1";
       rev = "minimal";
       sha256 = "";
     }) // {
-      url = "0";
+      url = "1";
       rev = "minimal";
       sha256 = "";
     };

@@ -45,9 +45,13 @@
           (hsPkgs."base" or (errorHandler.buildDepError "base"))
           (hsPkgs."bytestring" or (errorHandler.buildDepError "bytestring"))
           (hsPkgs."data-default" or (errorHandler.buildDepError "data-default"))
+          (hsPkgs."directory" or (errorHandler.buildDepError "directory"))
           (hsPkgs."exceptions" or (errorHandler.buildDepError "exceptions"))
+          (hsPkgs."filepath" or (errorHandler.buildDepError "filepath"))
+          (hsPkgs."process" or (errorHandler.buildDepError "process"))
           (hsPkgs."template-haskell" or (errorHandler.buildDepError "template-haskell"))
           (hsPkgs."text" or (errorHandler.buildDepError "text"))
+          (hsPkgs."transformers" or (errorHandler.buildDepError "transformers"))
           (hsPkgs."unliftio-core" or (errorHandler.buildDepError "unliftio-core"))
         ] ++ pkgs.lib.optional (compiler.isGhc && compiler.version.lt "9.4") (hsPkgs."data-array-byte" or (errorHandler.buildDepError "data-array-byte"));
         build-tools = [
@@ -82,6 +86,7 @@
           "Clang/Args"
           "Clang/Backtrace"
           "Clang/CStandard"
+          "Clang/Discover"
           "Clang/Enum/Bitfield"
           "Clang/Enum/Simple"
           "Clang/HighLevel"
@@ -117,6 +122,7 @@
             (hsPkgs."mtl" or (errorHandler.buildDepError "mtl"))
             (hsPkgs."text" or (errorHandler.buildDepError "text"))
             (hsPkgs."containers" or (errorHandler.buildDepError "containers"))
+            (hsPkgs."directory" or (errorHandler.buildDepError "directory"))
             (hsPkgs."QuickCheck" or (errorHandler.buildDepError "QuickCheck"))
             (hsPkgs."tasty" or (errorHandler.buildDepError "tasty"))
             (hsPkgs."tasty-hunit" or (errorHandler.buildDepError "tasty-hunit"))
@@ -124,6 +130,7 @@
           ];
           buildable = true;
           modules = [
+            "Test/Discover"
             "Test/Meta/IsConcrete"
             "Test/Test/Exceptions"
             "Test/Util/AST"
@@ -142,11 +149,11 @@
     };
   } // {
     src = pkgs.lib.mkDefault (pkgs.fetchgit {
-      url = "1";
+      url = "2";
       rev = "minimal";
       sha256 = "";
     }) // {
-      url = "1";
+      url = "2";
       rev = "minimal";
       sha256 = "";
     };

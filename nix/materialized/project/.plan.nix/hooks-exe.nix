@@ -26,9 +26,9 @@
       licenseFiles = [];
       dataDir = ".";
       dataFiles = [];
-      extraSrcFiles = [ "readme.md" "changelog.md" ];
+      extraSrcFiles = [];
       extraTmpFiles = [];
-      extraDocFiles = [];
+      extraDocFiles = [ "readme.md" "changelog.md" ];
     };
     components = {
       "library" = {
@@ -37,8 +37,8 @@
           (hsPkgs."bytestring" or (errorHandler.buildDepError "bytestring"))
           (hsPkgs."filepath" or (errorHandler.buildDepError "filepath"))
           (hsPkgs."process" or (errorHandler.buildDepError "process"))
-          (hsPkgs."Cabal-syntax" or (errorHandler.buildDepError "Cabal-syntax"))
           (hsPkgs."Cabal" or (errorHandler.buildDepError "Cabal"))
+          (hsPkgs."Cabal-syntax" or (errorHandler.buildDepError "Cabal-syntax"))
         ];
         buildable = true;
         modules = [
@@ -50,11 +50,11 @@
     };
   } // {
     src = pkgs.lib.mkDefault (pkgs.fetchgit {
-      url = "3";
+      url = "4";
       rev = "minimal";
       sha256 = "";
     }) // {
-      url = "3";
+      url = "4";
       rev = "minimal";
       sha256 = "";
     };

@@ -8,17 +8,12 @@
   , config
   , ... }:
   {
-    flags = {
-      native-dns = true;
-      lukko = false;
-      git-rev = false;
-      legacy-comparison = false;
-    };
+    flags = { native-dns = true; git-rev = false; legacy-comparison = false; };
     package = {
-      specVersion = "3.6";
+      specVersion = "3.8";
       identifier = { name = "cabal-install"; version = "3.17.0.0"; };
       license = "BSD-3-Clause";
-      copyright = "2003-2025, Cabal Development Team";
+      copyright = "2003-2026, Cabal Development Team";
       maintainer = "Cabal Development Team <cabal-devel@haskell.org>";
       author = "Cabal Development Team (see AUTHORS file)";
       homepage = "http://www.haskell.org/cabal/";
@@ -84,7 +79,7 @@
           ]
           else [
             (hsPkgs."unix" or (errorHandler.buildDepError "unix"))
-          ])) ++ pkgs.lib.optional (flags.lukko) (hsPkgs."lukko" or (errorHandler.buildDepError "lukko"))) ++ pkgs.lib.optional (compiler.isGhc && compiler.version.ge "8.2") (hsPkgs."process" or (errorHandler.buildDepError "process"))) ++ pkgs.lib.optional (flags.git-rev) (hsPkgs."githash" or (errorHandler.buildDepError "githash"));
+          ])) ++ pkgs.lib.optional (compiler.isGhc && compiler.version.ge "8.2") (hsPkgs."process" or (errorHandler.buildDepError "process"))) ++ pkgs.lib.optional (system.isOsx) (hsPkgs."process" or (errorHandler.buildDepError "process"))) ++ pkgs.lib.optional (flags.git-rev) (hsPkgs."githash" or (errorHandler.buildDepError "githash"));
         buildable = true;
         modules = [
           "Paths_cabal_install"
@@ -427,11 +422,11 @@
     };
   } // {
     src = pkgs.lib.mkDefault (pkgs.fetchgit {
-      url = "3";
+      url = "4";
       rev = "minimal";
       sha256 = "";
     }) // {
-      url = "3";
+      url = "4";
       rev = "minimal";
       sha256 = "";
     };

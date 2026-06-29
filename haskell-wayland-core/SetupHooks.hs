@@ -9,35 +9,23 @@
 module SetupHooks (setupHooks) where
 
 import           Distribution.HsBindgen.Hooks
-import qualified Distribution.HsBindgen.Lens as I
-import           Distribution.HsBindgen.Utils
-import           Distribution.Simple.Utils
+import qualified Distribution.HsBindgen.Types as I
 import           Distribution.Wayland.Hooks
-import qualified Distribution.Wayland.Hooks as I
 
-import           Distribution.CabalSpecVersion
 import           Distribution.Simple.Flag
-import           Distribution.Simple.Glob
 import           Distribution.Simple.SetupHooks
-import           Distribution.Types.LocalBuildConfig
-import           Distribution.Verbosity
-
 import           Distribution.Utils.Path
 
 import           Control.Monad
-import qualified Data.List as L
-import           Data.String
 import           Lens.Micro
 import           Lens.Micro.GHC ()
 
 setupHooks :: SetupHooks
-setupHooks = waylandProtocolHooks (options, config)
-  where options = def @ProtocolScannerOptions
-            & optionProtocolDirs <>~ [ makeSymbolicPath "." ]
+setupHooks = waylandProtocolHooks config
 
 config :: DynamicSetup ()
 config = do
-
+  modifyOptions $ optionProtocolDirs <>~ [ makeSymbolicPath "." ]
   addExtraBindGen wlutil
 
   void $ makeProtocol $ "wayland.xml"
@@ -45,15 +33,12 @@ config = do
       & I.stability .~ Stable
       & I.bindGens . ix ClientBindings %~ client
       & I.bindGens . ix ServerBindings %~ server
-      & disabled <>~ [ WrapClient ]
+      & disabled <>~ [ WrapClient, WrapServer ]
       & qualifiedImports <>~ [ ("WL.Util", "WL.Util") ]
-      & I.bindGens . ix ClientBindings . I.extBindingSpecs <>~ [ BModule $ wlutil ^. I.moduleName . to fromFlag ]
-      & I.bindGens . ix ServerBindings . I.extBindingSpecs <>~ [ BModule $ wlutil ^. I.moduleName . to fromFlag ]
-
-      where
-
+  where
     client c = c
       & bcMainHeaders <>~ [ makeHeader "wayland-client-core.h" ]
+      & I.extBindingSpecs <>~ [ BModule (wlutil ^. I.moduleName . to fromFlag) Nothing ]
       & I.excludeByDeclName <>~
           [ "wl_log_set_handler_client" -- variadic
           , "wl_proxy_marshal" -- variadic
@@ -65,6 +50,7 @@ config = do
     server s = s
       & bcMainHeaders <>~ [ makeHeader "wayland-server-core.h" ]
       & I.extBindingSpecs <>~ [ makeBindingSpec "sys-types" ]
+      & I.extBindingSpecs <>~ [ BModule (wlutil ^. I.moduleName . to fromFlag) Nothing ]
       & I.excludeByDeclName <>~
           [ "wl_log_func_t"
           , "wl_client_post_implementation_error" -- variadic

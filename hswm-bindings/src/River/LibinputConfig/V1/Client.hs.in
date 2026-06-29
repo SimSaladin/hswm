@@ -1,15 +1,17 @@
 import Foreign.C.Types (CFloat, CDouble)
 
 clientFromProtocolXML' commonSettings
-  { prEventArgTypeTrans = \s iface ev arg t -> case arg.argType of
-      AArray | arg.name == "matrix"                           -> [t|WL.Util.Array CFloat |] -- 32-bit float
-             | arg.name == "speed"                            -> [t|WL.Util.Array CDouble|] -- 64-bit float
-      _                                                       -> defaultEventArgTypeTrans s iface ev arg t
+  { prEventArgTypeTrans = \s iface ev arg t ->
+    case (arg.argType, arg.name) of
+      (AArray, "matrix") -> [t|WL.Util.Array CFloat |] -- 32-bit float
+      (AArray, "speed")  -> [t|WL.Util.Array CDouble|] -- 64-bit float
+      _                  -> defaultEventArgTypeTrans s iface ev arg t
 
-  , prRequestArgTypeTrans = \s iface req arg t -> case arg.argType of
-      AArray | arg.name == "matrix"                           -> [t|WL.Util.Array CFloat|]
-             | arg.name == "speed"                            -> [t|WL.Util.Array CDouble|] -- 64-bit float
-             | req.name == "set_points", arg.name == "step"   -> [t|WL.Util.Array CDouble|]
-             | req.name == "set_points", arg.name == "points" -> [t|WL.Util.Array CDouble|]
-      _                                                       -> defaultRequestArgTypeTrans s iface req arg t
+  , prRequestArgTypeTrans = \s iface req arg t ->
+    case (req.name, arg.argType, arg.name) of
+      (_,            AArray, "matrix") -> [t|WL.Util.Array CFloat|]
+      (_,            AArray, "speed")  -> [t|WL.Util.Array CDouble|] -- 64-bit float
+      ("set_points", AArray, "step")   -> [t|WL.Util.Array CDouble|]
+      ("set_points", AArray, "points") -> [t|WL.Util.Array CDouble|]
+      _                                -> defaultRequestArgTypeTrans s iface req arg t
   } protoXml

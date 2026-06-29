@@ -58,19 +58,19 @@ data Event
   | WlKeyboardEvent !WL.KeyboardEvent
   | WlPointerEvent !WL.PointerEvent
   | -- Ext_*
-    ForeignTopLevelListV1 !WL.ExtForeignToplevelListEvent
-  | ForeignTopLevelHandleV1 !WL.ExtForeignToplevelHandleEvent
-  | SessionLockEvent !SL.ExtSessionLockEvent
-  | ExtIdleNotificationEvent !Ext.ExtIdleNotificationEvent
+    ForeignTopLevelListV1 !WL.ForeignToplevelListEvent
+  | ForeignTopLevelHandleV1 !WL.ForeignToplevelHandleEvent
+  | SessionLockEvent !SL.SessionLockEvent
+  | ExtIdleNotificationEvent !Ext.IdleNotificationEvent
   | -- Zwp_*
     ZwpIM2PopupSurfaceE !Zwp.InputPopupSurfaceEvent
   | ZwpIM2KeyboardGrabE !Zwp.InputMethodKeyboardGrabEvent
   | ZwpIM2E !Zwp.InputMethodEvent
   | -- Wlr_*
-    WlrOutputManagerEvent !Wlr.ZwlrOutputManagerEvent
-  | WlrOutputHeadEvent !Wlr.ZwlrOutputHeadEvent
+    WlrOutputManagerEvent !Wlr.OutputManagerEvent
+  | WlrOutputHeadEvent !Wlr.OutputHeadEvent
   | -- Xdg
-    ZdgOutputEvent !Xdg.ZxdgOutputEvent
+    ZdgOutputEvent !Xdg.OutputEvent
   deriving (Eq, Show, Generic)
 
 instance (Monoid (m All)) => Default (Event -> m All) where

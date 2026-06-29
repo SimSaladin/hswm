@@ -30,7 +30,7 @@ data Output = Output
   , outputDescription      :: !String
   , layerShellOutput       :: !R.RiverLayerShellOutput
   , nonExclusive           :: Maybe (Int32, Int32, Int32, Int32) -- x, y, w, h
-  , outputPower            :: Maybe Wlr.ZwlrOutputPower
+  , outputPower            :: Maybe Wlr.OutputPower
   , wlOutput               :: !WL.Output
   }
   deriving stock (Eq, Show, Read, Generic)

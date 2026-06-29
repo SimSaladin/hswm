@@ -106,13 +106,13 @@ module River.WindowManagement
   , riverSeatSetXcursorTheme
   -- ** RiverSeatModifiers
   , RiverSeatModifiers
-  , riverSeatModifiersNone
-  , riverSeatModifiersShift
-  , riverSeatModifiersCtrl
-  , riverSeatModifiersMod1
-  , riverSeatModifiersMod3
-  , riverSeatModifiersMod4
-  , riverSeatModifiersMod5
+  , pattern RiverSeatModifiersNone
+  , pattern RiverSeatModifiersShift
+  , pattern RiverSeatModifiersCtrl
+  , pattern RiverSeatModifiersMod1
+  , pattern RiverSeatModifiersMod3
+  , pattern RiverSeatModifiersMod4
+  , pattern RiverSeatModifiersMod5
 
   -- * RiverDecoration
   , RiverDecoration

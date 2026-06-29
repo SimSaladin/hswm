@@ -16,10 +16,8 @@
     flake-utils.url = "github:numtide/flake-utils";
     flake-parts.url = "github:hercules-ci/flake-parts";
 
-    #haskell-flake.url = "github:srid/haskell-flake";
-
     # https://github.com/input-output-hk/haskell.nix/pull/2517/changes/
-    #haskellNix.url = "github:input-output-hk/haskell.nix/5b01b482aefbcadbe5388d8eb333f441f2127ce4";
+    #haskellNix.url = "github:input-output-hk/haskell.nix";
     haskellNix.url = "git+file:/home/sim/haskell.nix";
 
     hs-bindgen = {
@@ -59,30 +57,18 @@
     let
       inherit (inputs.flake-utils.lib) mkApp;
 
+      # Materialization.. nix run .#materialized-do
       checkMaterialization = false;
-      #checkMaterialization = true;
-
-      # Materialization:
-      #
-      #   nix build .#<P>.plan-nix.passthru.generateMaterialized | bash nix/materialized/<P>
-      #
-      #   nix build .#<P>.plan-nix.passthru.calculateMaterializedSha | bash
-      #
-      #   Check:
-      #    1. set "checkMaterialization = true"
-      #    2. nix build .#project.plan-nix
-      #
       materializedLocations = {
         project = { attr = "project"; materialized = "./nix/materialized/project"; };
         only-cabal = { attr = "only-cabal"; materialized = "./nix/materialized/cabal-plan-nix"; };
       };
 
-      materializedUtil = mkApp {
+      # Note: needs to run with checkMaterialization = false
+      materialized-do = mkApp {
         name = "materialized-util";
         drv = pkgs.writeShellApplication {
           name = "materialized-util";
-          runtimeInputs = [ /* self'.devShells.ghc-pkg-shell */ ];
-              # Note: needs to run with checkMaterialization = false
           text = ''
             set -x
             ${lib.concatMapStringsSep "\n\n" ({ attr, materialized }: ''
@@ -92,29 +78,23 @@
         };
       };
 
-      # Note: needs to run with checkMaterialization = false
-      calculate-materialized = lib.concatMapStringsSep "\n\n" ({ attr, materialized }: ''
-        set -x
-        sha256=$(env ${self'.legacyPackages.${attr}.plan-nix.passthru.calculateMaterializedSha})
-        hash=$(nix hash convert --hash-algo sha256 "$sha256")
-        echo "Calculated hash $hash for ${materialized}!"
-      '') (lib.attrValues materializedLocations);
-
       hsNixModules = {
 
         main = { lib, config, ... }: {
           config = {
             reinstallableLibGhc = true;
             # workaround hsc2hs problem
-            packages =lib.genAttrs [ "zlib" "network" "haskell-gi" "haskell-gi-base" "filelock" "unix-time" ]
+            packages = lib.genAttrs [ "zlib" "network" "haskell-gi" "haskell-gi-base" "filelock" "unix-time" ]
               (_: { components.library.depends = [ config.hsPkgs.process ]; });
           };
         };
 
         project = { config, pkgs, ... }: {
           config = {
+            packages.waybar-cffi-hs = { };
             packages.xkbcommon-bindings = { };
             packages.pixman-bindings = { };
+            packages.haskell-wayland-core.components.library.build-tools = [ pkgs.wayland-scanner ];
             packages.hswm-bindings.components.library.build-tools = [ pkgs.wayland-scanner ];
             packages.hswm = {
               components.library.build-tools = [
@@ -150,16 +130,6 @@
       };
 
       projectOverlay = final: _: {
-
-        #hls = final.haskell-nix.cabalProject' ({ ... }: {
-        #  index-state = "2026-06-04T23:15:22Z";
-        #  #plan-sha256 = "";
-        #  name = "hls-project";
-        #  src = inputs.hls;
-        #  compiler-nix-name = "ghc9141llvm";
-        #  builderVersion = 1;
-        #  flake.packages = ps: { inherit (ps) haskell-language-server; };
-        #});
 
         only-cabal = final.haskell-nix.cabalProject' ({ ... }: {
 
@@ -309,7 +279,7 @@
           };
         };
 
-        materialized-do = materializedUtil;
+        materialized-do = materialized-do;
       };
 
       packages = projectFlake.packages // {

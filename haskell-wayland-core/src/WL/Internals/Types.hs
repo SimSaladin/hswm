@@ -1,9 +1,6 @@
 {-# LANGUAGE TypeFamilyDependencies #-}
 {-# LANGUAGE UndecidableInstances   #-}
 {-# LANGUAGE FunctionalDependencies #-}
--- {-# LANGUAGE AllowAmbiguousTypes #-}
-
-
 
 -- |
 -- Module      : WL.Internals.Types
@@ -33,14 +30,14 @@ import           WL.Util.Generated (Wl_interface)
 import           Control.Monad.IO.Class
 import           Data.Kind (Type)
 import           Data.Proxy
+import           Data.Typeable
 import           Data.Void
 import           Foreign
 import           Foreign.C
 import           Foreign.C.ConstPtr
-import           HsBindgen.Runtime.Prelude as ReExports (FromFunPtr(..), PtrConst, ToFunPtr(..), CEnum(..), CEnumZ)
-import           Data.Typeable
-import GHC.TypeLits
-import GHC.OverloadedLabels
+import           GHC.TypeLits
+import           HsBindgen.Runtime.Prelude as ReExports (CEnum(..), CEnumZ, FromFunPtr(..),
+                                                         PtrConst, ToFunPtr(..))
 
 type Version = Word32
 
@@ -62,16 +59,6 @@ class Typeable object => IsWlObject (object :: Type) where
   setUserData :: object -> Ptr Void -> IO ()
 
   toProxy :: forall a. object -> Ptr a
-
-class Typeable object => HasMethod (method :: Symbol) object (since :: Nat) | object method -> since where
-
-  type ObjectMethod object (method :: Symbol) :: Type
-
-  objectMethod :: Proxy method -> object -> ObjectMethod object method -- ObjectMethod object method
-
-instance (KnownSymbol method, HasMethod method object since, info ~ ObjectMethod object method)
-  => IsLabel method (object -> info) where
-  fromLabel = objectMethod @method Proxy
 
 -- | Wayland objects that have destructors.
 class Typeable object => HasDestructor (object :: Type) where
@@ -133,3 +120,12 @@ instance Typeable a => IsUserData (StablePtr a) where
 instance {-# OVERLAPPABLE #-} Typeable a => IsUserData (Ptr a) where
   toUserData   = castPtr
   fromUserData = pure . castPtr
+
+class Typeable object => HasMethod (method :: Symbol) object (since :: Nat) | object method -> since where
+
+  type ObjectMethod object (method :: Symbol) :: Type
+
+  objectMethod :: Proxy method -> object -> ObjectMethod object method -- ObjectMethod object method
+
+-- instance (KnownSymbol method, HasMethod method object since, info ~ ObjectMethod object method) => IsLabel method (object -> info) where
+--   fromLabel = objectMethod @method Proxy

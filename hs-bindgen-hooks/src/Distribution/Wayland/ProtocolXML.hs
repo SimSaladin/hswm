@@ -3,6 +3,7 @@ module Distribution.Wayland.ProtocolXML ( module Distribution.Wayland.ProtocolXM
 import qualified Text.XML as X
 import           Text.XML.Cursor hiding (check)
 
+import qualified Data.Aeson as A
 import           Data.Char
 import qualified Data.List as L
 import           Data.Maybe
@@ -23,6 +24,7 @@ data Protocol = Protocol
   , description :: !Description
   , interfaces  :: ![Interface]
   } deriving (Eq, Show, Read, Generic, Binary)
+  deriving (A.ToJSON)
 
 data Interface = Interface
   { name        :: !String
@@ -32,18 +34,21 @@ data Interface = Interface
   , requests    :: ![IRequest]
   , events      :: ![IEvent]
   } deriving (Eq, Show, Read, Generic, Binary)
+  deriving (A.ToJSON)
 
 data IEnum = IEnum
   { name        :: !String
   , entries     :: ![Entry]
   , since       :: !(Maybe Int) -- version
   } deriving (Eq, Show, Read, Generic, Binary)
+  deriving (A.ToJSON)
 
 data Entry = Entry
   { name        :: !String
   , value       :: !Int
   , summary     :: !String
   } deriving (Eq, Show, Read, Generic, Binary)
+  deriving (A.ToJSON)
 
 data IRequest = IRequest
   { name        :: !String
@@ -52,6 +57,7 @@ data IRequest = IRequest
   , args        :: ![Arg]
   , since       :: !(Maybe Int) -- version
   } deriving (Eq, Show, Read, Generic, Binary)
+  deriving (A.ToJSON)
 
 data IEvent = IEvent
   { name        :: !String
@@ -59,11 +65,13 @@ data IEvent = IEvent
   , args        :: ![Arg]
   , since       :: !(Maybe Int) -- version
   } deriving (Eq, Show, Read, Generic, Binary)
+  deriving (A.ToJSON)
 
 data Description = Description
   { summary  :: !String
   , contents :: !String
   } deriving (Eq, Show, Read, Generic, Binary)
+  deriving (A.ToJSON)
 
 data Arg = Arg
   { name      :: !String
@@ -71,6 +79,7 @@ data Arg = Arg
   , argType   :: !ArgType
   , nullable  :: !(Maybe Bool)
   } deriving (Eq, Show, Read, Generic, Binary)
+  deriving (A.ToJSON)
 
 data ArgType
   = ANewId { argInterface :: !(Maybe String) }
@@ -90,6 +99,7 @@ data ArgType
   | AEmpty -- ???
   | ASelf -- ???
   deriving (Eq, Show, Read, Generic, Binary)
+  deriving (A.ToJSON)
 
 instance Pretty Protocol where
   pPrint x =
@@ -217,12 +227,14 @@ protocolFromXML root = Protocol (getName root)
     getSummary     = trim . T.unpack . T.unlines . attribute "summary"
     getContents    = trim . T.unpack . T.unlines . concatMap ($.// content)
 
+-- | Interfaces referenced by the protocol, that are not defined by the protocol.
 getProtocolInterfaceDeps :: Protocol -> [String]
 getProtocolInterfaceDeps proto = L.nub $ do
   arg <- do
     iface <- proto.interfaces
     concat $ [ x.args | x <- iface.requests ] ++ [ x.args | x <- iface.events ]
   case arg.argType of
+    ANewId  (Just iface) | check iface -> return iface
     AEnum _ (Just iface) | check iface -> return iface
     AObject (Just iface) | check iface -> return iface
     _                                  -> []

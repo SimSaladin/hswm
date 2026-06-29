@@ -8,16 +8,16 @@
 {-# OPTIONS_GHC -Wno-typed-holes #-}
 {-# OPTIONS_GHC -ddump-deriv #-}
 
-
 module WL.Internals.TH
   -- * Protocol XML
-  ( clientFromProtocolXML
-  , clientFromProtocolXML'
+  ( clientFromProtocolXML'
+  , clientFromProtocolXMLFile
   , commonSettings
   , ProtocolRenderSettings(..)
   , defaultEventArgTypeTrans
   , defaultEventArgTrans
   , defaultRequestArgTypeTrans
+  , defaultEventArgName
   , RequestSettings(..)
   , Protocol(..)
   , Interface(..)
@@ -25,6 +25,11 @@ module WL.Internals.TH
   , IEvent(..)
   , Arg(..)
   , ArgType(..)
+
+  -- * Util
+  , upperFirst
+  , formatDescription
+  , getArrowArgs
 
   -- * NewType only
   , renderNewType
@@ -45,15 +50,17 @@ import           HsBindgen.Runtime.PtrConst
 
 import           Control.Arrow
 import           Control.DeepSeq (NFData)
+import           Control.Exception (finally)
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.Char (toUpper)
+import           Data.Coerce
+import           Data.Data (Data)
 import           Data.Default
 import           Data.Hashable (Hashable)
 import qualified Data.List as L
 import           Data.Maybe
 import           Data.Void
-import           Data.Data (Data)
 import           Foreign
 import           Foreign.C
 import           Foreign.C.ConstPtr
@@ -63,12 +70,10 @@ import           Language.Haskell.TH
 import           Language.Haskell.TH.Syntax
 import           Prelude hiding (head)
 import           System.IO.Unsafe (unsafePerformIO)
-import Data.Coerce
-import Control.Exception (finally)
--- import Control.Monad.Trans.Writer.CPS
+import qualified Data.List.NonEmpty as NE
 
 data ProtocolRenderSettings = ProtocolRenderSettings
-  { prRequestOptions    :: [(String, String, RequestSettings)]
+  { prRequestOptions    :: [(String, String, RequestSettings)] -- (iface, request, settings)
   , prValueNameModifier :: String -> String
   , prTypeNameModifier  :: String -> String
 
@@ -76,6 +81,8 @@ data ProtocolRenderSettings = ProtocolRenderSettings
 
   , prInterfaceEventName :: ProtocolRenderSettings -> String -> String
   -- ^ Interface name -> Event name
+
+  , prEventName :: (ProtocolRenderSettings, Interface, IEvent) -> String -> Name
 
   , prEventDerive :: Interface -> [Q DerivClause]
   -- ^ Derived instances for event types
@@ -104,39 +111,51 @@ instance Default RequestSettings where
 
 instance Default ProtocolRenderSettings where
   def = ProtocolRenderSettings
-    { prValueNameModifier = fromSnailCase
-    , prTypeNameModifier  = upperFirst . fromSnailCase
-    , prInterfaceName     = \s -> s.prValueNameModifier . (++ "_interface") . s.prValueNameModifier
-    , prRequestOptions    = []
-    , prInterfaceEventName    = \s ifn -> s.prTypeNameModifier ifn ++ "Event"
-    , prEventDerive       = const [derivClause Nothing [[t|Eq|], [t|Show|], [t|Generic|]] ]
-    , prEventArgTypeTrans = defaultEventArgTypeTrans
+    { prValueNameModifier   = fromSnailCase
+    , prTypeNameModifier    = upperFirst . fromSnailCase
+    , prInterfaceName       = \s -> s.prValueNameModifier . (++ "_interface") . s.prValueNameModifier
+    , prInterfaceEventName  = \s ifn -> s.prTypeNameModifier ifn ++ "Event"
+
     , prRequestArgTypeTrans = defaultRequestArgTypeTrans
-    , prEventArgTrans = defaultEventArgTrans -- s iface ev arg t name
-    , prRequestArgTrans = defaultRequestArgTrans
-    , prEventArgName = defaultEventArgName
+    , prRequestArgTrans     = defaultRequestArgTrans
+    , prRequestOptions      = []
+
+    , prEventName           = defaultEventName
+    , prEventDerive         = const [derivClause Nothing [[t|Eq|], [t|Show|], [t|Generic|]] ]
+    , prEventArgName        = defaultEventArgName
+    , prEventArgTypeTrans   = defaultEventArgTypeTrans
+    , prEventArgTrans       = defaultEventArgTrans -- s iface ev arg t name
     }
 
--- type RenderM = WriterT String (ReaderT ProtocolRenderSettings Q)
+defaultEventName :: (ProtocolRenderSettings, Interface, IEvent) -> String -> Name
+defaultEventName (s, iface, _) ev
+  | iface.name == "zwp_tablet_pad_v2", ev == "group"
+  = mkName "TabletPad'Group" -- conflicts with interface with same name
+
+  | otherwise = mkName $ s.prTypeNameModifier $ s.prTypeNameModifier iface.name ++ "_" ++ dropSuffix "'" ev
 
 -- type mapping
 
-getArgIFName iface arg
+getArgIFName :: Interface -> Arg -> String
+getArgIFName _iface arg
+  | ANewId  (Just r) <- arg.argType = r
   | AEnum _ (Just r) <- arg.argType = r
   | AObject (Just r) <- arg.argType = r
-  | otherwise = iface.name
+  | otherwise = "" -- iface.name
 
 defaultEventArgName :: ProtocolRenderSettings -> Interface -> IEvent -> Arg -> Type -> String
-defaultEventArgName s iface ev arg t
-  | arg.name == "id", ANewId iface' <- argType arg
-  = s.prValueNameModifier (fromMaybe "new_id" iface')
+defaultEventArgName s iface _ev arg _t
+  | arg.name == "id", ANewId mif <- argType arg
+  = s.prValueNameModifier (fromMaybe iface.name mif)
 
-  | arg.name == "type" = "type'"
+  | arg.name == "type" = arg.name ++ "'"
 
    -- river wm fix
-  | arg.name `elem` ["hint", "state", "method", "methods", "button_map"]
-  , AEnum enum _mobj <- argType arg
+  | AEnum enum _ <- argType arg, arg.name `elem` ["hint", "state", "method", "methods", "button_map"]
   = s.prValueNameModifier enum
+
+  | AEnum _ (Just iface') <- argType arg
+  = s.prValueNameModifier $ iface' ++ "_" ++ arg.name
 
   | otherwise = s.prValueNameModifier arg.name
 
@@ -145,6 +164,9 @@ defaultTypeTrans s iface arg t
   | AEnum enum mobj <- arg.argType
   = conT =<< lookupImportedTypeName' mkName (getArgIFName iface arg) (s.prTypeNameModifier (s.prTypeNameModifier (fromMaybe iface.name mobj) ++ "_" ++ enum))
 
+  | AArray{} <- arg.argType
+  = appT (conT =<< lookupImportedTypeName "" "Array") (conT ''())
+
   | AppT (ConT cN) (ConT tN) <- t, cN == ''Ptr, nameBase tN == upperFirst iface.name
   = conT $ mkName $ s.prTypeNameModifier iface.name
 
@@ -152,6 +174,7 @@ defaultTypeTrans s iface arg t
   = conT =<< lookupImportedTypeName' mkName (getArgIFName iface arg) (s.prTypeNameModifier $ nameBase tN)
 
   | t == AppT (ConT ''PtrConst) (ConT ''CChar) = [t|Maybe String|]
+
   | otherwise = return t
 
 defaultEventArgTypeTrans :: ProtocolRenderSettings -> Interface -> IEvent -> Arg -> Type -> Q Type
@@ -160,7 +183,7 @@ defaultEventArgTypeTrans s iface _ arg t
   | otherwise = defaultTypeTrans s iface arg t
 
 defaultRequestArgTypeTrans :: ProtocolRenderSettings -> Interface -> IRequest -> Arg -> Type -> Q Type
-defaultRequestArgTypeTrans s iface _ arg t = defaultTypeTrans s iface arg t
+defaultRequestArgTypeTrans s iface _ = defaultTypeTrans s iface
 
 -- value mapping
 
@@ -173,7 +196,9 @@ defaultEventArgTrans s iface _ev arg t x
   = let nm = conE =<< lookupImportedValueName' mkName (getArgIFName iface arg) (upperFirst (fromMaybe iface.name mobj) ++ "_" ++ enum)
      in [|return $! $nm (fromIntegral $(x))|]
 
-  -- Some "Ptr a" (except "Ptr Void")
+  | AppT (ConT cN) (ConT tN) <- t, cN == ''Ptr, nameBase tN == upperFirst iface.name
+  = [|return $! $(conE (mkName $ s.prTypeNameModifier $ nameBase tN)) $(x)|]
+
   | AppT (ConT cN) (ConT tN) <- t, cN == ''Ptr, tN /= ''Void
   = [|return $! $(conE =<< lookupImportedValueName' mkName (getArgIFName iface arg) (s.prTypeNameModifier $ nameBase tN)) $(x)|]
 
@@ -185,28 +210,16 @@ defaultEventArgTrans s iface _ev arg t x
 defaultRequestArgTrans :: ProtocolRenderSettings -> Interface -> IRequest -> Arg -> Type -> Name -> (ExpQ, Maybe (Name -> ExpQ))
 defaultRequestArgTrans s iface _ arg t name
   | ASelf <- arg.argType
-  = (,Nothing) $ do
-    x <- newName "x"
-    letE [ valD (conP (mkName $ s.prTypeNameModifier iface.name) [varP x]) (normalB (varE name)) [] ]
-      $ appE (varE 'return) $ varE x
+  = ([|return (getField @"unwrap" $(varE name))|], Nothing)
 
-  | AEnum enum Nothing <- arg.argType
-  = (,Nothing) $ do
-    x <- newName "x"
-    letE [ valD (conP' (upperFirst iface.name ++ "_" ++ enum) [varP x]) (normalB (varE name)) [] ]
-      $ appE (varE 'return) $ appE (varE 'fromIntegral) $ varE x
+  | AEnum enum miface <- arg.argType
+  = ([|return (fromIntegral $! getField @"unwrap" $(varE name))|], Nothing)
 
-  | AEnum enum miface@(Just obj) <- arg.argType
-  = (,Nothing) $ do
-    x <- newName "x"
-    letE [ valD (conP' (upperFirst obj ++ "_" ++ enum) [varP x]) (normalB (varE name)) [] ]
-      $ appE (varE 'return) $ appE (varE 'fromIntegral) $ varE x
+  | AppT (ConT cN) (ConT tN) <- t, cN == ''Ptr, nameBase tN == upperFirst iface.name
+  = ([|return (getField @"unwrap" $(varE name))|], Nothing)
 
   | AppT (ConT cN) (ConT tN) <- t, cN == ''Ptr, tN /= ''Void, tN /= ''Word32
-  = (,Nothing) $ do
-    x <- newName "x"
-    letE [ valD (conP' (prTypeNameModifier s (nameBase tN)) [varP x]) (normalB (varE name)) []]
-      $ appE (varE 'return) $ varE x
+  = ([|return (getField @"unwrap" $(varE name))|], Nothing)
 
   | AppT (ConT cN) (ConT tN) <- t, cN == ''PtrConst, tN == ''CChar
   = ([|ConstPtr <$> maybe (pure nullPtr) (liftIO . newCString) $(varE name)|], -- note: cleanup in argFinalizer
@@ -216,9 +229,6 @@ defaultRequestArgTrans s iface _ arg t name
  where
     conP' str args = flip conP args =<< lookupImportedValueName' mkName (getArgIFName iface arg) str
 
-
-
-
 commonSettings :: ProtocolRenderSettings
 commonSettings = def
     { prTypeNameModifier  = (def::ProtocolRenderSettings).prTypeNameModifier . dropPre prefixes . dropEnd suffixes
@@ -226,12 +236,12 @@ commonSettings = def
     }
   where
       prefixes =
-        let xs = [ "wl_", "wp_", "xdg_", "wlr_", "ext_" ]
-            ys = xs ++ map ('z' :) xs
-            zs = map (\(x:xs) -> toUpper x : xs) ys
-         in xs ++ ys ++ zs
+        let xs0 = fmap NE.fromList [ "wl_", "wp_", "xdg_", "wlr_", "ext_" ] :: [NE.NonEmpty Char]
+            xs1 = xs0 <> fmap (('z' NE.:|) . NE.toList) xs0
+            xs2 = xs1 <> fmap (\(x NE.:| xs) -> toUpper x NE.:| xs) xs1
+         in fmap NE.toList xs2
 
-      suffixes = [ "_v" ++ show i | i <- [1..10::Int] ]
+      suffixes = [ "_v" ++ show i | i <- [1..10 :: Int] ]
 
       dropPre (x : xs) t | Just r <- L.stripPrefix x t = r
                          | otherwise = dropPre xs t
@@ -242,15 +252,13 @@ commonSettings = def
 
 -- * Protocol XML
 
-clientFromProtocolXML :: ProtocolRenderSettings -> FilePath ->  Q [Dec]
-clientFromProtocolXML settings filepath = do
-  pkgRoot <- getPackageRoot
-  proto <- runIO $ protocolFromFile (pkgRoot ++ "/protocol/" ++ filepath)
-  clientFromProtocol settings proto
-
 clientFromProtocolXML' :: ProtocolRenderSettings -> String ->  Q [Dec]
-clientFromProtocolXML' settings content =
-  clientFromProtocol settings $ protocolFromString content
+clientFromProtocolXML' settings = clientFromProtocol settings . protocolFromString
+
+clientFromProtocolXMLFile :: ProtocolRenderSettings -> FilePath ->  Q [Dec]
+clientFromProtocolXMLFile settings filepath = do
+  proto <- runIO $ protocolFromFile filepath
+  clientFromProtocol settings proto
 
 clientFromProtocol :: ProtocolRenderSettings -> Protocol -> Q [Dec]
 clientFromProtocol settings proto = do
@@ -282,19 +290,17 @@ doClient settings proto = do
       , docSection "Events"   [ "    * v'" ++ prTypeNameModifier (prTypeNameModifier iface.name ++ "_" ++ x.name) ++ "'\n" | x <- iface.events ]
       , docSection "Enums"    [ "    * t'" ++ prTypeNameModifier (prTypeNameModifier iface.name ++ "_" ++ x.name) ++ "'\n" | x <- iface.enums ]
       ]
-    docSection _ _ = ""
-    docSection name items = unlines $ [ "* " ++ name ++ "\n" ] ++ items
+    docSection name items = unlines $ ("* " ++ name ++ "\n") : items
 
 renderNewType :: Name -> Name -> String -> Q [Dec]
 renderNewType ntName objT doc = do
   let con = recC ntName [ varBangType (mkName "unwrap") (bangType (bang noSourceUnpackedness noSourceStrictness) [t|Ptr $(conT objT)|]) ]
   let derivs = [ derivClause (Just StockStrategy)   [ [t|Eq|], [t|Ord|], [t|Generic|] ]
-               -- , derivClause (Just AnyclassStrategy) [ [t|Data|] ]
                , derivClause (Just NewtypeStrategy) [ [t|Storable|], [t|Hashable|], [t|NFData|], [t|IsUserData|] ]
                ]
-  concat <$> sequence
-    [ sequence [ newtypeD_doc (pure []) ntName [] Nothing (con, Nothing, []) derivs (if doc == "" then Nothing else Just doc) ]
-    , [d|
+  concat <$> sequence (
+    [ sequence [ newtypeD_doc (pure []) ntName [] Nothing (con, Nothing, []) derivs (if doc == "" then Nothing else Just doc) ] {-| nameBase ntName /= "Display"-} ]
+    <> [ [d|
       instance Default $(conT ntName) where
         def = $(conE ntName) nullPtr
       instance Show $(conT ntName) where
@@ -302,25 +308,29 @@ renderNewType ntName objT doc = do
       instance Read $(conT ntName) where
         readsPrec n xs = first ($(conE ntName) . wordPtrToPtr) <$> readsPrec n xs
       |]
-    ]
+    ])
 
 renderInterface :: ProtocolRenderSettings -> Interface -> Q [Dec]
 renderInterface s iface = concat <$> sequence
-  [ renderInterfaceValue s iface
-  , renderInterfaceObject s iface
+  [ renderInterfaceObject s iface
+  , renderInterfaceValue s iface
+  , renderListenerEvents s iface
   , concat <$> mapM (renderEnum s iface) iface.enums
   , concat <$> mapM (renderRequest s iface) iface.requests
   , concat <$> mapM (renderMethod s iface) iface.requests
-  , renderListenerEvents s iface
   ]
 
+-- |
+-- @
+-- instance HasMethod "method" interface version where ...
+-- @
 renderMethod :: ProtocolRenderSettings -> Interface -> IRequest -> Q [Dec]
 renderMethod s iface req
  | reqDisable reqOpts = return []
  | otherwise = do
         reqFun <- lookupImportedValueName iface.name $ iface.name ++ "_" ++ req.name
         rawTy <- reifyType reqFun
-        let (argsT, resT) = (init &&& last) $ getArrowArgs rawTy
+        let argsT = init $ getArrowArgs rawTy
             reqArgs       = [ argSelf | length argsT >= length (filter (not . argIsNewId) req.args)] ++
               filter (not . argIsNewId) req.args
         [d|
@@ -333,17 +343,18 @@ renderMethod s iface req
     reqOpts = maybe def (\(_,_,x) -> x) $ L.find (\(ifN, rN, _) -> ifN == iface.name && rN == req.name) s.prRequestOptions
 
     methodImpl fn args = do
-      lhsN <- replicateM (length args) (newName "a")
-      rhsN <- replicateM (length args) (newName "b")
+      lhsN <- replicateM (length args) (newName "arg")
+      rhsN <- replicateM (length args) (newName "p")
       let args' = [ argTrans arg ty a | (a, (arg, ty)) <- zip lhsN args ]
       lamE (varP <$> lhsN) $ doE $
         [ bindS (varP b) x | (b, (x, _)) <- zip rhsN args' ] ++
-        [ noBindS [|coerce <$> finally $(appsE $ fn : map varE rhsN) $(doE [ noBindS (x n) | (n, (_, Just x)) <- zip rhsN args' ++ [(undefined, (undefined, Just $ \_ -> [|return ()|]))]]) |] ]
+        [ noBindS [|(coerce <$> $(appsE $ fn : map varE rhsN)) `finally` $(doE [ noBindS (x n) | (n, (_, Just x)) <- zip rhsN args' ++ [(undefined, (undefined, Just $ const [|return ()|]))]]) |] ]
 
     ntName = mkName $ s.prTypeNameModifier iface.name
     since = fromIntegral $ fromMaybe iface.version req.since
 
     mapType (_: args) (AppT _ t) = mapType' args t
+    mapType _ _ = error "mapType"
     mapType' (arg : args) = \case
       AppT (AppT ArrowT a) b -> appT (appT arrowT (mapType' [arg] a)) (mapType' args b)
       AppT a b | a == ConT ''IO -> AppT a <$> argTypeTrans arg b
@@ -360,7 +371,9 @@ renderInterfaceValue s iface = do
       ifN  = mkName $ iface.name <> "_interface"
       doc  = Just $ unlines
        [ "Interface: @" ++ iface.name ++ "@, version: " ++ show iface.version ++ "\n"
-       , formatDescription iface.description ]
+       , "Use 'objectInterface' to access this value."
+       ]
+       -- , formatDescription iface.description ]
   sequence
     [ sigD name [t|ConstPtr $(reifyType ifN)|]
     , funD_doc name [clause [] (normalB [|unsafePerformIO $! ConstPtr <$> new $(varE ifN)|]) []] doc []
@@ -369,19 +382,18 @@ renderInterfaceValue s iface = do
 
 renderEnum :: ProtocolRenderSettings -> Interface -> IEnum -> Q [Dec]
 renderEnum s iface e = do
-  let enumN = mkName $ s.prTypeNameModifier $ s.prTypeNameModifier iface.name ++ "_" ++ e.name
-      enumT = mkName $ upperFirst iface.name ++ "_" ++ e.name
-  doc <- fmap (fromMaybe "") $ getDoc $ DeclDoc enumT
-  x <- withDecDoc doc $ tySynD enumN [] (conT enumT)
-  xs <- concat <$> mapM (renderEntry enumN) e.entries
-  return (x : xs)
+  tySyn <- tySynD enumName [] (conT origTy)
+  patSyns <- mapM renderEntry e.entries
+  return (tySyn : concat patSyns)
   where
-    renderEntry eT en = do
-      let entryName = mkName $ fromSnailCase $ s.prValueNameModifier iface.name ++ "_" ++ e.name ++ "_" ++ en.name
-          doc = escapeString en.summary ++ "\n\nValue: " ++ show en.value
-      sequence
-        [ sigD entryName (conT eT)
-        , funD_doc entryName [clause [] (normalB [|toCEnum $(litE $ integerL $ fromIntegral en.value)|]) []] (Just doc) []
+    enumName = mkName $ s.prTypeNameModifier $ s.prTypeNameModifier iface.name ++ "_" ++ e.name
+    origTy = mkName $ upperFirst iface.name ++ "_" ++ e.name
+    renderEntry en = do
+      let doc  = escapeString en.summary ++ "\n\nValue: " ++ show en.value
+          name = mkName $ upperFirst $ fromSnailCase $ s.prValueNameModifier iface.name ++ "_" ++ e.name ++ "_" ++ en.name
+      withDecsDoc doc $ sequence
+        [ patSynSigD name (conT enumName)
+        , patSynD name (prefixPatSyn []) implBidir (conP origTy [litP $ integerL $ fromIntegral en.value])
         ]
 
 -- |
@@ -443,28 +455,31 @@ argIsNewId Arg{argType=t}
   | ANewId{} <- t = True
   | otherwise = False
 
-lookupImportedValueName' :: (String -> Name) -> String -> String -> Q Name
-lookupImportedValueName' onerr ifname str = do
-  ModuleInfo imports <- reifyModule =<< thisModule
-  let alts = [ nm ++ str | nm <- [ "IF_" ++ ifname ++ ".", "Safe.", "Unsafe.", "" ] ++ [ nm ++ "." | Module _ (ModName nm) <- imports ] ]
-      find (x : xs) = lookupValueName x >>= maybe (find xs) pure
-      find       [] = return $ onerr str
-   in find alts
-
 lookupImportedValueName :: String -> String -> Q Name
 lookupImportedValueName = lookupImportedValueName' $ \s -> error $ "Value not found: " ++ s
+
+lookupImportedTypeName :: String -> String -> Q Name
+lookupImportedTypeName = lookupImportedTypeName' $ \str -> error $ "Type not found: " ++ str
+
+lookupAlternatives :: String -> String -> Q [String]
+lookupAlternatives ifname str = do
+  ModuleInfo imports <- reifyModule =<< thisModule
+  return [ nm ++ str | nm <- [ "IF_" ++ ifname ++ ".", "Safe.", "Unsafe.", "" ] ++ [ nm ++ "." | ifname == "", Module _ (ModName nm) <- imports ] ]
+
+lookupImportedValueName' :: (String -> Name) -> String -> String -> Q Name
+lookupImportedValueName' onerr ifname str = do
+  alts <- lookupAlternatives ifname str
+  let find (x : xs) = lookupValueName x >>= maybe (find xs) pure
+      find       [] = return $ onerr str
+  find alts
 
 lookupImportedTypeName' :: (String -> Name) -> String -> String -> Q Name
 lookupImportedTypeName' onerr ifname strIn = do
   let str = upperFirst strIn
-  ModuleInfo imports <- reifyModule =<< thisModule
-  let alts = [ nm ++ str | nm <- [ "IF_" ++ ifname ++ ".", "Safe.", "Unsafe.", "" ] ++ [ nm ++ "." | Module _ (ModName nm) <- imports ] ]
-      find (x : xs) = lookupTypeName x >>= maybe (find xs) pure
+  alts <- lookupAlternatives ifname str
+  let find (x : xs) = lookupTypeName x >>= maybe (find xs) pure
       find       [] = return $ onerr str
-   in find alts
-
-lookupImportedTypeName :: String -> String -> Q Name
-lookupImportedTypeName = lookupImportedTypeName' $ \str -> error $ "Type not found: " ++ str
+  find alts
 
 renderRequest :: ProtocolRenderSettings -> Interface -> IRequest -> Q [Dec]
 renderRequest _ _ r | requestType r == Just "destructor" = pure []
@@ -490,12 +505,11 @@ renderRequest s iface request
         ++ [ "\nThrows if NULL." | reqCheckNull reqOpts]
         ++ [ "\nThrows if -1."   | reqCheckMinusOne reqOpts]
 
-  namesP <- mapM (\_ -> newName "a") argsT
+  namesP <- mapM (\_ -> newName "arg") argsT
+  namesR <- mapM (\_ -> newName "p") namesP
+  resN <- newName "res"
 
-  let body = do
-        resN <- newName "res"
-        namesR <- mapM (\_ -> newName "r") namesP
-        doE $
+  let body = doE $
           [ bindS (varP rN) (fst $ argTransform arg argT pN) | (pN, rN, (argT, arg)) <- zip3 namesP namesR (zip argsT rargs) ] -- args
             ++ [bindS (varP resN) $ appsE (map varE (f_name : namesR)) ]
             ++ [noBindS finalizer | (rN, argT) <- zip namesR argsT, Just finalizer <- [argFinalizer argT rN] ]
@@ -503,12 +517,12 @@ renderRequest s iface request
             ++ [noBindS [|when ($(varE resN) == nullPtr) $ throwErrno $(litE . StringL $ nameBase f_name)|] | reqCheckNull reqOpts, reqErrnoIfError reqOpts]
             ++ [noBindS [|when ($(varE resN) == -1)      $ error    $ $(litE . StringL $ nameBase f_name) ++ " returned -1"|] | reqCheckMinusOne reqOpts, not (reqErrnoIfError reqOpts)]
             ++ [noBindS [|when ($(varE resN) == -1)      $ throwErrno $(litE . StringL $ nameBase f_name)|] | reqCheckMinusOne reqOpts, reqErrnoIfError reqOpts]
-            ++ [noBindS $ resTransform resT resN ]
+            ++ [noBindS $ resTransform argRes resT resN ]
 
       body' = appE (varE 'liftIO) body
   sequence
     [ sigD reqN (toTypeTop (zip argsT rargs) (resT, argRes))
-    , funD_doc reqN [clause (map varP namesP) (normalB body' {- $ appE (varE 'liftIO) body-}) []] (Just doc) []
+    , funD_doc reqN [clause (map varP namesP) (normalB body') []] (Just doc) []
     , pragInlD reqN Inline FunLike AllPhases
     ]
   where
@@ -518,7 +532,7 @@ renderRequest s iface request
 
     reqOpts = maybe def (\(_,_,x) -> x) $ L.find (\(ifN, rN, _) -> ifN == iface.name && rN == request.name) s.prRequestOptions
 
-    toTypeTop args res = [t|forall m. MonadIO m => $(toType args)|]
+    toTypeTop args res = forallT [plainTV (mkName "m")] (cxt [appT (conT ''MonadIO) (varT (mkName "m"))]) (toType args)
       where
         toType ((x, arg) : xs) = appT (appT arrowT (argTypeTransform arg x)) (toType xs)
         toType []              = toTypeRes res
@@ -535,16 +549,15 @@ renderRequest s iface request
       = Just [|when (unConstPtr $(varE name) /= nullPtr) $ liftIO . free $ unConstPtr $(varE name)|]
       | otherwise = Nothing
 
-    resTransform (AppT (ConT _IO) (AppT (ConT _Ptr) (ConT obj))) name
+    resTransform arg (AppT (ConT _IO) (AppT (ConT _Ptr) (ConT obj))) name
       | obj /= ''Void
-      = [|return $! $(conE' $ s.prTypeNameModifier $ nameBase obj) $(varE name)|]
+      = [|return $! $(conE' arg $ s.prTypeNameModifier $ nameBase obj) $(varE name)|]
+    resTransform _ _ name = [|return $(varE name)|]
 
-    resTransform _ name = [|return $(varE name)|]
-
-    conE' str = conE =<< lookupImportedValueName' mkName "_" str
+    conE' arg str = conE =<< lookupImportedValueName' mkName (getArgIFName iface arg) str
 
 argDoc :: Arg -> String
-argDoc a = "@" ++ show a.argType ++ "@: " ++ escapeString a.summary ++ docNullable a.nullable
+argDoc a = "@" ++ show a.argType ++ "@ " ++ "(" ++ escapeString a.summary ++ docNullable a.nullable ++ ")"
   where
     docNullable (Just True)  = " __(nullable)__"
     docNullable (Just False) = " __(not nullable)__"
@@ -575,11 +588,11 @@ renderListenerEvents s iface = concat <$> sequence [ mkEvent s iface, mkHasListe
             'Wayland.listenerAdd' object listener ()
             @
             """
-      let listenerAddC = clause [] (normalB [|\o l -> $(varE =<< addListenerN) (coerce o) l|]) []
+      let listenerAddC = clause [] (normalB [|$(varE =<< addListenerN) . coerce|]) []
       sequence
-        [ withDecDoc doc $ instanceD (pure []) [t|HasListener $(objT)|]
-          [ tySynInstD $ tySynEqn Nothing [t|ObjectListener      $(objT)|] (conT =<< listenerN)
-          , tySynInstD $ tySynEqn Nothing [t|ObjectListenerEvent $(objT)|] (conT eventN)
+        [ withDecDoc doc $ instanceD (pure []) [t|HasListener $objT|]
+          [ tySynInstD $ tySynEqn Nothing [t|ObjectListener      $objT|] (conT =<< listenerN)
+          , tySynInstD $ tySynEqn Nothing [t|ObjectListenerEvent $objT|] (conT eventN)
           , funD 'createListener [createListenerC]
           , funD 'objectListenerAdd [listenerAddC]
           , funD 'freeListener [mkFreeListener]
@@ -593,19 +606,19 @@ renderListenerEvents s iface = concat <$> sequence [ mkEvent s iface, mkHasListe
 
     createListenerC = do
       (_, TyConI (DataD _ _ _ _ [RecC recName recs] _)) <- interfaceListener iface
+      fpNames <- forM recs $ \_ -> newName "fp"
       handle <- newName "handle"
       let mkExp (evN, _, evType) = do
             let fields  = getFields evType
                 ev      = eventFromName (nameBase evN)
                 params  = evParams $ nameBase evN
-                conName = mkName $ s.prTypeNameModifier iface.name ++ upperFirst (fromSnailCase $ nameBase evN)
-            patNs <- forM fields $ \_ -> newName "a"
-            argNs <- forM fields $ \_ -> newName "b"
+                conName = s.prEventName (s, iface, undefined) $ nameBase evN
+            patNs <- forM fields $ \_ -> newName "field"
+            argNs <- forM fields $ \_ -> newName "fieldB"
             appE (varE 'toFunPtr) $ lamE (map varP patNs) $ doE $
                   [ bindS (varP aN) (argTransform ev arg pT pN)
                     | ((pN, aN), arg, pT) <- zip3 (zip patNs argNs) params fields ]
                   ++ [ noBindS $ varE handle `appE` appsE (conE conName : map varE argNs) ]
-      fpNames <- forM recs $ \_ -> newName "fp"
       let fpExps = map mkExp recs
       let body = appE (varE 'liftIO) . doE $
             [ bindS   (varP nm) rhs | (nm, rhs) <- zip fpNames fpExps] ++
@@ -620,12 +633,17 @@ renderListenerEvents s iface = concat <$> sequence [ mkEvent s iface, mkHasListe
       let pat  = conP conName (map varP fps)
       let body = appE (varE 'liftIO) $ doE $
             [ bindS pat [| Foreign.peek (unConstPtr $(varE ptr)) |] ] ++
-            [ noBindS   [| freeHaskellFunPtr $(varE nm)    |] | nm <- fps ] ++
+            [ noBindS   [| freeHaskellFunPtr $(varE nm) |] | nm <- fps ] ++
             [ noBindS   [| free $ unConstPtr $(varE ptr) |] ]
       clause [varP ptr] (normalB body) []
 
     argTransform ev arg t name = s.prEventArgTrans s iface ev arg t (varE name)
 
+-- |
+-- @
+-- data InterfaceEvent = ...
+-- @
+--
 mkEvent :: ProtocolRenderSettings -> Interface -> Q [Dec]
 mkEvent s iface = do
   (_, TyConI (DataD _ _ _ _ [RecC _ recs] _)) <- interfaceListener iface
@@ -643,7 +661,7 @@ mkEvent s iface = do
     mkEvCon (evName', _, evType) =
       let event  = head [ e | e <- iface.events, e.name == dropSuffix "'" (nameBase evName') ]
           params = evParams $ nameBase evName'
-          evConN = eventCon s iface (nameBase evName')
+          evConN = s.prEventName (s, iface, undefined) (nameBase evName')
           con    = do
             fields <- forM (zip params $ getFields evType) $ \(arg, fT) -> do
               let name = s.prEventArgName s iface event arg fT
@@ -651,12 +669,10 @@ mkEvent s iface = do
             recC evConN [varBangType fN (bangType (bang sourceUnpack sourceStrict) fT) | (fT, fN) <- fields]
 
           doc = "'" ++ pprint evName' ++ "'\n\n"
-             ++ formatDescription event.description ++ "\n\n"
+             ++ formatDescription' event.description ++ "\n\n"
              ++ unlines ["- @" ++ a.name ++ "@: " ++ escapeString a.summary | a <- drop 2 params]
 
        in (con, Just doc, [])
-
-eventCon s iface ev = mkName $ s.prTypeNameModifier $ s.prTypeNameModifier iface.name ++ "_" ++ ev
 
 interfaceListener :: Interface -> Q (Name, Info)
 interfaceListener iface = do
@@ -701,3 +717,6 @@ escapeString = concatMap escape
 formatDescription :: Description -> String
 formatDescription desc = escapeString desc.summary
    ++ (if desc.contents /= "" then "\n\n" ++ escapeString desc.contents else "")
+
+formatDescription' :: Description -> String
+formatDescription' desc = escapeString $ if desc.contents /= "" then desc.contents else desc.summary

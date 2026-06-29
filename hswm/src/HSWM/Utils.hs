@@ -68,12 +68,12 @@ resolveModMask d s = go s
 
 ppModifiers :: ModMask -> [String]
 ppModifiers bm = [ s | (s, x) <-
-        [ ("C", R.riverSeatModifiersCtrl)
-        , ("S", R.riverSeatModifiersShift)
-        , ("M1", R.riverSeatModifiersMod1)
-        , ("M3", R.riverSeatModifiersMod3)
-        , ("M4", R.riverSeatModifiersMod4)
-        , ("M5", R.riverSeatModifiersMod5)
+        [ ("C",  R.RiverSeatModifiersCtrl)
+        , ("S",  R.RiverSeatModifiersShift)
+        , ("M1", R.RiverSeatModifiersMod1)
+        , ("M3", R.RiverSeatModifiersMod3)
+        , ("M4", R.RiverSeatModifiersMod4)
+        , ("M5", R.RiverSeatModifiersMod5)
         ], fi x.unwrap .&. bm /= 0 ]
 
 ppXBKey :: XBKey -> String

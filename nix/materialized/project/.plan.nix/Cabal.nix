@@ -10,10 +10,10 @@
   {
     flags = { git-rev = false; };
     package = {
-      specVersion = "3.6";
+      specVersion = "3.8";
       identifier = { name = "Cabal"; version = "3.17.0.0"; };
       license = "BSD-3-Clause";
-      copyright = "2003-2025, Cabal Development Team (see AUTHORS file)";
+      copyright = "2003-2026, Cabal Development Team (see AUTHORS file)";
       maintainer = "cabal-devel@haskell.org";
       author = "Cabal Development Team <cabal-devel@haskell.org>";
       homepage = "http://www.haskell.org/cabal/";
@@ -32,7 +32,7 @@
     };
     components = {
       "library" = {
-        depends = ([
+        depends = (([
           (hsPkgs."Cabal-syntax" or (errorHandler.buildDepError "Cabal-syntax"))
           (hsPkgs."array" or (errorHandler.buildDepError "array"))
           (hsPkgs."base" or (errorHandler.buildDepError "base"))
@@ -51,7 +51,7 @@
           then [ (hsPkgs."Win32" or (errorHandler.buildDepError "Win32")) ]
           else [
             (hsPkgs."unix" or (errorHandler.buildDepError "unix"))
-          ])) ++ pkgs.lib.optional (flags.git-rev) (hsPkgs."githash" or (errorHandler.buildDepError "githash"));
+          ])) ++ pkgs.lib.optional (system.isOsx) (hsPkgs."process" or (errorHandler.buildDepError "process"))) ++ pkgs.lib.optional (flags.git-rev) (hsPkgs."githash" or (errorHandler.buildDepError "githash"));
         buildable = true;
         modules = [
           "Distribution/Backpack/PreExistingComponent"
@@ -208,11 +208,11 @@
     };
   } // {
     src = pkgs.lib.mkDefault (pkgs.fetchgit {
-      url = "3";
+      url = "4";
       rev = "minimal";
       sha256 = "";
     }) // {
-      url = "3";
+      url = "4";
       rev = "minimal";
       sha256 = "";
     };

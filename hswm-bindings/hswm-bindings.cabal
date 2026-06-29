@@ -12,8 +12,8 @@ tested-with:
     , GHC == 9.12.4
     , GHC == 9.12.2
 extra-source-files:
-      binding-specs/*.yaml
       protocol/*.xml
+-- data-files: bindgen/*.yaml
 extra-doc-files:
       CHANGELOG.md
 
@@ -30,13 +30,11 @@ flag build-tool-depends
 custom-setup
     setup-depends:
           hs-bindgen-hooks
+        , haskell-wayland-core
         , base             >=4.21 && <5
         , Cabal            >=3.14 && <3.18
         , Cabal-hooks      >=3.14 && <3.18
         , microlens-ghc
-        , filepath
-        , string-interpolate
-        , directory
 
 common language
     default-language: GHC2024
@@ -72,15 +70,15 @@ library
           base                 >=4.21   && <4.23
         , containers           >=0.7    && <1.0
         , data-default         >=0.8    && <0.9
-        , deepseq              >=1.5.1  && <1.6
-        , hashable             >=1.5.1  && <1.6
+        --, deepseq              >=1.5.1  && <1.6
+        --, hashable             >=1.5.1  && <1.6
         , template-haskell     >=2.23   && <2.25
         , unix                ^>=2.8.6
         , unliftio            ^>=0.2.25
-        , c-expr-runtime       >=0.1.0  && <0.2
+        --, c-expr-runtime       >=0.1.0  && <0.2
         , hs-bindgen-runtime   >=0.1.0  && <0.2
         , hs-bindgen-hooks     ==0.1.0.0
-        , pretty
+        --, pretty
         , haskell-wayland-core
     hs-source-dirs: src
     ghc-options: -Wall -Wunused-packages -fPIC

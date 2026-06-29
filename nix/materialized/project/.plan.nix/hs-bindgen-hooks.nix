@@ -50,11 +50,11 @@
           (hsPkgs."text" or (errorHandler.buildDepError "text"))
           (hsPkgs."transformers" or (errorHandler.buildDepError "transformers"))
           (hsPkgs."xml-conduit" or (errorHandler.buildDepError "xml-conduit"))
+          (hsPkgs."aeson" or (errorHandler.buildDepError "aeson"))
         ];
         buildable = true;
         modules = [
           "Distribution/HsBindgen/Hooks"
-          "Distribution/HsBindgen/Lens"
           "Distribution/HsBindgen/Types"
           "Distribution/HsBindgen/Utils"
           "Distribution/Wayland/Hooks"

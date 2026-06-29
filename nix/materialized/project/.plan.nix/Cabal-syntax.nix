@@ -13,7 +13,7 @@
       specVersion = "3.6";
       identifier = { name = "Cabal-syntax"; version = "3.17.0.0"; };
       license = "BSD-3-Clause";
-      copyright = "2003-2025, Cabal Development Team (see AUTHORS file)";
+      copyright = "2003-2026, Cabal Development Team (see AUTHORS file)";
       maintainer = "cabal-devel@haskell.org";
       author = "Cabal Development Team <cabal-devel@haskell.org>";
       homepage = "http://www.haskell.org/cabal/";
@@ -65,7 +65,6 @@
           "Distribution/Compat/NonEmptySet"
           "Distribution/Compat/Parsing"
           "Distribution/Compat/Prelude"
-          "Distribution/Compat/Semigroup"
           "Distribution/Compiler"
           "Distribution/FieldGrammar"
           "Distribution/FieldGrammar/Class"
@@ -198,11 +197,11 @@
     };
   } // {
     src = pkgs.lib.mkDefault (pkgs.fetchgit {
-      url = "3";
+      url = "4";
       rev = "minimal";
       sha256 = "";
     }) // {
-      url = "3";
+      url = "4";
       rev = "minimal";
       sha256 = "";
     };

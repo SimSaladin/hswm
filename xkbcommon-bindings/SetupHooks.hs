@@ -193,23 +193,21 @@ parseHeader :: Verbosity -> FilePath -> IO [(String, [Macro])]
 parseHeader verb hdr = do
   res <- readFile hdr
   case explicitEitherParsec hdrParser res of
-    Left er -> die' verb er
     Right xs -> return xs
+    Left er -> die' verb er
 
-data Macro = Macro
-  { key, value :: String
-  , comment :: Maybe String
-  } deriving (Eq, Show, Read, Generic)
+data Macro = Macro { key, value :: String, comment :: Maybe String }
+  deriving (Eq, Show, Read, Generic)
 
 hdrParser :: CabalParsing m => m [(String, [Macro])]
 hdrParser = parse1
   where
     parse1 = do
-      _ <- P.many skipped
+      _     <- P.many skipped
       title <- P.optional comment
       case title of
         Just x -> do
-          _ <- P.some P.newline
+          _  <- P.some P.newline
           xs <- P.endBy define (P.some P.newline)
           ((x, xs) :) <$> parse1
         Nothing -> P.eof $> []
@@ -233,10 +231,10 @@ hdrParser = parse1
     hspace = P.satisfy (`elem` (" \t" :: String))
 
     define = P.try $ do
-      _ <- P.string "#define " <* P.many hspace
+      _   <- P.string "#define " <* P.many hspace
       key <- P.munch1 (`notElem` (" \t\n" :: String)) <* P.many hspace
       val <- P.many $ P.try $ P.satisfy (/= '\n') <* P.notFollowedBy (P.string "/*")
-      mc <- P.optional comment
+      mc  <- P.optional comment
       return $ Macro key val mc
 
 -- | Given a header file, find the absolute path to it.

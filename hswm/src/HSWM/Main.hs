@@ -197,13 +197,13 @@ startHSWM mainRun loggerSet logFunc wlDisplay config = do
       _ <- bindGlobalAuto'  @R.RiverLibinputConfig
       _ <- bindGlobalAuto'  @R.RiverInputManager
       _ <- bindGlobalAuto'  @R.RiverXkbConfig
-      _ <- bindGlobalAuto_  @Zdg.ZxdgOutputManager
-      _ <- bindGlobalAuto'  @Wlr.ZwlrOutputManager
-      _ <- bindGlobalAuto_  @Wlr.ZwlrLayerShell
+      _ <- bindGlobalAuto_  @Zdg.OutputManager
+      _ <- bindGlobalAuto'  @Wlr.OutputManager
+      _ <- bindGlobalAuto_  @Wlr.LayerShell
       _ <- bindGlobalAuto_  @FS.FractionalScaleManager
       _ <- bindGlobalAuto_  @VP.Viewporter
-      _ <- bindGlobalAuto_  @Wlr.ZwlrOutputPowerManager
-      _ <- bindGlobalAuto_  @Ext.ExtIdleNotifier
+      _ <- bindGlobalAuto_  @Wlr.OutputPowerManager
+      _ <- bindGlobalAuto_  @Ext.IdleNotifier
 
       logInfo "Installing signal handlers"
       _ <- io $ Posix.installHandler Posix.sigTERM (Posix.Catch $ runInH $ mainEvent $ MainSignal Posix.sigTERM) Nothing
@@ -363,12 +363,12 @@ instance HandleEvent H Event where
   handleEvent (LibinputDeviceEvent e) = InputConfig.handleLibinputDeviceEvent e
   handleEvent (XkbConfigEvent e) = InputConfig.handleXkbConfigEvent e
   handleEvent (XkbKeyboardEvent e) = InputConfig.handleXkbKeyboardEvent e
-  handleEvent (ForeignTopLevelListV1 (WL.ExtForeignToplevelListToplevel _ _ fh)) = WL.listenerAdd_ fh =<< getObject
-  handleEvent (WlrOutputManagerEvent (Wlr.ZwlrOutputManagerHead _ _ head)) = WL.listenerAdd_ head =<< getObject
+  handleEvent (ForeignTopLevelListV1 (WL.ForeignToplevelListToplevel _ _ fh)) = WL.listenerAdd_ fh =<< getObject
+  handleEvent (WlrOutputManagerEvent (Wlr.OutputManagerHead _ _ head)) = WL.listenerAdd_ head =<< getObject
   handleEvent (ExtIdleNotificationEvent e) = handleEvent e
   handleEvent _ = return ()
 
-instance HandleEvent H Ext.ExtIdleNotificationEvent where
+instance HandleEvent H Ext.IdleNotificationEvent where
   handleEvent = \case
-    Ext.ExtIdleNotificationIdled{} -> runInHS $ setOutputPower False
-    Ext.ExtIdleNotificationResumed{} -> runInHS $ setOutputPower True
+    Ext.IdleNotificationIdled{} -> runInHS $ setOutputPower False
+    Ext.IdleNotificationResumed{} -> runInHS $ setOutputPower True

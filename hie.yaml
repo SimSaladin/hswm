@@ -3,6 +3,9 @@ cradle:
     - path: "hs-bindgen-hooks/src"
       component: "lib:hs-bindgen-hooks"
 
+    - path: "haskell-wayland-core"
+      component: "lib:haskell-wayland-core"
+
     - path: "xkbcommon-bindings/src"
       component: "lib:xkbcommon-bindings"
 

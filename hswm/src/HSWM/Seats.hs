@@ -74,7 +74,7 @@ handleEvent = \case
           modifySeat seat $ \s' -> s' {hovered = window, pendingPointerEnter = Just (window, s.position)}
 
     R.RiverSeatPointerLeave _ seat ->
-      runInHS $ modifySeat seat $ \s -> s {hovered = R.invalidWindow, pendingPointerEnter = Nothing}
+      runInHS $ modifySeat seat $ \s -> s {hovered = def, pendingPointerEnter = Nothing}
 
     R.RiverSeatPointerPosition _ seat x y ->
       runInHS $ modifySeat seat $ \s -> s {position = Position x y}
@@ -93,7 +93,7 @@ handleEvent = \case
       withObject $ \l -> WL.listenerAdd wlseat l seat
       -- Register idle notifier
       withObject $ \idleNotify -> do
-        idleN <- Ext.extIdleNotifierGetIdleNotification idleNotify (10 * 60 * 1000) wlseat
+        idleN <- Ext.idleNotifierGetIdleNotification idleNotify (10 * 60 * 1000) wlseat
         withObject $ \l -> WL.listenerAdd idleN l seat
 
     R.RiverSeatRemoved _ seat ->
@@ -297,13 +297,13 @@ manage1 s = do
           when s.op_release $ do
             R.riverSeatOpEnd s.river_seat
             float s.op_window
-            modifySeat s.river_seat $ \x -> x {op = SEAT_OP_NONE, op_window = R.invalidWindow}
+            modifySeat s.river_seat $ \x -> x {op = SEAT_OP_NONE, op_window = def}
         SEAT_OP_RESIZE -> do
           when s.op_release $ do
             R.riverWindowInformResizeEnd s.op_window
             R.riverSeatOpEnd s.river_seat
             float s.op_window
-            modifySeat s.river_seat $ \x -> x {op = SEAT_OP_NONE, op_window = R.invalidWindow}
+            modifySeat s.river_seat $ \x -> x {op = SEAT_OP_NONE, op_window = def}
           withWindow s.op_window $ \w -> do
             let rw =
                   s.op_start_width
@@ -318,11 +318,11 @@ manage1 s = do
         modifySeat s.river_seat $ \x -> x {op_release = False}
 
 seatFocus :: Seat -> Window -> HS ()
-seatFocus s w = when (w.river_window /= R.invalidWindow) $ do
+seatFocus s w = when (w.river_window /= def) $ do
   when (w.river_window /= s.focused) $ setFocus w.river_window -- clearFocus
   modifySeat s.river_seat $ \s' -> s' {focused = w.river_window}
   where
-    setFocus rw = when (rw /= R.invalidWindow) $ R.riverSeatFocusWindow s.river_seat rw
+    setFocus rw = when (rw /= def) $ R.riverSeatFocusWindow s.river_seat rw
 
 -- | /manage sequence/
 seatClearFocus :: Seat -> H ()
@@ -395,7 +395,7 @@ createSeatBindings :: Seat -> H Seat
 createSeatBindings s = do
   binds     <- getObject
   kbdListen <- getObject
-  pbListen  <- getObject @R.RiverPointerBindingListener
+  pbListen  <- getObject @(ConstPtr (WL.ObjectListener R.RiverPointerBinding))
 
   myMod  <- view (config . defaultModMask) <&> resolveModMask 0
   pBinds <- view (config . pointerBindings) >>= resolvePointerBinds myMod

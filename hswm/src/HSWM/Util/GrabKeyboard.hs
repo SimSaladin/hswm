@@ -27,9 +27,9 @@ data GrabIM = GrabIM
   { reserved               :: MVar (),
     bcastChan              :: TChan (Either Done GrabbedKey),
     inputMethod            :: Wlr.InputMethod,
-    inputMethodListener    :: Wlr.InputMethodListener,
+    inputMethodListener    :: ConstPtr (WL.ObjectListener Wlr.InputMethod),
     imKeyboardGrab         :: MVar Wlr.InputMethodKeyboardGrab,
-    imKeyboardGrabListener :: Wlr.InputMethodKeyboardGrabListener,
+    imKeyboardGrabListener :: ConstPtr (WL.ObjectListener Wlr.InputMethodKeyboardGrab),
     xkbState               :: MVar XkbState
   }
 

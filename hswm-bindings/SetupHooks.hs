@@ -1,7 +1,8 @@
+{-# LANGUAGE DataKinds                #-}
 {-# LANGUAGE DisambiguateRecordFields #-}
 {-# LANGUAGE OverloadedLists          #-}
+{-# LANGUAGE OverloadedRecordDot      #-}
 {-# LANGUAGE OverloadedStrings        #-}
-{-# LANGUAGE OverloadedRecordDot #-}
 
 {-# OPTIONS_GHC -Wall #-}
 {-# OPTIONS_GHC -Wunused-packages #-}
@@ -10,93 +11,90 @@
 module SetupHooks (setupHooks) where
 
 import           Distribution.HsBindgen.Hooks
-import qualified Distribution.HsBindgen.Lens as I
+import qualified Distribution.HsBindgen.Types as I
 import           Distribution.HsBindgen.Utils
-import           Distribution.Simple.Utils
 import           Distribution.Wayland.Hooks
-import qualified Distribution.Wayland.Hooks as I
+import           Distribution.Wayland.ProtocolXML
 
 import           Distribution.CabalSpecVersion
-import           Distribution.Simple.Flag
+import           Distribution.Simple.Configure
+import           Distribution.Simple.Utils
 import           Distribution.Simple.Glob
-import           Distribution.Simple.SetupHooks
+import           Distribution.Simple.PackageIndex hiding (fromList)
+import           Distribution.Simple.SetupHooks (SetupHooks, Location(..))
+import qualified Distribution.Types.InstalledPackageInfo as PI
 import           Distribution.Types.LocalBuildConfig
-import           Distribution.Verbosity
-
+import           Distribution.Types.PackageName
 import           Distribution.Utils.Path
+import           Distribution.Verbosity
 
 import           Control.Monad
 import qualified Data.List as L
-import           Data.String
 import           Lens.Micro
 import           Lens.Micro.GHC ()
+import GHC.Exts (fromList)
+
+import qualified WL.Core.Internal as Core
 
 setupHooks :: SetupHooks
-setupHooks = waylandProtocolHooks (waylandOptions, config)
-
-waylandOptions :: ProtocolScannerOptions
-waylandOptions = def
-    & optionProtocolDirs <>~ [ makeSymbolicPath "protocol" ]
-    & optionCustom <>~ Endo f
-  where
-    f spec = spec
-      & qualifiedImports <>~ [ ("WL.Util", "WL.Util") ]
-      & I.bindGens . ix ClientBindings . I.extBindingSpecs <>~ [ BModule $ wlutil ^. I.moduleName . to fromFlag ]
-      & I.bindGens . ix ServerBindings . I.extBindingSpecs <>~ [ BModule $ wlutil ^. I.moduleName . to fromFlag ]
+setupHooks = waylandProtocolHooks config
 
 config :: DynamicSetup ()
 config = do
 
-  -- depends on core
-  let makeProtocolWayland spec deps = makeProtocol $ spec & depends (core.name : deps)
+  let v = verbosityFromFlags verbose
 
-  let makeProtoWL spec = makeProtocolWayland $ spec
-          & I.category .~ "wayland"
-          & I.fullName %~ ("wayland-" <>)
-          & I.baseName %~ (\bs -> spec ^. I.category <> (if bs == "" then "" else "-" <> bs))
+  setup <- ask
+  index <- liftIO $ getInstalledPackages v setup.packageBD.compiler Nothing setup.packageBD.withPackageDB setup.localBC.withPrograms
+  let (_, pkg : _) : _ = lookupPackageName index $ mkPackageName "haskell-wayland-core"
+      bspecDir = let d : _ = pkg.importDirs in makeSymbolicPath @Pkg @(Dir Source) $ d ++ "/binding-specs"
+      incDirs  = map makeSymbolicPath pkg.includeDirs
 
-      optionalProtoWL dir path deps = optionalProtocol $ parseWaylandProtosPath path
-          & _2 %~ depends (core.name : deps)
-          & _2 . I.protocolDirs <>~ dir
+  -- core
+  let coreProtocol = Core.protocol & setBindgenDir bspecDir
+      coreDeps     = [(x.name, coreProtocol) | x <- Core.proto.interfaces]
+      coreDep      = take 1 coreDeps
+  modifyOptions $ interfaceProtocols <>~ coreDeps
+  modifyOptions $ optionCustom <>~
+      (  Endo (I.bindGens . each . I.bcCustom <>~ Endo (I.includeDirs <>~ incDirs))
+      <> Endo (I.dependsOn <>~ coreDep)
+      )
 
-  let makeProtoRiver spec = makeProtocolWayland $ spec
-          & I.category  .~ "river"
-          & I.stability .~ Stable
-
-  let ignored = [ "ext-image-copy-capture"
-                , "ext-workspace"
-                , "presentation-time"
-                , "tablet"
-                , "cursor-shape"
-                , "single-pixel-buffer"
-                , "linux-dmabuf"
-                , "input-method"
-                ] :: [String]
+  -- utils
+  addExternal "utils" $ ProtocolRef
+    (fromList [(x, [makeLocation $ makeSymbolicPath @Pkg @File "wayland-util.h"]) | x <- [ EnumBindings, ClientBindings, ServerBindings ] ])
+    (fromList [(x, [BModule "WL.Util.Generated" $ Just bspecDir]) | x <- [ EnumBindings, ClientBindings, ServerBindings ] ])
+  modifyOptions $ optionCustom <>~
+    (  Endo (qualifiedImports <>~ [ ("WL.Util", "WL.Util") ])
+    <> Endo (bindGens . each . bcDepends %~ ("utils" :))
+    <> onlyIfName "linux-dmabuf"        (I.coreOnly .~ False)
+    <> onlyIfName "single-pixel-buffer" (I.coreOnly .~ False)
+    <> onlyIfName "input-method"        (I.coreOnly .~ False)
+    )
 
   withLBC $ \lbc -> do
-    let v = verbosityFromFlags verbose
     Just (AbsolutePath dir) <- liftIO $ getPkgConfDataDir v lbc.withPrograms "wayland-protocols"
-    liftIO $ notice v $ "Found dir: " ++ show dir
-    let Right glob = parseFileGlob CabalSpecV3_14  "**/*.xml"
-    matched <- liftIO $ runDirFileGlob v Nothing (getSymbolicPath dir) glob
-    let f d (GlobMatch x) = do
-              unless (any (`L.isInfixOf` x) ignored) $ do
-                res <- optionalProtoWL [d] x []
-                liftIO . noticeNoWrap v $ "Optional: " ++ show x ++ ": " ++ show res
-    mapM_ (f dir) matched
+    matched <- liftIO $ matchDirFileGlob v CabalSpecV3_14 (Just dir) (makeSymbolicPath "**/*.xml")
+    forM_ matched $ \x -> do
+      res <- optionalProtocol $ parseWaylandProtosPath (getSymbolicPath x)
+          & _2 . I.protocolDirs <>~ [dir]
+      liftIO . debugNoWrap v $ "Optional proto: " ++ show x ++ ": " ++ show res
 
-  -- wlr
-  _ <- makeProtocolWayland "wlr-layer-shell-unstable-v1.xml" [ "xdg-shell" ]
-  _ <- makeProtocolWayland "wlr-output-management-unstable-v1.xml" [ ]
-  _ <- makeProtocolWayland "wlr-output-power-management-unstable-v1.xml" []
-  _ <- makeProtocolWayland "wlr-input-method-unstable-v2.xml" [ "text-input" ]
+  -- Wlr
+  let makeProtocolWayland spec = makeProtocol $ spec & I.protocolDirs <>~ [makeSymbolicPath "protocol"]
+  void $ makeProtocolWayland "wlr-layer-shell-unstable-v1.xml"
+  void $ makeProtocolWayland "wlr-output-management-unstable-v1.xml"
+  void $ makeProtocolWayland "wlr-output-power-management-unstable-v1.xml"
+  void $ makeProtocolWayland "wlr-input-method-unstable-v2.xml"
 
-  -- river
-  riverWM <- makeProtoRiver "river-window-management-v1.xml" []
-  riverIM <- makeProtoRiver "river-input-management-v1.xml" []
-  _ <- makeProtoRiver "river-layer-shell-v1.xml" [ riverWM.name ]
-  _ <- makeProtoRiver "river-libinput-config-v1.xml" [ riverIM.name ]
-  _ <- makeProtoRiver "river-xkb-bindings-v1.xml" [ riverWM.name ]
-  _ <- makeProtoRiver "river-xkb-config-v1.xml" [ riverIM.name ]
-
-  return ()
+  -- River
+  let makeProtoRiver spec = makeProtocol $ spec
+          & I.category .~ "river"
+          & I.stability .~ Stable
+          & I.protocolDirs <>~ [makeSymbolicPath "protocol"]
+  void $ makeProtoRiver "river-window-management-v1.xml"
+  void $ makeProtoRiver "river-input-management-v1.xml"
+  void $ makeProtoRiver "river-layer-shell-v1.xml"
+  void $ makeProtoRiver "river-libinput-config-v1.xml"
+  void $ makeProtoRiver "river-xkb-bindings-v1.xml"
+  void $ makeProtoRiver "river-xkb-config-v1.xml"

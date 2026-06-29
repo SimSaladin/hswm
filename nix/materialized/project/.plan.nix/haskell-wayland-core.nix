@@ -35,8 +35,8 @@
       detailLevel = "FullDetails";
       licenseFiles = [ "LICENSE" ];
       dataDir = ".";
-      dataFiles = [];
-      extraSrcFiles = [ "protocol/*.xml" ];
+      dataFiles = [ "wayland.xml" "binding-specs/*.yaml" ];
+      extraSrcFiles = [ "wayland.xml" "binding-specs/*.yaml" ];
       extraTmpFiles = [];
       extraDocFiles = [];
     };
@@ -44,7 +44,6 @@
       "library" = {
         depends = [
           (hsPkgs."base" or (errorHandler.buildDepError "base"))
-          (hsPkgs."containers" or (errorHandler.buildDepError "containers"))
           (hsPkgs."data-default" or (errorHandler.buildDepError "data-default"))
           (hsPkgs."deepseq" or (errorHandler.buildDepError "deepseq"))
           (hsPkgs."hashable" or (errorHandler.buildDepError "hashable"))
@@ -54,7 +53,6 @@
           (hsPkgs."c-expr-runtime" or (errorHandler.buildDepError "c-expr-runtime"))
           (hsPkgs."hs-bindgen-runtime" or (errorHandler.buildDepError "hs-bindgen-runtime"))
           (hsPkgs."hs-bindgen-hooks" or (errorHandler.buildDepError "hs-bindgen-hooks"))
-          (hsPkgs."pretty" or (errorHandler.buildDepError "pretty"))
         ];
         libs = pkgs.lib.optionals (!flags.pkg-config) [
           (pkgs."wayland-client" or (errorHandler.sysDepError "wayland-client"))
@@ -67,6 +65,8 @@
         build-tools = pkgs.lib.optional (flags.build-tool-depends) (hsPkgs.pkgsBuildBuild.hs-bindgen.components.exes.hs-bindgen-cli or (pkgs.pkgsBuildBuild.hs-bindgen-cli or (errorHandler.buildToolDepError "hs-bindgen:hs-bindgen-cli")));
         buildable = true;
         modules = [
+          "Paths_haskell_wayland_core"
+          "PackageInfo_haskell_wayland_core"
           "WL/Core/Client"
           "WL/Internals/TH"
           "WL/Internals/Types"

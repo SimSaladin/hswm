@@ -13,7 +13,7 @@
       specVersion = "3.6";
       identifier = { name = "Cabal-hooks"; version = "3.17"; };
       license = "BSD-3-Clause";
-      copyright = "2025, Cabal Development Team";
+      copyright = "2003-2026, Cabal Development Team";
       maintainer = "cabal-devel@haskell.org";
       author = "Cabal Development Team <cabal-devel@haskell.org>";
       homepage = "http://www.haskell.org/cabal/";

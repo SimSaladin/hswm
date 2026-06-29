@@ -201,6 +201,7 @@
         hashable.flags.random-initial-seed = false;
         hashable.flags.arch-native = false;
         character-ps.revision = import ./cabal-files/character-ps.nix;
+        record-hasfield.revision = import ./cabal-files/record-hasfield.nix;
         th-compat.revision = import ./cabal-files/th-compat.nix;
         utf8-string.revision = import ./cabal-files/utf8-string.nix;
         gi-harfbuzz.revision = import ./cabal-files/gi-harfbuzz.nix;
@@ -426,7 +427,6 @@
           "cabal-install" = {
             flags = {
               "legacy-comparison" = lib.mkOverride 900 false;
-              "lukko" = lib.mkOverride 900 false;
               "native-dns" = lib.mkOverride 900 true;
               "git-rev" = lib.mkOverride 900 false;
             };
@@ -666,6 +666,7 @@
           "th-abstraction".components.library.planned = lib.mkOverride 900 true;
           "gi-gobject".components.setup.planned = lib.mkOverride 900 true;
           "regex-tdfa".components.library.planned = lib.mkOverride 900 true;
+          "record-hasfield".components.library.planned = lib.mkOverride 900 true;
           "stm-chans".components.library.planned = lib.mkOverride 900 true;
           "optparse-generic".components.exes."optparse-generic-example-unwrap-with-help".planned = lib.mkOverride 900 true;
           "pixman-bindings".components.setup.planned = lib.mkOverride 900 true;

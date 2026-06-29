@@ -1,0 +1,9 @@
+import Data.Word
+
+clientFromProtocolXML' commonSettings
+  { prEventArgTypeTrans = \s iface ev arg t ->
+    case (arg.argType, arg.name) of
+      (AArray, "device")  -> [t|WL.Util.Array Word8|] -- dev_t
+      (AArray, "indices") -> [t|WL.Util.Array Word16|]
+      _                   -> defaultEventArgTypeTrans s iface ev arg t
+  } protoXml

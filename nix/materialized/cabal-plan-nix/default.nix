@@ -169,7 +169,6 @@
           "cabal-install" = {
             flags = {
               "legacy-comparison" = lib.mkOverride 900 false;
-              "lukko" = lib.mkOverride 900 false;
               "native-dns" = lib.mkOverride 900 true;
               "git-rev" = lib.mkOverride 900 false;
             };

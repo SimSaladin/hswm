@@ -154,12 +154,13 @@ createKeyboardKeymap params = lookupKeymaps params >>= \case
       kmap <- io $ createKeymapFromNames ctx params KeymapFormatTextV1
       fd <- io $ keymapAsStringFd kmap KeymapFormatTextV1
       keymap <- withObject $ \xkbConfig ->
-        R.riverXkbConfigCreateKeymap xkbConfig (fi fd) R.riverXkbConfigKeymapFormatTextV1
+        R.riverXkbConfigCreateKeymap xkbConfig (fi fd) R.RiverXkbConfigKeymapFormatTextV1
       let kmState = KeymapState { created = False, failure = Nothing, keymap, keymapFd = fd, params = Just params }
       modifyObjectDef $ \st -> st { xkbKeymaps = M.insert keymap kmState st.xkbKeymaps }
       l <- getOrCreateObject $ do
         runInIO <- askRunInIO
-        R.mkRiverXkbKeymapListener $ runInIO . handleXkbKeymapEvent
+        WL.createListener $ runInIO . handleXkbKeymapEvent
+        -- R.mkRiverXkbKeymapListener $ runInIO . handleXkbKeymapEvent
       WL.listenerAdd_ keymap l
       return kmState
 
@@ -194,10 +195,10 @@ handleInputManagerEvent (R.RiverInputManagerInputDevice _ _ dev) = do
   withObject $ WL.listenerAdd_ dev
 
 handleInputDeviceEvent :: (MonadStateGlobal HConf m) => R.RiverInputDeviceEvent -> m ()
-handleInputDeviceEvent (R.RiverInputDeviceType' _ dev deviceType) = do
+handleInputDeviceEvent (R.RiverInputDeviceType _ dev deviceType) = do
   modifyObjectDef $ \st -> st { inputDevices = M.adjust (\ds -> ds { deviceType = Just deviceType }) dev st.inputDevices }
   -- Set repeat rate & delay for keyboard device
-  when (deviceType == R.riverInputDeviceTypeKeyboard) $ do
+  when (deviceType == R.RiverInputDeviceTypeKeyboard) $ do
     view (config . repeatInfo) >>= (`whenJust` uncurry (R.riverInputDeviceSetRepeatInfo dev))
 handleInputDeviceEvent (R.RiverInputDeviceName _ dev name) = do
   modifyObjectDef $ \st -> st { inputDevices = M.adjust (\ds -> ds { deviceName = name }) dev st.inputDevices }

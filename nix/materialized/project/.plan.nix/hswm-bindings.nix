@@ -24,19 +24,17 @@
       isLocal = true;
       setup-depends = [
         (hsPkgs.pkgsBuildBuild.hs-bindgen-hooks or (pkgs.pkgsBuildBuild.hs-bindgen-hooks or (errorHandler.setupDepError "hs-bindgen-hooks")))
+        (hsPkgs.pkgsBuildBuild.haskell-wayland-core or (pkgs.pkgsBuildBuild.haskell-wayland-core or (errorHandler.setupDepError "haskell-wayland-core")))
         (hsPkgs.pkgsBuildBuild.base or (pkgs.pkgsBuildBuild.base or (errorHandler.setupDepError "base")))
         (hsPkgs.pkgsBuildBuild.Cabal or (pkgs.pkgsBuildBuild.Cabal or (errorHandler.setupDepError "Cabal")))
         (hsPkgs.pkgsBuildBuild.Cabal-hooks or (pkgs.pkgsBuildBuild.Cabal-hooks or (errorHandler.setupDepError "Cabal-hooks")))
         (hsPkgs.pkgsBuildBuild.microlens-ghc or (pkgs.pkgsBuildBuild.microlens-ghc or (errorHandler.setupDepError "microlens-ghc")))
-        (hsPkgs.pkgsBuildBuild.filepath or (pkgs.pkgsBuildBuild.filepath or (errorHandler.setupDepError "filepath")))
-        (hsPkgs.pkgsBuildBuild.string-interpolate or (pkgs.pkgsBuildBuild.string-interpolate or (errorHandler.setupDepError "string-interpolate")))
-        (hsPkgs.pkgsBuildBuild.directory or (pkgs.pkgsBuildBuild.directory or (errorHandler.setupDepError "directory")))
       ];
       detailLevel = "FullDetails";
       licenseFiles = [ "LICENSE" ];
       dataDir = ".";
       dataFiles = [];
-      extraSrcFiles = [ "binding-specs/*.yaml" "protocol/*.xml" ];
+      extraSrcFiles = [ "protocol/*.xml" ];
       extraTmpFiles = [];
       extraDocFiles = [ "CHANGELOG.md" ];
     };
@@ -46,15 +44,11 @@
           (hsPkgs."base" or (errorHandler.buildDepError "base"))
           (hsPkgs."containers" or (errorHandler.buildDepError "containers"))
           (hsPkgs."data-default" or (errorHandler.buildDepError "data-default"))
-          (hsPkgs."deepseq" or (errorHandler.buildDepError "deepseq"))
-          (hsPkgs."hashable" or (errorHandler.buildDepError "hashable"))
           (hsPkgs."template-haskell" or (errorHandler.buildDepError "template-haskell"))
           (hsPkgs."unix" or (errorHandler.buildDepError "unix"))
           (hsPkgs."unliftio" or (errorHandler.buildDepError "unliftio"))
-          (hsPkgs."c-expr-runtime" or (errorHandler.buildDepError "c-expr-runtime"))
           (hsPkgs."hs-bindgen-runtime" or (errorHandler.buildDepError "hs-bindgen-runtime"))
           (hsPkgs."hs-bindgen-hooks" or (errorHandler.buildDepError "hs-bindgen-hooks"))
-          (hsPkgs."pretty" or (errorHandler.buildDepError "pretty"))
           (hsPkgs."haskell-wayland-core" or (errorHandler.buildDepError "haskell-wayland-core"))
         ];
         libs = pkgs.lib.optionals (!flags.pkg-config) [

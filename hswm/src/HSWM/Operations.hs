@@ -291,7 +291,7 @@ setOutputPower mode = do
     Nothing -> return ()
     Just power -> do
       logInfo $ "setting output power" :# [ "on" .= mode ]
-      Wlr.zwlrOutputPowerSetMode power (if mode then Wlr.zwlrOutputPowerModeOn else Wlr.zwlrOutputPowerModeOff)
+      Wlr.outputPowerSetMode power (if mode then Wlr.OutputPowerModeOn else Wlr.OutputPowerModeOff)
 
 --------------------------------------------------------------
 -- * Seats

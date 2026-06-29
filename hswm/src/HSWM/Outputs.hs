@@ -74,10 +74,10 @@ handle = \case
     wlo <- bindGlobalWith @WL.Output name Nothing
     withObject $ \l -> WL.listenerAdd wlo l output
     -- xdg_output
-    zdg_output <- withObject $ \om -> Zdg.zxdgOutputManagerGetXdgOutput om wlo
+    zdg_output <- withObject $ \om -> Zdg.outputManagerGetXdgOutput om wlo
     withObject $ \l -> WL.listenerAdd zdg_output l output
     -- output power mgmt
-    power <- withObject $ \opm -> Wlr.zwlrOutputPowerManagerGetOutputPower opm wlo
+    power <- withObject $ \opm -> Wlr.outputPowerManagerGetOutputPower opm wlo
     modifyObjectDef $ \om -> om
       { pending_setup = M.adjust (\o -> o { wlOutput = wlo, outputPower = Just power }) output (pending_setup om) }
 

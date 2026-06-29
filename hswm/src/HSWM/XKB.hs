@@ -19,7 +19,7 @@ import qualified Data.Map as M
 
 createXkbBindings
   :: (MonadReader env m, MonadLogger m, MonadIO m, Show a, Typeable a)
-  => (R.RiverXkbBindings, R.RiverXkbBindingListener, R.RiverSeat)
+  => (R.RiverXkbBindings, ConstPtr (WL.ObjectListener R.RiverXkbBinding), R.RiverSeat)
   -> (a -> [(XBKey, a)]) -- ^ 'actionSubmap' - get subkeys
   -> [(XBKey, a)]
   -> m (XkbBindingMap a)
@@ -32,7 +32,7 @@ createXkbBindings (a1, a2, a3) getSub keys = sequence top
 newXKBBinding
   :: (MonadReader env m, MonadLogger m, MonadIO m, Show action, Typeable action)
   => R.RiverXkbBindings
-  -> R.RiverXkbBindingListener
+  -> ConstPtr (WL.ObjectListener R.RiverXkbBinding)
   -> R.RiverSeat
   -> Bool -- ^ Enable by default?
   -> ModMask
@@ -61,7 +61,7 @@ destroyXKBBinding sptr = do
 
 newPointerBinding ::
   (MonadLogger m, MonadIO m, Show a, Typeable a)
-  => R.RiverPointerBindingListener
+  => ConstPtr (WL.ObjectListener R.RiverPointerBinding)
   -> R.RiverSeat
   -> ModMask
   -> Button

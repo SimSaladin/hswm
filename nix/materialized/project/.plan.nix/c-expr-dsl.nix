@@ -35,6 +35,7 @@
         depends = [
           (hsPkgs."base" or (errorHandler.buildDepError "base"))
           (hsPkgs."c-expr-runtime" or (errorHandler.buildDepError "c-expr-runtime"))
+          (hsPkgs."bytestring" or (errorHandler.buildDepError "bytestring"))
           (hsPkgs."containers" or (errorHandler.buildDepError "containers"))
           (hsPkgs."debruijn" or (errorHandler.buildDepError "debruijn"))
           (hsPkgs."fin" or (errorHandler.buildDepError "fin"))
@@ -54,14 +55,13 @@
           "C/Expr/Parse/Literal"
           "C/Expr/Parse/Name"
           "C/Expr/Syntax/Expr"
-          "C/Expr/Syntax/Literals"
+          "C/Expr/Syntax/Literal"
           "C/Expr/Syntax/Name"
           "C/Expr/Syntax/TTG"
           "C/Expr/Syntax/TTG/Parse"
           "C/Expr/Syntax/TTG/Typecheck"
           "C/Expr/Syntax/Type"
           "C/Expr/Typecheck/Expr"
-          "C/Expr/Util/Panic"
           "C/Expr/Util/Parsec"
           "C/Expr/Util/TestEquality"
           "C/Expr/Parse"
@@ -70,6 +70,7 @@
           "C/Expr/Typecheck/Interface/Type"
           "C/Expr/Typecheck/Interface/Value"
           "C/Expr/Typecheck/Type"
+          "C/Expr/Util/Panic"
         ];
         hsSourceDirs = [ "src" ];
       };
@@ -98,6 +99,7 @@
             "Test/CExpr/Parse"
             "Test/CExpr/Parse/Golden"
             "Test/CExpr/Parse/Infra"
+            "Test/CExpr/Parse/Literal"
             "Test/CExpr/Parse/Macro"
             "Test/CExpr/Parse/Type"
             "Test/CExpr/Typecheck"
@@ -112,11 +114,11 @@
     };
   } // {
     src = pkgs.lib.mkDefault (pkgs.fetchgit {
-      url = "0";
+      url = "1";
       rev = "minimal";
       sha256 = "";
     }) // {
-      url = "0";
+      url = "1";
       rev = "minimal";
       sha256 = "";
     };

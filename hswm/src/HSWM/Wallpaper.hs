@@ -74,7 +74,7 @@ instance Default OutputState where
 
 data Surfaces = Surfaces
   { wl_surface   :: !WL.Surface
-  , layerSurface :: !Wlr.ZwlrLayerSurface
+  , layerSurface :: !Wlr.LayerSurface
   , outViewport  :: !(Maybe VP.Viewport)
   } deriving (Eq, Show)
 
@@ -264,14 +264,14 @@ initOutput ro = withOutputState ro $ \os -> do
 
        -- layersurface
       layerSurface <- withObject $ \layerShell ->
-        Wlr.zwlrLayerShellGetLayerSurface layerShell wl_surface os.wl_output Wlr.ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND (Just "wallpaper")
-      Wlr.zwlrLayerSurfaceSetSize layerSurface 0 0
-      Wlr.zwlrLayerSurfaceSetAnchor layerSurface (R.toCEnum $ 1 + 2 + 4 + 8)
-      Wlr.zwlrLayerSurfaceSetExclusiveZone layerSurface (-1)
+        Wlr.layerShellGetLayerSurface layerShell wl_surface os.wl_output Wlr.ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND (Just "wallpaper")
+      Wlr.layerSurfaceSetSize layerSurface 0 0
+      Wlr.layerSurfaceSetAnchor layerSurface (R.toCEnum $ 1 + 2 + 4 + 8)
+      Wlr.layerSurfaceSetExclusiveZone layerSurface (-1)
 
       lsListener <- WL.createListener $ \case
-        Wlr.ZwlrLayerSurfaceConfigure _ ls serial cw ch -> runInIO $ do
-          Wlr.zwlrLayerSurfaceAckConfigure ls serial
+        Wlr.LayerSurfaceConfigure _ ls serial cw ch -> runInIO $ do
+          Wlr.layerSurfaceAckConfigure ls serial
           logInfo $ "wallpaper: layer surface configure" :# [ "size" .= show (cw, ch), "old-size" .= show (w, h), "output" .= show ro ]
           updateOutputState ro $ \x -> x
               { out_width = fi cw
@@ -280,7 +280,7 @@ initOutput ro = withOutputState ro $ \os -> do
               , pending_render = not x.configured || (x.out_width, x.out_height) /= (fi cw, fi ch)
               }
 
-        Wlr.ZwlrLayerSurfaceClosed {} -> do
+        Wlr.LayerSurfaceClosed {} -> do
           runInIO $ logError "Layer surface closed!"
           return ()
 

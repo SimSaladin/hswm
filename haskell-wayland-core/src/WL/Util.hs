@@ -15,7 +15,14 @@
 --
 module WL.Util
   (
-  -- * Arrays
+  -- * wl_fixed: Fixed-point numbers
+  Fixed(..),
+  fixedToDouble,
+  fixedFromDouble,
+  fixedToInt,
+  fixedFromInt,
+
+  -- * wl_array
   Array(..),
   arrayNew,
   arrayFromList,
@@ -26,7 +33,7 @@ module WL.Util
   arrayAddBytes,
   arrayForEach,
 
-  -- * Lists
+  -- * wl_list
   List(..),
   ListOf(..),
   SomeList,
@@ -46,23 +53,16 @@ module WL.Util
   listRemove,
   listInsertList,
 
-  -- * Fixed-point numbers
-  Fixed(..),
-  fixedToDouble,
-  fixedFromDouble,
-  fixedToInt,
-  fixedFromInt,
-
   -- * Interfaces
   Wl_interface(..),
   Wl_message(..),
-  -- ** Max message size
-  wL_MAX_MESSAGE_SIZE,
-  -- ** Dispatching (Wl_argument etc.)
   Wl_argument(..),
   Wl_object,
+  -- ** Dispatching (Wl_argument etc.)
   Wl_dispatcher_func_t(..),
   Wl_dispatcher_func_t_Aux(..),
+  -- ** Max message size
+  wL_MAX_MESSAGE_SIZE,
 
   ) where
 
@@ -72,9 +72,12 @@ import qualified WL.Util.Generated.Unsafe as U
 import qualified HsBindgen.Runtime.HasCField as CF
 import           UnliftIO
 
+import           Control.DeepSeq (NFData)
 import           Control.Monad
 import           Data.Coerce
 import           Data.Default
+import qualified Data.Fixed as F
+import           Data.Hashable (Hashable)
 import           Data.Kind
 import           Data.Proxy
 import           Foreign
@@ -83,7 +86,6 @@ import           Foreign.C.Types
 import           GHC.Generics
 import           GHC.Records
 import           System.IO.Unsafe
-import qualified Data.Fixed as F
 
 -- | Dynamic array
 --
@@ -94,6 +96,7 @@ import qualified Data.Fixed as F
 -- the same type and size.
 newtype Array (a :: k) = Array { unwrap :: Ptr Wl_array }
   deriving stock (Eq, Ord, Show, Generic)
+  deriving newtype (Storable, NFData, Hashable)
 
 -- | Initializes a new empty array.
 arrayNew :: MonadIO m => m (Array a)
@@ -178,11 +181,13 @@ instance Default Wl_list where
 --   offset# _ _ = ...
 --
 -- @
-newtype List (a :: Type) = List { unList :: Ptr Wl_list }
+newtype List (a :: Type) = List { unwrap :: Ptr Wl_list }
   deriving stock (Eq, Ord, Show, Generic)
+  deriving newtype (Storable, NFData, Hashable)
 
 newtype ListOf (a :: Type) = ListOf { unListOf :: Ptr a }
   deriving stock (Eq, Ord, Show, Generic)
+  deriving newtype (Storable, NFData, Hashable)
 
 type role List   nominal
 type role ListOf nominal
@@ -213,7 +218,7 @@ class IsListContainer list a where
   fromListLink = id
 
 instance IsListItem a => IsListContainer List a where
-  toListContainer   = ListOf . fromListItemLink @a . unList
+  toListContainer   = ListOf . fromListItemLink @a . (.unwrap)
   fromListContainer = List . toListItemLink @a . unListOf
 
 instance IsListItem a => IsListContainer ListOf a where
@@ -298,8 +303,9 @@ listSeekBackward (List l) = liftIO $ List . prev <$> peek l
 -- as an opaque struct with methods that facilitate conversion to and from
 -- Double and Int types.
 newtype Fixed = Fixed { unwrap :: Wl_fixed_t }
-  deriving newtype (Eq, Ord)
-  deriving stock (Generic)
+  deriving stock (Eq, Generic)
+  deriving newtype (Storable, Ord)
+  -- deriving anyclass (Hashable, NFData)
 
 instance Show Fixed where
   show (Fixed (Wl_fixed_t x)) = F.showFixed True (F.MkFixed $ fromIntegral x :: F.Fixed 256)
@@ -309,17 +315,17 @@ instance Num Fixed where
   (Fixed (Wl_fixed_t a)) - (Fixed (Wl_fixed_t b)) = Fixed . Wl_fixed_t $! a - b
   (Fixed (Wl_fixed_t a)) * (Fixed (Wl_fixed_t b)) = Fixed . Wl_fixed_t $! div (a * b) 256
   negate (Fixed (Wl_fixed_t x)) = Fixed . Wl_fixed_t $! negate x
-  abs (Fixed (Wl_fixed_t x)) = Fixed . Wl_fixed_t $! abs x
+  abs    (Fixed (Wl_fixed_t x)) = Fixed . Wl_fixed_t $! abs x
   signum (Fixed (Wl_fixed_t x)) = Fixed . Wl_fixed_t $! signum x
   fromInteger = fixedFromInt
-
-instance Real Fixed where
-  toRational (Fixed (Wl_fixed_t a)) = toRational a / 8
 
 instance Fractional Fixed where
   (Fixed (Wl_fixed_t a)) / (Fixed (Wl_fixed_t b)) = Fixed . Wl_fixed_t $! div (a * 256) b
   recip (Fixed (Wl_fixed_t a)) = Fixed . Wl_fixed_t $! div (256 * 256) a
   fromRational r = Fixed . Wl_fixed_t $! round (r * 256)
+
+instance Real Fixed where
+  toRational (Fixed (Wl_fixed_t a)) = toRational a / 8
 
 fixedToInt :: Fixed -> Int
 fixedToInt (Fixed x) = unsafePerformIO . fmap fromIntegral $ U.wl_fixed_to_int x

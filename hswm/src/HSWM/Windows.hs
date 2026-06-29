@@ -162,7 +162,7 @@ warpPointerToScreen :: ScreenDetail -> ScreenId -> HS ()
 warpPointerToScreen sd sid = do
   mapSeats $ \s -> do
     R.riverSeatPointerWarp s.river_seat px py
-    modifySeat s.river_seat $ \s' -> s' {focused = R.invalidWindow}
+    modifySeat s.river_seat $ \s' -> s' {focused = def}
   withScreenOutput sid $ \o -> io $ R.riverLayerShellOutputSetDefault o.layerShellOutput
   where
     px = fi $ sd.x + sd.width `div` 2
@@ -209,13 +209,13 @@ doRemoveWindow w = do
   use _seats >>= \xs -> do
     xs' <- forM xs $ \s -> do
       let seat = s
-            & focused . filtered (== w.river_window) .~ R.invalidWindow
-            & hovered . filtered (== w.river_window) .~ R.invalidWindow
-            & interacted . filtered (== w.river_window) .~ R.invalidWindow
+            & focused . filtered (== w.river_window) .~ def
+            & hovered . filtered (== w.river_window) .~ def
+            & interacted . filtered (== w.river_window) .~ def
       if seat.op_window == w.river_window
         then do
           R.riverSeatOpEnd seat.river_seat
-          return $ seat & op_window .~ R.invalidWindow & op .~ SEAT_OP_NONE
+          return $ seat & op_window .~ def & op .~ SEAT_OP_NONE
         else return seat
     modify $ \s -> s {_seats = xs'}
   -- destroy WL references

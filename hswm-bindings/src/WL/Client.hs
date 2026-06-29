@@ -527,8 +527,8 @@ pattern ShmFormatARGB8888 :: ShmFormat
 pattern ShmFormatARGB8888             = Client.WL_SHM_FORMAT_ARGB8888
 pattern ShmFormatXRGB8888 :: ShmFormat
 pattern ShmFormatXRGB8888             = Client.WL_SHM_FORMAT_XRGB8888
-pattern ShmFormatC8 :: ShmFormat
-pattern ShmFormatC8                   = Client.WL_SHM_FORMAT_C8
+--pattern ShmFormatC8 :: ShmFormat
+--pattern ShmFormatC8                   = Client.WL_SHM_FORMAT_C8
 pattern ShmFormatRGB332 :: ShmFormat
 pattern ShmFormatRGB332               = Client.WL_SHM_FORMAT_RGB332
 pattern ShmFormatBGR233 :: ShmFormat
@@ -639,10 +639,10 @@ pattern ShmFormatYUV444 :: ShmFormat
 pattern ShmFormatYUV444               = Client.WL_SHM_FORMAT_YUV444
 pattern ShmFormatYVU444 :: ShmFormat
 pattern ShmFormatYVU444               = Client.WL_SHM_FORMAT_YVU444
-pattern ShmFormatR8 :: ShmFormat
-pattern ShmFormatR8                   = Client.WL_SHM_FORMAT_R8
-pattern ShmFormatR16 :: ShmFormat
-pattern ShmFormatR16                  = Client.WL_SHM_FORMAT_R16
+--pattern ShmFormatR8 :: ShmFormat
+--pattern ShmFormatR8                   = Client.WL_SHM_FORMAT_R8
+--pattern ShmFormatR16 :: ShmFormat
+--pattern ShmFormatR16                  = Client.WL_SHM_FORMAT_R16
 pattern ShmFormatRG88 :: ShmFormat
 pattern ShmFormatRG88                 = Client.WL_SHM_FORMAT_RG88
 pattern ShmFormatGR88 :: ShmFormat
@@ -665,18 +665,18 @@ pattern ShmFormatVUY888 :: ShmFormat
 pattern ShmFormatVUY888               = Client.WL_SHM_FORMAT_VUY888
 pattern ShmFormatVUY101010 :: ShmFormat
 pattern ShmFormatVUY101010            = Client.WL_SHM_FORMAT_VUY101010
-pattern ShmFormatY210 :: ShmFormat
-pattern ShmFormatY210                 = Client.WL_SHM_FORMAT_Y210
-pattern ShmFormatY212 :: ShmFormat
-pattern ShmFormatY212                 = Client.WL_SHM_FORMAT_Y212
-pattern ShmFormatY216 :: ShmFormat
-pattern ShmFormatY216                 = Client.WL_SHM_FORMAT_Y216
-pattern ShmFormatY410 :: ShmFormat
-pattern ShmFormatY410                 = Client.WL_SHM_FORMAT_Y410
-pattern ShmFormatY412 :: ShmFormat
-pattern ShmFormatY412                 = Client.WL_SHM_FORMAT_Y412
-pattern ShmFormatY416 :: ShmFormat
-pattern ShmFormatY416                 = Client.WL_SHM_FORMAT_Y416
+--pattern ShmFormatY210 :: ShmFormat
+--pattern ShmFormatY210                 = Client.WL_SHM_FORMAT_Y210
+--pattern ShmFormatY212 :: ShmFormat
+--pattern ShmFormatY212                 = Client.WL_SHM_FORMAT_Y212
+--pattern ShmFormatY216 :: ShmFormat
+--pattern ShmFormatY216                 = Client.WL_SHM_FORMAT_Y216
+--pattern ShmFormatY410 :: ShmFormat
+--pattern ShmFormatY410                 = Client.WL_SHM_FORMAT_Y410
+--pattern ShmFormatY412 :: ShmFormat
+--pattern ShmFormatY412                 = Client.WL_SHM_FORMAT_Y412
+--pattern ShmFormatY416 :: ShmFormat
+--pattern ShmFormatY416                 = Client.WL_SHM_FORMAT_Y416
 pattern ShmFormatXVYU2101010 :: ShmFormat
 pattern ShmFormatXVYU2101010          = Client.WL_SHM_FORMAT_XVYU2101010
 pattern ShmFormatXVYU12_16161616 :: ShmFormat
@@ -715,22 +715,22 @@ pattern ShmFormatNV24 :: ShmFormat
 pattern ShmFormatNV24                 = Client.WL_SHM_FORMAT_NV24
 pattern ShmFormatNV42 :: ShmFormat
 pattern ShmFormatNV42                 = Client.WL_SHM_FORMAT_NV42
-pattern ShmFormatP210 :: ShmFormat
-pattern ShmFormatP210                 = Client.WL_SHM_FORMAT_P210
-pattern ShmFormatP010 :: ShmFormat
-pattern ShmFormatP010                 = Client.WL_SHM_FORMAT_P010
-pattern ShmFormatP012 :: ShmFormat
-pattern ShmFormatP012                 = Client.WL_SHM_FORMAT_P012
-pattern ShmFormatP016 :: ShmFormat
-pattern ShmFormatP016                 = Client.WL_SHM_FORMAT_P016
+--pattern ShmFormatP210 :: ShmFormat
+--pattern ShmFormatP210                 = Client.WL_SHM_FORMAT_P210
+--pattern ShmFormatP010 :: ShmFormat
+--pattern ShmFormatP010                 = Client.WL_SHM_FORMAT_P010
+--pattern ShmFormatP012 :: ShmFormat
+--pattern ShmFormatP012                 = Client.WL_SHM_FORMAT_P012
+--pattern ShmFormatP016 :: ShmFormat
+--pattern ShmFormatP016                 = Client.WL_SHM_FORMAT_P016
 pattern ShmFormatAXBXGXRX106106106106 :: ShmFormat
 pattern ShmFormatAXBXGXRX106106106106 = Client.WL_SHM_FORMAT_AXBXGXRX106106106106
 pattern ShmFormatNV15 :: ShmFormat
 pattern ShmFormatNV15                 = Client.WL_SHM_FORMAT_NV15
-pattern ShmFormatQ410 :: ShmFormat
-pattern ShmFormatQ410                 = Client.WL_SHM_FORMAT_Q410
-pattern ShmFormatQ401 :: ShmFormat
-pattern ShmFormatQ401                 = Client.WL_SHM_FORMAT_Q401
+--pattern ShmFormatQ410 :: ShmFormat
+--pattern ShmFormatQ410                 = Client.WL_SHM_FORMAT_Q410
+--pattern ShmFormatQ401 :: ShmFormat
+--pattern ShmFormatQ401                 = Client.WL_SHM_FORMAT_Q401
 pattern ShmFormatXRGB16161616 :: ShmFormat
 pattern ShmFormatXRGB16161616         = Client.WL_SHM_FORMAT_XRGB16161616
 pattern ShmFormatXBGR16161616 :: ShmFormat
@@ -739,67 +739,36 @@ pattern ShmFormatARGB16161616 :: ShmFormat
 pattern ShmFormatARGB16161616         = Client.WL_SHM_FORMAT_ARGB16161616
 pattern ShmFormatABGR16161616 :: ShmFormat
 pattern ShmFormatABGR16161616         = Client.WL_SHM_FORMAT_ABGR16161616
-pattern ShmFormatC1 :: ShmFormat
-pattern ShmFormatC1                   = Client.WL_SHM_FORMAT_C1
-pattern ShmFormatC2 :: ShmFormat
-pattern ShmFormatC2                   = Client.WL_SHM_FORMAT_C2
-pattern ShmFormatC4 :: ShmFormat
-pattern ShmFormatC4                   = Client.WL_SHM_FORMAT_C4
-pattern ShmFormatD1 :: ShmFormat
-pattern ShmFormatD1                   = Client.WL_SHM_FORMAT_D1
-pattern ShmFormatD2 :: ShmFormat
-pattern ShmFormatD2                   = Client.WL_SHM_FORMAT_D2
-pattern ShmFormatD4 :: ShmFormat
-pattern ShmFormatD4                   = Client.WL_SHM_FORMAT_D4
-pattern ShmFormatD8 :: ShmFormat
-pattern ShmFormatD8                   = Client.WL_SHM_FORMAT_D8
-pattern ShmFormatR1 :: ShmFormat
-pattern ShmFormatR1                   = Client.WL_SHM_FORMAT_R1
-pattern ShmFormatR2 :: ShmFormat
-pattern ShmFormatR2                   = Client.WL_SHM_FORMAT_R2
-pattern ShmFormatR4 :: ShmFormat
-pattern ShmFormatR4                   = Client.WL_SHM_FORMAT_R4
-pattern ShmFormatR10 :: ShmFormat
-pattern ShmFormatR10                  = Client.WL_SHM_FORMAT_R10
-pattern ShmFormatR12 :: ShmFormat
-pattern ShmFormatR12                  = Client.WL_SHM_FORMAT_R12
+--pattern ShmFormatC1 :: ShmFormat
+--pattern ShmFormatC1                   = Client.WL_SHM_FORMAT_C1
+--pattern ShmFormatC2 :: ShmFormat
+--pattern ShmFormatC2                   = Client.WL_SHM_FORMAT_C2
+--pattern ShmFormatC4 :: ShmFormat
+--pattern ShmFormatC4                   = Client.WL_SHM_FORMAT_C4
+--pattern ShmFormatD1 :: ShmFormat
+--pattern ShmFormatD1                   = Client.WL_SHM_FORMAT_D1
+--pattern ShmFormatD2 :: ShmFormat
+--pattern ShmFormatD2                   = Client.WL_SHM_FORMAT_D2
+--pattern ShmFormatD4 :: ShmFormat
+--pattern ShmFormatD4                   = Client.WL_SHM_FORMAT_D4
+--pattern ShmFormatD8 :: ShmFormat
+--pattern ShmFormatD8                   = Client.WL_SHM_FORMAT_D8
+--pattern ShmFormatR1 :: ShmFormat
+--pattern ShmFormatR1                   = Client.WL_SHM_FORMAT_R1
+--pattern ShmFormatR2 :: ShmFormat
+--pattern ShmFormatR2                   = Client.WL_SHM_FORMAT_R2
+--pattern ShmFormatR4 :: ShmFormat
+--pattern ShmFormatR4                   = Client.WL_SHM_FORMAT_R4
+--pattern ShmFormatR10 :: ShmFormat
+--pattern ShmFormatR10                  = Client.WL_SHM_FORMAT_R10
+--pattern ShmFormatR12 :: ShmFormat
+--pattern ShmFormatR12                  = Client.WL_SHM_FORMAT_R12
 pattern ShmFormatAVUY8888 :: ShmFormat
 pattern ShmFormatAVUY8888             = Client.WL_SHM_FORMAT_AVUY8888
 pattern ShmFormatXVUY8888 :: ShmFormat
 pattern ShmFormatXVUY8888             = Client.WL_SHM_FORMAT_XVUY8888
-pattern ShmFormatP030 :: ShmFormat
-pattern ShmFormatP030                 = Client.WL_SHM_FORMAT_P030
-
-pattern ShellSurfaceTransientInactive :: ShellSurfaceTransient
-pattern ShellSurfaceTransientInactive = Client.WL_SHELL_SURFACE_TRANSIENT_INACTIVE
-
-pattern ShellSurfaceResizeNone :: ShellSurfaceResize
-pattern ShellSurfaceResizeNone          = Client.WL_SHELL_SURFACE_RESIZE_NONE
-pattern ShellSurfaceResizeTop :: ShellSurfaceResize
-pattern ShellSurfaceResizeTop           = Client.WL_SHELL_SURFACE_RESIZE_TOP
-pattern ShellSurfaceResizeBottom :: ShellSurfaceResize
-pattern ShellSurfaceResizeBottom        = Client.WL_SHELL_SURFACE_RESIZE_BOTTOM
-pattern ShellSurfaceResizeLeft :: ShellSurfaceResize
-pattern ShellSurfaceResizeLeft          = Client.WL_SHELL_SURFACE_RESIZE_LEFT
-pattern ShellSurfaceResizeTopLeft :: ShellSurfaceResize
-pattern ShellSurfaceResizeTopLeft       = Client.WL_SHELL_SURFACE_RESIZE_TOP_LEFT
-pattern ShellSurfaceResizeBottomLeft :: ShellSurfaceResize
-pattern ShellSurfaceResizeBottomLeft    = Client.WL_SHELL_SURFACE_RESIZE_BOTTOM_LEFT
-pattern ShellSurfaceResizeRight :: ShellSurfaceResize
-pattern ShellSurfaceResizeRight         = Client.WL_SHELL_SURFACE_RESIZE_RIGHT
-pattern ShellSurfaceResizeTopRight :: ShellSurfaceResize
-pattern ShellSurfaceResizeTopRight      = Client.WL_SHELL_SURFACE_RESIZE_TOP_RIGHT
-pattern ShellSurfaceResizeBottomRight :: ShellSurfaceResize
-pattern ShellSurfaceResizeBottomRight   = Client.WL_SHELL_SURFACE_RESIZE_BOTTOM_RIGHT
-
-pattern ShellSurfaceFullscreenMethodDefault = Client.WL_SHELL_SURFACE_FULLSCREEN_METHOD_DEFAULT
-pattern ShellSurfaceFullscreenMethodScale   = Client.WL_SHELL_SURFACE_FULLSCREEN_METHOD_SCALE
-pattern ShellSurfaceFullscreenMethodDriver  = Client.WL_SHELL_SURFACE_FULLSCREEN_METHOD_DRIVER
-pattern ShellSurfaceFullscreenMethodFill    = Client.WL_SHELL_SURFACE_FULLSCREEN_METHOD_FILL
-
-pattern SeatCapabilityPointer  = Client.WL_SEAT_CAPABILITY_POINTER
-pattern SeatCapabilityKeyboard = Client.WL_SEAT_CAPABILITY_KEYBOARD
-pattern SeatCapabilityTouch    = Client.WL_SEAT_CAPABILITY_TOUCH
+--pattern ShmFormatP030 :: ShmFormat
+--pattern ShmFormatP030                 = Client.WL_SHM_FORMAT_P030
 
 parseSeatCapabilities :: SeatCapability -> [SeatCapability]
 parseSeatCapabilities x = [ v | v <- values, fromCEnum x .&. fromCEnum v > 0 ]
@@ -808,28 +777,6 @@ parseSeatCapabilities x = [ v | v <- values, fromCEnum x .&. fromCEnum v > 0 ]
              , SeatCapabilityKeyboard
              , SeatCapabilityTouch
              ]
-
--- PointerButtonState
-pattern PointerButtonStateReleased = Client.WL_POINTER_BUTTON_STATE_RELEASED
-pattern PointerButtonStatePressed  = Client.WL_POINTER_BUTTON_STATE_PRESSED
-
-pattern PointerAxisVerticalScroll   = Client.WL_POINTER_AXIS_VERTICAL_SCROLL
-pattern PointerAxisHorizontalScroll = Client.WL_POINTER_AXIS_HORIZONTAL_SCROLL
-
-pattern PointerAxisSourceWheel        = Client.WL_POINTER_AXIS_SOURCE_WHEEL
-pattern PointerAxisSourceFinger       = Client.WL_POINTER_AXIS_SOURCE_FINGER
-pattern PointerAxisSourceContinuous   = Client.WL_POINTER_AXIS_SOURCE_CONTINUOUS
-pattern PointerAxisSourceWheelTilt    = Client.WL_POINTER_AXIS_SOURCE_WHEEL_TILT
-
-pattern PointerAxisRelativeDirectionIdentical = Client.WL_POINTER_AXIS_RELATIVE_DIRECTION_IDENTICAL
-pattern PointerAxisRelativeDirectionInverted  = Client.WL_POINTER_AXIS_RELATIVE_DIRECTION_INVERTED
-
-pattern KeyboardKeymapFormatNoKeymap = Client.WL_KEYBOARD_KEYMAP_FORMAT_NO_KEYMAP
-pattern KeyboardKeymapFormatXkbV1    = Client.WL_KEYBOARD_KEYMAP_FORMAT_XKB_V1
-
-pattern KeyboardKeyStateReleased = Client.WL_KEYBOARD_KEY_STATE_RELEASED
-pattern KeyboardKeyStatePressed  = Client.WL_KEYBOARD_KEY_STATE_PRESSED
-pattern KeyboardKeyStateRepeated = Client.WL_KEYBOARD_KEY_STATE_REPEATED
 
 -- | @shmCreatePool shm fd sizeBytes@
 shmCreatePool :: MonadIO m => Shm -> Fd -> Int -> m ShmPool

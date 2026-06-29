@@ -1,6 +1,7 @@
 
 clientFromProtocolXML' commonSettings
-  { prRequestArgTypeTrans = \s iface r arg t -> case arg.argType of
-      AArray | r.name == "set_available_actions" -> [t| WL.Util.Array $(conT $ mkName "TextInputAction") |]
-      _                                          -> defaultRequestArgTypeTrans s iface r arg t
+  { prRequestArgTypeTrans = \s iface r arg t ->
+    case (arg.argType, r.name) of
+      (AArray, "set_available_actions") -> [t|WL.Util.Array $(conT $ mkName "TextInputAction")|]
+      _                                 -> defaultRequestArgTypeTrans s iface r arg t
   } protoXml

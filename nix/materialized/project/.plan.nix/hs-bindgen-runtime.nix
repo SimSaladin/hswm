@@ -34,8 +34,10 @@
       "library" = {
         depends = [
           (hsPkgs."base" or (errorHandler.buildDepError "base"))
+          (hsPkgs."bytestring" or (errorHandler.buildDepError "bytestring"))
           (hsPkgs."containers" or (errorHandler.buildDepError "containers"))
           (hsPkgs."primitive" or (errorHandler.buildDepError "primitive"))
+          (hsPkgs."record-hasfield" or (errorHandler.buildDepError "record-hasfield"))
           (hsPkgs."template-haskell" or (errorHandler.buildDepError "template-haskell"))
           (hsPkgs."vector" or (errorHandler.buildDepError "vector"))
         ] ++ pkgs.lib.optional (compiler.isGhc && compiler.version.lt "9.4") (hsPkgs."data-array-byte" or (errorHandler.buildDepError "data-array-byte"));
@@ -65,6 +67,7 @@
           "HsBindgen/Runtime/Internal/HasFFIType"
           "HsBindgen/Runtime/Internal/LibC/Auxiliary"
           "HsBindgen/Runtime/Internal/Prelude"
+          "HsBindgen/Runtime/Internal/Prelude/CompatHasField"
           "HsBindgen/Runtime/Internal/Ptr"
           "HsBindgen/Runtime/Internal/SizedByteArray"
           "HsBindgen/Runtime/IsArray"

@@ -26,7 +26,6 @@ library
   import: warnings
   exposed-modules:
     Distribution.HsBindgen.Hooks
-    Distribution.HsBindgen.Lens
     Distribution.HsBindgen.Types
     Distribution.HsBindgen.Utils
     Distribution.Wayland.Hooks
@@ -55,6 +54,7 @@ library
     text ^>=2.1.2,
     transformers,
     xml-conduit >=1.10 && <1.11,
+    aeson,
 
   hs-source-dirs: src
   default-language: GHC2024

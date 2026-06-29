@@ -12,7 +12,11 @@ tested-with:
     , GHC == 9.12.4
     , GHC == 9.12.2
 extra-source-files:
-      protocol/*.xml
+      wayland.xml
+      binding-specs/*.yaml
+data-files:
+      wayland.xml
+      binding-specs/*.yaml
 
 flag pkg-config
     description: Use pkgconfig to resolve C dependencies
@@ -31,38 +35,39 @@ custom-setup
         , Cabal            >=3.14 && <3.18
         , Cabal-hooks      >=3.14 && <3.18
         , microlens-ghc
-        , filepath
-        , string-interpolate
-        , directory
 
 common language
     default-language: GHC2024
     default-extensions:
+          DeriveAnyClass
+          DerivingVia
           DuplicateRecordFields
-          OverloadedStrings
+          LambdaCase
           OverloadedLabels
           OverloadedRecordDot
+          OverloadedStrings
+          PatternSynonyms
           TemplateHaskell
           TypeFamilies
-          PatternSynonyms
-          LambdaCase
-          DerivingVia
-          DeriveAnyClass
 
 library
     import: language
     exposed-modules:
-          -- WL.Client -- ???
           WL.Core.Client
+          WL.Core.Server
           WL.Internals.TH
+          WL.Internals.TH.Server
           WL.Internals.Types
           WL.Internals.Utils
           WL.Util
     other-modules:
+          Paths_haskell_wayland_core
+          PackageInfo_haskell_wayland_core
     autogen-modules:
+          Paths_haskell_wayland_core
+          PackageInfo_haskell_wayland_core
     build-depends:
           base                 >=4.21   && <4.23
-        , containers           >=0.7    && <1.0
         , data-default         >=0.8    && <0.9
         , deepseq              >=1.5.1  && <1.6
         , hashable             >=1.5.1  && <1.6
@@ -72,7 +77,6 @@ library
         , c-expr-runtime       >=0.1.0  && <0.2
         , hs-bindgen-runtime   >=0.1.0  && <0.2
         , hs-bindgen-hooks     ==0.1.0.0
-        , pretty
     hs-source-dirs: src
     ghc-options: -Wall -Wunused-packages -fPIC
 

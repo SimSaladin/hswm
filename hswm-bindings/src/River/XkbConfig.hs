@@ -19,8 +19,8 @@ module River.XkbConfig
   , riverXkbConfigCreateKeymap
   -- ** KeymapFormat
   , RiverXkbConfigKeymapFormat
-  , riverXkbConfigKeymapFormatTextV1
-  , riverXkbConfigKeymapFormatTextV2
+  , pattern RiverXkbConfigKeymapFormatTextV1
+  , pattern RiverXkbConfigKeymapFormatTextV2
 
   -- * RiverXkbKeymap
   , RiverXkbKeymap(..)

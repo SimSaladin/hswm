@@ -10,7 +10,7 @@ module WL.Core.Client
 import           WL.Internals.TH
 import           WL.Internals.Types
 import           WL.Internals.Utils
-import           Path_wayland
+import           WL.Core.Internal
 import           WL.Core.Enums
 import           WL.Util
 
@@ -19,13 +19,14 @@ import           WL.Core.Client.Generated.Global
 import           WL.Core.Client.Generated.Safe   as Safe
 import qualified WL.Core.Client.Generated.Unsafe as Unsafe
 
-import           Control.Monad
 import           Control.Exception
+import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.Maybe
 import           Foreign
 import           Foreign.C
 import           Foreign.C.ConstPtr
+import           GHC.Generics (Generic)
 import           System.Posix
 
 --------------------------------------------------------------------------------------
@@ -41,14 +42,14 @@ clientFromProtocolXML' commonSettings
 
   , prEventArgTypeTrans = \s iface ev arg t -> do
     case t of
-      _ | AArray <- arg.argType, ev.name == "enter" -> [t|WL.Util.Array Word32|]
-        | AFixed <- arg.argType                     -> [t|WL.Util.Fixed|]
+      _ | AFixed <- arg.argType                     -> [t|Fixed|]
+        | AArray <- arg.argType, ev.name == "enter" -> [t|Array Word32|]
       _                                             -> defaultEventArgTypeTrans s iface ev arg t
 
   , prEventArgTrans = \s iface ev arg t x -> do
     case t of
-      _ | AFixed <- arg.argType                     -> [|return $! WL.Util.Fixed $(x)|]
-      _ | AArray <- arg.argType, ev.name == "enter" -> [|return $! WL.Util.Array $(x)|]
+      _ | AFixed <- arg.argType                     -> [|return $! Fixed $(x)|]
+        | AArray <- arg.argType, ev.name == "enter" -> [|return $! Array $(x)|]
       _                                             -> defaultEventArgTrans s iface ev arg t x
 
   } protoXml
@@ -58,15 +59,15 @@ data WaylandProtocolError = WaylandProtocolError
   , errObjectId            :: !Word32
   , errInterface           :: !(ConstPtr Wl_interface)
   , errObjectInterfaceName :: !(Maybe String)
-  } deriving (Eq, Show)
+  } deriving stock (Eq, Ord, Show, Generic)
 
 instance Exception WaylandProtocolError
 
 data WaylandDisplayError
-  = DisplayConnectFailed String
-  | DisplayRoundtripFailed Display (Maybe EventQueue)
-  | DisplayDisplayError Display DisplayError
-  deriving (Eq, Ord, Show)
+  = DisplayConnectFailed !String
+  | DisplayRoundtripFailed !Display !(Maybe EventQueue)
+  | DisplayDisplayError !Display !DisplayError
+  deriving stock (Eq, Ord, Show, Generic)
 
 instance Exception WaylandDisplayError
 
@@ -385,8 +386,3 @@ registryBind reg name iface ver = liftIO $ castPtr <$> wl_registry_bind reg.unwr
 -- | Close the connection to display and free all resources associated with it.
 displayDisconnect :: MonadIO m => Display -> m ()
 displayDisconnect (Display d) = liftIO $ Safe.wl_display_disconnect d
-
--- calltest :: Display -> IO Registry
--- calltest d = #get_registry d
---
--- test2 = #add (undefined :: Region)
