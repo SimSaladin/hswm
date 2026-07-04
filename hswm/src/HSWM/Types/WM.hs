@@ -45,6 +45,8 @@ import           Data.Monoid (Ap(..))
 import           Data.Typeable
 import           System.Log.FastLogger (LoggerSet)
 
+-- * Types
+
 type WindowSet = WindowSetX Layout
 
 type WindowSpace = WindowSpaceX Layout
@@ -54,7 +56,7 @@ type Seat = Seat' H
 instance Default (Full a) where
   def = Full
 
--- Exceptions
+-- * Exceptions
 
 data HSWMException = HSWMStateLocked String
                    | HSWMTimeout String
@@ -62,10 +64,10 @@ data HSWMException = HSWMStateLocked String
 
 instance Exception HSWMException
 
--- WindowSet / Stacks
+-- * WindowSet / Stacks
 
 -- ---------------------------------------------------------------------
--- Extensible state/config
+-- * Extensible state/config
 --
 
 -- | Every module must make the data it wants to store
@@ -95,7 +97,7 @@ data StateExtension
     forall a. (Read a, Show a, ExtensionClass a) => PersistentExtension a
 
 --------------------------------------------------------------
--- Layout messages
+-- * Layout messages
 
 -- | Based on ideas in /An Extensible Dynamically-Typed Hierarchy of
 -- Exceptions/, Simon Marlow, 2006. Use extensible messages to the
@@ -113,7 +115,7 @@ fromMessage :: (Message m) => SomeMessage -> Maybe m
 fromMessage (SomeMessage m) = cast m
 
 -------------------------------------------------------------------------
--- Layouts
+-- * Layouts
 
 data Layout a = forall l. (LayoutClass l a, Read (l a)) => Layout (l a)
 

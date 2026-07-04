@@ -12,7 +12,6 @@ packages:
   ./waybar-cffi-hs
   ./xkbcommon-bindings
 
-
 -- local packages only
 executable-stripping: True
 library-stripping: True

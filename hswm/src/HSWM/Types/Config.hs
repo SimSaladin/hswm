@@ -119,12 +119,12 @@ type family LayoutProxy (m :: Type -> Type) :: Type -> Type
 makeLensesWith' classPerField
   [ ''RepeatInfo
   , ''XkbRuleNames
-  , ''HSWMConfig
   , ''ScreenDetail
   ]
 
-instance HasRepeatInfo RepeatInfo RepeatInfo where
-  repeatInfo = id
+makeLensesCombine [] [ ''HSWMConfig ]
+
+--instance HasRepeatInfo RepeatInfo RepeatInfo where repeatInfo = id
 
 instance HasPosition ScreenDetail Position where
   position = lens (Position <$> view (_x . to fi) <*> view (_y . to fi)) (\s a -> (s::ScreenDetail) { x = fi a.x, y = fi a.y })

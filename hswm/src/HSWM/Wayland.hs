@@ -35,7 +35,7 @@ bindGlobal = do
 -- | Bind global by type + add listener.
 bindGlobalWithListener
   :: forall a env m. (MonadGlobals env m, WL.IsWlObject a, WL.HasInterface a, WL.HasListener a, Show a)
-  => (ConstPtr (WL.ObjectListener a)) -- ^ listener
+  => ConstPtr (WL.ObjectListener a) -- ^ listener
   -> Ptr () -- ^ User data
   -> m a
 bindGlobalWithListener listener udata = do

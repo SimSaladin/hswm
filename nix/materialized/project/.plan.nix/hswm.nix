@@ -46,6 +46,7 @@
           (hsPkgs."hswm-bindings" or (errorHandler.buildDepError "hswm-bindings"))
           (hsPkgs."hswm".components.sublibs.ipc-api or (errorHandler.buildDepError "hswm:ipc-api"))
           (hsPkgs."hswm".components.sublibs.prelude or (errorHandler.buildDepError "hswm:prelude"))
+          (hsPkgs."microlens-th" or (errorHandler.buildDepError "microlens-th"))
           (hsPkgs."mtl" or (errorHandler.buildDepError "mtl"))
           (hsPkgs."network" or (errorHandler.buildDepError "network"))
           (hsPkgs."optparse-applicative" or (errorHandler.buildDepError "optparse-applicative"))

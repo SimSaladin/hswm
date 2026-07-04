@@ -60,7 +60,7 @@ modifySeat' ud = modifySeat (R.RiverSeat $ castPtr ud)
 handleEvent :: R.RiverSeatEvent -> H ()
 handleEvent = \case
     R.RiverSeatPointerEnter _ seat window ->
-      runInHS $ withSeat seat $ \s -> do
+      runInHS $ withSeat_ seat $ \s -> do
           logInfo $ "seat: pending pointer focus" :# [ "window" .= show window, "position" .= s.position ]
           modifySeat seat $ hovered .~ window
             &+ pendingPointerEnter ?~ (window, s.position)
@@ -88,7 +88,7 @@ handleEvent = \case
       withObject $ \l -> WL.listenerAdd idleN l seat
 
     R.RiverSeatRemoved _ seat ->
-      runInHS $ withSeat seat deleteRemovedSeat
+      runInHS $ withSeat_ seat deleteRemovedSeat
 
     _ -> return ()
 
@@ -203,7 +203,7 @@ manage1 s = do
           _ -> pure ()
         case s.currentFocus of
           SFocusNone -> do
-            withWindow s.focused $ \_ -> R.riverSeatFocusWindow s.river_seat s.focused
+            withWindow_ s.focused $ \_ -> R.riverSeatFocusWindow s.river_seat s.focused
             doS $ \x -> x { currentFocus = SFocusWindow s.focused }
           _ -> pure ()
 
@@ -227,7 +227,7 @@ manage1 s = do
         case mw of
           Just w -> do
             doS $ \s' -> s' {pending_action = S_NONE}
-            withWindow w $ seatPointerMove s.river_seat
+            withWindow_ w $ seatPointerMove s.river_seat
           Nothing -> return ()
 
       S_START_OP SEAT_OP_RESIZE -> do
@@ -254,7 +254,7 @@ manage1 s = do
             R.riverSeatOpEnd s.river_seat
             float s.op_window
             modifySeat s.river_seat $ \x -> x {op = SEAT_OP_NONE, op_window = def}
-          withWindow s.op_window $ \w -> do
+          withWindow_ s.op_window $ \w -> do
             let rw =
                   s.op_start_width
                     - (if (s.op_edges .&. fromIntegral ((.unwrap) R.EdgeLeft)) /= 0 then s.op_dx else 0)
@@ -282,7 +282,7 @@ seatClearFocus s = R.riverSeatClearFocus s.river_seat
 seatPointerMove :: RiverSeat -> Window -> HS ()
 seatPointerMove sid w = do
   logInfo $ "seat: pointer move" :# [ "seat" .= show sid, "window" .= show w ]
-  withSeat sid $ \s -> seatFocus s w
+  withSeat_ sid $ \s -> seatFocus s w
   R.riverNodePlaceTop w.node
   R.riverSeatOpStartPointer sid
   modifySeat sid $ \s ->
@@ -298,7 +298,7 @@ seatPointerMove sid w = do
 -- | Do SEAT_OP_RESIZE
 seatPointerResize :: RiverSeat -> Window -> Int32 -> HS ()
 seatPointerResize sid w edges = do
-  withSeat sid $ \s -> do
+  withSeat_ sid $ \s -> do
     logInfo $ "seat: pointer resize" :# [ "seat" .= show sid, "window" .= show w, "edges" .= edges ]
     seatFocus s w
     R.riverNodePlaceTop w.node
@@ -329,11 +329,11 @@ render1 s = do
   case s.op of
     SEAT_OP_NONE -> return ()
     SEAT_OP_MOVE -> do
-      withWindow s.op_window $ \w -> do
+      withWindow_ s.op_window $ \w -> do
         let x = s.op_start_x + s.op_dx
             y = s.op_start_y + s.op_dy
         setWindowPosition w x y
-    SEAT_OP_RESIZE -> withWindow s.op_window $ \w -> do
+    SEAT_OP_RESIZE -> withWindow_ s.op_window $ \w -> do
       let x = s.op_start_x + (if (s.op_edges .&. fi ((.unwrap) R.EdgeLeft)) /= 0 then s.op_start_width - fi w.size.width else 0)
       let y = s.op_start_y + (if (s.op_edges .&. fi ((.unwrap) R.EdgeTop)) /= 0 then s.op_start_height - fi w.size.height else 0)
       setWindowPosition w x y

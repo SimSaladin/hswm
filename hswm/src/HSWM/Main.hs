@@ -33,15 +33,16 @@ import qualified HSWM.Util.Debug as Debug
 import qualified WL.Client as WL
 import qualified River as R
 
-import           WL.ExtIdleNotify.Staging.V1.Client as Ext
-import qualified WL.FractionalScale.Staging.V1.Client as FS
-import           WL.ExtForeignToplevelList.Staging.V1.Client as WL
 import qualified WL.Viewporter as VP
-import qualified WL.XdgOutput.Unstable.V1.Client as Zdg
-import           WL.Wlr.InputMethod.Unstable.V2.Client as Wlr
-import qualified WL.Wlr.LayerShell.Unstable.V1.Client as Wlr
-import qualified WL.Wlr.OutputManagement.Unstable.V1.Client as Wlr
-import qualified WL.Wlr.OutputPowerManagement.Unstable.V1.Client as Wlr
+import qualified WL.FractionalScale.Staging.V1.Client as FS
+import qualified WL.XdgOutput.Unstable.V1.Client as XO
+
+import           WL.ExtIdleNotify.Staging.V1.Client as EXT_IN
+import           WL.ExtForeignToplevelList.Staging.V1.Client as EXT_FTL
+import           WL.Wlr.InputMethod.Unstable.V2.Client as WLR_IM
+import qualified WL.Wlr.LayerShell.Unstable.V1.Client as WLR_LS
+import qualified WL.Wlr.OutputManagement.Unstable.V1.Client as WLR_OM
+import qualified WL.Wlr.OutputPowerManagement.Unstable.V1.Client as WLR_OPM
 
 import           Control.Concurrent.Thread.Delay as Conc (delay)
 import           Options.Generic
@@ -120,6 +121,7 @@ startHSWM mainRun config = do
       _ <- mkListener $ handleWithHook . WlrOutputManagerEvent
       _ <- mkListener $ handleWithHook . WlrOutputHeadEvent
       _ <- mkListener $ handleWithHook . ExtIdleNotificationEvent
+      _ <- mkListener $ handleWithHook . OutputPowerEvent
 
       runInIO <- askRunInIO
 
@@ -136,22 +138,22 @@ startHSWM mainRun config = do
       void $ WL.displayRoundtrip wlDisplay
 
       logInfo "Binding initial globals"
-      _ <- bindGlobal  @WL.Compositor
+      _ <- bindGlobal                  @WL.Compositor
       _ <- bindGlobalWithAutoListener  @WL.Shm
-      _ <- bindGlobal  @Wlr.InputMethodManager
+      _ <- bindGlobal                  @WLR_IM.InputMethodManager
       _ <- bindGlobalWithAutoListener  @R.RiverWindowManager
-      _ <- bindGlobal  @R.RiverXkbBindings
-      _ <- bindGlobal  @R.RiverLayerShell
+      _ <- bindGlobal                  @R.RiverXkbBindings
+      _ <- bindGlobal                  @R.RiverLayerShell
       _ <- bindGlobalWithAutoListener  @R.RiverLibinputConfig
       _ <- bindGlobalWithAutoListener  @R.RiverInputManager
       _ <- bindGlobalWithAutoListener  @R.RiverXkbConfig
-      _ <- bindGlobal  @Zdg.OutputManager
-      _ <- bindGlobalWithAutoListener  @Wlr.OutputManager
-      _ <- bindGlobal  @Wlr.LayerShell
-      _ <- bindGlobal  @FS.FractionalScaleManager
-      _ <- bindGlobal  @VP.Viewporter
-      _ <- bindGlobal  @Wlr.OutputPowerManager
-      _ <- bindGlobal  @Ext.IdleNotifier
+      _ <- bindGlobal                  @XO.OutputManager
+      _ <- bindGlobalWithAutoListener  @WLR_OM.OutputManager
+      _ <- bindGlobal                  @WLR_LS.LayerShell
+      _ <- bindGlobal                  @FS.FractionalScaleManager
+      _ <- bindGlobal                  @VP.Viewporter
+      _ <- bindGlobal                  @WLR_OPM.OutputPowerManager
+      _ <- bindGlobal                  @EXT_IN.IdleNotifier
 
       logInfo "Installing signal handlers"
       _ <- io $ Posix.installHandler Posix.sigTERM (Posix.Catch $ runH' $ mainEvent $ MainSignal Posix.sigTERM) Nothing
@@ -271,15 +273,16 @@ instance HandleEvent H Event where
   handleEvent (LibinputDeviceEvent e) = InputConfig.handleLibinputDeviceEvent e
   handleEvent (XkbConfigEvent e) = InputConfig.handleXkbConfigEvent e
   handleEvent (XkbKeyboardEvent e) = InputConfig.handleXkbKeyboardEvent e
-  handleEvent (ForeignTopLevelListV1 (WL.ForeignToplevelListToplevel _ _ fh)) = WL.listenerAdd_ fh =<< getObject
-  handleEvent (WlrOutputManagerEvent (Wlr.OutputManagerHead _ _ head)) = WL.listenerAdd_ head =<< getObject
+  handleEvent (ForeignTopLevelListV1 (EXT_FTL.ForeignToplevelListToplevel _ _ fh)) = WL.listenerAdd_ fh =<< getObject
+  handleEvent (WlrOutputManagerEvent (WLR_OM.OutputManagerHead _ _ head)) = WL.listenerAdd_ head =<< getObject
   handleEvent (ExtIdleNotificationEvent e) = handleEvent e
+  handleEvent (OutputPowerEvent e) = e `seq` return () -- TODO
   handleEvent _ = return ()
 
-instance HandleEvent H Ext.IdleNotificationEvent where
+instance HandleEvent H EXT_IN.IdleNotificationEvent where
   handleEvent = \case
-    Ext.IdleNotificationIdled{} -> runInHS $ setOutputPower False
-    Ext.IdleNotificationResumed{} -> runInHS $ setOutputPower True
+    EXT_IN.IdleNotificationIdled{} -> runInHS $ setOutputPower False
+    EXT_IN.IdleNotificationResumed{} -> runInHS $ setOutputPower True
 
 handleWindowManagerEvent :: R.RiverWindowManagerEvent -> H ()
 handleWindowManagerEvent e = case e of

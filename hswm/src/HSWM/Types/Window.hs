@@ -20,6 +20,8 @@ import           HSWM.Types.Simple
 import qualified River as R
 import           River.WindowManagement as X (RiverWindow, RiverSeat, RiverOutput, RiverNode)
 
+-- * Window
+
 data Window = Window
   { river_window             :: !RiverWindow
   , node                     :: !RiverNode
@@ -62,13 +64,15 @@ data WindowManageAction
   | WRequestClose
   deriving (Eq, Ord, Show, Generic)
 
+-- * Lenses
+
 makeLensesWith' classPerField [ ''Window ]
 
 instance HasRiverId Window where
   type RiverId Window = RiverWindow
   riverId = riverWindow
 
-instance HasX Window Int32 where _x = position . _x
-instance HasY Window Int32 where _y = position . _y
-instance HasWidth Window Word32 where width = size . width
-instance HasHeight Window Word32 where height = size . height
+instance HasX      Window Position1D where _x = position . _x
+instance HasY      Window Position1D where _y = position . _y
+instance HasWidth  Window Dimension where width = size . width
+instance HasHeight Window Dimension where height = size . height

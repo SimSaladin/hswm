@@ -17,6 +17,7 @@ import WL.ExtForeignToplevelList.Staging.V1.Client qualified as WL
 import WL.XdgOutput.Unstable.V1.Client qualified as Xdg
 import WL.Wlr.InputMethod.Unstable.V2.Client qualified as Zwp
 import WL.Wlr.OutputManagement.Unstable.V1.Client qualified as Wlr
+import qualified WL.Wlr.OutputPowerManagement.Unstable.V1.Client as OPM
 
 import System.Posix (Signal)
 
@@ -71,6 +72,7 @@ data Event
   | WlrOutputHeadEvent !Wlr.OutputHeadEvent
   | -- Xdg
     ZdgOutputEvent !Xdg.OutputEvent
+  | OutputPowerEvent !OPM.OutputPowerEvent
   deriving (Eq, Show, Generic)
 
 instance Applicative m => Default (Event -> m All) where

@@ -18,15 +18,19 @@ import           HSWM.Types.Window
 
 import qualified River as R
 import qualified WL.Client as WL
-import qualified WL.Wlr.OutputPowerManagement.Unstable.V1.Client as Wlr
+import qualified WL.XdgOutput.Unstable.V1.Client as XO
+import qualified WL.Wlr.OutputPowerManagement.Unstable.V1.Client as OPM
 
 import qualified Data.Aeson as A
 
+-- * Output
+
 data Output = Output
   { river_output           :: !RiverOutput -- ^ Unique Id from river
-  , wlOutput               :: !WL.Output -- ^ Corresponding @wl_output@ object
   , layerShellOutput       :: !R.RiverLayerShellOutput
-  , outputPower            :: !(Maybe Wlr.OutputPower)
+  , wlOutput               :: !WL.Output -- ^ Corresponding @wl_output@ object
+  , xdgOutput              :: !XO.Output
+  , outputPower            :: !OPM.OutputPower
   , screen                 :: !ScreenId -- ^ Assigned Screen identifier (WM)
   , name                   :: !String
   , outputDescription      :: !String
@@ -39,6 +43,8 @@ data Output = Output
   }
   deriving stock (Eq, Show, Read, Generic)
   deriving anyclass (Default)
+
+-- ** ScreenId
 
 -- | Physical screen indices
 newtype ScreenId = S Int
@@ -56,10 +62,10 @@ instance Default ScreenId where
 
 makeLensesWith' classPerField [ ''Output ]
 
-instance HasX      Output Int32  where _x = position . _x
-instance HasY      Output Int32  where _y = position . _y
-instance HasWidth  Output Word32 where width = size . width
-instance HasHeight Output Word32 where height = size . height
+instance HasX      Output Position1D  where _x = position . _x
+instance HasY      Output Position1D  where _y = position . _y
+instance HasWidth  Output Dimension   where width = size . width
+instance HasHeight Output Dimension   where height = size . height
 
 instance HasRiverId Output where
   type RiverId Output = RiverOutput

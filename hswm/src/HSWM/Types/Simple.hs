@@ -20,7 +20,16 @@ import qualified HSWM.StackSet as W
 import           HSWM.Types.Lens
 import           Data.Aeson (FromJSON, ToJSON)
 
--- XXX should use Dimension ?
+-- * Types
+
+-- | e.g. width or height.
+type Dimension = Word32
+
+-- | e.g. x/y coords
+type Position1D = Int32
+
+-- ** Size and position in 2D
+
 data Size = Size { width, height :: {-# UNPACK #-} !Dimension }
   deriving stock (Eq, Ord, Show, Read, Generic)
   deriving anyclass (Default, FromJSON, ToJSON)
@@ -29,22 +38,26 @@ data Position = Position { x, y :: {-# UNPACK #-} !Position1D }
   deriving stock (Eq, Ord, Show, Read, Generic)
   deriving anyclass (Default, FromJSON, ToJSON)
 
+-- | A position on the (screen) output surface
+type Point = Position
+
+pattern Point :: Position1D -> Position1D -> Point
+pattern Point{x, y} = Position{x, y}
+
+{-# COMPLETE Point #-}
+
 data Rectangle = Rectangle'
   { position :: {-# UNPACK #-} !Position
   , size     :: {-# UNPACK #-} !Size
   }
   deriving stock (Eq, Ord, Show, Read, Generic)
 
--- | A position on the (screen) output surface
-type Point = Position
-
-pattern Point :: Position1D -> Position1D -> Point
-pattern Point{x, y} = Position{x, y}
-{-# COMPLETE Point #-}
-
 pattern Rectangle :: Position1D -> Position1D -> Dimension -> Dimension -> Rectangle
 pattern Rectangle{x, y, width, height} = Rectangle' (Position x y) (Size width height)
+
 {-# COMPLETE Rectangle #-}
+
+-- ** Directions (1D, 2D)
 
 -- | One-dimensional directions:
 data Direction1D = Next | Prev
@@ -62,11 +75,7 @@ data Direction2D
     L
   deriving stock (Eq, Ord, Bounded, Enum, Read, Show)
 
--- | Uh, X11 used this...
-type Dimension = Word32
-
--- | Also this...
-type Position1D = Int32
+-- * Functions
 
 -- | @pointWithin x y r@ returns 'True' if the @(x, y)@ co-ordinate is within
 -- @r@.
@@ -93,11 +102,13 @@ centerRationalRect r =
 
 -- * Lenses
 
-makeFieldClassesIfMissing [ "width", "height", "name" ]
+makeFieldClassesIfMissing [ "name" ]
 
-makeLensesWith' classPerField [ ''Size, ''Position, ''Rectangle ]
-
--- makeLensesCombine [] [ ''Rectangle ]
+makeLensesWith' classPerField
+  [ ''Size
+  , ''Position
+  , ''Rectangle
+  ]
 
 -- Orphans
 instance Show (StablePtr a) where show _ = "<SP>"

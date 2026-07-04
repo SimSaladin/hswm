@@ -24,6 +24,7 @@ import qualified Data.Set as Set
 import qualified Language.Haskell.TH.Datatype as D
 import qualified Language.Haskell.TH.Datatype.TyVarBndr as D
 import           Lens.Micro.TH.Internal
+import Data.Coerce
 
 import qualified River as R
 
@@ -175,3 +176,16 @@ instance HasRiverId R.RiverXkbBinding where
 
 instance HasRiverId R.RiverPointerBinding where
   type RiverId R.RiverPointerBinding = R.RiverPointerBinding
+
+type SomeWindow a = (HasRiverId a, RiverId a ~ R.RiverWindow)
+type SomeOutput a = (HasRiverId a, RiverId a ~ R.RiverOutput)
+type SomeSeat a   = (HasRiverId a, RiverId a ~ R.RiverSeat)
+
+class HasRiverId b => ToRiverId a b where
+  toRiverId :: a -> b
+  default toRiverId :: Coercible a b => a -> b
+  toRiverId = coerce
+
+instance ToRiverId (Ptr Void) R.RiverOutput
+instance ToRiverId (Ptr Void) R.RiverWindow
+instance ToRiverId (Ptr Void) R.RiverSeat

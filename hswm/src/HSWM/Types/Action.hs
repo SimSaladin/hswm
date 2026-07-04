@@ -27,9 +27,7 @@ import           Text.XkbCommon.KeySyms (key_NoSymbol)
 import qualified Data.Map as M
 import           Data.Typeable
 
-type Button = Word32
-
-type XBKey = (ModMask, KeySym)
+-- * XkbBinding, PointerBinding, etc.
 
 type XkbBindingMap a = M.Map XBKey (StablePtr (XkbBinding a))
 
@@ -52,6 +50,10 @@ data Submap m = Submap
   { submapKeys    :: [(XBKey, SomeAction m)]
   , submapDefault :: Maybe (SomeAction m)
   } deriving (Show, Generic)
+
+type Button = Word32
+
+type XBKey = (ModMask, KeySym)
 
 -- * IsKeySym
 
@@ -112,7 +114,8 @@ instance (MonadIO m) => IsAction m (SomeAction m) where
 -- * Lenses
 
 makeFieldClassesIfMissing [ "boundAction", "riverSeat" ]
-makeLensesCombine []
+
+makeLensesWith' classPerField
   [ ''XkbBinding
   , ''PointerBinding
   ]

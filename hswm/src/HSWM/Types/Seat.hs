@@ -22,6 +22,8 @@ import qualified WL.Client as WL
 import qualified River as R
 import Data.Kind
 
+-- * Seat
+
 data Seat' (m :: Type -> Type) = Seat
   { river_seat             :: !RiverSeat
   , river_layer_shell_seat :: !R.RiverLayerShellSeat
@@ -95,7 +97,7 @@ instance Default SeatFocus where def = SFocusNone
 instance Default (SeatAction m) where def = S_NONE
 instance Default SeatOperation where def = SEAT_OP_NONE
 
--- Lenses
+-- * Lenses
 
 makeLensesWith' classPerField [ ''Seat' ]
 

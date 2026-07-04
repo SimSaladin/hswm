@@ -25,8 +25,7 @@ import qualified River as R
 import qualified Data.List as L
 import qualified Data.Map as M
 
-modifyW :: (MonadIO m, MonadThrow m, MonadReader HConf m)
-        => RiverWindow -> (Window -> Window) -> m ()
+modifyW :: (MonadIO m, MonadThrow m, MonadReader HConf m) => RiverWindow -> (Window -> Window) -> m ()
 modifyW w = runInHS . modifyWindow w
 
 added :: RiverWindow -> H ()
@@ -206,23 +205,21 @@ setInitialManageProperties Window {river_window = rw} = do
 
 doRemoveWindow :: Window -> HS ()
 doRemoveWindow w = do
-  -- Remove from stack
+  -- Remove window (screen) from stack
   modifyWindowSet $ W.delete w.river_window
   alterWindow w.river_window (const Nothing)
   -- Remove references in seats
-  xs <- use seatList
-  xs' <- forM xs $ \s -> do
-    let seat = s
-          & focused . filtered (== w.river_window) .~ def
-          & hovered . filtered (== w.river_window) .~ def
-          & interacted . filtered (== w.river_window) .~ def
-    if s.op_window == w.river_window
-      then do
-        R.riverSeatOpEnd s.river_seat
-        return $ seat & opWindow .~ def & op .~ SEAT_OP_NONE
-      else return seat
-  assign seatList xs'
-  -- destroy WL references
+  seats <- use seatList
+  forM_ seats $ \s -> do
+    when (s.op_window == w.river_window) $ R.riverSeatOpEnd s.river_seat
+    modifySeat s.river_seat $
+      focused . filtered (== w.river_window) .~ def &+
+      hovered . filtered (== w.river_window) .~ def &+
+      interacted . filtered (== w.river_window) .~ def &+
+      if s.op_window == w.river_window
+         then op .~ def &+ opWindow .~ def
+         else id
+  -- Destroy WL references
   io $ R.objectDestroy w.node
   io $ R.objectDestroy w.river_window
 
@@ -243,43 +240,45 @@ handleEvent e = case e of
   -- The client should destroy this object with the river_window_v1.destroy request to free up resources.
   R.RiverWindowClosed _ w -> modifyW w $ \s -> s {closed = True}
   -- Properties
-  R.RiverWindowDimensions    _ rw w h               -> modifyW rw $ width .~ fi w &+ height .~ fi h
-  R.RiverWindowParent        _ rw we_parent         -> modifyW rw $ parent ?~ we_parent
-  R.RiverWindowAppId         _ rw we_app_id         -> modifyW rw $ appId .~ we_app_id
-  R.RiverWindowTitle         _ rw we_title          -> modifyW rw $ title .~ we_title
-  R.RiverWindowUnreliablePid _ rw we_unreliable_pid -> modifyW rw $ unreliablePid ?~ fi we_unreliable_pid
-  R.RiverWindowIdentifier    _ rw we_identifier     -> do
-    modifyW rw $ identifier .~ we_identifier
-    -- we use the unique identifier to recover windows after restart
-    let recoverWindow w = do
-          modifyWindowSet $ W.mapWindow (\x -> if x == w then rw else x) . W.delete rw
-          recoveredWindows %= M.delete we_identifier
-    runInHS $ gets (M.lookup we_identifier . view recoveredWindows) >>= (`whenJust` recoverWindow)
+  R.RiverWindowDimensions       _ rw w h               -> modifyW rw $ width .~ fi w &+ height .~ fi h
+  R.RiverWindowParent           _ rw we_parent         -> modifyW rw $ parent ?~ we_parent
+  R.RiverWindowAppId            _ rw we_app_id         -> modifyW rw $ appId .~ we_app_id
+  R.RiverWindowTitle            _ rw we_title          -> modifyW rw $ title .~ we_title
+  R.RiverWindowUnreliablePid    _ rw we_unreliable_pid -> modifyW rw $ unreliablePid ?~ fi we_unreliable_pid
+  R.RiverWindowIdentifier       _ rw uuid              -> modifyW rw (identifier .~ uuid) >> attemptWindowRecovery rw uuid
+  R.RiverWindowDecorationHint   _ rw we_hint           -> modifyW rw $ decorationHint ?~ we_hint
+  R.RiverWindowPresentationHint _ rw we_hint           -> modifyW rw $ presentationHint ?~ we_hint
 
-  -- Hints
-  R.RiverWindowDecorationHint   _ rw we_hint -> modifyW rw $ decorationHint ?~ we_hint
-  R.RiverWindowPresentationHint _ rw we_hint -> modifyW rw $ presentationHint ?~ we_hint
   R.RiverWindowDimensionsHint   _ rw minWidth minHeight maxWidth maxHeight -> do
     modifyW rw $ \s -> s {minWidth, minHeight, maxWidth, maxHeight}
-    -- auto-float fixed-size windows
+    fixedSizeAutoFloat rw minWidth minHeight maxWidth maxHeight
+
+  -- Manage fullscreen
+  R.RiverWindowFullscreenRequested     _ window output -> runInHS $ doManage (if output == def then WFullscreen else WFullscreenOnScreen output) window
+  R.RiverWindowExitFullscreenRequested _ window        -> runInHS $ doManage WExitFullscreen window
+
+  -- TODO
+  R.RiverWindowPointerMoveRequested   _ w seat       -> modifyW w $ pointerMoveRequested .~ seat
+  R.RiverWindowPointerResizeRequested _ w seat edges -> modifyW w $ pointerResizeRequested .~ seat &+ pointerResizeRequestedEdges .~ edges
+  R.RiverWindowMaximizeRequested _ _w    -> return ()
+  R.RiverWindowUnmaximizeRequested _ _w  -> return ()
+  R.RiverWindowShowWindowMenuRequested{} -> return ()
+  R.RiverWindowMinimizeRequested _ _     -> return ()
+
+-- | we use the unique identifier to recover windows after restart
+attemptWindowRecovery :: RiverWindow -> String -> H ()
+attemptWindowRecovery rw uuid = runInHS $ gets (M.lookup uuid . view recoveredWindows) >>= (`whenJust` recoverWindow)
+  where
+    recoverWindow w = do
+      modifyWindowSet $ W.mapWindow (\x -> if x == w then rw else x) . W.delete rw
+      recoveredWindows %= M.delete uuid
+
+-- auto-float fixed-size windows
+fixedSizeAutoFloat rw minWidth minHeight maxWidth maxHeight = do
     let fixed = maxWidth > 0 && maxHeight > 0 && maxWidth == minWidth && maxHeight == minHeight
     when fixed $ runInHS $
-      withWindow rw $ \w ->
+      withWindow_ rw $ \w ->
       modifyWindowSet $ \ws ->
         W.float rw (centerRationalRect $ rationalRectIn
               (Rectangle' w.position (Size (fi maxWidth) (fi maxHeight)))
               (screenRect $ W.screenDetail $ W.current ws)) ws
-
-  -- Set fullscreen
-  R.RiverWindowFullscreenRequested     _ window output -> runInHS $ doManage' (if output == def then WFullscreen else WFullscreenOnScreen output) window
-  R.RiverWindowExitFullscreenRequested _ window        -> runInHS $ doManage' WExitFullscreen window
-
-  -- TODO what's this
-  R.RiverWindowPointerMoveRequested   _ w seat       -> modifyW w $ pointerMoveRequested .~ seat
-  R.RiverWindowPointerResizeRequested _ w seat edges -> modifyW w $ pointerResizeRequested .~ seat &+ pointerResizeRequestedEdges .~ edges
-  -- TODO maximize
-  R.RiverWindowMaximizeRequested _ _w -> return ()
-  R.RiverWindowUnmaximizeRequested _ _w -> return ()
-  -- TODO
-  R.RiverWindowShowWindowMenuRequested{} -> return ()
-  R.RiverWindowMinimizeRequested _ _ -> return ()
