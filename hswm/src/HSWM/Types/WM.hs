@@ -1,7 +1,6 @@
 {-# LANGUAGE DefaultSignatures #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE NoFieldSelectors #-}
-
+{-# LANGUAGE NoFieldSelectors  #-}
+{-# LANGUAGE TemplateHaskell   #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 -- |
@@ -22,18 +21,19 @@ module HSWM.Types.WM
   , module HSWM.Types.Output
   , module HSWM.Types.Config
   , module HSWM.Types.Simple
+  , module HSWM.Types.Lens
   ) where
 
 import qualified HSWM.StackSet as W
-import           HSWM.Types.Lens
-import           HSWM.Types.Events
-import           HSWM.Types.TypeMap
 import           HSWM.Types.Action
-import           HSWM.Types.Window hiding (window)
-import           HSWM.Types.Seat
-import           HSWM.Types.Output hiding (output)
 import           HSWM.Types.Config
+import           HSWM.Types.Events
+import           HSWM.Types.Lens
+import           HSWM.Types.Output
+import           HSWM.Types.Seat
 import           HSWM.Types.Simple
+import           HSWM.Types.TypeMap
+import           HSWM.Types.Window
 import           HSWM.Wayland (HasGlobalsRegistry(..))
 
 import qualified WL.Client as WL
@@ -49,16 +49,18 @@ type WindowSet = WindowSetX Layout
 
 type WindowSpace = WindowSpaceX Layout
 
-data HSWMException = HSWMStateLocked String
-                   | HSWMTimeout String
-  deriving (Show)
-
-instance Exception HSWMException
-
 type Seat = Seat' H
 
 instance Default (Full a) where
   def = Full
+
+-- Exceptions
+
+data HSWMException = HSWMStateLocked String
+                   | HSWMTimeout String
+  deriving (Eq, Ord, Show)
+
+instance Exception HSWMException
 
 -- WindowSet / Stacks
 
@@ -266,25 +268,27 @@ data HConf = HConf
   , globals                        :: !(MVar WL.RegistryState)
     -- | The 'HState' XXX FIXME
   , _state                         :: !(TMVar HState)
-    -- | XXX ???
+    -- | Queue for main events.
   , eventQueue                     :: !(TQueue MainEvent)
     -- | Pending actions to be emitted in the next manage and render queues (respectively).
   , pendingManageQ, pendingRenderQ :: !(TQueue (HS ()))
+    -- | Global type-indexed variables.
   , globalTypeMap                  :: !(TMVar TypeMap)
   } deriving (Generic)
 
-class HasEventQueues env where
-  mainEventQL     :: Lens' env (TQueue MainEvent)
-  pendingManageQL :: Lens' env (TQueue (HS ()))
-  pendingRenderQL :: Lens' env (TQueue (HS ()))
-
 -- | Mutable stete.
 data HState = HState
+    -- | Current stackset
   { windowset        :: !WindowSet
+    -- | Old stackset (for change tracking)
   , windowsetOld     :: !WindowSet
-  , _seats           :: ![Seat]
-  , _outputs         :: ![Output]
+    -- | Current seats.
+  , seatList         :: ![Seat]
+    -- | Current outputs.
+  , outputList       :: ![Output]
+    -- | Current windows.
   , _windows         :: !(M.Map RiverWindow Window)
+    -- | While initializing after soft restart, windows from the old state are tracked here.
   , recoveredWindows :: !(M.Map String RiverWindow)
     -- | stores custom state information.
     --
@@ -298,7 +302,7 @@ newtype H a = H (ReaderT HConf IO a)
   deriving newtype (MonadCatch, MonadMask)
   deriving (Semigroup, Monoid) via Ap H a
 
-newtype HS a = HS (ReaderT HConf (StateT HState IO) a)
+newtype HS a = HS (StateT HState (ReaderT HConf IO) a)
   deriving newtype (Functor, Applicative, Monad, MonadFail, MonadIO, MonadState HState, MonadReader HConf, MonadThrow)
   deriving newtype (MonadCatch, MonadMask)
   deriving (Semigroup, Monoid) via Ap HS a
@@ -326,9 +330,6 @@ type MaybeManageHook = MaybeManageHookX HS
 
 type Query = QueryX HS
 
-liftHS :: HS a -> Query a
-liftHS a = Query (lift a)
-
 ---------------------------------------------------------
 -- Orphan instances
 
@@ -336,7 +337,15 @@ instance Show (Async a) where show _ = "<Async>"
 
 -- lenses
 
-makeLenses' [ ''HConf, ''HState ]
+class HasEventQueues env where
+  mainEventQL     :: Lens' env (TQueue MainEvent)
+  pendingManageQL :: Lens' env (TQueue (HS ()))
+  pendingRenderQL :: Lens' env (TQueue (HS ()))
+
+makeLensesWith' classPerField
+  [ ''HConf
+  , ''HState
+  ]
 
 instance HasGlobalTMap HConf where
   globalTMap = globalTypeMap

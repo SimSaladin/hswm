@@ -16,30 +16,16 @@ import           System.Console.Haskeline
 
 import           Data.Time
 
-instance ParseRecord Request
-
 type CM = InputT (LoggingT (ReaderT () IO))
-
-instance MonadLogger m => MonadLogger (InputT m) where
-
-instance MonadReader r m => MonadReader r (InputT m) where
-  ask = lift ask
-  local f = mapInputT $ local f
-
-instance MonadUnliftIO m => MonadUnliftIO (InputT m) where
-  withRunInIO inner =
-    withRunInBase $ \runInBase ->
-      withRunInIO $ \runInIO ->
-        inner (runInIO . runInBase)
 
 main :: IO ()
 main = do
   var <- newEmptyMVar
   let logfun loc src lv s = do
           t <- getCurrentTime
-          let logStrBS = fromLogStr $ defaultLogStr t mempty loc src lv s
-          let msg = A.decodeStrict @LoggedMessage logStrBS
           f <- readMVar var
+          let logStrBS = fromLogStr $ defaultLogStr t mempty loc src lv s
+              msg      = A.decodeStrict @LoggedMessage logStrBS
           whenJust msg $ f . TL.unpack . renderLazy . layoutPretty defaultLayoutOptions . prettyLogMsg
   flip runReaderT () $
     flip runLoggingT logfun $
@@ -47,24 +33,8 @@ main = do
         getExternalPrint >>= putMVar var
         mainCM
 
-prettyLogMsg :: LoggedMessage -> Doc AnsiStyle
-prettyLogMsg LoggedMessage{..} =
-  ppLevel loggedMessageLevel <> space <>
-  pretty loggedMessageText <> space <>
-  annotate (color Black <> bold) (pretty (BL.unpack (A.encode loggedMessageMeta))) <>
-  line
-    where
-      ppLevel = \case
-        LevelError   -> annotate (color Red) "error"
-        LevelWarn    -> annotate (color Red <> bold) "warn"
-        LevelInfo    -> annotate (color Cyan <> bold) "info"
-        LevelDebug   -> annotate (color Black) "dbg"
-        LevelOther x -> annotate (color Yellow) $ pretty x
-
 mainCM :: CM ()
-mainCM = do
-  logInfo "Connecting..."
-  clientRun def msgHandler consoleHandler
+mainCM = clientRun def msgHandler consoleHandler
 
 msgHandler :: Response -> CM ()
 msgHandler = \case
@@ -78,17 +48,49 @@ consoleHandler :: (Request -> CM ()) -> CM ()
 consoleHandler say = forever $ do
   minput <- getInputLine ">>> "
   case minput of
-    Nothing -> return ()
     Just "" -> return ()
     Just ln -> do
-      let
-        header = Options.header "hswmctl"
-        info   = Options.info (parseRecord @Request) header
-      let pres = Options.execParserPure (Options.prefs defaultParserPrefs) info (words ln)
+      let header = Options.header "hswmctl"
+          info   = Options.info (parseRecord @Request) header
+          pres   = Options.execParserPure (Options.prefs defaultParserPrefs) info (words ln)
       case pres of
         Options.Success msg -> say msg
         Options.Failure pfail -> outputStrLn $ fst $ Options.renderFailure pfail "hswm"
         _ -> return ()
+    Nothing -> return ()
 
 defaultParserPrefs :: Options.PrefsMod
 defaultParserPrefs = Options.multiSuffix "..."
+
+-- * Logging utilities
+
+prettyLogMsg :: LoggedMessage -> Doc AnsiStyle
+prettyLogMsg LoggedMessage{..} = mconcat
+    [ ppLevel loggedMessageLevel <> space
+    , pretty loggedMessageText <> space
+    , annotate (color Black <> bold) (pretty (BL.unpack (A.encode loggedMessageMeta)))
+    , line
+    ]
+  where
+    ppLevel = \case
+      LevelError   -> annotate (color Red) "error"
+      LevelWarn    -> annotate (color Red <> bold) "warn"
+      LevelInfo    -> annotate (color Cyan <> bold) "info"
+      LevelDebug   -> annotate (color Black) "dbg"
+      LevelOther x -> annotate (color Yellow) $ pretty x
+
+-- * Orphan instances
+
+instance ParseRecord Request
+
+instance MonadLogger m => MonadLogger (InputT m) where
+
+instance MonadReader r m => MonadReader r (InputT m) where
+  ask = lift ask
+  local f = mapInputT $ local f
+
+instance MonadUnliftIO m => MonadUnliftIO (InputT m) where
+  withRunInIO inner =
+    withRunInBase $ \runInBase ->
+      withRunInIO $ \runInIO ->
+        inner (runInIO . runInBase)

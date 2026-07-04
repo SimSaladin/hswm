@@ -17,44 +17,51 @@ import qualified Data.Map as M
 
 -- * KeySym parsing
 
+type XkbBindCtx = (R.RiverXkbBindings, ConstPtr (WL.ObjectListener R.RiverXkbBinding), R.RiverSeat)
+
 createXkbBindings
   :: (MonadReader env m, MonadLogger m, MonadIO m, Show a, Typeable a)
-  => (R.RiverXkbBindings, ConstPtr (WL.ObjectListener R.RiverXkbBinding), R.RiverSeat)
+  => XkbBindCtx
   -> (a -> [(XBKey, a)]) -- ^ 'actionSubmap' - get subkeys
   -> [(XBKey, a)]
   -> m (XkbBindingMap a)
-createXkbBindings (a1, a2, a3) getSub keys = sequence top
+createXkbBindings ctx getSub keys = sequence top
   where
     top = M.fromList [(k, create1 True k v =<< createSubs (getSub v)) | (k, v) <- keys]
     createSubs ks = sequence $ M.fromList [(k, create1 False k v =<< createSubs (getSub v)) | (k, v) <- ks]
-    create1 enable (m, k) = newXKBBinding a1 a2 a3 enable m k
+    create1 enable (m, k) = newXKBBinding ctx enable m k
 
 newXKBBinding
   :: (MonadReader env m, MonadLogger m, MonadIO m, Show action, Typeable action)
-  => R.RiverXkbBindings
-  -> ConstPtr (WL.ObjectListener R.RiverXkbBinding)
-  -> R.RiverSeat
+  => XkbBindCtx
   -> Bool -- ^ Enable by default?
-  -> ModMask
-  -> KeySym
+  -> ModMask -- ^ Modifiers
+  -> KeySym -- ^ Key
   -> action -- ^ Action when pressed
   -> XkbBindingMap action -- ^ Submap keys
   -> m (StablePtr (XkbBinding action))
-newXKBBinding xkbBinds xkb_binding_listener seat enable mods keysym action subKM = do
+newXKBBinding (xkbBinds, xkb_binding_listener, seat) enable mods keysym action subKM = do
   logDebug $ "new xkb binding" :# [ "key" .= ppXBKey (mods, keysym),  "action" .= show action ]
   xb <- R.riverXkbBindingsGetXkbBinding xkbBinds seat (fi keysym) (R.toCEnum $ fi mods)
   runvar <- newEmptyMVar
-  dtPtr <- io $ newStablePtr $ XkbBinding xb seat action subKM autorepeat runvar
+  dtPtr <- io $ newStablePtr $ XkbBinding
+    { boundAction = action
+    , boundSubmap = subKM
+    , riverXkbBinding = xb
+    , riverSeat = seat
+    , autorepeat = ar
+    , runningVar = runvar
+    }
   WL.listenerAdd xb xkb_binding_listener dtPtr
   when enable $ R.riverXkbBindingEnable xb
   return dtPtr
-    where autorepeat = False -- XXX : breaks GrabKeyboard repeating...
+  where ar = False -- XXX : breaks GrabKeyboard repeating...
 
 destroyXKBBinding :: (MonadIO m) => StablePtr (XkbBinding a) -> m ()
 destroyXKBBinding sptr = do
   xb <- io (deRefStablePtr sptr)
-  io $ R.objectDestroy xb.xkb_binding
-  mapM_ destroyXKBBinding xb.subKeymap
+  io $ R.objectDestroy xb.riverXkbBinding
+  mapM_ destroyXKBBinding xb.boundSubmap
   io $ freeStablePtr sptr
 
 -- * Pointer Binds
@@ -70,7 +77,11 @@ newPointerBinding ::
 newPointerBinding pointerBindingListener seat mods btn action = do
   logInfo $ "new pointer binding" :# [ "key" .= ppButton (mods, btn), "action" .= show action ]
   pb' <- R.riverSeatGetPointerBinding seat (fi btn) (R.toCEnum $ fi mods)
-  dtPtr <- io $ newStablePtr $ PointerBinding pb' seat action
+  dtPtr <- io $ newStablePtr $ PointerBinding
+    { riverPointerBinding = pb'
+    , riverSeat = seat
+    , boundAction = action
+    }
   WL.listenerAdd pb' pointerBindingListener dtPtr
   _ <- R.riverPointerBindingEnable pb'
   return dtPtr
@@ -78,5 +89,5 @@ newPointerBinding pointerBindingListener seat mods btn action = do
 destroyPointerBinding :: (MonadIO m) => StablePtr (PointerBinding a) -> m ()
 destroyPointerBinding sptr = io $ do
   pb <- deRefStablePtr sptr
-  WL.objectDestroy pb.pointer_binding
+  WL.objectDestroy pb.riverPointerBinding
   freeStablePtr sptr

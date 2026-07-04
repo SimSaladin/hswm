@@ -16,6 +16,7 @@ import qualified HSWM.StackSet as W
 import           HSWM.Types.Action
 import           HSWM.Types.Events
 import           HSWM.Types.Lens
+import           HSWM.Types.Simple
 import           HSWM.Types.Output
 import           HSWM.Types.Seat
 import           HSWM.Types.Window
@@ -37,45 +38,47 @@ data HSWMConfig m l = HSWMConfig
   , borderWidth     :: !Int32
   , normalBorder    :: !R.RiverColor
   , focusedBorder   :: !R.RiverColor
-  , borderEdges     :: !Int32
+  , borderEdges     :: !R.RiverWindowEdges
   , startupHook     :: !(m ())
-  , exitHook        :: !(m ())
-  , handleEventHook :: !(Event -> m All)
   , layoutHook      :: !(l RiverWindow)
+  , manageHook      :: !(ManageHookX (Stateful m))
   , renderHook      :: !(m ())
   , logHook         :: !(m ())
-  , manageHook      :: !(ManageHookX (Stateful m))
+  , exitHook        :: !(m ())
+  , handleEventHook :: !(Event -> m All)
+  , workspaces      :: [WorkspaceId]
    -- | Keyboard layout set for connected keyboards
   , xkbLayout       :: !(Maybe XkbRuleNames)
-  , workspaces      :: [WorkspaceId]
    -- | Keyboard repeat (rate, delay)
-  , repeatInfo      :: !(Maybe (Int32, Int32))
+  , repeatInfo      :: !RepeatInfo
    -- | XCursor theme and size
-  , xcursor         :: !(Maybe (String, Word32))
+  , cursorTheme     :: !String
+  , cursorSize      :: !Word32
   } deriving stock (Generic)
 
-instance {-# OVERLAPPABLE #-}
-  (Monad (Stateful m),
-   Monoid (m All),
-   Default (m ()),
-   Default (l RiverWindow)
-  ) => Default (HSWMConfig m l) where
+data RepeatInfo = RepeatInfo { rate, delay :: {-# UNPACK #-} !Int32 }
+  deriving stock (Eq, Ord, Show, Read, Generic)
+  deriving anyclass (Default)
+
+instance {-# OVERLAPPABLE #-} (Default (l RiverWindow), Default (m ()), Default (Event -> m All), Monad (Stateful m))
+  => Default (HSWMConfig m l) where
     def = (Generics.to gdef)
-      { borderWidth = 2,
-        normalBorder = parseRgba "0x0000B0",
-        focusedBorder = parseRgba "0xFA0050",
-        borderEdges = foldl' (.|.) 0 (fi . R.fromCEnum <$> [R.EdgeLeft, R.EdgeRight, R.EdgeTop, R.EdgeBottom]),
-        defaultModMask = "Ctrl",
-        workspaces = ["1", "2", "3", "4"]
+      { borderWidth    = 2
+      , borderEdges    = mconcat [R.EdgeLeft, R.EdgeRight, R.EdgeTop, R.EdgeBottom]
+      , normalBorder   = parseRgba "0x0000B0"
+      , focusedBorder  = parseRgba "0xFA0050"
+      , defaultModMask = "Ctrl"
+      , workspaces     = ["1", "2", "3", "4"]
       }
 
--- | This should usually map to @'Layout' 'RiverWindow'@
-type family LayoutProxy (m :: Type -> Type) :: Type -> Type
+-- * Configure modifiers
 
 -- | Composable config modification.
 type ConfigDoPure = forall m l. HSWMConfig m l -> HSWMConfig m l
 
 type ConfigDoM m = forall l. HSWMConfig m l -> HSWMConfig m l
+
+-- * WindowSet/StackSet
 
 type WindowSetX l = W.StackSet WorkspaceId (l RiverWindow) RiverWindow WorkspaceDetail ScreenId ScreenDetail
 
@@ -91,17 +94,45 @@ data ScreenDetail = SD {x, y, width, height :: {-# UNPACK #-} !Int}
 data WorkspaceDetail = WD
   deriving (Eq, Show, Read, Generic, Default)
 
-newtype QueryX (m :: Type -> Type) a = Query (ReaderT Window m a)
-  deriving newtype (Functor, Applicative, Monad, MonadIO, MonadReader Window)
+-- * Query, ManageHook
 
-instance (Monad m, l ~ LayoutProxy m) => Default (QueryX m (Endo (WindowSetX l))) where
-  def = return $ Endo id
+newtype QueryX (m :: Type -> Type) a = Query { unwrap :: ReaderT Window m a }
+  deriving newtype (Functor, Applicative, Monad, MonadIO, MonadReader Window)
 
 type ManageHookX m = QueryX m (Endo (WindowSetX (LayoutProxy m)))
 
 type MaybeManageHookX m = QueryX m (Maybe (Endo (WindowSetX (LayoutProxy m))))
 
+instance Monad m => Default (QueryX m (Endo a)) where
+  def = return mempty
+
 runQuery :: QueryX m a -> Window -> m a
 runQuery (Query q) = runReaderT q
 
-makeLenses' [ ''HSWMConfig ]
+-- ** Util
+
+-- | This should usually map to @'Layout' 'RiverWindow'@
+type family LayoutProxy (m :: Type -> Type) :: Type -> Type
+
+-- * Lenses
+
+makeLensesWith' classPerField
+  [ ''RepeatInfo
+  , ''XkbRuleNames
+  , ''HSWMConfig
+  , ''ScreenDetail
+  ]
+
+instance HasRepeatInfo RepeatInfo RepeatInfo where
+  repeatInfo = id
+
+instance HasPosition ScreenDetail Position where
+  position = lens (Position <$> view (_x . to fi) <*> view (_y . to fi)) (\s a -> (s::ScreenDetail) { x = fi a.x, y = fi a.y })
+
+instance HasSize ScreenDetail Size where
+  size = lens (Size <$> view (width . to fi) <*> view (height . to fi)) (\s a -> (s::ScreenDetail) { width = fi a.width, height = fi a.width })
+
+-- * Utilities
+
+screenRect :: ScreenDetail -> Rectangle
+screenRect sd = Rectangle' (sd ^. position) (sd ^. size)

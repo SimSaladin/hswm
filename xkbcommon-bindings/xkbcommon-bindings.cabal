@@ -85,20 +85,6 @@ library
   if !os(linux)
     buildable: False
 
--- TODO: per-component build not working with Hooks/Custom build-type...
--- library xkbregistry-bindings
---   import: warnings, language, deps
---   visibility: public
---   exposed-modules:
---      Text.XkbCommon.Registry
---   hs-source-dirs: registry
---   build-depends: xkbcommon-bindings
---
---   if flag(pkg-config)
---     pkgconfig-depends: xkbregistry
---   else
---     extra-libraries: xkbregistry
-
 test-suite spec
   import: warnings, language
   type: exitcode-stdio-1.0

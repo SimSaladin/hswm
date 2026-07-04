@@ -13,29 +13,27 @@ module HSWM.Core
     module HSWM.Types.Events,
     module HSWM.Types.WM,
     module HSWM.Types.TypeMap,
-    module HSWM.ManageHook,
     module HSWM.XKB,
     R.RiverColor(..),
   )
 where
 
-import HSWM.ManageHook
-import HSWM.Types.Config
-import HSWM.Types.Events
-import HSWM.Types.TypeMap
-import HSWM.Types.WM
-import HSWM.XKB hiding (LogLevel(..))
+import           HSWM.Types.Config
+import           HSWM.Types.Events
+import           HSWM.Types.TypeMap
+import           HSWM.Types.WM
+import           HSWM.XKB hiding (LogLevel(..))
 
 import qualified River as R
 
-import Control.Monad.State
-import GHC.Stack
+import           Control.Monad.State
+import           GHC.Stack
 
 runH :: HConf -> H a -> IO a
 runH c (H a) = runReaderT a c
 
 runHS :: HConf -> HState -> HS a -> IO (a, HState)
-runHS c st (HS a) = runStateT (runReaderT a c) st
+runHS c st (HS a) = flip runReaderT c $ runStateT a st
 
 runInHS :: HasCallStack => (MonadIO m, MonadThrow m, MonadReader HConf m) => HS a -> m a
 runInHS a = do
@@ -51,6 +49,9 @@ liftH :: (MonadReader HConf m, MonadIO m) => H a -> m a
 liftH a = do
   c <- ask
   io $ runH c a
+
+liftHS :: HS a -> Query a
+liftHS a = Query (lift a)
 
 -- a la xmonad
 catchH :: HasCallStack => H a -> H a -> H a
@@ -96,14 +97,29 @@ userCodeDefS defValue a = fromMaybe defValue <$> userCodeS a
 
 -- * Manage/Render Event queues
 
-getEventQueueFuncs ::
-  (MonadReader env m, HasEventQueues env, MonadIO inner) =>
-  -- | @(queueForManagePhase, queueForRenderPhase)@
-  m (HS e1 -> inner (), HS e2 -> inner ())
+-- | @(queueForManagePhase, queueForRenderPhase)@
+getEventQueueFuncs
+  :: (MonadReader env m, HasEventQueues env, MonadIO inner)
+  => m (HS e1 -> inner (), HS e2 -> inner ())
 getEventQueueFuncs = (wrap *** wrap) <$> asks ((,) <$> view pendingManageQL <*> view pendingRenderQL)
   where
     wrap q = atomically . writeTQueue q . void
 
+writeManageQ :: (MonadReader s m, HasEventQueues s, MonadIO m) => HS () -> m ()
 writeManageQ x = do
     q <- asks (view pendingManageQL)
     atomically $ writeTQueue q x
+
+--------------------------------------------------
+
+class Monad m => GetHState m where
+  getHState :: m HState
+
+instance GetHState HS where
+  getHState = use id
+
+instance GetHState H where
+  getHState = do
+    locked <- view _stateLocked
+    when locked $ throwM $ HSWMStateLocked $ "attempted to nest state lock?\n" ++ prettyCallStack callStack
+    view _state >>= atomically . readTMVar

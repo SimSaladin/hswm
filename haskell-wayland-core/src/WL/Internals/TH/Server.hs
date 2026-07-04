@@ -12,32 +12,24 @@
 module WL.Internals.TH.Server where
 
 import           Distribution.Wayland.ProtocolXML
-import           WL.Internals.Types
-import           WL.Internals.TH (ProtocolRenderSettings(..))
 import qualified WL.Internals.TH as C
+import           WL.Internals.TH (ProtocolRenderSettings(..))
+import           WL.Internals.Types
 
 import           Control.Arrow
-import           Control.DeepSeq (NFData)
-import           Control.Exception (finally)
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.Coerce
-import           Data.Data (Data)
 import           Data.Default
-import           Data.Hashable (Hashable)
-import qualified Data.List as L
-import qualified Data.List.NonEmpty as NE
 import           Data.Maybe
 import           Data.Void
 import           Foreign
 import           Foreign.C
 import           Foreign.C.ConstPtr
-import           GHC.Generics (Generic, Generically(..))
-import           GHC.Records (getField)
+import           GHC.Exts
+import           GHC.Generics (Generic)
 import           Language.Haskell.TH
-import           Language.Haskell.TH.Syntax
 import           System.Posix
-import GHC.Exts
 
 serverFromProtocolXML :: ProtocolRenderSettings -> String ->  Q [Dec]
 serverFromProtocolXML s content = serverFromProtocol s (protocolFromString content)
@@ -47,9 +39,7 @@ serverFromProtocol s proto = do
   concat <$> forM proto.interfaces (renderInterface s)
 
 renderInterface :: ProtocolRenderSettings -> Interface -> Q [Dec]
-renderInterface s iface = concat <$> sequence
-  [ renderInterfaceObject s iface
-  ]
+renderInterface s iface = concat <$> sequence [ renderInterfaceObject s iface ]
 
 renderInterfaceObject :: ProtocolRenderSettings -> Interface -> Q [Dec]
 renderInterfaceObject s iface = concat <$> sequence [ renderNT ] -- , renderIsWlObject, renderDestroy, renderHasIF ]
@@ -64,12 +54,20 @@ makeWrappedNT s name = C.renderNewType wName name ""
     wName = mkName $ s.prTypeNameModifier (nameBase name)
 
 data MethodConf = MethodConf
-  { methodName :: String
-  , methodUsage :: Maybe String
-  , methodArgs :: [MArgConf]
-  , methodResType :: Maybe (Q Type)
+  { methodName     :: String
+  , methodUsage    :: Maybe String
+  , methodArgs     :: [MArgConf]
+  , methodResType  :: Maybe (Q Type)
   , methodResTrans :: Maybe (Q Exp)
   , methodRetCheck :: Maybe (Q Exp)
+  } deriving (Generic)
+
+data MArgConf = MArgConf
+  { argName    :: Maybe String
+  , argType    :: Maybe (Q Type)
+  , argTrans   :: Maybe (Name -> Q Exp)
+  , argCleanup :: Maybe (Q Exp)
+  , argHelp    :: Maybe String
   } deriving (Generic)
 
 instance Default MethodConf where
@@ -82,17 +80,6 @@ instance Default MethodConf where
     , methodRetCheck = Nothing
     }
 
-instance IsString MethodConf where
-  fromString str = def { methodName = str }
-
-data MArgConf = MArgConf
-  { argName :: Maybe String
-  , argType :: Maybe (Q Type)
-  , argTrans :: Maybe (Name -> Q Exp)
-  , argCleanup :: Maybe (Q Exp)
-  , argHelp :: Maybe String
-  } deriving (Generic)
-
 instance Default MArgConf where
   def = MArgConf
     { argName = Nothing
@@ -102,27 +89,34 @@ instance Default MArgConf where
     , argCleanup = Nothing
     }
 
+instance IsString MethodConf where
+  fromString str = def { methodName = str }
+
 instance IsString MArgConf where
   fromString str = def { argName = Just str }
 
 argument :: MArgConf -> MethodConf -> MethodConf
 argument arg x = x { methodArgs = x.methodArgs ++ [arg] }
 
+-- | Document method.
+usage :: String -> MethodConf -> MethodConf
+usage txt x = x { methodUsage = Just txt }
+
+-- | Document argument.
 describe :: String -> MArgConf -> MArgConf
 describe txt x = x { argHelp = Just txt }
 
+-- | Coerce the type of argument.
 coercedAs :: Q Type -> MArgConf -> MArgConf
 coercedAs ty x = x { argType = Just ty, argTrans = Just (\nm -> [|pure (coerce $(varE nm))|]) }
 
+-- | Take a @String@ where @ConstPtr CChar@ (or eqivalent) is expected.
 stringInput :: MArgConf -> MArgConf
 stringInput x = x
-  { argType = Just [t|String|]
-  , argTrans = Just $ \nm -> [| liftIO $! fmap coerce $! newCString $(varE nm) |]
+  { argType    = Just [t|String|]
+  , argTrans   = Just $ \nm -> [| liftIO $! fmap coerce $! newCString $(varE nm) |]
   , argCleanup = Just [| free . coerce |]
   }
-
-usage :: String -> MethodConf -> MethodConf
-usage txt x = x { methodUsage = Just txt }
 
 throwIfMinus1 :: MethodConf -> MethodConf
 throwIfMinus1 x = x { methodRetCheck = Just [|throwErrnoIfMinus1 $(litE $ stringL $ x.methodName ++ " returned NULL!")|] }
@@ -168,10 +162,10 @@ makeMethodWrappers s name methodPrefix methods = do
               [ noBindS [|return $(varE ret)|] ]
             ) []
           ]
-          (Just $ "'" ++ methodName ++ "'" ++ maybe "" (\str -> "\n\n" ++ str) methodUsage)
+          (Just $ "'" ++ methodName ++ "'" ++ maybe "" ("\n\n" ++) methodUsage)
           [ if doc /= "" then Just doc else Nothing
             | x <- methodArgs
-            , let doc = maybe "" (\name -> "@" ++ name ++ "@ ") x.argName ++ fromMaybe "" x.argHelp
+            , let doc = maybe "" (\nm -> "@" ++ nm ++ "@ ") x.argName ++ fromMaybe "" x.argHelp
           ]
         ]
 

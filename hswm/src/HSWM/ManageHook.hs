@@ -1,8 +1,9 @@
 module HSWM.ManageHook where
 
-import Data.List (isInfixOf, isPrefixOf, isSuffixOf)
 import HSWM.StackSet qualified as W
-import HSWM.Types.WM
+import HSWM.Core
+
+import Data.List (isInfixOf, isPrefixOf, isSuffixOf)
 
 -- | If-then-else lifted to a 'Monad'.
 ifM :: (Monad m) => m Bool -> m a -> m a -> m a
@@ -135,4 +136,4 @@ doF = return . Endo
 
 -- | Move the window to a given workspace
 doShift :: WorkspaceId -> ManageHook
-doShift i = doF . W.shiftWin i =<< view river_window
+doShift i = doF . W.shiftWin i =<< view riverWindow

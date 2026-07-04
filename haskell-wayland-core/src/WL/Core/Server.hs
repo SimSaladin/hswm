@@ -9,6 +9,8 @@
 -- Stability   : unstable
 -- Portability : unportable
 --
+-- Very incomplete and untested!
+--
 -- See also:
 --
 --  - "WL.Util"
@@ -17,23 +19,20 @@
 module WL.Core.Server where
 
 import           WL.Core.Server.Generated
-import           WL.Core.Server.Generated.Global
-import           WL.Core.Server.Generated.Safe   as Safe
+--import           WL.Core.Server.Generated.Global
+import           WL.Core.Server.Generated.Safe as Safe
 import qualified WL.Core.Server.Generated.Unsafe as Unsafe
 
-import           WL.Internals.TH.Server
-import           WL.Internals.TH (commonSettings)
-import           WL.Internals.Types
-import           WL.Internals.Utils
+import           Foreign.C.ConstPtr
+import           Lens.Micro
+import           System.Posix (Fd(..))
+--import           WL.Core.Enums
 import           WL.Core.Internal
-import           WL.Core.Enums
+import           WL.Internals.TH (commonSettings)
+import           WL.Internals.TH.Server
+--import           WL.Internals.Types
+--import           WL.Internals.Utils
 import           WL.Util
-import Foreign.C.ConstPtr
-
-import Data.Word
-import System.Posix (UserID, GroupID, ProcessID, Fd(..))
-
-import Lens.Micro
 
 -- * Types
 

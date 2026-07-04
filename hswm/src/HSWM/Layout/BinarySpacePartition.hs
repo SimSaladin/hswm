@@ -271,12 +271,12 @@ toTree = fst . top
 
 goToNthLeaf :: Int -> Zipper a -> Maybe (Zipper a)
 goToNthLeaf _ z@(Leaf _, _) = Just z
-goToNthLeaf n z@(t, _) =
-  if numLeaves (left t) > n
+goToNthLeaf n z@(Node{left}, _) =
+  if numLeaves left > n
   then do z' <- goLeft z
           goToNthLeaf n z'
   else do z' <- goRight z
-          goToNthLeaf (n - (numLeaves . left $ t)) z'
+          goToNthLeaf (n - (numLeaves left)) z'
 
 toggleSplits :: Tree Split -> Tree Split
 toggleSplits (Leaf l) = Leaf l
@@ -554,11 +554,11 @@ zipperToBinarySpacePartition (Just z) = BinarySpacePartition [] noRef noRef . Ju
 rectangles :: BinarySpacePartition a -> Rectangle -> [Rectangle]
 rectangles (BinarySpacePartition _ _ _ Nothing) _ = []
 rectangles (BinarySpacePartition _ _ _ (Just (Leaf _))) rootRect = [rootRect]
-rectangles (BinarySpacePartition _ _ _ (Just node)) rootRect =
-    rectangles (makeBSP . left $ node) leftBox ++
-    rectangles (makeBSP . right $ node) rightBox
+rectangles (BinarySpacePartition _ _ _ (Just Node{left, right, value})) rootRect =
+    rectangles (makeBSP left) leftBox ++
+    rectangles (makeBSP right) rightBox
     where (leftBox, rightBox) = split (axis info) (ratio info) rootRect
-          info = value node
+          info = value
 
 getNodeRect :: BinarySpacePartition a -> Rectangle -> NodeRef -> Rectangle
 getNodeRect b r n = fromMaybe (Rectangle 0 0 1 1) (makeZipper b >>= goToNode n >>= getRect [])
@@ -714,7 +714,7 @@ getHidden :: HS [RiverWindow]
 getHidden = getStackSet
   >>= lookupWindows . W.integrate'
   >>=  filterM (runQuery isMinimized)
-  <&> map (view river_window)
+  <&> map (view riverWindow)
 
 getStackSet :: HS (Maybe (W.Stack RiverWindow))
 getStackSet = W.stack . W.workspace . W.current <$> use windowset -- windows on this WS (with floating)

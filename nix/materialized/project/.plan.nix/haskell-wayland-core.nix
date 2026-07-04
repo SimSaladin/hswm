@@ -28,15 +28,12 @@
         (hsPkgs.pkgsBuildBuild.Cabal or (pkgs.pkgsBuildBuild.Cabal or (errorHandler.setupDepError "Cabal")))
         (hsPkgs.pkgsBuildBuild.Cabal-hooks or (pkgs.pkgsBuildBuild.Cabal-hooks or (errorHandler.setupDepError "Cabal-hooks")))
         (hsPkgs.pkgsBuildBuild.microlens-ghc or (pkgs.pkgsBuildBuild.microlens-ghc or (errorHandler.setupDepError "microlens-ghc")))
-        (hsPkgs.pkgsBuildBuild.filepath or (pkgs.pkgsBuildBuild.filepath or (errorHandler.setupDepError "filepath")))
-        (hsPkgs.pkgsBuildBuild.string-interpolate or (pkgs.pkgsBuildBuild.string-interpolate or (errorHandler.setupDepError "string-interpolate")))
-        (hsPkgs.pkgsBuildBuild.directory or (pkgs.pkgsBuildBuild.directory or (errorHandler.setupDepError "directory")))
       ];
       detailLevel = "FullDetails";
       licenseFiles = [ "LICENSE" ];
       dataDir = ".";
-      dataFiles = [ "wayland.xml" "binding-specs/*.yaml" ];
-      extraSrcFiles = [ "wayland.xml" "binding-specs/*.yaml" ];
+      dataFiles = [ "binding-specs/*.yaml" "protocols/*.xml" ];
+      extraSrcFiles = [ "binding-specs/*.yaml" "protocols/*.xml" ];
       extraTmpFiles = [];
       extraDocFiles = [];
     };
@@ -68,7 +65,9 @@
           "Paths_haskell_wayland_core"
           "PackageInfo_haskell_wayland_core"
           "WL/Core/Client"
+          "WL/Core/Server"
           "WL/Internals/TH"
+          "WL/Internals/TH/Server"
           "WL/Internals/Types"
           "WL/Internals/Utils"
           "WL/Util"

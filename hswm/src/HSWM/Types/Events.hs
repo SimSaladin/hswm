@@ -73,5 +73,5 @@ data Event
     ZdgOutputEvent !Xdg.OutputEvent
   deriving (Eq, Show, Generic)
 
-instance (Monoid (m All)) => Default (Event -> m All) where
-  def _ = mempty
+instance Applicative m => Default (Event -> m All) where
+  def _ = pure mempty

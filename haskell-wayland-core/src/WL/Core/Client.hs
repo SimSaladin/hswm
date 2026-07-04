@@ -1,4 +1,6 @@
 {-# LANGUAGE OverloadedLabels #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
+
 
 module WL.Core.Client
   ( module WL.Core.Client
@@ -386,3 +388,7 @@ registryBind reg name iface ver = liftIO $ castPtr <$> wl_registry_bind reg.unwr
 -- | Close the connection to display and free all resources associated with it.
 displayDisconnect :: MonadIO m => Display -> m ()
 displayDisconnect (Display d) = liftIO $ Safe.wl_display_disconnect d
+
+-- orphan instances
+
+deriving via CUInt instance Default SeatCapability

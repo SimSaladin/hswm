@@ -1,3 +1,5 @@
+{-# LANGUAGE NoFieldSelectors #-}
+
 -- |
 -- Description: Keymap builder (XkbRmlvoBuilder)
 --
@@ -68,7 +70,7 @@ appendLayout rmlvo ls =
   withForeignPtr rmlvo.unwrap $ \ptr ->
   withCString ls.layoutLayout $ \laC ->
   withCString (fromMaybe "" ls.layoutVariant) $ \vaC ->
-  withMany withCString (map optionOption ls.layoutOptions) $ \optsS ->
+  withMany withCString (map (.optionOption) ls.layoutOptions) $ \optsS ->
   withArray (map ConstPtr optsS) $ \optsArr -> do
     r <- c_append_layout ptr (ConstPtr laC) (ConstPtr vaC) (ConstPtr optsArr) (length optsS)
     unless r $ throwIO $ KeymapBuilderInvalidLayout rmlvo ls

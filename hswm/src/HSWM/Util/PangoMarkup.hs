@@ -7,7 +7,14 @@
 -- Stability   : unstable
 -- Portability : unportable
 --
-module HSWM.Util.PangoMarkup where
+module HSWM.Util.PangoMarkup
+  (Markup(..), Attr(..), IsText(..), render,
+  escape, bold, italic,
+  text,
+  fromShow,
+  -- * Escape
+  escapeLineBreaks, escapeMarkupPure, escapeMarkup
+  ) where
 
 import GI.GLib.Functions (markupEscapeText)
 import Data.Text qualified as T
@@ -24,45 +31,49 @@ escapeMarkupPure x len = unsafePerformIO (escapeMarkup x len)
 escapeLineBreaks :: Text -> Text
 escapeLineBreaks = T.replace "\n" "\\n" . T.replace "\r" "\\r"
 
-data Markup a
-  = Raw a
-  | Escaped a
-  | Concat (Markup a) (Markup a)
-  | Bold (Markup a)
-  | Italic (Markup a)
-  | Monospace (Markup a)
-  | Markup a :<> [SpanAttr]
+data Markup
+  = Raw Text
+  | Escaped Text
+  | MEmpty
+  | Concat Markup Markup
+  | Bold Markup
+  | Italic Markup
+  | Monospace Markup
+  | Markup :<> [Attr]
   deriving (Eq, Show, Generic)
 
-data SpanAttr = Attr T.Text T.Text
+data Attr = Attr Text Text
   deriving (Eq, Show, Generic)
 
-instance IsString (Markup T.Text) where
+instance Semigroup Markup where
+  MEmpty <> b = b
+  a <> MEmpty = a
+  a <> b = Concat a b
+
+instance Monoid Markup where
+  mempty = MEmpty
+
+instance IsString Markup where
   fromString s = Escaped (toText s)
 
-instance Semigroup (Markup a) where
-  a <> b = Concat a b
-instance Monoid (Markup T.Text) where
-  mempty = Raw ""
-
-render :: MonadIO m => Markup T.Text -> m T.Text
+render :: Markup -> Text
 render = go
   where
-    go (Raw x)       = pure x
-    go (Concat a b)  = liftM2 (<>) (go a) (go b)
-    go (Escaped x)   = escapeMarkup x (-1)
+    go MEmpty        = ""
+    go (Raw x)       = x
+    go (Concat a b)  = (<>) (go a) (go b)
+    go (Escaped x)   = escapeMarkupPure x (-1)
     go (Bold x)      = tag "b" [] $ go x
     go (Italic x)    = tag "i" [] $ go x
     go (Monospace x) = tag "tt" [] $ go x
     go (x :<> attrs) = tag "span" attrs $ go x
 
-    tag label attrs inner = do
-      inner' <- inner
-      return $! "<" <> label <> T.concat (map prAttrs attrs) <> ">" <> inner' <> "</" <> label <> ">"
+    tag label attrs inner' =
+      "<" <> label <> T.concat (map prAttrs attrs) <> ">" <> inner' <> "</" <> label <> ">"
 
     prAttrs (Attr k v) = " " <> k <> "=\"" <> v <> "\""
 
-fromShow :: Show a => a -> Markup T.Text
+fromShow :: Show a => a -> Markup
 fromShow x = Escaped (toText $ show x)
 
 class IsText a where
@@ -71,8 +82,17 @@ class IsText a where
 instance IsText String where
   getText = T.pack
 
-instance IsText T.Text where
+instance IsText Text where
   getText = id
 
-text :: IsText a => a -> Markup T.Text
+text :: IsText a => a -> Markup
 text = Escaped . getText
+
+escape :: IsText a => a -> Markup
+escape = Raw . escapeLineBreaks . flip escapeMarkupPure (-1) . getText
+
+bold :: Markup -> Markup
+bold = Bold
+
+italic :: Markup -> Markup
+italic = Italic

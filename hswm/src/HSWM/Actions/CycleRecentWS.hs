@@ -118,17 +118,17 @@ cycleWindowSets ::
   --   If it's the same as nextOption key, it is effectively ignored.
   KeySym ->
   H ()
-cycleWindowSets genOptions holdMods keyNext keyPrev = do
-  (options, unView') <- runInHS $ gets $ (genOptions &&& unView) . view windowset
+cycleWindowSets genOptions holdMods keyNext' keyPrev = do
+  (opts, unView') <- runInHS $ gets $ (genOptions &&& unView) . view windowset
   let previewWS i = do
         logInfo $ "[cyclews] preview" :# [ "id" .= i ]
-        runInHS $ windows (W.view (options !! (i `mod` n)) . unView')
+        runInHS $ windows (W.view (opts !! (i `mod` n)) . unView')
         manageDirty
         where
-          n = length options
+          n = length opts
 
       process s (Right GK {..})
-        | state > 0, keysym == fi keyNext = previewWS (succ s) >> pure (Right (succ s))
+        | state > 0, keysym == fi keyNext' = previewWS (succ s) >> pure (Right (succ s))
         | state > 0, keysym == fi keyPrev = previewWS (pred s) >> pure (Right (pred s))
         | otherwise = pure (Right s)
       process s (Right GMod {..})
@@ -139,7 +139,7 @@ cycleWindowSets genOptions holdMods keyNext keyPrev = do
   Just rs <- view thisSeat
   Just seat <- runInHS $ lookupSeat rs
   previewWS 0
-  withKeyboardGrab seat (map fi holdMods) [keyNext, keyPrev] process 0
+  withKeyboardGrab seat (map fi holdMods) [keyNext', keyPrev] process 0
 
 -- | Given an old and a new 'WindowSet', which is __exactly__ one
 -- 'view' away from the old one, restore the workspace order of the
@@ -171,7 +171,7 @@ unView w0 w1 = fixOrderH . fixOrderV . view' (currentTag w0) $ w1
 -- given 'WindowSet', switch to the first generated workspace.
 toggleWindowSets :: (WindowSet -> [WorkspaceId]) -> HS ()
 toggleWindowSets genOptions = do
-  options <- gets $ genOptions . view windowset
-  case options of
+  opts <- gets $ genOptions . view windowset
+  case opts of
     [] -> return ()
     o : _ -> windows (W.view o)

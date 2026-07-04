@@ -23,32 +23,42 @@ import qualified WL.Wlr.OutputPowerManagement.Unstable.V1.Client as Wlr
 import qualified WL.XdgOutput.Unstable.V1.Client as Zdg
 
 import qualified Data.List as L
-import qualified Data.Map as M
 
-data OutputManager = OutputManager
-  { pending_setup :: M.Map RiverOutput Output -- ^ Waiting for OutputDone event
-  , pending_manage :: [Output]
-  }
-  deriving stock (Generic)
-  deriving anyclass (Default)
-
--- | New output is added
+-- | New output is added: is put to pending_setup.
+--
+-- When an OutputDone event is received for the output, it is moved to pending_manage.
 added :: RiverOutput -> H ()
-added out = do
+added ro = do
   -- Assign screen Id
-  om <- getObjectDef
-  scr <- runInHS $ nextScreenId om
+  output <- runInHS $ do
+    scr <- nextScreenId
+    let output = def & riverOutput .~ ro & screen .~ scr
+    outputList %= (<> [output])
+    return output
 
   -- Add RiverOutput event listener
-  withObject $ WL.listenerAdd_ out
+  withObject $ WL.listenerAdd_ ro
 
   -- Create layer shell output + add listener
-  lso <- withObject @R.RiverLayerShell $ \shell -> R.riverLayerShellGetOutput shell out
-  withObject $ \l -> WL.listenerAdd lso l out
+  lso <- withObject $ flip R.riverLayerShellGetOutput ro
+  withObject $ \l -> WL.listenerAdd lso l ro
+  runInHS $ outputList . eachRiverId ro . layerShellOutput %= const lso
 
-  let output = def { river_output = out, screen = scr, layerShellOutput = lso }
-  logInfo $ "Output added, pending setup" :# [ "output" .= tshow out, "screen" .= tshow scr ]
-  modifyObject $ \st -> st {pending_setup = M.insert out output $ pending_setup st}
+  logInfo $ "Output added, pending setup" :# [ "output" .= tshow ro, "screen" .= tshow output.screen ]
+
+-- * Manage
+
+manage :: H ()
+manage = do
+  runInHS $ do
+    outputs <- use outputList
+    forM_ outputs $ \o -> when (o ^. managePending) $ do
+      modifyOutput o.river_output $ managePending .~ False
+      updateScreenDetail o.river_output
+      defLayout <- view (config . layoutHook)
+      -- Add output to windowSet
+      modifyWindowSet $ W.insertScreen defLayout o.screen (getScreenDetail o)
+      R.riverLayerShellOutputSetDefault o.layerShellOutput
 
 ----------------------------------------------------------
 
@@ -56,101 +66,66 @@ added out = do
 
 handle :: R.RiverOutputEvent -> H ()
 handle = \case
-  R.RiverOutputRemoved _ output -> runInHS $
-    withOutput output $
-      \o@Output {screen = scr, layerShellOutput = lso, wlOutput = wlo} -> do
-        -- delete screen from windowset
-        modifyWindowSet $ W.deleteScreen scr
-        -- delete from list of outputs
-        modifying _outputs $ filter (\x -> x.river_output /= output)
-        -- destroy layer shell output, output, wl_output
-        io $ WL.objectDestroy lso
-        io $ WL.objectDestroy output
-        io $ WL.objectDestroy wlo
-        io $ whenJust o.outputPower WL.objectDestroy
+  R.RiverOutputRemoved _ output -> runInHS $ withOutput output $ \o -> do
+    -- delete screen from windowset
+    modifyWindowSet $ W.deleteScreen o.screen
+    -- delete from list of outputs
+    outputList %= filter (not . riverIdEq output)
+    -- destroy layer shell output, output, wl_output
+    io $ mapM_ WL.objectDestroy o.outputPower
+    io $ WL.objectDestroy o.layerShellOutput
+    io $ WL.objectDestroy output
+    io $ WL.objectDestroy o.wlOutput
 
   R.RiverOutputWlOutput _ output name -> do
     -- bind a wl_output listener
-    wlo <- bindGlobalWith @WL.Output name Nothing
+    wlo <- bindGlobalName @WL.Output name Nothing
     withObject $ \l -> WL.listenerAdd wlo l output
     -- xdg_output
-    zdg_output <- withObject $ \om -> Zdg.outputManagerGetXdgOutput om wlo
+    zdg_output <- withObject $ flip Zdg.outputManagerGetXdgOutput wlo
     withObject $ \l -> WL.listenerAdd zdg_output l output
     -- output power mgmt
-    power <- withObject $ \opm -> Wlr.outputPowerManagerGetOutputPower opm wlo
-    modifyObjectDef $ \om -> om
-      { pending_setup = M.adjust (\o -> o { wlOutput = wlo, outputPower = Just power }) output (pending_setup om) }
+    power <- withObject $ flip Wlr.outputPowerManagerGetOutputPower wlo
+    modifyOutput' output $ wlOutput .~ wlo &+ outputPower ?~ power
 
-  R.RiverOutputDimensions _ output w h ->
-    modifyOutput' output $ \x -> x & width .~ fi w & height .~ fi h
-
-  R.RiverOutputPosition _ output x y ->
-    modifyOutput' output $ \a -> a & _x .~ fi x & _y .~ fi y
+  R.RiverOutputDimensions _ output w h -> modifyOutput' output $ width .~ fi w &+ height .~ fi h
+  R.RiverOutputPosition   _ output x y -> modifyOutput' output $ _x .~ fi x &+ _y .~ fi y
 
 handleWlOutput :: WL.OutputEvent -> H ()
 handleWlOutput = \case
-  WL.OutputScale o _ sc ->
-    modifyOutput' (R.RiverOutput $ castPtr o) $ \x -> (x :: Output) {scale = sc}
-  WL.OutputName o _ nm ->
-    modifyOutput' (R.RiverOutput $ castPtr o) $ \x -> (x :: Output) {outputName = nm}
-  WL.OutputDescription o _ desc ->
-    modifyOutput' (R.RiverOutput $ castPtr o) $ \x -> (x :: Output) {outputDescription = desc}
-
-  WL.OutputDone o _ -> do
-    modifyObjectDef $ \om ->
-      case M.lookup (R.RiverOutput $ castPtr o) $ pending_setup om of
-        Just output -> om
-          { pending_setup = M.delete (R.RiverOutput $ castPtr o) (pending_setup om),
-            pending_manage = output : pending_manage om
-          }
-        Nothing -> om
-
+  WL.OutputScale       o _ sc   -> modifyOutput' (R.RiverOutput $ castPtr o) $ scale .~ sc
+  WL.OutputName        o _ nm   -> modifyOutput' (R.RiverOutput $ castPtr o) $ _name .~ nm
+  WL.OutputDescription o _ desc -> modifyOutput' (R.RiverOutput $ castPtr o) $ outputDescription .~ desc
+  WL.OutputDone        o _      -> modifyOutput' (R.RiverOutput $ castPtr o) $ setupDone .~ True &+ managePending .~ True
   _ -> mempty
 
 handleLayerShell :: R.RiverLayerShellOutputEvent -> H ()
 handleLayerShell = \case
   R.RiverLayerShellOutputNonExclusiveArea ro _ x y w h ->
-    modifyOutput' (R.RiverOutput $ castPtr ro) $ \o -> o {nonExclusive = Just (x, y, w, h)}
-
-----------------------------------------------------------
-
--- * Manage
-
-manage :: H ()
-manage = do
-  om <- getObjectDef @OutputManager
-  -- handle new outputs
-  forM_ om.pending_manage $ \output -> do
-    runInHS $ modifying _outputs (++ [output])
-    -- Adding to WindowSet
-    defLayout <- view (config . layoutHook)
-    runInHS $ modifyWindowSet $ W.insertScreen defLayout output.screen (getScreenDetail output)
-    R.riverLayerShellOutputSetDefault output.layerShellOutput
-    modifyObject $ \st -> st { pending_manage = filter (\x -> x.river_output /= output.river_output) $ pending_manage st }
+    modifyOutput' (R.RiverOutput $ castPtr ro) $ nonExclusive ?~ Rectangle x y (fi w) (fi h)
 
 ----------------------------------------------------------
 
 -- * Utilities
 
-nextScreenId :: OutputManager -> HS ScreenId
-nextScreenId om = do
-  curOutputs <- use _outputs
-  case [i | i <- [S 1 ..], isNothing $ L.find ((i ==) . view screen) (curOutputs ++ M.elems om.pending_setup ++ om.pending_manage)] of
-    i : _ -> return i
-    _ -> error "impossible"
-
-getScreenDetail :: Output -> ScreenDetail
-getScreenDetail o = SD {x = fi o.position.x, y = fi o.position.y, height = fi o.size.height, width = fi o.size.width}
+modifyOutput' :: RiverOutput -> (Output -> Output) -> H ()
+modifyOutput' ro f = runInHS $ modifyOutput ro f >> updateScreenDetail ro
 
 updateScreenDetail :: RiverOutput -> HS ()
-updateScreenDetail output = withOutput output $ \o -> do
+updateScreenDetail ro = withOutput ro $ \o -> when (o ^. setupDone) $ do
   modifyWindowSet $ modifyScreen o.screen $ modifyScreenDetail $ \_ -> getScreenDetail o
   liftH manageDirty
   where
     modifyScreen sid f = W.mapScreen (\s -> if sid == W.screen s then f s else s)
     modifyScreenDetail f scr = scr {W.screenDetail = f (W.screenDetail scr)}
 
-modifyOutput' :: RiverOutput -> (Output -> Output) -> H ()
-modifyOutput' output f = do
-  modifyObjectDef $ \st -> st { pending_setup = M.adjust f output st.pending_setup }
-  runInHS $ modifyOutput output f >> updateScreenDetail output
+getScreenDetail :: Output -> ScreenDetail
+getScreenDetail o = SD {x = fi $ o^._x, y = fi $ o^._y, height = fi $ o^.height, width = fi $ o^.width}
+
+nextScreenId :: HasCallStack => HS ScreenId
+nextScreenId = do
+  outputs <- use outputList
+  let check x = isNothing $ L.find ((x ==) . view screen) outputs
+  case filter check [S 1 ..] of
+    x : _ -> return x
+    _ -> throwString "nextScreenId"

@@ -12,41 +12,43 @@ class HasGlobalsRegistry env where
 instance HasGlobalsRegistry (MVar WL.RegistryState) where
   globalsRegistryL = lens id const
 
-type HasGlobals env m = (MonadUnliftIO m, MonadLogger m, MonadThrow m, MonadReader env m, HasGlobalsRegistry env, HasGlobalTMap env)
+type MonadGlobals env m = (MonadUnliftIO m, MonadLogger m, MonadThrow m, MonadReader env m, HasGlobalsRegistry env, HasGlobalTMap env)
 
 -- | Bind global by its name.
-bindGlobalWith
-  :: forall a env m. (HasGlobals env m, WL.IsWlObject a, WL.HasInterface a)
-  => WL.ObjectName -> Maybe WL.Version -> m a
-bindGlobalWith name mver = do
+bindGlobalName
+  :: forall a env m. (MonadGlobals env m, WL.IsWlObject a, WL.HasInterface a)
+  => WL.ObjectName -- ^ The object name (id)
+  -> Maybe WL.Version -- ^ Optional max version
+  -> m a
+bindGlobalName name mver = do
   regState <- asks (view globalsRegistryL) >>= readMVar
   WL.bindGlobal regState (Just name) mver
 
--- | bind global by type.
-bindGlobalAuto_
-  :: forall a env m. (HasGlobals env m, WL.IsWlObject a, WL.HasInterface a)
+-- | Bind global by type.
+bindGlobal
+  :: forall a env m. (MonadGlobals env m, WL.IsWlObject a, WL.HasInterface a)
   => m a
-bindGlobalAuto_ = do
+bindGlobal = do
   regState <- asks (view globalsRegistryL) >>= readMVar
   getOrCreateObjectIO $ WL.bindGlobal regState Nothing Nothing
 
 -- | Bind global by type + add listener.
-bindGlobalAuto
-  :: forall a env m. (HasGlobals env m, WL.IsWlObject a, WL.HasInterface a, WL.HasListener a, Show a)
+bindGlobalWithListener
+  :: forall a env m. (MonadGlobals env m, WL.IsWlObject a, WL.HasInterface a, WL.HasListener a, Show a)
   => (ConstPtr (WL.ObjectListener a)) -- ^ listener
   -> Ptr () -- ^ User data
   -> m a
-bindGlobalAuto listener udata = do
+bindGlobalWithListener listener udata = do
   regState <- asks (view globalsRegistryL) >>= readMVar
   o <- getOrCreateObjectIO $ WL.bindGlobal regState Nothing Nothing
   WL.listenerAdd o listener udata
   return o
 
 -- | Bind global by type + add listener if one has been created.
-bindGlobalAuto'
-  :: forall a env m. (HasGlobals env m, WL.IsWlObject a, WL.HasInterface a, WL.HasListener a, Show a, Typeable (WL.ObjectListener a))
+bindGlobalWithAutoListener
+  :: forall a env m. (MonadGlobals env m, WL.IsWlObject a, WL.HasInterface a, WL.HasListener a, Show a, Typeable (WL.ObjectListener a))
   => m a
-bindGlobalAuto' = do
+bindGlobalWithAutoListener = do
   regState <- asks (view globalsRegistryL) >>= readMVar
   o <- getOrCreateObjectIO $ WL.bindGlobal regState Nothing Nothing
   withObject $ \l -> WL.listenerAdd o l (nullPtr :: Ptr ())

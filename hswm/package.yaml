@@ -77,6 +77,7 @@ __:
   - &dep-gi-glib                     gi-glib                      >=2.0.30   && <2.1
   - &dep-haskeline                   haskeline                   ^>=0.8.2
   - &dep-microlens-platform          microlens-platform           >=0.4      && <1
+  - &dep-microlens                   microlens
   - &dep-monad-logger-aeson          monad-logger-aeson          ^>=0.4.1
   - &dep-mtl                         mtl                         ^>=2.3.1
   - &dep-network                     network                     ^>=3.2.8
@@ -99,6 +100,7 @@ __:
   - &dep-unliftio-core               unliftio-core               ^>=0.2.1
   - &dep-utf8-string                 utf8-string                 ^>=1.0.2
   - &dep-vector                      vector                      ^>=0.13.2
+  - &dep-filepath                    filepath
 
   # Packages from here
   - &dep-hswm-bindings               hswm-bindings
@@ -146,6 +148,9 @@ library:
     - *dep-unix
     - *dep-utf8-string
     - *dep-vector
+    - *dep-filepath
+    - th-abstraction
+    - microlens-th
   build-tools:
     - hsc2hs:hsc2hs
 
@@ -168,6 +173,7 @@ internal-libraries:
       - *dep-unliftio
       - *dep-monad-logger-aeson
       - *dep-microlens-platform
+      - *dep-microlens
 
   ipc-api:
     visibility: public

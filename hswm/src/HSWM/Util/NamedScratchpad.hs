@@ -12,6 +12,7 @@ import Data.List qualified as L
 import Data.Map qualified as M
 import HSWM.Actions.Minimize
 import HSWM.Core
+import HSWM.ManageHook
 import HSWM.Operations
 import HSWM.StackSet qualified as W
 import HSWM.Util.ExtensibleState qualified as XS
@@ -181,14 +182,14 @@ dynPadCurrent :: ScratchpadId -> HS (Maybe RiverWindow)
 dynPadCurrent k = XS.gets $ M.lookup k . dynWins
 
 -- | Pad with no static launch action. Use the provided action to bind to an existing window.
-mkPadDyn :: ScratchpadId -> RP.RofiPromptConfig -> ManageHook -> Scratchpad
+mkPadDyn :: ScratchpadId -> RP.RofiPromptConfig RP.SelectS -> ManageHook -> Scratchpad
 mkPadDyn nm rpc mh = mkPad nm mh q a
   where q = liftHS (dynPadCurrent nm) >>= \mw -> asks (\x -> Just x.river_window) =? mw
         a = dynDefaultPrompt rpc nm
         -- a = dynPadToggleFocused nm
 
 -- | Add a launch action to a dynamic pad. It prompts for confirmation to bind focused window to the pad.
-dynDefaultPrompt :: RP.RofiPromptConfig -> ScratchpadId -> H ()
+dynDefaultPrompt :: RP.RofiPromptConfig RP.SelectS -> ScratchpadId -> H ()
 dynDefaultPrompt rpc k = do
   mfoc <- runInHS $ use windowset >>= maybe (return Nothing) lookupWindow . W.peek
   case mfoc of

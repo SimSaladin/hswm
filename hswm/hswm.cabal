@@ -1,6 +1,6 @@
 cabal-version: 3.12
 
--- This file has been generated from package.yaml by hpack version 0.38.3.
+-- This file has been generated from package.yaml by hpack version 0.39.6.
 --
 -- see: https://github.com/sol/hpack
 
@@ -70,9 +70,11 @@ library
           HSWM.Layout.NoBorders
           HSWM.Layout.WindowNavigation
           HSWM.Main
+          HSWM.Main.Options
           HSWM.ManageHook
           HSWM.Operations
           HSWM.Outputs
+          HSWM.Prompt.Environment
           HSWM.Seats
           HSWM.StackSet
           HSWM.Types.Action
@@ -114,10 +116,12 @@ library
         , data-default >=0.8.0 && <0.9
         , fast-logger >=3.2.6 && <3.3
         , filelock >=0.1.1 && <0.2
+        , filepath
         , gi-glib >=2.0.30 && <2.1
         , hswm-bindings
         , hswm:ipc-api
         , hswm:prelude
+        , microlens-th
         , mtl >=2.3.1 && <2.4
         , network >=3.2.8 && <3.3
         , optparse-applicative >=0.18.1 && <0.20
@@ -127,6 +131,7 @@ library
         , process >=1.6.25 && <1.7
         , template-haskell >=2.20 && <3
         , text >=2.1.2 && <2.2
+        , th-abstraction
         , time >=1.14 && <2.0
         , transformers >=0.6.1 && <0.7
         , typed-process >=0.2.13 && <0.3
@@ -205,6 +210,7 @@ library prelude
         , base >=4.21 && <5
         , data-default >=0.8.0 && <0.9
         , exceptions >=0.10.9 && <0.11
+        , microlens
         , microlens-platform >=0.4 && <1
         , monad-logger-aeson >=0.4.1 && <0.5
         , mtl >=2.3.1 && <2.4

@@ -1,15 +1,13 @@
-{-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE UnboxedTuples #-}
-{-# LANGUAGE MagicHash #-}
-{-# LANGUAGE TypeFamilies           #-}
 {-# LANGUAGE DerivingVia            #-}
+{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE MagicHash              #-}
 {-# LANGUAGE NoFieldSelectors       #-}
 {-# LANGUAGE PatternSynonyms        #-}
 {-# LANGUAGE TemplateHaskell        #-}
 {-# LANGUAGE TypeData               #-}
+{-# LANGUAGE TypeFamilies           #-}
+{-# LANGUAGE UnboxedTuples          #-}
 {-# LANGUAGE ViewPatterns           #-}
-{-# OPTIONS_GHC -Wno-orphans #-}
-
 
 -- |
 -- Module      : Distribution.HsBindgen.Types
@@ -29,18 +27,15 @@ import qualified Distribution.Compat.CharParsing as P
 import           Distribution.ModuleName (ModuleName)
 import           Distribution.Parsec
 import           Distribution.Pretty
-import           Distribution.Simple.SetupHooks
-  (Location(..), location, LocalBuildConfig, PackageBuildDescr, Dependency(..), RuleOutput(..))
-import           Distribution.Simple.SetupHooks.Rule (RuleId(..))
 import           Distribution.Simple.Flag
+import           Distribution.Simple.SetupHooks (LocalBuildConfig, Location(..),
+                                                 PackageBuildDescr, location)
 import           Distribution.Utils.Generic
 import           Distribution.Utils.Path
-import           Distribution.Utils.ShortText
 
 import           Control.Applicative
 import qualified Data.Aeson as A
 import           Data.Char
-import           Data.Coerce
 import           Data.Default
 import           Data.Foldable
 import           Data.Functor
@@ -48,84 +43,104 @@ import qualified Data.List as L
 import qualified Data.Map.Strict as M
 import           Data.Maybe
 import           Data.Monoid
-import           Data.Proxy
 import           Data.Set (Set)
 import           Data.String
-import           Data.Typeable
-import           Foreign (Storable)
 import qualified GHC.Exts as GHC (IsList(..))
-import           GHC.Fingerprint
 import           GHC.Generics (Generic, Generic1(..), Generically(..))
-import           GHC.Read
-import           Lens.Micro
-import           Lens.Micro.GHC ()
-import           Numeric
+import           GHC.Stack
 import qualified Text.PrettyPrint as PP
-import           Text.Printf (printf)
-
--- orphan instances
-
-deriving anyclass instance A.FromJSON (SymbolicPathX a b c)
-deriving anyclass instance A.ToJSON (SymbolicPathX a b c)
-
-deriving anyclass instance A.FromJSON ModuleName
-deriving anyclass instance A.ToJSON ModuleName
-
-instance A.FromJSON Location where
-  parseJSON v = do
-    (base, file) <- A.parseJSON v
-    return $! Location base file
-instance A.ToJSON Location where
-  toJSON (Location base file) = A.toJSON (base, file)
-
--- * BindingSpec
-
--- | External binding spec (file or module reference)
-data ExtBindingSpec
-  = BFile !(RelativePath Build File) -- ^ File reference (static)
-  | BFileLocation !Location
-  | BModule !ModuleName !(Maybe (SymbolicPath Pkg (Dir Source)))  -- ^ Produced by another hs-bindgen-cli instance
-  deriving (Eq, Ord, Show, Generic, Binary)
-  deriving anyclass (A.FromJSON, A.ToJSON)
-
--- | Prescriptive or generated binding spec for the current module?
-data BSpec
-  = GenerateBSpec !(Maybe Location) -- ^ Generate the spec on build and write it to the given location (or use the default if empty)
-  | PrescriptiveBSpec !Location -- ^ Prescriptive spec from a file (must exist). No spec generation.
-  deriving (Eq, Ord, Show, Generic, Binary)
-  deriving anyclass (A.FromJSON, A.ToJSON)
-
-instance Default BSpec where
-  def = GenerateBSpec Nothing
 
 -- | Settings for a hs-bindgen-cli invocation.
 data HsBindGen = HsBindGen
   { headers                        :: [Location] -- ^ Header files
+  , includeDirs                    :: [SymbolicPath Pkg ('Dir Include)] -- ^ Include search directories (@-I@)
+  , defineMacros                   :: M.Map String String -- ^ -D k=v
+  , extBindingSpecs                :: [ExtBindingSpec]
   , moduleName                     :: Flag ModuleName -- ^ Output module name
   , uniqueId                       :: Flag String
   , omitFieldPrefixes              :: Flag Bool
   , programSlicing                 :: Flag Bool
   , cStandard                      :: Flag String
-  , extBindingSpecs                :: [ExtBindingSpec]
   , bindingSpec                    :: Flag BSpec
   , selectDeprecated               :: Flag Bool
   , selectFromMainHeaderDirs       :: Flag Bool
-  , includeDirs                    :: [SymbolicPath Pkg ('Dir Include)] -- ^ Include search directories (@-I@)
   , genGlobal                      :: Flag Bool
   , hasPointer, hasSafe, hasUnsafe :: Flag Bool
-  , excludeByDeclName              :: PCRE -- ^ PCRE
-  , excludeHeaders                 :: PCRE -- [SymbolicPath Include 'File]
+  , createOutputDirs               :: Flag Bool
+  , overwriteFiles                 :: Flag Bool
+  , disableStdlib                  :: Flag Bool
+  , builtinIncludeDir              :: Flag BuiltinIncludeDir
+  , selectHeaders, excludeHeaders  :: PCRE -- [SymbolicPath Include 'File]
+  , selectDecls, excludeDecls      :: PCRE -- ^ PCRE
   , extraArgs                      :: [String]  -- ^ Arbitrary additional arguments for @hs-bindgen-cli@
   }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Binary, Default, A.FromJSON, A.ToJSON)
   deriving (Semigroup, Monoid) via Generically HsBindGen
 
+-- | E.g. clang or disable
+newtype BuiltinIncludeDir = BuiltinIncludeDir { unwrap :: String }
+  deriving stock (Eq, Ord, Generic)
+  deriving newtype (Show, Binary, A.ToJSON, A.FromJSON)
+
+instance Default BuiltinIncludeDir where
+  def = BuiltinIncludeDir "clang"
+
+instance IsString BuiltinIncludeDir where
+  fromString = BuiltinIncludeDir
+
+data BindConfig = BindConfig
+  { bcBindGen :: HsBindGen
+  , bcDepends :: [String] -- name
+  }
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (Binary, Default)
+  deriving (Semigroup, Monoid) via Generically BindConfig
+
+-- | Value for headers
+makeHeader :: FilePath -> Location
+makeHeader = makeLocation . makeSymbolicPath @Pkg @File
+
+-- * BindingSpec
+
+-- | External binding spec (file or module reference)
+data ExtBindingSpec
+  = BFile !(RelativePath Build File)
+  -- ^ File reference (static). Relative to package root.
+  | BFileLocation !Location
+  -- ^ File reference (static).
+  | BModule !ModuleName !(Maybe (SymbolicPath Pkg (Dir Source)))
+  -- ^ Produced by another hs-bindgen-cli instance
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (Binary, A.FromJSON, A.ToJSON)
+
+-- | Prescriptive or generated binding spec for the current module?
+data BSpec
+  = GenerateBSpec !(Maybe Location)
+  -- ^ Generate the spec on build and write it to the given location (or use the default if empty)
+  | PrescriptiveBSpec !Location
+  -- ^ Prescriptive spec from a file (must exist). No spec generation.
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (Binary, A.FromJSON, A.ToJSON)
+
+instance Default BSpec where
+  def = GenerateBSpec Nothing
+
 -- * PCRE
 
-newtype PCRE = PCRE String
+-- | Regex
+newtype PCRE = PCRE { unwrap :: String }
   deriving stock (Eq, Ord, Show, Generic)
   deriving newtype (Binary, Default, A.FromJSON, A.ToJSON)
+
+pcreValue :: PCRE -> String
+pcreValue (PCRE x) = x
+
+escapePCRE :: String -> PCRE
+escapePCRE = PCRE . concatMap f
+  where
+    f x | x `elem` ("|()[]{}.?*\\" :: String) = [ '\\', x ]
+        | otherwise = [ x ]
 
 instance Semigroup PCRE where
   p1@(PCRE a) <> p2@(PCRE b)
@@ -137,129 +152,104 @@ instance Monoid PCRE where
   mempty = PCRE ""
 
 instance IsString PCRE where
-  fromString = PCRE -- TODO FIXME
+  fromString = PCRE
 
 instance GHC.IsList PCRE where
   type Item PCRE = PCRE
   fromList = fold
-  toList = pure
-
--- * ToPCRE
+  toList   = pure
 
 class ToPCRE a where
   toPCRE :: a -> PCRE
+
 instance ToPCRE PCRE where
   toPCRE = id
-instance {-# OVERLAPS #-} (ToPCRE a, Foldable t) => ToPCRE (t a) where
-  toPCRE = foldMap toPCRE
 instance ToPCRE String where
   toPCRE = PCRE
 instance ToPCRE (SymbolicPathX abs from to) where
-  toPCRE = PCRE . interpretSymbolicPathCWD . normaliseSymbolicPath
+  toPCRE = escapePCRE . interpretSymbolicPathCWD . normaliseSymbolicPath
 instance ToPCRE Location where
   toPCRE = toPCRE . location
+instance {-# OVERLAPS #-} (ToPCRE a, Foldable t) => ToPCRE (t a) where
+  toPCRE = foldMap toPCRE
 
--- * Stability
+-- * Protocol properties
 
 data Stability = Unknown | Unstable | Staging | Stable
-  deriving (Eq, Ord, Show, Read, Generic, Binary)
-  deriving anyclass (A.FromJSON, A.ToJSON)
+  deriving stock (Eq, Ord, Show, Read, Generic, Bounded, Enum)
+  deriving anyclass (Binary, A.FromJSON, A.ToJSON)
 
 instance Default Stability where
   def = Unknown
 
--- * Version
-
 newtype ProtocolVersion = ProtocolVersion { unwrap :: Int }
-  deriving stock (Generic)
-  deriving newtype (Eq, Ord, Show, Read, Binary)
-  deriving newtype (A.FromJSON, A.ToJSON)
+  deriving stock (Eq, Ord, Generic)
+  deriving newtype (Show, Read, Binary, A.FromJSON, A.ToJSON, Enum)
 
 -- * ProtocolId
 
+-- | Structured protocol keys
 data ProtocolId = ProtocolId
-  { name      :: String
-  , stability :: Stability
-  , version   :: ProtocolVersion
-  } deriving (Eq, Ord, Show, Read, Generic, Binary)
-  deriving anyclass (A.FromJSON, A.ToJSON)
+  { name      :: !String
+  , stability :: !Stability
+  , version   :: !ProtocolVersion
+  }
+  deriving stock (Eq, Ord, Show, Read, Generic)
+  deriving anyclass (Binary, A.FromJSON, A.ToJSON)
 
--- * Components (Fingerprint)
-
-getFpr :: forall {k} (a :: k). Typeable a => Proxy a -> ProtoComponent
-getFpr _ = ProtoComponent $ typeRepFingerprint (typeRep (undefined :: proxy (a :: k)))
-
-getFpr' :: forall {k} (a :: k). Typeable a => Proxy a -> Fingerprint
-getFpr' _ = typeRepFingerprint (typeRep (undefined :: proxy (a :: k)))
+deriveProtocolId :: ProtocolSpecX a -> ProtocolId
+deriveProtocolId c = ProtocolId
+  { name      = c.category ++ "-" ++ c.baseName
+  , stability = c.stability
+  , version   = fromMaybe (ProtocolVersion 1) c.version
+  }
 
 -- * Build targes
 
-newtype ProtoComponent = ProtoComponent Fingerprint
-  deriving stock (Eq, Ord, Generic)
-  deriving newtype (Binary, Storable)
-  deriving anyclass (A.FromJSONKey, A.ToJSONKey)
-
 type data ProtocolResult where
-  InfoModule    :: ProtocolResult
+  -- | Metadata module (@Foo/Internal.hs@)
+  InfoModule :: ProtocolResult
+  -- | @wayland-scanner@ output artifact (@.c@, @.h@)
   ScannerOutput :: ScannerResult -> ProtocolResult
+  -- | Interface wrapper (TH) module (@Foo.{Client,Server}@)
   WrapInterface :: ClientOrServer -> ProtocolResult
+
+type data ScannerResult = EnumBindings | ClientBindings | ServerBindings | PrivateSource
 
 type data ClientOrServer = Client | Server
 
-type data ScannerResult = EnumBindings | PrivateSource | ClientBindings | ServerBindings
-
-pattern EnumBindings, ClientBindings, ServerBindings, InfoModule, WrapClient, WrapServer :: ProtoComponent
-pattern InfoModule     <- ((== getFpr (Proxy @InfoModule)) -> True) where
-        InfoModule     =       getFpr (Proxy @InfoModule)
-pattern EnumBindings   <- ((== getFpr (Proxy @(ScannerOutput EnumBindings))) -> True) where
-        EnumBindings   =       getFpr (Proxy @(ScannerOutput EnumBindings))
-pattern ClientBindings <- ((== getFpr (Proxy @(ScannerOutput ClientBindings))) -> True) where
-        ClientBindings =       getFpr (Proxy @(ScannerOutput ClientBindings))
-pattern ServerBindings <- ((== getFpr (Proxy @(ScannerOutput ServerBindings))) -> True) where
-        ServerBindings =       getFpr (Proxy @(ScannerOutput ServerBindings))
-pattern WrapClient     <- ((== getFpr (Proxy @(WrapInterface Client))) -> True) where
-        WrapClient     =       getFpr (Proxy @(WrapInterface Client))
-pattern WrapServer     <- ((== getFpr (Proxy @(WrapInterface Server))) -> True) where
-        WrapServer     =       getFpr (Proxy @(WrapInterface Server))
+data ProtoComponent
+  = InfoModule
+  | EnumBindings | ClientBindings | ServerBindings
+  | WrapClient | WrapServer
+  deriving stock (Eq, Ord, Enum, Bounded, Show, Read, Generic)
+  deriving anyclass (Binary, A.FromJSONKey, A.ToJSONKey)
 
 instance A.ToJSON ProtoComponent where
-  toJSON (ProtoComponent (Fingerprint a b)) = A.toJSON (printf "%016x%016x" a b :: String)
+  toJSON = A.toJSON . show
 
 instance A.FromJSON ProtoComponent where
-  parseJSON v = do
-    str <- A.parseJSON v
-    return $! phex (take 16 str) (drop 16 str)
-   where
-     phex a b = coerce (Fingerprint (read1 a) (read1 b))
-     read1 x = case readHex x of
-                  [(num, "")] -> num
-                  _ -> error $ "ProtoComponent: " ++ show v ++ ": " ++ show x
-
-instance Show ProtoComponent where
-  show (ProtoComponent (Fingerprint a b)) = show $ encode (a, b)
-
-instance Read ProtoComponent where
-  readPrec = do
-    (a, b) <- readPrec
-    return $ coerce (Fingerprint a b)
+  parseJSON v = read <$> A.parseJSON v
 
 allComponents :: [ProtoComponent]
-allComponents = [ InfoModule, WrapClient, WrapServer ] ++ bindgenComponents
+allComponents = [ minBound .. maxBound ]
 
 bindgenComponents :: [ProtoComponent]
-bindgenComponents = [ EnumBindings, ClientBindings, ServerBindings ]
+bindgenComponents = [ EnumBindings .. ServerBindings ]
 
 -- * ProtocolSpec
 
-type ProtocolSpec = ProtocolSpecX HsBindGen
-
+-- | Protocol spec with incomplete bindgen specs.
 type ProtocolConfig = ProtocolSpecX BindConfig
+
+-- | Protocol spec with bindgen specs ready.
+type ProtocolSpec = ProtocolSpecX HsBindGen
 
 data ProtocolSpecX bindgen = ProtocolSpec
   { fullName            :: String -- ^ @river-window-management-v1@
   , baseName            :: String -- ^ @window-management@
   , category            :: String -- ^ @wayland@, @river@, etc.
-  , version             :: Maybe Int -- ^ Possible @-v<n>@ suffix
+  , version             :: Maybe ProtocolVersion -- ^ Possible @-v<n>@ suffix
   , stability           :: Stability
   , protocolXML         :: RelativePath DataDir 'File
   -- ^ Relative path of the protocol specification file (.xml)
@@ -274,38 +264,94 @@ data ProtocolSpecX bindgen = ProtocolSpec
   , coreOnly            :: Bool
   }
   deriving stock (Eq, Ord, Show, Generic, Generic1)
-  deriving anyclass (A.FromJSON1, A.ToJSON1, Binary)
-  deriving anyclass (A.FromJSON, A.ToJSON)
+  deriving anyclass (Binary, A.FromJSON1, A.ToJSON1, A.FromJSON, A.ToJSON)
+
+-- | @defaultProtocolSpec xmlfile@
+defaultProtocolSpec :: Default a => RelativePath DataDir File -> ProtocolSpecX a
+defaultProtocolSpec xml = ProtocolSpec
+  { fullName     = ""
+  , category     = ""
+  , baseName     = ""
+  , version      = Nothing
+  , stability    = Unknown
+  , protocolDirs = []
+  , protocolXML  = normaliseSymbolicPath xml
+  , disabled     = mempty
+  , qualifiedImports = mempty
+  , dependsOn = mempty
+  , coreOnly = True
+  , bindGens = M.fromList [ (k, def) | k <- bindgenComponents ]
+  , computedModuleNames = mempty
+  , computedComponents  = mempty
+  }
 
 data ProtocolRef = ProtocolRef
   { headers      :: M.Map ProtoComponent [Location]
   , bindingSpecs :: M.Map ProtoComponent [ExtBindingSpec]
   } deriving (Eq, Ord, Show, Generic, Binary)
 
--- * BindConfig
-
-data BindConfig = BindConfig
-  { bcMainHeaders     :: [Location]
-  , extBindingSpecs   :: [ExtBindingSpec]
-  , excludeByDeclName :: PCRE
-  , bcDepends         :: [String] -- name
-  , bcCustom          :: Endo HsBindGen
-  } deriving (Generic, Default)
-
 -- * ProtocolScannerOptions
 
 data ProtocolScannerOptions = ProtocolScannerOptions
-  { optionProtocolDirs     :: [SymbolicPath Pkg ('Dir DataDir)] -- ^ Additional paths in which to look for the the 'protocolXML' file.
+  { optionProtocolDirs     :: [SymbolicPath Pkg ('Dir DataDir)]
+  -- ^ Additional paths in which to look for the the 'protocolXML' file.
   , optionDisabled         :: Set ProtoComponent
-  , optionModuleName       :: ProtocolSpec -> ProtoComponent -> ModuleName
-  , optionCustom           :: Endo ProtocolConfig
+  -- ^ Components to be disabled always.
   , knownProtocols         :: M.Map String ProtocolRef
+  -- ^ Protocol references for dependency resolution.
   , knownProtocolSpecs     :: M.Map String ProtocolSpec
+  -- ^ Protocol references for dependency resolution.
   , interfaceProtocols     :: [(String, ProtocolSpec)]
-  } deriving (Generic)
+  , optionModuleName       :: ComponentModuleNameFunction
+  --- ^ construct module name for spec + component
+  , optionCustom           :: Endo ProtocolConfig
+  }
+  deriving stock (Generic)
+  deriving anyclass (Default)
+
+newtype ComponentModuleNameFunction = ComponentModuleNameFunction
+  { unwrap :: forall a. ProtocolSpecX a -> ProtoComponent -> ModuleName }
+
+instance Default ComponentModuleNameFunction where
+  def = ComponentModuleNameFunction $ \spec ->
+    let base = getRoot spec
+        nameFor = \case
+          InfoModule     -> base ++ pure "Internal"
+          WrapClient     -> base ++ pure "Client"
+          WrapServer     -> base ++ pure "Server"
+          EnumBindings   -> base ++ pure "Enums"
+          ClientBindings -> nameFor WrapClient ++ pure "Generated"
+          ServerBindings -> nameFor WrapServer ++ pure "Generated"
+     in fromString . L.intercalate "." . nameFor
+    where
+      getRoot spec =
+        let subMod =
+              case (spec.stability, spec.version) of
+                (Stable,   Nothing) -> []
+                (Unknown,  Nothing) -> []
+                (Stable,    Just v) -> [ 'V' : show v ]
+                (Staging,  Nothing) -> [ "Staging" ]
+                (Staging,   Just v) -> [ "Staging", 'V' : show v ]
+                (Unknown,   Just v) -> [ "Staging", 'V' : show v ]
+                (Unstable, Nothing) -> [ "Unstable" ]
+                (Unstable,  Just v) -> [ "Unstable", 'V' : show v ]
+         in map (_head %~ toUpper) $
+              (spec.category & getCat) ++ (spec.baseName & getName) ++ subMod
+
+      getCat "wayland" = [ "WL" ]
+      getCat   "river" = [ "River" ]
+      getCat       foo = [ "WL", foo ]
+
+      getName :: String -> [String]
+      getName       [] = []
+      getName (a : as) = [ toUpper a : go as ]
+        where
+          go ('-' : x : xs) = toUpper x : go xs
+          go       (x : xs) = x : go xs
+          go             [] = []
 
 data SetupInfo = SetupInfo
-  { localBC :: LocalBuildConfig
+  { localBC   :: LocalBuildConfig
   , packageBD :: PackageBuildDescr
   }
 
@@ -318,21 +364,6 @@ makeLenses' ''ProtocolSpecX
 makeLenses' ''ProtocolScannerOptions
 makeLenses' ''ProtocolId
 makeLenses' ''ProtocolRef
-
----------------------
-
-instance Show BindConfig where
-  show x = "BindConfig{" ++
-    show x.bcMainHeaders ++ ", " ++
-    show x.bcDepends ++ ", " ++
-    -- show x.bcCustom ++ ", " ++
-    show x.extBindingSpecs ++ ", " ++
-    show x.excludeByDeclName ++ "}"
-
-instance IsString ProtocolConfig where
-  fromString str = case eitherParsec str of
-                     Right x -> x
-                     Left err -> error $ "while parsing \"" ++ str ++ "\": " ++ err
 
 ---------------------
 -- inst Pretty
@@ -363,63 +394,14 @@ instance Pretty ProtocolSpec where
       | (k, m) <- M.toList c.computedModuleNames, Just bgen <- [c ^? bindGens . ix k]
     ]) PP.<> "\n"
 
-instance Pretty Dependency where
-  pretty (RuleDependency (RuleOutput rid index)) = "RuleDependency: " <> pretty rid <> " ix=" <> PP.text (show index)
-  pretty (FileDependency loc) = "FileDependency:" <> pretty (location loc)
-
-instance Pretty RuleId where
-  pretty (RuleId _ns nm) = PP.text (fromShortText nm)
-
-instance Default ProtocolScannerOptions where
-  def = ProtocolScannerOptions
-    { optionProtocolDirs = mempty
-    , optionCustom       = Endo id
-    , optionDisabled     = mempty
-    , knownProtocols     = mempty
-    , knownProtocolSpecs = mempty
-    , interfaceProtocols = mempty
-    , optionModuleName   =
-      \spec ->
-        let base = getRoot spec
-            nameFor c = case c of
-              InfoModule     -> base ++ pure "Internal"
-              WrapClient     -> base ++ pure "Client"
-              WrapServer     -> base ++ pure "Server"
-              EnumBindings   -> base ++ pure "Enums"
-              ClientBindings -> nameFor WrapClient ++ pure "Generated"
-              ServerBindings -> nameFor WrapServer ++ pure "Generated"
-              _              -> error $ "unknown component: " ++ show c
-         in fromString . L.intercalate "." . nameFor
-    } where
-      getRoot spec =
-        let subMod =
-              case (spec ^. stability, spec ^. version) of
-                (Stable,   Nothing) -> []
-                (Unknown,  Nothing) -> []
-                (Stable,    Just v) -> [ 'V' : show v ]
-                (Staging,  Nothing) -> [ "Staging" ]
-                (Staging,   Just v) -> [ "Staging", 'V' : show v ]
-                (Unknown,   Just v) -> [ "Staging", 'V' : show v ]
-                (Unstable, Nothing) -> [ "Unstable" ]
-                (Unstable,  Just v) -> [ "Unstable", 'V' : show v ]
-         in
-           map (_head %~ toUpper) $
-              (spec ^. category . to getCat) ++ (spec ^. baseName . to getName) ++ subMod
-
-      getCat "wayland" = [ "WL" ]
-      getCat   "river" = [ "River" ]
-      getCat       foo = [ "WL", foo ]
-
-      getName :: String -> [String]
-      getName       [] = []
-      getName (a : as) = [ toUpper a : go as ]
-        where
-          go ('-' : x : xs) = toUpper x : go xs
-          go       (x : xs) = x : go xs
-          go             [] = []
 
 ------------------------------
 -- * Parsers
+
+instance IsString ProtocolConfig where
+  fromString str = case eitherParsec str of
+                     Right x -> x
+                     Left err -> error $ "while parsing \"" ++ str ++ "\": " ++ err
 
 -- |
 -- @
@@ -438,103 +420,85 @@ instance Parsec ProtocolConfig where
   parsec :: forall m. CabalParsing m => m ProtocolConfig
   parsec = do
       P.spaces
-      (dirs, (parts, (mstability, ver, suffix))) <- parse
-      let spec = ProtocolSpec
-            { fullName = L.intercalate "-" parts ++ maybe "" stability' mstability ++ maybe "" version' ver
-            , baseName = L.intercalate "-" (drop 1 parts)
-            , category = L.intercalate "-" (take 1 parts)
-            , version = ver
-            , stability = fromMaybe Unknown mstability
-            , protocolXML = normaliseSymbolicPath $
-                if take 1 dirs /= [""]
+      dirs <- pDirectories
+      (parts, mstability, ver, suffix) <- pFileName
+      let spec = (defaultProtocolSpec
+                (if take 1 dirs /= [""]
                    then makeRelativePathEx (L.intercalate "/" dirs) </> makeRelativePathEx (spec.fullName ++ suffix)
                    else makeRelativePathEx (spec.fullName ++ suffix)
-            , bindGens = M.fromList [ (k, def) | k <- bindgenComponents ]
-            , disabled = mempty
+                ))
+            { fullName     = L.intercalate "-" parts ++ maybe "" stability' mstability ++ maybe "" version' ver
+            , category     = L.intercalate "-" (take 1 parts)
+            , baseName     = L.intercalate "-" (drop 1 parts)
+            , version      = ver
+            , stability    = fromMaybe Unknown mstability
             , protocolDirs = [ normaliseSymbolicPath $ makeSymbolicPath (L.intercalate "/" dirs) | take 1 dirs == [""] ]
-            , computedModuleNames = mempty
-            , computedComponents = mempty
-            , qualifiedImports = mempty
-            , dependsOn = mempty
-            , coreOnly = True
             }
       return spec
     where
-      parse = do
-          dirs <- pDirs
-          r <- pFileBase
-          pure (dirs, r)
+      pFileName = let go ps = P.try (pFileNameSuffix ps) <|> (pFileNamePart >>= \p -> go (ps ++ [p]))
+                   in go []
 
-      pFileBase = do
-        let go xs = P.try ((xs,) <$> nameEnd) <|> ((pNamePart <* P.optional (P.try (P.char '-'))) >>= \x -> go (xs ++ [x]))
-        go []
+      -- "[[:alnum:]]+-?"
+      pFileNamePart :: m String
+      pFileNamePart = P.munch1 isAsciiAlphaNum <* P.optional (P.try (P.char '-')) P.<?> "Filename part"
 
-      -- "[-STABILITY][-VERSION].xml"
-      nameEnd = (,,)
+      -- "[-STABILITY][-VERSION][.xml]"
+      pFileNameSuffix :: [String] -> m ([String], Maybe Stability, Maybe ProtocolVersion, String)
+      pFileNameSuffix parts = (parts,,,)
         <$> P.optional (P.try $ P.optional (P.try $ P.char '-') *> pStability)
         <*> P.optional (P.try $ P.optional (P.try $ P.char '-') *> pVersion)
         <*> P.string ".xml"
 
-      -- "[foo/[bar/[...]]]"
-      pDirs :: m [FilePath]
-      pDirs = P.many (P.try pDirectory)
-
-      -- "foo/"
-      pDirectory :: m FilePath
-      pDirectory = P.munch (/= '/') <* P.munch1 (== '/') P.<?> "Directory"
-
-      -- "[[:alnum:]]+"
-      pNamePart :: m String
-      pNamePart = P.munch1 isAsciiAlphaNum P.<?> "Name part"
-
-      -- "stable", "unstable", etc.
-      pStability :: m Stability
-      pStability = P.choice [ P.string s $> v | (v, s) <- zip [ Stable, Unstable, Staging ] [ "stable", "unstable", "staging" ] ]
-        P.<?> "Stability"
-
-      -- "v1", "v2", etc.
-      pVersion :: m Int
-      pVersion = P.char 'v' *> P.integral P.<?> "Version"
-
       stability' x = '-' : map toLower (show x)
       version'   x = '-' : 'v' : show x
 
-parseWaylandProtosPath
-  :: IsString (ProtocolSpecX bindgen)
-  => String
-  -> (ProtocolId, ProtocolSpecX bindgen)
-parseWaylandProtosPath str =
-  case explicitEitherParsec parseWaylandProtosPathP str of
-    Right (s, n, v) -> (ProtocolId n s v, (fromString $ "wayland-" ++ n ++ ".xml")
-       { stability = s
-       , category = "wayland"
-       , baseName = n
-       , version = Just $ coerce v
-       , protocolXML = makeRelativePathEx str
-       , protocolDirs = []
-       })
-    Left e -> error e
-
 -- | To parse "stable/name/name-vN.xml"
-parseWaylandProtosPathP :: forall m. CabalParsing m => m (Stability, String, ProtocolVersion)
+parseWaylandProtosPathP :: forall m. CabalParsing m => m ProtocolId
 parseWaylandProtosPathP = do
-  stab <- pStability <* P.munch1 (== '/')
-  nm   <- pName <* P.munch1 (== '/')
-  _    <- P.string nm
-  _    <- P.optional (P.try $ P.optional (P.try $ P.char '-') *> pStability)
-  mver <- P.optional (P.try $ P.optional (P.try $ P.char '-') *> pVersion)
-  _    <- P.string ".xml"
-  return (stab, nm, fromMaybe (ProtocolVersion 1) mver)
-
+    sta  <- pStability <* P.munch1 (== '/')
+    nm   <- pName
+    _    <- P.string nm
+    _    <- P.optional (P.try $ P.optional (P.try $ P.char '-') *> pStability)
+    mver <- P.optional (P.try $ P.optional (P.try $ P.char '-') *> pVersion)
+    _    <- P.string ".xml"
+    return $ ProtocolId nm sta $ fromMaybe (ProtocolVersion 1) mver
   where
-      -- "v1", "v2", etc.
-      pVersion :: m ProtocolVersion
-      pVersion = P.char 'v' *> fmap ProtocolVersion P.integral P.<?> "Version"
+    pName :: m String
+    pName = P.munch1 (/= '/') <* P.munch1 (== '/') P.<?> "Name part"
 
-      -- "stable", "unstable", etc.
-      pStability :: m Stability
-      pStability = P.choice [ P.try $ P.string s $> v | (v, s) <- zip [ Stable, Unstable, Staging ] [ "stable", "unstable", "staging" ] ]
-        P.<?> "Stability"
+instance Parsec ProtocolVersion where
+  parsec = pVersion
 
-      pName :: m String
-      pName = P.munch1 (/= '/') P.<?> "Name part"
+instance Parsec Stability where
+  parsec = pStability
+
+-- | "stable", "unstable", etc.
+pStability :: P.CharParsing m => m Stability
+pStability = P.choice
+  [ P.try $ P.string s $> v
+    | (v, s) <- zip [ Stable, Unstable, Staging ] [ "stable", "unstable", "staging" ]
+  ] P.<?> "Stability"
+
+-- "v1", "v2", etc.
+pVersion :: P.CharParsing m => m ProtocolVersion
+pVersion = P.char 'v' *> fmap ProtocolVersion P.integral P.<?> "ProtocolVersion"
+
+-- "foo/"
+pDirectory :: P.CharParsing m => m FilePath
+pDirectory = P.munch (/= '/') <* P.munch1 (== '/') P.<?> "Directory"
+
+-- "[foo/[bar/[...]]]"
+pDirectories :: P.CharParsing m => m [FilePath]
+pDirectories = P.many (P.try pDirectory)
+
+parseWaylandProtosPath :: HasCallStack => IsString (ProtocolSpecX bindgen) => String -> (ProtocolId, ProtocolSpecX bindgen)
+parseWaylandProtosPath str = case explicitEitherParsec parseWaylandProtosPathP str of
+  Right pid@(ProtocolId nm sta ver) -> (pid, (fromString $ "wayland-" ++ nm ++ ".xml")
+     { stability    = sta
+     , baseName     = nm
+     , version      = Just ver
+     , protocolXML  = makeRelativePathEx str
+     , protocolDirs = []
+     })
+  Left e -> error $ "while parsing '" ++ str ++ "': " ++ e

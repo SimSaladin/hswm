@@ -1,4 +1,4 @@
--- {-# OPTIONS_HADDOCK not-home #-}
+{-# LANGUAGE NoFieldSelectors #-}
 
 module Text.XkbCommon.FFI
   ( module Text.XkbCommon.FFI
@@ -110,14 +110,14 @@ withXkbRuleNames x f = allocaBytesAligned (#size struct xkb_rule_names) (#alignm
       #{poke struct xkb_rule_names, options} p c_options
       f $ castPtr p
   where
-    layout = L.intercalate "," $ map layoutLayout x.layouts
+    layout = L.intercalate "," $ map (.layoutLayout) x.layouts
     variant = L.intercalate "," $ map (\l -> fromMaybe "" l.layoutVariant) x.layouts
 
     layoutOpts = [ o.optionOption ++ "!" ++ show i | (i, l) <- zip [(1::Int)..] x.layouts, o <- l.layoutOptions ]
 
     withOptions Nothing     [] = ($ nullPtr)
     withOptions Nothing     xs = withCString $ L.intercalate "," xs
-    withOptions (Just opts) xs = withCString $ L.intercalate "," $ map optionOption opts ++ xs
+    withOptions (Just opts) xs = withCString $ L.intercalate "," $ map (.optionOption) opts ++ xs
 
 -- * Types
 

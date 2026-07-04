@@ -18,6 +18,7 @@ module HSWM.Prelude (
 
   -- * Lenses
   module Lens.Micro.Platform,
+  Lens.Each,
   module UnliftIO.Exception.Lens,
 
   -- * Logging
@@ -71,6 +72,7 @@ import qualified "text" Data.Text as T
 import           "monad-logger-aeson" Control.Monad.Logger.Aeson hiding (Message)
 import           "monad-logger-aeson" Control.Monad.Logger.Aeson as LA (Message)
 import           "microlens-platform" Lens.Micro.Platform hiding ((.=))
+import qualified "microlens" Lens.Micro.Internal as Lens
 
 toText :: String -> T.Text
 toText = T.pack

@@ -16,15 +16,15 @@ module HSWM.Wallpaper
   )
 where
 
-import           HSWM.Core hiding (size, width, height, scale)
 import qualified HSWM.BufferPool as BP
+import           HSWM.Core hiding (height, scale, size, width)
 import           HSWM.Utils (getPixmanFormatBE)
 
-import qualified WL.Client as WL
-import qualified WL.Viewporter as VP
 import qualified Pixman as P
 import qualified River as R
+import qualified WL.Client as WL
 import qualified WL.FractionalScale.Staging.V1.Client as FS
+import qualified WL.Viewporter as VP
 import qualified WL.Wlr.LayerShell.Unstable.V1.Client as Wlr
 
 import qualified Codec.Picture as JP
@@ -34,6 +34,9 @@ import qualified Data.Vector.Storable as V
 
 -- * Usage
 
+newtype WallpaperConfig = WallpaperConfig { filepath :: FilePath }
+  deriving (Show, Read)
+
 usingWallpaper :: WallpaperConfig -> HSWMConfig H l -> HSWMConfig H l
 usingWallpaper cfg userConf = userConf
   { startupHook = userConf.startupHook <> wpStartupHook cfg
@@ -41,9 +44,6 @@ usingWallpaper cfg userConf = userConf
   , renderHook = userConf.renderHook <> render
   , handleEventHook = userConf.handleEventHook <> wpHandleEventHook
   }
-
-newtype WallpaperConfig = WallpaperConfig { filepath :: FilePath }
-  deriving (Show, Read)
 
 -- * Implementation
 -- ** Types
@@ -54,9 +54,7 @@ data Ctx = Ctx
   , src_image    :: !(Maybe (JP.Image JP.PixelRGBA8))
   }
   deriving (Generic)
-
-instance Default Ctx where
-  def = Ctx def def def
+  deriving anyclass (Default)
 
 data OutputState = OutputState
   { out_x, out_y, out_width, out_height :: !Int32
@@ -70,13 +68,14 @@ data OutputState = OutputState
   } deriving (Generic)
 
 instance Default OutputState where
-  def = OutputState 0 0 0 0 1 0 "" False False def Nothing
+  def = OutputState 0 0 0 0 1 0 "" False False def def
 
 data Surfaces = Surfaces
   { wl_surface   :: !WL.Surface
   , layerSurface :: !Wlr.LayerSurface
   , outViewport  :: !(Maybe VP.Viewport)
-  } deriving (Eq, Show)
+  , surfacesCleanup :: !(IO ())
+  } deriving (Generic)
 
 -- ** Hooks
 
@@ -132,11 +131,10 @@ wpHandleEventHook _ = mempty
 tryLoadImage :: FilePath -> H ()
 tryLoadImage fp =
   io (doesFileExist fp) >>= \case
+    True -> io (JP.readImageWithMetadata fp) >>= \case
+      Right (dynimg, _metadata) -> modifyObjectDef $ \ctx -> ctx {src_image = Just $ JP.convertRGBA8 dynimg}
+      Left _ -> return ()
     False -> return ()
-    True ->
-      io (JP.readImageWithMetadata fp) >>= \case
-        Left _ -> return ()
-        Right (dynimg, _metadata) -> modifyObjectDef $ \ctx -> ctx {src_image = Just $ JP.convertRGBA8 dynimg}
 
 -- ** Manage and Render
 
@@ -230,64 +228,69 @@ deinit = do
   modifyObjectDef $ \c -> c {outputsState = mempty, bufferPool = def}
 
 deinitOutput :: OutputState -> H ()
-deinitOutput os = forM_ os.surfaces $ \ss -> do
-  io $ WL.objectDestroy ss.wl_surface
-  io $ WL.objectDestroy ss.layerSurface
-  forM_ ss.outViewport $ io . WL.objectDestroy
+deinitOutput os = forM_ os.surfaces $ \ss -> io ss.surfacesCleanup
 
 -- | Create surface etc.
 initOutput :: RiverOutput -> H ()
 initOutput ro = withOutputState ro $ \os -> do
   compositor <- getObject
   let w = os.out_width
-  let h = os.out_height
+      h = os.out_height
   ss <- case os.surfaces of
     Just ss -> return ss
     Nothing -> do
       runInIO <- askRunInIO
-      wl_surface <- WL.compositorCreateSurface compositor
 
+      -- 1: wl_surface
+      wl_surface <- WL.compositorCreateSurface compositor
       -- surface: set no input region
       WL.withNewRegion compositor $ WL.surfaceSetInputRegion wl_surface
 
-      -- fractional scale
-      fractSurface <- withObject $ \fsm -> FS.fractionalScaleManagerGetFractionalScale fsm wl_surface
-
+      -- 2: fractional scale
+      fractSurface <- withObject $ flip FS.fractionalScaleManagerGetFractionalScale wl_surface
+      -- fractional scale listener
       fsl <- WL.createListener $ \case
         FS.FractionalScalePreferredScale _ _ fscale -> runInIO $ do
-          logInfo $ "wallpaper: fractional scale updated" :# [ "fscale" .= fscale, "output" .= show ro ]
+          logInfo $ "wallpaper: fractional scale updated" :# [ "fractional-scale" .= fscale, "output" .= show ro ]
           updateOutputState ro $ \x -> x {pref_fract_scale = fscale, pending_render = True}
       WL.listenerAdd_ fractSurface fsl
 
-      -- viewport
-      viewport <- withObject $ \vpr -> VP.viewporterGetViewport vpr wl_surface
+      -- 3: viewport
+      viewport <- withObject $ flip VP.viewporterGetViewport wl_surface
 
-       -- layersurface
-      layerSurface <- withObject $ \layerShell ->
-        Wlr.layerShellGetLayerSurface layerShell wl_surface os.wl_output Wlr.ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND (Just "wallpaper")
+      -- 4: layer_surface
+      layerSurface <- withObject $ \ls ->
+        Wlr.layerShellGetLayerSurface ls wl_surface os.wl_output Wlr.ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND (Just "wallpaper")
       Wlr.layerSurfaceSetSize layerSurface 0 0
       Wlr.layerSurfaceSetAnchor layerSurface (R.toCEnum $ 1 + 2 + 4 + 8)
       Wlr.layerSurfaceSetExclusiveZone layerSurface (-1)
-
+      -- layersurface listener
       lsListener <- WL.createListener $ \case
         Wlr.LayerSurfaceConfigure _ ls serial cw ch -> runInIO $ do
-          Wlr.layerSurfaceAckConfigure ls serial
           logInfo $ "wallpaper: layer surface configure" :# [ "size" .= show (cw, ch), "old-size" .= show (w, h), "output" .= show ro ]
+          Wlr.layerSurfaceAckConfigure ls serial
           updateOutputState ro $ \x -> x
               { out_width = fi cw
               , out_height = fi ch
               , configured = True
               , pending_render = not x.configured || (x.out_width, x.out_height) /= (fi cw, fi ch)
               }
-
-        Wlr.LayerSurfaceClosed {} -> do
+        Wlr.LayerSurfaceClosed {} ->
           runInIO $ logError "Layer surface closed!"
-          return ()
-
       WL.listenerAdd_ layerSurface lsListener
+
+      -- finally:
       WL.surfaceCommit wl_surface
 
-      return $ Surfaces {wl_surface, layerSurface, outViewport = Just viewport}
+      let surfacesCleanup = do
+            WL.objectDestroy layerSurface
+            WL.objectDestroy viewport
+            WL.objectDestroy fractSurface
+            WL.objectDestroy wl_surface
+            WL.freeListener fsl
+            WL.freeListener lsListener
+
+      return $ Surfaces {outViewport = Just viewport, ..}
 
   -- set opaque region
   WL.withNewRegion compositor $ \opaqueRegion -> do

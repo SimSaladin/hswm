@@ -39,38 +39,36 @@ data ImageBuffer = ImageBuffer
 
 newImageBufferPool :: H ImageBufferPool
 newImageBufferPool = do
-  let bufferMultiplicity = 3
-      surfaceCount = 0
   wlShm <- getObject
   buffers <- newIORef ([], 0)
   bufferListener <- WL.createListener $ \case
     WL.BufferRelease ud _ -> do
       busy <- deRefStablePtr $ castPtrToStablePtr $ castPtr ud
       modifyIORef' busy $ const False
-  return ImageBufferPool {..}
+  return ImageBufferPool {surfaceCount = 0, bufferMultiplicity = 3, ..}
 
 destroyImageBufferPool :: MonadIO m => ImageBufferPool -> m ()
 destroyImageBufferPool pool = do
   (bufs, _) <- readIORef pool.buffers
   forM_ bufs destroyImageBuffer
-  io $ WL.objectDestroy pool.bufferListener
+  WL.freeListener pool.bufferListener
 
-initImageBuffer :: MonadIO m
-                => ImageBufferPool
-                -> WL.ShmFormat
-                -> Int -- ^ width
-                -> Int -- ^ height
-                -> m ImageBuffer
+initImageBuffer
+  :: MonadIO m
+  => ImageBufferPool
+  -> WL.ShmFormat
+  -> Int -- ^ width
+  -> Int -- ^ height
+  -> m ImageBuffer
 initImageBuffer bp shmFormat width height = io $ do
   let stride = width * 4
-      size = fi $ height * stride
+      size   = fi $ height * stride
   (fd, ptr) <- createShm (fi size)
-  pool <- WL.shmCreatePool bp.wlShm (fi fd) (fi size)
+  pool      <- WL.shmCreatePool bp.wlShm (fi fd) (fi size)
   closeFd fd
-  buf <- WL.shmPoolCreateBuffer pool 0 (fi width) (fi height) (fi stride) shmFormat
-  busy <- newIORef True
-  -- Sets busy = False
-  busyPtr <- newStablePtr busy
+  buf       <- WL.shmPoolCreateBuffer pool 0 (fi width) (fi height) (fi stride) shmFormat
+  busy      <- newIORef True
+  busyPtr   <- newStablePtr busy -- Sets busy = False
   WL.listenerAdd buf bp.bufferListener busyPtr
   return ImageBuffer {..}
 

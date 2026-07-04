@@ -1,4 +1,5 @@
-{-# LANGUAGE CPP                 #-}
+{-# LANGUAGE CPP #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 
 -- |
 -- Module      : Distribution.HsBindgen.Utils
@@ -16,35 +17,44 @@ module Distribution.HsBindgen.Utils
   , getPkgConfDataDir
   , configurePrograms
   , makeLenses'
-  , makeLensesMany
   , ToLocation(..)
+  -- * Re-exports
   , A.decode
   , A.aesonQQ
   , A.parseJSON
   , A.fromJSON
   , A.Result(..)
+  , A.Value
+  , module Lens.Micro
   ) where
 
-import qualified Data.Aeson as A
-import qualified Data.Aeson.QQ.Simple as A
 import           Distribution.Simple.SetupHooks
 import           Distribution.Simple.Program
 import           Distribution.Simple.Program.Db (ConfiguredProgs)
 import           Distribution.Simple.Utils
 import           Distribution.Utils.String (trim)
 import           Distribution.Utils.Path
+import           Distribution.Pretty
+import           Distribution.Simple.SetupHooks.Rule (RuleId(..))
+import           Distribution.Utils.ShortText
 
 #if MIN_VERSION_Cabal(3,17,0)
 import           Distribution.Verbosity
 #endif
 
 import           Control.Monad
+import qualified Data.Aeson as A
+import qualified Data.Aeson.QQ.Simple as A
 import           Data.Char
 import           GHC.IsList
-import           Language.Haskell.TH
+import           Language.Haskell.TH hiding (location)
 import           Lens.Micro
 import           Lens.Micro.TH
+import           Lens.Micro.GHC ()
 import qualified System.FilePath as FP
+import qualified Text.PrettyPrint as PP
+
+-- * Verbosity
 
 verbosityFromFlags :: VerbosityFlags -> Verbosity
 #if MIN_VERSION_Cabal(3,17,0)
@@ -61,6 +71,14 @@ verbosityLevelInt = fromEnum . verbosityLevel
 verbosityLevelInt = fromEnum
 #endif
 
+-- * Program utils
+
+configurePrograms :: Verbosity -> [String] -> ProgramDb -> IO ConfiguredProgs
+configurePrograms v progs progdb = fmap fromList $ forM progs $ \prog ->
+  configureUnconfiguredProgram v (simpleProgram prog) progdb >>= \case
+    Just cp -> return (prog, cp)
+    Nothing -> die' v $ "Failed to configure program: " ++ prog
+
 -- | @pkg-config --variable=pkgdatadir somepkg@
 getPkgConfDataDir :: Verbosity -> ProgramDb -> String -> IO (Maybe (AbsolutePath ('Dir to)))
 getPkgConfDataDir v progdb arg = do
@@ -69,23 +87,16 @@ getPkgConfDataDir v progdb arg = do
     guard (dir /= "")
     Just $ AbsolutePath $ normaliseSymbolicPath $ makeSymbolicPath dir
 
-configurePrograms :: Verbosity -> [String] -> ProgramDb -> IO ConfiguredProgs
-configurePrograms v progs progdb = fmap fromList $ forM progs $ \prog ->
-  configureUnconfiguredProgram v (simpleProgram prog) progdb >>= \case
-    Just cp -> return (prog, cp)
-    Nothing -> die' v $ "Failed to configure program '" ++ prog ++ "'"
+-- * Lenses
 
 makeLenses' :: Name -> Q [Dec]
-makeLenses' ty = makeLensesWith (classyRules
-        & lensClass .~ const Nothing
-        & lensField .~ getField) ty
+makeLenses' = makeLensesWith $ classyRules
+    & lensClass .~ const Nothing
+    & lensField .~ getField
  where
-    getField _ _ n = case nameBase n of
-                       base@(x : xs) -> [MethodName (mkName $ "Has" ++ toUpper x : xs) (mkName base)]
-                       _ -> error "empty"
-
-makeLensesMany :: [Name] -> Q [Dec]
-makeLensesMany types = concat <$> mapM makeLenses' types
+    getField _ _ n
+      | base@(x:xs) <- nameBase n = [MethodName (mkName $ "Has" ++ toUpper x : xs) (mkName base)]
+      | otherwise = error "makeLenses: getField: empty list"
 
 -- * class: ToLocation
 
@@ -100,3 +111,25 @@ instance ToLocation (SymbolicPath Pkg 'File) where
 
 instance ToLocation (RelativePath from 'File) where
   makeLocation sfp = Location sameDirectory $ normaliseSymbolicPath sfp
+
+-- * Orphan instances
+
+deriving anyclass instance A.FromJSON (SymbolicPathX a b c)
+deriving anyclass instance A.ToJSON (SymbolicPathX a b c)
+
+deriving anyclass instance A.FromJSON ModuleName
+deriving anyclass instance A.ToJSON ModuleName
+
+instance A.FromJSON Location where
+  parseJSON v = do
+    (base, file) <- A.parseJSON v
+    return $! Location base file
+instance A.ToJSON Location where
+  toJSON (Location base file) = A.toJSON (base, file)
+
+instance Pretty Dependency where
+  pretty (RuleDependency (RuleOutput rid index)) = "RuleDependency: " <> pretty rid <> " ix=" <> PP.text (show index)
+  pretty (FileDependency loc) = "FileDependency:" <> pretty (location loc)
+
+instance Pretty RuleId where
+  pretty (RuleId _ns nm) = PP.text (fromShortText nm)

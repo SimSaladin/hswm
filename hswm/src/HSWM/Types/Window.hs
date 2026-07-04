@@ -23,21 +23,22 @@ import           River.WindowManagement as X (RiverWindow, RiverSeat, RiverOutpu
 data Window = Window
   { river_window             :: !RiverWindow
   , node                     :: !RiverNode
-  , position :: !Position
-  , size :: !Size
-  -- , x, y, width, height      :: !Int32
+  , position                 :: !Position
+  , size                     :: !Size
   , title, appId, identifier :: !String
     -- | Dimension hints
-  , min_height, min_width, max_height, max_width :: !Int
+  , minHeight, minWidth
+  , maxHeight, maxWidth :: !Int32
+  --, sizeMin, sizeMax :: !Size
   , parent                   :: !(Maybe RiverWindow)
   , unreliablePid            :: !(Maybe Int)
-  , decorationHint           :: !(Maybe R.River_window_v1_decoration_hint)
-  , presentationHint         :: !(Maybe R.River_output_v1_presentation_mode)
+  , decorationHint           :: !(Maybe R.RiverWindowDecorationHint)
+  , presentationHint         :: !(Maybe R.RiverOutputPresentationMode)
   , wBorderWidth             :: !(Maybe Int32)
   , new                      :: !Bool
   , closed                   :: !Bool
-  , fullscreen               :: !(Maybe RiverOutput)
   , minimized                :: !Bool
+  , fullscreen               :: !(Maybe RiverOutput)
 
   , p_manage_action          :: [WindowManageAction]
   , p_render_border          :: Maybe R.RiverColor
@@ -46,11 +47,11 @@ data Window = Window
   , p_set_visible            :: Maybe Bool
 
     -- TODO: review below
-  , pointer_move_requested         :: RiverSeat
-  , pointer_resize_requested       :: RiverSeat
-  , pointer_resize_requested_edges :: Int32
+  , pointer_move_requested         :: !RiverSeat
+  , pointer_resize_requested       :: !RiverSeat
+  , pointer_resize_requested_edges :: !R.RiverWindowEdges
   }
-  deriving stock (Show, Generic)
+  deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Default)
 
 data WindowManageAction
@@ -59,12 +60,15 @@ data WindowManageAction
   | WExitFullscreen
   | WToggleFullscreen
   | WRequestClose
-  deriving (Eq, Show, Generic)
+  deriving (Eq, Ord, Show, Generic)
 
-makeLenses' [ ''Window ]
+makeLensesWith' classPerField [ ''Window ]
 
-instance HasSize Window where
-  size = windowSize
+instance HasRiverId Window where
+  type RiverId Window = RiverWindow
+  riverId = riverWindow
 
-instance HasPosition Window where
-  position = windowPosition
+instance HasX Window Int32 where _x = position . _x
+instance HasY Window Int32 where _y = position . _y
+instance HasWidth Window Word32 where width = size . width
+instance HasHeight Window Word32 where height = size . height

@@ -19,43 +19,43 @@ import           River qualified as R
 import           Data.Map qualified as M
 
 logEvent :: (MonadLogger m, Show a, Monoid (m b)) => a -> m b
-logEvent ev = logDebug (fromString $ "evt: " ++ show ev) >> mempty
+logEvent e = logEvent' "EV" e []
+
+logEvent' :: (MonadLogger m, Show a, Monoid (m b)) => Text -> a -> [SeriesElem] -> m b
+logEvent' str ev items = logDebug (("H.U.Debug:" <> str <> " " <> fromString (show ev)) :# items) >> mempty
 
 debugHook :: Event -> H All
 debugHook ev
   | WindowManagerEvent R.RiverWindowManagerManageStart {} <- ev = mempty
   | WindowManagerEvent R.RiverWindowManagerRenderStart {} <- ev = mempty
-  | WindowManagerEvent e <- ev = logEvent e
-  | XkbKeyboardEvent e <- ev = logEvent e
-  | XkbEvent (R.RiverXkbBindingPressed dt self) <- ev = do
-      (xb :: XkbBinding (SomeAction H)) <- liftIO $ deRefStablePtr (castPtrToStablePtr $ castPtr dt)
-      logDebug $ "XK (pressed)" :# [ "action" .= show xb.action,  "bind" .= show self ]
-      mempty
-  | XkbEvent (R.RiverXkbBindingReleased dt self) <- ev = do
-      (xb :: XkbBinding (SomeAction H)) <- liftIO $ deRefStablePtr (castPtrToStablePtr $ castPtr dt)
-      logDebug $ "XK (released)" :# [ "action" .= show xb.action,  "bind" .= show self ]
-      mempty
-  | XkbEvent (R.RiverXkbBindingStopRepeat dt self) <- ev = do
-      (xb :: XkbBinding (SomeAction H)) <- liftIO $ deRefStablePtr (castPtrToStablePtr $ castPtr dt)
-      logDebug $ "XK (stop-repeat)" :# [ "action" .= show xb.action,  "bind" .= show self ]
-      mempty
+  | WindowManagerEvent e                                  <- ev = logEvent e
+  | XkbKeyboardEvent e                                    <- ev = logEvent' "XKB" e []
+  | XkbEvent e                                            <- ev = logXkbEvent e
   | SeatEvent R.RiverSeatPointerPosition {} <- ev = mempty
-  | SeatEvent e <- ev = logEvent e
-  | OutputEvent e <- ev = logEvent e
-  | WindowEvent R.RiverWindowDimensions {} <- ev = mempty
-  | WindowEvent R.RiverWindowTitle {} <- ev = mempty
-  | WindowEvent e <- ev = logEvent e
-  -- WL_*
-  | WlOutputEvent _ <- ev = logEvent ev
-  | WlShmEvent (WL.ShmFormat _ _ fmt) <- ev = logInfo (fromString ("SHM FORMAT: " <> ppShmFormat fmt)) >> mempty
-  | WlSeatEvent e <- ev = logEvent e
-  -- Ext_*
-  | ForeignTopLevelHandleV1 e <- ev = logEvent e
+  | SeatEvent e                             <- ev = logEvent' "S" e []
+  | OutputEvent e                           <- ev = logEvent' "O" e []
+  | WindowEvent R.RiverWindowDimensions {}  <- ev = mempty
+  | WindowEvent R.RiverWindowTitle {}       <- ev = mempty
+  | WindowEvent e                           <- ev = logEvent' "W" e []
+  | WlOutputEvent _                         <- ev = logEvent' "WlOutput" ev []
+  | WlShmEvent (WL.ShmFormat _ _ fmt)       <- ev = logInfo (fromString ("SHM FORMAT: " <> ppShmFormat fmt)) >> mempty
+  | WlSeatEvent e                           <- ev = logEvent e
   | otherwise = logEvent ev
+
+logXkbEvent :: (MonadIO m, MonadLogger m, Monoid (m All)) => R.RiverXkbBindingEvent -> m All
+logXkbEvent ev = case ev of
+  R.RiverXkbBindingPressed dt self -> logBinding "Press" dt self
+  R.RiverXkbBindingReleased dt self -> logBinding "Release" dt self
+  R.RiverXkbBindingStopRepeat dt self -> logBinding "StopRepeat" dt self
+
+logBinding :: (MonadLogger m, MonadIO m, Show binding, Monoid (m All)) => Text -> Ptr Void -> binding -> m All
+logBinding str dt self = do
+  (xb :: XkbBinding (SomeAction H)) <- liftIO $ deRefStablePtr (castPtrToStablePtr $ castPtr dt)
+  logEvent' "XKB" str [ "action" .= show xb.boundAction,  "bind" .= show self ]
 
 debugAction :: H ()
 debugAction = runInHS $ do
-  logDebug "[[[ Windows ]]]" >> use _windows  >>= mapM_ logTraceShow . M.elems
-  logDebug "[[[WindowSet]]]" >> use windowset >>= logTraceShow
-  logDebug "[[[ Outputs ]]]" >> use _outputs  >>= mapM_ logTraceShow
-  logDebug "[[[  Seats  ]]]" >> use _seats    >>= mapM_ logTraceShow
+  logDebug "[[[ Outputs ]]]" >> use outputList >>= mapM_ logTraceShow
+  logDebug "[[[  Seats  ]]]" >> use seatList   >>= mapM_ logTraceShow
+  logDebug "[[[ Windows ]]]" >> use _windows   >>= mapM_ logTraceShow . M.elems
+  logDebug "[[[WindowSet]]]" >> use windowset  >>= logTraceShow

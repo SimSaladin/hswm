@@ -12,11 +12,11 @@ tested-with:
     , GHC == 9.12.4
     , GHC == 9.12.2
 extra-source-files:
-      wayland.xml
       binding-specs/*.yaml
+      protocols/*.xml
 data-files:
-      wayland.xml
       binding-specs/*.yaml
+      protocols/*.xml
 
 flag pkg-config
     description: Use pkgconfig to resolve C dependencies

@@ -15,23 +15,27 @@ module HSWM.Types.Output where
 import           HSWM.Types.Lens
 import           HSWM.Types.Simple
 import           HSWM.Types.Window
-import qualified WL.Client as WL
+
 import qualified River as R
+import qualified WL.Client as WL
 import qualified WL.Wlr.OutputPowerManagement.Unstable.V1.Client as Wlr
+
 import qualified Data.Aeson as A
 
 data Output = Output
-  { river_output           :: !RiverOutput
+  { river_output           :: !RiverOutput -- ^ Unique Id from river
+  , wlOutput               :: !WL.Output -- ^ Corresponding @wl_output@ object
+  , layerShellOutput       :: !R.RiverLayerShellOutput
+  , outputPower            :: !(Maybe Wlr.OutputPower)
+  , screen                 :: !ScreenId -- ^ Assigned Screen identifier (WM)
+  , name                   :: !String
+  , outputDescription      :: !String
   , position               :: !Position
   , size                   :: !Size
   , scale                  :: !Int32
-  , screen                 :: !ScreenId
-  , outputName             :: !String
-  , outputDescription      :: !String
-  , layerShellOutput       :: !R.RiverLayerShellOutput
-  , nonExclusive           :: Maybe (Int32, Int32, Int32, Int32) -- x, y, w, h
-  , outputPower            :: Maybe Wlr.OutputPower
-  , wlOutput               :: !WL.Output
+  , nonExclusive           :: !(Maybe Rectangle) -- ^ non-exclusive area
+  , setupDone              :: !Bool -- ^ Flipped to True when @WL.OutputDone@
+  , managePending          :: !Bool -- ^ Flipped to True when @WL.OutputDone@
   }
   deriving stock (Eq, Show, Read, Generic)
   deriving anyclass (Default)
@@ -45,12 +49,18 @@ instance Bounded ScreenId where
   minBound = S 1
   maxBound = S maxBound
 
-instance Default ScreenId where def = S (-1)
+instance Default ScreenId where
+  def = S (-1)
 
-makeLenses' [ ''Output ]
+-- * Lenses
 
-instance HasSize Output where
-  size = outputSize
+makeLensesWith' classPerField [ ''Output ]
 
-instance HasPosition Output where
-  position = outputPosition
+instance HasX      Output Int32  where _x = position . _x
+instance HasY      Output Int32  where _y = position . _y
+instance HasWidth  Output Word32 where width = size . width
+instance HasHeight Output Word32 where height = size . height
+
+instance HasRiverId Output where
+  type RiverId Output = RiverOutput
+  riverId = riverOutput

@@ -29,25 +29,26 @@ import           Network.Socket
 import           System.FileLock
 import qualified Text.Pretty.Simple as P
 
-type MonadIPC env m = (MonadLogger m, MonadIO m, MonadUnliftIO m, MonadMask m, MonadReader env m)
+type MonadIPC env m = (MonadLogger m, MonadUnliftIO m, MonadReader env m, MonadMask m)
 
 -- * ServerConfig
 
 data ServerConfig = ServerConfig
-  { bindTo          :: Maybe AddrInfo
-  , maxPendingConns :: Int
-  , onClientMessage :: Socket -> Msg Request -> H ()
+  { bindTo          :: !(Maybe AddrInfo)
+  , maxPendingConns :: !Int
+  , getWorkspacesInfo :: HS Response
   } deriving (Generic)
 
 instance Default ServerConfig where
-  def = ServerConfig Nothing 8 serverHandleMsg
+  def = ServerConfig Nothing 8
+    defaultWorkspacesInfo
 
 -- * Server State
 
 -- | Server-side state.
 data ConnectedPeers = ConnectedPeers
-  { connected    :: M.Map Int Connection
-  , serverThread :: Maybe (Async ())
+  { connected    :: !(M.Map Int Connection)
+  , serverThread :: !(Maybe (Async ()))
   }
   deriving stock (Generic)
   deriving anyclass (Default)
@@ -55,12 +56,18 @@ data ConnectedPeers = ConnectedPeers
 -- | A single connection (server-side).
 data Connection = Connection
   { connSocket                :: Socket
+  , connPid, connUid, connGid :: !Int
   , connSendQ                 :: TQueue Response
   , connWorkerThread          :: Async ()
-  , connPid, connUid, connGid :: !Int
   } deriving stock (Generic)
 
 -- * Hooks
+
+ipcServer :: ServerConfig -> _
+ipcServer conf c = c
+  { logHook = c.logHook <> ipcLogHook conf
+  , startupHook = c.startupHook <> serverStartupHook conf
+  }
 
 serverStartupHook :: ServerConfig -> H ()
 serverStartupHook conf = do
@@ -68,9 +75,9 @@ serverStartupHook conf = do
   serverThread <- async $ serverRun conf stateRef
   modifyIORef stateRef $ \st -> st { serverThread = Just serverThread }
 
-ipcLogHook :: H ()
-ipcLogHook = withObject $ \(sRef :: IORef ConnectedPeers) -> do
-  msgs <- fullStateUpdate
+ipcLogHook :: ServerConfig -> H ()
+ipcLogHook conf = withObject $ \(sRef :: IORef ConnectedPeers) -> do
+  msgs <- fullStateUpdate conf
   s <- readIORef sRef
   atomically $
     forM_ msgs $ \msg ->
@@ -105,41 +112,39 @@ serverRun conf stateRef = withThreadContext ["component" .= ("ipc/server" :: Str
       logInfo $ "Socket server listening" :# [ "addr" .= show ai.addrAddress ]
       return sock
 
-    loop :: _ -> H ()
+    loop :: Socket -> H ()
     loop sock = forever $
-      bracketOnError (io $ accept sock) (io . close . fst) $ \(conn, _peer) -> do
+      bracketOnError (io $ accept sock) (io . close . fst) $ \(connSocket, _peer) -> do
+        connFd <- io $ withFdSocket connSocket $ return . fi
+        (mpid, muid, mgid) <- io $ getPeerCredential connSocket
+        let connPid = fi $ fromMaybe (-1) mpid :: Int
+            connUid = fi $ fromMaybe (-1) muid :: Int
+            connGid = fi $ fromMaybe (-1) mgid :: Int
+            ctx = [ "fd" .= connFd, "pid" .= connPid, "uid" .= connUid, "gid" .= connGid ]
         connSendQ <- newTQueueIO
-        (connFd :: Int) <- io $ withFdSocket conn $ return . fi
-        (mpid, muid, mgid) <- io $ getPeerCredential conn
-        let pid = fi $ fromMaybe 0 mpid :: Int
-        let uid = fi $ fromMaybe 0 muid :: Int
-        let gid = fi $ fromMaybe 0 mgid :: Int
-        let ctx = [ "fd" .= connFd, "pid" .= pid, "uid" .= uid, "gid" .= gid ]
         connWorkerThread <- async $ withThreadContext ctx $
-          connWorker conn connSendQ `finally` cleanup connFd conn
-        let c = Connection{connSocket = conn, connPid = pid, connUid = uid, connGid = gid, ..}
+          connWorker connSocket connSendQ `finally` cleanup connFd connSocket
+        let c = Connection{..}
         modifyIORef stateRef $ \s -> s {connected = M.insert connFd c s.connected}
 
-    connWorker :: _ -> _ -> H ()
+    connWorker :: Socket -> _ -> H ()
     connWorker conn sendQ = do
-      logInfo "New domain socket client connected"
+      logInfo "New client connected"
       atomically . writeTQueue sendQ $ Identify (thisPeerIdent "server") 0 (Just thisPeerDescription)
-
-      let worker lo = do
-            waitRead <- io $ waitReadSocketSTM conn
-            r <- atomically $ (Left <$> waitRead) `orElse` (Right <$> readTQueue sendQ)
-            case r of
-              Left{} -> do
-                (rs, loNew) <- recvLines conn lo
-                mapM_ doMsg rs
-                worker loNew
-              Right msg -> sendMsg conn msg >> worker lo
-
-          doMsg resp = case A.eitherDecodeStrict' resp of
-                         Right msg -> conf.onClientMessage conn msg
-                         Left e -> logWarn $ "Received malformed message from client" :# [ "exception" .= toText e, "msg" .= BUTF8.toString resp ]
-
       worker ""
+      where
+        worker lo = do
+          waitRead <- io $ waitReadSocketSTM conn
+          r <- atomically $ (Left <$> waitRead) `orElse` (Right <$> readTQueue sendQ)
+          case r of
+            Right msg -> sendMsg conn msg >> worker lo
+            Left () -> do
+              (rs, loNew) <- recvLines conn lo
+              mapM_ handleRequest rs
+              worker loNew
+        handleRequest resp = case A.eitherDecodeStrict' resp of
+            Right msg -> serverHandleMsg conf conn msg
+            Left e -> logWarn $ "Malformed request from client" :# [ "exception" .= toText e, "msg" .= BUTF8.toString resp ]
 
     cleanup connFd conn = do
           modifyIORef stateRef $ \s -> s {connected = M.delete connFd s.connected}
@@ -159,12 +164,12 @@ getServerAddr conf =
         , addrAddress = SockAddrUnix sockFile
         }, Just (sockFile ++ ".lock"))
 
-serverHandleMsg :: (MonadIPC env m, env ~ HConf) => Socket -> Msg Request -> m ()
-serverHandleMsg c (Msg r seqn) =
+serverHandleMsg :: (MonadIPC env m, env ~ HConf) => ServerConfig -> Socket -> Msg Request -> m ()
+serverHandleMsg conf c (Msg r seqn) =
   case r of
     IdentifyClient{} -> do
       logInfo $ "client sent identity" :# [ "id" .= r ]
-      fullStateUpdate >>= mapM_ (sendMsg c)
+      fullStateUpdate conf >>= mapM_ (sendMsg c)
     DumpState{..} -> do
       dump <- case param of
                 "input-config-state" -> P.pShow <$> getObjectDef @InputConfigState
@@ -176,40 +181,41 @@ serverHandleMsg c (Msg r seqn) =
 -- * Info for status bars
 
 -- | Set of events to fully refresh statusbar's tracked state
-fullStateUpdate :: (MonadIPC env m, env ~ HConf) => m [Response]
-fullStateUpdate = runInHS $ sequence [ getOutputsInfo, getWorkspacesInfo, getFocusedInfo ]
+fullStateUpdate :: (MonadIPC env m, env ~ HConf) => ServerConfig -> m [Response]
+fullStateUpdate c = runInHS $ sequence [ getOutputsInfo, c.getWorkspacesInfo, getFocusedInfo ]
   where
     getOutputsInfo = do
-      outs <- use _outputs
-      return $! Outputs [(T.pack out.outputName, s2o out.screen) | out <- outs]
-
-    s2o (S x) = OutputId x
-
-    getWorkspacesInfo = do
-      ws <- use windowset
-      wins <- use _windows
-      wsSortPP <- DWO.getSortByOrder
-      let getWsData (W.Workspace{..}, keyhint) = WorkspaceInfo
-            { tag = tag
-            , keyhint = keyhint
-            , layout = toText (HSWM.description layout)
-            , windowList = map getWindowInfo (W.integrate' stack)
-            }
-          getWindowInfo rw = maybe def toWindowInfo (M.lookup rw wins)
-      return $! Workspaces $! RWorkspaces
-        { tags = map getWsData $ zip (wsSortPP (W.workspaces ws)) (keyhints ++ L.repeat "")
-        , focused = let W.Screen sws sid _ = W.current ws in (s2o sid, W.tag sws)
-        , visible = [(s2o sid, W.tag sws) | W.Screen sws sid _ <- W.visible ws]
-        }
-
-    keyhints = map (toText . (:[])) ['a'..'z']
+      outs <- use outputList
+      return $! Outputs [(T.pack out.name, s2o out.screen) | out <- outs]
 
     -- info about focused window (if any)
     getFocusedInfo = do
       ws <- use windowset
-      if
-        | Just fw <- W.peek ws -> FocusedWindow . fmap toWindowInfo <$> lookupWindow fw
-        | otherwise -> return $! FocusedWindow Nothing
+      if | Just fw <- W.peek ws -> FocusedWindow . fmap toWindowInfo <$> lookupWindow fw
+         | otherwise -> return $! FocusedWindow Nothing
+
+defaultWorkspacesInfo :: HS Response
+defaultWorkspacesInfo = do
+  ws       <- use windowset
+  wins     <- use _windows
+  wsSortPP <- DWO.getSortByOrder
+  let getWsData (W.Workspace{..}, keyhint) = WorkspaceInfo
+        { tag = tag
+        , keyhint = keyhint
+        , layout = toText (HSWM.description layout)
+        , windowList = map getWindowInfo (W.integrate' stack)
+        }
+      getWindowInfo rw = maybe def toWindowInfo (M.lookup rw wins)
+  return $! Workspaces $! RWorkspaces
+    { tags = map getWsData $ zip (wsSortPP (W.workspaces ws)) (keyhints ++ L.repeat "")
+    , focused = let W.Screen sws sid _ = W.current ws in (s2o sid, W.tag sws)
+    , visible = [(s2o sid, W.tag sws) | W.Screen sws sid _ <- W.visible ws]
+    }
+  where
+    keyhints = map (toText . (:[])) ['a'..'z']
+
+s2o :: ScreenId -> OutputId
+s2o (S x) = OutputId x
 
 toWindowId :: RiverWindow -> Word
 toWindowId (R.RiverWindow w) = let WordPtr res = ptrToWordPtr w in res

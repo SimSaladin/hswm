@@ -16,7 +16,6 @@
     flake-utils.url = "github:numtide/flake-utils";
     flake-parts.url = "github:hercules-ci/flake-parts";
 
-    # https://github.com/input-output-hk/haskell.nix/pull/2517/changes/
     #haskellNix.url = "github:input-output-hk/haskell.nix";
     haskellNix.url = "git+file:/home/sim/haskell.nix";
 
@@ -24,11 +23,6 @@
       url = "github:well-typed/hs-bindgen";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-parts.follows = "flake-parts";
-    };
-
-    hls = {
-      url = "github:haskell/haskell-language-server";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     river = {
@@ -43,43 +37,20 @@
   };
 
   outputs = inputs@{ ... }: inputs.flake-parts.lib.mkFlake { inherit inputs; } {
-
-    systems = [
-      "x86_64-linux"
-    # "aarch64-linux"
-    ];
-
-    imports = [ ];
-
-    debug = true;
-
+    #debug = true;
+    systems = [ "x86_64-linux" ];
     perSystem = { self', system, lib, config, pkgs, ... }:
     let
       inherit (inputs.flake-utils.lib) mkApp;
 
-      # Materialization.. nix run .#materialized-do
+      # Materialization: nix run .#materialized-do
       checkMaterialization = false;
       materializedLocations = {
         project = { attr = "project"; materialized = "./nix/materialized/project"; };
         only-cabal = { attr = "only-cabal"; materialized = "./nix/materialized/cabal-plan-nix"; };
       };
 
-      # Note: needs to run with checkMaterialization = false
-      materialized-do = mkApp {
-        name = "materialized-util";
-        drv = pkgs.writeShellApplication {
-          name = "materialized-util";
-          text = ''
-            set -x
-            ${lib.concatMapStringsSep "\n\n" ({ attr, materialized }: ''
-            ${self'.legacyPackages.${attr}.plan-nix.passthru.generateMaterialized} ${materialized}
-            '') (lib.attrValues materializedLocations)}
-          '';
-        };
-      };
-
       hsNixModules = {
-
         main = { lib, config, ... }: {
           config = {
             reinstallableLibGhc = true;
@@ -126,36 +97,28 @@
           packages.libclang-bindings.components.library.depends = [ config.hsPkgs.process ]; # for hsc2hs
           packages.c-expr-dsl.components.library.libs = [ config.ghc.package.llvmPackages.libclang ];
         };
-
       };
 
       projectOverlay = final: _: {
 
         only-cabal = final.haskell-nix.cabalProject' ({ ... }: {
+          name = "cabal-unreleased";
+          src = ./project-cabal;
+
+          cabalProjectFileName = "cabal-3.17.cabal";
+          builderVersion = 1;
 
           # important three to fix to avoid materialized drift!
           compiler-nix-name = "ghc9141llvm";
           index-state = "2026-06-04T23:15:22Z";
           evalPackages = final.buildPackages;
 
-          name = "cabal-unreleased";
-          src = ./project-cabal;
-          cabalProjectFileName = "cabal-3.17.cabal";
-          builderVersion = 1;
-
           materialized = let dir = ./. + materializedLocations.only-cabal.materialized; in
           if builtins.pathExists (dir + "/default.nix") then dir else null;
-
           inherit checkMaterialization;
         });
 
         project = final.haskell-nix.cabalProject' ({ lib, pkgs, ... }: {
-
-          # important three to fix to avoid materialized drift!
-          compiler-nix-name = "ghc9141llvm";
-          index-state = "2026-06-04T23:15:22Z";
-          evalPackages = final.buildPackages;
-
           name = "hswm-dev";
 
           modules = [
@@ -164,15 +127,18 @@
             hsNixModules.project
           ];
 
+          # important three to fix to avoid materialized drift!
+          compiler-nix-name = "ghc9141llvm";
+          index-state = "2026-06-04T23:15:22Z";
+          evalPackages = final.buildPackages;
+
           builderVersion = 2;
           #pkg-def-extras = [(_: { packages = { }; })];
           #useLocalGhcLib = true;
-
           # Enable optimizations when building as nix derivations
           cabalProjectLocal = lib.mkAfter ''
             optimization: True
           '';
-
           # Work around haskell.nix not handling sources imported in
           # cabal.project
           src = pkgs.runCommand "src" { } ''
@@ -246,8 +212,15 @@
           callZon2Nix = final.callPackage ./nix/callZon2nix.nix { };
         })
 
-        inputs.hs-bindgen.overlays.default
         inputs.haskellNix.overlay
+
+        # the overlay import is broken upstream; inputs.hs-bindgen.overlays.default
+        (import "${inputs.hs-bindgen}/nix/overlay" {
+          inherit lib;
+          inherit (inputs.hs-bindgen.inputs) libclang-bindings-src
+            doxygen-parser-src c-expr-src;
+        }).default
+
         projectOverlay
 
       ];
@@ -279,10 +252,23 @@
           };
         };
 
-        materialized-do = materialized-do;
+        # Note: needs to run with checkMaterialization = false
+        materialized-do = mkApp {
+          name = "materialized-do";
+          drv = pkgs.writeShellApplication {
+            name = "materialized-do";
+            text = ''
+              set -x
+              ${lib.concatMapStringsSep "\n\n" ({ attr, materialized }: ''
+              ${self'.legacyPackages.${attr}.plan-nix.passthru.generateMaterialized} ${materialized}
+              '') (lib.attrValues materializedLocations)}
+            '';
+          };
+        };
       };
 
       packages = projectFlake.packages // {
+
         # Export our overridden river for convenience.
         inherit (pkgs) river riverDebug;
 
@@ -294,18 +280,16 @@
             config.packages."hswm:exe:hswmctl"
             config.packages."waybar-cffi-hs:flib:waybarhaskellplugin"
           ];
+          pathsToLink = [ "/bin" "/lib" ];
         };
       };
 
       devShells =
-        let adjustedShellFor = project: args:
-              let
-                shell = project.shellFor (args);
-                key = if args ? name then args.name else null;
-              in
-              shell.overrideAttrs (oa: {
+        let adjustedShellFor =
+              project: args:
+              (project.shellFor (args)).overrideAttrs (oa: {
                 shellHook = ''
-                  ${defaultShellHook key}
+                  ${defaultShellHook (if args ? name then args.name else null)}
                   ${oa.shellHook}
                 '';
               });

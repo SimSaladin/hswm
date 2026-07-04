@@ -22,13 +22,15 @@ import qualified Network.Socket.ByteString as NB
 
 import qualified PackageInfo_hswm as PKG
 
+-- * Identity strings
+
 thisPeerIdent :: String -> String
 thisPeerIdent x = PKG.name ++ "-" ++ x
 
 thisPeerDescription :: String
 thisPeerDescription = PKG.synopsis ++ " " ++ showVersion PKG.version
 
-type MonadIPCClient m = (MonadLogger m, MonadIO m, MonadUnliftIO m, MonadMask m)
+-- * Message wrapper
 
 data Msg a = Msg { msgBody :: a, msgSeqn :: Maybe Int }
 
@@ -44,6 +46,8 @@ instance A.FromJSON a => A.FromJSON (Msg a) where
     msgSeqn <- A.withObject "Msg" (\v' -> v' A..:? "seqn") v
     return Msg{..}
 
+-- * Request
+
 -- | Requests (client to server).
 data Request
   = IdentifyClient {name :: String, version :: Int, description :: Maybe String }
@@ -54,6 +58,11 @@ data Request
 
   | Pong
   deriving (Generic, Eq, Show, Read)
+
+instance A.ToJSON Request
+instance A.FromJSON Request
+
+-- * Response
 
 -- | Responses (server to client).
 data Response
@@ -74,6 +83,9 @@ data Response
   | StateDumpResponse TL.Text
   deriving (Eq, Show, Read, Generic)
 
+instance A.ToJSON Response
+instance A.FromJSON Response
+
 data RWorkspaces = RWorkspaces
   { tags       :: [WorkspaceInfo]
   , focused    :: (OutputId, WsId)
@@ -88,9 +100,9 @@ data WorkspaceInfo = WorkspaceInfo
   } deriving (Eq, Show, Read, Generic)
 
 data WindowInfo = WindowInfo
-  { wid :: !Word
+  { wid                      :: !Word
   , title, appId, identifier :: !Text
-  , pid :: !(Maybe Int)
+  , pid                      :: !(Maybe Int)
   } deriving (Eq, Show, Read, Generic)
 
 newtype OutputId = OutputId { unwrap :: Int }
@@ -99,12 +111,6 @@ newtype OutputId = OutputId { unwrap :: Int }
 
 -- | Workspace identifier type
 type WsId = String
-
-instance A.ToJSON Request
-instance A.FromJSON Request
-
-instance A.ToJSON Response
-instance A.FromJSON Response
 
 instance Default RWorkspaces where def = RWorkspaces def (def, def) def
 instance A.ToJSON RWorkspaces
@@ -117,11 +123,6 @@ instance Default WindowInfo where def = WindowInfo def  "" "" "" def
 instance A.ToJSON WindowInfo
 instance A.FromJSON WindowInfo
 
-runMIO :: LoggingT m a -> m a
-runMIO = runStderrLoggingT
-
-type MIO = LoggingT IO
-
 -- * Client
 
 -- | IPC client configuration:
@@ -133,6 +134,8 @@ newtype ClientConfig = ClientConfig
 
 instance Default ClientConfig where
   def = ClientConfig "unix:"
+
+type MonadIPCClient m = (MonadLogger m, MonadIO m, MonadUnliftIO m, MonadMask m)
 
 getClientAI :: MonadIO m => ClientConfig -> m AddrInfo
 getClientAI ClientConfig{..} =
@@ -152,18 +155,19 @@ getClientAI ClientConfig{..} =
         rdir <- io getXdgRuntimeDirectory
         return $ rdir ++ "/" ++ name
 
-clientRun :: MonadIPCClient m
-          => ClientConfig
-          -> (Response -> m ()) -- ^ Process incoming
-          -> ((Request -> m ()) -> m ()) -- ^ Emit outgoing
-          -> m ()
+clientRun
+  :: MonadIPCClient m
+  => ClientConfig
+  -> (Response -> m ()) -- ^ Process incoming
+  -> ((Request -> m ()) -> m ()) -- ^ Emit outgoing
+  -> m ()
 clientRun conf onMsg cb = withThreadContext ["component" .= ("ipc/client" :: String)] $ do
   ai <- getClientAI conf
   bracket (open ai) (io . close) $ \sock -> do
     sendMsg sock $ IdentifyClient (thisPeerIdent "client") 0 (Just thisPeerDescription)
     withAsync (inputWorker sock) $ \inputAs -> do
       link inputAs
-      cb (sendMsg sock) `finally` cancel inputAs
+      cb (sendMsg sock)
   where
     open ai = bracketOnError (io $ socket ai.addrFamily ai.addrSocketType ai.addrProtocol) (io . close) $ \sock -> do
       io $ connect sock ai.addrAddress
@@ -184,22 +188,27 @@ clientRun conf onMsg cb = withThreadContext ["component" .= ("ipc/client" :: Str
 -- * Utilities
 
 sendMsg :: (MonadIO m, A.ToJSON msg) => Socket -> msg -> m ()
-sendMsg sock msg = io $ NB.sendAll sock $ BL.toStrict $ A.encode msg <> "\n"
+sendMsg sock msg = io $ NB.sendAll sock $! BL.toStrict $! A.encode msg <> "\n"
 
 recvLines :: (MonadIPCClient m) => Socket -> ByteString -> m ([ByteString], ByteString)
 recvLines sock leftover = do
-  res <- io $ NB.recv sock 4096
-  when (res == "") $ throwString "recvLines: disconnected"
-  return $! decode [] (leftover <> res)
+    res <- io $ NB.recv sock 4096
+    when (res == "") $ throwString "recvLines: disconnected"
+    return $! decode [] (leftover <> res)
   where
     decode :: [ByteString] -> ByteString -> ([ByteString], ByteString)
     decode msgs x =
       let (as, bs) = C8.break (== '\n') x
        in case C8.uncons bs of
             Just ('\n', bs') -> decode (msgs ++ [as]) bs'
-            _ -> (msgs, x)
+            _                -> (msgs, x)
 
 getXdgRuntimeDirectory :: IO FilePath
 getXdgRuntimeDirectory = lookupEnv "XDG_RUNTIME_DIR" >>= \case
-  Nothing -> error "XDG_RUNTIME_DIR not set"
   Just dir -> return dir
+  Nothing  -> error "XDG_RUNTIME_DIR not set"
+
+runMIO :: LoggingT m a -> m a
+runMIO = runStderrLoggingT
+
+type MIO = LoggingT IO

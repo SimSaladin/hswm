@@ -1,4 +1,6 @@
 {-# LANGUAGE DeriveAnyClass #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
+
 -- |
 -- Module      : River.WindowManagement
 -- Description : river-window-management v1
@@ -144,40 +146,50 @@ module River.WindowManagement
   ) where
 
 import River.WindowManagement.V1.Client
-import River.WindowManagement.V1.Client.Generated
 
+import Data.Bits
 import Data.Word
 import Data.Int
 import Data.Default
 import GHC.Generics
+import HsBindgen.Runtime.CEnum
+import Foreign.C.Types
 
-data RiverColor = RiverColor
-  { red, green, blue, alpha :: !Word32 }
-  deriving stock (Show, Read, Eq, Generic)
+data RiverColor = RiverColor { red, green, blue, alpha :: !Word32 }
+  deriving stock (Eq, Ord, Show, Read, Generic)
   deriving anyclass (Default)
 
 data WindowBorders = WindowBorders
-  { wb_edges               :: !Word32 -- ^ Edges on which to draw borders
-  , wb_width               :: !Int32  -- ^ Width of border
-  , wb_r, wb_g, wb_b, wb_a :: !Word32 -- ^ RGBA 32-bit
-  } deriving stock (Eq, Ord, Show)
+  { wbWidth :: !Int32            -- ^ Width of border
+  , wbEdges :: !RiverWindowEdges -- ^ Edges on which to draw borders
+  , wbColor :: !RiverColor       -- ^ RGBA 32_bit
+  } deriving stock (Eq, Ord, Show, Read, Generic)
 
-pattern EdgeNone   :: RiverWindowEdges
-pattern EdgeLeft   :: RiverWindowEdges
-pattern EdgeRight  :: RiverWindowEdges
-pattern EdgeBottom :: RiverWindowEdges
-pattern EdgeTop    :: RiverWindowEdges
+pattern EdgeNone, EdgeLeft, EdgeRight, EdgeBottom, EdgeTop :: RiverWindowEdges
 pattern EdgeNone   = RIVER_WINDOW_V1_EDGES_NONE
 pattern EdgeLeft   = RIVER_WINDOW_V1_EDGES_LEFT
 pattern EdgeRight  = RIVER_WINDOW_V1_EDGES_RIGHT
 pattern EdgeBottom = RIVER_WINDOW_V1_EDGES_BOTTOM
 pattern EdgeTop    = RIVER_WINDOW_V1_EDGES_TOP
 
-pattern WindowMenu :: RiverWindowCapabilities
-pattern Maximize   :: RiverWindowCapabilities
-pattern Fullscreen :: RiverWindowCapabilities
-pattern Minimize   :: RiverWindowCapabilities
+pattern WindowMenu, Maximize, Fullscreen, Minimize :: RiverWindowCapabilities
 pattern WindowMenu = RIVER_WINDOW_V1_CAPABILITIES_WINDOW_MENU
 pattern Maximize   = RIVER_WINDOW_V1_CAPABILITIES_MAXIMIZE
 pattern Fullscreen = RIVER_WINDOW_V1_CAPABILITIES_FULLSCREEN
 pattern Minimize   = RIVER_WINDOW_V1_CAPABILITIES_MINIMIZE
+
+-- Orphan instances
+
+instance Default RiverWindowEdges where def = RiverWindowEdgesNone
+deriving via (Xor CUInt)                instance Semigroup RiverWindowEdges
+deriving via (Xor CUInt)                instance Monoid    RiverWindowEdges
+deriving via (AsCEnum RiverWindowEdges) instance Bounded   RiverWindowEdges
+deriving via (AsCEnum RiverWindowEdges) instance Enum      RiverWindowEdges
+
+deriving via CUInt                      instance Default   RiverWindowCapabilities
+deriving via (Xor CUInt)                instance Semigroup RiverWindowCapabilities
+deriving via (Xor CUInt)                instance Monoid    RiverWindowCapabilities
+
+instance Default RiverSeatModifiers where def = RiverSeatModifiersNone
+deriving via (Xor CUInt)                instance Semigroup RiverSeatModifiers
+deriving via (Xor CUInt)                instance Monoid    RiverSeatModifiers

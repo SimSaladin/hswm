@@ -22,6 +22,7 @@ import           HSWM.Layout.MultiToggle (Toggle(..), mkToggle1)
 import           HSWM.Layout.MultiToggle.Instances
 import qualified HSWM.Layout.NoBorders as L.NoBorders
 import qualified HSWM.Layout.WindowNavigation as L.WNavigation
+import           HSWM.Prompt.Environment
 import qualified HSWM.StackSet as W
 import           HSWM.Util.Debug
 import qualified HSWM.Util.IPC as IPC
@@ -29,45 +30,43 @@ import           HSWM.Util.NamedScratchpad
 import qualified HSWM.Util.PangoMarkup as P
 import qualified HSWM.Util.RofiPrompt as RP
 import qualified HSWM.Util.Waybar as WB
-import qualified HSWM.Wallpaper
+import qualified HSWM.Wallpaper as Wallpaper
 
-import qualified Data.ByteString.Lazy.Char8 as BLC8
-import qualified Data.List as L
 import qualified Data.Map as M
-import qualified System.Environment as ENV
 import           Text.Printf
 
 main :: IO ()
-main =
-  hswm $
+main = hswm $
     addKeys' myKeys $
-      WB.waybarSB def $
-        HSWM.Wallpaper.usingWallpaper
-          HSWM.Wallpaper.WallpaperConfig {filepath = "/home/sim/wallpaper.png"}
-          (def @(HSWMConfig H Full))
-            { layoutHook = myLayoutHook,
-              handleEventHook = debugHook,
-              logHook = IPC.ipcLogHook,
-              xkbLayout = Just def
-                { model = "pc104",
-                  layouts = [ "dvp-my(dvp-my)" ],
-                  options = Just
-                    [ "terminate:ctrl_alt_bksp"
-                    , "compose:rctrl-altgr"
-                    , "lv3:ralt_switch"
-                    , "lv3:menu_switch"
-                    ]
-                },
-              pointerBindings = myPointerBinds,
-              defaultModMask = "mod4",
-              repeatInfo = Just (20, 150),
-              manageHook = myManageHook,
-              borderWidth = 1,
-              normalBorder = parseRgba colBase02,
-              focusedBorder = parseRgba colCyan,
-              startupHook = IPC.serverStartupHook def <> runInHS (scratchpadsStartupHook myScratchpads),
-              xcursor = Just ("Vanilla-DMZ", 24)
-            }
+    WB.waybarSB def $
+    Wallpaper.usingWallpaper Wallpaper.WallpaperConfig {filepath = "/home/sim/wallpaper.png"} $
+    IPC.ipcServer def $
+    (def @(HSWMConfig H Full))
+      { layoutHook = myLayoutHook
+      , manageHook = myManageHook
+      }
+      & handleEventHook <>~ debugHook
+      & startupHook <>~ runInHS (scratchpadsStartupHook myScratchpads)
+      & pointerBindings <>~ myPointerBinds
+      & defaultModMask .~ "mod4"
+      & borderWidth .~ 1
+      & normalBorder .~ parseRgba colBase02
+      & focusedBorder .~ parseRgba colCyan
+      & xkbLayout ?~ myKeyboard
+      & repeatInfo . rate .~ 20
+      & repeatInfo . delay .~ 150
+      & cursorTheme .~ "Vanilla-DMZ"
+      & cursorSize .~ 24
+  where
+    myKeyboard = def
+        & model .~ "pc104"
+        & layouts .~ [ "dvp-my(dvp-my)" ]
+        & options ?~
+          [ "terminate:ctrl_alt_bksp"
+          , "compose:rctrl-altgr"
+          , "lv3:ralt_switch"
+          , "lv3:menu_switch"
+          ]
 
 myScratchpads :: [Scratchpad]
 myScratchpads =
@@ -86,58 +85,36 @@ spawnOnceKitty name prog args mh = toggleScratchpad' True sp <?> "Spawn " <> nam
     sp = mkPad name mh (appName =? name) $
       void $ spawnProcess "kitty" $ ["--app-id=" ++ name, "--detach", "--", prog ] ++ args
 
-rofiPrompt :: RP.RofiPromptConfig
+rofiPrompt :: RP.RofiPromptConfig o
 rofiPrompt = def
-    { RP._dmenu = True,
-      RP._markupRows = True
+    & RP.dmenuMode .~ True
+    & RP.markupInput .~ True
    --   RP._dpi = 150 -- for X
-    }
-
-environPrompt :: H ()
-environPrompt = do
-  varsEnv <- io ENV.getEnvironment
-  (_, varsSessionBS, _) <- readProcess $ proc "systemctl" ["--user", "--no-block", "--no-pager", "show-environment"]
-  let varsSession = map parseLine $ lines $ BLC8.unpack varsSessionBS
-
-      varsMap = M.unionWith (\(e1, s1) (e2, s2) -> (e1 <|> e2, s1 <|> s2))
-        (M.fromList [ (k, (Nothing, Just v)) | (k, v) <- varsSession ])
-        (M.fromList [(k, (Just v, Nothing)) | (k, v) <- varsEnv])
-
-      rows =
-        [ "<b>" <> toText k <> "</b>"
-          <> maybe "" (\v -> "=" <> escval (toText v)) vEnv
-          <> (if vEnv /= vSD then maybe "" (\v -> "=" <> escval (toText v)) vSD else "")
-          <> (if isNothing vSD then " <i>(not in systemd user env)</i>" else "")
-          <> (if isNothing vEnv then " <i>(not in WM env)</i>" else "")
-        | (k, (vEnv, vSD)) <- M.toList varsMap]
-
-      escval x = P.escapeLineBreaks $ P.escapeMarkupPure x (-1)
-
-  RP.rofiRun rofiPrompt {RP._prompt = "Set env variable", RP._format = RP.FilterString} rows >>= (`whenJust` doApply)
-  where
-    doApply input = do
-      logInfo $ "environ prompt" :# [ "input" .= input ]
-      case L.span (/='=') input of
-        ("", _) -> return ()
-        (name, []) -> do
-          logInfo $ "Unset environment variable" :# [ "name" .= name ]
-          io $ ENV.unsetEnv name
-        (name, '=' : value) -> do
-          logInfo $ "Set environment variable" :# [ "name" .= name, "value" .= value ]
-          io $ ENV.setEnv name value -- TODO systemd env too
-        _ -> return ()
-
-    parseLine :: String -> (String, String)
-    parseLine line =
-      let (key, rest) = L.break (== '=') line
-       in case rest of
-            ('=' : val) -> (key, val)
-            _ -> (key, "") -- fallback in case there's no '='
 
 cycleRecentHiddenWS :: [KeySym] -> KeySym -> KeySym -> H ()
 cycleRecentHiddenWS =
   CycleRecentWS.cycleWindowSets $ \wset ->
     [W.tag ws | ws <- W.hidden wset ++ [W.workspace (W.current wset)]]
+
+wayDisplaysPrompt :: H ()
+wayDisplaysPrompt = do
+  withProcessWait (
+    setStdin (byteStringInput "") $
+    setStdout byteStringOutput $
+    setStderr byteStringOutput $
+    setNewSession True $
+    setCloseFds True $
+    proc "rofi" ["-dmenu"]) $ \p -> do
+      out <- atomically (getStdout p)
+      err <- atomically (getStderr p)
+      -- res <- try @_ @SomeException $ stopProcess p
+      -- logInfo $ "rofi: process stop" :# [ "result" .= show res ]
+      res1 <- try @_ @SomeException $ waitExitCode p
+      logInfo $ "rofi: process exit code" :# [ "ec" .= show res1 ]
+      logInfo $ "proc: output" :# [ "stdout" .= show out, "stderr" .= show err ]
+
+  -- error "TODO"
+  -- RP.rofiRun pc inp
 
 windowPrompt :: H ()
 windowPrompt = do
@@ -146,27 +123,25 @@ windowPrompt = do
     b <- use _windows
     return (a, b)
   let wins = [(rw, W.tag ws, w) | ws <- wss, rw <- W.integrate' (W.stack ws), Just w <- [M.lookup rw wState]]
-  RP.rofiRun rp (map fmtWindow wins) >>= (`whenJust` doApply wins)
+  RP.rofiRun' rp (map fmtWindow wins) >>= (`whenJust` doApply wins)
   where
+    rp :: RP.RofiPromptConfig RP.SelectI
     rp = rofiPrompt
-      { RP._prompt = "Go to window",
-        RP._format = RP.SelectedIndex,
-        RP._noCustom = True
-      }
+      & RP.prompt .~ "Go to window"
+      & RP.noCustomInput .~ True
 
     fmtWindow (_rw, tag, w) =
       P.Bold (P.text w.appId) <> " on " <> P.text tag <>
       " \"" <> P.text w.title <> "\"" <>
         maybe "" ((" " <>) . P.fromShow) w.unreliablePid
 
-    doApply wins idxStr = do
-      let idx = read idxStr :: Int
-          (rw, _, _) = wins !! idx
+    doApply wins idx = do
+      let (rw, _, _) = wins !! idx
       logInfo $ fromString $ show idx
       runInHS $ windows $ W.focusWindow rw
       manageDirty
 
-mkWorkspacePrompt :: (RP.RofiPromptConfig -> WorkspaceId -> RP.RofiPromptConfig)
+mkWorkspacePrompt :: (RP.RofiPromptConfig RP.SelectS -> WorkspaceId -> RP.RofiPromptConfig RP.SelectS)
                   -> (WorkspaceId -> String -> H a)
                   -> H ()
 mkWorkspacePrompt prompt apply = do
@@ -180,18 +155,18 @@ mkWorkspacePrompt prompt apply = do
 renameWorkspacePrompt :: H ()
 renameWorkspacePrompt = do
   (curTag, allTags) <- runInHS $ withWindowSet $ return . (W.currentTag &&& W.allTags)
-  RP.rofiRun rofiPrompt {RP._prompt = "Rename " ++ curTag} allTags >>= (`whenJust` doRename curTag)
+  RP.rofiRun rofiPrompt {RP.prompt = "Rename " ++ curTag} allTags >>= (`whenJust` apply curTag)
   where
-    doRename old new = do
+    apply old input = do
       runInHS $ do
-        DWO.updateName old new
-        DynWS.renameWorkspaceByName new
+        DWO.updateName old input
+        DynWS.renameWorkspaceByName input
       view (config . logHook) >>= void . userCode
 
 addWorkspacePrompt :: H ()
 addWorkspacePrompt =
   mkWorkspacePrompt
-    (\p _ -> p {RP._prompt = "Add workspace"})
+    (\p _ -> p {RP.prompt = "Add workspace"})
     ( \_ input -> do
         runInHS $ do
           modifySeats (const True) $ \s -> s { suppressChangeFocus = 2 }
@@ -201,7 +176,7 @@ addWorkspacePrompt =
 
 workspacePrompt :: H ()
 workspacePrompt = mkWorkspacePrompt
-  (\p _ -> p {RP._prompt = "Go to workspace"})
+  (\p _ -> p {RP.prompt = "Go to workspace"})
   (\_ input -> do
       logInfo $ "switching workspace" :# [ "tag" .= input ]
       runInHS $ windows $ W.view input
@@ -238,11 +213,11 @@ myKeys :: [(String, SomeAction H)]
 myKeys =
   -- ====== Core ==========
   [ ("M-S-c",     "Close the focused window" <??> withFocused manageKill),
-    ("M-q",       "Restart WM" <??> sendRestart @H),
-    ("M-Return",  "New terminal window" <??> spawnProcess @H "kitty" []),
-    ("M-Escape",  "Print debug stack" <??> debugAction),
-    ("M-Dollar",  "Lock session" <??> spawnProcess @H "swaylock" ["-k"]),
-    ("M-Print",   "Screenshot" <??> spawnProcess @H "sh" ["-c", "grim -g \"$(slurp)\""]),
+    ("M-q",       "Restart WM"               <??> sendRestart @H),
+    ("M-Return",  "New terminal window"      <??> spawnProcess @H "kitty" []),
+    ("M-Escape",  "Print debug stack"        <??> debugAction),
+    ("M-Dollar",  "Lock session"             <??> spawnProcess @H "swaylock" ["-k"]),
+    ("M-Print",   "Screenshot"               <??> spawnProcess @H "sh" ["-c", "grim -g \"$(slurp)\""]),
     -- "M-r M-S-c"     cmdT @"Signal process (SIGKILL) of focused window (_NET_WM_PID)" (withFocused (signalProcessBy Posix.sigKILL))
     -- "M-S-<Return>"  FloatNext.floatNext True >> spawnTerm def "" ? "Terminal (floating)"
     ("M-F1", showKeyHelp <?> "Show help"),
@@ -250,11 +225,12 @@ myKeys =
     --("M-F4", "" <??> setKeyboardKeymaps (const True) (keymapFromString "us")),
 
     -- ======== Execute ==========
-    ("M-r r", "Run shell (prompt)" <??> RP.rofiLaunch @_ @H def { RP._modes = "run", RP._show = "run" }),
-    ("M-r d", "Run desktop app (prompt)" <??> RP.rofiLaunch @_ @H def { RP._modes = "drun", RP._show = "drun", RP.showIcons = True }),
-    ("M-r s", "Run via systemd-run (prompt)" <??> RP.rofiRun @_ @H def { RP.history = Just "systemd-run", RP._prompt = "systemd-run", RP._dmenu = True } ([] :: [String]) RP.++> RP.runWithSystemD),
-    ("M-r c", "Open cliphist prompt" <??> RP.rofiLaunch @_ @H def { RP._modi = "clipboard:cliphist-rofi-img", RP._show = "clipboard", RP.showIcons = True }),
+    ("M-r r", RP.rofiLaunch @H (def & RP.oneMode "run") <?> "Run shell (prompt)"),
+    ("M-r d", RP.rofiLaunch @H (def & RP.oneMode "drun" & RP.showIcons .~ True) <?> "Run desktop app (prompt)"),
+    ("M-r s", RP.rofiRun @H (def & RP.history ?~ "systemd-run" & RP.prompt .~ "systemd-run" & RP.dmenuMode .~ True) ([] :: [String]) RP.++> RP.runWithSystemD <?> "Run via systemd-run (prompt)"),
+    ("M-r c", RP.rofiLaunch @H (def & RP.oneMode "clipboard:cliphist-rofi-img" & RP.showIcons .~ True) <?> "Open cliphist prompt"),
     ("M-r b", spawnOnceKitty "bluetoothctl@kitty" "bluetoothctl" [] (doCenterFloat (3/5) (2/3))),
+    ("M-r a", wayDisplaysPrompt <?> "Display config (way-displays)"),
 
     -- "M-r f"            >+ spawnOnceKitty "fself" "bash" ["-lic", "fself"] doCenterFloat
     --   -- spawnDialog ("bash", ["-ic", "fself"]) ? "FZF multi-prompt"
@@ -293,7 +269,7 @@ myKeys =
       ("M-x",           "Layout: " <??> Shrink),
       ("M-S-x",         "Layout: " <??> Expand),
       ("M-b t",         "Toggle NonExcl. Area" <??> NEArea.ToggleNonExclusiveArea),
-      ("M-m",           "Maximize Restore" <??> withFocused (sendMessage . L.Maximize.maximizeRestore . view river_window)),
+      ("M-m",           "Maximize Restore" <??> withFocused (sendMessage . L.Maximize.maximizeRestore . view riverWindow)),
       ("M-b b",         "Toggle NOBORDERS" <??> sendMessage (Toggle NOBORDERS)),
       ("M-b m",         "Toggle MIRROR" <??> sendMessage (Toggle MIRROR)),
       ("M-b f",         "Toggle NBFULL" <??> sendMessage (Toggle NBFULL)),
@@ -372,7 +348,7 @@ myKeys =
          --   "M-@"                     >+ togglePad "taskwarrior-tui"
 
          -- ===== "Prompts (Execute)"
-         ("M-r e", "Environment prompt" <??> environPrompt)
+         ("M-r e", "Environment prompt" <??> environPrompt rofiPrompt)
          --   "M-r p"   >+ XP.Pass.passPrompt xpConfig          ? "Pass (Prompt)"
          --   "M-r C-p" >+ XP.Pass.passOTPPrompt xpConfig       ? "Pass OTP (Prompt)"
          --   "M-r C-u" >+ XP.Pass.passPromptWith "show-field --clip username" xpConfig ? "Pass username (Prompt)"

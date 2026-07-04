@@ -13,7 +13,6 @@ import           Data.Ratio ((%))
 import qualified Data.Set as S
 import           Data.Time.Clock.System
 import           System.Environment (executablePath)
--- import           Foreign (IntPtr, deRefStablePtr, intPtrToPtr, ptrToIntPtr, (.&.))
 import           System.IO (hGetContents, hPrint, print, writeFile)
 import qualified System.Posix as Posix
 import           System.Posix.Process (executeFile)
@@ -24,18 +23,15 @@ import           Text.Printf
 -- | Given a point, determine the screen (if any) that contains it.
 pointScreen :: Position1D -> Position1D
             -> HS (Maybe (W.Screen WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail ScreenId ScreenDetail))
-pointScreen x y = withWindowSet $ return . L.find p . W.screens
+pointScreen x y = withWindowSet $ return . L.find point . W.screens
   where
-    p = pointWithin x y . screenRect . W.screenDetail
-
-screenRect :: ScreenDetail -> Rectangle
-screenRect sd = Rectangle (fi sd.x) (fi sd.y) (fi sd.width) (fi sd.height)
+    point = pointWithin x y . screenRect . W.screenDetail
 
 -- * Manage tasks that defer to next manage sequence
 
 manageReveal, manageHide :: RiverWindow -> HS ()
-manageReveal = flip modifyWindow $ p_set_visible ?~ True
-manageHide = flip modifyWindow $ p_set_visible ?~ False
+manageReveal = flip modifyWindow $ pSetVisible ?~ True
+manageHide   = flip modifyWindow $ pSetVisible ?~ False
 
 manageKill :: Window -> HS ()
 manageKill = doManage WRequestClose
@@ -45,26 +41,23 @@ manageKill = doManage WRequestClose
 --
 -- /manage/
 tileWindow :: Bool -> RiverWindow -> Rectangle -> HS ()
-tileWindow placeTop rw r = do
+tileWindow placeTop rw r =
   withWindow rw $ \w -> do
-    --logDebug $ "Tiling window" :# [ "window" .= show rw, "title" .= w.title, "placetop" .= placeTop ]
     case w.fullscreen of
       Nothing -> do
         bwDef <- view $ config . borderWidth . to fi
         let bw = fromMaybe bwDef w.wBorderWidth
         -- give all windows at least 1x1 pixels
-        let least x
-              | x <= bw * 2 = 1
-              | otherwise = x - bw * 2
-        R.riverWindowProposeDimensions w.river_window (least $ fi r.width) (least $ fi r.height)
+        let least x | x <= bw * 2 = 1
+                    | otherwise   = x - bw * 2
+        R.riverWindowProposeDimensions w.river_window (least $ fi r.size.width) (least $ fi r.size.height)
         modifyWindow rw $ \w' -> w'
-            & p_render_pos ?~ Position (fi r.x + bw) (fi r.y + bw)
-            & p_render_place_top ?~ placeTop
+            & pRenderPos ?~ Position (fi r.position.x + bw) (fi r.position.y + bw)
+            & pRenderPlaceTop ?~ placeTop
       Just ro -> do
-        sid <- pointScreen r.x r.y
-        lookupOutputBy (\x -> Just x.screen == fmap W.screen sid) >>= \mo -> do
-          case mo of
-            Nothing -> return ()
+        sid <- pointScreen r.position.x r.position.y
+        mo <- lookupOutputBy (\x -> Just x.screen == fmap W.screen sid)
+        case mo of
             Just o
               | ro == o.river_output -> modifyWindow rw $ \w' -> w'
                   { p_render_place_top = Just placeTop }
@@ -72,10 +65,11 @@ tileWindow placeTop rw r = do
                 -- need to change the output where the window is fullscreened
                 R.riverWindowFullscreen rw o.river_output
                 modifyWindow rw $ \x -> x
-                  & p_render_place_top ?~ placeTop
+                  & pRenderPlaceTop ?~ placeTop
                   & fullscreen ?~ o.river_output
                   & position .~ o.position
                   & size .~ o.size
+            Nothing -> return ()
 
 manageWindowPlaceTop :: RiverWindow -> Bool -> HS ()
 manageWindowPlaceTop rw top = modifyWindow rw $ \w -> w
@@ -88,7 +82,7 @@ manageWindowBorderWidth :: RiverWindow -> Maybe Int32 -> HS ()
 manageWindowBorderWidth rw bw = modifyWindow rw $ \w -> w {wBorderWidth = bw}
 
 doManage' :: WindowManageAction -> RiverWindow -> HS ()
-doManage' a rw = modifyWindow rw $ p_manage_action <>~ [a]
+doManage' a rw = modifyWindow rw $ pManageAction <>~ [a]
 
 doManage :: WindowManageAction -> Window -> HS ()
 doManage a w = doManage' a w.river_window
@@ -153,7 +147,7 @@ updateLayout i ml = whenJust ml $ \l ->
   runOnWorkspaces $ \ww -> return $ if W.tag ww == i then ww {W.layout = l} else ww
 
 withScreenOutput :: ScreenId -> (Output -> HS ()) -> HS ()
-withScreenOutput sid f = mapM_ f . L.find (\o -> o.screen == sid) =<< use _outputs
+withScreenOutput sid f = mapM_ f . L.find (\o -> o.screen == sid) =<< use outputList
 
 -- | Force new manage sequence.
 manageDirty :: (MonadStateGlobal env m, HasEventQueues env) => m ()
@@ -183,33 +177,35 @@ setTopFocus' rw = mapSeats $ \s -> do
       logInfo $ "seat: focus window" :# [ "window" .= show rw, "seat" .= s.name ]
       R.riverSeatFocusWindow s.river_seat rw
       modifySeat s.river_seat $ focused .~ rw
-      -- FIXME: when focusing a newly created window, we end up here when w.x and w.y are still 0. The position is updated
-      -- a bit later by the WindowDimensions event.
+      -- FIXME: when focusing a newly created window, we end up here when w.x and w.y are still 0.
+      -- The position is updated a bit later by the WindowDimensions event.
       when (s.suppressChangeFocus <= 0 && w ^. size /= Size 0 0) $ do
           -- modifySeat s.river_seat $ \x -> x {focused = rw}
           let Position x' y' = fromMaybe w.position w.p_render_pos
-              px = x' + (w.size.width `div` 2)
-              py = y' + (w.size.height `div` 2)
-          logInfo $ "seat: pointer warp" :# [ "dest" .= (px, py), "seat" .= s.name, "window" .= show w ]
+              px = x' + (fi w.size.width `div` 2)
+              py = y' + (fi w.size.height `div` 2)
+          logInfo $ "seat: pointer warp" :# [ "dest" .= (px, py), "seat" .= s.name, "window" .= show w.river_window ]
           io $ R.riverSeatPointerWarp s.river_seat px py
 
 seatDisableBindingsMatching :: RiverSeat -> [ModMask] -> [KeySym] -> HS ()
 seatDisableBindingsMatching rs mods keys = withSeat rs $ \s -> do
   let binds = s.xkb_bindings
-      matchedKeys = S.filter match (M.keysSet binds)
-      match (mod', key) = any (\m -> m .&. mod' > 0) mods || key `elem` keys
+      matchedKeys  = S.filter match (M.keysSet binds)
       matchedBinds = M.fromSet (binds M.!) matchedKeys
   logInfo $ "seat: temporarily disabling bindings" :# [ "count" .= length matchedBinds ]
-  io . forM_ matchedBinds $ deRefStablePtr >=> R.riverXkbBindingDisable . xkb_binding
+  io . forM_ matchedBinds $ deRefStablePtr >=> R.riverXkbBindingDisable . (.riverXkbBinding)
+  where
+    match (mod', key) = any (\m -> m .&. mod' > 0) mods || key `elem` keys
 
 seatEnableBindingsMatching :: RiverSeat -> [ModMask] -> [KeySym] -> HS ()
 seatEnableBindingsMatching rs mods keys = withSeat rs $ \s -> do
   let binds = s.xkb_bindings
-      matchedKeys = S.filter match (M.keysSet binds)
-      match (mod', key) = any (\m -> m .&. mod' > 0) mods || key `elem` keys
+      matchedKeys  = S.filter match (M.keysSet binds)
       matchedBinds = M.fromSet (binds M.!) matchedKeys
-  logInfo $ "seat: restoring bindings to enabled: " :# [ "count" .= length matchedBinds ]
-  io . forM_ matchedBinds $ deRefStablePtr >=> R.riverXkbBindingEnable . xkb_binding
+  logInfo $ "seat: restoring bindings to enabled" :# [ "seat" .= show rs, "count" .= length matchedBinds ]
+  io . forM_ matchedBinds $ deRefStablePtr >=> R.riverXkbBindingEnable . (.riverXkbBinding)
+  where
+    match (mod', key) = any (\m -> m .&. mod' > 0) mods || key `elem` keys
 
 --------------------------------------------------------------
 
@@ -222,13 +218,13 @@ hide rw = withWindow rw $ \_ -> R.riverWindowHide rw
 
 -- | /render sequence/ Draw borders on the the window.
 setWindowBorder :: RiverWindow -> Int32 -> RiverColor -> HS ()
-setWindowBorder w wb_width RiverColor {red = wb_r, green = wb_g, blue = wb_b, alpha = wb_a} = withWindow w $ \_ -> do
-  wb_edges <- asks $ fi . view (config . borderEdges)
-  let borders = R.WindowBorders {..}
-  io $ riverWindowSetBorders w borders
+setWindowBorder w wbWidth wbColor = withWindow w $ \_ -> do
+  wbEdges <- asks $ view (config . borderEdges)
+  liftIO $ riverWindowSetBorders w R.WindowBorders {..}
 
 riverWindowSetBorders :: RiverWindow -> R.WindowBorders -> IO ()
-riverWindowSetBorders w R.WindowBorders {..} = R.riverWindowSetBorders w (R.toCEnum $ fi wb_edges) wb_width wb_r wb_g wb_b wb_a
+riverWindowSetBorders w R.WindowBorders {wbColor = RiverColor{..}, ..} =
+  R.riverWindowSetBorders w wbEdges wbWidth red green blue alpha
 
 setWindowPosition :: Window -> Int32 -> Int32 -> HS ()
 setWindowPosition w x y = do
@@ -243,7 +239,7 @@ withWindowSet :: (WindowSet -> HS a) -> HS a
 withWindowSet f = use windowset >>= f
 
 modifyWindowSet :: (WindowSet -> WindowSet) -> HS ()
-modifyWindowSet f = modifying windowset f
+modifyWindowSet = modifying windowset
 
 windows :: (WindowSet -> WindowSet) -> HS ()
 windows = modifyWindowSet
@@ -269,27 +265,25 @@ runOnWorkspaces job = do
 -- * Outputs
 
 lookupOutput :: RiverOutput -> HS (Maybe Output)
-lookupOutput k = use _outputs <&> L.find (\x -> x.river_output == k)
+lookupOutput k = lookupOutputBy (\x -> x.river_output == k)
 
 lookupOutputBy :: (Output -> Bool) -> HS (Maybe Output)
-lookupOutputBy f = use _outputs <&> L.find f
+lookupOutputBy f = use outputList <&> L.find f
 
 withOutput :: RiverOutput -> (Output -> HS ()) -> HS ()
-withOutput k m = use _outputs >>= mapM_ (\x -> when (x.river_output == k) (m x))
+withOutput k m = use outputList >>= mapM_ (\x -> when (x.river_output == k) (m x))
 
 modifyOutput :: RiverOutput -> (Output -> Output) -> HS ()
-modifyOutput ro f = modifying _outputs $ map g
+modifyOutput ro f = outputList %= map g
   where
     g out
       | out.river_output == ro = f out
       | otherwise = out
 
 setOutputPower :: Bool -> HS ()
-setOutputPower mode = do
-  outs <- use _outputs
-  forM_ (outs ^.. traversed . outputPower) $ \case
-    Nothing -> return ()
-    Just power -> do
+setOutputPower mode = use outputList >>= traverseOf_ (each . outputPower . _Just) f
+  where
+    f power = do
       logInfo $ "setting output power" :# [ "on" .= mode ]
       Wlr.outputPowerSetMode power (if mode then Wlr.OutputPowerModeOn else Wlr.OutputPowerModeOff)
 
@@ -297,36 +291,26 @@ setOutputPower mode = do
 -- * Seats
 
 lookupSeat :: RiverSeat -> HS (Maybe Seat)
-lookupSeat rs = L.find (\x -> x.river_seat == rs) <$> use _seats
+lookupSeat rs = L.find (\x -> x.river_seat == rs) <$> use seatList
 
 withSeat :: RiverSeat -> (Seat -> HS ()) -> HS ()
-withSeat sid f = use _seats >>= mapM_ (\s -> when (s.river_seat == sid) (f s))
+withSeat sid f = use seatList >>= mapM_ (\s -> when (s.river_seat == sid) (f s))
 
 modifySeat :: RiverSeat -> (Seat -> Seat) -> HS ()
-modifySeat ro f = modifying _seats $ map g
-  where
-    g x@Seat {}
-      | x.river_seat == ro = f x
-      | otherwise = x
+modifySeat ro = modifySeats (\x -> x.river_seat == ro)
 
 modifySeats :: (Seat -> Bool) -> (Seat -> Seat) -> HS ()
-modifySeats choose f = modifying _seats $ map g
+modifySeats choose f = seatList %= map g
   where
-    g x
-      | choose x = f x
-      | otherwise = x
+    g x | choose x  = f x
+        | otherwise = x
 
-mapSeats :: (Seat -> HS ()) -> HS ()
-mapSeats f = use _seats >>= mapM_ f
+-- | Use seat list read-only.
+mapSeats :: GetHState m => (Seat -> m ()) -> m ()
+mapSeats f = getHState >>= mapM_ f . view seatList
 
--- ** Starting Seat operations
-
-startSeatOp :: SeatOp -> HS ()
-startSeatOp seatop = modifySeats (const True) $ \seat -> seat {pending_action = S_START_OP seatop}
-
-seatInputOverride :: String -> HS Bool -> [((ModMask, KeySym), H ())] -> HS ()
-seatInputOverride seat onempty keys = modifySeats (\s -> s.name == seat) $ \s ->
-  s {pending_action = S_INPUT_OVERRIDE onempty (map (second SomeAction) keys)}
+startSeatOp :: SeatOperation -> HS ()
+startSeatOp seatop = modifySeats (const True) $ pendingAction .~ S_START_OP seatop
 
 --------------------------------------------------------------
 -- * windows
@@ -381,11 +365,11 @@ floatLocation w = go
             fromMaybe (W.current ws) $
               if point_sc `sr_eq` Just (W.current ws) then point_sc else Nothing
           sr = screenRect . W.screenDetail $ sc
-          x = (fi w.position.x - fi sr.x) % fi sr.width
-          y = (fi w.position.y - fi sr.y) % fi sr.height
+          x = (fi w.position.x - fi sr.position.x) % fi sr.size.width
+          y = (fi w.position.y - fi sr.position.y) % fi sr.size.height
           (width', height') = {- applySizeHintsContents sh -} (fi w.size.width, fi w.size.height)
-          rwidth = fi (width' + bw * 2) % fi sr.width
-          rheight = fi (height' + bw * 2) % fi sr.height
+          rwidth = fi (width' + bw * 2) % fi sr.size.width
+          rheight = fi (height' + bw * 2) % fi sr.size.height
           -- adjust x/y of unmanaged windows if we ignored or didn't get pointScreen,
           -- it might be out of bounds otherwise
           rr =
@@ -425,25 +409,25 @@ restart prog = do
   io $ do
     res <- try $ executeFile prog True [ "--state-file", statefile ] Nothing
     case res of
-      Left (SomeException e) -> hPrint stderr e >> exitFailure
       Right {} -> return ()
+      Left (SomeException e) -> hPrint stderr e >> exitFailure
 
 writeStateToFile :: HS FilePath
 writeStateToFile = do
-  dir <- getStateDirectory
-  ts <- getTimeStamp
-  let filename = printf "savedstate-%i" ts
-  let filepath = dir ++ "/" ++ filename
-      linkpath = dir ++ "/" ++ "savedstate"
-  stateString <- dumpStateAsString
-  io $ catchIO (writeFile filepath stateString >> updateLink filename linkpath) (print . show)
-  logInfo $ "Wrote current WM state to disk" :# [ "statefile" .= filepath ]
-  return filepath
-    where
-      updateLink src dst = do
-        b <- doesFileExist dst
-        when b $ removeFile dst
-        createFileLink src dst
+    dir <- getStateDirectory
+    ts  <- getTimeStamp
+    let filename = printf "savedstate-%i" ts
+        filepath = dir ++ "/" ++ filename
+        linkpath = dir ++ "/" ++ "savedstate"
+    stateString <- dumpStateAsString
+    io $ catchIO (writeFile filepath stateString >> updateLink filename linkpath) (print . show)
+    logInfo $ "Wrote current WM state to disk" :# [ "statefile" .= filepath ]
+    return filepath
+  where
+    updateLink src dst = do
+      b <- doesFileExist dst
+      when b $ removeFile dst
+      createFileLink src dst
 
 dumpStateAsString :: HS String
 dumpStateAsString = do
@@ -520,8 +504,7 @@ readStateFile msf xmc = do
     readStrict h = hGetContents h >>= \s -> length s `seq` return s
 
 getProgramPath :: IO FilePath
-getProgramPath =
-  lookupEnv "HSWM_EXECUTABLE" >>= \case
+getProgramPath = lookupEnv "HSWM_EXECUTABLE" >>= \case
     Just x -> return x
     Nothing
       | Just getExe <- executablePath -> do

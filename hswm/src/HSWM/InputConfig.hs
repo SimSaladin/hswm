@@ -199,7 +199,9 @@ handleInputDeviceEvent (R.RiverInputDeviceType _ dev deviceType) = do
   modifyObjectDef $ \st -> st { inputDevices = M.adjust (\ds -> ds { deviceType = Just deviceType }) dev st.inputDevices }
   -- Set repeat rate & delay for keyboard device
   when (deviceType == R.RiverInputDeviceTypeKeyboard) $ do
-    view (config . repeatInfo) >>= (`whenJust` uncurry (R.riverInputDeviceSetRepeatInfo dev))
+    RepeatInfo rrate rdelay <- view (config . repeatInfo)
+    when (rrate > 0 && rdelay > 0) $
+      R.riverInputDeviceSetRepeatInfo dev rrate rdelay
 handleInputDeviceEvent (R.RiverInputDeviceName _ dev name) = do
   modifyObjectDef $ \st -> st { inputDevices = M.adjust (\ds -> ds { deviceName = name }) dev st.inputDevices }
 handleInputDeviceEvent (R.RiverInputDeviceRemoved _ dev) = do

@@ -22,7 +22,6 @@ import System.Posix ( CPid, getAnyProcessStatus )
 import System.Posix.Signals
 import System.Process (CmdSpec(..))
 import System.Process.Typed hiding (closed)
-import System.Process.Typed.Internal
 import qualified Data.ByteString.Char8 as C8
 
 spawnProcess :: MonadProcessSpawn m => String -> [String] -> m ()
@@ -45,7 +44,6 @@ type MonadProcessSpawn m = (MonadUnliftIO m, MonadLogger m)
 installSignalHandlers :: (MonadIO m) => m ()
 installSignalHandlers = io $ do
   _ <- installHandler openEndedPipe Ignore Nothing
-  _ <- installHandler sigCHLD Default Nothing
   -- _ <- installHandler sigCHLD Ignore Nothing
   void $
     (try :: IO a -> IO (Either SomeException a)) $
@@ -60,23 +58,10 @@ uninstallSignalHandlers = io $ do
   _ <- installHandler sigCHLD Default Nothing
   return ()
 
-logOutput :: (Loc -> LogSource -> LogLevel -> LogStr -> IO ()) -> StreamSpec anyStreamType ()
-logOutput logFn = StreamSpec ($ CreatePipe) $ \pc mh ->
-  Cleanup $ case mh of
-    Just h -> do
-      void . async $ flip runLoggingT logFn $ forever $ do
-        ln <- io $ C8.hGetLine h
-        logInfo $ fromString ("process output: " ++ C8.unpack ln) :# [ "process" .= show pc ]
-      return ((), hClose h :: IO ())
-    Nothing -> error "StreamSpec with CreatePipe should always return a Handle"
-
-{-
-rangeSections :: CInt -> CInt -> [CInt] -> [(CInt, CInt)]
-rangeSections begin last holes = go begin (L.sort $ L.nub $ filter (\x -> begin <= x && x <= last) holes)
-  where
-    go a        _ | a >= last = []
-    go a (x : xs) | a == x    = go (a + 1) xs
-                  | x >= last = [(a, min (x - 1) last)]
-                  | otherwise = (a, x - 1) : go (x + 1) xs
-    go a       []             = [(a, last)]
--}
+logOutput :: (Loc -> LogSource -> LogLevel -> LogStr -> IO ()) -> Text -> StreamSpec anyStreamType (Async ())
+logOutput logFn prefix = mkPipeStreamSpec $ \pc h -> do
+  hSetBuffering h LineBuffering
+  as <- async $ flip runLoggingT logFn $ forever $ do
+    ln <- io $ C8.hGetLine h
+    logInfo $ prefix <> ": " <> fromString (C8.unpack ln) :# [ "processConfig" .= show pc ]
+  return (as, hClose h)

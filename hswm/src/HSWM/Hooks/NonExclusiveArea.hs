@@ -28,11 +28,9 @@ instance LayoutModifier NonExclusiveArea a where
   modifyLayout (NonExclusiveArea ss) w r
     | not ss = runLayout w r
     | otherwise = do
-      outputs <- use _outputs
-      case L.find (\x -> x.position == Position r.x r.y) outputs of
-        Just out | Just (x,y,w',h) <- out.nonExclusive -> do
-          let srect = Rectangle (fi x) (fi y) (fi w') (fi h)
-          runLayout w srect
+      outputs <- use outputList
+      case L.find (\x -> x.position == r.position) outputs of
+        Just out | Just srect <- out.nonExclusive -> runLayout w srect
         _ -> runLayout w r
 
   pureMess (NonExclusiveArea ss) m

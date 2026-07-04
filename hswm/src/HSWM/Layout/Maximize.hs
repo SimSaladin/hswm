@@ -25,7 +25,7 @@ module HSWM.Layout.Maximize (
         Maximize, MaximizeRestore,
     ) where
 
-import HSWM hiding (Maximize)
+import HSWM
 import Data.List (partition)
 import qualified HSWM.StackSet as S
 import HSWM.Layout.LayoutModifier
@@ -82,10 +82,10 @@ instance LayoutModifier Maximize RiverWindow where
         where
             (toMax, rest) = partition (\(w, _) -> w == target) wrs
             maxed = map (\(w, _) -> (w, maxRect)) toMax
-            maxRect = Rectangle (rect.x + fromIntegral padding)
-                                (rect.y + fromIntegral padding)
-                                (rect.width  - padding * 2)
-                                (rect.height - padding * 2)
+            maxRect = Rectangle (rect.position.x + fromIntegral padding)
+                                (rect.position.y + fromIntegral padding)
+                                (rect.size.width  - padding * 2)
+                                (rect.size.height - padding * 2)
             lay | null maxed = Just (Maximize padding Nothing)
                 | otherwise  = Nothing
     pureModifier _ _ _ wrs = (wrs, Nothing)

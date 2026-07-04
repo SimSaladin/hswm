@@ -8,6 +8,7 @@
 -- Portability : unportable
 module HSWM
   ( module HSWM.Core,
+    module HSWM.ManageHook,
     module HSWM.Config,
     module HSWM.Layout,
     module HSWM.Main,
@@ -27,6 +28,7 @@ import Data.Semigroup as ReExports (All (..))
 
 import HSWM.Config
 import HSWM.Core
+import HSWM.ManageHook
 import HSWM.Layout
 import HSWM.Main
 import HSWM.Operations
