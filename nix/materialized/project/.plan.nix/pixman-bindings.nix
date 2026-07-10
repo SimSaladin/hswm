@@ -69,4 +69,4 @@
         };
       };
     };
-  } // rec { src = pkgs.lib.mkDefault .././pixman-bindings; }
+  } // rec { src = pkgs.lib.mkDefault ../pixman-bindings; }

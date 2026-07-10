@@ -8,26 +8,40 @@
 -- Portability : unportable
 module HSWM.Util.NamedScratchpad where
 
-import Data.List qualified as L
-import Data.Map qualified as M
-import HSWM.Actions.Minimize
-import HSWM.Core
-import HSWM.ManageHook
-import HSWM.Operations
-import HSWM.StackSet qualified as W
-import HSWM.Util.ExtensibleState qualified as XS
-import HSWM.Util.RofiPrompt qualified as RP
-import Text.Printf
+import qualified Data.List as L
+import qualified Data.Map as M
+import           HSWM.Actions.Minimize
+import           HSWM.Core
+import           HSWM.ManageHook
+import           HSWM.Operations
+import qualified HSWM.StackSet as W
+import qualified HSWM.Util.ExtensibleState as XS
+import qualified HSWM.Util.RofiPrompt as RP
+import           Text.Printf
+
+data Scratchpad = SP
+  { spName      :: !ScratchpadId,
+    spCmd       :: H (),
+    spQuery     :: Query Bool,
+    spHook      :: ManageHook,
+    spExclusive :: [String]
+  }
 
 type ScratchpadId = String
 
-data Scratchpad = SP
-  { spName :: ScratchpadId,
-    spCmd :: H (),
-    spQuery :: Query Bool,
-    spHook :: ManageHook,
-    spExclusive :: [String]
-  }
+newtype Scratchpads = Scratchpads { xpads :: M.Map ScratchpadId Scratchpad }
+
+instance ExtensionClass Scratchpads where
+  initialValue = Scratchpads mempty
+
+newtype ScratchpadDyn = ScratchpadDyn { dynWins :: M.Map ScratchpadId RiverWindow }
+  deriving (Eq, Ord, Read, Show)
+
+instance ExtensionClass ScratchpadDyn where
+  initialValue = ScratchpadDyn mempty
+  extensionType = PersistentExtension
+
+-- * Initialize
 
 -- | "mkPad name mh match launch"
 mkPad :: ScratchpadId -> ManageHook -> Query Bool -> H () -> Scratchpad
@@ -36,17 +50,6 @@ mkPad nm mh q a = SP nm a q mh []
 -- | Make exclusive set.
 exclusive :: [Scratchpad] -> [Scratchpad]
 exclusive xs = [x {spExclusive = L.delete (spName x) (map spName xs)} | x <- xs]
-
-newtype Scratchpads = Scratchpads {xpads :: M.Map ScratchpadId Scratchpad}
-
-instance ExtensionClass Scratchpads where
-  initialValue = Scratchpads mempty
-
-newtype ScratchpadDyn = ScratchpadDyn {dynWins :: M.Map ScratchpadId RiverWindow} deriving (Read, Show)
-
-instance ExtensionClass ScratchpadDyn where
-  initialValue = ScratchpadDyn mempty
-  extensionType = PersistentExtension
 
 -- * Actions
 
@@ -92,21 +95,6 @@ togglePad = toggleScratchpad True
 togglePadNoCreate :: ScratchpadId -> H ()
 togglePadNoCreate = toggleScratchpad False
 
-{-
--- | Toggle next scratchpad (cyclic)
-cyclePads :: H ()
-cyclePads = do
-    padsAll <- runInHS $ XS.gets (M.elems . xpads)
-    padsExist <- runInHS $ withWindowSet $ \wset ->
-      catMaybes <$> mapM (runQuery xpad) (W.allWindows wset)
-    let pads = [pad | pad <- padsAll, any ((==) (spName pad) . spName) padsExist]
-    res <- withFocii $ \_ w ->
-      fmap (\x -> drop 1 . dropWhile ((/=) (spName x) . spName)) <$> runQuery xpad w
-    case fromMaybe id res pads of
-      npad:_ -> togglePadNoCreate (spName npad)
-      _      -> minimizeScratchpads pads
--}
-
 -- | Toggle minimize/maximize of a window. See "HSWM.Actions.Minimize"
 -- First argument: only maximize (True) or minimize (False).
 toggleWindow :: Maybe Bool -> ManageHook -> Window -> HS ()
@@ -127,13 +115,26 @@ toggleWindow ma mh w = do
     inCurrentWS = withWindowSet (return . elem w.river_window . currentWindows)
     isHidden = isMinimized
 
+{-
+-- | Toggle next scratchpad (cyclic)
+cyclePads :: H ()
+cyclePads = do
+    padsAll <- runInHS $ XS.gets (M.elems . xpads)
+    padsExist <- runInHS $ withWindowSet $ \wset ->
+      catMaybes <$> mapM (runQuery xpad) (W.allWindows wset)
+    let pads = [pad | pad <- padsAll, any ((==) (spName pad) . spName) padsExist]
+    res <- withFocii $ \_ w ->
+      fmap (\x -> drop 1 . dropWhile ((/=) (spName x) . spName)) <$> runQuery xpad w
+    case fromMaybe id res pads of
+      npad:_ -> togglePadNoCreate (spName npad)
+      _      -> minimizeScratchpads pads
+-}
+
 -- * Hooks
 
 scratchpadsStartupHook :: [Scratchpad] -> HS ()
 scratchpadsStartupHook pads = do
   mapM_ (`dynPadSet'` Nothing) pads
-
--- * ManageHooks
 
 managePads :: MaybeManageHook
 managePads = xpad >>= flip whenJust' padManageHook
@@ -155,7 +156,7 @@ xpad' = go
     go [] = return Nothing
 
 {-
--- * Dynamic
+-- * Dynamic scratchpads
 
 dynUpdateFocusedWindow :: ScratchpadId -> "Set ad-hoc scratchpad with focused window" :? HS ()
 dynUpdateFocusedWindow k = cmdT $ dynPadToggleFocused k
@@ -169,7 +170,7 @@ dynPadToggleFocused k = do
 dynPadSet :: ScratchpadId -> Maybe Window -> H ()
 dynPadSet k w = do
     old <- runInHS $ dynPadCurrent k
-    runInHS $ XS.modify $ \s -> s { dynWins = M.alter (const $ fmap (\x -> x.river_window) w) k (dynWins s) }
+    runInHS $ XS.modify $ \s -> s { dynWins = M.alter (const $ fmap (.river_window) w) k (dynWins s) }
     runInHS $ forM_ old (`withWindow` toggleWindow (Just True) idHook)
     whenJust w (\_ -> togglePadNoCreate k)
 
@@ -199,7 +200,7 @@ dynDefaultPrompt rpc k = do
 
     Nothing -> return ()
 
--- * Misc.
+-- * Utils
 
 currentWindows :: W.StackSet i l a wd sid sd -> [a]
 currentWindows = W.integrate' . W.stack . W.workspace . W.current
@@ -215,8 +216,7 @@ asWindows cur = do
   wins <- use _windows
   return [w | rw <- cur, Just w <- [M.lookup rw wins]]
 
---
--- -- * Prompts & completion
---
+-- * Prompts & completion
+
 -- -- scratchpadCompl :: [Scratchpad] -> XP.ComplFunction
 -- scratchpadCompl xpc pads = XP.mkComplFunFromList' xpc (map spName pads)

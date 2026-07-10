@@ -70,4 +70,4 @@
         };
       };
     };
-  } // rec { src = pkgs.lib.mkDefault .././waybar-cffi-hs; }
+  } // rec { src = pkgs.lib.mkDefault ../waybar-cffi-hs; }

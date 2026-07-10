@@ -18,10 +18,13 @@ import           System.Log.FastLogger
 
 -- | Main entrypoint settings.
 data MainRun w = MainRun
-  { mainLogFile   :: w ::: Maybe FilePath <#> "o" <?> "Send logs to a file. If empty, a default file is used. If \"-\" the log output is sent to stdout."
-  , mainLogLevel  :: w ::: LogLevel       <#> "l" <?> "Log level (one of debug, info, warn or error)" <!> "debug"
-  , mainStateFile :: w ::: Maybe FilePath <#> "f" <?> "State file to read on restart."
+  { mainLogLevel  :: w ::: Last LogLevel <#> "l" <?> "Log level (one of debug, info, warn or error)" <!> "debug"
+  , mainLogFile   :: w ::: Last FilePath <#> "o" <?> "Send logs to a file. If empty, a default file is used. If \"-\" the log output is sent to stdout."
+  , mainStateFile :: w ::: Last FilePath <#> "f" <?> "State file to read on restart."
   } deriving (Generic)
+
+deriving instance Eq (MainRun Unwrapped)
+deriving instance Show (MainRun Unwrapped)
 
 -- | Read the program arguments.
 parseMainArgs :: IO (MainRun Unwrapped)
@@ -30,9 +33,9 @@ parseMainArgs = unwrapRecord "hswm"
 -- | Defaults defined via 'Default'
 instance Default (MainRun Unwrapped) where
   def = MainRun
-    { mainLogFile = Nothing
-    , mainLogLevel = LevelDebug
-    , mainStateFile = Nothing
+    { mainLogLevel = pure LevelDebug
+    , mainLogFile = mempty
+    , mainStateFile = mempty
     }
 
 -- | Field modifiers: drop the @main@ prefix, use @-@ as word separator.
@@ -51,7 +54,7 @@ instance ParseRecord (MainRun Wrapped) where
 -- * Logging
 
 mkMainLogger :: MainRun Unwrapped -> IO LoggerSet
-mkMainLogger main = case main.mainLogFile of
+mkMainLogger main = case getLast main.mainLogFile of
     Just dst | dst == "-" || dst == "/dev/stdout" -> newStdoutLoggerSet defaultBufSize
     Just dst -> newFileLoggerSet defaultBufSize dst
     Nothing -> newFileLoggerSet defaultBufSize =<< defaultLogFile
@@ -68,6 +71,7 @@ instance ParseField LogLevel where
     "info"  -> Just LevelInfo
     "error" -> Just LevelError
     "warn"  -> Just LevelWarn
+    "warning" -> Just LevelWarn
     _       -> Nothing
 instance ParseFields LogLevel
 instance ParseRecord LogLevel where

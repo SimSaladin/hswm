@@ -63,4 +63,4 @@
         hsSourceDirs = [ "src" ];
       };
     };
-  } // rec { src = pkgs.lib.mkDefault .././hs-bindgen-hooks; }
+  } // rec { src = pkgs.lib.mkDefault ../hs-bindgen-hooks; }

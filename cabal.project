@@ -1,38 +1,37 @@
-index-state: 2026-06-04T23:15:22Z
-optimization: False
-verbose: 0
-jobs: $ncpus
+index-state: 2026-07-10T00:04:30Z
 
 packages:
-  ./hs-bindgen-hooks
-  ./haskell-wayland-core
-  ./hswm
-  ./hswm-bindings
-  ./pixman-bindings
-  ./waybar-cffi-hs
-  ./xkbcommon-bindings
+  hswm
+  hswm-bindings
+  waybar-cffi-hs
+  haskell-wayland-core
+  pixman-bindings
+  xkbcommon-bindings
+  hs-bindgen-hooks
+
+jobs: $ncpus
+verbose: 0
 
 -- local packages only
 executable-stripping: True
 library-stripping: True
 
-documentation: True
+-- documentation: True
 haddock-html: True
 haddock-hoogle: True
 haddock-quickjump: True
 haddock-hyperlink-source: True
 haddock-use-unicode: True
 
--- for all packages
-package *
-   documentation: True
-
 -- haskell.nix only supports imports when they end in .cabal:
 -- https://github.com/input-output-hk/haskell.nix/issues/2144
 import: project-cabal/hs-bindgen.cabal
 import: project-cabal/cabal-3.17.cabal
 
+--
 -- Temporary relaxes for GHC 9.14.1
+--
+
 if impl(ghc >= 9.14)
   allow-newer: debruijn-0.3.1:base
   allow-newer: cairo-0.13.12.0:time
@@ -44,3 +43,5 @@ if impl(ghc >= 9.14)
   allow-newer: skew-list-0.1:base
   allow-newer: typerep-map-0.7.0.0:base
   allow-newer: hs-bindgen:aeson
+
+write-ghc-environment-files: never

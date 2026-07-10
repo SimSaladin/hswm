@@ -51,10 +51,11 @@
         buildable = true;
         modules = [
           "C/Expr/Parse/Expr"
+          "C/Expr/Parse/Identifier"
           "C/Expr/Parse/Infra"
           "C/Expr/Parse/Literal"
-          "C/Expr/Parse/Name"
           "C/Expr/Syntax/Expr"
+          "C/Expr/Syntax/Identifier"
           "C/Expr/Syntax/Literal"
           "C/Expr/Syntax/Name"
           "C/Expr/Syntax/TTG"

@@ -1,7 +1,5 @@
-{-# LANGUAGE DefaultSignatures    #-}
 {-# LANGUAGE RoleAnnotations      #-}
 {-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE ViewPatterns         #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 -- |
@@ -35,9 +33,6 @@ module WL.Util
 
   -- * wl_list
   List(..),
-  ListOf(..),
-  SomeList,
-  IsListContainer(..),
   IsListItem(..),
   listNew,
   listFromList,
@@ -78,7 +73,6 @@ import           Data.Coerce
 import           Data.Default
 import qualified Data.Fixed as F
 import           Data.Hashable (Hashable)
-import           Data.Kind
 import           Data.Proxy
 import           Foreign
 import           Foreign.C.ConstPtr
@@ -175,124 +169,105 @@ instance Default Wl_list where
 --   ...
 --
 -- instance CF.HasCField MyList "link" where
--- 
 --   type CFieldType MyList "link" = Wl_list
--- 
 --   offset# _ _ = ...
---
 -- @
-newtype List (a :: Type) = List { unwrap :: Ptr Wl_list }
+newtype List (a :: k) = List { unwrap :: Ptr Wl_list }
   deriving stock (Eq, Ord, Show, Generic)
   deriving newtype (Storable, NFData, Hashable)
 
-newtype ListOf (a :: Type) = ListOf { unListOf :: Ptr a }
-  deriving stock (Eq, Ord, Show, Generic)
-  deriving newtype (Storable, NFData, Hashable)
+type role List nominal
 
-type role List   nominal
-type role ListOf nominal
+-- | Class of list items that have a link item for use with wl_list
+class Storable a => IsListItem a where
+  -- | Pointer to the link field.
+  listFromListItem :: Ptr a -> List a
 
-class IsListItem a where
-  toListItemLink   :: Ptr a -> Ptr Wl_list
-  fromListItemLink :: Ptr Wl_list -> Ptr a
+  -- | Item beginning address from link field.
+  listItemFromList :: List a -> Ptr a
 
-instance (sy ~ "link", CF.HasCField a sy, CF.CFieldType a sy ~ Wl_list) => IsListItem a where
-  toListItemLink = CF.fromPtr (Proxy @"link")
-  fromListItemLink p = castPtr p `plusPtr` (- CF.offset (Proxy @a) (Proxy @"link"))
+-- | Anything with C field @"link"@ of type 'List' can be used as wl_list item
+instance (Storable a, sy ~ "link", CF.HasCField a sy, CF.CFieldType a sy ~ List a) => IsListItem a where
+  listFromListItem = List . castPtr . CF.fromPtr (Proxy @"link")
+  listItemFromList (List p) = castPtr p `plusPtr` (- CF.offset (Proxy @a) (Proxy @"link"))
 
-class IsListContainer list a where
-  toListContainer :: list a -> ListOf a
-  default toListContainer :: (list ~ ListOf) => list a -> ListOf a
-  toListContainer = id
-
-  fromListContainer :: ListOf a -> list a
-  default fromListContainer :: (list ~ ListOf) => ListOf a -> list a
-  fromListContainer = id
-
-  toListLink :: list a -> List a
-  default toListLink :: (list ~ List) => list a -> List a
-  toListLink = id
-
-  fromListLink :: List a -> list a
-  default fromListLink :: (list ~ List) => List a -> list a
-  fromListLink = id
-
-instance IsListItem a => IsListContainer List a where
-  toListContainer   = ListOf . fromListItemLink @a . (.unwrap)
-  fromListContainer = List . toListItemLink @a . unListOf
-
-instance IsListItem a => IsListContainer ListOf a where
-  toListLink   = fromListContainer
-  fromListLink = toListContainer
-
-type SomeList t a = (IsListContainer t a, IsListItem a)
-
-listNew :: (MonadIO m, SomeList List a) => m (List a)
+-- | Allocate and initialize a new @wl_list@
+listNew :: MonadIO m => m (List a)
 listNew = liftIO $ do
   list <- List <$> malloc
   listInit list
   return list
 
-listInit :: (MonadIO m, SomeList list a) => list a -> m ()
-listInit (toListLink -> List ls) = liftIO $ U.wl_list_init ls
-
--- | Number of items in the list.
---
--- O(n)
-listLength :: (MonadIO m, SomeList list a) => list a -> m Int
-listLength (toListLink -> List ls) = liftIO $ fromIntegral <$> U.wl_list_length (ConstPtr ls)
+-- | @'U.wl_list_init'@
+listInit :: MonadIO m => List a -> m ()
+listInit (List ls) = liftIO $ U.wl_list_init ls
 
 -- | Is the list empty?
 --
 -- O(1)
-listEmpty :: (MonadIO m, SomeList list a) => list a -> m Bool
-listEmpty (toListLink -> List ls) = liftIO $ (== 1) <$> U.wl_list_empty (ConstPtr ls)
+listEmpty :: (MonadIO m) => List a -> m Bool
+listEmpty (List ls) = liftIO $ (== 1) <$> U.wl_list_empty (ConstPtr ls)
+
+-- | Number of items in the list.
+--
+-- O(n)
+listLength :: MonadIO m => List a -> m Int
+listLength (List ls) = liftIO $ fromIntegral <$> U.wl_list_length (ConstPtr ls)
+
+-- ** Insert
 
 -- | Insert the element after the current index.
-listInsert :: (MonadIO m, SomeList list a) => list a -> Ptr a -> m ()
-listInsert (toListLink -> List ls) = liftIO . U.wl_list_insert ls . toListItemLink
+listInsert :: (MonadIO m, IsListItem a) => List a -> Ptr a -> m ()
+listInsert (List ls) x = liftIO $ U.wl_list_insert ls (listFromListItem x).unwrap
 
-listInsertMany :: (MonadIO m, SomeList list a) => list a -> [Ptr a] -> m ()
-listInsertMany (toListLink -> List ls) = liftIO . mapM_ (U.wl_list_insert ls . toListItemLink)
-
--- | Remove the element from the list.
-listRemove :: (MonadIO m, SomeList list a) => list a -> m ()
-listRemove (toListContainer -> ListOf p) = liftIO $ U.wl_list_remove $ toListItemLink p
+listInsertMany :: (MonadIO m, IsListItem a) => List a -> [Ptr a] -> m ()
+listInsertMany ls = mapM_ (listInsert ls)
 
 -- | Insert a list to a list.
 --
 -- The other list is in an invalid state after this operation.
-listInsertList :: (MonadIO m, SomeList l a, SomeList l' a) => l a -> l' a -> m ()
-listInsertList (toListLink -> List ls) (toListLink -> List other) = liftIO $ U.wl_list_insert_list ls other
+listInsertList :: (MonadIO m) => List a -> List a -> m ()
+listInsertList (List ls) (List other) = liftIO $ U.wl_list_insert_list ls other
 
-listFromList :: (MonadUnliftIO m, SomeList List a, Storable a) => [a] -> m (List a)
+-- ** Remove
+
+-- | Remove the element from the list.
+listRemove :: (MonadIO m) => List a -> m ()
+listRemove (List ls) = liftIO $ U.wl_list_remove ls
+
+-- ** From/to Haskell list
+
+listFromList :: (MonadUnliftIO m, IsListItem a) => [a] -> m (List a)
 listFromList xs = do
   l <- listNew
   bracketOnError (liftIO $ newArray xs) (liftIO . free) $ \p ->
     listInsertMany l [ p `advancePtr` i | i <- [ length xs - 1, length xs - 2 .. 0 ] ]
   return l
 
-listToList :: (MonadIO m, SomeList list a, Storable a) => list a -> m [a]
-listToList (toListLink -> top) = listIterWith listSeekForward (== top) (\(ListOf p) -> liftIO $ peek p) top
+listToList :: (MonadIO m, IsListItem a) => List a -> m [a]
+listToList ls = liftIO $ listIterWith listSeekForward (== ls) peek ls
 
-listIterWith :: (MonadIO m, SomeList list a)
-             => (List a -> m (List a)) -- ^ Seek list
-             -> (List a -> Bool) -- ^ End condition
-             -> (ListOf a -> m b) -- ^ Perform action on item
-             -> list a
-             -> m [b]
-listIterWith seek condEnd act (toListLink -> top) = go =<< seek top
+-- ** Iterate wl_list
+
+listIterWith
+  :: (MonadIO m, IsListItem a)
+  => (List a -> m (List a)) -- ^ Seek
+  -> (List a -> Bool) -- ^ End condition
+  -> (Ptr a -> m b) -- ^ Action
+  -> List a -- ^ The list
+  -> m [b]
+listIterWith seek condEnd act top = go =<< seek top
    where
      go pos | condEnd pos = return []
             | otherwise = do
-                x <- act (toListContainer pos)
+                x <- act (listItemFromList pos)
                 fmap (x :) $ go =<< seek pos
 
 listSeekForward :: MonadIO m => List a -> m (List a)
-listSeekForward (List l) = liftIO $ List . next <$> peek l
+listSeekForward (List l) = liftIO $ List . (.next) <$> peek l
 
 listSeekBackward :: MonadIO m => List a -> m (List a)
-listSeekBackward (List l) = liftIO $ List . prev <$> peek l
+listSeekBackward (List l) = liftIO $ List . (.prev) <$> peek l
 
 -- * Fixed
 

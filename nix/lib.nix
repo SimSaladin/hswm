@@ -1,56 +1,64 @@
-top@{ project-lib, ... }:
+{ lib, ... }:
 
 let
   materializedRoot = ./. + "./materialized";
   materializedDest = "./nix/materialized";
 
-  make-project-lib = { pkgs, ... }: {
-    # Work around haskell.nix not handling sources imported in
-    # cabal.project
-    fixCabalProjectImports =
-      { src
-      , cabalProjectFile ? "./cabal.project"
-      }:
-      pkgs.runCommand "src" { } ''
-        cp -r --no-preserve=mode ${src} $out
-        cd $out
-        while IFS=$'\n' read -r line; do
-          if [[ $line = import:* ]]; then
-            read -r _ uri <<< "$line"
-            if [[ $uri != http://* ]] && [[ $uri != https://* ]]; then
-              cat "$uri"
-              rm -f "$uri"
-              continue
-            fi
-          fi
-          echo "$line"
-        done <${cabalProjectFile} >>cabal.project.new
-        mv -v cabal.project.new ${cabalProjectFile}
-      '';
+  make-project-lib = { pkgs, ... }:
+    let
+      self = {
 
-    materialized-do = { project, key }: ''
-      ${project.plan-nix.passthru.generateMaterialized} ${toString (materializedDest + "/${key}")}
-    '';
-  };
+        materializedFor = key:
+          let dir = materializedRoot + "/${key}"; in
+          if builtins.pathExists (dir + "/default.nix") then dir else null;
+
+        materialized-do =
+        { project, key, what ? "generateMaterialized" }:
+        ''
+          ${project.plan-nix.passthru.${what}} ${toString (materializedDest + "/${key}")}
+        '';
+
+        materialized-do-all = args:
+        lib.concatMapStringsSep "\n" (x: self.materialized-do (args // x));
+
+        # Work around haskell.nix not handling sources imported in
+        # cabal.project
+        fixCabalProjectImports =
+          { src
+          , cabalProjectFile ? "./cabal.project"
+          }:
+          pkgs.runCommand "src" { } ''
+            cp -r --no-preserve=mode ${src} $out
+            cd $out
+            res=$(mktemp)
+            while IFS=$'\n' read -r line; do
+              if [[ $line = import:* ]]; then
+                read -r _ uri <<< "$line"
+                if [[ $uri != http://* ]] && [[ $uri != https://* ]] && [[ -r $uri ]]; then
+                  cat "$uri"
+                  rm -f "$uri"
+                  continue
+                fi
+              fi
+              echo "$line"
+            done <${cabalProjectFile} >>"$res"
+            mv -v "$res" ${cabalProjectFile}
+          '';
+
+      };
+    in
+    self;
 in
 {
-  _module.args.project-lib = {
-    materializedFor = key:
-      let dir = materializedRoot + "/${key}"; in
-      if builtins.pathExists (dir + "/default.nix") then dir else null;
-  };
-
-  flake.overlays.project-lib = final: _: {
-    project-lib = project-lib // make-project-lib { pkgs = final; };
-  };
-
   perSystem = { pkgs, ... }: {
-    _module.args.project-lib = top.project-lib // make-project-lib { inherit pkgs; };
+    _module.args.project-lib = pkgs.project-lib;
 
     legacyPackages = {
       inherit (pkgs) project-lib;
-      inherit (pkgs) haskell-nix;
-      inherit (pkgs.haskell-nix) haskellLib;
     };
+  };
+
+  flake.overlays.project-lib = final: _: {
+    project-lib = make-project-lib { pkgs = final; };
   };
 }

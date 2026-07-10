@@ -12,13 +12,13 @@ import           Data.Ratio ((%))
 import qualified Data.Set as S
 import           Data.Time.Clock.System
 import           System.Environment (executablePath)
+import qualified System.FilePath as FP
 import           System.IO (hGetContents, hPrint, writeFile)
+import           System.IO.Error
+import           System.Log.FastLogger (flushLogStr)
 import qualified System.Posix as Posix
 import           System.Posix.Process (executeFile)
 import           Text.Printf
-import   qualified System.FilePath as FP
-import System.Log.FastLogger (flushLogStr)
-import System.IO.Error
 
 -- * Misc. pure operations
 
@@ -31,11 +31,11 @@ pointScreen x y = withWindowSet $ return . L.find point . W.screens
 
 -- * Manage tasks that defer to next manage sequence
 
-manageReveal, manageHide :: RiverWindow -> HS ()
-manageReveal = flip modifyWindow $ pSetVisible ?~ True
-manageHide   = flip modifyWindow $ pSetVisible ?~ False
+manageReveal, manageHide :: SomeWindow a => a -> HS ()
+manageReveal = doRender WRReveal
+manageHide   = doRender WRHide
 
-manageKill :: Window -> HS ()
+manageKill :: SomeWindow a => a -> HS ()
 manageKill = doManage WRequestClose
 
 -- |
@@ -54,37 +54,46 @@ tileWindow placeTop sw r = do
         let least x | x <= bw * 2 = 1
                     | otherwise   = x - bw * 2
         R.riverWindowProposeDimensions w.river_window (least $ fi r.size.width) (least $ fi r.size.height)
-        modifyWindow rw $ \w' -> w'
-            & pRenderPos ?~ Position (fi r.position.x + bw) (fi r.position.y + bw)
-            & pRenderPlaceTop ?~ placeTop
+        doRender (WRPosition $ Position (fi r.position.x + bw) (fi r.position.y + bw)) rw
+        doRender (if placeTop then WRPlaceTop else WRPlaceBottom) rw
       Just ro -> do
         sid <- pointScreen r.position.x r.position.y
         mo <- lookupOutputBy (\x -> Just x.screen == fmap W.screen sid)
         case mo of
             Just o
-              | ro == o.river_output -> modifyWindow rw $ \w' -> w'
-                  { p_render_place_top = Just placeTop }
+              | ro == o.river_output -> doRender (if placeTop then WRPlaceTop else WRPlaceBottom) rw
               | otherwise -> do
                 -- need to change the output where the window is fullscreened
                 R.riverWindowFullscreen rw o.river_output
-                modifyWindow rw $ \x -> x
-                  & pRenderPlaceTop ?~ placeTop
-                  & fullscreen ?~ o.river_output
-                  & position .~ o.position
-                  & size .~ o.size
+                modifyWindow rw $
+                  fullscreen ?~ o.river_output &+
+                  position .~ o.position &+
+                  size .~ o.size
+                doRender (if placeTop then WRPlaceTop else WRPlaceBottom) rw
             Nothing -> return ()
 
-manageWindowPlaceTop :: SomeWindow a => a -> Bool -> HS ()
-manageWindowPlaceTop sw top = modifyWindow sw $ pRenderPlaceTop ?~ top
+windowPlaceTop :: SomeWindow a => a -> HS ()
+windowPlaceTop = doRender WRPlaceTop
 
+windowPlaceBottom :: SomeWindow a => a -> HS ()
+windowPlaceBottom = doRender WRPlaceBottom
+
+-- | Set the window border color
 manageWindowBorder :: SomeWindow a => a -> RiverColor -> HS ()
-manageWindowBorder sw rc = modifyWindow sw $ pRenderBorder ?~ rc
+manageWindowBorder sw rc = do
+  modifyWindow sw $ borderColor ?~ rc
+  doRender WRBorder sw
 
 manageWindowBorderWidth :: SomeWindow a => a -> Maybe Int32 -> HS ()
-manageWindowBorderWidth sw bw = modifyWindow sw $ wBorderWidth .~ bw
+manageWindowBorderWidth sw bw = do
+  modifyWindow sw $ wBorderWidth .~ bw
+  doRender WRBorder sw
 
 doManage :: SomeWindow a => WindowManageAction -> a -> HS ()
 doManage a sw = modifyWindow sw $ pManageAction <>~ [a]
+
+doRender :: SomeWindow a => WindowRenderAction -> a -> HS ()
+doRender a sw = modifyWindow sw $ pendingRender <>~ [a]
 
 ----------------------------------------------------------------------------------
 -- * Operations not tied to manage/render phases
@@ -169,8 +178,7 @@ setTopFocus' rw = mapSeats $ \s -> do
       -- FIXME: when focusing a newly created window, we end up here when w.x and w.y are still 0.
       -- The position is updated a bit later by the WindowDimensions event.
       when (s.suppressChangeFocus <= 0 && w ^. size /= Size 0 0) $ do
-          -- modifySeat s.river_seat $ \x -> x {focused = rw}
-          let Position x' y' = fromMaybe w.position w.p_render_pos
+          let Position x' y' = fromMaybe w.position $ listToMaybe [ pos | WRPosition pos <- w.pendingRender ]
               px = x' + (fi w.size.width `div` 2)
               py = y' + (fi w.size.height `div` 2)
           --logDebug $ "seat: pointer warp" :# [ "dest" .= (px, py), "seat" .= s.name, "window" .= show w.river_window ]

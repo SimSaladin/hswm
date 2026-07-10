@@ -272,7 +272,6 @@
         hspec-expectations.revision = import ./cabal-files/hspec-expectations.nix;
         pretty.revision = hackage.pretty."1.1.3.6".revisions.default;
         hackage-security.revision = import ./cabal-files/hackage-security.nix;
-        hackage-security.flags.lukko = false;
         hackage-security.flags.cabal-syntax = true;
         zlib.revision = import ./cabal-files/zlib.nix;
         zlib.flags.bundled-c-zlib = false;

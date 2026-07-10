@@ -37,16 +37,16 @@
   };
 
   outputs = inputs@{ ... }: inputs.flake-parts.lib.mkFlake { inherit inputs; }
-  (top@{ self, project-lib, ... }: {
+  ({ self, ... }: {
 
     # Materialization: nix run .#materialized-do
     _module.args.checkMaterialization = false;
 
     imports = [
       ./nix/lib.nix
-      ./nix/cabal.nix
-      ./nix/hs-bindgen.nix
       ./nix/river-module.nix
+      ./nix/cabal-master.nix
+      ./nix/hs-bindgen.nix
       ./nix/project.nix
     ];
 
@@ -54,24 +54,22 @@
 
     debug = true;
 
-    perSystem = { self', system, lib, config, pkgs, haskellNixModules, project-lib, checkMaterialization, ... }@perSystemArgs:
-    let
-      overlays = [
-        inputs.haskellNix.overlay
-        self.overlays.river
-        self.overlays.hs-bindgen
-        self.overlays.cabal-unreleased
-        self.overlays.project-lib
-        self.overlays.project
-      ];
-    in
+    perSystem = { system, lib, ... }:
     {
       _module.args.pkgs = import inputs.nixpkgs {
-        inherit system overlays;
+        inherit system;
+        overlays = [
+          inputs.haskellNix.overlay
+          self.overlays.river
+          self.overlays.cabal-master
+          self.overlays.hs-bindgen
+          self.overlays.project-lib
+          self.overlays.project
+        ];
         config = lib.recursiveUpdate inputs.haskellNix.config {
            problems.handlers = {
-             monad-logger-aeson.broken = "warn";
-             Cabal-hooks.broken = "warn"; # or "ignore"
+             #monad-logger-aeson.broken = "warn";
+             #Cabal-hooks.broken = "warn"; # or "ignore"
            };
          };
       };

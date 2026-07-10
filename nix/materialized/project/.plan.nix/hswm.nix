@@ -146,6 +146,6 @@
         };
       };
     };
-  } // rec { src = pkgs.lib.mkDefault .././hswm; }) // {
+  } // rec { src = pkgs.lib.mkDefault ../hswm; }) // {
     cabal-generator = "hpack";
   }

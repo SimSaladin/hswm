@@ -1,47 +1,50 @@
-{
-  src,
-  depsHash ? "",
-  lib,
-  stdenv,
-  libGL,
-  libx11,
-  libevdev,
-  libinput,
-  libxkbcommon,
-  pixman,
-  pkg-config,
-  scdoc,
-  udev,
-  versionCheckHook,
-  wayland,
-  wayland-protocols,
-  wayland-scanner,
-  wlroots_0_20,
-  xwayland,
-  zig_0_16,
-  withManpages ? true,
-  xwaylandSupport ? true,
-  withDebug ? false,
-  useLLVM ? true,
-  runCommand,
-  callZon2Nix,
+{ src
+, depsHash ? ""
+, lib
+, stdenv
+, libGL
+, libx11
+, libevdev
+, libinput
+, libxkbcommon
+, pixman
+, pkg-config
+, scdoc
+, udev
+, versionCheckHook
+, wayland
+, wayland-protocols
+, wayland-scanner
+, wlroots_0_20
+, xwayland
+, zig_0_16
+, mkZon2nixPkgs
+, withManpages ? true
+, xwaylandSupport ? true
+, withDebug ? false
+, useLLVM ? stdenv.hostPlatform.isLinux || (stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isx86_64)
+, runCommand
 }:
 let
 
-  version = lib.fileContents (runCommand "get-version" { } ''
-    sed -n '/\.version =/s/^[^"]*"\(.*\)".*$/\1/p' ${src}/build.zig.zon >$out
+  # read version string from build.zig.zon
+  zonVersion = lib.fileContents (runCommand "get-version" { } ''
+    sed -nE '/\.version =/s/^.*?"(.+-dev|.+)".*$/\1/p' ${src}/build.zig.zon >$out
   '');
 
-  suffix = "-g${src.sourceInfo.shortRev}+${lib.substring 0 8 src.sourceInfo.lastModifiedDate}";
+  versionSuffix = lib.concatStrings (
+    (lib.optional (src ? sourceInfo && src.sourceInfo ? lastModifiedDate) "+${lib.substring 0 8 src.sourceInfo.lastModifiedDate}")
+    ++ (lib.optional (src ? sourceInfo && src.sourceInfo ? shortRev) "-g${src.sourceInfo.shortRev}")
+  );
 in
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "river";
-  version = version + suffix;
+  version = zonVersion + versionSuffix;
 
   outputs = [ "out" ] ++ lib.optionals withManpages [ "man" ];
 
-  inherit src;
+  src = builtins.toPath src;
 
   postPatch = ''
     sed -i '/\.version =/s/".*"/"${finalAttrs.version}"/' build.zig.zon
@@ -49,9 +52,8 @@ stdenv.mkDerivation (finalAttrs: {
 
   strictDeps = true;
 
-  deps = callZon2Nix {
-    name = finalAttrs.pname;
-    inherit (finalAttrs) src;
+  deps = mkZon2nixPkgs {
+    inherit (finalAttrs) src pname;
     outputHash = depsHash;
   };
 
@@ -79,30 +81,14 @@ stdenv.mkDerivation (finalAttrs: {
     libx11
   ];
 
-  preBuild = ''
-    mkdir -p .zig-pkgs
-    pushd .zig-pkgs
-    for pkg in ${finalAttrs.deps}/*; do
-      name=$(basename "$pkg")
-      pkg=$(readlink -f $pkg)
-      if [[ -d $pkg ]]; then
-        cp -r --no-preserve=all "$pkg" ./"$name"
-      else
-        tar xf "$pkg"
-      fi
-    done
-    ls -la . */
-    popd
-  '';
-
   zigBuildFlags = [
     "--system"
-    ".zig-pkgs"
+    finalAttrs.deps
   ]
-  ++ lib.optional (!withDebug) "-Dstrip"
-  ++ lib.optional useLLVM "-Dllvm"
   ++ lib.optional withDebug "-Doptimize=Debug"
   ++ lib.optional (!withDebug) "-Doptimize=ReleaseFast"
+  ++ lib.optional (!withDebug) "-Dstrip"
+  ++ lib.optional useLLVM "-Dllvm"
   ++ lib.optional withManpages "-Dman-pages"
   ++ lib.optional xwaylandSupport "-Dxwayland";
 
@@ -115,7 +101,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru = {
     providedSessions = [ "river" ];
-    #updateScript = ./update.sh;
   };
 
   meta = {

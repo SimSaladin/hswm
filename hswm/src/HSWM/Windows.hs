@@ -1,21 +1,23 @@
 {-# LANGUAGE MultiWayIf #-}
-{-# OPTIONS_GHC -Wno-ambiguous-fields #-}
 {-# OPTIONS_GHC -Wno-name-shadowing #-}
-
 
 -- |
 -- Module      : HSWM.Windows
--- Description : Short description
+-- Description : Window handling
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
---
--- Longer description of this module.
-module HSWM.Windows where
+module HSWM.Windows
+  ( manage
+  , render
+  , handleEvent
+  , added
+  , finishRecovery
+  ) where
 
-import           HSWM.Core
+import           HSWM.Core hiding (handleEvent)
 import           HSWM.Operations
 import qualified HSWM.StackSet as W
 
@@ -25,15 +27,18 @@ import qualified River as R
 import qualified Data.List as L
 import qualified Data.Map as M
 
-modifyW :: (MonadIO m, MonadThrow m, MonadReader HConf m) => RiverWindow -> (Window -> Window) -> m ()
-modifyW w = runInHS . modifyWindow w
-
 added :: RiverWindow -> H ()
 added w = do
   -- Setup WL window listener
   withObject $ WL.listenerAdd_ w
   node <- R.riverWindowGetNode w
-  let win = def {new = True, river_window = w, node = node, maxHeight = maxBound, maxWidth = maxBound}
+  let win = def
+        { new = True
+        , river_window = w
+        , node = node
+        , maxHeight = maxBound
+        , maxWidth = maxBound
+        }
   -- Insert it into stack and state
   runInHS $ do
     alterWindow w (\_ -> Just win)
@@ -89,14 +94,13 @@ manage_ = do
       | w.closed -> doRemoveWindow w
       | w.new -> do
           setInitialManageProperties w
-          modifyWindow w.river_window (_new .~ False)
           mh <- view (config . manageHook)
           g <- appEndo <$> userCodeDefS mempty (runQuery mh w)
           windows g
-      | otherwise -> applyManageActions w w.p_manage_action >>= (`whenJust` (modifyWindow w.river_window . const))
+      | otherwise -> applyManageActions w w.p_manage_action >>= (`whenJust` (modifyWindow w . const))
 
+  ws  <- use windowset
   old <- use windowsetOld
-  ws <- use windowset
   let oldvisible = concatMap (W.integrate' . W.stack . W.workspace) $ W.current old : W.visible old
       newwindows = W.allWindows ws L.\\ W.allWindows old
 
@@ -148,7 +152,7 @@ manage_ = do
   mapM_ manageHide (L.nub (oldvisible ++ newwindows) L.\\ visible)
 
   whenJust (W.peek ws) $ \w -> do
-    manageWindowPlaceTop w True
+    windowPlaceTop w
     manageWindowBorder w =<< view (config . focusedBorder)
 
   mapM_ manageReveal visible
@@ -174,25 +178,16 @@ warpPointerToScreen sd sid = do
 render :: H ()
 render = runInHS $ do
   bwDef <- view (config . borderWidth)
+  borderDef <- view (config . normalBorder)
   mapWindows $ \w -> do
-    whenJust w.p_render_pos $ \(Position x y) -> unless w.minimized $ setWindowPosition w x y
-    whenJust w.p_render_border $ setWindowBorder w.river_window (fromMaybe bwDef w.wBorderWidth)
-    case w.p_render_place_top of
-        Just True  -> unless w.minimized $ R.riverNodePlaceTop w.node
-        Just False -> unless w.minimized $ R.riverNodePlaceBottom w.node
-        Nothing -> return ()
-    whenJust w.p_set_visible $ \viz ->
-      if viz
-        then unless w.minimized $ reveal w.river_window
-        else hide w.river_window
-    -- reset pending fields
-    modifyWindow w.river_window $ \s ->
-      s
-        { p_render_border = Nothing,
-          p_render_pos = Nothing,
-          p_render_place_top = Nothing,
-          p_set_visible = Nothing
-        }
+    forM_ w.pendingRender $ \case
+      WRPosition (Position x y) -> unless w.minimized $ setWindowPosition w x y
+      WRBorder -> setWindowBorder w.river_window (fromMaybe bwDef w.wBorderWidth) (fromMaybe borderDef w.borderColor)
+      WRPlaceTop -> unless w.minimized $ R.riverNodePlaceTop w.node
+      WRPlaceBottom -> unless w.minimized $ R.riverNodePlaceBottom w.node
+      WRHide -> hide w.river_window
+      WRReveal -> unless w.minimized $ reveal w.river_window
+    modifyWindow w.river_window $ \s -> s { pendingRender = [] }
 
 -- | /manage/
 setInitialManageProperties :: Window -> HS ()
@@ -200,8 +195,8 @@ setInitialManageProperties Window {river_window = rw} = do
   R.riverWindowUseSsd rw
   R.riverWindowSetCapabilities rw (mconcat [R.Maximize, R.Fullscreen])
   R.riverWindowSetTiled rw (mconcat [R.EdgeTop, R.EdgeBottom, R.EdgeLeft, R.EdgeRight])
-  nbc <- view (config . normalBorder)
-  modifyWindow rw $ \s -> s {new = False, p_render_border = Just nbc}
+  modifyWindow rw $ _new .~ False
+  doRender WRBorder rw
 
 doRemoveWindow :: Window -> HS ()
 doRemoveWindow w = do
@@ -248,7 +243,6 @@ handleEvent e = case e of
   R.RiverWindowIdentifier       _ rw uuid              -> modifyW rw (identifier .~ uuid) >> attemptWindowRecovery rw uuid
   R.RiverWindowDecorationHint   _ rw we_hint           -> modifyW rw $ decorationHint ?~ we_hint
   R.RiverWindowPresentationHint _ rw we_hint           -> modifyW rw $ presentationHint ?~ we_hint
-
   R.RiverWindowDimensionsHint   _ rw minWidth minHeight maxWidth maxHeight -> do
     modifyW rw $ \s -> s {minWidth, minHeight, maxWidth, maxHeight}
     fixedSizeAutoFloat rw minWidth minHeight maxWidth maxHeight
@@ -273,12 +267,16 @@ attemptWindowRecovery rw uuid = runInHS $ gets (M.lookup uuid . view recoveredWi
       modifyWindowSet $ W.mapWindow (\x -> if x == w then rw else x) . W.delete rw
       recoveredWindows %= M.delete uuid
 
--- auto-float fixed-size windows
-fixedSizeAutoFloat rw minWidth minHeight maxWidth maxHeight = do
-    let fixed = maxWidth > 0 && maxHeight > 0 && maxWidth == minWidth && maxHeight == minHeight
-    when fixed $ runInHS $
-      withWindow_ rw $ \w ->
-      modifyWindowSet $ \ws ->
-        W.float rw (centerRationalRect $ rationalRectIn
-              (Rectangle' w.position (Size (fi maxWidth) (fi maxHeight)))
-              (screenRect $ W.screenDetail $ W.current ws)) ws
+-- | Auto-float fixed-size windows
+fixedSizeAutoFloat :: RiverWindow -> Int32 -> Int32 -> Int32 -> Int32 -> H ()
+fixedSizeAutoFloat rw minWidth minHeight maxWidth maxHeight = when fixed $
+  runInHS $ withWindow_ rw $ \w ->
+    modifyWindowSet $ \ws ->
+      W.float rw (centerRationalRect $ rationalRectIn
+          (Rectangle' w.position (Size (fi maxWidth) (fi maxHeight)))
+          (screenRect $ W.screenDetail $ W.current ws)) ws
+  where
+    fixed = maxWidth > 0 && maxHeight > 0 && maxWidth == minWidth && maxHeight == minHeight
+
+modifyW :: (MonadIO m, MonadThrow m, MonadReader HConf m) => RiverWindow -> (Window -> Window) -> m ()
+modifyW w = runInHS . modifyWindow w

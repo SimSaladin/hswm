@@ -88,4 +88,4 @@
         };
       };
     };
-  } // rec { src = pkgs.lib.mkDefault .././xkbcommon-bindings; }
+  } // rec { src = pkgs.lib.mkDefault ../xkbcommon-bindings; }

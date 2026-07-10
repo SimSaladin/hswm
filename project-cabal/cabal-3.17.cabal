@@ -1,12 +1,11 @@
 -- vim: ft=cabalproject
 
--- Cabal, cabal-install 3.17 (unreleased)
+-- Cabal, cabal-install 3.17 (unreleased) @ Jul 9, 2026
 source-repository-package
   type: git
   location: https://github.com/haskell/cabal
   -- branch: master
-  tag: bc27d17d93851f78070be6f8ee0724f58168ee97
-  -- tag: 832789ea85297f0b5c3f92d63f8238eb3241614d
+  tag: 996d9e0d825516251b0995128ad074848f7dbefb
   subdir:
     Cabal
     Cabal-hooks
@@ -14,9 +13,7 @@ source-repository-package
     cabal-install
     cabal-install-solver
     hooks-exe
-  --sha256: 16sx9nl272ax7n292v7jqxwqzn5k2ipak99xd32q13702558rsp1
-
--- old 0x3rwmldnzzyi718h48ggm0630wiz2bbjgp2f3wpcvyqb46gxwcw
+  --sha256: 14pdms8xgizz4bjhbxls9y4sm8wid72l4pzyk8s73z015mf7ky90
 
 -- cabal-doctest fixed for Cabal-3.17
 source-repository-package

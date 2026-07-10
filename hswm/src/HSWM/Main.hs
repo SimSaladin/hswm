@@ -86,7 +86,7 @@ startHSWM mainRun config = do
     withLogging $ do
       let newEmpty = let wset = W.new conf.config.layoutHook config.workspaces [SD 0 0 0 0]
                       in def {windowset = wset, windowsetOld = wset}
-      st <- fromMaybe newEmpty <$> readStateFile mainRun.mainStateFile config
+      st <- fromMaybe newEmpty <$> readStateFile (getLast mainRun.mainStateFile) config
       atomically $ putTMVar conf._state st
 
     let runH' :: H a -> IO a

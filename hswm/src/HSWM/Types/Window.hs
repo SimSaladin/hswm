@@ -28,25 +28,25 @@ data Window = Window
   , position                 :: !Position
   , size                     :: !Size
   , title, appId, identifier :: !String
-    -- | Dimension hints
-  , minHeight, minWidth
-  , maxHeight, maxWidth :: !Int32
-  --, sizeMin, sizeMax :: !Size
   , parent                   :: !(Maybe RiverWindow)
   , unreliablePid            :: !(Maybe Int)
   , decorationHint           :: !(Maybe R.RiverWindowDecorationHint)
   , presentationHint         :: !(Maybe R.RiverOutputPresentationMode)
   , wBorderWidth             :: !(Maybe Int32)
+  , borderColor              :: !(Maybe R.RiverColor)
   , new                      :: !Bool
   , closed                   :: !Bool
   , minimized                :: !Bool
   , fullscreen               :: !(Maybe RiverOutput)
 
-  , p_manage_action          :: [WindowManageAction]
-  , p_render_border          :: Maybe R.RiverColor
-  , p_render_pos             :: Maybe Position
-  , p_render_place_top       :: Maybe Bool
-  , p_set_visible            :: Maybe Bool
+    -- | Dimension hints
+  , minHeight, minWidth, maxHeight, maxWidth :: !Int32
+
+  -- | Actions to perform in next manage phase
+  , p_manage_action :: [WindowManageAction]
+
+  -- | Actions to perform in next render phase
+  , pendingRender :: [WindowRenderAction]
 
     -- TODO: review below
   , pointer_move_requested         :: !RiverSeat
@@ -62,6 +62,15 @@ data WindowManageAction
   | WExitFullscreen
   | WToggleFullscreen
   | WRequestClose
+  deriving (Eq, Ord, Show, Generic)
+
+data WindowRenderAction
+  = WRPosition !Position
+  | WRBorder
+  | WRPlaceTop
+  | WRPlaceBottom
+  | WRHide
+  | WRReveal
   deriving (Eq, Ord, Show, Generic)
 
 -- * Lenses

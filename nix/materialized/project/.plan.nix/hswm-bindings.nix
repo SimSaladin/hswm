@@ -94,4 +94,4 @@
         };
       };
     };
-  } // rec { src = pkgs.lib.mkDefault .././hswm-bindings; }
+  } // rec { src = pkgs.lib.mkDefault ../hswm-bindings; }

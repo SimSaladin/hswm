@@ -75,4 +75,4 @@
         hsSourceDirs = [ "src" ];
       };
     };
-  } // rec { src = pkgs.lib.mkDefault .././haskell-wayland-core; }
+  } // rec { src = pkgs.lib.mkDefault ../haskell-wayland-core; }

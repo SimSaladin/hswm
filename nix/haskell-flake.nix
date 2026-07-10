@@ -1,5 +1,11 @@
 { inputs, ... }:
 
+
+    # for support "cabal-version: 3.14"
+    #cabal2nix-unwrapped = final.haskell.packages.ghc914.cabal2nix;
+
+    # For cabal pkg-config-depends: xkbregistry
+    #xkbregistry = final.libxkbcommon;
 {
   perSystem = { system, lib, config, pkgs, ... }@perSys:
       let

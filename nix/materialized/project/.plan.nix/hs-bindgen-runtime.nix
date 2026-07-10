@@ -75,6 +75,7 @@
           "HsBindgen/Runtime/Marshal"
           "HsBindgen/Runtime/Prelude"
           "HsBindgen/Runtime/PtrConst"
+          "HsBindgen/Runtime/Union"
         ];
         hsSourceDirs = [ "src" ];
       };

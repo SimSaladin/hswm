@@ -13,10 +13,10 @@
     # With debug enabled
     riverDebug = final.river.override { withDebug = true; };
 
-    # Different one than the one in nixpkgs
-    zon2nix = inputs.zon2nix.packages.${final.stdenv.hostPlatform.system}.zon2nix;
+    mkZon2nixPkgs = final.callPackage ./mk-zon2nix-pkgs.nix { };
 
-    callZon2Nix = final.callPackage ./callZon2nix.nix { };
+    # Note: different from the zon2nix in upstream nixpkgs!
+    zon2nix = inputs.zon2nix.packages.${final.stdenv.hostPlatform.system}.zon2nix;
   };
 
   perSystem = { pkgs, ... }: {

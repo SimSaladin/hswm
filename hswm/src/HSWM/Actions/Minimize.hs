@@ -60,8 +60,12 @@ import HSWM.Util.Minimize
 -- >        , ((modm .|. shiftMask, xK_m     ), withLastMinimized maximizeWindow)
 
 setMinimizedState :: RiverWindow -> Bool -> HS ()
-setMinimizedState win True = modifyWindow win $ \s -> s {minimized = True, p_set_visible = Just False}
-setMinimizedState win False = modifyWindow win $ \s -> s {minimized = False, p_set_visible = Just True}
+setMinimizedState win True = do
+  modifyWindow win $ \s -> s {minimized = True}
+  doRender WRHide win
+setMinimizedState win False = do
+  modifyWindow win $ \s -> s {minimized = False}
+  doRender WRReveal win
 
 setMinimized :: RiverWindow -> HS ()
 setMinimized win = setMinimizedState win True
