@@ -20,20 +20,21 @@ import           HSWM.Wayland
 
 import qualified River as R
 import qualified WL.Client as WL
-import qualified WL.ExtIdleNotify.Staging.V1.Client as Ext
+import qualified WL.ExtIdleNotify.Staging.V1.Client as EXT_IN
 
 import qualified Data.List as L
 
 -- | New seat added
+--
+-- - Add river_seat listener
+-- - Add layer_shell_seat listener
+-- - Add xkb_bindings_seat listener
 added :: RiverSeat -> H ()
 added rs = do
-  -- Add river_seat listener
-  withObject $ WL.listenerAdd_ rs
-  -- Add layer_shell_seat listener
   lss <- withObject $ flip R.riverLayerShellGetSeat rs
-  withObject $ \l -> WL.listenerAdd lss l rs
-  -- Add xkb_bindings_seat listener
   xbs <- withObject $ flip R.riverXkbBindingsGetSeat rs
+  withObject $ WL.listenerAdd_ rs
+  withObject $ \l -> WL.listenerAdd lss l rs
   withObject $ \l -> WL.listenerAdd xbs l rs
   let seat = def
         & _new .~ True
@@ -42,6 +43,14 @@ added rs = do
         & xkbBindingsSeat .~ xbs
   runInHS $ seatList %= (<> [seat])
 
+hasWlSeat :: RiverSeat -> WL.ObjectName -> H ()
+hasWlSeat seat name = do
+    wls   <- bindGlobalName @WL.Seat name Nothing
+    idlno <- withObject $ \idno -> EXT_IN.idleNotifierGetIdleNotification idno (10 * 60 * 1000) wls
+    withObject $ \l -> WL.listenerAdd wls l seat
+    withObject $ \l -> WL.listenerAdd idlno l seat
+    runInHS $ modifySeat seat $ wlSeat .~ wls &+ idleNotification .~ idlno
+
 deleteRemovedSeat :: Seat -> HS ()
 deleteRemovedSeat s = do
   seatList %= L.filter ((/= s.river_seat) . view riverSeat)
@@ -49,6 +58,10 @@ deleteRemovedSeat s = do
   forM_ s.pointer_bindings destroyPointerBinding
   io $ R.objectDestroy s.xkb_bindings_seat
   io $ R.objectDestroy s.river_layer_shell_seat
+  io $ R.objectDestroy s.idleNotification
+  io $ R.objectDestroy s.wlKeyboard
+  io $ R.objectDestroy s.wlPointer
+  io $ R.objectDestroy s.wlTouch
   io $ R.objectDestroy s.wl_seat
   io $ R.objectDestroy s.river_seat
 
@@ -59,80 +72,62 @@ modifySeat' ud = modifySeat (R.RiverSeat $ castPtr ud)
 
 handleEvent :: R.RiverSeatEvent -> H ()
 handleEvent = \case
-    R.RiverSeatPointerEnter _ seat window ->
-      runInHS $ withSeat_ seat $ \s -> do
-          logInfo $ "seat: pending pointer focus" :# [ "window" .= show window, "position" .= s.position ]
-          modifySeat seat $ hovered .~ window
-            &+ pendingPointerEnter ?~ (window, s.position)
-
-    R.RiverSeatPointerLeave _ seat ->
-      runInHS $ modifySeat seat $ hovered .~ def &+ pendingPointerEnter .~ Nothing
-
-    R.RiverSeatPointerPosition _ seat x y ->
-      runInHS $ modifySeat seat $ \s -> s {position = Position x y}
-
-    R.RiverSeatWindowInteraction _ seat window ->
-      runInHS $ modifySeat seat $ \s -> s {interacted = window}
-
-    R.RiverSeatOpDelta _ seat dx dy ->
-      runInHS $ modifySeat seat $ \s -> s {op_dx = fromIntegral dx, op_dy = fromIntegral dy}
-
-    R.RiverSeatOpRelease _ seat ->
-      runInHS $ modifySeat seat $ \s -> s {op_release = True}
-
-    R.RiverSeatWlSeat _ seat name -> do
-      wlseat <- bindGlobalName @WL.Seat name Nothing
-      withObject $ \l -> WL.listenerAdd wlseat l seat
-      -- Register idle notifier
-      idleN <- withObject $ \idleNotify -> Ext.idleNotifierGetIdleNotification idleNotify (10 * 60 * 1000) wlseat
-      withObject $ \l -> WL.listenerAdd idleN l seat
-
-    R.RiverSeatRemoved _ seat ->
-      runInHS $ withSeat_ seat deleteRemovedSeat
-
+    R.RiverSeatWlSeat _ seat name              -> hasWlSeat seat name
+    R.RiverSeatPointerEnter _ seat window      -> runInHS $ withSeat_ seat $ \s -> modifySeat seat $ hovered .~ window &+ pendingPointerEnter ?~ (window, s.position)
+    R.RiverSeatPointerLeave _ seat             -> runInHS $ modifySeat seat $ hovered .~ def &+ pendingPointerEnter .~ Nothing
+    R.RiverSeatPointerPosition _ seat x y      -> runInHS $ modifySeat seat $ position .~ Position x y
+    R.RiverSeatWindowInteraction _ seat window -> runInHS $ modifySeat seat $ interacted .~ window
+    R.RiverSeatOpDelta _ seat dx dy            -> runInHS $ modifySeat seat $ opDx .~ fi dx &+ opDy .~ fi dy
+    R.RiverSeatOpRelease _ seat                -> runInHS $ modifySeat seat $ opRelease .~ True
+    R.RiverSeatRemoved _ seat                  -> runInHS $ withSeat_ seat deleteRemovedSeat
     _ -> return ()
 
 handleWlSeatEvent :: WL.SeatEvent -> H ()
 handleWlSeatEvent e = case e of
-  WL.SeatName ud wls nm -> runInHS $ modifySeat' ud $ _name .~ nm &+ wlSeat .~ wls
-
-  WL.SeatCapabilities ud s sc -> do
-    runInHS $ modifySeat' ud $ caps .~ sc
-    forM_ (WL.parseSeatCapabilities sc) $ \case
+  WL.SeatName ud _ name -> runInHS $ modifySeat' ud $ _name .~ name
+  WL.SeatCapabilities ud wls seatCaps -> do
+    let individual = WL.parseSeatCapabilities seatCaps
+    upds <- forM individual $ \case
       WL.SeatCapabilityKeyboard -> do
-        wlkeyboard <- WL.seatGetKeyboard s
-        withObject $ WL.listenerAdd_ wlkeyboard
-        logDebug $ "seat: get keyboard" :# [ "seat" .= tshow s, "keyboard" .= tshow wlkeyboard ]
-
+        wlKbd <- WL.seatGetKeyboard wls
+        withObject $ WL.listenerAdd_ wlKbd
+        logDebug $ "Seat has capability: keyboard" :# [ "wl_seat" .= tshow wls, "wl_keyboard" .= tshow wlKbd ]
+        return $ wlKeyboard .~ wlKbd
       WL.SeatCapabilityPointer -> do
-        wlpointer <- WL.seatGetPointer s
-        withObject $ WL.listenerAdd_ wlpointer
-        logDebug $ "seat: got pointer" :# [ "seat" .= tshow s, "pointer" .= tshow wlpointer ]
-
+        wlPtr <- WL.seatGetPointer wls
+        withObject $ WL.listenerAdd_ wlPtr
+        logDebug $ "Seat has capability: pointer" :# [ "wl_seat" .= tshow wls, "wl_pointer" .= tshow wlPtr ]
+        return $ wlPointer .~ wlPtr
       WL.SeatCapabilityTouch -> do
-        logDebug $ "seat: got touch" :# [ "seat" .= tshow s ]
+        wltch <- WL.seatGetTouch wls
+        withObject $ WL.listenerAdd_ wltch
+        logDebug $ "Seat has capabality: touch" :# [ "wl_seat" .= tshow wls ]
+        return $ wlTouch .~ wltch
+      _ -> return id
+    runInHS $ modifySeat' ud $ foldl' (.) (caps .~ seatCaps) upds
 
-      _ -> return ()
-
+-- |
+-- Possible states:
+--
+-- - layer shell surface has exclusive focus
+--
+-- - layer shell surface wants non-exclusive focus
+--
+--    A layer shell surface will be given non-exclusive keyboard focus at the end
+--    of the manage sequence in which this event is sent. The window manager may want
+--    to update window decorations or similar to indicate that no window is focused.
+--
+-- - no layer shell surface has focus
+--
+--    No layer shell surface will have keyboard focus at the end
+--    of the manage sequence in which this event is sent. The window
+--    manager may want to return focus to whichever window last had focus, for example.
+--
 handleLayerShellSeat :: R.RiverLayerShellSeatEvent -> H ()
 handleLayerShellSeat e = case e of
-  -- layer shell surface has exclusive focus
-  R.RiverLayerShellSeatFocusExclusive ud _ ->
-    runInHS $ modifySeat' ud $ currentFocus %~ SFocusLayerShell True
-
-  -- layer shell surface wants non-exclusive focus
-  -- A layer shell surface will be given non-exclusive keyboard focus at the end
-  -- of the manage sequence in which this event is sent. The window manager may want
-  -- to update window decorations or similar to indicate that no window is focused.
-  R.RiverLayerShellSeatFocusNonExclusive ud _ ->
-    runInHS $ modifySeat' ud $ currentFocus %~ SFocusLayerShell False
-
-  -- no layer shell surface has focus
-  -- No layer shell surface will have keyboard focus at the end
-  -- of the manage sequence in which this event is sent. The window
-  -- manager may want to return focus to whichever window last had focus, for example.
-  R.RiverLayerShellSeatFocusNone ud _ ->
-    runInHS $ modifySeat' ud $ currentFocus .~ SFocusNone
+  R.RiverLayerShellSeatFocusExclusive    ud _ -> runInHS $ modifySeat' ud $ currentFocus %~ SFocusLayerShell True
+  R.RiverLayerShellSeatFocusNonExclusive ud _ -> runInHS $ modifySeat' ud $ currentFocus %~ SFocusLayerShell False
+  R.RiverLayerShellSeatFocusNone         ud _ -> runInHS $ modifySeat' ud $ currentFocus .~ SFocusNone
 
 -- | Handle key bind events.
 --
@@ -150,6 +145,7 @@ handleXkbBindingsSeatEvent :: R.RiverXkbBindingsSeatEvent -> H ()
 handleXkbBindingsSeatEvent = \case
   R.RiverXkbBindingsSeatAteUnboundKey dt _ -> runInHS $ modifySeat' dt $ pendingAction .~ S_SUBMAP_CANCEL
 
+-- | Pointer events.
 handlePointerEvent :: R.RiverPointerBindingEvent -> H ()
 handlePointerEvent = \case
     R.RiverPointerBindingPressed dt _ -> do
@@ -196,7 +192,7 @@ manage1 s = do
           Just (rw, pos) -> do
             doS $ \x -> x { pendingPointerEnter = Nothing }
             when (pos /= s.position) $ do
-                logInfo "seat: focus changed by pointer"
+                -- logDebug "seat: focus changed by pointer"
                 doS $ \x -> x { focused = rw }
                 R.riverSeatFocusWindow s.river_seat rw
                 windows $ W.focusWindow rw

@@ -12,10 +12,13 @@ import           Data.Ratio ((%))
 import qualified Data.Set as S
 import           Data.Time.Clock.System
 import           System.Environment (executablePath)
-import           System.IO (hGetContents, hPrint, print, writeFile)
+import           System.IO (hGetContents, hPrint, writeFile)
 import qualified System.Posix as Posix
 import           System.Posix.Process (executeFile)
 import           Text.Printf
+import   qualified System.FilePath as FP
+import System.Log.FastLogger (flushLogStr)
+import System.IO.Error
 
 -- * Misc. pure operations
 
@@ -136,13 +139,13 @@ withScreenOutput :: ScreenId -> (Output -> HS ()) -> HS ()
 withScreenOutput sid f = mapM_ f . L.find (\o -> o.screen == sid) =<< use outputList
 
 -- | Force new manage sequence.
-manageDirty :: (MonadStateGlobal env m, HasEventQueues env) => m ()
+manageDirty :: (MonadStateGlobal env m, env ~ HConf) => m ()
 manageDirty = withObject $ \wm -> do
   logDebug "wm request: manage_dirty"
   R.riverWindowManagerManageDirty wm
   writeMainEvent MainPoll
 
-writeMainEvent :: (MonadIO m, MonadReader env m, HasEventQueues env) => MainEvent -> m ()
+writeMainEvent :: (MonadIO m, MonadReader env m, env ~ HConf) => MainEvent -> m ()
 writeMainEvent ev = do
   q <- asks $ view mainEventQL
   atomically $ writeTQueue q ev
@@ -160,7 +163,7 @@ setTopFocus' :: RiverWindow -> HS ()
 setTopFocus' rw = mapSeats $ \s -> do
   when (s.focused /= rw) $ do
     withWindow_ rw $ \w -> do
-      logInfo $ "seat: focus window" :# [ "window" .= show rw, "seat" .= s.name ]
+      --logDebug $ "seat: focus window" :# [ "window" .= show rw, "seat" .= s.name ]
       R.riverSeatFocusWindow s.river_seat rw
       modifySeat s.river_seat $ focused .~ rw
       -- FIXME: when focusing a newly created window, we end up here when w.x and w.y are still 0.
@@ -170,7 +173,7 @@ setTopFocus' rw = mapSeats $ \s -> do
           let Position x' y' = fromMaybe w.position w.p_render_pos
               px = x' + (fi w.size.width `div` 2)
               py = y' + (fi w.size.height `div` 2)
-          logInfo $ "seat: pointer warp" :# [ "dest" .= (px, py), "seat" .= s.name, "window" .= show w.river_window ]
+          --logDebug $ "seat: pointer warp" :# [ "dest" .= (px, py), "seat" .= s.name, "window" .= show w.river_window ]
           io $ R.riverSeatPointerWarp s.river_seat px py
 
 seatDisableBindingsMatching :: SomeSeat a => a -> [ModMask] -> [KeySym] -> HS ()
@@ -389,34 +392,54 @@ getStateDirectory = do
 getTimeStamp :: MonadIO m => m Int64
 getTimeStamp = systemSeconds <$> io getSystemTime
 
-restart :: String -> H ()
+restart :: FilePath -> H ()
 restart prog = do
   runInHS $ broadcastMessage ReleaseResources
   void . userCode =<< asks (view $ config . exitHook)
   statefile <- runInHS writeStateToFile
-  logInfo $ "restart: executing" :# [ "program" .= prog ]
-  io $ do
-    res <- try $ executeFile prog True [ "--state-file", statefile ] Nothing
-    case res of
-      Right {} -> return ()
-      Left (SomeException e) -> hPrint stderr e >> exitFailure
+  let args = [ "--state-file", statefile ]
+  logInfo $ "Now restarting! Executing file " <> toText prog <> "..." :# [ "args" .= args ]
+  lgrSet <- view _loggerSet
+  io $ flushLogStr lgrSet -- Flush logger
+  res <- io $ try $ executeFile prog True args Nothing
+  case res of
+    Right {} -> do
+      logError "Uh-oh, execing the new program appears to have failed!"
+    Left (e :: SomeException) -> do
+      logError $ "Failed to execute new program file, aborting!" :# [ "exception" .= show e ]
+      io $ hPrint stderr e >> exitFailure
 
 writeStateToFile :: HS FilePath
 writeStateToFile = do
     dir <- getStateDirectory
     ts  <- getTimeStamp
-    let filename = printf "savedstate-%i" ts
-        filepath = dir ++ "/" ++ filename
-        linkpath = dir ++ "/" ++ "savedstate"
     stateString <- dumpStateAsString
-    io $ catchIO (writeFile filepath stateString >> updateLink filename linkpath) (print . show)
-    logInfo $ "Wrote current WM state to disk" :# [ "statefile" .= filepath ]
-    return filepath
-  where
-    updateLink src dst = do
-      b <- doesFileExist dst
-      when b $ removeFile dst
-      createFileLink src dst
+    let stateFileName = printf "savedstate-%i" ts
+        stateFP  = dir ++ "/" ++ stateFileName
+        linkFP   = dir ++ "/" ++ "savedstate"
+        update = do
+          writeFile stateFP stateString
+          isLink <- pathIsSymbolicLink linkFP
+          exists <- doesFileExist linkFP
+          when (isLink || exists) $ removeFile linkFP
+          createFileLink stateFileName linkFP
+        cleanup = do
+          contents <- listDirectory dir
+          forM_ contents $ \file ->
+            when ("savedstate-" `L.isPrefixOf` FP.takeFileName file) $ do
+              res <- try @_ @IOException $ systemSeconds . utcToSystemTime <$> getModificationTime file
+              case res of
+                Right mtime | mtime < ts - (60 * 60 * 12) -> removeFile file
+                            | otherwise -> return ()
+                Left e
+                  -- try to remove anyway, it might be a broken symlink
+                  | isDoesNotExistError e -> void $ try @_ @IOException $ removeFile file
+                  | otherwise -> throwIO e
+
+    io $ catchIO update (hPrint stderr)
+    logInfo $ "Wrote current WM state to disk" :# [ "state-file" .= stateFP ]
+    io $ catchIO cleanup (hPrint stderr)
+    return stateFP
 
 dumpStateAsString :: HS String
 dumpStateAsString = do
@@ -436,21 +459,13 @@ dumpStateAsString = do
 
 -- | Read the state of a previous xmonad instance from a file and
 -- return that state.  The state file is removed after reading it.
-readStateFile :: forall m l m2. (MonadUnliftIO m, MonadLogger m, LayoutClass l RiverWindow, Read (l RiverWindow))
-              => Maybe FilePath
-              -> HSWMConfig m2 l
-              -> m (Maybe HState)
+readStateFile
+  :: forall m l m2. (MonadUnliftIO m, MonadLogger m, LayoutClass l RiverWindow, Read (l RiverWindow))
+  => Maybe FilePath -> HSWMConfig m2 l -> m (Maybe HState)
 readStateFile msf xmc = do
-  sfile <- case msf of
-             Just x -> return x
-             Nothing -> do
-                  dir <- getStateDirectory
-                  return $ dir ++ "/" ++ "savedstate"
+  sfile <- maybe getDefFile return msf
   exists <- doesFileExist sfile
-  if exists
-     then doIt sfile
-     else return Nothing
-
+  if exists then doIt sfile else return Nothing
   where
     doIt :: FilePath -> m (Maybe HState)
     doIt path = do
@@ -459,11 +474,7 @@ readStateFile msf xmc = do
       res <- try @_ @SomeException $ do
         raw <- io $ withFile path ReadMode readStrict
         return $! maybeRead reads raw
-
       case res of
-        Left e -> do
-          logError $ "Failed to restore WM state from file" :# [ "exception" .= show e ]
-          return Nothing
         Right sf' -> do
           logInfo $ "Restoring WM state from file" :# [ "statefile" .= path ]
           return $ do
@@ -476,18 +487,25 @@ readStateFile msf xmc = do
                 extState = M.fromList . map (second Left) $ sfExt sf
             return
               def
-                { windowset = winset,
-                  windowsetOld = winset,
-                  recoveredWindows = M.fromList [(b, R.RiverWindow $ intPtrToPtr a) | (a, b) <- wins],
-                  extensibleState = extState
+                { windowset = winset
+                , windowsetOld = winset
+                , recoveredWindows = M.fromList [(b, R.RiverWindow $ intPtrToPtr a) | (a, b) <- wins]
+                , extensibleState = extState
                 }
+        Left e -> do
+          logError $ "Failed to restore WM state from file" :# [ "exception" .= show e ]
+          return Nothing
 
     layout = Layout xmc.layoutHook
     lreads = readsLayout layout
 
+    getDefFile = do
+        dir <- getStateDirectory
+        return $ dir ++ "/" ++ "savedstate"
+
     maybeRead reads' s = case reads' s of
       [(x, "")] -> Just x
-      _ -> Nothing
+      _         -> Nothing
 
     readStrict :: Handle -> IO String
     readStrict h = hGetContents h >>= \s -> length s `seq` return s

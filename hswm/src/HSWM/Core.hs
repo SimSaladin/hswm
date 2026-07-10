@@ -98,16 +98,20 @@ userCodeDefS defValue a = fromMaybe defValue <$> userCodeS a
 -- * Manage/Render Event queues
 
 -- | @(queueForManagePhase, queueForRenderPhase)@
-getEventQueueFuncs
-  :: (MonadReader env m, HasEventQueues env, MonadIO inner)
+getEventQueueFuncs :: (MonadReader env m, MonadIO inner, env ~ HConf)
   => m (HS e1 -> inner (), HS e2 -> inner ())
 getEventQueueFuncs = (wrap *** wrap) <$> asks ((,) <$> view pendingManageQL <*> view pendingRenderQL)
   where
     wrap q = atomically . writeTQueue q . void
 
-writeManageQ :: (MonadReader s m, HasEventQueues s, MonadIO m) => HS () -> m ()
+writeManageQ :: (MonadReader s m, MonadIO m, s ~ HConf) => HS () -> m ()
 writeManageQ x = do
     q <- asks (view pendingManageQL)
+    atomically $ writeTQueue q x
+
+writeRenderQ :: (MonadReader s m, MonadIO m, s ~ HConf) => HS () -> m ()
+writeRenderQ x = do
+    q <- asks (view pendingRenderQL)
     atomically $ writeTQueue q x
 
 --------------------------------------------------

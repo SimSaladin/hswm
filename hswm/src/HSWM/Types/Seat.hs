@@ -20,6 +20,8 @@ import HSWM.Types.Window
 
 import qualified WL.Client as WL
 import qualified River as R
+import qualified WL.ExtIdleNotify.Staging.V1.Client as EXT_IN
+
 import Data.Kind
 
 -- * Seat
@@ -29,7 +31,11 @@ data Seat' (m :: Type -> Type) = Seat
   , river_layer_shell_seat :: !R.RiverLayerShellSeat
   , xkb_bindings_seat      :: !R.RiverXkbBindingsSeat
   , wl_seat                :: !WL.Seat
+  , idleNotification       :: !EXT_IN.IdleNotification
   , caps                   :: !WL.SeatCapability
+  , wlKeyboard             :: !WL.Keyboard -- ^ Keyboard capability
+  , wlPointer              :: !WL.Pointer -- ^ Pointer capability
+  , wlTouch                :: !WL.Touch -- ^ Touch capability
   , position               :: !Position -- (Int32, Int32) -- x, y
   , name                   :: !String
   , currentFocus           :: !SeatFocus

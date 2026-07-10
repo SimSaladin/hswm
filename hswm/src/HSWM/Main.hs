@@ -61,8 +61,18 @@ startHSWM
   => MainRun Unwrapped -> HSWMConfig m l -> IO ()
 startHSWM mainRun config = do
     loggerSet <- mkMainLogger mainRun
-    wlDisplay <- WL.displayConnect Nothing
-    let logFunc = fastLoggerOutput loggerSet
+    let logFunc     = fastLoggerOutput loggerSet
+        withLogging = flip runLoggingT logFunc
+
+    let connectTo = Nothing
+    withLogging $ logDebug $ "Connecting Wayland display..." :# [ "connect-to" .= toText (fromMaybe "(using defaults)" connectTo) ]
+    wlDisplay <- WL.displayConnect connectTo
+    withLogging $ logInfo $ "Wayland display connected!" :# [ "display" .= show wlDisplay ]
+
+    -- Do not propagate debug to child processes.
+    unsetEnv "WAYLAND_DEBUG"
+
+    -- initialize config
     let config' = config { layoutHook = Layout config.layoutHook }
     conf <- HConf False Nothing config' wlDisplay logFunc loggerSet
         <$> newEmptyMVar
@@ -72,28 +82,21 @@ startHSWM mainRun config = do
         <*> newTQueueIO
         <*> newTMVarIO def
 
+    -- Restore or initialize initial state
+    withLogging $ do
+      let newEmpty = let wset = W.new conf.config.layoutHook config.workspaces [SD 0 0 0 0]
+                      in def {windowset = wset, windowsetOld = wset}
+      st <- fromMaybe newEmpty <$> readStateFile mainRun.mainStateFile config
+      atomically $ putTMVar conf._state st
+
     let runH' :: H a -> IO a
         runH' = runH conf
-        withLogging = flip runLoggingT logFunc
         mainEvent :: MonadIO m => MainEvent -> m ()
         mainEvent = atomically . writeTQueue conf.eventQueue
         mkListener :: (WL.HasListener o, Typeable (R.ObjectListener o)) => (WL.ObjectListenerEvent o -> H ()) -> H (ConstPtr (WL.ObjectListener o))
         mkListener f = getOrCreateObjectIO $ WL.createListener (runH' . f)
 
-    -- Do not propagate debug to child processes.
-    unsetEnv "WAYLAND_DEBUG"
-
-    -- Restore or initialize initial state
-    withLogging $ do
-      st <- readStateFile mainRun.mainStateFile config >>= \case
-        Just hs -> return hs
-        Nothing ->
-          let initialWinSet = W.new conf.config.layoutHook config.workspaces [SD 0 0 0 0]
-              in return def {windowset = initialWinSet, windowsetOld = initialWinSet}
-      atomically $ putTMVar conf._state st
-
     runH' $ do
-
       logInfo "Allocating wayland event listeners"
       _ <- mkListener $ handleWithHook . WlShmEvent
       _ <- mkListener $ handleWithHook . WlOutputEvent
@@ -101,6 +104,7 @@ startHSWM mainRun config = do
       _ <- mkListener $ handleWithHook . WlSeatEvent
       _ <- mkListener $ handleWithHook . WlKeyboardEvent
       _ <- mkListener $ handleWithHook . WlPointerEvent
+      _ <- mkListener $ handleWithHook . WlTouchEvent
       _ <- mkListener $ handleWithHook . XkbConfigEvent
       _ <- mkListener $ handleWithHook . XkbKeyboardEvent
       _ <- mkListener $ handleWithHook . XkbEvent
@@ -126,13 +130,17 @@ startHSWM mainRun config = do
       runInIO <- askRunInIO
 
       -- Setup the globals registry
-      regState <- WL.initRegistryState def
-        { WL.regOnEvent = runInIO . Debug.logEvent
-        , WL.regOnBind = \p name ver -> runInIO $ do
-            let ifVer = WL.objectInterfaceVersion p
-            logInfo $ "registry bind global" :# [ "name" .= name, "version" .= ver, "iface-version" .= ifVer, "iface" .= WL.objectInterfaceName p ]
-        } wlDisplay
-      putMVar conf.globals regState
+      let regSettings = def
+            { WL.regOnBind = \p name ver ->
+                runInIO $ logInfo $ "Registry: bind global" :#
+                  [ "name" .= name
+                  , "version" .= ver
+                  , "interface-version" .= WL.objectInterfaceVersion p
+                  , "interface" .= WL.objectInterfaceName p
+                  ]
+            , WL.regOnEvent = runInIO . Debug.logEvent
+            }
+      putMVar conf.globals =<< WL.initRegistryState regSettings wlDisplay
 
       logInfo "Waiting for one roundtrip for the registry listener to become aware of all current globals..."
       void $ WL.displayRoundtrip wlDisplay
@@ -161,63 +169,67 @@ startHSWM mainRun config = do
       _ <- io $ Posix.installHandler Posix.sigQUIT (Posix.Catch $ runH' $ mainEvent $ MainSignal Posix.sigQUIT) Nothing
       _ <- io $ Posix.installHandler Posix.sigUSR2 (Posix.Catch $ runH' $ io getProgramPath >>= mainEvent . MainRestart) Nothing
 
-      logInfo "Running user startup hooks..."
-      void $ userCode config.startupHook
-
       -- Create an additional seat; useful for testing
       -- io $ R.riverInputManagerCreateSeat inputManager (Just "foobar")
 
-      -- save state to disk every half an hour
-      timerAs <- async $ forever $ do
-        io (Conc.delay (1_000_000 * 60 * 30))
-        mainEvent MainSaveToDisk
-      link timerAs
+      let periodMins = 30
+      logInfo $ "Starting timer for saving state to disk every period" :# [ "minutes" .= periodMins ]
+      link =<< async (forever $ io (Conc.delay (1_000_000 * 60 * periodMins)) >> mainEvent MainSaveToDisk)
 
-      wlPollFd <- WL.displayGetFd wlDisplay
-      mainLoop wlDisplay wlPollFd
+      displayFd <- WL.displayGetFd wlDisplay
+      logInfo $ "Main loop is starting" :# [ "display-fd" .= show displayFd ]
+
+      logInfo "Running user startup hooks..."
+      void $ userCode config.startupHook
+
+      mainLoop wlDisplay displayFd
 
 mainLoop :: WL.Display -> Posix.Fd -> H ()
-mainLoop wlDisplay wlPollFd = do
-    logInfo "main: ready"
-    main MainPoll
+mainLoop wlDisplay wlPollFd = main MainPoll
   where
-    main MainPoll = do
-      dispatchPending wlDisplay >>= \case
-        Left end -> main end
-        Right{} -> flushRequests wlDisplay >>= \case
-          Left end -> main end
-          Right pollWrite -> do
-            let pollfd = if pollWrite then io (threadWaitWrite wlPollFd `race_` threadWaitRead wlPollFd)
-                                      else io (threadWaitRead wlPollFd)
-            eq <- view eventQueue
-            res <- atomically (readTQueue eq) `race` pollfd
-            res' <- readIncomingEvents wlDisplay
-            case (res, res') of
-              (Left ev, _) -> main ev
-              (_, Left ev) -> main ev
-              _ -> main MainPoll
-
-    main (MainSignal sig) = do
-      logError $ "Exiting (signal)" :# ["signal" .= show sig ]
-      void . userCode =<< view (config . exitHook)
-      io . rmLoggerSet =<< view _loggerSet
-      exitFailure
-
-    main (MainExit desc e) = do
-      logError $ "Exiting (exception)" :# [ "description" .= desc, "exception" .= show e ]
-      void . userCode =<< view (config . exitHook)
-      io . rmLoggerSet =<< view _loggerSet
-      exitFailure
+    main MainPoll = mainProcessing
 
     main (MainRestart prog) = do
-      logInfo $ "(main) Restarting" :# [ "program" .= prog ]
+      logInfo $ "Main: interrupted by reload request" :# [ "program" .= prog ]
       restart prog
-      logError "(main) restart was not successful!"
+      logError "Main: restart was unsuccessful! Resuming normal operation"
       main MainPoll
 
     main MainSaveToDisk = do
       void $ runInHS $ userCodeS writeStateToFile
       main MainPoll
+
+    main (MainSignal sig) = do
+      logError $ "Main: interrupted by signal: " <> tshow sig :# ["signal" .= show sig ]
+      mainExit exitFailure
+
+    main (MainExit desc e) = do
+      logError $ "Main: interrupted by exception in the main thread" :# [ "description" .= desc, "exception" .= show e ]
+      mainExit exitFailure
+
+    mainProcessing =
+      dispatchPending wlDisplay >>= \case
+        Right{} -> flushRequests wlDisplay >>= \case
+          Right pollWrite -> do
+            let pollfd = if pollWrite then threadWaitWrite wlPollFd `race_` threadWaitRead wlPollFd
+                                      else threadWaitRead wlPollFd
+            evQ  <- view eventQueue
+            incoming <- atomically (readTQueue evQ) `race` io pollfd
+            evts <- readIncomingEvents wlDisplay
+            case (incoming, evts) of
+              (Left ev, _      ) -> main ev
+              (_      , Left ev) -> main ev
+              _                  -> main MainPoll
+          Left end               -> main end
+        Left end                 -> main end
+
+    mainExit how = do
+      logInfo "Main: now exiting. Running exit hooks..."
+      void . userCode =<< view (config . exitHook)
+      lgrSet <- view _loggerSet
+      io $ flushLogStr lgrSet
+      io $ rmLoggerSet lgrSet
+      how
 
 -- Dispatch pending events
 dispatchPending :: MonadIO m => WL.Display -> m (Either MainEvent ())

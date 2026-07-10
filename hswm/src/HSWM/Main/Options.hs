@@ -18,28 +18,24 @@ import           System.Log.FastLogger
 
 -- | Main entrypoint settings.
 data MainRun w = MainRun
-  { mainLogFile   :: w ::: Maybe FilePath <?> "If not logging to file, logs are sent to stdout" <!> ""
-  , mainLogLevel  :: w ::: LogLevel       <?> "Log level (debug, info, warn or error)" <!> "debug"
-  , mainStateFile :: w ::: Maybe FilePath <?> "State file to read on restart"
+  { mainLogFile   :: w ::: Maybe FilePath <#> "o" <?> "Send logs to a file. If empty, a default file is used. If \"-\" the log output is sent to stdout."
+  , mainLogLevel  :: w ::: LogLevel       <#> "l" <?> "Log level (one of debug, info, warn or error)" <!> "debug"
+  , mainStateFile :: w ::: Maybe FilePath <#> "f" <?> "State file to read on restart."
   } deriving (Generic)
 
-instance Default (MainRun Unwrapped) where
-  def = MainRun (Just "") LevelDebug Nothing
-
+-- | Read the program arguments.
 parseMainArgs :: IO (MainRun Unwrapped)
 parseMainArgs = unwrapRecord "hswm"
 
-instance ParseField LogLevel where
-  readField = Opts.maybeReader $ \case
-    "debug" -> Just LevelDebug
-    "info"  -> Just LevelInfo
-    "error" -> Just LevelError
-    "warn"  -> Just LevelWarn
-    _       -> Nothing
-instance ParseFields LogLevel
-instance ParseRecord LogLevel where
-  parseRecord = fmap getOnly parseRecord
+-- | Defaults defined via 'Default'
+instance Default (MainRun Unwrapped) where
+  def = MainRun
+    { mainLogFile = Nothing
+    , mainLogLevel = LevelDebug
+    , mainStateFile = Nothing
+    }
 
+-- | Field modifiers: drop the @main@ prefix, use @-@ as word separator.
 instance ParseRecord (MainRun Wrapped) where
   parseRecord = parseRecordWithModifiers defaultModifiers
     { fieldNameModifier = \name -> fromCC $ fromMaybe name (L.stripPrefix "main" name) }
@@ -52,14 +48,27 @@ instance ParseRecord (MainRun Wrapped) where
                       | otherwise = y : go ys
             go     []             = []
 
+-- * Logging
+
 mkMainLogger :: MainRun Unwrapped -> IO LoggerSet
 mkMainLogger main = case main.mainLogFile of
-   Nothing -> newStdoutLoggerSet defaultBufSize
-   Just "" -> newFileLoggerSet defaultBufSize =<< defaultLogFile
-   Just file -> newFileLoggerSet defaultBufSize file
+    Just dst | dst == "-" || dst == "/dev/stdout" -> newStdoutLoggerSet defaultBufSize
+    Just dst -> newFileLoggerSet defaultBufSize dst
+    Nothing -> newFileLoggerSet defaultBufSize =<< defaultLogFile
 
 defaultLogFile :: IO FilePath
 defaultLogFile = do
   d <- getXdgDirectory XdgData "hswm"
   createDirectoryIfMissing True d
   return $ d ++ "/" ++ "hswm.log"
+
+instance ParseField LogLevel where
+  readField = Opts.maybeReader $ \case
+    "debug" -> Just LevelDebug
+    "info"  -> Just LevelInfo
+    "error" -> Just LevelError
+    "warn"  -> Just LevelWarn
+    _       -> Nothing
+instance ParseFields LogLevel
+instance ParseRecord LogLevel where
+  parseRecord = fmap getOnly parseRecord

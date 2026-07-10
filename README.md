@@ -53,6 +53,12 @@ cabal clean
 cabal build
 ```
 
+# Running nested inside weston
+
+```bash
+weston --backend=wayland -- river -c $HSWM_EXECUTABLE -o -
+```
+
 --------
 
 - [c2hs

@@ -57,7 +57,8 @@ data Event
   | WlOutputEvent !WL.OutputEvent
   | WlShellSurfaceEvent !WL.ShellSurfaceEvent
   | WlKeyboardEvent !WL.KeyboardEvent
-  | WlPointerEvent !WL.PointerEvent
+  | WlPointerEvent  !WL.PointerEvent
+  | WlTouchEvent    !WL.TouchEvent
   | -- Ext_*
     ForeignTopLevelListV1 !WL.ForeignToplevelListEvent
   | ForeignTopLevelHandleV1 !WL.ForeignToplevelHandleEvent

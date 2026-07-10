@@ -22,10 +22,10 @@ import System.Posix ( CPid, getAnyProcessStatus )
 import System.Posix.Signals
 import System.Process (CmdSpec(..))
 import System.Process.Typed hiding (closed)
-import qualified Data.ByteString.Char8 as C8
+import qualified Data.Text.IO as T
 
 spawnProcess :: MonadProcessSpawn m => String -> [String] -> m ()
-spawnProcess prog args = void . async $ runProcess $
+spawnProcess prog args = void . async $ runProcess_ $
   setCloseFds True $
   setNewSession True $
   proc prog args
@@ -58,10 +58,11 @@ uninstallSignalHandlers = io $ do
   _ <- installHandler sigCHLD Default Nothing
   return ()
 
-logOutput :: (Loc -> LogSource -> LogLevel -> LogStr -> IO ()) -> Text -> StreamSpec anyStreamType (Async ())
+-- | StreamSpec that logs output
+logOutput :: (Loc -> LogSource -> LogLevel -> LogStr -> IO ()) -> Text -> StreamSpec STOutput (Async ())
 logOutput logFn prefix = mkPipeStreamSpec $ \pc h -> do
   hSetBuffering h LineBuffering
   as <- async $ flip runLoggingT logFn $ forever $ do
-    ln <- io $ C8.hGetLine h
-    logInfo $ prefix <> ": " <> fromString (C8.unpack ln) :# [ "processConfig" .= show pc ]
+    ln <- io $ T.hGetLine h
+    logInfo $ prefix <> ": " <> ln :# [ "processConfig" .= show pc ]
   return (as, hClose h)

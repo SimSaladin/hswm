@@ -339,26 +339,28 @@ instance Show (Async a) where show _ = "<Async>"
 
 -- lenses
 
-class HasEventQueues env where
-  mainEventQL     :: Lens' env (TQueue MainEvent)
-  pendingManageQL :: Lens' env (TQueue (HS ()))
-  pendingRenderQL :: Lens' env (TQueue (HS ()))
-
 makeLensesWith' classPerField
   [ ''HConf
   , ''HState
   ]
+
+-- Aliases  XXX
+mainEventQL :: Lens' HConf (TQueue MainEvent)
+mainEventQL = eventQueue
+
+-- Aliases  XXX
+pendingManageQL :: Lens' HConf (TQueue (HS ()))
+pendingManageQL = pendingManageQ
+
+-- Aliases  XXX
+pendingRenderQL :: Lens' HConf (TQueue (HS ()))
+pendingRenderQL = pendingRenderQ
 
 instance HasGlobalTMap HConf where
   globalTMap = globalTypeMap
 
 instance HasGlobalsRegistry HConf where
   globalsRegistryL = globals
-
-instance HasEventQueues HConf where
-  mainEventQL = eventQueue
-  pendingManageQL = pendingManageQ
-  pendingRenderQL = pendingRenderQ
 
 instance MonadLoggerIO H  where askLoggerIO = view _logFunc
 instance MonadLoggerIO HS where askLoggerIO = view _logFunc

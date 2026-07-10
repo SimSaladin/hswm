@@ -30,8 +30,11 @@ debugHook ev
   | WindowManagerEvent R.RiverWindowManagerRenderStart {} <- ev = mempty
   | WindowManagerEvent e                                  <- ev = logEvent e
   | XkbKeyboardEvent e                                    <- ev = logEvent' "XKB" e []
-  | XkbEvent e                                            <- ev = logXkbEvent e
+  | XkbEvent e                                            <- ev = mempty
+  -- | XkbEvent e                                            <- ev = logXkbEvent e
   | SeatEvent R.RiverSeatPointerPosition {} <- ev = mempty
+  | SeatEvent R.RiverSeatPointerEnter {}    <- ev = mempty
+  | SeatEvent R.RiverSeatPointerLeave {}    <- ev = mempty
   | SeatEvent e                             <- ev = logEvent' "S" e []
   | OutputEvent e                           <- ev = logEvent' "O" e []
   | WindowEvent R.RiverWindowDimensions {}  <- ev = mempty

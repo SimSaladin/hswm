@@ -22,7 +22,7 @@ import           Control.Monad.Fix
 import           Data.Aeson (ToJSON)
 import qualified Data.Map as M
 
-type HasGrabCtx env m = (MonadStateGlobal env m, HasEventQueues env, MonadReader env m, MonadLogger m, MonadUnliftIO m, MonadFix m)
+type HasGrabCtx env m = (env ~ HConf, MonadStateGlobal env m, MonadReader env m, MonadLogger m, MonadUnliftIO m, MonadFix m)
 
 type SeatIMs = Map WL.Seat GrabIM
 
