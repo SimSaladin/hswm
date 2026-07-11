@@ -28,36 +28,35 @@ import           Prelude hiding (filter, modify, view, peek, with)
 data StackSet i l a wd sid sd
   = StackSet
   { -- | currently focused workspace
-    current :: !(Screen i l a wd sid sd),
+    current :: !(Screen i l a wd sid sd)
     -- | non-focused workspaces, visible in xinerama
-    visible :: [Screen i l a wd sid sd],
+  , visible :: [Screen i l a wd sid sd]
     -- | workspaces not visible anywhere
-    hidden :: [Workspace i l a wd],
+  , hidden :: [Workspace i l a wd]
     -- | floating windows
-    floating :: M.Map a RationalRect
+  , floating :: M.Map a RationalRect
   }
-  deriving (Show, Read, Eq)
-  deriving (Generic, Default)
+  deriving stock (Eq, Ord, Show, Read, Generic)
+  deriving anyclass (Default, NFData)
 
 -- | Visible workspaces, and their outputs.
 data Screen i l a wd sid sd = Screen
-  { workspace :: !(Workspace i l a wd),
-    screen :: !sid,
-    screenDetail :: !sd
+  { workspace    :: !(Workspace i l a wd)
+  , screen       :: sid
+  , screenDetail :: sd
   }
-  deriving (Show, Read, Eq)
-  deriving (Generic, Default)
+  deriving stock (Eq, Ord, Show, Read, Generic)
+  deriving anyclass (Default, NFData)
 
--- |
--- A workspace is just a tag, a layout, and a stack.
+-- | A workspace is just a tag, a layout, and a stack.
 data Workspace i l a wd = Workspace
-  { tag :: !i,
-    layout :: l,
-    stack :: Maybe (Stack a),
-    workspaceDetail :: !wd
+  { tag             :: !i
+  , layout          :: l
+  , stack           :: Maybe (Stack a)
+  , workspaceDetail :: wd
   }
-  deriving (Show, Read, Eq)
-  deriving (Generic, Default)
+  deriving stock (Eq, Ord, Show, Read, Generic)
+  deriving anyclass (Default, NFData)
 
 -- |
 -- A stack is a cursor onto a window list.
@@ -77,12 +76,12 @@ data Workspace i l a wd = Workspace
 -- structures, it is the differentiation of a [a], and integrating it
 -- back has a natural implementation used in 'index'.
 data Stack a = Stack
-  { focus :: !a, -- focused thing in this set
-    up :: [a], -- clowns to the left
-    down :: [a] -- jokers to the right
+  { focus :: !a -- ^ focused thing in this set
+  , up    :: [a] -- ^ clowns to the left
+  , down  :: [a] -- ^ jokers to the right
   }
-  deriving (Show, Read, Eq, Functor)
-  deriving (Generic, Default)
+  deriving stock (Eq, Ord, Show, Read, Functor, Generic)
+  deriving anyclass (Default, NFData)
 
 instance Foldable Stack where
   toList = integrate
@@ -98,7 +97,8 @@ instance Traversable Stack where
 
 -- | A structure for window geometries
 data RationalRect = RationalRect { x, y, width, height :: !Rational }
-  deriving (Show, Read, Eq)
+  deriving stock (Eq, Ord, Show, Read, Generic)
+  deriving anyclass (NFData)
 
 -- ---------------------------------------------------------------------
 
@@ -535,9 +535,9 @@ shiftWin n w s = case findTag w s of
   where
     go from = onWorkspace n (insertUp w) . onWorkspace from (delete' w)
 
-onWorkspace ::
-  (Eq i, Eq s) =>
-  i ->
-  (StackSet i l a wd s sd -> StackSet i l a wd s sd) ->
-  (StackSet i l a wd s sd -> StackSet i l a wd s sd)
+onWorkspace
+  :: (Eq i, Eq s)
+  => i
+  -> (StackSet i l a wd s sd -> StackSet i l a wd s sd)
+  -> (StackSet i l a wd s sd -> StackSet i l a wd s sd)
 onWorkspace n f s = view (currentTag s) . f . view n $ s

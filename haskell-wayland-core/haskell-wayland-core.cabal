@@ -77,8 +77,13 @@ library
         , c-expr-runtime       >=0.1.0  && <0.2
         , hs-bindgen-runtime   >=0.1.0  && <0.2
         , hs-bindgen-hooks     ==0.1.0.0
+        , primitive
     hs-source-dirs: src
-    ghc-options: -Wall -Wunused-packages -fPIC
+    ghc-options:
+      -Wall
+      -Wunused-packages
+      -Wno-orphans
+      -fPIC
 
     if flag(pkg-config)
         pkgconfig-depends:

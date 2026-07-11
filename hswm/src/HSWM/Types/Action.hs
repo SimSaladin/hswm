@@ -1,6 +1,8 @@
 {-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE NoFieldSelectors  #-}
 {-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE UndecidableInstances #-}
+
 
 -- |
 -- Module      : HSWM.Types.Action
@@ -34,26 +36,31 @@ type XkbBindingMap a = M.Map XBKey (StablePtr (XkbBinding a))
 data XkbBinding a = XkbBinding
   { boundAction     :: !a
   , boundSubmap     :: !(XkbBindingMap a)
+  , defaultSubmapAction :: !(Maybe a)
   , autorepeat      :: {-# UNPACK #-} !Bool
   , riverXkbBinding :: {-# UNPACK #-} !R.RiverXkbBinding
   , riverSeat       :: {-# UNPACK #-} !R.RiverSeat -- ^ Needed to know which seat triggered an action.
   , runningVar      :: {-# UNPACK #-} !(MVar (Async ()))
-  } deriving stock (Generic)
+  }
+  deriving stock (Generic)
+  deriving anyclass (NFData)
 
 data PointerBinding a = PointerBinding
   { boundAction         :: !a
   , riverPointerBinding :: {-# UNPACK #-} !R.RiverPointerBinding
   , riverSeat           :: {-# UNPACK #-} !R.RiverSeat
-  } deriving stock (Generic)
+  }
+  deriving stock (Generic)
+  deriving anyclass (NFData)
 
 data Submap m = Submap
   { submapKeys    :: [(XBKey, SomeAction m)]
   , submapDefault :: Maybe (SomeAction m)
-  } deriving (Show, Generic)
+  } deriving stock (Eq, Show, Generic)
+  deriving anyclass (Default, NFData)
 
 type Button = Word32
-
-type XBKey = (ModMask, KeySym)
+type XBKey  = (ModMask, KeySym)
 
 -- * IsKeySym
 
@@ -73,9 +80,9 @@ class Functor m => IsAction m a where
   -- | How to execute the action @a@ in @m@.
   runner :: a -> m ()
 
-  -- | actions may trigger submap bindings.
-  actionSubmap :: a -> [(XBKey, SomeAction m)]
-  actionSubmap _ = []
+  -- | Action may trigger submap bindings.
+  actionSubmap :: a -> Submap m
+  actionSubmap _ = def
 
   -- | Description based on the value (defaults to type info)
   actionDescription :: Proxy m -> a -> String
@@ -94,18 +101,28 @@ instance (MonadIO m) => IsAction m (IO ()) where
 
 instance (MonadIO m, Typeable m) => IsAction m (Submap m) where
   runner Submap {..} = whenJust submapDefault runner
-  actionSubmap Submap {..} = submapKeys
+  actionSubmap = id
 
 -- * SomeAction
 
 data SomeAction m where
   SomeAction :: forall m a. (IsAction m a) => a -> SomeAction m
 
+instance Eq (SomeAction m) where
+  SomeAction a == SomeAction b =
+    typeDescription proxy a == typeDescription proxy b &&
+    actionDescription proxy a == actionDescription proxy b &&
+    actionSubmap @m a == actionSubmap @m b
+   where proxy = Proxy @m
+
 instance (MonadIO m) => Show (SomeAction m) where
   show x = case x of
     SomeAction (val :: (IsAction m a) => a) -> actionDescription (Proxy :: Proxy m) val
 
-instance (MonadIO m) => IsAction m (SomeAction m) where
+instance NFData (SomeAction m) where
+  rnf (SomeAction a) = a `seq` ()
+
+instance MonadIO m => IsAction m (SomeAction m) where
   runner (SomeAction a) = runner a
   actionSubmap (SomeAction a) = actionSubmap a
   actionDescription mp (SomeAction a) = actionDescription mp a

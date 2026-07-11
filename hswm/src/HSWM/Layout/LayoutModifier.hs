@@ -102,14 +102,14 @@ class (Show (m a), Read (m a)) => LayoutModifier m a where
   --   The default implementation of 'modifyLayout' simply calls
   --   'runLayout' on the underlying layout.
   modifyLayout ::
-    (HandleLayouts menv, LayoutClass l a) =>
+    LayoutClass l a =>
     -- | the layout modifier
     m a ->
     -- | current workspace
     Workspace WorkspaceId (l a) a WorkspaceDetail ->
     -- | screen rectangle
     Rectangle ->
-    menv ([(a, Rectangle)], Maybe (l a))
+    HS ([(a, Rectangle)], Maybe (l a))
   modifyLayout _ = runLayout
 
   -- | Similar to 'modifyLayout', but this function also allows you
@@ -122,11 +122,11 @@ class (Show (m a), Read (m a)) => LayoutModifier m a where
   -- state will internally be used in the subsequent call to
   -- 'redoLayout' as well.
   modifyLayoutWithUpdate ::
-    (HandleLayouts menv, LayoutClass l a) =>
+    LayoutClass l a =>
     m a ->
     Workspace WorkspaceId (l a) a WorkspaceDetail ->
     Rectangle ->
-    menv (([(a, Rectangle)], Maybe (l a)), Maybe (m a))
+    HS (([(a, Rectangle)], Maybe (l a)), Maybe (m a))
   modifyLayoutWithUpdate m w r = (,Nothing) <$> modifyLayout m w r
 
   -- | 'handleMess' allows you to spy on messages to the underlying
@@ -146,7 +146,7 @@ class (Show (m a), Read (m a)) => LayoutModifier m a where
   --   when receiving a 'Hide' or 'ReleaseResources' method (after
   --   which it returns @Nothing@), and otherwise passes the message
   --   on to 'pureMess'.
-  handleMess :: (HandleLayouts menv) => m a -> SomeMessage -> menv (Maybe (m a))
+  handleMess :: m a -> SomeMessage -> HS (Maybe (m a))
   handleMess m mess
     | Just Hide <- fromMessage mess = doUnhook
     | Just ReleaseResources <- fromMessage mess = doUnhook
@@ -161,7 +161,7 @@ class (Show (m a), Read (m a)) => LayoutModifier m a where
   --
   --   The default implementation of 'handleMessOrMaybeModifyIt'
   --   simply passes on the message to 'handleMess'.
-  handleMessOrMaybeModifyIt :: (HandleLayouts menv) => m a -> SomeMessage -> menv (Maybe (Either (m a) SomeMessage))
+  handleMessOrMaybeModifyIt :: m a -> SomeMessage -> HS (Maybe (Either (m a) SomeMessage))
   handleMessOrMaybeModifyIt m mess = do
     mm' <- handleMess m mess
     return (Left <$> mm')
@@ -194,7 +194,6 @@ class (Show (m a), Read (m a)) => LayoutModifier m a where
   --   The default implementation of 'redoLayout' calls 'hook' and
   --   then 'pureModifier'.
   redoLayout ::
-    (HandleLayouts menv) =>
     -- | the layout modifier
     m a ->
     -- | screen rectangle
@@ -204,7 +203,7 @@ class (Show (m a), Read (m a)) => LayoutModifier m a where
     -- | (window,rectangle) pairs returned
     -- by the underlying layout
     [(a, Rectangle)] ->
-    menv ([(a, Rectangle)], Maybe (m a))
+    HS ([(a, Rectangle)], Maybe (m a))
   redoLayout m r ms wrs = do hook m; return $ pureModifier m r ms wrs
 
   -- | 'pureModifier' allows you to intercept a call to 'runLayout'
@@ -236,7 +235,7 @@ class (Show (m a), Read (m a)) => LayoutModifier m a where
   --
   --   The default implementation of 'hook' is @return ()@ (i.e., it
   --   has no effect).
-  hook :: (HandleLayouts menv) => m a -> menv ()
+  hook :: m a -> HS ()
   hook _ = return ()
 
   -- | 'unhook' is called by the default implementation of
@@ -244,7 +243,7 @@ class (Show (m a), Read (m a)) => LayoutModifier m a where
   --   message.
   --
   --   The default implementation, of course, does nothing.
-  unhook :: (HandleLayouts menv) => m a -> menv ()
+  unhook :: m a -> HS ()
   unhook _ = return ()
 
   -- | 'modifierDescription' is used to give a String description to
@@ -294,4 +293,5 @@ instance (LayoutModifier m a, LayoutClass l a, Typeable m) => LayoutClass (Modif
 -- | A 'ModifiedLayout' is simply a container for a layout modifier
 --   combined with an underlying layout.  It is, of course, itself a
 --   layout (i.e. an instance of 'LayoutClass').
-data ModifiedLayout m l a = ModifiedLayout (m a) (l a) deriving (Read, Show)
+data ModifiedLayout m l a = ModifiedLayout (m a) (l a)
+  deriving (Eq, Read, Show, Generic)

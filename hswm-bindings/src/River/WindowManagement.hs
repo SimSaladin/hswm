@@ -1,5 +1,4 @@
 {-# LANGUAGE DeriveAnyClass #-}
-{-# OPTIONS_GHC -Wno-orphans #-}
 
 -- |
 -- Module      : River.WindowManagement
@@ -145,25 +144,29 @@ module River.WindowManagement
   , RiverColor(..)
   ) where
 
-import River.WindowManagement.V1.Client
+import           River.WindowManagement.V1.Client
 
-import Data.Bits
-import Data.Word
-import Data.Int
-import Data.Default
-import GHC.Generics
-import HsBindgen.Runtime.CEnum
-import Foreign.C.Types
+import           Control.DeepSeq (NFData)
+import           Data.Bits
+import           Data.Default
+import           Data.Int
+import           Data.Word
+import           Foreign.C.Types
+import           GHC.Generics
+import           HsBindgen.Runtime.CEnum
 
-data RiverColor = RiverColor { red, green, blue, alpha :: !Word32 }
-  deriving stock (Eq, Ord, Show, Read, Generic)
-  deriving anyclass (Default)
+-- | Color in the format River expects it (@4 * 32b@ RGBA).
+data RiverColor = RiverColor { red, green, blue, alpha :: {-# UNPACK #-} !Word32 }
+  deriving stock (Eq, Ord, Show, Read, Bounded, Generic)
+  deriving anyclass (Default, NFData)
 
 data WindowBorders = WindowBorders
-  { wbWidth :: !Int32            -- ^ Width of border
-  , wbEdges :: !RiverWindowEdges -- ^ Edges on which to draw borders
-  , wbColor :: !RiverColor       -- ^ RGBA 32_bit
-  } deriving stock (Eq, Ord, Show, Read, Generic)
+  { wbWidth :: {-# UNPACK #-} !Int32            -- ^ Width of border
+  , wbEdges :: {-# UNPACK #-} !RiverWindowEdges -- ^ Edges on which to draw borders
+  , wbColor :: {-# UNPACK #-} !RiverColor       -- ^ Border color (RGBA 32-bit)
+  }
+  deriving stock (Eq, Ord, Show, Read, Generic)
+  deriving anyclass (Default, NFData)
 
 pattern EdgeNone, EdgeLeft, EdgeRight, EdgeBottom, EdgeTop :: RiverWindowEdges
 pattern EdgeNone   = RIVER_WINDOW_V1_EDGES_NONE

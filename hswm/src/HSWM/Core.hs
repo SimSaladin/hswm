@@ -40,10 +40,10 @@ runInHS a = do
   conf <- ask
   when conf._stateLocked $ throwM $ HSWMStateLocked $ "attempted to nest state lock?\n" ++ prettyCallStack callStack
   io $ bracketOnError (atomically $ takeTMVar conf._state) (atomically . tryPutTMVar conf._state) $ \st -> do
-    res <- timeout 2_000_000 $ runHS conf {_stateLocked = True} st a
+    res <- timeout 3_000_000 $ runHS conf {_stateLocked = True} st a
     case res of
       Just (r, st') -> atomically (putTMVar conf._state st') >> return r
-      Nothing -> throwM $ HSWMTimeout $ "runInHS: timed out (2s): " ++ prettyCallStack callStack
+      Nothing -> throwM $ HSWMTimeout $ "runInHS: timed out (3s): " ++ prettyCallStack callStack
 
 liftH :: (MonadReader HConf m, MonadIO m) => H a -> m a
 liftH a = do

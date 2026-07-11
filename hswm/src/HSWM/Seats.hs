@@ -140,10 +140,18 @@ handleXkbBindingEvent = \case
   where
     getBindingRef dt = io $ deRefStablePtr (castPtrToStablePtr $ castPtr dt :: StablePtr (XkbBinding (SomeAction H)))
 
--- Unhandled submap key
+-- | Unhandled submap keys.
+--
+-- User data is the 'RiverSeat'.
 handleXkbBindingsSeatEvent :: R.RiverXkbBindingsSeatEvent -> H ()
 handleXkbBindingsSeatEvent = \case
-  R.RiverXkbBindingsSeatAteUnboundKey dt _ -> runInHS $ modifySeat' dt $ pendingAction .~ S_SUBMAP_CANCEL
+  R.RiverXkbBindingsSeatAteUnboundKey dt _ -> do
+    -- Run default action if defined
+    mseat <- runInHS $ lookupSeat $ R.RiverSeat $ castPtr dt
+    whenJust mseat $ \s ->
+      whenJust s.submap_pending $ \(_, _, subdef) ->
+      whenJust subdef $ void . async . runner
+    runInHS $ modifySeat' dt $ pendingAction .~ S_SUBMAP_CANCEL
 
 -- | Pointer events.
 handlePointerEvent :: R.RiverPointerBindingEvent -> H ()
@@ -203,18 +211,23 @@ manage1 s = do
             doS $ \x -> x { currentFocus = SFocusWindow s.focused }
           _ -> pure ()
 
-      S_SUBMAP_NEXT_KEY action subkeys -> do
+      S_SUBMAP_NEXT_KEY action subkeys subdef -> do
         ensureNextKeyEaten s
         -- Disable previous keymap keys + activate sub-keymap keys + store submap state
         io $ mapM_ (deRefStablePtr >=> R.riverXkbBindingDisable . (.riverXkbBinding)) $
-            maybe s.xkb_bindings snd s.submap_pending
+            maybe s.xkb_bindings (view _2) s.submap_pending
+        -- Enable submap keys
         io $ forM_ subkeys $ deRefStablePtr >=> R.riverXkbBindingEnable . (.riverXkbBinding)
-        doS $ \s' -> s' {submap_pending = Just (action, subkeys), pending_action = S_NONE}
+        doS $ \s' -> s'
+          { submap_pending = Just (action, subkeys, subdef)
+          , pending_action = S_NONE
+          }
 
       S_SUBMAP_CANCEL -> do
         -- Disable sub-keymap keys + enable main keymap keys + reset state
-        whenJust s.submap_pending $ \(_, subkeys) ->
+        whenJust s.submap_pending $ \(_, subkeys, _) ->
           io $ forM_ subkeys $ deRefStablePtr >=> R.riverXkbBindingDisable . (.riverXkbBinding)
+        -- Enable base bindings
         io $ forM_ s.xkb_bindings $ deRefStablePtr >=> R.riverXkbBindingEnable . (.riverXkbBinding)
         doS $ \s' -> s' {submap_pending = Nothing, pending_action = S_NONE}
 
@@ -373,10 +386,10 @@ execXkbBinding :: XkbBinding (SomeAction H) -> H ()
 execXkbBinding xb = local (\r -> r {thisSeat = Just rs}) $ do
   ms <- runInHS $ lookupSeat rs
   whenJust ms $ \s -> case (s.submap_pending, actionSubmap @H xb.boundAction) of
-    (Nothing, [])        -> doAction
-    (Nothing, _)         -> next (S_SUBMAP_NEXT_KEY xb.boundAction xb.boundSubmap) -- Submap binding activated
-    (Just _, [])         -> next S_SUBMAP_CANCEL >> void (async execute) -- Submap action + reset
-    (Just (_, _), _ : _) -> next (S_SUBMAP_NEXT_KEY xb.boundAction xb.boundSubmap) -- Submap binding activated (lvl++)
+    (Nothing, Submap [] _) -> doAction
+    (Nothing, _)           -> next (S_SUBMAP_NEXT_KEY xb.boundAction xb.boundSubmap xb.defaultSubmapAction) -- Submap binding activated
+    (Just _, Submap [] _)  -> next S_SUBMAP_CANCEL >> void (async execute) -- Submap action + reset
+    (Just _, _)            -> next (S_SUBMAP_NEXT_KEY xb.boundAction xb.boundSubmap xb.defaultSubmapAction) -- Submap binding activated (lvl++)
   where
     doAction = do
       tryTakeMVar xb.runningVar >>= maybe (return ()) cancel

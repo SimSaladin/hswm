@@ -50,6 +50,7 @@
           (hsPkgs."c-expr-runtime" or (errorHandler.buildDepError "c-expr-runtime"))
           (hsPkgs."hs-bindgen-runtime" or (errorHandler.buildDepError "hs-bindgen-runtime"))
           (hsPkgs."hs-bindgen-hooks" or (errorHandler.buildDepError "hs-bindgen-hooks"))
+          (hsPkgs."primitive" or (errorHandler.buildDepError "primitive"))
         ];
         libs = pkgs.lib.optionals (!flags.pkg-config) [
           (pkgs."wayland-client" or (errorHandler.sysDepError "wayland-client"))

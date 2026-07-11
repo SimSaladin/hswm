@@ -67,7 +67,7 @@ import qualified WL.Util.Generated.Unsafe as U
 import qualified HsBindgen.Runtime.HasCField as CF
 import           UnliftIO
 
-import           Control.DeepSeq (NFData)
+import           Control.DeepSeq (NFData(..))
 import           Control.Monad
 import           Data.Coerce
 import           Data.Default
@@ -80,6 +80,9 @@ import           Foreign.C.Types
 import           GHC.Generics
 import           GHC.Records
 import           System.IO.Unsafe
+import Data.Primitive.Types (Prim)
+
+deriving newtype instance Hashable CUInt
 
 -- | Dynamic array
 --
@@ -279,8 +282,12 @@ listSeekBackward (List l) = liftIO $ List . (.prev) <$> peek l
 -- Double and Int types.
 newtype Fixed = Fixed { unwrap :: Wl_fixed_t }
   deriving stock (Eq, Generic)
-  deriving newtype (Storable, Ord)
-  -- deriving anyclass (Hashable, NFData)
+  deriving newtype (Ord, Bits, Bounded, Enum, NFData, Storable, Prim, Hashable)
+  -- deriving anyclass (Hashable)
+
+deriving newtype instance Hashable Wl_fixed_t
+instance NFData Wl_fixed_t where
+  rnf (Wl_fixed_t a) = rnf a
 
 instance Show Fixed where
   show (Fixed (Wl_fixed_t x)) = F.showFixed True (F.MkFixed $ fromIntegral x :: F.Fixed 256)

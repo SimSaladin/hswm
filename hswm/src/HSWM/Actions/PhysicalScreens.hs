@@ -74,9 +74,9 @@ newtype PhysicalScreen = P Int
   deriving newtype (Eq, Ord, Show, Read, Enum, Num, Integral, Real)
 
 getScreenIdAndRectangle :: W.Screen i l a WorkspaceDetail ScreenId ScreenDetail -> (ScreenId, Rectangle)
-getScreenIdAndRectangle screen = (W.screen screen, rect)
+getScreenIdAndRectangle scr = (W.screen scr, rect)
   where
-    rect = screenRect $ W.screenDetail screen
+    rect = screenRect $ W.screenDetail scr
 
 -- | Translate a physical screen index to a 'ScreenId'
 getScreen :: ScreenComparator -> PhysicalScreen -> HS (Maybe ScreenId)

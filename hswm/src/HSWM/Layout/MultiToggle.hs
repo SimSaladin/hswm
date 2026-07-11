@@ -100,7 +100,7 @@ import Data.Enum
 
 -- | A class to identify custom transformers (and look up transforming
 -- functions by type).
-class (Eq t, Typeable t) => Transformer t a | t -> a where
+class (Eq t, Typeable t, Show t) => Transformer t a | t -> a where
     transform :: (LayoutClass l a) => t -> l a ->
         (forall l'. (LayoutClass l' a) => l' a -> (l' a -> l a) -> b) -> b
 
@@ -116,18 +116,21 @@ transform' :: (Transformer t a, LayoutClass l a) => t -> EL l a -> EL l a
 transform' t (EL l det) = transform t l (\l' det' -> EL l' (det . det'))
 
 -- | Toggle the specified layout transformer.
-data Toggle a = forall t. (Transformer t a) => Toggle t
+data Toggle a = forall t. Transformer t a => Toggle t
 
-instance (Typeable a) => Message (Toggle a)
+instance Show (Toggle a) where
+  show (Toggle t) = "Toggle " ++ show t
+
+instance Typeable a => Message (Toggle a)
 
 data MultiToggleS ts l a = MultiToggleS (l a) (Maybe Int) ts
     deriving (Read, Show)
 
-data MultiToggle ts l a = MultiToggle{
-    currLayout :: EL l a,
+data MultiToggle ts l a = MultiToggle
+  { currLayout :: EL l a,
     currIndex :: Maybe Int,
     transformers :: ts
-}
+  }
 
 expand :: (LayoutClass l a, HList ts a) => MultiToggleS ts l a -> MultiToggle ts l a
 expand (MultiToggleS b i ts) =

@@ -30,7 +30,7 @@ data StdTransformers = FULL          -- ^ switch to Full layout
                      | MIRROR        -- ^ Mirror the current layout.
                      | NOBORDERS     -- ^ Remove borders.
                      | SMARTBORDERS  -- ^ Apply smart borders.
-  deriving (Read, Show, Eq)
+  deriving (Eq, Read, Show, Generic)
 
 instance Transformer StdTransformers RiverWindow where
     transform FULL         x k = k Full (const x)

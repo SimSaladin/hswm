@@ -8,18 +8,17 @@
 -- Portability : unportable
 module HSWM.Types.Events where
 
-import River qualified as R
-import WL.Client qualified as WL
+import qualified River as R
+import qualified WL.Client as WL
+import qualified WL.ExtIdleNotify.Staging.V1.Client as ExtIN
+import qualified WL.ExtForeignToplevelList.Staging.V1.Client as ExtFTL
+import qualified WL.ExtSessionLock.Staging.V1.Client as ExtSL
+import qualified WL.Wlr.InputMethod.Unstable.V2.Client as WlrIM
+import qualified WL.Wlr.OutputManagement.Unstable.V1.Client as WlrOM
+import qualified WL.Wlr.OutputPowerManagement.Unstable.V1.Client as WlrOPM
+import qualified WL.XdgOutput.Unstable.V1.Client as Xdg
 
-import WL.ExtIdleNotify.Staging.V1.Client qualified as Ext
-import WL.ExtSessionLock.Staging.V1.Client qualified as SL
-import WL.ExtForeignToplevelList.Staging.V1.Client qualified as WL
-import WL.XdgOutput.Unstable.V1.Client qualified as Xdg
-import WL.Wlr.InputMethod.Unstable.V2.Client qualified as Zwp
-import WL.Wlr.OutputManagement.Unstable.V1.Client qualified as Wlr
-import qualified WL.Wlr.OutputPowerManagement.Unstable.V1.Client as OPM
-
-import System.Posix (Signal)
+import           System.Posix (Signal)
 
 -- | Main loop events.
 data MainEvent
@@ -28,53 +27,53 @@ data MainEvent
   | MainExit String SomeException
   | MainRestart FilePath
   | MainSaveToDisk
-  deriving (Show, Generic)
-
-class HandleEvent m event where
-  handleEvent :: event -> m ()
+  deriving stock (Show, Generic)
+  --deriving anyclass (NFData)
 
 -- | Mash-up of all River/Wayland generated events
 data Event
-  = -- River_*
-    WindowManagerEvent    !R.RiverWindowManagerEvent
-  | OutputEvent           !R.RiverOutputEvent
-  | WindowEvent           !R.RiverWindowEvent
-  | SeatEvent             !R.RiverSeatEvent
-  | PointerEvent          !R.RiverPointerBindingEvent
-  | XkbEvent              !R.RiverXkbBindingEvent
-  | XkbSeatEvent          !R.RiverXkbBindingsSeatEvent
-  | XkbConfigEvent        !R.RiverXkbConfigEvent
-  | XkbKeyboardEvent      !R.RiverXkbKeyboardEvent
-  | LayerShellOutputEvent !R.RiverLayerShellOutputEvent
-  | LayerShellSeatEvent   !R.RiverLayerShellSeatEvent
-  | InputManagerEvent     !R.RiverInputManagerEvent
-  | InputDeviceEvent      !R.RiverInputDeviceEvent
-  | LibinputConfigEvent   !R.RiverLibinputConfigEvent
-  | LibinputDeviceEvent   !R.RiverLibinputDeviceEvent
-  | -- Wl_*
-    WlShmEvent !WL.ShmEvent
-  | WlSeatEvent !WL.SeatEvent
-  | WlOutputEvent !WL.OutputEvent
-  | WlShellSurfaceEvent !WL.ShellSurfaceEvent
-  | WlKeyboardEvent !WL.KeyboardEvent
-  | WlPointerEvent  !WL.PointerEvent
-  | WlTouchEvent    !WL.TouchEvent
-  | -- Ext_*
-    ForeignTopLevelListV1 !WL.ForeignToplevelListEvent
-  | ForeignTopLevelHandleV1 !WL.ForeignToplevelHandleEvent
-  | SessionLockEvent !SL.SessionLockEvent
-  | ExtIdleNotificationEvent !Ext.IdleNotificationEvent
-  | -- Zwp_*
-    ZwpIM2PopupSurfaceE !Zwp.InputPopupSurfaceEvent
-  | ZwpIM2KeyboardGrabE !Zwp.InputMethodKeyboardGrabEvent
-  | ZwpIM2E !Zwp.InputMethodEvent
-  | -- Wlr_*
-    WlrOutputManagerEvent !Wlr.OutputManagerEvent
-  | WlrOutputHeadEvent !Wlr.OutputHeadEvent
-  | -- Xdg
-    ZdgOutputEvent !Xdg.OutputEvent
-  | OutputPowerEvent !OPM.OutputPowerEvent
-  deriving (Eq, Show, Generic)
+  -- River
+  = WindowManagerEvent        !R.RiverWindowManagerEvent
+  | OutputEvent               !R.RiverOutputEvent
+  | WindowEvent               !R.RiverWindowEvent
+  | SeatEvent                 !R.RiverSeatEvent
+  | PointerEvent              !R.RiverPointerBindingEvent
+  | XkbEvent                  !R.RiverXkbBindingEvent
+  | XkbSeatEvent              !R.RiverXkbBindingsSeatEvent
+  | XkbConfigEvent            !R.RiverXkbConfigEvent
+  | XkbKeyboardEvent          !R.RiverXkbKeyboardEvent
+  | LayerShellOutputEvent     !R.RiverLayerShellOutputEvent
+  | LayerShellSeatEvent       !R.RiverLayerShellSeatEvent
+  | InputManagerEvent         !R.RiverInputManagerEvent
+  | InputDeviceEvent          !R.RiverInputDeviceEvent
+  | LibinputConfigEvent       !R.RiverLibinputConfigEvent
+  | LibinputDeviceEvent       !R.RiverLibinputDeviceEvent
+  -- Wayland core
+  | WlShmEvent                !WL.ShmEvent
+  | WlSeatEvent               !WL.SeatEvent
+  | WlOutputEvent             !WL.OutputEvent
+  | WlShellSurfaceEvent       !WL.ShellSurfaceEvent
+  | WlKeyboardEvent           !WL.KeyboardEvent
+  | WlPointerEvent            !WL.PointerEvent
+  | WlTouchEvent              !WL.TouchEvent
+  -- Wlroots
+  | WlrIMEvent                !WlrIM.InputMethodEvent
+  | WlrIMPopupSurfaceEvent    !WlrIM.InputPopupSurfaceEvent
+  | WlrIMKeyboardGrabEvent    !WlrIM.InputMethodKeyboardGrabEvent
+  | WlrOutputManagerEvent     !WlrOM.OutputManagerEvent
+  | WlrOutputHeadEvent        !WlrOM.OutputHeadEvent
+  | OutputPowerEvent          !WlrOPM.OutputPowerEvent
+  -- Misc
+  | XdgOutputEvent            !Xdg.OutputEvent
+  | SessionLockEvent          !ExtSL.SessionLockEvent
+  | IdleNotificationEvent     !ExtIN.IdleNotificationEvent
+  | FTopLevelListEvent        !ExtFTL.ForeignToplevelListEvent
+  | FTopLevelHandleEvent      !ExtFTL.ForeignToplevelHandleEvent
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (NFData, Hashable)
 
-instance Applicative m => Default (Event -> m All) where
+instance (Applicative m, Monoid a) => Default (Event -> m a) where
   def _ = pure mempty
+
+class HandleEvent m event where
+  handleEvent :: event -> m ()

@@ -1,6 +1,8 @@
+{-# LANGUAGE DefaultSignatures      #-}
+{-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE TypeFamilyDependencies #-}
 {-# LANGUAGE UndecidableInstances   #-}
-{-# LANGUAGE FunctionalDependencies #-}
+
 
 -- |
 -- Module      : WL.Internals.Types
@@ -38,6 +40,7 @@ import           Foreign.C.ConstPtr
 import           GHC.TypeLits
 import           HsBindgen.Runtime.Prelude as ReExports (CEnum(..), CEnumZ, FromFunPtr(..),
                                                          PtrConst, ToFunPtr(..))
+import Data.Coerce
 
 type Version = Word32
 
@@ -48,7 +51,7 @@ type ObjectName = Word32
 --   - Reading @Version@
 --
 --   - Read/write @userdata@
-class Typeable object => IsWlObject (object :: Type) where
+class Typeable object => IsWlObject object where
   -- | Read object version.
   getVersion :: object -> IO Version
 
@@ -58,15 +61,18 @@ class Typeable object => IsWlObject (object :: Type) where
   -- | Write object user data.
   setUserData :: object -> Ptr Void -> IO ()
 
-  toProxy :: forall a. object -> Ptr a
+  -- | @wl_proxy@ wrapper
+  toProxy :: object -> Ptr a
+  default toProxy :: (Coercible object (Ptr Void)) => object -> Ptr a
+  toProxy = castPtr . coerce
 
 -- | Wayland objects that have destructors.
-class Typeable object => HasDestructor (object :: Type) where
+class Typeable object => HasDestructor object where
 
   objectDestroy :: MonadIO m => object -> m ()
 
 -- | Wayland objects that have interface (e.g. for global registry).
-class IsWlObject object => HasInterface (object :: Type) where
+class IsWlObject object => HasInterface object where
 
   -- | The interface global (constant).
   objectInterface :: Proxy object -> ConstPtr Wl_interface
@@ -79,17 +85,21 @@ class IsWlObject object => HasInterface (object :: Type) where
 
   -- | Object constructor.
   objectBindWrap :: Ptr () -> object
+  default objectBindWrap :: Coercible (Ptr ()) object => Ptr () -> object
+  objectBindWrap = coerce
 
 -- | Objects for which it is possible to create listeners.
-class HasInterface object => HasListener (object :: Type) where
+class HasInterface object => HasListener object where
 
   -- | The listener interface.
-  type ObjectListener object = (r :: Type) | r -> object
+  type ObjectListener object = r | r -> object
 
   -- | The event type of the listener.
-  type ObjectListenerEvent object = (r :: Type) | r -> object
+  type ObjectListenerEvent object = r | r -> object
 
-  -- | Create a new listener. The created listener should be freed with 'freeListener'.
+  -- | Create a new listener with provided callback function.
+  --
+  -- The created listener should be freed with 'freeListener'.
   createListener :: MonadIO m => (ObjectListenerEvent object -> IO ()) -> m (ConstPtr (ObjectListener object))
 
   -- | Add listener to object with the given user data.
@@ -105,10 +115,15 @@ instance (HasListener object, Typeable a, a ~ ObjectListener object) => HasDestr
 -- | Class of values that can be used as user data.
 class Typeable a => IsUserData a where
 
-  toUserData   :: a -> Ptr Void
+  toUserData :: a -> Ptr Void
+  default toUserData :: Coercible a (Ptr Void) => a -> Ptr Void
+  toUserData = coerce
 
   fromUserData :: Ptr Void -> IO a
+  default fromUserData :: Coercible (Ptr Void) a => Ptr Void -> IO a
+  fromUserData = pure . coerce
 
+-- | @NULL@
 instance IsUserData () where
   toUserData   _ = nullPtr
   fromUserData _ = pure ()
@@ -117,15 +132,11 @@ instance Typeable a => IsUserData (StablePtr a) where
   toUserData   = castPtr . castStablePtrToPtr
   fromUserData = pure . castPtrToStablePtr . castPtr
 
-instance {-# OVERLAPPABLE #-} Typeable a => IsUserData (Ptr a) where
-  toUserData   = castPtr
-  fromUserData = pure . castPtr
+instance {-# OVERLAPPABLE #-} Typeable a => IsUserData (Ptr a)
 
+-- | Invoke methods by their C names via labels.
 class Typeable object => HasMethod (method :: Symbol) object (since :: Nat) | object method -> since where
 
   type ObjectMethod object (method :: Symbol) :: Type
 
-  objectMethod :: Proxy method -> object -> ObjectMethod object method -- ObjectMethod object method
-
--- instance (KnownSymbol method, HasMethod method object since, info ~ ObjectMethod object method) => IsLabel method (object -> info) where
---   fromLabel = objectMethod @method Proxy
+  objectMethod :: Proxy method -> object -> ObjectMethod object method

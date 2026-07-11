@@ -15,31 +15,42 @@ import qualified Data.List as L
 import qualified Options.Applicative as Opts
 import           Options.Generic
 import           System.Log.FastLogger
-
--- | Main entrypoint settings.
-data MainRun w = MainRun
-  { mainLogLevel  :: w ::: Last LogLevel <#> "l" <?> "Log level (one of debug, info, warn or error)" <!> "debug"
-  , mainLogFile   :: w ::: Last FilePath <#> "o" <?> "Send logs to a file. If empty, a default file is used. If \"-\" the log output is sent to stdout."
-  , mainStateFile :: w ::: Last FilePath <#> "f" <?> "State file to read on restart."
-  } deriving (Generic)
-
-deriving instance Eq (MainRun Unwrapped)
-deriving instance Show (MainRun Unwrapped)
+import qualified PackageInfo_hswm
+import           Data.Version (showVersion)
 
 -- | Read the program arguments.
-parseMainArgs :: IO (MainRun Unwrapped)
-parseMainArgs = unwrapRecord "hswm"
+parseMainArgs :: IO Main
+parseMainArgs = unwrapRecord (toText programVersion)
+
+programVersion :: String
+programVersion = "hswm " ++ showVersion PackageInfo_hswm.version
+
+type Main = MainOptions Unwrapped
+
+-- XXX Note: <!> seems to not work with e.g. "Last foo <?> "desc""
+
+-- | Main entrypoint settings.
+data MainOptions w = MainOptions
+  { mainLogLevel  :: w ::: Last LogLevel  <#> "l" <?> "Log level (one of debug, info, warn or error)"
+  , mainLogFile   :: w ::: Last FilePath  <#> "o" <?> "Send logs to a file. If empty, a default file is used. If \"-\" the log output is sent to stdout."
+  , mainStateFile :: w ::: Maybe FilePath <#> "f" <?> "State file to read on restart."
+  , mainVersion   :: w ::: Bool           <#> "V" <?> "Display version and exit."
+  } deriving (Generic)
+
+deriving instance Eq Main
+deriving instance Show Main
 
 -- | Defaults defined via 'Default'
-instance Default (MainRun Unwrapped) where
-  def = MainRun
+instance Default Main where
+  def = MainOptions
     { mainLogLevel = pure LevelDebug
     , mainLogFile = mempty
     , mainStateFile = mempty
+    , mainVersion = def
     }
 
 -- | Field modifiers: drop the @main@ prefix, use @-@ as word separator.
-instance ParseRecord (MainRun Wrapped) where
+instance ParseRecord (MainOptions Wrapped) where
   parseRecord = parseRecordWithModifiers defaultModifiers
     { fieldNameModifier = \name -> fromCC $ fromMaybe name (L.stripPrefix "main" name) }
       where
@@ -53,7 +64,7 @@ instance ParseRecord (MainRun Wrapped) where
 
 -- * Logging
 
-mkMainLogger :: MainRun Unwrapped -> IO LoggerSet
+mkMainLogger :: MainOptions Unwrapped -> IO LoggerSet
 mkMainLogger main = case getLast main.mainLogFile of
     Just dst | dst == "-" || dst == "/dev/stdout" -> newStdoutLoggerSet defaultBufSize
     Just dst -> newFileLoggerSet defaultBufSize dst
@@ -67,12 +78,9 @@ defaultLogFile = do
 
 instance ParseField LogLevel where
   readField = Opts.maybeReader $ \case
-    "debug" -> Just LevelDebug
-    "info"  -> Just LevelInfo
-    "error" -> Just LevelError
-    "warn"  -> Just LevelWarn
+    "debug"   -> Just LevelDebug
+    "info"    -> Just LevelInfo
+    "error"   -> Just LevelError
+    "warn"    -> Just LevelWarn
     "warning" -> Just LevelWarn
-    _       -> Nothing
-instance ParseFields LogLevel
-instance ParseRecord LogLevel where
-  parseRecord = fmap getOnly parseRecord
+    _         -> Nothing

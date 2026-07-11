@@ -71,6 +71,7 @@
           (hsPkgs.pkgsBuildBuild.hsc2hs.components.exes.hsc2hs or (pkgs.pkgsBuildBuild.hsc2hs or (errorHandler.buildToolDepError "hsc2hs:hsc2hs")))
         ];
         buildable = true;
+        modules = [ "PackageInfo_hswm" ];
         hsSourceDirs = [ "src" ];
       };
       sublibs = {

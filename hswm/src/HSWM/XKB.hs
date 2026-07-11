@@ -1,3 +1,5 @@
+{-# LANGUAGE PartialTypeSignatures #-}
+
 module HSWM.XKB
   ( module HSWM.XKB,
     module Text.XkbCommon,
@@ -18,18 +20,21 @@ import qualified Data.Map as M
 -- * KeySym parsing
 
 type XkbBindCtx = (R.RiverXkbBindings, ConstPtr (WL.ObjectListener R.RiverXkbBinding), R.RiverSeat)
+type SKey a = StablePtr (XkbBinding a)
 
 createXkbBindings
-  :: (MonadReader env m, MonadLogger m, MonadIO m, Show a, Typeable a)
+  :: forall env m a m2. (MonadReader env m, MonadLogger m, MonadIO m, Show a, Typeable a, a ~ SomeAction m2)
   => XkbBindCtx
-  -> (a -> [(XBKey, a)]) -- ^ 'actionSubmap' - get subkeys
+  -> (a -> Submap m2) -- ^ 'actionSubmap' - get subkeys + default action
   -> [(XBKey, a)]
   -> m (XkbBindingMap a)
-createXkbBindings ctx getSub keys = sequence top
+createXkbBindings ctx getSub keys = sequence $ M.fromList top
   where
-    top = M.fromList [(k, create1 True k v =<< createSubs (getSub v)) | (k, v) <- keys]
-    createSubs ks = sequence $ M.fromList [(k, create1 False k v =<< createSubs (getSub v)) | (k, v) <- ks]
-    create1 enable (m, k) = newXKBBinding ctx enable m k
+    top = [(k, create1 Nothing True k v =<< createSubs (getSub v)) | (k, v) <- keys]
+    createSubs :: Submap m2 -> m (M.Map XBKey (SKey a))
+    createSubs subm = sequence $ M.fromList
+      [(k, create1 subm.submapDefault False k v =<< createSubs (getSub v)) | (k, v) <- subm.submapKeys]
+    create1 subdef enable (m, k) a subks = newXKBBinding ctx enable m k a (subks, subdef)
 
 newXKBBinding
   :: (MonadReader env m, MonadLogger m, MonadIO m, Show action, Typeable action)
@@ -38,15 +43,16 @@ newXKBBinding
   -> ModMask -- ^ Modifiers
   -> KeySym -- ^ Key
   -> action -- ^ Action when pressed
-  -> XkbBindingMap action -- ^ Submap keys
-  -> m (StablePtr (XkbBinding action))
-newXKBBinding (xkbBinds, xkb_binding_listener, seat) enable mods keysym action subKM = do
+  -> (XkbBindingMap action, Maybe action) -- ^ Submap keys + default action
+  -> m (SKey action)
+newXKBBinding (xkbBinds, xkb_binding_listener, seat) enable mods keysym action (subKM, subDef) = do
   logDebug $ "new xkb binding" :# [ "key" .= ppXBKey (mods, keysym),  "action" .= show action ]
   xb <- R.riverXkbBindingsGetXkbBinding xkbBinds seat (fi keysym) (R.toCEnum $ fi mods)
   runvar <- newEmptyMVar
   dtPtr <- io $ newStablePtr $ XkbBinding
     { boundAction = action
     , boundSubmap = subKM
+    , defaultSubmapAction = subDef
     , riverXkbBinding = xb
     , riverSeat = seat
     , autorepeat = ar
@@ -57,7 +63,7 @@ newXKBBinding (xkbBinds, xkb_binding_listener, seat) enable mods keysym action s
   return dtPtr
   where ar = False -- XXX : breaks GrabKeyboard repeating...
 
-destroyXKBBinding :: (MonadIO m) => StablePtr (XkbBinding a) -> m ()
+destroyXKBBinding :: (MonadIO m) => SKey a -> m ()
 destroyXKBBinding sptr = do
   xb <- io (deRefStablePtr sptr)
   io $ R.objectDestroy xb.riverXkbBinding

@@ -1,5 +1,5 @@
-{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE NoFieldSelectors #-}
+{-# LANGUAGE TemplateHaskell  #-}
 
 -- |
 -- Module      : HSWM.Util.RofiPrompt

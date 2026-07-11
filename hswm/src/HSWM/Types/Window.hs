@@ -54,7 +54,7 @@ data Window = Window
   , pointer_resize_requested_edges :: !R.RiverWindowEdges
   }
   deriving stock (Eq, Ord, Show, Generic)
-  deriving anyclass (Default)
+  deriving anyclass (Default, NFData)
 
 data WindowManageAction
   = WFullscreen
@@ -62,7 +62,8 @@ data WindowManageAction
   | WExitFullscreen
   | WToggleFullscreen
   | WRequestClose
-  deriving (Eq, Ord, Show, Generic)
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (Default, NFData)
 
 data WindowRenderAction
   = WRPosition !Position
@@ -71,7 +72,8 @@ data WindowRenderAction
   | WRPlaceBottom
   | WRHide
   | WRReveal
-  deriving (Eq, Ord, Show, Generic)
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (Default, NFData)
 
 -- * Lenses
 

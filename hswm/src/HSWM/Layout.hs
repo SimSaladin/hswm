@@ -35,14 +35,13 @@ import Prelude hiding (handle)
 
 -- | Change the size of the master pane.
 data Resize = Shrink | Expand
-  deriving (Eq, Show)
+  deriving stock (Eq, Show, Read, Bounded, Enum, Generic)
 
 -- | Increase the number of clients in the master pane.
 newtype IncMasterN = IncMasterN Int
-  deriving (Eq, Show)
+  deriving stock (Eq, Show, Read, Generic)
 
 instance Message Resize
-
 instance Message IncMasterN
 
 -- | The builtin tiling mode of xmonad. Supports 'Shrink', 'Expand' and
@@ -55,7 +54,7 @@ data Tall a = Tall
     -- | Default proportion of screen occupied by master pane (default: 1/2)
     tallRatio :: !Rational
   }
-  deriving (Show, Read)
+  deriving stock (Eq, Show, Read, Generic)
 
 -- TODO should be capped [0..1] ..
 
@@ -133,8 +132,6 @@ splitVerticallyBy f = (mirrorRect *** mirrorRect) . splitHorizontallyBy f . mirr
 
 ------------------------------------------------------------------------
 
-------------------------------------------------------------------------
-
 -- | Mirror a layout, compute its 90 degree rotated form.
 newtype Mirror l a = Mirror (l a) deriving (Show, Read)
 
@@ -154,9 +151,8 @@ mirrorRect (Rectangle rx ry rw rh) = Rectangle ry rx rh rw
 -- Layouts that transition between other layouts
 
 -- | Messages to change the current layout.  Also see 'JumpToLayout'.
-data ChangeLayout = FirstLayout | NextLayout deriving (Eq, Show)
-
-instance Message ChangeLayout
+data ChangeLayout = FirstLayout | NextLayout
+  deriving stock (Eq, Show, Read, Bounded, Enum, Generic)
 
 -- For example, if you want to jump directly to the 'Full' layout you
 -- can do
@@ -164,8 +160,18 @@ instance Message ChangeLayout
 -- > , ((modm .|. controlMask, xK_f), sendMessage $ JumpToLayout "Full")
 --
 newtype JumpToLayout = JumpToLayout String
+  deriving stock (Eq, Show, Read, Generic)
 
-instance Message JumpToLayout
+data NextNoWrap = NextNoWrap
+  deriving stock (Eq, Read, Show, Bounded, Enum, Generic)
+
+-- | A layout that allows users to switch between various layout options.
+data Choose l r a = Choose CLR (l a) (r a)
+  deriving stock (Read, Show, Generic)
+
+-- | Choose the current sub-layout (left or right) in 'Choose'.
+data CLR = CL | CR
+  deriving stock (Eq, Read, Show, Bounded, Enum, Generic)
 
 -- | The layout choice combinator
 (|||) :: l a -> r a -> Choose l r a
@@ -173,27 +179,22 @@ instance Message JumpToLayout
 
 infixr 5 |||
 
--- | A layout that allows users to switch between various layout options.
-data Choose l r a = Choose CLR (l a) (r a) deriving (Read, Show)
-
--- | Choose the current sub-layout (left or right) in 'Choose'.
-data CLR = CL | CR deriving (Read, Show, Eq)
-
-data NextNoWrap = NextNoWrap deriving (Eq, Show)
-
+instance Message ChangeLayout
+instance Message JumpToLayout
 instance Message NextNoWrap
+
 
 -- | A small wrapper around handleMessage, as it is tedious to write
 -- SomeMessage repeatedly.
-handle :: (HandleLayouts m) => (LayoutClass l a, Message msg) => l a -> msg -> m (Maybe (l a))
+handle :: (LayoutClass l a, Message msg) => l a -> msg -> HS (Maybe (l a))
 handle l m = handleMessage l (SomeMessage m)
 
 -- | A smart constructor that takes some potential modifications, returns a
 -- new structure if any fields have changed, and performs any necessary cleanup
 -- on newly non-visible layouts.
 choose ::
-  (HandleLayouts m, LayoutClass l a, LayoutClass r a) =>
-  Choose l r a -> CLR -> Maybe (l a) -> Maybe (r a) -> m (Maybe (Choose l r a))
+  (LayoutClass l a, LayoutClass r a) =>
+  Choose l r a -> CLR -> Maybe (l a) -> Maybe (r a) -> HS (Maybe (Choose l r a))
 choose (Choose d _ _) d' Nothing Nothing | d == d' = return Nothing
 choose (Choose d l r) d' ml mr = f lr
   where

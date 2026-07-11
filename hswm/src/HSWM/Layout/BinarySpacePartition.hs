@@ -863,31 +863,28 @@ renderBorders r b = do
 
 -- create a window for each border line, show, add into stack and set floating
 createBorder :: Rectangle -> Maybe RiverColor -> HS [RiverWindow]
-createBorder (Rectangle wx wy ww wh) c = do
-  bw <- view (config . borderWidth)
-
-  pure []
+createBorder _ _ = do
+--createBorder (Rectangle wx wy ww wh) c = do
   -- TODO: setting border color
   --
+  --bw <- view (config . borderWidth)
   --bc <- case c of
   --       Nothing -> asks (focusedBorder . config)
   --       Just s -> return s
-
   --let rects = [ Rectangle wx wy ww (fi bw)
   --            , Rectangle wx wy (fi bw) wh
   --            , Rectangle wx (wy+fi wh-fi bw) ww (fi bw)
   --            , Rectangle (wx+fi ww-fi bw) wy (fi bw) wh
   --            ]
-
   --ws <- mapM (\r -> createNewWindow r Nothing bc False) rects
   --showWindows ws
   --replaceStack . maybe Nothing (\s -> Just s{W.down=W.down s ++ ws}) =<< getStackSet
   --replaceFloating . M.union (M.fromList $ zip ws $ map toRR rects) . W.floating . windowset =<< get
-
   --modify (\s -> s{ mapped = mapped s `S.union` S.fromList ws})
-
-  -- show <$> mapM isClient ws >>= debug
+  --show <$> mapM isClient ws >>= debug
   --return ws
+
+  pure []
   --where toRR (Rectangle x y w h) = W.RationalRect (fi x) (fi y) (fi w) (fi h)
 
 -- remove border line windows from stack + floating, kill

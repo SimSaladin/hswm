@@ -1,6 +1,6 @@
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE PatternGuards #-}
+{-# LANGUAGE PatternGuards         #-}
 
 -- |
 -- Module      :  HSWM.Layout.WindowNavigation
@@ -137,9 +137,9 @@ instance LayoutModifier WindowNavigation RiverWindow where
     do
       HSWMConfig {normalBorder = nbc, focusedBorder = fbc} <- view config
 
-      let [uc,dc,lc,rc] = case brightness conf of
-            Just frac -> let myc = mixRGBA frac fbc nbc in [myc,myc,myc,myc]
-            Nothing -> map parseRgba [upColor conf, downColor conf, leftColor conf, rightColor conf]
+      let (uc,dc,lc,rc) = case brightness conf of
+            Just frac -> let myc = mixRGBA frac fbc nbc in (myc,myc,myc,myc)
+            Nothing -> each %~ parseRgba $ (upColor conf, downColor conf, leftColor conf, rightColor conf)
 
       let dirc U = uc
           dirc D = dc

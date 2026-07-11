@@ -1,6 +1,6 @@
+{-# LANGUAGE NoFieldSelectors     #-}
+{-# LANGUAGE TemplateHaskell      #-}
 {-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE NoFieldSelectors #-}
 
 -- |
 -- Module      : HSWM.Types.Config
@@ -24,6 +24,7 @@ import           HSWM.Utils (parseRgba)
 
 import qualified River as R
 
+import           Control.Monad.Fix
 import           Data.Default.Internal (gdef)
 import           Data.Kind
 import qualified GHC.Generics as Generics
@@ -56,12 +57,12 @@ data HSWMConfig m l = HSWMConfig
   , cursorSize      :: !Word32
   } deriving stock (Generic)
 
-data RepeatInfo = RepeatInfo { rate, delay :: {-# UNPACK #-} !Int32 }
-  deriving stock (Eq, Ord, Show, Read, Generic)
-  deriving anyclass (Default)
-
-instance {-# OVERLAPPABLE #-} (Default (l RiverWindow), Default (m ()), Default (Event -> m All), Monad (Stateful m))
-  => Default (HSWMConfig m l) where
+instance
+  (Default (l RiverWindow),
+   Default (m ()),
+   Default (Event -> m All),
+   Monad (Stateful m)
+  ) => Default (HSWMConfig m l) where
     def = (Generics.to gdef)
       { borderWidth    = 2
       , borderEdges    = mconcat [R.EdgeLeft, R.EdgeRight, R.EdgeTop, R.EdgeBottom]
@@ -71,11 +72,14 @@ instance {-# OVERLAPPABLE #-} (Default (l RiverWindow), Default (m ()), Default 
       , workspaces     = ["1", "2", "3", "4"]
       }
 
--- * Configure modifiers
+data RepeatInfo = RepeatInfo { rate, delay :: {-# UNPACK #-} !Int32 }
+  deriving stock (Eq, Ord, Show, Read, Generic)
+  deriving anyclass (Default, NFData)
 
 -- | Composable config modification.
 type ConfigDoPure = forall m l. HSWMConfig m l -> HSWMConfig m l
 
+-- | Composable config modification.
 type ConfigDoM m = forall l. HSWMConfig m l -> HSWMConfig m l
 
 -- * WindowSet/StackSet
@@ -89,27 +93,27 @@ type WorkspaceId = String
 
 -- | The output dimensions
 data ScreenDetail = SD {x, y, width, height :: {-# UNPACK #-} !Int}
-  deriving (Eq, Show, Read, Generic, Default)
+  deriving stock (Eq, Show, Read, Generic)
+  deriving anyclass (Default, NFData)
 
 data WorkspaceDetail = WD
-  deriving (Eq, Show, Read, Generic, Default)
+  deriving stock (Eq, Show, Read, Generic)
+  deriving anyclass (Default, NFData)
 
--- * Query, ManageHook
+-- * QueryT
 
-newtype QueryX (m :: Type -> Type) a = Query { unwrap :: ReaderT Window m a }
-  deriving newtype (Functor, Applicative, Monad, MonadIO, MonadReader Window)
+newtype QueryT m a = Query { unwrap :: ReaderT Window m a }
+  deriving newtype (Functor, Applicative, Monad, MonadIO, MonadFix, MonadThrow, MonadReader Window)
 
-type ManageHookX m = QueryX m (Endo (WindowSetX (LayoutProxy m)))
+instance Applicative m => Default (QueryT m (Endo a)) where
+  def = pure mempty
 
-type MaybeManageHookX m = QueryX m (Maybe (Endo (WindowSetX (LayoutProxy m))))
-
-instance Monad m => Default (QueryX m (Endo a)) where
-  def = return mempty
-
-runQuery :: QueryX m a -> Window -> m a
+runQuery :: QueryT m a -> Window -> m a
 runQuery (Query q) = runReaderT q
 
--- ** Util
+type ManageHookX m = QueryT m (Endo (WindowSetX (LayoutProxy m)))
+
+type MaybeManageHookX m = QueryT m (Maybe (Endo (WindowSetX (LayoutProxy m))))
 
 -- | This should usually map to @'Layout' 'RiverWindow'@
 type family LayoutProxy (m :: Type -> Type) :: Type -> Type
@@ -122,15 +126,19 @@ makeLensesWith' classPerField
   , ''ScreenDetail
   ]
 
-makeLensesCombine [] [ ''HSWMConfig ]
+makeLensesCombine'
+  (lensField %~ (\f ty b n -> if nameBase n == "layoutHook" then [] else f ty b n))
+  [ ] [ ''HSWMConfig ]
 
---instance HasRepeatInfo RepeatInfo RepeatInfo where repeatInfo = id
+-- | Correctly type-changing lens for @layoutHook@ (the generated yields invalid signature...)
+layoutHook :: Lens (HSWMConfig m l) (HSWMConfig m l') (l RiverWindow) (l' RiverWindow)
+layoutHook = lens (.layoutHook) (\s b -> s { layoutHook = b })
 
 instance HasPosition ScreenDetail Position where
-  position = lens (Position <$> view (_x . to fi) <*> view (_y . to fi)) (\s a -> (s::ScreenDetail) { x = fi a.x, y = fi a.y })
+  position = lens (Position <$> view (_x . to fi) <*> view (_y . to fi)) (\s a -> (s :: ScreenDetail) { x = fi a.x, y = fi a.y })
 
 instance HasSize ScreenDetail Size where
-  size = lens (Size <$> view (width . to fi) <*> view (height . to fi)) (\s a -> (s::ScreenDetail) { width = fi a.width, height = fi a.width })
+  size = lens (Size <$> view (width . to fi) <*> view (height . to fi)) (\s a -> (s :: ScreenDetail) { width = fi a.width, height = fi a.width })
 
 -- * Utilities
 

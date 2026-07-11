@@ -30,35 +30,36 @@ import qualified HSWM.Windows as Windows
 import           HSWM.Wayland
 import qualified HSWM.Util.Debug as Debug
 
-import qualified WL.Client as WL
 import qualified River as R
-
-import qualified WL.Viewporter as VP
-import qualified WL.FractionalScale.Staging.V1.Client as FS
-import qualified WL.XdgOutput.Unstable.V1.Client as XO
-
-import           WL.ExtIdleNotify.Staging.V1.Client as EXT_IN
+import qualified WL.Client as WL
 import           WL.ExtForeignToplevelList.Staging.V1.Client as EXT_FTL
+import           WL.ExtIdleNotify.Staging.V1.Client as EXT_IN
+import qualified WL.FractionalScale.Staging.V1.Client as FS
+import qualified WL.Viewporter as VP
 import           WL.Wlr.InputMethod.Unstable.V2.Client as WLR_IM
 import qualified WL.Wlr.LayerShell.Unstable.V1.Client as WLR_LS
 import qualified WL.Wlr.OutputManagement.Unstable.V1.Client as WLR_OM
 import qualified WL.Wlr.OutputPowerManagement.Unstable.V1.Client as WLR_OPM
+import qualified WL.XdgOutput.Unstable.V1.Client as XO
 
 import           Control.Concurrent.Thread.Delay as Conc (delay)
-import           Options.Generic
+import           System.IO (putStrLn)
 import           System.IO.Error
 import           System.Log.FastLogger
 import qualified System.Posix as Posix
 
 hswm :: (m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow)) => HSWMConfig m l -> IO ()
 hswm conf = do
-  installSignalHandlers -- TODO uninstall on exit?
   mainRun <- parseMainArgs
-  startHSWM mainRun conf
+  case () of
+    _ | mainRun.mainVersion -> putStrLn programVersion
+    _ -> do
+      installSignalHandlers -- TODO uninstall on exit?
+      startHSWM mainRun conf
 
 startHSWM
   :: (m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow))
-  => MainRun Unwrapped -> HSWMConfig m l -> IO ()
+  => Main -> HSWMConfig m l -> IO ()
 startHSWM mainRun config = do
     loggerSet <- mkMainLogger mainRun
     let logFunc     = fastLoggerOutput loggerSet
@@ -86,7 +87,7 @@ startHSWM mainRun config = do
     withLogging $ do
       let newEmpty = let wset = W.new conf.config.layoutHook config.workspaces [SD 0 0 0 0]
                       in def {windowset = wset, windowsetOld = wset}
-      st <- fromMaybe newEmpty <$> readStateFile (getLast mainRun.mainStateFile) config
+      st <- fromMaybe newEmpty <$> readStateFile (mainRun.mainStateFile) config
       atomically $ putTMVar conf._state st
 
     let runH' :: H a -> IO a
@@ -120,11 +121,11 @@ startHSWM mainRun config = do
       _ <- mkListener $ handleWithHook . LibinputDeviceEvent
       _ <- mkListener $ handleWithHook . InputManagerEvent
       _ <- mkListener $ handleWithHook . WindowManagerEvent
-      _ <- mkListener $ handleWithHook . ForeignTopLevelHandleV1
-      _ <- mkListener $ handleWithHook . ZdgOutputEvent
+      _ <- mkListener $ handleWithHook . FTopLevelHandleEvent
+      _ <- mkListener $ handleWithHook . XdgOutputEvent
       _ <- mkListener $ handleWithHook . WlrOutputManagerEvent
       _ <- mkListener $ handleWithHook . WlrOutputHeadEvent
-      _ <- mkListener $ handleWithHook . ExtIdleNotificationEvent
+      _ <- mkListener $ handleWithHook . IdleNotificationEvent
       _ <- mkListener $ handleWithHook . OutputPowerEvent
 
       runInIO <- askRunInIO
@@ -285,9 +286,9 @@ instance HandleEvent H Event where
   handleEvent (LibinputDeviceEvent e) = InputConfig.handleLibinputDeviceEvent e
   handleEvent (XkbConfigEvent e) = InputConfig.handleXkbConfigEvent e
   handleEvent (XkbKeyboardEvent e) = InputConfig.handleXkbKeyboardEvent e
-  handleEvent (ForeignTopLevelListV1 (EXT_FTL.ForeignToplevelListToplevel _ _ fh)) = WL.listenerAdd_ fh =<< getObject
+  handleEvent (FTopLevelListEvent (EXT_FTL.ForeignToplevelListToplevel _ _ fh)) = WL.listenerAdd_ fh =<< getObject
   handleEvent (WlrOutputManagerEvent (WLR_OM.OutputManagerHead _ _ head)) = WL.listenerAdd_ head =<< getObject
-  handleEvent (ExtIdleNotificationEvent e) = handleEvent e
+  handleEvent (IdleNotificationEvent e) = handleEvent e
   handleEvent (OutputPowerEvent e) = e `seq` return () -- TODO
   handleEvent _ = return ()
 

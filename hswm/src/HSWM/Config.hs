@@ -23,6 +23,23 @@ import           Data.Foldable
 import qualified Data.List as L
 import qualified Data.Text as T
 
+-- | Concatenate many messages
+data a :>>: b = a :>>: b
+  deriving stock (Eq, Show, Generic)
+
+infixr 6 :>>:
+
+instance (IsAction H a, IsAction H b, Typeable a, Typeable b) => IsAction H (a :>>: b) where
+  runner (a :>>: b) = runner a >> runner b
+  actionSubmap (a :>>: b) =
+    let s1 = actionSubmap a
+        s2 = actionSubmap b
+     in Submap { submapKeys = s1.submapKeys <> s2.submapKeys
+               , submapDefault = s1.submapDefault <|> s2.submapDefault -- XXX
+               }
+  actionDescription p (a :>>: b) = actionDescription p a ++ ", " ++ actionDescription p b
+
+
 -- * NamedAction
 
 data NamedAction = NamedAction String (SomeAction H)
@@ -43,6 +60,12 @@ class IsKeyAction a where
 instance {-# OVERLAPPABLE #-} IsKeyAction (SomeAction H) where
   toKeyAction d a = SomeAction $ NamedAction d a
 
+instance {-# OVERLAPPABLE #-} (IsKeyAction a, IsKeyAction b) => IsKeyAction (a :>>: b) where
+  toKeyAction d (a :>>: b) =
+    let aa = toKeyAction "" a
+        ba = toKeyAction "" b
+    in toKeyAction d $ SomeAction @H $ aa :>>: ba
+
 instance {-# OVERLAPPABLE #-} IsKeyAction (H b) where
   toKeyAction d = named d . void
 
@@ -50,7 +73,7 @@ instance {-# OVERLAPPABLE #-} IsKeyAction (HS b) where
   toKeyAction d = named @(H ()) d . runInHS . void
 
 instance {-# OVERLAPPABLE #-} (Message a, Show a) => IsKeyAction a where
-  toKeyAction d a = named (d ++ ": " ++ show a) (runInHS $ sendMessage a :: H ())
+  toKeyAction d a = named ((if null d then "" else d ++ ": ") ++ show a) (runInHS $ sendMessage a :: H ())
 
 -- | Attach a description to some action: @ restart <?> "Restart" @
 (<?>) :: IsKeyAction a => a -> String -> SomeAction H

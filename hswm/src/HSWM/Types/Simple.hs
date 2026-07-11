@@ -1,7 +1,6 @@
 {-# LANGUAGE NoFieldSelectors #-}
 {-# LANGUAGE TemplateHaskell  #-}
 {-# LANGUAGE PatternSynonyms  #-}
-
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 -- |
@@ -16,9 +15,10 @@
 module HSWM.Types.Simple where
 
 import           Data.Ratio
-import qualified HSWM.StackSet as W
 import           HSWM.Types.Lens
 import           Data.Aeson (FromJSON, ToJSON)
+
+import qualified HSWM.StackSet as W
 
 -- * Types
 
@@ -32,11 +32,11 @@ type Position1D = Int32
 
 data Size = Size { width, height :: {-# UNPACK #-} !Dimension }
   deriving stock (Eq, Ord, Show, Read, Generic)
-  deriving anyclass (Default, FromJSON, ToJSON)
+  deriving anyclass (Default, FromJSON, ToJSON, NFData)
 
 data Position = Position { x, y :: {-# UNPACK #-} !Position1D }
   deriving stock (Eq, Ord, Show, Read, Generic)
-  deriving anyclass (Default, FromJSON, ToJSON)
+  deriving anyclass (Default, FromJSON, ToJSON, NFData)
 
 -- | A position on the (screen) output surface
 type Point = Position
@@ -51,6 +51,7 @@ data Rectangle = Rectangle'
   , size     :: {-# UNPACK #-} !Size
   }
   deriving stock (Eq, Ord, Show, Read, Generic)
+  deriving anyclass (Default, FromJSON, ToJSON, NFData)
 
 pattern Rectangle :: Position1D -> Position1D -> Dimension -> Dimension -> Rectangle
 pattern Rectangle{x, y, width, height} = Rectangle' (Position x y) (Size width height)
@@ -59,11 +60,12 @@ pattern Rectangle{x, y, width, height} = Rectangle' (Position x y) (Size width h
 
 -- ** Directions (1D, 2D)
 
--- | One-dimensional directions:
+-- | One-dimensional directions
 data Direction1D = Next | Prev
-  deriving stock (Eq, Ord, Bounded, Enum, Read, Show)
+  deriving stock (Eq, Ord, Bounded, Enum, Read, Show, Generic)
+  deriving anyclass (FromJSON, ToJSON, NFData)
 
--- | Two-dimensional directions:
+-- | Two-dimensional directions
 data Direction2D
   = -- | Up
     U
@@ -73,7 +75,8 @@ data Direction2D
     R
   | -- | Left
     L
-  deriving stock (Eq, Ord, Bounded, Enum, Read, Show)
+  deriving stock (Eq, Ord, Bounded, Enum, Read, Show, Generic)
+  deriving anyclass (FromJSON, ToJSON, NFData)
 
 -- * Functions
 
@@ -108,6 +111,19 @@ makeLensesWith' classPerField
   [ ''Size
   , ''Position
   , ''Rectangle
+  ]
+
+-- * StackSet lenses
+
+makeLensesWith' classPerField [ ''W.RationalRect ]
+makeLensesWith' (classPerType
+  & lensField .~ (\ty _ n -> [TopName $ mkName $ fromSnake True $ "_" ++ (nameBase ty & _head %~ toLower) ++ "_" ++ (nameBase n & _head %~ toLower)])
+  & lensClass .~ (\n -> Just (mkName $ "Has" ++ nameBase n ++ "'", mkName $ "_" ++ (nameBase n & _head %~ toLower)))
+                )
+  [ ''W.Workspace
+  , ''W.Screen
+  , ''W.Stack
+  , ''W.StackSet
   ]
 
 -- Orphans

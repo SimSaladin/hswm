@@ -48,7 +48,7 @@ data Seat' (m :: Type -> Type) = Seat
   -- ^ Pointer bindings.
 
   , pending_action         :: !(SeatAction m)
-  , submap_pending         :: !(Maybe (SomeAction m, XkbBindingMap (SomeAction m)))
+  , submap_pending         :: !(Maybe (SomeAction m, XkbBindingMap (SomeAction m), Maybe (SomeAction m)))
   , pendingPointerEnter    :: !(Maybe (RiverWindow, Position))
 
   , op                     :: !SeatOperation
@@ -65,7 +65,7 @@ data Seat' (m :: Type -> Type) = Seat
   , removed                :: !Bool
   }
   deriving stock (Generic)
-  deriving anyclass (Default)
+  deriving anyclass (Default, NFData)
 
 deriving instance (MonadIO m, Show (Stateful m Bool)) => Show (Seat' m)
 
@@ -75,7 +75,8 @@ data SeatFocus
   = SFocusNone
   | SFocusWindow !RiverWindow
   | SFocusLayerShell { exclusiveFocus :: !Bool, prev :: !SeatFocus }
-  deriving (Eq, Ord, Show, Generic)
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (NFData)
 
 data SeatAction m
   = -- | no action / reset
@@ -83,10 +84,11 @@ data SeatAction m
   | -- | start pointer drag operation
     S_START_OP SeatOperation
   | -- | interpret next keypress for submap, swallowing an unexpected key
-    S_SUBMAP_NEXT_KEY (SomeAction m) (XkbBindingMap (SomeAction m))
+    S_SUBMAP_NEXT_KEY (SomeAction m) (XkbBindingMap (SomeAction m)) (Maybe (SomeAction m))
   | -- | Cancel submap input, resetting to root bindings.
     S_SUBMAP_CANCEL
-  deriving (Generic)
+  deriving stock (Generic)
+  deriving anyclass (NFData)
 
 deriving instance (MonadIO m, Show (Stateful m Bool)) => Show (SeatAction m)
 
@@ -95,7 +97,8 @@ data SeatOperation
   = SEAT_OP_NONE
   | SEAT_OP_MOVE
   | SEAT_OP_RESIZE
-  deriving (Eq, Bounded, Enum, Show, Read, Generic)
+  deriving stock (Eq, Bounded, Enum, Show, Read, Generic)
+  deriving anyclass (NFData)
 
 -- Default
 

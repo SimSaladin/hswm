@@ -121,7 +121,10 @@ instance Default ProtocolRenderSettings where
     , prRequestOptions      = []
 
     , prEventName           = defaultEventName
-    , prEventDerive         = const [derivClause Nothing [[t|Eq|], [t|Show|], [t|Generic|]] ]
+    , prEventDerive         = const
+        [ derivClause (Just StockStrategy) [ [t|Eq|], [t|Ord|], [t|Show|], [t|Generic|] ]
+        , derivClause (Just AnyclassStrategy) [ [t|NFData|], [t|Hashable|] ]
+        ]
     , prEventArgName        = defaultEventArgName
     , prEventArgTypeTrans   = defaultEventArgTypeTrans
     , prEventArgTrans       = defaultEventArgTrans -- s iface ev arg t name
@@ -208,11 +211,11 @@ defaultEventArgTrans s iface _ev arg t x
   | otherwise = [|return $(x)|]
 
 defaultRequestArgTrans :: ProtocolRenderSettings -> Interface -> IRequest -> Arg -> Type -> Name -> (ExpQ, Maybe (Name -> ExpQ))
-defaultRequestArgTrans s iface _ arg t name
+defaultRequestArgTrans _s iface _ arg t name
   | ASelf <- arg.argType
   = ([|return (getField @"unwrap" $(varE name))|], Nothing)
 
-  | AEnum enum miface <- arg.argType
+  | AEnum{} <- arg.argType
   = ([|return (fromIntegral $! getField @"unwrap" $(varE name))|], Nothing)
 
   | AppT (ConT cN) (ConT tN) <- t, cN == ''Ptr, nameBase tN == upperFirst iface.name
@@ -226,8 +229,6 @@ defaultRequestArgTrans s iface _ arg t name
      Just $ \nm -> [|when (unConstPtr $(varE nm) /= nullPtr) $ liftIO . free $ unConstPtr $(varE nm)|])
 
   | otherwise = ([|return $(varE name)|], Nothing)
- where
-    conP' str args = flip conP args =<< lookupImportedValueName' mkName (getArgIFName iface arg) str
 
 commonSettings :: ProtocolRenderSettings
 commonSettings = def
@@ -384,7 +385,12 @@ renderEnum :: ProtocolRenderSettings -> Interface -> IEnum -> Q [Dec]
 renderEnum s iface e = do
   tySyn <- tySynD enumName [] (conT origTy)
   patSyns <- mapM renderEntry e.entries
-  return (tySyn : concat patSyns)
+  -- Missing instances
+  derivs <- [d|
+    deriving newtype instance NFData $(conT origTy)
+    deriving newtype instance Hashable $(conT origTy)
+    |]
+  return (tySyn : concat patSyns ++ derivs)
   where
     enumName = mkName $ s.prTypeNameModifier $ s.prTypeNameModifier iface.name ++ "_" ++ e.name
     origTy = mkName $ upperFirst iface.name ++ "_" ++ e.name
@@ -422,7 +428,6 @@ renderInterfaceObject s iface = concat <$> sequence [ renderNT, renderIsWlObject
 
     renderIsWlObject = [d|
       instance IsWlObject $(conT ntName) where
-        toProxy     $(conP ntName [[p|x|]]) = castPtr x
         getVersion  $(conP ntName [[p|x|]]) = $(varE =<< getFn "get_version") x
         getUserData $(conP ntName [[p|x|]]) = $(varE =<< getFn "get_user_data") x
         setUserData $(conP ntName [[p|x|]]) = $(varE =<< getFn "set_user_data") x
@@ -446,7 +451,6 @@ renderInterfaceObject s iface = concat <$> sequence [ renderNT, renderIsWlObject
         objectInterface        _ = $(varE $ mkName $ s.prInterfaceName s iface.name)
         objectInterfaceName    _ = $(litE $ stringL iface.name)
         objectInterfaceVersion _ = $(litE $ integerL $ fromIntegral iface.version)
-        objectBindWrap           = $(conE $ mkName $ prTypeNameModifier s iface.name) . castPtr
       |]
       where doc = "@" ++ show (iface.name, iface.version) ++ "@"
 
