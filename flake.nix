@@ -17,7 +17,8 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
 
     #haskellNix.url = "github:input-output-hk/haskell.nix";
-    haskellNix.url = "git+file:/home/sim/haskell.nix";
+    #haskellNix.url = "git+file:/home/sim/haskell.nix";
+    haskellNix.url = "github:SimSaladin/haskell.nix";
 
     hs-bindgen = {
       url = "github:well-typed/hs-bindgen";
