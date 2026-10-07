@@ -38,7 +38,12 @@
         "test-artefacts/headers/**/*.yaml"
       ];
       extraTmpFiles = [];
-      extraDocFiles = [ "CHANGELOG.md" "CHANGELOG.md" "README.md" ];
+      extraDocFiles = [
+        "CHANGELOG.md"
+        "CHANGELOG.md"
+        "known-issues.md"
+        "README.md"
+      ];
     };
     components = {
       "library" = {
@@ -59,14 +64,15 @@
         ];
         buildable = true;
         modules = [
+          "HsBindgen/Internal/Macro/CExpr"
+          "HsBindgen/Internal/Macro/CExpr/Global"
+          "HsBindgen/Internal/Macro/CExpr/Parse"
+          "HsBindgen/Internal/Macro/CExpr/Resolution"
+          "HsBindgen/Internal/Macro/CExpr/Translation/Type"
+          "HsBindgen/Internal/Macro/CExpr/Translation/Value"
+          "HsBindgen/Internal/Macro/CExpr/Type"
+          "HsBindgen/Internal/Macro/CExpr/Typecheck"
           "HsBindgen/Macro"
-          "HsBindgen/Macro/CExpr"
-          "HsBindgen/Macro/Global"
-          "HsBindgen/Macro/Parse"
-          "HsBindgen/Macro/Resolution"
-          "HsBindgen/Macro/Translation/Type"
-          "HsBindgen/Macro/Translation/Value"
-          "HsBindgen/Macro/Typecheck"
           "HsBindgen/TH"
         ];
         hsSourceDirs = [ "src" ];
@@ -75,7 +81,6 @@
         "internal" = {
           depends = [
             (hsPkgs."base" or (errorHandler.buildDepError "base"))
-            (hsPkgs."doxygen-parser" or (errorHandler.buildDepError "doxygen-parser"))
             (hsPkgs."hs-bindgen-runtime" or (errorHandler.buildDepError "hs-bindgen-runtime"))
             (hsPkgs."aeson" or (errorHandler.buildDepError "aeson"))
             (hsPkgs."ansi-terminal" or (errorHandler.buildDepError "ansi-terminal"))
@@ -89,6 +94,7 @@
             (hsPkgs."data-default" or (errorHandler.buildDepError "data-default"))
             (hsPkgs."debruijn" or (errorHandler.buildDepError "debruijn"))
             (hsPkgs."directory" or (errorHandler.buildDepError "directory"))
+            (hsPkgs."doxygen-parser" or (errorHandler.buildDepError "doxygen-parser"))
             (hsPkgs."exceptions" or (errorHandler.buildDepError "exceptions"))
             (hsPkgs."filepath" or (errorHandler.buildDepError "filepath"))
             (hsPkgs."fin" or (errorHandler.buildDepError "fin"))
@@ -104,15 +110,10 @@
             (hsPkgs."template-haskell" or (errorHandler.buildDepError "template-haskell"))
             (hsPkgs."temporary" or (errorHandler.buildDepError "temporary"))
             (hsPkgs."text" or (errorHandler.buildDepError "text"))
-            (hsPkgs."time" or (errorHandler.buildDepError "time"))
             (hsPkgs."transformers" or (errorHandler.buildDepError "transformers"))
             (hsPkgs."unliftio-core" or (errorHandler.buildDepError "unliftio-core"))
             (hsPkgs."vec" or (errorHandler.buildDepError "vec"))
-            (hsPkgs."witherable" or (errorHandler.buildDepError "witherable"))
             (hsPkgs."yaml" or (errorHandler.buildDepError "yaml"))
-          ] ++ pkgs.lib.optionals (compiler.isGhc && compiler.version.lt "9.4") [
-            (hsPkgs."data-array-byte" or (errorHandler.buildDepError "data-array-byte"))
-            (hsPkgs."th-compat" or (errorHandler.buildDepError "th-compat"))
           ];
           buildable = true;
           modules = [
@@ -131,12 +132,12 @@
             "HsBindgen/Backend/Hs/AST/CompletePragma"
             "HsBindgen/Backend/Hs/AST/Strategy"
             "HsBindgen/Backend/Hs/CallConv"
-            "HsBindgen/Backend/Hs/Haddock/Config"
             "HsBindgen/Backend/Hs/Haddock/Documentation"
             "HsBindgen/Backend/Hs/Haddock/Translation"
             "HsBindgen/Backend/Hs/Name"
             "HsBindgen/Backend/Hs/Origin"
             "HsBindgen/Backend/Hs/Translation"
+            "HsBindgen/Backend/Hs/Translation/Field"
             "HsBindgen/Backend/Hs/Translation/ForeignImport"
             "HsBindgen/Backend/Hs/Translation/Function"
             "HsBindgen/Backend/Hs/Translation/Instances"
@@ -144,7 +145,6 @@
             "HsBindgen/Backend/Hs/Translation/Newtype"
             "HsBindgen/Backend/Hs/Translation/Structure"
             "HsBindgen/Backend/Hs/Translation/ToFromFunPtr"
-            "HsBindgen/Backend/Hs/Translation/Type"
             "HsBindgen/Backend/Hs/Translation/Union"
             "HsBindgen/Backend/HsModule/Names"
             "HsBindgen/Backend/HsModule/Pretty"
@@ -158,12 +158,14 @@
             "HsBindgen/Backend/HsModule/Translation"
             "HsBindgen/Backend/HsModule/Translation/Doxygen"
             "HsBindgen/Backend/Level"
+            "HsBindgen/Backend/Runtime"
             "HsBindgen/Backend/SHs/AST"
             "HsBindgen/Backend/SHs/AST/Expr"
             "HsBindgen/Backend/SHs/AST/Type"
             "HsBindgen/Backend/SHs/Simplify"
             "HsBindgen/Backend/SHs/Translation"
             "HsBindgen/Backend/SHs/Translation/Common"
+            "HsBindgen/Backend/SHs/Translation/MapFunction"
             "HsBindgen/Backend/TH/Translation"
             "HsBindgen/Backend/UniqueSymbol"
             "HsBindgen/BindingSpec"
@@ -179,12 +181,6 @@
             "HsBindgen/Clang/Discover"
             "HsBindgen/Clang/ExtraClangArgs"
             "HsBindgen/Clang/Macos"
-            "HsBindgen/Clang/Macros"
-            "HsBindgen/Clang/Macros/UniqueExpansion"
-            "HsBindgen/Clang/Macros/UniqueExpansion/Parse"
-            "HsBindgen/Clang/Macros/UniqueExpansion/Parse/Infra"
-            "HsBindgen/Clang/Macros/UniqueExpansion/Types"
-            "HsBindgen/Clang/Sizeof"
             "HsBindgen/Clang/Tokens"
             "HsBindgen/Config/ClangArgs"
             "HsBindgen/Config/Internal"
@@ -196,7 +192,6 @@
             "HsBindgen/Errors"
             "HsBindgen/Frontend"
             "HsBindgen/Frontend/Analysis"
-            "HsBindgen/Frontend/Analysis/AnonUsage"
             "HsBindgen/Frontend/Analysis/DeclIndex"
             "HsBindgen/Frontend/Analysis/DeclIndex/ResolveMacro"
             "HsBindgen/Frontend/Analysis/DeclUseGraph"
@@ -206,6 +201,7 @@
             "HsBindgen/Frontend/Analysis/Deps"
             "HsBindgen/Frontend/Analysis/IncludeGraph"
             "HsBindgen/Frontend/Analysis/Typedefs"
+            "HsBindgen/Frontend/Analysis/UnnamedIdUsage"
             "HsBindgen/Frontend/Analysis/UseDeclGraph"
             "HsBindgen/Frontend/DeclMeta"
             "HsBindgen/Frontend/LanguageC"
@@ -216,13 +212,13 @@
             "HsBindgen/Frontend/LanguageC/PartialAST/ToBindgen"
             "HsBindgen/Frontend/Pass/AdjustTypes"
             "HsBindgen/Frontend/Pass/AdjustTypes/IsPass"
-            "HsBindgen/Frontend/Pass/AssignAnonIds"
-            "HsBindgen/Frontend/Pass/AssignAnonIds/ChooseNames"
-            "HsBindgen/Frontend/Pass/AssignAnonIds/IsPass"
             "HsBindgen/Frontend/Pass/ConstructTranslationUnit"
             "HsBindgen/Frontend/Pass/ConstructTranslationUnit/IsPass"
             "HsBindgen/Frontend/Pass/EnrichComments"
             "HsBindgen/Frontend/Pass/EnrichComments/IsPass"
+            "HsBindgen/Frontend/Pass/FillUnnamedIds"
+            "HsBindgen/Frontend/Pass/FillUnnamedIds/ChooseNames"
+            "HsBindgen/Frontend/Pass/FillUnnamedIds/IsPass"
             "HsBindgen/Frontend/Pass/Final"
             "HsBindgen/Frontend/Pass/MangleNames"
             "HsBindgen/Frontend/Pass/MangleNames/CreateNames"
@@ -272,6 +268,10 @@
             "HsBindgen/Frontend/Pass/Select/IsPass"
             "HsBindgen/Frontend/Pass/SimplifyAST"
             "HsBindgen/Frontend/Pass/SimplifyAST/IsPass"
+            "HsBindgen/Frontend/Pass/TranslateTypes"
+            "HsBindgen/Frontend/Pass/TranslateTypes/IsPass"
+            "HsBindgen/Frontend/Pass/TranslateTypes/IsPass/Msg"
+            "HsBindgen/Frontend/Pass/TranslateTypes/Translation"
             "HsBindgen/Frontend/Pass/TypecheckMacros"
             "HsBindgen/Frontend/Pass/TypecheckMacros/IsPass"
             "HsBindgen/Frontend/Pass/TypecheckMacros/KnownTypes"
@@ -287,10 +287,13 @@
             "HsBindgen/IR/C"
             "HsBindgen/IR/C/Conflict"
             "HsBindgen/IR/C/Decl"
+            "HsBindgen/IR/C/DeclPath"
+            "HsBindgen/IR/C/HashDefine"
             "HsBindgen/IR/C/HashIncludeArg"
             "HsBindgen/IR/C/LocationInfo"
             "HsBindgen/IR/C/Naming"
             "HsBindgen/IR/C/PrettyPrinter"
+            "HsBindgen/IR/C/RootDirective"
             "HsBindgen/IR/C/Type"
             "HsBindgen/IR/Hs"
             "HsBindgen/IR/Hs/Type"
@@ -303,13 +306,23 @@
             "HsBindgen/IR/Pass/Macro"
             "HsBindgen/IR/Pass/Msg"
             "HsBindgen/IR/Pass/ScopedName"
+            "HsBindgen/IR/Pass/Types"
             "HsBindgen/IR/Translation"
             "HsBindgen/Language/C"
             "HsBindgen/Language/Haskell"
+            "HsBindgen/Macro/Empty"
             "HsBindgen/Macro/Error"
             "HsBindgen/Macro/Flip"
             "HsBindgen/Macro/Interface"
+            "HsBindgen/Macro/Parse"
+            "HsBindgen/Macro/Raw"
+            "HsBindgen/Macro/Raw/Lang"
+            "HsBindgen/Macro/Raw/Parse"
+            "HsBindgen/Macro/Syntax"
             "HsBindgen/Macro/Type"
+            "HsBindgen/Macro/UniqueExpansion"
+            "HsBindgen/Macro/UniqueExpansion/Parse"
+            "HsBindgen/Macro/UniqueExpansion/Types"
             "HsBindgen/NameHint"
             "HsBindgen/Orphans"
             "HsBindgen/Resolve"
@@ -323,7 +336,6 @@
             "HsBindgen/Util/Monad"
             "HsBindgen/Util/Process"
             "HsBindgen/Util/Rational"
-            "HsBindgen/Util/TH"
             "HsBindgen/Util/Tracer"
             "Text/SimplePrettyPrint"
           ];
@@ -428,10 +440,13 @@
           depends = [
             (hsPkgs."base" or (errorHandler.buildDepError "base"))
             (hsPkgs."hs-bindgen" or (errorHandler.buildDepError "hs-bindgen"))
+            (hsPkgs."hs-bindgen-runtime" or (errorHandler.buildDepError "hs-bindgen-runtime"))
             (hsPkgs."hs-bindgen".components.sublibs.internal or (errorHandler.buildDepError "hs-bindgen:internal"))
             (hsPkgs."hs-bindgen".components.sublibs.test-common or (errorHandler.buildDepError "hs-bindgen:test-common"))
+            (hsPkgs."c-expr-dsl" or (errorHandler.buildDepError "c-expr-dsl"))
             (hsPkgs."containers" or (errorHandler.buildDepError "containers"))
             (hsPkgs."data-default" or (errorHandler.buildDepError "data-default"))
+            (hsPkgs."debruijn" or (errorHandler.buildDepError "debruijn"))
             (hsPkgs."directory" or (errorHandler.buildDepError "directory"))
             (hsPkgs."filepath" or (errorHandler.buildDepError "filepath"))
             (hsPkgs."libclang-bindings" or (errorHandler.buildDepError "libclang-bindings"))
@@ -454,7 +469,7 @@
           ];
           buildable = true;
           modules = [
-            "Test/HsBindgen/Clang/Macros/UniqueExpansion"
+            "Test/HsBindgen/Clang"
             "Test/HsBindgen/Fixtures/Haddock"
             "Test/HsBindgen/Fixtures/TestCases"
             "Test/HsBindgen/Fixtures/Utils"
@@ -478,12 +493,18 @@
             "Test/HsBindgen/Golden/Infra/TestCase"
             "Test/HsBindgen/Golden/Infra/TestCaseTree"
             "Test/HsBindgen/Golden/Macros"
+            "Test/HsBindgen/Golden/Macros/Lang"
             "Test/HsBindgen/Golden/Macros/Redeclaration"
             "Test/HsBindgen/Golden/Macros/Reparse"
             "Test/HsBindgen/Golden/ProgramAnalysis"
             "Test/HsBindgen/Golden/Types"
             "Test/HsBindgen/Integration/ExitCode"
             "Test/HsBindgen/Integration/OverwritePolicy"
+            "Test/HsBindgen/Macro/CExpr"
+            "Test/HsBindgen/Macro/Infra"
+            "Test/HsBindgen/Macro/Syntax"
+            "Test/HsBindgen/Macro/Syntax/Clang"
+            "Test/HsBindgen/Macro/UniqueExpansion"
             "Test/HsBindgen/PPFixtures"
             "Test/HsBindgen/PPFixtures/Compile"
             "Test/HsBindgen/PPFixtures/TestCases"
@@ -497,6 +518,8 @@
             "Test/HsBindgen/Unit/Digraph"
             "Test/HsBindgen/Unit/Frontend"
             "Test/HsBindgen/Unit/Pretty"
+            "Test/HsBindgen/Unit/RootDirective"
+            "Test/HsBindgen/Unit/Runtime"
             "Test/HsBindgen/Unit/Tracer"
           ];
           hsSourceDirs = [ "test/hs-bindgen" ];

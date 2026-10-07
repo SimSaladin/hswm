@@ -12,30 +12,21 @@
         string-interpolate.flags.text-builder = false;
         string-interpolate.flags.bytestring-builder = false;
         string-interpolate.flags.extended-benchmarks = false;
-        ed25519.revision = import ./cabal-files/ed25519.nix;
-        ed25519.flags.test-doctests = true;
-        ed25519.flags.test-properties = true;
-        ed25519.flags.no-donna = true;
-        ed25519.flags.test-hlint = true;
         regex-pcre-builtin.revision = import ./cabal-files/regex-pcre-builtin.nix;
         filepath.revision = hackage.filepath."1.5.4.0".revisions.default;
         attoparsec.revision = import ./cabal-files/attoparsec.nix;
         attoparsec.flags.developer = false;
         text-iso8601.revision = import ./cabal-files/text-iso8601.nix;
-        semaphore-compat.revision = import ./cabal-files/semaphore-compat.nix;
-        semaphore-compat.flags.build-testing = false;
         yaml.revision = import ./cabal-files/yaml.nix;
         yaml.flags.no-exe = true;
         yaml.flags.no-examples = true;
         base64-bytestring.revision = import ./cabal-files/base64-bytestring.nix;
         haskell-gi-overloading.revision = import ./cabal-files/haskell-gi-overloading.nix;
-        HTTP.revision = import ./cabal-files/HTTP.nix;
-        HTTP.flags.warp-tests = false;
-        HTTP.flags.conduit10 = false;
-        HTTP.flags.warn-as-error = false;
+        Cabal-hooks.revision = import ./cabal-files/Cabal-hooks.nix;
         unordered-containers.revision = import ./cabal-files/unordered-containers.nix;
         unordered-containers.flags.debug = false;
         unix-time.revision = import ./cabal-files/unix-time.nix;
+        doxygen-parser.revision = import ./cabal-files/doxygen-parser.nix;
         microlens-platform.revision = import ./cabal-files/microlens-platform.nix;
         xdg-basedir.revision = import ./cabal-files/xdg-basedir.nix;
         transformers-base.revision = import ./cabal-files/transformers-base.nix;
@@ -60,15 +51,13 @@
         comonad.flags.containers = true;
         comonad.flags.indexed-traversable = true;
         comonad.flags.distributive = true;
-        resolv.revision = import ./cabal-files/resolv.nix;
+        c-expr-runtime.revision = import ./cabal-files/c-expr-runtime.nix;
         gi-gtk3.revision = import ./cabal-files/gi-gtk3.nix;
         ghc-bignum.revision = hackage.ghc-bignum."1.4".revisions.default;
         stm.revision = hackage.stm."2.5.3.1".revisions.default;
         blaze-builder.revision = import ./cabal-files/blaze-builder.nix;
         microlens-ghc.revision = import ./cabal-files/microlens-ghc.nix;
         integer-conversion.revision = import ./cabal-files/integer-conversion.nix;
-        echo.revision = import ./cabal-files/echo.nix;
-        echo.flags.example = false;
         typed-process.revision = import ./cabal-files/typed-process.nix;
         transformers.revision = hackage.transformers."0.6.1.2".revisions.default;
         microlens.revision = import ./cabal-files/microlens.nix;
@@ -77,8 +66,6 @@
         distributive.revision = import ./cabal-files/distributive.nix;
         distributive.flags.tagged = true;
         deepseq.revision = hackage.deepseq."1.5.1.0".revisions.default;
-        open-browser.revision = import ./cabal-files/open-browser.nix;
-        open-browser.flags.example = false;
         auto-update.revision = import ./cabal-files/auto-update.nix;
         optparse-applicative.revision = import ./cabal-files/optparse-applicative.nix;
         optparse-applicative.flags.process = true;
@@ -94,6 +81,7 @@
         cryptohash-sha256.flags.use-cbits = true;
         microlens-th.revision = import ./cabal-files/microlens-th.nix;
         parsec.revision = hackage.parsec."3.1.18.0".revisions.default;
+        Cabal.revision = hackage.Cabal."3.16.0.0".revisions.default;
         strict.revision = import ./cabal-files/strict.nix;
         th-abstraction.revision = import ./cabal-files/th-abstraction.nix;
         unbounded-delays.revision = import ./cabal-files/unbounded-delays.nix;
@@ -104,12 +92,9 @@
         mtl.revision = hackage.mtl."2.3.1".revisions.default;
         optparse-generic.revision = import ./cabal-files/optparse-generic.nix;
         tasty-hunit.revision = import ./cabal-files/tasty-hunit.nix;
+        cabal-doctest.revision = import ./cabal-files/cabal-doctest.nix;
         ansi-terminal-types.revision = import ./cabal-files/ansi-terminal-types.nix;
-        process.revision = import ./cabal-files/process.nix;
-        process.flags.os-string = true;
-        atomic-counter.revision = import ./cabal-files/atomic-counter.nix;
-        atomic-counter.flags.dev = false;
-        atomic-counter.flags.no-cmm = false;
+        process.revision = hackage.process."1.6.26.1".revisions.default;
         base.revision = hackage.base."4.22.0.0".revisions.default;
         fast-logger.revision = import ./cabal-files/fast-logger.nix;
         vec.revision = import ./cabal-files/vec.nix;
@@ -132,6 +117,7 @@
         QuickCheck.flags.templatehaskell = true;
         hspec.revision = import ./cabal-files/hspec.nix;
         gi-gobject.revision = import ./cabal-files/gi-gobject.nix;
+        Cabal-syntax.revision = hackage.Cabal-syntax."3.16.0.0".revisions.default;
         haskell-src-meta.revision = import ./cabal-files/haskell-src-meta.nix;
         monad-control.revision = import ./cabal-files/monad-control.nix;
         network-uri.revision = import ./cabal-files/network-uri.nix;
@@ -163,8 +149,6 @@
         vector-algorithms.flags.llvm = false;
         semialign.revision = import ./cabal-files/semialign.nix;
         semialign.flags.semigroupoids = true;
-        regex-posix.revision = import ./cabal-files/regex-posix.nix;
-        regex-posix.flags._regex-posix-clib = false;
         typerep-map.revision = import ./cabal-files/typerep-map.nix;
         hspec-discover.revision = import ./cabal-files/hspec-discover.nix;
         text-short.revision = import ./cabal-files/text-short.nix;
@@ -175,7 +159,6 @@
         semigroupoids.flags.comonad = true;
         semigroupoids.flags.tagged = true;
         semigroupoids.flags.contravariant = true;
-        tar.revision = import ./cabal-files/tar.nix;
         universe-base.revision = import ./cabal-files/universe-base.nix;
         rio.revision = import ./cabal-files/rio.nix;
         monad-logger-aeson.revision = import ./cabal-files/monad-logger-aeson.nix;
@@ -191,9 +174,7 @@
         unliftio-core.revision = import ./cabal-files/unliftio-core.nix;
         resourcet.revision = import ./cabal-files/resourcet.nix;
         mono-traversable.revision = import ./cabal-files/mono-traversable.nix;
-        haskeline.revision = import ./cabal-files/haskeline.nix;
-        haskeline.flags.terminfo = true;
-        haskeline.flags.examples = true;
+        haskeline.revision = hackage.haskeline."0.8.3.0".revisions.default;
         happy.revision = import ./cabal-files/happy.nix;
         indexed-traversable.revision = import ./cabal-files/indexed-traversable.nix;
         indexed-traversable.flags.base-ge-4-18 = true;
@@ -216,8 +197,6 @@
         monad-loops.revision = import ./cabal-files/monad-loops.nix;
         monad-loops.flags.base4 = true;
         free.revision = import ./cabal-files/free.nix;
-        directory-ospath-streaming.revision = import ./cabal-files/directory-ospath-streaming.nix;
-        directory-ospath-streaming.flags.os-string = true;
         template-haskell.revision = hackage.template-haskell."2.24.0.0".revisions.default;
         filelock.revision = import ./cabal-files/filelock.nix;
         th-reify-many.revision = import ./cabal-files/th-reify-many.nix;
@@ -244,7 +223,6 @@
         time-compat.revision = import ./cabal-files/time-compat.nix;
         text-conversions.revision = import ./cabal-files/text-conversions.nix;
         tagged.revision = import ./cabal-files/tagged.nix;
-        tagged.flags.template-haskell = true;
         tagged.flags.deepseq = true;
         pretty-simple.revision = import ./cabal-files/pretty-simple.nix;
         pretty-simple.flags.buildexe = true;
@@ -271,8 +249,6 @@
         th-expand-syns.revision = import ./cabal-files/th-expand-syns.nix;
         hspec-expectations.revision = import ./cabal-files/hspec-expectations.nix;
         pretty.revision = hackage.pretty."1.1.3.6".revisions.default;
-        hackage-security.revision = import ./cabal-files/hackage-security.nix;
-        hackage-security.flags.cabal-syntax = true;
         zlib.revision = import ./cabal-files/zlib.nix;
         zlib.flags.bundled-c-zlib = false;
         zlib.flags.non-blocking-ffi = true;
@@ -323,18 +299,22 @@
           "file-io" = "0.1.5";
           "ghc-prim" = "0.13.1";
           "bytestring" = "0.12.2.0";
+          "process" = "1.6.26.1";
           "mtl" = "2.3.1";
           "text" = "2.1.3";
           "template-haskell" = "2.24.0.0";
           "parsec" = "3.1.18.0";
           "ghc-bignum" = "1.4";
           "stm" = "2.5.3.1";
+          "Cabal" = "3.16.0.0";
           "filepath" = "1.5.4.0";
           "os-string" = "2.0.8";
           "rts" = "1.0.3";
+          "haskeline" = "0.8.3.0";
           "unix" = "2.8.8.0";
           "exceptions" = "0.10.11";
           "deepseq" = "1.5.1.0";
+          "Cabal-syntax" = "3.16.0.0";
           "transformers" = "0.6.1.2";
           "containers" = "0.8";
           "ghc-internal" = "9.1401.0";
@@ -347,18 +327,9 @@
     {
       packages = {
         hs-bindgen = ./.plan.nix/hs-bindgen.nix;
-        hooks-exe = ./.plan.nix/hooks-exe.nix;
-        Cabal-hooks = ./.plan.nix/Cabal-hooks.nix;
-        doxygen-parser = ./.plan.nix/doxygen-parser.nix;
-        c-expr-runtime = ./.plan.nix/c-expr-runtime.nix;
         haskell-wayland-core = ./.plan.nix/haskell-wayland-core.nix;
         hs-bindgen-runtime = ./.plan.nix/hs-bindgen-runtime.nix;
-        Cabal = ./.plan.nix/Cabal.nix;
         pixman-bindings = ./.plan.nix/pixman-bindings.nix;
-        cabal-doctest = ./.plan.nix/cabal-doctest.nix;
-        Cabal-syntax = ./.plan.nix/Cabal-syntax.nix;
-        cabal-install = ./.plan.nix/cabal-install.nix;
-        cabal-install-solver = ./.plan.nix/cabal-install-solver.nix;
         c-expr-dsl = ./.plan.nix/c-expr-dsl.nix;
         libclang-bindings = ./.plan.nix/libclang-bindings.nix;
         hswm-bindings = ./.plan.nix/hswm-bindings.nix;
@@ -380,11 +351,15 @@
         "directory"
         "file-io"
         "parsec"
+        "Cabal"
         "mtl"
+        "process"
         "base"
+        "Cabal-syntax"
         "text"
         "time"
         "array"
+        "haskeline"
         "ghc-internal"
         "binary"
         "template-haskell"
@@ -403,10 +378,6 @@
       {
         packages = {
           "hs-bindgen" = { flags = { "dev" = lib.mkOverride 900 false; }; };
-          "hooks-exe" = { flags = {}; };
-          "Cabal-hooks" = { flags = {}; };
-          "doxygen-parser" = { flags = {}; };
-          "c-expr-runtime" = { flags = {}; };
           "haskell-wayland-core" = {
             flags = {
               "pkg-config" = lib.mkOverride 900 true;
@@ -414,26 +385,10 @@
             };
           };
           "hs-bindgen-runtime" = { flags = {}; };
-          "Cabal" = { flags = { "git-rev" = lib.mkOverride 900 false; }; };
           "pixman-bindings" = {
             flags = {
               "pkg-config" = lib.mkOverride 900 true;
               "build-tool-depends" = lib.mkOverride 900 true;
-            };
-          };
-          "cabal-doctest" = { flags = {}; };
-          "Cabal-syntax" = { flags = {}; };
-          "cabal-install" = {
-            flags = {
-              "legacy-comparison" = lib.mkOverride 900 false;
-              "native-dns" = lib.mkOverride 900 true;
-              "git-rev" = lib.mkOverride 900 false;
-            };
-          };
-          "cabal-install-solver" = {
-            flags = {
-              "debug-tracetree" = lib.mkOverride 900 false;
-              "debug-expensive-assertions" = lib.mkOverride 900 false;
             };
           };
           "c-expr-dsl" = { flags = {}; };
@@ -471,7 +426,6 @@
           "quickcheck-io".components.library.planned = lib.mkOverride 900 true;
           "hswm".components.exes."hswm".planned = lib.mkOverride 900 true;
           "hs-bindgen".components.library.planned = lib.mkOverride 900 true;
-          "semaphore-compat".components.library.planned = lib.mkOverride 900 true;
           "base64-bytestring".components.library.planned = lib.mkOverride 900 true;
           "file-io".components.library.planned = lib.mkOverride 900 true;
           "attoparsec".components.sublibs."attoparsec-internal".planned = lib.mkOverride 900 true;
@@ -534,10 +488,8 @@
           "directory".components.library.planned = lib.mkOverride 900 true;
           "HUnit".components.library.planned = lib.mkOverride 900 true;
           "syb".components.library.planned = lib.mkOverride 900 true;
-          "echo".components.library.planned = lib.mkOverride 900 true;
           "semigroupoids".components.library.planned = lib.mkOverride 900 true;
           "indexed-traversable-instances".components.library.planned = lib.mkOverride 900 true;
-          "ed25519".components.library.planned = lib.mkOverride 900 true;
           "hs-bindgen".components.sublibs."internal".planned = lib.mkOverride 900 true;
           "haskell-gi-overloading".components.library.planned = lib.mkOverride 900 true;
           "happy-lib".components.sublibs."frontend".planned = lib.mkOverride 900 true;
@@ -549,7 +501,6 @@
           "utf8-string".components.library.planned = lib.mkOverride 900 true;
           "universe-base".components.library.planned = lib.mkOverride 900 true;
           "gi-gdkpixbuf".components.library.planned = lib.mkOverride 900 true;
-          "HTTP".components.library.planned = lib.mkOverride 900 true;
           "vec".components.library.planned = lib.mkOverride 900 true;
           "c-expr-dsl".components.library.planned = lib.mkOverride 900 true;
           "parsec".components.library.planned = lib.mkOverride 900 true;
@@ -563,18 +514,14 @@
           "th-reify-many".components.library.planned = lib.mkOverride 900 true;
           "dlist".components.library.planned = lib.mkOverride 900 true;
           "gi-gtk3".components.library.planned = lib.mkOverride 900 true;
-          "cabal-install".components.library.planned = lib.mkOverride 900 true;
           "vector-algorithms".components.library.planned = lib.mkOverride 900 true;
-          "open-browser".components.library.planned = lib.mkOverride 900 true;
           "dec".components.library.planned = lib.mkOverride 900 true;
           "aeson".components.library.planned = lib.mkOverride 900 true;
           "Only".components.library.planned = lib.mkOverride 900 true;
-          "resolv".components.library.planned = lib.mkOverride 900 true;
           "Cabal-hooks".components.library.planned = lib.mkOverride 900 true;
           "pixman-bindings".components.tests."pixman-test".planned = lib.mkOverride 900 true;
           "pixman-bindings".components.library.planned = lib.mkOverride 900 true;
           "Cabal".components.library.planned = lib.mkOverride 900 true;
-          "hooks-exe".components.library.planned = lib.mkOverride 900 true;
           "unbounded-delays".components.library.planned = lib.mkOverride 900 true;
           "pretty-simple".components.library.planned = lib.mkOverride 900 true;
           "gi-atk".components.setup.planned = lib.mkOverride 900 true;
@@ -592,7 +539,6 @@
           "typed-process".components.library.planned = lib.mkOverride 900 true;
           "auto-update".components.library.planned = lib.mkOverride 900 true;
           "gi-harfbuzz".components.library.planned = lib.mkOverride 900 true;
-          "cabal-install-solver".components.library.planned = lib.mkOverride 900 true;
           "safe-exceptions".components.library.planned = lib.mkOverride 900 true;
           "context".components.library.planned = lib.mkOverride 900 true;
           "StateVar".components.library.planned = lib.mkOverride 900 true;
@@ -605,7 +551,6 @@
           "happy-lib".components.sublibs."grammar".planned = lib.mkOverride 900 true;
           "rts".components.library.planned = lib.mkOverride 900 true;
           "hs-bindgen-runtime".components.library.planned = lib.mkOverride 900 true;
-          "tar".components.library.planned = lib.mkOverride 900 true;
           "language-c".components.library.planned = lib.mkOverride 900 true;
           "network".components.library.planned = lib.mkOverride 900 true;
           "comonad".components.library.planned = lib.mkOverride 900 true;
@@ -613,7 +558,6 @@
           "gi-freetype2".components.setup.planned = lib.mkOverride 900 true;
           "bytestring".components.library.planned = lib.mkOverride 900 true;
           "debruijn".components.library.planned = lib.mkOverride 900 true;
-          "tar".components.sublibs."tar-internal".planned = lib.mkOverride 900 true;
           "bitvec".components.library.planned = lib.mkOverride 900 true;
           "streaming-commons".components.library.planned = lib.mkOverride 900 true;
           "unix-compat".components.library.planned = lib.mkOverride 900 true;
@@ -639,13 +583,11 @@
           "gi-glib".components.library.planned = lib.mkOverride 900 true;
           "regex-base".components.library.planned = lib.mkOverride 900 true;
           "witherable".components.library.planned = lib.mkOverride 900 true;
-          "regex-posix".components.library.planned = lib.mkOverride 900 true;
           "happy".components.exes."happy".planned = lib.mkOverride 900 true;
           "gi-atk".components.library.planned = lib.mkOverride 900 true;
           "gi-pango".components.library.planned = lib.mkOverride 900 true;
           "ghc-internal".components.library.planned = lib.mkOverride 900 true;
           "yaml".components.library.planned = lib.mkOverride 900 true;
-          "atomic-counter".components.library.planned = lib.mkOverride 900 true;
           "time".components.library.planned = lib.mkOverride 900 true;
           "primitive".components.library.planned = lib.mkOverride 900 true;
           "ghc-bignum".components.library.planned = lib.mkOverride 900 true;
@@ -655,7 +597,6 @@
           "gi-gtk3".components.setup.planned = lib.mkOverride 900 true;
           "haskell-lexer".components.library.planned = lib.mkOverride 900 true;
           "th-orphans".components.library.planned = lib.mkOverride 900 true;
-          "haskeline".components.exes."haskeline-examples-Test".planned = lib.mkOverride 900 true;
           "microlens-mtl".components.library.planned = lib.mkOverride 900 true;
           "character-ps".components.library.planned = lib.mkOverride 900 true;
           "os-string".components.library.planned = lib.mkOverride 900 true;
@@ -681,7 +622,6 @@
           "text-iso8601".components.library.planned = lib.mkOverride 900 true;
           "binary".components.library.planned = lib.mkOverride 900 true;
           "ansi-terminal-types".components.library.planned = lib.mkOverride 900 true;
-          "directory-ospath-streaming".components.library.planned = lib.mkOverride 900 true;
           "ghc-boot-th".components.library.planned = lib.mkOverride 900 true;
           "data-default".components.library.planned = lib.mkOverride 900 true;
           "ansi-terminal".components.library.planned = lib.mkOverride 900 true;
@@ -696,7 +636,6 @@
           "hswm".components.library.planned = lib.mkOverride 900 true;
           "happy-lib".components.sublibs."backend-lalr".planned = lib.mkOverride 900 true;
           "libclang-bindings".components.library.planned = lib.mkOverride 900 true;
-          "cabal-install".components.exes."cabal".planned = lib.mkOverride 900 true;
           "libyaml-clib".components.library.planned = lib.mkOverride 900 true;
           "microlens".components.library.planned = lib.mkOverride 900 true;
           "hsc2hs".components.exes."hsc2hs".planned = lib.mkOverride 900 true;
@@ -704,7 +643,6 @@
           "gi-cairo".components.setup.planned = lib.mkOverride 900 true;
           "hswm-bindings".components.setup.planned = lib.mkOverride 900 true;
           "xkbcommon-bindings".components.setup.planned = lib.mkOverride 900 true;
-          "hackage-security".components.library.planned = lib.mkOverride 900 true;
           "hswm-bindings".components.library.planned = lib.mkOverride 900 true;
           "text-conversions".components.library.planned = lib.mkOverride 900 true;
           "unix-time".components.library.planned = lib.mkOverride 900 true;

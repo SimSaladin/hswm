@@ -1,4 +1,4 @@
-index-state: 2026-07-10T00:04:30Z
+index-state: 2026-09-29T22:54:10Z
 
 packages:
   hswm
@@ -23,10 +23,17 @@ haddock-quickjump: True
 haddock-hyperlink-source: True
 haddock-use-unicode: True
 
+extra-packages: process
+
 -- haskell.nix only supports imports when they end in .cabal:
 -- https://github.com/input-output-hk/haskell.nix/issues/2144
 import: project-cabal/hs-bindgen.cabal
-import: project-cabal/cabal-3.17.cabal
+-- import: project-cabal/cabal-3.17.cabal
+
+-- string-interpolate-1.0.0.0 depends on ghc-hs-meta, which causes issues
+constraints:
+    string-interpolate <1.0
+--   , Cabal >= 3.17
 
 --
 -- Temporary relaxes for GHC 9.14.1
@@ -43,5 +50,6 @@ if impl(ghc >= 9.14)
   allow-newer: skew-list-0.1:base
   allow-newer: typerep-map-0.7.0.0:base
   allow-newer: hs-bindgen:aeson
+  allow-newer: tagged
 
 write-ghc-environment-files: never

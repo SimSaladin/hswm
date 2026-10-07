@@ -35,7 +35,7 @@ let
 
 
   thisProject = { cabalDefaults, haskell-nix }:
-    haskell-nix.cabalProject' ({ lib, pkgs, ... }: cabalDefaults // {
+    haskell-nix.cabalProject' ({ lib, pkgs, evalPackages, ... }: cabalDefaults // {
       name = "hswm";
       src = pkgs.project-lib.fixCabalProjectImports {
         src = ../.;
@@ -48,13 +48,16 @@ let
       ];
 
       # Enable optimizations when building as nix derivations
-      cabalProjectLocal = lib.mkAfter ''
-        optimization: True
-        package *
-           documentation: True
-      '';
+      #cabalProjectLocal = lib.mkAfter ''
+      #  optimization: True
+      #  package *
+      #     documentation: True
+      #'';
 
       materialized = pkgs.project-lib.materializedFor "project";
+
+      # For Cabal >= 3.18
+      nix-tools = pkgs.my-nix-tools;
 
       # default shell
       shell = {
@@ -72,7 +75,7 @@ let
         allToolDeps = true;
         nativeBuildInputs = [
           # Use the newer cabal-install binary
-          pkgs.cabal-master.hsPkgs.cabal-install.components.exes.cabal
+          #pkgs.cabal-master.hsPkgs.cabal-install.components.exes.cabal
         ];
       };
 
@@ -171,13 +174,13 @@ let
           calculateHash() {
             ${project-lib.materialized-do-all { what = "calculateMaterializedSha"; } projects}
           }
-          ''
-          #update() {
-          #  set -x
-          #  ${project-lib.materialized-do-all { what = "updateMaterialized"; } projects}
-          #}
-          +
-          ''
+        ''
+        #update() {
+        #  set -x
+        #  ${project-lib.materialized-do-all { what = "updateMaterialized"; } projects}
+        #}
+        +
+        ''
           case ''${1-} in
             "" | generate )
               generate
@@ -207,39 +210,37 @@ in
     let
       projectFlake = pkgs.project.flake { };
     in
-    lib.recursiveUpdate
-      {
-        inherit (projectFlake) apps checks packages;
-        devShells = lib.mapAttrs (_: adjustShell "hswm-default") projectFlake.devShells;
-      }
-      {
-        apps = {
-          # Note: needs to run with checkMaterialization = false
-          materialized-do = mkMaterializedDoApp {
-            inherit pkgs project-lib;
-          };
+    {
+      checks = projectFlake.checks;
 
-          hoogle = mkApp {
-            name = "hoogle";
-            drv = pkgs.writeShellApplication {
-              name = "hoogle";
-              runtimeInputs = [ config.devShells."default:ghc-pkg" ];
-              text = ''
-                # shellcheck disable=SC1091
-                source ${config.devShells."default:ghc-pkg".shellHook}
-                if [[ $# -eq 0 ]]; then
-                  set -- server --local
-                fi
-
-                hoogle generate --local
-
-                hoogle "$@"
-              '';
-            };
-          };
+      apps = projectFlake.apps // {
+        # Note: needs to run with checkMaterialization = false
+        materialized-do = mkMaterializedDoApp {
+          inherit pkgs project-lib;
         };
 
-        packages.default = pkgs.buildEnv {
+        hoogle = mkApp {
+          name = "hoogle";
+          drv = pkgs.writeShellApplication {
+            name = "hoogle";
+            runtimeInputs = [ config.devShells."default:ghc-pkg" ];
+            text = ''
+              # shellcheck disable=SC1091
+              source ${config.devShells."default:ghc-pkg".shellHook}
+              if [[ $# -eq 0 ]]; then
+                set -- server --local
+              fi
+
+              hoogle generate --local
+
+              hoogle "$@"
+            '';
+          };
+        };
+      };
+
+      packages = projectFlake.packages // {
+        default = pkgs.buildEnv {
           pname = "hswm";
           version = config.packages."hswm:lib:hswm".version;
           paths = [
@@ -249,20 +250,22 @@ in
           ];
           pathsToLink = [ "/bin" "/lib" ];
         };
-
-        devShells =
-          let
-            pkgShells = perPackageShellsFor pkgs.project;
-          in
-          pkgShells // {
-            "default:ghc-pkg" = mkGhcPkgShell {
-              inherit (pkgs) project;
-              projectShells = lib.attrValues pkgShells;
-            };
-          };
-
-        legacyPackages = {
-          inherit (pkgs) project;
-        };
       };
+
+      devShells =
+        let
+          projectShells = lib.mapAttrs (_: adjustShell "hswm-default") projectFlake.devShells;
+          pkgShells = perPackageShellsFor pkgs.project;
+        in
+        projectShells // pkgShells // {
+          "default:ghc-pkg" = mkGhcPkgShell {
+            inherit (pkgs) project;
+            projectShells = lib.attrValues pkgShells;
+          };
+        };
+
+      legacyPackages = {
+        inherit (pkgs) project;
+      };
+    };
 }

@@ -11,15 +11,15 @@
     flags = {};
     package = {
       specVersion = "3.0";
-      identifier = { name = "libclang-bindings"; version = "0.1.0"; };
+      identifier = { name = "libclang-bindings"; version = "0.1.0.0"; };
       license = "BSD-3-Clause";
       copyright = "";
       maintainer = "info@well-typed.com";
       author = "Well-Typed LLP";
-      homepage = "";
+      homepage = "https://github.com/well-typed/libclang-bindings";
       url = "";
       synopsis = "libclang bindings";
-      description = "";
+      description = "Haskell bindings to the LLVM/Clang @libclang@ C API, providing low-level FFI\nbindings and a higher-level API for parsing and traversing C code.";
       buildType = "Configure";
       isLocal = true;
       detailLevel = "FullDetails";
@@ -133,6 +133,7 @@
             "Test/Discover"
             "Test/Meta/IsConcrete"
             "Test/Test/Exceptions"
+            "Test/Test/Tokens"
             "Test/Util/AST"
             "Test/Util/Clang"
             "Test/Util/FoldException"
@@ -149,11 +150,11 @@
     };
   } // {
     src = pkgs.lib.mkDefault (pkgs.fetchgit {
-      url = "2";
+      url = "1";
       rev = "minimal";
       sha256 = "";
     }) // {
-      url = "2";
+      url = "1";
       rev = "minimal";
       sha256 = "";
     };

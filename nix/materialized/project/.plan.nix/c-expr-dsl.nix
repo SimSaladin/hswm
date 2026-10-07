@@ -11,7 +11,7 @@
     flags = {};
     package = {
       specVersion = "3.0";
-      identifier = { name = "c-expr-dsl"; version = "0.1.0.0"; };
+      identifier = { name = "c-expr-dsl"; version = "0.1.0.1"; };
       license = "BSD-3-Clause";
       copyright = "";
       maintainer = "info@well-typed.com";
@@ -19,16 +19,16 @@
       homepage = "";
       url = "";
       synopsis = "DSL for the language support by c-expr-runtime";
-      description = "";
+      description = "This library provides the front end for the c-expr DSL: a Parsec-based parser\nthat turns libclang macro tokens into a syntax tree, and a typechecker that\nassigns types to macro expressions according to the rules implemented in\nc-expr-runtime.";
       buildType = "Simple";
       isLocal = true;
       detailLevel = "FullDetails";
       licenseFiles = [ "LICENSE" ];
       dataDir = "test/fixtures";
-      dataFiles = [ "*.golden" ];
+      dataFiles = [ "*.golden" "*.h" ];
       extraSrcFiles = [];
       extraTmpFiles = [];
-      extraDocFiles = [ "CHANGELOG.md" ];
+      extraDocFiles = [ "CHANGELOG.md" "README.md" ];
     };
     components = {
       "library" = {
@@ -115,11 +115,11 @@
     };
   } // {
     src = pkgs.lib.mkDefault (pkgs.fetchgit {
-      url = "1";
+      url = "2";
       rev = "minimal";
       sha256 = "";
     }) // {
-      url = "1";
+      url = "2";
       rev = "minimal";
       sha256 = "";
     };

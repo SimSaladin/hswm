@@ -12,6 +12,7 @@
         semaphore-compat.revision = import ./cabal-files/semaphore-compat.nix;
         semaphore-compat.flags.build-testing = false;
         base64-bytestring.revision = import ./cabal-files/base64-bytestring.nix;
+        hooks-exe.revision = import ./cabal-files/hooks-exe.nix;
         HTTP.revision = import ./cabal-files/HTTP.nix;
         HTTP.flags.warp-tests = false;
         HTTP.flags.conduit10 = false;
@@ -32,6 +33,8 @@
         cryptohash-sha256.flags.exe = false;
         cryptohash-sha256.flags.use-cbits = true;
         parsec.revision = hackage.parsec."3.1.18.0".revisions.default;
+        Cabal.revision = import ./cabal-files/Cabal.nix;
+        Cabal.flags.git-rev = false;
         mtl.revision = hackage.mtl."2.3.1".revisions.default;
         process.revision = import ./cabal-files/process.nix;
         process.flags.os-string = true;
@@ -39,11 +42,19 @@
         atomic-counter.flags.dev = false;
         atomic-counter.flags.no-cmm = false;
         base.revision = hackage.base."4.22.0.0".revisions.default;
+        Cabal-syntax.revision = import ./cabal-files/Cabal-syntax.nix;
         network-uri.revision = import ./cabal-files/network-uri.nix;
+        cabal-install.revision = import ./cabal-files/cabal-install.nix;
+        cabal-install.flags.legacy-comparison = false;
+        cabal-install.flags.native-dns = true;
+        cabal-install.flags.git-rev = false;
         random.revision = import ./cabal-files/random.nix;
         async.revision = import ./cabal-files/async.nix;
         async.flags.bench = false;
         async.flags.debug-auto-label = false;
+        cabal-install-solver.revision = import ./cabal-files/cabal-install-solver.nix;
+        cabal-install-solver.flags.debug-tracetree = false;
+        cabal-install-solver.flags.debug-expensive-assertions = false;
         text.revision = hackage.text."2.1.3".revisions.default;
         safe-exceptions.revision = import ./cabal-files/safe-exceptions.nix;
         time.revision = hackage.time."1.15".revisions.default;
@@ -117,17 +128,7 @@
       };
     };
   extras = hackage:
-    {
-      packages = {
-        hooks-exe = ./.plan.nix/hooks-exe.nix;
-        Cabal-hooks = ./.plan.nix/Cabal-hooks.nix;
-        Cabal = ./.plan.nix/Cabal.nix;
-        cabal-doctest = ./.plan.nix/cabal-doctest.nix;
-        Cabal-syntax = ./.plan.nix/Cabal-syntax.nix;
-        cabal-install = ./.plan.nix/cabal-install.nix;
-        cabal-install-solver = ./.plan.nix/cabal-install-solver.nix;
-      };
-    };
+    { packages = {}; };
   modules = [
     {
       preExistingPkgs = [
@@ -158,28 +159,7 @@
       ];
     }
     ({ lib, ... }:
-      {
-        packages = {
-          "hooks-exe" = { flags = {}; };
-          "Cabal-hooks" = { flags = {}; };
-          "Cabal" = { flags = { "git-rev" = lib.mkOverride 900 false; }; };
-          "cabal-doctest" = { flags = {}; };
-          "Cabal-syntax" = { flags = {}; };
-          "cabal-install" = {
-            flags = {
-              "legacy-comparison" = lib.mkOverride 900 false;
-              "native-dns" = lib.mkOverride 900 true;
-              "git-rev" = lib.mkOverride 900 false;
-            };
-          };
-          "cabal-install-solver" = {
-            flags = {
-              "debug-tracetree" = lib.mkOverride 900 false;
-              "debug-expensive-assertions" = lib.mkOverride 900 false;
-            };
-          };
-        };
-      })
+      { packages = {}; })
     ({ lib, ... }:
       {
         packages = {
@@ -204,11 +184,9 @@
           "HTTP".components.library.planned = lib.mkOverride 900 true;
           "parsec".components.library.planned = lib.mkOverride 900 true;
           "random".components.library.planned = lib.mkOverride 900 true;
-          "cabal-doctest".components.library.planned = lib.mkOverride 900 true;
           "cabal-install".components.library.planned = lib.mkOverride 900 true;
           "open-browser".components.library.planned = lib.mkOverride 900 true;
           "resolv".components.library.planned = lib.mkOverride 900 true;
-          "Cabal-hooks".components.library.planned = lib.mkOverride 900 true;
           "Cabal".components.library.planned = lib.mkOverride 900 true;
           "hooks-exe".components.library.planned = lib.mkOverride 900 true;
           "cabal-install-solver".components.library.planned = lib.mkOverride 900 true;

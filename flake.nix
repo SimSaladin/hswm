@@ -18,7 +18,10 @@
 
     #haskellNix.url = "github:input-output-hk/haskell.nix";
     #haskellNix.url = "git+file:/home/sim/haskell.nix";
-    haskellNix.url = "github:SimSaladin/haskell.nix";
+    haskellNix.url = "github:SimSaladin/haskell.nix?ref=sim/v2-flib";
+
+    # cabal 3.18
+    nix-tools.url = "github:SimSaladin/haskell.nix?dir=nix-tools&ref=sim/cabal-3.18";
 
     hs-bindgen = {
       url = "github:well-typed/hs-bindgen";
@@ -68,6 +71,7 @@
           self.overlays.project
         ];
         config = lib.recursiveUpdate inputs.haskellNix.config {
+          allowUnfree = true; # XXX: ghc-toolchain-lib-ghc-toolchain-0.1.0.0
            problems.handlers = {
              #monad-logger-aeson.broken = "warn";
              #Cabal-hooks.broken = "warn"; # or "ignore"

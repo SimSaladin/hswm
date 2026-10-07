@@ -40,15 +40,15 @@
           (hsPkgs."record-hasfield" or (errorHandler.buildDepError "record-hasfield"))
           (hsPkgs."template-haskell" or (errorHandler.buildDepError "template-haskell"))
           (hsPkgs."vector" or (errorHandler.buildDepError "vector"))
-        ] ++ pkgs.lib.optional (compiler.isGhc && compiler.version.lt "9.4") (hsPkgs."data-array-byte" or (errorHandler.buildDepError "data-array-byte"));
+        ];
         build-tools = [
           (hsPkgs.pkgsBuildBuild.hsc2hs.components.exes.hsc2hs or (pkgs.pkgsBuildBuild.hsc2hs or (errorHandler.buildToolDepError "hsc2hs:hsc2hs")))
         ];
         buildable = true;
         modules = [
-          "HsBindgen/Runtime/Internal/FunPtr/Class"
-          "HsBindgen/Runtime/TH/Instances"
-          "HsBindgen/Runtime/TH/Types"
+          "HsBindgen/Runtime/Support/FunPtr/Class"
+          "HsBindgen/Runtime/Support/TH/Instances"
+          "HsBindgen/Runtime/Support/TH/Types"
           "HsBindgen/Runtime/BitfieldPtr"
           "HsBindgen/Runtime/Block"
           "HsBindgen/Runtime/CBool"
@@ -57,24 +57,25 @@
           "HsBindgen/Runtime/FLAM"
           "HsBindgen/Runtime/HasCBitfield"
           "HsBindgen/Runtime/HasCField"
+          "HsBindgen/Runtime/HasFFIType"
           "HsBindgen/Runtime/IncompleteArray"
-          "HsBindgen/Runtime/Internal/Bitfield"
-          "HsBindgen/Runtime/Internal/ByteArray"
-          "HsBindgen/Runtime/Internal/CAPI"
-          "HsBindgen/Runtime/Internal/Deriving"
-          "HsBindgen/Runtime/Internal/FFIType"
-          "HsBindgen/Runtime/Internal/FunPtr"
-          "HsBindgen/Runtime/Internal/HasFFIType"
-          "HsBindgen/Runtime/Internal/LibC/Auxiliary"
-          "HsBindgen/Runtime/Internal/Prelude"
-          "HsBindgen/Runtime/Internal/Prelude/CompatHasField"
-          "HsBindgen/Runtime/Internal/Ptr"
-          "HsBindgen/Runtime/Internal/SizedByteArray"
           "HsBindgen/Runtime/IsArray"
           "HsBindgen/Runtime/LibC"
+          "HsBindgen/Runtime/Macro"
           "HsBindgen/Runtime/Marshal"
+          "HsBindgen/Runtime/Overloading"
           "HsBindgen/Runtime/Prelude"
           "HsBindgen/Runtime/PtrConst"
+          "HsBindgen/Runtime/Struct"
+          "HsBindgen/Runtime/Support"
+          "HsBindgen/Runtime/Support/Bitfield"
+          "HsBindgen/Runtime/Support/ByteArray"
+          "HsBindgen/Runtime/Support/CAPI"
+          "HsBindgen/Runtime/Support/CompatHasField"
+          "HsBindgen/Runtime/Support/FunPtr"
+          "HsBindgen/Runtime/Support/LibC/Auxiliary"
+          "HsBindgen/Runtime/Support/Ptr"
+          "HsBindgen/Runtime/Support/SizedByteArray"
           "HsBindgen/Runtime/Union"
         ];
         hsSourceDirs = [ "src" ];
@@ -100,8 +101,12 @@
             "Test/HsBindgen/Runtime/CEnumArbitrary"
             "Test/HsBindgen/Runtime/ConstantArray"
             "Test/HsBindgen/Runtime/IncompleteArray"
+            "Test/HsBindgen/Runtime/Macro"
             "Test/HsBindgen/Runtime/SizedByteArray"
+            "Test/HsBindgen/Runtime/Support/ByteArray"
             "Test/Util/Orphans"
+            "Test/Util/QC"
+            "Test/Util/Show"
             "Test/Util/Tasty"
           ];
           hsSourceDirs = [ "test" ];

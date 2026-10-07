@@ -32,8 +32,8 @@ custom-setup
           hs-bindgen-hooks
         , haskell-wayland-core
         , base             >=4.21 && <5
-        , Cabal            >=3.14 && <3.18
-        , Cabal-hooks      >=3.14 && <3.18
+        , Cabal            >=3.14 && <3.19
+        , Cabal-hooks      >=3.14 && <3.19
         , microlens-ghc
 
 common language

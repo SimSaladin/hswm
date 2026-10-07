@@ -37,6 +37,10 @@ import           Distribution.Utils.Path
 import           Distribution.Pretty
 import           Distribution.Simple.SetupHooks.Rule (RuleId(..))
 import           Distribution.Utils.ShortText
+#if MIN_VERSION_Cabal(3,17,0)
+#else
+import           Distribution.ModuleName (ModuleName)
+#endif
 
 #if MIN_VERSION_Cabal(3,17,0)
 import           Distribution.Verbosity
@@ -118,7 +122,9 @@ deriving anyclass instance A.FromJSON (SymbolicPathX a b c)
 deriving anyclass instance A.ToJSON (SymbolicPathX a b c)
 
 deriving anyclass instance A.FromJSON ModuleName
+--   parseJSON v = fromString <$> A.parseJSON v
 deriving anyclass instance A.ToJSON ModuleName
+--   toJSON = A.toJSON . unModuleName
 
 instance A.FromJSON Location where
   parseJSON v = do

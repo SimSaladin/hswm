@@ -15,10 +15,7 @@ module SetupHooks (setupHooks) where
 
 import           Distribution.HsBindgen.Utils
 
-import           Distribution.Compat.Binary (Binary)
-import           Distribution.ModuleName (ModuleName)
 import           Distribution.Pretty (prettyShow)
-import           Distribution.Simple.LocalBuildInfo (withPrograms)
 import           Distribution.Simple.Program (gccProgram, programInvocation, requireProgram)
 import           Distribution.Simple.Program.Run (getProgramInvocationOutputAndErrors)
 import           Distribution.Simple.SetupHooks
@@ -28,6 +25,13 @@ import           Distribution.Utils.IOData (hPutContents)
 import           Distribution.Utils.Path
 import           Distribution.Parsec
 import qualified Distribution.Compat.CharParsing as P
+
+#if MIN_VERSION_Cabal(3,17,0)
+#else
+import           Distribution.Compat.Binary (Binary)
+import           Distribution.ModuleName (ModuleName)
+import           Distribution.Simple.LocalBuildInfo (withPrograms)
+#endif
 
 import           Control.Monad
 import           Control.Monad.IO.Class

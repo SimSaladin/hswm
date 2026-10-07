@@ -49,8 +49,8 @@ common deps
 custom-setup
   setup-depends:
       base           >=4.21   && <5
-    , Cabal          >=3.14   && <3.18
-    , Cabal-hooks    >=3.14   && <3.18
+    , Cabal          >=3.14   && <3.19
+    , Cabal-hooks    >=3.14   && <3.19
     , filepath       >=1.5    && <2
     , hs-bindgen-hooks
 
