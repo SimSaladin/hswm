@@ -1,10 +1,12 @@
 { lib
 , callPackage
 , runCommand
+, runCommandLocal
 , cacert
 , nix
 , zig_0_16
 , zon2nix
+, pkgs
 }:
 
 { src
@@ -25,17 +27,29 @@
 
 let
 
-  zon-nix =
+  # XXX manually crteated...
+  zon-nix = ./river.deps.nix;
+  _zon-nix =
     let
-      fixed = runCommand "zon2nix"
+      fixed = runCommandLocal "zon2nix"
         {
-          nativeBuildInputs = [ zon2nix zig cacert nix ];
+          nativeBuildInputs = [
+            zon2nix
+            zig
+            cacert
+            nix # pkgs.nixVersions.latest # nix # for nix-prefetech-url
+            pkgs.nix-prefetch-git
+            pkgs.nixfmt
+          ];
           inherit zigVersion buildZigZon;
           inherit outputHashMode outputHashAlgo outputHash;
         }
         ''
-          export HOME=$TMPDIR
-          zon2nix "--$zigVersion" --nix=$out ${src}/"$buildZigZon"
+          set -x
+          export HOME=$PWD
+          export ZIG_GLOBAL_CACHE_DIR=$TMPDIR/zig-cache
+
+          zon2nix --debug "--$zigVersion" --nix=$out ${src}/"$buildZigZon"
         '';
       unfixed = fixed.overrideAttrs (_: {
         outputHash = null;
@@ -75,4 +89,5 @@ let
       '') zig-packages.passthru.entries}
     '';
 in
-pkgs-unpacked
+  zig-packages
+# pkgs-unpacked

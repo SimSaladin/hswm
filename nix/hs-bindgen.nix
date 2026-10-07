@@ -28,12 +28,13 @@ in
 
   # the overlay import is broken upstream; inputs.hs-bindgen.overlays.default
   flake.overlays.hs-bindgen =
-    (import "${inputs.hs-bindgen}/nix/overlay" {
-      inherit lib;
-      inherit (inputs.hs-bindgen.inputs)
-        libclang-bindings-src
-        c-expr-src
-        doxygen-parser-src
-        ;
-    }).default;
+    inputs.hs-bindgen.overlays.default;
+    #(import "${inputs.hs-bindgen}/nix/overlay" {
+    #  inherit lib;
+    #  inherit (inputs.hs-bindgen.inputs)
+    #    libclang-bindings-src
+    #    c-expr-src
+    #    doxygen-parser-src
+    #    ;
+    #}).default;
 }
