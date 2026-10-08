@@ -169,7 +169,7 @@ rofiRun'
 rofiRun' pcfg input = do
   input' <- rofiHistoryInput pcfg input
   let inputBS = LB.intercalate "\n" $ map toRofiInput input'
-  logInfo $ "rofi: starting" :# [ "prompt" .= pcfg.prompt ]
+  logInfo $ "rofi: launch initiated" :# [ "prompt" .= pcfg.prompt, "msg" .= pcfg.promptMessage ]
   withProcessTerm (
     setStdin (byteStringInput inputBS) $
     setStdout byteStringOutput $
@@ -179,10 +179,10 @@ rofiRun' pcfg input = do
       err <- atomically (getStderr p)
       exitCode <- waitExitCode p
       when (err /= "") $
-        logWarn $ "rofi output to stderr" :# [ "output" .= C8.unpack (LB.toStrict err) ]
+        logWarn $ "rofi: output to stderr" :# [ "output" .= C8.unpack (LB.toStrict err) ]
       case exitCode of
         ExitSuccess -> do
-          logInfo $ "rofi: process exit" :# [ "ec" .= show exitCode  ]
+          logInfo $ "rofi: success (exited)" :# [ "prompt" .= pcfg.prompt  ]
           case out of
             "" -> return Nothing
             _  -> do
@@ -221,8 +221,8 @@ rofiHistorySave s ln = do
     forM_ (outputHistEntry (Proxy :: Proxy ofmt) ln) $ \e -> do
       io $ createDirectoryIfMissing True (takeDirectory histFile)
       linesCur <- lines <$> io (readFile histFile)
-      let linesNew = L.nub $ e : linesCur
-      L.last linesCur `seq` io $ writeFile histFile $ unlines linesNew
+      let linesNew = L.nub $ linesCur ++ [e]
+      L.last linesCur `seq` io (writeFile histFile $ unlines linesNew)
 
 getHistoryFile :: MonadIO m => RofiPromptConfig o -> m (Maybe FilePath)
 getHistoryFile pc =
@@ -278,6 +278,7 @@ confirmPrompt cfg text act = rofiRun cfg' ["yes" :: T.Text, "no"] ++> apply
   where
     cfg' = cfg
       & dmenuMode .~ True
+      & prompt .~ "Confirm [y/n]? "
       & promptMessage .~ text
     apply "yes" = act
     apply _ = return ()

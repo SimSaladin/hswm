@@ -11,9 +11,12 @@
 -- Portability : unportable
 --
 module Distribution.HsBindgen.Utils
+  -- * Verbosity
   ( VerbosityFlags
+  , makeVerbose
   , verbosityFromFlags
   , verbosityLevelInt
+  -- * Misc.
   , getPkgConfDataDir
   , configurePrograms
   , makeLenses'
@@ -38,13 +41,12 @@ import           Distribution.Pretty
 import           Distribution.Simple.SetupHooks.Rule (RuleId(..))
 import           Distribution.Utils.ShortText
 #if MIN_VERSION_Cabal(3,17,0)
+import           Distribution.Verbosity (VerbosityFlags, makeVerbose)
 #else
 import           Distribution.ModuleName (ModuleName)
+import           Distribution.Text (simpleParse)
 #endif
-
-#if MIN_VERSION_Cabal(3,17,0)
-import           Distribution.Verbosity
-#endif
+import qualified Distribution.Verbosity as Verbosity
 
 import           Control.Monad
 import qualified Data.Aeson as A
@@ -62,7 +64,7 @@ import qualified Text.PrettyPrint as PP
 
 verbosityFromFlags :: VerbosityFlags -> Verbosity
 #if MIN_VERSION_Cabal(3,17,0)
-verbosityFromFlags = mkVerbosity defaultVerbosityHandles
+verbosityFromFlags = Verbosity.mkVerbosity Verbosity.defaultVerbosityHandles
 #else
 verbosityFromFlags = id
 type VerbosityFlags = Verbosity
@@ -70,9 +72,17 @@ type VerbosityFlags = Verbosity
 
 verbosityLevelInt :: Verbosity -> Int
 #if MIN_VERSION_Cabal(3,17,0)
-verbosityLevelInt = fromEnum . verbosityLevel
+verbosityLevelInt = fromEnum . Verbosity.verbosityLevel
 #else
 verbosityLevelInt = fromEnum
+#endif
+
+#if !MIN_VERSION_Cabal(3,17,0)
+-- | Increase verbosity up to verbose if not totally silent.
+makeVerbose :: Verbosity -> Verbosity
+makeVerbose v
+  | v == Verbosity.normal = Verbosity.moreVerbose v
+  | otherwise = v
 #endif
 
 -- * Program utils
@@ -119,12 +129,15 @@ instance ToLocation (RelativePath from 'File) where
 -- * Orphan instances
 
 deriving anyclass instance A.FromJSON (SymbolicPathX a b c)
-deriving anyclass instance A.ToJSON (SymbolicPathX a b c)
+deriving anyclass instance A.ToJSON   (SymbolicPathX a b c)
 
+#if MIN_VERSION_Cabal(3,17,0)
 deriving anyclass instance A.FromJSON ModuleName
---   parseJSON v = fromString <$> A.parseJSON v
-deriving anyclass instance A.ToJSON ModuleName
---   toJSON = A.toJSON . unModuleName
+deriving anyclass instance A.ToJSON   ModuleName
+#else
+instance A.FromJSON ModuleName where parseJSON v = A.parseJSON v >>= maybe (fail "invalid ModuleName") pure . simpleParse
+instance A.ToJSON   ModuleName where toJSON      = A.toJSON . prettyShow
+#endif
 
 instance A.FromJSON Location where
   parseJSON v = do

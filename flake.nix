@@ -17,7 +17,6 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
 
     #haskellNix.url = "github:input-output-hk/haskell.nix";
-    #haskellNix.url = "git+file:/home/sim/haskell.nix";
     haskellNix.url = "github:SimSaladin/haskell.nix?ref=sim/v2-flib";
 
     # cabal 3.18
@@ -41,7 +40,7 @@
   };
 
   outputs = inputs@{ ... }: inputs.flake-parts.lib.mkFlake { inherit inputs; }
-  ({ self, ... }: {
+  ({ self, lib, ... }: {
 
     # Materialization: nix run .#materialized-do
     _module.args.checkMaterialization = false;
@@ -58,25 +57,28 @@
 
     debug = true;
 
-    perSystem = { system, lib, ... }:
-    {
+    flake.overlays.default = lib.composeManyExtensions [
+      self.overlays.river
+      self.overlays.project-lib
+      self.overlays.hs-bindgen
+      self.overlays.cabal-master
+      self.overlays.project
+    ];
+
+    perSystem = { system, lib, pkgs, ... }: {
       _module.args.pkgs = import inputs.nixpkgs {
         inherit system;
         overlays = [
           inputs.haskellNix.overlay
-          self.overlays.river
-          self.overlays.cabal-master
-          self.overlays.hs-bindgen
-          self.overlays.project-lib
-          self.overlays.project
+          self.overlays.default
         ];
-        config = lib.recursiveUpdate inputs.haskellNix.config {
+        config = inputs.haskellNix.config // {
           allowUnfree = true; # XXX: ghc-toolchain-lib-ghc-toolchain-0.1.0.0
-           problems.handlers = {
-             #monad-logger-aeson.broken = "warn";
-             #Cabal-hooks.broken = "warn"; # or "ignore"
-           };
-         };
+        };
+      };
+
+      legacyPackages = {
+        inherit pkgs;
       };
     };
   });

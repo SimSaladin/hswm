@@ -13,13 +13,17 @@ let
           if builtins.pathExists (dir + "/default.nix") then dir else null;
 
         materialized-do =
-        { project, key, what ? "generateMaterialized" }:
-        ''
-          ${project.plan-nix.passthru.${what}} ${toString (materializedDest + "/${key}")}
-        '';
+          { project
+          , key
+          , what ? "generateMaterialized"
+          }:
+          ''
+            ${project.plan-nix.passthru.${what}} ${toString (materializedDest + "/${key}")}
+          '';
 
-        materialized-do-all = args:
-        lib.concatMapStringsSep "\n" (x: self.materialized-do (args // x));
+        materialized-do-all =
+          args:
+          lib.concatMapStringsSep "\n" (x: self.materialized-do (args // x));
 
         # Work around haskell.nix not handling sources imported in
         # cabal.project

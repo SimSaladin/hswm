@@ -437,12 +437,12 @@ import qualified WL.Core.Client as Client
 import qualified WL.Core.Enums
 import qualified WL.Core.Client.Generated.Unsafe as C.Unsafe
 
-import qualified HsBindgen.Runtime.Internal.Prelude as RIP
 import qualified HsBindgen.Runtime.CEnum as CEnum
 import           UnliftIO
 
 import           Control.Monad
 import           Data.Bits
+import           Data.Word
 import           Data.Default
 import qualified Data.List as L
 import           Data.Maybe
@@ -452,6 +452,8 @@ import qualified Data.Map as M
 import           Foreign
 import           Foreign.C.ConstPtr
 import           Foreign.C.String
+import           Foreign.C.Types
+import           Data.Proxy
 import           GHC.Generics
 
 data WaylandClientException
@@ -467,7 +469,7 @@ data GlobalException = NoSuchGlobal String (Maybe Version) (Maybe ObjectName)
 
 instance Exception GlobalException
 
-getObjectId :: (MonadIO m, IsWlObject object) => object -> m RIP.Word32
+getObjectId :: (MonadIO m, IsWlObject object) => object -> m Word32
 getObjectId o = liftIO $ C.Unsafe.wl_proxy_get_id (toProxy o)
 
 getObjectDisplay :: (MonadIO m, IsWlObject object) => object -> m Display
@@ -476,7 +478,7 @@ getObjectDisplay o = liftIO $ do
   when (ptr == nullPtr) $ throwIO WaylandInvalidId
   return (Display ptr)
 
-type Tag = ConstPtr RIP.CChar
+type Tag = ConstPtr CChar
 
 newTag :: MonadIO m => String -> m Tag
 newTag str = liftIO $ ConstPtr <$> newCString str
@@ -880,8 +882,8 @@ registryBindObject st name maxVersion = liftIO $ do
   return o
   where
     ver = min maxVersion $ objectInterfaceVersion proxy
-    proxy :: RIP.Proxy a
-    proxy = RIP.Proxy
+    proxy :: Proxy a
+    proxy = Proxy
 
 -- * Compositor
 

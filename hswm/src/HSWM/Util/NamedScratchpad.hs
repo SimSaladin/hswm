@@ -185,7 +185,8 @@ dynPadCurrent k = XS.gets $ M.lookup k . dynWins
 -- | Pad with no static launch action. Use the provided action to bind to an existing window.
 mkPadDyn :: ScratchpadId -> RP.RofiPromptConfig RP.SelectS -> ManageHook -> Scratchpad
 mkPadDyn nm rpc mh = mkPad nm mh q a
-  where q = liftHS (dynPadCurrent nm) >>= \mw -> asks (\x -> Just x.river_window) =? mw
+  where q = do mw <- liftHS (dynPadCurrent nm)
+               asks (\x -> Just x.river_window) =? mw
         a = dynDefaultPrompt rpc nm
         -- a = dynPadToggleFocused nm
 
@@ -196,6 +197,7 @@ dynDefaultPrompt rpc k = do
   case mfoc of
     Just foc -> do
       let text = printf "%s: Bind window %s '%s'" k (show foc.river_window) foc.title
+      -- TODO: this crashes!
       RP.confirmPrompt rpc text (dynPadSet k (Just foc))
 
     Nothing -> return ()

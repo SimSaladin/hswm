@@ -32,6 +32,7 @@ import           Distribution.HsBindgen.Types
 import           Distribution.Wayland.ProtocolXML
 
 import           Distribution.CabalSpecVersion
+import           Distribution.Compat.Binary (Binary)
 import           Distribution.Compat.Lens (getting)
 import           Distribution.ModuleName
 import           Distribution.Pretty

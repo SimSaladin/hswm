@@ -81,7 +81,8 @@
         cryptohash-sha256.flags.use-cbits = true;
         microlens-th.revision = import ./cabal-files/microlens-th.nix;
         parsec.revision = hackage.parsec."3.1.18.0".revisions.default;
-        Cabal.revision = hackage.Cabal."3.16.0.0".revisions.default;
+        Cabal.revision = import ./cabal-files/Cabal.nix;
+        Cabal.flags.git-rev = false;
         strict.revision = import ./cabal-files/strict.nix;
         th-abstraction.revision = import ./cabal-files/th-abstraction.nix;
         unbounded-delays.revision = import ./cabal-files/unbounded-delays.nix;
@@ -94,7 +95,8 @@
         tasty-hunit.revision = import ./cabal-files/tasty-hunit.nix;
         cabal-doctest.revision = import ./cabal-files/cabal-doctest.nix;
         ansi-terminal-types.revision = import ./cabal-files/ansi-terminal-types.nix;
-        process.revision = hackage.process."1.6.26.1".revisions.default;
+        process.revision = import ./cabal-files/process.nix;
+        process.flags.os-string = true;
         base.revision = hackage.base."4.22.0.0".revisions.default;
         fast-logger.revision = import ./cabal-files/fast-logger.nix;
         vec.revision = import ./cabal-files/vec.nix;
@@ -117,7 +119,7 @@
         QuickCheck.flags.templatehaskell = true;
         hspec.revision = import ./cabal-files/hspec.nix;
         gi-gobject.revision = import ./cabal-files/gi-gobject.nix;
-        Cabal-syntax.revision = hackage.Cabal-syntax."3.16.0.0".revisions.default;
+        Cabal-syntax.revision = import ./cabal-files/Cabal-syntax.nix;
         haskell-src-meta.revision = import ./cabal-files/haskell-src-meta.nix;
         monad-control.revision = import ./cabal-files/monad-control.nix;
         network-uri.revision = import ./cabal-files/network-uri.nix;
@@ -174,7 +176,9 @@
         unliftio-core.revision = import ./cabal-files/unliftio-core.nix;
         resourcet.revision = import ./cabal-files/resourcet.nix;
         mono-traversable.revision = import ./cabal-files/mono-traversable.nix;
-        haskeline.revision = hackage.haskeline."0.8.3.0".revisions.default;
+        haskeline.revision = import ./cabal-files/haskeline.nix;
+        haskeline.flags.terminfo = true;
+        haskeline.flags.examples = true;
         happy.revision = import ./cabal-files/happy.nix;
         indexed-traversable.revision = import ./cabal-files/indexed-traversable.nix;
         indexed-traversable.flags.base-ge-4-18 = true;
@@ -299,22 +303,18 @@
           "file-io" = "0.1.5";
           "ghc-prim" = "0.13.1";
           "bytestring" = "0.12.2.0";
-          "process" = "1.6.26.1";
           "mtl" = "2.3.1";
           "text" = "2.1.3";
           "template-haskell" = "2.24.0.0";
           "parsec" = "3.1.18.0";
           "ghc-bignum" = "1.4";
           "stm" = "2.5.3.1";
-          "Cabal" = "3.16.0.0";
           "filepath" = "1.5.4.0";
           "os-string" = "2.0.8";
           "rts" = "1.0.3";
-          "haskeline" = "0.8.3.0";
           "unix" = "2.8.8.0";
           "exceptions" = "0.10.11";
           "deepseq" = "1.5.1.0";
-          "Cabal-syntax" = "3.16.0.0";
           "transformers" = "0.6.1.2";
           "containers" = "0.8";
           "ghc-internal" = "9.1401.0";
@@ -351,15 +351,11 @@
         "directory"
         "file-io"
         "parsec"
-        "Cabal"
         "mtl"
-        "process"
         "base"
-        "Cabal-syntax"
         "text"
         "time"
         "array"
-        "haskeline"
         "ghc-internal"
         "binary"
         "template-haskell"
@@ -597,6 +593,7 @@
           "gi-gtk3".components.setup.planned = lib.mkOverride 900 true;
           "haskell-lexer".components.library.planned = lib.mkOverride 900 true;
           "th-orphans".components.library.planned = lib.mkOverride 900 true;
+          "haskeline".components.exes."haskeline-examples-Test".planned = lib.mkOverride 900 true;
           "microlens-mtl".components.library.planned = lib.mkOverride 900 true;
           "character-ps".components.library.planned = lib.mkOverride 900 true;
           "os-string".components.library.planned = lib.mkOverride 900 true;

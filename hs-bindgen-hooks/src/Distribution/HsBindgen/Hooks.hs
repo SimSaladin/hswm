@@ -242,8 +242,7 @@ createBindings PreProcessArgs{ bindgenSpec = gen, .. } = do
     [ "preprocess" ] ++
     [ "--builtin-include-dir=" <> v.unwrap   | let v = fromFlagOrDefault def gen.builtinIncludeDir ] ++ -- clang / disable
     [ "-I" <> v                              | v <- prSP hsOutputDir : map prSP gen.includeDirs ] ++
-    -- [ "-D" <> k <> "=" <> v                  | (k, v) <- M.toList gen.defineMacros ] ++
-    (join [ [ "--hash-define", k, v ]                  | (k, v) <- M.toList gen.defineMacros ]) ++
+    (join [[ "--hash-define", k, v ]         | (k, v) <- M.toList gen.defineMacros ]) ++
     [ "--clang-option-before=" <> v          | v <- clangBefore ] ++
     [ "--clang-option=" <> v                 | v <- clangOpts ] ++
     [ "--clang-option-after=" <> v           | v <- clangAfter ] ++

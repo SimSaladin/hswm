@@ -106,7 +106,8 @@ myKeys =
   -- ======== Execute ==========
   [ ("M-r r", RP.rofiLaunch @H (def & RP.oneMode "run") <?> "Run shell (prompt)"),
     ("M-r d", RP.rofiLaunch @H (def & RP.oneMode "drun" & RP.showIcons .~ True) <?> "Run desktop app (prompt)"),
-    ("M-r s", RP.rofiRun @H (def & RP.history ?~ "systemd-run" & RP.prompt .~ "systemd-run" & RP.dmenuMode .~ True) ([] :: [String]) RP.++> RP.runWithSystemD <?> "Run via systemd-run (prompt)"),
+    ("M-r s", RP.rofiRun @H (def & RP.history ?~ "systemd-run" & RP.prompt .~ "systemd-run" & RP.dmenuMode .~ True) ([] :: [String])
+                  RP.++> RP.runWithSystemD <?> "Run via systemd-run (prompt)"),
     ("M-r c", RP.rofiLaunch @H (def & RP.oneMode "clipboard:cliphist-rofi-img" & RP.showIcons .~ True) <?> "Open cliphist prompt"),
     ("M-r b", spawnOnceKitty "bluetoothctl@kitty" "bluetoothctl" [] (doCenterFloat (3/5) (2/3))),
     -- TODO
@@ -182,8 +183,8 @@ myKeys =
       withFocused (\w -> modifyWindowSet (\ws ->
         W.float w.river_window (rationalRectIn (Rectangle w.position.x w.position.y (fi w.size.width) (fi w.size.height)) (screenRect $ W.screenDetail $ W.current ws)) ws
                                          ))),
-    ("M-exclam",   "Toggle tmux PAD" <??> togglePad "tmux-0"),
-    ("M-Slash",    "Toggle dynamic PAD" <??> togglePad "dynamic")
+    ("M-exclam",   togglePad "tmux-0"  <?> "Toggle tmux PAD"),
+    ("M-Slash",    togglePad "dynamic" <?> "Toggle dynamic PAD") -- XXX crashes
     -- ("M-Tab",  "Cycle PADs" <??> cyclePads),
     -- "M-f "      >>+ directions2D >++> flip SnapMove   Nothing
     -- "M-f S-"    >>+ directions2D >++> flip SnapGrow   Nothing
