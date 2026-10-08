@@ -184,7 +184,11 @@ myKeys =
         W.float w.river_window (rationalRectIn (Rectangle w.position.x w.position.y (fi w.size.width) (fi w.size.height)) (screenRect $ W.screenDetail $ W.current ws)) ws
                                          ))),
     ("M-exclam",   togglePad "tmux-0"  <?> "Toggle tmux PAD"),
-    ("M-Slash",    togglePad "dynamic" <?> "Toggle dynamic PAD") -- XXX crashes
+
+    -- XXX: these somehow segfault river!
+    -- ("M-Slash",  togglePad "dynamic" <?> "Toggle dynamic PAD"),
+    --("M-C-r n",    RP.confirmPrompt def "TESTING" (return ()) <?> "TESTING BINDING")
+
     -- ("M-Tab",  "Cycle PADs" <??> cyclePads),
     -- "M-f "      >>+ directions2D >++> flip SnapMove   Nothing
     -- "M-f S-"    >>+ directions2D >++> flip SnapGrow   Nothing
