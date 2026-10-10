@@ -10,11 +10,12 @@ import           Data.Maybe
 import           Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
-import           Distribution.Utils.String (trim)
 import           Distribution.Compat.Binary (Binary)
+import           Distribution.Utils.String (trim)
+import           Distribution.Utils.Structured
 import           GHC.Generics (Generic)
 import           GHC.Stack
-import           Prelude hiding (head, getContents)
+import           Prelude hiding (getContents, head)
 import qualified Text.PrettyPrint.HughesPJClass as P
 import           Text.PrettyPrint.HughesPJClass (Doc, Pretty(..))
 
@@ -24,7 +25,7 @@ data Protocol = Protocol
   , description :: !Description
   , interfaces  :: ![Interface]
   } deriving (Eq, Show, Read, Generic, Binary)
-  deriving (A.ToJSON)
+  deriving (Structured, A.ToJSON)
 
 data Interface = Interface
   { name        :: !String
@@ -34,21 +35,21 @@ data Interface = Interface
   , requests    :: ![IRequest]
   , events      :: ![IEvent]
   } deriving (Eq, Show, Read, Generic, Binary)
-  deriving (A.ToJSON)
+  deriving (Structured, A.ToJSON)
 
 data IEnum = IEnum
   { name        :: !String
   , entries     :: ![Entry]
   , since       :: !(Maybe Int) -- version
   } deriving (Eq, Show, Read, Generic, Binary)
-  deriving (A.ToJSON)
+  deriving (Structured, A.ToJSON)
 
 data Entry = Entry
   { name        :: !String
   , value       :: !Int
   , summary     :: !String
   } deriving (Eq, Show, Read, Generic, Binary)
-  deriving (A.ToJSON)
+  deriving (Structured, A.ToJSON)
 
 data IRequest = IRequest
   { name        :: !String
@@ -57,7 +58,7 @@ data IRequest = IRequest
   , args        :: ![Arg]
   , since       :: !(Maybe Int) -- version
   } deriving (Eq, Show, Read, Generic, Binary)
-  deriving (A.ToJSON)
+  deriving (Structured, A.ToJSON)
 
 data IEvent = IEvent
   { name        :: !String
@@ -65,13 +66,13 @@ data IEvent = IEvent
   , args        :: ![Arg]
   , since       :: !(Maybe Int) -- version
   } deriving (Eq, Show, Read, Generic, Binary)
-  deriving (A.ToJSON)
+  deriving (Structured, A.ToJSON)
 
 data Description = Description
   { summary  :: !String
   , contents :: !String
   } deriving (Eq, Show, Read, Generic, Binary)
-  deriving (A.ToJSON)
+  deriving (Structured, A.ToJSON)
 
 data Arg = Arg
   { name      :: !String
@@ -79,7 +80,7 @@ data Arg = Arg
   , argType   :: !ArgType
   , nullable  :: !(Maybe Bool)
   } deriving (Eq, Show, Read, Generic, Binary)
-  deriving (A.ToJSON)
+  deriving (Structured, A.ToJSON)
 
 data ArgType
   = ANewId { argInterface :: !(Maybe String) }
@@ -99,7 +100,7 @@ data ArgType
   | AEmpty -- ???
   | ASelf -- ???
   deriving (Eq, Show, Read, Generic, Binary)
-  deriving (A.ToJSON)
+  deriving (Structured, A.ToJSON)
 
 instance Pretty Protocol where
   pPrint x =

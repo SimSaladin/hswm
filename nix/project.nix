@@ -4,6 +4,9 @@ let
   inherit (inputs.flake-utils.lib) mkApp;
 
   thisProject = { lib, config, pkgs, evalPackages, ... }: {
+    imports = [
+      projectSetup
+    ];
     modules = [
       cabal-master-hnix
       haskellNixModules.hs-bindgen
@@ -22,13 +25,6 @@ let
     #nix-tools = pkgs.my-nix-tools; # Using Cabal >= 3.18 tools
 
     shell.name = config.name;
-    shell.packages = ps: [
-      ps.hswm
-      ps.hswm-bindings
-      ps.pixman-bindings
-      ps.xkbcommon-bindings
-      ps.waybar-cffi-hs
-    ];
     shell.allToolDeps = true;
     shell.tools.hpack = { };
     shell.withHaddock = true;
@@ -36,6 +32,7 @@ let
     shell.nativeBuildInputs = [
       # Use a newer cabal-install binary
       pkgs.cabal_3_18
+      config.hsPkgs.hs-bindgen.components.exes.hs-bindgen-cli
     ];
 
     flake = {
@@ -61,7 +58,17 @@ let
     "xkbcommon-bindings"
   ];
 
-  hsNixModule = { config, pkgs, ... }: {
+  projectSetup = { lib, config, pkgs, ... }:
+  let
+    haskellLib = pkgs.haskell-nix.haskellLib;
+    myHaskellPackages = haskellLib.selectProjectPackages config.hsPkgs;
+  in {
+    #shell.packages = ps: lib.attrValues (haskellLib.selectProjectPackages ps);
+    #shell.buildInputs = [ myHaskellPackages."haskell-wayland-core-0.1.0.0-inplace".components.library ];
+  };
+
+  hsNixModule = { config, pkgs, ... }:
+  {
     packages = {
       hswm = {
         components.library.build-tools = [
@@ -85,12 +92,8 @@ let
           config.ghc.package.llvmPackages.libclang
         ];
       };
-      hswm-bindings.components.library.build-tools = [
-        pkgs.wayland-scanner
-      ];
-      haskell-wayland-core.components.library.build-tools = [
-        pkgs.wayland-scanner
-      ];
+      hswm-bindings.components.library.build-tools = [ pkgs.wayland-scanner ];
+      haskell-wayland-core.components.library.build-tools = [ pkgs.wayland-scanner ];
     };
   };
 

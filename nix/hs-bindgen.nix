@@ -7,6 +7,8 @@ let
       # # The clang executable is needed for full macro support.
       hs-bindgen.components.exes.hs-bindgen-cli.pkgconfig = [
         # setup hook that configures libclang for the build environment.
+        # Need the clang binary in PATH
+        [ config.ghc.package.llvmPackages.libclang ]
         # XXX: better place than pkgconfig for this? build-tools?
         [ pkgs.hsBindgenHook ]
         # Doxygen is used for some documentation handling

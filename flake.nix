@@ -40,7 +40,11 @@
   };
 
   outputs = inputs@{ ... }: inputs.flake-parts.lib.mkFlake { inherit inputs; }
-  ({ self, lib, ... }: {
+  ({ self, lib, ... }:
+  let
+    inherit (inputs.flake-utils.lib) mkApp;
+  in
+  {
 
     # Materialization: nix run .#materialized-do
     _module.args.checkMaterialization = false;
@@ -79,6 +83,20 @@
 
       legacyPackages = {
         inherit pkgs;
+      };
+
+      apps.updateProtocols = mkApp {
+        drv = pkgs.writeShellApplication {
+          name = "update-protocols";
+          runtimeInputs = [ ];
+          text = ''
+            set -x
+            upstream=${inputs.river}/protocol
+            current=./hswm-bindings/protocol/
+            diff -r $current $upstream || :
+            cp -v -t "$current" $upstream/*.xml
+          '';
+        };
       };
     };
   });

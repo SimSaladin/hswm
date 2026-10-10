@@ -20,29 +20,25 @@ import           Lens.Micro.GHC ()
 
 setupHooks :: SetupHooks
 setupHooks = waylandProtocolHooks $ do
+  registerBindGen $ newHsBindGen "WL.Util.Generated" [ makeHeader "wayland-util.h" ]
+    & genGlobal .~ pure False
+    & selectFromMainHeaderDirs .~ pure True
+    & excludeDecls <>~ "wl_log_func_t"
 
-  addExtraBindGen wlUtil
+  modifyOptions $ optionProtocolDirs <>~ [ makeSymbolicPath "protocols" ]
 
   void $ makeProtocol $ "wayland.xml"
       & category .~ "core"
       & stability .~ Stable
       & disabled <>~ [ WrapClient, WrapServer ]
-      & qualifiedImports <>~ [ ("WL.Util", "WL.Util") ]
+      & bindGens . each . bcBindGen . dependsOn <>~ [ "WL.Util.Generated" ]
       & bindGens . ix ClientBindings %~ baseClient
       & bindGens . ix ServerBindings %~ baseServer
 
-  modifyOptions $ optionProtocolDirs <>~ [ makeSymbolicPath "protocols" ]
-
-wlUtil :: HsBindGen
-wlUtil = newHsBindGen "WL.Util.Generated" [ makeHeader "wayland-util.h" ]
-  & genGlobal .~ pure False
-  & selectFromMainHeaderDirs .~ pure True
-  & excludeDecls <>~ "wl_log_func_t"
 
 baseClient :: BindConfig -> BindConfig
 baseClient c = c
   & bcBindGen . headers <>~ [ makeHeader "wayland-client-core.h" ]
-  & bcBindGen . extBindingSpecs <>~ [ BModule (wlUtil ^. moduleName . to fromFlag) Nothing ]
   & bcBindGen . excludeDecls <>~
       [ "wl_log_set_handler_client" -- variadic
       , "wl_proxy_marshal" -- variadic
@@ -55,7 +51,6 @@ baseServer :: BindConfig -> BindConfig
 baseServer s = s
   & bcBindGen . headers <>~ [ makeHeader "wayland-server-core.h" ]
   & bcBindGen . extBindingSpecs <>~ [ makeBindingSpec "sys-types" ]
-  & bcBindGen . extBindingSpecs <>~ [ BModule (wlUtil ^. moduleName . to fromFlag) Nothing ]
   & bcBindGen . excludeDecls <>~
       [ "wl_log_func_t"
       , "wl_client_post_implementation_error" -- variadic
