@@ -1344,11 +1344,11 @@
     "river": {
       "flake": false,
       "locked": {
-        "lastModified": 1790171129,
-        "narHash": "sha256-VScFaKC5q4QhABqPYC1wS6aqKOlhi5MK6CMczERZO5M=",
+        "lastModified": 1791622468,
+        "narHash": "sha256-KR2eQdnaNA+dz5OY8lXEfZVaPpQEC+aJ4jcIDCDVk1g=",
         "ref": "refs/heads/main",
-        "rev": "fd5ea7fe823cda6db7411871cac600a0ebd3b154",
-        "revCount": 1788,
+        "rev": "843e75cc0db8307beed3ea5f947fe9f95fa4e470",
+        "revCount": 1798,
         "type": "git",
         "url": "https://codeberg.org/river/river"
       },
@@ -1366,6 +1366,7 @@
         "nix-tools": "nix-tools",
         "nixpkgs": "nixpkgs",
         "river": "river",
+        "zig2nix": "zig2nix",
         "zon2nix": "zon2nix"
       }
     },
@@ -1416,6 +1417,29 @@
         "type": "github"
       }
     },
+    "zig2nix": {
+      "inputs": {
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1791608586,
+        "narHash": "sha256-vhULPK8OGNOvXijuecLYu+rUz97UY8aedr6xU+m2bcs=",
+        "owner": "Cloudef",
+        "repo": "zig2nix",
+        "rev": "a86d06d96fe99b7d25225d17dcdb5152a3d3d601",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Cloudef",
+        "repo": "zig2nix",
+        "type": "github"
+      }
+    },
     "zon2nix": {
       "inputs": {
         "nixpkgs": [
@@ -1423,11 +1447,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791261699,
-        "narHash": "sha256-Y1s36Ny116/8wZNgZj8dOez3qJqA/QpnCfaVs2kuNC8=",
+        "lastModified": 1791501737,
+        "narHash": "sha256-T7MptQ+0iyCHqCxHZr4NEOSj0etiKfZAMdVch7k05i8=",
         "owner": "jcollie",
         "repo": "zon2nix",
-        "rev": "5efe627e5901a73a8b707f797d08f2835ab59ac2",
+        "rev": "07cebfc65ceea14832b6c7246808ab8c11c93cdd",
         "type": "github"
       },
       "original": {

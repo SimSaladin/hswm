@@ -4,9 +4,7 @@ let
   inherit (inputs.flake-utils.lib) mkApp;
 
   thisProject = { lib, config, pkgs, evalPackages, ... }: {
-    imports = [
-      projectSetup
-    ];
+    imports = [ projectSetup ];
     modules = [
       cabal-master-hnix
       haskellNixModules.hs-bindgen
@@ -20,7 +18,8 @@ let
       # ''optimization: True'' +
       ''package *
             documentation: True
-      '');
+      ''
+    );
     materialized = pkgs.project-lib.materializedFor "project";
     #nix-tools = pkgs.my-nix-tools; # Using Cabal >= 3.18 tools
 
@@ -59,47 +58,48 @@ let
   ];
 
   projectSetup = { lib, config, pkgs, ... }:
-  let
-    haskellLib = pkgs.haskell-nix.haskellLib;
-    myHaskellPackages = haskellLib.selectProjectPackages config.hsPkgs;
-  in {
-    #shell.packages = ps: lib.attrValues (haskellLib.selectProjectPackages ps);
-    #shell.buildInputs = [ myHaskellPackages."haskell-wayland-core-0.1.0.0-inplace".components.library ];
-  };
+    let
+      haskellLib = pkgs.haskell-nix.haskellLib;
+      myHaskellPackages = haskellLib.selectProjectPackages config.hsPkgs;
+    in
+    {
+      #shell.packages = ps: lib.attrValues (haskellLib.selectProjectPackages ps);
+      #shell.buildInputs = [ myHaskellPackages."haskell-wayland-core-0.1.0.0-inplace".components.library ];
+    };
 
   hsNixModule = { config, pkgs, ... }:
-  {
-    packages = {
-      hswm = {
-        components.library.build-tools = [
-          config.ghc.package.llvmPackages.llvm
-          config.ghc.package.llvmPackages.libclang
-        ];
-        components.sublibs.prelude.build-tools = [
-          config.ghc.package.llvmPackages.llvm
-          config.ghc.package.llvmPackages.libclang
-        ];
-        components.sublibs.ipc-api.build-tools = [
-          config.ghc.package.llvmPackages.llvm
-          config.ghc.package.llvmPackages.libclang
-        ];
-        components.exes.hswm.build-tools = [
-          config.ghc.package.llvmPackages.llvm
-          config.ghc.package.llvmPackages.libclang
-        ];
-        components.exes.hswmctl.build-tools = [
-          config.ghc.package.llvmPackages.llvm
-          config.ghc.package.llvmPackages.libclang
-        ];
+    {
+      packages = {
+        hswm = {
+          components.library.build-tools = [
+            config.ghc.package.llvmPackages.llvm
+            config.ghc.package.llvmPackages.libclang
+          ];
+          components.sublibs.prelude.build-tools = [
+            config.ghc.package.llvmPackages.llvm
+            config.ghc.package.llvmPackages.libclang
+          ];
+          components.sublibs.ipc-api.build-tools = [
+            config.ghc.package.llvmPackages.llvm
+            config.ghc.package.llvmPackages.libclang
+          ];
+          components.exes.hswm.build-tools = [
+            config.ghc.package.llvmPackages.llvm
+            config.ghc.package.llvmPackages.libclang
+          ];
+          components.exes.hswmctl.build-tools = [
+            config.ghc.package.llvmPackages.llvm
+            config.ghc.package.llvmPackages.libclang
+          ];
+        };
+        hswm-bindings.components.library.build-tools = [ pkgs.wayland-scanner ];
+        haskell-wayland-core.components.library.build-tools = [ pkgs.wayland-scanner ];
       };
-      hswm-bindings.components.library.build-tools = [ pkgs.wayland-scanner ];
-      haskell-wayland-core.components.library.build-tools = [ pkgs.wayland-scanner ];
     };
-  };
 
   # Shell using exposePackagesVia = "ghc-pkg" for use with eg. hoogle
   # Note: v2 shell ignores exactDeps, additional, components
-  mkGhcPkgShell = { project , projectShells ? [ ] , ... }@args:
+  mkGhcPkgShell = { project, projectShells ? [ ], ... }@args:
     adjustedShellFor project ({
       name = "hswm-ghc-pkg";
       exposePackagesVia = "ghc-pkg";
@@ -211,7 +211,6 @@ in
       };
 
       packages = projectFlake.packages // {
-
         default = pkgs.buildEnv {
           pname = "hswm";
           version = config.packages."hswm:lib:hswm".version;
@@ -224,8 +223,8 @@ in
         };
       };
 
+      # XXX clean this up
       devShells =
-        # XXX clean this up
         let
           projectShells = lib.mapAttrs (_: adjustShell "hswm-default") projectFlake.devShells;
           pkgShells = perPackageShellsFor pkgs.project;
@@ -237,8 +236,6 @@ in
           };
         };
 
-      legacyPackages = {
-        inherit (pkgs) project;
-      };
+      legacyPackages = { inherit (pkgs) project; };
     };
 }

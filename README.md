@@ -53,6 +53,14 @@ cabal clean
 cabal build
 ```
 
+# River build
+
+```bash
+nix run '.#zig2nix-0_16_0' zon2lock river/build.zig.zon
+nix run '.#zon2nix-0_16_0' zon2nix  river/build.zig.zon
+# copy --> river/build.zig.zon.nix
+```
+
 # Running nested inside weston
 
 ```bash
