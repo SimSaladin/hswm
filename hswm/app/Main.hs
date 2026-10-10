@@ -187,7 +187,7 @@ myKeys =
 
     -- XXX: these somehow segfault river!
     -- ("M-Slash",  togglePad "dynamic" <?> "Toggle dynamic PAD"),
-    --("M-C-r n",    RP.confirmPrompt def "TESTING" (return ()) <?> "TESTING BINDING")
+    ("M-C-r n",    RP.confirmPrompt def "TESTING" (return ()) <?> "TESTING BINDING")
 
     -- ("M-Tab",  "Cycle PADs" <??> cyclePads),
     -- "M-f "      >>+ directions2D >++> flip SnapMove   Nothing
