@@ -183,7 +183,7 @@ myKeys =
       withFocused (\w -> modifyWindowSet (\ws ->
         W.float w.river_window (rationalRectIn (Rectangle w.position.x w.position.y (fi w.size.width) (fi w.size.height)) (screenRect $ W.screenDetail $ W.current ws)) ws
                                          ))),
-    ("M-exclam",   togglePad "tmux-0"  <?> "Toggle tmux PAD")
+    ("M-exclam",   togglePad "tmux-0"  <?> "Toggle tmux PAD"),
 
     -- XXX: these somehow segfault river!
     -- ("M-Slash",  togglePad "dynamic" <?> "Toggle dynamic PAD"),
