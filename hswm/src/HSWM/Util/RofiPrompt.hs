@@ -22,7 +22,7 @@ import qualified HSWM.Util.PangoMarkup as P
 import           System.FilePath (takeDirectory)
 import           System.IO (readFile, writeFile)
 
-type MonadRofi env m = (MonadUnliftIO m, MonadReader env m, MonadLogger m)
+type MonadRofi env m = (MonadUnliftIO m, MonadReader env m, MonadLogger m, MonadLoggerIO m)
 
 -- * Configuration
 
@@ -156,6 +156,9 @@ rofiLaunch rp = void $ async $ do
     rofiToProc rp
   logInfo $ "rofi: launch finished" :# [ "result" .= show res ]
 
+promptRofi :: MonadRofi env m => String -> [String] -> m (Maybe String)
+promptRofi str = rofiRun def { prompt = str, dmenuMode = True }
+
 -- | Launch a prompt (synchronous) with input and read the output.
 rofiRun
   :: forall m env input. (MonadRofi env m, IsRofiInput input)
@@ -168,33 +171,31 @@ rofiRun'
   => RofiPromptConfig output -> [input] -> m (Maybe (RofiOutput output))
 rofiRun' pcfg input = do
   input' <- rofiHistoryInput pcfg input
-  let inputBS = LB.intercalate "\n" $ map toRofiInput input'
+  let inputBS = LC8.unlines $ map toRofiInput input'
+  logFn <- askLoggerIO
   logInfo $ "rofi: launch initiated" :# [ "prompt" .= pcfg.prompt, "msg" .= pcfg.promptMessage ]
-  withProcessTerm (
-    setStdin (byteStringInput inputBS) $
-    setStdout byteStringOutput $
-    setStderr byteStringOutput $
-    rofiToProc pcfg) $ \p -> do
-      out <- atomically (getStdout p)
-      err <- atomically (getStderr p)
-      exitCode <- waitExitCode p
-      when (err /= "") $
-        logWarn $ "rofi: output to stderr" :# [ "output" .= C8.unpack (LB.toStrict err) ]
-      case exitCode of
-        ExitSuccess -> do
-          logInfo $ "rofi: success (exited)" :# [ "prompt" .= pcfg.prompt  ]
-          case out of
-            "" -> return Nothing
-            _  -> do
-              let out' = parseOutput (Proxy :: Proxy output) out
-              rofiHistorySave pcfg out'
-              return $ Just out'
-        ExitFailure{} -> do
-          logError $ "rofi: error exit code" :# [ "code" .= show exitCode ]
-          return Nothing
-
-promptRofi :: MonadRofi env m => String -> [String] -> m (Maybe String)
-promptRofi str = rofiRun def { prompt = str, dmenuMode = True }
+  res <- try @_ @SomeException $ withProcessWait (
+      setStdin (byteStringInput inputBS) $
+      setStdout byteStringOutput $
+      setStderr (logOutput logFn "rofi (stderr)") $
+      rofiToProc pcfg)
+      $ \p -> do
+        out <- atomically (getStdout p)
+        exitCode <- waitExitCode p
+        case exitCode of
+          ExitSuccess -> do
+            logInfo $ "rofi: success (exited)" :# [ "prompt" .= pcfg.prompt, "output" .= C8.unpack (LB.toStrict out) ]
+            case out of
+              "" -> return Nothing
+              _  -> return $ Just $ parseOutput (Proxy :: Proxy output) out
+          ExitFailure{} -> do
+            logError $ "rofi: error exit code" :# [ "code" .= show exitCode ]
+            return Nothing
+  case res of
+    Right (Just out) -> do
+        rofiHistorySave pcfg out
+        return $ Just out
+    _ -> return Nothing
 
 -- | Get input with history (if configured).
 rofiHistoryInput
@@ -234,8 +235,8 @@ getHistoryFile pc =
 
 rofiToProc :: forall o. ParseOutput o => RofiPromptConfig o -> ProcessConfig () () ()
 rofiToProc pcfg =
-   setNewSession True $
    setCloseFds True $
+   setNewSession True $
    proc "rofi" (toRofiArgs pcfg)
   where
     outFmt = Proxy :: Proxy o
@@ -274,8 +275,9 @@ ma ++> f = ma >>= flip whenJust f
 -- * Prompts
 
 confirmPrompt :: RofiPromptConfig SelectS -> String -> H () -> H ()
-confirmPrompt cfg text act = rofiRun cfg' ["yes" :: T.Text, "no"] ++> apply
+confirmPrompt cfg text act = rofiRun cfg' input ++> apply
   where
+    input = ["yes", "no"] :: [T.Text]
     cfg' = cfg
       & dmenuMode .~ True
       & prompt .~ "Confirm [y/n]? "

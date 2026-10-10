@@ -110,7 +110,7 @@ __:
   # Other
   - &common-rts
     -threaded
-    -rtsopts "-with-rtsopts=-N -maxN4 -qn2 -M2G -A8M -K64M -kc8k -I5 -xr100G"
+    -rtsopts "-with-rtsopts=-N -maxN8 -qn3 -M2G -A2m -K8M -I2 -xr100G"
 
 library:
   source-dirs: src
