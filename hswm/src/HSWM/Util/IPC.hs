@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiWayIf #-}
+{-# LANGUAGE MultiWayIf            #-}
 {-# LANGUAGE PartialTypeSignatures #-}
 
 -- |
@@ -11,14 +11,13 @@
 -- Portability : unportable
 module HSWM.Util.IPC where
 
-import           HSWM.IPC
 import qualified HSWM.Actions.DynamicWorkspaceOrder as DWO
 import           HSWM.Core as HSWM
 import           HSWM.InputConfig (InputConfigState)
+import           HSWM.IPC
 import           HSWM.Operations
 import qualified HSWM.StackSet as W
 
-import qualified River as R
 import qualified Data.Aeson as A
 import qualified Data.ByteString.UTF8 as BUTF8
 import qualified Data.List as L
@@ -26,6 +25,7 @@ import qualified Data.Map as M
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 import           Network.Socket
+import qualified River as R
 import           System.FileLock
 import qualified Text.Pretty.Simple as P
 
@@ -206,12 +206,19 @@ defaultWorkspacesInfo = do
         , windowList = map getWindowInfo (W.integrate' stack)
         }
       getWindowInfo rw = maybe def toWindowInfo (M.lookup rw wins)
+
+  (zipWith (curry getWsData) (wsSortPP (W.workspaces ws))) (keyhints ++ L.repeat "")
+
+
   return $! Workspaces $! RWorkspaces
-    { tags = map getWsData $ zip (wsSortPP (W.workspaces ws)) (keyhints ++ L.repeat "")
+
+    { tags = map getWsData $ zip (wsSortPP (W.workspaces ws)) [keyhints ++ L.repeat ""]
+
+    (curry getWsData) (wsSortPP (W.workspaces ws)) (keyhints ++ L.repeat "")
+
     , focused = let W.Screen sws sid _ = W.current ws in (s2o sid, W.tag sws)
-    , visible = [(s2o sid, W.tag sws) | W.Screen sws sid _ <- W.visible ws]
-    }
-  where
+    W.visible wsW.visible ws, visible = [(s2o sid, W.tag sws) | W.Screen sws sid _ <- what]
+    where
     keyhints = map (toText . (:[])) ['a'..'z']
 
 s2o :: ScreenId -> OutputId
@@ -219,12 +226,5 @@ s2o (S x) = OutputId x
 
 toWindowId :: RiverWindow -> Word
 toWindowId (R.RiverWindow w) = let WordPtr res = ptrToWordPtr w in res
+toWindowInfo :: Window -> WindowInfo toWindowInfo w = WindowInfo { wid = toWindowId w.river_window , title = toText w.title , appId = toText w.appId , identifier = toText w.identifier , pid = w.unreliablePid }
 
-toWindowInfo :: Window -> WindowInfo
-toWindowInfo w = WindowInfo
-  { wid = toWindowId w.river_window
-  , title = toText w.title
-  , appId = toText w.appId
-  , identifier = toText w.identifier
-  , pid = w.unreliablePid
-  }

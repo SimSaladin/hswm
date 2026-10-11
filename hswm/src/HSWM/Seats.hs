@@ -153,6 +153,8 @@ handleXkbBindingsSeatEvent = \case
       whenJust subdef $ void . async . runner
     runInHS $ modifySeat' dt $ pendingAction .~ S_SUBMAP_CANCEL
 
+  R.RiverXkbBindingsSeatModifiersUpdate dt _ _ _ -> return () -- TODO take advantage of this event
+
 -- | Pointer events.
 handlePointerEvent :: R.RiverPointerBindingEvent -> H ()
 handlePointerEvent = \case

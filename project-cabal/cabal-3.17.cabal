@@ -1,7 +1,0 @@
--- vim: ft=cabalproject
-
-extra-packages: cabal-install, Cabal, process
-
-constraints: cabal-install >= 3.17
--- constraints: Cabal >= 3.17
--- Cabal-syntax >= 3.18.1.0,

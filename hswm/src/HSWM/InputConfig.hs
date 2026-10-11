@@ -202,11 +202,15 @@ handleInputDeviceEvent (R.RiverInputDeviceType _ dev deviceType) = do
     RepeatInfo rrate rdelay <- view (config . repeatInfo)
     when (rrate > 0 && rdelay > 0) $
       R.riverInputDeviceSetRepeatInfo dev rrate rdelay
+
 handleInputDeviceEvent (R.RiverInputDeviceName _ dev name) = do
   modifyObjectDef $ \st -> st { inputDevices = M.adjust (\ds -> ds { deviceName = name }) dev st.inputDevices }
+
 handleInputDeviceEvent (R.RiverInputDeviceRemoved _ dev) = do
   modifyObjectDef $ \st -> st { inputDevices = M.delete dev st.inputDevices }
   io $ WL.objectDestroy dev
+handleInputDeviceEvent R.RiverInputDeviceDone{} = do
+  return () -- TODO take advantage of this event
 
 -- river_xkb_config_v1
 handleXkbConfigEvent :: R.RiverXkbConfigEvent -> H ()
@@ -295,6 +299,8 @@ handleLibinputDeviceEvent = \case
   R.RiverLibinputDeviceRotationSupport _ dev supported          -> modifyLibinputDevice dev $ \s -> s { rotation = s.rotation { support = supported } }
   R.RiverLibinputDeviceRotationDefault _ dev angle              -> modifyLibinputDevice dev $ \s -> s { rotation = s.rotation { defval = angle } }
   R.RiverLibinputDeviceRotationCurrent _ dev angle              -> modifyLibinputDevice dev $ \s -> s { rotation = s.rotation { curval = angle } }
+  R.RiverLibinputDeviceDone _  _                                -> return () -- TODO take advantage of this event
+
 
   where
     modifyLibinputDevice dev f = modifyObjectDef $ \st -> st { libinputDevices = M.adjust f dev st.libinputDevices }

@@ -98,6 +98,9 @@ handle = \case
   R.RiverOutputWlOutput   _ k name -> bindWlOutput k name
   R.RiverOutputDimensions _ output w h -> modifyOutput' output $ width .~ fi w &+ height .~ fi h
   R.RiverOutputPosition   _ output x y -> modifyOutput' output $ _x .~ fi x &+ _y .~ fi y
+  -- TODO make use of this event
+  _                                    -> logError "Handle exceptions "
+
 
 handleWlOutput :: WL.OutputEvent -> H ()
 handleWlOutput = \case
