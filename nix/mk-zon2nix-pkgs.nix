@@ -96,17 +96,5 @@ let
       #overrideAttrs = f: rerunOnChange args (zon-nix.overrideAttrs f);
     };
 in
-  {
-    inherit zonNix;
-  }
-
-  # pkgs-unpacked
-
-#
-#let
-#
-#  # XXX manually crteated...
-#  zon-nix = ./river.deps.nix;
-#  zig-packages = callPackage (import zon-nix) { };
-#in
-#  zig-packages
+{
+}
