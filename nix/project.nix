@@ -187,7 +187,7 @@ in
         materialized-do = mkMaterializedDoApp {
           projects = [
             { project = project; key = "project"; }
-            { project = pkgs.cabal-master; key = "cabal-plan-nix"; }
+            #{ project = pkgs.cabal-master; key = "cabal-plan-nix"; }
           ];
           inherit pkgs project-lib;
         };
