@@ -23,7 +23,7 @@ let
       constructDrv = mkDrvUpper;
 
       # Derivation -> Derivation;
-      transformDrv = rerunOnChange { preOverrideAttrs = attrs: attrs // { pname = null; }; } drv;
+      transformDrv = rerunOnChange { preOverrideAttrs = attrs: attrs // { pname = null; }; };
 
       #excludeFunctionArgNames = [];
     };
