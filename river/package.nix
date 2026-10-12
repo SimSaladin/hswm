@@ -1,12 +1,13 @@
-{ src
-, input
-
-, zigEnv
-
-, lib
+{ lib
 , stdenv
 , callPackage
 , runCommand
+
+, src
+, depsHash ? ""
+, zigEnv
+, my-lib
+, updateRiverDeps
 
 , libGL
 , libx11
@@ -17,16 +18,13 @@
 , pkg-config
 , scdoc
 , udev
-, systemdLibs
 , versionCheckHook
 , wayland
 , wayland-protocols
 , wayland-scanner
 , wlroots_0_20
 , xwayland
-, zig_0_16
-, zig_0_17
-
+, zig # tested with 0.16...
 , withManpages ? true
 , xwaylandSupport ? true
 , withDebug ? false
@@ -34,22 +32,18 @@
 }:
 
 let
-  zig = zig_0_16;
-
-  # read version string from build.zig.zon
-  zonVersion = lib.fileContents (runCommand "get-version" { } ''
-    sed -nE '/\.version =/s/^.*?"(.+-dev|.+)".*$/\1/p' ${src}/build.zig.zon >$out
+  readZigZonVersion = file: lib.fileContents (runCommand "get-version" { } ''
+    sed -nE '/\.version =/s/^.*?"(.+-dev|.+)".*$/\1/p' ${file} >$out
   '');
-  versionSuffix = lib.concatStrings (
-       (lib.optional (input ? sourceInfo && input.sourceInfo ? lastModifiedDate) "+${lib.substring 0 8 input.sourceInfo.lastModifiedDate}")
-    ++ (lib.optional (input ? sourceInfo && input.sourceInfo ? shortRev) "-g${input.sourceInfo.shortRev}")
-  );
+
 
   # Unpack all deps in case they are tarballs for use with zig build "--system"
-  prepareZigDB = deps: runCommand "zig-packages" { } # { passthru = { inherit zon-nix input zig-packages; }; }
+  prepareZigDB = src: runCommand "zig-packages" {
+    passthru = { inherit src; };
+  }
     ''
       mkdir -p $out
-      for pkg in ${deps}/*; do
+      for pkg in ${src}/*; do
         if [[ -d $(readlink -f "$pkg") ]]; then
           echo "error: is directory:  (cp -rv --no-preserve=all '$pkg/ $out/$name)"
           exit 1
@@ -59,20 +53,37 @@ let
       done
     '';
 
-  calculatedDeps = callPackage ./build.zig.zon.nix { inherit zig; };
+  build-zig-zon-nix = my-lib.mkFOD {
+    inherit src;
+    name = "zig-packages";
+    hash = depsHash;
+    nativeBuildInputs = [ updateRiverDeps ];
+    buildPhase = ''
+      export ZIG_GLOBAL_CACHE_DIR=$(mktemp -d)
+      make-zig-dependencies
+    '';
+  };
+
+  calculatedDeps = callPackage (import "${build-zig-zon-nix}") { inherit zig; };
 in
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "river";
-  version = zonVersion + versionSuffix;
+
+  version =
+    readZigZonVersion (toString src + "/build.zig.zon")
+    # in case src is a flake input, add extra info to version
+    + lib.optionalString (lib.isAttrs src && src ? sourceInfo)
+      (lib.optionalString (src.sourceInfo ? lastModifiedDate) "+${lib.substring 0 8 src.sourceInfo.lastModifiedDate}" +
+      lib.optionalString (src.sourceInfo ? shortRev) "-g${src.sourceInfo.shortRev}");
+
   outputs = [ "out" ] ++ lib.optionals withManpages [ "man" ];
-  src = builtins.toPath src;
-  postPatch = ''
-    sed -i '/\.version =/s/".*"/"${finalAttrs.version}"/' build.zig.zon
-  '';
-  strictDeps = true;
+
+  src = src;
 
   deps = prepareZigDB calculatedDeps;
+
+  strictDeps = true;
 
   nativeBuildInputs = [
     pkg-config
@@ -98,7 +109,10 @@ stdenv.mkDerivation (finalAttrs: {
     libx11
   ];
 
-  zigBuildFlags = [ "--system" finalAttrs.deps ]
+  zigBuildFlags = [
+    "--system" finalAttrs.deps
+    "-Dversion-string=${finalAttrs.version}"
+  ]
   ++ lib.optional withDebug "-Doptimize=Debug"
   ++ lib.optional (!withDebug) "-Doptimize=ReleaseFast"
   ++ lib.optional (!withDebug) "-Dstrip"
@@ -114,7 +128,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru = {
     providedSessions = [ "river" ];
-    inherit input calculatedDeps;
   };
 
   meta = {
@@ -122,5 +135,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://codeberg.org/river/river";
     mainProgram = "river";
     platforms = lib.platforms.linux;
+    pkgConfigModules = [ "river-protocols" ];
   };
 })

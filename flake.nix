@@ -54,8 +54,8 @@
         _module.args.checkMaterialization = false;
 
         imports = [
+          ./river/flake-module.nix
           ./nix/lib.nix
-          ./nix/river-module.nix
           ./nix/cabal-master.nix
           ./nix/hs-bindgen.nix
           ./nix/project.nix
@@ -65,6 +65,7 @@
 
         debug = true;
 
+        # combined overlay for export
         flake.overlays.default = lib.composeManyExtensions [
           self.overlays.river
           self.overlays.project-lib
@@ -73,24 +74,7 @@
           self.overlays.project
 
           (final: prev: {
-
-            zigEnv = inputs.zig2nix.outputs.zig-env.${final.stdenv.hostPlatform.system} {
-              nixpkgs = inputs.nixpkgs;
-              zig = final.zig_0_16;
-            };
-
-            # roll our own for now because the nixpkgs one is rather old and lacks
-            # features (the wm protocol etc.)
-            river = final.callPackage ./river/package.nix {
-              input = inputs.river;
-              src = inputs.river.outPath;
-              inherit (final) zigEnv;
-            };
-
-            # With debug enabled
-            riverDebug = final.river.override {
-              withDebug = true;
-            };
+            my-lib = final.callPackage ./nix/make-fixed-output.nix { };
           })
         ];
 
@@ -106,44 +90,10 @@
             };
           };
 
-          packages = {
-            # Export our overridden river for convenience.
-            inherit (pkgs) river riverDebug;
-          };
-
-          legacyPackages = {
-            inherit pkgs;
-            inherit (pkgs) river riverDebug;
-          };
+          legacyPackages = { inherit pkgs; };
 
           apps =
-            let
-              zig2nix = inputs.zig2nix.outputs.apps.${system};
-            in
             {
-              updateRiverDeps = mkApp {
-                drv = pkgs.writeShellApplication {
-                  runtimeInputs = [ ];
-                  text = ''
-                    set -x
-                    tool=${zig2nix.zig2nix-0_16_0}
-                    src=${toString inputs.river}
-                    work=$(mktemp -d)
-                    cp -RP $src $work
-                    pushd $work
-                    $tool zon2lock build.zig.zon
-                    $tool zon2nix  build.zig.zon
-                    cp -v build.zig.zon.nix $ROOT/river/
-                    popd
-                    rm -ri "$work"
-                    echo "Done!"
-                  '';
-                };
-              };
-
-              zig2nix-0_16_0 = zig2nix.zig2nix-0_16_0;
-              zig2nix-latest = zig2nix.zig2nix-latest;
-
               updateProtocols = mkApp {
                 drv = pkgs.writeShellApplication {
                   name = "update-protocols";

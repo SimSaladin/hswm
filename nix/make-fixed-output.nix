@@ -12,13 +12,10 @@ let
 
       # AttrSet -> AttrSet -> AttrSet;
       extendDrvArgs = finalAttrs: { hash ? lib.fakeHash, ... }@attrs: {
-        name = attrs.pname or "fixed-out";
-        pname = attrs.name or "fixed-out";
-        nameSuffix = attrs.nameSuffix or ("-" + (attrs.pname or "-fixed-out"));
-        outputHash = hash;
-        outputHashAlgo = "sha256";
-        outputHashMode = "recursive";
-        __structuredAttrs = true;
+        ${if attrs ? name then null else "name"} = attrs.pname or "fixed";
+        ${if attrs ? outputHash then null else "outputHash"} = hash;
+        ${if attrs ? outputHashAlgo then null else "outputHashAlgo"} = "sha256";
+        ${if attrs ? outputHashMode then null else "outputHashMode"} = "recursive";
       };
       excludeDrvArgNames = [ "hash" ];
 
@@ -26,20 +23,19 @@ let
       constructDrv = mkDrvUpper;
 
       # Derivation -> Derivation;
-      transformDrv = drv:
-        let cfg = { preOverrideAttrs = lib.flip builtins.removeAttrs [ "version" "pname" "meta" ]; };
-        in rerunOnChange cfg drv;
+      transformDrv = rerunOnChange { preOverrideAttrs = attrs: attrs // { pname = null; }; } drv;
 
-      #inheritFunctionArgs = true;
       #excludeFunctionArgNames = [];
     };
 
   # This is inspired by the idea described in https://blog.eigenvalue.net/nix-rerunning-fixed-output-derivations/
   # Fixed output derivations (FODs) that invalidate themselves when it seems necessary
   rerunOnChange =
-    { preOverrideAttrs ? x: x } @ args:
+    { preOverrideAttrs ? x: x, nested ? false } @ args:
     fixedOutputDerivation: # The initially constructed fixed output derivation.
 
+      assert (lib.assertMsg (fixedOutputDerivation ? name || (fixedOutputDerivation ? pname && fixedOutputDerivation ? version))
+        "name or (pname and version) required");
       assert (lib.assertMsg (fixedOutputDerivation ? outputHash)
         "rerunOnChange expects a fixedOutputDerivation");
       assert (lib.assertMsg (fixedOutputDerivation ? overrideAttrs)
@@ -62,13 +58,14 @@ let
           substring 11 32 (unsafeDiscardStringContext drv.outPath);
       in
       fixedOutputDerivation.overrideAttrs
-        (attrs: {
+        (attrs@{ name ? pname + "-" + version, pname ? null, version ? null, ... }: {
           # Any input (we are about) changing will change the name, too.
-          name = inputsHash + (fixedOutputDerivation.nameSuffix or fixedOutputDerivation.pname or "fod-renamed");
+          name = name + "-" + inputsHash;
+            #inputsHash + (fixedOutputDerivation.nameSuffix or fixedOutputDerivation.pname or "fod-renamed");
         }) // {
         # Overriding also changes the hash calculation!
         overrideAttrs =
-          f: rerunOnChange args (fixedOutputDerivation.overrideAttrs f);
+          f: rerunOnChange (args // { nested = true; }) (fixedOutputDerivation.overrideAttrs f);
       };
 
 in
