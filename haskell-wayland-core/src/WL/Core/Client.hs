@@ -25,6 +25,7 @@ import           Control.Exception
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.Maybe
+import           Data.Proxy (Proxy(..))
 import           Foreign
 import           Foreign.C
 import           Foreign.C.ConstPtr
@@ -55,6 +56,14 @@ clientFromProtocolXML' commonSettings
       _                                             -> defaultEventArgTrans s iface ev arg t x
 
   } protoXml
+
+data WaylandClientException
+  = WlListenerAddFailed { interfaceName :: String, objectId :: String }
+  | WaylandInvalidId
+  -- ^ When attempting to use an invalid object
+  deriving stock (Eq, Ord, Show, Generic)
+
+instance Exception WaylandClientException
 
 data WaylandProtocolError = WaylandProtocolError
   { errCode                :: !Word32
@@ -388,6 +397,33 @@ registryBind reg name iface ver = liftIO $ castPtr <$> wl_registry_bind reg.unwr
 -- | Close the connection to display and free all resources associated with it.
 displayDisconnect :: MonadIO m => Display -> m ()
 displayDisconnect (Display d) = liftIO $ Safe.wl_display_disconnect d
+
+-- Add listeners
+
+-- | Add a listener to an object with the specified user data.
+--
+-- Fails if a listener is already set.
+--
+-- Throws 'WlListenerAddFailed' on failure listener fails.
+listenerAdd
+  :: forall object m userdata. (MonadIO m, Show object, HasListener object, IsUserData userdata)
+  => object -- ^ The target object
+  -> ConstPtr (ObjectListener object) -- ^ Listener instance (function pointers)
+  -> userdata -- ^ Userdata
+  -> m ()
+{-# INLINE listenerAdd #-}
+listenerAdd obj l ud = liftIO $ do
+  res <- objectListenerAdd obj l (toUserData ud)
+  when (res < 0) $ throwIO $ WlListenerAddFailed (objectInterfaceName @object Proxy) (show obj)
+
+-- | 'listenerAdd' using @NULL@ user data.
+listenerAdd_
+  :: (MonadIO m, Show object, HasListener object)
+  => object -- ^ The target object
+  -> ConstPtr (ObjectListener object) -- ^ Listener instance (function pointers)
+  -> m ()
+{-# INLINE listenerAdd_ #-}
+listenerAdd_ obj l = listenerAdd obj l ()
 
 -- orphan instances
 

@@ -89,7 +89,7 @@ class IsWlObject object => HasInterface object where
   objectBindWrap = coerce
 
 -- | Objects for which it is possible to create listeners.
-class HasInterface object => HasListener object where
+class (HasInterface object, Typeable (ObjectListener object)) => HasListener object where
 
   -- | The listener interface.
   type ObjectListener object = r | r -> object

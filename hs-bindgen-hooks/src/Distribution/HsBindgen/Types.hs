@@ -331,7 +331,6 @@ data ProtocolScannerOptions = ProtocolScannerOptions
   -- ^ Protocol references for dependency resolution.
   , optionModuleName       :: ComponentModuleNameFunction
   --- ^ construct module name for spec + component
-  --, optionProtocolDefaults :: ProtocolConfig -- ^ Defaults for all protocol specs XXX
   , optionCustom           :: Endo ProtocolConfig
   -- ^ XXX modify protocol configs arbitrarily
   , interfaceProtocols     :: ProtocolScannerDependencies
@@ -346,42 +345,45 @@ newtype ComponentModuleNameFunction = ComponentModuleNameFunction
   { unwrap :: forall a. ProtocolSpecX a -> ProtoComponent -> ModuleName }
 
 instance Default ComponentModuleNameFunction where
-  def = ComponentModuleNameFunction $ \spec ->
-    let base = getRoot spec
-        nameFor = \case
-          InfoModule     -> base ++ pure "Internal"
-          WrapClient     -> base ++ pure "Client"
-          WrapServer     -> base ++ pure "Server"
-          EnumBindings   -> base ++ pure "Enums"
-          ClientBindings -> nameFor WrapClient ++ pure "Generated"
-          ServerBindings -> nameFor WrapServer ++ pure "Generated"
-     in fromString . L.intercalate "." . nameFor
-    where
-      getRoot spec =
-        let subMod =
-              case (spec.stability, spec.version) of
-                (Stable,   Nothing) -> []
-                (Unknown,  Nothing) -> []
-                (Stable,    Just v) -> [ 'V' : show v ]
-                (Staging,  Nothing) -> [ "Staging" ]
-                (Staging,   Just v) -> [ "Staging", 'V' : show v ]
-                (Unknown,   Just v) -> [ "Staging", 'V' : show v ]
-                (Unstable, Nothing) -> [ "Unstable" ]
-                (Unstable,  Just v) -> [ "Unstable", 'V' : show v ]
-         in map (_head %~ toUpper) $
-              (spec.category & getCat) ++ (spec.baseName & getName) ++ subMod
+  def = ComponentModuleNameFunction $ \k -> fromString . L.intercalate "." . map (_head %~ toUpper) . defaultModuleName k
 
-      getCat "wayland" = [ "WL" ]
-      getCat   "river" = [ "River" ]
-      getCat       foo = [ "WL", foo ]
+defaultModuleName :: ProtocolSpecX a -> ProtoComponent -> [String]
+defaultModuleName spec key = case key of
+    EnumBindings   -> base ++ ["Enums"]
+    ClientBindings -> base ++ ["Client", "Generated"]
+    ServerBindings -> base ++ ["Server", "Generated"]
+    WrapClient     -> base ++ ["Client"]
+    WrapServer     -> base ++ ["Server"]
+    InfoModule     -> base ++ ["Internal"]
+  where base = defaultModulesPrefix spec
 
-      getName :: String -> [String]
-      getName       [] = []
-      getName (a : as) = [ toUpper a : go as ]
-        where
-          go ('-' : x : xs) = toUpper x : go xs
-          go       (x : xs) = x : go xs
-          go             [] = []
+defaultModulesPrefix :: ProtocolSpecX a -> [String]
+defaultModulesPrefix spec =
+    getCat spec.category
+    ++ getName spec.baseName
+    ++ subMod
+    ++ [ 'V' : show v | Just v <- pure spec.version ]
+  where
+    subMod = case (spec.stability, spec.version) of
+      (Stable, _)        -> []
+      (Unstable, _)      -> [ "Unstable" ]
+      (Staging, _)       -> [ "Staging" ]
+      (Unknown, Nothing) -> []
+      (Unknown, _)       -> [ "Staging" ]
+
+    getCat "wayland" = [ "WL" ]
+    getCat   "river" = [ "River" ]
+    getCat       foo = [ "WL", foo ]
+
+    -- "xdg-shell"  ->  "XdgShell"
+    getName :: String -> [String]
+    getName       [] = []
+    getName (a : as) = [ toUpper a : go as ]
+      where
+        go ('-' : x : xs) = toUpper x : go xs
+        go ('_' : x : xs) = toUpper x : go xs
+        go       (x : xs) = x : go xs
+        go             [] = []
 
 -- * Lenses
 
@@ -422,6 +424,11 @@ instance Pretty ProtocolSpec where
       | (k, m) <- M.toList c.computedModuleNames, Just bgen <- [c ^? bindGens . ix k]
     ]) PP.<> "\n"
 
+instance Pretty ProtocolVersion where
+  pretty (ProtocolVersion ver) = "v" <> PP.int ver
+
+instance Pretty ProtocolId where
+  pretty pid = PP.text pid.name PP.<+> pretty pid.version PP.<+> PP.text ("(" ++ show pid.stability ++ ")")
 
 ------------------------------
 -- * Parsers
@@ -484,13 +491,15 @@ parseProtocolConfigWithName = do
     stability' x = '-' : map toLower (show x)
     version'   x = '-' : 'v' : show x
 
-parseWaylandProtosPath :: HasCallStack => IsString (ProtocolSpecX bindgen) => String -> (ProtocolId, ProtocolSpecX bindgen)
+parseWaylandProtosPath :: HasCallStack => IsString (ProtocolSpecX bindgen)
+                       => FilePath -> (ProtocolId, ProtocolSpecX bindgen)
 parseWaylandProtosPath str = case explicitEitherParsec pProtocolId str of
   Right pid@(ProtocolId nm sta ver) -> (pid, (fromString $ "wayland-" ++ nm ++ ".xml")
-     { stability    = sta
-     , fullName     = FP.takeBaseName str
+     { fullName     = FP.takeBaseName str
+     , category     = "wayland"
      , baseName     = nm
      , version      = Just ver
+     , stability    = sta
      , protocolXML  = makeRelativePathEx str
      , protocolDirs = []
      })
@@ -515,9 +524,9 @@ parseWaylandProtocolId = do
 -- | To parse "NAME[-STABILITY][-vNUM].xml"
 pProtocolIdBase :: forall m. CabalParsing m => m ProtocolId
 pProtocolIdBase = do
-    name <- P.many $ P.notFollowedBy psv *> P.satisfy (/= '/')
+    nm <- P.many $ P.notFollowedBy psv *> (P.alphaNum <|> P.oneOf "_-")
     (s, v) <- psv
-    return $ ProtocolId name s v
+    return $ ProtocolId nm s v
   where
     psv = do
       s <- P.option Unknown (P.try $ P.char '-' *> pStability)

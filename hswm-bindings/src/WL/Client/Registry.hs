@@ -1,0 +1,160 @@
+{-# LANGUAGE PatternSynonyms     #-}
+{-# LANGUAGE OverloadedRecordDot #-}
+{-# LANGUAGE RecordWildCards     #-}
+-- |
+-- Module      : WL.Client.Registry
+-- Description : Global registry wrapper interface
+-- Copyright   : (c) Samuli Thomasson, 2026
+--
+-- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
+-- Stability   : unstable
+-- Portability : unportable
+--
+module WL.Client.Registry
+  -- * Initialize registry
+  ( initRegistryState
+  , RegistrySettings(..)
+  , RegistryState
+
+  -- * Bind objects
+  , bindGlobal
+  , registryBindObject
+  , GlobalException(..)
+
+  -- * Events
+  , RegistryEvent(..)
+  , pattern RegistryGlobalRemove'
+  , pattern RegistryGlobal'
+  ) where
+
+import           WL.Core.Client hiding (shmCreatePool)
+import           UnliftIO
+import           Data.Proxy
+import           GHC.Generics (Generic)
+import qualified Data.Map as M
+import           Data.Maybe
+import qualified Data.List as L
+import           Data.Default (Default(..))
+import           Foreign.C.ConstPtr (ConstPtr)
+
+data GlobalException = NoSuchGlobal String (Maybe Version) (Maybe ObjectName)
+  deriving stock (Eq, Ord, Show, Generic)
+
+instance Exception GlobalException
+
+pattern RegistryGlobal' :: String -> ObjectName -> Version -> RegistryEvent
+pattern RegistryGlobal' interface name version <- RegistryGlobal{name, interface, version}
+
+pattern RegistryGlobalRemove' :: ObjectName -> RegistryEvent
+pattern RegistryGlobalRemove' name <- RegistryGlobalRemove{name}
+
+-- | Tracks the global objects that are available through wl_registry.
+data RegistryState = RegistryState
+  { registrySettings :: !RegistrySettings
+  , registryPtr      :: !Registry
+  , registryListener :: !(ConstPtr (ObjectListener Registry))
+  , fixesMVar        :: !(MVar Fixes)
+  , globals          :: !(IORef [Global])
+  -- ^ All global variables that the server has announced and are have not been removed.
+  , bindings         :: !(IORef (M.Map ObjectName SomeObject))
+  -- ^ All objects that have been bound to.
+  } deriving stock (Generic)
+
+data SomeObject where
+  SomeObject :: HasInterface object => object -> SomeObject
+
+-- | Global description
+data Global = Global
+  { name :: {-# UNPACK #-} !ObjectName
+  -- ^ Name of the global.
+  --
+  -- This is an identifier used by the server to reference some specific global.
+  , version :: {-# UNPACK #-} !Version
+  -- ^ Advertised version of the global.
+  --
+  -- This specifies the maximum version of the global that may be bound. This means any lower version of
+  -- the global may be bound.
+  , interface :: !String
+  -- ^ Interface of the global.
+  --
+  -- Describes what type of protocol object the global is.
+  } deriving stock (Eq, Ord, Show, Read, Generic)
+
+data RegistrySettings = RegistrySettings
+ { regOnEvent :: RegistryEvent -> IO ()
+   -- ^ Callback to run for registry events (in addition)
+ , regOnBind :: forall a. HasInterface a => Proxy a -> ObjectName -> Version -> IO ()
+   -- ^ A function run on every successful global bind
+ }
+
+instance Default RegistrySettings where
+  def = RegistrySettings
+    { regOnEvent = \_ -> pure ()
+    , regOnBind = \_ _ _ -> pure ()
+    }
+
+instance HasDestructor RegistryState where
+  objectDestroy st = do
+    tryTakeMVar st.fixesMVar >>= \case
+      Just fixes -> do
+        fixesDestroyRegistry fixes st.registryPtr
+        objectDestroy fixes
+        objectDestroy st.registryListener
+      Nothing -> return ()
+
+initRegistryState :: MonadIO m => RegistrySettings -> Display -> m RegistryState
+initRegistryState registrySettings disp = do
+  registryPtr <- displayGetRegistry disp
+  globals     <- newIORef mempty
+  bindings    <- newIORef mempty
+  fixesMVar   <- newEmptyMVar
+  registryListener <- createListener $ \ev -> do
+    case ev of
+      RegistryGlobal{..} -> do
+        modifyIORef globals $ \xs -> Global name version interface : xs
+      RegistryGlobalRemove{..} -> do
+        modifyIORef bindings $ M.delete name
+        modifyIORef globals $ filter (\x -> x.name /= name)
+        -- TODO fixesAckGlobalRemove fixes st.registryPtr name
+    regOnEvent registrySettings ev
+  listenerAdd registryPtr registryListener ()
+  return RegistryState{..}
+
+-- |
+-- Throws 'NoSuchGlobal' if the requested global cannot be found.
+bindGlobal
+  :: forall a m. (MonadIO m, HasInterface a)
+  => RegistryState
+  -> Maybe ObjectName -- ^ Bind to specific object (name)
+  -> Maybe Version -- ^ Request a specific version. The final version is smallest of this and the reported version
+  -> m a
+bindGlobal st reqName reqVersion = liftIO $ readIORef st.globals >>= maybe notFound found . L.find check
+  where
+    found x  = registryBindObject st x.name (min limitVer x.version)
+    notFound = throwIO $ NoSuchGlobal implName reqVersion reqName
+    check x  = maybe True (== x.name) reqName && x.interface == implName
+    limitVer = min implVer (fromMaybe implVer reqVersion)
+    implName = objectInterfaceName @a Proxy
+    implVer  = objectInterfaceVersion @a Proxy
+
+-- | Bind to the specified object.
+--
+-- @
+-- registryBindObject @Interface
+-- @
+registryBindObject
+  :: forall a m. (MonadIO m, HasInterface a)
+  => RegistryState
+  -> ObjectName -- ^ The object to bind.
+  -> Version -- ^ The maximum version to request. Clamped to the version of the generated bindings.
+  -> m a
+{-# INLINE registryBindObject #-}
+registryBindObject st name maxVersion = liftIO $ do
+  o <- objectBindWrap <$> registryBind st.registryPtr name (objectInterface proxy) limitVer
+  modifyIORef st.bindings $ M.insert name $ SomeObject o
+  regOnBind st.registrySettings proxy name limitVer
+  return o
+  where
+    limitVer = min maxVersion $ objectInterfaceVersion proxy
+    proxy :: Proxy a
+    proxy = Proxy

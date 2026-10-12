@@ -12,7 +12,7 @@
 -- Stability   : unstable
 -- Portability : unportable
 module HSWM.Main
-  ( module HSWM.Main,
+  ( hswm, startHSWM, handleWithHook,
     module HSWM.Core,
     module HSWM.Wayland,
   )
@@ -50,22 +50,21 @@ import qualified System.Posix as Posix
 
 hswm :: (m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow)) => HSWMConfig m l -> IO ()
 hswm conf = do
-  mainRun <- parseMainArgs
+  options <- parseMainArgs
   case () of
-    _ | mainRun.mainVersion -> putStrLn programVersion
-    _ -> do
-      installSignalHandlers -- TODO uninstall on exit?
-      startHSWM mainRun conf
+    _ | options.mainVersion -> putStrLn programVersion
+    _ -> startHSWM options conf
 
 startHSWM
   :: (m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow))
   => Main -> HSWMConfig m l -> IO ()
-startHSWM mainRun config = do
-    loggerSet <- mkMainLogger mainRun
+startHSWM options config = do
+    installSignalHandlers -- TODO uninstall on exit?
+    loggerSet <- mkMainLogger options
     let logFunc     = fastLoggerOutput loggerSet
         withLogging = flip runLoggingT logFunc
+        connectTo   = Nothing
 
-    let connectTo = Nothing
     withLogging $ logDebug $ "Connecting Wayland display..." :# [ "connect-to" .= toText (fromMaybe "(using defaults)" connectTo) ]
     wlDisplay <- WL.displayConnect connectTo
     withLogging $ logInfo $ "Wayland display connected!" :# [ "display" .= show wlDisplay ]
@@ -87,7 +86,7 @@ startHSWM mainRun config = do
     withLogging $ do
       let newEmpty = let wset = W.new conf.config.layoutHook config.workspaces [SD 0 0 0 0]
                       in def {windowset = wset, windowsetOld = wset}
-      st <- fromMaybe newEmpty <$> readStateFile (mainRun.mainStateFile) config
+      st <- fromMaybe newEmpty <$> readStateFile options.mainStateFile config
       atomically $ putTMVar conf._state st
 
     let runH' :: H a -> IO a
@@ -201,7 +200,7 @@ mainLoop wlDisplay wlPollFd = main MainPoll
       main MainPoll
 
     main (MainSignal sig) = do
-      logError $ "Main: interrupted by signal: " <> tshow sig :# ["signal" .= show sig ]
+      logInfo $ "Main: interrupted by signal: " <> tshow sig :# ["signal" .= show sig ]
       mainExit exitFailure
 
     main (MainExit desc e) = do

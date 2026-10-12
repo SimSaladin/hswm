@@ -609,56 +609,48 @@ modifyOptions f = modify $ \s -> s { scannerOptions = f s.scannerOptions }
 
 -- | Register a new protocol. Fails if a protocol with same name is already registered.
 makeProtocol :: Monad m => ProtocolConfig -> ScannerT m ProtocolId
-makeProtocol cfg = do
-  st <- get
-  let key = deriveProtocolId cfg
-  case M.lookup key st.protocolConfigs of
-    Nothing -> do
-      modify $ \s -> s { protocolConfigs = M.insert key cfg s.protocolConfigs }
-      return key
-    Just _ -> error $ "Duplicate protocol: " ++ show key
+makeProtocol cfg = optionalProtocol Nothing cfg >>= either error return
 
 -- | Register a protocol if it's new or newer than any existing ones.
-optionalProtocol :: Monad m => (ProtocolId, ProtocolConfig) -> ScannerT m (Either String ProtocolId)
-optionalProtocol (key, cfg) = do
+optionalProtocol :: Monad m => Maybe ProtocolId -> ProtocolConfig -> ScannerT m (Either String ProtocolId)
+optionalProtocol mkey cfg = do
   st <- get
+  let existing = M.keys $ M.filterWithKey (conflicts key) st.protocolConfigs
   case M.lookup key st.protocolConfigs of
     Nothing
-      | xs@(_:_) <- M.keys $ M.filterWithKey (conflicts key) st.protocolConfigs -> do
-        if all (key >) xs
-           then doReplace xs
-           else return $ Left $ "A newer protocol already loaded: " <> show xs
-      | otherwise -> do
-          modify $ \s -> s
-            { protocolConfigs = M.insert key cfg s.protocolConfigs }
-          return $ Right key
+      | all (key >) existing -> doReplace existing
+      | otherwise -> return $ Left $ "A newer protocol already loaded: " <> show existing
     Just _ -> return $ Left $ "Duplicate protocol: " ++ show key
   where
+    key = fromMaybe (deriveProtocolId cfg) mkey
     conflicts k1 k2 _ = k1.name == k2.name
     doReplace xs = do
-      modify $ \s -> s
-        { protocolConfigs = M.insert key cfg . (`M.withoutKeys` Set.fromList xs) $ s.protocolConfigs }
+      modify $ \s -> s { protocolConfigs = M.insert key cfg . (`M.withoutKeys` Set.fromList xs) $ s.protocolConfigs }
       return $ Right key
 
 registerProtocolsFileGlob
   :: Verbosity
-  -> Bool
-  -> Maybe (SymbolicPath CWD (Dir Pkg))
-  -> SymbolicPath Pkg (Dir DataDir) -- Prefix
-  -> FilePath
-  -> (ProtocolConfig -> ProtocolConfig)
+  -> Bool -- ^ Allow multiple instances of the same protocol? Latest/stable is selected.
+  -> Maybe (SymbolicPath CWD (Dir Pkg)) -- ^ Working directory
+  -> SymbolicPath Pkg (Dir DataDir) -- ^ Root directory to start the glob search
+  -> FilePath -- ^ File glob, i.e. @"**/*.xml"@
+  -> (ProtocolId -> ProtocolConfig -> Maybe ProtocolConfig)
+      -- ^ Can be used to select only certain protocol files; also possible transformation to apply on the detected protocols.
   -> ScannerT IO ()
 registerProtocolsFileGlob v lax mbWorkDir dir pat f = do
   let workDir = maybe (unsafeCoerceSymbolicPath dir) (fromMaybe sameDirectory mbWorkDir </>) $ symbolicPathRelative_maybe dir
-  liftIO $ notice v $ "register matching: " ++ pat ++ " in " ++ prettyShow workDir
-  matched <- liftIO $ matchDirFileGlob v CabalSpecV3_0 (Just workDir) (makeSymbolicPath pat)
-  forM_ matched $ \x -> do
-    res <- optionalProtocol $ parseWaylandProtosPath (getSymbolicPath x)
-                & _2 . protocolDirs <>~ [dir]
-                & _2 %~ f
-    case res of
-      Right res -> liftIO . debugNoWrap v $ "Optional proto: " ++ show x ++ ": " ++ show res
-      Left err -> unless lax $ liftIO $ die' v err
+  matched <- liftIO $ do
+    notice v $ "looking for protocols matching " ++ pat ++ " in " ++ prettyShow workDir
+    matchDirFileGlob v CabalSpecV3_0 (Just workDir) (makeSymbolicPath pat)
+  forM_ matched $ \xmlFP -> do
+    let (protoId, protoConf) = parseWaylandProtosPath (getSymbolicPath xmlFP)
+    case f protoId protoConf of
+      Nothing -> liftIO . info v $ "Skipped protocol " ++ prettyShow protoId
+      Just newConf -> do
+        res <- optionalProtocol (Just protoId) $ newConf & protocolDirs <>~ [dir]
+        case res of
+          Right res -> liftIO . infoNoWrap v $ "Included protocol " ++ prettyShow protoId ++ " (" ++ prettyShow xmlFP ++ ")"
+          Left err -> unless lax $ liftIO $ die' v err
 
 -- | Register some 'HsBindGen'.
 registerBindGen :: Monad m => HsBindGen -> ScannerT m ()

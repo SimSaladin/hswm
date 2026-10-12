@@ -60,6 +60,7 @@ library
           River.XkbBindings
           River.XkbConfig
           WL.Client
+          WL.Client.Registry
           WL.Viewporter
           -- Most exposed modules are determined at configure time
     other-modules:

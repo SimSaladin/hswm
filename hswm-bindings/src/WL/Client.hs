@@ -1,6 +1,4 @@
-{-# LANGUAGE OverloadedRecordDot #-}
 {-# LANGUAGE PatternSynonyms     #-}
-{-# LANGUAGE RecordWildCards     #-}
 {-# OPTIONS_GHC -Wno-missing-pattern-synonym-signatures #-}
 
 -- |
@@ -34,19 +32,6 @@ module WL.Client
 
   -- * Exceptions
   , WaylandClientException(..)
-  , GlobalException(..)
-
-  -- * Registry & Globals
-  , RegistryState
-  , RegistrySettings(..)
-  , initRegistryState
-  , bindGlobal
-  , Registry
-  , RegistryEvent(..)
-  , pattern RegistryGlobalRemove'
-  , pattern RegistryGlobal'
-  , registryBind
-  , registryBindObject
 
   -- * Display
   , Display
@@ -91,6 +76,9 @@ module WL.Client
   , Client.displayGetFd
   , Client.displayGetError
   , Client.displayGetProtocolError
+
+  -- * Registry & Globals
+  , module WL.Client.Registry
 
   -- * Callback
   , Callback
@@ -416,11 +404,6 @@ module WL.Client
   -- * DataDeviceManager
   , DataDeviceManager
 
-  -- * Fixes
-  , Fixes
-  -- ** DestroyRegistry
-  , fixesDestroyRegistry
-
   -- * Wayland.Util
   , module WL.Util
   -- * Core Enums
@@ -432,6 +415,7 @@ module WL.Client
 import WL.Internals.Types
 
 import           WL.Util
+import           WL.Client.Registry
 import           WL.Core.Client hiding (shmCreatePool)
 import qualified WL.Core.Client as Client
 import qualified WL.Core.Enums
@@ -443,31 +427,11 @@ import           UnliftIO
 import           Control.Monad
 import           Data.Bits
 import           Data.Word
-import           Data.Default
-import qualified Data.List as L
-import           Data.Maybe
-import           Data.Proxy
 import           System.Posix (Fd)
-import qualified Data.Map as M
 import           Foreign
 import           Foreign.C.ConstPtr
 import           Foreign.C.String
 import           Foreign.C.Types
-import           Data.Proxy
-import           GHC.Generics
-
-data WaylandClientException
-  = WlListenerAddFailed { interfaceName :: String, objectId :: String }
-  | WaylandInvalidId
-  -- ^ When attempting to use an invalid object
-  deriving stock (Eq, Ord, Show, Generic)
-
-instance Exception WaylandClientException
-
-data GlobalException = NoSuchGlobal String (Maybe Version) (Maybe ObjectName)
-  deriving stock (Eq, Ord, Show, Generic)
-
-instance Exception GlobalException
 
 getObjectId :: (MonadIO m, IsWlObject object) => object -> m Word32
 getObjectId o = liftIO $ C.Unsafe.wl_proxy_get_id (toProxy o)
@@ -493,37 +457,6 @@ getObjectTag object = liftIO $ do
   if tag /= nullPtr
      then Just <$> peek tag
      else return Nothing
-
--- | Add a listener to an object with the specified user data.
---
--- Fails if a listener is already set.
---
--- Throws 'WlListenerAddFailed' on failure listener fails.
-listenerAdd
-  :: forall object m userdata. (MonadIO m, Show object, HasListener object, IsUserData userdata)
-  => object -- ^ The target object
-  -> ConstPtr (ObjectListener object) -- ^ Listener instance (function pointers)
-  -> userdata -- ^ Userdata
-  -> m ()
-{-# INLINE listenerAdd #-}
-listenerAdd obj l ud = liftIO $ do
-  res <- objectListenerAdd obj l (toUserData ud)
-  when (res < 0) $ throwIO $ WlListenerAddFailed (objectInterfaceName @object Proxy) (show obj)
-
--- | 'listenerAdd' using @NULL@ user data.
-listenerAdd_
-  :: (MonadIO m, Show object, HasListener object)
-  => object -- ^ The target object
-  -> ConstPtr (ObjectListener object) -- ^ Listener instance (function pointers)
-  -> m ()
-{-# INLINE listenerAdd_ #-}
-listenerAdd_ obj l = listenerAdd obj l ()
-
-pattern RegistryGlobal' :: String -> ObjectName -> Version -> RegistryEvent
-pattern RegistryGlobal' interface name version <- RegistryGlobal{name, interface, version}
-
-pattern RegistryGlobalRemove' :: ObjectName -> RegistryEvent
-pattern RegistryGlobalRemove' name <- RegistryGlobalRemove{name}
 
 pattern ShmFormatARGB8888 :: ShmFormat
 pattern ShmFormatARGB8888             = Client.WL_SHM_FORMAT_ARGB8888
@@ -784,106 +717,6 @@ parseSeatCapabilities x = [ v | v <- values, fromCEnum x .&. fromCEnum v > 0 ]
 shmCreatePool :: MonadIO m => Shm -> Fd -> Int -> m ShmPool
 {-# INLINE shmCreatePool #-}
 shmCreatePool shm fd size = Client.shmCreatePool shm (fromIntegral fd) (fromIntegral size)
-
--- * Registry / Globals
-
--- | Tracks the global objects that are available through wl_registry.
-data RegistryState = RegistryState
-  { registrySettings :: !RegistrySettings
-  , registryPtr      :: !Registry
-  , registryListener :: !(ConstPtr (ObjectListener Registry))
-  , fixesMVar        :: !(MVar Fixes)
-  , globals          :: !(IORef [Global])
-  , bindings         :: !(IORef (M.Map ObjectName SomeObject))
-  } deriving stock (Generic)
-
-data SomeObject where
-  SomeObject :: HasInterface object => object -> SomeObject
-
--- | Global description
-data Global = Global
-  { name :: {-# UNPACK #-} !ObjectName
-  -- ^ Name of the global.
-  --
-  -- This is an identifier used by the server to reference some specific global.
-  , version :: {-# UNPACK #-} !Version
-  -- ^ Advertised version of the global.
-  --
-  -- This specifies the maximum version of the global that may be bound. This means any lower version of
-  -- the global may be bound.
-  , interface :: !String
-  -- ^ Interface of the global.
-  --
-  -- Describes what type of protocol object the global is.
-  } deriving stock (Eq, Ord, Show, Read, Generic)
-
-data RegistrySettings = RegistrySettings
- { regOnEvent :: RegistryEvent -> IO ()
- , regOnBind :: forall a. HasInterface a => Proxy a -> ObjectName -> Version -> IO ()
- }
-
-instance Default RegistrySettings where
-  def = RegistrySettings
-    { regOnEvent = \_ -> pure ()
-    , regOnBind = \_ _ _ -> pure ()
-    }
-
-instance HasDestructor RegistryState where
-  objectDestroy st = do
-    tryTakeMVar st.fixesMVar >>= \case
-      Just fixes -> do
-        fixesDestroyRegistry fixes st.registryPtr
-        objectDestroy fixes
-        objectDestroy st.registryListener
-      Nothing -> return ()
-
-initRegistryState :: MonadIO m => RegistrySettings -> Display -> m RegistryState
-initRegistryState registrySettings disp = do
-  registryPtr <- displayGetRegistry disp
-  globals     <- newIORef mempty
-  bindings    <- newIORef mempty
-  fixesMVar   <- newEmptyMVar
-  registryListener <- createListener $ \ev -> do
-    case ev of
-      RegistryGlobal{..} -> do
-        modifyIORef globals $ \xs -> Global name version interface : xs
-      RegistryGlobalRemove{..} -> do
-        modifyIORef bindings $ M.delete name
-        modifyIORef globals $ filter (\x -> x.name /= name)
-    regOnEvent registrySettings ev
-  listenerAdd_ registryPtr registryListener
-  return RegistryState{..}
-
--- |
--- Throws 'NoSuchGlobal' if the requested global cannot be found.
-bindGlobal
-  :: forall a m. (MonadIO m, HasInterface a)
-  => RegistryState
-  -> Maybe ObjectName -- ^ Bind to specific object (name)
-  -> Maybe Version -- ^ Request a specific version. The final version is smallest of this and the reported version
-  -> m a
-bindGlobal st reqName reqVersion = liftIO $ readIORef st.globals >>= maybe notFound found . L.find check
-  where
-    found x = registryBindObject st x.name (min limitVer x.version)
-    notFound = throwIO $ NoSuchGlobal implName reqVersion reqName
-    check x = maybe True (== x.name) reqName && x.interface == implName
-    limitVer = min implVer (fromMaybe implVer reqVersion)
-    implName = objectInterfaceName @a Proxy
-    implVer  = objectInterfaceVersion @a Proxy
-
-registryBindObject
-  :: forall a m. (MonadIO m, HasInterface a)
-  => RegistryState -> ObjectName -> Version -> m a
-{-# INLINE registryBindObject #-}
-registryBindObject st name maxVersion = liftIO $ do
-  o <- objectBindWrap <$> registryBind st.registryPtr name (objectInterface proxy) ver
-  modifyIORef st.bindings $ M.insert name $ SomeObject o
-  regOnBind st.registrySettings proxy name ver
-  return o
-  where
-    ver = min maxVersion $ objectInterfaceVersion proxy
-    proxy :: Proxy a
-    proxy = Proxy
 
 -- * Compositor
 

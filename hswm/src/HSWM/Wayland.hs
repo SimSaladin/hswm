@@ -16,7 +16,7 @@ type MonadGlobals env m = (MonadUnliftIO m, MonadLogger m, MonadThrow m, MonadRe
 
 -- | Bind global by its name.
 bindGlobalName
-  :: forall a env m. (MonadGlobals env m, WL.IsWlObject a, WL.HasInterface a)
+  :: forall a env m. (MonadGlobals env m, WL.HasInterface a)
   => WL.ObjectName -- ^ The object name (id)
   -> Maybe WL.Version -- ^ Optional max version
   -> m a
@@ -26,7 +26,7 @@ bindGlobalName name mver = do
 
 -- | Bind global by type.
 bindGlobal
-  :: forall a env m. (MonadGlobals env m, WL.IsWlObject a, WL.HasInterface a)
+  :: forall a env m. (MonadGlobals env m, WL.HasInterface a)
   => m a
 bindGlobal = do
   regState <- asks (view globalsRegistryL) >>= readMVar
@@ -34,7 +34,7 @@ bindGlobal = do
 
 -- | Bind global by type + add listener.
 bindGlobalWithListener
-  :: forall a env m. (MonadGlobals env m, WL.IsWlObject a, WL.HasInterface a, WL.HasListener a, Show a)
+  :: forall a env m. (MonadGlobals env m, WL.HasListener a, Show a)
   => ConstPtr (WL.ObjectListener a) -- ^ listener
   -> Ptr () -- ^ User data
   -> m a
@@ -46,7 +46,8 @@ bindGlobalWithListener listener udata = do
 
 -- | Bind global by type + add listener if one has been created.
 bindGlobalWithAutoListener
-  :: forall a env m. (MonadGlobals env m, WL.IsWlObject a, WL.HasInterface a, WL.HasListener a, Show a, Typeable (WL.ObjectListener a))
+  :: forall a env m.
+    (MonadGlobals env m, WL.HasListener a, Show a, Typeable (WL.ObjectListener a))
   => m a
 bindGlobalWithAutoListener = do
   regState <- asks (view globalsRegistryL) >>= readMVar

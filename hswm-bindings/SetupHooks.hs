@@ -42,6 +42,20 @@ import qualified WL.Core.Internal as Core
 setupHooks :: SetupHooks
 setupHooks = waylandProtocolHooks config
 
+-- Selected standard protocols
+isEnabled :: ProtocolId -> Bool
+isEnabled ProtocolId{name} = name `elem`
+  ([ "viewporter"
+  , "xdg-shell"
+  , "ext-idle-notify"
+  , "ext-session-lock"
+  , "input-method"
+  , "xdg-output"
+  , "text-input"
+  , "ext-foreign-toplevel-list"
+  , "fractional-scale"
+  ] :: [String])
+
 config :: DynamicSetup ()
 config = do
 
@@ -56,21 +70,19 @@ config = do
   -- So that the core bindings are loaded first always...
   modifyOptions $ optionCustom <>~ Endo (dependsOn <>~ ["wl_display"])
 
-  setup <- ask
-  index <- liftIO $ getInstalledPackages v setup.packageBuildDescr.compiler Nothing setup.packageBuildDescr.withPackageDB setup.localBuildConfig.withPrograms
-  let selector pkg = packageName pkg `elem` ([ "haskell-wayland-core" ] :: [PackageName])
-      Left depsIndex = dependencyClosure index $ map (newSimpleUnitId . givenComponentId) setup.packageBuildDescr.configFlags.configDependencies
-      deps = filter selector $ reverseTopologicalOrder depsIndex
-  forM_ deps $ \pkg -> do
-    let incdirs = map makeSymbolicPath pkg.includeDirs
-        specdir = let d : _ = pkg.importDirs in makeSymbolicPath @Pkg @(Dir Source) (d </> "binding-specs")
-        (spec', proto) = case packageName pkg of
-            "haskell-wayland-core" -> (Core.protocolSpec, Core.protocol)
-            _ -> error $ "no imports: " ++ show (packageName pkg)
-        spec = setBindgenDir specdir spec'
-    liftIO $ print (PI.installedUnitId pkg, incdirs, specdir)
-    modifyOptions $ interfaceProtocols <>~ [(map (.name) proto.interfaces, spec)]
-    modifyOptions $ optionCustom <>~ Endo (bindGens . each . bcBindGen . includeDirs <>~ incdirs)
+  -- Inject known interface info as needed include dirs from cabal dependencies
+  deps <- getDependencies v
+  forM_ deps $ \pkg -> case packageName pkg of
+    "haskell-wayland-core" -> do
+        let incdirs = map makeSymbolicPath pkg.includeDirs
+        let specdir = let d : _ = pkg.importDirs in makeSymbolicPath @Pkg @(Dir Source) (d </> "binding-specs")
+        let proto   = Core.protocol -- XXX from haskell import
+        let spec    = setBindgenDir specdir Core.protocolSpec -- XXX from haskell import
+        liftIO $ print (PI.installedUnitId pkg, incdirs, specdir)
+        -- Inject include dirs + protocol dependency info
+        modifyOptions $ optionCustom <>~ Endo (bindGens . each . bcBindGen . includeDirs <>~ incdirs)
+        modifyOptions $ interfaceProtocols <>~ [(map (.name) proto.interfaces, spec)]
+    _ -> error $ "no imports: " ++ show (packageName pkg)
 
   -- Settings for specific protocols
   modifyOptions $ optionCustom <>~ onlyIfName "linux-dmabuf"        (coreOnly .~ False)
@@ -79,17 +91,29 @@ config = do
 
   -- Discovered wayland-protocols via pkg-config
   Just (AbsolutePath dir) <- withLBC $ \lbc -> liftIO $ getPkgConfDataDir v lbc.withPrograms "wayland-protocols"
-  registerProtocolsFileGlob v True Nothing dir "**/*.xml" id
+  registerProtocolsFileGlob v True Nothing dir "**/*.xml" $ \k v -> do
+    guard $ isEnabled k
+    return v
+
+  setup <- ask
 
   -- Local files
   let wd = flagToMaybe setup.packageBuildDescr.configFlags.configCommonFlags.setupWorkingDir
-  registerProtocolsFileGlob v False wd (makeSymbolicPath "protocol") "*.xml" $ \x ->
-    case () of
-    _ | "river-" `L.isPrefixOf` x.fullName ->
-            x & stability .~ Stable
-              & category .~ "river"
-              & baseName %~ fromMaybe x.baseName . L.stripPrefix "river-"
-    _ | "wlr-" `L.isPrefixOf` x.fullName ->
-            x & category .~ "wlr"
-              & baseName %~ fromMaybe x.baseName . L.stripPrefix "wlr-"
-      | otherwise -> x
+  registerProtocolsFileGlob v False wd (makeSymbolicPath "protocol") "*.xml" $ \key val ->
+    Just $ case () of
+      _ | "river-" `L.isPrefixOf` val.fullName -> val
+                & stability .~ Stable
+                & category .~ "river"
+                & baseName %~ fromMaybe val.baseName . L.stripPrefix "river-"
+      _ | "wlr-" `L.isPrefixOf` val.fullName -> val
+                & category .~ "wlr"
+                & baseName %~ fromMaybe val.baseName . L.stripPrefix "wlr-"
+        | otherwise -> val
+
+getDependencies v = do
+  setup <- ask
+  index <- liftIO $ getInstalledPackages v setup.packageBuildDescr.compiler Nothing setup.packageBuildDescr.withPackageDB setup.localBuildConfig.withPrograms
+  let Left index' = dependencyClosure index $ map (newSimpleUnitId . givenComponentId) setup.packageBuildDescr.configFlags.configDependencies
+  return $ filter selector $ reverseTopologicalOrder index'
+  where
+    selector pkg = packageName pkg == "haskell-wayland-core"
