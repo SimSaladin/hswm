@@ -17,6 +17,7 @@ import           HSWM.Core as HSWM
 import           HSWM.InputConfig (InputConfigState)
 import           HSWM.Operations
 import qualified HSWM.StackSet as W
+import qualified HSWM.Main.Persist as Persist
 
 import qualified River as R
 import qualified Data.Aeson as A
@@ -180,7 +181,7 @@ serverHandleMsg conf c (Msg r seqn) =
     DumpState{..} -> do
       dump <- case param of
                 "input-config-state" -> P.pShow <$> getObjectDef @InputConfigState
-                _ -> TL.pack <$> runInHS dumpStateAsString
+                _ -> TL.pack <$> runInHS Persist.dumpStateAsString
       sendMsg c $ Msg (StateDumpResponse dump) seqn
 
     _ -> logWarn $ "Unhandled message" :# [ "message" .= r ]

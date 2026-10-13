@@ -71,6 +71,7 @@ library
           HSWM.Layout.WindowNavigation
           HSWM.Main
           HSWM.Main.Options
+          HSWM.Main.Persist
           HSWM.ManageHook
           HSWM.Operations
           HSWM.Outputs

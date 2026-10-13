@@ -21,10 +21,10 @@ where
 import           HSWM.Core
 import qualified HSWM.InputConfig as InputConfig
 import           HSWM.Main.Options
+import qualified HSWM.Main.Persist as Persist
 import           HSWM.Operations
 import qualified HSWM.Outputs as Outputs
 import qualified HSWM.Seats as Seats
-import qualified HSWM.StackSet as W
 import qualified HSWM.Util.Debug as Debug
 import           HSWM.Utils
 import           HSWM.Wayland
@@ -42,7 +42,6 @@ import qualified WL.Wlr.OutputManagement.Unstable.V1.Client as WLR_OM
 import qualified WL.Wlr.OutputPowerManagement.Unstable.V1.Client as WLR_OPM
 import qualified WL.XdgOutput.Unstable.V1.Client as XO
 
-import           Control.Concurrent.Thread.Delay as Conc (delay)
 import           System.IO (putStrLn)
 import qualified System.Posix as Posix
 
@@ -71,10 +70,7 @@ startHSWM options config = do
       unsetEnv "WAYLAND_DEBUG"
 
       -- Restore or initialize initial state
-      let config' = config { layoutHook = Layout config.layoutHook }
-      let newEmpty = let wset = W.new config'.layoutHook config.workspaces [SD 0 0 0 0]
-                      in def {windowset = wset, windowsetOld = wset}
-      initialState <- fromMaybe newEmpty <$> readStateFile options.mainStateFile config
+      (config', initialState) <- Persist.maybeRestoreState options config
       HConf False Nothing config' wlDisplay
           <$> askLoggerIO
           <*> pure lgrCleanup
@@ -158,21 +154,13 @@ startHSWM options config = do
         catchSignal Posix.sigQUIT
         catchSignalWith Posix.sigUSR2 $ io getProgramPath >>= writeMainQ . MainRestart
 
-        scheduleStateSave options.mainStateSave
+        Persist.scheduleStateSave options.mainStateSave
 
       -- Create an additional seat; useful for testing
       -- io $ R.riverInputManagerCreateSeat inputManager (Just "foobar")
 
       displayFd <- WL.displayGetFd conf._wlDisplay
       mainLoop conf._wlDisplay displayFd
-
-scheduleStateSave :: Integer -> H ()
-scheduleStateSave interval
-  | interval <= 0 = return ()
-  | otherwise = do
-      let period = 1_000_000 * 60 * interval
-      link =<< async (forever $ io (Conc.delay period) >> writeMainQ MainSaveToDisk)
-      logInfo $ "started timer for saving state to disk every period" :# [ "minutes" .= interval ]
 
 defaultRegistrySettings :: H WL.RegistrySettings
 defaultRegistrySettings = withRunInIO $ \runInIO -> return def
@@ -193,32 +181,12 @@ mainLoop wlDisplay wlPollFd = do
   async (void . userCode =<< view (config . startupHook)) >>= link
   main MainPoll
   where
-    main MainPoll = mainProcessing
-
-    main (MainRestart prog) = do
-      logInfo $ "Main: interrupted by reload request" :# [ "program" .= prog ]
-      restart prog
-      logError "Main: restart was unsuccessful! Resuming normal operation"
-      main MainPoll
-
-    main MainSaveToDisk = do
-      void $ runInHS $ userCodeS writeStateToFile
-      main MainPoll
-
-    main (MainSignal sig) = do
-      logInfo $ "Main: interrupted by signal: " <> tshow sig :# ["signal" .= show sig ]
-      mainExit exitFailure
-
-    main (MainExit desc e) = do
-      logError $ "Main: interrupted by exception in the main thread" :# [ "description" .= desc, "exception" .= show e ]
-      mainExit exitFailure
-
-    -- wl_display_prepare_read() needs to be balanced with either
-    -- wl_display_read_events() or wl_display_cancel_read()
-    --
-    -- if prepare_read() returns non-zero, there are events to be dispatched
-    mainProcessing = do
+    main MainPoll = do
       next <- bracketOnError_
+        -- wl_display_prepare_read() needs to be balanced with either
+        -- wl_display_read_events() or wl_display_cancel_read()
+        --
+        -- if prepare_read() returns non-zero, there are events to be dispatched
         -- obtain read intent:
         -- will try wl_display_prepare_read until it succeeds, attempting to dispatch
         -- pending events until none left.
@@ -235,9 +203,25 @@ mainLoop wlDisplay wlPollFd = do
           -- read events - pair to dsplayPrepareRead
           WL.displayReadEvents wlDisplay
           return incoming
-      main $ case next of
-        Right () -> MainPoll
-        Left ev -> ev
+      main $ either id (const MainPoll) next
+
+    main (MainRestart prog) = do
+      logInfo $ "Main: interrupted by reload request" :# [ "program" .= prog ]
+      restart prog
+      logError "Main: restart was unsuccessful! Resuming normal operation"
+      main MainPoll
+
+    main MainSaveToDisk = do
+      void $ runInHS $ userCodeS Persist.writeStateToFile
+      main MainPoll
+
+    main (MainSignal sig) = do
+      logInfo $ "Main: interrupted by signal: " <> tshow sig :# ["signal" .= show sig ]
+      mainExit exitFailure
+
+    main (MainExit desc e) = do
+      logError $ "Main: interrupted by exception in the main thread" :# [ "description" .= desc, "exception" .= show e ]
+      mainExit exitFailure
 
     mainExit how = do
       logInfo "Main: now exiting. Running exit hooks..."

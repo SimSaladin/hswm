@@ -2,6 +2,7 @@ module HSWM.Operations where
 
 import           HSWM.Core
 import qualified HSWM.StackSet as W
+import qualified HSWM.Main.Persist as Persist
 
 import qualified River as R
 import qualified WL.Wlr.OutputPowerManagement.Unstable.V1.Client as WLR_OPM
@@ -10,13 +11,8 @@ import qualified Data.List as L
 import qualified Data.Map as M
 import           Data.Ratio ((%))
 import qualified Data.Set as S
-import           Data.Time.Clock.System
-import qualified System.FilePath as FP
-import           System.IO (hGetContents, hPrint, writeFile)
-import           System.IO.Error
 import qualified System.Posix as Posix
 import           System.Posix.Process (executeFile)
-import           Text.Printf
 
 -- * Misc. pure operations
 
@@ -270,10 +266,10 @@ modifyOutput :: SomeOutput a => a -> (Output -> Output) -> HS ()
 modifyOutput k f = outputList . eachRiverId k %= f
 
 setOutputPower :: Bool -> HS ()
-setOutputPower mode = use outputList >>= traverseOf_ (each . filtered ((/= def) . outputPower)) f
+setOutputPower mode = use outputList >>= traverseOf_ (each . filtered ((/= def) . view outputPower)) f
   where
     f output = do
-      logInfo $ "Setting output power" :# [ "on" .= mode, "output" .= output.river_output, "opmId" .= output.outputPower ]
+      logInfo $ "Setting output power" :# [ "on" .= mode, "output" .= show output.river_output, "opmId" .= show output.outputPower ]
       WLR_OPM.outputPowerSetMode output.outputPower $
         if mode then WLR_OPM.OutputPowerModeOn
                 else WLR_OPM.OutputPowerModeOff
@@ -381,7 +377,7 @@ restart :: FilePath -> H ()
 restart prog = do
   runInHS $ broadcastMessage ReleaseResources
   void . userCode =<< asks (view $ config . exitHook)
-  statefile <- runInHS writeStateToFile
+  statefile <- runInHS Persist.writeStateToFile
   let args = [ "--state-file", statefile ]
   logInfo $ "Now restarting! Executing file " <> toText prog <> "..." :# [ "args" .= args ]
   io =<< view _loggerCleanup
