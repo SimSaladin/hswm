@@ -177,7 +177,9 @@
         unliftio-core.revision = import ./cabal-files/unliftio-core.nix;
         resourcet.revision = import ./cabal-files/resourcet.nix;
         mono-traversable.revision = import ./cabal-files/mono-traversable.nix;
-        haskeline.revision = hackage.haskeline."0.8.3.0".revisions.default;
+        haskeline.revision = import ./cabal-files/haskeline.nix;
+        haskeline.flags.terminfo = true;
+        haskeline.flags.examples = true;
         happy.revision = import ./cabal-files/happy.nix;
         indexed-traversable.revision = import ./cabal-files/indexed-traversable.nix;
         indexed-traversable.flags.base-ge-4-18 = true;
@@ -315,7 +317,6 @@
           "filepath" = "1.5.4.0";
           "os-string" = "2.0.8";
           "rts" = "1.0.3";
-          "haskeline" = "0.8.3.0";
           "unix" = "2.8.8.0";
           "exceptions" = "0.10.11";
           "deepseq" = "1.5.1.0";
@@ -364,7 +365,6 @@
         "text"
         "time"
         "array"
-        "haskeline"
         "ghc-internal"
         "binary"
         "template-haskell"
@@ -605,6 +605,7 @@
           "gi-gtk3".components.setup.planned = lib.mkOverride 900 true;
           "haskell-lexer".components.library.planned = lib.mkOverride 900 true;
           "th-orphans".components.library.planned = lib.mkOverride 900 true;
+          "haskeline".components.exes."haskeline-examples-Test".planned = lib.mkOverride 900 true;
           "microlens-mtl".components.library.planned = lib.mkOverride 900 true;
           "character-ps".components.library.planned = lib.mkOverride 900 true;
           "os-string".components.library.planned = lib.mkOverride 900 true;

@@ -74,7 +74,7 @@ __:
   - &dep-fast-logger                 fast-logger                 ^>=3.2.6
   - &dep-filelock                    filelock                    ^>=0.1.1
   - &dep-gi-glib                     gi-glib                      >=2.0.30   && <2.1
-  - &dep-haskeline                   haskeline                   ^>=0.8.2
+  - &dep-haskeline                   haskeline                   ^>=0.8.4
   - &dep-microlens-platform          microlens-platform           >=0.4      && <1
   - &dep-microlens                   microlens
   - &dep-monad-logger-aeson          monad-logger-aeson          ^>=0.4.1

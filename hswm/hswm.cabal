@@ -276,7 +276,7 @@ executable hswmctl
           aeson >=2.2.3 && <2.4
         , base >=4.21 && <5
         , bytestring >=0.12.2 && <0.13
-        , haskeline >=0.8.2 && <0.9
+        , haskeline >=0.8.4 && <0.9
         , hswm
         , hswm:ipc-api
         , hswm:prelude
