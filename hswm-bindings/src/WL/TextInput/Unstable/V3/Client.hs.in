@@ -4,4 +4,4 @@ clientFromProtocolXML' commonSettings
     case (arg.argType, r.name) of
       (AArray, "set_available_actions") -> [t|WL.Util.Array $(conT $ mkName "TextInputAction")|]
       _                                 -> defaultRequestArgTypeTrans s iface r arg t
-  } protoXml
+  } protocolXmlString

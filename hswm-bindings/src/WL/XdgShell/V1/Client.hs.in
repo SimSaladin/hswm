@@ -6,4 +6,4 @@ clientFromProtocolXML' commonSettings
       (AArray, "configure")       -> [t|WL.Util.Array $(conT $ mkName "ToplevelState")|]
       (AArray, "wm_capabilities") -> [t|WL.Util.Array $(conT $ mkName "ToplevelWmCapabilities")|]
       _                           -> defaultEventArgTypeTrans s iface ev arg t
-  } protoXml
+  } protocolXmlString

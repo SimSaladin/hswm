@@ -258,7 +258,7 @@ handleEvent e = case e of
   R.RiverWindowUnmaximizeRequested _ _w  -> return ()
   R.RiverWindowShowWindowMenuRequested{} -> return ()
   R.RiverWindowMinimizeRequested _ _     -> return ()
-  _ -> return ()
+  _ -> return () -- Touch events
 
 -- | we use the unique identifier to recover windows after restart
 attemptWindowRecovery :: RiverWindow -> String -> H ()

@@ -4,4 +4,4 @@ clientFromProtocolXML' commonSettings
     case (iface.name, arg.argType) of
       ("wp_presentation_feedback", ASelf) -> "presFeedback"
       _                                   -> defaultEventArgName s iface ev arg t
-  } protoXml
+  } protocolXmlString

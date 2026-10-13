@@ -40,10 +40,9 @@ import qualified WL.Client as WL
 
 import           Control.Monad.Fix
 import           Control.Monad.State
+import           Data.Data
 import qualified Data.Map as M
 import           Data.Monoid (Ap(..))
-import           Data.Typeable
-import           System.Log.FastLogger (LoggerSet)
 
 -- * Types
 
@@ -100,6 +99,11 @@ instance NFData StateExtension where
   rnf (StateExtension a)      = a `seq` ()
   rnf (PersistentExtension a) = a `seq` ()
 
+instance Data StateExtension where
+  toConstr _ = error "toConstr"
+  gunfold _ _ = error "gunfold"
+  dataTypeOf _ = mkNoRepType "StateExtension"
+
 --------------------------------------------------------------
 -- * Layout messages
 
@@ -125,7 +129,7 @@ data LayoutMessages
     Hide
   | -- | Sent when WM is exiting or restarting
     ReleaseResources
-  deriving stock (Eq, Ord, Show, Read, Generic)
+  deriving stock (Eq, Ord, Show, Read, Generic, Data)
   deriving anyclass (NFData)
 
 instance Message LayoutMessages
@@ -236,6 +240,11 @@ instance Show (Layout a) where
 instance NFData (Layout a) where
   rnf (Layout l) = l `seq` ()
 
+instance Typeable a => Data (Layout a) where
+  toConstr _ = error "toConstr"
+  gunfold _ _ = error "gunfold"
+  dataTypeOf _ = mkNoRepType "Layout"
+
 instance LayoutClass Layout RiverWindow where
   runLayout (W.Workspace i (Layout l) ms wd) r = fmap (fmap Layout) `fmap` runLayout (W.Workspace i l ms wd) r
   doLayout (Layout l) r s = fmap (fmap Layout) `fmap` doLayout l r s
@@ -252,7 +261,7 @@ readsLayout (Layout l) s = [(Layout (asTypeOf x l), rs) | (x, rs) <- reads s]
 
 -- | Simple fullscreen mode. Renders the focused window fullscreen.
 data Full a = Full
-  deriving stock (Eq, Ord, Show, Read, Generic)
+  deriving stock (Eq, Ord, Show, Read, Generic, Data)
   deriving anyclass (Default, NFData)
 
 instance LayoutClass Full a
@@ -273,8 +282,8 @@ data HConf = HConf
   , _wlDisplay                     :: {-# UNPACK #-} !WL.Display
     -- | Root logger function.
   , _logFunc                       :: !(Loc -> LogSource -> LogLevel -> LogStr -> IO ())
+  , _loggerCleanup                 :: !(IO ())
     -- | The global objects available through wl_registry.
-  , _loggerSet                     :: !LoggerSet
   , globals                        :: !(MVar WL.RegistryState)
     -- | The 'HState' XXX FIXME
   , _state                         :: !(TMVar HState)
@@ -284,7 +293,9 @@ data HConf = HConf
   , pendingManageQ, pendingRenderQ :: !(TQueue (HS ()))
     -- | Global type-indexed variables.
   , globalTypeMap                  :: !(TMVar TypeMap)
-  } deriving (Generic)
+  }
+  deriving (Generic)
+  -- deriving anyclass (NFData)
 
 -- | Mutable stete.
 data HState = HState
@@ -306,7 +317,7 @@ data HState = HState
     -- provides additional information and a simple interface for using this.
   , extensibleState  :: !(M.Map String (Either String StateExtension))
   }
-  deriving stock (Generic)
+  deriving stock (Generic, Data)
   deriving anyclass (Default, NFData)
 
 -- | IO and read-only global environment 'HConf'.
@@ -315,37 +326,21 @@ data HState = HState
 --
 -- Run 'HS' actions via 'runInHS'.
 newtype H a = H (ReaderT HConf IO a)
-  deriving newtype (Functor, Applicative, Monad, MonadFix, MonadFail, MonadIO, MonadThrow, MonadCatch, MonadMask)
-  deriving newtype (MonadUnliftIO)
-  deriving newtype (MonadReader HConf)
+  deriving newtype (Functor, Applicative, Monad, MonadFix, MonadFail, MonadIO, MonadThrow, MonadCatch, MonadMask,
+                    MonadReader HConf, MonadUnliftIO)
   deriving (Semigroup, Monoid) via Ap H a
 
 -- | IO, read-only global 'HConf' and modifiable 'HState'.
 --
 -- Only one 'HS' action can run concurrently.
 newtype HS a = HS (StateT HState (ReaderT HConf IO) a)
-  deriving newtype (Functor, Applicative, Monad, MonadFix, MonadFail, MonadIO, MonadThrow, MonadCatch, MonadMask)
-  deriving newtype (MonadReader HConf, MonadState HState)
+  deriving newtype (Functor, Applicative, Monad, MonadFix, MonadFail, MonadIO, MonadThrow, MonadCatch, MonadMask,
+                    MonadReader HConf, MonadState HState)
   deriving (Semigroup, Monoid) via Ap HS a
 
 -- Lenses
 
-makeLensesWith' classPerField
-  [ ''HConf
-  , ''HState
-  ]
-
--- Aliases  XXX
-mainEventQL :: Lens' HConf (TQueue MainEvent)
-mainEventQL = eventQueue
-
--- Aliases  XXX
-pendingManageQL :: Lens' HConf (TQueue (HS ()))
-pendingManageQL = pendingManageQ
-
--- Aliases  XXX
-pendingRenderQL :: Lens' HConf (TQueue (HS ()))
-pendingRenderQL = pendingRenderQ
+makeLensesWith' classPerField [ ''HConf, ''HState ]
 
 instance HasGlobalTMap HConf where
   globalTMap = globalTypeMap
@@ -362,13 +357,6 @@ type instance Stateful HS = HS
 type instance LayoutProxy H  = Layout
 type instance LayoutProxy HS = Layout
 
-instance Show (H ())    where show _ = "H()"
-instance Show (H Bool)  where show _ = "H(Bool)"
-instance Show (HS Bool) where show _ = "HS(Bool)"
-
-instance Default a => Default (H a)  where def = pure def
-instance Default a => Default (HS a) where def = pure def
-
 instance MonadLoggerIO H  where askLoggerIO = view _logFunc
 instance MonadLoggerIO HS where askLoggerIO = view _logFunc
 
@@ -381,7 +369,9 @@ instance MonadLogger HS where
     f <- askLoggerIO
     io $ f loc src lvl (toLogStr msg)
 
----------------------------------------------------------
--- Orphan instances
+instance Default a => Default (H a)  where def = pure def
+instance Default a => Default (HS a) where def = pure def
 
-instance Show (Async a) where show _ = "<Async>"
+instance Show (H ())    where show _ = "H()"
+instance Show (H Bool)  where show _ = "H(Bool)"
+instance Show (HS Bool) where show _ = "HS(Bool)"

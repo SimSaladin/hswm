@@ -195,22 +195,20 @@ handleInputManagerEvent (R.RiverInputManagerInputDevice _ _ dev) = do
   withObject $ WL.listenerAdd_ dev
 
 handleInputDeviceEvent :: (MonadStateGlobal HConf m) => R.RiverInputDeviceEvent -> m ()
-handleInputDeviceEvent (R.RiverInputDeviceType _ dev deviceType) = do
-  modifyObjectDef $ \st -> st { inputDevices = M.adjust (\ds -> ds { deviceType = Just deviceType }) dev st.inputDevices }
-  -- Set repeat rate & delay for keyboard device
-  when (deviceType == R.RiverInputDeviceTypeKeyboard) $ do
-    RepeatInfo rrate rdelay <- view (config . repeatInfo)
-    when (rrate > 0 && rdelay > 0) $
-      R.riverInputDeviceSetRepeatInfo dev rrate rdelay
-
-handleInputDeviceEvent (R.RiverInputDeviceName _ dev name) = do
-  modifyObjectDef $ \st -> st { inputDevices = M.adjust (\ds -> ds { deviceName = name }) dev st.inputDevices }
-
-handleInputDeviceEvent (R.RiverInputDeviceRemoved _ dev) = do
-  modifyObjectDef $ \st -> st { inputDevices = M.delete dev st.inputDevices }
-  io $ WL.objectDestroy dev
-handleInputDeviceEvent R.RiverInputDeviceDone{} = do
-  return () -- TODO take advantage of this event
+handleInputDeviceEvent ev = case ev of
+  R.RiverInputDeviceType _ dev deviceType -> do
+    modifyObjectDef $ \st -> st { inputDevices = M.adjust (\ds -> ds { deviceType = Just deviceType }) dev st.inputDevices }
+    -- Set repeat rate & delay for keyboard device
+    when (deviceType == R.RiverInputDeviceTypeKeyboard) $ do
+      RepeatInfo rrate rdelay <- view (config . repeatInfo)
+      when (rrate > 0 && rdelay > 0) $
+        R.riverInputDeviceSetRepeatInfo dev rrate rdelay
+  R.RiverInputDeviceName _ dev name -> modifyObjectDef $ \st -> st { inputDevices = M.adjust (\ds -> ds { deviceName = name }) dev st.inputDevices }
+  R.RiverInputDeviceRemoved _ dev -> do
+    modifyObjectDef $ \st -> st { inputDevices = M.delete dev st.inputDevices }
+    io $ WL.objectDestroy dev
+  R.RiverInputDeviceDone{} -> do
+    return () -- TODO take advantage of this event
 
 -- river_xkb_config_v1
 handleXkbConfigEvent :: R.RiverXkbConfigEvent -> H ()
@@ -223,28 +221,28 @@ handleXkbConfigEvent = \case
   R.RiverXkbConfigFinished _ xc -> io $ WL.objectDestroy xc
 
 handleXkbKeyboardEvent :: (MonadStateGlobal env m) => R.RiverXkbKeyboardEvent -> m ()
-handleXkbKeyboardEvent (R.RiverXkbKeyboardLayout _ kbd index name) =
-  modifyObjectDef $ \st -> st { xkbKeyboards = M.adjust (\ks -> ks { layoutIndex = index, layoutName = name }) kbd st.xkbKeyboards }
-handleXkbKeyboardEvent (R.RiverXkbKeyboardInputDevice _ kbd dev) =
-  modifyObjectDef $ \st -> st { xkbKeyboards = M.adjust (\ks -> ks { inputDevice = dev } :: XkbKeyboardState) kbd st.xkbKeyboards }
-handleXkbKeyboardEvent (R.RiverXkbKeyboardRemoved _ kbd) = do
-  modifyObjectDef $ \st -> st { xkbKeyboards = M.delete kbd st.xkbKeyboards }
-  io $ WL.objectDestroy kbd
-handleXkbKeyboardEvent _ = return ()
+handleXkbKeyboardEvent = \case
+  R.RiverXkbKeyboardLayout _ kbd index name -> modifyObjectDef $ \st -> st { xkbKeyboards = M.adjust (\ks -> ks { layoutIndex = index, layoutName = name }) kbd st.xkbKeyboards }
+  R.RiverXkbKeyboardInputDevice _ kbd dev   -> modifyObjectDef $ \st -> st { xkbKeyboards = M.adjust (\ks -> ks { inputDevice = dev } :: XkbKeyboardState) kbd st.xkbKeyboards }
+  R.RiverXkbKeyboardRemoved _ kbd -> do
+    modifyObjectDef $ \st -> st { xkbKeyboards = M.delete kbd st.xkbKeyboards }
+    WL.objectDestroy kbd
+  R.RiverXkbKeyboardDone _ _kbd -> return () -- TODO
+  _ -> return () -- TODO capslock/numlock/scrolllock enabled/disabled
 
 -- | river_libinput_config_v1
 handleLibinputEvent :: (HasGlobalTMap s, MonadReader s m, MonadUnliftIO m, MonadLogger m, MonadThrow m) => R.RiverLibinputConfigEvent -> m ()
-handleLibinputEvent (R.RiverLibinputConfigLibinputDevice _ _ dev) = do
-  modifyObjectDef $ \st -> st { libinputDevices = M.insert dev def st.libinputDevices }
-  withObject $ WL.listenerAdd_ dev
-handleLibinputEvent (R.RiverLibinputConfigFinished _ lic) = do
-  io $ WL.objectDestroy lic
+handleLibinputEvent = \case
+  R.RiverLibinputConfigLibinputDevice _ _ dev -> do
+    modifyObjectDef $ \st -> st { libinputDevices = M.insert dev def st.libinputDevices }
+    withObject $ WL.listenerAdd_ dev
+  R.RiverLibinputConfigFinished _ lic -> WL.objectDestroy lic
 
 handleLibinputDeviceEvent :: (HasGlobalTMap s, MonadReader s m, MonadUnliftIO m, MonadLogger m, MonadThrow m) => R.RiverLibinputDeviceEvent -> m ()
 handleLibinputDeviceEvent = \case
   R.RiverLibinputDeviceRemoved _ dev -> do
     modifyObjectDef $ \st -> st { libinputDevices = M.delete dev st.libinputDevices }
-    io $ WL.objectDestroy dev
+    WL.objectDestroy dev
   R.RiverLibinputDeviceInputDevice _ dev inputDevice            -> modifyLibinputDevice dev $ \s -> s { inputDevice } :: LibinputDeviceState
   R.RiverLibinputDeviceSendEventsSupport _ dev modes            -> modifyLibinputDevice dev $ \s -> s { sendEvents = s.sendEvents { support = modes } }
   R.RiverLibinputDeviceSendEventsDefault _ dev mode             -> modifyLibinputDevice dev $ \s -> s { sendEvents = s.sendEvents { defval = mode } }
@@ -299,7 +297,7 @@ handleLibinputDeviceEvent = \case
   R.RiverLibinputDeviceRotationSupport _ dev supported          -> modifyLibinputDevice dev $ \s -> s { rotation = s.rotation { support = supported } }
   R.RiverLibinputDeviceRotationDefault _ dev angle              -> modifyLibinputDevice dev $ \s -> s { rotation = s.rotation { defval = angle } }
   R.RiverLibinputDeviceRotationCurrent _ dev angle              -> modifyLibinputDevice dev $ \s -> s { rotation = s.rotation { curval = angle } }
-  R.RiverLibinputDeviceDone _  _                                -> return () -- TODO take advantage of this event
+  R.RiverLibinputDeviceDone _  dev                              -> return () -- TODO take advantage of this event
 
 
   where

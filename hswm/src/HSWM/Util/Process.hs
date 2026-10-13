@@ -22,6 +22,7 @@ import System.Posix ( CPid, getAnyProcessStatus )
 import System.Posix.Signals
 import System.Process (CmdSpec(..))
 import System.Process.Typed hiding (closed)
+import qualified System.Process.Typed.Internal as Internal
 import qualified Data.Text.IO as T
 
 spawnProcess :: MonadProcessSpawn m => String -> [String] -> m ()
@@ -59,10 +60,18 @@ uninstallSignalHandlers = io $ do
   return ()
 
 -- | StreamSpec that logs output
-logOutput :: (Loc -> LogSource -> LogLevel -> LogStr -> IO ()) -> Text -> StreamSpec STOutput (Async ())
-logOutput logFn prefix = mkPipeStreamSpec $ \pc h -> do
+logOutput :: (Loc -> LogSource -> LogLevel -> LogStr -> IO ())
+          -> Text -- ^ Log line prefix
+          -> [SeriesElem] -- ^ Metadata
+          -> StreamSpec STOutput (Async ())
+logOutput logFn prefix meta = mkPipeStreamSpec $ \pc h -> do
   hSetBuffering h LineBuffering
   as <- async $ flip runLoggingT logFn $ forever $ do
     ln <- io $ T.hGetLine h
-    logInfo $ prefix <> ": " <> ln :# [ "processConfig" .= show pc ]
+    logInfo $ f ln :# (meta ++ [ "process" .= showCmd pc.pcCmdSpec ])
   return (as, hClose h)
+    where
+      showCmd (ShellCommand s) = s
+      showCmd (RawCommand x xs) = unwords (x : xs)
+      f | prefix == "" = id
+        | otherwise    = ((prefix <> ": ") <>)

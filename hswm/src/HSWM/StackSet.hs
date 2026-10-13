@@ -14,6 +14,7 @@ import           Control.Applicative.Backwards (Backwards(Backwards, forwards))
 import qualified Data.List as L
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map as M
+import           Data.Data
 import           Prelude hiding (filter, modify, view, peek, with)
 
 ------------------------------------------------------------------------
@@ -36,7 +37,7 @@ data StackSet i l a wd sid sd
     -- | floating windows
   , floating :: M.Map a RationalRect
   }
-  deriving stock (Eq, Ord, Show, Read, Generic)
+  deriving stock (Eq, Ord, Show, Read, Generic, Data)
   deriving anyclass (Default, NFData)
 
 -- | Visible workspaces, and their outputs.
@@ -45,7 +46,7 @@ data Screen i l a wd sid sd = Screen
   , screen       :: sid
   , screenDetail :: sd
   }
-  deriving stock (Eq, Ord, Show, Read, Generic)
+  deriving stock (Eq, Ord, Show, Read, Generic, Data)
   deriving anyclass (Default, NFData)
 
 -- | A workspace is just a tag, a layout, and a stack.
@@ -55,7 +56,7 @@ data Workspace i l a wd = Workspace
   , stack           :: Maybe (Stack a)
   , workspaceDetail :: wd
   }
-  deriving stock (Eq, Ord, Show, Read, Generic)
+  deriving stock (Eq, Ord, Show, Read, Generic, Data)
   deriving anyclass (Default, NFData)
 
 -- |
@@ -80,7 +81,7 @@ data Stack a = Stack
   , up    :: [a] -- ^ clowns to the left
   , down  :: [a] -- ^ jokers to the right
   }
-  deriving stock (Eq, Ord, Show, Read, Functor, Generic)
+  deriving stock (Eq, Ord, Show, Read, Functor, Generic, Data)
   deriving anyclass (Default, NFData)
 
 instance Foldable Stack where
@@ -97,7 +98,7 @@ instance Traversable Stack where
 
 -- | A structure for window geometries
 data RationalRect = RationalRect { x, y, width, height :: !Rational }
-  deriving stock (Eq, Ord, Show, Read, Generic)
+  deriving stock (Eq, Ord, Show, Read, Generic, Data)
   deriving anyclass (NFData)
 
 -- ---------------------------------------------------------------------

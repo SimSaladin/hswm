@@ -28,6 +28,8 @@ import           Text.XkbCommon.KeySyms (key_NoSymbol)
 
 import qualified Data.Map as M
 import           Data.Typeable
+import           Data.Generics.Instances ()
+import           Data.Data
 
 -- * XkbBinding, PointerBinding, etc.
 
@@ -56,11 +58,15 @@ data PointerBinding a = PointerBinding
 data Submap m = Submap
   { submapKeys    :: [(XBKey, SomeAction m)]
   , submapDefault :: Maybe (SomeAction m)
-  } deriving stock (Eq, Show, Generic)
+  }
+  deriving stock (Eq, Show, Generic)
   deriving anyclass (Default, NFData)
 
 type Button = Word32
 type XBKey  = (ModMask, KeySym)
+
+deriving instance (Data a, Data (StablePtr (XkbBinding a))) => Data (XkbBinding a)
+deriving instance (Data a, Data (StablePtr (XkbBinding a))) => Data (PointerBinding a)
 
 -- * IsKeySym
 
@@ -105,8 +111,15 @@ instance (MonadIO m, Typeable m) => IsAction m (Submap m) where
 
 -- * SomeAction
 
-data SomeAction m where
-  SomeAction :: forall m a. (IsAction m a) => a -> SomeAction m
+data SomeAction m = forall a. (IsAction m a) => SomeAction a
+
+--data SomeAction m where
+--  SomeAction :: forall m a. (IsAction m a) => a -> SomeAction m
+
+instance Typeable m => Data (SomeAction m) where
+  toConstr _ = error "toConstr"
+  gunfold _ _ = error "gunfold"
+  dataTypeOf _ = mkNoRepType "SomeAction"
 
 instance Eq (SomeAction m) where
   SomeAction a == SomeAction b =

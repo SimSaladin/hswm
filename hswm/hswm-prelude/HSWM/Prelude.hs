@@ -23,7 +23,6 @@ module HSWM.Prelude (
 
   -- * Logging
   module Control.Monad.Logger.Aeson,
-  log', display,
 
   -- * UnliftIO
   module UnliftIO,
@@ -70,7 +69,6 @@ import           "data-default" Data.Default
 import qualified "async" Control.Concurrent.Async as Async
 import qualified "text" Data.Text as T
 import           "monad-logger-aeson" Control.Monad.Logger.Aeson hiding (Message)
-import           "monad-logger-aeson" Control.Monad.Logger.Aeson as LA (Message)
 import           "microlens-platform" Lens.Micro.Platform hiding ((.=))
 import qualified "microlens" Lens.Micro.Internal as Lens
 
@@ -88,15 +86,6 @@ fi = fromIntegral
 -- | Conditionally run an action, using a @Maybe a@ to decide.
 whenJust :: (Monad m) => Maybe a -> (a -> m ()) -> m ()
 whenJust mg f = maybe (return ()) f mg
-
-log' :: MonadLogger m => LA.Message -> m ()
-log' = logInfo
-{-# DEPRECATED log' "Use something else" #-}
-
--- XXX temp glue code..
-display :: (Show a, IsString b) => a -> b
-display = fromString . show
-{-# DEPRECATED display "use something else" #-}
 
 -- | "Async.cancelMany" lifted to "MonadIO".
 cancelMany :: MonadIO m => [Async ()] -> m ()

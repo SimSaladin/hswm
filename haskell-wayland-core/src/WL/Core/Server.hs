@@ -48,7 +48,7 @@ makeWrappedNT commonSettings ''Wl_interface
 
 -- ** Protocol
 
-serverFromProtocolXML commonSettings protoXml
+serverFromProtocolXML commonSettings protocolXmlString
 
 -- * Display
 

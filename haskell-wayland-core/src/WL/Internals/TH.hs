@@ -293,15 +293,15 @@ doClient settings proto = do
       ]
     docSection name items = unlines $ ("* " ++ name ++ "\n") : items
 
-renderNewType :: Name -> Name -> String -> Q [Dec]
-renderNewType ntName objT doc = do
-  let con = recC ntName [ varBangType (mkName "unwrap") (bangType (bang noSourceUnpackedness noSourceStrictness) [t|Ptr $(conT objT)|]) ]
-  let derivs = [ derivClause (Just StockStrategy)   [ [t|Eq|], [t|Ord|], [t|Generic|] ]
-               , derivClause (Just NewtypeStrategy) [ [t|Storable|], [t|Hashable|], [t|NFData|], [t|IsUserData|] ]
-               ]
+renderNewType :: Bool -> Name -> Name -> String -> Q [Dec]
+renderNewType deriveData ntName objT doc = do
+  let con    = recC ntName [ varBangType (mkName "unwrap") (bangType (bang noSourceUnpackedness noSourceStrictness) [t|Ptr $(conT objT)|]) ]
+      derivs = [ derivClause (Just StockStrategy)   [ [t|Eq|], [t|Ord|], [t|Generic|] ]
+               , derivClause (Just NewtypeStrategy) [ [t|Storable|], [t|Hashable|], [t|NFData|], [t|IsUserData|] ] ]
+               ++ [ derivClause (Just StockStrategy) [ [t|Data|] ] | deriveData ]
   concat <$> sequence (
-    [ sequence [ newtypeD_doc (pure []) ntName [] Nothing (con, Nothing, []) derivs (if doc == "" then Nothing else Just doc) ] {-| nameBase ntName /= "Display"-} ]
-    <> [ [d|
+    [ sequence [ newtypeD_doc (pure []) ntName [] Nothing (con, Nothing, []) derivs (if doc == "" then Nothing else Just doc) ]
+    , [d|
       instance Default $(conT ntName) where
         def = $(conE ntName) nullPtr
       instance Show $(conT ntName) where
@@ -309,7 +309,9 @@ renderNewType ntName objT doc = do
       instance Read $(conT ntName) where
         readsPrec n xs = first ($(conE ntName) . wordPtrToPtr) <$> readsPrec n xs
       |]
-    ])
+    ]
+    -- XXX: orphan Data instance
+    ++ [ [d|deriving stock instance Data $(conT objT)|] | deriveData ])
 
 renderInterface :: ProtocolRenderSettings -> Interface -> Q [Dec]
 renderInterface s iface = concat <$> sequence
@@ -385,8 +387,17 @@ renderEnum :: ProtocolRenderSettings -> Interface -> IEnum -> Q [Dec]
 renderEnum s iface e = do
   tySyn <- tySynD enumName [] (conT origTy)
   patSyns <- mapM renderEntry e.entries
-  -- Missing instances
+  -- Missing instances:
+  --    Bitfield
+  --    Bounded
+  --    <Enum>
+  --    Ix
+  --    Num Integral Real
+  -- XXX: orphan instances
   derivs <- [d|
+    deriving stock instance Data $(conT origTy)
+    deriving newtype instance Bits $(conT origTy)
+    deriving newtype instance FiniteBits $(conT origTy)
     deriving newtype instance NFData $(conT origTy)
     deriving newtype instance Hashable $(conT origTy)
     |]
@@ -419,7 +430,7 @@ renderInterfaceObject s iface = concat <$> sequence [ renderNT, renderIsWlObject
     getFn fn = lookupImportedValueName iface.name (iface.name ++ "_" ++ fn)
     hasDestroy = any (\x -> requestType x == Just "destructor") iface.requests
 
-    renderNT = renderNewType ntName (mkName $ upperFirst iface.name) $ unlines
+    renderNT = renderNewType True ntName (mkName $ upperFirst iface.name) $ unlines
         [ formatDescription iface.description
         , "\nEnums: "    ++ unwords [ e.name | e <- iface.enums ]
         , "\nRequests: " ++ unwords [ r.name | r <- iface.requests ]
@@ -486,7 +497,7 @@ lookupImportedTypeName' onerr ifname strIn = do
   find alts
 
 renderRequest :: ProtocolRenderSettings -> Interface -> IRequest -> Q [Dec]
-renderRequest _ _ r | requestType r == Just "destructor" = pure []
+-- renderRequest _ _ r | requestType r == Just "destructor" = pure []
 renderRequest s iface request
  | reqDisable reqOpts = return []
  | otherwise = do

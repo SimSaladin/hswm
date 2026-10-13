@@ -80,7 +80,9 @@ handleEvent = \case
     R.RiverSeatOpDelta _ seat dx dy            -> runInHS $ modifySeat seat $ opDx .~ fi dx &+ opDy .~ fi dy
     R.RiverSeatOpRelease _ seat                -> runInHS $ modifySeat seat $ opRelease .~ True
     R.RiverSeatRemoved _ seat                  -> runInHS $ withSeat_ seat deleteRemovedSeat
-    _ -> return ()
+    -- unhandled
+    R.RiverSeatShellSurfaceInteraction _ seat ss -> logError $ "shell surface interaction" :# [ "seat" .= show seat, "shell-surface" .= show ss ]
+    _ -> return () -- TODO touch events
 
 handleWlSeatEvent :: WL.SeatEvent -> H ()
 handleWlSeatEvent e = case e of
@@ -153,7 +155,8 @@ handleXkbBindingsSeatEvent = \case
       whenJust subdef $ void . async . runner
     runInHS $ modifySeat' dt $ pendingAction .~ S_SUBMAP_CANCEL
 
-  R.RiverXkbBindingsSeatModifiersUpdate dt _ _ _ -> return () -- TODO take advantage of this event
+  R.RiverXkbBindingsSeatModifiersUpdate _dt _ _old _new ->
+    return () -- TODO take advantage of this event
 
 -- | Pointer events.
 handlePointerEvent :: R.RiverPointerBindingEvent -> H ()

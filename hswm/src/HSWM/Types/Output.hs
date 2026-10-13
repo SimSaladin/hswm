@@ -41,14 +41,14 @@ data Output = Output
   , setupDone              :: !Bool -- ^ Flipped to True when @WL.OutputDone@
   , managePending          :: !Bool -- ^ Flipped to True when @WL.OutputDone@
   }
-  deriving stock (Eq, Show, Read, Generic)
+  deriving stock (Eq, Show, Read, Generic, Data)
   deriving anyclass (Default, NFData)
 
 -- ** ScreenId
 
 -- | Physical screen indices
 newtype ScreenId = S Int
-  deriving stock (Eq, Show, Read, Generic)
+  deriving stock (Eq, Show, Read, Generic, Data)
   deriving newtype (Ord, Enum, Num, Integral, Real, A.ToJSON, A.FromJSON, NFData)
 
 instance Bounded ScreenId where

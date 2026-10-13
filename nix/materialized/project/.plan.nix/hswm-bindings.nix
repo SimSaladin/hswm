@@ -72,6 +72,7 @@
           "River/XkbBindings"
           "River/XkbConfig"
           "WL/Client"
+          "WL/Client/Registry"
           "WL/Viewporter"
         ];
         hsSourceDirs = [ "src" ];

@@ -31,11 +31,11 @@ type Position1D = Int32
 -- ** Size and position in 2D
 
 data Size = Size { width, height :: {-# UNPACK #-} !Dimension }
-  deriving stock (Eq, Ord, Show, Read, Generic)
+  deriving stock (Eq, Ord, Show, Read, Generic, Data)
   deriving anyclass (Default, FromJSON, ToJSON, NFData)
 
 data Position = Position { x, y :: {-# UNPACK #-} !Position1D }
-  deriving stock (Eq, Ord, Show, Read, Generic)
+  deriving stock (Eq, Ord, Show, Read, Generic, Data)
   deriving anyclass (Default, FromJSON, ToJSON, NFData)
 
 -- | A position on the (screen) output surface
@@ -50,7 +50,7 @@ data Rectangle = Rectangle'
   { position :: {-# UNPACK #-} !Position
   , size     :: {-# UNPACK #-} !Size
   }
-  deriving stock (Eq, Ord, Show, Read, Generic)
+  deriving stock (Eq, Ord, Show, Read, Generic, Data)
   deriving anyclass (Default, FromJSON, ToJSON, NFData)
 
 pattern Rectangle :: Position1D -> Position1D -> Dimension -> Dimension -> Rectangle
@@ -62,7 +62,7 @@ pattern Rectangle{x, y, width, height} = Rectangle' (Position x y) (Size width h
 
 -- | One-dimensional directions
 data Direction1D = Next | Prev
-  deriving stock (Eq, Ord, Bounded, Enum, Read, Show, Generic)
+  deriving stock (Eq, Ord, Bounded, Enum, Read, Show, Generic, Data)
   deriving anyclass (FromJSON, ToJSON, NFData)
 
 -- | Two-dimensional directions
@@ -75,7 +75,7 @@ data Direction2D
     R
   | -- | Left
     L
-  deriving stock (Eq, Ord, Bounded, Enum, Read, Show, Generic)
+  deriving stock (Eq, Ord, Bounded, Enum, Read, Show, Generic, Data)
   deriving anyclass (FromJSON, ToJSON, NFData)
 
 -- * Functions
@@ -125,6 +125,3 @@ makeLensesWith' (classPerType
   , ''W.Stack
   , ''W.StackSet
   ]
-
--- Orphans
-instance Show (StablePtr a) where show _ = "<SP>"

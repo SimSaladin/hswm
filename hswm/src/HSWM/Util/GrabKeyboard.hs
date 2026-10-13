@@ -82,11 +82,10 @@ withKeyboardGrab seat mods keys fun acc0 = do
                              (tryTakeMVar grabIM.reserved)
 
     withActive grabIM f = do
-      (manage, _) <- getEventQueueFuncs
-      syncVar     <- newEmptyMVar
+      syncVar <- newEmptyMVar
       bracket_
-        (activate grabIM >> manage (lockSeatActions >> io (putMVar syncVar ())) >> manageDirty)
-        (deactivate grabIM >> manage freeSeatActions >> manageDirty)
+        (activate grabIM >> writeManageQ (lockSeatActions >> io (putMVar syncVar ())) >> manageDirty)
+        (deactivate grabIM >> writeManageQ freeSeatActions >> manageDirty)
         (takeMVar syncVar >> f)
 
     lockSeatActions :: HS ()

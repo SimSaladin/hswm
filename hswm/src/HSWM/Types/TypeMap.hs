@@ -15,7 +15,9 @@ import Data.TMap qualified as TM
 
 -- * Types
 
-newtype TypeMap = TypeMap {unTypeMap :: TM.TMap}
+-- ** TypeMap
+
+newtype TypeMap = TypeMap { unTypeMap :: TM.TMap }
   deriving (Show, Generic)
 
 instance Default TypeMap where
@@ -27,23 +29,30 @@ class HasGlobalTMap env where
 instance HasGlobalTMap (TMVar TypeMap) where
   globalTMap = lens id const
 
-type MonadStateGlobal env m = (MonadReader env m, HasGlobalTMap env, MonadUnliftIO m, MonadLogger m, MonadThrow m)
+-- ** Exceptions
 
-type MonadGlobalRead env m = (MonadReader env m, HasGlobalTMap env, MonadIO m, MonadLogger m, MonadThrow m)
-
-newtype TypeMapException = TypeMapError String
+data TypeMapException
+  = TypeMapKeyNotFound TypeRep
+  | TypeMapKeyExists TypeRep
   deriving (Eq, Ord, Show)
 instance Exception TypeMapException
+
+-- ** Constraints
+
+type MonadStateGlobal env m = (MonadGlobalRead env m, MonadUnliftIO m)
+
+type MonadGlobalRead env m =
+  (MonadReader env m, HasGlobalTMap env, MonadIO m, MonadLogger m, MonadThrow m)
 
 -- * With
 
 -- | Fails if the object does not exist.
-withObject :: forall a s m b.  (MonadGlobalRead s m, Typeable a) => (a -> m b) -> m b
+withObject :: forall a s m b. HasCallStack => (MonadGlobalRead s m, Typeable a) => (a -> m b) -> m b
 withObject f = withObjects $ maybe notFound f . TM.lookup
   where
-    notFound = throwM $ TypeMapError ("withObject: no such object: " ++ show (typeRep (Proxy :: Proxy a)))
+    notFound = throwM $ TypeMapKeyNotFound (typeRep $ Proxy @a)
 
-withObjectDef :: forall a s m b. (MonadStateGlobal s m, Typeable a, Default a) => (a -> m b) -> m b
+withObjectDef :: forall a s m b. HasCallStack => (MonadStateGlobal s m, Typeable a, Default a) => (a -> m b) -> m b
 withObjectDef f = do
   modifyObjectDef @a id
   withObjects $ \tm -> f $ fromMaybe def (TM.lookup tm)
@@ -57,8 +66,9 @@ withObjectDef f = do
 getObject :: forall a s m. HasCallStack => (MonadGlobalRead s m, Typeable a) => m a
 getObject = withObjects $ maybe notFound return . TM.lookup
   where
-    notFound = throwM $ TypeMapError ("getObject: no such object: " ++ show (typeRep (Proxy :: Proxy a)))
+    notFound = throwM $ TypeMapKeyNotFound (typeRep $ Proxy @a)
 
+-- | Version of 'getObject' that returns the 'def' value when an object is not found.
 getObjectDef :: forall a s m. (MonadStateGlobal s m, Typeable a, Default a) => m a
 getObjectDef = withObjectsEx $ \tm ->
   case TM.lookup $ unTypeMap tm of
@@ -72,6 +82,16 @@ getOrCreateObject m = withObjectsEx $ \tm ->
 
 getOrCreateObjectIO :: forall a s m. (MonadStateGlobal s m, Typeable a) => IO a -> m a
 getOrCreateObjectIO = getOrCreateObject . liftIO
+
+-- | Create an object that is unique. Throws 'TypeMapKeyExists' on existing keys.
+createUnique :: forall a s m. (MonadStateGlobal s m, Typeable a) => m a -> m a
+createUnique f = withObjectsEx $ \(TypeMap tm) ->
+  if TM.member @a tm
+     then throwM $ TypeMapKeyExists (typeRep $ Proxy @a)
+     else f >>= \x -> return (x, TypeMap $ TM.insert x tm)
+
+createUnique_ :: forall a s m. (MonadStateGlobal s m, Typeable a) => m a -> m ()
+createUnique_ = void . createUnique
 
 {-# INLINE getObject #-}
 {-# INLINE getObjectDef #-}
@@ -94,14 +114,12 @@ modifyObject f = withObjectsEx $ \s -> return ((), TypeMap . g $ unTypeMap s)
 
 -- | Modify object (if it does not exist, @def@ is used to initialize the value).
 modifyObjectDef :: forall a s m. (Typeable a, Default a, MonadStateGlobal s m) => (a -> a) -> m ()
-modifyObjectDef f = withObjectsEx $ \s -> return ((), TypeMap . g $ unTypeMap s)
-  where
-    g tm = TM.insert (f . fromMaybe def $ TM.lookup tm) tm
+modifyObjectDef f = modifyObjectDef' (\x -> ((), f x))
 
 modifyObjectDef' :: forall a s m b. (Typeable a, Default a, MonadStateGlobal s m) => (a -> (b, a)) -> m b
 modifyObjectDef' f = withObjectsEx $ g . unTypeMap
   where
-    g tm = let (r, a') = f $ fromMaybe def $ TM.lookup tm
+    g tm = let (r, a') = f . fromMaybe def $ TM.lookup tm
             in return (r, TypeMap $ TM.insert a' tm)
 
 {-# INLINE putObject #-}

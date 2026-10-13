@@ -85,42 +85,48 @@ ipcLogHook conf = withObject $ \(sRef :: IORef ConnectedPeers) -> do
         writeTQueue c.connSendQ msg
 
 serverRun :: ServerConfig -> IORef ConnectedPeers -> H ()
-serverRun conf stateRef = withThreadContext ["component" .= ("ipc/server" :: String)] $ do
+serverRun conf stateRef = withThreadContext ["component" .= ("ipc-server" :: String)] $ do
   (ai, mlockFile) <- getServerAddr conf
   withLock mlockFile $ do
-    logInfo $ "Starting IPC server" :# [ "bind" .= show ai ]
+    logDebug $ "Starting IPC server" :# [ "bind" .= show ai.addrAddress ]
     case ai.addrAddress of
-      SockAddrUnix socketPath -> do
-        exists <- io $ doesFileExist socketPath
-        io $ when exists $ removeFile socketPath
+      SockAddrUnix socketPath -> io $ do
+        exists <- doesFileExist socketPath
+        when exists $ removeFile socketPath
       _ -> return ()
     bracket (open ai) (io . close) loop
       `finally` logInfo "IPC server thread finished"
   where
-    withLock mlock f = case mlock of
-      Nothing -> f
-      Just file -> do
-        r <- io $ tryLockFile file Exclusive
-        case r of
-          Just _ -> f
-          Nothing -> logError $ "Could not lock lockfile" :# [ "lockfile" .= file ]
+    withLock Nothing f = f
+    withLock (Just file) f =
+      io (tryLockFile file Exclusive) >>= \case
+        Just _ -> f
+        Nothing -> logError $ "Could not lock lockfile" :# [ "filepath" .= file ]
 
     open ai = bracketOnError (io $ openSocket ai) (io . close) $ \sock -> do
       io $ withFdSocket sock setCloseOnExecIfNeeded
       io $ bind sock ai.addrAddress
       io $ listen sock conf.maxPendingConns
-      logInfo $ "Socket server listening" :# [ "addr" .= show ai.addrAddress ]
+      logInfo $ "server listener started" :# [ "address" .= show ai.addrAddress ]
       return sock
 
     loop :: Socket -> H ()
     loop sock = forever $
-      bracketOnError (io $ accept sock) (io . close . fst) $ \(connSocket, _peer) -> do
+      bracketOnError (io $ accept sock) (io . close . fst) $ \(connSocket, peerAddr) -> do
         connFd <- io $ withFdSocket connSocket $ return . fi
         (mpid, muid, mgid) <- io $ getPeerCredential connSocket
         let connPid = fi $ fromMaybe (-1) mpid :: Int
             connUid = fi $ fromMaybe (-1) muid :: Int
             connGid = fi $ fromMaybe (-1) mgid :: Int
-            ctx = [ "fd" .= connFd, "pid" .= connPid, "uid" .= connUid, "gid" .= connGid ]
+            ctx = [ "component" .= ("ipc-server" :: String)
+                  , "peer" .= A.object
+                    [ "address" .= show peerAddr
+                    , "fd" .= connFd
+                    , "pid" .= connPid
+                    , "uid" .= connUid
+                    , "gid" .= connGid
+                    ]
+                  ]
         connSendQ <- newTQueueIO
         connWorkerThread <- async $ withThreadContext ctx $
           connWorker connSocket connSendQ `finally` cleanup connFd connSocket
@@ -157,7 +163,8 @@ getServerAddr conf =
     Just ai -> return (ai, Nothing)
     Nothing -> do
       runtimeDir <- io getXdgRuntimeDirectory
-      let sockFile = runtimeDir ++ "/hswm-1"
+      sockName <- io defaultSocketName
+      let sockFile = runtimeDir ++ "/" ++ sockName
       return (defaultHints
         { addrFamily = AF_UNIX
         , addrSocketType = Stream

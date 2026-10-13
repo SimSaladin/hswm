@@ -2,8 +2,6 @@
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE TypeFamilyDependencies #-}
 {-# LANGUAGE UndecidableInstances   #-}
-
-
 -- |
 -- Module      : WL.Internals.Types
 -- Description : Common types
@@ -30,6 +28,8 @@ module WL.Internals.Types (
 import           WL.Util.Generated (Wl_interface)
 
 import           Control.Monad.IO.Class
+import           Data.Coerce
+import           Data.Data (Data)
 import           Data.Kind (Type)
 import           Data.Proxy
 import           Data.Typeable
@@ -40,7 +40,10 @@ import           Foreign.C.ConstPtr
 import           GHC.TypeLits
 import           HsBindgen.Runtime.Prelude as ReExports (CEnum(..), CEnumZ, FromFunPtr(..),
                                                          PtrConst, ToFunPtr(..))
-import Data.Coerce
+
+-- Orphan instances
+deriving instance Data CUInt
+deriving instance Data CInt
 
 type Version = Word32
 
@@ -89,7 +92,7 @@ class IsWlObject object => HasInterface object where
   objectBindWrap = coerce
 
 -- | Objects for which it is possible to create listeners.
-class (HasInterface object, Typeable (ObjectListener object)) => HasListener object where
+class (HasInterface object, Typeable (ObjectListener object), Typeable (ObjectListenerEvent object)) => HasListener object where
 
   -- | The listener interface.
   type ObjectListener object = r | r -> object

@@ -447,34 +447,29 @@ infoModAction InfoModuleArgs{..} = do
       [__i'L|
       {-\# LANGUAGE MultilineStrings \#-}
       {-\# LANGUAGE QuasiQuotes \#-}
-      {-\# LANGUAGE TemplateHaskell \#-}
       module #{prettyShow outModuleName} where
 
-      import Distribution.HsBindgen.Types
-      import Distribution.HsBindgen.Utils (Value, aesonQQ, fromJSON, Result(..))
-      import Distribution.Wayland.ProtocolXML (Protocol, protocolFromString)
+      import           Distribution.HsBindgen.Types
+      import           Distribution.HsBindgen.Utils (Value, aesonQQ, fromJSON, Result(..))
+      import           Distribution.Wayland.ProtocolXML (Protocol, protocolFromString)
       import qualified Language.Haskell.TH.Syntax as TH
 
       protocol :: Protocol
       protocol = protocolFromString protocolXmlString
 
       protocolSpec :: ProtocolSpec
-      protocolSpec = case fromJSON protocolJSON of
+      protocolSpec = case fromJSON protocolSpecJSON of
         Success r -> r
         Error e -> error e
 
-      addCSource :: TH.Q [a]
-      addCSource = TH.addForeignSource TH.LangC cSource >> return []
-
-      protocolJSON :: Value
-      protocolJSON = #{protoJSON}
-
-      -- XXX: legacy...
-      protoXml :: String
-      protoXml = protocolXmlString
+      protocolSpecJSON :: Value
+      protocolSpecJSON = #{protoJSON}
 
       protocolXmlString :: String
       protocolXmlString = """#{protoXML}"""
+
+      addCSource :: TH.Q [a]
+      addCSource = TH.addForeignSource TH.LangC cSource >> return []
 
       cSource :: String
       cSource = """#{csource'}"""
@@ -553,13 +548,6 @@ genWrapperCommand = mkCommand (static Dict) (static genWrapperAction)
 
 genWrapperAction :: HasCallStack => GenWrapModArgs -> IO ()
 genWrapperAction env@GenWrapModArgs{..} = do
-  let infoMod  = spec ^?! computedModuleNames . ix InfoModule
-      enums    = spec ^?! bindGens . ix EnumBindings
-      _INFO    = prettyShow infoMod
-      _MODNAME = prettyShow wrapperModule
-      _BINDS   = prettyShow $ fromFlag bindgen.moduleName
-      _ENUMS   = prettyShow $ fromFlag enums.moduleName
-
   infoNoWrap v $ "Generating wrapper for " ++ _INFO ++ "..."
   contents <-
     case inputFile of
@@ -570,30 +558,37 @@ genWrapperAction env@GenWrapModArgs{..} = do
 
   createDirectoryIfMissingVerbose v True (FP.takeDirectory outputFile)
   rewriteFileEx v outputFile [__i'L|
-        #{unlines pragmas}
+    #{unlines pragmas}
+    module #{_MODNAME} (module #{_MODNAME}, module #{_ENUMS}) where
 
-        module #{_MODNAME}
-          ( module #{_MODNAME}
-          , module #{_ENUMS}
-          ) where
+    #{importBinds bindgen}
 
-        import           WL.Internals.TH
-        #{if component == ServerBindings then "import qualified WL.Internals.TH.Server as TH" else "" :: String}
-        import           #{_INFO}
-        #{mconcat $ map ppDep protoDeps}
-        import           #{_ENUMS}
-        import           #{_BINDS}
-        import           #{_BINDS}.Global
-        import qualified #{_BINDS}.Safe   as Safe
-        import qualified #{_BINDS}.Unsafe as Unsafe
+    #{contents}
 
-        #{contents}
-
-        #{if component == ClientBindings then "$(addCSource)" else "" :: String}
-        |]
+    #{if component == ClientBindings then "$(addCSource)" else "" :: String}
+    |]
   where
     v = verbosityFromFlags verbosityFlags
-    ppDep (ifname, mods) = unlines [ [iii|import qualified #{prettyShow mo} as #{ifname}|] | mo <- mods ]
+    infoMod  = spec ^?! computedModuleNames . ix InfoModule
+    enums    = spec ^?! bindGens . ix EnumBindings
+    _INFO    = prettyShow infoMod
+    _MODNAME = prettyShow wrapperModule
+    _BINDS   = prettyShow $ fromFlag bindgen.moduleName
+    _ENUMS   = prettyShow $ fromFlag enums.moduleName
+    importBinds bg = unlines $ map renderImport $
+      [ (False, "WL.Internals.TH", "") ] ++
+      [ (True,  "WL.Internals.TH.Server", "TH") | component == ServerBindings ] ++
+      [ (False, _INFO, "") ] ++
+      [ (False, _ENUMS, "") ] ++
+      [ (False, _BINDS, "") ] ++
+      [ (False, _BINDS ++ ".Global", "") | fromFlagOrDefault True bg.genGlobal ] ++
+      [ (True,  _BINDS ++ ".Safe", "Safe") | fromFlagOrDefault True bg.hasSafe ] ++
+      [ (True,  _BINDS ++ ".Unsafe", "Unsafe") | fromFlagOrDefault True bg.hasUnsafe ] ++
+      [ (True,  _BINDS ++ ".FunPtr", "FunPtr") | fromFlagOrDefault True bg.hasPointer ] ++
+      [ (True, prettyShow mo, ifn) | (ifn, mods) <- protoDeps, mo <- mods ]
+
+    renderImport (qual, name, as) = "import " ++ (if qual then "qualified " else "") ++ name ++ " as " ++ (if as == "" then name else as)
+      -- ppDep (ifname, mods) = unlines [ [iii|import qualified #{prettyShow mo} as #{ifname}|] | mo <- mods ]
 
 wrapperContent :: GenWrapModArgs -> String
 wrapperContent env = case env.component of

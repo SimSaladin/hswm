@@ -46,10 +46,10 @@ renderInterfaceObject s iface = concat <$> sequence [ renderNT ] -- , renderIsWl
   where
     ntName = mkName $ s.prTypeNameModifier iface.name
 
-    renderNT = C.renderNewType ntName (mkName $ C.upperFirst iface.name) $ C.formatDescription iface.description
+    renderNT = C.renderNewType False ntName (mkName $ C.upperFirst iface.name) $ C.formatDescription iface.description
 
 makeWrappedNT :: ProtocolRenderSettings -> Name -> Q [Dec]
-makeWrappedNT s name = C.renderNewType wName name ""
+makeWrappedNT s name = C.renderNewType False wName name ""
   where
     wName = mkName $ s.prTypeNameModifier (nameBase name)
 

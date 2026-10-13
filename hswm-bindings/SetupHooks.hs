@@ -54,6 +54,8 @@ isEnabled ProtocolId{name} = name `elem`
   , "text-input"
   , "ext-foreign-toplevel-list"
   , "fractional-scale"
+  , "linux-dmabuf"
+  , "presentation-time"
   ] :: [String])
 
 config :: DynamicSetup ()

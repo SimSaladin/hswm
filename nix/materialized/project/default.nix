@@ -84,6 +84,7 @@
         Cabal.revision = hackage.Cabal."3.16.0.0".revisions.default;
         strict.revision = import ./cabal-files/strict.nix;
         th-abstraction.revision = import ./cabal-files/th-abstraction.nix;
+        bimap.revision = import ./cabal-files/bimap.nix;
         unbounded-delays.revision = import ./cabal-files/unbounded-delays.nix;
         Diff.revision = import ./cabal-files/Diff.nix;
         profunctors.revision = import ./cabal-files/profunctors.nix;
@@ -110,6 +111,8 @@
         boring.flags.tagged = true;
         base-orphans.revision = import ./cabal-files/base-orphans.nix;
         xml-types.revision = import ./cabal-files/xml-types.nix;
+        enummapset.revision = import ./cabal-files/enummapset.nix;
+        enummapset.flags.debug = false;
         gi-gmodule.revision = import ./cabal-files/gi-gmodule.nix;
         indexed-profunctors.revision = import ./cabal-files/indexed-profunctors.nix;
         QuickCheck.revision = import ./cabal-files/QuickCheck.nix;
@@ -274,6 +277,8 @@
         some.revision = import ./cabal-files/some.nix;
         some.flags.newtype-unsafe = true;
         gi-cairo.revision = import ./cabal-files/gi-cairo.nix;
+        prettyprinter-combinators.revision = import ./cabal-files/prettyprinter-combinators.nix;
+        prettyprinter-combinators.flags.enummapset = true;
         unix-compat.revision = import ./cabal-files/unix-compat.nix;
         rts.revision = hackage.rts."1.0.3".revisions.default;
         gi-gio.revision = import ./cabal-files/gi-gio.nix;
@@ -514,7 +519,9 @@
           "th-reify-many".components.library.planned = lib.mkOverride 900 true;
           "dlist".components.library.planned = lib.mkOverride 900 true;
           "gi-gtk3".components.library.planned = lib.mkOverride 900 true;
+          "bimap".components.library.planned = lib.mkOverride 900 true;
           "vector-algorithms".components.library.planned = lib.mkOverride 900 true;
+          "prettyprinter-combinators".components.library.planned = lib.mkOverride 900 true;
           "dec".components.library.planned = lib.mkOverride 900 true;
           "aeson".components.library.planned = lib.mkOverride 900 true;
           "Only".components.library.planned = lib.mkOverride 900 true;
@@ -588,6 +595,7 @@
           "gi-pango".components.library.planned = lib.mkOverride 900 true;
           "ghc-internal".components.library.planned = lib.mkOverride 900 true;
           "yaml".components.library.planned = lib.mkOverride 900 true;
+          "enummapset".components.library.planned = lib.mkOverride 900 true;
           "time".components.library.planned = lib.mkOverride 900 true;
           "primitive".components.library.planned = lib.mkOverride 900 true;
           "ghc-bignum".components.library.planned = lib.mkOverride 900 true;

@@ -11,11 +11,9 @@ import qualified Data.Map as M
 import           Data.Ratio ((%))
 import qualified Data.Set as S
 import           Data.Time.Clock.System
-import           System.Environment (executablePath)
 import qualified System.FilePath as FP
 import           System.IO (hGetContents, hPrint, writeFile)
 import           System.IO.Error
-import           System.Log.FastLogger (flushLogStr)
 import qualified System.Posix as Posix
 import           System.Posix.Process (executeFile)
 import           Text.Printf
@@ -152,12 +150,7 @@ manageDirty :: (MonadStateGlobal env m, env ~ HConf) => m ()
 manageDirty = withObject $ \wm -> do
   logDebug "wm request: manage_dirty"
   R.riverWindowManagerManageDirty wm
-  writeMainEvent MainPoll
-
-writeMainEvent :: (MonadIO m, MonadReader env m, env ~ HConf) => MainEvent -> m ()
-writeMainEvent ev = do
-  q <- asks $ view mainEventQL
-  atomically $ writeTQueue q ev
+  writeMainQ MainPoll
 
 --------------------------------------------------------------
 -- * Manage sequence /only/
@@ -382,24 +375,6 @@ floatLocation sw = withWindow sw $ \w -> do
 -------------------------------------------------------------------
 -- * Restart with state
 
-data StateData = StateData
-  { sfWins :: W.StackSet WorkspaceId String (IntPtr, String) WorkspaceDetail ScreenId ScreenDetail,
-    sfExt :: [(String, String)]
-  }
-  deriving (Show, Read)
-
-sendRestart :: MonadIO m => m ()
-sendRestart = io $ Posix.raiseSignal Posix.sigUSR2
-
-getStateDirectory :: MonadIO m => m FilePath
-getStateDirectory = do
-  dir <- getXdgDirectory XdgState "hswm"
-  createDirectoryIfMissing True dir
-  return dir
-
-getTimeStamp :: MonadIO m => m Int64
-getTimeStamp = systemSeconds <$> io getSystemTime
-
 restart :: FilePath -> H ()
 restart prog = do
   runInHS $ broadcastMessage ReleaseResources
@@ -407,15 +382,20 @@ restart prog = do
   statefile <- runInHS writeStateToFile
   let args = [ "--state-file", statefile ]
   logInfo $ "Now restarting! Executing file " <> toText prog <> "..." :# [ "args" .= args ]
-  lgrSet <- view _loggerSet
-  io $ flushLogStr lgrSet -- Flush logger
+  io =<< view _loggerCleanup
   res <- io $ try $ executeFile prog True args Nothing
-  case res of
-    Right {} -> do
-      logError "Uh-oh, execing the new program appears to have failed!"
-    Left (e :: SomeException) -> do
-      logError $ "Failed to execute new program file, aborting!" :# [ "exception" .= show e ]
-      io $ hPrint stderr e >> exitFailure
+  logError $ "Uh-oh, executing the new program appears to have failed!"
+    :# [ "reason" .= show e | Left (e :: IOException) <- [res] ]
+
+-- | Trigger restart by signal (USR2).
+sendRestart :: MonadIO m => m ()
+sendRestart = io $ Posix.raiseSignal Posix.sigUSR2
+
+data StateData = StateData
+  { sfWins :: W.StackSet WorkspaceId String (IntPtr, String) WorkspaceDetail ScreenId ScreenDetail,
+    sfExt :: [(String, String)]
+  }
+  deriving (Show, Read)
 
 writeStateToFile :: HS FilePath
 writeStateToFile = do
@@ -448,6 +428,9 @@ writeStateToFile = do
     logInfo $ "Wrote current WM state to disk" :# [ "state-file" .= stateFP ]
     io $ catchIO cleanup (hPrint stderr)
     return stateFP
+  where
+    getTimeStamp :: MonadIO m => m Int64
+    getTimeStamp = systemSeconds <$> io getSystemTime
 
 dumpStateAsString :: HS String
 dumpStateAsString = do
@@ -469,7 +452,9 @@ dumpStateAsString = do
 -- return that state.  The state file is removed after reading it.
 readStateFile
   :: forall m l m2. (MonadUnliftIO m, MonadLogger m, LayoutClass l RiverWindow, Read (l RiverWindow))
-  => Maybe FilePath -> HSWMConfig m2 l -> m (Maybe HState)
+  => Maybe FilePath
+  -> HSWMConfig m2 l
+  -> m (Maybe HState)
 readStateFile msf xmc = do
   sfile <- maybe getDefFile return msf
   exists <- doesFileExist sfile
@@ -518,12 +503,8 @@ readStateFile msf xmc = do
     readStrict :: Handle -> IO String
     readStrict h = hGetContents h >>= \s -> length s `seq` return s
 
-getProgramPath :: IO FilePath
-getProgramPath = lookupEnv "HSWM_EXECUTABLE" >>= \case
-    Just x -> return x
-    Nothing
-      | Just getExe <- executablePath -> do
-          x <- fromMaybe (error "restart: unable to get program path") <$> getExe
-          setEnv "HSWM_EXECUTABLE" x
-          return x
-      | otherwise -> error "restart: unable to resolve program path"
+getStateDirectory :: MonadIO m => m FilePath
+getStateDirectory = do
+  dir <- getXdgDirectory XdgState "hswm"
+  createDirectoryIfMissing True dir
+  return dir

@@ -9,16 +9,16 @@ module WL.Core.Client
   , module WL.Internals.Types
   ) where
 
+import           WL.Core.Enums
+import           WL.Core.Internal
 import           WL.Internals.TH
 import           WL.Internals.Types
 import           WL.Internals.Utils
-import           WL.Core.Internal
-import           WL.Core.Enums
 import           WL.Util
 
 import           WL.Core.Client.Generated
 import           WL.Core.Client.Generated.Global
-import           WL.Core.Client.Generated.Safe   as Safe
+import           WL.Core.Client.Generated.Safe as Safe
 import qualified WL.Core.Client.Generated.Unsafe as Unsafe
 
 import           Control.Exception
@@ -26,16 +26,18 @@ import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.Maybe
 import           Data.Proxy (Proxy(..))
+import           Data.Typeable (typeOf)
 import           Foreign
 import           Foreign.C
 import           Foreign.C.ConstPtr
 import           GHC.Generics (Generic)
+import           GHC.Stack
 import           System.Posix
 
 --------------------------------------------------------------------------------------
 -- EVENT QUEUES
 
-renderNewType (mkName "EventQueue") ''Wl_event_queue ""
+renderNewType True (mkName "EventQueue") ''Wl_event_queue ""
 
 --------------------------------------------------------------------------------------
 -- wayland.xml
@@ -55,12 +57,15 @@ clientFromProtocolXML' commonSettings
         | AArray <- arg.argType, ev.name == "enter" -> [|return $! Array $(x)|]
       _                                             -> defaultEventArgTrans s iface ev arg t x
 
-  } protoXml
+  } protocolXmlString
 
-data WaylandClientException
-  = WlListenerAddFailed { interfaceName :: String, objectId :: String }
-  | WaylandInvalidId
-  -- ^ When attempting to use an invalid object
+--------------------------------------------------------------------------------------
+-- Exceptions
+
+data WaylandClientException = WlListenerAddFailed { interfaceName :: String, objectId :: String }
+                            | WaylandInvalidId -- ^ When attempting to use an invalid object
+                            | DisplayConnectFailed !String
+                            | DisplayDisplayError { display :: !Display, displayError :: !DisplayError }
   deriving stock (Eq, Ord, Show, Generic)
 
 instance Exception WaylandClientException
@@ -74,13 +79,8 @@ data WaylandProtocolError = WaylandProtocolError
 
 instance Exception WaylandProtocolError
 
-data WaylandDisplayError
-  = DisplayConnectFailed !String
-  | DisplayRoundtripFailed !Display !(Maybe EventQueue)
-  | DisplayDisplayError !Display !DisplayError
-  deriving stock (Eq, Ord, Show, Generic)
-
-instance Exception WaylandDisplayError
+--------------------------------------------------------------------------------------
+-- EventQueue functions
 
 -- | wl_display object used to create the queue should not be
 -- destroyed until all event queues created with it are destroyed.
@@ -91,20 +91,23 @@ eventQueueGetName :: MonadIO m => EventQueue -> m (Maybe String)
 {-# INLINE eventQueueGetName #-}
 eventQueueGetName (EventQueue evq) = liftIO $ Unsafe.wl_event_queue_get_name (ConstPtr evq) >>= peekMaybeCString
 
+--------------------------------------------------------------------------------------
+-- Display functions
+
 -- | Connect to a Wayland display.
 displayConnect :: MonadIO m => Maybe String -> m Display
 {-# INLINE displayConnect #-}
-displayConnect marg = liftIO $
-  maybe ($ nullPtr) withCString marg $ \c_arg ->
-    fmap Display $ throwExIfNull (DisplayConnectFailed $ show marg) $ wl_display_connect $ ConstPtr c_arg
+displayConnect marg = liftIO . fmap Display $
+  maybe ($ nullPtr) withCString marg $
+    throwExIfNull (DisplayConnectFailed $ show marg) . wl_display_connect . ConstPtr
 
 -- | Connect to a Wayland display on an already open fd.
 --
 -- The display takes ownership of the fd.
 displayConnectToFd :: MonadIO m => Fd -> m Display
 {-# INLINE displayConnectToFd #-}
-displayConnectToFd fd = liftIO $
-  fmap Display $ throwExIfNull (DisplayConnectFailed $ show fd) $ wl_display_connect_to_fd (fromIntegral fd)
+displayConnectToFd fd = liftIO . fmap Display $
+  throwExIfNull (DisplayConnectFailed $ show fd) $ wl_display_connect_to_fd (fromIntegral fd)
 
 -- | Retrieve the Wayland socket FD for polling.
 displayGetFd :: MonadIO m => Display -> m Fd
@@ -120,8 +123,8 @@ displayGetFd (Display disp) = liftIO $ fromIntegral <$> wl_display_get_fd disp
 -- and doing so will cause a dead lock.
 displayRoundtrip :: MonadIO m => Display -> m Int
 {-# INLINE displayRoundtrip #-}
-displayRoundtrip disp@(Display d) = liftIO $
-  fmap fromIntegral $ throwExIfMinus1 (DisplayRoundtripFailed disp Nothing) $ wl_display_roundtrip d
+displayRoundtrip (Display d) = liftIO $ fmap fromIntegral $
+  throwErrnoIfMinus1Retry "wl_display_roundtrip" $ Safe.wl_display_roundtrip d
 
 -- | Block until all pending request are processed by the server.
 --
@@ -132,13 +135,14 @@ displayRoundtrip disp@(Display d) = liftIO $
 -- and doing so will cause a dead lock.
 displayRoundtripQueue :: MonadIO m => Display -> EventQueue -> m Int
 {-# INLINE displayRoundtripQueue #-}
-displayRoundtripQueue disp@(Display d) eq@(EventQueue evq) = liftIO $
-  fmap fromIntegral $ throwExIfMinus1 (DisplayRoundtripFailed disp (Just eq)) $ wl_display_roundtrip_queue d evq
+displayRoundtripQueue (Display d) (EventQueue evq) = liftIO $ fmap fromIntegral $
+  throwErrnoIfMinus1Retry "wl_display_roundtrip_queue" $ Safe.wl_display_roundtrip_queue d evq
 
 -- | Set maximum buffer size for connection.
 displaySetMaxBufferSize :: MonadIO m => Display -> Maybe Int -> m ()
 {-# INLINE displaySetMaxBufferSize #-}
-displaySetMaxBufferSize (Display d) msize = liftIO $ wl_display_set_max_buffer_size d $ fromIntegral $ fromMaybe 0 msize
+displaySetMaxBufferSize (Display d) msize = liftIO $
+  wl_display_set_max_buffer_size d $ fromIntegral $ fromMaybe 0 msize
 
 -- | Flush all pending outgoing requests to the server
 --
@@ -151,11 +155,15 @@ displayFlush :: MonadIO m => Display -> m Int
 {-# INLINE displayFlush #-}
 displayFlush (Display d) = liftIO $ do
   ret <- Unsafe.wl_display_flush d
-  when (ret == -1) $ do
-    errno <- getErrno
-    {- TODO when (errno /= eAGAIN) $ -}
-    ioError (errnoToIOError "displayFlush" errno Nothing Nothing)
-  return (fromIntegral ret)
+  if ret == -1
+     then do
+        err <- getErrno
+        if err == eINTR
+           then displayFlush (Display d)
+           else if err /= eAGAIN
+                then throwErrno "displayFlush"
+                else return (-1)
+     else return (fromIntegral ret)
 
 -- | Read events from display file descriptor.
 --
@@ -185,7 +193,7 @@ displayFlush (Display d) = liftIO $ do
 displayReadEvents :: MonadIO m => Display -> m ()
 {-# INLINE displayReadEvents #-}
 displayReadEvents (Display d) = liftIO $
-  throwErrnoIfMinus1_ "displayReadEvents" $ Safe.wl_display_read_events d
+  throwErrnoIfMinus1Retry_ "displayReadEvents" $ Safe.wl_display_read_events d
 
 -- |  Prepare to read events from the display's file descriptor to a queue.
 --
@@ -234,28 +242,29 @@ displayReadEvents (Display d) = liftIO $
 displayPrepareReadQueue :: MonadIO m => Display -> EventQueue -> m ()
 {-# INLINE displayPrepareReadQueue #-}
 displayPrepareReadQueue (Display d) (EventQueue evq) = liftIO $
-  throwErrnoIfMinus1_ "displayPrepareReadQueue" $ Safe.wl_display_prepare_read_queue d evq
+  throwErrnoIfMinus1RetryMayBlock_ "displayPrepareReadQueue"
+    (Safe.wl_display_prepare_read_queue d evq)
+    (Safe.wl_display_dispatch_queue_pending d evq)
 
 -- | This function does the same thing as 'displayPrepareReadQueue'
 -- with the default queue passed as the queue.
+--
+-- Will try wl_display_prepare_read until it succeeds, attempting to dispatch
+-- pending events until none left.
+--
+-- This needs to be balanced with a call to read_events or cancel_read!
 displayPrepareRead :: MonadIO m => Display -> m ()
 {-# INLINE displayPrepareRead #-}
-displayPrepareRead (Display d) = liftIO $ throwErrnoIfMinus1_ "displayPrepareRead" $ Safe.wl_display_prepare_read d
-
--- TODO
---checkPrepareRead loc ma = do
---  ret <- ma
---  if ret < 0 then checkErrno ret else return True
---    where
---      checkErrno ret = do
---        errno <- getErrno
---        if errno == eAGAIN then return False else ioError (errnoToIOError loc errno Nothing Nothing)
+displayPrepareRead (Display d) = liftIO $
+  throwErrnoIfMinus1RetryMayBlock_ "wl_display_prepare_read"
+    (Safe.wl_display_prepare_read d)
+    (Safe.wl_display_dispatch_pending d)
 
 -- | Dispatch events on the default event queue.
 displayDispatch :: MonadIO m => Display -> m Int
 {-# INLINE displayDispatch #-}
-displayDispatch (Display d) = liftIO $
-  fmap fromIntegral $ throwErrnoIfMinus1 "displayDispatch" $ Safe.wl_display_dispatch d
+displayDispatch (Display d) = liftIO $ fmap fromIntegral $
+  throwErrnoIfMinus1Retry "displayDispatch" $ Safe.wl_display_dispatch d
 
 -- | Dispatch events in an event queue.
 --
@@ -280,13 +289,14 @@ displayDispatch (Display d) = liftIO $
 -- dispatching events.
 displayDispatchQueue :: MonadIO m => Display -> EventQueue -> m Int
 {-# INLINE displayDispatchQueue #-}
-displayDispatchQueue (Display d) (EventQueue evq) = liftIO $
-  fmap fromIntegral $ throwErrnoIfMinus1 "displayDispatchQueue" $ Safe.wl_display_dispatch_queue d evq
+displayDispatchQueue (Display d) (EventQueue evq) = liftIO $ fmap fromIntegral $
+  throwErrnoIfMinus1Retry "displayDispatchQueue" $ Safe.wl_display_dispatch_queue d evq
 
 displayDispatchTimeout :: MonadIO m => Display -> Maybe (ConstPtr Timespec) -> m Int
 {-# INLINE displayDispatchTimeout #-}
-displayDispatchTimeout (Display d) mtimeout = liftIO $
-  fmap fromIntegral $ throwErrnoIfMinus1 "displayDispatchTimeout" $ Safe.wl_display_dispatch_timeout d (fromMaybe (ConstPtr nullPtr) mtimeout)
+displayDispatchTimeout (Display d) mtimeout = liftIO $ fmap fromIntegral $
+  throwErrnoIfMinus1Retry "displayDispatchTimeout" $ Safe.wl_display_dispatch_timeout d $
+    fromMaybe (ConstPtr nullPtr) mtimeout
 
 -- | Dispatch events in an event queue with a timeout
 --
@@ -300,16 +310,17 @@ displayDispatchTimeout (Display d) mtimeout = liftIO $
 -- Returns the number of dispatched events on success.
 displayDispatchQueueTimeout :: MonadIO m => Display -> EventQueue -> Maybe (ConstPtr Timespec) -> m Int
 {-# INLINE displayDispatchQueueTimeout #-}
-displayDispatchQueueTimeout (Display d) (EventQueue evq) mtimeout = liftIO $
-  fmap fromIntegral $ throwErrnoIfMinus1 "displayDispatchQueueTimeout" $ Safe.wl_display_dispatch_queue_timeout d evq (fromMaybe (ConstPtr nullPtr) mtimeout)
+displayDispatchQueueTimeout (Display d) (EventQueue evq) mtimeout = liftIO $ fmap fromIntegral $
+  throwErrnoIfMinus1Retry "displayDispatchQueueTimeout" $ Safe.wl_display_dispatch_queue_timeout d evq
+    (fromMaybe (ConstPtr nullPtr) mtimeout)
 
 -- | Dispatch pending events in an event queue
 --
 -- Returns immediately if there are no events queued.
 displayDispatchQueuePending :: MonadIO m => Display -> EventQueue -> m Int
 {-# INLINE displayDispatchQueuePending #-}
-displayDispatchQueuePending (Display d) (EventQueue evq) =
-  fmap fromIntegral . liftIO $ throwErrnoIfMinus1 "displayDispatchQueuePending" $ Safe.wl_display_dispatch_queue_pending d evq
+displayDispatchQueuePending (Display d) (EventQueue evq) = liftIO . fmap fromIntegral $
+  throwErrnoIfMinus1Retry "displayDispatchQueuePending" $ Safe.wl_display_dispatch_queue_pending d evq
 
 -- | Dispatch default queue events without reading from the display fd.
 --
@@ -317,8 +328,8 @@ displayDispatchQueuePending (Display d) (EventQueue evq) =
 -- queue is empty, i.e., it doesn't block.
 displayDispatchPending :: MonadIO m => Display -> m Int
 {-# INLINE displayDispatchPending #-}
-displayDispatchPending (Display d) =
-  fmap fromIntegral . liftIO $ throwErrnoIfMinus1 "displayDispatchPending" $ Safe.wl_display_dispatch_pending d
+displayDispatchPending (Display d) = liftIO . fmap fromIntegral $
+  throwErrnoIfMinus1Retry "displayDispatchPending" $ Safe.wl_display_dispatch_pending d
 
 -- | Cancel read intention on display's fd
 --
@@ -389,14 +400,14 @@ displayCreateQueueWithName :: MonadIO m => Display -> String -> m EventQueue
 displayCreateQueueWithName (Display d) name = liftIO $ withCString name $ \c_name ->
   fmap EventQueue . throwErrnoIfNull ("displayCreateQueueWithName: " ++ name) $ wl_display_create_queue_with_name d (ConstPtr c_name)
 
+-- | Close the connection to display and free all resources associated with it.
+displayDisconnect :: MonadIO m => Display -> m ()
+displayDisconnect (Display d) = liftIO $ Safe.wl_display_disconnect d
+
 -- | Binds a new, client-created object to the server using the specified name as the identifier.
 registryBind :: MonadIO m => Registry -> ObjectName -> PtrConst Wl_interface -> Version -> m (Ptr a)
 {-# INLINE registryBind #-}
 registryBind reg name iface ver = liftIO $ castPtr <$> wl_registry_bind reg.unwrap name iface ver
-
--- | Close the connection to display and free all resources associated with it.
-displayDisconnect :: MonadIO m => Display -> m ()
-displayDisconnect (Display d) = liftIO $ Safe.wl_display_disconnect d
 
 -- Add listeners
 
@@ -406,7 +417,8 @@ displayDisconnect (Display d) = liftIO $ Safe.wl_display_disconnect d
 --
 -- Throws 'WlListenerAddFailed' on failure listener fails.
 listenerAdd
-  :: forall object m userdata. (MonadIO m, Show object, HasListener object, IsUserData userdata)
+  :: forall object m userdata. (MonadIO m, HasListener object, IsUserData userdata)
+  => HasCallStack
   => object -- ^ The target object
   -> ConstPtr (ObjectListener object) -- ^ Listener instance (function pointers)
   -> userdata -- ^ Userdata
@@ -414,11 +426,11 @@ listenerAdd
 {-# INLINE listenerAdd #-}
 listenerAdd obj l ud = liftIO $ do
   res <- objectListenerAdd obj l (toUserData ud)
-  when (res < 0) $ throwIO $ WlListenerAddFailed (objectInterfaceName @object Proxy) (show obj)
+  when (res < 0) $ throwIO $ WlListenerAddFailed (objectInterfaceName @object Proxy) (show $ typeOf obj)
 
 -- | 'listenerAdd' using @NULL@ user data.
 listenerAdd_
-  :: (MonadIO m, Show object, HasListener object)
+  :: (MonadIO m, HasListener object)
   => object -- ^ The target object
   -> ConstPtr (ObjectListener object) -- ^ Listener instance (function pointers)
   -> m ()

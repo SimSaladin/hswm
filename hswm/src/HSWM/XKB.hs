@@ -20,6 +20,7 @@ import qualified Data.Map as M
 -- * KeySym parsing
 
 type XkbBindCtx = (R.RiverXkbBindings, ConstPtr (WL.ObjectListener R.RiverXkbBinding), R.RiverSeat)
+
 type SKey a = StablePtr (XkbBinding a)
 
 createXkbBindings

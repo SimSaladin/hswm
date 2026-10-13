@@ -37,8 +37,8 @@ waybarStartupHook cfg = do
   logFn <- askLoggerIO
   process <- startProcess $
       setStdin nullStream $
-      setStdout (logOutput logFn "waybar (stdout)") $
-      setStderr (logOutput logFn "waybar (stderr)") $
+      setStdout (logOutput logFn "waybar" [ "stream" .= ("stdout" :: String) ]) $
+      setStderr (logOutput logFn "waybar" [ "stream" .= ("stderr" :: String) ]) $
       setCloseFds True $
       setNewSession True $
       proc cfg.command cfg.args

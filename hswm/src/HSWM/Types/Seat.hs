@@ -69,13 +69,19 @@ data Seat' (m :: Type -> Type) = Seat
 
 deriving instance (MonadIO m, Show (Stateful m Bool)) => Show (Seat' m)
 
+deriving instance
+  (Typeable m, Data (SomeAction m),
+  Data (SeatAction m),
+  Data (StablePtr (XkbBinding (SomeAction m))),
+  Data (StablePtr (PointerBinding (SomeAction m)))) => Data (Seat' m)
+
 type family Stateful (m :: Type -> Type) :: Type -> Type
 
 data SeatFocus
   = SFocusNone
   | SFocusWindow !RiverWindow
   | SFocusLayerShell { exclusiveFocus :: !Bool, prev :: !SeatFocus }
-  deriving stock (Eq, Ord, Show, Generic)
+  deriving stock (Eq, Ord, Show, Generic, Data)
   deriving anyclass (NFData)
 
 data SeatAction m
@@ -87,7 +93,7 @@ data SeatAction m
     S_SUBMAP_NEXT_KEY (SomeAction m) (XkbBindingMap (SomeAction m)) (Maybe (SomeAction m))
   | -- | Cancel submap input, resetting to root bindings.
     S_SUBMAP_CANCEL
-  deriving stock (Generic)
+  deriving stock (Generic, Data)
   deriving anyclass (NFData)
 
 deriving instance (MonadIO m, Show (Stateful m Bool)) => Show (SeatAction m)
@@ -97,22 +103,22 @@ data SeatOperation
   = SEAT_OP_NONE
   | SEAT_OP_MOVE
   | SEAT_OP_RESIZE
-  deriving stock (Eq, Bounded, Enum, Show, Read, Generic)
+  deriving stock (Eq, Ord, Bounded, Enum, Show, Read, Generic, Data)
   deriving anyclass (NFData)
 
 -- Default
 
-instance Default SeatFocus where def = SFocusNone
+instance Default SeatFocus      where def = SFocusNone
 instance Default (SeatAction m) where def = S_NONE
-instance Default SeatOperation where def = SEAT_OP_NONE
+instance Default SeatOperation  where def = SEAT_OP_NONE
 
 -- * Lenses
 
 makeLensesWith' classPerField [ ''Seat' ]
 
+instance HasX (Seat' m) Int32 where _x = position . _x
+instance HasY (Seat' m) Int32 where _y = position . _y
+
 instance HasRiverId (Seat' m) where
   type RiverId (Seat' m) = RiverSeat
   riverId = riverSeat
-
-instance HasX (Seat' m) Int32 where _x = position . _x
-instance HasY (Seat' m) Int32 where _y = position . _y

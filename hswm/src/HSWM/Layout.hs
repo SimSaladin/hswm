@@ -28,10 +28,10 @@ module HSWM.Layout
   )
 where
 
-import HSWM.Core
-import HSWM.StackSet qualified as W
-import River qualified as R
-import Prelude hiding (handle)
+import           HSWM.Core
+import qualified HSWM.StackSet as W
+import           Prelude hiding (handle)
+import qualified River as R
 
 -- | Change the size of the master pane.
 data Resize = Shrink | Expand

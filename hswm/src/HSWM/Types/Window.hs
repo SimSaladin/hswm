@@ -53,7 +53,7 @@ data Window = Window
   , pointer_resize_requested       :: !RiverSeat
   , pointer_resize_requested_edges :: !R.RiverWindowEdges
   }
-  deriving stock (Eq, Ord, Show, Generic)
+  deriving stock (Eq, Ord, Show, Generic, Data)
   deriving anyclass (Default, NFData)
 
 data WindowManageAction
@@ -62,7 +62,7 @@ data WindowManageAction
   | WExitFullscreen
   | WToggleFullscreen
   | WRequestClose
-  deriving stock (Eq, Ord, Show, Generic)
+  deriving stock (Eq, Ord, Show, Generic, Data)
   deriving anyclass (Default, NFData)
 
 data WindowRenderAction
@@ -72,7 +72,7 @@ data WindowRenderAction
   | WRPlaceBottom
   | WRHide
   | WRReveal
-  deriving stock (Eq, Ord, Show, Generic)
+  deriving stock (Eq, Ord, Show, Generic, Data)
   deriving anyclass (Default, NFData)
 
 -- * Lenses
@@ -83,7 +83,7 @@ instance HasRiverId Window where
   type RiverId Window = RiverWindow
   riverId = riverWindow
 
-instance HasX      Window Position1D where _x = position . _x
-instance HasY      Window Position1D where _y = position . _y
-instance HasWidth  Window Dimension where width = size . width
-instance HasHeight Window Dimension where height = size . height
+instance HasX      Window Position1D where _x     = position . _x
+instance HasY      Window Position1D where _y     = position . _y
+instance HasWidth  Window Dimension  where width  = size . width
+instance HasHeight Window Dimension  where height = size . height

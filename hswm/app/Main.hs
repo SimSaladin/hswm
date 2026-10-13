@@ -42,7 +42,6 @@ main = hswm $
     Wallpaper.usingWallpaper Wallpaper.WallpaperConfig {filepath = "/home/sim/wallpaper.png"} $
     IPC.ipcServer def $
     (def @(HSWMConfig H Full))
-      -- { layoutHook = myLayoutHook }
       & layoutHook .~ myLayoutHook
       & manageHook .~ myManageHook
       & handleEventHook <>~ debugHook
@@ -186,7 +185,7 @@ myKeys =
     ("M-exclam",   togglePad "tmux-0"  <?> "Toggle tmux PAD"),
 
     -- XXX: these somehow segfault river!
-    -- ("M-Slash",  togglePad "dynamic" <?> "Toggle dynamic PAD"),
+    ("M-Slash",  togglePad "dynamic" <?> "Toggle dynamic PAD"),
     ("M-C-r n",    RP.confirmPrompt def "TESTING" (return ()) <?> "TESTING BINDING")
 
     -- ("M-Tab",  "Cycle PADs" <??> cyclePads),

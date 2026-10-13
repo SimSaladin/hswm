@@ -55,7 +55,8 @@ data HSWMConfig m l = HSWMConfig
    -- | XCursor theme and size
   , cursorTheme     :: !String
   , cursorSize      :: !Word32
-  } deriving stock (Generic)
+  }
+  deriving stock (Generic)
 
 instance
   (Default (l RiverWindow),
@@ -72,8 +73,10 @@ instance
       , workspaces     = ["1", "2", "3", "4"]
       }
 
+-- deriving anyclass instance (NFData (m ()), NFData (l RiverWindow)) => NFData (HSWMConfig m l)
+
 data RepeatInfo = RepeatInfo { rate, delay :: {-# UNPACK #-} !Int32 }
-  deriving stock (Eq, Ord, Show, Read, Generic)
+  deriving stock (Eq, Ord, Show, Read, Generic, Data)
   deriving anyclass (Default, NFData)
 
 -- | Composable config modification.
@@ -93,17 +96,18 @@ type WorkspaceId = String
 
 -- | The output dimensions
 data ScreenDetail = SD {x, y, width, height :: {-# UNPACK #-} !Int}
-  deriving stock (Eq, Show, Read, Generic)
+  deriving stock (Eq, Show, Read, Generic, Data)
   deriving anyclass (Default, NFData)
 
 data WorkspaceDetail = WD
-  deriving stock (Eq, Show, Read, Generic)
+  deriving stock (Eq, Show, Read, Generic, Data)
   deriving anyclass (Default, NFData)
 
 -- * QueryT
 
 newtype QueryT m a = Query { unwrap :: ReaderT Window m a }
-  deriving newtype (Functor, Applicative, Monad, MonadIO, MonadFix, MonadThrow, MonadReader Window)
+  deriving newtype (Functor, Applicative, Monad, MonadIO, MonadFix, MonadThrow, MonadCatch, MonadMask,
+                    MonadReader Window)
 
 instance Applicative m => Default (QueryT m (Endo a)) where
   def = pure mempty

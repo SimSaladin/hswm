@@ -14,4 +14,4 @@ clientFromProtocolXML' commonSettings
       ("set_points", AArray, "step")   -> [t|WL.Util.Array CDouble|]
       ("set_points", AArray, "points") -> [t|WL.Util.Array CDouble|]
       _                                -> defaultRequestArgTypeTrans s iface req arg t
-  } protoXml
+  } protocolXmlString

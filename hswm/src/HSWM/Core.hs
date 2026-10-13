@@ -29,6 +29,9 @@ import qualified River as R
 import           Control.Monad.State
 import           GHC.Stack
 
+-----------------------------------------------------------
+-- * run / lift
+
 runH :: HConf -> H a -> IO a
 runH c (H a) = runReaderT a c
 
@@ -43,7 +46,7 @@ runInHS a = do
     res <- timeout 3_000_000 $ runHS conf {_stateLocked = True} st a
     case res of
       Just (r, st') -> atomically (putTMVar conf._state st') >> return r
-      Nothing -> throwM $ HSWMTimeout $ "runInHS: timed out (3s): " ++ prettyCallStack callStack
+      Nothing -> throwM $ HSWMTimeout $ "runInHS timed out (3s)!" ++ prettyCallStack callStack
 
 liftH :: (MonadReader HConf m, MonadIO m) => H a -> m a
 liftH a = do
@@ -53,6 +56,9 @@ liftH a = do
 liftHS :: HS a -> Query a
 liftHS a = Query (lift a)
 
+-----------------------------------------------------------
+-- * catch
+
 -- a la xmonad
 catchH :: HasCallStack => H a -> H a -> H a
 catchH job errcase = do
@@ -60,18 +66,19 @@ catchH job errcase = do
   io (runH c job)
     `catch` \e -> case fromException e of
       Just (_ :: ExitCode) -> throwM e
-      _ -> do logError $ "exception in H action" :# [ "exception" .= show e, "callstack" .= prettyCallStack callStack ]
+      _ -> do logError $ "exception in H action" :# [ "exception" .= show e, "callStack" .= prettyCallStack callStack ]
               errcase
 
 catchHS :: HasCallStack => HS a -> HS a -> HS a
 catchHS job errcase = do
   c <- ask
   s <- get
-  (a, s') <- liftIO $ runHS c s job
-        `catch` \e -> case fromException e of
-          Just (_ :: ExitCode) -> throwM e
-          _ -> do runH c $ logError $ "exception in HS action" :# [ "exception" .= show e, "callstack" .= prettyCallStack callStack ]
-                  runHS c s errcase
+  (a, s') <- io $
+    runHS c s job
+    `catch` \e -> case fromException e of
+      Just (_ :: ExitCode) -> throwM e
+      _ -> do runH c $ logError $ "exception in HS action" :# [ "exception" .= show e, "callStack" .= prettyCallStack callStack ]
+              runHS c s errcase
   put s'
   return a
 
@@ -79,14 +86,14 @@ catchHS job errcase = do
 userCode :: HasCallStack => H a -> H (Maybe a)
 userCode a = catchH (Just <$> a) (return Nothing)
 
+-- a la xmonad
+userCodeS :: HasCallStack => HS a -> HS (Maybe a)
+userCodeS a = catchHS (Just <$> a) (return Nothing)
+
 -- | Same as userCode but with a default argument to return instead of using
 -- Maybe, provided for convenience.
 userCodeDef :: HasCallStack => a -> H a -> H a
 userCodeDef defValue a = fromMaybe defValue <$> userCode a
-
--- a la xmonad
-userCodeS :: HasCallStack => HS a -> HS (Maybe a)
-userCodeS a = catchHS (Just <$> a) (return Nothing)
 
 -- | Same as userCode but with a default argument to return instead of using
 -- Maybe, provided for convenience.
@@ -97,22 +104,21 @@ userCodeDefS defValue a = fromMaybe defValue <$> userCodeS a
 
 -- * Manage/Render Event queues
 
--- | @(queueForManagePhase, queueForRenderPhase)@
-getEventQueueFuncs :: (MonadReader env m, MonadIO inner, env ~ HConf)
-  => m (HS e1 -> inner (), HS e2 -> inner ())
-getEventQueueFuncs = (wrap *** wrap) <$> asks ((,) <$> view pendingManageQL <*> view pendingRenderQL)
-  where
-    wrap q = atomically . writeTQueue q . void
-
 writeManageQ :: (MonadReader s m, MonadIO m, s ~ HConf) => HS () -> m ()
 writeManageQ x = do
-    q <- asks (view pendingManageQL)
+    q <- asks (view pendingManageQ)
     atomically $ writeTQueue q x
 
 writeRenderQ :: (MonadReader s m, MonadIO m, s ~ HConf) => HS () -> m ()
 writeRenderQ x = do
-    q <- asks (view pendingRenderQL)
+    q <- asks (view pendingRenderQ)
     atomically $ writeTQueue q x
+
+-- | Queue an event for the main event queue.
+writeMainQ :: (MonadReader s m, MonadIO m, s ~ HConf) => MainEvent -> m ()
+writeMainQ ev = do
+    q <- asks (view eventQueue)
+    atomically $ writeTQueue q ev
 
 --------------------------------------------------
 

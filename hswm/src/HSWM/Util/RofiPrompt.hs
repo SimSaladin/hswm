@@ -177,7 +177,7 @@ rofiRun' pcfg input = do
   res <- try @_ @SomeException $ withProcessWait (
       setStdin (byteStringInput inputBS) $
       setStdout byteStringOutput $
-      setStderr (logOutput logFn "rofi (stderr)") $
+      setStderr (logOutput logFn "rofi" [ "stream" .= ("stderr" :: String) ]) $
       rofiToProc pcfg)
       $ \p -> do
         out <- atomically (getStdout p)

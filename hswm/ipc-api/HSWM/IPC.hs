@@ -43,7 +43,7 @@ instance A.ToJSON a => A.ToJSON (Msg a) where
 instance A.FromJSON a => A.FromJSON (Msg a) where
   parseJSON v = do
     msgBody <- A.parseJSON v
-    msgSeqn <- A.withObject "Msg" (\v' -> v' A..:? "seqn") v
+    msgSeqn <- A.withObject "Msg" (A..:? "seqn") v
     return Msg{..}
 
 -- * Request
@@ -141,7 +141,7 @@ getClientAI :: MonadIO m => ClientConfig -> m AddrInfo
 getClientAI ClientConfig{..} =
   case L.break (== ':') connectTo of
     ("unix", ':' : name) -> do
-      file <- makeAbs $ if name == "" then "hswm-1" else name
+      file <- makeAbs =<< io (if name == "" then defaultSocketName else return name)
       return defaultHints
         { addrFamily = AF_UNIX
         , addrSocketType = Stream
@@ -161,15 +161,17 @@ clientRun
   -> (Response -> m ()) -- ^ Process incoming
   -> ((Request -> m ()) -> m ()) -- ^ Emit outgoing
   -> m ()
-clientRun conf onMsg cb = withThreadContext ["component" .= ("ipc/client" :: String)] $ do
+clientRun conf onMsg cb = do
   ai <- getClientAI conf
-  bracket (open ai) (io . close) $ \sock -> do
-    sendMsg sock $ IdentifyClient (thisPeerIdent "client") 0 (Just thisPeerDescription)
-    withAsync (inputWorker sock) $ \inputAs -> do
-      link inputAs
-      cb (sendMsg sock)
+  withThreadContext ["component" .= ("ipc-client" :: String), "address" .= show ai.addrAddress] $ do
+    bracket (open ai) (io . close) $ \sock -> do
+      sendMsg sock $ IdentifyClient (thisPeerIdent "client") 0 (Just thisPeerDescription)
+      withAsync (inputWorker sock) $ \inputAs -> do
+        link inputAs
+        cb (sendMsg sock)
   where
     open ai = bracketOnError (io $ socket ai.addrFamily ai.addrSocketType ai.addrProtocol) (io . close) $ \sock -> do
+      logInfo $ "Connecting to server..." :# [ "address" .= show ai.addrAddress ]
       io $ connect sock ai.addrAddress
       return sock
 
@@ -207,6 +209,12 @@ getXdgRuntimeDirectory :: IO FilePath
 getXdgRuntimeDirectory = lookupEnv "XDG_RUNTIME_DIR" >>= \case
   Just dir -> return dir
   Nothing  -> error "XDG_RUNTIME_DIR not set"
+
+defaultSocketName :: IO String
+defaultSocketName = lookupEnv "WAYLAND_DISPLAY" >>= \case
+  Just str | Just (s::Int) <- L.stripPrefix "wayland-" str >>= readMaybe -> return $ "hswm-" ++ show s
+  _ -> return "hswm-1"
+
 
 runMIO :: LoggingT m a -> m a
 runMIO = runStderrLoggingT

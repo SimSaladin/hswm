@@ -31,7 +31,13 @@ import           Lens.Micro.TH.Internal
 
 import qualified River as R
 
+---------------------------------------------------------
 -- Orphan instances
+
+deriving instance Data R.RiverColor
+
+instance Show (Async a) where show _ = "<Async>"
+instance Show (StablePtr a) where show _ = "<SP>"
 
 instance NFData (StablePtr a) where
   rnf = rnf . castStablePtrToPtr
@@ -191,32 +197,34 @@ class Eq (RiverId a) => HasRiverId a where
   default riverId :: (a ~ RiverId a) => Lens' a (RiverId a)
   riverId = id
 
-type SameRiverId a b = (HasRiverId a, HasRiverId b, RiverId a ~ RiverId b)
+-- | Default instances for matching 'Coercible' types.
+class HasRiverId rid => ToRiverId a rid where
 
-riverIdEq :: SameRiverId a b => a -> b -> Bool
-riverIdEq a b = (a ^. riverId) == (b ^. riverId)
-
-eachRiverId :: (SameRiverId k a, Each s s a a) => k -> Traversal' s a
-eachRiverId k = each . filtered (riverIdEq k)
-
-instance HasRiverId R.RiverOutput         where type RiverId R.RiverOutput = R.RiverOutput
-instance HasRiverId R.RiverWindow         where type RiverId R.RiverWindow = R.RiverWindow
-instance HasRiverId R.RiverSeat           where type RiverId R.RiverSeat = R.RiverSeat
-instance HasRiverId R.RiverXkbBinding     where type RiverId R.RiverXkbBinding = R.RiverXkbBinding
-instance HasRiverId R.RiverPointerBinding where type RiverId R.RiverPointerBinding = R.RiverPointerBinding
+  toRiverId :: a -> rid
+  default toRiverId :: Coercible a rid => a -> rid
+  toRiverId = coerce
 
 type SomeWindow a = (HasRiverId a, RiverId a ~ R.RiverWindow)
 type SomeOutput a = (HasRiverId a, RiverId a ~ R.RiverOutput)
 type SomeSeat a   = (HasRiverId a, RiverId a ~ R.RiverSeat)
 
--- * ToRiverId
+type SameRiverId a b = (HasRiverId a, HasRiverId b, RiverId a ~ RiverId b)
 
--- | Default instances for matching 'Coercible' types.
-class HasRiverId rid => ToRiverId a rid where
-  toRiverId :: a -> rid
-  default toRiverId :: Coercible a rid => a -> rid
-  toRiverId = coerce
+riverIdEq :: SameRiverId a b => a -> b -> Bool
+riverIdEq a b = (a ^. riverId) == (b ^. riverId)
+
+-- | An 'Each' traversal that goes
+eachRiverId :: (Each s s a a, SameRiverId k a) => k -> Traversal' s a
+eachRiverId k = each . filtered (riverIdEq k)
+
+-- Instances
 
 instance ToRiverId (Ptr Void) R.RiverOutput
 instance ToRiverId (Ptr Void) R.RiverWindow
 instance ToRiverId (Ptr Void) R.RiverSeat
+
+instance HasRiverId R.RiverOutput         where type RiverId R.RiverOutput         = R.RiverOutput
+instance HasRiverId R.RiverWindow         where type RiverId R.RiverWindow         = R.RiverWindow
+instance HasRiverId R.RiverSeat           where type RiverId R.RiverSeat           = R.RiverSeat
+instance HasRiverId R.RiverXkbBinding     where type RiverId R.RiverXkbBinding     = R.RiverXkbBinding
+instance HasRiverId R.RiverPointerBinding where type RiverId R.RiverPointerBinding = R.RiverPointerBinding

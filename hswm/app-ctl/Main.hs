@@ -8,33 +8,40 @@ import           HSWM.IPC
 import qualified Data.Aeson as A
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.Text.Lazy as TL
+import           Data.Time
 import qualified Options.Applicative as Options
 import           Options.Generic
 import           Prettyprinter
 import           Prettyprinter.Render.Terminal
 import           System.Console.Haskeline
+--import           System.Console.Haskeline.Internal (mapReaderT)
+import           System.Console.Haskeline.ReaderT
+import Control.Monad.Reader
 
-import           Data.Time
-
-type CM = InputT (LoggingT (ReaderT () IO))
+type CM = InputT (LoggingT IO)
 
 main :: IO ()
-main = do
-  var <- newEmptyMVar
-  let logfun loc src lv s = do
+main = runInputT defaultSettings $ do
+  printExt <- getExternalPrint
+  let logFun loc src lv s = do
           t <- getCurrentTime
-          f <- readMVar var
           let logStrBS = fromLogStr $ defaultLogStr t mempty loc src lv s
               msg      = A.decodeStrict @LoggedMessage logStrBS
-          whenJust msg $ f . TL.unpack . renderLazy . layoutPretty defaultLayoutOptions . prettyLogMsg
-  flip runReaderT () $
-    flip runLoggingT logfun $
-      runInputT defaultSettings $ do
-        getExternalPrint >>= putMVar var
-        mainCM
+          whenJust msg $ printExt . TL.unpack . renderLazy . layoutPretty defaultLayoutOptions . prettyLogMsg
+  fromReaderT $ runRT logFun
+
+runRT :: (Loc -> LogSource -> LogLevel -> LogStr -> IO ())
+      -> ReaderT (InputTEnv IO) IO ()
+runRT logFun = withReaderT f' $ mapReaderT f $ toReaderT mainCM
+  where
+    f :: LoggingT IO () -> IO ()
+    f ma = runLoggingT ma logFun
+    f' :: InputTEnv IO -> InputTEnv (LoggingT IO)
+    f' = mapInputTEnv liftIO -- _f''
 
 mainCM :: CM ()
-mainCM = clientRun def msgHandler consoleHandler
+mainCM = do
+  clientRun def msgHandler consoleHandler
 
 msgHandler :: Response -> CM ()
 msgHandler = \case
@@ -68,7 +75,8 @@ prettyLogMsg :: LoggedMessage -> Doc AnsiStyle
 prettyLogMsg LoggedMessage{..} = mconcat
     [ ppLevel loggedMessageLevel <> space
     , pretty loggedMessageText <> space
-    , annotate (color Black <> bold) (pretty (BL.unpack (A.encode loggedMessageMeta)))
+    , annotate (color Black <> bold)
+        (pretty (BL.unpack (A.encode $ loggedMessageThreadContext <> loggedMessageMeta)))
     , line
     ]
   where

@@ -98,8 +98,7 @@ handle = \case
   R.RiverOutputWlOutput   _ k name -> bindWlOutput k name
   R.RiverOutputDimensions _ output w h -> modifyOutput' output $ width .~ fi w &+ height .~ fi h
   R.RiverOutputPosition   _ output x y -> modifyOutput' output $ _x .~ fi x &+ _y .~ fi y
-  -- TODO make use of this event
-  _                                    -> logError "Handle exceptions "
+  R.RiverOutputCaptureSessions _ _ c   -> logError $ "active screen capture session" :# [ "count" .= c ]
 
 
 handleWlOutput :: WL.OutputEvent -> H ()
