@@ -1,18 +1,18 @@
-{-# LANGUAGE MagicHash            #-}
+{-# LANGUAGE MagicHash    #-}
 {-# LANGUAGE TypeFamilies #-}
 
 
 module Wayland.UtilSpec where
 
-import Bindings.Wayland.Util
-import Bindings.Wayland.Util.Generated (Wl_list)
+import           WL.Util
+import           WL.Util.Generated (Wl_list)
 
-import Test.Hspec
-import Foreign
-import Foreign.C
+import           Control.Exception
+import           Data.Default
+import           Foreign
+import           Foreign.C
 import qualified HsBindgen.Runtime.HasCField as CF
-import Data.Default
-import Control.Exception
+import           Test.Hspec
 
 spec :: Spec
 spec = do

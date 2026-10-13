@@ -53,6 +53,8 @@ import           GHC.Stack
 import qualified Text.PrettyPrint as PP
 import qualified System.FilePath as FP
 
+-- * @HsBindGen@
+
 -- | Settings for a hs-bindgen-cli invocation.
 data HsBindGen = HsBindGen
   -- Select declarations
@@ -85,12 +87,17 @@ data HsBindGen = HsBindGen
 
   -- Other
   , extraArgs                      :: [String]  -- ^ Arbitrary additional arguments for @hs-bindgen-cli@
-  , dependsOn :: [ModuleName] -- ^ Dependency tracking
+  , dependsOn                      :: [ModuleName] -- ^ Dependency tracking
   }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Binary, Structured, Default, A.FromJSON, A.ToJSON)
   deriving (Semigroup, Monoid) via Generically HsBindGen
 
+-- | Value for headers
+makeHeader :: FilePath -> Location
+makeHeader = makeLocation . makeSymbolicPath @Pkg @File
+
+-- TODO: graph dependency resolution
 instance G.IsNode HsBindGen where
   type Key HsBindGen = ModuleName
   nodeKey x = fromFlag x.moduleName
@@ -107,17 +114,11 @@ instance Default BuiltinIncludeDir where
 instance IsString BuiltinIncludeDir where
   fromString = BuiltinIncludeDir
 
-data BindConfig = BindConfig
-  { bcBindGen :: HsBindGen
-  , bcDepends :: [String] -- name
-  }
+-- TODO: refactor this away...
+data BindConfig = BindConfig { bcBindGen :: HsBindGen, bcDepends :: [String] }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Binary, Default)
   deriving (Semigroup, Monoid) via Generically BindConfig
-
--- | Value for headers
-makeHeader :: FilePath -> Location
-makeHeader = makeLocation . makeSymbolicPath @Pkg @File
 
 -- * BindingSpec
 
@@ -141,8 +142,7 @@ data BSpec
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Binary, Structured, A.FromJSON, A.ToJSON)
 
-instance Default BSpec where
-  def = GenerateBSpec Nothing
+instance Default BSpec where def = GenerateBSpec Nothing
 
 -- * PCRE
 
@@ -150,6 +150,20 @@ instance Default BSpec where
 newtype PCRE = PCRE { unwrap :: String }
   deriving stock (Eq, Ord, Show, Generic)
   deriving newtype (Binary, Structured, Default, A.FromJSON, A.ToJSON)
+
+class ToPCRE a where
+  toPCRE :: a -> PCRE
+
+instance ToPCRE PCRE where
+  toPCRE = id
+instance ToPCRE String where
+  toPCRE = PCRE
+instance ToPCRE (SymbolicPathX abs from to) where
+  toPCRE = escapePCRE . interpretSymbolicPathCWD . normaliseSymbolicPath
+instance ToPCRE Location where
+  toPCRE = toPCRE . location
+instance {-# OVERLAPS #-} (ToPCRE a, Foldable t) => ToPCRE (t a) where
+  toPCRE = foldMap toPCRE
 
 pcreValue :: PCRE -> String
 pcreValue (PCRE x) = x
@@ -176,20 +190,6 @@ instance GHC.IsList PCRE where
   type Item PCRE = PCRE
   fromList = fold
   toList   = pure
-
-class ToPCRE a where
-  toPCRE :: a -> PCRE
-
-instance ToPCRE PCRE where
-  toPCRE = id
-instance ToPCRE String where
-  toPCRE = PCRE
-instance ToPCRE (SymbolicPathX abs from to) where
-  toPCRE = escapePCRE . interpretSymbolicPathCWD . normaliseSymbolicPath
-instance ToPCRE Location where
-  toPCRE = toPCRE . location
-instance {-# OVERLAPS #-} (ToPCRE a, Foldable t) => ToPCRE (t a) where
-  toPCRE = foldMap toPCRE
 
 -- * Protocol properties
 
@@ -283,7 +283,7 @@ data ProtocolSpecX bindgen = ProtocolSpec
   -- ^ Modules to be imported in the generated code.
   , coreOnly            :: Bool
   -- ^ Settings for wayland-scanner
-  , dependsOn :: [String]
+  , dependsOn           :: [String]
   -- ^ Which other protocols this one depends on. This is needed for proper bindings generation.
   }
   deriving stock (Eq, Ord, Show, Generic, Generic1)
@@ -291,12 +291,13 @@ data ProtocolSpecX bindgen = ProtocolSpec
 
 instance Structured a => Structured (ProtocolSpecX a)
 
-{-
+{- TODO: graph dependencies
 instance G.IsNode (ProtocolSpecX a) where
   type Key (ProtocolSpecX a) = String
 -}
 
--- | @defaultProtocolSpec xmlfile@
+-- | Prefill some information based on the supplied protocol filename.
+-- @defaultProtocolSpec xmlfile@
 defaultProtocolSpec :: Default a => RelativePath DataDir File -> ProtocolSpecX a
 defaultProtocolSpec xml = ProtocolSpec
   { fullName            = ""
@@ -314,11 +315,6 @@ defaultProtocolSpec xml = ProtocolSpec
   , computedModuleNames = mempty
   , computedComponents  = mempty
   }
-
-data ProtocolRef = ProtocolRef
-  { headers      :: M.Map ProtoComponent [Location]
-  , bindingSpecs :: M.Map ProtoComponent [ExtBindingSpec]
-  } deriving (Eq, Ord, Show, Generic, Binary, Structured)
 
 -- * ProtocolScannerOptions
 
@@ -340,6 +336,14 @@ data ProtocolScannerOptions = ProtocolScannerOptions
   deriving anyclass (Default)
 
 type ProtocolScannerDependencies = [([String], ProtocolSpec)]
+
+-- XXX: explain
+data ProtocolRef = ProtocolRef
+  { headers      :: M.Map ProtoComponent [Location]
+  , bindingSpecs :: M.Map ProtoComponent [ExtBindingSpec]
+  } deriving (Eq, Ord, Show, Generic, Binary, Structured)
+
+-- ** Module naming
 
 newtype ComponentModuleNameFunction = ComponentModuleNameFunction
   { unwrap :: forall a. ProtocolSpecX a -> ProtoComponent -> ModuleName }

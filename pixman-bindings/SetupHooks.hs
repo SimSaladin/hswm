@@ -15,4 +15,5 @@ setupHooks :: SetupHooks
 setupHooks = bindgenHooks ([ pixmanSpec ] :: [HsBindGen])
 
 pixmanSpec :: HsBindGen
-pixmanSpec = newHsBindGen "Pixman.Generated" [ makeHeader "pixman.h" ] & genGlobal .~ pure False
+pixmanSpec = newHsBindGen "Pixman.Generated" [ makeHeader "pixman.h" ]
+  & genGlobal .~ pure False

@@ -6,6 +6,7 @@
 {-# LANGUAGE RecursiveDo         #-}
 {-# LANGUAGE TypeFamilies        #-}
 {-# LANGUAGE ViewPatterns        #-}
+{-# LANGUAGE CPP                 #-}
 {-# OPTIONS_GHC -Wno-ambiguous-fields #-}
 
 -- |
@@ -31,10 +32,11 @@ import           Distribution.HsBindgen.Types
 import           Distribution.Wayland.ProtocolXML
 
 import           Distribution.CabalSpecVersion
-import           Distribution.Compat.Binary (Binary)
-import           Distribution.Compat.Lens (getting)
 import           Distribution.ModuleName
 import           Distribution.Pretty
+#if !MIN_VERSION_Cabal(3,17,0)
+import           Distribution.Compat.Binary (Binary)
+#endif
 import           Distribution.Simple.LocalBuildInfo
 import           Distribution.Simple.Program
 import           Distribution.Simple.Setup
@@ -45,11 +47,10 @@ import qualified Distribution.Types.BuildInfo.Lens as BI
 import           Distribution.Types.Library (explicitLibModules)
 import qualified Distribution.Types.Library.Lens as Lib
 import           Distribution.Types.LocalBuildConfig
-import           Distribution.Types.LocalBuildInfo
 import           Distribution.Utils.Path
 import           Distribution.Utils.Structured
-import           Distribution.Verbosity
 import           Distribution.Simple.Glob
+import           Distribution.Simple.BuildPaths (autogenPackageModulesDir)
 
 import           Control.Monad
 import           Control.Monad.Fix (MonadFix)
@@ -74,19 +75,24 @@ import qualified System.FilePath as FP
 import           Data.String.Interpolate
 import qualified Data.Aeson as A
 
+-- XXX: refactor out these classes
+
 class Typeable a => IsProtoResult (a :: k) where
+
   protoResultPC :: proxy a -> ProtoComponent
 
-instance IsProtoResult InfoModule where protoResultPC _ = InfoModule
-instance IsProtoResult (ScannerOutput EnumBindings) where protoResultPC _ = EnumBindings
+class Typeable a => HasScannerResult (a :: ScannerResult) where
+
+  scannerCommand            :: Proxy (ScannerOutput a) -> String
+
+  scannerResultRelativePath :: Proxy (ScannerOutput a) -> ProtocolSpec -> RelativePath from 'File
+
+instance IsProtoResult InfoModule                     where protoResultPC _ = InfoModule
+instance IsProtoResult (ScannerOutput EnumBindings)   where protoResultPC _ = EnumBindings
 instance IsProtoResult (ScannerOutput ClientBindings) where protoResultPC _ = ClientBindings
 instance IsProtoResult (ScannerOutput ServerBindings) where protoResultPC _ = ServerBindings
-instance IsProtoResult (WrapInterface Client) where protoResultPC _ = WrapClient
-instance IsProtoResult (WrapInterface Server) where protoResultPC _ = WrapServer
-
-class Typeable a => HasScannerResult (a :: ScannerResult) where
-  scannerCommand :: Proxy (ScannerOutput a) -> String
-  scannerResultRelativePath :: Proxy (ScannerOutput a) -> ProtocolSpec -> RelativePath from 'File
+instance IsProtoResult (WrapInterface Client)         where protoResultPC _ = WrapClient
+instance IsProtoResult (WrapInterface Server)         where protoResultPC _ = WrapServer
 
 instance HasScannerResult EnumBindings where
   scannerResultRelativePath _ spec = makeRelativePathEx $ spec.fullName ++ "-enums.h"
@@ -103,26 +109,26 @@ instance HasScannerResult PrivateSource where
 
 -- * ScannerT
 
+-- | A monad transformer to be used as the context in setup scripts.
+newtype ScannerT m a = ScannerT { runScannerT :: Reader.ReaderT SetupInfo (State.StateT State m) a }
+  deriving newtype (Functor, Applicative, Monad, MonadIO, MonadFix, MonadFail,
+                    MonadReader SetupInfo, MonadState State)
+
+instance MonadTrans ScannerT where
+  lift = ScannerT . lift . lift
+
 type DynamicSetup = ScannerT IO
 
 type ScannerM = ScannerT IO
 
-newtype ScannerT m a = ScannerT
-  { runScannerT :: Reader.ReaderT SetupInfo (State.StateT State m) a
-  } deriving newtype ( Functor, Applicative, Monad, MonadIO, MonadFix, MonadFail
-                     , MonadReader SetupInfo, MonadState State)
-
-instance MonadTrans ScannerT where
-  lift = ScannerT . lift . lift
+-- | Information available in 'ScannerM'
+type SetupInfo = PostConfPackageInputs
 
 data State = State
   { protocolConfigs :: M.Map ProtocolId ProtocolConfig
   , scannerOptions  :: ProtocolScannerOptions
   , otherBindGen    :: [HsBindGen]
   } deriving stock (Generic)
-
--- | Information available in 'ScannerM'
-type SetupInfo = PostConfPackageInputs
 
 -- * Setup hooks for Cabal
 
@@ -137,29 +143,33 @@ waylandProtocolHooks cfg = mempty
   }
   <> mempty { configureHooks = mempty { preConfPackageHook = Just bindgenPreConfPackageHook } }
   where
-
-    postConf inputs = void $ writeProtocolInfo (verbosityFromFlags $ fromFlag $ setupVerbosity flags) inputs (flagToMaybe $ setupWorkingDir flags) distPref cfg
-      where
-        distPref = fromFlag $ setupDistPref flags
-        flags = configCommonFlags inputs.packageBuildDescr.configFlags
+    postConf inputs =
+      void $ writeProtocolInfo
+          (verbosityFromFlags $ fromFlag $ setupVerbosity flags) inputs
+          (flagToMaybe $ setupWorkingDir flags) distPref cfg
+        where distPref = fromFlag $ setupDistPref flags
+              flags    = configCommonFlags inputs.packageBuildDescr.configFlags
 
 preBuildComponent :: PreBuildComponentRules
-preBuildComponent = rules (static ()) $ \inputs -> mdo
-  specs <- waylandProtocolRules inputs specs
-  mkBindGenRules specs inputs
+preBuildComponent = rules (static ()) preBuildComponent'
 
-waylandProtocolRules
-  :: PreBuildComponentInputs
-  -> [(HsBindGen, [Dependency])] -- fixed-point
-  -> RulesM [(HsBindGen, [Dependency])]
-waylandProtocolRules pbci dict = do
-  pi <- liftIO $ readProtocolInfo v (buildingWhatWorkingDir pbci.buildingWhat) (buildingWhatDistPref pbci.buildingWhat)
-  liftM2 (++) (mkBindRules pbci dict pi.infoExtras) (protoRules pi)
+preBuildComponent' :: PreBuildComponentInputs -> RulesM ()
+preBuildComponent' inputs
+  | CLib{} <- inputs.targetInfo.targetComponent = mdo
+      specs <- waylandProtocolRules inputs
+      mkBindGenRules' specs inputs
+  | otherwise = return ()
+
+waylandProtocolRules :: PreBuildComponentInputs -> RulesM [(HsBindGen, [Dependency])]
+waylandProtocolRules pbci = do
+  pinfo <- liftIO $ readProtocolInfo v (buildingWhatWorkingDir pbci.buildingWhat) (buildingWhatDistPref pbci.buildingWhat)
+  xs <- protoRules pinfo
+  return $ [ (x, []) | x <- pinfo.infoExtras ] <> xs
   where
     v = verbosityFromFlags $ buildingWhatVerbosity pbci.buildingWhat
 
-    protoRules pi = do
-      bgens <- forM pi.infoFound $ protocolRules pbci pi
+    protoRules pinfo = do
+      bgens <- forM pinfo.infoFound $ protocolRules pbci pinfo
       return $ mconcat bgens
 
 -- ** ProtocolInfo file
@@ -175,6 +185,7 @@ data ProtocolInfo = ProtocolInfo
 
 type ProtoFound = (ProtocolSpec, FilePath, SymbolicPath Pkg File, Protocol)
 
+localProtocolInfoFile :: SymbolicPath a (Dir b) -> SymbolicPath a (Dir c)
 localProtocolInfoFile dist = dist </> makeRelativePathEx "bindgen-info.data"
 
 writeProtocolInfo
@@ -236,17 +247,19 @@ preConfPackage inp@PreConfPackageInputs{configFlags=flags, localBuildConfig=lbc}
 preConfComponent :: HasCallStack => PreConfComponentHook
 preConfComponent inputs
   | CLib lib <- inputs.component = do
-      pi <- readProtocolInfo verb workDir distPref
-      let specs = pi.infoFound & map (^._1)
-      let bindgenSpecs = pi.infoExtras ++ concatMap (\s -> M.elems s.bindGens) specs
+      pinfo <- readProtocolInfo verb workDir distPref
+      let specs        = pinfo.infoFound & map (^._1)
+      let bindgenSpecs = pinfo.infoExtras ++ concatMap (\s -> M.elems s.bindGens) specs
       outputs <- bindgenPreConfComponentHook bindgenSpecs inputs
-      return $ (noPreConfComponentOutputs inputs) { componentDiff = ComponentDiff (doLib lib specs) <> outputs.componentDiff }
+      return $ (noPreConfComponentOutputs inputs)
+        { componentDiff = ComponentDiff (doLib lib specs) <> outputs.componentDiff }
   | otherwise = return (noPreConfComponentOutputs inputs)
   where
     autogen  = distPref </> makeRelativePathEx "build" </> makeRelativePathEx "autogen"
     distPref = fromFlag $ setupDistPref $ configCommonFlags inputs.packageBuildDescr.configFlags
-    workDir = flagToMaybe $ setupWorkingDir $ configCommonFlags inputs.packageBuildDescr.configFlags
-    verb = verbosityFromFlags $ fromFlag $ setupVerbosity $ configCommonFlags inputs.packageBuildDescr.configFlags
+    workDir  = flagToMaybe $ setupWorkingDir $ configCommonFlags inputs.packageBuildDescr.configFlags
+    verb     = verbosityFromFlags $ fromFlag inputs.packageBuildDescr.configFlags.configCommonFlags.setupVerbosity
+
     doLib lib specs = CLib $ mempty
       & Lib.exposedModules  <>~ map snd (filter fst mods)
       & BI.otherModules     <>~ map snd (filter (not . fst) mods)
@@ -265,11 +278,12 @@ preConfComponent inputs
 installHook :: InstallComponentHook
 installHook inputs@InstallComponentInputs{localBuildInfo=lbi} = do
   -- binding specs (generated)
-  copy (Just buildFP, makeSymbolicPath installDirs.libdir) (makeRelativePathEx "binding-specs/*.yaml")
+  copy (Just (unsafeCoerceSymbolicPath from), makeSymbolicPath installDirs.libdir) ( makeRelativePathEx "binding-specs/*.yaml")
   -- protocol XML TODO
   where
     v = verbosityFromFlags $ fromFlag $ setupVerbosity inputs.copyFlags.copyCommonFlags
     copy = installFileGlob v CabalSpecV3_0 (mbWorkDirLBI lbi)
+    from = autogenPackageModulesDir lbi
     buildFP = makeSymbolicPath $ interpretSymbolicPathLBI lbi $ buildDir lbi
     installDirs = absoluteComponentInstallDirs lbi.localBuildDescr.packageBuildDescr.localPkgDescr lbi
       inputs.targetInfo.targetCLBI.componentUnitId (fromFlag inputs.copyFlags.copyDest)
@@ -296,13 +310,13 @@ protocolRules
   -> ProtocolInfo
   -> ProtoFound -- ^ Target protocol
   -> RulesM [(HsBindGen, [Dependency])] -- ^ [bindgen + deps]
-protocolRules inputs@PreBuildComponentInputs{buildingWhat=what, localBuildInfo=lbi} pi found@(spec, xmlFP, _, proto) = do
+protocolRules inputs@PreBuildComponentInputs{buildingWhat=what, localBuildInfo=lbi} pinfo found@(spec, xmlFP, _, proto) = do
     addRuleMonitors $ monitorFileHashedSearchPath [] xmlFP
 
     let resolvedDeps = do
           x <- getProtocolInterfaceDeps proto ++ spec.dependsOn
-          let as = [ s | (s, _, _, p) <- pi.infoFound, x `elem` [ y.name | y <- p.interfaces ] ]
-              bs = [ s | (xs, s) <- pi.infoDeps, x `elem` xs ]
+          let as = [ s | (s, _, _, p) <- pinfo.infoFound, x `elem` [ y.name | y <- p.interfaces ] ]
+              bs = [ s | (xs, s) <- pinfo.infoDeps, x `elem` xs ]
           case (as, bs) of
             (r:_,_) -> [(x, r)]
             (_,r:_) -> [(x, r)]
@@ -330,7 +344,7 @@ protocolRules inputs@PreBuildComponentInputs{buildingWhat=what, localBuildInfo=l
     _ <- genWrapperRule @Server inputs spec resolvedDeps Proxy
 
     return
-      [ (resolveDeps pi spec comp <> bgen, ruleDeps)
+      [ (resolveDeps pinfo spec comp <> bgen, ruleDeps)
         | (comp, bgen) <- spec ^. bindGens . to M.toList
         , let ruleDeps = [ RuleDependency dep | (dep, loc) <- headerRules, any (checkLocation loc) bgen.headers ]
       ]
@@ -587,7 +601,7 @@ genWrapperAction env@GenWrapModArgs{..} = do
       [ (True,  _BINDS ++ ".FunPtr", "FunPtr") | fromFlagOrDefault True bg.hasPointer ] ++
       [ (True, prettyShow mo, ifn) | (ifn, mods) <- protoDeps, mo <- mods ]
 
-    renderImport (qual, name, as) = "import " ++ (if qual then "qualified " else "") ++ name ++ " as " ++ (if as == "" then name else as)
+    renderImport (qual, na, as) = "import " ++ (if qual then "qualified " else "") ++ na ++ " as " ++ (if as == "" then na else as)
       -- ppDep (ifname, mods) = unlines [ [iii|import qualified #{prettyShow mo} as #{ifname}|] | mo <- mods ]
 
 wrapperContent :: GenWrapModArgs -> String
@@ -644,7 +658,7 @@ registerProtocolsFileGlob v lax mbWorkDir dir pat f = do
       Just newConf -> do
         res <- optionalProtocol (Just protoId) $ newConf & protocolDirs <>~ [dir]
         case res of
-          Right res -> liftIO . infoNoWrap v $ "Included protocol " ++ prettyShow protoId ++ " (" ++ prettyShow xmlFP ++ ")"
+          Right{} -> liftIO . infoNoWrap v $ "Included protocol " ++ prettyShow protoId ++ " (" ++ prettyShow xmlFP ++ ")"
           Left err -> unless lax $ liftIO $ die' v err
 
 -- | Register some 'HsBindGen'.
@@ -679,19 +693,14 @@ dynamicProtocols st scanM = mdo
   let cfgs = finalState.protocolConfigs
       opts = finalState.scannerOptions
   specs <- fmap (M.mapKeys (.name)) $ flip M.traverseWithKey cfgs $ \k cfg -> do
-    return (M.singleton k (interpretProtocolConfig opts specs cfg))
+    return (M.singleton k (interpretProtocolConfig opts cfg))
   return (opts, specs ^.. each . each, finalState.otherBindGen)
   where
     initialState = State mempty def []
     run = flip State.runStateT initialState . flip Reader.runReaderT st . runScannerT
 
-interpretProtocolConfig
-  :: HasCallStack
-  => ProtocolScannerOptions
-  -> M.Map String (M.Map ProtocolId ProtocolSpec)
-  -> ProtocolConfig
-  -> ProtocolSpec
-interpretProtocolConfig o specs c' = spec
+interpretProtocolConfig :: HasCallStack => ProtocolScannerOptions -> ProtocolConfig -> ProtocolSpec
+interpretProtocolConfig o c' = spec
   where
     spec = c { bindGens = M.fromList [ (k, binds k) | k <- bindgenComponents, k `Set.member` c.computedComponents ] }
       & computedModuleNames <>~ M.fromList [ (k, getModName spec k) | k <- allComponents ]
@@ -746,12 +755,12 @@ interpretProtocolConfig o specs c' = spec
       _ -> x
 
 resolveDeps :: ProtocolInfo -> ProtocolSpec -> ProtoComponent -> HsBindGen
-resolveDeps pi spec k = mconcat [ solveDep d | d <- spec.dependsOn ]
+resolveDeps pinfo spec k = mconcat [ solveDep d | d <- spec.dependsOn ]
   where
     solveDep :: HasCallStack => String -> HsBindGen
     solveDep x
-      | r : _ <- [ s | (s,_,_,p) <- pi.infoFound, x == s.fullName ] = protoAddDependent r k mempty
-      | (_, r) : _ <- pi.infoDeps, r.fullName == x = protoAddDependent r k mempty
+      | r : _ <- [ s | (s,_,_,_) <- pinfo.infoFound, x == s.fullName ] = protoAddDependent r k mempty
+      | (_, r) : _ <- pinfo.infoDeps, r.fullName == x = protoAddDependent r k mempty
       | otherwise = error $ "Could not resolve: " ++ show x ++ " for " ++ spec.fullName
 
 -- | Makes the first protocol a requirement for the second. References to the first in the second are resolved to the
@@ -764,14 +773,14 @@ protoAddDependent :: HasCallStack
 protoAddDependent dep comp = \x -> x
     & headers %~ L.nub . (<> hdrs comp)
     & excludeHeaders <>~ toPCRE (hdrs comp)
-    & extBindingSpecs <>~ [ x | x@BModule{} <- dep ^.. bindGens . ix comp . extBindingSpecs . folded ]
+    & extBindingSpecs <>~ [ mo | mo@BModule{} <- dep ^.. bindGens . ix comp . extBindingSpecs . folded ]
     & extBindingSpecs <>~ [ getSpec dep comp ]
     & extBindingSpecs %~ L.nub
   where
     hdrs k = dep ^.. bindGens . ix k . headers . folded
-    getSpec dep k = BModule
-        (dep ^?! bindGens . ix k . moduleName . to fromFlag)
-        (dep ^?! bindGens . ix k . bindingSpec . to getSpec')
+    getSpec x k = BModule
+        (x ^?! bindGens . ix k . moduleName . to fromFlag)
+        (x ^?! bindGens . ix k . bindingSpec . to getSpec')
     getSpec' x = case x of
       Flag (GenerateBSpec (Just loc)) -> Just $ takeDirectorySymbolicPath $ location loc
       _                               -> Nothing

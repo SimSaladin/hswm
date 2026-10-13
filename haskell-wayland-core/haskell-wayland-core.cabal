@@ -96,3 +96,23 @@ library
 
     if flag(build-tool-depends)
        build-tool-depends: hs-bindgen:hs-bindgen-cli
+
+test-suite spec
+    import: language
+    type: exitcode-stdio-1.0
+    other-modules:
+          Paths_haskell_wayland_core
+          Wayland.UtilSpec
+    autogen-modules:
+          Paths_haskell_wayland_core
+    build-depends:
+          base
+        , data-default
+        , hspec
+        , hs-bindgen-runtime   >=0.1.0  && <0.2
+        , haskell-wayland-core
+    build-tool-depends:
+        hspec-discover:hspec-discover
+    main-is: Spec.hs
+    hs-source-dirs: tests
+    ghc-options: -threaded -with-rtsopts=-N

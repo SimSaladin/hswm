@@ -11,23 +11,25 @@
 -- Portability : unportable
 --
 module Distribution.HsBindgen.Utils
-  -- * Verbosity
+  -- * Cabal verbosity plumbing
   ( VerbosityFlags
   , makeVerbose
   , verbosityFromFlags
   , verbosityLevelInt
   -- * Misc.
-  , getPkgConfDataDir
   , configurePrograms
-  , makeLenses'
+  , getPkgConfDataDir
   , ToLocation(..)
+  , makeLenses'
   -- * Re-exports
+  -- ** JSON tools
   , A.decode
   , A.aesonQQ
   , A.parseJSON
   , A.fromJSON
   , A.Result(..)
   , A.Value
+  -- ** Lens library
   , module Lens.Micro
   ) where
 

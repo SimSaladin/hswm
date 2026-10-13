@@ -597,6 +597,7 @@
           "yaml".components.library.planned = lib.mkOverride 900 true;
           "enummapset".components.library.planned = lib.mkOverride 900 true;
           "time".components.library.planned = lib.mkOverride 900 true;
+          "haskell-wayland-core".components.tests."spec".planned = lib.mkOverride 900 true;
           "primitive".components.library.planned = lib.mkOverride 900 true;
           "ghc-bignum".components.library.planned = lib.mkOverride 900 true;
           "blaze-html".components.library.planned = lib.mkOverride 900 true;

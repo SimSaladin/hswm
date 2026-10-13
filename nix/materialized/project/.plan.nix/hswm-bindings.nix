@@ -90,7 +90,7 @@
             (hsPkgs.pkgsBuildBuild.hspec-discover.components.exes.hspec-discover or (pkgs.pkgsBuildBuild.hspec-discover or (errorHandler.buildToolDepError "hspec-discover:hspec-discover")))
           ];
           buildable = true;
-          modules = [ "Paths_hswm_bindings" "Wayland/UtilSpec" ];
+          modules = [ "Paths_hswm_bindings" ];
           hsSourceDirs = [ "tests" ];
           mainPath = [ "Spec.hs" ];
         };

@@ -20,21 +20,21 @@ import           Lens.Micro.GHC ()
 
 setupHooks :: SetupHooks
 setupHooks = waylandProtocolHooks $ do
+  -- bindings to wayland-util.h
   registerBindGen $ newHsBindGen "WL.Util.Generated" [ makeHeader "wayland-util.h" ]
     & genGlobal .~ pure False
     & selectFromMainHeaderDirs .~ pure True
     & excludeDecls <>~ "wl_log_func_t"
 
-  modifyOptions $ optionProtocolDirs <>~ [ makeSymbolicPath "protocols" ]
-
+  -- the wayland.xml protocol
   void $ makeProtocol $ "wayland.xml"
+      & protocolDirs <>~ [ makeSymbolicPath "protocols" ]
       & category .~ "core"
       & stability .~ Stable
       & disabled <>~ [ WrapClient, WrapServer ]
       & bindGens . each . bcBindGen . dependsOn <>~ [ "WL.Util.Generated" ]
       & bindGens . ix ClientBindings %~ baseClient
       & bindGens . ix ServerBindings %~ baseServer
-
 
 baseClient :: BindConfig -> BindConfig
 baseClient c = c

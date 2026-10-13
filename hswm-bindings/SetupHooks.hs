@@ -10,16 +10,12 @@
 module SetupHooks (setupHooks) where
 
 import           Distribution.HsBindgen.Hooks
-import qualified Distribution.HsBindgen.Types as I
 import           Distribution.Wayland.Hooks
 import           Distribution.Wayland.ProtocolXML
 
-import qualified Data.List as L
-import           Distribution.CabalSpecVersion
 import           Distribution.Package
 import           Distribution.Simple.Configure
 import           Distribution.Simple.Flag
-import           Distribution.Simple.Glob
 import           Distribution.Simple.PackageIndex hiding (fromList)
 import           Distribution.Simple.Setup (setupWorkingDir)
 import           Distribution.Simple.SetupHooks (PostConfPackageInputs(..), SetupHooks,
@@ -28,14 +24,12 @@ import           Distribution.Simple.Utils
 import           Distribution.Types.GivenComponent
 import qualified Distribution.Types.InstalledPackageInfo as PI
 import           Distribution.Types.LocalBuildConfig
-import           Distribution.Types.PackageName
-import           Distribution.Types.UnitId
 import           Distribution.Utils.Path
 import           Distribution.Verbosity
 
-import           Data.Maybe (fromMaybe)
 import           Control.Monad
-import           GHC.Exts (coerce, fromList)
+import qualified Data.List as L
+import           Data.Maybe (fromMaybe)
 
 import qualified WL.Core.Internal as Core
 
@@ -44,7 +38,7 @@ setupHooks = waylandProtocolHooks config
 
 -- Selected standard protocols
 isEnabled :: ProtocolId -> Bool
-isEnabled ProtocolId{name} = name `elem`
+isEnabled pro = pro.name `elem`
   ([ "viewporter"
   , "xdg-shell"
   , "ext-idle-notify"
@@ -63,59 +57,59 @@ config = do
 
   let v = verbosityFromFlags verbose
 
-  -- Hide deprecated declarations in wayland server bindings
-  modifyOptions $ optionCustom <>~ Endo (bindGens . ix ServerBindings . bcBindGen . defineMacros . at "WL_HIDE_DEPRECATED" ?~ "1")
-
-  -- Configure dependency on wayland-util.h
-  modifyOptions $ optionCustom <>~ Endo (qualifiedImports <>~ [ ("WL.Util", "WL.Util") ])
-
-  -- So that the core bindings are loaded first always...
-  modifyOptions $ optionCustom <>~ Endo (dependsOn <>~ ["wl_display"])
+  modifyOptions $ optionCustom <>~
+    Endo (bindGens . ix ServerBindings . bcBindGen . defineMacros . at "WL_HIDE_DEPRECATED" ?~ "1") <> -- Hide deprecated declarations in wayland server bindings
+    Endo (qualifiedImports <>~ [ ("WL.Util", "WL.Util") ]) <>            -- Configure dependency on wayland-util.h
+    Endo (dependsOn <>~ ["wl_display"])                                  -- So that the core bindings are loaded first always...
 
   -- Inject known interface info as needed include dirs from cabal dependencies
-  deps <- getDependencies v
-  forM_ deps $ \pkg -> case packageName pkg of
-    "haskell-wayland-core" -> do
-        let incdirs = map makeSymbolicPath pkg.includeDirs
-        let specdir = let d : _ = pkg.importDirs in makeSymbolicPath @Pkg @(Dir Source) (d </> "binding-specs")
-        let proto   = Core.protocol -- XXX from haskell import
-        let spec    = setBindgenDir specdir Core.protocolSpec -- XXX from haskell import
-        liftIO $ print (PI.installedUnitId pkg, incdirs, specdir)
-        -- Inject include dirs + protocol dependency info
-        modifyOptions $ optionCustom <>~ Endo (bindGens . each . bcBindGen . includeDirs <>~ incdirs)
-        modifyOptions $ interfaceProtocols <>~ [(map (.name) proto.interfaces, spec)]
-    _ -> error $ "no imports: " ++ show (packageName pkg)
-
-  -- Settings for specific protocols
-  modifyOptions $ optionCustom <>~ onlyIfName "linux-dmabuf"        (coreOnly .~ False)
-  modifyOptions $ optionCustom <>~ onlyIfName "single-pixel-buffer" (coreOnly .~ False)
-  modifyOptions $ optionCustom <>~ onlyIfName "input-method"        (coreOnly .~ False)
+  getDependencies v [ "haskell-wayland-core" ] $ \pkg -> do
+    let specdir =
+          let d : _ = pkg.importDirs
+           in makeSymbolicPath @Pkg @(Dir Source) (d </> "binding-specs")
+    -- Inject protocol dependency info
+    case packageName pkg of
+      "haskell-wayland-core" -> do
+          let ifaceNames = map (.name) Core.protocol.interfaces -- XXX from haskell import
+          let spec       = setBindgenDir specdir Core.protocolSpec -- XXX from haskell import
+          liftIO $ print (PI.installedUnitId pkg, specdir)
+          modifyOptions $ interfaceProtocols <>~ [(ifaceNames, spec)]
+      _ -> error $ "unhandled dependency: " ++ show (packageName pkg)
 
   -- Discovered wayland-protocols via pkg-config
   Just (AbsolutePath dir) <- withLBC $ \lbc -> liftIO $ getPkgConfDataDir v lbc.withPrograms "wayland-protocols"
-  registerProtocolsFileGlob v True Nothing dir "**/*.xml" $ \k v -> do
-    guard $ isEnabled k
-    return v
-
-  setup <- ask
+  registerProtocolsFileGlob v True Nothing dir "**/*.xml" $ \key val -> do
+    guard $ isEnabled key
+    return $ val & case key.name of
+        -- Settings for specific protocols
+        "linux-dmabuf"        -> coreOnly .~ False
+        "single-pixel-buffer" -> coreOnly .~ False
+        "input-method"        -> coreOnly .~ False
+        _ -> id
 
   -- Local files
+  setup <- ask
   let wd = flagToMaybe setup.packageBuildDescr.configFlags.configCommonFlags.setupWorkingDir
-  registerProtocolsFileGlob v False wd (makeSymbolicPath "protocol") "*.xml" $ \key val ->
-    Just $ case () of
-      _ | "river-" `L.isPrefixOf` val.fullName -> val
-                & stability .~ Stable
-                & category .~ "river"
-                & baseName %~ fromMaybe val.baseName . L.stripPrefix "river-"
-      _ | "wlr-" `L.isPrefixOf` val.fullName -> val
-                & category .~ "wlr"
-                & baseName %~ fromMaybe val.baseName . L.stripPrefix "wlr-"
-        | otherwise -> val
+  registerProtocolsFileGlob v False wd (makeSymbolicPath "protocol") "*.xml" $ \_key val -> Just $ case () of
+      _ | "river-" `L.isPrefixOf` val.fullName -> val & category .~ "river" & baseName %~ fromMaybe val.baseName . L.stripPrefix "river-" & stability .~ Stable
+      _ | "wlr-"   `L.isPrefixOf` val.fullName -> val & category .~ "wlr"   & baseName %~ fromMaybe val.baseName . L.stripPrefix "wlr-"
+      _ -> val
 
-getDependencies v = do
+getDependencies :: Verbosity -> [PackageName] -> (PI.InstalledPackageInfo -> DynamicSetup ()) -> DynamicSetup ()
+getDependencies v required f = do
   setup <- ask
   index <- liftIO $ getInstalledPackages v setup.packageBuildDescr.compiler Nothing setup.packageBuildDescr.withPackageDB setup.localBuildConfig.withPrograms
-  let Left index' = dependencyClosure index $ map (newSimpleUnitId . givenComponentId) setup.packageBuildDescr.configFlags.configDependencies
-  return $ filter selector $ reverseTopologicalOrder index'
+  let index'   = either id (error "index not found") $ dependencyClosure index $ map (newSimpleUnitId . givenComponentId) setup.packageBuildDescr.configFlags.configDependencies
+      result   = filter selector $ reverseTopologicalOrder index'
+      notFound = [ k | k <- required, notElem k $ map packageName result ]
+  when (notFound /= []) $
+    liftIO $ die' v $ "could not find requested packages: " ++ show notFound
+  forM_ result $ \pkg -> do
+    -- Inject include dirs
+    let incdirs = map makeSymbolicPath pkg.includeDirs
+    modifyOptions $ optionCustom <>~ Endo (bindGens . each . bcBindGen . includeDirs <>~ incdirs)
+    liftIO $ print (PI.installedUnitId pkg, incdirs)
+    -- other
+    f pkg
   where
-    selector pkg = packageName pkg == "haskell-wayland-core"
+    selector pkg = packageName pkg `elem` required

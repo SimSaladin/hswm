@@ -106,7 +106,6 @@ test-suite spec
     type: exitcode-stdio-1.0
     other-modules:
           Paths_hswm_bindings
-          Wayland.UtilSpec
     autogen-modules:
           Paths_hswm_bindings
     build-depends:

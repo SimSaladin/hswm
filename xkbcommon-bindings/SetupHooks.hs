@@ -7,8 +7,6 @@
 {-# LANGUAGE OverloadedStrings        #-}
 {-# LANGUAGE StaticPointers           #-}
 {-# LANGUAGE DisambiguateRecordFields #-}
-
-
 {-# OPTIONS_GHC -Wall #-}
 
 module SetupHooks (setupHooks) where

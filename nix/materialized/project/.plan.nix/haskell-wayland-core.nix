@@ -75,5 +75,23 @@
         ];
         hsSourceDirs = [ "src" ];
       };
+      tests = {
+        "spec" = {
+          depends = [
+            (hsPkgs."base" or (errorHandler.buildDepError "base"))
+            (hsPkgs."data-default" or (errorHandler.buildDepError "data-default"))
+            (hsPkgs."hspec" or (errorHandler.buildDepError "hspec"))
+            (hsPkgs."hs-bindgen-runtime" or (errorHandler.buildDepError "hs-bindgen-runtime"))
+            (hsPkgs."haskell-wayland-core" or (errorHandler.buildDepError "haskell-wayland-core"))
+          ];
+          build-tools = [
+            (hsPkgs.pkgsBuildBuild.hspec-discover.components.exes.hspec-discover or (pkgs.pkgsBuildBuild.hspec-discover or (errorHandler.buildToolDepError "hspec-discover:hspec-discover")))
+          ];
+          buildable = true;
+          modules = [ "Paths_haskell_wayland_core" "Wayland/UtilSpec" ];
+          hsSourceDirs = [ "tests" ];
+          mainPath = [ "Spec.hs" ];
+        };
+      };
     };
   } // rec { src = pkgs.lib.mkDefault ../haskell-wayland-core; }
