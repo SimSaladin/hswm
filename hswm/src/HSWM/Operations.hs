@@ -270,11 +270,13 @@ modifyOutput :: SomeOutput a => a -> (Output -> Output) -> HS ()
 modifyOutput k f = outputList . eachRiverId k %= f
 
 setOutputPower :: Bool -> HS ()
-setOutputPower mode = use outputList >>= traverseOf_ (each . outputPower . filtered (/= def)) f
+setOutputPower mode = use outputList >>= traverseOf_ (each . filtered ((/= def) . outputPower)) f
   where
-    f power = do
-      logInfo $ "setting output power" :# [ "on" .= mode ]
-      WLR_OPM.outputPowerSetMode power (if mode then WLR_OPM.OutputPowerModeOn else WLR_OPM.OutputPowerModeOff)
+    f output = do
+      logInfo $ "Setting output power" :# [ "on" .= mode, "output" .= output.river_output, "opmId" .= output.outputPower ]
+      WLR_OPM.outputPowerSetMode output.outputPower $
+        if mode then WLR_OPM.OutputPowerModeOn
+                else WLR_OPM.OutputPowerModeOff
 
 --------------------------------------------------------------
 -- * Seats
@@ -390,121 +392,3 @@ restart prog = do
 -- | Trigger restart by signal (USR2).
 sendRestart :: MonadIO m => m ()
 sendRestart = io $ Posix.raiseSignal Posix.sigUSR2
-
-data StateData = StateData
-  { sfWins :: W.StackSet WorkspaceId String (IntPtr, String) WorkspaceDetail ScreenId ScreenDetail,
-    sfExt :: [(String, String)]
-  }
-  deriving (Show, Read)
-
-writeStateToFile :: HS FilePath
-writeStateToFile = do
-    dir <- getStateDirectory
-    ts  <- getTimeStamp
-    stateString <- dumpStateAsString
-    let stateFileName = printf "savedstate-%i" ts
-        stateFP  = dir ++ "/" ++ stateFileName
-        linkFP   = dir ++ "/" ++ "savedstate"
-        update = do
-          writeFile stateFP stateString
-          isLink <- pathIsSymbolicLink linkFP
-          exists <- doesFileExist linkFP
-          when (isLink || exists) $ removeFile linkFP
-          createFileLink stateFileName linkFP
-        cleanup = do
-          contents <- listDirectory dir
-          forM_ contents $ \file ->
-            when ("savedstate-" `L.isPrefixOf` FP.takeFileName file) $ do
-              res <- try @_ @IOException $ systemSeconds . utcToSystemTime <$> getModificationTime file
-              case res of
-                Right mtime | mtime < ts - (60 * 60 * 12) -> removeFile file
-                            | otherwise -> return ()
-                Left e
-                  -- try to remove anyway, it might be a broken symlink
-                  | isDoesNotExistError e -> void $ try @_ @IOException $ removeFile file
-                  | otherwise -> throwIO e
-
-    io $ catchIO update (hPrint stderr)
-    logInfo $ "Wrote current WM state to disk" :# [ "state-file" .= stateFP ]
-    io $ catchIO cleanup (hPrint stderr)
-    return stateFP
-  where
-    getTimeStamp :: MonadIO m => m Int64
-    getTimeStamp = systemSeconds <$> io getSystemTime
-
-dumpStateAsString :: HS String
-dumpStateAsString = do
-  let wsData s = W.mapLayout show $ W.mapWindow winIdent $ s.windowset
-        where
-          winIdent w
-            | Just win <- L.find (\x -> x.river_window == w) s._windows = (rwToIntPtr w, win.identifier)
-            | otherwise = (rwToIntPtr w, "")
-  let maybeShow (t, Right (PersistentExtension ext)) = Just (t, show ext)
-      maybeShow (t, Left str) = Just (t, str)
-      maybeShow _ = Nothing
-      extState = mapMaybe maybeShow . M.toList . view extensibleState
-  stateData <- gets $ \s -> StateData (wsData s) (extState s)
-  return $! show stateData
-  where
-    rwToIntPtr (R.RiverWindow w) = ptrToIntPtr w
-
--- | Read the state of a previous xmonad instance from a file and
--- return that state.  The state file is removed after reading it.
-readStateFile
-  :: forall m l m2. (MonadUnliftIO m, MonadLogger m, LayoutClass l RiverWindow, Read (l RiverWindow))
-  => Maybe FilePath
-  -> HSWMConfig m2 l
-  -> m (Maybe HState)
-readStateFile msf xmc = do
-  sfile <- maybe getDefFile return msf
-  exists <- doesFileExist sfile
-  if exists then doIt sfile else return Nothing
-  where
-    doIt :: FilePath -> m (Maybe HState)
-    doIt path = do
-      -- I'm trying really hard here to make sure we read the entire
-      -- contents of the file before it is removed from the file system.
-      res <- try @_ @SomeException $ do
-        raw <- io $ withFile path ReadMode readStrict
-        return $! maybeRead reads raw
-      case res of
-        Right sf' -> do
-          logInfo $ "Restoring WM state from file" :# [ "statefile" .= path ]
-          return $ do
-            sf <- sf'
-            let wins = W.allWindows (sfWins sf)
-            let winset =
-                  W.ensureTags layout xmc.workspaces $
-                    W.mapLayout (fromMaybe layout . maybeRead lreads) $
-                      W.mapWindow (R.RiverWindow . intPtrToPtr . fst) (sfWins sf)
-                extState = M.fromList . map (second Left) $ sfExt sf
-            return
-              def
-                { windowset = winset
-                , windowsetOld = winset
-                , recoveredWindows = M.fromList [(b, R.RiverWindow $ intPtrToPtr a) | (a, b) <- wins]
-                , extensibleState = extState
-                }
-        Left e -> do
-          logError $ "Failed to restore WM state from file" :# [ "exception" .= show e ]
-          return Nothing
-
-    layout = Layout xmc.layoutHook
-    lreads = readsLayout layout
-
-    getDefFile = do
-        dir <- getStateDirectory
-        return $ dir ++ "/" ++ "savedstate"
-
-    maybeRead reads' s = case reads' s of
-      [(x, "")] -> Just x
-      _         -> Nothing
-
-    readStrict :: Handle -> IO String
-    readStrict h = hGetContents h >>= \s -> length s `seq` return s
-
-getStateDirectory :: MonadIO m => m FilePath
-getStateDirectory = do
-  dir <- getXdgDirectory XdgState "hswm"
-  createDirectoryIfMissing True dir
-  return dir
