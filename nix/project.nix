@@ -1,4 +1,4 @@
-{ inputs, lib, haskellNixModules, cabal-master-hnix, ... }:
+{ self, inputs, lib, haskellNixModules, cabal-master-hnix, ... }:
 
 let
   inherit (inputs.flake-utils.lib) mkApp;
@@ -164,33 +164,20 @@ let
         '';
       };
     };
-in
 
-{
-  flake.overlays.project = final: _: {
-    project = final.haskell-nix.cabalProject' [
-      final.cabalDefaults
-      thisProject
-    ];
-  };
-
-  perSystem = { lib, config, pkgs, project-lib, ... }:
+  customizations.perSystem = { lib, config, pkgs, project-lib, ... }:
     let
       project = pkgs.project;
-      projectFlake = project.flake { };
+      projectFlake = project.flake';
+      projects = [
+        { project = project; key = "project"; }
+        #{ project = pkgs.cabal-master; key = "cabal-plan-nix"; }
+      ];
     in
     {
-      checks = projectFlake.checks;
-
-      apps = projectFlake.apps // {
+      apps = {
         # Note: needs to run with checkMaterialization = false
-        materialized-do = mkMaterializedDoApp {
-          projects = [
-            { project = project; key = "project"; }
-            #{ project = pkgs.cabal-master; key = "cabal-plan-nix"; }
-          ];
-          inherit pkgs project-lib;
-        };
+        materialized-do = mkMaterializedDoApp { inherit projects pkgs project-lib; };
 
         hoogle = mkApp {
           name = "hoogle";
@@ -210,9 +197,9 @@ in
         };
       };
 
-      packages = projectFlake.packages // {
+      packages = {
         default = pkgs.buildEnv {
-          pname = "hswm";
+          pname = "hswm-env";
           version = config.packages."hswm:lib:hswm".version;
           paths = [
             config.packages."hswm:exe:hswm"
@@ -223,19 +210,78 @@ in
         };
       };
 
-      # XXX clean this up
+
       devShells =
         let
-          projectShells = lib.mapAttrs (_: adjustShell "hswm-default") projectFlake.devShells;
+          projectShells = lib.mapAttrs (k: adjustShell "hswm-${k}") projectFlake.devShells;
           pkgShells = perPackageShellsFor pkgs.project;
         in
-        projectShells // pkgShells // {
-          "default:ghc-pkg" = mkGhcPkgShell {
-            inherit (pkgs) project;
-            projectShells = lib.attrValues pkgShells;
-          };
-        };
+        lib.mapAttrs (_: lib.mkForce) projectShells //
+        pkgShells //
+        {
 
-      legacyPackages = { inherit (pkgs) project; };
+          #"default:ghc-pkg" = mkGhcPkgShell {
+          #  inherit (pkgs) project;
+          #  projectShells = lib.attrValues pkgShells;
+          #};
+
+          project-pkgs = adjustedShellFor project ({
+            name = "project-pkgs";
+            #exposePackagesVia = "ghc-pkg";
+            packages = ps: [
+              ps.hswm
+            ];
+            inputsFrom = [
+              #lib.map (drv: drv.overrideAttrs { shellHook = ""; }) (lib.attrValues projectShells);
+            ];
+            #allToolDeps = lib.mkForce false;
+            withHoogle = true;
+            #shellHook = "unset PROMPT_COMMAND";
+          });
+
+          all = adjustedShellFor project ({
+            name = "hswm-deps";
+            #exposePackagesVia = "ghc-pkg";
+            packages = lib.mkForce (_: [ ]);
+            inputsFrom = lib.map (drv: drv.overrideAttrs { shellHook = ""; }) (lib.attrValues projectShells);
+            #allToolDeps = lib.mkForce false;
+            withHoogle = true;
+            #shellHook = "unset PROMPT_COMMAND";
+          });
+        };
+    };
+in
+
+{
+  imports = [
+    customizations
+  ];
+
+  flake.overlays.project = final: _: {
+    project = final.haskell-nix.cabalProject' [
+      final.cabalDefaults
+      thisProject
+    ];
+  };
+
+  flake = {
+  #  inherit (projectFlake) ciJobs hydraJobs;
+  };
+
+  #transposition.ciJobs.adHoc = true;
+  #transposition.hydraJobs.adHoc = true;
+
+  perSystem = { lib, config, pkgs, project-lib, ... }:
+    let
+      project = pkgs.project;
+      projectFlake = project.flake';
+    in
+    {
+      inherit (projectFlake) apps packages devShells checks;
+      #ciJobs hydraJobs;
+
+      legacyPackages = {
+        inherit project projectFlake;
+      };
     };
 }
