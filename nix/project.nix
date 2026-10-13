@@ -4,7 +4,6 @@ let
   inherit (inputs.flake-utils.lib) mkApp;
 
   thisProject = { lib, config, pkgs, evalPackages, ... }: {
-    imports = [ projectSetup ];
     modules = [
       cabal-master-hnix
       haskellNixModules.hs-bindgen
@@ -23,18 +22,24 @@ let
     materialized = pkgs.project-lib.materializedFor "project";
     #nix-tools = pkgs.my-nix-tools; # Using Cabal >= 3.18 tools
 
-    shell.name = config.name;
-    shell.allToolDeps = true;
-    shell.tools.hpack = { };
-    shell.withHaddock = true;
-    shell.withHoogle = true;
-    shell.nativeBuildInputs = [
-      # Use a newer cabal-install binary
-      pkgs.cabal_3_18
-      config.hsPkgs.hs-bindgen.components.exes.hs-bindgen-cli
-    ];
+    shell = {
+      name = config.name;
+      tools.hpack = { };
+      allToolDeps = true;
+      withHaddock = true;
+      withHoogle = true;
+      nativeBuildInputs = [
+        # Use a newer cabal-install binary
+        pkgs.cabal_3_18
+        config.hsPkgs.hs-bindgen.components.exes.hs-bindgen-cli
+      ];
+    };
 
     flake = {
+      variants.hls = {
+        shell.tools.haskell-language-server = { };
+        flake.packages = _: { }; # hide package outputs
+      };
       # Using the haskell.nix V1 builder
       variants.BuilderV1 = {
         builderVersion = lib.mkForce 1;
@@ -56,16 +61,6 @@ let
     "waybar-cffi-hs"
     "xkbcommon-bindings"
   ];
-
-  projectSetup = { lib, config, pkgs, ... }:
-    let
-      haskellLib = pkgs.haskell-nix.haskellLib;
-      myHaskellPackages = haskellLib.selectProjectPackages config.hsPkgs;
-    in
-    {
-      #shell.packages = ps: lib.attrValues (haskellLib.selectProjectPackages ps);
-      #shell.buildInputs = [ myHaskellPackages."haskell-wayland-core-0.1.0.0-inplace".components.library ];
-    };
 
   hsNixModule = { config, pkgs, ... }:
     {
@@ -216,6 +211,7 @@ let
           projectShells = lib.mapAttrs (k: adjustShell "hswm-${k}") projectFlake.devShells;
           pkgShells = perPackageShellsFor pkgs.project;
         in
+
         lib.mapAttrs (_: lib.mkForce) projectShells //
         pkgShells //
         {
@@ -264,13 +260,6 @@ in
     ];
   };
 
-  flake = {
-  #  inherit (projectFlake) ciJobs hydraJobs;
-  };
-
-  #transposition.ciJobs.adHoc = true;
-  #transposition.hydraJobs.adHoc = true;
-
   perSystem = { lib, config, pkgs, project-lib, ... }:
     let
       project = pkgs.project;
@@ -278,10 +267,6 @@ in
     in
     {
       inherit (projectFlake) apps packages devShells checks;
-      #ciJobs hydraJobs;
-
-      legacyPackages = {
-        inherit project projectFlake;
-      };
+      legacyPackages = { inherit project projectFlake; };
     };
 }
