@@ -43,6 +43,9 @@ added rs = do
         & xkbBindingsSeat .~ xbs
   runInHS $ seatList %= (<> [seat])
 
+-- | Bind the Wl_seat interface of a river_seat as well.
+--
+-- Currently this will also request idle notifications via ext-idle-notify-v1.
 hasWlSeat :: RiverSeat -> WL.ObjectName -> H ()
 hasWlSeat seat name = do
     wls   <- bindGlobalName @WL.Seat name Nothing
@@ -64,9 +67,6 @@ deleteRemovedSeat s = do
   io $ R.objectDestroy s.wlTouch
   io $ R.objectDestroy s.wl_seat
   io $ R.objectDestroy s.river_seat
-
-modifySeat' :: Ptr Void -> (Seat -> Seat) -> HS ()
-modifySeat' ud = modifySeat (R.RiverSeat $ castPtr ud)
 
 -- * Events
 
@@ -171,16 +171,6 @@ handlePointerEvent = \case
 ---------------------------------------------------------
 
 -- * Manage
-
--- XXX: also set XCURSOR_THEME= ? XCURSOR_PATH= ?
-setXCursorTheme :: (MonadIO m, MonadReader HConf m) => RiverSeat -> m ()
-setXCursorTheme rs = do
-  theme <- view (config . cursorTheme)
-  sz <- view (config . cursorSize)
-  case (theme, sz) of
-    ("" , _) | sz > 1 -> R.riverSeatSetXcursorTheme rs Nothing sz
-    (_:_, _) | sz > 1 -> R.riverSeatSetXcursorTheme rs (Just theme) sz
-    _                 -> pure ()
 
 manage :: H ()
 manage = runInHS $ use seatList >>= mapM_ manage1
@@ -330,6 +320,16 @@ seatPointerResize sid w edges = do
         op_dx = 0,
         op_dy = 0
       }
+
+-- | XXX: also set XCURSOR_THEME= ? XCURSOR_PATH= ?
+setXCursorTheme :: (MonadIO m, MonadReader HConf m) => RiverSeat -> m ()
+setXCursorTheme rs = do
+  theme <- view (config . cursorTheme)
+  sz <- view (config . cursorSize)
+  case (theme, sz) of
+    ("" , _) | sz > 1 -> R.riverSeatSetXcursorTheme rs Nothing sz
+    (_:_, _) | sz > 1 -> R.riverSeatSetXcursorTheme rs (Just theme) sz
+    _                 -> pure ()
 
 ---------------------------------------------------------
 

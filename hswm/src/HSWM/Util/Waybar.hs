@@ -19,7 +19,7 @@ data WaybarConfig = WaybarConfig { command :: FilePath, args :: [String] }
   deriving (Show, Eq, Generic)
 
 instance Default WaybarConfig where
-  def = WaybarConfig "waybar" []
+  def = WaybarConfig "waybar" [ "-l", "warning" ]
 
 newtype WaybarState = WaybarState { wbProcess :: Maybe (Process () (Async ()) (Async ())) }
   deriving (Show, Generic)

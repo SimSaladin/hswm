@@ -5,6 +5,7 @@ module Main (main) where
 
 import           HSWM.IPC
 
+import           Control.Monad.Reader
 import qualified Data.Aeson as A
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.Text.Lazy as TL
@@ -14,34 +15,28 @@ import           Options.Generic
 import           Prettyprinter
 import           Prettyprinter.Render.Terminal
 import           System.Console.Haskeline
---import           System.Console.Haskeline.Internal (mapReaderT)
 import           System.Console.Haskeline.ReaderT
-import Control.Monad.Reader
 
 type CM = InputT (LoggingT IO)
 
 main :: IO ()
 main = runInputT defaultSettings $ do
   printExt <- getExternalPrint
-  let logFun loc src lv s = do
-          t <- getCurrentTime
-          let logStrBS = fromLogStr $ defaultLogStr t mempty loc src lv s
-              msg      = A.decodeStrict @LoggedMessage logStrBS
-          whenJust msg $ printExt . TL.unpack . renderLazy . layoutPretty defaultLayoutOptions . prettyLogMsg
-  fromReaderT $ runRT logFun
-
-runRT :: (Loc -> LogSource -> LogLevel -> LogStr -> IO ())
-      -> ReaderT (InputTEnv IO) IO ()
-runRT logFun = withReaderT f' $ mapReaderT f $ toReaderT mainCM
+  fromReaderT $ runRT (getLogFun printExt)
   where
-    f :: LoggingT IO () -> IO ()
-    f ma = runLoggingT ma logFun
-    f' :: InputTEnv IO -> InputTEnv (LoggingT IO)
-    f' = mapInputTEnv liftIO -- _f''
+    getLogFun f loc src lv s = do
+      t <- getCurrentTime
+      let logStrBS = fromLogStr $ defaultLogStr t mempty loc src lv s
+          msg      = A.decodeStrict @LoggedMessage logStrBS
+      whenJust msg $ f . TL.unpack . renderLazy . layoutPretty defaultLayoutOptions . prettyLogMsg
+
+runRT :: (Loc -> LogSource -> LogLevel -> LogStr -> IO ()) -> ReaderT (InputTEnv IO) IO ()
+runRT logFun = withReaderT (mapInputTEnv liftIO) $
+  mapReaderT (`runLoggingT` logFun) $
+    toReaderT mainCM
 
 mainCM :: CM ()
-mainCM = do
-  clientRun def msgHandler consoleHandler
+mainCM = clientRun def msgHandler consoleHandler
 
 msgHandler :: Response -> CM ()
 msgHandler = \case

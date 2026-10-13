@@ -241,8 +241,6 @@ modifyWindowSet = modifying windowset
 windows :: (WindowSet -> WindowSet) -> HS ()
 windows = modifyWindowSet
 
--- ** Composite
-
 -- | Return workspace visible on screen @sc@, or 'Nothing'.
 screenWorkspace :: ScreenId -> HS (Maybe WorkspaceId)
 screenWorkspace sc = withWindowSet $ return . W.lookupWorkspace sc
@@ -313,6 +311,10 @@ mapSeats f = getHState >>= mapM_ f . view seatList
 startSeatOp :: SeatOperation -> HS ()
 startSeatOp seatop = modifySeats (const True) $ pendingAction .~ S_START_OP seatop
 
+-- | Casts the pointer into @RiverSeat@.
+modifySeat' :: Ptr Void -> (Seat -> Seat) -> HS ()
+modifySeat' ud = modifySeat (R.RiverSeat $ castPtr ud)
+
 --------------------------------------------------------------
 
 -- * windows
@@ -332,7 +334,7 @@ withWindow_ k f = lookupWindow k >>= mapM_ f
 modifyWindow :: (SomeWindow a) => a -> (Window -> Window) -> HS ()
 modifyWindow k f = alterWindow k (fmap f)
 
-modifyWindow' :: (SomeWindow a, MonadIO m, MonadThrow m, MonadReader HConf m) => a -> (Window -> Window) -> m ()
+modifyWindow' :: (SomeWindow a, MonadEffects m, MonadReader HConf m) => a -> (Window -> Window) -> m ()
 modifyWindow' w = runInHS . modifyWindow w
 
 alterWindow :: (SomeWindow a) => a -> (Maybe Window -> Maybe Window) -> HS ()
@@ -406,5 +408,5 @@ restart prog = do
       :# ["reason" .= show e | Left (e :: IOException) <- [res]]
 
 -- | Trigger restart by signal (USR2).
-sendRestart :: (MonadIO m) => m ()
+sendRestart :: MonadIO m => m ()
 sendRestart = io $ Posix.raiseSignal Posix.sigUSR2

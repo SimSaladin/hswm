@@ -15,15 +15,11 @@ module HSWM.Utils
 
 import           HSWM.Types.Action
 import           HSWM.Util.Process
-
+import qualified Pixman as P
+import qualified River as R
+import           River (RiverColor(..))
 import           Text.XkbCommon
 import           Text.XkbCommon.EventCodes (fromEventCodeBTN)
-
-import qualified River as R
-import qualified Pixman as P
-
-import           River (RiverColor(..))
---import qualified River.WindowManagementV1 as R
 import qualified WL.Client as WL
 
 import           Data.Char (toLower)
@@ -283,7 +279,7 @@ bytesToRiverColor bytes = RiverColor
   , blue  = (bytes .&. 0x0000FF00) .<<. 16
   , alpha = (bytes .&. 0x000000FF) .<<. 24 }
 
-data RGBA a = RGBA {red, green, blue, alpha :: !a}
+data RGBA a = RGBA { red, green, blue, alpha :: !a }
 
 fromRiverColor :: RiverColor -> RGBA Double
 fromRiverColor rc = RGBA

@@ -19,7 +19,6 @@ where
 import qualified HSWM.BufferPool as BP
 import           HSWM.Core hiding (height, scale, size, width)
 import           HSWM.Utils (getPixmanFormatBE)
-
 import qualified Pixman as P
 import qualified River as R
 import qualified WL.Client as WL
@@ -28,14 +27,13 @@ import qualified WL.Viewporter as VP
 import qualified WL.Wlr.LayerShell.Unstable.V1.Client as Wlr
 
 import qualified Codec.Picture as JP
-
 import qualified Data.Map as M
 import qualified Data.Vector.Storable as V
 
 -- * Usage
 
 newtype WallpaperConfig = WallpaperConfig { filepath :: FilePath }
-  deriving (Show, Read)
+  deriving stock (Eq, Ord, Show, Read)
 
 usingWallpaper :: WallpaperConfig -> HSWMConfig H l -> HSWMConfig H l
 usingWallpaper cfg userConf = userConf
