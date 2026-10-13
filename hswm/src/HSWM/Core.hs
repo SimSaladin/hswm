@@ -23,7 +23,6 @@ import           HSWM.Types.Events
 import           HSWM.Types.TypeMap
 import           HSWM.Types.WM
 import           HSWM.XKB hiding (LogLevel(..))
-
 import qualified River as R
 
 import           Control.Monad.State
@@ -121,15 +120,3 @@ writeMainQ ev = do
     atomically $ writeTQueue q ev
 
 --------------------------------------------------
-
-class Monad m => GetHState m where
-  getHState :: m HState
-
-instance GetHState HS where
-  getHState = use id
-
-instance GetHState H where
-  getHState = do
-    locked <- view _stateLocked
-    when locked $ throwM $ HSWMStateLocked $ "attempted to nest state lock?\n" ++ prettyCallStack callStack
-    view _state >>= atomically . readTMVar

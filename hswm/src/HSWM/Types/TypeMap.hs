@@ -15,6 +15,18 @@ import Data.TMap qualified as TM
 
 -- * Types
 
+type MonadStateGlobal env m = (MonadReader env m, HasGlobalTMap env, MonadEffectsIO m)
+
+type MonadStateGlobal' env m = (MonadReader env m, HasGlobalTMap env, MonadEffects m)
+
+-- | XXX: there's probably a better place for this somewhre...
+type MonadEffectsIO m = (MonadUnliftIO m, MonadLoggerIO m, MonadMask m, MonadThrow m, MonadFail m)
+
+-- | XXX: there's probably a better place for this somewhre...
+type MonadEffects m = (MonadIO m, MonadLogger m, MonadMask m, MonadThrow m, MonadFail m)
+
+-- ** Constraints
+
 -- ** TypeMap
 
 newtype TypeMap = TypeMap { unTypeMap :: TM.TMap }
@@ -37,17 +49,11 @@ data TypeMapException
   deriving (Eq, Ord, Show)
 instance Exception TypeMapException
 
--- ** Constraints
-
-type MonadStateGlobal env m = (MonadGlobalRead env m, MonadUnliftIO m)
-
-type MonadGlobalRead env m =
-  (MonadReader env m, HasGlobalTMap env, MonadIO m, MonadLogger m, MonadThrow m)
-
 -- * With
 
 -- | Fails if the object does not exist.
-withObject :: forall a s m b. HasCallStack => (MonadGlobalRead s m, Typeable a) => (a -> m b) -> m b
+-- No 'MonadUnliftIO' needed.
+withObject :: forall a s m b. HasCallStack => (MonadStateGlobal' s m, Typeable a) => (a -> m b) -> m b
 withObject f = withObjects $ maybe notFound f . TM.lookup
   where
     notFound = throwM $ TypeMapKeyNotFound (typeRep $ Proxy @a)
@@ -63,18 +69,22 @@ withObjectDef f = do
 -- * Get / Create
 
 -- | Partial function, assumes the type exists already.
-getObject :: forall a s m. HasCallStack => (MonadGlobalRead s m, Typeable a) => m a
+-- No 'MonadUnliftIO' needed.
+getObject :: forall a s m. HasCallStack => (MonadStateGlobal' s m, Typeable a) => m a
 getObject = withObjects $ maybe notFound return . TM.lookup
   where
     notFound = throwM $ TypeMapKeyNotFound (typeRep $ Proxy @a)
 
 -- | Version of 'getObject' that returns the 'def' value when an object is not found.
+--   Needs 'MonadUnliftIO'.
 getObjectDef :: forall a s m. (MonadStateGlobal s m, Typeable a, Default a) => m a
 getObjectDef = withObjectsEx $ \tm ->
   case TM.lookup $ unTypeMap tm of
     Just x -> return (x, tm)
     Nothing -> let x = def in return (x, TypeMap $ TM.insert x $ unTypeMap tm)
 
+--   Needs 'MonadUnliftIO'.
+--   Needs 'MonadUnliftIO'.
 getOrCreateObject :: forall a s m. (MonadStateGlobal s m, Typeable a) => m a -> m a
 getOrCreateObject m = withObjectsEx $ \tm ->
   let notFound = m >>= \a -> return (a, TypeMap $ TM.insert a $ unTypeMap tm)
@@ -84,6 +94,7 @@ getOrCreateObjectIO :: forall a s m. (MonadStateGlobal s m, Typeable a) => IO a 
 getOrCreateObjectIO = getOrCreateObject . liftIO
 
 -- | Create an object that is unique. Throws 'TypeMapKeyExists' on existing keys.
+--   Needs 'MonadUnliftIO'.
 createUnique :: forall a s m. (MonadStateGlobal s m, Typeable a) => m a -> m a
 createUnique f = withObjectsEx $ \(TypeMap tm) ->
   if TM.member @a tm
@@ -101,12 +112,14 @@ createUnique_ = void . createUnique
 -- * Put
 
 -- | Insert new or replace existing.
+--   Needs 'MonadUnliftIO'.
 putObject :: forall a s m. (MonadStateGlobal s m, Typeable a) => a -> m ()
 putObject x = withObjectsEx $ \s -> return ((), TypeMap . TM.insert x $ unTypeMap s)
 
 -- * Modify
 
 -- | Modify object (if it exists).
+--   Needs 'MonadUnliftIO'.
 modifyObject :: forall a s m. (MonadStateGlobal s m, Typeable a) => (a -> a) -> m ()
 modifyObject f = withObjectsEx $ \s -> return ((), TypeMap . g $ unTypeMap s)
   where
@@ -129,8 +142,8 @@ modifyObjectDef' f = withObjectsEx $ g . unTypeMap
 
 -- * Internal
 
--- | Read-only operations (no 'MonadUnliftIO' constraint)
-withObjects :: forall a s m. (MonadReader s m, HasGlobalTMap s, MonadIO m) => (TM.TMap -> m a) -> m a
+-- | Read-only operations; no 'MonadUnliftIO' needed.
+withObjects :: forall a s m. (MonadStateGlobal' s m) => (TM.TMap -> m a) -> m a
 withObjects f = asks (view globalTMap) >>= atomically . readTMVar >>= f . unTypeMap
 
 -- | Do @m@ with the map state locked.

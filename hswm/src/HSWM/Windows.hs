@@ -20,9 +20,8 @@ module HSWM.Windows
 import           HSWM.Core hiding (handleEvent)
 import           HSWM.Operations
 import qualified HSWM.StackSet as W
-
-import qualified WL.Client as WL
 import qualified River as R
+import qualified WL.Client as WL
 
 import qualified Data.List as L
 import qualified Data.Map as M
@@ -233,18 +232,18 @@ handleEvent e = case e of
   -- The window has been closed by the server, perhaps due to an xdg_toplevel.close request or similar.
   -- The server will send no further events on this object and ignore any request other than river_window_v1.destroy made after this event is sent.
   -- The client should destroy this object with the river_window_v1.destroy request to free up resources.
-  R.RiverWindowClosed _ w -> modifyW w $ \s -> s {closed = True}
+  R.RiverWindowClosed _ w -> modifyWindow' w $ \s -> s {closed = True}
   -- Properties
-  R.RiverWindowDimensions       _ rw w h               -> modifyW rw $ width .~ fi w &+ height .~ fi h
-  R.RiverWindowParent           _ rw we_parent         -> modifyW rw $ parent ?~ we_parent
-  R.RiverWindowAppId            _ rw we_app_id         -> modifyW rw $ appId .~ we_app_id
-  R.RiverWindowTitle            _ rw we_title          -> modifyW rw $ title .~ we_title
-  R.RiverWindowUnreliablePid    _ rw we_unreliable_pid -> modifyW rw $ unreliablePid ?~ fi we_unreliable_pid
-  R.RiverWindowIdentifier       _ rw uuid              -> modifyW rw (identifier .~ uuid) >> attemptWindowRecovery rw uuid
-  R.RiverWindowDecorationHint   _ rw we_hint           -> modifyW rw $ decorationHint ?~ we_hint
-  R.RiverWindowPresentationHint _ rw we_hint           -> modifyW rw $ presentationHint ?~ we_hint
+  R.RiverWindowDimensions       _ rw w h               -> modifyWindow' rw $ width .~ fi w &+ height .~ fi h
+  R.RiverWindowParent           _ rw we_parent         -> modifyWindow' rw $ parent ?~ we_parent
+  R.RiverWindowAppId            _ rw we_app_id         -> modifyWindow' rw $ appId .~ we_app_id
+  R.RiverWindowTitle            _ rw we_title          -> modifyWindow' rw $ title .~ we_title
+  R.RiverWindowUnreliablePid    _ rw we_unreliable_pid -> modifyWindow' rw $ unreliablePid ?~ fi we_unreliable_pid
+  R.RiverWindowIdentifier       _ rw uuid              -> modifyWindow' rw (identifier .~ uuid) >> attemptWindowRecovery rw uuid
+  R.RiverWindowDecorationHint   _ rw we_hint           -> modifyWindow' rw $ decorationHint ?~ we_hint
+  R.RiverWindowPresentationHint _ rw we_hint           -> modifyWindow' rw $ presentationHint ?~ we_hint
   R.RiverWindowDimensionsHint   _ rw minWidth minHeight maxWidth maxHeight -> do
-    modifyW rw $ \s -> s {minWidth, minHeight, maxWidth, maxHeight}
+    modifyWindow' rw $ \s -> s {minWidth, minHeight, maxWidth, maxHeight}
     fixedSizeAutoFloat rw minWidth minHeight maxWidth maxHeight
 
   -- Manage fullscreen
@@ -252,8 +251,8 @@ handleEvent e = case e of
   R.RiverWindowExitFullscreenRequested _ window        -> runInHS $ doManage WExitFullscreen window
 
   -- TODO
-  R.RiverWindowPointerMoveRequested   _ w seat       -> modifyW w $ pointerMoveRequested .~ seat
-  R.RiverWindowPointerResizeRequested _ w seat edges -> modifyW w $ pointerResizeRequested .~ seat &+ pointerResizeRequestedEdges .~ edges
+  R.RiverWindowPointerMoveRequested   _ w seat       -> modifyWindow' w $ pointerMoveRequested .~ seat
+  R.RiverWindowPointerResizeRequested _ w seat edges -> modifyWindow' w $ pointerResizeRequested .~ seat &+ pointerResizeRequestedEdges .~ edges
   R.RiverWindowMaximizeRequested _ _w    -> return ()
   R.RiverWindowUnmaximizeRequested _ _w  -> return ()
   R.RiverWindowShowWindowMenuRequested{} -> return ()
@@ -278,6 +277,3 @@ fixedSizeAutoFloat rw minWidth minHeight maxWidth maxHeight = when fixed $
           (screenRect $ W.screenDetail $ W.current ws)) ws
   where
     fixed = maxWidth > 0 && maxHeight > 0 && maxWidth == minWidth && maxHeight == minHeight
-
-modifyW :: (MonadIO m, MonadThrow m, MonadReader HConf m) => RiverWindow -> (Window -> Window) -> m ()
-modifyW w = runInHS . modifyWindow w

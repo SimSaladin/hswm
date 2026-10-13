@@ -24,6 +24,8 @@ import qualified WL.ExtIdleNotify.Staging.V1.Client as EXT_IN
 
 import Data.Kind
 
+type family Stateful (m :: Type -> Type) :: Type -> Type
+
 -- * Seat
 
 data Seat' (m :: Type -> Type) = Seat
@@ -38,28 +40,31 @@ data Seat' (m :: Type -> Type) = Seat
   , wlTouch                :: !WL.Touch -- ^ Touch capability
   , position               :: !Position -- (Int32, Int32) -- x, y
   , name                   :: !String
-  , currentFocus           :: !SeatFocus
-  -- ^ Currently focused window/shell layer.
-  , focused, hovered, interacted :: !RiverWindow
-  -- ^ Windows last interacted with.
-  , xkb_bindings           :: !(XkbBindingMap (SomeAction m))
-  -- ^ XKB (keyboard) bindings.
-  , pointer_bindings       :: [StablePtr (PointerBinding (SomeAction m))]
-  -- ^ Pointer bindings.
+  , currentFocus           :: !SeatFocus -- ^ Currently focused window/shell layer.
+  , focused, hovered, interacted :: !RiverWindow -- | Windows last interacted with.
 
+  -- | XKB (keyboard) bindings.
+  , xkb_bindings           :: !(XkbBindingMap (SomeAction m))
+
+  -- | Pointer bindings.
+  , pointer_bindings       :: [StablePtr (PointerBinding (SomeAction m))]
+
+  -- | Event queues.
   , pending_action         :: !(SeatAction m)
   , submap_pending         :: !(Maybe (SomeAction m, XkbBindingMap (SomeAction m), Maybe (SomeAction m)))
   , pendingPointerEnter    :: !(Maybe (RiverWindow, Position))
 
+  -- | Pointer move/resize.
   , op                     :: !SeatOperation
-  -- ^ Pointer move/resize.
   , op_window              :: !RiverWindow
   , op_release             :: !Bool
-  , op_start_x, op_start_y, op_dx, op_dy :: !Int32
-  , op_start_width, op_start_height      :: !Int32
+  , op_start_x, op_start_y :: !Int32
+  , op_dx, op_dy           :: !Int32
+  , op_start_width         :: !Int32
+  , op_start_height        :: !Int32
   , op_edges               :: !Int32
 
-  -- TODO: review below
+  -- | TODO: review below
   , suppressChangeFocus    :: !Int
   , new                    :: !Bool
   , removed                :: !Bool
@@ -67,15 +72,16 @@ data Seat' (m :: Type -> Type) = Seat
   deriving stock (Generic)
   deriving anyclass (Default, NFData)
 
-deriving instance (MonadIO m, Show (Stateful m Bool)) => Show (Seat' m)
+deriving instance
+  ( MonadIO m, Show (Stateful m Bool)
+  ) => Show (Seat' m)
 
 deriving instance
-  (Typeable m, Data (SomeAction m),
-  Data (SeatAction m),
-  Data (StablePtr (XkbBinding (SomeAction m))),
-  Data (StablePtr (PointerBinding (SomeAction m)))) => Data (Seat' m)
-
-type family Stateful (m :: Type -> Type) :: Type -> Type
+  ( Typeable m, Data (SomeAction m),
+    Data (SeatAction m),
+    Data (StablePtr (XkbBinding (SomeAction m))),
+    Data (StablePtr (PointerBinding (SomeAction m)))
+  ) => Data (Seat' m)
 
 data SeatFocus
   = SFocusNone
@@ -93,7 +99,7 @@ data SeatAction m
     S_SUBMAP_NEXT_KEY (SomeAction m) (XkbBindingMap (SomeAction m)) (Maybe (SomeAction m))
   | -- | Cancel submap input, resetting to root bindings.
     S_SUBMAP_CANCEL
-  deriving stock (Generic, Data)
+  deriving stock (Eq, Generic, Data)
   deriving anyclass (NFData)
 
 deriving instance (MonadIO m, Show (Stateful m Bool)) => Show (SeatAction m)
@@ -120,5 +126,7 @@ instance HasX (Seat' m) Int32 where _x = position . _x
 instance HasY (Seat' m) Int32 where _y = position . _y
 
 instance HasRiverId (Seat' m) where
+
   type RiverId (Seat' m) = RiverSeat
+
   riverId = riverSeat

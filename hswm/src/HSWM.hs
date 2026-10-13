@@ -16,22 +16,22 @@ module HSWM
     module HSWM.Utils,
     module HSWM.XKB,
     module HSWM.InputConfig,
+
     -- * Re-exports
     module Prelude,
     module ReExports,
   )
 where
 
-import Prelude hiding ((^?), setEnv)
 import Data.Default as ReExports
 import Data.Semigroup as ReExports (All (..))
-
 import HSWM.Config
 import HSWM.Core
-import HSWM.ManageHook
+import HSWM.InputConfig
 import HSWM.Layout
 import HSWM.Main
+import HSWM.ManageHook
 import HSWM.Operations
-import HSWM.InputConfig
 import HSWM.Utils
-import HSWM.XKB hiding (LogLevel(..))
+import HSWM.XKB hiding (LogLevel (..))
+import Prelude hiding (setEnv, (^?))

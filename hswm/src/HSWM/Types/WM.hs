@@ -43,6 +43,7 @@ import           Control.Monad.State
 import           Data.Data
 import qualified Data.Map as M
 import           Data.Monoid (Ap(..))
+import           GHC.Stack (callStack, prettyCallStack)
 
 -- * Types
 
@@ -273,15 +274,17 @@ instance LayoutClass Full a
 
 -- | The read-only window manager state.
 data HConf = HConf
+    -- | Reference counting for state lock.
   { _stateLocked                   :: {-# UNPACK #-} !Bool
     -- | Just when executing seat-originating key/pointer bindings.
   , thisSeat                       :: !(Maybe RiverSeat)
-    -- | User-provided configuration.
+    -- | User-provided configuration. (Generally immutable after launch.)
   , config                         :: !(HSWMConfig H Layout)
     -- | The Wayland display pointer
   , _wlDisplay                     :: {-# UNPACK #-} !WL.Display
     -- | Root logger function.
   , _logFunc                       :: !(Loc -> LogSource -> LogLevel -> LogStr -> IO ())
+    -- | Finalizer for logger (FastLogger) resources.
   , _loggerCleanup                 :: !(IO ())
     -- | The global objects available through wl_registry.
   , globals                        :: !(MVar WL.RegistryState)
@@ -338,7 +341,15 @@ newtype HS a = HS (StateT HState (ReaderT HConf IO) a)
                     MonadReader HConf, MonadState HState)
   deriving (Semigroup, Monoid) via Ap HS a
 
--- Lenses
+type instance Stateful H  = HS
+type instance Stateful HS = HS
+
+type instance LayoutProxy H  = Layout
+type instance LayoutProxy HS = Layout
+
+type MonadHConf m = (MonadReader HConf m, MonadEffects m)
+
+-- * Lenses: (HConf, HState)
 
 makeLensesWith' classPerField [ ''HConf, ''HState ]
 
@@ -348,14 +359,22 @@ instance HasGlobalTMap HConf where
 instance HasGlobalsRegistry HConf where
   globalsRegistryL = globals
 
+-- * Monadic "HState" reader access.
+
+class Monad m => GetHState m where
+  getHState :: m HState
+
+instance GetHState HS where
+  getHState = use id
+
+instance GetHState H where
+  getHState = do
+    locked <- view _stateLocked
+    when locked $ throwM $ HSWMStateLocked $ "attempted to nest state lock?\n" ++ prettyCallStack callStack
+    view _state >>= atomically . readTMVar
+
 ---------------------------------------------------------
 -- H/HS instances
-
-type instance Stateful H  = HS
-type instance Stateful HS = HS
-
-type instance LayoutProxy H  = Layout
-type instance LayoutProxy HS = Layout
 
 instance MonadLoggerIO H  where askLoggerIO = view _logFunc
 instance MonadLoggerIO HS where askLoggerIO = view _logFunc

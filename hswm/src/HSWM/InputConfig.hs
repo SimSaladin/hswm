@@ -176,7 +176,7 @@ lookupValidKeymap params = do
 
 -- * Event handlers
 
-handleXkbKeymapEvent :: (MonadUnliftIO m, MonadLogger m, MonadReader HConf m, MonadThrow m) => R.RiverXkbKeymapEvent -> m ()
+handleXkbKeymapEvent :: (MonadStateGlobal s m) => R.RiverXkbKeymapEvent -> m ()
 handleXkbKeymapEvent = \case
   R.RiverXkbKeymapSuccess _ km -> do
     logInfo $ "Keymap created successfully" :# [ "keymap" .= show km ]
@@ -187,7 +187,7 @@ handleXkbKeymapEvent = \case
     kmaps <- modifyObjectDef' $ \st -> (st.xkbKeymaps, st { xkbKeymaps = M.adjust (\ks -> ks { failure = Just err }) km st.xkbKeymaps })
     io $ forM_ kmaps $ \ks -> when (ks.keymap == km) $ closeFd ks.keymapFd
 
-handleInputManagerEvent :: (MonadUnliftIO m, MonadLogger m, MonadReader HConf m, MonadThrow m) => R.RiverInputManagerEvent -> m ()
+handleInputManagerEvent :: (MonadStateGlobal s m) => R.RiverInputManagerEvent -> m ()
 handleInputManagerEvent (R.RiverInputManagerFinished _ rim) = do
   io $ WL.objectDestroy rim
 handleInputManagerEvent (R.RiverInputManagerInputDevice _ _ dev) = do
@@ -231,14 +231,14 @@ handleXkbKeyboardEvent = \case
   _ -> return () -- TODO capslock/numlock/scrolllock enabled/disabled
 
 -- | river_libinput_config_v1
-handleLibinputEvent :: (HasGlobalTMap s, MonadReader s m, MonadUnliftIO m, MonadLogger m, MonadThrow m) => R.RiverLibinputConfigEvent -> m ()
+handleLibinputEvent :: (MonadStateGlobal s m) => R.RiverLibinputConfigEvent -> m ()
 handleLibinputEvent = \case
   R.RiverLibinputConfigLibinputDevice _ _ dev -> do
     modifyObjectDef $ \st -> st { libinputDevices = M.insert dev def st.libinputDevices }
     withObject $ WL.listenerAdd_ dev
   R.RiverLibinputConfigFinished _ lic -> WL.objectDestroy lic
 
-handleLibinputDeviceEvent :: (HasGlobalTMap s, MonadReader s m, MonadUnliftIO m, MonadLogger m, MonadThrow m) => R.RiverLibinputDeviceEvent -> m ()
+handleLibinputDeviceEvent :: (MonadStateGlobal s m) => R.RiverLibinputDeviceEvent -> m ()
 handleLibinputDeviceEvent = \case
   R.RiverLibinputDeviceRemoved _ dev -> do
     modifyObjectDef $ \st -> st { libinputDevices = M.delete dev st.libinputDevices }

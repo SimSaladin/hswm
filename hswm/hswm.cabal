@@ -38,7 +38,7 @@ library
           QuantifiedConstraints
           RecordWildCards
           TypeFamilies
-    ghc-options: -Wall -Wno-partial-type-signatures -Wno-ambiguous-fields
+    ghc-options: -Wall -Wno-partial-type-signatures -Wno-ambiguous-fields -Wno-typed-holes
     build-tool-depends:
           hsc2hs:hsc2hs
     exposed-modules:
@@ -178,7 +178,7 @@ library ipc-api
           QuantifiedConstraints
           RecordWildCards
           TypeFamilies
-    ghc-options: -Wall -Wno-partial-type-signatures -Wno-ambiguous-fields
+    ghc-options: -Wall -Wno-partial-type-signatures -Wno-ambiguous-fields -Wno-typed-holes
     build-depends:
           aeson >=2.2.3 && <2.4
         , base >=4.21 && <5
@@ -212,7 +212,7 @@ library prelude
           QuantifiedConstraints
           RecordWildCards
           TypeFamilies
-    ghc-options: -Wall -Wno-partial-type-signatures -Wno-ambiguous-fields
+    ghc-options: -Wall -Wno-partial-type-signatures -Wno-ambiguous-fields -Wno-typed-holes
     build-depends:
           async >=2.2.6 && <2.3
         , base >=4.21 && <5
@@ -254,7 +254,7 @@ executable hswm
           QuantifiedConstraints
           RecordWildCards
           TypeFamilies
-    ghc-options: -Wall -Wno-partial-type-signatures -Wno-ambiguous-fields -threaded -rtsopts "-with-rtsopts=-N -maxN8 -qn3 -M2G -A2m -K8M -I2 -xr100G"
+    ghc-options: -Wall -Wno-partial-type-signatures -Wno-ambiguous-fields -Wno-typed-holes -threaded -rtsopts "-with-rtsopts=-N -maxN8 -qn3 -M2G -A2m -K8M -I2 -xr100G"
 
 executable hswmctl
     main-is: Main.hs
@@ -272,7 +272,7 @@ executable hswmctl
           QuantifiedConstraints
           RecordWildCards
           TypeFamilies
-    ghc-options: -Wall -Wno-partial-type-signatures -Wno-ambiguous-fields -threaded -rtsopts "-with-rtsopts=-N -maxN8 -qn3 -M2G -A2m -K8M -I2 -xr100G"
+    ghc-options: -Wall -Wno-partial-type-signatures -Wno-ambiguous-fields -Wno-typed-holes -threaded -rtsopts "-with-rtsopts=-N -maxN8 -qn3 -M2G -A2m -K8M -I2 -xr100G"
     build-depends:
           aeson >=2.2.3 && <2.4
         , base >=4.21 && <5

@@ -41,6 +41,7 @@ ghc-options:
   -Wall
   -Wno-partial-type-signatures
   -Wno-ambiguous-fields
+  -Wno-typed-holes
 
 when:
   - condition: flag(use-llvm) && impl(ghc >= 9.14.1)

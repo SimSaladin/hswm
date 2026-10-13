@@ -29,6 +29,9 @@ import           Data.Default.Internal (gdef)
 import           Data.Kind
 import qualified GHC.Generics as Generics
 
+-- | Composable config modification.
+type ConfigDoM m = forall l. HSWMConfig m l -> HSWMConfig m l
+
 -- * User configuration
 
 -- | User configuration
@@ -79,12 +82,6 @@ data RepeatInfo = RepeatInfo { rate, delay :: {-# UNPACK #-} !Int32 }
   deriving stock (Eq, Ord, Show, Read, Generic, Data)
   deriving anyclass (Default, NFData)
 
--- | Composable config modification.
-type ConfigDoPure = forall m l. HSWMConfig m l -> HSWMConfig m l
-
--- | Composable config modification.
-type ConfigDoM m = forall l. HSWMConfig m l -> HSWMConfig m l
-
 -- * WindowSet/StackSet
 
 type WindowSetX l = W.StackSet WorkspaceId (l RiverWindow) RiverWindow WorkspaceDetail ScreenId ScreenDetail
@@ -127,8 +124,7 @@ type family LayoutProxy (m :: Type -> Type) :: Type -> Type
 makeLensesWith' classPerField
   [ ''RepeatInfo
   , ''XkbRuleNames
-  , ''ScreenDetail
-  ]
+  , ''ScreenDetail ]
 
 makeLensesCombine'
   (lensField %~ (\f ty b n -> if nameBase n == "layoutHook" then [] else f ty b n))

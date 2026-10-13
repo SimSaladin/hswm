@@ -4,7 +4,7 @@ import           HSWM.Types.TypeMap
 
 import qualified WL.Client as WL
 
-type MonadGlobals env m = (MonadUnliftIO m, MonadLogger m, MonadThrow m, MonadReader env m, HasGlobalsRegistry env, HasGlobalTMap env)
+type MonadGlobals env m = (MonadEffectsIO m, MonadReader env m, HasGlobalsRegistry env, HasGlobalTMap env)
 
 class HasGlobalsRegistry env where
   globalsRegistryL :: Lens' env (MVar WL.RegistryState)
@@ -74,7 +74,7 @@ globalBindAndListen uniq mbListen mbData mverMax mname = do
     udata = maybe nullPtr WL.toUserData mbData
 
 -- | Create a type-directed listener
-mkListener :: forall m env o. (MonadStateGlobal env m, WL.HasListener o) => (WL.ObjectListenerEvent o -> m ()) -> m ()
+mkListener :: forall m env o. (MonadStateGlobal env m, MonadEffectsIO m, WL.HasListener o) => (WL.ObjectListenerEvent o -> m ()) -> m ()
 mkListener f = createUnique_ $ do
   run <- askRunInIO
   WL.createListener (run . f)

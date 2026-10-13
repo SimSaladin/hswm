@@ -30,7 +30,7 @@ import           Network.Socket
 import           System.FileLock
 import qualified Text.Pretty.Simple as P
 
-type MonadIPC env m = (MonadLogger m, MonadUnliftIO m, MonadReader env m, MonadMask m)
+type MonadIPC env m = (MonadEffectsIO m, MonadReader env m)
 
 -- * ServerConfig
 
