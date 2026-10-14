@@ -84,7 +84,7 @@ manage = runInHS $ do
   seats <- use seatList
   unless (any (\s -> s.op /= SEAT_OP_NONE) seats) manage_
 
-manage_ :: HS ()
+manage_ :: HasCallStack => HS ()
 manage_ = do
   -- Do initial properties for new windows
   -- Get rid of any closed windows
@@ -100,66 +100,78 @@ manage_ = do
 
   ws  <- use windowset
   old <- use windowsetOld
-  let oldvisible = concatMap (W.integrate' . W.stack . W.workspace) $ W.current old : W.visible old
-      newwindows = W.allWindows ws L.\\ W.allWindows old
 
-  whenJust (W.peek old) $ \otherw ->
-    manageWindowBorder otherw =<< view (config . normalBorder)
+  let oldvisible      = concatMap (W.integrate' . W.stack . W.workspace) $ W.current old : W.visible old
+      newwindows      = W.allWindows ws L.\\ W.allWindows old
+      tags_oldvisible = map (W.tag . W.workspace) $ W.current old : W.visible old
+      gottenhidden    = filter (flip elem tags_oldvisible . W.tag) $ W.hidden ws
+      allscreens      = W.screens ws
+      summed_visible  = scanl (++) [] $ map (W.integrate' . W.stack . W.workspace) allscreens
 
-  let tags_oldvisible = map (W.tag . W.workspace) $ W.current old : W.visible old
-      gottenhidden = filter (flip elem tags_oldvisible . W.tag) $ W.hidden ws
+  -- Update border on to normal (XXX: ??)
+  whenJust (W.peek old) $ \otherw -> manageWindowBorder otherw =<< view (config . normalBorder)
+
+  -- Dispatch messages to workspaces that got hidden.
   mapM_ (sendMessageWithNoRefresh Hide) gottenhidden
 
-  -- for each workspace, layout the currently visible workspaces
-  let allscreens = W.screens ws
-      summed_visible = scanl (++) [] $ map (W.integrate' . W.stack . W.workspace) allscreens
-
-  rects <- fmap concat $ forM (zip allscreens summed_visible) $ \(w, vis) -> do
-    let wsp = W.workspace w
-        this = W.view n ws
-        n = W.tag wsp
-        tiled = (W.stack . W.workspace . W.current) this
-            >>= W.filter (`M.notMember` W.floating ws)
-            >>= W.filter (`notElem` vis)
-        sd = W.screenDetail w
+  -- for each workspace, layout the currently visible workspaces...
+  -- return the visible windows for this workspace
+  (trects, frects) <- fmap mconcat $ forM (zip allscreens summed_visible) $ \(w, vis) -> do
+    let wsp      = W.workspace w
+        sd       = W.screenDetail w
+        this     = W.view n ws
+        n        = W.tag wsp
         viewrect = Rectangle {x = fi sd.x, y = fi sd.y, width = fi sd.width, height = fi sd.height}
+        tiled    = (W.stack . W.workspace . W.current) this
+                      >>= W.filter (`M.notMember` W.floating ws)
+                      >>= W.filter (`notElem` vis)
 
-    -- just the tiled windows:
-    -- now tile the windows on this workspace, modified by the gap
-    (rs, ml') <-
-      runLayout wsp {W.stack = tiled} viewrect
+    -- just the tiled windows: now tile the windows on this workspace, modified by the gap
+    (rs, ml') <- runLayout wsp {W.stack = tiled} viewrect
         `catchHS` runLayout wsp {W.stack = tiled, W.layout = Layout Full} viewrect
     updateLayout n ml'
 
     let m = W.floating ws
         flt =
-          [ (fw, scaleRationalRect viewrect r, True)
+          [ (fw, scaleRationalRect viewrect r)
           | fw <- filter (`M.member` m) (W.index this),
             fw `notElem` vis,
-            Just r <- [M.lookup fw m]
-          ]
+            Just r <- [M.lookup fw m] ]
 
-    -- return the visible windows for this workspace:
-    return (flt ++ [(a, b, False) | (a, b) <- rs])
+    return (rs, flt)
+    -- return (flt ++ [(a, b, False) | (a, b) <- rs])
 
-  let visible = map (\(a, _, _) -> a) rects
-
-  mapM_ (\(rw, rect, top) -> tileWindow top rw rect) rects
+  let visible = map fst frects ++ map fst trects
 
   -- hide every window that was potentially visible before, but is not
   -- given a position by a layout now.
   mapM_ manageHide (L.nub (oldvisible ++ newwindows) L.\\ visible)
 
+  -- Position all visible tiled windows
+  forM_ trects $ uncurry tileWindow
+  -- Raise the top-most window in the stack to the front...
   whenJust (W.peek ws) $ \w -> do
     windowPlaceTop w
     manageWindowBorder w =<< view (config . focusedBorder)
 
+  -- Position any floating windows
+  forM_ frects $ \(rw, rect) -> do
+    tileWindow rw rect
+    doRender WRPlaceTop rw
+
+  -- Show windows that should be visible.
   mapM_ manageReveal visible
+
+  -- Change the seat focus
   setTopFocus
 
-  if isNothing (W.peek ws) && W.tag (W.workspace $ W.current ws) /= W.tag (W.workspace $ W.current old)
-    then warpPointerToScreen (W.screenDetail $ W.current ws) (W.screen $ W.current ws)
-    else withScreenOutput (W.screen $ W.current ws) $ \o ->
+  -- Corner case: pointer focused moved to an empty
+  -- screen; warp the pointer to the empty center.
+  when (isNothing (W.peek ws) && W.tag (W.workspace $ W.current ws) /= W.tag (W.workspace $ W.current old)) $
+      warpPointerToScreen (W.screenDetail $ W.current ws) (W.screen $ W.current ws)
+
+  -- Change layer shell default output to currently focused output.
+  withScreenOutput (W.screen $ W.current ws) $ \o ->
       R.riverLayerShellOutputSetDefault o.layerShellOutput
 
   use windowset >>= \ws' -> modify (\s -> s {windowsetOld = ws'})

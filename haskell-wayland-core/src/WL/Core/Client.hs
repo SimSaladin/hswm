@@ -37,7 +37,7 @@ import           System.Posix
 --------------------------------------------------------------------------------------
 -- EVENT QUEUES
 
-renderNewType True (mkName "EventQueue") ''Wl_event_queue ""
+renderNewType def False (mkName "EventQueue") ''Wl_event_queue ""
 
 --------------------------------------------------------------------------------------
 -- wayland.xml

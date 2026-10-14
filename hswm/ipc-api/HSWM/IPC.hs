@@ -81,6 +81,8 @@ data Response
   -- ^ Details of the currently focused window.
 
   | StateDumpResponse TL.Text
+
+  | InternalObject { objects :: [A.Value] }
   deriving (Eq, Show, Read, Generic)
 
 instance A.ToJSON Response
@@ -159,33 +161,49 @@ clientRun
   :: MonadIPCClient m
   => ClientConfig
   -> (Response -> m ()) -- ^ Process incoming
-  -> ((Request -> m ()) -> m ()) -- ^ Emit outgoing
-  -> m ()
-clientRun conf onMsg cb = do
+  -> ((Request -> m ()) -> m r) -- ^ Emit outgoing
+  -> m r
+clientRun conf onMsg cb = clientRunWith conf $ \sock -> do
+  let doMsg resp = case A.eitherDecodeStrict' resp of
+        Right (Msg Ping n) -> sendMsg sock $ Msg Pong n
+        Right (Msg msg _) -> onMsg msg
+        Left e -> logWarn $ "Received malformed message from server" :# [ "ex" .= toText e, "msg" .= BUTF8.toString resp ]
+
+  let worker lo = do (resps, leftover) <- recvLines sock lo
+                     mapM_ doMsg resps
+                     worker leftover
+
+  withAsync (worker mempty) $ \inputAs -> do
+    link inputAs
+    cb (sendMsg sock)
+
+clientRunWith :: MonadIPCClient m => ClientConfig -> (Socket -> m r) -> m r
+clientRunWith conf program = do
   ai <- getClientAI conf
   withThreadContext ["component" .= ("ipc-client" :: String), "address" .= show ai.addrAddress] $ do
     bracket (open ai) (io . close) $ \sock -> do
       sendMsg sock $ IdentifyClient (thisPeerIdent "client") 0 (Just thisPeerDescription)
-      withAsync (inputWorker sock) $ \inputAs -> do
-        link inputAs
-        cb (sendMsg sock)
+      program sock
   where
     open ai = bracketOnError (io $ socket ai.addrFamily ai.addrSocketType ai.addrProtocol) (io . close) $ \sock -> do
       logInfo $ "Connecting to server..." :# [ "address" .= show ai.addrAddress ]
       io $ connect sock ai.addrAddress
       return sock
 
-    inputWorker sock = do
-      let worker lo = do
-            (resps, leftover) <- recvLines sock lo
-            mapM_ doMsg resps
-            worker leftover
+syncRequest :: MonadIPCClient m => Socket -> Request -> m Response
+syncRequest sock req = do
+  let m = 123 -- TODO
+  sendMsg sock (Msg req (Just 0))
+  let go [] = syncReceive sock >>= go
+      go (Msg x n : xs) | n == Just m = return x
+                        | otherwise = go xs
+  go []
 
-          doMsg resp = case A.eitherDecodeStrict' resp of
-            Right (Msg Ping n) -> sendMsg sock $ Msg Pong n
-            Right (Msg msg _) -> onMsg msg
-            Left e -> logWarn $ "Received malformed message from server" :# [ "ex" .= toText e, "msg" .= BUTF8.toString resp ]
-      worker ""
+syncReceive :: MonadIPCClient m => Socket -> m [Msg Response]
+syncReceive sock = go mempty
+  where go acc = recvLines sock acc >>= \case
+                   ([], acc') -> go (acc <> acc')
+                   (xs, _) -> return $ map (either error id . A.eitherDecodeStrict') xs
 
 -- * Utilities
 

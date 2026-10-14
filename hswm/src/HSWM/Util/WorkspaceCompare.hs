@@ -1,7 +1,3 @@
------------------------------------------------------------------------------
-
------------------------------------------------------------------------------
-
 -- |
 -- Module      :  HSWM.Util.WorkspaceCompare
 -- Description :  Functions for examining, comparing, and sorting workspaces.

@@ -8,6 +8,8 @@
 -- Portability : unportable
 module HSWM.Types.Events where
 
+import HSWM.Util.PP
+
 import qualified River as R
 import qualified WL.Client as WL
 import qualified WL.ExtIdleNotify.Staging.V1.Client as ExtIN
@@ -17,7 +19,6 @@ import qualified WL.Wlr.InputMethod.Unstable.V2.Client as WlrIM
 import qualified WL.Wlr.OutputManagement.Unstable.V1.Client as WlrOM
 import qualified WL.Wlr.OutputPowerManagement.Unstable.V1.Client as WlrOPM
 import qualified WL.XdgOutput.Unstable.V1.Client as Xdg
-
 import           System.Posix (Signal)
 
 -- | Main loop events.
@@ -69,11 +70,13 @@ data Event
   | IdleNotificationEvent     !ExtIN.IdleNotificationEvent
   | FTopLevelListEvent        !ExtFTL.ForeignToplevelListEvent
   | FTopLevelHandleEvent      !ExtFTL.ForeignToplevelHandleEvent
-  deriving stock (Eq, Ord, Show, Generic)
+  deriving stock (Eq, Ord, Show, Generic, Data)
   deriving anyclass (NFData, Hashable)
 
 instance (Applicative m, Monoid a) => Default (Event -> m a) where
   def _ = pure mempty
+
+deriving via PPGeneric Event instance Pretty Event
 
 class HandleEvent m event where
   handleEvent :: event -> m ()

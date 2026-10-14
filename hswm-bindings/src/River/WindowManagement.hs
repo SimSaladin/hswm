@@ -154,10 +154,11 @@ import           Data.Word
 import           Foreign.C.Types
 import           GHC.Generics
 import           HsBindgen.Runtime.CEnum
+import           Data.Data (Data)
 
 -- | Color in the format River expects it (@4 * 32b@ RGBA).
 data RiverColor = RiverColor { red, green, blue, alpha :: {-# UNPACK #-} !Word32 }
-  deriving stock (Eq, Ord, Show, Read, Bounded, Generic)
+  deriving stock (Eq, Ord, Show, Read, Bounded, Generic, Data)
   deriving anyclass (Default, NFData)
 
 data WindowBorders = WindowBorders

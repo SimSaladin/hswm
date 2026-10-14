@@ -1,7 +1,3 @@
------------------------------------------------------------------------------
-
------------------------------------------------------------------------------
-
 -- |
 -- Module      :  HSWM.Actions.DynamicWorkspaceOrder
 -- Description :  Remember a dynamically updateable ordering on workspaces.

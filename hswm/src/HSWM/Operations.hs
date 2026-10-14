@@ -36,8 +36,8 @@ manageKill = doManage WRequestClose
 -- Move and resize @w@ such that it fits inside the given rectangle, including its border.
 --
 -- /manage/
-tileWindow :: (SomeWindow a) => Bool -> a -> Rectangle -> HS ()
-tileWindow placeTop sw r = do
+tileWindow :: (SomeWindow a) => a -> Rectangle -> HS ()
+tileWindow sw r = do
   let rw = sw ^. riverId
   withWindow_ rw $ \w -> do
     case w.fullscreen of
@@ -50,25 +50,15 @@ tileWindow placeTop sw r = do
               | otherwise = x - bw * 2
         R.riverWindowProposeDimensions w.river_window (least $ fi r.size.width) (least $ fi r.size.height)
         doRender (WRPosition $ Position (fi r.position.x + bw) (fi r.position.y + bw)) rw
-        doRender (if placeTop then WRPlaceTop else WRPlaceBottom) rw
       Just ro -> do
         sid <- pointScreen r.position.x r.position.y
         mo <- lookupOutputBy (\x -> Just x.screen == fmap W.screen sid)
         case mo of
-          Just o
-            | ro == o.river_output -> doRender (if placeTop then WRPlaceTop else WRPlaceBottom) rw
-            | otherwise -> do
-                -- need to change the output where the window is fullscreened
-                R.riverWindowFullscreen rw o.river_output
-                modifyWindow rw $
-                  fullscreen
-                    ?~ o.river_output
-                    &+ position
-                    .~ o.position
-                    &+ size
-                    .~ o.size
-                doRender (if placeTop then WRPlaceTop else WRPlaceBottom) rw
-          Nothing -> return ()
+          -- need to change the output where the window is fullscreened
+          Just o | ro /= o.river_output -> do
+              R.riverWindowFullscreen rw o.river_output
+              modifyWindow rw $ fullscreen ?~ o.river_output &+ position .~ o.position &+ size .~ o.size
+          _ -> return ()
 
 windowPlaceTop :: (SomeWindow a) => a -> HS ()
 windowPlaceTop = doRender WRPlaceTop

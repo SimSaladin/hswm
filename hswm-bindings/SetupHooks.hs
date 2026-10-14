@@ -59,7 +59,7 @@ config = do
 
   modifyOptions $ optionCustom <>~
     Endo (bindGens . ix ServerBindings . bcBindGen . defineMacros . at "WL_HIDE_DEPRECATED" ?~ "1") <> -- Hide deprecated declarations in wayland server bindings
-    Endo (qualifiedImports <>~ [ ("WL.Util", "WL.Util") ]) <>            -- Configure dependency on wayland-util.h
+    Endo (qualifiedImports <>~ [ ("WL.Util", "WL.Util"), ("WL.Util.Generated", "WL.Util.Generated") ]) <>            -- Configure dependency on wayland-util.h
     Endo (dependsOn <>~ ["wl_display"])                                  -- So that the core bindings are loaded first always...
 
   -- Inject known interface info as needed include dirs from cabal dependencies

@@ -59,6 +59,7 @@ import           Data.Data (Data)
 import           Data.Default
 import           Data.Hashable (Hashable)
 import qualified Data.List as L
+import qualified Data.List.NonEmpty as NE
 import           Data.Maybe
 import           Data.Void
 import           Foreign
@@ -68,35 +69,35 @@ import           GHC.Generics (Generic, Generically(..))
 import           GHC.Records (getField)
 import           Language.Haskell.TH
 import           Language.Haskell.TH.Syntax
+import           Numeric (readHex)
 import           Prelude hiding (head)
 import           System.IO.Unsafe (unsafePerformIO)
-import qualified Data.List.NonEmpty as NE
+
 
 data ProtocolRenderSettings = ProtocolRenderSettings
-  { prRequestOptions    :: [(String, String, RequestSettings)] -- (iface, request, settings)
-  , prValueNameModifier :: String -> String
+  { prValueNameModifier :: String -> String
   , prTypeNameModifier  :: String -> String
 
-  , prInterfaceName :: ProtocolRenderSettings -> String -> String
 
+  , prInterfaceName :: ProtocolRenderSettings -> String -> String
   , prInterfaceEventName :: ProtocolRenderSettings -> String -> String
   -- ^ Interface name -> Event name
+  , prInterfaceTypeDerive :: Name -> [Q DerivClause]
 
-  , prEventName :: (ProtocolRenderSettings, Interface, IEvent) -> String -> Name
 
-  , prEventDerive :: Interface -> [Q DerivClause]
+  , prEventName             :: (ProtocolRenderSettings, Interface, IEvent) -> String -> Name
+  , prEventDerive           :: Name -> Interface -> [Q DerivClause]
   -- ^ Derived instances for event types
-
-  , prEventArgTypeTrans :: ProtocolRenderSettings -> Interface -> IEvent -> Arg -> Type -> Q Type
+  , prEventArgTypeTrans     :: ProtocolRenderSettings -> Interface -> IEvent -> Arg -> Type -> Q Type
   -- ^ Transform the type of event arguments.
+  , prEventArgTrans         :: ProtocolRenderSettings -> Interface -> IEvent -> Arg -> Type -> Q Exp -> Q Exp
+  , prEventArgName          :: ProtocolRenderSettings -> Interface -> IEvent -> Arg -> Type -> String
 
-  , prEventArgTrans :: ProtocolRenderSettings -> Interface -> IEvent -> Arg -> Type -> Q Exp -> Q Exp
 
   , prRequestArgTypeTrans :: ProtocolRenderSettings -> Interface -> IRequest -> Arg -> Type -> Q Type
   -- ^ Transform the type of request arguments.
-  , prRequestArgTrans :: ProtocolRenderSettings -> Interface -> IRequest -> Arg -> Type -> Name -> (ExpQ, Maybe (Name -> ExpQ))
-
-  , prEventArgName :: ProtocolRenderSettings -> Interface -> IEvent -> Arg -> Type -> String
+  , prRequestArgTrans     :: ProtocolRenderSettings -> Interface -> IRequest -> Arg -> Type -> Name -> (ExpQ, Maybe (Name -> ExpQ))
+  , prRequestOptions      :: [(String, String, RequestSettings)] -- (iface, request, settings)
   }
 
 data RequestSettings = RequestSettings
@@ -104,7 +105,7 @@ data RequestSettings = RequestSettings
   , reqCheckNull     :: Bool
   , reqCheckMinusOne :: Bool
   , reqDisable       :: Bool
-  }
+  } deriving (Show)
 
 instance Default RequestSettings where
   def = RequestSettings False False False False
@@ -115,15 +116,21 @@ instance Default ProtocolRenderSettings where
     , prTypeNameModifier    = upperFirst . fromSnailCase
     , prInterfaceName       = \s -> s.prValueNameModifier . (++ "_interface") . s.prValueNameModifier
     , prInterfaceEventName  = \s ifn -> s.prTypeNameModifier ifn ++ "Event"
+    , prInterfaceTypeDerive = \nm ->
+        [ derivClause (Just StockStrategy)   [ [t|Eq|], [t|Ord|], [t|Generic|] ]
+        , derivClause (Just NewtypeStrategy) [ [t|Storable|], [t|Hashable|], [t|NFData|], [t|IsUserData|] ]
+        , viaStrategy [t|PPShow $(conT nm)|] >>= \st -> derivClause (Just st) [ [t|Pretty|] ]
+        ]
 
     , prRequestArgTypeTrans = defaultRequestArgTypeTrans
     , prRequestArgTrans     = defaultRequestArgTrans
     , prRequestOptions      = []
 
     , prEventName           = defaultEventName
-    , prEventDerive         = const
-        [ derivClause (Just StockStrategy) [ [t|Eq|], [t|Ord|], [t|Show|], [t|Generic|] ]
+    , prEventDerive         = \tyName _ ->
+        [ derivClause (Just StockStrategy) [ [t|Eq|], [t|Ord|], [t|Show|], [t|Generic|], [t|Data|] ]
         , derivClause (Just AnyclassStrategy) [ [t|NFData|], [t|Hashable|] ]
+        , viaStrategy [t|PPGeneric $(conT tyName)|] >>= \st -> derivClause (Just st) [ [t|Pretty|] ]
         ]
     , prEventArgName        = defaultEventArgName
     , prEventArgTypeTrans   = defaultEventArgTypeTrans
@@ -167,6 +174,9 @@ defaultTypeTrans s iface arg t
   | AEnum enum mobj <- arg.argType
   = conT =<< lookupImportedTypeName' mkName (getArgIFName iface arg) (s.prTypeNameModifier (s.prTypeNameModifier (fromMaybe iface.name mobj) ++ "_" ++ enum))
 
+  | ConT cN <- t, nameBase cN == "Wl_fixed_t"
+  = conT $ mkName "WL.Util.Fixed"
+
   | AArray{} <- arg.argType
   = appT (conT =<< lookupImportedTypeName "" "Array") (conT ''())
 
@@ -208,6 +218,9 @@ defaultEventArgTrans s iface _ev arg t x
   | AppT (ConT cN) (ConT tN) <- t, cN == ''PtrConst, tN == ''CChar
   = [|let p = unConstPtr $(x) in if p == nullPtr then return "" else peekCString p|]
 
+  | ConT cN <- t, nameBase cN == "Wl_fixed_t"
+  = [|return $! $(conE $ mkName "WL.Util.Fixed") $(x)|]
+
   | otherwise = [|return $(x)|]
 
 defaultRequestArgTrans :: ProtocolRenderSettings -> Interface -> IRequest -> Arg -> Type -> Name -> (ExpQ, Maybe (Name -> ExpQ))
@@ -217,6 +230,9 @@ defaultRequestArgTrans _s iface _ arg t name
 
   | AEnum{} <- arg.argType
   = ([|return (fromIntegral $! getField @"unwrap" $(varE name))|], Nothing)
+
+  | ConT cN <- t, nameBase cN == "Wl_fixed_t"
+  = ([|return (getField @"unwrap" $(varE name))|], Nothing)
 
   | AppT (ConT cN) (ConT tN) <- t, cN == ''Ptr, nameBase tN == upperFirst iface.name
   = ([|return (getField @"unwrap" $(varE name))|], Nothing)
@@ -293,21 +309,25 @@ doClient settings proto = do
       ]
     docSection name items = unlines $ ("* " ++ name ++ "\n") : items
 
-renderNewType :: Bool -> Name -> Name -> String -> Q [Dec]
-renderNewType deriveData ntName objT doc = do
+renderNewType :: ProtocolRenderSettings -> Bool -> Name -> Name -> String -> Q [Dec]
+renderNewType s deriveData ntName objT doc = do
   let con    = recC ntName [ varBangType (mkName "unwrap") (bangType (bang noSourceUnpackedness noSourceStrictness) [t|Ptr $(conT objT)|]) ]
-      derivs = [ derivClause (Just StockStrategy)   [ [t|Eq|], [t|Ord|], [t|Generic|] ]
-               , derivClause (Just NewtypeStrategy) [ [t|Storable|], [t|Hashable|], [t|NFData|], [t|IsUserData|] ] ]
-               ++ [ derivClause (Just StockStrategy) [ [t|Data|] ] | deriveData ]
-  concat <$> sequence (
+      derivs = s.prInterfaceTypeDerive ntName
+        ++ [  derivClause (Just StockStrategy) [ [t|Data|] ] | deriveData ]
+   in
+    concat <$> sequence (
     [ sequence [ newtypeD_doc (pure []) ntName [] Nothing (con, Nothing, []) derivs (if doc == "" then Nothing else Just doc) ]
     , [d|
+      -- | 'nullPtr'
       instance Default $(conT ntName) where
         def = $(conE ntName) nullPtr
+
       instance Show $(conT ntName) where
-        show = show . ptrToWordPtr . getField @"unwrap"
+        showsPrec _ x rs = show (castPtr $ getField @"unwrap" x :: Ptr Void) ++ rs
+
       instance Read $(conT ntName) where
-        readsPrec n xs = first ($(conE ntName) . wordPtrToPtr) <$> readsPrec n xs
+        readsPrec _ ('0' : 'x' : xs) = first ($(conE ntName) . wordPtrToPtr) <$> readHex xs
+        readsPrec _ _ = error "expected a string starting with \"0x...\""
       |]
     ]
     -- XXX: orphan Data instance
@@ -385,26 +405,22 @@ renderInterfaceValue s iface = do
 
 renderEnum :: ProtocolRenderSettings -> Interface -> IEnum -> Q [Dec]
 renderEnum s iface e = do
-  tySyn <- tySynD enumName [] (conT origTy)
+  tySyn   <- tySynD enumName [] (conT origTy)
   patSyns <- mapM renderEntry e.entries
-  -- Missing instances:
-  --    Bitfield
-  --    Bounded
-  --    <Enum>
-  --    Ix
-  --    Num Integral Real
+  -- Missing instances: Bitfield Bounded <Enum> Ix Num Integral Real
   -- XXX: orphan instances
-  derivs <- [d|
-    deriving stock instance Data $(conT origTy)
-    deriving newtype instance Bits $(conT origTy)
+  derivs  <- [d|
+    deriving stock   instance Data       $(conT origTy)
+    deriving newtype instance Bits       $(conT origTy)
     deriving newtype instance FiniteBits $(conT origTy)
-    deriving newtype instance NFData $(conT origTy)
-    deriving newtype instance Hashable $(conT origTy)
+    deriving newtype instance NFData     $(conT origTy)
+    deriving newtype instance Hashable   $(conT origTy)
+    deriving via (PPGeneric ($(conT origTy))) instance Pretty $(conT origTy)
     |]
   return (tySyn : concat patSyns ++ derivs)
   where
     enumName = mkName $ s.prTypeNameModifier $ s.prTypeNameModifier iface.name ++ "_" ++ e.name
-    origTy = mkName $ upperFirst iface.name ++ "_" ++ e.name
+    origTy   = mkName $ upperFirst iface.name ++ "_" ++ e.name
     renderEntry en = do
       let doc  = escapeString en.summary ++ "\n\nValue: " ++ show en.value
           name = mkName $ upperFirst $ fromSnailCase $ s.prValueNameModifier iface.name ++ "_" ++ e.name ++ "_" ++ en.name
@@ -430,7 +446,7 @@ renderInterfaceObject s iface = concat <$> sequence [ renderNT, renderIsWlObject
     getFn fn = lookupImportedValueName iface.name (iface.name ++ "_" ++ fn)
     hasDestroy = any (\x -> requestType x == Just "destructor") iface.requests
 
-    renderNT = renderNewType True ntName (mkName $ upperFirst iface.name) $ unlines
+    renderNT = renderNewType s True ntName (mkName $ upperFirst iface.name) $ unlines
         [ formatDescription iface.description
         , "\nEnums: "    ++ unwords [ e.name | e <- iface.enums ]
         , "\nRequests: " ++ unwords [ r.name | r <- iface.requests ]
@@ -662,7 +678,7 @@ renderListenerEvents s iface = concat <$> sequence [ mkEvent s iface, mkHasListe
 mkEvent :: ProtocolRenderSettings -> Interface -> Q [Dec]
 mkEvent s iface = do
   (_, TyConI (DataD _ _ _ _ [RecC _ recs] _)) <- interfaceListener iface
-  sequence [ dataD_doc (pure []) eventN [] Nothing (map mkEvCon recs) (s.prEventDerive iface) (Just "") ]
+  sequence [ dataD_doc (pure []) eventN [] Nothing (map mkEvCon recs) (s.prEventDerive eventN iface) (Just "") ]
 
   where
     eventN = mkName $ s.prInterfaceEventName s iface.name

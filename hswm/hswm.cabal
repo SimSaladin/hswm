@@ -1,6 +1,6 @@
 cabal-version: 3.12
 
--- This file has been generated from package.yaml by hpack version 0.39.6.
+-- This file has been generated from package.yaml by hpack version 0.39.0.
 --
 -- see: https://github.com/sol/hpack
 
@@ -97,6 +97,7 @@ library
           HSWM.Util.NamedScratchpad
           HSWM.Util.PangoMarkup
           HSWM.Util.Posix
+          HSWM.Util.PP
           HSWM.Util.Process
           HSWM.Util.Rectangle
           HSWM.Util.RofiPrompt

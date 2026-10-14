@@ -1,10 +1,13 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
+{-# OPTIONS_GHC -Wno-incomplete-record-selectors #-} -- XXX
+
 
 module Main (main) where
 
 import           HSWM.IPC
 
+import           HSWM.Main.Options as HSWM (LogType'(LogStderr), defaultBufSize, initLoggers, AnsiColors(..), LogFormat)
 import           Control.Monad.Reader
 import qualified Data.Aeson as A
 import qualified Data.ByteString.Lazy.Char8 as BL
@@ -17,18 +20,61 @@ import           Prettyprinter.Render.Terminal
 import           System.Console.Haskeline
 import           System.Console.Haskeline.ReaderT
 
-type CM = InputT (LoggingT IO)
+type ClientOptions = ClientOptions' Unwrapped
+
+deriving instance Eq ClientOptions
+deriving instance Show ClientOptions
+
+data ClientOptions' w
+  = Version
+  | Interactive
+    { colorEnable :: w ::: AnsiColors <!> "auto" <#> "c" <?> "enable color output"
+    , logFormat   :: w ::: LogFormat <!> "plain" <?> "Log output"
+    }
+  | Dump
+    { colorEnable :: w ::: AnsiColors <!> "auto" <#> "c" <?> "enable color output"
+    , logFormat   :: w ::: LogFormat <!> "plain" <?> "Log output"
+    }
+    deriving (Generic)
+
+instance ParseRecord (ClientOptions' Wrapped) where
+  parseRecord = parseRecordWithModifiers defaultModifiers
+    -- { constructorNameModifier = }
+
 
 main :: IO ()
-main = runInputT defaultSettings $ do
-  printExt <- getExternalPrint
-  fromReaderT $ runRT (getLogFun printExt)
+main = do
+    opts <- unwrapRecord progDesc
+    runMode opts
   where
+    progDesc :: Text
+    progDesc = "hswmctl"
+
+    runMode :: ClientOptions -> IO ()
+    runMode Interactive{} = interactive
+    runMode Version{} = undefined
+    runMode opts@Dump{} = withConnect opts $ \sock -> do
+      res <- syncRequest sock (DumpState { param = "" })
+      io $ BL.putStrLn $ "\n\n" <> A.encode res <> "\n"
+
+    withConnect opts f = withLogging (opts.logFormat, opts.colorEnable) $ clientRunWith def f
+
+    withLogging (fmt, co) f =
+      bracket (initLoggers (LogStderr defaultBufSize) fmt co)
+              (\(_, fn) -> liftIO fn) $ \(logFn, _) ->
+                runLoggingT f logFn
+
+    interactive = runInputT defaultSettings $ do
+        printExt <- getExternalPrint
+        fromReaderT $ runRT (getLogFun printExt)
+
     getLogFun f loc src lv s = do
-      t <- getCurrentTime
-      let logStrBS = fromLogStr $ defaultLogStr t mempty loc src lv s
-          msg      = A.decodeStrict @LoggedMessage logStrBS
-      whenJust msg $ f . TL.unpack . renderLazy . layoutPretty defaultLayoutOptions . prettyLogMsg
+        t <- getCurrentTime
+        let logStrBS = fromLogStr $ defaultLogStr t mempty loc src lv s
+            msg      = A.decodeStrict @LoggedMessage logStrBS
+        whenJust msg $ f . TL.unpack . renderLazy . layoutPretty defaultLayoutOptions . prettyLogMsg
+
+type CM = InputT (LoggingT IO)
 
 runRT :: (Loc -> LogSource -> LogLevel -> LogStr -> IO ()) -> ReaderT (InputTEnv IO) IO ()
 runRT logFun = withReaderT (mapInputTEnv liftIO) $

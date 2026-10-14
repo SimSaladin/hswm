@@ -107,7 +107,7 @@ myKeys =
   [ ("M-r r", RP.rofiLaunch @H (def & RP.oneMode "run") <?> "Run shell (prompt)"),
     ("M-r d", RP.rofiLaunch @H (def & RP.oneMode "drun" & RP.showIcons .~ True) <?> "Run desktop app (prompt)"),
     ("M-r s", RP.rofiRun @H (def & RP.history ?~ "systemd-run" & RP.prompt .~ "systemd-run" & RP.dmenuMode .~ True) ([] :: [String])
-                  RP.++> RP.runWithSystemD <?> "Run via systemd-run (prompt)"),
+                  RP.++> runWithSystemD <?> "Run via systemd-run (prompt)"),
     -- clipboard prompt
     ("M-r c", RP.rofiLaunch @H (def & RP.oneMode "clipboard:cliphist-rofi-img" & RP.showIcons .~ True) <?> "Open cliphist prompt"),
     -- bluetooth prompt
@@ -286,7 +286,7 @@ adjustVolume :: String -> Double -> SomeAction H
 adjustVolume target base = act <?> printf "Audio volume %s (%s)" (ppAdj base :: String) target
   where
     getFactor = clamp (5, - 5) . fromMaybe 1 . (>>= readMaybe) <$> lookupEnv "WPCTL_VOLUME_SCALE"
-    ppAdj x = printf "%.5%c" (abs x) (if x >= 0 then '+' else '-')
+    ppAdj x = printf "%.5f%c" (abs x) (if x >= 0 then '+' else '-')
     act = do a <- getFactor
              spawnProcess @H "wpctl" ["set-volume", target, ppAdj (base * a)]
 

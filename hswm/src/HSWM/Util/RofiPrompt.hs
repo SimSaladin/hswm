@@ -264,11 +264,6 @@ rofiToProc pcfg =
     fromMode (Mode s) = s
     fromMode (ModeCustom ti sc) = ti ++ ":" ++ sc
 
-
-runWithSystemD :: (HasCallStack, MonadRofi env m) => String -> m ()
-runWithSystemD cmd = void $ readProcess $ proc "systemd-run"
-  [ "--user", "--no-block", "--collect", "--", "bash", "-c", cmd ]
-
 (++>) :: Monad m => m (Maybe String) -> (String -> m ()) -> m ()
 ma ++> f = ma >>= flip whenJust f
 

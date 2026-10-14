@@ -75,3 +75,7 @@ logOutput logFn prefix meta = mkPipeStreamSpec $ \pc h -> do
       showCmd (RawCommand x xs) = unwords (x : xs)
       f | prefix == "" = id
         | otherwise    = ((prefix <> ": ") <>)
+
+runWithSystemD :: HasCallStack => MonadProcessSpawn m => String -> m ()
+runWithSystemD cmd = void $ readProcess $ proc "systemd-run"
+  [ "--user", "--no-block", "--collect", "--", "bash", "-c", cmd ]

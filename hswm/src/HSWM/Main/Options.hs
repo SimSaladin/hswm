@@ -8,7 +8,13 @@
 -- Stability   : unstable
 -- Portability : unportable
 --
-module HSWM.Main.Options where
+module HSWM.Main.Options
+  ( module HSWM.Main.Options
+  , FastLogger
+  , LogType'(..)
+  , defaultBufSize
+  , Last(..)
+  ) where
 
 import           Data.Char
 import qualified Data.List as L
@@ -43,7 +49,7 @@ type Main = MainOptions Unwrapped
 data MainOptions w = MainOptions
   { mainLogLevel  :: w ::: Last LogLevel  <#> "l" <?> "Log level [debug,info,warn,error]"
   , mainLogFile   :: w ::: Last FilePath  <#> "o" <?> "Send logs to a file. If empty, a default file is used. If \"-\" the log output is sent to stdout."
-  , mainLogFormat :: w ::: Last LogFormat         <?> "Which log format use [plain,json]"
+  , mainLogFormat :: w ::: LogFormat         <?> "Which log format use [plain,json]"
   , mainColor     :: w ::: Last AnsiColors        <?> "Whether to enable color output in plain format mode"
   , mainStateFile :: w ::: Maybe FilePath <#> "f" <?> "State file to read on restart."
   , mainVersion   :: w ::: Bool           <#> "V" <?> "Display version and exit."
@@ -58,7 +64,7 @@ instance Default Main where
   def = MainOptions
     { mainLogLevel  = pure LevelDebug
     , mainLogFile   = mempty
-    , mainLogFormat = pure LogFormatJSON
+    , mainLogFormat = LogFormatJSON
     , mainColor     = mempty
     , mainStateFile = mempty
     , mainVersion   = def
@@ -67,6 +73,9 @@ instance Default Main where
 
 data AnsiColors = ColorAuto | ColorNever | ColorAlways
   deriving (Eq, Ord, Show, Read, Generic)
+
+instance Default AnsiColors where
+  def = ColorAuto
 
 instance ParseField AnsiColors where
   readField = Opts.maybeReader $ \case
@@ -77,6 +86,11 @@ instance ParseField AnsiColors where
     "yes"     -> Just ColorAlways
     "always"  -> Just ColorAlways
     _         -> Nothing
+
+instance ParseFields AnsiColors
+
+instance ParseRecord AnsiColors where
+  parseRecord = fmap getOnly parseRecord
 
 -- | Field modifiers: drop the @main@ prefix, use @-@ as word separator.
 instance ParseRecord (MainOptions Wrapped) where
@@ -94,20 +108,21 @@ instance ParseRecord (MainOptions Wrapped) where
 -- * Logging
 
 initLoggers
-  :: MainOptions Unwrapped
-  -> IO (LogType, Loc -> LogSource -> LogLevel -> LogStr -> IO (), IO ())
-initLoggers options = do
-  logType <- mainLogType options
-  case getLast options.mainLogFormat of
-    Just LogFormatJSON -> do
+    :: LogType
+    -> LogFormat
+    -> AnsiColors -- ^ Enable color output if terminal?
+    -> IO (Loc -> LogSource -> LogLevel -> LogStr -> IO (), IO ())
+initLoggers logType logFormat ansiColors = do
+  case logFormat of
+    LogFormatJSON -> do
       (lgr, clean) <- newFastLogger logType
       let lgrFun = defaultOutputWith $ defaultOutputOptions $ \_ -> lgr . toLogStr
-      return (logType, lgrFun, clean)
+      return (lgrFun, clean)
 
-    Just LogFormatPLAIN -> do
+    LogFormatPLAIN -> do
       getTime <- FastLogger.newTimeCache FastLogger.simpleTimeFormat'
       (timedLog, clean) <- newTimedFastLogger getTime logType
-      let hasColor = case fromMaybe ColorAuto $ getLast options.mainColor of
+      let hasColor = case ansiColors of
                          ColorAlways -> True
                          ColorNever -> False
                          ColorAuto -> case logType of
@@ -127,8 +142,7 @@ initLoggers options = do
               toLogStr time <> " " <>
               MonadLog.defaultLogStr loc src lvl (unJSON msg toLogStr (toLogStr . A.encode) id)
 
-      return (logType, lgrFun, clean)
-    _ -> error "loggerOutput"
+      return (lgrFun, clean)
   where
     lopts = PP.defaultLayoutOptions { PP.layoutPageWidth = PP.Unbounded }
     ppLevel = \case
@@ -197,13 +211,15 @@ instance ParseField LogLevel where
 
 data LogFormat = LogFormatJSON
                | LogFormatPLAIN
-               deriving (Eq, Ord, Enum, Show, Read)
+               deriving (Eq, Ord, Enum, Show, Read, Generic, Data)
 
 instance ParseField LogFormat where
   readField = Opts.maybeReader $ \case
     "json"  -> Just LogFormatJSON
     "plain" -> Just LogFormatPLAIN
     _       -> Nothing
+instance ParseFields LogFormat
+instance ParseRecord LogFormat
 
 -- * Misc.
 

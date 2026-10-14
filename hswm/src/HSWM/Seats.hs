@@ -48,25 +48,29 @@ added rs = do
 -- Currently this will also request idle notifications via ext-idle-notify-v1.
 hasWlSeat :: RiverSeat -> WL.ObjectName -> H ()
 hasWlSeat seat name = do
-    wls   <- bindGlobalName @WL.Seat name Nothing
-    idlno <- withObject $ \idno -> EXT_IN.idleNotifierGetIdleNotification idno (10 * 60 * 1000) wls
-    withObject $ \l -> WL.listenerAdd wls l seat
-    withObject $ \l -> WL.listenerAdd idlno l seat
+    wls <- globalBindAndListen @WL.Seat False Nothing (Just seat) Nothing (Just name)
+    idlno <- objectCommand EXT_IN.idleNotifierGetIdleNotification >>= \f -> f (10 * 60 * 1000) wls
+    addGlobalListener idlno (Just seat)
     runInHS $ modifySeat seat $ wlSeat .~ wls &+ idleNotification .~ idlno
+
+objectCommand :: forall o f. (Typeable o) => (o -> f) -> H f
+objectCommand f = do
+  o <- getObject @o
+  return (f o)
 
 deleteRemovedSeat :: Seat -> HS ()
 deleteRemovedSeat s = do
   seatList %= L.filter ((/= s.river_seat) . view riverSeat)
   forM_ s.xkb_bindings destroyXKBBinding
   forM_ s.pointer_bindings destroyPointerBinding
-  io $ R.objectDestroy s.xkb_bindings_seat
-  io $ R.objectDestroy s.river_layer_shell_seat
-  io $ R.objectDestroy s.idleNotification
-  io $ R.objectDestroy s.wlKeyboard
-  io $ R.objectDestroy s.wlPointer
-  io $ R.objectDestroy s.wlTouch
-  io $ R.objectDestroy s.wl_seat
-  io $ R.objectDestroy s.river_seat
+  R.objectDestroy s.xkb_bindings_seat
+  R.objectDestroy s.river_layer_shell_seat
+  R.objectDestroy s.idleNotification
+  R.objectDestroy s.wlKeyboard
+  R.objectDestroy s.wlPointer
+  R.objectDestroy s.wlTouch
+  R.objectDestroy s.wl_seat
+  R.objectDestroy s.river_seat
 
 -- * Events
 
@@ -167,8 +171,6 @@ handlePointerEvent = \case
     _ -> return ()
   where
     getBindingRef dt = io $ deRefStablePtr (castPtrToStablePtr $ castPtr dt :: StablePtr (PointerBinding (SomeAction H)))
-
----------------------------------------------------------
 
 -- * Manage
 
@@ -331,8 +333,6 @@ setXCursorTheme rs = do
     (_:_, _) | sz > 1 -> R.riverSeatSetXcursorTheme rs (Just theme) sz
     _                 -> pure ()
 
----------------------------------------------------------
-
 -- * Render
 
 render :: H ()
@@ -351,8 +351,6 @@ render1 s = do
       let x = s.op_start_x + (if (s.op_edges .&. fi ((.unwrap) R.EdgeLeft)) /= 0 then s.op_start_width - fi w.size.width else 0)
       let y = s.op_start_y + (if (s.op_edges .&. fi ((.unwrap) R.EdgeTop)) /= 0 then s.op_start_height - fi w.size.height else 0)
       setWindowPosition w x y
-
-----------------------------------------------------------
 
 -- * Xkb and Pointer bindings
 

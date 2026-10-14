@@ -58,7 +58,8 @@ startHSWM
 startHSWM options config = do
     installSignalHandlers -- TODO uninstall on exit?
 
-    (_logType, lgrFun, lgrCleanup) <- initLoggers options
+    logType <- mainLogType options
+    (lgrFun, lgrCleanup) <- initLoggers logType options.mainLogFormat (fromMaybe def $ getLast options.mainColor)
 
     let connectTo = Nothing
 
@@ -171,7 +172,7 @@ defaultRegistrySettings = withRunInIO $ \runInIO -> return def
         , "interface-version" .= WL.objectInterfaceVersion p
         , "interface"         .= WL.objectInterfaceName p
         ]
-  , WL.regOnEvent = runInIO . Debug.logEvent
+  , WL.regOnEvent = \ev -> runInIO $ Debug.logEventShow "Registry" ev []
   }
 
 mainLoop :: WL.Display -> Posix.Fd -> H ()
@@ -216,7 +217,7 @@ mainLoop wlDisplay wlPollFd = do
       main MainPoll
 
     main (MainSignal sig) = do
-      logInfo $ "Main: interrupted by signal: " <> tshow sig :# ["signal" .= show sig ]
+      logInfo $ "Main: interrupted by signal (" <> tshow sig <> ")" :# [ "signal" .= show sig ]
       mainExit exitFailure
 
     main (MainExit desc e) = do

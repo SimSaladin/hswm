@@ -23,13 +23,17 @@ module WL.Internals.Types (
   IsUserData(..),
   -- * Re-exports
   module ReExports,
+  Wl_fixed_t(..),
   ) where
 
-import           WL.Util.Generated (Wl_interface)
+import           WL.Util.Generated (Wl_array(..), Wl_fixed_t(..), Wl_interface, Wl_list(..))
 
+import           Control.DeepSeq (NFData(..))
+import           Data.Default  (Default(..))
 import           Control.Monad.IO.Class
 import           Data.Coerce
 import           Data.Data (Data)
+import           Data.Hashable (Hashable)
 import           Data.Kind (Type)
 import           Data.Proxy
 import           Data.Typeable
@@ -40,10 +44,22 @@ import           Foreign.C.ConstPtr
 import           GHC.TypeLits
 import           HsBindgen.Runtime.Prelude as ReExports (CEnum(..), CEnumZ, FromFunPtr(..),
                                                          PtrConst, ToFunPtr(..))
+import           Prettyprinter.Generics as ReExports (PPGeneric(..), PPGenericOverride(..),
+                                                      Pretty(..))
+import           Prettyprinter.Show as ReExports (PPShow(..))
 
--- Orphan instances
+-- Orphan instances XXX
 deriving instance Data CUInt
 deriving instance Data CInt
+deriving instance Data CSize
+deriving instance Data Wl_array
+deriving newtype instance Hashable CUInt
+deriving newtype instance Pretty CUInt
+deriving instance Data Wl_fixed_t
+deriving via PPShow (Ptr a) instance Pretty (Ptr a)
+deriving newtype instance Hashable Wl_fixed_t
+instance NFData Wl_fixed_t where rnf (Wl_fixed_t a) = rnf a
+instance Default Wl_list where def = Wl_list nullPtr nullPtr
 
 type Version = Word32
 

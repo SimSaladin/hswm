@@ -1,6 +1,5 @@
 {-# LANGUAGE RoleAnnotations      #-}
 {-# LANGUAGE UndecidableInstances #-}
-{-# OPTIONS_GHC -Wno-orphans #-}
 
 -- |
 -- Module      : WL.Util
@@ -59,10 +58,13 @@ module WL.Util
   -- ** Max message size
   wL_MAX_MESSAGE_SIZE,
 
+  module ReExports,
+  Wl_fixed_t(..)
   ) where
 
 import           WL.Util.Generated
 import qualified WL.Util.Generated.Unsafe as U
+import           WL.Internals.Types ()
 
 import qualified HsBindgen.Runtime.HasCField as CF
 import           UnliftIO
@@ -70,9 +72,10 @@ import           UnliftIO
 import           Control.DeepSeq (NFData(..))
 import           Control.Monad
 import           Data.Coerce
-import           Data.Default
+import           Data.Data (Data)
 import qualified Data.Fixed as F
 import           Data.Hashable (Hashable)
+import           Data.Primitive.Types (Prim)
 import           Data.Proxy
 import           Foreign
 import           Foreign.C.ConstPtr
@@ -80,9 +83,10 @@ import           Foreign.C.Types
 import           GHC.Generics
 import           GHC.Records
 import           System.IO.Unsafe
-import Data.Primitive.Types (Prim)
 
-deriving newtype instance Hashable CUInt
+import Prettyprinter.Generics as ReExports (Pretty(..), PPGeneric(..), PPGenericOverride(..))
+import Prettyprinter.Show as ReExports (PPShow(..))
+
 
 -- | Dynamic array
 --
@@ -92,8 +96,10 @@ deriving newtype instance Hashable CUInt
 -- be of the same size, wl_array_for_each() does require all elements to have
 -- the same type and size.
 newtype Array (a :: k) = Array { unwrap :: Ptr Wl_array }
-  deriving stock (Eq, Ord, Show, Generic)
+  deriving stock (Eq, Ord, Show, Generic, Data)
   deriving newtype (Storable, NFData, Hashable)
+
+deriving via PPShow (Array a) instance Pretty (Array a)
 
 -- | Initializes a new empty array.
 arrayNew :: MonadIO m => m (Array a)
@@ -154,9 +160,6 @@ arrayForEach (Array arr) f = do
   if dataPP == nullPtr
      then return mempty
      else liftIO (peek dataPP) >>= go . castPtr
-
-instance Default Wl_list where
-  def = Wl_list nullPtr nullPtr
 
 -- * Wl_list
 
@@ -281,13 +284,8 @@ listSeekBackward (List l) = liftIO $ List . (.prev) <$> peek l
 -- as an opaque struct with methods that facilitate conversion to and from
 -- Double and Int types.
 newtype Fixed = Fixed { unwrap :: Wl_fixed_t }
-  deriving stock (Eq, Generic)
+  deriving stock (Eq, Generic, Data)
   deriving newtype (Ord, Bits, Bounded, Enum, NFData, Storable, Prim, Hashable)
-  -- deriving anyclass (Hashable)
-
-deriving newtype instance Hashable Wl_fixed_t
-instance NFData Wl_fixed_t where
-  rnf (Wl_fixed_t a) = rnf a
 
 instance Show Fixed where
   show (Fixed (Wl_fixed_t x)) = F.showFixed True (F.MkFixed $ fromIntegral x :: F.Fixed 256)
@@ -308,6 +306,8 @@ instance Fractional Fixed where
 
 instance Real Fixed where
   toRational (Fixed (Wl_fixed_t a)) = toRational a / 8
+
+deriving via PPShow Fixed instance Pretty Fixed
 
 fixedToInt :: Fixed -> Int
 fixedToInt (Fixed x) = unsafePerformIO . fmap fromIntegral $ U.wl_fixed_to_int x

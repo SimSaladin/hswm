@@ -34,8 +34,6 @@ import qualified River as R
 ---------------------------------------------------------
 -- Orphan instances
 
-deriving instance Data R.RiverColor
-
 instance Show (Async a) where show _ = "<Async>"
 instance Show (StablePtr a) where show _ = "<SP>"
 

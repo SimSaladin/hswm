@@ -72,8 +72,18 @@ globalBindAndListen uniq mbListen mbData mverMax mname = do
   where
     udata = maybe nullPtr WL.toUserData mbData
 
+-- * Create and track event listeners
+
 -- | Create a type-directed listener
-mkListener :: forall m env o. (MonadStateGlobal env m, MonadEffectsIO m, WL.HasListener o) => (WL.ObjectListenerEvent o -> m ()) -> m ()
+mkListener :: forall m env o. (MonadStateGlobal env m, MonadEffectsIO m, WL.HasListener o, Typeable (WL.ObjectListener o))
+           => (WL.ObjectListenerEvent o -> m ()) -> m ()
 mkListener f = createUnique_ $ do
   run <- askRunInIO
   WL.createListener (run . f)
+
+addGlobalListener
+  :: forall obj env m userdata. (MonadStateGlobal env m, WL.IsUserData userdata, WL.HasListener obj)
+  => obj -> Maybe userdata -> m ()
+addGlobalListener obj mbData = do
+    l <- getObject @(ConstPtr (WL.ObjectListener obj))
+    WL.listenerAdd obj l $ maybe nullPtr WL.toUserData mbData
