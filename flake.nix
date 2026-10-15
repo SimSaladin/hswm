@@ -46,14 +46,25 @@
       url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    systems.url = "github:nix-systems/default";
   };
 
-  outputs = inputs@{ ... }: inputs.flake-parts.lib.mkFlake { inherit inputs; }
-    ({ self, lib, ... }:
-      let
-        inherit (inputs.flake-utils.lib) mkApp;
-      in
-      {
+  outputs = inputs@{ nixpkgs, systems, ... }:
+    let
+      inherit (inputs.flake-utils.lib) mkApp;
+      forEachSystem = nixpkgs.lib.genAttrs (import systems);
+    in
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } ({ self, lib, ... }:
+    {
+      flake.formatter = forEachSystem (system:
+          let
+            pkgs = nixpkgs.legacyPackages.${system};
+            config = pkgs.pre-commit-check.config;
+                    inherit (config) package configFile;
+            script = ''${pkgs.lib.getExe package} run --all-files --config ${configFile}'';
+          in
+           pkgs.writeShellScriptBin "pre-commit-run" script);
+
         # Materialization: nix run .#materialized-do
         _module.args.checkMaterialization = false;
 
@@ -67,8 +78,6 @@
         ];
 
         systems = [ "x86_64-linux" ];
-
-
         debug = true;
 
         # combined overlay for export
@@ -78,12 +87,10 @@
           self.overlays.hs-bindgen
           self.overlays.cabal-master
           self.overlays.project
-
-          (final: prev: {
-            my-lib = final.callPackage ./nix/make-fixed-output.nix { };
+          (f: prev: {
+            my-lib = f.callPackage ./nix/make-fixed-output.nix { };
           })
         ];
-
 
         perSystem = { system, lib, pkgs, ... }: {
           _module.args.pkgs = import inputs.nixpkgs {
@@ -97,10 +104,10 @@
             };
           };
 
-          pre-commit = {
+          apps.pre-commit = {
             pkgs = pkgs;
             settings = {
-              hooks.nixpks-fmt.enable = true;
+              #hooks.nixpks-fmt.enable = true;
             };
           };
 
@@ -114,7 +121,7 @@
                   runtimeInputs = [ ];
                   text = ''
                     set -x
-                    upstream=${inputs.river}/protocol
+                    upstream=${inputs.rver}/protocol
                     current=./hswm-bindings/protocol/
                     diff -r $current $upstream || :
                     cp -v -t "$current" $upstream/*.xml

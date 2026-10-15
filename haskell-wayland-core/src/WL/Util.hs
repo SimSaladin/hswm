@@ -1,5 +1,5 @@
 {-# LANGUAGE RoleAnnotations      #-}
--- {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 -- |
 -- Module      : WL.Util
@@ -193,9 +193,13 @@ class Storable a => IsListItem a where
   -- | Item beginning address from link field.
   listItemFromList :: List a -> Ptr a
 
--- | Anything with C field @"link"@ of type 'List' can be used as wl_list item
+-- | Anything with C field @"link"@ of type 'List' can be used as wl_list item.
+--
+-- __FIXME needs UndecidableInstances tococomppileZZ
 instance (Storable a, sy ~ "link", CF.HasCField a sy, CF.CFieldType a sy ~ List a) => IsListItem a where
+
   listFromListItem = List . castPtr . CF.fromPtr (Proxy @"link")
+
   listItemFromList (List p) = castPtr p `plusPtr` (- CF.offset (Proxy @a) (Proxy @"link"))
 
 -- | Allocate and initialize a new @wl_list@
@@ -288,9 +292,6 @@ newtype Fixed = Fixed { unwrap :: Wl_fixed_t }
   deriving stock (Eq, Generic, Data)
   deriving newtype (Ord, Bits, Bounded, Enum, NFData, Storable, Prim, Hashable)
 
-instance Show Fixed where
-  show (Fixed (Wl_fixed_t x)) = F.showFixed True (F.MkFixed $ fromIntegral x :: F.Fixed 256)
-
 instance Num Fixed where
   (Fixed (Wl_fixed_t a)) + (Fixed (Wl_fixed_t b)) = Fixed . Wl_fixed_t $! a + b
   (Fixed (Wl_fixed_t a)) - (Fixed (Wl_fixed_t b)) = Fixed . Wl_fixed_t $! a - b
@@ -299,15 +300,15 @@ instance Num Fixed where
   abs    (Fixed (Wl_fixed_t x)) = Fixed . Wl_fixed_t $! abs x
   signum (Fixed (Wl_fixed_t x)) = Fixed . Wl_fixed_t $! signum x
   fromInteger = fixedFromInt
-
 instance Fractional Fixed where
   (Fixed (Wl_fixed_t a)) / (Fixed (Wl_fixed_t b)) = Fixed . Wl_fixed_t $! div (a * 256) b
   recip (Fixed (Wl_fixed_t a)) = Fixed . Wl_fixed_t $! div (256 * 256) a
   fromRational r = Fixed . Wl_fixed_t $! round (r * 256)
-
 instance Real Fixed where
   toRational (Fixed (Wl_fixed_t a)) = toRational a / 8
 
+instance Show Fixed where
+  show (Fixed (Wl_fixed_t x)) = F.showFixed True (F.MkFixed $ fromIntegral x :: F.Fixed 256)
 deriving via PPShow Fixed instance Pretty Fixed
 
 fixedToInt :: Fixed -> Int
