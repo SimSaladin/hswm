@@ -48,18 +48,21 @@ import           Prettyprinter.Generics as ReExports (PPGeneric(..), PPGenericOv
                                                       Pretty(..))
 import           Prettyprinter.Show as ReExports (PPShow(..))
 
--- Orphan instances XXX
+-- XXX Orphan instances XXX
 deriving instance Data CUInt
 deriving instance Data CInt
 deriving instance Data CSize
-deriving instance Data Wl_array
 deriving newtype instance Hashable CUInt
 deriving newtype instance Pretty CUInt
-deriving instance Data Wl_fixed_t
 deriving via PPShow (Ptr a) instance Pretty (Ptr a)
+
+-- ... wl_fixed_t
+deriving instance Data Wl_fixed_t
 deriving newtype instance Hashable Wl_fixed_t
 instance NFData Wl_fixed_t where rnf (Wl_fixed_t a) = rnf a
 instance Default Wl_list where def = Wl_list nullPtr nullPtr
+--- ... wl_array
+deriving instance Data Wl_array
 
 type Version = Word32
 

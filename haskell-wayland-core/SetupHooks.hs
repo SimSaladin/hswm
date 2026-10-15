@@ -1,9 +1,7 @@
 {-# LANGUAGE DisambiguateRecordFields #-}
 {-# LANGUAGE OverloadedLists          #-}
 {-# LANGUAGE OverloadedStrings        #-}
-{-# OPTIONS_GHC -Wall #-}
-{-# OPTIONS_GHC -Wunused-packages #-}
-{-# OPTIONS_GHC -Wno-ambiguous-fields #-}
+{-# OPTIONS_GHC -Wall -Wunused-packages -Wno-ambiguous-fields #-}
 
 module SetupHooks (setupHooks) where
 
@@ -13,7 +11,6 @@ import           Distribution.Wayland.Hooks
 import           Distribution.Simple.Flag
 import           Distribution.Simple.SetupHooks (SetupHooks)
 import           Distribution.Utils.Path
-
 import           Control.Monad
 import           Lens.Micro
 import           Lens.Micro.GHC ()

@@ -98,6 +98,7 @@
           };
 
           pre-commit = {
+            pkgs = pkgs;
             settings = {
               hooks.nixpks-fmt.enable = true;
             };

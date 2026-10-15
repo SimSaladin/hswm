@@ -1,5 +1,5 @@
 {-# LANGUAGE RoleAnnotations      #-}
-{-# LANGUAGE UndecidableInstances #-}
+-- {-# LANGUAGE UndecidableInstances #-}
 
 -- |
 -- Module      : WL.Util
@@ -10,10 +10,12 @@
 -- Stability   : unstable
 -- Portability : unportable
 --
+-- Bindings to the @wayland-util.h@ definitions.
 module WL.Util
   (
   -- * wl_fixed: Fixed-point numbers
   Fixed(..),
+  Wl_fixed_t(..),
   fixedToDouble,
   fixedFromDouble,
   fixedToInt,
@@ -58,16 +60,13 @@ module WL.Util
   -- ** Max message size
   wL_MAX_MESSAGE_SIZE,
 
+  -- * Re-exports
   module ReExports,
-  Wl_fixed_t(..)
   ) where
 
 import           WL.Util.Generated
 import qualified WL.Util.Generated.Unsafe as U
 import           WL.Internals.Types ()
-
-import qualified HsBindgen.Runtime.HasCField as CF
-import           UnliftIO
 
 import           Control.DeepSeq (NFData(..))
 import           Control.Monad
@@ -82,10 +81,12 @@ import           Foreign.C.ConstPtr
 import           Foreign.C.Types
 import           GHC.Generics
 import           GHC.Records
+import qualified HsBindgen.Runtime.HasCField as CF
+import           Prettyprinter.Generics as ReExports (PPGeneric(..), PPGenericOverride(..),
+                                                      Pretty(..))
+import           Prettyprinter.Show as ReExports (PPShow(..))
 import           System.IO.Unsafe
-
-import Prettyprinter.Generics as ReExports (Pretty(..), PPGeneric(..), PPGenericOverride(..))
-import Prettyprinter.Show as ReExports (PPShow(..))
+import           UnliftIO
 
 
 -- | Dynamic array
