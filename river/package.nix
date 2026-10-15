@@ -38,9 +38,10 @@ let
 
 
   # Unpack all deps in case they are tarballs for use with zig build "--system"
-  prepareZigDB = src: runCommand "zig-packages" {
-    passthru = { inherit src; };
-  }
+  prepareZigDB = src: runCommand "zig-packages"
+    {
+      passthru = { inherit src; };
+    }
     ''
       mkdir -p $out
       for pkg in ${src}/*; do
@@ -110,7 +111,8 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   zigBuildFlags = [
-    "--system" finalAttrs.deps
+    "--system"
+    finalAttrs.deps
     "-Dversion-string=${finalAttrs.version}"
   ]
   ++ lib.optional withDebug "-Doptimize=Debug"

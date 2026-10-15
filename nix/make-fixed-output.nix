@@ -61,7 +61,7 @@ let
         (attrs@{ name ? pname + "-" + version, pname ? null, version ? null, ... }: {
           # Any input (we are about) changing will change the name, too.
           name = name + "-" + inputsHash;
-            #inputsHash + (fixedOutputDerivation.nameSuffix or fixedOutputDerivation.pname or "fod-renamed");
+          #inputsHash + (fixedOutputDerivation.nameSuffix or fixedOutputDerivation.pname or "fod-renamed");
         }) // {
         # Overriding also changes the hash calculation!
         overrideAttrs =

@@ -1,4 +1,4 @@
-{ self, inputs, lib, haskellNixModules, cabal-master-hnix, ... }:
+{ self, inputs, lib, withSystem, haskellNixModules, cabal-master-hnix, ... }:
 
 let
   inherit (inputs.flake-utils.lib) mkApp;
@@ -32,6 +32,9 @@ let
         # Use a newer cabal-install binary
         pkgs.cabal_3_18
         config.hsPkgs.hs-bindgen.components.exes.hs-bindgen-cli
+      ];
+      inputsFrom = [
+        (withSystem pkgs.stdenv.hostPlatform.system ({config,...}: config.pre-commit.devShell))
       ];
     };
 

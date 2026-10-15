@@ -48,30 +48,30 @@ in
   };
 
   perSystem = { inputs', system, lib, pkgs, ... }:
-  let
-    inherit (inputs.flake-utils.lib) mkApp;
-    zig2nix = inputs'.zig2nix.apps;
-  in
-  {
-    apps = {
-      updateRiverDeps = mkApp {
-        drv = pkgs.callPackage mkZigDependencies {
-          zig2nix = zig2nix.zig2nix-0_16_0;
+    let
+      inherit (inputs.flake-utils.lib) mkApp;
+      zig2nix = inputs'.zig2nix.apps;
+    in
+    {
+      apps = {
+        updateRiverDeps = mkApp {
+          drv = pkgs.callPackage mkZigDependencies {
+            zig2nix = zig2nix.zig2nix-0_16_0;
+          };
         };
+
+        # re-exported as a convenience
+        zig2nix = zig2nix.zig2nix-0_16_0;
+        zig2nix-latest = zig2nix.zig2nix-latest;
       };
 
-      # re-exported as a convenience
-      zig2nix = zig2nix.zig2nix-0_16_0;
-      zig2nix-latest = zig2nix.zig2nix-latest;
-    };
+      # Export our overridden river as flake packages as a convenience.
+      packages = {
+        inherit (pkgs) river river-debug updateRiverDeps;
+      };
 
-    # Export our overridden river as flake packages as a convenience.
-    packages = {
-      inherit (pkgs) river river-debug updateRiverDeps;
+      legacyPackages = {
+        inherit (pkgs) river river-pebug zigEnv;
+      };
     };
-
-    legacyPackages = {
-      inherit (pkgs) river river-pebug zigEnv;
-    };
-  };
 }

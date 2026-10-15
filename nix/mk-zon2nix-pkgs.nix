@@ -96,5 +96,4 @@ let
       #overrideAttrs = f: rerunOnChange args (zon-nix.overrideAttrs f);
     };
 in
-{
-}
+{ }
