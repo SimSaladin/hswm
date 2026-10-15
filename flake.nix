@@ -42,6 +42,10 @@
       url = "github:jcollie/zon2nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    git-hooks = {
+      url = "github:cachix/git-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs@{ ... }: inputs.flake-parts.lib.mkFlake { inherit inputs; }
@@ -54,6 +58,7 @@
         _module.args.checkMaterialization = false;
 
         imports = [
+          inputs.git-hooks.flakeModule
           ./river/flake-module.nix
           ./nix/lib.nix
           ./nix/cabal-master.nix
@@ -62,6 +67,7 @@
         ];
 
         systems = [ "x86_64-linux" ];
+
 
         debug = true;
 
@@ -78,6 +84,7 @@
           })
         ];
 
+
         perSystem = { system, lib, pkgs, ... }: {
           _module.args.pkgs = import inputs.nixpkgs {
             inherit system;
@@ -87,6 +94,12 @@
             ];
             config = inputs.haskellNix.config // {
               allowUnfree = true; # XXX: ghc-toolchain-lib-ghc-toolchain-0.1.0.0
+            };
+          };
+
+          pre-commit = {
+            settings = {
+              hooks.nixpks-fmt.enable = true;
             };
           };
 
