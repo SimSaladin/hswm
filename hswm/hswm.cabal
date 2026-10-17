@@ -1,6 +1,6 @@
 cabal-version: 3.12
 
--- This file has been generated from package.yaml by hpack version 0.39.0.
+-- This file has been generated from package.yaml by hpack version 0.39.6.
 --
 -- see: https://github.com/sol/hpack
 
@@ -76,6 +76,7 @@ library
           HSWM.Operations
           HSWM.Outputs
           HSWM.Prompt.Environment
+          HSWM.Prompt.Workspaces
           HSWM.Seats
           HSWM.StackSet
           HSWM.Types.Action

@@ -1,3 +1,5 @@
+{-# LANGUAGE UndecidableInstances #-}
+
 -- |
 -- Module      : HSWM.InputConfig
 -- Description : Short description
@@ -68,63 +70,75 @@ data InputDeviceState = InputDeviceState
 
 data LibinputDeviceState = LibinputDeviceState
   { inputDevice          :: R.RiverInputDevice
-  , sendEvents           :: SDC' R.RiverLibinputDeviceSendEventsModes
-  , tap                  :: SDC' R.RiverLibinputDeviceTapState
+  , sendEvents           :: SDC R.RiverLibinputDeviceSendEventsModes
+  , tap                  :: SDC R.RiverLibinputDeviceTapState
   , tapButtonMap         :: DC R.RiverLibinputDeviceTapButtonMap
   , drag                 :: DC R.RiverLibinputDeviceDragState -- ^ tap-and-drag state
   , dragLock             :: DC R.RiverLibinputDeviceDragLockState -- ^ drag lock state
-  , threeFingerDrag      :: SDC Int32 R.RiverLibinputDeviceThreeFingerDragState -- ^ three finger drag state
-  , calibrationMatrix    :: SDC Int32 [Float] -- ^ calibration matrix. Supported if non-zero
-  , accelProfile         :: SDC R.RiverLibinputDeviceAccelProfiles R.RiverLibinputDeviceAccelProfile
+  , threeFingerDrag      :: SDC R.RiverLibinputDeviceThreeFingerDragState -- ^ three finger drag state
+  , calibrationMatrix    :: SDC CalibrationMatrix -- ^ calibration matrix. Supported if non-zero
+  , accelProfile         :: SDC R.RiverLibinputDeviceAccelProfile
   , accelSpeed           :: DC [Double] -- ^ accel speed
-  , naturalScroll        :: SDC Int32 R.RiverLibinputDeviceNaturalScrollState -- ^ natural scroll, supported if non-zero
-  , leftHanded           :: SDC Int32 R.RiverLibinputDeviceLeftHandedState -- ^ left-handed mode, supported if non-zero
-  , clickMethod          :: SDC R.RiverLibinputDeviceClickMethods R.RiverLibinputDeviceClickMethod -- ^ click methods
+  , naturalScroll        :: SDC R.RiverLibinputDeviceNaturalScrollState -- ^ natural scroll, supported if non-zero
+  , leftHanded           :: SDC R.RiverLibinputDeviceLeftHandedState -- ^ left-handed mode, supported if non-zero
+  , clickMethod          :: SDC R.RiverLibinputDeviceClickMethod -- ^ click methods
   , clickfingerButtonMap :: DC R.RiverLibinputDeviceClickfingerButtonMap -- ^ clickfinger button map, supported if cilck_methods.clickfinger
-  , middleEmulation      :: SDC Int32 R.RiverLibinputDeviceMiddleEmulationState -- ^ middle mouse button emulation, supported if non-zero
-  , scrollMethod         :: SDC R.RiverLibinputDeviceScrollMethods R.RiverLibinputDeviceScrollMethod -- ^ scroll method
+  , middleEmulation      :: SDC R.RiverLibinputDeviceMiddleEmulationState -- ^ middle mouse button emulation, supported if non-zero
+  , scrollMethod         :: SDC R.RiverLibinputDeviceScrollMethod -- ^ scroll method
   , scrollButton         :: DC Word32 -- ^ scroll button, supported if scroll_methods.on_button_down is supported
   , scrollButtonLock     :: DC R.RiverLibinputDeviceScrollButtonLockState -- ^ scroll button lock state, supported if ccroll_methods.on_button_down is supported
-  , dwt                  :: SDC Int32 R.RiverLibinputDeviceDwtState -- ^ disable-while-typing, supported if non-zero
-  , dwtp                 :: SDC Int32 R.RiverLibinputDeviceDwtpState -- ^ disable-while-trackpointing, supported if non-zero
-  , rotation             :: SDC Int32 Word32 -- ^ rotation angle, supported if non-zero
+  , dwt                  :: SDC R.RiverLibinputDeviceDwtState -- ^ disable-while-typing, supported if non-zero
+  , dwtp                 :: SDC R.RiverLibinputDeviceDwtpState -- ^ disable-while-trackpointing, supported if non-zero
+  , rotation             :: SDC RotationAngle -- ^ rotation angle, supported if non-zero
   }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Default)
 
-type family StateSupported a
-type instance StateSupported R.RiverLibinputDeviceSendEventsModes = R.RiverLibinputDeviceSendEventsModes
--- | Finger count indicated
-type instance StateSupported R.RiverLibinputDeviceTapState = Int32
--- | Finger count indicated
-type instance StateSupported R.RiverLibinputDeviceThreeFingerDragState = Int32
+newtype RotationAngle = RotationAngle { unwrap :: Word32 }
+  deriving (Eq, Ord, Show, Generic)
+
+newtype CalibrationMatrix = CalibrationMatrix { unwrap :: [Float] }
+  deriving (Eq, Ord, Show, Generic)
+
+type family StateSupported a where
+  StateSupported R.RiverLibinputDeviceSendEventsModes = Maybe R.RiverLibinputDeviceSendEventsModes
+  -- | Finger count indicated
+  StateSupported R.RiverLibinputDeviceTapState = Int32
+  -- | Finger count indicated; if less than 3 then 3f drag is not supported.
+  StateSupported R.RiverLibinputDeviceThreeFingerDragState = Int32
+  -- | Supported if non-zero
+  StateSupported CalibrationMatrix = Bool
+  -- | Profiles is bitfield
+  StateSupported R.RiverLibinputDeviceAccelProfile = R.RiverLibinputDeviceAccelProfiles
+  StateSupported R.RiverLibinputDeviceNaturalScrollState = Bool
+  StateSupported R.RiverLibinputDeviceLeftHandedState = Bool
+  StateSupported R.RiverLibinputDeviceClickMethod =  R.RiverLibinputDeviceClickMethods
+  StateSupported R.RiverLibinputDeviceMiddleEmulationState = Bool
+  StateSupported R.RiverLibinputDeviceScrollMethod = R.RiverLibinputDeviceScrollMethods
+  StateSupported R.RiverLibinputDeviceDwtState  = Bool
+  StateSupported R.RiverLibinputDeviceDwtpState = Bool
+  StateSupported RotationAngle = Bool
 
 -- | (support, default, current)
-data SDC' a = SDC'
+data SDC a = SDC
   { supported :: StateSupported a
   , defaultValue, currentValue :: a
-  } deriving stock (Eq, Show, Generic)
+  } deriving stock (Generic)
 
--- | (support, default, current)
-data SDC support a = SDC
-  { support :: support
-  , defval, curval :: a
-  } deriving stock (Eq, Show, Generic)
+deriving instance (Eq a, Eq (StateSupported a)) => Eq (SDC a)
+deriving instance (Show a, Show (StateSupported a)) => Show (SDC a)
 
-instance {-# OVERLAPPABLE #-} (CEnum a, CEnum b) => Default (SDC a b) where
-  def = SDC (toCEnum 42) (toCEnum 42) (toCEnum 42)
+instance {-# OVERLAPPABLE #-} (CEnum a, Default (StateSupported a)) => Default (SDC a) where
+  def = SDC def (toCEnum 42) (toCEnum 42)
 
-instance {-# OVERLAPPABLE #-} (CEnum a) => Default (SDC Int32 a) where
-  def = SDC minBound (toCEnum 42) (toCEnum 42)
-
-instance Default (SDC Int32 [a]) where
-  def = SDC minBound [] []
-
-instance Default (SDC Int32 Word32) where
-  def = SDC minBound maxBound maxBound
+instance Default (SDC CalibrationMatrix) where def = SDC False (CalibrationMatrix []) (CalibrationMatrix [])
+instance Default (SDC RotationAngle) where def = SDC False (RotationAngle 0) (RotationAngle 0)
+instance Default (SDC R.RiverLibinputDeviceAccelProfile) where def = SDC (toCEnum 0) (toCEnum 0) (toCEnum 0)
+instance Default (SDC R.RiverLibinputDeviceClickMethod) where def = SDC (toCEnum 0) (toCEnum 0) (toCEnum 0)
+instance Default (SDC R.RiverLibinputDeviceScrollMethod) where def = SDC (toCEnum 0) (toCEnum 0) (toCEnum 0)
 
 -- | (default, current)
-data DC a = DC { defval, curval :: a }
+data DC a = DC { defaultValue, currentValue :: a }
   deriving stock (Eq, Show, Generic)
 
 instance {-# OVERLAPPABLE #-} (CEnum a) => Default (DC a) where
@@ -250,65 +264,66 @@ handleLibinputEvent = \case
     withObject $ WL.listenerAdd_ dev
   R.RiverLibinputConfigFinished _ lic -> WL.objectDestroy lic
 
+-- | river_libinput_device_v1
 handleLibinputDeviceEvent :: (MonadStateGlobal s m) => R.RiverLibinputDeviceEvent -> m ()
 handleLibinputDeviceEvent = \case
   R.RiverLibinputDeviceRemoved _ dev -> do
     modifyObjectDef $ \st -> st { libinputDevices = M.delete dev st.libinputDevices }
     WL.objectDestroy dev
   R.RiverLibinputDeviceInputDevice _ dev inputDevice            -> modifyLibinputDevice dev $ \s -> s { inputDevice } :: LibinputDeviceState
-  R.RiverLibinputDeviceSendEventsSupport _ dev modes            -> modifyLibinputDevice dev $ \s -> s { sendEvents = s.sendEvents { supported = modes } }
+  R.RiverLibinputDeviceSendEventsSupport _ dev modes            -> modifyLibinputDevice dev $ \s -> s { sendEvents = s.sendEvents { supported = Just modes } }
   R.RiverLibinputDeviceSendEventsDefault _ dev mode             -> modifyLibinputDevice dev $ \s -> s { sendEvents = s.sendEvents { defaultValue = mode } }
   R.RiverLibinputDeviceSendEventsCurrent _ dev mode             -> modifyLibinputDevice dev $ \s -> s { sendEvents = s.sendEvents { currentValue = mode } }
   R.RiverLibinputDeviceTapSupport _ dev fingercount             -> modifyLibinputDevice dev $ \s -> s { tap = s.tap { supported = fingercount } }
   R.RiverLibinputDeviceTapDefault _ dev tapSt                   -> modifyLibinputDevice dev $ \s -> s { tap = s.tap { defaultValue = tapSt } }
   R.RiverLibinputDeviceTapCurrent _ dev tapSt                   -> modifyLibinputDevice dev $ \s -> s { tap = s.tap { currentValue = tapSt } }
-  R.RiverLibinputDeviceTapButtonMapDefault _ dev tbMap          -> modifyLibinputDevice dev $ \s -> s { tapButtonMap = s.tapButtonMap { defval = tbMap } }
-  R.RiverLibinputDeviceTapButtonMapCurrent _ dev tbMap          -> modifyLibinputDevice dev $ \s -> s { tapButtonMap = s.tapButtonMap { curval = tbMap } }
-  R.RiverLibinputDeviceDragDefault _ dev dragSt                 -> modifyLibinputDevice dev $ \s -> s { drag = s.drag { defval = dragSt } }
-  R.RiverLibinputDeviceDragCurrent _ dev dragSt                 -> modifyLibinputDevice dev $ \s -> s { drag = s.drag { curval = dragSt } }
-  R.RiverLibinputDeviceDragLockDefault _ dev dragLockSt         -> modifyLibinputDevice dev $ \s -> s { dragLock = s.dragLock { defval = dragLockSt } }
-  R.RiverLibinputDeviceDragLockCurrent _ dev dragLockSt         -> modifyLibinputDevice dev $ \s -> s { dragLock = s.dragLock { curval = dragLockSt } }
-  R.RiverLibinputDeviceThreeFingerDragSupport _ dev fingercount -> modifyLibinputDevice dev $ \s -> s { threeFingerDrag = s.threeFingerDrag { support = fingercount } }
-  R.RiverLibinputDeviceThreeFingerDragDefault _ dev tfdSt       -> modifyLibinputDevice dev $ \s -> s { threeFingerDrag = s.threeFingerDrag { defval = tfdSt } }
-  R.RiverLibinputDeviceThreeFingerDragCurrent _ dev tfdSt       -> modifyLibinputDevice dev $ \s -> s { threeFingerDrag = s.threeFingerDrag { curval = tfdSt } }
-  R.RiverLibinputDeviceCalibrationMatrixSupport _ dev supported -> modifyLibinputDevice dev $ \s -> s { calibrationMatrix = s.calibrationMatrix { support = supported } }
-  R.RiverLibinputDeviceCalibrationMatrixDefault _ dev mat       -> WL.arrayToList mat >>= \arr -> modifyLibinputDevice dev $ \s -> s { calibrationMatrix = s.calibrationMatrix { defval = map coerce arr } }
-  R.RiverLibinputDeviceCalibrationMatrixCurrent _ dev mat       -> WL.arrayToList mat >>= \arr -> modifyLibinputDevice dev $ \s -> s { calibrationMatrix = s.calibrationMatrix { curval = map coerce arr } }
-  R.RiverLibinputDeviceAccelProfilesSupport _ dev profiles      -> modifyLibinputDevice dev $ \s -> s { accelProfile = s.accelProfile { support = profiles } }
-  R.RiverLibinputDeviceAccelProfileDefault _ dev profile        -> modifyLibinputDevice dev $ \s -> s { accelProfile = s.accelProfile { defval = profile } }
-  R.RiverLibinputDeviceAccelProfileCurrent _ dev profile        -> modifyLibinputDevice dev $ \s -> s { accelProfile = s.accelProfile { curval = profile } }
-  R.RiverLibinputDeviceAccelSpeedDefault _ dev speed            -> WL.arrayToList speed >>= \arr -> modifyLibinputDevice dev $ \s -> s { accelSpeed = s.accelSpeed { defval = map coerce arr } }
-  R.RiverLibinputDeviceAccelSpeedCurrent _ dev speed            -> WL.arrayToList speed >>= \arr -> modifyLibinputDevice dev $ \s -> s { accelSpeed = s.accelSpeed { curval = map coerce arr } }
-  R.RiverLibinputDeviceNaturalScrollSupport _ dev supported     -> modifyLibinputDevice dev $ \s -> s { naturalScroll = s.naturalScroll { support = supported } }
-  R.RiverLibinputDeviceNaturalScrollDefault _ dev nsSt          -> modifyLibinputDevice dev $ \s -> s { naturalScroll = s.naturalScroll { defval = nsSt } }
-  R.RiverLibinputDeviceNaturalScrollCurrent _ dev nsSt          -> modifyLibinputDevice dev $ \s -> s { naturalScroll = s.naturalScroll { curval = nsSt } }
-  R.RiverLibinputDeviceLeftHandedSupport _ dev supported        -> modifyLibinputDevice dev $ \s -> s { leftHanded = s.leftHanded { support = supported } }
-  R.RiverLibinputDeviceLeftHandedDefault _ dev lhSt             -> modifyLibinputDevice dev $ \s -> s { leftHanded = s.leftHanded { defval = lhSt } }
-  R.RiverLibinputDeviceLeftHandedCurrent _ dev lhSt             -> modifyLibinputDevice dev $ \s -> s { leftHanded = s.leftHanded { defval = lhSt } }
-  R.RiverLibinputDeviceClickMethodSupport _ dev clickMethods    -> modifyLibinputDevice dev $ \s -> s { clickMethod = s.clickMethod { support = clickMethods } }
-  R.RiverLibinputDeviceClickMethodDefault _ dev clickMethod     -> modifyLibinputDevice dev $ \s -> s { clickMethod = s.clickMethod { defval = clickMethod } }
-  R.RiverLibinputDeviceClickMethodCurrent _ dev clickMethod     -> modifyLibinputDevice dev $ \s -> s { clickMethod = s.clickMethod { curval = clickMethod } }
-  R.RiverLibinputDeviceClickfingerButtonMapDefault _ dev cbmap  -> modifyLibinputDevice dev $ \s -> s { clickfingerButtonMap = s.clickfingerButtonMap { defval = cbmap } }
-  R.RiverLibinputDeviceClickfingerButtonMapCurrent _ dev cbmap  -> modifyLibinputDevice dev $ \s -> s { clickfingerButtonMap = s.clickfingerButtonMap { curval = cbmap } }
-  R.RiverLibinputDeviceMiddleEmulationSupport _ dev supported   -> modifyLibinputDevice dev $ \s -> s { middleEmulation = s.middleEmulation { support = supported } }
-  R.RiverLibinputDeviceMiddleEmulationDefault _ dev meSt        -> modifyLibinputDevice dev $ \s -> s { middleEmulation = s.middleEmulation { defval = meSt } }
-  R.RiverLibinputDeviceMiddleEmulationCurrent _ dev meSt        -> modifyLibinputDevice dev $ \s -> s { middleEmulation = s.middleEmulation { curval = meSt } }
-  R.RiverLibinputDeviceScrollMethodSupport _ dev scrollMethods  -> modifyLibinputDevice dev $ \s -> s { scrollMethod = s.scrollMethod { support = scrollMethods } }
-  R.RiverLibinputDeviceScrollMethodDefault _ dev scrollMethod   -> modifyLibinputDevice dev $ \s -> s { scrollMethod = s.scrollMethod { defval = scrollMethod } }
-  R.RiverLibinputDeviceScrollMethodCurrent _ dev scrollMethod   -> modifyLibinputDevice dev $ \s -> s { scrollMethod = s.scrollMethod { curval = scrollMethod } }
-  R.RiverLibinputDeviceScrollButtonDefault _ dev button         -> modifyLibinputDevice dev $ \s -> s { scrollButton = s.scrollButton { defval = button } }
-  R.RiverLibinputDeviceScrollButtonCurrent _ dev button         -> modifyLibinputDevice dev $ \s -> s { scrollButton = s.scrollButton { curval = button } }
-  R.RiverLibinputDeviceScrollButtonLockDefault _ dev lockSt     -> modifyLibinputDevice dev $ \s -> s { scrollButtonLock = s.scrollButtonLock { defval = lockSt } }
-  R.RiverLibinputDeviceScrollButtonLockCurrent _ dev lockSt     -> modifyLibinputDevice dev $ \s -> s { scrollButtonLock = s.scrollButtonLock { curval = lockSt } }
-  R.RiverLibinputDeviceDwtSupport _ dev supported               -> modifyLibinputDevice dev $ \s -> s { dwt = s.dwt { support = supported } }
-  R.RiverLibinputDeviceDwtDefault _ dev dwtSt                   -> modifyLibinputDevice dev $ \s -> s { dwt = s.dwt { defval = dwtSt } }
-  R.RiverLibinputDeviceDwtCurrent _ dev dwtSt                   -> modifyLibinputDevice dev $ \s -> s { dwt = s.dwt { curval = dwtSt } }
-  R.RiverLibinputDeviceDwtpSupport _ dev supported              -> modifyLibinputDevice dev $ \s -> s { dwtp = s.dwtp { support = supported } }
-  R.RiverLibinputDeviceDwtpDefault _ dev dwtpSt                 -> modifyLibinputDevice dev $ \s -> s { dwtp = s.dwtp { defval = dwtpSt } }
-  R.RiverLibinputDeviceDwtpCurrent _ dev dwtpSt                 -> modifyLibinputDevice dev $ \s -> s { dwtp = s.dwtp { curval = dwtpSt } }
-  R.RiverLibinputDeviceRotationSupport _ dev supported          -> modifyLibinputDevice dev $ \s -> s { rotation = s.rotation { support = supported } }
-  R.RiverLibinputDeviceRotationDefault _ dev angle              -> modifyLibinputDevice dev $ \s -> s { rotation = s.rotation { defval = angle } }
-  R.RiverLibinputDeviceRotationCurrent _ dev angle              -> modifyLibinputDevice dev $ \s -> s { rotation = s.rotation { curval = angle } }
+  R.RiverLibinputDeviceTapButtonMapDefault _ dev tbMap          -> modifyLibinputDevice dev $ \s -> s { tapButtonMap = s.tapButtonMap { defaultValue = tbMap } }
+  R.RiverLibinputDeviceTapButtonMapCurrent _ dev tbMap          -> modifyLibinputDevice dev $ \s -> s { tapButtonMap = s.tapButtonMap { currentValue = tbMap } }
+  R.RiverLibinputDeviceDragDefault _ dev dragSt                 -> modifyLibinputDevice dev $ \s -> s { drag = s.drag { defaultValue = dragSt } }
+  R.RiverLibinputDeviceDragCurrent _ dev dragSt                 -> modifyLibinputDevice dev $ \s -> s { drag = s.drag { currentValue = dragSt } }
+  R.RiverLibinputDeviceDragLockDefault _ dev dragLockSt         -> modifyLibinputDevice dev $ \s -> s { dragLock = s.dragLock { defaultValue = dragLockSt } }
+  R.RiverLibinputDeviceDragLockCurrent _ dev dragLockSt         -> modifyLibinputDevice dev $ \s -> s { dragLock = s.dragLock { currentValue = dragLockSt } }
+  R.RiverLibinputDeviceThreeFingerDragSupport _ dev fingercount -> modifyLibinputDevice dev $ \s -> s { threeFingerDrag = s.threeFingerDrag { supported = fingercount } }
+  R.RiverLibinputDeviceThreeFingerDragDefault _ dev tfdSt       -> modifyLibinputDevice dev $ \s -> s { threeFingerDrag = s.threeFingerDrag { defaultValue = tfdSt } }
+  R.RiverLibinputDeviceThreeFingerDragCurrent _ dev tfdSt       -> modifyLibinputDevice dev $ \s -> s { threeFingerDrag = s.threeFingerDrag { currentValue = tfdSt } }
+  R.RiverLibinputDeviceCalibrationMatrixSupport _ dev supported -> modifyLibinputDevice dev $ \s -> s { calibrationMatrix = s.calibrationMatrix { supported = supported /= 0 } }
+  R.RiverLibinputDeviceCalibrationMatrixDefault _ dev mat       -> WL.arrayToList mat >>= \arr -> modifyLibinputDevice dev $ \s -> s { calibrationMatrix = s.calibrationMatrix { defaultValue = CalibrationMatrix $ map coerce arr } }
+  R.RiverLibinputDeviceCalibrationMatrixCurrent _ dev mat       -> WL.arrayToList mat >>= \arr -> modifyLibinputDevice dev $ \s -> s { calibrationMatrix = s.calibrationMatrix { currentValue = CalibrationMatrix $ map coerce arr } }
+  R.RiverLibinputDeviceAccelProfilesSupport _ dev profiles      -> modifyLibinputDevice dev $ \s -> s { accelProfile = s.accelProfile { supported = profiles } }
+  R.RiverLibinputDeviceAccelProfileDefault _ dev profile        -> modifyLibinputDevice dev $ \s -> s { accelProfile = s.accelProfile { defaultValue = profile } }
+  R.RiverLibinputDeviceAccelProfileCurrent _ dev profile        -> modifyLibinputDevice dev $ \s -> s { accelProfile = s.accelProfile { currentValue = profile } }
+  R.RiverLibinputDeviceAccelSpeedDefault _ dev speed            -> WL.arrayToList speed >>= \arr -> modifyLibinputDevice dev $ \s -> s { accelSpeed = s.accelSpeed { defaultValue = map coerce arr } }
+  R.RiverLibinputDeviceAccelSpeedCurrent _ dev speed            -> WL.arrayToList speed >>= \arr -> modifyLibinputDevice dev $ \s -> s { accelSpeed = s.accelSpeed { currentValue = map coerce arr } }
+  R.RiverLibinputDeviceNaturalScrollSupport _ dev supported     -> modifyLibinputDevice dev $ \s -> s { naturalScroll = s.naturalScroll { supported = supported /= 0 } }
+  R.RiverLibinputDeviceNaturalScrollDefault _ dev nsSt          -> modifyLibinputDevice dev $ \s -> s { naturalScroll = s.naturalScroll { defaultValue = nsSt } }
+  R.RiverLibinputDeviceNaturalScrollCurrent _ dev nsSt          -> modifyLibinputDevice dev $ \s -> s { naturalScroll = s.naturalScroll { currentValue = nsSt } }
+  R.RiverLibinputDeviceLeftHandedSupport _ dev supported        -> modifyLibinputDevice dev $ \s -> s { leftHanded = s.leftHanded { supported = supported /= 0 } }
+  R.RiverLibinputDeviceLeftHandedDefault _ dev lhSt             -> modifyLibinputDevice dev $ \s -> s { leftHanded = s.leftHanded { defaultValue = lhSt } }
+  R.RiverLibinputDeviceLeftHandedCurrent _ dev lhSt             -> modifyLibinputDevice dev $ \s -> s { leftHanded = s.leftHanded { currentValue = lhSt } }
+  R.RiverLibinputDeviceClickMethodSupport _ dev clickMethods    -> modifyLibinputDevice dev $ \s -> s { clickMethod = s.clickMethod { supported = clickMethods } }
+  R.RiverLibinputDeviceClickMethodDefault _ dev clickMethod     -> modifyLibinputDevice dev $ \s -> s { clickMethod = s.clickMethod { defaultValue = clickMethod } }
+  R.RiverLibinputDeviceClickMethodCurrent _ dev clickMethod     -> modifyLibinputDevice dev $ \s -> s { clickMethod = s.clickMethod { currentValue = clickMethod } }
+  R.RiverLibinputDeviceClickfingerButtonMapDefault _ dev cbmap  -> modifyLibinputDevice dev $ \s -> s { clickfingerButtonMap = s.clickfingerButtonMap { defaultValue = cbmap } }
+  R.RiverLibinputDeviceClickfingerButtonMapCurrent _ dev cbmap  -> modifyLibinputDevice dev $ \s -> s { clickfingerButtonMap = s.clickfingerButtonMap { currentValue = cbmap } }
+  R.RiverLibinputDeviceMiddleEmulationSupport _ dev supported   -> modifyLibinputDevice dev $ \s -> s { middleEmulation = s.middleEmulation { supported = supported /= 0 } }
+  R.RiverLibinputDeviceMiddleEmulationDefault _ dev meSt        -> modifyLibinputDevice dev $ \s -> s { middleEmulation = s.middleEmulation { defaultValue = meSt } }
+  R.RiverLibinputDeviceMiddleEmulationCurrent _ dev meSt        -> modifyLibinputDevice dev $ \s -> s { middleEmulation = s.middleEmulation { currentValue = meSt } }
+  R.RiverLibinputDeviceScrollMethodSupport _ dev scrollMethods  -> modifyLibinputDevice dev $ \s -> s { scrollMethod = s.scrollMethod { supported = scrollMethods } }
+  R.RiverLibinputDeviceScrollMethodDefault _ dev scrollMethod   -> modifyLibinputDevice dev $ \s -> s { scrollMethod = s.scrollMethod { defaultValue = scrollMethod } }
+  R.RiverLibinputDeviceScrollMethodCurrent _ dev scrollMethod   -> modifyLibinputDevice dev $ \s -> s { scrollMethod = s.scrollMethod { currentValue = scrollMethod } }
+  R.RiverLibinputDeviceScrollButtonDefault _ dev button         -> modifyLibinputDevice dev $ \s -> s { scrollButton = s.scrollButton { defaultValue = button } }
+  R.RiverLibinputDeviceScrollButtonCurrent _ dev button         -> modifyLibinputDevice dev $ \s -> s { scrollButton = s.scrollButton { currentValue = button } }
+  R.RiverLibinputDeviceScrollButtonLockDefault _ dev lockSt     -> modifyLibinputDevice dev $ \s -> s { scrollButtonLock = s.scrollButtonLock { defaultValue = lockSt } }
+  R.RiverLibinputDeviceScrollButtonLockCurrent _ dev lockSt     -> modifyLibinputDevice dev $ \s -> s { scrollButtonLock = s.scrollButtonLock { currentValue = lockSt } }
+  R.RiverLibinputDeviceDwtSupport _ dev supported               -> modifyLibinputDevice dev $ \s -> s { dwt = s.dwt { supported = supported /= 0 } }
+  R.RiverLibinputDeviceDwtDefault _ dev dwtSt                   -> modifyLibinputDevice dev $ \s -> s { dwt = s.dwt { defaultValue = dwtSt } }
+  R.RiverLibinputDeviceDwtCurrent _ dev dwtSt                   -> modifyLibinputDevice dev $ \s -> s { dwt = s.dwt { currentValue = dwtSt } }
+  R.RiverLibinputDeviceDwtpSupport _ dev supported              -> modifyLibinputDevice dev $ \s -> s { dwtp = s.dwtp { supported = supported /= 0 } }
+  R.RiverLibinputDeviceDwtpDefault _ dev dwtpSt                 -> modifyLibinputDevice dev $ \s -> s { dwtp = s.dwtp { defaultValue = dwtpSt } }
+  R.RiverLibinputDeviceDwtpCurrent _ dev dwtpSt                 -> modifyLibinputDevice dev $ \s -> s { dwtp = s.dwtp { currentValue = dwtpSt } }
+  R.RiverLibinputDeviceRotationSupport _ dev supported          -> modifyLibinputDevice dev $ \s -> s { rotation = s.rotation { supported = supported /= 0 } }
+  R.RiverLibinputDeviceRotationDefault _ dev angle              -> modifyLibinputDevice dev $ \s -> s { rotation = s.rotation { defaultValue = RotationAngle angle } }
+  R.RiverLibinputDeviceRotationCurrent _ dev angle              -> modifyLibinputDevice dev $ \s -> s { rotation = s.rotation { currentValue = RotationAngle angle } }
   R.RiverLibinputDeviceDone _  dev                              -> return () -- TODO take advantage of this event
   where
     modifyLibinputDevice dev f = modifyObjectDef $ \st -> st { libinputDevices = M.adjust f dev st.libinputDevices }

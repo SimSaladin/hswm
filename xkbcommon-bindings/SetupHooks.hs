@@ -1,13 +1,12 @@
 {-# LANGUAGE CPP                      #-}
-{-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE LambdaCase               #-}
 {-# LANGUAGE DataKinds                #-}
-{-# LANGUAGE DeriveAnyClass           #-}
+{-# LANGUAGE DerivingStrategies       #-}
+{-# LANGUAGE DisambiguateRecordFields #-}
+{-# LANGUAGE LambdaCase               #-}
 {-# LANGUAGE OverloadedLists          #-}
 {-# LANGUAGE OverloadedRecordDot      #-}
 {-# LANGUAGE OverloadedStrings        #-}
 {-# LANGUAGE StaticPointers           #-}
-{-# LANGUAGE DisambiguateRecordFields #-}
 {-# OPTIONS_GHC -Wall #-}
 
 module SetupHooks where
@@ -15,15 +14,22 @@ module SetupHooks where
 import           Distribution.HsBindgen.Utils
 
 import           Distribution.Pretty (prettyShow)
-import           Distribution.Simple.Program (gccProgram, programInvocation, requireProgram)
+import           Distribution.Simple.Program (ConfiguredProgram, ProgramDb, gccProgram,
+                                              programInvocation, requireProgram)
 import           Distribution.Simple.Program.Run (getProgramInvocationOutputAndErrors)
+
+import           Distribution.Simple.BuildPaths
 import           Distribution.Simple.SetupHooks
+import           Distribution.Verbosity
+
+import qualified Distribution.Compat.CharParsing as P
+import           Distribution.Parsec
 import           Distribution.Simple.Utils
+import           Distribution.Types.Component
 import           Distribution.Types.Library (explicitLibModules)
 import           Distribution.Utils.IOData (hPutContents)
 import           Distribution.Utils.Path
-import           Distribution.Parsec
-import qualified Distribution.Compat.CharParsing as P
+import           Distribution.Utils.Structured
 
 #if MIN_VERSION_Cabal(3,17,0)
 #else
@@ -34,6 +40,7 @@ import           Distribution.Simple.LocalBuildInfo (withPrograms)
 
 import           Control.Monad
 import           Control.Monad.IO.Class
+import           Data.ByteString.Lazy (ByteString)
 import           Data.Char
 import           Data.Function
 import           Data.Functor
@@ -56,9 +63,16 @@ data GenerateModule = GenerateModule
   , sGroupBy      :: Maybe Char
   }
   deriving stock (Eq, Show, Generic)
-  deriving anyclass (Binary)
 
-type ActionArgs = (VerbosityFlags, GenerateModule, Location)
+instance Binary GenerateModule
+
+data ActionArgs = ActionArgs
+  { aGenerate  :: GenerateModule
+  , aResult    :: Location
+  , aVerbosity :: VerbosityFlags
+  } deriving stock (Eq, Show, Generic)
+
+instance Binary ActionArgs
 
 setupHooks :: SetupHooks
 setupHooks = mempty
@@ -94,12 +108,13 @@ myRules xs PreBuildComponentInputs{buildingWhat=flags, localBuildInfo=lbi, targe
   case tgt.targetComponent of
     CLib lib -> do
       forM_ xs $ \gen -> do
+        (gcc, _) <- liftIO $ requireProgram verb gccProgram (withPrograms lbi)
         let res = Location autogendir $ moduleNameSymbolicPath gen.sModule <.> "hs"
         if gen.sModule `elem` explicitLibModules lib
            then registerRule_ (fromString $ prettyShow gen.sModule) $
                 dynamicRule (static Dict)
-                  (mkCommand (static Dict) (static getHeaderDeps) (vflags, withPrograms lbi, gen.sHeader))
-                  (mkCommand (static Dict) (static bindHeaderAction) (vflags, gen, res))
+                  (mkCommand (static Dict) (static getHeaderDeps) (vflags, gcc, gen.sHeader))
+                  (mkCommand (static Dict) (static bindHeaderAction) (ActionArgs gen res vflags))
                   []
                   [res]
            else liftIO $ warn verb $ "Module not configured in cabal, not generating for this component: " ++ prettyShow gen.sModule
@@ -109,22 +124,22 @@ myRules xs PreBuildComponentInputs{buildingWhat=flags, localBuildInfo=lbi, targe
       verb = verbosityFromFlags vflags
       autogendir = autogenComponentModulesDir lbi tgt.targetCLBI
 
-getHeaderDeps :: (VerbosityFlags, ProgramDb, FilePath) -> IO ([Dependency], ByteString)
-getHeaderDeps (vflags, progdb, hdr) = do
-    (gcc, _) <- requireProgram verb gccProgram progdb
+getHeaderDeps :: (VerbosityFlags, ConfiguredProgram, FilePath) -> IO ([Dependency], FilePath)
+getHeaderDeps (vflags, gcc, hdr) = do
     fp <- resolveHeader verb gcc hdr
     let dep = FileDependency $ Location (makeSymbolicPath "/") (makeRelativePathEx $ drop 1 $ getAbsolutePath fp)
-        res = ([dep], toUTF8BS $ getAbsolutePath fp)
+        res = ([dep], getAbsolutePath fp)
     noticeNoWrap verb $ "Header dependencies: " ++ show res
     return res
   where
       verb = verbosityFromFlags vflags
 
-bindHeaderAction :: ActionArgs -> ByteString -> IO ()
-bindHeaderAction (vflags, gen, res) headerFile' = do
+bindHeaderAction :: ActionArgs -> FilePath -> IO ()
+bindHeaderAction args@(ActionArgs gen res vflags) headerFile' = do
   let verb = verbosityFromFlags vflags
       modFile = interpretSymbolicPathCWD $ location res
-      headerFile = AbsolutePath $ makeSymbolicPath $ fromUTF8BS headerFile'
+      headerFile = AbsolutePath $ makeSymbolicPath headerFile'
+  noticeNoWrap verb $ show args
   noticeNoWrap verb $ "Processing header '" ++ gen.sHeader ++ "' for module " ++ prettyShow gen.sModule ++ " (file: " ++ show headerFile' ++ ")"
   defines <- getDefines verb gen headerFile
   createDirectoryIfMissingVerbose verb True (FP.takeDirectory modFile)

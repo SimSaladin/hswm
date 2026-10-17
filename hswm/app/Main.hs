@@ -22,6 +22,7 @@ import           HSWM.Layout.MultiToggle.Instances
 import qualified HSWM.Layout.NoBorders as L.NoBorders
 import qualified HSWM.Layout.WindowNavigation as L.WNavigation
 import           HSWM.Prompt.Environment
+import           HSWM.Prompt.Workspaces
 import qualified HSWM.StackSet as W
 import           HSWM.Util.Debug
 import qualified HSWM.Util.IPC as IPC
@@ -135,9 +136,9 @@ myKeys =
   [ ("M-y",   cycleRecentHiddenWS [4, 8, 64] 121 112 <?> "Cycle recent hidden tags")
   , ("M-S-n", DWO.swapWith Next CycleWS.anyWS        <?> "Shift current tag (forwards)")
   , ("M-S-p", DWO.swapWith Prev CycleWS.anyWS        <?> "Shift current tag (backwards)")
-  , ("M-g r", renameWorkspacePrompt                  <?> "Rename workspace (prompt)")
-  , ("M-g n", addWorkspacePrompt                     <?> "Add workspace (prompt)")
-  , ("M-g g", workspacePrompt                        <?> "Go to workspace (prompt)")
+  , ("M-g r", renameWorkspacePrompt rofiPrompt       <?> "Rename workspace (prompt)")
+  , ("M-g n", addWorkspacePrompt  rofiPrompt         <?> "Add workspace (prompt)")
+  , ("M-g g", workspacePrompt rofiPrompt             <?> "Go to workspace (prompt)")
   , ("M-g d", removeFocusedWorkspace                 <?> "Remove focused workspace")
   , ("M-g f", windowPrompt                           <?> "Go to window")
   ] ++
@@ -361,48 +362,6 @@ windowPrompt = do
       logInfo $ fromString $ show idx
       runInHS $ windows $ W.focusWindow rw
       manageDirty
-
-mkWorkspacePrompt :: (RP.RofiPromptConfig RP.SelectS -> WorkspaceId -> RP.RofiPromptConfig RP.SelectS)
-                  -> (WorkspaceId -> String -> H a)
-                  -> H ()
-mkWorkspacePrompt prompt apply = do
-  (curTag, allTags) <- runInHS $ withWindowSet $ return . (W.currentTag &&& W.allTags)
-  RP.rofiRun (prompt rofiPrompt curTag) allTags >>= (`whenJust` doApply curTag)
-  where
-    doApply cur input = do
-      _ <- apply cur input
-      view (config . logHook) >>= void . userCode
-
-renameWorkspacePrompt :: H ()
-renameWorkspacePrompt = do
-  (curTag, allTags) <- runInHS $ withWindowSet $ return . (W.currentTag &&& W.allTags)
-  RP.rofiRun rofiPrompt {RP.prompt = "Rename " ++ curTag} allTags >>= (`whenJust` apply curTag)
-  where
-    apply old input = do
-      runInHS $ do
-        DWO.updateName old input
-        DynWS.renameWorkspaceByName input
-      view (config . logHook) >>= void . userCode
-
-addWorkspacePrompt :: H ()
-addWorkspacePrompt =
-  mkWorkspacePrompt
-    (\p _ -> p {RP.prompt = "Add workspace"})
-    ( \_ input -> do
-        runInHS $ do
-          modifySeats (const True) $ \s -> s { suppressChangeFocus = 2 }
-          DynWS.addWorkspace input
-        manageDirty
-    )
-
-workspacePrompt :: H ()
-workspacePrompt = mkWorkspacePrompt
-  (\p _ -> p {RP.prompt = "Go to workspace"})
-  (\_ input -> do
-      logInfo $ "switching workspace" :# [ "tag" .= input ]
-      runInHS $ windows $ W.view input
-      manageDirty
-  )
 
 removeFocusedWorkspace :: HS ()
 removeFocusedWorkspace = do
