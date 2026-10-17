@@ -8,12 +8,9 @@ module SetupHooks (setupHooks) where
 import           Distribution.HsBindgen.Hooks
 import           Distribution.Wayland.Hooks
 
-import           Distribution.Simple.Flag
 import           Distribution.Simple.SetupHooks (SetupHooks)
 import           Distribution.Utils.Path
 import           Control.Monad
-import           Lens.Micro
-import           Lens.Micro.GHC ()
 
 setupHooks :: SetupHooks
 setupHooks = waylandProtocolHooks $ do

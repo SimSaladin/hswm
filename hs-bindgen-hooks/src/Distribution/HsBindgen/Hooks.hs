@@ -88,8 +88,20 @@ bindgenHooks specs = mempty
     { preConfPackageHook = Just bindgenPreConfPackageHook
     , preConfComponentHook = Just $ bindgenPreConfComponentHook specs }
   , buildHooks = mempty
-    { preBuildComponentRules = Just $ mkBindGenRules [ (x, []) | x <- specs ] }
+    { preBuildComponentRules = Just $ mkBindGenRules [ (x, []) | x <- specs ]
+    , postBuildComponentHook = Just $ postBuildHook specs
+    }
   }
+
+postBuildHook :: [HsBindGen] -> PostBuildComponentHook
+postBuildHook specs inputs = do
+  --let generated =
+  --      [ interpretSymbolicPathCWD $ maybe (genBindingSpecDir </> genBindingSpec (getModuleName x)) location mloc
+  --        | x <- specs
+  --        , GenerateBSpec mloc <- [fromFlagOrDefault def x.bindingSpec]
+  --      ]
+  --    genBindingSpecDir = autogenPackageModulesDir inputs.localBuildInfo </> makeRelativePathEx "binding-specs"
+  return ()
 
 -- | Initialize bindgen with module name.
 --
@@ -148,7 +160,8 @@ mkBindGenRules' items inputs
       let args = PreProcessArgs
             { workingDirectory  = buildingWhatWorkingDir inputs.buildingWhat
             , verbosityFlags    = buildingWhatVerbosity inputs.buildingWhat
-            , genBindingSpecDir = autogenPackageModulesDir inputs.localBuildInfo </> makeRelativePathEx "binding-specs"
+            , genBindingSpecDir = componentBuildDir inputs.localBuildInfo inputs.targetInfo.targetCLBI </> makeRelativePathEx "binding-specs"
+            -- , genBindingSpecDir = autogenPackageModulesDir inputs.localBuildInfo </> makeRelativePathEx "binding-specs"
             , hsOutputDir       = autogenComponentModulesDir inputs.localBuildInfo (targetCLBI inputs.targetInfo)
             , .. }
       bindgenRule inputs (fmap fst knownDeps) args extraDeps
@@ -207,6 +220,8 @@ createBindings' :: PreProcessArgs -> IO ()
 createBindings' PreProcessArgs{ bindgenSpec = gen, .. } = do
   noticeNoWrap vmore $ "[bindgen] Generating bindings for " <> prettyShow mname <> "..."
   infoNoWrap vless $ "headers: " <> show (map (FP.takeFileName . getSymbolicPath . location) gen.headers)
+  info vmore $ "gen-binding-spec-dir: " ++ show genBindingSpecDir
+  info vmore $ "workingDirectory: " ++ show workingDirectory
   noticeDoc vless $ pretty gen
   runProgramCwd vless workingDirectory bindgenProgram $
     [ "--verbosity=" <> show (verbosityLevelInt vmore) ] ++

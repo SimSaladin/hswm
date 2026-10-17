@@ -1,4 +1,5 @@
 {-# LANGUAGE CPP                      #-}
+{-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE LambdaCase               #-}
 {-# LANGUAGE DataKinds                #-}
 {-# LANGUAGE DeriveAnyClass           #-}
@@ -9,7 +10,7 @@
 {-# LANGUAGE DisambiguateRecordFields #-}
 {-# OPTIONS_GHC -Wall #-}
 
-module SetupHooks (setupHooks) where
+module SetupHooks where
 
 import           Distribution.HsBindgen.Utils
 
@@ -53,7 +54,9 @@ data GenerateModule = GenerateModule
   , sHsNameMod    :: Maybe StaticKey -- (StaticPtr (String -> String)) -- NameModifier
   , sLookupFn     :: Maybe String
   , sGroupBy      :: Maybe Char
-  } deriving (Eq, Show, Generic, Binary)
+  }
+  deriving stock (Eq, Show, Generic)
+  deriving anyclass (Binary)
 
 type ActionArgs = (VerbosityFlags, GenerateModule, Location)
 
@@ -106,20 +109,23 @@ myRules xs PreBuildComponentInputs{buildingWhat=flags, localBuildInfo=lbi, targe
       verb = verbosityFromFlags vflags
       autogendir = autogenComponentModulesDir lbi tgt.targetCLBI
 
-getHeaderDeps :: (VerbosityFlags, ProgramDb, FilePath) -> IO ([Dependency], FilePath)
+getHeaderDeps :: (VerbosityFlags, ProgramDb, FilePath) -> IO ([Dependency], ByteString)
 getHeaderDeps (vflags, progdb, hdr) = do
     (gcc, _) <- requireProgram verb gccProgram progdb
     fp <- resolveHeader verb gcc hdr
     let dep = FileDependency $ Location (makeSymbolicPath "/") (makeRelativePathEx $ drop 1 $ getAbsolutePath fp)
-    return ([dep], getAbsolutePath fp)
+        res = ([dep], toUTF8BS $ getAbsolutePath fp)
+    noticeNoWrap verb $ "Header dependencies: " ++ show res
+    return res
   where
       verb = verbosityFromFlags vflags
 
-bindHeaderAction :: ActionArgs -> FilePath -> IO ()
-bindHeaderAction (vflags, gen, res) headerFile = do
+bindHeaderAction :: ActionArgs -> ByteString -> IO ()
+bindHeaderAction (vflags, gen, res) headerFile' = do
   let verb = verbosityFromFlags vflags
       modFile = interpretSymbolicPathCWD $ location res
-  noticeNoWrap verb $ "Processing header '" ++ gen.sHeader ++ "' for module " ++ prettyShow gen.sModule ++ " (file: " ++ modFile ++ ")"
+      headerFile = AbsolutePath $ makeSymbolicPath $ fromUTF8BS headerFile'
+  noticeNoWrap verb $ "Processing header '" ++ gen.sHeader ++ "' for module " ++ prettyShow gen.sModule ++ " (file: " ++ show headerFile' ++ ")"
   defines <- getDefines verb gen headerFile
   createDirectoryIfMissingVerbose verb True (FP.takeDirectory modFile)
   rewriteFileEx verb modFile defines
@@ -133,7 +139,7 @@ toSnakeCase = snakeCase False
       | otherwise = toLower x : snakeCase False xs
     snakeCase _ [] = []
 
-getDefines :: Verbosity -> GenerateModule -> FilePath -> IO String
+getDefines :: Verbosity -> GenerateModule -> AbsolutePath File -> IO String
 getDefines verb gen headerFile = do
   content <- parseHeader verb headerFile
   toName <- case gen.sHsNameMod of
@@ -191,9 +197,9 @@ getDefines verb gen headerFile = do
       [ printf "  | x == %s = Just \"%s\"" (toName m.key) m.key | m <- macros ] ++
       [ printf "  | otherwise = Nothing" ]
 
-parseHeader :: Verbosity -> FilePath -> IO [(String, [Macro])]
+parseHeader :: Verbosity -> AbsolutePath File -> IO [(String, [Macro])]
 parseHeader verb hdr = do
-  res <- readFile hdr
+  res <- readFile $ getAbsolutePath hdr
   case explicitEitherParsec hdrParser res of
     Right xs -> return xs
     Left er -> die' verb er
@@ -247,21 +253,10 @@ resolveHeader verb gcc hdr =
     unless (ec == ExitSuccess) $ die' verb $ "gcc returned " ++ show ec ++ ": " ++ gccErr
     case map words $ lines gccErr of
       (_ : file : _) : _ -> do
-        noticeNoWrap verb $ "Using header file '" ++ file ++ "' for " ++ hdr
+        noticeNoWrap verb $ "Using header file '" ++ show file ++ "' for " ++ hdr
         return $ AbsolutePath $ makeSymbolicPath file
       _ -> die' verb $ "Failed to locate header file " ++ hdr ++ ": " ++ gccErr
   where
     prog = unlines
       [ "#include <" ++ hdr ++ ">"
       , "int main(int argc, char** argv) { return 0; }" ]
-
-withTempFileContents :: FilePath -> String -> (FilePath -> IO a) -> IO a
-withTempFileContents name contents f =
-#if MIN_VERSION_Cabal(3,15,0)
-  withTempFile
-#else
-  withTempFile "src"
-#endif
-  name $ \fp h -> do
-      hPutContents h $ IODataText contents
-      f fp

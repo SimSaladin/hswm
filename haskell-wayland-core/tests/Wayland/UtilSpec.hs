@@ -42,7 +42,7 @@ spec = do
 
 data TestElem = TestElem
   { field1, field2, field3 :: Int
-  , testLink :: Wl_list
+  , testLink :: List TestElem
   } deriving (Eq, Show)
 
 instance Storable TestElem where
@@ -61,13 +61,13 @@ instance Storable TestElem where
 
 instance CF.HasCField TestElem "link" where
 
-  type CFieldType TestElem "link" = Wl_list
+  type CFieldType TestElem "link" = List TestElem
 
   offset# _ _ = sizeOf (0 :: Int) * 3
 
 testList :: IO (List TestElem)
 testList = do
   list <- listNew
-  listInsert list =<< new (TestElem 5 2 3 def)
-  listInsert list =<< new (TestElem 1 2 3 def)
+  listInsert list =<< new (TestElem 5 2 3 $ List def)
+  listInsert list =<< new (TestElem 1 2 3 $ List def)
   return list

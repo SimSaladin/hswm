@@ -123,7 +123,7 @@ getWaybarVersion InitInfo{waybar_version = ConstPtr ptr} = do
   str <- peekCString ptr
   case reverse $ readP_to_S parseVersion str of
     (ver, "") : _ -> return ver
-    _ -> throwIO $ WaybarPluginVersionParseError str
+    _ -> throwIO $! WaybarPluginVersionParseError str
 
 -- | Module init/new function, called on module instantiation.
 --

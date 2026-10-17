@@ -33,6 +33,7 @@ import           WL.Internals.TH.Server
 --import           WL.Internals.Types
 --import           WL.Internals.Utils
 import           WL.Util
+import           Language.Haskell.TH.Syntax
 
 -- * Types
 
@@ -66,6 +67,7 @@ makeMethodWrappers commonSettings ''Wl_display "wl_display_"
                      )
           & throwIfMinus1_
     , "add_socket_fd"
+          & usage "Add a file descriptor as a socket"
           & argument ("display" & describe "Wayland display to which the socket should be added.")
           & argument ("sock_fd" & coercedAs [t|Fd|])
           & throwIfMinus1_

@@ -1,6 +1,5 @@
-cabal-version:      2.2
-build-type:         Custom
---build-type:         Hooks
+cabal-version:      3.16
+build-type:         Hooks
 name:               xkbcommon-bindings
 version:            0.1.0.0
 synopsis:           Low-level bindings to libxkbcommon
@@ -48,11 +47,11 @@ common deps
 
 custom-setup
   setup-depends:
-      base           >=4.21   && <5
+      hs-bindgen-hooks
+    , base           >=4.21   && <5
     , Cabal          >=3.14   && <3.19
     , Cabal-hooks    >=3.14   && <3.19
     , filepath       >=1.5    && <2
-    , hs-bindgen-hooks
 
 library
   import: warnings, language, deps

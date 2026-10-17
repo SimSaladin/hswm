@@ -25,7 +25,7 @@ data Protocol = Protocol
   , description :: !Description
   , interfaces  :: ![Interface]
   } deriving (Eq, Show, Read, Generic, Binary)
-  deriving (Structured, A.ToJSON)
+  deriving (Structured, A.ToJSON, A.FromJSON)
 
 data Interface = Interface
   { name        :: !String
@@ -35,21 +35,21 @@ data Interface = Interface
   , requests    :: ![IRequest]
   , events      :: ![IEvent]
   } deriving (Eq, Show, Read, Generic, Binary)
-  deriving (Structured, A.ToJSON)
+  deriving (Structured, A.ToJSON, A.FromJSON)
 
 data IEnum = IEnum
   { name        :: !String
   , entries     :: ![Entry]
   , since       :: !(Maybe Int) -- version
   } deriving (Eq, Show, Read, Generic, Binary)
-  deriving (Structured, A.ToJSON)
+  deriving (Structured, A.ToJSON, A.FromJSON)
 
 data Entry = Entry
   { name        :: !String
   , value       :: !Int
   , summary     :: !String
   } deriving (Eq, Show, Read, Generic, Binary)
-  deriving (Structured, A.ToJSON)
+  deriving (Structured, A.ToJSON, A.FromJSON)
 
 data IRequest = IRequest
   { name        :: !String
@@ -58,7 +58,7 @@ data IRequest = IRequest
   , args        :: ![Arg]
   , since       :: !(Maybe Int) -- version
   } deriving (Eq, Show, Read, Generic, Binary)
-  deriving (Structured, A.ToJSON)
+  deriving (Structured, A.ToJSON, A.FromJSON)
 
 data IEvent = IEvent
   { name        :: !String
@@ -66,13 +66,13 @@ data IEvent = IEvent
   , args        :: ![Arg]
   , since       :: !(Maybe Int) -- version
   } deriving (Eq, Show, Read, Generic, Binary)
-  deriving (Structured, A.ToJSON)
+  deriving (Structured, A.ToJSON, A.FromJSON)
 
 data Description = Description
   { summary  :: !String
   , contents :: !String
   } deriving (Eq, Show, Read, Generic, Binary)
-  deriving (Structured, A.ToJSON)
+  deriving (Structured, A.ToJSON, A.FromJSON)
 
 data Arg = Arg
   { name      :: !String
@@ -80,7 +80,7 @@ data Arg = Arg
   , argType   :: !ArgType
   , nullable  :: !(Maybe Bool)
   } deriving (Eq, Show, Read, Generic, Binary)
-  deriving (Structured, A.ToJSON)
+  deriving (Structured, A.ToJSON, A.FromJSON)
 
 data ArgType
   = ANewId { argInterface :: !(Maybe String) }
@@ -100,7 +100,7 @@ data ArgType
   | AEmpty -- ???
   | ASelf -- ???
   deriving (Eq, Show, Read, Generic, Binary)
-  deriving (Structured, A.ToJSON)
+  deriving (Structured, A.ToJSON, A.FromJSON)
 
 instance Pretty Protocol where
   pPrint x =

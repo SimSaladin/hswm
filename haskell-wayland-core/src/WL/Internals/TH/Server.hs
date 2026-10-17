@@ -29,6 +29,7 @@ import           Foreign.C.ConstPtr
 import           GHC.Exts
 import           GHC.Generics (Generic)
 import           Language.Haskell.TH
+import           Language.Haskell.TH.Syntax
 import           System.Posix
 
 serverFromProtocolXML :: ProtocolRenderSettings -> String ->  Q [Dec]
@@ -136,21 +137,20 @@ checkNotNull' :: MethodConf -> MethodConf
 checkNotNull' x = x { methodRetCheck = Just [|fmap ConstPtr . throwErrnoIfNull $(litE $ stringL $ x.methodName ++ " returned NULL!") . fmap unConstPtr |] }
 
 makeMethodWrappers :: ProtocolRenderSettings -> Name -> String -> [MethodConf] -> Q [Dec]
-makeMethodWrappers s name methodPrefix methods = do
+makeMethodWrappers s _name methodPrefix methods = do
   concat <$> forM [x { methodName = methodPrefix <> x.methodName } | x <- methods] make
   where
     make MethodConf{..} = do
       let methodArgs' = methodArgs ++ repeat def
       let wName = mkName $ s.prValueNameModifier methodName
       (tyArgs, tyRes) <- (init &&& last) . C.getArrowArgs <$> reifyType (mkName methodName)
-      as <- replicateM (length tyArgs) (newName "a")
+      as <- forM [1..length tyArgs] (\i -> newName $ "a" ++ show i)
       bs <- replicateM (length tyArgs) (newName "b")
       ret <- newName "ret"
       sequence
-        [ sigD wName [t|forall m. MonadIO m => $(appsT ([ fromMaybe (argTypeTrans t) x.argType | (t, x) <- zip tyArgs methodArgs' ] ++
-            [resTypeTrans methodResType tyRes]))|]
+        [ sigD wName [t|forall m. MonadIO m => $(appsT ([ fromMaybe (argTypeTrans t) x.argType | (t, x) <- zip tyArgs methodArgs' ] ++ [resTypeTrans methodResType tyRes]))|]
         , funD_doc wName
-          [ clause [varP a | (a, _) <- zip as tyArgs]
+          [ clause [varP a | a <- as]
             (normalB $ doE $
               [ bindS (varP b) (fromMaybe (argTrans t) x.argTrans a) | (a, b, (t, x)) <- zip3 as bs (zip tyArgs methodArgs') ] ++
               [ bindS (varP ret) [|liftIO $
@@ -163,11 +163,11 @@ makeMethodWrappers s name methodPrefix methods = do
             ) []
           ]
           (Just $ "'" ++ methodName ++ "'" ++ maybe "" ("\n\n" ++) methodUsage)
-          [ if doc /= "" then Just doc else Nothing
+          [ if doc /= "" then Just $ doc ++ "\n" else Nothing
             | x <- methodArgs
             , let doc = maybe "" (\nm -> "@" ++ nm ++ "@ ") x.argName ++ fromMaybe "" x.argHelp
           ]
-        ]
+         ]
 
     notWrapper = [ ''Void, ''Word32, ''ProcessID, ''GroupID, ''UserID, ''CChar ]
 

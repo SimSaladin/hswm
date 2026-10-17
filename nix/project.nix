@@ -191,6 +191,7 @@ let
       };
 
       packages = {
+        with-hoogle = project.ghcWithHoogle (ps: [ ps.hswm ]);
         default = pkgs.buildEnv {
           pname = "hswm-env";
           version = config.packages."hswm:lib:hswm".version;

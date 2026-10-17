@@ -21,6 +21,7 @@ module Distribution.HsBindgen.Utils
   , getPkgConfDataDir
   , ToLocation(..)
   , makeLenses'
+  , withTempFileContents
   -- * Re-exports
   -- ** JSON tools
   , A.decode
@@ -38,6 +39,7 @@ import           Distribution.Simple.Program
 import           Distribution.Simple.Program.Db (ConfiguredProgs)
 import           Distribution.Simple.Utils
 import           Distribution.Utils.String (trim)
+import           Distribution.Utils.IOData (hPutContents)
 import           Distribution.Utils.Path
 import           Distribution.Pretty
 import           Distribution.Simple.SetupHooks.Rule (RuleId(..))
@@ -61,6 +63,17 @@ import           Lens.Micro.TH
 import           Lens.Micro.GHC ()
 import qualified System.FilePath as FP
 import qualified Text.PrettyPrint as PP
+
+withTempFileContents :: FilePath -> String -> (FilePath -> IO a) -> IO a
+withTempFileContents name contents f =
+#if MIN_VERSION_Cabal(3,15,0)
+  withTempFile
+#else
+  withTempFile "src"
+#endif
+  name $ \fp h -> do
+      hPutContents h $ IODataText contents
+      f fp
 
 -- * Verbosity
 

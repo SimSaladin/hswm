@@ -40,17 +40,22 @@ import           Distribution.Compat.Binary (Binary)
 import           Distribution.Simple.LocalBuildInfo
 import           Distribution.Simple.Program
 import           Distribution.Simple.Setup
-import           Distribution.Simple.SetupHooks
+import           Distribution.Simple.SetupHooks hiding (includeDirs)
 import           Distribution.Simple.SetupHooks.Rule
 import           Distribution.Simple.Utils
 import qualified Distribution.Types.BuildInfo.Lens as BI
 import           Distribution.Types.Library (explicitLibModules)
 import qualified Distribution.Types.Library.Lens as Lib
 import           Distribution.Types.LocalBuildConfig
+import           Distribution.Types.LocalBuildInfo
+import           Distribution.Types.GivenComponent (givenComponentId)
 import           Distribution.Utils.Path
 import           Distribution.Utils.Structured
 import           Distribution.Simple.Glob
-import           Distribution.Simple.BuildPaths (autogenPackageModulesDir)
+import qualified Distribution.Types.InstalledPackageInfo as PI
+import qualified Distribution.Package as P
+import           Distribution.Simple.Configure (getInstalledPackages)
+import           Distribution.Simple.PackageIndex (dependencyClosure, reverseTopologicalOrder)
 
 import           Control.Monad
 import           Control.Monad.Fix (MonadFix)
@@ -135,30 +140,39 @@ data State = State
 waylandProtocolHooks :: ScannerM () -> SetupHooks
 waylandProtocolHooks cfg = mempty
   { configureHooks = mempty { preConfPackageHook = Just preConfPackage
-                            , postConfPackageHook = Just postConf
+                            , postConfPackageHook = Just $ postConf cfg
                             , preConfComponentHook = Just preConfComponent
                             }
-  , buildHooks     = mempty { preBuildComponentRules = Just preBuildComponent }
+  , buildHooks     = mempty { preBuildComponentRules = Just preBuildComponent
+                            , postBuildComponentHook = Just postBuildComponent
+                            }
   , installHooks   = mempty { installComponentHook   = Just installHook }
   }
   <> mempty { configureHooks = mempty { preConfPackageHook = Just bindgenPreConfPackageHook } }
-  where
-    postConf inputs =
-      void $ writeProtocolInfo
-          (verbosityFromFlags $ fromFlag $ setupVerbosity flags) inputs
-          (flagToMaybe $ setupWorkingDir flags) distPref cfg
-        where distPref = fromFlag $ setupDistPref flags
-              flags    = configCommonFlags inputs.packageBuildDescr.configFlags
+
+postConf :: ScannerM () -> PostConfPackageHook
+postConf cfg inputs = void $ writeProtocolInfo inputs cfg
 
 preBuildComponent :: PreBuildComponentRules
 preBuildComponent = rules (static ()) preBuildComponent'
 
 preBuildComponent' :: PreBuildComponentInputs -> RulesM ()
 preBuildComponent' inputs
-  | CLib{} <- inputs.targetInfo.targetComponent = mdo
+  | CLib{} <- inputs.targetInfo.targetComponent = do
       specs <- waylandProtocolRules inputs
       mkBindGenRules' specs inputs
   | otherwise = return ()
+
+postBuildComponent :: PostBuildComponentHook
+postBuildComponent inputs
+  | CLib{} <- inputs.targetInfo.targetComponent = do
+    pinfo <- readProtocolInfo v (flagToMaybe $ setupWorkingDir flags) (fromFlag $ setupDistPref flags)
+    let infoFile = buildDir inputs.localBuildInfo </> makeRelativePathEx "wayland-protocol-bindings.json"
+    writeFileAtomic (interpretSymbolicPathLBI inputs.localBuildInfo infoFile) $ A.encode pinfo.infoFound
+  | otherwise = return ()
+  where
+    v = verbosityFromFlags $ fromFlag $ setupVerbosity inputs.buildFlags.buildCommonFlags
+    flags = inputs.buildFlags.buildCommonFlags
 
 waylandProtocolRules :: PreBuildComponentInputs -> RulesM [(HsBindGen, [Dependency])]
 waylandProtocolRules pbci = do
@@ -185,18 +199,11 @@ data ProtocolInfo = ProtocolInfo
 
 type ProtoFound = (ProtocolSpec, FilePath, SymbolicPath Pkg File, Protocol)
 
-localProtocolInfoFile :: SymbolicPath a (Dir b) -> SymbolicPath a (Dir c)
+localProtocolInfoFile :: SymbolicPath Pkg (Dir Dist) -> SymbolicPath Pkg File
 localProtocolInfoFile dist = dist </> makeRelativePathEx "bindgen-info.data"
 
-writeProtocolInfo
-  :: HasCallStack
-  => Verbosity
-  -> SetupInfo
-  -> Maybe (SymbolicPath CWD (Dir Pkg)) -- ^ WorkDir
-  -> SymbolicPath Pkg (Dir Dist) -- ^ The dist directory
-  -> ScannerM ()
-  -> IO ProtocolInfo
-writeProtocolInfo v setup mbWorkDir distPref cfg = do
+writeProtocolInfo :: HasCallStack => SetupInfo -> ScannerM () -> IO ProtocolInfo
+writeProtocolInfo setup cfg = do
   (opts, protos, extraBindgen) <- dynamicProtocols setup cfg
   found <- locateProtocols v mbWorkDir [] protos -- TODO add common dirs
   let ifdeps = map (\(xs, s) -> (xs, s.fullName)) opts.interfaceProtocols ++
@@ -213,6 +220,11 @@ writeProtocolInfo v setup mbWorkDir distPref cfg = do
     structuredEncode protoInfo
   return protoInfo
   where
+    v = verbosityFromFlags $ fromFlag flags.setupVerbosity
+    flags = setup.packageBuildDescr.configFlags.configCommonFlags
+    mbWorkDir = flagToMaybe $ setupWorkingDir flags
+    distPref = fromFlag $ setupDistPref flags
+    interp :: SymbolicPath Pkg to -> FilePath
     interp = interpretSymbolicPath mbWorkDir
     getDeps ifdeps spec proto
       | missing@(_:_) <- [x | (x,[]) <- zip ifs deps] = error $ "missing interfaces in " ++ proto.name ++ ": " ++ show missing ++ "\n  deps: " ++ show ifdeps
@@ -238,9 +250,9 @@ readProtocolInfo v mbWorkDir distPref = do
 
 -- | Require the @wayland-scanner@ program.
 preConfPackage :: PreConfPackageHook
-preConfPackage inp@PreConfPackageInputs{configFlags=flags, localBuildConfig=lbc} = do
+preConfPackage inputs@PreConfPackageInputs{configFlags=flags, localBuildConfig=lbc} = do
   configured <- configurePrograms v [ "wayland-scanner" ] lbc.withPrograms
-  return (noPreConfPackageOutputs inp) { extraConfiguredProgs = configured }
+  return (noPreConfPackageOutputs inputs) { extraConfiguredProgs = configured }
   where
     v = verbosityFromFlags $ fromFlag $ setupVerbosity $ configCommonFlags flags
 
@@ -255,10 +267,11 @@ preConfComponent inputs
         { componentDiff = ComponentDiff (doLib lib specs) <> outputs.componentDiff }
   | otherwise = return (noPreConfComponentOutputs inputs)
   where
-    autogen  = distPref </> makeRelativePathEx "build" </> makeRelativePathEx "autogen"
-    distPref = fromFlag $ setupDistPref $ configCommonFlags inputs.packageBuildDescr.configFlags
-    workDir  = flagToMaybe $ setupWorkingDir $ configCommonFlags inputs.packageBuildDescr.configFlags
-    verb     = verbosityFromFlags $ fromFlag inputs.packageBuildDescr.configFlags.configCommonFlags.setupVerbosity
+    flags    = inputs.packageBuildDescr.configFlags.configCommonFlags
+    verb     = verbosityFromFlags $ fromFlag flags.setupVerbosity
+    autogen  = buildDirPBD inputs.packageBuildDescr </> makeRelativePathEx "autogen"
+    distPref = fromFlagOrDefault defaultDistPref flags.setupDistPref
+    workDir  = flagToMaybe flags.setupWorkingDir
 
     doLib lib specs = CLib $ mempty
       & Lib.exposedModules  <>~ map snd (filter fst mods)
@@ -278,14 +291,16 @@ preConfComponent inputs
 installHook :: InstallComponentHook
 installHook inputs@InstallComponentInputs{localBuildInfo=lbi} = do
   -- binding specs (generated)
-  copy (Just (unsafeCoerceSymbolicPath from), makeSymbolicPath installDirs.libdir) ( makeRelativePathEx "binding-specs/*.yaml")
-  -- protocol XML TODO
+  copy (Just srcdir, makeSymbolicPath installDirs.libdir) (makeRelativePathEx "binding-specs/*.yaml")
+  copy (Just srcdir, makeSymbolicPath installDirs.libdir) (makeRelativePathEx "wayland-protocol-bindings.json")
   where
     v = verbosityFromFlags $ fromFlag $ setupVerbosity inputs.copyFlags.copyCommonFlags
     copy = installFileGlob v CabalSpecV3_0 (mbWorkDirLBI lbi)
-    from = autogenPackageModulesDir lbi
-    buildFP = makeSymbolicPath $ interpretSymbolicPathLBI lbi $ buildDir lbi
-    installDirs = absoluteComponentInstallDirs lbi.localBuildDescr.packageBuildDescr.localPkgDescr lbi
+    srcdir = maybe (unsafeCoerceSymbolicPath from) (coerceSymbolicPath .  (workDir </>)) (symbolicPathRelative_maybe from)
+    from = buildDir lbi
+    workDir = fromMaybe sameDirectory (mbWorkDirLBI lbi)
+    installDirs = absoluteComponentInstallDirs
+      lbi.localBuildDescr.packageBuildDescr.localPkgDescr lbi
       inputs.targetInfo.targetCLBI.componentUnitId (fromFlag inputs.copyFlags.copyDest)
 
 -- * Utils
@@ -356,8 +371,8 @@ protocolRules inputs@PreBuildComponentInputs{buildingWhat=what, localBuildInfo=l
 
 protoAutogenModules :: ProtocolSpec -> [(Bool, ModuleName)] -- bool true if export the module
 protoAutogenModules spec =
-  [ (True, mn)
-    | k <- [ WrapClient, WrapServer, InfoModule ]
+  [ (exposed, mn)
+    | (exposed, k) <- (False, InfoModule) : map (True,) [ WrapClient, WrapServer ]
     , not $ spec & has (disabled . ix k)
     , Just mn <- [ spec ^? computedModuleNames . ix k ]
   ]
@@ -638,16 +653,17 @@ optionalProtocol mkey cfg = do
       return $ Right key
 
 registerProtocolsFileGlob
-  :: Verbosity
-  -> Bool -- ^ Allow multiple instances of the same protocol? Latest/stable is selected.
-  -> Maybe (SymbolicPath CWD (Dir Pkg)) -- ^ Working directory
+  :: Bool -- ^ Allow multiple instances of the same protocol? Latest/stable is selected.
   -> SymbolicPath Pkg (Dir DataDir) -- ^ Root directory to start the glob search
   -> FilePath -- ^ File glob, i.e. @"**/*.xml"@
   -> (ProtocolId -> ProtocolConfig -> Maybe ProtocolConfig)
       -- ^ Can be used to select only certain protocol files; also possible transformation to apply on the detected protocols.
   -> ScannerT IO ()
-registerProtocolsFileGlob v lax mbWorkDir dir pat f = do
-  let workDir = maybe (unsafeCoerceSymbolicPath dir) (fromMaybe sameDirectory mbWorkDir </>) $ symbolicPathRelative_maybe dir
+registerProtocolsFileGlob lax dir pat f = do
+  setup <- ask
+  let v = verbosityFromFlags $ fromFlag setup.packageBuildDescr.configFlags.configCommonFlags.setupVerbosity
+      mbWorkDir = flagToMaybe setup.packageBuildDescr.configFlags.configCommonFlags.setupWorkingDir
+      workDir = maybe (unsafeCoerceSymbolicPath dir) (fromMaybe sameDirectory mbWorkDir </>) $ symbolicPathRelative_maybe dir
   matched <- liftIO $ do
     notice v $ "looking for protocols matching " ++ pat ++ " in " ++ prettyShow workDir
     matchDirFileGlob v CabalSpecV3_0 (Just workDir) (makeSymbolicPath pat)
@@ -692,9 +708,8 @@ dynamicProtocols st scanM = mdo
   ((), finalState) <- run scanM
   let cfgs = finalState.protocolConfigs
       opts = finalState.scannerOptions
-  specs <- fmap (M.mapKeys (.name)) $ flip M.traverseWithKey cfgs $ \k cfg -> do
-    return (M.singleton k (interpretProtocolConfig opts cfg))
-  return (opts, specs ^.. each . each, finalState.otherBindGen)
+      specs = M.map (interpretProtocolConfig opts) cfgs
+  return (opts, specs ^.. each, finalState.otherBindGen)
   where
     initialState = State mempty def []
     run = flip State.runStateT initialState . flip Reader.runReaderT st . runScannerT
@@ -798,10 +813,29 @@ setBindgenDir dir s = s
        NoFlag                       -> toFlag $ GenerateBSpec $ Just $ Location dir $ makeRelativePathEx @_ @File "file"
        _ -> x
 
--- * ProtocolConfig
+importPackageProtocols :: PI.InstalledPackageInfo -> ScannerT IO ()
+importPackageProtocols pkg = do
+  let pdir : _ = pkg.importDirs
+  let specdir = makeSymbolicPath @Pkg @(Dir Source) (pdir </> "binding-specs")
+  let infojson = pdir </> "wayland-protocol-bindings.json"
+  Just (res :: [ProtoFound]) <- liftIO $ A.decodeFileStrict infojson
+  let protocols = [(map (.name) proto.interfaces, setBindgenDir specdir spec)
+          | (spec, _, _, proto) <- res ]
+  modifyOptions $ interfaceProtocols <>~ protocols
+  -- Inject include dirs
+  let incdirs = map makeSymbolicPath pkg.includeDirs
+  modifyOptions $ optionCustom <>~ Endo (bindGens . each . bcBindGen . includeDirs <>~ incdirs)
 
-onlyIf :: (ProtocolConfig -> Bool) -> (ProtocolConfig -> ProtocolConfig) -> Endo ProtocolConfig
-onlyIf check f = Endo $ \s -> if check s then f s else s
-
-onlyIfName :: String -> (ProtocolConfig -> ProtocolConfig) -> Endo ProtocolConfig
-onlyIfName x = onlyIf $ \s -> s.baseName == x
+getDependencies :: [P.PackageName] -> DynamicSetup [PI.InstalledPackageInfo]
+getDependencies required = do
+  setup <- ask
+  let v = verbosityFromFlags $ fromFlag setup.packageBuildDescr.configFlags.configCommonFlags.setupVerbosity
+  index <- liftIO $ getInstalledPackages v setup.packageBuildDescr.compiler Nothing setup.packageBuildDescr.withPackageDB setup.localBuildConfig.withPrograms
+  let index'   = either id (error "index not found") $ dependencyClosure index $ map (P.newSimpleUnitId . givenComponentId) setup.packageBuildDescr.configFlags.configDependencies
+      result   = filter selector $ reverseTopologicalOrder index'
+      notFound = [ k | k <- required, notElem k $ map P.packageName result ]
+  when (notFound /= []) $
+    liftIO $ die' v $ "could not find requested packages: " ++ show notFound
+  return result
+  where
+    selector pkg = P.packageName pkg `elem` required

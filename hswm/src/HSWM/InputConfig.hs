@@ -67,30 +67,43 @@ data InputDeviceState = InputDeviceState
   deriving anyclass (Default)
 
 data LibinputDeviceState = LibinputDeviceState
-  { inputDevice :: R.RiverInputDevice
-  , sendEvents :: SDC R.RiverLibinputDeviceSendEventsModes R.RiverLibinputDeviceSendEventsModes
-  , tap :: SDC Int32 R.RiverLibinputDeviceTapState
-  , tapButtonMap :: DC R.RiverLibinputDeviceTapButtonMap
-  , drag :: DC R.RiverLibinputDeviceDragState -- ^ tap-and-drag state
-  , dragLock :: DC R.RiverLibinputDeviceDragLockState -- ^ drag lock state
-  , threeFingerDrag :: SDC Int32 R.RiverLibinputDeviceThreeFingerDragState -- ^ three finger drag state
-  , calibrationMatrix :: SDC Int32 [Float] -- ^ calibration matrix. Supported if non-zero
-  , accelProfile :: SDC R.RiverLibinputDeviceAccelProfiles R.RiverLibinputDeviceAccelProfile
-  , accelSpeed :: DC [Double] -- ^ accel speed
-  , naturalScroll :: SDC Int32 R.RiverLibinputDeviceNaturalScrollState -- ^ natural scroll, supported if non-zero
-  , leftHanded :: SDC Int32 R.RiverLibinputDeviceLeftHandedState -- ^ left-handed mode, supported if non-zero
-  , clickMethod :: SDC R.RiverLibinputDeviceClickMethods R.RiverLibinputDeviceClickMethod -- ^ click methods
+  { inputDevice          :: R.RiverInputDevice
+  , sendEvents           :: SDC' R.RiverLibinputDeviceSendEventsModes
+  , tap                  :: SDC' R.RiverLibinputDeviceTapState
+  , tapButtonMap         :: DC R.RiverLibinputDeviceTapButtonMap
+  , drag                 :: DC R.RiverLibinputDeviceDragState -- ^ tap-and-drag state
+  , dragLock             :: DC R.RiverLibinputDeviceDragLockState -- ^ drag lock state
+  , threeFingerDrag      :: SDC Int32 R.RiverLibinputDeviceThreeFingerDragState -- ^ three finger drag state
+  , calibrationMatrix    :: SDC Int32 [Float] -- ^ calibration matrix. Supported if non-zero
+  , accelProfile         :: SDC R.RiverLibinputDeviceAccelProfiles R.RiverLibinputDeviceAccelProfile
+  , accelSpeed           :: DC [Double] -- ^ accel speed
+  , naturalScroll        :: SDC Int32 R.RiverLibinputDeviceNaturalScrollState -- ^ natural scroll, supported if non-zero
+  , leftHanded           :: SDC Int32 R.RiverLibinputDeviceLeftHandedState -- ^ left-handed mode, supported if non-zero
+  , clickMethod          :: SDC R.RiverLibinputDeviceClickMethods R.RiverLibinputDeviceClickMethod -- ^ click methods
   , clickfingerButtonMap :: DC R.RiverLibinputDeviceClickfingerButtonMap -- ^ clickfinger button map, supported if cilck_methods.clickfinger
-  , middleEmulation :: SDC Int32 R.RiverLibinputDeviceMiddleEmulationState -- ^ middle mouse button emulation, supported if non-zero
-  , scrollMethod :: SDC R.RiverLibinputDeviceScrollMethods R.RiverLibinputDeviceScrollMethod -- ^ scroll method
-  , scrollButton :: DC Word32 -- ^ scroll button, supported if scroll_methods.on_button_down is supported
-  , scrollButtonLock :: DC R.RiverLibinputDeviceScrollButtonLockState -- ^ scroll button lock state, supported if ccroll_methods.on_button_down is supported
-  , dwt :: SDC Int32 R.RiverLibinputDeviceDwtState -- ^ disable-while-typing, supported if non-zero
-  , dwtp :: SDC Int32 R.RiverLibinputDeviceDwtpState -- ^ disable-while-trackpointing, supported if non-zero
-  , rotation :: SDC Int32 Word32 -- ^ rotation angle, supported if non-zero
+  , middleEmulation      :: SDC Int32 R.RiverLibinputDeviceMiddleEmulationState -- ^ middle mouse button emulation, supported if non-zero
+  , scrollMethod         :: SDC R.RiverLibinputDeviceScrollMethods R.RiverLibinputDeviceScrollMethod -- ^ scroll method
+  , scrollButton         :: DC Word32 -- ^ scroll button, supported if scroll_methods.on_button_down is supported
+  , scrollButtonLock     :: DC R.RiverLibinputDeviceScrollButtonLockState -- ^ scroll button lock state, supported if ccroll_methods.on_button_down is supported
+  , dwt                  :: SDC Int32 R.RiverLibinputDeviceDwtState -- ^ disable-while-typing, supported if non-zero
+  , dwtp                 :: SDC Int32 R.RiverLibinputDeviceDwtpState -- ^ disable-while-trackpointing, supported if non-zero
+  , rotation             :: SDC Int32 Word32 -- ^ rotation angle, supported if non-zero
   }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Default)
+
+type family StateSupported a
+type instance StateSupported R.RiverLibinputDeviceSendEventsModes = R.RiverLibinputDeviceSendEventsModes
+-- | Finger count indicated
+type instance StateSupported R.RiverLibinputDeviceTapState = Int32
+-- | Finger count indicated
+type instance StateSupported R.RiverLibinputDeviceThreeFingerDragState = Int32
+
+-- | (support, default, current)
+data SDC' a = SDC'
+  { supported :: StateSupported a
+  , defaultValue, currentValue :: a
+  } deriving stock (Eq, Show, Generic)
 
 -- | (support, default, current)
 data SDC support a = SDC
@@ -107,7 +120,7 @@ instance {-# OVERLAPPABLE #-} (CEnum a) => Default (SDC Int32 a) where
 instance Default (SDC Int32 [a]) where
   def = SDC minBound [] []
 
-instance Default (SDC Int32 Word32)   where
+instance Default (SDC Int32 Word32) where
   def = SDC minBound maxBound maxBound
 
 -- | (default, current)
@@ -160,7 +173,6 @@ createKeyboardKeymap params = lookupKeymaps params >>= \case
       l <- getOrCreateObject $ do
         runInIO <- askRunInIO
         WL.createListener $ runInIO . handleXkbKeymapEvent
-        -- R.mkRiverXkbKeymapListener $ runInIO . handleXkbKeymapEvent
       WL.listenerAdd_ keymap l
       return kmState
 
@@ -244,12 +256,12 @@ handleLibinputDeviceEvent = \case
     modifyObjectDef $ \st -> st { libinputDevices = M.delete dev st.libinputDevices }
     WL.objectDestroy dev
   R.RiverLibinputDeviceInputDevice _ dev inputDevice            -> modifyLibinputDevice dev $ \s -> s { inputDevice } :: LibinputDeviceState
-  R.RiverLibinputDeviceSendEventsSupport _ dev modes            -> modifyLibinputDevice dev $ \s -> s { sendEvents = s.sendEvents { support = modes } }
-  R.RiverLibinputDeviceSendEventsDefault _ dev mode             -> modifyLibinputDevice dev $ \s -> s { sendEvents = s.sendEvents { defval = mode } }
-  R.RiverLibinputDeviceSendEventsCurrent _ dev mode             -> modifyLibinputDevice dev $ \s -> s { sendEvents = s.sendEvents { curval = mode } }
-  R.RiverLibinputDeviceTapSupport _ dev fingercount             -> modifyLibinputDevice dev $ \s -> s { tap = s.tap { support = fingercount } }
-  R.RiverLibinputDeviceTapDefault _ dev tapSt                   -> modifyLibinputDevice dev $ \s -> s { tap = s.tap { defval = tapSt } }
-  R.RiverLibinputDeviceTapCurrent _ dev tapSt                   -> modifyLibinputDevice dev $ \s -> s { tap = s.tap { curval = tapSt } }
+  R.RiverLibinputDeviceSendEventsSupport _ dev modes            -> modifyLibinputDevice dev $ \s -> s { sendEvents = s.sendEvents { supported = modes } }
+  R.RiverLibinputDeviceSendEventsDefault _ dev mode             -> modifyLibinputDevice dev $ \s -> s { sendEvents = s.sendEvents { defaultValue = mode } }
+  R.RiverLibinputDeviceSendEventsCurrent _ dev mode             -> modifyLibinputDevice dev $ \s -> s { sendEvents = s.sendEvents { currentValue = mode } }
+  R.RiverLibinputDeviceTapSupport _ dev fingercount             -> modifyLibinputDevice dev $ \s -> s { tap = s.tap { supported = fingercount } }
+  R.RiverLibinputDeviceTapDefault _ dev tapSt                   -> modifyLibinputDevice dev $ \s -> s { tap = s.tap { defaultValue = tapSt } }
+  R.RiverLibinputDeviceTapCurrent _ dev tapSt                   -> modifyLibinputDevice dev $ \s -> s { tap = s.tap { currentValue = tapSt } }
   R.RiverLibinputDeviceTapButtonMapDefault _ dev tbMap          -> modifyLibinputDevice dev $ \s -> s { tapButtonMap = s.tapButtonMap { defval = tbMap } }
   R.RiverLibinputDeviceTapButtonMapCurrent _ dev tbMap          -> modifyLibinputDevice dev $ \s -> s { tapButtonMap = s.tapButtonMap { curval = tbMap } }
   R.RiverLibinputDeviceDragDefault _ dev dragSt                 -> modifyLibinputDevice dev $ \s -> s { drag = s.drag { defval = dragSt } }
@@ -298,7 +310,5 @@ handleLibinputDeviceEvent = \case
   R.RiverLibinputDeviceRotationDefault _ dev angle              -> modifyLibinputDevice dev $ \s -> s { rotation = s.rotation { defval = angle } }
   R.RiverLibinputDeviceRotationCurrent _ dev angle              -> modifyLibinputDevice dev $ \s -> s { rotation = s.rotation { curval = angle } }
   R.RiverLibinputDeviceDone _  dev                              -> return () -- TODO take advantage of this event
-
-
   where
     modifyLibinputDevice dev f = modifyObjectDef $ \st -> st { libinputDevices = M.adjust f dev st.libinputDevices }
