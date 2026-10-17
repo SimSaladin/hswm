@@ -71,7 +71,7 @@ in
       };
 
       legacyPackages = {
-        inherit (pkgs) river river-pebug zigEnv;
+        inherit (pkgs) river river-debug zigEnv;
       };
     };
 }

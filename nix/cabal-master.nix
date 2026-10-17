@@ -96,22 +96,11 @@ let
     nix-tools-set = args1: haskell-nix.nix-tools-set (lib.composeExtensions args args1);
     nix-tools-eval-on-linux = haskell-nix.nix-tools-set (lib.composeExtensions args { evalSystem = "x86_64-linux"; });
   };
-
-  hsNixModule = { lib, config, ... }: {
-    # workaround issue around hsc2hs and process override
-    #packages = lib.genAttrs [
-    #  "filelock"
-    #  "unix-time"
-    #  "network"
-    #  "haskell-gi-base"
-    #  "zlib"
-    #] (_: {
-    #  components.library.depends = [ config.hsPkgs.process ];
-    #});
-  };
 in
 {
-  _module.args.cabal-master-hnix = hsNixModule;
+  _module.args.cabal-defaults = { pkgs, ... }: cabalDefaults // {
+    evalPackages = pkgs.buildPackages;
+  };
 
   perSystem = { pkgs, ... }: {
     legacyPackages = { };

@@ -46,36 +46,22 @@
       url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    systems.url = "github:nix-systems/default";
+    #systems.url = "github:nix-systems/default";
   };
 
   outputs =
-    inputs@{ nixpkgs, systems, ... }:
+    inputs@{ flake-parts, ... }:
     let
       inherit (inputs.flake-utils.lib) mkApp;
-      forEachSystem = nixpkgs.lib.genAttrs (import systems);
     in
-    inputs.flake-parts.lib.mkFlake { inherit inputs; } (
-      { self, lib, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } ({ self, lib, ... }:
       {
-        # To run git-hooks.nix hooks with `nix fmt`
-        flake.formatter = forEachSystem (
-          system:
-          let
-            pkgs = nixpkgs.legacyPackages.${system};
-            config = inputs.git-hooks.checks.${system}.pre-commit-check.config;
-            inherit (config) package configFile;
-            script = "${pkgs.lib.getExe package} run --all-files --config ${configFile}";
-          in
-          pkgs.writeShellScriptBin "pre-commit-run" script
-        );
-
         # Materialization: nix run .#materialized-do
         _module.args.checkMaterialization = false;
 
         imports = [
           inputs.git-hooks.flakeModule
-          ./river/flake-module.nix
+          ./nix/river/flake-module.nix
           ./nix/lib.nix
           ./nix/cabal-master.nix
           ./nix/hs-bindgen.nix
@@ -92,13 +78,11 @@
           self.overlays.hs-bindgen
           self.overlays.cabal-master
           self.overlays.project
-          (f: prev: {
-            my-lib = f.callPackage ./nix/make-fixed-output.nix { };
-          })
         ];
 
         perSystem =
           {
+            config,
             system,
             lib,
             pkgs,
@@ -116,14 +100,17 @@
               };
             };
 
+            # To run git-hooks.nix hooks with `nix fmt`
+            formatter =
+              let
+                config = inputs.git-hooks.checks.${system}.pre-commit-check.config;
+                inherit (config) package configFile;
+                script = "${pkgs.lib.getExe package} run --all-files --config ${configFile}";
+              in
+              pkgs.writeShellScriptBin "pre-commit-run" script;
+
             pre-commit.settings = { pkgs, ... }: {
               hooks = {
-                #treefmt.enable = true;
-                #treefmt.settings.formatters = [
-                #  pkgs.nixfmt
-                #  pkgs.stylish-haskell
-                #  pkgs.haskellPackages.cabal-gild
-                #];
                 hpack.enable = true;
                 nixfmt.enable = true;
                 cabal-gild.enable = true;
@@ -133,9 +120,7 @@
               ];
             };
 
-            devShells.pre-commit-check = self.pre-commit.devShell;
-
-            legacyPackages = { inherit pkgs; };
+            devShells.pre-commit-check = config.pre-commit.devShell;
 
             apps = {
               updateProtocols = mkApp {
@@ -144,7 +129,7 @@
                   runtimeInputs = [ ];
                   text = ''
                     set -x
-                    upstream=${inputs.rver}/protocol
+                    upstream=${inputs.river}/protocol
                     current=./hswm-bindings/protocol/
                     diff -r $current $upstream || :
                     cp -v -t "$current" $upstream/*.xml

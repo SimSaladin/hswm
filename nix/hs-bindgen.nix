@@ -28,6 +28,6 @@ in
 
   perSystem = { pkgs, inputs', ... }: {
     # Expose the hs-bindgen-cli binary for development purposes.
-    packages.hs-bindgen-cli = pkgs.project.hsPkgs.hs-bindgen.components.exes.hs-bindgen-cli;
+    packages.hs-bindgen-cli = pkgs.hs-bindgen-cli;
   };
 }

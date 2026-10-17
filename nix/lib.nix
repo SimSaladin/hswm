@@ -1,15 +1,15 @@
 { lib, ... }:
 
 let
-  materializedRoot = ./. + "./materialized";
-  materializedDest = "./nix/materialized";
 
   make-project-lib = { pkgs, ... }:
     let
       self = {
+        materializedRoot = ./materialized;
+        materializedDest = "./nix/materialized";
 
         materializedFor = key:
-          let dir = materializedRoot + "/${key}"; in
+          let dir = self.materializedRoot + "/${key}"; in
           if builtins.pathExists (dir + "/default.nix") then dir else null;
 
         materialized-do =
@@ -18,7 +18,7 @@ let
           , what ? "generateMaterialized"
           }:
           ''
-            ${project.plan-nix.passthru.${what}} ${toString (materializedDest + "/${key}")}
+            ${project.plan-nix.passthru.${what}} ${toString (self.materializedDest + "/${key}")}
           '';
 
         materialized-do-all =
@@ -51,18 +51,20 @@ let
 
       };
     in
+    pkgs.callPackage ./make-fixed-output.nix { } //
     self;
 in
 {
-  perSystem = { pkgs, ... }: {
-    _module.args.project-lib = pkgs.project-lib;
+  perSystem = { pkgs, project-lib, ... }: {
+    _module.args.project-lib = make-project-lib { inherit pkgs; };
 
     legacyPackages = {
-      inherit (pkgs) project-lib;
+      inherit project-lib;
     };
   };
 
   flake.overlays.project-lib = final: _: {
     project-lib = make-project-lib { pkgs = final; };
+    my-lib = final.project-lib;
   };
 }

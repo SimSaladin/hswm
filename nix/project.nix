@@ -1,11 +1,13 @@
-{ self, inputs, lib, withSystem, haskellNixModules, cabal-master-hnix, ... }:
+{ self, inputs, lib, withSystem, haskellNixModules, cabal-defaults, ... }:
 
 let
   inherit (inputs.flake-utils.lib) mkApp;
 
-  thisProject = { lib, config, pkgs, evalPackages, ... }: {
+  thisProject = { lib, config, pkgs, ... }: {
+    imports = [
+      cabal-defaults
+    ];
     modules = [
-      cabal-master-hnix
       haskellNixModules.hs-bindgen
       hsNixModule
     ];
@@ -39,10 +41,6 @@ let
     };
 
     flake = {
-      variants.hls = {
-        shell.tools.haskell-language-server = { };
-        flake.packages = _: { }; # hide package outputs
-      };
       # Using the haskell.nix V1 builder
       variants.BuilderV1 = {
         builderVersion = lib.mkForce 1;
@@ -167,10 +165,7 @@ let
     let
       project = pkgs.project;
       projectFlake = project.flake';
-      projects = [
-        { project = project; key = "project"; }
-        #{ project = pkgs.cabal-master; key = "cabal-plan-nix"; }
-      ];
+      projects = [ { project = project; key = "project"; } ];
     in
     {
       apps = {
@@ -218,34 +213,19 @@ let
         lib.mapAttrs (_: lib.mkForce) projectShells //
         pkgShells //
         {
-
-          #"default:ghc-pkg" = mkGhcPkgShell {
-          #  inherit (pkgs) project;
-          #  projectShells = lib.attrValues pkgShells;
-          #};
-
-          project-pkgs = adjustedShellFor project ({
+          project-pkgs = adjustedShellFor project {
             name = "project-pkgs";
             #exposePackagesVia = "ghc-pkg";
-            packages = ps: [
-              ps.hswm
-            ];
-            inputsFrom = [
-              #lib.map (drv: drv.overrideAttrs { shellHook = ""; }) (lib.attrValues projectShells);
-            ];
-            #allToolDeps = lib.mkForce false;
+            packages = ps: [ ps.hswm ];
             withHoogle = true;
-            #shellHook = "unset PROMPT_COMMAND";
-          });
+          };
 
           all = adjustedShellFor project ({
             name = "hswm-deps";
             #exposePackagesVia = "ghc-pkg";
             packages = lib.mkForce (_: [ ]);
             inputsFrom = lib.map (drv: drv.overrideAttrs { shellHook = ""; }) (lib.attrValues projectShells);
-            #allToolDeps = lib.mkForce false;
             withHoogle = true;
-            #shellHook = "unset PROMPT_COMMAND";
           });
         };
     };
@@ -256,20 +236,14 @@ in
     customizations
   ];
 
-  flake.overlays.project = final: _: {
-    project = final.haskell-nix.cabalProject' [
-      final.cabalDefaults
-      thisProject
-    ];
-  };
-
-  perSystem = { lib, config, pkgs, project-lib, ... }:
-    let
-      project = pkgs.project;
-      projectFlake = project.flake';
-    in
+  perSystem = { lib, config, pkgs, project, project-lib, ... }:
     {
-      inherit (projectFlake) apps packages devShells checks;
-      legacyPackages = { inherit project projectFlake; };
+      _module.args.project = pkgs.project;
+      inherit (project.flake') apps packages devShells checks;
+      legacyPackages = { inherit project; };
     };
+
+  flake.overlays.project = final: _: {
+    project = final.haskell-nix.cabalProject' [ thisProject ];
+  };
 }
