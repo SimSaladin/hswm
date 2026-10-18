@@ -10,8 +10,8 @@ import           Control.Concurrent.Thread.Delay as Conc (delay)
 import qualified Data.List as L
 import qualified Data.Map as M
 import           Data.Time.Clock.System
-import qualified System.FilePath as FP
-import           System.IO (hGetContents, hPrint, writeFile)
+import           System.FilePath ((</>))
+import           System.IO (hGetContents, writeFile)
 import           System.IO.Error
 import           Text.Printf
 
@@ -56,19 +56,24 @@ writeStateToFile = do
         cleanup = do
           contents <- listDirectory dir
           forM_ contents $ \file ->
-            when ("savedstate-" `L.isPrefixOf` FP.takeFileName file) $ do
-              res <- try @_ @IOException $ systemSeconds . utcToSystemTime <$> getModificationTime file
+            when ("savedstate-" `L.isPrefixOf` file) $ do
+              res <- tryIO $ systemSeconds . utcToSystemTime <$> getModificationTime (dir </> file)
               case res of
-                Right mtime | mtime < ts - (60 * 60 * 12) -> removeFile file
+                Right mtime | mtime < ts - (60 * 60 * 12) -> removeFile (dir </> file)
                             | otherwise -> return ()
                 Left e
                   -- try to remove anyway, it might be a broken symlink
-                  | isDoesNotExistError e -> void $ try @_ @IOException $ removeFile file
+                  | isDoesNotExistError e -> void $ tryIO $ removeFile (dir </> file)
                   | otherwise -> throwIO e
 
-    io $ catchIO update (hPrint stderr)
-    logInfo $ "Wrote current WM state to disk" :# [ "state-file" .= stateFP ]
-    io $ catchIO cleanup (hPrint stderr)
+    resUpdate <- io $ tryIO update
+    case resUpdate of
+      Left err -> logError $ "Failed to write state file" :# [ "state-file" .= stateFP, "exception" .= show err ]
+      Right{} -> logInfo $ "Wrote current WM state to disk" :# [ "state-file" .= stateFP ]
+    resCleanup <- io $ tryIO cleanup
+    case resCleanup of
+      Left err -> logError $ "Could not cleanup old state files" :# [ "state-file" .= stateFP, "exception" .= show err ]
+      Right{} -> return ()
     return stateFP
   where
     getTimeStamp :: MonadIO m => m Int64
@@ -136,7 +141,7 @@ readStateFile msf xmc = do
 
     getDefFile = do
         dir <- getStateDirectory
-        return $ dir ++ "/" ++ "savedstate"
+        return $ dir </> "savedstate"
 
     maybeRead reads' s = case reads' s of
       [(x, "")] -> Just x

@@ -55,22 +55,22 @@ data Ctx = Ctx
   deriving anyclass (Default)
 
 data OutputState = OutputState
-  { out_x, out_y, out_width, out_height :: !Int32
-  , scale                               :: !Int32
-  , pref_fract_scale                    :: !Word32
-  , name                                :: !String
-  , pending_render                      :: !Bool
-  , configured                          :: !Bool
-  , wl_output                           :: !WL.Output
-  , surfaces                            :: !(Maybe Surfaces)
+  { out_x, out_y, out_width
+  , out_height, scale :: {-# UNPACK #-} !Int32
+  , pref_fract_scale  :: {-# UNPACK #-} !Word32
+  , name              :: !String
+  , pending_render    :: {-# UNPACK #-} !Bool
+  , configured        :: {-# UNPACK #-} !Bool
+  , wl_output         :: {-# UNPACK #-} !WL.Output
+  , surfaces          :: !(Maybe Surfaces)
   } deriving (Generic)
 
 instance Default OutputState where
   def = OutputState 0 0 0 0 1 0 "" False False def def
 
 data Surfaces = Surfaces
-  { wl_surface   :: !WL.Surface
-  , layerSurface :: !Wlr.LayerSurface
+  { wl_surface   :: {-# UNPACK #-} !WL.Surface
+  , layerSurface :: {-# UNPACK #-} !Wlr.LayerSurface
   , outViewport  :: !(Maybe VP.Viewport)
   , surfacesCleanup :: !(IO ())
   } deriving (Generic)
@@ -265,7 +265,6 @@ initOutput ro = withOutputState ro $ \os -> do
       -- layersurface listener
       lsListener <- WL.createListener $ \case
         Wlr.LayerSurfaceConfigure _ ls serial cw ch -> runInIO $ do
-          logInfo $ "wallpaper: layer surface configure" :# [ "size" .= show (cw, ch), "old-size" .= show (w, h), "output" .= show ro ]
           Wlr.layerSurfaceAckConfigure ls serial
           updateOutputState ro $ \x -> x
               { out_width = fi cw
@@ -273,8 +272,8 @@ initOutput ro = withOutputState ro $ \os -> do
               , configured = True
               , pending_render = not x.configured || (x.out_width, x.out_height) /= (fi cw, fi ch)
               }
-        Wlr.LayerSurfaceClosed {} ->
-          runInIO $ logError "Layer surface closed!"
+          -- logDebug $ "wallpaper: layer surface configure" :# [ "size" .= show (cw, ch), "old-size" .= show (w, h), "output" .= show ro ]
+        Wlr.LayerSurfaceClosed {} -> runInIO $ logError "Layer surface closed!"
       WL.listenerAdd_ layerSurface lsListener
 
       -- finally:

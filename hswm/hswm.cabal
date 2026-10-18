@@ -62,12 +62,14 @@ library
           HSWM.Layout
           HSWM.Layout.BinarySpacePartition
           HSWM.Layout.BoringWindows
+          HSWM.Layout.GridVariants
           HSWM.Layout.LayoutModifier
           HSWM.Layout.Maximize
           HSWM.Layout.Minimize
           HSWM.Layout.MultiToggle
           HSWM.Layout.MultiToggle.Instances
           HSWM.Layout.NoBorders
+          HSWM.Layout.Reflect
           HSWM.Layout.WindowNavigation
           HSWM.Main
           HSWM.Main.Options
@@ -187,6 +189,7 @@ library ipc-api
         , bytestring >=0.12.2 && <0.13
         , hswm:prelude
         , network >=3.2.8 && <3.3
+        , random
         , text >=2.1.2 && <2.2
         , utf8-string >=1.0.2 && <1.1
     mixins:
@@ -277,6 +280,7 @@ executable hswmctl
     ghc-options: -Wall -Wno-partial-type-signatures -Wno-ambiguous-fields -Wno-typed-holes -threaded -rtsopts "-with-rtsopts=-N -maxN8 -qn3 -M2G -A2m -K8M -I2 -xr100G"
     build-depends:
           aeson >=2.2.3 && <2.4
+        , aeson-pretty
         , base >=4.21 && <5
         , bytestring >=0.12.2 && <0.13
         , haskeline >=0.8.4 && <0.9

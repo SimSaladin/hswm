@@ -87,3 +87,10 @@ instance HasX      Window Position1D where _x     = position . _x
 instance HasY      Window Position1D where _y     = position . _y
 instance HasWidth  Window Dimension  where width  = size . width
 instance HasHeight Window Dimension  where height = size . height
+
+instance ToJSON Window where
+  toJSON     = genericToJSON aesonOptions
+  toEncoding = genericToEncoding aesonOptions
+
+instance ToJSON WindowManageAction
+instance ToJSON WindowRenderAction

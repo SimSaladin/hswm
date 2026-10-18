@@ -111,7 +111,7 @@ lessBorders amb = ModifiedLayout (ConfigurableBorder amb [] [] [])
 --
 -- There is no equivalent for 'ResetBorder'.
 hasBorder :: Bool -> ManageHook
-hasBorder b = ask >>= \w -> liftHS (broadcastMessage $ HasBorder b w.river_window) >> idHook
+hasBorder b = ask >>= \w -> runInHS (broadcastMessage $ HasBorder b w.river_window) >> idHook
 
 data BorderMessage
     = HasBorder Bool RiverWindow

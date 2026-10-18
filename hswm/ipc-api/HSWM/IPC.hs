@@ -19,6 +19,7 @@ import qualified Data.Text.Lazy as TL
 import           Data.Version (showVersion)
 import           Network.Socket
 import qualified Network.Socket.ByteString as NB
+import           System.Random (randomIO)
 
 import qualified PackageInfo_hswm as PKG
 
@@ -69,6 +70,8 @@ data Response
   = Identify { name :: String, version :: Int, description :: Maybe String }
   -- ^ Server identification info.
 
+  | Error { message :: Text }
+
   | Ping
 
   | Outputs { outputs :: [(Text, OutputId)] }
@@ -82,7 +85,7 @@ data Response
 
   | StateDumpResponse TL.Text
 
-  | InternalObject { objects :: [A.Value] }
+  | InternalObject { value :: A.Value }
   deriving (Eq, Show, Read, Generic)
 
 instance A.ToJSON Response
@@ -192,18 +195,19 @@ clientRunWith conf program = do
 
 syncRequest :: MonadIPCClient m => Socket -> Request -> m Response
 syncRequest sock req = do
-  let m = 123 -- TODO
-  sendMsg sock (Msg req (Just 0))
-  let go [] = syncReceive sock >>= go
-      go (Msg x n : xs) | n == Just m = return x
-                        | otherwise = go xs
-  go []
+  m <- randomIO
+  sendMsg sock (Msg req (Just m))
+  let go ([], acc) = syncReceive sock acc >>= go
+      go (Msg x n : xs, acc)
+        | n == Just m = return x
+        | otherwise = go (xs, acc)
+  go ([], "")
 
-syncReceive :: MonadIPCClient m => Socket -> m [Msg Response]
-syncReceive sock = go mempty
+syncReceive :: MonadIPCClient m => Socket -> ByteString -> m ([Msg Response], ByteString)
+syncReceive sock = go
   where go acc = recvLines sock acc >>= \case
                    ([], acc') -> go (acc <> acc')
-                   (xs, _) -> return $ map (either error id . A.eitherDecodeStrict') xs
+                   (xs, acc') -> return (map (either error id . A.eitherDecodeStrict') xs, acc')
 
 -- * Utilities
 

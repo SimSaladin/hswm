@@ -1,4 +1,4 @@
-{-# LANGUAGE PatternGuards #-}
+{-# LANGUAGE PatternGuards       #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 -- |
@@ -53,28 +53,28 @@ import HSWM.Util.GrabKeyboard
 --   workspaces is maintained, similarly to how many window managers handle window
 --   switching. For best effects use the same modkey+key combination as the one used
 --   to invoke this action.
-cycleRecentWS ::
+cycleRecentWS :: (IsModMask mods, IsKeySym key) =>
   -- | A list of modifier keys used when invoking this action.
   --   As soon as one of them is released, the final switch is made.
-  [KeySym] ->
+  mods ->
   -- | Key used to switch to next (less recent) workspace.
-  KeySym ->
+  key ->
   -- | Key used to switch to previous (more recent) workspace.
   --   If it's the same as the nextWorkspace key, it is effectively ignored.
-  KeySym ->
+  key ->
   H ()
 cycleRecentWS = cycleWindowSets $ recentWS (const True)
 
 -- | Like 'cycleRecentWS', but restricted to non-empty workspaces.
-cycleRecentNonEmptyWS ::
+cycleRecentNonEmptyWS :: (IsModMask mods, IsKeySym key) =>
   -- | A list of modifier keys used when invoking this action.
   --   As soon as one of them is released, the final switch is made.
-  [KeySym] ->
+  mods ->
   -- | Key used to switch to next (less recent) workspace.
-  KeySym ->
+  key ->
   -- | Key used to switch to previous (more recent) workspace.
   --   If it's the same as the nextWorkspace key, it is effectively ignored.
-  KeySym ->
+  key ->
   H ()
 cycleRecentNonEmptyWS = cycleWindowSets $ recentWS (not . null . stack)
 
@@ -106,19 +106,22 @@ recentWS p w =
 -- | Cycle through a finite list of workspaces with repeated presses of a key, while
 --   a modifier key is held down. For best effects use the same modkey+key combination
 --   as the one used to invoke this action.
-cycleWindowSets ::
+cycleWindowSets :: (IsModMask mods, IsKeySym key) =>
   -- | A function used to create a list of workspaces to choose from
   (WindowSet -> [WorkspaceId]) ->
   -- | A list of modifier keys used when invoking this action.
   --   As soon as one of them is released, the final workspace is chosen and the action exits.
-  [KeySym] ->
+  mods ->
   -- | Key used to preview next workspace from the list of generated options
-  KeySym ->
+  key ->
   -- | Key used to preview previous workspace from the list of generated options.
   --   If it's the same as nextOption key, it is effectively ignored.
-  KeySym ->
+  key ->
   H ()
-cycleWindowSets genOptions holdMods keyNext' keyPrev = do
+cycleWindowSets genOptions hmods knext kprev = do
+  let keyNext' = toKeySym knext
+      keyPrev  = toKeySym kprev
+      holdMods = modifierIndices hmods
   (opts, unView') <- runInHS $ gets $ (genOptions &&& unView) . view windowset
   let previewWS i = do
         logInfo $ "[cyclews] preview" :# [ "id" .= i ]

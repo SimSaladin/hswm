@@ -130,3 +130,17 @@ instance HasRiverId (Seat' m) where
   type RiverId (Seat' m) = RiverSeat
 
   riverId = riverSeat
+
+-- aeson
+
+instance ToJSON (Seat' m) where
+  toJSON     = genericToJSON aesonOptions
+  toEncoding = genericToEncoding aesonOptions
+
+instance ToJSON (SeatAction m) where
+  toJSON     = genericToJSON aesonOptions
+  toEncoding = genericToEncoding aesonOptions
+
+instance ToJSON SeatFocus
+
+instance ToJSON SeatOperation

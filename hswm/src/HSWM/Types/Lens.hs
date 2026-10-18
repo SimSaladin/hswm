@@ -19,17 +19,28 @@ module HSWM.Types.Lens
   , nameBase
   , toUpper
   , toLower
+  , A.ToJSON(..)
+  , A.FromJSON(..)
+  , A.genericToJSON
+  , A.genericToEncoding
   ) where
 
+import qualified Data.Aeson as A
 import           Data.Char
 import           Data.Coerce
+import           Data.Functor.Contravariant
 import qualified Data.Set as Set
 import           Language.Haskell.TH hiding (Type)
 import qualified Language.Haskell.TH.Datatype as D
 import qualified Language.Haskell.TH.Datatype.TyVarBndr as D
 import           Lens.Micro.TH.Internal
+import           Text.Read (read)
 
 import qualified River as R
+import qualified WL.Client as WL
+import qualified WL.ExtIdleNotify.Staging.V1.Client as EXT_IN
+import qualified WL.Wlr.OutputPowerManagement.Unstable.V1.Client as OPM
+import qualified WL.XdgOutput.Unstable.V1.Client as XO
 
 ---------------------------------------------------------
 -- Orphan instances
@@ -39,6 +50,10 @@ instance Show (StablePtr a) where show _ = "<SP>"
 
 instance NFData (StablePtr a) where
   rnf = rnf . castStablePtrToPtr
+
+-- XXX
+instance A.ToJSON (StablePtr a) where
+  toJSON _ = "StablePtr"
 
 -- * Constants
 
@@ -220,9 +235,64 @@ eachRiverId k = each . filtered (riverIdEq k)
 instance ToRiverId (Ptr Void) R.RiverOutput
 instance ToRiverId (Ptr Void) R.RiverWindow
 instance ToRiverId (Ptr Void) R.RiverSeat
+instance ToRiverId (Ptr Void) R.RiverNode
+instance ToRiverId (Ptr Void) R.RiverLayerShellOutput
 
 instance HasRiverId R.RiverOutput         where type RiverId R.RiverOutput         = R.RiverOutput
 instance HasRiverId R.RiverWindow         where type RiverId R.RiverWindow         = R.RiverWindow
 instance HasRiverId R.RiverSeat           where type RiverId R.RiverSeat           = R.RiverSeat
+instance HasRiverId R.RiverNode           where type RiverId R.RiverNode           = R.RiverNode
+instance HasRiverId R.RiverLayerShellOutput where type RiverId R.RiverLayerShellOutput = R.RiverLayerShellOutput
 instance HasRiverId R.RiverXkbBinding     where type RiverId R.RiverXkbBinding     = R.RiverXkbBinding
 instance HasRiverId R.RiverPointerBinding where type RiverId R.RiverPointerBinding = R.RiverPointerBinding
+
+riverIdToWord :: Coercible a (Ptr Void) => a -> Word
+riverIdToWord = coerce . ptrToWordPtr . coerce
+
+wordToRiverId :: ToRiverId (Ptr Void) a => Word -> a
+wordToRiverId = toRiverId . wordPtrToPtr @Void . WordPtr
+
+riverIdToHex :: (WL.IsWlObject a, Show a) => a -> String
+riverIdToHex = show
+
+hexToRiverId :: (WL.IsWlObject a, Read a) => String -> a
+hexToRiverId = read
+
+instance A.ToJSON R.RiverColor
+
+instance A.ToJSONKey   R.RiverWindow where toJSONKey = contramap riverIdToHex A.toJSONKey
+instance A.FromJSONKey R.RiverWindow where fromJSONKey = fmap hexToRiverId A.fromJSONKey
+
+instance A.ToJSON      R.RiverWindow           where toJSON = A.toJSON . riverIdToHex
+instance A.FromJSON    R.RiverWindow           where parseJSON = fmap hexToRiverId . A.parseJSON
+instance A.ToJSON      R.RiverSeat             where toJSON = A.toJSON . riverIdToHex
+instance A.FromJSON    R.RiverSeat             where parseJSON = fmap hexToRiverId . A.parseJSON
+instance A.ToJSON      R.RiverOutput           where toJSON = A.toJSON . riverIdToHex
+instance A.FromJSON    R.RiverOutput           where parseJSON = fmap hexToRiverId . A.parseJSON
+instance A.ToJSON      R.RiverNode             where toJSON = A.toJSON . riverIdToHex
+instance A.FromJSON    R.RiverNode             where parseJSON = fmap hexToRiverId . A.parseJSON
+instance A.ToJSON      R.RiverLayerShellOutput where toJSON = A.toJSON . riverIdToHex
+instance A.FromJSON    R.RiverLayerShellOutput where parseJSON = fmap hexToRiverId . A.parseJSON
+instance A.ToJSON      R.RiverXkbBindingsSeat  where toJSON = A.toJSON . riverIdToHex
+instance A.ToJSON      R.RiverLayerShellSeat   where toJSON = A.toJSON . riverIdToHex
+instance A.ToJSON      WL.Output               where toJSON = A.toJSON . riverIdToHex
+instance A.ToJSON      WL.Seat                 where toJSON = A.toJSON . riverIdToHex
+instance A.ToJSON      WL.Keyboard             where toJSON = A.toJSON . riverIdToHex
+instance A.ToJSON      WL.Pointer              where toJSON = A.toJSON . riverIdToHex
+instance A.ToJSON      WL.Touch                where toJSON = A.toJSON . riverIdToHex
+instance A.ToJSON      XO.Output               where toJSON = A.toJSON . riverIdToHex
+instance A.ToJSON      OPM.OutputPower         where toJSON = A.toJSON . riverIdToHex
+instance A.ToJSON      EXT_IN.IdleNotification where toJSON = A.toJSON . riverIdToHex
+
+instance A.ToJSON R.RiverOutputPresentationMode where
+  toJSON = A.toJSON . fromIntegral @_ @Int . coerce
+instance A.ToJSON R.RiverWindowDecorationHint where
+  toJSON = A.toJSON . fromIntegral @_ @Int . coerce
+instance A.ToJSON R.RiverWindowEdges where
+  toJSON = A.toJSON . fromIntegral @_ @Int . coerce
+instance A.ToJSON WL.SeatCapability where
+  toJSON = A.toJSON . fromIntegral @_ @Int . coerce
+
+-- | For ToJSON/FromJSON instances
+aesonOptions :: A.Options
+aesonOptions = A.defaultOptions { A.omitNothingFields = True }

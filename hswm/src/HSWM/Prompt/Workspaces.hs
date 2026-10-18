@@ -16,40 +16,33 @@ import qualified HSWM.Actions.DynamicWorkspaces as DynWS
 import qualified HSWM.StackSet as W
 
 -- | Go to workspace
-workspacePrompt :: RP.RofiPromptConfig RP.SelectS -> H ()
+workspacePrompt :: RP.RofiPromptConfig' -> H ()
 workspacePrompt = mkWorkspacePrompt
-  (\p _ -> p {RP.prompt = "Go to workspace"})
+  (\pc _ -> pc {RP.prompt = "Go to workspace"})
   (\_ input -> do
       logInfo $ "switching workspace" :# [ "tag" .= input ]
       runInHS $ windows $ W.view input
-      manageDirty
-  )
+      manageDirty)
 
-renameWorkspacePrompt :: RP.RofiPromptConfig RP.SelectS -> H ()
-renameWorkspacePrompt rofiPrompt = do
-  (curTag, allTags) <- runInHS $ withWindowSet $ return . (W.currentTag &&& W.allTags)
-  RP.rofiRun rofiPrompt {RP.prompt = "Rename " ++ curTag} allTags >>= (`whenJust` apply curTag)
-  where
-    apply old input = do
+renameWorkspacePrompt :: RP.RofiPromptConfig' -> H ()
+renameWorkspacePrompt = mkWorkspacePrompt
+  (\pc curTag -> pc {RP.prompt = "Rename workspace '" ++ curTag ++ "'"})
+  (\old input -> runInHS $ do
+      DWO.updateName old input
+      DynWS.renameWorkspaceByName input)
+
+addWorkspacePrompt :: RP.RofiPromptConfig' -> H ()
+addWorkspacePrompt = mkWorkspacePrompt
+  (\pc _ -> pc {RP.prompt = "Add new workspace"})
+  ( \_ input -> do
       runInHS $ do
-        DWO.updateName old input
-        DynWS.renameWorkspaceByName input
-      view (config . logHook) >>= void . userCode
+        modifySeats (const True) $ \s -> s { suppressChangeFocus = 2 }
+        DynWS.addWorkspace input
+      manageDirty)
 
-addWorkspacePrompt :: RP.RofiPromptConfig RP.SelectS -> H ()
-addWorkspacePrompt =
-  mkWorkspacePrompt
-    (\p _ -> p {RP.prompt = "Add workspace"})
-    ( \_ input -> do
-        runInHS $ do
-          modifySeats (const True) $ \s -> s { suppressChangeFocus = 2 }
-          DynWS.addWorkspace input
-        manageDirty
-    )
-
-mkWorkspacePrompt :: (RP.RofiPromptConfig RP.SelectS -> WorkspaceId -> RP.RofiPromptConfig RP.SelectS)
+mkWorkspacePrompt :: (RP.RofiPromptConfig' -> WorkspaceId -> RP.RofiPromptConfig')
                   -> (WorkspaceId -> String -> H a)
-                  -> RP.RofiPromptConfig RP.SelectS
+                  -> RP.RofiPromptConfig'
                   -> H ()
 mkWorkspacePrompt prompt apply rofiPrompt = do
   (curTag, allTags) <- runInHS $ withWindowSet $ return . (W.currentTag &&& W.allTags)

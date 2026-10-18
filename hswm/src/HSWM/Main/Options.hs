@@ -16,23 +16,25 @@ module HSWM.Main.Options
   , Last(..)
   ) where
 
-import           Data.Char
-import qualified Data.List as L
-import qualified Options.Applicative as Opts
-import           Options.Generic
-import           System.Log.FastLogger
-import qualified PackageInfo_hswm
-import           Data.Version (showVersion)
-import           System.Environment (executablePath)
-import qualified System.Log.FastLogger as FastLogger
 import qualified Control.Monad.Logger as MonadLog
+import           Control.Monad.Trans.Except (runExcept)
 import qualified Data.Aeson as A
-import qualified Data.Aeson.Text as A
 import qualified Data.Aeson.KeyMap as A
+import qualified Data.Aeson.Text as A
 import qualified Data.Aeson.Types as A
+import qualified Data.List as L
+import qualified Data.Text as T
+import           Data.Version (showVersion)
+import qualified Options.Applicative as Opts
+import qualified Options.Applicative.Types as Opts
+import           Options.Generic
+import qualified PackageInfo_hswm
 import qualified Prettyprinter as PP
 import           Prettyprinter.Instances ()
 import qualified Prettyprinter.Render.Terminal as PP
+import           System.Environment (executablePath)
+import qualified System.Log.FastLogger as FastLogger
+import           System.Log.FastLogger
 
 -- | Read the program arguments.
 parseMainArgs :: IO Main
@@ -41,69 +43,28 @@ parseMainArgs = unwrapRecord (toText programVersion)
 programVersion :: String
 programVersion = "hswm " ++ showVersion PackageInfo_hswm.version
 
-type Main = MainOptions Unwrapped
-
--- XXX Note: <!> seems to not work with e.g. "Last foo <?> "desc""
-
 -- | Main entrypoint settings.
 data MainOptions w = MainOptions
-  { mainLogLevel  :: w ::: Last LogLevel  <#> "l" <?> "Log level [debug,info,warn,error]"
-  , mainLogFile   :: w ::: Last FilePath  <#> "o" <?> "Send logs to a file. If empty, a default file is used. If \"-\" the log output is sent to stdout."
-  , mainLogFormat :: w ::: LogFormat         <?> "Which log format use [plain,json]"
-  , mainColor     :: w ::: Last AnsiColors        <?> "Whether to enable color output in plain format mode"
-  , mainStateFile :: w ::: Maybe FilePath <#> "f" <?> "State file to read on restart."
-  , mainVersion   :: w ::: Bool           <#> "V" <?> "Display version and exit."
-  , mainStateSave :: w ::: Integer        <?> "Save the state to file every X minutes. Disabled if <=0"
+  { mainVersion   :: w ::: Bool           <#> "V"            <?> "Display version and exit."
+  , mainStateSave :: w ::: Integer                <!> "30"   <?> "Save the state to file every X minutes. Disabled if <=0"
+  , mainStateFile :: w ::: Maybe FilePath <#> "f"            <?> "State file to read on restart."
+  , mainColor     :: w ::: AnsiColors             <!> "auto" <?> "Whether to enable color output in plain format mode"
+  , mainLogFormat :: w ::: LogFormat              <!> "json" <?> "Which log format use [plain,json]"
+  , mainLogLevel  :: w ::: Last LogLevel  <#> "l"            <?> "Log level [debug,info,warn,error]"
+  , mainLogFile   :: w ::: Last FilePath  <#> "o"            <?> "Send logs to a file. If empty, a default file is used. If \"-\" the log output is sent to stdout."
   } deriving (Generic)
+
+type Main = MainOptions Unwrapped
 
 deriving instance Eq Main
 deriving instance Show Main
 
--- | Defaults defined via 'Default'
-instance Default Main where
-  def = MainOptions
-    { mainLogLevel  = pure LevelDebug
-    , mainLogFile   = mempty
-    , mainLogFormat = LogFormatJSON
-    , mainColor     = mempty
-    , mainStateFile = mempty
-    , mainVersion   = def
-    , mainStateSave = 30
-    }
-
-data AnsiColors = ColorAuto | ColorNever | ColorAlways
-  deriving (Eq, Ord, Show, Read, Generic)
-
-instance Default AnsiColors where
-  def = ColorAuto
-
-instance ParseField AnsiColors where
-  readField = Opts.maybeReader $ \case
-    ""        -> Just ColorAuto
-    "auto"    -> Just ColorAuto
-    "never"   -> Just ColorNever
-    "no"      -> Just ColorNever
-    "yes"     -> Just ColorAlways
-    "always"  -> Just ColorAlways
-    _         -> Nothing
-
-instance ParseFields AnsiColors
-
-instance ParseRecord AnsiColors where
-  parseRecord = fmap getOnly parseRecord
-
 -- | Field modifiers: drop the @main@ prefix, use @-@ as word separator.
 instance ParseRecord (MainOptions Wrapped) where
-  parseRecord = parseRecordWithModifiers defaultModifiers
-    { fieldNameModifier = \name -> fromCC $ fromMaybe name (L.stripPrefix "main" name) }
-      where
-        fromCC :: String -> String
-        fromCC     [] = []
-        fromCC (x:xs) = go (toLower x : xs)
-          where
-            go (y:ys) | isUpper y = '-' : toLower y : go ys
-                      | otherwise = y : go ys
-            go     []             = []
+  parseRecord = parseRecordWithModifiers lispCaseModifiers
+    { fieldNameModifier = \name -> lispCaseModifiers.fieldNameModifier $
+      fromMaybe name (L.stripPrefix "main" name)
+    }
 
 -- * Logging
 
@@ -111,13 +72,14 @@ initLoggers
     :: LogType
     -> LogFormat
     -> AnsiColors -- ^ Enable color output if terminal?
+    -> Maybe LogLevel -- ^ Filter by log level
     -> IO (Loc -> LogSource -> LogLevel -> LogStr -> IO (), IO ())
-initLoggers logType logFormat ansiColors = do
+initLoggers logType logFormat ansiColors mbLogLevel = do
   case logFormat of
     LogFormatJSON -> do
       (lgr, clean) <- newFastLogger logType
-      let lgrFun = defaultOutputWith $ defaultOutputOptions $ \_ -> lgr . toLogStr
-      return (lgrFun, clean)
+      let lgrFun = defaultOutputWith $ defaultOutputOptions $ \_ bs -> lgr $ toLogStr bs <> "\n"
+      return (withFilter lgrFun, clean)
 
     LogFormatPLAIN -> do
       getTime <- FastLogger.newTimeCache FastLogger.simpleTimeFormat'
@@ -139,11 +101,13 @@ initLoggers logType logFormat ansiColors = do
                     ]) <> "\n"
 
             | otherwise = timedLog $ \time ->
-              toLogStr time <> " " <>
-              MonadLog.defaultLogStr loc src lvl (unJSON msg toLogStr (toLogStr . A.encode) id)
+                  toLogStr time <> " " <> MonadLog.defaultLogStr loc src lvl (unJSON msg toLogStr (toLogStr . A.encode) id)<> "\n"
 
-      return (lgrFun, clean)
+      return (withFilter lgrFun, clean)
   where
+    withFilter f
+      | Just lvl <- mbLogLevel = \lo so lv str -> when (lvl <= lv) (f lo so lv str)
+      | otherwise = f
     lopts = PP.defaultLayoutOptions { PP.layoutPageWidth = PP.Unbounded }
     ppLevel = \case
       LevelError   -> PP.annotate (PP.colorDull PP.Red)     "ERR"
@@ -200,27 +164,6 @@ defaultLogFile = do
   createDirectoryIfMissing True d
   return $ d ++ "/" ++ "hswm.log"
 
-instance ParseField LogLevel where
-  readField = Opts.maybeReader $ \case
-    "debug"   -> Just LevelDebug
-    "info"    -> Just LevelInfo
-    "warn"    -> Just LevelWarn
-    "warning" -> Just LevelWarn
-    "error"   -> Just LevelError
-    _         -> Nothing
-
-data LogFormat = LogFormatJSON
-               | LogFormatPLAIN
-               deriving (Eq, Ord, Enum, Show, Read, Generic, Data)
-
-instance ParseField LogFormat where
-  readField = Opts.maybeReader $ \case
-    "json"  -> Just LogFormatJSON
-    "plain" -> Just LogFormatPLAIN
-    _       -> Nothing
-instance ParseFields LogFormat
-instance ParseRecord LogFormat
-
 -- * Misc.
 
 -- | Default executable for restart via executeFile
@@ -233,3 +176,86 @@ getProgramPath = lookupEnv "HSWM_EXECUTABLE" >>= \case
         setEnv "HSWM_EXECUTABLE" x
         return x
     | otherwise -> error "restart: unable to resolve program path"
+
+-- ** Last1
+
+newtype Last1 field = Last1 { getLast1 :: field }
+  deriving (Eq, Show, Generic)
+
+instance forall a. ParseField a => ParseFields (Last1 a) where
+  parseFields h m c d =
+    case m of
+      Just name ->
+        let fs = Opts.metavar (metavar (Proxy :: Proxy a))
+                <> Opts.long (T.unpack name)
+                <> foldMap (Opts.help . T.unpack) h
+                <> foldMap Opts.short c
+                <> foldMap (Opts.showDefaultWith . const) d
+            fsD = fs <> foldMap Opts.value (d >>= runReadM readField)
+            parse1 = Opts.option readField (fs <> Opts.internal)
+        in
+          (\x xs -> Last1 . fromMaybe x . getLast $ mconcat xs)
+          <$> Opts.option readField fsD
+          <*> (many . fmap (Last . Just)) parse1
+      Nothing -> Last1 <$> parseField h m c d
+
+instance ParseField a => ParseRecord (Last1 a) where
+  parseRecord = fmap getOnly parseRecord
+
+-- | a readMaybe using provided ReadM
+runReadM :: Opts.ReadM a -> String -> Maybe a
+runReadM r s = either (const Nothing) Just $
+    runExcept (runReaderT (Opts.unReadM r) s)
+
+-- ** LogLevel
+
+instance ParseField LogLevel where
+  readField = Opts.maybeReader $ \case
+    "debug"   -> Just LevelDebug
+    "info"    -> Just LevelInfo
+    "warn"    -> Just LevelWarn
+    "warning" -> Just LevelWarn
+    "error"   -> Just LevelError
+    _         -> Nothing
+
+-- ** LogFormat
+
+data LogFormat = LogFormatJSON
+               | LogFormatPLAIN
+               deriving (Eq, Ord, Enum, Bounded, Show, Read, Generic, Data)
+
+instance ParseField LogFormat where
+  readField = Opts.maybeReader $ \case
+    "json"  -> Just LogFormatJSON
+    "plain" -> Just LogFormatPLAIN
+    _       -> Nothing
+
+instance ParseFields LogFormat where
+  parseFields h m c d = getLast1 <$> parseFields h m c d
+
+instance ParseRecord LogFormat where
+  parseRecord = fmap getOnly parseRecord
+
+-- ** AnsiColors
+
+data AnsiColors = ColorAuto | ColorNever | ColorAlways
+  deriving (Eq, Ord, Show, Read, Generic)
+
+instance Default AnsiColors where
+  def = ColorAuto
+
+instance ParseField AnsiColors where
+  readField = Opts.maybeReader $ \case
+    ""        -> Just ColorAuto
+    "auto"    -> Just ColorAuto
+    "never"   -> Just ColorNever
+    "no"      -> Just ColorNever
+    "yes"     -> Just ColorAlways
+    "always"  -> Just ColorAlways
+    _         -> Nothing
+
+instance ParseFields AnsiColors where
+  parseFields h m c d = getLast1 <$> parseFields h m c d
+
+instance ParseRecord AnsiColors where
+  parseRecord = fmap getOnly parseRecord

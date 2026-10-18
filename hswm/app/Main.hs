@@ -21,6 +21,8 @@ import           HSWM.Layout.MultiToggle (Toggle(..), mkToggle1)
 import           HSWM.Layout.MultiToggle.Instances
 import qualified HSWM.Layout.NoBorders as L.NoBorders
 import qualified HSWM.Layout.WindowNavigation as L.WNavigation
+import           HSWM.Layout.Reflect (REFLECTX(..), REFLECTY(..))
+import qualified HSWM.Layout.GridVariants as GV
 import           HSWM.Prompt.Environment
 import           HSWM.Prompt.Workspaces
 import qualified HSWM.StackSet as W
@@ -77,15 +79,21 @@ myLayoutHook =
   NEArea.nonExclusiveArea $
   L.Maximize.maximize $
   L.WNavigation.configurableNavigation (L.WNavigation.navigateBrightness 0.8) $ -- apply on top of any modifiers that might modify placement of tiled windows
-  --mkToggle1 REFLECTX $
-  --mkToggle1 REFLECTY $
+  mkToggle1 REFLECTX $
+  mkToggle1 REFLECTY $
   mkToggle1 MIRROR $
     BSP.emptyBSP |||
+      GV.Grid (16/10) |||
+      GV.SplitGrid GV.R 2 3 (2/3) (16/10) (5/100) |||
     Tall 3 (3 / 100) (1 / 2) |||
     L.NoBorders.noBorders Full
 
 myManageHook :: Query (Endo WindowSet)
 myManageHook = composeOne [ managePads ]
+
+promptLaunchSystemD :: H ()
+promptLaunchSystemD = RP.rofiRun' (RP.basicRofiConfig & RP.history ?~ "systemd-run" & RP.prompt .~ "systemd-run")
+  RP.++> runWithSystemD
 
 myKeys :: [(String, SomeAction H)]
 myKeys =
@@ -96,19 +104,18 @@ myKeys =
   , ("M-Escape",  debugAction                                         <?> "Print debug stack")
   , ("M-Dollar",  spawnProcess @H "swaylock" ["-k"]                   <?> "Lock session")
   , ("M-Print",   spawnProcess @H "sh" ["-c", "grim -g \"$(slurp)\""] <?> "Screenshot")
-  , ("M-S-c",     withFocused manageKill                              <?> "Close the focused window")
-    -- "M-r M-S-c"     cmdT @"Signal process (SIGKILL) of focused window (_NET_WM_PID)" (withFocused (signalProcessBy Posix.sigKILL))
+  , ("M-S-c",     withFocused' @HS manageKill                             <?> "Close the focused window")
+  , ("M-r M-S-c", withFocused' @H (signalWindowByPID sigKILL)            <?> "Signal process (SIGKILL) of focused window")
     -- "M-S-<Return>"  FloatNext.floatNext True >> spawnTerm def "" ? "Terminal (floating)"
-    --("M-F3", "" <??> (`whenJust` setKeyboardKeymaps (const True)) =<< asks (xkbLayout . config)),
-    --("M-F4", "" <??> setKeyboardKeymaps (const True) (keymapFromString "us")),
+    --("M-F3",  (`whenJust` setKeyboardKeymaps (const True)) =<< asks (xkbLayout . config)),
+    --("M-F4",  setKeyboardKeymaps (const True) (keymapFromString "us")),
   ] ++
 
   -- ======== Execute ==========
     -- shell/application runners
   [ ("M-r r", RP.rofiLaunch @H (def & RP.oneMode "run") <?> "Run shell (prompt)"),
     ("M-r d", RP.rofiLaunch @H (def & RP.oneMode "drun" & RP.showIcons .~ True) <?> "Run desktop app (prompt)"),
-    ("M-r s", RP.rofiRun @H (def & RP.history ?~ "systemd-run" & RP.prompt .~ "systemd-run" & RP.dmenuMode .~ True) ([] :: [String])
-                  RP.++> runWithSystemD <?> "Run via systemd-run (prompt)"),
+    ("M-r s", promptLaunchSystemD <?> "Run via systemd-run (prompt)"),
     -- clipboard prompt
     ("M-r c", RP.rofiLaunch @H (def & RP.oneMode "clipboard:cliphist-rofi-img" & RP.showIcons .~ True) <?> "Open cliphist prompt"),
     -- bluetooth prompt
@@ -118,7 +125,6 @@ myKeys =
 
     -- "M-r f" >+ spawnOnceKitty "fself" "bash" ["-lic", "fself"] doCenterFloat
     --   -- spawnDialog ("bash", ["-ic", "fself"]) ? "FZF multi-prompt"
-    -- "M-r a" >+ spawn "dmenu_autorandr" ? "autorandr (menu)"
   ] ++
 
   -- ===== Screens =====
@@ -133,7 +139,11 @@ myKeys =
   -- ===== Workspaces =====
     -- TODO:
     -- ( "M-g m"    "Shift to tag: "       ?+ (defile . shift) ? "Move window to this tag (XP)"
-  [ ("M-y",   cycleRecentHiddenWS [4, 8, 64] 121 112 <?> "Cycle recent hidden tags")
+            -- mod 4  := Ctrl
+            -- mod 8  := Alt
+            -- mod 64 := Meta
+  -- [ ("M-y",   cycleRecentHiddenWS [4, 8, 64] "y" "p" <?> "Cycle recent hidden tags")
+  [ ("M-y",   cycleRecentHiddenWS "C-M4-A" "y" "p" <?> "Cycle recent hidden tags")
   , ("M-S-n", DWO.swapWith Next CycleWS.anyWS        <?> "Shift current tag (forwards)")
   , ("M-S-p", DWO.swapWith Prev CycleWS.anyWS        <?> "Shift current tag (backwards)")
   , ("M-g r", renameWorkspacePrompt rofiPrompt       <?> "Rename workspace (prompt)")
@@ -147,8 +157,6 @@ myKeys =
 
   -- ====== Layout
   {- TODO: also ToggleScreenSpacing :>> ToggleWindowSpacing -}
-  --   "M-b x"       >+ toggle1 REFLECTX
-  --   "M-b y"       >+ toggle1 REFLECTY
   --   "M-b s"       >+ ToggleScreenSpacing :>> ToggleWindowSpacing
   [ ("M-space",       NextLayout                                          <?> "Layout")
   , ("M-F3",          NextLayout                                          <?> "Layout")
@@ -162,6 +170,8 @@ myKeys =
   , ("M-b b",         Toggle NOBORDERS                                    <?> "Layout")
   , ("M-b m",         Toggle MIRROR                                       <?> "Layout")
   , ("M-b f",         Toggle NBFULL                                       <?> "Layout")
+  , ("M-b x",         Toggle REFLECTX                                     <?> "Layout")
+  , ("M-b y",         Toggle REFLECTY                                     <?> "Layout")
   , ("M-b M-x",       NEArea.ToggleNonExclusiveArea :>>: Toggle NOBORDERS <?> "Layout")
   , ("M-m",           withFocused (sendMessage . L.Maximize.maximizeRestore . view riverWindow) <?> "Maximize Restore")
   ] ++
@@ -193,28 +203,28 @@ myKeys =
 
   ] ++
 
-    -- ("M-Tab",  "Cycle PADs" <??> cyclePads),
-    -- "M-f "      >>+ directions2D >++> flip SnapMove   Nothing
-    -- "M-f S-"    >>+ directions2D >++> flip SnapGrow   Nothing
-    -- "M-f C-"    >>+ directions2D >++> flip SnapShrink Nothing
-    -- "M-f ,"     >+ RotSlavesDown
-    -- "M-f ."     >+ RotSlavesUp
-    -- "M-f M-,"   >+ RotAllDown
-    -- "M-f M-."   >+ RotAllUp
-    -- "M-f M-m"   >+ FocusMaster
-    -- "M-f M-n"   >+ FocusUp
-    -- "M-f M-p"   >+ FocusDown
-    -- "M-f m"     >+ SwapMaster
-    -- "M-f n"     >+ SwapUp
-    -- "M-f p"     >+ SwapDown
-    -- "M-f u"     >+ FocusUrgent
-    -- "M-f b"     >+ ToggleFocusedWindowBorder
-    -- "M-f c"     >+ CenterWindow
-    -- "M-f S-s"   >+ SinkAll
-    -- "M-f S-f"   >+ ToggleFloatAllNew
-    -- "M-f y"     >+ SwitchLayer
-    -- "M-f h"     >+ pidPrompt xpConfig "SpawnOn/PPID" ?+ (\p -> wsPromptWithCurrent xpConfig "Shift to:" ?+ setManageByPPID p) ? "SpawnOn by Window PID"
-    -- "M-@"       >+ togglePad "taskwarrior-tui"
+  -- ("M-Tab",  cyclePads <?> "Cycle pads"),
+  -- "M-f "      >>+ directions2D >++> flip SnapMove   Nothing
+  -- "M-f S-"    >>+ directions2D >++> flip SnapGrow   Nothing
+  -- "M-f C-"    >>+ directions2D >++> flip SnapShrink Nothing
+  -- "M-f ,"     >+ RotSlavesDown
+  -- "M-f ."     >+ RotSlavesUp
+  -- "M-f M-,"   >+ RotAllDown
+  -- "M-f M-."   >+ RotAllUp
+  -- "M-f M-m"   >+ FocusMaster
+  -- "M-f M-n"   >+ FocusUp
+  -- "M-f M-p"   >+ FocusDown
+  -- "M-f m"     >+ SwapMaster
+  -- "M-f n"     >+ SwapUp
+  -- "M-f p"     >+ SwapDown
+  -- "M-f u"     >+ FocusUrgent
+  -- "M-f b"     >+ ToggleFocusedWindowBorder
+  -- "M-f c"     >+ CenterWindow
+  -- "M-f S-s"   >+ SinkAll
+  -- "M-f S-f"   >+ ToggleFloatAllNew
+  -- "M-f y"     >+ SwitchLayer
+  -- "M-f h"     >+ pidPrompt xpConfig "SpawnOn/PPID" ?+ (\p -> wsPromptWithCurrent xpConfig "Shift to:" ?+ setManageByPPID p) ? "SpawnOn by Window PID"
+  -- "M-@"       >+ togglePad "taskwarrior-tui"
 
   -- ====== Media
   [ ("M-plus",                adjustVolume "@DEFAULT_SINK@"   volAdjAmount),
@@ -249,7 +259,7 @@ myKeys =
   --   "M-r q"   >+ XP.QB.qutebrowserP xpConfigNoHist "qutebrowser" ?+ XP.QB.qutebrowser ? "Prompt: qutebrowser"
   --   "M-r s"   >+ inputPromptWithCompl xpConfig "scratchpad" (scratchpadCompl xpConfig myScratchpads) ?+ getAction . togglePad ? "Prompt: pad"
   --   "M-r u"   >+ inputPromptWithHistCompl xpConfig "browser-app" ?+ (\s -> launchDesktopEntry "chrome-app" [s]) ? "Chrome App"
-  [ ("M-r e", "Environment prompt" <??> environPrompt rofiPrompt)
+  [ ("M-r e", environPrompt rofiPrompt <?> "Environment variable prompt")
   ]
   where
     volAdjAmount = 0.01
@@ -286,7 +296,7 @@ mpc args = spawnProcess @H "mpc" args <?> "MPD: " ++ unwords args
 adjustVolume :: String -> Double -> SomeAction H
 adjustVolume target base = act <?> printf "Audio volume %s (%s)" (ppAdj base :: String) target
   where
-    getFactor = clamp (5, - 5) . fromMaybe 1 . (>>= readMaybe) <$> lookupEnv "WPCTL_VOLUME_SCALE"
+    getFactor = clamp (-5,5) . fromMaybe 1 . (>>= readMaybe) <$> lookupEnv "WPCTL_VOLUME_SCALE"
     ppAdj x = printf "%.5f%c" (abs x) (if x >= 0 then '+' else '-')
     act = do a <- getFactor
              spawnProcess @H "wpctl" ["set-volume", target, ppAdj (base * a)]
@@ -322,16 +332,15 @@ spawnOnceKitty name prog args mh = toggleScratchpad' True sp <?> "Spawn " <> nam
     sp = mkPad name mh (appName =? name) $
       void $ spawnProcess "kitty" $ ["--app-id=" ++ name, "--detach", "--", prog ] ++ args
 
-rofiPrompt :: RP.RofiPromptConfig o
+rofiPrompt :: RP.RofiPromptConfig () o r
 rofiPrompt = def
     & RP.dmenuMode .~ True
     & RP.markupInput .~ True
    --   RP._dpi = 150 -- for X
 
-cycleRecentHiddenWS :: [KeySym] -> KeySym -> KeySym -> H ()
-cycleRecentHiddenWS =
-  CycleRecentWS.cycleWindowSets $ \wset ->
-    [W.tag ws | ws <- W.hidden wset ++ [W.workspace (W.current wset)]]
+cycleRecentHiddenWS :: String -> String -> String -> H ()
+cycleRecentHiddenWS = CycleRecentWS.cycleWindowSets $ \wset ->
+  [W.tag ws | ws <- W.hidden wset ++ [W.workspace (W.current wset)]]
 
 wayDisplaysPrompt :: H ()
 wayDisplaysPrompt = do
@@ -340,22 +349,24 @@ wayDisplaysPrompt = do
 
 windowPrompt :: H ()
 windowPrompt = do
-  (wss, wState) <- runInHS $ do
-    a <- withWindowSet $ return . W.workspaces
-    b <- use _windows
-    return (a, b)
+  (wss, wState) <- runInHS $ (,) <$> withWindowSet (return . W.workspaces)
+                                 <*> use _windows
   let wins = [(rw, W.tag ws, w) | ws <- wss, rw <- W.integrate' (W.stack ws), Just w <- [M.lookup rw wState]]
-  RP.rofiRun' rp (map fmtWindow wins) >>= (`whenJust` doApply wins)
+      input :: RP.ColumnsInput 4 P.Markup
+      input = map fmtWindow wins RP.:||: "\x1"
+  RP.rofiRun rp input >>= (`whenJust` doApply wins)
   where
-    rp :: RP.RofiPromptConfig RP.SelectI
+    rp :: RP.RofiPromptConfig () RP.SelectI Int
     rp = rofiPrompt
       & RP.prompt .~ "Go to window"
       & RP.noCustomInput .~ True
 
     fmtWindow (_rw, tag, w) =
-      P.Bold (P.text w.appId) <> " on " <> P.text tag <>
-      " \"" <> P.text w.title <> "\"" <>
-        maybe "" ((" " <>) . P.fromShow) w.unreliablePid
+      [ P.Bold (P.text w.appId)
+      , " on " <> P.text tag
+      , " \"" <> P.text w.title <> "\""
+      , maybe "" ((" pid:" <>) . P.fromShow) w.unreliablePid
+      ]
 
     doApply wins idx = do
       let (rw, _, _) = wins !! idx

@@ -12,6 +12,7 @@ module HSWM.Types.TypeMap where
 
 import Data.Typeable
 import Data.TMap qualified as TM
+import qualified Data.Aeson as A
 
 -- * Types
 
@@ -159,3 +160,7 @@ withTMVar var f = bracketOnError (atomically $ takeTMVar var) (atomically . tryP
 {-# INLINE withObjects #-}
 {-# INLINE withObjectsEx #-}
 {-# INLINE withTMVar #-}
+
+dumpObjects :: MonadStateGlobal s m => m A.Value
+dumpObjects = withObjects $ return . A.toJSON . TM.toListWith f where
+  f a = tshow (typeOf a)

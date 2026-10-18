@@ -30,19 +30,21 @@ import           Network.Socket
 import           System.FileLock
 import qualified Text.Pretty.Simple as P
 
-type MonadIPC env m = (MonadEffectsIO m, MonadReader env m)
+type MonadIPC env m = (MonadEffectsIO m, MonadReader env m, MonadHS m)
 
 -- * ServerConfig
 
 data ServerConfig = ServerConfig
-  { bindTo          :: !(Maybe AddrInfo)
-  , maxPendingConns :: !Int
+  { bindTo            :: !(Maybe AddrInfo)
+  , maxPendingConns   :: !Int
   , getWorkspacesInfo :: HS Response
+  , requestHandler    :: ServerConfig -> Socket -> Request -> H Response
   } deriving (Generic)
 
 instance Default ServerConfig where
   def = ServerConfig Nothing 8
     defaultWorkspacesInfo
+    defaultRequestHandler
 
 -- * Server State
 
@@ -98,7 +100,7 @@ serverRun conf stateRef = withThreadContext ["component" .= ("ipc-server" :: Str
     bracket (open ai) (io . close) loop
       `finally` logInfo "IPC server thread finished"
   where
-    withLock Nothing f = f
+    withLock Nothing     f = f
     withLock (Just file) f =
       io (tryLockFile file Exclusive) >>= \case
         Just _ -> f
@@ -158,7 +160,7 @@ serverRun conf stateRef = withThreadContext ["component" .= ("ipc-server" :: Str
           io $ gracefulClose conn 5000
           logInfo "Client connection closed"
 
-getServerAddr :: ServerConfig -> H (AddrInfo, Maybe FilePath) -- ^ (resolved addrinfo, lockfile)
+getServerAddr :: MonadIO m => ServerConfig -> m (AddrInfo, Maybe FilePath) -- ^ (resolved addrinfo, lockfile)
 getServerAddr conf =
   case conf.bindTo of
     Just ai -> return (ai, Nothing)
@@ -172,19 +174,29 @@ getServerAddr conf =
         , addrAddress = SockAddrUnix sockFile
         }, Just (sockFile ++ ".lock"))
 
-serverHandleMsg :: (MonadIPC env m, env ~ HConf) => ServerConfig -> Socket -> Msg Request -> m ()
-serverHandleMsg conf c (Msg r seqn) =
+serverHandleMsg :: ServerConfig -> Socket -> Msg Request -> H ()
+serverHandleMsg conf c (Msg r seqn) = do
   case r of
     IdentifyClient{} -> do
       logInfo $ "client sent identity" :# [ "id" .= r ]
       fullStateUpdate conf >>= mapM_ (sendMsg c)
-    DumpState{..} -> do
-      dump <- case param of
-                "input-config-state" -> P.pShow <$> getObjectDef @InputConfigState
-                _ -> TL.pack <$> runInHS Persist.dumpStateAsString
-      sendMsg c $ Msg (StateDumpResponse dump) seqn
+    _ -> do
+      res <- conf.requestHandler conf c r
+      sendMsg c $ Msg res seqn
 
-    _ -> logWarn $ "Unhandled message" :# [ "message" .= r ]
+defaultRequestHandler :: ServerConfig -> Socket -> Request -> H Response
+defaultRequestHandler _ _ r =
+  case r of
+    DumpState{..} -> case param of
+      "input-config" -> StateDumpResponse . P.pShow <$> getObjectDef @InputConfigState
+      "hstate" -> InternalObject . A.toJSON <$> getHState
+      "config" -> InternalObject . A.toJSON <$> view config
+      "global" -> InternalObject <$> dumpObjects
+      _ -> StateDumpResponse . TL.pack <$> runInHS Persist.dumpStateAsString
+
+    _ -> do
+      logWarn $ "Unhandled message" :# [ "message" .= r ]
+      return $ Error "no handler"
 
 -- * Info for status bars
 

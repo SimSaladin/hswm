@@ -19,7 +19,6 @@ import qualified WL.Client as WL
 import qualified WL.Wlr.InputMethod.Unstable.V2.Client as Wlr
 
 import           Control.Monad.Fix
-import           Data.Aeson (ToJSON)
 import qualified Data.Map as M
 
 type HasGrabCtx env m = (env ~ HConf, MonadStateGlobal env m, MonadReader env m, MonadLogger m, MonadUnliftIO m, MonadFix m)

@@ -106,6 +106,9 @@ newtype QueryT m a = Query { unwrap :: ReaderT Window m a }
   deriving newtype (Functor, Applicative, Monad, MonadIO, MonadFix, MonadThrow, MonadCatch, MonadMask,
                     MonadReader Window)
 
+instance MonadTrans QueryT where
+  lift = Query . lift
+
 instance Applicative m => Default (QueryT m (Endo a)) where
   def = pure mempty
 
@@ -144,3 +147,9 @@ instance HasSize ScreenDetail Size where
 
 screenRect :: ScreenDetail -> Rectangle
 screenRect sd = Rectangle' (sd ^. position) (sd ^. size)
+
+-- ToJSON/FromJSON
+
+instance ToJSON ScreenDetail
+instance ToJSON WorkspaceDetail
+instance ToJSON RepeatInfo

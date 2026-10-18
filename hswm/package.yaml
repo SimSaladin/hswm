@@ -104,6 +104,8 @@ __:
   - &dep-utf8-string                 utf8-string                 ^>=1.0.2
   - &dep-vector                      vector                      ^>=0.13.2
   - &dep-filepath                    filepath
+  - &dep-random random
+  - &dep-aeson-pretty aeson-pretty
 
   # Packages from here
   - &dep-hswm-bindings               hswm-bindings
@@ -198,6 +200,7 @@ internal-libraries:
       - *dep-network
       - *dep-text
       - *dep-utf8-string
+      - *dep-random
 
 executables:
   hswm:
@@ -231,5 +234,6 @@ executables:
       - *dep-haskeline
       - *dep-prettyprinter
       - *dep-prettyprinter-ansi-terminal
+      - *dep-aeson-pretty
     ghc-options:
       - *common-rts

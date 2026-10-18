@@ -15,7 +15,6 @@ module HSWM.Seats where
 import           HSWM.Core
 import           HSWM.Operations
 import qualified HSWM.StackSet as W
-import           HSWM.Utils
 import           HSWM.Wayland
 
 import qualified River as R
@@ -360,12 +359,12 @@ createSeatBindings rs = do
   kbdListen <- getObject
   pbListen  <- getObject
   myMod     <- view (config . defaultModMask) <&> resolveModMask 0
-  pBinds    <- view (config . pointerBindings) >>= resolvePointerBinds myMod
-  pPtrs     <- forM pBinds $ \((m, b), a) -> newPointerBinding pbListen rs m b a
-  kPtrs     <- createXkbBindings (binds, kbdListen, rs) actionSubmap =<< view (config . keyBindings)
+  pPtrs     <- view (config . pointerBindings) >>= resolvePointerBinds myMod pbListen
+  kPtrs     <- view (config . keyBindings) >>= createXkbBindings (binds, kbdListen, rs) actionSubmap
   modifySeat rs $ \s -> s & xkbBindings <>~ kPtrs & pointerBindings <>~ pPtrs
   where
-    resolvePointerBinds mdef = mapM $ \((m, k), a) -> return ((resolveModMask mdef m, k), a)
+    resolvePointerBinds mdef pbListen = mapM $ \((m, k), a) ->
+       newPointerBinding pbListen rs (resolveModMask mdef m) k a
 
 -- |
 -- Ensure that the next non-modifier key press and corresponding release events

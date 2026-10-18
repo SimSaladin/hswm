@@ -147,7 +147,7 @@ padManageHook :: Scratchpad -> MaybeManageHook
 padManageHook sp = spQuery sp -?> spHook sp
 
 xpad :: Query (Maybe Scratchpad)
-xpad = liftHS (XS.gets xpads) >>= xpad' . M.elems
+xpad = runInHS (XS.gets xpads) >>= xpad' . M.elems
 
 xpad' :: [Scratchpad] -> Query (Maybe Scratchpad)
 xpad' = go
@@ -183,15 +183,15 @@ dynPadCurrent :: ScratchpadId -> HS (Maybe RiverWindow)
 dynPadCurrent k = XS.gets $ M.lookup k . dynWins
 
 -- | Pad with no static launch action. Use the provided action to bind to an existing window.
-mkPadDyn :: ScratchpadId -> RP.RofiPromptConfig RP.SelectS -> ManageHook -> Scratchpad
+mkPadDyn :: ScratchpadId -> RP.RofiPromptConfig' -> ManageHook -> Scratchpad
 mkPadDyn nm rpc mh = mkPad nm mh q a
-  where q = do mw <- liftHS (dynPadCurrent nm)
+  where q = do mw <- runInHS (dynPadCurrent nm)
                asks (\x -> Just x.river_window) =? mw
         a = dynDefaultPrompt rpc nm
         -- a = dynPadToggleFocused nm
 
 -- | Add a launch action to a dynamic pad. It prompts for confirmation to bind focused window to the pad.
-dynDefaultPrompt :: RP.RofiPromptConfig RP.SelectS -> ScratchpadId -> H ()
+dynDefaultPrompt :: RP.RofiPromptConfig' -> ScratchpadId -> H ()
 dynDefaultPrompt rpc k = do
   mfoc <- runInHS $ use windowset >>= maybe (return Nothing) lookupWindow . W.peek
   case mfoc of

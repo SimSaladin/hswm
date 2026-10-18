@@ -36,6 +36,7 @@ import           HSWM.Types.TypeMap
 import           HSWM.Types.Window
 import           HSWM.Wayland (HasGlobalsRegistry(..))
 
+import qualified Text.XkbCommon as Xkb
 import qualified WL.Client as WL
 
 import           Control.Monad.Fix
@@ -44,6 +45,7 @@ import           Data.Data
 import qualified Data.Map as M
 import           Data.Monoid (Ap(..))
 import           GHC.Stack (callStack, prettyCallStack)
+import qualified Data.Aeson as A
 
 -- * Types
 
@@ -376,17 +378,56 @@ instance GetHState H where
 ---------------------------------------------------------
 -- H/HS instances
 
+-- | Contexts in which it is possible to execute state-locked 'HS' actions.
+class Monad m => MonadHS m where
+
+  runInHS :: HS a -> m a
+
+instance MonadHS HS where
+  runInHS = id
+
+instance MonadHS (QueryT HS) where
+  runInHS ma = Query (lift ma)
+
+instance MonadHS H where
+  runInHS = runInHS'
+
+runInHS' :: HasCallStack => (MonadIO m, MonadThrow m, MonadReader HConf m) => HS a -> m a
+runInHS' a = do
+  conf <- ask
+  when conf._stateLocked $ throwM $ HSWMStateLocked $ "attempted to nest state lock?\n" ++ prettyCallStack callStack
+  io $ bracketOnError (atomically $ takeTMVar conf._state) (atomically . tryPutTMVar conf._state) $ \st -> do
+    res <- timeout 3_000_000 $ runHS conf {_stateLocked = True} st a
+    case res of
+      Just (r, st') -> atomically (putTMVar conf._state st') >> return r
+      Nothing -> throwM $ HSWMTimeout $ "runInHS timed out (3s)!" ++ prettyCallStack callStack
+  where
+    runHS :: HConf -> HState -> HS a -> IO (a, HState)
+    runHS c st (HS ma) = flip runReaderT c $ runStateT ma st
+
+
+class MonadH m where
+
+  liftH :: H a -> m a
+
+instance MonadH H where
+  liftH = id
+
+instance MonadH HS where
+  liftH (H ma) = HS (lift ma)
+
+
 instance MonadLoggerIO H  where askLoggerIO = view _logFunc
-instance MonadLoggerIO HS where askLoggerIO = view _logFunc
 
 instance MonadLogger H where
   monadLoggerLog loc src lvl msg = do
     f <- askLoggerIO
     io $ f loc src lvl (toLogStr msg)
+
+instance MonadLoggerIO HS where
+  askLoggerIO = liftH askLoggerIO
 instance MonadLogger HS where
-  monadLoggerLog loc src lvl msg = do
-    f <- askLoggerIO
-    io $ f loc src lvl (toLogStr msg)
+  monadLoggerLog loc src lvl msg = liftH (monadLoggerLog loc src lvl msg)
 
 instance Default a => Default (H a)  where def = pure def
 instance Default a => Default (HS a) where def = pure def
@@ -394,3 +435,26 @@ instance Default a => Default (HS a) where def = pure def
 instance Show (H ())    where show _ = "H()"
 instance Show (H Bool)  where show _ = "H(Bool)"
 instance Show (HS Bool) where show _ = "HS(Bool)"
+
+instance ToJSON StateExtension where
+  toJSON (StateExtension _) = A.object [("type", "StateExtension")]
+  toJSON (PersistentExtension a) = A.object [("type", "PersistentExtension"), ("value", toJSON $ show a)]
+
+instance ToJSON (Layout RiverWindow) where
+  toJSON = toJSON . show
+
+instance ToJSON HState where
+  toJSON     = genericToJSON aesonOptions
+  toEncoding = genericToEncoding aesonOptions
+
+instance ToJSON (HSWMConfig H Layout) where
+  toJSON     = genericToJSON aesonOptions
+  toEncoding = genericToEncoding aesonOptions
+
+instance ToJSON (Event -> H All) where toJSON _ = "<Event -> H All>"
+instance ToJSON (Query a)        where toJSON _ = "<Query a>"
+instance ToJSON (H a)            where toJSON _ = "<H a>"
+
+instance ToJSON Xkb.XkbRuleNames
+instance ToJSON Xkb.OptionSpec
+instance ToJSON Xkb.LayoutSpec

@@ -10,6 +10,7 @@
 -- From xmonad:XMonad.StackSet
 module HSWM.StackSet where
 
+import           HSWM.Types.Lens
 import           Control.Applicative.Backwards (Backwards(Backwards, forwards))
 import qualified Data.List as L
 import qualified Data.List.NonEmpty as NE
@@ -38,7 +39,7 @@ data StackSet i l a wd sid sd
   , floating :: M.Map a RationalRect
   }
   deriving stock (Eq, Ord, Show, Read, Generic, Data)
-  deriving anyclass (Default, NFData)
+  deriving anyclass (Default, NFData, ToJSON, FromJSON)
 
 -- | Visible workspaces, and their outputs.
 data Screen i l a wd sid sd = Screen
@@ -47,7 +48,7 @@ data Screen i l a wd sid sd = Screen
   , screenDetail :: sd
   }
   deriving stock (Eq, Ord, Show, Read, Generic, Data)
-  deriving anyclass (Default, NFData)
+  deriving anyclass (Default, NFData, ToJSON, FromJSON)
 
 -- | A workspace is just a tag, a layout, and a stack.
 data Workspace i l a wd = Workspace
@@ -57,7 +58,7 @@ data Workspace i l a wd = Workspace
   , workspaceDetail :: wd
   }
   deriving stock (Eq, Ord, Show, Read, Generic, Data)
-  deriving anyclass (Default, NFData)
+  deriving anyclass (Default, NFData, ToJSON, FromJSON)
 
 -- |
 -- A stack is a cursor onto a window list.
@@ -82,7 +83,7 @@ data Stack a = Stack
   , down  :: [a] -- ^ jokers to the right
   }
   deriving stock (Eq, Ord, Show, Read, Functor, Generic, Data)
-  deriving anyclass (Default, NFData)
+  deriving anyclass (Default, NFData, ToJSON, FromJSON)
 
 instance Foldable Stack where
   toList = integrate
@@ -99,7 +100,7 @@ instance Traversable Stack where
 -- | A structure for window geometries
 data RationalRect = RationalRect { x, y, width, height :: !Rational }
   deriving stock (Eq, Ord, Show, Read, Generic, Data)
-  deriving anyclass (NFData)
+  deriving anyclass (NFData, ToJSON, FromJSON)
 
 -- ---------------------------------------------------------------------
 

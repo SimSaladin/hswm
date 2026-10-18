@@ -1,29 +1,26 @@
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE PartialTypeSignatures #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 {-# OPTIONS_GHC -Wno-incomplete-record-selectors #-} -- XXX
-
 
 module Main (main) where
 
 import           HSWM.IPC
 
-import           HSWM.Main.Options as HSWM (LogType'(LogStderr), defaultBufSize, initLoggers, AnsiColors(..), LogFormat)
+import           HSWM.Main.Options as HSWM (LogType'(..), defaultBufSize, initLoggers, AnsiColors(..), LogFormat)
 import           Control.Monad.Reader
 import qualified Data.Aeson as A
+import qualified Data.ByteString.Char8 as BC8
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.Text.Lazy as TL
-import           Data.Time
+--import           Data.Time
 import qualified Options.Applicative as Options
 import           Options.Generic
-import           Prettyprinter
-import           Prettyprinter.Render.Terminal
+--import           Prettyprinter
+--import           Prettyprinter.Render.Terminal
 import           System.Console.Haskeline
 import           System.Console.Haskeline.ReaderT
-
-type ClientOptions = ClientOptions' Unwrapped
-
-deriving instance Eq ClientOptions
-deriving instance Show ClientOptions
+import Data.Aeson.Encode.Pretty (encodePretty)
 
 data ClientOptions' w
   = Version
@@ -37,9 +34,13 @@ data ClientOptions' w
     }
     deriving (Generic)
 
+type ClientOptions = ClientOptions' Unwrapped
+
+deriving instance Eq ClientOptions
+deriving instance Show ClientOptions
+
 instance ParseRecord (ClientOptions' Wrapped) where
-  parseRecord = parseRecordWithModifiers defaultModifiers
-    -- { constructorNameModifier = }
+  parseRecord = parseRecordWithModifiers lispCaseModifiers
 
 
 main :: IO ()
@@ -51,28 +52,23 @@ main = do
     progDesc = "hswmctl"
 
     runMode :: ClientOptions -> IO ()
-    runMode Interactive{} = interactive
+    runMode opts@Interactive{} = interactive opts
     runMode Version{} = undefined
     runMode opts@Dump{} = withConnect opts $ \sock -> do
       res <- syncRequest sock (DumpState { param = "" })
       io $ BL.putStrLn $ "\n\n" <> A.encode res <> "\n"
 
-    withConnect opts f = withLogging (opts.logFormat, opts.colorEnable) $ clientRunWith def f
+    withConnect opts f = withLogging (LogStderr defaultBufSize) opts.logFormat opts.colorEnable $ runLoggingT $ clientRunWith def f
 
-    withLogging (fmt, co) f =
-      bracket (initLoggers (LogStderr defaultBufSize) fmt co)
-              (\(_, fn) -> liftIO fn) $ \(logFn, _) ->
-                runLoggingT f logFn
+    withLogging :: MonadUnliftIO m => LogType' LogStr -> LogFormat -> AnsiColors -> (_ -> m a) -> m a
+    withLogging logtype fmt co f =
+      bracket (liftIO $ initLoggers logtype fmt co Nothing)
+              (\(_, fn) -> liftIO fn) $ \(logFn, _) -> f logFn
 
-    interactive = runInputT defaultSettings $ do
+    interactive o = runInputT defaultSettings $ do
         printExt <- getExternalPrint
-        fromReaderT $ runRT (getLogFun printExt)
-
-    getLogFun f loc src lv s = do
-        t <- getCurrentTime
-        let logStrBS = fromLogStr $ defaultLogStr t mempty loc src lv s
-            msg      = A.decodeStrict @LoggedMessage logStrBS
-        whenJust msg $ f . TL.unpack . renderLazy . layoutPretty defaultLayoutOptions . prettyLogMsg
+        withLogging (LogCallback (printExt . BC8.unpack . fromLogStr) (return ())) o.logFormat (if o.colorEnable /= ColorNever then ColorAlways else o.colorEnable) $ \logFn ->
+          fromReaderT $ runRT logFn
 
 type CM = InputT (LoggingT IO)
 
@@ -90,6 +86,7 @@ msgHandler = \case
   Outputs{} -> return ()
   Workspaces{} -> return ()
   FocusedWindow{} -> return ()
+  InternalObject value -> outputStrLn $ BL.unpack $ encodePretty value
   msg -> outputStrLn $ show msg
 
 consoleHandler :: (Request -> CM ()) -> CM ()
@@ -109,24 +106,6 @@ consoleHandler say = forever $ do
 
 defaultParserPrefs :: Options.PrefsMod
 defaultParserPrefs = Options.multiSuffix "..."
-
--- * Logging utilities
-
-prettyLogMsg :: LoggedMessage -> Doc AnsiStyle
-prettyLogMsg LoggedMessage{..} = mconcat
-    [ ppLevel loggedMessageLevel <> space
-    , pretty loggedMessageText <> space
-    , annotate (color Black <> bold)
-        (pretty (BL.unpack (A.encode $ loggedMessageThreadContext <> loggedMessageMeta)))
-    , line
-    ]
-  where
-    ppLevel = \case
-      LevelError   -> annotate (color Red) "error"
-      LevelWarn    -> annotate (color Red <> bold) "warn"
-      LevelInfo    -> annotate (color Cyan <> bold) "info"
-      LevelDebug   -> annotate (color Black) "dbg"
-      LevelOther x -> annotate (color Yellow) $ pretty x
 
 -- * Orphan instances
 

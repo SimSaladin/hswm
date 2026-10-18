@@ -327,7 +327,8 @@ renderNewType s deriveData ntName objT doc = do
 
       instance Read $(conT ntName) where
         readsPrec _ ('0' : 'x' : xs) = first ($(conE ntName) . wordPtrToPtr) <$> readHex xs
-        readsPrec _ _ = error "expected a string starting with \"0x...\""
+        readsPrec p xs = first ($(conE ntName) . wordPtrToPtr) <$> readsPrec p xs
+        -- readsPrec _ _ = error "expected a string starting with \"0x...\""
       |]
     ]
     -- XXX: orphan Data instance

@@ -266,7 +266,8 @@ modifyOutput :: (SomeOutput a) => a -> (Output -> Output) -> HS ()
 modifyOutput k f = outputList . eachRiverId k %= f
 
 setOutputPower :: Bool -> HS ()
-setOutputPower mode = use outputList >>= traverseOf_ (each . filtered ((/= def) . view outputPower)) f
+setOutputPower mode = do
+  use outputList >>= traverseOf_ (each . filtered ((/= def) . view outputPower)) f
   where
     f output = do
       logInfo $ "Setting output power" :# ["on" .= mode, "output" .= show output.river_output, "opmId" .= show output.outputPower]
@@ -324,7 +325,7 @@ withWindow_ k f = lookupWindow k >>= mapM_ f
 modifyWindow :: (SomeWindow a) => a -> (Window -> Window) -> HS ()
 modifyWindow k f = alterWindow k (fmap f)
 
-modifyWindow' :: (SomeWindow a, MonadEffects m, MonadReader HConf m) => a -> (Window -> Window) -> m ()
+modifyWindow' :: (SomeWindow a, MonadEffects m, MonadHS m) => a -> (Window -> Window) -> m ()
 modifyWindow' w = runInHS . modifyWindow w
 
 alterWindow :: (SomeWindow a) => a -> (Maybe Window -> Maybe Window) -> HS ()
@@ -337,6 +338,9 @@ mapWindows f = use _windows >>= mapM_ f
 
 withFocused :: (Window -> HS ()) -> HS ()
 withFocused f = use windowset >>= \ws -> whenJust (W.peek ws) (`withWindow_` f)
+
+withFocused' :: (MonadHS m) => (Window -> m ()) -> m ()
+withFocused' f = runInHS (use windowset >>= mapM lookupWindow . W.peek) >>= mapM_ f . join
 
 -- | Make a tiled window floating, using its suggested rectangle (modifies the windowset only).
 float :: (SomeWindow a) => a -> HS ()

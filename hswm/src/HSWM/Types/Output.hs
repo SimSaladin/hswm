@@ -1,5 +1,5 @@
-{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE NoFieldSelectors #-}
+{-# LANGUAGE TemplateHaskell  #-}
 
 -- |
 -- Module      : HSWM.Types.Output
@@ -20,8 +20,6 @@ import qualified River as R
 import qualified WL.Client as WL
 import qualified WL.XdgOutput.Unstable.V1.Client as XO
 import qualified WL.Wlr.OutputPowerManagement.Unstable.V1.Client as OPM
-
-import qualified Data.Aeson as A
 
 -- * Output
 
@@ -49,7 +47,7 @@ data Output = Output
 -- | Physical screen indices
 newtype ScreenId = S Int
   deriving stock (Eq, Show, Read, Generic, Data)
-  deriving newtype (Ord, Enum, Num, Integral, Real, A.ToJSON, A.FromJSON, NFData)
+  deriving newtype (Ord, Enum, Num, Integral, Real, ToJSON, FromJSON, NFData)
 
 instance Bounded ScreenId where
   minBound = S 1
@@ -70,3 +68,7 @@ instance HasHeight Output Dimension   where height = size . height
 instance HasRiverId Output where
   type RiverId Output = RiverOutput
   riverId = riverOutput
+
+instance ToJSON Output where
+  toJSON     = genericToJSON aesonOptions
+  toEncoding = genericToEncoding aesonOptions

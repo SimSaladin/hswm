@@ -21,8 +21,6 @@ import qualified Data.Map as M
 
 type XkbBindCtx = (R.RiverXkbBindings, ConstPtr (WL.ObjectListener R.RiverXkbBinding), R.RiverSeat)
 
-type SKey a = StablePtr (XkbBinding a)
-
 createXkbBindings
   :: forall env m a m2. (MonadReader env m, MonadLogger m, MonadIO m, Show a, Typeable a, a ~ SomeAction m2)
   => XkbBindCtx
@@ -67,7 +65,7 @@ newXKBBinding (xkbBinds, xkb_binding_listener, seat) enable mods keysym action (
 destroyXKBBinding :: (MonadIO m) => SKey a -> m ()
 destroyXKBBinding sptr = do
   xb <- io (deRefStablePtr sptr)
-  io $ R.objectDestroy xb.riverXkbBinding
+  R.objectDestroy xb.riverXkbBinding
   mapM_ destroyXKBBinding xb.boundSubmap
   io $ freeStablePtr sptr
 

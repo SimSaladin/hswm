@@ -1,6 +1,6 @@
-{-# LANGUAGE DefaultSignatures #-}
-{-# LANGUAGE NoFieldSelectors  #-}
-{-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE DefaultSignatures    #-}
+{-# LANGUAGE NoFieldSelectors     #-}
+{-# LANGUAGE TemplateHaskell      #-}
 {-# LANGUAGE UndecidableInstances #-}
 
 
@@ -26,14 +26,20 @@ import qualified River as R
 import           Text.XkbCommon
 import           Text.XkbCommon.KeySyms (key_NoSymbol)
 
+import qualified Data.List as L
 import qualified Data.Map as M
 import           Data.Typeable
 import           Data.Generics.Instances ()
 import           Data.Data
+import qualified Data.Aeson as A
 
 -- * XkbBinding, PointerBinding, etc.
 
-type XkbBindingMap a = M.Map XBKey (StablePtr (XkbBinding a))
+type Button = Word32
+type XBKey  = (ModMask, KeySym)
+type SKey a = StablePtr (XkbBinding a)
+
+type XkbBindingMap a = M.Map XBKey (SKey a)
 
 data XkbBinding a = XkbBinding
   { boundAction     :: !a
@@ -62,8 +68,13 @@ data Submap m = Submap
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Default, NFData)
 
-type Button = Word32
-type XBKey  = (ModMask, KeySym)
+instance ToJSON (Submap m) where
+  toJSON     = A.genericToJSON aesonOptions
+  toEncoding = A.genericToEncoding aesonOptions
+  omitField (Submap [] Nothing) = True
+  omitField _                   = False
+
+-- Data instances
 
 deriving instance (Data a, Data (StablePtr (XkbBinding a))) => Data (XkbBinding a)
 deriving instance (Data a, Data (StablePtr (XkbBinding a))) => Data (PointerBinding a)
@@ -79,6 +90,57 @@ instance IsKeySym KeySym where
 
 instance IsKeySym String where
   toKeySym s = fromMaybe key_NoSymbol $ keysymFromName s <|> keysymFromNameCaseInsensitive s
+
+-- * IsModMask
+
+class IsModMask a where
+  toModMask :: ModMask -> a -> ModMask
+  modifierIndices :: a -> [ModIndex]
+  modifierIndices a =
+    let mm = toModMask 0 a
+     in [ i | i <- take 8 (L.iterate (.<<. 1) 1), mm .&. i /= 0 ]
+
+instance IsModMask ModMask where
+  toModMask _ = id
+
+-- | E.g. @C-M-S@, @ctrl-meta-shift@
+instance IsModMask String where
+  toModMask = resolveModMask
+
+instance IsModMask [ModIndex] where
+  toModMask _ = foldl' (.|.) 0
+  modifierIndices = id
+
+resolveModMask :: ModMask -- ^ Default mod mask
+               -> String
+               -> ModMask
+resolveModMask d s = go s
+  where
+    go x = case L.span (/= '-') x of
+      (m, '-' : xs) -> get1 m .|. go xs
+      (m, []) -> get1 m
+      _ -> error $ "malformed mod mask: " ++ s
+    get1 y = case map toLower y of
+      ""      -> 0
+      "m"     -> d
+      "none"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_NONE
+      "shift" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_SHIFT
+      "s"     -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_SHIFT
+      "ctrl"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_CTRL
+      "c"     -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_CTRL
+      "mod1"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD1
+      "m1"    -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD1
+      "alt"   -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD1
+      "a"     -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD1
+      "mod3"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD3
+      "m3"    -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD3
+      "mod4"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD4
+      "m4"    -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD4
+      "super" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD4
+      "logo"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD4
+      "mod5"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD5
+      "m5"    -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD5
+      _       -> error $ "unrecognized modifier: " ++ y
 
 -- * IsAction
 
@@ -113,9 +175,6 @@ instance (MonadIO m, Typeable m) => IsAction m (Submap m) where
 
 data SomeAction m = forall a. (IsAction m a) => SomeAction a
 
---data SomeAction m where
---  SomeAction :: forall m a. (IsAction m a) => a -> SomeAction m
-
 instance Typeable m => Data (SomeAction m) where
   toConstr _ = error "toConstr"
   gunfold _ _ = error "gunfold"
@@ -134,6 +193,16 @@ instance (MonadIO m) => Show (SomeAction m) where
 
 instance NFData (SomeAction m) where
   rnf (SomeAction a) = a `seq` ()
+
+instance ToJSON (SomeAction m) where
+  toJSON (SomeAction (val :: IsAction m a => a)) = A.object $
+    [ "description" .= actionDescription (Proxy @m) val
+    , "typeDescription" .= typeDescription (Proxy @m) val ] ++
+    [ "submap" .= x | let x = actionSubmap @m val, not (omitField x) ]
+  toEncoding (SomeAction (val :: IsAction m a => a)) = A.pairs $
+    "description" .= actionDescription (Proxy @m) val <>
+    "typeDescription" .= typeDescription (Proxy @m) val <>
+    (let x = actionSubmap @m val in if omitField x then mempty else "submap" .= x)
 
 instance MonadIO m => IsAction m (SomeAction m) where
   runner (SomeAction a) = runner a

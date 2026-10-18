@@ -32,6 +32,8 @@ debugHook ev
   | SeatEvent R.RiverSeatPointerPosition {} <- ev = mempty
   | SeatEvent R.RiverSeatPointerEnter {}    <- ev = mempty
   | SeatEvent R.RiverSeatPointerLeave {}    <- ev = mempty
+  | SeatEvent R.RiverSeatOpDelta {}         <- ev = mempty
+  | SeatEvent R.RiverSeatWindowInteraction {} <- ev = mempty
   | SeatEvent e                             <- ev = logEventPretty e []
   | OutputEvent e                           <- ev = logEventShow "O" e []
   | WindowEvent R.RiverWindowDimensions {}  <- ev = mempty

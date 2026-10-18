@@ -59,7 +59,7 @@ startHSWM options config = do
     installSignalHandlers -- TODO uninstall on exit?
 
     logType <- mainLogType options
-    (lgrFun, lgrCleanup) <- initLoggers logType options.mainLogFormat (fromMaybe def $ getLast options.mainColor)
+    (lgrFun, lgrCleanup) <- initLoggers logType options.mainLogFormat options.mainColor (getLast options.mainLogLevel)
 
     let connectTo = Nothing
 
@@ -204,7 +204,7 @@ mainLoop wlDisplay wlPollFd = do
           -- read events - pair to dsplayPrepareRead
           WL.displayReadEvents wlDisplay
           return incoming
-      main $ either id (const MainPoll) next
+      main $ fromLeft MainPoll next
 
     main (MainRestart prog) = do
       logInfo $ "Main: interrupted by reload request" :# [ "program" .= prog ]

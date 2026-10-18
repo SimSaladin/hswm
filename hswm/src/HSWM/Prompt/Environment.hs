@@ -20,7 +20,7 @@ import qualified Data.List as L
 import qualified Data.Map as M
 import qualified System.Environment as ENV
 
-environPrompt :: RP.RofiPromptConfig RP.FilterS -> H ()
+environPrompt :: RP.RofiPromptConfig a RP.FilterS String -> H ()
 environPrompt pc = do
   varsEnv <- io ENV.getEnvironment
   varsSD  <- map parseLine . lines <$> runUserSD ["show-environment"]
@@ -39,7 +39,7 @@ environPrompt pc = do
 
   let pc' = pc & RP.prompt .~ "Set env variable"
                -- & RP.outputFormat .~ RP.FilterS
-  RP.rofiRun' pc' rows >>= (`whenJust` process)
+  RP.rofiRun pc' rows >>= (`whenJust` process)
 
 process :: String -> H ()
 process input = do

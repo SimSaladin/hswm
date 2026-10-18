@@ -11,6 +11,7 @@
 module HSWM.Utils
   ( module HSWM.Utils
   , module HSWM.Util.Process
+  , resolveModMask
   ) where
 
 import           HSWM.Types.Action
@@ -22,7 +23,6 @@ import           Text.XkbCommon
 import           Text.XkbCommon.EventCodes (fromEventCodeBTN)
 import qualified WL.Client as WL
 
-import           Data.Char (toLower)
 import qualified Data.List as L
 import           Data.Ord
 import           GHC.Stack
@@ -30,37 +30,6 @@ import           Numeric (readHex)
 import qualified Text.Pretty.Simple as P
 
 -- * Keymap utils
-
-resolveModMask :: ModMask -- ^ Default mod mask
-               -> String
-               -> ModMask
-resolveModMask d s = go s
-  where
-    go x = case L.span (/= '-') x of
-      (m, '-' : xs) -> get1 m .|. go xs
-      (m, []) -> get1 m
-      _ -> error $ "malformed mod mask: " ++ s
-    get1 y = case map toLower y of
-      ""      -> 0
-      "m"     -> d
-      "none"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_NONE
-      "shift" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_SHIFT
-      "s"     -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_SHIFT
-      "ctrl"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_CTRL
-      "c"     -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_CTRL
-      "mod1"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD1
-      "m1"    -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD1
-      "alt"   -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD1
-      "a"     -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD1
-      "mod3"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD3
-      "m3"    -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD3
-      "mod4"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD4
-      "m4"    -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD4
-      "super" -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD4
-      "logo"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD4
-      "mod5"  -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD5
-      "m5"    -> fi $ (.unwrap) R.RIVER_SEAT_V1_MODIFIERS_MOD5
-      _       -> error $ "unrecognized modifier: " ++ y
 
 ppModifiers :: ModMask -> [String]
 ppModifiers bm = [ s | (s, x) <-

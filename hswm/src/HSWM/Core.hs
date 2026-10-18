@@ -37,23 +37,10 @@ runH c (H a) = runReaderT a c
 runHS :: HConf -> HState -> HS a -> IO (a, HState)
 runHS c st (HS a) = flip runReaderT c $ runStateT a st
 
-runInHS :: HasCallStack => (MonadIO m, MonadThrow m, MonadReader HConf m) => HS a -> m a
-runInHS a = do
-  conf <- ask
-  when conf._stateLocked $ throwM $ HSWMStateLocked $ "attempted to nest state lock?\n" ++ prettyCallStack callStack
-  io $ bracketOnError (atomically $ takeTMVar conf._state) (atomically . tryPutTMVar conf._state) $ \st -> do
-    res <- timeout 3_000_000 $ runHS conf {_stateLocked = True} st a
-    case res of
-      Just (r, st') -> atomically (putTMVar conf._state st') >> return r
-      Nothing -> throwM $ HSWMTimeout $ "runInHS timed out (3s)!" ++ prettyCallStack callStack
-
-liftH :: (MonadReader HConf m, MonadIO m) => H a -> m a
-liftH a = do
+liftH' :: (MonadReader HConf m, MonadIO m) => H a -> m a
+liftH' a = do
   c <- ask
   io $ runH c a
-
-liftHS :: HS a -> Query a
-liftHS a = Query (lift a)
 
 -----------------------------------------------------------
 -- * catch

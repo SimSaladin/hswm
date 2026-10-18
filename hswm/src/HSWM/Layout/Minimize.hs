@@ -3,10 +3,6 @@
 {-# LANGUAGE PatternGuards #-}
 {-# LANGUAGE TypeSynonymInstances #-}
 
-----------------------------------------------------------------------------
-
------------------------------------------------------------------------------
-
 -- |
 -- Module      :  HSWM.Layout.Minimize
 -- Description :  Minimize windows, temporarily removing them from the layout.

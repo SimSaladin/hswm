@@ -16,7 +16,6 @@ module HSWM.Types.Simple where
 
 import           Data.Ratio
 import           HSWM.Types.Lens
-import           Data.Aeson (FromJSON, ToJSON)
 
 import qualified HSWM.StackSet as W
 

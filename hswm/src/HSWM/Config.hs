@@ -30,23 +30,23 @@ data a :>>: b = a :>>: b
 infixr 6 :>>:
 
 instance (IsAction H a, IsAction H b, Typeable a, Typeable b) => IsAction H (a :>>: b) where
-  runner (a :>>: b) = runner a >> runner b
-  actionSubmap (a :>>: b) =
-    let s1 = actionSubmap a
-        s2 = actionSubmap b
-     in Submap { submapKeys = s1.submapKeys <> s2.submapKeys
-               , submapDefault = s1.submapDefault <|> s2.submapDefault -- XXX
-               }
+  runner              (a :>>: b) = runner a >> runner b
   actionDescription p (a :>>: b) = actionDescription p a ++ ", " ++ actionDescription p b
+  actionSubmap        (a :>>: b) = Submap { submapKeys = s1.submapKeys <> s2.submapKeys
+                                          , submapDefault = s1.submapDefault <|> s2.submapDefault -- XXX
+                                          }
+                                    where s1 = actionSubmap a
+                                          s2 = actionSubmap b
 
 
 -- * NamedAction
 
 data NamedAction = NamedAction String (SomeAction H)
+  deriving stock (Generic)
 
 instance IsAction H NamedAction where
-  runner (NamedAction _ a) = runner a
-  actionSubmap (NamedAction _ a) = actionSubmap a
+  runner              (NamedAction _  a) = runner a
+  actionSubmap        (NamedAction _  a) = actionSubmap a
   actionDescription _ (NamedAction nm _) = nm
 
 named :: (IsAction H a) => String -> a -> SomeAction H
@@ -79,11 +79,7 @@ instance {-# OVERLAPPABLE #-} (Message a, Show a) => IsKeyAction a where
 (<?>) :: IsKeyAction a => a -> String -> SomeAction H
 action <?> desc = toKeyAction desc action
 
--- | Attach a description to some action: @ "Restart" <??> restart @
-(<??>) :: IsKeyAction a => String -> a -> SomeAction H
-desc <??> action = toKeyAction desc action
-
-infixr 1 <??>, <?>
+infixr 1 <?>
 
 -- * Add keys to config
 
@@ -150,7 +146,7 @@ breakKeys  "" = []
 breakKeys str = case L.span (/= '-') str of
   (k, '-' : xs) -> k : breakKeys xs
   (k,       []) -> [k]
-  (_,        _) -> error "breakkeys"
+  (_,        _) -> error "breakKeys"
 
 -- * Show key help
 
