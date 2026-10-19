@@ -4,7 +4,6 @@
 {-# LANGUAGE PartialTypeSignatures #-}
 {-# LANGUAGE TypeFamilies          #-}
 
-
 -- |
 -- Module      : Waybar.CFFI.Plugin.HSWM
 -- Description : HSWM Waybar CFFI Plugin
@@ -66,6 +65,7 @@ instance FromJSON (PluginConfig MyMod) where
   parseJSON = withObject "Config" $ \v -> Config
     <$> (v .: "spacing" <|> pure 5)
     <*> (v .: "focused-window-max-length" <|> pure 42)
+    <*> (v .: "workspace-spacing" <|> pure 1)
     <*> (v .: "workspace-format" <|> pure defWs)
     <*> (v .: "workspace-tooltip-format" <|> pure defWsTooltip)
     <*> (v .: "focused-window-tooltip-format" <|> pure defFocusedTooltip)
@@ -99,6 +99,7 @@ instance WaybarPlugin MyMod where
   data PluginConfig MyMod = Config
     { spacing                    :: !Int32
     , focusedWindowMaxLength     :: !Int32
+    , wsSpacing                  :: !Int32 -- ^ Spacing between workspace boxes
     , wsFormat                   :: !TextFormat
     , wsTooltipFormat            :: !TextFormat
     , focusedWindowTooltipFormat :: !TextFormat
@@ -131,14 +132,17 @@ instance WaybarPlugin MyMod where
     addClass topContainer "module"
     containerAdd (instRootWidget ic) topContainer
 
-    workspacesContainer <- toContainer =<< new Box [ #orientation := OrientationHorizontal, #spacing := c.spacing ]
+    -- Container for workspace boxes
+    workspacesContainer <- toContainer =<< new Box [ #orientation := OrientationHorizontal, #spacing := c.wsSpacing ]
     addClass workspacesContainer "workspaces"
     containerAdd topContainer workspacesContainer
 
+    -- Widget to display the current layout
     layoutWidget <- new Label [ ]
     addClass layoutWidget "current-layout"
     containerAdd topContainer layoutWidget
 
+    -- Widget to display the currently focused window info
     focusInfoWidget <- new Label [ #maxWidthChars := c.focusedWindowMaxLength, #ellipsize := EllipsizeModeEnd ]
     addClass focusInfoWidget "focused-window"
     containerAdd topContainer focusInfoWidget
@@ -218,38 +222,36 @@ updateWorkspaces = do
         setClass sc "focused" foc
         setClass sc "visible" vis
         setClass sc "empty" (null ws.windowList)
-        text <- mkWorkspaceLabel ws
+        text    <- mkWorkspaceLabel ws
         tooltip <- mkWorkspaceTooltip ws screen (fst <$> L.find (\(_, b) -> Just b == screen) g.outputs)
         set w [ #label := text, #tooltipMarkup := tooltip ]
+        -- update layout widget on correct iteration
         when (screen == Just thisScreen) $
           set (layoutWidget m) [ #label := last $ T.words ws.layout, #tooltipText := ws.layout ]
 
-  -- Destroy deleted
+  -- Destroy deleted / create new needed
   forM_ (drop (length tags) st.tagWidgets) widgetDestroy
-
-  -- Create new
-  newTags <- forM (drop (length st.tagWidgets) tags) add
-
+  newTags <- forM (drop (length st.tagWidgets) tags) addWorkspaceLabel
   let widgets = take (length tags) st.tagWidgets ++ newTags
 
   forM_ (zip tags widgets) $ \(ws, w) ->
     if
       -- Focused (on this screen)
-      | (thisScreen, ws.tag) == focused -> setWidgetWSI w ws True False (Just thisScreen)
+      | (thisScreen, ws.tag) == focused                                  -> setWidgetWSI w ws True False (Just thisScreen)
       -- Visible but not focused (on this screen)
       | (screen, _) : _ <- [x | x <- focused : visible, ws.tag == snd x] -> setWidgetWSI w ws False True (Just screen)
       -- Hidden
-      | otherwise -> setWidgetWSI w ws False False Nothing
+      | otherwise                                                        -> setWidgetWSI w ws False False Nothing
 
   modifyState $ \x -> x {tagWidgets = widgets}
-    where
-      add _ = do
-        m <- getInstance
-        l <- new Label [ #useMarkup := True ]
-        addClass l "workspace"
-        containerAdd m.workspacesContainer l
-        widgetShow l
-        return l
+  where
+    addWorkspaceLabel _ = do
+      m <- getInstance
+      l <- new Label [ #useMarkup := True ]
+      addClass l "workspace"
+      containerAdd m.workspacesContainer l
+      widgetShow l
+      return l
 
 updateFocusInfo :: MIO ()
 updateFocusInfo = do
@@ -280,6 +282,8 @@ mkWorkspaceTooltip ws screen outputName = do
     , ("layout",     pure ws.layout)
     , ("screen",     pure $ maybe "" (tshow . fromEnum) screen)
     , ("outputName", pure $ fromMaybe "-" outputName)
+    , ("tag",        pure $ T.pack ws.tag)
+    , ("keyhint",    pure ws.keyhint)
     ]
 
 mkFocusedTooltip :: WindowInfo -> MIO Text

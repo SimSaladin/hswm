@@ -24,22 +24,24 @@ environPrompt :: RP.RofiPromptConfig a RP.FilterS String -> H ()
 environPrompt pc = do
   varsEnv <- io ENV.getEnvironment
   varsSD  <- map parseLine . lines <$> runUserSD ["show-environment"]
-
-  let varsMap = M.unionWith (\(e1, s1) (e2, s2) -> (e1 <|> e2, s1 <|> s2))
+  let varsMap =
+        M.unionWith (\(e1, s1) (e2, s2) -> (e1 <|> e2, s1 <|> s2))
         (M.fromList [ (k, (Nothing, Just v)) | (k, v) <- varsSD ])
         (M.fromList [ (k, (Just v, Nothing)) | (k, v) <- varsEnv ])
+      rows = do
+        (vname, (mbValInEnv, mbValInSD)) <- M.toList varsMap
+        case (mbValInEnv, mbValInSD) of
+          (Just valInEnv, Just valInSD)
+            | valInEnv == valInSD -> [out vname valInEnv "synced"]
+            | otherwise           -> [ out vname v s | (v, s) <- [(valInEnv, "in process"), (valInSD, "in systemd")] ]
+          (Just val, _)           -> [ out vname val "only in process" ]
+          (_, Just val)           -> [ out vname val "only in systemd" ]
+          _                       -> error "empty"
+      pc' = pc & RP.prompt .~ "Set env variable"
 
-      rows =
-        [ P.render $ P.bold (P.escape k)
-          <> maybe mempty (\x -> "=" <> P.escape x) vEnv
-          <> (if vEnv /= vSD then maybe mempty (\v -> "=" <> P.escape v) vSD else mempty)
-          <> (if isNothing vSD then " " <> P.italic "(not in systemd user env)" else mempty)
-          <> (if isNothing vEnv then " " <> P.italic "(not in WM env)" else mempty)
-        | (k, (vEnv, vSD)) <- M.toList varsMap]
-
-  let pc' = pc & RP.prompt .~ "Set env variable"
-               -- & RP.outputFormat .~ RP.FilterS
   RP.rofiRun pc' rows >>= (`whenJust` process)
+    where
+      out k v notes = P.render $ P.bold (P.escape k) <> "=" <> P.escape v <> "\t" <> P.italic ("(" <> notes <> ")")
 
 process :: String -> H ()
 process input = do

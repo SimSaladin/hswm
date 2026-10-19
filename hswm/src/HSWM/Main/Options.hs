@@ -36,12 +36,9 @@ import           System.Environment (executablePath)
 import qualified System.Log.FastLogger as FastLogger
 import           System.Log.FastLogger
 
--- | Read the program arguments.
-parseMainArgs :: IO Main
-parseMainArgs = unwrapRecord (toText programVersion)
+-- * Main
 
-programVersion :: String
-programVersion = "hswm " ++ showVersion PackageInfo_hswm.version
+type Main = MainOptions Unwrapped
 
 -- | Main entrypoint settings.
 data MainOptions w = MainOptions
@@ -54,8 +51,6 @@ data MainOptions w = MainOptions
   , mainLogFile   :: w ::: Last FilePath  <#> "o"            <?> "Send logs to a file. If empty, a default file is used. If \"-\" the log output is sent to stdout."
   } deriving (Generic)
 
-type Main = MainOptions Unwrapped
-
 deriving instance Eq Main
 deriving instance Show Main
 
@@ -63,92 +58,20 @@ deriving instance Show Main
 instance ParseRecord (MainOptions Wrapped) where
   parseRecord = parseRecordWithModifiers lispCaseModifiers
     { fieldNameModifier = \name -> lispCaseModifiers.fieldNameModifier $
-      fromMaybe name (L.stripPrefix "main" name)
+          fromMaybe name (L.stripPrefix "main" name)
     }
 
--- * Logging
-
-initLoggers
-    :: LogType
-    -> LogFormat
-    -> AnsiColors -- ^ Enable color output if terminal?
-    -> Maybe LogLevel -- ^ Filter by log level
-    -> IO (Loc -> LogSource -> LogLevel -> LogStr -> IO (), IO ())
-initLoggers logType logFormat ansiColors mbLogLevel = do
-  case logFormat of
-    LogFormatJSON -> do
-      (lgr, clean) <- newFastLogger logType
-      let lgrFun = defaultOutputWith $ defaultOutputOptions $ \_ bs -> lgr $ toLogStr bs <> "\n"
-      return (withFilter lgrFun, clean)
-
-    LogFormatPLAIN -> do
-      getTime <- FastLogger.newTimeCache FastLogger.simpleTimeFormat'
-      (timedLog, clean) <- newTimedFastLogger getTime logType
-      let hasColor = case ansiColors of
-                         ColorAlways -> True
-                         ColorNever -> False
-                         ColorAuto -> case logType of
-                                        LogStdout{} -> True
-                                        LogStderr{} -> True
-                                        _           -> False
-      let lgrFun loc src lvl msg
-            | hasColor = timedLog $ \time ->
-                  toLogStr (PP.renderLazy $ PP.layoutPretty lopts $ PP.hsep
-                    [ PP.annotate (PP.colorDull PP.Yellow) $ PP.pretty time
-                    , PP.brackets $ ppLevel lvl
-                    , unJSON msg PP.pretty (PP.annotate (PP.colorDull PP.Green) . PP.pretty . A.encodeToLazyText) (PP.pretty . fromLogStr)
-                    , PP.annotate (PP.colorDull PP.Cyan) $ PP.pretty $ fileLocStr loc
-                    ]) <> "\n"
-
-            | otherwise = timedLog $ \time ->
-                  toLogStr time <> " " <> MonadLog.defaultLogStr loc src lvl (unJSON msg toLogStr (toLogStr . A.encode) id)<> "\n"
-
-      return (withFilter lgrFun, clean)
-  where
-    withFilter f
-      | Just lvl <- mbLogLevel = \lo so lv str -> when (lvl <= lv) (f lo so lv str)
-      | otherwise = f
-    lopts = PP.defaultLayoutOptions { PP.layoutPageWidth = PP.Unbounded }
-    ppLevel = \case
-      LevelError   -> PP.annotate (PP.colorDull PP.Red)     "ERR"
-      LevelWarn    -> PP.annotate (PP.colorDull PP.Yellow)  "WRN"
-      LevelInfo    -> PP.annotate (PP.colorDull PP.Blue)    "INF"
-      LevelDebug   -> PP.annotate (PP.colorDull PP.Cyan)    "DBG"
-      LevelOther x -> PP.annotate (PP.colorDull PP.Magenta) $ PP.pretty x
-
-    unJSON :: (Monoid x, IsString x)
-           => LogStr
-           -> (Text -> x)
-           -> (A.KeyMap A.Value -> x)
-           -> (LogStr -> x)
-           -> x
-    unJSON bs f g backup
-      | Just (val :: A.Value) <- A.decodeStrict $ fromLogStr bs
-      , Just (txt :: Text, mmeta :: Maybe A.Object) <- A.parseMaybe parse val
-      = f txt <> maybe mempty ((" " <>) . g) mmeta
-      | otherwise = backup bs
-
-    parse = A.withObject "LogMsg" $ \v -> do
-      txt  <- v A..: "text"
-      meta <- v A..:? "meta"
-      return (txt, meta)
-
-    -- taken from file-location package
-    -- turn the TH Loc loaction information into a human readable string
-    -- leaving out the loc_end parameter
-    fileLocStr loc = loc_package loc ++ ':' : loc_module loc ++
-      ' ' : loc_filename loc ++ ':' : line loc ++ ':' : char loc
-      where
-        line = show . fst . loc_start
-        char = show . snd . loc_start
+-- | Read the program arguments.
+parseMainArgs :: IO Main
+parseMainArgs = unwrapRecord (toText programVersion)
 
 mainLogType :: MainOptions Unwrapped -> IO LogType
 mainLogType config = do
   case getLast config.mainLogFile of
     Just dst | dst == "-" || dst == "/dev/stdout" -> pure $ LogStdout defaultBufSize
-             | dst == "/dev/stderr" -> pure $ LogStderr defaultBufSize
-             | otherwise -> fileSpec dst
-    Nothing -> defaultLogFile >>= fileSpec
+             | dst == "/dev/stderr"               -> pure $ LogStderr defaultBufSize
+             | otherwise                          -> fileSpec dst
+    Nothing                                       -> defaultLogFile >>= fileSpec
   where
     fileSpec file = return $ LogFile (FileLogSpec file (1024 * 1024 * 25) 3) defaultBufSize
 
@@ -164,8 +87,6 @@ defaultLogFile = do
   createDirectoryIfMissing True d
   return $ d ++ "/" ++ "hswm.log"
 
--- * Misc.
-
 -- | Default executable for restart via executeFile
 getProgramPath :: IO FilePath
 getProgramPath = lookupEnv "HSWM_EXECUTABLE" >>= \case
@@ -176,6 +97,11 @@ getProgramPath = lookupEnv "HSWM_EXECUTABLE" >>= \case
         setEnv "HSWM_EXECUTABLE" x
         return x
     | otherwise -> error "restart: unable to resolve program path"
+
+programVersion :: String
+programVersion = "hswm " ++ showVersion PackageInfo_hswm.version
+
+-- * Optparse options
 
 -- ** Last1
 
@@ -259,3 +185,81 @@ instance ParseFields AnsiColors where
 
 instance ParseRecord AnsiColors where
   parseRecord = fmap getOnly parseRecord
+
+-- * Logging
+
+initLoggers
+    :: LogType
+    -> LogFormat
+    -> AnsiColors -- ^ Enable color output if terminal?
+    -> Maybe LogLevel -- ^ Filter by log level
+    -> IO (Loc -> LogSource -> LogLevel -> LogStr -> IO (), IO ())
+initLoggers logType logFormat ansiColors mbLogLevel = do
+  case logFormat of
+    LogFormatJSON -> do
+      (lgr, clean) <- newFastLogger logType
+      let lgrFun = defaultOutputWith $ defaultOutputOptions $ \_ bs -> lgr $ toLogStr bs <> "\n"
+      return (withFilter lgrFun, clean)
+
+    LogFormatPLAIN -> do
+      getTime <- FastLogger.newTimeCache FastLogger.simpleTimeFormat'
+      (timedLog, clean) <- newTimedFastLogger getTime logType
+      let hasColor = case ansiColors of
+                         ColorAlways -> True
+                         ColorNever -> False
+                         ColorAuto -> case logType of
+                                        LogStdout{} -> True
+                                        LogStderr{} -> True
+                                        _           -> False
+      let lgrFun loc src lvl msg
+            | hasColor = timedLog $ \time ->
+                  toLogStr (PP.renderLazy $ PP.layoutPretty lopts $ PP.hsep
+                    [ PP.annotate (PP.colorDull PP.Yellow) $ PP.pretty time
+                    , PP.brackets $ ppLevel lvl
+                    , unJSON msg PP.pretty (PP.annotate (PP.colorDull PP.Green) . PP.pretty . A.encodeToLazyText) (PP.pretty . fromLogStr)
+                    , PP.annotate (PP.colorDull PP.Cyan) $ PP.pretty $ fileLocStr loc
+                    ]) <> "\n"
+
+            | otherwise = timedLog $ \time ->
+                  toLogStr time <> " " <> MonadLog.defaultLogStr loc src lvl (unJSON msg toLogStr (toLogStr . A.encode) id)<> "\n"
+
+      return (withFilter lgrFun, clean)
+  where
+    withFilter f
+      | Just lvl <- mbLogLevel = \lo so lv str -> when (lvl <= lv) (f lo so lv str)
+      | otherwise = f
+
+    lopts = PP.defaultLayoutOptions { PP.layoutPageWidth = PP.Unbounded }
+
+    ppLevel = \case
+      LevelError   -> PP.annotate (PP.colorDull PP.Red)     "ERR"
+      LevelWarn    -> PP.annotate (PP.colorDull PP.Yellow)  "WRN"
+      LevelInfo    -> PP.annotate (PP.colorDull PP.Blue)    "INF"
+      LevelDebug   -> PP.annotate (PP.colorDull PP.Cyan)    "DBG"
+      LevelOther x -> PP.annotate (PP.colorDull PP.Magenta) $ PP.pretty x
+
+    unJSON :: (Monoid x, IsString x)
+           => LogStr
+           -> (Text -> x)
+           -> (A.KeyMap A.Value -> x)
+           -> (LogStr -> x)
+           -> x
+    unJSON bs f g backup
+      | Just (val :: A.Value) <- A.decodeStrict $ fromLogStr bs
+      , Just (txt :: Text, mmeta :: Maybe A.Object) <- A.parseMaybe parse val
+      = f txt <> maybe mempty ((" " <>) . g) mmeta
+      | otherwise = backup bs
+
+    parse = A.withObject "LogMsg" $ \v -> do
+      txt  <- v A..: "text"
+      meta <- v A..:? "meta"
+      return (txt, meta)
+
+    -- taken from file-location package
+    -- turn the TH Loc loaction information into a human readable string
+    -- leaving out the loc_end parameter
+    fileLocStr loc = loc_package loc ++ ':' : loc_module loc ++
+      ' ' : loc_filename loc ++ ':' : line loc ++ ':' : char loc
+      where
+        line = show . fst . loc_start
+        char = show . snd . loc_start

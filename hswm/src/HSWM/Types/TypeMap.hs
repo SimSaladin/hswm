@@ -64,6 +64,11 @@ withObjectDef f = do
   modifyObjectDef @a id
   withObjects $ \tm -> f $ fromMaybe def (TM.lookup tm)
 
+-- | Does nothing if a suitable element was not found.
+withOptionalObject :: forall a s m. HasCallStack => (MonadStateGlobal' s m, Typeable a)
+                => (a -> m ()) -> m ()
+withOptionalObject f = withObjects $ maybe (return ()) f . TM.lookup
+
 {-# INLINE withObject #-}
 {-# INLINE withObjectDef #-}
 

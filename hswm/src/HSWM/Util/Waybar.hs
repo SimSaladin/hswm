@@ -1,3 +1,5 @@
+{-# LANGUAGE StaticPointers #-}
+
 -- |
 -- Module      : HSWM.Util.Waybar
 -- Description : Short description
@@ -14,6 +16,7 @@ import HSWM.Core hiding (closed)
 import System.Process (terminateProcess)
 import System.Process.Typed
 import HSWM.Util.Process
+import GHC.StaticPtr
 
 data WaybarConfig = WaybarConfig { command :: FilePath, args :: [String] }
   deriving (Show, Eq, Generic)
@@ -21,35 +24,52 @@ data WaybarConfig = WaybarConfig { command :: FilePath, args :: [String] }
 instance Default WaybarConfig where
   def = WaybarConfig "waybar" [ "-l", "warning" ]
 
-newtype WaybarState = WaybarState { wbProcess :: Maybe (Process () (Async ()) (Async ())) }
-  deriving (Show, Generic)
-  deriving anyclass (Default)
+data WaybarState = WaybarState
+  { wbProcess :: !(Maybe (Process () (Async ()) (Async ())))
+  , wbConfig  :: !WaybarConfig
+  } deriving (Show, Generic)
 
 waybarSB :: WaybarConfig -> ConfigDoM H
 waybarSB wbcfg ucfg = ucfg
-  { startupHook = ucfg.startupHook <> waybarStartupHook wbcfg
-  , exitHook = ucfg.exitHook <> waybarExitHook wbcfg
-  }
+  & startupHook <>~ waybarStartupHook wbcfg
+  & exitHook <>~ waybarCleanup
 
 waybarStartupHook :: WaybarConfig -> H ()
 waybarStartupHook cfg = do
-  logInfo "Waybar starting..."
-  logFn <- askLoggerIO
-  process <- startProcess $
-      setStdin nullStream $
-      setStdout (logOutput logFn "waybar" [ "stream" .= ("stdout" :: String) ]) $
-      setStderr (logOutput logFn "waybar" [ "stream" .= ("stderr" :: String) ]) $
-      setCloseFds True $
-      setNewSession True $
-      proc cfg.command cfg.args
-  modifyObjectDef $ \st -> st {wbProcess = Just process}
+  putObject $ WaybarState Nothing cfg
+  waybarTask
+  let wbTaskPtr = static waybarTask
+  logInfo $ "waybar task" :# [ "taskPtr" .= show (staticPtrInfo wbTaskPtr) ]
 
-waybarExitHook :: WaybarConfig -> H ()
-waybarExitHook _ = do
-  withObject $ \WaybarState {wbProcess} ->
-    case wbProcess of
-      Just p -> do
-        void $ io $ try @_ @SomeException $ terminateProcess $ unsafeProcessHandle p
-        void $ io $ try @_ @SomeException $ stopProcess p
-        modifyObjectDef $ \st -> st { wbProcess = Nothing }
-      Nothing -> pure ()
+waybarTask :: H ()
+waybarTask = withOptionalObject $ \WaybarState {wbProcess, wbConfig} -> do
+  case wbProcess of
+    Nothing -> startIt wbConfig
+    Just ph -> getExitCode ph >>= maybe (return ()) (\_ -> restartIt ph wbConfig)
+  where
+    startIt cfg = do
+      logInfo "Waybar starting..."
+      logFn <- askLoggerIO
+      let pc =
+            setStdin nullStream $
+            setStdout (logOutput logFn "waybar" [ "stream" .= ("stdout" :: String) ]) $
+            setStderr (logOutput logFn "waybar" [ "stream" .= ("stderr" :: String) ]) $
+            setCloseFds True $
+            setNewSession True $
+            proc cfg.command cfg.args
+      logProcessConfig "waybar" pc
+      process <- startProcess pc
+      modifyObject $ \st -> st {wbProcess = Just process}
+    restartIt ph cfg = do
+      logInfo "waybar: process is no longer running, now restarting"
+      stopProcess ph
+      startIt cfg
+
+waybarCleanup :: H ()
+waybarCleanup = withOptionalObject $ \WaybarState {wbProcess} -> do
+  logDebug "waybar: stopping the process and cleaning up the state"
+  forM_ wbProcess $ \p -> do
+    withAsync (io $ delayKill p) $ \_ -> stopProcess p
+    modifyObject $ \st -> st { wbProcess = Nothing }
+  where
+    delayKill p = threadDelay 3_000_000 >> terminateProcess (unsafeProcessHandle p)

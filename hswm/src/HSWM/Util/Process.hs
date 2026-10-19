@@ -39,9 +39,8 @@ spawnProcess prog args = do
   logProcessConfig "spawn" pc
   void . async $ runProcess_ pc
 
-logProcessConfig :: forall m stdin stdout stderr.
-  (Typeable stdin, Typeable stdout, Typeable stderr) =>
-  MonadProcessSpawn m => T.Text -> ProcessConfig stdin stdout stderr -> m ()
+logProcessConfig :: forall m stdin stdout stderr. (MonadProcessSpawn m, Typeable stdin, Typeable stdout, Typeable stderr)
+   => T.Text -> ProcessConfig stdin stdout stderr -> m ()
 logProcessConfig text pc = logInfo $ text <> ": run process: " <> toText (showCmdSpec pc.pcCmdSpec)
   :# ([ "cmd" .= toText (showCmdSpec pc.pcCmdSpec)
       , "closeFds" .= pc.pcCloseFds
