@@ -218,6 +218,10 @@
         bytestring.revision = hackage.bytestring."0.12.2.0".revisions.default;
         regex-base.revision = import ./cabal-files/regex-base.nix;
         witherable.revision = import ./cabal-files/witherable.nix;
+        cmdargs.revision = import ./cabal-files/cmdargs.nix;
+        cmdargs.flags.testprog = false;
+        cmdargs.flags.quotation = true;
+        attoparsec-aeson.revision = import ./cabal-files/attoparsec-aeson.nix;
         base-compat.revision = import ./cabal-files/base-compat.nix;
         dec.revision = import ./cabal-files/dec.nix;
         unliftio.revision = import ./cabal-files/unliftio.nix;
@@ -279,6 +283,8 @@
         some.revision = import ./cabal-files/some.nix;
         some.flags.newtype-unsafe = true;
         gi-cairo.revision = import ./cabal-files/gi-cairo.nix;
+        aeson-pretty.revision = import ./cabal-files/aeson-pretty.nix;
+        aeson-pretty.flags.lib-only = false;
         prettyprinter-combinators.revision = import ./cabal-files/prettyprinter-combinators.nix;
         prettyprinter-combinators.flags.enummapset = true;
         unix-compat.revision = import ./cabal-files/unix-compat.nix;
@@ -417,7 +423,6 @@
     ({ lib, ... }:
       {
         packages = {
-          "hswm-bindings".components.tests."spec".planned = lib.mkOverride 900 true;
           "gi-harfbuzz".components.setup.planned = lib.mkOverride 900 true;
           "alex".components.exes."alex".planned = lib.mkOverride 900 true;
           "data-fix".components.library.planned = lib.mkOverride 900 true;
@@ -486,6 +491,7 @@
           "cryptohash-sha256".components.library.planned = lib.mkOverride 900 true;
           "optics-core".components.library.planned = lib.mkOverride 900 true;
           "filelock".components.library.planned = lib.mkOverride 900 true;
+          "hswm-bindings".components.tests."tests".planned = lib.mkOverride 900 true;
           "regex-pcre-builtin".components.library.planned = lib.mkOverride 900 true;
           "unliftio".components.library.planned = lib.mkOverride 900 true;
           "gi-gdkpixbuf".components.setup.planned = lib.mkOverride 900 true;
@@ -518,6 +524,7 @@
           "cabal-doctest".components.library.planned = lib.mkOverride 900 true;
           "th-reify-many".components.library.planned = lib.mkOverride 900 true;
           "dlist".components.library.planned = lib.mkOverride 900 true;
+          "aeson-pretty".components.exes."aeson-pretty".planned = lib.mkOverride 900 true;
           "gi-gtk3".components.library.planned = lib.mkOverride 900 true;
           "bimap".components.library.planned = lib.mkOverride 900 true;
           "vector-algorithms".components.library.planned = lib.mkOverride 900 true;
@@ -527,6 +534,7 @@
           "Only".components.library.planned = lib.mkOverride 900 true;
           "Cabal-hooks".components.library.planned = lib.mkOverride 900 true;
           "pixman-bindings".components.tests."pixman-test".planned = lib.mkOverride 900 true;
+          "attoparsec-aeson".components.library.planned = lib.mkOverride 900 true;
           "pixman-bindings".components.library.planned = lib.mkOverride 900 true;
           "Cabal".components.library.planned = lib.mkOverride 900 true;
           "unbounded-delays".components.library.planned = lib.mkOverride 900 true;
@@ -556,6 +564,7 @@
           "strict".components.library.planned = lib.mkOverride 900 true;
           "gi-gdk3".components.library.planned = lib.mkOverride 900 true;
           "happy-lib".components.sublibs."grammar".planned = lib.mkOverride 900 true;
+          "cmdargs".components.library.planned = lib.mkOverride 900 true;
           "rts".components.library.planned = lib.mkOverride 900 true;
           "hs-bindgen-runtime".components.library.planned = lib.mkOverride 900 true;
           "language-c".components.library.planned = lib.mkOverride 900 true;
@@ -663,6 +672,7 @@
           "process".components.library.planned = lib.mkOverride 900 true;
           "rio".components.library.planned = lib.mkOverride 900 true;
           "gi-gio".components.library.planned = lib.mkOverride 900 true;
+          "aeson-pretty".components.library.planned = lib.mkOverride 900 true;
           "gi-gmodule".components.setup.planned = lib.mkOverride 900 true;
           "microlens-ghc".components.library.planned = lib.mkOverride 900 true;
           "vector".components.library.planned = lib.mkOverride 900 true;

@@ -78,7 +78,7 @@
         hsSourceDirs = [ "src" ];
       };
       tests = {
-        "spec" = {
+        "tests" = {
           depends = [
             (hsPkgs."base" or (errorHandler.buildDepError "base"))
             (hsPkgs."data-default" or (errorHandler.buildDepError "data-default"))

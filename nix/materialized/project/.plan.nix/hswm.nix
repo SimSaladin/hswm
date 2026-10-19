@@ -87,6 +87,7 @@
             (hsPkgs."bytestring" or (errorHandler.buildDepError "bytestring"))
             (hsPkgs."hswm".components.sublibs.prelude or (errorHandler.buildDepError "hswm:prelude"))
             (hsPkgs."network" or (errorHandler.buildDepError "network"))
+            (hsPkgs."random" or (errorHandler.buildDepError "random"))
             (hsPkgs."text" or (errorHandler.buildDepError "text"))
             (hsPkgs."utf8-string" or (errorHandler.buildDepError "utf8-string"))
           ];
@@ -131,6 +132,7 @@
         "hswmctl" = {
           depends = [
             (hsPkgs."aeson" or (errorHandler.buildDepError "aeson"))
+            (hsPkgs."aeson-pretty" or (errorHandler.buildDepError "aeson-pretty"))
             (hsPkgs."base" or (errorHandler.buildDepError "base"))
             (hsPkgs."bytestring" or (errorHandler.buildDepError "bytestring"))
             (hsPkgs."haskeline" or (errorHandler.buildDepError "haskeline"))
