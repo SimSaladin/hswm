@@ -1,42 +1,42 @@
--- |
--- Module      : HSWM.Hooks.NonExclusiveArea
--- Description : Short description
--- Copyright   : (c) Samuli Thomasson, 2026
---
--- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
--- Stability   : unstable
--- Portability : unportable
---
+{- |
+Module      : HSWM.Hooks.NonExclusiveArea
+Description : Short description
+Copyright   : (c) Samuli Thomasson, 2026
+
+Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
+Stability   : unstable
+Portability : unportable
+-}
 module HSWM.Hooks.NonExclusiveArea where
 
+import Data.List qualified as L
 import HSWM
 import HSWM.Layout.LayoutModifier
-import qualified Data.List as L
 
-nonExclusiveArea :: LayoutClass l a => l a -> ModifiedLayout NonExclusiveArea l a
+nonExclusiveArea :: (LayoutClass l a) => l a -> ModifiedLayout NonExclusiveArea l a
 nonExclusiveArea = ModifiedLayout $ NonExclusiveArea True
 
-newtype NonExclusiveArea a = NonExclusiveArea { enabled :: Bool }
-  deriving ( Read, Show )
+newtype NonExclusiveArea a = NonExclusiveArea {enabled :: Bool}
+    deriving (Read, Show)
 
 data ToggleNonExclusiveArea = ToggleNonExclusiveArea
-  deriving (Show, Read)
+    deriving (Show, Read)
 
 instance Message ToggleNonExclusiveArea
 
 instance LayoutModifier NonExclusiveArea a where
-  modifyLayout (NonExclusiveArea ss) w r
-    | not ss = runLayout w r
-    | otherwise = do
-      outputs <- use outputList
-      case L.find (\x -> x.position == r.position) outputs of
-        Just out | Just srect <- out.nonExclusive -> runLayout w srect
-        _ -> runLayout w r
+    modifyLayout (NonExclusiveArea ss) w r
+        | not ss = runLayout w r
+        | otherwise = do
+            outputs <- use outputList
+            case L.find (\x -> x.position == r.position) outputs of
+                Just out | Just srect <- out.nonExclusive -> runLayout w srect
+                _ -> runLayout w r
 
-  pureMess (NonExclusiveArea ss) m
+    pureMess (NonExclusiveArea ss) m
         | Just ToggleNonExclusiveArea <- fromMessage m = Just $ NonExclusiveArea (not ss)
-        -- | Just (SetStruts n k) <- fromMessage m
-        --, let newSS = S.fromList n `S.union` (ss S.\\ S.fromList k)
-        --, newSS /= ss = Just $ AvoidStruts newSS
-        -- | Just UpdateDocks <- fromMessage m = Just as
+        -- \| Just (SetStruts n k) <- fromMessage m
+        -- , let newSS = S.fromList n `S.union` (ss S.\\ S.fromList k)
+        -- , newSS /= ss = Just $ AvoidStruts newSS
+        --  | Just UpdateDocks <- fromMessage m = Just as
         | otherwise = Nothing

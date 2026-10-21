@@ -1,18 +1,19 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
--- |
--- Module       : HSWM.Actions.PhysicalScreens
--- Description  : Manipulate screens ordered by physical location instead of ID.
--- Copyright    : (c) Nelson Elhage <nelhage@mit.edu>
--- License      : BSD
---
--- Maintainer   : Nelson Elhage <nelhage@mit.edu>
--- Stability    : unstable
--- Portability  : unportable
---
--- Manipulate screens ordered by physical location instead of ID
-module HSWM.Actions.PhysicalScreens
-  ( -- * Usage
+{- |
+Module       : HSWM.Actions.PhysicalScreens
+Description  : Manipulate screens ordered by physical location instead of ID.
+Copyright    : (c) Nelson Elhage <nelhage@mit.edu>
+License      : BSD
+
+Maintainer   : Nelson Elhage <nelhage@mit.edu>
+Stability    : unstable
+Portability  : unportable
+
+Manipulate screens ordered by physical location instead of ID
+-}
+module HSWM.Actions.PhysicalScreens (
+    -- * Usage
     -- $usage
     PhysicalScreen (..),
     getScreen,
@@ -27,51 +28,53 @@ module HSWM.Actions.PhysicalScreens
     screenComparatorById,
     screenComparatorByRectangle,
     rescreen,
-  )
+)
 where
 
 import Data.List (elemIndex, sortBy, (!!))
---import Data.List.NonEmpty (NonEmpty ((:|)), nonEmpty)
---import Data.List.NonEmpty qualified as NE
+
+-- import Data.List.NonEmpty (NonEmpty ((:|)), nonEmpty)
+-- import Data.List.NonEmpty qualified as NE
 import HSWM
 import HSWM.StackSet qualified as W
 
--- $usage
---
--- This module allows you name Xinerama screens from HSWM using their
--- physical location relative to each other (as reported by Xinerama),
--- rather than their @ScreenID@ s, which are arbitrarily determined by
--- your H server and graphics hardware.
---
--- You can specify how to order the screen by giving a ScreenComparator.
--- To create a screen comparator you can use screenComparatorByRectangle or screenComparatorByScreenId.
--- The default ScreenComparator orders screens by the upper-left-most corner, from top-to-bottom
--- and then left-to-right.
---
--- Example usage in your @xmonad.hs@ file:
---
--- > import HSWM.Actions.PhysicalScreens
--- > import Data.Default
---
--- > , ((modMask, xK_a), onPrevNeighbour def W.view)
--- > , ((modMask, xK_o), onNextNeighbour def W.view)
--- > , ((modMask .|. shiftMask, xK_a), onPrevNeighbour def W.shift)
--- > , ((modMask .|. shiftMask, xK_o), onNextNeighbour def W.shift)
---
--- > --
--- > -- mod-{w,e,r}, Switch to physical/Xinerama screens 1, 2, or 3
--- > -- mod-shift-{w,e,r}, Move client to screen 1, 2, or 3
--- > --
--- > [((modm .|. mask, key), f sc)
--- >     | (key, sc) <- zip [xK_w, xK_e, xK_r] [0..]
--- >     , (f, mask) <- [(viewScreen def, 0), (sendToScreen def, shiftMask)]]
---
--- For detailed instructions on editing your key bindings, see
--- <https://xmonad.org/TUTORIAL.html#customizing-xmonad the tutorial>.
+{- $usage
+
+This module allows you name Xinerama screens from HSWM using their
+physical location relative to each other (as reported by Xinerama),
+rather than their @ScreenID@ s, which are arbitrarily determined by
+your H server and graphics hardware.
+
+You can specify how to order the screen by giving a ScreenComparator.
+To create a screen comparator you can use screenComparatorByRectangle or screenComparatorByScreenId.
+The default ScreenComparator orders screens by the upper-left-most corner, from top-to-bottom
+and then left-to-right.
+
+Example usage in your @xmonad.hs@ file:
+
+> import HSWM.Actions.PhysicalScreens
+> import Data.Default
+
+> , ((modMask, xK_a), onPrevNeighbour def W.view)
+> , ((modMask, xK_o), onNextNeighbour def W.view)
+> , ((modMask .|. shiftMask, xK_a), onPrevNeighbour def W.shift)
+> , ((modMask .|. shiftMask, xK_o), onNextNeighbour def W.shift)
+
+> --
+> -- mod-{w,e,r}, Switch to physical/Xinerama screens 1, 2, or 3
+> -- mod-shift-{w,e,r}, Move client to screen 1, 2, or 3
+> --
+> [((modm .|. mask, key), f sc)
+>     | (key, sc) <- zip [xK_w, xK_e, xK_r] [0..]
+>     , (f, mask) <- [(viewScreen def, 0), (sendToScreen def, shiftMask)]]
+
+For detailed instructions on editing your key bindings, see
+<https://xmonad.org/TUTORIAL.html#customizing-xmonad the tutorial>.
+-}
 
 -- | The type of the index of a screen by location
 newtype PhysicalScreen = P Int
-  deriving newtype (Eq, Ord, Show, Read, Enum, Num, Integral, Real)
+    deriving newtype (Eq, Ord, Show, Read, Enum, Num, Integral, Real)
 
 getScreenIdAndRectangle :: W.Screen i l a WorkspaceDetail ScreenId ScreenDetail -> (ScreenId, Rectangle)
 getScreenIdAndRectangle scr = (W.screen scr, rect)
@@ -81,36 +84,36 @@ getScreenIdAndRectangle scr = (W.screen scr, rect)
 -- | Translate a physical screen index to a 'ScreenId'
 getScreen :: ScreenComparator -> PhysicalScreen -> HS (Maybe ScreenId)
 getScreen (ScreenComparator cmpScreen) (P i) = do
-  w <- use windowset
-  let screens = W.current w : W.visible w
-  if i < 0 || i >= length screens
-    then return Nothing
-    else
-      let ss = sortBy (cmpScreen `on` getScreenIdAndRectangle) screens
-       in return $ Just $ W.screen $ ss !! i
+    w <- use windowset
+    let screens = W.current w : W.visible w
+    if i < 0 || i >= length screens
+        then return Nothing
+        else
+            let ss = sortBy (cmpScreen `on` getScreenIdAndRectangle) screens
+             in return $ Just $ W.screen $ ss !! i
 
 -- | Switch to a given physical screen
 viewScreen :: ScreenComparator -> PhysicalScreen -> HS ()
 viewScreen sc p = do
-  i <- getScreen sc p
-  whenJust i $ \s -> do
-    w <- screenWorkspace s
-    whenJust w $ windows . W.view
+    i <- getScreen sc p
+    whenJust i $ \s -> do
+        w <- screenWorkspace s
+        whenJust w $ windows . W.view
 
 -- | Send the active window to a given physical screen
 sendToScreen :: ScreenComparator -> PhysicalScreen -> HS ()
 sendToScreen sc p = do
-  i <- getScreen sc p
-  whenJust i $ \s -> do
-    w <- screenWorkspace s
-    whenJust w $ windows . W.shift
+    i <- getScreen sc p
+    whenJust i $ \s -> do
+        w <- screenWorkspace s
+        whenJust w $ windows . W.shift
 
 -- | A ScreenComparator allow to compare two screen based on their coordonate and Xinerama Id
 newtype ScreenComparator = ScreenComparator ((ScreenId, Rectangle) -> (ScreenId, Rectangle) -> Ordering)
 
 -- | The default ScreenComparator orders screens by the upper-left-most corner, from top-to-bottom
 instance Default ScreenComparator where
-  def = verticalScreenOrderer
+    def = verticalScreenOrderer
 
 -- | Compare screen only by their coordonate
 screenComparatorByRectangle :: (Rectangle -> Rectangle -> Ordering) -> ScreenComparator
@@ -139,18 +142,18 @@ horizontalScreenOrderer = screenComparatorByRectangle comparator
 -- | Get ScreenId for neighbours of the current screen based on position offset.
 getNeighbour :: ScreenComparator -> Int -> HS ScreenId
 getNeighbour (ScreenComparator cmpScreen) d =
-  do
-    w <- use windowset
-    let ss = map W.screen $ sortBy (cmpScreen `on` getScreenIdAndRectangle) $ W.current w : W.visible w
-        curPos = fromMaybe 0 $ elemIndex (W.screen (W.current w)) ss
-        pos = (curPos + d) `mod` length ss
-    return $ ss !! pos
+    do
+        w <- use windowset
+        let ss = map W.screen $ sortBy (cmpScreen `on` getScreenIdAndRectangle) $ W.current w : W.visible w
+            curPos = fromMaybe 0 $ elemIndex (W.screen (W.current w)) ss
+            pos = (curPos + d) `mod` length ss
+        return $ ss !! pos
 
 neighbourWindows :: ScreenComparator -> Int -> (WorkspaceId -> WindowSet -> WindowSet) -> HS ()
 neighbourWindows sc d f = do
-  s <- getNeighbour sc d
-  w <- screenWorkspace s
-  whenJust w $ windows . f
+    s <- getNeighbour sc d
+    w <- screenWorkspace s
+    whenJust w $ windows . f
 
 -- | Apply operation on a WindowSet with the WorkspaceId of the next screen in the physical order as parameter.
 onNextNeighbour :: ScreenComparator -> (WorkspaceId -> WindowSet -> WindowSet) -> HS ()
@@ -160,15 +163,16 @@ onNextNeighbour sc = neighbourWindows sc 1
 onPrevNeighbour :: ScreenComparator -> (WorkspaceId -> WindowSet -> WindowSet) -> HS ()
 onPrevNeighbour sc = neighbourWindows sc (-1)
 
--- | An alternative to 'HSWM.Operations.rescreen' that avoids reshuffling
--- the workspaces if the number of screens doesn't change and only their
--- locations do. Useful for users of @xrandr --setmonitor@.
---
--- See 'HSWM.Hooks.Rescreen.setRescreenWorkspacesHook', which lets you
--- replace the builtin rescreen handler.
+{- | An alternative to 'HSWM.Operations.rescreen' that avoids reshuffling
+the workspaces if the number of screens doesn't change and only their
+locations do. Useful for users of @xrandr --setmonitor@.
+
+See 'HSWM.Hooks.Rescreen.setRescreenWorkspacesHook', which lets you
+replace the builtin rescreen handler.
+-}
 rescreen :: ScreenComparator -> HS ()
 rescreen (ScreenComparator _cmpScreen) = do
-  logError "warning: physcreen/rescreen is not implemented!"
+    logError "warning: physcreen/rescreen is not implemented!"
 
 -- withDisplay (fmap nonEmpty . getCleanedScreenInfo) >>= \case
 --  Nothing -> trace "getCleanedScreenInfo returned []"

@@ -1,9 +1,9 @@
+{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE TemplateHaskell   #-}
 
 module Plugin () where
 
-import Waybar.CFFI.Plugin.TH
 import Waybar.CFFI.Plugin.HSWM (MyMod)
+import Waybar.CFFI.Plugin.TH
 
-makeCFFIModule ''MyMod [ "-N" ]
+makeCFFIModule ''MyMod ["-N"]

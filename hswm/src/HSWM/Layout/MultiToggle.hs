@@ -1,33 +1,39 @@
-{-# LANGUAGE ExistentialQuantification, Rank2Types, FunctionalDependencies, FlexibleInstances, FlexibleContexts, PatternGuards, ScopedTypeVariables #-}
+{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE PatternGuards #-}
+{-# LANGUAGE Rank2Types #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 -----------------------------------------------------------------------------
--- |
--- Module      :  HSWM.Layout.MultiToggle
--- Description :  Dynamically apply and unapply transformers to your window layout.
--- Copyright   :  (c) Lukas Mai
--- License     :  BSD-style (see LICENSE)
---
--- Maintainer  :  <l.mai@web.de>
--- Stability   :  unstable
--- Portability :  unportable
---
--- Dynamically apply and unapply transformers to your window layout. This can
--- be used to rotate your window layout by 90 degrees, or to make the
--- currently focused window occupy the whole screen (\"zoom in\") then undo
--- the transformation (\"zoom out\").
 
+{- |
+Module      :  HSWM.Layout.MultiToggle
+Description :  Dynamically apply and unapply transformers to your window layout.
+Copyright   :  (c) Lukas Mai
+License     :  BSD-style (see LICENSE)
+
+Maintainer  :  <l.mai@web.de>
+Stability   :  unstable
+Portability :  unportable
+
+Dynamically apply and unapply transformers to your window layout. This can
+be used to rotate your window layout by 90 degrees, or to make the
+currently focused window occupy the whole screen (\"zoom in\") then undo
+the transformation (\"zoom out\").
+-}
 module HSWM.Layout.MultiToggle (
     -- * Usage
     -- $usage
-    Transformer(..),
-    Toggle(..),
+    Transformer (..),
+    Toggle (..),
     (??),
-    EOT(..),
+    EOT (..),
     single,
     mkToggle,
     mkToggle1,
     isToggleActive,
-
     HList,
     HCons,
     MultiToggle,
@@ -35,76 +41,83 @@ module HSWM.Layout.MultiToggle (
 
 import HSWM
 
-import HSWM.StackSet (Workspace(..))
+import HSWM.StackSet (Workspace (..))
 
---import Control.Arrow
+-- import Control.Arrow
+
+import Data.Enum
 import Data.Typeable
 import Text.Read
 import Text.Show
-import Data.Enum
 
--- $usage
--- The basic idea is to have a base layout and a set of layout transformers,
--- of which at most one is active at any time. Enabling another transformer
--- first disables any currently active transformer; i.e. it works like a
--- group of radio buttons.
---
--- To use this module, you need some data types which represent
--- transformers; for some commonly used transformers (including
--- MIRROR, NOBORDERS, and FULL used in the examples below) you can
--- simply import "HSWM.Layout.MultiToggle.Instances".
---
--- Somewhere else in your file you probably have a definition of @layout@;
--- the default looks like this:
---
--- > layout = tiled ||| Mirror tiled ||| Full
---
--- After changing this to
---
--- > layout = mkToggle (single MIRROR) (tiled ||| Full)
---
--- you can now dynamically apply the 'HSWM.Layout.Mirror' transformation:
---
--- > ...
--- >   , ((modm,               xK_x     ), sendMessage $ Toggle MIRROR)
--- > ...
---
--- (That should be part of your key bindings.) When you press @mod-x@, the
--- active layout is mirrored. Another @mod-x@ and it's back to normal.
---
--- It's also possible to stack @MultiToggle@s.  For example:
---
--- @
--- layout = id
---     . 'HSWM.Layout.NoBorders.smartBorders'
---     . mkToggle (NOBORDERS ?? FULL ?? EOT)
---     . mkToggle (single MIRROR)
---     $ tiled ||| 'HSWM.Layout.Grid.Grid' ||| 'HSWM.Layout.Circle.Circle'
--- @
---
--- By binding a key to @(sendMessage $ Toggle FULL)@ you can temporarily
--- maximize windows, in addition to being able to rotate layouts and remove
--- window borders.
---
--- You can also define your own transformers by creating a data type
--- which is an instance of the 'Transformer' class.  For example, here
--- is the definition of @MIRROR@:
---
--- > data MIRROR = MIRROR deriving (Read, Show, Eq)
--- > instance Transformer MIRROR RiverWindow where
--- >     transform _ x k = k (Mirror x) (\(Mirror x') -> x')
---
--- Note, you need to put @{-\# LANGUAGE
--- TypeSynonymInstances, MultiParamTypeClasses \#-}@ at the
--- beginning of your file.
+{- $usage
+The basic idea is to have a base layout and a set of layout transformers,
+of which at most one is active at any time. Enabling another transformer
+first disables any currently active transformer; i.e. it works like a
+group of radio buttons.
 
--- | A class to identify custom transformers (and look up transforming
--- functions by type).
+To use this module, you need some data types which represent
+transformers; for some commonly used transformers (including
+MIRROR, NOBORDERS, and FULL used in the examples below) you can
+simply import "HSWM.Layout.MultiToggle.Instances".
+
+Somewhere else in your file you probably have a definition of @layout@;
+the default looks like this:
+
+> layout = tiled ||| Mirror tiled ||| Full
+
+After changing this to
+
+> layout = mkToggle (single MIRROR) (tiled ||| Full)
+
+you can now dynamically apply the 'HSWM.Layout.Mirror' transformation:
+
+> ...
+>   , ((modm,               xK_x     ), sendMessage $ Toggle MIRROR)
+> ...
+
+(That should be part of your key bindings.) When you press @mod-x@, the
+active layout is mirrored. Another @mod-x@ and it's back to normal.
+
+It's also possible to stack @MultiToggle@s.  For example:
+
+@
+layout = id
+    . 'HSWM.Layout.NoBorders.smartBorders'
+    . mkToggle (NOBORDERS ?? FULL ?? EOT)
+    . mkToggle (single MIRROR)
+    $ tiled ||| 'HSWM.Layout.Grid.Grid' ||| 'HSWM.Layout.Circle.Circle'
+@
+
+By binding a key to @(sendMessage $ Toggle FULL)@ you can temporarily
+maximize windows, in addition to being able to rotate layouts and remove
+window borders.
+
+You can also define your own transformers by creating a data type
+which is an instance of the 'Transformer' class.  For example, here
+is the definition of @MIRROR@:
+
+> data MIRROR = MIRROR deriving (Read, Show, Eq)
+> instance Transformer MIRROR RiverWindow where
+>     transform _ x k = k (Mirror x) (\(Mirror x') -> x')
+
+Note, you need to put @{\-\# LANGUAGE
+TypeSynonymInstances, MultiParamTypeClasses \#-\}@ at the
+beginning of your file.
+-}
+
+{- | A class to identify custom transformers (and look up transforming
+functions by type).
+-}
 class (Eq t, Typeable t, Show t) => Transformer t a | t -> a where
-    transform :: (LayoutClass l a) => t -> l a ->
-        (forall l'. (LayoutClass l' a) => l' a -> (l' a -> l a) -> b) -> b
+    transform ::
+        (LayoutClass l a) =>
+        t ->
+        l a ->
+        (forall l'. (LayoutClass l' a) => l' a -> (l' a -> l a) -> b) ->
+        b
 
-data  EL l a = forall l'. (LayoutClass l' a) => EL (l' a) (l' a -> l a)
+data EL l a = forall l'. (LayoutClass l' a) => EL (l' a) (l' a -> l a)
 
 unEL :: (LayoutClass l a) => EL l a -> (forall l'. (LayoutClass l' a) => l' a -> b) -> b
 unEL (EL x _) k = k x
@@ -116,27 +129,30 @@ transform' :: (Transformer t a, LayoutClass l a) => t -> EL l a -> EL l a
 transform' t (EL l det) = transform t l (\l' det' -> EL l' (det . det'))
 
 -- | Toggle the specified layout transformer.
-data Toggle a = forall t. Transformer t a => Toggle t
+data Toggle a = forall t. (Transformer t a) => Toggle t
 
 instance Show (Toggle a) where
-  show (Toggle t) = "Toggle " ++ show t
+    show (Toggle t) = "Toggle " ++ show t
 
-instance Typeable a => Message (Toggle a)
+instance (Typeable a) => Message (Toggle a)
 
 data MultiToggleS ts l a = MultiToggleS (l a) (Maybe Int) ts
     deriving (Read, Show)
 
 data MultiToggle ts l a = MultiToggle
-  { currLayout :: EL l a,
-    currIndex :: Maybe Int,
-    transformers :: ts
-  }
+    { currLayout :: EL l a
+    , currIndex :: Maybe Int
+    , transformers :: ts
+    }
 
 expand :: (LayoutClass l a, HList ts a) => MultiToggleS ts l a -> MultiToggle ts l a
 expand (MultiToggleS b i ts) =
-    resolve ts (fromMaybe (-1) i) id
-        (\x mt ->
-            let g = transform' x in mt{ currLayout = g $ currLayout mt }
+    resolve
+        ts
+        (fromMaybe (-1) i)
+        id
+        ( \x mt ->
+            let g = transform' x in mt{currLayout = g $ currLayout mt}
         )
         (MultiToggle (EL b id) i ts)
 
@@ -149,24 +165,29 @@ instance (LayoutClass l a, Read (l a), HList ts a, Read ts) => Read (MultiToggle
 instance (Show ts, Show (l a), LayoutClass l a) => Show (MultiToggle ts l a) where
     showsPrec p = showsPrec p . collapse
 
--- | Construct a @MultiToggle@ layout from a transformer table and a base
--- layout.
+{- | Construct a @MultiToggle@ layout from a transformer table and a base
+layout.
+-}
 mkToggle :: (LayoutClass l a) => ts -> l a -> MultiToggle ts l a
 mkToggle ts l = MultiToggle (EL l id) Nothing ts
 
--- | Construct a @MultiToggle@ layout from a single transformer and a base
--- layout.
+{- | Construct a @MultiToggle@ layout from a single transformer and a base
+layout.
+-}
 mkToggle1 :: (LayoutClass l a) => t -> l a -> MultiToggle (HCons t EOT) l a
 mkToggle1 t = mkToggle (single t)
 
 -- | Marks the end of a transformer list.
 data EOT = EOT deriving (Read, Show)
+
 data HCons a b = HCons a b deriving (Read, Show)
 
 infixr 0 ??
--- | Prepend an element to a heterogeneous list. Used to build transformer
--- tables for 'mkToggle'.
-(??) ::  a -> b -> HCons a b
+
+{- | Prepend an element to a heterogeneous list. Used to build transformer
+tables for 'mkToggle'.
+-}
+(??) :: a -> b -> HCons a b
 (??) = HCons
 
 -- | Construct a singleton transformer table.
@@ -198,40 +219,46 @@ instance (Typeable a, Show ts, Typeable ts, HList ts a, LayoutClass l a) => Layo
     description mt = currLayout mt `unEL` \l -> description l
 
     runLayout (Workspace i mt s wd) r = case currLayout mt of
-        EL l det -> (fmap . fmap $ (\x -> mt { currLayout = EL x det })) <$>
-            runLayout (Workspace i l s wd) r
+        EL l det ->
+            (fmap . fmap $ (\x -> mt{currLayout = EL x det}))
+                <$> runLayout (Workspace i l s wd) r
 
     handleMessage mt m
         | Just (Toggle t) <- fromMessage m
-        , i@(Just _) <- find (transformers mt) t
-            = case currLayout mt of
+        , i@(Just _) <- find (transformers mt) t =
+            case currLayout mt of
                 EL l det -> do
                     l' <- fromMaybe l <$> handleMessage l (SomeMessage ReleaseResources)
                     return . Just $
-                        mt {
-                            currLayout = (if cur then id else transform' t) (EL (det l') id),
-                            currIndex = if cur then Nothing else i
-                        }
-                    where cur = i == currIndex mt
+                        mt
+                            { currLayout = (if cur then id else transform' t) (EL (det l') id)
+                            , currIndex = if cur then Nothing else i
+                            }
+                  where
+                    cur = i == currIndex mt
         | Just (MultiToggleActiveQueryMessage t ref :: MultiToggleActiveQueryMessage a) <- fromMessage m
-        , i@(Just _) <- find (transformers mt) t
-            = Nothing <$ io (writeIORef ref (Just (i == currIndex mt)))
-        | otherwise
-            = case currLayout mt of
-                EL l det -> fmap (\x -> mt { currLayout = EL x det }) <$>
-                    handleMessage l m
+        , i@(Just _) <- find (transformers mt) t =
+            Nothing <$ io (writeIORef ref (Just (i == currIndex mt)))
+        | otherwise =
+            case currLayout mt of
+                EL l det ->
+                    fmap (\x -> mt{currLayout = EL x det})
+                        <$> handleMessage l m
 
-data MultiToggleActiveQueryMessage a = forall t. (Transformer t a) =>
-    MultiToggleActiveQueryMessage t (IORef (Maybe Bool))
+data MultiToggleActiveQueryMessage a
+    = forall t.
+        (Transformer t a) =>
+      MultiToggleActiveQueryMessage t (IORef (Maybe Bool))
 
 instance (Typeable a) => Message (MultiToggleActiveQueryMessage a)
 
--- | Query the state of a 'Transformer' on a given workspace.
---
--- To query the current workspace, use something like this:
---
--- > withWindowSet (isToggleActive t . W.workspace . W.current)
-isToggleActive :: Transformer t RiverWindow => t -> WindowSpace -> HS (Maybe Bool)
+{- | Query the state of a 'Transformer' on a given workspace.
+
+To query the current workspace, use something like this:
+
+> withWindowSet (isToggleActive t . W.workspace . W.current)
+-}
+isToggleActive :: (Transformer t RiverWindow) => t -> WindowSpace -> HS (Maybe Bool)
 isToggleActive t w = do
     ref <- io $ newIORef Nothing
     sendMessageWithNoRefresh (MultiToggleActiveQueryMessage t ref) w

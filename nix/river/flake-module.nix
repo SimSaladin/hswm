@@ -2,9 +2,10 @@
 
 let
   mkZigDependencies =
-    { writeShellApplication
-    , zig2nix # zig2nix.zig2nix-0_16_0
-    , zig
+    {
+      writeShellApplication,
+      zig2nix, # zig2nix.zig2nix-0_16_0
+      zig,
     }:
     writeShellApplication {
       name = "make-zig-dependencies";
@@ -47,7 +48,14 @@ in
     };
   };
 
-  perSystem = { inputs', system, lib, pkgs, ... }:
+  perSystem =
+    {
+      inputs',
+      system,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       inherit (inputs.flake-utils.lib) mkApp;
       zig2nix = inputs'.zig2nix.apps;

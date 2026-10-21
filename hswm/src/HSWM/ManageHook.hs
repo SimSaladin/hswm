@@ -1,7 +1,7 @@
 module HSWM.ManageHook where
 
-import HSWM.StackSet qualified as W
 import HSWM.Core
+import HSWM.StackSet qualified as W
 
 import Data.List (isInfixOf, isPrefixOf, isSuffixOf)
 
@@ -12,26 +12,29 @@ ifM mb t f = mb >>= \b -> if b then t else f
 idHook :: ManageHook
 idHook = pure $ Endo id
 
--- | A grouping type, which can hold the outcome of a predicate Query.
--- This is analogous to group types in regular expressions.
--- TODO: create a better API for aggregating multiple Matches logically
+{- | A grouping type, which can hold the outcome of a predicate Query.
+This is analogous to group types in regular expressions.
+TODO: create a better API for aggregating multiple Matches logically
+-}
 data Match a = Match Bool a
 
--- | An alternative 'ManageHook' composer. Unlike 'composeAll' it stops as soon as
--- a candidate returns a 'Just' value, effectively running only the first match
--- (whereas 'composeAll' continues and executes all matching rules).
+{- | An alternative 'ManageHook' composer. Unlike 'composeAll' it stops as soon as
+a candidate returns a 'Just' value, effectively running only the first match
+(whereas 'composeAll' continues and executes all matching rules).
+-}
 composeOne :: (Monoid a, Monad m) => [m (Maybe a)] -> m a
 composeOne = foldr f (return mempty)
   where
     f q z = do
-      x <- q
-      maybe z return x
+        x <- q
+        maybe z return x
 
 infix 0 -->
 
--- | @p --> x@.  If @p@ returns 'True', execute the 'ManageHook'.
---
--- > (-->) :: Monoid m => Query Bool -> Query m -> Query m -- a simpler type
+{- | @p --> x@.  If @p@ returns 'True', execute the 'ManageHook'.
+
+> (-->) :: Monoid m => Query Bool -> Query m -> Query m -- a simpler type
+-}
 (-->) :: (Monad m, Monoid a) => m Bool -> m a -> m a
 p --> f = p >>= \b -> if b then f else return mempty
 
@@ -79,25 +82,26 @@ q </=? x = fmap (`neq` x) q
   where
     neq q' x' = Match (q' /= x') q'
 
--- | A helper operator for use in 'composeOne'. It takes a condition and an action;
--- if the condition fails, it returns 'Nothing' from the 'Query' so 'composeOne' will
--- go on and try the next rule.
+{- | A helper operator for use in 'composeOne'. It takes a condition and an action;
+if the condition fails, it returns 'Nothing' from the 'Query' so 'composeOne' will
+go on and try the next rule.
+-}
 (-?>) :: (Functor m, Monad m) => m Bool -> m a -> m (Maybe a)
 p -?> f = do
-  x <- p
-  if x then fmap Just f else return Nothing
+    x <- p
+    if x then fmap Just f else return Nothing
 
 -- | A helper operator for use in 'composeAll'. It takes a condition and a function taking a grouped datum to action.  If 'p' is true, it executes the resulting action.
 (-->>) :: (Monoid b, Monad m) => m (Match a) -> (a -> m b) -> m b
 p -->> f = do
-  Match b m <- p
-  if b then f m else return mempty
+    Match b m <- p
+    if b then f m else return mempty
 
 -- | A helper operator for use in 'composeOne'.  It takes a condition and a function taking a groupdatum to action.  If 'p' is true, it executes the resulting action.  If it fails, it returns 'Nothing' from the 'Query' so 'composeOne' will go on and try the next rule.
 (-?>>) :: (Functor m, Monad m) => m (Match a) -> (a -> m b) -> m (Maybe b)
 p -?>> f = do
-  Match b m <- p
-  if b then fmap Just (f m) else return Nothing
+    Match b m <- p
+    if b then fmap Just (f m) else return Nothing
 
 -- | A predicate to check whether a window is hidden (minimized).
 isMinimized :: Query Bool
@@ -111,16 +115,16 @@ wTitle = view title
 
 -- | Floats the new window in the given rectangle.
 doRectFloat ::
-  -- | The rectangle to float the window in. 0 to 1; x, y, w, h.
-  W.RationalRect ->
-  ManageHook
+    -- | The rectangle to float the window in. 0 to 1; x, y, w, h.
+    W.RationalRect ->
+    ManageHook
 doRectFloat r = ask >>= \w -> doF (W.float w.river_window r)
 
 -- | Float the window in given relative size at the center of the screen.
 doCenterFloat :: Rational -> Rational -> ManageHook
 doCenterFloat fwidth fheight = do
-  w <- ask
-  doF $ W.float w.river_window (centerRationalRect $ W.RationalRect 0 0 fwidth fheight)
+    w <- ask
+    doF $ W.float w.river_window (centerRationalRect $ W.RationalRect 0 0 fwidth fheight)
 
 -- | Modify the 'WindowSet' with a pure function.
 doF :: (s -> s) -> Query (Endo s)

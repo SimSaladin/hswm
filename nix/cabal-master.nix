@@ -1,4 +1,9 @@
-{ lib, inputs, checkMaterialization, ... }:
+{
+  lib,
+  inputs,
+  checkMaterialization,
+  ...
+}:
 
 let
   cabalDefaults = {
@@ -90,17 +95,25 @@ let
     ];
   };
 
-  overrideNixTools = haskell-nix: args: haskell-nix // rec {
-    nix-tools-unchecked = haskell-nix.nix-tools-set args;
-    nix-tools = haskell-nix.nix-tools-set { nix-tools = nix-tools-unchecked; };
-    nix-tools-set = args1: haskell-nix.nix-tools-set (lib.composeExtensions args args1);
-    nix-tools-eval-on-linux = haskell-nix.nix-tools-set (lib.composeExtensions args { evalSystem = "x86_64-linux"; });
-  };
+  overrideNixTools =
+    haskell-nix: args:
+    haskell-nix
+    // rec {
+      nix-tools-unchecked = haskell-nix.nix-tools-set args;
+      nix-tools = haskell-nix.nix-tools-set { nix-tools = nix-tools-unchecked; };
+      nix-tools-set = args1: haskell-nix.nix-tools-set (lib.composeExtensions args args1);
+      nix-tools-eval-on-linux = haskell-nix.nix-tools-set (
+        lib.composeExtensions args { evalSystem = "x86_64-linux"; }
+      );
+    };
 in
 {
-  _module.args.cabal-defaults = { pkgs, ... }: cabalDefaults // {
-    evalPackages = pkgs.buildPackages;
-  };
+  _module.args.cabal-defaults =
+    { pkgs, ... }:
+    cabalDefaults
+    // {
+      evalPackages = pkgs.buildPackages;
+    };
 
   perSystem = { pkgs, ... }: {
     legacyPackages = { };

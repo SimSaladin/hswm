@@ -1,39 +1,44 @@
 -- {-# OPTIONS_GHC -ddump-splices #-}
 
--- |
--- Module      : WL.Core.Server
--- Description : Short description
--- Copyright   : (c) Samuli Thomasson, 2026
---
--- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
--- Stability   : unstable
--- Portability : unportable
---
--- Very incomplete and untested!
---
--- See also:
---
---  - "WL.Util"
---  - "WL.Core.Server.Generated.Safe"
---  - "WL.Core.Client"
+{- |
+Module      : WL.Core.Server
+Description : Short description
+Copyright   : (c) Samuli Thomasson, 2026
+
+Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
+Stability   : unstable
+Portability : unportable
+
+Very incomplete and untested!
+
+See also:
+
+ - "WL.Util"
+ - "WL.Core.Server.Generated.Safe"
+ - "WL.Core.Client"
+-}
 module WL.Core.Server where
 
-import           WL.Core.Server.Generated
---import           WL.Core.Server.Generated.Global
-import           WL.Core.Server.Generated.Safe as Safe
-import qualified WL.Core.Server.Generated.Unsafe as Unsafe
+import WL.Core.Server.Generated
 
-import           Foreign.C.ConstPtr
-import           Lens.Micro
-import           System.Posix (Fd(..))
---import           WL.Core.Enums
-import           WL.Core.Internal
-import           WL.Internals.TH (commonSettings)
-import           WL.Internals.TH.Server
---import           WL.Internals.Types
---import           WL.Internals.Utils
-import           WL.Util
-import           Language.Haskell.TH.Syntax
+-- import           WL.Core.Server.Generated.Global
+import WL.Core.Server.Generated.Safe as Safe
+import WL.Core.Server.Generated.Unsafe qualified as Unsafe
+
+import Foreign.C.ConstPtr
+import Lens.Micro
+import System.Posix (Fd (..))
+
+-- import           WL.Core.Enums
+import WL.Core.Internal
+import WL.Internals.TH (commonSettings)
+import WL.Internals.TH.Server
+
+-- import           WL.Internals.Types
+-- import           WL.Internals.Utils
+
+import Language.Haskell.TH.Syntax
+import WL.Util
 
 -- * Types
 
@@ -53,24 +58,29 @@ serverFromProtocolXML commonSettings protocolXmlString
 
 -- * Display
 
-makeMethodWrappers commonSettings ''Wl_display "wl_display_"
+makeMethodWrappers
+    commonSettings
+    ''Wl_display
+    "wl_display_"
     [ "create"
-          & checkNotNull
+        & checkNotNull
     , "add_socket_auto"
-          & checkNotNull'
-          & argument ("display" & describe "Wayland display to which the socket should be added.")
+        & checkNotNull'
+        & argument ("display" & describe "Wayland display to which the socket should be added.")
     , "add_socket"
-          & usage "Add a socket to display for the clients to connect."
-          & argument ("display" & describe "Wayland display to which the socket should be added.")
-          & argument ("name" & describe "Name of the Unix socket"
-                             & stringInput
-                     )
-          & throwIfMinus1_
+        & usage "Add a socket to display for the clients to connect."
+        & argument ("display" & describe "Wayland display to which the socket should be added.")
+        & argument
+            ( "name"
+                & describe "Name of the Unix socket"
+                & stringInput
+            )
+        & throwIfMinus1_
     , "add_socket_fd"
-          & usage "Add a file descriptor as a socket"
-          & argument ("display" & describe "Wayland display to which the socket should be added.")
-          & argument ("sock_fd" & coercedAs [t|Fd|])
-          & throwIfMinus1_
+        & usage "Add a file descriptor as a socket"
+        & argument ("display" & describe "Wayland display to which the socket should be added.")
+        & argument ("sock_fd" & coercedAs [t|Fd|])
+        & throwIfMinus1_
     , "get_event_loop"
     , "terminate"
     , "run"
@@ -92,23 +102,29 @@ makeMethodWrappers commonSettings ''Wl_display "wl_display_"
 
 -- * EventLoop
 
-makeMethodWrappers commonSettings ''Wl_event_loop "wl_event_loop_"
-   [ "create"
-   , "destroy"
-   , "add_fd"
-   , "add_timer"
-   , "add_signal"
-   , "dispatch"
-   , "dispatch_idle"
-   , "add_idle"
-   , "get_fd"
-   , "add_destroy_listener"
-   , "get_destroy_listener"
-   ]
+makeMethodWrappers
+    commonSettings
+    ''Wl_event_loop
+    "wl_event_loop_"
+    [ "create"
+    , "destroy"
+    , "add_fd"
+    , "add_timer"
+    , "add_signal"
+    , "dispatch"
+    , "dispatch_idle"
+    , "add_idle"
+    , "get_fd"
+    , "add_destroy_listener"
+    , "get_destroy_listener"
+    ]
 
 -- * EventSource
 
-makeMethodWrappers commonSettings ''Wl_event_source "wl_event_source_"
+makeMethodWrappers
+    commonSettings
+    ''Wl_event_source
+    "wl_event_source_"
     [ "fd_update"
     , "timer_update"
     , "remove"
@@ -116,97 +132,115 @@ makeMethodWrappers commonSettings ''Wl_event_source "wl_event_source_"
 
 -- * Global
 
-makeMethodWrappers commonSettings ''Wl_global "wl_global_"
-   [ "create"
-   , "remove"
-   , "destroy"
-   , "get_name"
-   , "get_version"
-   , "get_display"
-   , "get_user_data"
-   , "set_user_data"
-   ]
+makeMethodWrappers
+    commonSettings
+    ''Wl_global
+    "wl_global_"
+    [ "create"
+    , "remove"
+    , "destroy"
+    , "get_name"
+    , "get_version"
+    , "get_display"
+    , "get_user_data"
+    , "set_user_data"
+    ]
 
 -- * Client
 
-makeMethodWrappers commonSettings ''Wl_client "wl_client_"
-  [ "create"
-  , "get_link"
-  , "from_link"
-  -- , "for_each" -- macro actually
-  , "destroy"
-  , "flush"
-  , "get_credentials"
-  , "get_fd"
-  , "add_destroy_listener"
-  , "get_destroy_listener"
-  , "add_destroy_late_listener"
-  , "get_destroy_late_listener"
-  , "get_object"
-  , "post_no_memory"
-  -- , "post_implementation_error" -- varargs
-  , "add_resource_created_listener"
-  , "for_each_resource"
-  , "set_user_data"
-  , "get_user_data"
-  , "set_max_buffer_size"
-  , "get_display"
-  ]
+makeMethodWrappers
+    commonSettings
+    ''Wl_client
+    "wl_client_"
+    [ "create"
+    , "get_link"
+    , "from_link"
+    , -- , "for_each" -- macro actually
+      "destroy"
+    , "flush"
+    , "get_credentials"
+    , "get_fd"
+    , "add_destroy_listener"
+    , "get_destroy_listener"
+    , "add_destroy_late_listener"
+    , "get_destroy_late_listener"
+    , "get_object"
+    , "post_no_memory"
+    , -- , "post_implementation_error" -- varargs
+      "add_resource_created_listener"
+    , "for_each_resource"
+    , "set_user_data"
+    , "get_user_data"
+    , "set_max_buffer_size"
+    , "get_display"
+    ]
 
 -- * Signal
 
-makeMethodWrappers commonSettings ''Wl_signal "wl_signal_"
-  [ "add"
-  , "get"
-  , "emit"
-  , "emit_mutable"
-  ]
+makeMethodWrappers
+    commonSettings
+    ''Wl_signal
+    "wl_signal_"
+    [ "add"
+    , "get"
+    , "emit"
+    , "emit_mutable"
+    ]
 
 -- * Resource
 
-makeMethodWrappers commonSettings ''Wl_resource "wl_resource_"
-  -- "post_event_array" -- no bind?
-  -- post_event -- no bind?
-  -- post_error -- no bind?
-  -- queue_event -- no bind?
-  -- queue_event_array -- no bind?
-  [ "post_no_memory"
-  , "create"
-  , "set_implementation"
-  , "set_dispatcher"
-  , "destroy"
-  , "get_id"
-  , "get_link"
-  , "from_link"
-  , "find_for_client"
-  , "get_client"
-  , "set_user_data"
-  , "get_user_data"
-  , "get_version"
-  , "set_destructor"
-  , "instance_of"
-  , "get_class"
-  , "get_interface"
-  , "add_destroy_listener"
-  , "get_destroy_listener"
-  ]
+makeMethodWrappers
+    commonSettings
+    ''Wl_resource
+    "wl_resource_"
+    -- "post_event_array" -- no bind?
+    -- post_event -- no bind?
+    -- post_error -- no bind?
+    -- queue_event -- no bind?
+    -- queue_event_array -- no bind?
+    [ "post_no_memory"
+    , "create"
+    , "set_implementation"
+    , "set_dispatcher"
+    , "destroy"
+    , "get_id"
+    , "get_link"
+    , "from_link"
+    , "find_for_client"
+    , "get_client"
+    , "set_user_data"
+    , "get_user_data"
+    , "get_version"
+    , "set_destructor"
+    , "instance_of"
+    , "get_class"
+    , "get_interface"
+    , "add_destroy_listener"
+    , "get_destroy_listener"
+    ]
 
 -- * ShmBuffer/Pool
 
-makeMethodWrappers commonSettings ''Wl_shm_buffer "wl_shm_buffer_"
- [ "get"
- , "begin_access"
- , "end_access"
- , "get_data"
- , "get_stride"
- , "get_format"
- , "get_width"
- , "get_height"
- , "ref"
- , "unref"
- , "ref_pool"
- ]
+makeMethodWrappers
+    commonSettings
+    ''Wl_shm_buffer
+    "wl_shm_buffer_"
+    [ "get"
+    , "begin_access"
+    , "end_access"
+    , "get_data"
+    , "get_stride"
+    , "get_format"
+    , "get_width"
+    , "get_height"
+    , "ref"
+    , "unref"
+    , "ref_pool"
+    ]
 
-makeMethodWrappers commonSettings ''Wl_shm_pool "wl_shm_pool_"
- [ "unref"
- ]
+makeMethodWrappers
+    commonSettings
+    ''Wl_shm_pool
+    "wl_shm_pool_"
+    [ "unref"
+    ]

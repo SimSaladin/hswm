@@ -82,6 +82,7 @@ repo-local hooks!
 
 ```bash
 pre-commit run # run checks
+pre-commit run -a # run checks
 ```
 
 --------

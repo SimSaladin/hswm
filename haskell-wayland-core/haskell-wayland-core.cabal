@@ -1,119 +1,131 @@
 cabal-version: 3.14
 -- build-type:         Custom
-build-type:         Hooks
-name:               haskell-wayland-core
-version:            0.1.0.0
-license:            MIT
-license-file:       LICENSE
-author:             Samuli Thomasson
-maintainer:         samuli.thomasson@pm.me
+build-type: Hooks
+name: haskell-wayland-core
+version: 0.1.0.0
+license: MIT
+license-file: LICENSE
+author: Samuli Thomasson
+maintainer: samuli.thomasson@pm.me
 tested-with:
-      GHC == 9.14.1
-    , GHC == 9.12.4
-    , GHC == 9.12.2
+  ghc ==9.12.2
+  ghc ==9.12.4
+  ghc ==9.14.1
+
 extra-source-files:
-      binding-specs/*.yaml
-      protocols/*.xml
+  binding-specs/*.yaml
+  protocols/*.xml
+
 data-files:
-      binding-specs/*.yaml
-      protocols/*.xml
+  binding-specs/*.yaml
+  protocols/*.xml
 
 flag pkg-config
-    description: Use pkgconfig to resolve C dependencies
-    manual: True
-    default: True
+  description: Use pkgconfig to resolve C dependencies
+  manual: True
+  default: True
 
 flag build-tool-depends
-    description: Use build-tool-depends for hs-bindgen-cli
-    manual: True
-    default: True
+  description: Use build-tool-depends for hs-bindgen-cli
+  manual: True
+  default: True
 
 custom-setup
-    setup-depends:
-          hs-bindgen-hooks
-        , base             >=4.21 && <5
-        , Cabal            >=3.14 && <3.19
-        , Cabal-hooks      >=3.14 && <3.19
-        , microlens-ghc
+  setup-depends:
+    Cabal >=3.14 && <3.19,
+    Cabal-hooks >=3.14 && <3.19,
+    base >=4.21 && <5,
+    hs-bindgen-hooks,
+    microlens-ghc
 
 common language
-    default-language: GHC2024
-    default-extensions:
-          DeriveAnyClass
-          DerivingVia
-          DuplicateRecordFields
-          LambdaCase
-          OverloadedLabels
-          OverloadedRecordDot
-          OverloadedStrings
-          PatternSynonyms
-          TemplateHaskell
-          TypeFamilies
+  default-language: GHC2024
+  default-extensions:
+    DeriveAnyClass
+    DerivingVia
+    DuplicateRecordFields
+    LambdaCase
+    OverloadedLabels
+    OverloadedRecordDot
+    OverloadedStrings
+    PatternSynonyms
+    TemplateHaskell
+    TypeFamilies
 
 library
-    import: language
-    exposed-modules:
-          WL.Core.Client
-          WL.Core.Server
-          WL.Internals.TH
-          WL.Internals.TH.Server
-          WL.Internals.Types
-          WL.Internals.Utils
-          WL.Util
-    other-modules:
-          Paths_haskell_wayland_core
-          PackageInfo_haskell_wayland_core
-    autogen-modules:
-          Paths_haskell_wayland_core
-          PackageInfo_haskell_wayland_core
-    build-depends:
-          base                 >=4.21   && <4.23
-        , data-default         >=0.8    && <0.9
-        , deepseq              >=1.5.1  && <1.6
-        , hashable             >=1.5.1  && <1.6
-        , template-haskell     >=2.23   && <2.25
-        , unix                ^>=2.8.6
-        , unliftio            ^>=0.2.25
-        , c-expr-runtime       >=0.1.0  && <0.2
-        , hs-bindgen-runtime   >=0.1.0  && <0.2
-        , hs-bindgen-hooks     ==0.1.0.0
-        , primitive
-        , prettyprinter-combinators
-    hs-source-dirs: src
-    ghc-options:
-      -Wall
-      -Wunused-packages
-      -Wno-orphans
-      -fPIC
+  import: language
+  exposed-modules:
+    WL.Core.Client
+    WL.Core.Server
+    WL.Internals.TH
+    WL.Internals.TH.Server
+    WL.Internals.Types
+    WL.Internals.Utils
+    WL.Util
 
-    if flag(pkg-config)
-        pkgconfig-depends:
-              wayland-client     >= 1.24
-            , wayland-server     >= 1.24
-    else
-        extra-libraries:
-              wayland-client
-            , wayland-server
+  other-modules:
+    PackageInfo_haskell_wayland_core
+    Paths_haskell_wayland_core
 
-    if flag(build-tool-depends)
-       build-tool-depends: hs-bindgen:hs-bindgen-cli
+  autogen-modules:
+    PackageInfo_haskell_wayland_core
+    Paths_haskell_wayland_core
+
+  build-depends:
+    base >=4.21 && <4.23,
+    c-expr-runtime >=0.1.0 && <0.2,
+    data-default >=0.8 && <0.9,
+    deepseq >=1.5.1 && <1.6,
+    hashable >=1.5.1 && <1.6,
+    hs-bindgen-hooks ==0.1.0.0,
+    hs-bindgen-runtime >=0.1.0 && <0.2,
+    prettyprinter-combinators,
+    primitive,
+    template-haskell >=2.23 && <2.25,
+    unix ^>=2.8.6,
+    unliftio ^>=0.2.25
+
+  hs-source-dirs: src
+  ghc-options:
+    -Wall
+    -Wunused-packages
+    -Wno-orphans
+    -fPIC
+
+  if flag(pkg-config)
+    pkgconfig-depends:
+      wayland-client >=1.24,
+      wayland-server >=1.24
+  else
+    extra-libraries:
+      wayland-client
+      wayland-server
+
+  if flag(build-tool-depends)
+    build-tool-depends: hs-bindgen:hs-bindgen-cli
 
 test-suite spec
-    import: language
-    type: exitcode-stdio-1.0
-    other-modules:
-          Paths_haskell_wayland_core
-          Wayland.UtilSpec
-    autogen-modules:
-          Paths_haskell_wayland_core
-    build-depends:
-          base
-        , data-default
-        , hspec
-        , hs-bindgen-runtime   >=0.1.0  && <0.2
-        , haskell-wayland-core
-    build-tool-depends:
-        hspec-discover:hspec-discover
-    main-is: Spec.hs
-    hs-source-dirs: tests
-    ghc-options: -threaded -with-rtsopts=-N
+  import: language
+  type: exitcode-stdio-1.0
+  other-modules:
+    Paths_haskell_wayland_core
+    Wayland.UtilSpec
+
+  autogen-modules:
+    Paths_haskell_wayland_core
+
+  build-depends:
+    base,
+    data-default,
+    haskell-wayland-core,
+    hs-bindgen-runtime >=0.1.0 && <0.2,
+    hspec
+
+  build-tool-depends:
+    hspec-discover:hspec-discover
+
+  main-is: Spec.hs
+  hs-source-dirs: tests
+  ghc-options:
+    -threaded
+    -with-rtsopts=-N

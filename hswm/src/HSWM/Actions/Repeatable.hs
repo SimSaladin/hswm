@@ -4,35 +4,36 @@
 
 -----------------------------------------------------------------------------
 
--- |
--- Module      :  HSWM.Actions.Repeatable
--- Description :  Actions you'd like to repeat.
--- Copyright   :  (c) 2022,2026 L. S. Leary
--- License     :  BSD3-style (see LICENSE)
---
--- Maintainer  :  L.S.Leary.II@gmail.com
--- Stability   :  unstable
--- Portability :  unportable
---
--- This module factors out the shared logic of "HSWM.Actions.CycleRecentWS",
--- "HSWM.Actions.CycleWorkspaceByScreen", "HSWM.Actions.CycleWindows" and
--- "HSWM.Actions.MostRecentlyUsed".
---
--- See the source of these modules for usage examples.
-module HSWM.Actions.Repeatable
-  (
-  -- -- * Repeatable
-  -- repeatable,
-  -- repeatableSt,
-  -- repeatableM,
+{- |
+Module      :  HSWM.Actions.Repeatable
+Description :  Actions you'd like to repeat.
+Copyright   :  (c) 2022,2026 L. S. Leary
+License     :  BSD3-style (see LICENSE)
 
-  -- -- * Concludable
-  -- NotOurEvent(..),
-  -- Done(..),
-  -- concludable,
-  -- concludableSt,
-  -- concludableM,
-  )
+Maintainer  :  L.S.Leary.II@gmail.com
+Stability   :  unstable
+Portability :  unportable
+
+This module factors out the shared logic of "HSWM.Actions.CycleRecentWS",
+"HSWM.Actions.CycleWorkspaceByScreen", "HSWM.Actions.CycleWindows" and
+"HSWM.Actions.MostRecentlyUsed".
+
+See the source of these modules for usage examples.
+-}
+module HSWM.Actions.Repeatable (
+-- -- * Repeatable
+-- repeatable,
+-- repeatableSt,
+-- repeatableM,
+
+-- -- * Concludable
+-- NotOurEvent(..),
+-- Done(..),
+-- concludable,
+-- concludableSt,
+-- concludableM,
+
+)
 where
 
 -- import Data.Functor (($>))

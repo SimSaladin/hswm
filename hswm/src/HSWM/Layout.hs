@@ -1,15 +1,16 @@
--- |
--- Module      : HSWM.Layout
--- Description : Short description
--- Copyright   : (c) Samuli Thomasson, 2026
---
--- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
--- Stability   : unstable
--- Portability : unportable
---
--- Longer description of this module.
-module HSWM.Layout
-  ( Full (..),
+{- |
+Module      : HSWM.Layout
+Description : Short description
+Copyright   : (c) Samuli Thomasson, 2026
+
+Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
+Stability   : unstable
+Portability : unportable
+
+Longer description of this module.
+-}
+module HSWM.Layout (
+    Full (..),
     Tall (..),
     Mirror (..),
     Resize (..),
@@ -25,82 +26,84 @@ module HSWM.Layout
     splitHorizontallyBy,
     splitVerticallyBy,
     tile,
-  )
+)
 where
 
-import           HSWM.Core
-import qualified HSWM.StackSet as W
-import           Prelude hiding (handle)
-import qualified River as R
+import HSWM.Core
+import HSWM.StackSet qualified as W
+import River qualified as R
+import Prelude hiding (handle)
 
 -- | Change the size of the master pane.
 data Resize = Shrink | Expand
-  deriving stock (Eq, Show, Read, Bounded, Enum, Generic)
+    deriving stock (Eq, Show, Read, Bounded, Enum, Generic)
 
 -- | Increase the number of clients in the master pane.
 newtype IncMasterN = IncMasterN Int
-  deriving stock (Eq, Show, Read, Generic)
+    deriving stock (Eq, Show, Read, Generic)
 
 instance Message Resize
 instance Message IncMasterN
 
--- | The builtin tiling mode of xmonad. Supports 'Shrink', 'Expand' and
--- 'IncMasterN'.
+{- | The builtin tiling mode of xmonad. Supports 'Shrink', 'Expand' and
+'IncMasterN'.
+-}
 data Tall a = Tall
-  { -- | The default number of windows in the master pane (default: 1)
-    tallNMaster :: !Int,
-    -- | Percent of screen to increment by when resizing panes (default: 3/100)
-    tallRatioIncrement :: !Rational,
-    -- | Default proportion of screen occupied by master pane (default: 1/2)
-    tallRatio :: !Rational
-  }
-  deriving stock (Eq, Show, Read, Generic)
+    { tallNMaster :: !Int
+    -- ^ The default number of windows in the master pane (default: 1)
+    , tallRatioIncrement :: !Rational
+    -- ^ Percent of screen to increment by when resizing panes (default: 3/100)
+    , tallRatio :: !Rational
+    -- ^ Default proportion of screen occupied by master pane (default: 1/2)
+    }
+    deriving stock (Eq, Show, Read, Generic)
 
 -- TODO should be capped [0..1] ..
 
 -- a nice pure layout, lots of properties for the layout, and its messages, in Properties.hs
 instance LayoutClass Tall a where
-  pureLayout (Tall nmaster _ frac) r s
-    | frac == 0 = drop nmaster layout
-    | frac == 1 = take nmaster layout
-    | otherwise = layout
-    where
-      ws = W.integrate s
-      rs = tile frac r nmaster (length ws)
-      layout = zip ws rs
+    pureLayout (Tall nmaster _ frac) r s
+        | frac == 0 = drop nmaster layout
+        | frac == 1 = take nmaster layout
+        | otherwise = layout
+      where
+        ws = W.integrate s
+        rs = tile frac r nmaster (length ws)
+        layout = zip ws rs
 
-  pureMessage (Tall nmaster delta frac) m =
-    msum
-      [ fmap resize (fromMessage m),
-        fmap incmastern (fromMessage m)
-      ]
-    where
-      resize Shrink = Tall nmaster delta (max 0 $ frac - delta)
-      resize Expand = Tall nmaster delta (min 1 $ frac + delta)
-      incmastern (IncMasterN d) = Tall (max 0 (nmaster + d)) delta frac
+    pureMessage (Tall nmaster delta frac) m =
+        msum
+            [ fmap resize (fromMessage m)
+            , fmap incmastern (fromMessage m)
+            ]
+      where
+        resize Shrink = Tall nmaster delta (max 0 $ frac - delta)
+        resize Expand = Tall nmaster delta (min 1 $ frac + delta)
+        incmastern (IncMasterN d) = Tall (max 0 (nmaster + d)) delta frac
 
-  description _ = "Tall"
+    description _ = "Tall"
 
--- | Compute the positions for windows using the default two-pane tiling
--- algorithm.
---
--- The screen is divided into two panes. All clients are
--- then partitioned between these two panes. One pane, the master, by
--- convention has the least number of windows in it.
+{- | Compute the positions for windows using the default two-pane tiling
+algorithm.
+
+The screen is divided into two panes. All clients are
+then partitioned between these two panes. One pane, the master, by
+convention has the least number of windows in it.
+-}
 tile ::
-  -- | @frac@, what proportion of the screen to devote to the master area
-  Rational ->
-  -- | @r@, the rectangle representing the screen
-  Rectangle ->
-  -- | @nmaster@, the number of windows in the master pane
-  Int ->
-  -- | @n@, the total number of windows to tile
-  Int ->
-  [Rectangle]
+    -- | @frac@, what proportion of the screen to devote to the master area
+    Rational ->
+    -- | @r@, the rectangle representing the screen
+    Rectangle ->
+    -- | @nmaster@, the number of windows in the master pane
+    Int ->
+    -- | @n@, the total number of windows to tile
+    Int ->
+    [Rectangle]
 tile f r nmaster n =
-  if n <= nmaster || nmaster == 0
-    then splitVertically n r
-    else splitVertically nmaster r1 ++ splitVertically (n - nmaster) r2 -- two columns
+    if n <= nmaster || nmaster == 0
+        then splitVertically n r
+        else splitVertically nmaster r1 ++ splitVertically (n - nmaster) r2 -- two columns
   where
     (r1, r2) = splitHorizontallyBy f r
 
@@ -110,8 +113,8 @@ tile f r nmaster n =
 splitVertically, splitHorizontally :: Int -> Rectangle -> [Rectangle]
 splitVertically n r | n < 2 = [r]
 splitVertically n (Rectangle sx sy sw sh) =
-  Rectangle sx sy sw smallh
-    : splitVertically (n - 1) (Rectangle sx (sy + fromIntegral smallh) sw (sh - smallh))
+    Rectangle sx sy sw smallh
+        : splitVertically (n - 1) (Rectangle sx (sy + fromIntegral smallh) sw (sh - smallh))
   where
     smallh = sh `div` fromIntegral n -- hmm, this is a fold or map.
 
@@ -121,9 +124,9 @@ splitHorizontally n = map mirrorRect . splitVertically n . mirrorRect
 -- Divide the screen into two rectangles, using a rational to specify the ratio
 splitHorizontallyBy, splitVerticallyBy :: (RealFrac r) => r -> Rectangle -> (Rectangle, Rectangle)
 splitHorizontallyBy f (Rectangle sx sy sw sh) =
-  ( Rectangle sx sy leftw sh,
-    Rectangle (sx + fromIntegral leftw) sy (sw - fromIntegral leftw) sh
-  )
+    ( Rectangle sx sy leftw sh
+    , Rectangle (sx + fromIntegral leftw) sy (sw - fromIntegral leftw) sh
+    )
   where
     leftw = floor $ fromIntegral sw * f
 
@@ -136,11 +139,11 @@ splitVerticallyBy f = (mirrorRect *** mirrorRect) . splitHorizontallyBy f . mirr
 newtype Mirror l a = Mirror (l a) deriving (Show, Read)
 
 instance (LayoutClass l a) => LayoutClass (Mirror l) a where
-  runLayout (W.Workspace i (Mirror l) ms wd) r =
-    (map (second mirrorRect) *** fmap Mirror)
-      `fmap` runLayout (W.Workspace i l ms wd) (mirrorRect r)
-  handleMessage (Mirror l) = fmap (fmap Mirror) . handleMessage l
-  description (Mirror l) = "Mirror " ++ description l
+    runLayout (W.Workspace i (Mirror l) ms wd) r =
+        (map (second mirrorRect) *** fmap Mirror)
+            `fmap` runLayout (W.Workspace i l ms wd) (mirrorRect r)
+    handleMessage (Mirror l) = fmap (fmap Mirror) . handleMessage l
+    description (Mirror l) = "Mirror " ++ description l
 
 -- | Mirror a rectangle.
 mirrorRect :: Rectangle -> Rectangle
@@ -152,7 +155,7 @@ mirrorRect (Rectangle rx ry rw rh) = Rectangle ry rx rh rw
 
 -- | Messages to change the current layout.  Also see 'JumpToLayout'.
 data ChangeLayout = FirstLayout | NextLayout
-  deriving stock (Eq, Show, Read, Bounded, Enum, Generic)
+    deriving stock (Eq, Show, Read, Bounded, Enum, Generic)
 
 -- For example, if you want to jump directly to the 'Full' layout you
 -- can do
@@ -160,18 +163,18 @@ data ChangeLayout = FirstLayout | NextLayout
 -- > , ((modm .|. controlMask, xK_f), sendMessage $ JumpToLayout "Full")
 --
 newtype JumpToLayout = JumpToLayout String
-  deriving stock (Eq, Show, Read, Generic)
+    deriving stock (Eq, Show, Read, Generic)
 
 data NextNoWrap = NextNoWrap
-  deriving stock (Eq, Read, Show, Bounded, Enum, Generic)
+    deriving stock (Eq, Read, Show, Bounded, Enum, Generic)
 
 -- | A layout that allows users to switch between various layout options.
 data Choose l r a = Choose CLR (l a) (r a)
-  deriving stock (Read, Show, Generic)
+    deriving stock (Read, Show, Generic)
 
 -- | Choose the current sub-layout (left or right) in 'Choose'.
 data CLR = CL | CR
-  deriving stock (Eq, Read, Show, Bounded, Enum, Generic)
+    deriving stock (Eq, Read, Show, Bounded, Enum, Generic)
 
 -- | The layout choice combinator
 (|||) :: l a -> r a -> Choose l r a
@@ -183,71 +186,72 @@ instance Message ChangeLayout
 instance Message JumpToLayout
 instance Message NextNoWrap
 
-
--- | A small wrapper around handleMessage, as it is tedious to write
--- SomeMessage repeatedly.
+{- | A small wrapper around handleMessage, as it is tedious to write
+SomeMessage repeatedly.
+-}
 handle :: (LayoutClass l a, Message msg) => l a -> msg -> HS (Maybe (l a))
 handle l m = handleMessage l (SomeMessage m)
 
--- | A smart constructor that takes some potential modifications, returns a
--- new structure if any fields have changed, and performs any necessary cleanup
--- on newly non-visible layouts.
+{- | A smart constructor that takes some potential modifications, returns a
+new structure if any fields have changed, and performs any necessary cleanup
+on newly non-visible layouts.
+-}
 choose ::
-  (LayoutClass l a, LayoutClass r a) =>
-  Choose l r a -> CLR -> Maybe (l a) -> Maybe (r a) -> HS (Maybe (Choose l r a))
+    (LayoutClass l a, LayoutClass r a) =>
+    Choose l r a -> CLR -> Maybe (l a) -> Maybe (r a) -> HS (Maybe (Choose l r a))
 choose (Choose d _ _) d' Nothing Nothing | d == d' = return Nothing
 choose (Choose d l r) d' ml mr = f lr
   where
     (l', r') = (fromMaybe l ml, fromMaybe r mr)
     lr = case (d, d') of
-      (CL, CR) -> (hide l', return r')
-      (CR, CL) -> (return l', hide r')
-      (_, _) -> (return l', return r')
+        (CL, CR) -> (hide l', return r')
+        (CR, CL) -> (return l', hide r')
+        (_, _) -> (return l', return r')
     f (x, y) = Just <$> liftM2 (Choose d') x y
     hide x = fromMaybe x <$> handle x Hide
 
 instance (LayoutClass l a, LayoutClass r a) => LayoutClass (Choose l r) a where
-  runLayout (W.Workspace i (Choose CL l r) ms wd) =
-    fmap (second . fmap $ flip (Choose CL) r) . runLayout (W.Workspace i l ms wd)
-  runLayout (W.Workspace i (Choose CR l r) ms wd) =
-    fmap (second . fmap $ Choose CR l) . runLayout (W.Workspace i r ms wd)
+    runLayout (W.Workspace i (Choose CL l r) ms wd) =
+        fmap (second . fmap $ flip (Choose CL) r) . runLayout (W.Workspace i l ms wd)
+    runLayout (W.Workspace i (Choose CR l r) ms wd) =
+        fmap (second . fmap $ Choose CR l) . runLayout (W.Workspace i r ms wd)
 
-  description (Choose CL l _) = description l
-  description (Choose CR _ r) = description r
+    description (Choose CL l _) = description l
+    description (Choose CR _ r) = description r
 
-  handleMessage lr m | Just NextLayout <- fromMessage m = do
-    mlr' <- handle lr NextNoWrap
-    maybe (handle lr FirstLayout) (return . Just) mlr'
-  handleMessage c@(Choose d l r) m | Just NextNoWrap <- fromMessage m =
-    case d of
-      CL -> do
-        ml <- handle l NextNoWrap
-        case ml of
-          Just _ -> choose c CL ml Nothing
-          Nothing -> choose c CR Nothing =<< handle r FirstLayout
-      CR -> choose c CR Nothing =<< handle r NextNoWrap
-  handleMessage c@(Choose _ l _) m
-    | Just FirstLayout <- fromMessage m =
-        flip (choose c CL) Nothing =<< handle l FirstLayout
-  handleMessage c@(Choose d l r) m
-    | Just ReleaseResources <- fromMessage m =
-        join $ liftM2 (choose c d) (handle l ReleaseResources) (handle r ReleaseResources)
-  handleMessage c@(Choose d l r) m
-    | Just e@(WindowEvent (R.RiverWindowClosed {})) <- fromMessage m =
-        join $ liftM2 (choose c d) (handle l e) (handle r e)
-  handleMessage c@(Choose d l r) m | Just (JumpToLayout desc) <- fromMessage m = do
-    ml <- handleMessage l m
-    mr <- handleMessage r m
-    let md
-          | desc == description (fromMaybe l ml) = CL
-          | desc == description (fromMaybe r mr) = CR
-          | otherwise = d
-    choose c md ml mr
-  handleMessage c@(Choose d l r) m = do
-    ml' <- case d of
-      CL -> handleMessage l m
-      CR -> return Nothing
-    mr' <- case d of
-      CL -> return Nothing
-      CR -> handleMessage r m
-    choose c d ml' mr'
+    handleMessage lr m | Just NextLayout <- fromMessage m = do
+        mlr' <- handle lr NextNoWrap
+        maybe (handle lr FirstLayout) (return . Just) mlr'
+    handleMessage c@(Choose d l r) m | Just NextNoWrap <- fromMessage m =
+        case d of
+            CL -> do
+                ml <- handle l NextNoWrap
+                case ml of
+                    Just _ -> choose c CL ml Nothing
+                    Nothing -> choose c CR Nothing =<< handle r FirstLayout
+            CR -> choose c CR Nothing =<< handle r NextNoWrap
+    handleMessage c@(Choose _ l _) m
+        | Just FirstLayout <- fromMessage m =
+            flip (choose c CL) Nothing =<< handle l FirstLayout
+    handleMessage c@(Choose d l r) m
+        | Just ReleaseResources <- fromMessage m =
+            join $ liftM2 (choose c d) (handle l ReleaseResources) (handle r ReleaseResources)
+    handleMessage c@(Choose d l r) m
+        | Just e@(WindowEvent (R.RiverWindowClosed{})) <- fromMessage m =
+            join $ liftM2 (choose c d) (handle l e) (handle r e)
+    handleMessage c@(Choose d l r) m | Just (JumpToLayout desc) <- fromMessage m = do
+        ml <- handleMessage l m
+        mr <- handleMessage r m
+        let md
+                | desc == description (fromMaybe l ml) = CL
+                | desc == description (fromMaybe r mr) = CR
+                | otherwise = d
+        choose c md ml mr
+    handleMessage c@(Choose d l r) m = do
+        ml' <- case d of
+            CL -> handleMessage l m
+            CR -> return Nothing
+        mr' <- case d of
+            CL -> return Nothing
+            CR -> handleMessage r m
+        choose c d ml' mr'

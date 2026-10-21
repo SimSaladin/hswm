@@ -2,34 +2,38 @@
 
 let
 
-  make-project-lib = { pkgs, ... }:
+  make-project-lib =
+    { pkgs, ... }:
     let
       self = {
         materializedRoot = ./materialized;
         materializedDest = "./nix/materialized";
 
-        materializedFor = key:
-          let dir = self.materializedRoot + "/${key}"; in
+        materializedFor =
+          key:
+          let
+            dir = self.materializedRoot + "/${key}";
+          in
           if builtins.pathExists (dir + "/default.nix") then dir else null;
 
         materialized-do =
-          { project
-          , key
-          , what ? "generateMaterialized"
+          {
+            project,
+            key,
+            what ? "generateMaterialized",
           }:
           ''
             ${project.plan-nix.passthru.${what}} ${toString (self.materializedDest + "/${key}")}
           '';
 
-        materialized-do-all =
-          args:
-          lib.concatMapStringsSep "\n" (x: self.materialized-do (args // x));
+        materialized-do-all = args: lib.concatMapStringsSep "\n" (x: self.materialized-do (args // x));
 
         # Work around haskell.nix not handling sources imported in
         # cabal.project
         fixCabalProjectImports =
-          { src
-          , cabalProjectFile ? "./cabal.project"
+          {
+            src,
+            cabalProjectFile ? "./cabal.project",
           }:
           pkgs.runCommand "src" { } ''
             cp -r --no-preserve=mode ${src} $out
@@ -51,8 +55,7 @@ let
 
       };
     in
-    pkgs.callPackage ./make-fixed-output.nix { } //
-    self;
+    pkgs.callPackage ./make-fixed-output.nix { } // self;
 in
 {
   perSystem = { pkgs, project-lib, ... }: {

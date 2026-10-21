@@ -53,91 +53,93 @@
     let
       inherit (inputs.flake-utils.lib) mkApp;
     in
-    flake-parts.lib.mkFlake { inherit inputs; } ({ self, lib, ... }:
-    {
-      # Materialization: nix run .#materialized-do
-      _module.args.checkMaterialization = false;
+    flake-parts.lib.mkFlake { inherit inputs; } (
+      { self, lib, ... }:
+      {
+        # Materialization: nix run .#materialized-do
+        _module.args.checkMaterialization = false;
 
-      imports = [
-        inputs.git-hooks.flakeModule
-        ./nix/river/flake-module.nix
-        ./nix/lib.nix
-        ./nix/cabal-master.nix
-        ./nix/hs-bindgen.nix
-        ./nix/project.nix
-      ];
+        imports = [
+          inputs.git-hooks.flakeModule
+          ./nix/river/flake-module.nix
+          ./nix/lib.nix
+          ./nix/cabal-master.nix
+          ./nix/hs-bindgen.nix
+          ./nix/project.nix
+        ];
 
-      systems = [ "x86_64-linux" ];
-      debug = true;
+        systems = [ "x86_64-linux" ];
+        debug = true;
 
-      # combined overlay for export
-      flake.overlays.default = lib.composeManyExtensions [
-        self.overlays.river
-        self.overlays.project-lib
-        self.overlays.hs-bindgen
-        self.overlays.cabal-master
-        self.overlays.project
-      ];
+        # combined overlay for export
+        flake.overlays.default = lib.composeManyExtensions [
+          self.overlays.river
+          self.overlays.project-lib
+          self.overlays.hs-bindgen
+          self.overlays.cabal-master
+          self.overlays.project
+        ];
 
-      perSystem =
-        { config
-        , system
-        , lib
-        , pkgs
-        , ...
-        }:
-        {
-          _module.args.pkgs = import inputs.nixpkgs {
-            inherit system;
-            overlays = [
-              inputs.haskellNix.overlay
-              self.overlays.default
-            ];
-            config = inputs.haskellNix.config // {
-              allowUnfree = true; # XXX: ghc-toolchain-lib-ghc-toolchain-0.1.0.0
+        perSystem =
+          {
+            config,
+            system,
+            lib,
+            pkgs,
+            ...
+          }:
+          {
+            _module.args.pkgs = import inputs.nixpkgs {
+              inherit system;
+              overlays = [
+                inputs.haskellNix.overlay
+                self.overlays.default
+              ];
+              config = inputs.haskellNix.config // {
+                allowUnfree = true; # XXX: ghc-toolchain-lib-ghc-toolchain-0.1.0.0
+              };
             };
-          };
 
-          # To run git-hooks.nix hooks with `nix fmt`
-          formatter =
-            let
-              config = inputs.git-hooks.checks.${system}.pre-commit-check.config;
-              inherit (config) package configFile;
-              script = "${pkgs.lib.getExe package} run --all-files --config ${configFile}";
-            in
-            pkgs.writeShellScriptBin "pre-commit-run" script;
+            # To run git-hooks.nix hooks with `nix fmt`
+            formatter =
+              let
+                config = inputs.git-hooks.checks.${system}.pre-commit-check.config;
+                inherit (config) package configFile;
+                script = "${pkgs.lib.getExe package} run --all-files --config ${configFile}";
+              in
+              pkgs.writeShellScriptBin "pre-commit-run" script;
 
-          pre-commit.settings = { pkgs, ... }: {
-            hooks = {
-              hpack.enable = true;
-              nixfmt.enable = true;
-              shellcheck.enable = true;
-              cabal-gild.enable = true;
-              fourmolu.enable = true;
+            pre-commit.settings = { pkgs, ... }: {
+              hooks = {
+                hpack.enable = true;
+                nixfmt.enable = true;
+                shellcheck.enable = true;
+                cabal-gild.enable = true;
+                fourmolu.enable = true;
+              };
+              excludes = [
+                "nix/materialized/.*"
+              ];
             };
-            excludes = [
-              "nix/materialized/.*"
-            ];
-          };
 
-          devShells.pre-commit-check = config.pre-commit.devShell;
+            devShells.pre-commit-check = config.pre-commit.devShell;
 
-          apps = {
-            updateProtocols = mkApp {
-              drv = pkgs.writeShellApplication {
-                name = "update-protocols";
-                runtimeInputs = [ ];
-                text = ''
-                  set -x
-                  upstream=${inputs.river}/protocol
-                  current=./hswm-bindings/protocol/
-                  diff -r $current $upstream || :
-                  cp -v -t "$current" $upstream/*.xml
-                '';
+            apps = {
+              updateProtocols = mkApp {
+                drv = pkgs.writeShellApplication {
+                  name = "update-protocols";
+                  runtimeInputs = [ ];
+                  text = ''
+                    set -x
+                    upstream=${inputs.river}/protocol
+                    current=./hswm-bindings/protocol/
+                    diff -r $current $upstream || :
+                    cp -v -t "$current" $upstream/*.xml
+                  '';
+                };
               };
             };
           };
-        };
-    }
+      }
     );
 }

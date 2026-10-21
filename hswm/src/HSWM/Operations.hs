@@ -1,47 +1,48 @@
 module HSWM.Operations where
 
-import qualified Data.List as L
-import qualified Data.Map as M
-import           Data.Ratio ((%))
-import qualified Data.Set as S
-import           HSWM.Core
-import qualified HSWM.Main.Persist as Persist
-import qualified HSWM.StackSet as W
-import qualified River as R
-import qualified System.Posix as Posix
-import           System.Posix.Process (executeFile)
-import qualified WL.Wlr.OutputPowerManagement.Unstable.V1.Client as WLR_OPM
+import Data.List qualified as L
+import Data.Map qualified as M
+import Data.Ratio ((%))
+import Data.Set qualified as S
 import GHC.Stack
+import HSWM.Core
+import HSWM.Main.Persist qualified as Persist
+import HSWM.StackSet qualified as W
+import River qualified as R
+import System.Posix qualified as Posix
+import System.Posix.Process (executeFile)
+import WL.Wlr.OutputPowerManagement.Unstable.V1.Client qualified as WLR_OPM
 
 -- * Schedule window operations to next manage or render phase
 
--- |
--- Move and resize @w@ such that it fits inside the given rectangle, including its border.
---
--- /manage/
+{- |
+Move and resize @w@ such that it fits inside the given rectangle, including its border.
+
+/manage/
+-}
 tileWindow :: (SomeWindow a) => a -> Rectangle -> HS ()
 tileWindow sw r = do
-  let rw = sw ^. riverId
-  withWindow_ rw $ \w ->
-    case w.fullscreen of
-      Nothing -> do
-        bwDef <- view $ config . borderWidth . to fi
-        let bw = fromMaybe bwDef w.wBorderWidth
-        -- give all windows at least 1x1 pixels
-        let least x
-              | x <= bw * 2 = 1
-              | otherwise = x - bw * 2
-        R.riverWindowProposeDimensions w.river_window (least $ fi r.size.width) (least $ fi r.size.height)
-        doRender (WRPosition $ Position (fi r.position.x + bw) (fi r.position.y + bw)) rw
-      Just ro -> do
-        sid <- pointScreen r.position.x r.position.y
-        mo <- lookupOutputBy (\x -> Just x.screen == fmap W.screen sid)
-        case mo of
-          -- need to change the output where the window is fullscreened
-          Just o | ro /= o.river_output -> do
-              R.riverWindowFullscreen rw o.river_output
-              modifyWindow rw $ fullscreen ?~ o.river_output &+ position .~ o.position &+ size .~ o.size
-          _ -> return ()
+    let rw = sw ^. riverId
+    withWindow_ rw $ \w ->
+        case w.fullscreen of
+            Nothing -> do
+                bwDef <- view $ config . borderWidth . to fi
+                let bw = fromMaybe bwDef w.wBorderWidth
+                -- give all windows at least 1x1 pixels
+                let least x
+                        | x <= bw * 2 = 1
+                        | otherwise = x - bw * 2
+                R.riverWindowProposeDimensions w.river_window (least $ fi r.size.width) (least $ fi r.size.height)
+                doRender (WRPosition $ Position (fi r.position.x + bw) (fi r.position.y + bw)) rw
+            Just ro -> do
+                sid <- pointScreen r.position.x r.position.y
+                mo <- lookupOutputBy (\x -> Just x.screen == fmap W.screen sid)
+                case mo of
+                    -- need to change the output where the window is fullscreened
+                    Just o | ro /= o.river_output -> do
+                        R.riverWindowFullscreen rw o.river_output
+                        modifyWindow rw $ fullscreen ?~ o.river_output &+ position .~ o.position &+ size .~ o.size
+                    _ -> return ()
 
 -- | Mark the window to be revealed or hidden in next manage sequence.
 manageReveal, manageHide :: (SomeWindow a) => a -> HS ()
@@ -67,13 +68,13 @@ windowPlaceBottom = doRender WRPlaceBottom
 -- | Set the window border color
 manageWindowBorder :: (SomeWindow a) => a -> RiverColor -> HS ()
 manageWindowBorder sw rc = do
-  modifyWindow sw $ borderColor ?~ rc
-  doRender WRBorder sw
+    modifyWindow sw $ borderColor ?~ rc
+    doRender WRBorder sw
 
 manageWindowBorderWidth :: (SomeWindow a) => a -> Maybe Int32 -> HS ()
 manageWindowBorderWidth sw bw = do
-  modifyWindow sw $ wBorderWidth .~ bw
-  doRender WRBorder sw
+    modifyWindow sw $ wBorderWidth .~ bw
+    doRender WRBorder sw
 
 ----------------------------------------------------------------------------------
 
@@ -82,44 +83,46 @@ manageWindowBorderWidth sw bw = do
 -- | Send a message to all layouts, without refreshing.
 broadcastMessage :: (Message a) => a -> HS ()
 broadcastMessage a = withWindowSet $ \ws -> do
-  -- this is O(n²), but we can't really fix this as there's code in
-  -- xmonad-contrib that touches the windowset during handleMessage
-  -- (returning Nothing for changes to not get overwritten), so we
-  -- unfortunately need to do this one by one and persist layout states
-  -- of each workspace separately)
-  let c = W.workspace . W.current $ ws
-      v = map W.workspace . W.visible $ ws
-      h = W.hidden ws
-  mapM_ (sendMessageWithNoRefresh a) (c : v ++ h)
+    -- this is O(n²), but we can't really fix this as there's code in
+    -- xmonad-contrib that touches the windowset during handleMessage
+    -- (returning Nothing for changes to not get overwritten), so we
+    -- unfortunately need to do this one by one and persist layout states
+    -- of each workspace separately)
+    let c = W.workspace . W.current $ ws
+        v = map W.workspace . W.visible $ ws
+        h = W.hidden ws
+    mapM_ (sendMessageWithNoRefresh a) (c : v ++ h)
 
--- | Throw a message to the current 'LayoutClass' possibly modifying how we
--- layout the windows, in which case changes are handled through a refresh.
+{- | Throw a message to the current 'LayoutClass' possibly modifying how we
+layout the windows, in which case changes are handled through a refresh.
+-}
 sendMessage :: (Message a) => a -> HS ()
 sendMessage a = do
-  w <- gets $ W.workspace . W.current . view windowset
-  ml' <- handleMessage (W.layout w) (SomeMessage a) `catchHS` return Nothing
-  whenJust ml' $ \l' -> do
-    modifyWindowSet $ \ws ->
-      ws
-        { W.current =
-            (W.current ws)
-              { W.workspace = (W.workspace $ W.current ws) {W.layout = l'} }
-        }
-    manageDirty
-  return ()
+    w <- gets $ W.workspace . W.current . view windowset
+    ml' <- handleMessage (W.layout w) (SomeMessage a) `catchHS` return Nothing
+    whenJust ml' $ \l' -> do
+        modifyWindowSet $ \ws ->
+            ws
+                { W.current =
+                    (W.current ws)
+                        { W.workspace = (W.workspace $ W.current ws){W.layout = l'}
+                        }
+                }
+        manageDirty
+    return ()
 
 -- | Send a message to a layout, without refreshing.
 sendMessageWithNoRefresh :: (Message a) => a -> WindowSpace -> HS ()
 sendMessageWithNoRefresh a w =
-  handleMessage (W.layout w) (SomeMessage a) `catchHS` return Nothing
-    >>= updateLayout (W.tag w)
+    handleMessage (W.layout w) (SomeMessage a) `catchHS` return Nothing
+        >>= updateLayout (W.tag w)
 
 -- | Force new manage sequence.
-manageDirty :: HasCallStack => MonadH m => m ()
+manageDirty :: (HasCallStack) => (MonadH m) => m ()
 manageDirty = liftH $ do
-  logDebug $ "wm request: manage_dirty" :# [ "stack" .= prettyCallStack callStack ]
-  withObject R.riverWindowManagerManageDirty
-  writeMainQ MainPoll
+    logDebug $ "wm request: manage_dirty" :# ["stack" .= prettyCallStack callStack]
+    withObject R.riverWindowManagerManageDirty
+    writeMainQ MainPoll
 
 --------------------------------------------------------------
 
@@ -127,46 +130,47 @@ manageDirty = liftH $ do
 
 -- NOTE: these operations can only be executed within an active render phase!
 
--- | Set the focus to the window on top of the stack, or root
---
--- /manage sequence/ focus a window in every seat.
+{- | Set the focus to the window on top of the stack, or root
+
+/manage sequence/ focus a window in every seat.
+-}
 setTopFocus :: HS ()
 setTopFocus = withWindowSet $ maybe (pure ()) setTopFocus' . W.peek
 
 -- | Set the specified window as focus (all seats).
 setTopFocus' :: RiverWindow -> HS ()
 setTopFocus' rw = mapSeats $ \s -> do
-  when (s.focused /= rw) $ do
-    withWindow_ rw $ \w -> do
-      -- logDebug $ "seat: focus window" :# [ "window" .= show rw, "seat" .= s.name ]
-      R.riverSeatFocusWindow s.river_seat rw
-      modifySeat s.river_seat $ focused .~ rw
-      -- FIXME: when focusing a newly created window, we end up here when w.x and w.y are still 0.
-      -- The position is updated a bit later by the WindowDimensions event.
-      when (s.suppressChangeFocus <= 0 && w ^. size /= Size 0 0) $ do
-        let Position x' y' = fromMaybe w.position $ listToMaybe [pos | WRPosition pos <- w.pendingRender]
-            px = x' + (fi w.size.width `div` 2)
-            py = y' + (fi w.size.height `div` 2)
-        -- logDebug $ "seat: pointer warp" :# [ "dest" .= (px, py), "seat" .= s.name, "window" .= show w.river_window ]
-        io $ R.riverSeatPointerWarp s.river_seat px py
+    when (s.focused /= rw) $ do
+        withWindow_ rw $ \w -> do
+            -- logDebug $ "seat: focus window" :# [ "window" .= show rw, "seat" .= s.name ]
+            R.riverSeatFocusWindow s.river_seat rw
+            modifySeat s.river_seat $ focused .~ rw
+            -- FIXME: when focusing a newly created window, we end up here when w.x and w.y are still 0.
+            -- The position is updated a bit later by the WindowDimensions event.
+            when (s.suppressChangeFocus <= 0 && w ^. size /= Size 0 0) $ do
+                let Position x' y' = fromMaybe w.position $ listToMaybe [pos | WRPosition pos <- w.pendingRender]
+                    px = x' + (fi w.size.width `div` 2)
+                    py = y' + (fi w.size.height `div` 2)
+                -- logDebug $ "seat: pointer warp" :# [ "dest" .= (px, py), "seat" .= s.name, "window" .= show w.river_window ]
+                io $ R.riverSeatPointerWarp s.river_seat px py
 
 seatDisableBindingsMatching :: (SomeSeat a) => a -> [ModMask] -> [KeySym] -> HS ()
 seatDisableBindingsMatching rs mods keys = withSeat_ rs $ \s -> do
-  let binds = s.xkb_bindings
-      matchedKeys = S.filter match (M.keysSet binds)
-      matchedBinds = M.fromSet (view _2 . (.unBoth) . (binds M.!)) matchedKeys
-  logInfo $ "seat: temporarily disabling bindings" :# ["count" .= length matchedBinds]
-  io . forM_ matchedBinds $ deRefStablePtr >=> R.riverXkbBindingDisable . (.riverXkbBinding)
+    let binds = s.xkb_bindings
+        matchedKeys = S.filter match (M.keysSet binds)
+        matchedBinds = M.fromSet (view _2 . (.unBoth) . (binds M.!)) matchedKeys
+    logInfo $ "seat: temporarily disabling bindings" :# ["count" .= length matchedBinds]
+    io . forM_ matchedBinds $ deRefStablePtr >=> R.riverXkbBindingDisable . (.riverXkbBinding)
   where
     match (XBKey mod' key) = any (\m -> m .&. mod' > 0) mods || key `elem` keys
 
 seatEnableBindingsMatching :: (SomeSeat a) => a -> [ModMask] -> [KeySym] -> HS ()
 seatEnableBindingsMatching rs mods keys = withSeat_ rs $ \s -> do
-  let binds = s.xkb_bindings
-      matchedKeys = S.filter match (M.keysSet binds)
-      matchedBinds = M.fromSet (view _2 . (.unBoth) . (binds M.!)) matchedKeys
-  logInfo $ "seat: restoring bindings to enabled" :# ["seat" .= show (rs ^. riverId), "count" .= length matchedBinds]
-  io . forM_ matchedBinds $ deRefStablePtr >=> R.riverXkbBindingEnable . (.riverXkbBinding)
+    let binds = s.xkb_bindings
+        matchedKeys = S.filter match (M.keysSet binds)
+        matchedBinds = M.fromSet (view _2 . (.unBoth) . (binds M.!)) matchedKeys
+    logInfo $ "seat: restoring bindings to enabled" :# ["seat" .= show (rs ^. riverId), "count" .= length matchedBinds]
+    io . forM_ matchedBinds $ deRefStablePtr >=> R.riverXkbBindingEnable . (.riverXkbBinding)
   where
     match (XBKey mod' key) = any (\m -> m .&. mod' > 0) mods || key `elem` keys
 
@@ -184,17 +188,17 @@ hide rw = withWindow_ rw $ \_ -> R.riverWindowHide rw
 -- | /render sequence/ Draw borders on the the window.
 setWindowBorder :: RiverWindow -> Int32 -> RiverColor -> HS ()
 setWindowBorder w wbWidth wbColor = withWindow_ w $ \_ -> do
-  wbEdges <- asks $ view (config . borderEdges)
-  liftIO $ riverWindowSetBorders w R.WindowBorders {..}
+    wbEdges <- asks $ view (config . borderEdges)
+    liftIO $ riverWindowSetBorders w R.WindowBorders{..}
 
 riverWindowSetBorders :: RiverWindow -> R.WindowBorders -> IO ()
-riverWindowSetBorders w R.WindowBorders {wbColor = RiverColor {..}, ..} =
-  R.riverWindowSetBorders w wbEdges wbWidth red green blue alpha
+riverWindowSetBorders w R.WindowBorders{wbColor = RiverColor{..}, ..} =
+    R.riverWindowSetBorders w wbEdges wbWidth red green blue alpha
 
 setWindowPosition :: Window -> Int32 -> Int32 -> HS ()
 setWindowPosition w x y = do
-  R.riverNodeSetPosition w.node x y
-  modifyWindow w.river_window $ _x .~ x &+ _y .~ y
+    R.riverNodeSetPosition w.node x y
+    modifyWindow w.river_window $ _x .~ x &+ _y .~ y
 
 --------------------------------------------------------------
 
@@ -204,9 +208,9 @@ setWindowPosition w x y = do
 
 -- | Given a point, determine the screen (if any) that contains it.
 pointScreen ::
-  Position1D ->
-  Position1D ->
-  HS (Maybe (W.Screen WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail ScreenId ScreenDetail))
+    Position1D ->
+    Position1D ->
+    HS (Maybe (W.Screen WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail ScreenId ScreenDetail))
 pointScreen x y = withWindowSet $ return . L.find point . W.screens
   where
     point = pointWithin x y . screenRect . W.screenDetail
@@ -214,14 +218,14 @@ pointScreen x y = withWindowSet $ return . L.find point . W.screens
 -- | Set the layout of the currently viewed workspace.
 setLayout :: Layout RiverWindow -> HS ()
 setLayout l = do
-  ss@W.StackSet {W.current = c@W.Screen {W.workspace = ws}} <- use windowset
-  _ <- handleMessage (W.layout ws) (SomeMessage ReleaseResources)
-  windows $ const $ ss {W.current = c {W.workspace = ws {W.layout = l}}}
+    ss@W.StackSet{W.current = c@W.Screen{W.workspace = ws}} <- use windowset
+    _ <- handleMessage (W.layout ws) (SomeMessage ReleaseResources)
+    windows $ const $ ss{W.current = c{W.workspace = ws{W.layout = l}}}
 
 -- | Update the layout field of a workspace.
 updateLayout :: WorkspaceId -> Maybe (Layout RiverWindow) -> HS ()
 updateLayout i ml = whenJust ml $ \l ->
-  runOnWorkspaces $ \ww -> return $ if W.tag ww == i then ww {W.layout = l} else ww
+    runOnWorkspaces $ \ww -> return $ if W.tag ww == i then ww{W.layout = l} else ww
 
 withFocused :: (Window -> HS ()) -> HS ()
 withFocused f = use windowset >>= \ws -> whenJust (W.peek ws) (`withWindow_` f)
@@ -235,43 +239,43 @@ float sw = floatLocation sw >>= mapM_ go
   where
     rw = sw ^. riverId
     go (sc, rr) = modifyWindowSet $ \ws -> W.float rw rr . fromMaybe ws $ do
-      i <- W.findTag rw ws
-      guard $ i `elem` map (W.tag . W.workspace) (W.screens ws)
-      f <- W.peek ws
-      tows <- W.lookupWorkspace sc ws
-      return (W.focusWindow f . W.shiftWin tows rw $ ws)
+        i <- W.findTag rw ws
+        guard $ i `elem` map (W.tag . W.workspace) (W.screens ws)
+        f <- W.peek ws
+        tows <- W.lookupWorkspace sc ws
+        return (W.focusWindow f . W.shiftWin tows rw $ ws)
 
--- | Given a window, find the screen it is located on, and compute
--- the geometry of that window WRT that screen.
+{- | Given a window, find the screen it is located on, and compute
+the geometry of that window WRT that screen.
+-}
 floatLocation :: (SomeWindow a) => a -> HS (Maybe (ScreenId, W.RationalRect))
 floatLocation sw = withWindow sw $ \w -> do
-  ws <- use windowset
-  let bw = 2 :: Int -- (fromIntegral . wa_border_width) wa
-  point_sc <- pointScreen (fi $ w ^. _x) (fi $ w ^. _y)
+    ws <- use windowset
+    let bw = 2 :: Int -- (fromIntegral . wa_border_width) wa
+    point_sc <- pointScreen (fi $ w ^. _x) (fi $ w ^. _y)
 
-  -- ignore pointScreen for new windows unless it's the current
-  -- screen, otherwise the float's relative size is computed against
-  -- a different screen and the float ends up with the wrong size
-  let sr_eq = (==) `on` fmap (screenRect . W.screenDetail)
-      sc =
-        fromMaybe (W.current ws) $
-          if point_sc `sr_eq` Just (W.current ws) then point_sc else Nothing
-      sr = screenRect . W.screenDetail $ sc
-      x = (fi w.position.x - fi sr.position.x) % fi sr.size.width
-      y = (fi w.position.y - fi sr.position.y) % fi sr.size.height
-      (width', height') = {- applySizeHintsContents sh -} (fi w.size.width, fi w.size.height)
-      rwidth = fi (width' + bw * 2) % fi sr.size.width
-      rheight = fi (height' + bw * 2) % fi sr.size.height
-      -- adjust x/y of unmanaged windows if we ignored or didn't get pointScreen,
-      -- it might be out of bounds otherwise
-      rr =
-        if point_sc `sr_eq` Just sc
-          then W.RationalRect x y rwidth rheight
-          else W.RationalRect (0.5 - rwidth / 2) (0.5 - rheight / 2) rwidth rheight
+    -- ignore pointScreen for new windows unless it's the current
+    -- screen, otherwise the float's relative size is computed against
+    -- a different screen and the float ends up with the wrong size
+    let sr_eq = (==) `on` fmap (screenRect . W.screenDetail)
+        sc =
+            fromMaybe (W.current ws) $
+                if point_sc `sr_eq` Just (W.current ws) then point_sc else Nothing
+        sr = screenRect . W.screenDetail $ sc
+        x = (fi w.position.x - fi sr.position.x) % fi sr.size.width
+        y = (fi w.position.y - fi sr.position.y) % fi sr.size.height
+        (width', height') = {- applySizeHintsContents sh -} (fi w.size.width, fi w.size.height)
+        rwidth = fi (width' + bw * 2) % fi sr.size.width
+        rheight = fi (height' + bw * 2) % fi sr.size.height
+        -- adjust x/y of unmanaged windows if we ignored or didn't get pointScreen,
+        -- it might be out of bounds otherwise
+        rr =
+            if point_sc `sr_eq` Just sc
+                then W.RationalRect x y rwidth rheight
+                else W.RationalRect (0.5 - rwidth / 2) (0.5 - rheight / 2) rwidth rheight
 
-  return (W.screen sc, rr)
+    return (W.screen sc, rr)
 
--- |
 windows :: (WindowSet -> WindowSet) -> HS ()
 windows = modifyWindowSet
 
@@ -286,16 +290,17 @@ modifyWindowSet = modifying windowset
 screenWorkspace :: ScreenId -> HS (Maybe WorkspaceId)
 screenWorkspace sc = withWindowSet $ return . W.lookupWorkspace sc
 
--- | This is basically a map function, running a function in the 'H' monad on
--- each workspace with the output of that function being the modified workspace.
+{- | This is basically a map function, running a function in the 'H' monad on
+each workspace with the output of that function being the modified workspace.
+-}
 runOnWorkspaces :: (WindowSpace -> HS WindowSpace) -> HS ()
 runOnWorkspaces job = do
-  ws <- use windowset
-  h <- mapM job $ W.hidden ws
-  c : v <-
-    mapM (\s -> (\w -> s {W.workspace = w}) <$> job (W.workspace s)) $
-      W.current ws : W.visible ws
-  modify $ \s -> s {windowset = ws {W.current = c, W.visible = v, W.hidden = h}}
+    ws <- use windowset
+    h <- mapM job $ W.hidden ws
+    c : v <-
+        mapM (\s -> (\w -> s{W.workspace = w}) <$> job (W.workspace s)) $
+            W.current ws : W.visible ws
+    modify $ \s -> s{windowset = ws{W.current = c, W.visible = v, W.hidden = h}}
 
 --------------------------------------------------------------
 
@@ -318,14 +323,14 @@ modifyOutput k f = outputList . eachRiverId k %= f
 
 setOutputPower :: Bool -> HS ()
 setOutputPower mode = do
-  use outputList >>= traverseOf_ (each . filtered ((/= def) . view outputPower)) f
+    use outputList >>= traverseOf_ (each . filtered ((/= def) . view outputPower)) f
   where
     f output = do
-      logInfo $ "Setting output power" :# ["on" .= mode, "output" .= show output.river_output, "opmId" .= show output.outputPower]
-      WLR_OPM.outputPowerSetMode output.outputPower $
-        if mode
-          then WLR_OPM.OutputPowerModeOn
-          else WLR_OPM.OutputPowerModeOff
+        logInfo $ "Setting output power" :# ["on" .= mode, "output" .= show output.river_output, "opmId" .= show output.outputPower]
+        WLR_OPM.outputPowerSetMode output.outputPower $
+            if mode
+                then WLR_OPM.OutputPowerModeOn
+                else WLR_OPM.OutputPowerModeOff
 
 withScreenOutput :: ScreenId -> (Output -> HS ()) -> HS ()
 withScreenOutput sid f = mapM_ f . L.find (\o -> o.screen == sid) =<< use outputList
@@ -392,20 +397,20 @@ mapWindows f = use _windows >>= mapM_ f
 
 -- * Restart (with state)
 
-restart :: HasCallStack => FilePath -> H ()
+restart :: (HasCallStack) => FilePath -> H ()
 restart prog = do
-  runInHS $ broadcastMessage ReleaseResources
-  logInfo $ "Running exit hooks..."
-  void . userCode =<< asks (view $ config . exitHook)
-  statefile <- runInHS Persist.writeStateToFile
-  let args = ["--state-file", statefile]
-  logInfo $ "Now restarting! Executing file " <> toText prog <> "..." :# ["args" .= args]
-  io =<< view _loggerCleanup
-  res <- io $ try $ executeFile prog True args Nothing
-  logError $
-    "Uh-oh, executing the new program appears to have failed!"
-      :# ["reason" .= show e | Left (e :: IOException) <- [res]]
+    runInHS $ broadcastMessage ReleaseResources
+    logInfo $ "Running exit hooks..."
+    void . userCode =<< asks (view $ config . exitHook)
+    statefile <- runInHS Persist.writeStateToFile
+    let args = ["--state-file", statefile]
+    logInfo $ "Now restarting! Executing file " <> toText prog <> "..." :# ["args" .= args]
+    io =<< view _loggerCleanup
+    res <- io $ try $ executeFile prog True args Nothing
+    logError $
+        "Uh-oh, executing the new program appears to have failed!"
+            :# ["reason" .= show e | Left (e :: IOException) <- [res]]
 
 -- | Trigger restart by signal (USR2).
-sendRestart :: MonadIO m => m ()
+sendRestart :: (MonadIO m) => m ()
 sendRestart = io $ Posix.raiseSignal Posix.sigUSR2

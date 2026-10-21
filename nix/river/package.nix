@@ -1,58 +1,65 @@
-{ lib
-, stdenv
-, callPackage
-, runCommand
+{
+  lib,
+  stdenv,
+  callPackage,
+  runCommand,
 
-, src
-, depsHash ? ""
-, zigEnv
-, my-lib
-, updateRiverDeps
+  src,
+  depsHash ? "",
+  zigEnv,
+  my-lib,
+  updateRiverDeps,
 
-, libGL
-, libx11
-, libevdev
-, libinput
-, libxkbcommon
-, pixman
-, pkg-config
-, scdoc
-, udev
-, versionCheckHook
-, wayland
-, wayland-protocols
-, wayland-scanner
-, wlroots_0_20
-, xwayland
-, zig # tested with 0.16...
-, withManpages ? true
-, xwaylandSupport ? true
-, withDebug ? false
-, useLLVM ? stdenv.hostPlatform.isLinux || (stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isx86_64)
+  libGL,
+  libx11,
+  libevdev,
+  libinput,
+  libxkbcommon,
+  pixman,
+  pkg-config,
+  scdoc,
+  udev,
+  versionCheckHook,
+  wayland,
+  wayland-protocols,
+  wayland-scanner,
+  wlroots_0_20,
+  xwayland,
+  zig, # tested with 0.16...
+  withManpages ? true,
+  xwaylandSupport ? true,
+  withDebug ? false,
+  useLLVM ?
+    stdenv.hostPlatform.isLinux || (stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isx86_64),
 }:
 
 let
-  readZigZonVersion = file: lib.fileContents (runCommand "get-version" { } ''
-    sed -nE '/\.version =/s/^.*?"(.+-dev|.+)".*$/\1/p' ${file} >$out
-  '');
-
+  readZigZonVersion =
+    file:
+    lib.fileContents (
+      runCommand "get-version" { } ''
+        sed -nE '/\.version =/s/^.*?"(.+-dev|.+)".*$/\1/p' ${file} >$out
+      ''
+    );
 
   # Unpack all deps in case they are tarballs for use with zig build "--system"
-  prepareZigDB = src: runCommand "zig-packages"
-    {
-      passthru = { inherit src; };
-    }
-    ''
-      mkdir -p $out
-      for pkg in ${src}/*; do
-        if [[ -d $(readlink -f "$pkg") ]]; then
-          echo "error: is directory:  (cp -rv --no-preserve=all '$pkg/ $out/$name)"
-          exit 1
-        else
-          tar -xf "$pkg" -C $out
-        fi
-      done
-    '';
+  prepareZigDB =
+    src:
+    runCommand "zig-packages"
+      {
+        passthru = { inherit src; };
+      }
+      ''
+        mkdir -p $out
+        for pkg in ${src}/*; do
+          if [[ -d $(readlink -f "$pkg") ]]; then
+            echo "error: is directory:  (cp -rv --no-preserve=all '$pkg/ $out/$name)"
+            exit 1
+          else
+            tar -xf "$pkg" -C $out
+          fi
+        done
+      '';
 
   build-zig-zon-nix = my-lib.mkFOD {
     inherit src;
@@ -74,9 +81,11 @@ stdenv.mkDerivation (finalAttrs: {
   version =
     readZigZonVersion (toString src + "/build.zig.zon")
     # in case src is a flake input, add extra info to version
-    + lib.optionalString (lib.isAttrs src && src ? sourceInfo)
-      (lib.optionalString (src.sourceInfo ? lastModifiedDate) "+${lib.substring 0 8 src.sourceInfo.lastModifiedDate}" +
-      lib.optionalString (src.sourceInfo ? shortRev) "-g${src.sourceInfo.shortRev}");
+    + lib.optionalString (lib.isAttrs src && src ? sourceInfo) (
+      lib.optionalString (src.sourceInfo ? lastModifiedDate)
+        "+${lib.substring 0 8 src.sourceInfo.lastModifiedDate}"
+      + lib.optionalString (src.sourceInfo ? shortRev) "-g${src.sourceInfo.shortRev}"
+    );
 
   outputs = [ "out" ] ++ lib.optionals withManpages [ "man" ];
 

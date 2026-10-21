@@ -1,725 +1,795 @@
-{-# LANGUAGE PatternSynonyms     #-}
+{-# LANGUAGE PatternSynonyms #-}
 {-# OPTIONS_GHC -Wno-missing-pattern-synonym-signatures #-}
 
--- |
--- Module      : Wayland
--- Description : Wayland bindings
--- Copyright   : (c) Samuli Thomasson, 2026
---
--- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
--- Stability   : unstable
--- Portability : unportable
---
-module WL.Client
-  -- * Objects
-  ( IsWlObject(..)
-  , HasDestructor(..)
-  , HasInterface(..)
-  , Version
-  , ObjectName
-  , getObjectId
-  , getObjectDisplay
-  -- ** Object Tags
-  , Tag
-  , newTag
-  , getObjectTag
-  , setObjectTag
-  -- ** Listeners
-  , HasListener(..)
-  , IsUserData(..)
-  , listenerAdd
-  , listenerAdd_
+{- |
+Module      : Wayland
+Description : Wayland bindings
+Copyright   : (c) Samuli Thomasson, 2026
 
-  -- * Exceptions
-  , WaylandClientException(..)
+Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
+Stability   : unstable
+Portability : unportable
+-}
+module WL.Client (
+    -- * Objects
+    IsWlObject (..),
+    HasDestructor (..),
+    HasInterface (..),
+    Version,
+    ObjectName,
+    getObjectId,
+    getObjectDisplay,
 
-  -- * Display
-  , Display
-  -- ** Events
-  , DisplayEvent(..)
-  -- ** Create EventQueue
-  , displayCreateQueue
-  , displayCreateQueueWithName
-  -- ** EventQueue
-  , EventQueue
-  , eventQueueGetName
-  -- ** Connect
-  , Client.displayConnect
-  , Client.displayConnectToFd
-  -- ** Disconnect
-  , Client.displayDisconnect
-  -- ** Get Registry
-  , Client.displayGetRegistry
-  -- ** SetMaxBufferSize
-  , Client.displaySetMaxBufferSize
-  -- ** Roundtrip
-  , Client.displayRoundtrip
-  , Client.displayRoundtripQueue
-  -- ** Flush
-  , Client.displayFlush
-  -- ** Sync
-  , Client.displaySync
-  -- ** Read / prepare read
-  , Client.displayReadEvents
-  , Client.displayPrepareReadQueue
-  , Client.displayPrepareRead
-  , Client.displayCancelRead
-  -- ** Dispatch
-  , Client.displayDispatch
-  , Client.displayDispatchQueue
-  , Client.displayDispatchTimeout
-  , Client.displayDispatchQueueTimeout
-  , Client.displayDispatchQueuePending
-  , Client.displayDispatchPending
-  -- ** Misc.
-  , Client.displayThrowIfError
-  , Client.displayGetFd
-  , Client.displayGetError
-  , Client.displayGetProtocolError
+    -- ** Object Tags
+    Tag,
+    newTag,
+    getObjectTag,
+    setObjectTag,
 
-  -- * Registry & Globals
-  , module WL.Client.Registry
+    -- ** Listeners
+    HasListener (..),
+    IsUserData (..),
+    listenerAdd,
+    listenerAdd_,
 
-  -- * Callback
-  , Callback
-  -- ** Events
-  , CallbackEvent(..)
+    -- * Exceptions
+    WaylandClientException (..),
 
-  -- * Compositor
-  , Compositor
-  -- ** CreateSurface
-  , Client.compositorCreateSurface
-  -- ** CreateRegion
-  , withNewRegion
-  , Client.compositorCreateRegion
+    -- * Display
+    Display,
 
-  -- * ShmPool
-  , ShmPool
-  -- ** CreateBuffer
-  , Client.shmPoolCreateBuffer
-  -- ** Resize
-  , Client.shmPoolResize
+    -- ** Events
+    DisplayEvent (..),
 
-  -- * Shm
-  , Shm
-  -- ** Events
-  , ShmEvent(..)
-  -- ** CreatePool
-  , shmCreatePool
-  -- ** SHM Formats
-  , ShmFormat
-  , pattern ShmFormatARGB8888
-  , pattern ShmFormatXRGB8888
-  , pattern ShmFormatC8
-  , pattern ShmFormatRGB332
-  , pattern ShmFormatBGR233
-  , pattern ShmFormatXRGB4444
-  , pattern ShmFormatXBGR4444
-  , pattern ShmFormatRGBX4444
-  , pattern ShmFormatBGRX4444
-  , pattern ShmFormatARGB4444
-  , pattern ShmFormatABGR4444
-  , pattern ShmFormatRGBA4444
-  , pattern ShmFormatBGRA4444
-  , pattern ShmFormatXRGB1555
-  , pattern ShmFormatXBGR1555
-  , pattern ShmFormatRGBX5551
-  , pattern ShmFormatBGRX5551
-  , pattern ShmFormatARGB1555
-  , pattern ShmFormatABGR1555
-  , pattern ShmFormatRGBA5551
-  , pattern ShmFormatBGRA5551
-  , pattern ShmFormatRGB565
-  , pattern ShmFormatBGR565
-  , pattern ShmFormatRGB888
-  , pattern ShmFormatBGR888
-  , pattern ShmFormatXBGR8888
-  , pattern ShmFormatRGBX8888
-  , pattern ShmFormatBGRX8888
-  , pattern ShmFormatABGR8888
-  , pattern ShmFormatRGBA8888
-  , pattern ShmFormatBGRA8888
-  , pattern ShmFormatXRGB2101010
-  , pattern ShmFormatXBGR2101010
-  , pattern ShmFormatRGBX1010102
-  , pattern ShmFormatBGRX1010102
-  , pattern ShmFormatARGB2101010
-  , pattern ShmFormatABGR2101010
-  , pattern ShmFormatRGBA1010102
-  , pattern ShmFormatBGRA1010102
-  , pattern ShmFormatYUYV
-  , pattern ShmFormatYVYU
-  , pattern ShmFormatUYVY
-  , pattern ShmFormatVYUY
-  , pattern ShmFormatAYUV
-  , pattern ShmFormatNV12
-  , pattern ShmFormatNV21
-  , pattern ShmFormatNV16
-  , pattern ShmFormatNV61
-  , pattern ShmFormatYUV410
-  , pattern ShmFormatYVU410
-  , pattern ShmFormatYUV411
-  , pattern ShmFormatYVU411
-  , pattern ShmFormatYUV420
-  , pattern ShmFormatYVU420
-  , pattern ShmFormatYUV422
-  , pattern ShmFormatYVU422
-  , pattern ShmFormatYUV444
-  , pattern ShmFormatYVU444
-  , pattern ShmFormatR8
-  , pattern ShmFormatR16
-  , pattern ShmFormatRG88
-  , pattern ShmFormatGR88
-  , pattern ShmFormatRG1616
-  , pattern ShmFormatGR1616
-  , pattern ShmFormatXRGB16161616F
-  , pattern ShmFormatXBGR16161616F
-  , pattern ShmFormatARGB16161616F
-  , pattern ShmFormatABGR16161616F
-  , pattern ShmFormatXYUV8888
-  , pattern ShmFormatVUY888
-  , pattern ShmFormatVUY101010
-  , pattern ShmFormatY210
-  , pattern ShmFormatY212
-  , pattern ShmFormatY216
-  , pattern ShmFormatY410
-  , pattern ShmFormatY412
-  , pattern ShmFormatY416
-  , pattern ShmFormatXVYU2101010
-  , pattern ShmFormatXVYU12_16161616
-  , pattern ShmFormatXVYU16161616
-  , pattern ShmFormatY0L0
-  , pattern ShmFormatX0L0
-  , pattern ShmFormatY0L2
-  , pattern ShmFormatX0L2
-  , pattern ShmFormatYUV420_8BIT
-  , pattern ShmFormatYUV420_10BIT
-  , pattern ShmFormatXRGB8888_A8
-  , pattern ShmFormatXBGR8888_A8
-  , pattern ShmFormatRGBX8888_A8
-  , pattern ShmFormatBGRX8888_A8
-  , pattern ShmFormatRGB888_A8
-  , pattern ShmFormatBGR888_A8
-  , pattern ShmFormatRGB565_A8
-  , pattern ShmFormatBGR565_A8
-  , pattern ShmFormatNV24
-  , pattern ShmFormatNV42
-  , pattern ShmFormatP210
-  , pattern ShmFormatP010
-  , pattern ShmFormatP012
-  , pattern ShmFormatP016
-  , pattern ShmFormatAXBXGXRX106106106106
-  , pattern ShmFormatNV15
-  , pattern ShmFormatQ410
-  , pattern ShmFormatQ401
-  , pattern ShmFormatXRGB16161616
-  , pattern ShmFormatXBGR16161616
-  , pattern ShmFormatARGB16161616
-  , pattern ShmFormatABGR16161616
-  , pattern ShmFormatC1
-  , pattern ShmFormatC2
-  , pattern ShmFormatC4
-  , pattern ShmFormatD1
-  , pattern ShmFormatD2
-  , pattern ShmFormatD4
-  , pattern ShmFormatD8
-  , pattern ShmFormatR1
-  , pattern ShmFormatR2
-  , pattern ShmFormatR4
-  , pattern ShmFormatR10
-  , pattern ShmFormatR12
-  , pattern ShmFormatAVUY8888
-  , pattern ShmFormatXVUY8888
-  , pattern ShmFormatP030
+    -- ** Create EventQueue
+    displayCreateQueue,
+    displayCreateQueueWithName,
 
-  -- * Buffer
-  , Buffer
-  -- ** Events
-  , BufferEvent(..)
+    -- ** EventQueue
+    EventQueue,
+    eventQueueGetName,
 
-  -- * Shell
-  , Shell
-  -- ** GetShellSurface
-  , Client.shellGetShellSurface
+    -- ** Connect
+    Client.displayConnect,
+    Client.displayConnectToFd,
 
-  -- * ShellSurface
-  , ShellSurface
-  -- ** Events
-  , ShellSurfaceEvent(..)
-  -- ** Pong
-  , shellSurfacePong
-  -- ** Move
-  , shellSurfaceMove
-  -- ** Resize
-  , shellSurfaceResize
-  -- ** SetTopLevel
-  , shellSurfaceSetToplevel
-  -- ** SetTransient
-  , shellSurfaceSetTransient
-  -- ** SetFullscreen
-  , shellSurfaceSetFullscreen
-  -- ** SetPopup
-  , shellSurfaceSetPopup
-  -- ** SetMaximized
-  , shellSurfaceSetMaximized
-  -- ** SetTitle
-  , shellSurfaceSetTitle
-  -- ** SetClass
-  , shellSurfaceSetClass
-  -- ** Enum: Resize
-  , ShellSurfaceResize
-  , pattern ShellSurfaceResizeNone
-  , pattern ShellSurfaceResizeTop
-  , pattern ShellSurfaceResizeBottom
-  , pattern ShellSurfaceResizeLeft
-  , pattern ShellSurfaceResizeTopLeft
-  , pattern ShellSurfaceResizeBottomLeft
-  , pattern ShellSurfaceResizeRight
-  , pattern ShellSurfaceResizeTopRight
-  , pattern ShellSurfaceResizeBottomRight
-  -- ** Enum: FullScreenMethod
-  , ShellSurfaceFullscreenMethod
-  , pattern ShellSurfaceFullscreenMethodDefault
-  , pattern ShellSurfaceFullscreenMethodScale
-  , pattern ShellSurfaceFullscreenMethodDriver
-  , pattern ShellSurfaceFullscreenMethodFill
-  -- ** Enum: Transient
-  , ShellSurfaceTransient
-  , pattern ShellSurfaceTransientInactive
+    -- ** Disconnect
+    Client.displayDisconnect,
 
-  -- * Surface
-  , Surface
-  -- ** Events
-  , SurfaceEvent(..)
-  -- ** Methods
-  , surfaceAttach
-  , surfaceDamage
-  , surfaceFrame
-  , surfaceSetOpaqueRegion
-  , surfaceSetInputRegion
-  , surfaceCommit
-  , surfaceSetBufferTransform
-  , surfaceSetBufferScale
-  , surfaceDamageBuffer
-  , surfaceOffset
+    -- ** Get Registry
+    Client.displayGetRegistry,
 
-  -- * Seat
-  , Seat
-  -- ** Events
-  , SeatEvent(..)
-  -- ** Methods
-  , seatGetPointer
-  , seatGetKeyboard
-  , seatGetTouch
-  -- ** SeatCapability (enum)
-  , SeatCapability
-  , pattern SeatCapabilityPointer
-  , pattern SeatCapabilityKeyboard
-  , pattern SeatCapabilityTouch
-  , parseSeatCapabilities
+    -- ** SetMaxBufferSize
+    Client.displaySetMaxBufferSize,
 
-  -- * Pointer
-  , Pointer
-  -- ** Events
-  , PointerEvent(..)
-  -- ** SetCursor
-  , pointerSetCursor
-  -- ** ButtonState
-  , PointerButtonState
-  , pattern PointerButtonStateReleased
-  , pattern PointerButtonStatePressed
-  -- ** Axis
-  , PointerAxis
-  , pattern PointerAxisVerticalScroll
-  , pattern PointerAxisHorizontalScroll
-  -- ** AxisSource
-  , PointerAxisSource
-  , pattern PointerAxisSourceWheel
-  , pattern PointerAxisSourceFinger
-  , pattern PointerAxisSourceContinuous
-  , pattern PointerAxisSourceWheelTilt
-  -- ** AxisRelativeDirection
-  , PointerAxisRelativeDirection
-  , pattern PointerAxisRelativeDirectionIdentical
-  , pattern PointerAxisRelativeDirectionInverted
+    -- ** Roundtrip
+    Client.displayRoundtrip,
+    Client.displayRoundtripQueue,
 
-  -- * Keyboard
-  , Keyboard
-  -- ** Events
-  , KeyboardEvent(..)
-  -- * KeymapFormat
-  , KeyboardKeymapFormat
-  , pattern KeyboardKeymapFormatNoKeymap
-  , pattern KeyboardKeymapFormatXkbV1
-  -- ** KeyState
-  , KeyboardKeyState
-  , pattern KeyboardKeyStateReleased
-  , pattern KeyboardKeyStatePressed
-  , pattern KeyboardKeyStateRepeated
+    -- ** Flush
+    Client.displayFlush,
 
-  -- * Touch
-  , Touch
-  -- ** Events
-  , TouchEvent(..)
+    -- ** Sync
+    Client.displaySync,
 
-  -- * Output
-  , Output
-  -- ** Events
-  , OutputEvent(..)
-  -- ** Enums
-  , OutputSubpixel
-  , OutputTransform
-  , OutputMode
+    -- ** Read / prepare read
+    Client.displayReadEvents,
+    Client.displayPrepareReadQueue,
+    Client.displayPrepareRead,
+    Client.displayCancelRead,
 
-  -- * Region
-  , Region
-  -- ** Add
-  , regionAdd
-  -- ** Subtract
-  , regionSubtract
+    -- ** Dispatch
+    Client.displayDispatch,
+    Client.displayDispatchQueue,
+    Client.displayDispatchTimeout,
+    Client.displayDispatchQueueTimeout,
+    Client.displayDispatchQueuePending,
+    Client.displayDispatchPending,
 
-  -- * Subcompositor
-  , Subcompositor
-  -- ** GetSubsurface
-  , subcompositorGetSubsurface
+    -- ** Misc.
+    Client.displayThrowIfError,
+    Client.displayGetFd,
+    Client.displayGetError,
+    Client.displayGetProtocolError,
 
-  -- * Subsurface
-  , Subsurface
-  -- ** Methods
-  , subsurfaceSetPosition
-  , subsurfacePlaceAbove
-  , subsurfacePlaceBelow
-  , subsurfaceSetSync
-  , subsurfaceSetDesync
+    -- * Registry & Globals
+    module WL.Client.Registry,
 
-  -- * DataOffer
-  , DataOffer
+    -- * Callback
+    Callback,
 
-  -- * DataSource
-  , DataSource
+    -- ** Events
+    CallbackEvent (..),
 
-  -- * DataDevice
-  , DataDevice
+    -- * Compositor
+    Compositor,
 
-  -- * DataDeviceManager
-  , DataDeviceManager
+    -- ** CreateSurface
+    Client.compositorCreateSurface,
 
-  -- * Wayland.Util
-  , module WL.Util
-  -- * Core Enums
-  , module WL.Core.Enums
-  -- * Misc
-  , CEnum.CEnum(..)
-  ) where
+    -- ** CreateRegion
+    withNewRegion,
+    Client.compositorCreateRegion,
+
+    -- * ShmPool
+    ShmPool,
+
+    -- ** CreateBuffer
+    Client.shmPoolCreateBuffer,
+
+    -- ** Resize
+    Client.shmPoolResize,
+
+    -- * Shm
+    Shm,
+
+    -- ** Events
+    ShmEvent (..),
+
+    -- ** CreatePool
+    shmCreatePool,
+
+    -- ** SHM Formats
+    ShmFormat,
+    pattern ShmFormatARGB8888,
+    pattern ShmFormatXRGB8888,
+    pattern ShmFormatC8,
+    pattern ShmFormatRGB332,
+    pattern ShmFormatBGR233,
+    pattern ShmFormatXRGB4444,
+    pattern ShmFormatXBGR4444,
+    pattern ShmFormatRGBX4444,
+    pattern ShmFormatBGRX4444,
+    pattern ShmFormatARGB4444,
+    pattern ShmFormatABGR4444,
+    pattern ShmFormatRGBA4444,
+    pattern ShmFormatBGRA4444,
+    pattern ShmFormatXRGB1555,
+    pattern ShmFormatXBGR1555,
+    pattern ShmFormatRGBX5551,
+    pattern ShmFormatBGRX5551,
+    pattern ShmFormatARGB1555,
+    pattern ShmFormatABGR1555,
+    pattern ShmFormatRGBA5551,
+    pattern ShmFormatBGRA5551,
+    pattern ShmFormatRGB565,
+    pattern ShmFormatBGR565,
+    pattern ShmFormatRGB888,
+    pattern ShmFormatBGR888,
+    pattern ShmFormatXBGR8888,
+    pattern ShmFormatRGBX8888,
+    pattern ShmFormatBGRX8888,
+    pattern ShmFormatABGR8888,
+    pattern ShmFormatRGBA8888,
+    pattern ShmFormatBGRA8888,
+    pattern ShmFormatXRGB2101010,
+    pattern ShmFormatXBGR2101010,
+    pattern ShmFormatRGBX1010102,
+    pattern ShmFormatBGRX1010102,
+    pattern ShmFormatARGB2101010,
+    pattern ShmFormatABGR2101010,
+    pattern ShmFormatRGBA1010102,
+    pattern ShmFormatBGRA1010102,
+    pattern ShmFormatYUYV,
+    pattern ShmFormatYVYU,
+    pattern ShmFormatUYVY,
+    pattern ShmFormatVYUY,
+    pattern ShmFormatAYUV,
+    pattern ShmFormatNV12,
+    pattern ShmFormatNV21,
+    pattern ShmFormatNV16,
+    pattern ShmFormatNV61,
+    pattern ShmFormatYUV410,
+    pattern ShmFormatYVU410,
+    pattern ShmFormatYUV411,
+    pattern ShmFormatYVU411,
+    pattern ShmFormatYUV420,
+    pattern ShmFormatYVU420,
+    pattern ShmFormatYUV422,
+    pattern ShmFormatYVU422,
+    pattern ShmFormatYUV444,
+    pattern ShmFormatYVU444,
+    pattern ShmFormatR8,
+    pattern ShmFormatR16,
+    pattern ShmFormatRG88,
+    pattern ShmFormatGR88,
+    pattern ShmFormatRG1616,
+    pattern ShmFormatGR1616,
+    pattern ShmFormatXRGB16161616F,
+    pattern ShmFormatXBGR16161616F,
+    pattern ShmFormatARGB16161616F,
+    pattern ShmFormatABGR16161616F,
+    pattern ShmFormatXYUV8888,
+    pattern ShmFormatVUY888,
+    pattern ShmFormatVUY101010,
+    pattern ShmFormatY210,
+    pattern ShmFormatY212,
+    pattern ShmFormatY216,
+    pattern ShmFormatY410,
+    pattern ShmFormatY412,
+    pattern ShmFormatY416,
+    pattern ShmFormatXVYU2101010,
+    pattern ShmFormatXVYU12_16161616,
+    pattern ShmFormatXVYU16161616,
+    pattern ShmFormatY0L0,
+    pattern ShmFormatX0L0,
+    pattern ShmFormatY0L2,
+    pattern ShmFormatX0L2,
+    pattern ShmFormatYUV420_8BIT,
+    pattern ShmFormatYUV420_10BIT,
+    pattern ShmFormatXRGB8888_A8,
+    pattern ShmFormatXBGR8888_A8,
+    pattern ShmFormatRGBX8888_A8,
+    pattern ShmFormatBGRX8888_A8,
+    pattern ShmFormatRGB888_A8,
+    pattern ShmFormatBGR888_A8,
+    pattern ShmFormatRGB565_A8,
+    pattern ShmFormatBGR565_A8,
+    pattern ShmFormatNV24,
+    pattern ShmFormatNV42,
+    pattern ShmFormatP210,
+    pattern ShmFormatP010,
+    pattern ShmFormatP012,
+    pattern ShmFormatP016,
+    pattern ShmFormatAXBXGXRX106106106106,
+    pattern ShmFormatNV15,
+    pattern ShmFormatQ410,
+    pattern ShmFormatQ401,
+    pattern ShmFormatXRGB16161616,
+    pattern ShmFormatXBGR16161616,
+    pattern ShmFormatARGB16161616,
+    pattern ShmFormatABGR16161616,
+    pattern ShmFormatC1,
+    pattern ShmFormatC2,
+    pattern ShmFormatC4,
+    pattern ShmFormatD1,
+    pattern ShmFormatD2,
+    pattern ShmFormatD4,
+    pattern ShmFormatD8,
+    pattern ShmFormatR1,
+    pattern ShmFormatR2,
+    pattern ShmFormatR4,
+    pattern ShmFormatR10,
+    pattern ShmFormatR12,
+    pattern ShmFormatAVUY8888,
+    pattern ShmFormatXVUY8888,
+    pattern ShmFormatP030,
+
+    -- * Buffer
+    Buffer,
+
+    -- ** Events
+    BufferEvent (..),
+
+    -- * Shell
+    Shell,
+
+    -- ** GetShellSurface
+    Client.shellGetShellSurface,
+
+    -- * ShellSurface
+    ShellSurface,
+
+    -- ** Events
+    ShellSurfaceEvent (..),
+
+    -- ** Pong
+    shellSurfacePong,
+
+    -- ** Move
+    shellSurfaceMove,
+
+    -- ** Resize
+    shellSurfaceResize,
+
+    -- ** SetTopLevel
+    shellSurfaceSetToplevel,
+
+    -- ** SetTransient
+    shellSurfaceSetTransient,
+
+    -- ** SetFullscreen
+    shellSurfaceSetFullscreen,
+
+    -- ** SetPopup
+    shellSurfaceSetPopup,
+
+    -- ** SetMaximized
+    shellSurfaceSetMaximized,
+
+    -- ** SetTitle
+    shellSurfaceSetTitle,
+
+    -- ** SetClass
+    shellSurfaceSetClass,
+
+    -- ** Enum: Resize
+    ShellSurfaceResize,
+    pattern ShellSurfaceResizeNone,
+    pattern ShellSurfaceResizeTop,
+    pattern ShellSurfaceResizeBottom,
+    pattern ShellSurfaceResizeLeft,
+    pattern ShellSurfaceResizeTopLeft,
+    pattern ShellSurfaceResizeBottomLeft,
+    pattern ShellSurfaceResizeRight,
+    pattern ShellSurfaceResizeTopRight,
+    pattern ShellSurfaceResizeBottomRight,
+
+    -- ** Enum: FullScreenMethod
+    ShellSurfaceFullscreenMethod,
+    pattern ShellSurfaceFullscreenMethodDefault,
+    pattern ShellSurfaceFullscreenMethodScale,
+    pattern ShellSurfaceFullscreenMethodDriver,
+    pattern ShellSurfaceFullscreenMethodFill,
+
+    -- ** Enum: Transient
+    ShellSurfaceTransient,
+    pattern ShellSurfaceTransientInactive,
+
+    -- * Surface
+    Surface,
+
+    -- ** Events
+    SurfaceEvent (..),
+
+    -- ** Methods
+    surfaceAttach,
+    surfaceDamage,
+    surfaceFrame,
+    surfaceSetOpaqueRegion,
+    surfaceSetInputRegion,
+    surfaceCommit,
+    surfaceSetBufferTransform,
+    surfaceSetBufferScale,
+    surfaceDamageBuffer,
+    surfaceOffset,
+
+    -- * Seat
+    Seat,
+
+    -- ** Events
+    SeatEvent (..),
+
+    -- ** Methods
+    seatGetPointer,
+    seatGetKeyboard,
+    seatGetTouch,
+
+    -- ** SeatCapability (enum)
+    SeatCapability,
+    pattern SeatCapabilityPointer,
+    pattern SeatCapabilityKeyboard,
+    pattern SeatCapabilityTouch,
+    parseSeatCapabilities,
+
+    -- * Pointer
+    Pointer,
+
+    -- ** Events
+    PointerEvent (..),
+
+    -- ** SetCursor
+    pointerSetCursor,
+
+    -- ** ButtonState
+    PointerButtonState,
+    pattern PointerButtonStateReleased,
+    pattern PointerButtonStatePressed,
+
+    -- ** Axis
+    PointerAxis,
+    pattern PointerAxisVerticalScroll,
+    pattern PointerAxisHorizontalScroll,
+
+    -- ** AxisSource
+    PointerAxisSource,
+    pattern PointerAxisSourceWheel,
+    pattern PointerAxisSourceFinger,
+    pattern PointerAxisSourceContinuous,
+    pattern PointerAxisSourceWheelTilt,
+
+    -- ** AxisRelativeDirection
+    PointerAxisRelativeDirection,
+    pattern PointerAxisRelativeDirectionIdentical,
+    pattern PointerAxisRelativeDirectionInverted,
+
+    -- * Keyboard
+    Keyboard,
+
+    -- ** Events
+    KeyboardEvent (..),
+
+    -- * KeymapFormat
+    KeyboardKeymapFormat,
+    pattern KeyboardKeymapFormatNoKeymap,
+    pattern KeyboardKeymapFormatXkbV1,
+
+    -- ** KeyState
+    KeyboardKeyState,
+    pattern KeyboardKeyStateReleased,
+    pattern KeyboardKeyStatePressed,
+    pattern KeyboardKeyStateRepeated,
+
+    -- * Touch
+    Touch,
+
+    -- ** Events
+    TouchEvent (..),
+
+    -- * Output
+    Output,
+
+    -- ** Events
+    OutputEvent (..),
+
+    -- ** Enums
+    OutputSubpixel,
+    OutputTransform,
+    OutputMode,
+
+    -- * Region
+    Region,
+
+    -- ** Add
+    regionAdd,
+
+    -- ** Subtract
+    regionSubtract,
+
+    -- * Subcompositor
+    Subcompositor,
+
+    -- ** GetSubsurface
+    subcompositorGetSubsurface,
+
+    -- * Subsurface
+    Subsurface,
+
+    -- ** Methods
+    subsurfaceSetPosition,
+    subsurfacePlaceAbove,
+    subsurfacePlaceBelow,
+    subsurfaceSetSync,
+    subsurfaceSetDesync,
+
+    -- * DataOffer
+    DataOffer,
+
+    -- * DataSource
+    DataSource,
+
+    -- * DataDevice
+    DataDevice,
+
+    -- * DataDeviceManager
+    DataDeviceManager,
+
+    -- * Wayland.Util
+    module WL.Util,
+
+    -- * Core Enums
+    module WL.Core.Enums,
+
+    -- * Misc
+    CEnum.CEnum (..),
+) where
 
 import WL.Internals.Types
 
-import           WL.Util
-import           WL.Client.Registry
-import           WL.Core.Client hiding (shmCreatePool)
-import qualified WL.Core.Client as Client
-import qualified WL.Core.Enums
-import qualified WL.Core.Client.Generated.Unsafe as C.Unsafe
+import WL.Client.Registry
+import WL.Core.Client hiding (shmCreatePool)
+import WL.Core.Client qualified as Client
+import WL.Core.Client.Generated.Unsafe qualified as C.Unsafe
+import WL.Core.Enums qualified
+import WL.Util
 
-import qualified HsBindgen.Runtime.CEnum as CEnum
-import           UnliftIO
+import HsBindgen.Runtime.CEnum qualified as CEnum
+import UnliftIO
 
-import           Control.Monad
-import           Data.Bits
-import           Data.Word
-import           System.Posix (Fd)
-import           Foreign
-import           Foreign.C.ConstPtr
-import           Foreign.C.String
-import           Foreign.C.Types
+import Control.Monad
+import Data.Bits
+import Data.Word
+import Foreign
+import Foreign.C.ConstPtr
+import Foreign.C.String
+import Foreign.C.Types
+import System.Posix (Fd)
 
 getObjectId :: (MonadIO m, IsWlObject object) => object -> m Word32
 getObjectId o = liftIO $ C.Unsafe.wl_proxy_get_id (toProxy o)
 
 getObjectDisplay :: (MonadIO m, IsWlObject object) => object -> m Display
 getObjectDisplay o = liftIO $ do
-  ptr <- C.Unsafe.wl_proxy_get_display (toProxy o)
-  when (ptr == nullPtr) $ throwIO WaylandInvalidId
-  return (Display ptr)
+    ptr <- C.Unsafe.wl_proxy_get_display (toProxy o)
+    when (ptr == nullPtr) $ throwIO WaylandInvalidId
+    return (Display ptr)
 
 type Tag = ConstPtr CChar
 
-newTag :: MonadIO m => String -> m Tag
+newTag :: (MonadIO m) => String -> m Tag
 newTag str = liftIO $ ConstPtr <$> newCString str
 
 setObjectTag :: (MonadIO m, IsWlObject object) => object -> Tag -> m ()
 setObjectTag object tag = liftIO $ with tag $ \tagPtr ->
-  C.Unsafe.wl_proxy_set_tag (toProxy object) (ConstPtr tagPtr)
+    C.Unsafe.wl_proxy_set_tag (toProxy object) (ConstPtr tagPtr)
 
 getObjectTag :: (MonadIO m, IsWlObject object) => object -> m (Maybe Tag)
 getObjectTag object = liftIO $ do
-  ConstPtr tag <- C.Unsafe.wl_proxy_get_tag (toProxy object)
-  if tag /= nullPtr
-     then Just <$> peek tag
-     else return Nothing
+    ConstPtr tag <- C.Unsafe.wl_proxy_get_tag (toProxy object)
+    if tag /= nullPtr
+        then Just <$> peek tag
+        else return Nothing
 
 pattern ShmFormatARGB8888 :: ShmFormat
-pattern ShmFormatARGB8888             = Client.WL_SHM_FORMAT_ARGB8888
+pattern ShmFormatARGB8888 = Client.WL_SHM_FORMAT_ARGB8888
 pattern ShmFormatXRGB8888 :: ShmFormat
-pattern ShmFormatXRGB8888             = Client.WL_SHM_FORMAT_XRGB8888
---pattern ShmFormatC8 :: ShmFormat
---pattern ShmFormatC8                   = Client.WL_SHM_FORMAT_C8
+pattern ShmFormatXRGB8888 = Client.WL_SHM_FORMAT_XRGB8888
+
+-- pattern ShmFormatC8 :: ShmFormat
+-- pattern ShmFormatC8                   = Client.WL_SHM_FORMAT_C8
 pattern ShmFormatRGB332 :: ShmFormat
-pattern ShmFormatRGB332               = Client.WL_SHM_FORMAT_RGB332
+pattern ShmFormatRGB332 = Client.WL_SHM_FORMAT_RGB332
 pattern ShmFormatBGR233 :: ShmFormat
-pattern ShmFormatBGR233               = Client.WL_SHM_FORMAT_BGR233
+pattern ShmFormatBGR233 = Client.WL_SHM_FORMAT_BGR233
 pattern ShmFormatXRGB4444 :: ShmFormat
-pattern ShmFormatXRGB4444             = Client.WL_SHM_FORMAT_XRGB4444
+pattern ShmFormatXRGB4444 = Client.WL_SHM_FORMAT_XRGB4444
 pattern ShmFormatXBGR4444 :: ShmFormat
-pattern ShmFormatXBGR4444             = Client.WL_SHM_FORMAT_XBGR4444
+pattern ShmFormatXBGR4444 = Client.WL_SHM_FORMAT_XBGR4444
 pattern ShmFormatRGBX4444 :: ShmFormat
-pattern ShmFormatRGBX4444             = Client.WL_SHM_FORMAT_RGBX4444
+pattern ShmFormatRGBX4444 = Client.WL_SHM_FORMAT_RGBX4444
 pattern ShmFormatBGRX4444 :: ShmFormat
-pattern ShmFormatBGRX4444             = Client.WL_SHM_FORMAT_BGRX4444
+pattern ShmFormatBGRX4444 = Client.WL_SHM_FORMAT_BGRX4444
 pattern ShmFormatARGB4444 :: ShmFormat
-pattern ShmFormatARGB4444             = Client.WL_SHM_FORMAT_ARGB4444
+pattern ShmFormatARGB4444 = Client.WL_SHM_FORMAT_ARGB4444
 pattern ShmFormatABGR4444 :: ShmFormat
-pattern ShmFormatABGR4444             = Client.WL_SHM_FORMAT_ABGR4444
+pattern ShmFormatABGR4444 = Client.WL_SHM_FORMAT_ABGR4444
 pattern ShmFormatRGBA4444 :: ShmFormat
-pattern ShmFormatRGBA4444             = Client.WL_SHM_FORMAT_RGBA4444
+pattern ShmFormatRGBA4444 = Client.WL_SHM_FORMAT_RGBA4444
 pattern ShmFormatBGRA4444 :: ShmFormat
-pattern ShmFormatBGRA4444             = Client.WL_SHM_FORMAT_BGRA4444
+pattern ShmFormatBGRA4444 = Client.WL_SHM_FORMAT_BGRA4444
 pattern ShmFormatXRGB1555 :: ShmFormat
-pattern ShmFormatXRGB1555             = Client.WL_SHM_FORMAT_XRGB1555
+pattern ShmFormatXRGB1555 = Client.WL_SHM_FORMAT_XRGB1555
 pattern ShmFormatXBGR1555 :: ShmFormat
-pattern ShmFormatXBGR1555             = Client.WL_SHM_FORMAT_XBGR1555
+pattern ShmFormatXBGR1555 = Client.WL_SHM_FORMAT_XBGR1555
 pattern ShmFormatRGBX5551 :: ShmFormat
-pattern ShmFormatRGBX5551             = Client.WL_SHM_FORMAT_RGBX5551
+pattern ShmFormatRGBX5551 = Client.WL_SHM_FORMAT_RGBX5551
 pattern ShmFormatBGRX5551 :: ShmFormat
-pattern ShmFormatBGRX5551             = Client.WL_SHM_FORMAT_BGRX5551
+pattern ShmFormatBGRX5551 = Client.WL_SHM_FORMAT_BGRX5551
 pattern ShmFormatARGB1555 :: ShmFormat
-pattern ShmFormatARGB1555             = Client.WL_SHM_FORMAT_ARGB1555
+pattern ShmFormatARGB1555 = Client.WL_SHM_FORMAT_ARGB1555
 pattern ShmFormatABGR1555 :: ShmFormat
-pattern ShmFormatABGR1555             = Client.WL_SHM_FORMAT_ABGR1555
+pattern ShmFormatABGR1555 = Client.WL_SHM_FORMAT_ABGR1555
 pattern ShmFormatRGBA5551 :: ShmFormat
-pattern ShmFormatRGBA5551             = Client.WL_SHM_FORMAT_RGBA5551
+pattern ShmFormatRGBA5551 = Client.WL_SHM_FORMAT_RGBA5551
 pattern ShmFormatBGRA5551 :: ShmFormat
-pattern ShmFormatBGRA5551             = Client.WL_SHM_FORMAT_BGRA5551
+pattern ShmFormatBGRA5551 = Client.WL_SHM_FORMAT_BGRA5551
 pattern ShmFormatRGB565 :: ShmFormat
-pattern ShmFormatRGB565               = Client.WL_SHM_FORMAT_RGB565
+pattern ShmFormatRGB565 = Client.WL_SHM_FORMAT_RGB565
 pattern ShmFormatBGR565 :: ShmFormat
-pattern ShmFormatBGR565               = Client.WL_SHM_FORMAT_BGR565
+pattern ShmFormatBGR565 = Client.WL_SHM_FORMAT_BGR565
 pattern ShmFormatRGB888 :: ShmFormat
-pattern ShmFormatRGB888               = Client.WL_SHM_FORMAT_RGB888
+pattern ShmFormatRGB888 = Client.WL_SHM_FORMAT_RGB888
 pattern ShmFormatBGR888 :: ShmFormat
-pattern ShmFormatBGR888               = Client.WL_SHM_FORMAT_BGR888
+pattern ShmFormatBGR888 = Client.WL_SHM_FORMAT_BGR888
 pattern ShmFormatXBGR8888 :: ShmFormat
-pattern ShmFormatXBGR8888             = Client.WL_SHM_FORMAT_XBGR8888
+pattern ShmFormatXBGR8888 = Client.WL_SHM_FORMAT_XBGR8888
 pattern ShmFormatRGBX8888 :: ShmFormat
-pattern ShmFormatRGBX8888             = Client.WL_SHM_FORMAT_RGBX8888
+pattern ShmFormatRGBX8888 = Client.WL_SHM_FORMAT_RGBX8888
 pattern ShmFormatBGRX8888 :: ShmFormat
-pattern ShmFormatBGRX8888             = Client.WL_SHM_FORMAT_BGRX8888
+pattern ShmFormatBGRX8888 = Client.WL_SHM_FORMAT_BGRX8888
 pattern ShmFormatABGR8888 :: ShmFormat
-pattern ShmFormatABGR8888             = Client.WL_SHM_FORMAT_ABGR8888
+pattern ShmFormatABGR8888 = Client.WL_SHM_FORMAT_ABGR8888
 pattern ShmFormatRGBA8888 :: ShmFormat
-pattern ShmFormatRGBA8888             = Client.WL_SHM_FORMAT_RGBA8888
+pattern ShmFormatRGBA8888 = Client.WL_SHM_FORMAT_RGBA8888
 pattern ShmFormatBGRA8888 :: ShmFormat
-pattern ShmFormatBGRA8888             = Client.WL_SHM_FORMAT_BGRA8888
+pattern ShmFormatBGRA8888 = Client.WL_SHM_FORMAT_BGRA8888
 pattern ShmFormatXRGB2101010 :: ShmFormat
-pattern ShmFormatXRGB2101010          = Client.WL_SHM_FORMAT_XRGB2101010
+pattern ShmFormatXRGB2101010 = Client.WL_SHM_FORMAT_XRGB2101010
 pattern ShmFormatXBGR2101010 :: ShmFormat
-pattern ShmFormatXBGR2101010          = Client.WL_SHM_FORMAT_XBGR2101010
+pattern ShmFormatXBGR2101010 = Client.WL_SHM_FORMAT_XBGR2101010
 pattern ShmFormatRGBX1010102 :: ShmFormat
-pattern ShmFormatRGBX1010102          = Client.WL_SHM_FORMAT_RGBX1010102
+pattern ShmFormatRGBX1010102 = Client.WL_SHM_FORMAT_RGBX1010102
 pattern ShmFormatBGRX1010102 :: ShmFormat
-pattern ShmFormatBGRX1010102          = Client.WL_SHM_FORMAT_BGRX1010102
+pattern ShmFormatBGRX1010102 = Client.WL_SHM_FORMAT_BGRX1010102
 pattern ShmFormatARGB2101010 :: ShmFormat
-pattern ShmFormatARGB2101010          = Client.WL_SHM_FORMAT_ARGB2101010
+pattern ShmFormatARGB2101010 = Client.WL_SHM_FORMAT_ARGB2101010
 pattern ShmFormatABGR2101010 :: ShmFormat
-pattern ShmFormatABGR2101010          = Client.WL_SHM_FORMAT_ABGR2101010
+pattern ShmFormatABGR2101010 = Client.WL_SHM_FORMAT_ABGR2101010
 pattern ShmFormatRGBA1010102 :: ShmFormat
-pattern ShmFormatRGBA1010102          = Client.WL_SHM_FORMAT_RGBA1010102
+pattern ShmFormatRGBA1010102 = Client.WL_SHM_FORMAT_RGBA1010102
 pattern ShmFormatBGRA1010102 :: ShmFormat
-pattern ShmFormatBGRA1010102          = Client.WL_SHM_FORMAT_BGRA1010102
+pattern ShmFormatBGRA1010102 = Client.WL_SHM_FORMAT_BGRA1010102
 pattern ShmFormatYUYV :: ShmFormat
-pattern ShmFormatYUYV                 = Client.WL_SHM_FORMAT_YUYV
+pattern ShmFormatYUYV = Client.WL_SHM_FORMAT_YUYV
 pattern ShmFormatYVYU :: ShmFormat
-pattern ShmFormatYVYU                 = Client.WL_SHM_FORMAT_YVYU
+pattern ShmFormatYVYU = Client.WL_SHM_FORMAT_YVYU
 pattern ShmFormatUYVY :: ShmFormat
-pattern ShmFormatUYVY                 = Client.WL_SHM_FORMAT_UYVY
+pattern ShmFormatUYVY = Client.WL_SHM_FORMAT_UYVY
 pattern ShmFormatVYUY :: ShmFormat
-pattern ShmFormatVYUY                 = Client.WL_SHM_FORMAT_VYUY
+pattern ShmFormatVYUY = Client.WL_SHM_FORMAT_VYUY
 pattern ShmFormatAYUV :: ShmFormat
-pattern ShmFormatAYUV                 = Client.WL_SHM_FORMAT_AYUV
+pattern ShmFormatAYUV = Client.WL_SHM_FORMAT_AYUV
 pattern ShmFormatNV12 :: ShmFormat
-pattern ShmFormatNV12                 = Client.WL_SHM_FORMAT_NV12
+pattern ShmFormatNV12 = Client.WL_SHM_FORMAT_NV12
 pattern ShmFormatNV21 :: ShmFormat
-pattern ShmFormatNV21                 = Client.WL_SHM_FORMAT_NV21
+pattern ShmFormatNV21 = Client.WL_SHM_FORMAT_NV21
 pattern ShmFormatNV16 :: ShmFormat
-pattern ShmFormatNV16                 = Client.WL_SHM_FORMAT_NV16
+pattern ShmFormatNV16 = Client.WL_SHM_FORMAT_NV16
 pattern ShmFormatNV61 :: ShmFormat
-pattern ShmFormatNV61                 = Client.WL_SHM_FORMAT_NV61
+pattern ShmFormatNV61 = Client.WL_SHM_FORMAT_NV61
 pattern ShmFormatYUV410 :: ShmFormat
-pattern ShmFormatYUV410               = Client.WL_SHM_FORMAT_YUV410
+pattern ShmFormatYUV410 = Client.WL_SHM_FORMAT_YUV410
 pattern ShmFormatYVU410 :: ShmFormat
-pattern ShmFormatYVU410               = Client.WL_SHM_FORMAT_YVU410
+pattern ShmFormatYVU410 = Client.WL_SHM_FORMAT_YVU410
 pattern ShmFormatYUV411 :: ShmFormat
-pattern ShmFormatYUV411               = Client.WL_SHM_FORMAT_YUV411
+pattern ShmFormatYUV411 = Client.WL_SHM_FORMAT_YUV411
 pattern ShmFormatYVU411 :: ShmFormat
-pattern ShmFormatYVU411               = Client.WL_SHM_FORMAT_YVU411
+pattern ShmFormatYVU411 = Client.WL_SHM_FORMAT_YVU411
 pattern ShmFormatYUV420 :: ShmFormat
-pattern ShmFormatYUV420               = Client.WL_SHM_FORMAT_YUV420
+pattern ShmFormatYUV420 = Client.WL_SHM_FORMAT_YUV420
 pattern ShmFormatYVU420 :: ShmFormat
-pattern ShmFormatYVU420               = Client.WL_SHM_FORMAT_YVU420
+pattern ShmFormatYVU420 = Client.WL_SHM_FORMAT_YVU420
 pattern ShmFormatYUV422 :: ShmFormat
-pattern ShmFormatYUV422               = Client.WL_SHM_FORMAT_YUV422
+pattern ShmFormatYUV422 = Client.WL_SHM_FORMAT_YUV422
 pattern ShmFormatYVU422 :: ShmFormat
-pattern ShmFormatYVU422               = Client.WL_SHM_FORMAT_YVU422
+pattern ShmFormatYVU422 = Client.WL_SHM_FORMAT_YVU422
 pattern ShmFormatYUV444 :: ShmFormat
-pattern ShmFormatYUV444               = Client.WL_SHM_FORMAT_YUV444
+pattern ShmFormatYUV444 = Client.WL_SHM_FORMAT_YUV444
 pattern ShmFormatYVU444 :: ShmFormat
-pattern ShmFormatYVU444               = Client.WL_SHM_FORMAT_YVU444
---pattern ShmFormatR8 :: ShmFormat
---pattern ShmFormatR8                   = Client.WL_SHM_FORMAT_R8
---pattern ShmFormatR16 :: ShmFormat
---pattern ShmFormatR16                  = Client.WL_SHM_FORMAT_R16
+pattern ShmFormatYVU444 = Client.WL_SHM_FORMAT_YVU444
+
+-- pattern ShmFormatR8 :: ShmFormat
+-- pattern ShmFormatR8                   = Client.WL_SHM_FORMAT_R8
+-- pattern ShmFormatR16 :: ShmFormat
+-- pattern ShmFormatR16                  = Client.WL_SHM_FORMAT_R16
 pattern ShmFormatRG88 :: ShmFormat
-pattern ShmFormatRG88                 = Client.WL_SHM_FORMAT_RG88
+pattern ShmFormatRG88 = Client.WL_SHM_FORMAT_RG88
 pattern ShmFormatGR88 :: ShmFormat
-pattern ShmFormatGR88                 = Client.WL_SHM_FORMAT_GR88
+pattern ShmFormatGR88 = Client.WL_SHM_FORMAT_GR88
 pattern ShmFormatRG1616 :: ShmFormat
-pattern ShmFormatRG1616               = Client.WL_SHM_FORMAT_RG1616
+pattern ShmFormatRG1616 = Client.WL_SHM_FORMAT_RG1616
 pattern ShmFormatGR1616 :: ShmFormat
-pattern ShmFormatGR1616               = Client.WL_SHM_FORMAT_GR1616
+pattern ShmFormatGR1616 = Client.WL_SHM_FORMAT_GR1616
 pattern ShmFormatXRGB16161616F :: ShmFormat
-pattern ShmFormatXRGB16161616F        = Client.WL_SHM_FORMAT_XRGB16161616F
+pattern ShmFormatXRGB16161616F = Client.WL_SHM_FORMAT_XRGB16161616F
 pattern ShmFormatXBGR16161616F :: ShmFormat
-pattern ShmFormatXBGR16161616F        = Client.WL_SHM_FORMAT_XBGR16161616F
+pattern ShmFormatXBGR16161616F = Client.WL_SHM_FORMAT_XBGR16161616F
 pattern ShmFormatARGB16161616F :: ShmFormat
-pattern ShmFormatARGB16161616F        = Client.WL_SHM_FORMAT_ARGB16161616F
+pattern ShmFormatARGB16161616F = Client.WL_SHM_FORMAT_ARGB16161616F
 pattern ShmFormatABGR16161616F :: ShmFormat
-pattern ShmFormatABGR16161616F        = Client.WL_SHM_FORMAT_ABGR16161616F
+pattern ShmFormatABGR16161616F = Client.WL_SHM_FORMAT_ABGR16161616F
 pattern ShmFormatXYUV8888 :: ShmFormat
-pattern ShmFormatXYUV8888             = Client.WL_SHM_FORMAT_XYUV8888
+pattern ShmFormatXYUV8888 = Client.WL_SHM_FORMAT_XYUV8888
 pattern ShmFormatVUY888 :: ShmFormat
-pattern ShmFormatVUY888               = Client.WL_SHM_FORMAT_VUY888
+pattern ShmFormatVUY888 = Client.WL_SHM_FORMAT_VUY888
 pattern ShmFormatVUY101010 :: ShmFormat
-pattern ShmFormatVUY101010            = Client.WL_SHM_FORMAT_VUY101010
---pattern ShmFormatY210 :: ShmFormat
---pattern ShmFormatY210                 = Client.WL_SHM_FORMAT_Y210
---pattern ShmFormatY212 :: ShmFormat
---pattern ShmFormatY212                 = Client.WL_SHM_FORMAT_Y212
---pattern ShmFormatY216 :: ShmFormat
---pattern ShmFormatY216                 = Client.WL_SHM_FORMAT_Y216
---pattern ShmFormatY410 :: ShmFormat
---pattern ShmFormatY410                 = Client.WL_SHM_FORMAT_Y410
---pattern ShmFormatY412 :: ShmFormat
---pattern ShmFormatY412                 = Client.WL_SHM_FORMAT_Y412
---pattern ShmFormatY416 :: ShmFormat
---pattern ShmFormatY416                 = Client.WL_SHM_FORMAT_Y416
+pattern ShmFormatVUY101010 = Client.WL_SHM_FORMAT_VUY101010
+
+-- pattern ShmFormatY210 :: ShmFormat
+-- pattern ShmFormatY210                 = Client.WL_SHM_FORMAT_Y210
+-- pattern ShmFormatY212 :: ShmFormat
+-- pattern ShmFormatY212                 = Client.WL_SHM_FORMAT_Y212
+-- pattern ShmFormatY216 :: ShmFormat
+-- pattern ShmFormatY216                 = Client.WL_SHM_FORMAT_Y216
+-- pattern ShmFormatY410 :: ShmFormat
+-- pattern ShmFormatY410                 = Client.WL_SHM_FORMAT_Y410
+-- pattern ShmFormatY412 :: ShmFormat
+-- pattern ShmFormatY412                 = Client.WL_SHM_FORMAT_Y412
+-- pattern ShmFormatY416 :: ShmFormat
+-- pattern ShmFormatY416                 = Client.WL_SHM_FORMAT_Y416
 pattern ShmFormatXVYU2101010 :: ShmFormat
-pattern ShmFormatXVYU2101010          = Client.WL_SHM_FORMAT_XVYU2101010
+pattern ShmFormatXVYU2101010 = Client.WL_SHM_FORMAT_XVYU2101010
 pattern ShmFormatXVYU12_16161616 :: ShmFormat
-pattern ShmFormatXVYU12_16161616      = Client.WL_SHM_FORMAT_XVYU12_16161616
+pattern ShmFormatXVYU12_16161616 = Client.WL_SHM_FORMAT_XVYU12_16161616
 pattern ShmFormatXVYU16161616 :: ShmFormat
-pattern ShmFormatXVYU16161616         = Client.WL_SHM_FORMAT_XVYU16161616
+pattern ShmFormatXVYU16161616 = Client.WL_SHM_FORMAT_XVYU16161616
 pattern ShmFormatY0L0 :: ShmFormat
-pattern ShmFormatY0L0                 = Client.WL_SHM_FORMAT_Y0L0
+pattern ShmFormatY0L0 = Client.WL_SHM_FORMAT_Y0L0
 pattern ShmFormatX0L0 :: ShmFormat
-pattern ShmFormatX0L0                 = Client.WL_SHM_FORMAT_X0L0
+pattern ShmFormatX0L0 = Client.WL_SHM_FORMAT_X0L0
 pattern ShmFormatY0L2 :: ShmFormat
-pattern ShmFormatY0L2                 = Client.WL_SHM_FORMAT_Y0L2
+pattern ShmFormatY0L2 = Client.WL_SHM_FORMAT_Y0L2
 pattern ShmFormatX0L2 :: ShmFormat
-pattern ShmFormatX0L2                 = Client.WL_SHM_FORMAT_X0L2
+pattern ShmFormatX0L2 = Client.WL_SHM_FORMAT_X0L2
 pattern ShmFormatYUV420_8BIT :: ShmFormat
-pattern ShmFormatYUV420_8BIT          = Client.WL_SHM_FORMAT_YUV420_8BIT
+pattern ShmFormatYUV420_8BIT = Client.WL_SHM_FORMAT_YUV420_8BIT
 pattern ShmFormatYUV420_10BIT :: ShmFormat
-pattern ShmFormatYUV420_10BIT         = Client.WL_SHM_FORMAT_YUV420_10BIT
+pattern ShmFormatYUV420_10BIT = Client.WL_SHM_FORMAT_YUV420_10BIT
 pattern ShmFormatXRGB8888_A8 :: ShmFormat
-pattern ShmFormatXRGB8888_A8          = Client.WL_SHM_FORMAT_XRGB8888_A8
+pattern ShmFormatXRGB8888_A8 = Client.WL_SHM_FORMAT_XRGB8888_A8
 pattern ShmFormatXBGR8888_A8 :: ShmFormat
-pattern ShmFormatXBGR8888_A8          = Client.WL_SHM_FORMAT_XBGR8888_A8
+pattern ShmFormatXBGR8888_A8 = Client.WL_SHM_FORMAT_XBGR8888_A8
 pattern ShmFormatRGBX8888_A8 :: ShmFormat
-pattern ShmFormatRGBX8888_A8          = Client.WL_SHM_FORMAT_RGBX8888_A8
+pattern ShmFormatRGBX8888_A8 = Client.WL_SHM_FORMAT_RGBX8888_A8
 pattern ShmFormatBGRX8888_A8 :: ShmFormat
-pattern ShmFormatBGRX8888_A8          = Client.WL_SHM_FORMAT_BGRX8888_A8
+pattern ShmFormatBGRX8888_A8 = Client.WL_SHM_FORMAT_BGRX8888_A8
 pattern ShmFormatRGB888_A8 :: ShmFormat
-pattern ShmFormatRGB888_A8            = Client.WL_SHM_FORMAT_RGB888_A8
+pattern ShmFormatRGB888_A8 = Client.WL_SHM_FORMAT_RGB888_A8
 pattern ShmFormatBGR888_A8 :: ShmFormat
-pattern ShmFormatBGR888_A8            = Client.WL_SHM_FORMAT_BGR888_A8
+pattern ShmFormatBGR888_A8 = Client.WL_SHM_FORMAT_BGR888_A8
 pattern ShmFormatRGB565_A8 :: ShmFormat
-pattern ShmFormatRGB565_A8            = Client.WL_SHM_FORMAT_RGB565_A8
+pattern ShmFormatRGB565_A8 = Client.WL_SHM_FORMAT_RGB565_A8
 pattern ShmFormatBGR565_A8 :: ShmFormat
-pattern ShmFormatBGR565_A8            = Client.WL_SHM_FORMAT_BGR565_A8
+pattern ShmFormatBGR565_A8 = Client.WL_SHM_FORMAT_BGR565_A8
 pattern ShmFormatNV24 :: ShmFormat
-pattern ShmFormatNV24                 = Client.WL_SHM_FORMAT_NV24
+pattern ShmFormatNV24 = Client.WL_SHM_FORMAT_NV24
 pattern ShmFormatNV42 :: ShmFormat
-pattern ShmFormatNV42                 = Client.WL_SHM_FORMAT_NV42
---pattern ShmFormatP210 :: ShmFormat
---pattern ShmFormatP210                 = Client.WL_SHM_FORMAT_P210
---pattern ShmFormatP010 :: ShmFormat
---pattern ShmFormatP010                 = Client.WL_SHM_FORMAT_P010
---pattern ShmFormatP012 :: ShmFormat
---pattern ShmFormatP012                 = Client.WL_SHM_FORMAT_P012
---pattern ShmFormatP016 :: ShmFormat
---pattern ShmFormatP016                 = Client.WL_SHM_FORMAT_P016
+pattern ShmFormatNV42 = Client.WL_SHM_FORMAT_NV42
+
+-- pattern ShmFormatP210 :: ShmFormat
+-- pattern ShmFormatP210                 = Client.WL_SHM_FORMAT_P210
+-- pattern ShmFormatP010 :: ShmFormat
+-- pattern ShmFormatP010                 = Client.WL_SHM_FORMAT_P010
+-- pattern ShmFormatP012 :: ShmFormat
+-- pattern ShmFormatP012                 = Client.WL_SHM_FORMAT_P012
+-- pattern ShmFormatP016 :: ShmFormat
+-- pattern ShmFormatP016                 = Client.WL_SHM_FORMAT_P016
 pattern ShmFormatAXBXGXRX106106106106 :: ShmFormat
 pattern ShmFormatAXBXGXRX106106106106 = Client.WL_SHM_FORMAT_AXBXGXRX106106106106
 pattern ShmFormatNV15 :: ShmFormat
-pattern ShmFormatNV15                 = Client.WL_SHM_FORMAT_NV15
---pattern ShmFormatQ410 :: ShmFormat
---pattern ShmFormatQ410                 = Client.WL_SHM_FORMAT_Q410
---pattern ShmFormatQ401 :: ShmFormat
---pattern ShmFormatQ401                 = Client.WL_SHM_FORMAT_Q401
+pattern ShmFormatNV15 = Client.WL_SHM_FORMAT_NV15
+
+-- pattern ShmFormatQ410 :: ShmFormat
+-- pattern ShmFormatQ410                 = Client.WL_SHM_FORMAT_Q410
+-- pattern ShmFormatQ401 :: ShmFormat
+-- pattern ShmFormatQ401                 = Client.WL_SHM_FORMAT_Q401
 pattern ShmFormatXRGB16161616 :: ShmFormat
-pattern ShmFormatXRGB16161616         = Client.WL_SHM_FORMAT_XRGB16161616
+pattern ShmFormatXRGB16161616 = Client.WL_SHM_FORMAT_XRGB16161616
 pattern ShmFormatXBGR16161616 :: ShmFormat
-pattern ShmFormatXBGR16161616         = Client.WL_SHM_FORMAT_XBGR16161616
+pattern ShmFormatXBGR16161616 = Client.WL_SHM_FORMAT_XBGR16161616
 pattern ShmFormatARGB16161616 :: ShmFormat
-pattern ShmFormatARGB16161616         = Client.WL_SHM_FORMAT_ARGB16161616
+pattern ShmFormatARGB16161616 = Client.WL_SHM_FORMAT_ARGB16161616
 pattern ShmFormatABGR16161616 :: ShmFormat
-pattern ShmFormatABGR16161616         = Client.WL_SHM_FORMAT_ABGR16161616
---pattern ShmFormatC1 :: ShmFormat
---pattern ShmFormatC1                   = Client.WL_SHM_FORMAT_C1
---pattern ShmFormatC2 :: ShmFormat
---pattern ShmFormatC2                   = Client.WL_SHM_FORMAT_C2
---pattern ShmFormatC4 :: ShmFormat
---pattern ShmFormatC4                   = Client.WL_SHM_FORMAT_C4
---pattern ShmFormatD1 :: ShmFormat
---pattern ShmFormatD1                   = Client.WL_SHM_FORMAT_D1
---pattern ShmFormatD2 :: ShmFormat
---pattern ShmFormatD2                   = Client.WL_SHM_FORMAT_D2
---pattern ShmFormatD4 :: ShmFormat
---pattern ShmFormatD4                   = Client.WL_SHM_FORMAT_D4
---pattern ShmFormatD8 :: ShmFormat
---pattern ShmFormatD8                   = Client.WL_SHM_FORMAT_D8
---pattern ShmFormatR1 :: ShmFormat
---pattern ShmFormatR1                   = Client.WL_SHM_FORMAT_R1
---pattern ShmFormatR2 :: ShmFormat
---pattern ShmFormatR2                   = Client.WL_SHM_FORMAT_R2
---pattern ShmFormatR4 :: ShmFormat
---pattern ShmFormatR4                   = Client.WL_SHM_FORMAT_R4
---pattern ShmFormatR10 :: ShmFormat
---pattern ShmFormatR10                  = Client.WL_SHM_FORMAT_R10
---pattern ShmFormatR12 :: ShmFormat
---pattern ShmFormatR12                  = Client.WL_SHM_FORMAT_R12
+pattern ShmFormatABGR16161616 = Client.WL_SHM_FORMAT_ABGR16161616
+
+-- pattern ShmFormatC1 :: ShmFormat
+-- pattern ShmFormatC1                   = Client.WL_SHM_FORMAT_C1
+-- pattern ShmFormatC2 :: ShmFormat
+-- pattern ShmFormatC2                   = Client.WL_SHM_FORMAT_C2
+-- pattern ShmFormatC4 :: ShmFormat
+-- pattern ShmFormatC4                   = Client.WL_SHM_FORMAT_C4
+-- pattern ShmFormatD1 :: ShmFormat
+-- pattern ShmFormatD1                   = Client.WL_SHM_FORMAT_D1
+-- pattern ShmFormatD2 :: ShmFormat
+-- pattern ShmFormatD2                   = Client.WL_SHM_FORMAT_D2
+-- pattern ShmFormatD4 :: ShmFormat
+-- pattern ShmFormatD4                   = Client.WL_SHM_FORMAT_D4
+-- pattern ShmFormatD8 :: ShmFormat
+-- pattern ShmFormatD8                   = Client.WL_SHM_FORMAT_D8
+-- pattern ShmFormatR1 :: ShmFormat
+-- pattern ShmFormatR1                   = Client.WL_SHM_FORMAT_R1
+-- pattern ShmFormatR2 :: ShmFormat
+-- pattern ShmFormatR2                   = Client.WL_SHM_FORMAT_R2
+-- pattern ShmFormatR4 :: ShmFormat
+-- pattern ShmFormatR4                   = Client.WL_SHM_FORMAT_R4
+-- pattern ShmFormatR10 :: ShmFormat
+-- pattern ShmFormatR10                  = Client.WL_SHM_FORMAT_R10
+-- pattern ShmFormatR12 :: ShmFormat
+-- pattern ShmFormatR12                  = Client.WL_SHM_FORMAT_R12
 pattern ShmFormatAVUY8888 :: ShmFormat
-pattern ShmFormatAVUY8888             = Client.WL_SHM_FORMAT_AVUY8888
+pattern ShmFormatAVUY8888 = Client.WL_SHM_FORMAT_AVUY8888
 pattern ShmFormatXVUY8888 :: ShmFormat
-pattern ShmFormatXVUY8888             = Client.WL_SHM_FORMAT_XVUY8888
---pattern ShmFormatP030 :: ShmFormat
---pattern ShmFormatP030                 = Client.WL_SHM_FORMAT_P030
+pattern ShmFormatXVUY8888 = Client.WL_SHM_FORMAT_XVUY8888
+
+-- pattern ShmFormatP030 :: ShmFormat
+-- pattern ShmFormatP030                 = Client.WL_SHM_FORMAT_P030
 
 parseSeatCapabilities :: SeatCapability -> [SeatCapability]
-parseSeatCapabilities x = [ v | v <- values, fromCEnum x .&. fromCEnum v > 0 ]
+parseSeatCapabilities x = [v | v <- values, fromCEnum x .&. fromCEnum v > 0]
   where
-    values = [ SeatCapabilityPointer
-             , SeatCapabilityKeyboard
-             , SeatCapabilityTouch
-             ]
+    values =
+        [ SeatCapabilityPointer
+        , SeatCapabilityKeyboard
+        , SeatCapabilityTouch
+        ]
 
 -- | @shmCreatePool shm fd sizeBytes@
-shmCreatePool :: MonadIO m => Shm -> Fd -> Int -> m ShmPool
+shmCreatePool :: (MonadIO m) => Shm -> Fd -> Int -> m ShmPool
 {-# INLINE shmCreatePool #-}
 shmCreatePool shm fd size = Client.shmCreatePool shm (fromIntegral fd) (fromIntegral size)
 
 -- * Compositor
 
 -- | Create a new region and destroy it automatically after the callback finishes.
-withNewRegion :: MonadUnliftIO m => Compositor -> (Region -> m a) -> m a
+withNewRegion :: (MonadUnliftIO m) => Compositor -> (Region -> m a) -> m a
 withNewRegion comp = bracket (compositorCreateRegion comp) (liftIO . objectDestroy)

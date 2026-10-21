@@ -1,13 +1,14 @@
--- |
--- Module      : HSWM
--- Description : Short description
--- Copyright   : (c) Samuli Thomasson, 2026
---
--- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
--- Stability   : unstable
--- Portability : unportable
-module HSWM
-  ( module HSWM.Core,
+{- |
+Module      : HSWM
+Description : Short description
+Copyright   : (c) Samuli Thomasson, 2026
+
+Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
+Stability   : unstable
+Portability : unportable
+-}
+module HSWM (
+    module HSWM.Core,
     module HSWM.ManageHook,
     module HSWM.Config,
     module HSWM.Layout,
@@ -20,7 +21,7 @@ module HSWM
     -- * Re-exports
     module Prelude,
     module ReExports,
-  )
+)
 where
 
 import Data.Default as ReExports

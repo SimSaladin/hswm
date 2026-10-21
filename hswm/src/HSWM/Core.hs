@@ -1,34 +1,35 @@
--- |
--- Module      : HSWM.Core
--- Description :
--- Copyright   : (c) Samuli Thomasson, 2026
---
--- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
--- Stability   : unstable
--- Portability : unportable
---
-module HSWM.Core
-  ( module HSWM.Core,
+{- |
+Module      : HSWM.Core
+Description :
+Copyright   : (c) Samuli Thomasson, 2026
+
+Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
+Stability   : unstable
+Portability : unportable
+-}
+module HSWM.Core (
+    module HSWM.Core,
     module HSWM.Types.Config,
     module HSWM.Types.Events,
     module HSWM.Types.WM,
     module HSWM.Types.TypeMap,
     module HSWM.XKB,
-    R.RiverColor(..),
-  )
+    R.RiverColor (..),
+)
 where
 
-import           HSWM.Types.Config
-import           HSWM.Types.Events
-import           HSWM.Types.TypeMap
-import           HSWM.Types.WM
-import           HSWM.XKB hiding (LogLevel(..))
+import HSWM.Types.Config
+import HSWM.Types.Events
+import HSWM.Types.TypeMap
+import HSWM.Types.WM
+import HSWM.XKB hiding (LogLevel (..))
 
-import qualified River as R
-import           Control.Monad.State
-import           GHC.Stack
+import Control.Monad.State
+import GHC.Stack
+import River qualified as R
 
 -----------------------------------------------------------
+
 -- * run / lift
 
 runH :: HConf -> H a -> IO a
@@ -39,51 +40,57 @@ runHS c st (HS a) = flip runReaderT c $ runStateT a st
 
 liftH' :: (MonadReader HConf m, MonadIO m) => H a -> m a
 liftH' a = do
-  c <- ask
-  io $ runH c a
+    c <- ask
+    io $ runH c a
 
 -----------------------------------------------------------
+
 -- * catch
 
 -- a la xmonad
-catchH :: HasCallStack => H a -> H a -> H a
+catchH :: (HasCallStack) => H a -> H a -> H a
 catchH job errcase = do
-  c <- ask
-  io (runH c job)
-    `catch` \e -> case fromException e of
-      Just (_ :: ExitCode) -> throwM e
-      _ -> do logError $ "exception in H action" :# [ "exception" .= show e, "callStack" .= prettyCallStack callStack ]
-              errcase
+    c <- ask
+    io (runH c job)
+        `catch` \e -> case fromException e of
+            Just (_ :: ExitCode) -> throwM e
+            _ -> do
+                logError $ "exception in H action" :# ["exception" .= show e, "callStack" .= prettyCallStack callStack]
+                errcase
 
-catchHS :: HasCallStack => HS a -> HS a -> HS a
+catchHS :: (HasCallStack) => HS a -> HS a -> HS a
 catchHS job errcase = do
-  c <- ask
-  s <- get
-  (a, s') <- io $
-    runHS c s job
-    `catch` \e -> case fromException e of
-      Just (_ :: ExitCode) -> throwM e
-      _ -> do runH c $ logError $ "exception in HS action" :# [ "exception" .= show e, "callStack" .= prettyCallStack callStack ]
-              runHS c s errcase
-  put s'
-  return a
+    c <- ask
+    s <- get
+    (a, s') <-
+        io $
+            runHS c s job
+                `catch` \e -> case fromException e of
+                    Just (_ :: ExitCode) -> throwM e
+                    _ -> do
+                        runH c $ logError $ "exception in HS action" :# ["exception" .= show e, "callStack" .= prettyCallStack callStack]
+                        runHS c s errcase
+    put s'
+    return a
 
 -- a la xmonad
-userCode :: HasCallStack => H a -> H (Maybe a)
+userCode :: (HasCallStack) => H a -> H (Maybe a)
 userCode a = catchH (Just <$> a) (return Nothing)
 
 -- a la xmonad
-userCodeS :: HasCallStack => HS a -> HS (Maybe a)
+userCodeS :: (HasCallStack) => HS a -> HS (Maybe a)
 userCodeS a = catchHS (Just <$> a) (return Nothing)
 
--- | Same as userCode but with a default argument to return instead of using
--- Maybe, provided for convenience.
-userCodeDef :: HasCallStack => a -> H a -> H a
+{- | Same as userCode but with a default argument to return instead of using
+Maybe, provided for convenience.
+-}
+userCodeDef :: (HasCallStack) => a -> H a -> H a
 userCodeDef defValue a = fromMaybe defValue <$> userCode a
 
--- | Same as userCode but with a default argument to return instead of using
--- Maybe, provided for convenience.
-userCodeDefS :: HasCallStack => a -> HS a -> HS a
+{- | Same as userCode but with a default argument to return instead of using
+Maybe, provided for convenience.
+-}
+userCodeDefS :: (HasCallStack) => a -> HS a -> HS a
 userCodeDefS defValue a = fromMaybe defValue <$> userCodeS a
 
 -----------------------------------------------------------
@@ -108,9 +115,10 @@ writeMainQ ev = do
 
 --------------------------------------------------
 
--- | Runs handleEventHook from the configuration and runs the default handler
--- function if it returned True.
+{- | Runs handleEventHook from the configuration and runs the default handler
+function if it returned True.
+-}
 handleWithHook :: (HandleEvent m ev, m ~ H, ev ~ Event) => ev -> m ()
 handleWithHook e = do
-  evHook <- view (config . handleEventHook)
-  whenM (userCodeDef True $ getAll `fmap` evHook e) (handleEvent e)
+    evHook <- view (config . handleEventHook)
+    whenM (userCodeDef True $ getAll `fmap` evHook e) (handleEvent e)

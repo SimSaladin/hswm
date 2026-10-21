@@ -1,26 +1,37 @@
 { inputs, ... }:
 
-
 # for support "cabal-version: 3.14"
 #cabal2nix-unwrapped = final.haskell.packages.ghc914.cabal2nix;
 
 # For cabal pkg-config-depends: xkbregistry
 #xkbregistry = final.libxkbcommon;
 {
-  perSystem = { system, lib, config, pkgs, ... }@perSys:
+  perSystem =
+    {
+      system,
+      lib,
+      config,
+      pkgs,
+      ...
+    }@perSys:
     let
       defaultGhc = "ghc914";
       hlib = pkgs.haskell.lib.compose;
-      sourceHackageVersion = { version, hash ? "" }:
+      sourceHackageVersion =
+        {
+          version,
+          hash ? "",
+        }:
         p:
-        hlib.overrideCabal (_: { editedCabalFile = null; })
-          (p.overrideAttrs (oa: rec {
+        hlib.overrideCabal (_: { editedCabalFile = null; }) (
+          p.overrideAttrs (oa: rec {
             inherit version;
             src = pkgs.fetchzip {
               url = "mirror://hackage/${oa.pname}-${version}/${oa.pname}-${version}.tar.gz";
               sha256 = hash;
             };
-          }));
+          })
+        );
       haskellProjectBaseWith = ghcVersion: { config, ... }: {
         imports = [ perSys.config.haskellProjects.${ghcVersion}.defaults.projectModules.output ];
         basePackages = perSys.config.haskellProjects.${ghcVersion}.outputs.finalPackages;
@@ -40,19 +51,21 @@
         haskellProjects.hswm = { config, pkgs, ... }: {
           # To avoid unnecessary rebuilds, we filter projectRoot:
           # https://community.flake.parts/haskell-flake/local#rebuild
-          projectRoot = builtins.toString (lib.fileset.toSource rec {
-            root = ./.;
-            fileset = lib.fileset.unions [
-              (root + /cabal.project)
-              (root + /README.md)
-              (root + /hswm)
-              (root + /hswm-bindings)
-              (root + /xkbcommon-bindings)
-              (root + /waybar-cffi-hs)
-              (root + /hs-bindgen-hooks)
-              (root + /pixman-bindings)
-            ];
-          });
+          projectRoot = builtins.toString (
+            lib.fileset.toSource rec {
+              root = ./.;
+              fileset = lib.fileset.unions [
+                (root + /cabal.project)
+                (root + /README.md)
+                (root + /hswm)
+                (root + /hswm-bindings)
+                (root + /xkbcommon-bindings)
+                (root + /waybar-cffi-hs)
+                (root + /hs-bindgen-hooks)
+                (root + /pixman-bindings)
+              ];
+            }
+          );
           defaults = {
             enable = false;
             projectModules.output = { inherit (config) packages settings devShell; };
@@ -79,15 +92,19 @@
         # GHC 9.14 .. future
         haskellProjects.ghc914 = { pkgs, ... }: {
           defaults.enable = false;
-          basePackages = pkgs.haskell.packages.ghc914.extend (self: super: {
-            buildHaskellPackages = super.buildHaskellPackages.extend (self: super: {
+          basePackages = pkgs.haskell.packages.ghc914.extend (
+            self: super: {
+              buildHaskellPackages = super.buildHaskellPackages.extend (
+                self: super: {
+                  Cabal = self.Cabal_3_16_1_0;
+                }
+              );
               Cabal = self.Cabal_3_16_1_0;
-            });
-            Cabal = self.Cabal_3_16_1_0;
-            gtk2hs-buildtools = self.buildHaskellPackages.gtk2hs-buildtools;
-            # XXX: specifying this via packages.glib.source throws infinite recursion...
-            glib = hlib.overrideSrc { src = inputs.gtk2hs + "/glib"; } super.glib;
-          });
+              gtk2hs-buildtools = self.buildHaskellPackages.gtk2hs-buildtools;
+              # XXX: specifying this via packages.glib.source throws infinite recursion...
+              glib = hlib.overrideSrc { src = inputs.gtk2hs + "/glib"; } super.glib;
+            }
+          );
 
           packages = {
             gtk2hs-buildtools.source = inputs.gtk2hs + "/tools";
@@ -100,8 +117,18 @@
           settings = {
             HTTP.check = false;
             ghc-typelits-natnormalise.check = false; # ???
-            ghc-typelits-knownnat = { custom = sourceHackageVersion { version = "0.8.4"; hash = "sha256-PyYMUvJ8/miqusNl7+xay8OJqtK1/uHNQEiLr1utieg="; }; };
-            ghc-tcplugin-api = { custom = sourceHackageVersion { version = "0.19.0.0"; hash = "sha256-2jm1Q2lmaG6vtRnxcvxf4U2gvQdVkDL0h8PWaTpDWJA="; }; };
+            ghc-typelits-knownnat = {
+              custom = sourceHackageVersion {
+                version = "0.8.4";
+                hash = "sha256-PyYMUvJ8/miqusNl7+xay8OJqtK1/uHNQEiLr1utieg=";
+              };
+            };
+            ghc-tcplugin-api = {
+              custom = sourceHackageVersion {
+                version = "0.19.0.0";
+                hash = "sha256-2jm1Q2lmaG6vtRnxcvxf4U2gvQdVkDL0h8PWaTpDWJA=";
+              };
+            };
             string-interpolate.jailbreak = true; # containers 0.8
             config-ini.jailbreak = true; # containers 0.8
             brick.jailbreak = true; # containers 0.8
@@ -126,25 +153,37 @@
             haskell-language-server = { self, ... }: { jailbreak = true; };
             fourmolu = { self, ... }: {
               jailbreak = true;
-              custom = p: p.override {
-                ghc-lib-parser = self.ghc-lib-parser_9_14_1_20251220;
-              };
+              custom =
+                p:
+                p.override {
+                  ghc-lib-parser = self.ghc-lib-parser_9_14_1_20251220;
+                };
             };
             ormolu = { self, ... }: {
-              custom = p: (sourceHackageVersion { version = "0.8.1.0"; hash = "sha256-a1g+ococHdfwFYn2ImesdPJ4xwCbyP6ey5zQVYzG2PE="; } p).override {
-                ghc-lib-parser = self.ghc-lib-parser_9_14_1_20251220;
-              };
+              custom =
+                p:
+                (sourceHackageVersion {
+                  version = "0.8.1.0";
+                  hash = "sha256-a1g+ococHdfwFYn2ImesdPJ4xwCbyP6ey5zQVYzG2PE=";
+                } p).override
+                  {
+                    ghc-lib-parser = self.ghc-lib-parser_9_14_1_20251220;
+                  };
             };
             ghc-lib-parser-ex_9_14_2_0 = { self, ... }: {
-              custom = p: p.override {
-                ghc-lib-parser = self.ghc-lib-parser_9_14_1_20251220;
-              };
+              custom =
+                p:
+                p.override {
+                  ghc-lib-parser = self.ghc-lib-parser_9_14_1_20251220;
+                };
             };
             hlint = { self, ... }: {
-              custom = p: p.override {
-                ghc-lib-parser = self.ghc-lib-parser_9_14_1_20251220;
-                ghc-lib-parser-ex = self.ghc-lib-parser-ex_9_14_2_0;
-              };
+              custom =
+                p:
+                p.override {
+                  ghc-lib-parser = self.ghc-lib-parser_9_14_1_20251220;
+                  ghc-lib-parser-ex = self.ghc-lib-parser-ex_9_14_2_0;
+                };
             };
           };
           autoWire = [ ];
@@ -156,7 +195,9 @@
             (haskellProjectBaseWith defaultGhc)
             perSys.config.haskellProjects.hswm.defaults.projectModules.output
           ];
-          defaults = { settings.defined = { }; };
+          defaults = {
+            settings.defined = { };
+          };
           devShell = {
             tools = ps: {
               haskell-language-server = null; # broken
@@ -164,7 +205,12 @@
             };
             #extraLibraries = ps: { };
           };
-          autoWire = lib.mkForce [ "devShells" "packages" "apps" "checks" ];
+          autoWire = lib.mkForce [
+            "devShells"
+            "packages"
+            "apps"
+            "checks"
+          ];
         };
 
         ## GHC 9.12 with -fPIC (static shared objects)
@@ -188,6 +234,5 @@
         #  defaults.settings.all.extraConfigureFlags = [ "--ghc-options=-fPIC" ];
         #};
       };
-    }
-  ;
+    };
 }

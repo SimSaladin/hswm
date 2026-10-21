@@ -1,33 +1,36 @@
-cabal-version:      3.14
+cabal-version: 3.14
 -- XXX: https://github.com/haskell/cabal/issues/12053
 --build-type:         Hooks
-build-type:         Custom
-name:               xkbcommon-bindings
-version:            0.1.0.0
-synopsis:           Low-level bindings to libxkbcommon
-description:        Low-level bindings to libxkbcommon e.g. xkbcommon.h (incomplete)
-license:            MIT
-license-file:       LICENSE
-author:             Samuli Thomasson
-maintainer:         samuli.thomasson@pm.me
+build-type: Custom
+name: xkbcommon-bindings
+version: 0.1.0.0
+synopsis: Low-level bindings to libxkbcommon
+description: Low-level bindings to libxkbcommon e.g. xkbcommon.h (incomplete)
+license: MIT
+license-file: LICENSE
+author: Samuli Thomasson
+maintainer: samuli.thomasson@pm.me
 -- copyright:
-category:           System
-extra-doc-files:    CHANGELOG.md
-tested-with:        GHC == 9.14.1, GHC == 9.12.2
--- extra-source-files:
+category: System
+extra-doc-files: CHANGELOG.md
+tested-with:
+  ghc ==9.12.2
+  ghc ==9.14.1
 
+-- extra-source-files:
 flag pkg-config
   description: Use pkg-config to find external library dependencies
   default: True
 
 common warnings
-    ghc-options:
-      -Wall
-      -Wunused-packages
+  ghc-options:
+    -Wall
+    -Wunused-packages
 
 common language
   default-language: Haskell2010
   default-extensions:
+    CApiFFI
     DataKinds
     DeriveAnyClass
     DeriveDataTypeable
@@ -37,52 +40,56 @@ common language
     FlexibleContexts
     GeneralizedNewtypeDeriving
     OverloadedRecordDot
-    TypeApplications
     PatternSynonyms
-    CApiFFI
+    TypeApplications
 
 common deps
-    build-depends:
-       base              >=4.21   && <5
-     , data-default     ^>=0.8
-     , unix             ^>=2.8.6
+  build-depends:
+    base >=4.21 && <5,
+    data-default ^>=0.8,
+    unix ^>=2.8.6
 
 custom-setup
   setup-depends:
-      hs-bindgen-hooks
-    , base           >=4.21   && <5
-    , Cabal          >=3.14   && <3.19
     -- , Cabal-hooks    >=3.14   && <3.19
-    , filepath       >=1.5    && <2
-    , bytestring
+    Cabal >=3.14 && <3.19,
+    base >=4.21 && <5,
+    bytestring,
+    filepath >=1.5 && <2,
+    hs-bindgen-hooks
 
 library
   import: warnings, language, deps
   exposed-modules:
-     Text.XkbCommon
-   , Text.XkbCommon.Context
-   , Text.XkbCommon.EventCodes
-   , Text.XkbCommon.KeySym
-   , Text.XkbCommon.KeySyms
-   , Text.XkbCommon.Keymap
-   , Text.XkbCommon.Keymap.RmlvoBuilder
-   , Text.XkbCommon.State
-   , Text.XkbCommon.Registry
+    Text.XkbCommon
+    Text.XkbCommon.Context
+    Text.XkbCommon.EventCodes
+    Text.XkbCommon.KeySym
+    Text.XkbCommon.KeySyms
+    Text.XkbCommon.Keymap
+    Text.XkbCommon.Keymap.RmlvoBuilder
+    Text.XkbCommon.Registry
+    Text.XkbCommon.State
+
   autogen-modules:
-     Text.XkbCommon.EventCodes
-   , Text.XkbCommon.KeySyms
+    Text.XkbCommon.EventCodes
+    Text.XkbCommon.KeySyms
+
   other-modules:
-     Text.XkbCommon.FFI
-   , Text.XkbCommon.Internal
-  hs-source-dirs:     src
+    Text.XkbCommon.FFI
+    Text.XkbCommon.Internal
+
+  hs-source-dirs: src
   build-tool-depends: hsc2hs:hsc2hs
 
   if flag(pkg-config)
     pkgconfig-depends:
-        xkbcommon   >= 1.13
-      , xkbregistry >= 1.13
+      xkbcommon >=1.13,
+      xkbregistry >=1.13
   else
-    extra-libraries: xkbcommon, xkbregistry
+    extra-libraries:
+      xkbcommon
+      xkbregistry
 
   if !os(linux)
     buildable: False
@@ -93,12 +100,17 @@ test-suite spec
   main-is: Spec.hs
   hs-source-dirs: tests
   other-modules:
-      Text.XkbCommonSpec
-    , Text.XkbRegistrySpec
+    Text.XkbCommonSpec
+    Text.XkbRegistrySpec
+
   build-depends:
-      base
-    , hspec
-    , xkbcommon-bindings
+    base,
+    hspec,
+    xkbcommon-bindings
+
   build-tool-depends:
     hspec-discover:hspec-discover
-  ghc-options: -threaded -with-rtsopts=-N
+
+  ghc-options:
+    -threaded
+    -with-rtsopts=-N

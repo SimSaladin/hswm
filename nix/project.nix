@@ -1,58 +1,74 @@
-{ self, inputs, lib, withSystem, haskellNixModules, cabal-defaults, ... }:
+{
+  self,
+  inputs,
+  lib,
+  withSystem,
+  haskellNixModules,
+  cabal-defaults,
+  ...
+}:
 
 let
   inherit (inputs.flake-utils.lib) mkApp;
 
-  thisProject = { lib, config, pkgs, ... }: {
-    imports = [
-      cabal-defaults
-    ];
-    modules = [
-      haskellNixModules.hs-bindgen
-      hsNixModule
-    ];
-    name = "hswm";
-    src = pkgs.project-lib.fixCabalProjectImports {
-      src = ../.;
-    };
-    cabalProjectLocal = lib.mkAfter (
-      # ''optimization: True'' +
-      ''package *
-            documentation: True
-      ''
-    );
-    materialized = pkgs.project-lib.materializedFor "project";
-    #nix-tools = pkgs.my-nix-tools; # Using Cabal >= 3.18 tools
-
-    shell = {
-      name = config.name;
-      tools.hpack = { };
-      allToolDeps = true;
-      withHaddock = true;
-      withHoogle = true;
-      nativeBuildInputs = [
-        # Use a newer cabal-install binary
-        pkgs.cabal_3_18
-        config.hsPkgs.hs-bindgen.components.exes.hs-bindgen-cli
+  thisProject =
+    {
+      lib,
+      config,
+      pkgs,
+      ...
+    }:
+    {
+      imports = [
+        cabal-defaults
       ];
-      inputsFrom = [
-        (withSystem pkgs.stdenv.hostPlatform.system ({ config, ... }: config.pre-commit.devShell))
+      modules = [
+        haskellNixModules.hs-bindgen
+        hsNixModule
       ];
-    };
+      name = "hswm";
+      src = pkgs.project-lib.fixCabalProjectImports {
+        src = ../.;
+      };
+      cabalProjectLocal = lib.mkAfter (
+        # ''optimization: True'' +
+        ''
+          package *
+                      documentation: True
+        ''
+      );
+      materialized = pkgs.project-lib.materializedFor "project";
+      #nix-tools = pkgs.my-nix-tools; # Using Cabal >= 3.18 tools
 
-    flake = {
-      # Using the haskell.nix V1 builder
-      variants.BuilderV1 = {
-        builderVersion = lib.mkForce 1;
-        flake.packages = _: { }; # hide package outputs
+      shell = {
+        name = config.name;
+        tools.hpack = { };
+        allToolDeps = true;
+        withHaddock = true;
+        withHoogle = true;
+        nativeBuildInputs = [
+          # Use a newer cabal-install binary
+          pkgs.cabal_3_18
+          config.hsPkgs.hs-bindgen.components.exes.hs-bindgen-cli
+        ];
+        inputsFrom = [
+          (withSystem pkgs.stdenv.hostPlatform.system ({ config, ... }: config.pre-commit.devShell))
+        ];
       };
-      # Using a GHC without LLVM support
-      variants.NoLLVM = {
-        compiler-nix-name = lib.mkForce "ghc9141";
-        flake.packages = _: { }; # hide package outputs
+
+      flake = {
+        # Using the haskell.nix V1 builder
+        variants.BuilderV1 = {
+          builderVersion = lib.mkForce 1;
+          flake.packages = _: { }; # hide package outputs
+        };
+        # Using a GHC without LLVM support
+        variants.NoLLVM = {
+          compiler-nix-name = lib.mkForce "ghc9141";
+          flake.packages = _: { }; # hide package outputs
+        };
       };
     };
-  };
 
   projectNames = [
     "hs-bindgen-hooks"
@@ -63,7 +79,8 @@ let
     "xkbcommon-bindings"
   ];
 
-  hsNixModule = { config, pkgs, ... }:
+  hsNixModule =
+    { config, pkgs, ... }:
     {
       packages = {
         hswm = {
@@ -95,51 +112,73 @@ let
 
   # Shell using exposePackagesVia = "ghc-pkg" for use with eg. hoogle
   # Note: v2 shell ignores exactDeps, additional, components
-  mkGhcPkgShell = { project, projectShells ? [ ], ... }@args:
-    adjustedShellFor project ({
-      name = "hswm-ghc-pkg";
-      exposePackagesVia = "ghc-pkg";
-      packages = lib.mkForce (_: [ ]);
-      inputsFrom = lib.map (drv: drv.overrideAttrs { shellHook = ""; }) projectShells
-        ++ args.inputsFrom or [ ];
-      allToolDeps = lib.mkForce false;
-      withHoogle = true;
-      shellHook = "unset PROMPT_COMMAND";
-    } // removeAttrs args [ "project" "projectShells" "inputsFrom" ]);
+  mkGhcPkgShell =
+    {
+      project,
+      projectShells ? [ ],
+      ...
+    }@args:
+    adjustedShellFor project (
+      {
+        name = "hswm-ghc-pkg";
+        exposePackagesVia = "ghc-pkg";
+        packages = lib.mkForce (_: [ ]);
+        inputsFrom =
+          lib.map (drv: drv.overrideAttrs { shellHook = ""; }) projectShells ++ args.inputsFrom or [ ];
+        allToolDeps = lib.mkForce false;
+        withHoogle = true;
+        shellHook = "unset PROMPT_COMMAND";
+      }
+      // removeAttrs args [
+        "project"
+        "projectShells"
+        "inputsFrom"
+      ]
+    );
 
   # A shell per project/package
-  perPackageShellsFor = project:
-    lib.genAttrs' projectNames
-      (name: lib.nameValuePair "package:${name}" (
+  perPackageShellsFor =
+    project:
+    lib.genAttrs' projectNames (
+      name:
+      lib.nameValuePair "package:${name}" (
         adjustedShellFor project {
           name = "package:${name}";
           packages = lib.mkForce (ps: [ ps.${name} ]);
           exposePackagesVia = "ghc-pkg";
           withHoogle = true;
         }
-      ));
+      )
+    );
 
-  adjustedShellFor = project: args:
-    adjustShell (if args ? name then args.name else null) (project.shellFor args);
+  adjustedShellFor =
+    project: args: adjustShell (if args ? name then args.name else null) (project.shellFor args);
 
   # For haskell.nix v2 builder (writes to ~/.cabal by default)
-  adjustShell = key: drv:
+  adjustShell =
+    key: drv:
     drv.overrideAttrs (oa: {
       shellHook = ''
         export CABAL_DIR="${
-          if key == null then "$HOME/.local/state/cabal"
-                         else "$HOME/.local/state/cabal/${key}"}"
+          if key == null then "$HOME/.local/state/cabal" else "$HOME/.local/state/cabal/${key}"
+        }"
 
         # Don't exit the shell if the sync fails. The tool to fix it
         # is inside the shell.
-        ${lib.replaceString
-            "haskell-nix-cabal-store-sync || return 1"
-            "haskell-nix-cabal-store-sync || true"
-            oa.shellHook}
+        ${lib.replaceString "haskell-nix-cabal-store-sync || return 1"
+          "haskell-nix-cabal-store-sync || true"
+          oa.shellHook
+        }
       '';
     });
 
-  mkMaterializedDoApp = { projects, pkgs, project-lib, ... }:
+  mkMaterializedDoApp =
+    {
+      projects,
+      pkgs,
+      project-lib,
+      ...
+    }:
     mkApp {
       name = "materialized-do";
       drv = pkgs.writeShellApplication {
@@ -147,7 +186,7 @@ let
         text = ''
           generate(){
             set -x
-            ${project-lib.materialized-do-all {} projects}
+            ${project-lib.materialized-do-all { } projects}
           }
           calculateHash() {
             ${project-lib.materialized-do-all { what = "calculateMaterializedSha"; } projects}
@@ -161,11 +200,23 @@ let
       };
     };
 
-  customizations.perSystem = { lib, config, pkgs, project-lib, ... }:
+  customizations.perSystem =
+    {
+      lib,
+      config,
+      pkgs,
+      project-lib,
+      ...
+    }:
     let
       project = pkgs.project;
       projectFlake = project.flake';
-      projects = [{ project = project; key = "project"; }];
+      projects = [
+        {
+          project = project;
+          key = "project";
+        }
+      ];
     in
     {
       apps = {
@@ -200,10 +251,12 @@ let
             config.packages."hswm:exe:hswmctl"
             config.packages."waybar-cffi-hs:flib:waybarhaskellplugin"
           ];
-          pathsToLink = [ "/bin" "/lib" ];
+          pathsToLink = [
+            "/bin"
+            "/lib"
+          ];
         };
       };
-
 
       devShells =
         let
@@ -211,9 +264,9 @@ let
           pkgShells = perPackageShellsFor pkgs.project;
         in
 
-        lib.mapAttrs (_: lib.mkForce) projectShells //
-        pkgShells //
-        {
+        lib.mapAttrs (_: lib.mkForce) projectShells
+        // pkgShells
+        // {
           project-pkgs = adjustedShellFor project {
             name = "project-pkgs";
             #exposePackagesVia = "ghc-pkg";
@@ -237,10 +290,23 @@ in
     customizations
   ];
 
-  perSystem = { lib, config, pkgs, project, project-lib, ... }:
+  perSystem =
+    {
+      lib,
+      config,
+      pkgs,
+      project,
+      project-lib,
+      ...
+    }:
     {
       _module.args.project = pkgs.project;
-      inherit (project.flake') apps packages devShells checks;
+      inherit (project.flake')
+        apps
+        packages
+        devShells
+        checks
+        ;
       legacyPackages = { inherit project; };
     };
 
