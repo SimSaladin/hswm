@@ -17,12 +17,23 @@ import qualified HSWM.StackSet as W
 
 -- | Go to workspace
 workspacePrompt :: RP.RofiPromptConfig' -> H ()
-workspacePrompt = mkWorkspacePrompt
-  (\pc _ -> pc {RP.prompt = "Go to workspace"})
+workspacePrompt pc = mkWorkspacePrompt
+  (\_ _ -> pc {RP.prompt = "Go to workspace"})
   (\_ input -> do
       logInfo $ "switching workspace" :# [ "tag" .= input ]
-      runInHS $ windows $ W.view input
-      manageDirty)
+      exist <- runInHS $ do
+        windows $ W.view input
+        withWindowSet (return . W.tagMember input)
+      if exist
+         then manageDirty
+         else handleNotExists input
+  ) pc
+  where
+    handleNotExists tag = do
+      RP.confirmPrompt (pc @[String]) ("Create new workspace '"++ tag ++ "'?") $ runInHS $ do
+        -- modifySeats (const True) $ \s -> s { suppressChangeFocus = 2 }
+        DynWS.addWorkspace tag
+        manageDirty
 
 renameWorkspacePrompt :: RP.RofiPromptConfig' -> H ()
 renameWorkspacePrompt = mkWorkspacePrompt
