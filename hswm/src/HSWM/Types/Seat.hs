@@ -24,7 +24,7 @@ import qualified WL.ExtIdleNotify.Staging.V1.Client as EXT_IN
 
 import Data.Kind
 
-type family Stateful (m :: Type -> Type) :: Type -> Type
+type family Stateful (m :: k) :: k
 
 -- * Seat
 
@@ -44,14 +44,15 @@ data Seat' (m :: Type -> Type) = Seat
   , focused, hovered, interacted :: !RiverWindow -- | Windows last interacted with.
 
   -- | XKB (keyboard) bindings.
-  , xkb_bindings           :: !(XkbBindingMap (SomeAction m))
+  , xkb_bindings           :: !(XkbBindingMap2 (SomeAction m))
 
   -- | Pointer bindings.
-  , pointer_bindings       :: [StablePtr (PointerBinding (SomeAction m))]
+  , pointer_bindings       :: !(PointerBindings (SomeAction m))
+  --, pointer_bindings       :: [StablePtr (PointerBinding (SomeAction m))]
 
   -- | Event queues.
   , pending_action         :: !(SeatAction m)
-  , submap_pending         :: !(Maybe (SomeAction m, XkbBindingMap (SomeAction m), Maybe (SomeAction m)))
+  , submap_pending         :: !(Maybe (SomeAction m, XkbBindingMap2 (SomeAction m), Maybe (SomeAction m)))
   , pendingPointerEnter    :: !(Maybe (RiverWindow, Position))
 
   -- | Pointer move/resize.
@@ -96,7 +97,7 @@ data SeatAction m
   | -- | start pointer drag operation
     S_START_OP SeatOperation
   | -- | interpret next keypress for submap, swallowing an unexpected key
-    S_SUBMAP_NEXT_KEY (SomeAction m) (XkbBindingMap (SomeAction m)) (Maybe (SomeAction m))
+    S_SUBMAP_NEXT_KEY (SomeAction m) (XkbBindingMap2 (SomeAction m)) (Maybe (SomeAction m))
   | -- | Cancel submap input, resetting to root bindings.
     S_SUBMAP_CANCEL
   deriving stock (Eq, Generic, Data)
@@ -141,6 +142,10 @@ instance ToJSON (SeatAction m) where
   toJSON     = genericToJSON aesonOptions
   toEncoding = genericToEncoding aesonOptions
 
-instance ToJSON SeatFocus
+instance ToJSON SeatFocus where
+  toJSON     = genericToJSON aesonOptions
+  toEncoding = genericToEncoding aesonOptions
 
-instance ToJSON SeatOperation
+instance ToJSON SeatOperation where
+  toJSON     = genericToJSON aesonOptions
+  toEncoding = genericToEncoding aesonOptions

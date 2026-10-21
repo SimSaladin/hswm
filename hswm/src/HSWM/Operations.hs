@@ -1,36 +1,19 @@
 module HSWM.Operations where
 
-import Data.List qualified as L
-import Data.Map qualified as M
-import Data.Ratio ((%))
-import Data.Set qualified as S
-import HSWM.Core
-import HSWM.Main.Persist qualified as Persist
-import HSWM.StackSet qualified as W
-import River qualified as R
-import System.Posix qualified as Posix
-import System.Posix.Process (executeFile)
-import WL.Wlr.OutputPowerManagement.Unstable.V1.Client qualified as WLR_OPM
+import qualified Data.List as L
+import qualified Data.Map as M
+import           Data.Ratio ((%))
+import qualified Data.Set as S
+import           HSWM.Core
+import qualified HSWM.Main.Persist as Persist
+import qualified HSWM.StackSet as W
+import qualified River as R
+import qualified System.Posix as Posix
+import           System.Posix.Process (executeFile)
+import qualified WL.Wlr.OutputPowerManagement.Unstable.V1.Client as WLR_OPM
+import GHC.Stack
 
--- * Misc. pure operations
-
--- | Given a point, determine the screen (if any) that contains it.
-pointScreen ::
-  Position1D ->
-  Position1D ->
-  HS (Maybe (W.Screen WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail ScreenId ScreenDetail))
-pointScreen x y = withWindowSet $ return . L.find point . W.screens
-  where
-    point = pointWithin x y . screenRect . W.screenDetail
-
--- * Manage tasks that defer to next manage sequence
-
-manageReveal, manageHide :: (SomeWindow a) => a -> HS ()
-manageReveal = doRender WRReveal
-manageHide = doRender WRHide
-
-manageKill :: (SomeWindow a) => a -> HS ()
-manageKill = doManage WRequestClose
+-- * Schedule window operations to next manage or render phase
 
 -- |
 -- Move and resize @w@ such that it fits inside the given rectangle, including its border.
@@ -39,7 +22,7 @@ manageKill = doManage WRequestClose
 tileWindow :: (SomeWindow a) => a -> Rectangle -> HS ()
 tileWindow sw r = do
   let rw = sw ^. riverId
-  withWindow_ rw $ \w -> do
+  withWindow_ rw $ \w ->
     case w.fullscreen of
       Nothing -> do
         bwDef <- view $ config . borderWidth . to fi
@@ -60,6 +43,21 @@ tileWindow sw r = do
               modifyWindow rw $ fullscreen ?~ o.river_output &+ position .~ o.position &+ size .~ o.size
           _ -> return ()
 
+-- | Mark the window to be revealed or hidden in next manage sequence.
+manageReveal, manageHide :: (SomeWindow a) => a -> HS ()
+manageReveal = doRender WRReveal
+manageHide = doRender WRHide
+
+-- | Mark the window to be closed in the next manage sequence.
+manageKill :: (SomeWindow a) => a -> HS ()
+manageKill = doManage WRequestClose
+
+doManage :: (SomeWindow a) => WindowManageAction -> a -> HS ()
+doManage a sw = modifyWindow sw $ pManageAction <>~ [a]
+
+doRender :: (SomeWindow a) => WindowRenderAction -> a -> HS ()
+doRender a sw = modifyWindow sw $ pendingRender <>~ [a]
+
 windowPlaceTop :: (SomeWindow a) => a -> HS ()
 windowPlaceTop = doRender WRPlaceTop
 
@@ -77,34 +75,9 @@ manageWindowBorderWidth sw bw = do
   modifyWindow sw $ wBorderWidth .~ bw
   doRender WRBorder sw
 
-doManage :: (SomeWindow a) => WindowManageAction -> a -> HS ()
-doManage a sw = modifyWindow sw $ pManageAction <>~ [a]
-
-doRender :: (SomeWindow a) => WindowRenderAction -> a -> HS ()
-doRender a sw = modifyWindow sw $ pendingRender <>~ [a]
-
 ----------------------------------------------------------------------------------
 
 -- * Operations not tied to manage/render phases
-
-{-
--- \| Throw a message to the current 'LayoutClass' possibly modifying how we
--- layout the windows, in which case changes are handled through a refresh.
--}
-sendMessage :: (Message a) => a -> HS ()
-sendMessage a = do
-  w <- gets $ W.workspace . W.current . view windowset
-  ml' <- handleMessage (W.layout w) (SomeMessage a) `catchHS` return Nothing
-  whenJust ml' $ \l' -> do
-    modifyWindowSet $ \ws ->
-      ws
-        { W.current =
-            (W.current ws)
-              { W.workspace = (W.workspace $ W.current ws) {W.layout = l'}
-              }
-        }
-    liftH manageDirty
-  return ()
 
 -- | Send a message to all layouts, without refreshing.
 broadcastMessage :: (Message a) => a -> HS ()
@@ -119,37 +92,40 @@ broadcastMessage a = withWindowSet $ \ws -> do
       h = W.hidden ws
   mapM_ (sendMessageWithNoRefresh a) (c : v ++ h)
 
+-- | Throw a message to the current 'LayoutClass' possibly modifying how we
+-- layout the windows, in which case changes are handled through a refresh.
+sendMessage :: (Message a) => a -> HS ()
+sendMessage a = do
+  w <- gets $ W.workspace . W.current . view windowset
+  ml' <- handleMessage (W.layout w) (SomeMessage a) `catchHS` return Nothing
+  whenJust ml' $ \l' -> do
+    modifyWindowSet $ \ws ->
+      ws
+        { W.current =
+            (W.current ws)
+              { W.workspace = (W.workspace $ W.current ws) {W.layout = l'} }
+        }
+    manageDirty
+  return ()
+
 -- | Send a message to a layout, without refreshing.
 sendMessageWithNoRefresh :: (Message a) => a -> WindowSpace -> HS ()
 sendMessageWithNoRefresh a w =
   handleMessage (W.layout w) (SomeMessage a) `catchHS` return Nothing
     >>= updateLayout (W.tag w)
 
--- | Set the layout of the currently viewed workspace.
-setLayout :: Layout RiverWindow -> HS ()
-setLayout l = do
-  ss@W.StackSet {W.current = c@W.Screen {W.workspace = ws}} <- use windowset
-  _ <- handleMessage (W.layout ws) (SomeMessage ReleaseResources)
-  windows $ const $ ss {W.current = c {W.workspace = ws {W.layout = l}}}
-
--- | Update the layout field of a workspace.
-updateLayout :: WorkspaceId -> Maybe (Layout RiverWindow) -> HS ()
-updateLayout i ml = whenJust ml $ \l ->
-  runOnWorkspaces $ \ww -> return $ if W.tag ww == i then ww {W.layout = l} else ww
-
-withScreenOutput :: ScreenId -> (Output -> HS ()) -> HS ()
-withScreenOutput sid f = mapM_ f . L.find (\o -> o.screen == sid) =<< use outputList
-
 -- | Force new manage sequence.
-manageDirty :: (MonadStateGlobal env m, env ~ HConf) => m ()
-manageDirty = withObject $ \wm -> do
-  logDebug "wm request: manage_dirty"
-  R.riverWindowManagerManageDirty wm
+manageDirty :: HasCallStack => MonadH m => m ()
+manageDirty = liftH $ do
+  logDebug $ "wm request: manage_dirty" :# [ "stack" .= prettyCallStack callStack ]
+  withObject R.riverWindowManagerManageDirty
   writeMainQ MainPoll
 
 --------------------------------------------------------------
 
 -- * Manage sequence /only/
+
+-- NOTE: these operations can only be executed within an active render phase!
 
 -- | Set the focus to the window on top of the stack, or root
 --
@@ -157,6 +133,7 @@ manageDirty = withObject $ \wm -> do
 setTopFocus :: HS ()
 setTopFocus = withWindowSet $ maybe (pure ()) setTopFocus' . W.peek
 
+-- | Set the specified window as focus (all seats).
 setTopFocus' :: RiverWindow -> HS ()
 setTopFocus' rw = mapSeats $ \s -> do
   when (s.focused /= rw) $ do
@@ -177,25 +154,27 @@ seatDisableBindingsMatching :: (SomeSeat a) => a -> [ModMask] -> [KeySym] -> HS 
 seatDisableBindingsMatching rs mods keys = withSeat_ rs $ \s -> do
   let binds = s.xkb_bindings
       matchedKeys = S.filter match (M.keysSet binds)
-      matchedBinds = M.fromSet (binds M.!) matchedKeys
+      matchedBinds = M.fromSet (view _2 . (.unBoth) . (binds M.!)) matchedKeys
   logInfo $ "seat: temporarily disabling bindings" :# ["count" .= length matchedBinds]
   io . forM_ matchedBinds $ deRefStablePtr >=> R.riverXkbBindingDisable . (.riverXkbBinding)
   where
-    match (mod', key) = any (\m -> m .&. mod' > 0) mods || key `elem` keys
+    match (XBKey mod' key) = any (\m -> m .&. mod' > 0) mods || key `elem` keys
 
 seatEnableBindingsMatching :: (SomeSeat a) => a -> [ModMask] -> [KeySym] -> HS ()
 seatEnableBindingsMatching rs mods keys = withSeat_ rs $ \s -> do
   let binds = s.xkb_bindings
       matchedKeys = S.filter match (M.keysSet binds)
-      matchedBinds = M.fromSet (binds M.!) matchedKeys
+      matchedBinds = M.fromSet (view _2 . (.unBoth) . (binds M.!)) matchedKeys
   logInfo $ "seat: restoring bindings to enabled" :# ["seat" .= show (rs ^. riverId), "count" .= length matchedBinds]
   io . forM_ matchedBinds $ deRefStablePtr >=> R.riverXkbBindingEnable . (.riverXkbBinding)
   where
-    match (mod', key) = any (\m -> m .&. mod' > 0) mods || key `elem` keys
+    match (XBKey mod' key) = any (\m -> m .&. mod' > 0) mods || key `elem` keys
 
 --------------------------------------------------------------
 
 -- * Render sequence / defer to render sequence
+
+-- NOTE: these operations can only be executed within an active render phase!
 
 -- | /render sequence/
 reveal, hide :: RiverWindow -> HS ()
@@ -219,122 +198,30 @@ setWindowPosition w x y = do
 
 --------------------------------------------------------------
 
--- * WindowSet etc. modifications
+-- * WindowSet operations
 
--- | Run a monadic action with the current stack set
-withWindowSet :: (WindowSet -> HS a) -> HS a
-withWindowSet f = use windowset >>= f
+-- TODO clean this up
 
-modifyWindowSet :: (WindowSet -> WindowSet) -> HS ()
-modifyWindowSet = modifying windowset
-
-windows :: (WindowSet -> WindowSet) -> HS ()
-windows = modifyWindowSet
-
--- | Return workspace visible on screen @sc@, or 'Nothing'.
-screenWorkspace :: ScreenId -> HS (Maybe WorkspaceId)
-screenWorkspace sc = withWindowSet $ return . W.lookupWorkspace sc
-
--- | This is basically a map function, running a function in the 'H' monad on
--- each workspace with the output of that function being the modified workspace.
-runOnWorkspaces :: (WindowSpace -> HS WindowSpace) -> HS ()
-runOnWorkspaces job = do
-  ws <- use windowset
-  h <- mapM job $ W.hidden ws
-  c : v <-
-    mapM (\s -> (\w -> s {W.workspace = w}) <$> job (W.workspace s)) $
-      W.current ws : W.visible ws
-  modify $ \s -> s {windowset = ws {W.current = c, W.visible = v, W.hidden = h}}
-
---------------------------------------------------------------
-
--- * Outputs
-
-lookupOutput :: (SomeOutput a) => a -> HS (Maybe Output)
-lookupOutput k = preuse $ outputList . eachRiverId k
-
-lookupOutputBy :: (Output -> Bool) -> HS (Maybe Output)
-lookupOutputBy f = preuse $ outputList . each . filtered f
-
-withOutput :: (SomeOutput a) => a -> (Output -> HS b) -> HS (Maybe b)
-withOutput k f = lookupOutput k >>= mapM f
-
-withOutput_ :: (SomeOutput a) => a -> (Output -> HS ()) -> HS ()
-withOutput_ k f = lookupOutput k >>= mapM_ f
-
-modifyOutput :: (SomeOutput a) => a -> (Output -> Output) -> HS ()
-modifyOutput k f = outputList . eachRiverId k %= f
-
-setOutputPower :: Bool -> HS ()
-setOutputPower mode = do
-  use outputList >>= traverseOf_ (each . filtered ((/= def) . view outputPower)) f
+-- | Given a point, determine the screen (if any) that contains it.
+pointScreen ::
+  Position1D ->
+  Position1D ->
+  HS (Maybe (W.Screen WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail ScreenId ScreenDetail))
+pointScreen x y = withWindowSet $ return . L.find point . W.screens
   where
-    f output = do
-      logInfo $ "Setting output power" :# ["on" .= mode, "output" .= show output.river_output, "opmId" .= show output.outputPower]
-      WLR_OPM.outputPowerSetMode output.outputPower $
-        if mode
-          then WLR_OPM.OutputPowerModeOn
-          else WLR_OPM.OutputPowerModeOff
+    point = pointWithin x y . screenRect . W.screenDetail
 
---------------------------------------------------------------
+-- | Set the layout of the currently viewed workspace.
+setLayout :: Layout RiverWindow -> HS ()
+setLayout l = do
+  ss@W.StackSet {W.current = c@W.Screen {W.workspace = ws}} <- use windowset
+  _ <- handleMessage (W.layout ws) (SomeMessage ReleaseResources)
+  windows $ const $ ss {W.current = c {W.workspace = ws {W.layout = l}}}
 
--- * Seats
-
-lookupSeat :: (SomeSeat a) => a -> HS (Maybe Seat)
-lookupSeat k = preuse $ seatList . eachRiverId k
-
-withSeat :: (SomeSeat a) => a -> (Seat -> HS b) -> HS (Maybe b)
-withSeat k f = lookupSeat k >>= mapM f
-
-withSeat_ :: (SomeSeat a) => a -> (Seat -> HS ()) -> HS ()
-withSeat_ k f = lookupSeat k >>= mapM_ f
-
-modifySeat :: (SomeSeat a) => a -> (Seat -> Seat) -> HS ()
-modifySeat k f = seatList . eachRiverId k %= f
-
-modifySeats :: (Seat -> Bool) -> (Seat -> Seat) -> HS ()
-modifySeats choose f = seatList . each . filtered choose %= f
-
--- | Use seat list read-only.
-mapSeats :: (GetHState m) => (Seat -> m ()) -> m ()
-mapSeats f = getHState >>= mapM_ f . view seatList
-
-startSeatOp :: SeatOperation -> HS ()
-startSeatOp seatop = modifySeats (const True) $ pendingAction .~ S_START_OP seatop
-
--- | Casts the pointer into @RiverSeat@.
-modifySeat' :: Ptr Void -> (Seat -> Seat) -> HS ()
-modifySeat' ud = modifySeat (R.RiverSeat $ castPtr ud)
-
---------------------------------------------------------------
-
--- * windows
-
-lookupWindow :: (SomeWindow a) => a -> HS (Maybe Window)
-lookupWindow k = preuse (_windows . ix (k ^. riverId))
-
-lookupWindows :: (SomeWindow a) => [a] -> HS [Window]
-lookupWindows ks = gets (^.. _windows . traversed . filtered (\x -> any (riverIdEq x) ks))
-
-withWindow :: (SomeWindow a) => a -> (Window -> HS b) -> HS (Maybe b)
-withWindow k f = lookupWindow k >>= mapM f
-
-withWindow_ :: (SomeWindow a) => a -> (Window -> HS ()) -> HS ()
-withWindow_ k f = lookupWindow k >>= mapM_ f
-
-modifyWindow :: (SomeWindow a) => a -> (Window -> Window) -> HS ()
-modifyWindow k f = alterWindow k (fmap f)
-
-modifyWindow' :: (SomeWindow a, MonadEffects m, MonadHS m) => a -> (Window -> Window) -> m ()
-modifyWindow' w = runInHS . modifyWindow w
-
-alterWindow :: (SomeWindow a) => a -> (Maybe Window -> Maybe Window) -> HS ()
-alterWindow k f = _windows . at (k ^. riverId) %= f
-
-mapWindows :: (Window -> HS ()) -> HS ()
-mapWindows f = use _windows >>= mapM_ f
-
--- Windowset
+-- | Update the layout field of a workspace.
+updateLayout :: WorkspaceId -> Maybe (Layout RiverWindow) -> HS ()
+updateLayout i ml = whenJust ml $ \l ->
+  runOnWorkspaces $ \ww -> return $ if W.tag ww == i then ww {W.layout = l} else ww
 
 withFocused :: (Window -> HS ()) -> HS ()
 withFocused f = use windowset >>= \ws -> whenJust (W.peek ws) (`withWindow_` f)
@@ -384,13 +271,131 @@ floatLocation sw = withWindow sw $ \w -> do
 
   return (W.screen sc, rr)
 
+-- |
+windows :: (WindowSet -> WindowSet) -> HS ()
+windows = modifyWindowSet
+
+-- | Run a monadic action with the current stack set
+withWindowSet :: (WindowSet -> HS a) -> HS a
+withWindowSet f = use windowset >>= f
+
+modifyWindowSet :: (WindowSet -> WindowSet) -> HS ()
+modifyWindowSet = modifying windowset
+
+-- | Return workspace visible on screen @sc@, or 'Nothing'.
+screenWorkspace :: ScreenId -> HS (Maybe WorkspaceId)
+screenWorkspace sc = withWindowSet $ return . W.lookupWorkspace sc
+
+-- | This is basically a map function, running a function in the 'H' monad on
+-- each workspace with the output of that function being the modified workspace.
+runOnWorkspaces :: (WindowSpace -> HS WindowSpace) -> HS ()
+runOnWorkspaces job = do
+  ws <- use windowset
+  h <- mapM job $ W.hidden ws
+  c : v <-
+    mapM (\s -> (\w -> s {W.workspace = w}) <$> job (W.workspace s)) $
+      W.current ws : W.visible ws
+  modify $ \s -> s {windowset = ws {W.current = c, W.visible = v, W.hidden = h}}
+
+--------------------------------------------------------------
+
+-- * Output lookup and manipulation
+
+lookupOutput :: (SomeOutput a) => a -> HS (Maybe Output)
+lookupOutput k = preuse $ outputList . eachRiverId k
+
+lookupOutputBy :: (Output -> Bool) -> HS (Maybe Output)
+lookupOutputBy f = preuse $ outputList . each . filtered f
+
+withOutput :: (SomeOutput a) => a -> (Output -> HS b) -> HS (Maybe b)
+withOutput k f = lookupOutput k >>= mapM f
+
+withOutput_ :: (SomeOutput a) => a -> (Output -> HS ()) -> HS ()
+withOutput_ k f = lookupOutput k >>= mapM_ f
+
+modifyOutput :: (SomeOutput a) => a -> (Output -> Output) -> HS ()
+modifyOutput k f = outputList . eachRiverId k %= f
+
+setOutputPower :: Bool -> HS ()
+setOutputPower mode = do
+  use outputList >>= traverseOf_ (each . filtered ((/= def) . view outputPower)) f
+  where
+    f output = do
+      logInfo $ "Setting output power" :# ["on" .= mode, "output" .= show output.river_output, "opmId" .= show output.outputPower]
+      WLR_OPM.outputPowerSetMode output.outputPower $
+        if mode
+          then WLR_OPM.OutputPowerModeOn
+          else WLR_OPM.OutputPowerModeOff
+
+withScreenOutput :: ScreenId -> (Output -> HS ()) -> HS ()
+withScreenOutput sid f = mapM_ f . L.find (\o -> o.screen == sid) =<< use outputList
+
+--------------------------------------------------------------
+
+-- * Seat lookup & manipulation
+
+lookupSeat :: (SomeSeat a) => a -> HS (Maybe Seat)
+lookupSeat k = preuse $ seatList . eachRiverId k
+
+withSeat :: (SomeSeat a) => a -> (Seat -> HS b) -> HS (Maybe b)
+withSeat k f = lookupSeat k >>= mapM f
+
+withSeat_ :: (SomeSeat a) => a -> (Seat -> HS ()) -> HS ()
+withSeat_ k f = lookupSeat k >>= mapM_ f
+
+modifySeat :: (SomeSeat a) => a -> (Seat -> Seat) -> HS ()
+modifySeat k f = seatList . eachRiverId k %= f
+
+modifySeats :: (Seat -> Bool) -> (Seat -> Seat) -> HS ()
+modifySeats choose f = seatList . each . filtered choose %= f
+
+-- | Use seat list read-only.
+mapSeats :: (GetHState m) => (Seat -> m ()) -> m ()
+mapSeats f = getHState >>= mapM_ f . view seatList
+
+startSeatOp :: SeatOperation -> HS ()
+startSeatOp seatop = modifySeats (const True) $ pendingAction .~ S_START_OP seatop
+
+-- | Casts the pointer into @RiverSeat@.
+modifySeat' :: Ptr Void -> (Seat -> Seat) -> HS ()
+modifySeat' ud = modifySeat (R.RiverSeat $ castPtr ud)
+
+--------------------------------------------------------------
+
+-- * Window lookup & manipulation
+
+lookupWindow :: (SomeWindow a) => a -> HS (Maybe Window)
+lookupWindow k = preuse (_windows . ix (k ^. riverId))
+
+lookupWindows :: (SomeWindow a) => [a] -> HS [Window]
+lookupWindows ks = gets (^.. _windows . traversed . filtered (\x -> any (riverIdEq x) ks))
+
+withWindow :: (SomeWindow a) => a -> (Window -> HS b) -> HS (Maybe b)
+withWindow k f = lookupWindow k >>= mapM f
+
+withWindow_ :: (SomeWindow a) => a -> (Window -> HS ()) -> HS ()
+withWindow_ k f = lookupWindow k >>= mapM_ f
+
+modifyWindow :: (SomeWindow a) => a -> (Window -> Window) -> HS ()
+modifyWindow k f = alterWindow k (fmap f)
+
+modifyWindow' :: (SomeWindow a, MonadEffects m, MonadHS m) => a -> (Window -> Window) -> m ()
+modifyWindow' w = runInHS . modifyWindow w
+
+alterWindow :: (SomeWindow a) => a -> (Maybe Window -> Maybe Window) -> HS ()
+alterWindow k f = _windows . at (k ^. riverId) %= f
+
+mapWindows :: (Window -> HS ()) -> HS ()
+mapWindows f = use _windows >>= mapM_ f
+
 -------------------------------------------------------------------
 
--- * Restart with state
+-- * Restart (with state)
 
-restart :: FilePath -> H ()
+restart :: HasCallStack => FilePath -> H ()
 restart prog = do
   runInHS $ broadcastMessage ReleaseResources
+  logInfo $ "Running exit hooks..."
   void . userCode =<< asks (view $ config . exitHook)
   statefile <- runInHS Persist.writeStateToFile
   let args = ["--state-file", statefile]

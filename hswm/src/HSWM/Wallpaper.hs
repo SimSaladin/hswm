@@ -88,7 +88,7 @@ wpStartupHook conf = do
   -- load source image
   tryLoadImage (filepath conf)
 
-wpExitHook :: H ()
+wpExitHook :: HasCallStack => H ()
 wpExitHook = do
   logInfo "wallpaper: exiting"
   deinit

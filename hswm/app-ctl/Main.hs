@@ -1,34 +1,25 @@
-{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE PartialTypeSignatures #-}
+{-# LANGUAGE UndecidableInstances  #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
-{-# OPTIONS_GHC -Wno-incomplete-record-selectors #-} -- XXX
 
-module Main (main) where
+module Main {-(main)-} where
 
-import           HSWM.IPC
-
-import           HSWM.Main.Options as HSWM (LogType'(..), defaultBufSize, initLoggers, AnsiColors(..), LogFormat)
 import           Control.Monad.Reader
-import qualified Data.Aeson as A
 import qualified Data.ByteString.Char8 as BC8
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.Text.Lazy as TL
---import           Data.Time
+import           HSWM.IPC  hiding (unwrap)
+import           HSWM.Main.Options as HSWM (AnsiColors(..), LogFormat, LogType'(..),
+                                            defaultBufSize, initLoggers)
 import qualified Options.Applicative as Options
 import           Options.Generic
 --import           Prettyprinter
 --import           Prettyprinter.Render.Terminal
+import           Data.Aeson.Encode.Pretty (encodePretty)
 import           System.Console.Haskeline
 import           System.Console.Haskeline.ReaderT
-import Data.Aeson.Encode.Pretty (encodePretty)
 
-data ClientOptions' w
-  = Version
-  | Interactive
-    { colorEnable :: w ::: AnsiColors <!> "auto" <#> "c" <?> "enable color output"
-    , logFormat   :: w ::: LogFormat <!> "plain" <?> "Log output"
-    }
-  | Dump
+data ClientOptions' w = ClientOptions
     { colorEnable :: w ::: AnsiColors <!> "auto" <#> "c" <?> "enable color output"
     , logFormat   :: w ::: LogFormat <!> "plain" <?> "Log output"
     }
@@ -42,33 +33,49 @@ deriving instance Show ClientOptions
 instance ParseRecord (ClientOptions' Wrapped) where
   parseRecord = parseRecordWithModifiers lispCaseModifiers
 
+instance ParseRecord Request where
+  parseRecord = parseRecordWithModifiers lispCaseModifiers
+
+instance ParseField Request where
+instance ParseFields Request where
+  --parseFields h m c d
+
+data Cmdline w = Cmdline (Maybe Request) (ClientOptions' w)
+  deriving (Generic)
+
+instance ParseRecord (Cmdline Wrapped) where
+  parseRecord = Cmdline <$> optional (parseRecordWithModifiers lispCaseModifiers)
+                        <*> parseRecordWithModifiers lispCaseModifiers
 
 main :: IO ()
 main = do
-    opts <- unwrapRecord progDesc
-    runMode opts
+    Cmdline cmd opts' <- getRecordWith infoPrefs mods :: IO (Cmdline Wrapped)
+    let opts = unwrap opts'
+    runMode opts cmd
+
   where
-    progDesc :: Text
+    infoPrefs = Options.header progDesc
+    mods = Options.subparserInline
     progDesc = "hswmctl"
 
-    runMode :: ClientOptions -> IO ()
-    runMode opts@Interactive{} = interactive opts
-    runMode Version{} = undefined
-    runMode opts@Dump{} = withConnect opts $ \sock -> do
-      res <- syncRequest sock (DumpState { param = "" })
-      io $ BL.putStrLn $ "\n\n" <> A.encode res <> "\n"
+    runMode opts Nothing = interactive opts
+    runMode opts (Just req) = withConnect opts $ \sock -> do
+      logInfoNS "hswmctl" "running some mode"
+      res <- syncRequest sock req
+      io $ BL.putStrLn $ BL.pack $ prettyResponse res
 
     withConnect opts f = withLogging (LogStderr defaultBufSize) opts.logFormat opts.colorEnable $ runLoggingT $ clientRunWith def f
 
-    withLogging :: MonadUnliftIO m => LogType' LogStr -> LogFormat -> AnsiColors -> (_ -> m a) -> m a
-    withLogging logtype fmt co f =
-      bracket (liftIO $ initLoggers logtype fmt co Nothing)
-              (\(_, fn) -> liftIO fn) $ \(logFn, _) -> f logFn
+withLogging :: MonadUnliftIO m => LogType' LogStr -> LogFormat -> AnsiColors -> (_ -> m a) -> m a
+withLogging logtype fmt co f =
+  bracket (liftIO $ initLoggers logtype fmt co Nothing)
+          (\(_, fn) -> liftIO fn) $ \(logFn, _) -> f logFn
 
-    interactive o = runInputT defaultSettings $ do
-        printExt <- getExternalPrint
-        withLogging (LogCallback (printExt . BC8.unpack . fromLogStr) (return ())) o.logFormat (if o.colorEnable /= ColorNever then ColorAlways else o.colorEnable) $ \logFn ->
-          fromReaderT $ runRT logFn
+interactive :: ClientOptions -> IO ()
+interactive o = runInputT defaultSettings $ do
+    printExt <- getExternalPrint
+    withLogging (LogCallback (printExt . BC8.unpack . fromLogStr) (return ())) o.logFormat (if o.colorEnable /= ColorNever then ColorAlways else o.colorEnable) $ \logFn ->
+      fromReaderT $ runRT logFn
 
 type CM = InputT (LoggingT IO)
 
@@ -79,6 +86,12 @@ runRT logFun = withReaderT (mapInputTEnv liftIO) $
 
 mainCM :: CM ()
 mainCM = clientRun def msgHandler consoleHandler
+
+prettyResponse :: Response -> String
+prettyResponse = \case
+  StateDumpResponse str -> TL.unpack str
+  InternalObject value -> BL.unpack $ encodePretty value
+  msg -> show msg
 
 msgHandler :: Response -> CM ()
 msgHandler = \case
@@ -108,8 +121,6 @@ defaultParserPrefs :: Options.PrefsMod
 defaultParserPrefs = Options.multiSuffix "..."
 
 -- * Orphan instances
-
-instance ParseRecord Request
 
 instance MonadLogger m => MonadLogger (InputT m) where
 

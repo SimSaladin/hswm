@@ -31,6 +31,7 @@ infixr 6 :>>:
 
 instance (IsAction H a, IsAction H b, Typeable a, Typeable b) => IsAction H (a :>>: b) where
   runner              (a :>>: b) = runner a >> runner b
+  onHoldRepeat      p (a :>>: b) = onHoldRepeat p a && onHoldRepeat p b
   actionDescription p (a :>>: b) = actionDescription p a ++ ", " ++ actionDescription p b
   actionSubmap        (a :>>: b) = Submap { submapKeys = s1.submapKeys <> s2.submapKeys
                                           , submapDefault = s1.submapDefault <|> s2.submapDefault -- XXX
@@ -38,6 +39,15 @@ instance (IsAction H a, IsAction H b, Typeable a, Typeable b) => IsAction H (a :
                                     where s1 = actionSubmap a
                                           s2 = actionSubmap b
 
+data RepeatOnHold a = a :%* Int deriving (Eq, Show, Generic)
+
+infixr 6 :%*
+
+instance (Typeable a, IsAction H a) => IsAction H (RepeatOnHold a) where
+  runner              (a :%* _) = runner a
+  onHoldRepeat _      (_ :%* n) = n > 0
+  actionDescription p (a :%* _) = actionDescription p a
+  actionSubmap        (a :%* _) = actionSubmap a
 
 -- * NamedAction
 
@@ -46,6 +56,7 @@ data NamedAction = NamedAction String (SomeAction H)
 
 instance IsAction H NamedAction where
   runner              (NamedAction _  a) = runner a
+  onHoldRepeat      p (NamedAction _  a) = onHoldRepeat p a
   actionSubmap        (NamedAction _  a) = actionSubmap a
   actionDescription _ (NamedAction nm _) = nm
 
@@ -85,7 +96,7 @@ infixr 1 <?>
 
 addKeys :: (IsKeySym k, IsAction m a) => [((ModMask, k), a)] -> ConfigDoM m
 addKeys keys c = c
-  { keyBindings = c.keyBindings <> [((m, toKeySym k), SomeAction a) | ((m, k), a) <- keys] }
+  { keyBindings = c.keyBindings <> [(XBKey m (toKeySym k), SomeAction a) | ((m, k), a) <- keys] }
 
 addKeys' :: forall m. (m ~ H, Typeable m, MonadIO m) => [(String, SomeAction m)] -> ConfigDoM m
 addKeys' keys c = c
@@ -107,14 +118,14 @@ fromKeyTree = map doKey
   where
     doKey (KeyAction mk a ) = (mk, a)
     doKey (KeySubmap mk xs) =
-      let helpAction = toKeyAction ("Help submap: " ++ show mk) $ showKeyHelpFor skeys
+      let helpAction = toKeyAction ("Submap " <> ppXBKey @String mk) $ showKeyHelpFor (ppXBKey mk) skeys
           skeys = fromKeyTree xs
        in (mk, SomeAction $ submap @m @a (Just helpAction) skeys)
 
 -- | @submap defaultAction submapKeys@
 submap
-  :: forall m a a0. (IsAction m a, IsAction m a0, IsAction m (Submap m), MonadIO m)
-  => Maybe a -> [(XBKey, a0)] -> Submap m
+  :: forall m a. (IsAction m a, MonadIO m, a ~ SomeAction m)
+  => Maybe a -> [(XBKey, a)] -> Submap a
 submap defAct subKeys = Submap
   { submapKeys    = [(mk, SomeAction a) | (mk, a) <- subKeys]
   , submapDefault = SomeAction <$> defAct
@@ -125,9 +136,9 @@ parseSubmaps
   :: forall a. (String -> ModMask) -- ^ Get modifier mask
   -> [(String, a)] -> [KeyTree XBKey a]
 parseSubmaps getMod ks0 = combine $ do
-    (s, a) <- ks0
-    let ks = [ (getMod $ L.intercalate "-" (L.init bk), toKeySym $ L.last bk) | k <- L.words s, let bk = breakKeys k ]
-    return $ mkKeyTree ks a
+  (s, a) <- ks0
+  let ks = [ XBKey (getMod $ L.intercalate "-" (L.init bk)) (toKeySym $ L.last bk) | k <- L.words s, let bk = breakKeys k ]
+  return $ mkKeyTree ks a
 
 combine :: Eq k => [KeyTree k a] -> [KeyTree k a]
 combine xs@(x@KeySubmap{} :  _) = let (lhs, rhs) = L.partition (\y -> y._key == x._key) xs
@@ -153,15 +164,16 @@ breakKeys str = case L.span (/= '-') str of
 showKeyHelp :: H ()
 showKeyHelp = do
   binds <- view (config . keyBindings)
-  showKeyHelpFor binds
+  showKeyHelpFor "" binds
 
-showKeyHelpFor :: [(XBKey, SomeAction H)] -> H ()
-showKeyHelpFor binds = do
-  let pretty = [ (ppXBKey (m, k), actionDescription (Proxy @H) a)
-                  | ((m, k), a) <- L.sortOn (ppXBKey . fst) binds ]
-  let indent = maximum $ map (length . fst) pretty
-  let text = P.render $ P.Monospace $ mconcat
-          [ P.text (T.justifyLeft indent ' ' (toText mk)) <> " " <> P.text a <> "\n"
-            | (mk, a) <- pretty ]
+showKeyHelpFor :: String -> [(XBKey, SomeAction H)] -> H ()
+showKeyHelpFor lead binds = do
+  let out :: [(Text, String)]
+      out = [ (ppXBKey @Text xk, actionDescription (Proxy @H) a)
+                  | (xk, a) <- L.sortOn (ppXBKey @String . fst) binds ]
+  let indent = maximum $ map (T.length . fst) out
+  let text = P.render $ P.monospace $ mconcat
+          [ P.text (T.justifyRight indent ' ' mk) <> " " <> P.text a <> "\n"
+            | (mk, a) <- out ]
   void . runProcess $
-    proc "notify-send" [ "--app-name=hswm", "Keys", "--", T.unpack text ]
+    proc "notify-send" [ "--app-name=hswm", "Keys " ++ lead, "--", T.unpack text ]

@@ -7,18 +7,108 @@
 -- Stability   : unstable
 -- Portability : unportable
 --
-module HSWM.Util.PangoMarkup
-  (Markup(..), Attr(..), IsText(..), render,
-  escape, bold, italic,
-  text,
-  fromShow,
-  -- * Escape
-  escapeLineBreaks, escapeMarkupPure, escapeMarkup
-  ) where
+module HSWM.Util.PangoMarkup where
 
 import GI.GLib.Functions (markupEscapeText)
 import Data.Text qualified as T
 import System.IO.Unsafe
+
+-- * IsText
+
+class IsText a where
+  getText :: a -> T.Text
+
+instance IsText String where
+  getText = T.pack
+
+instance IsText Text where
+  getText = id
+
+-- * Markup
+
+data Markup
+  = MNUL -- ^ zero-length document.
+  | Concat Markup Markup -- ^ Simple document concatenation
+  | Escaped Text -- ^ text, markup tags automatically escaped.
+  | Raw Text -- ^ direct text include, no escaping, can contain markup tags!
+  | Markup :<< (Text, [Attr]) -- ^ <TAG [ATTRS]>BODY</TAG>
+  deriving (Eq, Show, Generic, Data)
+
+instance Semigroup Markup where
+  MNUL <> b = b
+  a <> MNUL = a
+  a <> b = Concat a b
+
+instance Monoid Markup where
+  mempty = MNUL
+
+instance Default Markup where
+  def = mempty
+
+instance IsString Markup where
+  fromString s = Escaped (toText s)
+
+-- ** ToMarkup
+
+class ToMarkup a where
+  toMarkup :: a -> Markup
+
+instance ToMarkup Markup where
+  toMarkup = id
+
+instance ToMarkup T.Text where
+  toMarkup = Escaped
+
+instance ToMarkup String where
+  toMarkup = toMarkup . T.pack
+
+-- ** Attributes
+
+data Attr = Attr !Text !Text
+  deriving (Eq, Show, Generic, Data)
+
+-- ** Rendering
+
+render :: Markup -> Text
+render = go
+  where
+    go MNUL          = ""
+    go (Concat a b)  = (<>) (go a) (go b)
+    go (Raw x)       = x
+    go (Escaped x)   = escapeLineBreaks $ escapeMarkupPure x (-1)
+    go (x :<< (t,as)) = tag t as (go x)
+
+    tag label attrs inner' =
+      "<" <> label <> T.concat (map prAttrs attrs) <> ">" <> inner' <> "</" <> label <> ">"
+    prAttrs (Attr k v) = " " <> k <> "=\"" <> v <> "\""
+
+-- ** Building Markup
+
+span :: ToMarkup a => [Attr] -> a -> Markup
+span attrs = (:<< ("span", attrs)) . toMarkup
+
+bold :: ToMarkup a => a -> Markup
+bold = (:<< ("b",[])) . toMarkup
+
+italic :: ToMarkup a => a -> Markup
+italic = (:<< ("i", [])) . toMarkup
+
+monospace :: ToMarkup a => a -> Markup
+monospace = (:<< ("tt", [])) . toMarkup
+
+text :: IsText a => a -> Markup
+text = Escaped . getText
+
+escape :: IsText a => a -> Markup
+escape = Raw . escapeLineBreaks . flip escapeMarkupPure (-1) . getText
+
+fromShow :: Show a => a -> Markup
+fromShow x = Escaped (toText $ show x)
+
+(~++) :: ToMarkup a => Markup -> a -> Markup
+(~++) a b = Concat a (toMarkup b)
+
+-- * Escape markup/newlines
 
 escapeMarkup :: MonadIO m => Text -> Int64 -> m Text
 escapeMarkup x len
@@ -30,69 +120,3 @@ escapeMarkupPure x len = unsafePerformIO (escapeMarkup x len)
 
 escapeLineBreaks :: Text -> Text
 escapeLineBreaks = T.replace "\n" "\\n" . T.replace "\r" "\\r"
-
-data Markup
-  = Raw Text
-  | Escaped Text
-  | MEmpty
-  | Concat Markup Markup
-  | Bold Markup
-  | Italic Markup
-  | Monospace Markup
-  | Markup :<> [Attr]
-  deriving (Eq, Show, Generic)
-
-data Attr = Attr Text Text
-  deriving (Eq, Show, Generic)
-
-instance Semigroup Markup where
-  MEmpty <> b = b
-  a <> MEmpty = a
-  a <> b = Concat a b
-
-instance Monoid Markup where
-  mempty = MEmpty
-
-instance IsString Markup where
-  fromString s = Escaped (toText s)
-
-render :: Markup -> Text
-render = go
-  where
-    go MEmpty        = ""
-    go (Raw x)       = x
-    go (Concat a b)  = (<>) (go a) (go b)
-    go (Escaped x)   = escapeMarkupPure x (-1)
-    go (Bold x)      = tag "b" [] $ go x
-    go (Italic x)    = tag "i" [] $ go x
-    go (Monospace x) = tag "tt" [] $ go x
-    go (x :<> attrs) = tag "span" attrs $ go x
-
-    tag label attrs inner' =
-      "<" <> label <> T.concat (map prAttrs attrs) <> ">" <> inner' <> "</" <> label <> ">"
-
-    prAttrs (Attr k v) = " " <> k <> "=\"" <> v <> "\""
-
-fromShow :: Show a => a -> Markup
-fromShow x = Escaped (toText $ show x)
-
-class IsText a where
-  getText :: a -> T.Text
-
-instance IsText String where
-  getText = T.pack
-
-instance IsText Text where
-  getText = id
-
-text :: IsText a => a -> Markup
-text = Escaped . getText
-
-escape :: IsText a => a -> Markup
-escape = Raw . escapeLineBreaks . flip escapeMarkupPure (-1) . getText
-
-bold :: Markup -> Markup
-bold = Bold
-
-italic :: Markup -> Markup
-italic = Italic

@@ -18,6 +18,7 @@ import           Data.Ratio
 import           HSWM.Types.Lens
 
 import qualified HSWM.StackSet as W
+import qualified Data.Aeson as A
 
 -- * Types
 
@@ -31,11 +32,11 @@ type Position1D = Int32
 
 data Size = Size { width, height :: {-# UNPACK #-} !Dimension }
   deriving stock (Eq, Ord, Show, Read, Generic, Data)
-  deriving anyclass (Default, FromJSON, ToJSON, NFData)
+  deriving anyclass (Default, NFData)
 
 data Position = Position { x, y :: {-# UNPACK #-} !Position1D }
   deriving stock (Eq, Ord, Show, Read, Generic, Data)
-  deriving anyclass (Default, FromJSON, ToJSON, NFData)
+  deriving anyclass (Default, NFData)
 
 -- | A position on the (screen) output surface
 type Point = Position
@@ -50,7 +51,7 @@ data Rectangle = Rectangle'
   , size     :: {-# UNPACK #-} !Size
   }
   deriving stock (Eq, Ord, Show, Read, Generic, Data)
-  deriving anyclass (Default, FromJSON, ToJSON, NFData)
+  deriving anyclass (Default, NFData)
 
 pattern Rectangle :: Position1D -> Position1D -> Dimension -> Dimension -> Rectangle
 pattern Rectangle{x, y, width, height} = Rectangle' (Position x y) (Size width height)
@@ -124,3 +125,20 @@ makeLensesWith' (classPerType
   , ''W.Stack
   , ''W.StackSet
   ]
+
+-- Aeson instances
+
+instance ToJSON Size where
+  toJSON     = genericToJSON aesonOptions
+  toEncoding = genericToEncoding aesonOptions
+
+instance ToJSON Position where
+  toJSON     = genericToJSON aesonOptions
+  toEncoding = genericToEncoding aesonOptions
+
+instance ToJSON Rectangle where
+  toJSON rect =
+    case (genericToJSON aesonOptions rect.position, genericToJSON aesonOptions rect.size) of
+      (A.Object km1, A.Object km2) -> A.Object $! km1 <> km2
+      _ -> error "ToJSON"
+  --toEncoding rect = ...

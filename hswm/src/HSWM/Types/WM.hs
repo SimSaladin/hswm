@@ -49,12 +49,17 @@ import qualified Data.Aeson as A
 
 -- * Types
 
-type WindowSet       = WindowSetX Layout
-type WindowSpace     = WindowSpaceX Layout
-type Seat            = Seat' H
+type WindowSpace     = W.Workspace WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail
+type WindowSet       = W.StackSet WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail ScreenId ScreenDetail
+type ManageHook      = Query (Endo WindowSet)
+type MaybeManageHook = Query (Maybe (Endo WindowSet))
 type Query           = QueryT HS
-type ManageHook      = ManageHookX HS
-type MaybeManageHook = MaybeManageHookX HS
+
+type Seat            = Seat' H
+
+type instance Stateful H  = HS
+type instance Stateful HS = HS
+type instance ManageHook' H = ManageHook
 
 -- * Exceptions
 
@@ -298,6 +303,7 @@ data HConf = HConf
   , pendingManageQ, pendingRenderQ :: !(TQueue (HS ()))
     -- | Global type-indexed variables.
   , globalTypeMap                  :: !(TMVar TypeMap)
+  , repeatWorker                   :: !(IORef (Async ()))
   }
   deriving (Generic)
   -- deriving anyclass (NFData)
@@ -342,12 +348,6 @@ newtype HS a = HS (StateT HState (ReaderT HConf IO) a)
   deriving newtype (Functor, Applicative, Monad, MonadFix, MonadFail, MonadIO, MonadThrow, MonadCatch, MonadMask,
                     MonadReader HConf, MonadState HState)
   deriving (Semigroup, Monoid) via Ap HS a
-
-type instance Stateful H  = HS
-type instance Stateful HS = HS
-
-type instance LayoutProxy H  = Layout
-type instance LayoutProxy HS = Layout
 
 type MonadHConf m = (MonadReader HConf m, MonadEffects m)
 
@@ -415,7 +415,6 @@ instance MonadH H where
 
 instance MonadH HS where
   liftH (H ma) = HS (lift ma)
-
 
 instance MonadLoggerIO H  where askLoggerIO = view _logFunc
 

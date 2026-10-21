@@ -23,8 +23,8 @@ import           HSWM.Types.Events
 import           HSWM.Types.TypeMap
 import           HSWM.Types.WM
 import           HSWM.XKB hiding (LogLevel(..))
-import qualified River as R
 
+import qualified River as R
 import           Control.Monad.State
 import           GHC.Stack
 
@@ -107,3 +107,10 @@ writeMainQ ev = do
     atomically $ writeTQueue q ev
 
 --------------------------------------------------
+
+-- | Runs handleEventHook from the configuration and runs the default handler
+-- function if it returned True.
+handleWithHook :: (HandleEvent m ev, m ~ H, ev ~ Event) => ev -> m ()
+handleWithHook e = do
+  evHook <- view (config . handleEventHook)
+  whenM (userCodeDef True $ getAll `fmap` evHook e) (handleEvent e)

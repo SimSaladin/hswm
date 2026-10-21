@@ -198,7 +198,7 @@ dynDefaultPrompt rpc k = do
     Just foc -> do
       let text = printf "%s: Bind window %s '%s'" k (show foc.river_window) foc.title
       -- TODO: this crashes!
-      RP.confirmPrompt rpc text (dynPadSet k (Just foc))
+      RP.confirmPrompt @() rpc text (dynPadSet k (Just foc))
 
     Nothing -> return ()
 

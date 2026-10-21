@@ -57,7 +57,7 @@ data RegistryState = RegistryState
   { registrySettings :: !RegistrySettings
   , registryPtr      :: !Registry
   , registryListener :: !(ConstPtr (ObjectListener Registry))
-  , fixesMVar        :: !(MVar Fixes)
+  , fixesMVar        :: !(MVar (Fixes, Version))
   , globals          :: !(IORef (M.Map ObjectName Global))
   -- ^ All global variables that the server has announced and are have not been removed.
   } deriving stock (Generic)
@@ -110,7 +110,7 @@ instance Default RegistrySettings where
 instance HasDestructor RegistryState where
   objectDestroy st = do
     tryTakeMVar st.fixesMVar >>= \case
-      Just fixes -> do
+      Just (fixes, _) -> do
         fixesDestroyRegistry fixes st.registryPtr
         objectDestroy fixes
         objectDestroy st.registryListener
@@ -128,13 +128,12 @@ initRegistryState disp registrySettings = liftIO $ do
           modifyIORef globals $ M.insert name $ Global name version interface Nothing
           when (interface == objectInterfaceName @Fixes Proxy) $ do
              fixes <- registryBindObject st name version
-             putMVar fixesMVar fixes
+             putMVar fixesMVar (fixes, version)
           regOnEvent registrySettings ev
         RegistryGlobalRemove{..} -> do
           modifyIORef globals $ M.delete name
           regOnEvent registrySettings ev
-          tryReadMVar fixesMVar >>= mapM_ (\fixes ->
-            fixesAckGlobalRemove fixes registryPtr name)
+          tryReadMVar fixesMVar >>= mapM_ (\(fx, ver) -> when (ver >= 2) (fixesAckGlobalRemove fx registryPtr name))
     listenerAdd_ registryPtr registryListener
     return RegistryState{..}
 

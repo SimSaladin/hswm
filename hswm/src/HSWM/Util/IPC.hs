@@ -21,7 +21,8 @@ import qualified HSWM.Main.Persist as Persist
 
 import qualified River as R
 import qualified Data.Aeson as A
-import qualified Data.ByteString.UTF8 as BUTF8
+import qualified Data.ByteString.Lazy as LB
+--import qualified Data.ByteString.UTF8 as BUTF8
 import qualified Data.List as L
 import qualified Data.Map as M
 import qualified Data.Text as T
@@ -38,13 +39,27 @@ data ServerConfig = ServerConfig
   { bindTo            :: !(Maybe AddrInfo)
   , maxPendingConns   :: !Int
   , getWorkspacesInfo :: HS Response
-  , requestHandler    :: ServerConfig -> Socket -> Request -> H Response
+  , requestHandler    :: Request -> H Response
   } deriving (Generic)
 
 instance Default ServerConfig where
-  def = ServerConfig Nothing 8
-    defaultWorkspacesInfo
-    defaultRequestHandler
+  def = ServerConfig Nothing 8 defaultWorkspacesInfo defaultRequestHandler
+
+defaultRequestHandler :: Request -> H Response
+defaultRequestHandler = \case
+    ListWindows{} -> getHState <&> InternalObject . toJSON . (^.. _windows . traversed)
+    ListSeats{}   -> getHState <&> view (seatList . to toJSON . to InternalObject)
+    ListOutputs{} -> getHState <&> view (outputList . to toJSON . to InternalObject)
+    ConfigGet{}   -> view $ config . to toJSON . to InternalObject
+    DumpState{..} -> case param of
+      "input-config" -> StateDumpResponse . P.pShow <$> getObjectDef @InputConfigState
+      "hstate" -> InternalObject . A.toJSON <$> getHState
+      "global" -> InternalObject <$> dumpObjects
+      _ -> StateDumpResponse . TL.pack <$> runInHS Persist.dumpStateAsString
+
+    r -> do
+      logWarn $ "Unhandled message" :# [ "message" .= r ]
+      return $ Error "no handler"
 
 -- * Server State
 
@@ -58,34 +73,31 @@ data ConnectedPeers = ConnectedPeers
 
 -- | A single connection (server-side).
 data Connection = Connection
-  { connSocket                :: Socket
+  { connSocket                :: !Socket
   , connPid, connUid, connGid :: !Int
-  , connSendQ                 :: TQueue Response
-  , connWorkerThread          :: Async ()
+  , connSendQ                 :: !(TQueue Response)
+  , connWorkerThread          :: !(Async ())
   } deriving stock (Generic)
 
 -- * Hooks
 
-ipcServer :: ServerConfig -> _
-ipcServer conf c = c
-  { logHook = c.logHook <> ipcLogHook conf
-  , startupHook = c.startupHook <> serverStartupHook conf
-  }
+ipcServer :: ServerConfig -> ConfigDoM H
+ipcServer conf =
+   startupHook <>~ serverStartupHook conf &+
+   logHook <>~ ipcLogHook conf
 
-serverStartupHook :: ServerConfig -> H ()
+serverStartupHook :: HasCallStack => ServerConfig -> H ()
 serverStartupHook conf = do
   stateRef <- getOrCreateObject (newIORef (def :: ConnectedPeers))
   serverThread <- async $ serverRun conf stateRef
   modifyIORef stateRef $ \st -> st { serverThread = Just serverThread }
 
-ipcLogHook :: ServerConfig -> H ()
+ipcLogHook :: HasCallStack => ServerConfig -> H ()
 ipcLogHook conf = withObject $ \(sRef :: IORef ConnectedPeers) -> do
   msgs <- fullStateUpdate conf
   s <- readIORef sRef
-  atomically $
-    forM_ msgs $ \msg ->
-      forM_ (M.elems s.connected) $ \c ->
-        writeTQueue c.connSendQ msg
+  forConcurrently_ (M.elems s.connected) $ \c ->
+    forM_ msgs $ atomically . writeTQueue c.connSendQ
 
 serverRun :: ServerConfig -> IORef ConnectedPeers -> H ()
 serverRun conf stateRef = withThreadContext ["component" .= ("ipc-server" :: String)] $ do
@@ -132,33 +144,33 @@ serverRun conf stateRef = withThreadContext ["component" .= ("ipc-server" :: Str
                   ]
         connSendQ <- newTQueueIO
         connWorkerThread <- async $ withThreadContext ctx $
-          connWorker connSocket connSendQ `finally` cleanup connFd connSocket
+          connWorker conf connSocket connSendQ `finally` cleanup connFd connSocket
         let c = Connection{..}
         modifyIORef stateRef $ \s -> s {connected = M.insert connFd c s.connected}
-
-    connWorker :: Socket -> _ -> H ()
-    connWorker conn sendQ = do
-      logInfo "New client connected"
-      atomically . writeTQueue sendQ $ Identify (thisPeerIdent "server") 0 (Just thisPeerDescription)
-      worker ""
-      where
-        worker lo = do
-          waitRead <- io $ waitReadSocketSTM conn
-          r <- atomically $ (Left <$> waitRead) `orElse` (Right <$> readTQueue sendQ)
-          case r of
-            Right msg -> sendMsg conn msg >> worker lo
-            Left () -> do
-              (rs, loNew) <- recvLines conn lo
-              mapM_ handleRequest rs
-              worker loNew
-        handleRequest resp = case A.eitherDecodeStrict' resp of
-            Right msg -> serverHandleMsg conf conn msg
-            Left e -> logWarn $ "Malformed request from client" :# [ "exception" .= toText e, "msg" .= BUTF8.toString resp ]
 
     cleanup connFd conn = do
           modifyIORef stateRef $ \s -> s {connected = M.delete connFd s.connected}
           io $ gracefulClose conn 5000
           logInfo "Client connection closed"
+
+connWorker :: ServerConfig -> Socket -> _ -> H ()
+connWorker conf conn sendQ = do
+  logInfo "New client connected"
+  atomically . writeTQueue sendQ $ Identify (thisPeerIdent "server") 0 (Just thisPeerDescription)
+  worker ""
+  where
+    worker lo = do
+      waitRead <- io $ waitReadSocketSTM conn
+      r <- atomically $ (Left <$> waitRead) `orElse` (Right <$> readTQueue sendQ)
+      case r of
+        Right msg -> sendMsg conn msg >> worker lo
+        Left () -> do
+          (rs, lo') <- recvLines conn lo
+          mapM_ handleRequest rs
+          worker lo'
+    handleRequest resp = case A.eitherDecode resp of
+        Right msg -> serverHandleMsg conf conn msg
+        Left e -> logWarn $ "Malformed request from client" :# [ "error" .= toText e, "msg" .= LB.unpack (LB.take 256 resp) ]
 
 getServerAddr :: MonadIO m => ServerConfig -> m (AddrInfo, Maybe FilePath) -- ^ (resolved addrinfo, lockfile)
 getServerAddr conf =
@@ -181,22 +193,8 @@ serverHandleMsg conf c (Msg r seqn) = do
       logInfo $ "client sent identity" :# [ "id" .= r ]
       fullStateUpdate conf >>= mapM_ (sendMsg c)
     _ -> do
-      res <- conf.requestHandler conf c r
-      sendMsg c $ Msg res seqn
-
-defaultRequestHandler :: ServerConfig -> Socket -> Request -> H Response
-defaultRequestHandler _ _ r =
-  case r of
-    DumpState{..} -> case param of
-      "input-config" -> StateDumpResponse . P.pShow <$> getObjectDef @InputConfigState
-      "hstate" -> InternalObject . A.toJSON <$> getHState
-      "config" -> InternalObject . A.toJSON <$> view config
-      "global" -> InternalObject <$> dumpObjects
-      _ -> StateDumpResponse . TL.pack <$> runInHS Persist.dumpStateAsString
-
-    _ -> do
-      logWarn $ "Unhandled message" :# [ "message" .= r ]
-      return $ Error "no handler"
+      res <- userCode $ conf.requestHandler r
+      forM_ res $ sendMsg c . flip Msg seqn
 
 -- * Info for status bars
 
@@ -238,12 +236,9 @@ defaultWorkspacesInfo = do
 s2o :: ScreenId -> OutputId
 s2o (S x) = OutputId x
 
-toWindowId :: RiverWindow -> Word
-toWindowId (R.RiverWindow w) = let WordPtr res = ptrToWordPtr w in res
-
 toWindowInfo :: Window -> WindowInfo
 toWindowInfo w = WindowInfo
-  { wid = toWindowId w.river_window
+  { wid = riverIdToWord w.river_window
   , title = toText w.title
   , appId = toText w.appId
   , identifier = toText w.identifier

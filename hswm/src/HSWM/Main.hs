@@ -12,7 +12,7 @@
 -- Stability   : unstable
 -- Portability : unportable
 module HSWM.Main
-  ( hswm, startHSWM, handleWithHook,
+  ( hswm, startHSWM,
     module HSWM.Core,
     module HSWM.Wayland,
   )
@@ -44,6 +44,21 @@ import qualified WL.XdgOutput.Unstable.V1.Client as XO
 
 import           System.IO (putStrLn)
 import qualified System.Posix as Posix
+
+defaultRegistrySettings :: H WL.RegistrySettings
+defaultRegistrySettings = withRunInIO $ \runInIO -> return def
+  { WL.regOnBind = \p name ver ->
+      runInIO $ logInfo $ "Registry: bind global" :#
+        [ "name"              .= name
+        , "version"           .= ver
+        , "interface-version" .= WL.objectInterfaceVersion p
+        , "interface"         .= WL.objectInterfaceName p
+        ]
+  , WL.regOnEvent = \ev -> runInIO $
+      case ev of
+        WL.RegistryGlobal{..} -> return ()
+        _ -> Debug.logEventShow "registry" ev []
+  }
 
 hswm :: (m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow)) => HSWMConfig m l -> IO ()
 hswm conf = do
@@ -81,6 +96,7 @@ startHSWM options config = do
           <*> newTQueueIO -- manage q
           <*> newTQueueIO -- render q
           <*> newTMVarIO def -- typemap
+          <*> (newIORef =<< async (return ()))
 
     let handleErrors f = try f >>= \case
                 Right{} -> return ()
@@ -146,14 +162,20 @@ startHSWM options config = do
 
         logInfo "Installing signal handlers"
         run <- askRunInIO
-        let catchSignalWith sig f = io $ void $ Posix.installHandler sig (Posix.Catch $ run f) Nothing
-            catchSignal sig = catchSignalWith sig $ do
-                logInfo $ "signal handler invoked" :# [ "signal" .= show sig ]
-                writeMainQ $ MainSignal sig
-        catchSignal Posix.sigTERM
-        catchSignal Posix.sigINT
-        catchSignal Posix.sigQUIT
-        catchSignalWith Posix.sigUSR2 $ io getProgramPath >>= writeMainQ . MainRestart
+
+        let installHandler' sig f other = do
+              logDebug $ "install signal handler" :# [ "signal" .= tshow sig ]
+              void $ io $ Posix.installHandler sig (f sig) other
+            sigevent sig = do
+              logInfo $ "signal handler invoked" :# [ "signal" .= show sig ]
+              if sig == Posix.sigUSR2
+                 then io getProgramPath >>= writeMainQ . MainRestart
+                 else writeMainQ $ MainSignal sig
+
+        installHandler' Posix.sigTERM (Posix.Catch . run . sigevent) Nothing
+        installHandler' Posix.sigINT  (Posix.Catch . run . sigevent) Nothing
+        installHandler' Posix.sigQUIT (Posix.Catch . run . sigevent) Nothing
+        installHandler' Posix.sigUSR2 (Posix.Catch . run . sigevent) Nothing
 
         Persist.scheduleStateSave options.mainStateSave
 
@@ -163,25 +185,18 @@ startHSWM options config = do
       displayFd <- WL.displayGetFd conf._wlDisplay
       mainLoop conf._wlDisplay displayFd
 
-defaultRegistrySettings :: H WL.RegistrySettings
-defaultRegistrySettings = withRunInIO $ \runInIO -> return def
-  { WL.regOnBind = \p name ver ->
-      runInIO $ logInfo $ "Registry: bind global" :#
-        [ "name"              .= name
-        , "version"           .= ver
-        , "interface-version" .= WL.objectInterfaceVersion p
-        , "interface"         .= WL.objectInterfaceName p
-        ]
-  , WL.regOnEvent = \ev -> runInIO $ Debug.logEventShow "Registry" ev []
-  }
+-- MAIN LOOP (WAYLAND EVENT LOOP)
 
 mainLoop :: WL.Display -> Posix.Fd -> H ()
 mainLoop wlDisplay wlPollFd = do
-  logDebug $ "Main loop is starting" :# [ "display-fd" .= show wlPollFd ]
-  logInfo "Running user startup hooks..."
-  async (void . userCode =<< view (config . startupHook)) >>= link
+  logDebugNS "main" $ "Main loop is starting" :# [ "display-fd" .= show wlPollFd ]
+  async runStartupHook >>= link
   main MainPoll
   where
+    runStartupHook = do
+      logInfoNS "main" "Running user startup hook..."
+      void . userCode =<< view (config . startupHook)
+
     main MainPoll = do
       next <- bracketOnError_
         -- wl_display_prepare_read() needs to be balanced with either
@@ -207,78 +222,66 @@ mainLoop wlDisplay wlPollFd = do
       main $ fromLeft MainPoll next
 
     main (MainRestart prog) = do
-      logInfo $ "Main: interrupted by reload request" :# [ "program" .= prog ]
+      logInfoNS "main" $ "Restart/reload request received" :# [ "program" .= prog ]
       restart prog
-      logError "Main: restart was unsuccessful! Resuming normal operation"
+      logErrorNS "main" "Restart was unsuccessful! Resuming normal operation."
       main MainPoll
 
     main MainSaveToDisk = do
-      void $ runInHS $ userCodeS Persist.writeStateToFile
+      runInHS (void $ userCodeS Persist.writeStateToFile)
       main MainPoll
 
-    main (MainSignal sig) = do
-      logInfo $ "Main: interrupted by signal (" <> tshow sig <> ")" :# [ "signal" .= show sig ]
-      mainExit exitFailure
+    main (MainSignal sig) = mainExit ("Interrupted by signal (" <> tshow sig <> ")") Nothing exitFailure [ "signal" .= show sig ]
 
-    main (MainExit desc e) = do
-      logError $ "Main: interrupted by exception in the main thread" :# [ "description" .= desc, "exception" .= show e ]
-      mainExit exitFailure
+    main (MainExit desc e) = mainExit (toText desc) (Just e) exitFailure []
 
-    mainExit how = do
-      logInfo "Main: now exiting. Running exit hooks..."
+    mainExit :: Text -> Maybe SomeException -> H () -> [SeriesElem] -> H ()
+    mainExit msg mbex how meta = do
+      logInfoNS "main" $ ("now exiting: " <> msg) :# meta
+      forM_ mbex $ \e -> logErrorNS "main" $ ("error: " <> tshow e) :# meta
+      logDebugNS "main" "Running exit hook..."
       void . userCode =<< view (config . exitHook)
-      lgrCleanup <- view _loggerCleanup
-      io lgrCleanup
+      io =<< view _loggerCleanup
       how
 
 ---------------------------------------------------
 -- event handling
 
--- | Runs handleEventHook from the configuration and runs the default handler
--- function if it returned True.
-handleWithHook :: Event -> H ()
-handleWithHook e = do
-  evHook <- view (config . handleEventHook)
-  whenM (userCodeDef True $ getAll `fmap` evHook e) (handleEvent e)
-
 instance HandleEvent H Event where
-  handleEvent (WindowManagerEvent e) = handleWindowManagerEvent e
-  handleEvent (OutputEvent e) = Outputs.handle e
+  handleEvent (WindowManagerEvent e)    = handleEvent e
+  handleEvent (OutputEvent e)           = Outputs.handle e
   handleEvent (LayerShellOutputEvent e) = Outputs.handleLayerShell e
-  handleEvent (WlOutputEvent e) = Outputs.handleWlOutput e
-  handleEvent (SeatEvent e) = Seats.handleEvent e
-  handleEvent (LayerShellSeatEvent e) = Seats.handleLayerShellSeat e
-  handleEvent (WlSeatEvent e) = Seats.handleWlSeatEvent e
-  handleEvent (WindowEvent e) = Windows.handleEvent e
-  handleEvent (XkbEvent e) = Seats.handleXkbBindingEvent e -- XKB Keyboard events
-  handleEvent (XkbSeatEvent e) = Seats.handleXkbBindingsSeatEvent e -- XKB Keyboard events
-  handleEvent (PointerEvent e) = Seats.handlePointerEvent e -- Pointer events
-  handleEvent (InputManagerEvent e) = InputConfig.handleInputManagerEvent e
-  handleEvent (InputDeviceEvent e) = InputConfig.handleInputDeviceEvent e
-  handleEvent (LibinputConfigEvent e) = InputConfig.handleLibinputEvent e
-  handleEvent (LibinputDeviceEvent e) = InputConfig.handleLibinputDeviceEvent e
-  handleEvent (XkbConfigEvent e) = InputConfig.handleXkbConfigEvent e
-  handleEvent (XkbKeyboardEvent e) = InputConfig.handleXkbKeyboardEvent e
+  handleEvent (WlOutputEvent e)         = Outputs.handleWlOutput e
+  handleEvent (SeatEvent e)             = Seats.handleEvent e
+  handleEvent (LayerShellSeatEvent e)   = Seats.handleLayerShellSeat e
+  handleEvent (WlSeatEvent e)           = Seats.handleWlSeatEvent e
+  handleEvent (WindowEvent e)           = Windows.handleEvent e
+  handleEvent (XkbEvent e)              = Seats.handleXkbBindingEvent e -- XKB Keyboard events
+  handleEvent (XkbSeatEvent e)          = Seats.handleXkbBindingsSeatEvent e -- XKB Keyboard events
+  handleEvent (PointerEvent e)          = Seats.handlePointerEvent e -- Pointer events
+  handleEvent (InputManagerEvent e)     = InputConfig.handleInputManagerEvent e
+  handleEvent (InputDeviceEvent e)      = InputConfig.handleInputDeviceEvent e
+  handleEvent (LibinputConfigEvent e)   = InputConfig.handleLibinputEvent e
+  handleEvent (LibinputDeviceEvent e)   = InputConfig.handleLibinputDeviceEvent e
+  handleEvent (XkbConfigEvent e)        = InputConfig.handleXkbConfigEvent e
+  handleEvent (XkbKeyboardEvent e)      = InputConfig.handleXkbKeyboardEvent e
+  handleEvent (IdleNotificationEvent e) = handleEvent e
+  handleEvent (OutputPowerEvent e)      = e `seq` return () -- TODO
   handleEvent (FTopLevelListEvent (EXT_FTL.ForeignToplevelListToplevel _ _ fh)) = WL.listenerAdd_ fh =<< getObject
   handleEvent (WlrOutputManagerEvent (WLR_OM.OutputManagerHead _ _ head)) = WL.listenerAdd_ head =<< getObject
-  handleEvent (IdleNotificationEvent e) = handleEvent e
-  handleEvent (OutputPowerEvent e) = e `seq` return () -- TODO
-  handleEvent _ = return ()
+  handleEvent _                         = return ()
 
 instance HandleEvent H EXT_IN.IdleNotificationEvent where
-  handleEvent = \case
-    EXT_IN.IdleNotificationIdled{} -> runInHS $ setOutputPower False
-    EXT_IN.IdleNotificationResumed{} -> runInHS $ setOutputPower True
+  handleEvent EXT_IN.IdleNotificationIdled{}   = runInHS $ setOutputPower False
+  handleEvent EXT_IN.IdleNotificationResumed{} = runInHS $ setOutputPower True
 
-handleWindowManagerEvent :: R.RiverWindowManagerEvent -> H ()
-handleWindowManagerEvent e = case e of
+instance HandleEvent H R.RiverWindowManagerEvent where
+  handleEvent = \case
     R.RiverWindowManagerOutput _ _ out -> Outputs.added out
     R.RiverWindowManagerWindow _ _ w -> Windows.added w
-    R.RiverWindowManagerSeat _ _ seat -> do
-      -- NOTE: river does not indicate when it is done signalling about present windows, so we assume that it is done by the
-      -- time first seat is announced.
-      runInHS Windows.finishRecovery
-      Seats.added seat
+    -- NOTE: river does not indicate when it is done signalling about present windows,
+    -- so we assume that it is done by the time first seat is announced.
+    R.RiverWindowManagerSeat _ _ seat -> runInHS Windows.finishRecovery >> Seats.added seat
 
     -- /manage sequence/
     R.RiverWindowManagerManageStart _ wm -> do
@@ -296,16 +299,16 @@ handleWindowManagerEvent e = case e of
 
     R.RiverWindowManagerSessionLocked _ _wm ->
       writeManageQ $ mapSeats $ \s ->
-        io $ mapM_ (deRefStablePtr >=> R.riverXkbBindingDisable . (.riverXkbBinding)) s.xkb_bindings
+        mapM_ (io . deRefStablePtr >=> R.riverXkbBindingDisable . (.riverXkbBinding)) (Seats.bindsToList s.xkb_bindings)
 
     R.RiverWindowManagerSessionUnlocked _ _wm ->
       writeManageQ $ mapSeats $ \s ->
-        io $ mapM_ (deRefStablePtr >=> R.riverXkbBindingEnable . (.riverXkbBinding)) s.xkb_bindings
+        mapM_ (io . deRefStablePtr >=> R.riverXkbBindingEnable . (.riverXkbBinding)) (Seats.bindsToList s.xkb_bindings)
 
     R.RiverWindowManagerFinished _ wm -> do
-      io $ R.objectDestroy wm
+      R.objectDestroy wm
       writeMainQ $ MainExit "river_window_manager_v1 finished, exiting." (toException $ ExitFailure 1)
 
     R.RiverWindowManagerUnavailable _ wm -> do
-      io $ R.objectDestroy wm
+      R.objectDestroy wm
       writeMainQ $ MainExit "another window manager already running" (toException $ ExitFailure 1)

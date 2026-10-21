@@ -1,5 +1,5 @@
-{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE NoFieldSelectors #-}
+{-# LANGUAGE TemplateHaskell  #-}
 
 -- |
 -- Module      : HSWM.Types.Window
@@ -23,24 +23,47 @@ import           River.WindowManagement as X (RiverWindow, RiverSeat, RiverOutpu
 -- * Window
 
 data Window = Window
-  { river_window             :: !RiverWindow
-  , node                     :: !RiverNode
-  , position                 :: !Position
-  , size                     :: !Size
+  { river_window :: {-# UNPACK #-}  !RiverWindow
+
+  -- | The associated RiverNode object
+  , node :: {-# UNPACK #-}  !RiverNode
+
+  -- | Current size and position
+  , position :: {-# UNPACK #-}  !Position
+  , size :: {-# UNPACK #-} !Size
+
+  -- | Window identifiers
   , title, appId, identifier :: !String
-  , parent                   :: !(Maybe RiverWindow)
-  , unreliablePid            :: !(Maybe Int)
-  , decorationHint           :: !(Maybe R.RiverWindowDecorationHint)
-  , presentationHint         :: !(Maybe R.RiverOutputPresentationMode)
-  , wBorderWidth             :: !(Maybe Int32)
-  , borderColor              :: !(Maybe R.RiverColor)
-  , new                      :: !Bool
-  , closed                   :: !Bool
-  , minimized                :: !Bool
-  , fullscreen               :: !(Maybe RiverOutput)
+
+  -- | Parent window (if available)
+  , parent :: !(Maybe RiverWindow)
+
+  -- | ProcessID (if available)
+  , unreliablePid :: !(Maybe Int)
+
+  -- XXX what's this
+  , decorationHint :: !(Maybe R.RiverWindowDecorationHint)
+
+  -- XXX what's this
+  , presentationHint :: !(Maybe R.RiverOutputPresentationMode)
+
+  -- | Per-window border width & color (optional)
+  , wBorderWidth :: !(Maybe Int32)
+  , borderColor  :: !(Maybe R.RiverColor)
+
+  -- TODO what's this for
+  , minimized :: {-# UNPACK #-} !Bool
 
     -- | Dimension hints
-  , minHeight, minWidth, maxHeight, maxWidth :: !Int32
+  , minHeight, minWidth, maxHeight, maxWidth :: {-# UNPACK #-} !Int32
+
+  -- | When this window is set to be fullscreen, the assigned output
+  -- is stored.
+  , fullscreen :: !(Maybe RiverOutput)
+    -- TODO: review move/resize request handling
+  , pointer_move_requested         :: !RiverSeat
+  , pointer_resize_requested       :: !RiverSeat
+  , pointer_resize_requested_edges :: !R.RiverWindowEdges
 
   -- | Actions to perform in next manage phase
   , p_manage_action :: [WindowManageAction]
@@ -48,10 +71,12 @@ data Window = Window
   -- | Actions to perform in next render phase
   , pendingRender :: [WindowRenderAction]
 
-    -- TODO: review below
-  , pointer_move_requested         :: !RiverSeat
-  , pointer_resize_requested       :: !RiverSeat
-  , pointer_resize_requested_edges :: !R.RiverWindowEdges
+  -- | New windows should be added with 'new' set to 'True'. Initial window properties are then
+  -- determined at the next cycle.
+  , new :: {-# UNPACK #-} !Bool
+
+  -- | All 'closed' windows will be cleaned up in the next manage cycle.
+  , closed :: {-# UNPACK #-} !Bool
   }
   deriving stock (Eq, Ord, Show, Generic, Data)
   deriving anyclass (Default, NFData)

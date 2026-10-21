@@ -11,71 +11,24 @@
 module HSWM.Utils
   ( module HSWM.Utils
   , module HSWM.Util.Process
+  , module HSWM.Util.PP
   , resolveModMask
   ) where
 
 import           HSWM.Types.Action
+import           HSWM.Util.PP
 import           HSWM.Util.Process
 import qualified Pixman as P
 import qualified River as R
 import           River (RiverColor(..))
-import           Text.XkbCommon
-import           Text.XkbCommon.EventCodes (fromEventCodeBTN)
 import qualified WL.Client as WL
 
-import qualified Data.List as L
+--import qualified Data.List as L
 import           Data.Ord
 import           GHC.Stack
 import           Numeric (readHex)
-import qualified Text.Pretty.Simple as P
-
--- * Keymap utils
-
-ppModifiers :: ModMask -> [String]
-ppModifiers bm = [ s | (s, x) <-
-        [ ("C",  R.RiverSeatModifiersCtrl)
-        , ("S",  R.RiverSeatModifiersShift)
-        , ("M1", R.RiverSeatModifiersMod1)
-        , ("M3", R.RiverSeatModifiersMod3)
-        , ("M4", R.RiverSeatModifiersMod4)
-        , ("M5", R.RiverSeatModifiersMod5)
-        ], fi x.unwrap .&. bm /= 0 ]
-
-ppXBKey :: XBKey -> String
-ppXBKey (m, ksym) = L.intercalate "+" $ ppModifiers m ++ [fromMaybe "???" $ keysymName ksym]
-
-ppButton :: (ModMask, Button) -> String
-ppButton (m, btn) = L.intercalate "+" $ ppModifiers m ++ [fromMaybe "???" $ fromEventCodeBTN btn]
 
 -- * Logging and debug
-
-logTraceShow :: (MonadIO m, MonadReader env m, MonadLogger m, Show show) => show -> m ()
-logTraceShow x =
-  logDebug $
-      P.pShowOpt
-        P.defaultOutputOptionsNoColor
-          { P.outputOptionsPageWidth = 380,
-            P.outputOptionsCompact = True,
-            P.outputOptionsCompactParens = True,
-            P.outputOptionsInitialIndent = 0,
-            -- P.outputOptionsColorOptions = Just P.defaultColorOptionsDarkBg
-            P.outputOptionsColorOptions = Nothing
-          }
-        x ^. strict :# [ ]
-
-pTrace :: (MonadIO m, Show a) => a -> m ()
-pTrace =
-  P.pHPrintOpt
-    P.CheckColorTty
-    P.defaultOutputOptionsNoColor
-      { P.outputOptionsPageWidth = 380,
-        P.outputOptionsCompact = True,
-        P.outputOptionsCompactParens = True,
-        --P.outputOptionsInitialIndent = 4,
-        --P.outputOptionsColorOptions = Just P.defaultColorOptionsDarkBg
-        P.outputOptionsColorOptions = Nothing
-      }
-    stderr
 
 ppShmFormat :: WL.Wl_shm_format -> String
 ppShmFormat x = case x of

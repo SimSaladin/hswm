@@ -44,16 +44,13 @@ import qualified WL.XdgOutput.Unstable.V1.Client as XO
 
 ---------------------------------------------------------
 -- Orphan instances
-
-instance Show (Async a) where show _ = "<Async>"
-instance Show (StablePtr a) where show _ = "<SP>"
-
-instance NFData (StablePtr a) where
-  rnf = rnf . castStablePtrToPtr
-
 -- XXX
-instance A.ToJSON (StablePtr a) where
-  toJSON _ = "StablePtr"
+
+instance Show     (MVar (Async ())) where show _ = "<MVar>"
+instance Show     (Async a)     where show _ = "<Async>"
+instance Show     (StablePtr a) where show _ = "<SP>"
+instance NFData   (StablePtr a) where rnf = rnf . castStablePtrToPtr
+instance A.ToJSON (StablePtr a) where toJSON _ = "StablePtr"
 
 -- * Constants
 
@@ -192,11 +189,17 @@ fromSnake flag inp
 
 -- * Operators
 
+-- | For easier lens operation composition.
 (&+) :: (b -> c) -> (a -> b) -> a -> c
 (&+) = (.)
+
 infixl 2 &+
 
 -- * HasRiverId
+
+type SomeWindow a = (HasRiverId a, RiverId a ~ R.RiverWindow)
+type SomeOutput a = (HasRiverId a, RiverId a ~ R.RiverOutput)
+type SomeSeat a   = (HasRiverId a, RiverId a ~ R.RiverSeat)
 
 -- | Data structures that are or contain some River identifier of type 'RiverId'.
 --
@@ -210,25 +213,32 @@ class Eq (RiverId a) => HasRiverId a where
   default riverId :: (a ~ RiverId a) => Lens' a (RiverId a)
   riverId = id
 
--- | Default instances for matching 'Coercible' types.
-class HasRiverId rid => ToRiverId a rid where
-
-  toRiverId :: a -> rid
-  default toRiverId :: Coercible a rid => a -> rid
-  toRiverId = coerce
-
-type SomeWindow a = (HasRiverId a, RiverId a ~ R.RiverWindow)
-type SomeOutput a = (HasRiverId a, RiverId a ~ R.RiverOutput)
-type SomeSeat a   = (HasRiverId a, RiverId a ~ R.RiverSeat)
-
-type SameRiverId a b = (HasRiverId a, HasRiverId b, RiverId a ~ RiverId b)
-
 riverIdEq :: SameRiverId a b => a -> b -> Bool
 riverIdEq a b = (a ^. riverId) == (b ^. riverId)
 
 -- | An 'Each' traversal that goes
 eachRiverId :: (Each s s a a, SameRiverId k a) => k -> Traversal' s a
 eachRiverId k = each . filtered (riverIdEq k)
+
+type SameRiverId a b = (HasRiverId a, HasRiverId b, RiverId a ~ RiverId b)
+
+instance HasRiverId R.RiverOutput           where type RiverId R.RiverOutput           = R.RiverOutput
+instance HasRiverId R.RiverWindow           where type RiverId R.RiverWindow           = R.RiverWindow
+instance HasRiverId R.RiverSeat             where type RiverId R.RiverSeat             = R.RiverSeat
+instance HasRiverId R.RiverNode             where type RiverId R.RiverNode             = R.RiverNode
+instance HasRiverId R.RiverLayerShellOutput where type RiverId R.RiverLayerShellOutput = R.RiverLayerShellOutput
+instance HasRiverId R.RiverXkbBinding       where type RiverId R.RiverXkbBinding       = R.RiverXkbBinding
+instance HasRiverId R.RiverPointerBinding   where type RiverId R.RiverPointerBinding   = R.RiverPointerBinding
+
+
+-- * ToRiverId
+
+-- | Default instances for matching 'Coercible' types.
+class HasRiverId a => ToRiverId b a where
+
+  toRiverId :: b -> a
+  default toRiverId :: Coercible b a => b -> a
+  toRiverId = coerce
 
 -- Instances
 
@@ -237,14 +247,6 @@ instance ToRiverId (Ptr Void) R.RiverWindow
 instance ToRiverId (Ptr Void) R.RiverSeat
 instance ToRiverId (Ptr Void) R.RiverNode
 instance ToRiverId (Ptr Void) R.RiverLayerShellOutput
-
-instance HasRiverId R.RiverOutput         where type RiverId R.RiverOutput         = R.RiverOutput
-instance HasRiverId R.RiverWindow         where type RiverId R.RiverWindow         = R.RiverWindow
-instance HasRiverId R.RiverSeat           where type RiverId R.RiverSeat           = R.RiverSeat
-instance HasRiverId R.RiverNode           where type RiverId R.RiverNode           = R.RiverNode
-instance HasRiverId R.RiverLayerShellOutput where type RiverId R.RiverLayerShellOutput = R.RiverLayerShellOutput
-instance HasRiverId R.RiverXkbBinding     where type RiverId R.RiverXkbBinding     = R.RiverXkbBinding
-instance HasRiverId R.RiverPointerBinding where type RiverId R.RiverPointerBinding = R.RiverPointerBinding
 
 riverIdToWord :: Coercible a (Ptr Void) => a -> Word
 riverIdToWord = coerce . ptrToWordPtr . coerce
@@ -258,21 +260,22 @@ riverIdToHex = show
 hexToRiverId :: (WL.IsWlObject a, Read a) => String -> a
 hexToRiverId = read
 
-instance A.ToJSON R.RiverColor
+-- Aeson instances
+
+-- | For ToJSON/FromJSON instances
+aesonOptions :: A.Options
+aesonOptions = A.defaultOptions { A.omitNothingFields = True }
+
+instance A.ToJSON      R.RiverColor
 
 instance A.ToJSONKey   R.RiverWindow where toJSONKey = contramap riverIdToHex A.toJSONKey
 instance A.FromJSONKey R.RiverWindow where fromJSONKey = fmap hexToRiverId A.fromJSONKey
 
 instance A.ToJSON      R.RiverWindow           where toJSON = A.toJSON . riverIdToHex
-instance A.FromJSON    R.RiverWindow           where parseJSON = fmap hexToRiverId . A.parseJSON
 instance A.ToJSON      R.RiverSeat             where toJSON = A.toJSON . riverIdToHex
-instance A.FromJSON    R.RiverSeat             where parseJSON = fmap hexToRiverId . A.parseJSON
 instance A.ToJSON      R.RiverOutput           where toJSON = A.toJSON . riverIdToHex
-instance A.FromJSON    R.RiverOutput           where parseJSON = fmap hexToRiverId . A.parseJSON
 instance A.ToJSON      R.RiverNode             where toJSON = A.toJSON . riverIdToHex
-instance A.FromJSON    R.RiverNode             where parseJSON = fmap hexToRiverId . A.parseJSON
 instance A.ToJSON      R.RiverLayerShellOutput where toJSON = A.toJSON . riverIdToHex
-instance A.FromJSON    R.RiverLayerShellOutput where parseJSON = fmap hexToRiverId . A.parseJSON
 instance A.ToJSON      R.RiverXkbBindingsSeat  where toJSON = A.toJSON . riverIdToHex
 instance A.ToJSON      R.RiverLayerShellSeat   where toJSON = A.toJSON . riverIdToHex
 instance A.ToJSON      WL.Output               where toJSON = A.toJSON . riverIdToHex
@@ -284,15 +287,15 @@ instance A.ToJSON      XO.Output               where toJSON = A.toJSON . riverId
 instance A.ToJSON      OPM.OutputPower         where toJSON = A.toJSON . riverIdToHex
 instance A.ToJSON      EXT_IN.IdleNotification where toJSON = A.toJSON . riverIdToHex
 
-instance A.ToJSON R.RiverOutputPresentationMode where
-  toJSON = A.toJSON . fromIntegral @_ @Int . coerce
-instance A.ToJSON R.RiverWindowDecorationHint where
-  toJSON = A.toJSON . fromIntegral @_ @Int . coerce
-instance A.ToJSON R.RiverWindowEdges where
-  toJSON = A.toJSON . fromIntegral @_ @Int . coerce
-instance A.ToJSON WL.SeatCapability where
-  toJSON = A.toJSON . fromIntegral @_ @Int . coerce
+-- Enum instances...
+instance A.ToJSON R.RiverOutputPresentationMode where toJSON = A.toJSON . fromIntegral @_ @Int . coerce
+instance A.ToJSON R.RiverWindowDecorationHint   where toJSON = A.toJSON . fromIntegral @_ @Int . coerce
+instance A.ToJSON R.RiverWindowEdges            where toJSON = A.toJSON . fromIntegral @_ @Int . coerce
+instance A.ToJSON WL.SeatCapability             where toJSON = A.toJSON . fromIntegral @_ @Int . coerce
 
--- | For ToJSON/FromJSON instances
-aesonOptions :: A.Options
-aesonOptions = A.defaultOptions { A.omitNothingFields = True }
+-- FromJSON
+instance A.FromJSON    R.RiverWindow           where parseJSON = fmap hexToRiverId . A.parseJSON
+instance A.FromJSON    R.RiverSeat             where parseJSON = fmap hexToRiverId . A.parseJSON
+instance A.FromJSON    R.RiverOutput           where parseJSON = fmap hexToRiverId . A.parseJSON
+instance A.FromJSON    R.RiverNode             where parseJSON = fmap hexToRiverId . A.parseJSON
+instance A.FromJSON    R.RiverLayerShellOutput where parseJSON = fmap hexToRiverId . A.parseJSON

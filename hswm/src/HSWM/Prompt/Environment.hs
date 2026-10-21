@@ -13,14 +13,16 @@ module HSWM.Prompt.Environment
 
 import           HSWM
 import qualified HSWM.Util.PangoMarkup as P
+import           HSWM.Util.PangoMarkup ((~++))
 import qualified HSWM.Util.RofiPrompt as RP
 
 import qualified Data.ByteString.Lazy.Char8 as BLC8
 import qualified Data.List as L
 import qualified Data.Map as M
 import qualified System.Environment as ENV
+default(P.Markup)
 
-environPrompt :: RP.RofiPromptConfig a RP.FilterS String -> H ()
+environPrompt :: RP.RofiPromptConfig () RP.FilterS String -> H ()
 environPrompt pc = do
   varsEnv <- io ENV.getEnvironment
   varsSD  <- map parseLine . lines <$> runUserSD ["show-environment"]
@@ -33,15 +35,19 @@ environPrompt pc = do
         case (mbValInEnv, mbValInSD) of
           (Just valInEnv, Just valInSD)
             | valInEnv == valInSD -> [out vname valInEnv "synced"]
-            | otherwise           -> [ out vname v s | (v, s) <- [(valInEnv, "in process"), (valInSD, "in systemd")] ]
-          (Just val, _)           -> [ out vname val "only in process" ]
-          (_, Just val)           -> [ out vname val "only in systemd" ]
+            | otherwise           -> [out vname v s | (v, s) <- [(valInEnv, "in process"), (valInSD, "in systemd")] ]
+          (Just val, _)           -> [out vname val "only in process" ]
+          (_, Just val)           -> [out vname val "only in systemd" ]
           _                       -> error "empty"
       pc' = pc & RP.prompt .~ "Set env variable"
+               & RP.promptMessage .~ "\"VAR=VALUE\" to set the value of $VAR. \"VAR\" to unset the variable."
+               & RP.clearInputSettings
 
-  RP.rofiRun pc' rows >>= (`whenJust` process)
+  RP.runRofi pc' rows >>= (`whenJust` process)
     where
-      out k v notes = P.render $ P.bold (P.escape k) <> "=" <> P.escape v <> "\t" <> P.italic ("(" <> notes <> ")")
+      out :: String -> String -> String -> Text
+      out k v notes = P.render $
+        P.bold k <> "=" ~++ v <> "\t" <> P.italic ("(" ~++ notes <> ")")
 
 process :: String -> H ()
 process input = do

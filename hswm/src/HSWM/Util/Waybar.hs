@@ -14,7 +14,7 @@ module HSWM.Util.Waybar where
 
 import HSWM.Core hiding (closed)
 import System.Process (terminateProcess)
-import System.Process.Typed
+--import System.Process.Typed
 import HSWM.Util.Process
 import GHC.StaticPtr
 
@@ -65,11 +65,21 @@ waybarTask = withOptionalObject $ \WaybarState {wbProcess, wbConfig} -> do
       stopProcess ph
       startIt cfg
 
-waybarCleanup :: H ()
+waybarCleanup :: HasCallStack => H ()
 waybarCleanup = withOptionalObject $ \WaybarState {wbProcess} -> do
-  logDebug "waybar: stopping the process and cleaning up the state"
   forM_ wbProcess $ \p -> do
-    withAsync (io $ delayKill p) $ \_ -> stopProcess p
+    logDebug "waybar: stopping the process and cleaning up the state"
+    withAsync (delayKill p) $ \_ -> do
+      mpid <- io $ getPid p
+      io $ forM_ mpid $ signalProcess sigTERM
+      stopProcess p `onException` logError "stopProcess threw an error!"
     modifyObject $ \st -> st { wbProcess = Nothing }
   where
-    delayKill p = threadDelay 3_000_000 >> terminateProcess (unsafeProcessHandle p)
+    delayKill p = do
+      --
+      mpid <- io $ getPid p
+      io $ threadDelay 5_000
+      io $ forM_ mpid $ signalProcess sigINT
+      io $ threadDelay 10_000_000
+      logWarn "waybar: process apparently still running after 15s, killing it forcefully..."
+      io $ terminateProcess (unsafeProcessHandle p)

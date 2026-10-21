@@ -12,12 +12,10 @@
 -- Portability : unportable
 module HSWM.Types.Config where
 
-import qualified HSWM.StackSet as W
 import           HSWM.Types.Action
 import           HSWM.Types.Events
 import           HSWM.Types.Lens
 import           HSWM.Types.Simple
-import           HSWM.Types.Output
 import           HSWM.Types.Seat
 import           HSWM.Types.Window
 import           HSWM.Utils (parseRgba)
@@ -45,7 +43,7 @@ data HSWMConfig m l = HSWMConfig
   , borderEdges     :: !R.RiverWindowEdges
   , startupHook     :: !(m ())
   , layoutHook      :: !(l RiverWindow)
-  , manageHook      :: !(ManageHookX (Stateful m))
+  , manageHook      :: !(ManageHook' m)
   , renderHook      :: !(m ())
   , logHook         :: !(m ())
   , exitHook        :: !(m ())
@@ -65,7 +63,7 @@ instance
   (Default (l RiverWindow),
    Default (m ()),
    Default (Event -> m All),
-   Monad (Stateful m)
+   Default (ManageHook' m)
   ) => Default (HSWMConfig m l) where
     def = (Generics.to gdef)
       { borderWidth    = 2
@@ -76,17 +74,11 @@ instance
       , workspaces     = ["1", "2", "3", "4"]
       }
 
--- deriving anyclass instance (NFData (m ()), NFData (l RiverWindow)) => NFData (HSWMConfig m l)
-
 data RepeatInfo = RepeatInfo { rate, delay :: {-# UNPACK #-} !Int32 }
   deriving stock (Eq, Ord, Show, Read, Generic, Data)
   deriving anyclass (Default, NFData)
 
 -- * WindowSet/StackSet
-
-type WindowSetX l = W.StackSet WorkspaceId (l RiverWindow) RiverWindow WorkspaceDetail ScreenId ScreenDetail
-
-type WindowSpaceX l = W.Workspace WorkspaceId (l RiverWindow) RiverWindow WorkspaceDetail
 
 -- | Virtual workspace indices
 type WorkspaceId = String
@@ -115,12 +107,8 @@ instance Applicative m => Default (QueryT m (Endo a)) where
 runQuery :: QueryT m a -> Window -> m a
 runQuery (Query q) = runReaderT q
 
-type ManageHookX m = QueryT m (Endo (WindowSetX (LayoutProxy m)))
 
-type MaybeManageHookX m = QueryT m (Maybe (Endo (WindowSetX (LayoutProxy m))))
-
--- | This should usually map to @'Layout' 'RiverWindow'@
-type family LayoutProxy (m :: Type -> Type) :: Type -> Type
+type family ManageHook' (m :: k2) :: Type
 
 -- * Lenses
 
@@ -150,6 +138,12 @@ screenRect sd = Rectangle' (sd ^. position) (sd ^. size)
 
 -- ToJSON/FromJSON
 
-instance ToJSON ScreenDetail
-instance ToJSON WorkspaceDetail
-instance ToJSON RepeatInfo
+instance ToJSON ScreenDetail where
+  toJSON = genericToJSON aesonOptions
+  toEncoding = genericToEncoding aesonOptions
+instance ToJSON WorkspaceDetail where
+  toJSON = genericToJSON aesonOptions
+  toEncoding = genericToEncoding aesonOptions
+instance ToJSON RepeatInfo where
+  toJSON = genericToJSON aesonOptions
+  toEncoding = genericToEncoding aesonOptions

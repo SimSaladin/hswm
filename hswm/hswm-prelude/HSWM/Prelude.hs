@@ -41,6 +41,8 @@ module HSWM.Prelude (
   toText, io, fi, whenJust,
   module Data.Default,
   module Misc,
+  BS.StrictByteString, LazyByteString,
+  T.StrictText, TL.LazyText,
   ) where
 
 import           "unliftio" UnliftIO
@@ -68,9 +70,12 @@ import           "mtl" Control.Monad.State as Misc (MonadState, gets, modify)
 import           "data-default" Data.Default
 import qualified "async" Control.Concurrent.Async as Async
 import qualified "text" Data.Text as T
+import qualified "text" Data.Text.Lazy as TL
 import           "monad-logger-aeson" Control.Monad.Logger.Aeson hiding (Message)
 import           "microlens-platform" Lens.Micro.Platform hiding ((.=))
 import qualified "microlens" Lens.Micro.Internal as Lens
+import qualified "bytestring" Data.ByteString as BS
+import           "bytestring" Data.ByteString.Lazy (LazyByteString)
 
 toText :: String -> T.Text
 toText = T.pack

@@ -221,6 +221,7 @@ library prelude
     build-depends:
           async >=2.2.6 && <2.3
         , base >=4.21 && <5
+        , bytestring >=0.12.2 && <0.13
         , data-default >=0.8.0 && <0.9
         , exceptions >=0.10.9 && <0.11
         , microlens

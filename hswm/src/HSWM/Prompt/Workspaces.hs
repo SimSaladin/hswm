@@ -46,7 +46,7 @@ mkWorkspacePrompt :: (RP.RofiPromptConfig' -> WorkspaceId -> RP.RofiPromptConfig
                   -> H ()
 mkWorkspacePrompt prompt apply rofiPrompt = do
   (curTag, allTags) <- runInHS $ withWindowSet $ return . (W.currentTag &&& W.allTags)
-  RP.rofiRun (prompt rofiPrompt curTag) allTags >>= (`whenJust` doApply curTag)
+  RP.runRofi (prompt rofiPrompt curTag) allTags >>= (`whenJust` doApply curTag)
   where
     doApply cur input = do
       _ <- apply cur input

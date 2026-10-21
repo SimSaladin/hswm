@@ -16,14 +16,16 @@ module HSWM.Main.Options
   , Last(..)
   ) where
 
-import qualified Control.Monad.Logger as MonadLog
 import           Control.Monad.Trans.Except (runExcept)
 import qualified Data.Aeson as A
+import qualified Data.Aeson.Key as A.Key
 import qualified Data.Aeson.KeyMap as A
 import qualified Data.Aeson.Text as A
 import qualified Data.Aeson.Types as A
 import qualified Data.List as L
 import qualified Data.Text as T
+import qualified Data.Text.Lazy as TL
+import           Data.Text.Encoding (decodeUtf8)
 import           Data.Version (showVersion)
 import qualified Options.Applicative as Opts
 import qualified Options.Applicative.Types as Opts
@@ -176,7 +178,9 @@ instance ParseField AnsiColors where
     "auto"    -> Just ColorAuto
     "never"   -> Just ColorNever
     "no"      -> Just ColorNever
+    "off"     -> Just ColorNever
     "yes"     -> Just ColorAlways
+    "on"      -> Just ColorAlways
     "always"  -> Just ColorAlways
     _         -> Nothing
 
@@ -204,24 +208,9 @@ initLoggers logType logFormat ansiColors mbLogLevel = do
     LogFormatPLAIN -> do
       getTime <- FastLogger.newTimeCache FastLogger.simpleTimeFormat'
       (timedLog, clean) <- newTimedFastLogger getTime logType
-      let hasColor = case ansiColors of
-                         ColorAlways -> True
-                         ColorNever -> False
-                         ColorAuto -> case logType of
-                                        LogStdout{} -> True
-                                        LogStderr{} -> True
-                                        _           -> False
-      let lgrFun loc src lvl msg
-            | hasColor = timedLog $ \time ->
-                  toLogStr (PP.renderLazy $ PP.layoutPretty lopts $ PP.hsep
-                    [ PP.annotate (PP.colorDull PP.Yellow) $ PP.pretty time
-                    , PP.brackets $ ppLevel lvl
-                    , unJSON msg PP.pretty (PP.annotate (PP.colorDull PP.Green) . PP.pretty . A.encodeToLazyText) (PP.pretty . fromLogStr)
-                    , PP.annotate (PP.colorDull PP.Cyan) $ PP.pretty $ fileLocStr loc
-                    ]) <> "\n"
-
-            | otherwise = timedLog $ \time ->
-                  toLogStr time <> " " <> MonadLog.defaultLogStr loc src lvl (unJSON msg toLogStr (toLogStr . A.encode) id)<> "\n"
+      let lgrFun loc src lvl msg = timedLog $ \time ->
+            let (txt, meta) = parseMessage msg
+             in toLogStr (ppLogMessage hasColor loc src lvl txt meta time) <> "\n"
 
       return (withFilter lgrFun, clean)
   where
@@ -229,37 +218,59 @@ initLoggers logType logFormat ansiColors mbLogLevel = do
       | Just lvl <- mbLogLevel = \lo so lv str -> when (lvl <= lv) (f lo so lv str)
       | otherwise = f
 
-    lopts = PP.defaultLayoutOptions { PP.layoutPageWidth = PP.Unbounded }
+    hasColor
+      | ColorAlways <- ansiColors = True
+      | ColorNever <- ansiColors = False
+      | LogStdout{} <- logType = True
+      | LogStderr{} <- logType = True
+      | otherwise   = False
+
+    parseMessage :: LogStr -> (Text, Maybe A.Object)
+    parseMessage bs
+      | Just (val :: A.Value) <- A.decodeStrict $ fromLogStr bs
+      , Just (txt :: Text, meta :: Maybe A.Object) <- A.parseMaybe parse val
+      = (txt, meta)
+      | otherwise = (decodeUtf8 $ fromLogStr bs, Nothing)
+      where
+        parse = A.withObject "LogMsg" $ \v -> do
+          txt  <- v A..: "text"
+          meta <- v A..:? "meta"
+          return (txt, meta)
+
+ppLogMessage :: Bool
+             -> Loc -> Text -> LogLevel -> Text -> Maybe A.Object -> ByteString -> TL.Text
+ppLogMessage hasColor loc src lvl txt meta time = PP.renderLazy $ layout $ PP.hsep
+      [ annotate (PP.colorDull PP.Yellow) $ PP.pretty time
+      , PP.brackets $ ppLevel lvl <> (if src /= "" then "#" <> PP.pretty src else "")
+      , PP.pretty txt <> maybe "" ppMeta meta
+      , annotate (PP.colorDull PP.Cyan) $ PP.pretty fileLocStr
+      ]
+  where
+    layout = if hasColor then PP.layoutPretty PP.defaultLayoutOptions { PP.layoutPageWidth = PP.Unbounded }
+                         else PP.layoutCompact
+    annotate = PP.annotate
 
     ppLevel = \case
-      LevelError   -> PP.annotate (PP.colorDull PP.Red)     "ERR"
-      LevelWarn    -> PP.annotate (PP.colorDull PP.Yellow)  "WRN"
-      LevelInfo    -> PP.annotate (PP.colorDull PP.Blue)    "INF"
-      LevelDebug   -> PP.annotate (PP.colorDull PP.Cyan)    "DBG"
-      LevelOther x -> PP.annotate (PP.colorDull PP.Magenta) $ PP.pretty x
+      LevelError   -> annotate (PP.colorDull PP.Red)     "ERR"
+      LevelWarn    -> annotate (PP.colorDull PP.Yellow)  "WRN"
+      LevelInfo    -> annotate (PP.colorDull PP.Blue)    "INF"
+      LevelDebug   -> annotate (PP.colorDull PP.Cyan)    "DBG"
+      LevelOther x -> annotate (PP.colorDull PP.Magenta) $ PP.pretty x
 
-    unJSON :: (Monoid x, IsString x)
-           => LogStr
-           -> (Text -> x)
-           -> (A.KeyMap A.Value -> x)
-           -> (LogStr -> x)
-           -> x
-    unJSON bs f g backup
-      | Just (val :: A.Value) <- A.decodeStrict $ fromLogStr bs
-      , Just (txt :: Text, mmeta :: Maybe A.Object) <- A.parseMaybe parse val
-      = f txt <> maybe mempty ((" " <>) . g) mmeta
-      | otherwise = backup bs
-
-    parse = A.withObject "LogMsg" $ \v -> do
-      txt  <- v A..: "text"
-      meta <- v A..:? "meta"
-      return (txt, meta)
+    ppMeta = ppKM ""
+      where
+        ppKM p = A.foldMapWithKey $ \k v -> case v of
+                    A.Object inner -> ppKM (A.Key.toText k <> ".") inner
+                    _ -> " " <>
+                        annotate (PP.colorDull PP.Green) (PP.pretty $ p <> A.Key.toText k) <>
+                        "=" <>
+                        annotate (PP.color PP.Green) (PP.pretty $ A.encodeToLazyText v)
 
     -- taken from file-location package
-    -- turn the TH Loc loaction information into a human readable string
+    -- turn the Loc TH location information into a human readable string
     -- leaving out the loc_end parameter
-    fileLocStr loc = loc_package loc ++ ':' : loc_module loc ++
-      ' ' : loc_filename loc ++ ':' : line loc ++ ':' : char loc
+    fileLocStr = "@(" ++ loc_package loc ++ ':' : loc_module loc ++
+      ' ' : loc_filename loc ++ ':' : line loc ++ ':' : char loc ++ ")"
       where
         line = show . fst . loc_start
         char = show . snd . loc_start

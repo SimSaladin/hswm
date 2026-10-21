@@ -21,7 +21,7 @@ import qualified WL.Wlr.InputMethod.Unstable.V2.Client as Wlr
 import           Control.Monad.Fix
 import qualified Data.Map as M
 
-type HasGrabCtx env m = (env ~ HConf, MonadStateGlobal env m, MonadReader env m, MonadLogger m, MonadUnliftIO m, MonadFix m)
+type HasGrabCtx env m = (MonadH m, env ~ HConf, MonadStateGlobal env m, MonadReader env m, MonadLogger m, MonadUnliftIO m, MonadFix m)
 
 type SeatIMs = Map WL.Seat GrabIM
 
@@ -106,9 +106,9 @@ lookupGrabIM s = do
         putObject $ M.insert s.wl_seat grabIM seatInputMethods
         return grabIM
   case M.lookup s.wl_seat seatInputMethods of
-    Just im -> do
-      isFree <- isEmptyMVar im.reserved
-      if isFree then makeGrabIM else return im
+    Just im -> return im
+      -- isFree <- isEmptyMVar im.reserved
+      -- if isFree then makeGrabIM else return im
     Nothing -> makeGrabIM
 
 newGrabIM
@@ -128,18 +128,13 @@ newGrabIM manager seat = do
       logError "grab: unavailable"
       atomically $ writeTChan bcastChan (Left Done)
       io $ WL.objectDestroy self
-
-    Wlr.InputMethodActivate _ _ -> do
-      writeIORef pending_active True
-
-    Wlr.InputMethodDeactivate _ _ -> do
-      writeIORef pending_active False
-
-    Wlr.InputMethodDone _ _ -> do
+    Wlr.InputMethodActivate udata _ -> when (udata /= nullPtr) $ writeIORef pending_active True
+    Wlr.InputMethodDeactivate udata _ -> when (udata /= nullPtr) $ writeIORef pending_active False
+    Wlr.InputMethodDone udata _ -> when (udata /= nullPtr) $ do
       prev_active <- readIORef active
       next_active <- readIORef pending_active
       when (prev_active /= next_active) $
-        logInfo $ "grab: active state" :# [ "active" .= next_active ]
+        logDebug $ "grab: active state" :# [ "active" .= next_active ]
       writeIORef active next_active
 
     _ -> pure () -- ignored
@@ -177,21 +172,30 @@ newGrabIM manager seat = do
 
 activate :: HasCallStack => (MonadIO m, MonadLogger m, MonadReader env m) => GrabIM -> m ()
 activate GrabIM {..} = do
-  res <- Wlr.inputMethodGrabKeyboard inputMethod
-  when (res == def) $ do
-    logError "grab: failed to activate (failed to grab keyboard)"
-    throwString "Failed to grab keyboard"
-  WL.listenerAdd_ res imKeyboardGrabListener
-  putMVar imKeyboardGrab res
-  logInfo "grab: activated"
+  imUD <- io $ WL.getUserData inputMethod
+  when (imUD == nullPtr) $ do
+    imKbdGrab <- Wlr.inputMethodGrabKeyboard inputMethod
+    when (imKbdGrab == def) $ do
+      logError "grab: failed to activate (failed to grab keyboard)"
+      throwString "Failed to grab keyboard"
+    WL.listenerAdd_ imKbdGrab imKeyboardGrabListener
+    putMVar imKeyboardGrab imKbdGrab
+    io $ WL.setUserData inputMethod $ WL.toUserData imKbdGrab
+    logInfo "grab: activated"
 
 deactivate :: HasCallStack => (MonadIO m, MonadLogger m, MonadReader env m) => GrabIM -> m ()
 deactivate GrabIM {..} = do
+  Wlr.inputMethodCommitString inputMethod (Just "")
   res <- tryTakeMVar imKeyboardGrab
   forM_ res $ \kbdg -> when (kbdg /= def) $ do
     logDebug "grab: releasing keyboard grab"
-    io $ WL.objectDestroy kbdg
-  io $ WL.objectDestroy inputMethod
-  io $ WL.objectDestroy inputMethodListener
-  io $ WL.objectDestroy imKeyboardGrabListener
-  logDebug "grab: deactivated"
+    Wlr.inputMethodKeyboardGrabRelease kbdg
+  io $ WL.setUserData inputMethod nullPtr
+  logDebug "grab: input method deactivated"
+  -- zwp_input_popup_surface_v2
+  --Wlr.inputMethodDestroy inputMethod
+  --WL.objectDestroy kbdg
+  --io $ WL.objectDestroy inputMethod
+  --io $ WL.objectDestroy inputMethodListener
+  --io $ WL.objectDestroy imKeyboardGrabListener
+  --logDebug "grab: input method destroyed"

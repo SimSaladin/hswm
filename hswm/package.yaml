@@ -185,6 +185,7 @@ internal-libraries:
       - *dep-monad-logger-aeson
       - *dep-microlens-platform
       - *dep-microlens
+      - *dep-bytestring
 
   ipc-api:
     visibility: public

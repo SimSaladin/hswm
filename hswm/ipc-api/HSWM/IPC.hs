@@ -10,10 +10,12 @@
 module HSWM.IPC where
 
 import qualified Data.Aeson as A
+--import qualified Data.Aeson.Encoding.Internal as A
 import qualified Data.Aeson.KeyMap as KM
-import qualified Data.ByteString.Char8 as C8
+--import qualified Data.ByteString.Char8 as C8
+import qualified Data.ByteString.Lazy.Char8 as C8LB
 import qualified Data.ByteString.Lazy as BL
-import qualified Data.ByteString.UTF8 as BUTF8
+--import qualified Data.ByteString.UTF8 as BUTF8
 import qualified Data.List as L
 import qualified Data.Text.Lazy as TL
 import           Data.Version (showVersion)
@@ -23,28 +25,27 @@ import           System.Random (randomIO)
 
 import qualified PackageInfo_hswm as PKG
 
--- * Identity strings
-
-thisPeerIdent :: String -> String
-thisPeerIdent x = PKG.name ++ "-" ++ x
-
-thisPeerDescription :: String
-thisPeerDescription = PKG.synopsis ++ " " ++ showVersion PKG.version
+aesonOptions :: A.Options
+aesonOptions = A.defaultOptions
+  { A.omitNothingFields = True
+  , A.fieldLabelModifier = A.camelTo2 '_'
+  }
 
 -- * Message wrapper
 
 data Msg a = Msg { msgBody :: a, msgSeqn :: Maybe Int }
+  deriving (Eq, Show, Generic)
 
 instance A.ToJSON a => A.ToJSON (Msg a) where
   toJSON Msg{..} =
     case A.toJSON msgBody of
         A.Object o -> A.Object $! KM.insert "seqn" (A.toJSON msgSeqn) o
-        x -> x
+        x -> error $ "expected body to be an object: " ++ show x
 
 instance A.FromJSON a => A.FromJSON (Msg a) where
-  parseJSON v = do
-    msgBody <- A.parseJSON v
-    msgSeqn <- A.withObject "Msg" (A..:? "seqn") v
+  parseJSON = A.withObject "Msg" $ \v -> do
+    msgSeqn <- v A..:? "seqn"
+    msgBody <- A.parseJSON (A.Object v)
     return Msg{..}
 
 -- * Request
@@ -57,11 +58,17 @@ data Request
   | DumpState { param :: String }
   -- ^ Request a state dump.
 
-  | Pong
+  | ListSeats
+  | ListOutputs
+  | ListWindows
+  | ConfigGet
   deriving (Generic, Eq, Show, Read)
 
-instance A.ToJSON Request
-instance A.FromJSON Request
+instance A.ToJSON Request where
+  toJSON = A.genericToJSON aesonOptions
+  toEncoding = A.genericToEncoding aesonOptions
+instance A.FromJSON Request where
+  parseJSON = A.genericParseJSON aesonOptions
 
 -- * Response
 
@@ -71,8 +78,6 @@ data Response
   -- ^ Server identification info.
 
   | Error { message :: Text }
-
-  | Ping
 
   | Outputs { outputs :: [(Text, OutputId)] }
   -- ^ Outputs updated. @(outputName, OutputId)@
@@ -88,8 +93,11 @@ data Response
   | InternalObject { value :: A.Value }
   deriving (Eq, Show, Read, Generic)
 
-instance A.ToJSON Response
-instance A.FromJSON Response
+instance A.ToJSON Response where
+  toJSON = A.genericToJSON aesonOptions
+  toEncoding = A.genericToEncoding aesonOptions
+instance A.FromJSON Response where
+  parseJSON = A.genericParseJSON aesonOptions
 
 data RWorkspaces = RWorkspaces
   { tags       :: [WorkspaceInfo]
@@ -142,24 +150,6 @@ instance Default ClientConfig where
 
 type MonadIPCClient m = (MonadLogger m, MonadIO m, MonadUnliftIO m, MonadMask m)
 
-getClientAI :: MonadIO m => ClientConfig -> m AddrInfo
-getClientAI ClientConfig{..} =
-  case L.break (== ':') connectTo of
-    ("unix", ':' : name) -> do
-      file <- makeAbs =<< io (if name == "" then defaultSocketName else return name)
-      return defaultHints
-        { addrFamily = AF_UNIX
-        , addrSocketType = Stream
-        , addrAddress = SockAddrUnix file
-        }
-    _ -> throwString $ "cannot parse connect-to parameter: " ++ connectTo
-  where
-    makeAbs name
-      | "/" `L.isPrefixOf` name = return name
-      | otherwise = do
-        rdir <- io getXdgRuntimeDirectory
-        return $ rdir ++ "/" ++ name
-
 clientRun
   :: MonadIPCClient m
   => ClientConfig
@@ -167,15 +157,12 @@ clientRun
   -> ((Request -> m ()) -> m r) -- ^ Emit outgoing
   -> m r
 clientRun conf onMsg cb = clientRunWith conf $ \sock -> do
-  let doMsg resp = case A.eitherDecodeStrict' resp of
-        Right (Msg Ping n) -> sendMsg sock $ Msg Pong n
+  let doMsg resp = case A.eitherDecode resp of
         Right (Msg msg _) -> onMsg msg
-        Left e -> logWarn $ "Received malformed message from server" :# [ "ex" .= toText e, "msg" .= BUTF8.toString resp ]
-
+        Left e -> logWarn $ "Received malformed message from server" :# [ "ex" .= toText e, "msg" .= BL.unpack (BL.take 256 resp) ]
   let worker lo = do (resps, leftover) <- recvLines sock lo
                      mapM_ doMsg resps
                      worker leftover
-
   withAsync (worker mempty) $ \inputAs -> do
     link inputAs
     cb (sendMsg sock)
@@ -196,6 +183,7 @@ clientRunWith conf program = do
 syncRequest :: MonadIPCClient m => Socket -> Request -> m Response
 syncRequest sock req = do
   m <- randomIO
+  logDebug $ "new request" :# [ "req" .= req, "id" .= m ]
   sendMsg sock (Msg req (Just m))
   let go ([], acc) = syncReceive sock acc >>= go
       go (Msg x n : xs, acc)
@@ -203,29 +191,38 @@ syncRequest sock req = do
         | otherwise = go (xs, acc)
   go ([], "")
 
-syncReceive :: MonadIPCClient m => Socket -> ByteString -> m ([Msg Response], ByteString)
-syncReceive sock = go
-  where go acc = recvLines sock acc >>= \case
-                   ([], acc') -> go (acc <> acc')
-                   (xs, acc') -> return (map (either error id . A.eitherDecodeStrict') xs, acc')
+syncReceive :: HasCallStack => MonadIPCClient m => Socket -> BL.ByteString -> m ([Msg Response], BL.ByteString)
+syncReceive sock acc0 = do
+  go acc0
+  where
+    go acc = recvLines sock acc >>= \case
+        ([], acc') -> go acc'
+        (xs, acc') -> do
+          xs' <- forM xs $ \bs -> do
+            --logDebug $ "response" :# [ "begin" .= C8LB.unpack (C8LB.take 50 bs) ]
+            case A.eitherDecode bs :: Either String (Msg Response) of
+               Left err -> throwString $ "invalid response: " ++ err ++ "\nresponse was: " ++ C8LB.unpack (C8LB.take 500 bs)
+               Right x -> return x
+          return (xs', acc')
 
 -- * Utilities
 
 sendMsg :: (MonadIO m, A.ToJSON msg) => Socket -> msg -> m ()
 sendMsg sock msg = io $ NB.sendAll sock $! BL.toStrict $! A.encode msg <> "\n"
 
-recvLines :: (MonadIPCClient m) => Socket -> ByteString -> m ([ByteString], ByteString)
+recvLines :: MonadIPCClient m => Socket -> BL.ByteString -> m ([BL.ByteString], BL.ByteString)
 recvLines sock leftover = do
     res <- io $ NB.recv sock 4096
     when (res == "") $ throwString "recvLines: disconnected"
-    return $! decode [] (leftover <> res)
+    --logDebug $ "received input" :# [ "size" .= C8.length res ]
+    return $! decode [] leftover (BL.fromStrict res)
   where
-    decode :: [ByteString] -> ByteString -> ([ByteString], ByteString)
-    decode msgs x =
-      let (as, bs) = C8.break (== '\n') x
-       in case C8.uncons bs of
-            Just ('\n', bs') -> decode (msgs ++ [as]) bs'
-            _                -> (msgs, x)
+    decode :: [BL.ByteString] -> BL.ByteString -> BL.ByteString -> ([BL.ByteString], BL.ByteString)
+    decode msgs acc x =
+      let (as, bs) = C8LB.break (== '\n') x
+       in case C8LB.uncons bs of
+            Just ('\n', bs') -> decode (msgs ++ [acc <> as]) "" bs'
+            _                -> (msgs, acc <> x)
 
 getXdgRuntimeDirectory :: IO FilePath
 getXdgRuntimeDirectory = lookupEnv "XDG_RUNTIME_DIR" >>= \case
@@ -234,11 +231,31 @@ getXdgRuntimeDirectory = lookupEnv "XDG_RUNTIME_DIR" >>= \case
 
 defaultSocketName :: IO String
 defaultSocketName = lookupEnv "WAYLAND_DISPLAY" >>= \case
-  Just str | Just (s::Int) <- L.stripPrefix "wayland-" str >>= readMaybe -> return $ "hswm-" ++ show s
+  Just str | Just (s :: Int) <- L.stripPrefix "wayland-" str >>= readMaybe -> return $ "hswm-" ++ show s
   _ -> return "hswm-1"
 
+getClientAI :: MonadIO m => ClientConfig -> m AddrInfo
+getClientAI ClientConfig{..} =
+  case L.break (== ':') connectTo of
+    ("unix", ':' : name) -> do
+      file <- makeAbs =<< io (if name == "" then defaultSocketName else return name)
+      return defaultHints
+        { addrFamily = AF_UNIX
+        , addrSocketType = Stream
+        , addrAddress = SockAddrUnix file
+        }
+    _ -> throwString $ "cannot parse connect-to parameter: " ++ connectTo
+  where
+    makeAbs name
+      | "/" `L.isPrefixOf` name = return name
+      | otherwise = do
+        rdir <- io getXdgRuntimeDirectory
+        return $ rdir ++ "/" ++ name
 
-runMIO :: LoggingT m a -> m a
-runMIO = runStderrLoggingT
+-- * Identity strings
 
-type MIO = LoggingT IO
+thisPeerIdent :: String -> String
+thisPeerIdent x = PKG.name ++ "-" ++ x
+
+thisPeerDescription :: String
+thisPeerDescription = PKG.synopsis ++ " " ++ showVersion PKG.version

@@ -17,7 +17,7 @@ module Waybar.CFFI.Plugin.HSWM ( MyMod ) where
 import           Waybar.CFFI.Plugin.Base
 import           Waybar.CFFI.Plugin.TextFormat
 
-import           HSWM.IPC (Response(..), RWorkspaces(..), WindowInfo(..), WorkspaceInfo(..), OutputId(..), runMIO, clientRun)
+import           HSWM.IPC (Response(..), RWorkspaces(..), WindowInfo(..), WorkspaceInfo(..), OutputId(..), clientRun)
 
 import           GI.Gtk as Gtk -- "gi-gtk3"
 import           GI.Pango (EllipsizeMode(..)) -- "gi-pango"
@@ -110,7 +110,7 @@ instance WaybarPlugin MyMod where
     , thisOutputName :: !Text -- ^ Name of this output, e.g. eDP-1, DP-2, etc.
     } deriving (Eq, Generic)
 
-  runContextT _ = runMIO
+  runContextT _ = runStderrLoggingT
 
   initGlobal = do
     wmAs <- async connectToWM
