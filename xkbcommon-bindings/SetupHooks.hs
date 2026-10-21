@@ -15,8 +15,6 @@ import Distribution.HsBindgen.Utils
 
 import Distribution.Pretty (prettyShow)
 import Distribution.Simple.Program (
-    ConfiguredProgram,
-    ProgramDb,
     gccProgram,
     programInvocation,
     requireProgram,
@@ -25,16 +23,12 @@ import Distribution.Simple.Program.Run (getProgramInvocationOutputAndErrors)
 
 import Distribution.Simple.BuildPaths
 import Distribution.Simple.SetupHooks
-import Distribution.Verbosity
 
 import qualified Distribution.Compat.CharParsing as P
 import Distribution.Parsec
 import Distribution.Simple.Utils
-import Distribution.Types.Component
 import Distribution.Types.Library (explicitLibModules)
-import Distribution.Utils.IOData (hPutContents)
 import Distribution.Utils.Path
-import Distribution.Utils.Structured
 
 #if MIN_VERSION_Cabal(3,17,0)
 #else
@@ -45,7 +39,6 @@ import           Distribution.Simple.LocalBuildInfo (withPrograms)
 
 import Control.Monad
 import Control.Monad.IO.Class
-import Data.ByteString.Lazy (ByteString)
 import Data.Char
 import Data.Function
 import Data.Functor

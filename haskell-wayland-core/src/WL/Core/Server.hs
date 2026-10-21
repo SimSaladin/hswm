@@ -1,5 +1,3 @@
--- {-# OPTIONS_GHC -ddump-splices #-}
-
 {- |
 Module      : WL.Core.Server
 Description : Short description
@@ -23,7 +21,7 @@ import WL.Core.Server.Generated
 
 -- import           WL.Core.Server.Generated.Global
 import WL.Core.Server.Generated.Safe as Safe
-import WL.Core.Server.Generated.Unsafe qualified as Unsafe
+--import WL.Core.Server.Generated.Unsafe qualified as Unsafe
 
 import Foreign.C.ConstPtr
 import Lens.Micro
@@ -37,7 +35,6 @@ import WL.Internals.TH.Server
 -- import           WL.Internals.Types
 -- import           WL.Internals.Utils
 
-import Language.Haskell.TH.Syntax
 import WL.Util
 
 -- * Types

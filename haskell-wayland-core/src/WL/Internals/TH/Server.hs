@@ -29,7 +29,6 @@ import Foreign.C.ConstPtr
 import GHC.Exts
 import GHC.Generics (Generic)
 import Language.Haskell.TH
-import Language.Haskell.TH.Syntax
 import System.Posix
 
 serverFromProtocolXML :: ProtocolRenderSettings -> String -> Q [Dec]

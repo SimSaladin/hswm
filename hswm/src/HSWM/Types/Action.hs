@@ -32,7 +32,6 @@ import Data.Data
 import Data.Generics.Instances ()
 import Data.List qualified as L
 import Data.Map qualified as M
-import Data.Typeable
 
 -- * XkbBinding, PointerBinding, etc.
 

@@ -14,6 +14,7 @@ import HSWM.Actions.DynamicWorkspaceOrder qualified as DWO
 import HSWM.Actions.DynamicWorkspaces qualified as DynWS
 import HSWM.StackSet qualified as W
 import HSWM.Util.RofiPrompt qualified as RP
+import qualified Data.List as L
 
 -- | Go to workspace
 workspacePrompt :: RP.RofiPromptConfig' -> H ()
@@ -63,8 +64,14 @@ mkWorkspacePrompt ::
     RP.RofiPromptConfig' ->
     H ()
 mkWorkspacePrompt prompt apply rofiPrompt = do
-    (curTag, allTags) <- runInHS $ withWindowSet $ return . (W.currentTag &&& W.allTags)
-    RP.runRofi (prompt rofiPrompt curTag) allTags >>= (`whenJust` doApply curTag)
+    wsComp <- runInHS DWO.getWsCompareByOrder
+    (curTag, (hiddenTags, visibleTags)) <- runInHS $ withWindowSet $ return . (W.currentTag &&& map W.tag . W.hidden &&& map (W.tag . W.workspace) . W.visible)
+    let allTags =
+          [ RP.fromContent curTag & RP.active .~ True & RP.nonselectable .~ True ] ++
+          [ RP.fromContent t & RP.active .~ True | t <- visibleTags ] ++
+          [ RP.fromContent t | t <- hiddenTags ]
+        sorted = L.sortBy (wsComp `on` view RP.content) allTags
+    RP.runRofi (prompt rofiPrompt curTag) sorted >>= (`whenJust` doApply curTag)
   where
     doApply cur input = do
         _ <- apply cur input

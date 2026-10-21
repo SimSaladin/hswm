@@ -129,11 +129,6 @@ class HistoryInput a where
 
 instance HistoryInput [String]
 
--- instance HistoryInput [LazyByteString] where
--- instance HistoryInput [ByteString] where
--- instance HistoryInput [Text] where
--- instance HistoryInput [P.Markup] where
-
 class ParseRow a where
     rowFromText :: StrictText -> InputRow a
 

@@ -12,12 +12,8 @@ module SetupHooks (setupHooks) where
 import Distribution.HsBindgen.Hooks
 import Distribution.Wayland.Hooks
 
-import Distribution.Simple.Flag
-import Distribution.Simple.Setup (setupWorkingDir)
 import Distribution.Simple.SetupHooks (
-    PostConfPackageInputs (..),
     SetupHooks,
-    configCommonFlags,
  )
 import Distribution.Types.LocalBuildConfig
 import Distribution.Utils.Path
