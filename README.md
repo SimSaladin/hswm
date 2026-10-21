@@ -67,6 +67,23 @@ nix run '.#zon2nix-0_16_0' zon2nix  river/build.zig.zon
 weston --backend=wayland -- river -c $HSWM_EXECUTABLE -o -
 ```
 
+# git-hooks
+
+The git-hooks.nix install script won't install hooks if core.hooksPath is set;
+
+```bash
+git config set --local core.hooksPath ""
+pre-commit install
+git config unset --local core.hooksPath
+```
+
+Useful if the other hooksPath contains hooks that will discover and run
+repo-local hooks!
+
+```bash
+pre-commit run # run checks
+```
+
 --------
 
 - [c2hs

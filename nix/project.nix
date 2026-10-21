@@ -36,7 +36,7 @@ let
         config.hsPkgs.hs-bindgen.components.exes.hs-bindgen-cli
       ];
       inputsFrom = [
-        (withSystem pkgs.stdenv.hostPlatform.system ({config,...}: config.pre-commit.devShell))
+        (withSystem pkgs.stdenv.hostPlatform.system ({ config, ... }: config.pre-commit.devShell))
       ];
     };
 
@@ -165,7 +165,7 @@ let
     let
       project = pkgs.project;
       projectFlake = project.flake';
-      projects = [ { project = project; key = "project"; } ];
+      projects = [{ project = project; key = "project"; }];
     in
     {
       apps = {
