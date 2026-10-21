@@ -238,12 +238,11 @@ class Functor m => IsAction m a where
 
   -- | Description based on the value (defaults to type info)
   actionDescription :: Proxy m -> a -> String
-  actionDescription = typeDescription
+  actionDescription _ _ = ""
 
-  -- | Description based on type info
-  typeDescription :: Proxy m -> a -> String
-  default typeDescription :: (Typeable a) => Proxy m -> a -> String
-  typeDescription _ = show . typeOf
+  actionDescriptionFallback :: Proxy m -> a -> String
+  default actionDescriptionFallback :: (Typeable a) => Proxy m -> a -> String
+  actionDescriptionFallback _ = show . typeOf
 
 instance (Functor m, Typeable m) => IsAction m (m ()) where
   runner = id
@@ -254,21 +253,21 @@ instance (MonadIO m) => IsAction m (IO ()) where
 instance (MonadIO m, Typeable m) => IsAction m (Submap (SomeAction m)) where
   runner Submap{..} = whenJust submapDefault runner
   actionSubmap = id
+  actionDescription _ _ = "(Submap)"
 
 -- * SomeAction
 
 data SomeAction m = forall a. (IsAction m a) => SomeAction a
 
 instance Functor m => IsAction m (SomeAction m) where
-  runner               (SomeAction a) = runner a
-  onHoldRepeat      mp (SomeAction a) = onHoldRepeat mp a
-  actionSubmap         (SomeAction a) = actionSubmap a
-  actionDescription mp (SomeAction a) = actionDescription mp a
-  typeDescription   mp (SomeAction a) = typeDescription mp a
+  runner                       (SomeAction a) = runner a
+  onHoldRepeat      mp         (SomeAction a) = onHoldRepeat mp a
+  actionSubmap                 (SomeAction a) = actionSubmap a
+  actionDescription mp         (SomeAction a) = actionDescription mp a
+  actionDescriptionFallback mp (SomeAction a) = actionDescriptionFallback mp a
 
 instance Eq (SomeAction m) where
   SomeAction a == SomeAction b =
-    typeDescription proxy a   == typeDescription proxy b &&
     actionDescription proxy a == actionDescription proxy b &&
     actionSubmap @m a         == actionSubmap @m b
       where proxy = Proxy @m
@@ -285,12 +284,10 @@ instance NFData (SomeAction m) where
 
 instance ToJSON (SomeAction m) where
   toJSON (SomeAction val) = A.object $
-    [ "description"     .= actionDescription @m Proxy val
-    , "typeDescription" .= typeDescription @m Proxy val ] ++
-    [ "submap"          .= x | let x = actionSubmap @m val, not (omitField x) ]
+    ("description" .= actionDescription @m Proxy val) :
+    [ "submap" .= x | let x = actionSubmap @m val, not (omitField x) ]
   toEncoding (SomeAction val) = A.pairs $
-    "description"     .= actionDescription @m Proxy val <>
-    "typeDescription" .= typeDescription @m Proxy val <>
+    "description" .= actionDescription @m Proxy val <>
     (let x = actionSubmap @m val in if omitField x then mempty else "submap" .= x)
 
 -- * Lenses

@@ -59,6 +59,9 @@ data RofiPromptConfig (i :: Type) (o :: OutputFormat) (a :: Type) = RofiPromptCo
   , displayColumns  :: [Int]        -- ^ (dmenu) Columns to display. @-display-columns@
   , columnSeparator :: String       -- ^ (dmenu) Display column separator. (Regex)
   , extraArgs       :: [String]     -- ^ Additional arguments to rofi
+  , smartCase       :: Bool         -- ^ --smart-case
+  , filterString    :: String       -- ^ Sets the initial filter string input
+  , matching        :: String       -- ^ Matching style: normal,regex,glob,fuzzy,prefix
   }
   deriving stock (Eq, Ord, Show, Read, Generic)
   deriving anyclass (Default)
@@ -361,11 +364,14 @@ rofiToProc pcfg = do
           ++ [["-no-custom"] | pc.noCustomInput]
           ++ [["-markup-rows"] | pc.markupInput]
           ++ [["-multi-select"] | pc.multiSelect]
+          ++ [["-smart-case"] | pc.smartCase]
           ++ [["-dpi", show pc.dpi] | pc.dpi > 0]
           ++ [["-l", show pc.maxLines] | pc.maxLines > 0]
           ++ [["-eh", show pc.rowHeight] | pc.rowHeight > 1]
           ++ [["-p", pc.prompt] | pc.prompt /= mempty]
           ++ [["-mesg", pc.promptMessage] | pc.promptMessage /= mempty]
+          ++ [["-filter", pc.filterString] | pc.filterString /= mempty]
+          ++ [["-matching", pc.matching] | pc.matching /= mempty]
           ++ [["-a", show pc.activeRow] | pc.activeRow /= mempty]
           ++ [["-u", show pc.urgentRow] | pc.urgentRow /= mempty]
           ++ [["-selected-row", show pc.selectedRow] | pc.selectedRow /= 0]
@@ -457,6 +463,12 @@ instance (KnownChar colsep, KnownNat (ColumnsCount a), input ~ [InputRow a], Has
                         &+ (if x.columnsHeader then selectedRow %~ max 1 else id)
 
 -- * Prompts
+
+modePromptWith :: RofiPromptConfig i o a -> Mode -> RofiPromptConfig () 's' ()
+modePromptWith pc mo = pc & clearTypeParams
+                          & showMode ?~ mo
+                          & modes <>~ [mo]
+                          & dmenuMode .~ False
 
 modePrompt :: Mode -> RofiPromptConfig () 's' ()
 modePrompt mo = def & showMode ?~ mo & modes <>~ [mo]

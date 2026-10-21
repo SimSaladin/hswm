@@ -56,6 +56,27 @@ runWithSystemD :: HasCallStack => MonadProcessSpawn m => String -> m ()
 runWithSystemD cmd = void $ readProcess $ proc "systemd-run"
   [ "--user", "--no-block", "--collect", "--", "bash", "-c", cmd ]
 
+notifySend :: MonadProcessSpawn m
+           => NotifySendOptions
+           -> String -- ^ Summary
+           -> Maybe String -- ^ Body
+           -> m (Async ())
+notifySend opts summary mbody =
+  async . runProcess_ $
+    setStdin nullStream $
+    setStdout nullStream $
+    setCloseFds True $
+    proc "notify-send" $
+      [ "--"<>k<>"="<>v | (k, v) <- opts.notifySendOptions ] ++
+        [ summary, "--" ] ++ catMaybes [mbody]
+
+newtype NotifySendOptions = NotifySendOptions { notifySendOptions :: [(String, String)] }
+  deriving (Eq, Ord, Show, Read, Generic)
+
+instance Default NotifySendOptions where
+  def = NotifySendOptions [("app-name", "HSWM")]
+
+
 -- * Standard streams & logging
 
 -- | Renamed 'P.closed'
