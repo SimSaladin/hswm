@@ -23,11 +23,11 @@
       buildType = "Hooks";
       isLocal = true;
       setup-depends = [
-        (hsPkgs.pkgsBuildBuild.hs-bindgen-hooks or (pkgs.pkgsBuildBuild.hs-bindgen-hooks or (errorHandler.setupDepError "hs-bindgen-hooks")))
-        (hsPkgs.pkgsBuildBuild.haskell-wayland-core or (pkgs.pkgsBuildBuild.haskell-wayland-core or (errorHandler.setupDepError "haskell-wayland-core")))
-        (hsPkgs.pkgsBuildBuild.base or (pkgs.pkgsBuildBuild.base or (errorHandler.setupDepError "base")))
         (hsPkgs.pkgsBuildBuild.Cabal or (pkgs.pkgsBuildBuild.Cabal or (errorHandler.setupDepError "Cabal")))
         (hsPkgs.pkgsBuildBuild.Cabal-hooks or (pkgs.pkgsBuildBuild.Cabal-hooks or (errorHandler.setupDepError "Cabal-hooks")))
+        (hsPkgs.pkgsBuildBuild.base or (pkgs.pkgsBuildBuild.base or (errorHandler.setupDepError "base")))
+        (hsPkgs.pkgsBuildBuild.haskell-wayland-core or (pkgs.pkgsBuildBuild.haskell-wayland-core or (errorHandler.setupDepError "haskell-wayland-core")))
+        (hsPkgs.pkgsBuildBuild.hs-bindgen-hooks or (pkgs.pkgsBuildBuild.hs-bindgen-hooks or (errorHandler.setupDepError "hs-bindgen-hooks")))
         (hsPkgs.pkgsBuildBuild.microlens-ghc or (pkgs.pkgsBuildBuild.microlens-ghc or (errorHandler.setupDepError "microlens-ghc")))
       ];
       detailLevel = "FullDetails";
@@ -45,12 +45,12 @@
           (hsPkgs."containers" or (errorHandler.buildDepError "containers"))
           (hsPkgs."data-default" or (errorHandler.buildDepError "data-default"))
           (hsPkgs."deepseq" or (errorHandler.buildDepError "deepseq"))
+          (hsPkgs."haskell-wayland-core" or (errorHandler.buildDepError "haskell-wayland-core"))
+          (hsPkgs."hs-bindgen-hooks" or (errorHandler.buildDepError "hs-bindgen-hooks"))
+          (hsPkgs."hs-bindgen-runtime" or (errorHandler.buildDepError "hs-bindgen-runtime"))
           (hsPkgs."template-haskell" or (errorHandler.buildDepError "template-haskell"))
           (hsPkgs."unix" or (errorHandler.buildDepError "unix"))
           (hsPkgs."unliftio" or (errorHandler.buildDepError "unliftio"))
-          (hsPkgs."hs-bindgen-runtime" or (errorHandler.buildDepError "hs-bindgen-runtime"))
-          (hsPkgs."hs-bindgen-hooks" or (errorHandler.buildDepError "hs-bindgen-hooks"))
-          (hsPkgs."haskell-wayland-core" or (errorHandler.buildDepError "haskell-wayland-core"))
         ];
         libs = pkgs.lib.optionals (!flags.pkg-config) [
           (pkgs."wayland-client" or (errorHandler.sysDepError "wayland-client"))
@@ -58,8 +58,8 @@
         ];
         pkgconfig = pkgs.lib.optionals (flags.pkg-config) [
           (pkgconfPkgs."wayland-client" or (errorHandler.pkgConfDepError "wayland-client"))
-          (pkgconfPkgs."wayland-server" or (errorHandler.pkgConfDepError "wayland-server"))
           (pkgconfPkgs."wayland-protocols" or (errorHandler.pkgConfDepError "wayland-protocols"))
+          (pkgconfPkgs."wayland-server" or (errorHandler.pkgConfDepError "wayland-server"))
         ];
         build-tools = pkgs.lib.optional (flags.build-tool-depends) (hsPkgs.pkgsBuildBuild.hs-bindgen.components.exes.hs-bindgen-cli or (pkgs.pkgsBuildBuild.hs-bindgen-cli or (errorHandler.buildToolDepError "hs-bindgen:hs-bindgen-cli")));
         buildable = true;
@@ -82,8 +82,8 @@
           depends = [
             (hsPkgs."base" or (errorHandler.buildDepError "base"))
             (hsPkgs."data-default" or (errorHandler.buildDepError "data-default"))
-            (hsPkgs."hspec" or (errorHandler.buildDepError "hspec"))
             (hsPkgs."hs-bindgen-runtime" or (errorHandler.buildDepError "hs-bindgen-runtime"))
+            (hsPkgs."hspec" or (errorHandler.buildDepError "hspec"))
             (hsPkgs."hswm-bindings" or (errorHandler.buildDepError "hswm-bindings"))
           ];
           build-tools = [

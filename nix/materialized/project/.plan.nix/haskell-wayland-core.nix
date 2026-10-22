@@ -23,10 +23,10 @@
       buildType = "Hooks";
       isLocal = true;
       setup-depends = [
-        (hsPkgs.pkgsBuildBuild.hs-bindgen-hooks or (pkgs.pkgsBuildBuild.hs-bindgen-hooks or (errorHandler.setupDepError "hs-bindgen-hooks")))
-        (hsPkgs.pkgsBuildBuild.base or (pkgs.pkgsBuildBuild.base or (errorHandler.setupDepError "base")))
         (hsPkgs.pkgsBuildBuild.Cabal or (pkgs.pkgsBuildBuild.Cabal or (errorHandler.setupDepError "Cabal")))
         (hsPkgs.pkgsBuildBuild.Cabal-hooks or (pkgs.pkgsBuildBuild.Cabal-hooks or (errorHandler.setupDepError "Cabal-hooks")))
+        (hsPkgs.pkgsBuildBuild.base or (pkgs.pkgsBuildBuild.base or (errorHandler.setupDepError "base")))
+        (hsPkgs.pkgsBuildBuild.hs-bindgen-hooks or (pkgs.pkgsBuildBuild.hs-bindgen-hooks or (errorHandler.setupDepError "hs-bindgen-hooks")))
         (hsPkgs.pkgsBuildBuild.microlens-ghc or (pkgs.pkgsBuildBuild.microlens-ghc or (errorHandler.setupDepError "microlens-ghc")))
       ];
       detailLevel = "FullDetails";
@@ -41,17 +41,17 @@
       "library" = {
         depends = [
           (hsPkgs."base" or (errorHandler.buildDepError "base"))
+          (hsPkgs."c-expr-runtime" or (errorHandler.buildDepError "c-expr-runtime"))
           (hsPkgs."data-default" or (errorHandler.buildDepError "data-default"))
           (hsPkgs."deepseq" or (errorHandler.buildDepError "deepseq"))
           (hsPkgs."hashable" or (errorHandler.buildDepError "hashable"))
+          (hsPkgs."hs-bindgen-hooks" or (errorHandler.buildDepError "hs-bindgen-hooks"))
+          (hsPkgs."hs-bindgen-runtime" or (errorHandler.buildDepError "hs-bindgen-runtime"))
+          (hsPkgs."prettyprinter-combinators" or (errorHandler.buildDepError "prettyprinter-combinators"))
+          (hsPkgs."primitive" or (errorHandler.buildDepError "primitive"))
           (hsPkgs."template-haskell" or (errorHandler.buildDepError "template-haskell"))
           (hsPkgs."unix" or (errorHandler.buildDepError "unix"))
           (hsPkgs."unliftio" or (errorHandler.buildDepError "unliftio"))
-          (hsPkgs."c-expr-runtime" or (errorHandler.buildDepError "c-expr-runtime"))
-          (hsPkgs."hs-bindgen-runtime" or (errorHandler.buildDepError "hs-bindgen-runtime"))
-          (hsPkgs."hs-bindgen-hooks" or (errorHandler.buildDepError "hs-bindgen-hooks"))
-          (hsPkgs."primitive" or (errorHandler.buildDepError "primitive"))
-          (hsPkgs."prettyprinter-combinators" or (errorHandler.buildDepError "prettyprinter-combinators"))
         ];
         libs = pkgs.lib.optionals (!flags.pkg-config) [
           (pkgs."wayland-client" or (errorHandler.sysDepError "wayland-client"))
@@ -64,8 +64,8 @@
         build-tools = pkgs.lib.optional (flags.build-tool-depends) (hsPkgs.pkgsBuildBuild.hs-bindgen.components.exes.hs-bindgen-cli or (pkgs.pkgsBuildBuild.hs-bindgen-cli or (errorHandler.buildToolDepError "hs-bindgen:hs-bindgen-cli")));
         buildable = true;
         modules = [
-          "Paths_haskell_wayland_core"
           "PackageInfo_haskell_wayland_core"
+          "Paths_haskell_wayland_core"
           "WL/Core/Client"
           "WL/Core/Server"
           "WL/Internals/TH"
@@ -81,9 +81,9 @@
           depends = [
             (hsPkgs."base" or (errorHandler.buildDepError "base"))
             (hsPkgs."data-default" or (errorHandler.buildDepError "data-default"))
-            (hsPkgs."hspec" or (errorHandler.buildDepError "hspec"))
-            (hsPkgs."hs-bindgen-runtime" or (errorHandler.buildDepError "hs-bindgen-runtime"))
             (hsPkgs."haskell-wayland-core" or (errorHandler.buildDepError "haskell-wayland-core"))
+            (hsPkgs."hs-bindgen-runtime" or (errorHandler.buildDepError "hs-bindgen-runtime"))
+            (hsPkgs."hspec" or (errorHandler.buildDepError "hspec"))
           ];
           build-tools = [
             (hsPkgs.pkgsBuildBuild.hspec-discover.components.exes.hspec-discover or (pkgs.pkgsBuildBuild.hspec-discover or (errorHandler.buildToolDepError "hspec-discover:hspec-discover")))

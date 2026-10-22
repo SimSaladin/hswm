@@ -87,6 +87,7 @@
             (hsPkgs."bytestring" or (errorHandler.buildDepError "bytestring"))
             (hsPkgs."hswm".components.sublibs.prelude or (errorHandler.buildDepError "hswm:prelude"))
             (hsPkgs."network" or (errorHandler.buildDepError "network"))
+            (hsPkgs."optparse-generic" or (errorHandler.buildDepError "optparse-generic"))
             (hsPkgs."random" or (errorHandler.buildDepError "random"))
             (hsPkgs."text" or (errorHandler.buildDepError "text"))
             (hsPkgs."utf8-string" or (errorHandler.buildDepError "utf8-string"))
@@ -99,6 +100,7 @@
           depends = [
             (hsPkgs."async" or (errorHandler.buildDepError "async"))
             (hsPkgs."base" or (errorHandler.buildDepError "base"))
+            (hsPkgs."bytestring" or (errorHandler.buildDepError "bytestring"))
             (hsPkgs."data-default" or (errorHandler.buildDepError "data-default"))
             (hsPkgs."exceptions" or (errorHandler.buildDepError "exceptions"))
             (hsPkgs."microlens" or (errorHandler.buildDepError "microlens"))

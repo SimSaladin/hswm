@@ -23,9 +23,9 @@
       buildType = "Hooks";
       isLocal = true;
       setup-depends = [
-        (hsPkgs.pkgsBuildBuild.hs-bindgen-hooks or (pkgs.pkgsBuildBuild.hs-bindgen-hooks or (errorHandler.setupDepError "hs-bindgen-hooks")))
-        (hsPkgs.pkgsBuildBuild.base or (pkgs.pkgsBuildBuild.base or (errorHandler.setupDepError "base")))
         (hsPkgs.pkgsBuildBuild.Cabal or (pkgs.pkgsBuildBuild.Cabal or (errorHandler.setupDepError "Cabal")))
+        (hsPkgs.pkgsBuildBuild.base or (pkgs.pkgsBuildBuild.base or (errorHandler.setupDepError "base")))
+        (hsPkgs.pkgsBuildBuild.hs-bindgen-hooks or (pkgs.pkgsBuildBuild.hs-bindgen-hooks or (errorHandler.setupDepError "hs-bindgen-hooks")))
       ];
       detailLevel = "FullDetails";
       licenseFiles = [ "LICENSE" ];
@@ -39,10 +39,10 @@
       "library" = {
         depends = [
           (hsPkgs."base" or (errorHandler.buildDepError "base"))
+          (hsPkgs."c-expr-runtime" or (errorHandler.buildDepError "c-expr-runtime"))
           (hsPkgs."data-default" or (errorHandler.buildDepError "data-default"))
           (hsPkgs."deepseq" or (errorHandler.buildDepError "deepseq"))
           (hsPkgs."hs-bindgen-runtime" or (errorHandler.buildDepError "hs-bindgen-runtime"))
-          (hsPkgs."c-expr-runtime" or (errorHandler.buildDepError "c-expr-runtime"))
         ];
         libs = pkgs.lib.optional (!flags.pkg-config) (pkgs."pixman-1" or (errorHandler.sysDepError "pixman-1"));
         pkgconfig = pkgs.lib.optional (flags.pkg-config) (pkgconfPkgs."pixman-1" or (errorHandler.pkgConfDepError "pixman-1"));
@@ -55,9 +55,9 @@
         "pixman-test" = {
           depends = [
             (hsPkgs."base" or (errorHandler.buildDepError "base"))
-            (hsPkgs."pixman-bindings" or (errorHandler.buildDepError "pixman-bindings"))
             (hsPkgs."deepseq" or (errorHandler.buildDepError "deepseq"))
             (hsPkgs."hspec" or (errorHandler.buildDepError "hspec"))
+            (hsPkgs."pixman-bindings" or (errorHandler.buildDepError "pixman-bindings"))
           ];
           build-tools = [
             (hsPkgs.pkgsBuildBuild.hspec-discover.components.exes.hspec-discover or (pkgs.pkgsBuildBuild.hspec-discover or (errorHandler.buildToolDepError "hspec-discover:hspec-discover")))

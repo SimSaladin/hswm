@@ -33,28 +33,28 @@
     components = {
       "library" = {
         depends = [
-          (hsPkgs."hswm".components.sublibs.ipc-api or (errorHandler.buildDepError "hswm:ipc-api"))
-          (hsPkgs."base" or (errorHandler.buildDepError "base"))
           (hsPkgs."aeson" or (errorHandler.buildDepError "aeson"))
+          (hsPkgs."base" or (errorHandler.buildDepError "base"))
           (hsPkgs."bytestring" or (errorHandler.buildDepError "bytestring"))
           (hsPkgs."data-default" or (errorHandler.buildDepError "data-default"))
+          (hsPkgs."gi-glib" or (errorHandler.buildDepError "gi-glib"))
+          (hsPkgs."gi-gtk3" or (errorHandler.buildDepError "gi-gtk3"))
+          (hsPkgs."gi-pango" or (errorHandler.buildDepError "gi-pango"))
+          (hsPkgs."haskell-gi-base" or (errorHandler.buildDepError "haskell-gi-base"))
+          (hsPkgs."hswm".components.sublibs.ipc-api or (errorHandler.buildDepError "hswm:ipc-api"))
           (hsPkgs."monad-logger-aeson" or (errorHandler.buildDepError "monad-logger-aeson"))
           (hsPkgs."mtl" or (errorHandler.buildDepError "mtl"))
           (hsPkgs."rio" or (errorHandler.buildDepError "rio"))
           (hsPkgs."template-haskell" or (errorHandler.buildDepError "template-haskell"))
           (hsPkgs."text" or (errorHandler.buildDepError "text"))
-          (hsPkgs."haskell-gi-base" or (errorHandler.buildDepError "haskell-gi-base"))
-          (hsPkgs."gi-gtk3" or (errorHandler.buildDepError "gi-gtk3"))
-          (hsPkgs."gi-pango" or (errorHandler.buildDepError "gi-pango"))
-          (hsPkgs."gi-glib" or (errorHandler.buildDepError "gi-glib"))
         ];
         buildable = true;
         modules = [
           "Paths_waybar_cffi_hs"
           "Waybar/CFFI/Plugin/ABIv2"
           "Waybar/CFFI/Plugin/Base"
-          "Waybar/CFFI/Plugin/TH"
           "Waybar/CFFI/Plugin/HSWM"
+          "Waybar/CFFI/Plugin/TH"
           "Waybar/CFFI/Plugin/TextFormat"
         ];
         hsSourceDirs = [ "src" ];

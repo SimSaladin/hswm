@@ -116,7 +116,12 @@ in
     };
 
   perSystem = { pkgs, ... }: {
-    legacyPackages = { };
+    packages = {
+      inherit (pkgs) cabal_3_18 nix-tools-cabal_3_18;
+    };
+    legacyPackages = {
+      inherit (pkgs) cabal_3_18 nix-tools-cabal_3_18;
+    };
   };
 
   flake.overlays.cabal-master = final: prev: {

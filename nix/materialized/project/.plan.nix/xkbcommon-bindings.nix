@@ -23,11 +23,11 @@
       buildType = "Custom";
       isLocal = true;
       setup-depends = [
-        (hsPkgs.pkgsBuildBuild.hs-bindgen-hooks or (pkgs.pkgsBuildBuild.hs-bindgen-hooks or (errorHandler.setupDepError "hs-bindgen-hooks")))
-        (hsPkgs.pkgsBuildBuild.base or (pkgs.pkgsBuildBuild.base or (errorHandler.setupDepError "base")))
         (hsPkgs.pkgsBuildBuild.Cabal or (pkgs.pkgsBuildBuild.Cabal or (errorHandler.setupDepError "Cabal")))
-        (hsPkgs.pkgsBuildBuild.filepath or (pkgs.pkgsBuildBuild.filepath or (errorHandler.setupDepError "filepath")))
+        (hsPkgs.pkgsBuildBuild.base or (pkgs.pkgsBuildBuild.base or (errorHandler.setupDepError "base")))
         (hsPkgs.pkgsBuildBuild.bytestring or (pkgs.pkgsBuildBuild.bytestring or (errorHandler.setupDepError "bytestring")))
+        (hsPkgs.pkgsBuildBuild.filepath or (pkgs.pkgsBuildBuild.filepath or (errorHandler.setupDepError "filepath")))
+        (hsPkgs.pkgsBuildBuild.hs-bindgen-hooks or (pkgs.pkgsBuildBuild.hs-bindgen-hooks or (errorHandler.setupDepError "hs-bindgen-hooks")))
       ];
       detailLevel = "FullDetails";
       licenseFiles = [ "LICENSE" ];
@@ -66,8 +66,8 @@
           "Text/XkbCommon/KeySyms"
           "Text/XkbCommon/Keymap"
           "Text/XkbCommon/Keymap/RmlvoBuilder"
-          "Text/XkbCommon/State"
           "Text/XkbCommon/Registry"
+          "Text/XkbCommon/State"
         ];
         hsSourceDirs = [ "src" ];
       };
