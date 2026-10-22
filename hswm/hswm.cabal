@@ -1,6 +1,6 @@
 cabal-version: 3.12
 
--- This file has been generated from package.yaml by hpack version 0.38.3.
+-- This file has been generated from package.yaml by hpack version 0.39.6.
 --
 -- see: https://github.com/sol/hpack
 
@@ -17,6 +17,11 @@ tested-with:
   GHC == 9.14.1,
   GHC == 9.12.4,
   GHC == 9.12.2
+
+flag optimize
+  description: Enable further compiler optimizations
+  manual: True
+  default: True
 
 flag use-llvm
   description: Link with LLVM
@@ -38,7 +43,7 @@ library
     QuantifiedConstraints
     RecordWildCards
     TypeFamilies
-  ghc-options: -Wall -Wno-partial-type-signatures -Wno-ambiguous-fields -Wno-typed-holes
+  ghc-options: -Wall -Wno-partial-type-signatures -Wno-ambiguous-fields -Wno-typed-holes -pie -fPIC
   build-tool-depends:
     hsc2hs:hsc2hs
   exposed-modules:
@@ -91,6 +96,7 @@ library
     HSWM.Types.TypeMap
     HSWM.Types.Window
     HSWM.Types.WM
+    HSWM.Util.CommandStatic
     HSWM.Util.Debug
     HSWM.Util.ExtensibleState
     HSWM.Util.GrabKeyboard
@@ -159,6 +165,8 @@ library
   default-language: GHC2024
   if flag(use-llvm) && impl(ghc >= 9.14.1)
     ghc-options: -fllvm
+  if flag(optimize)
+    ghc-options: -O2 -funbox-strict-fields
 
 library ipc-api
   visibility: public
@@ -199,6 +207,8 @@ library ipc-api
   default-language: GHC2024
   if flag(use-llvm) && impl(ghc >= 9.14.1)
     ghc-options: -fllvm
+  if flag(optimize)
+    ghc-options: -O2 -funbox-strict-fields
 
 library prelude
   visibility: public
@@ -236,6 +246,8 @@ library prelude
   default-language: GHC2024
   if flag(use-llvm) && impl(ghc >= 9.14.1)
     ghc-options: -fllvm
+  if flag(optimize)
+    ghc-options: -O2 -funbox-strict-fields
 
 executable hswm
   main-is: Main.hs
@@ -247,6 +259,8 @@ executable hswm
   default-language: GHC2024
   if flag(use-llvm) && impl(ghc >= 9.14.1)
     ghc-options: -fllvm
+  if flag(optimize)
+    ghc-options: -O2 -funbox-strict-fields
   hs-source-dirs:
     app
   default-extensions:
@@ -302,3 +316,5 @@ executable hswmctl
   default-language: GHC2024
   if flag(use-llvm) && impl(ghc >= 9.14.1)
     ghc-options: -fllvm
+  if flag(optimize)
+    ghc-options: -O2 -funbox-strict-fields

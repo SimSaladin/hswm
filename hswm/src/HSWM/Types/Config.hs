@@ -48,6 +48,7 @@ data HSWMConfig m l = HSWMConfig
   , logHook :: !(m ())
   , exitHook :: !(m ())
   , handleEventHook :: !(Event -> m All)
+  , handleEventHookDynamic :: !(Dynamic -> m All)
   , workspaces :: [WorkspaceId]
   , xkbLayout :: !(Maybe XkbRuleNames)
   -- ^ Keyboard layout set for connected keyboards
@@ -62,9 +63,11 @@ data HSWMConfig m l = HSWMConfig
 instance
   ( Default (l RiverWindow)
   , Default (m ())
-  , Default (Event -> m All)
   , Default (ManageHook' m)
-  ) =>
+  , Monoid (m All)
+  --, Default (Event -> m All)
+  , Default (Dynamic -> m All)
+  , Applicative m) =>
   Default (HSWMConfig m l)
   where
   def =
@@ -75,6 +78,8 @@ instance
       , focusedBorder = parseRgba "0xFA0050"
       , defaultModMask = "Ctrl"
       , workspaces = ["1", "2", "3", "4"]
+      , handleEventHook = mempty
+      , handleEventHookDynamic = mempty
       }
 
 data RepeatInfo = RepeatInfo {rate, delay :: {-# UNPACK #-} !Int32}

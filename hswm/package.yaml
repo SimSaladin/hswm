@@ -21,6 +21,10 @@ flags:
     description: Link with LLVM
     default: true
     manual: true
+  optimize:
+    description: Enable further compiler optimizations
+    default: true
+    manual: true
 
 language: GHC2024
 default-extensions:
@@ -46,6 +50,8 @@ ghc-options:
 when:
   - condition: flag(use-llvm) && impl(ghc >= 9.14.1)
     ghc-options: -fllvm
+  - condition: flag(optimize)
+    ghc-options: -O2 -funbox-strict-fields
 
 __:
   # Deps
@@ -164,6 +170,9 @@ library:
     - microlens-th
   build-tools:
     - hsc2hs:hsc2hs
+  ghc-options:
+    - -pie
+    - -fPIC
 
 internal-libraries:
   prelude:

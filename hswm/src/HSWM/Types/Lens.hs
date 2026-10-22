@@ -23,6 +23,9 @@ module HSWM.Types.Lens (
   A.FromJSON (..),
   A.genericToJSON,
   A.genericToEncoding,
+  Dynamic,
+  toDyn,
+  fromDynamic,
 ) where
 
 import Data.Aeson qualified as A
@@ -35,6 +38,7 @@ import Language.Haskell.TH.Datatype qualified as D
 import Language.Haskell.TH.Datatype.TyVarBndr qualified as D
 import Lens.Micro.TH.Internal
 import Text.Read (read)
+import Data.Dynamic
 
 import River qualified as R
 import WL.Client qualified as WL

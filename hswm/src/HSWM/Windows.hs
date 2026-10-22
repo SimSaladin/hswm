@@ -25,6 +25,8 @@ import River qualified as R
 
 import Data.List qualified as L
 import Data.Map qualified as M
+import System.Posix.Time (epochTime)
+import System.Posix.Types (EpochTime)
 
 -- * Events processing
 
@@ -45,6 +47,7 @@ handleEvent e = case e of
   R.RiverWindowPresentationHint _ rw we_hint -> modifyWindow' rw $ presentationHint ?~ we_hint
   R.RiverWindowDimensionsHint _ rw minWidth minHeight maxWidth maxHeight -> do
     modifyWindow' rw $ \s -> s{minWidth, minHeight, maxWidth, maxHeight}
+    -- On receiving dimension hint for a fixed size window, make it floating.
     fixedSizeAutoFloat rw minWidth minHeight maxWidth maxHeight
 
   -- Manage fullscreen
@@ -72,6 +75,12 @@ render = runInHS $ do
       WRReveal -> unless w.minimized $ reveal w.river_window
     modifyWindow w.river_window $ \s -> s{pendingRender = []}
 
+-- A global set for keeping track which windows are still susceptible to
+-- user managehook firing.
+newtype WindowsPendingSetup = WPS { unWPS :: M.Map RiverWindow EpochTime }
+    deriving stock (Eq, Ord, Show, Read, Generic)
+    deriving anyclass (Default)
+
 -- | Do nothing while pointer operation is in progress.
 manage :: H ()
 manage = runInHS $ do
@@ -83,15 +92,31 @@ manage_ = do
   -- Do initial properties for new windows
   -- Get rid of any closed windows
   mapWindows $ \w ->
-    if
-      | w.closed -> doRemoveWindow w
-      | w.new -> do
-          setInitialManageProperties w
-          -- run user manageHook for the new window
-          mh <- view (config . manageHook)
-          g <- appEndo <$> userCodeDefS mempty (runQuery mh w)
-          windows g
-      | otherwise -> return ()
+    if | w.closed -> doRemoveWindow w
+       | w.new -> setInitialManageProperties w
+       | otherwise -> return ()
+
+  -- run user manageHook for new windows that haven't triggered a hook yet.
+  WPS unmanaged <- liftH getObjectDef
+  mh <- view (config . manageHook)
+  ts0 <- io epochTime
+  forM_ (M.toList unmanaged) $ \(rw, ts) ->
+        if ts + 10 <= ts0
+           then liftH . modifyObjectDef @WindowsPendingSetup $ \(WPS m) -> WPS (M.delete rw m)
+           else do
+              res <- withWindow rw $ \w ->
+                  if w.didManageHook && not w.new && not w.closed
+                     then do
+                         res <- userCodeDefS mempty (runQuery mh w)
+                         modifyWindow w $ didManageHook .~ True
+                         return res
+                     else return mempty
+              case res of
+                -- the window is presumably already dead and removed
+                Nothing -> liftH . modifyObjectDef @WindowsPendingSetup $ \(WPS m) -> WPS (M.delete rw m)
+                Just g  -> do
+                    logDebug $ "user manage hook triggered for new new window" :# [ "window" .= rw ]
+                    windows $ appEndo g
 
   -- run queued manage actions for each window
   mapWindows $ \w ->
@@ -233,6 +258,8 @@ added w = do
   runInHS $ do
     alterWindow w (\_ -> Just win)
     modifyWindowSet (W.insertUp w)
+  ts <- io epochTime
+  modifyObjectDef @WindowsPendingSetup $ \(WPS x) -> WPS $ M.insert w ts x
 
 -- | /manage/
 setInitialManageProperties :: Window -> HS ()
@@ -294,7 +321,8 @@ finishRecovery = do
 
 -- * Misc. tweaks
 
--- | Auto-float fixed-size windows
+-- | Auto-float fixed-size windows. A window is deemed fixed-size when it is
+-- created with non-zero max and min dimensions that are the same.
 fixedSizeAutoFloat :: RiverWindow -> Int32 -> Int32 -> Int32 -> Int32 -> H ()
 fixedSizeAutoFloat rw minWidth minHeight maxWidth maxHeight = when fixed $
   runInHS $

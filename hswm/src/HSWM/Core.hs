@@ -118,3 +118,8 @@ handleWithHook :: (HandleEvent m ev, m ~ H, ev ~ Event) => ev -> m ()
 handleWithHook e = do
   evHook <- view (config . handleEventHook)
   whenM (userCodeDef True $ getAll `fmap` evHook e) (handleEvent e)
+
+handleWithHook' :: forall ev. (Typeable ev, HandleEvent H ev) => ev -> H ()
+handleWithHook' ev = do
+    hook <- view (config . handleEventHookDynamic)
+    whenM (userCodeDef True $ getAll <$> hook (toDyn ev)) (handleEvent ev)

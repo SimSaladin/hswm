@@ -11,6 +11,7 @@
 -- Portability : unportable
 module HSWM.Util.IPC where
 
+import HSWM.Util.CommandStatic
 import HSWM.Actions.DynamicWorkspaceOrder qualified as DWO
 import HSWM.Core as HSWM
 import HSWM.IPC
@@ -20,7 +21,6 @@ import HSWM.Operations
 import HSWM.StackSet qualified as W
 
 import Data.Aeson qualified as A
-import Data.Aeson.Types qualified as A
 import Data.ByteString.Lazy qualified as LB
 import River qualified as R
 
@@ -29,8 +29,6 @@ import Data.List qualified as L
 import Data.Map qualified as M
 import Data.Text qualified as T
 import Data.Text.Lazy qualified as TL
-import Data.Typeable
-import GHC.StaticPtr
 import Network.Socket
 import System.FileLock
 import Text.Pretty.Simple qualified as P
@@ -275,76 +273,3 @@ toWindowInfo w =
     , identifier = toText w.identifier
     , pid = w.unreliablePid
     }
-
--- * Static methods
-
-data Command arg res = Command
-  { actionPtr :: !(StaticPtr (arg -> H res))
-  , actionArg :: !(Maybe (Argument arg))
-  , cmdInstances :: !(StaticPtr (Dict (CommandCtx arg res)))
-  }
-  deriving (Generic)
-
-type CommandCtx arg res =
-  ( Typeable arg
-  , FromJSON arg
-  , Show arg
-  , Typeable res
-  , ToJSON res
-  , Show res
-  )
-
-newtype Argument arg = Argument {getArg :: arg}
-  deriving (Eq, Ord, Show, Generic)
-
-data Dict c where
-  Dict :: (c) => Dict c
-
-instance Show (Command arg res) where
-  show (Command ptr _ dict) =
-    case deRefStaticPtr dict of
-      (Dict :: Dict (CommandCtx arg res)) ->
-        let fnTy = typeRep (undefined :: proxy (arg -> H res))
-         in "Command"
-              ++ "{ type = "
-              ++ show fnTy
-              ++ ", ptr = "
-              ++ showStaticPtr ptr
-              ++ "}"
-    where
-      showStaticPtr p =
-        let StaticPtrInfo{..} = staticPtrInfo p
-         in show (staticKey ptr) ++ " @(" ++ spInfoUnitId ++ ":" ++ spInfoModuleName ++ ":" ++ (\(x, y) -> show x ++ ":" ++ show y) spInfoSrcLoc ++ ")"
-
-data SomeCommand where
-  SomeCommand :: forall arg res. {someCommand :: Command arg res} -> SomeCommand
-
-instance Show SomeCommand where
-  show (SomeCommand cmd) = show cmd
-
-mkCommand :: StaticPtr (Dict (CommandCtx arg res)) -> StaticPtr (arg -> H res) -> Maybe () -> Command arg res
-mkCommand dict action _arg =
-  Command
-    { actionPtr = action
-    , actionArg = Nothing -- Argument arg
-    , cmdInstances = dict
-    }
-
-runCommand :: Command arg res -> arg -> H res
-runCommand (Command ptr _ _) = deRefStaticPtr ptr
-
-runCommandJSON :: Command arg res -> MethodParams -> H (Either String A.Value)
-runCommandJSON cmd@(Command ptr _ dict) (MethodParams val) =
-  case deRefStaticPtr dict of
-    (Dict :: Dict (CommandCtx arg res)) ->
-      case A.parseEither A.parseJSON val :: Either String arg of
-        Left err -> return (Left err)
-        Right arg1 -> Right . A.toJSON <$> runCommand cmd arg1
-
-newtype CommandStore = CommandStore {commands :: M.Map String SomeCommand}
-  deriving stock (Show, Generic)
-  deriving anyclass (Default)
-
-registerCommand :: String -> Command arg res -> H ()
-registerCommand name cmd =
-  modifyObjectDef @CommandStore $ \st -> st{commands = M.insert name (SomeCommand cmd) st.commands}

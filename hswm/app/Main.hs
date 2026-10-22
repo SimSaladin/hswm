@@ -67,12 +67,8 @@ main =
                 .~ parseRgba colCyan
               & xkbLayout
                 ?~ myKeyboard
-              & repeatInfo
-                . rate
-                .~ 20
-              & repeatInfo
-                . delay
-                .~ 150
+              & repeatInfo . rate .~ 20
+              & repeatInfo . delay .~ 150
               & cursorTheme
                 .~ "Vanilla-DMZ"
               & cursorSize
@@ -111,7 +107,13 @@ myLayoutHook =
                         ||| L.NoBorders.noBorders Full
 
 myManageHook :: Query (Endo WindowSet)
-myManageHook = composeOne [managePads]
+myManageHook = composeOne
+    [ managePads
+    -- ominWidth -> 550, minHeight -> 348, maxWidth -> 0, maxHeight -> 0
+    , appName =? "eu.web-eid." -?> doCenterFloat (2 / 5) (2 / 5)
+    , appName =? "xdg-desktop-portal-gtk" -?>  doCenterFloat (2 / 5) (2 / 5)
+    , hasParent -?> doFloat
+    ]
 
 promptLaunchSystemD :: H ()
 promptLaunchSystemD =
@@ -311,8 +313,8 @@ myKeys =
 
 myPointerBinds :: [((String, Button), SomeAction H)]
 myPointerBinds =
-  [ (("M", btnLeft), startSeatOp SEAT_OP_MOVE <?> "Move window")
-  , (("M", btnRight), startSeatOp SEAT_OP_RESIZE <?> "Resize (stretch) window")
+  [ (("M", btnLeft), startSeatOp @H SEAT_OP_MOVE <?> "Move window")
+  , (("M", btnRight), startSeatOp @H SEAT_OP_RESIZE <?> "Resize (stretch) window")
   ]
 
 backlight :: [String] -> SomeAction H

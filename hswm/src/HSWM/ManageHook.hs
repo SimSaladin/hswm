@@ -1,6 +1,7 @@
 module HSWM.ManageHook where
 
 import HSWM.Core
+import HSWM.Operations (floatLocation)
 import HSWM.StackSet qualified as W
 
 import Data.List (isInfixOf, isPrefixOf, isSuffixOf)
@@ -126,9 +127,10 @@ doCenterFloat fwidth fheight = do
 doF :: (s -> s) -> Query (Endo s)
 doF = return . Endo
 
--- -- | Move the window to the floating layer.
--- doFloat :: ManageHook
--- doFloat = ask >>= \w -> doF . W.float w . snd =<< runInHS (floatLocation w)
+-- | Move the window to the floating layer.
+doFloat :: ManageHook
+doFloat = ask >>= \w -> lift (floatLocation w) >>=
+    maybe (error "floatloc") (doF . W.float (w^.riverId) . snd)
 
 -- -- | Map the window and remove it from the 'WindowSet'.
 -- doIgnore :: ManageHook
@@ -137,3 +139,9 @@ doF = return . Endo
 -- | Move the window to a given workspace
 doShift :: WorkspaceId -> ManageHook
 doShift i = doF . W.shiftWin i =<< view riverWindow
+
+qParent :: Query (Maybe RiverWindow)
+qParent = view parent
+
+hasParent :: Query Bool
+hasParent = isJust <$> qParent

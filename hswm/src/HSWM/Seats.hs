@@ -1,4 +1,6 @@
 {-# OPTIONS_GHC -Wno-ambiguous-fields #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
+
 
 -- |
 -- Module      : HSWM.Seats
@@ -43,6 +45,13 @@ handleEvent = \case
   R.RiverSeatShellSurfaceInteraction _ seat ss -> logError $ "shell surface interaction" :# ["seat" .= show seat, "shell-surface" .= show ss]
   _ -> return () -- TODO touch events
 
+instance HandleEvent H WL.KeyboardEvent where
+    handleEvent = \case
+        WL.KeyboardRepeatInfo ud _kbd r d -> modifySeat' ud $
+            keyboard . rrate .~ r &+ keyboard . rdelay .~ d
+        --KeyboardKeymap{}
+        _ -> pure ()
+
 handleWlSeatEvent :: WL.SeatEvent -> H ()
 handleWlSeatEvent = \case
   WL.SeatName ud _ name -> runInHS $ modifySeat' ud $ _name .~ name
@@ -51,9 +60,9 @@ handleWlSeatEvent = \case
     upds <- forM individual $ \case
       WL.SeatCapabilityKeyboard -> do
         wlKbd <- WL.seatGetKeyboard wls
-        addGlobalListener_ wlKbd
+        addGlobalListener wlKbd (Just ud)
         logDebug $ "Seat has capability: keyboard" :# ["wl_seat" .= tshow wls, "wl_keyboard" .= tshow wlKbd]
-        return $ wlKeyboard .~ wlKbd
+        return $ keyboard .~ def { wl_keyboard = wlKbd }
       WL.SeatCapabilityPointer -> do
         wlPtr <- WL.seatGetPointer wls
         addGlobalListener_ wlPtr
@@ -304,7 +313,7 @@ deleteRemovedSeat s = do
   R.objectDestroy s.xkb_bindings_seat
   R.objectDestroy s.river_layer_shell_seat
   R.objectDestroy s.idleNotification
-  R.objectDestroy s.wlKeyboard
+  R.objectDestroy s.keyboard.wl_keyboard
   R.objectDestroy s.wlPointer
   R.objectDestroy s.wlTouch
   R.objectDestroy s.wl_seat

@@ -230,7 +230,8 @@ withFocused f = use windowset >>= \ws -> whenJust (W.peek ws) (`withWindow_` f)
 withFocused' :: (MonadHS m) => (Window -> m ()) -> m ()
 withFocused' f = runInHS (use windowset >>= mapM lookupWindow . W.peek) >>= mapM_ f . join
 
--- | Make a tiled window floating, using its suggested rectangle (modifies the windowset only).
+-- | Make a tiled window floating, using its suggested rectangle
+-- (modifies the windowset only).
 float :: (SomeWindow a) => a -> HS ()
 float sw = floatLocation sw >>= mapM_ go
   where
@@ -334,8 +335,8 @@ withScreenOutput sid f = mapM_ f . L.find (\o -> o.screen == sid) =<< use output
 
 -- * Seat lookup & manipulation
 
-lookupSeat :: (SomeSeat a) => a -> HS (Maybe Seat)
-lookupSeat k = preuse $ seatList . eachRiverId k
+lookupSeat :: (SomeSeat a, GetHState m) => a -> m (Maybe Seat)
+lookupSeat k = getHState <&> preview (seatList . eachRiverId k)
 
 withSeat :: (SomeSeat a) => a -> (Seat -> HS b) -> HS (Maybe b)
 withSeat k f = lookupSeat k >>= mapM f
@@ -343,21 +344,21 @@ withSeat k f = lookupSeat k >>= mapM f
 withSeat_ :: (SomeSeat a) => a -> (Seat -> HS ()) -> HS ()
 withSeat_ k f = lookupSeat k >>= mapM_ f
 
-modifySeat :: (SomeSeat a) => a -> (Seat -> Seat) -> HS ()
-modifySeat k f = seatList . eachRiverId k %= f
+modifySeat :: (SomeSeat a, MonadHS m) => a -> (Seat -> Seat) -> m ()
+modifySeat k f = runInHS $ seatList . eachRiverId k %= f
 
-modifySeats :: (Seat -> Bool) -> (Seat -> Seat) -> HS ()
-modifySeats choose f = seatList . each . filtered choose %= f
+modifySeats :: MonadHS m => (Seat -> Bool) -> (Seat -> Seat) -> m ()
+modifySeats choose f = runInHS $ seatList . each . filtered choose %= f
 
 -- | Use seat list read-only.
 mapSeats :: (GetHState m) => (Seat -> m ()) -> m ()
 mapSeats f = getHState >>= mapM_ f . view seatList
 
-startSeatOp :: SeatOperation -> HS ()
-startSeatOp seatop = modifySeats (const True) $ pendingAction .~ S_START_OP seatop
+startSeatOp :: MonadHS m => SeatOperation -> m ()
+startSeatOp seatop = runInHS $ modifySeats (const True) $ pendingAction .~ S_START_OP seatop
 
 -- | Casts the pointer into @RiverSeat@.
-modifySeat' :: Ptr Void -> (Seat -> Seat) -> HS ()
+modifySeat' :: MonadHS m => Ptr Void -> (Seat -> Seat) -> m ()
 modifySeat' ud = modifySeat (R.RiverSeat $ castPtr ud)
 
 --------------------------------------------------------------
@@ -395,7 +396,7 @@ mapWindows f = use _windows >>= mapM_ f
 restart :: (HasCallStack) => FilePath -> H ()
 restart prog = do
   runInHS $ broadcastMessage ReleaseResources
-  logInfo $ "Running exit hooks..."
+  logInfo "Running exit hooks..."
   void . userCode =<< asks (view $ config . exitHook)
   statefile <- runInHS Persist.writeStateToFile
   let args = ["--state-file", statefile]

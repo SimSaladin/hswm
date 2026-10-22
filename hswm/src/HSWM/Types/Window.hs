@@ -59,6 +59,8 @@ data Window = Window
   , new :: {-# UNPACK #-} !Bool
   -- ^ New windows should be added with 'new' set to 'True'. Initial window properties are then
   --     determined at the next cycle.
+  ,didManageHook :: !Bool
+  -- ^ Whether or not user's manage hook has had a chance to process this window or not.
   , closed :: {-# UNPACK #-} !Bool
   -- ^ All 'closed' windows will be cleaned up in the next manage cycle.
   }

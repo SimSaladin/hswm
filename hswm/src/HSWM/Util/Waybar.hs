@@ -12,7 +12,7 @@
 -- Longer description of this module.
 module HSWM.Util.Waybar where
 
-import HSWM.Util.IPC
+import HSWM.Util.CommandStatic
 
 import HSWM.Core hiding (closed)
 import HSWM.Util.Process

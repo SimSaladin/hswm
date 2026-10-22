@@ -116,7 +116,6 @@ startHSWM options config = do
       mkListener $ handleWithHook . WlOutputEvent
       mkListener $ handleWithHook . WlShellSurfaceEvent
       mkListener $ handleWithHook . WlSeatEvent
-      mkListener $ handleWithHook . WlKeyboardEvent
       mkListener $ handleWithHook . WlPointerEvent
       mkListener $ handleWithHook . WlTouchEvent
       mkListener $ handleWithHook . XkbConfigEvent
@@ -140,6 +139,8 @@ startHSWM options config = do
       mkListener $ handleWithHook . WlrOutputHeadEvent
       mkListener $ handleWithHook . IdleNotificationEvent
       mkListener $ handleWithHook . OutputPowerEvent
+
+      mkListener $ handleWithHook' @WL.KeyboardEvent -- . WlKeyboardEvent
 
       -- Setup the globals registry
       putMVar conf.globals =<< WL.initRegistryState conf._wlDisplay =<< defaultRegistrySettings

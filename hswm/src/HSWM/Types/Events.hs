@@ -55,7 +55,7 @@ data Event
   | WlSeatEvent !WL.SeatEvent
   | WlOutputEvent !WL.OutputEvent
   | WlShellSurfaceEvent !WL.ShellSurfaceEvent
-  | WlKeyboardEvent !WL.KeyboardEvent
+  -- | WlKeyboardEvent !WL.KeyboardEvent
   | WlPointerEvent !WL.PointerEvent
   | WlTouchEvent !WL.TouchEvent
   | -- Wlroots
@@ -74,10 +74,11 @@ data Event
   deriving stock (Eq, Ord, Show, Generic, Data)
   deriving anyclass (NFData, Hashable)
 
-instance (Applicative m, Monoid a) => Default (Event -> m a) where
-  def _ = pure mempty
-
 deriving via PPGeneric Event instance Pretty Event
 
 class HandleEvent m event where
   handleEvent :: event -> m ()
+
+-- | To define empty event handler
+instance (Applicative m, Monoid a) => Default (Event -> m a) where
+  def _ = pure mempty

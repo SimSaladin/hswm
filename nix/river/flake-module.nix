@@ -27,7 +27,6 @@ in
     # features (the wm protocol etc.)
     river = final.callPackage ./package.nix {
       src = inputs.river;
-      inherit (final) zigEnv;
       depsHash = "sha256-jZiZwh4+4CcDph7oJt/CX1HwY2YB3QyRRYvJdvQzgkU=";
     };
 

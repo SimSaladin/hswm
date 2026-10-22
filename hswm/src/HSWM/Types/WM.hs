@@ -60,6 +60,7 @@ type Seat = Seat' H
 type instance Stateful H = HS
 type instance Stateful HS = HS
 type instance ManageHook' H = ManageHook
+--type instance MaybeManageHook' H = MaybeManageHook
 
 -- * Exceptions
 
@@ -440,6 +441,8 @@ instance MonadH H where
 
 instance MonadH HS where
   liftH (H ma) = HS (lift ma)
+instance MonadH (QueryT HS) where
+  liftH ma = Query (lift $ liftH ma)
 
 instance MonadLoggerIO H where askLoggerIO = view _logFunc
 
@@ -456,9 +459,12 @@ instance MonadLogger HS where
 instance (Default a) => Default (H a) where def = pure def
 instance (Default a) => Default (HS a) where def = pure def
 
-instance Show (H ()) where show _ = "H()"
-instance Show (H Bool) where show _ = "H(Bool)"
-instance Show (HS Bool) where show _ = "HS(Bool)"
+instance (Monoid a) => Default (x -> H a) where
+  def _ = pure mempty
+
+-- XXX not particularly useful instances
+instance Typeable a => Show (H a) where show _ = "H(" ++ show (typeRep (undefined :: Proxy a)) ++ ")"
+instance Typeable a => Show (HS a) where show _ = "HS(" ++ show (typeRep (undefined :: Proxy a)) ++ ")"
 
 instance ToJSON StateExtension where
   toJSON (StateExtension _) = A.object [("type", "StateExtension")]
@@ -475,9 +481,12 @@ instance ToJSON (HSWMConfig H Layout) where
   toJSON = genericToJSON aesonOptions
   toEncoding = genericToEncoding aesonOptions
 
-instance ToJSON (Event -> H All) where toJSON _ = "<Event -> H All>"
-instance ToJSON (Query a) where toJSON _ = "<Query a>"
-instance ToJSON (H a) where toJSON _ = "<H a>"
+instance ToJSON (a -> H All) where
+    toJSON _ = A.Null
+    omitField _ = True
+instance {-# OVERLAPPABLE #-} MonadH m => ToJSON (m a) where
+    toJSON _ = A.Null
+    omitField _ = True
 
 instance ToJSON Xkb.XkbRuleNames
 instance ToJSON Xkb.OptionSpec

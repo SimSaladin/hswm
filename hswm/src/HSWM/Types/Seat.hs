@@ -34,7 +34,7 @@ data Seat' (m :: Type -> Type) = Seat
   , wl_seat :: !WL.Seat
   , idleNotification :: !EXT_IN.IdleNotification
   , caps :: !WL.SeatCapability
-  , wlKeyboard :: !WL.Keyboard
+  , keyboard :: {-# UNPACK #-} !SeatKeyboardInfo
   -- ^ Keyboard capability
   , wlPointer :: !WL.Pointer
   -- ^ Pointer capability
@@ -88,6 +88,14 @@ deriving instance
   ) =>
   Data (Seat' m)
 
+data SeatKeyboardInfo = SKInfo
+    { wl_keyboard :: WL.Keyboard
+    , rrate :: Int32
+    , rdelay :: Int32
+    }
+    deriving stock (Eq, Ord, Show, Read, Generic, Data)
+    deriving anyclass (Default, NFData)
+
 data SeatFocus
   = SFocusNone
   | SFocusWindow !RiverWindow
@@ -125,7 +133,7 @@ instance Default SeatOperation where def = SEAT_OP_NONE
 
 -- * Lenses
 
-makeLensesWith' classPerField [''Seat']
+makeLensesWith' classPerField [''Seat', ''SeatKeyboardInfo]
 
 instance HasX (Seat' m) Int32 where _x = position . _x
 instance HasY (Seat' m) Int32 where _y = position . _y
@@ -150,5 +158,9 @@ instance ToJSON SeatFocus where
   toEncoding = genericToEncoding aesonOptions
 
 instance ToJSON SeatOperation where
+  toJSON = genericToJSON aesonOptions
+  toEncoding = genericToEncoding aesonOptions
+
+instance ToJSON SeatKeyboardInfo where
   toJSON = genericToJSON aesonOptions
   toEncoding = genericToEncoding aesonOptions
