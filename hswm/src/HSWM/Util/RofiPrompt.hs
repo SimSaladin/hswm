@@ -298,7 +298,7 @@ class HasRows a where
     default getRows :: (Foldable t, a ~ t e, RowData (t e) ~ e) => a -> [InputRow (RowData a)]
     getRows = map fromContent . toList
 
-    renderRow :: Proxy a -> RowData a -> LazyByteString
+    renderRow :: a -> RowData a -> LazyByteString
 
     rofiInputSettings :: a -> RofiPromptConfig a out r -> RofiPromptConfig a out r
     rofiInputSettings _ = id
@@ -326,7 +326,7 @@ instance HasRows [P.Markup] where
 instance (HasRows [a], RowData [a] ~ a) => HasRows [InputRow a] where
     type RowData [InputRow a] = a
     getRows = id
-    renderRow _ = renderRow @[a] Proxy
+    renderRow _ = renderRow @[a] undefined -- XXX
 
 class HasColumns a where
     type ColumnsCount a :: Nat
@@ -363,7 +363,7 @@ runRofi ::
 runRofi pcfg input0 = do
     logInfo $ "rofi: launch initiated" :# ["prompt" .= pcfg.prompt, "msg" .= pcfg.promptMessage]
     allInput <- rofiHistoryInput pcfg input0
-    let inputBS = LC8.unlines $ map (renderInputRow (renderRow (Proxy @i))) allInput
+    let inputBS = LC8.unlines $ map (renderInputRow (renderRow input0)) allInput
     pc <- setStdin (byteStringInput inputBS) <$> rofiToProc (rofiInputSettings input0 pcfg)
     logProcessConfig "rofi" pc
     res <- try @_ @SomeException $ withProcessWait pc $ \p -> do
@@ -476,17 +476,19 @@ makeLenses' [''RofiPromptConfig, ''InputRow]
 
 -- * Columns input
 
-withColumns :: (HasColumns cols, Traversable t) => t cols -> ColumnsInput '\x1' [InputRow cols]
+withColumns :: (HasColumns cols, Traversable t) => t cols -> ColumnsInput [InputRow cols]
 withColumns input =
     ColumnsInput
         { columnsInput = map fromContent (toList input)
+        , columnsSep = '\x1'
         , columnsHeader = True
         }
 
-columnsWithHeader :: (HasColumns cols, Foldable t) => cols -> t cols -> ColumnsInput '\x1' [InputRow cols]
+columnsWithHeader :: (HasColumns cols, Foldable t) => cols -> t cols -> ColumnsInput [InputRow cols]
 columnsWithHeader hdr input =
     ColumnsInput
         { columnsInput = (fromContent hdr){nonselectable = True, permanent = True} : map fromContent (toList input)
+        , columnsSep = '\x1'
         , columnsHeader = True
         }
 
@@ -495,22 +497,21 @@ columnsWithHeader hdr input =
 --  ColumnsInput [["row1", "row1b"], ["row2", "row3"]]
 --     :: ColumnsInput '\x1' 2 [[Markup]]
 --  @
-data ColumnsInput (colsep :: Char) input = ColumnsInput
+data ColumnsInput input = ColumnsInput
     { columnsInput :: input
+    , columnsSep :: Char
     , columnsHeader :: Bool
     }
     deriving (Eq)
 
-instance (KnownChar colsep, KnownNat (ColumnsCount a), input ~ [InputRow a], HasColumns a) => HasRows (ColumnsInput colsep input) where
-    type RowData (ColumnsInput colsep input) = RowData input
+instance (KnownNat (ColumnsCount a), input ~ [InputRow a], HasColumns a) => HasRows (ColumnsInput input) where
+    type RowData (ColumnsInput input) = RowData input
     getRows ColumnsInput{..} = columnsInput
-    renderRow _ = LC8.intercalate (LC8.pack [charVal (Proxy @colsep)]) . getColumns
+    renderRow x = LC8.intercalate (LC8.pack [x.columnsSep]) . getColumns
     rofiInputSettings x =
-        displayColumns
-            .~ [1 .. fromIntegral $ natVal (Proxy @(ColumnsCount a))]
-            &+ columnSeparator
-            .~ [charVal (Proxy @colsep)]
-            &+ (if x.columnsHeader then selectedRow %~ max 1 else id)
+        displayColumns .~ [1 .. fromIntegral $ natVal (Proxy @(ColumnsCount a))]
+        &+ columnSeparator .~ [x.columnsSep]
+        &+ (if x.columnsHeader then selectedRow %~ max 1 else id)
 
 -- * Prompts
 

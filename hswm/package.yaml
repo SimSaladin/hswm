@@ -202,6 +202,7 @@ internal-libraries:
       - *dep-text
       - *dep-utf8-string
       - *dep-random
+      - *dep-optparse-generic
 
 executables:
   hswm:

@@ -1,6 +1,6 @@
 cabal-version: 3.12
 
--- This file has been generated from package.yaml by hpack version 0.38.3.
+-- This file has been generated from package.yaml by hpack version 0.39.6.
 --
 -- see: https://github.com/sol/hpack
 
@@ -189,6 +189,7 @@ library ipc-api
     bytestring >=0.12.2 && <0.13,
     hswm:prelude,
     network >=3.2.8 && <3.3,
+    optparse-generic ==1.5.*,
     random,
     text >=2.1.2 && <2.2,
     utf8-string >=1.0.2 && <1.1

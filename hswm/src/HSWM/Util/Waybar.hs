@@ -13,13 +13,20 @@ Longer description of this module.
 -}
 module HSWM.Util.Waybar where
 
+import HSWM.Util.IPC
+
 import HSWM.Core hiding (closed)
 import System.Process (terminateProcess)
-
--- import System.Process.Typed
-
-import GHC.StaticPtr
 import HSWM.Util.Process
+
+testCmd :: Command Int String
+testCmd = mkCommand (static Dict) (static (\arg -> return $ "Hello" ++ show arg)) Nothing
+
+taskCmd :: Command Operation ()
+taskCmd = mkCommand (static Dict) (static waybarTask) Nothing
+
+data Operation = StopWaybar | StartWaybar | RestartWaybar
+    deriving (Eq, Ord, Show, Read, Enum, Bounded, FromJSON, ToJSON, Generic)
 
 data WaybarConfig = WaybarConfig {command :: FilePath, args :: [String]}
     deriving (Show, Eq, Generic)
@@ -35,24 +42,30 @@ data WaybarState = WaybarState
 
 waybarSB :: WaybarConfig -> ConfigDoM H
 waybarSB wbcfg ucfg =
-    ucfg
-        & startupHook
-        <>~ waybarStartupHook wbcfg
-        & exitHook
-        <>~ waybarCleanup
+    ucfg & startupHook <>~ waybarStartupHook wbcfg
+         & exitHook <>~ waybarCleanup
 
 waybarStartupHook :: WaybarConfig -> H ()
 waybarStartupHook cfg = do
     putObject $ WaybarState Nothing cfg
-    waybarTask
-    let wbTaskPtr = static waybarTask
-    logInfo $ "waybar task" :# ["taskPtr" .= show (staticPtrInfo wbTaskPtr)]
 
-waybarTask :: H ()
-waybarTask = withOptionalObject $ \WaybarState{wbProcess, wbConfig} -> do
+    registerCommand "waybar/start" taskCmd
+
+    registerCommand "testcmd" testCmd
+
+    waybarTask StartWaybar
+
+waybarTask :: Operation -> H ()
+waybarTask oper = withOptionalObject $ \WaybarState{wbProcess, wbConfig} -> do
     case wbProcess of
-        Nothing -> startIt wbConfig
-        Just ph -> getExitCode ph >>= maybe (return ()) (\_ -> restartIt ph wbConfig)
+        Nothing
+          | oper == StartWaybar || oper == RestartWaybar -> startIt wbConfig
+          | otherwise -> return ()
+        Just ph -> getExitCode ph >>= \case
+            Just{}  | oper == StartWaybar || oper == RestartWaybar -> restartIt ph wbConfig
+            Nothing | oper == StopWaybar -> stopProcess ph
+                    | oper == RestartWaybar -> restartIt ph wbConfig
+            _  -> return ()
   where
     startIt cfg = do
         logInfo "Waybar starting..."
@@ -83,7 +96,7 @@ waybarCleanup = withOptionalObject $ \WaybarState{wbProcess} -> do
         modifyObject $ \st -> st{wbProcess = Nothing}
   where
     delayKill p = do
-        --
+        -- XXX tricky
         mpid <- io $ getPid p
         io $ threadDelay 5_000
         io $ forM_ mpid $ signalProcess sigINT

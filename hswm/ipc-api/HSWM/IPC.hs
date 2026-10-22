@@ -10,24 +10,17 @@ Portability : unportable
 module HSWM.IPC where
 
 import Data.Aeson qualified as A
-
--- import qualified Data.Aeson.Encoding.Internal as A
 import Data.Aeson.KeyMap qualified as KM
-
--- import qualified Data.ByteString.Char8 as C8
-
 import Data.ByteString.Lazy qualified as BL
 import Data.ByteString.Lazy.Char8 qualified as C8LB
-
--- import qualified Data.ByteString.UTF8 as BUTF8
 import Data.List qualified as L
 import Data.Text.Lazy qualified as TL
 import Data.Version (showVersion)
 import Network.Socket
 import Network.Socket.ByteString qualified as NB
 import System.Random (randomIO)
-
 import PackageInfo_hswm qualified as PKG
+import Options.Generic
 
 aesonOptions :: A.Options
 aesonOptions =
@@ -56,22 +49,39 @@ instance (A.FromJSON a) => A.FromJSON (Msg a) where
 -- * Request
 
 -- | Requests (client to server).
-data Request
+type Request = Request' Unwrapped
+
+-- | The unwrapped version is for optparse-generic
+data Request' w
     = -- | Identifies the client to the server.
-      IdentifyClient {name :: String, version :: Int, description :: Maybe String}
+      IdentifyClient
+          { name :: String
+          , version :: Int, description :: Maybe String}
     | -- | Request a state dump.
-      DumpState {param :: String}
+      DumpState {param :: w ::: String }
     | ListSeats
     | ListOutputs
     | ListWindows
     | ConfigGet
-    deriving (Generic, Eq, Show, Read)
+    | CallMethod
+        { method :: w ::: String       <#> "n" <?> "method name"
+        , params :: w ::: MethodParams <#> "p" <?> "arbitrary method arguments (JSON-encoded)"
+        }
+    deriving (Generic)
+
+deriving instance Eq Request
+deriving instance Show Request
+deriving instance Read Request
 
 instance A.ToJSON Request where
     toJSON = A.genericToJSON aesonOptions
     toEncoding = A.genericToEncoding aesonOptions
 instance A.FromJSON Request where
     parseJSON = A.genericParseJSON aesonOptions
+
+newtype MethodParams = MethodParams A.Value
+    deriving (Generic, Eq, Show, Read)
+    deriving newtype (A.ToJSON, A.FromJSON)
 
 -- * Response
 
@@ -176,7 +186,7 @@ clientRunWith conf program = do
     ai <- getClientAI conf
     withThreadContext ["component" .= ("ipc-client" :: String), "address" .= show ai.addrAddress] $ do
         bracket (open ai) (io . close) $ \sock -> do
-            sendMsg sock $ IdentifyClient (thisPeerIdent "client") 0 (Just thisPeerDescription)
+            sendMsg sock $ (IdentifyClient (thisPeerIdent "client") 0 (Just thisPeerDescription) :: Request)
             program sock
   where
     open ai = bracketOnError (io $ socket ai.addrFamily ai.addrSocketType ai.addrProtocol) (io . close) $ \sock -> do
