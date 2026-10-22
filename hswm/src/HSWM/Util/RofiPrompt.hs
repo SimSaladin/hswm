@@ -510,7 +510,7 @@ instance (KnownNat (ColumnsCount a), input ~ [InputRow a], HasColumns a) => HasR
     displayColumns
       .~ [1 .. fromIntegral $ natVal (Proxy @(ColumnsCount a))]
       &+ columnSeparator
-      .~ [x.columnsSep]
+        .~ [x.columnsSep]
       &+ (if x.columnsHeader then selectedRow %~ max 1 else id)
 
 -- * Prompts
@@ -520,11 +520,11 @@ modePromptWith pc mo =
   pc
     & clearTypeParams
     & showMode
-    ?~ mo
+      ?~ mo
     & modes
-    <>~ [mo]
+      <>~ [mo]
     & dmenuMode
-    .~ False
+      .~ False
 
 modePrompt :: Mode -> RofiPromptConfig () 's' ()
 modePrompt mo = def & showMode ?~ mo & modes <>~ [mo]
@@ -539,9 +539,9 @@ confirmPrompt pc text act = selectPrompt pc' values ++> flip when act
     pc' =
       pc
         & prompt
-        .~ "Confirm [y/n]"
+          .~ "Confirm [y/n]"
         & promptMessage
-        .~ text
+          .~ text
     values = [(True, "yes"), (False, "no")]
 
 confirmPrompt' :: RofiPromptConfig [T.Text] SelectS String -> String -> H () -> H ()
@@ -551,11 +551,11 @@ confirmPrompt' cfg text act = runRofi cfg' input ++> apply
     cfg' =
       cfg
         & dmenuMode
-        .~ True
+          .~ True
         & prompt
-        .~ "Confirm [y/n]? "
+          .~ "Confirm [y/n]? "
         & promptMessage
-        .~ text
+          .~ text
     apply "yes" = act
     apply _ = return ()
 
@@ -572,9 +572,9 @@ selectPrompt pc vals = runRofi pc' (map snd vals) <&> (>>= (map fst vals L.!?))
     pc' =
       pc
         & noCustomInput
-        .~ True
+          .~ True
         & promptMessage
-        . filtered (== "")
-        .~ "Select "
-        ++ show (typeRep vals)
-          & clearTypeParams @_ @'i'
+          . filtered (== "")
+          .~ "Select "
+            ++ show (typeRep vals)
+        & clearTypeParams @_ @'i'

@@ -43,9 +43,9 @@ environPrompt pc = do
       pc' =
         pc
           & RP.prompt
-          .~ "Set env variable"
+            .~ "Set env variable"
           & RP.promptMessage
-          .~ "\"VAR=VALUE\" to set the value of $VAR. \"VAR\" to unset the variable."
+            .~ "\"VAR=VALUE\" to set the value of $VAR. \"VAR\" to unset the variable."
           & RP.clearInputSettings
 
   RP.runRofi pc' rows >>= (`whenJust` process)

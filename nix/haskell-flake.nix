@@ -8,9 +8,7 @@
 {
   perSystem =
     {
-      system,
       lib,
-      config,
       pkgs,
       ...
     }@perSys:
@@ -95,7 +93,7 @@
           basePackages = pkgs.haskell.packages.ghc914.extend (
             self: super: {
               buildHaskellPackages = super.buildHaskellPackages.extend (
-                self: super: {
+                self: _: {
                   Cabal = self.Cabal_3_16_1_0;
                 }
               );
@@ -150,7 +148,7 @@
             tasty-hspec.jailbreak = true;
             binary-orphans.jailbreak = true;
             apply-refact.jailbreak = true;
-            haskell-language-server = { self, ... }: { jailbreak = true; };
+            haskell-language-server.jailbreak = true;
             fourmolu = { self, ... }: {
               jailbreak = true;
               custom =
@@ -199,7 +197,7 @@
             settings.defined = { };
           };
           devShell = {
-            tools = ps: {
+            tools = _: {
               haskell-language-server = null; # broken
               hlint = null;
             };

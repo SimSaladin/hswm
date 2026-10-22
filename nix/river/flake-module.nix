@@ -1,11 +1,10 @@
-{ lib, inputs, ... }:
+{ inputs, ... }:
 
 let
   mkZigDependencies =
     {
       writeShellApplication,
       zig2nix, # zig2nix.zig2nix-0_16_0
-      zig,
     }:
     writeShellApplication {
       name = "make-zig-dependencies";
@@ -22,7 +21,7 @@ let
     };
 in
 {
-  flake.overlays.river = final: prev: {
+  flake.overlays.river = final: _: {
 
     # roll our own for now because the nixpkgs one is rather old and lacks
     # features (the wm protocol etc.)
@@ -51,8 +50,6 @@ in
   perSystem =
     {
       inputs',
-      system,
-      lib,
       pkgs,
       ...
     }:

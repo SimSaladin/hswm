@@ -1,6 +1,5 @@
 # Haskell Waybar cFFI Plugin
 
-
 In your `waybar/config.jsonc`:
 
 ```json

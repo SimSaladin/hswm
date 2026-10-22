@@ -84,7 +84,6 @@
           {
             config,
             system,
-            lib,
             pkgs,
             ...
           }:
@@ -109,13 +108,16 @@
               in
               pkgs.writeShellScriptBin "pre-commit-run" script;
 
-            pre-commit.settings = { pkgs, ... }: {
+            pre-commit.settings = { ... }: {
               hooks = {
+                fourmolu.enable = true;
+                cabal-gild.enable = true;
+                cabal-gild.excludes = [ "hswm/hswm.cabal" ]; # XXX: hpack is used there
                 hpack.enable = true;
                 nixfmt.enable = true;
+                deadnix.enable = true;
                 shellcheck.enable = true;
-                cabal-gild.enable = true;
-                fourmolu.enable = true;
+                mdl.enable = true; # .md
               };
               excludes = [
                 "nix/materialized/.*"

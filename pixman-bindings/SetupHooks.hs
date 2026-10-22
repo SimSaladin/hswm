@@ -17,4 +17,4 @@ pixmanSpec :: HsBindGen
 pixmanSpec =
   newHsBindGen "Pixman.Generated" [makeHeader "pixman.h"]
     & genGlobal
-    .~ pure False
+      .~ pure False

@@ -195,7 +195,7 @@ applyManageActions w0 xs0 = doAll w0 xs0 >>= \w' -> return $ Just w'{p_manage_ac
         pure $
           w
             & fullscreen
-            ?~ ro
+              ?~ ro
             & maybe id (\o -> size .~ o.size) mbOut
       WFullscreen -> do
         sid <- gets $ W.screen . W.current . view windowset
@@ -260,11 +260,11 @@ doRemoveWindow w = do
         . filtered (== w.river_window)
         .~ def
         &+ hovered
-        . filtered (== w.river_window)
-        .~ def
+          . filtered (== w.river_window)
+          .~ def
         &+ interacted
-        . filtered (== w.river_window)
-        .~ def
+          . filtered (== w.river_window)
+          .~ def
         &+ if s.op_window == w.river_window
           then op .~ def &+ opWindow .~ def
           else id

@@ -26,7 +26,7 @@ logTraceShow x =
         }
       x
       ^. strict
-      :# []
+        :# []
 
 pTrace :: (MonadIO m, Show a) => a -> m ()
 pTrace =

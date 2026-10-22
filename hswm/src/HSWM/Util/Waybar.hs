@@ -43,9 +43,9 @@ waybarSB :: WaybarConfig -> ConfigDoM H
 waybarSB wbcfg ucfg =
   ucfg
     & startupHook
-    <>~ waybarStartupHook wbcfg
+      <>~ waybarStartupHook wbcfg
     & exitHook
-    <>~ waybarCleanup
+      <>~ waybarCleanup
 
 waybarStartupHook :: WaybarConfig -> H ()
 waybarStartupHook cfg = do

@@ -156,11 +156,11 @@ classPerField' :: (String -> String -> Bool) -> LensRules
 classPerField' only =
   classyRules
     & lensClass
-    .~ const Nothing
+      .~ const Nothing
     & lensField
-    .~ getName
+      .~ getName
     & simpleLenses
-    .~ False
+      .~ False
   where
     getName (nameBase -> ty) _ (nameBase -> n)
       | only ty n || only ty (fromSnake False n) =
@@ -178,9 +178,9 @@ classPerType' :: (String -> String -> Bool) -> LensRules
 classPerType' only =
   classyRules
     & lensField
-    .~ getName
+      .~ getName
     & simpleLenses
-    .~ True -- needs to be True to work with createClass for more complex types
+      .~ True -- needs to be True to work with createClass for more complex types
   where
     getName (nameBase -> ty) _ (nameBase -> n)
       | only ty n || only ty (fromSnake False n) =

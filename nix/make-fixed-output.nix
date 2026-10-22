@@ -12,7 +12,7 @@ let
 
       # AttrSet -> AttrSet -> AttrSet;
       extendDrvArgs =
-        finalAttrs:
+        _:
         {
           hash ? lib.fakeHash,
           ...
@@ -39,7 +39,6 @@ let
   rerunOnChange =
     {
       preOverrideAttrs ? x: x,
-      nested ? false,
     }@args:
     fixedOutputDerivation: # The initially constructed fixed output derivation.
 
@@ -77,7 +76,7 @@ let
         substring 11 32 (unsafeDiscardStringContext drv.outPath);
     in
     fixedOutputDerivation.overrideAttrs (
-      attrs@{
+      {
         name ? pname + "-" + version,
         pname ? null,
         version ? null,

@@ -48,49 +48,49 @@ main =
           IPC.ipcServer def $
             (def @(HSWMConfig H Full))
               & layoutHook
-              .~ myLayoutHook
+                .~ myLayoutHook
               & manageHook
-              .~ myManageHook
+                .~ myManageHook
               & handleEventHook
-              <>~ debugHook
+                <>~ debugHook
               & startupHook
-              <>~ runInHS (scratchpadsStartupHook myScratchpads)
+                <>~ runInHS (scratchpadsStartupHook myScratchpads)
               & pointerBindings
-              <>~ myPointerBinds
+                <>~ myPointerBinds
               & defaultModMask
-              .~ "mod4"
+                .~ "mod4"
               & borderWidth
-              .~ 1
+                .~ 1
               & normalBorder
-              .~ parseRgba colBase02
+                .~ parseRgba colBase02
               & focusedBorder
-              .~ parseRgba colCyan
+                .~ parseRgba colCyan
               & xkbLayout
-              ?~ myKeyboard
+                ?~ myKeyboard
               & repeatInfo
-              . rate
-              .~ 20
+                . rate
+                .~ 20
               & repeatInfo
-              . delay
-              .~ 150
+                . delay
+                .~ 150
               & cursorTheme
-              .~ "Vanilla-DMZ"
+                .~ "Vanilla-DMZ"
               & cursorSize
-              .~ 24
+                .~ 24
 
 myKeyboard :: XkbRuleNames
 myKeyboard =
   def
     & model
-    .~ "pc104"
+      .~ "pc104"
     & layouts
-    .~ ["dvp-my(dvp-my)"]
+      .~ ["dvp-my(dvp-my)"]
     & options
-    ?~ [ "terminate:ctrl_alt_bksp"
-       , "compose:rctrl-altgr"
-       , "lv3:ralt_switch"
-       , "lv3:menu_switch"
-       ]
+      ?~ [ "terminate:ctrl_alt_bksp"
+         , "compose:rctrl-altgr"
+         , "lv3:ralt_switch"
+         , "lv3:menu_switch"
+         ]
 
 myLayoutHook :: _
 myLayoutHook =
@@ -378,13 +378,13 @@ myRofiBaseConfig =
   (RP.dmenuPrompt @())
     & RP.clearTypeParams
     & RP.markupInput
-    .~ True
+      .~ True
     & RP.smartCase
-    .~ True
+      .~ True
     & RP.showIcons
-    .~ True
+      .~ True
     & RP.matching
-    .~ "fuzzy,prefix,normal"
+      .~ "fuzzy,prefix,normal"
 
 cycleRecentHiddenWS :: String -> String -> String -> H ()
 cycleRecentHiddenWS = CycleRecentWS.cycleWindowSets $ \wset ->
@@ -405,11 +405,11 @@ windowPrompt = do
     rp =
       myRofiBaseConfig
         & RP.prompt
-        .~ "window"
+          .~ "window"
         & RP.promptMessage
-        .~ "Go to window"
+          .~ "Go to window"
         & RP.noCustomInput
-        .~ True
+          .~ True
 
     fmtWindow ws w =
       ( P.bold w.appId

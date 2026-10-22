@@ -759,7 +759,7 @@ getHidden =
   getStackSet
     >>= lookupWindows . W.integrate'
     >>= filterM (runQuery isMinimized)
-      <&> map (view riverWindow)
+    <&> map (view riverWindow)
 
 getStackSet :: HS (Maybe (W.Stack RiverWindow))
 getStackSet = W.stack . W.workspace . W.current <$> use windowset -- windows on this WS (with floating)

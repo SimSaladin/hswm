@@ -99,7 +99,7 @@ ipcServer conf =
   startupHook
     <>~ serverStartupHook conf
     &+ logHook
-    <>~ ipcLogHook conf
+      <>~ ipcLogHook conf
 
 serverStartupHook :: (HasCallStack) => ServerConfig -> H ()
 serverStartupHook conf = do

@@ -6,7 +6,6 @@
 
   src,
   depsHash ? "",
-  zigEnv,
   my-lib,
   updateRiverDeps,
 

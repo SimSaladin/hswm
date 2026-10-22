@@ -1,5 +1,4 @@
 {
-  self,
   inputs,
   lib,
   withSystem,
@@ -112,29 +111,7 @@ let
 
   # Shell using exposePackagesVia = "ghc-pkg" for use with eg. hoogle
   # Note: v2 shell ignores exactDeps, additional, components
-  mkGhcPkgShell =
-    {
-      project,
-      projectShells ? [ ],
-      ...
-    }@args:
-    adjustedShellFor project (
-      {
-        name = "hswm-ghc-pkg";
-        exposePackagesVia = "ghc-pkg";
-        packages = lib.mkForce (_: [ ]);
-        inputsFrom =
-          lib.map (drv: drv.overrideAttrs { shellHook = ""; }) projectShells ++ args.inputsFrom or [ ];
-        allToolDeps = lib.mkForce false;
-        withHoogle = true;
-        shellHook = "unset PROMPT_COMMAND";
-      }
-      // removeAttrs args [
-        "project"
-        "projectShells"
-        "inputsFrom"
-      ]
-    );
+  # May want to build shell with exposePackagesVia = "ghc-pkg"
 
   # A shell per project/package
   perPackageShellsFor =
@@ -292,11 +269,8 @@ in
 
   perSystem =
     {
-      lib,
-      config,
       pkgs,
       project,
-      project-lib,
       ...
     }:
     {

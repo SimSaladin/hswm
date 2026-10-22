@@ -1,4 +1,4 @@
-{ inputs, lib, ... }:
+{ inputs, ... }:
 
 let
   hsNixModule = { config, pkgs, ... }: {
@@ -26,7 +26,7 @@ in
 
   flake.overlays.hs-bindgen = inputs.hs-bindgen.overlays.default;
 
-  perSystem = { pkgs, inputs', ... }: {
+  perSystem = { pkgs, ... }: {
     # Expose the hs-bindgen-cli binary for development purposes.
     packages.hs-bindgen-cli = pkgs.hs-bindgen-cli;
   };

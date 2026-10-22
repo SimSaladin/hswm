@@ -301,8 +301,9 @@ instance ToJSON (SomeAction m) where
         : ["submap" .= x | let x = actionSubmap @m val, not (omitField x)]
   toEncoding (SomeAction val) =
     A.pairs $
-      "description" .= actionDescription @m Proxy val
-        <> (let x = actionSubmap @m val in if omitField x then mempty else "submap" .= x)
+      "description"
+        .= actionDescription @m Proxy val
+          <> (let x = actionSubmap @m val in if omitField x then mempty else "submap" .= x)
 
 -- * Lenses
 

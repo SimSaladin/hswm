@@ -9,61 +9,65 @@
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
---
-module Distribution.HsBindgen.Utils
+module Distribution.HsBindgen.Utils (
   -- * Cabal verbosity plumbing
-  ( VerbosityFlags
-  , makeVerbose
-  , verbosityFromFlags
-  , verbosityLevelInt
-  -- * Misc.
-  , configurePrograms
-  , getPkgConfDataDir
-  , ToLocation(..)
-  , makeLenses'
-  , withTempFileContents
-  -- * Re-exports
-  -- ** JSON tools
-  , A.decode
-  , A.aesonQQ
-  , A.parseJSON
-  , A.fromJSON
-  , A.Result(..)
-  , A.Value
-  -- ** Lens library
-  , module Lens.Micro
-  ) where
+  VerbosityFlags,
+  makeVerbose,
+  verbosityFromFlags,
+  verbosityLevelInt,
 
-import           Distribution.Simple.SetupHooks
-import           Distribution.Simple.Program
-import           Distribution.Simple.Program.Db (ConfiguredProgs)
-import           Distribution.Simple.Utils
-import           Distribution.Utils.String (trim)
-import           Distribution.Utils.IOData (hPutContents)
-import           Distribution.Utils.Path
-import           Distribution.Pretty
-import           Distribution.Simple.SetupHooks.Rule (RuleId(..))
-import           Distribution.Utils.ShortText
+  -- * Misc.
+  configurePrograms,
+  getPkgConfDataDir,
+  ToLocation (..),
+  makeLenses',
+  withTempFileContents,
+
+  -- * Re-exports
+
+  -- ** JSON tools
+  A.decode,
+  A.aesonQQ,
+  A.parseJSON,
+  A.fromJSON,
+  A.Result (..),
+  A.Value,
+
+  -- ** Lens library
+  module Lens.Micro,
+) where
+
+import Distribution.Pretty
+import Distribution.Simple.Program
+import Distribution.Simple.Program.Db (ConfiguredProgs)
+import Distribution.Simple.SetupHooks
+import Distribution.Simple.SetupHooks.Rule (RuleId (..))
+import Distribution.Simple.Utils
+import Distribution.Utils.IOData (hPutContents)
+import Distribution.Utils.Path
+import Distribution.Utils.ShortText
+import Distribution.Utils.String (trim)
 #if MIN_VERSION_Cabal(3,17,0)
 import           Distribution.Verbosity (VerbosityFlags, makeVerbose)
 #else
 import           Distribution.ModuleName (ModuleName)
 import           Distribution.Text (simpleParse)
 #endif
-import qualified Distribution.Verbosity as Verbosity
+import Distribution.Verbosity qualified as Verbosity
 
-import           Control.Monad
-import qualified Data.Aeson as A
-import qualified Data.Aeson.QQ.Simple as A
-import           Data.Char
-import           GHC.IsList
-import           Language.Haskell.TH hiding (location)
-import           Lens.Micro
-import           Lens.Micro.TH
-import           Lens.Micro.GHC ()
-import qualified System.FilePath as FP
-import qualified Text.PrettyPrint as PP
+import Control.Monad
+import Data.Aeson qualified as A
+import Data.Aeson.QQ.Simple qualified as A
+import Data.Char
+import GHC.IsList
+import Language.Haskell.TH hiding (location)
+import Lens.Micro
+import Lens.Micro.GHC ()
+import Lens.Micro.TH
+import System.FilePath qualified as FP
+import Text.PrettyPrint qualified as PP
 
+{- FOURMOLU_DISABLE -}
 withTempFileContents :: FilePath -> String -> (FilePath -> IO a) -> IO a
 withTempFileContents name contents f =
 #if MIN_VERSION_Cabal(3,15,0)
@@ -99,6 +103,7 @@ makeVerbose v
   | v == Verbosity.normal = Verbosity.moreVerbose v
   | otherwise = v
 #endif
+{- FOURMOLU_ENABLE -}
 
 -- * Program utils
 
@@ -119,12 +124,14 @@ getPkgConfDataDir v progdb arg = do
 -- * Lenses
 
 makeLenses' :: Name -> Q [Dec]
-makeLenses' = makeLensesWith $ classyRules
-    & lensClass .~ const Nothing
-    & lensField .~ getField
- where
+makeLenses' =
+  makeLensesWith $
+    classyRules
+      & lensClass .~ const Nothing
+      & lensField .~ getField
+  where
     getField _ _ n
-      | base@(x:xs) <- nameBase n = [MethodName (mkName $ "Has" ++ toUpper x : xs) (mkName base)]
+      | base@(x : xs) <- nameBase n = [MethodName (mkName $ "Has" ++ toUpper x : xs) (mkName base)]
       | otherwise = error "makeLenses: getField: empty list"
 
 -- * class: ToLocation
@@ -135,7 +142,7 @@ class ToLocation a where
 instance ToLocation (SymbolicPath Pkg 'File) where
   makeLocation sfp = maybe defAbs (Location sameDirectory) $ symbolicPathRelative_maybe norm
     where
-      norm   = normaliseSymbolicPath sfp
+      norm = normaliseSymbolicPath sfp
       defAbs = Location (coerceSymbolicPath $ takeDirectorySymbolicPath norm) . makeRelativePathEx . FP.takeFileName $ getSymbolicPath norm
 
 instance ToLocation (RelativePath from 'File) where
@@ -144,7 +151,7 @@ instance ToLocation (RelativePath from 'File) where
 -- * Orphan instances
 
 deriving anyclass instance A.FromJSON (SymbolicPathX a b c)
-deriving anyclass instance A.ToJSON   (SymbolicPathX a b c)
+deriving anyclass instance A.ToJSON (SymbolicPathX a b c)
 
 #if MIN_VERSION_Cabal(3,17,0)
 deriving anyclass instance A.FromJSON ModuleName

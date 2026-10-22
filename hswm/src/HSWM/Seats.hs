@@ -275,13 +275,13 @@ added rs = do
   let seat =
         def
           & _new
-          .~ True
+            .~ True
           & riverSeat
-          .~ rs
+            .~ rs
           & riverLayerShellSeat
-          .~ lss
+            .~ lss
           & xkbBindingsSeat
-          .~ xbs
+            .~ xbs
   runInHS $ seatList %= (<> [seat])
 
 -- | Bind the Wl_seat interface of a river_seat as well.

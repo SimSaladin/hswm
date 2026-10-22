@@ -138,11 +138,11 @@ bindgenPreConfComponentHook specs pci
       CLib $
         mempty
           & Lib.exposedModules
-          .~ filter exposed undeclared
+            .~ filter exposed undeclared
           & BI.autogenModules
-          .~ filter (`notElem` (lib ^. BI.autogenModules)) genmodules
+            .~ filter (`notElem` (lib ^. BI.autogenModules)) genmodules
           & BI.otherModules
-          .~ filter (not . exposed) undeclared
+            .~ filter (not . exposed) undeclared
       where
         genmodules = concatMap getModuleNames specs
         undeclared = filter (`notElem` explicitLibModules lib) genmodules

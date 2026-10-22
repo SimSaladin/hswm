@@ -121,9 +121,9 @@ makeLensesWith' classPerField [''W.RationalRect]
 makeLensesWith'
   ( classPerType
       & lensField
-      .~ (\ty _ n -> [TopName $ mkName $ fromSnake True $ "_" ++ (nameBase ty & _head %~ toLower) ++ "_" ++ (nameBase n & _head %~ toLower)])
+        .~ (\ty _ n -> [TopName $ mkName $ fromSnake True $ "_" ++ (nameBase ty & _head %~ toLower) ++ "_" ++ (nameBase n & _head %~ toLower)])
       & lensClass
-      .~ (\n -> Just (mkName $ "Has" ++ nameBase n ++ "'", mkName $ "_" ++ (nameBase n & _head %~ toLower)))
+        .~ (\n -> Just (mkName $ "Has" ++ nameBase n ++ "'", mkName $ "_" ++ (nameBase n & _head %~ toLower)))
   )
   [ ''W.Workspace
   , ''W.Screen
