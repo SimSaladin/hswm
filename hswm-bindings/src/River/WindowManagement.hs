@@ -1,176 +1,175 @@
 {-# LANGUAGE DeriveAnyClass #-}
 
-{- |
-Module      : River.WindowManagement
-Description : river-window-management v1
-Copyright   : (c) Samuli Thomasson, 2026
-
-Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
-Stability   : unstable
-Portability : unportable
--}
+-- |
+-- Module      : River.WindowManagement
+-- Description : river-window-management v1
+-- Copyright   : (c) Samuli Thomasson, 2026
+--
+-- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
+-- Stability   : unstable
+-- Portability : unportable
 module River.WindowManagement (
-    -- * RiverWindowManager
-    RiverWindowManager,
+  -- * RiverWindowManager
+  RiverWindowManager,
 
-    -- ** Events
-    RiverWindowManagerEvent (..),
+  -- ** Events
+  RiverWindowManagerEvent (..),
 
-    -- ** ManageFinish (Manage)
-    riverWindowManagerManageFinish,
+  -- ** ManageFinish (Manage)
+  riverWindowManagerManageFinish,
 
-    -- ** RenderFinish (Render)
-    riverWindowManagerRenderFinish,
+  -- ** RenderFinish (Render)
+  riverWindowManagerRenderFinish,
 
-    -- ** Get ShellSurface
-    riverWindowManagerGetShellSurface,
+  -- ** Get ShellSurface
+  riverWindowManagerGetShellSurface,
 
-    -- ** ManageDirty
-    riverWindowManagerManageDirty,
+  -- ** ManageDirty
+  riverWindowManagerManageDirty,
 
-    -- ** Stop
-    riverWindowManagerStop,
+  -- ** Stop
+  riverWindowManagerStop,
 
-    -- ** Exit Session
-    riverWindowManagerExitSession,
+  -- ** Exit Session
+  riverWindowManagerExitSession,
 
-    -- * RiverWindow
-    RiverWindow,
+  -- * RiverWindow
+  RiverWindow,
 
-    -- ** Events
-    RiverWindowEvent (..),
+  -- ** Events
+  RiverWindowEvent (..),
 
-    -- ** Get Node
-    riverWindowGetNode,
+  -- ** Get Node
+  riverWindowGetNode,
 
-    -- ** Get Decoration
-    riverWindowGetDecorationAbove,
-    riverWindowGetDecorationBelow,
+  -- ** Get Decoration
+  riverWindowGetDecorationAbove,
+  riverWindowGetDecorationBelow,
 
-    -- ** (Manage)
-    riverWindowProposeDimensions,
-    riverWindowSetDimensionBounds,
-    riverWindowUseCsd,
-    riverWindowUseSsd,
-    riverWindowSetTiled,
-    riverWindowInformResizeStart,
-    riverWindowInformResizeEnd,
-    riverWindowSetCapabilities,
-    riverWindowInformMaximized,
-    riverWindowInformUnmaximized,
-    riverWindowInformFullscreen,
-    riverWindowInformNotFullscreen,
-    riverWindowFullscreen,
-    riverWindowExitFullscreen,
-    riverWindowClose,
+  -- ** (Manage)
+  riverWindowProposeDimensions,
+  riverWindowSetDimensionBounds,
+  riverWindowUseCsd,
+  riverWindowUseSsd,
+  riverWindowSetTiled,
+  riverWindowInformResizeStart,
+  riverWindowInformResizeEnd,
+  riverWindowSetCapabilities,
+  riverWindowInformMaximized,
+  riverWindowInformUnmaximized,
+  riverWindowInformFullscreen,
+  riverWindowInformNotFullscreen,
+  riverWindowFullscreen,
+  riverWindowExitFullscreen,
+  riverWindowClose,
 
-    -- ** (Render)
-    riverWindowHide,
-    riverWindowShow,
-    riverWindowSetBorders,
-    riverWindowSetClipBox,
-    riverWindowSetContentClipBox,
+  -- ** (Render)
+  riverWindowHide,
+  riverWindowShow,
+  riverWindowSetBorders,
+  riverWindowSetClipBox,
+  riverWindowSetContentClipBox,
 
-    -- ** RiverWindowEdges
-    RiverWindowEdges,
-    pattern EdgeNone,
-    pattern EdgeLeft,
-    pattern EdgeRight,
-    pattern EdgeBottom,
-    pattern EdgeTop,
+  -- ** RiverWindowEdges
+  RiverWindowEdges,
+  pattern EdgeNone,
+  pattern EdgeLeft,
+  pattern EdgeRight,
+  pattern EdgeBottom,
+  pattern EdgeTop,
 
-    -- ** RiverWindowCapabilities
-    RiverWindowCapabilities,
-    pattern WindowMenu,
-    pattern Maximize,
-    pattern Fullscreen,
-    pattern Minimize,
+  -- ** RiverWindowCapabilities
+  RiverWindowCapabilities,
+  pattern WindowMenu,
+  pattern Maximize,
+  pattern Fullscreen,
+  pattern Minimize,
 
-    -- * RiverNode
-    RiverNode,
+  -- * RiverNode
+  RiverNode,
 
-    -- ** SetPosition (Render)
-    riverNodeSetPosition,
+  -- ** SetPosition (Render)
+  riverNodeSetPosition,
 
-    -- ** Place (Top / Bottom / Above / Below) (Render)
-    riverNodePlaceTop,
-    riverNodePlaceBottom,
-    riverNodePlaceAbove,
-    riverNodePlaceBelow,
+  -- ** Place (Top / Bottom / Above / Below) (Render)
+  riverNodePlaceTop,
+  riverNodePlaceBottom,
+  riverNodePlaceAbove,
+  riverNodePlaceBelow,
 
-    -- * RiverOutput
-    RiverOutput,
+  -- * RiverOutput
+  RiverOutput,
 
-    -- ** Events
-    RiverOutputEvent (..),
+  -- ** Events
+  RiverOutputEvent (..),
 
-    -- ** Set Presentation Mode (Render)
-    riverOutputSetPresentationMode,
-    RiverOutputPresentationMode,
+  -- ** Set Presentation Mode (Render)
+  riverOutputSetPresentationMode,
+  RiverOutputPresentationMode,
 
-    -- * RiverSeat
-    RiverSeat,
+  -- * RiverSeat
+  RiverSeat,
 
-    -- ** Events
-    RiverSeatEvent (..),
+  -- ** Events
+  RiverSeatEvent (..),
 
-    -- ** Requests (manage)
-    riverSeatFocusWindow,
-    riverSeatFocusShellSurface,
-    riverSeatClearFocus,
-    riverSeatOpStartPointer,
-    riverSeatOpEnd,
-    riverSeatPointerWarp,
+  -- ** Requests (manage)
+  riverSeatFocusWindow,
+  riverSeatFocusShellSurface,
+  riverSeatClearFocus,
+  riverSeatOpStartPointer,
+  riverSeatOpEnd,
+  riverSeatPointerWarp,
 
-    -- ** Get PointerBinding
-    riverSeatGetPointerBinding,
+  -- ** Get PointerBinding
+  riverSeatGetPointerBinding,
 
-    -- ** Set XCursorTheme
-    riverSeatSetXcursorTheme,
+  -- ** Set XCursorTheme
+  riverSeatSetXcursorTheme,
 
-    -- ** RiverSeatModifiers
-    RiverSeatModifiers,
-    pattern RiverSeatModifiersNone,
-    pattern RiverSeatModifiersShift,
-    pattern RiverSeatModifiersCtrl,
-    pattern RiverSeatModifiersMod1,
-    pattern RiverSeatModifiersMod3,
-    pattern RiverSeatModifiersMod4,
-    pattern RiverSeatModifiersMod5,
+  -- ** RiverSeatModifiers
+  RiverSeatModifiers,
+  pattern RiverSeatModifiersNone,
+  pattern RiverSeatModifiersShift,
+  pattern RiverSeatModifiersCtrl,
+  pattern RiverSeatModifiersMod1,
+  pattern RiverSeatModifiersMod3,
+  pattern RiverSeatModifiersMod4,
+  pattern RiverSeatModifiersMod5,
 
-    -- * RiverDecoration
-    RiverDecoration,
+  -- * RiverDecoration
+  RiverDecoration,
 
-    -- ** SetOffset (Render)
-    riverDecorationSetOffset,
+  -- ** SetOffset (Render)
+  riverDecorationSetOffset,
 
-    -- ** SyncNextCommit (Render)
-    riverDecorationSyncNextCommit,
+  -- ** SyncNextCommit (Render)
+  riverDecorationSyncNextCommit,
 
-    -- * RiverShellSurface
-    RiverShellSurface,
+  -- * RiverShellSurface
+  RiverShellSurface,
 
-    -- ** GetNode
-    riverShellSurfaceGetNode,
+  -- ** GetNode
+  riverShellSurfaceGetNode,
 
-    -- ** SyncNextCommit (Render)
-    riverShellSurfaceSyncNextCommit,
+  -- ** SyncNextCommit (Render)
+  riverShellSurfaceSyncNextCommit,
 
-    -- * RiverPointerBinding
-    RiverPointerBinding,
+  -- * RiverPointerBinding
+  RiverPointerBinding,
 
-    -- ** Events
-    RiverPointerBindingEvent (..),
+  -- ** Events
+  RiverPointerBindingEvent (..),
 
-    -- ** Enable / Disable (Manage)
-    riverPointerBindingEnable,
-    riverPointerBindingDisable,
+  -- ** Enable / Disable (Manage)
+  riverPointerBindingEnable,
+  riverPointerBindingDisable,
 
-    -- * WindowBorders
-    WindowBorders (..),
+  -- * WindowBorders
+  WindowBorders (..),
 
-    -- * RiverColor
-    RiverColor (..),
+  -- * RiverColor
+  RiverColor (..),
 ) where
 
 import River.WindowManagement.V1.Client
@@ -187,19 +186,19 @@ import HsBindgen.Runtime.CEnum
 
 -- | Color in the format River expects it (@4 * 32b@ RGBA).
 data RiverColor = RiverColor {red, green, blue, alpha :: {-# UNPACK #-} !Word32}
-    deriving stock (Eq, Ord, Show, Read, Bounded, Generic, Data)
-    deriving anyclass (Default, NFData)
+  deriving stock (Eq, Ord, Show, Read, Bounded, Generic, Data)
+  deriving anyclass (Default, NFData)
 
 data WindowBorders = WindowBorders
-    { wbWidth :: {-# UNPACK #-} !Int32
-    -- ^ Width of border
-    , wbEdges :: {-# UNPACK #-} !RiverWindowEdges
-    -- ^ Edges on which to draw borders
-    , wbColor :: {-# UNPACK #-} !RiverColor
-    -- ^ Border color (RGBA 32-bit)
-    }
-    deriving stock (Eq, Ord, Show, Read, Generic)
-    deriving anyclass (Default, NFData)
+  { wbWidth :: {-# UNPACK #-} !Int32
+  -- ^ Width of border
+  , wbEdges :: {-# UNPACK #-} !RiverWindowEdges
+  -- ^ Edges on which to draw borders
+  , wbColor :: {-# UNPACK #-} !RiverColor
+  -- ^ Border color (RGBA 32-bit)
+  }
+  deriving stock (Eq, Ord, Show, Read, Generic)
+  deriving anyclass (Default, NFData)
 
 pattern EdgeNone, EdgeLeft, EdgeRight, EdgeBottom, EdgeTop :: RiverWindowEdges
 pattern EdgeNone = RIVER_WINDOW_V1_EDGES_NONE

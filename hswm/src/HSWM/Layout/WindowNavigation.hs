@@ -2,32 +2,31 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE PatternGuards #-}
 
-{- |
-Module      :  HSWM.Layout.WindowNavigation
-Description :  A layout modifier to allow easy navigation of a workspace.
-Copyright   :  (c) 2007  David Roundy <droundy@darcs.net>
-License     :  BSD3-style (see LICENSE)
-
-Maintainer  :  Devin Mullins <me@twifkak.com>
-Stability   :  unstable
-Portability :  unportable
-
-WindowNavigation is an extension to allow easy navigation of a workspace.
--}
+-- |
+-- Module      :  HSWM.Layout.WindowNavigation
+-- Description :  A layout modifier to allow easy navigation of a workspace.
+-- Copyright   :  (c) 2007  David Roundy <droundy@darcs.net>
+-- License     :  BSD3-style (see LICENSE)
+--
+-- Maintainer  :  Devin Mullins <me@twifkak.com>
+-- Stability   :  unstable
+-- Portability :  unportable
+--
+-- WindowNavigation is an extension to allow easy navigation of a workspace.
 module HSWM.Layout.WindowNavigation (
-    -- * Usage
-    -- $usage
-    windowNavigation,
-    configurableNavigation,
-    Navigate (..),
-    Direction2D (..),
-    MoveWindowToWindow (..),
-    WNConfig,
-    navigateColor,
-    navigateBrightness,
-    noNavigateBorders,
-    def,
-    WindowNavigation,
+  -- * Usage
+  -- $usage
+  windowNavigation,
+  configurableNavigation,
+  Navigate (..),
+  Direction2D (..),
+  MoveWindowToWindow (..),
+  WNConfig,
+  navigateColor,
+  navigateBrightness,
+  noNavigateBorders,
+  def,
+  WindowNavigation,
 )
 where
 
@@ -39,88 +38,85 @@ import HSWM.Util.Invisible
 
 -- import HSWM.Util.XUtils
 
-{- $usage
-You can use this module with the following in your @xmonad.hs@:
-
-> import HSWM.Layout.WindowNavigation
-
-Then edit your 'layoutHook' by adding the WindowNavigation layout modifier
-to some layout:
-
-> myLayout = windowNavigation (Tall 1 (3/100) (1/2)) ||| Full ||| etc..
-> main = xmonad def { layoutHook = myLayout }
-
-For more detailed instructions on editing the 'layoutHook' see
-<https://xmonad.org/TUTORIAL.html#customizing-xmonad the tutorial> and
-"HSWM.Doc.Extending#Editing_the_layout_hook".
-
-In keybindings:
-
->    , ((modm,                 xK_Right), sendMessage $ Go R)
->    , ((modm,                 xK_Left ), sendMessage $ Go L)
->    , ((modm,                 xK_Up   ), sendMessage $ Go U)
->    , ((modm,                 xK_Down ), sendMessage $ Go D)
->    , ((modm .|. controlMask, xK_Right), sendMessage $ Swap R)
->    , ((modm .|. controlMask, xK_Left ), sendMessage $ Swap L)
->    , ((modm .|. controlMask, xK_Up   ), sendMessage $ Swap U)
->    , ((modm .|. controlMask, xK_Down ), sendMessage $ Swap D)
-
-For detailed instruction on editing the key binding see:
-
-<https://xmonad.org/TUTORIAL.html#customizing-xmonad the tutorial>.
--}
+-- $usage
+-- You can use this module with the following in your @xmonad.hs@:
+--
+-- > import HSWM.Layout.WindowNavigation
+--
+-- Then edit your 'layoutHook' by adding the WindowNavigation layout modifier
+-- to some layout:
+--
+-- > myLayout = windowNavigation (Tall 1 (3/100) (1/2)) ||| Full ||| etc..
+-- > main = xmonad def { layoutHook = myLayout }
+--
+-- For more detailed instructions on editing the 'layoutHook' see
+-- <https://xmonad.org/TUTORIAL.html#customizing-xmonad the tutorial> and
+-- "HSWM.Doc.Extending#Editing_the_layout_hook".
+--
+-- In keybindings:
+--
+-- >    , ((modm,                 xK_Right), sendMessage $ Go R)
+-- >    , ((modm,                 xK_Left ), sendMessage $ Go L)
+-- >    , ((modm,                 xK_Up   ), sendMessage $ Go U)
+-- >    , ((modm,                 xK_Down ), sendMessage $ Go D)
+-- >    , ((modm .|. controlMask, xK_Right), sendMessage $ Swap R)
+-- >    , ((modm .|. controlMask, xK_Left ), sendMessage $ Swap L)
+-- >    , ((modm .|. controlMask, xK_Up   ), sendMessage $ Swap U)
+-- >    , ((modm .|. controlMask, xK_Down ), sendMessage $ Swap D)
+--
+-- For detailed instruction on editing the key binding see:
+--
+-- <https://xmonad.org/TUTORIAL.html#customizing-xmonad the tutorial>.
 
 data MoveWindowToWindow a = MoveWindowToWindow a a deriving (Read, Show)
 
 instance (Typeable a) => Message (MoveWindowToWindow a)
 
 data Navigate
-    = Go Direction2D
-    | Swap Direction2D
-    | Move Direction2D
-    | -- | Apply action with destination window
-      Apply (RiverWindow -> H ()) Direction2D
+  = Go Direction2D
+  | Swap Direction2D
+  | Move Direction2D
+  | -- | Apply action with destination window
+    Apply (RiverWindow -> H ()) Direction2D
 
 instance Message Navigate
 
 instance Show Navigate where
-    show (Go d) = "Go " ++ show d
-    show (Swap d) = "Swap " ++ show d
-    show (Move d) = "Move " ++ show d
-    show (Apply _ d) = "Apply " ++ show d
+  show (Go d) = "Go " ++ show d
+  show (Swap d) = "Swap " ++ show d
+  show (Move d) = "Move " ++ show d
+  show (Apply _ d) = "Apply " ++ show d
 
-{- | Used with 'configurableNavigation' to specify how to show reachable windows'
-borders. You cannot create 'WNConfig' values directly; use 'def' or one of the following
-three functions to create one.
-
-'def', and 'windowNavigation', uses the focused border color at 40% brightness, as if
-you had specified
-
-> configurableNavigation (navigateBrightness 0.4)
--}
+-- | Used with 'configurableNavigation' to specify how to show reachable windows'
+-- borders. You cannot create 'WNConfig' values directly; use 'def' or one of the following
+-- three functions to create one.
+--
+-- 'def', and 'windowNavigation', uses the focused border color at 40% brightness, as if
+-- you had specified
+--
+-- > configurableNavigation (navigateBrightness 0.4)
 data WNConfig
-    = WNC
-    { brightness :: Maybe Double -- Indicates a fraction of the focus color.
-    , upColor :: String
-    , downColor :: String
-    , leftColor :: String
-    , rightColor :: String
-    }
-    deriving (Show, Read)
+  = WNC
+  { brightness :: Maybe Double -- Indicates a fraction of the focus color.
+  , upColor :: String
+  , downColor :: String
+  , leftColor :: String
+  , rightColor :: String
+  }
+  deriving (Show, Read)
 
 -- | Don't use window borders for navigation.
 noNavigateBorders :: WNConfig
 noNavigateBorders =
-    def{brightness = Just 0}
+  def{brightness = Just 0}
 
 -- | Indicate reachable windows by drawing their borders in the specified color.
 navigateColor :: String -> WNConfig
 navigateColor c =
-    WNC Nothing c c c c
+  WNC Nothing c c c c
 
-{- | Indicate reachable windows by drawing their borders in the active border color, with
-the specified brightness.
--}
+-- | Indicate reachable windows by drawing their borders in the active border color, with
+-- the specified brightness.
 navigateBrightness :: Double -> WNConfig
 navigateBrightness f = def{brightness = Just $ max 0 $ min 1 f}
 
@@ -137,124 +133,124 @@ configurableNavigation :: (LayoutClass l a) => WNConfig -> l a -> ModifiedLayout
 configurableNavigation conf = ModifiedLayout (WindowNavigation conf (I Nothing))
 
 instance LayoutModifier WindowNavigation RiverWindow where
-    redoLayout (WindowNavigation conf (I st)) rscr (Just s) origwrs =
+  redoLayout (WindowNavigation conf (I st)) rscr (Just s) origwrs =
+    do
+      HSWMConfig{normalBorder = nbc, focusedBorder = fbc} <- view config
+
+      let (uc, dc, lc, rc) = case brightness conf of
+            Just frac -> let myc = mixRGBA frac fbc nbc in (myc, myc, myc, myc)
+            Nothing -> each %~ parseRgba $ (upColor conf, downColor conf, leftColor conf, rightColor conf)
+
+      let dirc U = uc
+          dirc D = dc
+          dirc L = lc
+          dirc R = rc
+      let w = W.focus s
+          r = case filter ((== w) . fst) origwrs of
+            ((_, x) : _) -> x
+            [] -> rscr
+          pt = case st of
+            Just (NS ptold _) | ptold `inrect` r -> ptold
+            _ -> center r
+          existing_wins = W.integrate s
+          wrs =
+            filter ((`elem` existing_wins) . fst) $
+              filter ((/= r) . snd) $
+                filter ((/= w) . fst) origwrs
+          wnavigable =
+            nub $
+              concatMap
+                (\d -> take 1 $ navigable d pt wrs)
+                [U, D, R, L]
+          wnavigablec =
+            nub $
+              concatMap
+                ( \d ->
+                    map (\(win, _) -> (win, dirc d)) $
+                      take 1 $
+                        navigable d pt wrs
+                )
+                [U, D, R, L]
+          wothers = case st of
+            Just (NS _ wo) -> map fst wo
+            _ -> []
+      mapM_ (sc nbc) (wothers \\ map fst wnavigable)
+      mapM_ (\(win, c) -> sc c win) wnavigablec
+      return (origwrs, Just $ WindowNavigation conf $ I $ Just $ NS pt wnavigable)
+  redoLayout _ _ _ origwrs = return (origwrs, Nothing)
+
+  handleMessOrMaybeModifyIt (WindowNavigation conf (I (Just (NS pt wrs)))) m
+    | Just (Go d) <- fromMessage m =
+        case navigable d pt wrs of
+          [] -> return Nothing
+          ((w, r) : _) -> do
+            modify focusWindowHere
+            return $
+              Just $
+                Left $
+                  WindowNavigation conf $
+                    I $
+                      Just $
+                        NS (centerd d pt r) wrs
+            where
+              focusWindowHere :: HState -> HState
+              focusWindowHere s
+                | Just w == W.peek s.windowset = s
+                | has_ w $ W.stack $ W.workspace $ W.current s.windowset =
+                    s
+                      { windowset =
+                          until
+                            ((Just w ==) . W.peek)
+                            W.focusUp
+                            s.windowset
+                      }
+                | otherwise = s
+              has_ _ Nothing = False
+              has_ x (Just (W.Stack t l rr)) = x `elem` (t : l ++ rr)
+    | Just (Swap d) <- fromMessage m =
+        case navigable d pt wrs of
+          [] -> return Nothing
+          ((w, _) : _) -> do
+            let swap st = unint (W.focus st) $ map (swapw (W.focus st)) $ W.integrate st
+                swapw y x
+                  | x == w = y
+                  | x == y = w
+                  | otherwise = x
+                unint f xs = case span (/= f) xs of
+                  (u, _ : dn) ->
+                    W.Stack
+                      { W.focus = f
+                      , W.up = reverse u
+                      , W.down = dn
+                      }
+                  _ ->
+                    W.Stack
+                      { W.focus = f
+                      , W.down = xs
+                      , W.up = []
+                      }
+            windows $ W.modify' swap
+            return Nothing
+    | Just (Move d) <- fromMessage m =
+        case navigable d pt wrs of
+          [] -> return Nothing
+          ((w, _) : _) -> do
+            mst <- gets (W.stack . W.workspace . W.current . view windowset)
+            return $ do
+              st <- mst
+              Just $ Right $ SomeMessage $ MoveWindowToWindow (W.focus st) w
+    | Just (Apply f d) <- fromMessage m =
+        case navigable d pt wrs of
+          [] -> return Nothing
+          ((w, _) : _) -> liftH (f w) >> return Nothing
+    | Just Hide <- fromMessage m =
         do
-            HSWMConfig{normalBorder = nbc, focusedBorder = fbc} <- view config
-
-            let (uc, dc, lc, rc) = case brightness conf of
-                    Just frac -> let myc = mixRGBA frac fbc nbc in (myc, myc, myc, myc)
-                    Nothing -> each %~ parseRgba $ (upColor conf, downColor conf, leftColor conf, rightColor conf)
-
-            let dirc U = uc
-                dirc D = dc
-                dirc L = lc
-                dirc R = rc
-            let w = W.focus s
-                r = case filter ((== w) . fst) origwrs of
-                    ((_, x) : _) -> x
-                    [] -> rscr
-                pt = case st of
-                    Just (NS ptold _) | ptold `inrect` r -> ptold
-                    _ -> center r
-                existing_wins = W.integrate s
-                wrs =
-                    filter ((`elem` existing_wins) . fst) $
-                        filter ((/= r) . snd) $
-                            filter ((/= w) . fst) origwrs
-                wnavigable =
-                    nub $
-                        concatMap
-                            (\d -> take 1 $ navigable d pt wrs)
-                            [U, D, R, L]
-                wnavigablec =
-                    nub $
-                        concatMap
-                            ( \d ->
-                                map (\(win, _) -> (win, dirc d)) $
-                                    take 1 $
-                                        navigable d pt wrs
-                            )
-                            [U, D, R, L]
-                wothers = case st of
-                    Just (NS _ wo) -> map fst wo
-                    _ -> []
-            mapM_ (sc nbc) (wothers \\ map fst wnavigable)
-            mapM_ (\(win, c) -> sc c win) wnavigablec
-            return (origwrs, Just $ WindowNavigation conf $ I $ Just $ NS pt wnavigable)
-    redoLayout _ _ _ origwrs = return (origwrs, Nothing)
-
-    handleMessOrMaybeModifyIt (WindowNavigation conf (I (Just (NS pt wrs)))) m
-        | Just (Go d) <- fromMessage m =
-            case navigable d pt wrs of
-                [] -> return Nothing
-                ((w, r) : _) -> do
-                    modify focusWindowHere
-                    return $
-                        Just $
-                            Left $
-                                WindowNavigation conf $
-                                    I $
-                                        Just $
-                                            NS (centerd d pt r) wrs
-                  where
-                    focusWindowHere :: HState -> HState
-                    focusWindowHere s
-                        | Just w == W.peek s.windowset = s
-                        | has_ w $ W.stack $ W.workspace $ W.current s.windowset =
-                            s
-                                { windowset =
-                                    until
-                                        ((Just w ==) . W.peek)
-                                        W.focusUp
-                                        s.windowset
-                                }
-                        | otherwise = s
-                    has_ _ Nothing = False
-                    has_ x (Just (W.Stack t l rr)) = x `elem` (t : l ++ rr)
-        | Just (Swap d) <- fromMessage m =
-            case navigable d pt wrs of
-                [] -> return Nothing
-                ((w, _) : _) -> do
-                    let swap st = unint (W.focus st) $ map (swapw (W.focus st)) $ W.integrate st
-                        swapw y x
-                            | x == w = y
-                            | x == y = w
-                            | otherwise = x
-                        unint f xs = case span (/= f) xs of
-                            (u, _ : dn) ->
-                                W.Stack
-                                    { W.focus = f
-                                    , W.up = reverse u
-                                    , W.down = dn
-                                    }
-                            _ ->
-                                W.Stack
-                                    { W.focus = f
-                                    , W.down = xs
-                                    , W.up = []
-                                    }
-                    windows $ W.modify' swap
-                    return Nothing
-        | Just (Move d) <- fromMessage m =
-            case navigable d pt wrs of
-                [] -> return Nothing
-                ((w, _) : _) -> do
-                    mst <- gets (W.stack . W.workspace . W.current . view windowset)
-                    return $ do
-                        st <- mst
-                        Just $ Right $ SomeMessage $ MoveWindowToWindow (W.focus st) w
-        | Just (Apply f d) <- fromMessage m =
-            case navigable d pt wrs of
-                [] -> return Nothing
-                ((w, _) : _) -> liftH (f w) >> return Nothing
-        | Just Hide <- fromMessage m =
-            do
-                HSWMConfig{normalBorder = nbc} <- view config
-                mapM_ (sc nbc . fst) wrs
-                return $ Just $ Left $ WindowNavigation conf $ I $ Just $ NS pt []
-        | Just ReleaseResources <- fromMessage m =
-            handleMessOrMaybeModifyIt (WindowNavigation conf (I $ Just (NS pt wrs))) (SomeMessage Hide)
-    handleMessOrMaybeModifyIt _ _ = return Nothing
+          HSWMConfig{normalBorder = nbc} <- view config
+          mapM_ (sc nbc . fst) wrs
+          return $ Just $ Left $ WindowNavigation conf $ I $ Just $ NS pt []
+    | Just ReleaseResources <- fromMessage m =
+        handleMessOrMaybeModifyIt (WindowNavigation conf (I $ Just (NS pt wrs))) (SomeMessage Hide)
+  handleMessOrMaybeModifyIt _ _ = return Nothing
 
 navigable :: Direction2D -> Point -> [(RiverWindow, Rectangle)] -> [(RiverWindow, Rectangle)]
 navigable d pt = sortby d . filter (inr d pt . snd)
@@ -267,33 +263,33 @@ center (Rectangle x y w h) = P (fromIntegral x + fromIntegral w / 2) (fromIntegr
 
 centerd :: Direction2D -> Point -> Rectangle -> Point
 centerd d (P xx yy) (Rectangle x y w h)
-    | d == U || d == D = P xx (fromIntegral y + fromIntegral h / 2)
-    | otherwise = P (fromIntegral x + fromIntegral w / 2) yy
+  | d == U || d == D = P xx (fromIntegral y + fromIntegral h / 2)
+  | otherwise = P (fromIntegral x + fromIntegral w / 2) yy
 
 inr :: Direction2D -> Point -> Rectangle -> Bool
 inr D (P x y) (Rectangle l yr w h) =
-    x >= fromIntegral l
-        && x < fromIntegral l + fromIntegral w
-        && y < fromIntegral yr + fromIntegral h
+  x >= fromIntegral l
+    && x < fromIntegral l + fromIntegral w
+    && y < fromIntegral yr + fromIntegral h
 inr U (P x y) (Rectangle l yr w _) =
-    x >= fromIntegral l
-        && x < fromIntegral l + fromIntegral w
-        && y > fromIntegral yr
+  x >= fromIntegral l
+    && x < fromIntegral l + fromIntegral w
+    && y > fromIntegral yr
 inr R (P a x) (Rectangle b l _ w) =
-    x >= fromIntegral l
-        && x < fromIntegral l + fromIntegral w
-        && a < fromIntegral b
+  x >= fromIntegral l
+    && x < fromIntegral l + fromIntegral w
+    && a < fromIntegral b
 inr L (P a x) (Rectangle b l c w) =
-    x >= fromIntegral l
-        && x < fromIntegral l + fromIntegral w
-        && a > fromIntegral b + fromIntegral c
+  x >= fromIntegral l
+    && x < fromIntegral l + fromIntegral w
+    && a > fromIntegral b + fromIntegral c
 
 inrect :: Point -> Rectangle -> Bool
 inrect (P x y) (Rectangle a b w h) =
-    x > fromIntegral a
-        && x < fromIntegral a + fromIntegral w
-        && y > fromIntegral b
-        && y < fromIntegral b + fromIntegral h
+  x > fromIntegral a
+    && x < fromIntegral a + fromIntegral w
+    && y > fromIntegral b
+    && y < fromIntegral b + fromIntegral h
 
 sortby :: Direction2D -> [(a, Rectangle)] -> [(a, Rectangle)]
 sortby U = sortBy (\(_, Rectangle _ y _ _) (_, Rectangle _ y' _ _) -> compare y' y)

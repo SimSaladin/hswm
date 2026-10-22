@@ -1,27 +1,26 @@
-{- |
-Module      : WL.Viewporter
-Description : default viewporter (client) interface
-Copyright   : (c) Samuli Thomasson, 2026
-
-Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
-Stability   : unstable
-Portability : unportable
--}
+-- |
+-- Module      : WL.Viewporter
+-- Description : default viewporter (client) interface
+-- Copyright   : (c) Samuli Thomasson, 2026
+--
+-- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
+-- Stability   : unstable
+-- Portability : unportable
 module WL.Viewporter (
-    -- * Viewporter
-    Viewporter,
+  -- * Viewporter
+  Viewporter,
 
-    -- ** GetViewport
-    viewporterGetViewport,
+  -- ** GetViewport
+  viewporterGetViewport,
 
-    -- * Viewport
-    Viewport,
+  -- * Viewport
+  Viewport,
 
-    -- ** SetSource
-    viewportSetSource,
+  -- ** SetSource
+  viewportSetSource,
 
-    -- ** SetDestination
-    viewportSetDestination,
+  -- ** SetDestination
+  viewportSetDestination,
 ) where
 
 import WL.Viewporter.V1.Client

@@ -1,26 +1,25 @@
-{- |
-Module      : HSWM
-Description : Short description
-Copyright   : (c) Samuli Thomasson, 2026
-
-Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
-Stability   : unstable
-Portability : unportable
--}
+-- |
+-- Module      : HSWM
+-- Description : Short description
+-- Copyright   : (c) Samuli Thomasson, 2026
+--
+-- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
+-- Stability   : unstable
+-- Portability : unportable
 module HSWM (
-    module HSWM.Core,
-    module HSWM.ManageHook,
-    module HSWM.Config,
-    module HSWM.Layout,
-    module HSWM.Main,
-    module HSWM.Operations,
-    module HSWM.Utils,
-    module HSWM.XKB,
-    module HSWM.InputConfig,
+  module HSWM.Core,
+  module HSWM.ManageHook,
+  module HSWM.Config,
+  module HSWM.Layout,
+  module HSWM.Main,
+  module HSWM.Operations,
+  module HSWM.Utils,
+  module HSWM.XKB,
+  module HSWM.InputConfig,
 
-    -- * Re-exports
-    module Prelude,
-    module ReExports,
+  -- * Re-exports
+  module Prelude,
+  module ReExports,
 )
 where
 

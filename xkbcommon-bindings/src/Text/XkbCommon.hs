@@ -1,17 +1,16 @@
-{- |
-Module      : Text.XkbCommon
-Description : Bindings to libxkbcommon
-Copyright   : (c) Samuli Thomasson, 2026
-
-Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
-Stability   : unstable
-Portability : unportable
-
-Bindings to libxkbcommon.
--}
+-- |
+-- Module      : Text.XkbCommon
+-- Description : Bindings to libxkbcommon
+-- Copyright   : (c) Samuli Thomasson, 2026
+--
+-- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
+-- Stability   : unstable
+-- Portability : unportable
+--
+-- Bindings to libxkbcommon.
 module Text.XkbCommon (
-    module X,
-    def,
+  module X,
+  def,
 ) where
 
 import Text.XkbCommon.Context as X

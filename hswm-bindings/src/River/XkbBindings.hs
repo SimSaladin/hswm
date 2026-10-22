@@ -1,44 +1,43 @@
-{- |
-Module      : River.XkbBindings
-Description :
-Copyright   : (c) Samuli Thomasson, 2026
-
-Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
-Stability   : unstable
-Portability : unportable
--}
+-- |
+-- Module      : River.XkbBindings
+-- Description :
+-- Copyright   : (c) Samuli Thomasson, 2026
+--
+-- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
+-- Stability   : unstable
+-- Portability : unportable
 module River.XkbBindings (
-    -- * RiverXkbBindings
-    RiverXkbBindings,
+  -- * RiverXkbBindings
+  RiverXkbBindings,
 
-    -- ** GetXkbBinding
-    riverXkbBindingsGetXkbBinding,
+  -- ** GetXkbBinding
+  riverXkbBindingsGetXkbBinding,
 
-    -- ** GetSeat
-    riverXkbBindingsGetSeat,
+  -- ** GetSeat
+  riverXkbBindingsGetSeat,
 
-    -- * RiverXkbBinding
-    RiverXkbBinding,
+  -- * RiverXkbBinding
+  RiverXkbBinding,
 
-    -- ** Events
-    RiverXkbBindingEvent (..),
+  -- ** Events
+  RiverXkbBindingEvent (..),
 
-    -- ** Enable / Disable
-    riverXkbBindingEnable,
-    riverXkbBindingDisable,
+  -- ** Enable / Disable
+  riverXkbBindingEnable,
+  riverXkbBindingDisable,
 
-    -- ** SetLayoutOverride
-    riverXkbBindingSetLayoutOverride,
+  -- ** SetLayoutOverride
+  riverXkbBindingSetLayoutOverride,
 
-    -- * RiverXkbBindingsSeat
-    RiverXkbBindingsSeat,
+  -- * RiverXkbBindingsSeat
+  RiverXkbBindingsSeat,
 
-    -- ** Events
-    RiverXkbBindingsSeatEvent (..),
+  -- ** Events
+  RiverXkbBindingsSeatEvent (..),
 
-    -- ** EnsureNextKeyEaten
-    riverXkbBindingsSeatEnsureNextKeyEaten,
-    riverXkbBindingsSeatCancelEnsureNextKeyEaten,
+  -- ** EnsureNextKeyEaten
+  riverXkbBindingsSeatEnsureNextKeyEaten,
+  riverXkbBindingsSeatCancelEnsureNextKeyEaten,
 ) where
 
 import River.XkbBindings.V1.Client

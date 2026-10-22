@@ -1,56 +1,55 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 
-{- |
-Module      : HSWM.Prelude
-Description : Custom Prelude
-Copyright   : (c) Samuli Thomasson, 2026
-
-Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
-Stability   : unstable
-Portability : unportable
--}
+-- |
+-- Module      : HSWM.Prelude
+-- Description : Custom Prelude
+-- Copyright   : (c) Samuli Thomasson, 2026
+--
+-- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
+-- Stability   : unstable
+-- Portability : unportable
 module HSWM.Prelude (
-    -- * Base
-    module RIO.Prelude.Types,
-    module RIO.Prelude,
-    module RIO,
-    module Base,
+  -- * Base
+  module RIO.Prelude.Types,
+  module RIO.Prelude,
+  module RIO,
+  module Base,
 
-    -- * Lenses
-    module Lens.Micro.Platform,
-    Lens.Each,
-    module UnliftIO.Exception.Lens,
+  -- * Lenses
+  module Lens.Micro.Platform,
+  Lens.Each,
+  module UnliftIO.Exception.Lens,
 
-    -- * Logging
-    module Control.Monad.Logger.Aeson,
+  -- * Logging
+  module Control.Monad.Logger.Aeson,
 
-    -- * UnliftIO
-    module UnliftIO,
-    module UnliftIO.Concurrent,
-    module UnliftIO.Directory,
-    module UnliftIO.Environment,
-    module UnliftIO.Foreign,
-    module UnliftIO.IO.File,
+  -- * UnliftIO
+  module UnliftIO,
+  module UnliftIO.Concurrent,
+  module UnliftIO.Directory,
+  module UnliftIO.Environment,
+  module UnliftIO.Foreign,
+  module UnliftIO.IO.File,
 
-    -- * Other
+  -- * Other
 
-    -- ** Async
-    cancelMany,
+  -- ** Async
+  cancelMany,
 
-    -- ** Control.Monad.Catch
-    module Control.Monad.Catch,
+  -- ** Control.Monad.Catch
+  module Control.Monad.Catch,
 
-    -- ** Misc.
-    toText,
-    io,
-    fi,
-    whenJust,
-    module Data.Default,
-    module Misc,
-    BS.StrictByteString,
-    LazyByteString,
-    T.StrictText,
-    TL.LazyText,
+  -- ** Misc.
+  toText,
+  io,
+  fi,
+  whenJust,
+  module Data.Default,
+  module Misc,
+  BS.StrictByteString,
+  LazyByteString,
+  T.StrictText,
+  TL.LazyText,
 ) where
 
 import "unliftio" UnliftIO

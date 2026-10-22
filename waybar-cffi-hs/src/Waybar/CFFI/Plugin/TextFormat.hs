@@ -1,12 +1,11 @@
-{- |
-Module      : Waybar.CFFI.Plugin.TextFormat
-Description : Text formatting helpers
-Copyright   : (c) Samuli Thomasson, 2026
-
-Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
-Stability   : unstable
-Portability : unportable
--}
+-- |
+-- Module      : Waybar.CFFI.Plugin.TextFormat
+-- Description : Text formatting helpers
+-- Copyright   : (c) Samuli Thomasson, 2026
+--
+-- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
+-- Stability   : unstable
+-- Portability : unportable
 module Waybar.CFFI.Plugin.TextFormat where
 
 import Data.Aeson qualified as A
@@ -20,24 +19,24 @@ import GHC.TypeLits
 import Text.ParserCombinators.ReadP qualified as RP
 
 data TextFormat
-    = TFMany [TextFormat]
-    | TFLit !Text
-    | TFInterp !SomeSymbol
-    deriving (Eq, Ord, Show, Read, Generic)
+  = TFMany [TextFormat]
+  | TFLit !Text
+  | TFInterp !SomeSymbol
+  deriving (Eq, Ord, Show, Read, Generic)
 
 instance IsString TextFormat where
-    fromString s = case reverse $ RP.readP_to_S parseTextFormat s of
-        (x, "") : _ -> x
-        _ -> error $ "TextFormat: no parse: " ++ s
+  fromString s = case reverse $ RP.readP_to_S parseTextFormat s of
+    (x, "") : _ -> x
+    _ -> error $ "TextFormat: no parse: " ++ s
 
 instance A.FromJSON TextFormat where
-    parseJSON = A.withText "TextFormat" $ \x ->
-        case reverse $ RP.readP_to_S parseTextFormat $ T.unpack x of
-            (r, "") : _ -> return r
-            _ -> fail $ "no parse: " ++ show x
+  parseJSON = A.withText "TextFormat" $ \x ->
+    case reverse $ RP.readP_to_S parseTextFormat $ T.unpack x of
+      (r, "") : _ -> return r
+      _ -> fail $ "no parse: " ++ show x
 
 instance A.ToJSON TextFormat where
-    toJSON = A.String . ppTextFormat
+  toJSON = A.String . ppTextFormat
 
 ppTextFormat :: TextFormat -> Text
 ppTextFormat = go
@@ -51,8 +50,8 @@ parseTextFormat = (TFMany <$> RP.many (lit RP.+++ interp)) <* RP.eof
   where
     lit = TFLit . T.pack <$> RP.munch1 (/= '{')
     interp = do
-        s <- RP.between (RP.char '{') (RP.char '}') (RP.munch (/= '}'))
-        return $ TFInterp $ someSymbolVal s
+      s <- RP.between (RP.char '{') (RP.char '}') (RP.munch (/= '}'))
+      return $ TFInterp $ someSymbolVal s
 
 runTextFormat :: forall m. (Monad m) => TextFormat -> [(String, m Text)] -> m Text
 runTextFormat fmt vals = go fmt

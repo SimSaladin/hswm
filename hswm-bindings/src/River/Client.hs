@@ -1,12 +1,11 @@
-{- |
-Module      : River.Client
-Description : River client protocols
-Copyright   : (c) Samuli Thomasson, 2026
-
-Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
-Stability   : unstable
-Portability : unportable
--}
+-- |
+-- Module      : River.Client
+-- Description : River client protocols
+-- Copyright   : (c) Samuli Thomasson, 2026
+--
+-- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
+-- Stability   : unstable
+-- Portability : unportable
 module River.Client (module X) where
 
 import River.InputManagement.V1.Client as X

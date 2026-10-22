@@ -1,61 +1,60 @@
-{- |
-Module      : River.InputManagement
-Description : Short description
-Copyright   : (c) Samuli Thomasson, 2026
-
-Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
-Stability   : unstable
-Portability : unportable
-
-River Input Management V1.
-
-See also: "Bindings.River.InputManagementV1"
--}
+-- |
+-- Module      : River.InputManagement
+-- Description : Short description
+-- Copyright   : (c) Samuli Thomasson, 2026
+--
+-- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
+-- Stability   : unstable
+-- Portability : unportable
+--
+-- River Input Management V1.
+--
+-- See also: "Bindings.River.InputManagementV1"
 module River.InputManagement (
-    -- * InputManagement
-    RiverInputManager (..),
+  -- * InputManagement
+  RiverInputManager (..),
 
-    -- ** Events
-    RiverInputManagerEvent (..),
+  -- ** Events
+  RiverInputManagerEvent (..),
 
-    -- ** Requests
+  -- ** Requests
 
-    -- *** CreateSeat
-    riverInputManagerCreateSeat,
+  -- *** CreateSeat
+  riverInputManagerCreateSeat,
 
-    -- *** DestroySeat
-    riverInputManagerDestroySeat,
+  -- *** DestroySeat
+  riverInputManagerDestroySeat,
 
-    -- *** Stop
-    riverInputManagerStop,
+  -- *** Stop
+  riverInputManagerStop,
 
-    -- * RiverInputDevice
-    RiverInputDevice (..),
+  -- * RiverInputDevice
+  RiverInputDevice (..),
 
-    -- ** Events
-    RiverInputDeviceEvent (..),
+  -- ** Events
+  RiverInputDeviceEvent (..),
 
-    -- ** Enums
+  -- ** Enums
 
-    -- *** RiverInputDeviceType
-    RiverInputDeviceType,
+  -- *** RiverInputDeviceType
+  RiverInputDeviceType,
 
-    -- ** Requests
+  -- ** Requests
 
-    -- *** AssignToSeat
-    riverInputDeviceAssignToSeat,
+  -- *** AssignToSeat
+  riverInputDeviceAssignToSeat,
 
-    -- *** SetRepeatInfo
-    riverInputDeviceSetRepeatInfo,
+  -- *** SetRepeatInfo
+  riverInputDeviceSetRepeatInfo,
 
-    -- *** SetScrollFactor
-    riverInputDeviceSetScrollFactor,
+  -- *** SetScrollFactor
+  riverInputDeviceSetScrollFactor,
 
-    -- *** MapToOutput
-    riverInputDeviceMapToOutput,
+  -- *** MapToOutput
+  riverInputDeviceMapToOutput,
 
-    -- *** MapToRectangle
-    riverInputDeviceMapToRectangle,
+  -- *** MapToRectangle
+  riverInputDeviceMapToRectangle,
 ) where
 
 import River.InputManagement.V1.Client

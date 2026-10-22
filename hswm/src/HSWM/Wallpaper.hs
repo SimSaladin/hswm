@@ -1,18 +1,17 @@
-{- |
-Module      : HSWM.Wallpaper
-Description : Short description
-Copyright   : (c) Samuli Thomasson, 2026
-
-Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
-Stability   : unstable
-Portability : unportable
--}
+-- |
+-- Module      : HSWM.Wallpaper
+-- Description : Short description
+-- Copyright   : (c) Samuli Thomasson, 2026
+--
+-- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
+-- Stability   : unstable
+-- Portability : unportable
 module HSWM.Wallpaper (
-    WallpaperConfig (..),
-    usingWallpaper,
-    wpStartupHook,
-    wpExitHook,
-    wpHandleEventHook,
+  WallpaperConfig (..),
+  usingWallpaper,
+  wpStartupHook,
+  wpExitHook,
+  wpHandleEventHook,
 )
 where
 
@@ -33,116 +32,116 @@ import Data.Vector.Storable qualified as V
 -- * Usage
 
 newtype WallpaperConfig = WallpaperConfig {filepath :: FilePath}
-    deriving stock (Eq, Ord, Show, Read)
+  deriving stock (Eq, Ord, Show, Read)
 
 usingWallpaper :: WallpaperConfig -> HSWMConfig H l -> HSWMConfig H l
 usingWallpaper cfg userConf =
-    userConf
-        { startupHook = userConf.startupHook <> wpStartupHook cfg
-        , exitHook = userConf.exitHook <> wpExitHook
-        , renderHook = userConf.renderHook <> render
-        , handleEventHook = userConf.handleEventHook <> wpHandleEventHook
-        }
+  userConf
+    { startupHook = userConf.startupHook <> wpStartupHook cfg
+    , exitHook = userConf.exitHook <> wpExitHook
+    , renderHook = userConf.renderHook <> render
+    , handleEventHook = userConf.handleEventHook <> wpHandleEventHook
+    }
 
 -- * Implementation
 
 -- ** Types
 
 data Ctx = Ctx
-    { bufferPool :: !(Maybe BP.ImageBufferPool)
-    , outputsState :: !(Map RiverOutput OutputState)
-    , src_image :: !(Maybe (JP.Image JP.PixelRGBA8))
-    }
-    deriving (Generic)
-    deriving anyclass (Default)
+  { bufferPool :: !(Maybe BP.ImageBufferPool)
+  , outputsState :: !(Map RiverOutput OutputState)
+  , src_image :: !(Maybe (JP.Image JP.PixelRGBA8))
+  }
+  deriving (Generic)
+  deriving anyclass (Default)
 
 data OutputState = OutputState
-    { out_x
-      , out_y
-      , out_width
-      , out_height
-      , scale ::
-        {-# UNPACK #-} !Int32
-    , pref_fract_scale :: {-# UNPACK #-} !Word32
-    , name :: !String
-    , pending_render :: {-# UNPACK #-} !Bool
-    , configured :: {-# UNPACK #-} !Bool
-    , wl_output :: {-# UNPACK #-} !WL.Output
-    , surfaces :: !(Maybe Surfaces)
-    }
-    deriving (Generic)
+  { out_x
+    , out_y
+    , out_width
+    , out_height
+    , scale ::
+      {-# UNPACK #-} !Int32
+  , pref_fract_scale :: {-# UNPACK #-} !Word32
+  , name :: !String
+  , pending_render :: {-# UNPACK #-} !Bool
+  , configured :: {-# UNPACK #-} !Bool
+  , wl_output :: {-# UNPACK #-} !WL.Output
+  , surfaces :: !(Maybe Surfaces)
+  }
+  deriving (Generic)
 
 instance Default OutputState where
-    def = OutputState 0 0 0 0 1 0 "" False False def def
+  def = OutputState 0 0 0 0 1 0 "" False False def def
 
 data Surfaces = Surfaces
-    { wl_surface :: {-# UNPACK #-} !WL.Surface
-    , layerSurface :: {-# UNPACK #-} !Wlr.LayerSurface
-    , outViewport :: !(Maybe VP.Viewport)
-    , surfacesCleanup :: !(IO ())
-    }
-    deriving (Generic)
+  { wl_surface :: {-# UNPACK #-} !WL.Surface
+  , layerSurface :: {-# UNPACK #-} !Wlr.LayerSurface
+  , outViewport :: !(Maybe VP.Viewport)
+  , surfacesCleanup :: !(IO ())
+  }
+  deriving (Generic)
 
 -- ** Hooks
 
 wpStartupHook :: WallpaperConfig -> H ()
 wpStartupHook conf = do
-    logInfo $ "wallpaper: startup" :# ["config" .= show conf]
-    ctx <- getObjectDef @Ctx
-    -- create bufferpool if missing
-    when (isNothing ctx.bufferPool) $ do
-        bp <- BP.newImageBufferPool
-        modifyObjectDef $ \c -> c{bufferPool = Just bp}
-    -- load source image
-    tryLoadImage (filepath conf)
+  logInfo $ "wallpaper: startup" :# ["config" .= show conf]
+  ctx <- getObjectDef @Ctx
+  -- create bufferpool if missing
+  when (isNothing ctx.bufferPool) $ do
+    bp <- BP.newImageBufferPool
+    modifyObjectDef $ \c -> c{bufferPool = Just bp}
+  -- load source image
+  tryLoadImage (filepath conf)
 
 wpExitHook :: (HasCallStack) => H ()
 wpExitHook = do
-    logInfo "wallpaper: exiting"
-    deinit
+  logInfo "wallpaper: exiting"
+  deinit
 
 wpHandleEventHook :: Event -> H All
 wpHandleEventHook (WindowManagerEvent (R.RiverWindowManagerOutput{})) = do
-    modifyObjectDef $ \c -> c{bufferPool = fmap (BP.incSurfaceCount 1) (bufferPool c)}
-    mempty
+  modifyObjectDef $ \c -> c{bufferPool = fmap (BP.incSurfaceCount 1) (bufferPool c)}
+  mempty
 wpHandleEventHook (OutputEvent (R.RiverOutputDimensions _ ro w h)) = do
-    updateOutputState ro $ \a -> a{pending_render = True, out_width = fi w, out_height = fi h}
-    mempty
+  updateOutputState ro $ \a -> a{pending_render = True, out_width = fi w, out_height = fi h}
+  mempty
 wpHandleEventHook (OutputEvent (R.RiverOutputPosition _ ro x y)) = do
-    updateOutputState ro $ \a -> a{pending_render = True, out_x = fi x, out_y = fi y}
-    mempty
+  updateOutputState ro $ \a -> a{pending_render = True, out_x = fi x, out_y = fi y}
+  mempty
 wpHandleEventHook (OutputEvent (R.RiverOutputRemoved _ ro)) = do
-    withOutputState ro deinitOutput
-    modifyObjectDef $ \c ->
-        c
-            { bufferPool = fmap (BP.incSurfaceCount (-1)) (bufferPool c)
-            , outputsState = M.delete ro c.outputsState
-            }
-    mempty
+  withOutputState ro deinitOutput
+  modifyObjectDef $ \c ->
+    c
+      { bufferPool = fmap (BP.incSurfaceCount (-1)) (bufferPool c)
+      , outputsState = M.delete ro c.outputsState
+      }
+  mempty
 wpHandleEventHook (WlOutputEvent (WL.OutputScale ro _ scale)) = do
-    let ro' = R.RiverOutput $ castPtr ro
-    updateOutputState ro' $ \x -> x{pending_render = True, scale = scale}
-    mempty
+  let ro' = R.RiverOutput $ castPtr ro
+  updateOutputState ro' $ \x -> x{pending_render = True, scale = scale}
+  mempty
 wpHandleEventHook (WlOutputEvent (WL.OutputName ro wl_output name)) = do
-    let ro' = R.RiverOutput $ castPtr ro
-    updateOutputState ro' $ \x -> x{name, wl_output}
-    mempty
+  let ro' = R.RiverOutput $ castPtr ro
+  updateOutputState ro' $ \x -> x{name, wl_output}
+  mempty
 wpHandleEventHook (WlOutputEvent (WL.OutputDone ro _)) = do
-    let ro' = R.RiverOutput $ castPtr ro
-    initOutput ro'
-    mempty
+  let ro' = R.RiverOutput $ castPtr ro
+  initOutput ro'
+  mempty
 wpHandleEventHook _ = mempty
 
 -- ** Loading image files
 
 tryLoadImage :: FilePath -> H ()
 tryLoadImage fp =
-    io (doesFileExist fp) >>= \case
-        True ->
-            io (JP.readImageWithMetadata fp) >>= \case
-                Right (dynimg, _metadata) -> modifyObjectDef $ \ctx -> ctx{src_image = Just $ JP.convertRGBA8 dynimg}
-                Left _ -> return ()
-        False -> return ()
+  io (doesFileExist fp) >>= \case
+    True ->
+      io (JP.readImageWithMetadata fp) >>= \case
+        Right (dynimg, _metadata) -> modifyObjectDef $ \ctx -> ctx{src_image = Just $ JP.convertRGBA8 dynimg}
+        Left _ -> return ()
+    False -> return ()
 
 -- ** Manage and Render
 
@@ -154,88 +153,88 @@ calculateTransform src out scale = (fi src / scale - fi out) / 2 / scale
 
 render :: H ()
 render = do
-    ctx <- getObjectDef @Ctx
-    forM_ (M.toList ctx.outputsState) $ \(ro, os) ->
-        case (ctx.bufferPool, ctx.src_image, os.surfaces) of
-            (Just bp, Just img, Just surfaces) -> when (os.pending_render && os.configured && os.out_width > 0 && os.out_height > 0) $ do
-                drawImage bp os img surfaces
-                updateOutputState ro $ \x -> x{pending_render = False}
-            _ -> return ()
+  ctx <- getObjectDef @Ctx
+  forM_ (M.toList ctx.outputsState) $ \(ro, os) ->
+    case (ctx.bufferPool, ctx.src_image, os.surfaces) of
+      (Just bp, Just img, Just surfaces) -> when (os.pending_render && os.configured && os.out_width > 0 && os.out_height > 0) $ do
+        drawImage bp os img surfaces
+        updateOutputState ro $ \x -> x{pending_render = False}
+      _ -> return ()
 
 drawImage :: BP.ImageBufferPool -> OutputState -> JP.Image JP.PixelRGBA8 -> Surfaces -> H ()
 drawImage bp OutputState{..} img Surfaces{..} = do
-    let w = out_width
-        h = out_height
-        src_w = JP.imageWidth img
-        src_h = JP.imageHeight img
-        src_stride = src_w * 4
-        shmFormat = WL.ShmFormatABGR8888
-        pixmanFormat = getPixmanFormatBE shmFormat
+  let w = out_width
+      h = out_height
+      src_w = JP.imageWidth img
+      src_h = JP.imageHeight img
+      src_stride = src_w * 4
+      shmFormat = WL.ShmFormatABGR8888
+      pixmanFormat = getPixmanFormatBE shmFormat
 
-        -- Calculate the buffer size
-        buf_size@(buf_w, buf_h)
-            | pref_fract_scale > 0 =
-                let buffer_width = ceiling $ (fi w * fi pref_fract_scale + fract_denom / 2 :: Double) / fract_denom
-                    buffer_height = ceiling $ (fi h * fi pref_fract_scale + fract_denom / 2 :: Double) / fract_denom
-                    fract_denom = 120
-                 in (buffer_width, buffer_height)
-            | otherwise = (w * scale, h * scale)
+      -- Calculate the buffer size
+      buf_size@(buf_w, buf_h)
+        | pref_fract_scale > 0 =
+            let buffer_width = ceiling $ (fi w * fi pref_fract_scale + fract_denom / 2 :: Double) / fract_denom
+                buffer_height = ceiling $ (fi h * fi pref_fract_scale + fract_denom / 2 :: Double) / fract_denom
+                fract_denom = 120
+             in (buffer_width, buffer_height)
+        | otherwise = (w * scale, h * scale)
 
-        -- calculate scale
-        sx' = calculateScale src_w buf_w 1 -- scale
-        sy' = calculateScale src_h buf_h 1 -- scale
-        (sx, sy) = if sx' > sy' then (sy', sy') else (sx', sx')
+      -- calculate scale
+      sx' = calculateScale src_w buf_w 1 -- scale
+      sy' = calculateScale src_h buf_h 1 -- scale
+      (sx, sy) = if sx' > sy' then (sy', sy') else (sx', sx')
 
-        tx = calculateTransform src_w buf_w sx
-        ty = calculateTransform src_h buf_h sy
+      tx = calculateTransform src_w buf_w sx
+      ty = calculateTransform src_h buf_h sy
 
-    -- Set opaque region
-    compositor <- getObject
-    WL.withNewRegion compositor $ \opaqueRegion -> do
-        WL.regionAdd opaqueRegion 0 0 w h
-        WL.surfaceSetOpaqueRegion wl_surface opaqueRegion
+  -- Set opaque region
+  compositor <- getObject
+  WL.withNewRegion compositor $ \opaqueRegion -> do
+    WL.regionAdd opaqueRegion 0 0 w h
+    WL.surfaceSetOpaqueRegion wl_surface opaqueRegion
 
-    buf <- BP.nextBuffer bp shmFormat (fi buf_w) (fi buf_h)
+  buf <- BP.nextBuffer bp shmFormat (fi buf_w) (fi buf_h)
 
-    logDebug $
-        "drawing wallpaper"
-            :# [ "out" .= name
-               , "out-size" .= (w, h)
-               , "out-scale" .= scale
-               , "out-fscale" .= pref_fract_scale
-               , "src-size" .= (src_w, src_h)
-               , "buf-size" .= buf_size
-               , "calc-scale" .= ((sx', sy'), (sx, sy))
-               , "calc-trans" .= (tx, ty)
-               ]
+  logDebug $
+    "drawing wallpaper"
+      :# [ "out" .= name
+         , "out-size" .= (w, h)
+         , "out-scale" .= scale
+         , "out-fscale" .= pref_fract_scale
+         , "src-size" .= (src_w, src_h)
+         , "buf-size" .= buf_size
+         , "calc-scale" .= ((sx', sy'), (sx, sy))
+         , "calc-trans" .= (tx, ty)
+         ]
 
-    _ <- io $ V.unsafeWith (JP.imageData img) $ \bits -> do
-        let trans =
-                P.transformScale sx sy False $
-                    P.transformTranslate tx ty False P.transformIdentity
-        let pix =
-                P.imageSetFilter P.FilterBest [] $
-                    P.imageSetTransform (P.fromFTransform trans) $
-                        P.imageWithBits pixmanFormat (fi src_w, fi src_h) True (castPtr bits) (fi src_stride)
-        let dest =
-                P.imageSetComposite32 (P.setComposite32 pix){P.op = P.OpSrc, P.size = (buf_w, buf_h)} $
-                    P.imageWithBits pixmanFormat (buf.width, buf.height) False (castPtr buf.ptr) buf.stride
-        P.createImage dest
+  _ <- io $ V.unsafeWith (JP.imageData img) $ \bits -> do
+    let trans =
+          P.transformScale sx sy False $
+            P.transformTranslate tx ty False P.transformIdentity
+    let pix =
+          P.imageSetFilter P.FilterBest [] $
+            P.imageSetTransform (P.fromFTransform trans) $
+              P.imageWithBits pixmanFormat (fi src_w, fi src_h) True (castPtr bits) (fi src_stride)
+    let dest =
+          P.imageSetComposite32 (P.setComposite32 pix){P.op = P.OpSrc, P.size = (buf_w, buf_h)} $
+            P.imageWithBits pixmanFormat (buf.width, buf.height) False (castPtr buf.ptr) buf.stride
+    P.createImage dest
 
-    WL.surfaceAttach wl_surface buf.buf 0 0
-    WL.surfaceDamageBuffer wl_surface 0 0 buf_w buf_h
-    case outViewport of
-        Just vp -> VP.viewportSetDestination vp w h
-        Nothing -> return () -- io $ WL.surfaceSetBufferScale wl_surface scale -- XXX
-    WL.surfaceCommit wl_surface
+  WL.surfaceAttach wl_surface buf.buf 0 0
+  WL.surfaceDamageBuffer wl_surface 0 0 buf_w buf_h
+  case outViewport of
+    Just vp -> VP.viewportSetDestination vp w h
+    Nothing -> return () -- io $ WL.surfaceSetBufferScale wl_surface scale -- XXX
+  WL.surfaceCommit wl_surface
 
 -- | Destroy ctx
 deinit :: H ()
 deinit = do
-    ctx <- getObjectDef @Ctx
-    forM_ ctx.outputsState $ deinitOutput
-    forM_ ctx.bufferPool $ io . BP.destroyImageBufferPool
-    modifyObjectDef $ \c -> c{outputsState = mempty, bufferPool = def}
+  ctx <- getObjectDef @Ctx
+  forM_ ctx.outputsState $ deinitOutput
+  forM_ ctx.bufferPool $ io . BP.destroyImageBufferPool
+  modifyObjectDef $ \c -> c{outputsState = mempty, bufferPool = def}
 
 deinitOutput :: OutputState -> H ()
 deinitOutput os = forM_ os.surfaces $ \ss -> io ss.surfacesCleanup
@@ -243,72 +242,72 @@ deinitOutput os = forM_ os.surfaces $ \ss -> io ss.surfacesCleanup
 -- | Create surface etc.
 initOutput :: RiverOutput -> H ()
 initOutput ro = withOutputState ro $ \os -> do
-    compositor <- getObject
-    let w = os.out_width
-        h = os.out_height
-    ss <- case os.surfaces of
-        Just ss -> return ss
-        Nothing -> do
-            runInIO <- askRunInIO
+  compositor <- getObject
+  let w = os.out_width
+      h = os.out_height
+  ss <- case os.surfaces of
+    Just ss -> return ss
+    Nothing -> do
+      runInIO <- askRunInIO
 
-            -- 1: wl_surface
-            wl_surface <- WL.compositorCreateSurface compositor
-            -- surface: set no input region
-            WL.withNewRegion compositor $ WL.surfaceSetInputRegion wl_surface
+      -- 1: wl_surface
+      wl_surface <- WL.compositorCreateSurface compositor
+      -- surface: set no input region
+      WL.withNewRegion compositor $ WL.surfaceSetInputRegion wl_surface
 
-            -- 2: fractional scale
-            fractSurface <- withObject $ flip FS.fractionalScaleManagerGetFractionalScale wl_surface
-            -- fractional scale listener
-            fsl <- WL.createListener $ \case
-                FS.FractionalScalePreferredScale _ _ fscale -> runInIO $ do
-                    logInfo $ "wallpaper: fractional scale updated" :# ["fractional-scale" .= fscale, "output" .= show ro]
-                    updateOutputState ro $ \x -> x{pref_fract_scale = fscale, pending_render = True}
-            WL.listenerAdd_ fractSurface fsl
+      -- 2: fractional scale
+      fractSurface <- withObject $ flip FS.fractionalScaleManagerGetFractionalScale wl_surface
+      -- fractional scale listener
+      fsl <- WL.createListener $ \case
+        FS.FractionalScalePreferredScale _ _ fscale -> runInIO $ do
+          logInfo $ "wallpaper: fractional scale updated" :# ["fractional-scale" .= fscale, "output" .= show ro]
+          updateOutputState ro $ \x -> x{pref_fract_scale = fscale, pending_render = True}
+      WL.listenerAdd_ fractSurface fsl
 
-            -- 3: viewport
-            viewport <- withObject $ flip VP.viewporterGetViewport wl_surface
+      -- 3: viewport
+      viewport <- withObject $ flip VP.viewporterGetViewport wl_surface
 
-            -- 4: layer_surface
-            layerSurface <- withObject $ \ls ->
-                Wlr.layerShellGetLayerSurface ls wl_surface os.wl_output Wlr.ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND (Just "wallpaper")
-            Wlr.layerSurfaceSetSize layerSurface 0 0
-            Wlr.layerSurfaceSetAnchor layerSurface (R.toCEnum $ 1 + 2 + 4 + 8)
-            Wlr.layerSurfaceSetExclusiveZone layerSurface (-1)
-            -- layersurface listener
-            lsListener <- WL.createListener $ \case
-                Wlr.LayerSurfaceConfigure _ ls serial cw ch -> runInIO $ do
-                    Wlr.layerSurfaceAckConfigure ls serial
-                    updateOutputState ro $ \x ->
-                        x
-                            { out_width = fi cw
-                            , out_height = fi ch
-                            , configured = True
-                            , pending_render = not x.configured || (x.out_width, x.out_height) /= (fi cw, fi ch)
-                            }
-                -- logDebug $ "wallpaper: layer surface configure" :# [ "size" .= show (cw, ch), "old-size" .= show (w, h), "output" .= show ro ]
-                Wlr.LayerSurfaceClosed{} -> runInIO $ logError "Layer surface closed!"
-            WL.listenerAdd_ layerSurface lsListener
+      -- 4: layer_surface
+      layerSurface <- withObject $ \ls ->
+        Wlr.layerShellGetLayerSurface ls wl_surface os.wl_output Wlr.ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND (Just "wallpaper")
+      Wlr.layerSurfaceSetSize layerSurface 0 0
+      Wlr.layerSurfaceSetAnchor layerSurface (R.toCEnum $ 1 + 2 + 4 + 8)
+      Wlr.layerSurfaceSetExclusiveZone layerSurface (-1)
+      -- layersurface listener
+      lsListener <- WL.createListener $ \case
+        Wlr.LayerSurfaceConfigure _ ls serial cw ch -> runInIO $ do
+          Wlr.layerSurfaceAckConfigure ls serial
+          updateOutputState ro $ \x ->
+            x
+              { out_width = fi cw
+              , out_height = fi ch
+              , configured = True
+              , pending_render = not x.configured || (x.out_width, x.out_height) /= (fi cw, fi ch)
+              }
+        -- logDebug $ "wallpaper: layer surface configure" :# [ "size" .= show (cw, ch), "old-size" .= show (w, h), "output" .= show ro ]
+        Wlr.LayerSurfaceClosed{} -> runInIO $ logError "Layer surface closed!"
+      WL.listenerAdd_ layerSurface lsListener
 
-            -- finally:
-            WL.surfaceCommit wl_surface
+      -- finally:
+      WL.surfaceCommit wl_surface
 
-            let surfacesCleanup = do
-                    WL.objectDestroy layerSurface
-                    WL.objectDestroy viewport
-                    WL.objectDestroy fractSurface
-                    WL.objectDestroy wl_surface
-                    WL.freeListener fsl
-                    WL.freeListener lsListener
+      let surfacesCleanup = do
+            WL.objectDestroy layerSurface
+            WL.objectDestroy viewport
+            WL.objectDestroy fractSurface
+            WL.objectDestroy wl_surface
+            WL.freeListener fsl
+            WL.freeListener lsListener
 
-            return $ Surfaces{outViewport = Just viewport, ..}
+      return $ Surfaces{outViewport = Just viewport, ..}
 
-    -- set opaque region
-    WL.withNewRegion compositor $ \opaqueRegion -> do
-        WL.regionAdd opaqueRegion 0 0 w h
-        WL.surfaceSetOpaqueRegion ss.wl_surface opaqueRegion
+  -- set opaque region
+  WL.withNewRegion compositor $ \opaqueRegion -> do
+    WL.regionAdd opaqueRegion 0 0 w h
+    WL.surfaceSetOpaqueRegion ss.wl_surface opaqueRegion
 
-    -- Update ctx
-    updateOutputState ro $ \x -> x{surfaces = Just ss}
+  -- Update ctx
+  updateOutputState ro $ \x -> x{surfaces = Just ss}
 
 ------------------------------------------
 -- Internal boilerplate

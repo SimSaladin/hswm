@@ -1,60 +1,59 @@
-{- |
-Module      : River.XkbConfig
-Description : Short description
-Copyright   : (c) Samuli Thomasson, 2026
-
-Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
-Stability   : unstable
-Portability : unportable
--}
+-- |
+-- Module      : River.XkbConfig
+-- Description : Short description
+-- Copyright   : (c) Samuli Thomasson, 2026
+--
+-- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
+-- Stability   : unstable
+-- Portability : unportable
 module River.XkbConfig (
-    -- * RiverXkbConfig
-    RiverXkbConfig (..),
+  -- * RiverXkbConfig
+  RiverXkbConfig (..),
 
-    -- ** Events
-    RiverXkbConfigEvent (..),
+  -- ** Events
+  RiverXkbConfigEvent (..),
 
-    -- ** Requests
+  -- ** Requests
 
-    -- *** Stop
-    riverXkbConfigStop,
+  -- *** Stop
+  riverXkbConfigStop,
 
-    -- *** CreateKeymap
-    riverXkbConfigCreateKeymap,
+  -- *** CreateKeymap
+  riverXkbConfigCreateKeymap,
 
-    -- ** KeymapFormat
-    RiverXkbConfigKeymapFormat,
-    pattern RiverXkbConfigKeymapFormatTextV1,
-    pattern RiverXkbConfigKeymapFormatTextV2,
+  -- ** KeymapFormat
+  RiverXkbConfigKeymapFormat,
+  pattern RiverXkbConfigKeymapFormatTextV1,
+  pattern RiverXkbConfigKeymapFormatTextV2,
 
-    -- * RiverXkbKeymap
-    RiverXkbKeymap (..),
+  -- * RiverXkbKeymap
+  RiverXkbKeymap (..),
 
-    -- ** Events
-    RiverXkbKeymapEvent (..),
+  -- ** Events
+  RiverXkbKeymapEvent (..),
 
-    -- * RiverXkbKeyboard
-    RiverXkbKeyboard (..),
+  -- * RiverXkbKeyboard
+  RiverXkbKeyboard (..),
 
-    -- ** Events
-    RiverXkbKeyboardEvent (..),
+  -- ** Events
+  RiverXkbKeyboardEvent (..),
 
-    -- ** Requests
+  -- ** Requests
 
-    -- *** SetKeymap
-    riverXkbKeyboardSetKeymap,
+  -- *** SetKeymap
+  riverXkbKeyboardSetKeymap,
 
-    -- *** SetLayout
-    riverXkbKeyboardSetLayoutByIndex,
-    riverXkbKeyboardSetLayoutByName,
+  -- *** SetLayout
+  riverXkbKeyboardSetLayoutByIndex,
+  riverXkbKeyboardSetLayoutByName,
 
-    -- *** Capslock
-    riverXkbKeyboardCapslockEnable,
-    riverXkbKeyboardCapslockDisable,
+  -- *** Capslock
+  riverXkbKeyboardCapslockEnable,
+  riverXkbKeyboardCapslockDisable,
 
-    -- *** Numlock
-    riverXkbKeyboardNumlockEnable,
-    riverXkbKeyboardNumlockDisable,
+  -- *** Numlock
+  riverXkbKeyboardNumlockEnable,
+  riverXkbKeyboardNumlockDisable,
 ) where
 
 import River.XkbConfig.V1.Client

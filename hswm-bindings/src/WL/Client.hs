@@ -1,477 +1,476 @@
 {-# LANGUAGE PatternSynonyms #-}
 {-# OPTIONS_GHC -Wno-missing-pattern-synonym-signatures #-}
 
-{- |
-Module      : Wayland
-Description : Wayland bindings
-Copyright   : (c) Samuli Thomasson, 2026
-
-Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
-Stability   : unstable
-Portability : unportable
--}
+-- |
+-- Module      : Wayland
+-- Description : Wayland bindings
+-- Copyright   : (c) Samuli Thomasson, 2026
+--
+-- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
+-- Stability   : unstable
+-- Portability : unportable
 module WL.Client (
-    -- * Objects
-    IsWlObject (..),
-    HasDestructor (..),
-    HasInterface (..),
-    Version,
-    ObjectName,
-    getObjectId,
-    getObjectDisplay,
-
-    -- ** Object Tags
-    Tag,
-    newTag,
-    getObjectTag,
-    setObjectTag,
-
-    -- ** Listeners
-    HasListener (..),
-    IsUserData (..),
-    listenerAdd,
-    listenerAdd_,
+  -- * Objects
+  IsWlObject (..),
+  HasDestructor (..),
+  HasInterface (..),
+  Version,
+  ObjectName,
+  getObjectId,
+  getObjectDisplay,
+
+  -- ** Object Tags
+  Tag,
+  newTag,
+  getObjectTag,
+  setObjectTag,
+
+  -- ** Listeners
+  HasListener (..),
+  IsUserData (..),
+  listenerAdd,
+  listenerAdd_,
 
-    -- * Exceptions
-    WaylandClientException (..),
-
-    -- * Display
-    Display,
-
-    -- ** Events
-    DisplayEvent (..),
-
-    -- ** Create EventQueue
-    displayCreateQueue,
-    displayCreateQueueWithName,
-
-    -- ** EventQueue
-    EventQueue,
-    eventQueueGetName,
-
-    -- ** Connect
-    Client.displayConnect,
-    Client.displayConnectToFd,
-
-    -- ** Disconnect
-    Client.displayDisconnect,
-
-    -- ** Get Registry
-    Client.displayGetRegistry,
-
-    -- ** SetMaxBufferSize
-    Client.displaySetMaxBufferSize,
-
-    -- ** Roundtrip
-    Client.displayRoundtrip,
-    Client.displayRoundtripQueue,
-
-    -- ** Flush
-    Client.displayFlush,
-
-    -- ** Sync
-    Client.displaySync,
-
-    -- ** Read / prepare read
-    Client.displayReadEvents,
-    Client.displayPrepareReadQueue,
-    Client.displayPrepareRead,
-    Client.displayCancelRead,
-
-    -- ** Dispatch
-    Client.displayDispatch,
-    Client.displayDispatchQueue,
-    Client.displayDispatchTimeout,
-    Client.displayDispatchQueueTimeout,
-    Client.displayDispatchQueuePending,
-    Client.displayDispatchPending,
-
-    -- ** Misc.
-    Client.displayThrowIfError,
-    Client.displayGetFd,
-    Client.displayGetError,
-    Client.displayGetProtocolError,
-
-    -- * Registry & Globals
-    module WL.Client.Registry,
-
-    -- * Callback
-    Callback,
-
-    -- ** Events
-    CallbackEvent (..),
-
-    -- * Compositor
-    Compositor,
-
-    -- ** CreateSurface
-    Client.compositorCreateSurface,
-
-    -- ** CreateRegion
-    withNewRegion,
-    Client.compositorCreateRegion,
-
-    -- * ShmPool
-    ShmPool,
-
-    -- ** CreateBuffer
-    Client.shmPoolCreateBuffer,
-
-    -- ** Resize
-    Client.shmPoolResize,
-
-    -- * Shm
-    Shm,
-
-    -- ** Events
-    ShmEvent (..),
-
-    -- ** CreatePool
-    shmCreatePool,
-
-    -- ** SHM Formats
-    ShmFormat,
-    pattern ShmFormatARGB8888,
-    pattern ShmFormatXRGB8888,
-    pattern ShmFormatC8,
-    pattern ShmFormatRGB332,
-    pattern ShmFormatBGR233,
-    pattern ShmFormatXRGB4444,
-    pattern ShmFormatXBGR4444,
-    pattern ShmFormatRGBX4444,
-    pattern ShmFormatBGRX4444,
-    pattern ShmFormatARGB4444,
-    pattern ShmFormatABGR4444,
-    pattern ShmFormatRGBA4444,
-    pattern ShmFormatBGRA4444,
-    pattern ShmFormatXRGB1555,
-    pattern ShmFormatXBGR1555,
-    pattern ShmFormatRGBX5551,
-    pattern ShmFormatBGRX5551,
-    pattern ShmFormatARGB1555,
-    pattern ShmFormatABGR1555,
-    pattern ShmFormatRGBA5551,
-    pattern ShmFormatBGRA5551,
-    pattern ShmFormatRGB565,
-    pattern ShmFormatBGR565,
-    pattern ShmFormatRGB888,
-    pattern ShmFormatBGR888,
-    pattern ShmFormatXBGR8888,
-    pattern ShmFormatRGBX8888,
-    pattern ShmFormatBGRX8888,
-    pattern ShmFormatABGR8888,
-    pattern ShmFormatRGBA8888,
-    pattern ShmFormatBGRA8888,
-    pattern ShmFormatXRGB2101010,
-    pattern ShmFormatXBGR2101010,
-    pattern ShmFormatRGBX1010102,
-    pattern ShmFormatBGRX1010102,
-    pattern ShmFormatARGB2101010,
-    pattern ShmFormatABGR2101010,
-    pattern ShmFormatRGBA1010102,
-    pattern ShmFormatBGRA1010102,
-    pattern ShmFormatYUYV,
-    pattern ShmFormatYVYU,
-    pattern ShmFormatUYVY,
-    pattern ShmFormatVYUY,
-    pattern ShmFormatAYUV,
-    pattern ShmFormatNV12,
-    pattern ShmFormatNV21,
-    pattern ShmFormatNV16,
-    pattern ShmFormatNV61,
-    pattern ShmFormatYUV410,
-    pattern ShmFormatYVU410,
-    pattern ShmFormatYUV411,
-    pattern ShmFormatYVU411,
-    pattern ShmFormatYUV420,
-    pattern ShmFormatYVU420,
-    pattern ShmFormatYUV422,
-    pattern ShmFormatYVU422,
-    pattern ShmFormatYUV444,
-    pattern ShmFormatYVU444,
-    pattern ShmFormatR8,
-    pattern ShmFormatR16,
-    pattern ShmFormatRG88,
-    pattern ShmFormatGR88,
-    pattern ShmFormatRG1616,
-    pattern ShmFormatGR1616,
-    pattern ShmFormatXRGB16161616F,
-    pattern ShmFormatXBGR16161616F,
-    pattern ShmFormatARGB16161616F,
-    pattern ShmFormatABGR16161616F,
-    pattern ShmFormatXYUV8888,
-    pattern ShmFormatVUY888,
-    pattern ShmFormatVUY101010,
-    pattern ShmFormatY210,
-    pattern ShmFormatY212,
-    pattern ShmFormatY216,
-    pattern ShmFormatY410,
-    pattern ShmFormatY412,
-    pattern ShmFormatY416,
-    pattern ShmFormatXVYU2101010,
-    pattern ShmFormatXVYU12_16161616,
-    pattern ShmFormatXVYU16161616,
-    pattern ShmFormatY0L0,
-    pattern ShmFormatX0L0,
-    pattern ShmFormatY0L2,
-    pattern ShmFormatX0L2,
-    pattern ShmFormatYUV420_8BIT,
-    pattern ShmFormatYUV420_10BIT,
-    pattern ShmFormatXRGB8888_A8,
-    pattern ShmFormatXBGR8888_A8,
-    pattern ShmFormatRGBX8888_A8,
-    pattern ShmFormatBGRX8888_A8,
-    pattern ShmFormatRGB888_A8,
-    pattern ShmFormatBGR888_A8,
-    pattern ShmFormatRGB565_A8,
-    pattern ShmFormatBGR565_A8,
-    pattern ShmFormatNV24,
-    pattern ShmFormatNV42,
-    pattern ShmFormatP210,
-    pattern ShmFormatP010,
-    pattern ShmFormatP012,
-    pattern ShmFormatP016,
-    pattern ShmFormatAXBXGXRX106106106106,
-    pattern ShmFormatNV15,
-    pattern ShmFormatQ410,
-    pattern ShmFormatQ401,
-    pattern ShmFormatXRGB16161616,
-    pattern ShmFormatXBGR16161616,
-    pattern ShmFormatARGB16161616,
-    pattern ShmFormatABGR16161616,
-    pattern ShmFormatC1,
-    pattern ShmFormatC2,
-    pattern ShmFormatC4,
-    pattern ShmFormatD1,
-    pattern ShmFormatD2,
-    pattern ShmFormatD4,
-    pattern ShmFormatD8,
-    pattern ShmFormatR1,
-    pattern ShmFormatR2,
-    pattern ShmFormatR4,
-    pattern ShmFormatR10,
-    pattern ShmFormatR12,
-    pattern ShmFormatAVUY8888,
-    pattern ShmFormatXVUY8888,
-    pattern ShmFormatP030,
-
-    -- * Buffer
-    Buffer,
-
-    -- ** Events
-    BufferEvent (..),
-
-    -- * Shell
-    Shell,
-
-    -- ** GetShellSurface
-    Client.shellGetShellSurface,
-
-    -- * ShellSurface
-    ShellSurface,
-
-    -- ** Events
-    ShellSurfaceEvent (..),
-
-    -- ** Pong
-    shellSurfacePong,
-
-    -- ** Move
-    shellSurfaceMove,
-
-    -- ** Resize
-    shellSurfaceResize,
-
-    -- ** SetTopLevel
-    shellSurfaceSetToplevel,
-
-    -- ** SetTransient
-    shellSurfaceSetTransient,
-
-    -- ** SetFullscreen
-    shellSurfaceSetFullscreen,
-
-    -- ** SetPopup
-    shellSurfaceSetPopup,
-
-    -- ** SetMaximized
-    shellSurfaceSetMaximized,
-
-    -- ** SetTitle
-    shellSurfaceSetTitle,
-
-    -- ** SetClass
-    shellSurfaceSetClass,
-
-    -- ** Enum: Resize
-    ShellSurfaceResize,
-    pattern ShellSurfaceResizeNone,
-    pattern ShellSurfaceResizeTop,
-    pattern ShellSurfaceResizeBottom,
-    pattern ShellSurfaceResizeLeft,
-    pattern ShellSurfaceResizeTopLeft,
-    pattern ShellSurfaceResizeBottomLeft,
-    pattern ShellSurfaceResizeRight,
-    pattern ShellSurfaceResizeTopRight,
-    pattern ShellSurfaceResizeBottomRight,
-
-    -- ** Enum: FullScreenMethod
-    ShellSurfaceFullscreenMethod,
-    pattern ShellSurfaceFullscreenMethodDefault,
-    pattern ShellSurfaceFullscreenMethodScale,
-    pattern ShellSurfaceFullscreenMethodDriver,
-    pattern ShellSurfaceFullscreenMethodFill,
-
-    -- ** Enum: Transient
-    ShellSurfaceTransient,
-    pattern ShellSurfaceTransientInactive,
-
-    -- * Surface
-    Surface,
-
-    -- ** Events
-    SurfaceEvent (..),
-
-    -- ** Methods
-    surfaceAttach,
-    surfaceDamage,
-    surfaceFrame,
-    surfaceSetOpaqueRegion,
-    surfaceSetInputRegion,
-    surfaceCommit,
-    surfaceSetBufferTransform,
-    surfaceSetBufferScale,
-    surfaceDamageBuffer,
-    surfaceOffset,
-
-    -- * Seat
-    Seat,
-
-    -- ** Events
-    SeatEvent (..),
-
-    -- ** Methods
-    seatGetPointer,
-    seatGetKeyboard,
-    seatGetTouch,
-
-    -- ** SeatCapability (enum)
-    SeatCapability,
-    pattern SeatCapabilityPointer,
-    pattern SeatCapabilityKeyboard,
-    pattern SeatCapabilityTouch,
-    parseSeatCapabilities,
-
-    -- * Pointer
-    Pointer,
-
-    -- ** Events
-    PointerEvent (..),
-
-    -- ** SetCursor
-    pointerSetCursor,
-
-    -- ** ButtonState
-    PointerButtonState,
-    pattern PointerButtonStateReleased,
-    pattern PointerButtonStatePressed,
-
-    -- ** Axis
-    PointerAxis,
-    pattern PointerAxisVerticalScroll,
-    pattern PointerAxisHorizontalScroll,
-
-    -- ** AxisSource
-    PointerAxisSource,
-    pattern PointerAxisSourceWheel,
-    pattern PointerAxisSourceFinger,
-    pattern PointerAxisSourceContinuous,
-    pattern PointerAxisSourceWheelTilt,
-
-    -- ** AxisRelativeDirection
-    PointerAxisRelativeDirection,
-    pattern PointerAxisRelativeDirectionIdentical,
-    pattern PointerAxisRelativeDirectionInverted,
-
-    -- * Keyboard
-    Keyboard,
-
-    -- ** Events
-    KeyboardEvent (..),
-
-    -- * KeymapFormat
-    KeyboardKeymapFormat,
-    pattern KeyboardKeymapFormatNoKeymap,
-    pattern KeyboardKeymapFormatXkbV1,
-
-    -- ** KeyState
-    KeyboardKeyState,
-    pattern KeyboardKeyStateReleased,
-    pattern KeyboardKeyStatePressed,
-    pattern KeyboardKeyStateRepeated,
-
-    -- * Touch
-    Touch,
-
-    -- ** Events
-    TouchEvent (..),
-
-    -- * Output
-    Output,
-
-    -- ** Events
-    OutputEvent (..),
-
-    -- ** Enums
-    OutputSubpixel,
-    OutputTransform,
-    OutputMode,
-
-    -- * Region
-    Region,
-
-    -- ** Add
-    regionAdd,
-
-    -- ** Subtract
-    regionSubtract,
-
-    -- * Subcompositor
-    Subcompositor,
-
-    -- ** GetSubsurface
-    subcompositorGetSubsurface,
-
-    -- * Subsurface
-    Subsurface,
-
-    -- ** Methods
-    subsurfaceSetPosition,
-    subsurfacePlaceAbove,
-    subsurfacePlaceBelow,
-    subsurfaceSetSync,
-    subsurfaceSetDesync,
-
-    -- * DataOffer
-    DataOffer,
-
-    -- * DataSource
-    DataSource,
-
-    -- * DataDevice
-    DataDevice,
-
-    -- * DataDeviceManager
-    DataDeviceManager,
-
-    -- * Wayland.Util
-    module WL.Util,
-
-    -- * Core Enums
-    module WL.Core.Enums,
-
-    -- * Misc
-    CEnum.CEnum (..),
+  -- * Exceptions
+  WaylandClientException (..),
+
+  -- * Display
+  Display,
+
+  -- ** Events
+  DisplayEvent (..),
+
+  -- ** Create EventQueue
+  displayCreateQueue,
+  displayCreateQueueWithName,
+
+  -- ** EventQueue
+  EventQueue,
+  eventQueueGetName,
+
+  -- ** Connect
+  Client.displayConnect,
+  Client.displayConnectToFd,
+
+  -- ** Disconnect
+  Client.displayDisconnect,
+
+  -- ** Get Registry
+  Client.displayGetRegistry,
+
+  -- ** SetMaxBufferSize
+  Client.displaySetMaxBufferSize,
+
+  -- ** Roundtrip
+  Client.displayRoundtrip,
+  Client.displayRoundtripQueue,
+
+  -- ** Flush
+  Client.displayFlush,
+
+  -- ** Sync
+  Client.displaySync,
+
+  -- ** Read / prepare read
+  Client.displayReadEvents,
+  Client.displayPrepareReadQueue,
+  Client.displayPrepareRead,
+  Client.displayCancelRead,
+
+  -- ** Dispatch
+  Client.displayDispatch,
+  Client.displayDispatchQueue,
+  Client.displayDispatchTimeout,
+  Client.displayDispatchQueueTimeout,
+  Client.displayDispatchQueuePending,
+  Client.displayDispatchPending,
+
+  -- ** Misc.
+  Client.displayThrowIfError,
+  Client.displayGetFd,
+  Client.displayGetError,
+  Client.displayGetProtocolError,
+
+  -- * Registry & Globals
+  module WL.Client.Registry,
+
+  -- * Callback
+  Callback,
+
+  -- ** Events
+  CallbackEvent (..),
+
+  -- * Compositor
+  Compositor,
+
+  -- ** CreateSurface
+  Client.compositorCreateSurface,
+
+  -- ** CreateRegion
+  withNewRegion,
+  Client.compositorCreateRegion,
+
+  -- * ShmPool
+  ShmPool,
+
+  -- ** CreateBuffer
+  Client.shmPoolCreateBuffer,
+
+  -- ** Resize
+  Client.shmPoolResize,
+
+  -- * Shm
+  Shm,
+
+  -- ** Events
+  ShmEvent (..),
+
+  -- ** CreatePool
+  shmCreatePool,
+
+  -- ** SHM Formats
+  ShmFormat,
+  pattern ShmFormatARGB8888,
+  pattern ShmFormatXRGB8888,
+  pattern ShmFormatC8,
+  pattern ShmFormatRGB332,
+  pattern ShmFormatBGR233,
+  pattern ShmFormatXRGB4444,
+  pattern ShmFormatXBGR4444,
+  pattern ShmFormatRGBX4444,
+  pattern ShmFormatBGRX4444,
+  pattern ShmFormatARGB4444,
+  pattern ShmFormatABGR4444,
+  pattern ShmFormatRGBA4444,
+  pattern ShmFormatBGRA4444,
+  pattern ShmFormatXRGB1555,
+  pattern ShmFormatXBGR1555,
+  pattern ShmFormatRGBX5551,
+  pattern ShmFormatBGRX5551,
+  pattern ShmFormatARGB1555,
+  pattern ShmFormatABGR1555,
+  pattern ShmFormatRGBA5551,
+  pattern ShmFormatBGRA5551,
+  pattern ShmFormatRGB565,
+  pattern ShmFormatBGR565,
+  pattern ShmFormatRGB888,
+  pattern ShmFormatBGR888,
+  pattern ShmFormatXBGR8888,
+  pattern ShmFormatRGBX8888,
+  pattern ShmFormatBGRX8888,
+  pattern ShmFormatABGR8888,
+  pattern ShmFormatRGBA8888,
+  pattern ShmFormatBGRA8888,
+  pattern ShmFormatXRGB2101010,
+  pattern ShmFormatXBGR2101010,
+  pattern ShmFormatRGBX1010102,
+  pattern ShmFormatBGRX1010102,
+  pattern ShmFormatARGB2101010,
+  pattern ShmFormatABGR2101010,
+  pattern ShmFormatRGBA1010102,
+  pattern ShmFormatBGRA1010102,
+  pattern ShmFormatYUYV,
+  pattern ShmFormatYVYU,
+  pattern ShmFormatUYVY,
+  pattern ShmFormatVYUY,
+  pattern ShmFormatAYUV,
+  pattern ShmFormatNV12,
+  pattern ShmFormatNV21,
+  pattern ShmFormatNV16,
+  pattern ShmFormatNV61,
+  pattern ShmFormatYUV410,
+  pattern ShmFormatYVU410,
+  pattern ShmFormatYUV411,
+  pattern ShmFormatYVU411,
+  pattern ShmFormatYUV420,
+  pattern ShmFormatYVU420,
+  pattern ShmFormatYUV422,
+  pattern ShmFormatYVU422,
+  pattern ShmFormatYUV444,
+  pattern ShmFormatYVU444,
+  pattern ShmFormatR8,
+  pattern ShmFormatR16,
+  pattern ShmFormatRG88,
+  pattern ShmFormatGR88,
+  pattern ShmFormatRG1616,
+  pattern ShmFormatGR1616,
+  pattern ShmFormatXRGB16161616F,
+  pattern ShmFormatXBGR16161616F,
+  pattern ShmFormatARGB16161616F,
+  pattern ShmFormatABGR16161616F,
+  pattern ShmFormatXYUV8888,
+  pattern ShmFormatVUY888,
+  pattern ShmFormatVUY101010,
+  pattern ShmFormatY210,
+  pattern ShmFormatY212,
+  pattern ShmFormatY216,
+  pattern ShmFormatY410,
+  pattern ShmFormatY412,
+  pattern ShmFormatY416,
+  pattern ShmFormatXVYU2101010,
+  pattern ShmFormatXVYU12_16161616,
+  pattern ShmFormatXVYU16161616,
+  pattern ShmFormatY0L0,
+  pattern ShmFormatX0L0,
+  pattern ShmFormatY0L2,
+  pattern ShmFormatX0L2,
+  pattern ShmFormatYUV420_8BIT,
+  pattern ShmFormatYUV420_10BIT,
+  pattern ShmFormatXRGB8888_A8,
+  pattern ShmFormatXBGR8888_A8,
+  pattern ShmFormatRGBX8888_A8,
+  pattern ShmFormatBGRX8888_A8,
+  pattern ShmFormatRGB888_A8,
+  pattern ShmFormatBGR888_A8,
+  pattern ShmFormatRGB565_A8,
+  pattern ShmFormatBGR565_A8,
+  pattern ShmFormatNV24,
+  pattern ShmFormatNV42,
+  pattern ShmFormatP210,
+  pattern ShmFormatP010,
+  pattern ShmFormatP012,
+  pattern ShmFormatP016,
+  pattern ShmFormatAXBXGXRX106106106106,
+  pattern ShmFormatNV15,
+  pattern ShmFormatQ410,
+  pattern ShmFormatQ401,
+  pattern ShmFormatXRGB16161616,
+  pattern ShmFormatXBGR16161616,
+  pattern ShmFormatARGB16161616,
+  pattern ShmFormatABGR16161616,
+  pattern ShmFormatC1,
+  pattern ShmFormatC2,
+  pattern ShmFormatC4,
+  pattern ShmFormatD1,
+  pattern ShmFormatD2,
+  pattern ShmFormatD4,
+  pattern ShmFormatD8,
+  pattern ShmFormatR1,
+  pattern ShmFormatR2,
+  pattern ShmFormatR4,
+  pattern ShmFormatR10,
+  pattern ShmFormatR12,
+  pattern ShmFormatAVUY8888,
+  pattern ShmFormatXVUY8888,
+  pattern ShmFormatP030,
+
+  -- * Buffer
+  Buffer,
+
+  -- ** Events
+  BufferEvent (..),
+
+  -- * Shell
+  Shell,
+
+  -- ** GetShellSurface
+  Client.shellGetShellSurface,
+
+  -- * ShellSurface
+  ShellSurface,
+
+  -- ** Events
+  ShellSurfaceEvent (..),
+
+  -- ** Pong
+  shellSurfacePong,
+
+  -- ** Move
+  shellSurfaceMove,
+
+  -- ** Resize
+  shellSurfaceResize,
+
+  -- ** SetTopLevel
+  shellSurfaceSetToplevel,
+
+  -- ** SetTransient
+  shellSurfaceSetTransient,
+
+  -- ** SetFullscreen
+  shellSurfaceSetFullscreen,
+
+  -- ** SetPopup
+  shellSurfaceSetPopup,
+
+  -- ** SetMaximized
+  shellSurfaceSetMaximized,
+
+  -- ** SetTitle
+  shellSurfaceSetTitle,
+
+  -- ** SetClass
+  shellSurfaceSetClass,
+
+  -- ** Enum: Resize
+  ShellSurfaceResize,
+  pattern ShellSurfaceResizeNone,
+  pattern ShellSurfaceResizeTop,
+  pattern ShellSurfaceResizeBottom,
+  pattern ShellSurfaceResizeLeft,
+  pattern ShellSurfaceResizeTopLeft,
+  pattern ShellSurfaceResizeBottomLeft,
+  pattern ShellSurfaceResizeRight,
+  pattern ShellSurfaceResizeTopRight,
+  pattern ShellSurfaceResizeBottomRight,
+
+  -- ** Enum: FullScreenMethod
+  ShellSurfaceFullscreenMethod,
+  pattern ShellSurfaceFullscreenMethodDefault,
+  pattern ShellSurfaceFullscreenMethodScale,
+  pattern ShellSurfaceFullscreenMethodDriver,
+  pattern ShellSurfaceFullscreenMethodFill,
+
+  -- ** Enum: Transient
+  ShellSurfaceTransient,
+  pattern ShellSurfaceTransientInactive,
+
+  -- * Surface
+  Surface,
+
+  -- ** Events
+  SurfaceEvent (..),
+
+  -- ** Methods
+  surfaceAttach,
+  surfaceDamage,
+  surfaceFrame,
+  surfaceSetOpaqueRegion,
+  surfaceSetInputRegion,
+  surfaceCommit,
+  surfaceSetBufferTransform,
+  surfaceSetBufferScale,
+  surfaceDamageBuffer,
+  surfaceOffset,
+
+  -- * Seat
+  Seat,
+
+  -- ** Events
+  SeatEvent (..),
+
+  -- ** Methods
+  seatGetPointer,
+  seatGetKeyboard,
+  seatGetTouch,
+
+  -- ** SeatCapability (enum)
+  SeatCapability,
+  pattern SeatCapabilityPointer,
+  pattern SeatCapabilityKeyboard,
+  pattern SeatCapabilityTouch,
+  parseSeatCapabilities,
+
+  -- * Pointer
+  Pointer,
+
+  -- ** Events
+  PointerEvent (..),
+
+  -- ** SetCursor
+  pointerSetCursor,
+
+  -- ** ButtonState
+  PointerButtonState,
+  pattern PointerButtonStateReleased,
+  pattern PointerButtonStatePressed,
+
+  -- ** Axis
+  PointerAxis,
+  pattern PointerAxisVerticalScroll,
+  pattern PointerAxisHorizontalScroll,
+
+  -- ** AxisSource
+  PointerAxisSource,
+  pattern PointerAxisSourceWheel,
+  pattern PointerAxisSourceFinger,
+  pattern PointerAxisSourceContinuous,
+  pattern PointerAxisSourceWheelTilt,
+
+  -- ** AxisRelativeDirection
+  PointerAxisRelativeDirection,
+  pattern PointerAxisRelativeDirectionIdentical,
+  pattern PointerAxisRelativeDirectionInverted,
+
+  -- * Keyboard
+  Keyboard,
+
+  -- ** Events
+  KeyboardEvent (..),
+
+  -- * KeymapFormat
+  KeyboardKeymapFormat,
+  pattern KeyboardKeymapFormatNoKeymap,
+  pattern KeyboardKeymapFormatXkbV1,
+
+  -- ** KeyState
+  KeyboardKeyState,
+  pattern KeyboardKeyStateReleased,
+  pattern KeyboardKeyStatePressed,
+  pattern KeyboardKeyStateRepeated,
+
+  -- * Touch
+  Touch,
+
+  -- ** Events
+  TouchEvent (..),
+
+  -- * Output
+  Output,
+
+  -- ** Events
+  OutputEvent (..),
+
+  -- ** Enums
+  OutputSubpixel,
+  OutputTransform,
+  OutputMode,
+
+  -- * Region
+  Region,
+
+  -- ** Add
+  regionAdd,
+
+  -- ** Subtract
+  regionSubtract,
+
+  -- * Subcompositor
+  Subcompositor,
+
+  -- ** GetSubsurface
+  subcompositorGetSubsurface,
+
+  -- * Subsurface
+  Subsurface,
+
+  -- ** Methods
+  subsurfaceSetPosition,
+  subsurfacePlaceAbove,
+  subsurfacePlaceBelow,
+  subsurfaceSetSync,
+  subsurfaceSetDesync,
+
+  -- * DataOffer
+  DataOffer,
+
+  -- * DataSource
+  DataSource,
+
+  -- * DataDevice
+  DataDevice,
+
+  -- * DataDeviceManager
+  DataDeviceManager,
+
+  -- * Wayland.Util
+  module WL.Util,
+
+  -- * Core Enums
+  module WL.Core.Enums,
+
+  -- * Misc
+  CEnum.CEnum (..),
 ) where
 
 import WL.Internals.Types
@@ -500,9 +499,9 @@ getObjectId o = liftIO $ C.Unsafe.wl_proxy_get_id (toProxy o)
 
 getObjectDisplay :: (MonadIO m, IsWlObject object) => object -> m Display
 getObjectDisplay o = liftIO $ do
-    ptr <- C.Unsafe.wl_proxy_get_display (toProxy o)
-    when (ptr == nullPtr) $ throwIO WaylandInvalidId
-    return (Display ptr)
+  ptr <- C.Unsafe.wl_proxy_get_display (toProxy o)
+  when (ptr == nullPtr) $ throwIO WaylandInvalidId
+  return (Display ptr)
 
 type Tag = ConstPtr CChar
 
@@ -511,14 +510,14 @@ newTag str = liftIO $ ConstPtr <$> newCString str
 
 setObjectTag :: (MonadIO m, IsWlObject object) => object -> Tag -> m ()
 setObjectTag object tag = liftIO $ with tag $ \tagPtr ->
-    C.Unsafe.wl_proxy_set_tag (toProxy object) (ConstPtr tagPtr)
+  C.Unsafe.wl_proxy_set_tag (toProxy object) (ConstPtr tagPtr)
 
 getObjectTag :: (MonadIO m, IsWlObject object) => object -> m (Maybe Tag)
 getObjectTag object = liftIO $ do
-    ConstPtr tag <- C.Unsafe.wl_proxy_get_tag (toProxy object)
-    if tag /= nullPtr
-        then Just <$> peek tag
-        else return Nothing
+  ConstPtr tag <- C.Unsafe.wl_proxy_get_tag (toProxy object)
+  if tag /= nullPtr
+    then Just <$> peek tag
+    else return Nothing
 
 pattern ShmFormatARGB8888 :: ShmFormat
 pattern ShmFormatARGB8888 = Client.WL_SHM_FORMAT_ARGB8888
@@ -778,10 +777,10 @@ parseSeatCapabilities :: SeatCapability -> [SeatCapability]
 parseSeatCapabilities x = [v | v <- values, fromCEnum x .&. fromCEnum v > 0]
   where
     values =
-        [ SeatCapabilityPointer
-        , SeatCapabilityKeyboard
-        , SeatCapabilityTouch
-        ]
+      [ SeatCapabilityPointer
+      , SeatCapabilityKeyboard
+      , SeatCapabilityTouch
+      ]
 
 -- | @shmCreatePool shm fd sizeBytes@
 shmCreatePool :: (MonadIO m) => Shm -> Fd -> Int -> m ShmPool

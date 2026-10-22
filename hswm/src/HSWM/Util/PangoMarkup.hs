@@ -1,12 +1,11 @@
-{- |
-Module      : HSWM.Util.PangoMarkup
-Description : Short description
-Copyright   : (c) Samuli Thomasson, 2026
-
-Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
-Stability   : unstable
-Portability : unportable
--}
+-- |
+-- Module      : HSWM.Util.PangoMarkup
+-- Description : Short description
+-- Copyright   : (c) Samuli Thomasson, 2026
+--
+-- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
+-- Stability   : unstable
+-- Portability : unportable
 module HSWM.Util.PangoMarkup where
 
 import Data.Text qualified as T
@@ -16,61 +15,61 @@ import System.IO.Unsafe
 -- * IsText
 
 class IsText a where
-    getText :: a -> T.Text
+  getText :: a -> T.Text
 
 instance IsText String where
-    getText = T.pack
+  getText = T.pack
 
 instance IsText Text where
-    getText = id
+  getText = id
 
 -- * Markup
 
 data Markup
-    = -- | zero-length document.
-      MNUL
-    | -- | Simple document concatenation
-      Concat Markup Markup
-    | -- | text, markup tags automatically escaped.
-      Escaped Text
-    | -- | direct text include, no escaping, can contain markup tags!
-      Raw Text
-    | -- | <TAG [ATTRS]>BODY</TAG>
-      Markup :<< (Text, [Attr])
-    deriving (Eq, Show, Generic, Data)
+  = -- | zero-length document.
+    MNUL
+  | -- | Simple document concatenation
+    Concat Markup Markup
+  | -- | text, markup tags automatically escaped.
+    Escaped Text
+  | -- | direct text include, no escaping, can contain markup tags!
+    Raw Text
+  | -- | <TAG [ATTRS]>BODY</TAG>
+    Markup :<< (Text, [Attr])
+  deriving (Eq, Show, Generic, Data)
 
 instance Semigroup Markup where
-    MNUL <> b = b
-    a <> MNUL = a
-    a <> b = Concat a b
+  MNUL <> b = b
+  a <> MNUL = a
+  a <> b = Concat a b
 
 instance Monoid Markup where
-    mempty = MNUL
+  mempty = MNUL
 
 instance Default Markup where
-    def = mempty
+  def = mempty
 
 instance IsString Markup where
-    fromString s = Escaped (toText s)
+  fromString s = Escaped (toText s)
 
 -- ** ToMarkup
 
 class ToMarkup a where
-    toMarkup :: a -> Markup
+  toMarkup :: a -> Markup
 
 instance ToMarkup Markup where
-    toMarkup = id
+  toMarkup = id
 
 instance ToMarkup T.Text where
-    toMarkup = Escaped
+  toMarkup = Escaped
 
 instance ToMarkup String where
-    toMarkup = toMarkup . T.pack
+  toMarkup = toMarkup . T.pack
 
 -- ** Attributes
 
 data Attr = Attr !Text !Text
-    deriving (Eq, Show, Generic, Data)
+  deriving (Eq, Show, Generic, Data)
 
 -- ** Rendering
 
@@ -84,7 +83,7 @@ render = go
     go (x :<< (t, as)) = tag t as (go x)
 
     tag label attrs inner' =
-        "<" <> label <> T.concat (map prAttrs attrs) <> ">" <> inner' <> "</" <> label <> ">"
+      "<" <> label <> T.concat (map prAttrs attrs) <> ">" <> inner' <> "</" <> label <> ">"
     prAttrs (Attr k v) = " " <> k <> "=\"" <> v <> "\""
 
 -- ** Building Markup
@@ -117,8 +116,8 @@ fromShow x = Escaped (toText $ show x)
 
 escapeMarkup :: (MonadIO m) => Text -> Int64 -> m Text
 escapeMarkup x len
-    | len < 1 = markupEscapeText (x <> "\0") (-1)
-    | otherwise = markupEscapeText x len
+  | len < 1 = markupEscapeText (x <> "\0") (-1)
+  | otherwise = markupEscapeText x len
 
 escapeMarkupPure :: Text -> Int64 -> Text
 escapeMarkupPure x len = unsafePerformIO (escapeMarkup x len)
