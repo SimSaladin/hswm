@@ -21,6 +21,7 @@ module HSWM.Types.Lens (
   toLower,
   A.ToJSON (..),
   A.FromJSON (..),
+  A.genericParseJSON,
   A.genericToJSON,
   A.genericToEncoding,
   Dynamic,
@@ -31,7 +32,6 @@ module HSWM.Types.Lens (
 import Data.Aeson qualified as A
 import Data.Char
 import Data.Coerce
-import Data.Functor.Contravariant
 import Data.Set qualified as Set
 import Language.Haskell.TH hiding (Type)
 import Language.Haskell.TH.Datatype qualified as D
@@ -39,22 +39,28 @@ import Language.Haskell.TH.Datatype.TyVarBndr qualified as D
 import Lens.Micro.TH.Internal
 import Text.Read (read)
 import Data.Dynamic
+import Data.Typeable
 
 import River qualified as R
 import WL.Client qualified as WL
-import WL.ExtIdleNotify.Staging.V1.Client qualified as EXT_IN
-import WL.Wlr.OutputPowerManagement.Unstable.V1.Client qualified as OPM
-import WL.XdgOutput.Unstable.V1.Client qualified as XO
 
 ---------------------------------------------------------
 -- Orphan instances
 -- XXX
 
-instance Show (MVar (Async ())) where show _ = "<MVar>"
-instance Show (Async a) where show _ = "<Async>"
-instance Show (StablePtr a) where show _ = "<SP>"
-instance NFData (StablePtr a) where rnf = rnf . castStablePtrToPtr
-instance A.ToJSON (StablePtr a) where toJSON _ = "StablePtr"
+instance Typeable a => Show (MVar a) where
+    show a = "MVar " ++ show (typeOf a)
+instance Typeable a => Show (Async a) where
+    show a = "Async " ++ show (typeOf a)
+instance Typeable a => Show (StablePtr a) where
+    show a = "StablePtr " ++ show (typeOf a)
+
+instance NFData (StablePtr a) where
+    rnf = rnf . castStablePtrToPtr
+
+instance A.ToJSON (StablePtr a) where
+    toJSON _ = A.Null
+    omitField _ = True
 
 -- * Constants
 
@@ -70,24 +76,33 @@ shortFields =
 
 -- * Make lenses
 
--- | This uses the same record field names, you want to use @NoFieldSelectors@ with this.
+-- |
+-- Method A. Generate one class per type. The class shall contain the lens methods.
+--
+-- This uses the same record field names, you want to use @NoFieldSelectors@ with this.
 makeLenses' :: [Name] -> Q [Dec]
 makeLenses' = makeLensesWith' classPerType
 
+-- | Wrapper over 'makeLensesWith' that takes a list of types and creates lenses for them all
+-- using the same set of options.
 makeLensesWith' :: LensRules -> [Name] -> Q [Dec]
 makeLensesWith' rules = fmap join . mapM (makeLensesWith rules)
 
 -- |
+-- Method B. (Hybrid) field mentioned in the supplied list are /not/ included in generated
+-- type-oriented classes (the @HasType@ classes that are created for each type).
+--
+-- The selected fields get their respective @HasField@ classes (which host
+-- field-oriented lenses normally).
+--
 -- @
 -- makeLensesCombine fields types
 -- @
---
--- Each field in @fields@ gets its own @HasField@ class.
---
--- Other fields get lenses under a @HasType@ class.
 makeLensesCombine :: [String] -> [Name] -> Q [Dec]
 makeLensesCombine = makeLensesCombine' id
 
+-- | Like 'makeLensesCombine' but further customizable: the first parameter (function)
+-- is applied to the inferred LensRules before using.
 makeLensesCombine' :: (LensRules -> LensRules) -> [String] -> [Name] -> Q [Dec]
 makeLensesCombine' fRules fieldsIn namesIn = do
   -- [(type-name, [field-name])] -- all types + their fields
@@ -105,7 +120,8 @@ makeLensesCombine' fRules fieldsIn namesIn = do
     exists <- isJust <$> lookupTypeName c
     return [field | exists]
   -- [field-name] -- fields that get lenses on class-per-field basis
-  let fields = fieldsIn ++ map nameBase fieldsWithClass
+  let fields = let fs = fieldsIn ++ map nameBase fieldsWithClass
+                in fs ++ map (fromSnake False) fs
       -- [type-name] -- types that get lenses on class-per-field basis
       namesPerField = namesIn
       -- [type-name] -- types that get lenses on class-per-type basis
@@ -120,6 +136,9 @@ makeLensesCombine' fRules fieldsIn namesIn = do
     (makeLensesWith' (fRules $ classPerField' $ const (`elem` fields)) namesPerField)
     (makeLensesWith' (fRules $ classPerType' $ const (`notElem` fields)) namesPerTy)
 
+-- | This will create any missing classes for the supplied field/record names.
+-- Useful to call before a makeLenses* call that needs it, but can't figure it out when
+-- the class won't exist until in the same splice (where it is at that point unavailable).
 makeFieldClassesIfMissing :: [String] -> Q [Dec]
 makeFieldClassesIfMissing fields = do
   res <- fmap join $ forM fields $ \field -> do
@@ -132,6 +151,7 @@ makeFieldClassesIfMissing fields = do
     return $ [makeFieldClass defType c n | not exists]
   sequence res
 
+-- | Used by 'makeFieldClassesIfMissing'.
 makeFieldClass :: (Quote m) => () -> Name -> Name -> m Dec
 makeFieldClass defType className methodName =
   classD
@@ -151,20 +171,21 @@ makeFieldClass defType className methodName =
     stabToContext _ = []
     stabToOptic _ = mkName "Lens'"
 
--- * LensRules
+-- * The LensRules
 
+-- ** Class-per-Field
+
+-- | Rules used for the @HasField@-style.
 classPerField :: LensRules
 classPerField = classPerField' (\_ _ -> True)
 
+-- | Just like 'classPerField', with an additional parameter for further customization.
 classPerField' :: (String -> String -> Bool) -> LensRules
 classPerField' only =
   classyRules
-    & lensClass
-      .~ const Nothing
-    & lensField
-      .~ getName
-    & simpleLenses
-      .~ False
+    & lensClass .~ const Nothing
+    & lensField .~ getName
+    & simpleLenses .~ False
   where
     getName (nameBase -> ty) _ (nameBase -> n)
       | only ty n || only ty (fromSnake False n) =
@@ -175,9 +196,14 @@ classPerField' only =
            in [MethodName (mkName $ "Has" <> (fromSnake False n & _head %~ toUpper)) (mkName method)]
       | otherwise = []
 
+-- ** Class-per-type
+
+-- | Rules used for the @HasClass@-style.
 classPerType :: LensRules
 classPerType = classPerType' (\_ _ -> True)
 
+-- | Customizable version of 'classPerType'. The function parameter is used to further select which
+-- fields are accepted.
 classPerType' :: (String -> String -> Bool) -> LensRules
 classPerType' only =
   classyRules
@@ -195,8 +221,9 @@ classPerType' only =
            in [TopName (mkName method)]
       | otherwise = []
 
--- * Utilities
+-- ** Utility functions
 
+-- | Convert @snake_case_input@ to @snakeCaseInput@
 fromSnake :: Bool -> String -> String
 fromSnake flag inp
   | flag, '_' : xs <- inp = '_' : inner xs
@@ -216,15 +243,11 @@ infixl 2 &+
 
 -- * HasRiverId
 
-type SomeWindow a = (HasRiverId a, RiverId a ~ R.RiverWindow)
-type SomeOutput a = (HasRiverId a, RiverId a ~ R.RiverOutput)
-type SomeSeat a = (HasRiverId a, RiverId a ~ R.RiverSeat)
-
 -- | Data structures that are or contain some River identifier of type 'RiverId'.
 --
 -- Useful to overload functions that operate on an identifier to work directly with data types that contain an
 -- identifier.
-class (Eq (RiverId a)) => HasRiverId a where
+class Eq (RiverId a) => HasRiverId a where
   type RiverId a
 
   riverId :: Lens' a (RiverId a)
@@ -240,6 +263,11 @@ eachRiverId k = each . filtered (riverIdEq k)
 
 type SameRiverId a b = (HasRiverId a, HasRiverId b, RiverId a ~ RiverId b)
 
+-- | Constraints for indicating that the input is or has a distinguishing identifier.
+type SomeWindow a = (HasRiverId a, RiverId a ~ R.RiverWindow)
+type SomeOutput a = (HasRiverId a, RiverId a ~ R.RiverOutput)
+type SomeSeat   a = (HasRiverId a, RiverId a ~ R.RiverSeat)
+
 instance HasRiverId R.RiverOutput where type RiverId R.RiverOutput = R.RiverOutput
 instance HasRiverId R.RiverWindow where type RiverId R.RiverWindow = R.RiverWindow
 instance HasRiverId R.RiverSeat where type RiverId R.RiverSeat = R.RiverSeat
@@ -250,68 +278,42 @@ instance HasRiverId R.RiverPointerBinding where type RiverId R.RiverPointerBindi
 
 -- * ToRiverId
 
--- | Default instances for matching 'Coercible' types.
+-- | Class for types that can be transformed into thte primary identifier.
+--
+-- Default implementation exists via 'Coercible' for compatible types.
 class (HasRiverId a) => ToRiverId b a where
   toRiverId :: b -> a
   default toRiverId :: (Coercible b a) => b -> a
   toRiverId = coerce
 
--- Instances
+-- | RiverIds can be converted into "Word" without conversion loss.
+riverIdToWord :: (Coercible a (Ptr Void)) => a -> Word
+riverIdToWord = coerce . ptrToWordPtr . coerce
 
+-- | The reverse of 'riverIdToWord'. @Word -> RiverId@.
+wordToRiverId :: (ToRiverId (Ptr Void) a) => Word -> a
+wordToRiverId = toRiverId . wordPtrToPtr @Void . WordPtr
+
+-- | 'riverIdToHex' and 'hexToRiverId' is the encoding used for JSON too.
+-- They also correspond to the (custom) 'Show' and 'Read' instances.
+riverIdToHex :: (WL.IsWlObject a, Show a) => a -> String
+hexToRiverId :: (WL.IsWlObject a, Read a) => String -> a
+riverIdToHex = show
+hexToRiverId = read
+
+
+-- Instances for most common River identifiers...
 instance ToRiverId (Ptr Void) R.RiverOutput
 instance ToRiverId (Ptr Void) R.RiverWindow
 instance ToRiverId (Ptr Void) R.RiverSeat
 instance ToRiverId (Ptr Void) R.RiverNode
 instance ToRiverId (Ptr Void) R.RiverLayerShellOutput
 
-riverIdToWord :: (Coercible a (Ptr Void)) => a -> Word
-riverIdToWord = coerce . ptrToWordPtr . coerce
 
-wordToRiverId :: (ToRiverId (Ptr Void) a) => Word -> a
-wordToRiverId = toRiverId . wordPtrToPtr @Void . WordPtr
+-- * Aeson instances
 
-riverIdToHex :: (WL.IsWlObject a, Show a) => a -> String
-riverIdToHex = show
-
-hexToRiverId :: (WL.IsWlObject a, Read a) => String -> a
-hexToRiverId = read
-
--- Aeson instances
-
--- | For ToJSON/FromJSON instances
+-- | The shared Aeson generation options. These same ptions should be used across the project.
+--
+-- ToJSON/FromJSON instances
 aesonOptions :: A.Options
 aesonOptions = A.defaultOptions{A.omitNothingFields = True}
-
-instance A.ToJSON R.RiverColor
-
-instance A.ToJSONKey R.RiverWindow where toJSONKey = contramap riverIdToHex A.toJSONKey
-instance A.FromJSONKey R.RiverWindow where fromJSONKey = fmap hexToRiverId A.fromJSONKey
-
-instance A.ToJSON R.RiverWindow where toJSON = A.toJSON . riverIdToHex
-instance A.ToJSON R.RiverSeat where toJSON = A.toJSON . riverIdToHex
-instance A.ToJSON R.RiverOutput where toJSON = A.toJSON . riverIdToHex
-instance A.ToJSON R.RiverNode where toJSON = A.toJSON . riverIdToHex
-instance A.ToJSON R.RiverLayerShellOutput where toJSON = A.toJSON . riverIdToHex
-instance A.ToJSON R.RiverXkbBindingsSeat where toJSON = A.toJSON . riverIdToHex
-instance A.ToJSON R.RiverLayerShellSeat where toJSON = A.toJSON . riverIdToHex
-instance A.ToJSON WL.Output where toJSON = A.toJSON . riverIdToHex
-instance A.ToJSON WL.Seat where toJSON = A.toJSON . riverIdToHex
-instance A.ToJSON WL.Keyboard where toJSON = A.toJSON . riverIdToHex
-instance A.ToJSON WL.Pointer where toJSON = A.toJSON . riverIdToHex
-instance A.ToJSON WL.Touch where toJSON = A.toJSON . riverIdToHex
-instance A.ToJSON XO.Output where toJSON = A.toJSON . riverIdToHex
-instance A.ToJSON OPM.OutputPower where toJSON = A.toJSON . riverIdToHex
-instance A.ToJSON EXT_IN.IdleNotification where toJSON = A.toJSON . riverIdToHex
-
--- Enum instances...
-instance A.ToJSON R.RiverOutputPresentationMode where toJSON = A.toJSON . fromIntegral @_ @Int . coerce
-instance A.ToJSON R.RiverWindowDecorationHint where toJSON = A.toJSON . fromIntegral @_ @Int . coerce
-instance A.ToJSON R.RiverWindowEdges where toJSON = A.toJSON . fromIntegral @_ @Int . coerce
-instance A.ToJSON WL.SeatCapability where toJSON = A.toJSON . fromIntegral @_ @Int . coerce
-
--- FromJSON
-instance A.FromJSON R.RiverWindow where parseJSON = fmap hexToRiverId . A.parseJSON
-instance A.FromJSON R.RiverSeat where parseJSON = fmap hexToRiverId . A.parseJSON
-instance A.FromJSON R.RiverOutput where parseJSON = fmap hexToRiverId . A.parseJSON
-instance A.FromJSON R.RiverNode where parseJSON = fmap hexToRiverId . A.parseJSON
-instance A.FromJSON R.RiverLayerShellOutput where parseJSON = fmap hexToRiverId . A.parseJSON

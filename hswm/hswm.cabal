@@ -255,7 +255,8 @@ executable hswm
     base >=4.21 && <5,
     bytestring >=0.12.2 && <0.13,
     containers >=0.7 && <1.0,
-    hswm
+    hswm,
+    text >=2.1.2 && <2.2
   default-language: GHC2024
   if flag(use-llvm) && impl(ghc >= 9.14.1)
     ghc-options: -fllvm

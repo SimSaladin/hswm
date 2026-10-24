@@ -34,7 +34,6 @@ import HSWM.Types.Seat
 import HSWM.Types.Simple
 import HSWM.Types.TypeMap
 import HSWM.Types.Window
-import HSWM.Wayland (HasGlobalsRegistry (..))
 
 import Text.XkbCommon qualified as Xkb
 import WL.Client qualified as WL
@@ -146,7 +145,7 @@ data LayoutMessages
 
 instance Message LayoutMessages
 
-instance Message Event
+--instance Message Event
 
 -------------------------------------------------------------------------
 
@@ -384,6 +383,14 @@ type MonadHConf m = (MonadReader HConf m, MonadEffects m)
 
 makeLensesWith' classPerField [''HConf, ''HState]
 
+-- * HasGlobalsRegistry
+
+class HasGlobalsRegistry env where
+  globalsRegistryL :: Lens' env (MVar WL.RegistryState)
+
+instance HasGlobalsRegistry (MVar WL.RegistryState) where
+  globalsRegistryL = lens id const
+
 instance HasGlobalTMap HConf where
   globalTMap = globalTypeMap
 
@@ -433,7 +440,7 @@ runInHS' a = do
     runHS :: HConf -> HState -> HS a -> IO (a, HState)
     runHS c st (HS ma) = flip runReaderT c $ runStateT ma st
 
-class MonadH m where
+class Monad m => MonadH m where
   liftH :: H a -> m a
 
 instance MonadH H where
@@ -443,6 +450,9 @@ instance MonadH HS where
   liftH (H ma) = HS (lift ma)
 instance MonadH (QueryT HS) where
   liftH ma = Query (lift $ liftH ma)
+
+instance IsAction H (HS ()) where
+  actionPassthru _ a = Just $ SomeAction (runInHS a :: H ())
 
 instance MonadLoggerIO H where askLoggerIO = view _logFunc
 

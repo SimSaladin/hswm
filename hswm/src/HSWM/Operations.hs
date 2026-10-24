@@ -4,7 +4,6 @@ import Data.List qualified as L
 import Data.Map qualified as M
 import Data.Ratio ((%))
 import Data.Set qualified as S
-import GHC.Stack
 import HSWM.Core
 import HSWM.Main.Persist qualified as Persist
 import HSWM.StackSet qualified as W
@@ -118,7 +117,7 @@ sendMessageWithNoRefresh a w =
 -- | Force new manage sequence.
 manageDirty :: (HasCallStack) => (MonadH m) => m ()
 manageDirty = liftH $ do
-  logDebug $ "wm request: manage_dirty" :# ["stack" .= prettyCallStack callStack]
+  --logDebug $ "wm request: manage_dirty" :# ["stack" .= prettyCallStack callStack]
   withObject R.riverWindowManagerManageDirty
   writeMainQ MainPoll
 
@@ -394,18 +393,21 @@ mapWindows f = use _windows >>= mapM_ f
 -- * Restart (with state)
 
 restart :: (HasCallStack) => FilePath -> H ()
-restart prog = do
-  runInHS $ broadcastMessage ReleaseResources
-  logInfo "Running exit hooks..."
-  void . userCode =<< asks (view $ config . exitHook)
-  statefile <- runInHS Persist.writeStateToFile
-  let args = ["--state-file", statefile]
-  logInfo $ "Now restarting! Executing file " <> toText prog <> "..." :# ["args" .= args]
-  io =<< view _loggerCleanup
-  res <- io $ try $ executeFile prog True args Nothing
-  logError $
-    "Uh-oh, executing the new program appears to have failed!"
-      :# ["reason" .= show e | Left (e :: IOException) <- [res]]
+restart prog0 = findExecutable prog0 >>= maybe notFound restart'
+    where
+  notFound = logError $ "not restarting: did not find desired executable" :# ["executable" .= prog0 ]
+  restart' prog = do
+      runInHS $ broadcastMessage ReleaseResources
+      logInfo "Running exit hooks..."
+      void . userCode =<< asks (view $ config . exitHook)
+      statefile <- runInHS Persist.writeStateToFile
+      let args = ["--state-file", statefile]
+      logInfo $ "Now restarting! Executing file " <> toText prog <> "..." :# ["args" .= args]
+      io =<< view _loggerCleanup
+      res <- io $ try $ executeFile prog True args Nothing
+      logError $
+        "Uh-oh, executing the new program appears to have failed!"
+          :# ["reason" .= show e | Left (e :: IOException) <- [res]]
 
 -- | Trigger restart by signal (USR2).
 sendRestart :: (MonadIO m) => m ()

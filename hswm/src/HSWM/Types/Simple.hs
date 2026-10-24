@@ -77,6 +77,12 @@ data Direction2D
   deriving stock (Eq, Ord, Bounded, Enum, Read, Show, Generic, Data)
   deriving anyclass (FromJSON, ToJSON, NFData)
 
+-- ** RepeatInfo
+
+data RepeatInfo = RepeatInfo {rate, delay :: {-# UNPACK #-} !Int32}
+  deriving stock (Eq, Ord, Show, Read, Generic, Data)
+  deriving anyclass (Default, NFData)
+
 -- * Functions
 
 -- | @pointWithin x y r@ returns 'True' if the @(x, y)@ co-ordinate is within
@@ -108,15 +114,9 @@ centerRationalRect r =
 
 makeFieldClassesIfMissing ["name"]
 
-makeLensesWith'
-  classPerField
-  [ ''Size
-  , ''Position
-  , ''Rectangle
-  ]
+makeLensesWith' classPerField [''Size, ''Position, ''Rectangle, ''RepeatInfo]
 
--- * StackSet lenses
-
+-- StackSet
 makeLensesWith' classPerField [''W.RationalRect]
 makeLensesWith'
   ( classPerType
@@ -125,11 +125,7 @@ makeLensesWith'
       & lensClass
         .~ (\n -> Just (mkName $ "Has" ++ nameBase n ++ "'", mkName $ "_" ++ (nameBase n & _head %~ toLower)))
   )
-  [ ''W.Workspace
-  , ''W.Screen
-  , ''W.Stack
-  , ''W.StackSet
-  ]
+  [''W.Workspace, ''W.Screen, ''W.Stack, ''W.StackSet]
 
 -- Aeson instances
 
@@ -146,5 +142,12 @@ instance ToJSON Rectangle where
     case (genericToJSON aesonOptions rect.position, genericToJSON aesonOptions rect.size) of
       (A.Object km1, A.Object km2) -> A.Object $! km1 <> km2
       _ -> error "ToJSON"
+
+instance ToJSON RepeatInfo where
+  toJSON = genericToJSON aesonOptions
+  toEncoding = genericToEncoding aesonOptions
+
+instance FromJSON RepeatInfo where
+  parseJSON = genericParseJSON aesonOptions
 
 -- toEncoding rect = ...

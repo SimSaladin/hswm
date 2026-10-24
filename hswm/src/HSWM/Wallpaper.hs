@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-orphans #-}
+
 -- |
 -- Module      : HSWM.Wallpaper
 -- Description : Short description
@@ -12,6 +14,7 @@ module HSWM.Wallpaper (
   wpStartupHook,
   wpExitHook,
   wpHandleEventHook,
+  WallpaperContext(..),
 )
 where
 
@@ -29,6 +32,8 @@ import Codec.Picture qualified as JP
 import Data.Map qualified as M
 import Data.Vector.Storable qualified as V
 
+--import GHC.Generics
+
 -- * Usage
 
 newtype WallpaperConfig = WallpaperConfig {filepath :: FilePath}
@@ -41,19 +46,26 @@ usingWallpaper cfg userConf =
     , exitHook = userConf.exitHook <> wpExitHook
     , renderHook = userConf.renderHook <> render
     , handleEventHook = userConf.handleEventHook <> wpHandleEventHook
+    , handleEventHookDynamic = userConf.handleEventHookDynamic <> wpHandleEventHookDyn
     }
 
 -- * Implementation
 
 -- ** Types
 
-data Ctx = Ctx
+data WallpaperContext = WallpaperContext
   { bufferPool :: !(Maybe BP.ImageBufferPool)
   , outputsState :: !(Map RiverOutput OutputState)
   , src_image :: !(Maybe (JP.Image JP.PixelRGBA8))
   }
-  deriving (Generic)
+  deriving stock (Generic)
   deriving anyclass (Default)
+
+instance Inspect WallpaperContext
+instance Inspect OutputState
+instance Inspect Surfaces
+instance Inspect (JP.Image JP.PixelRGBA8) where
+  inspect _ = "<Image>"
 
 data OutputState = OutputState
   { out_x
@@ -69,7 +81,7 @@ data OutputState = OutputState
   , wl_output :: {-# UNPACK #-} !WL.Output
   , surfaces :: !(Maybe Surfaces)
   }
-  deriving (Generic)
+  deriving stock (Generic)
 
 instance Default OutputState where
   def = OutputState 0 0 0 0 1 0 "" False False def def
@@ -87,7 +99,7 @@ data Surfaces = Surfaces
 wpStartupHook :: WallpaperConfig -> H ()
 wpStartupHook conf = do
   logInfo $ "wallpaper: startup" :# ["config" .= show conf]
-  ctx <- getObjectDef @Ctx
+  ctx <- getObjectDef @WallpaperContext
   -- create bufferpool if missing
   when (isNothing ctx.bufferPool) $ do
     bp <- BP.newImageBufferPool
@@ -100,10 +112,28 @@ wpExitHook = do
   logInfo "wallpaper: exiting"
   deinit
 
+wpHandleEventHookDyn :: Dynamic -> H All
+wpHandleEventHookDyn ev
+  | Just R.RiverWindowManagerOutput{} <- fromDynamic ev = do
+      modifyObjectDef $ \c -> c{bufferPool = fmap (BP.incSurfaceCount 1) (bufferPool c)}
+      mempty
+  | Just (oev :: WL.OutputEvent) <- fromDynamic ev = do
+      case oev of
+        WL.OutputScale ro _ scale -> do
+          let ro' = R.RiverOutput $ castPtr ro
+          updateOutputState ro' $ \x -> x{pending_render = True, scale = scale}
+        WL.OutputName ro wl_output name -> do
+          let ro' = R.RiverOutput $ castPtr ro
+          updateOutputState ro' $ \x -> x{name, wl_output}
+        WL.OutputDone ro _ -> do
+          let ro' = R.RiverOutput $ castPtr ro
+          initOutput ro'
+        _ -> return ()
+      mempty
+
+  | otherwise = mempty
+
 wpHandleEventHook :: Event -> H All
-wpHandleEventHook (WindowManagerEvent (R.RiverWindowManagerOutput{})) = do
-  modifyObjectDef $ \c -> c{bufferPool = fmap (BP.incSurfaceCount 1) (bufferPool c)}
-  mempty
 wpHandleEventHook (OutputEvent (R.RiverOutputDimensions _ ro w h)) = do
   updateOutputState ro $ \a -> a{pending_render = True, out_width = fi w, out_height = fi h}
   mempty
@@ -117,18 +147,6 @@ wpHandleEventHook (OutputEvent (R.RiverOutputRemoved _ ro)) = do
       { bufferPool = fmap (BP.incSurfaceCount (-1)) (bufferPool c)
       , outputsState = M.delete ro c.outputsState
       }
-  mempty
-wpHandleEventHook (WlOutputEvent (WL.OutputScale ro _ scale)) = do
-  let ro' = R.RiverOutput $ castPtr ro
-  updateOutputState ro' $ \x -> x{pending_render = True, scale = scale}
-  mempty
-wpHandleEventHook (WlOutputEvent (WL.OutputName ro wl_output name)) = do
-  let ro' = R.RiverOutput $ castPtr ro
-  updateOutputState ro' $ \x -> x{name, wl_output}
-  mempty
-wpHandleEventHook (WlOutputEvent (WL.OutputDone ro _)) = do
-  let ro' = R.RiverOutput $ castPtr ro
-  initOutput ro'
   mempty
 wpHandleEventHook _ = mempty
 
@@ -153,7 +171,7 @@ calculateTransform src out scale = (fi src / scale - fi out) / 2 / scale
 
 render :: H ()
 render = do
-  ctx <- getObjectDef @Ctx
+  ctx <- getObjectDef @WallpaperContext
   forM_ (M.toList ctx.outputsState) $ \(ro, os) ->
     case (ctx.bufferPool, ctx.src_image, os.surfaces) of
       (Just bp, Just img, Just surfaces) -> when (os.pending_render && os.configured && os.out_width > 0 && os.out_height > 0) $ do
@@ -231,7 +249,7 @@ drawImage bp OutputState{..} img Surfaces{..} = do
 -- | Destroy ctx
 deinit :: H ()
 deinit = do
-  ctx <- getObjectDef @Ctx
+  ctx <- getObjectDef @WallpaperContext
   forM_ ctx.outputsState $ deinitOutput
   forM_ ctx.bufferPool $ io . BP.destroyImageBufferPool
   modifyObjectDef $ \c -> c{outputsState = mempty, bufferPool = def}

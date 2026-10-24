@@ -9,7 +9,8 @@
 module HSWM.IPC where
 
 import Data.Aeson qualified as A
-import Data.Aeson.KeyMap qualified as KM
+import Data.Aeson.Encoding qualified as A
+--import Data.Aeson.KeyMap qualified as KM
 import Data.ByteString.Lazy qualified as BL
 import Data.ByteString.Lazy.Char8 qualified as C8LB
 import Data.List qualified as L
@@ -20,6 +21,7 @@ import Network.Socket.ByteString qualified as NB
 import Options.Generic
 import PackageInfo_hswm qualified as PKG
 import System.Random (randomIO)
+import GHC.Generics (Generic1)
 
 aesonOptions :: A.Options
 aesonOptions =
@@ -30,20 +32,28 @@ aesonOptions =
 
 -- * Message wrapper
 
-data Msg a = Msg {msgBody :: a, msgSeqn :: Maybe Int}
-  deriving (Eq, Show, Generic)
+data Msg a
+  = Contents {contents :: a, seqn :: Maybe Int}
+  | Error Text
+  deriving (Eq, Show, Generic, Generic1)
 
-instance (A.ToJSON a) => A.ToJSON (Msg a) where
-  toJSON Msg{..} =
-    case A.toJSON msgBody of
-      A.Object o -> A.Object $! KM.insert "seqn" (A.toJSON msgSeqn) o
-      x -> error $ "expected body to be an object: " ++ show x
+instance A.ToJSON1 Msg where
+  liftToJSON _ inner _ Contents{..} = A.object [ "contents" .= inner contents, "id" .= seqn ]
+  liftToJSON _ _ _ (Error msg) = A.object [ "error" .= msg ]
+  liftToEncoding _ f _ Contents{..} = A.pairs $ A.pairStr "contents" (f contents) <> "id" .= seqn
+  liftToEncoding _ _ _ (Error msg) = A.pairs $ "error" .= msg
 
-instance (A.FromJSON a) => A.FromJSON (Msg a) where
-  parseJSON = A.withObject "Msg" $ \v -> do
-    msgSeqn <- v A..:? "seqn"
-    msgBody <- A.parseJSON (A.Object v)
-    return Msg{..}
+instance A.FromJSON1 Msg where
+  liftParseJSON _ f _ = A.withObject "Msg" $ \v ->
+    (Error <$> v A..: "error") <|>
+    (Contents <$> (v A..: "contents" >>= f) <*> v A..:? "id")
+
+
+instance A.ToJSON a => A.ToJSON (Msg a) where
+  toJSON = A.toJSON1
+  toEncoding = A.toEncoding1
+instance A.FromJSON a => A.FromJSON (Msg a) where
+  parseJSON = A.parseJSON1
 
 -- * Request
 
@@ -59,15 +69,20 @@ data Request' w
       , description :: Maybe String
       }
   | -- | Request a state dump.
-    DumpState {param :: w ::: String}
+    DumpState
+        { param :: w ::: String <?> "the internal state which is to be shown [hstate,global,input-config,*]" }
   | ListSeats
+      { bindings :: w ::: Bool <#> "k" <?> "show keybindings too" }
   | ListOutputs
   | ListWindows
-  | ConfigGet
+  | ListInputDevices
+    { libinput :: w ::: Bool <#> "L" <?> "show libinput configuration" }
+  | ListMethods
   | CallMethod
-      { method :: w ::: String <#> "n" <?> "method name"
+      { method :: w ::: MethodName <#> "n" <?> "method name"
       , params :: w ::: MethodParams <#> "p" <?> "arbitrary method arguments (JSON-encoded)"
       }
+  | ConfigGet
   deriving (Generic)
 
 deriving instance Eq Request
@@ -80,6 +95,10 @@ instance A.ToJSON Request where
 instance A.FromJSON Request where
   parseJSON = A.genericParseJSON aesonOptions
 
+newtype MethodName = MkMethod { unwrap :: String }
+  deriving (Generic, Eq, Show, Read)
+  deriving newtype (A.ToJSON, A.FromJSON, IsString)
+
 newtype MethodParams = MethodParams A.Value
   deriving (Generic, Eq, Show, Read)
   deriving newtype (A.ToJSON, A.FromJSON)
@@ -90,7 +109,7 @@ newtype MethodParams = MethodParams A.Value
 data Response
   = -- | Server identification info.
     Identify {name :: String, version :: Int, description :: Maybe String}
-  | Error {message :: Text}
+  -- | Error {message :: Text}
   | -- | Outputs updated. @(outputName, OutputId)@
     Outputs {outputs :: [(Text, OutputId)]}
   | -- | Inform the client of current workspace configuration.
@@ -171,7 +190,8 @@ clientRun ::
   -> m r
 clientRun conf onMsg cb = clientRunWith conf $ \sock -> do
   let doMsg resp = case A.eitherDecode resp of
-        Right (Msg msg _) -> onMsg msg
+        Right (Contents msg _) -> onMsg msg
+        Right (Error msg) -> logWarn $ "Server error" :# [ "error" .= msg ]
         Left e -> logWarn $ "Received malformed message from server" :# ["ex" .= toText e, "msg" .= BL.unpack (BL.take 256 resp)]
   let worker lo = do
         (resps, leftover) <- recvLines sock lo
@@ -186,7 +206,7 @@ clientRunWith conf program = do
   ai <- getClientAI conf
   withThreadContext ["component" .= ("ipc-client" :: String), "address" .= show ai.addrAddress] $ do
     bracket (open ai) (io . close) $ \sock -> do
-      sendMsg sock $ (IdentifyClient (thisPeerIdent "client") 0 (Just thisPeerDescription) :: Request)
+      sendMsg sock $ Contents (IdentifyClient (thisPeerIdent "client") 0 (Just thisPeerDescription) :: Request) Nothing
       program sock
   where
     open ai = bracketOnError (io $ socket ai.addrFamily ai.addrSocketType ai.addrProtocol) (io . close) $ \sock -> do
@@ -198,9 +218,11 @@ syncRequest :: (MonadIPCClient m) => Socket -> Request -> m Response
 syncRequest sock req = do
   m <- randomIO
   logDebug $ "new request" :# ["req" .= req, "id" .= m]
-  sendMsg sock (Msg req (Just m))
+  sendMsg sock (Contents req (Just m))
   let go ([], acc) = syncReceive sock acc >>= go
-      go (Msg x n : xs, acc)
+      go (Error err : _, _)
+        = throwString $ "Server error: " <> show err
+      go (Contents x n : xs, acc)
         | n == Just m = return x
         | otherwise = go (xs, acc)
   go ([], "")
@@ -220,6 +242,11 @@ syncReceive sock acc0 = do
               Right x -> return x
           return (xs', acc')
 
+data SocketDisconnected = SocketDisconnected
+    deriving (Eq, Show)
+
+instance Exception SocketDisconnected
+
 -- * Utilities
 
 sendMsg :: (MonadIO m, A.ToJSON msg) => Socket -> msg -> m ()
@@ -228,7 +255,7 @@ sendMsg sock msg = io $ NB.sendAll sock $! BL.toStrict $! A.encode msg <> "\n"
 recvLines :: (MonadIPCClient m) => Socket -> BL.ByteString -> m ([BL.ByteString], BL.ByteString)
 recvLines sock leftover = do
   res <- io $ NB.recv sock 4096
-  when (res == "") $ throwString "recvLines: disconnected"
+  when (res == "") $ throwM SocketDisconnected
   -- logDebug $ "received input" :# [ "size" .= C8.length res ]
   return $! decode [] leftover (BL.fromStrict res)
   where

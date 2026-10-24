@@ -15,7 +15,7 @@ module HSWM.Types.Config where
 import HSWM.Types.Action
 import HSWM.Types.Events
 import HSWM.Types.Lens
-import HSWM.Types.Seat
+--import HSWM.Types.Seat
 import HSWM.Types.Simple
 import HSWM.Types.Window
 import HSWM.Utils (parseRgba)
@@ -65,7 +65,6 @@ instance
   , Default (m ())
   , Default (ManageHook' m)
   , Monoid (m All)
-  --, Default (Event -> m All)
   , Default (Dynamic -> m All)
   , Applicative m) =>
   Default (HSWMConfig m l)
@@ -81,10 +80,6 @@ instance
       , handleEventHook = mempty
       , handleEventHookDynamic = mempty
       }
-
-data RepeatInfo = RepeatInfo {rate, delay :: {-# UNPACK #-} !Int32}
-  deriving stock (Eq, Ord, Show, Read, Generic, Data)
-  deriving anyclass (Default, NFData)
 
 -- * WindowSet/StackSet
 
@@ -130,14 +125,13 @@ type family ManageHook' (m :: k2) :: Type
 
 makeLensesWith'
   classPerField
-  [ ''RepeatInfo
-  , ''XkbRuleNames
+  [ ''XkbRuleNames
   , ''ScreenDetail
   ]
 
 makeLensesCombine'
   (lensField %~ (\f ty b n -> if nameBase n == "layoutHook" then [] else f ty b n))
-  []
+  ["repeatInfo", "pointerBindings"]
   [''HSWMConfig]
 
 -- | Correctly type-changing lens for @layoutHook@ (the generated yields invalid signature...)
@@ -161,8 +155,5 @@ instance ToJSON ScreenDetail where
   toJSON = genericToJSON aesonOptions
   toEncoding = genericToEncoding aesonOptions
 instance ToJSON WorkspaceDetail where
-  toJSON = genericToJSON aesonOptions
-  toEncoding = genericToEncoding aesonOptions
-instance ToJSON RepeatInfo where
   toJSON = genericToJSON aesonOptions
   toEncoding = genericToEncoding aesonOptions

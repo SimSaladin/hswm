@@ -40,12 +40,13 @@ defaultParserPrefs :: Options.PrefsMod
 defaultParserPrefs =
   Options.multiSuffix "..."
     <> Options.subparserInline
+    <> Options.helpShowGlobals
 
 data Cmdline w = Cmdline (Maybe (Request' w)) (ClientOptions' w)
   deriving (Generic)
 
-instance ParseRecord (ClientOptions' Wrapped)
 instance ParseRecord (Request' Wrapped)
+
 instance ParseRecord (Cmdline Wrapped) where
   parseRecord =
     Cmdline
@@ -53,6 +54,10 @@ instance ParseRecord (Cmdline Wrapped) where
       <*> fmap G.to (genericParseRecord mods)
     where
       mods = lispCaseModifiers
+          { fieldNameModifier = \s -> case s of
+                                        "colorEnable" -> "color"
+                                        _ -> lispCaseModifiers.fieldNameModifier s
+          }
 
 data ClientOptions' w = ClientOptions
   { colorEnable :: w ::: AnsiColors <!> "auto" <#> "c" <?> "enable color output"
@@ -63,6 +68,15 @@ data ClientOptions' w = ClientOptions
 type ClientOptions = ClientOptions' Unwrapped
 deriving instance Eq ClientOptions
 deriving instance Show ClientOptions
+
+instance ParseRecord MethodName
+instance ParseField MethodName where
+instance ParseFields MethodName where
+    parseFields h _ _ _ =
+        let proxy = Proxy :: Proxy MethodName in
+        Options.argument Options.str $
+            Options.metavar (metavar proxy)
+            <> foldMap (Options.help . Data.Text.unpack) h
 
 instance ParseRecord MethodParams where
   parseRecord = fmap getOnly parseRecord
@@ -103,7 +117,6 @@ main = do
   where
     runMode opts Nothing = interactive opts
     runMode opts (Just req) = withConnect opts $ \sock -> do
-      logInfoNS "hswmctl" "running some mode"
       res <- syncRequest sock req
       io $ BL.putStrLn $ BL.pack $ prettyResponse res
 
@@ -137,6 +150,7 @@ prettyResponse :: Response -> String
 prettyResponse = \case
   StateDumpResponse str -> TL.unpack str
   InternalObject value -> BL.unpack $ encodePretty value
+  --Error msg -> "error: " ++ T.unpack msg
   msg -> show msg
 
 msgHandler :: Response -> CM ()
@@ -146,6 +160,7 @@ msgHandler = \case
   Workspaces{} -> return ()
   FocusedWindow{} -> return ()
   InternalObject value -> outputStrLn $ BL.unpack $ encodePretty value
+  --Error msg -> outputStrLn $ T.unpack msg
   msg -> outputStrLn $ show msg
 
 consoleHandler :: (Request -> CM ()) -> CM ()

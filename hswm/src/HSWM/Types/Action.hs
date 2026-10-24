@@ -158,7 +158,7 @@ data Submap a = Submap
   , submapDefault :: Maybe a
   -- ^ Default action to trigger when a subkey is not found.
   }
-  deriving stock (Eq, Show, Generic)
+  deriving stock (Eq, Show, Generic, Functor)
   deriving anyclass (Default, NFData)
 
 instance ToJSON (Submap (SomeAction m)) where
@@ -237,22 +237,37 @@ resolveModMask d s = go s
 class (Functor m) => IsAction m a where
   -- | How to execute the action @a@ in @m@.
   runner :: a -> m ()
+  runner = passthruOrDef (error "runner not defined") (const runner) (Proxy @m)
 
   -- | If True, this action should run repeatedly when the trigger is held.
   onHoldRepeat :: Proxy m -> a -> Bool
-  onHoldRepeat _ _ = False
+  onHoldRepeat = passthruOrDef False onHoldRepeat
 
   -- | Action may trigger submap bindings.
   actionSubmap :: a -> Submap (SomeAction m)
-  actionSubmap _ = def
+  --actionSubmap _ = def
+  actionSubmap = passthruOrDef def (\_ -> actionSubmap) (Proxy @m)
 
   -- | Description based on the value (defaults to type info)
   actionDescription :: Proxy m -> a -> String
-  actionDescription _ _ = ""
+  actionDescription = passthruOrDef "" actionDescription
+  --actionDescription _ _ = ""
 
   actionDescriptionFallback :: Proxy m -> a -> String
   default actionDescriptionFallback :: (Typeable a) => Proxy m -> a -> String
-  actionDescriptionFallback _ = show . typeOf
+  actionDescriptionFallback p a = passthruOrDef (show (typeOf a)) actionDescriptionFallback p a
+
+  actionCategories :: Proxy m -> a -> [String]
+  actionCategories = passthruOrDef [] actionCategories
+
+  actionPassthru :: Proxy m -> a -> Maybe (SomeAction m)
+  actionPassthru _ _ = Nothing
+
+passthruOrDef :: IsAction m a => r -> (forall a2. IsAction m a2 => Proxy m -> a2 -> r) -> Proxy m -> a -> r
+passthruOrDef d f p a =
+  case actionPassthru p a of
+    Just (SomeAction a2) -> f p a2
+    Nothing -> d
 
 instance (Functor m, Typeable m) => IsAction m (m ()) where
   runner = id
@@ -269,12 +284,8 @@ instance (MonadIO m, Typeable m) => IsAction m (Submap (SomeAction m)) where
 
 data SomeAction m = forall a. (IsAction m a) => SomeAction a
 
-instance (Functor m) => IsAction m (SomeAction m) where
-  runner (SomeAction a) = runner a
-  onHoldRepeat mp (SomeAction a) = onHoldRepeat mp a
-  actionSubmap (SomeAction a) = actionSubmap a
-  actionDescription mp (SomeAction a) = actionDescription mp a
-  actionDescriptionFallback mp (SomeAction a) = actionDescriptionFallback mp a
+instance (Typeable m, Functor m) => IsAction m (SomeAction m) where
+  actionPassthru _ = Just
 
 instance Eq (SomeAction m) where
   SomeAction a == SomeAction b =
@@ -284,7 +295,13 @@ instance Eq (SomeAction m) where
       proxy = Proxy @m
 
 instance Show (SomeAction m) where
-  show (SomeAction val) = actionDescription (Proxy @m) val
+  show (SomeAction v) =
+    let p = Proxy @m
+        desc = actionDescription p v
+        repeat = onHoldRepeat p v
+        cats = actionCategories p v
+        subm = show (actionSubmap v :: Submap (SomeAction m))
+      in "SomeAction{\"" ++ desc ++ "\", repeat: " ++ show repeat ++ ", categories: " ++ show cats ++ ", submap: " ++ subm ++ "}"
 
 instance NFData (SomeAction m) where
   rnf (SomeAction a) =
@@ -323,7 +340,7 @@ instance HasRiverId (PointerBinding a) where
 -- Data instances
 
 --- deriving instance (Data a, Data (StablePtr (XkbBinding a))) => Data (XkbBinding a)
-deriving instance (Data a, Data (StablePtr (XkbBinding a))) => Data (PointerBinding a)
+deriving instance (Data a) => Data (PointerBinding a)
 
 instance (Typeable m) => Data (SomeAction m) where
   toConstr _ = error "toConstr"

@@ -1,17 +1,20 @@
 {-# LANGUAGE PartialTypeSignatures #-}
 
+-- Might also want one or both of these:
+--
+--    module Text.XkbCommon,
+--    module Text.XkbCommon.EventCodes,
+--
 module HSWM.XKB (
   module HSWM.XKB,
-  module Text.XkbCommon,
-  module Text.XkbCommon.EventCodes,
 )
 where
 
 import HSWM.Types.Action
 
 import River qualified as R
-import Text.XkbCommon
-import Text.XkbCommon.EventCodes
+--import Text.XkbCommon
+--import Text.XkbCommon.EventCodes
 import WL.Client qualified as WL
 
 import Data.Map qualified as M

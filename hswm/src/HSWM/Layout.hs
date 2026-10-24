@@ -30,7 +30,7 @@ where
 
 import HSWM.Core
 import HSWM.StackSet qualified as W
-import River qualified as R
+--import River qualified as R
 import Prelude hiding (handle)
 
 -- | Change the size of the master pane.
@@ -231,9 +231,9 @@ instance (LayoutClass l a, LayoutClass r a) => LayoutClass (Choose l r) a where
   handleMessage c@(Choose d l r) m
     | Just ReleaseResources <- fromMessage m =
         join $ liftM2 (choose c d) (handle l ReleaseResources) (handle r ReleaseResources)
-  handleMessage c@(Choose d l r) m
-    | Just e@(WindowEvent (R.RiverWindowClosed{})) <- fromMessage m =
-        join $ liftM2 (choose c d) (handle l e) (handle r e)
+--  handleMessage c@(Choose d l r) m
+--    | Just e@(WindowEvent (R.RiverWindowClosed{})) <- fromMessage m =
+--        join $ liftM2 (choose c d) (handle l e) (handle r e)
   handleMessage c@(Choose d l r) m | Just (JumpToLayout desc) <- fromMessage m = do
     ml <- handleMessage l m
     mr <- handleMessage r m

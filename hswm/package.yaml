@@ -223,6 +223,7 @@ executables:
       - *base
       - *dep-containers
       - *dep-bytestring
+      - *dep-text
     ghc-options:
       - *common-rts
 

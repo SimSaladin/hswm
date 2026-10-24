@@ -12,9 +12,8 @@ import HSWM.Util.PP
 
 import River qualified as R
 import System.Posix (Signal)
-import WL.Client qualified as WL
 import WL.ExtForeignToplevelList.Staging.V1.Client qualified as ExtFTL
-import WL.ExtIdleNotify.Staging.V1.Client qualified as ExtIN
+--import WL.ExtIdleNotify.Staging.V1.Client qualified as ExtIN
 import WL.ExtSessionLock.Staging.V1.Client qualified as ExtSL
 import WL.Wlr.InputMethod.Unstable.V2.Client qualified as WlrIM
 import WL.Wlr.OutputManagement.Unstable.V1.Client qualified as WlrOM
@@ -35,31 +34,19 @@ data MainEvent
 -- | Mash-up of all River/Wayland generated events
 data Event
   = -- River
-    WindowManagerEvent !R.RiverWindowManagerEvent
-  | OutputEvent !R.RiverOutputEvent
-  | WindowEvent !R.RiverWindowEvent
+    OutputEvent !R.RiverOutputEvent
   | SeatEvent !R.RiverSeatEvent
   | PointerEvent !R.RiverPointerBindingEvent
   | XkbEvent !R.RiverXkbBindingEvent
   | XkbSeatEvent !R.RiverXkbBindingsSeatEvent
   | XkbConfigEvent !R.RiverXkbConfigEvent
-  | XkbKeyboardEvent !R.RiverXkbKeyboardEvent
   | LayerShellOutputEvent !R.RiverLayerShellOutputEvent
   | LayerShellSeatEvent !R.RiverLayerShellSeatEvent
   | InputManagerEvent !R.RiverInputManagerEvent
   | InputDeviceEvent !R.RiverInputDeviceEvent
   | LibinputConfigEvent !R.RiverLibinputConfigEvent
-  | LibinputDeviceEvent !R.RiverLibinputDeviceEvent
-  | -- Wayland core
-    WlShmEvent !WL.ShmEvent
-  | WlSeatEvent !WL.SeatEvent
-  | WlOutputEvent !WL.OutputEvent
-  | WlShellSurfaceEvent !WL.ShellSurfaceEvent
-  -- | WlKeyboardEvent !WL.KeyboardEvent
-  | WlPointerEvent !WL.PointerEvent
-  | WlTouchEvent !WL.TouchEvent
-  | -- Wlroots
-    WlrIMEvent !WlrIM.InputMethodEvent
+    -- Wlroots
+  | WlrIMEvent !WlrIM.InputMethodEvent
   | WlrIMPopupSurfaceEvent !WlrIM.InputPopupSurfaceEvent
   | WlrIMKeyboardGrabEvent !WlrIM.InputMethodKeyboardGrabEvent
   | WlrOutputManagerEvent !WlrOM.OutputManagerEvent
@@ -68,7 +55,6 @@ data Event
   | -- Misc
     XdgOutputEvent !Xdg.OutputEvent
   | SessionLockEvent !ExtSL.SessionLockEvent
-  | IdleNotificationEvent !ExtIN.IdleNotificationEvent
   | FTopLevelListEvent !ExtFTL.ForeignToplevelListEvent
   | FTopLevelHandleEvent !ExtFTL.ForeignToplevelHandleEvent
   deriving stock (Eq, Ord, Show, Generic, Data)

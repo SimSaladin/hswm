@@ -414,7 +414,12 @@
           "xkbcommon-bindings" = {
             flags = { "pkg-config" = lib.mkOverride 900 true; };
           };
-          "hswm" = { flags = { "use-llvm" = lib.mkOverride 900 true; }; };
+          "hswm" = {
+            flags = {
+              "use-llvm" = lib.mkOverride 900 true;
+              "optimize" = lib.mkOverride 900 true;
+            };
+          };
           "waybar-cffi-hs" = {
             flags = { "standalone" = lib.mkOverride 900 false; };
           };

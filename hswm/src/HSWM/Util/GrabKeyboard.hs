@@ -12,14 +12,12 @@ module HSWM.Util.GrabKeyboard where
 
 import HSWM.Core
 import HSWM.Operations
-
 import River qualified as R
 import WL.Client qualified as WL
-
 import WL.Wlr.InputMethod.Unstable.V2.Client qualified as Wlr
-
 import Control.Monad.Fix
 import Data.Map qualified as M
+import Text.XkbCommon as XKBC
 
 type HasGrabCtx env m = (MonadH m, env ~ HConf, MonadStateGlobal env m, MonadReader env m, MonadLogger m, MonadUnliftIO m, MonadFix m)
 
@@ -27,14 +25,17 @@ type SeatIMs = Map WL.Seat GrabIM
 
 data GrabIM = GrabIM
   { reserved :: MVar ()
-  , xkbState :: MVar XkbState
+  , xkbState :: MVar XKBC.XkbState
   , bcastChan :: TChan (Either Done GrabbedKey)
   , inputMethod :: Wlr.InputMethod
   , imKeyboardGrab :: MVar Wlr.InputMethodKeyboardGrab
   , inputMethodListener :: ConstPtr (WL.ObjectListener Wlr.InputMethod)
   , imKeyboardGrabListener :: ConstPtr (WL.ObjectListener Wlr.InputMethodKeyboardGrab)
   }
-  deriving (Eq, Generic)
+  deriving stock (Eq, Generic)
+
+instance Show GrabIM where
+  show x = "GrabIM{" ++ show x.inputMethod ++ "," ++ show x.inputMethodListener ++ "}"
 
 data GrabbedKey
   = -- | Grabbed key
@@ -189,11 +190,3 @@ deactivate GrabIM{..} = do
     Wlr.inputMethodKeyboardGrabRelease kbdg
   io $ WL.setUserData inputMethod nullPtr
   logDebug "grab: input method deactivated"
-
--- zwp_input_popup_surface_v2
--- Wlr.inputMethodDestroy inputMethod
--- WL.objectDestroy kbdg
--- io $ WL.objectDestroy inputMethod
--- io $ WL.objectDestroy inputMethodListener
--- io $ WL.objectDestroy imKeyboardGrabListener
--- logDebug "grab: input method destroyed"

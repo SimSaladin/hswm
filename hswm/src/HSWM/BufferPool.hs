@@ -27,6 +27,8 @@ data ImageBufferPool = ImageBufferPool
   }
   deriving (Eq, Generic)
 
+instance Inspect ImageBufferPool
+
 data ImageBuffer = ImageBuffer
   { width, height :: !Int
   , stride :: !Int

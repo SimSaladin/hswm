@@ -51,7 +51,7 @@ defaultRegistrySettings = withRunInIO $ \runInIO ->
   return
     def
       { WL.regOnBind = \p name ver ->
-          runInIO $
+          runInIO $ do
             logInfo $
               "Registry: bind global"
                 :# [ "name" .= name
@@ -59,6 +59,8 @@ defaultRegistrySettings = withRunInIO $ \runInIO ->
                    , "interface-version" .= WL.objectInterfaceVersion p
                    , "interface" .= WL.objectInterfaceName p
                    ]
+            when (ver /= WL.objectInterfaceVersion p) $
+                logWarn $ "Registry: bound interface does not match the bindings version" :# [ "version" .= ver, "interface" .= WL.objectInterfaceName p, "bindings-version" .= WL.objectInterfaceVersion p ]
       , WL.regOnEvent = \ev -> runInIO $
           case ev of
             WL.RegistryGlobal{..} -> return ()
@@ -110,37 +112,36 @@ startHSWM options config = do
             exitFailure
 
   runH conf $ do
+    InputConfig.initialize
     handleErrors $ do
       logInfo "Allocating wayland event listeners"
-      mkListener $ handleWithHook . WlShmEvent
-      mkListener $ handleWithHook . WlOutputEvent
-      mkListener $ handleWithHook . WlShellSurfaceEvent
-      mkListener $ handleWithHook . WlSeatEvent
-      mkListener $ handleWithHook . WlPointerEvent
-      mkListener $ handleWithHook . WlTouchEvent
+      mkListener $ handleWithHook' @WL.ShmEvent
+      mkListener $ handleWithHook' @WL.OutputEvent
+      mkListener $ handleWithHook' @WL.SeatEvent
+      mkListener $ handleWithHook' @WL.PointerEvent
+      mkListener $ handleWithHook' @WL.TouchEvent
+      mkListener $ handleWithHook' @WL.KeyboardEvent
+      mkListener $ handleWithHook' @WL.ShellSurfaceEvent
       mkListener $ handleWithHook . XkbConfigEvent
-      mkListener $ handleWithHook . XkbKeyboardEvent
+      mkListener $ handleWithHook' @R.RiverXkbKeyboardEvent
       mkListener $ handleWithHook . XkbEvent
       mkListener $ handleWithHook . XkbSeatEvent
       mkListener $ handleWithHook . PointerEvent
-      mkListener $ handleWithHook . WindowEvent
+      mkListener $ handleWithHook' @R.RiverWindowEvent
       mkListener $ handleWithHook . SeatEvent
       mkListener $ handleWithHook . OutputEvent
       mkListener $ handleWithHook . LayerShellOutputEvent
       mkListener $ handleWithHook . LayerShellSeatEvent
       mkListener $ handleWithHook . InputDeviceEvent
       mkListener $ handleWithHook . LibinputConfigEvent
-      mkListener $ handleWithHook . LibinputDeviceEvent
+      mkListener $ handleWithHook' @R.RiverLibinputDeviceEvent
       mkListener $ handleWithHook . InputManagerEvent
-      mkListener $ handleWithHook . WindowManagerEvent
+      mkListener $ handleWithHook' @R.RiverWindowManagerEvent
       mkListener $ handleWithHook . FTopLevelHandleEvent
       mkListener $ handleWithHook . XdgOutputEvent
       mkListener $ handleWithHook . WlrOutputManagerEvent
       mkListener $ handleWithHook . WlrOutputHeadEvent
-      mkListener $ handleWithHook . IdleNotificationEvent
       mkListener $ handleWithHook . OutputPowerEvent
-
-      mkListener $ handleWithHook' @WL.KeyboardEvent -- . WlKeyboardEvent
 
       -- Setup the globals registry
       putMVar conf.globals =<< WL.initRegistryState conf._wlDisplay =<< defaultRegistrySettings
@@ -155,9 +156,11 @@ startHSWM options config = do
       _ <- bindGlobalWithAutoListener @R.RiverWindowManager
       _ <- bindGlobal @R.RiverXkbBindings
       _ <- bindGlobal @R.RiverLayerShell
-      _ <- bindGlobalWithAutoListener @R.RiverLibinputConfig
       _ <- bindGlobalWithAutoListener @R.RiverInputManager
       _ <- bindGlobalWithAutoListener @R.RiverXkbConfig
+      -- note: libinputconfig has to come after RiverInputManager,
+      -- otherwise we don't get the inputDevice associations!
+      _ <- bindGlobalWithAutoListener @R.RiverLibinputConfig
       _ <- bindGlobal @XO.OutputManager
       _ <- bindGlobalWithAutoListener @WLR_OM.OutputManager
       _ <- bindGlobal @WLR_LS.LayerShell
@@ -252,24 +255,17 @@ mainLoop wlDisplay wlPollFd = do
 -- event handling
 
 instance HandleEvent H Event where
-  handleEvent (WindowManagerEvent e) = handleEvent e
   handleEvent (OutputEvent e) = Outputs.handle e
   handleEvent (LayerShellOutputEvent e) = Outputs.handleLayerShell e
-  handleEvent (WlOutputEvent e) = Outputs.handleWlOutput e
   handleEvent (SeatEvent e) = Seats.handleEvent e
   handleEvent (LayerShellSeatEvent e) = Seats.handleLayerShellSeat e
-  handleEvent (WlSeatEvent e) = Seats.handleWlSeatEvent e
-  handleEvent (WindowEvent e) = Windows.handleEvent e
   handleEvent (XkbEvent e) = Seats.handleXkbBindingEvent e -- XKB Keyboard events
   handleEvent (XkbSeatEvent e) = Seats.handleXkbBindingsSeatEvent e -- XKB Keyboard events
   handleEvent (PointerEvent e) = Seats.handlePointerEvent e -- Pointer events
   handleEvent (InputManagerEvent e) = InputConfig.handleInputManagerEvent e
   handleEvent (InputDeviceEvent e) = InputConfig.handleInputDeviceEvent e
   handleEvent (LibinputConfigEvent e) = InputConfig.handleLibinputEvent e
-  handleEvent (LibinputDeviceEvent e) = InputConfig.handleLibinputDeviceEvent e
   handleEvent (XkbConfigEvent e) = InputConfig.handleXkbConfigEvent e
-  handleEvent (XkbKeyboardEvent e) = InputConfig.handleXkbKeyboardEvent e
-  handleEvent (IdleNotificationEvent e) = handleEvent e
   handleEvent (OutputPowerEvent e) = e `seq` return () -- TODO
   handleEvent (FTopLevelListEvent (EXT_FTL.ForeignToplevelListToplevel _ _ fh)) = WL.listenerAdd_ fh =<< getObject
   handleEvent (WlrOutputManagerEvent (WLR_OM.OutputManagerHead _ _ head)) = WL.listenerAdd_ head =<< getObject
@@ -278,6 +274,9 @@ instance HandleEvent H Event where
 instance HandleEvent H EXT_IN.IdleNotificationEvent where
   handleEvent EXT_IN.IdleNotificationIdled{} = runInHS $ setOutputPower False
   handleEvent EXT_IN.IdleNotificationResumed{} = runInHS $ setOutputPower True
+
+instance HandleEvent H R.RiverWindowEvent where
+    handleEvent = Windows.handleEvent
 
 instance HandleEvent H R.RiverWindowManagerEvent where
   handleEvent = \case
@@ -311,3 +310,23 @@ instance HandleEvent H R.RiverWindowManagerEvent where
     R.RiverWindowManagerUnavailable _ wm -> do
       R.objectDestroy wm
       writeMainQ $ MainExit "another window manager already running" (toException $ ExitFailure 1)
+
+instance HandleEvent H R.RiverLibinputDeviceEvent where
+    handleEvent = InputConfig.handleLibinputDeviceEvent
+instance HandleEvent H R.RiverXkbKeymapEvent where
+    handleEvent = InputConfig.handleXkbKeymapEvent
+instance HandleEvent H R.RiverXkbKeyboardEvent where
+    handleEvent = InputConfig.handleXkbKeyboardEvent
+
+instance HandleEvent H WL.ShmEvent where
+    handleEvent _ = return ()
+instance HandleEvent H WL.PointerEvent where
+    handleEvent _ = return ()
+instance HandleEvent H WL.TouchEvent where
+    handleEvent _ = return ()
+instance HandleEvent H WL.ShellSurfaceEvent where
+    handleEvent _ = return ()
+instance HandleEvent H WL.SeatEvent where
+    handleEvent = Seats.handleWlSeatEvent
+instance HandleEvent H WL.OutputEvent where
+    handleEvent = Outputs.handleWlOutput

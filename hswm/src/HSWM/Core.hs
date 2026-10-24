@@ -21,7 +21,7 @@ import HSWM.Types.Config
 import HSWM.Types.Events
 import HSWM.Types.TypeMap
 import HSWM.Types.WM
-import HSWM.XKB hiding (LogLevel (..))
+import HSWM.XKB
 
 import Control.Monad.State
 import GHC.Stack

@@ -67,7 +67,7 @@ waybarTask oper = withOptionalObject $ \WaybarState{wbProcess, wbConfig} -> do
       getExitCode ph >>= \case
         Just{} | oper == StartWaybar || oper == RestartWaybar -> restartIt ph wbConfig
         Nothing
-          | oper == StopWaybar -> stopProcess ph
+          | oper == StopWaybar -> stopWaybarProcess ph
           | oper == RestartWaybar -> restartIt ph wbConfig
         _ -> return ()
   where
@@ -86,20 +86,24 @@ waybarTask oper = withOptionalObject $ \WaybarState{wbProcess, wbConfig} -> do
       modifyObject $ \st -> st{wbProcess = Just process}
     restartIt ph cfg = do
       logInfo "waybar: process is no longer running, now restarting"
-      stopProcess ph
+      stopWaybarProcess ph
       startIt cfg
 
 waybarCleanup :: (HasCallStack) => H ()
 waybarCleanup = withOptionalObject $ \WaybarState{wbProcess} -> do
   forM_ wbProcess $ \p -> do
     logDebug "waybar: stopping the process and cleaning up the state"
-    withAsync (delayKill p) $ \_ -> do
+    stopWaybarProcess p
+
+stopWaybarProcess :: Process a b c -> H ()
+stopWaybarProcess p = do
+    withAsync delayKill $ \_ -> do
       mpid <- io $ getPid p
       io $ forM_ mpid $ signalProcess sigTERM
-      stopProcess p `onException` logError "stopProcess threw an error!"
+      void $ tryIO $ stopProcess p `onException` logError "stopProcess threw an error!"
     modifyObject $ \st -> st{wbProcess = Nothing}
   where
-    delayKill p = do
+    delayKill = do
       -- XXX tricky
       mpid <- io $ getPid p
       io $ threadDelay 5_000

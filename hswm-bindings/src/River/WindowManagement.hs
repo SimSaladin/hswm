@@ -1,4 +1,6 @@
 {-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE RecordWildCards #-}
+
 
 -- |
 -- Module      : River.WindowManagement
@@ -183,11 +185,26 @@ import Data.Word
 import Foreign.C.Types
 import GHC.Generics
 import HsBindgen.Runtime.CEnum
+import qualified Data.Aeson as A
+import qualified Data.Aeson.Types as A
+import Data.Functor ((<&>))
+
+-- * RiverColor
 
 -- | Color in the format River expects it (@4 * 32b@ RGBA).
 data RiverColor = RiverColor {red, green, blue, alpha :: {-# UNPACK #-} !Word32}
   deriving stock (Eq, Ord, Show, Read, Bounded, Generic, Data)
   deriving anyclass (Default, NFData)
+
+-- | Encoded in an array [R,G,B,A] numeric
+instance A.ToJSON RiverColor where
+    toJSON c = A.toJSON (c.red, c.green, c.blue, c.alpha)
+    toEncoding c = A.toEncoding (c.red, c.green, c.blue, c.alpha)
+
+instance A.FromJSON RiverColor where
+    parseJSON v = A.modifyFailure ("Parsing RiverColor: " ++) $
+        A.parseJSON v <&> (\(red, green, blue, alpha) -> RiverColor{..})
+
 
 data WindowBorders = WindowBorders
   { wbWidth :: {-# UNPACK #-} !Int32
@@ -199,6 +216,8 @@ data WindowBorders = WindowBorders
   }
   deriving stock (Eq, Ord, Show, Read, Generic)
   deriving anyclass (Default, NFData)
+
+-- * Enums
 
 pattern EdgeNone, EdgeLeft, EdgeRight, EdgeBottom, EdgeTop :: RiverWindowEdges
 pattern EdgeNone = RIVER_WINDOW_V1_EDGES_NONE

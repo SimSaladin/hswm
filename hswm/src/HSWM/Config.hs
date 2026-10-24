@@ -22,68 +22,80 @@ import Data.Foldable
 import Data.List qualified as L
 import Data.Text qualified as T
 import Data.Typeable
+import GHC.TypeLits
 
-class ToAction a where
-  toAction :: a -> SomeAction H
+infixl 4 <?>
+infixl 4 <!>
+infixl 4 <%>
 
-instance ToAction (SomeAction H) where toAction = id
-instance ToAction (H a) where toAction = SomeAction . void
-instance ToAction (HS a) where toAction = SomeAction . void . runInHS @H
-instance ToAction (IO a) where toAction = SomeAction . void
-instance (Typeable a, Typeable b, IsAction H a, IsAction H b) => ToAction (a :>>: b) where
-  toAction = SomeAction
-instance (Message a, Show a) => ToAction (SendMessage a) where
-  toAction = SomeAction
+-- * SendMessage
 
 newtype SendMessage a = SendMessage a
 
 instance (Message a, Show a) => IsAction H (SendMessage a) where
   runner (SendMessage msg) = runInHS (sendMessage msg)
   actionDescription _ (SendMessage msg) = "Send '" ++ show msg ++ "' (" ++ show (typeOf msg) ++ ")"
+  actionCategories _ _ = ["Message"]
 
--- onHoldRepeat _ _ = True -- ?
-
--- | Attach a description to some action: @ restart <?> "Restart" @
-(<?>) :: (ToAction a) => a -> String -> SomeAction H
-action <?> desc = SomeAction $ NamedAction desc (toAction action)
-
-infixr 1 <?>
-
--- | Control key autorepeat
-data RepeatOnHold a = a :%* Int deriving (Eq, Show, Generic)
-
-infixr 6 :%*
-
-instance (Typeable a, IsAction H a) => IsAction H (RepeatOnHold a) where
-  runner (a :%* _) = runner a
-  onHoldRepeat _ (_ :%* n) = n > 0
-  actionDescription p (a :%* _) = actionDescription p a
-  actionDescriptionFallback p (a :%* _) = actionDescriptionFallback p a
-  actionSubmap (a :%* _) = actionSubmap a
-
--- * NamedAction
+-- * NamedAction and descriptions
 
 -- | Add a label to an action
-data NamedAction = NamedAction String (SomeAction H)
+--data NamedAction a = NamedAction String a
+newtype (<?>) a (desc :: Symbol) = NamedAction { fromNamedAction :: a }
   deriving stock (Generic)
 
-instance IsAction H NamedAction where
-  runner (NamedAction _ a) = runner a
-  onHoldRepeat p (NamedAction _ a) = onHoldRepeat p a
-  actionSubmap (NamedAction _ a) = actionSubmap a
-  actionDescription p (NamedAction nm a) =
-    nm
+-- | Attach a description to some action: @ restart <?> "Restart" @
+(<?>) :: (IsAction H a) => a -> String -> SomeAction H
+(<?>) = flip named
+
+named :: forall a. (IsAction H a) => String -> a -> SomeAction H
+named str a = withSomeSSymbol str $ \case
+  (ssym :: SSymbol s) -> withKnownSymbol ssym $ SomeAction (NamedAction a :: a <?> s)
+
+instance (KnownSymbol desc, IsAction H a) => IsAction H (a <?> desc) where
+  actionPassthru _ (NamedAction a) = Just $ SomeAction a
+  actionDescription p (NamedAction a) =
+    symbolVal (Proxy @desc)
       ++ ( let sub = actionDescription p a
             in if sub /= "" then ": " ++ sub else ""
          )
-  actionDescriptionFallback p (NamedAction nm a) =
-    nm
+  actionDescriptionFallback p (NamedAction a) =
+    symbolVal (Proxy @desc)
       ++ ( let sub = actionDescriptionFallback p a
             in if sub /= "" then ": " ++ sub else ""
          )
 
-named :: (IsAction H a) => String -> a -> SomeAction H
-named str a = SomeAction $ NamedAction str (SomeAction a)
+-- * Autorepeat
+
+-- | Control key autorepeat
+newtype (<!>) action (repeat :: Nat) = RepeatOnHold { getRepeat :: action }
+
+instance (Typeable a, IsAction H a, KnownNat repeat) => IsAction H (a <!> repeat) where
+  onHoldRepeat _ _ = natVal (Proxy @repeat) > 0
+  actionPassthru _ (RepeatOnHold a) = Just $ SomeAction a
+
+(<!>) :: forall a. (Typeable a, IsAction H a) => a -> Integer -> SomeAction H
+action <!> n = withSomeSNat n $ \case
+  Just (snat :: SNat n) -> withKnownNat snat $ SomeAction (RepeatOnHold action :: a <!> n)
+  Nothing -> error "invalid SNat"
+
+-- * Categories
+
+category :: String -> [(a, SomeAction H)] -> [(a, SomeAction H)]
+category cat = over (each . _2) (<%> [cat])
+
+data WithCategories a = WithCategories [String] a deriving (Eq, Show, Generic)
+
+-- | Add categories to action
+(<%>) :: (Typeable a, IsAction H a) => a -> [String] -> SomeAction H
+action <%> cats = SomeAction $ WithCategories cats  action
+
+instance (Typeable a, IsAction H a) => IsAction H (WithCategories a) where
+  actionPassthru _ (_ `WithCategories` a) = Just $ SomeAction a
+  actionSubmap (xs `WithCategories` a) = (actionSubmap a :: Submap (SomeAction H)) <&> (<%> xs)
+  actionCategories p (xs `WithCategories` a) = xs ++ actionCategories p a
+
+-- * Combine actions
 
 -- | Concatenate many messages
 data a :>>: b = a :>>: b
@@ -96,6 +108,7 @@ instance (IsAction H a, IsAction H b, Typeable a, Typeable b) => IsAction H (a :
   onHoldRepeat p (a :>>: b) = onHoldRepeat p a && onHoldRepeat p b
   actionDescription p (a :>>: b) = L.intercalate " && " $ filter (/= "") [actionDescription p a, actionDescription p b]
   actionDescriptionFallback p (a :>>: b) = L.intercalate " && " $ filter (/= "") [actionDescriptionFallback p a, actionDescriptionFallback p b]
+  actionCategories p (a :>>: b) = actionCategories p a ++ actionCategories p b
   actionSubmap (a :>>: b) =
     Submap
       { submapKeys = s1.submapKeys <> s2.submapKeys
@@ -114,14 +127,14 @@ addKeys keys c =
     }
 
 addKeys' :: forall m. (m ~ H, Typeable m, MonadIO m) => [(String, SomeAction m)] -> ConfigDoM m
-addKeys' keys c =
-  c
-    { keyBindings = c.keyBindings <> fromKeyTree (parseSubmaps doMod keys)
-    }
-  where
-    doMod = resolveModMask (resolveModMask 0 c.defaultModMask)
+addKeys' keys c = c { keyBindings = c.keyBindings <> interpretStringKeys c keys }
 
 -- * Parse ADT
+
+interpretStringKeys :: (a ~ SomeAction m, m ~ H, Foldable t) => HSWMConfig m l -> t (String, a) -> [(XBKey, a)]
+interpretStringKeys c = fromKeyTree . parseSubmaps doMod . toList
+  where
+    doMod = resolveModMask (resolveModMask 0 c.defaultModMask)
 
 data KeyTree k a
   = KeyAction {_key :: k, _action :: a}
@@ -129,17 +142,14 @@ data KeyTree k a
   deriving (Show, Generic)
 
 -- | Convert KeyTrees to flat key list.
-fromKeyTree ::
-  forall a m.
-  (a ~ SomeAction m, Typeable m, MonadIO m, m ~ H) =>
-  [KeyTree XBKey a] -> [(XBKey, a)]
+fromKeyTree :: forall a. (a ~ SomeAction H) => [KeyTree XBKey a] -> [(XBKey, a)]
 fromKeyTree = map doKey
   where
     doKey (KeyAction mk a) = (mk, a)
     doKey (KeySubmap mk xs) =
       let helpAction = showKeyHelpFor (ppXBKey mk) skeys <?> ("Submap " <> ppXBKey @String mk)
           skeys = fromKeyTree xs
-       in (mk, SomeAction $ submap @m @a (Just helpAction) skeys)
+       in (mk, SomeAction $ submap @H @a (Just helpAction) skeys)
 
 -- | @submap defaultAction submapKeys@
 submap ::
@@ -163,7 +173,8 @@ parseSubmaps ::
   -> [KeyTree XBKey a]
 parseSubmaps getMod ks0 = combine $ do
   (s, a) <- ks0
-  let ks = [XBKey (getMod $ L.intercalate "-" (L.init bk)) (toKeySym $ L.last bk) | k <- L.words s, let bk = breakKeys k]
+  let ks = [XBKey (getMod $ L.intercalate "-" (L.init bk)) (toKeySym $ L.last bk)
+              | k <- L.words s, let bk = breakKeys k]
   return $ mkKeyTree ks a
   where
     combine :: (Eq k) => [KeyTree k a] -> [KeyTree k a]
@@ -180,11 +191,9 @@ parseSubmaps getMod ks0 = combine $ do
     mkKeyTree [] _ = error "mkKeyTree"
 
     breakKeys :: String -> [String]
-    breakKeys "" = []
-    breakKeys str = case L.span (/= '-') str of
-      (k, '-' : xs) -> k : breakKeys xs
-      (k, []) -> [k]
-      (_, _) -> error "breakKeys"
+    breakKeys s = case L.span (/= '-') s of
+      ("", _) -> []
+      (k, xs) -> k : breakKeys (drop 1 xs)
 
 -- * Show key help
 

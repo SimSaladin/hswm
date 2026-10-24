@@ -52,13 +52,27 @@ signalWindowByPID sig w
       io $ signalProcess sig (fromIntegral pid)
   | otherwise = logWarn $ "Cannot signal process of window " <> tshow w.river_window <> " (ProcessID unknown)" :# ["signal" .= tshow sig]
 
-runWithSystemD :: (HasCallStack) => (MonadProcessSpawn m) => String -> m ()
-runWithSystemD cmd =
-  void $
-    readProcess $
-      proc
-        "systemd-run"
-        ["--user", "--no-block", "--collect", "--", "bash", "-c", cmd]
+data SDRunParams = SDRunParams
+  { sdCollect :: Bool
+  , sdScope :: Bool
+  , sdUnit :: Maybe String
+  , sdSlice :: Maybe String
+  } deriving (Eq, Generic)
+
+instance Default SDRunParams where
+  def = SDRunParams { sdCollect = True, sdScope = True, sdUnit = Nothing, sdSlice = Nothing }
+
+runProgWithSystemD :: (HasCallStack) => (MonadProcessSpawn m) => SDRunParams -> String -> [String] -> m ()
+runProgWithSystemD p cmd args = void $ readProcess $ proc "systemd-run" $
+    ["--user", "--no-pager", "--no-block", "--no-ask-password"] ++
+    ["--collect" | p.sdCollect] ++
+    ["--scope" | p.sdScope] ++
+    ["--unit=" ++ u | Just u <- pure p.sdUnit] ++
+    ["--slice=" ++ s | Just s <- pure p.sdSlice] ++
+    ["--", cmd] ++ args -- ["bash", "-c", cmd]
+
+runWithSystemD :: (HasCallStack) => (MonadProcessSpawn m) => SDRunParams -> String -> m ()
+runWithSystemD p cmd = runProgWithSystemD p "bash" ["-c", cmd]
 
 notifySend ::
   (MonadProcessSpawn m) =>

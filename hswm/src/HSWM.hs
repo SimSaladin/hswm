@@ -16,6 +16,7 @@ module HSWM (
   module HSWM.Utils,
   module HSWM.XKB,
   module HSWM.InputConfig,
+  module Text.XkbCommon.EventCodes,
 
   -- * Re-exports
   module Prelude,
@@ -33,5 +34,6 @@ import HSWM.Main
 import HSWM.ManageHook
 import HSWM.Operations
 import HSWM.Utils
-import HSWM.XKB hiding (LogLevel (..))
+import HSWM.XKB
 import Prelude hiding (setEnv, (^?))
+import Text.XkbCommon.EventCodes

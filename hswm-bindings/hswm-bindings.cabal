@@ -82,7 +82,8 @@ library
     hs-bindgen-runtime >=0.1.0 && <0.2,
     template-haskell >=2.23 && <2.25,
     unix ^>=2.8.6,
-    unliftio ^>=0.2.25
+    unliftio ^>=0.2.25,
+    aeson
 
   hs-source-dirs: src
   ghc-options:

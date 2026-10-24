@@ -8,7 +8,7 @@
   , config
   , ... }:
   ({
-    flags = { use-llvm = true; };
+    flags = { optimize = true; use-llvm = true; };
     package = {
       specVersion = "3.12";
       identifier = { name = "hswm"; version = "0.1.0.0"; };
@@ -127,9 +127,9 @@
           ];
           buildable = true;
           hsSourceDirs = [ "app" ];
-          mainPath = [
+          mainPath = ([
             "Main.hs"
-          ] ++ pkgs.lib.optional (flags.use-llvm && (compiler.isGhc && compiler.version.ge "9.14.1")) "";
+          ] ++ pkgs.lib.optional (flags.use-llvm && (compiler.isGhc && compiler.version.ge "9.14.1")) "") ++ pkgs.lib.optional (flags.optimize) "";
         };
         "hswmctl" = {
           depends = [
@@ -151,9 +151,9 @@
           ];
           buildable = true;
           hsSourceDirs = [ "app-ctl" ];
-          mainPath = [
+          mainPath = ([
             "Main.hs"
-          ] ++ pkgs.lib.optional (flags.use-llvm && (compiler.isGhc && compiler.version.ge "9.14.1")) "";
+          ] ++ pkgs.lib.optional (flags.use-llvm && (compiler.isGhc && compiler.version.ge "9.14.1")) "") ++ pkgs.lib.optional (flags.optimize) "";
         };
       };
     };

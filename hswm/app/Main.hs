@@ -14,7 +14,7 @@ import HSWM.Actions.OnScreen qualified as OnScreen
 import HSWM.Actions.PhysicalScreens qualified as PScreen
 import HSWM.Hooks.NonExclusiveArea qualified as NEArea
 import HSWM.Layout.BinarySpacePartition qualified as BSP
-import HSWM.Layout.BoringWindows (BoringMessage (Replace), boringWindows)
+import HSWM.Layout.BoringWindows (UpdateBoring(..), boringWindows)
 import HSWM.Layout.GridVariants qualified as GV
 import HSWM.Layout.Maximize qualified as L.Maximize
 import HSWM.Layout.Minimize qualified as L.Minimize
@@ -33,11 +33,15 @@ import HSWM.Util.PangoMarkup qualified as P
 import HSWM.Util.RofiPrompt qualified as RP
 import HSWM.Util.Waybar qualified as WB
 import HSWM.Wallpaper qualified as Wallpaper
+import HSWM.Util.ExtensibleState qualified as XS
+import HSWM.Util.Minimize (Minimized(..))
 
 import Data.List qualified as L
 import Data.Map qualified as M
+import Data.Set qualified as S
 import Data.Ord (clamp)
 import Text.Printf
+import qualified Data.Text as T
 
 main :: IO ()
 main =
@@ -53,6 +57,8 @@ main =
                 .~ myManageHook
               & handleEventHook
                 <>~ debugHook
+              & handleEventHookDynamic
+                <>~ debugHookDyn
               & startupHook
                 <>~ runInHS (scratchpadsStartupHook myScratchpads)
               & pointerBindings
@@ -120,7 +126,7 @@ promptLaunchSystemD =
   RP.runRofi
     (myRofiBaseConfig @_ @'s' & RP.withHistory "systemd-run" & RP.prompt .~ "systemd-run")
     (mempty @[String])
-    RP.++> runWithSystemD
+    RP.++> runWithSystemD def
 
 myKeys :: [(String, SomeAction H)]
 myKeys =
@@ -200,7 +206,7 @@ myKeys =
     , ("M-b y", SendMessage (Toggle REFLECTY) <?> "Layout")
     , ("M-b M-x", SendMessage NEArea.ToggleNonExclusiveArea :>>: SendMessage (Toggle NOBORDERS) <?> "Layout")
     , ("M-m", withFocused (sendMessage . L.Maximize.maximizeRestore . view riverWindow) <?> "Maximize Restore")
-    , ("M-b M-c", SendMessage (Replace "Minimize" []) <?> "Clear boring window cache")
+    , ("M-b M-c", cleanupMinimized <?> "Clear boring window cache")
     ]
     ++
     -- ======= Layout: BSP
@@ -266,8 +272,9 @@ myKeys =
     -- "M-@"       >+ togglePad "taskwarrior-tui"
 
     -- ====== Media
-    [ ("M-plus", adjustVolume "@DEFAULT_SINK@" volAdjAmount)
-    , ("M-minus", SomeAction $ adjustVolume "@DEFAULT_SINK@" (-volAdjAmount) :%* 500)
+    category "Media"
+    [ ("M-plus", adjustVolume "@DEFAULT_SINK@" volAdjAmount <!> 500)
+    , ("M-minus", adjustVolume "@DEFAULT_SINK@" (-volAdjAmount) <!> 500)
     , ("M-numbersign", togglePad "ncmpcpp" <?> "Toggle ncmpcpp")
     , ("M-c n", mpc ["next"])
     , ("M-c p", mpc ["prev"])
@@ -282,10 +289,10 @@ myKeys =
     , ("XF86AudioNext", mpc ["next"])
     , ("XF86AudioMute", toggleMute "@DEFAULT_SINK@" def)
     , ("XF86AudioMicMute", toggleMute "@DEFAULT_SOURCE@" def)
-    , ("XF86AudioRaiseVolume", adjustVolume "@DEFAULT_SINK@" volAdjAmount)
-    , ("XF86AudioLowerVolume", adjustVolume "@DEFAULT_SINK@" (-volAdjAmount))
-    , ("XF86MonBrightnessUp", backlight ["set", "2%+"])
-    , ("XF86MonBrightnessDown", backlight ["set", "2%-"])
+    , ("XF86AudioRaiseVolume", adjustVolume "@DEFAULT_SINK@" volAdjAmount <!> 500)
+    , ("XF86AudioLowerVolume", adjustVolume "@DEFAULT_SINK@" (-volAdjAmount) <!> 500)
+    , ("XF86MonBrightnessUp", backlight ["set", "2%+"] <!> 500)
+    , ("XF86MonBrightnessDown", backlight ["set", "2%-"] <!> 500)
     , ("M-c s", spawnProcess @H "sink-switch" [] <?> "Toggle speakers-phones output")
     , ("M-c m", spawnOnceKitty "pulsemixer@kitty" "pulsemixer" [] (doCenterFloat (1 / 2) (2 / 3)))
     ]
@@ -436,16 +443,30 @@ removeFocusedWorkspace = do
 bindsPrompt :: H ()
 bindsPrompt = do
   binds <- view (config . keyBindings)
-  let xs = renderBindings binds
-  let input = [{-T.justifyLeft ind  ' '-} P.bold mk <> "\t" <> P.italic desc | (mk, desc) <- xs]
-  RP.runRofi @_ @'i' myRofiBaseConfig input RP.++> (\(x :: Int) -> logInfo $ "binds prompt" :# ["res" .= tshow x])
+  let xs = renderBindings [] binds
+      ind = maximum $ xs ^.. traversed . _2 . _1 . to T.length
+      input = [ P.bold (T.justifyLeft ind ' ' mk) <> "\t" <> P.italic desc <> " " <> P.bold (show cats) | (_, (mk, desc, cats)) <- xs]
+  RP.runRofi @_ @'i' myRofiBaseConfig input
+    RP.++> \(x :: Int) -> do
+      logInfo $ "binds prompt" :# ["res" .= tshow x]
+      case xs ^.. ix x of
+        [(k,_)] -> runner k
+        _ -> return ()
   where
-    renderBindings :: [(XBKey, SomeAction H)] -> [(Text, String)]
-    renderBindings binds =
-      let out :: [(Text, String)]
-          out =
-            [ (ppXBKey @Text xk, actionDescription (Proxy @H) a)
-            | (xk, a) <- L.sortOn (ppXBKey @String . fst) binds
-            ]
-          indent = 0 -- maximum $ map (T.length . fst) out
-       in out
+    renderBindings :: [XBKey] -> [(XBKey, SomeAction H)] -> [(SomeAction H, (Text, String, [String]))]
+    renderBindings pre binds = join
+      [ (a, (T.unwords $ map (ppXBKey @Text) $ pre ++ [xk], actionDescription (Proxy @H) a, actionCategories (Proxy @H) a)) : renderBindings (pre ++ [xk]) (actionSubmap a).submapKeys
+      | (xk, a) <- L.sortOn (ppXBKey @String . fst) binds
+      ]
+
+-- | XXX: this should be run after window restore
+cleanupMinimized :: H ()
+cleanupMinimized = runInHS $ do
+  exists <- gets (^.. _windows . each . riverWindow)
+  modi <- XS.modified $ \Minimized{..} -> Minimized
+    { rectMap = rectMap `M.restrictKeys` S.fromList exists
+    , minimizedStack = minimizedStack `L.intersect` exists
+    }
+  logInfo $ "cleaned up minimized" :# [ "modified" .= modi ]
+  ws <- gets (W.workspace . W.current . view windowset)
+  sendMessageWithNoRefresh UpdateBoring ws

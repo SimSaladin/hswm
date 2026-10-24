@@ -31,7 +31,7 @@ bindsToList = (^.. each . to (snd . (.unBoth)))
 
 -- * Event handling
 
-handleEvent :: R.RiverSeatEvent -> H ()
+handleEvent :: HandleEvent H EXT_IN.IdleNotificationEvent => R.RiverSeatEvent -> H ()
 handleEvent = \case
   R.RiverSeatWlSeat _ seat name -> hasWlSeat seat name
   R.RiverSeatPointerEnter _ seat window -> runInHS $ withSeat_ seat $ \s -> modifySeat seat $ hovered .~ window &+ pendingPointerEnter ?~ (window, s.position)
@@ -52,7 +52,7 @@ instance HandleEvent H WL.KeyboardEvent where
         --KeyboardKeymap{}
         _ -> pure ()
 
-handleWlSeatEvent :: WL.SeatEvent -> H ()
+handleWlSeatEvent :: (HandleEvent H WL.TouchEvent, HandleEvent H WL.PointerEvent) => WL.SeatEvent -> H ()
 handleWlSeatEvent = \case
   WL.SeatName ud _ name -> runInHS $ modifySeat' ud $ _name .~ name
   WL.SeatCapabilities ud wls seatCaps -> do
@@ -296,7 +296,7 @@ added rs = do
 -- | Bind the Wl_seat interface of a river_seat as well.
 --
 -- Currently this will also request idle notifications via ext-idle-notify-v1.
-hasWlSeat :: RiverSeat -> WL.ObjectName -> H ()
+hasWlSeat :: HandleEvent H EXT_IN.IdleNotificationEvent => RiverSeat -> WL.ObjectName -> H ()
 hasWlSeat seat name = do
   wls <- globalBindAndListen @WL.Seat False Nothing (Just seat) Nothing (Just name)
   idlno <- objectCommand EXT_IN.idleNotifierGetIdleNotification >>= \f -> f (10 * 60 * 1000) wls
@@ -476,7 +476,7 @@ calcResizeEdges w (Position sx sy) = (if closerL then 4 else 8) .|. (if closerU 
     closerL = (sx - w.position.x) < (w.position.x + fi w.size.width - sx)
     closerU = (sy - w.position.y) < (w.position.y + fi w.size.height - sy)
 
-objectCommand :: forall o f. (Typeable o) => (o -> f) -> H f
+objectCommand :: forall o f. (Inspect o) => (o -> f) -> H f
 objectCommand f = do
   o <- getObject @o
   return (f o)

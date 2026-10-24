@@ -14,6 +14,7 @@ module HSWM.Types.Seat where
 
 import HSWM.Types.Action
 import HSWM.Types.Lens
+import HSWM.Types.Config
 import HSWM.Types.Simple
 import HSWM.Types.Window
 
@@ -45,14 +46,12 @@ data Seat' (m :: Type -> Type) = Seat
   , currentFocus :: !SeatFocus
   -- ^ Currently focused window/shell layer.
   , focused, hovered, interacted :: !RiverWindow
-  , -- \| XKB (keyboard) bindings.
-    xkb_bindings :: !(XkbBindingMap2 (SomeAction m))
   -- ^ Windows last interacted with.
+  , xkb_bindings :: !(XkbBindingMap2 (SomeAction m))
+  -- ^ XKB (keyboard) bindings.
   , pointer_bindings :: !(PointerBindings (SomeAction m))
   -- ^ Pointer bindings.
-  , -- , pointer_bindings       :: [StablePtr (PointerBinding (SomeAction m))]
-
-    pending_action :: !(SeatAction m)
+  , pending_action :: !(SeatAction m)
   -- ^ Event queues.
   , submap_pending :: !(Maybe (SomeAction m, XkbBindingMap2 (SomeAction m), Maybe (SomeAction m)))
   , pendingPointerEnter :: !(Maybe (RiverWindow, Position))
@@ -73,11 +72,7 @@ data Seat' (m :: Type -> Type) = Seat
   deriving stock (Generic)
   deriving anyclass (Default, NFData)
 
-deriving instance
-  ( MonadIO m
-  , Show (Stateful m Bool)
-  ) =>
-  Show (Seat' m)
+deriving instance (Typeable m, Show (Stateful m Bool)) => Show (Seat' m)
 
 deriving instance
   ( Typeable m
@@ -89,9 +84,9 @@ deriving instance
   Data (Seat' m)
 
 data SeatKeyboardInfo = SKInfo
-    { wl_keyboard :: WL.Keyboard
-    , rrate :: Int32
-    , rdelay :: Int32
+    { wl_keyboard :: !WL.Keyboard
+    , rrate :: !Int32
+    , rdelay :: !Int32
     }
     deriving stock (Eq, Ord, Show, Read, Generic, Data)
     deriving anyclass (Default, NFData)
@@ -115,7 +110,7 @@ data SeatAction m
   deriving stock (Eq, Generic, Data)
   deriving anyclass (NFData)
 
-deriving instance (MonadIO m, Show (Stateful m Bool)) => Show (SeatAction m)
+deriving instance (Typeable m, Show (Stateful m Bool)) => Show (SeatAction m)
 
 -- | Move/resize active
 data SeatOperation
@@ -133,7 +128,7 @@ instance Default SeatOperation where def = SEAT_OP_NONE
 
 -- * Lenses
 
-makeLensesWith' classPerField [''Seat', ''SeatKeyboardInfo]
+makeLensesCombine ["riverSeat"] [''Seat', ''SeatKeyboardInfo]
 
 instance HasX (Seat' m) Int32 where _x = position . _x
 instance HasY (Seat' m) Int32 where _y = position . _y

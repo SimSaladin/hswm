@@ -6,7 +6,6 @@
 {-# LANGUAGE TemplateHaskellQuotes #-}
 {-# LANGUAGE NoTemplateHaskell #-}
 {-# OPTIONS_GHC -Wno-typed-holes #-}
-{-# OPTIONS_GHC -ddump-deriv #-}
 
 module WL.Internals.TH (
   -- * Protocol XML
@@ -45,6 +44,7 @@ module WL.Internals.TH (
 
 import Distribution.Wayland.ProtocolXML
 import WL.Internals.Types
+import WL.Internals.Utils
 
 import HsBindgen.Runtime.PtrConst
 
@@ -69,9 +69,11 @@ import GHC.Generics (Generic, Generically (..))
 import GHC.Records (getField)
 import Language.Haskell.TH
 import Language.Haskell.TH.Syntax
-import Numeric (readHex)
 import System.IO.Unsafe (unsafePerformIO)
 import Prelude hiding (head)
+import Text.Read (Read(..))
+import qualified Data.Aeson as A
+import Data.Functor.Contravariant
 
 data ProtocolRenderSettings = ProtocolRenderSettings
   { prValueNameModifier :: String -> String
@@ -320,16 +322,14 @@ renderNewType s deriveData ntName objT doc = do
           ( [ sequence [newtypeD_doc (pure []) ntName [] Nothing (con, Nothing, []) derivs (if doc == "" then Nothing else Just doc)]
             , [d|
                 -- \| 'nullPtr'
-                instance Default $(conT ntName) where
-                  def = $(conE ntName) nullPtr
-
-                instance Show $(conT ntName) where
-                  showsPrec _ x rs = show (castPtr $ getField @"unwrap" x :: Ptr Void) ++ rs
-
-                instance Read $(conT ntName) where
-                  readsPrec _ ('0' : 'x' : xs) = first ($(conE ntName) . wordPtrToPtr) <$> readHex xs
-                  readsPrec p xs = first ($(conE ntName) . wordPtrToPtr) <$> readsPrec p xs
-                  -- readsPrec _ _ = error "expected a string starting with \"0x...\""
+                instance Default       $(conT ntName) where def         = $(conE ntName) nullPtr
+                instance Show          $(conT ntName) where show        = showObjHex
+                instance Read          $(conT ntName) where readPrec    = $(conE ntName) <$> readPtrHexPrec
+                instance A.ToJSON      $(conT ntName) where toJSON      = A.toJSON     . showObjHex
+                                                            toEncoding  = A.toEncoding . showObjHex
+                instance A.FromJSON    $(conT ntName) where parseJSON   = fmap read . A.parseJSON
+                instance A.ToJSONKey   $(conT ntName) where toJSONKey   = contramap showObjHex A.toJSONKey
+                instance A.FromJSONKey $(conT ntName) where fromJSONKey = fmap read A.fromJSONKey
                 |]
             ]
               -- XXX: orphan Data instance
@@ -434,6 +434,14 @@ renderEnum s iface e = do
       deriving newtype instance Hashable $(conT origTy)
 
       deriving via (PPGeneric ($(conT origTy))) instance Pretty $(conT origTy)
+
+      -- | XXX this is not a nice instance!
+      instance A.ToJSON $(conT origTy) where
+          toJSON = A.toJSON . show
+
+      -- | XXX this is not a nice instance!
+      instance A.FromJSON $(conT origTy) where
+          parseJSON = fmap read . A.parseJSON
       |]
   return (tySyn : concat patSyns ++ derivs)
   where

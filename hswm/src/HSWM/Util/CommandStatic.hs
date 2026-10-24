@@ -9,6 +9,7 @@
 --
 module HSWM.Util.CommandStatic
     ( mkCommand
+    , mkCommand_
     , registerCommand
     , runCommand
     , runCommandJSON
@@ -77,6 +78,9 @@ mkCommand dict action _arg =
     , actionArg = Nothing -- Argument arg
     , cmdInstances = dict
     }
+
+mkCommand_ :: StaticPtr (Dict (CommandCtx arg res)) -> StaticPtr (arg -> H res) -> Command arg res
+mkCommand_ d p = mkCommand d p Nothing
 
 runCommand :: Command arg res -> arg -> H res
 runCommand (Command ptr _ _) = deRefStaticPtr ptr

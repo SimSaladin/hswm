@@ -15,17 +15,51 @@ import HSWM.Core
 import HSWM.Util.PP
 import HSWM.Utils
 
+import Data.Dynamic
+import WL.Wlr.OutputManagement.Unstable.V1.Client qualified as WlrOM
+--import WL.Wlr.OutputPowerManagement.Unstable.V1.Client qualified as WlrOPM
 -- import qualified Prettyprinter.Combinators as PP
 import Prettyprinter.Show qualified as PP
 import River qualified as R
 import WL.Client qualified as WL
 
+debugHookDyn :: Dynamic -> H All
+debugHookDyn dyn
+  | Just R.RiverWindowManagerManageStart{} <- ev = mempty
+  | Just R.RiverWindowManagerRenderStart{} <- ev = mempty
+  | Just (e :: R.RiverWindowManagerEvent) <- ev = logEventShow src e []
+  | Just (e :: R.RiverXkbKeyboardEvent) <- ev = logEventShow src e []
+  | Just (_ :: R.RiverXkbBindingEvent) <- ev = mempty
+  | Just R.RiverSeatPointerPosition{} <- ev = mempty
+  | Just R.RiverSeatPointerEnter{} <- ev = mempty
+  | Just R.RiverSeatPointerLeave{} <- ev = mempty
+  | Just R.RiverSeatOpDelta{} <- ev = mempty
+  | Just R.RiverSeatWindowInteraction{} <- ev = mempty
+  | Just R.RiverXkbBindingsSeatModifiersUpdate{} <- ev = mempty
+  | Just (e :: R.RiverSeatEvent) <- ev = logEventShow src e []
+  | Just (e :: R.RiverOutputEvent) <- ev = logEventShow src e []
+  | Just R.RiverWindowDimensions{} <- ev = mempty
+  | Just R.RiverWindowTitle{} <- ev = mempty
+  | Just (e :: R.RiverWindowEvent) <- ev = logEventShow src e []
+  | Just (e :: WL.OutputEvent) <- ev = logEventShow src e []
+  | Just (WL.ShmFormat _ _ fmt) <- ev = logInfoNS src (fromString ("SHM FORMAT: " <> ppShmFormat fmt)) >> mempty
+  | Just (e :: WL.SeatEvent) <- ev = logEventShow src e []
+  | Just (e :: WlrOM.OutputHeadEvent) <- ev = mempty
+  | Just (e :: R.RiverInputDeviceEvent) <- ev = mempty
+  | Just (e :: R.RiverLibinputDeviceEvent) <- ev = mempty -- logEventShow src e []
+  | otherwise = do logInfoNS src $ fromString $ "unhandled event of type " <> show (dynTypeRep dyn)
+                   mempty
+  where
+    ev :: Typeable a => Maybe a
+    ev = fromDynamic dyn
+    src = "debugHook"
+
 debugHook :: Event -> H All
 debugHook ev
-  | WindowManagerEvent R.RiverWindowManagerManageStart{} <- ev = mempty
-  | WindowManagerEvent R.RiverWindowManagerRenderStart{} <- ev = mempty
-  | WindowManagerEvent e <- ev = logEventShow src e []
-  | XkbKeyboardEvent e <- ev = logEventShow src e []
+  -- | WindowManagerEvent R.RiverWindowManagerManageStart{} <- ev = mempty
+  -- | WindowManagerEvent R.RiverWindowManagerRenderStart{} <- ev = mempty
+  -- | WindowManagerEvent e <- ev = logEventShow src e []
+  -- | XkbKeyboardEvent e <- ev = logEventShow src e []
   | XkbEvent _ <- ev = mempty
   -- \| XkbEvent e                                            <- ev = logXkbEvent e
   | SeatEvent R.RiverSeatPointerPosition{} <- ev = mempty
@@ -36,14 +70,14 @@ debugHook ev
   | XkbSeatEvent R.RiverXkbBindingsSeatModifiersUpdate{} <- ev = mempty
   | SeatEvent e <- ev = logEventShow src e []
   | OutputEvent e <- ev = logEventShow src e []
-  | WindowEvent R.RiverWindowDimensions{} <- ev = mempty
-  | WindowEvent R.RiverWindowTitle{} <- ev = mempty
-  | WindowEvent e <- ev = logEventShow src e []
-  | WlOutputEvent _ <- ev = logEventShow src ev []
-  | WlShmEvent (WL.ShmFormat _ _ fmt) <- ev = logInfoNS src (fromString ("SHM FORMAT: " <> ppShmFormat fmt)) >> mempty
-  | WlSeatEvent e <- ev = logEventShow src e []
+  -- | WindowEvent R.RiverWindowDimensions{} <- ev = mempty
+  -- | WindowEvent R.RiverWindowTitle{} <- ev = mempty
+  -- | WindowEvent e <- ev = logEventShow src e []
+  -- | WlOutputEvent _ <- ev = logEventShow src ev []
+  -- | WlShmEvent (WL.ShmFormat _ _ fmt) <- ev = logInfoNS src (fromString ("SHM FORMAT: " <> ppShmFormat fmt)) >> mempty
+  -- | WlSeatEvent e <- ev = logEventShow src e []
   | WlrOutputHeadEvent{} <- ev = mempty
-  | LibinputDeviceEvent{} <- ev = mempty
+  -- | LibinputDeviceEvent{} <- ev = mempty
   | InputDeviceEvent{} <- ev = mempty
   | otherwise = logEventShow src ev []
   where
