@@ -41,8 +41,9 @@ in
     };
 
     updateRiverDeps = final.callPackage mkZigDependencies {
-      zig = final.zig_0_16;
+      #zig = final.zig_0_16;
       zig2nix = final.zigEnv.zig2nix;
+      #zig2nix = final.zig2nix.zig2nix-0_16_0;
     };
   };
 
