@@ -14,7 +14,7 @@ module HSWM.Wallpaper (
   wpStartupHook,
   wpExitHook,
   wpHandleEventHook,
-  WallpaperContext(..),
+  WallpaperContext (..),
 )
 where
 
@@ -32,7 +32,7 @@ import Codec.Picture qualified as JP
 import Data.Map qualified as M
 import Data.Vector.Storable qualified as V
 
---import GHC.Generics
+-- import GHC.Generics
 
 -- * Usage
 
@@ -130,7 +130,6 @@ wpHandleEventHookDyn ev
           initOutput ro'
         _ -> return ()
       mempty
-
   | otherwise = mempty
 
 wpHandleEventHook :: Event -> H All

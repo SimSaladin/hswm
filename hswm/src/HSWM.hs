@@ -35,5 +35,5 @@ import HSWM.ManageHook
 import HSWM.Operations
 import HSWM.Utils
 import HSWM.XKB
-import Prelude hiding (setEnv, (^?))
 import Text.XkbCommon.EventCodes
+import Prelude hiding (setEnv, (^?))

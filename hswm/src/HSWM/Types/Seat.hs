@@ -13,8 +13,8 @@
 module HSWM.Types.Seat where
 
 import HSWM.Types.Action
-import HSWM.Types.Lens
 import HSWM.Types.Config
+import HSWM.Types.Lens
 import HSWM.Types.Simple
 import HSWM.Types.Window
 
@@ -84,12 +84,12 @@ deriving instance
   Data (Seat' m)
 
 data SeatKeyboardInfo = SKInfo
-    { wl_keyboard :: !WL.Keyboard
-    , rrate :: !Int32
-    , rdelay :: !Int32
-    }
-    deriving stock (Eq, Ord, Show, Read, Generic, Data)
-    deriving anyclass (Default, NFData)
+  { wl_keyboard :: !WL.Keyboard
+  , rrate :: !Int32
+  , rdelay :: !Int32
+  }
+  deriving stock (Eq, Ord, Show, Read, Generic, Data)
+  deriving anyclass (Default, NFData)
 
 data SeatFocus
   = SFocusNone

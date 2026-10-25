@@ -1,6 +1,6 @@
-{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE StaticPointers #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE NoFieldSelectors #-}
 
 -- |
@@ -27,37 +27,42 @@ module HSWM.InputConfig (
   handleXkbConfigEvent,
   handleXkbKeyboardEvent,
   handleXkbKeymapEvent,
-
-  HasInputConfigState(..),
-  HasInputDevice(..),
-  HasInputDeviceState(..),
-  HasXkbKeyboardState(..),
-  HasCurrentValue(..),
-  HasDefaultValue(..),
-  HasSupported(..),
+  HasInputConfigState (..),
+  HasInputDevice (..),
+  HasInputDeviceState (..),
+  HasXkbKeyboardState (..),
+  HasCurrentValue (..),
+  HasDefaultValue (..),
+  HasSupported (..),
 ) where
 
+import Data.Coerce (coerce)
 import HSWM.Core
 import HSWM.Util.CommandStatic
 import River qualified as R
 import WL.Client (CEnum (..))
 import WL.Client qualified as WL
-import Data.Coerce (coerce)
---import Data.List qualified as L
+
+-- import Data.List qualified as L
 import Data.Map qualified as M
+import HSWM.Wayland
 import System.Posix
 import Text.XkbCommon qualified as XKBC
-import HSWM.Wayland
 
 -- * Commands (static)
 
 initialize :: H ()
 initialize = do
-    registerCommand "set-repeat-info" setRepeatInfoCommand
+  registerCommand "set-repeat-info" setRepeatInfoCommand
 
 setRepeatInfoCommand :: Command (R.RiverInputDevice, RepeatInfo) ()
-setRepeatInfoCommand = mkCommand_ (static Dict) (static \(dev, p) ->
-    R.riverInputDeviceSetRepeatInfo dev p.rate p.delay)
+setRepeatInfoCommand =
+  mkCommand_
+    (static Dict)
+    ( static
+        \(dev, p) ->
+          R.riverInputDeviceSetRepeatInfo dev p.rate p.delay
+    )
 
 -- * Types
 
@@ -73,7 +78,6 @@ setRepeatInfoCommand = mkCommand_ (static Dict) (static \(dev, p) ->
 --
 --    - R.RiverLibinputDevice
 --      - links to 'R.RiverInputDevice'
---
 data InputConfigState = InputConfigState
   { inputDevices :: M.Map R.RiverInputDevice InputDeviceState
   , xkbKeyboards :: M.Map R.RiverXkbKeyboard XkbKeyboardState
@@ -163,13 +167,13 @@ newtype CalibrationMatrix = CalibrationMatrix {unwrap :: [Float]}
 
 type family StateSupported a where
   StateSupported R.RiverLibinputDeviceSendEventsModes = Maybe R.RiverLibinputDeviceSendEventsModes
-  -- | Finger count indicated: tap-to-click is supported if @fingercount > 0@
+  -- \| Finger count indicated: tap-to-click is supported if @fingercount > 0@
   StateSupported R.RiverLibinputDeviceTapState = Int32
-  -- | Finger count indicated; if less than 3 then 3f drag is not supported.
+  -- \| Finger count indicated; if less than 3 then 3f drag is not supported.
   StateSupported R.RiverLibinputDeviceThreeFingerDragState = Int32
-  -- | Supported if non-zero
+  -- \| Supported if non-zero
   StateSupported CalibrationMatrix = Bool
-  -- | Profiles is bitfield
+  -- \| Profiles is bitfield
   StateSupported R.RiverLibinputDeviceAccelProfile = R.RiverLibinputDeviceAccelProfiles
   StateSupported R.RiverLibinputDeviceNaturalScrollState = Bool
   StateSupported R.RiverLibinputDeviceLeftHandedState = Bool
@@ -208,7 +212,7 @@ instance Default (DC Word32) where def = DC maxBound maxBound
 -- * Lenses
 
 makeFieldClassesIfMissing ["inputDevice"]
-makeLensesCombine' id ["inputDevice", "repeatInfo"] [''InputConfigState, ''XkbKeyboardState, ''InputDeviceState, ''LibinputDeviceState ]
+makeLensesCombine' id ["inputDevice", "repeatInfo"] [''InputConfigState, ''XkbKeyboardState, ''InputDeviceState, ''LibinputDeviceState]
 
 makeFieldClassesIfMissing ["currentValue", "defaultValue"]
 makeLensesWith' classPerField [''SDC, ''DC]
@@ -216,18 +220,18 @@ makeLensesWith' classPerField [''SDC, ''DC]
 -- * Aeson instances
 
 instance ToJSON XkbKeyboardState where
-    toJSON = genericToJSON aesonOptions
-    toEncoding = genericToEncoding aesonOptions
+  toJSON = genericToJSON aesonOptions
+  toEncoding = genericToEncoding aesonOptions
 
 instance ToJSON InputDeviceState where
-    toJSON = genericToJSON aesonOptions
-    toEncoding = genericToEncoding aesonOptions
+  toJSON = genericToJSON aesonOptions
+  toEncoding = genericToEncoding aesonOptions
 
-instance (ToJSON a, ToJSON (StateSupported a)) => ToJSON (SDC a) where
-instance (ToJSON a) => ToJSON (DC a) where
+instance (ToJSON a, ToJSON (StateSupported a)) => ToJSON (SDC a)
+instance (ToJSON a) => ToJSON (DC a)
 instance ToJSON LibinputDeviceState where
-    toJSON = genericToJSON aesonOptions
-    toEncoding = genericToEncoding aesonOptions
+  toJSON = genericToJSON aesonOptions
+  toEncoding = genericToEncoding aesonOptions
 
 -- * Helper combinators
 
@@ -241,14 +245,14 @@ lookupInputDevice dev = withObjectDef @InputConfigState $ return . view (inputDe
 
 inputDeviceHook :: R.RiverInputDevice -> H ()
 inputDeviceHook dev = do
-    lookupInputDevice dev >>= \case
-        Nothing -> return ()
-        Just st ->
-            -- Set repeat rate & delay for keyboard device
-            when (st.deviceType == Just R.RiverInputDeviceTypeKeyboard) $ do
-              info <- view (config . repeatInfo)
-              when (info.rate > 0 && info.delay > 0) $
-                setRepeatInfo dev info
+  lookupInputDevice dev >>= \case
+    Nothing -> return ()
+    Just st ->
+      -- Set repeat rate & delay for keyboard device
+      when (st.deviceType == Just R.RiverInputDeviceTypeKeyboard) $ do
+        info <- view (config . repeatInfo)
+        when (info.rate > 0 && info.delay > 0) $
+          setRepeatInfo dev info
 
 setRepeatInfo :: R.RiverInputDevice -> RepeatInfo -> H ()
 setRepeatInfo dev info = do
@@ -257,50 +261,52 @@ setRepeatInfo dev info = do
   modifyConfigs $ inputDevices . ix dev . repeatInfo ?~ info
 
 -- | Sets the keymap for all selected keyboards.
-setKeyboardKeymaps :: HandleEvent H R.RiverXkbKeymapEvent => (XkbKeyboardState -> Bool) -> XkbRuleNames -> H ()
+setKeyboardKeymaps :: (HandleEvent H R.RiverXkbKeymapEvent) => (XkbKeyboardState -> Bool) -> XkbRuleNames -> H ()
 setKeyboardKeymaps sel kmdef =
-    withObjectDef @InputConfigState $ \st ->
-        forM_ (M.toList st.xkbKeyboards) $ \(kbd, ks) ->
-        when (sel ks) $ setKeyboardKeymap kbd kmdef
+  withObjectDef @InputConfigState $ \st ->
+    forM_ (M.toList st.xkbKeyboards) $ \(kbd, ks) ->
+      when (sel ks) $ setKeyboardKeymap kbd kmdef
 
 -- | Set the keyboard's keymap.
-setKeyboardKeymap :: HandleEvent H R.RiverXkbKeymapEvent => R.RiverXkbKeyboard -> XkbRuleNames -> H ()
+setKeyboardKeymap :: (HandleEvent H R.RiverXkbKeymapEvent) => R.RiverXkbKeyboard -> XkbRuleNames -> H ()
 setKeyboardKeymap kbd kmdef = do
   getOrCreateKeyboardKeymap kmdef >>= \case
-    Left err -> logError $ "Unable to set keymap: keymap creation failed" :# [ "params" .= show kmdef, "error" .= err ]
+    Left err -> logError $ "Unable to set keymap: keymap creation failed" :# ["params" .= show kmdef, "error" .= err]
     Right km -> R.riverXkbKeyboardSetKeymap kbd km
-    -- else void . async $ threadDelay 2_000_000 >> retry
+
+-- else void . async $ threadDelay 2_000_000 >> retry
 --    retry =
 --      lookupValidKeymap kmdef >>= \case
 --        Just kmSt -> R.riverXkbKeyboardSetKeymap kbd kmSt.keymap
 --        Nothing -> logError $ "Cannot set keymap: not created after 2s" :# ["keyboard" .= show kbd, "params" .= show kmdef]
 
-newtype PendingKeymaps = PendingKeymaps { _unwrap :: [(XkbRuleNames, KeymapState)] }
+newtype PendingKeymaps = PendingKeymaps {_unwrap :: [(XkbRuleNames, KeymapState)]}
 
 -- | Given keymap parameters return a matching keymap. It is created if it does not exist yet.
-getOrCreateKeyboardKeymap :: HandleEvent H R.RiverXkbKeymapEvent => XkbRuleNames -> H (Either String R.RiverXkbKeymap)
+getOrCreateKeyboardKeymap :: (HandleEvent H R.RiverXkbKeymapEvent) => XkbRuleNames -> H (Either String R.RiverXkbKeymap)
 getOrCreateKeyboardKeymap kmdef =
   lookupKeymap kmdef >>= \case
     Just x -> return $ Right x
     Nothing -> do
-        pendingVar <- getOrCreateObjectIO @(MVar PendingKeymaps) $ newMVar (PendingKeymaps [])
-        res <- modifyMVar pendingVar $ \pending'@(PendingKeymaps pending) ->
-            case pending ^? each . filtered (^. _1 . to (== kmdef)) . _2 of
-              Just res -> return (pending', res)
-              Nothing -> do
-                  st <- create
-                  return (PendingKeymaps $ (kmdef, st) : pending, st)
-        returnResult res
+      pendingVar <- getOrCreateObjectIO @(MVar PendingKeymaps) $ newMVar (PendingKeymaps [])
+      res <- modifyMVar pendingVar $ \pending'@(PendingKeymaps pending) ->
+        case pending ^? each . filtered (^. _1 . to (== kmdef)) . _2 of
+          Just res -> return (pending', res)
+          Nothing -> do
+            st <- create
+            return (PendingKeymaps $ (kmdef, st) : pending, st)
+      returnResult res
       where
-        returnResult res = atomically (readTMVar res.resultVar) >>= \case
+        returnResult res =
+          atomically (readTMVar res.resultVar) >>= \case
             Right () -> return $ Right res.keymap
             Left err -> return $ Left err
         create = do
           logInfo $ "Attempting to create a new keymap" :# ["params" .= show kmdef]
           fd <- io $ do
-              ctx <- XKBC.createXkbContext def
-              kmap <- XKBC.createKeymapFromNames ctx kmdef XKBC.KeymapFormatTextV1
-              XKBC.keymapAsStringFd kmap XKBC.KeymapFormatTextV1
+            ctx <- XKBC.createXkbContext def
+            kmap <- XKBC.createKeymapFromNames ctx kmdef XKBC.KeymapFormatTextV1
+            XKBC.keymapAsStringFd kmap XKBC.KeymapFormatTextV1
           km <- withObject $ \xkbConfig ->
             R.riverXkbConfigCreateKeymap xkbConfig (fi fd) R.RiverXkbConfigKeymapFormatTextV1
           rvar <- newEmptyTMVarIO
@@ -312,7 +318,7 @@ getOrCreateKeyboardKeymap kmdef =
 lookupKeymap :: XkbRuleNames -> H (Maybe R.RiverXkbKeymap)
 lookupKeymap kmdef = do
   st <- getObjectDef @InputConfigState
-  return $! st ^? keymaps . each . filtered (^._2 . to (== Just kmdef)) . _1
+  return $! st ^? keymaps . each . filtered (^. _2 . to (== Just kmdef)) . _1
 
 -- * Event handlers
 
@@ -361,14 +367,14 @@ handleXkbKeyboardEvent :: (MonadStateGlobal env m) => R.RiverXkbKeyboardEvent ->
 handleXkbKeyboardEvent = \case
   R.RiverXkbKeyboardLayout _ kbd i n -> modifyConfigs $ xkbKeyboards . ix kbd %~ ((layoutIndex .~ i) . (layoutName .~ n))
   R.RiverXkbKeyboardInputDevice _ kbd dev -> do
-      modifyConfigs $ xkbKeyboards . ix kbd . inputDevice .~ dev
-      modifyConfigs $ inputDevices . ix dev . xkbKeyboard ?~ kbd
+    modifyConfigs $ xkbKeyboards . ix kbd . inputDevice .~ dev
+    modifyConfigs $ inputDevices . ix dev . xkbKeyboard ?~ kbd
   R.RiverXkbKeyboardRemoved _ kbd -> modifyConfigs (xkbKeyboards . at kbd .~ Nothing) >> WL.objectDestroy kbd
   R.RiverXkbKeyboardDone _ _ -> return () -- TODO
   _ -> return () -- TODO capslock/numlock/scrolllock enabled/disabled
 
 -- | river_libinput_config_v1
-handleLibinputEvent :: HandleEvent H R.RiverLibinputDeviceEvent => R.RiverLibinputConfigEvent -> H ()
+handleLibinputEvent :: (HandleEvent H R.RiverLibinputDeviceEvent) => R.RiverLibinputConfigEvent -> H ()
 handleLibinputEvent = \case
   R.RiverLibinputConfigLibinputDevice _ _ dev -> modifyConfigs (libinputDevices . at dev ?~ def) >> addGlobalListener_ dev
   R.RiverLibinputConfigFinished _ lic -> WL.objectDestroy lic

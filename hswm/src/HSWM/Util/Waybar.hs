@@ -97,11 +97,11 @@ waybarCleanup = withOptionalObject $ \WaybarState{wbProcess} -> do
 
 stopWaybarProcess :: Process a b c -> H ()
 stopWaybarProcess p = do
-    withAsync delayKill $ \_ -> do
-      mpid <- io $ getPid p
-      io $ forM_ mpid $ signalProcess sigTERM
-      void $ tryIO $ stopProcess p `onException` logError "stopProcess threw an error!"
-    modifyObject $ \st -> st{wbProcess = Nothing}
+  withAsync delayKill $ \_ -> do
+    mpid <- io $ getPid p
+    io $ forM_ mpid $ signalProcess sigTERM
+    void $ tryIO $ stopProcess p `onException` logError "stopProcess threw an error!"
+  modifyObject $ \st -> st{wbProcess = Nothing}
   where
     delayKill = do
       -- XXX tricky

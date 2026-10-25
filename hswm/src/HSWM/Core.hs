@@ -121,5 +121,5 @@ handleWithHook e = do
 
 handleWithHook' :: forall ev. (Typeable ev, HandleEvent H ev) => ev -> H ()
 handleWithHook' ev = do
-    hook <- view (config . handleEventHookDynamic)
-    whenM (userCodeDef True $ getAll <$> hook (toDyn ev)) (handleEvent ev)
+  hook <- view (config . handleEventHookDynamic)
+  whenM (userCodeDef True $ getAll <$> hook (toDyn ev)) (handleEvent ev)

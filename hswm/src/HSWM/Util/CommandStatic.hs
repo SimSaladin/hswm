@@ -6,26 +6,25 @@
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
---
-module HSWM.Util.CommandStatic
-    ( mkCommand
-    , mkCommand_
-    , registerCommand
-    , runCommand
-    , runCommandJSON
-    , SomeCommand(..)
-    , Command
-    , Dict(..)
-    , CommandStore(..)
-    ) where
+module HSWM.Util.CommandStatic (
+  mkCommand,
+  mkCommand_,
+  registerCommand,
+  runCommand,
+  runCommandJSON,
+  SomeCommand (..),
+  Command,
+  Dict (..),
+  CommandStore (..),
+) where
 
-import HSWM.IPC (MethodParams(..))
-import HSWM.Core as HSWM
-import GHC.StaticPtr
 import Data.Aeson qualified as A
 import Data.Aeson.Types qualified as A
 import Data.Map qualified as M
 import Data.Typeable
+import GHC.StaticPtr
+import HSWM.Core as HSWM
+import HSWM.IPC (MethodParams (..))
 
 data Command arg res = Command
   { actionPtr :: !(StaticPtr (arg -> H res))

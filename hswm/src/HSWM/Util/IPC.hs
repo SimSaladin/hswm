@@ -11,30 +11,30 @@
 -- Portability : unportable
 module HSWM.Util.IPC where
 
-import HSWM.Util.CommandStatic
 import HSWM.Actions.DynamicWorkspaceOrder qualified as DWO
+import HSWM.Actions.OnScreen qualified as A.OnScreen
 import HSWM.Core as HSWM
 import HSWM.IPC
+import HSWM.InputConfig
 import HSWM.Main.Persist qualified as Persist
 import HSWM.Operations
 import HSWM.StackSet qualified as W
-import HSWM.InputConfig
-import HSWM.Actions.OnScreen qualified as A.OnScreen
+import HSWM.Util.CommandStatic
 
-import Data.Enum
 import Data.Aeson qualified as A
 import Data.Aeson.Types qualified as A
 import Data.ByteString.Lazy qualified as LB
 import Data.ByteString.Lazy.Char8 qualified as LBC8
-import River qualified as R
+import Data.Enum
 import Data.List qualified as L
 import Data.Map qualified as M
 import Data.Text qualified as T
 import Data.Text.Lazy qualified as TL
+import Data.Text.Short qualified as TS
 import Network.Socket
+import River qualified as R
 import System.FileLock
 import Text.Pretty.Simple qualified as P
-import Data.Text.Short qualified as TS
 
 type MonadIPC env m = (MonadEffectsIO m, MonadReader env m, MonadHS m)
 
@@ -54,61 +54,57 @@ instance Default ServerConfig where
 defaultRequestHandler :: Request -> H (Either Text Response)
 defaultRequestHandler = \case
   ListWindows{} -> getHState <&> Right . InternalObject . toJSON . (^.. _windows . traversed)
-
   -- hide key bindings by default (lots of noise)
-  ListSeats{bindings} -> getHState <&>
-      view (seatList . to (if bindings then id else each . xkbBindings .~ mempty) . to (Right . InternalObject . toJSON))
-
+  ListSeats{bindings} ->
+    getHState
+      <&> view (seatList . to (if bindings then id else each . xkbBindings .~ mempty) . to (Right . InternalObject . toJSON))
   ListOutputs{} -> getHState <&> view (outputList . to toJSON . to InternalObject . to Right)
-
   ConfigGet{} -> view $ config . to toJSON . to InternalObject . to Right
-
-  ListInputDevices{libinput} -> getObjectDef @InputConfigState <&> fmap (Right . InternalObject . toJSON)
-      (\st ->
-        let getInputDev k dev = A.object $
-              [ "name" .= (dev ^. deviceName)
-              , "type" .= (dev ^. deviceType)
-              ] ++
-              [ "libinput" .= getLibinputDevice k | libinput ] ++
-              [ "repeat-info" .= info | Just info <- [dev ^. repeatInfo] ] ++
-              maybe [] getXkbKeyboard (dev ^. xkbKeyboard)
-            getXkbKeyboard k
-              | Just v <- st ^. xkbKeyboards . at k =
-                    [ "layout" .= (v ^. layoutName)
-                    , "layout_index" .= (v ^. layoutIndex)
+  ListInputDevices{libinput} ->
+    getObjectDef @InputConfigState
+      <&> fmap
+        (Right . InternalObject . toJSON)
+        ( \st ->
+            let getInputDev k dev =
+                  A.object $
+                    [ "name" .= (dev ^. deviceName)
+                    , "type" .= (dev ^. deviceType)
                     ]
-              | otherwise = []
-            getLibinputDevice k = A.toJSON $ st ^? libinputDevices . each . filtered ((== k) . view inputDevice)
-        in st ^. inputDevices & M.mapWithKey getInputDev
-      )
-
+                      ++ ["libinput" .= getLibinputDevice k | libinput]
+                      ++ ["repeat-info" .= info | Just info <- [dev ^. repeatInfo]]
+                      ++ maybe [] getXkbKeyboard (dev ^. xkbKeyboard)
+                getXkbKeyboard k
+                  | Just v <- st ^. xkbKeyboards . at k =
+                      [ "layout" .= (v ^. layoutName)
+                      , "layout_index" .= (v ^. layoutIndex)
+                      ]
+                  | otherwise = []
+                getLibinputDevice k = A.toJSON $ st ^? libinputDevices . each . filtered ((== k) . view inputDevice)
+             in st ^. inputDevices & M.mapWithKey getInputDev
+        )
   DumpState{..} -> case param of
     "input-config" -> Right . StateDumpResponse . P.pShow <$> getObjectDef @InputConfigState
     "hstate" -> Right . InternalObject . A.toJSON <$> getHState
     "global" -> Right . InternalObject <$> dumpObjects
     _ -> Right . StateDumpResponse . TL.pack <$> runInHS Persist.dumpStateAsString
-
   ListMethods{} -> getObjectDef @CommandStore <&> Right . StateDumpResponse . P.pShow
-
   CallMethod{..} -> do
     cs <- getObjectDef @CommandStore
     case cs.commands ^? ix method.unwrap of
       Just (SomeCommand cmd) -> runCommandJSON cmd params <&> either (Left . toText) (Right . InternalObject)
       Nothing -> pure $ Left "method not found"
-
   WmCtrl val -> case A.parseEither A.parseJSON val.unwrap of
-                  Right action -> handleWmCtrlAction action
-                  Left err -> return $ Left $ "failed to decode request body: " <> toText err
-
+    Right action -> handleWmCtrlAction action
+    Left err -> return $ Left $ "failed to decode request body: " <> toText err
   r -> do
     logWarn $ "Unhandled message" :# ["message" .= r]
     return $ Left "no handler"
 
 handleWmCtrlAction :: WmCtrlAction -> H (Either Text Response)
 handleWmCtrlAction = \case
-  ViewWorkspaceOnScreen{tag,screen = s} -> do
+  ViewWorkspaceOnScreen{tag, screen = s} -> do
     runInHS . windows $ A.OnScreen.viewOnScreen (toEnum $ fromEnum s) (TS.unpack tag)
-    return $ Right $ InternalObject $ A.object [ "result" .= ("OK" :: Text) ]
+    return $ Right $ InternalObject $ A.object ["result" .= ("OK" :: Text)]
   x -> return $ Left $ "handleWmCtrlAction: not implemented: " <> tshow x
 
 -- * Server State
@@ -183,32 +179,35 @@ serverRun conf stateRef = withThreadContext ["component" .= ("ipc-server" :: Str
        in go 1
 
     withPeer peerId (connSocket, peerAddr) = do
-        peerInfo <- case peerAddr of
-                      SockAddrUnix{} -> do
-                        connFd <- io $ withFdSocket connSocket $ return . fi
-                        (mpid, muid, mgid) <- io $ getPeerCredential connSocket
-                        let connPid = fi $ fromMaybe (-1) mpid :: Int
-                            connUid = fi $ fromMaybe (-1) muid :: Int
-                            connGid = fi $ fromMaybe (-1) mgid :: Int
-                        return $ A.object
-                              [ "fd" .= (connFd :: Int)
-                              , "pid" .= connPid
-                              , "uid" .= connUid
-                              , "gid" .= connGid
-                              , "id" .= peerId
-                              ]
-                      _ -> return $ A.object
-                              [ "address" .= show peerAddr
-                              , "id" .= peerId
-                              ]
-        let ctx = [ "component" .= ("ipc-server" :: String), "peer" .= peerInfo ]
-        connSendQ <- newTQueueIO
-        connWorkerThread <-
-          async $
-            withThreadContext ctx $
-              connWorker conf connSocket connSendQ `finally` cleanup peerId connSocket
-        let c = Connection{..}
-        modifyIORef stateRef $ \s -> s{connected = M.insert peerId c s.connected}
+      peerInfo <- case peerAddr of
+        SockAddrUnix{} -> do
+          connFd <- io $ withFdSocket connSocket $ return . fi
+          (mpid, muid, mgid) <- io $ getPeerCredential connSocket
+          let connPid = fi $ fromMaybe (-1) mpid :: Int
+              connUid = fi $ fromMaybe (-1) muid :: Int
+              connGid = fi $ fromMaybe (-1) mgid :: Int
+          return $
+            A.object
+              [ "fd" .= (connFd :: Int)
+              , "pid" .= connPid
+              , "uid" .= connUid
+              , "gid" .= connGid
+              , "id" .= peerId
+              ]
+        _ ->
+          return $
+            A.object
+              [ "address" .= show peerAddr
+              , "id" .= peerId
+              ]
+      let ctx = ["component" .= ("ipc-server" :: String), "peer" .= peerInfo]
+      connSendQ <- newTQueueIO
+      connWorkerThread <-
+        async $
+          withThreadContext ctx $
+            connWorker conf connSocket connSendQ `finally` cleanup peerId connSocket
+      let c = Connection{..}
+      modifyIORef stateRef $ \s -> s{connected = M.insert peerId c s.connected}
 
     cleanup peerId conn = do
       modifyIORef stateRef $ \s -> s{connected = M.delete peerId s.connected}
@@ -233,8 +232,8 @@ connWorker conf conn sendQ = do
     handleRequest resp = case A.eitherDecode resp of
       Right msg -> serverHandleMsg conf conn msg
       Left e -> do
-          logWarn $ "Malformed request from client" :# ["error" .= toText e, "msg" .= LBC8.unpack (LB.take 256 resp)]
-          sendMsg conn (Error (toText e) :: Msg ())
+        logWarn $ "Malformed request from client" :# ["error" .= toText e, "msg" .= LBC8.unpack (LB.take 256 resp)]
+        sendMsg conn (Error (toText e) :: Msg ())
 
 getServerAddr ::
   (MonadIO m) =>
@@ -258,7 +257,7 @@ getServerAddr conf =
         )
 
 serverHandleMsg :: ServerConfig -> Socket -> Msg Request -> H ()
-serverHandleMsg _    _ Error{} = return ()
+serverHandleMsg _ _ Error{} = return ()
 serverHandleMsg conf c (Contents r seqn) = do
   case r of
     IdentifyClient{} -> do

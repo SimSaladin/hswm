@@ -13,8 +13,9 @@ where
 import HSWM.Types.Action
 
 import River qualified as R
---import Text.XkbCommon
---import Text.XkbCommon.EventCodes
+
+-- import Text.XkbCommon
+-- import Text.XkbCommon.EventCodes
 import WL.Client qualified as WL
 
 import Data.Map qualified as M

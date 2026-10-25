@@ -40,8 +40,8 @@ instance (Message a, Show a) => IsAction H (SendMessage a) where
 -- * NamedAction and descriptions
 
 -- | Add a label to an action
---data NamedAction a = NamedAction String a
-newtype (<?>) a (desc :: Symbol) = NamedAction { fromNamedAction :: a }
+-- data NamedAction a = NamedAction String a
+newtype (<?>) a (desc :: Symbol) = NamedAction {fromNamedAction :: a}
   deriving stock (Generic)
 
 -- | Attach a description to some action: @ restart <?> "Restart" @
@@ -68,7 +68,7 @@ instance (KnownSymbol desc, IsAction H a) => IsAction H (a <?> desc) where
 -- * Autorepeat
 
 -- | Control key autorepeat
-newtype (<!>) action (repeat :: Nat) = RepeatOnHold { getRepeat :: action }
+newtype (<!>) action (repeat :: Nat) = RepeatOnHold {getRepeat :: action}
 
 instance (Typeable a, IsAction H a, KnownNat repeat) => IsAction H (a <!> repeat) where
   onHoldRepeat _ _ = natVal (Proxy @repeat) > 0
@@ -88,7 +88,7 @@ data WithCategories a = WithCategories [String] a deriving (Eq, Show, Generic)
 
 -- | Add categories to action
 (<%>) :: (Typeable a, IsAction H a) => a -> [String] -> SomeAction H
-action <%> cats = SomeAction $ WithCategories cats  action
+action <%> cats = SomeAction $ WithCategories cats action
 
 instance (Typeable a, IsAction H a) => IsAction H (WithCategories a) where
   actionPassthru _ (_ `WithCategories` a) = Just $ SomeAction a
@@ -127,7 +127,7 @@ addKeys keys c =
     }
 
 addKeys' :: forall m. (m ~ H, Typeable m, MonadIO m) => [(String, SomeAction m)] -> ConfigDoM m
-addKeys' keys c = c { keyBindings = c.keyBindings <> interpretStringKeys c keys }
+addKeys' keys c = c{keyBindings = c.keyBindings <> interpretStringKeys c keys}
 
 -- * Parse ADT
 
@@ -173,8 +173,11 @@ parseSubmaps ::
   -> [KeyTree XBKey a]
 parseSubmaps getMod ks0 = combine $ do
   (s, a) <- ks0
-  let ks = [XBKey (getMod $ L.intercalate "-" (L.init bk)) (toKeySym $ L.last bk)
-              | k <- L.words s, let bk = breakKeys k]
+  let ks =
+        [ XBKey (getMod $ L.intercalate "-" (L.init bk)) (toKeySym $ L.last bk)
+        | k <- L.words s
+        , let bk = breakKeys k
+        ]
   return $ mkKeyTree ks a
   where
     combine :: (Eq k) => [KeyTree k a] -> [KeyTree k a]

@@ -53,10 +53,12 @@ import Control.DeepSeq (NFData)
 import Control.Exception (finally)
 import Control.Monad
 import Control.Monad.IO.Class
+import Data.Aeson qualified as A
 import Data.Char (toUpper)
 import Data.Coerce
 import Data.Data (Data)
 import Data.Default
+import Data.Functor.Contravariant
 import Data.Hashable (Hashable)
 import Data.List qualified as L
 import Data.List.NonEmpty qualified as NE
@@ -70,10 +72,8 @@ import GHC.Records (getField)
 import Language.Haskell.TH
 import Language.Haskell.TH.Syntax
 import System.IO.Unsafe (unsafePerformIO)
+import Text.Read (Read (..))
 import Prelude hiding (head)
-import Text.Read (Read(..))
-import qualified Data.Aeson as A
-import Data.Functor.Contravariant
 
 data ProtocolRenderSettings = ProtocolRenderSettings
   { prValueNameModifier :: String -> String
@@ -322,13 +322,20 @@ renderNewType s deriveData ntName objT doc = do
           ( [ sequence [newtypeD_doc (pure []) ntName [] Nothing (con, Nothing, []) derivs (if doc == "" then Nothing else Just doc)]
             , [d|
                 -- \| 'nullPtr'
-                instance Default       $(conT ntName) where def         = $(conE ntName) nullPtr
-                instance Show          $(conT ntName) where show        = showObjHex
-                instance Read          $(conT ntName) where readPrec    = $(conE ntName) <$> readPtrHexPrec
-                instance A.ToJSON      $(conT ntName) where toJSON      = A.toJSON     . showObjHex
-                                                            toEncoding  = A.toEncoding . showObjHex
-                instance A.FromJSON    $(conT ntName) where parseJSON   = fmap read . A.parseJSON
-                instance A.ToJSONKey   $(conT ntName) where toJSONKey   = contramap showObjHex A.toJSONKey
+                instance Default $(conT ntName) where def = $(conE ntName) nullPtr
+
+                instance Show $(conT ntName) where show = showObjHex
+
+                instance Read $(conT ntName) where readPrec = $(conE ntName) <$> readPtrHexPrec
+
+                instance A.ToJSON $(conT ntName) where
+                  toJSON = A.toJSON . showObjHex
+                  toEncoding = A.toEncoding . showObjHex
+
+                instance A.FromJSON $(conT ntName) where parseJSON = fmap read . A.parseJSON
+
+                instance A.ToJSONKey $(conT ntName) where toJSONKey = contramap showObjHex A.toJSONKey
+
                 instance A.FromJSONKey $(conT ntName) where fromJSONKey = fmap read A.fromJSONKey
                 |]
             ]
@@ -435,13 +442,13 @@ renderEnum s iface e = do
 
       deriving via (PPGeneric ($(conT origTy))) instance Pretty $(conT origTy)
 
-      -- | XXX this is not a nice instance!
+      -- \| XXX this is not a nice instance!
       instance A.ToJSON $(conT origTy) where
-          toJSON = A.toJSON . show
+        toJSON = A.toJSON . show
 
-      -- | XXX this is not a nice instance!
+      -- \| XXX this is not a nice instance!
       instance A.FromJSON $(conT origTy) where
-          parseJSON = fmap read . A.parseJSON
+        parseJSON = fmap read . A.parseJSON
       |]
   return (tySyn : concat patSyns ++ derivs)
   where

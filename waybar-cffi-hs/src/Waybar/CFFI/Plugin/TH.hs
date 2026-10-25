@@ -22,9 +22,6 @@ module Waybar.CFFI.Plugin.TH (
 import Waybar.CFFI.Plugin.ABIv2
 import Waybar.CFFI.Plugin.Base
 
-import GI.Gtk qualified as Gtk
-import Language.Haskell.TH
-import Language.Haskell.TH.Syntax
 import Control.Exception qualified as E
 import Control.Monad
 import Control.Monad.Reader
@@ -34,6 +31,9 @@ import Foreign
 import Foreign.C
 import Foreign.C.ConstPtr (ConstPtr (..))
 import GHC.Exts (inline)
+import GI.Gtk qualified as Gtk
+import Language.Haskell.TH
+import Language.Haskell.TH.Syntax
 import System.IO (hPrint, stderr)
 import System.IO.Unsafe
 import Prelude hiding (init)

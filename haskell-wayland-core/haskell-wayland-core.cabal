@@ -72,6 +72,7 @@ library
     Paths_haskell_wayland_core
 
   build-depends:
+    aeson,
     base >=4.21 && <4.23,
     c-expr-runtime >=0.1.0 && <0.2,
     data-default >=0.8 && <0.9,
@@ -83,8 +84,7 @@ library
     primitive,
     template-haskell >=2.23 && <2.25,
     unix ^>=2.8.6,
-    unliftio ^>=0.2.25,
-    aeson
+    unliftio ^>=0.2.25
 
   hs-source-dirs: src
   ghc-options:

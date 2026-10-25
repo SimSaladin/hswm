@@ -117,7 +117,7 @@ sendMessageWithNoRefresh a w =
 -- | Force new manage sequence.
 manageDirty :: (HasCallStack) => (MonadH m) => m ()
 manageDirty = liftH $ do
-  --logDebug $ "wm request: manage_dirty" :# ["stack" .= prettyCallStack callStack]
+  -- logDebug $ "wm request: manage_dirty" :# ["stack" .= prettyCallStack callStack]
   withObject R.riverWindowManagerManageDirty
   writeMainQ MainPoll
 
@@ -346,18 +346,18 @@ withSeat_ k f = lookupSeat k >>= mapM_ f
 modifySeat :: (SomeSeat a, MonadHS m) => a -> (Seat -> Seat) -> m ()
 modifySeat k f = runInHS $ seatList . eachRiverId k %= f
 
-modifySeats :: MonadHS m => (Seat -> Bool) -> (Seat -> Seat) -> m ()
+modifySeats :: (MonadHS m) => (Seat -> Bool) -> (Seat -> Seat) -> m ()
 modifySeats choose f = runInHS $ seatList . each . filtered choose %= f
 
 -- | Use seat list read-only.
 mapSeats :: (GetHState m) => (Seat -> m ()) -> m ()
 mapSeats f = getHState >>= mapM_ f . view seatList
 
-startSeatOp :: MonadHS m => SeatOperation -> m ()
+startSeatOp :: (MonadHS m) => SeatOperation -> m ()
 startSeatOp seatop = runInHS $ modifySeats (const True) $ pendingAction .~ S_START_OP seatop
 
 -- | Casts the pointer into @RiverSeat@.
-modifySeat' :: MonadHS m => Ptr Void -> (Seat -> Seat) -> m ()
+modifySeat' :: (MonadHS m) => Ptr Void -> (Seat -> Seat) -> m ()
 modifySeat' ud = modifySeat (R.RiverSeat $ castPtr ud)
 
 --------------------------------------------------------------
@@ -394,9 +394,9 @@ mapWindows f = use _windows >>= mapM_ f
 
 restart :: (HasCallStack) => FilePath -> H ()
 restart prog0 = findExecutable prog0 >>= maybe notFound restart'
-    where
-  notFound = logError $ "not restarting: did not find desired executable" :# ["executable" .= prog0 ]
-  restart' prog = do
+  where
+    notFound = logError $ "not restarting: did not find desired executable" :# ["executable" .= prog0]
+    restart' prog = do
       runInHS $ broadcastMessage ReleaseResources
       logInfo "Running exit hooks..."
       void . userCode =<< asks (view $ config . exitHook)

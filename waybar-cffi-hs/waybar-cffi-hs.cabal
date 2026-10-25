@@ -48,6 +48,7 @@ library
     aeson >=2.2.3 && <2.4,
     base >=4.20 && <5,
     bytestring ^>=0.12.2,
+    containers,
     data-default ^>=0.8.0,
     gi-glib ^>=2.0,
     gi-gobject ^>=2.0,
@@ -60,7 +61,6 @@ library
     rio ^>=0.1.24,
     template-haskell >=2.20 && <3,
     text ^>=2.1.2,
-    containers,
     text-short,
 
 foreign-library waybarhaskellplugin

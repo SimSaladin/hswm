@@ -129,8 +129,10 @@ doF = return . Endo
 
 -- | Move the window to the floating layer.
 doFloat :: ManageHook
-doFloat = ask >>= \w -> lift (floatLocation w) >>=
-    maybe (error "floatloc") (doF . W.float (w^.riverId) . snd)
+doFloat =
+  ask >>= \w ->
+    lift (floatLocation w)
+      >>= maybe (error "floatloc") (doF . W.float (w ^. riverId) . snd)
 
 -- -- | Map the window and remove it from the 'WindowSet'.
 -- doIgnore :: ManageHook

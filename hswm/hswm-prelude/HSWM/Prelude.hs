@@ -72,6 +72,7 @@ import "rio" RIO (ExitCode (..), exitFailure, exitSuccess, threadDelay)
 import "rio" RIO.Prelude
 import "rio" RIO.Prelude.Types
 
+import Data.Text.Short (ShortText)
 import "async" Control.Concurrent.Async qualified as Async
 import "bytestring" Data.ByteString qualified as BS
 import "bytestring" Data.ByteString.Lazy (LazyByteString)
@@ -84,7 +85,6 @@ import "mtl" Control.Monad.State as Misc (MonadState, gets, modify)
 import "stm" Control.Concurrent.STM as Misc (flushTQueue)
 import "text" Data.Text qualified as T
 import "text" Data.Text.Lazy qualified as TL
-import Data.Text.Short (ShortText)
 
 toText :: String -> T.Text
 toText = T.pack

@@ -1,10 +1,10 @@
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE ImplicitParams #-}
 {-# LANGUAGE MultiWayIf #-}
 {-# LANGUAGE OverloadedRecordDot #-}
 {-# LANGUAGE PartialTypeSignatures #-}
 {-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE ImplicitParams #-}
-{-# LANGUAGE DeriveAnyClass #-}
 
 -- |
 -- Module      : Waybar.CFFI.Plugin.HSWM
@@ -19,24 +19,28 @@ module Waybar.CFFI.Plugin.HSWM (MyMod) where
 import Waybar.CFFI.Plugin.Base
 import Waybar.CFFI.Plugin.TextFormat
 
-import HSWM.IPC (OutputId (..), RWorkspaces (..), Response (..), WindowInfo (..), WorkspaceInfo (..), clientRun, WsId)
+import HSWM.IPC (OutputId (..), RWorkspaces (..), Response (..), WindowInfo (..), WorkspaceInfo (..), WsId, clientRun)
 
-import Foreign.StablePtr
-import Data.GI.Base.ShortPrelude (clear) -- "haskell-gi-base"
-import GI.Gtk as Gtk -- "gi-gtk3"
-import GI.Pango (EllipsizeMode (..)) -- "gi-pango"
-import GI.GObject.Objects.Object qualified as GIGO
+-- "haskell-gi-base"
+-- "gi-gtk3"
+-- "gi-pango"
+
+import Control.Monad.IO.Class
 import Control.Monad.Logger.Aeson hiding (Message)
+import Data.Aeson as A
+import Data.Char (isDigit)
+import Data.GI.Base.ShortPrelude (clear)
+import Data.List qualified as L
+import Data.Map qualified as M
+import Data.Text qualified as T
+import Data.Text.Short qualified as TS
+import Foreign.StablePtr
+import GI.GObject.Objects.Object qualified as GIGO
+import GI.Gtk as Gtk
+import GI.Pango (EllipsizeMode (..))
 import RIO (Async, SomeException, askRunInIO, async, cancel, threadDelay, try)
 import RIO.Prelude hiding (on)
 import RIO.Prelude.Types
-import Control.Monad.IO.Class
-import Data.Aeson as A
-import Data.Char (isDigit)
-import Data.List qualified as L
-import Data.Text qualified as T
-import Data.Map qualified as M
-import qualified Data.Text.Short as TS
 
 data MyMod = MyMod
   { workspacesContainer :: Maybe Container
@@ -68,20 +72,23 @@ instance FromJSON (PluginConfig MyMod) where
       defWs = fromString "<span>{keyhint}:</span>{tag}"
       defLayoutTooltip = fromString "Layout: {layout}\rWindows:\r{windowlist}"
       defLayoutWindowList = fromString "{title} - {kitty} [{pid}]"
-      defWsTooltip = fromString $
+      defWsTooltip =
+        fromString $
           "{screen}@{outputName}\r"
             <> "Windows:\t{numWindows}\r"
             <> "Layout:\t{layout}"
-      defFocusedTooltip = fromString $
+      defFocusedTooltip =
+        fromString $
           "{title}\r"
             <> "AppID: {appId}\r"
             <> "PID: {pid}"
 
 -- | Sum constructor for different views for this widget.
-data ActivePart = ViewWorkspaces
-                | ViewCurrentLayout
-                | ViewFocusedWindow
-                deriving (Eq, Ord, Show, Read)
+data ActivePart
+  = ViewWorkspaces
+  | ViewCurrentLayout
+  | ViewFocusedWindow
+  deriving (Eq, Ord, Show, Read)
 
 instance FromJSON ActivePart where
   parseJSON = withText "ActivePart" $ \case
@@ -92,7 +99,7 @@ instance FromJSON ActivePart where
 
 instance ToJSON ActivePart where
   toJSON x = toJSON $ case x of
-    ViewWorkspaces    -> "workspaces" :: Text
+    ViewWorkspaces -> "workspaces" :: Text
     ViewCurrentLayout -> "layout"
     ViewFocusedWindow -> "focused"
 
@@ -116,7 +123,7 @@ instance WaybarPlugin MyMod where
     { activePart :: ActivePart
     , focusedWindowMaxLength :: !Int32
     , wsSpacing :: !Int32
-    , -- ^ Spacing between workspace boxes
+    , -- \^ Spacing between workspace boxes
       wsFormat :: !TextFormat
     , wsTooltipFormat :: !TextFormat
     , focusedWindowTooltipFormat :: !TextFormat
@@ -128,8 +135,9 @@ instance WaybarPlugin MyMod where
   -- instance-specific plugin state
   data PluginState MyMod = ModState
     { tagWidgets :: [(Button, Label)]
-    , thisOutputName :: !Text -- ^ Name of this output, e.g. eDP-1, DP-2, etc.
-    , workspacePtrs :: !(M.Map WsId (StablePtr WsId))
+    , thisOutputName :: !Text
+    , -- \^ Name of this output, e.g. eDP-1, DP-2, etc.
+      workspacePtrs :: !(M.Map WsId (StablePtr WsId))
     }
     deriving (Eq, Generic)
 
@@ -154,21 +162,21 @@ instance WaybarPlugin MyMod where
         -- Container for workspace boxes
         container <- toContainer =<< new Box [#name := "hswm-workspaces", #orientation := OrientationHorizontal, #spacing := c.wsSpacing]
         setMain container
-        return def { workspacesContainer = Just container }
+        return def{workspacesContainer = Just container}
       ViewCurrentLayout -> do
         -- Widget to display the current layout
         label <- new Label [#name := "hswm-layout", #sensitive := True]
         setMain label
-        return def { layoutLabel = Just label }
+        return def{layoutLabel = Just label}
       ViewFocusedWindow -> do
         -- Widget to display the currently focused window info
         label <- new Label [#name := "hswm-focused", #sensitive := True, #maxWidthChars := c.focusedWindowMaxLength, #ellipsize := EllipsizeModeEnd]
         setMain label
-        return def { focusInfoLabel = Just label }
+        return def{focusInfoLabel = Just label}
   update = do
     c <- getConfig
     case c.activePart of
-      ViewWorkspaces    -> updateWorkspaces
+      ViewWorkspaces -> updateWorkspaces
       ViewCurrentLayout -> updateLayoutInfo
       ViewFocusedWindow -> updateFocusInfo
   deinit = do
@@ -177,9 +185,11 @@ instance WaybarPlugin MyMod where
     mapM_ widgetDestroy m.workspacesContainer
     mapM_ widgetDestroy m.layoutLabel
     mapM_ widgetDestroy m.focusInfoLabel
-  -- | Handle signal which was propagated by waybar (reload, etc.)
+
+  -- \| Handle signal which was propagated by waybar (reload, etc.)
   refresh sig = logInfo $ "received signal" :# ["signal" .= show sig]
-  -- | Trigger a module action
+
+  -- \| Trigger a module action
   doaction act = logWarn $ "unhandled module action" :# ["action" .= show act]
 
 -- * HSWM Client
@@ -235,7 +245,7 @@ updateLayoutInfo = do
   g <- getGlobal
   m <- getInstance
   st <- getState
-  forM_ m.layoutLabel $ \lLabel  -> do
+  forM_ m.layoutLabel $ \lLabel -> do
     let RWorkspaces{..} = g.workspacesInfo
         thisScreen = fromMaybe maxBound (L.lookup st.thisOutputName g.outputs)
     -- with the layout of currently visible tag on this screen...
@@ -252,11 +262,10 @@ updateWorkspaces = do
       thisScreen = fromMaybe maxBound (L.lookup st.thisOutputName g.outputs)
 
       setWidgetWSI (btnW, labelW) ws foc vis screen = do
-
         dt <- case M.lookup ws.tag st.workspacePtrs of
           Nothing -> do
             ptr <- liftIO $ newStablePtr ws.tag
-            modifyState $ \s -> s { workspacePtrs = M.insert ws.tag ptr s.workspacePtrs }
+            modifyState $ \s -> s{workspacePtrs = M.insert ws.tag ptr s.workspacePtrs}
             return ptr
           Just x -> return x
         GIGO.objectSetData btnW gTagName $ castStablePtrToPtr dt
@@ -271,31 +280,27 @@ updateWorkspaces = do
 
   m <- getInstance
   forM_ m.workspacesContainer $ \wsContainer -> do
-
     -- Destroy deleted / create new needed
-    forM_ (drop (length tags) st.tagWidgets) $ \(b,l) -> widgetDestroy l >> widgetDestroy b
+    forM_ (drop (length tags) st.tagWidgets) $ \(b, l) -> widgetDestroy l >> widgetDestroy b
     newTags <- forM (drop (length st.tagWidgets) tags) (addWorkspaceWidget wsContainer)
     let widgets = take (length tags) st.tagWidgets ++ newTags
     modifyState $ \x -> x{tagWidgets = widgets}
 
     forM_ (zip tags widgets) $ \(ws, wds) ->
-
-      if | (thisScreen, ws.tag) == focused ->
+      if
+        | (thisScreen, ws.tag) == focused ->
             -- Focused (on this screen)
             setWidgetWSI wds ws True False (Just thisScreen)
-
-         | (screen, _) : _ <- [x | x <- focused : visible, ws.tag == snd x] ->
-           -- Visible but not focused (on this screen)
-           setWidgetWSI wds ws False True (Just screen)
-
-         | otherwise ->
-           -- Hidden
-           setWidgetWSI wds ws False False Nothing
-
+        | (screen, _) : _ <- [x | x <- focused : visible, ws.tag == snd x] ->
+            -- Visible but not focused (on this screen)
+            setWidgetWSI wds ws False True (Just screen)
+        | otherwise ->
+            -- Hidden
+            setWidgetWSI wds ws False False Nothing
   where
     addWorkspaceWidget contw _ws = do
-      b <- new Button [#valign := AlignEnd ]
-      l <- new Label [ #valign := AlignEnd, #useMarkup := True]
+      b <- new Button [#valign := AlignEnd]
+      l <- new Label [#valign := AlignEnd, #useMarkup := True]
       addClass b "workspace"
       -- set b [ #label := T.pack ws.tag ]
       containerAdd b l
@@ -306,8 +311,8 @@ updateWorkspaces = do
       return (b, l)
 
     handleClick _lb btn = do
-      (tag ::WsId) <- liftIO $ GIGO.objectGetData btn gTagName >>= deRefStablePtr . castPtrToStablePtr
-      logInfo $ "button was clicked!" :# [ "tag" .= tag ]
+      (tag :: WsId) <- liftIO $ GIGO.objectGetData btn gTagName >>= deRefStablePtr . castPtrToStablePtr
+      logInfo $ "button was clicked!" :# ["tag" .= tag]
 
 updateFocusInfo :: MIO ()
 updateFocusInfo = do
@@ -329,21 +334,21 @@ mkWorkspaceLabel :: WorkspaceInfo -> MIO Text
 mkWorkspaceLabel ws = do
   c <- getConfig
   runTextFormatWith c.wsFormat $ \case
-    "tag"     -> formatted ws.tag
+    "tag" -> formatted ws.tag
     "keyhint" -> formatted ws.keyhint
-    _         -> pure ""
+    _ -> pure ""
 
 mkWorkspaceTooltip :: WorkspaceInfo -> Maybe OutputId -> Maybe Text -> MIO Text
 mkWorkspaceTooltip ws screen outputName = do
   c <- getConfig
   runTextFormatWith c.wsTooltipFormat $ \case
     "numWindows" -> formatted $ length ws.windowList
-    "layout"     -> formatted ws.layout
-    "screen"     -> formatted $ fmap fromEnum screen
+    "layout" -> formatted ws.layout
+    "screen" -> formatted $ fmap fromEnum screen
     "outputName" -> formatted $ fromMaybe "-" outputName
-    "tag"        -> formatted ws.tag
-    "keyhint"    -> formatted ws.keyhint
-    _            -> return ""
+    "tag" -> formatted ws.tag
+    "keyhint" -> formatted ws.keyhint
+    _ -> return ""
 
 mkFocusedTooltip :: WindowInfo -> MIO Text
 mkFocusedTooltip wi = do
@@ -357,16 +362,19 @@ mkFocusedTooltip wi = do
 mkLayoutTooltip :: WorkspaceInfo -> MIO Text
 mkLayoutTooltip ws = do
   c <- getConfig
-  runTextFormat c.layoutTooltipFormat
+  runTextFormat
+    c.layoutTooltipFormat
     [ ("layout", markupEscape ws.layout)
-    , ("windowlist", T.intercalate "\r" <$> sequence [ fmtWin c wi | wi <- ws.windowList ])
+    , ("windowlist", T.intercalate "\r" <$> sequence [fmtWin c wi | wi <- ws.windowList])
     ]
   where
-    fmtWin c v = runTextFormat c.layoutWindowListFormat
-      [ ("appId", markupEscape $ TS.toText v.appId)
-      , ("title", markupEscape $ TS.toText v.title)
-      , ("pid", pure $ maybe "" tshow v.pid)
-      ]
+    fmtWin c v =
+      runTextFormat
+        c.layoutWindowListFormat
+        [ ("appId", markupEscape $ TS.toText v.appId)
+        , ("title", markupEscape $ TS.toText v.title)
+        , ("pid", pure $ maybe "" tshow v.pid)
+        ]
 
 -- * General utilities
 

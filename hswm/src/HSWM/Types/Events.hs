@@ -13,7 +13,8 @@ import HSWM.Util.PP
 import River qualified as R
 import System.Posix (Signal)
 import WL.ExtForeignToplevelList.Staging.V1.Client qualified as ExtFTL
---import WL.ExtIdleNotify.Staging.V1.Client qualified as ExtIN
+
+-- import WL.ExtIdleNotify.Staging.V1.Client qualified as ExtIN
 import WL.ExtSessionLock.Staging.V1.Client qualified as ExtSL
 import WL.Wlr.InputMethod.Unstable.V2.Client qualified as WlrIM
 import WL.Wlr.OutputManagement.Unstable.V1.Client qualified as WlrOM
@@ -45,8 +46,8 @@ data Event
   | InputManagerEvent !R.RiverInputManagerEvent
   | InputDeviceEvent !R.RiverInputDeviceEvent
   | LibinputConfigEvent !R.RiverLibinputConfigEvent
-    -- Wlroots
-  | WlrIMEvent !WlrIM.InputMethodEvent
+  | -- Wlroots
+    WlrIMEvent !WlrIM.InputMethodEvent
   | WlrIMPopupSurfaceEvent !WlrIM.InputPopupSurfaceEvent
   | WlrIMKeyboardGrabEvent !WlrIM.InputMethodKeyboardGrabEvent
   | WlrOutputManagerEvent !WlrOM.OutputManagerEvent

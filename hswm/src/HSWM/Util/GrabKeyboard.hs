@@ -10,14 +10,14 @@
 -- Portability : unportable
 module HSWM.Util.GrabKeyboard where
 
+import Control.Monad.Fix
+import Data.Map qualified as M
 import HSWM.Core
 import HSWM.Operations
 import River qualified as R
+import Text.XkbCommon as XKBC
 import WL.Client qualified as WL
 import WL.Wlr.InputMethod.Unstable.V2.Client qualified as Wlr
-import Control.Monad.Fix
-import Data.Map qualified as M
-import Text.XkbCommon as XKBC
 
 type HasGrabCtx env m = (MonadH m, env ~ HConf, MonadStateGlobal env m, MonadReader env m, MonadLogger m, MonadUnliftIO m, MonadFix m)
 

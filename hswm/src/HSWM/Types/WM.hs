@@ -59,7 +59,8 @@ type Seat = Seat' H
 type instance Stateful H = HS
 type instance Stateful HS = HS
 type instance ManageHook' H = ManageHook
---type instance MaybeManageHook' H = MaybeManageHook
+
+-- type instance MaybeManageHook' H = MaybeManageHook
 
 -- * Exceptions
 
@@ -145,7 +146,7 @@ data LayoutMessages
 
 instance Message LayoutMessages
 
---instance Message Event
+-- instance Message Event
 
 -------------------------------------------------------------------------
 
@@ -440,7 +441,7 @@ runInHS' a = do
     runHS :: HConf -> HState -> HS a -> IO (a, HState)
     runHS c st (HS ma) = flip runReaderT c $ runStateT ma st
 
-class Monad m => MonadH m where
+class (Monad m) => MonadH m where
   liftH :: H a -> m a
 
 instance MonadH H where
@@ -473,8 +474,8 @@ instance (Monoid a) => Default (x -> H a) where
   def _ = pure mempty
 
 -- XXX not particularly useful instances
-instance Typeable a => Show (H a) where show _ = "H(" ++ show (typeRep (undefined :: Proxy a)) ++ ")"
-instance Typeable a => Show (HS a) where show _ = "HS(" ++ show (typeRep (undefined :: Proxy a)) ++ ")"
+instance (Typeable a) => Show (H a) where show _ = "H(" ++ show (typeRep (undefined :: Proxy a)) ++ ")"
+instance (Typeable a) => Show (HS a) where show _ = "HS(" ++ show (typeRep (undefined :: Proxy a)) ++ ")"
 
 instance ToJSON StateExtension where
   toJSON (StateExtension _) = A.object [("type", "StateExtension")]
@@ -492,11 +493,11 @@ instance ToJSON (HSWMConfig H Layout) where
   toEncoding = genericToEncoding aesonOptions
 
 instance ToJSON (a -> H All) where
-    toJSON _ = A.Null
-    omitField _ = True
-instance {-# OVERLAPPABLE #-} MonadH m => ToJSON (m a) where
-    toJSON _ = A.Null
-    omitField _ = True
+  toJSON _ = A.Null
+  omitField _ = True
+instance {-# OVERLAPPABLE #-} (MonadH m) => ToJSON (m a) where
+  toJSON _ = A.Null
+  omitField _ = True
 
 instance ToJSON Xkb.XkbRuleNames
 instance ToJSON Xkb.OptionSpec

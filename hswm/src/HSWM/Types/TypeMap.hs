@@ -1,6 +1,5 @@
-{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE DefaultSignatures #-}
-
+{-# LANGUAGE UndecidableInstances #-}
 
 -- |
 -- Module      : HSWM.Types.TypeMap
@@ -15,12 +14,14 @@
 module HSWM.Types.TypeMap where
 
 import Data.Aeson qualified as A
---import Data.TMap qualified as TM
+
+-- import Data.TMap qualified as TM
+
+import Data.Kind
+import Data.Map qualified as M
 import Data.TypeRepMap qualified as TM
 import Data.Typeable
 import GHC.Generics
-import qualified Data.Map as M
-import Data.Kind
 
 -- * Types
 
@@ -38,7 +39,7 @@ type MonadEffects m = (MonadIO m, MonadLogger m, MonadMask m, MonadThrow m, Mona
 
 -- ** TypeMap
 
-class Typeable a => Inspect a where
+class (Typeable a) => Inspect a where
   inspect :: a -> String
   default inspect :: (Generic a, GInspect (Rep a)) => a -> String
   inspect x = ginspect (from @_ @() x)
@@ -46,11 +47,11 @@ class Typeable a => Inspect a where
 instance {-# OVERLAPS #-} (Generic a, Typeable a, Inspect (Rep a ())) => Inspect (Generically a) where
   inspect (Generically x) = inspect (from @_ @() x)
 
-instance Typeable a => Inspect (IORef a) where
+instance (Typeable a) => Inspect (IORef a) where
   inspect _ = "<IORef>"
-instance Typeable a => Inspect (IO a) where
+instance (Typeable a) => Inspect (IO a) where
   inspect _ = "<IO>"
-instance Inspect a => Inspect (Maybe a) where
+instance (Inspect a) => Inspect (Maybe a) where
   inspect Nothing = "Nothing"
   inspect (Just x) = "Just " ++ inspect x
 instance {-# OVERLAPS #-} (Inspect a, Typeable k, Show k) => Inspect (M.Map k a) where
@@ -62,34 +63,39 @@ instance {-# OVERLAPPABLE #-} (Typeable a, Show a) => Inspect a where
 class GInspect f where
   ginspect :: f p -> String
 
-instance  GInspect U1 where
+instance GInspect U1 where
   ginspect U1 = ""
-instance Inspect c => GInspect (K1 i c) where
+instance (Inspect c) => GInspect (K1 i c) where
   ginspect (K1 x) = inspect x
-instance GInspect f => GInspect (D1 c f) where
+instance (GInspect f) => GInspect (D1 c f) where
   ginspect (M1 x) = ginspect x
 instance (GInspect f, Selector i) => GInspect (S1 i f) where
   ginspect y@(M1 x)
     | selName y == "" = ginspect x
     | otherwise = selName y ++ " = " ++ ginspect x
 instance (GInspect f, Constructor c) => GInspect (C1 c f) where
-  ginspect y@(M1 x) = conName y ++ " " ++ (if conIsRecord y then "{ " ++ ginspect x ++ " }"
-                                                            else ginspect x)
+  ginspect y@(M1 x) =
+    conName y
+      ++ " "
+      ++ ( if conIsRecord y
+             then "{ " ++ ginspect x ++ " }"
+             else ginspect x
+         )
 instance (GInspect c1, GInspect c2) => GInspect (c1 :+: c2) where
   ginspect (L1 x) = ginspect x
   ginspect (R1 x) = ginspect x
 instance (GInspect (S1 i f), GInspect c2, Selector i) => GInspect (S1 i f :*: c2) where
   ginspect (x :*: y)
     | selName x == "" = ginspect x ++ ", " ++ ginspect y
-    | otherwise     = ginspect x ++ " " ++ ginspect y
+    | otherwise = ginspect x ++ " " ++ ginspect y
 instance (GInspect c2, GInspect (c1 :*: c1')) => GInspect ((c1 :*: c1') :*: c2) where
   ginspect (x :*: y) = ginspect x ++ ", " ++ ginspect y
 
-data TF (a :: Type) = Inspect a => TF { runTF :: !a }
+data TF (a :: Type) = (Inspect a) => TF {runTF :: !a}
 
-unwrapVal :: Inspect a => TF a -> a
+unwrapVal :: (Inspect a) => TF a -> a
 unwrapVal (TF x) = x
-wrapVal :: Inspect a => a -> TF a
+wrapVal :: (Inspect a) => a -> TF a
 wrapVal x = TF x
 
 newtype TypeMap = TypeMap {unTypeMap :: TM.TypeRepMap TF}

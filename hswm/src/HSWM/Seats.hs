@@ -1,7 +1,6 @@
 {-# OPTIONS_GHC -Wno-ambiguous-fields #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
-
 -- |
 -- Module      : HSWM.Seats
 -- Description : Short description
@@ -31,7 +30,7 @@ bindsToList = (^.. each . to (snd . (.unBoth)))
 
 -- * Event handling
 
-handleEvent :: HandleEvent H EXT_IN.IdleNotificationEvent => R.RiverSeatEvent -> H ()
+handleEvent :: (HandleEvent H EXT_IN.IdleNotificationEvent) => R.RiverSeatEvent -> H ()
 handleEvent = \case
   R.RiverSeatWlSeat _ seat name -> hasWlSeat seat name
   R.RiverSeatPointerEnter _ seat window -> runInHS $ withSeat_ seat $ \s -> modifySeat seat $ hovered .~ window &+ pendingPointerEnter ?~ (window, s.position)
@@ -46,11 +45,12 @@ handleEvent = \case
   _ -> return () -- TODO touch events
 
 instance HandleEvent H WL.KeyboardEvent where
-    handleEvent = \case
-        WL.KeyboardRepeatInfo ud _kbd r d -> modifySeat' ud $
-            keyboard . rrate .~ r &+ keyboard . rdelay .~ d
-        --KeyboardKeymap{}
-        _ -> pure ()
+  handleEvent = \case
+    WL.KeyboardRepeatInfo ud _kbd r d ->
+      modifySeat' ud $
+        keyboard . rrate .~ r &+ keyboard . rdelay .~ d
+    -- KeyboardKeymap{}
+    _ -> pure ()
 
 handleWlSeatEvent :: (HandleEvent H WL.TouchEvent, HandleEvent H WL.PointerEvent) => WL.SeatEvent -> H ()
 handleWlSeatEvent = \case
@@ -62,7 +62,7 @@ handleWlSeatEvent = \case
         wlKbd <- WL.seatGetKeyboard wls
         addGlobalListener wlKbd (Just ud)
         logDebug $ "Seat has capability: keyboard" :# ["wl_seat" .= tshow wls, "wl_keyboard" .= tshow wlKbd]
-        return $ keyboard .~ def { wl_keyboard = wlKbd }
+        return $ keyboard .~ def{wl_keyboard = wlKbd}
       WL.SeatCapabilityPointer -> do
         wlPtr <- WL.seatGetPointer wls
         addGlobalListener_ wlPtr
@@ -296,7 +296,7 @@ added rs = do
 -- | Bind the Wl_seat interface of a river_seat as well.
 --
 -- Currently this will also request idle notifications via ext-idle-notify-v1.
-hasWlSeat :: HandleEvent H EXT_IN.IdleNotificationEvent => RiverSeat -> WL.ObjectName -> H ()
+hasWlSeat :: (HandleEvent H EXT_IN.IdleNotificationEvent) => RiverSeat -> WL.ObjectName -> H ()
 hasWlSeat seat name = do
   wls <- globalBindAndListen @WL.Seat False Nothing (Just seat) Nothing (Just name)
   idlno <- objectCommand EXT_IN.idleNotifierGetIdleNotification >>= \f -> f (10 * 60 * 1000) wls

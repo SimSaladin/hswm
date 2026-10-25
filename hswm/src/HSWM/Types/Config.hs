@@ -15,7 +15,8 @@ module HSWM.Types.Config where
 import HSWM.Types.Action
 import HSWM.Types.Events
 import HSWM.Types.Lens
---import HSWM.Types.Seat
+
+-- import HSWM.Types.Seat
 import HSWM.Types.Simple
 import HSWM.Types.Window
 import HSWM.Utils (parseRgba)
@@ -66,7 +67,8 @@ instance
   , Default (ManageHook' m)
   , Monoid (m All)
   , Default (Dynamic -> m All)
-  , Applicative m) =>
+  , Applicative m
+  ) =>
   Default (HSWMConfig m l)
   where
   def =

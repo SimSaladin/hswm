@@ -1,7 +1,6 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE RecordWildCards #-}
 
-
 -- |
 -- Module      : River.WindowManagement
 -- Description : river-window-management v1
@@ -177,17 +176,17 @@ module River.WindowManagement (
 import River.WindowManagement.V1.Client
 
 import Control.DeepSeq (NFData)
+import Data.Aeson qualified as A
+import Data.Aeson.Types qualified as A
 import Data.Bits
 import Data.Data (Data)
 import Data.Default
+import Data.Functor ((<&>))
 import Data.Int
 import Data.Word
 import Foreign.C.Types
 import GHC.Generics
 import HsBindgen.Runtime.CEnum
-import qualified Data.Aeson as A
-import qualified Data.Aeson.Types as A
-import Data.Functor ((<&>))
 
 -- * RiverColor
 
@@ -198,13 +197,13 @@ data RiverColor = RiverColor {red, green, blue, alpha :: {-# UNPACK #-} !Word32}
 
 -- | Encoded in an array [R,G,B,A] numeric
 instance A.ToJSON RiverColor where
-    toJSON c = A.toJSON (c.red, c.green, c.blue, c.alpha)
-    toEncoding c = A.toEncoding (c.red, c.green, c.blue, c.alpha)
+  toJSON c = A.toJSON (c.red, c.green, c.blue, c.alpha)
+  toEncoding c = A.toEncoding (c.red, c.green, c.blue, c.alpha)
 
 instance A.FromJSON RiverColor where
-    parseJSON v = A.modifyFailure ("Parsing RiverColor: " ++) $
-        A.parseJSON v <&> (\(red, green, blue, alpha) -> RiverColor{..})
-
+  parseJSON v =
+    A.modifyFailure ("Parsing RiverColor: " ++) $
+      A.parseJSON v <&> (\(red, green, blue, alpha) -> RiverColor{..})
 
 data WindowBorders = WindowBorders
   { wbWidth :: {-# UNPACK #-} !Int32

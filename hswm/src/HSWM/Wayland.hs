@@ -1,9 +1,9 @@
 module HSWM.Wayland where
 
-import HSWM.Types.TypeMap
-import HSWM.Types.Events
-import WL.Client qualified as WL
 import HSWM.Core
+import HSWM.Types.Events
+import HSWM.Types.TypeMap
+import WL.Client qualified as WL
 
 type MonadGlobals env m = (MonadEffectsIO m, MonadReader env m, HasGlobalsRegistry env, HasGlobalTMap env)
 
@@ -105,7 +105,7 @@ addGlobalListener ::
   a -> Maybe udata -> m ()
 addGlobalListener obj mbData = do
   l <- getOrCreateGlobalListener
-  --l <- getObject @(ConstPtr (WL.ObjectListener a))
+  -- l <- getObject @(ConstPtr (WL.ObjectListener a))
   liftH $ WL.listenerAdd obj l $ maybe nullPtr WL.toUserData mbData
 
 -- | 'addGlobalListener' with empty user data.
@@ -114,9 +114,9 @@ addGlobalListener_ = flip addGlobalListener (Nothing @())
 
 getOrCreateGlobalListener ::
   forall a m.
-    (MonadH m, WL.HasListener a, Inspect a, HandleEvent H (WL.ObjectListenerEvent a))
-  => m (ConstPtr (WL.ObjectListener a))
+  (MonadH m, WL.HasListener a, Inspect a, HandleEvent H (WL.ObjectListenerEvent a)) =>
+  m (ConstPtr (WL.ObjectListener a))
 getOrCreateGlobalListener = liftH $ do
-    getOrCreateObject $ do
-        runInIO <- askRunInIO
-        WL.createListener $ runInIO . handleWithHook'
+  getOrCreateObject $ do
+    runInIO <- askRunInIO
+    WL.createListener $ runInIO . handleWithHook'

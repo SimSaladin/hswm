@@ -77,9 +77,9 @@ render = runInHS $ do
 
 -- A global set for keeping track which windows are still susceptible to
 -- user managehook firing.
-newtype WindowsPendingSetup = WPS { unWPS :: M.Map RiverWindow EpochTime }
-    deriving stock (Eq, Ord, Show, Read, Generic)
-    deriving anyclass (Default)
+newtype WindowsPendingSetup = WPS {unWPS :: M.Map RiverWindow EpochTime}
+  deriving stock (Eq, Ord, Show, Read, Generic)
+  deriving anyclass (Default)
 
 -- | Do nothing while pointer operation is in progress.
 manage :: H ()
@@ -92,32 +92,33 @@ manage_ = do
   -- Do initial properties for new windows
   -- Get rid of any closed windows
   mapWindows $ \w ->
-    if | w.closed -> doRemoveWindow w
-       | w.new -> setInitialManageProperties w
-       | otherwise -> return ()
+    if
+      | w.closed -> doRemoveWindow w
+      | w.new -> setInitialManageProperties w
+      | otherwise -> return ()
 
   -- run user manageHook for new windows that haven't triggered a hook yet.
   WPS unmanaged <- liftH getObjectDef
   mh <- view (config . manageHook)
   ts0 <- io epochTime
   forM_ (M.toList unmanaged) $ \(rw, ts) ->
-        if ts + 10 <= ts0
-           then liftH . modifyObjectDef @WindowsPendingSetup $ \(WPS m) -> WPS (M.delete rw m)
-           else do
-              res <- withWindow rw $ \w ->
-                  if not w.didManageHook && not w.new && not w.closed
-                     then do
-                         res <- userCodeDefS mempty (runQuery mh w)
-                         modifyWindow w $ didManageHook .~ True
-                         return $ Just res
-                     else return Nothing
-              case res of
-                -- the window is presumably already dead and removed
-                Nothing -> liftH . modifyObjectDef @WindowsPendingSetup $ \(WPS m) -> WPS (M.delete rw m)
-                Just Nothing -> return ()
-                Just (Just g) -> do
-                    logDebug $ "user manage hook triggered for new new window" :# [ "window" .= rw ]
-                    windows $ appEndo g
+    if ts + 10 <= ts0
+      then liftH . modifyObjectDef @WindowsPendingSetup $ \(WPS m) -> WPS (M.delete rw m)
+      else do
+        res <- withWindow rw $ \w ->
+          if not w.didManageHook && not w.new && not w.closed
+            then do
+              res <- userCodeDefS mempty (runQuery mh w)
+              modifyWindow w $ didManageHook .~ True
+              return $ Just res
+            else return Nothing
+        case res of
+          -- the window is presumably already dead and removed
+          Nothing -> liftH . modifyObjectDef @WindowsPendingSetup $ \(WPS m) -> WPS (M.delete rw m)
+          Just Nothing -> return ()
+          Just (Just g) -> do
+            logDebug $ "user manage hook triggered for new new window" :# ["window" .= rw]
+            windows $ appEndo g
 
   -- run queued manage actions for each window
   mapWindows $ \w ->
@@ -242,7 +243,7 @@ applyManageActions w0 xs0 = doAll w0 xs0 >>= \w' -> return $ Just w'{p_manage_ac
 
 -- * Add window state
 
-added :: HandleEvent H R.RiverWindowEvent => RiverWindow -> H ()
+added :: (HandleEvent H R.RiverWindowEvent) => RiverWindow -> H ()
 added w = do
   -- Setup WL window listener
   addGlobalListener_ w

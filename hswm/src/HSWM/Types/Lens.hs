@@ -32,14 +32,14 @@ module HSWM.Types.Lens (
 import Data.Aeson qualified as A
 import Data.Char
 import Data.Coerce
+import Data.Dynamic
 import Data.Set qualified as Set
+import Data.Typeable
 import Language.Haskell.TH hiding (Type)
 import Language.Haskell.TH.Datatype qualified as D
 import Language.Haskell.TH.Datatype.TyVarBndr qualified as D
 import Lens.Micro.TH.Internal
 import Text.Read (read)
-import Data.Dynamic
-import Data.Typeable
 
 import River qualified as R
 import WL.Client qualified as WL
@@ -48,19 +48,19 @@ import WL.Client qualified as WL
 -- Orphan instances
 -- XXX
 
-instance Typeable a => Show (MVar a) where
-    show a = "MVar " ++ show (typeOf a)
-instance Typeable a => Show (Async a) where
-    show a = "Async " ++ show (typeOf a)
-instance Typeable a => Show (StablePtr a) where
-    show a = "StablePtr " ++ show (typeOf a)
+instance (Typeable a) => Show (MVar a) where
+  show a = "MVar " ++ show (typeOf a)
+instance (Typeable a) => Show (Async a) where
+  show a = "Async " ++ show (typeOf a)
+instance (Typeable a) => Show (StablePtr a) where
+  show a = "StablePtr " ++ show (typeOf a)
 
 instance NFData (StablePtr a) where
-    rnf = rnf . castStablePtrToPtr
+  rnf = rnf . castStablePtrToPtr
 
 instance A.ToJSON (StablePtr a) where
-    toJSON _ = A.Null
-    omitField _ = True
+  toJSON _ = A.Null
+  omitField _ = True
 
 -- * Constants
 
@@ -120,8 +120,9 @@ makeLensesCombine' fRules fieldsIn namesIn = do
     exists <- isJust <$> lookupTypeName c
     return [field | exists]
   -- [field-name] -- fields that get lenses on class-per-field basis
-  let fields = let fs = fieldsIn ++ map nameBase fieldsWithClass
-                in fs ++ map (fromSnake False) fs
+  let fields =
+        let fs = fieldsIn ++ map nameBase fieldsWithClass
+         in fs ++ map (fromSnake False) fs
       -- [type-name] -- types that get lenses on class-per-field basis
       namesPerField = namesIn
       -- [type-name] -- types that get lenses on class-per-type basis
@@ -247,7 +248,7 @@ infixl 2 &+
 --
 -- Useful to overload functions that operate on an identifier to work directly with data types that contain an
 -- identifier.
-class Eq (RiverId a) => HasRiverId a where
+class (Eq (RiverId a)) => HasRiverId a where
   type RiverId a
 
   riverId :: Lens' a (RiverId a)
@@ -265,8 +266,9 @@ type SameRiverId a b = (HasRiverId a, HasRiverId b, RiverId a ~ RiverId b)
 
 -- | Constraints for indicating that the input is or has a distinguishing identifier.
 type SomeWindow a = (HasRiverId a, RiverId a ~ R.RiverWindow)
+
 type SomeOutput a = (HasRiverId a, RiverId a ~ R.RiverOutput)
-type SomeSeat   a = (HasRiverId a, RiverId a ~ R.RiverSeat)
+type SomeSeat a = (HasRiverId a, RiverId a ~ R.RiverSeat)
 
 instance HasRiverId R.RiverOutput where type RiverId R.RiverOutput = R.RiverOutput
 instance HasRiverId R.RiverWindow where type RiverId R.RiverWindow = R.RiverWindow
@@ -299,8 +301,8 @@ wordToRiverId = toRiverId . wordPtrToPtr @Void . WordPtr
 riverIdToHex :: (WL.IsWlObject a, Show a) => a -> String
 hexToRiverId :: (WL.IsWlObject a, Read a) => String -> a
 riverIdToHex = show
-hexToRiverId = read
 
+hexToRiverId = read
 
 -- Instances for most common River identifiers...
 instance ToRiverId (Ptr Void) R.RiverOutput
@@ -308,7 +310,6 @@ instance ToRiverId (Ptr Void) R.RiverWindow
 instance ToRiverId (Ptr Void) R.RiverSeat
 instance ToRiverId (Ptr Void) R.RiverNode
 instance ToRiverId (Ptr Void) R.RiverLayerShellOutput
-
 
 -- * Aeson instances
 

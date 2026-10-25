@@ -5,10 +5,13 @@
 module Main {-(main)-} where
 
 import Control.Monad.Reader
+import Data.Aeson qualified as A
+import Data.Aeson.Encode.Pretty (encodePretty)
 import Data.ByteString.Char8 qualified as BC8
 import Data.ByteString.Lazy.Char8 qualified as BL
 import Data.Text qualified
 import Data.Text.Lazy qualified as TL
+import Data.Text.Short qualified as TS
 import GHC.Generics qualified as G
 import HSWM.IPC
 import HSWM.Main.Options as HSWM (
@@ -21,11 +24,8 @@ import HSWM.Main.Options as HSWM (
  )
 import Options.Applicative qualified as Options
 import Options.Generic
-import Data.Aeson qualified as A
-import Data.Aeson.Encode.Pretty (encodePretty)
 import System.Console.Haskeline
 import System.Console.Haskeline.ReaderT
-import Data.Text.Short qualified as TS
 
 progDesc :: String
 progDesc = "hswmctl"
@@ -118,10 +118,11 @@ deriving instance Show ClientOptions
 instance ParseRecord (Cmdline Wrapped) where
   parseRecord = Cmdline <$> optional parseRecord <*> fmap G.to (genericParseRecord mods)
     where
-      mods = lispCaseModifiers
+      mods =
+        lispCaseModifiers
           { fieldNameModifier = \s -> case s of
-                                        "colorEnable" -> "color"
-                                        _ -> lispCaseModifiers.fieldNameModifier s
+              "colorEnable" -> "color"
+              _ -> lispCaseModifiers.fieldNameModifier s
           }
 
 -- Request
@@ -146,10 +147,10 @@ instance ParseRecord MethodName where
   parseRecord = fmap getOnly parseRecord
 instance ParseField MethodName
 instance ParseFields MethodName where
-    parseFields h _ _ _ =
-        let proxy = Proxy :: Proxy MethodName in
-        Options.argument Options.str $
-            Options.metavar (metavar proxy)
+  parseFields h _ _ _ =
+    let proxy = Proxy :: Proxy MethodName
+     in Options.argument Options.str $
+          Options.metavar (metavar proxy)
             <> foldMap (Options.help . Data.Text.unpack) h
 
 -- MethodParams

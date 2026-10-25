@@ -10,16 +10,16 @@ module WL.Internals.Utils where
 
 import Control.Exception
 import Control.Monad
+import Data.Char (isSpace)
+import Data.Functor
+import Data.Void
 import Foreign
 import Foreign.C
 import Foreign.C.ConstPtr
-import Text.ParserCombinators.ReadPrec qualified as R
+import GHC.Records (HasField, getField)
 import Text.ParserCombinators.ReadP qualified as P
+import Text.ParserCombinators.ReadPrec qualified as R
 import Text.Read.Lex (readHexP)
-import Data.Void
-import Data.Functor
-import Data.Char (isSpace)
-import GHC.Records (getField, HasField)
 
 peekMaybeCString :: ConstPtr CChar -> IO (Maybe String)
 peekMaybeCString (ConstPtr ptr)
@@ -42,7 +42,7 @@ showPtrHex :: Ptr a -> String
 showPtrHex x = show (castPtr x :: Ptr Void)
 {-# INLINE showPtrHex #-}
 
-showObjHex :: HasField "unwrap" a (Ptr a1) => a -> String
+showObjHex :: (HasField "unwrap" a (Ptr a1)) => a -> String
 showObjHex = showPtrHex . getField @"unwrap"
 
 readPtrHexP :: P.ReadP (Ptr a)

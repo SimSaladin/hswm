@@ -245,13 +245,14 @@ class (Functor m) => IsAction m a where
 
   -- | Action may trigger submap bindings.
   actionSubmap :: a -> Submap (SomeAction m)
-  --actionSubmap _ = def
+  -- actionSubmap _ = def
   actionSubmap = passthruOrDef def (\_ -> actionSubmap) (Proxy @m)
 
   -- | Description based on the value (defaults to type info)
   actionDescription :: Proxy m -> a -> String
   actionDescription = passthruOrDef "" actionDescription
-  --actionDescription _ _ = ""
+
+  -- actionDescription _ _ = ""
 
   actionDescriptionFallback :: Proxy m -> a -> String
   default actionDescriptionFallback :: (Typeable a) => Proxy m -> a -> String
@@ -263,7 +264,7 @@ class (Functor m) => IsAction m a where
   actionPassthru :: Proxy m -> a -> Maybe (SomeAction m)
   actionPassthru _ _ = Nothing
 
-passthruOrDef :: IsAction m a => r -> (forall a2. IsAction m a2 => Proxy m -> a2 -> r) -> Proxy m -> a -> r
+passthruOrDef :: (IsAction m a) => r -> (forall a2. (IsAction m a2) => Proxy m -> a2 -> r) -> Proxy m -> a -> r
 passthruOrDef d f p a =
   case actionPassthru p a of
     Just (SomeAction a2) -> f p a2
@@ -301,7 +302,7 @@ instance Show (SomeAction m) where
         repeat = onHoldRepeat p v
         cats = actionCategories p v
         subm = show (actionSubmap v :: Submap (SomeAction m))
-      in "SomeAction{\"" ++ desc ++ "\", repeat: " ++ show repeat ++ ", categories: " ++ show cats ++ ", submap: " ++ subm ++ "}"
+     in "SomeAction{\"" ++ desc ++ "\", repeat: " ++ show repeat ++ ", categories: " ++ show cats ++ ", submap: " ++ subm ++ "}"
 
 instance NFData (SomeAction m) where
   rnf (SomeAction a) =

@@ -12,16 +12,16 @@ import Data.Aeson qualified as A
 import Data.Aeson.Encoding qualified as A
 import Data.ByteString.Lazy qualified as BL
 import Data.ByteString.Lazy.Char8 qualified as C8LB
+import Data.Char qualified as C
 import Data.List qualified as L
 import Data.Text.Lazy qualified as TL
 import Data.Version (showVersion)
+import GHC.Generics (Generic1)
 import Network.Socket
 import Network.Socket.ByteString qualified as NB
 import Options.Generic
 import PackageInfo_hswm qualified as PKG
 import System.Random (randomIO)
-import GHC.Generics (Generic1)
-import Data.Char qualified as C
 
 aesonOptions :: A.Options
 aesonOptions =
@@ -39,20 +39,20 @@ data Msg a
   deriving (Eq, Show, Generic, Generic1)
 
 instance A.ToJSON1 Msg where
-  liftToJSON _ inner _ Contents{..} = A.object [ "contents" .= inner contents, "id" .= seqn ]
-  liftToJSON _ _ _ (Error msg) = A.object [ "error" .= msg ]
+  liftToJSON _ inner _ Contents{..} = A.object ["contents" .= inner contents, "id" .= seqn]
+  liftToJSON _ _ _ (Error msg) = A.object ["error" .= msg]
   liftToEncoding _ f _ Contents{..} = A.pairs $ A.pairStr "contents" (f contents) <> "id" .= seqn
   liftToEncoding _ _ _ (Error msg) = A.pairs $ "error" .= msg
 
 instance A.FromJSON1 Msg where
   liftParseJSON _ f _ = A.withObject "Msg" $ \v ->
-    (Error <$> v A..: "error") <|>
-    (Contents <$> (v A..: "contents" >>= f) <*> v A..:? "id")
+    (Error <$> v A..: "error")
+      <|> (Contents <$> (v A..: "contents" >>= f) <*> v A..:? "id")
 
-instance A.ToJSON a => A.ToJSON (Msg a) where
+instance (A.ToJSON a) => A.ToJSON (Msg a) where
   toJSON = A.toJSON1
   toEncoding = A.toEncoding1
-instance A.FromJSON a => A.FromJSON (Msg a) where
+instance (A.FromJSON a) => A.FromJSON (Msg a) where
   parseJSON = A.parseJSON1
 
 -- * Request & Response
@@ -70,20 +70,20 @@ data Request' w
       }
   | -- | Request a state dump.
     DumpState
-        { param :: w ::: String <?> "the internal state which is to be shown [hstate,global,input-config,*]" }
+      {param :: w ::: String <?> "the internal state which is to be shown [hstate,global,input-config,*]"}
   | ListSeats
-      { bindings :: w ::: Bool <#> "k" <?> "show keybindings too" }
+      {bindings :: w ::: Bool <#> "k" <?> "show keybindings too"}
   | ListOutputs
   | ListWindows
   | ListInputDevices
-    { libinput :: w ::: Bool <#> "L" <?> "show libinput configuration" }
+      {libinput :: w ::: Bool <#> "L" <?> "show libinput configuration"}
   | ListMethods
   | CallMethod
       { method :: w ::: MethodName <#> "n" <?> "method name"
       , params :: w ::: MethodParams <#> "p" <?> "arbitrary method arguments (JSON-encoded)"
       }
   | ConfigGet
-  | WmCtrl { action :: WmCtrlActionValue } -- Note: should be a WmCtrlAction'
+  | WmCtrl {action :: WmCtrlActionValue} -- Note: should be a WmCtrlAction'
   deriving (Generic)
 
 deriving instance Eq Request
@@ -94,8 +94,9 @@ deriving instance Read Request
 data Response
   = -- | Server identification info.
     Identify {name :: String, version :: Int, description :: Maybe String}
-  -- | Error {message :: Text}
-  | -- | Outputs updated. @(outputName, OutputId)@
+  | -- \| Outputs updated. @(outputName, OutputId)@
+
+    -- | Error {message :: Text}
     Outputs {outputs :: [(Text, OutputId)]}
   | -- | Inform the client of current workspace configuration.
     Workspaces {workspaces :: RWorkspaces}
@@ -119,31 +120,32 @@ instance A.FromJSON Response where
 
 -- * Wrapper datatypes for parameter handling
 
-newtype WmCtrlActionValue =  WmCtrlActionValue { unwrap :: A.Value }
+newtype WmCtrlActionValue = WmCtrlActionValue {unwrap :: A.Value}
   deriving (Eq, Ord, Show, Read)
   deriving newtype (A.FromJSON, A.ToJSON)
 
 -- | Actions that will alter the StackSet.
 data WmCtrlAction' w
   = ViewWorkspaceOnScreen
-    { tag :: w ::: WsId <?> "Workspace name"
-    , screen :: w ::: OutputId <?> "Screen number (1, 2, etc.)"
-    }
+      { tag :: w ::: WsId <?> "Workspace name"
+      , screen :: w ::: OutputId <?> "Screen number (1, 2, etc.)"
+      }
   | SendLayoutMessage
-    { message :: w ::: Text <?> "message (how to encode??)"
-    } -- TODO
+      { message :: w ::: Text <?> "message (how to encode??)"
+      } -- TODO
   deriving stock (Generic)
+
 deriving instance Eq (WmCtrlAction' Unwrapped)
 deriving instance Show (WmCtrlAction' Unwrapped)
 deriving instance Read (WmCtrlAction' Unwrapped)
 
 type WmCtrlAction = WmCtrlAction' Unwrapped
 
-newtype MethodName = MkMethod { unwrap :: String }
+newtype MethodName = MkMethod {unwrap :: String}
   deriving (Generic, Eq, Show, Read)
   deriving newtype (A.ToJSON, A.FromJSON, IsString)
 
-newtype MethodParams = MethodParams { unwrap :: A.Value }
+newtype MethodParams = MethodParams {unwrap :: A.Value}
   deriving (Generic, Eq, Show, Read)
   deriving newtype (A.ToJSON, A.FromJSON)
 
@@ -206,7 +208,7 @@ instance A.FromJSON (WmCtrlAction' Unwrapped) where
 -- * Exceptions
 
 data SocketDisconnected = SocketDisconnected
-    deriving (Eq, Show)
+  deriving (Eq, Show)
 
 instance Exception SocketDisconnected
 
@@ -249,18 +251,18 @@ clientRun ::
   -> m r
 clientRun conf onMsg f =
   clientRunWith conf $ \sock ->
-  withAsync (worker sock mempty) $ \inputAs -> do
-    link inputAs
-    f (sendMsg sock)
+    withAsync (worker sock mempty) $ \inputAs -> do
+      link inputAs
+      f (sendMsg sock)
   where
     worker sock lo = do
-        (resps, leftover) <- recvLines sock lo
-        mapM_ doMsg resps
-        worker sock leftover
+      (resps, leftover) <- recvLines sock lo
+      mapM_ doMsg resps
+      worker sock leftover
     doMsg resp = case A.eitherDecode resp of
-        Right (Contents msg _) -> onMsg msg
-        Right (Error msg) -> logWarn $ "Server error" :# [ "error" .= msg ]
-        Left e -> logWarn $ "Received malformed message from server" :# ["ex" .= toText e, "msg" .= BL.unpack (BL.take 256 resp)]
+      Right (Contents msg _) -> onMsg msg
+      Right (Error msg) -> logWarn $ "Server error" :# ["error" .= msg]
+      Left e -> logWarn $ "Received malformed message from server" :# ["ex" .= toText e, "msg" .= BL.unpack (BL.take 256 resp)]
 
 syncRequest :: (MonadIPCClient m) => Socket -> Request -> m Response
 syncRequest sock req = do
@@ -268,8 +270,8 @@ syncRequest sock req = do
   logDebug $ "new request" :# ["req" .= req, "id" .= m]
   sendMsg sock (Contents req (Just m))
   let go ([], acc) = syncReceive sock acc >>= go
-      go (Error err : _, _)
-        = throwString $ "Server error: " <> show err
+      go (Error err : _, _) =
+        throwString $ "Server error: " <> show err
       go (Contents x n : xs, acc)
         | n == Just m = return x
         | otherwise = go (xs, acc)

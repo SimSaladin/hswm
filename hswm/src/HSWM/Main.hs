@@ -60,7 +60,8 @@ defaultRegistrySettings = withRunInIO $ \runInIO ->
                    , "interface" .= WL.objectInterfaceName p
                    ]
             when (ver /= WL.objectInterfaceVersion p) $
-                logWarn $ "Registry: bound interface does not match the bindings version" :# [ "version" .= ver, "interface" .= WL.objectInterfaceName p, "bindings-version" .= WL.objectInterfaceVersion p ]
+              logWarn $
+                "Registry: bound interface does not match the bindings version" :# ["version" .= ver, "interface" .= WL.objectInterfaceName p, "bindings-version" .= WL.objectInterfaceVersion p]
       , WL.regOnEvent = \ev -> runInIO $
           case ev of
             WL.RegistryGlobal{..} -> return ()
@@ -276,7 +277,7 @@ instance HandleEvent H EXT_IN.IdleNotificationEvent where
   handleEvent EXT_IN.IdleNotificationResumed{} = runInHS $ setOutputPower True
 
 instance HandleEvent H R.RiverWindowEvent where
-    handleEvent = Windows.handleEvent
+  handleEvent = Windows.handleEvent
 
 instance HandleEvent H R.RiverWindowManagerEvent where
   handleEvent = \case
@@ -312,21 +313,21 @@ instance HandleEvent H R.RiverWindowManagerEvent where
       writeMainQ $ MainExit "another window manager already running" (toException $ ExitFailure 1)
 
 instance HandleEvent H R.RiverLibinputDeviceEvent where
-    handleEvent = InputConfig.handleLibinputDeviceEvent
+  handleEvent = InputConfig.handleLibinputDeviceEvent
 instance HandleEvent H R.RiverXkbKeymapEvent where
-    handleEvent = InputConfig.handleXkbKeymapEvent
+  handleEvent = InputConfig.handleXkbKeymapEvent
 instance HandleEvent H R.RiverXkbKeyboardEvent where
-    handleEvent = InputConfig.handleXkbKeyboardEvent
+  handleEvent = InputConfig.handleXkbKeyboardEvent
 
 instance HandleEvent H WL.ShmEvent where
-    handleEvent _ = return ()
+  handleEvent _ = return ()
 instance HandleEvent H WL.PointerEvent where
-    handleEvent _ = return ()
+  handleEvent _ = return ()
 instance HandleEvent H WL.TouchEvent where
-    handleEvent _ = return ()
+  handleEvent _ = return ()
 instance HandleEvent H WL.ShellSurfaceEvent where
-    handleEvent _ = return ()
+  handleEvent _ = return ()
 instance HandleEvent H WL.SeatEvent where
-    handleEvent = Seats.handleWlSeatEvent
+  handleEvent = Seats.handleWlSeatEvent
 instance HandleEvent H WL.OutputEvent where
-    handleEvent = Outputs.handleWlOutput
+  handleEvent = Outputs.handleWlOutput
