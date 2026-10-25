@@ -28,6 +28,7 @@ logTraceShow x =
       ^. strict
         :# []
 
+-- | Text.Pretty.Simple -based output
 pTrace :: (MonadIO m, Show a) => a -> m ()
 pTrace =
   P.pHPrintOpt

@@ -19,8 +19,11 @@ import HSWM.Main.Persist qualified as Persist
 import HSWM.Operations
 import HSWM.StackSet qualified as W
 import HSWM.InputConfig
+import HSWM.Actions.OnScreen qualified as A.OnScreen
 
+import Data.Enum
 import Data.Aeson qualified as A
+import Data.Aeson.Types qualified as A
 import Data.ByteString.Lazy qualified as LB
 import Data.ByteString.Lazy.Char8 qualified as LBC8
 import River qualified as R
@@ -93,9 +96,20 @@ defaultRequestHandler = \case
       Just (SomeCommand cmd) -> runCommandJSON cmd params <&> either (Left . toText) (Right . InternalObject)
       Nothing -> pure $ Left "method not found"
 
+  WmCtrl val -> case A.parseEither A.parseJSON val.unwrap of
+                  Right action -> handleWmCtrlAction action
+                  Left err -> return $ Left $ "failed to decode request body: " <> toText err
+
   r -> do
     logWarn $ "Unhandled message" :# ["message" .= r]
     return $ Left "no handler"
+
+handleWmCtrlAction :: WmCtrlAction -> H (Either Text Response)
+handleWmCtrlAction = \case
+  ViewWorkspaceOnScreen{tag,screen = s} -> do
+    runInHS . windows $ A.OnScreen.viewOnScreen (toEnum $ fromEnum s) (TS.unpack tag)
+    return $ Right $ InternalObject $ A.object [ "result" .= ("OK" :: Text) ]
+  x -> return $ Left $ "handleWmCtrlAction: not implemented: " <> tshow x
 
 -- * Server State
 

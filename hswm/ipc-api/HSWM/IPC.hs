@@ -21,12 +21,14 @@ import Options.Generic
 import PackageInfo_hswm qualified as PKG
 import System.Random (randomIO)
 import GHC.Generics (Generic1)
+import Data.Char qualified as C
 
 aesonOptions :: A.Options
 aesonOptions =
   A.defaultOptions
     { A.omitNothingFields = True
     , A.fieldLabelModifier = A.camelTo2 '_'
+    , A.constructorTagModifier = map C.toUpper . A.camelTo2 '_'
     }
 
 -- * Message wrapper
@@ -81,6 +83,7 @@ data Request' w
       , params :: w ::: MethodParams <#> "p" <?> "arbitrary method arguments (JSON-encoded)"
       }
   | ConfigGet
+  | WmCtrl { action :: WmCtrlActionValue } -- Note: should be a WmCtrlAction'
   deriving (Generic)
 
 deriving instance Eq Request
@@ -115,6 +118,26 @@ instance A.FromJSON Response where
   parseJSON = A.genericParseJSON aesonOptions
 
 -- * Wrapper datatypes for parameter handling
+
+newtype WmCtrlActionValue =  WmCtrlActionValue { unwrap :: A.Value }
+  deriving (Eq, Ord, Show, Read)
+  deriving newtype (A.FromJSON, A.ToJSON)
+
+-- | Actions that will alter the StackSet.
+data WmCtrlAction' w
+  = ViewWorkspaceOnScreen
+    { tag :: w ::: WsId <?> "Workspace name"
+    , screen :: w ::: OutputId <?> "Screen number (1, 2, etc.)"
+    }
+  | SendLayoutMessage
+    { message :: w ::: Text <?> "message (how to encode??)"
+    } -- TODO
+  deriving stock (Generic)
+deriving instance Eq (WmCtrlAction' Unwrapped)
+deriving instance Show (WmCtrlAction' Unwrapped)
+deriving instance Read (WmCtrlAction' Unwrapped)
+
+type WmCtrlAction = WmCtrlAction' Unwrapped
 
 newtype MethodName = MkMethod { unwrap :: String }
   deriving (Generic, Eq, Show, Read)
@@ -172,6 +195,12 @@ instance A.ToJSON WindowInfo where
   toJSON = A.genericToJSON aesonOptions
   toEncoding = A.genericToEncoding aesonOptions
 instance A.FromJSON WindowInfo where
+  parseJSON = A.genericParseJSON aesonOptions
+
+instance A.ToJSON (WmCtrlAction' Unwrapped) where
+  toJSON = A.genericToJSON aesonOptions
+  toEncoding = A.genericToEncoding aesonOptions
+instance A.FromJSON (WmCtrlAction' Unwrapped) where
   parseJSON = A.genericParseJSON aesonOptions
 
 -- * Exceptions

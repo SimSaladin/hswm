@@ -250,5 +250,6 @@ executables:
       - *dep-prettyprinter
       - *dep-prettyprinter-ansi-terminal
       - *dep-aeson-pretty
+      - *dep-text-short
     ghc-options:
       - *common-rts

@@ -10,7 +10,7 @@ import Data.ByteString.Lazy.Char8 qualified as BL
 import Data.Text qualified
 import Data.Text.Lazy qualified as TL
 import GHC.Generics qualified as G
-import HSWM.IPC hiding (unwrap)
+import HSWM.IPC
 import HSWM.Main.Options as HSWM (
   AnsiColors (..),
   LogFormat,
@@ -21,14 +21,11 @@ import HSWM.Main.Options as HSWM (
  )
 import Options.Applicative qualified as Options
 import Options.Generic
-
--- import           Prettyprinter
--- import           Prettyprinter.Render.Terminal
-
 import Data.Aeson qualified as A
 import Data.Aeson.Encode.Pretty (encodePretty)
 import System.Console.Haskeline
 import System.Console.Haskeline.ReaderT
+import Data.Text.Short qualified as TS
 
 progDesc :: String
 progDesc = "hswmctl"
@@ -42,22 +39,71 @@ defaultParserPrefs =
     <> Options.subparserInline
     <> Options.helpShowGlobals
 
+main :: IO ()
+main = do
+  Cmdline cmd' opts' <- getRecordWith infoPrefs defaultParserPrefs :: IO (Cmdline Wrapped)
+  let cmd = Options.Generic.unwrap <$> cmd'
+      opts = Options.Generic.unwrap opts'
+  case cmd of
+    Nothing -> interactive opts
+    Just req -> withConnect opts $ \sock -> do
+      res <- syncRequest sock req
+      io $ BL.putStrLn $ BL.pack $ prettyResponse res
+  where
+    withConnect opts f = withLogging (LogStderr defaultBufSize) opts.logFormat opts.colorEnable $ runLoggingT $ clientRunWith def f
+
+interactive :: ClientOptions -> IO ()
+interactive o = runInputT defaultSettings $ do
+  printExt <- getExternalPrint
+  withLogging (LogCallback (printExt . BC8.unpack . fromLogStr) (return ())) o.logFormat (if o.colorEnable /= ColorNever then ColorAlways else o.colorEnable) $ \logFn ->
+    fromReaderT $ runRT logFn
+  where
+    runRT :: (Loc -> LogSource -> LogLevel -> LogStr -> IO ()) -> ReaderT (InputTEnv IO) IO ()
+    runRT logFun = withReaderT (mapInputTEnv liftIO) $ mapReaderT (`runLoggingT` logFun) $ toReaderT mainCM
+
+withLogging :: (MonadUnliftIO m) => LogType' LogStr -> LogFormat -> AnsiColors -> (_ -> m a) -> m a
+withLogging logtype fmt co f = bracket (liftIO $ initLoggers logtype fmt co Nothing) (\(_, fn) -> liftIO fn) $ \(logFn, _) -> f logFn
+
+prettyResponse :: Response -> String
+prettyResponse = \case
+  StateDumpResponse str -> TL.unpack str
+  InternalObject value -> BL.unpack $ encodePretty value
+  msg -> show msg
+
+-- * Haskeline
+
+type CM = InputT (LoggingT IO)
+
+mainCM :: CM ()
+mainCM = clientRun def msgHandler consoleHandler
+
+msgHandler :: Response -> CM ()
+msgHandler = \case
+  StateDumpResponse str -> outputStrLn $ TL.unpack str
+  Outputs{} -> return ()
+  Workspaces{} -> return ()
+  FocusedWindow{} -> return ()
+  InternalObject value -> outputStrLn $ BL.unpack $ encodePretty value
+  msg -> outputStrLn $ show msg
+
+consoleHandler :: (Request -> CM ()) -> CM ()
+consoleHandler say = forever $ do
+  minput <- getInputLine ">>> "
+  case minput of
+    Just "" -> return ()
+    Just ln -> do
+      let info = Options.info (parseRecord @(Request' Wrapped)) infoPrefs
+          pres = Options.execParserPure (Options.prefs defaultParserPrefs) info (words ln)
+      case pres of
+        Options.Success msg -> say (Options.Generic.unwrap msg)
+        Options.Failure pfail -> outputStrLn $ fst $ Options.renderFailure pfail "hswm"
+        _ -> return ()
+    Nothing -> return ()
+
+-- * Options.Generic parsing
+
 data Cmdline w = Cmdline (Maybe (Request' w)) (ClientOptions' w)
   deriving (Generic)
-
-instance ParseRecord (Request' Wrapped)
-
-instance ParseRecord (Cmdline Wrapped) where
-  parseRecord =
-    Cmdline
-      <$> optional (fmap (G.to . G.M1) (genericParseRecord mods))
-      <*> fmap G.to (genericParseRecord mods)
-    where
-      mods = lispCaseModifiers
-          { fieldNameModifier = \s -> case s of
-                                        "colorEnable" -> "color"
-                                        _ -> lispCaseModifiers.fieldNameModifier s
-          }
 
 data ClientOptions' w = ClientOptions
   { colorEnable :: w ::: AnsiColors <!> "auto" <#> "c" <?> "enable color output"
@@ -69,14 +115,44 @@ type ClientOptions = ClientOptions' Unwrapped
 deriving instance Eq ClientOptions
 deriving instance Show ClientOptions
 
-instance ParseRecord MethodName
-instance ParseField MethodName where
+instance ParseRecord (Cmdline Wrapped) where
+  parseRecord = Cmdline <$> optional parseRecord <*> fmap G.to (genericParseRecord mods)
+    where
+      mods = lispCaseModifiers
+          { fieldNameModifier = \s -> case s of
+                                        "colorEnable" -> "color"
+                                        _ -> lispCaseModifiers.fieldNameModifier s
+          }
+
+-- Request
+
+instance ParseRecord (Request' Wrapped) where
+  parseRecord = G.to . G.M1 <$> genericParseRecord lispCaseModifiers
+
+-- WmCtrlAction
+
+instance ParseRecord WmCtrlActionValue where
+  parseRecord = WmCtrlActionValue . A.toJSON . Options.Generic.unwrap <$> parseRecord @(WmCtrlAction' Wrapped)
+instance ParseFields WmCtrlActionValue where
+  parseFields a b c d = WmCtrlActionValue . A.toJSON . Options.Generic.unwrap <$> parseFields @(WmCtrlAction' Wrapped) a b c d
+instance ParseRecord (WmCtrlAction' Wrapped) where
+  parseRecord = G.to . G.M1 <$> genericParseRecord lispCaseModifiers
+instance ParseFields (WmCtrlAction' Wrapped) where
+  parseFields _ _ _ _ = parseRecord
+
+-- MethodName
+
+instance ParseRecord MethodName where
+  parseRecord = fmap getOnly parseRecord
+instance ParseField MethodName
 instance ParseFields MethodName where
     parseFields h _ _ _ =
         let proxy = Proxy :: Proxy MethodName in
         Options.argument Options.str $
             Options.metavar (metavar proxy)
             <> foldMap (Options.help . Data.Text.unpack) h
+
+-- MethodParams
 
 instance ParseRecord MethodParams where
   parseRecord = fmap getOnly parseRecord
@@ -108,74 +184,19 @@ instance ParseField MethodParams where
   readField = MethodParams <$> Options.eitherReader (A.eitherDecode . BL.pack)
   metavar _ = "JSON"
 
-main :: IO ()
-main = do
-  Cmdline cmd' opts' <- getRecordWith infoPrefs defaultParserPrefs :: IO (Cmdline Wrapped)
-  let cmd = fmap unwrap cmd'
-      opts = unwrap opts'
-  runMode opts cmd
-  where
-    runMode opts Nothing = interactive opts
-    runMode opts (Just req) = withConnect opts $ \sock -> do
-      res <- syncRequest sock req
-      io $ BL.putStrLn $ BL.pack $ prettyResponse res
+-- OutputId
 
-    withConnect opts f = withLogging (LogStderr defaultBufSize) opts.logFormat opts.colorEnable $ runLoggingT $ clientRunWith def f
+instance ParseFields OutputId where
+  parseFields a b c d = OutputId <$> parseFields a b c d
+instance ParseRecord OutputId where
+  parseRecord = OutputId <$> parseRecord
 
-withLogging :: (MonadUnliftIO m) => LogType' LogStr -> LogFormat -> AnsiColors -> (_ -> m a) -> m a
-withLogging logtype fmt co f =
-  bracket
-    (liftIO $ initLoggers logtype fmt co Nothing)
-    (\(_, fn) -> liftIO fn)
-    $ \(logFn, _) -> f logFn
+-- ShortText
 
-interactive :: ClientOptions -> IO ()
-interactive o = runInputT defaultSettings $ do
-  printExt <- getExternalPrint
-  withLogging (LogCallback (printExt . BC8.unpack . fromLogStr) (return ())) o.logFormat (if o.colorEnable /= ColorNever then ColorAlways else o.colorEnable) $ \logFn ->
-    fromReaderT $ runRT logFn
-
-type CM = InputT (LoggingT IO)
-
-runRT :: (Loc -> LogSource -> LogLevel -> LogStr -> IO ()) -> ReaderT (InputTEnv IO) IO ()
-runRT logFun =
-  withReaderT (mapInputTEnv liftIO) $
-    mapReaderT (`runLoggingT` logFun) $
-      toReaderT mainCM
-
-mainCM :: CM ()
-mainCM = clientRun def msgHandler consoleHandler
-
-prettyResponse :: Response -> String
-prettyResponse = \case
-  StateDumpResponse str -> TL.unpack str
-  InternalObject value -> BL.unpack $ encodePretty value
-  --Error msg -> "error: " ++ T.unpack msg
-  msg -> show msg
-
-msgHandler :: Response -> CM ()
-msgHandler = \case
-  StateDumpResponse str -> outputStrLn $ TL.unpack str
-  Outputs{} -> return ()
-  Workspaces{} -> return ()
-  FocusedWindow{} -> return ()
-  InternalObject value -> outputStrLn $ BL.unpack $ encodePretty value
-  --Error msg -> outputStrLn $ T.unpack msg
-  msg -> outputStrLn $ show msg
-
-consoleHandler :: (Request -> CM ()) -> CM ()
-consoleHandler say = forever $ do
-  minput <- getInputLine ">>> "
-  case minput of
-    Just "" -> return ()
-    Just ln -> do
-      let info = Options.info (parseRecord @(Request' Wrapped)) infoPrefs
-          pres = Options.execParserPure (Options.prefs defaultParserPrefs) info (words ln)
-      case pres of
-        Options.Success msg -> say (unwrap msg)
-        Options.Failure pfail -> outputStrLn $ fst $ Options.renderFailure pfail "hswm"
-        _ -> return ()
-    Nothing -> return ()
+instance ParseFields ShortText where
+  parseFields a b c d = TS.fromString <$> parseFields a b c d
+instance ParseRecord ShortText where
+  parseRecord = TS.fromString <$> parseRecord
 
 -- * Orphan instances
 
