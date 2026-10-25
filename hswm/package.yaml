@@ -112,6 +112,7 @@ __:
   - &dep-filepath                    filepath
   - &dep-random random
   - &dep-aeson-pretty aeson-pretty
+  - &dep-text-short text-short
 
   # Packages from here
   - &dep-hswm-bindings               hswm-bindings
@@ -166,6 +167,7 @@ library:
     - *dep-utf8-string
     - *dep-vector
     - *dep-filepath
+    - *dep-text-short
     - th-abstraction
     - microlens-th
   build-tools:
@@ -195,6 +197,7 @@ internal-libraries:
       - *dep-microlens-platform
       - *dep-microlens
       - *dep-bytestring
+      - *dep-text-short
 
   ipc-api:
     visibility: public

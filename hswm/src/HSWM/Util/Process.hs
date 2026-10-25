@@ -63,13 +63,18 @@ instance Default SDRunParams where
   def = SDRunParams { sdCollect = True, sdScope = True, sdUnit = Nothing, sdSlice = Nothing }
 
 runProgWithSystemD :: (HasCallStack) => (MonadProcessSpawn m) => SDRunParams -> String -> [String] -> m ()
-runProgWithSystemD p cmd args = void $ readProcess $ proc "systemd-run" $
-    ["--user", "--no-pager", "--no-block", "--no-ask-password"] ++
-    ["--collect" | p.sdCollect] ++
-    ["--scope" | p.sdScope] ++
-    ["--unit=" ++ u | Just u <- pure p.sdUnit] ++
-    ["--slice=" ++ s | Just s <- pure p.sdSlice] ++
-    ["--", cmd] ++ args -- ["bash", "-c", cmd]
+runProgWithSystemD p cmd args = do
+  let pc = proc "systemd-run" $
+        ["--user", "--no-pager", "--no-ask-password"] ++
+        ["--no-block" | not p.sdScope] ++  -- not supported in scope mode
+        ["--collect" | p.sdCollect] ++
+        ["--scope" | p.sdScope] ++
+        ["--unit=" ++ u | Just u <- pure p.sdUnit] ++
+        ["--slice=" ++ s | Just s <- pure p.sdSlice] ++
+        ["--", cmd] ++ args -- ["bash", "-c", cmd]
+  logProcessConfig "run-sd" pc
+  res <- readProcess pc
+  logInfo $ "run-sd: process completed" :# ["result" .= show res ]
 
 runWithSystemD :: (HasCallStack) => (MonadProcessSpawn m) => SDRunParams -> String -> m ()
 runWithSystemD p cmd = runProgWithSystemD p "bash" ["-c", cmd]

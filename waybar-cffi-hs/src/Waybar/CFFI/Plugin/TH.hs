@@ -23,10 +23,8 @@ import Waybar.CFFI.Plugin.ABIv2
 import Waybar.CFFI.Plugin.Base
 
 import GI.Gtk qualified as Gtk
-
 import Language.Haskell.TH
 import Language.Haskell.TH.Syntax
-
 import Control.Exception qualified as E
 import Control.Monad
 import Control.Monad.Reader
@@ -38,7 +36,6 @@ import Foreign.C.ConstPtr (ConstPtr (..))
 import GHC.Exts (inline)
 import System.IO (hPrint, stderr)
 import System.IO.Unsafe
-import Text.Read
 import Prelude hiding (init)
 
 -- |
@@ -202,12 +199,10 @@ instanceDestroy ptr = withInstEnv ptr $ \env -> do
   atomicModifyIORef env._instances $ \xs -> (filter (/= env) xs, ())
   runContext env deinit `E.finally` freeStablePtr ptr
 
-instanceDoAction :: (WaybarPlugin a, Read (PluginAction a)) => DoAction (StablePtr (Env a))
+instanceDoAction :: (WaybarPlugin a) => DoAction (StablePtr (Env a))
 instanceDoAction ptr aptr = withInstEnv ptr $ \env -> do
   action <- peekCString (unConstPtr aptr)
-  case readMaybe action of
-    Just x -> runContext env (inline doaction x)
-    Nothing -> hPrint stderr $ "action no parse: " ++ action
+  runContext env (inline doaction action)
 
 withInstEnv :: forall a m. (MonadIO m) => StablePtr a -> (a -> m ()) -> m ()
 {-# INLINE withInstEnv #-}

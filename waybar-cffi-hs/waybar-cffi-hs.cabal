@@ -50,6 +50,7 @@ library
     bytestring ^>=0.12.2,
     data-default ^>=0.8.0,
     gi-glib ^>=2.0,
+    gi-gobject ^>=2.0,
     gi-gtk3 ^>=3.0.44,
     gi-pango ^>=1.0.30,
     haskell-gi-base ^>=0.26.9,
@@ -59,6 +60,8 @@ library
     rio ^>=0.1.24,
     template-haskell >=2.20 && <3,
     text ^>=2.1.2,
+    containers,
+    text-short,
 
 foreign-library waybarhaskellplugin
   import: default-language, build-settings

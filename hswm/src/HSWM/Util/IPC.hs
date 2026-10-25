@@ -31,6 +31,7 @@ import Data.Text.Lazy qualified as TL
 import Network.Socket
 import System.FileLock
 import Text.Pretty.Simple qualified as P
+import Data.Text.Short qualified as TS
 
 type MonadIPC env m = (MonadEffectsIO m, MonadReader env m, MonadHS m)
 
@@ -277,7 +278,7 @@ defaultWorkspacesInfo = do
   wsSortPP <- DWO.getSortByOrder
   let getWsData W.Workspace{..} keyhint =
         WorkspaceInfo
-          { tag = tag
+          { tag = TS.pack tag
           , keyhint = keyhint
           , layout = toText (HSWM.description layout)
           , windowList = map getWindowInfo (W.integrate' stack)
@@ -288,11 +289,11 @@ defaultWorkspacesInfo = do
     Workspaces $!
       RWorkspaces
         { tags = zipWith getWsData (wsSortPP (W.workspaces ws)) (keyhints ++ L.repeat "")
-        , focused = let W.Screen sws sid _ = W.current ws in (s2o sid, W.tag sws)
-        , visible = [(s2o sid, W.tag sws) | W.Screen sws sid _ <- W.visible ws]
+        , focused = let W.Screen sws sid _ = W.current ws in (s2o sid, TS.pack $ W.tag sws)
+        , visible = [(s2o sid, TS.pack $ W.tag sws) | W.Screen sws sid _ <- W.visible ws]
         }
   where
-    keyhints = map (toText . (: [])) ['a' .. 'z']
+    keyhints = map (TS.pack . (: [])) ['a' .. 'z']
 
 s2o :: ScreenId -> OutputId
 s2o (S x) = OutputId x
@@ -301,8 +302,8 @@ toWindowInfo :: Window -> WindowInfo
 toWindowInfo w =
   WindowInfo
     { wid = riverIdToWord w.river_window
-    , title = toText w.title
-    , appId = toText w.appId
-    , identifier = toText w.identifier
+    , title = TS.pack w.title
+    , appId = TS.pack w.appId
+    , identifier = TS.pack w.identifier
     , pid = w.unreliablePid
     }

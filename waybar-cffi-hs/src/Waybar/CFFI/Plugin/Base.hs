@@ -1,6 +1,5 @@
 {-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeFamilyDependencies #-}
 
 -- |
@@ -16,8 +15,8 @@ module Waybar.CFFI.Plugin.Base (
   Env (..),
   EnvGlobal (..),
   Context,
-  ContextM,
-  ContextGlobalM,
+  ContextT',
+  SetupGlobal,
   getInstance,
   getConfig,
   getGlobal,
@@ -55,7 +54,7 @@ import GHC.Generics (Generic)
 import GHC.Records
 
 -- | Data types that implement this class can be turned into Waybar CFFI plugins.
-class (MonadTrans (ContextT plugin), A.FromJSON (PluginConfig plugin), Read (PluginAction plugin)) => WaybarPlugin (plugin :: Type) where
+class (MonadTrans (ContextT plugin), A.FromJSON (PluginConfig plugin)) => WaybarPlugin (plugin :: Type) where
   -- | Execution context of the plugin callbacks.
   type ContextT plugin :: ((Type -> Type) -> Type -> Type)
 
@@ -72,16 +71,16 @@ class (MonadTrans (ContextT plugin), A.FromJSON (PluginConfig plugin), Read (Plu
   data PluginState plugin :: Type
 
   -- | Called once on library load.
-  initGlobal :: ContextGlobalM plugin (GlobalState plugin)
-  default initGlobal :: (Default (GlobalState plugin)) => ContextGlobalM plugin (GlobalState plugin)
+  initGlobal :: SetupGlobal plugin (GlobalState plugin)
+  default initGlobal :: (Default (GlobalState plugin)) => SetupGlobal plugin (GlobalState plugin)
   initGlobal = return def
 
   -- | Called once at exit.
-  deinitGlobal :: GlobalState plugin -> ContextGlobalM plugin ()
+  deinitGlobal :: GlobalState plugin -> SetupGlobal plugin ()
   deinitGlobal _ = return ()
 
   -- | Initalize a new instance.
-  init :: ContextM plugin Env plugin
+  init :: ContextT' plugin Env plugin
 
   -- | Destroy the instance.
   deinit :: Context plugin ()
@@ -96,21 +95,19 @@ class (MonadTrans (ContextT plugin), A.FromJSON (PluginConfig plugin), Read (Plu
   refresh :: Signal -> Context plugin ()
   refresh _ = return ()
 
-  -- | Plugin actions. Must have a 'Read' instance.
-  type PluginAction plugin :: Type
-
   -- | Called on module action (see
   --     https://github.com/Alexays/Waybar/wiki/Configuration#module-actions-config)
-  doaction :: PluginAction plugin -> Context plugin ()
+  doaction :: String -> Context plugin ()
   doaction _ = pure ()
 
 -- | Common execution context (see 'runContext').
-type ContextM plugin (env :: Type -> Type) = ContextT plugin (ReaderT (env plugin) IO)
+type Context plugin = ContextT' plugin Env
 
-type ContextGlobalM plugin = ContextM plugin EnvGlobal
+-- | Execution context for global (shared) plugin init/deinit.
+type SetupGlobal plugin = ContextT' plugin EnvGlobal
 
 -- | Common execution context (see 'runContext').
-type Context plugin = ContextM plugin Env
+type ContextT' plugin (env :: Type -> Type) = ContextT plugin (ReaderT (env plugin) IO)
 
 data EnvGlobal plugin = EnvGlobal
   { _global :: IORef (GlobalState plugin)
@@ -150,12 +147,11 @@ type HasGlobal plugin env m =
   ( WaybarPlugin plugin
   , HasField "_instances" (env plugin) (IORef [Env plugin])
   , HasField "_global" (env plugin) (IORef (GlobalState plugin))
+  , m ~ ContextT' plugin env
   , MonadIO m
-  , m ~ ContextM plugin env
   )
 
-runContext :: forall plugin env a. (WaybarPlugin plugin) => env plugin -> ContextM plugin env a -> IO a
-{-# INLINE runContext #-}
+runContext :: forall plugin env a. (WaybarPlugin plugin) => env plugin -> ContextT' plugin env a -> IO a
 runContext env m = runReaderT (runContextT @plugin Proxy m) env
 
 getGlobal :: (HasGlobal plugin env m) => m (GlobalState plugin)
@@ -169,38 +165,40 @@ getInstancesRef = lift $ asks $ getField @"_instances"
 
 -- | Queue update (redraw) for all plugin instances.
 queueUpdateAll :: (WaybarPlugin plugin, HasGlobal plugin env m) => m ()
-{-# INLINE queueUpdateAll #-}
 queueUpdateAll = do
   xs <- getInstancesRef >>= liftIO . readIORef
   forM_ xs $ liftIO . instQueueUpdate
 
 -- | Get the current module instance.
-getInstance :: (WaybarPlugin plugin) => ContextM plugin Env plugin
-{-# INLINE getInstance #-}
+getInstance :: (WaybarPlugin plugin) => ContextT' plugin Env plugin
 getInstance = lift $ asks instData
 
 -- | Get the module config.
-getConfig :: (WaybarPlugin plugin) => ContextM plugin Env (PluginConfig plugin)
-{-# INLINE getConfig #-}
+getConfig :: (WaybarPlugin plugin) => ContextT' plugin Env (PluginConfig plugin)
 getConfig = lift $ asks instConfig
 
 -- | Get the module state.
-getStateRef :: (WaybarPlugin plugin) => ContextM plugin Env (IORef (PluginState plugin))
-{-# INLINE getStateRef #-}
+getStateRef :: (WaybarPlugin plugin) => ContextT' plugin Env (IORef (PluginState plugin))
 getStateRef = lift $ asks instState
 
-getState :: (WaybarPlugin plugin) => ContextM plugin Env (PluginState plugin)
-{-# INLINE getState #-}
+getState :: (WaybarPlugin plugin) => ContextT' plugin Env (PluginState plugin)
 getState = getStateRef >>= lift . liftIO . readIORef
 
 modifyState ::
   forall plugin s.
   (WaybarPlugin plugin, s ~ PluginState plugin) =>
-  (s -> s) -> ContextM plugin Env ()
-{-# INLINE modifyState #-}
+  (s -> s) -> ContextT' plugin Env ()
 modifyState f = lift $ asks instState >>= liftIO . flip atomicModifyIORef (\x -> (f x, ()))
 
 -- | Queue update (redraw).
-queueUpdate :: (WaybarPlugin plugin) => ContextM plugin Env ()
-{-# INLINE queueUpdate #-}
+queueUpdate :: (WaybarPlugin plugin) => ContextT' plugin Env ()
 queueUpdate = lift $ asks instQueueUpdate >>= liftIO
+
+{-# INLINE runContext #-}
+{-# INLINE queueUpdateAll #-}
+{-# INLINE getInstance #-}
+{-# INLINE getConfig #-}
+{-# INLINE getStateRef #-}
+{-# INLINE getState #-}
+{-# INLINE modifyState #-}
+{-# INLINE queueUpdate #-}

@@ -10,7 +10,6 @@ module HSWM.IPC where
 
 import Data.Aeson qualified as A
 import Data.Aeson.Encoding qualified as A
---import Data.Aeson.KeyMap qualified as KM
 import Data.ByteString.Lazy qualified as BL
 import Data.ByteString.Lazy.Char8 qualified as C8LB
 import Data.List qualified as L
@@ -33,7 +32,7 @@ aesonOptions =
 -- * Message wrapper
 
 data Msg a
-  = Contents {contents :: a, seqn :: Maybe Int}
+  = Contents {contents :: a, seqn :: Maybe Word16}
   | Error Text
   deriving (Eq, Show, Generic, Generic1)
 
@@ -48,14 +47,13 @@ instance A.FromJSON1 Msg where
     (Error <$> v A..: "error") <|>
     (Contents <$> (v A..: "contents" >>= f) <*> v A..:? "id")
 
-
 instance A.ToJSON a => A.ToJSON (Msg a) where
   toJSON = A.toJSON1
   toEncoding = A.toEncoding1
 instance A.FromJSON a => A.FromJSON (Msg a) where
   parseJSON = A.parseJSON1
 
--- * Request
+-- * Request & Response
 
 -- | Requests (client to server).
 type Request = Request' Unwrapped
@@ -89,22 +87,6 @@ deriving instance Eq Request
 deriving instance Show Request
 deriving instance Read Request
 
-instance A.ToJSON Request where
-  toJSON = A.genericToJSON aesonOptions
-  toEncoding = A.genericToEncoding aesonOptions
-instance A.FromJSON Request where
-  parseJSON = A.genericParseJSON aesonOptions
-
-newtype MethodName = MkMethod { unwrap :: String }
-  deriving (Generic, Eq, Show, Read)
-  deriving newtype (A.ToJSON, A.FromJSON, IsString)
-
-newtype MethodParams = MethodParams A.Value
-  deriving (Generic, Eq, Show, Read)
-  deriving newtype (A.ToJSON, A.FromJSON)
-
--- * Response
-
 -- | Responses (server to client).
 data Response
   = -- | Server identification info.
@@ -120,11 +102,27 @@ data Response
   | InternalObject {value :: A.Value}
   deriving (Eq, Show, Read, Generic)
 
+instance A.ToJSON Request where
+  toJSON = A.genericToJSON aesonOptions
+  toEncoding = A.genericToEncoding aesonOptions
+instance A.FromJSON Request where
+  parseJSON = A.genericParseJSON aesonOptions
+
 instance A.ToJSON Response where
   toJSON = A.genericToJSON aesonOptions
   toEncoding = A.genericToEncoding aesonOptions
 instance A.FromJSON Response where
   parseJSON = A.genericParseJSON aesonOptions
+
+-- * Wrapper datatypes for parameter handling
+
+newtype MethodName = MkMethod { unwrap :: String }
+  deriving (Generic, Eq, Show, Read)
+  deriving newtype (A.ToJSON, A.FromJSON, IsString)
+
+newtype MethodParams = MethodParams { unwrap :: A.Value }
+  deriving (Generic, Eq, Show, Read)
+  deriving newtype (A.ToJSON, A.FromJSON)
 
 data RWorkspaces = RWorkspaces
   { tags :: [WorkspaceInfo]
@@ -135,7 +133,7 @@ data RWorkspaces = RWorkspaces
 
 data WorkspaceInfo = WorkspaceInfo
   { tag :: !WsId
-  , keyhint :: !Text
+  , keyhint :: !ShortText
   , layout :: !Text
   , windowList :: ![WindowInfo]
   }
@@ -143,7 +141,7 @@ data WorkspaceInfo = WorkspaceInfo
 
 data WindowInfo = WindowInfo
   { wid :: !Word
-  , title, appId, identifier :: !Text
+  , title, appId, identifier :: !ShortText
   , pid :: !(Maybe Int)
   }
   deriving (Eq, Show, Read, Generic)
@@ -153,18 +151,35 @@ newtype OutputId = OutputId {unwrap :: Int}
   deriving newtype (Bounded, Enum, A.FromJSON, A.ToJSON, Default)
 
 -- | Workspace identifier type
-type WsId = String
+type WsId = ShortText
 
-instance Default RWorkspaces where def = RWorkspaces def (def, def) def
-instance A.ToJSON RWorkspaces
-instance A.FromJSON RWorkspaces
-
-instance A.ToJSON WorkspaceInfo
-instance A.FromJSON WorkspaceInfo
-
+instance Default RWorkspaces where def = RWorkspaces def (def, "") def
 instance Default WindowInfo where def = WindowInfo def "" "" "" def
-instance A.ToJSON WindowInfo
-instance A.FromJSON WindowInfo
+
+instance A.ToJSON RWorkspaces where
+  toJSON = A.genericToJSON aesonOptions
+  toEncoding = A.genericToEncoding aesonOptions
+instance A.FromJSON RWorkspaces where
+  parseJSON = A.genericParseJSON aesonOptions
+
+instance A.ToJSON WorkspaceInfo where
+  toJSON = A.genericToJSON aesonOptions
+  toEncoding = A.genericToEncoding aesonOptions
+instance A.FromJSON WorkspaceInfo where
+  parseJSON = A.genericParseJSON aesonOptions
+
+instance A.ToJSON WindowInfo where
+  toJSON = A.genericToJSON aesonOptions
+  toEncoding = A.genericToEncoding aesonOptions
+instance A.FromJSON WindowInfo where
+  parseJSON = A.genericParseJSON aesonOptions
+
+-- * Exceptions
+
+data SocketDisconnected = SocketDisconnected
+    deriving (Eq, Show)
+
+instance Exception SocketDisconnected
 
 -- * Client
 
@@ -180,27 +195,7 @@ instance Default ClientConfig where
 
 type MonadIPCClient m = (MonadLogger m, MonadIO m, MonadUnliftIO m, MonadMask m)
 
-clientRun ::
-  (MonadIPCClient m) =>
-  ClientConfig
-  -> (Response -> m ())
-  -- ^ Process incoming
-  -> ((Request -> m ()) -> m r)
-  -- ^ Emit outgoing
-  -> m r
-clientRun conf onMsg cb = clientRunWith conf $ \sock -> do
-  let doMsg resp = case A.eitherDecode resp of
-        Right (Contents msg _) -> onMsg msg
-        Right (Error msg) -> logWarn $ "Server error" :# [ "error" .= msg ]
-        Left e -> logWarn $ "Received malformed message from server" :# ["ex" .= toText e, "msg" .= BL.unpack (BL.take 256 resp)]
-  let worker lo = do
-        (resps, leftover) <- recvLines sock lo
-        mapM_ doMsg resps
-        worker leftover
-  withAsync (worker mempty) $ \inputAs -> do
-    link inputAs
-    cb (sendMsg sock)
-
+-- | Simplest client invocation.
 clientRunWith :: (MonadIPCClient m) => ClientConfig -> (Socket -> m r) -> m r
 clientRunWith conf program = do
   ai <- getClientAI conf
@@ -214,9 +209,33 @@ clientRunWith conf program = do
       io $ connect sock ai.addrAddress
       return sock
 
+-- | Callback-oriented client entrypoint.
+clientRun ::
+  (MonadIPCClient m) =>
+  ClientConfig
+  -> (Response -> m ())
+  -- ^ Process incoming
+  -> ((Request -> m ()) -> m r)
+  -- ^ Emit outgoing
+  -> m r
+clientRun conf onMsg f =
+  clientRunWith conf $ \sock ->
+  withAsync (worker sock mempty) $ \inputAs -> do
+    link inputAs
+    f (sendMsg sock)
+  where
+    worker sock lo = do
+        (resps, leftover) <- recvLines sock lo
+        mapM_ doMsg resps
+        worker sock leftover
+    doMsg resp = case A.eitherDecode resp of
+        Right (Contents msg _) -> onMsg msg
+        Right (Error msg) -> logWarn $ "Server error" :# [ "error" .= msg ]
+        Left e -> logWarn $ "Received malformed message from server" :# ["ex" .= toText e, "msg" .= BL.unpack (BL.take 256 resp)]
+
 syncRequest :: (MonadIPCClient m) => Socket -> Request -> m Response
 syncRequest sock req = do
-  m <- randomIO
+  m <- randomIO @Word16
   logDebug $ "new request" :# ["req" .= req, "id" .= m]
   sendMsg sock (Contents req (Just m))
   let go ([], acc) = syncReceive sock acc >>= go
@@ -242,16 +261,13 @@ syncReceive sock acc0 = do
               Right x -> return x
           return (xs', acc')
 
-data SocketDisconnected = SocketDisconnected
-    deriving (Eq, Show)
-
-instance Exception SocketDisconnected
-
 -- * Utilities
 
+-- | Send a JSON object over the socket.
 sendMsg :: (MonadIO m, A.ToJSON msg) => Socket -> msg -> m ()
-sendMsg sock msg = io $ NB.sendAll sock $! BL.toStrict $! A.encode msg <> "\n"
+sendMsg sock msg = io $ NB.sendMany sock $ BL.toChunks (A.encode msg <> "\n")
 
+-- | Read and parse lines
 recvLines :: (MonadIPCClient m) => Socket -> BL.ByteString -> m ([BL.ByteString], BL.ByteString)
 recvLines sock leftover = do
   res <- io $ NB.recv sock 4096
@@ -265,18 +281,6 @@ recvLines sock leftover = do
        in case C8LB.uncons bs of
             Just ('\n', bs') -> decode (msgs ++ [acc <> as]) "" bs'
             _ -> (msgs, acc <> x)
-
-getXdgRuntimeDirectory :: IO FilePath
-getXdgRuntimeDirectory =
-  lookupEnv "XDG_RUNTIME_DIR" >>= \case
-    Just dir -> return dir
-    Nothing -> error "XDG_RUNTIME_DIR not set"
-
-defaultSocketName :: IO String
-defaultSocketName =
-  lookupEnv "WAYLAND_DISPLAY" >>= \case
-    Just str | Just (s :: Int) <- L.stripPrefix "wayland-" str >>= readMaybe -> return $ "hswm-" ++ show s
-    _ -> return "hswm-1"
 
 getClientAI :: (MonadIO m) => ClientConfig -> m AddrInfo
 getClientAI ClientConfig{..} =
@@ -296,6 +300,20 @@ getClientAI ClientConfig{..} =
       | otherwise = do
           rdir <- io getXdgRuntimeDirectory
           return $ rdir ++ "/" ++ name
+
+-- ** Filepath stuff
+
+getXdgRuntimeDirectory :: IO FilePath
+getXdgRuntimeDirectory =
+  lookupEnv "XDG_RUNTIME_DIR" >>= \case
+    Just dir -> return dir
+    Nothing -> error "XDG_RUNTIME_DIR not set"
+
+defaultSocketName :: IO String
+defaultSocketName =
+  lookupEnv "WAYLAND_DISPLAY" >>= \case
+    Just str | Just (s :: Int) <- L.stripPrefix "wayland-" str >>= readMaybe -> return $ "hswm-" ++ show s
+    _ -> return "hswm-1"
 
 -- * Identity strings
 

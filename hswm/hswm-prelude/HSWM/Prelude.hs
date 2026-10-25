@@ -50,6 +50,7 @@ module HSWM.Prelude (
   LazyByteString,
   T.StrictText,
   TL.LazyText,
+  ShortText,
 ) where
 
 import "unliftio" UnliftIO
@@ -83,6 +84,7 @@ import "mtl" Control.Monad.State as Misc (MonadState, gets, modify)
 import "stm" Control.Concurrent.STM as Misc (flushTQueue)
 import "text" Data.Text qualified as T
 import "text" Data.Text.Lazy qualified as TL
+import Data.Text.Short (ShortText)
 
 toText :: String -> T.Text
 toText = T.pack
