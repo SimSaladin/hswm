@@ -109,6 +109,9 @@ instance HasY Window Position1D where _y = position . _y
 instance HasWidth Window Dimension where width = size . width
 instance HasHeight Window Dimension where height = size . height
 
+instance HasRectangle Window where
+  rectangle = lens (Rectangle' <$> view position <*> view size) (\s a -> s & position .~ (a^.position) & size .~ (a^.size))
+
 -- Aeson instances
 
 instance ToJSON Window where
