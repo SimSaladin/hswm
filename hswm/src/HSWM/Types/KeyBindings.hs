@@ -1,6 +1,8 @@
 {-# LANGUAGE ViewPatterns #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE NoFieldSelectors #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
+
 
 -- |
 -- Module      : HSWM.Types.KeyBindings
@@ -21,7 +23,6 @@ import qualified River as R
 import qualified Data.Aeson as A
 import qualified Data.List as L
 import qualified Data.Map as M
-import           Prettyprinter.Combinators (renderString)
 import qualified Data.Set as S
 
 data KeyBindings k a = KeyBindings
@@ -152,6 +153,10 @@ instance (Ord key, Pretty key, Pretty action) => Semigroup (KeyBindings key acti
 
 deriving via (PPGeneric (Either (KeyBindings k a) a)) instance (Pretty k, Pretty a) => Pretty (Either (KeyBindings k a) a)
 deriving via (PPGeneric (KeyBindings k a)) instance (Pretty k, Pretty a) => Pretty (KeyBindings k a)
+deriving via (PPGeneric (BoundKeyInfo k)) instance Pretty (BoundKeyInfo k)
+
+instance Pretty (MVar (Async ())) where
+  pretty _ = fromString "(MVar (Async))"
 
 instance (A.ToJSON k, A.ToJSONKey k, A.ToJSON a)  => ToJSON (KeyBindings k a) where
   toJSON = genericToJSON aesonOptions

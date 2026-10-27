@@ -173,7 +173,7 @@ data WindowInfo = WindowInfo
 
 newtype OutputId = OutputId {unwrap :: Int}
   deriving stock (Eq, Show, Read, Generic)
-  deriving newtype (Bounded, Enum, A.FromJSON, A.ToJSON, Default)
+  deriving newtype (Bounded, Enum, Num, A.FromJSON, A.ToJSON, Default)
 
 -- | Workspace identifier type
 type WsId = ShortText

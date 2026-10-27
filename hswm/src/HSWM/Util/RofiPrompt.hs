@@ -29,7 +29,7 @@ import Data.Typeable
 import GHC.IsList qualified
 import GHC.Show
 import GHC.TypeLits
-import HSWM
+import HSWM hiding (render)
 import HSWM.Util.PangoMarkup qualified as P
 import System.FilePath (takeDirectory)
 import System.IO (readFile, writeFile)

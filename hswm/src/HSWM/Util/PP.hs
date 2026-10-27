@@ -1,9 +1,10 @@
 module HSWM.Util.PP (
   module X,
   module HSWM.Util.PP,
+  module Prettyprinter.Combinators,
 ) where
 
-import Prettyprinter.Combinators
+import Prettyprinter.Combinators (render, Doc, layoutPageWidth, defaultLayoutOptions, renderWith, renderString, PageWidth(Unbounded))
 import Prettyprinter.Generics as X ( PPGeneric (..), PPGenericOverride (..), Pretty (..))
 import Prettyprinter.Show as X (ppShow, PPShow(..))
 

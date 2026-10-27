@@ -38,6 +38,10 @@ import System.Process.Typed.Internal qualified as Internal
 
 type MonadProcessSpawn m = (MonadUnliftIO m, MonadLogger m)
 
+-- | No logging or other extras, just start thte process ASAP.
+spawnProcessFast :: String -> [String] -> IO ()
+spawnProcessFast prog args = void . async $ runProcess_ (proc prog args)
+
 spawnProcess :: (MonadProcessSpawn m) => String -> [String] -> m ()
 spawnProcess prog args = do
   let pc = setCloseFds True $ setNewSession True $ proc prog args

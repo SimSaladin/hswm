@@ -27,6 +27,8 @@ import Data.Map qualified as M
 import qualified Data.Set as Set
 import Data.Kind
 import GHC.Records
+--import HSWM.Util.PP
+--import qualified Prettyprinter.Combinators as PP
 
 
 type family UserDataFormat (m :: Type -> Type) object
@@ -78,19 +80,15 @@ decodeUserDataHandler f e = do
 instance HandleEvent H R.RiverXkbBindingEvent where
   handleEvent =
     decodeUserDataHandler $ \bkey ev -> do
+        --logDebugNS "xkb" $ "key event" :# [ "data" .=  PP.render (pretty bkey)]
         --handleXkbBindingEvent bkey $ \case
         case ev of
             R.RiverXkbBindingPressed _ _ -> runBoundKeyBinding bkey
             R.RiverXkbBindingReleased _ _ -> cancelRepeat bkey
             R.RiverXkbBindingStopRepeat _ _ -> cancelRepeat bkey
-{-    where
-      withSeat' rs' f' = withSeat_ rs' $ \s' -> local (\r -> r{thisSeat = Just r}) f'
-      foobar =
-        case (s.submap_pending, actionSubmap @H xb.boundAction) of
-            (Nothing, Submap [] _)  -> doAction
-            (Just _, Submap [] _)   -> next S_SUBMAP_CANCEL >> doAction -- Submap action + reset
-            _                       -> next (S_SUBMAP_NEXT_KEY xb.boundAction xb.boundSubmap xb.defaultSubmapAction) -- Submap binding activated
--}
+
+mapInternalSeatDatas :: (MonadReader s m, HasGlobalTMap s, MonadEffectsIO m) => (RiverSeat -> InternalSeatState -> m b) -> m ()
+mapInternalSeatDatas f = withObjectDef @InternalSeatStateStore $ mapM_ (uncurry f) . M.toList
 
 lookupInternalSeatState :: MonadStateGlobal env m => RiverSeat -> m InternalSeatState
 lookupInternalSeatState rs = withObjectDef @InternalSeatStateStore $ maybe f return . M.lookup rs
@@ -478,7 +476,7 @@ keyBindingsInit rs = do
   keyBinds <- view (config . keyBindings)
   logDebug $ "Setting keybindings" :# [ "bindings" .= keyBinds ]
   let getLeafBinds km =
-        M.keysSet (km ^. bindings . to (M.filter isRight)) <>
+        M.keysSet (km ^. bindings) <>
           fold (km ^.. bindings . each . _Left . to getLeafBinds)
       utilized = getLeafBinds keyBinds
 
@@ -524,12 +522,13 @@ runBoundKeyBinding boundInfo = withSeat' rs $ \seat -> do
 
       rs = boundInfo.riverSeat
       runBindingAction rref action = do
-        logDebugNS "xkb-bindings" "starting keypress handler"
+        --logDebugNS "xkb-bindings" "starting keypress handler"
         bindingStartAction boundInfo.riverXkbBinding (onHoldRepeat (Proxy @H) action) rref boundInfo.runningVar action
 
       -- NOTE it is necessary to sync this to the next manage phase.
       setActiveKeyBinds :: Bool -> KeyBindingsState k -> KeyBindings k v -> HS ()
       setActiveKeyBinds waitSubmap curstate binds = writeManageQ $ do
+          logInfoNS "submaps" "seat active keymap is now being updated"
           when waitSubmap $ do
               ensureNextKeyEaten rs
               modifySeat rs $ pendingSubmapKey ?~ True
@@ -594,13 +593,18 @@ checkRun xkbBind runVar =
 -- XXX: this should be one per Seat!
 cancelRepeat :: xb -> H ()
 cancelRepeat _ = do
-  as <- view repeatWorker >>= readIORef
-  cancel as
-  waitCatch as >>= \case
-    Right{} -> return ()
-    Left err
-      | Just AsyncCancelled <- fromException err -> return ()
-      | otherwise -> logError $ "Repeat worker threw exception" :# ["error" .= tshow err]
+  -- Handle the global repeat worker
+  cancelIt =<< view repeatWorker
+  mapInternalSeatDatas $ \_ st -> cancelIt st.seatBindingsRepeatWorker
+    where
+      cancelIt ref = do
+        as <- readIORef ref
+        cancel as
+        waitCatch as >>= \case
+          Right{} -> return ()
+          Left err
+            | Just AsyncCancelled <- fromException err -> return ()
+            | otherwise -> logError $ "Repeat worker threw exception" :# ["error" .= tshow err]
 
 -- |
 -- Ensure that the next non-modifier key press and corresponding release events

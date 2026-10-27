@@ -172,10 +172,8 @@ render :: H ()
 render = do
   ctx <- getObjectDef @WallpaperContext
   forM_ (M.toList ctx.outputsState) $ \(ro, os) -> do
-    logDebugNS "wallpaper" $ "render test"  :# [ "output" .= ro, "status" .= show (isJust ctx.bufferPool, isJust ctx.src_image, isJust os.surfaces, os.pending_render ,os.configured , os.out_width > 0, os.out_height > 0) ]
     case (ctx.bufferPool, ctx.src_image, os.surfaces) of
       (Just bp, Just img, Just surfaces) -> when (os.pending_render && os.configured && os.out_width > 0 && os.out_height > 0) $ do
-        logDebugNS "wallpaper" $ "now ready to render"
         drawImage bp os img surfaces
         updateOutputState ro $ \x -> x{pending_render = False}
       _ -> return ()
