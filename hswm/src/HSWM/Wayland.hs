@@ -127,3 +127,10 @@ getOrCreateGlobalListener = liftH $ do
   getOrCreateObject $ do
     runInIO <- askRunInIO
     WL.createListener $ runInIO . handleWithHook'
+
+-- * Object methods
+
+objectCommand :: forall o f. (Inspect o) => (o -> f) -> H f
+objectCommand f = do
+  o <- getObject @o
+  return (f o)

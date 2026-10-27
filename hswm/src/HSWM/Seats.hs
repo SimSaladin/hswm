@@ -634,8 +634,3 @@ calcResizeEdges w (Position sx sy) = (if closerL then 4 else 8) .|. (if closerU 
   where
     closerL = (sx - w.position.x) < (w.position.x + fi w.size.width - sx)
     closerU = (sy - w.position.y) < (w.position.y + fi w.size.height - sy)
-
-objectCommand :: forall o f. (Inspect o) => (o -> f) -> H f
-objectCommand f = do
-  o <- getObject @o
-  return (f o)

@@ -162,6 +162,7 @@ setTopFocus' rw = mapSeats $ \s -> do
         -- logDebug $ "seat: pointer warp" :# [ "dest" .= (px, py), "seat" .= s.name, "window" .= show w.river_window ]
         io $ R.riverSeatPointerWarp s.river_seat px py
 
+-- | See "GrabKeyboard" for reasoning why these exist.
 seatDisableBindingsMatching :: (SomeSeat a, GetHState m, MonadEffects m) => a -> [ModMask] -> [KeySym] -> m ()
 seatDisableBindingsMatching rs mods keys = do
   found <- lookupMatchingKeyBindings rs $ \(XBKey mod' key) -> any (\m -> m .&. mod' > 0) mods || key `elem` keys
@@ -174,9 +175,10 @@ seatEnableBindingsMatching rs mods keys = do
   logInfo $ "seat: restoring bindings to enabled" :# ["seat" .= show (rs ^. riverId), "count" .= length found]
   io $ forM_ found R.riverXkbBindingEnable
 
+-- | Result is restricted to th eenabled (supposed to be) bindings under current keymap (usually base).
 lookupMatchingKeyBindings :: (SomeSeat ss, MonadEffects m, GetHState m) => ss -> (XBKey -> Bool) -> m [R.RiverXkbBinding]
 lookupMatchingKeyBindings ss match = fmap (fromMaybe mempty) $ withSeat ss $ \s ->
-  return $ s ^. keyBindingsState . riverBoundKeys & M.filterWithKey (\k _ -> match k) & M.elems
+  return $ s ^. keyBindingsState . riverBoundKeys & (`M.restrictKeys` (s ^. keyBindingsState . riverBoundKeysEnabled)) & M.filterWithKey (\k _ -> match k) & M.elems
 
 --------------------------------------------------------------
 
