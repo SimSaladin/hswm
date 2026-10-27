@@ -17,7 +17,6 @@ import HSWM.Core
 import HSWM.Operations
 import HSWM.StackSet qualified as W
 import HSWM.Wayland
-import HSWM.Types.KeyBindings hiding (boundKeyInfo)
 
 import River qualified as R
 import WL.Client qualified as WL
@@ -78,12 +77,12 @@ decodeUserDataHandler f e = do
 -- | Handle key bind events.
 instance HandleEvent H R.RiverXkbBindingEvent where
   handleEvent =
-    decodeUserDataHandler $ \boundKeyInfo ev -> do
-        --handleXkbBindingEvent boundKeyInfo $ \case
+    decodeUserDataHandler $ \bkey ev -> do
+        --handleXkbBindingEvent bkey $ \case
         case ev of
-            R.RiverXkbBindingPressed _ _ -> runBoundKeyBinding boundKeyInfo
-            R.RiverXkbBindingReleased _ _ -> cancelRepeat boundKeyInfo
-            R.RiverXkbBindingStopRepeat _ _ -> cancelRepeat boundKeyInfo
+            R.RiverXkbBindingPressed _ _ -> runBoundKeyBinding bkey
+            R.RiverXkbBindingReleased _ _ -> cancelRepeat bkey
+            R.RiverXkbBindingStopRepeat _ _ -> cancelRepeat bkey
 {-    where
       withSeat' rs' f' = withSeat_ rs' $ \s' -> local (\r -> r{thisSeat = Just r}) f'
       foobar =
@@ -100,10 +99,6 @@ lookupInternalSeatState rs = withObjectDef @InternalSeatStateStore $ maybe f ret
              modifyObject @InternalSeatStateStore (M.insert rs s) $> s
       mk = InternalSeatState <$> (newIORef =<< async (return ()))
 
-
-
-bindsToList :: XkbBindingMap2 (SomeAction H) -> [StablePtr (XkbBinding' Both (SomeAction H))]
-bindsToList = (^.. each . to (snd . (.unBoth)))
 
 -- * Event handling
 
@@ -179,13 +174,29 @@ handleLayerShellSeat = \case
 handleXkbBindingsSeatEvent :: R.RiverXkbBindingsSeatEvent -> H ()
 handleXkbBindingsSeatEvent = \case
   R.RiverXkbBindingsSeatAteUnboundKey dt _ -> do
-    -- Run default action if defined
+    -- Run default action if defined TODO readd this
     mseat <- runInHS $ lookupSeat $ R.RiverSeat $ castPtr dt
-    whenJust mseat $ \s ->
-      whenJust s.submap_pending $ \(_, _, subdef) ->
-        whenJust subdef $ void . async . runner
-    runInHS $ modifySeat' dt $ pendingAction .~ S_SUBMAP_CANCEL
-  R.RiverXkbBindingsSeatModifiersUpdate _dt _ _modsOld _modsNew -> return () -- TODO take advantage of this event
+    whenJust mseat $ \s -> do
+      -- submap cancellation in next manage p phase
+      writeManageQ $ do
+         -- Disable sub-keymap keys + enable main keymap keys + reset state
+         modifySeat s $ (pendingSubmapKey .~ Nothing) . (keyBindings %~ (\x -> fromMaybe x (rollbackSubmaps x)))
+         updateActiveBindings s
+
+  R.RiverXkbBindingsSeatModifiersUpdate{} -> return () -- TODO take advantage of this event
+
+
+-- | Calculate the necessary changes to which binds will be disabled and which enabled on the account of active
+-- submaps.
+updateActiveBindings :: SomeSeat ss => ss -> HS ()
+updateActiveBindings ss = withSeat_ ss $ \seat -> do
+  let enable  = seat.keyBindingsState.riverBoundKeys `M.restrictKeys` (M.keysSet seat.keyBindings.bindings `Set.difference` seat.keyBindingsState.riverBoundKeysEnabled)
+  let disable = seat.keyBindingsState.riverBoundKeys `M.restrictKeys` (seat.keyBindingsState.riverBoundKeysEnabled `Set.difference` M.keysSet seat.keyBindings.bindings)
+  forM_ disable R.riverXkbBindingDisable
+  forM_ enable R.riverXkbBindingEnable
+  logDebug $ "key bindings updated" :# ["disabled" .= M.size disable, "enable" .= M.size enable]
+  modifySeat seat (keyBindingsState . riverBoundKeysEnabled %~
+    (`Set.difference` M.keysSet disable) . (`Set.union` M.keysSet enable))
 
 -- | Pointer events.
 handlePointerEvent :: R.RiverPointerBindingEvent -> H ()
@@ -195,9 +206,6 @@ handlePointerEvent = \case
 
 unRefPointerBindingUser :: MonadIO m => Ptr Void -> m (PointerBinding (SomeAction H))
 unRefPointerBindingUser dt = io $ deRefStablePtr (castPtrToStablePtr $ castPtr dt)
-
-unRefXkbBindingUSer :: MonadIO m => Ptr Void -> m (XkbBinding' Both (SomeAction H))
-unRefXkbBindingUSer dt = io $ deRefStablePtr (castPtrToStablePtr $ castPtr dt)
 
 -- * Manage
 
@@ -243,26 +251,29 @@ managePendingAction s = \case
         withWindow_ s.focused $ \_ -> R.riverSeatFocusWindow s.river_seat s.focused
         modifySeat s $ \x -> x{currentFocus = SFocusWindow s.focused}
       _ -> pure ()
-  S_SUBMAP_NEXT_KEY action subkeys subdef -> do
-    ensureNextKeyEaten s
-    -- Disable previous keymap keys + activate sub-keymap keys + store submap state
-    io $
-      mapM_ (deRefStablePtr >=> R.riverXkbBindingDisable . (.riverXkbBinding)) $
-        maybe (s.xkb_bindings ^.. each . to (snd . (.unBoth))) ((^.. each . to (snd . (.unBoth))) . view _2) s.submap_pending
-    -- Enable submap keys
-    io $ forM_ (bindsToList subkeys) $ deRefStablePtr >=> R.riverXkbBindingEnable . (.riverXkbBinding)
-    modifySeat s $ \s' ->
-      s'
-        { submap_pending = Just (action, subkeys, subdef)
-        , pending_action = S_NONE
-        }
-  S_SUBMAP_CANCEL -> do
-    -- Disable sub-keymap keys + enable main keymap keys + reset state
-    whenJust s.submap_pending $ \(_, subkeys, _) ->
-      io $ forM_ (subkeys ^.. each . to (.unBoth) . _2) $ deRefStablePtr >=> R.riverXkbBindingDisable . (.riverXkbBinding)
-    -- Enable base bindings
-    io $ forM_ (s.xkb_bindings ^.. each . to (.unBoth) . _2) $ deRefStablePtr >=> R.riverXkbBindingEnable . (.riverXkbBinding)
-    modifySeat s $ \s' -> s'{submap_pending = Nothing, pending_action = S_NONE}
+
+      -- We need to take care to properly reset bindings to base keymap s state also when the submap selection is
+     -- -- interrupted or is cancelled... Hence this.
+     -- S_SUBMAP_NEXT_KEY action subkeys subdef -> do
+     --   ensureNextKeyEaten s
+     --   -- Disable previous keymap keys + activate sub-keymap keys + store submap state
+     --   io $
+     --     mapM_ (deRefStablePtr >=> R.riverXkbBindingDisable . (.riverXkbBinding)) $
+     --       maybe (s.xkb_bindings ^.. each . to (snd . (.unBoth))) ((^.. each . to (snd . (.unBoth))) . view _2) s.submap_pending
+     --   -- Enable submap keys
+     --   io $ forM_ (bindsToList subkeys) $ deRefStablePtr >=> R.riverXkbBindingEnable . (.riverXkbBinding)
+     --   modifySeat s $ \s' ->
+     --     s'
+     --       { submap_pending = Just (action, subkeys, subdef)
+     --       , pending_action = S_NONE
+     --       }
+    --  S_SUBMAP_CANCEL -> do
+    --    -- Disable sub-keymap keys + enable main keymap keys + reset state
+    --    whenJust s.submap_pending $ \(_, subkeys, _) ->
+    --      io $ forM_ (subkeys ^.. each . to (.unBoth) . _2) $ deRefStablePtr >=> R.riverXkbBindingDisable . (.riverXkbBinding)
+    --    -- Enable base bindings
+    --    io $ forM_ (s.xkb_bindings ^.. each . to (.unBoth) . _2) $ deRefStablePtr >=> R.riverXkbBindingEnable . (.riverXkbBinding)
+    --    modifySeat s $ \s' -> s'{submap_pending = Nothing, pending_action = S_NONE}
   S_START_OP SEAT_OP_MOVE -> do
     mw <- withWindowSet $ return . W.peek
     case mw of
@@ -371,7 +382,7 @@ hasWlSeat seat name = do
 deleteRemovedSeat :: Seat -> HS ()
 deleteRemovedSeat s = do
   seatList %= L.filter ((/= s.river_seat) . view riverSeat)
-  forM_ (s.xkb_bindings ^.. each) destroyXKBBinding
+  forM_ (s ^.. keyBindingsState . riverBoundKeys . each) WL.objectDestroy
   forM_ s.pointer_bindings destroyPointerBinding
   R.objectDestroy s.xkb_bindings_seat
   R.objectDestroy s.river_layer_shell_seat
@@ -460,15 +471,6 @@ createSeatPointerBindings rs = do
   pPtrs <- view (config . pointerBindings) >>= resolvePointerBinds myMod
   modifySeat rs $ \s -> s & pointerBindings <>~ pPtrs
 
--- -- TODO deprecate
--- createSeatKeyboardBindingsOld :: (HandleEvent H R.RiverXkbBindingEvent) => RiverSeat -> HS ()
--- createSeatKeyboardBindingsOld rs = do
---   -- xkb bindings
---   binds <- getObject
---   kbdListen <- getObject
---   kPtrs <- view (config . keyBindings) >>= createXkbBindings (binds, kbdListen, rs) actionSubmap (onHoldRepeat (Proxy @H))
---   modifySeat rs $ \s -> s & xkbBindings <>~ kPtrs
-
 keyBindingsInit :: (HandleEvent H R.RiverXkbBindingEvent) => RiverSeat -> HS ()
 keyBindingsInit rs = do
   logInfo "NEW key bindings init in progress!"
@@ -509,12 +511,12 @@ keyBindingsInit rs = do
     logDebugNS "xkb-bindings" $ "Enabled some initial keybindings" :# [ "count" .= M.size need ]
 
 runBoundKeyBinding :: forall k v f a. (k ~ XBKey, v ~ SomeAction f, H ~ f) => BoundKeyInfo a -> f ()
-runBoundKeyBinding boundInfo = withSeat_ rs $ \seat -> do
+runBoundKeyBinding boundInfo = withSeat' rs $ \seat -> do
     let newInput = getInput seat.keyBindings
     res <- runInHS $ case newInput of
-        BindingRunAction action mbNewKeys -> mapM_ (setActiveKeyBinds seat.keyBindingsState) mbNewKeys $> Just action
-        BindingNotFound mbNewKeys xbkey -> mapM_ (setActiveKeyBinds seat.keyBindingsState) mbNewKeys >> logError ("no binding found for key" :# [ "key" .= xbkey ]) $> Nothing
-        BindingActivateSubmap newKeys -> setActiveKeyBinds seat.keyBindingsState newKeys $> Nothing
+        BindingRunAction action mbNewKeys -> mapM_ (setActiveKeyBinds False seat.keyBindingsState) mbNewKeys $> Just action
+        BindingNotFound mbNewKeys xbkey -> mapM_ (setActiveKeyBinds False seat.keyBindingsState) mbNewKeys >> logError ("no binding found for key" :# [ "key" .= xbkey ]) $> Nothing
+        BindingActivateSubmap newKeys -> setActiveKeyBinds True seat.keyBindingsState newKeys $> Nothing
     intSt <- lookupInternalSeatState rs
     mapM_ (runBindingAction intSt.seatBindingsRepeatWorker) (res :: Maybe (SomeAction f))
   where
@@ -525,10 +527,14 @@ runBoundKeyBinding boundInfo = withSeat_ rs $ \seat -> do
         logDebugNS "xkb-bindings" "starting keypress handler"
         bindingStartAction boundInfo.riverXkbBinding (onHoldRepeat (Proxy @H) action) rref boundInfo.runningVar action
 
-      setActiveKeyBinds :: KeyBindingsState k -> KeyBindings k v -> HS ()
-      setActiveKeyBinds curstate binds = do
+      -- NOTE it is necessary to sync this to the next manage phase.
+      setActiveKeyBinds :: Bool -> KeyBindingsState k -> KeyBindings k v -> HS ()
+      setActiveKeyBinds waitSubmap curstate binds = writeManageQ $ do
+          when waitSubmap $ do
+              ensureNextKeyEaten rs
+              modifySeat rs $ pendingSubmapKey ?~ True
           let enable  = curstate.riverBoundKeys `M.restrictKeys` (M.keysSet binds.bindings `Set.difference` curstate.riverBoundKeysEnabled)
-              disable = curstate.riverBoundKeys `M.restrictKeys` (curstate.riverBoundKeysEnabled `Set.difference` M.keysSet binds.bindings)
+          let disable = curstate.riverBoundKeys `M.restrictKeys` (curstate.riverBoundKeysEnabled `Set.difference` M.keysSet binds.bindings)
           forM_ disable R.riverXkbBindingDisable
           forM_ enable R.riverXkbBindingEnable
           logDebug $ "key bindings updated" :# ["disabled" .= M.size disable, "enable" .= M.size enable]
@@ -537,24 +543,13 @@ runBoundKeyBinding boundInfo = withSeat_ rs $ \seat -> do
               (keyBindings . previous .~ binds.previous) .
               (keyBindingsState . riverBoundKeysEnabled %~ (`Set.difference` M.keysSet disable) . (`Set.union` M.keysSet enable))
 
--- | Handler for the old code of xkb  binding execution.
--- XXX: maybe cancel if still running for too long time?
-execXkbBinding :: XkbBinding' Both (SomeAction H) -> H ()
-execXkbBinding xb = local (\r -> r{thisSeat = Just rs}) $ do
-  ms <- runInHS $ lookupSeat rs
-  whenJust ms $ \s -> case (s.submap_pending, actionSubmap @H xb.boundAction) of
-    (Nothing, Submap [] _) -> doAction
-    (Just _, Submap [] _) -> next S_SUBMAP_CANCEL >> doAction -- Submap action + reset
-    _ -> next (S_SUBMAP_NEXT_KEY xb.boundAction xb.boundSubmap xb.defaultSubmapAction) -- Submap binding activated
-  where
-    rs = xb ^. riverSeat
-    next action = runInHS $ modifySeat rs $ \s' -> s'{pending_action = action}
 
-    doAction = do
-      rref <- view repeatWorker
-      bindingStartAction xb.riverXkbBinding xb.repeatInfo rref xb.runningVar xb.boundAction
+withSeat' :: (SomeSeat a, GetHState m, MonadReader HConf m) => a -> (Seat -> m ()) -> m ()
+withSeat' ss f = withSeat_ ss $ \s ->
+  local (\r -> r{thisSeat = Just (s ^. riverId)}) (f s)
 
--- | Start the action in new thread (stored in xb.runningVar), there's not already a runner active for the same
+-- |
+-- Start the action in new thread (stored in xb.runningVar), there's not already a runner active for the same
 -- binding.
 --
 -- @
@@ -618,8 +613,9 @@ cancelRepeat _ = do
 -- the ate_unbound_key event is sent instead.
 --
 -- /manage sequence/
-ensureNextKeyEaten :: (MonadIO m) => Seat -> m ()
-ensureNextKeyEaten s = R.riverXkbBindingsSeatEnsureNextKeyEaten s.xkb_bindings_seat
+ensureNextKeyEaten :: (SomeSeat s, GetHState m, MonadIO m) => s -> m ()
+ensureNextKeyEaten ss = withSeat_ ss $
+  \s -> R.riverXkbBindingsSeatEnsureNextKeyEaten s.xkb_bindings_seat
 
 cancelEnsureNextKeyEaten :: (MonadIO m) => Seat -> m ()
 cancelEnsureNextKeyEaten s = R.riverXkbBindingsSeatCancelEnsureNextKeyEaten s.xkb_bindings_seat

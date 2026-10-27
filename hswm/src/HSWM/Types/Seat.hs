@@ -51,14 +51,12 @@ data Seat' (m :: Type -> Type) = Seat
   , keyBindings :: !(KeyBindings XBKey (SomeAction m))
   , keyBindingsState :: !(KeyBindingsState XBKey)
   -- ^ New key binding tracking implementation
-  , xkb_bindings :: !(XkbBindingMap2 (SomeAction m))
-  -- ^ XKB (keyboard) bindings. TODO deprecate, favor keyBindings
   , pointer_bindings :: !(PointerBindings (SomeAction m))
   -- ^ Pointer bindings.
   , pending_action :: !(SeatAction m)
   -- ^ Event queues.
-  , submap_pending :: !(Maybe (SomeAction m, XkbBindingMap2 (SomeAction m), Maybe (SomeAction m)))
-  -- ^ XXX TODO deprecate, use keyBindings instead
+  , pendingSubmapKey :: Maybe Bool
+  -- ^ When Just, we are waiting on a next key input to complete submap; unbound key will be eaten and notified!
   , pendingPointerEnter :: !(Maybe (RiverWindow, Position))
   , op :: !SeatOperation
   -- ^ Pointer move/resize.
@@ -84,7 +82,6 @@ deriving instance
   ( Typeable m
   , Data (SomeAction m)
   , Data (SeatAction m)
-  , Data (StablePtr (XkbBinding (SomeAction m)))
   , Data (StablePtr (PointerBinding (SomeAction m)))
   ) =>
   Data (Seat' m)
@@ -109,10 +106,10 @@ data SeatAction m
     S_NONE
   | -- | start pointer drag operation
     S_START_OP SeatOperation
-  | -- | interpret next keypress for submap, swallowing an unexpected key
-    S_SUBMAP_NEXT_KEY (SomeAction m) (XkbBindingMap2 (SomeAction m)) (Maybe (SomeAction m))
-  | -- | Cancel submap input, resetting to root bindings.
-    S_SUBMAP_CANCEL
+ --  | -- | interpret next keypress for submap, swallowing an unexpected key
+ --    S_SUBMAP_NEXT_KEY (SomeAction m) (XkbBindingMap2 (SomeAction m)) (Maybe (SomeAction m))
+ --  | -- | Cancel submap input, resetting to root bindings.
+ --    S_SUBMAP_CANCEL
   deriving stock (Eq, Generic, Data)
   deriving anyclass (NFData)
 

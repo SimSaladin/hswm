@@ -35,16 +35,6 @@ data KeyBindings k a = KeyBindings
   } deriving (Eq, Ord, Show, Generic, Data)
   deriving anyclass (NFData, Default)
 
--- | Only picks the bindings on the current level
-bindingsToList1 :: KeyBindings k a -> [(k, a)]
-bindingsToList1 binds = [ (k, a) | (k, Right a) <- M.toList binds.bindings ]
-
-flatBindings :: KeyBindings k a -> [([k], a)]
-flatBindings v = go [] $ M.toList v.bindings where
-  go pre ((k,Right a) : xs) = (pre ++ [k], a) : go pre xs
-  go pre ((k,Left bs) : xs) = go (pre ++ [k]) (M.toList bs.bindings) ++ go pre xs
-  go _                   [] = []
-
 -- | state for managing river bindings (turning on and off)
 data KeyBindingsState k = KeyBindingsState
   { -- | River objects created for input purposes.
@@ -57,32 +47,50 @@ data KeyBindingsState k = KeyBindingsState
 data BindingAction k a
   = BindingRunAction
     { runAction :: a
-    , mbReplaceKeyBindings :: Maybe (KeyBindings k a)  -- reset back to top-level map;
+    -- ^ The resolved user action. This should be run!
+    , mbReplaceKeyBindings :: Maybe (KeyBindings k a)
+    -- ^ To reset back to top-level map.
     }
   | BindingNotFound
-    { mbReplaceKeyBindings :: Maybe (KeyBindings k a)  -- XXX: reset back to top-level map;
+    { mbReplaceKeyBindings :: Maybe (KeyBindings k a)
+    -- ^ To reset back to top-level map.
     , bindingKey :: k
     }
   | BindingActivateSubmap
-    { replaceKeyBindings :: KeyBindings k a        -- XXX: enter this keymap, remember old
+    { replaceKeyBindings :: KeyBindings k a
+    -- ^ A submap is to be activated momentarily
     }
 
+-- | The state data associated with each binding.
+-- Used to navigate into doing correct operations when triggered
+-- in wayland callbacks.
 data BoundKeyInfo a = BoundKeyInfo
   { boundKey :: {-# UNPACK #-} !XBKey
+  -- ^ The modifiers and keycode
   , riverXkbBinding :: {-# UNPACK #-} !R.RiverXkbBinding
-  , riverSeat :: {-# UNPACK #-} !R.RiverSeat -- ^ Needed to know which seat triggered an action.
+  -- ^ Reference to the Wayland object
+  , riverSeat :: {-# UNPACK #-} !R.RiverSeat
+  -- ^ Needed to know which seat triggered an action.
   , runningVar :: {-# UNPACK #-} !(MVar (Async ()))
+  -- ^ MVar that stores the execution state of the binding action
   }
   deriving stock (Generic)
+
+-- * Lenses
 
 makeLensesWith classPerField ''BindingAction
 makeLensesWith classPerField ''KeyBindings
 makeLensesWith classPerField ''KeyBindingsState
 makeLensesCombine ["riverSeat"] [''BoundKeyInfo]
 
+
+-- | Calculate the key bindings that are used by the currently active mappings (layer).
+-- The returned bindings should be activated and other bindings should be deactivated.
+-- Check again whenever the set of active bindings changes (i.e. a submap layer is activated or deactivated).
 bindingsNeeded :: Ord k => KeyBindingsState k -> KeyBindings k v -> M.Map k R.RiverXkbBinding
 bindingsNeeded st binds = st.riverBoundKeys `M.restrictKeys` M.keysSet binds.bindings
 
+-- | Activate (or try to) the given key in the keymap. Returns the effects, but does not apply them.
 activateBinding :: (Ord k) => k -> KeyBindings k a -> BindingAction k a
 activateBinding k v =
   case M.lookup k v.bindings of
@@ -91,33 +99,43 @@ activateBinding k v =
     Nothing          -> BindingNotFound (rollbackSubmaps v) k
   where
     activateSubmap sm = sm { previous = Just v }
-    rollbackSubmaps ((.previous) -> Just x) = Just (go x)
-                  where go ((.previous) -> Just m2) = go m2
-                        go                   m2  = m2
 
 
-    rollbackSubmaps _ = Nothing
 
+rollbackSubmaps :: KeyBindings k v -> Maybe (KeyBindings k v)
+rollbackSubmaps ((.previous) -> Just x) = Just (go x)
+              where go ((.previous) -> Just m2) = go m2
+                    go                   m2  = m2
+rollbackSubmaps _ = Nothing
+
+-- | Parses key sequences separated by whitespace as nested submap bindings.
+-- Modifiers always preceded by @-@ e.g. @"C-"@, @"alt-shift-"@ and followed by the name of the keycode key.
 toKeyBindings :: ModMask -> (String, a) -> KeyBindings XBKey a
 toKeyBindings defmm (k, a) = withKeys (L.words k)
   where
-    withKeys       [] = error "no keys in the key string!"
     withKeys      [x] = def { bindings = M.singleton (parseXBKey x) (Right a) }
     withKeys (x : xs) = def { bindings = M.singleton (parseXBKey x) (Left $ withKeys xs) }
+    withKeys       [] = def
 
-    parseXBKey s =
-      let (rkey, rmods) = L.span (/= '-') (L.reverse s)
-          (key, mods) = (L.reverse rkey, L.reverse $ drop 1 rmods)
-          key' = toKeySym key
-          modm = toModMask defmm mods
-       in XBKey modm key'
+    parseXBKey s = XBKey (toModMask defmm mods) (toKeySym key)
+      where (rkey, rmods) = L.span (/= '-') (L.reverse s)
+            (key, mods) = (L.reverse rkey, L.reverse $ drop 1 rmods)
 
+-- | Only picks the bindings on the current level
+bindingsToList1 :: KeyBindings k a -> [(k, a)]
+bindingsToList1 binds = [ (k, a) | (k, Right a) <- M.toList binds.bindings ]
 
-deriving via (PPGeneric (Either (KeyBindings k a) a)) instance (Pretty k, Pretty a) => Pretty (Either (KeyBindings k a) a)
-deriving via (PPGeneric (KeyBindings k a)) instance (Pretty k, Pretty a) => Pretty (KeyBindings k a)
+flatBindings :: KeyBindings k a -> [([k], a)]
+flatBindings v = go [] $ M.toList v.bindings where
+  go pre ((k,Right a) : xs) = (pre ++ [k], a) : go pre xs
+  go pre ((k,Left bs) : xs) = go (pre ++ [k]) (M.toList bs.bindings) ++ go pre xs
+  go _                   [] = []
 
-instance (Ord key, Pretty action, Pretty key) => Monoid (KeyBindings key action) where mempty = def
--- instance Ord key => Default (KeyBindings key action) where def = KeyBindings mempty Nothing
+-- Monoid/Semigroup
+
+instance (Ord key, Pretty key, Pretty action) => Monoid (KeyBindings key action) where
+  mempty = def
+
 instance (Ord key, Pretty key, Pretty action) => Semigroup (KeyBindings key action) where
   a <> b
     | Just{} <- b.previous = error "can't concat submap on rhs"
@@ -129,6 +147,11 @@ instance (Ord key, Pretty key, Pretty action) => Semigroup (KeyBindings key acti
 
         pshow :: Pretty a => a -> String
         pshow  = renderString . pretty
+
+-- Pretty-printing instances
+
+deriving via (PPGeneric (Either (KeyBindings k a) a)) instance (Pretty k, Pretty a) => Pretty (Either (KeyBindings k a) a)
+deriving via (PPGeneric (KeyBindings k a)) instance (Pretty k, Pretty a) => Pretty (KeyBindings k a)
 
 instance (A.ToJSON k, A.ToJSONKey k, A.ToJSON a)  => ToJSON (KeyBindings k a) where
   toJSON = genericToJSON aesonOptions

@@ -12,7 +12,6 @@ module HSWM.Operations where
 import Data.List qualified as L
 import Data.Map qualified as M
 import Data.Ratio ((%))
-import Data.Set qualified as S
 import HSWM.Core
 import HSWM.Main.Persist qualified as Persist
 import HSWM.StackSet qualified as W
@@ -164,24 +163,20 @@ setTopFocus' rw = mapSeats $ \s -> do
         io $ R.riverSeatPointerWarp s.river_seat px py
 
 seatDisableBindingsMatching :: (SomeSeat a, GetHState m, MonadEffects m) => a -> [ModMask] -> [KeySym] -> m ()
-seatDisableBindingsMatching rs mods keys = withSeat_ rs $ \s -> do
-  let binds = s.xkb_bindings
-      matchedKeys = S.filter match (M.keysSet binds)
-      matchedBinds = M.fromSet (view _2 . (.unBoth) . (binds M.!)) matchedKeys
-  logInfo $ "seat: temporarily disabling bindings" :# ["count" .= length matchedBinds]
-  io . forM_ matchedBinds $ deRefStablePtr >=> R.riverXkbBindingDisable . (.riverXkbBinding)
-  where
-    match (XBKey mod' key) = any (\m -> m .&. mod' > 0) mods || key `elem` keys
+seatDisableBindingsMatching rs mods keys = do
+  found <- lookupMatchingKeyBindings rs $ \(XBKey mod' key) -> any (\m -> m .&. mod' > 0) mods || key `elem` keys
+  logInfo $ "seat: temporarily disabling bindings" :# ["count" .= length found]
+  io $ forM_ found R.riverXkbBindingDisable
 
 seatEnableBindingsMatching :: (SomeSeat a, GetHState m, MonadEffects m) => a -> [ModMask] -> [KeySym] -> m ()
-seatEnableBindingsMatching rs mods keys = withSeat_ rs $ \s -> do
-  let binds = s.xkb_bindings
-      matchedKeys = S.filter match (M.keysSet binds)
-      matchedBinds = M.fromSet (view _2 . (.unBoth) . (binds M.!)) matchedKeys
-  logInfo $ "seat: restoring bindings to enabled" :# ["seat" .= show (rs ^. riverId), "count" .= length matchedBinds]
-  io . forM_ matchedBinds $ deRefStablePtr >=> R.riverXkbBindingEnable . (.riverXkbBinding)
-  where
-    match (XBKey mod' key) = any (\m -> m .&. mod' > 0) mods || key `elem` keys
+seatEnableBindingsMatching rs mods keys = do
+  found <- lookupMatchingKeyBindings rs $ \(XBKey mod' key) -> any (\m -> m .&. mod' > 0) mods || key `elem` keys
+  logInfo $ "seat: restoring bindings to enabled" :# ["seat" .= show (rs ^. riverId), "count" .= length found]
+  io $ forM_ found R.riverXkbBindingEnable
+
+lookupMatchingKeyBindings :: (SomeSeat ss, MonadEffects m, GetHState m) => ss -> (XBKey -> Bool) -> m [R.RiverXkbBinding]
+lookupMatchingKeyBindings ss match = fmap (fromMaybe mempty) $ withSeat ss $ \s ->
+  return $ s ^. keyBindingsState . riverBoundKeys & M.filterWithKey (\k _ -> match k) & M.elems
 
 --------------------------------------------------------------
 

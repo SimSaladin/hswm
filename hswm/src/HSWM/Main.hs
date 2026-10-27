@@ -45,6 +45,8 @@ import WL.XdgOutput.Unstable.V1.Client qualified as XO
 import Control.Concurrent (threadWaitReadSTM, threadWaitWriteSTM)
 import System.IO (putStrLn)
 import System.Posix qualified as Posix
+--import qualified Data.Set as Set
+import qualified Data.Map as M
 
 defaultRegistrySettings :: H WL.RegistrySettings
 defaultRegistrySettings = withRunInIO $ \runInIO ->
@@ -312,15 +314,23 @@ instance HandleEvent H R.RiverWindowManagerEvent where
       Seats.render >> Windows.render
       void . userCode =<< view (config . renderHook)
       R.riverWindowManagerRenderFinish wm
+
     R.RiverWindowManagerSessionLocked _ _wm ->
+      -- Bulk disable all bindings
       writeManageQ $ mapSeats $ \s ->
-        mapM_ (io . deRefStablePtr >=> R.riverXkbBindingDisable . (.riverXkbBinding)) (Seats.bindsToList s.xkb_bindings)
+        forM_ (s.keyBindingsState.riverBoundKeys `M.restrictKeys` s.keyBindingsState.riverBoundKeysEnabled)
+          R.riverXkbBindingDisable
+
     R.RiverWindowManagerSessionUnlocked _ _wm ->
+      -- Bulk enable all bindings that should be enabled
       writeManageQ $ mapSeats $ \s ->
-        mapM_ (io . deRefStablePtr >=> R.riverXkbBindingEnable . (.riverXkbBinding)) (Seats.bindsToList s.xkb_bindings)
+        forM_ (s.keyBindingsState.riverBoundKeys `M.restrictKeys` s.keyBindingsState.riverBoundKeysEnabled)
+          R.riverXkbBindingEnable
+
     R.RiverWindowManagerFinished _ wm -> do
       R.objectDestroy wm
       writeMainQ $ MainExit "river_window_manager_v1 finished, exiting." (Just $ toException $ ExitFailure 1)
+
     R.RiverWindowManagerUnavailable _ wm -> do
       R.objectDestroy wm
       writeMainQ $ MainExit "another window manager already running" (Just $ toException $ ExitFailure 1)

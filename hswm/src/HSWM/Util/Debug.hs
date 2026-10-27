@@ -78,16 +78,14 @@ debugAction = runInHS $ do
 
 logXkbEvent :: (MonadIO m, MonadLogger m, Monoid (m All)) => Text -> R.RiverXkbBindingEvent -> m All
 logXkbEvent src ev = case ev of
-  R.RiverXkbBindingPressed dt self -> logBinding src "Press" dt self
-  R.RiverXkbBindingReleased dt self -> logBinding src "Release" dt self
-  R.RiverXkbBindingStopRepeat dt self -> logBinding src "StopRepeat" dt self
+  R.RiverXkbBindingPressed _ self -> logBinding src "Press" self
+  R.RiverXkbBindingReleased _ self -> logBinding src "Release" self
+  R.RiverXkbBindingStopRepeat _ self -> logBinding src "StopRepeat" self
 
 logBinding ::
   (MonadLogger m, MonadIO m, Typeable binding, Show binding, Generic binding, Monoid (m All)) =>
-  Text -> Text -> Ptr Void -> binding -> m All
-logBinding src str dt self = do
-  (xb :: XkbBinding (SomeAction H)) <- liftIO $ deRefStablePtr (castPtrToStablePtr $ castPtr dt)
-  logEventShow src self ["event" .= str, "action" .= show xb.boundAction, "seat" .= show xb.riverSeat]
+  Text -> Text -> binding -> m All
+logBinding src str self = logEventShow src self ["event" .= str]
 
 -- ** Event logging
 

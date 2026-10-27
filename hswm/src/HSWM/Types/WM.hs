@@ -23,6 +23,7 @@ module HSWM.Types.WM (
   module HSWM.Types.Config,
   module HSWM.Types.Simple,
   module HSWM.Types.Lens,
+  module HSWM.Types.KeyBindings,
 ) where
 
 import HSWM.StackSet qualified as W
@@ -35,6 +36,7 @@ import HSWM.Types.Seat
 import HSWM.Types.Simple
 import HSWM.Types.TypeMap
 import HSWM.Types.Window
+import HSWM.Types.KeyBindings
 
 import Text.XkbCommon qualified as Xkb
 import WL.Client qualified as WL

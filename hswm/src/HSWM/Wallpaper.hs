@@ -98,7 +98,7 @@ data Surfaces = Surfaces
 
 wpStartupHook :: WallpaperConfig -> H ()
 wpStartupHook conf = do
-  logInfo $ "wallpaper: startup" :# ["config" .= show conf]
+  logInfoNS "wallpaper" $ "Starting up..." :# ["config" .= show conf]
   ctx <- getObjectDef @WallpaperContext
   -- create bufferpool if missing
   when (isNothing ctx.bufferPool) $ do
@@ -109,7 +109,7 @@ wpStartupHook conf = do
 
 wpExitHook :: (HasCallStack) => H ()
 wpExitHook = do
-  logInfo "wallpaper: exiting"
+  logInfoNS "wallpaper" "exit hook, cleaning up..."
   deinit
 
 wpHandleEventHookDyn :: Dynamic -> H All
@@ -171,15 +171,18 @@ calculateTransform src out scale = (fi src / scale - fi out) / 2 / scale
 render :: H ()
 render = do
   ctx <- getObjectDef @WallpaperContext
-  forM_ (M.toList ctx.outputsState) $ \(ro, os) ->
+  forM_ (M.toList ctx.outputsState) $ \(ro, os) -> do
+    logDebugNS "wallpaper" $ "render test"  :# [ "output" .= ro, "status" .= show (isJust ctx.bufferPool, isJust ctx.src_image, isJust os.surfaces, os.pending_render ,os.configured , os.out_width > 0, os.out_height > 0) ]
     case (ctx.bufferPool, ctx.src_image, os.surfaces) of
       (Just bp, Just img, Just surfaces) -> when (os.pending_render && os.configured && os.out_width > 0 && os.out_height > 0) $ do
+        logDebugNS "wallpaper" $ "now ready to render"
         drawImage bp os img surfaces
         updateOutputState ro $ \x -> x{pending_render = False}
       _ -> return ()
 
 drawImage :: BP.ImageBufferPool -> OutputState -> JP.Image JP.PixelRGBA8 -> Surfaces -> H ()
 drawImage bp OutputState{..} img Surfaces{..} = do
+  logDebugNS "wallpaper" $ "render: now drawing"
   let w = out_width
       h = out_height
       src_w = JP.imageWidth img
@@ -213,8 +216,8 @@ drawImage bp OutputState{..} img Surfaces{..} = do
 
   buf <- BP.nextBuffer bp shmFormat (fi buf_w) (fi buf_h)
 
-  logDebug $
-    "drawing wallpaper"
+  logDebugNS "wallpaper" $
+    "render: now drawing wallpaper"
       :# [ "out" .= name
          , "out-size" .= (w, h)
          , "out-scale" .= scale
@@ -262,6 +265,7 @@ initOutput ro = withOutputState ro $ \os -> do
   compositor <- getObject
   let w = os.out_width
       h = os.out_height
+  logDebugNS "wallpaper" $ "initOutput: start"  :# [ "output" .= ro ]
   ss <- case os.surfaces of
     Just ss -> return ss
     Nothing -> do
@@ -325,6 +329,7 @@ initOutput ro = withOutputState ro $ \os -> do
 
   -- Update ctx
   updateOutputState ro $ \x -> x{surfaces = Just ss}
+  logDebugNS "wallpaper" $ "initOutput: done" :# [ "output" .= ro ]
 
 ------------------------------------------
 -- Internal boilerplate

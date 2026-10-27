@@ -20,9 +20,8 @@ module HSWM.Types.Action (
 ) where
 
 import HSWM.Types.Lens
-import HSWM.Types.Simple (RepeatInfo(..), HasRepeatInfo(..))
+import HSWM.Types.Simple (RepeatInfo(..))
 import HSWM.Util.PP
-
 import River qualified as R
 import Text.XkbCommon
 import Text.XkbCommon.EventCodes (fromEventCodeBTN)
@@ -86,55 +85,6 @@ ppButton (m, btn) =
   L.intercalate "+" $
     ppModifiers m ++ [fromMaybe "???" $ fromEventCodeBTN btn]
 
-newtype Both a = Both {unBoth :: (a, StablePtr a)}
-  deriving stock (Eq, Show, Generic, Data)
-  deriving newtype (NFData)
-
-instance (ToJSON a) => ToJSON (Both a) where
-  toJSON (Both (a, _)) = toJSON a
-  toEncoding (Both (a, _)) = toEncoding a
-
-type XkbBindingMap2 a = XkbBindingMap' Both a
-
-type XkbBindingMap a = XkbBindingMap' StablePtr a -- M.Map XBKey (XkbBindingPtr a)
-type XkbBindingPtr a = XkbBindingPtr' StablePtr a -- StablePtr (XkbBinding a)
-type XkbBinding a = XkbBinding' StablePtr a
-
-type XkbBindingMap' f a = M.Map XBKey (XkbBindingPtr' f a)
-type XkbBindingPtr' f a = f (XkbBinding' f a)
-data XkbBinding' f a = XkbBinding
-  { boundAction :: !a
-  , boundSubmap :: !(XkbBindingMap' f a)
-  , defaultSubmapAction :: !(Maybe a)
-  , repeatInfo :: {-# UNPACK #-} !RepeatInfo
-  , riverXkbBinding :: {-# UNPACK #-} !R.RiverXkbBinding
-  , riverSeat :: {-# UNPACK #-} !R.RiverSeat
-  -- ^ Needed to know which seat triggered an action.
-  , runningVar :: {-# UNPACK #-} !(MVar (Async ()))
-  }
-  deriving stock (Generic)
-
-deriving instance (Eq a, Eq (f (XkbBinding' f a))) => Eq (XkbBinding' f a)
-deriving instance (Show a, Show (f (XkbBinding' f a))) => Show (XkbBinding' f a)
-deriving anyclass instance (NFData a, NFData (f (XkbBinding' f a))) => NFData (XkbBinding' f a)
-
-instance ToJSON (XkbBinding' Both (SomeAction m)) where
-  toJSON v =
-    A.object
-      [ "bound_action" A..= v.boundAction
-      , "submap" A..= v.boundSubmap
-      , "submap_default_action" A..= v.defaultSubmapAction
-      , "repeat_info" A..= v.repeatInfo
-      , "river_seat" A..= v.riverSeat
-      ]
-  toEncoding v =
-    A.pairs $
-      "bound_action" A..?= v.boundAction
-    <> "submap" A..?= v.boundSubmap
-    <> "submap_default_action" A..?= v.defaultSubmapAction
-    <> "repeat_info" A..?= v.repeatInfo
-    <> "river_seat" A..?= v.riverSeat
-
 data PKey = PKey {keyModMask :: !ModMask, keyButton :: !Button}
   deriving stock (Eq, Ord, Show, Read, Generic, Data)
   deriving anyclass (NFData)
@@ -147,9 +97,7 @@ instance A.ToJSONKey PKey where
   toJSONKey = A.ToJSONKeyText ppPKey (A.text . ppPKey)
 
 type PointerBindings a = M.Map PKey (PointerBindingPtr a)
-
 type PointerBindingPtr a = StablePtr (PointerBinding a)
-
 data PointerBinding a = PointerBinding
   { boundAction :: !a
   , riverPointerBinding :: {-# UNPACK #-} !R.RiverPointerBinding
@@ -248,11 +196,6 @@ class (Functor m) => IsAction m a where
   onHoldRepeat :: Proxy m -> a -> RepeatInfo
   onHoldRepeat = passthruOrDef def onHoldRepeat
 
-  -- | Action may trigger submap bindings.
-  actionSubmap :: a -> Submap (SomeAction m)
-  -- actionSubmap _ = def
-  actionSubmap = passthruOrDef def (const actionSubmap) (Proxy @m)
-
   -- | Description based on the value (defaults to type info)
   actionDescription :: Proxy m -> a -> String
   actionDescription = passthruOrDef "" actionDescription
@@ -281,11 +224,6 @@ instance (Functor m, Typeable m) => IsAction m (m ()) where
 instance (MonadIO m) => IsAction m (IO ()) where
   runner = liftIO
 
-instance (MonadIO m, Typeable m) => IsAction m (Submap (SomeAction m)) where
-  runner Submap{..} = whenJust submapDefault runner
-  actionSubmap = id
-  actionDescription _ _ = "(Submap)"
-
 -- * SomeAction
 
 data SomeAction m = forall a. (IsAction m a) => SomeAction a
@@ -296,7 +234,6 @@ instance (Typeable m, Functor m) => IsAction m (SomeAction m) where
 instance Eq (SomeAction m) where
   SomeAction a == SomeAction b =
     actionDescription proxy a == actionDescription proxy b
-      && actionSubmap @m a == actionSubmap @m b
     where
       proxy = Proxy @m
 
@@ -311,11 +248,8 @@ instance Show (SomeAction m) where
                    x | x == def -> "no"
                      | otherwise -> "yes [R=" ++ show x.rate ++ ",D=" ++ show x.delay ++ "]"
         cats = actionCategories p v
-        subm = case (actionSubmap v :: Submap (SomeAction m)) of
-                 sm | sm == def -> ""
-                    | otherwise -> ", submap: " ++ show sm
      in
-     "Action \"" ++ desc ++ "\"" ++ " repeat:" ++ repeat ++ (" @" ++ show cats) ++ subm
+     "Action \"" ++ desc ++ "\"" ++ " repeat:" ++ repeat ++ (" @" ++ show cats)
 
 deriving via PPShow (SomeAction m) instance Pretty (SomeAction m)
 
@@ -324,31 +258,21 @@ instance NFData (SomeAction m) where
     a `seq`
       runner @m a `seq`
         onHoldRepeat @m Proxy a `seq`
-          rnf (actionDescription @m Proxy a) `seq`
-            rnf (actionSubmap @m a)
+          rnf (actionDescription @m Proxy a)
 
 instance ToJSON (SomeAction m) where
   toJSON (SomeAction val) =
-    A.object $
-      ("description" .= actionDescription @m Proxy val)
-        : ["submap" .= x | let x = actionSubmap @m val, not (omitField x)]
+    A.object ["description" .= actionDescription @m Proxy val]
   toEncoding (SomeAction val) =
     A.pairs $
       "description"
         .= actionDescription @m Proxy val
-          <> (let x = actionSubmap @m val in if omitField x then mempty else "submap" .= x)
 
 -- * Lenses
 
 makeFieldClassesIfMissing ["boundAction", "riverSeat", "keyBindings"]
-makeLensesCombine' (ignoreFields ["repeatInfo"]) [] [''XkbBinding', ''PointerBinding]
 
-instance HasRepeatInfo (XkbBinding a) where
-  repeatInfo = lens (.repeatInfo) (\s b -> s{repeatInfo = b} :: XkbBinding a)
-
-instance HasRiverId (XkbBinding a) where
-  type RiverId (XkbBinding a) = R.RiverXkbBinding
-  riverId = riverXkbBinding
+makeLensesCombine' (ignoreFields ["repeatInfo"]) [] [''PointerBinding]
 
 instance HasRiverId (PointerBinding a) where
   type RiverId (PointerBinding a) = R.RiverPointerBinding
@@ -356,7 +280,6 @@ instance HasRiverId (PointerBinding a) where
 
 -- Data instances...
 
-deriving instance (Typeable f, Data a, Data (f (XkbBinding' f a))) => Data (XkbBinding' f a)
 deriving instance (Data a) => Data (PointerBinding a)
 
 instance (Typeable m) => Data (SomeAction m) where

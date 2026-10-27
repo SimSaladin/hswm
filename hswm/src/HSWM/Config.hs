@@ -21,8 +21,6 @@ import HSWM.Operations
 import HSWM.Util.PangoMarkup qualified as P
 import HSWM.Utils
 
-import HSWM.Types.KeyBindings
-
 import Data.Foldable
 import Data.List qualified as L
 import Data.Text qualified as T
@@ -34,35 +32,6 @@ infixr 6 :>>:
 infixl 4 <?>, <!>, <@>
 infixl 9 ///
 infixl 1 .@=, .@=>
-
-testBindings :: Validator ()
-testBindings = do
-
-  let val :: SomeAction H
-      val = (return () :: IO ()) <?> "repeated"
-
-  "M-C" .@= (return () :: IO ()) <!> 500 <@> ["Repeat"]
-  "M-C-s" .@= (return () :: H ()) <?> "Custom name"
-  "M-c M-c x" .@= val
-  "M-c M-c y" .@= val
-  "M-c M-c z" .@= val
-  bindGroup "subcategory" $ do
-    "S-3" .@= (pure () :: IO ())
-    "S-4 5" .@= (pure () :: IO ())
-
-  bindGroup "subs1" $
-    "M-S-" /// screenKeys .@=> \i -> (return () :: IO ()) <?> show i <!> 532
-
-  bindGroup "subs5" $
-    "M-C-" /// screenKeys .@=> \i -> (return () :: IO ()) <?> show i
-  "M-c M-y z" .@= val
-  "M-c M-y S-z" .@= val
-  "M-c M-y g" .@= val
-  "M-c M-z" .@= val
-
-    where
-      screenKeys :: [String]
-      screenKeys = map (: []) "wvza"
 
 -- | Wrap a Message as an action for use in keybindings.
 newtype SendMessage a = SendMessage a
@@ -116,7 +85,7 @@ instance Applicative Validator where
     , curmap = v1.curmap <> v2.curmap
     }
 
-instance Monad (Validator) where
+instance Monad Validator where
   v >>= f = let v2 = f v.curval in liftA2 (const id) v v2
 
 validateBindings :: (key ~ XBKey)
@@ -245,10 +214,6 @@ instance (IsAction f a, SymlistValue xs) => IsAction f (a <@> xs) where
   actionPassthru _ (WithCategories a) = Just $ SomeAction a
   actionDescriptionFallback p (WithCategories a) = actionDescriptionFallback p a
   actionCategories p (WithCategories a) = symlistVal (undefined :: Proxy xs) ++ actionCategories p a
-  actionSubmap (WithCategories a) =
-    let f (SomeAction (x :: b)) = SomeAction (WithCategories x :: b <@> xs)
-        Submap sks sa = actionSubmap @f a
-     in Submap (sks & each . _2 %~ f) (sa & _Just %~ f)
 
 instance (IsAction H a, IsAction H b, Typeable a, Typeable b) => IsAction H (a :>>: b) where
   runner (a :>>: b) = runner a >> runner b
@@ -258,14 +223,6 @@ instance (IsAction H a, IsAction H b, Typeable a, Typeable b) => IsAction H (a :
   actionDescription p (a :>>: b) = L.intercalate " && " $ filter (/= "") [actionDescription p a, actionDescription p b]
   actionDescriptionFallback p (a :>>: b) = L.intercalate " && " $ filter (/= "") [actionDescriptionFallback p a, actionDescriptionFallback p b]
   actionCategories p (a :>>: b) = actionCategories p a ++ actionCategories p b
-  actionSubmap (a :>>: b) =
-    Submap
-      { submapKeys = s1.submapKeys <> s2.submapKeys
-      , submapDefault = s1.submapDefault <|> s2.submapDefault -- XXX
-      }
-    where
-      s1 = actionSubmap a
-      s2 = actionSubmap b
 
 
 -- * Extract type-level categories

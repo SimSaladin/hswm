@@ -55,9 +55,9 @@ main :: IO ()
 main =
   -- adding keys late, so that a changed modMask override can take effect...
   hswm (validateAndAddKeys myKeys) $
-  IPC.ipcServer def $
-  WB.waybarSB def $
   Wallpaper.usingWallpaper Wallpaper.WallpaperConfig{filepath = "/home/sim/wallpaper.png"} $
+  WB.waybarSB def $
+  IPC.ipcServer def $
   (def @(HSWMConfig H Full))
     & layoutHook .~ myLayoutHook
     & manageHook .~ myManageHook

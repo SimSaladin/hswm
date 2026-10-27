@@ -55,9 +55,9 @@ defaultRequestHandler :: Request -> H (Either Text Response)
 defaultRequestHandler = \case
   ListWindows{} -> getHState <&> Right . InternalObject . toJSON . (^.. _windows . traversed)
   -- hide key bindings by default (lots of noise)
-  ListSeats{bindings} ->
+  ListSeats{} ->
     getHState
-      <&> view (seatList . to (if bindings then id else each . xkbBindings .~ mempty) . to (Right . InternalObject . toJSON))
+      <&> view (seatList . to (Right . InternalObject . toJSON))
   ListOutputs{} -> getHState <&> view (outputList . to toJSON . to InternalObject . to Right)
   ConfigGet{} -> view $ config . to toJSON . to InternalObject . to Right
   ListInputDevices{libinput} ->
