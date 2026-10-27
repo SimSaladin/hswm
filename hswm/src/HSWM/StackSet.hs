@@ -1,6 +1,6 @@
 -- |
 -- Module      : HSWM.StackSet
--- Description : Short description
+-- Description : The core stack of managed windows
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>

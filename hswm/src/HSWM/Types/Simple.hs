@@ -5,7 +5,7 @@
 
 -- |
 -- Module      : HSWM.Types.Simple
--- Description : Short description
+-- Description : Some very basic types used all acrcoss.
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
@@ -13,11 +13,11 @@
 -- Portability : unportable
 module HSWM.Types.Simple where
 
-import Data.Ratio
-import HSWM.Types.Lens
-
-import Data.Aeson qualified as A
-import HSWM.StackSet qualified as W
+import qualified Data.Aeson as A
+import           Data.Ratio
+import qualified HSWM.StackSet as W
+import           HSWM.Types.Lens
+import           Data.Data
 
 -- * Types
 
@@ -83,6 +83,25 @@ data RepeatInfo = RepeatInfo {rate, delay :: {-# UNPACK #-} !Int32}
   deriving stock (Eq, Ord, Show, Read, Generic, Data)
   deriving anyclass (Default, NFData)
 
+-- * CleanupTask
+
+newtype CleanupTasks = CleanupTasks { runCleanupTasks :: IO () }
+  deriving (Generic)
+instance NFData CleanupTasks where
+  rnf x = x `seq` ()
+
+instance Show CleanupTasks where
+  show _ = "CleanupTasks"
+
+instance Semigroup CleanupTasks where
+  a <> b = CleanupTasks $ a.runCleanupTasks >> b.runCleanupTasks
+
+instance Monoid CleanupTasks where
+  mempty = CleanupTasks (return ())
+
+instance Default CleanupTasks where
+  def = mempty
+
 -- * Functions
 
 -- | @pointWithin x y r@ returns 'True' if the @(x, y)@ co-ordinate is within
@@ -112,20 +131,22 @@ centerRationalRect r =
 
 -- * Lenses
 
-makeFieldClassesIfMissing ["name"]
+makeFieldClassesIfMissing ["name", "new"]
 
-makeLensesWith' classPerField [''Size, ''Position, ''Rectangle, ''RepeatInfo]
+makeLensesCombine' (ignoreFields ["size", "position"])
+  ["width", "height", "x", "y", "size", "position"]
+  [''RepeatInfo, ''Size, ''Position, ''Rectangle]
 
--- StackSet
 makeLensesWith' classPerField [''W.RationalRect]
-makeLensesWith'
-  ( classPerType
-      & lensField
-        .~ (\ty _ n -> [TopName $ mkName $ fromSnake True $ "_" ++ (nameBase ty & _head %~ toLower) ++ "_" ++ (nameBase n & _head %~ toLower)])
-      & lensClass
-        .~ (\n -> Just (mkName $ "Has" ++ nameBase n ++ "'", mkName $ "_" ++ (nameBase n & _head %~ toLower)))
-  )
-  [''W.Workspace, ''W.Screen, ''W.Stack, ''W.StackSet]
+
+instance HasPosition Rectangle where
+  position = lens (.position) (\s a -> s { position = a })
+instance HasSize Rectangle where
+  size = lens (.size) (\s a -> s { size = a })
+
+-- | To get rectangle from e.g. screen dimensions.
+screenRect :: (MonadReader s m, HasRectangle s) => m Rectangle
+screenRect = view rectangle
 
 -- Aeson instances
 
@@ -150,4 +171,14 @@ instance ToJSON RepeatInfo where
 instance FromJSON RepeatInfo where
   parseJSON = genericParseJSON aesonOptions
 
--- toEncoding rect = ...
+
+-- XXX
+
+instance Data (IO ()) where
+  toConstr _ = error "toConstr"
+  gunfold _ _ = error "gunfold"
+  dataTypeOf _ = mkNoRepType "SomeAction"
+
+deriving instance Data CleanupTasks
+instance ToJSON CleanupTasks where
+  toJSON _ = toJSON ()

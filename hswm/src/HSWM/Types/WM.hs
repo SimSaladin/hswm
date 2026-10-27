@@ -3,6 +3,7 @@
 {-# LANGUAGE NoFieldSelectors #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
+
 -- |
 -- Module      : HSWM.Types.WM
 -- Description : Short description
@@ -47,6 +48,9 @@ import Data.Monoid (Ap (..))
 import GHC.Stack (callStack, prettyCallStack)
 
 -- * Types
+
+type MonadEffectsIO m = (MonadUnliftIO m, MonadLoggerIO m, MonadMask m, MonadThrow m, MonadFail m)
+type MonadEffects m = (MonadIO m, MonadLogger m, MonadMask m, MonadThrow m, MonadFail m)
 
 type WindowSpace = W.Workspace WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail
 type WindowSet = W.StackSet WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail ScreenId ScreenDetail
@@ -311,9 +315,7 @@ data HConf = HConf
   -- ^ Global type-indexed variables.
   , repeatWorker :: !(IORef (Async ()))
   }
-  deriving (Generic)
-
--- deriving anyclass (NFData)
+  deriving stock (Generic)
 
 -- | Mutable stete.
 data HState = HState
@@ -382,30 +384,28 @@ type MonadHConf m = (MonadReader HConf m, MonadEffects m)
 
 -- * Lenses: (HConf, HState)
 
-makeLensesWith' classPerField [''HConf, ''HState]
+makeLensesCombine' preserveLeading_ [] [''HConf, ''HState]
 
 -- * HasGlobalsRegistry
 
 class HasGlobalsRegistry env where
   globalsRegistryL :: Lens' env (MVar WL.RegistryState)
-
 instance HasGlobalsRegistry (MVar WL.RegistryState) where
   globalsRegistryL = lens id const
+instance HasGlobalsRegistry HConf where
+  globalsRegistryL = globals
 
 instance HasGlobalTMap HConf where
   globalTMap = globalTypeMap
-
-instance HasGlobalsRegistry HConf where
-  globalsRegistryL = globals
 
 -- * Monadic "HState" reader access.
 
 class (Monad m) => GetHState m where
   getHState :: m HState
-
+instance GetHState (QueryT HS) where
+  getHState = Query (lift getHState)
 instance GetHState HS where
   getHState = use id
-
 instance GetHState H where
   getHState = do
     locked <- view _stateLocked
@@ -416,17 +416,17 @@ instance GetHState H where
 -- H/HS instances
 
 -- | Contexts in which it is possible to execute state-locked 'HS' actions.
-class (Monad m) => MonadHS m where
+class (GetHState m) => MonadHS m where
   runInHS :: HS a -> m a
+instance MonadHS HS where runInHS = id
+instance MonadHS (QueryT HS) where runInHS ma = Query (lift ma)
+instance MonadHS H where runInHS = runInHS'
 
-instance MonadHS HS where
-  runInHS = id
-
-instance MonadHS (QueryT HS) where
-  runInHS ma = Query (lift ma)
-
-instance MonadHS H where
-  runInHS = runInHS'
+class (Monad m) => MonadH m where
+  liftH :: H a -> m a
+instance MonadH H where liftH = id
+instance MonadH HS where liftH (H ma) = HS (lift ma)
+instance MonadH (QueryT HS) where liftH ma = Query (lift $ liftH ma)
 
 runInHS' :: (HasCallStack) => (MonadIO m, MonadThrow m, MonadReader HConf m) => HS a -> m a
 runInHS' a = do
@@ -441,22 +441,11 @@ runInHS' a = do
     runHS :: HConf -> HState -> HS a -> IO (a, HState)
     runHS c st (HS ma) = flip runReaderT c $ runStateT ma st
 
-class (Monad m) => MonadH m where
-  liftH :: H a -> m a
-
-instance MonadH H where
-  liftH = id
-
-instance MonadH HS where
-  liftH (H ma) = HS (lift ma)
-instance MonadH (QueryT HS) where
-  liftH ma = Query (lift $ liftH ma)
-
 instance IsAction H (HS ()) where
   actionPassthru _ a = Just $ SomeAction (runInHS a :: H ())
 
-instance MonadLoggerIO H where askLoggerIO = view _logFunc
-
+instance MonadLoggerIO H where
+  askLoggerIO = view _logFunc
 instance MonadLogger H where
   monadLoggerLog loc src lvl msg = do
     f <- askLoggerIO
@@ -469,11 +458,10 @@ instance MonadLogger HS where
 
 instance (Default a) => Default (H a) where def = pure def
 instance (Default a) => Default (HS a) where def = pure def
-
-instance (Monoid a) => Default (x -> H a) where
-  def _ = pure mempty
+instance (Monoid a) => Default (x -> H a) where def _ = pure mempty
 
 -- XXX not particularly useful instances
+
 instance (Typeable a) => Show (H a) where show _ = "H(" ++ show (typeRep (undefined :: Proxy a)) ++ ")"
 instance (Typeable a) => Show (HS a) where show _ = "HS(" ++ show (typeRep (undefined :: Proxy a)) ++ ")"
 

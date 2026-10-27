@@ -1,3 +1,12 @@
+-- |
+-- Module      : HSWM.ManageHook
+-- Description : ManageHooks for deciding what to do with new/modified windows.
+-- Copyright   : (c) Samuli Thomasson, 2026
+--
+-- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
+-- Stability   : unstable
+-- Portability : unportable
+--
 module HSWM.ManageHook where
 
 import HSWM.Core

@@ -71,7 +71,7 @@ defaultRequestHandler = \case
                     , "type" .= (dev ^. deviceType)
                     ]
                       ++ ["libinput" .= getLibinputDevice k | libinput]
-                      ++ ["repeat-info" .= info | Just info <- [dev ^. repeatInfo]]
+                      ++ ["repeat-info" .= info | let info = dev ^. repeatInfo, info /= def]
                       ++ maybe [] getXkbKeyboard (dev ^. xkbKeyboard)
                 getXkbKeyboard k
                   | Just v <- st ^. xkbKeyboards . at k =

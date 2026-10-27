@@ -1,6 +1,6 @@
 -- |
 -- Module      : HSWM.Core
--- Description :
+-- Description : The most core definitions are re-exported here.
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>

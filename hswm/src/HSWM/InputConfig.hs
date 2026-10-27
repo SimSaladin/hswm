@@ -5,7 +5,7 @@
 
 -- |
 -- Module      : HSWM.InputConfig
--- Description : Short description
+-- Description : Input device management home.
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
@@ -92,7 +92,7 @@ data InputDeviceState = InputDeviceState
   -- ^ keyboard/pointer/touch/tablet
   , deviceName :: String
   , xkbKeyboard :: Maybe R.RiverXkbKeyboard
-  , repeatInfo :: Maybe RepeatInfo
+  , repeatInfo :: RepeatInfo
   }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Default)
@@ -212,10 +212,15 @@ instance Default (DC Word32) where def = DC maxBound maxBound
 -- * Lenses
 
 makeFieldClassesIfMissing ["inputDevice"]
-makeLensesCombine' id ["inputDevice", "repeatInfo"] [''InputConfigState, ''XkbKeyboardState, ''InputDeviceState, ''LibinputDeviceState]
+makeLensesCombine'
+  (ignoreFields ["repeatInfo"])
+  ["inputDevice"] [''InputConfigState, ''XkbKeyboardState, ''InputDeviceState, ''LibinputDeviceState]
 
 makeFieldClassesIfMissing ["currentValue", "defaultValue"]
 makeLensesWith' classPerField [''SDC, ''DC]
+
+instance HasRepeatInfo InputDeviceState where
+  repeatInfo = lens (.repeatInfo) (\s b -> s{repeatInfo = b} :: InputDeviceState)
 
 -- * Aeson instances
 
@@ -250,7 +255,7 @@ inputDeviceHook dev = do
     Just st ->
       -- Set repeat rate & delay for keyboard device
       when (st.deviceType == Just R.RiverInputDeviceTypeKeyboard) $ do
-        info <- view (config . repeatInfo)
+        info <- view config <&> (.repeatInfo)
         when (info.rate > 0 && info.delay > 0) $
           setRepeatInfo dev info
 
@@ -258,7 +263,7 @@ setRepeatInfo :: R.RiverInputDevice -> RepeatInfo -> H ()
 setRepeatInfo dev info = do
   when (info.rate < 0 || info.delay < 0) $ throwString $ "setRepeatInfo: rate and delay must be over 0. " ++ show info
   R.riverInputDeviceSetRepeatInfo dev info.rate info.delay
-  modifyConfigs $ inputDevices . ix dev . repeatInfo ?~ info
+  modifyConfigs $ inputDevices . ix dev . repeatInfo .~ info
 
 -- | Sets the keymap for all selected keyboards.
 setKeyboardKeymaps :: (HandleEvent H R.RiverXkbKeymapEvent) => (XkbKeyboardState -> Bool) -> XkbRuleNames -> H ()

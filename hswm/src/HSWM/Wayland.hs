@@ -1,8 +1,15 @@
+-- |
+-- Module      : HSWM.Wayland
+-- Description : Most important wayland functionality: object binding and listener creation.
+-- Copyright   : (c) Samuli Thomasson, 2026
+--
+-- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
+-- Stability   : unstable
+-- Portability : unportable
+--
 module HSWM.Wayland where
 
 import HSWM.Core
-import HSWM.Types.Events
-import HSWM.Types.TypeMap
 import WL.Client qualified as WL
 
 type MonadGlobals env m = (MonadEffectsIO m, MonadReader env m, HasGlobalsRegistry env, HasGlobalTMap env)

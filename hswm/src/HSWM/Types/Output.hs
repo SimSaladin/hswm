@@ -63,7 +63,16 @@ instance Default ScreenId where
 
 -- * Lenses
 
-makeLensesWith' classPerField [''Output]
+makeLensesCombine'
+  ((lensClass %~ (\f n -> if n == ''Output then Just (mkName "HasOutput", mkName "outputL") else f n))
+  . ignoreFields ["size", "position"])
+  [] [''Output, ''ScreenId]
+
+instance HasPosition Output where
+  position = lens (.position) (\s a -> s { position = a } :: Output)
+
+instance HasSize Output where
+  size = lens (.size) (\s a -> s { size = a } :: Output)
 
 instance HasX Output Position1D where _x = position . _x
 instance HasY Output Position1D where _y = position . _y

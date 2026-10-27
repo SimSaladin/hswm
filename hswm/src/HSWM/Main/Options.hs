@@ -45,6 +45,7 @@ type Main = MainOptions Unwrapped
 -- | Main entrypoint settings.
 data MainOptions w = MainOptions
   { mainVersion :: w ::: Bool <#> "V" <?> "Display version and exit."
+  , mainOverrideDefaultModMask :: w ::: Maybe String <#> "m" <?> "Override the default modmask in config"
   , mainStateSave :: w ::: Integer <!> "30" <?> "Save the state to file every X minutes. Disabled if <=0"
   , mainStateFile :: w ::: Maybe FilePath <#> "f" <?> "State file to read on restart."
   , mainColor :: w ::: AnsiColors <!> "auto" <?> "Whether to enable color output in plain format mode"

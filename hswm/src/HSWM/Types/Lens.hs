@@ -72,6 +72,7 @@ shortFields =
   , "node"
   , "new"
   , "tag"
+  , "state"
   ]
 
 -- * Make lenses
@@ -130,11 +131,12 @@ makeLensesCombine' fRules fieldsIn namesIn = do
         [ ty
         | (ty, fs) <- typeFields
         , (nameBase ty & _head %~ toLower) `notElem` map nameBase fieldsWithClass
-        , any ((`notElem` fields) . nameBase) fs
+        -- , any ((`notElem` fields) . nameBase) fs
+        -- ^ Note: Without this we still get record classes even if they don't contain any lenses themselves.
         ]
   liftM2
     (++)
-    (makeLensesWith' (fRules $ classPerField' $ const (`elem` fields)) namesPerField)
+    (makeLensesWith' (lensClass .~ const Nothing $ fRules $ classPerField' $ const (`elem` fields)) namesPerField)
     (makeLensesWith' (fRules $ classPerType' $ const (`notElem` fields)) namesPerTy)
 
 -- | This will create any missing classes for the supplied field/record names.
@@ -146,7 +148,7 @@ makeFieldClassesIfMissing fields = do
     let c = mkName $ "Has" <> (fromSnake False field & _head %~ toUpper)
         n
           | field `elem` shortFields = mkName $ "_" <> fromSnake True field
-          | otherwise = mkName $ fromSnake True field
+          | otherwise = mkName $ fromSnake True field & _head %~ toLower
         defType = ()
     exists <- isJust <$> lookupTypeName (show c)
     return $ [makeFieldClass defType c n | not exists]
@@ -217,15 +219,30 @@ classPerType' only =
       | only ty n || only ty (fromSnake False n) =
           let method
                 -- prefix short/common fields with _
+                | '_':n' <- n, n' `elem` shortFields = n'
                 | n `elem` shortFields = "_" <> n
-                | otherwise = fromSnake False n
+                | otherwise = fromSnake False n & _head %~ toLower
            in [TopName (mkName method)]
       | otherwise = []
 
 -- ** Utility functions
 
+ignoreFields :: [String] -> LensRules -> LensRules
+ignoreFields xs = lensField %~ (\f ty b n -> if nameBase n `elem` xs then [] else f ty b n)
+
+-- | Keep leading underscores in field names where they were after applying fromSnakeCase modifier.
+preserveLeading_ :: LensRules -> LensRules
+preserveLeading_ = lensField %~ (\f ty b n -> map (fixit n) (f ty b n)) where
+  fixit _ x@(MethodName _ (nameBase -> '_':_)) = x
+  fixit _ x@(TopName (nameBase -> '_':_)) = x
+  fixit (nameBase -> '_':n) (MethodName c (nameBase -> m)) = MethodName c $ mkName ('_':m)
+  fixit (nameBase -> '_':n) (TopName (nameBase -> m)) = TopName $ mkName ('_':m)
+  fixit _ x = x
+
 -- | Convert @snake_case_input@ to @snakeCaseInput@
-fromSnake :: Bool -> String -> String
+fromSnake :: Bool -- ^ Preserve preceding @"_"@ prefix?
+          -> String
+          -> String
 fromSnake flag inp
   | flag, '_' : xs <- inp = '_' : inner xs
   | otherwise = inner inp

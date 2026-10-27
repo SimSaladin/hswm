@@ -15,12 +15,10 @@ module HSWM.Types.Config where
 import HSWM.Types.Action
 import HSWM.Types.Events
 import HSWM.Types.Lens
-
--- import HSWM.Types.Seat
 import HSWM.Types.Simple
 import HSWM.Types.Window
+import HSWM.Types.KeyBindings (KeyBindings)
 import HSWM.Utils (parseRgba)
-
 import River qualified as R
 
 import Control.Monad.Fix
@@ -31,11 +29,13 @@ import GHC.Generics qualified as Generics
 -- | Composable config modification.
 type ConfigDoM m = forall l. HSWMConfig m l -> HSWMConfig m l
 
+type family ManageHook' (m :: k2) :: Type
+
 -- * User configuration
 
 -- | User configuration
 data HSWMConfig m l = HSWMConfig
-  { keyBindings :: [(XBKey, SomeAction m)]
+  { keyBindings :: KeyBindings XBKey (SomeAction m)
   , pointerBindings :: [((String, Button), SomeAction m)]
   , defaultModMask :: !String
   , borderWidth :: !Int32
@@ -121,35 +121,26 @@ instance (Applicative m) => Default (QueryT m (Endo a)) where
 runQuery :: QueryT m a -> Window -> m a
 runQuery (Query q) = runReaderT q
 
-type family ManageHook' (m :: k2) :: Type
-
 -- * Lenses
 
-makeLensesWith'
-  classPerField
-  [ ''XkbRuleNames
-  , ''ScreenDetail
-  ]
-
-makeLensesCombine'
-  (lensField %~ (\f ty b n -> if nameBase n == "layoutHook" then [] else f ty b n))
-  ["repeatInfo", "pointerBindings"]
-  [''HSWMConfig]
+makeLensesWith' classPerField [''XkbRuleNames ]
+makeLensesCombine' (ignoreFields [ "layoutHook", "repeatInfo"]) ["pointerBindings", "keyBindings"] [''HSWMConfig, ''ScreenDetail]
 
 -- | Correctly type-changing lens for @layoutHook@ (the generated yields invalid signature...)
 layoutHook :: Lens (HSWMConfig m l) (HSWMConfig m l') (l RiverWindow) (l' RiverWindow)
 layoutHook = lens (.layoutHook) (\s b -> s{layoutHook = b})
 
-instance HasPosition ScreenDetail Position where
+instance HasRepeatInfo (HSWMConfig l m)  where
+  repeatInfo = lens (.repeatInfo) (\s b -> s{repeatInfo = b} :: HSWMConfig l m)
+
+instance HasPosition ScreenDetail where
   position = lens (Position <$> view (_x . to fi) <*> view (_y . to fi)) (\s a -> (s :: ScreenDetail){x = fi a.x, y = fi a.y})
 
-instance HasSize ScreenDetail Size where
+instance HasSize ScreenDetail where
   size = lens (Size <$> view (width . to fi) <*> view (height . to fi)) (\s a -> (s :: ScreenDetail){width = fi a.width, height = fi a.width})
 
--- * Utilities
-
-screenRect :: ScreenDetail -> Rectangle
-screenRect sd = Rectangle' (sd ^. position) (sd ^. size)
+instance HasRectangle ScreenDetail where
+  rectangle = lens (Rectangle' <$> view position <*> view size) (\s a -> s & position .~ a.position & size .~ a.size)
 
 -- ToJSON/FromJSON
 

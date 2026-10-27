@@ -1,6 +1,6 @@
 -- |
 -- Module      : HSWM.IPC
--- Description :
+-- Description : API definitions and documentation for the socket IPC interface.
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>

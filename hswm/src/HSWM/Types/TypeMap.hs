@@ -3,7 +3,7 @@
 
 -- |
 -- Module      : HSWM.Types.TypeMap
--- Description : Short description
+-- Description : Type-indexed global store
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
@@ -14,9 +14,6 @@
 module HSWM.Types.TypeMap where
 
 import Data.Aeson qualified as A
-
--- import Data.TMap qualified as TM
-
 import Data.Kind
 import Data.Map qualified as M
 import Data.TypeRepMap qualified as TM
@@ -25,15 +22,9 @@ import GHC.Generics
 
 -- * Types
 
-type MonadStateGlobal env m = (MonadReader env m, HasGlobalTMap env, MonadEffectsIO m)
+type MonadStateGlobal env m = (MonadReader env m, HasGlobalTMap env, MonadUnliftIO m, MonadLogger m, MonadThrow m, MonadMask m)
 
-type MonadStateGlobal' env m = (MonadReader env m, HasGlobalTMap env, MonadEffects m)
-
--- | XXX: there's probably a better place for this somewhre...
-type MonadEffectsIO m = (MonadUnliftIO m, MonadLoggerIO m, MonadMask m, MonadThrow m, MonadFail m)
-
--- | XXX: there's probably a better place for this somewhre...
-type MonadEffects m = (MonadIO m, MonadLogger m, MonadMask m, MonadThrow m, MonadFail m)
+type MonadStateGlobal' env m = (MonadReader env m, HasGlobalTMap env, MonadIO m, MonadLogger m, MonadThrow m, MonadMask m)
 
 -- ** Constraints
 
@@ -95,8 +86,9 @@ data TF (a :: Type) = (Inspect a) => TF {runTF :: !a}
 
 unwrapVal :: (Inspect a) => TF a -> a
 unwrapVal (TF x) = x
+
 wrapVal :: (Inspect a) => a -> TF a
-wrapVal x = TF x
+wrapVal = TF
 
 newtype TypeMap = TypeMap {unTypeMap :: TM.TypeRepMap TF}
   deriving (Show, Generic)

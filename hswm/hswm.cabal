@@ -1,6 +1,6 @@
 cabal-version: 3.12
 
--- This file has been generated from package.yaml by hpack version 0.38.3.
+-- This file has been generated from package.yaml by hpack version 0.39.6.
 --
 -- see: https://github.com/sol/hpack
 
@@ -89,6 +89,7 @@ library
     HSWM.Types.Action
     HSWM.Types.Config
     HSWM.Types.Events
+    HSWM.Types.KeyBindings
     HSWM.Types.Lens
     HSWM.Types.Output
     HSWM.Types.Seat
@@ -96,6 +97,7 @@ library
     HSWM.Types.TypeMap
     HSWM.Types.Window
     HSWM.Types.WM
+    HSWM.Util.Colors
     HSWM.Util.CommandStatic
     HSWM.Util.Debug
     HSWM.Util.ExtensibleState
@@ -111,6 +113,7 @@ library
     HSWM.Util.Rectangle
     HSWM.Util.RofiPrompt
     HSWM.Util.Stack
+    HSWM.Util.StackSet.Lens
     HSWM.Util.Waybar
     HSWM.Util.WorkspaceCompare
     HSWM.Utils

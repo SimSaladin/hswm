@@ -12,6 +12,7 @@
 -- Portability : unportable
 module HSWM.Types.Seat where
 
+import HSWM.Types.KeyBindings
 import HSWM.Types.Action
 import HSWM.Types.Config
 import HSWM.Types.Lens
@@ -47,13 +48,17 @@ data Seat' (m :: Type -> Type) = Seat
   -- ^ Currently focused window/shell layer.
   , focused, hovered, interacted :: !RiverWindow
   -- ^ Windows last interacted with.
+  , keyBindings :: !(KeyBindings XBKey (SomeAction m))
+  , keyBindingsState :: !(KeyBindingsState XBKey)
+  -- ^ New key binding tracking implementation
   , xkb_bindings :: !(XkbBindingMap2 (SomeAction m))
-  -- ^ XKB (keyboard) bindings.
+  -- ^ XKB (keyboard) bindings. TODO deprecate, favor keyBindings
   , pointer_bindings :: !(PointerBindings (SomeAction m))
   -- ^ Pointer bindings.
   , pending_action :: !(SeatAction m)
   -- ^ Event queues.
   , submap_pending :: !(Maybe (SomeAction m, XkbBindingMap2 (SomeAction m), Maybe (SomeAction m)))
+  -- ^ XXX TODO deprecate, use keyBindings instead
   , pendingPointerEnter :: !(Maybe (RiverWindow, Position))
   , op :: !SeatOperation
   -- ^ Pointer move/resize.
@@ -68,6 +73,7 @@ data Seat' (m :: Type -> Type) = Seat
   -- ^ TODO: review below
   , new :: !Bool
   , removed :: !Bool
+  , cleanupTasks :: !CleanupTasks -- ^ Misc. cleanup tasks that should be run when this seat is destroyed.
   }
   deriving stock (Generic)
   deriving anyclass (Default, NFData)
@@ -128,7 +134,14 @@ instance Default SeatOperation where def = SEAT_OP_NONE
 
 -- * Lenses
 
-makeLensesCombine ["riverSeat"] [''Seat', ''SeatKeyboardInfo]
+makeLensesCombine' (ignoreFields ["position", "keyBindings"])
+  ["riverSeat", "keyBindings"] [''Seat', ''SeatKeyboardInfo]
+
+instance HasKeyBindings (Seat' m) (KeyBindings  XBKey (SomeAction m)) where
+  keyBindings = lens (.keyBindings) (\s a -> s { keyBindings = a } :: Seat' m)
+
+instance HasPosition (Seat' a) where
+  position = lens (.position) (\s a -> s { position = a } :: Seat' a)
 
 instance HasX (Seat' m) Int32 where _x = position . _x
 instance HasY (Seat' m) Int32 where _y = position . _y

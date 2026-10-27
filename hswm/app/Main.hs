@@ -1,5 +1,7 @@
 {-# LANGUAGE PartialTypeSignatures #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE NamedDefaults #-}
+{-# LANGUAGE ExtendedDefaultRules #-}
 {-# OPTIONS_GHC -Wno-type-defaults #-}
 {-# OPTIONS_GHC -Wno-unused-binds #-}
 
@@ -35,6 +37,7 @@ import HSWM.Util.PangoMarkup qualified as P
 import HSWM.Util.RofiPrompt qualified as RP
 import HSWM.Util.Waybar qualified as WB
 import HSWM.Wallpaper qualified as Wallpaper
+import HSWM.Types.KeyBindings qualified as KB
 
 import Data.List qualified as L
 import Data.Map qualified as M
@@ -42,43 +45,34 @@ import Data.Ord (clamp)
 import Data.Set qualified as S
 import Data.Text qualified as T
 import Text.Printf
+import GHC.IsList
+
+default MonadH (H, HS)
+default MonadHS (H, HS)
+default GetHState (H, HS)
 
 main :: IO ()
 main =
-  hswm $
-    addKeys' myKeys $
-      WB.waybarSB def $
-        Wallpaper.usingWallpaper Wallpaper.WallpaperConfig{filepath = "/home/sim/wallpaper.png"} $
-          IPC.ipcServer def $
-            (def @(HSWMConfig H Full))
-              & layoutHook
-                .~ myLayoutHook
-              & manageHook
-                .~ myManageHook
-              & handleEventHook
-                <>~ debugHook
-              & handleEventHookDynamic
-                <>~ debugHookDyn
-              & startupHook
-                <>~ runInHS (scratchpadsStartupHook myScratchpads)
-              & pointerBindings
-                <>~ myPointerBinds
-              & defaultModMask
-                .~ "mod4"
-              & borderWidth
-                .~ 1
-              & normalBorder
-                .~ parseRgba colBase02
-              & focusedBorder
-                .~ parseRgba colCyan
-              & xkbLayout
-                ?~ myKeyboard
-              & repeatInfo . rate .~ 20
-              & repeatInfo . delay .~ 150
-              & cursorTheme
-                .~ "Vanilla-DMZ"
-              & cursorSize
-                .~ 24
+  -- adding keys late, so that a changed modMask override can take effect...
+  hswm (validateAndAddKeys myKeys) $
+  IPC.ipcServer def $
+  WB.waybarSB def $
+  Wallpaper.usingWallpaper Wallpaper.WallpaperConfig{filepath = "/home/sim/wallpaper.png"} $
+  (def @(HSWMConfig H Full))
+    & layoutHook .~ myLayoutHook
+    & manageHook .~ myManageHook
+    & handleEventHook <>~ debugHook
+    & handleEventHookDynamic <>~ debugHookDyn & startupHook <>~ runInHS (scratchpadsStartupHook myScratchpads)
+    & pointerBindings <>~ myPointerBinds
+    & defaultModMask .~ "mod4"
+    & borderWidth .~ 1
+    & normalBorder .~ parseRgba colBase02
+    & focusedBorder .~ parseRgba colCyan
+    & xkbLayout ?~ myKeyboard
+    & repeatInfo . rate .~ 20
+    & repeatInfo . delay .~ 150
+    & cursorTheme .~ "Vanilla-DMZ"
+    & cursorSize .~ 24
 
 myKeyboard :: XkbRuleNames
 myKeyboard =
@@ -129,23 +123,27 @@ promptLaunchSystemD =
     (mempty @[String])
     RP.++> runWithSystemD def
 
-myKeys :: [(String, SomeAction H)]
-myKeys =
-  -- ====== Core ==========
-  [ ("M-F1", showKeyHelp <?> "Show help")
-  , ("M-q", sendRestart @H <?> "Restart WM")
-  , ("M-Return", spawnProcess @H "kitty" [] <?> "New terminal window")
-  , ("M-Escape", debugAction <?> "Print debug stack")
-  , ("M-Dollar", spawnProcess @H "swaylock" ["-k"] <?> "Lock session")
-  , ("M-Print", spawnProcess @H "sh" ["-c", "grim -g \"$(slurp)\""] <?> "Screenshot")
-  , ("M-S-c", withFocused' @HS manageKill <?> "Close the focused window")
-  , ("M-r M-S-c", withFocused' @H (signalWindowByPID sigKILL) <?> "Signal process (SIGKILL) of focused window")
-  -- "M-S-<Return>"  FloatNext.floatNext True >> spawnTerm def "" ? "Terminal (floating)"
-  -- ("M-F3",  (`whenJust` setKeyboardKeymaps (const True)) =<< asks (xkbLayout . config)),
-  -- ("M-F4",  setKeyboardKeymaps (const True) (keymapFromString "us")),
-  ]
-    ++
-    -- ======== Execute ==========
+myKeys :: Validator () -- [(String, SomeAction H)]
+myKeys = fromList $
+  category "Core"
+    [ ("M-F1", showKeyHelp <?> "Show help")
+    , ("M-q", sendRestart @H <?> "Restart WM")
+    , ("M-Return", spawnProcess @H "kitty" [] <?> "New terminal window")
+    -- XXX Debugging
+    -- , ("Return", spawnProcess @H "kitty" [] <?> "New terminal window")
+    , ("M-Escape", debugAction <?> "Print debug stack")
+    , ("M-Dollar", spawnProcess @H "swaylock" ["-k"] <?> "Lock session")
+    , ("M-Print", spawnProcess @H "sh" ["-c", "grim -g \"$(slurp)\""] <?> "Screenshot")
+    , ("M-S-c", withFocused @H manageKill <?> "Close the focused window")
+    , ("M-r M-S-c", withFocused @H (signalWindowByPID sigKILL) <?> "Signal process (SIGKILL) of focused window")
+    -- "M-S-<Return>"  FloatNext.floatNext True >> spawnTerm def "" ? "Terminal (floating)"
+    -- ("M-F3",  (`whenJust` setKeyboardKeymaps (const True)) =<< asks (xkbLayout . config)),
+    -- ("M-F4",  setKeyboardKeymaps (const True) (keymapFromString "us")),
+    ]
+
+  ++
+
+  category "run/execute"
     -- shell/application runners
     [ ("M-r r", RP.launchRofi_ @H (RP.modePromptWith myRofiBaseConfig "run") <?> "Run shell (prompt)")
     , ("M-r d", RP.launchRofi_ @H (RP.modePromptWith myRofiBaseConfig "drun" & RP.showIcons .~ True) <?> "Run desktop app (prompt)")
@@ -160,8 +158,11 @@ myKeys =
       -- "M-r f" >+ spawnOnceKitty "fself" "bash" ["-lic", "fself"] doCenterFloat
       --   -- spawnDialog ("bash", ["-ic", "fself"]) ? "FZF multi-prompt"
     ]
-    ++
-    -- ===== Screens =====
+
+  ++
+
+  category "Screen"
+  (
     [ ("M-C-Right", CycleWS.nextScreen <?> "Focus previous screen")
     , ("M-C-Left", CycleWS.prevScreen <?> "Focus next screen")
     ]
@@ -169,8 +170,12 @@ myKeys =
     ++ [("M-S-" ++ key, PScreen.sendToScreen def i <?> "Send window to screen " ++ show i) | (key, i) <- screenKeysScreens]
     ++ [("M-M1-" ++ key, sendFocusedWorkspaceToScreen OnScreen.FocusCurrent i <?> "Send workspace to screen " ++ show i) | (key, i) <- screenKeysScreens]
     ++ [("M-C-" ++ key, sendFocusedWorkspaceToScreen OnScreen.FocusNew i <?> "Send workspace to screen and focus it " ++ show i) | (key, i) <- screenKeysScreens]
-    ++
-    -- ===== Workspaces =====
+  )
+
+  ++
+
+  category "Workspaces"
+  (
     -- TODO:
     -- ( "M-g m"    "Shift to tag: "       ?+ (defile . shift) ? "Move window to this tag (XP)"
     -- mod 4  := Ctrl
@@ -187,8 +192,11 @@ myKeys =
     ]
     ++ [("M-semicolon " ++ key, DWO.withNthWorkspace W.view i <?> "View workspace " ++ show i) | (key, i) <- tagKeysTags]
     ++ [("M-S-semicolon " ++ key, DWO.withNthWorkspace W.shift i <?> "Shift to workspace " ++ show i) | (key, i) <- tagKeysTags]
-    ++
-    -- ====== Layout
+  )
+
+  ++
+
+  category "Layout"
     {- TODO: also ToggleScreenSpacing :>> ToggleWindowSpacing -}
     --   "M-b s"       >+ ToggleScreenSpacing :>> ToggleWindowSpacing
     [ ("M-C-space", (view (config . layoutHook) >>= setLayout) <?> "Layout: Reset")
@@ -203,14 +211,18 @@ myKeys =
     , ("M-b b", SendMessage (Toggle NOBORDERS) <?> "Layout")
     , ("M-b m", SendMessage (Toggle MIRROR) <?> "Layout")
     , ("M-b f", SendMessage (Toggle NBFULL) <?> "Layout")
+    , ("M-b M-f", withFocused (doManage WToggleFullscreen) <?> "Fullscreen: focused")
     , ("M-b x", SendMessage (Toggle REFLECTX) <?> "Layout")
     , ("M-b y", SendMessage (Toggle REFLECTY) <?> "Layout")
     , ("M-b M-x", SendMessage NEArea.ToggleNonExclusiveArea :>>: SendMessage (Toggle NOBORDERS) <?> "Layout")
     , ("M-m", withFocused (sendMessage . L.Maximize.maximizeRestore . view riverWindow) <?> "Maximize Restore")
     , ("M-b M-c", cleanupMinimized <?> "Clear boring window cache")
     ]
-    ++
-    -- ======= Layout: BSP
+
+  ++
+
+  category "Layout:BSP"
+    (
     [ ("M-C-y", SendMessage BSP.SelectNode <?> "BSP")
     , ("M-C-p", SendMessage BSP.MoveNode <?> "BSP")
     , ("M-C-u", SendMessage BSP.FocusParent <?> "BSP")
@@ -219,20 +231,23 @@ myKeys =
     , ("M-C-exclam", SendMessage BSP.Balance <?> "BSP")
     ]
     ++ [("M-C-" ++ key, SendMessage (BSP.ExpandTowards dir) <?> "BSP") | (key, dir) <- directions2D]
-    ++
-    -- ====== Window =============
+    )
+
+  ++
+
+  category "Window"
+  (
     [("M-" ++ key, SendMessage (L.WNavigation.Go dir) <?> "Window") | (key, dir) <- zip ["k", "j", "l", "h"] [minBound .. maxBound @Direction2D]]
     ++ [("M-S-" ++ key, SendMessage (L.WNavigation.Swap dir) <?> "Window") | (key, dir) <- zip ["k", "j", "l", "h"] [minBound .. maxBound @Direction2D]]
     ++ [ ("M-exclam", togglePad "tmux-0" <?> "Toggle tmux PAD")
        , ("M-Slash", togglePad "dynamic" <?> "Toggle dynamic PAD")
        , ("M-n", windows W.focusDown <?> "Focus down")
        , ("M-p", windows W.focusUp <?> "Focus up")
-       , ("M-b f", withFocused (doManage WToggleFullscreen) <?> "Fullscreen: focused")
-       , ("M-f s", withFocused (\w -> modifyWindowSet (W.sink w.river_window)) <?> "Sink: focused")
+       , ("M-f s", withFocused @H (\w -> modifyWindowSet (W.sink w.river_window)) <?> "Sink: focused")
        ]
     ++ [
          ( "M-f f"
-         , withFocused
+         , withFocused @H
              ( \w ->
                  modifyWindowSet
                    ( \ws ->
@@ -248,58 +263,60 @@ myKeys =
              <?> "Float (focused)"
          )
        ]
-    ++
-    -- ("M-Tab",  cyclePads <?> "Cycle pads"),
-    -- "M-f "      >>+ directions2D >++> flip SnapMove   Nothing
-    -- "M-f S-"    >>+ directions2D >++> flip SnapGrow   Nothing
-    -- "M-f C-"    >>+ directions2D >++> flip SnapShrink Nothing
-    -- "M-f ,"     >+ RotSlavesDown
-    -- "M-f ."     >+ RotSlavesUp
-    -- "M-f M-,"   >+ RotAllDown
-    -- "M-f M-."   >+ RotAllUp
-    -- "M-f M-m"   >+ FocusMaster
-    -- "M-f M-n"   >+ FocusUp
-    -- "M-f M-p"   >+ FocusDown
-    -- "M-f m"     >+ SwapMaster
-    -- "M-f n"     >+ SwapUp
-    -- "M-f p"     >+ SwapDown
-    -- "M-f u"     >+ FocusUrgent
-    -- "M-f b"     >+ ToggleFocusedWindowBorder
-    -- "M-f c"     >+ CenterWindow
-    -- "M-f S-s"   >+ SinkAll
-    -- "M-f S-f"   >+ ToggleFloatAllNew
-    -- "M-f y"     >+ SwitchLayer
-    -- "M-f h"     >+ pidPrompt xpConfig "SpawnOn/PPID" ?+ (\p -> wsPromptWithCurrent xpConfig "Shift to:" ?+ setManageByPPID p) ? "SpawnOn by Window PID"
-    -- "M-@"       >+ togglePad "taskwarrior-tui"
+  )
+  ++
 
-    -- ====== Media
-    category
-      "Media"
-      [ ("M-plus", adjustVolume "@DEFAULT_SINK@" volAdjAmount <!> 500)
-      , ("M-minus", adjustVolume "@DEFAULT_SINK@" (-volAdjAmount) <!> 500)
-      , ("M-numbersign", togglePad "ncmpcpp" <?> "Toggle ncmpcpp")
-      , ("M-c n", mpc ["next"])
-      , ("M-c p", mpc ["prev"])
-      , ("M-c t", mpc ["toggle"])
-      , ("M-c y", mpc ["single", "once"])
-      , ("M-c r", mpc ["random"])
-      , ("M-c plus", mpc ["volume", "+3"])
-      , ("M-c minus", mpc ["volume", "-3"])
-      , ("XF86AudioPlay", mpc ["toggle"])
-      , ("XF86AudioStop", mpc ["stop"])
-      , ("XF86AudioPrev", mpc ["prev"])
-      , ("XF86AudioNext", mpc ["next"])
-      , ("XF86AudioMute", toggleMute "@DEFAULT_SINK@" def)
-      , ("XF86AudioMicMute", toggleMute "@DEFAULT_SOURCE@" def)
-      , ("XF86AudioRaiseVolume", adjustVolume "@DEFAULT_SINK@" volAdjAmount <!> 500)
-      , ("XF86AudioLowerVolume", adjustVolume "@DEFAULT_SINK@" (-volAdjAmount) <!> 500)
-      , ("XF86MonBrightnessUp", backlight ["set", "2%+"] <!> 500)
-      , ("XF86MonBrightnessDown", backlight ["set", "2%-"] <!> 500)
-      , ("M-c s", spawnProcess @H "sink-switch" [] <?> "Toggle speakers-phones output")
-      , ("M-c m", spawnOnceKitty "pulsemixer@kitty" "pulsemixer" [] (doCenterFloat (1 / 2) (2 / 3)))
-      ]
-    ++
-    -- ===== "Prompts (Execute)"
+  -- ("M-Tab",  cyclePads <?> "Cycle pads"),
+  -- "M-f "      >>+ directions2D >++> flip SnapMove   Nothing
+  -- "M-f S-"    >>+ directions2D >++> flip SnapGrow   Nothing
+  -- "M-f C-"    >>+ directions2D >++> flip SnapShrink Nothing
+  -- "M-f ,"     >+ RotSlavesDown
+  -- "M-f ."     >+ RotSlavesUp
+  -- "M-f M-,"   >+ RotAllDown
+  -- "M-f M-."   >+ RotAllUp
+  -- "M-f M-m"   >+ FocusMaster
+  -- "M-f M-n"   >+ FocusUp
+  -- "M-f M-p"   >+ FocusDown
+  -- "M-f m"     >+ SwapMaster
+  -- "M-f n"     >+ SwapUp
+  -- "M-f p"     >+ SwapDown
+  -- "M-f u"     >+ FocusUrgent
+  -- "M-f b"     >+ ToggleFocusedWindowBorder
+  -- "M-f c"     >+ CenterWindow
+  -- "M-f S-s"   >+ SinkAll
+  -- "M-f S-f"   >+ ToggleFloatAllNew
+  -- "M-f y"     >+ SwitchLayer
+  -- "M-f h"     >+ pidPrompt xpConfig "SpawnOn/PPID" ?+ (\p -> wsPromptWithCurrent xpConfig "Shift to:" ?+ setManageByPPID p) ? "SpawnOn by Window PID"
+  -- "M-@"       >+ togglePad "taskwarrior-tui"
+
+  category "Media"
+    [ ("M-plus", adjustVolume "@DEFAULT_SINK@" volAdjAmount <!> 500)
+    , ("M-minus", adjustVolume "@DEFAULT_SINK@" (-volAdjAmount) <!> 500)
+    , ("M-numbersign", togglePad "ncmpcpp" <?> "Toggle ncmpcpp")
+    , ("M-c n", mpc ["next"])
+    , ("M-c p", mpc ["prev"])
+    , ("M-c t", mpc ["toggle"])
+    , ("M-c y", mpc ["single", "once"])
+    , ("M-c r", mpc ["random"])
+    , ("M-c plus", mpc ["volume", "+3"])
+    , ("M-c minus", mpc ["volume", "-3"])
+    , ("XF86AudioPlay", mpc ["toggle"])
+    , ("XF86AudioStop", mpc ["stop"])
+    , ("XF86AudioPrev", mpc ["prev"])
+    , ("XF86AudioNext", mpc ["next"])
+    , ("XF86AudioMute", toggleMute "@DEFAULT_SINK@" def)
+    , ("XF86AudioMicMute", toggleMute "@DEFAULT_SOURCE@" def)
+    , ("XF86AudioRaiseVolume", adjustVolume "@DEFAULT_SINK@" volAdjAmount <!> 500)
+    , ("XF86AudioLowerVolume", adjustVolume "@DEFAULT_SINK@" (-volAdjAmount) <!> 500)
+    , ("XF86MonBrightnessUp", backlight ["set", "2%+"] <!> 500)
+    , ("XF86MonBrightnessDown", backlight ["set", "2%-"] <!> 500)
+    , ("M-c s", spawnProcess @H "sink-switch" [] <?> "Toggle speakers-phones output")
+    , ("M-c m", spawnOnceKitty "pulsemixer@kitty" "pulsemixer" [] (doCenterFloat (1 / 2) (2 / 3)))
+    ]
+
+  ++
+
+  category "Prompt"
     -- TODO: prompts
     --   "M-r p"   >+ XP.Pass.passPrompt xpConfig          ? "Pass (Prompt)"
     --   "M-r C-p" >+ XP.Pass.passOTPPrompt xpConfig       ? "Pass OTP (Prompt)"
@@ -307,8 +324,7 @@ myKeys =
     --   "M-r q"   >+ XP.QB.qutebrowserP xpConfigNoHist "qutebrowser" ?+ XP.QB.qutebrowser ? "Prompt: qutebrowser"
     --   "M-r s"   >+ inputPromptWithCompl xpConfig "scratchpad" (scratchpadCompl xpConfig myScratchpads) ?+ getAction . togglePad ? "Prompt: pad"
     --   "M-r u"   >+ inputPromptWithHistCompl xpConfig "browser-app" ?+ (\s -> launchDesktopEntry "chrome-app" [s]) ? "Chrome App"
-    [ ("M-r e", environPrompt myRofiBaseConfig <?> "Environment variable prompt")
-    ]
+    [ ("M-r e", environPrompt myRofiBaseConfig <?> "Environment variable prompt") ]
   where
     volAdjAmount = 0.01
     directions2D = map (: []) "kjlh" `zip` [minBound .. maxBound @Direction2D]
@@ -316,7 +332,6 @@ myKeys =
     screenKeys = map (: []) "wvza"
     tagKeysTags = zip tagKeys [(0 :: Int) ..]
     screenKeysScreens = zip screenKeys [(PScreen.P 0) ..]
-
     sendFocusedWorkspaceToScreen focus i =
       PScreen.getScreen def i >>= (`whenJust` (\s -> windows (W.currentTag >>= \x -> OnScreen.onScreen (W.greedyView x) focus s)))
 
@@ -444,7 +459,7 @@ removeFocusedWorkspace = do
 
 bindsPrompt :: H ()
 bindsPrompt = do
-  binds <- view (config . keyBindings)
+  binds <- view (config . keyBindings) <&> KB.flatBindings
   let xs = renderBindings [] binds
       ind = maximum $ xs ^.. traversed . _2 . _1 . to T.length
       input = [P.bold (T.justifyLeft ind ' ' mk) <> "\t" <> P.italic desc <> " " <> P.bold (show cats) | (_, (mk, desc, cats)) <- xs]
@@ -455,12 +470,12 @@ bindsPrompt = do
         [(k, _)] -> runner k
         _ -> return ()
   where
-    renderBindings :: [XBKey] -> [(XBKey, SomeAction H)] -> [(SomeAction H, (Text, String, [String]))]
+    renderBindings :: [XBKey] -> [([XBKey], SomeAction H)] -> [(SomeAction H, (Text, String, [String]))]
     renderBindings pre binds =
-      join
-        [ (a, (T.unwords $ map (ppXBKey @Text) $ pre ++ [xk], actionDescription (Proxy @H) a, actionCategories (Proxy @H) a)) : renderBindings (pre ++ [xk]) (actionSubmap a).submapKeys
-        | (xk, a) <- L.sortOn (ppXBKey @String . fst) binds
+        [ (a, (T.unwords $ map (ppXBKey @Text) $ pre ++ xk, actionDescription (Proxy @H) a, actionCategories (Proxy @H) a))
+        | (xk, a) <- L.sortOn (map (ppXBKey @String) . fst) binds
         ]
+            -- : renderBindings (pre ++ [xk]) (actionSubmap a).submapKeys
 
 -- | XXX: this should be run after window restore
 cleanupMinimized :: H ()

@@ -1,8 +1,11 @@
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE ApplicativeDo #-}
+{-# LANGUAGE ExtendedDefaultRules #-}
+
 
 -- |
 -- Module      : HSWM.Config
--- Description :
+-- Description : User-facing configuration and related types.
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
@@ -18,94 +21,240 @@ import HSWM.Operations
 import HSWM.Util.PangoMarkup qualified as P
 import HSWM.Utils
 
+import HSWM.Types.KeyBindings
+
 import Data.Foldable
 import Data.List qualified as L
 import Data.Text qualified as T
 import Data.Typeable
 import GHC.TypeLits
+import GHC.IsList
 
-infixl 4 <?>
-infixl 4 <!>
-infixl 4 <%>
+infixr 6 :>>:
+infixl 4 <?>, <!>, <@>
+infixl 9 ///
+infixl 1 .@=, .@=>
 
--- * SendMessage
+testBindings :: Validator ()
+testBindings = do
 
+  let val :: SomeAction H
+      val = (return () :: IO ()) <?> "repeated"
+
+  "M-C" .@= (return () :: IO ()) <!> 500 <@> ["Repeat"]
+  "M-C-s" .@= (return () :: H ()) <?> "Custom name"
+  "M-c M-c x" .@= val
+  "M-c M-c y" .@= val
+  "M-c M-c z" .@= val
+  bindGroup "subcategory" $ do
+    "S-3" .@= (pure () :: IO ())
+    "S-4 5" .@= (pure () :: IO ())
+
+  bindGroup "subs1" $
+    "M-S-" /// screenKeys .@=> \i -> (return () :: IO ()) <?> show i <!> 532
+
+  bindGroup "subs5" $
+    "M-C-" /// screenKeys .@=> \i -> (return () :: IO ()) <?> show i
+  "M-c M-y z" .@= val
+  "M-c M-y S-z" .@= val
+  "M-c M-y g" .@= val
+  "M-c M-z" .@= val
+
+    where
+      screenKeys :: [String]
+      screenKeys = map (: []) "wvza"
+
+-- | Wrap a Message as an action for use in keybindings.
 newtype SendMessage a = SendMessage a
 
-instance (Message a, Show a) => IsAction H (SendMessage a) where
-  runner (SendMessage msg) = runInHS (sendMessage msg)
-  actionDescription _ (SendMessage msg) = "Send '" ++ show msg ++ "' (" ++ show (typeOf msg) ++ ")"
-  actionCategories _ _ = ["Message"]
-
--- * NamedAction and descriptions
+-- | Concatenate many messages (or actions, indeed)
+data (:>>:) a b = a :>>: b
+  deriving stock (Eq, Show, Generic)
 
 -- | Add a label to an action
 -- data NamedAction a = NamedAction String a
 newtype (<?>) a (desc :: Symbol) = NamedAction {fromNamedAction :: a}
   deriving stock (Generic)
 
--- | Attach a description to some action: @ restart <?> "Restart" @
-(<?>) :: (IsAction H a) => a -> String -> SomeAction H
-(<?>) = flip named
-
-named :: forall a. (IsAction H a) => String -> a -> SomeAction H
-named str a = withSomeSSymbol str $ \case
-  (ssym :: SSymbol s) -> withKnownSymbol ssym $ SomeAction (NamedAction a :: a <?> s)
-
-instance (KnownSymbol desc, IsAction H a) => IsAction H (a <?> desc) where
-  actionPassthru _ (NamedAction a) = Just $ SomeAction a
-  actionDescription p (NamedAction a) =
-    symbolVal (Proxy @desc)
-      ++ ( let sub = actionDescription p a
-            in if sub /= "" then ": " ++ sub else ""
-         )
-  actionDescriptionFallback p (NamedAction a) =
-    symbolVal (Proxy @desc)
-      ++ ( let sub = actionDescriptionFallback p a
-            in if sub /= "" then ": " ++ sub else ""
-         )
-
--- * Autorepeat
-
 -- | Control key autorepeat
 newtype (<!>) action (repeat :: Nat) = RepeatOnHold {getRepeat :: action}
 
-instance (Typeable a, IsAction H a, KnownNat repeat) => IsAction H (a <!> repeat) where
-  onHoldRepeat _ _ = natVal (Proxy @repeat) > 0
-  actionPassthru _ (RepeatOnHold a) = Just $ SomeAction a
+-- | Categories
+newtype (<@>) a (names :: [Symbol]) = WithCategories {unwrap :: a}
+  deriving (Eq, Show, Generic)
 
+-- * Validator
+
+data Validator a = Validator
+  { keys :: [(String, SomeAction H)]
+  , curval :: a
+  , curmap :: KeyBindings XBKey (SomeAction H)
+  }
+  deriving (Generic)
+
+deriving via (PPGeneric (Validator a)) instance
+  {-# OVERLAPPABLE #-} (Pretty a, Pretty (SomeAction H)
+  ) => Pretty (Validator a)
+
+instance Show a => Show (Validator a) where
+  show Validator{..} = "Keys: " ++ show keys ++ " -> " ++ show curval ++ " map -> " ++ show curmap
+
+instance Semigroup (Validator a) where
+  (<>) = liftA2 undefined
+
+instance Monoid a => Monoid (Validator a) where
+  mempty = Validator [] mempty mempty
+
+instance Functor Validator where
+  fmap f x = x{curval=f x.curval}
+
+instance Applicative Validator where
+  pure x = (mempty::Validator ()){curval=x}
+  liftA2 f v1 v2 = v1
+    { keys = v1.keys <> v2.keys
+    , curval = f v1.curval v2.curval
+    , curmap = v1.curmap <> v2.curmap
+    }
+
+instance Monad (Validator) where
+  v >>= f = let v2 = f v.curval in liftA2 (const id) v v2
+
+validateBindings :: (key ~ XBKey)
+                 => Validator a
+                 -> ModMask -- ^ default mod mask. (@"M"@)
+                 -> KeyBindings key (SomeAction H)
+validateBindings val mm = fold $ map (toKeyBindings mm) val.keys
+
+bindKey :: IsAction H a => String -> a -> Validator ()
+bindKey k v = mempty{keys=[(k, SomeAction v)]}
+
+-- | Create a single (key, action) binding.
+(.@=) :: IsAction H a => String -> a -> Validator ()
+(.@=) = bindKey
+
+-- | Create a series of bindings for a list of subkeys.
+--
+-- @
+-- "Key-prefix-" /// key-list .@=> (\i -> handle i <?> describe i)
+-- @
+(.@=>) :: IsAction H a => [(String, i)] -> (i -> a) -> Validator ()
+xs .@=> f = fold [ bindKey k (f i) | (k, i) <- xs ]
+
+(///) :: String -> [String] -> [(String, Int)]
+x /// xs = zip [ x <> y | y <- xs ] [1..]
+
+-- | Add the mentioned bindings to the mentioned category.
+bindGroup :: forall b. String -> Validator b -> Validator ()
+bindGroup cat (Validator{keys}) =
+  mconcat [ k .@= (v <@> [cat]) | (k, v) <- keys ]
+
+
+instance IsList (Validator ()) where
+  type Item (Validator ()) = (String, SomeAction H)
+  fromList xs = mempty{keys=xs}
+  toList v = v.keys
+
+-- * Functions
+
+-- | Attach a description to some action: @ restart <?> "Restart" @
+(<?>) :: forall a. (IsAction H a) => a -> String -> SomeAction H
+a <?> str = withSomeSSymbol str $ \case
+  (ssym :: SSymbol s) -> withKnownSymbol ssym $ SomeAction (NamedAction a :: a <?> s)
+
+named :: forall a. (IsAction H a) => String -> a -> SomeAction H
+named = flip (<?>)
+
+-- | Autorepeat
 (<!>) :: forall a. (Typeable a, IsAction H a) => a -> Integer -> SomeAction H
 action <!> n = withSomeSNat n $ \case
   Just (snat :: SNat n) -> withKnownNat snat $ SomeAction (RepeatOnHold action :: a <!> n)
   Nothing -> error "invalid SNat"
 
--- * Categories
-
-category :: String -> [(a, SomeAction H)] -> [(a, SomeAction H)]
-category cat = over (each . _2) (<%> [cat])
-
-data WithCategories a = WithCategories [String] a deriving (Eq, Show, Generic)
-
 -- | Add categories to action
-(<%>) :: (Typeable a, IsAction H a) => a -> [String] -> SomeAction H
-action <%> cats = SomeAction $ WithCategories cats action
+(<@>) :: forall a. (Typeable a, IsAction H a) => a -> [String] -> SomeAction H
+action <@> cats =
+  let
+      go :: forall xs. (Typeable xs, SymlistValue xs) => Proxy (xs :: [Symbol]) -> [String] -> SomeAction H
+      go _ (x:xs) = withSomeSSymbol x $ \case
+                  (sy :: SSymbol s) -> withKnownSymbol sy $ go (Proxy :: Proxy (s ': xs)) xs
+      go _ [] = SomeAction (WithCategories action :: a <@> xs)
 
-instance (Typeable a, IsAction H a) => IsAction H (WithCategories a) where
-  actionPassthru _ (_ `WithCategories` a) = Just $ SomeAction a
-  actionSubmap (xs `WithCategories` a) = (actionSubmap a :: Submap (SomeAction H)) <&> (<%> xs)
-  actionCategories p (xs `WithCategories` a) = xs ++ actionCategories p a
+  in
+      go (Proxy @'[]) cats
 
--- * Combine actions
+-- | Add categories to all actions
+category :: String -> [(a, SomeAction H)] -> [(a, SomeAction H)]
+category cat = over (each . _2) (<@> [cat])
 
--- | Concatenate many messages
-data a :>>: b = a :>>: b
-  deriving stock (Eq, Show, Generic)
+-- * Add keys to config
 
-infixr 6 :>>:
+validateAndAddKeys ::  Validator a -> ConfigDoM H
+validateAndAddKeys val c = c & keyBindings .~ validated
+  where validated = validateBindings val (toModMask 0 $ c ^. defaultModMask)
+
+--addKeys :: (IsKeySym k, IsAction m a) => [((ModMask, k), a)] -> ConfigDoM m
+--addKeys keys c =
+--  c
+--    { keyBindings = c.keyBindings <> [(XBKey m (toKeySym k), SomeAction a) | ((m, k), a) <- keys]
+--    }
+
+--addKeys' :: forall m. (m ~ H, Typeable m, MonadIO m) => [(String, SomeAction m)] -> ConfigDoM m
+--addKeys' keys c = c{keyBindings = c.keyBindings <> interpretStringKeys c keys}
+
+-- * Show key help
+
+-- | Top-level bindings.
+showKeyHelp :: H ()
+showKeyHelp = do
+  binds <- view (config . keyBindings)
+  showKeyHelpFor "" binds
+
+showKeyHelpFor :: String -> KeyBindings XBKey (SomeAction H) -> H ()
+showKeyHelpFor lead binds = do
+  let out :: [(Text, String)]
+      out =
+        [ (ppXBKey @Text xk, actionDescription (Proxy @H) a)
+        | (xk, a) <- L.sortOn (ppXBKey @String . fst) $ bindingsToList1 binds
+        ]
+  let indent = maximum $ map (T.length . fst) out
+  let text =
+        P.render $
+          P.monospace $
+            mconcat
+              [ P.text (T.justifyRight indent ' ' mk) <> " " <> P.text a <> "\n"
+              | (mk, a) <- out
+              ]
+
+  void $ notifySend def ("Keys " ++ lead) (Just $ "<span font-size='12pt'>\n" ++ T.unpack text ++ "</span>")
+
+instance (Message a, Show a) => IsAction H (SendMessage a) where
+  runner (SendMessage msg) = runInHS (sendMessage msg)
+  actionDescription _ (SendMessage msg) = "Send '" ++ show msg ++ "' (" ++ show (typeOf msg) ++ ")"
+  actionCategories _ _ = ["Message"]
+
+instance (KnownSymbol desc, IsAction H a) => IsAction H (a <?> desc) where
+  actionPassthru _ (NamedAction a) = Just $ SomeAction a
+  actionDescription p (NamedAction a) = symbolVal (Proxy @desc) ++ ( let sub = actionDescription p a in if sub /= "" then ": " ++ sub else "")
+  actionDescriptionFallback p (NamedAction a) = symbolVal (Proxy @desc) ++ ( let sub = actionDescriptionFallback p a in if sub /= "" then ": " ++ sub else "")
+
+instance (Typeable a, IsAction H a, KnownNat repeat) => IsAction H (a <!> repeat) where
+  onHoldRepeat _ _ = RepeatInfo { rate = fi $ natVal (Proxy @repeat), delay = 400 } -- TODO configurable delay
+  actionPassthru _ (RepeatOnHold a) = Just $ SomeAction a
+
+instance (IsAction f a, SymlistValue xs) => IsAction f (a <@> xs) where
+  actionPassthru _ (WithCategories a) = Just $ SomeAction a
+  actionDescriptionFallback p (WithCategories a) = actionDescriptionFallback p a
+  actionCategories p (WithCategories a) = symlistVal (undefined :: Proxy xs) ++ actionCategories p a
+  actionSubmap (WithCategories a) =
+    let f (SomeAction (x :: b)) = SomeAction (WithCategories x :: b <@> xs)
+        Submap sks sa = actionSubmap @f a
+     in Submap (sks & each . _2 %~ f) (sa & _Just %~ f)
 
 instance (IsAction H a, IsAction H b, Typeable a, Typeable b) => IsAction H (a :>>: b) where
   runner (a :>>: b) = runner a >> runner b
-  onHoldRepeat p (a :>>: b) = onHoldRepeat p a && onHoldRepeat p b
+  onHoldRepeat p (a :>>: b) = let RepeatInfo r1 d1 = onHoldRepeat p a
+                                  RepeatInfo r2 d2 = onHoldRepeat p b
+                               in RepeatInfo (max r1 r2) (max d1 d2)
   actionDescription p (a :>>: b) = L.intercalate " && " $ filter (/= "") [actionDescription p a, actionDescription p b]
   actionDescriptionFallback p (a :>>: b) = L.intercalate " && " $ filter (/= "") [actionDescriptionFallback p a, actionDescriptionFallback p b]
   actionCategories p (a :>>: b) = actionCategories p a ++ actionCategories p b
@@ -118,108 +267,12 @@ instance (IsAction H a, IsAction H b, Typeable a, Typeable b) => IsAction H (a :
       s1 = actionSubmap a
       s2 = actionSubmap b
 
--- * Add keys to config
 
-addKeys :: (IsKeySym k, IsAction m a) => [((ModMask, k), a)] -> ConfigDoM m
-addKeys keys c =
-  c
-    { keyBindings = c.keyBindings <> [(XBKey m (toKeySym k), SomeAction a) | ((m, k), a) <- keys]
-    }
+-- * Extract type-level categories
 
-addKeys' :: forall m. (m ~ H, Typeable m, MonadIO m) => [(String, SomeAction m)] -> ConfigDoM m
-addKeys' keys c = c{keyBindings = c.keyBindings <> interpretStringKeys c keys}
-
--- * Parse ADT
-
-interpretStringKeys :: (a ~ SomeAction m, m ~ H, Foldable t) => HSWMConfig m l -> t (String, a) -> [(XBKey, a)]
-interpretStringKeys c = fromKeyTree . parseSubmaps doMod . toList
-  where
-    doMod = resolveModMask (resolveModMask 0 c.defaultModMask)
-
-data KeyTree k a
-  = KeyAction {_key :: k, _action :: a}
-  | KeySubmap {_key :: k, _submap :: [KeyTree k a]}
-  deriving (Show, Generic)
-
--- | Convert KeyTrees to flat key list.
-fromKeyTree :: forall a. (a ~ SomeAction H) => [KeyTree XBKey a] -> [(XBKey, a)]
-fromKeyTree = map doKey
-  where
-    doKey (KeyAction mk a) = (mk, a)
-    doKey (KeySubmap mk xs) =
-      let helpAction = showKeyHelpFor (ppXBKey mk) skeys <?> ("Submap " <> ppXBKey @String mk)
-          skeys = fromKeyTree xs
-       in (mk, SomeAction $ submap @H @a (Just helpAction) skeys)
-
--- | @submap defaultAction submapKeys@
-submap ::
-  forall m a.
-  (IsAction m a, MonadIO m, a ~ SomeAction m) =>
-  Maybe a
-  -> [(XBKey, a)]
-  -> Submap a
-submap defAct subKeys =
-  Submap
-    { submapKeys = [(mk, SomeAction a) | (mk, a) <- subKeys]
-    , submapDefault = SomeAction <$> defAct
-    }
-
--- | Parse KeyTrees from @(mods-keys-sequence, action)@ pairs.
-parseSubmaps ::
-  forall a.
-  (String -> ModMask)
-  -- ^ Get modifier mask
-  -> [(String, a)]
-  -> [KeyTree XBKey a]
-parseSubmaps getMod ks0 = combine $ do
-  (s, a) <- ks0
-  let ks =
-        [ XBKey (getMod $ L.intercalate "-" (L.init bk)) (toKeySym $ L.last bk)
-        | k <- L.words s
-        , let bk = breakKeys k
-        ]
-  return $ mkKeyTree ks a
-  where
-    combine :: (Eq k) => [KeyTree k a] -> [KeyTree k a]
-    combine xs@(x@KeySubmap{} : _) =
-      let (lhs, rhs) = L.partition (\y -> y._key == x._key) xs
-          smap = combine $ L.concat [sm | KeySubmap _ sm <- lhs]
-       in KeySubmap x._key smap : combine rhs
-    combine (x@KeyAction{} : xs) = x : combine xs
-    combine [] = []
-
-    mkKeyTree :: [k] -> a -> KeyTree k a
-    mkKeyTree [k] a = KeyAction k a
-    mkKeyTree (k : ks) a = KeySubmap k [mkKeyTree ks a]
-    mkKeyTree [] _ = error "mkKeyTree"
-
-    breakKeys :: String -> [String]
-    breakKeys s = case L.span (/= '-') s of
-      ("", _) -> []
-      (k, xs) -> k : breakKeys (drop 1 xs)
-
--- * Show key help
-
--- | Top-level bindings.
-showKeyHelp :: H ()
-showKeyHelp = do
-  binds <- view (config . keyBindings)
-  showKeyHelpFor "" binds
-
-showKeyHelpFor :: String -> [(XBKey, SomeAction H)] -> H ()
-showKeyHelpFor lead binds = do
-  let out :: [(Text, String)]
-      out =
-        [ (ppXBKey @Text xk, actionDescription (Proxy @H) a)
-        | (xk, a) <- L.sortOn (ppXBKey @String . fst) binds
-        ]
-  let indent = maximum $ map (T.length . fst) out
-  let text =
-        P.render $
-          P.monospace $
-            mconcat
-              [ P.text (T.justifyRight indent ' ' mk) <> " " <> P.text a <> "\n"
-              | (mk, a) <- out
-              ]
-
-  void $ notifySend def ("Keys " ++ lead) (Just $ "<span font-size='12pt'>\n" ++ T.unpack text ++ "</span>")
+class SymlistValue (a :: [Symbol]) where
+  symlistVal :: Proxy a -> [String]
+instance (KnownSymbol x, SymlistValue xs) => SymlistValue (x ': xs) where
+  symlistVal _ = symbolVal (Proxy :: Proxy x) : symlistVal (undefined :: Proxy xs)
+instance SymlistValue '[] where
+  symlistVal _ = []

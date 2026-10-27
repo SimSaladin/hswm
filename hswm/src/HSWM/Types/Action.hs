@@ -16,9 +16,12 @@ module HSWM.Types.Action (
   KeySym,
   ModMask,
   XkbRuleNames,
+  RepeatInfo,
 ) where
 
 import HSWM.Types.Lens
+import HSWM.Types.Simple (RepeatInfo(..), HasRepeatInfo(..))
+import HSWM.Util.PP
 
 import River qualified as R
 import Text.XkbCommon
@@ -41,6 +44,9 @@ type Button = Word32
 data XBKey = XBKey {keyModMask :: ModMask, keyKeySym :: KeySym}
   deriving stock (Eq, Ord, Show, Read, Generic, Data)
   deriving anyclass (NFData)
+
+instance Pretty XBKey where
+  pretty xbk = fromString $ ppXBKey xbk
 
 instance ToJSON XBKey where
   toJSON x = A.toJSON (ppXBKey @Text x)
@@ -100,7 +106,7 @@ data XkbBinding' f a = XkbBinding
   { boundAction :: !a
   , boundSubmap :: !(XkbBindingMap' f a)
   , defaultSubmapAction :: !(Maybe a)
-  , autorepeat :: {-# UNPACK #-} !Bool
+  , repeatInfo :: {-# UNPACK #-} !RepeatInfo
   , riverXkbBinding :: {-# UNPACK #-} !R.RiverXkbBinding
   , riverSeat :: {-# UNPACK #-} !R.RiverSeat
   -- ^ Needed to know which seat triggered an action.
@@ -111,7 +117,6 @@ data XkbBinding' f a = XkbBinding
 deriving instance (Eq a, Eq (f (XkbBinding' f a))) => Eq (XkbBinding' f a)
 deriving instance (Show a, Show (f (XkbBinding' f a))) => Show (XkbBinding' f a)
 deriving anyclass instance (NFData a, NFData (f (XkbBinding' f a))) => NFData (XkbBinding' f a)
-deriving instance (Typeable f, Data a, Data (f (XkbBinding' f a))) => Data (XkbBinding' f a)
 
 instance ToJSON (XkbBinding' Both (SomeAction m)) where
   toJSON v =
@@ -119,16 +124,16 @@ instance ToJSON (XkbBinding' Both (SomeAction m)) where
       [ "bound_action" A..= v.boundAction
       , "submap" A..= v.boundSubmap
       , "submap_default_action" A..= v.defaultSubmapAction
-      , "autorepeat" A..= v.autorepeat
+      , "repeat_info" A..= v.repeatInfo
       , "river_seat" A..= v.riverSeat
       ]
   toEncoding v =
     A.pairs $
-      A.pairStr "bound_action" (A.toEncoding v.boundAction)
-        <> A.pairStr "submap" (A.toEncoding v.boundSubmap)
-        <> A.pairStr "submap_default_action" (A.toEncoding v.defaultSubmapAction)
-        <> A.pairStr "autorepeat" (A.toEncoding v.autorepeat)
-        <> A.pairStr "river_seat" (A.toEncoding v.riverSeat)
+      "bound_action" A..?= v.boundAction
+    <> "submap" A..?= v.boundSubmap
+    <> "submap_default_action" A..?= v.defaultSubmapAction
+    <> "repeat_info" A..?= v.repeatInfo
+    <> "river_seat" A..?= v.riverSeat
 
 data PKey = PKey {keyModMask :: !ModMask, keyButton :: !Button}
   deriving stock (Eq, Ord, Show, Read, Generic, Data)
@@ -240,13 +245,13 @@ class (Functor m) => IsAction m a where
   runner = passthruOrDef (error "runner not defined") (const runner) (Proxy @m)
 
   -- | If True, this action should run repeatedly when the trigger is held.
-  onHoldRepeat :: Proxy m -> a -> Bool
-  onHoldRepeat = passthruOrDef False onHoldRepeat
+  onHoldRepeat :: Proxy m -> a -> RepeatInfo
+  onHoldRepeat = passthruOrDef def onHoldRepeat
 
   -- | Action may trigger submap bindings.
   actionSubmap :: a -> Submap (SomeAction m)
   -- actionSubmap _ = def
-  actionSubmap = passthruOrDef def (\_ -> actionSubmap) (Proxy @m)
+  actionSubmap = passthruOrDef def (const actionSubmap) (Proxy @m)
 
   -- | Description based on the value (defaults to type info)
   actionDescription :: Proxy m -> a -> String
@@ -298,11 +303,21 @@ instance Eq (SomeAction m) where
 instance Show (SomeAction m) where
   show (SomeAction v) =
     let p = Proxy @m
-        desc = actionDescription p v
-        repeat = onHoldRepeat p v
+        desc1 = actionDescription p v
+        desc
+          | desc1 == "" = actionDescriptionFallback p v
+          | otherwise = desc1
+        repeat = case onHoldRepeat p v of
+                   x | x == def -> "no"
+                     | otherwise -> "yes [R=" ++ show x.rate ++ ",D=" ++ show x.delay ++ "]"
         cats = actionCategories p v
-        subm = show (actionSubmap v :: Submap (SomeAction m))
-     in "SomeAction{\"" ++ desc ++ "\", repeat: " ++ show repeat ++ ", categories: " ++ show cats ++ ", submap: " ++ subm ++ "}"
+        subm = case (actionSubmap v :: Submap (SomeAction m)) of
+                 sm | sm == def -> ""
+                    | otherwise -> ", submap: " ++ show sm
+     in
+     "Action \"" ++ desc ++ "\"" ++ " repeat:" ++ repeat ++ (" @" ++ show cats) ++ subm
+
+deriving via PPShow (SomeAction m) instance Pretty (SomeAction m)
 
 instance NFData (SomeAction m) where
   rnf (SomeAction a) =
@@ -325,10 +340,11 @@ instance ToJSON (SomeAction m) where
 
 -- * Lenses
 
-makeFieldClassesIfMissing ["boundAction", "riverSeat"]
+makeFieldClassesIfMissing ["boundAction", "riverSeat", "keyBindings"]
+makeLensesCombine' (ignoreFields ["repeatInfo"]) [] [''XkbBinding', ''PointerBinding]
 
-makeLensesWith' classPerField [''PointerBinding]
-makeLensesCombine' id [] [''XkbBinding']
+instance HasRepeatInfo (XkbBinding a) where
+  repeatInfo = lens (.repeatInfo) (\s b -> s{repeatInfo = b} :: XkbBinding a)
 
 instance HasRiverId (XkbBinding a) where
   type RiverId (XkbBinding a) = R.RiverXkbBinding
@@ -338,9 +354,9 @@ instance HasRiverId (PointerBinding a) where
   type RiverId (PointerBinding a) = R.RiverPointerBinding
   riverId = riverPointerBinding
 
--- Data instances
+-- Data instances...
 
---- deriving instance (Data a, Data (StablePtr (XkbBinding a))) => Data (XkbBinding a)
+deriving instance (Typeable f, Data a, Data (f (XkbBinding' f a))) => Data (XkbBinding' f a)
 deriving instance (Data a) => Data (PointerBinding a)
 
 instance (Typeable m) => Data (SomeAction m) where

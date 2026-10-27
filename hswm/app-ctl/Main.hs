@@ -2,7 +2,16 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
-module Main {-(main)-} where
+-- |
+-- Module      : Main
+-- Description : Main file for the hswmctl CLI interface
+-- Copyright   : (c) Samuli Thomasson, 2026
+--
+-- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
+-- Stability   : unstable
+-- Portability : unportable
+--
+module Main (main) where
 
 import Control.Monad.Reader
 import Data.Aeson qualified as A

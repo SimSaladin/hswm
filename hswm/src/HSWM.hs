@@ -1,6 +1,6 @@
 -- |
 -- Module      : HSWM
--- Description : Short description
+-- Description : Public interface of this library / main module to import.
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>

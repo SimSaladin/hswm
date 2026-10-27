@@ -1,5 +1,14 @@
 {-# LANGUAGE PartialTypeSignatures #-}
 
+-- |
+-- Module      : HSWM.XKB
+-- Description : XKB definitions... Refactor, probably.
+-- Copyright   : (c) Samuli Thomasson, 2026
+--
+-- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
+-- Stability   : unstable
+-- Portability : unportable
+--
 -- Might also want one or both of these:
 --
 --    module Text.XkbCommon,
@@ -11,13 +20,8 @@ module HSWM.XKB (
 where
 
 import HSWM.Types.Action
-
 import River qualified as R
-
--- import Text.XkbCommon
--- import Text.XkbCommon.EventCodes
 import WL.Client qualified as WL
-
 import Data.Map qualified as M
 
 -- * KeySym parsing
@@ -30,7 +34,7 @@ createXkbBindings ::
   XkbBindCtx
   -> (a -> Submap a)
   -- ^ 'actionSubmap' - get subkeys + default action
-  -> (a -> Bool)
+  -> (a -> RepeatInfo)
   -- ^ should auto-repeat be enabled?
   -> [(XBKey, a)]
   -> m (XkbBindingMap2 a)
@@ -62,17 +66,17 @@ newXKBBinding ::
   -- ^ Key
   -> action
   -- ^ Action when pressed
-  -> Bool
+  -> RepeatInfo
   -- ^ Auto-repeat on hold?
   -> (XkbBindingMap2 action, Maybe action)
   -- ^ Submap keys + default action
   -> m (XkbBindingPtr' Both action)
-newXKBBinding (xkbBinds, xkb_binding_listener, seat) enable mods keysym action autorepeat_ (subKM, subDef) = do
+newXKBBinding (xkbBinds, xkb_binding_listener, seat) enable mods keysym action rinfo (subKM, subDef) = do
   logInfo $
     "new xkb binding"
       :# [ "key" .= ppXBKey @Text (XBKey mods keysym)
          , "action" .= show action
-         , "autorepeat" .= autorepeat_
+         , "repeat" .= (rinfo /= def)
          , "enabled" .= enable
          , "seat" .= show seat
          ]
@@ -85,7 +89,7 @@ newXKBBinding (xkbBinds, xkb_binding_listener, seat) enable mods keysym action a
           , defaultSubmapAction = subDef
           , riverXkbBinding = xb
           , riverSeat = seat
-          , autorepeat = autorepeat_
+          , repeatInfo = rinfo
           , runningVar = runvar
           }
   dtPtr <- io $ newStablePtr val

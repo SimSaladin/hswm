@@ -5,7 +5,7 @@
 
 -- |
 -- Module      : HSWM.Main
--- Description : Short description
+-- Description : The main loop and entrypoint
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
@@ -30,7 +30,6 @@ import HSWM.Util.Debug qualified as Debug
 import HSWM.Utils
 import HSWM.Wayland
 import HSWM.Windows qualified as Windows
-
 import River qualified as R
 import WL.Client qualified as WL
 import WL.ExtForeignToplevelList.Staging.V1.Client as EXT_FTL
@@ -43,6 +42,7 @@ import WL.Wlr.OutputManagement.Unstable.V1.Client qualified as WLR_OM
 import WL.Wlr.OutputPowerManagement.Unstable.V1.Client qualified as WLR_OPM
 import WL.XdgOutput.Unstable.V1.Client qualified as XO
 
+import Control.Concurrent (threadWaitReadSTM, threadWaitWriteSTM)
 import System.IO (putStrLn)
 import System.Posix qualified as Posix
 
@@ -68,12 +68,19 @@ defaultRegistrySettings = withRunInIO $ \runInIO ->
             _ -> Debug.logEventShow "registry" ev []
       }
 
-hswm :: (m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow)) => HSWMConfig m l -> IO ()
-hswm conf = do
+hswm :: (m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow))
+     => ConfigDoM m -- ^ Post-configuration: use this to configure things that depend on parsing CLI arguments etc.
+     -> HSWMConfig m l -- ^ Initial user configuration
+     -> IO ()
+hswm userConfPost conf = do
   options <- parseMainArgs
   case () of
     _ | options.mainVersion -> putStrLn programVersion
-    _ -> startHSWM options conf
+    _ -> do
+      -- add computed properties to the user config
+      let conf' = maybe id (defaultModMask .~) options.mainOverrideDefaultModMask $ conf
+      -- apply user post-configuration before start
+      startHSWM options $ userConfPost conf'
 
 startHSWM ::
   (m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow)) =>
@@ -125,14 +132,14 @@ startHSWM options config = do
       mkListener $ handleWithHook' @WL.ShellSurfaceEvent
       mkListener $ handleWithHook . XkbConfigEvent
       mkListener $ handleWithHook' @R.RiverXkbKeyboardEvent
-      mkListener $ handleWithHook . XkbEvent
-      mkListener $ handleWithHook . XkbSeatEvent
+      mkListener $ handleWithHook' @R.RiverXkbBindingEvent
+      mkListener $ handleWithHook' @R.RiverXkbBindingsSeatEvent
       mkListener $ handleWithHook . PointerEvent
       mkListener $ handleWithHook' @R.RiverWindowEvent
-      mkListener $ handleWithHook . SeatEvent
+      mkListener $ handleWithHook' @R.RiverSeatEvent
       mkListener $ handleWithHook . OutputEvent
       mkListener $ handleWithHook . LayerShellOutputEvent
-      mkListener $ handleWithHook . LayerShellSeatEvent
+      mkListener $ handleWithHook' @R.RiverLayerShellSeatEvent
       mkListener $ handleWithHook . InputDeviceEvent
       mkListener $ handleWithHook . LibinputConfigEvent
       mkListener $ handleWithHook' @R.RiverLibinputDeviceEvent
@@ -201,56 +208,63 @@ mainLoop :: WL.Display -> Posix.Fd -> H ()
 mainLoop wlDisplay wlPollFd = do
   logDebugNS "main" $ "Main loop is starting" :# ["display-fd" .= show wlPollFd]
   async runStartupHook >>= link
-  main MainPoll
+  mainPoll
   where
     runStartupHook = do
-      logInfoNS "main" "Running user startup hook..."
+      logInfoNS "main" "Running user startup hooks..."
       void . userCode =<< view (config . startupHook)
-
-    main MainPoll = do
-      next <- bracketOnError_
-        -- wl_display_prepare_read() needs to be balanced with either
-        -- wl_display_read_events() or wl_display_cancel_read()
-        --
-        -- if prepare_read() returns non-zero, there are events to be dispatched
-        -- obtain read intent:
-        -- will try wl_display_prepare_read until it succeeds, attempting to dispatch
-        -- pending events until none left.
-        (WL.displayPrepareRead wlDisplay)
-        -- cancel read intent in case of error
-        (WL.displayCancelRead wlDisplay)
-        $ do
-          -- poll
-          -- if == -1, need to poll for writes and try again
-          flushed <- WL.displayFlush wlDisplay
-          let pollfd
-                | flushed == -1 = threadWaitWrite wlPollFd `race_` threadWaitRead wlPollFd
-                | otherwise = threadWaitRead wlPollFd
-          evQ <- view eventQueue
-          incoming <- atomically (readTQueue evQ) `race` io pollfd
-          -- read events - pair to dsplayPrepareRead
-          WL.displayReadEvents wlDisplay
-          return incoming
-      main $ fromLeft MainPoll next
-    main (MainRestart prog) = do
-      logInfoNS "main" $ "Restart/reload request received" :# ["program" .= prog]
-      restart prog
-      logErrorNS "main" "Restart was unsuccessful! Resuming normal operation."
-      main MainPoll
-    main MainSaveToDisk = do
-      runInHS (void $ userCodeS Persist.writeStateToFile)
-      main MainPoll
-    main (MainSignal sig) = mainExit ("Interrupted by signal (" <> tshow sig <> ")") Nothing exitFailure ["signal" .= show sig]
-    main (MainExit desc e) = mainExit (toText desc) (Just e) exitFailure []
-
-    mainExit :: Text -> Maybe SomeException -> H () -> [SeriesElem] -> H ()
-    mainExit msg mbex how meta = do
-      logInfoNS "main" $ ("now exiting: " <> msg) :# meta
-      forM_ mbex $ \e -> logErrorNS "main" $ ("error: " <> tshow e) :# meta
-      logDebugNS "main" "Running exit hook..."
+    runExitHook = do
+      logDebugNS "main" "Running user exit hooks..."
       void . userCode =<< view (config . exitHook)
-      io =<< view _loggerCleanup
-      how
+
+    mainPoll = forever $ do
+      -- * wl_display_prepare_read() needs to be balanced with either
+      --   wl_display_read_events() or wl_display_cancel_read()
+      -- * If prepare_read() returns non-zero, there are events to be dispatched obtain read intent:
+      --   will try wl_display_prepare_read until it succeeds, attempting to dispatch pending events until none left.
+      -- * displayReadEvents: pair to dsplayPrepareRead or displaycancelread if problem !!
+      -- * Cancel read intent in case of error
+      next <- bracketOnError_
+          (WL.displayPrepareRead wlDisplay)
+          (WL.displayCancelRead wlDisplay)
+          $ do next <- mainPollDisplayFdOrEvent
+               WL.displayReadEvents wlDisplay $> next
+      forM_ next $ \case
+        MainSaveToDisk -> mainSaveState
+        MainRestart prog -> mainTryRestart prog
+        MainSignal sig -> mainSignal sig
+        MainExit msg ex -> mainExit (toText msg) ex
+        MainCont -> return ()
+
+    -- displayFlush: if == -1, need to poll for writes and try again
+    -- poll for display fd read/write, or program event
+    mainPollDisplayFdOrEvent = do
+        flush <- WL.displayFlush wlDisplay
+        (poll, cleanup) <- io $ (asum . map fst &&& io . foldMap snd) <$>
+          mapM ($ wlPollFd) (threadWaitReadSTM : [ threadWaitWriteSTM | flush < 0 ])
+        evQ <- view eventQueue
+        res <- atomically $ (poll $> []) `orElse` liftM2 (:) (readTQueue evQ) (flushTQueue evQ)
+        cleanup $> res
+
+    mainSaveState = runInHS (void $ userCodeS Persist.writeStateToFile)
+
+    mainTryRestart prog = do
+        logInfoNS "main" $ "Restart/reload request received" :# ["program" .= prog]
+        restart prog
+        logErrorNS "main" "Restart was unsuccessful! Resuming normal operation."
+
+    mainSignal sig = do
+        logInfoNS "main" $ ("interrupted by signal (" <> tshow sig <> "), exiting...") :# ["signal" .= show sig]
+        runExitHook >> view _loggerCleanup >>= io >> exitFailure
+
+    mainExit msg Nothing = do
+        logInfoNS "main" $ "now exiting... (reason: user request)" :# ["message" .= msg]
+        runExitHook >> view _loggerCleanup >>= io >> exitSuccess
+
+    mainExit msg (Just ex) = do
+        logErrorNS "main" $ "now exiting... (reason: application error)" :# [ "message" .= msg, "error" .= tshow ex ]
+        runExitHook >> view _loggerCleanup >>= io >> exitFailure
+
 
 ---------------------------------------------------
 -- event handling
@@ -258,10 +272,6 @@ mainLoop wlDisplay wlPollFd = do
 instance HandleEvent H Event where
   handleEvent (OutputEvent e) = Outputs.handle e
   handleEvent (LayerShellOutputEvent e) = Outputs.handleLayerShell e
-  handleEvent (SeatEvent e) = Seats.handleEvent e
-  handleEvent (LayerShellSeatEvent e) = Seats.handleLayerShellSeat e
-  handleEvent (XkbEvent e) = Seats.handleXkbBindingEvent e -- XKB Keyboard events
-  handleEvent (XkbSeatEvent e) = Seats.handleXkbBindingsSeatEvent e -- XKB Keyboard events
   handleEvent (PointerEvent e) = Seats.handlePointerEvent e -- Pointer events
   handleEvent (InputManagerEvent e) = InputConfig.handleInputManagerEvent e
   handleEvent (InputDeviceEvent e) = InputConfig.handleInputDeviceEvent e
@@ -271,6 +281,9 @@ instance HandleEvent H Event where
   handleEvent (FTopLevelListEvent (EXT_FTL.ForeignToplevelListToplevel _ _ fh)) = WL.listenerAdd_ fh =<< getObject
   handleEvent (WlrOutputManagerEvent (WLR_OM.OutputManagerHead _ _ head)) = WL.listenerAdd_ head =<< getObject
   handleEvent _ = return ()
+
+instance HandleEvent H R.RiverSeatEvent where
+  handleEvent = Seats.handleEvent
 
 instance HandleEvent H EXT_IN.IdleNotificationEvent where
   handleEvent EXT_IN.IdleNotificationIdled{} = runInHS $ setOutputPower False
@@ -307,10 +320,15 @@ instance HandleEvent H R.RiverWindowManagerEvent where
         mapM_ (io . deRefStablePtr >=> R.riverXkbBindingEnable . (.riverXkbBinding)) (Seats.bindsToList s.xkb_bindings)
     R.RiverWindowManagerFinished _ wm -> do
       R.objectDestroy wm
-      writeMainQ $ MainExit "river_window_manager_v1 finished, exiting." (toException $ ExitFailure 1)
+      writeMainQ $ MainExit "river_window_manager_v1 finished, exiting." (Just $ toException $ ExitFailure 1)
     R.RiverWindowManagerUnavailable _ wm -> do
       R.objectDestroy wm
-      writeMainQ $ MainExit "another window manager already running" (toException $ ExitFailure 1)
+      writeMainQ $ MainExit "another window manager already running" (Just $ toException $ ExitFailure 1)
+
+instance HandleEvent H R.RiverLayerShellSeatEvent where
+  handleEvent = Seats.handleLayerShellSeat
+instance HandleEvent H R.RiverXkbBindingsSeatEvent where
+  handleEvent = Seats.handleXkbBindingsSeatEvent -- XKB Keyboard events
 
 instance HandleEvent H R.RiverLibinputDeviceEvent where
   handleEvent = InputConfig.handleLibinputDeviceEvent

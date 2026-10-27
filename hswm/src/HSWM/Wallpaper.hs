@@ -2,7 +2,7 @@
 
 -- |
 -- Module      : HSWM.Wallpaper
--- Description : Short description
+-- Description : Wallpaper management using JuicyPixels and pixman.
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>

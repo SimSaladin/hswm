@@ -1,6 +1,6 @@
 -- |
 -- Module      : HSWM.Hooks.NonExclusiveArea
--- Description : Short description
+-- Description : Layout modifier for clearing exclusive areas
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>

@@ -22,6 +22,7 @@ import HSWM.Operations
 import HSWM.StackSet qualified as W
 import HSWM.Wayland
 import River qualified as R
+import qualified HSWM.Util.StackSet.Lens as L
 
 import Data.List qualified as L
 import Data.Map qualified as M
@@ -335,7 +336,7 @@ fixedSizeAutoFloat rw minWidth minHeight maxWidth maxHeight = when fixed $
           ( centerRationalRect $
               rationalRectIn
                 (Rectangle' w.position (Size (fi maxWidth) (fi maxHeight)))
-                (screenRect $ W.screenDetail $ W.current ws)
+                (ws ^. L.current . L.screenDetail . rectangle)
           )
           ws
   where

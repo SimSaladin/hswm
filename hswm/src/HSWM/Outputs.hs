@@ -2,14 +2,13 @@
 
 -- |
 -- Module      : HSWM.Outputs
--- Description : Short description
+-- Description : River outputs management home.
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
 --
--- Longer description of this module.
 module HSWM.Outputs where
 
 import HSWM.Core

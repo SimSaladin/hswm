@@ -1,6 +1,6 @@
 -- |
 -- Module      : HSWM.Prompt.Environment
--- Description :
+-- Description : Rofi prompts for fiddling with environment variables.
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
@@ -20,7 +20,18 @@ import Data.List qualified as L
 import Data.Map qualified as M
 import System.Environment qualified as ENV
 
-default (P.Markup)
+-- TODO use this and finish
+data EnvPrompt = EnvPrompt
+  { inputFilter :: String -> Bool
+  , inputCallerEnv :: Bool
+  , inputSystemdUser :: Bool
+  } deriving (Generic)
+
+instance Default EnvPrompt where
+  def = EnvPrompt { inputFilter = const True
+                  , inputCallerEnv = True
+                  , inputSystemdUser = True
+                  }
 
 environPrompt :: RP.RofiPromptConfig () RP.FilterS String -> H ()
 environPrompt pc = do

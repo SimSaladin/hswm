@@ -1,6 +1,6 @@
 -- |
 -- Module      : HSWM.BufferPool
--- Description : Short description
+-- Description : Bufferpool allocation utility
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
