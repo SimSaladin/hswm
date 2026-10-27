@@ -104,6 +104,7 @@ handleWmCtrlAction :: WmCtrlAction -> H (Either Text Response)
 handleWmCtrlAction = \case
   ViewWorkspaceOnScreen{tag, screen = s} -> do
     runInHS . windows $ A.OnScreen.viewOnScreen (toEnum $ fromEnum s) (TS.unpack tag)
+    manageDirty
     return $ Right $ InternalObject $ A.object ["result" .= ("OK" :: Text)]
   x -> return $ Left $ "handleWmCtrlAction: not implemented: " <> tshow x
 

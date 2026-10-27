@@ -29,6 +29,7 @@ aesonOptions =
     { A.omitNothingFields = True
     , A.fieldLabelModifier = A.camelTo2 '_'
     , A.constructorTagModifier = map C.toUpper . A.camelTo2 '_'
+    , A.sumEncoding = A.TaggedObject "__tag" "contents"
     }
 
 -- * Message wrapper
