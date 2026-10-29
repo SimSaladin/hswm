@@ -48,10 +48,6 @@ import WL.Client qualified as WL
 -- Orphan instances
 -- XXX
 
-instance (Typeable a) => Show (MVar a) where
-  show a = "MVar " ++ show (typeOf a)
-instance (Typeable a) => Show (Async a) where
-  show a = "Async " ++ show (typeOf a)
 instance (Typeable a) => Show (StablePtr a) where
   show a = "StablePtr " ++ show (typeOf a)
 
@@ -129,7 +125,7 @@ makeLensesCombine' fRules fieldsIn namesIn = do
       -- [type-name] -- types that get lenses on class-per-type basis
       namesPerTy =
         [ ty
-        | (ty, fs) <- typeFields
+        | (ty, _fs) <- typeFields
         , (nameBase ty & _head %~ toLower) `notElem` map nameBase fieldsWithClass
         -- , any ((`notElem` fields) . nameBase) fs
         -- ^ Note: Without this we still get record classes even if they don't contain any lenses themselves.
@@ -235,8 +231,8 @@ preserveLeading_ :: LensRules -> LensRules
 preserveLeading_ = lensField %~ (\f ty b n -> map (fixit n) (f ty b n)) where
   fixit _ x@(MethodName _ (nameBase -> '_':_)) = x
   fixit _ x@(TopName (nameBase -> '_':_)) = x
-  fixit (nameBase -> '_':n) (MethodName c (nameBase -> m)) = MethodName c $ mkName ('_':m)
-  fixit (nameBase -> '_':n) (TopName (nameBase -> m)) = TopName $ mkName ('_':m)
+  fixit (nameBase -> '_':_n) (MethodName c (nameBase -> m)) = MethodName c $ mkName ('_':m)
+  fixit (nameBase -> '_':_n) (TopName (nameBase -> m)) = TopName $ mkName ('_':m)
   fixit _ x = x
 
 -- | Convert @snake_case_input@ to @snakeCaseInput@

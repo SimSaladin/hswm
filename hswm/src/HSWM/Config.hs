@@ -2,7 +2,6 @@
 {-# LANGUAGE ApplicativeDo #-}
 {-# LANGUAGE ExtendedDefaultRules #-}
 
-
 -- |
 -- Module      : HSWM.Config
 -- Description : User-facing configuration and related types.
@@ -18,9 +17,9 @@ module HSWM.Config (
   -- ** Action parameters
   (<?>), (<!>), (<@>),
   named,
-  type (<!>),
-  type (<@>),
-  type (<?>),
+  type (<!>)(..),
+  type (<@>)(..),
+  type (<?>)(..),
 
   -- * The Validator interface
   Validator,
@@ -32,9 +31,7 @@ module HSWM.Config (
   bindKey,
 
   -- * Misc.
-  category,
   SymlistValue(..),
-
 
   -- * Help
   showKeyHelp,
@@ -83,7 +80,6 @@ newtype (<@>) a (names :: [Symbol]) = (:<@>) a
 data Validator a = Validator
   { keys :: [(String, SomeAction H)]
   , curval :: a
-  , curmap :: KeyBindings XBKey (SomeAction H)
   }
   deriving (Generic)
 
@@ -92,13 +88,16 @@ deriving via (PPGeneric (Validator a)) instance
   ) => Pretty (Validator a)
 
 instance Show a => Show (Validator a) where
-  show Validator{..} = "Keys: " ++ show keys ++ " -> " ++ show curval ++ " map -> " ++ show curmap
+  show Validator{..} = "Keys: " ++ show keys ++ " -> " ++ show curval
 
-instance Semigroup (Validator a) where
-  (<>) = liftA2 undefined
+instance Semigroup a => Semigroup (Validator a) where
+  (<>) v1 v2 = v1
+    { keys = v1.keys <> v2.keys
+    , curval = v1.curval <> v2.curval
+    }
 
 instance Monoid a => Monoid (Validator a) where
-  mempty = Validator [] mempty mempty
+  mempty = Validator [] mempty
 
 instance Functor Validator where
   fmap f x = x{curval=f x.curval}
@@ -108,11 +107,15 @@ instance Applicative Validator where
   liftA2 f v1 v2 = v1
     { keys = v1.keys <> v2.keys
     , curval = f v1.curval v2.curval
-    , curmap = v1.curmap <> v2.curmap
     }
 
 instance Monad Validator where
   v >>= f = let v2 = f v.curval in liftA2 (const id) v v2
+
+instance Monoid a => IsList (Validator a) where
+  type Item (Validator a) = (String, SomeAction H)
+  fromList xs = mempty{keys=xs}
+  toList v = v.keys
 
 validateBindings :: (key ~ XBKey)
                  => Validator a
@@ -147,11 +150,6 @@ group s Validator{keys} = withSomeSSymbol s $ \case
   (ss :: SSymbol s) -> withKnownSymbol ss $ mconcat [ k .@= (v <@> [s]) | (k, v) <- keys ]
 
 
-instance IsList (Validator ()) where
-  type Item (Validator ()) = (String, SomeAction H)
-  fromList xs = mempty{keys=xs}
-  toList v = v.keys
-
 -- * Functions
 
 -- | Attach a description to some action: @ restart <?> "Restart" @
@@ -179,10 +177,6 @@ action <@> cats =
 
   in
       go (Proxy @'[]) cats
-
--- | Add categories to all actions
-category :: String -> [(a, SomeAction H)] -> [(a, SomeAction H)]
-category cat = over (each . _2) (<@> [cat])
 
 -- * Add keys to config
 
@@ -242,7 +236,7 @@ instance (IsAction H a, IsAction H b, Typeable a, Typeable b) => IsAction H (a :
                                in RepeatInfo (max r1 r2) (max d1 d2)
   actionDescription p (a :>>: b) = L.intercalate " && " $ filter (/= "") [actionDescription p a, actionDescription p b]
   actionDescriptionFallback p (a :>>: b) = L.intercalate " && " $ filter (/= "") [actionDescriptionFallback p a, actionDescriptionFallback p b]
-  actionCategories p (a :>>: b) = actionCategories p a ++ actionCategories p b
+  actionCategories p (a :>>: b) = L.nub $ actionCategories p a ++ actionCategories p b
 
 
 -- * Extract type-level categories

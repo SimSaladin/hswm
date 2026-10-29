@@ -21,11 +21,9 @@ import HSWM.Types.Window
 
 import River qualified as R
 import WL.Client qualified as WL
-import WL.ExtIdleNotify.Staging.V1.Client qualified as EXT_IN
+import WL.ExtIdleNotify.Staging.V1.Client qualified as IdleNotify
 
 import Data.Kind
-
-type family Stateful (m :: k) :: k
 
 -- * Seat
 
@@ -34,7 +32,7 @@ data Seat' (m :: Type -> Type) = Seat
   , river_layer_shell_seat :: !R.RiverLayerShellSeat
   , xkb_bindings_seat :: !R.RiverXkbBindingsSeat
   , wl_seat :: !WL.Seat
-  , idleNotification :: !EXT_IN.IdleNotification
+  , idleNotification :: !IdleNotify.IdleNotification
   , caps :: !WL.SeatCapability
   , keyboard :: {-# UNPACK #-} !SeatKeyboardInfo
   -- ^ Keyboard capability
@@ -76,7 +74,7 @@ data Seat' (m :: Type -> Type) = Seat
   deriving stock (Generic)
   deriving anyclass (Default, NFData)
 
-deriving instance (Typeable m, Show (Stateful m Bool)) => Show (Seat' m)
+deriving instance (Typeable m) => Show (Seat' m)
 
 deriving instance
   ( Typeable m
@@ -88,8 +86,7 @@ deriving instance
 
 data SeatKeyboardInfo = SKInfo
   { wl_keyboard :: !WL.Keyboard
-  , rrate :: !Int32
-  , rdelay :: !Int32
+  , repeatInfo :: !RepeatInfo
   }
   deriving stock (Eq, Ord, Show, Read, Generic, Data)
   deriving anyclass (Default, NFData)
@@ -113,7 +110,7 @@ data SeatAction m
   deriving stock (Eq, Generic, Data)
   deriving anyclass (NFData)
 
-deriving instance (Typeable m, Show (Stateful m Bool)) => Show (SeatAction m)
+deriving instance (Typeable m) => Show (SeatAction m)
 
 -- | Move/resize active
 data SeatOperation
@@ -131,7 +128,7 @@ instance Default SeatOperation where def = SEAT_OP_NONE
 
 -- * Lenses
 
-makeLensesCombine' (ignoreFields ["position", "keyBindings"])
+makeLensesCombine' (ignoreFields ["position", "keyBindings", "repeatInfo"])
   ["riverSeat", "keyBindings"] [''Seat', ''SeatKeyboardInfo]
 
 instance HasKeyBindings (Seat' m) (KeyBindings  XBKey (SomeAction m)) where
@@ -147,6 +144,9 @@ instance HasRiverId (Seat' m) where
   type RiverId (Seat' m) = RiverSeat
 
   riverId = riverSeat
+
+instance HasRepeatInfo SeatKeyboardInfo where
+  repeatInfo = lens (.repeatInfo) (\s a -> s { repeatInfo = a } :: SeatKeyboardInfo)
 
 -- aeson
 

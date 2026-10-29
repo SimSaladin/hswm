@@ -80,6 +80,7 @@ import Foreign
 import Foreign.C
 import Foreign.C.ConstPtr
 import System.Posix (Fd, closeFd, fdWrite)
+import GHC.Stack
 
 import Text.XkbCommon.FFI
 import Text.XkbCommon.Internal
@@ -98,7 +99,7 @@ wrapKeymap = fmap XkbKeymap . newForeignPtr _xkbKeymapUnref
 
 -- |
 -- Throws "KeymapCreationFailed" on error.
-createKeymapFromString :: XkbContext -> String -> XkbKeymapFormat -> IO XkbKeymap
+createKeymapFromString :: HasCallStack => XkbContext -> String -> XkbKeymapFormat -> IO XkbKeymap
 createKeymapFromString ctx s fmt =
   withCString s $ \cStr ->
     xkbKeymapNewFromCString (take 42 s) ctx cStr fmt
@@ -106,7 +107,7 @@ createKeymapFromString ctx s fmt =
 -- | Returns A keymap compiled according to the [RMLVO] names.
 --
 -- Throws "KeymapCreationFailed" on error.
-createKeymapFromNames :: XkbContext -> XkbRuleNames -> XkbKeymapFormat -> IO XkbKeymap
+createKeymapFromNames :: HasCallStack => XkbContext -> XkbRuleNames -> XkbKeymapFormat -> IO XkbKeymap
 createKeymapFromNames ctx rns fmt =
   withForeignPtr ctx.unwrap $ \ctxPtr ->
     withXkbRuleNames rns $ \p ->
@@ -115,16 +116,16 @@ createKeymapFromNames ctx rns fmt =
         >>= wrapKeymap
 
 -- | Throws "KeymapCreationFailed" on error.
-createKeymapFromFd :: XkbContext -> Fd -> CSize -> Bool -> XkbKeymapFormat -> IO XkbKeymap
+createKeymapFromFd :: HasCallStack => XkbContext -> Fd -> CSize -> Bool -> XkbKeymapFormat -> IO XkbKeymap
 createKeymapFromFd ctx fd size private fmt =
-  bracket mmap' (\ptr -> munmap ptr size) $ \ptr -> do
+  bracket mmap' (`munmap` size) $ \ptr -> do
     keymap <- xkbKeymapNewFromCString (show fd) ctx (castPtr ptr) fmt
     closeFd fd
     return keymap
   where
     mmap' = mmap nullPtr size protRead (if private then mapPrivate else mapShared) fd 0
 
-xkbKeymapNewFromCString :: String -> XkbContext -> CString -> XkbKeymapFormat -> IO XkbKeymap
+xkbKeymapNewFromCString :: HasCallStack => String -> XkbContext -> CString -> XkbKeymapFormat -> IO XkbKeymap
 xkbKeymapNewFromCString loc ctx s fmt =
   withForeignPtr ctx.unwrap $ \ctxPtr ->
     _xkbKeymapNewFromString ctxPtr s (fromKeymapFormat fmt) 0
@@ -132,7 +133,7 @@ xkbKeymapNewFromCString loc ctx s fmt =
       >>= wrapKeymap
 
 -- | Get the compiled keymap as a string.
-keymapAsString :: XkbKeymap -> XkbKeymapFormat -> IO String
+keymapAsString :: HasCallStack => XkbKeymap -> XkbKeymapFormat -> IO String
 keymapAsString km fmt = bracket get free peekCString
   where
     get =

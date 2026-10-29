@@ -20,6 +20,21 @@ module HSWM.Util.Posix
 
 import System.Posix (Fd(..))
 import qualified System.Posix as P
+import System.IO.Unsafe (unsafePerformIO)
+
+-- | Retrieve description for a signal
+strsignal :: CInt -> IO String
+strsignal sig = c_strsignal sig >>= peekCString
+
+-- | Signal description
+sigabbrev :: CInt -> String
+sigabbrev sig = unsafePerformIO $ c_sigabbrev_np sig >>= peekCString
+
+foreign import ccall unsafe "strsignal"
+  c_strsignal :: CInt -> IO CString
+
+foreign import ccall unsafe "sigabbrev_np"
+  c_sigabbrev_np :: CInt -> IO CString
 
 -- | @memfdCreate name@
 memfdCreate :: String -> IO Fd

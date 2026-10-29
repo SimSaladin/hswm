@@ -34,7 +34,7 @@ import HSWM.Util.PangoMarkup qualified as P
 import System.FilePath (takeDirectory)
 import System.IO (readFile, writeFile)
 
-type MonadRofi env m = (MonadUnliftIO m, MonadReader env m, MonadLogger m, MonadLoggerIO m)
+type MonadRofi env m = (MonadUnliftIO m, MonadReader env m, MonadLogger m, MonadLoggerIO m, MonadMask m)
 
 -- * Configuration
 
@@ -135,7 +135,7 @@ instance ParseRow StrictText where rowFromText = fromContent
 instance ParseRow StrictByteString where rowFromText = fromContent . TE.encodeUtf8
 instance ParseRow LazyByteString where rowFromText = fromContent . LB.fromStrict . TE.encodeUtf8
 instance ParseRow String where rowFromText = fromContent . T.unpack
-instance ParseRow P.Markup where rowFromText = fromContent . P.Raw
+instance ParseRow P.Markup where rowFromText = fromContent . P.raw
 
 -- ** Output format
 
@@ -391,7 +391,7 @@ rofiToProc ::
 rofiToProc pcfg = do
   logger <- askLoggerIO
   return $
-    setStderr (logOutput logger "rofi" ["stream" .= ("stderr" :: String)]) $
+    setStderr (logOutput logger "rofi" LevelWarn ["stream" .= ("stderr" :: String)]) $
       setStdout byteStringOutput $
         setCloseFds True $
           setNewSession True $

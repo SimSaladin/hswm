@@ -14,7 +14,6 @@ module HSWM (
   module HSWM.Main,
   module HSWM.Operations,
   module HSWM.Utils,
-  module HSWM.XKB,
   module HSWM.InputConfig,
   module Text.XkbCommon.EventCodes,
 
@@ -34,6 +33,5 @@ import HSWM.Main
 import HSWM.ManageHook
 import HSWM.Operations
 import HSWM.Utils
-import HSWM.XKB
 import Text.XkbCommon.EventCodes
 import Prelude hiding (setEnv, (^?))

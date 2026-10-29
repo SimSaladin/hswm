@@ -40,7 +40,7 @@ import Data.Map qualified as M
 type Button = Word32
 
 -- | A single key (press) with modifiers.
-data XBKey = XBKey {keyModMask :: ModMask, keyKeySym :: KeySym}
+data XBKey = XBKey {keyModMask :: !ModMask, keyKeySym :: !KeySym}
   deriving stock (Eq, Ord, Show, Read, Generic, Data)
   deriving anyclass (NFData)
 
@@ -96,8 +96,8 @@ instance ToJSON PKey where
 instance A.ToJSONKey PKey where
   toJSONKey = A.ToJSONKeyText ppPKey (A.text . ppPKey)
 
-type PointerBindings a = M.Map PKey (PointerBindingPtr a)
-type PointerBindingPtr a = StablePtr (PointerBinding a)
+type PointerBindings a = M.Map PKey (PointerBinding a)
+
 data PointerBinding a = PointerBinding
   { boundAction :: !a
   , riverPointerBinding :: {-# UNPACK #-} !R.RiverPointerBinding
@@ -105,6 +105,11 @@ data PointerBinding a = PointerBinding
   }
   deriving stock (Eq, Generic)
   deriving anyclass (NFData)
+
+deriving instance Show a => Show (PointerBinding a)
+instance ToJSON a => ToJSON (PointerBinding a) where
+  toJSON = A.genericToJSON aesonOptions
+  toEncoding = A.genericToEncoding aesonOptions
 
 data Submap a = Submap
   { submapKeys :: [(XBKey, a)]

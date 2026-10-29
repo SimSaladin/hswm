@@ -129,13 +129,13 @@ initRegistryState disp registrySettings = liftIO $ do
     registryListener <- createListener $ \ev -> do
       case ev of
         RegistryGlobal{..} -> do
-          modifyIORef globals $ M.insert name $ Global name version interface Nothing
+          atomicModifyIORef globals $ (,()) . M.insert name (Global name version interface Nothing)
           when (interface == objectInterfaceName @Fixes Proxy) $ do
             fixes <- registryBindObject st name version
             putMVar fixesMVar (fixes, version)
           regOnEvent registrySettings ev
         RegistryGlobalRemove{..} -> do
-          modifyIORef globals $ M.delete name
+          atomicModifyIORef globals $ (,()) . M.delete name
           regOnEvent registrySettings ev
           tryReadMVar fixesMVar >>= mapM_ (\(fx, ver) -> when (ver >= 2) (fixesAckGlobalRemove fx registryPtr name))
     listenerAdd_ registryPtr registryListener
@@ -186,7 +186,7 @@ registryBindObject ::
 registryBindObject st name maxVersion = liftIO $ do
   o <- objectBindWrap <$> registryBind st.registryPtr name (objectInterface @a Proxy) limitVer
   ver <- getVersion o
-  modifyIORef st.globals $
+  atomicModifyIORef st.globals $ (,()) .
     let f x = x{proxyObject = Just (SomeObject name ver o)}
      in M.adjust f name
   (regOnBind st.registrySettings) @a Proxy name ver

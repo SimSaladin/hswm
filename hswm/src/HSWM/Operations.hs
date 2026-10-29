@@ -139,15 +139,11 @@ manageDirty = liftH $ do
 
 -- NOTE: these operations can only be executed within an active render phase!
 
--- | Set the focus to the window on top of the stack, or root
+-- | Set the specified window as focus (all seats).
 --
 -- /manage sequence/ focus a window in every seat.
-setTopFocus :: (MonadEffects m, MonadHS m) => m ()
-setTopFocus = withWindowSet $ maybe (pure ()) setTopFocus' . W.peek
-
--- | Set the specified window as focus (all seats).
-setTopFocus' :: (MonadHS m, MonadEffects m) => RiverWindow -> m ()
-setTopFocus' rw = mapSeats $ \s -> do
+setTopFocus :: (MonadHS m, MonadEffects m) => RiverWindow -> m ()
+setTopFocus rw = mapSeats $ \s -> do
   when (s.focused /= rw) $ do
     withWindow_ rw $ \w -> do
       -- logDebug $ "seat: focus window" :# [ "window" .= show rw, "seat" .= s.name ]
@@ -160,7 +156,7 @@ setTopFocus' rw = mapSeats $ \s -> do
             px = x' + (fi w.size.width `div` 2)
             py = y' + (fi w.size.height `div` 2)
         -- logDebug $ "seat: pointer warp" :# [ "dest" .= (px, py), "seat" .= s.name, "window" .= show w.river_window ]
-        io $ R.riverSeatPointerWarp s.river_seat px py
+        R.riverSeatPointerWarp s.river_seat px py
 
 -- | See "GrabKeyboard" for reasoning why these exist.
 seatDisableBindingsMatching :: (SomeSeat a, GetHState m, MonadEffects m) => a -> [ModMask] -> [KeySym] -> m ()
@@ -417,13 +413,20 @@ restart prog0 = findExecutable prog0 >>= maybe notFound restart'
       logInfo "Running exit hooks..."
       void . userCode =<< asks (view $ config . exitHook)
       statefile <- runInHS Persist.writeStateToFile
-      let args = ["--state-file", statefile]
+      curArgs <- getArgs
+      let args = filterArgs curArgs ++ ["--state-file", statefile]
       logInfo $ "Now restarting! Executing file " <> toText prog <> "..." :# ["args" .= args]
       io =<< view _loggerCleanup
       res <- io $ try $ executeFile prog True args Nothing
       logError $
         "Uh-oh, executing the new program appears to have failed!"
           :# ["reason" .= show e | Left (e :: IOException) <- [res]]
+
+    filterArgs ("--state-file":_:xs) = filterArgs xs
+    filterArgs (x:xs)
+      | "--state-file=" `L.isPrefixOf` x = filterArgs xs
+      | otherwise = x : filterArgs xs
+    filterArgs [] = []
 
 -- | Trigger restart by signal (USR2).
 sendRestart :: (MonadIO m) => m ()

@@ -51,7 +51,7 @@ data ServerConfig = ServerConfig
 instance Default ServerConfig where
   def = ServerConfig Nothing 8 defaultWorkspacesInfo defaultRequestHandler
 
-defaultRequestHandler :: Request -> H (Either Text Response)
+defaultRequestHandler :: HasCallStack => Request -> H (Either Text Response)
 defaultRequestHandler = \case
   ListWindows{} -> getHState <&> Right . InternalObject . toJSON . (^.. _windows . traversed)
   -- hide key bindings by default (lots of noise)
@@ -100,7 +100,7 @@ defaultRequestHandler = \case
     logWarn $ "Unhandled message" :# ["message" .= r]
     return $ Left "no handler"
 
-handleWmCtrlAction :: WmCtrlAction -> H (Either Text Response)
+handleWmCtrlAction :: HasCallStack => WmCtrlAction -> H (Either Text Response)
 handleWmCtrlAction = \case
   ViewWorkspaceOnScreen{tag, screen = s} -> do
     runInHS . windows $ A.OnScreen.viewOnScreen (toEnum $ fromEnum s) (TS.unpack tag)
@@ -139,7 +139,7 @@ serverStartupHook :: (HasCallStack) => ServerConfig -> H ()
 serverStartupHook conf = do
   stateRef <- getOrCreateObject (newIORef (def :: ConnectedPeers))
   serverThread <- async $ serverRun conf stateRef
-  modifyIORef stateRef $ \st -> st{serverThread = Just serverThread}
+  atomicModifyIORef stateRef $ \st -> (st{serverThread = Just serverThread}, ())
 
 ipcLogHook :: (HasCallStack) => ServerConfig -> H ()
 ipcLogHook conf = withObject $ \(sRef :: IORef ConnectedPeers) -> do
@@ -208,10 +208,10 @@ serverRun conf stateRef = withThreadContext ["component" .= ("ipc-server" :: Str
           withThreadContext ctx $
             connWorker conf connSocket connSendQ `finally` cleanup peerId connSocket
       let c = Connection{..}
-      modifyIORef stateRef $ \s -> s{connected = M.insert peerId c s.connected}
+      atomicModifyIORef stateRef $ \s -> (s{connected = M.insert peerId c s.connected}, ())
 
     cleanup peerId conn = do
-      modifyIORef stateRef $ \s -> s{connected = M.delete peerId s.connected}
+      atomicModifyIORef stateRef $ \s -> (s{connected = M.delete peerId s.connected}, ())
       logInfo "Client connection closed"
       io $ gracefulClose conn 5000
 

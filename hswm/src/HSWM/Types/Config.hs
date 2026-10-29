@@ -29,7 +29,7 @@ import GHC.Generics qualified as Generics
 -- | Composable config modification.
 type ConfigDoM m = forall l. HSWMConfig m l -> HSWMConfig m l
 
-type family ManageHook' (m :: k2) :: Type
+type family ManageHook' (m :: k) :: Type
 
 -- * User configuration
 

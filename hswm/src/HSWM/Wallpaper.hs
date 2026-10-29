@@ -13,7 +13,7 @@ module HSWM.Wallpaper (
   usingWallpaper,
   wpStartupHook,
   wpExitHook,
-  wpHandleEventHook,
+  --wpHandleEventHook,
   WallpaperContext (..),
 )
 where
@@ -45,7 +45,6 @@ usingWallpaper cfg userConf =
     { startupHook = userConf.startupHook <> wpStartupHook cfg
     , exitHook = userConf.exitHook <> wpExitHook
     , renderHook = userConf.renderHook <> render
-    , handleEventHook = userConf.handleEventHook <> wpHandleEventHook
     , handleEventHookDynamic = userConf.handleEventHookDynamic <> wpHandleEventHookDyn
     }
 
@@ -65,7 +64,7 @@ instance Inspect WallpaperContext
 instance Inspect OutputState
 instance Inspect Surfaces
 instance Inspect (JP.Image JP.PixelRGBA8) where
-  inspect _ = "<Image>"
+  inspectPrec _ _ = "<Image>"
 
 data OutputState = OutputState
   { out_x
@@ -117,6 +116,23 @@ wpHandleEventHookDyn ev
   | Just R.RiverWindowManagerOutput{} <- fromDynamic ev = do
       modifyObjectDef $ \c -> c{bufferPool = fmap (BP.incSurfaceCount 1) (bufferPool c)}
       mempty
+  | Just (oev :: R.RiverOutputEvent) <- fromDynamic ev = do
+      case oev of
+        (R.RiverOutputDimensions _ ro w h) -> do
+          updateOutputState ro $ \a -> a{pending_render = True, out_width = fi w, out_height = fi h}
+          mempty
+        (R.RiverOutputPosition _ ro x y) -> do
+          updateOutputState ro $ \a -> a{pending_render = True, out_x = fi x, out_y = fi y}
+          mempty
+        (R.RiverOutputRemoved _ ro) -> do
+          withOutputState ro deinitOutput
+          modifyObjectDef $ \c ->
+            c
+              { bufferPool = fmap (BP.incSurfaceCount (-1)) (bufferPool c)
+              , outputsState = M.delete ro c.outputsState
+              }
+          mempty
+        _ -> mempty
   | Just (oev :: WL.OutputEvent) <- fromDynamic ev = do
       case oev of
         WL.OutputScale ro _ scale -> do
@@ -131,23 +147,6 @@ wpHandleEventHookDyn ev
         _ -> return ()
       mempty
   | otherwise = mempty
-
-wpHandleEventHook :: Event -> H All
-wpHandleEventHook (OutputEvent (R.RiverOutputDimensions _ ro w h)) = do
-  updateOutputState ro $ \a -> a{pending_render = True, out_width = fi w, out_height = fi h}
-  mempty
-wpHandleEventHook (OutputEvent (R.RiverOutputPosition _ ro x y)) = do
-  updateOutputState ro $ \a -> a{pending_render = True, out_x = fi x, out_y = fi y}
-  mempty
-wpHandleEventHook (OutputEvent (R.RiverOutputRemoved _ ro)) = do
-  withOutputState ro deinitOutput
-  modifyObjectDef $ \c ->
-    c
-      { bufferPool = fmap (BP.incSurfaceCount (-1)) (bufferPool c)
-      , outputsState = M.delete ro c.outputsState
-      }
-  mempty
-wpHandleEventHook _ = mempty
 
 -- ** Loading image files
 
@@ -180,7 +179,6 @@ render = do
 
 drawImage :: BP.ImageBufferPool -> OutputState -> JP.Image JP.PixelRGBA8 -> Surfaces -> H ()
 drawImage bp OutputState{..} img Surfaces{..} = do
-  logDebugNS "wallpaper" $ "render: now drawing"
   let w = out_width
       h = out_height
       src_w = JP.imageWidth img

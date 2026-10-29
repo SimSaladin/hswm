@@ -25,32 +25,9 @@ import WL.ExtIdleNotify.Staging.V1.Client qualified as EXT_IN
 import Data.List qualified as L
 import Data.Map qualified as M
 import qualified Data.Set as Set
-import Data.Kind
-import GHC.Records
---import HSWM.Util.PP
---import qualified Prettyprinter.Combinators as PP
 
-
-type family UserDataFormat (m :: Type -> Type) object
-
-class MonadIO m => DecodeUserData m object decoded | m object -> decoded where
-
-  -- | Dereference the opaque pointer to expected data type.
-  unrefUserData :: WL.ObjectListenerEvent object -> m decoded
-  --unrefUserData = io . WL.fromUserData . getField @"userdata"
-
-  -- | Creates a new pointer that's suitable to be used as userdata in wayland protocols with the given content.
-  refUserData :: Proxy object -> decoded -> m (Ptr Void)
-
-  -- addGlobalListener
--- instance DecodeUserData H R.RiverXkbBinding where
--- Pointer: old: (PointerBinding (SomeAction H))
---Keyboard:  (XkbBinding' Both (SomeAction H))
-
--- OLD
---type instance UserDataFormat H R.RiverXkbBinding = StablePtr (XkbBinding' Both (SomeAction H))
--- NEW
-type instance UserDataFormat H R.RiverXkbBinding = {- StablePtr-} (BoundKeyInfo (SomeAction H))
+instance TypedUserData H R.RiverXkbBinding where
+  type UserDataType H R.RiverXkbBinding = BoundKeyInfo (SomeAction H)
 
 -- | Separate data type for state data that's not serializable or Showable.
 newtype InternalSeatState = InternalSeatState
@@ -60,32 +37,12 @@ instance Show InternalSeatState where show _ = "<InternalSeatState>"
 
 type InternalSeatStateStore = M.Map RiverSeat InternalSeatState
 
--- | Create an event handler that automatically extracts the userdata pointer
--- and dereferences it for use in the handler.
-decodeUserDataHandler
-  :: forall object decoded.
-    (decoded ~ UserDataFormat H object,
-    --WL.IsUserData decoded,
-    HasField "userdata" (WL.ObjectListenerEvent object) (Ptr Void)
-    )
-  => (UserDataFormat H object -> WL.ObjectListenerEvent object -> H ())
-  -> WL.ObjectListenerEvent object
-  -> H ()
-decodeUserDataHandler f e = do
-  let udPtr = getField @"userdata" e
-  dec <- io $ deRefStablePtr . castPtrToStablePtr . castPtr $ udPtr
-  f dec e
-
 -- | Handle key bind events.
 instance HandleEvent H R.RiverXkbBindingEvent where
-  handleEvent =
-    decodeUserDataHandler $ \bkey ev -> do
-        --logDebugNS "xkb" $ "key event" :# [ "data" .=  PP.render (pretty bkey)]
-        --handleXkbBindingEvent bkey $ \case
-        case ev of
-            R.RiverXkbBindingPressed _ _ -> runBoundKeyBinding bkey
-            R.RiverXkbBindingReleased _ _ -> cancelRepeat bkey
-            R.RiverXkbBindingStopRepeat _ _ -> cancelRepeat bkey
+  handleEvent = eventHandlerWithTypedUserData $ \bkey -> \case
+    R.RiverXkbBindingPressed _ _ -> runBoundKeyBinding bkey
+    R.RiverXkbBindingReleased _ _ -> cancelRepeat bkey
+    R.RiverXkbBindingStopRepeat _ _ -> cancelRepeat bkey
 
 mapInternalSeatDatas :: (MonadReader s m, HasGlobalTMap s, MonadEffectsIO m) => (RiverSeat -> InternalSeatState -> m b) -> m ()
 mapInternalSeatDatas f = withObjectDef @InternalSeatStateStore $ mapM_ (uncurry f) . M.toList
@@ -117,7 +74,7 @@ handleEvent = \case
 instance HandleEvent H WL.KeyboardEvent where
   handleEvent = \case
     WL.KeyboardRepeatInfo ud _kbd r d ->
-      modifySeat' ud $ keyboard . rrate .~ r &+ keyboard . rdelay .~ d
+      modifySeat' ud $ keyboard . repeatInfo . rate .~ r &+ keyboard . repeatInfo . delay .~ d
     _ -> pure ()
 
 handleWlSeatEvent :: (HandleEvent H WL.TouchEvent, HandleEvent H WL.PointerEvent) => WL.SeatEvent -> H ()
@@ -182,7 +139,6 @@ handleXkbBindingsSeatEvent = \case
          updateActiveBindings s
 
   R.RiverXkbBindingsSeatModifiersUpdate{} -> return () -- TODO take advantage of this event
-
 
 -- | Calculate the necessary changes to which binds will be disabled and which enabled on the account of active
 -- submaps.
@@ -381,7 +337,7 @@ deleteRemovedSeat :: Seat -> HS ()
 deleteRemovedSeat s = do
   seatList %= L.filter ((/= s.river_seat) . view riverSeat)
   forM_ (s ^.. keyBindingsState . riverBoundKeys . each) WL.objectDestroy
-  forM_ s.pointer_bindings destroyPointerBinding
+  forM_ (s ^.. pointerBindings . each . riverPointerBinding) WL.objectDestroy
   R.objectDestroy s.xkb_bindings_seat
   R.objectDestroy s.river_layer_shell_seat
   R.objectDestroy s.idleNotification
@@ -390,6 +346,8 @@ deleteRemovedSeat s = do
   R.objectDestroy s.wlTouch
   R.objectDestroy s.wl_seat
   R.objectDestroy s.river_seat
+  let CleanupTasks task = s ^. cleanupTasks
+   in io task
 
 -- * Seat management
 
@@ -460,19 +418,42 @@ createSeatPointerBindings :: (HandleEvent H R.RiverXkbBindingEvent) => RiverSeat
 createSeatPointerBindings rs = do
   -- pointer bindings
   pbListen <- getObject
-  let resolvePointerBinds mdef xs = do
-          r <- forM xs $ \((m, k), a) -> do
-            let mods = resolveModMask mdef m
-            (PKey mods k,) <$> newPointerBinding pbListen rs mods k a
-          return $ M.fromList r
   myMod <- view (config . defaultModMask) <&> resolveModMask 0
-  pPtrs <- view (config . pointerBindings) >>= resolvePointerBinds myMod
+  let resolvePointerBinds xs = do
+          r <- forM xs $ \((m, k), a) -> do
+            let mods = resolveModMask myMod m
+            (pb, c) <- newPointerBinding pbListen rs mods k a
+            return ((PKey mods k, pb), c)
+          return (M.fromList (map fst r), mconcat (map snd r))
+  (pPtrs, cleanupBinds) <- view (config . pointerBindings) >>= resolvePointerBinds
   modifySeat rs $ \s -> s & pointerBindings <>~ pPtrs
+    & cleanupTasks <>~ cleanupBinds
+
+newPointerBinding ::
+  (MonadLogger m, MonadIO m, Show a, Typeable a) =>
+  ConstPtr (WL.ObjectListener R.RiverPointerBinding)
+  -> R.RiverSeat
+  -> ModMask
+  -> Button
+  -> a
+  -> m (PointerBinding a, CleanupTasks)
+newPointerBinding pointerBindingListener seat mods btn action = do
+  let pk = PKey mods btn
+  logInfo $ "new pointer binding" :# ["key" .= ppPKey @Text pk, "action" .= show action]
+  pb' <- R.riverSeatGetPointerBinding seat (fi btn) (R.toCEnum $ fi mods)
+  let dt =
+        PointerBinding
+          { riverPointerBinding = pb'
+          , riverSeat = seat
+          , boundAction = action
+          }
+  dtPtr <- io $ newStablePtr dt
+  WL.listenerAdd pb' pointerBindingListener dtPtr
+  _ <- R.riverPointerBindingEnable pb'
+  return (dt, CleanupTasks $ freeStablePtr dtPtr)
 
 keyBindingsInit :: (HandleEvent H R.RiverXkbBindingEvent) => RiverSeat -> HS ()
 keyBindingsInit rs = do
-  logInfo "NEW key bindings init in progress!"
-
   keyBinds <- view (config . keyBindings)
   logDebug $ "Setting keybindings" :# [ "bindings" .= keyBinds ]
   let getLeafBinds km =
@@ -556,7 +537,7 @@ withSeat' ss f = withSeat_ ss $ \s ->
 -- @
 bindingStartAction :: R.RiverXkbBinding -> RepeatInfo -> IORef (Async ()) -> MVar (Async ()) -> SomeAction H -> H ()
 bindingStartAction xkbBind rinfo rref runVar action = do
-  cancelRepeat () -- TODO
+  cancelRepeat xkbBind
   execute
   when (def /= rinfo) $ do
     let RepeatInfo{rate = rr,delay = rd} = rinfo
@@ -590,12 +571,8 @@ checkRun xkbBind runVar =
     Nothing ->
       return False
 
--- XXX: this should be one per Seat!
 cancelRepeat :: xb -> H ()
-cancelRepeat _ = do
-  -- Handle the global repeat worker
-  cancelIt =<< view repeatWorker
-  mapInternalSeatDatas $ \_ st -> cancelIt st.seatBindingsRepeatWorker
+cancelRepeat _ = mapInternalSeatDatas $ \_ st -> cancelIt st.seatBindingsRepeatWorker
     where
       cancelIt ref = do
         as <- readIORef ref

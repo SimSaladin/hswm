@@ -12,7 +12,6 @@ module HSWM.Core (
   module HSWM.Types.Events,
   module HSWM.Types.WM,
   module HSWM.Types.TypeMap,
-  module HSWM.XKB,
   R.RiverColor (..),
 )
 where
@@ -21,7 +20,6 @@ import HSWM.Types.Config
 import HSWM.Types.Events
 import HSWM.Types.TypeMap
 import HSWM.Types.WM
-import HSWM.XKB
 
 import Control.Monad.State
 import GHC.Stack
@@ -52,7 +50,7 @@ catchH job errcase = do
   c <- ask
   io (runH c job)
     `catch` \e -> case fromException e of
-      Just (_ :: ExitCode) -> throwM e
+      Just (_ :: ExitCode) -> throwIO e
       _ -> do
         logError $ "exception in H action" :# ["exception" .= show e, "callStack" .= prettyCallStack callStack]
         errcase
@@ -65,7 +63,7 @@ catchHS job errcase = do
     io $
       runHS c s job
         `catch` \e -> case fromException e of
-          Just (_ :: ExitCode) -> throwM e
+          Just (_ :: ExitCode) -> throwIO e
           _ -> do
             runH c $ logError $ "exception in HS action" :# ["exception" .= show e, "callStack" .= prettyCallStack callStack]
             runHS c s errcase
@@ -74,21 +72,21 @@ catchHS job errcase = do
 
 -- a la xmonad
 userCode :: (HasCallStack) => H a -> H (Maybe a)
-userCode a = catchH (Just <$> a) (return Nothing)
+userCode a = withFrozenCallStack catchH (Just <$> a) (return Nothing)
 
 -- a la xmonad
 userCodeS :: (HasCallStack) => HS a -> HS (Maybe a)
-userCodeS a = catchHS (Just <$> a) (return Nothing)
+userCodeS a = withFrozenCallStack catchHS (Just <$> a) (return Nothing)
 
 -- | Same as userCode but with a default argument to return instead of using
 -- Maybe, provided for convenience.
 userCodeDef :: (HasCallStack) => a -> H a -> H a
-userCodeDef defValue a = fromMaybe defValue <$> userCode a
+userCodeDef defValue a = fromMaybe defValue <$> withFrozenCallStack userCode a
 
 -- | Same as userCode but with a default argument to return instead of using
 -- Maybe, provided for convenience.
 userCodeDefS :: (HasCallStack) => a -> HS a -> HS a
-userCodeDefS defValue a = fromMaybe defValue <$> userCodeS a
+userCodeDefS defValue a = fromMaybe defValue <$> withFrozenCallStack userCodeS a
 
 -----------------------------------------------------------
 
@@ -114,12 +112,12 @@ writeMainQ ev = do
 
 -- | Runs handleEventHook from the configuration and runs the default handler
 -- function if it returned True.
-handleWithHook :: (HandleEvent m ev, m ~ H, ev ~ Event) => ev -> m ()
+handleWithHook :: (HasCallStack, HandleEvent m ev, m ~ H, ev ~ Event) => ev -> m ()
 handleWithHook e = do
   evHook <- view (config . handleEventHook)
   whenM (userCodeDef True $ getAll `fmap` evHook e) (handleEvent e)
 
-handleWithHook' :: forall ev. (Typeable ev, HandleEvent H ev) => ev -> H ()
+handleWithHook' :: forall ev. (HasCallStack, Typeable ev, HandleEvent H ev) => ev -> H ()
 handleWithHook' ev = do
   hook <- view (config . handleEventHookDynamic)
   whenM (userCodeDef True $ getAll <$> hook (toDyn ev)) (handleEvent ev)

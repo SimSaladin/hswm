@@ -8,7 +8,7 @@
 -- Portability : unportable
 module WL.Internals.Utils where
 
-import Control.Exception
+import UnliftIO.Exception
 import Control.Monad
 import Data.Char (isSpace)
 import Data.Functor

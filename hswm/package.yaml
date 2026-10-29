@@ -113,6 +113,7 @@ __:
   - &dep-random random
   - &dep-aeson-pretty aeson-pretty
   - &dep-text-short text-short
+  - &dep-safe-exceptions safe-exceptions
 
   # Packages from here
   - &dep-hswm-bindings               hswm-bindings
@@ -191,13 +192,15 @@ internal-libraries:
       - *dep-async
       - *dep-exceptions
       - *dep-rio
-      # - *dep-unliftio-core
+      - *dep-unliftio-core
       - *dep-unliftio
       - *dep-monad-logger-aeson
       - *dep-microlens-platform
       - *dep-microlens
       - *dep-bytestring
       - *dep-text-short
+      - *dep-safe-exceptions
+      - unix
 
   ipc-api:
     visibility: public

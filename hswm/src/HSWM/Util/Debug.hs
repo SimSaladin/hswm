@@ -23,13 +23,14 @@ import WL.Wlr.OutputManagement.Unstable.V1.Client qualified as WlrOM
 import Prettyprinter.Show qualified as PP
 import River qualified as R
 import WL.Client qualified as WL
+import qualified Data.Text as T
 
 debugHookDyn :: Dynamic -> H All
 debugHookDyn dyn
   | Just R.RiverWindowManagerManageStart{} <- ev = mempty
   | Just R.RiverWindowManagerRenderStart{} <- ev = mempty
-  | Just (e :: R.RiverWindowManagerEvent) <- ev = logEventShow src e []
-  | Just (e :: R.RiverXkbKeyboardEvent) <- ev = logEventShow src e []
+  | Just (e :: R.RiverWindowManagerEvent) <- ev = logEventPretty src e []
+  | Just (e :: R.RiverXkbKeyboardEvent) <- ev = logEventPretty src e []
   | Just (_ :: R.RiverXkbBindingEvent) <- ev = mempty
   | Just R.RiverSeatPointerPosition{} <- ev = mempty
   | Just R.RiverSeatPointerEnter{} <- ev = mempty
@@ -37,14 +38,14 @@ debugHookDyn dyn
   | Just R.RiverSeatOpDelta{} <- ev = mempty
   | Just R.RiverSeatWindowInteraction{} <- ev = mempty
   | Just R.RiverXkbBindingsSeatModifiersUpdate{} <- ev = mempty
-  | Just (e :: R.RiverSeatEvent) <- ev = logEventShow src e []
-  | Just (e :: R.RiverOutputEvent) <- ev = logEventShow src e []
+  | Just (e :: R.RiverSeatEvent) <- ev = logEventPretty src e []
+  | Just (e :: R.RiverOutputEvent) <- ev = logEventPretty src e []
   | Just R.RiverWindowDimensions{} <- ev = mempty
   | Just R.RiverWindowTitle{} <- ev = mempty
-  | Just (e :: R.RiverWindowEvent) <- ev = logEventShow src e []
-  | Just (e :: WL.OutputEvent) <- ev = logEventShow src e []
+  | Just (e :: R.RiverWindowEvent) <- ev = logEventPretty src e []
+  | Just (e :: WL.OutputEvent) <- ev = logEventPretty src e []
   | Just (WL.ShmFormat _ _ fmt) <- ev = logInfoNS src (fromString ("SHM FORMAT: " <> ppShmFormat fmt)) >> mempty
-  | Just (e :: WL.SeatEvent) <- ev = logEventShow src e []
+  | Just (e :: WL.SeatEvent) <- ev = logEventPretty src e []
   | Just (_ :: WlrOM.OutputHeadEvent) <- ev = mempty
   | Just (_ :: R.RiverInputDeviceEvent) <- ev = mempty
   | Just (_ :: R.RiverLibinputDeviceEvent) <- ev = mempty
@@ -58,10 +59,7 @@ debugHookDyn dyn
 
 debugHook :: Event -> H All
 debugHook ev
-  | OutputEvent e <- ev = logEventShow src e []
-  | WlrOutputHeadEvent{} <- ev = mempty
-  | InputDeviceEvent{} <- ev = mempty
-  | otherwise = logEventShow src ev []
+  | otherwise = logEventPretty src ev []
   where
     src = "debugHook"
 
@@ -91,10 +89,10 @@ logBinding src str self = logEventShow src self ["event" .= str]
 
 logEventShow :: (MonadLogger m, Typeable a, Show a, Generic a, Monoid (m b)) => Text -> a -> [SeriesElem] -> m b
 logEventShow src ev items = do
-  logDebugNS src $ "event: " <> ppRenderForLog (ppShow ev) :# (["type" .= show (typeOf ev)] <> items)
+  logDebugNS src $ ppRenderForLog (ppShow ev) :# (["type" .= show (typeOf ev)] <> items)
   mempty
 
 logEventPretty :: (MonadLogger m, Typeable a, PP.Pretty a, Monoid (m b)) => Text -> a -> [SeriesElem] -> m b
 logEventPretty src ev items = do
-  logDebugNS src $ ppRenderForLog (PP.pretty ev) :# (["type" .= show (typeOf ev)] <> items)
+  logDebugNS src $ T.replace "\n" " " (ppRenderForLog (PP.pretty ev)) :# (["type" .= show (typeOf ev)] <> items)
   mempty

@@ -32,21 +32,19 @@ import HSWM.Wayland
 import HSWM.Windows qualified as Windows
 import River qualified as R
 import WL.Client qualified as WL
-import WL.ExtForeignToplevelList.Staging.V1.Client as EXT_FTL
-import WL.ExtIdleNotify.Staging.V1.Client as EXT_IN
+import WL.ExtIdleNotify.Staging.V1.Client as IdleNotify
 import WL.FractionalScale.Staging.V1.Client qualified as FS
 import WL.Viewporter qualified as VP
-import WL.Wlr.InputMethod.Unstable.V2.Client as WLR_IM
-import WL.Wlr.LayerShell.Unstable.V1.Client qualified as WLR_LS
-import WL.Wlr.OutputManagement.Unstable.V1.Client qualified as WLR_OM
-import WL.Wlr.OutputPowerManagement.Unstable.V1.Client qualified as WLR_OPM
-import WL.XdgOutput.Unstable.V1.Client qualified as XO
+import WL.Wlr.InputMethod.Unstable.V2.Client as WlrInputMethod
+import WL.Wlr.LayerShell.Unstable.V1.Client qualified as WlrLayerShell
+import WL.Wlr.OutputManagement.Unstable.V1.Client qualified as WlrOutputManagement
+import WL.Wlr.OutputPowerManagement.Unstable.V1.Client qualified as WlrOutputPowerMgmt
+import WL.XdgOutput.Unstable.V1.Client qualified as XdgOutput
 
-import Control.Concurrent (threadWaitReadSTM, threadWaitWriteSTM)
 import System.IO (putStrLn)
 import System.Posix qualified as Posix
---import qualified Data.Set as Set
 import qualified Data.Map as M
+import HSWM.Util.Posix (sigabbrev)
 
 defaultRegistrySettings :: H WL.RegistrySettings
 defaultRegistrySettings = withRunInIO $ \runInIO ->
@@ -54,23 +52,23 @@ defaultRegistrySettings = withRunInIO $ \runInIO ->
     def
       { WL.regOnBind = \p name ver ->
           runInIO $ do
-            logInfo $
-              "Registry: bind global"
+            logInfoNS "registry" $
+              "bind global"
                 :# [ "name" .= name
                    , "version" .= ver
                    , "interface-version" .= WL.objectInterfaceVersion p
                    , "interface" .= WL.objectInterfaceName p
                    ]
             when (ver /= WL.objectInterfaceVersion p) $
-              logWarn $
-                "Registry: bound interface does not match the bindings version" :# ["version" .= ver, "interface" .= WL.objectInterfaceName p, "bindings-version" .= WL.objectInterfaceVersion p]
+              logWarnNS "registry" $
+                "bound interface does not match the bindings version" :# ["version" .= ver, "interface" .= WL.objectInterfaceName p, "bindings-version" .= WL.objectInterfaceVersion p]
       , WL.regOnEvent = \ev -> runInIO $
           case ev of
             WL.RegistryGlobal{..} -> return ()
             _ -> Debug.logEventShow "registry" ev []
       }
 
-hswm :: (m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow))
+hswm :: (HasCallStack, m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow))
      => ConfigDoM m -- ^ Post-configuration: use this to configure things that depend on parsing CLI arguments etc.
      -> HSWMConfig m l -- ^ Initial user configuration
      -> IO ()
@@ -85,7 +83,7 @@ hswm userConfPost conf = do
       startHSWM options $ userConfPost conf'
 
 startHSWM ::
-  (m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow)) =>
+  (HasCallStack, m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow)) =>
   Main -> HSWMConfig m l -> IO ()
 startHSWM options config = do
   installSignalHandlers -- TODO uninstall on exit?
@@ -112,14 +110,6 @@ startHSWM options config = do
       <*> newTQueueIO -- manage q
       <*> newTQueueIO -- render q
       <*> newTMVarIO def -- typemap
-      <*> (newIORef =<< async (return ()))
-
-  let handleErrors f =
-        try f >>= \case
-          Right{} -> return ()
-          Left (ex :: SomeException) -> do
-            logError $ "error in main setup phase!" :# ["error" .= show ex]
-            exitFailure
 
   runH conf $ do
     InputConfig.initialize
@@ -132,26 +122,21 @@ startHSWM options config = do
       mkListener $ handleWithHook' @WL.TouchEvent
       mkListener $ handleWithHook' @WL.KeyboardEvent
       mkListener $ handleWithHook' @WL.ShellSurfaceEvent
-      mkListener $ handleWithHook . XkbConfigEvent
+      mkListener $ handleWithHook' @R.RiverXkbConfigEvent
       mkListener $ handleWithHook' @R.RiverXkbKeyboardEvent
       mkListener $ handleWithHook' @R.RiverXkbBindingEvent
       mkListener $ handleWithHook' @R.RiverXkbBindingsSeatEvent
-      mkListener $ handleWithHook . PointerEvent
+      mkListener $ handleWithHook' @R.RiverPointerBindingEvent
       mkListener $ handleWithHook' @R.RiverWindowEvent
       mkListener $ handleWithHook' @R.RiverSeatEvent
-      mkListener $ handleWithHook . OutputEvent
-      mkListener $ handleWithHook . LayerShellOutputEvent
+      mkListener $ handleWithHook' @R.RiverOutputEvent
+      mkListener $ handleWithHook' @R.RiverLayerShellOutputEvent
       mkListener $ handleWithHook' @R.RiverLayerShellSeatEvent
-      mkListener $ handleWithHook . InputDeviceEvent
-      mkListener $ handleWithHook . LibinputConfigEvent
+      mkListener $ handleWithHook' @R.RiverInputDeviceEvent
+      mkListener $ handleWithHook' @R.RiverLibinputConfigEvent
       mkListener $ handleWithHook' @R.RiverLibinputDeviceEvent
-      mkListener $ handleWithHook . InputManagerEvent
+      mkListener $ handleWithHook' @R.RiverInputManagerEvent
       mkListener $ handleWithHook' @R.RiverWindowManagerEvent
-      mkListener $ handleWithHook . FTopLevelHandleEvent
-      mkListener $ handleWithHook . XdgOutputEvent
-      mkListener $ handleWithHook . WlrOutputManagerEvent
-      mkListener $ handleWithHook . WlrOutputHeadEvent
-      mkListener $ handleWithHook . OutputPowerEvent
 
       -- Setup the globals registry
       putMVar conf.globals =<< WL.initRegistryState conf._wlDisplay =<< defaultRegistrySettings
@@ -162,7 +147,7 @@ startHSWM options config = do
       logInfo "Binding initial globals"
       _ <- bindGlobal @WL.Compositor
       _ <- bindGlobalWithAutoListener @WL.Shm
-      _ <- bindGlobal @WLR_IM.InputMethodManager
+      _ <- bindGlobal @WlrInputMethod.InputMethodManager
       _ <- bindGlobalWithAutoListener @R.RiverWindowManager
       _ <- bindGlobal @R.RiverXkbBindings
       _ <- bindGlobal @R.RiverLayerShell
@@ -171,26 +156,17 @@ startHSWM options config = do
       -- note: libinputconfig has to come after RiverInputManager,
       -- otherwise we don't get the inputDevice associations!
       _ <- bindGlobalWithAutoListener @R.RiverLibinputConfig
-      _ <- bindGlobal @XO.OutputManager
-      _ <- bindGlobalWithAutoListener @WLR_OM.OutputManager
-      _ <- bindGlobal @WLR_LS.LayerShell
+      _ <- bindGlobal @XdgOutput.OutputManager
+      _ <- bindGlobalWithAutoListener @WlrOutputManagement.OutputManager
+      _ <- bindGlobal @WlrLayerShell.LayerShell
       _ <- bindGlobal @FS.FractionalScaleManager
       _ <- bindGlobal @VP.Viewporter
-      _ <- bindGlobal @WLR_OPM.OutputPowerManager
-      _ <- bindGlobal @EXT_IN.IdleNotifier
+      _ <- bindGlobal @WlrOutputPowerMgmt.OutputPowerManager
+      _ <- bindGlobal @IdleNotify.IdleNotifier
 
       logInfo "Installing signal handlers"
+
       run <- askRunInIO
-
-      let installHandler' sig f other = do
-            logDebug $ "install signal handler" :# ["signal" .= tshow sig]
-            void $ io $ Posix.installHandler sig (f sig) other
-          sigevent sig = do
-            logInfo $ "signal handler invoked" :# ["signal" .= show sig]
-            if sig == Posix.sigUSR2
-              then io getProgramPath >>= writeMainQ . MainRestart
-              else writeMainQ $ MainSignal sig
-
       installHandler' Posix.sigTERM (Posix.Catch . run . sigevent) Nothing
       installHandler' Posix.sigINT (Posix.Catch . run . sigevent) Nothing
       installHandler' Posix.sigQUIT (Posix.Catch . run . sigevent) Nothing
@@ -203,10 +179,28 @@ startHSWM options config = do
 
     displayFd <- WL.displayGetFd conf._wlDisplay
     mainLoop conf._wlDisplay displayFd
+  where
+
+    handleErrors f =
+      try f >>= \case
+        Right{} -> return ()
+        Left (ex :: SomeException) -> do
+          logError $ "error in main setup phase!" :# ["error" .= show ex]
+          exitFailure
+
+    sigevent sig = do
+      logInfo $ "signal handler invoked" :# ["signal" .= sigabbrev sig]
+      if sig == Posix.sigUSR2
+        then io getProgramPath >>= writeMainQ . MainRestart
+        else writeMainQ $ MainSignal sig
+
+    installHandler' sig f other = do
+      logDebug $ "install signal handler" :# ["signal" .= sigabbrev sig]
+      void $ io $ Posix.installHandler sig (f sig) other
 
 -- MAIN LOOP (WAYLAND EVENT LOOP)
 
-mainLoop :: WL.Display -> Posix.Fd -> H ()
+mainLoop :: WL.Display -> Fd -> H ()
 mainLoop wlDisplay wlPollFd = do
   logDebugNS "main" $ "Main loop is starting" :# ["display-fd" .= show wlPollFd]
   async runStartupHook >>= link
@@ -256,7 +250,7 @@ mainLoop wlDisplay wlPollFd = do
         logErrorNS "main" "Restart was unsuccessful! Resuming normal operation."
 
     mainSignal sig = do
-        logInfoNS "main" $ ("interrupted by signal (" <> tshow sig <> "), exiting...") :# ["signal" .= show sig]
+        logInfoNS "main" $ ("interrupted by signal (" <> toText (sigabbrev sig) <> "), exiting...") :# ["signal" .= show sig]
         runExitHook >> view _loggerCleanup >>= io >> exitFailure
 
     mainExit msg Nothing = do
@@ -272,24 +266,47 @@ mainLoop wlDisplay wlPollFd = do
 -- event handling
 
 instance HandleEvent H Event where
-  handleEvent (OutputEvent e) = Outputs.handle e
-  handleEvent (LayerShellOutputEvent e) = Outputs.handleLayerShell e
-  handleEvent (PointerEvent e) = Seats.handlePointerEvent e -- Pointer events
-  handleEvent (InputManagerEvent e) = InputConfig.handleInputManagerEvent e
-  handleEvent (InputDeviceEvent e) = InputConfig.handleInputDeviceEvent e
-  handleEvent (LibinputConfigEvent e) = InputConfig.handleLibinputEvent e
-  handleEvent (XkbConfigEvent e) = InputConfig.handleXkbConfigEvent e
-  handleEvent (OutputPowerEvent e) = e `seq` return () -- TODO
-  handleEvent (FTopLevelListEvent (EXT_FTL.ForeignToplevelListToplevel _ _ fh)) = WL.listenerAdd_ fh =<< getObject
-  handleEvent (WlrOutputManagerEvent (WLR_OM.OutputManagerHead _ _ head)) = WL.listenerAdd_ head =<< getObject
   handleEvent _ = return ()
+
+instance HandleEvent H WlrOutputPowerMgmt.OutputPowerEvent where
+  handleEvent _ = return ()
+
+instance HandleEvent H XdgOutput.OutputEvent where
+  handleEvent _ = return ()
+
+instance HandleEvent H WlrOutputManagement.OutputManagerEvent where
+  handleEvent (WlrOutputManagement.OutputManagerHead _ _ head) = addGlobalListener_ head
+  handleEvent _ = return ()
+instance HandleEvent H WlrOutputManagement.OutputHeadEvent where
+  handleEvent _ = return ()
+
+instance HandleEvent H R.RiverPointerBindingEvent where
+  handleEvent = Seats.handlePointerEvent -- Pointer events
+
+instance HandleEvent H R.RiverXkbConfigEvent where
+  handleEvent = InputConfig.handleXkbConfigEvent
+
+instance HandleEvent H R.RiverLibinputConfigEvent where
+  handleEvent = InputConfig.handleLibinputEvent
+
+instance HandleEvent H R.RiverInputManagerEvent where
+  handleEvent = InputConfig.handleInputManagerEvent
+
+instance HandleEvent H R.RiverInputDeviceEvent where
+  handleEvent = InputConfig.handleInputDeviceEvent
+
+instance HandleEvent H R.RiverOutputEvent where
+  handleEvent = Outputs.handle
+
+instance HandleEvent H R.RiverLayerShellOutputEvent where
+  handleEvent = Outputs.handleLayerShell
 
 instance HandleEvent H R.RiverSeatEvent where
   handleEvent = Seats.handleEvent
 
-instance HandleEvent H EXT_IN.IdleNotificationEvent where
-  handleEvent EXT_IN.IdleNotificationIdled{} = runInHS $ setOutputPower False
-  handleEvent EXT_IN.IdleNotificationResumed{} = runInHS $ setOutputPower True
+instance HandleEvent H IdleNotify.IdleNotificationEvent where
+  handleEvent IdleNotify.IdleNotificationIdled{} = setOutputPower False
+  handleEvent IdleNotify.IdleNotificationResumed{} = setOutputPower True
 
 instance HandleEvent H R.RiverWindowEvent where
   handleEvent = Windows.handleEvent

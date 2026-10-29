@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedLabels #-}
+-- {-# LANGUAGE OverloadedLabels #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 module WL.Core.Client (

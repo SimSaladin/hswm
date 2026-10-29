@@ -43,6 +43,7 @@ import Foreign.C
 import Foreign.C.ConstPtr
 
 import Text.XkbCommon.FFI
+import GHC.Stack
 
 -- | Context-related exceptions.
 data XkbContextException
@@ -55,7 +56,7 @@ instance Exception XkbContextException
 -- | Create a new "XkbContext" with the given options.
 --
 -- Throws "XkbContextCreationFailed" on failure.
-createXkbContext :: XkbContextOptions -> IO XkbContext
+createXkbContext :: HasCallStack => XkbContextOptions -> IO XkbContext
 createXkbContext opts = do
   ctx <-
     c_new (optionsToFlags opts)
@@ -92,7 +93,7 @@ setXkbContextLogVerbosity ctx verbosity = withForeignPtr ctx.unwrap $ \ctxPtr ->
 -- | Append an include path to the context.
 --
 -- Throws "IncludePathUnavailable" on problem.
-contextIncludePathAppend :: XkbContext -> FilePath -> IO ()
+contextIncludePathAppend :: HasCallStack => XkbContext -> FilePath -> IO ()
 contextIncludePathAppend ctx fp =
   withForeignPtr ctx.unwrap $ \ctxPtr ->
     withCString fp $ \fpPtr -> do
@@ -102,7 +103,7 @@ contextIncludePathAppend ctx fp =
 -- | Reset the include path to defaults.
 --
 -- Throws "IncludePathUnavailable" on problem.
-contextIncludePathResetDefaults :: XkbContext -> IO ()
+contextIncludePathResetDefaults :: HasCallStack => XkbContext -> IO ()
 contextIncludePathResetDefaults ctx =
   withForeignPtr ctx.unwrap $ \ctxPtr -> do
     r <- c_include_path_reset_defaults ctxPtr
@@ -111,7 +112,7 @@ contextIncludePathResetDefaults ctx =
 -- | Append the default include paths.
 --
 -- Throws "IncludePathUnavailable" on problem.
-contextIncludePathAppendDefault :: XkbContext -> IO ()
+contextIncludePathAppendDefault :: HasCallStack => XkbContext -> IO ()
 contextIncludePathAppendDefault ctx =
   withForeignPtr ctx.unwrap $ \ctxPtr -> do
     r <- c_include_path_append_default ctxPtr

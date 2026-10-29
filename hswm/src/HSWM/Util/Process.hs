@@ -65,9 +65,9 @@ data SDRunParams = SDRunParams
   deriving (Eq, Generic)
 
 instance Default SDRunParams where
-  def = SDRunParams{sdCollect = True, sdScope = True, sdUnit = Nothing, sdSlice = Nothing}
+  def = SDRunParams{sdCollect = True, sdScope = False, sdUnit = Nothing, sdSlice = Nothing}
 
-runProgWithSystemD :: (HasCallStack) => (MonadProcessSpawn m) => SDRunParams -> String -> [String] -> m ()
+runProgWithSystemD :: (HasCallStack, MonadProcessSpawn m) => SDRunParams -> String -> [String] -> m ()
 runProgWithSystemD p cmd args = do
   let pc =
         proc "systemd-run" $
@@ -83,7 +83,7 @@ runProgWithSystemD p cmd args = do
   res <- readProcess pc
   logInfo $ "run-sd: process completed" :# ["result" .= show res]
 
-runWithSystemD :: (HasCallStack) => (MonadProcessSpawn m) => SDRunParams -> String -> m ()
+runWithSystemD :: (HasCallStack, MonadProcessSpawn m) => SDRunParams -> String -> m ()
 runWithSystemD p cmd = runProgWithSystemD p "bash" ["-c", cmd]
 
 notifySend ::
@@ -121,14 +121,15 @@ logOutput ::
   (Loc -> LogSource -> LogLevel -> LogStr -> IO ())
   -> Text
   -- ^ Log line prefix
+  -> LogLevel
   -> [SeriesElem]
   -- ^ Metadata
   -> StreamSpec STOutput (Async ())
-logOutput logFn src meta = mkPipeStreamSpec $ \pc h -> do
+logOutput logFn src lvl meta = mkPipeStreamSpec $ \pc h -> do
   hSetBuffering h LineBuffering
   as <- async $ (`finally` hClose h) $ flip runLoggingT logFn $ forever $ do
     ln <- io (T.hGetLine h)
-    logInfoNS src $ ln :# (("process" .= showCmdSpec pc.pcCmdSpec) : meta)
+    logOtherNS src lvl $ ln :# (("process" .= showCmdSpec pc.pcCmdSpec) : meta)
   -- Note: the handle is closed by the async worker thread. If we closed it in the cleanup
   -- action below, hClose would block because of the hGetLine above. This breaks stopProcess!
   return (as, return ())

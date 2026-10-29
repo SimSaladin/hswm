@@ -23,10 +23,17 @@ import WL.XdgOutput.Unstable.V1.Client qualified as XO
 
 import Data.List qualified as L
 
+type OutputCtx =
+  (HandleEvent H WLR_OPM.OutputPowerEvent,
+  HandleEvent H XO.OutputEvent,
+  HandleEvent H WL.OutputEvent,
+  HandleEvent H R.RiverLayerShellOutputEvent,
+  HandleEvent H R.RiverOutputEvent)
+
 -- | New output is added: is put to pending_setup.
 --
 -- When an OutputDone event is received for the output, it is moved to pending_manage.
-added :: RiverOutput -> H ()
+added :: OutputCtx => RiverOutput -> H ()
 added k = do
   -- Assign screen Id
   output <- runInHS $ do
@@ -36,11 +43,11 @@ added k = do
     return output
 
   -- Add RiverOutput event listener
-  withObject $ WL.listenerAdd_ k
+  addGlobalListener_ k
 
   -- Create layer shell output + add listener
   lso <- withObject $ flip R.riverLayerShellGetOutput k
-  withObject $ \l -> WL.listenerAdd lso l k
+  addGlobalListener lso (Just k)
   modifyOutput' k $ layerShellOutput .~ lso
 
   logInfo $ "Output added, pending setup" :# ["output" .= tshow k, "screen" .= tshow output.screen]
@@ -63,14 +70,17 @@ destroyOutput k = withOutput_ k $ \o -> do
 -- - bind a wl_output listener
 -- - Set xdg_output
 -- - Register output power mgmt
-bindWlOutput :: RiverOutput -> WL.ObjectName -> H ()
+bindWlOutput :: OutputCtx => RiverOutput -> WL.ObjectName -> H ()
 bindWlOutput k name = do
   wlOut <- bindGlobalName @WL.Output name Nothing
   xdgOut <- withObject $ flip XO.outputManagerGetXdgOutput wlOut
   outputPwr <- withObject $ flip WLR_OPM.outputPowerManagerGetOutputPower wlOut
-  withObject $ \l -> WL.listenerAdd wlOut l k
-  withObject $ \l -> WL.listenerAdd xdgOut l k
-  withObject $ \l -> WL.listenerAdd outputPwr l k
+  addGlobalListener wlOut (Just k)
+  addGlobalListener xdgOut (Just k)
+  addGlobalListener outputPwr (Just k)
+  --withObject $ \l -> WL.listenerAdd wlOut l k
+  --withObject $ \l -> WL.listenerAdd xdgOut l k
+  --withObject $ \l -> WL.listenerAdd outputPwr l k
   modifyOutput' k $ wlOutput .~ wlOut &+ xdgOutput .~ xdgOut &+ outputPower .~ outputPwr
 
 -- * Manage
@@ -91,7 +101,7 @@ manage = do
 
 -- * Events
 
-handle :: R.RiverOutputEvent -> H ()
+handle :: OutputCtx => R.RiverOutputEvent -> H ()
 handle = \case
   R.RiverOutputRemoved _ k -> runInHS $ destroyOutput k
   R.RiverOutputWlOutput _ k name -> bindWlOutput k name

@@ -18,9 +18,6 @@ import HSWM.Core hiding (closed)
 import HSWM.Util.Process
 import System.Process (terminateProcess)
 
-testCmd :: Command Int String
-testCmd = mkCommand (static Dict) (static (\arg -> return $ "Hello" ++ show arg)) Nothing
-
 taskCmd :: Command Operation ()
 taskCmd = mkCommand (static Dict) (static waybarTask) Nothing
 
@@ -53,8 +50,6 @@ waybarStartupHook cfg = do
 
   registerCommand "waybar/start" taskCmd
 
-  registerCommand "testcmd" testCmd
-
   waybarTask StartWaybar
 
 waybarTask :: Operation -> H ()
@@ -76,8 +71,8 @@ waybarTask oper = withOptionalObject $ \WaybarState{wbProcess, wbConfig} -> do
       logFn <- askLoggerIO
       let pc =
             setStdin nullStream $
-              setStdout (logOutput logFn "waybar" ["stream" .= ("stdout" :: String)]) $
-                setStderr (logOutput logFn "waybar" ["stream" .= ("stderr" :: String)]) $
+              setStdout (logOutput logFn "waybar" LevelInfo ["stream" .= ("stdout" :: String)]) $
+              setStderr (logOutput logFn "waybar" LevelWarn ["stream" .= ("stderr" :: String)]) $
                   setCloseFds True $
                     setNewSession True $
                       proc cfg.command cfg.args

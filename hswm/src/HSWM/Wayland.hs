@@ -11,13 +11,15 @@ module HSWM.Wayland where
 
 import HSWM.Core
 import WL.Client qualified as WL
+import Data.Kind
+import GHC.Records
 
-type MonadGlobals env m = (MonadEffectsIO m, MonadReader env m, HasGlobalsRegistry env, HasGlobalTMap env)
+type MonadGlobals env m = (MonadEffectsIO m, MonadReader env m, HasGlobalsRegistry env, HasGlobalTMap env, MonadMask m)
 
 -- | Bind global by type.
 --
 -- Special case of 'globalBind'.
-bindGlobal :: forall a env m. (MonadGlobals env m, WL.HasInterface a, Inspect a) => m a
+bindGlobal :: forall a env m. (HasCallStack, MonadGlobals env m, WL.HasInterface a, Inspect a) => m a
 bindGlobal = globalBind True Nothing Nothing
 
 -- | Bind global by its name.
@@ -25,7 +27,7 @@ bindGlobal = globalBind True Nothing Nothing
 -- Special case of 'globalBind'.
 bindGlobalName ::
   forall a env m.
-  (MonadGlobals env m, WL.HasInterface a, Inspect a) =>
+  (HasCallStack, MonadGlobals env m, WL.HasInterface a, Inspect a) =>
   WL.ObjectName
   -- ^ The object name (id)
   -> Maybe WL.Version
@@ -37,16 +39,17 @@ bindGlobalName name mver = globalBind False mver (Just name)
 --
 -- Special case of 'globalBindAndListen'.
 bindGlobalWithAutoListener ::
-  forall a env m. (MonadGlobals env m, WL.HasListener a, Inspect a) => m a
-bindGlobalWithAutoListener =
-  globalBindAndListen True Nothing (Nothing @()) Nothing Nothing
+  forall a env m. (HasCallStack, MonadH m, MonadGlobals env m, WL.HasListener a, Inspect a, HandleEvent H (WL.ObjectListenerEvent a)) => m a
+bindGlobalWithAutoListener = do
+  l <- getOrCreateGlobalListener
+  globalBindAndListen True (Just l) (Nothing @()) Nothing Nothing
 
 -- | Bind global by type + add listener.
 --
 -- Special case of 'globalBindAndListen'.
 bindGlobalWithListener ::
   forall a env m.
-  (MonadGlobals env m, WL.HasListener a, Inspect a) =>
+  (HasCallStack, MonadGlobals env m, WL.HasListener a, Inspect a) =>
   ConstPtr (WL.ObjectListener a)
   -- ^ listener
   -> Ptr ()
@@ -60,7 +63,7 @@ bindGlobalWithListener listener udata =
 -- Roughly 'globalBind' + 'addGlobalListener'
 globalBindAndListen ::
   forall a env m udata.
-  (MonadGlobals env m, WL.HasListener a, Inspect a, WL.IsUserData udata) =>
+  (HasCallStack, MonadGlobals env m, WL.HasListener a, Inspect a, WL.IsUserData udata) =>
   Bool
   -- ^ Register in global typemap? Should only be used for globals that can't have multiple bindings per type!
   -> Maybe (ConstPtr (WL.ObjectListener a))
@@ -80,7 +83,7 @@ globalBindAndListen uniq mbListen mbData mverMax mname = do
 
 globalBind ::
   forall a env m.
-  (MonadGlobals env m, WL.HasInterface a, Inspect a) =>
+  (HasCallStack, MonadGlobals env m, WL.HasInterface a, Inspect a) =>
   Bool
   -- ^ Register in global typemap? Should only be used for globals that can't have multiple bindings per type!
   -> Maybe WL.Version
@@ -99,7 +102,7 @@ globalBind uniq mverMax mname = do
 -- If a listener with the same type already exists, an exception is raised.
 mkListener ::
   forall m env a.
-  (MonadStateGlobal env m, WL.HasListener a, Inspect a) =>
+  (HasCallStack, MonadStateGlobal env m, WL.HasListener a, Inspect a) =>
   (WL.ObjectListenerEvent a -> m ()) -> m ()
 mkListener f = createUnique_ $ do
   run <- askRunInIO
@@ -108,20 +111,19 @@ mkListener f = createUnique_ $ do
 -- | Given a wayland object, attach the previously created listener to it (see 'mkListener').
 addGlobalListener ::
   forall a m udata.
-  (MonadH m, WL.IsUserData udata, WL.HasListener a, Inspect a, HandleEvent H (WL.ObjectListenerEvent a)) =>
+  (HasCallStack, MonadH m, WL.IsUserData udata, WL.HasListener a, Inspect a, HandleEvent H (WL.ObjectListenerEvent a)) =>
   a -> Maybe udata -> m ()
 addGlobalListener obj mbData = do
   l <- getOrCreateGlobalListener
-  -- l <- getObject @(ConstPtr (WL.ObjectListener a))
   liftH $ WL.listenerAdd obj l $ maybe nullPtr WL.toUserData mbData
 
 -- | 'addGlobalListener' with empty user data.
-addGlobalListener_ :: forall a m. (MonadH m, WL.HasListener a, Inspect a, HandleEvent H (WL.ObjectListenerEvent a)) => a -> m ()
+addGlobalListener_ :: forall a m. (HasCallStack, MonadH m, WL.HasListener a, Inspect a, HandleEvent H (WL.ObjectListenerEvent a)) => a -> m ()
 addGlobalListener_ = flip addGlobalListener (Nothing @())
 
 getOrCreateGlobalListener ::
   forall a m.
-  (MonadH m, WL.HasListener a, Inspect a, HandleEvent H (WL.ObjectListenerEvent a)) =>
+  (HasCallStack, MonadH m, WL.HasListener a, Inspect a, HandleEvent H (WL.ObjectListenerEvent a)) =>
   m (ConstPtr (WL.ObjectListener a))
 getOrCreateGlobalListener = liftH $ do
   getOrCreateObject $ do
@@ -134,3 +136,40 @@ objectCommand :: forall o f. (Inspect o) => (o -> f) -> H f
 objectCommand f = do
   o <- getObject @o
   return (f o)
+
+-- * WIP
+
+class (MonadIO m, Inspect a) => TypedUserData m a where
+
+  type UserDataType m a :: Type
+
+  -- | Dereference the opaque pointer to expected data type.
+  toTypedUserData :: Proxy a -> Ptr Void -> m (UserDataType m a)
+  toTypedUserData _ = io . deRefStablePtr . castPtrToStablePtr . castPtr
+
+  -- | Creates a new pointer that's suitable to be used as userdata in wayland protocols with the given content.
+  fromTypedUserData :: Proxy a -> UserDataType m a -> m (Ptr Void)
+  fromTypedUserData _ = io . fmap (castPtr . castStablePtrToPtr) . newStablePtr
+
+addListenerWithTypedUserData
+  :: forall a m. (TypedUserData m a, MonadH m, WL.HasListener a, HandleEvent H (WL.ObjectListenerEvent a))
+  => a
+  -> UserDataType m a
+  -> m ()
+addListenerWithTypedUserData obj ud = do
+  addGlobalListener obj . Just =<< fromTypedUserData (Proxy @a) ud
+
+-- | Create an event handler that automatically extracts the userdata pointer
+-- and dereferences it for use in the handler.
+eventHandlerWithTypedUserData
+  :: forall a m.
+    (TypedUserData m a,
+    HasField "userdata" (WL.ObjectListenerEvent a) (Ptr Void)
+    )
+  => (UserDataType m a -> WL.ObjectListenerEvent a -> m ())
+  -> WL.ObjectListenerEvent a
+  -> m ()
+eventHandlerWithTypedUserData f e = do
+  let udPtr = getField @"userdata" e
+  dec <- toTypedUserData (Proxy @a) udPtr
+  f dec e

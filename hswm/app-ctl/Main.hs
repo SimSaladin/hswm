@@ -48,18 +48,26 @@ defaultParserPrefs =
     <> Options.subparserInline
     <> Options.helpShowGlobals
 
-main :: IO ()
+main :: HasCallStack => IO ()
 main = do
   Cmdline cmd' opts' <- getRecordWith infoPrefs defaultParserPrefs :: IO (Cmdline Wrapped)
   let cmd = Options.Generic.unwrap <$> cmd'
       opts = Options.Generic.unwrap opts'
   case cmd of
     Nothing -> interactive opts
-    Just req -> withConnect opts $ \sock -> do
-      res <- syncRequest sock req
-      io $ BL.putStrLn $ BL.pack $ prettyResponse res
-  where
-    withConnect opts f = withLogging (LogStderr defaultBufSize) opts.logFormat opts.colorEnable $ runLoggingT $ clientRunWith def f
+    Just req -> do
+      withConnect opts $ \sock -> do
+        res <- syncRequest sock req
+        io $ BL.putStrLn $ BL.pack $ prettyResponse res
+
+withConnect :: (HasCallStack, _) => _ -> (HasCallStack => _) -> _
+withConnect opts f = withLogging (LogStderr defaultBufSize) opts.logFormat opts.colorEnable $ \logFn -> do
+  flip runLoggingT logFn $ clientRunWith def f
+
+withLogging :: (HasCallStack, MonadMask m, MonadUnliftIO m) => LogType' LogStr -> LogFormat -> AnsiColors -> (HasCallStack => _ -> m a) -> m a
+withLogging logtype fmt co f =
+  bracket (liftIO $ initLoggers logtype fmt co Nothing) (\(_, fn) -> liftIO fn)
+  $ \(logFn, _) -> f logFn
 
 interactive :: ClientOptions -> IO ()
 interactive o = runInputT defaultSettings $ do
@@ -69,9 +77,6 @@ interactive o = runInputT defaultSettings $ do
   where
     runRT :: (Loc -> LogSource -> LogLevel -> LogStr -> IO ()) -> ReaderT (InputTEnv IO) IO ()
     runRT logFun = withReaderT (mapInputTEnv liftIO) $ mapReaderT (`runLoggingT` logFun) $ toReaderT mainCM
-
-withLogging :: (MonadUnliftIO m) => LogType' LogStr -> LogFormat -> AnsiColors -> (_ -> m a) -> m a
-withLogging logtype fmt co f = bracket (liftIO $ initLoggers logtype fmt co Nothing) (\(_, fn) -> liftIO fn) $ \(logFn, _) -> f logFn
 
 prettyResponse :: Response -> String
 prettyResponse = \case

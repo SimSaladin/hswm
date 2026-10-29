@@ -367,8 +367,8 @@ screenBy :: Int -> HS ScreenId
 screenBy d = do
   ws <- use windowset
   -- let ss = sortBy screen (screens ws)
-  let now = W.screen (W.current ws)
-  return $ (now + fromIntegral d) `mod` fromIntegral (length (W.screens ws))
+  let now = W.screen (W.current ws) - 1
+  return $ 1 + ((now + fromIntegral d) `mod` fromIntegral (length (W.screens ws)))
 
 -- | Swap current screen with next screen
 swapNextScreen :: HS ()

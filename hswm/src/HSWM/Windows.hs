@@ -188,12 +188,8 @@ manage_ = do
   whenJust (W.peek ws) $ \w -> do
     manageWindowBorder w =<< view (config . focusedBorder)
     when (W.peek old /= Just w) $ windowPlaceTop w
-
-  --  XXX: move floating to top
-  --  doRender WRPlaceTop rw
-
-  -- update focus
-  setTopFocus
+    -- update focus
+    setTopFocus w
 
   -- Corner case: pointer focused moved to an empty
   -- screen; warp the pointer to the empty center.

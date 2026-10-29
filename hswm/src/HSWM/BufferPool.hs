@@ -50,7 +50,7 @@ newImageBufferPool = do
   bufferListener <- WL.createListener $ \case
     WL.BufferRelease ud _ -> do
       busy <- deRefStablePtr $ castPtrToStablePtr $ castPtr ud
-      modifyIORef' busy $ const False
+      atomicModifyIORef' busy $ (,()) . const False
   return ImageBufferPool{surfaceCount = 0, bufferMultiplicity = 3, ..}
 
 destroyImageBufferPool :: (MonadIO m) => ImageBufferPool -> m ()
@@ -104,7 +104,7 @@ nextBuffer pool shmFormat w h = io $ do
             True -> (b :) <$> doCull (left - 1) bs
             False -> doCull left bs
     bufsDel <- doCull cullMax bufs
-    modifyIORef' pool.buffers $ \(bs, l) -> (bs L.\\ bufsDel, l - length bufsDel)
+    atomicModifyIORef' pool.buffers $ \(bs, l) -> ((bs L.\\ bufsDel, l - length bufsDel), ())
     mapM_ destroyImageBuffer bufsDel
 
   -- Find suitable buffer
@@ -117,8 +117,8 @@ nextBuffer pool shmFormat w h = io $ do
         False -> findSuitable bs
     findSuitable [] = do
       b <- initImageBuffer pool shmFormat w h
-      modifyIORef' pool.buffers $ \(bs, l) -> (b : bs, l + 1)
+      atomicModifyIORef' pool.buffers $ \(bs, l) -> ((b : bs, l + 1), ())
       return b
 
 tryLockBuffer :: (MonadIO m) => ImageBuffer -> m Bool
-tryLockBuffer buf = atomicModifyIORef' buf.busy $ \s -> if not s then (True, True) else (s, False)
+tryLockBuffer buf = atomicModifyIORef' buf.busy $ \s -> (True, not s)

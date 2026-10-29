@@ -54,7 +54,7 @@ default GetHState (H, HS)
 default MonadUnliftIO (IO, H)
 default MonadIO (H, IO)
 
-main :: IO ()
+main :: HasCallStack => IO ()
 main =
   -- adding keys late, so that a changed modMask override can take effect...
   hswm (validateAndAddKeys myKeys) $
@@ -93,21 +93,22 @@ myKeyboard =
 
 myLayoutHook :: _
 myLayoutHook =
-  L.Minimize.minimize $
-    boringWindows $
-      mkToggle1 NOBORDERS $
-        mkToggle1 NBFULL $
-          NEArea.nonExclusiveArea $
-            L.Maximize.maximize $
-              L.WNavigation.configurableNavigation (L.WNavigation.navigateBrightness 0.8) $ -- apply on top of any modifiers that might modify placement of tiled windows
-                mkToggle1 REFLECTX $
-                  mkToggle1 REFLECTY $
-                    mkToggle1 MIRROR $
-                      BSP.emptyBSP
-                        ||| GV.Grid (16 / 10)
-                        ||| GV.SplitGrid GV.R 2 3 (2 / 3) (16 / 10) (5 / 100)
-                        ||| Tall 3 (3 / 100) (1 / 2)
-                        ||| L.NoBorders.noBorders Full
+  L.Minimize.minimize
+  $ boringWindows
+  $ mkToggle1 NOBORDERS
+  $ mkToggle1 NBFULL
+  $ NEArea.nonExclusiveArea
+  $ L.Maximize.maximize
+  -- apply on top of any modifiers that might modify placement of tiled windows
+  $ L.WNavigation.configurableNavigation (L.WNavigation.navigateBrightness 0.8)
+  $ mkToggle1 REFLECTX
+  $ mkToggle1 REFLECTY
+  $ mkToggle1 MIRROR
+  $ BSP.emptyBSP
+    ||| GV.Grid (16 / 10)
+    ||| GV.SplitGrid GV.R 2 3 (2 / 3) (16 / 10) (5 / 100)
+    ||| Tall 3 (3 / 100) (1 / 2)
+    ||| L.NoBorders.noBorders Full
 
 myManageHook :: Query (Endo WindowSet)
 myManageHook =
@@ -139,8 +140,10 @@ myKeys = do
     "M-Escape" .@= debugAction <?> "Print debug stack"
 
   group "Screen" $ do
-    "M-C-Right" .@= CycleWS.nextScreen <?> "Focus previous screen"
-    "M-C-Left" .@= CycleWS.prevScreen <?> "Focus next screen"
+    "M-C-Right" .@= PScreen.onNextNeighbour def W.view <?> "Focus next screen"
+    "M-C-Left" .@= PScreen.onPrevNeighbour def W.view <?> "Focus previous screen"
+    "M-C-S-Right" .@= PScreen.onNextNeighbour def W.shift <?> "Send active window to next screen"
+    "M-C-S-Left" .@= PScreen.onPrevNeighbour def W.shift <?> "Send active window to previous screen"
 
     let ks = screenKeysScreens
     "M-"    ///& ks .@=> \i -> PScreen.viewScreen def i <?> "View screen " ++ show i
@@ -152,8 +155,7 @@ myKeys = do
   group "Layout" $ do
     "M-C-space"     .@= (view (config . layoutHook) >>= setLayout) <?> "Layout: Reset"
     "M-space"       .@= SendMessage NextLayout
-    "M-F3"          .@= SendMessage NextLayout
-    "M-Shift-space" .@= SendMessage FirstLayout
+    "M-S-space"     .@= SendMessage FirstLayout
     "M-comma"       .@= SendMessage (IncMasterN (-1))
     "M-period"      .@= SendMessage (IncMasterN 1)
     "M-x"           .@= SendMessage Shrink
@@ -179,7 +181,7 @@ myKeys = do
       "M-C-r" .@= SendMessage BSP.Rotate
       "M-C-equal" .@= SendMessage BSP.Equalize
       "M-C-exclam" .@= SendMessage BSP.Balance
-      "M-C-" ///& directions2D .@=> \dir -> SendMessage (BSP.ExpandTowards dir)
+      "M-C-" ///& directions2D .@=> \dir -> SendMessage (BSP.ExpandTowards dir) <!> 250
 
 
   group "Workspace" $ do
@@ -200,8 +202,8 @@ myKeys = do
     "M-"   ///& ks .@=> SendMessage . L.WNavigation.Go
     "M-S-" ///& ks .@=> SendMessage . L.WNavigation.Swap
 
-    "M-n" .@= windows W.focusDown <?> "Focus down"
-    "M-p" .@= windows W.focusUp <?> "Focus up"
+    "M-n" .@= windows W.focusDown <?> "Focus down" <!> 750
+    "M-p" .@= windows W.focusUp <?> "Focus up" <!> 750
     "M-f s" .@= withFocused (\w -> modifyWindowSet (W.sink w.river_window)) <?> "Sink focused window"
     "M-f f" .@= withFocused (\w -> modifyWindowSet (\ws -> W.float w.river_window (rationalRectIn (w^. rectangle) (screenRect $ W.screenDetail $ W.current ws)) ws)) <?> "Float focused window"
     "M-exclam" .@= togglePad "tmux-0" <?> "Toggle tmux PAD"
@@ -287,8 +289,10 @@ tagKeys = map (: []) ['a' .. 'z']
 screenKeys = map (: []) "wvza"
 tagKeysTags = zip tagKeys [(0 :: Int) ..]
 screenKeysScreens = zip screenKeys [(PScreen.P 0) ..]
-sendFocusedWorkspaceToScreen focus i =
-  PScreen.getScreen def i >>= (`whenJust` (\s -> windows (W.currentTag >>= \x -> OnScreen.onScreen (W.greedyView x) focus s)))
+
+sendFocusedWorkspaceToScreen focus i = do
+  msid <- PScreen.getScreen def i
+  whenJust msid $ \s -> windows (W.currentTag >>= \x -> OnScreen.onScreen (W.greedyView x) focus s)
 
 myPointerBinds :: [((String, Button), SomeAction H)]
 myPointerBinds =
@@ -415,9 +419,10 @@ removeFocusedWorkspace = do
 bindsPrompt :: H ()
 bindsPrompt = do
   binds <- view (config . keyBindings) <&> KB.flatBindings
-  let xs = renderBindings [] binds
-      ind = maximum $ xs ^.. traversed . _2 . _1 . to T.length
-      input = [P.bold (T.justifyLeft ind ' ' mk) <> "\t" <> P.italic desc <> " " <> P.bold (show cats) | (_, (mk, desc, cats)) <- xs]
+  let xs = L.sortBy (comparing snd) $ renderBindings [] binds
+      ind1 = maximum $ xs ^.. traversed . _2 . _1 . to T.length
+      ind2 = maximum $ xs ^.. traversed . _2 . _2 . to T.length
+      input = [P.toMarkup (T.justifyLeft ind1 ' ' cats) <> "\t" <> P.bold (T.justifyLeft ind2 ' ' mk) <> "\t" <> P.italic desc  | (_, (cats, mk, desc)) <- xs]
   RP.runRofi @_ @'i' myRofiBaseConfig input
     RP.++> \(x :: Int) -> do
       logInfo $ "binds prompt" :# ["res" .= tshow x]
@@ -425,12 +430,11 @@ bindsPrompt = do
         [(k, _)] -> runner k
         _ -> return ()
   where
-    renderBindings :: [XBKey] -> [([XBKey], SomeAction H)] -> [(SomeAction H, (Text, String, [String]))]
+    renderBindings :: [XBKey] -> [([XBKey], SomeAction H)] -> [(SomeAction H, (Text, Text, String))]
     renderBindings pre binds =
-        [ (a, (T.unwords $ map (ppXBKey @Text) $ pre ++ xk, actionDescription (Proxy @H) a, actionCategories (Proxy @H) a))
+        [ (a, (T.intercalate "," $ map toText $ actionCategories (Proxy @H) a, T.unwords $ map (ppXBKey @Text) $ pre ++ xk, actionDescription (Proxy @H) a))
         | (xk, a) <- L.sortOn (map (ppXBKey @String) . fst) binds
         ]
-            -- : renderBindings (pre ++ [xk]) (actionSubmap a).submapKeys
 
 -- | XXX: this should be run after window restore
 cleanupMinimized :: H ()

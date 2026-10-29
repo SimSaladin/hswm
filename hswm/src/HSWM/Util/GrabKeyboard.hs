@@ -111,8 +111,6 @@ lookupGrabIM s = do
         return grabIM
   case M.lookup s.wl_seat seatInputMethods of
     Just im -> return im
-    -- isFree <- isEmptyMVar im.reserved
-    -- if isFree then makeGrabIM else return im
     Nothing -> makeGrabIM
 
 newGrabIM ::

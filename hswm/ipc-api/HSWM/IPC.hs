@@ -22,6 +22,7 @@ import Network.Socket.ByteString qualified as NB
 import Options.Generic
 import PackageInfo_hswm qualified as PKG
 import System.Random (randomIO)
+--import GHC.Stack
 
 aesonOptions :: A.Options
 aesonOptions =
@@ -210,8 +211,13 @@ instance A.FromJSON (WmCtrlAction' Unwrapped) where
 
 data SocketDisconnected = SocketDisconnected
   deriving (Eq, Show)
-
 instance Exception SocketDisconnected
+
+data ClientException
+  = ServerError Text
+  | MalformedResponse String
+  deriving (Eq, Show)
+instance Exception ClientException
 
 -- * Client
 
@@ -225,16 +231,18 @@ newtype ClientConfig = ClientConfig
 instance Default ClientConfig where
   def = ClientConfig "unix:"
 
-type MonadIPCClient m = (MonadLogger m, MonadIO m, MonadUnliftIO m, MonadMask m)
+type MonadIPCClient m = (MonadLogger m, MonadUnliftIO m, MonadMask m)
 
 -- | Simplest client invocation.
-clientRunWith :: (MonadIPCClient m) => ClientConfig -> (Socket -> m r) -> m r
+clientRunWith
+  :: (HasCallStack, MonadIPCClient m)
+  => ClientConfig -> (Socket -> m r) -> m r
 clientRunWith conf program = do
-  ai <- getClientAI conf
-  withThreadContext ["component" .= ("ipc-client" :: String), "address" .= show ai.addrAddress] $ do
-    bracket (open ai) (io . close) $ \sock -> do
-      sendMsg sock $ Contents (IdentifyClient (thisPeerIdent "client") 0 (Just thisPeerDescription) :: Request) Nothing
-      program sock
+    ai <- getClientAI conf
+    withThreadContext ["component" .= ("ipc-client" :: String), "address" .= show ai.addrAddress] $ do
+      bracket (open ai) (io . close) $ \sock -> do
+        sendMsg sock $ Contents (IdentifyClient (thisPeerIdent "client") 0 (Just thisPeerDescription) :: Request) Nothing
+        program sock
   where
     open ai = bracketOnError (io $ socket ai.addrFamily ai.addrSocketType ai.addrProtocol) (io . close) $ \sock -> do
       logInfo $ "Connecting to server..." :# ["address" .= show ai.addrAddress]
@@ -243,7 +251,7 @@ clientRunWith conf program = do
 
 -- | Callback-oriented client entrypoint.
 clientRun ::
-  (MonadIPCClient m) =>
+  (HasCallStack, MonadIPCClient m) =>
   ClientConfig
   -> (Response -> m ())
   -- ^ Process incoming
@@ -265,20 +273,20 @@ clientRun conf onMsg f =
       Right (Error msg) -> logWarn $ "Server error" :# ["error" .= msg]
       Left e -> logWarn $ "Received malformed message from server" :# ["ex" .= toText e, "msg" .= BL.unpack (BL.take 256 resp)]
 
-syncRequest :: (MonadIPCClient m) => Socket -> Request -> m Response
+syncRequest :: (HasCallStack, MonadIPCClient m) => Socket -> Request -> m Response
 syncRequest sock req = do
   m <- randomIO @Word16
   logDebug $ "new request" :# ["req" .= req, "id" .= m]
   sendMsg sock (Contents req (Just m))
   let go ([], acc) = syncReceive sock acc >>= go
       go (Error err : _, _) =
-        throwString $ "Server error: " <> show err
+        throwIO $ ServerError err
       go (Contents x n : xs, acc)
         | n == Just m = return x
         | otherwise = go (xs, acc)
   go ([], "")
 
-syncReceive :: (HasCallStack) => (MonadIPCClient m) => Socket -> BL.ByteString -> m ([Msg Response], BL.ByteString)
+syncReceive :: (HasCallStack, MonadIPCClient m) => Socket -> BL.ByteString -> m ([Msg Response], BL.ByteString)
 syncReceive sock acc0 = do
   go acc0
   where
@@ -289,21 +297,21 @@ syncReceive sock acc0 = do
           xs' <- forM xs $ \bs -> do
             -- logDebug $ "response" :# [ "begin" .= C8LB.unpack (C8LB.take 50 bs) ]
             case A.eitherDecode bs :: Either String (Msg Response) of
-              Left err -> throwString $ "invalid response: " ++ err ++ "\nresponse was: " ++ C8LB.unpack (C8LB.take 500 bs)
+              Left err -> throwIO $ MalformedResponse $ "invalid response: " ++ err ++ "\nresponse was: " ++ C8LB.unpack (C8LB.take 500 bs)
               Right x -> return x
           return (xs', acc')
 
 -- * Utilities
 
 -- | Send a JSON object over the socket.
-sendMsg :: (MonadIO m, A.ToJSON msg) => Socket -> msg -> m ()
+sendMsg :: (HasCallStack, MonadIO m, A.ToJSON msg) => Socket -> msg -> m ()
 sendMsg sock msg = io $ NB.sendMany sock $ BL.toChunks (A.encode msg <> "\n")
 
 -- | Read and parse lines
-recvLines :: (MonadIPCClient m) => Socket -> BL.ByteString -> m ([BL.ByteString], BL.ByteString)
+recvLines :: (HasCallStack, MonadIPCClient m) => Socket -> BL.ByteString -> m ([BL.ByteString], BL.ByteString)
 recvLines sock leftover = do
   res <- io $ NB.recv sock 4096
-  when (res == "") $ throwM SocketDisconnected
+  when (res == "") $ throwIO SocketDisconnected
   -- logDebug $ "received input" :# [ "size" .= C8.length res ]
   return $! decode [] leftover (BL.fromStrict res)
   where

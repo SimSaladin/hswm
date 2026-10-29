@@ -11,7 +11,7 @@ import Data.List qualified as L
 import Data.Map qualified as M
 import Data.Time.Clock.System
 import System.FilePath ((</>))
-import System.IO (hGetContents, writeFile)
+import System.IO (hGetContents)
 import System.IO.Error
 import Text.Printf
 
@@ -30,7 +30,7 @@ scheduleStateSave interval
       logInfo $ "started timer for saving state to disk every period" :# ["minutes" .= interval]
 
 maybeRestoreState ::
-  (MonadUnliftIO m, MonadLoggerIO m, LayoutClass l RiverWindow, Read (l RiverWindow)) =>
+  (MonadUnliftIO m, MonadLoggerIO m, MonadCatch m, LayoutClass l RiverWindow, Read (l RiverWindow)) =>
   Main
   -> HSWMConfig n l
   -> m (HSWMConfig n Layout, HState)
@@ -41,7 +41,7 @@ maybeRestoreState opts conf = do
   st <- fromMaybe newEmpty <$> readStateFile opts.mainStateFile conf
   return (conf{layoutHook = Layout conf.layoutHook}, st)
 
-writeStateToFile :: HS FilePath
+writeStateToFile :: HasCallStack => HS FilePath
 writeStateToFile = do
   dir <- getStateDirectory
   ts <- getTimeStamp
@@ -50,7 +50,7 @@ writeStateToFile = do
       stateFP = dir ++ "/" ++ stateFileName
       linkFP = dir ++ "/" ++ "savedstate"
       update = do
-        writeFile stateFP stateString
+        writeBinaryFileAtomic stateFP (fromString stateString)
         isLink <- pathIsSymbolicLink linkFP
         exists <- doesFileExist linkFP
         when (isLink || exists) $ removeFile linkFP
@@ -102,7 +102,7 @@ dumpStateAsString = do
 -- return that state.  The state file is removed after reading it.
 readStateFile ::
   forall m l m2.
-  (MonadUnliftIO m, MonadLogger m, LayoutClass l RiverWindow, Read (l RiverWindow)) =>
+  (MonadUnliftIO m, MonadCatch m, MonadLogger m, LayoutClass l RiverWindow, Read (l RiverWindow)) =>
   Maybe FilePath
   -> HSWMConfig m2 l
   -> m (Maybe HState)
@@ -154,7 +154,7 @@ readStateFile msf xmc = do
     readStrict :: Handle -> IO String
     readStrict h = hGetContents h >>= \s -> length s `seq` return s
 
-getStateDirectory :: (MonadIO m) => m FilePath
+getStateDirectory :: (HasCallStack, MonadIO m) => m FilePath
 getStateDirectory = do
   dir <- getXdgDirectory XdgState "hswm"
   createDirectoryIfMissing True dir

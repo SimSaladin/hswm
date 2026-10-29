@@ -1,12 +1,20 @@
 -- |
 -- Module      : HSWM.Util.PangoMarkup
--- Description : Short description
+-- Description : Definitions for working with pango markup
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
-module HSWM.Util.PangoMarkup where
+module HSWM.Util.PangoMarkup
+  (
+  Markup,
+  ToMarkup(..),
+  render,
+  bold, italic, monospace, text, raw, escape, fromShow, (~++),
+  HSWM.Util.PangoMarkup.span, Attr(..),
+  IsText(..),
+  ) where
 
 import Data.Text qualified as T
 import GI.GLib.Functions (markupEscapeText)
@@ -22,6 +30,8 @@ instance IsText String where
 
 instance IsText Text where
   getText = id
+instance IsText LazyText where
+  getText = view strict
 
 -- * Markup
 
@@ -29,13 +39,13 @@ data Markup
   = -- | zero-length document.
     MNUL
   | -- | Simple document concatenation
-    Concat Markup Markup
+    Concat !Markup !Markup
   | -- | text, markup tags automatically escaped.
-    Escaped Text
+    Escaped !Text
   | -- | direct text include, no escaping, can contain markup tags!
-    Raw Text
+    Raw !Text
   | -- | <TAG [ATTRS]>BODY</TAG>
-    Markup :<< (Text, [Attr])
+    !Markup :<< !(Text, [Attr])
   deriving (Eq, Show, Generic, Data)
 
 instance Semigroup Markup where
@@ -60,7 +70,7 @@ class ToMarkup a where
 instance ToMarkup Markup where
   toMarkup = id
 
-instance ToMarkup T.Text where
+instance ToMarkup Text where
   toMarkup = Escaped
 
 instance ToMarkup String where
@@ -102,6 +112,9 @@ monospace = (:<< ("tt", [])) . toMarkup
 
 text :: (IsText a) => a -> Markup
 text = Escaped . getText
+
+raw :: (IsText a) => a -> Markup
+raw = Raw . getText
 
 escape :: (IsText a) => a -> Markup
 escape = Raw . escapeLineBreaks . flip escapeMarkupPure (-1) . getText

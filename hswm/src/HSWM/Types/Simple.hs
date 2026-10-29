@@ -19,6 +19,12 @@ import qualified HSWM.StackSet as W
 import           HSWM.Types.Lens
 import           Data.Data
 
+-- XXX
+instance Data (IO ()) where
+  toConstr _ = error "toConstr"
+  gunfold _ _ = error "gunfold"
+  dataTypeOf _ = mkNoRepType "SomeAction"
+
 -- * Types
 
 -- | e.g. width or height.
@@ -102,6 +108,11 @@ instance Monoid CleanupTasks where
 instance Default CleanupTasks where
   def = mempty
 
+deriving instance Data CleanupTasks
+
+instance ToJSON CleanupTasks where
+  toJSON _ = toJSON ()
+
 -- * Functions
 
 -- | @pointWithin x y r@ returns 'True' if the @(x, y)@ co-ordinate is within
@@ -171,14 +182,3 @@ instance ToJSON RepeatInfo where
 instance FromJSON RepeatInfo where
   parseJSON = genericParseJSON aesonOptions
 
-
--- XXX
-
-instance Data (IO ()) where
-  toConstr _ = error "toConstr"
-  gunfold _ _ = error "gunfold"
-  dataTypeOf _ = mkNoRepType "SomeAction"
-
-deriving instance Data CleanupTasks
-instance ToJSON CleanupTasks where
-  toJSON _ = toJSON ()

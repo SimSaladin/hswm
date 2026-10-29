@@ -120,7 +120,6 @@ library
     HSWM.Wallpaper
     HSWM.Wayland
     HSWM.Windows
-    HSWM.XKB
   other-modules:
     PackageInfo_hswm
   build-depends:
@@ -244,10 +243,13 @@ library prelude
     monad-logger-aeson >=0.4.1 && <0.5,
     mtl >=2.3.1 && <2.4,
     rio >=0.1.24 && <0.2,
+    safe-exceptions,
     stm >=2.5.3 && <2.6,
     text >=2.1.2 && <2.2,
     text-short,
-    unliftio >=0.2.25 && <0.3
+    unix,
+    unliftio >=0.2.25 && <0.3,
+    unliftio-core >=0.2.1 && <0.3
   default-language: GHC2024
   if flag(use-llvm) && impl(ghc >= 9.14.1)
     ghc-options: -fllvm

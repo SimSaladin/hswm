@@ -1,7 +1,7 @@
 {-# LANGUAGE DefaultSignatures #-}
-{-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE TypeFamilyDependencies #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
 
 -- |
 -- Module      : WL.Internals.Types
@@ -43,6 +43,8 @@ import Foreign
 import Foreign.C
 import Foreign.C.ConstPtr
 import GHC.TypeLits
+import GHC.OverloadedLabels
+
 import HsBindgen.Runtime.Prelude as ReExports (
   CEnum (..),
   CEnumZ,
@@ -163,7 +165,11 @@ instance (Typeable a) => IsUserData (StablePtr a) where
 instance {-# OVERLAPPABLE #-} (Typeable a) => IsUserData (Ptr a)
 
 -- | Invoke methods by their C names via labels.
-class (Typeable object) => HasMethod (method :: Symbol) object (since :: Nat) | object method -> since where
-  type ObjectMethod object (method :: Symbol) :: Type
+class (Typeable object) => HasMethod (f :: Type -> Type) (method :: Symbol) object where
 
-  objectMethod :: Proxy method -> object -> ObjectMethod object method
+  type ObjectMethod f object method :: Type
+
+  objectMethod :: object -> ObjectMethod f object method
+
+instance (HasMethod f t o, p ~ ObjectMethod f o t) => IsLabel t (o -> p) where
+  fromLabel = objectMethod @f @t

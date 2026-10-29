@@ -11,6 +11,7 @@
 -- Portability : unportable
 module HSWM.Types.Window (
   module HSWM.Types.Window,
+  -- * Re-exports
   module X,
 ) where
 

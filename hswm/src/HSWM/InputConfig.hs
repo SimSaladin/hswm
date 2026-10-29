@@ -328,11 +328,12 @@ lookupKeymap kmdef = do
 -- * Event handlers
 
 -- | InputManager events inform us of all 'inputDevice'.
-handleInputManagerEvent :: (MonadStateGlobal s m) => R.RiverInputManagerEvent -> m ()
+handleInputManagerEvent :: (HandleEvent H R.RiverInputDeviceEvent, MonadH m, MonadStateGlobal s m) => R.RiverInputManagerEvent -> m ()
 handleInputManagerEvent (R.RiverInputManagerFinished _ rim) = WL.objectDestroy rim
 handleInputManagerEvent (R.RiverInputManagerInputDevice _ _ dev) = do
   modifyConfigs $ inputDevices . at dev ?~ def
-  withObject $ WL.listenerAdd_ dev
+  addGlobalListener_ dev
+  --withObject $ WL.listenerAdd_ dev
 
 -- | Input device events give us details about the device.
 handleInputDeviceEvent :: R.RiverInputDeviceEvent -> H ()

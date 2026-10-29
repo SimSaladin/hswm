@@ -84,6 +84,7 @@ makeLensesWith classPerField ''KeyBindings
 makeLensesWith classPerField ''KeyBindingsState
 makeLensesCombine ["riverSeat"] [''BoundKeyInfo]
 
+-- * Functions
 
 -- | Calculate the key bindings that are used by the currently active mappings (layer).
 -- The returned bindings should be activated and other bindings should be deactivated.
@@ -100,8 +101,6 @@ activateBinding k v =
     Nothing          -> BindingNotFound (rollbackSubmaps v) k
   where
     activateSubmap sm = sm { previous = Just v }
-
-
 
 rollbackSubmaps :: KeyBindings k v -> Maybe (KeyBindings k v)
 rollbackSubmaps ((.previous) -> Just x) = Just (go x)

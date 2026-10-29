@@ -47,12 +47,12 @@ import Data.Aeson qualified as A
 import Data.Data
 import Data.Map qualified as M
 import Data.Monoid (Ap (..))
-import GHC.Stack (callStack, prettyCallStack)
+import GHC.Stack
 
 -- * Types
 
-type MonadEffectsIO m = (MonadUnliftIO m, MonadLoggerIO m, MonadMask m, MonadThrow m, MonadFail m)
-type MonadEffects m = (MonadIO m, MonadLogger m, MonadMask m, MonadThrow m, MonadFail m)
+type MonadEffectsIO m = (MonadUnliftIO m, MonadLoggerIO m)
+type MonadEffects m = (MonadIO m, MonadLogger m)
 
 type WindowSpace = W.Workspace WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail
 type WindowSet = W.StackSet WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail ScreenId ScreenDetail
@@ -62,8 +62,6 @@ type Query = QueryT HS
 
 type Seat = Seat' H
 
-type instance Stateful H = HS
-type instance Stateful HS = HS
 type instance ManageHook' H = ManageHook
 
 -- type instance MaybeManageHook' H = MaybeManageHook
@@ -315,7 +313,6 @@ data HConf = HConf
   -- ^ Pending actions to be emitted in the next manage and render queues (respectively).
   , globalTypeMap :: !(TMVar TypeMap)
   -- ^ Global type-indexed variables.
-  , repeatWorker :: !(IORef (Async ()))
   }
   deriving stock (Generic)
 
@@ -403,7 +400,7 @@ instance HasGlobalTMap HConf where
 -- * Monadic "HState" reader access.
 
 class (Monad m) => GetHState m where
-  getHState :: m HState
+  getHState :: HasCallStack => m HState
 instance GetHState (QueryT HS) where
   getHState = Query (lift getHState)
 instance GetHState HS where
@@ -411,7 +408,7 @@ instance GetHState HS where
 instance GetHState H where
   getHState = do
     locked <- view _stateLocked
-    when locked $ throwM $ HSWMStateLocked $ "attempted to nest state lock?\n" ++ prettyCallStack callStack
+    when locked $ throwIO $ HSWMStateLocked $ "attempted to nest state lock?\n" ++ prettyCallStack callStack
     view _state >>= atomically . readTMVar
 
 ---------------------------------------------------------
@@ -419,26 +416,34 @@ instance GetHState H where
 
 -- | Contexts in which it is possible to execute state-locked 'HS' actions.
 class (GetHState m) => MonadHS m where
-  runInHS :: HS a -> m a
-instance MonadHS HS where runInHS = id
-instance MonadHS (QueryT HS) where runInHS ma = Query (lift ma)
-instance MonadHS H where runInHS = runInHS'
+  runInHS :: HasCallStack => HS a -> m a
+
+instance MonadHS H where
+  runInHS = withFrozenCallStack runInHS'
+instance MonadHS HS where
+  runInHS = id
+instance MonadHS (QueryT HS) where
+  runInHS = Query . lift
 
 class (Monad m) => MonadH m where
-  liftH :: H a -> m a
-instance MonadH H where liftH = id
-instance MonadH HS where liftH (H ma) = HS (lift ma)
-instance MonadH (QueryT HS) where liftH ma = Query (lift $ liftH ma)
+  liftH :: HasCallStack => H a -> m a
 
-runInHS' :: (HasCallStack) => (MonadIO m, MonadThrow m, MonadReader HConf m) => HS a -> m a
+instance MonadH H where
+  liftH = id
+instance MonadH HS where
+  liftH (H ma) = HS (lift ma)
+instance MonadH (QueryT HS) where
+  liftH = Query . lift . liftH
+
+runInHS' :: (HasCallStack, MonadIO m, MonadReader HConf m) => HS a -> m a
 runInHS' a = do
   conf <- ask
-  when conf._stateLocked $ throwM $ HSWMStateLocked $ "attempted to nest state lock?\n" ++ prettyCallStack callStack
+  when conf._stateLocked $ throwIO $ HSWMStateLocked $ "attempted to nest state lock?\n" ++ prettyCallStack callStack
   io $ bracketOnError (atomically $ takeTMVar conf._state) (atomically . tryPutTMVar conf._state) $ \st -> do
     res <- timeout 3_000_000 $ runHS conf{_stateLocked = True} st a
     case res of
       Just (r, st') -> atomically (putTMVar conf._state st') >> return r
-      Nothing -> throwM $ HSWMTimeout $ "runInHS timed out (3s)!" ++ prettyCallStack callStack
+      Nothing -> throwIO $ HSWMTimeout $ "runInHS timed out (3s)!" ++ prettyCallStack callStack
   where
     runHS :: HConf -> HState -> HS a -> IO (a, HState)
     runHS c st (HS ma) = flip runReaderT c $ runStateT ma st
@@ -489,6 +494,7 @@ instance {-# OVERLAPPABLE #-} (MonadH m) => ToJSON (m a) where
   toJSON _ = A.Null
   omitField _ = True
 
+-- XXX Orphans..
 instance ToJSON Xkb.XkbRuleNames
 instance ToJSON Xkb.OptionSpec
 instance ToJSON Xkb.LayoutSpec

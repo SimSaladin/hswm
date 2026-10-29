@@ -24,6 +24,7 @@ import Data.Maybe
 import Foreign
 import Foreign.C
 import Foreign.C.ConstPtr
+import GHC.Stack
 
 import Text.XkbCommon.FFI
 import Text.XkbCommon.Keymap
@@ -40,7 +41,7 @@ instance Exception KeymapBuilderException
 -- | Create a keymap from a RMLVO builder.
 --
 -- Throws "KeymapCreationFailed" on failure.
-createKeymapFromBuilder :: XkbRmlvoBuilder -> XkbKeymapFormat -> IO XkbKeymap
+createKeymapFromBuilder :: HasCallStack => XkbRmlvoBuilder -> XkbKeymapFormat -> IO XkbKeymap
 createKeymapFromBuilder kmb fmt =
   withForeignPtr kmb.unwrap $ \ptr ->
     c_new_from_rmlvo ptr (fromKeymapFormat fmt) 0
@@ -51,7 +52,7 @@ createKeymapFromBuilder kmb fmt =
 --
 -- Throws "KeymapBuilderCompilationFailed" on failure.
 newBuilder ::
-  XkbContext
+  HasCallStack => XkbContext
   -> String
   -- ^ Rules (@""@ for default)
   -> String
@@ -68,7 +69,7 @@ newBuilder ctx rs ml =
 -- | Append a layout to the builder.
 --
 -- Throws "KeymapBuilderInvalidLayout" on failure.
-appendLayout :: XkbRmlvoBuilder -> LayoutSpec -> IO ()
+appendLayout :: HasCallStack => XkbRmlvoBuilder -> LayoutSpec -> IO ()
 appendLayout rmlvo ls =
   withForeignPtr rmlvo.unwrap $ \ptr ->
     withCString ls.layoutLayout $ \laC ->
@@ -81,7 +82,7 @@ appendLayout rmlvo ls =
 -- | Append an option to the builder.
 --
 -- Throws "KeymapBuilderInvalidOption" on failure.
-appendOption :: XkbRmlvoBuilder -> OptionSpec -> IO ()
+appendOption :: HasCallStack => XkbRmlvoBuilder -> OptionSpec -> IO ()
 appendOption rmlvo opt =
   withForeignPtr rmlvo.unwrap $ \ptr ->
     withCString opt.optionOption $ \optS -> do

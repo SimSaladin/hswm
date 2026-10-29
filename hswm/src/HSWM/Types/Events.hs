@@ -10,15 +10,9 @@ module HSWM.Types.Events where
 
 import HSWM.Util.PP
 
-import River qualified as R
 import System.Posix (Signal)
-import WL.ExtForeignToplevelList.Staging.V1.Client qualified as ExtFTL
 
 import WL.ExtSessionLock.Staging.V1.Client qualified as ExtSL
-import WL.Wlr.InputMethod.Unstable.V2.Client qualified as WlrIM
-import WL.Wlr.OutputManagement.Unstable.V1.Client qualified as WlrOM
-import WL.Wlr.OutputPowerManagement.Unstable.V1.Client qualified as WlrOPM
-import WL.XdgOutput.Unstable.V1.Client qualified as Xdg
 
 -- | Main loop events.
 data MainEvent
@@ -32,27 +26,10 @@ data MainEvent
 -- deriving anyclass (NFData)
 
 -- | Mash-up of all River/Wayland generated events
-data Event
-  = -- River
-    OutputEvent !R.RiverOutputEvent
-  | PointerEvent !R.RiverPointerBindingEvent
-  | XkbConfigEvent !R.RiverXkbConfigEvent
-  | LayerShellOutputEvent !R.RiverLayerShellOutputEvent
-  | InputManagerEvent !R.RiverInputManagerEvent
-  | InputDeviceEvent !R.RiverInputDeviceEvent
-  | LibinputConfigEvent !R.RiverLibinputConfigEvent
-  | -- Wlroots
-    WlrIMEvent !WlrIM.InputMethodEvent
-  | WlrIMPopupSurfaceEvent !WlrIM.InputPopupSurfaceEvent
-  | WlrIMKeyboardGrabEvent !WlrIM.InputMethodKeyboardGrabEvent
-  | WlrOutputManagerEvent !WlrOM.OutputManagerEvent
-  | WlrOutputHeadEvent !WlrOM.OutputHeadEvent
-  | OutputPowerEvent !WlrOPM.OutputPowerEvent
-  | -- Misc
-    XdgOutputEvent !Xdg.OutputEvent
-  | SessionLockEvent !ExtSL.SessionLockEvent
-  | FTopLevelListEvent !ExtFTL.ForeignToplevelListEvent
-  | FTopLevelHandleEvent !ExtFTL.ForeignToplevelHandleEvent
+newtype Event
+  =
+  -- Misc
+    SessionLockEvent ExtSL.SessionLockEvent
   deriving stock (Eq, Ord, Show, Generic, Data)
   deriving anyclass (NFData, Hashable)
 
