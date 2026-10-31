@@ -1,16 +1,16 @@
 ---
 verbatim:
-  - cabal-version:    3.12
-name:               hswm
-version: &version   0.1.0.0
-synopsis:           Wayland window manager for River
-description:        Wayland window manager for River
-license:            MIT
-license-file:       LICENSE
-author:             Samuli Thomasson
-maintainer:         samuli.thomasson@pm.me
+  - cabal-version: 3.12
+name: hswm
+version: 0.1.0.0
+synopsis: Wayland window manager for River
+description: Wayland window manager for River
+license: MIT
+license-file: LICENSE
+author: Samuli Thomasson
+maintainer: samuli.thomasson@pm.me
 # copyright:
-build-type:         Simple
+build-type: Simple
 tested-with:
   - GHC == 9.14.1
   - GHC == 9.12.4
@@ -19,7 +19,11 @@ tested-with:
 flags:
   use-llvm:
     description: Link with LLVM
-    default: true
+    default: false
+    manual: true
+  pie:
+    description: Enable PIE output
+    default: false
     manual: true
   optimize:
     description: Enable further compiler optimizations
@@ -48,8 +52,10 @@ ghc-options:
   -Wno-typed-holes
 
 when:
+  # llvm flag handling
   - condition: flag(use-llvm) && impl(ghc >= 9.14.1)
     ghc-options: -fllvm
+  # optimize flag
   - condition: flag(optimize)
     ghc-options: -O2 -funbox-strict-fields
 
@@ -67,39 +73,43 @@ __:
     name: hswm:prelude
     mixin: (HSWM.Prelude as Prelude)
 
-  - &dep-template-haskell            template-haskell             >=2.20     && <3
   - &dep-JuicyPixels                 JuicyPixels                 ^>=3.3.9
-  - &dep-aeson                       aeson                        >=2.2.3    && <2.4
+  - &dep-aeson aeson >=2.2.3 && <2.4
+  - &dep-aeson-pretty aeson-pretty
   - &dep-async                       async                       ^>=2.2.6
   - &dep-bytestring                  bytestring                  ^>=0.12.2
-  - &dep-containers                  containers                   >=0.7      && <1.0
+  - &dep-containers containers >=0.7 && <1.0
   - &dep-data-default                data-default                ^>=0.8.0
-  - &dep-deepseq                     deepseq                     ^>=1.5.1
-  - &dep-derive-storable             derive-storable             ^>=0.3.1
-  - &dep-directory                   directory                   ^>=1.3.9
   - &dep-exceptions                  exceptions                  ^>=0.10.9
   - &dep-fast-logger                 fast-logger                 ^>=3.2.6
   - &dep-filelock                    filelock                    ^>=0.1.1
-  - &dep-gi-glib                     gi-glib                      >=2.0.30   && <2.1
+  - &dep-filepath                    filepath
+  - &dep-gi-glib gi-glib >=2.0.30 && <2.1
   - &dep-haskeline                   haskeline                   ^>=0.8.4
-  - &dep-microlens-platform          microlens-platform           >=0.4      && <1
   - &dep-microlens                   microlens
-  - &dep-monad-logger-aeson          monad-logger-aeson          ^>=0.4.1
+  - &dep-microlens-platform microlens-platform >=0.4 && <1
+  - &dep-microlens-th microlens-th
   - &dep-monad-logger                monad-logger
+  - &dep-monad-logger-aeson          monad-logger-aeson          ^>=0.4.1
   - &dep-mtl                         mtl                         ^>=2.3.1
   - &dep-network                     network                     ^>=3.2.8
-  - &dep-optparse-applicative        optparse-applicative         >=0.18.1   && <0.20
+  - &dep-optparse-applicative optparse-applicative >=0.18.1 && <0.20
   - &dep-optparse-generic            optparse-generic            ^>=1.5
-  - &dep-syb syb
   - &dep-pretty-simple               pretty-simple               ^>=4.1.4
   - &dep-prettyprinter               prettyprinter               ^>=1.7.1
-  - &dep-prettyprinter-combinators   prettyprinter-combinators
   - &dep-prettyprinter-ansi-terminal prettyprinter-ansi-terminal ^>=1.1.3
+  - &dep-prettyprinter-combinators   prettyprinter-combinators
   - &dep-process                     process                     ^>=1.6.25
+  - &dep-random random
   - &dep-rio                         rio                         ^>=0.1.24
+  - &dep-safe-exceptions safe-exceptions
   - &dep-stm                         stm                         ^>=2.5.3
+  - &dep-syb syb
+  - &dep-template-haskell template-haskell >=2.20 && <3
   - &dep-text                        text                        ^>=2.1.2
-  - &dep-time                        time                         >=1.14     && <2.0
+  - &dep-text-short text-short
+  - &dep-th-abstraction th-abstraction
+  - &dep-time time >=1.14 && <2.0
   - &dep-transformers                transformers                ^>=0.6.1
   - &dep-typed-process               typed-process               ^>=0.2.13
   - &dep-typerep-map                 typerep-map                 ^>=0.7.0
@@ -109,11 +119,6 @@ __:
   - &dep-unliftio-core               unliftio-core               ^>=0.2.1
   - &dep-utf8-string                 utf8-string                 ^>=1.0.2
   - &dep-vector                      vector                      ^>=0.13.2
-  - &dep-filepath                    filepath
-  - &dep-random random
-  - &dep-aeson-pretty aeson-pretty
-  - &dep-text-short text-short
-  - &dep-safe-exceptions safe-exceptions
 
   # Packages from here
   - &dep-hswm-bindings               hswm-bindings
@@ -127,7 +132,6 @@ __:
 
 library:
   source-dirs: src
-  #exposed-modules: # discovered by hpack
   other-modules:
     - PackageInfo_hswm
   dependencies:
@@ -169,13 +173,15 @@ library:
     - *dep-vector
     - *dep-filepath
     - *dep-text-short
-    - th-abstraction
-    - microlens-th
+    - *dep-th-abstraction
+    - *dep-microlens-th
   build-tools:
     - hsc2hs:hsc2hs
-  ghc-options:
-    - -pie
-    - -fPIC
+  when:
+    - condition: flag(pie)
+      ghc-options:
+        - -fPIC
+        - -pie
 
 internal-libraries:
   prelude:
@@ -200,7 +206,7 @@ internal-libraries:
       - *dep-bytestring
       - *dep-text-short
       - *dep-safe-exceptions
-      - unix
+      - *dep-unix
 
   ipc-api:
     visibility: public

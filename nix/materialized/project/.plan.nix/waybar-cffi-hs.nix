@@ -36,17 +36,21 @@
           (hsPkgs."aeson" or (errorHandler.buildDepError "aeson"))
           (hsPkgs."base" or (errorHandler.buildDepError "base"))
           (hsPkgs."bytestring" or (errorHandler.buildDepError "bytestring"))
+          (hsPkgs."containers" or (errorHandler.buildDepError "containers"))
           (hsPkgs."data-default" or (errorHandler.buildDepError "data-default"))
           (hsPkgs."gi-glib" or (errorHandler.buildDepError "gi-glib"))
+          (hsPkgs."gi-gobject" or (errorHandler.buildDepError "gi-gobject"))
           (hsPkgs."gi-gtk3" or (errorHandler.buildDepError "gi-gtk3"))
           (hsPkgs."gi-pango" or (errorHandler.buildDepError "gi-pango"))
           (hsPkgs."haskell-gi-base" or (errorHandler.buildDepError "haskell-gi-base"))
           (hsPkgs."hswm".components.sublibs.ipc-api or (errorHandler.buildDepError "hswm:ipc-api"))
           (hsPkgs."monad-logger-aeson" or (errorHandler.buildDepError "monad-logger-aeson"))
           (hsPkgs."mtl" or (errorHandler.buildDepError "mtl"))
+          (hsPkgs."safe-exceptions" or (errorHandler.buildDepError "safe-exceptions"))
           (hsPkgs."rio" or (errorHandler.buildDepError "rio"))
           (hsPkgs."template-haskell" or (errorHandler.buildDepError "template-haskell"))
           (hsPkgs."text" or (errorHandler.buildDepError "text"))
+          (hsPkgs."text-short" or (errorHandler.buildDepError "text-short"))
         ];
         buildable = true;
         modules = [

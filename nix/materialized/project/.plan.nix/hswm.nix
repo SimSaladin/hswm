@@ -61,6 +61,7 @@
           (hsPkgs."syb" or (errorHandler.buildDepError "syb"))
           (hsPkgs."template-haskell" or (errorHandler.buildDepError "template-haskell"))
           (hsPkgs."text" or (errorHandler.buildDepError "text"))
+          (hsPkgs."text-short" or (errorHandler.buildDepError "text-short"))
           (hsPkgs."th-abstraction" or (errorHandler.buildDepError "th-abstraction"))
           (hsPkgs."time" or (errorHandler.buildDepError "time"))
           (hsPkgs."transformers" or (errorHandler.buildDepError "transformers"))
@@ -108,9 +109,13 @@
             (hsPkgs."monad-logger-aeson" or (errorHandler.buildDepError "monad-logger-aeson"))
             (hsPkgs."mtl" or (errorHandler.buildDepError "mtl"))
             (hsPkgs."rio" or (errorHandler.buildDepError "rio"))
+            (hsPkgs."safe-exceptions" or (errorHandler.buildDepError "safe-exceptions"))
             (hsPkgs."stm" or (errorHandler.buildDepError "stm"))
             (hsPkgs."text" or (errorHandler.buildDepError "text"))
+            (hsPkgs."text-short" or (errorHandler.buildDepError "text-short"))
+            (hsPkgs."unix" or (errorHandler.buildDepError "unix"))
             (hsPkgs."unliftio" or (errorHandler.buildDepError "unliftio"))
+            (hsPkgs."unliftio-core" or (errorHandler.buildDepError "unliftio-core"))
           ];
           buildable = true;
           modules = [ "HSWM/Prelude" ];
@@ -124,6 +129,7 @@
             (hsPkgs."bytestring" or (errorHandler.buildDepError "bytestring"))
             (hsPkgs."containers" or (errorHandler.buildDepError "containers"))
             (hsPkgs."hswm" or (errorHandler.buildDepError "hswm"))
+            (hsPkgs."text" or (errorHandler.buildDepError "text"))
           ];
           buildable = true;
           hsSourceDirs = [ "app" ];
@@ -147,6 +153,7 @@
             (hsPkgs."prettyprinter" or (errorHandler.buildDepError "prettyprinter"))
             (hsPkgs."prettyprinter-ansi-terminal" or (errorHandler.buildDepError "prettyprinter-ansi-terminal"))
             (hsPkgs."text" or (errorHandler.buildDepError "text"))
+            (hsPkgs."text-short" or (errorHandler.buildDepError "text-short"))
             (hsPkgs."time" or (errorHandler.buildDepError "time"))
           ];
           buildable = true;

@@ -41,6 +41,7 @@
     components = {
       "library" = {
         depends = [
+          (hsPkgs."aeson" or (errorHandler.buildDepError "aeson"))
           (hsPkgs."base" or (errorHandler.buildDepError "base"))
           (hsPkgs."containers" or (errorHandler.buildDepError "containers"))
           (hsPkgs."data-default" or (errorHandler.buildDepError "data-default"))
@@ -51,7 +52,6 @@
           (hsPkgs."template-haskell" or (errorHandler.buildDepError "template-haskell"))
           (hsPkgs."unix" or (errorHandler.buildDepError "unix"))
           (hsPkgs."unliftio" or (errorHandler.buildDepError "unliftio"))
-          (hsPkgs."aeson" or (errorHandler.buildDepError "aeson"))
         ];
         libs = pkgs.lib.optionals (!flags.pkg-config) [
           (pkgs."wayland-client" or (errorHandler.sysDepError "wayland-client"))

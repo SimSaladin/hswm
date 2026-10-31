@@ -40,6 +40,7 @@
     components = {
       "library" = {
         depends = [
+          (hsPkgs."aeson" or (errorHandler.buildDepError "aeson"))
           (hsPkgs."base" or (errorHandler.buildDepError "base"))
           (hsPkgs."c-expr-runtime" or (errorHandler.buildDepError "c-expr-runtime"))
           (hsPkgs."data-default" or (errorHandler.buildDepError "data-default"))

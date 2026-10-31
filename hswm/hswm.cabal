@@ -23,10 +23,15 @@ flag optimize
   manual: True
   default: True
 
+flag pie
+  description: Enable PIE output
+  manual: True
+  default: False
+
 flag use-llvm
   description: Link with LLVM
   manual: True
-  default: True
+  default: False
 
 library
   hs-source-dirs:
@@ -43,7 +48,7 @@ library
     QuantifiedConstraints
     RecordWildCards
     TypeFamilies
-  ghc-options: -Wall -Wno-partial-type-signatures -Wno-ambiguous-fields -Wno-typed-holes -pie -fPIC
+  ghc-options: -Wall -Wno-partial-type-signatures -Wno-ambiguous-fields -Wno-typed-holes
   build-tool-depends:
     hsc2hs:hsc2hs
   exposed-modules:
@@ -170,6 +175,8 @@ library
     ghc-options: -fllvm
   if flag(optimize)
     ghc-options: -O2 -funbox-strict-fields
+  if flag(pie)
+    ghc-options: -fPIC -pie
 
 library ipc-api
   visibility: public
@@ -247,7 +254,7 @@ library prelude
     stm >=2.5.3 && <2.6,
     text >=2.1.2 && <2.2,
     text-short,
-    unix,
+    unix >=2.8.6 && <2.9,
     unliftio >=0.2.25 && <0.3,
     unliftio-core >=0.2.1 && <0.3
   default-language: GHC2024

@@ -16,8 +16,6 @@ module HSWM.Util.RofiPrompt where
 import Data.ByteString.Char8 qualified as C8
 import Data.ByteString.Lazy qualified as LB
 import Data.ByteString.Lazy.Char8 qualified as LC8
-
--- import qualified Data.ByteString.Builder as BB
 import Data.Kind
 import Data.List qualified as L
 import Data.Text qualified as T
