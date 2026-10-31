@@ -434,6 +434,8 @@ rofiToProc pcfg = do
 (++>) :: (Monad m) => m (Maybe a) -> (a -> m ()) -> m ()
 ma ++> f = ma >>= flip whenJust f
 
+infixr 0 ++>
+
 -- * History handling
 
 -- | Get input with history (if configured).

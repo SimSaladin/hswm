@@ -11,7 +11,26 @@
 -- Portability : unportable
 --
 -- Type-indexed globals
-module HSWM.Types.TypeMap where
+module HSWM.Types.TypeMap
+  ( MonadStateGlobal, MonadStateGlobal',
+  TypeMap,
+  TypeMapException(..),
+  HasGlobalTMap(..),
+  -- * With
+  withObject, withObjectDef, withOptionalObject,
+  -- * get
+  getObject, getObjectDef, getOrCreateObject, getOrCreateObjectIO,
+  -- * Create unique
+  createUnique, createUnique_,
+  -- * Put
+  putObject,
+  -- * Modify
+  modifyObject, modifyObjectDef, modifyObjectDef',
+  -- * Debug
+  dumpObjects,
+  --- * Inspect
+  Inspect(..),
+  ) where
 
 import Data.Aeson qualified as A
 import Data.Kind
@@ -88,7 +107,7 @@ instance (Inspect c) => GInspect (K1 i c) where
 instance GInspect U1 where
   ginspect _ _ U1 = ""
 
-data TF (a :: Type) = (Inspect a) => TF {runTF :: !a}
+data TF (a :: Type) = (Inspect a) => TF !a
 
 unwrapVal :: (Inspect a) => TF a -> a
 unwrapVal (TF x) = x

@@ -1,6 +1,7 @@
 {-# LANGUAGE PatternSynonyms #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE NoFieldSelectors #-}
+{-# LANGUAGE ExplicitNamespaces #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 -- |
@@ -11,7 +12,47 @@
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
-module HSWM.Types.Simple where
+module HSWM.Types.Simple
+  (
+  -- * Dimension
+  Dimension,
+  -- * Position1D
+  Position1D,
+  -- * Size
+  Size(..),
+  -- * Position (Point)
+  Position(.., Point),
+  Point,
+  -- * Rectangle
+  Rectangle(.., Rectangle, height, width, x, y),
+  -- ** Functions
+  pointWithin,
+  scaleRationalRect,
+  rationalRectIn,
+  screenRect,
+  -- * Direction1D, 2D
+  Direction1D(..),
+  Direction2D(..),
+  -- * RepeatInfo
+  RepeatInfo(..),
+  -- * CleanaupTasks
+  CleanupTasks(..),
+
+  -- * RationalRect
+  centerRationalRect,
+
+  -- * Lenes
+  HasNew(..),
+  HasName(..),
+  HasRectangle(..),
+  HasPosition(..),
+  HasSize(..),
+  HasY(..),
+  HasX(..),
+  HasWidth(..),
+  HasHeight(..),
+  HasRepeatInfo(..),
+  ) where
 
 import qualified Data.Aeson as A
 import           Data.Ratio
@@ -46,11 +87,14 @@ data Position = Position {x, y :: {-# UNPACK #-} !Position1D}
 -- | A position on the (screen) output surface
 type Point = Position
 
+--pattern Point :: Position1D -> Position1D -> Point
+--pattern Point{x, y} = Position{x, y}
 pattern Point :: Position1D -> Position1D -> Point
-pattern Point{x, y} = Position{x, y}
+pattern Point x y = Position{x, y}
 
 {-# COMPLETE Point #-}
 
+-- | @Rectangle{x, y, width, height}@
 data Rectangle = Rectangle'
   { position :: {-# UNPACK #-} !Position
   , size :: {-# UNPACK #-} !Size
@@ -58,6 +102,7 @@ data Rectangle = Rectangle'
   deriving stock (Eq, Ord, Show, Read, Generic, Data)
   deriving anyclass (Default, NFData)
 
+-- | @Rectangle{x, y, width, height}@
 pattern Rectangle :: Position1D -> Position1D -> Dimension -> Dimension -> Rectangle
 pattern Rectangle{x, y, width, height} = Rectangle' (Position x y) (Size width height)
 

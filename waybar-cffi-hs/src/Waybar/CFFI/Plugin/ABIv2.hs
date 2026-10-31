@@ -16,13 +16,13 @@ import Data.Aeson.KeyMap qualified as A.KM
 import Data.ByteString qualified as BS
 import Data.Text qualified as T
 import Data.Text.Foreign qualified as T
-
-import Control.Exception
+import Control.Exception.Safe
 import Data.Version (Version, parseVersion)
 import Foreign
 import Foreign.C
 import Foreign.C.ConstPtr (ConstPtr (..))
 import GHC.Generics (Generic)
+import GHC.Stack
 import Text.ParserCombinators.ReadP (readP_to_S)
 import Text.Read ()
 
@@ -104,7 +104,7 @@ instance Exception WaybarPluginException
 -- * Configuration parsing
 
 -- | Parse module configuration.
-parseConfig :: (A.FromJSON a) => ConstPtr ConfigEntry -> CSize -> IO a
+parseConfig :: (HasCallStack, A.FromJSON a) => ConstPtr ConfigEntry -> CSize -> IO a
 parseConfig (ConstPtr ptr) size = do
   entries <- peekArray (fromIntegral size) ptr
   keymap <- A.KM.fromList <$> mapM fromEntry entries
@@ -114,13 +114,14 @@ parseConfig (ConstPtr ptr) size = do
   where
     fromEntry (ConfigEntry (ConstPtr pk) (ConstPtr pv)) = do
       key <- T.peekCString pk
-      valBS <- BS.packCString pv
-      case A.eitherDecodeStrict' valBS :: Either String A.Value of
-        Right val -> return (A.Key.fromText key, val)
-        Left err -> throwIO $! WaybarPluginConfigParseError $ err ++ " (while parsing entry '" ++ T.unpack key ++ "':" ++ show valBS ++ ")"
+      bs <- BS.packCString pv
+      case A.eitherDecodeStrict' bs :: Either String A.Value of
+        Right v -> return (A.Key.fromText key, v)
+        Left msg -> throwIO $! WaybarPluginConfigParseError $
+          msg ++ " (while parsing entry '" ++ T.unpack key ++ "':" ++ show bs ++ ")"
 
 -- | Get waybar version.
-getWaybarVersion :: InitInfo -> IO Version
+getWaybarVersion :: HasCallStack => InitInfo -> IO Version
 getWaybarVersion InitInfo{waybar_version = ConstPtr ptr} = do
   str <- peekCString ptr
   case reverse $ readP_to_S parseVersion str of

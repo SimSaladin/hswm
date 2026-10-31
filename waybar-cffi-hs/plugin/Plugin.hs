@@ -3,7 +3,7 @@
 
 module Plugin () where
 
-import Waybar.CFFI.Plugin.HSWM (MyMod)
+import Waybar.CFFI.Plugin.HSWM
 import Waybar.CFFI.Plugin.TH
 
-makeCFFIModule ''MyMod ["-N"]
+makeCFFIModule ''HSWMPlugin ["-N"]

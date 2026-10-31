@@ -37,7 +37,7 @@ import HSWM.Util.Minimize (Minimized (..))
 import HSWM.Util.NamedScratchpad
 import HSWM.Util.PangoMarkup qualified as P
 import HSWM.Util.RofiPrompt qualified as RP
-import HSWM.Util.Waybar qualified as WB
+--import HSWM.Util.Waybar qualified as WB
 import HSWM.Wallpaper qualified as Wallpaper
 import HSWM.Types.KeyBindings qualified as KB
 
@@ -59,7 +59,7 @@ main =
   -- adding keys late, so that a changed modMask override can take effect...
   hswm (validateAndAddKeys myKeys) $
   Wallpaper.usingWallpaper Wallpaper.WallpaperConfig{filepath = "/home/sim/wallpaper.png"} $
-  WB.waybarSB def $
+  --WB.waybarSB def $
   IPC.ipcServer def $
   (def @(HSWMConfig H Full))
     & layoutHook .~ myLayoutHook
@@ -69,8 +69,8 @@ main =
     & pointerBindings <>~ myPointerBinds
     & defaultModMask .~ "mod4"
     & borderWidth .~ 1
-    & normalBorder .~ parseRgba colBase02
-    & focusedBorder .~ parseRgba colCyan
+    & normalBorder .~ parseRGBA ColBase02
+    & focusedBorder .~ parseRGBA ColCyan
     & xkbLayout ?~ myKeyboard
     & repeatInfo . rate .~ 20
     & repeatInfo . delay .~ 150
@@ -220,6 +220,7 @@ myKeys = do
     "M-r c" .@= RP.launchRofi_ (RP.modePromptWith myRofiBaseConfig "clipboard:cliphist-rofi-img" & RP.showIcons .~ True) <?> "Open cliphist prompt"
     -- bluetooth prompt
     "M-r b" .@= spawnOnceKitty "bluetoothctl@kitty" "bluetoothctl" [] (doCenterFloat (3 / 5) (2 / 3))
+    "M-r q" .@= qutebrowserPrompt <?> "Launch qutebrowser (prompt for name)"
 
   group "Media" $ do
     "M-plus" .@= adjustVolume "@DEFAULT_SINK@" volAdjAmount <!> 80
@@ -377,24 +378,22 @@ cycleRecentHiddenWS = CycleRecentWS.cycleWindowSets $ \wset ->
 
 windowPrompt :: H ()
 windowPrompt = do
-  (wss, wState) <-
-    runInHS $
-      (,)
-        <$> withWindowSet (return . W.workspaces)
-        <*> use _windows
-  let wins = [(rw, fmtWindow ws w) | ws <- wss, rw <- W.integrate' (W.stack ws), Just w <- [M.lookup rw wState]]
-      input = RP.columnsWithHeader ("appID", "Workspace", "Title", "PID") $ map snd wins
-  RP.runRofi (RP.clearInputSettings rp) input >>= (`whenJust` doApply wins)
+  (wss, wState) <- runInHS $ (,) <$> withWindowSet (return . W.workspaces) <*> use _windows
+  let (input, toTarget) = getRows wss wState
+  RP.runRofi (RP.clearInputSettings rp) input RP.++> doApply . toTarget
   where
     rp :: RP.RofiPromptConfig () RP.SelectI Int
-    rp =
-      myRofiBaseConfig
-        & RP.prompt
-          .~ "window"
-        & RP.promptMessage
-          .~ "Go to window"
-        & RP.noCustomInput
-          .~ True
+    rp = myRofiBaseConfig
+        & RP.prompt .~ "window"
+        & RP.promptMessage .~ "Go to window"
+        & RP.noCustomInput .~ True
+
+    getRows wss wins = (RP.columnsWithHeader ("appID", "Workspace", "Title", "PID") $ map snd rows, fst . (rows !!) . subtract 1)
+      where rows = do
+              ws <- wss
+              rw <- W.integrate' (W.stack ws)
+              Just w <- [M.lookup rw wins]
+              return (rw, fmtWindow ws w)
 
     fmtWindow ws w =
       ( P.bold w.appId
@@ -403,10 +402,9 @@ windowPrompt = do
       , maybe "" ((" pid:" <>) . P.fromShow) w.unreliablePid
       )
 
-    doApply wins idx = do
-      let (rw, _) = wins !! idx
-      logInfo $ fromString $ show idx
-      runInHS $ windows $ W.focusWindow rw
+    doApply rw = do
+      logInfo $ "window prompt: focusing the chosen window" :# [ "window" .= rw ]
+      windows $ W.focusWindow rw
       manageDirty
 
 removeFocusedWorkspace :: HS ()
@@ -435,6 +433,21 @@ bindsPrompt = do
         [ (a, (T.intercalate "," $ map toText $ actionCategories (Proxy @H) a, T.unwords $ map (ppXBKey @Text) $ pre ++ xk, actionDescription (Proxy @H) a))
         | (xk, a) <- L.sortOn (map (ppXBKey @String) . fst) binds
         ]
+
+qutebrowserPrompt :: H ()
+qutebrowserPrompt = do
+  (_, out, _) <- readProcess $ proc "find"
+          [ "/home/sim/.local/share/qutebrowser/", "-maxdepth", "1",
+          "-mindepth", "1", "-type", "d",
+          "!", "-name", ".*", "!", "-name", "greasemonkey", "!", "-name", "qutebrowser",
+          "-printf", "%P\n" ]
+  let input = T.lines $ decodeUtf8Lenient $ out ^. strict
+  RP.runRofi @_ @'s' myRofiBaseConfig input RP.++> launch
+    where
+      launch name = do
+        logInfo $ "qutebrowser launch" :# [ "instance" .= name ]
+        runWithSystemD def{ sdUnit = Just $ "qutebrowser@" ++ name } ("qutebrowser -r " ++ name)
+
 
 -- | XXX: this should be run after window restore
 cleanupMinimized :: H ()

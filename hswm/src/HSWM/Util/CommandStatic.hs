@@ -7,13 +7,18 @@
 -- Stability   : unstable
 -- Portability : unportable
 module HSWM.Util.CommandStatic (
+  -- * Create command
   mkCommand,
   mkCommand_,
-  registerCommand,
+  -- * Run command
   runCommand,
   runCommandJSON,
+  -- * Command registration
+  registerCommand,
+  -- * Types
   SomeCommand (..),
   Command,
+  CommandCtx,
   Dict (..),
   CommandStore (..),
 ) where
@@ -70,7 +75,17 @@ data SomeCommand where
 instance Show SomeCommand where
   show (SomeCommand cmd) = show cmd
 
-mkCommand :: StaticPtr (Dict (CommandCtx arg res)) -> StaticPtr (arg -> H res) -> Maybe () -> Command arg res
+-- |
+-- @
+-- mkCommand_ (static Dict) (static myTask)
+--
+-- myTask :: InputArgs -> H ()
+-- @
+mkCommand
+  :: StaticPtr (Dict (CommandCtx arg res)) -- ^ Context
+  -> StaticPtr (arg -> H res) -- ^ Command
+  -> Maybe ()  -- ^ Argument (unused)
+  -> Command arg res
 mkCommand dict action _arg =
   Command
     { actionPtr = action

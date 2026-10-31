@@ -6,7 +6,14 @@
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
-module HSWM.BufferPool where
+module HSWM.BufferPool
+  ( ImageBufferPool
+  , ImageBuffer(height, width, stride, buf, ptr)
+  , newImageBufferPool
+  , destroyImageBufferPool
+  , nextBuffer
+  , incSurfaceCount
+  ) where
 
 import HSWM.Core hiding (height, size, width)
 import HSWM.Util.Posix

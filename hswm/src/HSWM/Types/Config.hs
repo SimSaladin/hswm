@@ -18,7 +18,7 @@ import HSWM.Types.Lens
 import HSWM.Types.Simple
 import HSWM.Types.Window
 import HSWM.Types.KeyBindings (KeyBindings)
-import HSWM.Utils (parseRgba)
+import HSWM.Utils (parseRGBA)
 import River qualified as R
 
 import Control.Monad.Fix
@@ -75,8 +75,8 @@ instance
     (Generics.to gdef)
       { borderWidth = 2
       , borderEdges = mconcat [R.EdgeLeft, R.EdgeRight, R.EdgeTop, R.EdgeBottom]
-      , normalBorder = parseRgba "0x0000B0"
-      , focusedBorder = parseRgba "0xFA0050"
+      , normalBorder = parseRGBA "0x0000B0"
+      , focusedBorder = parseRGBA "0xFA0050"
       , defaultModMask = "Ctrl"
       , workspaces = ["1", "2", "3", "4"]
       , handleEventHook = mempty

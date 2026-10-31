@@ -8,12 +8,18 @@
 -- Portability : unportable
 module HSWM.Util.PangoMarkup
   (
+  -- * Markup
   Markup,
-  ToMarkup(..),
-  render,
-  bold, italic, monospace, text, raw, escape, fromShow, (~++),
-  HSWM.Util.PangoMarkup.span, Attr(..),
+  -- ** ToMarkup
+  ToMarkup(..), (~++),
+  -- ** Text
+  text, raw, escape, fromShow,
   IsText(..),
+  -- ** tag
+  bold, italic, monospace,
+  HSWM.Util.PangoMarkup.span, Attr(..),
+  -- ** Render
+  render,
   ) where
 
 import Data.Text qualified as T

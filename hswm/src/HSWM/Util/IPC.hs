@@ -225,7 +225,7 @@ connWorker conf conn sendQ = do
       waitRead <- io $ waitReadSocketSTM conn
       r <- atomically $ (Left <$> waitRead) `orElse` (Right <$> readTQueue sendQ)
       case r of
-        Right msg -> sendMsg conn msg >> worker lo
+        Right msg -> sendMsg' conn msg >> worker lo
         Left () -> do
           (rs, lo') <- recvLines conn lo
           mapM_ handleRequest rs
@@ -234,7 +234,7 @@ connWorker conf conn sendQ = do
       Right msg -> serverHandleMsg conf conn msg
       Left e -> do
         logWarn $ "Malformed request from client" :# ["error" .= toText e, "msg" .= LBC8.unpack (LB.take 256 resp)]
-        sendMsg conn (Error (toText e) :: Msg ())
+        sendMsg' conn (Error (toText e) :: Msg ())
 
 getServerAddr ::
   (MonadIO m) =>
@@ -263,10 +263,13 @@ serverHandleMsg conf c (Contents r seqn) = do
   case r of
     IdentifyClient{} -> do
       logInfo $ "client sent identity" :# ["id" .= r]
-      fullStateUpdate conf >>= mapM_ (sendMsg c . flip Contents Nothing)
+      fullStateUpdate conf >>= mapM_ (sendMsg' c . flip Contents Nothing)
     _ -> do
       res <- userCode $ conf.requestHandler r
-      sendMsg c $ maybe (Error "handler exception") (either Error (`Contents` seqn)) res
+      sendMsg' c $ maybe (Error "handler exception") (either Error (`Contents` seqn)) res
+
+sendMsg' :: ToJSON a => Socket -> Msg a -> H ()
+sendMsg' s msg = sendMsg (ClientHandle s) msg
 
 -- * Info for status bars
 

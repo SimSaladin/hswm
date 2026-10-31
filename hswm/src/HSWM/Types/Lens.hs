@@ -1,7 +1,6 @@
 {-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE TypeFamilyDependencies #-}
 {-# LANGUAGE ViewPatterns #-}
-{-# OPTIONS_GHC -Wno-orphans #-}
 
 -- |
 -- Module      : HSWM.Types.Lens
@@ -12,7 +11,29 @@
 -- Stability   : unstable
 -- Portability : unportable
 module HSWM.Types.Lens (
-  module HSWM.Types.Lens,
+  -- * Lens derive
+  makeLenses', makeLensesWith',
+  makeLensesCombine, makeLensesCombine',
+  makeFieldClassesIfMissing,
+  classPerField, classPerField',
+  classPerType, classPerType',
+  ignoreFields, preserveLeading_,
+  fromSnake,
+  -- * Lens utils
+  (&+),
+  -- * RiverId
+  ToRiverId(..),
+  HasRiverId(..),
+  riverIdToWord, wordToRiverId,
+  riverIdToHex, hexToRiverId,
+  SomeWindow,
+  SomeOutput,
+  SomeSeat,
+  riverIdEq,
+  eachRiverId,
+  SameRiverId,
+  -- * Aeson deriving
+  aesonOptions,
 
   -- * Re-exports
   mkName,
@@ -34,7 +55,6 @@ import Data.Char
 import Data.Coerce
 import Data.Dynamic
 import Data.Set qualified as Set
-import Data.Typeable
 import Language.Haskell.TH hiding (Type)
 import Language.Haskell.TH.Datatype qualified as D
 import Language.Haskell.TH.Datatype.TyVarBndr qualified as D
@@ -43,20 +63,6 @@ import Text.Read (read)
 
 import River qualified as R
 import WL.Client qualified as WL
-
----------------------------------------------------------
--- Orphan instances
--- XXX
-
-instance (Typeable a) => Show (StablePtr a) where
-  show a = "StablePtr " ++ show (typeOf a)
-
-instance NFData (StablePtr a) where
-  rnf = rnf . castStablePtrToPtr
-
-instance A.ToJSON (StablePtr a) where
-  toJSON _ = A.Null
-  omitField _ = True
 
 -- * Constants
 
@@ -312,9 +318,8 @@ wordToRiverId = toRiverId . wordPtrToPtr @Void . WordPtr
 -- | 'riverIdToHex' and 'hexToRiverId' is the encoding used for JSON too.
 -- They also correspond to the (custom) 'Show' and 'Read' instances.
 riverIdToHex :: (WL.IsWlObject a, Show a) => a -> String
-hexToRiverId :: (WL.IsWlObject a, Read a) => String -> a
 riverIdToHex = show
-
+hexToRiverId :: (WL.IsWlObject a, Read a) => String -> a
 hexToRiverId = read
 
 -- Instances for most common River identifiers...

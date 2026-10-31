@@ -139,7 +139,7 @@ instance LayoutModifier WindowNavigation RiverWindow where
 
       let (uc, dc, lc, rc) = case brightness conf of
             Just frac -> let myc = mixRGBA frac fbc nbc in (myc, myc, myc, myc)
-            Nothing -> each %~ parseRgba $ (upColor conf, downColor conf, leftColor conf, rightColor conf)
+            Nothing -> each %~ parseRGBA $ (upColor conf, downColor conf, leftColor conf, rightColor conf)
 
       let dirc U = uc
           dirc D = dc

@@ -8,6 +8,8 @@
 -- Portability : unportable
 module HSWM.Util.Process (
   module HSWM.Util.Process,
+
+  -- * System.Process.Typed
   module System.Process.Typed,
 
   -- * Re-exports

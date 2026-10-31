@@ -109,9 +109,7 @@ lookupGrabIM s = do
         grabIM <- newGrabIM imManager s.wl_seat
         putObject $ M.insert s.wl_seat grabIM seatInputMethods
         return grabIM
-  case M.lookup s.wl_seat seatInputMethods of
-    Just im -> return im
-    Nothing -> makeGrabIM
+  maybe makeGrabIM return $ M.lookup s.wl_seat seatInputMethods
 
 newGrabIM ::
   (MonadReader env m, MonadLogger m, MonadUnliftIO m) =>

@@ -911,7 +911,7 @@ renderBorders r b = do
   let l = nodeRefToLeaf (getFocusedNode b) $ makeZipper b
   wssel <-
     if refLeaf (getSelectedNode b) /= (-1)
-      then createBorder (getNodeRect b r (getSelectedNode b)) $ Just (parseRgba "#00ff00")
+      then createBorder (getNodeRect b r (getSelectedNode b)) $ Just (parseRGBA "#00ff00")
       else return []
   let b' = b{getSelectedNode = (getSelectedNode b){refWins = wssel}}
   if refLeaf (getFocusedNode b') == (-1) || isJust l || size b' < 2

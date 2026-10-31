@@ -8,7 +8,6 @@
 -- Portability : unportable
 module Waybar.CFFI.Plugin.TextFormat where
 
--- "gi-glib"
 import Control.Monad.IO.Class
 import Data.Aeson qualified as A
 import Data.List qualified as L

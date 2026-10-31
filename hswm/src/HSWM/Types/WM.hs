@@ -16,6 +16,7 @@
 -- Basic window management -related types.
 module HSWM.Types.WM (
   module HSWM.Types.WM,
+  -- * Re-exports
   module HSWM.Types.Action,
   module HSWM.Types.Window,
   module HSWM.Types.Seat,

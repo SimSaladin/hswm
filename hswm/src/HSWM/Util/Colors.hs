@@ -1,3 +1,5 @@
+{-# LANGUAGE PatternSynonyms #-}
+
 -- |
 -- Module      : HSWM.Util.Colors
 -- Description : Extras for working with RiverColor and others.
@@ -7,7 +9,39 @@
 -- Stability   : unstable
 -- Portability : unportable
 --
-module HSWM.Util.Colors where
+module HSWM.Util.Colors
+  (
+  -- * RGBA
+  RGBA(..),
+  -- * RGBA from String
+  parseRGBA,
+  -- * RGBA from RiverColor
+  fromRiverColor,
+  -- * RGBA to RiverColor
+  packRGBA,
+  -- * Word32 to RiverColor
+  bytesToRiverColor,
+  -- * Mix RGBA
+  overRGBA,
+  mixRGBA,
+  -- * Solarized
+    pattern ColBase03,
+    pattern ColBase02,
+    pattern ColBase01,
+    pattern ColBase00,
+    pattern ColBase0,
+    pattern ColBase1,
+    pattern ColBase2,
+    pattern ColBase3,
+    pattern ColYellow,
+    pattern ColOrange,
+    pattern ColRed,
+    pattern ColMagenta,
+    pattern ColViolet,
+    pattern ColBlue,
+    pattern ColCyan,
+    pattern ColGreen
+  ) where
 
 import River (RiverColor (..))
 import GHC.Stack
@@ -16,9 +50,9 @@ import Data.Ord
 
 -- | Parse a color in the format 0xRRGGBB or 0xRRGGBBAA and convert it to
 -- 32-bit color values (used by Window.set_borders in rwm).
-parseRgba :: (HasCallStack) => String -> RiverColor
-parseRgba s
-  | '#' : s' <- s = parseRgba ('0' : 'x' : s')
+parseRGBA :: (HasCallStack) => String -> RiverColor
+parseRGBA s
+  | '#' : s' <- s = parseRGBA ('0' : 'x' : s')
   | '0' : 'x' : s' <- s
   , length s == 8 || length s == 10 =
       bytesToRiverColor $ case readHex @Word32 s' of
@@ -106,20 +140,24 @@ unpremult (RGBA r g b a)
 -- * Solarized colors
 
 -- | Solarized palette
-colBase03, colBase02, colBase01, colBase00, colBase0, colBase1, colBase2, colBase3, colYellow, colOrange, colRed, colMagenta, colViolet, colBlue, colCyan, colGreen :: String
-colBase03 = "0x002b36" -- "#002b36"
-colBase02 = "0x073642" -- "#073642"
-colBase01 = "0x586e75" -- "#586e75"
-colBase00 = "0x657b83" -- "#657b83"
-colBase0 = "0x839496" -- "#839496"
-colBase1 = "0x93a1a1" -- "#93a1a1"
-colBase2 = "0xeee8d5" -- "#eee8d5"
-colBase3 = "0xfdf6e3" -- "#fdf6e3"
-colYellow = "0xb58900" -- "#b58900"
-colOrange = "0xcb4b16" -- "#cb4b16"
-colRed = "0xdc322f" -- "#dc322f"
-colMagenta = "0xd33682" -- "#d33682"
-colViolet = "0x6c71c4" -- "#6c71c4"
-colBlue = "0x268bd2" -- "#268bd2"
-colCyan = "0x2aa198" -- "#2aa198"
-colGreen = "0x859900" -- "#859900"
+pattern
+  ColBase03,
+  ColBase02, ColBase01, ColBase00, ColBase0, ColBase1, ColBase2, ColBase3,
+  ColYellow, ColOrange, ColRed, ColMagenta, ColViolet, ColBlue, ColCyan, ColGreen
+    :: String
+pattern ColBase03 = "0x002b36" -- "#002b36"
+pattern ColBase02 = "0x073642" -- "#073642"
+pattern ColBase01 = "0x586e75" -- "#586e75"
+pattern ColBase00 = "0x657b83" -- "#657b83"
+pattern ColBase0 = "0x839496" -- "#839496"
+pattern ColBase1 = "0x93a1a1" -- "#93a1a1"
+pattern ColBase2 = "0xeee8d5" -- "#eee8d5"
+pattern ColBase3 = "0xfdf6e3" -- "#fdf6e3"
+pattern ColYellow = "0xb58900" -- "#b58900"
+pattern ColOrange = "0xcb4b16" -- "#cb4b16"
+pattern ColRed = "0xdc322f" -- "#dc322f"
+pattern ColMagenta = "0xd33682" -- "#d33682"
+pattern ColViolet = "0x6c71c4" -- "#6c71c4"
+pattern ColBlue = "0x268bd2" -- "#268bd2"
+pattern ColCyan = "0x2aa198" -- "#2aa198"
+pattern ColGreen = "0x859900" -- "#859900"

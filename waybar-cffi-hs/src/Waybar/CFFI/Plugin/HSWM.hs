@@ -14,16 +14,13 @@
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
-module Waybar.CFFI.Plugin.HSWM (MyMod) where
+module Waybar.CFFI.Plugin.HSWM (HSWMPlugin) where
 
 import Waybar.CFFI.Plugin.Base
 import Waybar.CFFI.Plugin.TextFormat
 
-import HSWM.IPC (OutputId (..), RWorkspaces (..), Response (..), WindowInfo (..), WorkspaceInfo (..), WsId, clientRun)
-
--- "haskell-gi-base"
--- "gi-gtk3"
--- "gi-pango"
+import HSWM.IPC (OutputId (..), RWorkspaces (..), Response (..), WindowInfo (..), WorkspaceInfo (..), WsId)
+import qualified HSWM.IPC as C
 
 import Control.Monad.IO.Class
 import Control.Monad.Logger.Aeson hiding (Message)
@@ -38,26 +35,27 @@ import Foreign.StablePtr
 import GI.GObject.Objects.Object qualified as GIGO
 import GI.Gtk as Gtk
 import GI.Pango (EllipsizeMode (..))
-import RIO (Async, SomeException, askRunInIO, async, cancel, threadDelay, try)
+import RIO (Async, askRunInIO, async, cancel, threadDelay, MVar, putMVar, takeMVar, newEmptyMVar, withMVar)
 import RIO.Prelude hiding (on)
 import RIO.Prelude.Types
+import Control.Exception.Safe
 
-data MyMod = MyMod
+data HSWMPlugin = HSWMPlugin
   { workspacesContainer :: Maybe Container
   , layoutLabel :: Maybe Label
   , focusInfoLabel :: Maybe Label
   }
   deriving (Eq, Generic, Default)
 
-type MIO = Context MyMod
+type MIO = Context HSWMPlugin
 
-instance Default (PluginState MyMod) where
+instance Default (PluginState HSWMPlugin) where
   def = ModState [] "" mempty
 
 -- * Plugin Config parsing
 
-instance ToJSON (PluginConfig MyMod)
-instance FromJSON (PluginConfig MyMod) where
+instance ToJSON (PluginConfig HSWMPlugin)
+instance FromJSON (PluginConfig HSWMPlugin) where
   parseJSON = withObject "Config" $ \v ->
     Config
       <$> (v .: "active" <|> pure ViewWorkspaces)
@@ -72,16 +70,8 @@ instance FromJSON (PluginConfig MyMod) where
       defWs = fromString "<span>{keyhint}:</span>{tag}"
       defLayoutTooltip = fromString "Layout: {layout}\rWindows:\r{windowlist}"
       defLayoutWindowList = fromString "{title} - {kitty} [{pid}]"
-      defWsTooltip =
-        fromString $
-          "{screen}@{outputName}\r"
-            <> "Windows:\t{numWindows}\r"
-            <> "Layout:\t{layout}"
-      defFocusedTooltip =
-        fromString $
-          "{title}\r"
-            <> "AppID: {appId}\r"
-            <> "PID: {pid}"
+      defWsTooltip = fromString $ mconcat [ "{screen}@{outputName}\r", "Windows:\t{numWindows}\r", "Layout:\t{layout}" ]
+      defFocusedTooltip = fromString $ mconcat [ "{title}\r", "AppID: {appId}\r", "PID: {pid}" ]
 
 -- | Sum constructor for different views for this widget.
 data ActivePart
@@ -103,23 +93,24 @@ instance ToJSON ActivePart where
     ViewCurrentLayout -> "layout"
     ViewFocusedWindow -> "focused"
 
--- * instance WaybarPlugin MyMod
+-- * instance WaybarPlugin HSWMPlugin
 
-instance WaybarPlugin MyMod where
-  type ContextT MyMod = LoggingT
+instance WaybarPlugin HSWMPlugin where
+  type ContextT HSWMPlugin = LoggingT
   runContextT _ = runStderrLoggingT
 
   -- shared between all instances of this plugin (in the same waybar!)
-  data GlobalState MyMod = Global
+  data GlobalState HSWMPlugin = Global
     { wmThread :: !(Async ())
     , outputs :: ![(Text, OutputId)]
     , workspacesInfo :: !RWorkspaces
     , curfocus :: !(Maybe WindowInfo)
+    , wmClient :: !(MVar C.ClientHandle)
     }
     deriving (Eq, Generic)
 
   -- config data supplied from waybar
-  data PluginConfig MyMod = Config
+  data PluginConfig HSWMPlugin = Config
     { activePart :: ActivePart
     , focusedWindowMaxLength :: !Int32
     , wsSpacing :: !Int32
@@ -133,7 +124,7 @@ instance WaybarPlugin MyMod where
     deriving (Eq, Ord, Show, Read, Generic)
 
   -- instance-specific plugin state
-  data PluginState MyMod = ModState
+  data PluginState HSWMPlugin = ModState
     { tagWidgets :: [(Button, Label)]
     , thisOutputName :: !Text
     , -- \^ Name of this output, e.g. eDP-1, DP-2, etc.
@@ -142,9 +133,11 @@ instance WaybarPlugin MyMod where
     deriving (Eq, Generic)
 
   initGlobal = do
+    wmClientVar <- newEmptyMVar
     -- Instances of this plugin share a single WM client!
-    wmAs <- async connectToWM
-    return $! Global wmAs def def def
+    wmAs <- async $ connectToWM wmClientVar
+    return $! Global wmAs def def def wmClientVar
+
   deinitGlobal g = cancel g.wmThread
 
   init = do
@@ -194,22 +187,28 @@ instance WaybarPlugin MyMod where
 
 -- * HSWM Client
 
-connectToWM :: SetupGlobal MyMod ()
-connectToWM = do
+connectToWM :: MVar C.ClientHandle -> SetupGlobal HSWMPlugin ()
+connectToWM clientVar = do
   logInfo "Connecting..."
-  res <- try $ clientRun def handleMsgG $ \_ -> do
+  handleErrors $ C.clientRunWith def $ \client -> do
     logInfo "Connected"
-    forever $ threadDelay maxBound
-  case res of
-    Right{} -> return ()
-    Left (ex :: SomeException) -> do
-      logError $ "Disconnected (exception occurred)" :# ["exception" .= show ex]
-      threadDelay 5_000_000
-      connectToWM
+    bracket_ (putMVar clientVar client) (takeMVar clientVar) $ C.receiveMessages handleMsgG client
+    return ""
+  where
+    handleErrors run = do
+      catches run
+        [ Handler $ \C.SocketDisconnected -> return "Socket disconnected"
+        , Handler $ \(e :: C.ClientException) -> return $ show e
+        ] >>= restart
 
-handleMsgG :: Response -> SetupGlobal MyMod ()
+    restart msg = do
+      logError $ "Disconnected (exception occurred), reconnect in 5s" :# ["reason" .= msg]
+      threadDelay 5_000_000
+      connectToWM clientVar
+
+handleMsgG :: Response -> SetupGlobal HSWMPlugin ()
 handleMsgG Identify{} = pure ()
-handleMsgG Outputs{..} = modifyGlobal $ \s -> (s :: GlobalState MyMod){outputs = outputs}
+handleMsgG Outputs{..} = modifyGlobal $ \s -> (s :: GlobalState HSWMPlugin){outputs = outputs}
 handleMsgG Workspaces{..} = do
   modifyGlobal $ \s -> s{workspacesInfo = workspaces}
   queueUpdateAll
@@ -221,7 +220,7 @@ handleMsgG msg = logWarn $ "Unhandled incoming message" :# ["msg" .= msg]
 -- * Sniff waybar output name
 
 -- | Wait for the waybar window to be created, then sniff out the assigned screen name.
-updateOutputName :: Context MyMod ()
+updateOutputName :: Context HSWMPlugin ()
 updateOutputName = do
   ic <- asks id
   let w = instRootWidget ic
@@ -299,20 +298,26 @@ updateWorkspaces = do
             setWidgetWSI wds ws False False Nothing
   where
     addWorkspaceWidget contw _ws = do
-      b <- new Button [#valign := AlignEnd]
-      l <- new Label [#valign := AlignEnd, #useMarkup := True]
-      addClass b "workspace"
-      -- set b [ #label := T.pack ws.tag ]
-      containerAdd b l
-      containerAdd contw b
+      btn <- new Button [#valign := AlignEnd]
+      label <- new Label [#valign := AlignEnd, #useMarkup := True]
+      addClass btn "workspace"
+      containerAdd btn label
+      containerAdd contw btn
       runInIO <- askRunInIO
-      void $ on b #clicked $ runInIO $ handleClick l ?self
-      widgetShowAll b
-      return (b, l)
+      void $ on btn #clicked $ runInIO $ handleClick ?self
+      widgetShowAll btn
+      return (btn, label)
 
-    handleClick _lb btn = do
-      (tag :: WsId) <- liftIO $ GIGO.objectGetData btn gTagName >>= deRefStablePtr . castPtrToStablePtr
-      logInfo $ "button was clicked!" :# ["tag" .= tag]
+-- | Workspace clicked
+handleClick :: Button -> MIO ()
+handleClick btn = do
+  (tag :: WsId) <- liftIO $ GIGO.objectGetData btn gTagName >>= deRefStablePtr . castPtrToStablePtr
+  logInfo $ "button was clicked!" :# ["tag" .= tag]
+  g <- getGlobal
+  st <- getState
+  let outputId = fromMaybe maxBound (L.lookup st.thisOutputName g.outputs)
+  withMVar g.wmClient $ \c ->
+    C.sendMsg c $ C.Contents (C.WmCtrl $ C.WmCtrlActionValue $ A.toJSON (C.ViewWorkspaceOnScreen { tag, screen = outputId } :: C.WmCtrlAction) :: C.Request) Nothing
 
 updateFocusInfo :: MIO ()
 updateFocusInfo = do

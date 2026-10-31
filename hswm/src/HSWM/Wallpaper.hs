@@ -31,6 +31,7 @@ import WL.Wlr.LayerShell.Unstable.V1.Client qualified as Wlr
 import Codec.Picture qualified as JP
 import Data.Map qualified as M
 import Data.Vector.Storable qualified as V
+import Text.Printf
 
 -- import GHC.Generics
 
@@ -108,7 +109,7 @@ wpStartupHook conf = do
 
 wpExitHook :: (HasCallStack) => H ()
 wpExitHook = do
-  logInfoNS "wallpaper" "exit hook, cleaning up..."
+  logInfoNS "wallpaper" "exit hook; cleaning up..."
   deinit
 
 wpHandleEventHookDyn :: Dynamic -> H All
@@ -213,15 +214,15 @@ drawImage bp OutputState{..} img Surfaces{..} = do
   buf <- BP.nextBuffer bp shmFormat (fi buf_w) (fi buf_h)
 
   logDebugNS "wallpaper" $
-    "render: now drawing wallpaper"
+    "rendering wallpaper"
       :# [ "out" .= name
          , "out-size" .= (w, h)
          , "out-scale" .= scale
          , "out-fscale" .= pref_fract_scale
          , "src-size" .= (src_w, src_h)
          , "buf-size" .= buf_size
-         , "calc-scale" .= ((sx', sy'), (sx, sy))
-         , "calc-trans" .= (tx, ty)
+         , "calc-scale" .= (printf "%.2f,%.2f;%.2f,%.2f" sx' sy' sx sy :: String)
+         , "calc-trans" .= (printf "%.2f,%.2f" tx ty :: String)
          ]
 
   _ <- io $ V.unsafeWith (JP.imageData img) $ \bits -> do
@@ -261,7 +262,7 @@ initOutput ro = withOutputState ro $ \os -> do
   compositor <- getObject
   let w = os.out_width
       h = os.out_height
-  logDebugNS "wallpaper" $ "initOutput: start"  :# [ "output" .= ro ]
+  logDebugNS "wallpaper" $ "initOutput: start"  :# [ "output" .= os.name, "river_output" .= ro ]
   ss <- case os.surfaces of
     Just ss -> return ss
     Nothing -> do
@@ -277,7 +278,7 @@ initOutput ro = withOutputState ro $ \os -> do
       -- fractional scale listener
       fsl <- WL.createListener $ \case
         FS.FractionalScalePreferredScale _ _ fscale -> runInIO $ do
-          logInfo $ "wallpaper: fractional scale updated" :# ["fractional-scale" .= fscale, "output" .= show ro]
+          logInfoNS "wallpaper" $ "fractional scale updated" :# [ "output" .= os.name, "river_output" .= ro, "fractional-scale" .= fscale ]
           updateOutputState ro $ \x -> x{pref_fract_scale = fscale, pending_render = True}
       WL.listenerAdd_ fractSurface fsl
 
@@ -299,10 +300,10 @@ initOutput ro = withOutputState ro $ \os -> do
               { out_width = fi cw
               , out_height = fi ch
               , configured = True
-              , pending_render = not x.configured || (x.out_width, x.out_height) /= (fi cw, fi ch)
+              , pending_render = x.pending_render || not x.configured || (x.out_width, x.out_height) /= (fi cw, fi ch)
               }
-        -- logDebug $ "wallpaper: layer surface configure" :# [ "size" .= show (cw, ch), "old-size" .= show (w, h), "output" .= show ro ]
-        Wlr.LayerSurfaceClosed{} -> runInIO $ logError "Layer surface closed!"
+          --withOutputState ro $ \x -> logInfoNS "wallpaper" $ "layer surface configure" :# [ "output" .= os.name, "river_output" .= ro, "cwch" .= (cw, ch), "configured" .= x.configured, "pending_render" .= x.pending_render ]
+        Wlr.LayerSurfaceClosed{} -> runInIO $ logErrorNS "wallpaper" $ "Layer surface closed!" :# [ "output" .= os.name, "river_output" .= ro ]
       WL.listenerAdd_ layerSurface lsListener
 
       -- finally:
@@ -325,7 +326,7 @@ initOutput ro = withOutputState ro $ \os -> do
 
   -- Update ctx
   updateOutputState ro $ \x -> x{surfaces = Just ss}
-  logDebugNS "wallpaper" $ "initOutput: done" :# [ "output" .= ro ]
+  logDebugNS "wallpaper" $ "initOutput: done" :# [ "output" .= os.name, "river_output" .= ro ]
 
 ------------------------------------------
 -- Internal boilerplate

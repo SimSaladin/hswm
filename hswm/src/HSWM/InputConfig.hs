@@ -279,12 +279,6 @@ setKeyboardKeymap kbd kmdef = do
     Left err -> logError $ "Unable to set keymap: keymap creation failed" :# ["params" .= show kmdef, "error" .= err]
     Right km -> R.riverXkbKeyboardSetKeymap kbd km
 
--- else void . async $ threadDelay 2_000_000 >> retry
---    retry =
---      lookupValidKeymap kmdef >>= \case
---        Just kmSt -> R.riverXkbKeyboardSetKeymap kbd kmSt.keymap
---        Nothing -> logError $ "Cannot set keymap: not created after 2s" :# ["keyboard" .= show kbd, "params" .= show kmdef]
-
 newtype PendingKeymaps = PendingKeymaps {_unwrap :: [(XkbRuleNames, KeymapState)]}
 
 -- | Given keymap parameters return a matching keymap. It is created if it does not exist yet.
@@ -333,7 +327,6 @@ handleInputManagerEvent (R.RiverInputManagerFinished _ rim) = WL.objectDestroy r
 handleInputManagerEvent (R.RiverInputManagerInputDevice _ _ dev) = do
   modifyConfigs $ inputDevices . at dev ?~ def
   addGlobalListener_ dev
-  --withObject $ WL.listenerAdd_ dev
 
 -- | Input device events give us details about the device.
 handleInputDeviceEvent :: R.RiverInputDeviceEvent -> H ()
