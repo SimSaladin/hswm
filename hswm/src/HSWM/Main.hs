@@ -285,32 +285,22 @@ instance HandleEvent H R.RiverPointerBindingEvent where
 
 instance HandleEvent H R.RiverXkbConfigEvent where
   handleEvent = InputConfig.handleXkbConfigEvent
-
 instance HandleEvent H R.RiverLibinputConfigEvent where
   handleEvent = InputConfig.handleLibinputEvent
-
 instance HandleEvent H R.RiverInputManagerEvent where
   handleEvent = InputConfig.handleInputManagerEvent
-
 instance HandleEvent H R.RiverInputDeviceEvent where
   handleEvent = InputConfig.handleInputDeviceEvent
-
 instance HandleEvent H R.RiverOutputEvent where
   handleEvent = Outputs.handle
-
 instance HandleEvent H R.RiverLayerShellOutputEvent where
   handleEvent = Outputs.handleLayerShell
 
 instance HandleEvent H R.RiverSeatEvent where
   handleEvent = Seats.handleEvent
 
-instance HandleEvent H IdleNotify.IdleNotificationEvent where
-  handleEvent IdleNotify.IdleNotificationIdled{} = setOutputPower False
-  handleEvent IdleNotify.IdleNotificationResumed{} = setOutputPower True
-
 instance HandleEvent H R.RiverWindowEvent where
   handleEvent = Windows.handleEvent
-
 instance HandleEvent H R.RiverWindowManagerEvent where
   handleEvent = \case
     R.RiverWindowManagerOutput _ _ out -> Outputs.added out
@@ -356,14 +346,12 @@ instance HandleEvent H R.RiverLayerShellSeatEvent where
   handleEvent = Seats.handleLayerShellSeat
 instance HandleEvent H R.RiverXkbBindingsSeatEvent where
   handleEvent = Seats.handleXkbBindingsSeatEvent -- XKB Keyboard events
-
 instance HandleEvent H R.RiverLibinputDeviceEvent where
   handleEvent = InputConfig.handleLibinputDeviceEvent
 instance HandleEvent H R.RiverXkbKeymapEvent where
   handleEvent = InputConfig.handleXkbKeymapEvent
 instance HandleEvent H R.RiverXkbKeyboardEvent where
   handleEvent = InputConfig.handleXkbKeyboardEvent
-
 instance HandleEvent H WL.ShmEvent where
   handleEvent _ = return ()
 instance HandleEvent H WL.PointerEvent where
@@ -376,3 +364,6 @@ instance HandleEvent H WL.SeatEvent where
   handleEvent = Seats.handleWlSeatEvent
 instance HandleEvent H WL.OutputEvent where
   handleEvent = Outputs.handleWlOutput
+instance HandleEvent H IdleNotify.IdleNotificationEvent where
+  handleEvent IdleNotify.IdleNotificationIdled{} = setOutputPower False
+  handleEvent IdleNotify.IdleNotificationResumed{} = setOutputPower True

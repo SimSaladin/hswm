@@ -1,23 +1,20 @@
-{
-  inputs,
-  lib,
-  withSystem,
-  haskellNixModules,
-  cabal-defaults,
-  ...
+{ inputs
+, lib
+, withSystem
+, haskellNixModules
+, cabal-defaults
+, ...
 }:
 
 let
   inherit (inputs.flake-utils.lib) mkApp;
 
-  thisProject =
+  hswmProject = { lib , config , pkgs , ... }:
     {
-      lib,
-      config,
-      pkgs,
-      ...
-    }:
-    {
+      name = "hswm";
+      src = pkgs.project-lib.fixCabalProjectImports {
+        src = ../.;
+      };
       imports = [
         cabal-defaults
       ];
@@ -25,22 +22,17 @@ let
         haskellNixModules.hs-bindgen
         hsNixModule
       ];
-      name = "hswm";
-      src = pkgs.project-lib.fixCabalProjectImports {
-        src = ../.;
-      };
-      cabalProjectLocal = lib.mkAfter (
-        # ''optimization: True'' +
+      cabalProjectLocal = lib.mkAfter
         ''
           package *
-                      documentation: True
-        ''
-      );
+              documentation: True
+        '';
+
       materialized = pkgs.project-lib.materializedFor "project";
       #nix-tools = pkgs.my-nix-tools; # Using Cabal >= 3.18 tools
 
       shell = {
-        name = config.name;
+        inherit (config) name;
         tools.hpack = { };
         allToolDeps = true;
         withHaddock = true;
@@ -61,11 +53,6 @@ let
           builderVersion = lib.mkForce 1;
           flake.packages = _: { }; # hide package outputs
         };
-        # Using a GHC without LLVM support
-        variants.NoLLVM = {
-          compiler-nix-name = lib.mkForce "ghc9141";
-          flake.packages = _: { }; # hide package outputs
-        };
       };
     };
 
@@ -82,24 +69,24 @@ let
     { config, pkgs, ... }:
     {
       packages = {
-        hswm = {
-          components.library.build-tools = [
+        hswm.components = {
+          library.build-tools = [
             config.ghc.package.llvmPackages.llvm
             config.ghc.package.llvmPackages.libclang
           ];
-          components.sublibs.prelude.build-tools = [
+          sublibs.prelude.build-tools = [
             config.ghc.package.llvmPackages.llvm
             config.ghc.package.llvmPackages.libclang
           ];
-          components.sublibs.ipc-api.build-tools = [
+          sublibs.ipc-api.build-tools = [
             config.ghc.package.llvmPackages.llvm
             config.ghc.package.llvmPackages.libclang
           ];
-          components.exes.hswm.build-tools = [
+          exes.hswm.build-tools = [
             config.ghc.package.llvmPackages.llvm
             config.ghc.package.llvmPackages.libclang
           ];
-          components.exes.hswmctl.build-tools = [
+          exes.hswmctl.build-tools = [
             config.ghc.package.llvmPackages.llvm
             config.ghc.package.llvmPackages.libclang
           ];
@@ -129,7 +116,7 @@ let
     );
 
   adjustedShellFor =
-    project: args: adjustShell (if args ? name then args.name else null) (project.shellFor args);
+    project: args: adjustShell (args.name or null) (project.shellFor args);
 
   # For haskell.nix v2 builder (writes to ~/.cabal by default)
   adjustShell =
@@ -150,11 +137,10 @@ let
     });
 
   mkMaterializedDoApp =
-    {
-      projects,
-      pkgs,
-      project-lib,
-      ...
+    { projects
+    , pkgs
+    , project-lib
+    , ...
     }:
     mkApp {
       name = "materialized-do";
@@ -177,20 +163,13 @@ let
       };
     };
 
-  customizations.perSystem =
-    {
-      lib,
-      config,
-      pkgs,
-      project-lib,
-      ...
-    }:
+  customizations.perSystem = { lib , config , pkgs , project-lib , ... }:
     let
-      project = pkgs.project;
+      inherit (pkgs) project;
       projectFlake = project.flake';
       projects = [
         {
-          project = project;
+          inherit project;
           key = "project";
         }
       ];
@@ -251,13 +230,12 @@ let
             withHoogle = true;
           };
 
-          all = adjustedShellFor project ({
+          all = adjustedShellFor project {
             name = "hswm-deps";
-            #exposePackagesVia = "ghc-pkg";
             packages = lib.mkForce (_: [ ]);
             inputsFrom = lib.map (drv: drv.overrideAttrs { shellHook = ""; }) (lib.attrValues projectShells);
             withHoogle = true;
-          });
+          };
         };
     };
 in
@@ -267,24 +245,18 @@ in
     customizations
   ];
 
-  perSystem =
-    {
-      pkgs,
-      project,
-      ...
-    }:
+  perSystem = { pkgs, project, ... }:
     {
       _module.args.project = pkgs.project;
-      inherit (project.flake')
-        apps
-        packages
-        devShells
-        checks
-        ;
+
+      inherit (project.flake') apps packages devShells checks;
+
       legacyPackages = { inherit project; };
     };
 
   flake.overlays.project = final: _: {
-    project = final.haskell-nix.cabalProject' [ thisProject ];
+
+    project = final.haskell-nix.cabalProject' [ hswmProject ];
+
   };
 }

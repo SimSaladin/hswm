@@ -1,25 +1,22 @@
 cradle:
   cabal:
-    - path: "hs-bindgen-hooks/src"
-      component: "lib:hs-bindgen-hooks"
-
-    - path: "haskell-wayland-core"
+    - path: "haskell-wayland-core/src"
       component: "lib:haskell-wayland-core"
 
-    - path: "xkbcommon-bindings/src"
-      component: "lib:xkbcommon-bindings"
+    - path: "haskell-wayland-core/tests"
+      component: "haskell-wayland-core:test:spec"
 
-    - path: "pixman-bindings/src"
-      component: "lib:pixman-bindings"
+    - path: "hs-bindgen-hooks/src"
+      component: "lib:hs-bindgen-hooks"
 
     - path: "hswm/src"
       component: "lib:hswm"
 
-    - path: "hswm/hswm-prelude"
-      component: "hswm:lib:prelude"
-
     - path: "hswm/ipc-api"
       component: "hswm:lib:ipc-api"
+
+    - path: "hswm/hswm-prelude"
+      component: "hswm:lib:prelude"
 
     - path: "hswm/app/Main.hs"
       component: "hswm:exe:hswm"
@@ -30,8 +27,23 @@ cradle:
     - path: "hswm-bindings/src"
       component: "lib:hswm-bindings"
 
-    - path: "waybar-cffi-hs/lib"
+    - path: "hswm-bindings/tests"
+      component: "hswm-bindings:test:tests"
+
+    - path: "pixman-bindings/src"
+      component: "lib:pixman-bindings"
+
+    - path: "pixman-bindings/test"
+      component: "pixman-bindings:test:pixman-test"
+
+    - path: "waybar-cffi-hs/src"
       component: "lib:waybar-cffi-hs"
 
-    - path: "waybar-cffi-hs/lib"
+    - path: "waybar-cffi-hs/plugin"
       component: "waybar-cffi-hs:lib:waybarhaskellplugin"
+
+    - path: "xkbcommon-bindings/src"
+      component: "lib:xkbcommon-bindings"
+
+    - path: "xkbcommon-bindings/tests"
+      component: "xkbcommon-bindings:test:spec"

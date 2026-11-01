@@ -62,6 +62,13 @@ let
         packages.cabal-install.patches = lib.mkForce [
           "${inputs.nix-tools}/cabal-install-patches/installed-package-id-os-override.patch"
         ];
+        packages.Cabal.patches = [
+          ./cabal-args.patch
+          #(pkgs.fetchpatch {
+          #  url = "https://raw.githubusercontent.com/haskell-infra/hackage-doc-builder-config/refs/heads/master/cabal-hsc2hs-args-patch.diff";
+          #  hash = "sha256-okmmiuhfw8EbkZN3m0oJCovpA8nx0l90UNh7twrh6pg=";
+          #})
+        ];
         # hnix HEAD + patched
         # Partial PR: https://github.com/haskell-nix/hnix/pull/1117
         packages.hnix = rec {

@@ -1,0 +1,60 @@
+# https://docs.haskellstack.org/en/stable/configure/yaml/
+
+snapshot: nightly-2026-10-28
+compiler: ghc-9.14.1
+
+packages:
+- haskell-wayland-core
+- hs-bindgen-hooks
+- hswm
+- hswm-bindings
+- pixman-bindings
+- waybar-cffi-hs
+- xkbcommon-bindings
+#
+extra-deps:
+- process-1.6.30.0
+- Cabal-3.18.2.0
+- Cabal-syntax-3.18.2.0
+- Cabal-hooks-3.18@sha256:d5a79fbb79d01b2adcbcadf8f55be21a2edc2763f26c56424ec3c43b8f2659b8,1713
+- git: https://github.com/well-typed/hs-bindgen
+  commit: 855a3777b85f9238674bdc778ed1a050bcbb5967
+  subdirs:
+  - hs-bindgen
+  - hs-bindgen-runtime
+- git: https://github.com/well-typed/libclang-bindings
+  commit: d67fb98d54301f1ef1bce08c643808d704fec813
+  subdirs:
+  - libclang-bindings
+- git: https://github.com/well-typed/c-expr
+  commit: 6a18018ac1b91c62d6d3114c01a6ffa6c2ae7da5
+  subdirs:
+  - c-expr-dsl
+- haskeline-0.8.5.0
+- c-expr-runtime-0.1.0.0
+- debruijn-0.3.1@sha256:d47a75af3ff779e908d8ed07864e498f209049623aee64da89d58e0b3d08f219,2532
+- doxygen-parser-0.1.2@sha256:f7f192756d071e694d73704bc02963365eb4c2167c36d6f25b529fd329dd93d1,4142
+- fin-0.3.2@sha256:e37d94e1bbca419bb5eb915631a3b1f08a2ef5582486fc478561f1edc2495a4c,3770
+- typerep-map-0.7.0.0@sha256:91cc11f9628d07b6799d61ef2e8ce57b127775d636c964c8b7cd3862d4b1bb4b,5495
+- vec-0.5.1.1@sha256:f3cc50e1044934260d32c913d914c3a8055015bed02d7cb0081fb902137023a5,5640
+- skew-list-0.1
+- QuickCheck-2.18.0.0
+
+allow-newer: true
+allow-newer-deps:
+- typerep-map
+- skew-list
+- process
+- debruijn
+- optparse-generic
+
+flags:
+  process:
+    os-string: true
+
+nix:
+  shell-file: stack-nix-shell.nix
+#
+# Require a specific version of Stack, using version ranges
+# require-stack-version: -any # Default
+# require-stack-version: ">=3.9"

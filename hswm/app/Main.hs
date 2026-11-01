@@ -5,8 +5,6 @@
 {-# OPTIONS_GHC -Wno-type-defaults #-}
 {-# OPTIONS_GHC -Wno-unused-binds #-}
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
-
-
 module Main (main) where
 
 import HSWM
@@ -37,7 +35,6 @@ import HSWM.Util.Minimize (Minimized (..))
 import HSWM.Util.NamedScratchpad
 import HSWM.Util.PangoMarkup qualified as P
 import HSWM.Util.RofiPrompt qualified as RP
---import HSWM.Util.Waybar qualified as WB
 import HSWM.Wallpaper qualified as Wallpaper
 import HSWM.Types.KeyBindings qualified as KB
 
@@ -59,7 +56,6 @@ main =
   -- adding keys late, so that a changed modMask override can take effect...
   hswm (validateAndAddKeys myKeys) $
   Wallpaper.usingWallpaper Wallpaper.WallpaperConfig{filepath = "/home/sim/wallpaper.png"} $
-  --WB.waybarSB def $
   IPC.ipcServer def $
   (def @(HSWMConfig H Full))
     & layoutHook .~ myLayoutHook
@@ -250,14 +246,11 @@ myKeys = do
 -- TODO
 --   "M-g m"        "Shift to tag: "       ?+ (defile . shift) ? "Move window to this tag (XP)"
 --   "M-S-<Return>" .@=  FloatNext.floatNext True >> spawnTerm def "" <?> "Terminal (floating)"
---   "M-F3"          .@= (`whenJust` setKeyboardKeymaps (const True)) =<< asks (xkbLayout . config)),
 --   "M-F4"          .@= setKeyboardKeymaps (const True) (keymapFromString "us")),
 --   "M-r a",         wayDisplaysPrompt <?> "Display config (way-displays)")
---   "M-r f"         spawnOnceKitty "fself" "bash" ["-lic", "fself"] doCenterFloat
 --   "M-r p"         XP.Pass.passPrompt xpConfig          ? "Pass (Prompt)"
 --   "M-r C-p"       XP.Pass.passOTPPrompt xpConfig       ? "Pass OTP (Prompt)"
 --   "M-r C-u"       XP.Pass.passPromptWith "show-field --clip username" xpConfig ? "Pass username (Prompt)"
---   "M-r q"         XP.QB.qutebrowserP xpConfigNoHist "qutebrowser" ?+ XP.QB.qutebrowser ? "Prompt: qutebrowser"
 --   "M-r s"         inputPromptWithCompl xpConfig "scratchpad" (scratchpadCompl xpConfig myScratchpads) ?+ getAction . togglePad ? "Prompt: pad"
 --   "M-r u"         inputPromptWithHistCompl xpConfig "browser-app" ?+ (\s -> launchDesktopEntry "chrome-app" [s]) ? "Chrome App"
 
@@ -363,14 +356,10 @@ myRofiBaseConfig :: RP.RofiPromptConfig i o a
 myRofiBaseConfig =
   (RP.dmenuPrompt @())
     & RP.clearTypeParams
-    & RP.markupInput
-      .~ True
-    & RP.smartCase
-      .~ True
-    & RP.showIcons
-      .~ True
-    & RP.matching
-      .~ "fuzzy,prefix,normal"
+    & RP.markupInput .~ True
+    & RP.smartCase .~ True
+    & RP.showIcons .~ True
+    & RP.matching .~ "fuzzy,prefix,normal"
 
 cycleRecentHiddenWS :: String -> String -> String -> H ()
 cycleRecentHiddenWS = CycleRecentWS.cycleWindowSets $ \wset ->
@@ -397,7 +386,7 @@ windowPrompt = do
 
     fmtWindow ws w =
       ( P.bold w.appId
-      , " on " <> P.text (W.tag ws)
+      , P.text (W.tag ws)
       , " \"" <> P.text w.title <> "\""
       , maybe "" ((" pid:" <>) . P.fromShow) w.unreliablePid
       )

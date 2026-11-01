@@ -19,11 +19,11 @@ tested-with:
 flags:
   use-llvm:
     description: Link with LLVM
-    default: false
+    default: true
     manual: true
   pie:
     description: Enable PIE output
-    default: false
+    default: true
     manual: true
   optimize:
     description: Enable further compiler optimizations
@@ -60,19 +60,7 @@ when:
     ghc-options: -O2 -funbox-strict-fields
 
 __:
-  # Deps
-  - &base
-    name: base
-    version: '>=4.21 && <5'
-
-  - &base-noprelude
-    <<: *base
-    mixin: hiding (Prelude)
-
-  - &hswm-prelude
-    name: hswm:prelude
-    mixin: (HSWM.Prelude as Prelude)
-
+  # Dependencies
   - &dep-JuicyPixels                 JuicyPixels                 ^>=3.3.9
   - &dep-aeson aeson >=2.2.3 && <2.4
   - &dep-aeson-pretty aeson-pretty
@@ -120,15 +108,16 @@ __:
   - &dep-utf8-string                 utf8-string                 ^>=1.0.2
   - &dep-vector                      vector                      ^>=0.13.2
 
-  # Packages from here
-  - &dep-hswm-bindings               hswm-bindings
-  - &dep-pixman-bindings             pixman-bindings
-  - &dep-xkbcommon-bindings          xkbcommon-bindings
-
-  # Other
-  - &common-rts
-    -threaded
-    -rtsopts "-with-rtsopts=-N -maxN8 -qn3 -M2G -A2m -K8M -I2 -xr100G"
+  # Base, custom prelude
+  - &hswm-prelude
+    name: hswm:prelude
+    mixin: (HSWM.Prelude as Prelude)
+  - &base
+    name: base
+    version: '>=4.21 && <5'
+  - &base-noprelude
+    <<: *base
+    mixin: hiding (Prelude)
 
 library:
   source-dirs: src
@@ -136,11 +125,10 @@ library:
     - PackageInfo_hswm
   dependencies:
     - hswm:ipc-api
+    - pixman-bindings
+    - xkbcommon-bindings
+    - hswm-bindings
     - *hswm-prelude
-    - *dep-pixman-bindings
-    - *dep-xkbcommon-bindings
-    - *dep-hswm-bindings
-    # external
     - *base-noprelude
     - *dep-JuicyPixels
     - *dep-aeson
@@ -182,7 +170,6 @@ library:
       ghc-options:
         - -fPIC
         - -pie
-
 internal-libraries:
   prelude:
     visibility: public
@@ -207,7 +194,6 @@ internal-libraries:
       - *dep-text-short
       - *dep-safe-exceptions
       - *dep-unix
-
   ipc-api:
     visibility: public
     exposed-modules: HSWM.IPC
@@ -237,7 +223,9 @@ executables:
       - *dep-bytestring
       - *dep-text
     ghc-options:
-      - *common-rts
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N -maxN8 -I0 -A96M -M4G -K12M -xr128G
 
   hswmctl:
     main: Main.hs
@@ -261,4 +249,6 @@ executables:
       - *dep-aeson-pretty
       - *dep-text-short
     ghc-options:
-      - *common-rts
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N -maxN8 -I0 -A96M -M4G -K12M -xr128G

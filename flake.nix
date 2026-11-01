@@ -22,6 +22,10 @@
     # cabal 3.18
     nix-tools.url = "github:SimSaladin/haskell.nix?dir=nix-tools&ref=sim/cabal-3.18";
 
+    haskell-language-server = {
+      url = "github:haskell/haskell-language-server";
+    };
+
     zig2nix = {
       url = "github:Cloudef/zig2nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -66,6 +70,7 @@
           ./nix/cabal-master.nix
           ./nix/hs-bindgen.nix
           ./nix/project.nix
+          ./nix/hls.nix
         ];
 
         systems = [ "x86_64-linux" ];
@@ -78,6 +83,7 @@
           self.overlays.hs-bindgen
           self.overlays.cabal-master
           self.overlays.project
+          self.overlays.hls
         ];
 
         perSystem =
