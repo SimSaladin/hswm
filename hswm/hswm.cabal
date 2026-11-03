@@ -290,7 +290,8 @@ executable hswm
     QuantifiedConstraints
     RecordWildCards
     TypeFamilies
-  ghc-options: -Wall -Wno-partial-type-signatures -Wno-ambiguous-fields -Wno-typed-holes -threaded -rtsopts -with-rtsopts=-N -maxN8 -I0 -A96M -M4G -K12M -xr128G
+  ghc-options: -Wall -Wno-partial-type-signatures -Wno-ambiguous-fields -Wno-typed-holes -threaded -rtsopts -with-rtsopts="-N -maxN8 -I0 -A96M -M4G -K12M -xr128G"
+
 
 executable hswmctl
   main-is: Main.hs
@@ -308,7 +309,8 @@ executable hswmctl
     QuantifiedConstraints
     RecordWildCards
     TypeFamilies
-  ghc-options: -Wall -Wno-partial-type-signatures -Wno-ambiguous-fields -Wno-typed-holes -threaded -rtsopts -with-rtsopts=-N -maxN8 -I0 -A96M -M4G -K12M -xr128G
+  ghc-options: -Wall -Wno-partial-type-signatures -Wno-ambiguous-fields -Wno-typed-holes -threaded -rtsopts -with-rtsopts="-N -maxN8 -I0 -A96M -M4G -K12M -xr128G"
+
   build-depends:
     aeson >=2.2.3 && <2.4,
     aeson-pretty,
