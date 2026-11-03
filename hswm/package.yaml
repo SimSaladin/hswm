@@ -226,7 +226,7 @@ executables:
       - -threaded
       - -rtsopts
       - >
-        -with-rtsopts="-N -maxN8 -I0 -A96M -M4G -K12M -xr128G"
+        "-with-rtsopts=-N -maxN8 -I0 -A96M -M4G -K12M -xr128G"
 
   hswmctl:
     main: Main.hs
@@ -253,4 +253,4 @@ executables:
       - -threaded
       - -rtsopts
       - >
-        -with-rtsopts="-N -maxN8 -I0 -A96M -M4G -K12M -xr128G"
+        "-with-rtsopts=-N -maxN8 -I0 -A96M -M4G -K12M -xr128G"
