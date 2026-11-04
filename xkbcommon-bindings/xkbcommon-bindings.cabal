@@ -43,15 +43,8 @@ common language
     PatternSynonyms
     TypeApplications
 
-common deps
-  build-depends:
-    base >=4.21 && <5,
-    data-default ^>=0.8,
-    unix ^>=2.8.6
-
 custom-setup
   setup-depends:
-    -- , Cabal-hooks    >=3.14   && <3.19
     Cabal >=3.14 && <3.19,
     base >=4.21 && <5,
     bytestring,
@@ -59,7 +52,11 @@ custom-setup
     hs-bindgen-hooks
 
 library
-  import: warnings, language, deps
+  import: warnings, language
+  build-depends:
+    base >=4.21 && <5,
+    data-default ^>=0.8,
+    unix ^>=2.8.6
   exposed-modules:
     Text.XkbCommon
     Text.XkbCommon.Context
@@ -94,7 +91,7 @@ library
   if !os(linux)
     buildable: False
 
-test-suite spec
+test-suite xkbcommon-spec
   import: warnings, language
   type: exitcode-stdio-1.0
   main-is: Spec.hs

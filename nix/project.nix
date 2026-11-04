@@ -22,6 +22,7 @@ let
         haskellNixModules.hs-bindgen
         hsNixModule
       ];
+      cabalProjectFreeze = builtins.readFile ../cabal.project.freeze;
       cabalProjectLocal = lib.mkAfter
         ''
           package *
@@ -29,7 +30,6 @@ let
         '';
 
       materialized = pkgs.project-lib.materializedFor "project";
-      #nix-tools = pkgs.my-nix-tools; # Using Cabal >= 3.18 tools
 
       shell = {
         inherit (config) name;
@@ -55,15 +55,6 @@ let
         };
       };
     };
-
-  projectNames = [
-    "hs-bindgen-hooks"
-    "hswm"
-    "hswm-bindings"
-    "pixman-bindings"
-    "waybar-cffi-hs"
-    "xkbcommon-bindings"
-  ];
 
   hsNixModule =
     { config, pkgs, ... }:
@@ -103,7 +94,14 @@ let
   # A shell per project/package
   perPackageShellsFor =
     project:
-    lib.genAttrs' projectNames (
+    let
+      names = lib.pipe project.hsPkgs [
+        (lib.filterAttrs (_: x: lib.isAttrs x && x.isLocal or false))
+        (lib.mapAttrsToList (_: x: x.identifier.name))
+        lib.unique
+      ];
+    in
+    lib.genAttrs' names (
       name:
       lib.nameValuePair "package:${name}" (
         adjustedShellFor project {
@@ -163,14 +161,12 @@ let
       };
     };
 
-  customizations.perSystem = { lib , config , pkgs , project-lib , ... }:
+  customizations.perSystem = { lib , config , pkgs , project, project-lib , ... }:
     let
-      inherit (pkgs) project;
-      projectFlake = project.flake';
       projects = [
         {
-          inherit project;
           key = "project";
+          inherit project;
         }
       ];
     in
@@ -216,7 +212,7 @@ let
 
       devShells =
         let
-          projectShells = lib.mapAttrs (k: adjustShell "hswm-${k}") projectFlake.devShells;
+          projectShells = lib.mapAttrs (k: adjustShell "hswm-${k}") project.flake'.devShells;
           pkgShells = perPackageShellsFor pkgs.project;
         in
 
@@ -245,6 +241,12 @@ in
     customizations
   ];
 
+  flake.overlays.project = final: _: {
+
+    project = final.haskell-nix.cabalProject' [ hswmProject ];
+
+  };
+
   perSystem = { pkgs, project, ... }:
     {
       _module.args.project = pkgs.project;
@@ -253,10 +255,4 @@ in
 
       legacyPackages = { inherit project; };
     };
-
-  flake.overlays.project = final: _: {
-
-    project = final.haskell-nix.cabalProject' [ hswmProject ];
-
-  };
 }

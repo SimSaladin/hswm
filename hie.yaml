@@ -40,10 +40,10 @@ cradle:
       component: "lib:waybar-cffi-hs"
 
     - path: "waybar-cffi-hs/plugin"
-      component: "waybar-cffi-hs:lib:waybarhaskellplugin"
+      component: "waybar-cffi-hs:flib:waybarhaskellplugin"
 
     - path: "xkbcommon-bindings/src"
       component: "lib:xkbcommon-bindings"
 
     - path: "xkbcommon-bindings/tests"
-      component: "xkbcommon-bindings:test:spec"
+      component: "xkbcommon-bindings:test:xkbcommon-spec"

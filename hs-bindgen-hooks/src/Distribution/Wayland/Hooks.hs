@@ -977,7 +977,7 @@ getDependencies required = do
   when (notFound /= []) $
     liftIO $
       die' v $
-        "could not find requested packages: " ++ show notFound
+        "could not find requested packages: " ++ show notFound ++ "\n" ++ show index'
   return result
   where
     selector pkg = P.packageName pkg `elem` required

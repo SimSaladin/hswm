@@ -4,8 +4,7 @@ let
 
   make-project-lib =
     { pkgs, ... }:
-    let
-      self = {
+    lib.makeExtensible (self: {
         materializedRoot = ./materialized;
         materializedDest = "./nix/materialized";
 
@@ -53,9 +52,8 @@ let
             mv -v "$res" ${cabalProjectFile}
           '';
 
-      };
-    in
-    pkgs.callPackage ./make-fixed-output.nix { } // self;
+    } // pkgs.callPackage ./make-fixed-output.nix { }
+    );
 in
 {
   perSystem = { pkgs, project-lib, ... }: {

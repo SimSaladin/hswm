@@ -8,7 +8,7 @@
   , config
   , ... }:
   {
-    flags = { pkg-config = true; build-tool-depends = true; };
+    flags = { pkg-config = true; };
     package = {
       specVersion = "3.14";
       identifier = { name = "pixman-bindings"; version = "0.1.0.0"; };
@@ -46,7 +46,9 @@
         ];
         libs = pkgs.lib.optional (!flags.pkg-config) (pkgs."pixman-1" or (errorHandler.sysDepError "pixman-1"));
         pkgconfig = pkgs.lib.optional (flags.pkg-config) (pkgconfPkgs."pixman-1" or (errorHandler.pkgConfDepError "pixman-1"));
-        build-tools = pkgs.lib.optional (flags.build-tool-depends) (hsPkgs.pkgsBuildBuild.hs-bindgen.components.exes.hs-bindgen-cli or (pkgs.pkgsBuildBuild.hs-bindgen-cli or (errorHandler.buildToolDepError "hs-bindgen:hs-bindgen-cli")));
+        build-tools = [
+          (hsPkgs.pkgsBuildBuild.hs-bindgen.components.exes.hs-bindgen-cli or (pkgs.pkgsBuildBuild.hs-bindgen-cli or (errorHandler.buildToolDepError "hs-bindgen:hs-bindgen-cli")))
+        ];
         buildable = true;
         modules = [ "Pixman" ];
         hsSourceDirs = [ "src" ];

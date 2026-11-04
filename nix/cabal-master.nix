@@ -13,11 +13,12 @@ let
     index-state = "2026-09-29T22:54:10Z";
     # using the V2 builder by default
     builderVersion = 2;
+    evalSystem = "x86_64-linux";
   };
 
   # XXX: haskell.nix nix-tools built with Cabal 3.18 libraries
   cabal_3_18-nix-tools = { lib, ... }: {
-    src = lib.mkForce (builtins.toPath inputs.nix-tools);
+    src = lib.mkForce (builtins.toPath inputs.nix-tools.outPath);
     inherit (cabalDefaults) compiler-nix-name index-state;
     cabalProjectLocal = ''
       index-state: ${cabalDefaults.index-state}
@@ -59,43 +60,45 @@ let
     '';
     modules = [
       ({ config, pkgs, ... }: {
-        packages.cabal-install.patches = lib.mkForce [
-          "${inputs.nix-tools}/cabal-install-patches/installed-package-id-os-override.patch"
-        ];
-        packages.Cabal.patches = [
-          ./cabal-args.patch
-          #(pkgs.fetchpatch {
-          #  url = "https://raw.githubusercontent.com/haskell-infra/hackage-doc-builder-config/refs/heads/master/cabal-hsc2hs-args-patch.diff";
-          #  hash = "sha256-okmmiuhfw8EbkZN3m0oJCovpA8nx0l90UNh7twrh6pg=";
-          #})
-        ];
-        # hnix HEAD + patched
-        # Partial PR: https://github.com/haskell-nix/hnix/pull/1117
-        packages.hnix = rec {
-          src = pkgs.fetchzip {
-            url = "https://github.com/SimSaladin/hnix/archive/4c981601e67e0b7c50d37a560e7b01d9ffc512b6.zip";
-            hash = "sha256-efLc97xeKEYZ9j7J2M/Sv9DQu3ZfQbXgDghK39NXYuE=";
-          };
-          package-description-override = lib.mkForce (builtins.readFile (src + "/hnix.cabal"));
-          components.library.depends = [
-            config.hsPkgs.dependent-sum
-            config.hsPkgs.hnix-store-nar
+        packages = {
+          cabal-install.patches = lib.mkForce [
+            "${inputs.nix-tools}/cabal-install-patches/installed-package-id-os-override.patch"
           ];
-        };
-        # hnix-store-json HEAD
-        packages.hnix-store-json.postUnpack = ''
-          rm $sourceRoot/{upstream-libstore-data,upstream-libutil-data}
-          cp -r ${pkgs.nixVersions.latest.src}/src/libstore-tests/data $sourceRoot/upstream-libstore-data
-          cp -r ${pkgs.nixVersions.latest.src}/src/libutil-tests/data $sourceRoot/upstream-libutil-data
-        '';
-        # crypton-2.1.7
-        packages.crypton = rec {
-          package.identifier.version = lib.mkForce "2.1.7";
-          src = pkgs.fetchzip {
-            url = "https://hackage.haskell.org/package/crypton-2.1.7/crypton-2.1.7.tar.gz";
-            hash = "sha256-mKWBG9HtZ8hLlSVbCqxBn8Kr4ZGxM2aFDiPEWuG0mFM=";
+          Cabal.patches = [
+            ./cabal-args.patch
+            #(pkgs.fetchpatch {
+            #  url = "https://raw.githubusercontent.com/haskell-infra/hackage-doc-builder-config/refs/heads/master/cabal-hsc2hs-args-patch.diff";
+            #  hash = "sha256-okmmiuhfw8EbkZN3m0oJCovpA8nx0l90UNh7twrh6pg=";
+            #})
+          ];
+          # hnix HEAD + patched
+          # Partial PR: https://github.com/haskell-nix/hnix/pull/1117
+          hnix = rec {
+            src = pkgs.fetchzip {
+              url = "https://github.com/SimSaladin/hnix/archive/4c981601e67e0b7c50d37a560e7b01d9ffc512b6.zip";
+              hash = "sha256-efLc97xeKEYZ9j7J2M/Sv9DQu3ZfQbXgDghK39NXYuE=";
+            };
+            package-description-override = lib.mkForce (builtins.readFile (src + "/hnix.cabal"));
+            components.library.depends = [
+              config.hsPkgs.dependent-sum
+              config.hsPkgs.hnix-store-nar
+            ];
           };
-          package-description-override = lib.mkForce (builtins.readFile (src + "/crypton.cabal"));
+          # hnix-store-json HEAD
+          hnix-store-json.postUnpack = ''
+            rm $sourceRoot/{upstream-libstore-data,upstream-libutil-data}
+            cp -r ${pkgs.nixVersions.latest.src}/src/libstore-tests/data $sourceRoot/upstream-libstore-data
+            cp -r ${pkgs.nixVersions.latest.src}/src/libutil-tests/data $sourceRoot/upstream-libutil-data
+          '';
+          # crypton-2.1.7
+          crypton = rec {
+            package.identifier.version = lib.mkForce "2.1.7";
+            src = pkgs.fetchzip {
+              url = "https://hackage.haskell.org/package/crypton-2.1.7/crypton-2.1.7.tar.gz";
+              hash = "sha256-mKWBG9HtZ8hLlSVbCqxBn8Kr4ZGxM2aFDiPEWuG0mFM=";
+            };
+            package-description-override = lib.mkForce (builtins.readFile (src + "/crypton.cabal"));
+          };
         };
       })
     ];
@@ -114,12 +117,7 @@ let
   #  };
 in
 {
-  _module.args.cabal-defaults =
-    { pkgs, ... }:
-    cabalDefaults
-    // {
-      evalPackages = pkgs.buildPackages;
-    };
+  _module.args.cabal-defaults = cabalDefaults;
 
   perSystem = { pkgs, ... }: {
     packages = {
@@ -132,9 +130,7 @@ in
 
   flake.overlays.cabal-master = final: _: {
 
-    cabalDefaults = cabalDefaults // {
-      evalPackages = final.buildPackages;
-    };
+    inherit cabalDefaults;
 
     # Alternative way of building newer cabal
     #cabal-master = final.haskell-nix.cabalProject' ({ lib, ... }:

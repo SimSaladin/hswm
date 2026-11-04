@@ -19,9 +19,10 @@ library-stripping: True
 -- documentation: True
 haddock-html: True
 haddock-hoogle: True
-haddock-quickjump: True
+--haddock-quickjump: True
 haddock-hyperlink-source: True
 haddock-use-unicode: True
+haddock-html-location: file:///packages/archive/$pkg/latest/doc/html
 
 extra-packages: process
 
@@ -30,8 +31,7 @@ extra-packages: process
 import: project-cabal/hs-bindgen.cabal
 
 -- string-interpolate-1.0.0.0 depends on ghc-hs-meta, which causes issues
-constraints:
-    string-interpolate <1.0
+constraints: any.string-interpolate <1.0
 
 --
 -- Temporary relaxes for GHC 9.14.1
@@ -49,6 +49,9 @@ if impl(ghc >= 9.14)
   allow-newer: typerep-map-0.7.0.0:base
   allow-newer: hs-bindgen:aeson
   allow-newer: tagged
+  allow-newer: vec:QuickCheck
+  allow-newer: fin:QuickCheck
+  allow-newer: hspec-core:QuickCheck
 
 
 -- TO catch inxhaustive patterns...

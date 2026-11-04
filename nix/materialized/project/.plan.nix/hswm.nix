@@ -7,8 +7,8 @@
   , errorHandler
   , config
   , ... }:
-  ({
-    flags = { optimize = true; use-llvm = true; };
+  {
+    flags = { llvm = true; optimize = true; pie = true; };
     package = {
       specVersion = "3.12";
       identifier = { name = "hswm"; version = "0.1.0.0"; };
@@ -77,7 +77,82 @@
           (hsPkgs.pkgsBuildBuild.hsc2hs.components.exes.hsc2hs or (pkgs.pkgsBuildBuild.hsc2hs or (errorHandler.buildToolDepError "hsc2hs:hsc2hs")))
         ];
         buildable = true;
-        modules = [ "PackageInfo_hswm" ];
+        modules = [
+          "PackageInfo_hswm"
+          "HSWM"
+          "HSWM/Actions/CycleRecentWS"
+          "HSWM/Actions/CycleWS"
+          "HSWM/Actions/DynamicWorkspaceOrder"
+          "HSWM/Actions/DynamicWorkspaces"
+          "HSWM/Actions/LockSession"
+          "HSWM/Actions/Minimize"
+          "HSWM/Actions/OnScreen"
+          "HSWM/Actions/PhysicalScreens"
+          "HSWM/Actions/Repeatable"
+          "HSWM/Actions/WindowNavigation"
+          "HSWM/BufferPool"
+          "HSWM/Config"
+          "HSWM/Core"
+          "HSWM/Hooks/NonExclusiveArea"
+          "HSWM/Hooks/WorkspaceHistory"
+          "HSWM/InputConfig"
+          "HSWM/Layout"
+          "HSWM/Layout/BinarySpacePartition"
+          "HSWM/Layout/BoringWindows"
+          "HSWM/Layout/GridVariants"
+          "HSWM/Layout/LayoutModifier"
+          "HSWM/Layout/Maximize"
+          "HSWM/Layout/Minimize"
+          "HSWM/Layout/MultiToggle"
+          "HSWM/Layout/MultiToggle/Instances"
+          "HSWM/Layout/NoBorders"
+          "HSWM/Layout/Reflect"
+          "HSWM/Layout/WindowNavigation"
+          "HSWM/Main"
+          "HSWM/Main/Options"
+          "HSWM/Main/Persist"
+          "HSWM/ManageHook"
+          "HSWM/Operations"
+          "HSWM/Outputs"
+          "HSWM/Prompt/Environment"
+          "HSWM/Prompt/Workspaces"
+          "HSWM/Seats"
+          "HSWM/StackSet"
+          "HSWM/Types/Action"
+          "HSWM/Types/Config"
+          "HSWM/Types/Events"
+          "HSWM/Types/KeyBindings"
+          "HSWM/Types/Lens"
+          "HSWM/Types/Output"
+          "HSWM/Types/Seat"
+          "HSWM/Types/Simple"
+          "HSWM/Types/TypeMap"
+          "HSWM/Types/Window"
+          "HSWM/Types/WM"
+          "HSWM/Util/Colors"
+          "HSWM/Util/CommandStatic"
+          "HSWM/Util/Debug"
+          "HSWM/Util/ExtensibleState"
+          "HSWM/Util/GrabKeyboard"
+          "HSWM/Util/Invisible"
+          "HSWM/Util/IPC"
+          "HSWM/Util/Minimize"
+          "HSWM/Util/NamedScratchpad"
+          "HSWM/Util/PangoMarkup"
+          "HSWM/Util/Posix"
+          "HSWM/Util/PP"
+          "HSWM/Util/Process"
+          "HSWM/Util/Rectangle"
+          "HSWM/Util/RofiPrompt"
+          "HSWM/Util/Stack"
+          "HSWM/Util/StackSet/Lens"
+          "HSWM/Util/Waybar"
+          "HSWM/Util/WorkspaceCompare"
+          "HSWM/Utils"
+          "HSWM/Wallpaper"
+          "HSWM/Wayland"
+          "HSWM/Windows"
+        ];
         hsSourceDirs = [ "src" ];
       };
       sublibs = {
@@ -135,7 +210,7 @@
           hsSourceDirs = [ "app" ];
           mainPath = ([
             "Main.hs"
-          ] ++ pkgs.lib.optional (flags.use-llvm && (compiler.isGhc && compiler.version.ge "9.14.1")) "") ++ pkgs.lib.optional (flags.optimize) "";
+          ] ++ pkgs.lib.optional (flags.llvm && (compiler.isGhc && compiler.version.ge "9.14.1")) "") ++ pkgs.lib.optional (flags.optimize) "";
         };
         "hswmctl" = {
           depends = [
@@ -160,10 +235,8 @@
           hsSourceDirs = [ "app-ctl" ];
           mainPath = ([
             "Main.hs"
-          ] ++ pkgs.lib.optional (flags.use-llvm && (compiler.isGhc && compiler.version.ge "9.14.1")) "") ++ pkgs.lib.optional (flags.optimize) "";
+          ] ++ pkgs.lib.optional (flags.llvm && (compiler.isGhc && compiler.version.ge "9.14.1")) "") ++ pkgs.lib.optional (flags.optimize) "";
         };
       };
     };
-  } // rec { src = pkgs.lib.mkDefault ../hswm; }) // {
-    cabal-generator = "hpack";
-  }
+  } // rec { src = pkgs.lib.mkDefault ../hswm; }

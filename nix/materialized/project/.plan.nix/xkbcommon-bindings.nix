@@ -72,7 +72,7 @@
         hsSourceDirs = [ "src" ];
       };
       tests = {
-        "spec" = {
+        "xkbcommon-spec" = {
           depends = [
             (hsPkgs."base" or (errorHandler.buildDepError "base"))
             (hsPkgs."hspec" or (errorHandler.buildDepError "hspec"))

@@ -1,16 +1,13 @@
-{ inputs, lib, cabal-defaults, ... }:
+{ inputs, lib, ... }:
 
 let
   hlsProject = { pkgs, ... }:
   {
     name = "haskell-language-server";
     src = inputs.haskell-language-server;
-    imports = [
-      cabal-defaults
-    ];
     index-state = lib.mkForce "2026-10-06T21:15:24Z";
-    #index-state = lib.mkForce "2026-10-07T00:00:00Z";
     builderVersion = lib.mkForce 1;
+    compiler-nix-name = "ghc9141llvm";
     cabalProjectLocal = lib.mkAfter
         ''
           package *

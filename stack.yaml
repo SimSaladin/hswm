@@ -51,10 +51,12 @@ allow-newer-deps:
 flags:
   process:
     os-string: true
+  hswm:
+    llvm: false
 
 nix:
   shell-file: stack-nix-shell.nix
 #
 # Require a specific version of Stack, using version ranges
 # require-stack-version: -any # Default
-# require-stack-version: ">=3.9"
+#require-stack-version: ">=3.11"

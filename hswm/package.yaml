@@ -17,7 +17,7 @@ tested-with:
   - GHC == 9.12.2
 
 flags:
-  use-llvm:
+  llvm:
     description: Link with LLVM
     default: true
     manual: true
@@ -53,7 +53,7 @@ ghc-options:
 
 when:
   # llvm flag handling
-  - condition: flag(use-llvm) && impl(ghc >= 9.14.1)
+  - condition: flag(llvm) && impl(ghc >= 9.14.1)
     ghc-options: -fllvm
   # optimize flag
   - condition: flag(optimize)
@@ -163,8 +163,6 @@ library:
     - *dep-text-short
     - *dep-th-abstraction
     - *dep-microlens-th
-  build-tools:
-    - hsc2hs:hsc2hs
   when:
     - condition: flag(pie)
       ghc-options:

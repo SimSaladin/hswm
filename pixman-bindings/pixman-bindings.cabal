@@ -22,11 +22,6 @@ flag pkg-config
   manual: True
   default: True
 
-flag build-tool-depends
-  description: Use build-tool-depends for hs-bindgen-cli
-  manual: True
-  default: True
-
 common warnings
   ghc-options:
     -Wall
@@ -53,9 +48,8 @@ library
   hs-source-dirs: src
   default-language: GHC2024
 
-  if flag(build-tool-depends)
-    build-tool-depends:
-      hs-bindgen:hs-bindgen-cli
+  build-tool-depends:
+    hs-bindgen:hs-bindgen-cli
 
   if flag(pkg-config)
     pkgconfig-depends: pixman-1 >=0.46

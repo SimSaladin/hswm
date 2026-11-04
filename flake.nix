@@ -16,8 +16,8 @@
     flake-utils.url = "github:numtide/flake-utils";
     flake-parts.url = "github:hercules-ci/flake-parts";
 
-    #haskellNix.url = "github:input-output-hk/haskell.nix";
-    haskellNix.url = "github:SimSaladin/haskell.nix?ref=sim/v2-flib";
+    haskellNix.url = "github:input-output-hk/haskell.nix";
+    #haskellNix.url = "github:SimSaladin/haskell.nix?ref=sim/v2-flib";
 
     # cabal 3.18
     nix-tools.url = "github:SimSaladin/haskell.nix?dir=nix-tools&ref=sim/cabal-3.18";
@@ -114,7 +114,7 @@
               in
               pkgs.writeShellScriptBin "pre-commit-run" script;
 
-            pre-commit.settings = { ... }: {
+            pre-commit.settings = _: {
               hooks = {
                 fourmolu.enable = true;
                 cabal-gild.enable = true;

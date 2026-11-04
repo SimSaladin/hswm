@@ -18,6 +18,11 @@ tested-with:
   GHC == 9.12.4,
   GHC == 9.12.2
 
+flag llvm
+  description: Link with LLVM
+  manual: True
+  default: True
+
 flag optimize
   description: Enable further compiler optimizations
   manual: True
@@ -25,11 +30,6 @@ flag optimize
 
 flag pie
   description: Enable PIE output
-  manual: True
-  default: True
-
-flag use-llvm
-  description: Link with LLVM
   manual: True
   default: True
 
@@ -49,8 +49,6 @@ library
     RecordWildCards
     TypeFamilies
   ghc-options: -Wall -Wno-partial-type-signatures -Wno-ambiguous-fields -Wno-typed-holes
-  build-tool-depends:
-    hsc2hs:hsc2hs
   exposed-modules:
     HSWM
     HSWM.Actions.CycleRecentWS
@@ -171,7 +169,7 @@ library
     base hiding (Prelude),
     hswm:prelude (HSWM.Prelude as Prelude)
   default-language: GHC2024
-  if flag(use-llvm) && impl(ghc >= 9.14.1)
+  if flag(llvm) && impl(ghc >= 9.14.1)
     ghc-options: -fllvm
   if flag(optimize)
     ghc-options: -O2 -funbox-strict-fields
@@ -215,7 +213,7 @@ library ipc-api
     base hiding (Prelude),
     hswm:prelude (HSWM.Prelude as Prelude)
   default-language: GHC2024
-  if flag(use-llvm) && impl(ghc >= 9.14.1)
+  if flag(llvm) && impl(ghc >= 9.14.1)
     ghc-options: -fllvm
   if flag(optimize)
     ghc-options: -O2 -funbox-strict-fields
@@ -258,7 +256,7 @@ library prelude
     unliftio >=0.2.25 && <0.3,
     unliftio-core >=0.2.1 && <0.3
   default-language: GHC2024
-  if flag(use-llvm) && impl(ghc >= 9.14.1)
+  if flag(llvm) && impl(ghc >= 9.14.1)
     ghc-options: -fllvm
   if flag(optimize)
     ghc-options: -O2 -funbox-strict-fields
@@ -272,7 +270,7 @@ executable hswm
     hswm,
     text >=2.1.2 && <2.2
   default-language: GHC2024
-  if flag(use-llvm) && impl(ghc >= 9.14.1)
+  if flag(llvm) && impl(ghc >= 9.14.1)
     ghc-options: -fllvm
   if flag(optimize)
     ghc-options: -O2 -funbox-strict-fields
@@ -332,7 +330,7 @@ executable hswmctl
     base hiding (Prelude),
     hswm:prelude (HSWM.Prelude as Prelude)
   default-language: GHC2024
-  if flag(use-llvm) && impl(ghc >= 9.14.1)
+  if flag(llvm) && impl(ghc >= 9.14.1)
     ghc-options: -fllvm
   if flag(optimize)
     ghc-options: -O2 -funbox-strict-fields
