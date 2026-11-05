@@ -42,8 +42,18 @@ module HSWM.Util.PangoMarkup (
   escapeStrings,
   escapeMarkupAuto,
   escapeMarkupPure,
+  actualLength,
+
+  -- * Justify
+  justifyColumn,
+  MarkupJustify (..),
+  justify,
+  justifyLeft,
+  justifyRight,
+  justifyCenter,
 ) where
 
+import Data.List qualified as L
 import Data.Text qualified as T
 import Data.Text.Lazy qualified as TL
 import Data.Text.Lazy.Builder qualified as TB
@@ -138,6 +148,46 @@ instance Monoid Markup where
   mempty = MNUL
 instance Default Markup where
   def = mempty
+
+actualLength :: Markup -> Int64
+actualLength = go
+  where
+    go MNUL = 0
+    go (Concat a b) = go a + go b
+    go (DirectBuilder x) = TL.length (TB.toLazyText x)
+    go (RawText x) = fromIntegral $ T.length x
+    go (RawTextLazy x) = TL.length x
+    go (Escaped x) = fromIntegral $ T.length x
+    go (EscapedLazy x) = TL.length x
+    go (_ :*>> x) = go x
+
+data MarkupJustify = JustifyL | JustifyR | JustifyC
+  deriving (Eq, Ord, Show, Read)
+
+-- | Justify a column indexed by a Lens in a list of values.
+-- The maximum length is calculated over the column.
+justifyColumn :: Lens' a Markup -> MarkupJustify -> Char -> [a] -> [a]
+justifyColumn f dir c xs = xs & each . f %~ justify dir ind c
+  where
+    ind = fromIntegral $ L.maximum $ xs ^.. traversed . f . to actualLength
+
+justify :: MarkupJustify -> Int -> Char -> Markup -> Markup
+justify JustifyL = justifyLeft
+justify JustifyR = justifyRight
+justify JustifyC = justifyCenter
+
+-- | @justifyLeft NUM CHAR TEXT@
+justifyLeft :: Int -> Char -> Markup -> Markup
+justifyLeft n c x = x <> text (T.replicate (n - fromIntegral (actualLength x)) (T.pack [c]))
+
+justifyRight :: Int -> Char -> Markup -> Markup
+justifyRight n c x = text (T.replicate (n - fromIntegral (actualLength x)) (T.pack [c])) <> x
+
+justifyCenter :: Int -> Char -> Markup -> Markup
+justifyCenter n c x = text (T.replicate (h + lef) (T.pack [c])) <> x <> text (T.replicate h (T.pack [c]))
+  where
+    num = n - fromIntegral (actualLength x)
+    (h, lef) = num `divMod` 2
 
 -- | Always escaped.
 instance IsString Markup where

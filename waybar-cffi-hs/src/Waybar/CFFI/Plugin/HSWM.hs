@@ -343,6 +343,7 @@ objectGetData ::
   (MonadIO m, GObject object, IsDescendantOf GIGO.Object object) => object -> Text -> m a
 objectGetData obj tag = liftIO $ GIGO.objectGetData obj tag >>= deRefStablePtr . castPtrToStablePtr
 
+objectSetData :: (MonadIO m, GObject object, IsDescendantOf GIGO.Object object) => object -> Text -> StablePtr a -> m ()
 objectSetData obj tag v = liftIO $ GIGO.objectSetData obj tag $ castStablePtrToPtr v
 
 -- * Output formatting

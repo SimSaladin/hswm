@@ -51,6 +51,7 @@ library
   ghc-options: -Wall -Wno-partial-type-signatures -Wno-ambiguous-fields -Wno-typed-holes
   exposed-modules:
     HSWM
+    HSWM.Actions.AudioControl
     HSWM.Actions.CycleRecentWS
     HSWM.Actions.CycleWS
     HSWM.Actions.DynamicWorkspaceOrder
@@ -85,8 +86,11 @@ library
     HSWM.ManageHook
     HSWM.Operations
     HSWM.Outputs
+    HSWM.Prompt.Bindings
     HSWM.Prompt.Confirm
     HSWM.Prompt.Environment
+    HSWM.Prompt.Qutebrowser
+    HSWM.Prompt.Windows
     HSWM.Prompt.Workspaces
     HSWM.Seats
     HSWM.StackSet

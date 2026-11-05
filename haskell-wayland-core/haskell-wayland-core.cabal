@@ -99,9 +99,11 @@ library
   build-tool-depends:
     hs-bindgen:hs-bindgen-cli
 
-test-suite spec
+test-suite wayland-core-tests
   import: language
   type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  hs-source-dirs: tests
   other-modules:
     Paths_haskell_wayland_core
     Wayland.UtilSpec
@@ -119,8 +121,6 @@ test-suite spec
   build-tool-depends:
     hspec-discover:hspec-discover
 
-  main-is: Spec.hs
-  hs-source-dirs: tests
   ghc-options:
     -threaded
     -with-rtsopts=-N
