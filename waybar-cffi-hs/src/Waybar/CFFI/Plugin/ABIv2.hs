@@ -10,43 +10,104 @@ module Waybar.CFFI.Plugin.ABIv2 where
 
 import GI.Gtk.Objects.Container (Container)
 
+import Control.Exception.Safe
 import Data.Aeson qualified as A
 import Data.Aeson.Key qualified as A.Key
 import Data.Aeson.KeyMap qualified as A.KM
 import Data.ByteString qualified as BS
 import Data.Text qualified as T
 import Data.Text.Foreign qualified as T
-import Control.Exception.Safe
 import Data.Version (Version, parseVersion)
 import Foreign
 import Foreign.C
 import Foreign.C.ConstPtr (ConstPtr (..))
+import GHC.Conc (Signal)
 import GHC.Generics (Generic)
 import GHC.Stack
 import Text.ParserCombinators.ReadP (readP_to_S)
 import Text.Read ()
 
--- | Private Waybar CFFI module.
-data {-# CTYPE "waybar_cffi_module.h" "wbcffi_module" #-} WbcffiModule
-  deriving (Show, Eq, Ord, Generic)
-
 -- | Waybar module information.
 data {-# CTYPE "waybar_cffi_module.h" "wbcffi_init_info" #-} InitInfo = InitInfo
   { wbcffi_module :: {-# UNPACK #-} !(Ptr WbcffiModule)
-  -- ^ Private Waybar CFFI module
+  -- ^ Private Waybar CFFI module.
   , waybar_version :: {-# UNPACK #-} !(ConstPtr CChar)
-  -- ^ Waybar version string
+  -- ^ Waybar version string.
   , get_root_widget :: {-# UNPACK #-} !(FunPtr GetRootWidget)
-  -- ^ Returns the waybar widget allocated for this module
+  -- ^ Get the widget allocated for this module.
   --
-  --     @param obj Waybar CFFI object pointer
+  -- @\@param obj@: Waybar CFFI object pointer
   , queue_update :: {-# UNPACK #-} !(FunPtr QueueUpdate)
-  -- ^ Queues a request for calling @wbcffi_update()@ on the next GTK main event
-  --     loop iteration.
+  -- ^ Queue a request for calling @wbcffi_update()@ on the next GTK main event loop iteration.
   --
-  --     @param obj Waybar CFFI object pointer
+  -- @\@param obj@: Waybar CFFI object pointer
   }
   deriving (Eq, Ord, Show, Generic)
+
+-- | Private Waybar CFFI module.
+data {-# CTYPE "waybar_cffi_module.h" "wbcffi_module" #-} WbcffiModule
+  deriving (Eq, Ord, Show, Generic)
+
+-- | @wbcffi_init@: Module init/new function, called on module instantiation.
+--
+-- __MANDATORY CFFI function__
+--
+--   - @param init_info@: Waybar module information
+--   - @param config_entries@: Flat representation of the module JSON config.
+--     The data only available during wbcffi_init call.
+--   - @param config_entries_len@: Number of entries in @config_entries@
+--
+-- @
+-- wbcffi_init :: !(Ptr InitInfo -> Ptr ConfigEntry -> CSize -> IO (Ptr Void))
+-- @
+--
+-- Returns an untyped pointer to module data, NULL if the module failed to load.
+type Init a = ConstPtr InitInfo -> ConstPtr ConfigEntry -> CSize -> IO a
+
+-- | Module deinit/delete function, called when Waybar is closed or when the module is removed
+--
+-- MANDATORY CFFI function
+--
+-- @
+-- param instance Module instance data (as returned by `Waybar.CFFI.Plugin.ABIv2.wbcffi_init`)
+-- wbcffi_deinit :: !(Ptr Void -> IO ())
+-- @
+type DeInit a = a -> IO ()
+
+-- | Called from the GTK main event loop, to update the UI
+--
+-- Optional CFFI function
+--
+-- @
+-- param instance Module instance data (as returned by `Waybar.CFFI.Plugin.ABIv2.wbcffi_init`)
+-- param action_name Action name
+-- wbcffi_update :: !(Ptr Void -> IO ())
+-- @
+type Update a = a -> IO ()
+
+-- | Optional CFFI function
+--
+-- Called on module action (see
+-- https://github.com/Alexays/Waybar/wiki/Configuration#module-actions-config)
+--
+-- param instance Module instance data (as returned by `Waybar.CFFI.Plugin.ABIv2.wbcffi_init`)
+-- param action_name Action name
+--
+-- @
+-- wbcffi_doaction :: !(Ptr Void -> ConstPtr CChar -> IO ())
+-- @
+type DoAction a = a -> ConstPtr CChar -> IO ()
+
+-- | Called when Waybar receives a POSIX signal and forwards it to each module
+--
+-- Optional CFFI function
+--
+-- @
+-- param instance Module instance data (as returned by `Waybar.CFFI.Plugin.ABIv2.wbcffi_init`)
+-- param signal Signal ID
+-- wbcffi_refresh :: !(Ptr Void -> Int -> IO ())
+-- @
+type Refresh a = a -> Signal -> IO ()
 
 -- | Config key-value pair
 data {-# CTYPE "waybar_cffi_module.h" "struct wbcffi_config_entry" #-} ConfigEntry = ConfigEntry
@@ -117,31 +178,15 @@ parseConfig (ConstPtr ptr) size = do
       bs <- BS.packCString pv
       case A.eitherDecodeStrict' bs :: Either String A.Value of
         Right v -> return (A.Key.fromText key, v)
-        Left msg -> throwIO $! WaybarPluginConfigParseError $
-          msg ++ " (while parsing entry '" ++ T.unpack key ++ "':" ++ show bs ++ ")"
+        Left msg ->
+          throwIO $!
+            WaybarPluginConfigParseError $
+              msg ++ " (while parsing entry '" ++ T.unpack key ++ "':" ++ show bs ++ ")"
 
 -- | Get waybar version.
-getWaybarVersion :: HasCallStack => InitInfo -> IO Version
+getWaybarVersion :: (HasCallStack) => InitInfo -> IO Version
 getWaybarVersion InitInfo{waybar_version = ConstPtr ptr} = do
   str <- peekCString ptr
   case reverse $ readP_to_S parseVersion str of
     (ver, "") : _ -> return ver
     _ -> throwIO $! WaybarPluginVersionParseError str
-
--- | Module init/new function, called on module instantiation.
---
--- MANDATORY CFFI function
---
--- @
--- param init_info          Waybar module information
--- param config_entries     Flat representation of the module JSON config. The data only available
---                           during wbcffi_init call.
--- param config_entries_len Number of entries in @config_entries@
---
--- return A untyped pointer to module data, NULL if the module failed to load.
---
--- wbcffi_init :: !(Ptr InitInfo -> Ptr ConfigEntry -> CSize -> IO (Ptr Void))
--- @
-type Init a = ConstPtr InitInfo -> ConstPtr ConfigEntry -> CSize -> IO a
-
-type DoAction a = a -> ConstPtr CChar -> IO ()

@@ -22,7 +22,7 @@ let
   };
 in
 {
-  _module.args.haskellNixModules.hs-bindgen = hsNixModule;
+  _module.args.haskell-nix-hs-bindgen-module = hsNixModule;
 
   flake.overlays.hs-bindgen = inputs.hs-bindgen.overlays.default;
 

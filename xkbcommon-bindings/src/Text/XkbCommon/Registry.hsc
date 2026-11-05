@@ -24,6 +24,8 @@ module Text.XkbCommon.Registry (
   Popularity(..),
   -- * Exceptions
   RxkbException(..),
+  -- * Internal
+  appendIncludePathDefault,
   -- * Re-exports
   def,
   ) where
@@ -67,7 +69,8 @@ data RegistryOptions = RegistryOptions
 instance Default RegistryOptions where
   def = RegistryOptions Nothing False False False Nothing []
 
-data RxkbException = RxkbContextParseFailed | RxkbContextIncludePathFailed FilePath
+data RxkbException = RxkbContextParseFailed
+                   | RxkbContextIncludePathFailed FilePath
   deriving (Eq, Show)
 
 instance Exception RxkbException
@@ -78,6 +81,7 @@ createRegistry opts = createRegistryContext opts >>= getRulesInfo
 
 -- * Aggregate rules info
 
+-- | Registry items.
 data Registry = Registry
   { models       :: [Model]
   , layouts      :: [LayoutInfo]
@@ -209,7 +213,6 @@ getRulesInfo ctx0 = withForeignPtr ctx0.unwrap $ \ctx' ->
 
       getPopularity :: CUInt -> Popularity
       getPopularity x = case x of
-                          #{const RXKB_POPULARITY_STANDARD} -> PopularityStandard
                           #{const RXKB_POPULARITY_EXOTIC} -> Exotic
                           _ -> error $ "no parse: Popularity: " ++ show x
 
@@ -242,7 +245,7 @@ createRegistryContext opts = do
   ctx' <- throwIfNull "createRegistry" $ c_ctx_new flags
   ctx <- RxkbContext <$> newForeignPtr c_ctx_unref ctx'
   withForeignPtr ctx.unwrap $ \p -> do
-    forM_ opts.setLogLevel $ _rxkbContextSetLogLevel p . displayLogLevel
+    forM_ opts.setLogLevel $ c_ctx_set_log_level p . displayLogLevel
     forM_ opts.extraIncludePaths $ appendIncludePath p
   maybe rxkbContextParseDefault (flip rxkbContextParse) opts.ruleSet ctx
   return ctx
@@ -254,6 +257,11 @@ createRegistryContext opts = do
       f True x = x
       f False _ = 0
 
+
+contextLogLevel :: Ptr RxkbContext -> IO CUInt
+contextLogLevel ctx = do
+  c_rxkb_context_get_log_level ctx
+
 displayLogLevel :: LogLevel -> CUInt
 displayLogLevel lvl =
   case lvl of
@@ -263,10 +271,16 @@ displayLogLevel lvl =
     LevelInfo     -> #{const RXKB_LOG_LEVEL_INFO}
     LevelDebug    -> #{const RXKB_LOG_LEVEL_DEBUG}
 
+-- | Append an include path to the context.
 appendIncludePath :: Ptr RxkbContext -> FilePath -> IO ()
 appendIncludePath ctx path = do
   r <- withCString path $ c_rxkb_context_include_path_append ctx
   unless r $ throwIO $ RxkbContextIncludePathFailed path
+
+appendIncludePathDefault :: Ptr RxkbContext -> IO ()
+appendIncludePathDefault ctx = do
+  r <- c_rxkb_context_include_path_append_default ctx
+  unless r $ throwIO $ RxkbContextIncludePathFailed "[default]"
 
 -- | Parse given ruleset (e.g. @"evdev"@).
 --
@@ -345,7 +359,7 @@ foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_context_parse_default_r
   c_ctx_parse_default_ruleset :: Ptr RxkbContext -> IO Bool
 
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_context_set_log_level"
-  _rxkbContextSetLogLevel :: Ptr RxkbContext -> CUInt -> IO ()
+  c_ctx_set_log_level :: Ptr RxkbContext -> CUInt -> IO ()
 
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_context_get_log_level"
   c_rxkb_context_get_log_level :: Ptr RxkbContext -> IO CUInt
@@ -361,7 +375,7 @@ foreign import capi unsafe "xkbcommon/xkbregistry.h &rxkb_context_unref"
 
 -- rxkb_model
 
-foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_model_unref"          _rxkbModelUnref          :: Ptr RxkbModel -> IO ()
+foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_model_unref"           _rxkbModelUnref          :: Ptr RxkbModel -> IO ()
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_model_first"           _rxkbModelFirst          :: Ptr RxkbContext -> IO RxkbModel
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_model_next"            _rxkbModelNext           :: RxkbModel -> IO RxkbModel
 foreign import capi unsafe "xkbcommon/xkbregistry.h rxkb_model_get_name"        _rxkbModelGetName        :: RxkbModel -> IO ConstCS

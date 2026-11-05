@@ -18,7 +18,7 @@ flag standalone
   manual: True
   default: False
 
-common default-language
+common language
   default-language: GHC2024
   default-extensions:
     NamedFieldPuns
@@ -26,14 +26,14 @@ common default-language
     OverloadedStrings
     RecordWildCards
 
-common build-settings
+common warnings
   ghc-options:
     -Wall
     -Wunused-packages
     -Wno-ambiguous-fields
 
 library
-  import: default-language, build-settings
+  import: language, warnings
   exposed-modules:
     Waybar.CFFI.Plugin.ABIv2
     Waybar.CFFI.Plugin.Base
@@ -58,19 +58,25 @@ library
     hswm:ipc-api,
     monad-logger-aeson ^>=0.4.1,
     mtl ^>=2.3.1,
-    safe-exceptions,
     rio ^>=0.1.24,
+    safe-exceptions,
     template-haskell >=2.20 && <3,
     text ^>=2.1.2,
     text-short,
 
 foreign-library waybarhaskellplugin
-  import: default-language, build-settings
+  import: language, warnings
   type: native-shared
   lib-version-linux: 1.0.0
-  other-modules: Plugin
-  hs-source-dirs: plugin
-  build-depends: waybar-cffi-hs
+  other-modules:
+    Plugin
+
+  hs-source-dirs:
+    plugin
+
+  build-depends:
+    waybar-cffi-hs
+
   ghc-options:
     -threaded
     -flink-rts

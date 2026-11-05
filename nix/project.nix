@@ -1,15 +1,22 @@
-{ inputs
-, lib
-, withSystem
-, haskellNixModules
-, cabal-defaults
-, ...
+{
+  inputs,
+  lib,
+  withSystem,
+  haskell-nix-hs-bindgen-module,
+  cabal-defaults,
+  ...
 }:
 
 let
   inherit (inputs.flake-utils.lib) mkApp;
 
-  hswmProject = { lib , config , pkgs , ... }:
+  hswmProject =
+    {
+      lib,
+      config,
+      pkgs,
+      ...
+    }:
     {
       name = "hswm";
       src = pkgs.project-lib.fixCabalProjectImports {
@@ -19,27 +26,58 @@ let
         cabal-defaults
       ];
       modules = [
-        haskellNixModules.hs-bindgen
-        hsNixModule
+        haskell-nix-hs-bindgen-module
+        haskell-nix-hswm-module
       ];
+
+      #compiler-nix-name = lib.mkForce "ghc9141";
+
       cabalProjectFreeze = builtins.readFile ../cabal.project.freeze;
-      cabalProjectLocal = lib.mkAfter
-        ''
-          package *
-              documentation: True
-        '';
+      cabalProjectLocal = lib.mkAfter ''
+        package *
+            documentation: True
+      '';
 
       materialized = pkgs.project-lib.materializedFor "project";
+
+      ghcOverride =
+        let
+          drv = (config.compilerSelection pkgs.buildPackages).${config.compiler-nix-name};
+          out' =
+            pkgs.runCommand "ghc"
+              {
+                passthru = {
+                  inherit (drv) llvmPackages version;
+                };
+              }
+              ''
+                cp -r --reflink=auto ${drv.out} $out
+                find $out -name '*.copy' -exec sh -c 'chmod +w "$1"; chmod +w $(dirname "$1")' - {} \;
+                find $out -name '*.copy' -exec ls -la {} \;
+                find $out -name '*.copy' -delete
+                substituteInPlace $out/bin/* \
+                   --replace ${drv} $out
+                chmod -R +w $out/lib/ghc-9.14.1/lib/package.conf.d
+                $out/bin/ghc-pkg recache
+              '';
+        in
+        out';
+      #drv.overrideAttrs (oa: {
+      #  postInstall = (oa.postInstall or "") +
+      #  ''
+      #    find $out -name '*.copy -delete
+      #  '';
+      #});
 
       shell = {
         inherit (config) name;
         tools.hpack = { };
         allToolDeps = true;
-        withHaddock = true;
-        withHoogle = true;
+        #withHaddock = true;
+        #withHoogle = true;
         nativeBuildInputs = [
           # Use a newer cabal-install binary
-          pkgs.cabal_3_18
+          pkgs.cabal_3_18_1_0
           config.hsPkgs.hs-bindgen.components.exes.hs-bindgen-cli
         ];
         inputsFrom = [
@@ -56,34 +94,41 @@ let
       };
     };
 
-  hsNixModule =
+  haskell-nix-hswm-module =
     { config, pkgs, ... }:
+    let
+      inherit (config.ghc.package.llvmPackages) llvm libclang;
+    in
     {
       packages = {
         hswm.components = {
           library.build-tools = [
-            config.ghc.package.llvmPackages.llvm
-            config.ghc.package.llvmPackages.libclang
+            llvm
+            libclang
           ];
           sublibs.prelude.build-tools = [
-            config.ghc.package.llvmPackages.llvm
-            config.ghc.package.llvmPackages.libclang
+            llvm
+            libclang
           ];
           sublibs.ipc-api.build-tools = [
-            config.ghc.package.llvmPackages.llvm
-            config.ghc.package.llvmPackages.libclang
+            llvm
+            libclang
           ];
           exes.hswm.build-tools = [
-            config.ghc.package.llvmPackages.llvm
-            config.ghc.package.llvmPackages.libclang
+            llvm
+            libclang
           ];
           exes.hswmctl.build-tools = [
-            config.ghc.package.llvmPackages.llvm
-            config.ghc.package.llvmPackages.libclang
+            llvm
+            libclang
           ];
         };
-        hswm-bindings.components.library.build-tools = [ pkgs.wayland-scanner ];
-        haskell-wayland-core.components.library.build-tools = [ pkgs.wayland-scanner ];
+        hswm-bindings.components.library.build-tools = [
+          pkgs.wayland-scanner
+        ];
+        haskell-wayland-core.components.library.build-tools = [
+          pkgs.wayland-scanner
+        ];
       };
     };
 
@@ -113,8 +158,7 @@ let
       )
     );
 
-  adjustedShellFor =
-    project: args: adjustShell (args.name or null) (project.shellFor args);
+  adjustedShellFor = project: args: adjustShell (args.name or null) (project.shellFor args);
 
   # For haskell.nix v2 builder (writes to ~/.cabal by default)
   adjustShell =
@@ -135,10 +179,11 @@ let
     });
 
   mkMaterializedDoApp =
-    { projects
-    , pkgs
-    , project-lib
-    , ...
+    {
+      projects,
+      pkgs,
+      project-lib,
+      ...
     }:
     mkApp {
       name = "materialized-do";
@@ -161,7 +206,15 @@ let
       };
     };
 
-  customizations.perSystem = { lib , config , pkgs , project, project-lib , ... }:
+  customizations.perSystem =
+    {
+      lib,
+      config,
+      pkgs,
+      project,
+      project-lib,
+      ...
+    }:
     let
       projects = [
         {
@@ -247,11 +300,17 @@ in
 
   };
 
-  perSystem = { pkgs, project, ... }:
+  perSystem =
+    { pkgs, project, ... }:
     {
       _module.args.project = pkgs.project;
 
-      inherit (project.flake') apps packages devShells checks;
+      inherit (project.flake')
+        apps
+        packages
+        devShells
+        checks
+        ;
 
       legacyPackages = { inherit project; };
     };

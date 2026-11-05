@@ -17,7 +17,7 @@ let
   };
 
   # XXX: haskell.nix nix-tools built with Cabal 3.18 libraries
-  cabal_3_18-nix-tools = { lib, ... }: {
+  cabal_3_18_1_0-nix-tools = { lib, ... }: {
     src = lib.mkForce (builtins.toPath inputs.nix-tools.outPath);
     inherit (cabalDefaults) compiler-nix-name index-state;
     cabalProjectLocal = ''
@@ -121,10 +121,10 @@ in
 
   perSystem = { pkgs, ... }: {
     packages = {
-      inherit (pkgs) cabal_3_18 nix-tools-cabal_3_18;
+      inherit (pkgs) cabal_3_18_1_0 nix-tools-cabal_3_18_1_0;
     };
     legacyPackages = {
-      inherit (pkgs) cabal_3_18 nix-tools-cabal_3_18;
+      inherit (pkgs) cabal_3_18_1_0 nix-tools-cabal_3_18_1_0;
     };
   };
 
@@ -144,9 +144,9 @@ in
     #    materialized = final.project-lib.materializedFor "cabal-plan-nix";
     #  });
 
-    # Cabal 3.18
-    nix-tools-cabal_3_18 = final.haskell-nix.nix-tools-set cabal_3_18-nix-tools;
-    cabal_3_18 = final.nix-tools-cabal_3_18.exes.cabal;
-    #haskell-nix = overrideNixTools prev.haskell-nix cabal_3_18-nix-tools;
+    # Cabal 3.18.1.0
+    nix-tools-cabal_3_18_1_0 = final.haskell-nix.nix-tools-set cabal_3_18_1_0-nix-tools;
+    cabal_3_18_1_0 = final.nix-tools-cabal_3_18_1_0.exes.cabal;
+    #haskell-nix = overrideNixTools prev.haskell-nix cabal_3_18_1_0-nix-tools;
   };
 }

@@ -1,6 +1,6 @@
 cabal-version: 3.12
 
--- This file has been generated from package.yaml by hpack version 0.39.6.
+-- This file has been generated from package.yaml by hpack version 0.38.3.
 --
 -- see: https://github.com/sol/hpack
 
@@ -85,6 +85,7 @@ library
     HSWM.ManageHook
     HSWM.Operations
     HSWM.Outputs
+    HSWM.Prompt.Confirm
     HSWM.Prompt.Environment
     HSWM.Prompt.Workspaces
     HSWM.Seats
@@ -114,6 +115,7 @@ library
     HSWM.Util.PP
     HSWM.Util.Process
     HSWM.Util.Rectangle
+    HSWM.Util.Rofi.Run
     HSWM.Util.RofiPrompt
     HSWM.Util.Stack
     HSWM.Util.StackSet.Lens

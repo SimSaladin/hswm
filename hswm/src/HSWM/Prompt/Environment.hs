@@ -10,9 +10,10 @@ module HSWM.Prompt.Environment (
   environPrompt,
 ) where
 
-import HSWM
+import HSWM hiding ((-->>))
 import HSWM.Util.PangoMarkup ((~++))
 import HSWM.Util.PangoMarkup qualified as P
+import HSWM.Util.RofiPrompt
 import HSWM.Util.RofiPrompt qualified as RP
 
 import Data.ByteString.Lazy.Char8 qualified as BLC8
@@ -22,49 +23,50 @@ import System.Environment qualified as ENV
 
 -- TODO use this and finish
 data EnvPrompt = EnvPrompt
-  { inputFilter :: String -> Bool
-  , inputCallerEnv :: Bool
-  , inputSystemdUser :: Bool
-  } deriving (Generic)
+  { inputFilter :: !(String -> Bool)
+  , inputCallerEnv :: !Bool
+  , inputSystemdUser :: !Bool
+  }
+  deriving (Generic)
 
 instance Default EnvPrompt where
-  def = EnvPrompt { inputFilter = const True
-                  , inputCallerEnv = True
-                  , inputSystemdUser = True
-                  }
+  def =
+    EnvPrompt
+      { inputFilter = const True
+      , inputCallerEnv = True
+      , inputSystemdUser = True
+      }
 
-environPrompt :: RP.RofiPromptConfig () RP.FilterS String -> H ()
-environPrompt pc = do
-  varsEnv <- io ENV.getEnvironment
-  varsSD <- map parseLine . lines <$> runUserSD ["show-environment"]
+environPrompt :: EnvPrompt -> RP.RofiPromptConfig i 's' -> H ()
+environPrompt cfg pc = do
+  varsEnv <- if cfg.inputCallerEnv then io ENV.getEnvironment else pure mempty
+  varsSD <- if cfg.inputSystemdUser then map parseLine . lines <$> runUserSD ["show-environment"] else mempty
   let varsMap =
         M.unionWith
           (\(e1, s1) (e2, s2) -> (e1 <|> e2, s1 <|> s2))
           (M.fromList [(k, (Nothing, Just v)) | (k, v) <- varsSD])
           (M.fromList [(k, (Just v, Nothing)) | (k, v) <- varsEnv])
+      rows :: [Text]
       rows = do
         (vname, (mbValInEnv, mbValInSD)) <- M.toList varsMap
         case (mbValInEnv, mbValInSD) of
           (Just valInEnv, Just valInSD)
-            | valInEnv == valInSD -> [out vname valInEnv "synced"]
-            | otherwise -> [out vname v s | (v, s) <- [(valInEnv, "in process"), (valInSD, "in systemd")]]
-          (Just val, _) -> [out vname val "only in process"]
-          (_, Just val) -> [out vname val "only in systemd"]
+            | valInEnv == valInSD -> [out vname valInEnv "synced" | cfg.inputFilter vname]
+            | otherwise -> [out vname v s | cfg.inputFilter vname, (v, s) <- [(valInEnv, "in process"), (valInSD, "in systemd")]]
+          (Just val, _) -> [out vname val "only in process" | cfg.inputFilter vname]
+          (_, Just val) -> [out vname val "only in systemd" | cfg.inputFilter vname]
           _ -> error "empty"
+      pc' :: RP.RofiPromptConfig [Text] 's'
       pc' =
         pc
-          & RP.prompt
-            .~ "Set env variable"
-          & RP.promptMessage
-            .~ "\"VAR=VALUE\" to set the value of $VAR. \"VAR\" to unset the variable."
-          & RP.clearInputSettings
+          & clearTypeParams
+          & RP.prompt .~ "Set env variable"
+          & RP.promptMessage .~ "\"VAR=VALUE\" to set the value of $VAR. \"VAR\" to unset the variable."
 
-  RP.runRofi pc' rows >>= (`whenJust` process)
+  void $ rows -->> pc' :-->> process
   where
     out :: String -> String -> String -> Text
-    out k v notes =
-      P.render $
-        P.bold k <> "=" ~++ v <> "\t" <> P.italic ("(" ~++ notes <> ")")
+    out k v notes = P.render $ P.bold k <> "=" ~++ v <> "\t" <> P.italic ("(" ~++ notes <> ")")
 
 process :: String -> H ()
 process input = do

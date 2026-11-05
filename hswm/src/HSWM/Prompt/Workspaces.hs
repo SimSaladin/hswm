@@ -9,47 +9,49 @@
 module HSWM.Prompt.Workspaces where
 
 import Data.List qualified as L
-import HSWM
+import HSWM hiding ((-->>))
 import HSWM.Actions.DynamicWorkspaceOrder qualified as DWO
 import HSWM.Actions.DynamicWorkspaces qualified as DynWS
+import HSWM.Prompt.Confirm
 import HSWM.StackSet qualified as W
+import HSWM.Util.RofiPrompt
 import HSWM.Util.RofiPrompt qualified as RP
 
+type WorkspacePrompt = RofiPromptConfig [(WorkspaceId, InputRowAttrs)] 's'
+
 -- | Go to workspace
-workspacePrompt :: RP.RofiPromptConfig' -> H ()
+workspacePrompt :: WorkspacePrompt -> H ()
 workspacePrompt pc =
   mkWorkspacePrompt
-    (\_ _ -> pc{RP.prompt = "Go to workspace"})
+    (\pc' _ -> pc' & prompt .~ "Go to workspace")
     ( \_ input -> do
         logInfo $ "switching workspace" :# ["tag" .= input]
         exist <- runInHS $ do
           windows $ W.view input
           withWindowSet (return . W.tagMember input)
-        if exist
-          then manageDirty
-          else handleNotExists input
+        if exist then manageDirty else handleNotExists input
     )
     pc
   where
     handleNotExists tag = do
-      RP.confirmPrompt (pc @[String]) ("Create new workspace '" ++ tag ++ "'?") $ runInHS $ do
+      confirmPrompt @[String] (pc & RP.clearTypeParams) ("Create new workspace '" ++ tag ++ "'?") $ runInHS $ do
         -- modifySeats (const True) $ \s -> s { suppressChangeFocus = 2 }
         DynWS.addWorkspace tag
         manageDirty
 
-renameWorkspacePrompt :: RP.RofiPromptConfig' -> H ()
+renameWorkspacePrompt :: WorkspacePrompt -> H ()
 renameWorkspacePrompt =
   mkWorkspacePrompt
-    (\pc curTag -> pc{RP.prompt = "Rename workspace '" ++ curTag ++ "'"})
+    (\pc curTag -> pc & prompt .~ "Rename workspace '" ++ curTag ++ "'")
     ( \old input -> runInHS $ do
         DWO.updateName old input
         DynWS.renameWorkspaceByName input
     )
 
-addWorkspacePrompt :: RP.RofiPromptConfig' -> H ()
+addWorkspacePrompt :: WorkspacePrompt -> H ()
 addWorkspacePrompt =
   mkWorkspacePrompt
-    (\pc _ -> pc{RP.prompt = "Add new workspace"})
+    (\pc _ -> pc & prompt .~ "Add new workspace")
     ( \_ input -> do
         runInHS $ do
           modifySeats (const True) $ \s -> s{suppressChangeFocus = 2}
@@ -58,19 +60,20 @@ addWorkspacePrompt =
     )
 
 mkWorkspacePrompt ::
-  (RP.RofiPromptConfig' -> WorkspaceId -> RP.RofiPromptConfig')
+  (WorkspacePrompt -> WorkspaceId -> WorkspacePrompt)
   -> (WorkspaceId -> String -> H a)
-  -> RP.RofiPromptConfig'
+  -- ^ Thing to do with ws
+  -> WorkspacePrompt
   -> H ()
-mkWorkspacePrompt prompt apply rofiPrompt = do
+mkWorkspacePrompt mkPrompt apply rofiPrompt = do
   wsComp <- runInHS DWO.getWsCompareByOrder
   (curTag, (hiddenTags, visibleTags)) <- runInHS $ withWindowSet $ return . (W.currentTag &&& map W.tag . W.hidden &&& map (W.tag . W.workspace) . W.visible)
   let allTags =
-        [RP.fromContent curTag & RP.active .~ True & RP.nonselectable .~ True]
-          ++ [RP.fromContent t & RP.active .~ True | t <- visibleTags]
-          ++ [RP.fromContent t | t <- hiddenTags]
-      sorted = L.sortBy (wsComp `on` view RP.content) allTags
-  RP.runRofi (prompt rofiPrompt curTag) sorted >>= (`whenJust` doApply curTag)
+        [(curTag, def & RP.active .~ True & RP.nonselectable .~ True :: RP.InputRowAttrs)]
+          ++ [(t, def & RP.active .~ True) | t <- visibleTags]
+          ++ [(t, def) | t <- hiddenTags]
+      sorted = L.sortBy (wsComp `on` fst) allTags
+  void $ sorted -->> mkPrompt rofiPrompt curTag :-->> doApply curTag
   where
     doApply cur input = do
       _ <- apply cur input

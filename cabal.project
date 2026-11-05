@@ -19,10 +19,10 @@ library-stripping: True
 -- documentation: True
 haddock-html: True
 haddock-hoogle: True
---haddock-quickjump: True
+haddock-quickjump: True
 haddock-hyperlink-source: True
 haddock-use-unicode: True
-haddock-html-location: file:///packages/archive/$pkg/latest/doc/html
+--haddock-html-location: file:///packages/archive/$pkg/latest/doc/html
 
 extra-packages: process
 

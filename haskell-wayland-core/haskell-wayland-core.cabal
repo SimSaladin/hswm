@@ -30,8 +30,7 @@ custom-setup
     Cabal >=3.14 && <3.19,
     Cabal-hooks >=3.14 && <3.19,
     base >=4.21 && <5,
-    hs-bindgen-hooks,
-    microlens-ghc
+    hs-bindgen-hooks
 
 common language
   default-language: GHC2024

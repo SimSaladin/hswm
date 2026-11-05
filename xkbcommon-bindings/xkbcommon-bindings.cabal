@@ -57,6 +57,7 @@ library
     base >=4.21 && <5,
     data-default ^>=0.8,
     unix ^>=2.8.6
+
   exposed-modules:
     Text.XkbCommon
     Text.XkbCommon.Context
@@ -77,7 +78,8 @@ library
     Text.XkbCommon.Internal
 
   hs-source-dirs: src
-  build-tool-depends: hsc2hs:hsc2hs
+  build-tool-depends:
+    hsc2hs:hsc2hs
 
   if flag(pkg-config)
     pkgconfig-depends:

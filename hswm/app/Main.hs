@@ -1,13 +1,14 @@
+{-# LANGUAGE ExtendedDefaultRules #-}
+{-# LANGUAGE NamedDefaults #-}
 {-# LANGUAGE PartialTypeSignatures #-}
 {-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE NamedDefaults #-}
-{-# LANGUAGE ExtendedDefaultRules #-}
+{-# OPTIONS_GHC -Wno-missing-signatures #-}
 {-# OPTIONS_GHC -Wno-type-defaults #-}
 {-# OPTIONS_GHC -Wno-unused-binds #-}
-{-# OPTIONS_GHC -Wno-missing-signatures #-}
+
 module Main (main) where
 
-import HSWM
+import HSWM hiding ((-->>))
 import HSWM.Actions.CycleRecentWS qualified as CycleRecentWS
 import HSWM.Actions.CycleWS qualified as CycleWS
 import HSWM.Actions.DynamicWorkspaceOrder qualified as DWO
@@ -28,15 +29,16 @@ import HSWM.Layout.WindowNavigation qualified as L.WNavigation
 import HSWM.Prompt.Environment
 import HSWM.Prompt.Workspaces
 import HSWM.StackSet qualified as W
+import HSWM.Types.KeyBindings qualified as KB
 import HSWM.Util.Debug
 import HSWM.Util.ExtensibleState qualified as XS
 import HSWM.Util.IPC qualified as IPC
 import HSWM.Util.Minimize (Minimized (..))
 import HSWM.Util.NamedScratchpad
 import HSWM.Util.PangoMarkup qualified as P
+import HSWM.Util.RofiPrompt ((-->>), (:-->>) (..))
 import HSWM.Util.RofiPrompt qualified as RP
 import HSWM.Wallpaper qualified as Wallpaper
-import HSWM.Types.KeyBindings qualified as KB
 
 import Data.List qualified as L
 import Data.Map qualified as M
@@ -51,27 +53,28 @@ default GetHState (H, HS)
 default MonadUnliftIO (IO, H)
 default MonadIO (H, IO)
 
-main :: HasCallStack => IO ()
+main :: (HasCallStack) => IO ()
 main =
   -- adding keys late, so that a changed modMask override can take effect...
   hswm (validateAndAddKeys myKeys) $
-  Wallpaper.usingWallpaper Wallpaper.WallpaperConfig{filepath = "/home/sim/wallpaper.png"} $
-  IPC.ipcServer def $
-  (def @(HSWMConfig H Full))
-    & layoutHook .~ myLayoutHook
-    & manageHook .~ myManageHook
-    & handleEventHook <>~ debugHook
-    & handleEventHookDynamic <>~ debugHookDyn & startupHook <>~ runInHS (scratchpadsStartupHook myScratchpads)
-    & pointerBindings <>~ myPointerBinds
-    & defaultModMask .~ "mod4"
-    & borderWidth .~ 1
-    & normalBorder .~ parseRGBA ColBase02
-    & focusedBorder .~ parseRGBA ColCyan
-    & xkbLayout ?~ myKeyboard
-    & repeatInfo . rate .~ 20
-    & repeatInfo . delay .~ 150
-    & cursorTheme .~ "Vanilla-DMZ"
-    & cursorSize .~ 24
+    Wallpaper.usingWallpaper Wallpaper.WallpaperConfig{filepath = "/home/sim/wallpaper.png"} $
+      IPC.ipcServer def $
+        (def @(HSWMConfig H Full))
+          & layoutHook .~ myLayoutHook
+          & manageHook .~ myManageHook
+          & handleEventHook <>~ debugHook
+          & handleEventHookDynamic <>~ debugHookDyn
+          & startupHook <>~ runInHS (scratchpadsStartupHook myScratchpads)
+          & pointerBindings <>~ myPointerBinds
+          & defaultModMask .~ "mod4"
+          & borderWidth .~ 1
+          & normalBorder .~ parseRGBA ColBase02
+          & focusedBorder .~ parseRGBA ColCyan
+          & xkbLayout ?~ myKeyboard
+          & repeatInfo . rate .~ 20
+          & repeatInfo . delay .~ 150
+          & cursorTheme .~ "Vanilla-DMZ"
+          & cursorSize .~ 24
 
 myKeyboard :: XkbRuleNames
 myKeyboard =
@@ -89,22 +92,23 @@ myKeyboard =
 
 myLayoutHook :: _
 myLayoutHook =
-  L.Minimize.minimize
-  $ boringWindows
-  $ mkToggle1 NOBORDERS
-  $ mkToggle1 NBFULL
-  $ NEArea.nonExclusiveArea
-  $ L.Maximize.maximize
-  -- apply on top of any modifiers that might modify placement of tiled windows
-  $ L.WNavigation.configurableNavigation (L.WNavigation.navigateBrightness 0.8)
-  $ mkToggle1 REFLECTX
-  $ mkToggle1 REFLECTY
-  $ mkToggle1 MIRROR
-  $ BSP.emptyBSP
-    ||| GV.Grid (16 / 10)
-    ||| GV.SplitGrid GV.R 2 3 (2 / 3) (16 / 10) (5 / 100)
-    ||| Tall 3 (3 / 100) (1 / 2)
-    ||| L.NoBorders.noBorders Full
+  L.Minimize.minimize $
+    boringWindows $
+      mkToggle1 NOBORDERS $
+        mkToggle1 NBFULL $
+          NEArea.nonExclusiveArea $
+            L.Maximize.maximize
+            -- apply on top of any modifiers that might modify placement of tiled windows
+            $
+              L.WNavigation.configurableNavigation (L.WNavigation.navigateBrightness 0.8) $
+                mkToggle1 REFLECTX $
+                  mkToggle1 REFLECTY $
+                    mkToggle1 MIRROR $
+                      BSP.emptyBSP
+                        ||| GV.Grid (16 / 10)
+                        ||| GV.SplitGrid GV.R 2 3 (2 / 3) (16 / 10) (5 / 100)
+                        ||| Tall 3 (3 / 100) (1 / 2)
+                        ||| L.NoBorders.noBorders Full
 
 myManageHook :: Query (Endo WindowSet)
 myManageHook =
@@ -117,11 +121,9 @@ myManageHook =
     ]
 
 promptLaunchSystemD :: H ()
-promptLaunchSystemD =
-  RP.runRofi
-    (myRofiBaseConfig @_ @'s' & RP.withHistory "systemd-run" & RP.prompt .~ "systemd-run")
-    (mempty @[String])
-    RP.++> runWithSystemD def
+promptLaunchSystemD = void $ ([] :: [String]) -->> pc :-->> runWithSystemD def
+  where
+    pc = myRofiBaseConfig @_ @'s' & RP.withLineHistory "systemd-run" & RP.prompt .~ "systemd-run"
 
 myKeys :: Validator ()
 myKeys = do
@@ -142,30 +144,29 @@ myKeys = do
     "M-C-S-Left" .@= PScreen.onPrevNeighbour def W.shift <?> "Send active window to previous screen"
 
     let ks = screenKeysScreens
-    "M-"    ///& ks .@=> \i -> PScreen.viewScreen def i <?> "View screen " ++ show i
-    "M-S-"  ///& ks .@=> \i -> PScreen.sendToScreen def i <?> "Send window to screen " ++ show i
+    "M-" ///& ks .@=> \i -> PScreen.viewScreen def i <?> "View screen " ++ show i
+    "M-S-" ///& ks .@=> \i -> PScreen.sendToScreen def i <?> "Send window to screen " ++ show i
     "M-M1-" ///& ks .@=> \i -> sendFocusedWorkspaceToScreen OnScreen.FocusCurrent i <?> "Send workspace to screen " ++ show i
-    "M-C-"  ///& ks .@=> \i -> sendFocusedWorkspaceToScreen OnScreen.FocusNew i <?> "Send workspace to screen and focus it " ++ show i
-
+    "M-C-" ///& ks .@=> \i -> sendFocusedWorkspaceToScreen OnScreen.FocusNew i <?> "Send workspace to screen and focus it " ++ show i
 
   group "Layout" $ do
-    "M-C-space"     .@= (view (config . layoutHook) >>= setLayout) <?> "Layout: Reset"
-    "M-space"       .@= SendMessage NextLayout
-    "M-S-space"     .@= SendMessage FirstLayout
-    "M-comma"       .@= SendMessage (IncMasterN (-1))
-    "M-period"      .@= SendMessage (IncMasterN 1)
-    "M-x"           .@= SendMessage Shrink
-    "M-S-x"         .@= SendMessage Expand
-    "M-b t"         .@= SendMessage NEArea.ToggleNonExclusiveArea
-    "M-b b"         .@= SendMessage (Toggle NOBORDERS)
-    "M-b m"         .@= SendMessage (Toggle MIRROR)
-    "M-b f"         .@= SendMessage (Toggle NBFULL)
-    "M-b M-f"       .@= withFocused (doManage WToggleFullscreen) <?> "Fullscreen: focused"
-    "M-b x"         .@= SendMessage (Toggle REFLECTX)
-    "M-b y"         .@= SendMessage (Toggle REFLECTY)
-    "M-b M-x"       .@= SendMessage NEArea.ToggleNonExclusiveArea :>>: SendMessage (Toggle NOBORDERS)
-    "M-m"           .@= withFocused (sendMessage . L.Maximize.maximizeRestore . view riverWindow) <?> "Maximize Restore"
-    "M-b M-c"       .@= cleanupMinimized <?> "Clear boring window cache"
+    "M-C-space" .@= (view (config . layoutHook) >>= setLayout) <?> "Layout: Reset"
+    "M-space" .@= SendMessage NextLayout
+    "M-S-space" .@= SendMessage FirstLayout
+    "M-comma" .@= SendMessage (IncMasterN (-1))
+    "M-period" .@= SendMessage (IncMasterN 1)
+    "M-x" .@= SendMessage Shrink
+    "M-S-x" .@= SendMessage Expand
+    "M-b t" .@= SendMessage NEArea.ToggleNonExclusiveArea
+    "M-b b" .@= SendMessage (Toggle NOBORDERS)
+    "M-b m" .@= SendMessage (Toggle MIRROR)
+    "M-b f" .@= SendMessage (Toggle NBFULL)
+    "M-b M-f" .@= withFocused (doManage WToggleFullscreen) <?> "Fullscreen: focused"
+    "M-b x" .@= SendMessage (Toggle REFLECTX)
+    "M-b y" .@= SendMessage (Toggle REFLECTY)
+    "M-b M-x" .@= SendMessage NEArea.ToggleNonExclusiveArea :>>: SendMessage (Toggle NOBORDERS)
+    "M-m" .@= withFocused (sendMessage . L.Maximize.maximizeRestore . view riverWindow) <?> "Maximize Restore"
+    "M-b M-c" .@= cleanupMinimized <?> "Clear boring window cache"
 
     {- TODO also
     --   "M-b s"       >+ ToggleScreenSpacing :>> ToggleWindowSpacing -}
@@ -179,11 +180,10 @@ myKeys = do
       "M-C-exclam" .@= SendMessage BSP.Balance
       "M-C-" ///& directions2D .@=> \dir -> SendMessage (BSP.ExpandTowards dir) <!> 250
 
-
   group "Workspace" $ do
-    "M-semicolon "   ///& tagKeysTags .@=> \i -> DWO.withNthWorkspace W.view i <?> "View workspace " ++ show i
+    "M-semicolon " ///& tagKeysTags .@=> \i -> DWO.withNthWorkspace W.view i <?> "View workspace " ++ show i
     "M-S-semicolon " ///& tagKeysTags .@=> \i -> DWO.withNthWorkspace W.shift i <?> "Shift to workspace " ++ show i
-    "M-y"   .@= cycleRecentHiddenWS "C-M4-A" "y" "p" <?> "Cycle recent hidden tags"
+    "M-y" .@= cycleRecentHiddenWS "C-M4-A" "y" "p" <?> "Cycle recent hidden tags"
     "M-S-n" .@= DWO.swapWith Next CycleWS.anyWS <?> "Shift current tag (forwards)"
     "M-S-p" .@= DWO.swapWith Prev CycleWS.anyWS <?> "Shift current tag (backwards)"
     "M-g r" .@= renameWorkspacePrompt myRofiBaseConfig <?> "Rename workspace (prompt)"
@@ -192,28 +192,27 @@ myKeys = do
     "M-g d" .@= removeFocusedWorkspace <?> "Remove focused workspace"
     "M-g f" .@= windowPrompt <?> "Go to window"
 
-
   group "Window" $ do
     let ks = zip ["k", "j", "l", "h"] [minBound .. maxBound @Direction2D]
-    "M-"   ///& ks .@=> SendMessage . L.WNavigation.Go
+    "M-" ///& ks .@=> SendMessage . L.WNavigation.Go
     "M-S-" ///& ks .@=> SendMessage . L.WNavigation.Swap
 
     "M-n" .@= windows W.focusDown <?> "Focus down" <!> 750
     "M-p" .@= windows W.focusUp <?> "Focus up" <!> 750
     "M-f s" .@= withFocused (\w -> modifyWindowSet (W.sink w.river_window)) <?> "Sink focused window"
-    "M-f f" .@= withFocused (\w -> modifyWindowSet (\ws -> W.float w.river_window (rationalRectIn (w^. rectangle) (screenRect $ W.screenDetail $ W.current ws)) ws)) <?> "Float focused window"
+    "M-f f" .@= withFocused (\w -> modifyWindowSet (\ws -> W.float w.river_window (rationalRectIn (w ^. rectangle) (screenRect $ W.screenDetail $ W.current ws)) ws)) <?> "Float focused window"
     "M-exclam" .@= togglePad "tmux-0" <?> "Toggle tmux PAD"
     "M-Slash" .@= togglePad "dynamic" <?> "Toggle dynamic PAD"
 
   group "Prompts/Run" $ do
     -- shell/application runners
-    "M-r r" .@= RP.launchRofi_ (RP.modePromptWith myRofiBaseConfig "run") <?> "Run shell (prompt)"
-    "M-r d" .@= RP.launchRofi_ (RP.modePromptWith myRofiBaseConfig "drun" & RP.showIcons .~ True) <?> "Run desktop app (prompt)"
+    "M-r r" .@= RP.launchRofi_ (RP.modePromptWith myRofiBaseConfig' "run") <?> "Run shell (prompt)"
+    "M-r d" .@= RP.launchRofi_ (RP.modePromptWith myRofiBaseConfig' "drun" & RP.showIcons .~ True) <?> "Run desktop app (prompt)"
     "M-r s" .@= promptLaunchSystemD <?> "Run via systemd-run (prompt)"
-    "M-r e" .@= environPrompt myRofiBaseConfig <?> "Environment variable prompt"
-    "M-r M-r" .@=  bindsPrompt <?> "Prompt for any bound key action"
+    "M-r e" .@= environPrompt def myRofiBaseConfig <?> "Environment variable prompt"
+    "M-r M-r" .@= bindsPrompt <?> "Prompt for any bound key action"
     -- clipboard prompt
-    "M-r c" .@= RP.launchRofi_ (RP.modePromptWith myRofiBaseConfig "clipboard:cliphist-rofi-img" & RP.showIcons .~ True) <?> "Open cliphist prompt"
+    "M-r c" .@= RP.launchRofi_ (RP.modePromptWith myRofiBaseConfig' "clipboard:cliphist-rofi-img" & RP.showIcons .~ True) <?> "Open cliphist prompt"
     -- bluetooth prompt
     "M-r b" .@= spawnOnceKitty "bluetoothctl@kitty" "bluetoothctl" [] (doCenterFloat (3 / 5) (2 / 3))
     "M-r q" .@= qutebrowserPrompt <?> "Launch qutebrowser (prompt for name)"
@@ -239,9 +238,8 @@ myKeys = do
     "XF86AudioLowerVolume" .@= adjustVolume "@DEFAULT_SINK@" (-volAdjAmount) <!> 80
     "XF86MonBrightnessUp" .@= backlight ["set", "2%+"] <!> 80
     "XF86MonBrightnessDown" .@= backlight ["set", "2%-"] <!> 80
-    "M-c s" .@= spawnProcess  "sink-switch" [] <?> "Toggle speakers-phones output" <!> 800
+    "M-c s" .@= spawnProcess "sink-switch" [] <?> "Toggle speakers-phones output" <!> 800
     "M-c m" .@= spawnOnceKitty "pulsemixer@kitty" "pulsemixer" [] (doCenterFloat (1 / 2) (2 / 3))
-
 
 -- TODO
 --   "M-g m"        "Shift to tag: "       ?+ (defile . shift) ? "Move window to this tag (XP)"
@@ -254,28 +252,28 @@ myKeys = do
 --   "M-r s"         inputPromptWithCompl xpConfig "scratchpad" (scratchpadCompl xpConfig myScratchpads) ?+ getAction . togglePad ? "Prompt: pad"
 --   "M-r u"         inputPromptWithHistCompl xpConfig "browser-app" ?+ (\s -> launchDesktopEntry "chrome-app" [s]) ? "Chrome App"
 
-  -- "M-Tab",        cyclePads <?> "Cycle pads"
-  -- "M-f "   ///& directions2D >++> flip SnapMove   Nothing
-  -- "M-f S-" ///& directions2D >++> flip SnapGrow   Nothing
-  -- "M-f C-" ///& directions2D >++> flip SnapShrink Nothing
-  -- "M-f ,"        RotSlavesDown
-  -- "M-f ."        RotSlavesUp
-  -- "M-f M-,"      RotAllDown
-  -- "M-f M-."      RotAllUp
-  -- "M-f M-m"      FocusMaster
-  -- "M-f M-n"      FocusUp
-  -- "M-f M-p"      FocusDown
-  -- "M-f m"        SwapMaster
-  -- "M-f n"        SwapUp
-  -- "M-f p"        SwapDown
-  -- "M-f u"        FocusUrgent
-  -- "M-f b"        ToggleFocusedWindowBorder
-  -- "M-f c"        CenterWindow
-  -- "M-f S-s"      SinkAll
-  -- "M-f S-f"      ToggleFloatAllNew
-  -- "M-f y"        SwitchLayer
-  -- "M-f h"        pidPrompt xpConfig "SpawnOn/PPID" ?+ (\p -> wsPromptWithCurrent xpConfig "Shift to:" ?+ setManageByPPID p) ? "SpawnOn by Window PID"
-  -- "M-@"          togglePad "taskwarrior-tui"
+-- "M-Tab",        cyclePads <?> "Cycle pads"
+-- "M-f "   ///& directions2D >++> flip SnapMove   Nothing
+-- "M-f S-" ///& directions2D >++> flip SnapGrow   Nothing
+-- "M-f C-" ///& directions2D >++> flip SnapShrink Nothing
+-- "M-f ,"        RotSlavesDown
+-- "M-f ."        RotSlavesUp
+-- "M-f M-,"      RotAllDown
+-- "M-f M-."      RotAllUp
+-- "M-f M-m"      FocusMaster
+-- "M-f M-n"      FocusUp
+-- "M-f M-p"      FocusDown
+-- "M-f m"        SwapMaster
+-- "M-f n"        SwapUp
+-- "M-f p"        SwapDown
+-- "M-f u"        FocusUrgent
+-- "M-f b"        ToggleFocusedWindowBorder
+-- "M-f c"        CenterWindow
+-- "M-f S-s"      SinkAll
+-- "M-f S-f"      ToggleFloatAllNew
+-- "M-f y"        SwitchLayer
+-- "M-f h"        pidPrompt xpConfig "SpawnOn/PPID" ?+ (\p -> wsPromptWithCurrent xpConfig "Shift to:" ?+ setManageByPPID p) ? "SpawnOn by Window PID"
+-- "M-@"          togglePad "taskwarrior-tui"
 
 volAdjAmount = 0.01
 directions2D = map (: []) "kjlh" `zip` [minBound .. maxBound @Direction2D]
@@ -352,14 +350,19 @@ spawnOnceKitty name prog args mh = toggleScratchpad' True sp <?> "Spawn " <> nam
           spawnProcess "kitty" $
             ["--app-id=" ++ name, "--detach", "--", prog] ++ args
 
-myRofiBaseConfig :: RP.RofiPromptConfig i o a
+myRofiBaseConfig' :: RP.RofiPromptConfig () '_'
+myRofiBaseConfig' =
+  myRofiBaseConfig
+    & RP.withHistory' Nothing
+
+myRofiBaseConfig :: RP.RofiPromptConfig s o
 myRofiBaseConfig =
-  (RP.dmenuPrompt @())
-    & RP.clearTypeParams
+  (RP.dmenuPrompt :: RP.RofiPromptConfig () 's')
     & RP.markupInput .~ True
     & RP.smartCase .~ True
     & RP.showIcons .~ True
     & RP.matching .~ "fuzzy,prefix,normal"
+    & RP.withHistory' Nothing
 
 cycleRecentHiddenWS :: String -> String -> String -> H ()
 cycleRecentHiddenWS = CycleRecentWS.cycleWindowSets $ \wset ->
@@ -368,21 +371,27 @@ cycleRecentHiddenWS = CycleRecentWS.cycleWindowSets $ \wset ->
 windowPrompt :: H ()
 windowPrompt = do
   (wss, wState) <- runInHS $ (,) <$> withWindowSet (return . W.workspaces) <*> use _windows
-  let (input, toTarget) = getRows wss wState
-  RP.runRofi (RP.clearInputSettings rp) input RP.++> doApply . toTarget
+  let input :: RP.ColumnsInput [(_, RP.InputRowAttrs)]
+      (input, toTarget) = getRows wss wState
+  void $ input -->> rp :-->> doApply . toTarget
   where
-    rp :: RP.RofiPromptConfig () RP.SelectI Int
-    rp = myRofiBaseConfig
+    rp =
+      myRofiBaseConfig @_ @'i'
         & RP.prompt .~ "window"
         & RP.promptMessage .~ "Go to window"
         & RP.noCustomInput .~ True
 
-    getRows wss wins = (RP.columnsWithHeader ("appID", "Workspace", "Title", "PID") $ map snd rows, fst . (rows !!) . subtract 1)
-      where rows = do
-              ws <- wss
-              rw <- W.integrate' (W.stack ws)
-              Just w <- [M.lookup rw wins]
-              return (rw, fmtWindow ws w)
+    columnNames = ("appID", "Workspace", "Title", "PID")
+
+    getRows wss wins = (input, findTarget)
+      where
+        input = RP.columnsWithHeader columnNames $ map snd rows
+        findTarget = fst . (rows !!) . subtract 1
+        rows = do
+          ws <- wss
+          rw <- W.integrate' (W.stack ws)
+          Just w <- [M.lookup rw wins]
+          return (rw, fmtWindow ws w)
 
     fmtWindow ws w =
       ( P.bold w.appId
@@ -392,7 +401,7 @@ windowPrompt = do
       )
 
     doApply rw = do
-      logInfo $ "window prompt: focusing the chosen window" :# [ "window" .= rw ]
+      logInfo $ "window prompt: focusing the chosen window" :# ["window" .= rw]
       windows $ W.focusWindow rw
       manageDirty
 
@@ -405,38 +414,72 @@ removeFocusedWorkspace = do
 
 bindsPrompt :: H ()
 bindsPrompt = do
-  binds <- view (config . keyBindings) <&> KB.flatBindings
-  let xs = L.sortBy (comparing snd) $ renderBindings [] binds
-      ind1 = maximum $ xs ^.. traversed . _2 . _1 . to T.length
-      ind2 = maximum $ xs ^.. traversed . _2 . _2 . to T.length
-      input = [P.toMarkup (T.justifyLeft ind1 ' ' cats) <> "\t" <> P.bold (T.justifyLeft ind2 ' ' mk) <> "\t" <> P.italic desc  | (_, (cats, mk, desc)) <- xs]
-  RP.runRofi @_ @'i' myRofiBaseConfig input
-    RP.++> \(x :: Int) -> do
+  binds <- view (config . keyBindings) <&> renderBindings . KB.flatBindings
+  void $ mkInput binds -->> (myRofiBaseConfig @_ @'i') :-->> doaction binds
+  where
+    mkInput binds =
+      [ P.text (T.justifyLeft ind1 ' ' cats)
+          <> "\t"
+          <> P.bold (T.justifyLeft ind2 ' ' mk)
+          <> "\t"
+          <> P.italic desc
+      | (_, (cats, mk, desc)) <- binds
+      ]
+      where
+        ind1 = calcIndent binds (_2 . _1)
+        ind2 = calcIndent binds (_2 . _2)
+
+    calcIndent xs f = maximum $ xs ^.. traversed . f . to T.length
+
+    renderBindings :: [([XBKey], SomeAction H)] -> [(SomeAction H, (Text, Text, String))]
+    renderBindings binds =
+      L.sortBy
+        (comparing snd)
+        [ (a, (ppCategories, ppKey, ppAction))
+        | (xk, a) <- L.sortOn (map (ppXBKey @String) . fst) binds
+        , let ppCategories = T.intercalate "," $ map toText $ actionCategories (Proxy @H) a
+        , let ppKey = T.unwords $ map (ppXBKey @Text) xk
+        , let ppAction = actionDescription (Proxy @H) a
+        ]
+
+    doaction binds (x :: Int) = do
       logInfo $ "binds prompt" :# ["res" .= tshow x]
-      case xs ^.. ix x of
+      case binds ^.. ix x of
         [(k, _)] -> runner k
         _ -> return ()
-  where
-    renderBindings :: [XBKey] -> [([XBKey], SomeAction H)] -> [(SomeAction H, (Text, Text, String))]
-    renderBindings pre binds =
-        [ (a, (T.intercalate "," $ map toText $ actionCategories (Proxy @H) a, T.unwords $ map (ppXBKey @Text) $ pre ++ xk, actionDescription (Proxy @H) a))
-        | (xk, a) <- L.sortOn (map (ppXBKey @String) . fst) binds
-        ]
 
 qutebrowserPrompt :: H ()
 qutebrowserPrompt = do
-  (_, out, _) <- readProcess $ proc "find"
-          [ "/home/sim/.local/share/qutebrowser/", "-maxdepth", "1",
-          "-mindepth", "1", "-type", "d",
-          "!", "-name", ".*", "!", "-name", "greasemonkey", "!", "-name", "qutebrowser",
-          "-printf", "%P\n" ]
-  let input = T.lines $ decodeUtf8Lenient $ out ^. strict
-  RP.runRofi @_ @'s' myRofiBaseConfig input RP.++> launch
-    where
-      launch name = do
-        logInfo $ "qutebrowser launch" :# [ "instance" .= name ]
-        runWithSystemD def{ sdUnit = Just $ "qutebrowser@" ++ name } ("qutebrowser -r " ++ name)
-
+  (_, out, _) <-
+    readProcess $
+      proc
+        "find"
+        [ "/home/sim/.local/share/qutebrowser/"
+        , "-maxdepth"
+        , "1"
+        , "-mindepth"
+        , "1"
+        , "-type"
+        , "d"
+        , "!"
+        , "-name"
+        , ".*"
+        , "!"
+        , "-name"
+        , "greasemonkey"
+        , "!"
+        , "-name"
+        , "qutebrowser"
+        , "-printf"
+        , "%P\n"
+        ]
+  let input :: [T.Text]
+      input = T.lines $ decodeUtf8Lenient $ out ^. strict
+  void $ input -->> (myRofiBaseConfig @_ @'s') :-->> launch
+  where
+    launch name = do
+      logInfo $ "qutebrowser launch" :# ["instance" .= name]
+      runWithSystemD def{sdUnit = Just $ "qutebrowser@" ++ name} ("qutebrowser -r " ++ name)
 
 -- | XXX: this should be run after window restore
 cleanupMinimized :: H ()

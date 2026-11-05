@@ -11,7 +11,11 @@
 -- Portability : unportable
 module Waybar.CFFI.Plugin.TH (
   makeCFFIModule,
+
+  -- * Internals
   forExpD,
+  mkGlobalVar,
+  mkExport,
 
   -- * Re-exports
   ConstPtr (..),
@@ -35,7 +39,7 @@ import GI.Gtk qualified as Gtk
 import Language.Haskell.TH
 import Language.Haskell.TH.Syntax
 import System.IO (hPrint, stderr)
-import System.IO.Unsafe
+import System.IO.Unsafe (unsafePerformIO)
 import Prelude hiding (init)
 
 -- |
@@ -43,46 +47,6 @@ import Prelude hiding (init)
 -- - @plugin_runtime_init :: IO ()@
 --
 -- - @plugin_runtime_destroy :: IO ()@
---
--- Module deinit/delete function, called when Waybar is closed or when the module is removed
---
--- MANDATORY CFFI function
---
--- @
--- param instance Module instance data (as returned by `Waybar.CFFI.Plugin.ABIv2.wbcffi_init`)
--- wbcffi_deinit :: !(Ptr Void -> IO ())
--- @
---
--- Called from the GTK main event loop, to update the UI
---
--- Optional CFFI function
---
--- @
--- param instance Module instance data (as returned by `Waybar.CFFI.Plugin.ABIv2.wbcffi_init`)
--- param action_name Action name
--- wbcffi_update :: !(Ptr Void -> IO ())
--- @
---
--- Called when Waybar receives a POSIX signal and forwards it to each module
---
--- Optional CFFI function
---
--- @
--- param instance Module instance data (as returned by `Waybar.CFFI.Plugin.ABIv2.wbcffi_init`)
--- param signal Signal ID
--- wbcffi_refresh :: !(Ptr Void -> Int -> IO ())
--- @
---
--- Called on module action (see
--- https://github.com/Alexays/Waybar/wiki/Configuration#module-actions-config)
---
--- Optional CFFI function
---
--- @
--- param instance Module instance data (as returned by `Waybar.CFFI.Plugin.ABIv2.wbcffi_init`)
--- param action_name Action name
--- wbcffi_doaction :: !(Ptr Void -> ConstPtr CChar -> IO ())
--- @
 makeCFFIModule ::
   Name
   -- ^ The plugin type. Must be an instance of 'WaybarPlugin'.
@@ -90,69 +54,74 @@ makeCFFIModule ::
   -- ^ RTS flags.
   -> Q [Dec]
 makeCFFIModule ty rtsFlags = do
-  Module _ modN <- thisModule
+  Module _ moduleName <- thisModule
   addModFinalizer $
     addForeignSource LangC $
-      unlines
-        [ "#include <stddef.h>"
-        , "#include \"cabal_macros.h\""
-        , "#include \"" ++ modString modN ++ "_stub.h\""
-        , "#include \"Rts.h\""
-        , -- FFI would export this as a function but waybar expects a const value...
-          "extern const size_t wbcffi_version;"
-        , "const size_t wbcffi_version = " ++ show version ++ ";"
-        , -- Constructor
-          "static HsBool library_init(void) __attribute__((constructor));"
-        , "static HsBool library_init(void) {"
-        , "    static int argc = " ++ show (length rtsFlags + 2) ++ ";"
-        , "    static char *argv[] = { CURRENT_COMPONENT_ID \".so\", " ++ ppFlags rtsFlags ++ ", NULL };"
-        , "    static char **pargv = argv;"
-        , "    RtsConfig conf = defaultRtsConfig;"
-        , "    conf.rts_opts_enabled = RtsOptsAll;"
-        , "    hs_init_ghc(&argc, &pargv, conf);"
-        , "    plugin_runtime_init();"
-        , "    return HS_BOOL_TRUE;"
-        , "}"
-        , -- Destructor
-          "static void library_exit(void) __attribute__((destructor));"
-        , "static void library_exit(void) {"
-        , "    plugin_runtime_destroy();"
-        , "    hs_exit_nowait();"
-        , "}"
-        ]
-
+      libraryInitCSource moduleName 2 rtsFlags
   globalN <- newName "global"
-
   join
     <$> sequence
-      [ sequence
-          [ sigD globalN [t|EnvGlobal $(conT ty)|]
-          , funD globalN [clause [] (normalB [|unsafePerformIO $ EnvGlobal <$> newIORef undefined <*> newIORef mempty|]) []]
-          , pragInlD globalN NoInline FunLike AllPhases
-          ]
-      , mkDec "plugin_runtime_init" [t|IO ()|] [|runtimeInit $(varE globalN)|]
-      , mkDec "plugin_runtime_destroy" [t|IO ()|] [|runtimeDeinit $(varE globalN)|]
-      , mkDec "wbcffi_init" [t|Init $handleT|] [|instanceInit $(varE globalN)|]
-      , mkDec "wbcffi_deinit" [t|$handleT -> IO ()|] [|instanceDestroy|]
-      , mkDec "wbcffi_update" [t|$handleT -> IO ()|] [|\ptr -> withInstEnv ptr $ \env -> runContext env update|]
-      , mkDec "wbcffi_refresh" [t|$handleT -> Signal -> IO ()|] [|\ptr sig -> withInstEnv ptr $ \env -> runContext env (refresh $ fromIntegral sig)|]
-      , mkDec "wbcffi_doaction" [t|DoAction $handleT|] [|instanceDoAction|]
+      [ mkGlobalVar globalN [t|EnvGlobal $modType|] [|EnvGlobal <$> newIORef undefined <*> newIORef mempty|]
+      , mkExport "plugin_runtime_init" [t|IO ()|] [|runtimeInit $(varE globalN)|]
+      , mkExport "plugin_runtime_destroy" [t|IO ()|] [|runtimeDeinit $(varE globalN)|]
+      , mkExport "wbcffi_init" [t|Init $modTypeSP|] [|instanceInit $(varE globalN)|]
+      , mkExport "wbcffi_deinit" [t|DeInit $modTypeSP|] [|instanceDestroy|]
+      , mkExport "wbcffi_update" [t|Update $modTypeSP|] [|instanceUpdate|]
+      , mkExport "wbcffi_refresh" [t|Refresh $modTypeSP|] [|instanceRefresh|]
+      , mkExport "wbcffi_doaction" [t|DoAction $modTypeSP|] [|instanceDoAction|]
       ]
   where
-    version :: Int
-    version = 2
+    modTypeSP = [t|StablePtr (Env $modType)|]
+    modType = conT ty
 
-    ppFlags xs = intercalate ", " $ map (\x -> "\"" <> x <> "\"") $ "+RTS" : xs
+mkGlobalVar :: (Quote m) => Name -> m Type -> m Exp -> m [Dec]
+mkGlobalVar name hsType create =
+  sequence
+    [ sigD name hsType
+    , funD name [clause [] (normalB [|unsafePerformIO $(create)|]) []]
+    , pragInlD name NoInline FunLike AllPhases
+    ]
 
-    handleT = [t|StablePtr (Env $(conT ty))|]
+mkExport :: (Quote m) => String -> m Type -> m Exp -> m [Dec]
+mkExport export hsType funBody = do
+  nm <- newName export
+  sequence
+    [ sigD nm hsType
+    , funD nm [clause [] (normalB funBody) []]
+    , forExpD CCall export nm hsType
+    ]
 
-    mkDec expNm ty' body = do
-      nm <- newName expNm
-      sequence
-        [ sigD nm ty'
-        , funD nm [clause [] (normalB body) []]
-        , forExpD CCall expNm nm ty'
-        ]
+libraryInitCSource :: ModName -> Int -> [String] -> String
+libraryInitCSource moduleName cffiVersion rtsFlags =
+  unlines
+    [ "#include <stddef.h>"
+    , "#include \"cabal_macros.h\""
+    , "#include \"" ++ modString moduleName ++ "_stub.h\""
+    , "#include \"Rts.h\""
+    , -- FFI would export this as a function but waybar expects a const value...
+      "extern const size_t wbcffi_version;"
+    , "const size_t wbcffi_version = " ++ show cffiVersion ++ ";"
+    , -- Constructor
+      "static HsBool library_init(void) __attribute__((constructor));"
+    , "static HsBool library_init(void) {"
+    , "    static int argc = " ++ show (length rtsFlags + 2) ++ ";"
+    , "    static char *argv[] = { CURRENT_COMPONENT_ID \".so\", " ++ ppFlags rtsFlags ++ ", NULL };"
+    , "    static char **pargv = argv;"
+    , "    RtsConfig conf = defaultRtsConfig;"
+    , "    conf.rts_opts_enabled = RtsOptsAll;"
+    , "    hs_init_ghc(&argc, &pargv, conf);"
+    , "    plugin_runtime_init();"
+    , "    return HS_BOOL_TRUE;"
+    , "}"
+    , -- Destructor
+      "static void library_exit(void) __attribute__((destructor));"
+    , "static void library_exit(void) {"
+    , "    plugin_runtime_destroy();"
+    , "    hs_exit_nowait();"
+    , "}"
+    ]
+  where
+    ppFlags = intercalate ", " . map (\x -> "\"" <> x <> "\"") . ("+RTS" :)
 
 -- | Create a foreign export declaration.
 --
@@ -162,29 +131,29 @@ forExpD cc str n ty = ForeignD . ExportF cc str n <$> ty
 
 runtimeInit :: forall plugin. (WaybarPlugin plugin) => EnvGlobal plugin -> IO ()
 runtimeInit env = do
-  g <- runContext env $ initGlobal @plugin
+  g <- runContextT env $ initGlobal @plugin
   writeIORef env._global g
 
 runtimeDeinit :: forall plugin. (WaybarPlugin plugin) => EnvGlobal plugin -> IO ()
 runtimeDeinit env = do
   g <- readIORef env._global
-  runContext env $ deinitGlobal @plugin g
+  runContextT env $ deinitGlobal @plugin g
 
 instanceInit ::
   forall plugin.
-  (WaybarPlugin plugin, Default (PluginState plugin)) =>
+  (WaybarPlugin plugin) =>
   EnvGlobal plugin
   -> Init (StablePtr (Env plugin))
 {-# INLINE instanceInit #-}
-instanceInit EnvGlobal{..} (ConstPtr infoPtr) cep csize = do
+instanceInit genv@EnvGlobal{..} (ConstPtr infoPtr) cep csize = do
   info <- peek infoPtr
   let IntPtr instId = ptrToIntPtr $! wbcffi_module info
   instWbVersion <- getWaybarVersion info
   instConfig <- parseConfig cep csize
-  instState <- newIORef def
+  instState <- newIORef =<< runContextT genv (pluginStateInit instConfig)
   instRootWidget <- mkGetRootWidget (get_root_widget info) (wbcffi_module info) >>= Gtk.newObject Gtk.Container
   let instQueueUpdate = mkQueueUpdate (queue_update info) (wbcffi_module info)
-  res <- E.try $ runContext Env{instData = undefined, ..} init
+  res <- E.try $ runContextT Env{instData = undefined, ..} init
   case res of
     Right instData -> do
       let env = Env{..}
@@ -194,15 +163,22 @@ instanceInit EnvGlobal{..} (ConstPtr infoPtr) cep csize = do
       hPrint stderr ex
       return (castPtrToStablePtr nullPtr)
 
-instanceDestroy :: (WaybarPlugin a) => StablePtr (Env a) -> IO ()
-instanceDestroy ptr = withInstEnv ptr $ \env -> do
+instanceUpdate :: (WaybarPlugin plugin) => Update (StablePtr (Env plugin))
+instanceUpdate envPtr = withInstEnv envPtr $ flip runContextT update
+
+-- instanceRefresh :: (WaybarPlugin plugin, Integral a) => StablePtr (Env plugin) -> Signal -> IO ()
+instanceRefresh :: (WaybarPlugin plugin) => Refresh (StablePtr (Env plugin))
+instanceRefresh envPtr = withInstEnv envPtr . flip runContextT . refresh . fromIntegral
+
+instanceDestroy :: (WaybarPlugin a) => DeInit (StablePtr (Env a))
+instanceDestroy envPtr = withInstEnv envPtr $ \env -> do
   atomicModifyIORef env._instances $ \xs -> (filter (/= env) xs, ())
-  runContext env deinit `E.finally` freeStablePtr ptr
+  runContextT env deinit `E.finally` freeStablePtr envPtr
 
 instanceDoAction :: (WaybarPlugin a) => DoAction (StablePtr (Env a))
-instanceDoAction ptr aptr = withInstEnv ptr $ \env -> do
-  action <- peekCString (unConstPtr aptr)
-  runContext env (inline doaction action)
+instanceDoAction envPtr (ConstPtr actPtr) = do
+  act <- peekCString actPtr
+  withInstEnv envPtr $ flip runContextT (inline doaction act)
 
 withInstEnv :: forall a m. (MonadIO m) => StablePtr a -> (a -> m ()) -> m ()
 {-# INLINE withInstEnv #-}

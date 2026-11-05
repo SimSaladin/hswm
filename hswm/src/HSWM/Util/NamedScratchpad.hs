@@ -14,6 +14,7 @@ import HSWM.Actions.Minimize
 import HSWM.Core
 import HSWM.ManageHook
 import HSWM.Operations
+import HSWM.Prompt.Confirm
 import HSWM.StackSet qualified as W
 import HSWM.Util.ExtensibleState qualified as XS
 import HSWM.Util.RofiPrompt qualified as RP
@@ -201,7 +202,7 @@ dynDefaultPrompt rpc k = do
     Just foc -> do
       let text = printf "%s: Bind window %s '%s'" k (show foc.river_window) foc.title
       -- TODO: this crashes!
-      RP.confirmPrompt @() rpc text (dynPadSet k (Just foc))
+      confirmPrompt rpc text (dynPadSet k (Just foc))
     Nothing -> return ()
 
 -- * Utils

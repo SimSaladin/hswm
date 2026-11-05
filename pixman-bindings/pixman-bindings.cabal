@@ -30,7 +30,7 @@ common warnings
 custom-setup
   setup-depends:
     Cabal >=3.14 && <3.19,
-    base >=4.21 && <5,
+    base,
     hs-bindgen-hooks
 
 library
@@ -47,7 +47,6 @@ library
 
   hs-source-dirs: src
   default-language: GHC2024
-
   build-tool-depends:
     hs-bindgen:hs-bindgen-cli
 
