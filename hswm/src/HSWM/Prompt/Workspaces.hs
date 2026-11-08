@@ -17,7 +17,7 @@ import HSWM.StackSet qualified as W
 import HSWM.Util.RofiPrompt
 import HSWM.Util.RofiPrompt qualified as RP
 
-type WorkspacePrompt = RofiPromptConfig [(WorkspaceId, InputRowAttrs)] 's'
+type WorkspacePrompt = RofiPromptConfig [(WorkspaceId, InputRowAttrs)] SelectValues
 
 -- | Go to workspace
 workspacePrompt :: WorkspacePrompt -> H ()

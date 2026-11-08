@@ -303,7 +303,7 @@ myScratchpads =
 
 myRofiBaseConfig :: RP.RofiPromptConfig s o
 myRofiBaseConfig =
-  (RP.dmenuPrompt :: RP.RofiPromptConfig () 's')
+  (RP.dmenuPrompt @())
     & RP.markupInput .~ True
     & RP.smartCase .~ True
     & RP.showIcons .~ True
@@ -317,7 +317,7 @@ promptLaunchSystemD :: H ()
 promptLaunchSystemD = void $ ([] :: [String]) -->> pc :-->> runWithSystemD def
   where
     pc =
-      myRofiBaseConfig @_ @'s'
+      myRofiBaseConfig @_ @RP.SelectValues
         & RP.withLineHistory "systemd-run"
         & RP.prompt .~ "systemd-run"
         & RP.promptMessage .~ "Execute the command as a systemd service"

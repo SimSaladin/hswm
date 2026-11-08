@@ -37,7 +37,7 @@ instance Default EnvPrompt where
       , inputSystemdUser = True
       }
 
-environPrompt :: EnvPrompt -> RP.RofiPromptConfig i 's' -> H ()
+environPrompt :: EnvPrompt -> RP.RofiPromptConfig i SelectValues -> H ()
 environPrompt cfg pc = do
   varsEnv <- if cfg.inputCallerEnv then io ENV.getEnvironment else pure mempty
   varsSD <- if cfg.inputSystemdUser then map parseLine . lines <$> runUserSD ["show-environment"] else mempty
@@ -56,7 +56,7 @@ environPrompt cfg pc = do
           (Just val, _) -> [out vname val "only in process" | cfg.inputFilter vname]
           (_, Just val) -> [out vname val "only in systemd" | cfg.inputFilter vname]
           _ -> error "empty"
-      pc' :: RP.RofiPromptConfig [Text] 's'
+      pc' :: RP.RofiPromptConfig [Text] SelectValues
       pc' =
         pc
           & clearTypeParams

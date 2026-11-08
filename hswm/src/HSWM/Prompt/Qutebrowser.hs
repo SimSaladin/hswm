@@ -16,7 +16,7 @@ import HSWM.Util.RofiPrompt
 import System.Environment qualified as ENV
 
 -- | Start a specific (or new) qutebrowser session as systemd user service.
-qutebrowserPrompt :: RofiPromptConfig [Text] 's' -> H ()
+qutebrowserPrompt :: RofiPromptConfig [Text] UserStrings -> H ()
 qutebrowserPrompt pcfg = do
   dataHome <- io $ ENV.lookupEnv "XDG_DATA_HOME" <&> fromMaybe "/unknown"
   (_, out, _) <-

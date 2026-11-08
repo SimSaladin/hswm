@@ -21,7 +21,7 @@ import HSWM.Util.PangoMarkup qualified as P
 import HSWM.Util.RofiPrompt
 
 -- | Focus the selected window.
-windowPromptFocusSelected :: RofiPromptConfig i 'i' -> H ()
+windowPromptFocusSelected :: RofiPromptConfig i SelectIndices -> H ()
 windowPromptFocusSelected pc = windowPrompt pc' $ \rw -> do
   windows $ W.focusWindow rw
   manageDirty
@@ -29,7 +29,7 @@ windowPromptFocusSelected pc = windowPrompt pc' $ \rw -> do
     pc' = pc & promptMessage .~ "Focus a window (any workspace)"
 
 -- | Shift the specified window to this tag.
-windowPromptShiftHere :: RofiPromptConfig i 'i' -> H ()
+windowPromptShiftHere :: RofiPromptConfig i SelectIndices -> H ()
 windowPromptShiftHere pc = windowPrompt pc' $ \rw -> do
   windows $ \ws -> W.shiftWin (W.currentTag ws) rw ws
   manageDirty
@@ -37,14 +37,14 @@ windowPromptShiftHere pc = windowPrompt pc' $ \rw -> do
     pc' = pc & promptMessage .~ "Shift a window to this workspace"
 
 -- | Prompt for a window and run a command with the selected window.
-windowPrompt :: RofiPromptConfig i 'i' -> (RiverWindow -> H ()) -> H ()
+windowPrompt :: RofiPromptConfig i SelectIndices -> (RiverWindow -> H ()) -> H ()
 windowPrompt pc operation = do
   (input, getResponse) <- getWindowsInput
   void $ input -->> pc' :-->> doApply . getResponse
   where
     pc' =
       pc
-        & clearTypeParams @(RofiColumns [(_, _)]) @'i'
+        & clearTypeParams @(RofiColumns [(_, _)]) @SelectIndices
         & noCustomInput .~ True
         & prompt .~ "Select window"
 

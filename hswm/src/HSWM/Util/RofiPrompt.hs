@@ -25,19 +25,18 @@ import Data.Typeable
 -- * Dmenu prompts
 
 -- | For dmenu usage
-dmenuPrompt :: (Default a) => RofiPromptConfig a 's'
+dmenuPrompt :: (Default a) => RofiPromptConfig a SelectValues
 dmenuPrompt = def & dmenuMode .~ True
 
 -- | Select one of the options.
 selectPrompt ::
   forall s i m.
-  (RofiRunnable m i 'i' [Int], i ~ [P.Markup], Typeable s) =>
-  RofiPromptConfig i 'i'
+  (RofiRunnable m i SelectIndices [Int], i ~ [P.Markup], Typeable s) =>
+  RofiPromptConfig i SelectIndices
   -> [(s, P.Markup)]
   -> m (Maybe s)
 selectPrompt pc vals = map snd vals --?>> pconf :-->> select
   where
-    pconf :: RofiPromptConfig [P.Markup] 'i'
     pconf =
       pc
         & noCustomInput .~ True
@@ -47,7 +46,7 @@ selectPrompt pc vals = map snd vals --?>> pconf :-->> select
 
 -- * Mode prompts
 
-modePromptWith :: RofiPromptConfig i o -> Mode -> RofiPromptConfig () '_'
+modePromptWith :: RofiPromptConfig i o -> Mode -> RofiPromptConfig () DummyOutput
 modePromptWith pc mo =
   pc
     & showMode ?~ mo
@@ -55,7 +54,7 @@ modePromptWith pc mo =
     & dmenuMode .~ False
     & withHistory' Nothing
 
-modePrompt :: Mode -> RofiPromptConfig () '_'
+modePrompt :: Mode -> RofiPromptConfig () DummyOutput
 modePrompt mo = def & showMode ?~ mo & modes <>~ [mo]
 
 -- * Prompt history

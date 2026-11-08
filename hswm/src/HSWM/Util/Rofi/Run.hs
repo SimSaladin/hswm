@@ -1,6 +1,7 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE NoFieldSelectors #-}
 
 -- |
@@ -11,8 +12,6 @@
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
---
--- (Longer desription of module.)
 module HSWM.Util.Rofi.Run where
 
 import Data.ByteString.Char8 qualified as C8
@@ -32,65 +31,111 @@ type MonadRofi m = (MonadUnliftIO m, MonadLogger m, MonadLoggerIO m, MonadMask m
 
 -- * Output format
 
--- output is one of:
--- - selected index/indices - [Int]
--- - selected string/strings - [String]
--- - filter string - String
+class (KnownChar (OutputSpec outputSpec)) => InterpretOutput (outputSpec :: k) a where
+  -- | which option to use for the -format switch?
+  type OutputSpec outputSpec :: Char
 
-type OutputFormat = Char
+  type OutputParams outputSpec :: Type
 
-type family FormatOutput (f :: OutputFormat) where
-  FormatOutput 's' = String
-  -- \^ s: selected string
-  FormatOutput 'i' = Int
-  -- \^ i: selected index (0 - (N-1))
-  FormatOutput 'd' = Int
-  -- \^ i: selected index (1 - N)
-  FormatOutput 'q' = String
-  -- \^ q: selected string quoted
-  FormatOutput 'p' = String
-  -- \^ p: selected string stripped of pango markup
-  FormatOutput 'f' = String
-  -- \^ f: filter string (user input)
-  FormatOutput 'F' = String
+  interpretOutput :: OutputParams outputSpec -> LazyByteString -> Either String a
 
--- \^ F: quoted filter string (user input)
+-- | Selected string(s) - e.g. @-format [sqp]@ (rofi default is @s@).
+--
+--  @s@: selected string (rofi default)
+--
+--  @q@: selected string quoted
+--
+--  @p@: selected string stripped of pango markup
+data SelectValues = SelectValues
 
-type OutputSpec o = (KnownChar o)
+-- | filter string(s) - e.g. @-format [fF]@, the user input/filter.
+--
+--   @f@: filter string (user input)
+--
+--   @F@: quoted filter string (user input)
+data UserStrings = UserStrings
 
--- * InterpretOutput
+-- | Selected index/indices - e.g. @-format i@
+--
+--   @i@: selected index (0 - (N-1))
+--
+--   @i@: selected index (1 - N)
+data SelectIndices = SelectIndices
 
-class (OutputSpec outf) => InterpretOutput (outf :: OutputFormat) a where
-  interpretOutput :: Proxy outf -> LazyByteString -> Either String a
+data DummyOutput = DummyOutput
 
-instance InterpretOutput 's' [LazyByteString] where
+instance InterpretOutput DummyOutput a where
+  type OutputSpec DummyOutput = '_'
+  type OutputParams DummyOutput = ()
+  interpretOutput _ _ = Left "Output not considered"
+
+-- | Splits on every newline. Result is a list of rows.
+instance InterpretOutput SelectValues [LazyByteString] where
+  type OutputSpec SelectValues = 's'
+  type OutputParams SelectValues = ()
   interpretOutput _ = Right . LB.splitWith (== toEnum (fromEnum '\n'))
 
--- | Selected rows
-instance InterpretOutput 's' [LazyText] where
+-- | Splits on every newline. Result is a list of rows.
+instance InterpretOutput SelectValues [LazyText] where
+  type OutputSpec SelectValues = 's'
+  type OutputParams SelectValues = ()
   interpretOutput _ = Right . TL.lines . TLE.decodeUtf8
 
-instance InterpretOutput 's' String where
-  interpretOutput _ = Right . TL.unpack . TLE.decodeUtf8
+-- | Select a single value.
+--
+-- Does not split the output into multiple lines even when returning multiple results.
+-- One trailing newline is trimmed from the output if it exists
+instance InterpretOutput SelectValues LazyText where
+  type OutputSpec SelectValues = 's'
+  type OutputParams SelectValues = ()
+  interpretOutput _ = Right . trimEnd . TLE.decodeUtf8
+    where
+      trimEnd txt = fromMaybe txt (TL.stripSuffix "\n" txt)
+
+-- | See the instance for @"LazyText"@
+instance InterpretOutput SelectValues String where
+  type OutputSpec SelectValues = 's'
+  type OutputParams SelectValues = ()
+  interpretOutput _ = Right . TL.unpack . trimEnd . TLE.decodeUtf8
+    where
+      trimEnd txt = fromMaybe txt (TL.stripSuffix "\n" txt)
+
+-- | See the instance for @"LazyText"@
+instance InterpretOutput UserStrings String where
+  type OutputSpec UserStrings = 'f'
+  type OutputParams UserStrings = ()
+  interpretOutput _ = Right . TL.unpack . trimEnd . TLE.decodeUtf8
+    where
+      trimEnd txt = fromMaybe txt (TL.stripSuffix "\n" txt)
 
 -- | Selected indices
-instance InterpretOutput 'i' [Int] where
+instance InterpretOutput SelectIndices [Int] where
+  type OutputSpec SelectIndices = 'i'
+  type OutputParams SelectIndices = ()
   interpretOutput _ = Right . mapMaybe (readMaybe . TL.unpack) . TL.lines . TLE.decodeUtf8
 
-instance InterpretOutput 'i' Int where
-  interpretOutput _ = maybe (Left "error") Right . listToMaybe . mapMaybe (readMaybe . TL.unpack) . TL.lines . TLE.decodeUtf8
+-- | Selects the first readable index value if there were multiple selections.
+instance InterpretOutput SelectIndices Int where
+  type OutputSpec SelectIndices = 'i'
+  type OutputParams SelectIndices = ()
+  interpretOutput _ =
+    maybe (Left "No index response") Right
+      . listToMaybe
+      . mapMaybe (readMaybe . TL.unpack)
+      . TL.lines
+      . TLE.decodeUtf8
 
 -- * InputFeed
 
--- LC8.unlines $ map (renderInputRow (renderRow input0)) allInput
+-- | @LC8.unlines $ map (renderInputRow (renderRow input0)) allInput@
 type InputFeed a = a -> LazyByteString
 
 -- * RofiPromptConfig
 
 -- | Specialized to select string output
-type RofiPromptConfig' = forall a. RofiPromptConfig [a] 's'
+type RofiPromptConfig' = forall a. RofiPromptConfig [a] SelectValues
 
-data RofiPromptConfig (input :: Type) (outf :: OutputFormat) = RofiPromptConfig
+data RofiPromptConfig (input :: Type) (outputSpec :: k) = RofiPromptConfig
   { modes :: [Mode]
   -- ^ Modes to enable.e.g. @"clipboard:cliphist-rofi-img"@ @-modes@
   , showMode :: Maybe Mode
@@ -223,7 +268,7 @@ makeLenses' [''RofiPromptConfig, ''PromptHistory, ''InputRowAttrs, ''RofiColumns
 -- * Launch
 
 -- | Launch a prompt (async) without reading the output.
-launchRofi :: forall m. (MonadRofi m) => RofiPromptConfig () '_' -> m (Async ())
+launchRofi :: forall m. (MonadRofi m) => RofiPromptConfig () DummyOutput -> m (Async ())
 launchRofi rp = do
   pc <- setStdin nullStream . setStdout nullStream <$> rofiToProc rp
   logProcessConfig "rofi-mode" pc
@@ -232,26 +277,36 @@ launchRofi rp = do
     logInfo $ "rofi: launch finished" :# ["result" .= show res]
 
 -- | Like "launchRofi" but discards output
-launchRofi_ :: forall m. (MonadRofi m) => RofiPromptConfig () '_' -> m ()
+launchRofi_ :: forall m. (MonadRofi m) => RofiPromptConfig () DummyOutput -> m ()
 launchRofi_ = void . launchRofi
 
 -- | Launch a prompt (synchronous) with input and read the output.
-runRofi :: forall i o m. (MonadRofi m, OutputSpec o, RofiRunnable m i o ()) => RofiPromptConfig i o -> i -> m (Maybe LazyByteString)
-runRofi pcfg = runRofiWith pcfg toInput -- pcfg.toPromptInput
-  where
-    toInput = flip (rofiRunnableInput @m @i @o @()) pcfg
+runRofi ::
+  forall i outputSpec m a.
+  (MonadRofi m, InterpretOutput outputSpec a, RofiRunnable m i outputSpec a, Default (OutputParams outputSpec)) =>
+  RofiPromptConfig i outputSpec
+  -> i
+  -> m (Maybe (Either String a))
+runRofi pcfg in0 = runRofiWith pcfg (flip (rofiRunnableInput @_ @m @i @outputSpec @a) pcfg) in0 def
 
-runRofiWith :: forall i o m. (MonadRofi m, OutputSpec o) => RofiPromptConfig i o -> InputFeed i -> i -> m (Maybe LazyByteString)
-runRofiWith pcfg toInput input0 = do
+runRofiWith ::
+  forall i outputSpec m a.
+  (MonadRofi m, InterpretOutput outputSpec a) =>
+  RofiPromptConfig i outputSpec
+  -> InputFeed i
+  -> i
+  -> OutputParams outputSpec
+  -> m (Maybe (Either String a))
+runRofiWith pcfg toInput input0 out0 = do
   logInfo $
     "rofi: launch initiated"
       :# [ "prompt" .= pcfg.prompt
          , "message" .= pcfg.promptMessage
          , "history" .= maybe "-" (.historyKey) pcfg.history
-         , "format" .= [charVal (Proxy @o)]
+         , "format" .= [charVal (Proxy @(OutputSpec outputSpec))]
          ]
   inputBS <- toInput <$> rofiHistoryInput toInput pcfg input0
-  pc <- setStdin (byteStringInput inputBS) <$> rofiToProc pcfg
+  pc <- setStdin (byteStringInput inputBS) <$> rofiToProc @i @outputSpec @m @a pcfg
   logProcessConfig "rofi" pc
   res <- try @_ @SomeException $ withProcessWait pc $ \p -> do
     atomically $ (,) <$> waitExitCodeSTM p <*> getStdout p
@@ -262,7 +317,7 @@ runRofiWith pcfg toInput input0 = do
     Right (ExitSuccess, out) -> do
       logInfo $ "rofi: success (exited)" :# ["prompt" .= pcfg.prompt, "output" .= C8.unpack (LB.toStrict out)]
       rofiHistorySave pcfg out
-      return $ Just out
+      return $ Just $ interpretOutput @_ @outputSpec out0 out
     Right (ExitFailure ec, _out) -> do
       logError $ "rofi: error exit code" :# ["code" .= show ec]
       return Nothing
@@ -272,9 +327,9 @@ runRofiWith pcfg toInput input0 = do
 
 -- | Build rofi process config
 rofiToProc ::
-  forall i o m.
-  (MonadLoggerIO m, OutputSpec o) =>
-  RofiPromptConfig i o
+  forall i outputSpec m a.
+  (MonadLoggerIO m, InterpretOutput outputSpec a) =>
+  RofiPromptConfig i outputSpec
   -> m (ProcessConfig () (STM LazyByteString) (Async ()))
 rofiToProc pcfg = do
   logger <- askLoggerIO
@@ -305,7 +360,7 @@ rofiToProc pcfg = do
           ++ [["-a", L.intercalate "," $ map show pc.activeRow] | pc.activeRow /= mempty]
           ++ [["-u", L.intercalate "," $ map show pc.urgentRow] | pc.urgentRow /= mempty]
           ++ [["-selected-row", show pc.selectedRow] | pc.selectedRow /= 0]
-          ++ [["-format", x] | let x = getFormat (Proxy @o), x /= "s" && x /= "_"]
+          ++ [["-format", x] | let x = getFormat (Proxy @outputSpec), x /= "s" && x /= "_"]
           ++ [["-display-columns", L.intercalate "," $ map show pc.displayColumns] | pc.displayColumns /= mempty]
           -- note: display-column-separator is a regex
           ++ [["-display-column-separator", pc.columnSeparator] | pc.columnSeparator /= mempty]
@@ -315,7 +370,8 @@ rofiToProc pcfg = do
     modeName (ModeCustom ti _) = ti
     fromMode (Mode s) = s
     fromMode (ModeCustom ti sc) = ti ++ ":" ++ sc
-    getFormat p = [charVal p]
+
+    getFormat _ = [charVal (Proxy @(OutputSpec outputSpec))]
 
 -- * InputRow render
 
@@ -378,35 +434,37 @@ withHistoryFile pch d f = case pch of
 
 -- * RofiRunnable class
 
-class (MonadRofi m, InterpretOutput o a) => RofiRunnable m i o a where
-  rofiRunnableInput :: i -> RofiPromptConfig i o -> LazyByteString
+class (MonadRofi m, InterpretOutput outputSpec a) => RofiRunnable (m :: Type -> Type) i (outputSpec :: k) a where
+  rofiRunnableInput :: i -> RofiPromptConfig i outputSpec -> LazyByteString
 
-  rofiRunnablePromptGet :: i -> RofiPromptConfig i o -> RofiPromptConfig i o
+  rofiRunnablePromptGet :: i -> RofiPromptConfig i outputSpec -> RofiPromptConfig i outputSpec
   rofiRunnablePromptGet _ pc = pc
 
-  rofiRunnablePrompt :: i -> Maybe (PromptHistory i) -> RofiPromptConfig any o -> RofiPromptConfig i o
+  rofiRunnablePrompt :: i -> Maybe (PromptHistory i) -> RofiPromptConfig any outputSpec -> RofiPromptConfig i outputSpec
+  default rofiRunnablePrompt :: (Default (OutputParams outputSpec)) => i -> Maybe (PromptHistory i) -> RofiPromptConfig any outputSpec -> RofiPromptConfig i outputSpec
   rofiRunnablePrompt _ hi pc = let pc' = pc{history = hi} in pc'
 
-  rofiRunMaybe :: RofiPromptConfig i o -> i -> m (Maybe a)
-  rofiRunMaybe pconf input = rofiRunWith toInput pconf.history pconf input
+  rofiRunMaybe :: (Default (OutputParams outputSpec)) => RofiPromptConfig i outputSpec -> i -> m (Maybe a)
+  rofiRunMaybe pconf input = rofiRunWith @_ @m @i @outputSpec @a toInput pconf.history pconf input (def @(OutputParams outputSpec))
     where
-      toInput = flip (rofiRunnableInput @m @i @o @a) pconf
+      toInput = flip (rofiRunnableInput @_ @m @i @outputSpec @a) pconf
 
-  rofiRunWith :: InputFeed i -> Maybe (PromptHistory i) -> RofiPromptConfig i o -> i -> m (Maybe a)
-  rofiRunWith toInput hist pconf input = runRofiWith @i @o @m pconf' toInput input <&> (>>= interp)
+  rofiRunWith :: InputFeed i -> Maybe (PromptHistory i) -> RofiPromptConfig i outputSpec -> i -> OutputParams outputSpec -> m (Maybe a)
+  default rofiRunWith :: (Default (OutputParams outputSpec)) => InputFeed i -> Maybe (PromptHistory i) -> RofiPromptConfig i outputSpec -> i -> OutputParams outputSpec -> m (Maybe a)
+  rofiRunWith toInput hist pconf input output = runRofiWith @i @outputSpec @m @a pconf' toInput input output <&> (>>= interp)
     where
-      interp = either (const Nothing) Just . interpretOutput (Proxy @o)
+      interp = either (const Nothing) Just
       pconf' =
-        rofiRunnablePromptGet @m @i @o @a input pconf
+        rofiRunnablePromptGet @_ @m @i @outputSpec @a input pconf
           & history .~ hist
 
-instance (MonadRofi m, InterpretOutput o a) => RofiRunnable m LazyByteString o a where
+instance (MonadRofi m, InterpretOutput spec a, Default (OutputParams spec)) => RofiRunnable m LazyByteString spec a where
   rofiRunnableInput inp _ = inp
 
-instance (MonadRofi m, P.ToMarkup i, InterpretOutput o a) => RofiRunnable m [(i, InputRowAttrs)] o a where
+instance (MonadRofi m, P.ToMarkup i, InterpretOutput spec a, Default (OutputParams spec)) => RofiRunnable m [(i, InputRowAttrs)] spec a where
   rofiRunnableInput inp _ = LB.intercalate "\n" . map (uncurry $ inputRowWithAttrs $ TLE.encodeUtf8 . TL.fromStrict . P.render . P.toMarkup) $ inp
 
-instance {-# OVERLAPS #-} (MonadRofi m, P.ToMarkup i, InterpretOutput o a) => RofiRunnable m [i] o a where
+instance {-# OVERLAPS #-} (MonadRofi m, P.ToMarkup i, InterpretOutput spec a, Default (OutputParams spec)) => RofiRunnable m [i] spec a where
   rofiRunnableInput inp _ = LB.intercalate "\n" . map (TLE.encodeUtf8 . TL.fromStrict . P.render . P.toMarkup) $ inp
 
 -- * Infix operators
@@ -418,10 +476,10 @@ instance {-# OVERLAPS #-} (MonadRofi m, P.ToMarkup i, InterpretOutput o a) => Ro
 -- @
 data (:-->>) m i o a r = RofiPromptConfig i o :-->> (a -> m r)
 
-(-->>) :: forall m i o a r. (RofiRunnable m i o a) => i -> (:-->>) m i o a r -> m (Maybe r)
+(-->>) :: forall m i o a r. (Default (OutputParams o)) => (RofiRunnable m i o a) => i -> (:-->>) m i o a r -> m (Maybe r)
 inp -->> (pc :-->> f) = rofiRunMaybe pc inp >>= traverse f
 
-(--?>>) :: forall m i o a r. (RofiRunnable m i o a) => i -> (:-->>) m i o a (Maybe r) -> m (Maybe r)
+(--?>>) :: forall m i o a r. (Default (OutputParams o)) => (RofiRunnable m i o a) => i -> (:-->>) m i o a (Maybe r) -> m (Maybe r)
 inp --?>> (pc :-->> f) = rofiRunMaybe pc inp >>= fmap join . traverse f
 
 (++>) :: (Monad m) => m (Maybe a) -> (a -> m ()) -> m ()
@@ -434,7 +492,10 @@ infixr 0 ++>
 
 -- * Columns
 
-instance (MonadRofi m, HasColumns a, InterpretOutput 'i' Int) => RofiRunnable m (RofiColumns [(a, InputRowAttrs)]) 'i' Int where
+instance
+  (MonadRofi m, HasColumns a, InterpretOutput SelectIndices Int) =>
+  RofiRunnable m (RofiColumns [(a, InputRowAttrs)]) SelectIndices Int
+  where
   rofiRunnableInput ci _ =
     LB.intercalate "\n" $
       map (uncurry $ inputRowWithAttrs (LB.intercalate (fromString [ci.columnsSep]) . getColumns)) ci.columnsInput

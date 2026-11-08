@@ -16,14 +16,14 @@ import HSWM.Util.PangoMarkup qualified as P
 import HSWM.Util.RofiPrompt
 
 -- | Prompt with all key bindings selectable
-bindsPrompt :: RofiPromptConfig i 'i' -> H ()
+bindsPrompt :: RofiPromptConfig i SelectIndices -> H ()
 bindsPrompt pcfg = do
   binds <- view (config . keyBindings) <&> renderBindings . KB.flatBindings
   void $ mkInput binds -->> pcfg' :-->> doaction binds
   where
     pcfg' =
       pcfg
-        & clearTypeParams @(RofiColumns [(_, _)]) @'i'
+        & clearTypeParams @(RofiColumns [(_, _)]) @SelectIndices
         & prompt .~ "key binding"
         & promptMessage .~ "Select a key binding to execute"
 
