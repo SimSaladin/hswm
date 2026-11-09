@@ -54,7 +54,8 @@ main :: (HasCallStack) => IO ()
 main =
   -- adding keys late, so that a changed modMask override can take effect...
   hswm (validateAndAddKeys myKeys) $
-    Wallpaper.usingWallpaper Wallpaper.WallpaperConfig{filepath = "/home/sim/wallpaper.png"} $
+    Wallpaper.usingWallpaper def $
+      -- Wallpaper.WallpaperConfig{filepath = "/home/sim/wallpaper.png"} $
       IPC.ipcServer def $
         (def @(HSWMConfig H Full))
           & layoutHook .~ myLayoutHook
@@ -68,8 +69,8 @@ main =
           & normalBorder .~ parseRGBA ColBase02
           & focusedBorder .~ parseRGBA ColCyan
           & xkbLayout ?~ myKeyboard
-          & repeatInfo . rate .~ 20
-          & repeatInfo . delay .~ 175
+          & repeatInfo . rate .~ 18
+          & repeatInfo . delay .~ 200
           & cursorTheme .~ "Vanilla-DMZ"
           & cursorSize .~ 24
 

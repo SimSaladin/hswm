@@ -1,3 +1,7 @@
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE PartialTypeSignatures #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE NoFieldSelectors #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 -- |
@@ -9,17 +13,25 @@
 -- Stability   : unstable
 -- Portability : unportable
 module HSWM.Wallpaper (
+  -- * Configuration
   WallpaperConfig (..),
+  ImageSelect (..),
   usingWallpaper,
+
+  -- * Hooks
   wpStartupHook,
   wpExitHook,
-  --wpHandleEventHook,
+  wpHandleEventHookDyn,
+
+  -- * Internal
   WallpaperContext (..),
+  searchLocal,
 )
 where
 
 import HSWM.BufferPool qualified as BP
 import HSWM.Core hiding (height, scale, size, width)
+import HSWM.Types.Simple
 import HSWM.Utils (getPixmanFormatBE)
 import Pixman qualified as P
 import River qualified as R
@@ -29,34 +41,47 @@ import WL.Viewporter qualified as VP
 import WL.Wlr.LayerShell.Unstable.V1.Client qualified as Wlr
 
 import Codec.Picture qualified as JP
+import Data.List qualified as L
 import Data.Map qualified as M
 import Data.Vector.Storable qualified as V
+import System.FilePath ((</>))
 import Text.Printf
 
 -- import GHC.Generics
 
 -- * Usage
 
-newtype WallpaperConfig = WallpaperConfig {filepath :: FilePath}
+data WallpaperConfig = WallpaperConfig
+  { imageSelect :: ImageSelect
+  , layerShellLayerName :: String
+  }
   deriving stock (Eq, Ord, Show, Read)
 
-usingWallpaper :: WallpaperConfig -> HSWMConfig H l -> HSWMConfig H l
-usingWallpaper cfg userConf =
-  userConf
-    { startupHook = userConf.startupHook <> wpStartupHook cfg
-    , exitHook = userConf.exitHook <> wpExitHook
-    , renderHook = userConf.renderHook <> render
-    , handleEventHookDynamic = userConf.handleEventHookDynamic <> wpHandleEventHookDyn
-    }
+instance Default WallpaperConfig where
+  def =
+    WallpaperConfig
+      { imageSelect = SearchLocalSystem
+      , layerShellLayerName = "wallpaper"
+      }
+
+data ImageSelect
+  = -- | Use a single statically defined image for all.
+    OneStaticImage {filepath :: FilePath}
+  | -- | Lookup wallpaper files under XDG data directories.
+    SearchLocalSystem
+  deriving stock (Eq, Ord, Show, Read)
 
 -- * Implementation
 
 -- ** Types
 
+type LoadedImage = JP.Image JP.PixelRGBA8
+
 data WallpaperContext = WallpaperContext
   { bufferPool :: !(Maybe BP.ImageBufferPool)
   , outputsState :: !(Map RiverOutput OutputState)
-  , src_image :: !(Maybe (JP.Image JP.PixelRGBA8))
+  , loadedImages :: !(Map FilePath LoadedImage)
+  , imageInfos :: ![([String], FilePath)]
   }
   deriving stock (Generic)
   deriving anyclass (Default)
@@ -68,23 +93,22 @@ instance Inspect (JP.Image JP.PixelRGBA8) where
   inspectPrec _ _ = "<Image>"
 
 data OutputState = OutputState
-  { out_x
-    , out_y
-    , out_width
-    , out_height
-    , scale ::
-      {-# UNPACK #-} !Int32
+  { x :: {-# UNPACK #-} !Int32
+  , y :: {-# UNPACK #-} !Int32
+  , width :: {-# UNPACK #-} !Int32
+  , height :: {-# UNPACK #-} !Int32
+  , scale :: {-# UNPACK #-} !Int32
   , pref_fract_scale :: {-# UNPACK #-} !Word32
-  , name :: !String
-  , pending_render :: {-# UNPACK #-} !Bool
+  , needsRender :: {-# UNPACK #-} !Bool
   , configured :: {-# UNPACK #-} !Bool
-  , wl_output :: {-# UNPACK #-} !WL.Output
+  , osWlOutput :: {-# UNPACK #-} !WL.Output
   , surfaces :: !(Maybe Surfaces)
+  , name :: !String
   }
   deriving stock (Generic)
 
 instance Default OutputState where
-  def = OutputState 0 0 0 0 1 0 "" False False def def
+  def = OutputState 0 0 0 0 1 0 False False def def ""
 
 data Surfaces = Surfaces
   { wl_surface :: {-# UNPACK #-} !WL.Surface
@@ -93,6 +117,17 @@ data Surfaces = Surfaces
   , surfacesCleanup :: !(IO ())
   }
   deriving (Generic)
+
+makeLensesWith' classPerField [''WallpaperContext, ''OutputState]
+
+usingWallpaper :: WallpaperConfig -> HSWMConfig H l -> HSWMConfig H l
+usingWallpaper cfg userConf =
+  userConf
+    { startupHook = userConf.startupHook <> wpStartupHook cfg
+    , exitHook = userConf.exitHook <> wpExitHook
+    , renderHook = userConf.renderHook <> render
+    , handleEventHookDynamic = userConf.handleEventHookDynamic <> wpHandleEventHookDyn cfg
+    }
 
 -- ** Hooks
 
@@ -103,85 +138,130 @@ wpStartupHook conf = do
   -- create bufferpool if missing
   when (isNothing ctx.bufferPool) $ do
     bp <- BP.newImageBufferPool
-    modifyObjectDef $ \c -> c{bufferPool = Just bp}
+    modifyCtx $ bufferPool ?~ bp
   -- load source image
-  tryLoadImage (filepath conf)
+  case conf.imageSelect of
+    OneStaticImage fp -> tryLoadImage fp []
+    SearchLocalSystem -> do
+      images <- io searchLocal
+      logInfo $ "Found wallpapers on system" :# ["count" .= length images]
+      forM_ (take 12 $ M.toList images) $ \(fp, attrs) -> do
+        tryLoadImage fp attrs
+
+-- | Finds @wallpapers/*/contents/images/*.*@ under xdg_data_dirs
+searchLocal :: IO (Map FilePath [String])
+searchLocal = do
+  roots <- getXdgDirectoryList XdgDataDirs
+  fmap (M.fromListWith (++) . mconcat) $ forM roots $ \r -> do
+    exists <- doesDirectoryExist (r </> "wallpapers")
+    collections <- if exists then listDirectory (r </> "wallpapers") else return []
+    fmap mconcat $ forM collections $ \c -> do
+      let cdir = r </> "wallpapers" </> c
+      exists' <- doesDirectoryExist (cdir </> "contents/images")
+      dirs <- if exists' then listDirectory (cdir </> "contents/images") else return []
+      fmap mconcat $ forM dirs $ \n -> do
+        let file = cdir </> "contents/images" </> n
+        rpath <- resolveRealPath file
+        return [(rpath, [n])]
+
+resolveRealPath :: (MonadIO m) => FilePath -> m FilePath
+resolveRealPath fp = do
+  lnk <- pathIsSymbolicLink fp
+  if lnk
+    then resolveRealPath =<< getSymbolicLinkTarget fp
+    else return fp
 
 wpExitHook :: (HasCallStack) => H ()
 wpExitHook = do
   logInfoNS "wallpaper" "exit hook; cleaning up..."
   deinit
 
-wpHandleEventHookDyn :: Dynamic -> H All
-wpHandleEventHookDyn ev
+wpHandleEventHookDyn :: _ -> Dynamic -> H All
+wpHandleEventHookDyn cfg ev
   | Just R.RiverWindowManagerOutput{} <- fromDynamic ev = do
-      modifyObjectDef $ \c -> c{bufferPool = fmap (BP.incSurfaceCount 1) (bufferPool c)}
+      modifyCtx $ bufferPool . _Just %~ BP.incSurfaceCount 1
       mempty
   | Just (oev :: R.RiverOutputEvent) <- fromDynamic ev = do
       case oev of
         (R.RiverOutputDimensions _ ro w h) -> do
-          updateOutputState ro $ \a -> a{pending_render = True, out_width = fi w, out_height = fi h}
+          updateOutputState ro $ \a -> a{needsRender = True, width = fi w, height = fi h}
           mempty
         (R.RiverOutputPosition _ ro x y) -> do
-          updateOutputState ro $ \a -> a{pending_render = True, out_x = fi x, out_y = fi y}
+          updateOutputState ro $ \a -> a{needsRender = True, x = fi x, y = fi y}
           mempty
         (R.RiverOutputRemoved _ ro) -> do
           withOutputState ro deinitOutput
-          modifyObjectDef $ \c ->
-            c
-              { bufferPool = fmap (BP.incSurfaceCount (-1)) (bufferPool c)
-              , outputsState = M.delete ro c.outputsState
-              }
+          modifyCtx $
+            bufferPool . _Just %~ BP.incSurfaceCount (-1)
+              &+ outputsState %~ M.delete ro
           mempty
         _ -> mempty
   | Just (oev :: WL.OutputEvent) <- fromDynamic ev = do
       case oev of
-        WL.OutputScale ro _ scale -> do
+        WL.OutputScale ro _ sc -> do
           let ro' = R.RiverOutput $ castPtr ro
-          updateOutputState ro' $ \x -> x{pending_render = True, scale = scale}
+          updateOutputState ro' $ needsRender .~ True &+ scale .~ sc
         WL.OutputName ro wl_output name -> do
           let ro' = R.RiverOutput $ castPtr ro
-          updateOutputState ro' $ \x -> x{name, wl_output}
+          updateOutputState ro' $ \x -> x{name, osWlOutput = wl_output}
         WL.OutputDone ro _ -> do
           let ro' = R.RiverOutput $ castPtr ro
-          initOutput ro'
+          initOutput cfg ro'
         _ -> return ()
       mempty
   | otherwise = mempty
 
 -- ** Loading image files
 
-tryLoadImage :: FilePath -> H ()
-tryLoadImage fp =
-  io (doesFileExist fp) >>= \case
+tryLoadImage :: FilePath -> [String] -> H ()
+tryLoadImage fp attrs =
+  doesFileExist fp >>= \case
     True ->
       io (JP.readImageWithMetadata fp) >>= \case
-        Right (dynimg, _metadata) -> modifyObjectDef $ \ctx -> ctx{src_image = Just $ JP.convertRGBA8 dynimg}
+        Right (dynimg, _metadata) ->
+          modifyCtx $
+            loadedImages . at fp ?~ JP.convertRGBA8 dynimg
+              &+ imageInfos <>~ [(attrs, fp)]
         Left _ -> return ()
     False -> return ()
 
 -- ** Manage and Render
 
 calculateScale :: (Integral i) => i -> Int32 -> Int32 -> Double
-calculateScale src out scale = fi src / (fi out * fi scale)
+calculateScale src out scale' = fi src / (fi out * fi scale')
 
 calculateTransform :: (Integral i) => i -> Int32 -> Double -> Double
-calculateTransform src out scale = (fi src / scale - fi out) / 2 / scale
+calculateTransform src out scale' = (fi src / scale' - fi out) / 2 / scale'
+
+lookupImage :: WallpaperContext -> OutputState -> Maybe LoadedImage
+lookupImage ctx os =
+  case [fp | (attrs, fp) <- ctx.imageInfos, any check attrs] of
+    x : _ -> fromMaybe fallback $ ctx ^? loadedImages . at x
+    _ -> fallback
+  where
+    check x
+      | dimensions `L.isPrefixOf` x = True
+      | otherwise = False
+    dimensions = show os.width ++ "x" ++ show os.height
+    fallback =
+      case ctx.loadedImages & M.elems of
+        x : _ -> Just x
+        _ -> Nothing
 
 render :: H ()
 render = do
   ctx <- getObjectDef @WallpaperContext
   forM_ (M.toList ctx.outputsState) $ \(ro, os) -> do
-    case (ctx.bufferPool, ctx.src_image, os.surfaces) of
-      (Just bp, Just img, Just surfaces) -> when (os.pending_render && os.configured && os.out_width > 0 && os.out_height > 0) $ do
-        drawImage bp os img surfaces
-        updateOutputState ro $ \x -> x{pending_render = False}
+    case (ctx.bufferPool, os.surfaces, lookupImage ctx os) of
+      (Just bp, Just surfs, Just img) -> when (os.needsRender && os.configured && os.width > 0 && os.height > 0) $ do
+        drawImage bp os img surfs
+        updateOutputState ro $ \x -> x{needsRender = False}
       _ -> return ()
 
 drawImage :: BP.ImageBufferPool -> OutputState -> JP.Image JP.PixelRGBA8 -> Surfaces -> H ()
-drawImage bp OutputState{..} img Surfaces{..} = do
-  let w = out_width
-      h = out_height
+drawImage bp os img Surfaces{..} = do
+  let w = os.width
+      h = os.height
       src_w = JP.imageWidth img
       src_h = JP.imageHeight img
       src_stride = src_w * 4
@@ -190,12 +270,12 @@ drawImage bp OutputState{..} img Surfaces{..} = do
 
       -- Calculate the buffer size
       buf_size@(buf_w, buf_h)
-        | pref_fract_scale > 0 =
-            let buffer_width = ceiling $ (fi w * fi pref_fract_scale + fract_denom / 2 :: Double) / fract_denom
-                buffer_height = ceiling $ (fi h * fi pref_fract_scale + fract_denom / 2 :: Double) / fract_denom
+        | os.pref_fract_scale > 0 =
+            let buffer_width = ceiling $ (fi w * fi os.pref_fract_scale + fract_denom / 2 :: Double) / fract_denom
+                buffer_height = ceiling $ (fi h * fi os.pref_fract_scale + fract_denom / 2 :: Double) / fract_denom
                 fract_denom = 120
              in (buffer_width, buffer_height)
-        | otherwise = (w * scale, h * scale)
+        | otherwise = (w * os.scale, h * os.scale)
 
       -- calculate scale
       sx' = calculateScale src_w buf_w 1 -- scale
@@ -215,10 +295,10 @@ drawImage bp OutputState{..} img Surfaces{..} = do
 
   logDebugNS "wallpaper" $
     "rendering wallpaper"
-      :# [ "out" .= name
+      :# [ "out" .= os.name
          , "out-size" .= (w, h)
-         , "out-scale" .= scale
-         , "out-fscale" .= pref_fract_scale
+         , "out-scale" .= (os ^. scale)
+         , "out-fscale" .= (os ^. prefFractScale)
          , "src-size" .= (src_w, src_h)
          , "buf-size" .= buf_size
          , "calc-scale" .= (printf "%.2f,%.2f;%.2f,%.2f" sx' sy' sx sy :: String)
@@ -242,7 +322,7 @@ drawImage bp OutputState{..} img Surfaces{..} = do
   WL.surfaceDamageBuffer wl_surface 0 0 buf_w buf_h
   case outViewport of
     Just vp -> VP.viewportSetDestination vp w h
-    Nothing -> return () -- io $ WL.surfaceSetBufferScale wl_surface scale -- XXX
+    Nothing -> return () -- io $ WL.surfaceSetBufferScale wl_surface os.scale -- XXX
   WL.surfaceCommit wl_surface
 
 -- | Destroy ctx
@@ -251,19 +331,19 @@ deinit = do
   ctx <- getObjectDef @WallpaperContext
   forM_ ctx.outputsState $ deinitOutput
   forM_ ctx.bufferPool $ io . BP.destroyImageBufferPool
-  modifyObjectDef $ \c -> c{outputsState = mempty, bufferPool = def}
+  modifyCtx $ outputsState .~ mempty &+ bufferPool .~ def
 
 deinitOutput :: OutputState -> H ()
 deinitOutput os = forM_ os.surfaces $ \ss -> io ss.surfacesCleanup
 
 -- | Create surface etc.
-initOutput :: RiverOutput -> H ()
-initOutput ro = withOutputState ro $ \os -> do
+initOutput :: WallpaperConfig -> RiverOutput -> H ()
+initOutput cfg ro = withOutputState ro $ \os -> do
   compositor <- getObject
-  let w = os.out_width
-      h = os.out_height
-  logDebugNS "wallpaper" $ "initOutput: start"  :# [ "output" .= os.name, "river_output" .= ro ]
-  ss <- case os.surfaces of
+  let w = os.width
+      h = os.height
+  logDebugNS "wallpaper" $ "initOutput: start" :# ["output" .= os.name, "river_output" .= ro]
+  ss <- case os ^. surfaces of
     Just ss -> return ss
     Nothing -> do
       runInIO <- askRunInIO
@@ -278,8 +358,8 @@ initOutput ro = withOutputState ro $ \os -> do
       -- fractional scale listener
       fsl <- WL.createListener $ \case
         FS.FractionalScalePreferredScale _ _ fscale -> runInIO $ do
-          logInfoNS "wallpaper" $ "fractional scale updated" :# [ "output" .= os.name, "river_output" .= ro, "fractional-scale" .= fscale ]
-          updateOutputState ro $ \x -> x{pref_fract_scale = fscale, pending_render = True}
+          logInfoNS "wallpaper" $ "fractional scale updated" :# ["output" .= os.name, "river_output" .= ro, "fractional-scale" .= fscale]
+          updateOutputState ro $ \x -> x{pref_fract_scale = fscale, needsRender = True}
       WL.listenerAdd_ fractSurface fsl
 
       -- 3: viewport
@@ -287,7 +367,7 @@ initOutput ro = withOutputState ro $ \os -> do
 
       -- 4: layer_surface
       layerSurface <- withObject $ \ls ->
-        Wlr.layerShellGetLayerSurface ls wl_surface os.wl_output Wlr.ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND (Just "wallpaper")
+        Wlr.layerShellGetLayerSurface ls wl_surface (os ^. osWlOutput) Wlr.ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND (Just cfg.layerShellLayerName)
       Wlr.layerSurfaceSetSize layerSurface 0 0
       Wlr.layerSurfaceSetAnchor layerSurface (R.toCEnum $ 1 + 2 + 4 + 8)
       Wlr.layerSurfaceSetExclusiveZone layerSurface (-1)
@@ -297,13 +377,12 @@ initOutput ro = withOutputState ro $ \os -> do
           Wlr.layerSurfaceAckConfigure ls serial
           updateOutputState ro $ \x ->
             x
-              { out_width = fi cw
-              , out_height = fi ch
+              { width = fi cw
+              , height = fi ch
               , configured = True
-              , pending_render = x.pending_render || not x.configured || (x.out_width, x.out_height) /= (fi cw, fi ch)
+              , needsRender = x.needsRender || not (x ^. configured) || (x.width, x.height) /= (fi cw, fi ch)
               }
-          --withOutputState ro $ \x -> logInfoNS "wallpaper" $ "layer surface configure" :# [ "output" .= os.name, "river_output" .= ro, "cwch" .= (cw, ch), "configured" .= x.configured, "pending_render" .= x.pending_render ]
-        Wlr.LayerSurfaceClosed{} -> runInIO $ logErrorNS "wallpaper" $ "Layer surface closed!" :# [ "output" .= os.name, "river_output" .= ro ]
+        Wlr.LayerSurfaceClosed{} -> runInIO $ logErrorNS "wallpaper" $ "Layer surface closed!" :# ["output" .= os.name, "river_output" .= ro]
       WL.listenerAdd_ layerSurface lsListener
 
       -- finally:
@@ -326,13 +405,16 @@ initOutput ro = withOutputState ro $ \os -> do
 
   -- Update ctx
   updateOutputState ro $ \x -> x{surfaces = Just ss}
-  logDebugNS "wallpaper" $ "initOutput: done" :# [ "output" .= os.name, "river_output" .= ro ]
+  logDebugNS "wallpaper" $ "initOutput: done" :# ["output" .= os.name, "river_output" .= ro]
 
 ------------------------------------------
 -- Internal boilerplate
 
 updateOutputState :: RiverOutput -> (OutputState -> OutputState) -> H ()
-updateOutputState ro f = modifyObjectDef $ \x -> x{outputsState = M.alter (Just . f . fromMaybe def) ro (outputsState x)}
+updateOutputState ro f = modifyObjectDef $ \x -> x{outputsState = M.alter (Just . f . fromMaybe def) ro x.outputsState}
 
 withOutputState :: RiverOutput -> (OutputState -> H ()) -> H ()
-withOutputState ro f = getObjectDef >>= mapM_ (\(k, v) -> when (k == ro) (f v)) . M.toList . outputsState
+withOutputState ro f = getObjectDef >>= mapM_ (\(k, v) -> when (k == ro) (f v)) . M.toList . ((.outputsState) @WallpaperContext)
+
+modifyCtx :: _ -> H ()
+modifyCtx = modifyObjectDef @WallpaperContext

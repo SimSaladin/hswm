@@ -37,6 +37,8 @@ instance Default EnvPrompt where
       , inputSystemdUser = True
       }
 
+type ARow = (String, InputRowAttrs)
+
 environPrompt :: EnvPrompt -> RP.RofiPromptConfig i SelectValues -> H ()
 environPrompt cfg pc = do
   varsEnv <- if cfg.inputCallerEnv then io ENV.getEnvironment else pure mempty
@@ -46,7 +48,8 @@ environPrompt cfg pc = do
           (\(e1, s1) (e2, s2) -> (e1 <|> e2, s1 <|> s2))
           (M.fromList [(k, (Nothing, Just v)) | (k, v) <- varsSD])
           (M.fromList [(k, (Just v, Nothing)) | (k, v) <- varsEnv])
-      rows :: [Text]
+
+      rows :: [ARow]
       rows = do
         (vname, (mbValInEnv, mbValInSD)) <- M.toList varsMap
         case (mbValInEnv, mbValInSD) of
@@ -56,7 +59,7 @@ environPrompt cfg pc = do
           (Just val, _) -> [out vname val "only in process" | cfg.inputFilter vname]
           (_, Just val) -> [out vname val "only in systemd" | cfg.inputFilter vname]
           _ -> error "empty"
-      pc' :: RP.RofiPromptConfig [Text] SelectValues
+      pc' :: RP.RofiPromptConfig [ARow] SelectValues
       pc' =
         pc
           & clearTypeParams
@@ -65,8 +68,11 @@ environPrompt cfg pc = do
 
   void $ rows -->> pc' :-->> process
   where
-    out :: String -> String -> String -> Text
-    out k v notes = P.render $ P.bold k <> "=" ~++ v <> "\t" <> P.italic ("(" ~++ notes <> ")")
+    out :: String -> String -> String -> ARow
+    out k v notes =
+      let disp = P.bold k <> "=" ~++ v <> "\t" <> P.italic ("(" ~++ notes <> ")")
+          sel = k <> "=" <> v
+       in (sel, def & display .~ disp)
 
 process :: String -> H ()
 process input = do

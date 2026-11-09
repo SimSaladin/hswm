@@ -138,6 +138,7 @@ library
     bytestring >=0.12.2 && <0.13,
     containers >=0.7 && <1.0,
     data-default >=0.8.0 && <0.9,
+    directory,
     fast-logger >=3.2.6 && <3.3,
     filelock >=0.1.1 && <0.2,
     filepath,

@@ -163,6 +163,7 @@ library:
     - *dep-text-short
     - *dep-th-abstraction
     - *dep-microlens-th
+    - directory
   when:
     - condition: flag(pie)
       ghc-options:

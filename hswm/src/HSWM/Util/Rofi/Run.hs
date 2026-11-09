@@ -71,13 +71,13 @@ instance InterpretOutput DummyOutput a where
 
 -- | Splits on every newline. Result is a list of rows.
 instance InterpretOutput SelectValues [LazyByteString] where
-  type OutputSpec SelectValues = 's'
+  type OutputSpec SelectValues = 'p'
   type OutputParams SelectValues = ()
   interpretOutput _ = Right . LB.splitWith (== toEnum (fromEnum '\n'))
 
 -- | Splits on every newline. Result is a list of rows.
 instance InterpretOutput SelectValues [LazyText] where
-  type OutputSpec SelectValues = 's'
+  type OutputSpec SelectValues = 'p'
   type OutputParams SelectValues = ()
   interpretOutput _ = Right . TL.lines . TLE.decodeUtf8
 
@@ -86,7 +86,7 @@ instance InterpretOutput SelectValues [LazyText] where
 -- Does not split the output into multiple lines even when returning multiple results.
 -- One trailing newline is trimmed from the output if it exists
 instance InterpretOutput SelectValues LazyText where
-  type OutputSpec SelectValues = 's'
+  type OutputSpec SelectValues = 'p'
   type OutputParams SelectValues = ()
   interpretOutput _ = Right . trimEnd . TLE.decodeUtf8
     where
@@ -94,7 +94,7 @@ instance InterpretOutput SelectValues LazyText where
 
 -- | See the instance for @"LazyText"@
 instance InterpretOutput SelectValues String where
-  type OutputSpec SelectValues = 's'
+  type OutputSpec SelectValues = 'p'
   type OutputParams SelectValues = ()
   interpretOutput _ = Right . TL.unpack . trimEnd . TLE.decodeUtf8
     where
