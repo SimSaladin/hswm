@@ -63,11 +63,14 @@ data SDRunParams = SDRunParams
   , sdScope :: Bool
   , sdUnit :: Maybe String
   , sdSlice :: Maybe String
+  , sdSameDir :: Bool
+  , sdType :: String
+  -- ^ Type=exec
   }
   deriving (Eq, Generic)
 
 instance Default SDRunParams where
-  def = SDRunParams{sdCollect = True, sdScope = False, sdUnit = Nothing, sdSlice = Nothing}
+  def = SDRunParams{sdCollect = True, sdScope = False, sdUnit = Nothing, sdSlice = Nothing, sdSameDir = False, sdType = ""}
 
 runProgWithSystemD :: (HasCallStack, MonadProcessSpawn m) => SDRunParams -> String -> [String] -> m ()
 runProgWithSystemD p cmd args = do
@@ -79,6 +82,8 @@ runProgWithSystemD p cmd args = do
             ++ ["--scope" | p.sdScope]
             ++ ["--unit=" ++ u | Just u <- pure p.sdUnit]
             ++ ["--slice=" ++ s | Just s <- pure p.sdSlice]
+            ++ ["--same-dir" | p.sdSameDir]
+            ++ ["--property=Type=" ++ p.sdType | p.sdType /= ""]
             ++ ["--", cmd]
             ++ args -- ["bash", "-c", cmd]
   logProcessConfig "run-sd" pc

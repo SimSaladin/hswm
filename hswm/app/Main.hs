@@ -128,7 +128,8 @@ myKeys :: Validator ()
 myKeys = do
   group "Core" $ do
     "M-F1" .@= showKeyHelp <?> "Show help"
-    "M-Return" .@= spawnProcess "kitty" [] <?> "New terminal window"
+    "M-Return" .@= runProgWithSystemD def{sdSlice = Just "app-kitty.slice", sdType = "exec"} "kitty" [] <?> "New terminal window (systemd service)"
+    "M-S-Return" .@= spawnProcess "kitty" [] <?> "New terminal window (direct)"
     "M-Dollar" .@= spawnProcess "swaylock" ["-k"] <?> "Lock session"
     "M-q" .@= sendRestart <?> "Restart WM"
     "M-Print" .@= spawnProcess "sh" ["-c", "grim -g \"$(slurp)\""] <?> "Screenshot"
