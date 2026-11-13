@@ -3,10 +3,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE PatternGuards #-}
 {-# LANGUAGE PatternSynonyms #-}
-
------------------------------------------------------------------------------
-
------------------------------------------------------------------------------
+{-# OPTIONS_GHC -Wno-error=all #-}
 
 -- |
 -- Module      :  HSWM.Layout.BinarySpacePartition
@@ -296,7 +293,7 @@ goToNthLeaf n z@(Node{left}, _) =
       goToNthLeaf n z'
     else do
       z' <- goRight z
-      goToNthLeaf (n - (numLeaves left)) z'
+      goToNthLeaf (n - numLeaves left) z'
 
 toggleSplits :: Tree Split -> Tree Split
 toggleSplits (Leaf l) = Leaf l

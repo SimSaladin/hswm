@@ -1,3 +1,6 @@
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE NoFieldSelectors #-}
+
 -- |
 -- Module      : HSWM.Util.Process
 -- Description : Spawning and managing child processes
@@ -31,6 +34,7 @@ import Data.Aeson qualified as A
 import Data.Text qualified as T
 import Data.Text.IO qualified as T
 import Data.Typeable
+import HSWM.Types.Lens
 import System.Posix (CPid, getAnyProcessStatus)
 import System.Posix.Signals
 import System.Process (CmdSpec (..), showCommandForUser)
@@ -39,6 +43,172 @@ import System.Process.Typed qualified as P (closed)
 import System.Process.Typed.Internal qualified as Internal
 
 type MonadProcessSpawn m = (MonadUnliftIO m, MonadLogger m)
+
+-- * systemd-run
+
+data Flag a = FlagEmpty | FlagDefault a | FlagSet a
+  deriving (Eq, Show, Read, Generic)
+instance Default (Flag a) where def = FlagEmpty
+
+instance {-# OVERLAPS #-} Semigroup (Flag String) where
+  FlagEmpty <> x = x
+  x <> FlagEmpty = x
+  x <> FlagDefault{} = x
+  x@FlagSet{} <> _ = x
+  _ <> x@FlagSet{} = x
+instance {-# OVERLAPS #-} Monoid (Flag String) where
+  mempty = def
+
+instance Semigroup (Flag Bool) where
+  FlagEmpty <> x = x
+  x <> FlagEmpty = x
+  x <> FlagDefault{} = x
+  x@FlagSet{} <> _ = x
+  _ <> x@FlagSet{} = x
+instance Monoid (Flag Bool) where
+  mempty = def
+
+instance Semigroup (Flag [a]) where
+  FlagEmpty <> x = x
+  x <> FlagEmpty = x
+  FlagDefault x <> FlagDefault y = FlagDefault (x <> y)
+  FlagSet x <> FlagSet y = FlagSet (x <> y)
+  x <> y = FlagSet $ fromFlag [] x <> fromFlag [] y
+instance Monoid (Flag [a]) where
+  mempty = def
+
+flagDef :: a -> Flag a
+flagDef = FlagDefault
+
+flagSet :: a -> Flag a
+flagSet = FlagSet
+
+flagToMaybe :: Flag a -> Maybe a
+flagToMaybe = \case
+  FlagEmpty -> Nothing
+  FlagDefault a -> Just a
+  FlagSet a -> Just a
+
+fromFlag :: a -> Flag a -> a
+fromFlag d = fromMaybe d . flagToMaybe
+
+flagYes :: Flag Bool -> Bool
+flagYes = \case
+  FlagEmpty -> False
+  FlagSet a -> a
+  FlagDefault a -> a
+
+flagNo :: Flag Bool -> Bool
+flagNo = not . flagYes
+
+flagVal :: Traversal (Flag a) (Flag a') a a'
+flagVal _ FlagEmpty = pure FlagEmpty
+flagVal f (FlagDefault x) = FlagDefault <$> f x
+flagVal f (FlagSet x) = FlagSet <$> f x
+
+-- | Options for launching something in
+-- the (user) systemd session (using @systemd-run@).
+data SDRunParams = SDRunParams
+  { sdCollect :: Flag Bool
+  -- ^ Collect unit state when it exits (even failed units).
+  , sdScope :: Flag Bool
+  -- ^ Launch as a scope (default: service)
+  , sdUnit :: Flag String
+  -- ^ Unit name (default is random)
+  , sdSlice :: Flag String
+  -- ^ Assign the unit to this slice.
+  , sdSameDir :: Flag Bool
+  -- ^ Inherit CWD
+  , sdType :: Flag String
+  -- ^ E.g. @Type=exec@ (default is @simple@)
+  , sdWorkDir :: Flag FilePath
+  , sdEnv :: Flag [(String, String)]
+  }
+  deriving (Eq, Generic)
+
+makeLenses' [''SDRunParams]
+
+slice' :: ASetter SDRunParams SDRunParams (Flag String) String
+slice' f x = Identity $ x{sdSlice = flagSet (runIdentity $ f x.sdSlice)}
+
+unit' :: ASetter SDRunParams SDRunParams (Flag String) String
+unit' f x = Identity $ x{sdUnit = flagSet (runIdentity $ f x.sdUnit)}
+
+workDir :: ASetter SDRunParams SDRunParams (Flag FilePath) FilePath
+workDir f x = Identity $ x{sdWorkDir = flagSet (runIdentity $ f x.sdWorkDir)}
+
+instance Semigroup SDRunParams where
+  a <> b =
+    SDRunParams
+      { sdCollect = a.sdCollect <> b.sdCollect
+      , sdScope = a.sdScope <> b.sdScope
+      , sdUnit = a.sdUnit <> b.sdUnit
+      , sdSlice = a.sdSlice <> b.sdSlice
+      , sdSameDir = a.sdSameDir <> b.sdSameDir
+      , sdType = a.sdType <> b.sdType
+      , sdWorkDir = a.sdWorkDir <> b.sdWorkDir
+      , sdEnv = a.sdEnv <> b.sdEnv
+      }
+
+instance Monoid SDRunParams where
+  mempty =
+    SDRunParams
+      { sdCollect = mempty
+      , sdScope = mempty
+      , sdUnit = mempty
+      , sdSlice = mempty
+      , sdSameDir = mempty
+      , sdType = mempty
+      , sdWorkDir = mempty
+      , sdEnv = mempty
+      }
+
+-- | Opinionated defaults!
+instance Default SDRunParams where
+  def =
+    mempty
+      { sdCollect = flagDef True
+      , sdSlice = flagDef "app.slice"
+      , sdType = flagDef "exec"
+      }
+
+-- | Run a program in the user's systemd session.
+sdSpawnProcess :: (HasCallStack, MonadProcessSpawn m) => SDRunParams -> String -> [String] -> m ()
+sdSpawnProcess p cmd args = do
+  let pc =
+        proc "systemd-run" $
+          ["--user", "--no-pager", "--no-ask-password"]
+            ++ ["--no-block" | flagNo p.sdScope]
+            ++ ["--collect" | flagYes p.sdCollect] -- not supported in scope mode
+            ++ ["--scope" | flagYes p.sdScope]
+            ++ ["--unit=" ++ u | Just u <- [flagToMaybe p.sdUnit]]
+            ++ ["--slice=" ++ s | Just s <- [flagToMaybe p.sdSlice]]
+            ++ ["--same-dir" | fromFlag False p.sdSameDir]
+            ++ ["--property=Type=" ++ ty | Just ty <- [flagToMaybe p.sdType]]
+            ++ ["--working-directory=" ++ pa | Just pa <- [flagToMaybe p.sdWorkDir]]
+            ++ ["--setenv=" ++ n ++ "=" ++ v | (n, v) <- fromFlag [] p.sdEnv]
+            ++ ["--", cmd]
+            ++ args
+  logProcessConfig "run-sd" pc
+  res <- readProcess pc
+  logInfo $ "run-sd: process completed" :# ["result" .= show res]
+
+-- | Like sdSpawnProcess but takes a shell script instead.
+sdSpawnShell :: (HasCallStack, MonadProcessSpawn m) => SDRunParams -> String -> m ()
+sdSpawnShell p cmd = sdSpawnProcess p "bash" ["-c", cmd]
+
+-- | Like sdSpawnProcess, but takes a ProcessConfig instead.
+sdSpawnProcessConfig :: (HasCallStack, MonadProcessSpawn m) => SDRunParams -> ProcessConfig a b c -> m ()
+sdSpawnProcessConfig p pc = do
+  case pc.pcCmdSpec of
+    RawCommand c as -> sdSpawnProcess (pset p) c as
+    ShellCommand x -> sdSpawnShell (pset p) x
+  where
+    pset =
+      maybe id (workDir .~) pc.pcWorkingDir
+        . maybe id (\e -> sdEnv %~ (<> flagSet e)) pc.pcEnv
+
+-- * spawn direct
 
 -- | No logging or other extras, just start thte process ASAP.
 spawnProcessFast :: String -> [String] -> IO ()
@@ -50,48 +220,7 @@ spawnProcess prog args = do
   logProcessConfig "spawn" pc
   void . async $ runProcess_ pc
 
--- | Send a signal to the ProcessID of a window.
-signalWindowByPID :: (MonadProcessSpawn m) => Signal -> Window -> m ()
-signalWindowByPID sig w
-  | Just pid <- w.unreliablePid = do
-      logInfo $ "Signalling window " <> tshow w.river_window <> " (signal " <> tshow sig <> ")" :# ["signal" .= tshow sig, "window" .= tshow w.river_window]
-      io $ signalProcess sig (fromIntegral pid)
-  | otherwise = logWarn $ "Cannot signal process of window " <> tshow w.river_window <> " (ProcessID unknown)" :# ["signal" .= tshow sig]
-
-data SDRunParams = SDRunParams
-  { sdCollect :: Bool
-  , sdScope :: Bool
-  , sdUnit :: Maybe String
-  , sdSlice :: Maybe String
-  , sdSameDir :: Bool
-  , sdType :: String
-  -- ^ Type=exec
-  }
-  deriving (Eq, Generic)
-
-instance Default SDRunParams where
-  def = SDRunParams{sdCollect = True, sdScope = False, sdUnit = Nothing, sdSlice = Nothing, sdSameDir = False, sdType = ""}
-
-runProgWithSystemD :: (HasCallStack, MonadProcessSpawn m) => SDRunParams -> String -> [String] -> m ()
-runProgWithSystemD p cmd args = do
-  let pc =
-        proc "systemd-run" $
-          ["--user", "--no-pager", "--no-ask-password"]
-            ++ ["--no-block" | not p.sdScope]
-            ++ ["--collect" | p.sdCollect] -- not supported in scope mode
-            ++ ["--scope" | p.sdScope]
-            ++ ["--unit=" ++ u | Just u <- pure p.sdUnit]
-            ++ ["--slice=" ++ s | Just s <- pure p.sdSlice]
-            ++ ["--same-dir" | p.sdSameDir]
-            ++ ["--property=Type=" ++ p.sdType | p.sdType /= ""]
-            ++ ["--", cmd]
-            ++ args -- ["bash", "-c", cmd]
-  logProcessConfig "run-sd" pc
-  res <- readProcess pc
-  logInfo $ "run-sd: process completed" :# ["result" .= show res]
-
-runWithSystemD :: (HasCallStack, MonadProcessSpawn m) => SDRunParams -> String -> m ()
-runWithSystemD p cmd = runProgWithSystemD p "bash" ["-c", cmd]
+-- * Send desktop notifications
 
 notifySend ::
   (MonadProcessSpawn m) =>
@@ -117,11 +246,19 @@ newtype NotifySendOptions = NotifySendOptions {notifySendOptions :: [(String, St
 instance Default NotifySendOptions where
   def = NotifySendOptions [("app-name", "HSWM")]
 
--- * Standard streams & logging
+-- * Stream specs (for typed-process)
 
 -- | Renamed 'P.closed'
 closedStream :: StreamSpec anyStreamType ()
 closedStream = P.closed
+
+-- | Modified 'P.byteStringOutput' so that 'stopProcess' works.
+byteStringOutput :: StreamSpec STOutput (STM LazyByteString)
+byteStringOutput = mkPipeStreamSpec $ \pc h -> do
+  (a, c) <- Internal.byteStringFromHandle pc h
+  return (a, void $ async c)
+
+-- * Logging helpers
 
 -- | StreamSpec that logs output lines as log lines
 logOutput ::
@@ -140,12 +277,6 @@ logOutput logFn src lvl meta = mkPipeStreamSpec $ \pc h -> do
   -- Note: the handle is closed by the async worker thread. If we closed it in the cleanup
   -- action below, hClose would block because of the hGetLine above. This breaks stopProcess!
   return (as, return ())
-
--- | Modified 'P.byteStringOutput' so that 'stopProcess' works.
-byteStringOutput :: StreamSpec STOutput (STM LazyByteString)
-byteStringOutput = mkPipeStreamSpec $ \pc h -> do
-  (a, c) <- Internal.byteStringFromHandle pc h
-  return (a, void $ async c)
 
 showCmdSpec :: CmdSpec -> String
 showCmdSpec (RawCommand prog args) = showCommandForUser prog args
@@ -171,7 +302,15 @@ logProcessConfig src pc =
                ++ ["workdir" .= toText x | Just x <- [pc.pcWorkingDir]]
            )
 
--- * Main process signal handling
+-- * Signal sending & handling
+
+-- | Send a signal to the ProcessID of a window.
+signalWindowByPID :: (MonadProcessSpawn m) => Signal -> Window -> m ()
+signalWindowByPID sig w
+  | Just pid <- w.unreliablePid = do
+      logInfo $ "Signalling window " <> tshow w.river_window <> " (signal " <> tshow sig <> ")" :# ["signal" .= tshow sig, "window" .= tshow w.river_window]
+      io $ signalProcess sig (fromIntegral pid)
+  | otherwise = logWarn $ "Cannot signal process of window " <> tshow w.river_window <> " (ProcessID unknown)" :# ["signal" .= tshow sig]
 
 -- | Ignore SIGPIPE to avoid termination when a pipe is full.
 --

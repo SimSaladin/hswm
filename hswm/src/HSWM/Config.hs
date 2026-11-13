@@ -1,6 +1,6 @@
-{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ApplicativeDo #-}
 {-# LANGUAGE ExtendedDefaultRules #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 -- |
 -- Module      : HSWM.Config
@@ -12,26 +12,34 @@
 -- Portability : unportable
 module HSWM.Config (
   -- * Actions
-  SendMessage(..),
-  (:>>:)(..),
+  SendMessage (..),
+  (:>>:) (..),
+
   -- ** Action parameters
-  (<?>), (<!>), (<@>),
+  (<?>),
+  (<!>),
+  (<!!>),
+  (<@>),
   named,
-  type (<!>)(..),
-  type (<@>)(..),
-  type (<?>)(..),
+  type (<!>) (..),
+  type (<@>) (..),
+  type (<?>) (..),
 
   -- * The Validator interface
   Validator,
   validateAndAddKeys,
   validateBindings,
+
   -- ** Combinators
-  (.@=), (.@=>), (///), (///&),
+  (.@=),
+  (.@=>),
+  (///),
+  (///&),
   group,
   bindKey,
 
   -- * Misc.
-  SymlistValue(..),
+  SymlistValue (..),
 
   -- * Help
   showKeyHelp,
@@ -44,15 +52,16 @@ import HSWM.Operations
 import HSWM.Util.PangoMarkup qualified as P
 import HSWM.Utils
 
+import Data.Char (isSpace)
 import Data.Foldable
 import Data.List qualified as L
 import Data.Text qualified as T
 import Data.Typeable
-import GHC.TypeLits
 import GHC.IsList
+import GHC.TypeLits
 
 infixr 6 :>>:
-infixl 4 <?>, <!>, <@>
+infixl 4 <?>, <!>, <!!>, <@>
 infixl 9 ///
 infixl 1 .@=, .@=>
 
@@ -69,7 +78,7 @@ newtype (<?>) a (desc :: Symbol) = (:<?>) a
   deriving stock (Generic)
 
 -- | Control key autorepeat
-newtype (<!>) a (repeat :: Nat) = (:<!>) a
+data (<!>) a (repeat :: Nat) = a :<!> RepeatInfo
 
 -- | Categories
 newtype (<@>) a (names :: [Symbol]) = (:<@>) a
@@ -83,51 +92,60 @@ data Validator a = Validator
   }
   deriving (Generic)
 
-deriving via (PPGeneric (Validator a)) instance
-  {-# OVERLAPPABLE #-} (Pretty a, Pretty (SomeAction H)
-  ) => Pretty (Validator a)
+deriving via
+  (PPGeneric (Validator a))
+  instance
+  {-# OVERLAPPABLE #-}
+    ( Pretty a
+    , Pretty (SomeAction H)
+    ) =>
+    Pretty (Validator a)
 
-instance Show a => Show (Validator a) where
+instance (Show a) => Show (Validator a) where
   show Validator{..} = "Keys: " ++ show keys ++ " -> " ++ show curval
 
-instance Semigroup a => Semigroup (Validator a) where
-  (<>) v1 v2 = v1
-    { keys = v1.keys <> v2.keys
-    , curval = v1.curval <> v2.curval
-    }
+instance (Semigroup a) => Semigroup (Validator a) where
+  (<>) v1 v2 =
+    v1
+      { keys = v1.keys <> v2.keys
+      , curval = v1.curval <> v2.curval
+      }
 
-instance Monoid a => Monoid (Validator a) where
+instance (Monoid a) => Monoid (Validator a) where
   mempty = Validator [] mempty
 
 instance Functor Validator where
-  fmap f x = x{curval=f x.curval}
+  fmap f x = x{curval = f x.curval}
 
 instance Applicative Validator where
-  pure x = (mempty::Validator ()){curval=x}
-  liftA2 f v1 v2 = v1
-    { keys = v1.keys <> v2.keys
-    , curval = f v1.curval v2.curval
-    }
+  pure x = (mempty :: Validator ()){curval = x}
+  liftA2 f v1 v2 =
+    v1
+      { keys = v1.keys <> v2.keys
+      , curval = f v1.curval v2.curval
+      }
 
 instance Monad Validator where
   v >>= f = let v2 = f v.curval in liftA2 (const id) v v2
 
-instance Monoid a => IsList (Validator a) where
+instance (Monoid a) => IsList (Validator a) where
   type Item (Validator a) = (String, SomeAction H)
-  fromList xs = mempty{keys=xs}
+  fromList xs = mempty{keys = xs}
   toList v = v.keys
 
-validateBindings :: (key ~ XBKey)
-                 => Validator a
-                 -> ModMask -- ^ default mod mask. (@"M"@)
-                 -> KeyBindings key (SomeAction H)
+validateBindings ::
+  (key ~ XBKey) =>
+  Validator a
+  -> ModMask
+  -- ^ default mod mask. (@"M"@)
+  -> KeyBindings key (SomeAction H)
 validateBindings val mm = fold $ map (toKeyBindings mm) val.keys
 
-bindKey :: IsAction H a => String -> a -> Validator ()
-bindKey k v = mempty{keys=[(k, SomeAction v)]}
+bindKey :: (IsAction H a) => String -> a -> Validator ()
+bindKey k v = mempty{keys = [(trim k, SomeAction v)]}
 
 -- | Create a single (key, action) binding.
-(.@=) :: IsAction H a => String -> a -> Validator ()
+(.@=) :: (IsAction H a) => String -> a -> Validator ()
 (.@=) = bindKey
 
 -- | Create a series of bindings for a list of subkeys.
@@ -135,24 +153,29 @@ bindKey k v = mempty{keys=[(k, SomeAction v)]}
 -- @
 -- "Key-prefix-" /// key-list .@=> (\i -> handle i <?> describe i)
 -- @
-(.@=>) :: IsAction H a => [(String, i)] -> (i -> a) -> Validator ()
-xs .@=> f = fold [ bindKey k (f i) | (k, i) <- xs ]
+(.@=>) :: (IsAction H a) => [(String, i)] -> (i -> a) -> Validator ()
+xs .@=> f = fold [bindKey k (f i) | (k, i) <- xs]
 
 (///) :: String -> [String] -> [(String, Int)]
-x /// xs = zip [ x <> y | y <- xs ] [1..]
+x /// xs = zip [trim x <> trim y | y <- xs] [1 ..]
 
 (///&) :: String -> [(String, k)] -> [(String, k)]
-x ///& xs = [ (x <> y, i) | (y, i) <- xs ]
+x ///& xs = [(trim x <> trim y, i) | (y, i) <- xs]
 
 -- | Add the mentioned bindings to the mentioned category.
 group :: forall b. String -> Validator b -> Validator ()
 group s Validator{keys} = withSomeSSymbol s $ \case
-  (ss :: SSymbol s) -> withKnownSymbol ss $ mconcat [ k .@= (v <@> [s]) | (k, v) <- keys ]
+  (ss :: SSymbol s) -> withKnownSymbol ss $ mconcat [k .@= (v <@> [s]) | (k, v) <- keys]
 
+trim :: String -> String
+trim = L.dropWhileEnd isSpace . L.dropWhile isSpace
 
 -- * Functions
 
--- | Attach a description to some action: @ restart <?> "Restart" @
+-- | Attach a description to some action.
+-- @
+-- restart <?> "Restart"
+-- @
 (<?>) :: forall a. (IsAction H a) => a -> String -> SomeAction H
 a <?> str = withSomeSSymbol str $ \case
   (ssym :: SSymbol s) -> withKnownSymbol ssym $ SomeAction ((:<?>) a :: a <?> s)
@@ -160,29 +183,47 @@ a <?> str = withSomeSSymbol str $ \case
 named :: forall a. (IsAction H a) => String -> a -> SomeAction H
 named = flip (<?>)
 
--- | Autorepeat
-(<!>) :: forall a. (Typeable a, IsAction H a) => a -> Integer -> SomeAction H
-action <!> n = withSomeSNat n $ \case
-  Just (snat :: SNat n) -> withKnownNat snat $ SomeAction ((:<!>) action :: a <!> n)
+-- | Autorepeat with specified rate and default delay.
+(<!>) ::
+  forall a i.
+  (Integral i, Typeable a, IsAction H a) =>
+  a
+  -> i
+  -- ^ Repeat rate
+  -> SomeAction H
+action <!> n = withSomeSNat (fi n) $ \case
+  Just (snat :: SNat n) -> withKnownNat snat $ SomeAction (action :<!> RepeatInfo{rate = fi n, delay = 400} :: a <!> n)
+  Nothing -> error "invalid SNat"
+
+-- | Autorepeat with specified rate and specified delay.
+(<!!>) ::
+  forall a i.
+  (Integral i, Typeable a, IsAction H a) =>
+  a
+  -> (i, i)
+  -- ^ @(repeat rate, repeat delay)@
+  -> SomeAction H
+action <!!> (r, d) = withSomeSNat (fi r) $ \case
+  Just (snat :: SNat r) -> withKnownNat snat $ SomeAction (action :<!> RepeatInfo{rate = fi r, delay = fi d} :: a <!> r)
   Nothing -> error "invalid SNat"
 
 -- | Add categories to action
 (<@>) :: forall a. (Typeable a, IsAction H a) => a -> [String] -> SomeAction H
 action <@> cats =
   let
-      go :: forall xs. (Typeable xs, SymlistValue xs) => Proxy (xs :: [Symbol]) -> [String] -> SomeAction H
-      go _ (x:xs) = withSomeSSymbol x $ \case
-                  (sy :: SSymbol s) -> withKnownSymbol sy $ go (Proxy :: Proxy (s ': xs)) xs
-      go _ [] = SomeAction ((:<@>) action :: a <@> xs)
-
-  in
-      go (Proxy @'[]) cats
+    go :: forall xs. (Typeable xs, SymlistValue xs) => Proxy (xs :: [Symbol]) -> [String] -> SomeAction H
+    go _ (x : xs) = withSomeSSymbol x $ \case
+      (sy :: SSymbol s) -> withKnownSymbol sy $ go (Proxy :: Proxy (s ': xs)) xs
+    go _ [] = SomeAction ((:<@>) action :: a <@> xs)
+   in
+    go (Proxy @'[]) cats
 
 -- * Add keys to config
 
-validateAndAddKeys ::  Validator a -> ConfigDoM H
+validateAndAddKeys :: Validator a -> ConfigDoM H
 validateAndAddKeys val c = c & keyBindings .~ validated
-  where validated = validateBindings val (toModMask 0 $ c ^. defaultModMask)
+  where
+    validated = validateBindings val (toModMask 0 $ c ^. defaultModMask)
 
 -- * Show key help
 
@@ -217,12 +258,12 @@ instance (Message a, Show a) => IsAction H (SendMessage a) where
 
 instance (KnownSymbol desc, IsAction H a) => IsAction H (a <?> desc) where
   actionPassthru _ ((:<?>) a) = Just $ SomeAction a
-  actionDescription p ((:<?>) a) = symbolVal (Proxy @desc) ++ ( let sub = actionDescription p a in if sub /= "" then ": " ++ sub else "")
-  actionDescriptionFallback p ((:<?>) a) = symbolVal (Proxy @desc) ++ ( let sub = actionDescriptionFallback p a in if sub /= "" then ": " ++ sub else "")
+  actionDescription p ((:<?>) a) = symbolVal (Proxy @desc) ++ (let sub = actionDescription p a in if sub /= "" then ": " ++ sub else "")
+  actionDescriptionFallback p ((:<?>) a) = symbolVal (Proxy @desc) ++ (let sub = actionDescriptionFallback p a in if sub /= "" then ": " ++ sub else "")
 
-instance (Typeable a, IsAction H a, KnownNat repeat) => IsAction H (a <!> repeat) where
-  onHoldRepeat _ _ = RepeatInfo { rate = fi $ natVal (Proxy @repeat), delay = 400 } -- TODO configurable delay
-  actionPassthru _ ((:<!>) a) = Just $ SomeAction a
+instance (Typeable a, IsAction H a, KnownNat rate) => IsAction H (a <!> rate) where
+  onHoldRepeat _ (_ :<!> ri) = ri{rate = fi $ natVal (Proxy @rate)}
+  actionPassthru _ (a :<!> _) = Just $ SomeAction a
 
 instance (IsAction f a, SymlistValue xs) => IsAction f (a <@> xs) where
   actionPassthru _ ((:<@>) a) = Just $ SomeAction a
@@ -231,23 +272,21 @@ instance (IsAction f a, SymlistValue xs) => IsAction f (a <@> xs) where
 
 instance (IsAction H a, IsAction H b, Typeable a, Typeable b) => IsAction H (a :>>: b) where
   runner (a :>>: b) = runner a >> runner b
-  onHoldRepeat p (a :>>: b) = let RepeatInfo r1 d1 = onHoldRepeat p a
-                                  RepeatInfo r2 d2 = onHoldRepeat p b
-                               in RepeatInfo (max r1 r2) (max d1 d2)
+  onHoldRepeat p (a :>>: b) =
+    let RepeatInfo r1 d1 = onHoldRepeat p a
+        RepeatInfo r2 d2 = onHoldRepeat p b
+     in RepeatInfo (max r1 r2) (max d1 d2)
   actionDescription p (a :>>: b) = L.intercalate " && " $ filter (/= "") [actionDescription p a, actionDescription p b]
   actionDescriptionFallback p (a :>>: b) = L.intercalate " && " $ filter (/= "") [actionDescriptionFallback p a, actionDescriptionFallback p b]
   actionCategories p (a :>>: b) = L.nub $ actionCategories p a ++ actionCategories p b
 
-
 -- * Extract type-level categories
 
 class SymlistValue (a :: [Symbol]) where
-
   -- | Value representation of types of the kind @[Symbol]@.
   symlistVal :: Proxy a -> [String]
 
 instance (KnownSymbol x, SymlistValue xs) => SymlistValue (x ': xs) where
-
   symlistVal _ = symbolVal (Proxy :: Proxy x) : symlistVal (undefined :: Proxy xs)
 
 instance SymlistValue '[] where

@@ -268,17 +268,11 @@ makeLenses' [''RofiPromptConfig, ''PromptHistory, ''InputRowAttrs, ''RofiColumns
 -- * Launch
 
 -- | Launch a prompt (async) without reading the output.
-launchRofi :: forall m. (MonadRofi m) => RofiPromptConfig () DummyOutput -> m (Async ())
+launchRofi :: forall m. (MonadRofi m) => RofiPromptConfig () DummyOutput -> m ()
 launchRofi rp = do
   pc <- setStdin nullStream . setStdout nullStream <$> rofiToProc rp
   logProcessConfig "rofi-mode" pc
-  async $ do
-    res <- try @_ @SomeException $ runProcess pc
-    logInfo $ "rofi: launch finished" :# ["result" .= show res]
-
--- | Like "launchRofi" but discards output
-launchRofi_ :: forall m. (MonadRofi m) => RofiPromptConfig () DummyOutput -> m ()
-launchRofi_ = void . launchRofi
+  sdSpawnProcessConfig def pc
 
 -- | Launch a prompt (synchronous) with input and read the output.
 runRofi ::

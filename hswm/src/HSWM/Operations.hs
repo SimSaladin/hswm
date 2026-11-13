@@ -6,7 +6,6 @@
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
---
 module HSWM.Operations where
 
 import Data.List qualified as L
@@ -116,14 +115,15 @@ sendMessage a = runInHS $ do
               { W.workspace = (W.workspace $ W.current ws){W.layout = l'}
               }
         }
-    manageDirty
+  manageDirty
   return ()
 
 -- | Send a message to a layout, without refreshing.
 sendMessageWithNoRefresh :: (Message a, MonadHS m) => a -> WindowSpace -> m ()
-sendMessageWithNoRefresh a w = runInHS $
-  handleMessage (W.layout w) (SomeMessage a) `catchHS` return Nothing
-    >>= updateLayout (W.tag w)
+sendMessageWithNoRefresh a w =
+  runInHS $
+    handleMessage (W.layout w) (SomeMessage a) `catchHS` return Nothing
+      >>= updateLayout (W.tag w)
 
 -- | Force new manage sequence.
 manageDirty :: (MonadH m) => m ()
@@ -193,7 +193,7 @@ setWindowBorder w wbWidth wbColor = withWindow_ w $ \_ -> do
   wbEdges <- asks $ view (config . borderEdges)
   riverWindowSetBorders w R.WindowBorders{..}
 
-riverWindowSetBorders :: MonadEffects m => RiverWindow -> R.WindowBorders -> m ()
+riverWindowSetBorders :: (MonadEffects m) => RiverWindow -> R.WindowBorders -> m ()
 riverWindowSetBorders w R.WindowBorders{wbColor = RiverColor{..}, ..} =
   R.riverWindowSetBorders w wbEdges wbWidth red green blue alpha
 
@@ -207,14 +207,15 @@ setWindowPosition w x y = runInHS $ do
 --------------------------------------------------------------
 
 -- * WindowSet operations
+
 -- ** Query the stack
 
 -- | Run a monadic action with the current stack set
-withWindowSet :: GetHState m => (WindowSet -> m a) -> m a
+withWindowSet :: (GetHState m) => (WindowSet -> m a) -> m a
 withWindowSet f = getHState >>= f . view windowset
 
 -- | Return workspace visible on screen @sc@, or 'Nothing'.
-screenWorkspace :: GetHState m => ScreenId -> m (Maybe WorkspaceId)
+screenWorkspace :: (GetHState m) => ScreenId -> m (Maybe WorkspaceId)
 screenWorkspace sc = withWindowSet $ return . W.lookupWorkspace sc
 
 -- | Given a window, find the screen it is located on, and compute
@@ -247,7 +248,9 @@ floatLocation sw = withWindow sw $ \w -> do
 
 -- | Given a point, determine the screen (if any) that contains it.
 pointScreen ::
-  (GetHState m) => Position1D -> Position1D
+  (GetHState m) =>
+  Position1D
+  -> Position1D
   -> m (Maybe (W.Screen WorkspaceId (Layout RiverWindow) RiverWindow WorkspaceDetail ScreenId ScreenDetail))
 pointScreen x y = withWindowSet $ return . L.find point . W.screens
   where
@@ -258,26 +261,26 @@ pointScreen x y = withWindowSet $ return . L.find point . W.screens
 -- ** Modify the Stack
 
 -- | Set the layout of the currently viewed workspace.
-setLayout :: MonadHS m => Layout RiverWindow -> m ()
+setLayout :: (MonadHS m) => Layout RiverWindow -> m ()
 setLayout l = runInHS $ do
   ss@W.StackSet{W.current = c@W.Screen{W.workspace = ws}} <- use windowset
   _ <- handleMessage (W.layout ws) (SomeMessage ReleaseResources)
   windows $ const $ ss{W.current = c{W.workspace = ws{W.layout = l}}}
 
 -- | Update the layout field of a workspace.
-updateLayout :: MonadHS m => WorkspaceId -> Maybe (Layout RiverWindow) -> m ()
+updateLayout :: (MonadHS m) => WorkspaceId -> Maybe (Layout RiverWindow) -> m ()
 updateLayout i ml = whenJust ml $ \l ->
   runOnWorkspaces $ \ww -> return $ if W.tag ww == i then ww{W.layout = l} else ww
 
-windows :: MonadHS m => (WindowSet -> WindowSet) -> m ()
+windows :: (MonadHS m) => (WindowSet -> WindowSet) -> m ()
 windows = modifyWindowSet
 
-modifyWindowSet :: MonadHS m => (WindowSet -> WindowSet) -> m ()
+modifyWindowSet :: (MonadHS m) => (WindowSet -> WindowSet) -> m ()
 modifyWindowSet = runInHS . modifying windowset
 
 -- | This is basically a map function, running a function in the 'H' monad on
 -- each workspace with the output of that function being the modified workspace.
-runOnWorkspaces :: MonadHS m => (WindowSpace -> HS WindowSpace) -> m ()
+runOnWorkspaces :: (MonadHS m) => (WindowSpace -> HS WindowSpace) -> m ()
 runOnWorkspaces job = runInHS $ do
   ws <- use windowset
   h <- mapM job $ W.hidden ws
@@ -306,7 +309,7 @@ float sw = floatLocation sw >>= mapM_ go
 lookupOutput :: (SomeOutput a, GetHState m) => a -> m (Maybe Output)
 lookupOutput k = getHState <&> preview (outputList . eachRiverId k)
 
-lookupOutputBy :: GetHState m => (Output -> Bool) -> m (Maybe Output)
+lookupOutputBy :: (GetHState m) => (Output -> Bool) -> m (Maybe Output)
 lookupOutputBy f = getHState <&> preview (outputList . each . filtered f)
 
 withOutput :: (SomeOutput a, GetHState m) => a -> (Output -> m b) -> m (Maybe b)
@@ -315,7 +318,7 @@ withOutput k f = lookupOutput k >>= mapM f
 withOutput_ :: (SomeOutput a, GetHState m) => a -> (Output -> m ()) -> m ()
 withOutput_ k f = lookupOutput k >>= mapM_ f
 
-withScreenOutput :: GetHState m => ScreenId -> (Output -> m ()) -> m ()
+withScreenOutput :: (GetHState m) => ScreenId -> (Output -> m ()) -> m ()
 withScreenOutput sid f = mapM_ f . L.find (\o -> o.screen == sid) =<< (getHState <&> view outputList)
 
 -- ** Modify outputs
@@ -323,7 +326,7 @@ withScreenOutput sid f = mapM_ f . L.find (\o -> o.screen == sid) =<< (getHState
 modifyOutput :: (SomeOutput a, MonadHS m) => a -> (Output -> Output) -> m ()
 modifyOutput k f = runInHS $ outputList . eachRiverId k %= f
 
-setOutputPower :: MonadHS m => Bool -> m ()
+setOutputPower :: (MonadHS m) => Bool -> m ()
 setOutputPower mode = runInHS $ do
   use outputList >>= traverseOf_ (each . filtered ((/= def) . view outputPower)) f
   where
@@ -374,8 +377,9 @@ lookupWindow :: (SomeWindow a, GetHState m) => a -> m (Maybe Window)
 lookupWindow k = getHState <&> preview (_windows . ix (k ^. riverId))
 
 lookupWindows :: (SomeWindow a, GetHState m) => [a] -> m [Window]
-lookupWindows ks = getHState <&>
-  (^.. _windows . traversed . filtered (\x -> any (riverIdEq x) ks))
+lookupWindows ks =
+  getHState
+    <&> (^.. _windows . traversed . filtered (\x -> any (riverIdEq x) ks))
 
 withWindow :: (SomeWindow a, GetHState m) => a -> (Window -> m b) -> m (Maybe b)
 withWindow k f = lookupWindow k >>= mapM f
@@ -387,7 +391,7 @@ mapWindows :: (GetHState m) => (Window -> m ()) -> m ()
 mapWindows f = (getHState <&> view _windows) >>= mapM_ f
 
 withFocused :: (GetHState m) => (Window -> m ()) -> m ()
-withFocused  f = (getHState <&> view windowset) >>= (`whenJust` (`withWindow_` f)) . W.peek
+withFocused f = (getHState <&> view windowset) >>= (`whenJust` (`withWindow_` f)) . W.peek
 
 -- ** Modify windows
 
@@ -422,8 +426,8 @@ restart prog0 = findExecutable prog0 >>= maybe notFound restart'
         "Uh-oh, executing the new program appears to have failed!"
           :# ["reason" .= show e | Left (e :: IOException) <- [res]]
 
-    filterArgs ("--state-file":_:xs) = filterArgs xs
-    filterArgs (x:xs)
+    filterArgs ("--state-file" : _ : xs) = filterArgs xs
+    filterArgs (x : xs)
       | "--state-file=" `L.isPrefixOf` x = filterArgs xs
       | otherwise = x : filterArgs xs
     filterArgs [] = []

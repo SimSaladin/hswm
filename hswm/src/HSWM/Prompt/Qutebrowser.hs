@@ -50,4 +50,4 @@ qutebrowserPrompt pcfg = do
   where
     launch name = do
       logInfo $ "qutebrowser launch" :# ["instance" .= name]
-      runWithSystemD def{sdUnit = Just $ "qutebrowser@" ++ name} ("qutebrowser -r " ++ name)
+      sdSpawnProcess (def & unit' .~ "qutebrowser@" ++ name) "qutebrowser" ["-r", name]
