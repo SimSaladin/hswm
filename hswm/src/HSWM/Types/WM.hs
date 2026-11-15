@@ -3,7 +3,6 @@
 {-# LANGUAGE NoFieldSelectors #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
-
 -- |
 -- Module      : HSWM.Types.WM
 -- Description : Short description
@@ -16,6 +15,7 @@
 -- Basic window management -related types.
 module HSWM.Types.WM (
   module HSWM.Types.WM,
+
   -- * Re-exports
   module HSWM.Types.Action,
   module HSWM.Types.Window,
@@ -31,13 +31,13 @@ import HSWM.StackSet qualified as W
 import HSWM.Types.Action
 import HSWM.Types.Config
 import HSWM.Types.Events
+import HSWM.Types.KeyBindings
 import HSWM.Types.Lens
 import HSWM.Types.Output
 import HSWM.Types.Seat
 import HSWM.Types.Simple
 import HSWM.Types.TypeMap
 import HSWM.Types.Window
-import HSWM.Types.KeyBindings
 
 import Text.XkbCommon qualified as Xkb
 import WL.Client qualified as WL
@@ -401,7 +401,7 @@ instance HasGlobalTMap HConf where
 -- * Monadic "HState" reader access.
 
 class (Monad m) => GetHState m where
-  getHState :: HasCallStack => m HState
+  getHState :: (HasCallStack) => m HState
 instance GetHState (QueryT HS) where
   getHState = Query (lift getHState)
 instance GetHState HS where
@@ -417,7 +417,7 @@ instance GetHState H where
 
 -- | Contexts in which it is possible to execute state-locked 'HS' actions.
 class (GetHState m) => MonadHS m where
-  runInHS :: HasCallStack => HS a -> m a
+  runInHS :: (HasCallStack) => HS a -> m a
 
 instance MonadHS H where
   runInHS = withFrozenCallStack runInHS'
@@ -427,7 +427,7 @@ instance MonadHS (QueryT HS) where
   runInHS = Query . lift
 
 class (Monad m) => MonadH m where
-  liftH :: HasCallStack => H a -> m a
+  liftH :: (HasCallStack) => H a -> m a
 
 instance MonadH H where
   liftH = id
@@ -497,5 +497,5 @@ instance {-# OVERLAPPABLE #-} (MonadH m) => ToJSON (m a) where
 
 -- XXX Orphans..
 instance ToJSON Xkb.XkbRuleNames
-instance ToJSON Xkb.OptionSpec
-instance ToJSON Xkb.LayoutSpec
+instance ToJSON Xkb.LayoutOption
+instance ToJSON Xkb.Layout

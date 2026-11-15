@@ -12,7 +12,7 @@ module Waybar.CFFI.Plugin.TextFormat where
 
 import GI.GLib (markupEscapeText)
 
-import Control.Applicative (asum, (<|>))
+import Control.Applicative ((<|>))
 import Control.Arrow (first)
 import Control.Monad.IO.Class
 import Data.Aeson qualified as A

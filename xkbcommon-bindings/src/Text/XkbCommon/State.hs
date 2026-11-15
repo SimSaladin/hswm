@@ -1,5 +1,5 @@
 -- |
--- Module      : Text.XkbCommon.XkbState
+-- Module      : Text.XkbCommon.State
 -- Description : XKbState
 -- Copyright   : (c) Samuli Thomasson, 2026
 --
@@ -9,33 +9,30 @@
 module Text.XkbCommon.State (
   -- * Create
   XkbState,
-  createXkbState,
+  newState,
 
-  -- * Functions
-  xkbStateKeymap,
-  xkbStateUpdateMask,
-  xkbStateKeySym,
-  xkbStateKeySyms,
-  xkbStateKeyUtf8,
-  xkbStateKeyUtf32,
-  xkbStateKeyLayout,
-  xkbStateKeyLevel,
-
-  -- * XkbStateComponent
+  -- * Update
+  updateMask,
   XkbStateComponent (
-    StateModsDepressed,
-    StateModsLatched,
-    StateModsLocked,
-    StateModsEffective,
-    StateLayoutDepressed,
-    StateLayoutLatched,
-    StateLayoutLocked,
-    StateLayoutEffective,
-    StateLeds
+    ModsDepressed,
+    ModsLatched,
+    ModsLocked,
+    ModsEffective,
+    LayoutDepressed,
+    LayoutLatched,
+    LayoutLocked,
+    LayoutEffective,
+    Leds
   ),
 
-  -- * Exceptions
-  XkbStateException (..),
+  -- * Query
+  keyGetOneSym,
+  keyGetSyms,
+  keyGetUtf8,
+  keyGetUtf32,
+  keyGetLayout,
+  keyGetLevel,
+  getStateKeymap,
 ) where
 
 import Control.Monad
@@ -44,31 +41,25 @@ import Foreign.C
 import Foreign.C.ConstPtr
 
 import Text.XkbCommon.FFI
+import Text.XkbCommon.Internal
 import Text.XkbCommon.Keymap
-
--- | Exceptions related to 't:XkbState'.
-data XkbStateException
-  = XkbStateCreationFailed {keymap :: !XkbKeymap}
-  deriving (Eq, Ord, Show, Generic)
-
-instance Exception XkbStateException
 
 -- | Create a new "XkbState" object for the given keymap.
 --
 -- Throws "XkbStateCreationFailed" on failure.
-createXkbState :: XkbKeymap -> IO XkbState
-createXkbState km = withForeignPtr km.unwrap $ \kmPtr ->
-  _xkbStateNew kmPtr
-    >>= xkbThrowIfNull' (XkbStateCreationFailed km)
-    >>= fmap XkbState . newForeignPtr _xkbStateUnref
+newState :: XkbKeymap -> IO XkbState
+newState km = withForeignPtr km.unwrap $ \kmPtr ->
+  c_xkb_state_new kmPtr
+    >>= throwIfNullEx (XkbStateCreationFailed km)
+    >>= fmap XkbState . newForeignPtr c_xkb_state_unref
 
 -- | Get the keymap that was used to construct this state.
-xkbStateKeymap :: XkbState -> IO XkbKeymap
-xkbStateKeymap xst = withForeignPtr xst.unwrap $ \xstPtr ->
-  _xkbStateGetKeymap xstPtr >>= refKeymap >>= wrapKeymap
+getStateKeymap :: XkbState -> IO XkbKeymap
+getStateKeymap xst = withForeignPtr xst.unwrap $ \xstPtr ->
+  c_xkb_state_get_keymap xstPtr >>= keymapIncreaseRefCount >>= keymapFromPtr
 
 -- | Update a keyboard state from a set of explicit masks.
-xkbStateUpdateMask ::
+updateMask ::
   XkbState
   -> ModMask
   -- ^ Depressed modifiers
@@ -83,29 +74,30 @@ xkbStateUpdateMask ::
   -> LayoutIndex
   -- ^ Locked layout
   -> IO XkbStateComponent
-xkbStateUpdateMask xst m1 m2 m3 l1 l2 l3 = withForeignPtr xst.unwrap $ \xstPtr ->
-  _xkbStateUpdateMask xstPtr m1 m2 m3 l1 l2 l3
+  -- ^ Bitmask of the changed properties
+updateMask xst m1 m2 m3 l1 l2 l3 = withForeignPtr xst.unwrap $ \xstPtr ->
+  c_xkb_state_update_mask xstPtr m1 m2 m3 l1 l2 l3
 
 -- | Get the single keysym obtained from pressing a particular key in a
 -- given keyboard state.
-xkbStateKeySym :: XkbState -> Keycode -> IO KeySym
-xkbStateKeySym xst kc = withForeignPtr xst.unwrap $ \xstPtr ->
-  _xkbStateKeyGetOneSym xstPtr kc
+keyGetOneSym :: XkbState -> Keycode -> IO KeySym
+keyGetOneSym xst kc = withForeignPtr xst.unwrap $ \xstPtr ->
+  c_xkb_state_key_get_one_sym xstPtr kc
 
 -- | Get the keysyms obtained from pressing a particular key in a given
 -- keyboard state.
-xkbStateKeySyms :: XkbState -> Keycode -> IO [KeySym]
-xkbStateKeySyms xst kc = withForeignPtr xst.unwrap $ \xstPtr ->
+keyGetSyms :: XkbState -> Keycode -> IO [KeySym]
+keyGetSyms xst kc = withForeignPtr xst.unwrap $ \xstPtr ->
   alloca $ \keyPtr -> do
-    n <- _xkbStateKeyGetSyms xstPtr kc keyPtr
+    n <- c_xkb_state_key_get_syms xstPtr kc keyPtr
     case n of
       0 -> return []
       _ -> peekArray (fromIntegral n) . unConstPtr =<< peek keyPtr
 
 -- | Get the Unicode/UTF-8 string obtained from pressing a particular key
 -- in a given keyboard state.
-xkbStateKeyUtf8 :: XkbState -> Keycode -> IO String
-xkbStateKeyUtf8 xst kc = withForeignPtr xst.unwrap $ \xstPtr -> do
+keyGetUtf8 :: XkbState -> Keycode -> IO String
+keyGetUtf8 xst kc = withForeignPtr xst.unwrap $ \xstPtr -> do
   len <- c_xkb_state_key_get_utf8 xstPtr kc nullPtr 0
   allocaArray (len + 1) $ \buf -> do
     _ <- c_xkb_state_key_get_utf8 xstPtr kc buf (fromIntegral len + 1)
@@ -116,42 +108,42 @@ xkbStateKeyUtf8 xst kc = withForeignPtr xst.unwrap $ \xstPtr -> do
 --
 -- Returns the UTF-32 representation for the key, if it consists of only
 -- a single codepoint.  Otherwise, returns 0.
-xkbStateKeyUtf32 :: XkbState -> Keycode -> IO Word32
-xkbStateKeyUtf32 xst kc = withForeignPtr xst.unwrap $ \xstPtr ->
+keyGetUtf32 :: XkbState -> Keycode -> IO Word32
+keyGetUtf32 xst kc = withForeignPtr xst.unwrap $ \xstPtr ->
   c_xkb_state_key_get_utf32 xstPtr kc
 
 -- | Get the effective layout index for a key in a given keyboard state.
-xkbStateKeyLayout :: XkbState -> Keycode -> IO (Maybe LayoutIndex)
-xkbStateKeyLayout xst kc = withForeignPtr xst.unwrap $ \xstPtr -> do
+keyGetLayout :: XkbState -> Keycode -> IO (Maybe LayoutIndex)
+keyGetLayout xst kc = withForeignPtr xst.unwrap $ \xstPtr -> do
   r <- c_xkb_state_key_get_layout xstPtr kc
   return $! do
-    guard $ r /= LayoutIndexInvalid
+    guard $ r /= LayoutInvalid
     return r
 
 -- | Get the effective shift level for a key in a given keyboard state and layout.
 --
 -- See also: xkb_keymap_num_levels_for_key
-xkbStateKeyLevel :: XkbState -> Keycode -> LayoutIndex -> IO (Maybe LevelIndex)
-xkbStateKeyLevel xst kc li = withForeignPtr xst.unwrap $ \xstPtr -> do
+keyGetLevel :: XkbState -> Keycode -> LayoutIndex -> IO (Maybe LevelIndex)
+keyGetLevel xst kc li = withForeignPtr xst.unwrap $ \xstPtr -> do
   r <- c_xkb_state_key_get_level xstPtr kc li
   return $! do
-    guard $ r /= LevelIndexInvalid
+    guard $ r /= LevelInvalid
     return r
 
 -- * Internals
 
 foreign import capi unsafe "xkbcommon/xkbcommon.h &xkb_state_unref"
-  _xkbStateUnref :: FunPtr (Ptr XkbState -> IO ())
+  c_xkb_state_unref :: FunPtr (Ptr XkbState -> IO ())
 
 foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_state_new"
-  _xkbStateNew :: Ptr XkbKeymap -> IO (Ptr XkbState)
+  c_xkb_state_new :: Ptr XkbKeymap -> IO (Ptr XkbState)
 
 -- | Note: the lifetime of the keymap is tied to the state by default!
 foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_state_get_keymap"
-  _xkbStateGetKeymap :: Ptr XkbState -> IO (Ptr XkbKeymap)
+  c_xkb_state_get_keymap :: Ptr XkbState -> IO (Ptr XkbKeymap)
 
 foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_state_update_mask"
-  _xkbStateUpdateMask ::
+  c_xkb_state_update_mask ::
     Ptr XkbState
     -> ModMask
     -> ModMask
@@ -162,10 +154,10 @@ foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_state_update_mask"
     -> IO XkbStateComponent
 
 foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_state_key_get_one_sym"
-  _xkbStateKeyGetOneSym :: Ptr XkbState -> Keycode -> IO KeySym
+  c_xkb_state_key_get_one_sym :: Ptr XkbState -> Keycode -> IO KeySym
 
 foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_state_key_get_syms"
-  _xkbStateKeyGetSyms :: Ptr XkbState -> Keycode -> Ptr (ConstPtr KeySym) -> IO CInt
+  c_xkb_state_key_get_syms :: Ptr XkbState -> Keycode -> Ptr (ConstPtr KeySym) -> IO CInt
 
 foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_state_key_get_utf8"
   c_xkb_state_key_get_utf8 :: Ptr XkbState -> Keycode -> CString -> CSize -> IO Int

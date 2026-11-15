@@ -14,10 +14,21 @@ import Control.Monad.Fix
 import Data.Map qualified as M
 import HSWM.Core
 import HSWM.Operations
-import River qualified as R
 import Text.XkbCommon as XKBC
 import WL.Client qualified as WL
 import WL.Wlr.InputMethod.Unstable.V2.Client qualified as Wlr
+
+data GrabbedKey
+  = -- | Grabbed key
+    GrabbedKeySym {pressed :: !Bool, keysym :: !KeySym}
+  | -- | Grabbed modifier(s) changed
+    GrabbedModifiers {modifiers :: !ModMask}
+  deriving (Eq, Ord, Show, Read, Generic)
+  deriving (ToJSON)
+
+data Done = Done
+  deriving (Eq, Ord, Show, Generic)
+  deriving (ToJSON)
 
 type HasGrabCtx env m = (MonadH m, env ~ HConf, MonadStateGlobal env m, MonadReader env m, MonadLogger m, MonadUnliftIO m, MonadFix m)
 
@@ -37,20 +48,6 @@ data GrabIM = GrabIM
 instance Show GrabIM where
   show x = "GrabIM{" ++ show x.inputMethod ++ "," ++ show x.inputMethodListener ++ "}"
 
-data GrabbedKey
-  = -- | Grabbed key
-    GK {state :: !Word, keycode :: !Word, keysym :: !Word}
-  | -- | Grabbed modifier(s)
-    GMod {mods :: !Word}
-  deriving (Eq, Ord, Show, Read, Generic)
-  deriving (ToJSON)
-
-data Done = Done
-  deriving (Eq, Ord, Show, Generic)
-  deriving (ToJSON)
-
-instance Default GrabbedKey where def = GK 0 0 0
-
 -- | Grab keyboard and process events until ungrabbed.
 withKeyboardGrab ::
   (Show acc, event ~ Either Done GrabbedKey, HasGrabCtx env m) =>
@@ -68,7 +65,8 @@ withKeyboardGrab ::
   -> m ()
 withKeyboardGrab seat mods keys fun acc0 = do
   grabIM <- lookupGrabIM seat
-  -- XXX: fork to avoid cancellation on the first "key released" event
+  -- NOTE: forking to avoid cancellation on the first key release
+  -- (when called from a key binding callback)
   void . async $ withIM grabIM $ do
     rdChan <- atomically $ dupTChan grabIM.bcastChan
     withActive grabIM $ do
@@ -141,21 +139,22 @@ newGrabIM manager seat = do
   imKeyboardGrabListener <- WL.createListener $ \e -> runInIO $ case e of
     Wlr.InputMethodKeyboardGrabKeymap _ _ _fmt fd sz -> do
       io $ do
-        ctx <- createXkbContext def
-        kmap <- createKeymapFromFd ctx (fi fd) (fi sz) False KeymapFormatTextV1
-        xst <- createXkbState kmap
+        ctx <- newContext def
+        kmap <- keymapFromFd ctx TextV1 (fi fd) (fi sz) False
+        xst <- newState kmap
         _ <- tryTakeMVar xkbState
         putMVar xkbState xst
     Wlr.InputMethodKeyboardGrabModifiers _ _ _ depressed latched locked group -> do
       st <- readMVar xkbState
-      _ <- io $ xkbStateUpdateMask st (fi depressed) (fi latched) (fi locked) 0 0 (fi group)
-      let it = GMod{mods = fi depressed}
-      logDebug $ "grab: modifiers grabbed" :# ["mod" .= it]
-      atomically $ writeTChan bcastChan $ Right it
+      changed <- io $ updateMask st (fi depressed) (fi latched) (fi locked) 0 0 (fi group)
+      when (changed .&. ModsEffective > 0) $ do
+        let it = GrabbedModifiers $ fi depressed
+        logDebug $ "grab: modifiers grabbed" :# ["mod" .= it]
+        atomically $ writeTChan bcastChan $ Right it
     Wlr.InputMethodKeyboardGrabKey _ _ _ _time key st -> do
       xst <- readMVar xkbState
-      keysym <- io $ xkbStateKeySym xst (fi $ key + 8)
-      let it = GK{state = fi $ R.fromCEnum st, keysym = fi keysym, keycode = fi key}
+      keysym <- io $ keyGetOneSym xst (fi $ key + 8)
+      let it = GrabbedKeySym{pressed = WL.fromCEnum st == 1, keysym = fi keysym}
       logDebug $ "grab: key grabbed" :# ["key" .= it]
       atomically $ writeTChan bcastChan $ Right it
     Wlr.InputMethodKeyboardGrabRepeatInfo{} -> pure () -- pTrace e -- ignored

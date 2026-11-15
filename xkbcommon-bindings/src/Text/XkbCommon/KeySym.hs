@@ -1,54 +1,58 @@
 -- |
+-- Module      : Text.XkbCommon.KeySym
 -- Description : Key symbol (KeySym) utilities
+-- Copyright   : (c) Samuli Thomasson, 2026
+--
+-- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
+-- Stability   : unstable
+-- Portability : unportable
 --
 -- See also "Text.XkbCommon.KeySyms".
 module Text.XkbCommon.KeySym (
-  -- * KeySym
   KeySym,
-  keysymMax,
+
+  -- * KeySym to\/from name
+  keysymFromName,
+  keysymFromNameCaseSensitive,
   keysymName,
 
-  -- * KeySym from name
-  keysymFromName,
-  keysymFromNameCaseInsensitive,
-
-  -- ** Unsafe
+  -- ** Partial variants
   keysymFromNameUnsafe,
   keysymNameUnsafe,
   KeySymException (..),
 
-  -- * KeySym to upper/lower
+  -- * KeySym to\/from UTF-8\/32
+  keysymToUTF8,
+  keysymFromUTF32,
+  keysymToUTF32,
+
+  -- * Uppercase\/lowercase
   keysymToUpper,
   keysymToLower,
+  -- Modifiers
 
-  -- * KeySym from/to UTF-32
-  keysymFromUtf32,
-  keysymToUtf32,
+  -- ** Real modifiers names
+  pattern ModShift,
+  pattern ModCaps,
+  pattern ModCtrl,
+  pattern ModMod1,
+  pattern ModMod2,
+  pattern ModMod3,
+  pattern ModMod4,
+  pattern ModMod5,
 
-  -- * KeySym to UTF-8
-  keysymToUtf8,
-
-  -- * Real modifiers names
-  pattern ModNameShift,
-  pattern ModNameCaps,
-  pattern ModNameCtrl,
-  pattern ModNameMod1,
-  pattern ModNameMod2,
-  pattern ModNameMod3,
-  pattern ModNameMod4,
-  pattern ModNameMod5,
-
-  -- * Virtual modifier names
-  pattern ModNameAlt,
-  pattern ModNameHyper,
-  pattern ModNameLevel3,
-  pattern ModNameLevel5,
-  pattern ModNameMeta,
-  pattern ModNameNum,
-  pattern ModNameScroll,
-  pattern ModNameSuper,
+  -- ** Virtual modifier names
+  pattern ModAlt,
+  pattern ModHyper,
+  pattern ModLevel3,
+  pattern ModLevel5,
+  pattern ModMeta,
+  pattern ModNum,
+  pattern ModScroll,
+  pattern ModSuper,
 ) where
 
+import Control.Applicative
 import Control.Exception
 import Data.Maybe
 import Foreign
@@ -60,17 +64,19 @@ import Text.XkbCommon.FFI
 pattern KeySymValid :: KeySym -> Maybe KeySym
 pattern KeySymValid ksym <- Just ksym
   where
-    KeySymValid x = if x == keysymNoSymbol then Nothing else Just x
+    KeySymValid x = if x > keysymMax || x == keysymNoSymbol then Nothing else Just x
 
--- | Get a keysym from its name.
+-- | Get a keysym by name (case-insensitive).
 keysymFromName :: String -> Maybe KeySym
 keysymFromName name = unsafePerformIO $ withCString name $ \c_name ->
-  return $! KeySymValid $ c_keysymFromName c_name keysymNoFlags
+  return $!
+    KeySymValid (c_keysym_from_name c_name keysymNoFlags)
+      <|> KeySymValid (c_keysym_from_name c_name keysymCaseInsensitive)
 
--- | Get a keysym from its name (case-insensitive).
-keysymFromNameCaseInsensitive :: String -> Maybe KeySym
-keysymFromNameCaseInsensitive name = unsafePerformIO $ withCString name $ \c_name ->
-  return $! KeySymValid $ c_keysymFromName c_name keysymCaseInsensitive
+-- | Get a keysym by name (case sensitive).
+keysymFromNameCaseSensitive :: String -> Maybe KeySym
+keysymFromNameCaseSensitive name = unsafePerformIO $ withCString name $ \c_name ->
+  return $! KeySymValid $ c_keysym_from_name c_name keysymNoFlags
 
 -- | Get the name of a 'KeySym'.
 keysymName :: KeySym -> Maybe String
@@ -78,14 +84,14 @@ keysymName k = unsafePerformIO $ go 64
   where
     go size = allocaBytes size $ \buf ->
       case c_keysymGetName k buf (fromIntegral size) of
-        -1 -> return Nothing
         len
-          | len >= fromIntegral size - 1 -> go (size * 2)
+          | len <= 0 -> return Nothing
+          | len + 1 > fromIntegral size -> go (size * 2)
           | otherwise -> Just <$> peekCStringLen (buf, fromIntegral len)
 
 -- |  Get the Unicode/UTF-8 representation of a 'KeySym'.
-keysymToUtf8 :: KeySym -> Maybe String
-keysymToUtf8 k = unsafePerformIO $ go 5
+keysymToUTF8 :: KeySym -> Maybe String
+keysymToUTF8 k = unsafePerformIO $ go 5
   where
     go size = allocaBytes size $ \buf ->
       case c_keysymToUtf8 k buf (fromIntegral size) of
@@ -94,19 +100,19 @@ keysymToUtf8 k = unsafePerformIO $ go 5
         len -> Just <$> peekCStringLen (buf, min size (fromIntegral len) - 1)
 
 -- | Map a KeySym into a UTF-32 codepoint.
-keysymToUtf32 :: KeySym -> Maybe Word32
-keysymToUtf32 sym = case c_keysymToUtf32 sym of
+keysymToUTF32 :: KeySym -> Maybe Word32
+keysymToUTF32 sym = case c_keysymToUtf32 sym of
   0 -> Nothing
   r -> Just r
 
 -- | Map UTF-32 codepoint into a keysym.
-keysymFromUtf32 :: Word32 -> Maybe KeySym
-keysymFromUtf32 x = KeySymValid $! c_keysymFromUtf32 x
+keysymFromUTF32 :: Word32 -> Maybe KeySym
+keysymFromUTF32 x = KeySymValid $! c_keysymFromUtf32 x
 
 -- | Exceptions thrown by unsafe keysym functions.
 data KeySymException
-  = NoSuchKeySym {kseKeysym :: !KeySym}
-  | KeySymNotFound {kseName :: !String}
+  = NoSuchKeySym !KeySym
+  | KeySymNotFound !String
   deriving (Eq, Ord, Show, Read, Generic)
 
 instance Exception KeySymException
@@ -124,7 +130,7 @@ keysymNameUnsafe k = fromMaybe err $! keysymName k
     err = throw $ NoSuchKeySym k
 
 foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keysym_from_name"
-  c_keysymFromName :: CString -> CUInt -> KeySym
+  c_keysym_from_name :: CString -> CUInt -> KeySym
 
 foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_keysym_get_name"
   c_keysymGetName :: KeySym -> CString -> CSize -> CInt

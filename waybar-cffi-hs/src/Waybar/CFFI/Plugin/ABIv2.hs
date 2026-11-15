@@ -184,8 +184,8 @@ parseConfig (ConstPtr ptr) size = do
               msg ++ " (while parsing entry '" ++ T.unpack key ++ "':" ++ show bs ++ ")"
 
 -- | Get waybar version.
-getWaybarVersion :: (HasCallStack) => InitInfo -> IO Version
-getWaybarVersion InitInfo{waybar_version = ConstPtr ptr} = do
+parseWaybarVersion :: (HasCallStack) => InitInfo -> IO Version
+parseWaybarVersion InitInfo{waybar_version = ConstPtr ptr} = do
   str <- peekCString ptr
   case reverse $ readP_to_S parseVersion str of
     (ver, "") : _ -> return ver

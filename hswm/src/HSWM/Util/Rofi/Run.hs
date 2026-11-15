@@ -272,7 +272,7 @@ launchRofi :: forall m. (MonadRofi m) => RofiPromptConfig () DummyOutput -> m ()
 launchRofi rp = do
   pc <- setStdin nullStream . setStdout nullStream <$> rofiToProc rp
   logProcessConfig "rofi-mode" pc
-  sdSpawnProcessConfig def pc
+  sdSpawnProcessConfig (def & sdType .~ flagSet "forking") pc
 
 -- | Launch a prompt (synchronous) with input and read the output.
 runRofi ::

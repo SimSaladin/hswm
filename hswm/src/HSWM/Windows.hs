@@ -20,9 +20,9 @@ module HSWM.Windows (
 import HSWM.Core hiding (handleEvent)
 import HSWM.Operations
 import HSWM.StackSet qualified as W
+import HSWM.Util.StackSet.Lens qualified as L
 import HSWM.Wayland
 import River qualified as R
-import qualified HSWM.Util.StackSet.Lens as L
 
 import Data.List qualified as L
 import Data.Map qualified as M
@@ -187,7 +187,7 @@ manage_ = do
   -- Raise the top-most window in the stack to the front...
   whenJust (W.peek ws) $ \w -> do
     manageWindowBorder w =<< view (config . focusedBorder)
-    when (W.peek old /= Just w) $ windowPlaceTop w
+    when (W.peek old /= Just w && (null frects || w `elem` map fst frects)) $ windowPlaceTop w
     -- update focus
     setTopFocus w
 

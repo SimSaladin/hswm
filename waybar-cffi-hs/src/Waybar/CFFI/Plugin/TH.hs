@@ -35,7 +35,6 @@ import Foreign
 import Foreign.C
 import Foreign.C.ConstPtr (ConstPtr (..))
 import GHC.Exts (inline)
-import GI.Gtk qualified as Gtk
 import Language.Haskell.TH
 import Language.Haskell.TH.Syntax
 import System.IO (hPrint, stderr)
@@ -61,7 +60,7 @@ makeCFFIModule ty rtsFlags = do
   globalN <- newName "global"
   join
     <$> sequence
-      [ mkGlobalVar globalN [t|EnvGlobal $modType|] [|EnvGlobal <$> newIORef undefined <*> newIORef mempty|]
+      [ mkGlobalVar globalN [t|EnvGlobal $modType|] [|newEnvGlobal|]
       , mkExport "plugin_runtime_init" [t|IO ()|] [|runtimeInit $(varE globalN)|]
       , mkExport "plugin_runtime_destroy" [t|IO ()|] [|runtimeDeinit $(varE globalN)|]
       , mkExport "wbcffi_init" [t|Init $modTypeSP|] [|instanceInit $(varE globalN)|]
@@ -132,32 +131,24 @@ forExpD cc str n ty = ForeignD . ExportF cc str n <$> ty
 runtimeInit :: forall plugin. (WaybarPlugin plugin) => EnvGlobal plugin -> IO ()
 runtimeInit env = do
   g <- runContextT env $ initGlobal @plugin
-  writeIORef env._global g
+  writeIORef (getField @"GlobalState" env) g
 
 runtimeDeinit :: forall plugin. (WaybarPlugin plugin) => EnvGlobal plugin -> IO ()
 runtimeDeinit env = do
-  g <- readIORef env._global
+  g <- readIORef $ getField @"GlobalState" env
   runContextT env $ deinitGlobal @plugin g
 
-instanceInit ::
-  forall plugin.
-  (WaybarPlugin plugin) =>
-  EnvGlobal plugin
-  -> Init (StablePtr (Env plugin))
+instanceInit :: (WaybarPlugin plugin) => EnvGlobal plugin -> Init (StablePtr (Env plugin))
 {-# INLINE instanceInit #-}
-instanceInit genv@EnvGlobal{..} (ConstPtr infoPtr) cep csize = do
+instanceInit genv (ConstPtr infoPtr) cep csize = do
   info <- peek infoPtr
-  let IntPtr instId = ptrToIntPtr $! wbcffi_module info
-  instWbVersion <- getWaybarVersion info
-  instConfig <- parseConfig cep csize
-  instState <- newIORef =<< runContextT genv (pluginStateInit instConfig)
-  instRootWidget <- mkGetRootWidget (get_root_widget info) (wbcffi_module info) >>= Gtk.newObject Gtk.Container
-  let instQueueUpdate = mkQueueUpdate (queue_update info) (wbcffi_module info)
-  res <- E.try $ runContextT Env{instData = undefined, ..} init
+  conf <- parseConfig cep csize
+  env0 <- newEnv genv info conf
+  res <- E.try $ runContextT env0 init
   case res of
-    Right instData -> do
-      let env = Env{..}
-      atomicModifyIORef _instances $ \xs -> (env : xs, ())
+    Right idata -> do
+      let env = env0 `setInstanceData` idata
+      atomicModifyIORef (getField @"GlobalInstances" genv) $ \xs -> (env : xs, ())
       newStablePtr env
     Left (ex :: E.SomeException) -> do
       hPrint stderr ex
@@ -172,7 +163,7 @@ instanceRefresh envPtr = withInstEnv envPtr . flip runContextT . refresh . fromI
 
 instanceDestroy :: (WaybarPlugin a) => DeInit (StablePtr (Env a))
 instanceDestroy envPtr = withInstEnv envPtr $ \env -> do
-  atomicModifyIORef env._instances $ \xs -> (filter (/= env) xs, ())
+  atomicModifyIORef (getField @"GlobalInstances" env) $ \xs -> (filter (/= env) xs, ())
   runContextT env deinit `E.finally` freeStablePtr envPtr
 
 instanceDoAction :: (WaybarPlugin a) => DoAction (StablePtr (Env a))

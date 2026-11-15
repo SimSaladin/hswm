@@ -1,28 +1,31 @@
+{-# OPTIONS_HADDOCK hide, not-home #-}
 {-# LANGUAGE NoFieldSelectors #-}
+{-# LANGUAGE LambdaCase #-}
 
+-- |
+-- FFI bindings to @xkbcommon.h@ via hsc2hs
 module Text.XkbCommon.FFI
   ( module Text.XkbCommon.FFI
   , Generic(Rep)
   , Exception
   ) where
 
+import           Control.Monad
 import           Control.Exception
-import           Control.Monad (when)
 import           Data.Data
 import           Data.Default
 import qualified Data.List as L
 import           Data.Maybe
 import           Data.String
+import qualified Data.Char as C
 import           Foreign
 import           Foreign.C
 import           GHC.Generics
+import           Text.Read
+import qualified Text.ParserCombinators.ReadPrec as R
+import qualified Text.ParserCombinators.ReadP as R hiding (pfail)
 
 #include <xkbcommon/xkbcommon.h>
-
-xkbThrowIfNull' :: Exception e => e -> Ptr a -> IO (Ptr a)
-xkbThrowIfNull' ex res = do
-  when (res == nullPtr) $ throwIO ex
-  return res
 
 -- | Context log level.
 data LogLevel
@@ -33,58 +36,108 @@ data LogLevel
   | LevelDebug
   deriving (Eq, Ord, Show, Read, Generic, Data)
 
--- | Layout option.
-newtype OptionSpec = OptionSpec { optionOption :: String }
-  deriving (Eq, Ord, Show, Read, Generic, Data)
-
--- | A layout name, and possibly variant.
-data LayoutSpec = LayoutSpec
-  { layoutLayout  :: String
-  , layoutVariant :: Maybe String
-  , layoutOptions :: [OptionSpec] -- ^ Options for only this layout.
-  } deriving (Eq, Ord, Show, Read, Generic, Data)
+instance Enum LogLevel where
+  toEnum #{const XKB_LOG_LEVEL_CRITICAL}  = LevelCritical
+  toEnum #{const XKB_LOG_LEVEL_ERROR}     = LevelError
+  toEnum #{const XKB_LOG_LEVEL_WARNING}   = LevelWarning
+  toEnum #{const XKB_LOG_LEVEL_INFO}      = LevelInfo
+  toEnum #{const XKB_LOG_LEVEL_DEBUG}     = LevelDebug
+  toEnum _                                = LevelInfo
+  fromEnum LevelCritical = #{const XKB_LOG_LEVEL_CRITICAL}
+  fromEnum LevelError    = #{const XKB_LOG_LEVEL_ERROR}
+  fromEnum LevelWarning  = #{const XKB_LOG_LEVEL_WARNING}
+  fromEnum LevelInfo     = #{const XKB_LOG_LEVEL_INFO}
+  fromEnum LevelDebug    = #{const XKB_LOG_LEVEL_DEBUG}
 
 fromLogLevel :: LogLevel -> CUInt
-fromLogLevel level =
-  case level of
-    LevelCritical -> #{const XKB_LOG_LEVEL_CRITICAL}
-    LevelError    -> #{const XKB_LOG_LEVEL_ERROR}
-    LevelWarning  -> #{const XKB_LOG_LEVEL_WARNING}
-    LevelInfo     -> #{const XKB_LOG_LEVEL_INFO}
-    LevelDebug    -> #{const XKB_LOG_LEVEL_DEBUG}
+fromLogLevel = fromIntegral . fromEnum
+
+-- | A layout name, and possibly variant.
+--
+-- @
+-- "us(intl)" { options = [ "lv5:ralt_switch" ] } :: Layout
+-- @
+data Layout = Layout
+  { baseLayout :: String -- ^ Name of the base layout.
+  , variant :: Maybe String
+  , options :: [LayoutOption] -- ^ Options for only this layout.
+  } deriving (Eq, Ord, Show, Generic, Data)
+
+fromLayout :: Layout -> String
+fromLayout l = l.baseLayout ++ maybe "" (\v -> "(" ++ v ++ ")") l.variant
+
+-- | Layout option.
+data LayoutOption = LayoutOption
+  { prefix :: String
+  , name :: String
+  }
+  deriving (Eq, Ord, Show, Generic, Data)
+
+fromOption :: LayoutOption -> String
+fromOption (LayoutOption pre n) = pre ++ ':' : n
 
 -- |
 -- @
--- "us"       == LayoutSpec "us" Nothing []
--- "us(intl)" == LayoutSpec "us" (Just "intl") []
+-- "us"       == Layout "us" Nothing []
+-- "us(intl)" == Layout "us" (Just "intl") []
 -- @
-instance IsString LayoutSpec where
-  fromString s =
-    case L.span (/= '(') s of
-      (a, '(' : b) -> LayoutSpec a (Just $ L.init b) []
-      _ -> LayoutSpec s Nothing []
+instance Read Layout where
+  readPrec = parens $ R.step $ do
+    bl <- R.lift $ R.munch1 isName <* R.skipSpaces
+    v <- R.lift $ R.option Nothing $ Just <$> R.between (R.char '(') (R.char ')') (R.skipSpaces *> R.munch1 isName <* R.skipSpaces)
+    let os = []
+    return $ Layout bl v os
+      where
+        isName = liftA2 (||) C.isAlphaNum (`elem` "-_+")
+
+instance IsString Layout where
+  fromString s = fromMaybe (error err) $ readMaybe s
+    where err = "Layout: no parse: " ++ s
 
 -- |
 -- @
--- "foo:bar" == OptionSpec "foo:bar"
+-- "foo:bar" == LayoutOption "foo:bar"
+-- "foo:bar!2" == LayoutOption "foo:bar" (layout-specificity ignored)
 -- @
-instance IsString OptionSpec where
-  fromString s =
-    case L.span (/= '!') s of
-      (x, _) -> OptionSpec x
+instance Read LayoutOption where
+  readPrec = parens $ R.step $ do
+    pre <- lexIdent
+    lexP >>= guard . (== Symbol ":")
+    opt <- R.lift $ R.munch1 isName
+    R.lift $ R.optional $ R.char '!' *> R.munch1 C.isNumber
+    return $ LayoutOption pre opt
+      where
+        lexIdent = lexP >>= \case
+          Ident x -> pure x
+          _ -> R.pfail
+        isName = liftA2 (||) C.isAlphaNum (`elem` "-_+")
 
--- | @struct xkb_rule_names@
+instance IsString LayoutOption where
+  fromString s = fromMaybe (error err) $ readMaybe s
+    where err = "LayoutOption: no parse: " ++ s
+
+-- | Use "def" to initialize a new empty instance of this structure.
+-- At least one layout is required.
+--
+-- C: @struct xkb_rule_names@
 data XkbRuleNames = XkbRuleNames
-  { rules   :: !String
-  -- ^ The rules file to use.
-  , model   :: !String
-  -- ^ Keyboard model by which to interpret keycodes and LEDs.
-  , layouts :: ![LayoutSpec]
+  { rules :: !String
+  -- ^ The rules file to use. For defaults use @""@.
+
+  , model :: !String
+  -- ^ Keyboard model by which to interpret keycodes and LEDs. For default use @""@.
+
+  , layouts :: ![Layout]
   -- ^ Layouts in this keymap (+ optionally variants).
-  , options :: Maybe [OptionSpec]
+
+  , options :: Maybe [LayoutOption]
   -- ^ Layout options.
+  --
   -- If 'Nothing', the default options are used.
+  --
   -- If 'Just []', no options are used.
+  --
+  -- Note that there can in addition also be layout-specific options defined per each layout.
   }
   deriving stock (Eq, Ord, Show, Read, Generic, Data)
   deriving anyclass (Default)
@@ -94,15 +147,15 @@ withXkbRuleNames x f = allocaBytesAligned (#size struct xkb_rule_names) (#alignm
     withCString x.rules $ \c_rules ->
     withCString x.model $ \c_model ->
     -- Comma-separated list of layouts (languages) to include in the keymap.
-    withCString layout $ \c_layout ->
+    withCString bls $ \c_layout ->
     -- Comma-separated list of variants, one per layout.
     -- Should either be empty or have the same number of values as the number of
     -- layouts.
-    withCString variant $ \c_variant ->
+    withCString vs $ \c_variant ->
     -- Comma-separated list of options; "ns:option!2"
     -- If NULL, a default value is used.
     -- If empty string "", no options are used.
-    withOptions x.options layoutOpts $ \c_options -> do
+    withOptions x.options $ \c_options -> do
       #{poke struct xkb_rule_names, rules} p c_rules
       #{poke struct xkb_rule_names, model} p c_model
       #{poke struct xkb_rule_names, layout} p c_layout
@@ -110,14 +163,12 @@ withXkbRuleNames x f = allocaBytesAligned (#size struct xkb_rule_names) (#alignm
       #{poke struct xkb_rule_names, options} p c_options
       f $ castPtr p
   where
-    layout = L.intercalate "," $ map (.layoutLayout) x.layouts
-    variant = L.intercalate "," $ map (\l -> fromMaybe "" l.layoutVariant) x.layouts
+    bls = L.intercalate "," $ map (.baseLayout) x.layouts
+    vs = L.intercalate "," $ map (fromMaybe "" . (.variant)) x.layouts
+    lopts = [ fromOption o ++ '!' : show i | (i, l) <- zip [(1::Int)..] x.layouts, o <- l.options ]
 
-    layoutOpts = [ o.optionOption ++ "!" ++ show i | (i, l) <- zip [(1::Int)..] x.layouts, o <- l.layoutOptions ]
-
-    withOptions Nothing     [] = ($ nullPtr)
-    withOptions Nothing     xs = withCString $ L.intercalate "," xs
-    withOptions (Just opts) xs = withCString $ L.intercalate "," $ map (.optionOption) opts ++ xs
+    withOptions Nothing | null lopts = ($ nullPtr)
+    withOptions opts = withCString $ L.intercalate "," $ maybe [] (map fromOption) opts ++ lopts
 
 -- * Types
 
@@ -169,20 +220,20 @@ pattern KeycodeInvalid :: Keycode
 pattern KeycodeInvalid = #{const XKB_KEYCODE_INVALID}
 
 -- | Invalid layout index
-pattern LayoutIndexInvalid :: LayoutIndex
-pattern LayoutIndexInvalid = #{const XKB_LAYOUT_INVALID}
+pattern LayoutInvalid :: LayoutIndex
+pattern LayoutInvalid = #{const XKB_LAYOUT_INVALID}
 
 -- | Invalid level index
-pattern LevelIndexInvalid :: LevelIndex
-pattern LevelIndexInvalid = #{const XKB_LEVEL_INVALID}
+pattern LevelInvalid :: LevelIndex
+pattern LevelInvalid = #{const XKB_LEVEL_INVALID}
 
 -- | Invalid modifier index
-pattern ModIndexInvalid :: ModIndex
-pattern ModIndexInvalid = #{const XKB_MOD_INVALID}
+pattern ModInvalid :: ModIndex
+pattern ModInvalid = #{const XKB_MOD_INVALID}
 
 -- | Invalid LED index
-pattern LedIndexInvalid :: LedIndex
-pattern LedIndexInvalid = #{const XKB_LED_INVALID}
+pattern LedInvalid :: LedIndex
+pattern LedInvalid = #{const XKB_LED_INVALID}
 
 -- | Maximum 'KeySym' value.
 keysymMax :: KeySym
@@ -195,23 +246,28 @@ keycodeMax = #{const XKB_KEYCODE_MAX}
 keysymNoSymbol :: KeySym
 keysymNoSymbol = #{const XKB_KEY_NoSymbol}
 
+-- | For @xkb_keysym_from_name@
 keysymNoFlags :: CUInt
 keysymNoFlags = #{const XKB_KEYSYM_NO_FLAGS}
 
+-- | For @xkb_keysym_from_name@
 keysymCaseInsensitive :: CUInt
 keysymCaseInsensitive = #{const XKB_KEYSYM_CASE_INSENSITIVE}
 
 -- | The possible keymap formats.
-data XkbKeymapFormat
-  = KeymapFormatTextV1
+data KeymapFormat
+  = TextV1
   -- ^ The classic XKB text format, as generated by `xkbcomp -xkb`.
-  | KeymapFormatTextV2
+  | TextV2
   -- ^ Xkbcommon extensions of the classic XKB text format, **incompatible with X11**.
   deriving stock (Eq, Ord, Show, Read, Enum, Bounded, Generic)
 
-fromKeymapFormat :: XkbKeymapFormat -> CUInt
-fromKeymapFormat KeymapFormatTextV1 = #{const XKB_KEYMAP_FORMAT_TEXT_V1}
-fromKeymapFormat KeymapFormatTextV2 = #{const XKB_KEYMAP_FORMAT_TEXT_V2}
+instance Default KeymapFormat where
+  def = TextV1
+
+fromKeymapFormat :: KeymapFormat -> CUInt
+fromKeymapFormat TextV1 = #{const XKB_KEYMAP_FORMAT_TEXT_V1}
+fromKeymapFormat TextV2 = #{const XKB_KEYMAP_FORMAT_TEXT_V2}
 
 -- | Opaque top level library context object.
 newtype XkbContext = XkbContext { unwrap :: ForeignPtr XkbContext }
@@ -228,116 +284,34 @@ newtype XkbKeymap = XkbKeymap { unwrap :: ForeignPtr XkbKeymap }
   deriving newtype (Eq, Ord)
   deriving stock (Show, Generic, Data)
 
--- | It denotes the configuration values by which a user picks a keymap.
-newtype XkbRmlvoBuilder = XkbRmlvoBuilder { unwrap :: ForeignPtr XkbRmlvoBuilder }
-  deriving newtype (Eq, Ord)
-  deriving stock (Show, Generic, Data)
-
 rmlvoBuilderNoFlags :: CUInt
 rmlvoBuilderNoFlags = #{const XKB_RMLVO_BUILDER_NO_FLAGS}
 
--- | Use 'Data.Default.def' to construct the default options.
-data XkbContextOptions = XkbContextOptions
-  { defaultIncludes :: !Bool
-  -- ^ Whether to create the context with default include paths.
-  --
-  -- Useful to avoid e.g. permission issues when only retrieving a keymap from Wayland/X server.
-  --
-  -- Default: @True@
-  , environmentNames :: !Bool
-  -- ^ Take RMLVO names from the environment.
-  --
-  -- Default: @True@
-  , secureGetEnv :: !Bool
-  -- ^ Whether to enable the use of @secure_getenv@.
-  --
-  -- Default: @True@
-  , contextLogLevel :: !(Maybe LogLevel)
-  -- ^ Override the log level.
-  --
-  -- May also be set via environment variable @XKB_LOG_LEVEL@.
-  --
-  -- Default: @Nothing@
-  , contextLogVerbosity :: !(Maybe Int)
-  -- ^ Between 0 and 10, default verbosity is 0.
-  --
-  -- May also be set via environment variable @XKB_LOG_VERBOSITY@.
-  --
-  -- Default: @Nothing@
-  } deriving (Eq, Ord, Show, Read, Generic, Data)
-
-instance Default XkbContextOptions where
-  def = XkbContextOptions True True True Nothing Nothing
-
-optionsToFlags :: XkbContextOptions -> CUInt
-optionsToFlags opts =
-  #{const XKB_CONTEXT_NO_FLAGS}
-  .|. f (not opts.defaultIncludes)  #{const XKB_CONTEXT_NO_DEFAULT_INCLUDES}
-  .|. f (not opts.environmentNames) #{const XKB_CONTEXT_NO_ENVIRONMENT_NAMES}
-  .|. f (not opts.secureGetEnv)     #{const XKB_CONTEXT_NO_SECURE_GETENV}
-    where
-      f True  x = x
-      f False _ = 0
-
 -- * Real modifiers names
 
--- | Real modifier names:
--- @Shift@
--- @Lock@
--- @Control@
--- @Mod1@
--- @Mod2@
--- @Mod3@
--- @Mod4@
--- @Mod5@
-pattern
-    ModNameShift
-  , ModNameCaps
-  , ModNameCtrl
-  , ModNameMod1
-  , ModNameMod2
-  , ModNameMod3
-  , ModNameMod4
-  , ModNameMod5
-  :: String
-pattern ModNameShift = #{const_str XKB_MOD_NAME_SHIFT} -- "Shift"
-pattern ModNameCaps  = #{const_str XKB_MOD_NAME_CAPS}  -- "Lock"
-pattern ModNameCtrl  = #{const_str XKB_MOD_NAME_CTRL}  -- "Control"
-pattern ModNameMod1  = #{const_str XKB_MOD_NAME_MOD1}  -- "Mod1"
-pattern ModNameMod2  = #{const_str XKB_MOD_NAME_MOD2}  -- "Mod2"
-pattern ModNameMod3  = #{const_str XKB_MOD_NAME_MOD3}  -- "Mod3"
-pattern ModNameMod4  = #{const_str XKB_MOD_NAME_MOD4}  -- "Mod4"
-pattern ModNameMod5  = #{const_str XKB_MOD_NAME_MOD5}  -- "Mod5"
+-- | Real modifier names: @Shift@ @Lock@ @Control@ @Mod1@ @Mod2@ @Mod3@ @Mod4@ @Mod5@
+pattern ModShift , ModCaps , ModCtrl , ModMod1 , ModMod2 , ModMod3 , ModMod4 , ModMod5 :: String
+pattern ModShift = #{const_str XKB_MOD_NAME_SHIFT} -- "Shift"
+pattern ModCaps  = #{const_str XKB_MOD_NAME_CAPS}  -- "Lock"
+pattern ModCtrl  = #{const_str XKB_MOD_NAME_CTRL}  -- "Control"
+pattern ModMod1  = #{const_str XKB_MOD_NAME_MOD1}  -- "Mod1"
+pattern ModMod2  = #{const_str XKB_MOD_NAME_MOD2}  -- "Mod2"
+pattern ModMod3  = #{const_str XKB_MOD_NAME_MOD3}  -- "Mod3"
+pattern ModMod4  = #{const_str XKB_MOD_NAME_MOD4}  -- "Mod4"
+pattern ModMod5  = #{const_str XKB_MOD_NAME_MOD5}  -- "Mod5"
 
 -- * Virtual modifier names
 
--- | Virtual modifier names:
--- @Alt@
--- @Hyper@
--- @LevelThree@
--- @LevelFive@
--- @Meta@
--- @NumLock@
--- @ScrollLock@
--- @Super@
-pattern
-    ModNameAlt
-  , ModNameHyper
-  , ModNameLevel3
-  , ModNameLevel5
-  , ModNameMeta
-  , ModNameNum
-  , ModNameScroll
-  , ModNameSuper
-    :: String
-pattern ModNameAlt     = #{const_str XKB_VMOD_NAME_ALT}     -- "Alt"
-pattern ModNameHyper   = #{const_str XKB_VMOD_NAME_HYPER}   -- "Hyper"
-pattern ModNameLevel3  = #{const_str XKB_VMOD_NAME_LEVEL3}  -- "LevelThree"
-pattern ModNameLevel5  = #{const_str XKB_VMOD_NAME_LEVEL5}  -- "LevelFive"
-pattern ModNameMeta    = #{const_str XKB_VMOD_NAME_META}    -- "Meta"
-pattern ModNameNum     = #{const_str XKB_VMOD_NAME_NUM}     -- "NumLock"
-pattern ModNameScroll  = #{const_str XKB_VMOD_NAME_SCROLL}  -- "ScrollLock"
-pattern ModNameSuper   = #{const_str XKB_VMOD_NAME_SUPER}   -- "Super"
+-- | Virtual modifier names: @Alt@ @Hyper@ @LevelThree@ @LevelFive@ @Meta@ @NumLock@ @ScrollLock@ @Super@
+pattern ModAlt , ModHyper , ModLevel3 , ModLevel5 , ModMeta , ModNum , ModScroll , ModSuper :: String
+pattern ModAlt     = #{const_str XKB_VMOD_NAME_ALT}     -- "Alt"
+pattern ModHyper   = #{const_str XKB_VMOD_NAME_HYPER}   -- "Hyper"
+pattern ModLevel3  = #{const_str XKB_VMOD_NAME_LEVEL3}  -- "LevelThree"
+pattern ModLevel5  = #{const_str XKB_VMOD_NAME_LEVEL5}  -- "LevelFive"
+pattern ModMeta    = #{const_str XKB_VMOD_NAME_META}    -- "Meta"
+pattern ModNum     = #{const_str XKB_VMOD_NAME_NUM}     -- "NumLock"
+pattern ModScroll  = #{const_str XKB_VMOD_NAME_SCROLL}  -- "ScrollLock"
+pattern ModSuper   = #{const_str XKB_VMOD_NAME_SUPER}   -- "Super"
 
 -- * LEDs names
 
@@ -347,18 +321,12 @@ pattern ModNameSuper   = #{const_str XKB_VMOD_NAME_SUPER}   -- "Super"
 -- @Scroll Lock@
 -- @Compose@
 -- @Kana@
-pattern
-    LedNameNum
-  , LedNameCaps
-  , LedNameScroll
-  , LedNameCompose
-  , LedNameKana
-    :: String
-pattern LedNameNum     = #{const_str XKB_LED_NAME_NUM} -- "Num Lock"
-pattern LedNameCaps    = #{const_str XKB_LED_NAME_CAPS} -- "Caps Lock"
-pattern LedNameScroll  = #{const_str XKB_LED_NAME_SCROLL}  -- "Scroll Lock"
-pattern LedNameCompose = #{const_str XKB_LED_NAME_COMPOSE} -- "Compose"
-pattern LedNameKana    = #{const_str XKB_LED_NAME_KANA} -- "Kana"
+pattern LedNumLock , LedCapsLock , LedScrollLock , LedCompose , LedKana :: String
+pattern LedNumLock = #{const_str XKB_LED_NAME_NUM} -- "Num Lock"
+pattern LedCapsLock = #{const_str XKB_LED_NAME_CAPS} -- "Caps Lock"
+pattern LedScrollLock = #{const_str XKB_LED_NAME_SCROLL}  -- "Scroll Lock"
+pattern LedCompose = #{const_str XKB_LED_NAME_COMPOSE} -- "Compose"
+pattern LedKana    = #{const_str XKB_LED_NAME_KANA} -- "Kana"
 
 -- * XkbStateComponent
 
@@ -367,47 +335,40 @@ pattern LedNameKana    = #{const_str XKB_LED_NAME_KANA} -- "Kana"
 -- This enum is bitmaskable, e.g. @StateModsDepressed .|. StateModsLatched@
 -- is valid to exclude locked modifiers.
 newtype XkbStateComponent = XkbStateComponent { unwrap :: CUInt }
-  deriving newtype (Eq, Ord, Storable, Num)
+  deriving newtype (Eq, Ord, Storable, Num, Bits)
   deriving stock (Generic, Show)
 
-pattern StateModsDepressed
-  , StateModsLatched
-  , StateModsLocked
-  , StateModsEffective
-  , StateLayoutDepressed
-  , StateLayoutLatched
-  , StateLayoutLocked
-  , StateLayoutEffective
-  , StateLeds
-    :: XkbStateComponent
+pattern ModsDepressed , ModsLatched , ModsLocked , ModsEffective
+  , LayoutDepressed , LayoutLatched , LayoutLocked , LayoutEffective
+  , Leds :: XkbStateComponent
 
 -- | Depressed modifiers, i.e. a key is physically holding them.
-pattern StateModsDepressed    = #{const XKB_STATE_MODS_DEPRESSED}
+pattern ModsDepressed    = #{const XKB_STATE_MODS_DEPRESSED}
 
 -- | Latched modifiers, i.e. will be unset after the next non-modifier key press.
-pattern StateModsLatched      = #{const XKB_STATE_MODS_LATCHED}
+pattern ModsLatched      = #{const XKB_STATE_MODS_LATCHED}
 
 -- | Locked modifiers, i.e. will be unset after the key provoking the lock has been pressed again.
-pattern StateModsLocked       = #{const XKB_STATE_MODS_LOCKED}
+pattern ModsLocked       = #{const XKB_STATE_MODS_LOCKED}
 
 -- | Effective modifiers, i.e. currently active and affect key processing (derived from the other state components).
 --
 -- Use this unless you explicitly care how the state came about.
-pattern StateModsEffective    = #{const XKB_STATE_MODS_EFFECTIVE}
+pattern ModsEffective    = #{const XKB_STATE_MODS_EFFECTIVE}
 
 -- | Depressed layout, i.e. a key is physically holding it.
-pattern StateLayoutDepressed  = #{const XKB_STATE_LAYOUT_DEPRESSED}
+pattern LayoutDepressed  = #{const XKB_STATE_LAYOUT_DEPRESSED}
 
 -- | Latched layout, i.e. will be unset after the next non-modifier key press.
-pattern StateLayoutLatched    = #{const XKB_STATE_LAYOUT_LATCHED}
+pattern LayoutLatched    = #{const XKB_STATE_LAYOUT_LATCHED}
 
 -- | Locked layout, i.e. will be unset after the key provoking the lock has been pressed again.
-pattern StateLayoutLocked     = #{const XKB_STATE_LAYOUT_LOCKED}
+pattern LayoutLocked     = #{const XKB_STATE_LAYOUT_LOCKED}
 
 -- | Effective layout, i.e. currently active and affects key processing (derived from the other state components).
 --
 -- Use this unless you explicitly care how the state came about.
-pattern StateLayoutEffective  = #{const XKB_STATE_LAYOUT_EFFECTIVE}
+pattern LayoutEffective  = #{const XKB_STATE_LAYOUT_EFFECTIVE}
 
 -- | LEDs (derived from the other state components).
-pattern StateLeds             = #{const XKB_STATE_LEDS}
+pattern Leds             = #{const XKB_STATE_LEDS}

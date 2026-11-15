@@ -214,7 +214,8 @@ instance Default (DC Word32) where def = DC maxBound maxBound
 makeFieldClassesIfMissing ["inputDevice"]
 makeLensesCombine'
   (ignoreFields ["repeatInfo"])
-  ["inputDevice"] [''InputConfigState, ''XkbKeyboardState, ''InputDeviceState, ''LibinputDeviceState]
+  ["inputDevice"]
+  [''InputConfigState, ''XkbKeyboardState, ''InputDeviceState, ''LibinputDeviceState]
 
 makeFieldClassesIfMissing ["currentValue", "defaultValue"]
 makeLensesWith' classPerField [''SDC, ''DC]
@@ -303,9 +304,9 @@ getOrCreateKeyboardKeymap kmdef =
         create = do
           logInfo $ "Attempting to create a new keymap" :# ["params" .= show kmdef]
           fd <- io $ do
-            ctx <- XKBC.createXkbContext def
-            kmap <- XKBC.createKeymapFromNames ctx kmdef XKBC.KeymapFormatTextV1
-            XKBC.keymapAsStringFd kmap XKBC.KeymapFormatTextV1
+            ctx <- XKBC.newContext def
+            kmap <- XKBC.keymapFromNames ctx XKBC.TextV1 kmdef
+            XKBC.keymapToFd kmap XKBC.TextV1
           km <- withObject $ \xkbConfig ->
             R.riverXkbConfigCreateKeymap xkbConfig (fi fd) R.RiverXkbConfigKeymapFormatTextV1
           rvar <- newEmptyTMVarIO

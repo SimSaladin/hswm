@@ -21,7 +21,6 @@ import Data.List qualified as L
 import Data.Map qualified as M
 import System.Environment qualified as ENV
 
--- TODO use this and finish
 data EnvPrompt = EnvPrompt
   { inputFilter :: !(String -> Bool)
   , inputCallerEnv :: !Bool

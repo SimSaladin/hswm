@@ -56,17 +56,26 @@ data GenerateModule = GenerateModule
   -- ^ output module name
   , sImports :: [String]
   -- ^ Import statements
-  , sType :: String
-  -- ^ Type of forward bindings E.g. @''Word32@
   , sHeader :: String
   -- ^ Header file. @foobar.h@
-  , sHsNameMod :: Maybe StaticKey -- (StaticPtr (String -> String)) -- NameModifier
   , sLookupFn :: Maybe String
-  , sGroupBy :: Maybe Char
+  , sRenderIt :: StaticKey
+  -- ^ Macro -> RenderIt
+  , sModuleLines :: [String]
+  }
+  deriving stock (Eq, Show, Generic)
+
+data RenderIt = RenderIt
+  { rType :: String
+  -- ^ Type of forward bindings E.g. @''Word32@
+  , rGroup :: String
+  , rName :: String
   }
   deriving stock (Eq, Show, Generic)
 
 instance Binary GenerateModule
+
+type GroupName = String
 
 data ActionArgs = ActionArgs
   { aGenerate :: GenerateModule
@@ -91,20 +100,55 @@ settings =
   [ GenerateModule -- system package "libxkbcommon"
       { sModule = "Text.XkbCommon.KeySyms"
       , sImports = ["Text.XkbCommon.KeySym (KeySym)"]
-      , sType = "KeySym"
       , sHeader = "xkbcommon/xkbcommon-keysyms.h"
-      , sHsNameMod = Just $ staticKey $ static \x -> "key_" ++ fromMaybe x (L.stripPrefix "XKB_KEY_" x)
       , sLookupFn = Nothing
-      , sGroupBy = Nothing
+      , sRenderIt =
+          staticKey $
+            static
+              \(x :: Macro) ->
+                let groupNames =
+                      [ "ISO_"
+                      , "Arabic_"
+                      , "kana_"
+                      , "KP_"
+                      , "Pointer_"
+                      , "Cyrillic_"
+                      , "Greek_"
+                      , "Thai_"
+                      , "Hangul_"
+                      , "Armenian_"
+                      , "Georgian_"
+                      , "braille_"
+                      , "XF86"
+                      ]
+                 in RenderIt
+                      { rType = "KeySym"
+                      , rGroup = fromMaybe "Other" $ msum [Just $ takeWhile (/= '_') pre | pre <- groupNames, ("XKB_KEY_" ++ pre) `L.isPrefixOf` x.key]
+                      , rName = "key_" ++ fromMaybe x.key (L.stripPrefix "XKB_KEY_" x.key)
+                      }
+      , sModuleLines = []
       }
   , GenerateModule -- system package "linux-headers"
       { sModule = "Text.XkbCommon.EventCodes"
-      , sImports = ["Data.Word (Word32)"]
-      , sType = "Word32"
       , sHeader = "linux/input-event-codes.h"
-      , sHsNameMod = Just $ staticKey $ static toSnakeCase
+      , sImports = ["Data.Word (Word32)"]
+      , sModuleLines =
+          [ "-- | Pointer button events"
+          , "type Button = Word32"
+          ]
       , sLookupFn = Just "fromEventCode"
-      , sGroupBy = Just '_'
+      , sRenderIt =
+          staticKey $
+            static
+              \(x :: Macro) ->
+                let groupName = case L.takeWhile (/= '_') x.key of
+                      "BTN" -> "Buttons"
+                      s -> s
+                 in RenderIt
+                      { rType = if groupName == "Buttons" then "Button" else "Word32"
+                      , rGroup = groupName
+                      , rName = toSnakeCase x.key
+                      }
       }
   ]
 
@@ -116,7 +160,7 @@ myRules xs PreBuildComponentInputs{buildingWhat = flags, localBuildInfo = lbi, t
         (gcc, _) <- liftIO $ requireProgram verb gccProgram (withPrograms lbi)
         let res = Location autogendir $ moduleNameSymbolicPath gen.sModule <.> "hs"
         if gen.sModule `elem` explicitLibModules lib
-          then
+          then do
             registerRule_ (fromString $ prettyShow gen.sModule) $
               dynamicRule
                 (static Dict)
@@ -164,9 +208,13 @@ toSnakeCase = snakeCase False
 getDefines :: Verbosity -> GenerateModule -> AbsolutePath File -> IO String
 getDefines verb gen headerFile = do
   content <- parseHeader verb headerFile
-  toName <- case gen.sHsNameMod of
-    Just key -> maybe (error "hsnamemod") deRefStaticPtr <$> unsafeLookupStaticPtr key
-    Nothing -> pure id
+  re <- getStatic @(Macro -> RenderIt) gen.sRenderIt
+
+  let mkMacroGroup :: GroupName -> [Macro] -> [String]
+      mkMacroGroup gname macros =
+        ["{- * " ++ esc gname ++ " -}\n"]
+          ++ [forImpD re m | m <- macros]
+          ++ [mkLookupFn re (nm ++ gname) macros | gname /= "", Just nm <- [gen.sLookupFn]]
   return $!
     unlines $
       [ "{-# LANGUAGE CApiFFI #-}"
@@ -181,49 +229,42 @@ getDefines verb gen headerFile = do
       , "module " ++ prettyShow gen.sModule ++ " where"
       ]
         ++ ["import " ++ m | m <- gen.sImports]
-        ++ [mkLookupFn toName nm (concatMap snd content) | Just nm <- [gen.sLookupFn]]
-        ++ concat
-          [ ("{- * " ++ gname ++ " -}\n")
-              : [forImpD toName m | m <- macros]
-              ++ [mkLookupFn toName (nm ++ gname) macros | gname /= "", Just nm <- [gen.sLookupFn]]
-          | macros@(_ : _) <- grouped content
-          , let gname = groupName macros
-          ]
+        ++ gen.sModuleLines
+        ++ [mkLookupFn re nm (concatMap snd content) | Just nm <- [gen.sLookupFn]]
+        ++ concat [mkMacroGroup (getGroupName re macros) macros | macros@(_ : _) <- grouped re content]
   where
-    groupName [] = ""
-    groupName (x : _)
-      | Nothing <- gen.sGroupBy = ""
-      | Just c <- gen.sGroupBy = L.takeWhile (/= c) x.key
+    getStatic :: forall a. StaticKey -> IO a
+    getStatic sk = maybe (error "getStatic") deRefStaticPtr <$> unsafeLookupStaticPtr sk
 
-    grouped xs
-      | Nothing <- gen.sGroupBy = map snd xs
-      | Just c <- gen.sGroupBy =
-          L.groupBy ((==) `on` L.takeWhile (/= c) . key) $
-            L.sortOn (L.takeWhile (/= c) . key) $
-              concatMap snd xs
+    getGroupName re (x : _) = (re x).rGroup
+    getGroupName _ [] = ""
+
+    grouped re xs = L.groupBy ((==) `on` ((.rGroup) . re)) $ L.sortOn ((.rGroup) . re) $ concatMap snd xs
 
     esc = concatMap $ \case
-      '*' -> "\\*"
-      c -> [c]
+      c
+        | c `elem` ("*<>/\\'`\"@$#-" :: String) -> '\\' : [c]
+        | otherwise -> [c]
 
-    forImpD toName (m :: Macro) =
+    forImpD re (m :: Macro) =
       printf
         "{- | %s\n -}\nforeign import capi unsafe \"%s value %s\"\n  %s :: %s\n"
         (getDoc m :: String)
         gen.sHeader
         m.key
-        (toName m.key)
-        gen.sType
+        (re m).rName
+        (re m).rType
 
     getDoc m = maybe "" esc m.comment ++ printf "\n\n@%s = %s@" m.key m.value
 
-    mkLookupFn toName fnName macros =
+    mkLookupFn _ _ [] = ""
+    mkLookupFn re fnName macros@(m0 : _) =
       unlines $
         [ printf "-- | Try to convert values to labels."
-        , printf "%s :: %s -> Maybe String" fnName gen.sType
+        , printf "%s :: %s -> Maybe String" fnName (re m0).rType
         , printf "%s x" fnName
         ]
-          ++ [printf "  | x == %s = Just \"%s\"" (toName m.key) m.key | m <- macros]
+          ++ [printf "  | x == %s = Just \"%s\"" (re m).rName m.key | m <- macros]
           ++ [printf "  | otherwise = Nothing"]
 
 parseHeader :: Verbosity -> AbsolutePath File -> IO [(String, [Macro])]
@@ -233,7 +274,10 @@ parseHeader verb hdr = do
     Right xs -> return xs
     Left er -> die' verb er
 
-data Macro = Macro {key, value :: String, comment :: Maybe String}
+data Macro = Macro
+  { key, value :: String
+  , comment :: Maybe String
+  }
   deriving (Eq, Show, Read, Generic)
 
 hdrParser :: (CabalParsing m) => m [(String, [Macro])]
@@ -281,7 +325,8 @@ hdrParser = parse1
 
 -- | Given a header file, find the absolute path to it.
 resolveHeader :: Verbosity -> ConfiguredProgram -> FilePath -> IO (AbsolutePath File)
-resolveHeader verb gcc hdr =
+resolveHeader verb gcc hdr = do
+  noticeNoWrap verb $ "Resolving header: " ++ show hdr
   withTempFileContents "test.c" prog $ \fp -> do
     (_, gccErr, ec) <- getProgramInvocationOutputAndErrors verb $ programInvocation gcc ["-H", "-fsyntax-only", fp]
     unless (ec == ExitSuccess) $ die' verb $ "gcc returned " ++ show ec ++ ": " ++ gccErr

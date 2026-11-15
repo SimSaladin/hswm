@@ -9,6 +9,19 @@
 -- Stability   : unstable
 -- Portability : unportable
 module Text.XkbCommon.Internal (
+  -- * Exceptions
+  throwIfNullEx,
+  XkbCommonException (..),
+
+  -- * Components
+  hasComponent,
+
+  -- * Logging
+  LogFn,
+  LogFnRaw,
+  mkLogFnFunPtr,
+  hs_free_fun_ptr,
+
   -- * @mmap@
   mmap,
   munmap,
@@ -33,11 +46,58 @@ module Text.XkbCommon.Internal (
   MfdFlags,
   mfdCloExec,
   mfdAllowSealing,
+
+  -- * Re-exports
+  NFData (..),
+  Data,
+  Default (..),
 ) where
 
+import Text.XkbCommon.FFI
+
+import Control.DeepSeq
+import Control.Exception (throwIO)
+import Control.Monad
+import Data.Data
+import Data.Default
+import Data.Functor
 import Foreign
 import Foreign.C
 import System.Posix (Fd (..))
+
+hasComponent :: XkbStateComponent -> XkbStateComponent -> Bool
+hasComponent haystack needle = haystack .&. needle > 0
+
+type LogFnRaw = CUInt -> CString -> IO ()
+
+type LogFn = LogLevel -> String -> IO ()
+
+mkLogFnFunPtr :: LogFn -> IO (FunPtr LogFnRaw)
+mkLogFnFunPtr f = mkLogFnFunPtrRaw $ \lv cs -> do
+  s <- peekCString cs
+  f (toEnum $ fromIntegral lv) s
+
+foreign import ccall "wrapper"
+  mkLogFnFunPtrRaw :: LogFnRaw -> IO (FunPtr LogFnRaw)
+
+foreign import capi "&" hs_free_fun_ptr :: FunPtr (FunPtr a -> IO ())
+
+data XkbCommonException
+  = ContextNewFailed String
+  | IncludePathUnavailable {message :: !String, path :: !FilePath}
+  | KeymapCreationFailed {message :: String, keNames :: Maybe XkbRuleNames, keFormat :: !KeymapFormat}
+  | KeymapGetAsStringFailed {keKeymap :: !XkbKeymap, keFormat :: !KeymapFormat}
+  | KeymapBuilderCompilationFailed {rules, model :: String}
+  | KeymapBuilderInvalidLayout {message :: !String, layout :: Layout}
+  | KeymapBuilderInvalidOption {message :: !String, option :: LayoutOption}
+  | XkbStateCreationFailed XkbKeymap
+  deriving (Eq, Ord, Show, Generic)
+
+instance Exception XkbCommonException
+
+-- | Like @throwIfNull@ but throwing a specific exception instead.
+throwIfNullEx :: (Exception e) => e -> Ptr a -> IO (Ptr a)
+throwIfNullEx ex ptr = when (ptr == nullPtr) (throwIO ex) $> ptr
 
 mmap ::
   forall a any.
@@ -64,7 +124,7 @@ memfdCreate ::
   -> MfdFlags
   -> IO Fd
 memfdCreate name flags =
-  throwErrnoIfMinus1 "memfd_create" $
+  throwErrnoIfMinus1 ("memfd_create: " ++ name) $
     withCString name $ \c_name ->
       c_memfd_create c_name flags.unwrap
 

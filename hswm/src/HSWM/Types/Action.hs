@@ -17,14 +17,15 @@ module HSWM.Types.Action (
   ModMask,
   XkbRuleNames,
   RepeatInfo,
+  Button,
 ) where
 
 import HSWM.Types.Lens
-import HSWM.Types.Simple (RepeatInfo(..))
+import HSWM.Types.Simple (RepeatInfo (..))
 import HSWM.Util.PP
 import River qualified as R
 import Text.XkbCommon
-import Text.XkbCommon.EventCodes (fromEventCodeBTN)
+import Text.XkbCommon.EventCodes (Button, fromEventCodeButtons)
 import Text.XkbCommon.KeySyms (key_NoSymbol)
 
 import Data.Aeson qualified as A
@@ -35,9 +36,6 @@ import Data.List qualified as L
 import Data.Map qualified as M
 
 -- * XkbBinding, PointerBinding, etc.
-
--- | In pointer bindings.
-type Button = Word32
 
 -- | A single key (press) with modifiers.
 data XBKey = XBKey {keyModMask :: !ModMask, keyKeySym :: !KeySym}
@@ -78,12 +76,12 @@ ppXBKey (XBKey m ksym) =
 ppPKey :: (IsString a) => PKey -> a
 ppPKey (PKey m btn) =
   fromString . L.intercalate "+" $
-    ppModifiers m ++ [fromMaybe "???" $ fromEventCodeBTN btn]
+    ppModifiers m ++ [fromMaybe "???" $ fromEventCodeButtons btn]
 
 ppButton :: (ModMask, Button) -> String
 ppButton (m, btn) =
   L.intercalate "+" $
-    ppModifiers m ++ [fromMaybe "???" $ fromEventCodeBTN btn]
+    ppModifiers m ++ [fromMaybe "???" $ fromEventCodeButtons btn]
 
 data PKey = PKey {keyModMask :: !ModMask, keyButton :: !Button}
   deriving stock (Eq, Ord, Show, Read, Generic, Data)
@@ -106,8 +104,8 @@ data PointerBinding a = PointerBinding
   deriving stock (Eq, Generic)
   deriving anyclass (NFData)
 
-deriving instance Show a => Show (PointerBinding a)
-instance ToJSON a => ToJSON (PointerBinding a) where
+deriving instance (Show a) => Show (PointerBinding a)
+instance (ToJSON a) => ToJSON (PointerBinding a) where
   toJSON = A.genericToJSON aesonOptions
   toEncoding = A.genericToEncoding aesonOptions
 
@@ -134,7 +132,7 @@ instance IsKeySym KeySym where
 
 -- | Uses 'keysymFromNameCaseInsensitive'
 instance IsKeySym String where
-  toKeySym s = fromMaybe key_NoSymbol $ keysymFromName s <|> keysymFromNameCaseInsensitive s
+  toKeySym = fromMaybe key_NoSymbol . keysymFromName
 
 -- * IsModMask
 
@@ -250,11 +248,11 @@ instance Show (SomeAction m) where
           | desc1 == "" = actionDescriptionFallback p v
           | otherwise = desc1
         repeat = case onHoldRepeat p v of
-                   x | x == def -> "no"
-                     | otherwise -> "yes [R=" ++ show x.rate ++ ",D=" ++ show x.delay ++ "]"
+          x
+            | x == def -> "no"
+            | otherwise -> "yes [R=" ++ show x.rate ++ ",D=" ++ show x.delay ++ "]"
         cats = actionCategories p v
-     in
-     "Action \"" ++ desc ++ "\"" ++ " repeat:" ++ repeat ++ (" @" ++ show cats)
+     in "Action \"" ++ desc ++ "\"" ++ " repeat:" ++ repeat ++ (" @" ++ show cats)
 
 deriving via PPShow (SomeAction m) instance Pretty (SomeAction m)
 

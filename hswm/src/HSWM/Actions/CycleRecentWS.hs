@@ -133,11 +133,11 @@ cycleWindowSets genOptions hmods knext kprev = do
         where
           n = length opts
 
-      process s (Right GK{..})
-        | state > 0, keysym == fi keyNext' = previewWS (succ s) >> pure (Right (succ s))
-        | state > 0, keysym == fi keyPrev = previewWS (pred s) >> pure (Right (pred s))
+      process s (Right GrabbedKeySym{..})
+        | pressed, keysym == fi keyNext' = previewWS (succ s) >> pure (Right (succ s))
+        | pressed, keysym == fi keyPrev = previewWS (pred s) >> pure (Right (pred s))
         | otherwise = pure (Right s)
-      process s (Right GMod{..})
+      process s (Right (GrabbedModifiers mods))
         | mods == 0 = pure (Left Done)
         | otherwise = pure (Right s)
       process _ Left{} = pure (Left Done)
