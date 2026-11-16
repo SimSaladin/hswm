@@ -8,7 +8,7 @@
   , config
   , ... }:
   {
-    flags = { pkg-config = true; build-tool-depends = true; };
+    flags = { pkg-config = true; };
     package = {
       specVersion = "3.14";
       identifier = { name = "haskell-wayland-core"; version = "0.1.0.0"; };
@@ -27,7 +27,6 @@
         (hsPkgs.pkgsBuildBuild.Cabal-hooks or (pkgs.pkgsBuildBuild.Cabal-hooks or (errorHandler.setupDepError "Cabal-hooks")))
         (hsPkgs.pkgsBuildBuild.base or (pkgs.pkgsBuildBuild.base or (errorHandler.setupDepError "base")))
         (hsPkgs.pkgsBuildBuild.hs-bindgen-hooks or (pkgs.pkgsBuildBuild.hs-bindgen-hooks or (errorHandler.setupDepError "hs-bindgen-hooks")))
-        (hsPkgs.pkgsBuildBuild.microlens-ghc or (pkgs.pkgsBuildBuild.microlens-ghc or (errorHandler.setupDepError "microlens-ghc")))
       ];
       detailLevel = "FullDetails";
       licenseFiles = [ "LICENSE" ];
@@ -62,7 +61,9 @@
           (pkgconfPkgs."wayland-client" or (errorHandler.pkgConfDepError "wayland-client"))
           (pkgconfPkgs."wayland-server" or (errorHandler.pkgConfDepError "wayland-server"))
         ];
-        build-tools = pkgs.lib.optional (flags.build-tool-depends) (hsPkgs.pkgsBuildBuild.hs-bindgen.components.exes.hs-bindgen-cli or (pkgs.pkgsBuildBuild.hs-bindgen-cli or (errorHandler.buildToolDepError "hs-bindgen:hs-bindgen-cli")));
+        build-tools = [
+          (hsPkgs.pkgsBuildBuild.hs-bindgen.components.exes.hs-bindgen-cli or (pkgs.pkgsBuildBuild.hs-bindgen-cli or (errorHandler.buildToolDepError "hs-bindgen:hs-bindgen-cli")))
+        ];
         buildable = true;
         modules = [
           "PackageInfo_haskell_wayland_core"
@@ -78,7 +79,7 @@
         hsSourceDirs = [ "src" ];
       };
       tests = {
-        "spec" = {
+        "wayland-core-tests" = {
           depends = [
             (hsPkgs."base" or (errorHandler.buildDepError "base"))
             (hsPkgs."data-default" or (errorHandler.buildDepError "data-default"))

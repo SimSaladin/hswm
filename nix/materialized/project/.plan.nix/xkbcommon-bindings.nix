@@ -42,6 +42,7 @@
         depends = [
           (hsPkgs."base" or (errorHandler.buildDepError "base"))
           (hsPkgs."data-default" or (errorHandler.buildDepError "data-default"))
+          (hsPkgs."deepseq" or (errorHandler.buildDepError "deepseq"))
           (hsPkgs."unix" or (errorHandler.buildDepError "unix"))
         ];
         libs = pkgs.lib.optionals (!flags.pkg-config) [
@@ -69,12 +70,15 @@
           "Text/XkbCommon/Registry"
           "Text/XkbCommon/State"
         ];
+        cSources = [ "cbits/extras.c" ];
         hsSourceDirs = [ "src" ];
+        includeDirs = [ "cbits" ];
       };
       tests = {
         "xkbcommon-spec" = {
           depends = [
             (hsPkgs."base" or (errorHandler.buildDepError "base"))
+            (hsPkgs."deepseq" or (errorHandler.buildDepError "deepseq"))
             (hsPkgs."hspec" or (errorHandler.buildDepError "hspec"))
             (hsPkgs."xkbcommon-bindings" or (errorHandler.buildDepError "xkbcommon-bindings"))
           ];

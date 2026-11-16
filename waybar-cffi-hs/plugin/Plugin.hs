@@ -6,4 +6,4 @@ module Plugin () where
 import Waybar.CFFI.Plugin.HSWM
 import Waybar.CFFI.Plugin.TH
 
-makeCFFIModule ''HSWMPlugin ["-N"]
+makeCFFIModule ''HSWMPlugin ["-N", "-maxN4", "-M800M", "-xn"]

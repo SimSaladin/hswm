@@ -81,6 +81,8 @@ foreign-library waybarhaskellplugin
     -threaded
     -flink-rts
     -no-hs-main
+    -pie
+    -fPIC
 
   if flag(standalone)
     options: standalone

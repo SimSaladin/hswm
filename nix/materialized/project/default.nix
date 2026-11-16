@@ -386,10 +386,7 @@
         packages = {
           "hs-bindgen" = { flags = { "dev" = lib.mkOverride 900 false; }; };
           "haskell-wayland-core" = {
-            flags = {
-              "pkg-config" = lib.mkOverride 900 true;
-              "build-tool-depends" = lib.mkOverride 900 true;
-            };
+            flags = { "pkg-config" = lib.mkOverride 900 true; };
           };
           "hs-bindgen-runtime" = { flags = {}; };
           "pixman-bindings" = {
@@ -603,7 +600,6 @@
           "yaml".components.library.planned = lib.mkOverride 900 true;
           "enummapset".components.library.planned = lib.mkOverride 900 true;
           "time".components.library.planned = lib.mkOverride 900 true;
-          "haskell-wayland-core".components.tests."spec".planned = lib.mkOverride 900 true;
           "primitive".components.library.planned = lib.mkOverride 900 true;
           "ghc-bignum".components.library.planned = lib.mkOverride 900 true;
           "blaze-html".components.library.planned = lib.mkOverride 900 true;
@@ -630,6 +626,7 @@
           "fast-logger".components.library.planned = lib.mkOverride 900 true;
           "th-lift".components.library.planned = lib.mkOverride 900 true;
           "mtl".components.library.planned = lib.mkOverride 900 true;
+          "haskell-wayland-core".components.tests."wayland-core-tests".planned = lib.mkOverride 900 true;
           "c-expr-runtime".components.library.planned = lib.mkOverride 900 true;
           "bifunctors".components.library.planned = lib.mkOverride 900 true;
           "uuid-types".components.library.planned = lib.mkOverride 900 true;

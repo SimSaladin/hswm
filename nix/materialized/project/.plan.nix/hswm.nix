@@ -39,6 +39,7 @@
           (hsPkgs."bytestring" or (errorHandler.buildDepError "bytestring"))
           (hsPkgs."containers" or (errorHandler.buildDepError "containers"))
           (hsPkgs."data-default" or (errorHandler.buildDepError "data-default"))
+          (hsPkgs."directory" or (errorHandler.buildDepError "directory"))
           (hsPkgs."fast-logger" or (errorHandler.buildDepError "fast-logger"))
           (hsPkgs."filelock" or (errorHandler.buildDepError "filelock"))
           (hsPkgs."filepath" or (errorHandler.buildDepError "filepath"))
@@ -73,13 +74,11 @@
           (hsPkgs."vector" or (errorHandler.buildDepError "vector"))
           (hsPkgs."xkbcommon-bindings" or (errorHandler.buildDepError "xkbcommon-bindings"))
         ];
-        build-tools = [
-          (hsPkgs.pkgsBuildBuild.hsc2hs.components.exes.hsc2hs or (pkgs.pkgsBuildBuild.hsc2hs or (errorHandler.buildToolDepError "hsc2hs:hsc2hs")))
-        ];
         buildable = true;
         modules = [
           "PackageInfo_hswm"
           "HSWM"
+          "HSWM/Actions/AudioControl"
           "HSWM/Actions/CycleRecentWS"
           "HSWM/Actions/CycleWS"
           "HSWM/Actions/DynamicWorkspaceOrder"
@@ -114,7 +113,11 @@
           "HSWM/ManageHook"
           "HSWM/Operations"
           "HSWM/Outputs"
+          "HSWM/Prompt/Bindings"
+          "HSWM/Prompt/Confirm"
           "HSWM/Prompt/Environment"
+          "HSWM/Prompt/Qutebrowser"
+          "HSWM/Prompt/Windows"
           "HSWM/Prompt/Workspaces"
           "HSWM/Seats"
           "HSWM/StackSet"
@@ -143,6 +146,7 @@
           "HSWM/Util/PP"
           "HSWM/Util/Process"
           "HSWM/Util/Rectangle"
+          "HSWM/Util/Rofi/Run"
           "HSWM/Util/RofiPrompt"
           "HSWM/Util/Stack"
           "HSWM/Util/StackSet/Lens"

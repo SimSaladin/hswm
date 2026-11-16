@@ -47,7 +47,12 @@ let
             pkgs.runCommand "ghc"
               {
                 passthru = {
-                  inherit (drv) llvmPackages version;
+                  inherit (drv)
+                    llvmPackages
+                    version
+                    targetPrefix
+                    buildGHC
+                    ;
                 };
               }
               ''
