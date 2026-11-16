@@ -69,7 +69,6 @@ module Waybar.CFFI.Plugin.Base (
 
 import Data.Aeson qualified as A
 import GI.Gtk qualified as Gtk
-import GI.Gtk.Objects.Container qualified as Gtk
 import Waybar.CFFI.Plugin.ABIv2
 
 import Prelude hiding (init)

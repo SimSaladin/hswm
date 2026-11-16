@@ -1,3 +1,5 @@
+{-# LANGUAGE DefaultSignatures #-}
+
 -- |
 -- Module      : HSWM.Util.PangoMarkup
 -- Description : Definitions for working with pango markup
@@ -12,7 +14,6 @@ module HSWM.Util.PangoMarkup (
 
   -- ** ToMarkup
   ToMarkup (..),
-  (~++),
 
   -- ** Text
   text,
@@ -39,7 +40,7 @@ module HSWM.Util.PangoMarkup (
   FromText (..),
 
   -- * Utils
-  escapeStrings,
+  escapeTextsLazy,
   escapeMarkupAuto,
   escapeMarkupPure,
   actualLength,
@@ -53,8 +54,10 @@ module HSWM.Util.PangoMarkup (
   justifyCenter,
 ) where
 
+import Data.ByteString.Lazy qualified as BL
 import Data.List qualified as L
 import Data.Text qualified as T
+import Data.Text.Encoding qualified as TE
 import Data.Text.Lazy qualified as TL
 import Data.Text.Lazy.Builder qualified as TB
 import Data.Text.Lazy.Encoding qualified as TLE
@@ -72,47 +75,74 @@ class FromText a where
   fromTextLazy :: LazyText -> a
   fromTextLazy = fromTextStrict . TL.toStrict
 
+  fromShortText :: ShortText -> a
+  fromShortText = fromTextStrict . TS.toText
+
   fromTextUnlines :: [StrictText] -> a
-  fromTextUnlines = fromTextLazy . TL.unlines . map TL.fromStrict
+  default fromTextUnlines :: (IsString a, Monoid a) => [StrictText] -> a
+  fromTextUnlines = fold . L.intersperse "\n" . map fromTextStrict
+
+  singleton :: Char -> a
+  singleton = fromShortText . TS.singleton
 
 instance FromText ShortText where
   fromTextStrict = TS.fromText
+  singleton = TS.singleton
 
 instance FromText StrictText where
   fromTextStrict = id
+  singleton = T.singleton
 
 instance FromText LazyText where
   fromTextLazy = id
-
-instance FromText LazyByteString where
-  fromTextStrict = TLE.encodeUtf8 . TL.fromStrict
-  fromTextLazy = TLE.encodeUtf8
+  fromTextUnlines = TL.unlines . map TL.fromStrict
+  singleton = TL.singleton
 
 instance FromText String where
   fromTextStrict = T.unpack
   fromTextLazy = TL.unpack
+  singleton = pure
+
+instance FromText TB.Builder where
+  fromTextStrict = TB.fromText
+  fromTextLazy = TB.fromLazyText
+  singleton = TB.singleton
+
+instance FromText StrictByteString where
+  fromTextStrict = TE.encodeUtf8
+
+instance FromText LazyByteString where
+  fromTextLazy = TLE.encodeUtf8
+
+instance FromText Markup where
+  fromTextStrict = RawT
+  fromTextLazy = RawTL
+  fromTextUnlines = fold . L.intersperse (RawTB $ TB.singleton '\n') . map fromTextStrict
+  singleton = RawTB . singleton
 
 -- * IsText
 
+-- | Class for things that can be transformed into Text\/LazyText.
 class IsText a where
-  getText :: a -> T.Text
-  getText = TL.toStrict . getLazyText
+  toStrictText :: a -> T.Text
+  toStrictText = TL.toStrict . toLazyText
 
-  getLazyText :: a -> LazyText
-  getLazyText = TL.fromStrict . getText
+  toLazyText :: a -> LazyText
+  toLazyText = TL.fromStrict . toStrictText
 
-instance IsText String where
-  getText = T.pack
 instance IsText Text where
-  getText = id
+  toStrictText = id
 instance IsText LazyText where
-  getLazyText = id
-instance IsText StrictByteString where
-  getText = decodeUtf8Lenient
-instance IsText LazyByteString where
-  getLazyText = TLE.decodeUtf8
+  toLazyText = id
 instance IsText ShortText where
-  getText = TS.toText
+  toStrictText = TS.toText
+instance IsText String where
+  toStrictText = T.pack
+instance IsText StrictByteString where
+  toStrictText = TE.decodeUtf8With lenientDecode
+  toLazyText = toLazyText . BL.fromStrict
+instance IsText LazyByteString where
+  toLazyText = TLE.decodeUtf8With lenientDecode
 
 -- * Markup
 
@@ -121,28 +151,30 @@ data Markup
     MNUL
   | -- | Simple document concatenation
     Concat !Markup !Markup
-  | -- | <TAG [ATTRS]>BODY</TAG>
-    !(ShortText :</> (ShortText := LazyText)) :*>> !Markup
   | -- | Direct Text builder
-    DirectBuilder !TB.Builder
+    RawTB !TB.Builder
   | -- | direct text include, no escaping, can contain markup tags!
-    RawText !Text
+    RawT !Text
   | -- | Direct lazy text
-    RawTextLazy !LazyText
+    RawTL !LazyText
   | -- | text, markup tags automatically escaped.
-    Escaped !Text
+    EscapeT !Text
   | -- | Text to be escaped
-    EscapedLazy !LazyText
+    EscapeTL !LazyText
+  | -- | <TAG [ATTRS]>BODY</TAG>
+    !TagAttrs :*>> !Markup
   deriving (Eq, Show, Generic)
 
+type TagAttrs = ShortText :</> (ShortText := LazyText)
+
 instance Semigroup Markup where
-  MNUL <> b = b
+  RawTB x <> RawTB y = RawTB (x <> y)
+  RawT x <> RawT y = RawT (x <> y)
+  RawTL x <> RawTL y = RawTL (x <> y)
+  EscapeT x <> EscapeT y = EscapeT (x <> y)
+  EscapeTL x <> EscapeTL y = EscapeTL (x <> y)
+  MNUL <> a = a
   a <> MNUL = a
-  DirectBuilder x <> DirectBuilder y = DirectBuilder (x <> y)
-  RawText x <> RawText y = RawText (x <> y)
-  RawTextLazy x <> RawTextLazy y = RawTextLazy (x <> y)
-  Escaped x <> Escaped y = Escaped (x <> y)
-  EscapedLazy x <> EscapedLazy y = EscapedLazy (x <> y)
   a <> b = Concat a b
 instance Monoid Markup where
   mempty = MNUL
@@ -154,11 +186,11 @@ actualLength = go
   where
     go MNUL = 0
     go (Concat a b) = go a + go b
-    go (DirectBuilder x) = TL.length (TB.toLazyText x)
-    go (RawText x) = fromIntegral $ T.length x
-    go (RawTextLazy x) = TL.length x
-    go (Escaped x) = fromIntegral $ T.length x
-    go (EscapedLazy x) = TL.length x
+    go (RawTB x) = TL.length (TB.toLazyText x)
+    go (RawT x) = fromIntegral $ T.length x
+    go (RawTL x) = TL.length x
+    go (EscapeT x) = fromIntegral $ T.length x
+    go (EscapeTL x) = TL.length x
     go (_ :*>> x) = go x
 
 data MarkupJustify = JustifyL | JustifyR | JustifyC
@@ -171,32 +203,39 @@ justifyColumn f dir c xs = xs & each . f %~ justify dir ind c
   where
     ind = fromIntegral $ L.maximum $ xs ^.. traversed . f . to actualLength
 
-justify :: MarkupJustify -> Int -> Char -> Markup -> Markup
+justify :: (ToMarkup a) => MarkupJustify -> Int -> Char -> a -> Markup
 justify JustifyL = justifyLeft
 justify JustifyR = justifyRight
 justify JustifyC = justifyCenter
 
 -- | @justifyLeft NUM CHAR TEXT@
-justifyLeft :: Int -> Char -> Markup -> Markup
-justifyLeft n c x = x <> text (T.replicate (n - fromIntegral (actualLength x)) (T.pack [c]))
-
-justifyRight :: Int -> Char -> Markup -> Markup
-justifyRight n c x = text (T.replicate (n - fromIntegral (actualLength x)) (T.pack [c])) <> x
-
-justifyCenter :: Int -> Char -> Markup -> Markup
-justifyCenter n c x = text (T.replicate (h + lef) (T.pack [c])) <> x <> text (T.replicate h (T.pack [c]))
+justifyLeft :: (ToMarkup a) => Int -> Char -> a -> Markup
+justifyLeft n c x = xm <> text (T.replicate (n - fromIntegral (actualLength xm)) (T.pack [c]))
   where
-    num = n - fromIntegral (actualLength x)
+    xm = toMarkup x
+
+justifyRight :: (ToMarkup a) => Int -> Char -> a -> Markup
+justifyRight n c x = text (T.replicate (n - fromIntegral (actualLength xm)) (T.pack [c])) <> xm
+  where
+    xm = toMarkup x
+
+justifyCenter :: (ToMarkup a) => Int -> Char -> a -> Markup
+justifyCenter n c x = text (T.replicate (h + lef) (T.pack [c])) <> xm <> text (T.replicate h (T.pack [c]))
+  where
+    xm = toMarkup x
+    num = n - fromIntegral (actualLength xm)
     (h, lef) = num `divMod` 2
 
 -- | Always escaped.
 instance IsString Markup where
-  fromString = EscapedLazy . getLazyText
+  fromString = EscapeTL . toLazyText
 
 -- ** ToMarkup
 
+-- | Class of types that have canonical transformation into Pango Markup.
 class ToMarkup a where
   toMarkup :: a -> Markup
+
 instance ToMarkup Markup where
   toMarkup = id
 
@@ -206,24 +245,26 @@ instance ToMarkup String where
 
 -- | Value will be escaped.
 instance ToMarkup Text where
-  toMarkup = Escaped
+  toMarkup = EscapeT
 
 -- | Value will be escaped.
 instance ToMarkup LazyText where
-  toMarkup = EscapedLazy
+  toMarkup = EscapeTL
 
 -- ** Tags and attributes
 
 -- | Tag + attributes, e.g. @"span" :<?> [attrs]@
-data tag :</> attrs = !tag :</> ![attrs]
+data tag :</> ap = !tag :</> ![ap]
   deriving (Eq, Show, Generic, Data)
+
+type Attrs = [ShortText := LazyText]
 
 -- | A single attribute, e.g.
 --
 -- @
 -- font := 'Terminess'
 -- @
-data key := value = !key := !value
+data k := v = !k := !v
   deriving (Eq, Show, Generic, Data)
 
 -- ** Rendering
@@ -233,29 +274,22 @@ renderTextBuilder = go
   where
     go = \case
       MNUL -> mempty
-      DirectBuilder x -> x
+      RawTB x -> x
       Concat a b -> go a <> go b
-      RawText x -> TB.fromText x
-      RawTextLazy x -> TB.fromLazyText x
-      Escaped x -> TB.fromText $ escapeMarkupAuto $ escapeLineBreaks x
-      EscapedLazy x -> TB.fromText $ escapeMarkupAuto $ TL.toStrict $ escapeLineBreaksLazy x
-      tag :*>> x -> ptag tag (go x)
+      RawT x -> fromTextStrict x
+      RawTL x -> fromTextLazy x
+      EscapeT x -> fromTextStrict $ escapeMarkupAuto $ escapeLineBreaks x
+      EscapeTL x -> fromTextStrict $ escapeMarkupAuto $ escapeLineBreaks x
+      tagAp :*>> x -> ptag tagAp (go x)
 
-    ptag (l :</> as) i =
-      "<"
-        <> TB.fromText (TS.toText l)
-        <> mconcat (map pattr as)
-        <> ">"
-        <> i
-        <> "</"
-        <> TB.fromText (TS.toText l)
-        <> ">"
-    pattr (k := v) =
-      " "
-        <> TB.fromText (TS.toText k)
-        <> "=\""
-        <> TB.fromLazyText (escapeStrings [("\"", "\\\"")] v)
-        <> "\""
+    between a b x = a <> x <> b
+
+    ptag (tag :</> ap) =
+      between
+        (between (singleton '<') (singleton '>') (fromShortText tag <> mconcat (map pattr ap)))
+        (between "</" (singleton '>') (fromShortText tag))
+
+    pattr (k := v) = singleton ' ' <> fromShortText k <> singleton '=' <> between (singleton '"') (singleton '"') (fromTextLazy (escapeTextsLazy [("\"", "\\\"")] v))
 
 -- | Same as "renderStrictText"
 render :: Markup -> Text
@@ -271,8 +305,6 @@ renderByteString :: Markup -> LazyByteString
 renderByteString = TLE.encodeUtf8 . renderText
 
 -- ** Building Markup
-
-type Attrs = [ShortText := LazyText]
 
 span :: (ToMarkup a) => Attrs -> a -> Markup
 span = ntag "span"
@@ -291,21 +323,17 @@ ntag l as x = (l :</> as) :*>> toMarkup x
 
 -- | No escaping of markup characters
 raw :: (IsText a) => a -> Markup
-raw = RawText . getText
+raw = RawTL . toLazyText
 
 text :: (IsText a) => a -> Markup
-text = Escaped . getText
+text = EscapeTL . toLazyText
 
 escape :: (IsText a) => a -> Markup
-escape = Escaped . getText
+escape = EscapeTL . toLazyText
 
 -- | Text via @Show@
 fromShow :: (Show a) => a -> Markup
-fromShow = Escaped . toText . show
-
--- | Concatenate with type conversion
-(~++) :: (ToMarkup a) => Markup -> a -> Markup
-(~++) a b = Concat a (toMarkup b)
+fromShow = EscapeT . toText . show
 
 -- * Escape markup/newlines
 
@@ -314,17 +342,14 @@ escapeMarkup x len
   | len < 1 = markupEscapeText (x <> "\0") (-1)
   | otherwise = markupEscapeText x len
 
-escapeMarkupAuto :: Text -> Text
-escapeMarkupAuto x = escapeMarkupPure x (-1)
+escapeMarkupAuto :: (IsText a) => a -> Text
+escapeMarkupAuto x = escapeMarkupPure (toStrictText x) (-1)
 
 escapeMarkupPure :: Text -> Int64 -> Text
 escapeMarkupPure x len = unsafePerformIO (escapeMarkup x len)
 
-escapeLineBreaks :: Text -> Text
-escapeLineBreaks = T.replace "\n" "\\n" . T.replace "\r" "\\r"
+escapeLineBreaks :: (IsText a) => a -> LazyText
+escapeLineBreaks = escapeTextsLazy [("\n", "\\n"), ("\r", "\\r")]
 
-escapeLineBreaksLazy :: LazyText -> LazyText
-escapeLineBreaksLazy = escapeStrings [("\n", "\\n"), ("\r", "\\r")]
-
-escapeStrings :: [(LazyText, LazyText)] -> LazyText -> LazyText
-escapeStrings = flip $ foldr (uncurry TL.replace)
+escapeTextsLazy :: (IsText a) => [(LazyText, LazyText)] -> a -> LazyText
+escapeTextsLazy xs s = foldr (uncurry TL.replace) (toLazyText s) xs

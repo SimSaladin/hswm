@@ -187,7 +187,7 @@ manage_ = do
   -- Raise the top-most window in the stack to the front...
   whenJust (W.peek ws) $ \w -> do
     manageWindowBorder w =<< view (config . focusedBorder)
-    when (W.peek old /= Just w && (null frects || w `elem` map fst frects)) $ windowPlaceTop w
+    when ((W.peek old /= Just w && w `elem` map fst frects) || null frects) $ windowPlaceTop w
     -- update focus
     setTopFocus w
 

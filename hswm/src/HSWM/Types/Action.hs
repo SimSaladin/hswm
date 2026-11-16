@@ -30,6 +30,7 @@ import Text.XkbCommon.KeySyms (key_NoSymbol)
 
 import Data.Aeson qualified as A
 import Data.Aeson.Encoding.Internal qualified as A
+import Data.Char qualified as C
 import Data.Data
 import Data.Generics.Instances ()
 import Data.List qualified as L
@@ -39,6 +40,10 @@ import Data.Map qualified as M
 
 -- | A single key (press) with modifiers.
 data XBKey = XBKey {keyModMask :: !ModMask, keyKeySym :: !KeySym}
+  deriving stock (Eq, Ord, Show, Read, Generic, Data)
+  deriving anyclass (NFData)
+
+data PKey = PKey {keyModMask :: !ModMask, keyButton :: !Button}
   deriving stock (Eq, Ord, Show, Read, Generic, Data)
   deriving anyclass (NFData)
 
@@ -52,7 +57,27 @@ instance ToJSON XBKey where
 instance A.ToJSONKey XBKey where
   toJSONKey = A.ToJSONKeyText ppXBKey (A.text . ppXBKey)
 
+instance ToJSON PKey where
+  toJSON x = A.toJSON (ppPKey @Text x)
+  toEncoding x = A.toEncoding (ppPKey @Text x)
+
+instance A.ToJSONKey PKey where
+  toJSONKey = A.ToJSONKeyText ppPKey (A.text . ppPKey)
+
 -- * Keymap utils
+
+ppXBKey :: (IsString a) => XBKey -> a
+ppXBKey (XBKey m ksym) =
+  fromString . L.intercalate "+" $
+    ppModifiers m ++ [fromMaybe "???" $ keysymName ksym]
+
+ppPKey :: (IsString a) => PKey -> a
+ppPKey (PKey m btn) = fromString $ ppButton (m, btn)
+
+ppButton :: (ModMask, Button) -> String
+ppButton (m, btn) =
+  L.intercalate "+" $
+    ppModifiers m ++ [fromMaybe "???" $ fromEventCodeButtons btn]
 
 ppModifiers :: (IsString a) => ModMask -> [a]
 ppModifiers bm =
@@ -67,32 +92,6 @@ ppModifiers bm =
       ]
   , fi x.unwrap .&. bm /= 0
   ]
-
-ppXBKey :: (IsString a) => XBKey -> a
-ppXBKey (XBKey m ksym) =
-  fromString . L.intercalate "+" $
-    ppModifiers m ++ [fromMaybe "???" $ keysymName ksym]
-
-ppPKey :: (IsString a) => PKey -> a
-ppPKey (PKey m btn) =
-  fromString . L.intercalate "+" $
-    ppModifiers m ++ [fromMaybe "???" $ fromEventCodeButtons btn]
-
-ppButton :: (ModMask, Button) -> String
-ppButton (m, btn) =
-  L.intercalate "+" $
-    ppModifiers m ++ [fromMaybe "???" $ fromEventCodeButtons btn]
-
-data PKey = PKey {keyModMask :: !ModMask, keyButton :: !Button}
-  deriving stock (Eq, Ord, Show, Read, Generic, Data)
-  deriving anyclass (NFData)
-
-instance ToJSON PKey where
-  toJSON x = A.toJSON (ppPKey @Text x)
-  toEncoding x = A.toEncoding (ppPKey @Text x)
-
-instance A.ToJSONKey PKey where
-  toJSONKey = A.ToJSONKeyText ppPKey (A.text . ppPKey)
 
 type PointerBindings a = M.Map PKey (PointerBinding a)
 
@@ -154,15 +153,12 @@ instance IsModMask String where
 instance IsModMask [ModIndex] where
   toModMask _ = foldl' (.|.) 0
   modifierIndices = id
+-- ^ First parameter is the default mod mask
 
-resolveModMask ::
-  ModMask
-  -- ^ Default mod mask
-  -> String
-  -> ModMask
+resolveModMask :: ModMask -> String -> ModMask
 resolveModMask d s = go s
   where
-    go x = case L.span (/= '-') x of
+    go x = case L.span C.isAlphaNum $ L.dropWhile C.isSpace x of
       (m, '-' : xs) -> get1 m .|. go xs
       (m, []) -> get1 m
       _ -> error $ "malformed mod mask: " ++ s
@@ -202,8 +198,6 @@ class (Functor m) => IsAction m a where
   -- | Description based on the value (defaults to type info)
   actionDescription :: Proxy m -> a -> String
   actionDescription = passthruOrDef "" actionDescription
-
-  -- actionDescription _ _ = ""
 
   actionDescriptionFallback :: Proxy m -> a -> String
   default actionDescriptionFallback :: (Typeable a) => Proxy m -> a -> String

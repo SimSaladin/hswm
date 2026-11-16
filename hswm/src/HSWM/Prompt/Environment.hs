@@ -11,7 +11,6 @@ module HSWM.Prompt.Environment (
 ) where
 
 import HSWM hiding ((-->>))
-import HSWM.Util.PangoMarkup ((~++))
 import HSWM.Util.PangoMarkup qualified as P
 import HSWM.Util.RofiPrompt
 import HSWM.Util.RofiPrompt qualified as RP
@@ -69,7 +68,7 @@ environPrompt cfg pc = do
   where
     out :: String -> String -> String -> ARow
     out k v notes =
-      let disp = P.bold k <> "=" ~++ v <> "\t" <> P.italic ("(" ~++ notes <> ")")
+      let disp = P.bold k <> "=" <> P.toMarkup v <> "\t" <> P.italic ("(" <> P.toMarkup notes <> ")")
           sel = k <> "=" <> v
        in (sel, def & display .~ disp)
 
@@ -85,7 +84,7 @@ process input = do
     (name, '=' : value) -> do
       logInfo $ "Set environment variable" :# ["name" .= name, "value" .= value]
       io $ ENV.setEnv name value
-      void $ runUserSD ["set-environment", name ++ "=" ++ value]
+      void $ runUserSD ["set-environment", name <> "=" <> value]
     _ -> return ()
 
 parseLine :: String -> (String, String)

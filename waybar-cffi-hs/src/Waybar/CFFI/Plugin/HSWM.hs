@@ -1,9 +1,13 @@
 {-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE ExtendedDefaultRules #-}
 {-# LANGUAGE ImplicitParams #-}
 {-# LANGUAGE MultiWayIf #-}
+{-# LANGUAGE NamedDefaults #-}
 {-# LANGUAGE OverloadedRecordDot #-}
 {-# LANGUAGE PartialTypeSignatures #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# OPTIONS_GHC -Wno-partial-type-signatures #-}
+{-# OPTIONS_GHC -Wno-type-defaults #-}
 
 -- |
 -- Module      : Waybar.CFFI.Plugin.HSWM
@@ -13,7 +17,9 @@
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
-module Waybar.CFFI.Plugin.HSWM (HSWMPlugin) where
+module Waybar.CFFI.Plugin.HSWM (
+  HSWMPlugin,
+) where
 
 import Waybar.CFFI.Plugin.Base
 import Waybar.CFFI.Plugin.TextFormat
@@ -41,6 +47,8 @@ import RIO (Async, MVar, askRunInIO, async, cancel, newEmptyMVar, putMVar, takeM
 import RIO.Prelude hiding (on)
 import RIO.Prelude.Types
 
+default Applicative (IO, PlugM)
+
 type PlugM = PluginM HSWMPlugin
 
 -- * Plugin and Global State
@@ -52,44 +60,37 @@ data HSWMPlugin
   | FocusInfoPlug {plugLabel :: Label}
   deriving (Eq, Generic)
 
--- | Shared between all instances of this plugin (in the same waybar!)
-data instance GlobalState HSWMPlugin = Global
-  { wmClient :: !(MVar C.ClientHandle)
-  , wmThread :: !(Async ())
-  , outputs :: ![(Text, OutputId)]
-  , workspacesInfo :: !RWorkspaces
-  , curfocus :: !(Maybe WindowInfo)
-  }
-  deriving (Eq, Generic)
-
--- | Instance-specific state.
-data instance PluginState HSWMPlugin = ModState
-  { thisOutputName :: !Text
-  -- ^ Name of this output, e.g. @eDP-1@, @DP-2@, etc.
-  , tagWidgets :: [(Button, Label)] -- XXX WorkspacePlug only
-  , workspacePtrs :: !(M.Map WsId (StablePtr WsId)) -- XXX WorkspacePlug only
-  }
-  deriving (Eq, Generic)
-
 -- * Plugin Config
 
 -- | Config data supplied from waybar.
 --
--- Workspaces section:
+-- @
+-- active := "workspaces" | "layout" | "focused"
+-- @
+--
+-- * @__workspaces__@:
 --
 --     @
---     workspace-format-hidden := format
---     workspace-format-visible := format
+--     workspace-format-hidden          := format
+--     workspace-format-visible         := format
 --     workspace-tooltip-format-visible := format
---     workspace-tooltip-format-hidden := format
---     workspace-spacing := integer
+--     workspace-tooltip-format-hidden  := format
+--     workspace-spacing                := integer
 --     @
+--     ...
 --
--- Layout section:
+-- * @__layout__@:
 --
 --     @
---     "layout-windowlist-format" := format
---     "layout-tooltip-format"    := format
+--     layout-windowlist-format := format
+--     layout-tooltip-format    := format
+--     @
+--     ...
+--
+-- * @__focused__@:
+--
+--     @
+--     ...
 --     @
 data instance PluginConfig HSWMPlugin = Config
   { activePart :: ActivePart
@@ -111,40 +112,69 @@ data instance PluginConfig HSWMPlugin = Config
   }
   deriving (Eq, Ord, Show, Read, Generic)
 
+instance Default (PluginConfig HSWMPlugin) where
+  def =
+    Config
+      { activePart = ViewWorkspaces
+      , wsSpacing = 1
+      , wsFormatVisible = fromString "<span>{keyhint}:</span>{tag}"
+      , wsFormatHidden = fromString "<span>{keyhint}:</span>{tag}"
+      , wsTooltipFormatVisible = defWsTooltipVisible
+      , wsTooltipFormatHidden = defWsTooltipHidden
+      , focusedWindowTooltipFormat = fromString $ mconcat ["{title}\r", "AppID: {appId}\r", "PID: {pid}"]
+      , layoutTooltipFormat = fromString "Layout: {layout}\rWindows:\r{windowlist}"
+      , layoutWindowListFormat = fromString "{title} - {kitty} [{pid}]"
+      , focusedWindowMaxLength = 42
+      }
+    where
+      defWsTooltipVisible =
+        mconcat
+          [ "<b>{tag}</b>: {numWindows} window(s)\r"
+          , "Showing on screen no. {screen} (output: {outputName})\r"
+          , "<i>Layout:</i> {layout}"
+          ]
+      defWsTooltipHidden =
+        mconcat
+          [ "<b>{tag}</b>: {numWindows} window(s)\r"
+          , "<i>Layout:</i> {layout}"
+          ]
+
 instance ToJSON (PluginConfig HSWMPlugin)
 instance FromJSON (PluginConfig HSWMPlugin) where
   parseJSON = withObject "Config" $ \v -> do
-    activePart <- v .: "active" <|> pure ViewWorkspaces
-    focusedWindowMaxLength <- v .: "focused-window-max-length" <|> pure 42
-    wsSpacing <- v .: "workspace-spacing" <|> pure 1
-    wsFormatVisible <- v .: "workspace-format-visible" <|> v .: "workspace-format" <|> pure defWs
-    wsFormatHidden <- v .: "workspace-format-hidden" <|> v .: "workspace-format" <|> pure defWs
-    wsTooltipFormatVisible <- v .: "workspace-tooltip-format-visible" <|> pure defWsTooltipVisible
-    wsTooltipFormatHidden <- v .: "workspace-tooltip-format-hidden" <|> pure defWsTooltipHidden
-    focusedWindowTooltipFormat <- v .: "focused-window-tooltip-format" <|> pure defFocusedTooltip
-    layoutTooltipFormat <- v .: "layout-tooltip-format" <|> pure defLayoutTooltip
-    layoutWindowListFormat <- v .: "layout-windowlist-format" <|> pure defLayoutWindowList
+    activePart <- v .: "active" <|> pure pdef.activePart
+    focusedWindowMaxLength <- v .: "focused-window-max-length" <|> pure pdef.focusedWindowMaxLength
+    wsSpacing <- v .: "workspace-spacing" <|> pure pdef.wsSpacing
+    wsFormatVisible <- v .: "workspace-format-visible" <|> pure pdef.wsFormatVisible
+    wsFormatHidden <- v .: "workspace-format-hidden" <|> pure pdef.wsFormatHidden
+    wsTooltipFormatVisible <- v .: "workspace-tooltip-format-visible" <|> pure pdef.wsTooltipFormatVisible
+    wsTooltipFormatHidden <- v .: "workspace-tooltip-format-hidden" <|> pure pdef.wsTooltipFormatHidden
+    focusedWindowTooltipFormat <- v .: "focused-window-tooltip-format" <|> pure pdef.focusedWindowTooltipFormat
+    layoutTooltipFormat <- v .: "layout-tooltip-format" <|> pure pdef.layoutTooltipFormat
+    layoutWindowListFormat <- v .: "layout-windowlist-format" <|> pure pdef.layoutWindowListFormat
     pure Config{..}
     where
-      defWs = fromString "<span>{keyhint}:</span>{tag}"
-      defWsTooltipVisible =
-        fromString $
-          mconcat
-            [ "<b>{tag}</b>: {numWindows} window(s)\r"
-            , "Showing on screen no. {screen} (output: {outputName})\r"
-            , "<i>Layout:</i> {layout}"
-            ]
-      defWsTooltipHidden =
-        fromString $
-          mconcat
-            [ "<b>{tag}</b>: {numWindows} window(s)\r"
-            , "<i>Layout:</i> {layout}"
-            ]
-      --
-      defLayoutTooltip = fromString "Layout: {layout}\rWindows:\r{windowlist}"
-      defLayoutWindowList = fromString "{title} - {kitty} [{pid}]"
-      --
-      defFocusedTooltip = fromString $ mconcat ["{title}\r", "AppID: {appId}\r", "PID: {pid}"]
+      pdef :: PluginConfig HSWMPlugin
+      pdef = def
+
+-- | Shared between all instances of this plugin (in the same waybar!)
+data instance GlobalState HSWMPlugin = Global
+  { wmClient :: !(MVar C.ClientHandle)
+  , wmThread :: !(Async ())
+  , outputs :: ![(Text, OutputId)]
+  , workspacesInfo :: !RWorkspaces
+  , curfocus :: !(Maybe WindowInfo)
+  }
+  deriving (Eq, Generic)
+
+-- | Instance-specific state.
+data instance PluginState HSWMPlugin = ModState
+  { thisOutputName :: !Text
+  -- ^ Name of this output, e.g. @eDP-1@, @DP-2@, etc.
+  , tagWidgets :: [(Button, Label)] -- XXX WorkspacePlug only
+  , workspacePtrs :: !(M.Map WsId (StablePtr WsId)) -- XXX WorkspacePlug only
+  }
+  deriving (Eq, Generic)
 
 -- | Sum constructor for different views for this widget.
 data ActivePart
@@ -424,7 +454,7 @@ mkWorkspaceTooltip ws screen outputName = do
 mkFocusedTooltip :: WindowInfo -> PlugM Text
 mkFocusedTooltip wi = do
   c <- getInstanceConf
-  runTextFormat
+  runTextFormat @PlugM
     c.focusedWindowTooltipFormat
     [ ("title", markupEscape $ TS.toText wi.title)
     , ("appId", markupEscape $ TS.toText wi.appId)
@@ -434,17 +464,17 @@ mkLayoutTooltip :: WorkspaceInfo -> PlugM Text
 mkLayoutTooltip ws = do
   c <- getInstanceConf
   runTextFormatWith c.layoutTooltipFormat $ \case
-    "layout" -> formatted $ markupEscape @PlugM ws.layout
-    "windowlist" -> formattedList @PlugM [fmtWin c wi | wi <- ws.windowList]
-    _ -> return ""
+    "layout" -> formatted $ markupEscape ws.layout
+    "windowlist" -> formattedList [fmtWin c wi | wi <- ws.windowList]
+    _ -> pure ""
   where
+    fmtWin :: (_) => _ -> _ -> PlugM _
     fmtWin c v =
-      runTextFormat @PlugM
-        c.layoutWindowListFormat
-        [ ("appId", markupEscape $ TS.toText v.appId)
-        , ("title", markupEscape $ TS.toText v.title)
-        , ("pid", pure $ maybe "" tshow v.pid)
-        ]
+      runTextFormatWith' c.layoutWindowListFormat $ \case
+        "appId" -> formatted $ markupEscape $ TS.toText v.appId
+        "title" -> formatted $ markupEscape $ TS.toText v.title
+        "pid" -> formatted $ maybe "" tshow v.pid
+        _ -> pure mempty
 
 -- * General utilities
 
