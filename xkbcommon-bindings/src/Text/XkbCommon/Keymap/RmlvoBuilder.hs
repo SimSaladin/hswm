@@ -54,17 +54,34 @@ import Text.XkbCommon.Internal
 
 import qualified Text.XkbCommon.Registry as RXKB
 
+data PureBuilder = PureBuilder
+  { rules :: Maybe String
+  , model :: String
+  , layouts :: [(Layout, Bool)]
+  , options :: [(LayoutOption, Bool)]
+  , context :: XkbContext
+  , build :: KeymapBuilder
+  , registry :: RXKB.Registry
+  }
+
+instance Default PureBuilder where
+  def = fix $ \r ->
+    PureBuilder
+      { rules = mempty
+      , model = ""
+      , layouts = mempty
+      , options = mempty
+      , context = mkCtx
+      , registry = buildRegistry r
+      , build = pureBuilderBuild r
+      }
+    where
+      mkCtx = unsafePerformIO $ newContext def
+
 -- | It denotes the configuration values by which a user picks a keymap.
 newtype KeymapBuilder = KeymapBuilder {unwrap :: ForeignPtr KeymapBuilder}
   deriving newtype (Eq, Ord)
   deriving stock (Show, Generic, Data)
-
--- | Turn 'Ptr' into a 't:XkbKeymap' 'ForeignPtr'
-keymapFromPtr :: Ptr XkbKeymap -> IO XkbKeymap
-keymapFromPtr = fmap XkbKeymap . newForeignPtr c_xkb_keymap_unref
-
-foreign import capi unsafe "xkbcommon/xkbcommon.h &xkb_keymap_unref"
-  c_xkb_keymap_unref :: FunPtr (Ptr XkbKeymap -> IO ())
 
 -- | Create a keymap from a RMLVO builder.
 --
@@ -119,30 +136,6 @@ addOption b o = optionalOption b o >>= (`unless` throwIO (KeymapBuilderInvalidOp
 optionalOption :: (HasCallStack) => KeymapBuilder -> LayoutOption -> IO Bool
 optionalOption b o = withForeignPtr b.unwrap $ withCString (fromOption o) . c_append_option
 
-data PureBuilder = PureBuilder
-  { rules :: Maybe String
-  , model :: String
-  , layouts :: [(Layout, Bool)]
-  , options :: [(LayoutOption, Bool)]
-  , context :: XkbContext
-  , build :: KeymapBuilder
-  , registry :: RXKB.Registry
-  }
-
-instance Default PureBuilder where
-  def = fix $ \r ->
-    PureBuilder
-      { rules = mempty
-      , model = ""
-      , layouts = mempty
-      , options = mempty
-      , context = mkCtx
-      , registry = buildRegistry r
-      , build = pureBuilderBuild r
-      }
-    where
-      mkCtx = unsafePerformIO $ newContext def
-
 keymapFromBuilderPure :: KeymapFormat -> PureBuilder -> XkbKeymap
 keymapFromBuilderPure fmt x = unsafePerformIO $ keymapFromBuilder fmt x.build
 
@@ -173,7 +166,6 @@ pureBuilderBuild x = unsafePerformIO $ do
 buildRegistry :: PureBuilder -> RXKB.Registry
 buildRegistry x = unsafePerformIO $ do
   inc <- getIncludePath x.context
-  -- print (x.rules, inc)
   RXKB.createRegistry
     def
       { RXKB.ruleSet = x.rules
@@ -200,6 +192,7 @@ withLayout req l x = rebuild x{layouts = x.layouts ++ [(l, req)]}
 withOption :: Bool -> LayoutOption -> PureBuilder -> PureBuilder
 withOption req o x = rebuild x{options = x.options ++ [(o, req)]}
 
+-- | Check option against parsed registry.
 isValidOption :: RXKB.Registry -> [LayoutOption] -> LayoutOption -> Either String ()
 isValidOption reg old opt =
   case L.find (opt `inGroup`) reg.optionGroups of
@@ -214,6 +207,7 @@ isValidOption reg old opt =
   where
     inGroup x g = any (\o -> o.name == fromOption x) g.item.options
 
+-- | Checks the layout against a parsed registry.
 isValidLayout :: RXKB.Registry -> Layout -> Either String ()
 isValidLayout reg l =
   case L.find (\x -> x.name == fromLayout l) reg.layouts of
@@ -229,6 +223,13 @@ isValidLayout reg l =
             else Left ("layout " ++ fromLayout l ++ ": missing layout-specific options: " ++ show notFound)
   where
     f o x = x.name == fromOption o && x.item.layoutSpecific
+
+-- | Turn 'Ptr' into a 't:XkbKeymap' 'ForeignPtr'
+keymapFromPtr :: Ptr XkbKeymap -> IO XkbKeymap
+keymapFromPtr = fmap XkbKeymap . newForeignPtr c_xkb_keymap_unref
+
+foreign import capi unsafe "xkbcommon/xkbcommon.h &xkb_keymap_unref"
+  c_xkb_keymap_unref :: FunPtr (Ptr XkbKeymap -> IO ())
 
 foreign import capi unsafe "xkbcommon/xkbcommon.h xkb_rmlvo_builder_new"
   c_new :: Ptr XkbContext -> CString -> CString -> CUInt -> IO (Ptr KeymapBuilder)

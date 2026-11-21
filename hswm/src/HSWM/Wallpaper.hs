@@ -47,20 +47,20 @@ import Data.Vector.Storable qualified as V
 import System.FilePath ((</>))
 import Text.Printf
 
--- import GHC.Generics
-
 -- * Usage
 
 data WallpaperConfig = WallpaperConfig
   { imageSelect :: ImageSelect
+  -- ^ Configure how wallpapers are discovered and selected.
   , layerShellLayerName :: String
+  -- ^ Default is @\"wallpaper\"@
   }
   deriving stock (Eq, Ord, Show, Read)
 
 instance Default WallpaperConfig where
   def =
     WallpaperConfig
-      { imageSelect = SearchLocalSystem
+      { imageSelect = SearchLocalSystem ["wallpapers/*/contents/images/*.*"]
       , layerShellLayerName = "wallpaper"
       }
 
@@ -68,7 +68,7 @@ data ImageSelect
   = -- | Use a single statically defined image for all.
     OneStaticImage {filepath :: FilePath}
   | -- | Lookup wallpaper files under XDG data directories.
-    SearchLocalSystem
+    SearchLocalSystem {patterns :: [FilePath]}
   deriving stock (Eq, Ord, Show, Read)
 
 -- * Implementation
@@ -142,15 +142,15 @@ wpStartupHook conf = do
   -- load source image
   case conf.imageSelect of
     OneStaticImage fp -> tryLoadImage fp []
-    SearchLocalSystem -> do
-      images <- io searchLocal
+    SearchLocalSystem pats -> do
+      images <- io $ searchLocal pats
       logInfo $ "Found wallpapers on system" :# ["count" .= length images]
       forM_ (take 12 $ M.toList images) $ \(fp, attrs) -> do
         tryLoadImage fp attrs
 
 -- | Finds @wallpapers/*/contents/images/*.*@ under xdg_data_dirs
-searchLocal :: IO (Map FilePath [String])
-searchLocal = do
+searchLocal :: [FilePath] -> IO (Map FilePath [String])
+searchLocal patterns = do
   roots <- getXdgDirectoryList XdgDataDirs
   fmap (M.fromListWith (++) . mconcat) $ forM roots $ \r -> do
     exists <- doesDirectoryExist (r </> "wallpapers")
@@ -307,16 +307,16 @@ drawImage bp os img Surfaces{..} = do
 
   _ <- io $ V.unsafeWith (JP.imageData img) $ \bits -> do
     let trans =
-          P.transformScale sx sy False $
-            P.transformTranslate tx ty False P.transformIdentity
+          P.scaleTransform sx sy False $
+            P.translateTransform tx ty False P.identityTransform
     let pix =
-          P.imageSetFilter P.FilterBest [] $
-            P.imageSetTransform (P.fromFTransform trans) $
-              P.imageWithBits pixmanFormat (fi src_w, fi src_h) True (castPtr bits) (fi src_stride)
+          P.setFilter P.FilterBest [] $
+            P.setTransform (P.fromFTransform trans) $
+              P.newImageWithBits pixmanFormat (fi src_w, fi src_h) True (castPtr bits) (fi src_stride)
     let dest =
-          P.imageSetComposite32 (P.setComposite32 pix){P.op = P.OpSrc, P.size = (buf_w, buf_h)} $
-            P.imageWithBits pixmanFormat (buf.width, buf.height) False (castPtr buf.ptr) buf.stride
-    P.createImage dest
+          P.setComposite @P.R32 P.Src pix (def & P.compositeSize (fi buf_w, fi buf_h)) $
+            P.newImageWithBits pixmanFormat (buf.width, buf.height) False (castPtr buf.ptr) buf.stride
+    P.mkImage dest
 
   WL.surfaceAttach wl_surface buf.buf 0 0
   WL.surfaceDamageBuffer wl_surface 0 0 buf_w buf_h

@@ -4,7 +4,7 @@
   withSystem,
   haskell-nix-hs-bindgen-module,
   cabal-defaults,
-  mk-cabal,
+  #mk-cabal,
   ...
 }:
 
@@ -13,7 +13,6 @@ let
 
   useLld =
     {
-      lib,
       config,
       pkgs,
       ...
@@ -33,8 +32,8 @@ let
             enableRelocatedStaticLibs = true; # XXX: should enable or not?
           };
           ghc2 = ghc.overrideAttrs (oa: {
-            depsBuildTargetPropagated = oa.depsBuildTarget ++ [ ghc.llvmPackages.bintools ];
-            propagatedBuildInputs = oa.depsBuildTarget ++ [ ghc.llvmPackages.bintools ];
+            depsBuildTargetPropagated = oa.depsBuildTarget ++ [ ghc.llvmPackages.bintoolsNoLibc ];
+            propagatedBuildInputs = oa.propagatedBuildInputs or [ ] ++ [ ghc.llvmPackages.bintoolsNoLibc ];
             #postInstall = oa.postInstall or "" + ''
             #  find $out -name '*.copy' -exec sh -c 'chmod +w "$1"; chmod +w $(dirname "$1")' - {} \;
             #  find $out -name '*.copy' -exec ls -la {} \;
@@ -62,16 +61,16 @@ let
       libc = ghc.llvmPackages.libc-full or ghc.llvmPackages.libunwind;
     in
     {
-      cabalProjectLocal = lib.mkAfter ''
-        package *
-            ghc-options: -fPIC -fllvm -pgmc=clang -pgma=clang -pgml=clang -optl-fuse-ld=lld
-            ghc-options: -optl-L${pkgs.gcc-unwrapped}/lib/gcc/x86_64-unknown-linux-gnu/16.2.0
-            ghc-options: -optl-B${pkgs.gcc-unwrapped}/lib/gcc/x86_64-unknown-linux-gnu/16.2.0
-            ghc-options: -optl-L${pkgs.gcc-unwrapped.libgcc}/lib
-            ghc-options: -optl-B${pkgs.glibc.static}/lib
-            ghc-options: -optl-L${pkgs.glibc.static}/lib
-            ghc-options: -optl-B${libc}/lib
-      '';
+      #cabalProjectLocal = lib.mkAfter ''
+      #  package *
+      #      ghc-options: -fPIC -fllvm -pgmc=clang -pgma=clang -pgml=clang -optl-fuse-ld=lld
+      #      ghc-options: -optl-L${pkgs.gcc-unwrapped}/lib/gcc/x86_64-unknown-linux-gnu/16.2.0
+      #      ghc-options: -optl-B${pkgs.gcc-unwrapped}/lib/gcc/x86_64-unknown-linux-gnu/16.2.0
+      #      ghc-options: -optl-L${pkgs.gcc-unwrapped.libgcc}/lib
+      #      ghc-options: -optl-B${pkgs.glibc.static}/lib
+      #      ghc-options: -optl-L${pkgs.glibc.static}/lib
+      #      ghc-options: -optl-B${libc}/lib
+      #'';
 
       materialized = pkgs.project-lib.materializedFor "project";
 
@@ -140,7 +139,7 @@ let
           builderVersion = lib.mkForce 1;
           flake.packages = _: { }; # hide package outputs
         };
-        variants.ghc912 = { pkgs, ... }: {
+        variants.ghc912 = {
           compiler-nix-name = lib.mkForce "ghc912";
           cabalProjectFreeze = lib.mkForce ''
             constraints: boring +tagged,
@@ -151,12 +150,13 @@ let
                          transformers-compat -five +five-three +generic-deriving +mtl
           '';
           shell = {
+            tools.cabal-install = { };
             nativeBuildInputs = [
               #cabal-3_18-912 =
-              (mk-cabal {
-                inherit pkgs;
-                compiler-nix-name = "ghc912";
-              })
+              #(mk-cabal {
+              #  inherit pkgs;
+              #  compiler-nix-name = "ghc912";
+              #})
             ];
           };
           #flake.packages = _: { }; # hide package outputs
@@ -172,10 +172,6 @@ let
     {
       keepGhc = true;
       packages = {
-        hspec-discover.components.exes.hspec-discover = {
-          enableExecutableDynamic = true;
-          enableStatic = false;
-        };
         hswm.components = {
           library.build-tools = [
             llvm
@@ -291,6 +287,7 @@ let
       config,
       pkgs,
       project,
+      project-lld,
       project-lib,
       ...
     }:
@@ -298,14 +295,16 @@ let
       projects = [
         {
           key = "project";
-          inherit project;
+          project = project-lld;
         }
       ];
     in
     {
       apps = {
         # Note: needs to run with checkMaterialization = false
-        materialized-do = mkMaterializedDoApp { inherit projects pkgs project-lib; };
+        materialized-do = mkMaterializedDoApp {
+          inherit pkgs project-lib projects;
+        };
 
         hoogle = mkApp {
           name = "hoogle";
@@ -384,14 +383,14 @@ in
   perSystem =
     {
       pkgs,
-      pkgs-hnix,
+      pkgs-nixos,
       project,
-      project-hnix,
+      project-lld,
       ...
     }:
     {
-      _module.args.project = pkgs.project-lld;
-      _module.args.project-hnix = pkgs-hnix.project;
+      _module.args.project = pkgs.project;
+      _module.args.project-lld = pkgs-nixos.project-lld;
 
       inherit (project.flake')
         apps
@@ -401,11 +400,7 @@ in
         ;
 
       legacyPackages = {
-        inherit project project-hnix;
-        cabal-3_18-912 = mk-cabal {
-          pkgs = pkgs-hnix;
-          compiler-nix-name = "ghc912";
-        };
+        inherit project project-lld;
       };
     };
 }

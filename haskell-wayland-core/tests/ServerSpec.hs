@@ -22,17 +22,11 @@ spec = do
 
       statePtr <- malloc @Int
 
-      -- Ptr Wl_client → Ptr Void → Word32 → Word32 → IO ()
-      let handler = Wl_global_bind_func_t_Aux $ \client data' version id' -> do
+      outputHandleBind <- fmap Wl_global_bind_func_t $
+        toFunPtr $
+          Wl_global_bind_func_t_Aux $ \client data' version id' -> do
             return ()
-      outputHandleBind <- Wl_global_bind_func_t <$> toFunPtr handler
 
       iface <- Interface <$> (malloc >>= \p -> poke p wl_output_interface >> return p)
-      g <-
-        globalCreate
-          d
-          iface
-          1 -- version
-          (castPtr statePtr)
-          outputHandleBind
+      g <- globalCreate d iface 1 {- version -} (castPtr statePtr) outputHandleBind
       print g

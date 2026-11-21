@@ -16,8 +16,8 @@
 
     haskellNix.url = "github:input-output-hk/haskell.nix";
 
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
-    nixpkgs-hnix.follows = "haskellNix/nixpkgs-unstable";
+    nixpkgs-nixos.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    nixpkgs.follows = "haskellNix/nixpkgs-unstable";
 
     # cabal 3.18
     nix-tools.url = "github:SimSaladin/haskell.nix?dir=nix-tools&ref=sim/cabal-3.18";
@@ -94,14 +94,14 @@
             ...
           }:
           {
-            _module.args.pkgs-hnix = import inputs.nixpkgs-hnix {
+            _module.args.pkgs = import inputs.nixpkgs {
               inherit system;
               overlays = [
                 inputs.haskellNix.overlay
                 self.overlays.default
               ];
             };
-            _module.args.pkgs = import inputs.nixpkgs {
+            _module.args.pkgs-nixos = import inputs.nixpkgs-nixos {
               inherit system;
               overlays = [
                 inputs.haskellNix.overlay

@@ -31,8 +31,8 @@ spec = do
             setTransform t1 $
               newEmptyImage X8R8G8B8 (100, 100) True
       let comp :: CompositeParameters R32
-          comp = (compositeParameters32 pix){size = (100, 100)}
-      res <- mkImage $ setComposite comp $ newEmptyImage X8R8G8B8 (100, 100) True
+          comp = (compositeParameters32){size = (100, 100)}
+      res <- mkImage $ setComposite Src pix comp $ newEmptyImage X8R8G8B8 (100, 100) True
       imageWidth res `shouldBe` 100
       imageDepth res `shouldBe` 24
       f (ft, t1, pix, res)

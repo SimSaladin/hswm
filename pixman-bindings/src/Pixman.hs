@@ -112,11 +112,12 @@ module Pixman (
 
   -- * Composite
   setComposite,
-  compositeParameters,
-  compositeParameters16,
-  compositeParameters32,
-  compositeParameters64F,
   CompositeParameters (..),
+  compositeSize,
+  compositeMask,
+  compositeSrcPos,
+  compositeMaskPos,
+  compositeDestPos,
   Operation (
     Clear,
     Src,
@@ -1417,29 +1418,33 @@ setComponentAlpha :: Bool -> CreateImage -> CreateImage
 setComponentAlpha b = imageAddTrans $ \img -> US.pixman_image_set_component_alpha img (toPixmanBool b)
 
 data CompositeParameters (a :: RegionType) = CompositeParameters
-  { op :: Operation
-  , srcImg :: IO Image
-  , maskImg :: Maybe Image
+  { maskImg :: Maybe Image
   , srcPos :: Position (PositionScalar a)
   , maskPos :: Position (PositionScalar a)
   , destPos :: Position (PositionScalar a)
   , size :: Size (SizeScalar a)
   }
 
-compositeParameters :: (IsImage src, Default (PositionScalar a), Default (SizeScalar a)) => src -> CompositeParameters a
-compositeParameters src = CompositeParameters Src (mkImage src) Nothing (def, def) (def, def) (def, def) (def, def)
+compositeSrcPos, compositeMaskPos, compositeDestPos :: Position (PositionScalar a) -> CompositeParameters a -> CompositeParameters a
+compositeSrcPos x pa = pa{srcPos = x}
+compositeMaskPos x pa = pa{maskPos = x}
+compositeDestPos x pa = pa{destPos = x}
 
-compositeParameters16 :: (IsImage src) => src -> CompositeParameters R16
-compositeParameters16 = compositeParameters
+compositeMask :: Maybe Image -> CompositeParameters a -> CompositeParameters a
+compositeMask x pa = pa{maskImg = x}
 
-compositeParameters32 :: (IsImage src) => src -> CompositeParameters R32
-compositeParameters32 = compositeParameters
+compositeSize :: Size (SizeScalar a) -> CompositeParameters a -> CompositeParameters a
+compositeSize sz pa = pa{size = sz}
 
-compositeParameters64F :: (IsImage src) => src -> CompositeParameters R64F
-compositeParameters64F = compositeParameters
+instance (Default (PositionScalar a), Default (SizeScalar a)) => Default (CompositeParameters a) where
+  def = CompositeParameters Nothing (def, def) (def, def) (def, def) (def, def)
 
-setComposite :: (Typeable a) => CompositeParameters a -> CreateImage -> CreateImage
-setComposite set
+-- |
+-- @
+-- setComposite @R32 Src srcimg def dstimg
+-- @
+setComposite :: (Typeable a, IsImage src) => Operation -> src -> CompositeParameters a -> CreateImage -> CreateImage
+setComposite op srcImg set
   | Just x <- cast set :: Maybe (CompositeParameters R16) = setCompositeInner US.pixman_image_composite id id x
   | Just x <- cast set :: Maybe (CompositeParameters R32) = setCompositeInner US.pixman_image_composite32 id fromIntegral x
   | Just x <- cast set :: Maybe (CompositeParameters R64F) = setCompositeInner US.pixman_image_composite64f CDouble CDouble x
@@ -1447,17 +1452,17 @@ setComposite set
   where
     setCompositeInner :: _ -> (PositionScalar a -> _) -> (SizeScalar a -> _) -> CompositeParameters a -> CreateImage -> CreateImage
     setCompositeInner f f1 f2 CompositeParameters{..} = imageAddTrans $ \img -> do
-      src <- srcImg
       let (w, h) = size
           (src_x, src_y) = srcPos
           (mask_x, mask_y) = maskPos
           (dest_x, dest_y) = destPos
-      withPtr src $ \src_p ->
-        maybe ($ nullPtr) withPtr maskImg $ \mask_p ->
+      src <- mkImage srcImg
+      withPtr src $ \srcP ->
+        maybe ($ nullPtr) withPtr maskImg $ \maskP ->
           f
             (coerce op :: G.Pixman_op_t)
-            src_p
-            mask_p
+            srcP
+            maskP
             img
             (f1 src_x)
             (f1 src_y)

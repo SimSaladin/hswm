@@ -312,15 +312,18 @@ instance Num Fixed where
   abs (Fixed (Wl_fixed_t x)) = Fixed . Wl_fixed_t $! abs x
   signum (Fixed (Wl_fixed_t x)) = Fixed . Wl_fixed_t $! signum x
   fromInteger = fixedFromInt
+
 instance Fractional Fixed where
   (Fixed (Wl_fixed_t a)) / (Fixed (Wl_fixed_t b)) = Fixed . Wl_fixed_t $! div (a * 256) b
   recip (Fixed (Wl_fixed_t a)) = Fixed . Wl_fixed_t $! div (256 * 256) a
   fromRational r = Fixed . Wl_fixed_t $! round (r * 256)
+
 instance Real Fixed where
   toRational (Fixed (Wl_fixed_t a)) = toRational a / 8
 
 instance Show Fixed where
   show (Fixed (Wl_fixed_t x)) = F.showFixed True (F.MkFixed $ fromIntegral x :: F.Fixed 256)
+
 deriving via PPShow Fixed instance Pretty Fixed
 
 fixedToInt :: Fixed -> Int
