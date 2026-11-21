@@ -11,13 +11,13 @@
   };
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
-
     flake-utils.url = "github:numtide/flake-utils";
     flake-parts.url = "github:hercules-ci/flake-parts";
 
     haskellNix.url = "github:input-output-hk/haskell.nix";
-    #haskellNix.url = "github:SimSaladin/haskell.nix?ref=sim/v2-flib";
+
+    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    nixpkgs-hnix.follows = "haskellNix/nixpkgs-unstable";
 
     # cabal 3.18
     nix-tools.url = "github:SimSaladin/haskell.nix?dir=nix-tools&ref=sim/cabal-3.18";
@@ -94,6 +94,13 @@
             ...
           }:
           {
+            _module.args.pkgs-hnix = import inputs.nixpkgs-hnix {
+              inherit system;
+              overlays = [
+                inputs.haskellNix.overlay
+                self.overlays.default
+              ];
+            };
             _module.args.pkgs = import inputs.nixpkgs {
               inherit system;
               overlays = [
@@ -108,11 +115,9 @@
             # To run git-hooks.nix hooks with `nix fmt`
             formatter =
               let
-                config = inputs.git-hooks.checks.${system}.pre-commit-check.config;
-                inherit (config) package configFile;
-                script = "${pkgs.lib.getExe package} run --all-files --config ${configFile}";
+                inherit (config.pre-commit.settings) package configFile;
               in
-              pkgs.writeShellScriptBin "pre-commit-run" script;
+              pkgs.writeShellScriptBin "pre-commit-run" "${pkgs.lib.getExe package} run --all-files --config ${configFile}";
 
             pre-commit.settings = _: {
               hooks = {

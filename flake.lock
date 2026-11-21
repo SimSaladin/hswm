@@ -1513,6 +1513,10 @@
         "hs-bindgen": "hs-bindgen",
         "nix-tools": "nix-tools",
         "nixpkgs": "nixpkgs_2",
+        "nixpkgs-hnix": [
+          "haskellNix",
+          "nixpkgs-unstable"
+        ],
         "river": "river",
         "zig2nix": "zig2nix",
         "zon2nix": "zon2nix"

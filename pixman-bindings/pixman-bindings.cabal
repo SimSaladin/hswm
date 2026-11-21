@@ -63,6 +63,7 @@ test-suite pixman-test
   hs-source-dirs: test
   main-is: Spec.hs
   build-depends:
+    QuickCheck,
     base,
     deepseq,
     hspec,

@@ -37,21 +37,23 @@ constraints: any.string-interpolate <1.0
 -- Temporary relaxes for GHC 9.14.1
 --
 
+if impl(ghc >= 9.12)
+  allow-newer: tagged
+  allow-newer: skew-list-0.1:QuickCheck
+  allow-newer: vec:QuickCheck
+  allow-newer: fin:QuickCheck
+  allow-newer: hspec-core:QuickCheck
+  allow-newer: hs-bindgen:aeson
+  allow-newer: optparse-generic-1.5.3:transformers-compat
+  allow-newer: monad-control-1.0.3.1:transformers-compat
+
 if impl(ghc >= 9.14)
   allow-newer: debruijn-0.3.1:base
   allow-newer: cairo-0.13.12.0:time
   allow-newer: pango-0.13.12.0:containers
-  allow-newer: monad-control-1.0.3.1:transformers-compat
   allow-newer: optparse-generic-1.5.3:time
-  allow-newer: optparse-generic-1.5.3:transformers-compat
-  allow-newer: skew-list-0.1:QuickCheck
   allow-newer: skew-list-0.1:base
   allow-newer: typerep-map-0.7.0.0:base
-  allow-newer: hs-bindgen:aeson
-  allow-newer: tagged
-  allow-newer: vec:QuickCheck
-  allow-newer: fin:QuickCheck
-  allow-newer: hspec-core:QuickCheck
 
 
 -- TO catch inxhaustive patterns...

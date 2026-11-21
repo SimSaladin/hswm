@@ -4,11 +4,89 @@
   withSystem,
   haskell-nix-hs-bindgen-module,
   cabal-defaults,
+  mk-cabal,
   ...
 }:
 
 let
   inherit (inputs.flake-utils.lib) mkApp;
+
+  useLld =
+    {
+      lib,
+      config,
+      pkgs,
+      ...
+    }:
+    let
+
+      ghc = (config.compilerSelection pkgs.buildPackages).${config.compiler-nix-name};
+
+      ghcUseLdLld =
+        oldGhc:
+        let
+          ghc = oldGhc.override {
+            useLdLld = true;
+            useLdGold = false;
+            llvmPackages = pkgs.llvmPackages_23;
+            extra-passthru = { };
+            enableRelocatedStaticLibs = true; # XXX: should enable or not?
+          };
+          ghc2 = ghc.overrideAttrs (oa: {
+            depsBuildTargetPropagated = oa.depsBuildTarget ++ [ ghc.llvmPackages.bintools ];
+            propagatedBuildInputs = oa.depsBuildTarget ++ [ ghc.llvmPackages.bintools ];
+            #postInstall = oa.postInstall or "" + ''
+            #  find $out -name '*.copy' -exec sh -c 'chmod +w "$1"; chmod +w $(dirname "$1")' - {} \;
+            #  find $out -name '*.copy' -exec ls -la {} \;
+            #  find $out -name '*.copy' -delete
+            #  chmod -R +w $out/lib/ghc-9.14.1/lib/package.conf.d
+            #  $out/bin/ghc-pkg recache
+            #'';
+          });
+          #ghc3 = pkgs.runCommand "ghc" {
+          #        passthru = { inherit (ghc2) llvmPackages version targetPrefix buildGHC ; } // ghc2.passthru;
+          #      }
+          #      ''
+          #        cp -r --reflink=auto ${ghc2.out} $out
+          #        chmod +w $out/bin
+          #        substituteInPlace $out/bin/* --replace ${ghc2} $out
+          #        for f in ${ghc2.llvmPackages.bintools}/bin/*; do
+          #           ln -ns $f $out/bin/$(basename -- "$f")
+          #        done
+          #        chmod -R +w $out/lib/ghc-9.14.1/lib/package.conf.d
+          #        $out/bin/ghc-pkg recache
+          #      '';
+        in
+        ghc2;
+
+      libc = ghc.llvmPackages.libc-full or ghc.llvmPackages.libunwind;
+    in
+    {
+      cabalProjectLocal = lib.mkAfter ''
+        package *
+            ghc-options: -fPIC -fllvm -pgmc=clang -pgma=clang -pgml=clang -optl-fuse-ld=lld
+            ghc-options: -optl-L${pkgs.gcc-unwrapped}/lib/gcc/x86_64-unknown-linux-gnu/16.2.0
+            ghc-options: -optl-B${pkgs.gcc-unwrapped}/lib/gcc/x86_64-unknown-linux-gnu/16.2.0
+            ghc-options: -optl-L${pkgs.gcc-unwrapped.libgcc}/lib
+            ghc-options: -optl-B${pkgs.glibc.static}/lib
+            ghc-options: -optl-L${pkgs.glibc.static}/lib
+            ghc-options: -optl-B${libc}/lib
+      '';
+
+      materialized = pkgs.project-lib.materializedFor "project";
+
+      compilerSelection =
+        p:
+        p.haskell-nix.compiler
+        // {
+          ghc9141llvm-lld = ghcUseLdLld p.haskell-nix.compiler.ghc9141llvm;
+          ghc9141llvm = ghcUseLdLld p.haskell-nix.compiler.ghc9141llvm;
+        };
+
+      shell = {
+        buildInputs = [ libc ];
+      };
+    };
 
   hswmProject =
     {
@@ -17,6 +95,7 @@ let
       pkgs,
       ...
     }:
+    #let ghc = (config.compilerSelection pkgs.buildPackages).${config.compiler-nix-name}; in
     {
       name = "hswm";
       src = pkgs.project-lib.fixCabalProjectImports {
@@ -30,61 +109,26 @@ let
         haskell-nix-hswm-module
       ];
 
-      #compiler-nix-name = lib.mkForce "ghc9141";
+      cabalProjectFreeze = builtins.readFile ../cabal.project.freeze.ghc914;
 
-      cabalProjectFreeze = builtins.readFile ../cabal.project.freeze;
       cabalProjectLocal = lib.mkAfter ''
         package *
             documentation: True
       '';
 
-      materialized = pkgs.project-lib.materializedFor "project";
-
-      ghcOverride =
-        let
-          drv = (config.compilerSelection pkgs.buildPackages).${config.compiler-nix-name};
-          out' =
-            pkgs.runCommand "ghc"
-              {
-                passthru = {
-                  inherit (drv)
-                    llvmPackages
-                    version
-                    targetPrefix
-                    buildGHC
-                    ;
-                };
-              }
-              ''
-                cp -r --reflink=auto ${drv.out} $out
-                find $out -name '*.copy' -exec sh -c 'chmod +w "$1"; chmod +w $(dirname "$1")' - {} \;
-                find $out -name '*.copy' -exec ls -la {} \;
-                find $out -name '*.copy' -delete
-                substituteInPlace $out/bin/* \
-                   --replace ${drv} $out
-                chmod -R +w $out/lib/ghc-9.14.1/lib/package.conf.d
-                $out/bin/ghc-pkg recache
-              '';
-        in
-        out';
-      #drv.overrideAttrs (oa: {
-      #  postInstall = (oa.postInstall or "") +
-      #  ''
-      #    find $out -name '*.copy -delete
-      #  '';
-      #});
-
       shell = {
         inherit (config) name;
         tools.hpack = { };
+        exactDeps = true;
         allToolDeps = true;
         #withHaddock = true;
         #withHoogle = true;
         nativeBuildInputs = [
           # Use a newer cabal-install binary
-          pkgs.cabal_3_18_1_0
+          #pkgs.cabal_3_18_1_0
           config.hsPkgs.hs-bindgen.components.exes.hs-bindgen-cli
         ];
+        buildInputs = [ ];
         inputsFrom = [
           (withSystem pkgs.stdenv.hostPlatform.system ({ config, ... }: config.pre-commit.devShell))
         ];
@@ -96,16 +140,42 @@ let
           builderVersion = lib.mkForce 1;
           flake.packages = _: { }; # hide package outputs
         };
+        variants.ghc912 = { pkgs, ... }: {
+          compiler-nix-name = lib.mkForce "ghc912";
+          cabalProjectFreeze = lib.mkForce ''
+            constraints: boring +tagged,
+                         any.transformers ==0.6.1.2,
+                         any.transformers-base ==0.4.6.1,
+                         transformers-base +orphaninstances,
+                         any.transformers-compat ==0.8,
+                         transformers-compat -five +five-three +generic-deriving +mtl
+          '';
+          shell = {
+            nativeBuildInputs = [
+              #cabal-3_18-912 =
+              (mk-cabal {
+                inherit pkgs;
+                compiler-nix-name = "ghc912";
+              })
+            ];
+          };
+          #flake.packages = _: { }; # hide package outputs
+        };
       };
     };
 
   haskell-nix-hswm-module =
     { config, pkgs, ... }:
     let
-      inherit (config.ghc.package.llvmPackages) llvm libclang;
+      inherit (config.ghc.package.llvmPackages) llvm bintools libclang;
     in
     {
+      keepGhc = true;
       packages = {
+        hspec-discover.components.exes.hspec-discover = {
+          enableExecutableDynamic = true;
+          enableStatic = false;
+        };
         hswm.components = {
           library.build-tools = [
             llvm
@@ -131,9 +201,13 @@ let
         hswm-bindings.components.library.build-tools = [
           pkgs.wayland-scanner
         ];
-        haskell-wayland-core.components.library.build-tools = [
-          pkgs.wayland-scanner
-        ];
+        haskell-wayland-core = {
+          components.library.build-tools = [
+            libclang
+            bintools
+            pkgs.wayland-scanner
+          ];
+        };
       };
     };
 
@@ -300,15 +374,24 @@ in
   ];
 
   flake.overlays.project = final: _: {
-
+    project-lld = final.haskell-nix.cabalProject' [
+      hswmProject
+      useLld
+    ];
     project = final.haskell-nix.cabalProject' [ hswmProject ];
-
   };
 
   perSystem =
-    { pkgs, project, ... }:
     {
-      _module.args.project = pkgs.project;
+      pkgs,
+      pkgs-hnix,
+      project,
+      project-hnix,
+      ...
+    }:
+    {
+      _module.args.project = pkgs.project-lld;
+      _module.args.project-hnix = pkgs-hnix.project;
 
       inherit (project.flake')
         apps
@@ -317,6 +400,12 @@ in
         checks
         ;
 
-      legacyPackages = { inherit project; };
+      legacyPackages = {
+        inherit project project-hnix;
+        cabal-3_18-912 = mk-cabal {
+          pkgs = pkgs-hnix;
+          compiler-nix-name = "ghc912";
+        };
+      };
     };
 }

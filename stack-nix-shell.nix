@@ -8,47 +8,49 @@ in
 
 pkgs.haskell.lib.buildStackProject {
   inherit ghc;
-  name = "myEnv";
+  name = "stack-nix";
   buildInputs = with pkgs; [
-    gobject-introspection
-    glib
-    libsysprof-capture
+    atk
     cairo
-    pcre2
-    #llvm_23
-    llvmPackages_23.llvm
-    llvmPackages_23.libclang
-    libxkbcommon
-    zlib
-    libxdmcp
-    libuuid
+    fribidi
+    gcc-unwrapped
+    gdk-pixbuf
+    glib
+    gobject-introspection
+    gtk3
+    harfbuzzFull
+    libdatrie
+    libepoxy
+    libgcc
     libselinux
     libsepol
-    harfbuzzFull
-    gdk-pixbuf
-    pango
-    fribidi
-    atk
+    libsysprof-capture
     libthai
-    libdatrie
-    gtk3
-    libepoxy
+    libuuid
+    libxdmcp
+    libxkbcommon
     libxml2
-    systemdLibs
     libxtst
+    llvmPackages_23.libc-full
+    llvmPackages_23.libclang
+    llvmPackages_23.llvm
+    pango
+    pcre2
     pixman
+    systemdLibs
     wayland
     wayland-protocols
+    zlib
   ];
 
   nativeBuildInputs = [
-    pkgs.pkg-config
-    pkgs.wayland-scanner
+    pkgs.doxygen
     # This setup hook should adjust BINDGEN_EXTRA_CLANG_ARGS
     # so that hs-bindgen-cli is passed include paths for our
     # Nix dependencies.
     pkgs.hsBindgenHook
-    pkgs.doxygen
+    pkgs.llvmPackages_23.bintools
+    pkgs.wayland-scanner
   ];
 
   extraArgs = "";

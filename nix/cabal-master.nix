@@ -1,4 +1,5 @@
 {
+  lib,
   inputs,
   checkMaterialization,
   ...
@@ -22,7 +23,7 @@ let
     inherit (cabalDefaults) compiler-nix-name index-state;
     cabalProjectLocal = ''
       index-state: ${cabalDefaults.index-state}
-      constraints: cabal-install    >=3.17
+      constraints: cabal-install    >=3.18
       constraints: Cabal-syntax     >=3.18
       constraints: extra            >=1.8.1
       constraints: algebraic-graphs >=0.8
@@ -103,23 +104,22 @@ let
       })
     ];
   };
-
-  #overrideNixTools =
-  #  haskell-nix: args:
-  #  haskell-nix
-  #  // rec {
-  #    nix-tools-unchecked = haskell-nix.nix-tools-set args;
-  #    nix-tools = haskell-nix.nix-tools-set { nix-tools = nix-tools-unchecked; };
-  #    nix-tools-set = args1: haskell-nix.nix-tools-set (lib.composeExtensions args args1);
-  #    nix-tools-eval-on-linux = haskell-nix.nix-tools-set (
-  #      lib.composeExtensions args { evalSystem = "x86_64-linux"; }
-  #    );
-  #  };
 in
 {
   _module.args.cabal-defaults = cabalDefaults;
 
+  _module.args.mk-cabal =
+    { pkgs, compiler-nix-name }:
+    let
+      tools = pkgs.haskell-nix.nix-tools-set (_: {
+        imports = [ cabal_3_18_1_0-nix-tools ];
+        compiler-nix-name = lib.mkForce compiler-nix-name;
+      });
+    in
+    tools.exes.cabal;
+
   perSystem = { pkgs, ... }: {
+
     packages = {
       inherit (pkgs) cabal_3_18_1_0 nix-tools-cabal_3_18_1_0;
     };
@@ -132,21 +132,8 @@ in
 
     inherit cabalDefaults;
 
-    # Alternative way of building newer cabal
-    #cabal-master = final.haskell-nix.cabalProject' ({ lib, ... }:
-    #  final.cabalDefaults // {
-    #    name = "cabal-master";
-    #    src = ../project-cabal;
-    #    cabalProjectFileName = "cabal-3.17.cabal";
-    #    # builder v2 fails with:
-    #    # > cp: cannot stat '/nix/store/vgh1nniw5b7bdq5cf7pqjbppcdha4n1a-cabal-bc27d17/cabal-install/./tests/fixtures/project-root/cabal.project.symlink.broken': No such file or directory
-    #    builderVersion = 1;
-    #    materialized = final.project-lib.materializedFor "cabal-plan-nix";
-    #  });
-
     # Cabal 3.18.1.0
     nix-tools-cabal_3_18_1_0 = final.haskell-nix.nix-tools-set cabal_3_18_1_0-nix-tools;
     cabal_3_18_1_0 = final.nix-tools-cabal_3_18_1_0.exes.cabal;
-    #haskell-nix = overrideNixTools prev.haskell-nix cabal_3_18_1_0-nix-tools;
   };
 }

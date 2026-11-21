@@ -90,6 +90,8 @@ mkExport export hsType funBody = do
     , forExpD CCall export nm hsType
     ]
 
+-- |
+-- `libraryInitCSource "Module" 2 ["-N"]`
 libraryInitCSource :: ModName -> Int -> [String] -> String
 libraryInitCSource moduleName cffiVersion rtsFlags =
   unlines
@@ -120,7 +122,11 @@ libraryInitCSource moduleName cffiVersion rtsFlags =
     , "}"
     ]
   where
-    ppFlags = intercalate ", " . map (\x -> "\"" <> x <> "\"") . ("+RTS" :)
+    ppFlags = intercalate ", " . map (\x -> "\"" <> esc x <> "\"") . ("+RTS" :)
+    esc = concatMap $ \case
+      c
+        | c `elem` ("\"\\" :: String) -> ['\\', c]
+        | otherwise -> [c]
 
 -- | Create a foreign export declaration.
 --

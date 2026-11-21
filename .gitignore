@@ -5,3 +5,4 @@ dist-newstyle
 dist-newstyle2
 /haddocks
 .pre-commit-config.yaml
+*.tix
