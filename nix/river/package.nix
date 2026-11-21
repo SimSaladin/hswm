@@ -71,7 +71,15 @@ let
     '';
   };
 
-  calculatedDeps = callPackage (import "${build-zig-zon-nix}") { inherit zig; };
+  calculatedDeps = callPackage (import "${build-zig-zon-nix}") {
+    inherit zig;
+    runCommand =
+      name: attrs: cmd:
+      runCommand name (attrs) ''
+        export ZIG_GLOBAL_CACHE_DIR=$(mktemp -d)
+        ${cmd}
+      '';
+  };
 in
 
 stdenv.mkDerivation (finalAttrs: {
@@ -138,6 +146,8 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru = {
     providedSessions = [ "river" ];
+    inherit calculatedDeps;
+    inherit build-zig-zon-nix;
   };
 
   meta = {

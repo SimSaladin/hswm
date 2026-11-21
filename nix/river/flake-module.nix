@@ -27,7 +27,7 @@ in
     # features (the wm protocol etc.)
     river = final.callPackage ./package.nix {
       src = inputs.river;
-      depsHash = "sha256-jZiZwh4+4CcDph7oJt/CX1HwY2YB3QyRRYvJdvQzgkU=";
+      depsHash = "sha256-HX9gFHWY4g6lTHr5jB9Dk3TDYsYmMzgiLmsii2xCddc=";
     };
 
     # With debug enabled

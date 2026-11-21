@@ -87,7 +87,9 @@ let
       '';
 
       shell = {
-        #additional = ps: [ ];
+        packages = ps: [
+          ps.hswm
+        ];
         buildInputs = [ libc ];
         tools.alex = { };
         tools.alex = { };
