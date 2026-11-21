@@ -25,6 +25,7 @@
   wlroots_0_20,
   xwayland,
   zig, # tested with 0.16...
+  zig_0_16,
   withManpages ? true,
   xwaylandSupport ? true,
   withDebug ? false,
@@ -72,7 +73,7 @@ let
   };
 
   calculatedDeps = callPackage (import "${build-zig-zon-nix}") {
-    inherit zig;
+    zig = zig_0_16;
     runCommand =
       name: attrs: cmd:
       runCommand name (attrs) ''
@@ -148,6 +149,7 @@ stdenv.mkDerivation (finalAttrs: {
     providedSessions = [ "river" ];
     inherit calculatedDeps;
     inherit build-zig-zon-nix;
+    inherit zig;
   };
 
   meta = {
