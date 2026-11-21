@@ -24,7 +24,7 @@
   wayland-scanner,
   wlroots_0_20,
   xwayland,
-  zig, # tested with 0.16...
+  #zig, # tested with 0.16...
   zig_0_16,
   withManpages ? true,
   xwaylandSupport ? true,
@@ -107,7 +107,7 @@ stdenv.mkDerivation (finalAttrs: {
     pkg-config
     wayland-scanner
     xwayland
-    zig
+    zig_0_16 # zig
   ]
   ++ lib.optional withManpages scdoc;
 
@@ -149,7 +149,6 @@ stdenv.mkDerivation (finalAttrs: {
     providedSessions = [ "river" ];
     inherit calculatedDeps;
     inherit build-zig-zon-nix;
-    inherit zig;
   };
 
   meta = {
