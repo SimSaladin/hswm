@@ -108,7 +108,7 @@ let
         haskell-nix-hswm-module
       ];
 
-      cabalProjectFreeze = builtins.readFile ../cabal.project.freeze.ghc914;
+      #cabalProjectFreeze = builtins.readFile ../cabal.project.freeze.ghc914;
 
       cabalProjectLocal = lib.mkAfter ''
         package *
@@ -333,10 +333,22 @@ let
             config.packages."hswm:exe:hswm"
             config.packages."hswm:exe:hswmctl"
             config.packages."waybar-cffi-hs:flib:waybarhaskellplugin"
+            (pkgs.runCommand "bash-completion"
+              {
+                nativeBuildInputs = [
+                  pkgs.installShellFiles
+                  config.packages."hswm:exe:hswmctl"
+                ];
+              }
+              ''
+                installShellCompletion --cmd hswmctl --bash <(hswmctl --bash-completion-script hswmctl)
+              ''
+            )
           ];
           pathsToLink = [
             "/bin"
             "/lib"
+            "/share"
           ];
         };
       };

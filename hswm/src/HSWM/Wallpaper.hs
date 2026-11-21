@@ -45,6 +45,7 @@ import Data.List qualified as L
 import Data.Map qualified as M
 import Data.Vector.Storable qualified as V
 import System.FilePath ((</>))
+import System.Path.Glob (glob)
 import Text.Printf
 
 -- * Usage
@@ -60,7 +61,7 @@ data WallpaperConfig = WallpaperConfig
 instance Default WallpaperConfig where
   def =
     WallpaperConfig
-      { imageSelect = SearchLocalSystem ["wallpapers/*/contents/images/*.*"]
+      { imageSelect = SearchLocalSystem ["wallpapers/*/contents/images/*.*"] []
       , layerShellLayerName = "wallpaper"
       }
 
@@ -68,7 +69,12 @@ data ImageSelect
   = -- | Use a single statically defined image for all.
     OneStaticImage {filepath :: FilePath}
   | -- | Lookup wallpaper files under XDG data directories.
-    SearchLocalSystem {patterns :: [FilePath]}
+    SearchLocalSystem
+      { patterns :: [FilePath]
+      -- ^ Glob patterns that are matched under XDG_DATA_DIRS and XDG_DATA_HOME
+      , directories :: [FilePath]
+      -- ^ Additional directories to search
+      }
   deriving stock (Eq, Ord, Show, Read)
 
 -- * Implementation
@@ -93,14 +99,9 @@ instance Inspect (JP.Image JP.PixelRGBA8) where
   inspectPrec _ _ = "<Image>"
 
 data OutputState = OutputState
-  { x :: {-# UNPACK #-} !Int32
-  , y :: {-# UNPACK #-} !Int32
-  , width :: {-# UNPACK #-} !Int32
-  , height :: {-# UNPACK #-} !Int32
-  , scale :: {-# UNPACK #-} !Int32
-  , pref_fract_scale :: {-# UNPACK #-} !Word32
-  , needsRender :: {-# UNPACK #-} !Bool
-  , configured :: {-# UNPACK #-} !Bool
+  { x, y, width, height, scale :: {-# UNPACK #-} !Int32
+  , fractionalScale :: {-# UNPACK #-} !Word32
+  , needsRender, configured :: {-# UNPACK #-} !Bool
   , osWlOutput :: {-# UNPACK #-} !WL.Output
   , surfaces :: !(Maybe Surfaces)
   , name :: !String
@@ -142,27 +143,28 @@ wpStartupHook conf = do
   -- load source image
   case conf.imageSelect of
     OneStaticImage fp -> tryLoadImage fp []
-    SearchLocalSystem pats -> do
-      images <- io $ searchLocal pats
+    SearchLocalSystem pats dirs -> do
+      images <- io $ searchLocal dirs pats
       logInfo $ "Found wallpapers on system" :# ["count" .= length images]
       forM_ (take 12 $ M.toList images) $ \(fp, attrs) -> do
         tryLoadImage fp attrs
 
 -- | Finds @wallpapers/*/contents/images/*.*@ under xdg_data_dirs
-searchLocal :: [FilePath] -> IO (Map FilePath [String])
-searchLocal patterns = do
-  roots <- getXdgDirectoryList XdgDataDirs
-  fmap (M.fromListWith (++) . mconcat) $ forM roots $ \r -> do
-    exists <- doesDirectoryExist (r </> "wallpapers")
-    collections <- if exists then listDirectory (r </> "wallpapers") else return []
-    fmap mconcat $ forM collections $ \c -> do
-      let cdir = r </> "wallpapers" </> c
-      exists' <- doesDirectoryExist (cdir </> "contents/images")
-      dirs <- if exists' then listDirectory (cdir </> "contents/images") else return []
-      fmap mconcat $ forM dirs $ \n -> do
-        let file = cdir </> "contents/images" </> n
-        rpath <- resolveRealPath file
-        return [(rpath, [n])]
+searchLocal :: [FilePath] -> [FilePath] -> IO (Map FilePath [String])
+searchLocal extra patterns = do
+  dataHome <- getXdgDirectory XdgData ""
+  dataDirs <- getXdgDirectoryList XdgDataDirs
+  let roots = extra ++ dataHome : dataDirs
+  fmap (M.fromListWith (++) . mconcat) $ forM roots $ traverseDir patterns
+  where
+    traverseDir [] _ = return []
+    traverseDir pats r = do
+      found <- fmap concat $ forM pats $ \pat -> glob (r </> pat)
+      fmap mconcat $ forM found $ \x -> do
+        isfile <- doesFileExist x
+        if isfile
+          then resolveRealPath x >>= \rp -> return [(rp, [x])]
+          else return []
 
 resolveRealPath :: (MonadIO m) => FilePath -> m FilePath
 resolveRealPath fp = do
@@ -270,9 +272,9 @@ drawImage bp os img Surfaces{..} = do
 
       -- Calculate the buffer size
       buf_size@(buf_w, buf_h)
-        | os.pref_fract_scale > 0 =
-            let buffer_width = ceiling $ (fi w * fi os.pref_fract_scale + fract_denom / 2 :: Double) / fract_denom
-                buffer_height = ceiling $ (fi h * fi os.pref_fract_scale + fract_denom / 2 :: Double) / fract_denom
+        | os.fractionalScale > 0 =
+            let buffer_width = ceiling $ (fi w * fi os.fractionalScale + fract_denom / 2 :: Double) / fract_denom
+                buffer_height = ceiling $ (fi h * fi os.fractionalScale + fract_denom / 2 :: Double) / fract_denom
                 fract_denom = 120
              in (buffer_width, buffer_height)
         | otherwise = (w * os.scale, h * os.scale)
@@ -298,7 +300,7 @@ drawImage bp os img Surfaces{..} = do
       :# [ "out" .= os.name
          , "out-size" .= (w, h)
          , "out-scale" .= (os ^. scale)
-         , "out-fscale" .= (os ^. prefFractScale)
+         , "out-fscale" .= (os ^. fractionalScale)
          , "src-size" .= (src_w, src_h)
          , "buf-size" .= buf_size
          , "calc-scale" .= (printf "%.2f,%.2f;%.2f,%.2f" sx' sy' sx sy :: String)
@@ -359,7 +361,7 @@ initOutput cfg ro = withOutputState ro $ \os -> do
       fsl <- WL.createListener $ \case
         FS.FractionalScalePreferredScale _ _ fscale -> runInIO $ do
           logInfoNS "wallpaper" $ "fractional scale updated" :# ["output" .= os.name, "river_output" .= ro, "fractional-scale" .= fscale]
-          updateOutputState ro $ \x -> x{pref_fract_scale = fscale, needsRender = True}
+          updateOutputState ro $ \x -> x{fractionalScale = fscale, needsRender = True}
       WL.listenerAdd_ fractSurface fsl
 
       -- 3: viewport

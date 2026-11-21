@@ -29,7 +29,6 @@ import Data.Enum
 import Data.List qualified as L
 import Data.Map qualified as M
 import Data.Text qualified as T
-import Data.Text.Lazy qualified as TL
 import Data.Text.Short qualified as TS
 import Network.Socket
 import River qualified as R
@@ -51,7 +50,7 @@ data ServerConfig = ServerConfig
 instance Default ServerConfig where
   def = ServerConfig Nothing 8 defaultWorkspacesInfo defaultRequestHandler
 
-defaultRequestHandler :: HasCallStack => Request -> H (Either Text Response)
+defaultRequestHandler :: (HasCallStack) => Request -> H (Either Text Response)
 defaultRequestHandler = \case
   ListWindows{} -> getHState <&> Right . InternalObject . toJSON . (^.. _windows . traversed)
   -- hide key bindings by default (lots of noise)
@@ -83,10 +82,10 @@ defaultRequestHandler = \case
              in st ^. inputDevices & M.mapWithKey getInputDev
         )
   DumpState{..} -> case param of
-    "input-config" -> Right . StateDumpResponse . P.pShow <$> getObjectDef @InputConfigState
     "hstate" -> Right . InternalObject . A.toJSON <$> getHState
     "global" -> Right . InternalObject <$> dumpObjects
-    _ -> Right . StateDumpResponse . TL.pack <$> runInHS Persist.dumpStateAsString
+    "input-config" -> Right . StateDumpResponse . P.pShow <$> getObjectDef @InputConfigState
+    _ -> Right . StateDumpResponse . P.pString <$> runInHS Persist.dumpStateAsString
   ListMethods{} -> getObjectDef @CommandStore <&> Right . StateDumpResponse . P.pShow
   CallMethod{..} -> do
     cs <- getObjectDef @CommandStore
@@ -100,7 +99,7 @@ defaultRequestHandler = \case
     logWarn $ "Unhandled message" :# ["message" .= r]
     return $ Left "no handler"
 
-handleWmCtrlAction :: HasCallStack => WmCtrlAction -> H (Either Text Response)
+handleWmCtrlAction :: (HasCallStack) => WmCtrlAction -> H (Either Text Response)
 handleWmCtrlAction = \case
   ViewWorkspaceOnScreen{tag, screen = s} -> do
     runInHS . windows $ A.OnScreen.viewOnScreen (toEnum $ fromEnum s) (TS.unpack tag)
@@ -268,8 +267,8 @@ serverHandleMsg conf c (Contents r seqn) = do
       res <- userCode $ conf.requestHandler r
       sendMsg' c $ maybe (Error "handler exception") (either Error (`Contents` seqn)) res
 
-sendMsg' :: ToJSON a => Socket -> Msg a -> H ()
-sendMsg' s msg = sendMsg (ClientHandle s) msg
+sendMsg' :: (ToJSON a) => Socket -> Msg a -> H ()
+sendMsg' s = sendMsg (ClientHandle s)
 
 -- * Info for status bars
 

@@ -108,6 +108,7 @@ __:
   - &dep-utf8-string                 utf8-string                 ^>=1.0.2
   - &dep-vector                      vector                      ^>=0.13.2
   - &dep-directory                   directory
+  - &dep-MissingH                    MissingH
 
   # Base, custom prelude
   - &hswm-prelude
@@ -165,6 +166,7 @@ library:
     - *dep-th-abstraction
     - *dep-microlens-th
     - *dep-directory
+    - *dep-MissingH
   when:
     - condition: flag(pie)
       ghc-options:

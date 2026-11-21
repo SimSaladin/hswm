@@ -27,6 +27,7 @@ import Data.Text qualified as T
 import Data.Text.Encoding (decodeUtf8)
 import Data.Text.Lazy qualified as TL
 import Data.Version (showVersion)
+import Options.Applicative qualified as Options
 import Options.Applicative qualified as Opts
 import Options.Applicative.Types qualified as Opts
 import Options.Generic
@@ -37,6 +38,9 @@ import Prettyprinter.Render.Terminal qualified as PP
 import System.Environment (executablePath)
 import System.Log.FastLogger
 import System.Log.FastLogger qualified as FastLogger
+
+-- import Data.List.NonEmpty (NonEmpty)
+-- import qualified Options.Applicative.NonEmpty as Options.NonEmpty
 
 -- * Main
 
@@ -112,40 +116,10 @@ programVersion = "hswm " ++ showVersion PackageInfo_hswm.version
 
 -- * Optparse options
 
--- ** Last1
-
-newtype Last1 field = Last1 {getLast1 :: field}
-  deriving (Eq, Show, Generic)
-
-instance forall a. (ParseField a) => ParseFields (Last1 a) where
-  parseFields h m c d =
-    case m of
-      Just name ->
-        let fs =
-              Opts.metavar (metavar (Proxy :: Proxy a))
-                <> Opts.long (T.unpack name)
-                <> foldMap (Opts.help . T.unpack) h
-                <> foldMap Opts.short c
-                <> foldMap (Opts.showDefaultWith . const) d
-            fsD = fs <> foldMap Opts.value (d >>= runReadM readField)
-            parse1 = Opts.option readField (fs <> Opts.internal)
-         in (\x xs -> Last1 . fromMaybe x . getLast $ mconcat xs)
-              <$> Opts.option readField fsD
-              <*> (many . fmap (Last . Just)) parse1
-      Nothing -> Last1 <$> parseField h m c d
-
-instance (ParseField a) => ParseRecord (Last1 a) where
-  parseRecord = fmap getOnly parseRecord
-
--- | a readMaybe using provided ReadM
-runReadM :: Opts.ReadM a -> String -> Maybe a
-runReadM r s =
-  either (const Nothing) Just $
-    runExcept (runReaderT (Opts.unReadM r) s)
-
 -- ** LogLevel
 
 instance ParseField LogLevel where
+  parseField = parseFieldWith $ Options.completeWith ["debug", "info", "warning", "error"]
   readField = Opts.maybeReader $ \case
     "debug" -> Just LevelDebug
     "info" -> Just LevelInfo
@@ -153,23 +127,24 @@ instance ParseField LogLevel where
     "warning" -> Just LevelWarn
     "error" -> Just LevelError
     _ -> Nothing
+instance ParseFields LogLevel where
+  parseFields h m c d = getLast1 <$> parseFields h m c d
+instance ParseRecord LogLevel where
+  parseRecord = fmap getOnly parseRecord
 
 -- ** LogFormat
 
-data LogFormat
-  = LogFormatJSON
-  | LogFormatPLAIN
+data LogFormat = LogFormatJSON | LogFormatPLAIN
   deriving (Eq, Ord, Enum, Bounded, Show, Read, Generic, Data)
 
 instance ParseField LogFormat where
+  parseField = parseFieldWith $ Options.completeWith ["json", "plain"]
   readField = Opts.maybeReader $ \case
     "json" -> Just LogFormatJSON
     "plain" -> Just LogFormatPLAIN
     _ -> Nothing
-
 instance ParseFields LogFormat where
   parseFields h m c d = getLast1 <$> parseFields h m c d
-
 instance ParseRecord LogFormat where
   parseRecord = fmap getOnly parseRecord
 
@@ -182,6 +157,7 @@ instance Default AnsiColors where
   def = ColorAuto
 
 instance ParseField AnsiColors where
+  parseField = parseFieldWith $ Options.completeWith ["auto", "always", "never", "yes", "no", "on", "off"]
   readField = Opts.maybeReader $ \case
     "" -> Just ColorAuto
     "auto" -> Just ColorAuto
@@ -192,12 +168,60 @@ instance ParseField AnsiColors where
     "on" -> Just ColorAlways
     "always" -> Just ColorAlways
     _ -> Nothing
-
 instance ParseFields AnsiColors where
   parseFields h m c d = getLast1 <$> parseFields h m c d
-
 instance ParseRecord AnsiColors where
   parseRecord = fmap getOnly parseRecord
+
+-- | from optparse-generic, modified to accomodate custom option modifiers
+parseFieldWith :: forall a. (ParseField a) => (forall f. (Options.HasCompleter f) => Options.Mod f a) -> Maybe Text -> Maybe Text -> Maybe Char -> Maybe String -> Options.Parser a
+parseFieldWith mods h m c d = do
+  let proxy = Proxy @a
+  case m of
+    Nothing -> do
+      let fs =
+            Options.metavar (metavar proxy)
+              <> foldMap (Options.help . T.unpack) h
+              <> mods
+      Options.argument readField fs
+    Just name -> do
+      let fs =
+            Options.metavar (metavar proxy)
+              <> Options.long (T.unpack name)
+              <> foldMap (Options.help . T.unpack) h
+              <> foldMap Options.short c
+              <> foldMap Options.value (d >>= runReadM readField)
+              <> foldMap (Options.showDefaultWith . const) d
+              <> mods
+      Options.option readField fs
+
+-- Last1
+
+newtype Last1 field = Last1 {getLast1 :: field}
+  deriving (Eq, Show, Generic)
+
+instance Semigroup (Last1 a) where
+  _ <> b = b
+
+-- | Utility for definining options that can be repeated, and only the
+-- latest value stays in effect. And if not set at all, a default is assumed.
+instance forall a. (ParseField a) => ParseFields (Last1 a) where
+  parseFields h m c d =
+    case m of
+      Nothing -> Last1 <$> parseField h m c d
+      Just _ ->
+        (\x xs -> Last1 . fromMaybe x . getLast $ mconcat xs)
+          <$> parseField h m c d
+          <*> (many . fmap (Last . Just)) (parseField Nothing m c Nothing)
+
+instance (ParseField a) => ParseRecord (Last1 a) where
+  parseRecord = fmap getOnly parseRecord
+
+-- | a readMaybe using provided ReadM
+runReadM :: Opts.ReadM a -> String -> Maybe a
+runReadM r s =
+  either (const Nothing) Just $
+    runExcept (runReaderT (Opts.unReadM r) s)
 
 -- * Logging
 

@@ -34,6 +34,7 @@
       "library" = {
         depends = [
           (hsPkgs."JuicyPixels" or (errorHandler.buildDepError "JuicyPixels"))
+          (hsPkgs."MissingH" or (errorHandler.buildDepError "MissingH"))
           (hsPkgs."aeson" or (errorHandler.buildDepError "aeson"))
           (hsPkgs."base" or (errorHandler.buildDepError "base"))
           (hsPkgs."bytestring" or (errorHandler.buildDepError "bytestring"))

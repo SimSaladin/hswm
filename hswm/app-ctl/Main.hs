@@ -10,7 +10,6 @@
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
---
 module Main (main) where
 
 import Control.Monad.Reader
@@ -31,6 +30,7 @@ import HSWM.Main.Options as HSWM (
   initLoggers,
   runReadM,
  )
+import HSWM.Util.Process
 import Options.Applicative qualified as Options
 import Options.Generic
 import System.Console.Haskeline
@@ -48,7 +48,7 @@ defaultParserPrefs =
     <> Options.subparserInline
     <> Options.helpShowGlobals
 
-main :: HasCallStack => IO ()
+main :: (HasCallStack) => IO ()
 main = do
   Cmdline cmd' opts' <- getRecordWith infoPrefs defaultParserPrefs :: IO (Cmdline Wrapped)
   let cmd = Options.Generic.unwrap <$> cmd'
@@ -58,31 +58,55 @@ main = do
     Just req -> do
       withConnect opts $ \sock -> do
         res <- syncRequest sock req
-        io $ BL.putStrLn $ BL.pack $ prettyResponse res
+        displayResponse opts res
 
-withConnect :: (HasCallStack, _) => _ -> (HasCallStack => _) -> _
-withConnect opts f = withLogging (LogStderr defaultBufSize) opts.logFormat opts.colorEnable $ \logFn -> do
+withConnect :: (HasCallStack, _) => _ -> ((HasCallStack) => _) -> _
+withConnect opts f = withLogging (LogStderr defaultBufSize) opts.logLevel opts.logFormat opts.colorEnable $ \logFn -> do
   flip runLoggingT logFn $ clientRunWith def f
 
-withLogging :: (HasCallStack, MonadMask m, MonadUnliftIO m) => LogType' LogStr -> LogFormat -> AnsiColors -> (HasCallStack => _ -> m a) -> m a
-withLogging logtype fmt co f =
-  bracket (liftIO $ initLoggers logtype fmt co Nothing) (\(_, fn) -> liftIO fn)
-  $ \(logFn, _) -> f logFn
+withLogging ::
+  (HasCallStack, MonadMask m, MonadUnliftIO m) =>
+  LogType' LogStr
+  -> Maybe LogLevel
+  -- ^ level filtering
+  -> LogFormat
+  -> AnsiColors
+  -> ((HasCallStack) => _ -> m a)
+  -> m a
+withLogging logtype logfilter fmt co f =
+  bracket (liftIO $ initLoggers logtype fmt co logfilter) (\(_, fn) -> liftIO fn) $
+    \(logFn, _) -> f logFn
 
 interactive :: ClientOptions -> IO ()
 interactive o = runInputT defaultSettings $ do
   printExt <- getExternalPrint
-  withLogging (LogCallback (printExt . BC8.unpack . fromLogStr) (return ())) o.logFormat (if o.colorEnable /= ColorNever then ColorAlways else o.colorEnable) $ \logFn ->
+  withLogging (LogCallback (printExt . BC8.unpack . fromLogStr) (return ())) Nothing o.logFormat (if o.colorEnable /= ColorNever then ColorAlways else o.colorEnable) $ \logFn ->
     fromReaderT $ runRT logFn
   where
     runRT :: (Loc -> LogSource -> LogLevel -> LogStr -> IO ()) -> ReaderT (InputTEnv IO) IO ()
     runRT logFun = withReaderT (mapInputTEnv liftIO) $ mapReaderT (`runLoggingT` logFun) $ toReaderT mainCM
 
-prettyResponse :: Response -> String
-prettyResponse = \case
-  StateDumpResponse str -> TL.unpack str
-  InternalObject value -> BL.unpack $ encodePretty value
-  msg -> show msg
+-- | Either display directly if short or launch in a pager.
+displayResponse :: (_) => _ -> Response -> _ ()
+displayResponse opts res = do
+  let (hl, raw) = case res of
+        StateDumpResponse str -> ("haskell", TL.unpack str)
+        InternalObject val -> ("json", BL.unpack $ encodePretty val)
+        msg -> ("", show msg)
+  if opts.noPager || length raw < 500
+    then io $ BL.putStrLn $ BL.pack raw
+    else
+      io $
+        runProcess_ $
+          setStdin (byteStringInput (fromString raw)) $
+            setStdout inherit $
+              setStderr inherit $
+                proc "bat" $
+                  ["--language=" ++ hl | hl /= ""]
+                    ++ ["--strip-ansi=auto"]
+                    ++ ["--file-name=Response from server"]
+                    ++ ["--color=never" | opts.colorEnable == ColorNever]
+                    ++ ["--color=always" | opts.colorEnable == ColorAlways]
 
 -- * Haskeline
 
@@ -122,6 +146,8 @@ data Cmdline w = Cmdline (Maybe (Request' w)) (ClientOptions' w)
 data ClientOptions' w = ClientOptions
   { colorEnable :: w ::: AnsiColors <!> "auto" <#> "c" <?> "enable color output"
   , logFormat :: w ::: LogFormat <!> "plain" <?> "Log output"
+  , noPager :: w ::: Bool <?> "Disable pager for long outputs"
+  , logLevel :: w ::: Maybe LogLevel <#> "l" <?> "Log level [debug,info,warn,error]"
   }
   deriving (Generic)
 
@@ -148,10 +174,13 @@ instance ParseRecord (Request' Wrapped) where
 
 instance ParseRecord WmCtrlActionValue where
   parseRecord = WmCtrlActionValue . A.toJSON . Options.Generic.unwrap <$> parseRecord @(WmCtrlAction' Wrapped)
+
 instance ParseFields WmCtrlActionValue where
   parseFields a b c d = WmCtrlActionValue . A.toJSON . Options.Generic.unwrap <$> parseFields @(WmCtrlAction' Wrapped) a b c d
+
 instance ParseRecord (WmCtrlAction' Wrapped) where
   parseRecord = G.to . G.M1 <$> genericParseRecord lispCaseModifiers
+
 instance ParseFields (WmCtrlAction' Wrapped) where
   parseFields _ _ _ _ = parseRecord
 

@@ -20,6 +20,7 @@
         yaml.revision = import ./cabal-files/yaml.nix;
         yaml.flags.no-exe = true;
         yaml.flags.no-examples = true;
+        regex-compat.revision = import ./cabal-files/regex-compat.nix;
         base64-bytestring.revision = import ./cabal-files/base64-bytestring.nix;
         haskell-gi-overloading.revision = import ./cabal-files/haskell-gi-overloading.nix;
         Cabal-hooks.revision = import ./cabal-files/Cabal-hooks.nix;
@@ -43,6 +44,8 @@
         optics-core.revision = import ./cabal-files/optics-core.nix;
         optics-core.flags.explicit-generic-labels = false;
         haskell-lexer.revision = import ./cabal-files/haskell-lexer.nix;
+        MissingH.revision = import ./cabal-files/MissingH.nix;
+        MissingH.flags.network--ge-3_0_0 = true;
         uuid-types.revision = import ./cabal-files/uuid-types.nix;
         haskell-gi.revision = import ./cabal-files/haskell-gi.nix;
         quickcheck-io.revision = import ./cabal-files/quickcheck-io.nix;
@@ -72,6 +75,7 @@
         streaming-commons.revision = import ./cabal-files/streaming-commons.nix;
         streaming-commons.flags.use-bytestring-builder = false;
         split.revision = import ./cabal-files/split.nix;
+        old-time.revision = import ./cabal-files/old-time.nix;
         directory.revision = hackage.directory."1.3.10.0".revisions.default;
         stm-chans.revision = import ./cabal-files/stm-chans.nix;
         file-io.revision = hackage.file-io."0.1.5".revisions.default;
@@ -90,6 +94,7 @@
         Diff.revision = import ./cabal-files/Diff.nix;
         profunctors.revision = import ./cabal-files/profunctors.nix;
         microlens-mtl.revision = import ./cabal-files/microlens-mtl.nix;
+        hslogger.revision = import ./cabal-files/hslogger.nix;
         adjunctions.revision = import ./cabal-files/adjunctions.nix;
         mtl.revision = hackage.mtl."2.3.1".revisions.default;
         optparse-generic.revision = import ./cabal-files/optparse-generic.nix;
@@ -127,6 +132,7 @@
         monad-control.revision = import ./cabal-files/monad-control.nix;
         network-uri.revision = import ./cabal-files/network-uri.nix;
         indexed-traversable-instances.revision = import ./cabal-files/indexed-traversable-instances.nix;
+        network-bsd.revision = import ./cabal-files/network-bsd.nix;
         bitvec.revision = import ./cabal-files/bitvec.nix;
         bitvec.flags.simd = true;
         these.revision = import ./cabal-files/these.nix;
@@ -154,6 +160,8 @@
         vector-algorithms.flags.llvm = false;
         semialign.revision = import ./cabal-files/semialign.nix;
         semialign.flags.semigroupoids = true;
+        regex-posix.revision = import ./cabal-files/regex-posix.nix;
+        regex-posix.flags._regex-posix-clib = false;
         typerep-map.revision = import ./cabal-files/typerep-map.nix;
         hspec-discover.revision = import ./cabal-files/hspec-discover.nix;
         text-short.revision = import ./cabal-files/text-short.nix;
@@ -198,6 +206,7 @@
         void.flags.safe = false;
         gi-gdk3.revision = import ./cabal-files/gi-gdk3.nix;
         ghc-internal.revision = hackage.ghc-internal."9.1401.0".revisions.default;
+        old-locale.revision = import ./cabal-files/old-locale.nix;
         alex.revision = import ./cabal-files/alex.nix;
         conduit-extra.revision = import ./cabal-files/conduit-extra.nix;
         binary.revision = hackage.binary."0.8.9.3".revisions.default;
@@ -469,6 +478,7 @@
           "profunctors".components.library.planned = lib.mkOverride 900 true;
           "happy-lib".components.sublibs."tabular".planned = lib.mkOverride 900 true;
           "th-expand-syns".components.library.planned = lib.mkOverride 900 true;
+          "regex-compat".components.library.planned = lib.mkOverride 900 true;
           "scientific".components.library.planned = lib.mkOverride 900 true;
           "hs-bindgen".components.exes."hs-bindgen-cli".planned = lib.mkOverride 900 true;
           "blaze-builder".components.library.planned = lib.mkOverride 900 true;
@@ -488,6 +498,7 @@
           "regex-pcre-builtin".components.library.planned = lib.mkOverride 900 true;
           "unliftio".components.library.planned = lib.mkOverride 900 true;
           "gi-gdkpixbuf".components.setup.planned = lib.mkOverride 900 true;
+          "network-bsd".components.library.planned = lib.mkOverride 900 true;
           "Diff".components.library.planned = lib.mkOverride 900 true;
           "directory".components.library.planned = lib.mkOverride 900 true;
           "HUnit".components.library.planned = lib.mkOverride 900 true;
@@ -509,6 +520,7 @@
           "c-expr-dsl".components.library.planned = lib.mkOverride 900 true;
           "parsec".components.library.planned = lib.mkOverride 900 true;
           "haskell-gi".components.setup.planned = lib.mkOverride 900 true;
+          "old-time".components.library.planned = lib.mkOverride 900 true;
           "gi-glib".components.setup.planned = lib.mkOverride 900 true;
           "monad-control".components.library.planned = lib.mkOverride 900 true;
           "doxygen-parser".components.sublibs."internal".planned = lib.mkOverride 900 true;
@@ -520,6 +532,8 @@
           "aeson-pretty".components.exes."aeson-pretty".planned = lib.mkOverride 900 true;
           "gi-gtk3".components.library.planned = lib.mkOverride 900 true;
           "bimap".components.library.planned = lib.mkOverride 900 true;
+          "hslogger".components.library.planned = lib.mkOverride 900 true;
+          "MissingH".components.library.planned = lib.mkOverride 900 true;
           "vector-algorithms".components.library.planned = lib.mkOverride 900 true;
           "prettyprinter-combinators".components.library.planned = lib.mkOverride 900 true;
           "dec".components.library.planned = lib.mkOverride 900 true;
@@ -593,6 +607,7 @@
           "gi-glib".components.library.planned = lib.mkOverride 900 true;
           "regex-base".components.library.planned = lib.mkOverride 900 true;
           "witherable".components.library.planned = lib.mkOverride 900 true;
+          "regex-posix".components.library.planned = lib.mkOverride 900 true;
           "happy".components.exes."happy".planned = lib.mkOverride 900 true;
           "gi-atk".components.library.planned = lib.mkOverride 900 true;
           "gi-pango".components.library.planned = lib.mkOverride 900 true;
@@ -608,6 +623,7 @@
           "gi-gtk3".components.setup.planned = lib.mkOverride 900 true;
           "haskell-lexer".components.library.planned = lib.mkOverride 900 true;
           "th-orphans".components.library.planned = lib.mkOverride 900 true;
+          "old-locale".components.library.planned = lib.mkOverride 900 true;
           "haskeline".components.exes."haskeline-examples-Test".planned = lib.mkOverride 900 true;
           "microlens-mtl".components.library.planned = lib.mkOverride 900 true;
           "character-ps".components.library.planned = lib.mkOverride 900 true;
