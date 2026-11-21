@@ -51,6 +51,7 @@ in
     {
       inputs',
       pkgs,
+      pkgs-nixos,
       ...
     }:
     let
@@ -72,11 +73,11 @@ in
 
       # Export our overridden river as flake packages as a convenience.
       packages = {
-        inherit (pkgs) river river-debug updateRiverDeps;
+        inherit (pkgs-nixos) river river-debug updateRiverDeps;
       };
 
       legacyPackages = {
-        inherit (pkgs) river river-debug zigEnv;
+        inherit (pkgs-nixos) river river-debug zigEnv;
       };
     };
 }
