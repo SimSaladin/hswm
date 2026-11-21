@@ -72,7 +72,7 @@ let
       #      ghc-options: -optl-B${libc}/lib
       #'';
 
-      materialized = pkgs.project-lib.materializedFor "project";
+      #materialized = pkgs.project-lib.materializedFor "project";
 
       compilerSelection =
         p:
@@ -82,8 +82,17 @@ let
           ghc9141llvm = ghcUseLdLld p.haskell-nix.compiler.ghc9141llvm;
         };
 
+      cabalProjectFreeze = lib.mkForce ''
+        constraints: alex installed
+      '';
+
       shell = {
+        #additional = ps: [ ];
         buildInputs = [ libc ];
+        tools.alex = { };
+        tools.alex = { };
+        exactDeps = lib.mkForce false;
+        allToolDeps = lib.mkForce false;
       };
     };
 
@@ -122,6 +131,7 @@ let
         allToolDeps = true;
         #withHaddock = true;
         #withHoogle = true;
+        tools.cabal-install = { };
         nativeBuildInputs = [
           # Use a newer cabal-install binary
           #pkgs.cabal_3_18_1_0

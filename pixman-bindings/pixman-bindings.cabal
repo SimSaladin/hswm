@@ -29,7 +29,7 @@ common warnings
 
 custom-setup
   setup-depends:
-    Cabal >=3.14 && <3.19,
+    Cabal >=3.14 && <3.21,
     base,
     hs-bindgen-hooks
 
@@ -40,10 +40,10 @@ library
 
   build-depends:
     base >=4.21 && <5,
-    c-expr-runtime >=0.1 && <0.2,
+    c-expr-runtime >=0.1 && <1.0,
     data-default ^>=0.8,
     deepseq ^>=1.5,
-    hs-bindgen-runtime >=0.1 && <0.2
+    hs-bindgen-runtime >=0.1 && <1.1
 
   hs-source-dirs: src
   default-language: GHC2024

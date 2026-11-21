@@ -45,6 +45,8 @@ library
   autogen-modules: Paths_waybar_cffi_hs
   hs-source-dirs: src
   build-depends:
+    -- FIXME: haskell.nix doesn't pick up the sublib dependency properly without the main lib
+    -- being imported too...
     aeson >=2.2.3 && <2.4,
     base >=4.20 && <5,
     bytestring ^>=0.12.2,
@@ -55,6 +57,7 @@ library
     gi-gtk3 ^>=3.0.44,
     gi-pango ^>=1.0.30,
     haskell-gi-base ^>=0.26.9,
+    hswm,
     hswm:ipc-api,
     monad-logger-aeson ^>=0.4.1,
     mtl ^>=2.3.1,

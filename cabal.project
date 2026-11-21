@@ -1,4 +1,4 @@
-index-state: 2026-09-29T22:54:10Z
+index-state: 2026-11-20T03:46:37Z
 
 packages:
   hswm
@@ -25,10 +25,6 @@ haddock-use-unicode: True
 --haddock-html-location: file:///packages/archive/$pkg/latest/doc/html
 
 extra-packages: process
-
--- haskell.nix only supports imports when they end in .cabal:
--- https://github.com/input-output-hk/haskell.nix/issues/2144
-import: project-cabal/hs-bindgen.cabal
 
 -- string-interpolate-1.0.0.0 depends on ghc-hs-meta, which causes issues
 constraints: any.string-interpolate <1.0

@@ -26,8 +26,8 @@ flag pkg-config
 
 custom-setup
   setup-depends:
-    Cabal >=3.14 && <3.19,
-    Cabal-hooks >=3.14 && <3.19,
+    Cabal >=3.14 && <3.21,
+    Cabal-hooks >=3.14 && <3.21,
     base >=4.21 && <5,
     haskell-wayland-core,
     hs-bindgen-hooks
@@ -74,7 +74,7 @@ library
     deepseq >=1.5.1 && <1.6,
     haskell-wayland-core,
     hs-bindgen-hooks ==0.1.0.0,
-    hs-bindgen-runtime >=0.1.0 && <0.2,
+    hs-bindgen-runtime >=0.1.0 && <1.1,
     template-haskell >=2.23 && <2.25,
     unix ^>=2.8.6,
     unliftio ^>=0.2.25
@@ -111,7 +111,7 @@ test-suite tests
   build-depends:
     base,
     data-default,
-    hs-bindgen-runtime >=0.1.0 && <0.2,
+    hs-bindgen-runtime,
     hspec,
     hswm-bindings
 
