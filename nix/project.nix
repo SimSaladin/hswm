@@ -306,12 +306,43 @@ let
       ];
     };
 
+  modifyShells =
+    project: shells:
+    let
+      projectShells = lib.mapAttrs (k: adjustShell "hswm-${k}") shells;
+      pkgShells = perPackageShellsFor project;
+    in
+    projectShells
+    // pkgShells
+    // {
+      project-pkgs = adjustedShellFor project {
+        name = "project-pkgs";
+        packages = ps: [ ps.hswm ];
+        withHoogle = true;
+      };
+
+      all = adjustedShellFor project {
+        name = "hswm-deps";
+        packages = lib.mkForce (_: [ ]);
+        inputsFrom = lib.map (drv: drv.overrideAttrs { shellHook = ""; }) (lib.attrValues projectShells);
+        withHoogle = true;
+      };
+    };
+
+  modifyProject =
+    project:
+    project
+    // {
+      flake' = project.flake' // {
+        devShells = modifyShells project project.flake'.devShells;
+      };
+    };
+
   customizations.perSystem =
     {
-      lib,
       config,
       pkgs,
-      project,
+      #project,
       project-lld,
       project-lib,
       ...
@@ -337,30 +368,6 @@ let
           flakePkgs = config.packages;
         };
       };
-
-      devShells =
-        let
-          projectShells = lib.mapAttrs (k: adjustShell "hswm-${k}") project.flake'.devShells;
-          pkgShells = perPackageShellsFor pkgs.project;
-        in
-
-        lib.mapAttrs (_: lib.mkForce) projectShells
-        // pkgShells
-        // {
-          project-pkgs = adjustedShellFor project {
-            name = "project-pkgs";
-            #exposePackagesVia = "ghc-pkg";
-            packages = ps: [ ps.hswm ];
-            withHoogle = true;
-          };
-
-          all = adjustedShellFor project {
-            name = "hswm-deps";
-            packages = lib.mkForce (_: [ ]);
-            inputsFrom = lib.map (drv: drv.overrideAttrs { shellHook = ""; }) (lib.attrValues projectShells);
-            withHoogle = true;
-          };
-        };
     };
 in
 
@@ -372,7 +379,7 @@ in
       hswmProject
       useLld
     ];
-    project = final.haskell-nix.cabalProject' [ hswmProject ];
+    project = modifyProject (final.haskell-nix.cabalProject' [ hswmProject ]);
   };
 
   perSystem =
@@ -390,8 +397,8 @@ in
       inherit (project.flake')
         apps
         packages
-        devShells
         checks
+        devShells
         ;
 
       legacyPackages = {

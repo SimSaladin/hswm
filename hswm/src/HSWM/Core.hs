@@ -112,12 +112,7 @@ writeMainQ ev = do
 
 -- | Runs handleEventHook from the configuration and runs the default handler
 -- function if it returned True.
-handleWithHook :: (HasCallStack, HandleEvent m ev, m ~ H, ev ~ Event) => ev -> m ()
-handleWithHook e = do
-  evHook <- view (config . handleEventHook)
-  whenM (userCodeDef True $ getAll `fmap` evHook e) (handleEvent e)
-
-handleWithHook' :: forall ev. (HasCallStack, Typeable ev, HandleEvent H ev) => ev -> H ()
-handleWithHook' ev = do
-  hook <- view (config . handleEventHookDynamic)
+handleWithHook :: forall ev. (HasCallStack, Typeable ev, HandleEvent H ev) => ev -> H ()
+handleWithHook ev = do
+  hook <- view (config . handleEventHook)
   whenM (userCodeDef True $ getAll <$> hook (toDyn ev)) (handleEvent ev)

@@ -21,7 +21,7 @@ module HSWM.Wallpaper (
   -- * Hooks
   wpStartupHook,
   wpExitHook,
-  wpHandleEventHookDyn,
+  wpHandleEventHook,
 
   -- * Internal
   WallpaperContext (..),
@@ -127,7 +127,7 @@ usingWallpaper cfg userConf =
     { startupHook = userConf.startupHook <> wpStartupHook cfg
     , exitHook = userConf.exitHook <> wpExitHook
     , renderHook = userConf.renderHook <> render
-    , handleEventHookDynamic = userConf.handleEventHookDynamic <> wpHandleEventHookDyn cfg
+    , handleEventHook = userConf.handleEventHook <> wpHandleEventHook cfg
     }
 
 -- ** Hooks
@@ -178,8 +178,8 @@ wpExitHook = do
   logInfoNS "wallpaper" "exit hook; cleaning up..."
   deinit
 
-wpHandleEventHookDyn :: _ -> Dynamic -> H All
-wpHandleEventHookDyn cfg ev
+wpHandleEventHook :: _ -> Dynamic -> H All
+wpHandleEventHook cfg ev
   | Just R.RiverWindowManagerOutput{} <- fromDynamic ev = do
       modifyCtx $ bufferPool . _Just %~ BP.incSurfaceCount 1
       mempty
@@ -310,15 +310,15 @@ drawImage bp os img Surfaces{..} = do
   _ <- io $ V.unsafeWith (JP.imageData img) $ \bits -> do
     let trans =
           P.scaleTransform sx sy False $
-            P.translateTransform tx ty False P.identityTransform
-    let pix =
-          P.setFilter P.FilterBest [] $
-            P.setTransform (P.fromFTransform trans) $
-              P.newImageWithBits pixmanFormat (fi src_w, fi src_h) True (castPtr bits) (fi src_stride)
-    let dest =
-          P.setComposite @P.R32 P.Src pix (def & P.compositeSize (fi buf_w, fi buf_h)) $
-            P.newImageWithBits pixmanFormat (buf.width, buf.height) False (castPtr buf.ptr) buf.stride
-    P.mkImage dest
+            P.translate tx ty False P.identityTransform
+    pix <- do
+      res <- P.newImageWithBits pixmanFormat (fi src_w, fi src_h) True (castPtr bits) (fi src_stride)
+      P.setTransform (P.fromFTransform trans) res
+      P.setFilter P.FilterBest [] res
+      return res
+    res <- P.newImageWithBits pixmanFormat (buf.width, buf.height) False (castPtr buf.ptr) buf.stride
+    P.setComposite @P.R32 P.SRC pix (def & P.compositeSize (fi buf_w, fi buf_h)) res
+    return res
 
   WL.surfaceAttach wl_surface buf.buf 0 0
   WL.surfaceDamageBuffer wl_surface 0 0 buf_w buf_h

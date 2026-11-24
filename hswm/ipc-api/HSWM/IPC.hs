@@ -6,24 +6,60 @@
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
-module HSWM.IPC where
+module HSWM.IPC (
+  -- * Client
+  ClientConfig (..),
+  MonadIPCClient,
+  clientRun,
+  clientRunWith,
+  ClientHandle,
+  sendMsg,
+  sendMsg',
+  syncRequest,
+  syncReceive,
+  recvLines,
+
+  -- * Message Types
+  Msg (..),
+  Request,
+  Request' (..),
+  Response (..),
+  RWorkspaces (..),
+  WorkspaceInfo (..),
+  WsId (..),
+  OutputId (..),
+  WindowInfo (..),
+  WmCtrlAction,
+  WmCtrlAction' (..),
+  MethodName (..),
+  MethodParams (..),
+
+  -- * Config
+  defaultSocketName,
+  getXdgRuntimeDirectory,
+
+  -- * Identity
+  packageInfo,
+  thisPeerIdent,
+  thisPeerDescription,
+) where
 
 import Data.Aeson qualified as A
 import Data.Aeson.Encoding qualified as A
 import Data.ByteString.Lazy qualified as BL
 import Data.ByteString.Lazy.Char8 qualified as C8LB
-import Data.Char qualified as C
-import Data.List qualified as L
 import Data.Text.Lazy qualified as TL
-import Data.Version (Version, showVersion)
-import GHC.Generics (Generic1)
 import Network.Socket
 import Network.Socket.ByteString qualified as NB
 import Options.Generic
-import PackageInfo_hswm qualified as PKG
 import System.Random (randomIO)
 
--- import GHC.Stack
+import Data.Char qualified as C
+import Data.List qualified as L
+import Data.Version (Version, showVersion)
+import GHC.Generics (Generic1)
+
+import PackageInfo_hswm qualified as PKG
 
 aesonOptions :: A.Options
 aesonOptions =
@@ -41,30 +77,32 @@ data Msg a
   | Error Text
   deriving (Eq, Show, Generic, Generic1)
 
-instance A.ToJSON1 Msg where
-  liftToJSON _ inner _ Contents{..} = A.object ["contents" .= inner contents, "id" .= seqn]
-  liftToJSON _ _ _ (Error msg) = A.object ["error" .= msg]
-  liftToEncoding _ f _ Contents{..} = A.pairs $ A.pairStr "contents" (f contents) <> "id" .= seqn
-  liftToEncoding _ _ _ (Error msg) = A.pairs $ "error" .= msg
-
-instance A.FromJSON1 Msg where
-  liftParseJSON _ f _ = A.withObject "Msg" $ \v ->
-    (Error <$> v A..: "error")
-      <|> (Contents <$> (v A..: "contents" >>= f) <*> v A..:? "id")
-
 instance (A.ToJSON a) => A.ToJSON (Msg a) where
   toJSON = A.toJSON1
   toEncoding = A.toEncoding1
+
 instance (A.FromJSON a) => A.FromJSON (Msg a) where
   parseJSON = A.parseJSON1
+
+instance A.ToJSON1 Msg where
+  liftToJSON _ inner _ Contents{..} = A.object ["contents" .= inner contents, "id" .= seqn]
+  liftToJSON _ _ _ (Error msg) = A.object ["error" .= msg]
+  liftToEncoding _ inner _ x = A.pairs $ case x of
+    Error msg -> "error" .= msg
+    Contents{..} -> A.pairStr "contents" (inner contents) <> "id" .= seqn
+
+instance A.FromJSON1 Msg where
+  liftParseJSON _ inner _ = A.withObject "Msg" $ \v ->
+    (Error <$> v A..: "error")
+      <|> (Contents <$> (v A..: "contents" >>= inner) <*> v A..:? "id")
 
 -- * Request & Response
 
 -- | Requests (client to server).
-type Request = Request' Unwrapped
+type Request = Request' Unwrapped Unwrapped
 
 -- | The unwrapped version is for optparse-generic
-data Request' w
+data Request' wi w
   = -- | Identifies the client to the server.
     IdentifyClient
       { name :: String
@@ -78,6 +116,7 @@ data Request' w
       {bindings :: w ::: Bool <#> "k" <?> "show keybindings too"}
   | ListOutputs
   | ListWindows
+  | ListWorkspaces
   | ListInputDevices
       {libinput :: w ::: Bool <#> "L" <?> "show libinput configuration"}
   | ListMethods
@@ -86,7 +125,7 @@ data Request' w
       , params :: w ::: MethodParams <#> "p" <?> "arbitrary method arguments (JSON-encoded)"
       }
   | ConfigGet
-  | WmCtrl {action :: WmCtrlActionValue} -- Note: should be a WmCtrlAction'
+  | WmCtrl {action :: WmCtrlAction' wi}
   deriving (Generic)
 
 deriving instance Eq Request
@@ -112,6 +151,7 @@ data Response
 instance A.ToJSON Request where
   toJSON = A.genericToJSON aesonOptions
   toEncoding = A.genericToEncoding aesonOptions
+
 instance A.FromJSON Request where
   parseJSON = A.genericParseJSON aesonOptions
 
@@ -122,10 +162,6 @@ instance A.FromJSON Response where
   parseJSON = A.genericParseJSON aesonOptions
 
 -- * Wrapper datatypes for parameter handling
-
-newtype WmCtrlActionValue = WmCtrlActionValue {unwrap :: A.Value}
-  deriving (Eq, Ord, Show, Read)
-  deriving newtype (A.FromJSON, A.ToJSON)
 
 -- | Actions that will alter the StackSet.
 data WmCtrlAction' w
@@ -179,7 +215,8 @@ newtype OutputId = OutputId {unwrap :: Int}
   deriving newtype (Bounded, Enum, Num, A.FromJSON, A.ToJSON, Default)
 
 -- | Workspace identifier type
-type WsId = ShortText
+newtype WsId = WsId {unwrap :: ShortText}
+  deriving newtype (Eq, Show, Read, A.FromJSON, A.ToJSON, IsString)
 
 instance Default RWorkspaces where def = RWorkspaces def (def, "") def
 instance Default WindowInfo where def = WindowInfo def "" "" "" def
@@ -234,12 +271,12 @@ instance Default ClientConfig where
 
 type MonadIPCClient m = (MonadLogger m, MonadUnliftIO m, MonadMask m)
 
-newtype ClientHandle = ClientHandle {clientSocket :: Socket}
+newtype ClientHandle = ClientHandle Socket
 
 -- | Simplest client invocation.
 clientRunWith ::
   (HasCallStack, MonadIPCClient m) =>
-  ClientConfig -> (ClientHandle -> m r) -> m r
+  ClientConfig -> (ClientHandle -> m a) -> m a
 clientRunWith conf program = do
   ai <- getClientAI conf
   withThreadContext ["component" .= ("ipc-client" :: String), "address" .= show ai.addrAddress] $ do
@@ -264,12 +301,12 @@ clientRun ::
   -> m r
 clientRun conf onMsg f =
   clientRunWith conf $ \chandle ->
-    withAsync (receiveMessages onMsg chandle) $ \inputAs -> do
+    withAsync (handleMessages onMsg chandle) $ \inputAs -> do
       link inputAs
       f (sendMsg chandle)
 
-receiveMessages :: (MonadIPCClient m) => (Response -> m ()) -> ClientHandle -> m ()
-receiveMessages onMsg (ClientHandle sock) = worker mempty
+handleMessages :: (MonadIPCClient m) => (Response -> m ()) -> ClientHandle -> m ()
+handleMessages onMsg (ClientHandle sock) = worker mempty
   where
     worker lo = do
       (resps, leftover) <- recvLines sock lo
@@ -315,8 +352,15 @@ syncReceive (ClientHandle sock) acc0 = do
 sendMsg :: (HasCallStack, MonadIO m, A.ToJSON msg) => ClientHandle -> msg -> m ()
 sendMsg (ClientHandle sock) msg = io $ NB.sendMany sock $ BL.toChunks (A.encode msg <> "\n")
 
+sendMsg' :: (HasCallStack, MonadIO m, A.ToJSON a) => Socket -> Msg a -> m ()
+sendMsg' s = sendMsg (ClientHandle s)
+
 -- | Read and parse lines
-recvLines :: (HasCallStack, MonadIPCClient m) => Socket -> BL.ByteString -> m ([BL.ByteString], BL.ByteString)
+recvLines ::
+  (HasCallStack, MonadIPCClient m) =>
+  Socket
+  -> BL.ByteString
+  -> m ([BL.ByteString], BL.ByteString)
 recvLines sock leftover = do
   res <- io $ NB.recv sock 4096
   when (res == "") $ throwIO SocketDisconnected

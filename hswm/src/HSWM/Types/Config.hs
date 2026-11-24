@@ -13,11 +13,10 @@
 module HSWM.Types.Config where
 
 import HSWM.Types.Action
-import HSWM.Types.Events
+import HSWM.Types.KeyBindings (KeyBindings)
 import HSWM.Types.Lens
 import HSWM.Types.Simple
 import HSWM.Types.Window
-import HSWM.Types.KeyBindings (KeyBindings)
 import HSWM.Utils (parseRGBA)
 import River qualified as R
 
@@ -48,8 +47,7 @@ data HSWMConfig m l = HSWMConfig
   , renderHook :: !(m ())
   , logHook :: !(m ())
   , exitHook :: !(m ())
-  , handleEventHook :: !(Event -> m All)
-  , handleEventHookDynamic :: !(Dynamic -> m All)
+  , handleEventHook :: !(Dynamic -> m All)
   , workspaces :: [WorkspaceId]
   , xkbLayout :: !(Maybe XkbRuleNames)
   -- ^ Keyboard layout set for connected keyboards
@@ -80,7 +78,6 @@ instance
       , defaultModMask = "Ctrl"
       , workspaces = ["1", "2", "3", "4"]
       , handleEventHook = mempty
-      , handleEventHookDynamic = mempty
       }
 
 -- * WindowSet/StackSet
@@ -123,14 +120,14 @@ runQuery (Query q) = runReaderT q
 
 -- * Lenses
 
-makeLensesWith' classPerField [''XkbRuleNames ]
-makeLensesCombine' (ignoreFields [ "layoutHook", "repeatInfo"]) ["pointerBindings", "keyBindings"] [''HSWMConfig, ''ScreenDetail]
+makeLensesWith' classPerField [''XkbRuleNames]
+makeLensesCombine' (ignoreFields ["layoutHook", "repeatInfo"]) ["pointerBindings", "keyBindings"] [''HSWMConfig, ''ScreenDetail]
 
 -- | Correctly type-changing lens for @layoutHook@ (the generated yields invalid signature...)
 layoutHook :: Lens (HSWMConfig m l) (HSWMConfig m l') (l RiverWindow) (l' RiverWindow)
 layoutHook = lens (.layoutHook) (\s b -> s{layoutHook = b})
 
-instance HasRepeatInfo (HSWMConfig l m)  where
+instance HasRepeatInfo (HSWMConfig l m) where
   repeatInfo = lens (.repeatInfo) (\s b -> s{repeatInfo = b} :: HSWMConfig l m)
 
 instance HasPosition ScreenDetail where

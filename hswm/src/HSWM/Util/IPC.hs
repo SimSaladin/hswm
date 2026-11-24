@@ -22,7 +22,6 @@ import HSWM.StackSet qualified as W
 import HSWM.Util.CommandStatic
 
 import Data.Aeson qualified as A
-import Data.Aeson.Types qualified as A
 import Data.ByteString.Lazy qualified as LB
 import Data.ByteString.Lazy.Char8 qualified as LBC8
 import Data.Enum
@@ -44,6 +43,7 @@ data ServerConfig = ServerConfig
   , maxPendingConns :: !Int
   , getWorkspacesInfo :: HS Response
   , requestHandler :: Request -> H (Either Text Response)
+  -- ^ See 'defaultRequestHandler'
   }
   deriving (Generic)
 
@@ -52,13 +52,11 @@ instance Default ServerConfig where
 
 defaultRequestHandler :: (HasCallStack) => Request -> H (Either Text Response)
 defaultRequestHandler = \case
-  ListWindows{} -> getHState <&> Right . InternalObject . toJSON . (^.. _windows . traversed)
-  -- hide key bindings by default (lots of noise)
-  ListSeats{} ->
-    getHState
-      <&> view (seatList . to (Right . InternalObject . toJSON))
-  ListOutputs{} -> getHState <&> view (outputList . to toJSON . to InternalObject . to Right)
-  ConfigGet{} -> view $ config . to toJSON . to InternalObject . to Right
+  ListWindows -> getHState <&> Right . InternalObject . toJSON . (^.. _windows . traversed)
+  -- TODO hide key bindings by default (lots of noise)
+  ListSeats _bindings -> getHState <&> view (seatList . to (Right . InternalObject . toJSON))
+  ListOutputs -> getHState <&> view (outputList . to toJSON . to InternalObject . to Right)
+  ConfigGet -> view $ config . to toJSON . to InternalObject . to Right
   ListInputDevices{libinput} ->
     getObjectDef @InputConfigState
       <&> fmap
@@ -81,20 +79,19 @@ defaultRequestHandler = \case
                 getLibinputDevice k = A.toJSON $ st ^? libinputDevices . each . filtered ((== k) . view inputDevice)
              in st ^. inputDevices & M.mapWithKey getInputDev
         )
-  DumpState{..} -> case param of
+  DumpState param -> case param of
     "hstate" -> Right . InternalObject . A.toJSON <$> getHState
     "global" -> Right . InternalObject <$> dumpObjects
     "input-config" -> Right . StateDumpResponse . P.pShow <$> getObjectDef @InputConfigState
     _ -> Right . StateDumpResponse . P.pString <$> runInHS Persist.dumpStateAsString
-  ListMethods{} -> getObjectDef @CommandStore <&> Right . StateDumpResponse . P.pShow
+  ListMethods -> getObjectDef @CommandStore <&> Right . StateDumpResponse . P.pShow
+  ListWorkspaces -> getHState <&> Right . InternalObject . toJSON . (^. windowset . to W.allTags)
   CallMethod{..} -> do
     cs <- getObjectDef @CommandStore
     case cs.commands ^? ix method.unwrap of
       Just (SomeCommand cmd) -> runCommandJSON cmd params <&> either (Left . toText) (Right . InternalObject)
       Nothing -> pure $ Left "method not found"
-  WmCtrl val -> case A.parseEither A.parseJSON val.unwrap of
-    Right action -> handleWmCtrlAction action
-    Left err -> return $ Left $ "failed to decode request body: " <> toText err
+  WmCtrl action -> handleWmCtrlAction action
   r -> do
     logWarn $ "Unhandled message" :# ["message" .= r]
     return $ Left "no handler"
@@ -102,7 +99,7 @@ defaultRequestHandler = \case
 handleWmCtrlAction :: (HasCallStack) => WmCtrlAction -> H (Either Text Response)
 handleWmCtrlAction = \case
   ViewWorkspaceOnScreen{tag, screen = s} -> do
-    runInHS . windows $ A.OnScreen.viewOnScreen (toEnum $ fromEnum s) (TS.unpack tag)
+    runInHS . windows $ A.OnScreen.viewOnScreen (toEnum $ fromEnum s) (TS.unpack tag.unwrap)
     manageDirty
     return $ Right $ InternalObject $ A.object ["result" .= ("OK" :: Text)]
   x -> return $ Left $ "handleWmCtrlAction: not implemented: " <> tshow x
@@ -267,9 +264,6 @@ serverHandleMsg conf c (Contents r seqn) = do
       res <- userCode $ conf.requestHandler r
       sendMsg' c $ maybe (Error "handler exception") (either Error (`Contents` seqn)) res
 
-sendMsg' :: (ToJSON a) => Socket -> Msg a -> H ()
-sendMsg' s = sendMsg (ClientHandle s)
-
 -- * Info for status bars
 
 -- | Set of events to fully refresh statusbar's tracked state
@@ -294,7 +288,7 @@ defaultWorkspacesInfo = do
   wsSortPP <- DWO.getSortByOrder
   let getWsData W.Workspace{..} keyhint =
         WorkspaceInfo
-          { tag = TS.pack tag
+          { tag = WsId $ TS.pack tag
           , keyhint = keyhint
           , layout = toText (HSWM.description layout)
           , windowList = map getWindowInfo (W.integrate' stack)
@@ -305,8 +299,8 @@ defaultWorkspacesInfo = do
     Workspaces $!
       RWorkspaces
         { tags = zipWith getWsData (wsSortPP (W.workspaces ws)) (keyhints ++ L.repeat "")
-        , focused = let W.Screen sws sid _ = W.current ws in (s2o sid, TS.pack $ W.tag sws)
-        , visible = [(s2o sid, TS.pack $ W.tag sws) | W.Screen sws sid _ <- W.visible ws]
+        , focused = let W.Screen sws sid _ = W.current ws in (s2o sid, WsId $ TS.pack $ W.tag sws)
+        , visible = [(s2o sid, WsId $ TS.pack $ W.tag sws) | W.Screen sws sid _ <- W.visible ws]
         }
   where
     keyhints = map (TS.pack . (: [])) ['a' .. 'z']

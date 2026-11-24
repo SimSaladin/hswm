@@ -12,26 +12,36 @@
 -- Portability : unportable
 module HSWM.Types.Lens (
   -- * Lens derive
-  makeLenses', makeLensesWith',
-  makeLensesCombine, makeLensesCombine',
+  makeLenses',
+  makeLensesWith',
+  makeLensesCombine,
+  makeLensesCombine',
   makeFieldClassesIfMissing,
-  classPerField, classPerField',
-  classPerType, classPerType',
-  ignoreFields, preserveLeading_,
+  classPerField,
+  classPerField',
+  classPerType,
+  classPerType',
+  ignoreFields,
+  preserveLeading_,
   fromSnake,
+
   -- * Lens utils
   (&+),
+
   -- * RiverId
-  ToRiverId(..),
-  HasRiverId(..),
-  riverIdToWord, wordToRiverId,
-  riverIdToHex, hexToRiverId,
+  ToRiverId (..),
+  HasRiverId (..),
+  riverIdToWord,
+  wordToRiverId,
+  riverIdToHex,
+  hexToRiverId,
   SomeWindow,
   SomeOutput,
   SomeSeat,
   riverIdEq,
   eachRiverId,
   SameRiverId,
+
   -- * Aeson deriving
   aesonOptions,
 
@@ -133,9 +143,10 @@ makeLensesCombine' fRules fieldsIn namesIn = do
         [ ty
         | (ty, _fs) <- typeFields
         , (nameBase ty & _head %~ toLower) `notElem` map nameBase fieldsWithClass
-        -- , any ((`notElem` fields) . nameBase) fs
-        -- ^ Note: Without this we still get record classes even if they don't contain any lenses themselves.
         ]
+  -- , any ((`notElem` fields) . nameBase) fs
+  -- \^ Note: Without this we still get record classes even if they don't contain any lenses themselves.
+
   liftM2
     (++)
     (makeLensesWith' (lensClass .~ const Nothing $ fRules $ classPerField' $ const (`elem` fields)) namesPerField)
@@ -221,7 +232,7 @@ classPerType' only =
       | only ty n || only ty (fromSnake False n) =
           let method
                 -- prefix short/common fields with _
-                | '_':n' <- n, n' `elem` shortFields = n'
+                | '_' : n' <- n, n' `elem` shortFields = n'
                 | n `elem` shortFields = "_" <> n
                 | otherwise = fromSnake False n & _head %~ toLower
            in [TopName (mkName method)]
@@ -234,17 +245,20 @@ ignoreFields xs = lensField %~ (\f ty b n -> if nameBase n `elem` xs then [] els
 
 -- | Keep leading underscores in field names where they were after applying fromSnakeCase modifier.
 preserveLeading_ :: LensRules -> LensRules
-preserveLeading_ = lensField %~ (\f ty b n -> map (fixit n) (f ty b n)) where
-  fixit _ x@(MethodName _ (nameBase -> '_':_)) = x
-  fixit _ x@(TopName (nameBase -> '_':_)) = x
-  fixit (nameBase -> '_':_n) (MethodName c (nameBase -> m)) = MethodName c $ mkName ('_':m)
-  fixit (nameBase -> '_':_n) (TopName (nameBase -> m)) = TopName $ mkName ('_':m)
-  fixit _ x = x
+preserveLeading_ = lensField %~ (\f ty b n -> map (fixit n) (f ty b n))
+  where
+    fixit _ x@(MethodName _ (nameBase -> '_' : _)) = x
+    fixit _ x@(TopName (nameBase -> '_' : _)) = x
+    fixit (nameBase -> '_' : _n) (MethodName c (nameBase -> m)) = MethodName c $ mkName ('_' : m)
+    fixit (nameBase -> '_' : _n) (TopName (nameBase -> m)) = TopName $ mkName ('_' : m)
+    fixit _ x = x
 
 -- | Convert @snake_case_input@ to @snakeCaseInput@
-fromSnake :: Bool -- ^ Preserve preceding @"_"@ prefix?
-          -> String
-          -> String
+fromSnake ::
+  Bool
+  -- ^ Preserve preceding @"_"@ prefix?
+  -> String
+  -> String
 fromSnake flag inp
   | flag, '_' : xs <- inp = '_' : inner xs
   | otherwise = inner inp
@@ -287,6 +301,7 @@ type SameRiverId a b = (HasRiverId a, HasRiverId b, RiverId a ~ RiverId b)
 type SomeWindow a = (HasRiverId a, RiverId a ~ R.RiverWindow)
 
 type SomeOutput a = (HasRiverId a, RiverId a ~ R.RiverOutput)
+
 type SomeSeat a = (HasRiverId a, RiverId a ~ R.RiverSeat)
 
 instance HasRiverId R.RiverOutput where type RiverId R.RiverOutput = R.RiverOutput
@@ -319,6 +334,7 @@ wordToRiverId = toRiverId . wordPtrToPtr @Void . WordPtr
 -- They also correspond to the (custom) 'Show' and 'Read' instances.
 riverIdToHex :: (WL.IsWlObject a, Show a) => a -> String
 riverIdToHex = show
+
 hexToRiverId :: (WL.IsWlObject a, Read a) => String -> a
 hexToRiverId = read
 
@@ -335,4 +351,9 @@ instance ToRiverId (Ptr Void) R.RiverLayerShellOutput
 --
 -- ToJSON/FromJSON instances
 aesonOptions :: A.Options
-aesonOptions = A.defaultOptions{A.omitNothingFields = True}
+aesonOptions =
+  A.defaultOptions
+    { A.omitNothingFields = True
+    , A.fieldLabelModifier = A.camelTo2 '_'
+    , A.constructorTagModifier = map toUpper . A.camelTo2 '_'
+    }

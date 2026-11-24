@@ -6,13 +6,12 @@
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
---
 module HSWM.Wayland where
 
-import HSWM.Core
-import WL.Client qualified as WL
 import Data.Kind
 import GHC.Records
+import HSWM.Core
+import WL.Client qualified as WL
 
 type MonadGlobals env m = (MonadEffectsIO m, MonadReader env m, HasGlobalsRegistry env, HasGlobalTMap env, MonadMask m)
 
@@ -128,7 +127,7 @@ getOrCreateGlobalListener ::
 getOrCreateGlobalListener = liftH $ do
   getOrCreateObject $ do
     runInIO <- askRunInIO
-    WL.createListener $ runInIO . handleWithHook'
+    WL.createListener $ runInIO . handleWithHook
 
 -- * Object methods
 
@@ -140,7 +139,6 @@ objectCommand f = do
 -- * WIP
 
 class (MonadIO m, Inspect a) => TypedUserData m a where
-
   type UserDataType m a :: Type
 
   -- | Dereference the opaque pointer to expected data type.
@@ -151,9 +149,10 @@ class (MonadIO m, Inspect a) => TypedUserData m a where
   fromTypedUserData :: Proxy a -> UserDataType m a -> m (Ptr Void)
   fromTypedUserData _ = io . fmap (castPtr . castStablePtrToPtr) . newStablePtr
 
-addListenerWithTypedUserData
-  :: forall a m. (TypedUserData m a, MonadH m, WL.HasListener a, HandleEvent H (WL.ObjectListenerEvent a))
-  => a
+addListenerWithTypedUserData ::
+  forall a m.
+  (TypedUserData m a, MonadH m, WL.HasListener a, HandleEvent H (WL.ObjectListenerEvent a)) =>
+  a
   -> UserDataType m a
   -> m ()
 addListenerWithTypedUserData obj ud = do
@@ -161,12 +160,12 @@ addListenerWithTypedUserData obj ud = do
 
 -- | Create an event handler that automatically extracts the userdata pointer
 -- and dereferences it for use in the handler.
-eventHandlerWithTypedUserData
-  :: forall a m.
-    (TypedUserData m a,
-    HasField "userdata" (WL.ObjectListenerEvent a) (Ptr Void)
-    )
-  => (UserDataType m a -> WL.ObjectListenerEvent a -> m ())
+eventHandlerWithTypedUserData ::
+  forall a m.
+  ( TypedUserData m a
+  , HasField "userdata" (WL.ObjectListenerEvent a) (Ptr Void)
+  ) =>
+  (UserDataType m a -> WL.ObjectListenerEvent a -> m ())
   -> WL.ObjectListenerEvent a
   -> m ()
 eventHandlerWithTypedUserData f e = do

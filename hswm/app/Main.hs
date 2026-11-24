@@ -60,7 +60,6 @@ main =
           & layoutHook .~ myLayoutHook
           & manageHook .~ myManageHook
           & handleEventHook <>~ debugHook
-          & handleEventHookDynamic <>~ debugHookDyn
           & startupHook <>~ runInHS (scratchpadsStartupHook myScratchpads)
           & pointerBindings <>~ myPointerBinds
           & defaultModMask .~ "mod4"

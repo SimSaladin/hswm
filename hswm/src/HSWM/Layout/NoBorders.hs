@@ -32,7 +32,6 @@ module HSWM.Layout.NoBorders (
   Ambiguity (..),
   With (..),
   BorderMessage (..),
-  borderEventHook,
   SmartBorder,
   WithBorder,
   ConfigurableBorder,
@@ -143,12 +142,6 @@ data ConfigurableBorder p w = ConfigurableBorder
   -- ^ The current set of windows without borders, i.e. the state.
   }
   deriving (Read, Show)
-
--- | Only necessary with 'BorderMessage' - remove non-existent windows from the
--- 'alwaysHidden' or 'neverHidden' lists.
-{-# DEPRECATED borderEventHook "No longer needed." #-}
-borderEventHook :: Event -> HS All
-borderEventHook _ = return $ All True
 
 instance (Read p, Show p, SetsAmbiguous p) => LayoutModifier (ConfigurableBorder p) RiverWindow where
   unhook (ConfigurableBorder _ _ _ ch) = view (config . borderWidth) >>= setBorders ch . fi

@@ -1567,7 +1567,7 @@ instance (Default (PositionScalar a), Default (SizeScalar a)) => Default (Compos
 -- @
 -- setComposite @R32 Src srcimg def dstimg
 -- @
-setComposite :: (PrimMonad m, Typeable a, IsImage src) => Operation -> src -> CompositeParameters a -> Image -> m ()
+setComposite :: (Typeable a, IsImage src, PrimMonad m) => Operation -> src -> CompositeParameters a -> Image -> m ()
 setComposite op src set
   | Just x <- cast set :: Maybe (CompositeParameters R16) = setCompositeInner US.pixman_image_composite id id x
   | Just x <- cast set :: Maybe (CompositeParameters R32) = setCompositeInner US.pixman_image_composite32 id fromIntegral x

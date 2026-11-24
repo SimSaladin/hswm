@@ -23,6 +23,7 @@ import Data.Aeson.KeyMap qualified as A
 import Data.Aeson.Text qualified as A
 import Data.Aeson.Types qualified as A
 import Data.List qualified as L
+import Data.Semigroup qualified as Semigroup
 import Data.Text qualified as T
 import Data.Text.Encoding (decodeUtf8)
 import Data.Text.Lazy qualified as TL
@@ -128,7 +129,7 @@ instance ParseField LogLevel where
     "error" -> Just LevelError
     _ -> Nothing
 instance ParseFields LogLevel where
-  parseFields h m c d = getLast1 <$> parseFields h m c d
+  parseFields h m c d = Semigroup.getLast <$> parseFields h m c d
 instance ParseRecord LogLevel where
   parseRecord = fmap getOnly parseRecord
 
@@ -144,7 +145,7 @@ instance ParseField LogFormat where
     "plain" -> Just LogFormatPLAIN
     _ -> Nothing
 instance ParseFields LogFormat where
-  parseFields h m c d = getLast1 <$> parseFields h m c d
+  parseFields h m c d = Semigroup.getLast <$> parseFields h m c d
 instance ParseRecord LogFormat where
   parseRecord = fmap getOnly parseRecord
 
@@ -169,7 +170,7 @@ instance ParseField AnsiColors where
     "always" -> Just ColorAlways
     _ -> Nothing
 instance ParseFields AnsiColors where
-  parseFields h m c d = getLast1 <$> parseFields h m c d
+  parseFields h m c d = Semigroup.getLast <$> parseFields h m c d
 instance ParseRecord AnsiColors where
   parseRecord = fmap getOnly parseRecord
 
@@ -195,26 +196,18 @@ parseFieldWith mods h m c d = do
               <> mods
       Options.option readField fs
 
--- Last1
-
-newtype Last1 field = Last1 {getLast1 :: field}
-  deriving (Eq, Show, Generic)
-
-instance Semigroup (Last1 a) where
-  _ <> b = b
-
 -- | Utility for definining options that can be repeated, and only the
 -- latest value stays in effect. And if not set at all, a default is assumed.
-instance forall a. (ParseField a) => ParseFields (Last1 a) where
+instance forall a. (ParseField a) => ParseFields (Semigroup.Last a) where
   parseFields h m c d =
     case m of
-      Nothing -> Last1 <$> parseField h m c d
+      Nothing -> Semigroup.Last <$> parseField h m c d
       Just _ ->
-        (\x xs -> Last1 . fromMaybe x . getLast $ mconcat xs)
+        (\x xs -> Semigroup.Last . fromMaybe x . getLast $ mconcat xs)
           <$> parseField h m c d
-          <*> (many . fmap (Last . Just)) (parseField Nothing m c Nothing)
+          <*> (many . fmap (Last . Just)) (parseFieldWith Options.internal Nothing m c Nothing)
 
-instance (ParseField a) => ParseRecord (Last1 a) where
+instance (ParseField a) => ParseRecord (Semigroup.Last a) where
   parseRecord = fmap getOnly parseRecord
 
 -- | a readMaybe using provided ReadM

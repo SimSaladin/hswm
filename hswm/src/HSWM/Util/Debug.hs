@@ -13,20 +13,22 @@ module HSWM.Util.Debug where
 import Data.Typeable (typeOf)
 import HSWM.Core
 import HSWM.Util.PP
---import HSWM.Utils
+
+-- import HSWM.Utils
 
 import Data.Dynamic
 import WL.Wlr.OutputManagement.Unstable.V1.Client qualified as WlrOM
 
 -- import WL.Wlr.OutputPowerManagement.Unstable.V1.Client qualified as WlrOPM
 -- import qualified Prettyprinter.Combinators as PP
+
+import Data.Text qualified as T
 import Prettyprinter.Show qualified as PP
 import River qualified as R
 import WL.Client qualified as WL
-import qualified Data.Text as T
 
-debugHookDyn :: Dynamic -> H All
-debugHookDyn dyn
+debugHook :: Dynamic -> H All
+debugHook dyn
   | Just R.RiverWindowManagerManageStart{} <- ev = mempty
   | Just R.RiverWindowManagerRenderStart{} <- ev = mempty
   | Just (e :: R.RiverWindowManagerEvent) <- ev = logEventPretty src e []
@@ -55,13 +57,7 @@ debugHookDyn dyn
   where
     ev :: (Typeable a) => Maybe a
     ev = fromDynamic dyn
-    src = "debugHook"
-
-debugHook :: Event -> H All
-debugHook ev
-  | otherwise = logEventPretty src ev []
-  where
-    src = "debugHook"
+    src = "debug"
 
 debugAction :: H ()
 debugAction = runInHS $ do

@@ -474,14 +474,28 @@ deleteScreen sid s
         }
   | otherwise = s
 
-insertScreen :: (Eq s, i ~ String, Default wd) => l -> s -> sd -> StackSet i l a wd s sd -> StackSet i l a wd s sd
-insertScreen defLayout sid sd s
+insertScreen ::
+  (Eq s, i ~ String, Default wd) =>
+  l
+  -> s
+  -> sd
+  -> Maybe i
+  -> StackSet i l a wd s sd
+  -> StackSet i l a wd s sd
+insertScreen defLayout sid sd mbPreferTag s
   -- change sd of current screen
   | screen (current s) == sid =
       s{current = (current s){screenDetail = sd}}
   -- change sd of visible screen
   | Just _ <- L.find (\x -> screen x == sid) (visible s) =
       s{visible = map (\x -> if screen x == sid then x{screenDetail = sd} else x) (visible s)}
+  -- new visible screen showing preferred workspace
+  | Just i <- mbPreferTag
+  , Just a <- L.find (\x -> tag x == i) (hidden s) =
+      s
+        { visible = Screen a sid sd : visible s
+        , hidden = L.filter (\x -> tag x /= i) (hidden s)
+        }
   -- new visible screen showing next hidden workspace
   | a : as <- hidden s =
       s{visible = Screen a sid sd : visible s, hidden = as}

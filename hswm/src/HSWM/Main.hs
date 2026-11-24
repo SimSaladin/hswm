@@ -41,10 +41,10 @@ import WL.Wlr.OutputManagement.Unstable.V1.Client qualified as WlrOutputManageme
 import WL.Wlr.OutputPowerManagement.Unstable.V1.Client qualified as WlrOutputPowerMgmt
 import WL.XdgOutput.Unstable.V1.Client qualified as XdgOutput
 
+import Data.Map qualified as M
+import HSWM.Util.Posix (sigabbrev)
 import System.IO (putStrLn)
 import System.Posix qualified as Posix
-import qualified Data.Map as M
-import HSWM.Util.Posix (sigabbrev)
 
 defaultRegistrySettings :: H WL.RegistrySettings
 defaultRegistrySettings = withRunInIO $ \runInIO ->
@@ -68,10 +68,13 @@ defaultRegistrySettings = withRunInIO $ \runInIO ->
             _ -> Debug.logEventShow "registry" ev []
       }
 
-hswm :: (HasCallStack, m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow))
-     => ConfigDoM m -- ^ Post-configuration: use this to configure things that depend on parsing CLI arguments etc.
-     -> HSWMConfig m l -- ^ Initial user configuration
-     -> IO ()
+hswm ::
+  (HasCallStack, m ~ H, LayoutClass l RiverWindow, Read (l RiverWindow)) =>
+  ConfigDoM m
+  -- ^ Post-configuration: use this to configure things that depend on parsing CLI arguments etc.
+  -> HSWMConfig m l
+  -- ^ Initial user configuration
+  -> IO ()
 hswm userConfPost conf = do
   options <- parseMainArgs
   case () of
@@ -110,33 +113,32 @@ startHSWM options config = do
       <*> newTQueueIO -- manage q
       <*> newTQueueIO -- render q
       <*> newTMVarIO def -- typemap
-
   runH conf $ do
     InputConfig.initialize
     handleErrors $ do
       logInfo "Allocating wayland event listeners"
-      mkListener $ handleWithHook' @WL.ShmEvent
-      mkListener $ handleWithHook' @WL.OutputEvent
-      mkListener $ handleWithHook' @WL.SeatEvent
-      mkListener $ handleWithHook' @WL.PointerEvent
-      mkListener $ handleWithHook' @WL.TouchEvent
-      mkListener $ handleWithHook' @WL.KeyboardEvent
-      mkListener $ handleWithHook' @WL.ShellSurfaceEvent
-      mkListener $ handleWithHook' @R.RiverXkbConfigEvent
-      mkListener $ handleWithHook' @R.RiverXkbKeyboardEvent
-      mkListener $ handleWithHook' @R.RiverXkbBindingEvent
-      mkListener $ handleWithHook' @R.RiverXkbBindingsSeatEvent
-      mkListener $ handleWithHook' @R.RiverPointerBindingEvent
-      mkListener $ handleWithHook' @R.RiverWindowEvent
-      mkListener $ handleWithHook' @R.RiverSeatEvent
-      mkListener $ handleWithHook' @R.RiverOutputEvent
-      mkListener $ handleWithHook' @R.RiverLayerShellOutputEvent
-      mkListener $ handleWithHook' @R.RiverLayerShellSeatEvent
-      mkListener $ handleWithHook' @R.RiverInputDeviceEvent
-      mkListener $ handleWithHook' @R.RiverLibinputConfigEvent
-      mkListener $ handleWithHook' @R.RiverLibinputDeviceEvent
-      mkListener $ handleWithHook' @R.RiverInputManagerEvent
-      mkListener $ handleWithHook' @R.RiverWindowManagerEvent
+      mkListener $ handleWithHook @WL.ShmEvent
+      mkListener $ handleWithHook @WL.OutputEvent
+      mkListener $ handleWithHook @WL.SeatEvent
+      mkListener $ handleWithHook @WL.PointerEvent
+      mkListener $ handleWithHook @WL.TouchEvent
+      mkListener $ handleWithHook @WL.KeyboardEvent
+      mkListener $ handleWithHook @WL.ShellSurfaceEvent
+      mkListener $ handleWithHook @R.RiverXkbConfigEvent
+      mkListener $ handleWithHook @R.RiverXkbKeyboardEvent
+      mkListener $ handleWithHook @R.RiverXkbBindingEvent
+      mkListener $ handleWithHook @R.RiverXkbBindingsSeatEvent
+      mkListener $ handleWithHook @R.RiverPointerBindingEvent
+      mkListener $ handleWithHook @R.RiverWindowEvent
+      mkListener $ handleWithHook @R.RiverSeatEvent
+      mkListener $ handleWithHook @R.RiverOutputEvent
+      mkListener $ handleWithHook @R.RiverLayerShellOutputEvent
+      mkListener $ handleWithHook @R.RiverLayerShellSeatEvent
+      mkListener $ handleWithHook @R.RiverInputDeviceEvent
+      mkListener $ handleWithHook @R.RiverLibinputConfigEvent
+      mkListener $ handleWithHook @R.RiverLibinputDeviceEvent
+      mkListener $ handleWithHook @R.RiverInputManagerEvent
+      mkListener $ handleWithHook @R.RiverWindowManagerEvent
 
       -- Setup the globals registry
       putMVar conf.globals =<< WL.initRegistryState conf._wlDisplay =<< defaultRegistrySettings
@@ -180,7 +182,6 @@ startHSWM options config = do
     displayFd <- WL.displayGetFd conf._wlDisplay
     mainLoop conf._wlDisplay displayFd
   where
-
     handleErrors f =
       try f >>= \case
         Right{} -> return ()
@@ -214,17 +215,18 @@ mainLoop wlDisplay wlPollFd = do
       void . userCode =<< view (config . exitHook)
 
     mainPoll = forever $ do
-      -- * wl_display_prepare_read() needs to be balanced with either
+      -- \* wl_display_prepare_read() needs to be balanced with either
       --   wl_display_read_events() or wl_display_cancel_read()
-      -- * If prepare_read() returns non-zero, there are events to be dispatched obtain read intent:
+      -- \* If prepare_read() returns non-zero, there are events to be dispatched obtain read intent:
       --   will try wl_display_prepare_read until it succeeds, attempting to dispatch pending events until none left.
-      -- * displayReadEvents: pair to dsplayPrepareRead or displaycancelread if problem !!
-      -- * Cancel read intent in case of error
+      -- \* displayReadEvents: pair to dsplayPrepareRead or displaycancelread if problem !!
+      -- \* Cancel read intent in case of error
       next <- bracketOnError_
-          (WL.displayPrepareRead wlDisplay)
-          (WL.displayCancelRead wlDisplay)
-          $ do next <- mainPollDisplayFdOrEvent
-               WL.displayReadEvents wlDisplay $> next
+        (WL.displayPrepareRead wlDisplay)
+        (WL.displayCancelRead wlDisplay)
+        $ do
+          next <- mainPollDisplayFdOrEvent
+          WL.displayReadEvents wlDisplay $> next
       forM_ next $ \case
         MainSaveToDisk -> mainSaveState
         MainRestart prog -> mainTryRestart prog
@@ -235,38 +237,35 @@ mainLoop wlDisplay wlPollFd = do
     -- displayFlush: if == -1, need to poll for writes and try again
     -- poll for display fd read/write, or program event
     mainPollDisplayFdOrEvent = do
-        flush <- WL.displayFlush wlDisplay
-        (poll, cleanup) <- io $ (asum . map fst &&& io . foldMap snd) <$>
-          mapM ($ wlPollFd) (threadWaitReadSTM : [ threadWaitWriteSTM | flush < 0 ])
-        evQ <- view eventQueue
-        res <- atomically $ (poll $> []) `orElse` liftM2 (:) (readTQueue evQ) (flushTQueue evQ)
-        cleanup $> res
+      flush <- WL.displayFlush wlDisplay
+      (poll, cleanup) <-
+        io $
+          (asum . map fst &&& io . foldMap snd)
+            <$> mapM ($ wlPollFd) (threadWaitReadSTM : [threadWaitWriteSTM | flush < 0])
+      evQ <- view eventQueue
+      res <- atomically $ (poll $> []) `orElse` liftM2 (:) (readTQueue evQ) (flushTQueue evQ)
+      cleanup $> res
 
     mainSaveState = runInHS (void $ userCodeS Persist.writeStateToFile)
 
     mainTryRestart prog = do
-        logInfoNS "main" $ "Restart/reload request received" :# ["program" .= prog]
-        restart prog
-        logErrorNS "main" "Restart was unsuccessful! Resuming normal operation."
+      logInfoNS "main" $ "Restart/reload request received" :# ["program" .= prog]
+      restart prog
+      logErrorNS "main" "Restart was unsuccessful! Resuming normal operation."
 
     mainSignal sig = do
-        logInfoNS "main" $ ("interrupted by signal (" <> toText (sigabbrev sig) <> "), exiting...") :# ["signal" .= show sig]
-        runExitHook >> view _loggerCleanup >>= io >> exitFailure
+      logInfoNS "main" $ ("interrupted by signal (" <> toText (sigabbrev sig) <> "), exiting...") :# ["signal" .= show sig]
+      runExitHook >> view _loggerCleanup >>= io >> exitFailure
 
     mainExit msg Nothing = do
-        logInfoNS "main" $ "now exiting... (reason: user request)" :# ["message" .= msg]
-        runExitHook >> view _loggerCleanup >>= io >> exitSuccess
-
+      logInfoNS "main" $ "now exiting... (reason: user request)" :# ["message" .= msg]
+      runExitHook >> view _loggerCleanup >>= io >> exitSuccess
     mainExit msg (Just ex) = do
-        logErrorNS "main" $ "now exiting... (reason: application error)" :# [ "message" .= msg, "error" .= tshow ex ]
-        runExitHook >> view _loggerCleanup >>= io >> exitFailure
-
+      logErrorNS "main" $ "now exiting... (reason: application error)" :# ["message" .= msg, "error" .= tshow ex]
+      runExitHook >> view _loggerCleanup >>= io >> exitFailure
 
 ---------------------------------------------------
 -- event handling
-
-instance HandleEvent H Event where
-  handleEvent _ = return ()
 
 instance HandleEvent H WlrOutputPowerMgmt.OutputPowerEvent where
   handleEvent _ = return ()
@@ -321,23 +320,21 @@ instance HandleEvent H R.RiverWindowManagerEvent where
       Seats.render >> Windows.render
       void . userCode =<< view (config . renderHook)
       R.riverWindowManagerRenderFinish wm
-
     R.RiverWindowManagerSessionLocked _ _wm ->
       -- Bulk disable all bindings
       writeManageQ $ mapSeats $ \s ->
-        forM_ (s.keyBindingsState.riverBoundKeys `M.restrictKeys` s.keyBindingsState.riverBoundKeysEnabled)
+        forM_
+          (s.keyBindingsState.riverBoundKeys `M.restrictKeys` s.keyBindingsState.riverBoundKeysEnabled)
           R.riverXkbBindingDisable
-
     R.RiverWindowManagerSessionUnlocked _ _wm ->
       -- Bulk enable all bindings that should be enabled
       writeManageQ $ mapSeats $ \s ->
-        forM_ (s.keyBindingsState.riverBoundKeys `M.restrictKeys` s.keyBindingsState.riverBoundKeysEnabled)
+        forM_
+          (s.keyBindingsState.riverBoundKeys `M.restrictKeys` s.keyBindingsState.riverBoundKeysEnabled)
           R.riverXkbBindingEnable
-
     R.RiverWindowManagerFinished _ wm -> do
       R.objectDestroy wm
       writeMainQ $ MainExit "river_window_manager_v1 finished, exiting." (Just $ toException $ ExitFailure 1)
-
     R.RiverWindowManagerUnavailable _ wm -> do
       R.objectDestroy wm
       writeMainQ $ MainExit "another window manager already running" (Just $ toException $ ExitFailure 1)

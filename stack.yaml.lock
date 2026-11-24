@@ -33,71 +33,12 @@ packages:
   original:
     hackage: Cabal-hooks-3.18@sha256:d5a79fbb79d01b2adcbcadf8f55be21a2edc2763f26c56424ec3c43b8f2659b8,1713
 - completed:
-    commit: 855a3777b85f9238674bdc778ed1a050bcbb5967
-    git: https://github.com/well-typed/hs-bindgen
-    name: hs-bindgen
-    pantry-tree:
-      sha256: 0cdc68d215f15b3e479fcf4b0d1cd76429d0d460944d48e149346c647df202eb
-      size: 289925
-    subdir: hs-bindgen
-    version: 0.1.0
-  original:
-    commit: 855a3777b85f9238674bdc778ed1a050bcbb5967
-    git: https://github.com/well-typed/hs-bindgen
-    subdir: hs-bindgen
-- completed:
-    commit: 855a3777b85f9238674bdc778ed1a050bcbb5967
-    git: https://github.com/well-typed/hs-bindgen
-    name: hs-bindgen-runtime
-    pantry-tree:
-      sha256: 706f3d77678e452979df31e5d37af74e3618639d99e490a00fd357be6e74c439
-      size: 3668
-    subdir: hs-bindgen-runtime
-    version: 0.1.0
-  original:
-    commit: 855a3777b85f9238674bdc778ed1a050bcbb5967
-    git: https://github.com/well-typed/hs-bindgen
-    subdir: hs-bindgen-runtime
-- completed:
-    commit: d67fb98d54301f1ef1bce08c643808d704fec813
-    git: https://github.com/well-typed/libclang-bindings
-    name: libclang-bindings
-    pantry-tree:
-      sha256: 67408da4c6120e159bcf72df9bdda6a7e84f793dc128b3c8f3ef116e170d6022
-      size: 4561
-    subdir: libclang-bindings
-    version: 0.1.0.0
-  original:
-    commit: d67fb98d54301f1ef1bce08c643808d704fec813
-    git: https://github.com/well-typed/libclang-bindings
-    subdir: libclang-bindings
-- completed:
-    commit: 6a18018ac1b91c62d6d3114c01a6ffa6c2ae7da5
-    git: https://github.com/well-typed/c-expr
-    name: c-expr-dsl
-    pantry-tree:
-      sha256: a5e5bc003c9ebe05d3cddd2bfbcbf824ac1403542c10574e89569636cb869785
-      size: 2680
-    subdir: c-expr-dsl
-    version: 0.1.0.1
-  original:
-    commit: 6a18018ac1b91c62d6d3114c01a6ffa6c2ae7da5
-    git: https://github.com/well-typed/c-expr
-    subdir: c-expr-dsl
-- completed:
     hackage: haskeline-0.8.5.0@sha256:fa3855c90062d9c9a0e3c5255a54185646fc6520fb52fd7e627a68c65ad12539,6200
     pantry-tree:
       sha256: 617fd4be0e58a64ac3217b6686456414a834b312da2e020de348b4b769e2dd42
       size: 2969
   original:
     hackage: haskeline-0.8.5.0
-- completed:
-    hackage: c-expr-runtime-0.1.0.0@sha256:48dbe82989ee01d0fb387670588a36ef64511a01d7ad5354d239752ad129b108,3213
-    pantry-tree:
-      sha256: 21de4dcee9b86b00fadc257a6fb3350d30813855075e0fb237221b3209a6c7ba
-      size: 1031
-  original:
-    hackage: c-expr-runtime-0.1.0.0
 - completed:
     hackage: debruijn-0.3.1@sha256:d47a75af3ff779e908d8ed07864e498f209049623aee64da89d58e0b3d08f219,2532
     pantry-tree:
@@ -147,6 +88,41 @@ packages:
       size: 2882
   original:
     hackage: QuickCheck-2.18.0.0
+- completed:
+    hackage: c-expr-runtime-0.2.0.0@sha256:0b22b2f1ec0a7bf25d03cc73189ade7bdfce633798111b09865f027ecf417e98,3235
+    pantry-tree:
+      sha256: 6336ed997f542e5258c6d620ad32a78ba75cf25b9f4261717759d152b2c1c411
+      size: 1032
+  original:
+    hackage: c-expr-runtime-0.2.0.0
+- completed:
+    hackage: hs-bindgen-1.0.0.0@sha256:5475059b532890189416c2fd68931c2155d7a52cb637364c7ee1097c644199d9,21803
+    pantry-tree:
+      sha256: 13b632efb57a36adbc77000297be8fb95b7c5b1d566758728582fbd45af77576
+      size: 290177
+  original:
+    hackage: hs-bindgen-1.0.0.0
+- completed:
+    hackage: hs-bindgen-runtime-1.0.0.0@sha256:042229b5260cac301198390896906645c2aac48a9ff5f5fee8aab7fd675045df,4525
+    pantry-tree:
+      sha256: 4a0be228e8ae649611bf062aa4d6d3a5d8907fdfa608a9d62fccc72d7d2639c1
+      size: 3668
+  original:
+    hackage: hs-bindgen-runtime-1.0.0.0
+- completed:
+    hackage: c-expr-dsl-0.2.0.0@sha256:13a76eee1d394a04edea856e75b5f040deb7f91d01c9e6f2d740c5331b577b03,4088
+    pantry-tree:
+      sha256: 7d209012be0153281bc30d7cdd7500b354bfe7132cac932868cd290efe208d48
+      size: 2680
+  original:
+    hackage: c-expr-dsl-0.2.0.0@sha256:13a76eee1d394a04edea856e75b5f040deb7f91d01c9e6f2d740c5331b577b03,4088
+- completed:
+    hackage: libclang-bindings-0.2.0.0@sha256:6af6e69c9d42bb0018ee568bcb484fa6d276a1d7d5e78960039ddc150b2393d8,5519
+    pantry-tree:
+      sha256: 12daf41922be9bb9bedac37e44e9c26f123e9c905dd5578c7847f475ba391015
+      size: 4506
+  original:
+    hackage: libclang-bindings-0.2.0.0@sha256:6af6e69c9d42bb0018ee568bcb484fa6d276a1d7d5e78960039ddc150b2393d8,5519
 snapshots:
 - completed:
     sha256: 5a365a790387c6fee9c1158c97f3701fdb34e523ba85730c8f0e45e1c4c30a7b
