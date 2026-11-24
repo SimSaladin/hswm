@@ -18,9 +18,7 @@ let
       ...
     }:
     let
-
       ghc = (config.compilerSelection pkgs.buildPackages).${config.compiler-nix-name};
-
       ghcUseLdLld =
         oldGhc:
         let
@@ -42,25 +40,13 @@ let
             #  $out/bin/ghc-pkg recache
             #'';
           });
-          #ghc3 = pkgs.runCommand "ghc" {
-          #        passthru = { inherit (ghc2) llvmPackages version targetPrefix buildGHC ; } // ghc2.passthru;
-          #      }
-          #      ''
-          #        cp -r --reflink=auto ${ghc2.out} $out
-          #        chmod +w $out/bin
-          #        substituteInPlace $out/bin/* --replace ${ghc2} $out
-          #        for f in ${ghc2.llvmPackages.bintools}/bin/*; do
-          #           ln -ns $f $out/bin/$(basename -- "$f")
-          #        done
-          #        chmod -R +w $out/lib/ghc-9.14.1/lib/package.conf.d
-          #        $out/bin/ghc-pkg recache
-          #      '';
         in
         ghc2;
-
       libc = ghc.llvmPackages.libc-full or ghc.llvmPackages.libunwind;
     in
     {
+      #materialized = pkgs.project-lib.materializedFor "project";
+
       #cabalProjectLocal = lib.mkAfter ''
       #  package *
       #      ghc-options: -fPIC -fllvm -pgmc=clang -pgma=clang -pgml=clang -optl-fuse-ld=lld
@@ -72,8 +58,6 @@ let
       #      ghc-options: -optl-B${libc}/lib
       #'';
 
-      #materialized = pkgs.project-lib.materializedFor "project";
-
       compilerSelection =
         p:
         p.haskell-nix.compiler
@@ -82,17 +66,13 @@ let
           ghc9141llvm = ghcUseLdLld p.haskell-nix.compiler.ghc9141llvm;
         };
 
-      cabalProjectFreeze = lib.mkForce ''
-        constraints: alex installed
-      '';
+      #cabalProjectFreeze = lib.mkForce ''
+      #  constraints: alex installed
+      #'';
 
       shell = {
-        packages = ps: [
-          ps.hswm
-        ];
+        packages = ps: [ ps.hswm ];
         buildInputs = [ libc ];
-        tools.alex = { };
-        tools.alex = { };
         exactDeps = lib.mkForce false;
         allToolDeps = lib.mkForce false;
       };
@@ -129,11 +109,11 @@ let
       shell = {
         inherit (config) name;
         tools.hpack = { };
+        tools.cabal-install = { };
         exactDeps = true;
         allToolDeps = true;
         #withHaddock = true;
         #withHoogle = true;
-        tools.cabal-install = { };
         nativeBuildInputs = [
           # Use a newer cabal-install binary
           #pkgs.cabal_3_18_1_0
@@ -293,6 +273,39 @@ let
       };
     };
 
+  makeProjectRuntime =
+    {
+      buildEnv,
+      runCommand,
+      installShellFiles,
+      flakePkgs,
+    }:
+    buildEnv {
+      pname = "hswm-env";
+      version = flakePkgs."hswm:lib:hswm".version;
+      paths = [
+        flakePkgs."hswm:exe:hswm"
+        flakePkgs."hswm:exe:hswmctl"
+        flakePkgs."waybar-cffi-hs:flib:waybarhaskellplugin"
+        (runCommand "bash-completion"
+          {
+            nativeBuildInputs = [
+              installShellFiles
+              flakePkgs."hswm:exe:hswmctl"
+            ];
+          }
+          ''
+            installShellCompletion --cmd hswmctl --bash <(hswmctl --bash-completion-script hswmctl)
+          ''
+        )
+      ];
+      pathsToLink = [
+        "/bin"
+        "/lib"
+        "/share"
+      ];
+    };
+
   customizations.perSystem =
     {
       lib,
@@ -317,51 +330,11 @@ let
         materialized-do = mkMaterializedDoApp {
           inherit pkgs project-lib projects;
         };
-
-        hoogle = mkApp {
-          name = "hoogle";
-          drv = pkgs.writeShellApplication {
-            name = "hoogle";
-            runtimeInputs = [ config.devShells."default:ghc-pkg" ];
-            text = ''
-              # shellcheck disable=SC1091
-              source ${config.devShells."default:ghc-pkg".shellHook}
-              if [[ $# -eq 0 ]]; then
-                set -- server --local
-              fi
-              hoogle generate --local
-              hoogle "$@"
-            '';
-          };
-        };
       };
 
       packages = {
-        with-hoogle = project.ghcWithHoogle (ps: [ ps.hswm ]);
-        default = pkgs.buildEnv {
-          pname = "hswm-env";
-          version = config.packages."hswm:lib:hswm".version;
-          paths = [
-            config.packages."hswm:exe:hswm"
-            config.packages."hswm:exe:hswmctl"
-            config.packages."waybar-cffi-hs:flib:waybarhaskellplugin"
-            (pkgs.runCommand "bash-completion"
-              {
-                nativeBuildInputs = [
-                  pkgs.installShellFiles
-                  config.packages."hswm:exe:hswmctl"
-                ];
-              }
-              ''
-                installShellCompletion --cmd hswmctl --bash <(hswmctl --bash-completion-script hswmctl)
-              ''
-            )
-          ];
-          pathsToLink = [
-            "/bin"
-            "/lib"
-            "/share"
-          ];
+        default = pkgs.callPackage makeProjectRuntime {
+          flakePkgs = config.packages;
         };
       };
 
@@ -392,9 +365,7 @@ let
 in
 
 {
-  imports = [
-    customizations
-  ];
+  imports = [ customizations ];
 
   flake.overlays.project = final: _: {
     project-lld = final.haskell-nix.cabalProject' [
