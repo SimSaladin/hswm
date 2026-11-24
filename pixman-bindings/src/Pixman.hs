@@ -7,7 +7,6 @@
 {-# LANGUAGE TypeData #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE ViewPatterns #-}
 {-# OPTIONS_GHC -Wno-missing-pattern-synonym-signatures #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 {-# OPTIONS_GHC -Wno-partial-type-signatures #-}
@@ -21,44 +20,108 @@
 -- Stability   : unstable
 -- Portability : unportable
 module Pixman (
+  -- * Fixed (fixed-point)
+  Fixed,
+  fixed2Int,
+  int2Fixed,
+  fixed2Double,
+  double2Fixed,
+
+  -- * Color
+  Color,
+  IsColor (..),
+
+  -- * Size, Position, Point
+  SizeScalar,
+  PositionScalar,
+  Size,
+  Position,
+  Point (..),
+
+  -- * Box
+  Box16,
+  Box32,
+  Box64F,
+  Box,
+  IsBox (..),
+
+  -- * Rectangle
+  Rectangle16,
+  Rectangle32,
+  Rectangle64F,
+  Rectangle,
+  IsRectangle (..),
+
+  -- * Vector
+  IsVector (..),
+  Vector,
+
+  -- * Region
+  RegionType (..),
+  Region (..),
+  Region16,
+  Region32,
+  Region64F,
+  IsRegion (..),
+  translateRegionF,
+  regionFromRectF,
+  unionRegionRectF,
+  intersectRegionRectF,
+  containsPointF,
+  Overlap (RegionOut, RegionIn, RegionPart),
+
+  -- * Transform
+  Transform,
+  FTransform,
+  IsTransform (..),
+
+  -- ** Conversions
+  fromFTransform,
+  fromTransform,
+
+  -- ** Predicates
+  isIdentity,
+  isScale,
+  isInverse,
+  isIntTranslate,
+
   -- * Image
   IsImage (..),
-  Image,
-  CreateImage,
 
-  -- ** Solid fill
+  -- ** Untyped
+  Image,
   newEmptyImage,
   newImageWithBits,
+
+  -- ** Typed
+  TypedImage,
+  newEmptyTypedImage,
+  newTypedImageWithBits,
+  imageToTypedImage,
+
+  -- ** Solid
+  Solid,
   solidFillImage,
 
-  -- ** Gradients
-  GradientStop,
+  -- ** Gradient
+  Gradient,
+  newLinearGradient,
+  newRadialGradient,
+  newConicalGradient,
   gradientStop,
-  linearGradientImage,
-  radialGradientImage,
-  conicalGradientImage,
+  GradientStop,
 
-  -- ** Set Repeat
+  -- ** Set properties
   setRepeat,
   Repeat (RepeatNone, RepeatNormal, RepeatPad, RepeatReflect),
-
-  -- ** Set Dither
   setDither,
   Dither (DitherNone, DitherFast, DitherGood, DitherBest, OrderedBayer8, OrderedBlueNoise64),
-
-  -- ** Set Source Clipping
   setSourceClipping,
-
-  -- ** Set Alpha Map
   setAlphaMap,
-
-  -- ** Set Component Alpha
+  clearAlphaMap,
   setComponentAlpha,
-
-  -- ** Set Transform
   setTransform,
-
-  -- ** Set Filter
+  clearTransform,
   setFilter,
   Filter (FilterFast, FilterGood, FilterBest, Nearest, Bilinear, Convolution, SeparableConvolution),
   separableConvolutionParams,
@@ -74,12 +137,8 @@ module Pixman (
     KernelLanczos3,
     KernelLanczos3Stretched
   ),
-
-  -- ** Set Clip Region
-  setHasClientClip,
   setClipRegion,
-
-  -- ** Set Indexed
+  setHasClientClip,
   setIndexed,
   Indexed,
 
@@ -100,15 +159,11 @@ module Pixman (
   SpanFix (..),
   Line (..),
 
-  -- ** TODO
+  -- * Edge
   Edge,
-  edgeStep,
-  edgeInit,
-  lineFixedEdgeInit,
-  rasterizeEdges,
-  rasterizeTrapezoid,
-  compositeTrapezoids,
-  compositeTriangles,
+  newEdge,
+  fromLine,
+  stepEdge,
 
   -- * Composite
   setComposite,
@@ -118,123 +173,22 @@ module Pixman (
   compositeSrcPos,
   compositeMaskPos,
   compositeDestPos,
-  Operation (
-    Clear,
-    Src,
-    Dst,
-    Over,
-    OverReverse,
-    In,
-    InReverse,
-    Out,
-    OutReverse,
-    Atop,
-    AtopReverse,
-    Xor,
-    Add,
-    Saturate,
-    DisjointClear,
-    DisjointSrc,
-    DisjointDst,
-    DisjointOver,
-    DisjointOverReverse,
-    DisjointIn,
-    DisjointInReverse,
-    DisjointOut,
-    DisjointOutReverse,
-    DisjointAtop,
-    DisjointAtopReverse,
-    DisjointXor,
-    ConjointClear,
-    ConjointSrc,
-    ConjointDst,
-    ConjointOver,
-    ConjointOverReverse,
-    ConjointIn,
-    ConjointInReverse,
-    ConjointOut,
-    ConjointOutReverse,
-    ConjointAtop,
-    ConjointAtopReverse,
-    ConjointXor,
-    Multiply,
-    Screen,
-    Overlay,
-    Darken,
-    Lighten,
-    ColorDodge,
-    ColorBurn,
-    HardLight,
-    SoftLight,
-    Difference,
-    Exclusion,
-    HslHue,
-    HslSaturation,
-    HslColor,
-    HslLuminosity
-  ),
+  compositeTrapezoids,
+  compositeTriangles,
+  Operation,
+  OP (..),
+  REVERSE (..),
 
   -- * Functions
-  blt,
+  blit,
   PaintTarget,
   computeCompositeRegion,
   getMinStride,
   sampleCeilY,
   sampleFloorY,
 
-  -- * Color
-  IsColor (..),
-  ColorComponent (..),
-  Color,
-
-  -- * Transform
-  Transform,
-  FTransform,
-  IsTransform (..),
-  TransformVector,
-
-  -- ** Conversions
-  fromFTransform,
-  fromTransform,
-
-  -- ** Predicates
-  isIdentity,
-  isScale,
-  isInverse,
-  isIntTranslate,
-
-  -- * Region
-  RegionType (..),
-  Region (..),
-  Region16,
-  Region32,
-  Region64F,
-  IsRegion (..),
-  translateRegionF,
-  regionFromRectF,
-  unionRegionRectF,
-  intersectRegionRectF,
-  containsPointF,
-  RegionOverlap (RegionOut, RegionIn, RegionPart),
-
-  -- * Box
-  IsBox (..),
-  Box,
-  Box16,
-  Box32,
-  Box64F,
-
-  -- * Rectangle
-  IsRectangle (..),
-  Rectangle16,
-  Rectangle32,
-  Rectangle64F,
-
-  -- * Vector
-  IsVector (..),
-  Vector,
-
   -- * Formats
+  ImageFormat (..),
   FormatCode,
   rawFormatCode,
 
@@ -243,7 +197,8 @@ module Pixman (
   formatBPP,
   formatDepth,
   formatType,
-  FormatType (A, ARGB, ABGR, ColorType, Gray, YUY2Type, YV12Type, BGRA, RGBA, ARGBsRGB, RGBAFloatFormat, OtherType),
+  FormatType (..),
+  -- FormatType (A, ARGB, ABGR, ColorType, Gray, YUY2Type, YV12Type, BGRA, RGBA, ARGBsRGB, RGBAFloatFormat, OtherType),
   formatSupportedDest,
   formatSupportedSource,
   allFormats,
@@ -321,22 +276,12 @@ module Pixman (
   pattern YUY2,
   pattern YV12,
 
-  -- * Fixed
-  Fixed,
-  fixed2Int,
-  int2Fixed,
-  fixed2Double,
-  double2Fixed,
-
-  -- * Position and Size
-  Size,
-  Position,
-  SizeScalar,
-  PositionScalar,
-  Point (..),
-
   -- * Exceptions
   PixmanException (..),
+
+  -- * TODO
+  rasterizeEdges,
+  rasterizeTrapezoid,
 
   -- * Re-exports
   def,
@@ -354,12 +299,14 @@ import HsBindgen.Runtime.Prelude qualified as RIP
 import Control.DeepSeq
 import Control.Exception
 import Control.Monad
+import Control.Monad.Primitive
+import Data.Char qualified as C
 import Data.Coerce
 import Data.Default
 import Data.Fixed qualified as Fixed
 import Data.Kind (Type)
-import Data.Maybe
 import Data.Typeable
+import Data.Void
 import Foreign
 import Foreign.C
 import Foreign.C.ConstPtr
@@ -370,9 +317,7 @@ import GHC.Stack
 import Numeric (readHex)
 import System.IO.Unsafe
 import Text.Printf
-
--- import Data.Primitive.Types (Prim)
--- import Data.Hashable (Hashable)
+import Text.Read (Read (..))
 
 -- * Types
 
@@ -395,32 +340,19 @@ type instance SizeScalar R16 = Word16
 type instance SizeScalar R32 = Word32
 type instance SizeScalar R64F = Double
 
-type instance PositionScalar Rectangle16 = PositionScalar R16
-type instance PositionScalar Rectangle32 = PositionScalar R32
-type instance PositionScalar Rectangle64F = PositionScalar R64F
-type instance PositionScalar Box16 = PositionScalar R16
-type instance PositionScalar Box32 = PositionScalar R32
-type instance PositionScalar Box64F = PositionScalar R64F
-type instance SizeScalar Rectangle16 = Word16
-type instance SizeScalar Rectangle32 = Word32
-type instance SizeScalar Rectangle64F = Double
+type instance PositionScalar (Box a) = PositionScalar a
+type instance PositionScalar (Rectangle a) = PositionScalar a
+type instance SizeScalar (Rectangle a) = SizeScalar a
 
 newtype PixmanException = PixmanException String
   deriving (Eq, Ord, Show)
 
 instance Exception PixmanException
 
--- | A 16.16 fixed-point represnted by @uint32_t@.
+-- | A 16.16 fixed-point (represented as @uint32_t@).
 newtype Fixed = Fixed {unwrap :: G.Pixman_fixed_t}
   deriving stock (Eq, Generic)
-  deriving newtype (Ord, Bits, Storable)
-
-instance NFData Fixed where
-  rnf f = rnf (coerce f :: Int32)
-
-instance Bounded Fixed where
-  minBound = coerce (minBound :: Int32)
-  maxBound = coerce (maxBound :: Int32)
+  deriving newtype (Ord, Bits, FiniteBits, Storable, RIP.ReadRaw, RIP.WriteRaw, RIP.StaticSize)
 
 -- | Get the int value of this fixed point.
 fixed2Int :: (Integral a) => Fixed -> a
@@ -438,8 +370,18 @@ fixed2Double f = fromIntegral (coerce f :: Int32) / fromIntegral (coerce $ int2F
 double2Fixed :: Double -> Fixed
 double2Fixed d = coerce @Int32 $ fromIntegral $ double2Int $ d * 65536.0
 
+instance NFData Fixed where
+  rnf f = rnf (coerce f :: Int32)
+
+instance Bounded Fixed where
+  minBound = coerce (minBound :: Int32)
+  maxBound = coerce (maxBound :: Int32)
+
 instance Show Fixed where
   show f = Fixed.showFixed True (Fixed.MkFixed $ fromIntegral (coerce f :: Int32) :: Fixed.Fixed 65536)
+
+instance Read Fixed where
+  readPrec = realToFrac <$> (readPrec @(Fixed.Fixed 65536))
 
 instance PrintfArg Fixed where
   formatArg a _ = shows a
@@ -467,7 +409,10 @@ instance Fixed.HasResolution Fixed where
 -- |
 -- @Point Fixed@ == @pixman_point_fixed_t@
 data Point a = Point {x, y :: !a}
-  deriving stock (Eq, Ord, Show, Generic)
+  deriving stock (Eq, Ord, Generic)
+
+instance (Show a) => Show (Point a) where
+  show Point{..} = show (x, y)
 
 -- | Same layout as @pixman_point_fixed_t@
 instance Storable (Point Fixed) where
@@ -482,7 +427,10 @@ type Indexed = G.Pixman_indexed_t
 
 -- | A triangle
 data Triangle = Triangle {p1, p2, p3 :: !(Point Fixed)}
-  deriving stock (Eq)
+  deriving stock (Eq, Generic)
+
+instance Show Triangle where
+  show Triangle{..} = "Triangle{" ++ show p1 ++ "," ++ show p2 ++ "," ++ show p3 ++ "}"
 
 instance Storable Triangle where
   sizeOf _ = sizeOf @G.Pixman_triangle_t undefined
@@ -497,8 +445,8 @@ fromPoint Point{..} = G.Pixman_point_fixed_t{x = coerce x, y = coerce y}
 toPoint :: G.Pixman_point_fixed_t -> Point Fixed
 toPoint G.Pixman_point_fixed_t{..} = Point{x = coerce x, y = coerce y}
 
-fromLine :: Line Fixed -> G.Pixman_line_fixed_t
-fromLine Line{..} = G.Pixman_line_fixed_t{p1 = fromPoint p1, p2 = fromPoint p2}
+unLine :: Line Fixed -> G.Pixman_line_fixed_t
+unLine Line{..} = G.Pixman_line_fixed_t{p1 = fromPoint p1, p2 = fromPoint p2}
 toLine :: G.Pixman_line_fixed_t -> Line Fixed
 toLine G.Pixman_line_fixed_t{..} = Line{p1 = toPoint p1, p2 = toPoint p2}
 
@@ -525,7 +473,7 @@ data Trapezoid = Trapezoid
   { top, bottom :: !Fixed
   , left, right :: !(Line Fixed)
   }
-  deriving stock (Eq)
+  deriving stock (Eq, Generic)
 
 instance Storable Trapezoid where
   sizeOf _ = sizeOf @G.Pixman_trapezoid_t undefined
@@ -533,11 +481,11 @@ instance Storable Trapezoid where
   peek p = do
     G.Pixman_trapezoid_t{..} <- peek (castPtr p)
     return $! Trapezoid{top = coerce top, bottom = coerce bottom, left = toLine left, right = toLine right}
-  poke p Trapezoid{..} = poke (castPtr p) G.Pixman_trapezoid_t{top = coerce top, bottom = coerce bottom, left = fromLine left, right = fromLine right}
+  poke p Trapezoid{..} = poke (castPtr p) G.Pixman_trapezoid_t{top = coerce top, bottom = coerce bottom, left = unLine left, right = unLine right}
 
 -- | A line consists of two 'Point's.
 data Line a = Line {p1, p2 :: !(Point a)}
-  deriving stock (Eq)
+  deriving stock (Eq, Generic)
 
 triangle :: Point Fixed -> Point Fixed -> Point Fixed -> Triangle
 triangle = Triangle
@@ -567,24 +515,30 @@ type Region64F = Region R64F
 instance (Typeable a, IsRegion (Region a)) => Show (Region a) where
   show reg = printf "Region[%s]{extents=%s, numRects=%d, rects=%s}" (show $ typeRep (Proxy @a)) (show ext) numRects (show rects)
     where
-      ext = regionExtents reg
+      ext = extents reg
+      rects = rectangles reg
       numRects = regionNumRects reg
-      rects = regionRectangles numRects reg
 
 instance (IsRegion (Region a)) => Eq (Region a) where
   (==) = eqRegion
 
--- | Fixed-point transform. (reference)
+-- | Fixed-point transform.
 --
 -- @pixman_fixed_t  matrix[3][3];@
 newtype Transform = Transform {unwrap :: ForeignPtr G.Pixman_transform}
-  deriving stock (Eq, Ord, Generic)
+  deriving stock (Generic)
 
--- | Floating-point transform. (reference)
+-- | Floating-point transform.
 --
 -- @double[3][3]@
 newtype FTransform = FTransform {unwrap :: ForeignPtr G.Pixman_f_transform}
-  deriving stock (Eq, Ord, Generic)
+  deriving stock (Generic)
+
+instance Eq Transform where
+  t1 == t2 = transformMatrix t1 == transformMatrix t2
+
+instance Eq FTransform where
+  t1 == t2 = transformMatrix t1 == transformMatrix t2
 
 instance Show Transform where
   show tr =
@@ -619,101 +573,6 @@ instance Show FTransform where
       _ -> error "FTransform: unexpected number of rows"
     where
       G.Pixman_f_transform mat = unsafePerformIO (withPtr tr peek)
-
-data family Vector a
-
--- | A single vector
-newtype instance Vector Fixed = VectorFixed {unwrap :: G.Pixman_vector_t}
-  deriving stock (Eq, Generic)
-  deriving newtype (Storable, RIP.StaticSize, RIP.ReadRaw, RIP.WriteRaw)
-
--- | Floating-point vector
-newtype instance Vector Double = VectorDouble {unwrap :: G.Pixman_f_vector_t}
-  deriving stock (Eq, Generic)
-  deriving newtype (Storable, RIP.StaticSize, RIP.ReadRaw, RIP.WriteRaw)
-
-instance Show (Vector Fixed) where
-  show (VectorFixed (G.Pixman_vector_t (G.Pixman_vector ca)))
-    | [a, b, c] <- map (coerce @_ @Fixed) $ CA.toList ca = printf "Vector[Fixed]{%s,%s,%s}" a b c
-    | otherwise = error "vector: unexpected element count"
-
-instance Show (Vector Double) where
-  show (VectorDouble (G.Pixman_f_vector_t (G.Pixman_f_vector ca)))
-    | [a, b, c] <- map (coerce @_ @Double) $ CA.toList ca = printf "Vector[Double]{%f,%f,%f}" a b c
-    | otherwise = error "vector: unexpected element count"
-
--- | 16-bit box
-newtype Box16 = Box16 {unwrap :: G.Pixman_box16_t}
-  deriving stock (Eq, Generic)
-  deriving newtype (Storable, RIP.StaticSize, RIP.ReadRaw, RIP.WriteRaw)
-
--- | 32-bit box
-newtype Box32 = Box32 {unwrap :: G.Pixman_box32_t}
-  deriving stock (Eq, Generic)
-  deriving newtype (Storable, RIP.StaticSize, RIP.ReadRaw, RIP.WriteRaw)
-
--- | 64-bit floating-point box
-newtype Box64F = Box64F {unwrap :: G.Pixman_box64f_t}
-  deriving stock (Eq, Generic)
-  deriving newtype (Storable, RIP.StaticSize, RIP.ReadRaw, RIP.WriteRaw)
-
-type family Box (a :: k)
-type instance Box R16 = Box16
-type instance Box R32 = Box32
-type instance Box R64F = Box64F
-
-instance HasField "x1" Box16 Int16 where getField = getField @"x1" . getField @"unwrap" . getField @"unwrap"
-instance HasField "y1" Box16 Int16 where getField = getField @"y1" . getField @"unwrap" . getField @"unwrap"
-instance HasField "x2" Box16 Int16 where getField = getField @"x2" . getField @"unwrap" . getField @"unwrap"
-instance HasField "y2" Box16 Int16 where getField = getField @"y2" . getField @"unwrap" . getField @"unwrap"
-
-instance HasField "x1" Box32 Int32 where getField = getField @"x1" . getField @"unwrap"
-instance HasField "y1" Box32 Int32 where getField = getField @"y1" . getField @"unwrap"
-instance HasField "x2" Box32 Int32 where getField = getField @"x2" . getField @"unwrap"
-instance HasField "y2" Box32 Int32 where getField = getField @"y2" . getField @"unwrap"
-
-instance HasField "x1" Box64F Double where getField = coerce . getField @"x1" . getField @"unwrap"
-instance HasField "y1" Box64F Double where getField = coerce . getField @"y1" . getField @"unwrap"
-instance HasField "x2" Box64F Double where getField = coerce . getField @"x2" . getField @"unwrap"
-instance HasField "y2" Box64F Double where getField = coerce . getField @"y2" . getField @"unwrap"
-
-instance Show Box16 where show box = "Box16{" ++ show [getField @"x1" box, getField @"y1" box, getField @"x2" box, getField @"y2" box] ++ "}"
-instance Show Box32 where show box = "Box32{" ++ show [getField @"x1" box, getField @"y1" box, getField @"x2" box, getField @"y2" box] ++ "}"
-instance Show Box64F where show box = "Box64F{" ++ show [getField @"x1" box, getField @"y1" box, getField @"x2" box, getField @"y2" box] ++ "}"
-
--- | 16-bit rectangle
-newtype Rectangle16 = Rectangle16 {unwrap :: G.Pixman_rectangle16_t}
-  deriving stock (Eq, Generic)
-  deriving newtype (Storable, RIP.StaticSize, RIP.ReadRaw, RIP.WriteRaw)
-
--- | 32-bit rectangle
-newtype Rectangle32 = Rectangle32 {unwrap :: G.Pixman_rectangle32_t}
-  deriving stock (Eq, Generic)
-  deriving newtype (Storable, RIP.StaticSize, RIP.ReadRaw, RIP.WriteRaw)
-
--- | 64-bit floating-point rectangle
-newtype Rectangle64F = Rectangle64F {unwrap :: G.Pixman_rectangle64f_t}
-  deriving stock (Eq, Generic)
-  deriving newtype (Storable, RIP.StaticSize, RIP.ReadRaw, RIP.WriteRaw)
-
-instance HasField "x" Rectangle16 Int16 where getField = getField @"x" . getField @"unwrap"
-instance HasField "y" Rectangle16 Int16 where getField = getField @"y" . getField @"unwrap"
-instance HasField "width" Rectangle16 Word16 where getField = getField @"width" . getField @"unwrap"
-instance HasField "height" Rectangle16 Word16 where getField = getField @"height" . getField @"unwrap"
-
-instance HasField "x" Rectangle32 Int32 where getField = getField @"x" . getField @"unwrap"
-instance HasField "y" Rectangle32 Int32 where getField = getField @"y" . getField @"unwrap"
-instance HasField "width" Rectangle32 Word32 where getField = getField @"width" . getField @"unwrap"
-instance HasField "height" Rectangle32 Word32 where getField = getField @"height" . getField @"unwrap"
-
-instance HasField "x" Rectangle64F Double where getField = coerce . getField @"x" . getField @"unwrap"
-instance HasField "y" Rectangle64F Double where getField = coerce . getField @"y" . getField @"unwrap"
-instance HasField "width" Rectangle64F Double where getField = coerce . getField @"width" . getField @"unwrap"
-instance HasField "height" Rectangle64F Double where getField = coerce . getField @"height" . getField @"unwrap"
-
-instance Show Rectangle16 where show x = printf "Rectangle16{x=%d,y=%d,width=%d,height=%d}" (getField @"x" x) (getField @"y" x) (getField @"width" x) (getField @"height" x)
-instance Show Rectangle32 where show x = printf "Rectangle32{x=%d,y=%d,width=%d,height=%d}" (getField @"x" x) (getField @"y" x) (getField @"width" x) (getField @"height" x)
-instance Show Rectangle64F where show x = printf "Rectangle64F{x=%f,y=%f,width=%f,height=%f}" (getField @"x" x) (getField @"y" x) (getField @"width" x) (getField @"height" x)
 
 -- | Possible format codes
 type FormatCode = G.Pixman_format_code_t
@@ -822,40 +681,129 @@ pattern G4 :: FormatCode
 pattern G4 = G.PIXMAN_g4
 pattern A1 :: FormatCode
 pattern A1 = G.PIXMAN_a1
+
+-- | 1bpp G1
 pattern G1 :: FormatCode
 pattern G1 = G.PIXMAN_g1
+
+-- | YUV YUY2
 pattern YUY2 :: FormatCode
 pattern YUY2 = G.PIXMAN_yuy2
+
+-- | YUV YV12
 pattern YV12 :: FormatCode
 pattern YV12 = G.PIXMAN_yv12
 
+type data ImageFormat
+  = RGBAFloat
+  | RGBFloat
+  | A16B16G16R16
+  | A8R8G8B8
+  | X8R8G8B8
+  | A8B8G8R8
+  | X8B8G8R8
+  | B8G8R8A8
+  | B8G8R8X8
+  | R8G8B8A8
+  | R8G8B8X8
+  | X14R6G6B6
+  | X2R10G10B10
+  | A2R10G10B10
+  | X2B10G10R10
+  | A2B10G10R10
+  | A8R8G8B8_sRGB
+  | R8G8B8_sRGB
+  | R8G8B8
+  | B8G8R8
+  | R5G6B5
+  | B5G6R5
+  | A1R5G5B5
+  | X1R5G5B5
+  | A1B5G5R5
+  | X1B5G5R5
+  | A4R4G4B4
+  | X4R4G4B4
+  | A4B4G4R4
+  | X4B4G4R4
+  | A8
+  | R3G3B2
+  | B2G3R3
+  | A2R2G2B2
+  | A2B2G2R2
+  | C8
+  | G8
+  | X4A4
+  | X4C4
+  | X4G4
+  | A4
+  | R1G2B1
+  | B1G2R1
+  | A1R1G1B1
+  | A1B1G1R1
+  | C4
+  | G4
+  | A1
+  | G1
+  | YUY2
+  | YV12
+
+type family ImageFormatType (format :: ImageFormat) :: FormatType
+type instance ImageFormatType A1 = A
+type instance ImageFormatType A4 = A
+type instance ImageFormatType A8 = A
+type instance ImageFormatType X4A4 = A
+type instance ImageFormatType C4 = COLOR
+type instance ImageFormatType C8 = COLOR
+
 -- | @PIXMAN_TYPE_*@
-newtype FormatType = FormatType {unwrap :: CInt}
-  deriving stock (Eq, Generic)
-  deriving newtype (Storable, Ord, Real, Integral, Num)
+data FormatType
+  = Other -- 0
+  | A -- 1
+  | ARGB -- 2
+  | ABGR -- 3
+  | COLOR -- 4
+  | GRAY -- 5
+  | YUY2_TYPE -- 6
+  | YV12_TYPE -- 7
+  | BGRA -- 8
+  | RGBA -- 9
+  | ARGBsRGB -- 10
+  | RGBA_FLOAT -- 11
+  deriving stock (Eq, Ord, Bounded, Generic)
+
+-- newtype FormatType = FormatType {unwrap :: CInt}
+--  deriving stock (Eq, Generic)
+--  deriving newtype (Storable, Ord, Real, Integral, Num)
+
+class (Typeable a) => IsImageFormat a where
+  imageFormatCode :: Proxy a -> FormatCode
+
+instance (Typeable a) => IsImageFormat (a :: ImageFormat) where
+  -- TODO hack implementation
+  imageFormatCode proxy = read $ "PIXMAN_" ++ map C.toLower (show (typeRep proxy))
 
 formatTypes :: [(FormatType, String)]
 formatTypes =
-  [ (OtherType, "Other") --  0
+  [ (Other, "Other") --  0
   , (A, "A") --  1
   , (ARGB, "ARGB") --  2
   , (ABGR, "ABGR") --  3
-  , (ColorType, "COLOR") --  4
-  , (Gray, "GRAY") --  5
-  , (YUY2Type, "YUY2") --  6
-  , (YV12Type, "YV12") --  7
+  , (COLOR, "COLOR") --  4
+  , (GRAY, "GRAY") --  5
+  , (YUY2_TYPE, "YUY2") --  6
+  , (YV12_TYPE, "YV12") --  7
   , (BGRA, "BGRA") --  8
   , (RGBA, "RGBA") --  9
   , (ARGBsRGB, "ARGB_sRGB") --  10
-  , (RGBAFloatFormat, "RGBA_FLOAT") --  11
+  , (RGBA_FLOAT, "RGBA_FLOAT") --  11
   ]
 
 instance Enum FormatType where
   toEnum i
-    | r : _ <- [v | (v@(FormatType vi), _str) <- formatTypes, vi == fromIntegral i] = r
-    | otherwise = OtherType
+    | r : _ <- [v | (vi, (v, _str)) <- zip [0 :: Int ..] formatTypes, vi == fromIntegral i] = r
+    | otherwise = Other
   fromEnum x
-    | r : _ <- [vi | (v@(FormatType vi), _str) <- formatTypes, v == x] = fromIntegral r
+    | r : _ <- [vi | (vi, (v, _str)) <- zip [0 :: Int ..] formatTypes, v == x] = fromIntegral r
     | otherwise = 0
 
 instance Show FormatType where
@@ -863,44 +811,11 @@ instance Show FormatType where
     s : _ -> s
     _ -> "TypeUnknown(" ++ show x ++ ")"
 
-pattern OtherType <- ((== FormatType G.pIXMAN_TYPE_OTHER) -> True) where OtherType = FormatType G.pIXMAN_TYPE_OTHER
-pattern A <- ((== FormatType G.pIXMAN_TYPE_A) -> True) where A = FormatType G.pIXMAN_TYPE_A
-pattern ARGB <- ((== FormatType G.pIXMAN_TYPE_ARGB) -> True) where ARGB = FormatType G.pIXMAN_TYPE_ARGB
-
--- \^ @PIXMAN_TYPE_ARGB        2 @
-pattern ABGR <- ((== FormatType G.pIXMAN_TYPE_ABGR) -> True) where ABGR = FormatType G.pIXMAN_TYPE_ABGR
-
--- \^ @PIXMAN_TYPE_ABGR        3 @
-pattern ColorType <- ((== FormatType G.pIXMAN_TYPE_COLOR) -> True) where ColorType = FormatType G.pIXMAN_TYPE_COLOR
-
--- \^ @PIXMAN_TYPE_COLOR       4 @
-pattern Gray <- ((== FormatType G.pIXMAN_TYPE_GRAY) -> True) where Gray = FormatType G.pIXMAN_TYPE_GRAY
-
--- \^ @PIXMAN_TYPE_GRAY        5 @
-pattern YUY2Type <- ((== FormatType G.pIXMAN_TYPE_YUY2) -> True) where YUY2Type = FormatType G.pIXMAN_TYPE_YUY2
-
--- \^ @PIXMAN_TYPE_YUY2        6 @
-pattern YV12Type <- ((== FormatType G.pIXMAN_TYPE_YV12) -> True) where YV12Type = FormatType G.pIXMAN_TYPE_YV12
-
--- \^ @PIXMAN_TYPE_YV12        7 @
-pattern BGRA <- ((== FormatType G.pIXMAN_TYPE_BGRA) -> True) where BGRA = FormatType G.pIXMAN_TYPE_BGRA
-
--- \^ @PIXMAN_TYPE_BGRA        8 @
-pattern RGBA <- ((== FormatType G.pIXMAN_TYPE_RGBA) -> True) where RGBA = FormatType G.pIXMAN_TYPE_RGBA
-
--- \^ @PIXMAN_TYPE_RGBA        9 @
-pattern ARGBsRGB <- ((== FormatType G.pIXMAN_TYPE_ARGB_SRGB) -> True) where ARGBsRGB = FormatType G.pIXMAN_TYPE_ARGB_SRGB
-
--- \^ @PIXMAN_TYPE_ARGB_SRGB   10@
-pattern RGBAFloatFormat <- ((== FormatType G.pIXMAN_TYPE_RGBA_FLOAT) -> True) where RGBAFloatFormat = FormatType G.pIXMAN_TYPE_RGBA_FLOAT
-
--- \^ @PIXMAN_TYPE_RGBA_FLOAT  11@
-
 -- | All named formats.
 allFormats :: [FormatCode]
 allFormats = filter CE.isDeclared [minBound .. maxBound]
 
--- | Bits-per-pixel. @PIXMAN_FORMAT_BPP@
+-- | Get the bpp (bits-per-pixel) for the specified format. (@PIXMAN_FORMAT_BPP@)
 formatBPP :: FormatCode -> Int
 formatBPP = fromIntegral . G.pIXMAN_FORMAT_BPP . CE.fromCEnum
 
@@ -912,7 +827,7 @@ formatDepth = fromIntegral . G.pIXMAN_FORMAT_DEPTH . CE.fromCEnum
 formatColor :: FormatCode -> Bool
 formatColor fmt = G.pIXMAN_FORMAT_COLOR (CE.fromCEnum fmt) == 1
 
--- | @PIXMAN_FORMAT_TYPE@
+-- | Get the 'FormatType' for the specified format. (@PIXMAN_FORMAT_TYPE@)
 formatType :: FormatCode -> FormatType
 formatType fmt = toEnum . fromIntegral $ G.pIXMAN_FORMAT_TYPE (CE.fromCEnum fmt)
 
@@ -922,105 +837,237 @@ formatSupportedDest fmt = unsafePerformIO $ fromPixmanBool <$> US.pixman_format_
 formatSupportedSource :: FormatCode -> Bool
 formatSupportedSource fmt = unsafePerformIO $ fromPixmanBool <$> US.pixman_format_supported_source fmt
 
--- | Possible operations
-newtype Operation = Op {unwrap :: G.Pixman_op_t}
-  deriving stock (Eq, Show, Generic)
-  deriving newtype (Ord, Storable)
+-- | Possible operations for composition
+type Operation = OP Void
 
-pattern Clear = Op G.PIXMAN_OP_CLEAR
-pattern Src = Op G.PIXMAN_OP_SRC
-pattern Dst = Op G.PIXMAN_OP_DST
-pattern Over = Op G.PIXMAN_OP_OVER
-pattern OverReverse = Op G.PIXMAN_OP_OVER_REVERSE
-pattern In = Op G.PIXMAN_OP_IN
-pattern InReverse = Op G.PIXMAN_OP_IN_REVERSE
-pattern Out = Op G.PIXMAN_OP_OUT
-pattern OutReverse = Op G.PIXMAN_OP_OUT_REVERSE
-pattern Atop = Op G.PIXMAN_OP_ATOP
-pattern AtopReverse = Op G.PIXMAN_OP_ATOP_REVERSE
-pattern Xor = Op G.PIXMAN_OP_XOR
-pattern Add = Op G.PIXMAN_OP_ADD
-pattern Saturate = Op G.PIXMAN_OP_SATURATE
-pattern DisjointClear = Op G.PIXMAN_OP_DISJOINT_CLEAR
-pattern DisjointSrc = Op G.PIXMAN_OP_DISJOINT_SRC
-pattern DisjointDst = Op G.PIXMAN_OP_DISJOINT_DST
-pattern DisjointOver = Op G.PIXMAN_OP_DISJOINT_OVER
-pattern DisjointOverReverse = Op G.PIXMAN_OP_DISJOINT_OVER_REVERSE
-pattern DisjointIn = Op G.PIXMAN_OP_DISJOINT_IN
-pattern DisjointInReverse = Op G.PIXMAN_OP_DISJOINT_IN_REVERSE
-pattern DisjointOut = Op G.PIXMAN_OP_DISJOINT_OUT
-pattern DisjointOutReverse = Op G.PIXMAN_OP_DISJOINT_OUT_REVERSE
-pattern DisjointAtop = Op G.PIXMAN_OP_DISJOINT_ATOP
-pattern DisjointAtopReverse = Op G.PIXMAN_OP_DISJOINT_ATOP_REVERSE
-pattern DisjointXor = Op G.PIXMAN_OP_DISJOINT_XOR
-pattern ConjointClear = Op G.PIXMAN_OP_CONJOINT_CLEAR
-pattern ConjointSrc = Op G.PIXMAN_OP_CONJOINT_SRC
-pattern ConjointDst = Op G.PIXMAN_OP_CONJOINT_DST
-pattern ConjointOver = Op G.PIXMAN_OP_CONJOINT_OVER
-pattern ConjointOverReverse = Op G.PIXMAN_OP_CONJOINT_OVER_REVERSE
-pattern ConjointIn = Op G.PIXMAN_OP_CONJOINT_IN
-pattern ConjointInReverse = Op G.PIXMAN_OP_CONJOINT_IN_REVERSE
-pattern ConjointOut = Op G.PIXMAN_OP_CONJOINT_OUT
-pattern ConjointOutReverse = Op G.PIXMAN_OP_CONJOINT_OUT_REVERSE
-pattern ConjointAtop = Op G.PIXMAN_OP_CONJOINT_ATOP
-pattern ConjointAtopReverse = Op G.PIXMAN_OP_CONJOINT_ATOP_REVERSE
-pattern ConjointXor = Op G.PIXMAN_OP_CONJOINT_XOR
-pattern Multiply = Op G.PIXMAN_OP_MULTIPLY
-pattern Screen = Op G.PIXMAN_OP_SCREEN
-pattern Overlay = Op G.PIXMAN_OP_OVERLAY
-pattern Darken = Op G.PIXMAN_OP_DARKEN
-pattern Lighten = Op G.PIXMAN_OP_LIGHTEN
-pattern ColorDodge = Op G.PIXMAN_OP_COLOR_DODGE
-pattern ColorBurn = Op G.PIXMAN_OP_COLOR_BURN
-pattern HardLight = Op G.PIXMAN_OP_HARD_LIGHT
-pattern SoftLight = Op G.PIXMAN_OP_SOFT_LIGHT
-pattern Difference = Op G.PIXMAN_OP_DIFFERENCE
-pattern Exclusion = Op G.PIXMAN_OP_EXCLUSION
-pattern HslHue = Op G.PIXMAN_OP_HSL_HUE
-pattern HslSaturation = Op G.PIXMAN_OP_HSL_SATURATION
-pattern HslColor = Op G.PIXMAN_OP_HSL_COLOR
-pattern HslLuminosity = Op G.PIXMAN_OP_HSL_LUMINOSITY
+data OP a where
+  CLEAR :: OP a
+  SRC :: OP a
+  DST :: OP a
+  OVER :: REVERSE -> OP a
+  IN :: REVERSE -> OP a
+  OUT :: REVERSE -> OP a
+  ATOP :: REVERSE -> OP a
+  XOR :: OP a
+  ADD :: OP Void
+  SATURATE :: OP Void
+  DISJOINT :: OP () -> OP Void
+  CONJOINT :: OP () -> OP Void
+  MULTIPLY :: OP Void
+  SCREEN :: OP Void
+  OVERLAY :: OP Void
+  DARKEN :: OP Void
+  LIGHTEN :: OP Void
+  COLOR_DODGE :: OP Void
+  COLOR_BURN :: OP Void
+  HARD_LIGHT :: OP Void
+  SOFT_LIGHT :: OP Void
+  DIFFERENCE :: OP Void
+  EXCLUSION :: OP Void
+  HSL_HUE :: OP Void
+  HSL_SATURATION :: OP Void
+  HSL_COLOR :: OP Void
+  HSL_LUMINOSITY :: OP Void
 
+deriving instance Eq (OP a)
+deriving instance Ord (OP a)
+deriving instance Show (OP a)
+
+instance Storable (OP Void) where
+  sizeOf _ = sizeOf @G.Pixman_op_t undefined
+  alignment _ = alignment @G.Pixman_op_t undefined
+  peek p = toOP <$> peek (castPtr p)
+  poke p a = poke (castPtr p) (fromOP a)
+
+data REVERSE = NORMAL | REVERSE
+  deriving stock (Eq, Ord, Show, Read, Generic)
+
+fromOP :: OP Void -> G.Pixman_op_t
+fromOP = \case
+  CLEAR -> G.PIXMAN_OP_CLEAR
+  SRC -> G.PIXMAN_OP_SRC
+  DST -> G.PIXMAN_OP_DST
+  OVER NORMAL -> G.PIXMAN_OP_OVER
+  OVER REVERSE -> G.PIXMAN_OP_OVER_REVERSE
+  IN NORMAL -> G.PIXMAN_OP_IN
+  IN REVERSE -> G.PIXMAN_OP_IN_REVERSE
+  OUT NORMAL -> G.PIXMAN_OP_OUT
+  OUT REVERSE -> G.PIXMAN_OP_OUT_REVERSE
+  ATOP NORMAL -> G.PIXMAN_OP_ATOP
+  ATOP REVERSE -> G.PIXMAN_OP_ATOP_REVERSE
+  XOR -> G.PIXMAN_OP_XOR
+  ADD -> G.PIXMAN_OP_ADD
+  SATURATE -> G.PIXMAN_OP_SATURATE
+  DISJOINT CLEAR -> G.PIXMAN_OP_DISJOINT_CLEAR
+  DISJOINT SRC -> G.PIXMAN_OP_DISJOINT_SRC
+  DISJOINT DST -> G.PIXMAN_OP_DISJOINT_DST
+  DISJOINT (OVER NORMAL) -> G.PIXMAN_OP_DISJOINT_OVER
+  DISJOINT (OVER REVERSE) -> G.PIXMAN_OP_DISJOINT_OVER_REVERSE
+  DISJOINT (IN NORMAL) -> G.PIXMAN_OP_DISJOINT_IN
+  DISJOINT (IN REVERSE) -> G.PIXMAN_OP_DISJOINT_IN_REVERSE
+  DISJOINT (OUT NORMAL) -> G.PIXMAN_OP_DISJOINT_OUT
+  DISJOINT (OUT REVERSE) -> G.PIXMAN_OP_DISJOINT_OUT_REVERSE
+  DISJOINT (ATOP NORMAL) -> G.PIXMAN_OP_DISJOINT_ATOP
+  DISJOINT (ATOP REVERSE) -> G.PIXMAN_OP_DISJOINT_ATOP_REVERSE
+  DISJOINT XOR -> G.PIXMAN_OP_DISJOINT_XOR
+  CONJOINT CLEAR -> G.PIXMAN_OP_CONJOINT_CLEAR
+  CONJOINT SRC -> G.PIXMAN_OP_CONJOINT_SRC
+  CONJOINT DST -> G.PIXMAN_OP_CONJOINT_DST
+  CONJOINT (OVER NORMAL) -> G.PIXMAN_OP_CONJOINT_OVER
+  CONJOINT (OVER REVERSE) -> G.PIXMAN_OP_CONJOINT_OVER_REVERSE
+  CONJOINT (IN NORMAL) -> G.PIXMAN_OP_CONJOINT_IN
+  CONJOINT (IN REVERSE) -> G.PIXMAN_OP_CONJOINT_IN_REVERSE
+  CONJOINT (OUT NORMAL) -> G.PIXMAN_OP_CONJOINT_OUT
+  CONJOINT (OUT REVERSE) -> G.PIXMAN_OP_CONJOINT_OUT_REVERSE
+  CONJOINT (ATOP NORMAL) -> G.PIXMAN_OP_CONJOINT_ATOP
+  CONJOINT (ATOP REVERSE) -> G.PIXMAN_OP_CONJOINT_ATOP_REVERSE
+  CONJOINT XOR -> G.PIXMAN_OP_CONJOINT_XOR
+  MULTIPLY -> G.PIXMAN_OP_MULTIPLY
+  SCREEN -> G.PIXMAN_OP_SCREEN
+  OVERLAY -> G.PIXMAN_OP_OVERLAY
+  DARKEN -> G.PIXMAN_OP_DARKEN
+  LIGHTEN -> G.PIXMAN_OP_LIGHTEN
+  COLOR_DODGE -> G.PIXMAN_OP_COLOR_DODGE
+  COLOR_BURN -> G.PIXMAN_OP_COLOR_BURN
+  HARD_LIGHT -> G.PIXMAN_OP_HARD_LIGHT
+  SOFT_LIGHT -> G.PIXMAN_OP_SOFT_LIGHT
+  DIFFERENCE -> G.PIXMAN_OP_DIFFERENCE
+  EXCLUSION -> G.PIXMAN_OP_EXCLUSION
+  HSL_HUE -> G.PIXMAN_OP_HSL_HUE
+  HSL_SATURATION -> G.PIXMAN_OP_HSL_SATURATION
+  HSL_COLOR -> G.PIXMAN_OP_HSL_COLOR
+  HSL_LUMINOSITY -> G.PIXMAN_OP_HSL_LUMINOSITY
+
+toOP :: G.Pixman_op_t -> OP Void
+toOP = \case
+  G.PIXMAN_OP_CLEAR -> CLEAR
+  G.PIXMAN_OP_SRC -> SRC
+  G.PIXMAN_OP_DST -> DST
+  G.PIXMAN_OP_OVER -> OVER NORMAL
+  G.PIXMAN_OP_OVER_REVERSE -> OVER REVERSE
+  G.PIXMAN_OP_IN -> IN NORMAL
+  G.PIXMAN_OP_IN_REVERSE -> IN REVERSE
+  G.PIXMAN_OP_OUT -> OUT NORMAL
+  G.PIXMAN_OP_OUT_REVERSE -> OUT REVERSE
+  G.PIXMAN_OP_ATOP -> ATOP NORMAL
+  G.PIXMAN_OP_ATOP_REVERSE -> ATOP REVERSE
+  G.PIXMAN_OP_XOR -> XOR
+  G.PIXMAN_OP_ADD -> ADD
+  G.PIXMAN_OP_SATURATE -> SATURATE
+  G.PIXMAN_OP_DISJOINT_CLEAR -> DISJOINT CLEAR
+  G.PIXMAN_OP_DISJOINT_SRC -> DISJOINT SRC
+  G.PIXMAN_OP_DISJOINT_DST -> DISJOINT DST
+  G.PIXMAN_OP_DISJOINT_OVER -> DISJOINT (OVER NORMAL)
+  G.PIXMAN_OP_DISJOINT_OVER_REVERSE -> DISJOINT (OVER REVERSE)
+  G.PIXMAN_OP_DISJOINT_IN -> DISJOINT (IN NORMAL)
+  G.PIXMAN_OP_DISJOINT_IN_REVERSE -> DISJOINT (IN REVERSE)
+  G.PIXMAN_OP_DISJOINT_OUT -> DISJOINT (OUT NORMAL)
+  G.PIXMAN_OP_DISJOINT_OUT_REVERSE -> DISJOINT (OUT REVERSE)
+  G.PIXMAN_OP_DISJOINT_ATOP -> DISJOINT (ATOP NORMAL)
+  G.PIXMAN_OP_DISJOINT_ATOP_REVERSE -> DISJOINT (ATOP REVERSE)
+  G.PIXMAN_OP_DISJOINT_XOR -> DISJOINT XOR
+  G.PIXMAN_OP_CONJOINT_CLEAR -> CONJOINT CLEAR
+  G.PIXMAN_OP_CONJOINT_SRC -> CONJOINT SRC
+  G.PIXMAN_OP_CONJOINT_DST -> CONJOINT DST
+  G.PIXMAN_OP_CONJOINT_OVER -> CONJOINT (OVER NORMAL)
+  G.PIXMAN_OP_CONJOINT_OVER_REVERSE -> CONJOINT (OVER REVERSE)
+  G.PIXMAN_OP_CONJOINT_IN -> CONJOINT (IN NORMAL)
+  G.PIXMAN_OP_CONJOINT_IN_REVERSE -> CONJOINT (IN REVERSE)
+  G.PIXMAN_OP_CONJOINT_OUT -> CONJOINT (OUT NORMAL)
+  G.PIXMAN_OP_CONJOINT_OUT_REVERSE -> CONJOINT (OUT REVERSE)
+  G.PIXMAN_OP_CONJOINT_ATOP -> CONJOINT (ATOP NORMAL)
+  G.PIXMAN_OP_CONJOINT_ATOP_REVERSE -> CONJOINT (ATOP REVERSE)
+  G.PIXMAN_OP_CONJOINT_XOR -> CONJOINT XOR
+  G.PIXMAN_OP_MULTIPLY -> MULTIPLY
+  G.PIXMAN_OP_SCREEN -> SCREEN
+  G.PIXMAN_OP_OVERLAY -> OVERLAY
+  G.PIXMAN_OP_DARKEN -> DARKEN
+  G.PIXMAN_OP_LIGHTEN -> LIGHTEN
+  G.PIXMAN_OP_COLOR_DODGE -> COLOR_DODGE
+  G.PIXMAN_OP_COLOR_BURN -> COLOR_BURN
+  G.PIXMAN_OP_HARD_LIGHT -> HARD_LIGHT
+  G.PIXMAN_OP_SOFT_LIGHT -> SOFT_LIGHT
+  G.PIXMAN_OP_DIFFERENCE -> DIFFERENCE
+  G.PIXMAN_OP_EXCLUSION -> EXCLUSION
+  G.PIXMAN_OP_HSL_HUE -> HSL_HUE
+  G.PIXMAN_OP_HSL_SATURATION -> HSL_SATURATION
+  G.PIXMAN_OP_HSL_COLOR -> HSL_COLOR
+  G.PIXMAN_OP_HSL_LUMINOSITY -> HSL_LUMINOSITY
+  x -> error $ "unknown operation type: " ++ show x
+
+-- | Possible dither operations
 newtype Dither = Dither {unwrap :: G.Pixman_dither_t}
   deriving stock (Eq, Show, Generic)
   deriving newtype (Ord, Storable)
 
+-- | No dithering
 pattern DitherNone = Dither G.PIXMAN_DITHER_NONE
+
+-- | Fast dithering
 pattern DitherFast = Dither G.PIXMAN_DITHER_FAST
+
+-- | Good dithering
 pattern DitherGood = Dither G.PIXMAN_DITHER_GOOD
+
+-- | Best dithering
 pattern DitherBest = Dither G.PIXMAN_DITHER_BEST
+
+-- | Ordered bayer 8 dithering
 pattern OrderedBayer8 = Dither G.PIXMAN_DITHER_ORDERED_BAYER_8
+
+-- | Ordered blue noise 64 dithering
 pattern OrderedBlueNoise64 = Dither G.PIXMAN_DITHER_ORDERED_BLUE_NOISE_64
 
--- | Possible repeat settings
+-- | Possible repeat operations
 newtype Repeat = Repeat {unwrap :: G.Pixman_repeat_t}
   deriving (Eq, Show, Read, Generic)
 
+-- | No repeat
 pattern RepeatNone = Repeat G.PIXMAN_REPEAT_NONE
+
+-- | Normal repeat
 pattern RepeatNormal = Repeat G.PIXMAN_REPEAT_NORMAL
+
+-- | Pad repeat
 pattern RepeatPad = Repeat G.PIXMAN_REPEAT_PAD
+
+-- | Reflect repeat
 pattern RepeatReflect = Repeat G.PIXMAN_REPEAT_REFLECT
 
+-- | Defines possible filter operations
 newtype Filter = Filter {unwrap :: G.Pixman_filter_t}
   deriving stock (Eq, Generic)
   deriving newtype (Ord, Show, Storable)
 
+-- | Fast filtering
 pattern FilterFast = Filter G.PIXMAN_FILTER_FAST
+
+-- | Good filtering
 pattern FilterGood = Filter G.PIXMAN_FILTER_GOOD
+
+-- | Best filtering
 pattern FilterBest = Filter G.PIXMAN_FILTER_BEST
+
+-- | Nearest-neighbor filtering
 pattern Nearest = Filter G.PIXMAN_FILTER_NEAREST
+
+-- | Bilinear filtering
 pattern Bilinear = Filter G.PIXMAN_FILTER_BILINEAR
+
+-- | Custom convolution kernel
 pattern Convolution = Filter G.PIXMAN_FILTER_CONVOLUTION
+
+-- | Custom separable convolution kernel
 pattern SeparableConvolution = Filter G.PIXMAN_FILTER_SEPARABLE_CONVOLUTION
 
 data SeparableConvolutionSettings = SeparableConvolutionSettings
-  { scale :: (Fixed, Fixed)
+  { scale :: !(Fixed, Fixed)
   -- ^ Scale parameters (x,y)
-  , reconstruct :: (Kernel, Kernel)
+  , reconstruct :: !(Kernel, Kernel)
   -- ^ Reconstruct (x,y)
-  , sample :: (Kernel, Kernel)
+  , sample :: !(Kernel, Kernel)
   -- ^ Sample (x,y)
-  , subsample :: (Int, Int)
+  , subsample :: !(Int, Int)
   -- ^ Subsample bits (x,y)
   }
   deriving (Eq, Show, Generic)
@@ -1058,13 +1105,19 @@ pattern KernelLanczos2 = Kernel G.PIXMAN_KERNEL_LANCZOS2
 pattern KernelLanczos3 = Kernel G.PIXMAN_KERNEL_LANCZOS3
 pattern KernelLanczos3Stretched = Kernel G.PIXMAN_KERNEL_LANCZOS3_STRETCHED
 
-newtype RegionOverlap = RegionOverlap {unwrap :: G.Pixman_region_overlap_t}
+-- | Describes overlap of a region with a rectangle.
+newtype Overlap = Overlap {unwrap :: G.Pixman_region_overlap_t}
   deriving stock (Eq, Generic)
   deriving newtype (Ord, Show, Storable)
 
-pattern RegionOut = RegionOverlap G.PIXMAN_REGION_OUT
-pattern RegionIn = RegionOverlap G.PIXMAN_REGION_IN
-pattern RegionPart = RegionOverlap G.PIXMAN_REGION_PART
+-- | No intersection
+pattern RegionOut = Overlap G.PIXMAN_REGION_OUT
+
+-- | Region contains a rectangle
+pattern RegionIn = Overlap G.PIXMAN_REGION_IN
+
+-- | Partial intersection
+pattern RegionPart = Overlap G.PIXMAN_REGION_PART
 
 -- * Colors
 
@@ -1091,13 +1144,6 @@ class IsColor a where
   blue = alpha . toColor
   alpha :: a -> Word16
   alpha = alpha . toColor
-
-class ColorComponent a where
-  toColorComponent :: a -> Word16
-
-  -- | @fromColorComponents red green blue alpha@
-  fromColorComponents :: a -> a -> a -> a -> Color
-  fromColorComponents r g b a = Color $ G.Pixman_color_t (toColorComponent r) (toColorComponent g) (toColorComponent b) (toColorComponent a)
 
 instance IsColor Color where
   toColor = id
@@ -1127,9 +1173,49 @@ instance IsColor Word64 where
         f x = fromIntegral $! x
      in fromColorComponents @Word16 (f r) (f g) (f b) (f a)
 
--- | @#[AA]RRGGBB@, @0x[AA]RRGGBB@
+-- | Expects hex values: @#[AA]RRGGBB@, @0x[AA]RRGGBB@
 instance IsColor String where
   toColor = parseARGB
+
+-- | Alpha is zero
+instance IsColor (Word16, Word16, Word16) where
+  toColor (a, b, c) = fromColorComponents a b c 0
+
+-- | @(R, G, B, A)@
+instance IsColor (Word16, Word16, Word16, Word16) where
+  toColor (a, b, c, d) = fromColorComponents a b c d
+
+-- | @RGBA@. Expects floating point numbers normalized to the @[0,1]@ range.
+instance IsColor (Double, Double, Double, Double) where
+  toColor (a, b, c, d) = fromColorComponents (toColorComponent a) (toColorComponent b) (toColorComponent c) (toColorComponent d)
+
+-- | @RGBA@. Expects floating point numbers normalized to the @[0,1]@ range.
+instance IsColor (Float, Float, Float, Float) where
+  toColor (a, b, c, d) = fromColorComponents (toColorComponent a) (toColorComponent b) (toColorComponent c) (toColorComponent d)
+
+class ColorComponent a where
+  toColorComponent :: a -> Word16
+
+-- | @fromColorComponents red green blue alpha@
+fromColorComponents :: (a ~ Word16) => a -> a -> a -> a -> Color
+fromColorComponents r g b a = Color $ G.Pixman_color_t r g b a
+
+instance ColorComponent Word16 where
+  toColorComponent = id
+
+-- | Expects a floating point number normalized to the @[0,1]@ range.
+instance ColorComponent Double where
+  toColorComponent = doubleToColorComponent 0 1.0
+
+-- | Expects a floating point number normalized to the @[0,1]@ range.
+instance ColorComponent Float where
+  toColorComponent = doubleToColorComponent 0 1.0 . float2Double
+
+-- | @doubleToColorComponent min max value@
+doubleToColorComponent :: Double -> Double -> Double -> Word16
+doubleToColorComponent imin imax x =
+  let normalized = max 0.0 (min 1.0 ((x - imin) / (imax - imin)))
+   in round $ normalized * 65535.0
 
 parseARGB :: (HasCallStack) => String -> Color
 parseARGB s
@@ -1144,53 +1230,61 @@ parseARGB s
         _ -> error $ "Invalid RGBA text: '" ++ s ++ "'\n" ++ prettyCallStack callStack
   | otherwise = error $ "Invalid RGBA text: '" ++ s ++ "'\n" ++ prettyCallStack callStack
 
--- | Alpha is zero
-instance IsColor (Word16, Word16, Word16) where
-  toColor (a, b, c) = fromColorComponents a b c 0
-
--- | @(R, G, B, A)@
-instance IsColor (Word16, Word16, Word16, Word16) where
-  toColor (a, b, c, d) = fromColorComponents a b c d
-
-instance ColorComponent Word16 where
-  toColorComponent = id
-
--- | Expects a floating point number normalized to the [0,1] range.
-instance ColorComponent Double where
-  toColorComponent = doubleToColorComponent 0 1.0
-
--- | Expects a floating point number normalized to the [0,1] range.
-instance ColorComponent Float where
-  toColorComponent = doubleToColorComponent 0 1.0 . float2Double
-
--- | @doubleToColorComponent min max value@
-doubleToColorComponent :: Double -> Double -> Double -> Word16
-doubleToColorComponent imin imax x =
-  let normalized = max 0.0 (min 1.0 ((x - imin) / (imax - imin)))
-   in round $ normalized * 65535.0
-
 -- * Vectors
+
+data family Vector a
+
+-- | A single vector
+newtype instance Vector Fixed = VectorFixed {unwrap :: G.Pixman_vector_t}
+  deriving stock (Eq, Generic)
+  deriving newtype (Storable, RIP.StaticSize, RIP.ReadRaw, RIP.WriteRaw)
+
+-- | Floating-point vector
+newtype instance Vector Double = VectorDouble {unwrap :: G.Pixman_f_vector_t}
+  deriving stock (Eq, Generic)
+  deriving newtype (Storable, RIP.StaticSize, RIP.ReadRaw, RIP.WriteRaw)
+
+instance Show (Vector Fixed) where
+  show v
+    | [a, b, c] <- vectorToList v = printf "Vector[Fixed]{%s,%s,%s}" a b c
+    | otherwise = error "vector: unexpected element count"
+
+instance Show (Vector Double) where
+  show v
+    | [a, b, c] <- vectorToList v = printf "Vector[Double]{%f,%f,%f}" a b c
+    | otherwise = error "vector: unexpected element count"
 
 class IsVector a where
   type VectorElem a
 
   vector :: VectorElem a -> VectorElem a -> VectorElem a -> a
+  vector x y z = vectorFromList [x, y, z]
 
-  vectorFromArray :: [VectorElem a] -> a
+  vectorToList :: a -> [VectorElem a]
+  vectorFromList :: [VectorElem a] -> a
+
+  vectorX :: a -> VectorElem a
+  vectorX v = vectorToList v !! 0
+
+  vectorY :: a -> VectorElem a
+  vectorY v = vectorToList v !! 1
+
+  vectorZ :: a -> VectorElem a
+  vectorZ v = vectorToList v !! 2
 
 instance IsVector (Vector Fixed) where
   type VectorElem (Vector Fixed) = Fixed
 
-  vector x y z = vectorFromArray [x, y, z]
+  vectorFromList xs = VectorFixed $! G.Pixman_vector_t $! G.Pixman_vector $! CA.fromList $! coerce xs
 
-  vectorFromArray xs = VectorFixed $! G.Pixman_vector_t $! G.Pixman_vector $! CA.fromList $! coerce xs
+  vectorToList (VectorFixed (G.Pixman_vector_t (G.Pixman_vector vec))) = map (coerce @_ @Fixed) $ CA.toList vec
 
 instance IsVector (Vector Double) where
   type VectorElem (Vector Double) = Double
 
-  vector x y z = vectorFromArray [x, y, z]
+  vectorFromList xs = VectorDouble $! G.Pixman_f_vector_t $! G.Pixman_f_vector $! CA.fromList $ map CDouble xs
 
-  vectorFromArray xs = VectorDouble $! G.Pixman_f_vector_t $! G.Pixman_f_vector $! CA.fromList $ map CDouble xs
+  vectorToList (VectorDouble (G.Pixman_f_vector_t (G.Pixman_f_vector vec))) = map (coerce @_ @Double) $ CA.toList vec
 
 -- * Gradient / misc
 
@@ -1207,6 +1301,29 @@ gradientStop x color = GradientStop $! G.Pixman_gradient_stop_t (coerce x) (coer
 -- | Image as "ForeignPtr" to `pixman_image_t`.
 newtype Image = Image {unwrap :: ForeignPtr G.Pixman_image_t}
   deriving stock (Eq, Generic)
+
+newImage :: Ptr G.Pixman_image_t -> IO Image
+newImage ptr = Image <$> newForeignPtr (castFunPtr FP.pixman_image_unref) ptr
+
+newtype TypedImage (format :: ImageFormat) = TypedImage {unwrap :: ForeignPtr G.Pixman_image_t}
+
+newtype Solid = Solid {unwrap :: ForeignPtr G.Pixman_image_t}
+
+newtype Gradient = Gradient {unwrap :: ForeignPtr G.Pixman_image_t}
+
+instance Show Solid where
+  show = show . toImage -- XXX
+
+instance (Typeable format) => Show (TypedImage format) where
+  show = show . toImage
+
+instance Show Gradient where
+  show = show . toImage -- XXX
+
+imageToTypedImage :: forall format. (IsImageFormat format) => Image -> Maybe (TypedImage format)
+imageToTypedImage img
+  | imageFormat img == imageFormatCode (Proxy @format) = Just (TypedImage $ getField @"unwrap" img)
+  | otherwise = Nothing
 
 instance Show Image where
   show img@(Image fp) =
@@ -1228,13 +1345,13 @@ instance Show Image where
       ++ show (imageComponentAlpha img)
       ++ ","
       ++ " data="
+      ++ show (imageData img)
+      ++ " ptr="
       ++ show fp
       ++ "}"
 
 class IsImage a where
-  mkImage :: a -> IO Image
-
-  asImage :: a -> Image
+  toImage :: a -> Image
 
   imageSize :: a -> Size Int
   imageSize = (,) <$> imageWidth <*> imageHeight
@@ -1252,6 +1369,7 @@ class IsImage a where
   imageStride :: a -> Int
   imageStride x = unsafePerformIO $ fromIntegral <$> withImagePtr x US.pixman_image_get_stride
 
+  -- | Whether the image has component alpha or unified alpha.
   imageComponentAlpha :: a -> Bool
   imageComponentAlpha x = unsafePerformIO $ fromPixmanBool <$> withImagePtr x US.pixman_image_get_component_alpha
 
@@ -1265,41 +1383,30 @@ class IsImage a where
   imageData x = unsafePerformIO $ withImagePtr x US.pixman_image_get_data
 
 instance IsImage Image where
-  mkImage = return
-  asImage = id
+  toImage = id
 
-instance IsImage CreateImage where
-  mkImage = createImage
-  asImage = unsafePerformIO . createImage
+instance (Typeable format) => IsImage (TypedImage format) where
+  toImage = coerce
+  imageFormat (_ :: TypedImage format) = imageFormatCode (Proxy @format)
 
--- ** CreateImage
+instance IsImage Solid where
+  toImage = coerce
 
--- | Image builder: use 'newEmptyImage', 'newImageWithBits' etc. to initialize, add transformations and call "createImage" to realize.
-data CreateImage = CreateImage
-  { createImageInit :: IO (Ptr G.Pixman_image_t)
-  , createImageFinalizers :: [ImageTransformFin G.Pixman_image_t]
-  }
-  deriving (Generic)
+instance IsImage Gradient where
+  toImage = coerce
 
-type ImageTransform a = Ptr a -> IO ()
+newEmptyTypedImage :: forall format m. (IsImageFormat format, PrimMonad m) => Size Int -> Bool -> m (TypedImage format)
+newEmptyTypedImage size clear = coerce <$> newImageWithBits (imageFormatCode $ Proxy @format) size clear nullPtr 0
 
-type ImageTransformFin a = Ptr a -> IO (ForeignPtr a -> IO ())
-
-imageAddTransFin :: ImageTransformFin G.Pixman_image_t -> CreateImage -> CreateImage
-imageAddTransFin x ci = ci{createImageFinalizers = createImageFinalizers ci ++ [x]}
-
--- | Add a transformation which doesn't require a finalizer action.
-imageAddTrans :: ImageTransform G.Pixman_image_t -> CreateImage -> CreateImage
-imageAddTrans x = imageAddTransFin y
-  where
-    y img = x img >> pure (const $ pure ())
+newTypedImageWithBits :: forall format m. (IsImageFormat format, PrimMonad m) => Size Int -> Bool -> Ptr Word32 -> Int -> m (TypedImage format)
+newTypedImageWithBits si cl b rs = coerce <$> newImageWithBits (imageFormatCode $ Proxy @format) si cl b rs
 
 -- | Initialize a new image with null data.
 --
 -- @newEmptyImage format (w, h) clear@
 --
 -- See 'newImageWithBits'.
-newEmptyImage :: FormatCode -> Size Int -> Bool -> CreateImage
+newEmptyImage :: (PrimMonad m) => FormatCode -> Size Int -> Bool -> m Image
 newEmptyImage fmt size clear = newImageWithBits fmt size clear nullPtr 0
 
 -- | Initialize image with provided bits.
@@ -1307,21 +1414,21 @@ newEmptyImage fmt size clear = newImageWithBits fmt size clear nullPtr 0
 -- @newImageWithBits format (w, h) clear data rowstride_bytes@
 --
 -- @pixman_image_create_bits{,_no_clear}@
-newImageWithBits :: FormatCode -> Size Int -> Bool -> Ptr Word32 -> Int -> CreateImage
-newImageWithBits fmt (width, height) clear bits stride = CreateImage imageFromBits []
+newImageWithBits :: (PrimMonad m) => FormatCode -> Size Int -> Bool -> Ptr Word32 -> Int -> m Image
+newImageWithBits fmt (width, height) clear bits stride = unsafeIOToPrim $ newImage =<< imageFromBits
   where
     imageFromBits = throwPixmanIfNull "newImageWithBits" $ f fmt (fromIntegral width) (fromIntegral height) bits (fromIntegral stride)
     f = if clear then US.pixman_image_create_bits else US.pixman_image_create_bits_no_clear
 
 -- | Create a solid fill image.
-solidFillImage :: (IsColor color) => color -> CreateImage
-solidFillImage color = CreateImage doit []
+solidFillImage :: (PrimMonad m, IsColor color) => color -> m Solid
+solidFillImage color = unsafeIOToPrim $ fmap coerce . newImage =<< doit
   where
     doit = with (toColor color) $ \colorP -> US.pixman_image_create_solid_fill (ConstPtr $ coerce colorP)
 
--- | @linearGradientImage point_a point_b stops@
-linearGradientImage :: Point Fixed -> Point Fixed -> [GradientStop] -> CreateImage
-linearGradientImage p1 p2 stops = CreateImage mk []
+-- | @newLinearGradient point_a point_b stops@
+newLinearGradient :: (PrimMonad m) => Point Fixed -> Point Fixed -> [GradientStop] -> m Gradient
+newLinearGradient p1 p2 stops = unsafeIOToPrim $ fmap coerce . newImage =<< mk
   where
     mk = with p1 $ \p1P ->
       with p2 $ \p2P ->
@@ -1329,18 +1436,18 @@ linearGradientImage p1 p2 stops = CreateImage mk []
           throwPixmanIfNull "linearGradientImage" $
             US.pixman_image_create_linear_gradient (coerce p1P) (coerce p2P) (coerce stopsP) (fromIntegral stopsLen)
 
--- | @conicalGradientImage center angle stops@
-conicalGradientImage :: Point Fixed -> Fixed -> [GradientStop] -> CreateImage
-conicalGradientImage center angle stops = CreateImage mk []
+-- | @newConicalGradient center angle stops@
+newConicalGradient :: (PrimMonad m) => Point Fixed -> Fixed -> [GradientStop] -> m Gradient
+newConicalGradient center angle stops = unsafeIOToPrim $ fmap coerce . newImage =<< mk
   where
     mk = with center $ \centerP ->
       withArrayLen stops $ \stopsLen stopsP ->
         throwPixmanIfNull "conicalGradientImage" $
           US.pixman_image_create_conical_gradient (coerce centerP) (coerce angle) (coerce stopsP) (fromIntegral stopsLen)
 
--- | @radialGradientImage point_a point_b inner_r outer_r stops@
-radialGradientImage :: Point Fixed -> Point Fixed -> Fixed -> Fixed -> [GradientStop] -> CreateImage
-radialGradientImage p1 p2 innerR outerR stops = CreateImage mk []
+-- | @newRadialGradient inner outer inner_radius outer_radius stops@
+newRadialGradient :: (PrimMonad m) => Point Fixed -> Point Fixed -> Fixed -> Fixed -> [GradientStop] -> m Gradient
+newRadialGradient p1 p2 innerR outerR stops = unsafeIOToPrim $ fmap coerce . newImage =<< mk
   where
     mk = with p1 $ \p1P ->
       with p2 $ \p2P ->
@@ -1348,26 +1455,17 @@ radialGradientImage p1 p2 innerR outerR stops = CreateImage mk []
           throwPixmanIfNull "radialGradientImage" $
             US.pixman_image_create_radial_gradient (coerce p1P) (coerce p2P) (coerce innerR) (coerce outerR) (coerce stopsP) (fromIntegral stopsLen)
 
--- | Realize a 'CreateImage'
-createImage :: CreateImage -> IO Image
-createImage ci = do
-  (fp, fin) <- bracketOnError (createImageInit ci) US.pixman_image_unref $ \imgPtr -> do
-    fin <- mapM ($ imgPtr) (createImageFinalizers ci)
-    fp <- newForeignPtr (castFunPtr FP.pixman_image_unref) imgPtr
-    return (fp, fin)
-  mapM_ ($ fp) fin
-  return $! Image fp
-
 -- ** Operations
 
-setHasClientClip :: Bool -> CreateImage -> CreateImage
-setHasClientClip x = imageAddTrans $ \img -> US.pixman_image_set_has_client_clip img (toPixmanBool x)
+-- | Set whether the source clip was set by a client.
+setHasClientClip :: (PrimMonad m) => Bool -> Image -> m ()
+setHasClientClip x (Image fp) = unsafeIOToPrim $ withForeignPtr fp $ \img -> US.pixman_image_set_has_client_clip img (toPixmanBool x)
 
-setIndexed :: Indexed -> CreateImage -> CreateImage
-setIndexed indexed = imageAddTransFin $ \img -> do
-  p <- new indexed
-  US.pixman_image_set_indexed img (ConstPtr p)
-  return $! addForeignPtrFinalizerEnv finalizeIndexed p
+setIndexed :: (PrimMonad m) => Indexed -> Image -> m ()
+setIndexed indexed (Image fp) = unsafeIOToPrim $ do
+  bracketOnError (new indexed) free $ \ptr -> do
+    withForeignPtr fp $ \img -> US.pixman_image_set_indexed img (ConstPtr ptr)
+    addForeignPtrFinalizerEnv finalizeIndexed ptr fp
 
 finalizeIndexed :: FinalizerEnvPtr Indexed G.Pixman_image_t
 finalizeIndexed = unsafePerformIO $ mkFinalizeIndexed $ \p _ -> free p
@@ -1376,46 +1474,72 @@ finalizeIndexed = unsafePerformIO $ mkFinalizeIndexed $ \p _ -> free p
 foreign import ccall "wrapper"
   mkFinalizeIndexed :: forall a. (Ptr Indexed -> Ptr a -> IO ()) -> IO (FinalizerEnvPtr Indexed a)
 
-setClipRegion :: (Typeable a) => Region (a :: RegionType) -> CreateImage -> CreateImage
+-- | Apply a clip region used during composition.
+setClipRegion :: (PrimMonad m, Typeable a) => Region (a :: RegionType) -> Image -> m ()
 setClipRegion r
   | Just x <- cast r :: Maybe (Region R16) = set "set_clip_region" US.pixman_image_set_clip_region x
   | Just x <- cast r :: Maybe (Region R32) = set "set_clip_region32" US.pixman_image_set_clip_region32 x
   | Just x <- cast r :: Maybe (Region R64F) = set "set_clip_region64f" US.pixman_image_set_clip_region64f x
   | otherwise = error "impossible"
   where
-    set str f reg = imageAddTrans $ throwPixmanUnless1 str . withConstPtr reg . f
+    set str f reg (Image fp) = unsafeIOToPrim $ withForeignPtr fp $ \img -> throwPixmanUnless1 str $ withConstPtr reg $ f img
 
-setTransform :: Transform -> CreateImage -> CreateImage
-setTransform t = imageAddTrans $ \img ->
+-- | Apply the specified transform during sampling from this image.
+setTransform :: (PrimMonad m) => Transform -> Image -> m ()
+setTransform t (Image fp) = unsafeIOToPrim $ withForeignPtr fp $ \img ->
   throwPixmanUnless1 "image_set_transform" $ withPtr t $ US.pixman_image_set_transform img . ConstPtr . castPtr
 
--- | @setFilter filter params image@
-setFilter :: Filter -> [Fixed] -> CreateImage -> CreateImage
-setFilter f params = imageAddTrans $ \img ->
-  withArrayLen (coerce params) $ \len ptr ->
-    throwPixmanUnless1 "image_set_filter" $ US.pixman_image_set_filter img (coerce f) (ConstPtr ptr) (fromIntegral len)
+-- | Clear a previously set transform.
+clearTransform :: (PrimMonad m) => Image -> m ()
+clearTransform (Image fp) = unsafeIOToPrim $ withForeignPtr fp $ \img ->
+  throwPixmanUnless1 "image_set_transform" $ US.pixman_image_set_transform img $ ConstPtr nullPtr
 
-setFilterSeparableConvolution :: SeparableConvolutionSettings -> CreateImage -> CreateImage
+-- | Set the filter operation used during composition.
+--
+-- @setFilter filter params image@
+setFilter :: (PrimMonad m) => Filter -> [Fixed] -> Image -> m ()
+setFilter f params (Image fp) = unsafeIOToPrim $
+  withForeignPtr fp $ \img ->
+    withArrayLen (coerce params) $ \len ptr ->
+      throwPixmanUnless1 "image_set_filter" $ US.pixman_image_set_filter img (coerce f) (ConstPtr ptr) (fromIntegral len)
+
+setFilterSeparableConvolution :: (PrimMonad m) => SeparableConvolutionSettings -> Image -> m ()
 setFilterSeparableConvolution cfg = setFilter SeparableConvolution (separableConvolutionParams cfg)
 
-setRepeat :: Repeat -> CreateImage -> CreateImage
-setRepeat r = imageAddTrans $ \img -> US.pixman_image_set_repeat img (coerce r)
+-- | Set the repeat operation for this image.
+setRepeat :: (PrimMonad m) => Repeat -> Image -> m ()
+setRepeat r (Image fp) = unsafeIOToPrim $ withForeignPtr fp $ \img -> US.pixman_image_set_repeat img (coerce r)
 
-setDither :: Dither -> Maybe (Int, Int) -> CreateImage -> CreateImage
-setDither d moff = imageAddTrans $ \img -> do
+-- | Set the dither operation used during composition.
+setDither :: (PrimMonad m) => Dither -> Maybe (Int, Int) -> Image -> m ()
+setDither d moff (Image fp) = unsafeIOToPrim $ withForeignPtr fp $ \img -> do
   US.pixman_image_set_dither img (coerce d)
   maybe (return ()) (\(x, y) -> US.pixman_image_set_dither_offset img (fromIntegral x) (fromIntegral y)) moff
 
-setSourceClipping :: Bool -> CreateImage -> CreateImage
-setSourceClipping b = imageAddTrans $ \img -> US.pixman_image_set_source_clipping img (toPixmanBool b)
+-- | Set whether the clip applies when the image is used as a source.
+setSourceClipping :: (PrimMonad m) => Bool -> Image -> m ()
+setSourceClipping b (Image fp) = unsafeIOToPrim $
+  withForeignPtr fp $ \img ->
+    US.pixman_image_set_source_clipping img (toPixmanBool b)
 
-setAlphaMap :: Image -> Int -> Int -> CreateImage -> CreateImage
-setAlphaMap amap x y = imageAddTrans $ \img ->
-  withPtr amap $ \amapPtr ->
-    US.pixman_image_set_alpha_map img amapPtr (fromIntegral x) (fromIntegral y)
+-- | Set an alpha map that will be used when this image is used as a src in a blit operation.
+setAlphaMap :: (PrimMonad m) => Image -> Int -> Int -> Image -> m ()
+setAlphaMap amap x y (Image fp) = unsafeIOToPrim $
+  withForeignPtr fp $ \img ->
+    withPtr amap $ \amapPtr ->
+      US.pixman_image_set_alpha_map img amapPtr (fromIntegral x) (fromIntegral y)
 
-setComponentAlpha :: Bool -> CreateImage -> CreateImage
-setComponentAlpha b = imageAddTrans $ \img -> US.pixman_image_set_component_alpha img (toPixmanBool b)
+-- | Clear a previously set alpha map.
+clearAlphaMap :: (PrimMonad m) => Image -> m ()
+clearAlphaMap (Image fp) = unsafeIOToPrim $
+  withForeignPtr fp $ \img ->
+    US.pixman_image_set_alpha_map img nullPtr 0 0
+
+-- | Set whether the image has component alpha or unified alpha.
+setComponentAlpha :: (PrimMonad m) => Bool -> Image -> m ()
+setComponentAlpha b (Image fp) = unsafeIOToPrim $
+  withForeignPtr fp $ \img ->
+    US.pixman_image_set_component_alpha img (toPixmanBool b)
 
 data CompositeParameters (a :: RegionType) = CompositeParameters
   { maskImg :: Maybe Image
@@ -1443,79 +1567,133 @@ instance (Default (PositionScalar a), Default (SizeScalar a)) => Default (Compos
 -- @
 -- setComposite @R32 Src srcimg def dstimg
 -- @
-setComposite :: (Typeable a, IsImage src) => Operation -> src -> CompositeParameters a -> CreateImage -> CreateImage
-setComposite op srcImg set
+setComposite :: (PrimMonad m, Typeable a, IsImage src) => Operation -> src -> CompositeParameters a -> Image -> m ()
+setComposite op src set
   | Just x <- cast set :: Maybe (CompositeParameters R16) = setCompositeInner US.pixman_image_composite id id x
   | Just x <- cast set :: Maybe (CompositeParameters R32) = setCompositeInner US.pixman_image_composite32 id fromIntegral x
   | Just x <- cast set :: Maybe (CompositeParameters R64F) = setCompositeInner US.pixman_image_composite64f CDouble CDouble x
   | otherwise = error "impossible"
   where
-    setCompositeInner :: _ -> (PositionScalar a -> _) -> (SizeScalar a -> _) -> CompositeParameters a -> CreateImage -> CreateImage
-    setCompositeInner f f1 f2 CompositeParameters{..} = imageAddTrans $ \img -> do
+    setCompositeInner :: (PrimMonad m) => _ -> (PositionScalar a -> _) -> (SizeScalar a -> _) -> CompositeParameters a -> Image -> m ()
+    setCompositeInner f f1 f2 CompositeParameters{..} (Image fp) = unsafeIOToPrim $ do
       let (w, h) = size
           (src_x, src_y) = srcPos
           (mask_x, mask_y) = maskPos
           (dest_x, dest_y) = destPos
-      src <- mkImage srcImg
-      withPtr src $ \srcP ->
-        maybe ($ nullPtr) withPtr maskImg $ \maskP ->
-          f
-            (coerce op :: G.Pixman_op_t)
-            srcP
-            maskP
-            img
-            (f1 src_x)
-            (f1 src_y)
-            (f1 mask_x)
-            (f1 mask_y)
-            (f1 dest_x)
-            (f1 dest_y)
-            (f2 w)
-            (f2 h)
+      withPtr (toImage src) $ \srcP ->
+        withForeignPtr fp $ \img ->
+          maybe ($ nullPtr) withPtr maskImg $ \maskP ->
+            f
+              (fromOP op)
+              srcP
+              maskP
+              img
+              (f1 src_x)
+              (f1 src_y)
+              (f1 mask_x)
+              (f1 mask_y)
+              (f1 dest_x)
+              (f1 dest_y)
+              (f2 w)
+              (f2 h)
 
-fillBoxes :: (IsColor color) => Operation -> color -> [Box R32] -> CreateImage -> CreateImage
-fillBoxes op color boxes = imageAddTrans $ \img ->
-  with (toColor color) $ \colorP ->
-    withArrayLen (coerce boxes) $ \len boxesP ->
-      throwPixmanUnless1 "image_fill_boxes" $
-        US.pixman_image_fill_boxes (coerce op) img (ConstPtr $ coerce colorP) (fromIntegral len) (ConstPtr boxesP)
+-- |
+-- @compositeTrapezoids op src dst maskFormat (x_src, y_src) (x_dst, y_dst) traps@
+compositeTrapezoids :: (PrimMonad m) => Operation -> Image -> Image -> FormatCode -> Position Int -> Position Int -> [Trapezoid] -> m ()
+compositeTrapezoids op src (Image dst) maskFormat (x_src, y_src) (x_dst, y_dst) trapsList = unsafeIOToPrim $
+  withArrayLen trapsList $ \n_traps traps ->
+    withPtr src $ \srcPtr ->
+      withForeignPtr dst $ \dstPtr ->
+        US.pixman_composite_trapezoids (fromOP op) srcPtr dstPtr maskFormat (fi x_src) (fi y_src) (fi x_dst) (fi y_dst) (fi n_traps) (ConstPtr $ castPtr traps)
+  where
+    fi = fromIntegral
 
-fillRectangles :: (IsColor color) => Operation -> color -> [Rectangle16] -> CreateImage -> CreateImage
-fillRectangles op color rects = imageAddTrans $ \img ->
-  with (toColor color) $ \colorP ->
-    withArrayLen (coerce rects) $ \len rsP ->
-      throwPixmanUnless1 "image_fill_rectangles" $
-        US.pixman_image_fill_rectangles (coerce op) img (ConstPtr $ coerce colorP) (fromIntegral len) (ConstPtr rsP)
+-- |
+-- @compositeTriangles op src dst maskFormat (x_src, y_src) (x_dst, y_dst) tris@
+compositeTriangles :: (PrimMonad m) => Operation -> Image -> Image -> FormatCode -> Position Int -> Position Int -> [Triangle] -> m ()
+compositeTriangles op src (Image dst) maskFormat (x_src, y_src) (x_dst, y_dst) trisList = unsafeIOToPrim $
+  withArrayLen trisList $ \n_tris tris ->
+    withPtr src $ \srcPtr ->
+      withForeignPtr dst $ \dstPtr ->
+        US.pixman_composite_triangles (fromOP op) srcPtr dstPtr maskFormat (fi x_src) (fi y_src) (fi x_dst) (fi y_dst) (fi n_tris) (ConstPtr $ castPtr tris)
+  where
+    fi = fromIntegral
 
--- | offset, xs
-addTriangles :: (Int, Int) -> [Triangle] -> CreateImage -> CreateImage
-addTriangles = imageAddGeneric castPtr US.pixman_add_triangles
+fillBoxes :: (PrimMonad m, IsColor color) => Operation -> color -> [Box R32] -> Image -> m ()
+fillBoxes op color boxes (Image fp) = unsafeIOToPrim $
+  withForeignPtr fp $ \img ->
+    with (toColor color) $ \colorP ->
+      withArrayLen (coerce boxes) $ \len boxesP ->
+        throwPixmanUnless1 "image_fill_boxes" $
+          US.pixman_image_fill_boxes (fromOP op) img (ConstPtr $ coerce colorP) (fromIntegral len) (ConstPtr boxesP)
 
-type Edge = G.Pixman_edge_t
+-- | @fillRectangles op color rects img@
+fillRectangles :: (PrimMonad m, IsColor color) => Operation -> color -> [Rectangle R16] -> Image -> m ()
+fillRectangles op color rects (Image fp) = unsafeIOToPrim $
+  withForeignPtr fp $ \img ->
+    with (toColor color) $ \colorP ->
+      withArrayLen (coerce rects) $ \len rsP ->
+        throwPixmanUnless1 "image_fill_rectangles" $
+          US.pixman_image_fill_rectangles (fromOP op) img (ConstPtr $ coerce colorP) (fromIntegral len) (ConstPtr rsP)
 
-edgeStep = US.pixman_edge_step
-edgeInit = US.pixman_edge_init
-lineFixedEdgeInit = US.pixman_line_fixed_edge_init
+-- | @addTriangles offset tris img@
+addTriangles :: (IsImageFormat format, ImageFormatType format ~ A, PrimMonad m) => (Int, Int) -> [Triangle] -> TypedImage format -> m ()
+addTriangles off tris img = do
+  when (formatType (imageFormat img) /= A) $ unsafeIOToPrim $ throwIO $ PixmanException "image format is not A"
+  imageAddGeneric castPtr US.pixman_add_triangles off tris (coerce img)
+
+newtype Edge = Edge {unwrap :: ForeignPtr G.Pixman_edge_t}
+  deriving stock (Generic)
+
+-- | Initialize one edge structure given a line, starting y value and a pixel offset for the line.
+--
+-- @fromLine bpp y line offset@
+fromLine :: Int -> Fixed -> Line Fixed -> Position Int -> Edge
+fromLine bpp y line (off_x, off_y) = unsafePerformIO $
+  withNewForeignPtr (pure . Edge) $ \ptr ->
+    with (unLine line) $ \line' ->
+      US.pixman_line_fixed_edge_init ptr (fromIntegral bpp) (coerce y) (ConstPtr line') (fromIntegral off_x) (fromIntegral off_y)
+
+-- |
+-- @newEdge bpp y_start x_top y_top x_bot y_bot@
+newEdge :: Int -> Fixed -> Fixed -> Fixed -> Fixed -> Fixed -> Edge
+newEdge bpp y_start x_top y_top x_bot y_bot = unsafePerformIO $
+  withNewForeignPtr (pure . Edge) $ \ptr ->
+    US.pixman_edge_init
+      ptr
+      (fromIntegral bpp)
+      (coerce y_start)
+      (coerce x_top)
+      (coerce y_top)
+      (coerce x_bot)
+      (coerce y_bot)
+
+-- | Step an edge by any amount
+stepEdge :: Int -> Edge -> Edge
+stepEdge amount edge = unsafePerformIO $
+  withNewForeignPtrCopy (pure . Edge) edge $ \ptr ->
+    US.pixman_edge_step ptr (fromIntegral amount)
 
 rasterizeEdges = US.pixman_rasterize_edges
+
 rasterizeTrapezoid = US.pixman_rasterize_trapezoid
 
-compositeTrapezoids = US.pixman_composite_trapezoids
-compositeTriangles = US.pixman_composite_triangles
+-- | offset, xs
+addTraps :: (IsImageFormat format, ImageFormatType format ~ A, PrimMonad m) => (Int, Int) -> [Trap] -> TypedImage format -> m ()
+addTraps off traps img = do
+  when (formatType (imageFormat img) /= A) $ unsafeIOToPrim $ throwIO $ PixmanException "image format is not A"
+  imageAddGeneric castPtr US.pixman_add_traps off traps (coerce img)
 
 -- | offset, xs
-addTraps :: (Int, Int) -> [Trap] -> CreateImage -> CreateImage
-addTraps = imageAddGeneric castPtr US.pixman_add_traps
-
--- | offset, xs
-addTrapezoids :: (Int, Int) -> [Trapezoid] -> CreateImage -> CreateImage
+addTrapezoids :: (PrimMonad m) => (Int, Int) -> [Trapezoid] -> Image -> m ()
 addTrapezoids = imageAddGeneric castPtr US.pixman_add_trapezoids
 
-imageAddGeneric :: (_) => _ -> _f -> (Int, Int) -> _xs -> CreateImage -> CreateImage
+imageAddGeneric :: (_) => _ -> _f -> (Int, Int) -> _xs -> Image -> m ()
 {-# INLINE imageAddGeneric #-}
-imageAddGeneric trans f (x_off, y_off) xs = imageAddTrans $ \img ->
-  withArrayLen xs $ \len xsP ->
-    f img (fromIntegral x_off) (fromIntegral y_off) (fromIntegral len) (ConstPtr $ trans xsP)
+imageAddGeneric trans f (x_off, y_off) xs (Image fp) = unsafeIOToPrim $
+  withForeignPtr fp $ \img ->
+    withArrayLen xs $ \len xsP ->
+      f img (fromIntegral x_off) (fromIntegral y_off) (fromIntegral len) (ConstPtr $ trans xsP)
 
 -- | Compute the composite region for the specified src.
 computeCompositeRegion ::
@@ -1556,8 +1734,6 @@ computeCompositeRegion src mask' dest (sx, sy) (mx, my) (dx, dy) (w, h) = unsafe
 
 -- * Transform
 
-type TransformVector a = Vector (MatrixElem a)
-
 -- | These methods exist for both 'Transform' and 'FTransform'.
 class IsTransform a where
   type MatrixElem a :: Type
@@ -1566,16 +1742,16 @@ class IsTransform a where
   identityTransform :: a
 
   -- | Initialize a transform from a matrix (3 x 3).
-  transformFromMatrix :: [[MatrixElem a]] -> a
+  fromMatrix :: [[MatrixElem a]] -> a
 
   -- | Initialize a transform from a rotation.
-  transformFromRotation :: MatrixElem a -> MatrixElem a -> a
+  fromRotation :: MatrixElem a -> MatrixElem a -> a
 
   -- | Initialize a transform from a scale.
-  transformFromScale :: MatrixElem a -> MatrixElem a -> a
+  fromScale :: MatrixElem a -> MatrixElem a -> a
 
   -- | Initialize a transform from a translate.
-  transformFromTranslation :: MatrixElem a -> MatrixElem a -> a
+  fromTranslation :: MatrixElem a -> MatrixElem a -> a
 
   -- | Invert transformation.
   invertTransform :: a -> a
@@ -1586,6 +1762,11 @@ class IsTransform a where
   -- | Multiply two transformations.
   multiplyTransform :: a -> a -> a
 
+  -- | Add a rotation to this transform.
+  --
+  -- @rotate cos sin reverse t@
+  rotate :: MatrixElem a -> MatrixElem a -> Bool -> a -> a
+
   -- | Add a scale to the transform
   --
   -- @scale sx sy reverse t@
@@ -1594,18 +1775,16 @@ class IsTransform a where
   -- | Add a translation to the transform.
   --
   -- @translate sx sy reverse t@
-  translateTransform :: MatrixElem a -> MatrixElem a -> Bool -> a -> a
-
-  -- |
-  --
-  -- @rotate reverse cos sin t@
-  rotateTransform :: Bool -> MatrixElem a -> MatrixElem a -> a -> a
+  translate :: MatrixElem a -> MatrixElem a -> Bool -> a -> a
 
   -- | Transform the given point
-  transformPoint :: a -> TransformVector a -> TransformVector a
+  transformPoint :: a -> Vector (MatrixElem a) -> Vector (MatrixElem a)
 
   -- | Transform the given point
-  transformPoint3D :: a -> TransformVector a -> TransformVector a
+  transformPoint3D :: a -> Vector (MatrixElem a) -> Vector (MatrixElem a)
+
+  -- | Access the current transform matrix
+  transformMatrix :: a -> [[MatrixElem a]]
 
 instance IsTransform Transform where
   type MatrixElem Transform = Fixed
@@ -1615,21 +1794,21 @@ instance IsTransform Transform where
       withNewForeignPtr (pure . Transform) US.pixman_transform_init_identity
   {-# NOINLINE identityTransform #-}
 
-  transformFromMatrix matrix = unsafePerformIO $
+  fromMatrix matrix = unsafePerformIO $
     withNewForeignPtr (pure . Transform) $
       \p -> poke p $ G.Pixman_transform $ mkArray (coerce matrix)
     where
       mkArray = CA.fromList . map CA.fromList
 
-  transformFromRotation cos' sin' = unsafePerformIO $
+  fromRotation cos' sin' = unsafePerformIO $
     withNewForeignPtr (pure . Transform) $
       \p -> US.pixman_transform_init_rotate p (coerce cos') (coerce sin')
 
-  transformFromScale sx sy = unsafePerformIO $
+  fromScale sx sy = unsafePerformIO $
     withNewForeignPtr (pure . Transform) $
       \p -> US.pixman_transform_init_scale p (coerce sx) (coerce sy)
 
-  transformFromTranslation tx ty = unsafePerformIO $
+  fromTranslation tx ty = unsafePerformIO $
     withNewForeignPtr (pure . Transform) $
       \p -> US.pixman_transform_init_translate p (coerce tx) (coerce ty)
 
@@ -1656,14 +1835,14 @@ instance IsTransform Transform where
           then US.pixman_transform_scale nullPtr t (coerce sx) (coerce sy)
           else US.pixman_transform_scale t nullPtr (coerce sx) (coerce sy)
 
-  translateTransform sx sy rev at = unsafePerformIO $
+  translate sx sy rev at = unsafePerformIO $
     withNewForeignPtrCopy (pure . Transform) at $ \t ->
       throwPixmanUnless1 "translateTransform" $
         if rev
           then US.pixman_transform_translate nullPtr t (coerce sx) (coerce sy)
           else US.pixman_transform_translate t nullPtr (coerce sx) (coerce sy)
 
-  rotateTransform rev c s at = unsafePerformIO $
+  rotate c s rev at = unsafePerformIO $
     withNewForeignPtrCopy (pure . Transform) at $ \t ->
       throwPixmanUnless1 "rotateTransform" $
         if rev
@@ -1682,6 +1861,10 @@ instance IsTransform Transform where
         throwPixmanUnless1 "transformPoint3d" $ US.pixman_transform_point_3d t (coerce v)
         peek v
 
+  transformMatrix at = unsafePerformIO $ do
+    G.Pixman_transform mat <- withPtr at peek
+    return $! map (map Fixed . CA.toList) $ CA.toList mat
+
 instance IsTransform FTransform where
   type MatrixElem FTransform = Double
 
@@ -1690,21 +1873,21 @@ instance IsTransform FTransform where
       withNewForeignPtr (pure . FTransform) US.pixman_f_transform_init_identity
   {-# NOINLINE identityTransform #-}
 
-  transformFromMatrix matrix = unsafePerformIO $
+  fromMatrix matrix = unsafePerformIO $
     withNewForeignPtr (pure . FTransform) $
       \p -> poke p $ G.Pixman_f_transform $ mkArray matrix
     where
       mkArray = CA.fromList . map (CA.fromList . map CDouble)
 
-  transformFromRotation cos' sin' = unsafePerformIO $
+  fromRotation cos' sin' = unsafePerformIO $
     withNewForeignPtr (pure . FTransform) $
       \p -> US.pixman_f_transform_init_rotate p (CDouble cos') (CDouble sin')
 
-  transformFromScale sx sy = unsafePerformIO $
+  fromScale sx sy = unsafePerformIO $
     withNewForeignPtr (pure . FTransform) $
       \p -> US.pixman_f_transform_init_scale p (CDouble sx) (CDouble sy)
 
-  transformFromTranslation tx ty = unsafePerformIO $
+  fromTranslation tx ty = unsafePerformIO $
     withNewForeignPtr (pure . FTransform) $
       \p -> US.pixman_f_transform_init_translate p (CDouble tx) (CDouble ty)
 
@@ -1732,14 +1915,14 @@ instance IsTransform FTransform where
           then US.pixman_f_transform_scale nullPtr t (CDouble sx) (CDouble sy)
           else US.pixman_f_transform_scale t nullPtr (CDouble sx) (CDouble sy)
 
-  translateTransform sx sy rev at = unsafePerformIO $
+  translate sx sy rev at = unsafePerformIO $
     withNewForeignPtrCopy (pure . FTransform) at $ \t ->
       throwPixmanUnless1 "f_transform_translate" $
         if rev
           then US.pixman_f_transform_translate nullPtr t (CDouble sx) (CDouble sy)
           else US.pixman_f_transform_translate t nullPtr (CDouble sx) (CDouble sy)
 
-  rotateTransform rev c s at = unsafePerformIO $
+  rotate c s rev at = unsafePerformIO $
     withNewForeignPtrCopy (pure . FTransform) at $ \t ->
       throwPixmanUnless1 "f_transform_rotate" $
         if rev
@@ -1758,14 +1941,18 @@ instance IsTransform FTransform where
         US.pixman_f_transform_point_3d t (coerce v)
         peek v
 
--- | Create new 'FTransform' from a 'Transform'. This could fail.
+  transformMatrix at = unsafePerformIO $ do
+    G.Pixman_f_transform mat <- withPtr at peek
+    return $! map (map coerce . CA.toList) $ CA.toList mat
+
+-- | Create new 'Transform' from a 'FTransform'.
 fromFTransform :: FTransform -> Transform
 fromFTransform ft = unsafePerformIO $
   withConstPtr ft $ \ftC ->
     withNewForeignPtr (pure . Transform) $ \p ->
-      throwPixmanUnless1 "transform_from_f_transform" $ US.pixman_transform_from_pixman_f_transform p ftC
+      throwPixmanUnless1 "TransformConvertError" $ US.pixman_transform_from_pixman_f_transform p ftC
 
--- | Create new 'Transform' from a 'FTransform'.
+-- | Create new 'FTransform' from a 'Transform'. This could fail.
 fromTransform :: Transform -> FTransform
 fromTransform t = unsafePerformIO $
   withConstPtr t $ \tC ->
@@ -1800,45 +1987,46 @@ isInverse at bt = unsafePerformIO $
 
 -- * Regions
 
-class (Typeable a, IsBox (Box (RType a)), Show (Box (RType a))) => IsRegion a where
+class (Typeable a, Eq a, IsBox (Box (RType a)), Show (Box (RType a))) => IsRegion a where
   type RType (a :: Type) :: RegionType
 
   -- | Initialize a new region.
   emptyRegion :: a
 
   -- | Initialize the region from the provided box.
-  regionFromRect :: Position Int32 -> Size Word32 -> a
+  fromRect :: Position Int32 -> Size Word32 -> a
 
   -- | Initialize the region from the provided boxes
-  regionFromRects :: [Box (RType a)] -> a
+  fromRects :: [Box (RType a)] -> a
 
   -- | Initialize the region from the provided extents
-  regionFromExtents :: Box (RType a) -> a
+  fromExtents :: Box (RType a) -> a
 
   -- | Convert bitmap clip mask into clipping region.
   --
   -- The image format has to be 'A1'.
-  regionFromImage :: Image -> a
+  fromImage :: TypedImage A1 -> a
 
   -- | Is the region empty
   regionIsEmpty :: a -> Bool
 
   -- | Region's extents
-  regionExtents :: a -> Box (RType a)
+  extents :: a -> Box (RType a)
+
+  -- | Returns the rectangles in the region.
+  rectangles :: a -> [Box (RType a)]
 
   -- | Number of rectangles in the region.
   regionNumRects :: a -> Int
-
-  -- | Get N rectangles in the region.
-  regionRectangles :: Int -> a -> [Box (RType a)]
 
   -- | Does a region contain the point?
   containsPoint :: Position Int32 -> Box (RType a) -> a -> Bool
 
   -- | Does the region contain the rectangle?
-  containsRectangle :: Box (RType a) -> a -> RegionOverlap
+  containsRectangle :: Box (RType a) -> a -> Overlap
 
   -- | Take a region and a box and return a region that is everything in the box but not in the region.
+  -- (This is the same as subtracting the region from the box.)
   inverseRegion :: Box (RType a) -> a -> a
 
   -- | Translate the region by specified amount
@@ -1868,33 +2056,35 @@ class (Typeable a, IsBox (Box (RType a)), Show (Box (RType a))) => IsRegion a wh
 
   regionSelfCheck :: a -> Bool
 
+  clearRegion :: a -> a
+
 instance IsRegion (Region R16) where
   type RType Region16 = R16
 
   emptyRegion = unsafePerformIO $ withNewRegion16 US.pixman_region_init
   {-# NOINLINE emptyRegion #-}
 
-  regionFromRect (x, y) (w, h) = unsafePerformIO $
+  fromRect (x, y) (w, h) = unsafePerformIO $
     withNewRegion16 $ \p ->
       US.pixman_region_init_rect p (fromIntegral x) (fromIntegral y) (fromIntegral w) (fromIntegral h)
 
-  regionFromRects boxes = unsafePerformIO $
+  fromRects boxes = unsafePerformIO $
     withArrayLen (coerce boxes) $ \len boxesP ->
       withNewRegion16 $ \p ->
         throwPixmanUnless1 "region_init_rects" $
           US.pixman_region_init_rects p (ConstPtr boxesP) (fromIntegral len)
 
-  regionFromExtents (Box16 extents) = unsafePerformIO $ withNewRegion16 $ \p ->
-    with extents $ US.pixman_region_init_with_extents p . ConstPtr
+  fromExtents (Box16 exts) = unsafePerformIO $ withNewRegion16 $ \p ->
+    with exts $ US.pixman_region_init_with_extents p . ConstPtr
 
-  regionFromImage img = unsafePerformIO $ do
+  fromImage img = unsafePerformIO $ do
     when (imageFormat img /= A1) $ throwIO $ PixmanException "regionFromImage: image format needs to be A1"
     withNewRegion16 $ \p ->
       withPtr img $ US.pixman_region_init_from_image p
 
   regionIsEmpty reg = unsafePerformIO $ fromPixmanBool <$> withConstPtr reg US.pixman_region_empty
 
-  regionExtents reg = unsafePerformIO $ fmap Box16 $ withConstPtr reg US.pixman_region_extents >>= peek
+  extents reg = unsafePerformIO $ fmap Box16 $ withConstPtr reg US.pixman_region_extents >>= peek
 
   regionNumRects reg = unsafePerformIO $ fromIntegral <$> withConstPtr reg US.pixman_region_n_rects
 
@@ -1911,11 +2101,12 @@ instance IsRegion (Region R16) where
         with box $ US.pixman_region_contains_point reg' (fromIntegral x) (fromIntegral y)
 
   containsRectangle (Box16 box) reg = unsafePerformIO $
-    fmap RegionOverlap $
+    fmap Overlap $
       withConstPtr reg $ \reg' ->
         with box $ US.pixman_region_contains_rectangle reg' . ConstPtr
 
-  regionRectangles n reg = unsafePerformIO $
+  rectangles reg = unsafePerformIO $ do
+    n <- fromIntegral <$> withConstPtr reg US.pixman_region_n_rects
     fmap coerce $
       withConstPtr reg $ \reg' ->
         with (fromIntegral n) $ US.pixman_region_rectangles reg' >=> peekArray n
@@ -1965,6 +2156,12 @@ instance IsRegion (Region R16) where
         throwPixmanUnless1 "region_intersect_rect" $
           US.pixman_region_intersect_rect p reg' (fromIntegral x) (fromIntegral y) (fromIntegral w) (fromIntegral h)
 
+  clearRegion reg = unsafePerformIO $
+    withConstPtr reg $ \reg' ->
+      withNewRegion16 $ \p -> do
+        throwPixmanUnless1 "region_copy" $ US.pixman_region_copy p reg'
+        US.pixman_region_clear p
+
   regionSelfCheck reg = unsafePerformIO $ fromPixmanBool <$> withPtr reg US.pixman_region_selfcheck
 
 instance IsRegion (Region R32) where
@@ -1973,28 +2170,28 @@ instance IsRegion (Region R32) where
   emptyRegion = unsafePerformIO $ withNewRegion32 US.pixman_region32_init
   {-# NOINLINE emptyRegion #-}
 
-  regionFromRect (x, y) (w, h) = unsafePerformIO $
+  fromRect (x, y) (w, h) = unsafePerformIO $
     withNewRegion32 $ \p ->
       US.pixman_region32_init_rect p (fromIntegral x) (fromIntegral y) (fromIntegral w) (fromIntegral h)
 
-  regionFromRects boxes = unsafePerformIO $
+  fromRects boxes = unsafePerformIO $
     withArrayLen (coerce boxes) $ \len boxesP ->
       withNewRegion32 $ \p ->
         throwPixmanUnless1 "region32_init_rects" $
           US.pixman_region32_init_rects p (ConstPtr boxesP) (fromIntegral len)
 
-  regionFromExtents (Box32 extents) = unsafePerformIO $
+  fromExtents (Box32 exts) = unsafePerformIO $
     withNewRegion32 $ \p ->
-      with extents $ US.pixman_region32_init_with_extents p . ConstPtr
+      with exts $ US.pixman_region32_init_with_extents p . ConstPtr
 
-  regionFromImage img = unsafePerformIO $ do
+  fromImage img = unsafePerformIO $ do
     when (imageFormat img /= A1) $ throwIO $ PixmanException "regionFromImage: image format needs to be A1"
     withNewRegion32 $ \p ->
       withPtr img $ US.pixman_region32_init_from_image p
 
   regionIsEmpty reg = unsafePerformIO $ fromPixmanBool <$> withConstPtr reg US.pixman_region32_empty
 
-  regionExtents reg = unsafePerformIO $ fmap Box32 $ withConstPtr reg US.pixman_region32_extents >>= peek
+  extents reg = unsafePerformIO $ fmap Box32 $ withConstPtr reg US.pixman_region32_extents >>= peek
 
   regionNumRects reg = unsafePerformIO $ fromIntegral <$> withConstPtr reg US.pixman_region32_n_rects
 
@@ -2013,12 +2210,13 @@ instance IsRegion (Region R32) where
           US.pixman_region32_contains_point reg' (fromIntegral x) (fromIntegral y)
 
   containsRectangle (Box32 box) reg = unsafePerformIO $
-    fmap RegionOverlap $
+    fmap Overlap $
       withConstPtr reg $ \reg' ->
         with box $
           US.pixman_region32_contains_rectangle reg' . ConstPtr
 
-  regionRectangles n reg = unsafePerformIO $
+  rectangles reg = unsafePerformIO $ do
+    n <- fromIntegral <$> withConstPtr reg US.pixman_region32_n_rects
     fmap coerce $
       withConstPtr reg $ \reg' ->
         with (fromIntegral n) $
@@ -2069,6 +2267,12 @@ instance IsRegion (Region R32) where
         throwPixmanUnless1 "region32_intersect_rect" $
           US.pixman_region32_intersect_rect p reg' (fromIntegral x) (fromIntegral y) (fromIntegral w) (fromIntegral h)
 
+  clearRegion reg = unsafePerformIO $
+    withConstPtr reg $ \reg' ->
+      withNewRegion32 $ \p -> do
+        throwPixmanUnless1 "region_copy" $ US.pixman_region32_copy p reg'
+        US.pixman_region32_clear p
+
   regionSelfCheck reg = unsafePerformIO $ fromPixmanBool <$> withPtr reg US.pixman_region32_selfcheck
 
 instance IsRegion (Region R64F) where
@@ -2077,28 +2281,28 @@ instance IsRegion (Region R64F) where
   emptyRegion = unsafePerformIO $ withNewRegion64F US.pixman_region64f_init
   {-# NOINLINE emptyRegion #-}
 
-  regionFromRect (x, y) (w, h) = unsafePerformIO $
+  fromRect (x, y) (w, h) = unsafePerformIO $
     withNewRegion64F $ \p ->
       US.pixman_region64f_init_rect p (fromIntegral x) (fromIntegral y) (fromIntegral w) (fromIntegral h)
 
-  regionFromRects boxes = unsafePerformIO $
+  fromRects boxes = unsafePerformIO $
     withArrayLen (coerce boxes) $ \len boxesP ->
       withNewRegion64F $ \p ->
         throwPixmanUnless1 "region64f_init_rects" $
           US.pixman_region64f_init_rects p (ConstPtr boxesP) (fromIntegral len)
 
-  regionFromExtents (Box64F extents) = unsafePerformIO $
+  fromExtents (Box64F exts) = unsafePerformIO $
     withNewRegion64F $ \p ->
-      with extents $ US.pixman_region64f_init_with_extents p . ConstPtr
+      with exts $ US.pixman_region64f_init_with_extents p . ConstPtr
 
-  regionFromImage img = unsafePerformIO $ do
+  fromImage img = unsafePerformIO $ do
     when (imageFormat img /= A1) $ throwIO $ PixmanException "regionFromImage: image format needs to be A1"
     withNewRegion64F $ \p ->
       withPtr img $ US.pixman_region64f_init_from_image p
 
   regionIsEmpty reg = unsafePerformIO $ fromPixmanBool <$> withConstPtr reg US.pixman_region64f_empty
 
-  regionExtents reg = unsafePerformIO $ fmap Box64F $ withConstPtr reg US.pixman_region64f_extents >>= peek
+  extents reg = unsafePerformIO $ fmap Box64F $ withConstPtr reg US.pixman_region64f_extents >>= peek
 
   regionNumRects reg = unsafePerformIO $ fromIntegral <$> withConstPtr reg US.pixman_region64f_n_rects
 
@@ -2117,12 +2321,13 @@ instance IsRegion (Region R64F) where
           US.pixman_region64f_contains_point reg' (fromIntegral x) (fromIntegral y)
 
   containsRectangle (Box64F box) reg = unsafePerformIO $
-    fmap RegionOverlap $
+    fmap Overlap $
       withConstPtr reg $ \reg' ->
         with box $
           US.pixman_region64f_contains_rectangle reg' . ConstPtr
 
-  regionRectangles n reg = unsafePerformIO $
+  rectangles reg = unsafePerformIO $ do
+    n <- fromIntegral <$> withConstPtr reg US.pixman_region64f_n_rects
     fmap coerce $
       withConstPtr reg $ \reg' ->
         with (fromIntegral n) $
@@ -2172,6 +2377,12 @@ instance IsRegion (Region R64F) where
       withNewRegion64F $ \p ->
         throwPixmanUnless1 "region64f_intersect_rect" $
           US.pixman_region64f_intersect_rect p reg' (fromIntegral x) (fromIntegral y) (fromIntegral w) (fromIntegral h)
+
+  clearRegion reg = unsafePerformIO $
+    withConstPtr reg $ \reg' ->
+      withNewRegion64F $ \p -> do
+        throwPixmanUnless1 "region_copy" $ US.pixman_region64f_copy p reg'
+        US.pixman_region64f_clear p
 
   regionSelfCheck reg = unsafePerformIO $ fromPixmanBool <$> withPtr reg US.pixman_region64f_selfcheck
 
@@ -2230,6 +2441,27 @@ containsPointF (x, y) (Box64F box) reg = unsafePerformIO $
 
 -- * Boxes
 
+data family Box (a :: RegionType)
+
+type Box16 = Box R16
+type Box32 = Box R32
+type Box64F = Box R64F
+
+-- | 16-bit box
+newtype instance Box R16 = Box16 {unwrap :: G.Pixman_box16_t}
+  deriving stock (Eq, Generic)
+  deriving newtype (Storable, RIP.StaticSize, RIP.ReadRaw, RIP.WriteRaw)
+
+-- | 32-bit box
+newtype instance Box R32 = Box32 {unwrap :: G.Pixman_box32_t}
+  deriving stock (Eq, Generic)
+  deriving newtype (Storable, RIP.StaticSize, RIP.ReadRaw, RIP.WriteRaw)
+
+-- | 64-bit floating-point box
+newtype instance Box R64F = Box64F {unwrap :: G.Pixman_box64f_t}
+  deriving stock (Eq, Generic)
+  deriving newtype (Storable, RIP.StaticSize, RIP.ReadRaw, RIP.WriteRaw)
+
 class (Show a, Eq a, Eq (PositionScalar a), Show (PositionScalar a), Num (PositionScalar a)) => IsBox a where
   -- | @mkBox (x1, y1) (x2, y2)@
   mkBox :: Position (PositionScalar a) -> Position (PositionScalar a) -> a
@@ -2237,19 +2469,31 @@ class (Show a, Eq a, Eq (PositionScalar a), Show (PositionScalar a), Num (Positi
   mkBox' :: PositionScalar a -> PositionScalar a -> PositionScalar a -> PositionScalar a -> a
   mkBox' x1 y1 x2 y2 = mkBox (x1, y1) (x2, y2)
 
+  -- | Get the @(x1, y1), (x2, y2)@
   boxPoints :: a -> (Position (PositionScalar a), Position (PositionScalar a))
 
-instance IsBox Box16 where
-  mkBox (x1, y1) (x2, y2) = Box16 $! G.Pixman_box16_t $! G.Pixman_box16 x1 y1 x2 y2
+instance IsBox (Box R16) where
+  mkBox (x1, y1) (x2, y2)
+    | x1 <= x2 && y1 <= y2 = Box16 $! G.Pixman_box16_t $! G.Pixman_box16 x1 y1 x2 y2
+    | otherwise = error "Box: invalid dimensions"
   boxPoints (Box16 (G.Pixman_box16_t (G.Pixman_box16 x1 y1 x2 y2))) = ((x1, y1), (x2, y2))
 
-instance IsBox Box32 where
-  mkBox (x1, y1) (x2, y2) = Box32 $! G.Pixman_box32_t x1 y1 x2 y2
+instance IsBox (Box R32) where
+  mkBox (x1, y1) (x2, y2)
+    | x1 <= x2 && y1 <= y2 = Box32 $! G.Pixman_box32_t x1 y1 x2 y2
+    | otherwise = error "Box: invalid dimensions"
   boxPoints (Box32 (G.Pixman_box32_t x1 y1 x2 y2)) = ((x1, y1), (x2, y2))
 
-instance IsBox Box64F where
-  mkBox (x1, y1) (x2, y2) = Box64F $! G.Pixman_box64f_t (coerce x1) (coerce y1) (coerce x2) (coerce y2)
+instance IsBox (Box R64F) where
+  mkBox (x1, y1) (x2, y2)
+    | x1 <= x2 && y1 <= y2 = Box64F $! G.Pixman_box64f_t (coerce x1) (coerce y1) (coerce x2) (coerce y2)
+    | otherwise = error "Box: invalid dimensions"
   boxPoints (Box64F (G.Pixman_box64f_t x1 y1 x2 y2)) = ((coerce x1, coerce y1), (coerce x2, coerce y2))
+
+instance (Typeable a, IsBox (Box a), PrintfArg (PositionScalar (Box a))) => Show (Box a) where
+  show box = printf "Box[%s]{" (show $ typeOf box) ++ show [x1, y1, x2, y2] ++ "}"
+    where
+      ((x1, y1), (x2, y2)) = boxPoints box
 
 -- * Rectangles
 
@@ -2260,14 +2504,68 @@ class (Show a, Eq a) => IsRectangle a where
   mkRect' :: PositionScalar a -> PositionScalar a -> SizeScalar a -> SizeScalar a -> a
   mkRect' x y w h = mkRectangle (x, y) (w, h)
 
-instance IsRectangle Rectangle16 where
+  rectanglePosition :: a -> Position (PositionScalar a)
+  rectanglePosition r = (rectangleX r, rectangleY r)
+
+  rectangleSize :: a -> Size (SizeScalar a)
+  rectangleSize r = (rectangleWidth r, rectangleHeight r)
+
+  rectangleX :: a -> PositionScalar a
+  rectangleY :: a -> PositionScalar a
+  rectangleWidth :: a -> SizeScalar a
+  rectangleHeight :: a -> SizeScalar a
+
+data family Rectangle (a :: RegionType) :: Type
+
+type Rectangle16 = Rectangle R16
+type Rectangle32 = Rectangle R32
+type Rectangle64F = Rectangle R64F
+
+---- | 16-bit rectangle
+newtype instance Rectangle R16 = Rectangle16 {unwrap :: G.Pixman_rectangle16_t}
+  deriving stock (Eq, Generic)
+  deriving newtype (Storable, RIP.StaticSize, RIP.ReadRaw, RIP.WriteRaw)
+
+---- | 32-bit rectangle
+newtype instance Rectangle R32 = Rectangle32 {unwrap :: G.Pixman_rectangle32_t}
+  deriving stock (Eq, Generic)
+  deriving newtype (Storable, RIP.StaticSize, RIP.ReadRaw, RIP.WriteRaw)
+
+---- | 64-bit floating-point rectangle
+newtype instance Rectangle R64F = Rectangle64F {unwrap :: G.Pixman_rectangle64f_t}
+  deriving stock (Eq, Generic)
+  deriving newtype (Storable, RIP.StaticSize, RIP.ReadRaw, RIP.WriteRaw)
+
+instance IsRectangle (Rectangle R16) where
   mkRectangle (x, y) (w, h) = Rectangle16 $! G.Pixman_rectangle16_t x y w h
+  rectangleX = getField @"x" . getField @"unwrap"
+  rectangleY = getField @"y" . getField @"unwrap"
+  rectangleWidth = getField @"width" . getField @"unwrap"
+  rectangleHeight = getField @"height" . getField @"unwrap"
 
-instance IsRectangle Rectangle32 where
+instance IsRectangle (Rectangle R32) where
   mkRectangle (x, y) (w, h) = Rectangle32 $! G.Pixman_rectangle32_t x y w h
+  rectangleX = getField @"x" . getField @"unwrap"
+  rectangleY = getField @"y" . getField @"unwrap"
+  rectangleWidth = getField @"width" . getField @"unwrap"
+  rectangleHeight = getField @"height" . getField @"unwrap"
 
-instance IsRectangle Rectangle64F where
+instance IsRectangle (Rectangle R64F) where
   mkRectangle (x, y) (w, h) = Rectangle64F $! G.Pixman_rectangle64f_t (coerce x) (coerce y) (coerce w) (coerce h)
+  rectangleX = coerce . getField @"x" . getField @"unwrap"
+  rectangleY = coerce . getField @"y" . getField @"unwrap"
+  rectangleWidth = coerce . getField @"width" . getField @"unwrap"
+  rectangleHeight = coerce . getField @"height" . getField @"unwrap"
+
+instance
+  forall (a :: RegionType).
+  (Typeable a, IsRectangle (Rectangle a), Show (PositionScalar (Rectangle a)), Show (SizeScalar (Rectangle a))) =>
+  Show (Rectangle a)
+  where
+  show rect = printf "Rectangle[%s]{x=%s,y=%s,width=%s,height=%s}" (show $ typeOf rect) (show x) (show y) (show width) (show height)
+    where
+      (x, y) = rectanglePosition rect
+      (width, height) = rectangleSize rect
 
 -- * Functions
 
@@ -2277,9 +2575,9 @@ type PaintTarget = (Ptr Word32, Int, Int, Position Int)
 -- | Blit the src into the dst with the specified values.
 --
 -- @blit src dst (w, h)@
-blt :: PaintTarget -> PaintTarget -> Size Int -> IO ()
-blt (src, s_stride, s_bpp, (s_x, s_y)) (dst, d_stride, d_bpp, (d_x, d_y)) (w, h) =
-  throwPixmanUnless1 "blt" $
+blit :: PaintTarget -> PaintTarget -> Size Int -> IO ()
+blit (src, s_stride, s_bpp, (s_x, s_y)) (dst, d_stride, d_bpp, (d_x, d_y)) (w, h) =
+  throwPixmanUnless1 "blit failed" $
     US.pixman_blt
       src
       dst
@@ -2294,12 +2592,12 @@ blt (src, s_stride, s_bpp, (s_x, s_y)) (dst, d_stride, d_bpp, (d_x, d_y)) (w, h)
       (fromIntegral w)
       (fromIntegral h)
 
--- | Fill the provided bits with the provided values
+-- | Fill the provided bits with the provided values.
 --
 -- @fill dst (w, h) filler@
 fill :: PaintTarget -> Size Int -> Word32 -> IO ()
 fill (bits, stride, bpp, (x, y)) (w, h) filler =
-  throwPixmanUnless1 "fill" $
+  throwPixmanUnless1 "fill failed" $
     US.pixman_fill
       bits
       (fromIntegral stride)
@@ -2359,8 +2657,8 @@ withNewForeignPtrCopy f x g = withNewForeignPtr f $ \p -> do
 withPtr :: (HasField "unwrap" r (ForeignPtr a)) => r -> (Ptr a -> IO b) -> IO b
 withPtr x = withForeignPtr (getField @"unwrap" x)
 
-withImagePtr :: (_) => r -> _ -> _
-withImagePtr x f = mkImage x >>= flip withPtr f
+withImagePtr :: (IsImage r) => r -> (Ptr G.Pixman_image_t -> IO a) -> IO a
+withImagePtr = withPtr . toImage
 
 withConstPtr :: (HasField "unwrap" r (ForeignPtr a)) => r -> (ConstPtr a -> IO b) -> IO b
 withConstPtr x f = withForeignPtr (getField @"unwrap" x) $ f . ConstPtr

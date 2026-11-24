@@ -43,7 +43,8 @@ library
     c-expr-runtime >=0.1 && <1.0,
     data-default ^>=0.8,
     deepseq ^>=1.5,
-    hs-bindgen-runtime >=0.1 && <1.1
+    hs-bindgen-runtime >=0.1 && <1.1,
+    primitive
 
   hs-source-dirs: src
   default-language: GHC2024

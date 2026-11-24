@@ -1,4 +1,6 @@
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 {-# OPTIONS_GHC -Wno-type-defaults #-}
 
 module PixmanSpec where
@@ -6,8 +8,9 @@ module PixmanSpec where
 import Control.DeepSeq
 import Control.Exception
 import Control.Monad
+import Data.Maybe
 import Data.Typeable
-import Foreign hiding (void)
+import Foreign hiding (rotate, void)
 import GHC.Float (float2Double)
 import Pixman
 import Test.Hspec
@@ -19,33 +22,36 @@ spec :: Spec
 spec = do
   describe "Pixman" $ do
     it "create empty image" $ do
-      img <- mkImage $ newEmptyImage X8R8G8B8 (100, 100) True
+      img <- newEmptyImage X8R8G8B8 (100, 100) True
       f img
 
     it "create image with transform" $ do
-      let ft = scaleTransform 5 5 False $ translateTransform 5 5 False identityTransform
+      let ft = scaleTransform 5 5 False $ translate 5 5 False identityTransform
           t1 = fromFTransform ft
-      pix <-
-        mkImage $
-          setFilter FilterBest [] $
-            setTransform t1 $
-              newEmptyImage X8R8G8B8 (100, 100) True
+      pix <- do
+        img <- newEmptyImage X8R8G8B8 (100, 100) True
+        setTransform t1 img
+        setFilter FilterBest [] img
+        return img
       let comp :: CompositeParameters R32
-          comp = (compositeParameters32){size = (100, 100)}
-      res <- mkImage $ setComposite Src pix comp $ newEmptyImage X8R8G8B8 (100, 100) True
+          comp = compositeSize (100, 100) def
+      res <- do
+        img <- newEmptyImage X8R8G8B8 (100, 100) True
+        setComposite SRC pix comp img
+        return img
       imageWidth res `shouldBe` 100
       imageDepth res `shouldBe` 24
       f (ft, t1, pix, res)
 
     it "image from color" $ do
-      img <- mkImage $ solidFillImage $ fromColorComponents @Word16 100 100 100 maxBound
+      img <- solidFillImage (toColor (0xFFAAAAAA :: Word32))
       imageWidth img `shouldBe` 0
       imageDepth img `shouldBe` 0
       imageStride img `shouldBe` 0
       imageData img `shouldBe` nullPtr
       imageSize img `shouldBe` (imageWidth img, imageHeight img)
-      toColorComponent (1.0 :: Double) `shouldBe` 65535
-      toColorComponent (0.0 :: Double) `shouldBe` 0
+      toColor (1.0 :: Double, 0 :: Double, 0 :: Double, 0 :: Double) `shouldBe` toColor (0x00FF0000 :: Word32) -- (65535, 0, 0, 0)
+      toColor (0.0 :: Double, 0 :: Double, 0 :: Double, 0 :: Double) `shouldBe` toColor (0 :: Word64)
 
     prop "parts equal" $
       \a b c d ->
@@ -61,7 +67,7 @@ spec = do
 
     it "image from bits" $ do
       withArray (replicate (50 * 50) maxBound) $ \bits -> do
-        img <- mkImage $ newImageWithBits A8R8G8B8 (50, 50) True bits (50 * 4)
+        img <- newImageWithBits A8R8G8B8 (50, 50) True bits (50 * 4)
         let p = imageData img
         xs <- peekArray (imageWidth img * imageHeight img) p
         all (== maxBound) xs `shouldBe` True
@@ -76,25 +82,37 @@ spec = do
       f $ mkRect' @Rectangle32 12 5 42 82
       f $ mkRect' @Rectangle64F 12 5 42 82
       f $ emptyRegion @Region16
-      f $ regionFromRect @Region16 (5, 5) (100, 100)
-      f $ regionFromRects @Region16 [mkBox' @Box16 5 5 100 100, mkBox' @Box16 50 0 500 500]
-      f $ regionFromRects @Region32 [mkBox' @Box32 5 5 100 100, mkBox' @Box32 50 0 500 500]
-      f $ regionFromRects @Region64F [mkBox' @Box64F 5 5 100 100, mkBox' @Box64F 50 0 500 500]
-      f $ fromColorComponents @Word16 100 100 100 maxBound
+      f $ fromRect @Region16 (5, 5) (100, 100)
+      f $ fromRects @Region16 [mkBox' @Box16 5 5 100 100, mkBox' @Box16 50 0 500 500]
+      f $ fromRects @Region32 [mkBox' @Box32 5 5 100 100, mkBox' @Box32 50 0 500 500]
+      f $ fromRects @Region64F [mkBox' @Box64F 5 5 100 100, mkBox' @Box64F 50 0 500 500]
+      f $ toColor (100 :: Word16, 100 :: Word16, 100 :: Word16, maxBound :: Word16)
 
     it "formats" $ do
       forM_ allFormats $ \x -> do
         void $ evaluate $ force (x, formatSupportedDest x, formatSupportedSource x)
-        img <- mkImage $ newEmptyImage x (50, 50) True
+        img <- newEmptyImage x (50, 50) True
         void $ f img
 
     it "computeCompositeRegion" $ do
-      src <- mkImage $ newEmptyImage A8R8G8B8 (10, 100) True
-      dst <- mkImage $ newEmptyImage A8R8G8B8 (100, 100) True
+      src <- newEmptyImage A8R8G8B8 (10, 100) True
+      dst <- newEmptyImage A8R8G8B8 (100, 100) True
       let reg = computeCompositeRegion src Nothing dst (0, 0) (0, 0) (0, 0) (50, 50)
       void . evaluate $ force $ show reg
 
+  describe "Triangles" $ do
+    it "add triangles" $ do
+      img <- do
+        img <- newEmptyTypedImage @A8 (100, 100) True
+        addTriangles (20, 20) [Triangle (Point (-5) 0) (Point 5 5) (Point 6 0)] img
+        return img
+      f img
+
   describe "Fixed" $ do
+    prop "Read/Show" $
+      \(x :: Fixed) -> (read . show) x `shouldBe` x
+    prop "Eq" $
+      \(x :: Fixed) -> x `shouldBe` x
     it "minBound / maxBound" $ do
       minBound @Fixed `shouldSatisfy` (< maxBound @Fixed)
       rnf (minBound @Fixed) `shouldBe` ()
@@ -170,43 +188,63 @@ spec = do
       let
         t = identityTransform @Transform
         t2 = scaleTransform 5 5 True t
-        t3 = translateTransform 2 5 True t2
+        t3 = translate 2 5 True t2
         t4 = invertTransform t3
         t5 = multiplyTransform t4 t3
         b1 = transformBounds t5 (mkBox' 5 5 100 100)
-        t6 = rotateTransform True 1 2 t5
+        t6 = rotate 1 2 True t5
        in
         b1 `seq` t6 `seq` (() `shouldBe` ())
 
 f :: (Show a) => a -> IO ()
 f = void . evaluate . force . show
 
-regionSpec :: forall a. (IsRegion a, Show a) => a -> Spec
+regionSpec :: forall a. (IsRegion a, Show a, Arbitrary a, Arbitrary (PositionScalar (RType a)), Ord (PositionScalar (RType a))) => a -> Spec
 regionSpec ty = describe ("Region " ++ show (typeOf ty)) $ do
   it "empty region is empty" $ do
     regionIsEmpty (emptyRegion @a) `shouldBe` True
-  it "regionFromRect" $ do
-    f $ regionFromRect @a (10, 10) (500, 500)
+  it "fromRect" $ do
+    f $ fromRect @a (10, 10) (500, 500)
 
-  it "regionFromImage" $ do
-    let fmt = A1 -- X4B4G4R4
-    img <- mkImage $ newImageWithBits fmt (100, 100) True nullPtr 0
+  it "fromImage" $ do
+    img <- newTypedImageWithBits (100, 100) True nullPtr 0
     let bpp = formatBPP (imageFormat img)
     fill (imageData img, imageStride img, bpp, (1, 1)) (5, 5) maxBound
-    let reg = regionFromImage @a img
+    let reg = fromImage @a img
     regionSelfCheck reg `shouldBe` True
 
-  it "regionFromImage fail" $ do
-    img <- mkImage $ newEmptyImage X4B4G4R4 (100, 100) True
-    let reg = regionFromImage @a img
+  it "fromImage fail" $ do
+    img <- newEmptyTypedImage @X4B4G4R4 (100, 100) True
+    let reg = fromImage @a (fromJust $ cast img)
     evaluate reg `shouldThrow` anyException
 
   it "region properties" $ do
-    let reg = regionFromRect @a (10, 10) (100, 100)
-    boxPoints (regionExtents reg) `shouldBe` ((10, 10), (100 + 10, 100 + 10))
+    let reg = fromRect @a (10, 10) (100, 100)
+    boxPoints (extents reg) `shouldBe` ((10, 10), (100 + 10, 100 + 10))
     regionNumRects reg `shouldBe` 1
-    regionRectangles 1 reg `shouldBe` [mkBox (10, 10) (100 + 10, 100 + 10)]
+    rectangles reg `shouldBe` [mkBox (10, 10) (100 + 10, 100 + 10)]
+
+  prop "fromExtents" $
+    \exts -> fromExtents @a exts `shouldSatisfy` (\reg -> exts == extents reg || (let ((x1, y1), (x2, y2)) = boxPoints exts in x1 == x2 || y1 == y2))
+
+  prop "containsRect" $
+    \exts -> fromExtents @a exts `shouldSatisfy` (\reg -> containsRectangle exts reg == RegionIn || (let ((x1, y1), (x2, y2)) = boxPoints exts in x1 == x2 || y1 == y2))
+
+  prop "subtract/union" $
+    \(a :: a) b -> ((a `subtractRegion` b) `unionRegion` b) `shouldBe` (a `unionRegion` b)
 
 approxEq :: (Real a) => Double -> Double -> a -> a -> Bool
 approxEq absTol relTol a b =
   abs (realToFrac a - realToFrac b) <= max absTol (relTol * max (abs $ realToFrac a) (abs $ realToFrac b))
+
+instance Arbitrary Fixed where
+  arbitrary = realToFrac <$> (arbitrary @Double)
+
+instance (IsBox (Box a), Arbitrary (PositionScalar a), Ord (PositionScalar a)) => Arbitrary (Box a) where
+  arbitrary = do
+    p1@(x1, y1) <- arbitrary
+    p2 <- arbitrary `suchThat` (\(x2, y2) -> x1 <= x2 && y1 <= y2)
+    return $ mkBox p1 p2
+
+instance (IsRegion (Region a), Arbitrary (PositionScalar (RType (Region a))), Ord (PositionScalar (RType (Region a)))) => Arbitrary (Region a) where
+  arbitrary = fromRects <$> arbitrary
