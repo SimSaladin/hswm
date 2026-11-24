@@ -501,7 +501,9 @@ insertScreen defLayout sid sd mbPreferTag s
       s{visible = Screen a sid sd : visible s, hidden = as}
   -- new visible screen, show a new workspace
   | otherwise =
-      s{visible = Screen (Workspace "10" defLayout Nothing def) sid sd : visible s}
+      case [show n | n <- [1 :: Int ..], isNothing $ L.find (\x -> tag x == show n) (workspaces s)] of
+        i : _ -> s{visible = Screen (Workspace i defLayout Nothing def) sid sd : visible s}
+        [] -> error "impossible"
 
 ------------------------------------------------------------------------
 
