@@ -1,6 +1,8 @@
+{-# LANGUAGE ExtendedDefaultRules #-}
 {-# LANGUAGE PartialTypeSignatures #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
+{-# OPTIONS_GHC -Wno-type-defaults #-}
 
 -- |
 -- Module      : Main
@@ -20,6 +22,7 @@ import Data.ByteString.Lazy.Char8 qualified as BL
 import Data.Text qualified
 import Data.Text.Lazy qualified as TL
 import Data.Text.Short qualified as TS
+import Data.Version (showVersion)
 import GHC.Generics qualified as G
 import HSWM.IPC
 import HSWM.Main.Options as HSWM (
@@ -32,21 +35,45 @@ import HSWM.Main.Options as HSWM (
  )
 import HSWM.Util.Process
 import Options.Applicative qualified as Options
+import Options.Applicative.Help.Pretty as OP
 import Options.Generic
 import System.Console.Haskeline
 import System.Console.Haskeline.ReaderT
 
-progDesc :: String
-progDesc = "hswmctl"
+default (String)
 
 infoPrefs :: Options.InfoMod a
-infoPrefs = Options.header progDesc
+infoPrefs =
+  Options.headerDoc (Just header)
+    <> Options.footerDoc (Just footer)
+    <> Options.progDescDoc (Just progdesc)
+  where
+    header =
+      OP.pretty "Client and CLI for the HsWM window manager"
+
+    footer =
+      OP.pretty name
+        OP.<+> OP.pretty (showVersion version)
+        OP.<+> "-"
+        OP.<+> OP.pretty synopsis
+        OP.<+> OP.pretty homepage
+        OP.<+> OP.parens (OP.pretty copyright)
+
+    progdesc =
+      OP.pretty "Run with no arguments to enter the REPL interactive mode."
+        <> OP.hardline
+        <> OP.pretty "By default this program will attempt to contact the WM at:"
+        OP.<+> OP.pretty (show (def :: ClientConfig))
+
+    (name, synopsis, version, copyright, homepage) = packageInfo
 
 defaultParserPrefs :: Options.PrefsMod
 defaultParserPrefs =
   Options.multiSuffix "..."
     <> Options.subparserInline
     <> Options.helpShowGlobals
+    <> Options.helpLongEquals
+    <> Options.columns 98
 
 main :: (HasCallStack) => IO ()
 main = do
@@ -170,21 +197,19 @@ instance ParseRecord (Cmdline Wrapped) where
 instance ParseRecord (Request' Wrapped) where
   parseRecord = G.to . G.M1 <$> genericParseRecord lispCaseModifiers
 
--- WmCtrlAction
+-- WmCtrlValue / WmCtrlAction
 
 instance ParseRecord WmCtrlActionValue where
   parseRecord = WmCtrlActionValue . A.toJSON . Options.Generic.unwrap <$> parseRecord @(WmCtrlAction' Wrapped)
-
 instance ParseFields WmCtrlActionValue where
   parseFields a b c d = WmCtrlActionValue . A.toJSON . Options.Generic.unwrap <$> parseFields @(WmCtrlAction' Wrapped) a b c d
 
 instance ParseRecord (WmCtrlAction' Wrapped) where
   parseRecord = G.to . G.M1 <$> genericParseRecord lispCaseModifiers
-
 instance ParseFields (WmCtrlAction' Wrapped) where
   parseFields _ _ _ _ = parseRecord
 
--- MethodName
+-- MethodName / MethodParams
 
 instance ParseRecord MethodName where
   parseRecord = fmap getOnly parseRecord
@@ -195,8 +220,6 @@ instance ParseFields MethodName where
      in Options.argument Options.str $
           Options.metavar (metavar proxy)
             <> foldMap (Options.help . Data.Text.unpack) h
-
--- MethodParams
 
 instance ParseRecord MethodParams where
   parseRecord = fmap getOnly parseRecord

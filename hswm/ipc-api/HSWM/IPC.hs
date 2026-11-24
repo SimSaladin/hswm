@@ -15,14 +15,15 @@ import Data.ByteString.Lazy.Char8 qualified as C8LB
 import Data.Char qualified as C
 import Data.List qualified as L
 import Data.Text.Lazy qualified as TL
-import Data.Version (showVersion)
+import Data.Version (Version, showVersion)
 import GHC.Generics (Generic1)
 import Network.Socket
 import Network.Socket.ByteString qualified as NB
 import Options.Generic
 import PackageInfo_hswm qualified as PKG
 import System.Random (randomIO)
---import GHC.Stack
+
+-- import GHC.Stack
 
 aesonOptions :: A.Options
 aesonOptions =
@@ -233,19 +234,19 @@ instance Default ClientConfig where
 
 type MonadIPCClient m = (MonadLogger m, MonadUnliftIO m, MonadMask m)
 
-newtype ClientHandle = ClientHandle { clientSocket :: Socket }
+newtype ClientHandle = ClientHandle {clientSocket :: Socket}
 
 -- | Simplest client invocation.
-clientRunWith
-  :: (HasCallStack, MonadIPCClient m)
-  => ClientConfig -> (ClientHandle -> m r) -> m r
+clientRunWith ::
+  (HasCallStack, MonadIPCClient m) =>
+  ClientConfig -> (ClientHandle -> m r) -> m r
 clientRunWith conf program = do
-    ai <- getClientAI conf
-    withThreadContext ["component" .= ("ipc-client" :: String), "address" .= show ai.addrAddress] $ do
-      bracket (open ai) (io . close) $ \sock -> do
-        let chandle = ClientHandle sock
-        sendMsg chandle $ Contents (IdentifyClient (thisPeerIdent "client") 0 (Just thisPeerDescription) :: Request) Nothing
-        program chandle
+  ai <- getClientAI conf
+  withThreadContext ["component" .= ("ipc-client" :: String), "address" .= show ai.addrAddress] $ do
+    bracket (open ai) (io . close) $ \sock -> do
+      let chandle = ClientHandle sock
+      sendMsg chandle $ Contents (IdentifyClient (thisPeerIdent "client") 0 (Just thisPeerDescription) :: Request) Nothing
+      program chandle
   where
     open ai = bracketOnError (io $ socket ai.addrFamily ai.addrSocketType ai.addrProtocol) (io . close) $ \sock -> do
       logInfo $ "Connecting to server..." :# ["address" .= show ai.addrAddress]
@@ -267,7 +268,7 @@ clientRun conf onMsg f =
       link inputAs
       f (sendMsg chandle)
 
-receiveMessages :: MonadIPCClient m => (Response -> m ()) -> ClientHandle -> m ()
+receiveMessages :: (MonadIPCClient m) => (Response -> m ()) -> ClientHandle -> m ()
 receiveMessages onMsg (ClientHandle sock) = worker mempty
   where
     worker lo = do
@@ -369,3 +370,6 @@ thisPeerIdent x = PKG.name ++ "-" ++ x
 
 thisPeerDescription :: String
 thisPeerDescription = PKG.synopsis ++ " " ++ showVersion PKG.version
+
+packageInfo :: (String, String, Version, String, String)
+packageInfo = (PKG.name, PKG.synopsis, PKG.version, PKG.copyright, PKG.homepage)
