@@ -59,67 +59,65 @@ when:
   - condition: flag(optimize)
     ghc-options: -O2 -funbox-strict-fields
 
+# Dependencies
 __:
-  # Dependencies
-  - &dep-JuicyPixels                 JuicyPixels                 ^>=3.3.9
-  - &dep-aeson                       aeson                       >=2.2.3 && <2.4
-  - &dep-aeson-pretty                aeson-pretty
-  - &dep-async                       async                       ^>=2.2.6
-  - &dep-bytestring                  bytestring                  ^>=0.12.2
-  - &dep-containers                  containers                  >=0.7 && <1.0
-  - &dep-data-default                data-default                ^>=0.8.0
-  - &dep-exceptions                  exceptions                  ^>=0.10.9
-  - &dep-fast-logger                 fast-logger                 ^>=3.2.6
-  - &dep-filelock                    filelock                    ^>=0.1.1
-  - &dep-filepath                    filepath
-  - &dep-gi-glib                     gi-glib       >=2.0.30 && <2.1
-  - &dep-haskeline                   haskeline                   ^>=0.8.4
-  - &dep-microlens                   microlens
-  - &dep-microlens-platform          microlens-platform          >=0.4 && <1
-  - &dep-microlens-th                microlens-th
-  - &dep-monad-logger                monad-logger
-  - &dep-monad-logger-aeson          monad-logger-aeson          ^>=0.4.1
-  - &dep-mtl                         mtl                         ^>=2.3.1
-  - &dep-network                     network                     ^>=3.2.8
-  - &dep-optparse-applicative        optparse-applicative >=0.18.1 && <0.20
-  - &dep-optparse-generic            optparse-generic            ^>=1.5
-  - &dep-pretty-simple               pretty-simple               ^>=4.1.4
-  - &dep-prettyprinter               prettyprinter               ^>=1.7.1
-  - &dep-prettyprinter-ansi-terminal prettyprinter-ansi-terminal ^>=1.1.3
-  - &dep-prettyprinter-combinators   prettyprinter-combinators
-  - &dep-process                     process                     ^>=1.6.25
-  - &dep-random                      random
-  - &dep-rio                         rio                         ^>=0.1.24
-  - &dep-safe-exceptions             safe-exceptions
-  - &dep-stm                         stm                         ^>=2.5.3
-  - &dep-syb                         syb
-  - &dep-template-haskell            template-haskell            >=2.20 && <3
-  - &dep-text                        text                        ^>=2.1.2
-  - &dep-text-short                  text-short
-  - &dep-th-abstraction              th-abstraction
-  - &dep-time                        time                        >=1.14 && <2.0
-  - &dep-transformers                transformers                ^>=0.6.1
-  - &dep-typed-process               typed-process               ^>=0.2.13
-  - &dep-typerep-map                 typerep-map                 ^>=0.7.0
-  - &dep-unbounded-delays            unbounded-delays            ^>=0.1.1
-  - &dep-unix                        unix                        ^>=2.8.6
-  - &dep-unliftio                    unliftio                    ^>=0.2.25
-  - &dep-unliftio-core               unliftio-core               ^>=0.2.1
-  - &dep-utf8-string                 utf8-string                 ^>=1.0.2
-  - &dep-vector                      vector                      ^>=0.13.2
-  - &dep-directory                   directory
-  - &dep-MissingH                    MissingH
-
-  # Base, custom prelude
-  - &hswm-prelude
-    name: hswm:prelude
-    mixin: (HSWM.Prelude as Prelude)
   - &base
     name: base
     version: '>=4.21 && <5'
   - &base-noprelude
     <<: *base
     mixin: hiding (Prelude)
+  - &hswm-prelude
+    name: hswm:prelude
+    mixin: (HSWM.Prelude as Prelude)
+  - &JuicyPixels                 JuicyPixels                 ^>=3.3.9
+  - &aeson                       aeson                       >=2.2.3 && <2.4
+  - &aeson-pretty                aeson-pretty
+  - &async                       async                       ^>=2.2.6
+  - &bytestring                  bytestring                  ^>=0.12.2
+  - &containers                  containers                  >=0.7 && <1.0
+  - &data-default                data-default                ^>=0.8.0
+  - &exceptions                  exceptions                  ^>=0.10.9
+  - &fast-logger                 fast-logger                 ^>=3.2.6
+  - &filelock                    filelock                    ^>=0.1.1
+  - &filepath                    filepath
+  - &gi-glib                     gi-glib       >=2.0.30 && <2.1
+  - &haskeline                   haskeline                   ^>=0.8.4
+  - &microlens                   microlens
+  - &microlens-platform          microlens-platform          >=0.4 && <1
+  - &microlens-th                microlens-th
+  - &monad-logger                monad-logger
+  - &monad-logger-aeson          monad-logger-aeson          ^>=0.4.1
+  - &mtl                         mtl                         ^>=2.3.1
+  - &network                     network                     ^>=3.2.8
+  - &optparse-applicative        optparse-applicative >=0.18.1 && <0.20
+  - &optparse-generic            optparse-generic            ^>=1.5
+  - &pretty-simple               pretty-simple               ^>=4.1.4
+  - &prettyprinter               prettyprinter               ^>=1.7.1
+  - &prettyprinter-ansi-terminal prettyprinter-ansi-terminal ^>=1.1.3
+  - &prettyprinter-combinators   prettyprinter-combinators
+  - &process                     process                     ^>=1.6.25
+  - &random                      random
+  - &rio                         rio                         ^>=0.1.24
+  - &safe-exceptions             safe-exceptions
+  - &stm                         stm                         ^>=2.5.3
+  - &syb                         syb
+  - &template-haskell            template-haskell            >=2.20 && <3
+  - &text                        text                        ^>=2.1.2
+  - &text-short                  text-short
+  - &th-abstraction              th-abstraction
+  - &time                        time                        >=1.14 && <2.0
+  - &transformers                transformers                ^>=0.6.1
+  - &typed-process               typed-process               ^>=0.2.13
+  - &typerep-map                 typerep-map                 ^>=0.7.0
+  - &unbounded-delays            unbounded-delays            ^>=0.1.1
+  - &unix                        unix                        ^>=2.8.6
+  - &unliftio                    unliftio                    ^>=0.2.25
+  - &unliftio-core               unliftio-core               ^>=0.2.1
+  - &utf8-string                 utf8-string                 ^>=1.0.2
+  - &vector                      vector                      ^>=0.13.2
+  - &directory                   directory
+  - &MissingH                    MissingH
 
 library:
   source-dirs: src
@@ -132,41 +130,41 @@ library:
     - hswm-bindings
     - *hswm-prelude
     - *base-noprelude
-    - *dep-JuicyPixels
-    - *dep-aeson
-    - *dep-bytestring
-    - *dep-containers
-    - *dep-data-default
-    - *dep-fast-logger
-    - *dep-monad-logger
-    - *dep-filelock
-    - *dep-gi-glib
-    - *dep-mtl
-    - *dep-syb
-    - *dep-network
-    - *dep-optparse-applicative
-    - *dep-optparse-generic
-    - *dep-pretty-simple
-    - *dep-prettyprinter
-    - *dep-prettyprinter-combinators
-    - *dep-prettyprinter-ansi-terminal
-    - *dep-process
-    - *dep-template-haskell
-    - *dep-text
-    - *dep-time
-    - *dep-transformers
-    - *dep-typed-process
-    - *dep-typerep-map
-    - *dep-unbounded-delays
-    - *dep-unix
-    - *dep-utf8-string
-    - *dep-vector
-    - *dep-filepath
-    - *dep-text-short
-    - *dep-th-abstraction
-    - *dep-microlens-th
-    - *dep-directory
-    - *dep-MissingH
+    - *JuicyPixels
+    - *aeson
+    - *bytestring
+    - *containers
+    - *data-default
+    - *fast-logger
+    - *monad-logger
+    - *filelock
+    - *gi-glib
+    - *mtl
+    - *syb
+    - *network
+    - *optparse-applicative
+    - *optparse-generic
+    - *pretty-simple
+    - *prettyprinter
+    - *prettyprinter-combinators
+    - *prettyprinter-ansi-terminal
+    - *process
+    - *template-haskell
+    - *text
+    - *time
+    - *transformers
+    - *typed-process
+    - *typerep-map
+    - *unbounded-delays
+    - *unix
+    - *utf8-string
+    - *vector
+    - *filepath
+    - *text-short
+    - *th-abstraction
+    - *microlens-th
+    - *directory
+    - *MissingH
   when:
     - condition: flag(pie)
       ghc-options:
@@ -180,22 +178,22 @@ internal-libraries:
     source-dirs: hswm-prelude
     dependencies:
       - *base
-      - *dep-mtl
-      - *dep-stm
-      - *dep-text
-      - *dep-data-default
-      - *dep-async
-      - *dep-exceptions
-      - *dep-rio
-      - *dep-unliftio-core
-      - *dep-unliftio
-      - *dep-monad-logger-aeson
-      - *dep-microlens-platform
-      - *dep-microlens
-      - *dep-bytestring
-      - *dep-text-short
-      - *dep-safe-exceptions
-      - *dep-unix
+      - *mtl
+      - *stm
+      - *text
+      - *data-default
+      - *async
+      - *exceptions
+      - *rio
+      - *unliftio-core
+      - *unliftio
+      - *monad-logger-aeson
+      - *microlens-platform
+      - *microlens
+      - *bytestring
+      - *text-short
+      - *safe-exceptions
+      - *unix
   ipc-api:
     visibility: public
     exposed-modules: HSWM.IPC
@@ -205,13 +203,13 @@ internal-libraries:
     dependencies:
       - *base-noprelude
       - *hswm-prelude
-      - *dep-aeson
-      - *dep-bytestring
-      - *dep-network
-      - *dep-text
-      - *dep-utf8-string
-      - *dep-random
-      - *dep-optparse-generic
+      - *aeson
+      - *bytestring
+      - *network
+      - *text
+      - *utf8-string
+      - *random
+      - *optparse-generic
 
 executables:
   hswm:
@@ -221,9 +219,9 @@ executables:
     dependencies:
       - hswm
       - *base
-      - *dep-containers
-      - *dep-bytestring
-      - *dep-text
+      - *bytestring
+      - *containers
+      - *text
     ghc-options:
       - -threaded
       - -rtsopts
@@ -239,18 +237,18 @@ executables:
       - hswm:ipc-api
       - *hswm-prelude
       - *base-noprelude
-      - *dep-bytestring
-      - *dep-mtl
-      - *dep-text
-      - *dep-time
-      - *dep-aeson
-      - *dep-optparse-applicative
-      - *dep-optparse-generic
-      - *dep-haskeline
-      - *dep-prettyprinter
-      - *dep-prettyprinter-ansi-terminal
-      - *dep-aeson-pretty
-      - *dep-text-short
+      - *aeson
+      - *aeson-pretty
+      - *bytestring
+      - *haskeline
+      - *mtl
+      - *optparse-applicative
+      - *optparse-generic
+      - *prettyprinter
+      - *prettyprinter-ansi-terminal
+      - *text
+      - *text-short
+      - *time
     ghc-options:
       - -threaded
       - -rtsopts

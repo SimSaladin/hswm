@@ -43,7 +43,7 @@ void my_registry_log_fn(struct rxkb_context *ctx, enum rxkb_log_level level, con
 
 void my_context_log_fn(struct xkb_context *ctx, enum xkb_log_level level, const char *fmt, va_list ap) {
     void (*cb)(enum rxkb_log_level, char*) = xkb_context_get_user_data(ctx);
-    my_log_fn(cb, level, fmt, ap);
+    my_log_fn(cb, (enum rxkb_log_level)level, fmt, ap);
 }
 
 void (*freeFunPtrFn)(void *) = NULL;
@@ -63,15 +63,13 @@ void set_context_log_fn(struct xkb_context *ctx, void *freeFunPtr, void (*cb)(en
 void finalize_context(void *env, struct xkb_context *ctx) {
     xkb_context_set_user_data(ctx, NULL);
     xkb_context_unref(ctx);
-    if (env != NULL) {
+    if (env != NULL)
         freeFunPtrFn(env);
-    }
 }
 
 void finalize_registry(void *env, struct rxkb_context *ctx) {
     rxkb_context_set_user_data(ctx, NULL);
     rxkb_context_unref(ctx);
-    if (env != NULL) {
+    if (env != NULL)
         freeFunPtrFn(env);
-    }
 }

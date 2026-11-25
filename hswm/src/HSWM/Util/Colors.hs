@@ -8,45 +8,49 @@
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
---
-module HSWM.Util.Colors
-  (
+module HSWM.Util.Colors (
   -- * RGBA
-  RGBA(..),
+  RGBA (..),
+
   -- * RGBA from String
   parseRGBA,
+
   -- * RGBA from RiverColor
   fromRiverColor,
+
   -- * RGBA to RiverColor
   packRGBA,
+
   -- * Word32 to RiverColor
   bytesToRiverColor,
+
   -- * Mix RGBA
   overRGBA,
   mixRGBA,
-  -- * Solarized
-    pattern ColBase03,
-    pattern ColBase02,
-    pattern ColBase01,
-    pattern ColBase00,
-    pattern ColBase0,
-    pattern ColBase1,
-    pattern ColBase2,
-    pattern ColBase3,
-    pattern ColYellow,
-    pattern ColOrange,
-    pattern ColRed,
-    pattern ColMagenta,
-    pattern ColViolet,
-    pattern ColBlue,
-    pattern ColCyan,
-    pattern ColGreen
-  ) where
 
-import River (RiverColor (..))
+  -- * Solarized
+  pattern ColBase03,
+  pattern ColBase02,
+  pattern ColBase01,
+  pattern ColBase00,
+  pattern ColBase0,
+  pattern ColBase1,
+  pattern ColBase2,
+  pattern ColBase3,
+  pattern ColYellow,
+  pattern ColOrange,
+  pattern ColRed,
+  pattern ColMagenta,
+  pattern ColViolet,
+  pattern ColBlue,
+  pattern ColCyan,
+  pattern ColGreen,
+) where
+
+import Data.Ord
 import GHC.Stack
 import Numeric (readHex)
-import Data.Ord
+import River (RiverColor (..))
 
 -- | Parse a color in the format 0xRRGGBB or 0xRRGGBBAA and convert it to
 -- 32-bit color values (used by Window.set_borders in rwm).
@@ -141,10 +145,23 @@ unpremult (RGBA r g b a)
 
 -- | Solarized palette
 pattern
-  ColBase03,
-  ColBase02, ColBase01, ColBase00, ColBase0, ColBase1, ColBase2, ColBase3,
-  ColYellow, ColOrange, ColRed, ColMagenta, ColViolet, ColBlue, ColCyan, ColGreen
-    :: String
+  ColBase03
+  , ColBase02
+  , ColBase01
+  , ColBase00
+  , ColBase0
+  , ColBase1
+  , ColBase2
+  , ColBase3
+  , ColYellow
+  , ColOrange
+  , ColRed
+  , ColMagenta
+  , ColViolet
+  , ColBlue
+  , ColCyan
+  , ColGreen ::
+    String
 pattern ColBase03 = "0x002b36" -- "#002b36"
 pattern ColBase02 = "0x073642" -- "#073642"
 pattern ColBase01 = "0x586e75" -- "#586e75"

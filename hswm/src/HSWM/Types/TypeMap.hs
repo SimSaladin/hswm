@@ -11,26 +11,41 @@
 -- Portability : unportable
 --
 -- Type-indexed globals
-module HSWM.Types.TypeMap
-  ( MonadStateGlobal, MonadStateGlobal',
+module HSWM.Types.TypeMap (
+  MonadStateGlobal,
+  MonadStateGlobal',
   TypeMap,
-  TypeMapException(..),
-  HasGlobalTMap(..),
+  TypeMapException (..),
+  HasGlobalTMap (..),
+
   -- * With
-  withObject, withObjectDef, withOptionalObject,
+  withObject,
+  withObjectDef,
+  withOptionalObject,
+
   -- * get
-  getObject, getObjectDef, getOrCreateObject, getOrCreateObjectIO,
+  getObject,
+  getObjectDef,
+  getOrCreateObject,
+  getOrCreateObjectIO,
+
   -- * Create unique
-  createUnique, createUnique_,
+  createUnique,
+  createUnique_,
+
   -- * Put
   putObject,
+
   -- * Modify
-  modifyObject, modifyObjectDef, modifyObjectDef',
+  modifyObject,
+  modifyObjectDef,
+  modifyObjectDef',
+
   -- * Debug
   dumpObjects,
   --- * Inspect
-  Inspect(..),
-  ) where
+  Inspect (..),
+) where
 
 import Data.Aeson qualified as A
 import Data.Kind
@@ -67,7 +82,7 @@ instance (Inspect a) => Inspect (Maybe a) where
   inspect Nothing = "Nothing"
   inspect (Just x) = "Just " ++ inspectPrec 1 x
 instance (Inspect a, Typeable k, Show k) => Inspect (M.Map k a) where
-  inspectPrec _ x = unlines [ inspect k ++ " -> " ++ inspect v | (k, v) <- M.toList x ]
+  inspectPrec _ x = unlines [inspect k ++ " -> " ++ inspect v | (k, v) <- M.toList x]
 
 instance (Generic a, Typeable a, GInspect (Rep a)) => Inspect (Generically a) where
   inspectPrec p (Generically x) = ginspect p Top (from @_ @() x)
@@ -82,13 +97,14 @@ data IType = Rec | Top
 instance (GInspect f) => GInspect (D1 c f) where
   ginspect p t (M1 x) = ginspect p t x
 instance (GInspect f, Constructor c) => GInspect (C1 c f) where
-  ginspect p _ y@(M1 x) = brackets $
-    conName y
-      ++ " "
-      ++ ( if conIsRecord y
-             then "{ " ++ ginspect (p + 1) Rec x ++ " }"
-             else ginspect (p + 1) Top x
-         )
+  ginspect p _ y@(M1 x) =
+    brackets $
+      conName y
+        ++ " "
+        ++ ( if conIsRecord y
+               then "{ " ++ ginspect (p + 1) Rec x ++ " }"
+               else ginspect (p + 1) Top x
+           )
     where
       brackets s
         | p > 0 = "(" ++ s ++ ")"
@@ -98,7 +114,7 @@ instance (GInspect c1, GInspect c2) => GInspect (c1 :+: c2) where
   ginspect p t (R1 x) = ginspect p t x
 instance (GInspect c1, GInspect c2) => GInspect (c1 :*: c2) where
   ginspect p t@Rec (x :*: y) = ginspect p t x ++ ", " ++ ginspect p t y
-  ginspect p t (x :*: y)   = ginspect p t x ++ " " ++ ginspect p t y
+  ginspect p t (x :*: y) = ginspect p t x ++ " " ++ ginspect p t y
 instance (GInspect f, Selector i) => GInspect (S1 i f) where
   ginspect p Rec y@(M1 x) = selName y ++ " = " ++ ginspect (p + 1) Top x
   ginspect p _ (M1 x) = ginspect (p + 1) Top x

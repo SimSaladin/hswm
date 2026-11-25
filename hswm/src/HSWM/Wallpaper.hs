@@ -32,7 +32,7 @@ where
 import HSWM.BufferPool qualified as BP
 import HSWM.Core hiding (height, scale, size, width)
 import HSWM.Types.Simple
-import HSWM.Utils (getPixmanFormatBE)
+--import HSWM.Utils (getPixmanFormatBE)
 import Pixman qualified as P
 import River qualified as R
 import WL.Client qualified as WL
@@ -268,7 +268,7 @@ drawImage bp os img Surfaces{..} = do
       src_h = JP.imageHeight img
       src_stride = src_w * 4
       shmFormat = WL.ShmFormatABGR8888
-      pixmanFormat = getPixmanFormatBE shmFormat
+      --pixmanFormat = getPixmanFormatBE shmFormat -- P.A8B8G8R8
 
       -- Calculate the buffer size
       buf_size@(buf_w, buf_h)
@@ -312,11 +312,11 @@ drawImage bp os img Surfaces{..} = do
           P.scaleTransform sx sy False $
             P.translate tx ty False P.identityTransform
     pix <- do
-      res <- P.newImageWithBits pixmanFormat (fi src_w, fi src_h) True (castPtr bits) (fi src_stride)
+      res <- P.newImageWithBits @P.A8B8G8R8 (fi src_w, fi src_h) True (castPtr bits) (fi src_stride)
       P.setTransform (P.fromFTransform trans) res
       P.setFilter P.FilterBest [] res
       return res
-    res <- P.newImageWithBits pixmanFormat (buf.width, buf.height) False (castPtr buf.ptr) buf.stride
+    res <- P.newImageWithBits @P.A8B8G8R8 (buf.width, buf.height) False (castPtr buf.ptr) buf.stride
     P.setComposite @P.R32 P.SRC pix (def & P.compositeSize (fi buf_w, fi buf_h)) res
     return res
 

@@ -18,7 +18,7 @@ module WL.Client (
   ObjectName,
   getObjectId,
   getObjectDisplay,
-  HasMethod(..),
+  HasMethod (..),
 
   -- ** Object Tags
   Tag,

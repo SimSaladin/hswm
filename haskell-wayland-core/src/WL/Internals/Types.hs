@@ -1,7 +1,7 @@
+{-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE TypeFamilyDependencies #-}
 {-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE AllowAmbiguousTypes #-}
 
 -- |
 -- Module      : WL.Internals.Types
@@ -42,8 +42,8 @@ import Data.Void
 import Foreign
 import Foreign.C
 import Foreign.C.ConstPtr
-import GHC.TypeLits
 import GHC.OverloadedLabels
+import GHC.TypeLits
 
 import HsBindgen.Runtime.Prelude as ReExports (
   CEnum (..),
@@ -166,7 +166,6 @@ instance {-# OVERLAPPABLE #-} (Typeable a) => IsUserData (Ptr a)
 
 -- | Invoke methods by their C names via labels.
 class (Typeable object) => HasMethod (f :: Type -> Type) (method :: Symbol) object where
-
   type ObjectMethod f object method :: Type
 
   objectMethod :: object -> ObjectMethod f object method

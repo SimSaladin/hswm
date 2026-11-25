@@ -1,57 +1,74 @@
-{
-  lib,
-  stdenv,
-  callPackage,
-  runCommand,
+{ lib
+, stdenv
+, callPackage
+, runCommand
+, my-lib
+, make-zig-dependencies
+, pkg-config
+, versionCheckHook
 
-  src,
-  depsHash ? "",
-  my-lib,
-  updateRiverDeps,
+, zig
+, libGL
+, libx11
+, libevdev
+, libinput
+, libxkbcommon
+, pixman
+, scdoc
+, udev
+, wayland
+, wayland-protocols
+, wayland-scanner
+, wlroots_0_20
+, xwayland
 
-  libGL,
-  libx11,
-  libevdev,
-  libinput,
-  libxkbcommon,
-  pixman,
-  pkg-config,
-  scdoc,
-  udev,
-  versionCheckHook,
-  wayland,
-  wayland-protocols,
-  wayland-scanner,
-  wlroots_0_20,
-  xwayland,
-  zig, # tested with 0.16...
-  zig_0_16,
-  withManpages ? true,
-  xwaylandSupport ? true,
-  withDebug ? false,
-  useLLVM ?
-    stdenv.hostPlatform.isLinux || (stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isx86_64),
+, src
+, depsHash ? ""
+, withManpages ? true
+, xwaylandSupport ? true
+, withDebug ? false
+, useLLVM ? stdenv.hostPlatform.isLinux || (stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isx86_64)
+,
 }:
 
 let
-  readZigZonVersion =
-    file:
+  get-build-zig-zon-version = { src, filename ? "build.zig.zon" }:
     lib.fileContents (
       runCommand "get-version" { } ''
-        sed -nE '/\.version =/s/^.*?"(.+-dev|.+)".*$/\1/p' ${file} >$out
+        sed -nE '/\.version =/s/^.*?"(.+-dev|.+)".*$/\1/p' ${toString src}/${filename} >$out
       ''
     );
 
   # Unpack all deps in case they are tarballs for use with zig build "--system"
   prepareZigDB =
-    src:
+    {src, pname, depsHash, ...}:
+    let
+      zig-packages-nix = my-lib.mkFOD {
+        name = "${pname}-zig-packages.nix";
+        inherit src;
+        hash = depsHash;
+        nativeBuildInputs = [ make-zig-dependencies ];
+        buildPhase = ''
+          export ZIG_GLOBAL_CACHE_DIR=$(mktemp -d)
+          make-zig-dependencies
+        '';
+        passthru = make-zig-dependencies.passthru // {
+          inherit make-zig-dependencies;
+        };
+      };
+      zig-packages = callPackage (import (toString zig-packages-nix)) {
+        inherit (zig-packages-nix.passthru.zig-env) zig;
+      };
+    in
     runCommand "zig-packages"
       {
-        passthru = { inherit src; };
+        passthru = zig-packages-nix.passthru // {
+          inherit zig-packages-nix zig-packages;
+        };
       }
       ''
         mkdir -p $out
-        for pkg in ${src}/*; do
+        for pkg in ${zig-packages}/*; do
           if [[ -d $(readlink -f "$pkg") ]]; then
             echo "error: is directory:  (cp -rv --no-preserve=all '$pkg/ $out/$name)"
             exit 1
@@ -60,34 +77,13 @@ let
           fi
         done
       '';
-
-  build-zig-zon-nix = my-lib.mkFOD {
-    inherit src;
-    name = "zig-packages";
-    hash = depsHash;
-    nativeBuildInputs = [ updateRiverDeps ];
-    buildPhase = ''
-      export ZIG_GLOBAL_CACHE_DIR=$(mktemp -d)
-      make-zig-dependencies
-    '';
-  };
-
-  calculatedDeps = callPackage (import "${build-zig-zon-nix}") {
-    zig = zig_0_16;
-    runCommand =
-      name: attrs: cmd:
-      runCommand name (attrs) ''
-        export ZIG_GLOBAL_CACHE_DIR=$(mktemp -d)
-        ${cmd}
-      '';
-  };
 in
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "river";
 
   version =
-    readZigZonVersion (toString src + "/build.zig.zon")
+    get-build-zig-zon-version { inherit src; }
     # in case src is a flake input, add extra info to version
     + lib.optionalString (lib.isAttrs src && src ? sourceInfo) (
       lib.optionalString (src.sourceInfo ? lastModifiedDate)
@@ -95,11 +91,13 @@ stdenv.mkDerivation (finalAttrs: {
       + lib.optionalString (src.sourceInfo ? shortRev) "-g${src.sourceInfo.shortRev}"
     );
 
+  inherit src depsHash;
+
   outputs = [ "out" ] ++ lib.optionals withManpages [ "man" ];
 
-  src = src;
-
-  deps = prepareZigDB calculatedDeps;
+  deps = prepareZigDB {
+    inherit (finalAttrs) pname src depsHash;
+  };
 
   strictDeps = true;
 
@@ -147,9 +145,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru = {
     providedSessions = [ "river" ];
-    inherit calculatedDeps;
-    inherit build-zig-zon-nix;
-    inherit zig;
+    inherit zig make-zig-dependencies;
   };
 
   meta = {

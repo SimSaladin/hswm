@@ -6,7 +6,6 @@
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
---
 module HSWM.Layout (
   Full (..),
   Tall (..),

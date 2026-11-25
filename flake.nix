@@ -19,9 +19,6 @@
     nixpkgs-nixos.url = "github:nixos/nixpkgs?ref=nixos-unstable";
     nixpkgs.follows = "haskellNix/nixpkgs-unstable";
 
-    # cabal 3.18
-    nix-tools.url = "github:SimSaladin/haskell.nix?dir=nix-tools&ref=sim/cabal-3.18";
-
     haskell-language-server = {
       url = "github:haskell/haskell-language-server";
     };
@@ -129,6 +126,13 @@
                 deadnix.enable = true;
                 shellcheck.enable = true;
                 mdl.enable = true; # .md
+                pretty-format-json.enable = true;
+                update-river-protocols = {
+                  enable = true;
+                  name = "Update river protocol files";
+                  entry = config.apps.updateProtocols.program;
+                  pass_filenames = false;
+                };
               };
               excludes = [
                 "nix/materialized/.*"
@@ -143,11 +147,15 @@
                   name = "update-protocols";
                   runtimeInputs = [ ];
                   text = ''
-                    set -x
-                    upstream=${inputs.river}/protocol
-                    current=./hswm-bindings/protocol/
-                    diff -r $current $upstream || :
-                    cp -v -t "$current" $upstream/*.xml
+                    dst=hswm-bindings/protocol
+                    src=${inputs.river}/protocol
+                    cp -vu --no-preserve=mode -t "$dst" "$src"/*.xml
+                    for f in "$src"/*.xml; do
+                      git add --intent-to-add "$dst/$(basename -- "$f")" || :
+                      if ! diff -q "$f" "$dst/$(basename -- "$f")" >/dev/null; then
+                        cp -v --no-preserve=mode -t "$dst" "$f"
+                      fi
+                    done
                   '';
                 };
               };

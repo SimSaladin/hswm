@@ -12,8 +12,10 @@ module HSWM.Prelude (
   -- * Base
   module RIO.Prelude.Types,
   module RIO.Prelude,
+
   -- ** RIO
   module RIO,
+
   -- ** From base
   module Base,
 
@@ -34,12 +36,15 @@ module HSWM.Prelude (
   module UnliftIO.Environment,
   module UnliftIO.Foreign,
   module UnliftIO.IO.File,
+
   -- ** UnliftIO.Concurrent
   module UnliftIO.Concurrent,
 
   -- * Exception
+
   -- ** Control.Exception.Safe
   module Control.Exception.Safe,
+
   -- ** UnliftIO.Exception
   module UnliftIO.Exception,
   throwIO,
@@ -78,8 +83,8 @@ import UnliftIO.Async
 import UnliftIO.Chan
 import UnliftIO.IO
 import UnliftIO.IORef
-import UnliftIO.Memoize
 import UnliftIO.MVar
+import UnliftIO.Memoize
 import UnliftIO.QSem
 import UnliftIO.QSemN
 import UnliftIO.STM
@@ -91,9 +96,9 @@ import "unliftio" UnliftIO.Environment
 import "unliftio" UnliftIO.Foreign
 import "unliftio" UnliftIO.IO.File
 
+import Control.Exception.Safe hiding (throwIO, throwString)
+import Control.Exception.Safe qualified as Safe
 import UnliftIO.Exception (throwString)
-import Control.Exception.Safe hiding (throwString, throwIO)
-import qualified Control.Exception.Safe as Safe
 
 import "base" Data.List as Base (zip3)
 import "base" Data.Monoid as Base (Any (..), Endo (..))
@@ -106,7 +111,10 @@ import "rio" RIO (ExitCode (..), exitFailure, exitSuccess)
 import "rio" RIO.Prelude
 import "rio" RIO.Prelude.Types
 
+import Control.Concurrent qualified
 import Data.Text.Short (ShortText)
+import GHC.Stack
+import System.Posix (Fd)
 import "async" Control.Concurrent.Async qualified as Async
 import "bytestring" Data.ByteString qualified as BS
 import "bytestring" Data.ByteString.Lazy (LazyByteString)
@@ -118,14 +126,11 @@ import "mtl" Control.Monad.State as Misc (MonadState, gets, modify)
 import "stm" Control.Concurrent.STM as Misc (flushTQueue)
 import "text" Data.Text qualified as T
 import "text" Data.Text.Lazy qualified as TL
-import GHC.Stack
-import qualified Control.Concurrent
-import System.Posix (Fd)
 
-threadWaitReadSTM :: MonadIO m => Fd -> m (STM (), IO ())
+threadWaitReadSTM :: (MonadIO m) => Fd -> m (STM (), IO ())
 threadWaitReadSTM = liftIO . Control.Concurrent.threadWaitReadSTM
 
-threadWaitWriteSTM :: MonadIO m => Fd -> m (STM (), IO ())
+threadWaitWriteSTM :: (MonadIO m) => Fd -> m (STM (), IO ())
 threadWaitWriteSTM = liftIO . Control.Concurrent.threadWaitWriteSTM
 
 throwIO :: (HasCallStack, MonadIO m, Exception e) => e -> m a

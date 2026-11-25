@@ -277,7 +277,7 @@ connectToWM clientVar = do
   handleErrors $ C.clientRunWith def $ \client -> do
     logInfo "Connected"
     bracket_ (putMVar clientVar client) (takeMVar clientVar) $
-      C.receiveMessages handleMsgG client
+      C.handleMessages handleMsgG client
     return ""
   where
     handleErrors run =
@@ -400,7 +400,7 @@ workspaceOnClick btn = do
   s <- getInstanceState
   let outputId = fromMaybe maxBound (L.lookup s.thisOutputName g.outputs)
   withMVar g.wmClient $ \c ->
-    C.sendMsg c $ C.Contents (C.WmCtrl $ C.WmCtrlActionValue $ A.toJSON (C.ViewWorkspaceOnScreen{tag, screen = outputId} :: C.WmCtrlAction) :: C.Request) Nothing
+    C.sendMsg c $ C.Contents (C.WmCtrl (C.ViewWorkspaceOnScreen{tag, screen = outputId} :: C.WmCtrlAction) :: C.Request) Nothing
 
 updateFocusInfo :: Label -> PlugM ()
 updateFocusInfo fiLabel = do
@@ -432,7 +432,7 @@ mkWorkspaceLabel :: WorkspaceInfo -> Maybe OutputId -> Maybe Text -> PlugM Text
 mkWorkspaceLabel ws screen outputName = do
   c <- getInstanceConf
   runTextFormatWith (if isJust screen then c.wsFormatVisible else c.wsFormatHidden) $ \case
-    "tag" -> formatted ws.tag
+    "tag" -> formatted ws.tag.unwrap
     "keyhint" -> formatted ws.keyhint
     "layout" -> formatted ws.layout
     "screen" -> formatted $ fmap fromEnum screen
@@ -443,7 +443,7 @@ mkWorkspaceTooltip :: WorkspaceInfo -> Maybe OutputId -> Maybe Text -> PlugM Tex
 mkWorkspaceTooltip ws screen outputName = do
   c <- getInstanceConf
   runTextFormatWith (if isJust screen then c.wsTooltipFormatVisible else c.wsTooltipFormatHidden) $ \case
-    "tag" -> formatted ws.tag
+    "tag" -> formatted ws.tag.unwrap
     "keyhint" -> formatted ws.keyhint
     "layout" -> formatted ws.layout
     "numWindows" -> formatted $ length ws.windowList

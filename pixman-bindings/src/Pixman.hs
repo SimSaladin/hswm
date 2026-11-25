@@ -88,15 +88,11 @@ module Pixman (
   -- * Image
   IsImage (..),
 
-  -- ** Untyped
+  -- ** New with bits
   Image,
+  TypedImage,
   newEmptyImage,
   newImageWithBits,
-
-  -- ** Typed
-  TypedImage,
-  newEmptyTypedImage,
-  newTypedImageWithBits,
   imageToTypedImage,
 
   -- ** Solid
@@ -111,34 +107,32 @@ module Pixman (
   gradientStop,
   GradientStop,
 
-  -- ** Set properties
+  -- ** Repeat
   setRepeat,
   Repeat (RepeatNone, RepeatNormal, RepeatPad, RepeatReflect),
+  -- ** Dither
   setDither,
   Dither (DitherNone, DitherFast, DitherGood, DitherBest, OrderedBayer8, OrderedBlueNoise64),
+  -- ** Clipping
   setSourceClipping,
+  setClipRegion,
+  setHasClientClip,
+  -- ** Alpha map
   setAlphaMap,
   clearAlphaMap,
+  -- ** Component alpha
   setComponentAlpha,
+  -- ** Set transform
   setTransform,
   clearTransform,
+  -- ** Filter
   setFilter,
   Filter (FilterFast, FilterGood, FilterBest, Nearest, Bilinear, Convolution, SeparableConvolution),
   separableConvolutionParams,
   SeparableConvolutionSettings (..),
   setFilterSeparableConvolution,
-  Kernel (
-    KernelImpulse,
-    KernelBox,
-    KernelLinear,
-    KernelCubic,
-    KernelGaussian,
-    KernelLanczos2,
-    KernelLanczos3,
-    KernelLanczos3Stretched
-  ),
-  setClipRegion,
-  setHasClientClip,
+  Kernel (Impulse, KernelBox, Linear, Cubic, Gaussian, Lanczos2, Lanczos3, Lanczos3Stretched),
+  -- ** Set indexed
   setIndexed,
   Indexed,
 
@@ -178,6 +172,8 @@ module Pixman (
   Operation,
   OP (..),
   REVERSE (..),
+  toOperation,
+  fromOperation,
 
   -- * Functions
   blit,
@@ -187,94 +183,27 @@ module Pixman (
   sampleCeilY,
   sampleFloorY,
 
-  -- * Formats
+  -- * ImageFormat
+  IsImageFormat(..),
   ImageFormat (..),
+  allFormats,
+
+  -- ** Format code
   FormatCode,
   rawFormatCode,
 
-  -- ** Functions
-  formatColor,
-  formatBPP,
-  formatDepth,
-  formatType,
+  -- ** Format type
+  ImageFormatType,
   FormatType (..),
-  -- FormatType (A, ARGB, ABGR, ColorType, Gray, YUY2Type, YV12Type, BGRA, RGBA, ARGBsRGB, RGBAFloatFormat, OtherType),
+  formatType,
+  formatColor,
+  formatDepth,
   formatSupportedDest,
   formatSupportedSource,
-  allFormats,
 
-  -- ** 128bpp
-  pattern RGBAFloat,
-
-  -- ** 96bpp
-  pattern RGBFloat,
-
-  -- ** 64bpp
-  pattern A16B16G16R16,
-
-  -- ** 32bpp
-  pattern A8R8G8B8,
-  pattern X8R8G8B8,
-  pattern A8B8G8R8,
-  pattern X8B8G8R8,
-  pattern B8G8R8A8,
-  pattern B8G8R8X8,
-  pattern R8G8B8A8,
-  pattern R8G8B8X8,
-  pattern X14R6G6B6,
-  pattern X2R10G10B10,
-  pattern A2R10G10B10,
-  pattern X2B10G10R10,
-  pattern A2B10G10R10,
-
-  -- ** sRGB
-  pattern A8R8G8B8_sRGB,
-  pattern R8G8B8_sRGB,
-
-  -- ** 24bpp
-  pattern R8G8B8,
-  pattern B8G8R8,
-
-  -- ** 16bpp
-  pattern R5G6B5,
-  pattern B5G6R5,
-  pattern A1R5G5B5,
-  pattern X1R5G5B5,
-  pattern A1B5G5R5,
-  pattern X1B5G5R5,
-  pattern A4R4G4B4,
-  pattern X4R4G4B4,
-  pattern A4B4G4R4,
-  pattern X4B4G4R4,
-
-  -- ** 8bpp
-  pattern A8,
-  pattern R3G3B2,
-  pattern B2G3R3,
-  pattern A2R2G2B2,
-  pattern A2B2G2R2,
-  pattern C8,
-  pattern G8,
-  pattern X4A4,
-  pattern X4C4,
-  pattern X4G4,
-
-  -- ** 4bpp
-  pattern A4,
-  pattern R1G2B1,
-  pattern B1G2R1,
-  pattern A1R1G1B1,
-  pattern A1B1G1R1,
-  pattern C4,
-  pattern G4,
-
-  -- ** 1bpp
-  pattern A1,
-  pattern G1,
-
-  -- ** YUV
-  pattern YUY2,
-  pattern YV12,
+  -- ** Format BPP
+  ImageFormatBPP,
+  formatBPP,
 
   -- * Exceptions
   PixmanException (..),
@@ -300,7 +229,6 @@ import Control.DeepSeq
 import Control.Exception
 import Control.Monad
 import Control.Monad.Primitive
-import Data.Char qualified as C
 import Data.Coerce
 import Data.Default
 import Data.Fixed qualified as Fixed
@@ -318,6 +246,7 @@ import Numeric (readHex)
 import System.IO.Unsafe
 import Text.Printf
 import Text.Read (Read (..))
+import GHC.TypeLits
 
 -- * Types
 
@@ -457,6 +386,7 @@ toSpanFix G.Pixman_span_fix_t{..} = SpanFix{l = coerce l, r = coerce r, y = coer
 
 -- | A single trap
 data Trap = Trap {top, bot :: !SpanFix}
+  deriving (Eq, Ord, Generic)
 
 instance Storable Trap where
   sizeOf _ = sizeOf @G.Pixman_trap_t undefined
@@ -467,6 +397,7 @@ instance Storable Trap where
   poke p Trap{..} = poke (castPtr p) G.Pixman_trap_t{top = fromSpanFix top, bot = fromSpanFix bot}
 
 data SpanFix = SpanFix {l, r, y :: !Fixed}
+  deriving (Eq, Ord, Generic)
 
 -- | A trapezoid
 data Trapezoid = Trapezoid
@@ -485,7 +416,7 @@ instance Storable Trapezoid where
 
 -- | A line consists of two 'Point's.
 data Line a = Line {p1, p2 :: !(Point a)}
-  deriving stock (Eq, Generic)
+  deriving stock (Eq, Ord, Generic)
 
 triangle :: Point Fixed -> Point Fixed -> Point Fixed -> Triangle
 triangle = Triangle
@@ -576,123 +507,12 @@ instance Show FTransform where
 
 -- | Possible format codes
 type FormatCode = G.Pixman_format_code_t
-
-rawFormatCode :: FormatCode -> CUInt
-rawFormatCode = CE.fromCEnum -- getField @"unwrap"
-
 deriving via (CE.AsCEnum FormatCode) instance Bounded FormatCode
 deriving via (CE.AsCEnum FormatCode) instance Enum FormatCode
-
 instance NFData FormatCode
 
-pattern RGBAFloat :: FormatCode
-pattern RGBAFloat = G.PIXMAN_rgba_float
-pattern RGBFloat :: FormatCode
-pattern RGBFloat = G.PIXMAN_rgb_float
-pattern A16B16G16R16 :: FormatCode
-pattern A16B16G16R16 = G.PIXMAN_a16b16g16r16
-pattern A8R8G8B8 :: FormatCode
-pattern A8R8G8B8 = G.PIXMAN_a8r8g8b8
-pattern X8R8G8B8 :: FormatCode
-pattern X8R8G8B8 = G.PIXMAN_x8r8g8b8
-pattern A8B8G8R8 :: FormatCode
-pattern A8B8G8R8 = G.PIXMAN_a8b8g8r8
-pattern X8B8G8R8 :: FormatCode
-pattern X8B8G8R8 = G.PIXMAN_x8b8g8r8
-pattern B8G8R8A8 :: FormatCode
-pattern B8G8R8A8 = G.PIXMAN_b8g8r8a8
-pattern B8G8R8X8 :: FormatCode
-pattern B8G8R8X8 = G.PIXMAN_b8g8r8x8
-pattern R8G8B8A8 :: FormatCode
-pattern R8G8B8A8 = G.PIXMAN_r8g8b8a8
-pattern R8G8B8X8 :: FormatCode
-pattern R8G8B8X8 = G.PIXMAN_r8g8b8x8
-pattern X14R6G6B6 :: FormatCode
-pattern X14R6G6B6 = G.PIXMAN_x14r6g6b6
-pattern X2R10G10B10 :: FormatCode
-pattern X2R10G10B10 = G.PIXMAN_x2r10g10b10
-pattern A2R10G10B10 :: FormatCode
-pattern A2R10G10B10 = G.PIXMAN_a2r10g10b10
-pattern X2B10G10R10 :: FormatCode
-pattern X2B10G10R10 = G.PIXMAN_x2b10g10r10
-pattern A2B10G10R10 :: FormatCode
-pattern A2B10G10R10 = G.PIXMAN_a2b10g10r10
-pattern A8R8G8B8_sRGB :: FormatCode
-pattern A8R8G8B8_sRGB = G.PIXMAN_a8r8g8b8_sRGB
-pattern R8G8B8_sRGB :: FormatCode
-pattern R8G8B8_sRGB = G.PIXMAN_r8g8b8_sRGB
-pattern R8G8B8 :: FormatCode
-pattern R8G8B8 = G.PIXMAN_r8g8b8
-pattern B8G8R8 :: FormatCode
-pattern B8G8R8 = G.PIXMAN_b8g8r8
-pattern R5G6B5 :: FormatCode
-pattern R5G6B5 = G.PIXMAN_r5g6b5
-pattern B5G6R5 :: FormatCode
-pattern B5G6R5 = G.PIXMAN_b5g6r5
-pattern A1R5G5B5 :: FormatCode
-pattern A1R5G5B5 = G.PIXMAN_a1r5g5b5
-pattern X1R5G5B5 :: FormatCode
-pattern X1R5G5B5 = G.PIXMAN_x1r5g5b5
-pattern A1B5G5R5 :: FormatCode
-pattern A1B5G5R5 = G.PIXMAN_a1b5g5r5
-pattern X1B5G5R5 :: FormatCode
-pattern X1B5G5R5 = G.PIXMAN_x1b5g5r5
-pattern A4R4G4B4 :: FormatCode
-pattern A4R4G4B4 = G.PIXMAN_a4r4g4b4
-pattern X4R4G4B4 :: FormatCode
-pattern X4R4G4B4 = G.PIXMAN_x4r4g4b4
-pattern A4B4G4R4 :: FormatCode
-pattern A4B4G4R4 = G.PIXMAN_a4b4g4r4
-pattern X4B4G4R4 :: FormatCode
-pattern X4B4G4R4 = G.PIXMAN_x4b4g4r4
-pattern A8 :: FormatCode
-pattern A8 = G.PIXMAN_a8
-pattern R3G3B2 :: FormatCode
-pattern R3G3B2 = G.PIXMAN_r3g3b2
-pattern B2G3R3 :: FormatCode
-pattern B2G3R3 = G.PIXMAN_b2g3r3
-pattern A2R2G2B2 :: FormatCode
-pattern A2R2G2B2 = G.PIXMAN_a2r2g2b2
-pattern A2B2G2R2 :: FormatCode
-pattern A2B2G2R2 = G.PIXMAN_a2b2g2r2
-pattern C8 :: FormatCode
-pattern C8 = G.PIXMAN_c8
-pattern G8 :: FormatCode
-pattern G8 = G.PIXMAN_g8
-pattern X4A4 :: FormatCode
-pattern X4A4 = G.PIXMAN_x4a4
-pattern X4C4 :: FormatCode
-pattern X4C4 = G.PIXMAN_x4c4
-pattern X4G4 :: FormatCode
-pattern X4G4 = G.PIXMAN_x4g4
-pattern A4 :: FormatCode
-pattern A4 = G.PIXMAN_a4
-pattern R1G2B1 :: FormatCode
-pattern R1G2B1 = G.PIXMAN_r1g2b1
-pattern B1G2R1 :: FormatCode
-pattern B1G2R1 = G.PIXMAN_b1g2r1
-pattern A1R1G1B1 :: FormatCode
-pattern A1R1G1B1 = G.PIXMAN_a1r1g1b1
-pattern A1B1G1R1 :: FormatCode
-pattern A1B1G1R1 = G.PIXMAN_a1b1g1r1
-pattern C4 :: FormatCode
-pattern C4 = G.PIXMAN_c4
-pattern G4 :: FormatCode
-pattern G4 = G.PIXMAN_g4
-pattern A1 :: FormatCode
-pattern A1 = G.PIXMAN_a1
-
--- | 1bpp G1
-pattern G1 :: FormatCode
-pattern G1 = G.PIXMAN_g1
-
--- | YUV YUY2
-pattern YUY2 :: FormatCode
-pattern YUY2 = G.PIXMAN_yuy2
-
--- | YUV YV12
-pattern YV12 :: FormatCode
-pattern YV12 = G.PIXMAN_yv12
+rawFormatCode :: FormatCode -> CUInt
+rawFormatCode = CE.fromCEnum
 
 type data ImageFormat
   = RGBAFloat
@@ -747,13 +567,111 @@ type data ImageFormat
   | YUY2
   | YV12
 
-type family ImageFormatType (format :: ImageFormat) :: FormatType
-type instance ImageFormatType A1 = A
-type instance ImageFormatType A4 = A
-type instance ImageFormatType A8 = A
-type instance ImageFormatType X4A4 = A
-type instance ImageFormatType C4 = COLOR
-type instance ImageFormatType C8 = COLOR
+type family ImageFormatType (format :: ImageFormat) :: FormatType where
+  ImageFormatType RGBAFloat = RGBA_FLOAT
+  ImageFormatType RGBFloat = RGBA_FLOAT
+  ImageFormatType A16B16G16R16 = ABGR
+  ImageFormatType A8R8G8B8 = ARGB
+  ImageFormatType X8R8G8B8 = ARGB
+  ImageFormatType A8B8G8R8 = ABGR
+  ImageFormatType X8B8G8R8 = ABGR
+  ImageFormatType B8G8R8A8 = BGRA
+  ImageFormatType B8G8R8X8 = BGRA
+  ImageFormatType R8G8B8A8 = RGBA
+  ImageFormatType R8G8B8X8 = RGBA
+  ImageFormatType X14R6G6B6 = ARGB
+  ImageFormatType X2R10G10B10 = ARGB
+  ImageFormatType A2R10G10B10 = ARGB
+  ImageFormatType X2B10G10R10 = ABGR
+  ImageFormatType A2B10G10R10 = ABGR
+  ImageFormatType A8R8G8B8_sRGB = ARGBsRGB
+  ImageFormatType R8G8B8_sRGB = ARGBsRGB
+  ImageFormatType R8G8B8 = ARGB
+  ImageFormatType B8G8R8 = ABGR
+  ImageFormatType R5G6B5 = ARGB
+  ImageFormatType B5G6R5 = ABGR
+  ImageFormatType A1R5G5B5 = ARGB
+  ImageFormatType X1R5G5B5 = ARGB
+  ImageFormatType A1B5G5R5 = ABGR
+  ImageFormatType X1B5G5R5 = ABGR
+  ImageFormatType A4R4G4B4 = ARGB
+  ImageFormatType X4R4G4B4 = ARGB
+  ImageFormatType A4B4G4R4 = ABGR
+  ImageFormatType X4B4G4R4 = ABGR
+  ImageFormatType R3G3B2 = ARGB
+  ImageFormatType B2G3R3 = ABGR
+  ImageFormatType A2R2G2B2 = ABGR
+  ImageFormatType A2B2G2R2 = ABGR
+  ImageFormatType G8 = GRAY
+  ImageFormatType X4C4 = COLOR
+  ImageFormatType X4G4 = GRAY
+  ImageFormatType R1G2B1 = ABGR
+  ImageFormatType B1G2R1 = ABGR
+  ImageFormatType A1R1G1B1 = ARGB
+  ImageFormatType A1B1G1R1 = ABGR
+  ImageFormatType G4 = GRAY
+  ImageFormatType G1 = GRAY
+  ImageFormatType YUY2 = YUY2_TYPE
+  ImageFormatType YV12 = YV12_TYPE
+  ImageFormatType A1 = A
+  ImageFormatType A4 = A
+  ImageFormatType A8 = A
+  ImageFormatType X4A4 = A
+  ImageFormatType C4 = COLOR
+  ImageFormatType C8 = COLOR
+
+type family ImageFormatBPP (format :: ImageFormat) :: Nat where
+  ImageFormatBPP RGBAFloat = 128
+  ImageFormatBPP RGBFloat = 96
+  ImageFormatBPP A16B16G16R16 = 64
+  ImageFormatBPP A8R8G8B8 = 32
+  ImageFormatBPP X8R8G8B8 = 32
+  ImageFormatBPP A8B8G8R8 = 32
+  ImageFormatBPP X8B8G8R8 = 32
+  ImageFormatBPP B8G8R8A8 = 32
+  ImageFormatBPP B8G8R8X8 = 32
+  ImageFormatBPP R8G8B8A8 = 32
+  ImageFormatBPP R8G8B8X8 = 32
+  ImageFormatBPP X14R6G6B6 = 32
+  ImageFormatBPP X2R10G10B10 = 32
+  ImageFormatBPP A2R10G10B10 = 32
+  ImageFormatBPP X2B10G10R10 = 32
+  ImageFormatBPP A2B10G10R10 = 32
+  ImageFormatBPP A8R8G8B8_sRGB = 32
+  ImageFormatBPP R8G8B8_sRGB = 32
+  ImageFormatBPP R8G8B8 = 24
+  ImageFormatBPP B8G8R8 = 24
+  ImageFormatBPP R5G6B5 = 16
+  ImageFormatBPP B5G6R5 = 16
+  ImageFormatBPP A1R5G5B5 = 16
+  ImageFormatBPP X1R5G5B5 = 16
+  ImageFormatBPP A1B5G5R5 = 16
+  ImageFormatBPP X1B5G5R5 = 16
+  ImageFormatBPP A4R4G4B4 = 16
+  ImageFormatBPP X4R4G4B4 = 16
+  ImageFormatBPP A4B4G4R4 = 16
+  ImageFormatBPP X4B4G4R4 = 16
+  ImageFormatBPP R3G3B2 = 8
+  ImageFormatBPP B2G3R3 = 8
+  ImageFormatBPP A2R2G2B2 = 8
+  ImageFormatBPP A2B2G2R2 = 8
+  ImageFormatBPP G8 = 8
+  ImageFormatBPP X4C4 = 8
+  ImageFormatBPP X4G4 = 8
+  ImageFormatBPP R1G2B1 = 4
+  ImageFormatBPP B1G2R1 = 4
+  ImageFormatBPP A1R1G1B1 = 4
+  ImageFormatBPP A1B1G1R1 = 4
+  ImageFormatBPP G4 = 4
+  ImageFormatBPP G1 = 1
+  ImageFormatBPP YUY2 = 14
+  ImageFormatBPP YV12 = 12
+  ImageFormatBPP A1 = 1
+  ImageFormatBPP A4 = 4
+  ImageFormatBPP A8 = 8
+  ImageFormatBPP X4A4 = 8
+  ImageFormatBPP C4 = 4
+  ImageFormatBPP C8 = 8
 
 -- | @PIXMAN_TYPE_*@
 data FormatType
@@ -771,16 +689,67 @@ data FormatType
   | RGBA_FLOAT -- 11
   deriving stock (Eq, Ord, Bounded, Generic)
 
--- newtype FormatType = FormatType {unwrap :: CInt}
---  deriving stock (Eq, Generic)
---  deriving newtype (Storable, Ord, Real, Integral, Num)
-
 class (Typeable a) => IsImageFormat a where
+
   imageFormatCode :: Proxy a -> FormatCode
 
+  imageFormatBPP :: Proxy a -> Int
+  imageFormatBPP proxy = formatBPP $ imageFormatCode proxy
+
 instance (Typeable a) => IsImageFormat (a :: ImageFormat) where
-  -- TODO hack implementation
-  imageFormatCode proxy = read $ "PIXMAN_" ++ map C.toLower (show (typeRep proxy))
+  imageFormatCode proxy
+    | Just (_ :: Proxy RGBAFloat) <- cast proxy = G.PIXMAN_rgba_float
+    | Just (_ :: Proxy RGBFloat) <- cast proxy = G.PIXMAN_rgb_float
+    | Just (_ :: Proxy A16B16G16R16) <- cast proxy = G.PIXMAN_a16b16g16r16
+    | Just (_ :: Proxy A8R8G8B8) <- cast proxy = G.PIXMAN_a8r8g8b8
+    | Just (_ :: Proxy X8R8G8B8) <- cast proxy = G.PIXMAN_x8r8g8b8
+    | Just (_ :: Proxy A8B8G8R8) <- cast proxy = G.PIXMAN_a8b8g8r8
+    | Just (_ :: Proxy X8B8G8R8) <- cast proxy = G.PIXMAN_x8b8g8r8
+    | Just (_ :: Proxy B8G8R8A8) <- cast proxy = G.PIXMAN_b8g8r8a8
+    | Just (_ :: Proxy B8G8R8X8) <- cast proxy = G.PIXMAN_b8g8r8x8
+    | Just (_ :: Proxy R8G8B8A8) <- cast proxy = G.PIXMAN_r8g8b8a8
+    | Just (_ :: Proxy R8G8B8X8) <- cast proxy = G.PIXMAN_r8g8b8x8
+    | Just (_ :: Proxy X14R6G6B6) <- cast proxy = G.PIXMAN_x14r6g6b6
+    | Just (_ :: Proxy X2R10G10B10) <- cast proxy = G.PIXMAN_x2r10g10b10
+    | Just (_ :: Proxy A2R10G10B10) <- cast proxy = G.PIXMAN_a2r10g10b10
+    | Just (_ :: Proxy X2B10G10R10) <- cast proxy = G.PIXMAN_x2b10g10r10
+    | Just (_ :: Proxy A2B10G10R10) <- cast proxy = G.PIXMAN_a2b10g10r10
+    | Just (_ :: Proxy A8R8G8B8_sRGB) <- cast proxy = G.PIXMAN_a8r8g8b8_sRGB
+    | Just (_ :: Proxy R8G8B8_sRGB) <- cast proxy = G.PIXMAN_r8g8b8_sRGB
+    | Just (_ :: Proxy R8G8B8) <- cast proxy = G.PIXMAN_r8g8b8
+    | Just (_ :: Proxy B8G8R8) <- cast proxy = G.PIXMAN_b8g8r8
+    | Just (_ :: Proxy R5G6B5) <- cast proxy = G.PIXMAN_r5g6b5
+    | Just (_ :: Proxy B5G6R5) <- cast proxy = G.PIXMAN_b5g6r5
+    | Just (_ :: Proxy A1R5G5B5) <- cast proxy = G.PIXMAN_a1r5g5b5
+    | Just (_ :: Proxy X1R5G5B5) <- cast proxy = G.PIXMAN_x1r5g5b5
+    | Just (_ :: Proxy A1B5G5R5) <- cast proxy = G.PIXMAN_a1b5g5r5
+    | Just (_ :: Proxy X1B5G5R5) <- cast proxy = G.PIXMAN_x1b5g5r5
+    | Just (_ :: Proxy A4R4G4B4) <- cast proxy = G.PIXMAN_a4r4g4b4
+    | Just (_ :: Proxy X4R4G4B4) <- cast proxy = G.PIXMAN_x4r4g4b4
+    | Just (_ :: Proxy A4B4G4R4) <- cast proxy = G.PIXMAN_a4b4g4r4
+    | Just (_ :: Proxy X4B4G4R4) <- cast proxy = G.PIXMAN_x4b4g4r4
+    | Just (_ :: Proxy A8) <- cast proxy = G.PIXMAN_a8
+    | Just (_ :: Proxy R3G3B2) <- cast proxy = G.PIXMAN_r3g3b2
+    | Just (_ :: Proxy B2G3R3) <- cast proxy = G.PIXMAN_b2g3r3
+    | Just (_ :: Proxy A2R2G2B2) <- cast proxy = G.PIXMAN_a2r2g2b2
+    | Just (_ :: Proxy A2B2G2R2) <- cast proxy = G.PIXMAN_a2b2g2r2
+    | Just (_ :: Proxy C8) <- cast proxy = G.PIXMAN_c8
+    | Just (_ :: Proxy G8) <- cast proxy = G.PIXMAN_g8
+    | Just (_ :: Proxy X4A4) <- cast proxy = G.PIXMAN_x4a4
+    | Just (_ :: Proxy X4C4) <- cast proxy = G.PIXMAN_x4c4
+    | Just (_ :: Proxy X4G4) <- cast proxy = G.PIXMAN_x4g4
+    | Just (_ :: Proxy A4) <- cast proxy = G.PIXMAN_a4
+    | Just (_ :: Proxy R1G2B1) <- cast proxy = G.PIXMAN_r1g2b1
+    | Just (_ :: Proxy B1G2R1) <- cast proxy = G.PIXMAN_b1g2r1
+    | Just (_ :: Proxy A1R1G1B1) <- cast proxy = G.PIXMAN_a1r1g1b1
+    | Just (_ :: Proxy A1B1G1R1) <- cast proxy = G.PIXMAN_a1b1g1r1
+    | Just (_ :: Proxy C4) <- cast proxy = G.PIXMAN_c4
+    | Just (_ :: Proxy G4) <- cast proxy = G.PIXMAN_g4
+    | Just (_ :: Proxy A1) <- cast proxy = G.PIXMAN_a1
+    | Just (_ :: Proxy G1) <- cast proxy = G.PIXMAN_g1
+    | Just (_ :: Proxy YUY2) <- cast proxy = G.PIXMAN_yuy2
+    | Just (_ :: Proxy YV12) <- cast proxy = G.PIXMAN_yv12
+    | otherwise = error "unknown format type"
 
 formatTypes :: [(FormatType, String)]
 formatTypes =
@@ -872,18 +841,32 @@ data OP a where
 deriving instance Eq (OP a)
 deriving instance Ord (OP a)
 deriving instance Show (OP a)
+instance Enum Operation where
+  toEnum = toOperation . toEnum
+  fromEnum = fromEnum . fromOperation
+  --succ = toOperation . succ . fromOperation
+  --pred = toOperation . pred . fromOperation
+  --enumFromThen f t = map toOperation $ enumFromThen (fromOperation f) (fromOperation t)
+  enumFromTo f e = map toOperation $ enumFromTo (fromOperation f) (fromOperation e)
+  --enumFromThenTo f t e = map toOperation $ enumFromThenTo (fromOperation f) (fromOperation t) (fromOperation e)
+instance Bounded Operation where
+  minBound = toOperation minBound
+  maxBound = toOperation maxBound
 
-instance Storable (OP Void) where
+deriving via (CE.AsCEnum G.Pixman_op_t) instance Bounded G.Pixman_op_t
+deriving via (CE.AsCEnum G.Pixman_op_t) instance Enum G.Pixman_op_t
+
+instance Storable Operation where
   sizeOf _ = sizeOf @G.Pixman_op_t undefined
   alignment _ = alignment @G.Pixman_op_t undefined
-  peek p = toOP <$> peek (castPtr p)
-  poke p a = poke (castPtr p) (fromOP a)
+  peek p = toOperation <$> peek (castPtr p)
+  poke p a = poke (castPtr p) (fromOperation a)
 
 data REVERSE = NORMAL | REVERSE
   deriving stock (Eq, Ord, Show, Read, Generic)
 
-fromOP :: OP Void -> G.Pixman_op_t
-fromOP = \case
+fromOperation :: Operation -> G.Pixman_op_t
+fromOperation = \case
   CLEAR -> G.PIXMAN_OP_CLEAR
   SRC -> G.PIXMAN_OP_SRC
   DST -> G.PIXMAN_OP_DST
@@ -938,8 +921,8 @@ fromOP = \case
   HSL_COLOR -> G.PIXMAN_OP_HSL_COLOR
   HSL_LUMINOSITY -> G.PIXMAN_OP_HSL_LUMINOSITY
 
-toOP :: G.Pixman_op_t -> OP Void
-toOP = \case
+toOperation :: G.Pixman_op_t -> Operation
+toOperation = \case
   G.PIXMAN_OP_CLEAR -> CLEAR
   G.PIXMAN_OP_SRC -> SRC
   G.PIXMAN_OP_DST -> DST
@@ -1096,14 +1079,14 @@ newtype Kernel = Kernel {unwrap :: G.Pixman_kernel_t}
   deriving stock (Eq, Show, Generic)
   deriving newtype (Ord, Storable)
 
-pattern KernelImpulse = Kernel G.PIXMAN_KERNEL_IMPULSE
+pattern Impulse = Kernel G.PIXMAN_KERNEL_IMPULSE
 pattern KernelBox = Kernel G.PIXMAN_KERNEL_BOX
-pattern KernelLinear = Kernel G.PIXMAN_KERNEL_LINEAR
-pattern KernelCubic = Kernel G.PIXMAN_KERNEL_CUBIC
-pattern KernelGaussian = Kernel G.PIXMAN_KERNEL_GAUSSIAN
-pattern KernelLanczos2 = Kernel G.PIXMAN_KERNEL_LANCZOS2
-pattern KernelLanczos3 = Kernel G.PIXMAN_KERNEL_LANCZOS3
-pattern KernelLanczos3Stretched = Kernel G.PIXMAN_KERNEL_LANCZOS3_STRETCHED
+pattern Linear = Kernel G.PIXMAN_KERNEL_LINEAR
+pattern Cubic = Kernel G.PIXMAN_KERNEL_CUBIC
+pattern Gaussian = Kernel G.PIXMAN_KERNEL_GAUSSIAN
+pattern Lanczos2 = Kernel G.PIXMAN_KERNEL_LANCZOS2
+pattern Lanczos3 = Kernel G.PIXMAN_KERNEL_LANCZOS3
+pattern Lanczos3Stretched = Kernel G.PIXMAN_KERNEL_LANCZOS3_STRETCHED
 
 -- | Describes overlap of a region with a rectangle.
 newtype Overlap = Overlap {unwrap :: G.Pixman_region_overlap_t}
@@ -1395,27 +1378,24 @@ instance IsImage Solid where
 instance IsImage Gradient where
   toImage = coerce
 
-newEmptyTypedImage :: forall format m. (IsImageFormat format, PrimMonad m) => Size Int -> Bool -> m (TypedImage format)
-newEmptyTypedImage size clear = coerce <$> newImageWithBits (imageFormatCode $ Proxy @format) size clear nullPtr 0
-
-newTypedImageWithBits :: forall format m. (IsImageFormat format, PrimMonad m) => Size Int -> Bool -> Ptr Word32 -> Int -> m (TypedImage format)
-newTypedImageWithBits si cl b rs = coerce <$> newImageWithBits (imageFormatCode $ Proxy @format) si cl b rs
-
 -- | Initialize a new image with null data.
 --
 -- @newEmptyImage format (w, h) clear@
 --
 -- See 'newImageWithBits'.
-newEmptyImage :: (PrimMonad m) => FormatCode -> Size Int -> Bool -> m Image
-newEmptyImage fmt size clear = newImageWithBits fmt size clear nullPtr 0
+newEmptyImage :: forall format m. (IsImageFormat format, PrimMonad m) => Size Int -> Bool -> m (TypedImage format)
+newEmptyImage size clear = coerce <$> newImageWithBits' (imageFormatCode $ Proxy @format) size clear nullPtr 0
 
 -- | Initialize image with provided bits.
 --
 -- @newImageWithBits format (w, h) clear data rowstride_bytes@
 --
 -- @pixman_image_create_bits{,_no_clear}@
-newImageWithBits :: (PrimMonad m) => FormatCode -> Size Int -> Bool -> Ptr Word32 -> Int -> m Image
-newImageWithBits fmt (width, height) clear bits stride = unsafeIOToPrim $ newImage =<< imageFromBits
+newImageWithBits :: forall format m. (IsImageFormat format, PrimMonad m) => Size Int -> Bool -> Ptr Word32 -> Int -> m (TypedImage format)
+newImageWithBits si cl b rs = coerce <$> newImageWithBits' (imageFormatCode $ Proxy @format) si cl b rs
+
+newImageWithBits' :: (PrimMonad m) => FormatCode -> Size Int -> Bool -> Ptr Word32 -> Int -> m Image
+newImageWithBits' fmt (width, height) clear bits stride = unsafeIOToPrim $ newImage =<< imageFromBits
   where
     imageFromBits = throwPixmanIfNull "newImageWithBits" $ f fmt (fromIntegral width) (fromIntegral height) bits (fromIntegral stride)
     f = if clear then US.pixman_image_create_bits else US.pixman_image_create_bits_no_clear
@@ -1459,13 +1439,13 @@ newRadialGradient p1 p2 innerR outerR stops = unsafeIOToPrim $ fmap coerce . new
 
 -- | Set whether the source clip was set by a client.
 setHasClientClip :: (PrimMonad m) => Bool -> Image -> m ()
-setHasClientClip x (Image fp) = unsafeIOToPrim $ withForeignPtr fp $ \img -> US.pixman_image_set_has_client_clip img (toPixmanBool x)
+setHasClientClip x imgPtr = unsafeIOToPrim $ withImagePtr imgPtr $ \img -> US.pixman_image_set_has_client_clip img (toPixmanBool x)
 
-setIndexed :: (PrimMonad m) => Indexed -> Image -> m ()
-setIndexed indexed (Image fp) = unsafeIOToPrim $ do
+setIndexed :: (PrimMonad m, IsImage img) => Indexed -> img -> m ()
+setIndexed indexed imgPtr = unsafeIOToPrim $ do
   bracketOnError (new indexed) free $ \ptr -> do
-    withForeignPtr fp $ \img -> US.pixman_image_set_indexed img (ConstPtr ptr)
-    addForeignPtrFinalizerEnv finalizeIndexed ptr fp
+    withImagePtr imgPtr $ \img -> US.pixman_image_set_indexed img (ConstPtr ptr)
+    addForeignPtrFinalizerEnv finalizeIndexed ptr (getField @"unwrap" $ toImage imgPtr)
 
 finalizeIndexed :: FinalizerEnvPtr Indexed G.Pixman_image_t
 finalizeIndexed = unsafePerformIO $ mkFinalizeIndexed $ \p _ -> free p
@@ -1482,24 +1462,24 @@ setClipRegion r
   | Just x <- cast r :: Maybe (Region R64F) = set "set_clip_region64f" US.pixman_image_set_clip_region64f x
   | otherwise = error "impossible"
   where
-    set str f reg (Image fp) = unsafeIOToPrim $ withForeignPtr fp $ \img -> throwPixmanUnless1 str $ withConstPtr reg $ f img
+    set str f reg imgPtr = unsafeIOToPrim $ withImagePtr imgPtr $ \img -> throwPixmanUnless1 str $ withConstPtr reg $ f img
 
 -- | Apply the specified transform during sampling from this image.
-setTransform :: (PrimMonad m) => Transform -> Image -> m ()
-setTransform t (Image fp) = unsafeIOToPrim $ withForeignPtr fp $ \img ->
+setTransform :: (PrimMonad m, IsImage img) => Transform -> img -> m ()
+setTransform t imgPtr = unsafeIOToPrim $ withImagePtr imgPtr $ \img ->
   throwPixmanUnless1 "image_set_transform" $ withPtr t $ US.pixman_image_set_transform img . ConstPtr . castPtr
 
 -- | Clear a previously set transform.
-clearTransform :: (PrimMonad m) => Image -> m ()
-clearTransform (Image fp) = unsafeIOToPrim $ withForeignPtr fp $ \img ->
+clearTransform :: (PrimMonad m, IsImage img) => img -> m ()
+clearTransform imgPtr = unsafeIOToPrim $ withImagePtr imgPtr $ \img ->
   throwPixmanUnless1 "image_set_transform" $ US.pixman_image_set_transform img $ ConstPtr nullPtr
 
 -- | Set the filter operation used during composition.
 --
 -- @setFilter filter params image@
-setFilter :: (PrimMonad m) => Filter -> [Fixed] -> Image -> m ()
-setFilter f params (Image fp) = unsafeIOToPrim $
-  withForeignPtr fp $ \img ->
+setFilter :: (PrimMonad m, IsImage img) => Filter -> [Fixed] -> img -> m ()
+setFilter f params imgPtr = unsafeIOToPrim $
+  withImagePtr imgPtr $ \img ->
     withArrayLen (coerce params) $ \len ptr ->
       throwPixmanUnless1 "image_set_filter" $ US.pixman_image_set_filter img (coerce f) (ConstPtr ptr) (fromIntegral len)
 
@@ -1507,38 +1487,38 @@ setFilterSeparableConvolution :: (PrimMonad m) => SeparableConvolutionSettings -
 setFilterSeparableConvolution cfg = setFilter SeparableConvolution (separableConvolutionParams cfg)
 
 -- | Set the repeat operation for this image.
-setRepeat :: (PrimMonad m) => Repeat -> Image -> m ()
-setRepeat r (Image fp) = unsafeIOToPrim $ withForeignPtr fp $ \img -> US.pixman_image_set_repeat img (coerce r)
+setRepeat :: (PrimMonad m, IsImage img) => Repeat -> img -> m ()
+setRepeat r imgPtr = unsafeIOToPrim $ withImagePtr imgPtr $ \img -> US.pixman_image_set_repeat img (coerce r)
 
 -- | Set the dither operation used during composition.
 setDither :: (PrimMonad m) => Dither -> Maybe (Int, Int) -> Image -> m ()
-setDither d moff (Image fp) = unsafeIOToPrim $ withForeignPtr fp $ \img -> do
+setDither d moff imgPtr = unsafeIOToPrim $ withImagePtr imgPtr $ \img -> do
   US.pixman_image_set_dither img (coerce d)
   maybe (return ()) (\(x, y) -> US.pixman_image_set_dither_offset img (fromIntegral x) (fromIntegral y)) moff
 
 -- | Set whether the clip applies when the image is used as a source.
 setSourceClipping :: (PrimMonad m) => Bool -> Image -> m ()
-setSourceClipping b (Image fp) = unsafeIOToPrim $
-  withForeignPtr fp $ \img ->
+setSourceClipping b imgPtr = unsafeIOToPrim $
+  withImagePtr imgPtr $ \img ->
     US.pixman_image_set_source_clipping img (toPixmanBool b)
 
 -- | Set an alpha map that will be used when this image is used as a src in a blit operation.
 setAlphaMap :: (PrimMonad m) => Image -> Int -> Int -> Image -> m ()
-setAlphaMap amap x y (Image fp) = unsafeIOToPrim $
-  withForeignPtr fp $ \img ->
+setAlphaMap amap x y imgPtr = unsafeIOToPrim $
+  withImagePtr imgPtr $ \img ->
     withPtr amap $ \amapPtr ->
       US.pixman_image_set_alpha_map img amapPtr (fromIntegral x) (fromIntegral y)
 
 -- | Clear a previously set alpha map.
 clearAlphaMap :: (PrimMonad m) => Image -> m ()
-clearAlphaMap (Image fp) = unsafeIOToPrim $
-  withForeignPtr fp $ \img ->
+clearAlphaMap imgPtr = unsafeIOToPrim $
+  withImagePtr imgPtr $ \img ->
     US.pixman_image_set_alpha_map img nullPtr 0 0
 
 -- | Set whether the image has component alpha or unified alpha.
 setComponentAlpha :: (PrimMonad m) => Bool -> Image -> m ()
-setComponentAlpha b (Image fp) = unsafeIOToPrim $
-  withForeignPtr fp $ \img ->
+setComponentAlpha b imgPtr = unsafeIOToPrim $
+  withImagePtr imgPtr $ \img ->
     US.pixman_image_set_component_alpha img (toPixmanBool b)
 
 data CompositeParameters (a :: RegionType) = CompositeParameters
@@ -1567,24 +1547,26 @@ instance (Default (PositionScalar a), Default (SizeScalar a)) => Default (Compos
 -- @
 -- setComposite @R32 Src srcimg def dstimg
 -- @
-setComposite :: (Typeable a, IsImage src, PrimMonad m) => Operation -> src -> CompositeParameters a -> Image -> m ()
+setComposite :: (Typeable a, IsImage src, PrimMonad m, IsImage dst) => Operation -> src -> CompositeParameters a -> dst -> m ()
 setComposite op src set
   | Just x <- cast set :: Maybe (CompositeParameters R16) = setCompositeInner US.pixman_image_composite id id x
   | Just x <- cast set :: Maybe (CompositeParameters R32) = setCompositeInner US.pixman_image_composite32 id fromIntegral x
   | Just x <- cast set :: Maybe (CompositeParameters R64F) = setCompositeInner US.pixman_image_composite64f CDouble CDouble x
   | otherwise = error "impossible"
   where
-    setCompositeInner :: (PrimMonad m) => _ -> (PositionScalar a -> _) -> (SizeScalar a -> _) -> CompositeParameters a -> Image -> m ()
-    setCompositeInner f f1 f2 CompositeParameters{..} (Image fp) = unsafeIOToPrim $ do
+    setCompositeInner
+      :: (PrimMonad m, IsImage dst)
+      => _ -> (PositionScalar a -> _) -> (SizeScalar a -> _) -> CompositeParameters a -> dst -> m ()
+    setCompositeInner f f1 f2 CompositeParameters{..} imgPtr = unsafeIOToPrim $ do
       let (w, h) = size
           (src_x, src_y) = srcPos
           (mask_x, mask_y) = maskPos
           (dest_x, dest_y) = destPos
       withPtr (toImage src) $ \srcP ->
-        withForeignPtr fp $ \img ->
+        withImagePtr imgPtr $ \img ->
           maybe ($ nullPtr) withPtr maskImg $ \maskP ->
             f
-              (fromOP op)
+              (fromOperation op)
               srcP
               maskP
               img
@@ -1604,7 +1586,7 @@ compositeTrapezoids op src (Image dst) maskFormat (x_src, y_src) (x_dst, y_dst) 
   withArrayLen trapsList $ \n_traps traps ->
     withPtr src $ \srcPtr ->
       withForeignPtr dst $ \dstPtr ->
-        US.pixman_composite_trapezoids (fromOP op) srcPtr dstPtr maskFormat (fi x_src) (fi y_src) (fi x_dst) (fi y_dst) (fi n_traps) (ConstPtr $ castPtr traps)
+        US.pixman_composite_trapezoids (fromOperation op) srcPtr dstPtr maskFormat (fi x_src) (fi y_src) (fi x_dst) (fi y_dst) (fi n_traps) (ConstPtr $ castPtr traps)
   where
     fi = fromIntegral
 
@@ -1615,26 +1597,26 @@ compositeTriangles op src (Image dst) maskFormat (x_src, y_src) (x_dst, y_dst) t
   withArrayLen trisList $ \n_tris tris ->
     withPtr src $ \srcPtr ->
       withForeignPtr dst $ \dstPtr ->
-        US.pixman_composite_triangles (fromOP op) srcPtr dstPtr maskFormat (fi x_src) (fi y_src) (fi x_dst) (fi y_dst) (fi n_tris) (ConstPtr $ castPtr tris)
+        US.pixman_composite_triangles (fromOperation op) srcPtr dstPtr maskFormat (fi x_src) (fi y_src) (fi x_dst) (fi y_dst) (fi n_tris) (ConstPtr $ castPtr tris)
   where
     fi = fromIntegral
 
 fillBoxes :: (PrimMonad m, IsColor color) => Operation -> color -> [Box R32] -> Image -> m ()
-fillBoxes op color boxes (Image fp) = unsafeIOToPrim $
-  withForeignPtr fp $ \img ->
+fillBoxes op color boxes imgPtr = unsafeIOToPrim $
+  withImagePtr imgPtr $ \img ->
     with (toColor color) $ \colorP ->
       withArrayLen (coerce boxes) $ \len boxesP ->
         throwPixmanUnless1 "image_fill_boxes" $
-          US.pixman_image_fill_boxes (fromOP op) img (ConstPtr $ coerce colorP) (fromIntegral len) (ConstPtr boxesP)
+          US.pixman_image_fill_boxes (fromOperation op) img (ConstPtr $ coerce colorP) (fromIntegral len) (ConstPtr boxesP)
 
 -- | @fillRectangles op color rects img@
 fillRectangles :: (PrimMonad m, IsColor color) => Operation -> color -> [Rectangle R16] -> Image -> m ()
-fillRectangles op color rects (Image fp) = unsafeIOToPrim $
-  withForeignPtr fp $ \img ->
+fillRectangles op color rects imgPtr = unsafeIOToPrim $
+  withImagePtr imgPtr $ \img ->
     with (toColor color) $ \colorP ->
       withArrayLen (coerce rects) $ \len rsP ->
         throwPixmanUnless1 "image_fill_rectangles" $
-          US.pixman_image_fill_rectangles (fromOP op) img (ConstPtr $ coerce colorP) (fromIntegral len) (ConstPtr rsP)
+          US.pixman_image_fill_rectangles (fromOperation op) img (ConstPtr $ coerce colorP) (fromIntegral len) (ConstPtr rsP)
 
 -- | @addTriangles offset tris img@
 addTriangles :: (IsImageFormat format, ImageFormatType format ~ A, PrimMonad m) => (Int, Int) -> [Triangle] -> TypedImage format -> m ()
@@ -1690,18 +1672,19 @@ addTrapezoids = imageAddGeneric castPtr US.pixman_add_trapezoids
 
 imageAddGeneric :: (_) => _ -> _f -> (Int, Int) -> _xs -> Image -> m ()
 {-# INLINE imageAddGeneric #-}
-imageAddGeneric trans f (x_off, y_off) xs (Image fp) = unsafeIOToPrim $
-  withForeignPtr fp $ \img ->
+imageAddGeneric trans f (x_off, y_off) xs imgPtr = unsafeIOToPrim $
+  withImagePtr imgPtr $ \img ->
     withArrayLen xs $ \len xsP ->
       f img (fromIntegral x_off) (fromIntegral y_off) (fromIntegral len) (ConstPtr $ trans xsP)
 
 -- | Compute the composite region for the specified src.
 computeCompositeRegion ::
-  Image
+  (IsImage src, IsImage dst) =>
+  src
   -- ^ @src_image@
   -> Maybe Image
   -- ^ @mask_image@
-  -> Image
+  -> dst
   -- ^ @dest_image@
   -> Position Int
   -- ^ @(src_x, src_y)@
@@ -1713,9 +1696,9 @@ computeCompositeRegion ::
   -- ^ @(width, height)@
   -> Region16
 computeCompositeRegion src mask' dest (sx, sy) (mx, my) (dx, dy) (w, h) = unsafePerformIO $
-  withPtr src $ \srcP ->
-    maybe ($ nullPtr) withPtr mask' $ \maskP ->
-      withPtr dest $ \destP ->
+  withImagePtr src $ \srcP ->
+    maybe ($ nullPtr) withImagePtr mask' $ \maskP ->
+      withImagePtr dest $ \destP ->
         withNewRegion16 $ \p ->
           throwPixmanUnless1 "computeCompositeRegion" $
             US.pixman_compute_composite_region
@@ -2078,7 +2061,7 @@ instance IsRegion (Region R16) where
     with exts $ US.pixman_region_init_with_extents p . ConstPtr
 
   fromImage img = unsafePerformIO $ do
-    when (imageFormat img /= A1) $ throwIO $ PixmanException "regionFromImage: image format needs to be A1"
+    when (imageFormat img /= G.PIXMAN_a1) $ throwIO $ PixmanException "regionFromImage: image format needs to be A1"
     withNewRegion16 $ \p ->
       withPtr img $ US.pixman_region_init_from_image p
 
@@ -2185,7 +2168,7 @@ instance IsRegion (Region R32) where
       with exts $ US.pixman_region32_init_with_extents p . ConstPtr
 
   fromImage img = unsafePerformIO $ do
-    when (imageFormat img /= A1) $ throwIO $ PixmanException "regionFromImage: image format needs to be A1"
+    when (imageFormat img /= G.PIXMAN_a1) $ throwIO $ PixmanException "regionFromImage: image format needs to be A1"
     withNewRegion32 $ \p ->
       withPtr img $ US.pixman_region32_init_from_image p
 
@@ -2296,7 +2279,7 @@ instance IsRegion (Region R64F) where
       with exts $ US.pixman_region64f_init_with_extents p . ConstPtr
 
   fromImage img = unsafePerformIO $ do
-    when (imageFormat img /= A1) $ throwIO $ PixmanException "regionFromImage: image format needs to be A1"
+    when (imageFormat img /= G.PIXMAN_a1) $ throwIO $ PixmanException "regionFromImage: image format needs to be A1"
     withNewRegion64F $ \p ->
       withPtr img $ US.pixman_region64f_init_from_image p
 

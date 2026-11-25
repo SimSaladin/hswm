@@ -106,7 +106,6 @@ makeHeader = makeLocation . makeSymbolicPath @Pkg @File
 
 -- TODO: graph dependency resolution
 instance G.IsNode HsBindGen where
-
   type Key HsBindGen = ModuleName
 
   nodeKey x = fromFlag x.moduleName
@@ -219,8 +218,7 @@ newtype ProtocolVersion = ProtocolVersion {unwrap :: Int}
 -- | Structured protocol keys
 data ProtocolId = ProtocolId
   { name :: !String
-
-  ,  stability :: !Stability
+  , stability :: !Stability
   , version :: !ProtocolVersion
   }
   deriving stock (Eq, Ord, Show, Read, Generic)

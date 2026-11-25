@@ -8,11 +8,10 @@
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
---
-module HSWM.Util.Posix
-  ( module HSWM.Util.Posix
-  , CSize
-  ) where
+module HSWM.Util.Posix (
+  module HSWM.Util.Posix,
+  CSize,
+) where
 
 -- #define _GNU_SOURCE
 -- #include <unistd.h>
@@ -20,9 +19,9 @@ module HSWM.Util.Posix
 -- #include <fcntl.h>
 -- #include <poll.h>
 
-import System.Posix (Fd(..))
-import qualified System.Posix as P
 import System.IO.Unsafe (unsafePerformIO)
+import System.Posix (Fd (..))
+import System.Posix qualified as P
 
 -- | Retrieve description for a signal
 strsignal :: CInt -> IO String
@@ -57,8 +56,9 @@ createShm size = bracketOnError (memfdCreate "hswm-shm") P.closeFd $ \fd -> do
     fcntl fd _F_ADD_SEALS (_F_SEAL_GROW .|. _F_SEAL_SHRINK .|. _F_SEAL_SEAL)
     return (fd, ptr)
   where
-    mmap fd = throwErrnoIf (== mapFailed) "mmap" $
-      c_mmap nullPtr (fi size) (protRead .|. protWrite) mapShared fd 0
+    mmap fd =
+      throwErrnoIf (== mapFailed) "mmap" $
+        c_mmap nullPtr (fi size) (protRead .|. protWrite) mapShared fd 0
 
 foreign import capi "fcntl.h value F_ADD_SEALS" _F_ADD_SEALS :: CUInt
 foreign import capi "fcntl.h value F_SEAL_GROW" _F_SEAL_GROW :: CUInt
@@ -89,28 +89,34 @@ foreign import ccall unsafe "mmap"
 -- * Poll
 
 data PollFd = PollFd
-  { pollfd_fd      :: {-# UNPACK #-} !Fd -- ^ Fd to poll
-  , pollfd_events  :: {-# UNPACK #-} !CShort -- ^ types of events poller cares about
-  , pollfd_revents :: {-# UNPACK #-} !CShort -- ^ types of events that actually occurred
-  } deriving (Eq, Show)
+  { pollfd_fd :: {-# UNPACK #-} !Fd
+  -- ^ Fd to poll
+  , pollfd_events :: {-# UNPACK #-} !CShort
+  -- ^ types of events poller cares about
+  , pollfd_revents :: {-# UNPACK #-} !CShort
+  -- ^ types of events that actually occurred
+  }
+  deriving (Eq, Show)
 
-data PollResult = PollResult !Int
-                | PollTimeout
+data PollResult
+  = PollResult !Int
+  | PollTimeout
   deriving (Eq, Ord, Show)
 
-data PollTimeout = PollBlock
-                 | PollWaitMs Int
+data PollTimeout
+  = PollBlock
+  | PollWaitMs Int
   deriving (Eq, Ord, Show)
 
---setPollEvents :: Ptr PollFd -> CShort -> IO ()
---setPollEvents p ev = #{poke struct pollfd, events} p ev
+-- setPollEvents :: Ptr PollFd -> CShort -> IO ()
+-- setPollEvents p ev = #{poke struct pollfd, events} p ev
 --
---isRevent :: Ptr PollFd -> CShort -> IO Bool
---isRevent p ev = do
+-- isRevent :: Ptr PollFd -> CShort -> IO Bool
+-- isRevent p ev = do
 --  rev <- #{peek struct pollfd, revents} p
 --  return $ rev .&. ev /= 0
 --
---instance Storable PollFd where
+-- instance Storable PollFd where
 --  sizeOf    _ = #{size struct pollfd}
 --  alignment _ = #{alignment struct pollfd}
 --  peek p = PollFd
@@ -123,25 +129,25 @@ data PollTimeout = PollBlock
 --    #{poke struct pollfd, revents} p revents
 
 ---- | There is data to read
---pOLLIN :: CShort
---pOLLIN = #{const POLLIN}
+-- pOLLIN :: CShort
+-- pOLLIN = #{const POLLIN}
 --
---pOLLOUT :: CShort
---pOLLOUT = #{const POLLOUT}
+-- pOLLOUT :: CShort
+-- pOLLOUT = #{const POLLOUT}
 --
 ---- | Hang up
---pOLLHUP :: CShort
---pOLLHUP = #{const POLLHUP}
+-- pOLLHUP :: CShort
+-- pOLLHUP = #{const POLLHUP}
 
 foreign import capi "poll.h value POLLIN" pOLLIN :: CShort
 foreign import capi "poll.h value POLLOUT" pOLLOUT :: CShort
 foreign import capi "poll.h value POLLHUP" pOLLHUP :: CShort
 
---withPollFds :: [PollFd] -> ((Ptr PollFd, CULong) -> IO a) -> IO a
---withPollFds fds f = withArray fds $ \p -> f (p, fi $ length fds)
+-- withPollFds :: [PollFd] -> ((Ptr PollFd, CULong) -> IO a) -> IO a
+-- withPollFds fds f = withArray fds $ \p -> f (p, fi $ length fds)
 --
---poll :: Ptr PollFd -> Int -> PollTimeout -> IO PollResult
---poll pfd npfd time = do
+-- poll :: Ptr PollFd -> Int -> PollTimeout -> IO PollResult
+-- poll pfd npfd time = do
 --  r <- throwErrnoIfMinus1 "poll" $ c_poll pfd (fi npfd) (asPollTimeout time)
 --  return $! if r == 0 then PollTimeout else PollResult (fi r)
 --  where
@@ -158,17 +164,22 @@ foreign import ccall unsafe "poll"
 -- @
 --   closeRange 0 maxBound False True
 -- @
-closeRange :: Integral i
-           => i -- ^ First fd to close
-           -> i -- ^ Last fd (max)
-           -> Bool -- ^ Don't close, just set CLOEXEC?
-           -> Bool -- ^ Unshare the fds before closing?
-           -> IO ()
+closeRange ::
+  (Integral i) =>
+  i
+  -- ^ First fd to close
+  -> i
+  -- ^ Last fd (max)
+  -> Bool
+  -- ^ Don't close, just set CLOEXEC?
+  -> Bool
+  -- ^ Unshare the fds before closing?
+  -> IO ()
 closeRange start end cloexec unshare =
   throwErrnoIfMinus1_ "close_range" $
     c_close_range (fi start) (fi end) $
-      (if cloexec then _CLOSE_RANGE_CLOEXEC else 0) .|.
-      (if unshare then _CLOSE_RANGE_UNSHARE else 0)
+      (if cloexec then _CLOSE_RANGE_CLOEXEC else 0)
+        .|. (if unshare then _CLOSE_RANGE_UNSHARE else 0)
 
 foreign import capi "unistd.h value CLOSE_RANGE_CLOEXEC" _CLOSE_RANGE_CLOEXEC :: CInt
 foreign import capi "unistd.h value CLOSE_RANGE_UNSHARE" _CLOSE_RANGE_UNSHARE :: CInt

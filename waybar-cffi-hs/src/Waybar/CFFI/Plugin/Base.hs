@@ -86,6 +86,7 @@ import GHC.Records
 
 -- | Data types that implement this class can be turned into Waybar CFFI plugins.
 class (MonadTrans (PluginContextT plugin), A.FromJSON (PluginConfig plugin)) => WaybarPlugin (plugin :: Type) where
+
   -- | Execution context of the plugin callbacks.
   type PluginContextT plugin :: ((Type -> Type) -> Type -> Type)
 
@@ -95,6 +96,8 @@ class (MonadTrans (PluginContextT plugin), A.FromJSON (PluginConfig plugin)) => 
   -- | Initalize a new instance.
   init :: PluginM plugin plugin
 
+  -- | This callback initializes the plugin state. For types that implement "Default" there
+  -- exists a default implementation.
   pluginStateInit :: PluginConfig plugin -> GlobalM plugin (PluginState plugin)
   default pluginStateInit :: (Default (PluginState plugin)) => PluginConfig plugin -> GlobalM plugin (PluginState plugin)
   pluginStateInit _ = return def

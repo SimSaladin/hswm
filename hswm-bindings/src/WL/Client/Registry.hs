@@ -186,9 +186,10 @@ registryBindObject ::
 registryBindObject st name maxVersion = liftIO $ do
   o <- objectBindWrap <$> registryBind st.registryPtr name (objectInterface @a Proxy) limitVer
   ver <- getVersion o
-  atomicModifyIORef st.globals $ (,()) .
-    let f x = x{proxyObject = Just (SomeObject name ver o)}
-     in M.adjust f name
+  atomicModifyIORef st.globals $
+    (,())
+      . let f x = x{proxyObject = Just (SomeObject name ver o)}
+         in M.adjust f name
   (regOnBind st.registrySettings) @a Proxy name ver
   return o
   where

@@ -11,6 +11,7 @@
 -- Portability : unportable
 module HSWM.Types.Window (
   module HSWM.Types.Window,
+
   -- * Re-exports
   module X,
 ) where
@@ -90,16 +91,17 @@ data WindowRenderAction
 -- * Lenses
 
 instance HasPosition Window where
-  position = lens (.position) (\s a -> s { position = a } :: Window)
+  position = lens (.position) (\s a -> s{position = a} :: Window)
 
 instance HasSize Window where
-  size = lens (.size) (\s a -> s { size = a } :: Window)
+  size = lens (.size) (\s a -> s{size = a} :: Window)
 
 makeLensesCombine'
-  ((lensClass %~ (\f n -> if n == ''Window then Just (mkName "HasWindow", mkName "windowL") else f n))
-  . ignoreFields ["position", "size"]
+  ( (lensClass %~ (\f n -> if n == ''Window then Just (mkName "HasWindow", mkName "windowL") else f n))
+      . ignoreFields ["position", "size"]
   )
-  ["position"] [''Window]
+  ["position"]
+  [''Window]
 
 instance HasRiverId Window where
   type RiverId Window = RiverWindow
@@ -111,7 +113,7 @@ instance HasWidth Window Dimension where width = size . width
 instance HasHeight Window Dimension where height = size . height
 
 instance HasRectangle Window where
-  rectangle = lens (Rectangle' <$> view position <*> view size) (\s a -> s & position .~ (a^.position) & size .~ (a^.size))
+  rectangle = lens (Rectangle' <$> view position <*> view size) (\s a -> s & position .~ (a ^. position) & size .~ (a ^. size))
 
 -- Aeson instances
 

@@ -12,9 +12,9 @@
 -- Portability : unportable
 module HSWM.Types.Seat where
 
-import HSWM.Types.KeyBindings
 import HSWM.Types.Action
 import HSWM.Types.Config
+import HSWM.Types.KeyBindings
 import HSWM.Types.Lens
 import HSWM.Types.Simple
 import HSWM.Types.Window
@@ -69,7 +69,8 @@ data Seat' (m :: Type -> Type) = Seat
   -- ^ TODO: review below
   , new :: !Bool
   , removed :: !Bool
-  , cleanupTasks :: !CleanupTasks -- ^ Misc. cleanup tasks that should be run when this seat is destroyed.
+  , cleanupTasks :: !CleanupTasks
+  -- ^ Misc. cleanup tasks that should be run when this seat is destroyed.
   }
   deriving stock (Generic)
   deriving anyclass (Default, NFData)
@@ -103,10 +104,10 @@ data SeatAction m
     S_NONE
   | -- | start pointer drag operation
     S_START_OP SeatOperation
- --  | -- | interpret next keypress for submap, swallowing an unexpected key
- --    S_SUBMAP_NEXT_KEY (SomeAction m) (XkbBindingMap2 (SomeAction m)) (Maybe (SomeAction m))
- --  | -- | Cancel submap input, resetting to root bindings.
- --    S_SUBMAP_CANCEL
+  --  | -- | interpret next keypress for submap, swallowing an unexpected key
+  --    S_SUBMAP_NEXT_KEY (SomeAction m) (XkbBindingMap2 (SomeAction m)) (Maybe (SomeAction m))
+  --  | -- | Cancel submap input, resetting to root bindings.
+  --    S_SUBMAP_CANCEL
   deriving stock (Eq, Generic, Data)
   deriving anyclass (NFData)
 
@@ -128,14 +129,16 @@ instance Default SeatOperation where def = SEAT_OP_NONE
 
 -- * Lenses
 
-makeLensesCombine' (ignoreFields ["position", "keyBindings", "repeatInfo"])
-  ["riverSeat", "keyBindings"] [''Seat', ''SeatKeyboardInfo]
+makeLensesCombine'
+  (ignoreFields ["position", "keyBindings", "repeatInfo"])
+  ["riverSeat", "keyBindings"]
+  [''Seat', ''SeatKeyboardInfo]
 
-instance HasKeyBindings (Seat' m) (KeyBindings  XBKey (SomeAction m)) where
-  keyBindings = lens (.keyBindings) (\s a -> s { keyBindings = a } :: Seat' m)
+instance HasKeyBindings (Seat' m) (KeyBindings XBKey (SomeAction m)) where
+  keyBindings = lens (.keyBindings) (\s a -> s{keyBindings = a} :: Seat' m)
 
 instance HasPosition (Seat' a) where
-  position = lens (.position) (\s a -> s { position = a } :: Seat' a)
+  position = lens (.position) (\s a -> s{position = a} :: Seat' a)
 
 instance HasX (Seat' m) Int32 where _x = position . _x
 instance HasY (Seat' m) Int32 where _y = position . _y
@@ -146,7 +149,7 @@ instance HasRiverId (Seat' m) where
   riverId = riverSeat
 
 instance HasRepeatInfo SeatKeyboardInfo where
-  repeatInfo = lens (.repeatInfo) (\s a -> s { repeatInfo = a } :: SeatKeyboardInfo)
+  repeatInfo = lens (.repeatInfo) (\s a -> s{repeatInfo = a} :: SeatKeyboardInfo)
 
 -- aeson
 

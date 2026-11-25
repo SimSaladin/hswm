@@ -7,6 +7,8 @@
 -- Stability   : unstable
 -- Portability : unportable
 module HSWM.IPC (
+  ClientException(..),
+  SocketDisconnected(..),
   -- * Client
   ClientConfig (..),
   MonadIPCClient,
@@ -17,6 +19,7 @@ module HSWM.IPC (
   sendMsg',
   syncRequest,
   syncReceive,
+  handleMessages,
   recvLines,
 
   -- * Message Types
@@ -216,7 +219,7 @@ newtype OutputId = OutputId {unwrap :: Int}
 
 -- | Workspace identifier type
 newtype WsId = WsId {unwrap :: ShortText}
-  deriving newtype (Eq, Show, Read, A.FromJSON, A.ToJSON, IsString)
+  deriving newtype (Eq, Ord, Show, Read, A.FromJSON, A.ToJSON, IsString)
 
 instance Default RWorkspaces where def = RWorkspaces def (def, "") def
 instance Default WindowInfo where def = WindowInfo def "" "" "" def

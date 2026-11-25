@@ -50,7 +50,6 @@ import HsBindgen.Runtime.PtrConst
 
 import Control.Arrow
 import Control.DeepSeq (NFData)
-import UnliftIO.Exception (finally)
 import Control.Monad
 import Control.Monad.IO.Class
 import Data.Aeson qualified as A
@@ -73,6 +72,7 @@ import Language.Haskell.TH
 import Language.Haskell.TH.Syntax
 import System.IO.Unsafe (unsafePerformIO)
 import Text.Read (Read (..))
+import UnliftIO.Exception (finally)
 import Prelude hiding (head)
 
 data ProtocolRenderSettings = ProtocolRenderSettings
@@ -371,7 +371,7 @@ renderMethod s iface req
             [argSelf | length argsT >= length (filter (not . argIsNewId) req.args)]
               ++ filter (not . argIsNewId) req.args
       [d|
-        instance MonadIO $(varT fIO) => HasMethod $(varT fIO) $(litT (strTyLit req.name)) $(conT ntName) where
+        instance (MonadIO $(varT fIO)) => HasMethod $(varT fIO) $(litT (strTyLit req.name)) $(conT ntName) where
           type
             ObjectMethod $(varT fIO) $(conT ntName) $(litT (strTyLit req.name)) =
               $(mapType (VarT fIO) (reqArgs ++ filter argIsNewId req.args) rawTy)
@@ -385,13 +385,14 @@ renderMethod s iface req
       rhsN <- replicateM (length args) (newName "p")
       let args' = [argTrans arg ty a | (a, (arg, ty)) <- zip lhsN args]
       lamE (varP <$> lhsN) $
-        appE (varE 'liftIO) $ doE $
-          [bindS (varP b) x | (b, (x, _)) <- zip rhsN args']
-            ++ [noBindS [|(coerce <$> $(appsE $ fn : map varE rhsN)) `finally` $(doE [noBindS (x n) | (n, (_, Just x)) <- zip rhsN args' ++ [(undefined, (undefined, Just $ const [|return ()|]))]])|]]
+        appE (varE 'liftIO) $
+          doE $
+            [bindS (varP b) x | (b, (x, _)) <- zip rhsN args']
+              ++ [noBindS [|(coerce <$> $(appsE $ fn : map varE rhsN)) `finally` $(doE [noBindS (x n) | (n, (_, Just x)) <- zip rhsN args' ++ [(undefined, (undefined, Just $ const [|return ()|]))]])|]]
 
     ntName = mkName $ s.prTypeNameModifier iface.name
-    --since = fromIntegral $ fromMaybe iface.version req.since :: Int
-    --doc = "Since protocol version " ++ show since
+    -- since = fromIntegral $ fromMaybe iface.version req.since :: Int
+    -- doc = "Since protocol version " ++ show since
 
     mapType fIO (_ : args) (AppT _ t) = mapType' fIO args t
     mapType _ _ _ = error "mapType"
@@ -529,11 +530,11 @@ renderInterfaceObject s iface = concat <$> sequence [renderNT, renderIsWlObject,
       where
         doc = "@" ++ show (iface.name, iface.version) ++ "@"
 
-    --renderIsLabel =
-    --  [d|
-    --    instance (HasMethod f t $(conT ntName), p ~ ObjectMethod f $(conT ntName) t) => IsLabel t ($(conT ntName) -> p) where
-    --      fromLabel = objectMethod @f @t
-    --    |]
+-- renderIsLabel =
+--  [d|
+--    instance (HasMethod f t $(conT ntName), p ~ ObjectMethod f $(conT ntName) t) => IsLabel t ($(conT ntName) -> p) where
+--      fromLabel = objectMethod @f @t
+--    |]
 
 argIsNewId :: Arg -> Bool
 argIsNewId Arg{argType = t}

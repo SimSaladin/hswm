@@ -8,7 +8,6 @@
 -- Portability : unportable
 module WL.Internals.Utils where
 
-import UnliftIO.Exception
 import Control.Monad
 import Data.Char (isSpace)
 import Data.Functor
@@ -20,6 +19,7 @@ import GHC.Records (HasField, getField)
 import Text.ParserCombinators.ReadP qualified as P
 import Text.ParserCombinators.ReadPrec qualified as R
 import Text.Read.Lex (readHexP)
+import UnliftIO.Exception
 
 peekMaybeCString :: ConstPtr CChar -> IO (Maybe String)
 peekMaybeCString (ConstPtr ptr)

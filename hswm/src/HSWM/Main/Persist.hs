@@ -41,7 +41,7 @@ maybeRestoreState opts conf = do
   st <- fromMaybe newEmpty <$> readStateFile opts.mainStateFile conf
   return (conf{layoutHook = Layout conf.layoutHook}, st)
 
-writeStateToFile :: HasCallStack => HS FilePath
+writeStateToFile :: (HasCallStack) => HS FilePath
 writeStateToFile = do
   dir <- getStateDirectory
   ts <- getTimeStamp

@@ -11,6 +11,17 @@
 let
   inherit (inputs.flake-utils.lib) mkApp;
 
+  fixGhcDocs =
+    ghc:
+    ghc.overrideAttrs (oa: {
+      postInstall = oa.postInstall or "" + ''
+        find $out -name '*.copy' -type f -exec sh -c 'chmod +w "$1"; chmod +w $(dirname "$1")' - {} \;
+        find $out -name '*.copy' -type f -delete
+        chmod -R +w $out/lib/*/lib/package.conf.d
+        $out/bin/ghc-pkg recache
+      '';
+    });
+
   useLld =
     {
       config,
@@ -32,13 +43,6 @@ let
           ghc2 = ghc.overrideAttrs (oa: {
             depsBuildTargetPropagated = oa.depsBuildTarget ++ [ ghc.llvmPackages.bintoolsNoLibc ];
             propagatedBuildInputs = oa.propagatedBuildInputs or [ ] ++ [ ghc.llvmPackages.bintoolsNoLibc ];
-            #postInstall = oa.postInstall or "" + ''
-            #  find $out -name '*.copy' -exec sh -c 'chmod +w "$1"; chmod +w $(dirname "$1")' - {} \;
-            #  find $out -name '*.copy' -exec ls -la {} \;
-            #  find $out -name '*.copy' -delete
-            #  chmod -R +w $out/lib/ghc-9.14.1/lib/package.conf.d
-            #  $out/bin/ghc-pkg recache
-            #'';
           });
         in
         ghc2;
@@ -66,15 +70,9 @@ let
           ghc9141llvm = ghcUseLdLld p.haskell-nix.compiler.ghc9141llvm;
         };
 
-      #cabalProjectFreeze = lib.mkForce ''
-      #  constraints: alex installed
-      #'';
-
       shell = {
         packages = ps: [ ps.hswm ];
         buildInputs = [ libc ];
-        exactDeps = lib.mkForce false;
-        allToolDeps = lib.mkForce false;
       };
     };
 
@@ -85,7 +83,9 @@ let
       pkgs,
       ...
     }:
-    #let ghc = (config.compilerSelection pkgs.buildPackages).${config.compiler-nix-name}; in
+    let
+      ghc0 = (config.compilerSelection pkgs.buildPackages).${config.compiler-nix-name};
+    in
     {
       name = "hswm";
       src = pkgs.project-lib.fixCabalProjectImports {
@@ -98,6 +98,8 @@ let
         haskell-nix-hs-bindgen-module
         haskell-nix-hswm-module
       ];
+
+      ghcOverride = fixGhcDocs ghc0;
 
       #cabalProjectFreeze = builtins.readFile ../cabal.project.freeze.ghc914;
 
@@ -112,11 +114,7 @@ let
         tools.cabal-install = { };
         exactDeps = true;
         allToolDeps = true;
-        #withHaddock = true;
-        #withHoogle = true;
         nativeBuildInputs = [
-          # Use a newer cabal-install binary
-          #pkgs.cabal_3_18_1_0
           config.hsPkgs.hs-bindgen.components.exes.hs-bindgen-cli
         ];
         buildInputs = [ ];
@@ -133,6 +131,7 @@ let
         };
         variants.ghc912 = {
           compiler-nix-name = lib.mkForce "ghc912";
+          ghcOverride = lib.mkForce null;
           cabalProjectFreeze = lib.mkForce ''
             constraints: boring +tagged,
                          any.transformers ==0.6.1.2,
@@ -144,7 +143,6 @@ let
           shell = {
             tools.cabal-install = { };
             nativeBuildInputs = [
-              #cabal-3_18-912 =
               #(mk-cabal {
               #  inherit pkgs;
               #  compiler-nix-name = "ghc912";
@@ -333,47 +331,32 @@ let
     project:
     project
     // {
+      projectVariants = lib.mapAttrs (_: modifyProject) project.projectVariants;
       flake' = project.flake' // {
         devShells = modifyShells project project.flake'.devShells;
-      };
-    };
-
-  customizations.perSystem =
-    {
-      config,
-      pkgs,
-      #project,
-      project-lld,
-      project-lib,
-      ...
-    }:
-    let
-      projects = [
-        {
-          key = "project";
-          project = project-lld;
-        }
-      ];
-    in
-    {
-      apps = {
-        # Note: needs to run with checkMaterialization = false
-        materialized-do = mkMaterializedDoApp {
-          inherit pkgs project-lib projects;
+        packages = project.flake'.packages // {
+          default = project.pkgs.callPackage makeProjectRuntime {
+            flakePkgs = project.flake'.packages;
+          };
         };
-      };
-
-      packages = {
-        default = pkgs.callPackage makeProjectRuntime {
-          flakePkgs = config.packages;
+        apps = project.flake'.apps // {
+          # Note: needs to run with checkMaterialization = false
+          materialized-do = mkMaterializedDoApp {
+            inherit (project) pkgs;
+            inherit (project.pkgs) project-lib;
+            projects = [
+              {
+                key = "project";
+                inherit project;
+              }
+            ];
+          };
         };
       };
     };
 in
 
 {
-  imports = [ customizations ];
-
   flake.overlays.project = final: _: {
     project-lld = final.haskell-nix.cabalProject' [
       hswmProject

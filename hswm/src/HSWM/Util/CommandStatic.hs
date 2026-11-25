@@ -10,11 +10,14 @@ module HSWM.Util.CommandStatic (
   -- * Create command
   mkCommand,
   mkCommand_,
+
   -- * Run command
   runCommand,
   runCommandJSON,
+
   -- * Command registration
   registerCommand,
+
   -- * Types
   SomeCommand (..),
   Command,
@@ -81,10 +84,13 @@ instance Show SomeCommand where
 --
 -- myTask :: InputArgs -> H ()
 -- @
-mkCommand
-  :: StaticPtr (Dict (CommandCtx arg res)) -- ^ Context
-  -> StaticPtr (arg -> H res) -- ^ Command
-  -> Maybe ()  -- ^ Argument (unused)
+mkCommand ::
+  StaticPtr (Dict (CommandCtx arg res))
+  -- ^ Context
+  -> StaticPtr (arg -> H res)
+  -- ^ Command
+  -> Maybe ()
+  -- ^ Argument (unused)
   -> Command arg res
 mkCommand dict action _arg =
   Command

@@ -22,21 +22,21 @@ spec :: Spec
 spec = do
   describe "Pixman" $ do
     it "create empty image" $ do
-      img <- newEmptyImage X8R8G8B8 (100, 100) True
+      img <- newEmptyImage @X8R8G8B8 (100, 100) True
       f img
 
     it "create image with transform" $ do
       let ft = scaleTransform 5 5 False $ translate 5 5 False identityTransform
           t1 = fromFTransform ft
       pix <- do
-        img <- newEmptyImage X8R8G8B8 (100, 100) True
+        img <- newEmptyImage @X8R8G8B8 (100, 100) True
         setTransform t1 img
         setFilter FilterBest [] img
         return img
       let comp :: CompositeParameters R32
           comp = compositeSize (100, 100) def
       res <- do
-        img <- newEmptyImage X8R8G8B8 (100, 100) True
+        img <- newEmptyImage @X8R8G8B8 (100, 100) True
         setComposite SRC pix comp img
         return img
       imageWidth res `shouldBe` 100
@@ -67,7 +67,7 @@ spec = do
 
     it "image from bits" $ do
       withArray (replicate (50 * 50) maxBound) $ \bits -> do
-        img <- newImageWithBits A8R8G8B8 (50, 50) True bits (50 * 4)
+        img <- newImageWithBits @A8R8G8B8 (50, 50) True bits (50 * 4)
         let p = imageData img
         xs <- peekArray (imageWidth img * imageHeight img) p
         all (== maxBound) xs `shouldBe` True
@@ -91,19 +91,17 @@ spec = do
     it "formats" $ do
       forM_ allFormats $ \x -> do
         void $ evaluate $ force (x, formatSupportedDest x, formatSupportedSource x)
-        img <- newEmptyImage x (50, 50) True
-        void $ f img
 
     it "computeCompositeRegion" $ do
-      src <- newEmptyImage A8R8G8B8 (10, 100) True
-      dst <- newEmptyImage A8R8G8B8 (100, 100) True
+      src <- newEmptyImage @A8R8G8B8 (10, 100) True
+      dst <- newEmptyImage @A8R8G8B8 (100, 100) True
       let reg = computeCompositeRegion src Nothing dst (0, 0) (0, 0) (0, 0) (50, 50)
       void . evaluate $ force $ show reg
 
   describe "Triangles" $ do
     it "add triangles" $ do
       img <- do
-        img <- newEmptyTypedImage @A8 (100, 100) True
+        img <- newEmptyImage @A8 (100, 100) True
         addTriangles (20, 20) [Triangle (Point (-5) 0) (Point 5 5) (Point 6 0)] img
         return img
       f img
@@ -196,6 +194,16 @@ spec = do
        in
         b1 `seq` t6 `seq` (() `shouldBe` ())
 
+  describe "Operations" $ do
+    modifyMaxSuccess (* 8) $
+      prop "fromOperation . toOpretion == id" $
+        \(op :: Operation) -> (toOperation . fromOperation) op `shouldBe` op
+    prop "instance Storable" $
+      \(op :: Operation) -> with op $ \ptr -> do
+        op' <- peek ptr
+        op' `shouldBe` op
+
+
 f :: (Show a) => a -> IO ()
 f = void . evaluate . force . show
 
@@ -207,14 +215,14 @@ regionSpec ty = describe ("Region " ++ show (typeOf ty)) $ do
     f $ fromRect @a (10, 10) (500, 500)
 
   it "fromImage" $ do
-    img <- newTypedImageWithBits (100, 100) True nullPtr 0
+    img <- newImageWithBits (100, 100) True nullPtr 0
     let bpp = formatBPP (imageFormat img)
     fill (imageData img, imageStride img, bpp, (1, 1)) (5, 5) maxBound
     let reg = fromImage @a img
     regionSelfCheck reg `shouldBe` True
 
   it "fromImage fail" $ do
-    img <- newEmptyTypedImage @X4B4G4R4 (100, 100) True
+    img <- newEmptyImage @X4B4G4R4 (100, 100) True
     let reg = fromImage @a (fromJust $ cast img)
     evaluate reg `shouldThrow` anyException
 
@@ -248,3 +256,6 @@ instance (IsBox (Box a), Arbitrary (PositionScalar a), Ord (PositionScalar a)) =
 
 instance (IsRegion (Region a), Arbitrary (PositionScalar (RType (Region a))), Ord (PositionScalar (RType (Region a)))) => Arbitrary (Region a) where
   arbitrary = fromRects <$> arbitrary
+
+instance Arbitrary Operation where
+  arbitrary = elements [minBound .. maxBound]

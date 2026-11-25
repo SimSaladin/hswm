@@ -1,5 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE ViewPatterns #-}
+
 -- |
 -- Module      : HSWM.Util.StackSet.Lens
 -- Description : Lenses for working with StackSets
@@ -17,11 +18,12 @@
 module HSWM.Util.StackSet.Lens where
 
 import HSWM.Types.Lens
---import HSWM.Types.Simple
-import qualified HSWM.StackSet as W
+
+-- import HSWM.Types.Simple
+import HSWM.StackSet qualified as W
 
 makeLensesWith'
-  (classPerType
+  ( classPerType
       & lensClass
         .~ (\(nameBase -> n) -> Just (mkName $ "Has" ++ n ++ "L", mkName $ (n & _head %~ toLower) ++ "L"))
   )

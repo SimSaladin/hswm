@@ -72,7 +72,7 @@ waybarTask oper = withOptionalObject $ \WaybarState{wbProcess, wbConfig} -> do
       let pc =
             setStdin nullStream $
               setStdout (logOutput logFn "waybar" LevelInfo ["stream" .= ("stdout" :: String)]) $
-              setStderr (logOutput logFn "waybar" LevelWarn ["stream" .= ("stderr" :: String)]) $
+                setStderr (logOutput logFn "waybar" LevelWarn ["stream" .= ("stderr" :: String)]) $
                   setCloseFds True $
                     setNewSession True $
                       proc cfg.command cfg.args

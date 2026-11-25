@@ -1,7 +1,7 @@
+{-# LANGUAGE ExplicitNamespaces #-}
 {-# LANGUAGE PatternSynonyms #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE NoFieldSelectors #-}
-{-# LANGUAGE ExplicitNamespaces #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 -- |
@@ -12,53 +12,60 @@
 -- Maintainer  : Samuli Thomasson <samuli.thomasson@pm.me>
 -- Stability   : unstable
 -- Portability : unportable
-module HSWM.Types.Simple
-  (
+module HSWM.Types.Simple (
   -- * Dimension
   Dimension,
+
   -- * Position1D
   Position1D,
+
   -- * Size
-  Size(..),
+  Size (..),
+
   -- * Position (Point)
-  Position(.., Point),
+  Position (.., Point),
   Point,
+
   -- * Rectangle
-  Rectangle(.., Rectangle, height, width, x, y),
+  Rectangle (.., Rectangle, height, width, x, y),
+
   -- ** Functions
   pointWithin,
   scaleRationalRect,
   rationalRectIn,
   screenRect,
+
   -- * Direction1D, 2D
-  Direction1D(..),
-  Direction2D(..),
+  Direction1D (..),
+  Direction2D (..),
+
   -- * RepeatInfo
-  RepeatInfo(..),
+  RepeatInfo (..),
+
   -- * CleanaupTasks
-  CleanupTasks(..),
+  CleanupTasks (..),
 
   -- * RationalRect
   centerRationalRect,
 
   -- * Lenes
-  HasNew(..),
-  HasName(..),
-  HasRectangle(..),
-  HasPosition(..),
-  HasSize(..),
-  HasY(..),
-  HasX(..),
-  HasWidth(..),
-  HasHeight(..),
-  HasRepeatInfo(..),
-  ) where
+  HasNew (..),
+  HasName (..),
+  HasRectangle (..),
+  HasPosition (..),
+  HasSize (..),
+  HasY (..),
+  HasX (..),
+  HasWidth (..),
+  HasHeight (..),
+  HasRepeatInfo (..),
+) where
 
-import qualified Data.Aeson as A
-import           Data.Ratio
-import qualified HSWM.StackSet as W
-import           HSWM.Types.Lens
-import           Data.Data
+import Data.Aeson qualified as A
+import Data.Data
+import Data.Ratio
+import HSWM.StackSet qualified as W
+import HSWM.Types.Lens
 
 -- XXX
 instance Data (IO ()) where
@@ -87,8 +94,8 @@ data Position = Position {x, y :: {-# UNPACK #-} !Position1D}
 -- | A position on the (screen) output surface
 type Point = Position
 
---pattern Point :: Position1D -> Position1D -> Point
---pattern Point{x, y} = Position{x, y}
+-- pattern Point :: Position1D -> Position1D -> Point
+-- pattern Point{x, y} = Position{x, y}
 pattern Point :: Position1D -> Position1D -> Point
 pattern Point x y = Position{x, y}
 
@@ -136,7 +143,7 @@ data RepeatInfo = RepeatInfo {rate, delay :: {-# UNPACK #-} !Int32}
 
 -- * CleanupTask
 
-newtype CleanupTasks = CleanupTasks { runCleanupTasks :: IO () }
+newtype CleanupTasks = CleanupTasks {runCleanupTasks :: IO ()}
   deriving (Generic)
 instance NFData CleanupTasks where
   rnf x = x `seq` ()
@@ -189,16 +196,17 @@ centerRationalRect r =
 
 makeFieldClassesIfMissing ["name", "new"]
 
-makeLensesCombine' (ignoreFields ["size", "position"])
+makeLensesCombine'
+  (ignoreFields ["size", "position"])
   ["width", "height", "x", "y", "size", "position"]
   [''RepeatInfo, ''Size, ''Position, ''Rectangle]
 
 makeLensesWith' classPerField [''W.RationalRect]
 
 instance HasPosition Rectangle where
-  position = lens (.position) (\s a -> s { position = a })
+  position = lens (.position) (\s a -> s{position = a})
 instance HasSize Rectangle where
-  size = lens (.size) (\s a -> s { size = a })
+  size = lens (.size) (\s a -> s{size = a})
 
 -- | To get rectangle from e.g. screen dimensions.
 screenRect :: (MonadReader s m, HasRectangle s) => m Rectangle
@@ -226,4 +234,3 @@ instance ToJSON RepeatInfo where
 
 instance FromJSON RepeatInfo where
   parseJSON = genericParseJSON aesonOptions
-
