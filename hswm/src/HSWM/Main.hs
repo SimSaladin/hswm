@@ -300,6 +300,7 @@ instance HandleEvent H R.RiverSeatEvent where
 
 instance HandleEvent H R.RiverWindowEvent where
   handleEvent = Windows.handleEvent
+
 instance HandleEvent H R.RiverWindowManagerEvent where
   handleEvent = \case
     R.RiverWindowManagerOutput _ _ out -> Outputs.added out
